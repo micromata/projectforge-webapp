@@ -26,7 +26,10 @@ package org.projectforge.ldap;
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.common.BeanHelper;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.xml.stream.XmlObjectReader;
+import org.projectforge.xml.stream.XmlObjectWriter;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -72,6 +75,9 @@ public class PFUserDOConverter
     if (ldapUser.isRestrictedUser() == true || LdapUserDao.isRestrictedUser(ldapUser) == true) {
       user.setRestrictedUser(true);
     }
+    if (isPosixAccountValuesEmpty(ldapUser) == false) {
+      user.setLdapValues(getLdapValuesAsXml(ldapUser));
+    }
     return user;
   }
 
@@ -93,7 +99,105 @@ public class PFUserDOConverter
       ldapUser.setMail(LdapUserDao.DEACTIVATED_MAIL);
     }
     ldapUser.setRestrictedUser(user.isRestrictedUser());
+    setLdapValues(ldapUser, user.getLdapValues());
     return ldapUser;
+  }
+
+  public static boolean isPosixAccountValuesEmpty(final LdapUser ldapUser)
+  {
+    return ldapUser.getUidNumber() == null
+        && StringUtils.isBlank(ldapUser.getHomeDirectory()) == true
+        && StringUtils.isBlank(ldapUser.getLoginShell()) == true
+        && ldapUser.getGidNumber() == null;
+  }
+
+  /**
+   * Sets the LDAP values such as posix account properties of the given ldapUser configured in the given xml string.
+   * @param ldapUser
+   * @param ldapValuesAsXml Posix account values as xml.
+   */
+  public static void setLdapValues(final LdapUser ldapUser, final String ldapValuesAsXml)
+  {
+    if (StringUtils.isBlank(ldapValuesAsXml) == true) {
+      return;
+    }
+    final LdapConfig ldapConfig = ConfigXml.getInstance().getLdapConfig();
+    final LdapPosixAccountsConfig posixAccountsConfig = ldapConfig != null ? ldapConfig.getPosixAccountsConfig() : null;
+    if (posixAccountsConfig == null) {
+      // No posix account default values configured
+      return;
+    }
+    final LdapUserValues values = readLdapUserValues(ldapValuesAsXml);
+    if (values == null) {
+      return;
+    }
+    if (values.getUidNumber() != null) {
+      ldapUser.setUidNumber(values.getUidNumber());
+    } else {
+      ldapUser.setUidNumber(-1);
+    }
+    if (values.getGidNumber() != null) {
+      ldapUser.setGidNumber(values.getGidNumber());
+    } else {
+      ldapUser.setGidNumber(posixAccountsConfig.getDefaultGidNumber());
+    }
+    if (StringUtils.isNotBlank(values.getHomeDirectory()) == true) {
+      ldapUser.setHomeDirectory(values.getHomeDirectory());
+    } else {
+      ldapUser.setHomeDirectory(posixAccountsConfig.getHomeDirectoryPrefix() + ldapUser.getUid());
+    }
+    if (StringUtils.isNotBlank(values.getLoginShell()) == true) {
+      ldapUser.setLoginShell(values.getLoginShell());
+    } else {
+      ldapUser.setLoginShell(posixAccountsConfig.getDefaultLoginShell());
+    }
+  }
+
+  public static LdapUserValues readLdapUserValues(final String ldapValuesAsXml)
+  {
+    if (StringUtils.isBlank(ldapValuesAsXml) == true) {
+      return null;
+    }
+    final XmlObjectReader reader = new XmlObjectReader();
+    reader.initialize(LdapUserValues.class);
+    final LdapUserValues values = (LdapUserValues) reader.read(ldapValuesAsXml);
+    return values;
+  }
+
+  /**
+   * Exports the LDAP values such as posix account properties of the given ldapUser as xml string.
+   * @param ldapUser
+   */
+  public static String getLdapValuesAsXml(final LdapUser ldapUser)
+  {
+    final LdapConfig ldapConfig = ConfigXml.getInstance().getLdapConfig();
+    final LdapPosixAccountsConfig posixAccountsConfig = ldapConfig != null ? ldapConfig.getPosixAccountsConfig() : null;
+    if (posixAccountsConfig == null) {
+      // No posix account default values configured
+      return null;
+    }
+    final LdapUserValues values = new LdapUserValues();
+    if (ldapUser.getUidNumber() != null) {
+      values.setUidNumber(ldapUser.getUidNumber());
+    }
+    if (ldapUser.getGidNumber() != null) {
+      values.setGidNumber(ldapUser.getGidNumber());
+    }
+    values.setHomeDirectory(ldapUser.getHomeDirectory());
+    values.setLoginShell(ldapUser.getLoginShell());
+    return getLdapValuesAsXml(values);
+  }
+
+  /**
+   * Exports the LDAP values such as posix account properties of the given ldapUser as xml string.
+   * @param ldapUser
+   */
+  public static String getLdapValuesAsXml(final LdapUserValues values)
+  {
+    final XmlObjectReader reader = new XmlObjectReader();
+    reader.initialize(LdapUserValues.class);
+    final String xml = XmlObjectWriter.writeAsXml(values);
+    return xml;
   }
 
   public static String buildEmployeeNumber(final PFUserDO user)
@@ -124,8 +228,14 @@ public class PFUserDOConverter
   {
     setMailNullArray(src);
     setMailNullArray(dest);
-    final boolean modified = BeanHelper.copyProperties(src, dest, true, "commonName", "givenName", "surname", "mail", "description",
-        "organization", "deactivated", "restrictedUser");
+    boolean modified;
+    if (LdapUserDao.isPosixAccountsConfigured() == true && isPosixAccountValuesEmpty(src) == false) {
+      modified = BeanHelper.copyProperties(src, dest, true, "commonName", "givenName", "surname", "mail", "description", "organization",
+          "deactivated", "restrictedUser", "uidNumber", "gidNumber", "homeDirectory", "loginShell");
+    } else {
+      modified = BeanHelper.copyProperties(src, dest, true, "commonName", "givenName", "surname", "mail", "description", "organization",
+          "deactivated", "restrictedUser");
+    }
     return modified;
   }
 

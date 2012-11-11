@@ -36,7 +36,10 @@ import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.projectforge.common.NumberHelper;
+import org.projectforge.core.ConfigXml;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -63,7 +66,9 @@ public class LdapUserDao extends LdapDao<String, LdapUser>
 
   private LdapPersonDao ldapPersonDao;
 
-  public static final String OBJECT_CLASS_POSIX_ACCOUNT = "posixAccount";
+  private static String[] ADDITIONAL_POSIX_OBJECT_CLASSES;
+
+  private static String POSIX_OBJECT_CLASS = "posixAccount";
 
   public static boolean isDeactivated(final LdapUser user)
   {
@@ -77,6 +82,16 @@ public class LdapUserDao extends LdapDao<String, LdapUser>
     return user.isRestrictedUser()
         || user.getOrganizationalUnit() != null
         && LdapUtils.getOu(user.getOrganizationalUnit()).contains(RESTRICTED_USER_SUB_CONTEXT) == true;
+  }
+
+  public static boolean isPosixAccountsConfigured()
+  {
+    final LdapConfig ldapConfig = ConfigXml.getInstance().getLdapConfig();
+    if (ldapConfig == null) {
+      return false;
+    }
+    final LdapPosixAccountsConfig posixAccountsConfig = ldapConfig.getPosixAccountsConfig();
+    return posixAccountsConfig != null;
   }
 
   public LdapUserDao()
@@ -99,7 +114,37 @@ public class LdapUserDao extends LdapDao<String, LdapUser>
   @Override
   protected String[] getAdditionalObjectClasses()
   {
-    return ldapPersonDao.getAdditionalObjectClasses();
+    if (isPosixAccountsConfigured() == true) {
+      if (ADDITIONAL_POSIX_OBJECT_CLASSES == null) {
+        final String[] personObjectClasses = ldapPersonDao.getAdditionalObjectClasses();
+        ADDITIONAL_POSIX_OBJECT_CLASSES = new String[personObjectClasses.length + 1];
+        for (int i = 0; i < personObjectClasses.length; i++) {
+          ADDITIONAL_POSIX_OBJECT_CLASSES[i] = personObjectClasses[i];
+        }
+        ADDITIONAL_POSIX_OBJECT_CLASSES[personObjectClasses.length] = POSIX_OBJECT_CLASS;
+      }
+      return ADDITIONAL_POSIX_OBJECT_CLASSES;
+    } else {
+      return ldapPersonDao.getAdditionalObjectClasses();
+    }
+  }
+
+  /**
+   * @see org.projectforge.ldap.LdapDao#getAdditionalObjectClasses(org.projectforge.ldap.LdapObject)
+   */
+  protected String[] getAdditionalObjectClasses(final LdapUser obj)
+  {
+    if (isPosixAccountsConfigured() == true) {
+      if (PFUserDOConverter.isPosixAccountValuesEmpty(obj) == true) {
+        // Get additional object classes without posixAccount because no posix account value is given.
+        return ldapPersonDao.getAdditionalObjectClasses();
+      } else {
+        // Get additional object classes including the posixAccount because posix account values are given.
+        return getAdditionalObjectClasses();
+      }
+    } else {
+      return ldapPersonDao.getAdditionalObjectClasses();
+    }
   }
 
   /**
@@ -128,6 +173,14 @@ public class LdapUserDao extends LdapDao<String, LdapUser>
   {
     final LdapUser user = new LdapUser();
     ldapPersonDao.mapToObject(dn, user, attributes);
+    if (isPosixAccountsConfigured() == true) {
+      String no = LdapUtils.getAttributeStringValue(attributes, "uidNumber");
+      user.setUidNumber(NumberHelper.parseInteger(no));
+      no = LdapUtils.getAttributeStringValue(attributes, "gidNumber");
+      user.setGidNumber(NumberHelper.parseInteger(no));
+      user.setHomeDirectory(LdapUtils.getAttributeStringValue(attributes, "homeDirectory"));
+      user.setLoginShell(LdapUtils.getAttributeStringValue(attributes, "loginShell"));
+    }
     if (dn != null) {
       if (dn.contains(DEACTIVATED_SUB_CONTEXT2) == true) {
         user.setDeactivated(true);
@@ -416,6 +469,19 @@ public class LdapUserDao extends LdapDao<String, LdapUser>
   {
     list = ldapPersonDao.getModificationItems(list, user);
     createAndAddModificationItems(list, "cn", user.getCommonName());
+    if (isPosixAccountsConfigured() == true && PFUserDOConverter.isPosixAccountValuesEmpty(user) == false) {
+      final List<String> missedObjectClasses = LdapUtils.getMissedObjectClasses(getAdditionalObjectClasses(user), getObjectClass(),
+          user.getObjectClasses());
+      if (CollectionUtils.isNotEmpty(missedObjectClasses) == true) {
+        for (final String missedObjectClass : missedObjectClasses) {
+          list.add(createModificationItem(DirContext.ADD_ATTRIBUTE, "objectClass", missedObjectClass));
+        }
+      }
+      createAndAddModificationItems(list, "uidNumber", String.valueOf(user.getUidNumber()));
+      createAndAddModificationItems(list, "gidNumber", String.valueOf(user.getGidNumber()));
+      createAndAddModificationItems(list, "homeDirectory", user.getHomeDirectory());
+      createAndAddModificationItems(list, "loginShell", user.getLoginShell());
+    }
     return list;
   }
 
