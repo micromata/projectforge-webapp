@@ -1078,4 +1078,13 @@ public class ConfigXml
   {
     return ldapConfig;
   }
+
+  /**
+   * @param ldapConfig the ldapConfig to set
+   * @return this for chaining.
+   */
+  public void setLdapConfig(final LdapConfig ldapConfig)
+  {
+    this.ldapConfig = ldapConfig;
+  }
 }
