@@ -38,8 +38,10 @@ import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -69,6 +71,7 @@ import org.projectforge.web.I18nCore;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.common.MultiChoiceListHelper;
 import org.projectforge.web.wicket.AbstractEditForm;
+import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
@@ -118,7 +121,9 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
 
   LdapUserValues ldapUserValues;
 
-  TextField< ? > usernameTextField, uidNumberField, gidNumberField, homeDirectoryField, loginShellField;
+  private TextField< ? > usernameTextField;
+
+  private final FormComponent< ? >[] dependentLdapFormComponents = new FormComponent< ? >[4];
 
   public UserEditForm(final UserEditPage parentPage, final PFUserDO data)
   {
@@ -398,74 +403,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     gridBuilder.newGrid16(true);
     addAssignedGroups(adminAccess);
     if (adminAccess == true && Login.getInstance().hasExternalUsermanagementSystem() == true) {
-      gridBuilder.newGrid16(true);
-      gridBuilder.newFormHeading(getString("ldap"));
-      gridBuilder.newColumnsPanel();
-      gridBuilder.newColumnPanel(DivType.COL_50);
-      WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("user.localUser"), "localUser",
-          new PropertyModel<Boolean>(data, "localUser"), getString("user.localUser.tooltip"));
-      if (LdapUserDao.isPosixAccountsConfigured() == true) {
-        {
-          final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.uidNumber"), getString("ldap.posixAccount"), true);
-          uidNumberField = new MinMaxNumberField<Integer>(fs.getTextFieldId(), new PropertyModel<Integer>(ldapUserValues, "uidNumber"), 1,
-              65535);
-          WicketUtils.setSize(uidNumberField, 6);
-          fs.add(uidNumberField);
-          if (ldapUserValues.isPosixAccountValuesEmpty() == true) {
-            final AjaxButton createButton = new AjaxButton(SingleButtonPanel.WICKET_ID, this) {
-              @Override
-              protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
-              {
-                data.setUsername(usernameTextField.getRawInput());
-                LdapPosixAccountsUtils.setDefaultValues(ldapUserValues, data);
-                uidNumberField.setEnabled(true);
-                gidNumberField.setEnabled(true);
-                homeDirectoryField.setEnabled(true);
-                loginShellField.setEnabled(true);
-                this.setVisible(false);
-                target.add(this, uidNumberField, gidNumberField, homeDirectoryField, loginShellField);
-              }
-
-              @Override
-              protected void onError(final AjaxRequestTarget target, final Form< ? > form)
-              {
-                target.add(UserEditForm.this.feedbackPanel);
-              }
-            };
-            createButton.setDefaultFormProcessing(false);
-            fs.add(new SingleButtonPanel(fs.newChildId(), createButton, gridBuilder.getString("create"), SingleButtonPanel.GREY));
-            WicketUtils.addTooltip(createButton, gridBuilder.getString("ldap.posixAccount.createDefault.tooltip"));
-          }
-        }
-        {
-          final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.gidNumber"), getString("ldap.posixAccount"));
-          gidNumberField = new MinMaxNumberField<Integer>(fs.getTextFieldId(), new PropertyModel<Integer>(ldapUserValues, "gidNumber"), 1,
-              65535);
-          WicketUtils.setSize(gidNumberField, 6);
-          fs.add(gidNumberField);
-        }
-      }
-      gridBuilder.newColumnPanel(DivType.COL_50);
-      WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("user.restrictedUser"), "restrictedUser", new PropertyModel<Boolean>(data,
-          "restrictedUser"), getString("user.restrictedUser.tooltip"));
-      if (LdapUserDao.isPosixAccountsConfigured() == true) {
-        {
-          final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.homeDirectory"), getString("ldap.posixAccount"));
-          homeDirectoryField = new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(ldapUserValues, "homeDirectory"));
-          fs.add(homeDirectoryField);
-        }
-        {
-          final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.loginShell"), getString("ldap.posixAccount"));
-          loginShellField = new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(ldapUserValues, "loginShell"));
-          fs.add(loginShellField);
-        }
-        if (ldapUserValues.isPosixAccountValuesEmpty() == true) {
-          uidNumberField.setEnabled(false);
-          gidNumberField.setEnabled(false);
-          homeDirectoryField.setEnabled(false);
-          loginShellField.setEnabled(false);
-        }
-      }
+      addLdapStuff();
     }
     if (adminAccess == true) {
       addRights();
@@ -473,6 +411,129 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
 
     gridBuilder.newGrid16();
     createDescription(gridBuilder, data);
+  }
+
+  @SuppressWarnings("serial")
+  private void addLdapStuff()
+  {
+    gridBuilder.newGrid16(true);
+    gridBuilder.newFormHeading(getString("ldap"));
+    gridBuilder.newColumnsPanel();
+    gridBuilder.newColumnPanel(DivType.COL_50);
+    WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("user.localUser"), "localUser", new PropertyModel<Boolean>(data, "localUser"),
+        getString("user.localUser.tooltip"));
+    if (LdapUserDao.isPosixAccountsConfigured() == false) {
+      return;
+    }
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.uidNumber"), getString("ldap.posixAccount"), true);
+      final MinMaxNumberField<Integer> uidNumberField = new MinMaxNumberField<Integer>(fs.getTextFieldId(), new PropertyModel<Integer>(
+          ldapUserValues, "uidNumber"), 1, 65535);
+      WicketUtils.setSize(uidNumberField, 6);
+      fs.add(uidNumberField);
+      fs.addHelpIcon(gridBuilder.getString("ldap.uidNumber.tooltip"));
+      dependentLdapFormComponents[0] = uidNumberField;
+      if (ldapUserValues.isPosixAccountValuesEmpty() == true) {
+        final AjaxButton createButton = new AjaxButton(SingleButtonPanel.WICKET_ID, this) {
+          @Override
+          protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
+          {
+            data.setUsername(usernameTextField.getRawInput());
+            LdapPosixAccountsUtils.setDefaultValues(ldapUserValues, data);
+            for (final FormComponent< ? > component : dependentLdapFormComponents) {
+              component.setEnabled(true);
+            }
+            this.setVisible(false);
+            target.add(this, dependentLdapFormComponents[0], dependentLdapFormComponents[1], dependentLdapFormComponents[2],
+                dependentLdapFormComponents[3]);
+          }
+
+          @Override
+          protected void onError(final AjaxRequestTarget target, final Form< ? > form)
+          {
+            target.add(UserEditForm.this.feedbackPanel);
+          }
+        };
+        createButton.setDefaultFormProcessing(false);
+        fs.add(new SingleButtonPanel(fs.newChildId(), createButton, gridBuilder.getString("create"), SingleButtonPanel.GREY));
+        WicketUtils.addTooltip(createButton, gridBuilder.getString("ldap.posixAccount.createDefault.tooltip"));
+      }
+    }
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.gidNumber"), getString("ldap.posixAccount"));
+      final MinMaxNumberField<Integer> gidNumberField = new MinMaxNumberField<Integer>(fs.getTextFieldId(), new PropertyModel<Integer>(
+          ldapUserValues, "gidNumber"), 1, 65535);
+      WicketUtils.setSize(gidNumberField, 6);
+      fs.add(gidNumberField);
+      dependentLdapFormComponents[1] = gidNumberField;
+    }
+    gridBuilder.newColumnPanel(DivType.COL_50);
+    WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("user.restrictedUser"), "restrictedUser", new PropertyModel<Boolean>(data,
+        "restrictedUser"), getString("user.restrictedUser.tooltip"));
+    if (LdapUserDao.isPosixAccountsConfigured() == true) {
+      {
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.homeDirectory"), getString("ldap.posixAccount"));
+        final MaxLengthTextField homeDirectoryField = new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(ldapUserValues,
+            "homeDirectory"), 255);
+        fs.add(homeDirectoryField);
+        dependentLdapFormComponents[2] = homeDirectoryField;
+      }
+      {
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.loginShell"), getString("ldap.posixAccount"));
+        final MaxLengthTextField loginShellField = new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(ldapUserValues,
+            "loginShell"), 100);
+        fs.add(loginShellField);
+        dependentLdapFormComponents[3] = loginShellField;
+      }
+      if (ldapUserValues.isPosixAccountValuesEmpty() == true) {
+        for (final FormComponent< ? > component : dependentLdapFormComponents) {
+          component.setEnabled(false);
+        }
+      }
+    }
+    add(new IFormValidator() {
+      @Override
+      public FormComponent< ? >[] getDependentFormComponents()
+      {
+        return dependentLdapFormComponents;
+      }
+
+      @SuppressWarnings("unchecked")
+      @Override
+      public void validate(final Form< ? > form)
+      {
+        final MinMaxNumberField<Integer> uidNumberField = (MinMaxNumberField<Integer>) dependentLdapFormComponents[0];
+        final MinMaxNumberField<Integer> gidNumberField = (MinMaxNumberField<Integer>) dependentLdapFormComponents[1];
+        final MaxLengthTextField homeDirectoryField = (MaxLengthTextField) dependentLdapFormComponents[2];
+        final MaxLengthTextField loginShellField = (MaxLengthTextField) dependentLdapFormComponents[3];
+        final LdapUserValues values = new LdapUserValues();
+        values.setUidNumber(uidNumberField.getConvertedInput());
+        values.setGidNumber(gidNumberField.getConvertedInput());
+        values.setHomeDirectory(homeDirectoryField.getConvertedInput());
+        values.setLoginShell(loginShellField.getConvertedInput());
+        if (StringUtils.isBlank(data.getLdapValues()) == true && values.isPosixAccountValuesEmpty() == true) {
+          // Nothing to validate: all fields are zero and posix account wasn't set for this user before.
+          return;
+        }
+        if (values.getUidNumber() == null) {
+          uidNumberField.error(getLocalizedMessage(WebConstants.I18N_KEY_FIELD_REQUIRED, getString("ldap.uidNumber")));
+        } else {
+          if (LdapPosixAccountsUtils.isGivenNumberFree(data, values.getUidNumber()) == false) {
+            uidNumberField.error(getLocalizedMessage("ldap.uidNumber.alreadyInUse", LdapPosixAccountsUtils.getNextFreeUidNumber()));
+          }
+        }
+        if (values.getGidNumber() == null) {
+          gidNumberField.error(getLocalizedMessage(WebConstants.I18N_KEY_FIELD_REQUIRED, getString("ldap.gidNumber")));
+        }
+        if (StringUtils.isBlank(values.getHomeDirectory()) == true) {
+          homeDirectoryField.error(getLocalizedMessage(WebConstants.I18N_KEY_FIELD_REQUIRED, getString("ldap.homeDirectory")));
+        }
+        if (StringUtils.isBlank(values.getLoginShell()) == true) {
+          loginShellField.error(getLocalizedMessage(WebConstants.I18N_KEY_FIELD_REQUIRED, getString("ldap.loginShell")));
+        }
+      }
+    });
+
   }
 
   @SuppressWarnings("serial")
