@@ -99,9 +99,8 @@ public class LdapGroupDao extends LdapDao<String, LdapGroup>
    * @see org.projectforge.ldap.LdapDao#getModificationItems(org.projectforge.ldap.LdapObject)
    */
   @Override
-  protected List<ModificationItem> getModificationItems(List<ModificationItem> list, final LdapGroup group)
+  protected List<ModificationItem> getModificationItems(final List<ModificationItem> list, final LdapGroup group)
   {
-    list = super.getModificationItems(list, group);
     createAndAddModificationItems(list, "businessCategory", group.getBusinessCategory());
     createAndAddModificationItems(list, "o", group.getOrganization());
     createAndAddModificationItems(list, "description", group.getDescription());
