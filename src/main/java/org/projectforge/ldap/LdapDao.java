@@ -60,6 +60,11 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
 
   protected abstract String[] getAdditionalObjectClasses();
 
+  protected String[] getAdditionalObjectClasses(final T obj)
+  {
+    return getAdditionalObjectClasses();
+  }
+
   public abstract String getIdAttrId();
 
   public abstract I getId(T obj);
@@ -91,7 +96,7 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
     final Attributes attrs = new BasicAttributes();
     final List<ModificationItem> modificationItems = getModificationItems(new ArrayList<ModificationItem>(), obj);
     modificationItems.add(createModificationItem(DirContext.ADD_ATTRIBUTE, "objectClass", getObjectClass()));
-    final String[] additionalObjectClasses = getAdditionalObjectClasses();
+    final String[] additionalObjectClasses = getAdditionalObjectClasses(obj);
     if (additionalObjectClasses != null) {
       for (final String objectClass : additionalObjectClasses) {
         modificationItems.add(createModificationItem(DirContext.ADD_ATTRIBUTE, "objectClass", objectClass));
@@ -181,29 +186,7 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
     modify(ctx, obj, getModificationItems(new ArrayList<ModificationItem>(), obj));
   }
 
-  protected List<ModificationItem> getModificationItems(final List<ModificationItem> list, final T obj)
-  {
-    // if (createNewObject == true || obj.getObjectClasses() != null) {
-    // // Don't manipulate object classes while updating objects and if objectClass of object to update isn't given.
-    // // Create objectClasses which aren't yet present in given object.
-    // final List<String> missedObjectClasses = LdapUtils.getMissedObjectClasses(getAdditionalObjectClasses(), getObjectClass(),
-    // obj.getObjectClasses());
-    // addMissedObjectClasses(list, missedObjectClasses);
-    // // Create objectClasses which are present in given object but not declared by this dao.
-    // // missedObjectClasses = LdapUtils.getMissedObjectClasses(obj.getObjectClasses(), null, getAdditionalObjectClasses());
-    // // addMissedObjectClasses(list, missedObjectClasses);
-    // }
-    return list;
-  }
-
-  // private void addMissedObjectClasses(final List<ModificationItem> list, final List<String> missedObjectClasses)
-  // {
-  // if (CollectionUtils.isNotEmpty(missedObjectClasses) == true) {
-  // for (final String missedObjectClass : missedObjectClasses) {
-  // list.add(createModificationItem(DirContext.ADD_ATTRIBUTE, "objectClass", missedObjectClass));
-  // }
-  // }
-  // }
+  protected abstract List<ModificationItem> getModificationItems(final List<ModificationItem> list, final T obj);
 
   /**
    * Helper method.
