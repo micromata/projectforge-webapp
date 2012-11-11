@@ -53,20 +53,7 @@ public class WebConstants
 
   public static final String DOC_LINK_HANDBUCH_LUCENE = "/secure/doc/Handbuch.html#label_volltextsuche";
 
-  @Deprecated
-  public static final String EMBATS_ARROW_LEFT = DIR + "embats-arrow-left.png";
-
-  @Deprecated
-  public static final String EMBATS_CROSS = DIR + "embats-cross.png";
-
-  @Deprecated
-  public static final String EMBATS_PIN = DIR + "embats-pin.png";
-
-  @Deprecated
-  public static final String EMBATS_PLUS = DIR + "embats-plus.png";
-
-  @Deprecated
-  public static final String EMBATS_ARROW_RIGHT = DIR + "embats-arrow-right.png";
+  public static final String I18N_KEY_FIELD_REQUIRED = "validation.error.fieldRequired";
 
   public static final String IMAGE_ACCEPT = DIR + "accept.png";
 
@@ -149,9 +136,6 @@ public class WebConstants
   public static final String IMAGE_KUNDE_SELECT = DIR + "button_selectCustomer.png";
 
   public static final String IMAGE_KUNDE_UNSELECT = DIR + "button_unselectCustomer.png";
-
-  @Deprecated
-  public static final String IMAGE_MICROMATA_MENU_ICON = DIR + "micromata_icon.png";
 
   public static final String IMAGE_NEW = DIR + "new.png";
 
