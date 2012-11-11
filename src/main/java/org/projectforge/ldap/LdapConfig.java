@@ -25,6 +25,7 @@ package org.projectforge.ldap;
 
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.common.ReflectionToString;
+import org.projectforge.xml.stream.XmlField;
 
 /**
  * Bean used by ConfigXML (config.xml).
@@ -48,6 +49,7 @@ public class LdapConfig
 
   private String sslCertificateFile;
 
+  @XmlField(alias = "posixAccounts")
   private LdapPosixAccountsConfig posixAccountsConfig;
 
   /**
@@ -243,6 +245,15 @@ public class LdapConfig
   public LdapPosixAccountsConfig getPosixAccountsConfig()
   {
     return posixAccountsConfig;
+  }
+
+  /**
+   * @param posixAccountsConfig the posixAccountsConfig to set
+   * @return this for chaining.
+   */
+  public void setPosixAccountsConfig(final LdapPosixAccountsConfig posixAccountsConfig)
+  {
+    this.posixAccountsConfig = posixAccountsConfig;
   }
 
   /**
