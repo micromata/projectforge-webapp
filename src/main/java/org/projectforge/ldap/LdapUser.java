@@ -28,51 +28,63 @@ package org.projectforge.ldap;
  */
 public class LdapUser extends LdapPerson
 {
-  private Integer posixAccountUidNumber, posixAccountGidNumber;
+  private Integer uidNumber, gidNumber;
 
-  private String posixAccountShell, posixAccountHomeDirectoriy;
+  private String loginShell, homeDirectory;
 
-  public Integer getPosixAccountUidNumber()
+  /**
+   * @return The uid number of object class posixAccount.
+   */
+  public Integer getUidNumber()
   {
-    return posixAccountUidNumber;
+    return uidNumber;
   }
 
-  public LdapUser setPosixAccountUidNumber(final Integer posixAccountUidNumber)
+  public LdapUser setUidNumber(final Integer uidNumber)
   {
-    this.posixAccountUidNumber = posixAccountUidNumber;
+    this.uidNumber = uidNumber;
     return this;
   }
 
-  public Integer getPosixAccountGidNumber()
+  /**
+   * @return The gid number of object class posixAccount.
+   */
+  public Integer getGidNumber()
   {
-    return posixAccountGidNumber;
+    return gidNumber;
   }
 
-  public LdapUser setPosixAccountGidNumber(final Integer posixAccountGidNumber)
+  public LdapUser setGidNumber(final Integer gidNumber)
   {
-    this.posixAccountGidNumber = posixAccountGidNumber;
+    this.gidNumber = gidNumber;
     return this;
   }
 
-  public String getPosixAccountShell()
+  /**
+   * @return The login shell of object class posixAccount.
+   */
+  public String getLoginShell()
   {
-    return posixAccountShell;
+    return loginShell;
   }
 
-  public LdapUser setPosixAccountShell(final String posixAccountShell)
+  public LdapUser setLoginShell(final String loginShell)
   {
-    this.posixAccountShell = posixAccountShell;
+    this.loginShell = loginShell;
     return this;
   }
 
-  public String getPosixAccountHomeDirectoriy()
+  /**
+   * @return The home directory of object class posixAccount.
+   */
+  public String getHomeDirectory()
   {
-    return posixAccountHomeDirectoriy;
+    return homeDirectory;
   }
 
-  public LdapUser setPosixAccountHomeDirectoriy(final String posixAccountHomeDirectoriy)
+  public LdapUser setHomeDirectory(final String homeDirectory)
   {
-    this.posixAccountHomeDirectoriy = posixAccountHomeDirectoriy;
+    this.homeDirectory = homeDirectory;
     return this;
   }
 }
