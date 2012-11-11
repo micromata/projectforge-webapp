@@ -49,4 +49,32 @@ public class LdapTestUtils
     Assert.assertArrayEquals(mail, user.getMail());
     Assert.assertEquals(description, user.getDescription());
   }
+
+  public static LdapUser createLdapUser(final String username, final String firstname, final String lastname, final String email,
+      final String organization, final String description)
+  {
+    return (LdapUser) new LdapUser().setUid(username).setGivenName(firstname).setSurname(lastname).setMail(email)
+        .setOrganization(organization).setDescription(description);
+  }
+
+  public static void assertUser(final LdapUser user, final String username, final String firstname, final String lastname, final String email,
+      final String organization, final String description)
+  {
+    Assert.assertEquals(username, user.getUid());
+    Assert.assertEquals(firstname, user.getGivenName());
+    Assert.assertEquals(lastname, user.getSurname());
+    final String mail = user.getMail() != null && user.getMail().length > 0 ? user.getMail()[0] : null;
+    Assert.assertEquals(email, mail);
+    Assert.assertEquals(organization, user.getOrganization());
+    Assert.assertEquals(description, user.getDescription());
+  }
+
+  public static void assertPosixAccountValues(final LdapUser ldapUser, final Integer uid, final Integer gid, final String homeDirectory,
+      final String loginShell)
+  {
+    Assert.assertEquals(uid, ldapUser.getUidNumber());
+    Assert.assertEquals(gid, ldapUser.getGidNumber());
+    Assert.assertEquals(homeDirectory, ldapUser.getHomeDirectory());
+    Assert.assertEquals(loginShell, ldapUser.getLoginShell());
+  }
 }

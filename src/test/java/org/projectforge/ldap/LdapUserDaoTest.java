@@ -27,6 +27,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.user.PFUserDO;
 
 public class LdapUserDaoTest
@@ -34,8 +35,6 @@ public class LdapUserDaoTest
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapUserDaoTest.class);
 
   private LdapUserDao ldapUserDao;
-
-  private LdapOrganizationalUnitDao ldapOrganizationalUnitDao;
 
   private LdapRealTestHelper ldapRealTestHelper;
 
@@ -49,7 +48,7 @@ public class LdapUserDaoTest
   {
     ldapRealTestHelper = new LdapRealTestHelper().setup();
     ldapUserDao = ldapRealTestHelper.ldapUserDao;
-    ldapOrganizationalUnitDao = ldapRealTestHelper.ldapOrganizationalUnitDao;
+    ConfigXml.getInstance().getLdapConfig().setPosixAccountsConfig(new LdapPosixAccountsConfig().setDefaultGidNumber(1000));
   }
 
   @After
@@ -66,9 +65,9 @@ public class LdapUserDaoTest
       return;
     }
     final String uid = "test-user-42";
-    final LdapUser user = (LdapUser)new LdapUser().setUid(uid).setGivenName("Kai").setSurname("ProjectForge Test").setDescription("description")
-        .setHomePhoneNumber("0123").setMail("kr@acme.com").setMobilePhoneNumber("4567").setOrganization("ProjectForge")
-        .setTelephoneNumber("890").setEmployeeNumber("42");
+    final LdapUser user = (LdapUser) new LdapUser().setUid(uid).setGivenName("Kai").setSurname("ProjectForge Test")
+        .setDescription("description").setHomePhoneNumber("0123").setMail("kr@acme.com").setMobilePhoneNumber("4567")
+        .setOrganization("ProjectForge").setTelephoneNumber("890").setEmployeeNumber("42");
     user.setOrganizationalUnit(getPath());
     ldapUserDao.createOrUpdate(getPath(), user);
     final LdapUser user2 = ldapUserDao.findByUsername(uid, getPath());
@@ -98,7 +97,7 @@ public class LdapUserDaoTest
       return;
     }
     final String uid = "test-user-43";
-    final LdapUser user = (LdapUser)new LdapUser().setUid(uid).setGivenName("Kai").setSurname("ProjectForge Test").setEmployeeNumber("43");
+    final LdapUser user = (LdapUser) new LdapUser().setUid(uid).setGivenName("Kai").setSurname("ProjectForge Test").setEmployeeNumber("43");
     user.setOrganizationalUnit(getPath());
     ldapUserDao.createOrUpdate(getPath(), user);
     ldapUserDao.changePassword(user, null, "hurzel");
@@ -221,7 +220,6 @@ public class LdapUserDaoTest
     Assert.assertNull(ldapUserDao.findByUsername(uid, getPath()));
   }
 
-
   @Test
   public void posixAccountUsers()
   {
@@ -229,20 +227,35 @@ public class LdapUserDaoTest
       log.info("No LDAP server configured for tests. Skipping test.");
       return;
     }
-    final String uid = "test-user-46";
-    final PFUserDO user = new PFUserDO().setUsername(uid).setLastname("Reinhard").setFirstname("Kai").setOrganization("Micromata GmbH")
+    String uid = "test-user-46";
+    PFUserDO user = new PFUserDO().setUsername(uid).setLastname("Reinhard").setFirstname("Kai").setOrganization("Micromata GmbH")
         .setEmail("k.reinhard@acme.com");
     user.setId(46);
-    final LdapUser initialLdapUser = PFUserDOConverter.convert(user);
-    initialLdapUser.setOrganizationalUnit(getPath());
-    initialLdapUser.setPosixAccountUidNumber(1042).setPosixAccountGidNumber(1000).setPosixAccountHomeDirectoriy("/home/kai").setPosixAccountShell("/bin/bash");
-    ldapUserDao.createOrUpdate(getPath(), initialLdapUser);
-
-    final LdapUser ldapUser = ldapUserDao.findByUsername(uid, getPath());
+    final LdapUser initialLdapUser1 = PFUserDOConverter.convert(user);
+    initialLdapUser1.setOrganizationalUnit(getPath());
+    initialLdapUser1.setUidNumber(1042).setGidNumber(1000).setHomeDirectory("/home/kai").setLoginShell("/bin/bash");
+    ldapUserDao.createOrUpdate(getPath(), initialLdapUser1);
+    LdapUser ldapUser = ldapUserDao.findByUsername(uid, getPath());
     Assert.assertNotNull(ldapUser);
+    LdapTestUtils.assertPosixAccountValues(ldapUser, 1042, 1000, "/home/kai", "/bin/bash");
+
+    uid = "test-user-47";
+    user = new PFUserDO().setUsername(uid).setLastname("Reinhard").setFirstname("Kai").setOrganization("Micromata GmbH")
+        .setEmail("k.reinhard@acme.com");
+    user.setId(47);
+    final LdapUser initialLdapUser2 = PFUserDOConverter.convert(user);
+    initialLdapUser2.setOrganizationalUnit(getPath());
+    ldapUserDao.createOrUpdate(getPath(), initialLdapUser2);
+    ldapUser = ldapUserDao.findByUsername(uid, getPath());
+    Assert.assertNotNull(ldapUser);
+    LdapTestUtils.assertPosixAccountValues(ldapUser, null, null, null, null);
+    ldapUser.setUidNumber(1047).setGidNumber(1000).setHomeDirectory("/home/kai").setLoginShell("/bin/bash");
+    ldapUserDao.createOrUpdate(getPath(), ldapUser);
+    ldapUser = ldapUserDao.findByUsername(uid, getPath());
+    LdapTestUtils.assertPosixAccountValues(ldapUser, 1047, 1000, "/home/kai", "/bin/bash");
 
     // Delete user
-    ldapUserDao.delete(initialLdapUser);
-    Assert.assertNull(ldapUserDao.findByUsername(uid, getPath()));
+    ldapUserDao.delete(initialLdapUser1);
+    ldapUserDao.delete(initialLdapUser2);
   }
 }

@@ -28,6 +28,7 @@ import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.projectforge.core.ConfigXmlTest;
 import org.projectforge.fibu.kost.AccountingConfig;
 import org.projectforge.xml.stream.AliasMap;
 import org.projectforge.xml.stream.XmlObjectReader;
@@ -77,6 +78,7 @@ public class LdapRealTestHelper
   {
     if (isAvailable() == true) {
       if (ldapOrganizationalUnitDao == null) {
+        ConfigXmlTest.createTestConfiguration();
         ldapPersonDao = new LdapPersonDao();
         ldapPersonDao.setLdapConnector(ldapConnector);
         ldapUserDao = new LdapUserDao();

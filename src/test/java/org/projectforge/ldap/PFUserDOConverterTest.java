@@ -27,11 +27,24 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.projectforge.core.ConfigXml;
+import org.projectforge.core.ConfigXmlTest;
 import org.projectforge.user.PFUserDO;
 
 public class PFUserDOConverterTest
 {
+  @BeforeClass
+  public static void setup()
+  {
+    final ConfigXml xml = ConfigXmlTest.createTestConfiguration();
+    final LdapConfig ldapConfig = new LdapConfig();
+    xml.setLdapConfig(ldapConfig);
+    final LdapPosixAccountsConfig posixAccountsConfig = new LdapPosixAccountsConfig();
+    ldapConfig.setPosixAccountsConfig(posixAccountsConfig);
+  }
+
   @Test
   public void convert()
   {
@@ -109,27 +122,32 @@ public class PFUserDOConverterTest
   @Test
   public void copyLdapUser()
   {
-    final LdapUser src = createLdapUser("kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
-    LdapUser dest = createLdapUser("kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
+    final LdapUser src = LdapTestUtils.createLdapUser("kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
+    LdapUser dest = LdapTestUtils.createLdapUser("kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
     Assert.assertFalse(PFUserDOConverter.copyUserFields(src, dest));
-    assertUser(src, "kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
-    assertUser(dest, "kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
+    LdapTestUtils.assertUser(src, "kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
+    LdapTestUtils.assertUser(dest, "kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
     dest = new LdapUser();
     Assert.assertTrue(PFUserDOConverter.copyUserFields(src, dest));
-    assertUser(src, "kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
-    assertUser(dest, null, "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
+    LdapTestUtils.assertUser(src, "kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
+    LdapTestUtils.assertUser(dest, null, "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
     Assert.assertTrue(PFUserDOConverter.copyUserFields(src,
-        createLdapUser("kai", "", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer")));
+        LdapTestUtils.createLdapUser("kai", "", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer")));
     Assert.assertTrue(PFUserDOConverter.copyUserFields(src,
-        createLdapUser("kai", "", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer")));
-    Assert.assertTrue(PFUserDOConverter.copyUserFields(src, createLdapUser("kai", "Kai", "", "k.reinhard@acme.com", "Micromata", "Developer")));
-    Assert.assertTrue(PFUserDOConverter.copyUserFields(src, createLdapUser("kai", "Kai", "Reinhard", "", "Micromata", "Developer")));
-    Assert.assertTrue(PFUserDOConverter.copyUserFields(src, createLdapUser("kai", "Kai", "Reinhard", "k.reinhard@acme.com", "", "Developer")));
-    Assert.assertTrue(PFUserDOConverter.copyUserFields(src, createLdapUser("kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "")));
+        LdapTestUtils.createLdapUser("kai", "", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer")));
+    Assert.assertTrue(PFUserDOConverter.copyUserFields(src,
+        LdapTestUtils.createLdapUser("kai", "Kai", "", "k.reinhard@acme.com", "Micromata", "Developer")));
+    Assert.assertTrue(PFUserDOConverter.copyUserFields(src,
+        LdapTestUtils.createLdapUser("kai", "Kai", "Reinhard", "", "Micromata", "Developer")));
+    Assert.assertTrue(PFUserDOConverter.copyUserFields(src,
+        LdapTestUtils.createLdapUser("kai", "Kai", "Reinhard", "k.reinhard@acme.com", "", "Developer")));
+    Assert.assertTrue(PFUserDOConverter.copyUserFields(src,
+        LdapTestUtils.createLdapUser("kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "")));
   }
 
   @Test
-  public void setNullMailArray() {
+  public void setNullMailArray()
+  {
     final LdapUser ldapUser = new LdapUser();
     PFUserDOConverter.setMailNullArray(ldapUser);
     Assert.assertNull(ldapUser.getMail());
@@ -141,23 +159,21 @@ public class PFUserDOConverterTest
     Assert.assertEquals(ldapUser.getMail()[1], "Hurzel");
   }
 
-  private LdapUser createLdapUser(final String username, final String firstname, final String lastname, final String email,
-      final String organization, final String description)
+  @Test
+  public void testLdapValues()
   {
-    return (LdapUser)new LdapUser().setUid(username).setGivenName(firstname).setSurname(lastname).setMail(email).setOrganization(organization)
-        .setDescription(description);
+    PFUserDO user = new PFUserDO().setLdapValues("");
+    user.setUsername("kai");
+    LdapUser ldapUser = PFUserDOConverter.convert(user);
+    LdapTestUtils.assertPosixAccountValues(ldapUser, null, null, null, null);
+    user.setLdapValues("<values uidNumber=\"65535\" />");
+    ldapUser = PFUserDOConverter.convert(user);
+    LdapTestUtils.assertPosixAccountValues(ldapUser, 65535, -1, "/home/kai", "/bin/bash");
+    ldapUser.setUidNumber(42).setGidNumber(1000).setHomeDirectory("/home/user").setLoginShell("/bin/ksh");
+    user = PFUserDOConverter.convert(ldapUser);
+    ldapUser = PFUserDOConverter.convert(user);
+    LdapTestUtils.assertPosixAccountValues(ldapUser, 42, 1000, "/home/user", "/bin/ksh");
+    Assert.assertEquals("<values uidNumber=\"42\" gidNumber=\"1000\" homeDirectory=\"/home/user\" loginShell=\"/bin/ksh\"/>",
+        user.getLdapValues());
   }
-
-  private void assertUser(final LdapUser user, final String username, final String firstname, final String lastname, final String email,
-      final String organization, final String description)
-  {
-    Assert.assertEquals(username, user.getUid());
-    Assert.assertEquals(firstname, user.getGivenName());
-    Assert.assertEquals(lastname, user.getSurname());
-    final String mail = user.getMail() != null && user.getMail().length > 0 ? user.getMail()[0] : null;
-    Assert.assertEquals(email, mail);
-    Assert.assertEquals(organization, user.getOrganization());
-    Assert.assertEquals(description, user.getDescription());
-  }
-
 }
