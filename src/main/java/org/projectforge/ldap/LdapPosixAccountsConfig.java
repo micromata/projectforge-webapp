@@ -23,6 +23,8 @@
 
 package org.projectforge.ldap;
 
+import org.projectforge.common.ReflectionToString;
+
 /**
  * Bean used by ConfigXML (config.xml).
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -76,5 +78,14 @@ public class LdapPosixAccountsConfig
   {
     this.defaultLoginShell = defaultLoginShell;
     return this;
+  }
+
+  /**
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString()
+  {
+    return ReflectionToString.toString(this);
   }
 }
