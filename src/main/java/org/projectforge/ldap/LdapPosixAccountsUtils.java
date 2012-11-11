@@ -75,10 +75,10 @@ public class LdapPosixAccountsUtils
       if (ldapUserValues != null && ldapUserValues.getUidNumber() != null && ldapUserValues.getUidNumber().intValue() == uidNumber) {
         // Number isn't free.
         log.info("The uidNumber (posix account) '" + uidNumber + "' is already occupied by user: " + user);
-        return true;
+        return false;
       }
     }
-    return false;
+    return true;
   }
 
   /**
