@@ -49,6 +49,8 @@ public class LdapConfig
 
   private String sslCertificateFile;
 
+  private boolean storePasswords = true;
+
   @XmlField(alias = "posixAccounts")
   private LdapPosixAccountsConfig posixAccountsConfig;
 
@@ -254,6 +256,27 @@ public class LdapConfig
   public void setPosixAccountsConfig(final LdapPosixAccountsConfig posixAccountsConfig)
   {
     this.posixAccountsConfig = posixAccountsConfig;
+  }
+
+  /**
+   * Is only used in client mode.
+   * @return true if the passwords should be stored (SHA encrypted) also in ProjectForge's data-base.
+   */
+  public boolean isStorePasswords()
+  {
+    return storePasswords;
+  }
+
+  /**
+   * Should ProjectForge store the SHA-encrypted passwords in the ProjectForge's data-base? If not so wanted in LDAP client mode, set this
+   * value to false.
+   * @param storePasswords the storePasswords to set
+   * @return this for chaining.
+   */
+  public LdapConfig setStorePasswords(final boolean storePasswords)
+  {
+    this.storePasswords = storePasswords;
+    return this;
   }
 
   /**
