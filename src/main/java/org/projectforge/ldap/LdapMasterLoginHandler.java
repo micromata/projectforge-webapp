@@ -174,8 +174,8 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
         int error = 0, unmodified = 0, created = 0, updated = 0, deleted = 0, renamed = 0;
         final Set<Integer> shadowUsersWithoutLdapPasswords = new HashSet<Integer>();
         for (final PFUserDO user : users) {
+          final LdapUser updatedLdapUser = PFUserDOConverter.convert(user);
           try {
-            final LdapUser updatedLdapUser = PFUserDOConverter.convert(user);
             final LdapUser ldapUser = getLdapUser(ldapUsers, user);
             if (ldapUser == null) {
               updatedLdapUser.setOrganizationalUnit(userBase);
@@ -198,18 +198,11 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
                 shadowUsersWithoutLdapPasswords.add(user.getId()); // Paranoia code, stay-logged-in shouldn't work with deleted users.
                 deleted++;
               } else {
-                boolean modified = PFUserDOConverter.copyUserFields(updatedLdapUser, ldapUser);
+                final boolean modified = PFUserDOConverter.copyUserFields(updatedLdapUser, ldapUser);
                 if (StringUtils.equals(updatedLdapUser.getUid(), ldapUser.getUid()) == false) {
                   // uid (dn) changed.
                   ldapUserDao.rename(ctx, updatedLdapUser, ldapUser);
                   renamed++;
-                }
-                if (modified == false) {
-                  final List<String> missedObjectClasses = LdapUtils.getMissedObjectClasses(ldapUserDao.getAdditionalObjectClasses(),
-                      ldapUserDao.getObjectClass(), ldapUser.getObjectClasses());
-                  if (missedObjectClasses != null) {
-                    modified = true;
-                  }
                 }
                 if (modified == true) {
                   updatedLdapUser.setObjectClasses(ldapUser.getObjectClasses());
@@ -235,6 +228,8 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
             ldapUserDao.buildDn(userBase, updatedLdapUser);
             updatedLdapUsers.add(updatedLdapUser);
           } catch (final Exception ex) {
+            ldapUserDao.buildDn(userBase, updatedLdapUser);
+            updatedLdapUsers.add(updatedLdapUser);
             log.error("Error while proceeding user '" + user.getUsername() + "'. Continuing with next user.", ex);
             error++;
           }
