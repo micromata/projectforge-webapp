@@ -118,6 +118,11 @@ public class XmlStreamTest extends TestBase
     assertEquals("b1", true, obj.b1);
     assertEquals("b2", true, obj.b2);
     assertEquals("b3", true, obj.b3);
+
+    obj = (TestObject) reader.read("<test />");
+    assertFalse(obj.b1);
+    assertTrue(obj.b2);
+    assertFalse(obj.b3);
   }
 
   @Test
