@@ -36,13 +36,18 @@ public class TeamCalCalendarFilter extends CalendarFilter
 
   private TeamCalCalendarCollection currentCollection;
 
-  /**
-   * 
-   */
   public TeamCalCalendarFilter()
   {
     super();
     teamCalCalendarCollection = new ArrayList<TeamCalCalendarCollection>();
+  }
+
+  public TeamCalCalendarFilter(final TeamCalCalendarFilter filter)
+  {
+    super();
+    this.teamCalCalendarCollection = filter.teamCalCalendarCollection;
+    if (filter.getCurrentCollection() != null)
+      this.currentCollection = new TeamCalCalendarCollection(filter.getCurrentCollection());
   }
 
   public Set<Integer> getCalendarPk(TeamCalCalendarCollection collection)
@@ -153,5 +158,4 @@ public class TeamCalCalendarFilter extends CalendarFilter
   {
     return teamCalCalendarCollection;
   }
-
 }

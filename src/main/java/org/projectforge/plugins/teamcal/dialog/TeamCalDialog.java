@@ -35,7 +35,6 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.hibernate.util.SerializationHelper;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalRight;
@@ -92,7 +91,7 @@ public class TeamCalDialog extends PFDialog
   {
     super(id, titleModel);
     this.oldFilter = filter;
-    this.newFilter = (TeamCalCalendarFilter) SerializationHelper.clone(filter);
+    this.newFilter = new TeamCalCalendarFilter(filter);
     selectedCalendars = new LinkedList<TeamCalDO>();
     timeSheetCalendar = new TeamCalDO();
   }
@@ -302,7 +301,7 @@ public class TeamCalDialog extends PFDialog
               newFilter.setCurrentCollection(addedCollection);
               selectedCalendars.clear();
               selectedCalendars.addAll(newFilter.calcAssignedtItems(teamCalDao, addedCollection));
-              addToTarget(target, collectionChoice.getDropDownChoice(), repeaterContainer, select, teamCalChoice);
+              addToTarget(target, collectionChoice.getDropDownChoice(), repeaterContainer, teamCalChoice);
             }
           };
           nameDialog.open(target);
@@ -333,7 +332,7 @@ public class TeamCalDialog extends PFDialog
               newFilter.getTeamCalCalendarCollection().remove(newFilter.getCurrentCollection());
               newFilter.getCurrentCollection().setTeamCalCalendarCollectionName(currentName);
               newFilter.getTeamCalCalendarCollection().add(newFilter.getCurrentCollection());
-              addToTarget(target, collectionChoice.getDropDownChoice(), repeaterContainer, select, teamCalChoice);
+              addToTarget(target, collectionChoice.getDropDownChoice(), repeaterContainer, teamCalChoice);
             }
           };
           currentName = newFilter.getCurrentCollection().getTeamCalCalendarColletionName();
@@ -414,6 +413,7 @@ public class TeamCalDialog extends PFDialog
           final List<TeamCalDO> filteredList = new ArrayList<TeamCalDO>();
           filteredList.add(0, timeSheetCalendar);
           if (result != null) {
+            // remove teamCals where user has less than full access or is not owner.
             final Iterator<TeamCalDO> it = result.iterator();
             while (it.hasNext()) {
               final TeamCalDO teamCal = it.next();
@@ -463,7 +463,7 @@ public class TeamCalDialog extends PFDialog
         private static final long serialVersionUID = 95566184649574010L;
 
         @Override
-        protected void onOk(final AjaxRequestTarget target)
+        protected void onConfirm(final AjaxRequestTarget target)
         {
           nameDialog.close(target);
           currentAjaxCallback.callback(target);

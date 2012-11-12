@@ -56,7 +56,7 @@ public abstract class TeamCalNameDialog extends PFDialog
       @Override
       public void callback(final AjaxRequestTarget target)
       {
-        onOk(target);
+        onConfirm(target);
       }
     };
     appendNewAjaxActionButton(okCallback, getString("save"), form, SingleButtonPanel.DEFAULT_SUBMIT);
@@ -65,7 +65,7 @@ public abstract class TeamCalNameDialog extends PFDialog
   /**
    * @param target
    */
-  protected abstract void onOk(AjaxRequestTarget target);
+  protected abstract void onConfirm(AjaxRequestTarget target);
 
   /**
    * @see org.projectforge.web.dialog.PFDialog#open(org.apache.wicket.ajax.AjaxRequestTarget)

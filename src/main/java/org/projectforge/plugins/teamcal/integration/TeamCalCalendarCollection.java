@@ -12,8 +12,6 @@ package org.projectforge.plugins.teamcal.integration;
 import java.io.Serializable;
 import java.util.HashMap;
 
-import org.apache.commons.lang.StringUtils;
-
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
  *
@@ -22,12 +20,25 @@ public class TeamCalCalendarCollection implements Serializable
 {
   private static final long serialVersionUID = -3111538883621120582L;
 
+  private final Long ID;
+
   private String teamCalCalendarCollectionName;
 
   private HashMap<Integer, String> calendarMap;
 
   public TeamCalCalendarCollection() {
+    ID = System.currentTimeMillis();
+  }
 
+  public TeamCalCalendarCollection(final TeamCalCalendarCollection oldCollection) {
+    if (oldCollection.ID != null)
+      ID = oldCollection.ID;
+    else
+      ID = System.currentTimeMillis();
+    if (oldCollection.getTeamCalCalendarColletionName() != null)
+      teamCalCalendarCollectionName = oldCollection.teamCalCalendarCollectionName;
+    if (oldCollection.getCalendarMap() != null)
+      calendarMap = new HashMap<Integer, String>(oldCollection.calendarMap);
   }
 
   public void setCalendarMap(final HashMap<Integer, String> calendarMap) {
@@ -55,6 +66,14 @@ public class TeamCalCalendarCollection implements Serializable
   }
 
   /**
+   * @return the iD
+   */
+  public Long getID()
+  {
+    return ID;
+  }
+
+  /**
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -62,8 +81,7 @@ public class TeamCalCalendarCollection implements Serializable
   {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((calendarMap == null) ? 0 : calendarMap.hashCode());
-    result = prime * result + ((teamCalCalendarCollectionName == null) ? 0 : teamCalCalendarCollectionName.hashCode());
+    result = prime * result + ((ID == null) ? 0 : ID.hashCode());
     return result;
   }
 
@@ -80,36 +98,11 @@ public class TeamCalCalendarCollection implements Serializable
     if (getClass() != obj.getClass())
       return false;
     final TeamCalCalendarCollection other = (TeamCalCalendarCollection) obj;
-    if (calendarMap == null) {
-      if (other.calendarMap != null)
+    if (ID == null) {
+      if (other.ID != null)
         return false;
-    } else if (equalHashMap(calendarMap, other.calendarMap) == false)
+    } else if (!ID.equals(other.ID))
       return false;
-    if (teamCalCalendarCollectionName == null) {
-      if (other.teamCalCalendarCollectionName != null)
-        return false;
-    } else if (!teamCalCalendarCollectionName.equals(other.teamCalCalendarCollectionName))
-      return false;
-    return true;
-  }
-
-  private boolean equalHashMap(final HashMap<Integer, String> first, final HashMap<Integer, String> second)
-  {
-    if(first == null && second == null) {
-      return true;
-    }
-    // only one of them is null -> false
-    if(first == null || second == null) {
-      return false;
-    }
-    for(final Integer key : first.keySet()) {
-      if(second.get(key) == null) {
-        return false;
-      }
-      if(StringUtils.equals(first.get(key), second.get(key)) == false) {
-        return false;
-      }
-    }
     return true;
   }
 }
