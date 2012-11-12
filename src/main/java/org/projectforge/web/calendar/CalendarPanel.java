@@ -126,8 +126,23 @@ public class CalendarPanel extends Panel
           if (accessChecker.isRestrictedUser() == true) {
             return;
           }
-          final TimesheetDO timesheet = new TimesheetDO().setStartDate(DateHelper.getDateTimeAsMillis(range.getStart()))//
-              .setStopTime(DateHelper.getDateTimeAsMillis(range.getEnd()));
+          final TimesheetDO timesheet = new TimesheetDO();
+          if (range.isAllDay() == true) {
+            // Start with the first hour displayed (combo-box) or if any time sheets already exists for this date with a time sheet starts
+            // with the stop date of the last time sheet of the current day.
+            final TimesheetDO latest = timesheetEventsProvider.getLatestTimesheetOfDay(range.getEnd());
+            if (latest != null) {
+              timesheet.setStartDate(latest.getStopTime()).setStopTime(latest.getStopTime());
+            } else {
+              final Integer firstHourOfDay = filter.getFirstHour();
+              final DateTime start = range.getStart().withHourOfDay(firstHourOfDay != null ? firstHourOfDay : 8);
+              final long millis = DateHelper.getDateTimeAsMillis(start);
+              timesheet.setStartDate(millis).setStopTime(millis);
+            }
+          } else {
+            timesheet.setStartDate(DateHelper.getDateTimeAsMillis(range.getStart()))//
+            .setStopTime(DateHelper.getDateTimeAsMillis(range.getEnd()));
+          }
           if (filter.getUserId() != null) {
             timesheetDao.setUser(timesheet, filter.getUserId());
           }
@@ -210,25 +225,33 @@ public class CalendarPanel extends Panel
               + ", sourceId: "
               + clickedEvent.getSource().getUuid());
         }
-        if (eventId != null && TimesheetEventsProvider.EVENT_CLASS_NAME.equals(eventClassName) == true) {
-          // User clicked on a time sheet, show the time sheet:
-          final Integer id = NumberHelper.parseInteger(eventId);
-          final PageParameters parameters = new PageParameters();
-          parameters.add(AbstractEditPage.PARAMETER_KEY_ID, id);
-          final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(parameters);
-          timesheetEditPage.setReturnToPage((WebPage) getPage());
-          setResponsePage(timesheetEditPage);
-          return;
-        }
-        if (eventId != null && BirthdayEventsProvider.EVENT_CLASS_NAME.equals(eventClassName) == true) {
-          // User clicked on birthday, show the address:
-          final Integer id = NumberHelper.parseInteger(eventId);
-          final PageParameters parameters = new PageParameters();
-          parameters.add(AbstractEditPage.PARAMETER_KEY_ID, id);
-          final AddressViewPage addressViewPage = new AddressViewPage(parameters);
-          setResponsePage(addressViewPage);
-          addressViewPage.setReturnToPage((WebPage) getPage());
-          return;
+        if (eventId != null) {
+          if (TimesheetEventsProvider.EVENT_CLASS_NAME.equals(eventClassName) == true) {
+            // User clicked on a time sheet, show the time sheet:
+            final Integer id = NumberHelper.parseInteger(eventId);
+            final PageParameters parameters = new PageParameters();
+            parameters.add(AbstractEditPage.PARAMETER_KEY_ID, id);
+            final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(parameters);
+            timesheetEditPage.setReturnToPage((WebPage) getPage());
+            setResponsePage(timesheetEditPage);
+            return;
+          } else if (TimesheetEventsProvider.BREAK_EVENT_CLASS_NAME.equals(eventClassName) == true) {
+            // User clicked on a break (between time sheets), create new time sheet with times of the break:
+            final TimesheetDO breaksTimesheet = timesheetEventsProvider.getBreakTimesheet(eventId);
+            final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(breaksTimesheet);
+            timesheetEditPage.setReturnToPage((WebPage) getPage());
+            setResponsePage(timesheetEditPage);
+            return;
+          } else if (BirthdayEventsProvider.EVENT_CLASS_NAME.equals(eventClassName) == true) {
+            // User clicked on birthday, show the address:
+            final Integer id = NumberHelper.parseInteger(eventId);
+            final PageParameters parameters = new PageParameters();
+            parameters.add(AbstractEditPage.PARAMETER_KEY_ID, id);
+            final AddressViewPage addressViewPage = new AddressViewPage(parameters);
+            setResponsePage(addressViewPage);
+            addressViewPage.setReturnToPage((WebPage) getPage());
+            return;
+          }
         }
         onEventClickedHook(clickedEvent, response, event, eventId, eventClassName);
         response.refetchEvents();
@@ -407,7 +430,7 @@ public class CalendarPanel extends Panel
           timesheetDao.update(timesheet);
           setResponsePage(getPage());
         } else {
-          setResponsePage(new TimesheetEditPage(timesheet).setReturnToPage((WebPage)getPage()));
+          setResponsePage(new TimesheetEditPage(timesheet).setReturnToPage((WebPage) getPage()));
         }
         return;
       }
@@ -424,7 +447,7 @@ public class CalendarPanel extends Panel
         setResponsePage(getPage());
         return;
       } else if (CalendarDropMode.COPY_EDIT.equals(dropMode) == true) {
-        setResponsePage(new TimesheetEditPage(timesheet).setReturnToPage((WebPage)getPage()));
+        setResponsePage(new TimesheetEditPage(timesheet).setReturnToPage((WebPage) getPage()));
       } else {
         // CANCEL -> should be handled through javascript now
         setResponsePage(getPage());

@@ -70,6 +70,9 @@ public class CalendarFilter implements Serializable
   private Integer userId;
 
   @XStreamAsAttribute
+  private Boolean showBreaks = true;
+
+  @XStreamAsAttribute
   private Integer firstHour = 8;
 
   @XStreamAsAttribute
@@ -179,6 +182,26 @@ public class CalendarFilter implements Serializable
   public void setUserId(final Integer userId)
   {
     this.userId = userId;
+  }
+
+  /**
+   * If the time sheets of an user are displayed and this option is set, then also all breaks between time-sheets of ones day will be
+   * displayed.
+   * @return the showBreaks
+   */
+  public boolean isShowBreaks()
+  {
+    return showBreaks == Boolean.TRUE;
+  }
+
+  /**
+   * @param showBreaks the showBreaks to set
+   * @return this for chaining.
+   */
+  public CalendarFilter setShowBreaks(final Boolean showBreaks)
+  {
+    this.showBreaks = showBreaks;
+    return this;
   }
 
   /**

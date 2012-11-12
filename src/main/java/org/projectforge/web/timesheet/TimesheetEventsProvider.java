@@ -23,7 +23,9 @@
 
 package org.projectforge.web.timesheet;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.ftlines.wicket.fullcalendar.Event;
 
@@ -75,10 +77,16 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
 
   private final long[] durationsPerDayOfYear = new long[380];
 
+  private Map<String, TimesheetDO> breaksMap;
+
+  private List<TimesheetDO> timesheets;
+
   /**
    * the name of the event class.
    */
   public static final String EVENT_CLASS_NAME = "timesheet";
+
+  public static final String BREAK_EVENT_CLASS_NAME = "ts-break";
 
   /**
    * @param parent For i18n.
@@ -110,12 +118,14 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
     if (userId == null) {
       return;
     }
+    breaksMap = new HashMap<String, TimesheetDO>();
+    int breaksCounter = 0;
     final TimesheetFilter filter = new TimesheetFilter();
     filter.setUserId(userId);
     filter.setStartTime(start.toDate());
     filter.setStopTime(end.toDate());
     filter.setOrderType(OrderDirection.ASC);
-    final List<TimesheetDO> timesheets = timesheetDao.getList(filter);
+    timesheets = timesheetDao.getList(filter);
     boolean longFormat = false;
     days = Days.daysBetween(start, end).getDays();
     if (days < 10) {
@@ -130,13 +140,30 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
       month = currentMonth.getMonthOfYear();
       firstDayOfMonth = currentMonth.withDayOfMonth(1);
     }
-    if (CollectionUtils.isNotEmpty(timesheets) == true) {
+    if (CollectionUtils.isEmpty(timesheets) == false) {
+      DateTime lastStopTime = null;
       for (final TimesheetDO timesheet : timesheets) {
         final DateTime startTime = new DateTime(timesheet.getStartTime(), PFUserContext.getDateTimeZone());
         final DateTime stopTime = new DateTime(timesheet.getStopTime(), PFUserContext.getDateTimeZone());
         if (stopTime.isBefore(start) == true || startTime.isAfter(end) == true) {
           // Time sheet doesn't match time period start - end.
           continue;
+        }
+        if (calFilter.isShowBreaks() == true) {
+          if (lastStopTime != null
+              && DateHelper.isSameDay(stopTime, lastStopTime) == true
+              && startTime.getMillis() - lastStopTime.getMillis() > 60000) {
+            // Show breaks between time sheets of one day (> 60s).
+            final Event breakEvent = new Event();
+            final String breakId = String.valueOf(++breaksCounter);
+            breakEvent.setClassName(BREAK_EVENT_CLASS_NAME).setId(breakId).setStart(lastStopTime).setEnd(startTime)
+            .setTitle(getString("timesheet.break"));
+            breakEvent.setTextColor("#666666").setBackgroundColor("#F9F9F9").setColor("#F9F9F9");
+            events.put(breakId, breakEvent);
+            final TimesheetDO breakTimesheet = new TimesheetDO().setStartDate(lastStopTime.toDate()).setStopTime(startTime.getMillis());
+            breaksMap.put(breakId, breakTimesheet);
+          }
+          lastStopTime = stopTime;
         }
         final long duration = timesheet.getDuration();
         final Event event = new Event();
@@ -212,6 +239,29 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
         day = day.plusDays(1);
       } while (day.isAfter(end) == false);
     }
+  }
+
+  public TimesheetDO getBreakTimesheet(final String id)
+  {
+    return breaksMap != null ? breaksMap.get(id) : null;
+  }
+
+  public TimesheetDO getLatestTimesheetOfDay(final DateTime date)
+  {
+    if (timesheets == null) {
+      return null;
+    }
+    TimesheetDO latest = null;
+    for (final TimesheetDO timesheet : timesheets) {
+      if (DateHelper.isSameDay(timesheet.getStopTime(), date.toDate()) == true) {
+        if (latest == null) {
+          latest = timesheet;
+        } else if (latest.getStopTime().before(timesheet.getStopTime()) == true) {
+          latest = timesheet;
+        }
+      }
+    }
+    return latest;
   }
 
   public String formatDuration(final long millis)

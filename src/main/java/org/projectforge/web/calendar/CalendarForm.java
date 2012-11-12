@@ -121,6 +121,8 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
           }
         });
       }
+      checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "showBreaks"),
+          getString("calendar.option.showBreaks"), true).setTooltip(getString("calendar.option.showBreaks.tooltip")));
       checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "showPlanning"),
           getString("calendar.option.planning"), true).setTooltip(getString("calendar.option.planning.tooltip")));
       if (Configuration.getInstance().isAddressManagementConfigured() == true) {
