@@ -132,6 +132,7 @@ public class LdapUserDao extends LdapDao<String, LdapUser>
   /**
    * @see org.projectforge.ldap.LdapDao#getAdditionalObjectClasses(org.projectforge.ldap.LdapObject)
    */
+  @Override
   protected String[] getAdditionalObjectClasses(final LdapUser obj)
   {
     if (isPosixAccountsConfigured() == true) {
@@ -470,11 +471,13 @@ public class LdapUserDao extends LdapDao<String, LdapUser>
     list = ldapPersonDao.getModificationItems(list, user);
     createAndAddModificationItems(list, "cn", user.getCommonName());
     if (isPosixAccountsConfigured() == true && PFUserDOConverter.isPosixAccountValuesEmpty(user) == false) {
-      final List<String> missedObjectClasses = LdapUtils.getMissedObjectClasses(getAdditionalObjectClasses(user), getObjectClass(),
-          user.getObjectClasses());
-      if (CollectionUtils.isNotEmpty(missedObjectClasses) == true) {
-        for (final String missedObjectClass : missedObjectClasses) {
-          list.add(createModificationItem(DirContext.ADD_ATTRIBUTE, "objectClass", missedObjectClass));
+      if (user.getObjectClasses() != null) {
+        final List<String> missedObjectClasses = LdapUtils.getMissedObjectClasses(getAdditionalObjectClasses(user), getObjectClass(),
+            user.getObjectClasses());
+        if (CollectionUtils.isNotEmpty(missedObjectClasses) == true) {
+          for (final String missedObjectClass : missedObjectClasses) {
+            list.add(createModificationItem(DirContext.ADD_ATTRIBUTE, "objectClass", missedObjectClass));
+          }
         }
       }
       createAndAddModificationItems(list, "uidNumber", String.valueOf(user.getUidNumber()));
