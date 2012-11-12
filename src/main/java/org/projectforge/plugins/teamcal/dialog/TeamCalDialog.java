@@ -204,6 +204,7 @@ public class TeamCalDialog extends PFDialog
       super.onInitialize();
       final RepeatingView calendarRepeater = new RepeatingView("repeater");
 
+      // COLOR TABLE
       final WebMarkupContainer repeaterContainer = new WebMarkupContainer("repeaterContainer") {
         private static final long serialVersionUID = 7750294984025761480L;
 

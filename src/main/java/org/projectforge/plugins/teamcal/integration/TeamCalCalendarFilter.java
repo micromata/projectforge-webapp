@@ -78,8 +78,27 @@ public class TeamCalCalendarFilter extends CalendarFilter
 
   public void addCalendarPk(final Integer pk, final TeamCalCalendarCollection collection)
   {
+    String color = DEFAULT_COLOR;
+    long lastEntry = 0;
+
+    // intelligent color choose
+    for (final TeamCalCalendarCollection tCCC : teamCalCalendarCollection) {
+      if (tCCC.getCalendarMap().containsKey(pk)) {
+        // init
+        if (lastEntry == 0){
+          lastEntry = tCCC.getID();
+        }
+
+        // get color of last entry
+        if (tCCC.getID() <= lastEntry) {
+          lastEntry = tCCC.getID();
+          color = tCCC.getCalendarMap().get(pk);
+        }
+      }
+    }
+
     // default color
-    updateCalendarColor(pk, DEFAULT_COLOR, collection);
+    updateCalendarColor(pk, color, collection);
   }
 
   public void updateCalendarColor(final Integer pk, final String color, TeamCalCalendarCollection collection)
