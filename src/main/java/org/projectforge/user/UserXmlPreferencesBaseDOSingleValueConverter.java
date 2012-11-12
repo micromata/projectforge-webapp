@@ -37,11 +37,11 @@ import com.thoughtworks.xstream.converters.SingleValueConverter;
 public class UserXmlPreferencesBaseDOSingleValueConverter implements SingleValueConverter
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UserXmlPreferencesBaseDOSingleValueConverter.class);
-  
-  private Class< ? extends BaseDao< ? >> daoClass ;
-  
-  private Class<? extends BaseDO<?>> doClass;
-  
+
+  private final Class< ? extends BaseDao< ? >> daoClass ;
+
+  private final Class<? extends BaseDO<?>> doClass;
+
   /**
    * Marshals only the id and unmarshals by loading the instance by id from the dao.
    * @param daoClass Class of the dao.
@@ -54,7 +54,7 @@ public class UserXmlPreferencesBaseDOSingleValueConverter implements SingleValue
     this.doClass = doClass;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   @Override
   public boolean canConvert(final Class type)
   {
