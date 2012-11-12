@@ -32,6 +32,8 @@ public abstract class TeamCalNameDialog extends PFDialog
 
   private Form<Void> form;
 
+  private TextField<String> nameField;
+
   /**
    * @param id
    * @param titleModel
@@ -73,6 +75,7 @@ public abstract class TeamCalNameDialog extends PFDialog
   @Override
   public void open(final AjaxRequestTarget target)
   {
+    nameField.setRequired(true);
     target.add(form);
     super.open(target);
   }
@@ -112,7 +115,8 @@ public abstract class TeamCalNameDialog extends PFDialog
       form = new Form<Void>("form");
       form.setOutputMarkupId(true);
       add(form);
-      form.add(new TextField<String>("name", nameModel));
+      nameField = new TextField<String>("name", nameModel);
+      form.add(nameField);
     }
 
   }

@@ -287,6 +287,7 @@ public class TeamCalDialog extends PFDialog
         @Override
         protected void onSubmit(final AjaxRequestTarget target)
         {
+          currentName = "";
           // this callback is evaluated when the name dialog was entered!
           currentAjaxCallback = new AjaxCallback() {
             private static final long serialVersionUID = -6959790939627419710L;
@@ -322,21 +323,25 @@ public class TeamCalDialog extends PFDialog
         @Override
         protected void onSubmit(final AjaxRequestTarget target)
         {
-          // this callback is evaluated when the name dialog was entered!
-          currentAjaxCallback = new AjaxCallback() {
-            private static final long serialVersionUID = -6959790939627419710L;
+          if (newFilter.getCurrentCollection() != null) {
+            // this callback is evaluated when the name dialog was entered!
+            currentAjaxCallback = new AjaxCallback() {
+              private static final long serialVersionUID = -6959790939627419710L;
 
-            @Override
-            public void callback(final AjaxRequestTarget target)
-            {
-              newFilter.getTeamCalCalendarCollection().remove(newFilter.getCurrentCollection());
-              newFilter.getCurrentCollection().setTeamCalCalendarCollectionName(currentName);
-              newFilter.getTeamCalCalendarCollection().add(newFilter.getCurrentCollection());
-              addToTarget(target, collectionChoice.getDropDownChoice(), repeaterContainer, teamCalChoice);
-            }
-          };
-          currentName = newFilter.getCurrentCollection().getTeamCalCalendarColletionName();
-          nameDialog.open(target);
+              @Override
+              public void callback(final AjaxRequestTarget target)
+              {
+                if (currentName.equals(newFilter.getCurrentCollection().getTeamCalCalendarColletionName()) == false) {
+                  newFilter.getTeamCalCalendarCollection().remove(newFilter.getCurrentCollection());
+                  newFilter.getCurrentCollection().setTeamCalCalendarCollectionName(currentName);
+                  newFilter.getTeamCalCalendarCollection().add(newFilter.getCurrentCollection());
+                  addToTarget(target, collectionChoice.getDropDownChoice(), repeaterContainer, teamCalChoice);
+                }
+              }
+            };
+            currentName = newFilter.getCurrentCollection().getTeamCalCalendarColletionName();
+            nameDialog.open(target);
+          }
         }
       };
       editCollectionButton.setDefaultFormProcessing(false);

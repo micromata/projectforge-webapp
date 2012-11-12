@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.util.SerializationHelper;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.web.calendar.CalendarFilter;
@@ -45,7 +44,14 @@ public class TeamCalCalendarFilter extends CalendarFilter
   public TeamCalCalendarFilter(final TeamCalCalendarFilter filter)
   {
     super();
-    this.teamCalCalendarCollection = filter.teamCalCalendarCollection;
+    if (this.teamCalCalendarCollection != null)
+      this.teamCalCalendarCollection.clear();
+    else
+      this.teamCalCalendarCollection = new ArrayList<TeamCalCalendarCollection>();
+
+    for (final TeamCalCalendarCollection tCCC : filter.teamCalCalendarCollection)
+      this.teamCalCalendarCollection.add(tCCC);
+
     if (filter.getCurrentCollection() != null)
       this.currentCollection = new TeamCalCalendarCollection(filter.getCurrentCollection());
   }
@@ -118,15 +124,16 @@ public class TeamCalCalendarFilter extends CalendarFilter
   {
     setSelectedCalendar(updatedFilter.getSelectedCalendar());
     if (updatedFilter.getCurrentCollection() != null) {
-      if (this.currentCollection == null) {
-        this.currentCollection = new TeamCalCalendarCollection();
-      }
-      this.currentCollection.setCalendarMap(new HashMap<Integer, String>(updatedFilter.currentCollection.getCalendarMap()));
-      this.currentCollection.setTeamCalCalendarCollectionName(updatedFilter.getCurrentCollection().getTeamCalCalendarColletionName());
+      this.currentCollection = new TeamCalCalendarCollection(updatedFilter.getCurrentCollection());
     }
-    this.teamCalCalendarCollection = new ArrayList<TeamCalCalendarCollection>();
+
+    if (this.teamCalCalendarCollection != null)
+      this.teamCalCalendarCollection.clear();
+    else
+      this.teamCalCalendarCollection = new ArrayList<TeamCalCalendarCollection>();
+
     for (final TeamCalCalendarCollection collection : updatedFilter.teamCalCalendarCollection) {
-      this.teamCalCalendarCollection.add((TeamCalCalendarCollection) SerializationHelper.clone(collection));
+      this.teamCalCalendarCollection.add(new TeamCalCalendarCollection(collection));
     }
   }
 

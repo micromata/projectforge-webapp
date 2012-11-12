@@ -20,23 +20,25 @@ public class TeamCalCalendarCollection implements Serializable
 {
   private static final long serialVersionUID = -3111538883621120582L;
 
-  private final Long ID;
+  private final Long id;
 
   private String teamCalCalendarCollectionName;
 
   private HashMap<Integer, String> calendarMap;
 
   public TeamCalCalendarCollection() {
-    ID = System.currentTimeMillis();
+    id = System.currentTimeMillis();
   }
 
   public TeamCalCalendarCollection(final TeamCalCalendarCollection oldCollection) {
-    if (oldCollection.ID != null)
-      ID = oldCollection.ID;
+    if (oldCollection.id != null)
+      id = oldCollection.id;
     else
-      ID = System.currentTimeMillis();
+      id = System.currentTimeMillis();
+
     if (oldCollection.getTeamCalCalendarColletionName() != null)
       teamCalCalendarCollectionName = oldCollection.teamCalCalendarCollectionName;
+
     if (oldCollection.getCalendarMap() != null)
       calendarMap = new HashMap<Integer, String>(oldCollection.calendarMap);
   }
@@ -70,7 +72,7 @@ public class TeamCalCalendarCollection implements Serializable
    */
   public Long getID()
   {
-    return ID;
+    return id;
   }
 
   /**
@@ -81,7 +83,7 @@ public class TeamCalCalendarCollection implements Serializable
   {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((ID == null) ? 0 : ID.hashCode());
+    result = prime * result + ((id == null) ? 0 : id.hashCode());
     return result;
   }
 
@@ -98,10 +100,10 @@ public class TeamCalCalendarCollection implements Serializable
     if (getClass() != obj.getClass())
       return false;
     final TeamCalCalendarCollection other = (TeamCalCalendarCollection) obj;
-    if (ID == null) {
-      if (other.ID != null)
+    if (id == null) {
+      if (other.id != null)
         return false;
-    } else if (!ID.equals(other.ID))
+    } else if (!id.equals(other.id))
       return false;
     return true;
   }
