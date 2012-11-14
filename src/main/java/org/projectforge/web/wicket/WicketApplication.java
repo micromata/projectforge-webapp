@@ -408,6 +408,8 @@ public class WicketApplication extends WebApplication implements WicketApplicati
       loginHandler.initialize();
       Login.getInstance().setLoginHandler(loginHandler);
     }
+
+    getPageSettings().setRecreateMountedPagesAfterExpiry(false);
   }
 
   @Override
