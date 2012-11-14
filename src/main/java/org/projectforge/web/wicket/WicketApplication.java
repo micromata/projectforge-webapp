@@ -38,6 +38,7 @@ import org.apache.wicket.Page;
 import org.apache.wicket.RuntimeConfigurationType;
 import org.apache.wicket.Session;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.protocol.http.PageExpiredException;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.IRequestHandler;
 import org.apache.wicket.request.Request;
@@ -269,6 +270,10 @@ public class WicketApplication extends WebApplication implements WicketApplicati
       @Override
       public IRequestHandler onException(final RequestCycle cycle, final Exception ex)
       {
+        // in case of expired session, please redirect to home page
+        if(ex instanceof PageExpiredException) {
+          return new RenderPageRequestHandler(new PageProvider(getHomePage()));
+        }
         final Throwable rootCause = ExceptionHelper.getRootCause(ex);
         // log.error(rootCause.getMessage(), ex);
         // if (rootCause instanceof ProjectForgeException == false) {
