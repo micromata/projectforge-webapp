@@ -36,6 +36,8 @@ import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.util.string.StringValue;
 import org.projectforge.web.wicket.WicketUtils;
 
 public abstract class PFAutoCompleteTextField<T> extends TextField<T>
@@ -52,6 +54,8 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
   protected boolean providesTooltip;
 
   private IAutoCompleteRenderer<String> renderer;
+
+  private static final String CONTENT = "content";
 
   /**
    * @param id
@@ -130,7 +134,14 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
       @Override
       protected void respond(final AjaxRequestTarget target)
       {
-        // TODO add to ignore list
+        // Gather query params ?...&content=kssel
+        final StringValue contentValue = RequestCycle.get().getRequest().getQueryParameters().getParameterValue(CONTENT);
+        if (contentValue != null) {
+          final String contentString = contentValue.toString();
+          if(getForm() instanceof AutoCompleteIgnoreForm) {
+            ((AutoCompleteIgnoreForm) getForm()).ignore(PFAutoCompleteTextField.this, contentString);
+          } // else { just ignore }
+        }
       }
     };
     add(deleteBehavior);

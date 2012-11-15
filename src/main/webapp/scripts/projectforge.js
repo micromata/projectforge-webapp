@@ -162,6 +162,7 @@ function enableScroll() {
 }
 
 function pf_deleteClick(element, content) {
-	console.log($(element).data("callback"));
-	var wcal = wicketAjaxGet($(element).data("callback"));
+	var callback = $(element).data("callback");
+	callback = callback + "&delete=" + content;
+	var wcal = wicketAjaxGet(callback);
 }

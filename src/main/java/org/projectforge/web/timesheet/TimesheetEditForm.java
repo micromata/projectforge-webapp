@@ -69,7 +69,9 @@ import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.autocompletion.AutoCompleteIgnoreForm;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteMaxLengthTextField;
+import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.components.ConsumptionBarPanel;
 import org.projectforge.web.wicket.components.DateTimePanel;
 import org.projectforge.web.wicket.components.DateTimePanelSettings;
@@ -85,7 +87,7 @@ import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 
-public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEditPage>
+public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEditPage> implements AutoCompleteIgnoreForm
 {
   private static final long serialVersionUID = 3150725003240437752L;
 
@@ -557,5 +559,14 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
   protected Logger getLogger()
   {
     return log;
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.autocompletion.AutoCompleteIgnoreForm#ignore(org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField, java.lang.String)
+   */
+  @Override
+  public void ignore(final PFAutoCompleteTextField< ? > autoCompleteField, final String ignoreText)
+  {
+    // TODO add this to the ignored filter
   }
 }
