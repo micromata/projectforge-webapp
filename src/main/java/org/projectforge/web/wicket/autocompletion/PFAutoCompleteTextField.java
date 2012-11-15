@@ -55,7 +55,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
 
   private IAutoCompleteRenderer<String> renderer;
 
-  private static final String CONTENT = "content";
+  private static final String CONTENT = "delete";
 
   /**
    * @param id
