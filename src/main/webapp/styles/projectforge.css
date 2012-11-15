@@ -575,3 +575,7 @@ h2.box_head .subtitle {
 	width: 73.5%;
 	margin: 0 0 10px 0;
 }
+.pf_deleteLink {
+  background-color: red;
+  z-index: 2000;
+}

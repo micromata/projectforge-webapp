@@ -160,3 +160,8 @@ function enableScroll() {
 	$("html").css("overflow", "auto");
 	$("body").css("padding-right", 0);
 }
+
+function pf_deleteClick(element, content) {
+	console.log($(element).data("callback"));
+	var wcal = wicketAjaxGet($(element).data("callback"));
+}

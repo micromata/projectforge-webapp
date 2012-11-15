@@ -323,6 +323,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
     {
       final AbstractFieldsetPanel< ? > fs = timesheetPageSupport.addLocation();
       locationTextField = (PFAutoCompleteMaxLengthTextField) fs.getStoreObject();
+      locationTextField.withDeletableItem(true);
     }
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.description"), true);

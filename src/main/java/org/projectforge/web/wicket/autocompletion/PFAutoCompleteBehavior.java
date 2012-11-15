@@ -126,6 +126,7 @@ public abstract class PFAutoCompleteBehavior<T> extends AbstractDefaultAjaxBehav
     addSetting(result, "scroll", settings.isScroll());
     addSetting(result, "scrollHeight", settings.getScrollHeight());
     addSetting(result, "width", settings.getWidth());
+    addSetting(result, "deletableItem", settings.isDeletableItem());
     if (settings.isLabelValue() == true) {
       addSetting(result, "labelValue", settings.isLabelValue());
     }

@@ -26,9 +26,13 @@ package org.projectforge.web.wicket.autocompletion;
 import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.wicket.Component;
+import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteBehavior;
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.IAutoCompleteRenderer;
 import org.apache.wicket.markup.ComponentTag;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -41,9 +45,13 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
   /** auto complete behavior attached to this textfield */
   private PFAutoCompleteBehavior<T> behavior;
 
+  private AbstractDefaultAjaxBehavior deleteBehavior;
+
   private PFAutoCompleteSettings settings;
 
   protected boolean providesTooltip;
+
+  private IAutoCompleteRenderer<String> renderer;
 
   /**
    * @param id
@@ -61,7 +69,17 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
       final PFAutoCompleteSettings settings)
   {
     super(id, model);
+    this.renderer = renderer;
     this.settings = settings;
+  }
+
+  /**
+   * @see org.apache.wicket.Component#onInitialize()
+   */
+  @Override
+  protected void onInitialize()
+  {
+    super.onInitialize();
     behavior = new PFAutoCompleteBehavior<T>(renderer, settings) {
       private static final long serialVersionUID = 1L;
 
@@ -96,6 +114,26 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
       }
     };
     add(behavior);
+    deleteBehavior = new AbstractDefaultAjaxBehavior() {
+      private static final long serialVersionUID = 3014042180471042845L;
+
+      /**
+       * @see org.apache.wicket.ajax.AbstractDefaultAjaxBehavior#renderHead(org.apache.wicket.Component, org.apache.wicket.markup.html.IHeaderResponse)
+       */
+      @Override
+      public void renderHead(final Component component, final IHeaderResponse response)
+      {
+        super.renderHead(component, response);
+        response.renderOnDomReadyJavaScript("$('#"+component.getMarkupId()+"').data('callback', '" + deleteBehavior.getCallbackUrl() + "');");
+      }
+
+      @Override
+      protected void respond(final AjaxRequestTarget target)
+      {
+        // TODO add to ignore list
+      }
+    };
+    add(deleteBehavior);
   }
 
   @SuppressWarnings("serial")
@@ -350,6 +388,16 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
   public PFAutoCompleteTextField<T> withLabelValue(final boolean labelValue)
   {
     settings.withLabelValue(labelValue);
+    return this;
+  }
+
+  /**
+   * Fluent.
+   * @see PFAutoCompleteSettings#withDeletableItem(boolean)
+   */
+  public PFAutoCompleteTextField<T> withDeletableItem(final boolean deletableItem)
+  {
+    settings.setDeletableItem(deletableItem);
     return this;
   }
 }

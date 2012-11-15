@@ -63,12 +63,14 @@ public class PFAutoCompleteSettings implements Serializable
 
   private boolean labelValue;
 
+  private boolean deletableItem;
+
   public Boolean isMatchContains()
   {
     return matchContains;
   }
 
-  public PFAutoCompleteSettings withMatchContains(boolean matchContains)
+  public PFAutoCompleteSettings withMatchContains(final boolean matchContains)
   {
     this.matchContains = matchContains;
     return this;
@@ -83,7 +85,7 @@ public class PFAutoCompleteSettings implements Serializable
   }
 
   /** Fluent. */
-  public PFAutoCompleteSettings withMinChars(int minChars)
+  public PFAutoCompleteSettings withMinChars(final int minChars)
   {
     this.minChars = minChars;
     return this;
@@ -100,7 +102,7 @@ public class PFAutoCompleteSettings implements Serializable
   /**
    * Fluent.
    */
-  public PFAutoCompleteSettings withDelay(int delay)
+  public PFAutoCompleteSettings withDelay(final int delay)
   {
     this.delay = delay;
     return this;
@@ -117,7 +119,7 @@ public class PFAutoCompleteSettings implements Serializable
   /**
    * Fluent.
    */
-  public PFAutoCompleteSettings withMatchCase(boolean matchCase)
+  public PFAutoCompleteSettings withMatchCase(final boolean matchCase)
   {
     this.matchCase = matchCase;
     return this;
@@ -134,7 +136,7 @@ public class PFAutoCompleteSettings implements Serializable
   /**
    * Fluent.
    */
-  public PFAutoCompleteSettings withMatchSubset(boolean matchSubset)
+  public PFAutoCompleteSettings withMatchSubset(final boolean matchSubset)
   {
     this.matchSubset = matchSubset;
     return this;
@@ -151,7 +153,7 @@ public class PFAutoCompleteSettings implements Serializable
   /**
    * Fluent.
    */
-  public PFAutoCompleteSettings withScroll(boolean scroll)
+  public PFAutoCompleteSettings withScroll(final boolean scroll)
   {
     this.scroll = scroll;
     return this;
@@ -168,7 +170,7 @@ public class PFAutoCompleteSettings implements Serializable
   /**
    * Fluent.
    */
-  public PFAutoCompleteSettings withScrollHeight(int scrollHeight)
+  public PFAutoCompleteSettings withScrollHeight(final int scrollHeight)
   {
     this.scrollHeight = scrollHeight;
     return this;
@@ -185,7 +187,7 @@ public class PFAutoCompleteSettings implements Serializable
   /**
    * Fluent.
    */
-  public PFAutoCompleteSettings withAutoFill(boolean autoFill)
+  public PFAutoCompleteSettings withAutoFill(final boolean autoFill)
   {
     this.autoFill = autoFill;
     return this;
@@ -202,7 +204,7 @@ public class PFAutoCompleteSettings implements Serializable
   /**
    * Fluent.
    */
-  public PFAutoCompleteSettings withAutoSubmit(boolean autoSubmit)
+  public PFAutoCompleteSettings withAutoSubmit(final boolean autoSubmit)
   {
     this.autoSubmit = autoSubmit;
     return this;
@@ -219,7 +221,7 @@ public class PFAutoCompleteSettings implements Serializable
   /**
    * Fluent.
    */
-  public PFAutoCompleteSettings withMustMatch(boolean mustMatch)
+  public PFAutoCompleteSettings withMustMatch(final boolean mustMatch)
   {
     this.mustMatch = mustMatch;
     return this;
@@ -236,7 +238,7 @@ public class PFAutoCompleteSettings implements Serializable
   /**
    * Fluent.
    */
-  public PFAutoCompleteSettings withSelectFirst(boolean selectFirst)
+  public PFAutoCompleteSettings withSelectFirst(final boolean selectFirst)
   {
     this.selectFirst = selectFirst;
     return this;
@@ -253,7 +255,7 @@ public class PFAutoCompleteSettings implements Serializable
   /**
    * Fluent.
    */
-  public PFAutoCompleteSettings withSelectOnly(boolean selectOnly)
+  public PFAutoCompleteSettings withSelectOnly(final boolean selectOnly)
   {
     this.selectOnly = selectOnly;
     return this;
@@ -270,7 +272,7 @@ public class PFAutoCompleteSettings implements Serializable
   /**
    * Fluent.
    */
-  public PFAutoCompleteSettings withMaxItemsToShow(int maxItemsToShow)
+  public PFAutoCompleteSettings withMaxItemsToShow(final int maxItemsToShow)
   {
     this.maxItemsToShow = maxItemsToShow;
     return this;
@@ -287,7 +289,7 @@ public class PFAutoCompleteSettings implements Serializable
   /**
    * Fluent.
    */
-  public PFAutoCompleteSettings withCacheLength(int cacheLength)
+  public PFAutoCompleteSettings withCacheLength(final int cacheLength)
   {
     this.cacheLength = cacheLength;
     return this;
@@ -345,4 +347,23 @@ public class PFAutoCompleteSettings implements Serializable
   {
     return labelValue;
   }
+
+  /**
+   * @return the deletableItem
+   */
+  public boolean isDeletableItem()
+  {
+    return deletableItem;
+  }
+
+  /**
+   * @param deletableItem the deletableItem to set
+   * @return this for chaining.
+   */
+  public PFAutoCompleteSettings setDeletableItem(final boolean deletableItem)
+  {
+    this.deletableItem = deletableItem;
+    return this;
+  }
+
 }

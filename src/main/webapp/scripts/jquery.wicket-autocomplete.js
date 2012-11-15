@@ -387,14 +387,14 @@ jQuery.autocomplete = function(input, options) {
 				}
 		    } else if (options.labelValue) {
 		        // First col contains label second col the value.
-		        li.innerHTML = defaultFormat(row[0], q);
+		        li.innerHTML = defaultFormat(row[0], q) + (options.deletableItem ? "<span class='pf_deleteLink' onClick='pf_deleteClick(\"#"+ $input.attr("id") +"\", \""+row[0]+"\")'>X</span>" : "");  // Johannes Unterstein, Kai Dorschner: Added deletableItem
 		        if (options.selectValue) {
 		          li.selectValue = options.selectValue(row);
 		        } else {
 		          li.selectValue = row[1];
 		        }
 			} else {
-				li.innerHTML = defaultFormat(row[0], q);
+				li.innerHTML = defaultFormat(row[0], q) + (options.deletableItem ? "<span class='pf_deleteLink' onClick='pf_deleteClick(\"#"+ $input.attr("id") +"\", \""+row[0]+"\")'>X</span>" : "");  // Johannes Unterstein, Kai Dorschner: Added deletableItem
 				if (options.selectValue) {
 				  li.selectValue = options.selectValue(row);
 				} else {
