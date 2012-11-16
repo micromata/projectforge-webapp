@@ -25,7 +25,7 @@ package org.projectforge.plugins.teamcal.admin;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.hibernate.criterion.Disjunction;
@@ -68,15 +68,12 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
 
   private UserDao userDao;
 
-  private final TeamCalRight right;
-
   private boolean allCals;
 
   public TeamCalDao()
   {
     super(TeamCalDO.class);
     userRightId = USER_RIGHT_ID;
-    right = new TeamCalRight();
   }
 
   @Override
@@ -141,19 +138,18 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
     final QueryFilter queryFilter = new QueryFilter();
 
     if (accessGroup != null && user != null) {
-      final Collection<Integer> groupIdsRequestedUser = userGroupCache.getUserGroups(user);
-      final Iterator<Integer> iteratorRequestedGroups = groupIdsRequestedUser.iterator();
-
+      final Collection<Integer> groupIds = userGroupCache.getUserGroups(user);
+      final List<GroupDO> groups = new LinkedList<GroupDO>();
+      for(final Integer groupId : groupIds) {
+        groups.add(userGroupCache.getGroup(groupId));
+      }
       // get teamCals where current user has access
       queryFilter.add(Restrictions.disjunction());
       final Disjunction disjunction = Restrictions.disjunction();
-      while (iteratorRequestedGroups.hasNext()) {
-        final GroupDO g = userGroupCache.getGroup(iteratorRequestedGroups.next());
-        if (g != null)
-          for (int i = 0; i < accessGroup.length; i++) {
-            if (accessGroup[i] != null)
-              disjunction.add(Restrictions.eq(accessGroup[i], g));
-          }
+      for (final String iterationAccessGroup : accessGroup) {
+        if (iterationAccessGroup != null) {
+          disjunction.add(Restrictions.in(iterationAccessGroup, groups));
+        }
       }
       if (own == true) {
         disjunction.add(Restrictions.eq("owner", user));
@@ -166,7 +162,7 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
       } else
         return new ArrayList<TeamCalDO>();
     }
-    return getListFilteredByAccess(getList(queryFilter));
+    return getList(queryFilter);
   }
 
   @Override
@@ -178,65 +174,23 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
       tFilter = new TeamCalFilter(filter);
     }
 
-    if (tFilter.getOwnerId() == null)
-      return new ArrayList<TeamCalDO>();
-    else {
-      final PFUserDO user = userGroupCache.getUser(tFilter.getOwnerId());
-      final String accessGroups[] = new String[ACCESS_GROUP_COUNT];
-      boolean ownTeamCals = false;
-      if (tFilter.isFullAccess() == true) {
-        accessGroups[0] = FULL_ACCESS_GROUP;
-      }
-      if (tFilter.isReadOnlyAccess() == true) {
-        accessGroups[1] = READONLY_ACCESS_GROUP;
-      }
-      if (tFilter.isMinimalAccess() == true) {
-        accessGroups[2] = MINIMAL_ACCESS_GROUP;
-      }
-      if (tFilter.isOwn() == true) {
-        ownTeamCals = true;
-      }
-
-      return getTeamCalsByAccess(user, ownTeamCals, accessGroups);
-    }
-  }
-
-  /**
-   * hide information
-   * 
-   * @param list
-   * @return
-   */
-  private List<TeamCalDO> hideByAccess(final List<TeamCalDO> list) {
     final PFUserDO user = PFUserContext.getUser();
-    for (final TeamCalDO teamCal : list) {
-      if (right.isOwner(user, teamCal) == true
-          || right.hasAccessGroup(teamCal.getFullAccessGroup(), userGroupCache, user) == true
-          || right.hasAccessGroup(teamCal.getReadOnlyAccessGroup(), userGroupCache, user) == true) {
-        // do nothing
-      } else
-        if (right.hasAccessGroup(teamCal.getMinimalAccessGroup(), userGroupCache, user) == true) {
-          teamCal.setDescription("");
-        } else
-          list.remove(teamCal);
+    final String accessGroups[] = new String[ACCESS_GROUP_COUNT];
+    boolean ownTeamCals = false;
+    if (tFilter.isFullAccess() == true) {
+      accessGroups[0] = FULL_ACCESS_GROUP;
     }
-    return list;
-  }
+    if (tFilter.isReadOnlyAccess() == true) {
+      accessGroups[1] = READONLY_ACCESS_GROUP;
+    }
+    if (tFilter.isMinimalAccess() == true) {
+      accessGroups[2] = MINIMAL_ACCESS_GROUP;
+    }
+    if (tFilter.isOwn() == true) {
+      ownTeamCals = true;
+    }
 
-  /**
-   * filter by access where current user has access.
-   * 
-   * @param list
-   * @return
-   */
-  private List<TeamCalDO> getListFilteredByAccess(final List<TeamCalDO> list) {
-    final PFUserDO user = PFUserContext.getUser();
-    final List<TeamCalDO> grantedList = new ArrayList<TeamCalDO>();
-    for (final TeamCalDO teamcal : list) {
-      if (right.hasSelectAccess(user, teamcal) == true)
-        grantedList.add(teamcal);
-    }
-    return hideByAccess(grantedList);
+    return getTeamCalsByAccess(user, ownTeamCals, accessGroups);
   }
 
   /**

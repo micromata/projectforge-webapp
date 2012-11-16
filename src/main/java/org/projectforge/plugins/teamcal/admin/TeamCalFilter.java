@@ -23,8 +23,6 @@ public class TeamCalFilter extends BaseSearchFilter implements Serializable
 
   private boolean own, fullAccess, readOnlyAccess, minimalAccess;
 
-  private Integer ownerId;
-
   public TeamCalFilter(){
     own = fullAccess = readOnlyAccess = minimalAccess = true;
   }
@@ -33,18 +31,6 @@ public class TeamCalFilter extends BaseSearchFilter implements Serializable
   {
     super(filter);
     own = fullAccess = readOnlyAccess = minimalAccess = true;
-  }
-
-  /**
-   * @return the userId
-   */
-  public Integer getOwnerId()
-  {
-    return ownerId;
-  }
-
-  public void setOwnerId(final Integer ownerId) {
-    this.ownerId = ownerId;
   }
 
   /**

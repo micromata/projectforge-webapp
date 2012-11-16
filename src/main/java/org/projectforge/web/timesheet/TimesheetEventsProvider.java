@@ -155,6 +155,7 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
               && startTime.getMillis() - lastStopTime.getMillis() > 60000) {
             // Show breaks between time sheets of one day (> 60s).
             final Event breakEvent = new Event();
+            breakEvent.setEditable(false);
             final String breakId = String.valueOf(++breaksCounter);
             breakEvent.setClassName(BREAK_EVENT_CLASS_NAME).setId(breakId).setStart(lastStopTime).setEnd(startTime)
             .setTitle(getString("timesheet.break"));
