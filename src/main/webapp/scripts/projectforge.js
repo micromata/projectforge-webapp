@@ -161,8 +161,13 @@ function enableScroll() {
 	$("body").css("padding-right", 0);
 }
 
-function pf_deleteClick(element, content) {
+function pf_deleteClick(element, content, liElement) {
 	var callback = $(element).data("callback");
 	callback = callback + "&delete=" + content;
 	var wcal = wicketAjaxGet(callback);
+	if(wcal == true) {
+		var li = $(liElement).parents('li');
+		$(li).data("me").flushCache();
+		$(li).remove();
+	}
 }
