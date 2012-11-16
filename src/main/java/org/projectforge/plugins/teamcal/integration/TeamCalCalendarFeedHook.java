@@ -74,7 +74,7 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
           final Integer id = Integer.valueOf(teamCalIds[i]);
           eventFilter.setTeamCalId(id);
 
-          final List<TeamEventDO> teamEvents = teamEventDao.getUnlimitedList(eventFilter);
+          final List<TeamEventDO> teamEvents = teamEventDao.getIcsExportList(eventFilter);
           if (teamEvents != null && teamEvents.size() > 0) {
             for (final TeamEventDO teamEvent : teamEvents) {
               final Date date = new Date(teamEvent.getStartDate().getTime());

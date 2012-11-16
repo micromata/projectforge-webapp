@@ -142,7 +142,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
    * @param filter
    * @return
    */
-  public List<TeamEventDO> getUnlimitedList(final TeamEventFilter filter) {
+  public List<TeamEventDO> getIcsExportList(final TeamEventFilter filter) {
     // limit loading results
     final DateTime now = DateTime.now();
     final Date eventDateLimit = now.minusYears(1).toDate();
