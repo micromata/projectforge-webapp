@@ -46,16 +46,13 @@ import org.projectforge.user.PFUserDO;
  * No ldap user is needed for accessing users or groups of LDAP, only the user's login-name and password is checked by trying to
  * authenticate!</li>
  * <li>If a user is deactivated in LDAP the user has the possibility to work with ProjectForge unlimited as long as he uses his
- * stay-logged-in-method! (If not acceptable please use the {@link LdapSlaveLoginHandler} instead.)</li>
+ * stay-logged-in-method! (If not acceptable please use the normal user mode instead.)</li>
  * <li>For local users any LDAP setting is ignored.</li>
  * </ul>
  * <h4>Normal users mode</h4> The normal user mode is assumed if a ldap managerUser is given in the config.xml.
  * <ul>
  * <li>Normal means that username and password is checked and all other user settings such as user name etc. are read by a given ldap
  * manager user.</li>
- * <li>
- * No ldap user is needed for accessing users or groups of LDAP, only the user's login-name and password is checked by trying to
- * authenticate!</li>
  * <li>If a user is deleted in LDAP the user will be marked as deleted also in ProjectForge's data-base. Any login after synchronizing isn't
  * allowed (the stay-logged-in-feature fails also for deleted users).</li>
  * <li>For local users any LDAP setting is ignored.</li>
