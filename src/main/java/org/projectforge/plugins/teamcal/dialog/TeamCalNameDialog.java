@@ -18,7 +18,7 @@ import org.apache.wicket.model.IModel;
 import org.projectforge.web.dialog.PFDialog;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 
-import de.micromata.wicket.ajax.AjaxCallback;
+import de.micromata.wicket.ajax.AjaxFormSubmitCallback;
 
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
@@ -52,8 +52,18 @@ public abstract class TeamCalNameDialog extends PFDialog
   protected void onInitialize()
   {
     super.onInitialize();
-    final AjaxCallback okCallback = new AjaxCallback() {
+    final AjaxFormSubmitCallback okCallback = new AjaxFormSubmitCallback() {
       private static final long serialVersionUID = 7224559508934430123L;
+
+      /**
+       * @see de.micromata.wicket.ajax.AjaxFormSubmitCallback#onError(org.apache.wicket.ajax.AjaxRequestTarget,
+       *      org.apache.wicket.markup.html.form.Form)
+       */
+      @Override
+      public void onError(final AjaxRequestTarget target, final Form< ? > form)
+      {
+        TeamCalNameDialog.this.onError(target);
+      }
 
       @Override
       public void callback(final AjaxRequestTarget target)
@@ -68,6 +78,11 @@ public abstract class TeamCalNameDialog extends PFDialog
    * @param target
    */
   protected abstract void onConfirm(AjaxRequestTarget target);
+
+  /**
+   * @param target
+   */
+  protected abstract void onError(AjaxRequestTarget target);
 
   /**
    * @see org.projectforge.web.dialog.PFDialog#open(org.apache.wicket.ajax.AjaxRequestTarget)

@@ -13,16 +13,20 @@ import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.behavior.AttributeAppender;
+import org.apache.wicket.feedback.ContainerFeedbackMessageFilter;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.panel.EmptyPanel;
+import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.projectforge.web.wicket.MySession;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
 
 import de.micromata.wicket.ajax.AjaxCallback;
+import de.micromata.wicket.ajax.AjaxFormSubmitCallback;
 import de.micromata.wicket.ajax.MDefaultAjaxBehavior;
 
 /**
@@ -39,7 +43,7 @@ public abstract class PFDialog extends Panel
 
   private static final String WID_CONTENT = "dialogContent";
 
-  private WebMarkupContainer dialogContainer;
+  protected WebMarkupContainer dialogContainer;
 
   private final IModel<String> titleModel;
 
@@ -71,6 +75,7 @@ public abstract class PFDialog extends Panel
   protected void onInitialize()
   {
     super.onInitialize();
+    // container
     dialogContainer = new WebMarkupContainer("dialogContainer");
     dialogContainer.setOutputMarkupId(true);
     dialogContainer.add(new AttributeAppender("title", titleModel));
@@ -80,6 +85,23 @@ public abstract class PFDialog extends Panel
     } else {
       dialogContainer.add(getDialogContent(WID_CONTENT));
     }
+    // feedback
+    final ContainerFeedbackMessageFilter containerFeedbackMessageFilter = new ContainerFeedbackMessageFilter(this);
+    final WebMarkupContainer feedbackContainer = new WebMarkupContainer("feedbackContainer") {
+      private static final long serialVersionUID = -2676548030393266940L;
+
+      /**
+       * @see org.apache.wicket.Component#isVisible()
+       */
+      @Override
+      public boolean isVisible()
+      {
+        return MySession.get().getFeedbackMessages().hasMessage(containerFeedbackMessageFilter);
+      }
+    };
+    dialogContainer.add(feedbackContainer);
+    feedbackContainer.add(new FeedbackPanel("feedback", containerFeedbackMessageFilter));
+    // lower button form
     final Form<String> buttonForm = new Form<String>("buttonForm", Model.of("")) {
       private static final long serialVersionUID = 4536735016945915848L;
 
@@ -197,7 +219,9 @@ public abstract class PFDialog extends Panel
       @Override
       protected void onError(final AjaxRequestTarget target, final Form< ? > form)
       {
-        // we have no form, therefore we have no error method
+        if(ajaxCallback instanceof AjaxFormSubmitCallback) {
+          ((AjaxFormSubmitCallback) ajaxCallback).onError(target, form);
+        }
       }
     };
     final SingleButtonPanel buttonPanel = new SingleButtonPanel(this.actionButtons.newChildId(), button, label, classnames);

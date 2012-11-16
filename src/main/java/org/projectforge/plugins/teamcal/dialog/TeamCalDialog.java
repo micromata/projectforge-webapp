@@ -477,6 +477,15 @@ public class TeamCalDialog extends PFDialog
           collectionChoice.getDropDownChoice().setDefaultModel(new PropertyModel<TeamCalCalendarCollection>(newFilter, "currentCollection"));
           addToTarget(target, collectionChoice.getDropDownChoice(), repeaterContainer, select, teamCalChoice);
         }
+
+        /**
+         * @see org.projectforge.plugins.teamcal.dialog.TeamCalNameDialog#onError(org.apache.wicket.ajax.AjaxRequestTarget)
+         */
+        @Override
+        protected void onError(final AjaxRequestTarget target)
+        {
+          target.add(dialogContainer);
+        }
       };
       add(nameDialog);
     }
