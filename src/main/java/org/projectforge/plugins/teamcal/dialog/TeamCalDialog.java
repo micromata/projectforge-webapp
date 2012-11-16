@@ -104,8 +104,7 @@ public class TeamCalDialog extends PFDialog
   {
     newFilter.updateTeamCalendarFilter(oldFilter);
     // this assignment is wanted to prevent auto save "final" action
-    if (newFilter.getSelectedCalendar() != null
-        || TimesheetEventsProvider.EVENT_CLASS_NAME.equals(newFilter.getSelectedCalendar())) {
+    if (newFilter.getSelectedCalendar() != null || TimesheetEventsProvider.EVENT_CLASS_NAME.equals(newFilter.getSelectedCalendar())) {
       selectedDefaultCalendar = timeSheetCalendar;
     } else {
       // get teamCal
@@ -204,6 +203,22 @@ public class TeamCalDialog extends PFDialog
       super.onInitialize();
       final RepeatingView calendarRepeater = new RepeatingView("repeater");
 
+      final WebMarkupContainer bottomContainer = new WebMarkupContainer("bottomContainer") {
+        private static final long serialVersionUID = -3088024211984625247L;
+
+        /**
+         * @see org.apache.wicket.Component#isVisible()
+         */
+        @Override
+        public boolean isVisible()
+        {
+          return newFilter.getTeamCalCalendarCollection().isEmpty() == false;
+        }
+      };
+      bottomContainer.setOutputMarkupId(true);
+      bottomContainer.setOutputMarkupPlaceholderTag(true);
+      add(bottomContainer);
+
       // COLOR TABLE
       final WebMarkupContainer repeaterContainer = new WebMarkupContainer("repeaterContainer") {
         private static final long serialVersionUID = 7750294984025761480L;
@@ -235,8 +250,8 @@ public class TeamCalDialog extends PFDialog
         }
       };
       repeaterContainer.setOutputMarkupId(true);
-      add(repeaterContainer);
       repeaterContainer.add(calendarRepeater);
+      bottomContainer.add(repeaterContainer);
 
       final IChoiceRenderer<TeamCalCalendarCollection> teamCalCollectionRenderer = new IChoiceRenderer<TeamCalCalendarCollection>() {
         private static final long serialVersionUID = 613794318110089990L;
@@ -255,10 +270,11 @@ public class TeamCalDialog extends PFDialog
       };
 
       // TEAMCALCALENDARCOLLECTION DROPDOWN
-      final IModel<List<TeamCalCalendarCollection>> choicesModel = new PropertyModel<List<TeamCalCalendarCollection>>(newFilter, "teamCalCalendarCollection");
+      final IModel<List<TeamCalCalendarCollection>> choicesModel = new PropertyModel<List<TeamCalCalendarCollection>>(newFilter,
+          "teamCalCalendarCollection");
       final IModel<TeamCalCalendarCollection> currentModel = new PropertyModel<TeamCalCalendarCollection>(newFilter, "currentCollection");
-      collectionChoice = new DropDownChoicePanel<TeamCalCalendarCollection>(
-          "collectionList", currentModel, choicesModel, teamCalCollectionRenderer, false);
+      collectionChoice = new DropDownChoicePanel<TeamCalCalendarCollection>("collectionList", currentModel, choicesModel,
+          teamCalCollectionRenderer, false);
       add(collectionChoice);
       collectionChoice.getDropDownChoice().setOutputMarkupId(true);
 
@@ -278,8 +294,7 @@ public class TeamCalDialog extends PFDialog
       });
 
       // ADD BUTTON FOR TCCC
-      final IconButtonPanel addCollectionButton = new AjaxIconButtonPanel("addCollection", IconType.PLUS_THICK,
-          getString("add")) {
+      final IconButtonPanel addCollectionButton = new AjaxIconButtonPanel("addCollection", IconType.PLUS_THICK, getString("add")) {
         private static final long serialVersionUID = -8572571785540159369L;
 
         /**
@@ -303,7 +318,6 @@ public class TeamCalDialog extends PFDialog
               newFilter.setCurrentCollection(addedCollection);
               selectedCalendars.clear();
               selectedCalendars.addAll(newFilter.calcAssignedtItems(teamCalDao, addedCollection));
-              addToTarget(target, collectionChoice.getDropDownChoice(), repeaterContainer, teamCalChoice);
             }
           };
           nameDialog.open(target);
@@ -314,8 +328,7 @@ public class TeamCalDialog extends PFDialog
       add(addCollectionButton);
 
       // EDIT BUTTON FOR TCCC
-      final IconButtonPanel editCollectionButton = new AjaxIconButtonPanel("editCollection", IconType.WRENCH,
-          getString("edit")) {
+      final IconButtonPanel editCollectionButton = new AjaxIconButtonPanel("editCollection", IconType.WRENCH, getString("edit")) {
         private static final long serialVersionUID = -8572571785540159369L;
 
         /**
@@ -336,7 +349,6 @@ public class TeamCalDialog extends PFDialog
                   newFilter.getTeamCalCalendarCollection().remove(newFilter.getCurrentCollection());
                   newFilter.getCurrentCollection().setTeamCalCalendarCollectionName(currentName);
                   newFilter.getTeamCalCalendarCollection().add(newFilter.getCurrentCollection());
-                  addToTarget(target, collectionChoice.getDropDownChoice(), repeaterContainer, teamCalChoice);
                 }
               }
             };
@@ -354,8 +366,8 @@ public class TeamCalDialog extends PFDialog
 
       // TEAMCAL CHOICE FIELD
       final TeamCalChoiceProvider teamProvider = new TeamCalChoiceProvider();
-      teamCalChoice = new Select2MultiChoice<TeamCalDO>("choices",
-          new PropertyModel<Collection<TeamCalDO>>(TeamCalDialog.this, "selectedCalendars"), teamProvider);
+      teamCalChoice = new Select2MultiChoice<TeamCalDO>("choices", new PropertyModel<Collection<TeamCalDO>>(TeamCalDialog.this,
+          "selectedCalendars"), teamProvider);
       teamCalChoice.setOutputMarkupId(true);
       teamCalChoice.add(new AjaxFormComponentUpdatingBehavior("onChange") {
         private static final long serialVersionUID = 1L;
@@ -382,7 +394,7 @@ public class TeamCalDialog extends PFDialog
           addToTarget(target, collectionChoice.getDropDownChoice(), repeaterContainer, select, teamCalChoice);
         }
       });
-      add(teamCalChoice);
+      bottomContainer.add(teamCalChoice);
 
       final IOptionRenderer<TeamCalDO> renderer = new IOptionRenderer<TeamCalDO>() {
         private static final long serialVersionUID = 4233157357375064338L;
@@ -402,7 +414,7 @@ public class TeamCalDialog extends PFDialog
 
       // TEAMCAL DROPDOWN
       final Form<Void> defaultForm = new Form<Void>("defaultForm");
-      add(defaultForm);
+      bottomContainer.add(defaultForm);
       select = new Select<TeamCalDO>("defaultSelect", new PropertyModel<TeamCalDO>(TeamCalDialog.this, "selectedDefaultCalendar")) {
         private static final long serialVersionUID = -1826120411566623945L;
 
@@ -461,11 +473,12 @@ public class TeamCalDialog extends PFDialog
           // just update the model
         }
       });
-      add(select);
+      // TODO add(select);
       select.setOutputMarkupId(true);
       defaultForm.add(select);
 
-      nameDialog = new TeamCalNameDialog("nameDialog", new ResourceModel("plugins.teamcal.title.list"), new PropertyModel<String>(Content.this, "currentName")){
+      nameDialog = new TeamCalNameDialog("nameDialog", new ResourceModel("plugins.teamcal.title.list"), new PropertyModel<String>(
+          Content.this, "currentName")) {
         private static final long serialVersionUID = 95566184649574010L;
 
         @Override
@@ -474,8 +487,9 @@ public class TeamCalDialog extends PFDialog
           nameDialog.close(target);
           currentAjaxCallback.callback(target);
           collectionChoice.getDropDownChoice().setChoices(newFilter.getTeamCalCalendarCollection());
-          collectionChoice.getDropDownChoice().setDefaultModel(new PropertyModel<TeamCalCalendarCollection>(newFilter, "currentCollection"));
-          addToTarget(target, collectionChoice.getDropDownChoice(), repeaterContainer, select, teamCalChoice);
+          collectionChoice.getDropDownChoice()
+              .setDefaultModel(new PropertyModel<TeamCalCalendarCollection>(newFilter, "currentCollection"));
+          addToTarget(target, collectionChoice.getDropDownChoice(), bottomContainer, select);
         }
 
         /**
@@ -490,8 +504,9 @@ public class TeamCalDialog extends PFDialog
       add(nameDialog);
     }
 
-    private void addToTarget(final AjaxRequestTarget target, final Component... components) {
-      for (final Component c: components) {
+    private void addToTarget(final AjaxRequestTarget target, final Component... components)
+    {
+      for (final Component c : components) {
         target.add(c);
       }
     }
