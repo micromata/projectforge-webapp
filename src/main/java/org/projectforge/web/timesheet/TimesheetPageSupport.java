@@ -82,8 +82,12 @@ class TimesheetPageSupport implements Serializable
     return pref;
   }
 
+  public AbstractFieldsetPanel< ? > addLocation() {
+    return addLocation(null);
+  }
+
   @SuppressWarnings("serial")
-  public AbstractFieldsetPanel< ? > addLocation()
+  public AbstractFieldsetPanel< ? > addLocation(final TimesheetEditFilter filter)
   {
     final FieldProperties<String> props = getLocationProperties();
     final AbstractFieldsetPanel< ? > fs = gridBuilder.newFieldset(props);
@@ -92,13 +96,21 @@ class TimesheetPageSupport implements Serializable
       @Override
       protected List<String> getChoices(final String input)
       {
-        return timesheetDao.getLocationAutocompletion(input);
+        return trimResults(timesheetDao.getLocationAutocompletion(input));
+      }
+
+      private List<String> trimResults(final List<String> result)
+      {
+        if(result != null && result.size() > 0 && filter != null && filter.getIgnoredLocations() != null && filter.getIgnoredLocations().size() > 0) {
+          result.removeAll(filter.getIgnoredLocations());
+        }
+        return result;
       }
 
       @Override
       protected List<String> getFavorites()
       {
-        return getTimesheetPrefData().getRecentLocations();
+        return trimResults(getTimesheetPrefData().getRecentLocations());
       }
     };
     locationTextField.withMatchContains(true).withMinChars(2).withFocus(true);

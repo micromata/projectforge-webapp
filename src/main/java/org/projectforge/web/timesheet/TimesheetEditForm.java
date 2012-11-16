@@ -93,6 +93,8 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TimesheetEditForm.class);
 
+  private static final String USERPREF_KEY = "TimesheetEditForm.userPrefs";
+
   private static final String RECENT_SHEETS_DIALOG_ID = "recentSheetsModalWindow";
 
   @SpringBean(name = "taskTree")
@@ -143,10 +145,13 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
 
   protected TimesheetPageSupport timesheetPageSupport;
 
+  private final TimesheetEditFilter filter;
+
   public TimesheetEditForm(final TimesheetEditPage parentPage, final TimesheetDO data)
   {
     super(parentPage, data);
     cost2Exists = SystemInfoCache.instance().isCost2EntriesExists();
+    filter = initTimesheetFilter();
   }
 
   @SuppressWarnings("serial")
@@ -323,7 +328,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
       }));
     }
     {
-      final AbstractFieldsetPanel< ? > fs = timesheetPageSupport.addLocation();
+      final AbstractFieldsetPanel< ? > fs = timesheetPageSupport.addLocation(filter);
       locationTextField = (PFAutoCompleteMaxLengthTextField) fs.getStoreObject();
       locationTextField.withDeletableItem(true);
     }
@@ -562,11 +567,27 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
   }
 
   /**
+   * 
+   * @return
+   */
+  protected TimesheetEditFilter initTimesheetFilter()
+  {
+    TimesheetEditFilter filter = (TimesheetEditFilter) getUserPrefEntry(USERPREF_KEY);
+    if (filter == null) {
+      filter = new TimesheetEditFilter();
+      putUserPrefEntry(USERPREF_KEY, filter, true);
+    }
+    return filter;
+  }
+
+  /**
    * @see org.projectforge.web.wicket.autocompletion.AutoCompleteIgnoreForm#ignore(org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField, java.lang.String)
    */
   @Override
   public void ignore(final PFAutoCompleteTextField< ? > autoCompleteField, final String ignoreText)
   {
-    // TODO add this to the ignored filter
+    if(locationTextField != null && locationTextField.equals(autoCompleteField) == true) {
+      filter.addIgnoredLocation(ignoreText);
+    }
   }
 }
