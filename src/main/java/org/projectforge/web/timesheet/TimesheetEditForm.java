@@ -590,4 +590,12 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
       filter.addIgnoredLocation(ignoreText);
     }
   }
+
+  /**
+   * @return the filter
+   */
+  public TimesheetEditFilter getFilter()
+  {
+    return filter;
+  }
 }

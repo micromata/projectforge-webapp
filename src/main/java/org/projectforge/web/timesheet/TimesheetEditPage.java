@@ -360,6 +360,10 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
   @Override
   public AbstractSecuredBasePage afterSaveOrUpdate()
   {
+    // clean ignore location if needed
+    if(form != null && form.getFilter() != null && getData() != null) {
+      form.getFilter().removeIgnoredLocation(getData().getLocation());
+    }
     // Save time sheet as recent time sheet
     final TimesheetPrefData pref = getTimesheetPrefData();
     final TimesheetDO timesheet = getData();
