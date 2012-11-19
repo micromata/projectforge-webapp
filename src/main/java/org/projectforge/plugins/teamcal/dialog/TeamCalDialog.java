@@ -104,7 +104,7 @@ public class TeamCalDialog extends PFDialog
   {
     newFilter.updateTeamCalendarFilter(oldFilter);
     // this assignment is wanted to prevent auto save "final" action
-    if (newFilter.getSelectedCalendar() != null || TimesheetEventsProvider.EVENT_CLASS_NAME.equals(newFilter.getSelectedCalendar())) {
+    if (newFilter.getSelectedCalendar() == null || TimesheetEventsProvider.EVENT_CLASS_NAME.equals(newFilter.getSelectedCalendar())) {
       selectedDefaultCalendar = timeSheetCalendar;
     } else {
       // get teamCal
@@ -142,6 +142,7 @@ public class TeamCalDialog extends PFDialog
       @Override
       public void callback(final AjaxRequestTarget target)
       {
+
         TeamCalDialog.this.close(target);
       }
     }, getString("cancel"), SingleButtonPanel.CANCEL);
@@ -153,6 +154,10 @@ public class TeamCalDialog extends PFDialog
       @Override
       public void callback(final AjaxRequestTarget target)
       {
+        // set choice to time sheet, if selected calendar is not element of current collection.
+        if (newFilter.getCurrentCollection().getCalendarMap().keySet().contains(selectedDefaultCalendar.getId()) == false) {
+          newFilter.setSelectedCalendar(TimesheetEventsProvider.EVENT_CLASS_NAME);
+        }
         oldFilter.updateTeamCalendarFilter(newFilter);
         setResponsePage(getPage().getClass(), getPage().getPageParameters());
       }
@@ -473,7 +478,6 @@ public class TeamCalDialog extends PFDialog
           // just update the model
         }
       });
-      // TODO add(select);
       select.setOutputMarkupId(true);
       defaultForm.add(select);
 
