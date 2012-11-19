@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans default-lazy-init="false" default-autowire="byType">
+  <!-- Daos (automatically initialized as singletons.) -->
+  <bean id="pollAttendeeDao" class="org.projectforge.plugins.poll.PollAttendeeDao" />
+  <bean id="pollDao" class="org.projectforge.plugins.poll.PollDao" />
+  <bean id="pollEventDao" class="org.projectforge.plugins.poll.PollEventDao" />
+  <bean id="pollResultDao" class="org.projectforge.plugins.poll.PollResultDao" />
+</beans>

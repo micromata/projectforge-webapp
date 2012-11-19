@@ -12,14 +12,8 @@ package org.projectforge.plugins.poll;
 import org.projectforge.admin.UpdateEntry;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.plugins.teamcal.TeamCalPluginUpdates;
-import org.projectforge.plugins.teamcal.admin.TeamCalEditPage;
-import org.projectforge.plugins.teamcal.admin.TeamCalListPage;
-import org.projectforge.plugins.teamcal.event.TeamEventEditPage;
-import org.projectforge.plugins.teamcal.integration.TeamCalCalendarPage;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.user.UserPrefArea;
-import org.projectforge.web.MenuItemDef;
-import org.projectforge.web.MenuItemDefId;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
@@ -34,7 +28,7 @@ public class PollPlugin extends AbstractPlugin
   static UserPrefArea USER_PREF_AREA;
 
   private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { PollDO.class, PollEventDO.class, PollAttendeeDO.class,
-      PollResultDO.class};
+    PollResultDO.class};
 
   /**
    * This dao should be defined in pluginContext.xml (as resources) for proper initialization.
@@ -73,22 +67,22 @@ public class PollPlugin extends AbstractPlugin
     register(resultEntry);
 
     // Register the web part:
-    registerWeb(ID, TeamCalListPage.class, TeamCalEditPage.class);
-    registerWeb("pollEvent", TeamEventEditPage.class, TeamEventEditPage.class);
-    registerWeb("attendeeEvent", TeamEventEditPage.class, TeamEventEditPage.class);
-    registerWeb("resultEvent", TeamEventEditPage.class, TeamEventEditPage.class);
+    //    registerWeb(ID, TeamCalListPage.class, TeamCalEditPage.class);
+    //    registerWeb("pollEvent", TeamEventEditPage.class, TeamEventEditPage.class);
+    //    registerWeb("attendeeEvent", TeamEventEditPage.class, TeamEventEditPage.class);
+    //    registerWeb("resultEvent", TeamEventEditPage.class, TeamEventEditPage.class);
 
-    addMountPage("teamCalendar", TeamCalCalendarPage.class);
+    //    addMountPage("teamCalendar", TeamCalCalendarPage.class);
     // Register the menu entry as sub menu entry of the misc menu:
-    final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
-    registerMenuItem(new MenuItemDef(parentMenu, ID, 7, "plugins.poll.menu", TeamCalCalendarPage.class));
+    //    final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
+    //    registerMenuItem(new MenuItemDef(parentMenu, ID, 7, "plugins.poll.menu", TeamCalCalendarPage.class));
     // registerMenuItem(new MenuItemDef(parentMenu, ID + "List", 8, "plugins.teamcal.title.list", TeamCalListPage.class));
 
     // Define the access management:
     registerRight(new PollRight());
 
     // All the i18n stuff:
-    addResourceBundle(RESOURCE_BUNDLE_NAME);
+    //    addResourceBundle(RESOURCE_BUNDLE_NAME);
 
     // Register favorite entries (the user can modify these templates/favorites via 'own settings'):
     USER_PREF_AREA = registerUserPrefArea("POLL_FAVORITE", PollDO.class, "poll.favorite");
@@ -99,7 +93,7 @@ public class PollPlugin extends AbstractPlugin
    * @param pollDao the calendarDao to set
    * @return this for chaining.
    */
-  public void setTeamCalDao(final PollDao pollDao)
+  public void setPollDao(final PollDao pollDao)
   {
     this.pollDao = pollDao;
   }

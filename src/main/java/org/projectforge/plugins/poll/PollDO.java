@@ -9,6 +9,14 @@
 
 package org.projectforge.plugins.poll;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.user.PFUserDO;
@@ -17,6 +25,9 @@ import org.projectforge.user.PFUserDO;
  * @author M. Lauterbach (m.lauterbach@micromata.de)
  * 
  */
+@Entity
+@Indexed
+@Table(name = "T_PLUGIN_POLL")
 public class PollDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = 1L;
@@ -37,6 +48,8 @@ public class PollDO extends DefaultBaseDO
 
   }
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "owner_fk")
   /**
    * @return the owner
    */
@@ -49,12 +62,13 @@ public class PollDO extends DefaultBaseDO
    * @param owner the owner to set
    * @return this for chaining.
    */
-  public PollDO setOwner(PFUserDO owner)
+  public PollDO setOwner(final PFUserDO owner)
   {
     this.owner = owner;
     return this;
   }
 
+  @Column
   /**
    * @return the title
    */
@@ -67,12 +81,13 @@ public class PollDO extends DefaultBaseDO
    * @param title the title to set
    * @return this for chaining.
    */
-  public PollDO setTitle(String title)
+  public PollDO setTitle(final String title)
   {
     this.title = title;
     return this;
   }
 
+  @Column
   /**
    * @return the location
    */
@@ -85,12 +100,13 @@ public class PollDO extends DefaultBaseDO
    * @param location the location to set
    * @return this for chaining.
    */
-  public PollDO setLocation(String location)
+  public PollDO setLocation(final String location)
   {
     this.location = location;
     return this;
   }
 
+  @Column
   /**
    * @return the description
    */
@@ -103,12 +119,13 @@ public class PollDO extends DefaultBaseDO
    * @param description the description to set
    * @return this for chaining.
    */
-  public PollDO setDescription(String description)
+  public PollDO setDescription(final String description)
   {
     this.description = description;
     return this;
   }
 
+  @Column
   /**
    * @return the active
    */
@@ -121,7 +138,7 @@ public class PollDO extends DefaultBaseDO
    * @param active the active to set
    * @return this for chaining.
    */
-  public PollDO setActive(boolean active)
+  public PollDO setActive(final boolean active)
   {
     this.active = active;
     return this;

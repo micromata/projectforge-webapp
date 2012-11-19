@@ -23,9 +23,10 @@ public class PollDao extends BaseDao<PollDO>
   /**
    * @param clazz
    */
-  protected PollDao(Class<PollDO> clazz)
+  protected PollDao()
   {
-    super(clazz);
+    super(PollDO.class);
+    userRightId = USER_RIGHT_ID;
   }
 
   /**

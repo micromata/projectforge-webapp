@@ -23,9 +23,10 @@ public class PollAttendeeDao extends BaseDao<PollAttendeeDO>
   /**
    * @param clazz
    */
-  protected PollAttendeeDao(Class<PollAttendeeDO> clazz)
+  protected PollAttendeeDao()
   {
-    super(clazz);
+    super(PollAttendeeDO.class);
+    userRightId = USER_RIGHT_ID;
   }
 
   /**

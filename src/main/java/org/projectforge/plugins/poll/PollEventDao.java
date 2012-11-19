@@ -23,9 +23,10 @@ public class PollEventDao extends BaseDao<PollEventDO>
   /**
    * @param clazz
    */
-  protected PollEventDao(Class<PollEventDO> clazz)
+  protected PollEventDao()
   {
-    super(clazz);
+    super(PollEventDO.class);
+    userRightId = USER_RIGHT_ID;
   }
 
   /**

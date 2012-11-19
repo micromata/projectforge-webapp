@@ -9,6 +9,14 @@
 
 package org.projectforge.plugins.poll;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.projectforge.core.DefaultBaseDO;
 
@@ -16,6 +24,9 @@ import org.projectforge.core.DefaultBaseDO;
  * @author M. Lauterbach (m.lauterbach@micromata.de)
  * 
  */
+@Entity
+@Indexed
+@Table(name = "T_PLUGIN_POLL_RESULT")
 public class PollResultDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = -8378182859274204836L;
@@ -33,6 +44,8 @@ public class PollResultDO extends DefaultBaseDO
 
   }
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "poll_event_fk")
   /**
    * @return the pollEvent
    */
@@ -45,12 +58,14 @@ public class PollResultDO extends DefaultBaseDO
    * @param pollEvent the pollEvent to set
    * @return this for chaining.
    */
-  public PollResultDO setPollEvent(PollEventDO pollEvent)
+  public PollResultDO setPollEvent(final PollEventDO pollEvent)
   {
     this.pollEvent = pollEvent;
     return this;
   }
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "poll_attendee_fk")
   /**
    * @return the pollAttendee
    */
@@ -63,12 +78,13 @@ public class PollResultDO extends DefaultBaseDO
    * @param pollAttendee the pollAttendee to set
    * @return this for chaining.
    */
-  public PollResultDO setPollAttendee(PollAttendeeDO pollAttendee)
+  public PollResultDO setPollAttendee(final PollAttendeeDO pollAttendee)
   {
     this.pollAttendee = pollAttendee;
     return this;
   }
 
+  @Column
   /**
    * @return the result
    */
@@ -81,7 +97,7 @@ public class PollResultDO extends DefaultBaseDO
    * @param result the result to set
    * @return this for chaining.
    */
-  public PollResultDO setResult(boolean result)
+  public PollResultDO setResult(final boolean result)
   {
     this.result = result;
     return this;
