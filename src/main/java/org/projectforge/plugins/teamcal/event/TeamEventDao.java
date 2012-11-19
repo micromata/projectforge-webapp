@@ -54,7 +54,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
 public class TeamEventDao extends BaseDao<TeamEventDO>
 {
-  public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_CALENDAR_EVENT", "plugin20", "plugins.teamcalendar.event");
+  public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_CALENDAR_EVENT", "plugin15", "plugins.teamcalendar.event");
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamEventDao.class);
 
