@@ -19,6 +19,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.wicket.Component;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
+import org.joda.time.Period;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalRight;
@@ -136,33 +137,23 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
             event.setAllDay(true);
           }
 
-          /*
-           * necessary, because if more days are selected the calendar sets end time and start time to 00:00 thus the calendar does not
-           * select the last day. for example: selected two days, but only one day would be shown.
-           */
-          //          if (endDate.getDayOfYear() != startDate.getDayOfYear()) {
-          //            if (endDate.getMillisOfDay() == 0 && startDate.getMillisOfDay() == 0) {
-          //            event.setAllDay(true);
-          //          }
-          //          } else {
-          //            if (endDate.getMillisOfDay() == startDate.getMillisOfDay()) {
-          //            event.setAllDay(true);
-          //        }
-          //          }
-
           event.setStart(startDate);
           event.setEnd(endDate);
 
           final String title = teamEvent.getSubject();
           String durationString = "";
           if (longFormat == true) {
-            final DateTime dt = new DateTime(teamEvent.getDuration());
-            String hour = dt.getHourOfDay() + "";
-            String minute = dt.getMinuteOfHour() + "";
-            if (dt.getHourOfDay() < 10)
-              hour = "0" + dt.getHourOfDay();
-            if (dt.getMinuteOfHour() < 10)
-              minute = "0" + dt.getMinuteOfHour();
+            Period duration = new Period(startDate, endDate);
+            // String day = duration.getDays() + "";
+
+            int hourInt = duration.getHours();
+            if (duration.getDays() > 0) {
+              hourInt += duration.getDays() * 24;
+            }
+            final String hour = hourInt < 10 ? "0" + hourInt : "" + hourInt;
+
+            int minuteInt = duration.getMinutes();
+            final String minute = minuteInt < 10 ? "0" + minuteInt : "" + minuteInt;
 
             if (event.isAllDay() == false)
               durationString = "\n" + getString("plugins.teamevent.duration") + ": " + hour + ":" + minute;
@@ -176,9 +167,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
                 + durationString);
             if (right.hasAccessGroup(teamEvent.getCalendar().getMinimalAccessGroup(), userGroupCache, user) == true) {
               // for minimal access
-              event.setTitle(getString("plugins.teamevent.subject")
-                  + ": "
-                  + title);
+              event.setTitle(getString("plugins.teamevent.subject") + ": " + title);
               event.setEditable(false);
             }
           } else {

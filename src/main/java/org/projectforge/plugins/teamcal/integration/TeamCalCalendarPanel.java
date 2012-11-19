@@ -72,7 +72,8 @@ public class TeamCalCalendarPanel extends CalendarPanel
   }
 
   /**
-   * @see org.projectforge.web.calendar.CalendarPanel#onDateRangeSelectedHook(java.lang.String, net.ftlines.wicket.fullcalendar.callback.SelectedRange, net.ftlines.wicket.fullcalendar.CalendarResponse)
+   * @see org.projectforge.web.calendar.CalendarPanel#onDateRangeSelectedHook(java.lang.String,
+   *      net.ftlines.wicket.fullcalendar.callback.SelectedRange, net.ftlines.wicket.fullcalendar.CalendarResponse)
    */
   @Override
   protected void onDateRangeSelectedHook(final String selectedCalendar, final SelectedRange range, final CalendarResponse response)
@@ -80,14 +81,17 @@ public class TeamCalCalendarPanel extends CalendarPanel
     handleDateRangeSelection(this, getWebPage(), range, teamCalDao, selectedCalendar);
   }
 
-  public static void handleDateRangeSelection(final Component caller, final WebPage returnPage, final SelectedRange range, final TeamCalDao teamCalDao, final String calendarId) {
+  public static void handleDateRangeSelection(final Component caller, final WebPage returnPage, final SelectedRange range,
+      final TeamCalDao teamCalDao, final String calendarId)
+  {
     final TeamCalDO calendar = TeamCalEventProvider.getTeamCalForEncodedId(teamCalDao, calendarId);
     final TeamEventDO event = new TeamEventDO();
-    event.setStartDate(new Timestamp(DateHelper.getDateTimeAsMillis(range.getStart())))
-    .setEndDate(new Timestamp(DateHelper.getDateTimeAsMillis(range.getEnd())));
+    event.setAllDay(range.isAllDay());
+    event.setStartDate(new Timestamp(DateHelper.getDateTimeAsMillis(range.getStart()))).setEndDate(
+        new Timestamp(DateHelper.getDateTimeAsMillis(range.getEnd())));
     event.setCalendar(calendar);
     final TeamEventEditPage page = new TeamEventEditPage(new PageParameters(), event);
-    page.setReturnToPage(returnPage);
+    page.setReturnToPage(new TeamCalCalendarPage(returnPage.getPageParameters()));
     caller.setResponsePage(page);
   }
 
@@ -169,7 +173,8 @@ public class TeamCalCalendarPanel extends CalendarPanel
    * @param dropMode
    * @param response
    */
-  private void modifyEvent(final Event event, final DateTime newStartDate, final DateTime newEndDate, final CalendarDropMode dropMode, final CalendarResponse response)
+  private void modifyEvent(final Event event, final DateTime newStartDate, final DateTime newEndDate, final CalendarDropMode dropMode,
+      final CalendarResponse response)
   {
     final Integer id = NumberHelper.parseInteger(event.getId());
     final TeamEventDO dbTeamEvent = teamEventDao.internalGetById(id);
@@ -187,10 +192,10 @@ public class TeamCalCalendarPanel extends CalendarPanel
     }
 
     // update start and end date
-    if(newStartDate != null) {
+    if (newStartDate != null) {
       dbTeamEvent.setStartDate(new Timestamp(newStartTimeMillis));
     }
-    if(newEndDate != null) {
+    if (newEndDate != null) {
       dbTeamEvent.setEndDate(new Timestamp(newEndTimeMillis));
     }
 
@@ -219,7 +224,7 @@ public class TeamCalCalendarPanel extends CalendarPanel
       setResponsePage(teamEventEditPage);
     } else if (CalendarDropMode.MOVE_SAVE.equals(dropMode) || CalendarDropMode.COPY_SAVE.equals(dropMode)) {
       // second mode: "quick save mode"
-      if(CalendarDropMode.MOVE_SAVE.equals(dropMode)) {
+      if (CalendarDropMode.MOVE_SAVE.equals(dropMode)) {
         // we need update only in "move" mode, in "copy" mode it was saved a few lines above
         teamEventDao.update(dbTeamEvent);
       }
