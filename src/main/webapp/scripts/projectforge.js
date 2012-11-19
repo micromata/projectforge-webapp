@@ -168,6 +168,7 @@ function pf_deleteClick(element, content, liElement) {
 	if(wcal == true) {
 		var li = $(liElement).parents('li');
 		$(li).data("me").flushCache();
+		$(li).data("me").clearHideTimeout();
 		$(li).remove();
 	}
 }

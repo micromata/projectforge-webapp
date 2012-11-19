@@ -505,6 +505,11 @@ jQuery.autocomplete = function(input, options) {
 		flushCache();
 	};
 
+	// function by Johannes & Kai
+	this.clearHideTimeout = function() {
+		if (timeout) clearTimeout(timeout)
+	}
+
 	this.setExtraParams = function(p) {
 		options.extraParams = p;
 	};
