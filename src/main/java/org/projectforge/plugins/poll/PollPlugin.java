@@ -15,6 +15,7 @@ import org.projectforge.plugins.poll.attendee.PollAttendeeDO;
 import org.projectforge.plugins.poll.attendee.PollAttendeeDao;
 import org.projectforge.plugins.poll.event.PollEventDO;
 import org.projectforge.plugins.poll.event.PollEventDao;
+import org.projectforge.plugins.poll.event.PollEventEditPage;
 import org.projectforge.plugins.poll.result.PollResultDO;
 import org.projectforge.plugins.poll.result.PollResultDao;
 import org.projectforge.plugins.teamcal.TeamCalPluginUpdates;
@@ -74,11 +75,11 @@ public class PollPlugin extends AbstractPlugin
 
     // Register the web part:
     //    registerWeb(ID, TeamCalListPage.class, TeamCalEditPage.class);
-    //    registerWeb("pollEvent", TeamEventEditPage.class, TeamEventEditPage.class);
+    //    registerWeb("pollEvent");
     //    registerWeb("attendeeEvent", TeamEventEditPage.class, TeamEventEditPage.class);
     //    registerWeb("resultEvent", TeamEventEditPage.class, TeamEventEditPage.class);
 
-    //    addMountPage("teamCalendar", TeamCalCalendarPage.class);
+    addMountPage("pollEvent", PollEventEditPage.class);
     // Register the menu entry as sub menu entry of the misc menu:
     //    final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
     //    registerMenuItem(new MenuItemDef(parentMenu, ID, 7, "plugins.poll.menu", TeamCalCalendarPage.class));
@@ -88,7 +89,7 @@ public class PollPlugin extends AbstractPlugin
     registerRight(new PollRight());
 
     // All the i18n stuff:
-    //    addResourceBundle(RESOURCE_BUNDLE_NAME);
+    addResourceBundle(RESOURCE_BUNDLE_NAME);
 
     // Register favorite entries (the user can modify these templates/favorites via 'own settings'):
     USER_PREF_AREA = registerUserPrefArea("POLL_FAVORITE", PollDO.class, "poll.favorite");
