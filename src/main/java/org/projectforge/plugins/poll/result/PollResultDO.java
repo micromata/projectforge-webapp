@@ -7,7 +7,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.plugins.poll;
+package org.projectforge.plugins.poll.result;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,6 +19,8 @@ import javax.persistence.Table;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.projectforge.core.DefaultBaseDO;
+import org.projectforge.plugins.poll.attendee.PollAttendeeDO;
+import org.projectforge.plugins.poll.event.PollEventDO;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)

@@ -7,7 +7,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.plugins.poll;
+package org.projectforge.plugins.poll.attendee;
 
 import org.projectforge.core.BaseDao;
 import org.projectforge.user.UserRightId;

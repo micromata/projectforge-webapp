@@ -15,6 +15,9 @@ import org.projectforge.admin.UpdatePreCheckStatus;
 import org.projectforge.admin.UpdateRunningStatus;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.Table;
+import org.projectforge.plugins.poll.attendee.PollAttendeeDO;
+import org.projectforge.plugins.poll.event.PollEventDO;
+import org.projectforge.plugins.poll.result.PollResultDO;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)

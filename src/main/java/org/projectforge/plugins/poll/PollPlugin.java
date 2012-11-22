@@ -11,6 +11,12 @@ package org.projectforge.plugins.poll;
 
 import org.projectforge.admin.UpdateEntry;
 import org.projectforge.plugins.core.AbstractPlugin;
+import org.projectforge.plugins.poll.attendee.PollAttendeeDO;
+import org.projectforge.plugins.poll.attendee.PollAttendeeDao;
+import org.projectforge.plugins.poll.event.PollEventDO;
+import org.projectforge.plugins.poll.event.PollEventDao;
+import org.projectforge.plugins.poll.result.PollResultDO;
+import org.projectforge.plugins.poll.result.PollResultDao;
 import org.projectforge.plugins.teamcal.TeamCalPluginUpdates;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.user.UserPrefArea;
