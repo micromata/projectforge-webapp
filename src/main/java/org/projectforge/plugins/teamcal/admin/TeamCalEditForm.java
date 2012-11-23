@@ -36,7 +36,7 @@ import org.projectforge.web.wicket.flowlayout.IconType;
  * Creates a top form-panel to add filter functions or other options.
  * 
  * @author Maximilian Lauterbach (m.lauterbach@micromata.de)
- *
+ * 
  */
 public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage>
 {
@@ -83,27 +83,23 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
     } else {
       if (right.hasUpdateAccess(getUser(), data, data) == true)
         access = true;
-      else
-        if (right.hasAccessGroup(data.getReadOnlyAccessGroup(), userGroupCache, getUser()) == true)
-          access = false;
-        else
-          if (right.hasAccessGroup(data.getMinimalAccessGroup(), userGroupCache, getUser()) == true) {
-            final TeamCalDO newTeamCalDO = new TeamCalDO();
-            newTeamCalDO.setId(data.getId());
-            newTeamCalDO.setMinimalAccessGroup(data.getMinimalAccessGroup());
-            newTeamCalDO.setOwner(data.getOwner());
-            newTeamCalDO.setTitle(data.getTitle());
-            data = newTeamCalDO;
-            access = false;
-          } else
-            access = false;
+      else if (right.hasAccessGroup(data.getReadOnlyAccessGroup(), userGroupCache, getUser()) == true)
+        access = false;
+      else if (right.hasAccessGroup(data.getMinimalAccessGroup(), userGroupCache, getUser()) == true) {
+        final TeamCalDO newTeamCalDO = new TeamCalDO();
+        newTeamCalDO.setId(data.getId());
+        newTeamCalDO.setMinimalAccessGroup(data.getMinimalAccessGroup());
+        newTeamCalDO.setOwner(data.getOwner());
+        newTeamCalDO.setTitle(data.getTitle());
+        data = newTeamCalDO;
+        access = false;
+      } else access = false;
     }
 
     // set title
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.title"));
-      final RequiredMaxLengthTextField title = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
-          "title"));
+      final RequiredMaxLengthTextField title = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "title"));
       if (isNew() == true) {
         title.add(WicketUtils.setFocus());
       }
@@ -136,8 +132,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
         // set full access group chooser
         final FieldsetPanel fsFullAccess = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess"), true);
         final PropertyModel<GroupDO> model = new PropertyModel<GroupDO>(data, "fullAccessGroup");
-        final GroupSelectPanel fullAccess = new GroupSelectPanel(fsFullAccess.newChildId(), model,
-            parentPage, "fullAccessGroupId");
+        final GroupSelectPanel fullAccess = new GroupSelectPanel(fsFullAccess.newChildId(), model, parentPage, "fullAccessGroupId");
         fsFullAccess.add(fullAccess);
         fsFullAccess.setLabelFor(fullAccess);
         fullAccess.init();
@@ -146,8 +141,8 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
 
         // set read-only access chooser
         final FieldsetPanel fsReadOnly = gridBuilder.newFieldset(getString("plugins.teamcal.readOnlyAccess"), true);
-        final GroupSelectPanel readOnly = new GroupSelectPanel(fsReadOnly.newChildId(), new PropertyModel<GroupDO>(data, "readOnlyAccessGroup"),
-            parentPage, "readOnlyAccessGroupId");
+        final GroupSelectPanel readOnly = new GroupSelectPanel(fsReadOnly.newChildId(), new PropertyModel<GroupDO>(data,
+            "readOnlyAccessGroup"), parentPage, "readOnlyAccessGroupId");
         fsReadOnly.add(readOnly);
         fsReadOnly.setLabelFor(readOnly);
         readOnly.init();
@@ -156,8 +151,8 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
 
         // set minimal access chooser
         final FieldsetPanel fsMinimal = gridBuilder.newFieldset(getString("plugins.teamcal.minimalAccess"), true);
-        final GroupSelectPanel minimalAccess = new GroupSelectPanel(fsMinimal.newChildId(), new PropertyModel<GroupDO>(data, "minimalAccessGroup"),
-            parentPage, "minimalAccessGroupId");
+        final GroupSelectPanel minimalAccess = new GroupSelectPanel(fsMinimal.newChildId(), new PropertyModel<GroupDO>(data,
+            "minimalAccessGroup"), parentPage, "minimalAccessGroupId");
         fsMinimal.add(minimalAccess);
         fsMinimal.setLabelFor(minimalAccess);
         fsMinimal.addHelpIcon(getString("plugins.teamcal.minimalAccess.hint"));
@@ -172,6 +167,8 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(fsSubscribe.newChildId(), IconType.SUBSCRIPTION,
           getString("plugins.teamcal.subscribe"), iCalExportLink).setLight();
       fsSubscribe.add(exportICalButtonPanel);
+      if (isNew() == true)
+        fsSubscribe.setVisible(false);
     }
   }
 

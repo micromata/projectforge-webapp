@@ -129,11 +129,9 @@ public class TeamEventRight extends UserRightAccessCheck<TeamEventDO>
   @Override
   public boolean hasHistoryAccess(final PFUserDO user, final TeamEventDO obj)
   {
-    // TODO remove hack
     if (obj != null)
       return hasUpdateAccess(user, obj, null);
-    else
-      return true;
+    else return false;
   }
 
   private boolean isMemberOfAtLeastOneGroup(final PFUserDO user, final Integer... groupIds)
@@ -149,14 +147,13 @@ public class TeamEventRight extends UserRightAccessCheck<TeamEventDO>
     if (ObjectUtils.equals(user.getId(), event.getCalendar().getOwnerId()) == true) {
       return true;
     }
-    if(UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), event.getCalendar().getFullAccessGroupId()) == true) {
+    if (UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), event.getCalendar().getFullAccessGroupId()) == true) {
       return true;
     }
-    if ((UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), event.getCalendar().getReadOnlyAccessGroupId()) == true
-        || UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), event.getCalendar().getMinimalAccessGroupId()) == true)
+    if ((UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), event.getCalendar().getReadOnlyAccessGroupId()) == true || UserRights
+        .getUserGroupCache().isUserMemberOfGroup(user.getId(), event.getCalendar().getMinimalAccessGroupId()) == true)
         && operationType.equals(OperationType.DELETE))
       return false;
-    else
-      return true;
+    else return true;
   }
 }

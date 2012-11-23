@@ -120,11 +120,12 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
     return false;
   }
 
-  public boolean hasAccessGroup(final GroupDO group, final UserGroupCache userGroupCache, final PFUserDO user) {
+  public boolean hasAccessGroup(final GroupDO group, final UserGroupCache userGroupCache, final PFUserDO user)
+  {
     if (group != null) {
       final Collection<Integer> groups = userGroupCache.getUserGroups(user);
       final Iterator<Integer> it = groups.iterator();
-      while (it.hasNext()){
+      while (it.hasNext()) {
         final int id = it.next();
         if (id == 0 || group.getId() == id)
           return true;
@@ -152,15 +153,14 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
     if (ObjectUtils.equals(user.getId(), teamCal.getOwnerId()) == true) {
       return true;
     }
-    if(UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), teamCal.getFullAccessGroupId()) == true) {
+    if (UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), teamCal.getFullAccessGroupId()) == true) {
       return true;
     }
-    if ((UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), teamCal.getReadOnlyAccessGroupId()) == true
-        || UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), teamCal.getMinimalAccessGroupId()) == true)
+    if ((UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), teamCal.getReadOnlyAccessGroupId()) == true || UserRights
+        .getUserGroupCache().isUserMemberOfGroup(user.getId(), teamCal.getMinimalAccessGroupId()) == true)
         && operationType.equals(OperationType.DELETE))
       return false;
-    else
-      return true;
+    else return true;
   }
 
   /**
@@ -169,11 +169,9 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
   @Override
   public boolean hasHistoryAccess(final PFUserDO user, final TeamCalDO obj)
   {
-    // TODO remove hack
     if (obj != null)
       return hasUpdateAccess(user, obj, null);
-    else
-      return true;
+    else return false;
   }
 
   public boolean isOwner(final PFUserDO user, final TeamCalDO cal)
