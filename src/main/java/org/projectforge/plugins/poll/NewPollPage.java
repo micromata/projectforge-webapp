@@ -68,7 +68,6 @@ public class NewPollPage extends AbstractSecuredPage
     super.onInitialize();
 
     final RepeatingView flowform = new RepeatingView("flowform");
-    // body.add(flowform);
     gridBuilder = new GridBuilder(flowform, getMySession());
 
     gridBuilder.newGrid8();

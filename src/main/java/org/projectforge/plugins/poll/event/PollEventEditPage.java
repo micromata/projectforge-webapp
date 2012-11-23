@@ -44,10 +44,19 @@ public class PollEventEditPage extends AbstractSecuredPage
 
   private final IModel<PollDO> pollDoModel;
 
+  private Collection<PollEventDO> events;
+
   public PollEventEditPage(final PageParameters parameters, IModel<PollDO> pollDoModel)
   {
     super(parameters);
     this.pollDoModel = pollDoModel;
+  }
+
+  public PollEventEditPage(final PageParameters parameters, IModel<PollDO> pollDoModel, Collection<PollEventDO> events)
+  {
+    super(parameters);
+    this.pollDoModel = pollDoModel;
+    this.events = events;
   }
 
   /**
@@ -60,6 +69,13 @@ public class PollEventEditPage extends AbstractSecuredPage
     final Form<Void> form = new Form<Void>("form");
     body.add(form);
     final PollEventEventsProvider eventProvider = new PollEventEventsProvider(this, pollDoModel);
+    if (events != null) {
+      if (events.isEmpty() == false) {
+        for (PollEventDO event : events) {
+          eventProvider.addEvent(new SelectedRange(event.getStartDate(), event.getEndDate(), false), null);
+        }
+      }
+    }
     config = new MyFullCalendarConfig(this);
     config.setSelectable(true);
     config.setEditable(true);
@@ -134,9 +150,9 @@ public class PollEventEditPage extends AbstractSecuredPage
   /**
    * @param allEvents
    */
-  protected void onNextButtonClick(final PollDO poll, final Collection<PollEventDO> allEvents)
+  protected void onNextButtonClick(final PollDO pollDo, final Collection<PollEventDO> allEvents)
   {
-    // TODO Max: here we go
+    // setResponsePage(new PollAttendeePage(getPageParameters(), pollDo, allEvents));
   }
 
   /**
