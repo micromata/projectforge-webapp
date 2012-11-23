@@ -70,6 +70,7 @@ public class Config implements Serializable
   private Integer slotMinutes;
   private Float aspectRatio;
   private boolean ignoreTimezone = false;
+  private boolean enableContextMenu;
 
   public Config add(final EventSource eventSource)
   {
@@ -448,6 +449,17 @@ public class Config implements Serializable
   public boolean isIgnoreTimezone()
   {
     return ignoreTimezone;
+  }
+
+  @JsonIgnore
+  public boolean isEnableContextMenu()
+  {
+    return enableContextMenu;
+  }
+
+  public void setEnableContextMenu(final boolean enableContextMenu)
+  {
+    this.enableContextMenu = enableContextMenu;
   }
 
 }

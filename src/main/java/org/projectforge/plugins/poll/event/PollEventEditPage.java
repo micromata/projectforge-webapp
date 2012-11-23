@@ -63,6 +63,7 @@ public class PollEventEditPage extends AbstractSecuredPage
     config.setSelectHelper(true);
     config.setDefaultView("agendaWeek");
     config.getHeader().setRight("");
+    config.setEnableContextMenu(false);
     config.setLoading("function(bool) { if (bool) $(\"#loading\").show(); else $(\"#loading\").hide(); }");
     calendar = new MyFullCalendar("cal", config) {
       private static final long serialVersionUID = -6819899072933690316L;

@@ -130,7 +130,7 @@ public class FullCalendar extends AbstractFullCalendar
     }
 
     if (Strings.isEmpty(config.getEventDrop()) == true) {
-      add(eventDropped = new EventDroppedCallback() {
+      add(eventDropped = new EventDroppedCallback(config) {
 
         @Override
         protected boolean onEventDropped(final DroppedEvent event, final CalendarResponse response)

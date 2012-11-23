@@ -112,7 +112,7 @@ public class PollEventEventsProvider extends MyFullCalendarEventsProvider
    */
   public boolean resizeEvent(final ResizedEvent event, final CalendarResponse response)
   {
-    return false;
+    return modifyEvent(event.getEvent(), null, event.getNewEndTime(), response);
   }
 
   /**
@@ -122,7 +122,35 @@ public class PollEventEventsProvider extends MyFullCalendarEventsProvider
    */
   public boolean dropEvent(final DroppedEvent event, final CalendarResponse response)
   {
-    return false;
+    return modifyEvent(event.getEvent(), event.getNewStartTime(), event.getNewEndTime(), response);
+  }
+
+  /**
+   * @param event
+   * @param newEndTime
+   * @param newStartTime
+   * @param response
+   * @return
+   */
+  private boolean modifyEvent(final Event event, final DateTime newStartTime, final DateTime newEndTime, final CalendarResponse response)
+  {
+    if (event != null) {
+      final PollEventDO eventDO = searchById(event.getId());
+      if (eventDO != null) {
+        if(newStartTime != null) {
+          eventDO.setStartDate(newStartTime);
+          event.setStart(newStartTime);
+        }
+        if(newEndTime != null) {
+          eventDO.setEndDate(newEndTime);
+          event.setEnd(newEndTime);
+        }
+        clearSelection(response);
+        return false;
+      }
+    }
+    clearSelection(response);
+    return true;
   }
 
   /**

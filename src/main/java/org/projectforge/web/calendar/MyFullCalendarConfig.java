@@ -84,6 +84,7 @@ public class MyFullCalendarConfig extends Config
     setMonthNames(dateFormatSymbols.getMonths());
     setMonthNamesShort(dateFormatSymbols.getShortMonths());
     setWeekMode("variable");
+    setEnableContextMenu(true);
   }
 
   /**

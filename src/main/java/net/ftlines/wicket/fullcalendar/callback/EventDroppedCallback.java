@@ -13,6 +13,7 @@
 package net.ftlines.wicket.fullcalendar.callback;
 
 import net.ftlines.wicket.fullcalendar.CalendarResponse;
+import net.ftlines.wicket.fullcalendar.Config;
 import net.ftlines.wicket.fullcalendar.Event;
 import net.ftlines.wicket.fullcalendar.EventSource;
 import net.ftlines.wicket.fullcalendar.EventSourceNotFoundException;
@@ -50,15 +51,30 @@ public abstract class EventDroppedCallback extends AbstractAjaxCallbackWithClien
       + "{hideCallback: function () {this.menu.remove(); revertFunc(); } }"
       + ").show(this, originalEvent);";
 
+  private final Config config;
+
+  /**
+   * @param config
+   */
+  public EventDroppedCallback(final Config config)
+  {
+    this.config = config;
+  }
+
   @Override
   protected String configureCallbackScript(final String script, final String urlTail)
   {
-
-    return CALLBACK_PRE_SCRIPT
-        + script.replace(urlTail, "&eventId='+event.id+'&sourceId='+event.source.data."
-            + EventSource.Const.UUID
-            + "+'&dayDelta='+dayDelta+'&minuteDelta='+minuteDelta+'&allDay='+allDay+'&which='+which+'")
-            + i18nCallbackScript(CALLBACK_POST_SCRIPT);
+    if(config.isEnableContextMenu() == false) { // do not show context menu
+      return script.replace(urlTail, "&eventId='+event.id+'&sourceId='+event.source.data."
+          + EventSource.Const.UUID
+          + "+'&dayDelta='+dayDelta+'&minuteDelta='+minuteDelta+'&allDay='+allDay+'");
+    } else { // do show context menu
+      return CALLBACK_PRE_SCRIPT
+          + script.replace(urlTail, "&eventId='+event.id+'&sourceId='+event.source.data."
+              + EventSource.Const.UUID
+              + "+'&dayDelta='+dayDelta+'&minuteDelta='+minuteDelta+'&allDay='+allDay+'&which='+which+'")
+              + i18nCallbackScript(CALLBACK_POST_SCRIPT);
+    }
   }
 
   /**
