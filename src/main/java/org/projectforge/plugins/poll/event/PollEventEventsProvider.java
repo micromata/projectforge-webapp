@@ -161,6 +161,7 @@ public class PollEventEventsProvider extends MyFullCalendarEventsProvider
   {
     final PollEventDO clickEvent = searchById(event.getEvent().getId());
     if (clickEvent != null) {
+      // TODO remove when side bar is ready
       pollEventCache.remove(clickEvent);
     }
     clearSelection(response);
@@ -178,5 +179,9 @@ public class PollEventEventsProvider extends MyFullCalendarEventsProvider
       }
     }
     return result;
+  }
+
+  public Collection<PollEventDO> getAllEvents() {
+    return pollEventCache.keySet();
   }
 }

@@ -9,6 +9,8 @@
 
 package org.projectforge.plugins.poll.event;
 
+import java.util.Collection;
+
 import net.ftlines.wicket.fullcalendar.CalendarResponse;
 import net.ftlines.wicket.fullcalendar.EventSource;
 import net.ftlines.wicket.fullcalendar.callback.ClickedEvent;
@@ -16,6 +18,8 @@ import net.ftlines.wicket.fullcalendar.callback.DroppedEvent;
 import net.ftlines.wicket.fullcalendar.callback.ResizedEvent;
 import net.ftlines.wicket.fullcalendar.callback.SelectedRange;
 
+import org.apache.wicket.markup.html.form.Button;
+import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -23,6 +27,7 @@ import org.projectforge.plugins.poll.PollDO;
 import org.projectforge.web.calendar.MyFullCalendar;
 import org.projectforge.web.calendar.MyFullCalendarConfig;
 import org.projectforge.web.wicket.AbstractSecuredPage;
+import org.projectforge.web.wicket.components.SingleButtonPanel;
 
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
@@ -56,6 +61,8 @@ public class PollEventEditPage extends AbstractSecuredPage
   protected void onInitialize()
   {
     super.onInitialize();
+    final Form<Void> form = new Form<Void>("form");
+    body.add(form);
     final PollEventEventsProvider eventProvider = new PollEventEventsProvider(this, model);
     config = new MyFullCalendarConfig(this);
     config.setSelectable(true);
@@ -110,7 +117,28 @@ public class PollEventEditPage extends AbstractSecuredPage
     final EventSource eventSource = new EventSource();
     eventSource.setEventsProvider(eventProvider);
     config.add(eventSource);
-    body.add(calendar);
+    form.add(calendar);
+    final Button nextButton = new Button(SingleButtonPanel.WICKET_ID) {
+      private static final long serialVersionUID = -7779593314951993472L;
+
+      @Override
+      public final void onSubmit()
+      {
+        onNextButtonClick(model.getObject(), eventProvider.getAllEvents());
+      }
+    };
+    nextButton.setDefaultFormProcessing(false);
+    final SingleButtonPanel nextButtonPanel = new SingleButtonPanel("continueButton", nextButton, getString("next"), SingleButtonPanel.DEFAULT_SUBMIT);
+    form.add(nextButtonPanel);
+  }
+
+
+  /**
+   * @param allEvents
+   */
+  protected void onNextButtonClick(final PollDO poll, final Collection<PollEventDO> allEvents)
+  {
+    // TODO Max: here we go
   }
 
   /**
