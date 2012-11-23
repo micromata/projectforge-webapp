@@ -35,7 +35,7 @@ public class PollPlugin extends AbstractPlugin
   static UserPrefArea USER_PREF_AREA;
 
   private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { PollDO.class, PollEventDO.class, PollAttendeeDO.class,
-    PollResultDO.class};
+      PollResultDO.class};
 
   /**
    * This dao should be defined in pluginContext.xml (as resources) for proper initialization.
@@ -74,15 +74,16 @@ public class PollPlugin extends AbstractPlugin
     register(resultEntry);
 
     // Register the web part:
-    //    registerWeb(ID, TeamCalListPage.class, TeamCalEditPage.class);
-    //    registerWeb("pollEvent");
-    //    registerWeb("attendeeEvent", TeamEventEditPage.class, TeamEventEditPage.class);
-    //    registerWeb("resultEvent", TeamEventEditPage.class, TeamEventEditPage.class);
+    // registerWeb(ID, TeamCalListPage.class, TeamCalEditPage.class);
+    // registerWeb("pollEvent");
+    // registerWeb("attendeeEvent", TeamEventEditPage.class, TeamEventEditPage.class);
+    // registerWeb("resultEvent", TeamEventEditPage.class, TeamEventEditPage.class);
 
+    addMountPage("newPoll", NewPollPage.class);
     addMountPage("pollEvent", PollEventEditPage.class);
     // Register the menu entry as sub menu entry of the misc menu:
-    //    final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
-    //    registerMenuItem(new MenuItemDef(parentMenu, ID, 7, "plugins.poll.menu", TeamCalCalendarPage.class));
+    // final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
+    // registerMenuItem(new MenuItemDef(parentMenu, ID, 7, "plugins.poll.menu", TeamCalCalendarPage.class));
     // registerMenuItem(new MenuItemDef(parentMenu, ID + "List", 8, "plugins.teamcal.title.list", TeamCalListPage.class));
 
     // Define the access management:

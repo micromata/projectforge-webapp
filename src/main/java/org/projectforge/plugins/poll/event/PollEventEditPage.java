@@ -21,7 +21,6 @@ import net.ftlines.wicket.fullcalendar.callback.SelectedRange;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.plugins.poll.PollDO;
 import org.projectforge.web.calendar.MyFullCalendar;
@@ -43,15 +42,12 @@ public class PollEventEditPage extends AbstractSecuredPage
 
   private MyFullCalendar calendar;
 
-  private final IModel<PollDO> model;
+  private final IModel<PollDO> pollDoModel;
 
-  /**
-   * @param parameters
-   */
-  public PollEventEditPage(final PageParameters parameters)
+  public PollEventEditPage(final PageParameters parameters, IModel<PollDO> pollDoModel)
   {
     super(parameters);
-    model = new Model<PollDO>(new PollDO());
+    this.pollDoModel = pollDoModel;
   }
 
   /**
@@ -63,7 +59,7 @@ public class PollEventEditPage extends AbstractSecuredPage
     super.onInitialize();
     final Form<Void> form = new Form<Void>("form");
     body.add(form);
-    final PollEventEventsProvider eventProvider = new PollEventEventsProvider(this, model);
+    final PollEventEventsProvider eventProvider = new PollEventEventsProvider(this, pollDoModel);
     config = new MyFullCalendarConfig(this);
     config.setSelectable(true);
     config.setEditable(true);
@@ -104,8 +100,10 @@ public class PollEventEditPage extends AbstractSecuredPage
       {
         return eventProvider.dropEvent(event, response);
       }
+
       /**
-       * @see net.ftlines.wicket.fullcalendar.FullCalendar#onEventClicked(net.ftlines.wicket.fullcalendar.callback.ClickedEvent, net.ftlines.wicket.fullcalendar.CalendarResponse)
+       * @see net.ftlines.wicket.fullcalendar.FullCalendar#onEventClicked(net.ftlines.wicket.fullcalendar.callback.ClickedEvent,
+       *      net.ftlines.wicket.fullcalendar.CalendarResponse)
        */
       @Override
       protected void onEventClicked(final ClickedEvent event, final CalendarResponse response)
@@ -124,14 +122,14 @@ public class PollEventEditPage extends AbstractSecuredPage
       @Override
       public final void onSubmit()
       {
-        onNextButtonClick(model.getObject(), eventProvider.getAllEvents());
+        onNextButtonClick(pollDoModel.getObject(), eventProvider.getAllEvents());
       }
     };
     nextButton.setDefaultFormProcessing(false);
-    final SingleButtonPanel nextButtonPanel = new SingleButtonPanel("continueButton", nextButton, getString("next"), SingleButtonPanel.DEFAULT_SUBMIT);
+    final SingleButtonPanel nextButtonPanel = new SingleButtonPanel("continueButton", nextButton, getString("next"),
+        SingleButtonPanel.DEFAULT_SUBMIT);
     form.add(nextButtonPanel);
   }
-
 
   /**
    * @param allEvents
