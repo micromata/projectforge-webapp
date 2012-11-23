@@ -228,7 +228,7 @@ public class TeamCalCalendarPanel extends CalendarPanel
         // we need update only in "move" mode, in "copy" mode it was saved a few lines above
         teamEventDao.update(dbTeamEvent);
       }
-      setResponsePage(getWebPage());
+      setResponsePage(getWebPage().getClass(), getWebPage().getPageParameters());
     } else {
       // CANCEL -> should be handled through javascript now
       setResponsePage(getWebPage());
