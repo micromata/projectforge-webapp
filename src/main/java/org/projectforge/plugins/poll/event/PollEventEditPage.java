@@ -11,9 +11,15 @@ package org.projectforge.plugins.poll.event;
 
 import net.ftlines.wicket.fullcalendar.CalendarResponse;
 import net.ftlines.wicket.fullcalendar.EventSource;
-import net.ftlines.wicket.fullcalendar.callback.View;
+import net.ftlines.wicket.fullcalendar.callback.ClickedEvent;
+import net.ftlines.wicket.fullcalendar.callback.DroppedEvent;
+import net.ftlines.wicket.fullcalendar.callback.ResizedEvent;
+import net.ftlines.wicket.fullcalendar.callback.SelectedRange;
 
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.projectforge.plugins.poll.PollDO;
 import org.projectforge.web.calendar.MyFullCalendar;
 import org.projectforge.web.calendar.MyFullCalendarConfig;
 import org.projectforge.web.wicket.AbstractSecuredPage;
@@ -32,12 +38,15 @@ public class PollEventEditPage extends AbstractSecuredPage
 
   private MyFullCalendar calendar;
 
+  private final IModel<PollDO> model;
+
   /**
    * @param parameters
    */
   public PollEventEditPage(final PageParameters parameters)
   {
     super(parameters);
+    model = new Model<PollDO>(new PollDO());
   }
 
   /**
@@ -47,8 +56,10 @@ public class PollEventEditPage extends AbstractSecuredPage
   protected void onInitialize()
   {
     super.onInitialize();
+    final PollEventEventsProvider eventProvider = new PollEventEventsProvider(this, model);
     config = new MyFullCalendarConfig(this);
     config.setSelectable(true);
+    config.setEditable(true);
     config.setSelectHelper(true);
     config.setDefaultView("agendaWeek");
     config.getHeader().setRight("");
@@ -56,15 +67,46 @@ public class PollEventEditPage extends AbstractSecuredPage
     calendar = new MyFullCalendar("cal", config) {
       private static final long serialVersionUID = -6819899072933690316L;
 
+      /**
+       * @see net.ftlines.wicket.fullcalendar.FullCalendar#onDateRangeSelected(net.ftlines.wicket.fullcalendar.callback.SelectedRange,
+       *      net.ftlines.wicket.fullcalendar.CalendarResponse)
+       */
       @Override
-      protected void onViewDisplayed(final View view, final CalendarResponse response)
+      protected void onDateRangeSelected(final SelectedRange range, final CalendarResponse response)
       {
-        response.refetchEvents();
+        eventProvider.addEvent(range, response);
+      }
+
+      /**
+       * @see net.ftlines.wicket.fullcalendar.FullCalendar#onEventResized(net.ftlines.wicket.fullcalendar.callback.ResizedEvent,
+       *      net.ftlines.wicket.fullcalendar.CalendarResponse)
+       */
+      @Override
+      protected boolean onEventResized(final ResizedEvent event, final CalendarResponse response)
+      {
+        return eventProvider.resizeEvent(event, response);
+      }
+
+      /**
+       * @see net.ftlines.wicket.fullcalendar.FullCalendar#onEventDropped(net.ftlines.wicket.fullcalendar.callback.DroppedEvent,
+       *      net.ftlines.wicket.fullcalendar.CalendarResponse)
+       */
+      @Override
+      protected boolean onEventDropped(final DroppedEvent event, final CalendarResponse response)
+      {
+        return eventProvider.dropEvent(event, response);
+      }
+      /**
+       * @see net.ftlines.wicket.fullcalendar.FullCalendar#onEventClicked(net.ftlines.wicket.fullcalendar.callback.ClickedEvent, net.ftlines.wicket.fullcalendar.CalendarResponse)
+       */
+      @Override
+      protected void onEventClicked(final ClickedEvent event, final CalendarResponse response)
+      {
+        eventProvider.eventClicked(event, response);
       }
     };
     calendar.setMarkupId("calendar");
     final EventSource eventSource = new EventSource();
-    final PollEventEventsProvider eventProvider = new PollEventEventsProvider(this);
     eventSource.setEventsProvider(eventProvider);
     config.add(eventSource);
     body.add(calendar);
