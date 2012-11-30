@@ -30,6 +30,7 @@ import org.apache.wicket.Component;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.FileHelper;
+import org.projectforge.common.MimeType;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.gantt.ExportMSProject;
 import org.projectforge.gantt.GanttChart;
@@ -119,16 +120,16 @@ public class GanttChartEditPage extends AbstractEditPage<GanttChartDO, GanttChar
       content = BatikImageRenderer.getByteArray(document, ganttChart.getWidth(), imageFormat);
       DownloadUtils.setDownloadTarget(content, filename);
     } else {
-      final String type;
+      final MimeType type;
       if (GanttChartEditForm.EXPORT_MS_PROJECT_MPX.equals(exportFormat) == true) {
         content = ExportMSProject.exportMpx(ganttChart);
-        type = DownloadUtils.TYPE_MS_PROJECT;
+        type = MimeType.MS_PROJECT;
       } else if (GanttChartEditForm.EXPORT_MS_PROJECT_XML.equals(exportFormat) == true) {
         content = ExportMSProject.exportXml(ganttChart);
-        type = DownloadUtils.TYPE_MS_PROJECT;
+        type = MimeType.MS_PROJECT;
       } else {
         content = ganttChartDao.exportAsXml(ganttChart, true).getBytes();
-        type = DownloadUtils.TYPE_XML;
+        type = MimeType.XML;
       }
       DownloadUtils.setDownloadTarget(content, filename, type);
     }
