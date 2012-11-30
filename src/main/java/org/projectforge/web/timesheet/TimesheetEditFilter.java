@@ -23,17 +23,16 @@
 
 package org.projectforge.web.timesheet;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.projectforge.core.BaseSearchFilter;
 
 /**
  * 
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  * 
  */
-public class TimesheetEditFilter extends BaseSearchFilter
+public class TimesheetEditFilter implements Serializable
 {
   private static final long serialVersionUID = -7685135320311389741L;
 
