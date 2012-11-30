@@ -1,12 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.projectforge</groupId>
-  <artifactId>ProjectForge</artifactId>
+  <artifactId>projectforge-webapp</artifactId>
   <packaging>war</packaging>
-  <name>ProjectForge</name>
   <parent>
     <groupId>org.projectforge</groupId>
-    <artifactId>ProjectForge-parent</artifactId>
+    <artifactId>projectforge-parent</artifactId>
     <version>4.1.4.14</version>
   </parent>
   <licenses>
@@ -26,15 +25,22 @@
     <jackson.version>1.7.5</jackson.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
+  <repositories>
+    <repository>
+      <id>org.projectforge</id>
+      <name>ProjectForge</name>
+      <url>http://www.projectforge.org/nexus/content/repositories/ProjectForge</url>
+    </repository>
+  </repositories>
   <dependencies>
     <dependency>
       <groupId>org.projectforge</groupId>
-      <artifactId>ProjectForge-common</artifactId>
+      <artifactId>projectforge-common</artifactId>
       <version>${projectforge.version}</version>
     </dependency>
     <dependency>
       <groupId>org.projectforge</groupId>
-      <artifactId>ProjectForge-webserver</artifactId>
+      <artifactId>projectforge-webserver</artifactId>
       <version>${projectforge.version}</version>
       <scope>test</scope>
     </dependency>
