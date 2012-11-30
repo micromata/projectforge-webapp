@@ -118,6 +118,7 @@ class TimesheetPageSupport implements Serializable
     fs.add(locationTextField);
     if (fs instanceof FieldsetPanel) {
       ((FieldsetPanel) fs).addKeyboardHelpIcon(getString("tooltip.autocomplete.withDblClickFunction"));
+      ((FieldsetPanel) fs).addHelpIcon(getString("timesheet.location.tooltip"));
     }
     return fs;
   }
