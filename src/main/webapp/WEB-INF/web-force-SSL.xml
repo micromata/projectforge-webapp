@@ -149,10 +149,6 @@
     <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
   <servlet>
-    <servlet-name>jersey</servlet-name>
-    <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
-  </servlet>
-  <servlet>
     <!-- Displays logo at the top of the navigation menu. -->
     <servlet-name>LogoServlet</servlet-name>
     <servlet-class>org.projectforge.web.core.LogoServlet</servlet-class>
@@ -193,11 +189,20 @@
     <servlet-name>PhoneLookUpServlet</servlet-name>
     <servlet-class>org.projectforge.web.address.PhoneLookUpServlet</servlet-class>
   </servlet>
-
+  <servlet>
+    <servlet-name>org.projectforge.rest.MyApplication</servlet-name>
+    <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+    <init-param>
+      <param-name>javax.ws.rs.Application</param-name>
+      <param-value>org.projectforge.rest.MyApplication</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
   <servlet-mapping>
-    <servlet-name>jersey</servlet-name>
+    <servlet-name>org.projectforge.rest.MyApplication</servlet-name>
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
+
   <servlet-mapping>
     <servlet-name>LogoServlet</servlet-name>
     <url-pattern>/secure/Logo.png</url-pattern>
