@@ -28,10 +28,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.projectforge.address.AddressDO;
-import org.projectforge.address.AddressDao;
-import org.projectforge.address.PersonalAddressDO;
-import org.projectforge.address.PersonalAddressDao;
 import org.projectforge.test.TestBase;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
