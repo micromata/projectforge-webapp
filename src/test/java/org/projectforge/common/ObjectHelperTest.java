@@ -29,7 +29,6 @@ import static org.junit.Assert.assertTrue;
 import java.math.BigDecimal;
 
 import org.junit.Test;
-import org.projectforge.common.ObjectHelper;
 
 
 public class ObjectHelperTest

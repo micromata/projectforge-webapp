@@ -26,7 +26,6 @@ package org.projectforge.core;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.projectforge.core.BaseDao;
 
 
 public class BaseDaoTest

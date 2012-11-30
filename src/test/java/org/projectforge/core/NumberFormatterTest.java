@@ -30,7 +30,6 @@ import java.util.Locale;
 
 import org.junit.Test;
 import org.projectforge.common.TestHelper;
-import org.projectforge.core.NumberFormatter;
 
 
 public class NumberFormatterTest

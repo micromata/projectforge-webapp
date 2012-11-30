@@ -25,8 +25,6 @@ package org.projectforge.core;
 
 import java.util.Collection;
 
-import org.projectforge.core.DefaultBaseDO;
-
 
 public class FooDO extends DefaultBaseDO
 {

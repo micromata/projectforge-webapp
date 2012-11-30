@@ -36,8 +36,6 @@ import java.util.List;
 
 import org.junit.Test;
 import org.projectforge.calendar.DayHolder;
-import org.projectforge.common.CSVParser;
-import org.projectforge.common.CSVWriter;
 
 
 public class CSVParserTest

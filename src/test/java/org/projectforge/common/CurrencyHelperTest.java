@@ -28,7 +28,6 @@ import static org.junit.Assert.fail;
 import java.math.BigDecimal;
 
 import org.junit.Test;
-import org.projectforge.common.CurrencyHelper;
 
 
 public class CurrencyHelperTest

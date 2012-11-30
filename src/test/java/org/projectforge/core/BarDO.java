@@ -24,7 +24,6 @@
 package org.projectforge.core;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.projectforge.core.DefaultBaseDO;
 
 
 public class BarDO extends DefaultBaseDO
