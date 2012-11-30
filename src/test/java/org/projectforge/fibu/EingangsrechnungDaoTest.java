@@ -31,10 +31,6 @@ import java.sql.Date;
 
 import org.junit.Test;
 import org.projectforge.access.AccessException;
-import org.projectforge.fibu.EingangsrechnungDO;
-import org.projectforge.fibu.EingangsrechnungDao;
-import org.projectforge.fibu.EingangsrechnungsPositionDO;
-import org.projectforge.fibu.RechnungFilter;
 import org.projectforge.test.TestBase;
 
 

@@ -32,9 +32,6 @@ import java.util.List;
 
 import org.junit.Test;
 import org.projectforge.core.Priority;
-import org.projectforge.fibu.kost.reporting.Report;
-import org.projectforge.fibu.kost.reporting.ReportDao;
-import org.projectforge.fibu.kost.reporting.ReportObjective;
 import org.projectforge.test.TestBase;
 
 

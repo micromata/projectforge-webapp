@@ -26,9 +26,6 @@ package org.projectforge.fibu;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.projectforge.fibu.AuftragDO;
-import org.projectforge.fibu.KundeDO;
-import org.projectforge.fibu.ProjektDO;
 
 
 public class AuftragDOTest

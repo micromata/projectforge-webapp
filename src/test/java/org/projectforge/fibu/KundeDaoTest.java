@@ -31,8 +31,6 @@ import java.io.Serializable;
 import org.junit.Test;
 import org.projectforge.access.AccessException;
 import org.projectforge.core.BaseSearchFilter;
-import org.projectforge.fibu.KundeDO;
-import org.projectforge.fibu.KundeDao;
 import org.projectforge.test.TestBase;
 
 

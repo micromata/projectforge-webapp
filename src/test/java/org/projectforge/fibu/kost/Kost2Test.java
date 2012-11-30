@@ -29,8 +29,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
-import org.projectforge.fibu.kost.Kost2ArtDO;
-import org.projectforge.fibu.kost.Kost2DO;
 
 
 public class Kost2Test

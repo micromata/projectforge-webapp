@@ -28,8 +28,6 @@ import static org.junit.Assert.assertEquals;
 import java.math.BigDecimal;
 
 import org.junit.Test;
-import org.projectforge.fibu.RechnungDO;
-import org.projectforge.fibu.RechnungsPositionDO;
 
 
 public class RechnungDOTest

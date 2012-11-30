@@ -33,11 +33,6 @@ import java.sql.Date;
 import org.junit.Test;
 import org.projectforge.access.AccessException;
 import org.projectforge.core.UserException;
-import org.projectforge.fibu.RechnungDO;
-import org.projectforge.fibu.RechnungDao;
-import org.projectforge.fibu.RechnungFilter;
-import org.projectforge.fibu.RechnungTyp;
-import org.projectforge.fibu.RechnungsPositionDO;
 import org.projectforge.test.TestBase;
 
 

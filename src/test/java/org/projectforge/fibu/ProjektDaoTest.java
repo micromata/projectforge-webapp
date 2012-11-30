@@ -30,9 +30,6 @@ import java.io.Serializable;
 
 import org.junit.Test;
 import org.projectforge.access.AccessException;
-import org.projectforge.fibu.ProjektDO;
-import org.projectforge.fibu.ProjektDao;
-import org.projectforge.fibu.ProjektFilter;
 import org.projectforge.test.TestBase;
 import org.projectforge.user.GroupDO;
 

@@ -25,7 +25,6 @@ package org.projectforge.fibu.kost;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.projectforge.fibu.kost.KostHelper;
 
 
 public class KostHelperTest
