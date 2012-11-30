@@ -66,6 +66,7 @@ import org.projectforge.ldap.LdapConfig;
 import org.projectforge.mail.MailAccountConfig;
 import org.projectforge.mail.SendMailConfig;
 import org.projectforge.orga.ContractType;
+import org.projectforge.storage.StorageConfig;
 import org.projectforge.user.LoginDefaultHandler;
 import org.projectforge.web.MenuEntryConfig;
 import org.projectforge.web.MenuItemDef;
@@ -115,6 +116,8 @@ public class ConfigXml
   private JiraConfig jiraConfig;
 
   private String jiraBrowseBaseUrl;
+
+  private StorageConfig storageConfig;
 
   private String telephoneSystemUrl;
 
@@ -264,7 +267,7 @@ public class ConfigXml
       dir.mkdir();
     }
     if (dir.canRead() == false) {
-      log.fatal("Can't create directory: " + applicationHomeDir);
+      log.fatal("Can't create directory: " + dir);
       return false;
     }
     return true;
@@ -645,6 +648,19 @@ public class ConfigXml
   public final boolean isJIRAConfigured()
   {
     return StringUtils.isNotBlank(getJiraBrowseBaseUrl());
+  }
+
+  /**
+   * @return the storageConfig
+   */
+  public StorageConfig getStorageConfig()
+  {
+    return storageConfig;
+  }
+
+  public boolean isStorageConfigured()
+  {
+    return storageConfig != null && StringUtils.isNotBlank(storageConfig.getAuthenticationToken());
   }
 
   /**
