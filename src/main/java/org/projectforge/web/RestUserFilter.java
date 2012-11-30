@@ -29,51 +29,62 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * 
  * @author Daniel Ludwig (d.ludwig@micromata.de)
- *
+ * 
  */
-public class RestUserFilter implements Filter {
-	@Autowired
-	private UserDao userDao;
+public class RestUserFilter implements Filter
+{
+  @Autowired
+  private UserDao userDao;
 
-	@Override
-	public void init(final FilterConfig filterConfig) throws ServletException {
-		// NOOP
-	}
+  @Override
+  public void init(final FilterConfig filterConfig) throws ServletException
+  {
+    // NOOP
+  }
 
-	@Override
-	public void doFilter(final ServletRequest request, final ServletResponse response,
-			final FilterChain chain) throws IOException, ServletException {
-		final HttpServletRequest req = (HttpServletRequest) request;
-		final String header = req.getHeader("Authorization");
-		try {
-			final String[] split = StringUtils.split(header, ":");
-			final String username = split[0];
-			final String encryptedPassword = userDao.encryptPassword(split[1]);
-			final PFUserDO user = userDao.authenticateUser(username, encryptedPassword);
-			if(user == null) {
-				final HttpServletResponse resp = (HttpServletResponse) response;
-				resp.sendError(HttpServletResponse.SC_FORBIDDEN);
-				return;
-			}
+  @Override
+  public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException,
+  ServletException
+  {
+    final HttpServletRequest req = (HttpServletRequest) request;
+    final String header = req.getHeader("Authorization");
+    try {
+      final String[] split = StringUtils.split(header, ":");
+      if (split == null || split.length != 2) {
+        final HttpServletResponse resp = (HttpServletResponse) response;
+        resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+        return;
+      }
+      final String username = split[0];
+      final String encryptedPassword = userDao.encryptPassword(split[1]);
+      final PFUserDO user = userDao.authenticateUser(username, encryptedPassword);
+      if (user == null) {
+        final HttpServletResponse resp = (HttpServletResponse) response;
+        resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+        return;
+      }
 
-			PFUserContext.setUser(user);
-			chain.doFilter(request, response);
-		} finally {
-			PFUserContext.setUser(null);
-		}
-	}
+      PFUserContext.setUser(user);
+      chain.doFilter(request, response);
+    } finally {
+      PFUserContext.setUser(null);
+    }
+  }
 
-	@Override
-	public void destroy() {
-		// NOOP
-	}
+  @Override
+  public void destroy()
+  {
+    // NOOP
+  }
 
-	public UserDao getUserDao() {
-		return userDao;
-	}
+  public UserDao getUserDao()
+  {
+    return userDao;
+  }
 
-	public void setUserDao(final UserDao userDao) {
-		this.userDao = userDao;
-	}
+  public void setUserDao(final UserDao userDao)
+  {
+    this.userDao = userDao;
+  }
 
 }
