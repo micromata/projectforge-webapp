@@ -29,36 +29,11 @@ import org.apache.wicket.request.Response;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.handler.resource.ResourceStreamRequestHandler;
 import org.apache.wicket.request.resource.ContentDisposition;
+import org.projectforge.common.MimeType;
 
 public class DownloadUtils
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(DownloadUtils.class);
-
-  // See e. g.: http://de.selfhtml.org/diverses/mimetypen.htm
-
-  public static final String TYPE_JPEG = "image/jpeg";
-
-  public static final String TYPE_MS_PROJECT = "application/vnd.ms-project";
-
-  public static final String TYPE_OCTET_STREAM = "application/octet-stream";
-
-  public static final String TYPE_GZIP = "application/gzip";
-
-  public static final String TYPE_PDF = "application/pdf";
-
-  public static final String TYPE_PNG = "image/png";
-
-  public static final String TYPE_SVG = "image/svg+xml";
-
-  public static final String TYPE_TEXT = "text";
-
-  public static final String TYPE_VCARD = "text/x-vcard";
-
-  public static final String TYPE_XLS = "application/vnd.ms-excel";
-
-  public static final String TYPE_XML = "application/xml";
-
-  public static final String TYPE_ZIP = "application/zip";
 
   public static void setCharacterEncoding(final Response response, final String encoding)
   {
@@ -82,7 +57,17 @@ public class DownloadUtils
    */
   public static void setDownloadTarget(final byte[] content, final String filename)
   {
-    setDownloadTarget(content, filename, null);
+    setDownloadTarget(content, filename, (String) null);
+  }
+
+  /**
+   * @param content The content of the file to download.
+   * @param filename
+   * @param contentType For setting contentType manually.
+   */
+  public static void setDownloadTarget(final byte[] content, final String filename, final MimeType mimeType)
+  {
+    setDownloadTarget(content, filename, mimeType != null ? mimeType.getMimeTypeString() : (String)null);
   }
 
   /**
@@ -112,30 +97,9 @@ public class DownloadUtils
    */
   public static String getContentType(final String filename)
   {
-    if (filename == null) {
-      return TYPE_OCTET_STREAM;
-    } else if (filename.endsWith(".jpg") == true || filename.endsWith(".jpeg") == true) {
-      return TYPE_JPEG;
-    } else if (filename.endsWith(".pdf") == true) {
-      return TYPE_PDF;
-    } else if (filename.endsWith(".gz") == true) {
-      return TYPE_GZIP;
-    } else if (filename.endsWith(".zip") == true) {
-      return TYPE_ZIP;
-    } else if (filename.endsWith(".xls") == true) {
-      return TYPE_XLS;
-    } else if (filename.endsWith(".txt") == true || filename.endsWith(".csv") == true) {
-      return TYPE_TEXT;
-    } else if (filename.endsWith(".vcf") == true) {
-      return TYPE_VCARD;
-    } else if (filename.endsWith(".svg") == true) {
-      return TYPE_SVG;
-    } else if (filename.endsWith(".png") == true) {
-      return TYPE_PNG;
-    } else if (filename.endsWith(".xml") == true) {
-      return TYPE_XML;
-    } else if (filename.endsWith(".mpx") == true) {
-      return TYPE_MS_PROJECT;
+    final MimeType mimeType = MimeType.getMimeType(filename);
+    if (mimeType != null) {
+      return mimeType.getMimeTypeString();
     }
     log.error("Unknown file type: " + filename);
     return "";
