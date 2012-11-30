@@ -23,6 +23,7 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.plugins.poll.PollDO;
+import org.projectforge.plugins.poll.attendee.PollAttendeePage;
 import org.projectforge.web.calendar.MyFullCalendar;
 import org.projectforge.web.calendar.MyFullCalendarConfig;
 import org.projectforge.web.wicket.AbstractSecuredPage;
@@ -152,7 +153,7 @@ public class PollEventEditPage extends AbstractSecuredPage
    */
   protected void onNextButtonClick(final PollDO pollDo, final Collection<PollEventDO> allEvents)
   {
-    // setResponsePage(new PollAttendeePage(getPageParameters(), pollDo, allEvents));
+    setResponsePage(new PollAttendeePage(getPageParameters(), pollDo, allEvents));
   }
 
   /**
