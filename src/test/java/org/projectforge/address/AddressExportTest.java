@@ -26,8 +26,6 @@ package org.projectforge.address;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.projectforge.address.AddressDO;
-import org.projectforge.address.AddressDao;
 
 
 public class AddressExportTest
