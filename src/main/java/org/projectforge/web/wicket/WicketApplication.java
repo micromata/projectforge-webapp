@@ -66,6 +66,7 @@ import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.HibernateUtils;
 import org.projectforge.plugins.core.PluginsRegistry;
 import org.projectforge.registry.DaoRegistry;
+import org.projectforge.storage.StorageClient;
 import org.projectforge.user.Login;
 import org.projectforge.user.LoginDefaultHandler;
 import org.projectforge.user.LoginHandler;
@@ -88,7 +89,7 @@ import com.vaynberg.wicket.select2.ApplicationSettings;
 /**
  * Application object for your web application. If you want to run this application without deploying, run the Start class.
  * 
- * @see org.StartHelper.demo.Start#main(String[])
+ * @see org.projectforge.web.AbstractStartHelper.demo.Start#main(String[])
  */
 public class WicketApplication extends WebApplication implements WicketApplicationInterface
 {
@@ -271,7 +272,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
       public IRequestHandler onException(final RequestCycle cycle, final Exception ex)
       {
         // in case of expired session, please redirect to home page
-        if(ex instanceof PageExpiredException) {
+        if (ex instanceof PageExpiredException) {
           return new RenderPageRequestHandler(new PageProvider(getHomePage()));
         }
         final Throwable rootCause = ExceptionHelper.getRootCause(ex);
@@ -413,7 +414,11 @@ public class WicketApplication extends WebApplication implements WicketApplicati
       loginHandler.initialize();
       Login.getInstance().setLoginHandler(loginHandler);
     }
-
+    try {
+      StorageClient.getInstance(); // Initialize storage
+    } catch (final Exception ex) {
+      log.error(ex.getMessage(), ex);
+    }
     getPageSettings().setRecreateMountedPagesAfterExpiry(false);
   }
 
