@@ -51,8 +51,9 @@ public class ModifyJavaFileHeaders
     final Collection<File> files = FileUtils.listFiles(new File(PATH), new String[] { "java"}, true);
     int counter = 0;
     for (final File file : files) {
-      if (file.getAbsolutePath().contains("org/projectforge/lucene/PF") == true ||
-          file.getAbsolutePath().contains("java/net") == true) {
+      if (file.getAbsolutePath().contains("org/projectforge/lucene/PF") == true
+          || file.getAbsolutePath().contains("arlut.csd.crypto") == true
+          || file.getAbsolutePath().contains("java/net") == true) {
         continue;
       }
       FileReader reader = null;
