@@ -3,118 +3,12 @@
   <groupId>org.projectforge</groupId>
   <artifactId>ProjectForge</artifactId>
   <packaging>war</packaging>
-  <version>4.1.4.14</version>
   <name>ProjectForge</name>
-  <description>
-    ProjectForge is a multi user web application for collaborative team work. Organize time sheets, tasks, addresses, books etc. with project teams.
-  </description>
-  <url>http://www.projectforge.org</url>
-  <organization>
-    <name>Kai Reinhard</name>
-    <url>http://www.projectforge.org</url>
-  </organization>
-  <issueManagement>
-    <system>JIRA</system>
-    <url>https://www.projectforge.org/jira</url>
-  </issueManagement>
-  <ciManagement>
-    <system>Bamboo</system>
-    <url>http://www.projectforge.org</url>
-  </ciManagement>
-  <distributionManagement>
-    <repository>
-      <id>ProjectForge</id>
-      <name>ProjectForge M2</name>
-      <url>http://www.projectforge.org/nexus</url>
-    </repository>
-  </distributionManagement>
-  <scm>
-    <connection>scm:svn:https://pforge.svn.sourceforge.net/svnroot/pforge</connection>
-    <developerConnection>scm:svn:https://pforge.svn.sourceforge.net/svnroot/pforge</developerConnection>
-    <url>https://pforge.svn.sourceforge.net/svnroot/pforge</url>
-  </scm>
-  <developers>
-    <developer>
-      <id>kai</id>
-      <name>Kai Reinhard</name>
-      <email>k.reinhard at micromata.de</email>
-      <organization>Micromata GmbH</organization>
-      <organizationUrl>http://www.micromata.com</organizationUrl>
-      <roles>
-        <role>architect</role>
-        <role>developer</role>
-        <role>CEO</role>
-      </roles>
-      <timezone>-1</timezone>
-    </developer>
-    <developer>
-      <id>wolle</id>
-      <name>Wolfgang Jung</name>
-      <email>w.jung at micromata.de</email>
-      <organization>Micromata GmbH</organization>
-      <organizationUrl>http://www.micromata.com</organizationUrl>
-      <roles>
-        <role>architect</role>
-        <role>developer</role>
-      </roles>
-      <timezone>-1</timezone>
-    </developer>
-    <developer>
-      <id>cclaus</id>
-      <name>Christian Claus</name>
-      <email>c.claus at micromata.de</email>
-      <organization>Micromata GmbH</organization>
-      <organizationUrl>http://www.micromata.com</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>-1</timezone>
-    </developer>
-    <developer>
-      <id>daniel</id>
-      <name>Daniel Ludwig</name>
-      <email>d.ludwig at micromata.de</email>
-      <organization>Micromata GmbH</organization>
-      <organizationUrl>http://www.micromata.com</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>-1</timezone>
-    </developer>
-    <developer>
-      <id>junterstein</id>
-      <name>Johannes Unterstein</name>
-      <email>j.unterstein at micromata.de</email>
-      <organization>Micromata GmbH</organization>
-      <organizationUrl>http://www.micromata.com</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>-1</timezone>
-    </developer>
-    <developer>
-      <id>mlauterbach</id>
-      <name>Maximilian Lauterbach</name>
-      <email>m.lauterbach at micromata.de</email>
-      <organization>Micromata GmbH</organization>
-      <organizationUrl>http://www.micromata.com</organizationUrl>
-      <roles>
-        <role>developer</role>
-      </roles>
-      <timezone>-1</timezone>
-    </developer>
-  </developers>
-  <contributors>
-    <contributor>
-      <name>Oisin Lavery</name>
-      <organization>Tricycle Interactive</organization>
-      <organizationUrl>http://www.tricycle.ie/</organizationUrl>
-      <roles>
-        <role>Contributor of Adminica, the web site template used by ProjectForge.</role>
-      </roles>
-      <timezone>-1</timezone>
-    </contributor>
-  </contributors>
+  <parent>
+    <groupId>org.projectforge</groupId>
+    <artifactId>ProjectForge-parent</artifactId>
+    <version>4.1.4.14</version>
+  </parent>
   <licenses>
     <license>
       <name>Dual license</name>
@@ -123,113 +17,41 @@
       <distribution>manual</distribution>
     </license>
   </licenses>
-  <repositories>
-    <repository>
-      <id>repo1.maven.org</id>
-      <name>Maven repository</name>
-      <url>http://repo1.maven.org/maven2/</url>
-      <layout>default</layout>
-    </repository>
-    <repository>
-      <id>org.projectforge</id>
-      <name>ProjectForge</name>
-      <url>http://www.projectforge.org/nexus/content/repositories/ProjectForge</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>micromata_labs</id>
-      <url>http://labs.micromata.de/nexus/content/groups/public/</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>java.net</id>
-      <url>http://download.java.net/maven/1</url>
-    </repository>
-    <repository>
-      <id>repository.jboss.org</id>
-      <name>JBoss Maven Repository</name>
-      <url>https://repository.jboss.org/nexus/content/groups/public</url>
-      <layout>default</layout>
-    </repository>
-    <repository>
-      <id>repository.codehaus.org</id>
-      <name>Codehaus Maven Repository</name>
-      <url>http://repository.codehaus.org</url>
-      <layout>default</layout>
-    </repository>
-    <repository>
-      <id>spring-release</id>
-      <url>http://maven.springframework.org/release</url>
-    </repository>
-    <repository>
-      <id>wicket-snaps</id>
-      <url>http://wicketstuff.org/maven/repository</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-    </repository>
-    <repository>
-      <id>maven2-repository.dev.java.net</id>
-      <name>Java.net Repository for Maven</name>
-      <url>http://download.java.net/maven/2/</url>
-      <layout>default</layout>
-    </repository>
-  </repositories>
   <properties>
     <!-- wtpversion>1.5</wtpversion -->
-    <downloadSources>true</downloadSources>
     <spring.version>3.1.1.RELEASE</spring.version>
     <wicket.version>1.5.5</wicket.version> <!-- Version check: 2012-03-12, 6.0.0-beta1 -->
     <!-- <wiquery.version>1.5.5</wiquery.version> -->
     <joda.version>2.0</joda.version>
     <jackson.version>1.7.5</jackson.version>
-    <jetty.version>7.5.0.v20110901</jetty.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <dependencies>
     <dependency>
+      <groupId>org.projectforge</groupId>
+      <artifactId>ProjectForge-common</artifactId>
+      <version>${projectforge.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.projectforge</groupId>
+      <artifactId>ProjectForge-webserver</artifactId>
+      <version>${projectforge.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-client</artifactId>
+      <version>${jersey.version}</version>
+    </dependency>
+    <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-server</artifactId>
-      <version>1.14</version>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.jersey.contribs</groupId>
-      <artifactId>jersey-spring</artifactId>
-      <version>1.14</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-aop</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-beans</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-core</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-context</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-web</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>${jersey.version}</version>
     </dependency>
     <dependency>
       <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-grizzly2</artifactId>
-      <version>1.14</version>
+      <artifactId>jersey-servlet</artifactId>
+      <version>${jersey.version}</version>
     </dependency>
     <dependency>
       <groupId>com.vaynberg.wicket.select2</groupId>
@@ -265,16 +87,6 @@
       <version>3.1</version> <!-- 4.0.1, but no maven repository found. -->
     </dependency>
     <dependency> <!-- Version check: 2010-08-28 -->
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>2.2</version>
-    </dependency>
-    <dependency> <!-- Version check: 2010-08-28 -->
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-      <version>2.5</version>
-    </dependency>
-    <dependency> <!-- Version check: 2010-08-28 -->
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>
       <version>3.2.1</version>
@@ -284,10 +96,10 @@
       <artifactId>commons-codec</artifactId>
       <version>1.4</version>
     </dependency>
-    <dependency> <!-- Version check: 2010-08-28 -->
+    <dependency>
       <groupId>dom4j</groupId>
       <artifactId>dom4j</artifactId>
-      <version>1.6.1</version>
+      <version>${dom4j.version}</version>
     </dependency>
     <dependency>
       <groupId>hsqldb</groupId>
@@ -333,11 +145,6 @@
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
       <version>${joda.version}</version>
-    </dependency>
-    <dependency> <!-- Version check: 2010-08-28 -->
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.16</version>
     </dependency>
     <dependency> <!-- Version check: 2010-08-?? -->
       <groupId>net.sf.mpxj</groupId>
@@ -465,12 +272,6 @@
       <artifactId>jsr173</artifactId>
       <version>1.0</version>
     </dependency>
-    <dependency> <!-- Version check: 2010-08-28 -->
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.7</version> <!-- 4.8.2, but no maven repository found. -->
-      <scope>test</scope>
-    </dependency>
 
     <dependency> <!-- Version check: 2010-08-28 -->
       <groupId>org.apache.poi</groupId>
@@ -492,11 +293,7 @@
       <artifactId>hibernate-core</artifactId>
       <version>3.6.10.Final</version>
     </dependency>
-    <!-- dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-ehcache</artifactId>
-      <version>4.1.7.Final</version>
-    </dependency-->
+    <!-- dependency> <groupId>org.hibernate</groupId> <artifactId>hibernate-ehcache</artifactId> <version>4.1.7.Final</version> </dependency -->
     <dependency>
       <groupId>net.sf.ehcache</groupId>
       <artifactId>ehcache-core</artifactId>
@@ -511,6 +308,11 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
+      <version>1.6.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
       <version>1.6.4</version>
     </dependency>
     <dependency> <!-- Version check: 2010-08-28 -->
@@ -618,41 +420,6 @@
       <version>3.1</version>
     </dependency>
 
-    <!-- Jackrabbit -->
-    <!-- The JCR API -->
-    <dependency>
-      <groupId>javax.jcr</groupId>
-      <artifactId>jcr</artifactId>
-      <version>2.0</version>
-    </dependency>
-
-    <!-- Jackrabbit content repository -->
-    <dependency>
-      <groupId>org.apache.jackrabbit</groupId>
-      <artifactId>jackrabbit-core</artifactId>
-      <version>2.5.2</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.lucene</groupId>
-          <artifactId>lucene-core</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-
-    <!-- JETTY DEPENDENCIES FOR TESTING -->
-    <dependency>
-      <groupId>org.eclipse.jetty.aggregate</groupId>
-      <artifactId>jetty-all-server</artifactId>
-      <scope>test</scope>
-      <version>${jetty.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-plus</artifactId>
-      <scope>test</scope>
-      <version>${jetty.version}</version>
-    </dependency>
   </dependencies>
   <build>
     <finalName>ProjectForge</finalName>
