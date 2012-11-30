@@ -31,9 +31,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.Serializable;
 
 import org.junit.Test;
-import org.projectforge.book.BookDO;
-import org.projectforge.book.BookDao;
-import org.projectforge.book.BookStatus;
 import org.projectforge.test.TestBase;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
