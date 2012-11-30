@@ -31,8 +31,6 @@ import org.projectforge.access.AccessType;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskFilter;
 import org.projectforge.test.TestBase;
-import org.projectforge.web.task.TaskTreeTable;
-import org.projectforge.web.task.TaskTreeTableNode;
 
 
 public class TaskTreeTableTest extends TestBase

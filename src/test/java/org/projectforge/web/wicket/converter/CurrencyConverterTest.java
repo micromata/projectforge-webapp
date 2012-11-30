@@ -33,7 +33,6 @@ import java.util.Locale;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectforge.core.ConfigXmlTest;
-import org.projectforge.web.wicket.converter.CurrencyConverter;
 
 
 public class CurrencyConverterTest

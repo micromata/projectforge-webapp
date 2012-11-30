@@ -29,7 +29,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
-import org.projectforge.web.wicket.components.YearListCoiceRenderer;
 
 
 public class YearListCoiceRendererTest
