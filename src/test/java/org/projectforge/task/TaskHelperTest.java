@@ -31,9 +31,6 @@ import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.ProjektDao;
 import org.projectforge.fibu.kost.Kost2ArtDO;
 import org.projectforge.fibu.kost.Kost2DO;
-import org.projectforge.task.TaskDO;
-import org.projectforge.task.TaskHelper;
-import org.projectforge.task.TaskTree;
 import org.projectforge.test.TestBase;
 
 

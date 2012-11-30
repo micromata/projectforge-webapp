@@ -29,9 +29,6 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 import org.projectforge.access.AccessException;
 import org.projectforge.test.TestBase;
-import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserXmlPreferencesCache;
-import org.projectforge.user.UserXmlPreferencesMap;
 
 
 public class UserXmlPreferencesTest extends TestBase

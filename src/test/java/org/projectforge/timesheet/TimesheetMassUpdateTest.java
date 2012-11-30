@@ -48,8 +48,6 @@ import org.projectforge.fibu.kost.Kost2Dao;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.test.TestBase;
-import org.projectforge.timesheet.TimesheetDO;
-import org.projectforge.timesheet.TimesheetDao;
 
 
 public class TimesheetMassUpdateTest extends TestBase

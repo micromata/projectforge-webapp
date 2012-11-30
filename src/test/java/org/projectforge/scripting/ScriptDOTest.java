@@ -26,7 +26,6 @@ package org.projectforge.scripting;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.projectforge.scripting.ScriptDO;
 
 
 public class ScriptDOTest

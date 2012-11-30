@@ -37,11 +37,6 @@ import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.task.TaskDO;
 import org.projectforge.test.TestBase;
 import org.projectforge.timesheet.TimesheetDO;
-import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserPrefArea;
-import org.projectforge.user.UserPrefDO;
-import org.projectforge.user.UserPrefDao;
-import org.projectforge.user.UserPrefEntryDO;
 
 
 public class UserPrefTest extends TestBase

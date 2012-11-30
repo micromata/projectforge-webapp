@@ -23,7 +23,8 @@
 
 package org.projectforge.web;
 
-import org.projectforge.database.HibernateDialect;
+import org.projectforge.common.DatabaseDialect;
+import org.projectforge.webserver.StartSettings;
 
 /**
  * Starts ProjectForge for development purposes as an alternative to WTP. Debug mode is supported.<br/>
@@ -43,9 +44,10 @@ public class Start
 
   public static void main(final String[] args) throws Exception
   {
-    final StartSettings settings = new StartSettings(HibernateDialect.HSQL, BASE_DIR);
+    final StartSettings settings = new StartSettings(DatabaseDialect.HSQL, BASE_DIR);
     settings.setSchemaUpdate(SCHEMA_UPDATE);
     settings.setLaunchBrowserAfterStartup(true);
-    StartHelper.start(settings);
+    final StartHelper startHelper = new StartHelper(settings);
+    startHelper.start();
   }
 }

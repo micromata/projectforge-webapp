@@ -23,7 +23,9 @@
 
 package org.projectforge.web;
 
-import org.projectforge.database.HibernateDialect;
+import org.projectforge.common.DatabaseDialect;
+import org.projectforge.shared.storage.StorageConstants;
+import org.projectforge.webserver.StartSettings;
 
 /**
  * Use this starter for you own configurations.<br/>
@@ -42,9 +44,12 @@ public class MyStart
 
   public static void main(final String[] args) throws Exception
   {
-    final StartSettings settings = new StartSettings(HibernateDialect.HSQL, BASE_DIR);
+    final StartSettings settings = new StartSettings(DatabaseDialect.HSQL, BASE_DIR);
     settings.setSchemaUpdate(SCHEMA_UPDATE);
     settings.setLaunchBrowserAfterStartup(true);
-    StartHelper.start(settings);
+    // Set the url of ProjectForge's storage web server:
+    System.setProperty(StorageConstants.SYSTEM_PROPERTY_URL, "http://localhost:8081/");
+    final StartHelper startHelper = new StartHelper(settings);
+    startHelper.start();
   }
 }

@@ -23,183 +23,39 @@
 
 package org.projectforge.web;
 
-import java.awt.Desktop;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.bio.SocketConnector;
-import org.eclipse.jetty.server.session.HashSessionManager;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.eclipse.jetty.xml.XmlConfiguration;
-import org.projectforge.common.DateHelper;
+import org.projectforge.webserver.AbstractStartHelper;
+import org.projectforge.webserver.StartSettings;
 
 /**
- * Helper for starting ProjectForge via Jetty web server.
  * @author Kai Reinhard (k.reinhard@micromata.de)
- * 
  */
-public class StartHelper
+public class StartHelper extends AbstractStartHelper
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(StartHelper.class);
 
   /**
-   * Helper method for starting ProjectForge via Jetty web server. If any key is pressed in the console the web server will be stopped.
-   * @param settings Configuration of the web server and web application.
+   * @param startSettings
    */
-  public static void start(final StartSettings settings)
+  public StartHelper(final StartSettings startSettings)
   {
-    final int timeout = (int) DateHelper.MILLIS_HOUR;
-    setProperty("base.dir", settings.getBaseDir());
-    setProperty("hibernate.dialect", settings.getDialect());
-    setProperty("jettyEnv.driverClassName", settings.getJdbcDriverClass());
-    setProperty("jettyEnv.jdbcUrl", settings.getJdbcUrl());
-    setProperty("hibernate.schemaUpdate", settings.isSchemaUpdate());
-    setProperty("jetty.home", settings.getBaseDir());
-    setProperty("jettyEnv.jdbcUser", settings.getJdbcUser());
-    setProperty("jettyEnv.jdbcPassword", settings.getJdbcPassword(), false);
-    setProperty("jettyEnv.jdbcMaxActive", settings.getJdbcMaxActive() != null ? settings.getJdbcMaxActive() : 200);
+    super(startSettings);
+  }
 
-    final Server server = new Server();
-    final SocketConnector connector = new SocketConnector();
-
-    // Set some timeout options to make debugging easier.
-    connector.setMaxIdleTime(timeout);
-    connector.setSoLingerTime(-1);
-    connector.setPort(settings.getPort());
-    server.addConnector(connector);
-
-    // check if a keystore for a SSL certificate is available, and
-    // if so, start a SSL connector on port 8443. By default, the
-    // quickstart comes with a Apache Wicket Quickstart Certificate
-    // that expires about half way september 2021. Do not use this
-    // certificate anywhere important as the passwords are available
-    // in the source.
-
-    // Resource keystore = Resource.newClassPathResource("/keystore");
-    // if (keystore != null && keystore.exists()) {
-    // connector.setConfidentialPort(8443);
-    //
-    // SslContextFactory factory = new SslContextFactory();
-    // factory.setKeyStoreResource(keystore);
-    // factory.setKeyStorePassword("wicket");
-    // factory.setTrustStore(keystore);
-    // factory.setKeyManagerPassword("wicket");
-    // SslSocketConnector sslConnector = new SslSocketConnector(factory);
-    // sslConnector.setMaxIdleTime(timeout);
-    // sslConnector.setPort(8443);
-    // sslConnector.setAcceptors(4);
-    // server.addConnector(sslConnector);
-    //
-    // System.out.println("SSL access to the quickstart has been enabled on port 8443");
-    // System.out.println("You can access the application using SSL on https://localhost:8443");
-    // System.out.println();
-    // }
-
+  /**
+   * @see org.projectforge.webserver.AbstractStartHelper#getWebAppContext()
+   */
+  @Override
+  protected WebAppContext getWebAppContext()
+  {
     final WebAppContext webAppContext = new WebAppContext();
-    webAppContext.setClassLoader(StartHelper.class.getClassLoader());
-    webAppContext.setServer(server);
+    webAppContext.setClassLoader(this.getClass().getClassLoader());
+    webAppContext.setConfigurationClasses(CONFIGURATION_CLASSES);
     webAppContext.setContextPath("/ProjectForge");
     webAppContext.setWar("src/main/webapp");
     webAppContext.setDescriptor("src/main/webapp/WEB-INF/web.xml");
-    webAppContext.setConfigurationClasses(CONFIGURATION_CLASSES);
     webAppContext.setExtraClasspath("target/classes");
-    webAppContext.setInitParameter("development", String.valueOf(settings.isDevelopment()));
-    webAppContext.setInitParameter("stripWicketTags", String.valueOf(settings.isStripWicketTags()));
-    if (settings.isUsingCookies() == false) {
-      log.info("Using cookies is disabled.");
-      final HashSessionManager manager = (HashSessionManager) webAppContext.getSessionHandler().getSessionManager();
-      manager.setUsingCookies(false);
-    }
-
-    // START JMX SERVER
-    // MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
-    // MBeanContainer mBeanContainer = new MBeanContainer(mBeanServer);
-    // server.getContainer().addEventListener(mBeanContainer);
-    // mBeanContainer.start();
-
-    server.setHandler(webAppContext);
-
-    try {
-      final ClassLoader classLoader = StartHelper.class.getClassLoader();
-      final InputStream is = classLoader.getResourceAsStream("jetty.xml");
-      final XmlConfiguration configuration = new XmlConfiguration(is);
-      configuration.configure(server);
-      System.out.println(">>> STARTING EMBEDDED JETTY SERVER, PRESS ANY KEY TO STOP");
-      server.start();
-      if (settings.isLaunchBrowserAfterStartup() == true) {
-        launchBrowser(connector);
-      }
-      System.in.read();
-      System.out.println(">>> STOPPING EMBEDDED JETTY SERVER");
-      server.stop();
-      server.join();
-    } catch (final Exception e) {
-      e.printStackTrace();
-      System.exit(1);
-    }
+    webAppContext.setInitParameter("development", String.valueOf(startSettings.isDevelopment()));
+    webAppContext.setInitParameter("stripWicketTags", String.valueOf(startSettings.isStripWicketTags()));
+    return webAppContext;
   }
-
-  private static void launchBrowser(final SocketConnector connector)
-  {
-    Desktop desktop = null;
-    if (Desktop.isDesktopSupported()) {
-      desktop = Desktop.getDesktop();
-    }
-    if (desktop != null) {
-      try {
-        desktop.browse(new URI("http://localhost:" + connector.getPort() + "/ProjectForge/"));
-      } catch (final IOException e) {
-        log.error("Can't launch browser: " + e.getMessage(), e);
-      } catch (final URISyntaxException e) {
-        log.error("Can't launch browser: " + e.getMessage(), e);
-      }
-    }
-  }
-
-  /**
-   * @param key
-   * @param value
-   */
-  private static void setProperty(final String key, final String value)
-  {
-    setProperty(key, value, true);
-  }
-
-  /**
-   * @param key
-   * @param value
-   * @param logValue If true (default) then the property value will be logged, otherwise "****" is logged.
-   */
-  private static void setProperty(final String key, final String value, final boolean logValue)
-  {
-    if (logValue == true) {
-      log.info(key + "=" + value);
-    } else {
-      log.info(key + "=*****");
-    }
-    System.setProperty(key, value);
-  }
-
-  private static void setProperty(final String key, final Object value)
-  {
-    if (value == null) {
-      setProperty(key, (String) null);
-    } else {
-      setProperty(key, String.valueOf(value));
-    }
-  }
-
-  private static final String[] CONFIGURATION_CLASSES = { //
-    org.eclipse.jetty.webapp.WebInfConfiguration.class.getName(), //
-    org.eclipse.jetty.webapp.WebXmlConfiguration.class.getName(), //
-    org.eclipse.jetty.webapp.MetaInfConfiguration.class.getName(), //
-    org.eclipse.jetty.webapp.FragmentConfiguration.class.getName(), //
-    org.eclipse.jetty.plus.webapp.EnvConfiguration.class.getName(), //
-    org.eclipse.jetty.plus.webapp.PlusConfiguration.class.getName(), //
-    org.eclipse.jetty.annotations.AnnotationConfiguration.class.getName(), //
-    org.eclipse.jetty.webapp.JettyWebXmlConfiguration.class.getName(), //
-    org.eclipse.jetty.webapp.TagLibConfiguration.class.getName()};
 }

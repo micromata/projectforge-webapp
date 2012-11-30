@@ -23,7 +23,9 @@
 
 package org.projectforge.web;
 
-import org.projectforge.database.HibernateDialect;
+import org.projectforge.common.DatabaseDialect;
+import org.projectforge.shared.storage.StorageConstants;
+import org.projectforge.webserver.StartSettings;
 
 /**
  * For larger installations please increase memory by giving the following start VM parameters: -Xmx1024m -Xms512m -XX:PermSize=96m
@@ -49,12 +51,15 @@ public class MyStartPostgreSQL
   {
     // Please don't forget to add your Postgresql driver, such as postgresql-8.3-603.jdbc3.jar
     // Open Run/Debug configurations dialog (Eclipse context menu of this class) and add external jar to classpath.
-    final StartSettings settings = new StartSettings(HibernateDialect.PostgreSQL, BASE_DIR);
+    final StartSettings settings = new StartSettings(DatabaseDialect.PostgreSQL, BASE_DIR);
     settings.setJdbcUser(JDBC_USER);
     settings.setSchemaUpdate(SCHEMA_UPDATE);
     //settings.setUsingCookies(false);
     settings.setDevelopment(DEVELOPMENT_MODE);
     settings.setLaunchBrowserAfterStartup(true);
-    StartHelper.start(settings);
+    // Set the url of ProjectForge's storage web server:
+    System.setProperty(StorageConstants.SYSTEM_PROPERTY_URL, "http://localhost:8081/");
+    final StartHelper startHelper = new StartHelper(settings);
+    startHelper.start();
   }
 }
