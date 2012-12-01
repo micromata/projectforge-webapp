@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.projectforge</groupId>
     <artifactId>ProjectForge-parent</artifactId>
-    <version>4.1.4.14</version>
+    <version>4.1.4.14b1</version> <!-- automatically set -->
   </parent>
   <licenses>
     <license>
