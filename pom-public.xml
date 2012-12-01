@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.projectforge</groupId>
     <artifactId>ProjectForge-parent</artifactId>
-    <version>4.1.4.14b1</version> <!-- automatically set -->
+    <version>4.1.4.14-SNAPSHOT</version> <!-- automatically set -->
   </parent>
   <licenses>
     <license>
@@ -26,6 +26,13 @@
     <jackson.version>1.7.5</jackson.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
+  <repositories>
+    <repository>
+      <id>org.projectforge</id>
+      <name>ProjectForge</name>
+      <url>http://www.projectforge.org/nexus/content/repositories/ProjectForge-Snapshots</url> <!-- automatically set -->
+    </repository>
+  </repositories>
   <dependencies>
     <dependency>
       <groupId>org.projectforge</groupId>
