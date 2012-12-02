@@ -3,7 +3,7 @@
 // Project ProjectForge Community Edition
 //         www.projectforge.org
 //
-// Copyright (C) 2001-2012 Kai Reinhard (k.reinhard@micromata.com)
+// Copyright (C) 2001-2012 Kai Reinhard (k.reinhard@micromata.de)
 //
 // ProjectForge is dual-licensed.
 //
@@ -66,7 +66,7 @@ public class StorageClient implements ConfigurationListener
       }
       this.config = ConfigXml.getInstance().getStorageConfig();
       if (this.config == null) {
-        log.error("No storageConfig given in config.xml. Storage not available.");
+        log.warn("No storageConfig given in config.xml. Storage not available.");
         return;
       }
       final Client client = Client.create();
