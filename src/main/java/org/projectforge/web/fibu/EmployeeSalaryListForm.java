@@ -24,7 +24,6 @@
 package org.projectforge.web.fibu;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.StringHelper;
@@ -46,7 +45,6 @@ public class EmployeeSalaryListForm extends AbstractListForm<EmployeeSalaryFilte
   @SpringBean(name = "employeeSalaryDao")
   private EmployeeSalaryDao employeeSalaryDao;
 
-  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
@@ -57,39 +55,14 @@ public class EmployeeSalaryListForm extends AbstractListForm<EmployeeSalaryFilte
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true);
       // DropDownChoice years
       final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(employeeSalaryDao.getYears(), true);
-      final DropDownChoice<Integer> yearChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(this,
-          "year"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer) {
-        /**
-         * @see org.apache.wicket.markup.html.form.DropDownChoice#wantOnSelectionChangedNotifications()
-         */
-        @Override
-        protected boolean wantOnSelectionChangedNotifications()
-        {
-          return true;
-        }
-      };
-      yearChoice.setNullValid(false);
-      fs.add(yearChoice);
-      fs.setLabelFor(yearChoice);
+      fs.addDropDownChoice(new PropertyModel<Integer>(this, "year"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer, true)
+      .setNullValid(false);
       // DropDownChoice months
       final LabelValueChoiceRenderer<Integer> monthChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
       for (int i = 0; i <= 11; i++) {
         monthChoiceRenderer.addValue(i, StringHelper.format2DigitNumber(i + 1));
       }
-      final DropDownChoice<Integer> monthChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(this,
-          "month"), monthChoiceRenderer.getValues(), monthChoiceRenderer) {
-        /**
-         * @see org.apache.wicket.markup.html.form.DropDownChoice#wantOnSelectionChangedNotifications()
-         */
-        @Override
-        protected boolean wantOnSelectionChangedNotifications()
-        {
-          return true;
-        }
-      };
-      monthChoice.setNullValid(true);
-      monthChoice.setRequired(false);
-      fs.add(monthChoice);
+      fs.addDropDownChoice(new PropertyModel<Integer>(this, "month"), monthChoiceRenderer.getValues(), monthChoiceRenderer, true).setNullValid(true);
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
       checkBoxPanel.add(createOnlyDeletedCheckBoxPanel(checkBoxPanel.newChildId()));
     }
