@@ -70,6 +70,16 @@
       <version>1.8.3</version>
     </dependency>
     <dependency> <!-- Version check: 2010-08-28 -->
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>1.4</version>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
       <groupId>commons-dbcp</groupId>
       <artifactId>commons-dbcp</artifactId>
       <version>1.4</version>
@@ -92,15 +102,10 @@
       <artifactId>commons-httpclient</artifactId>
       <version>3.1</version> <!-- 4.0.1, but no maven repository found. -->
     </dependency>
-    <dependency> <!-- Version check: 2010-08-28 -->
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
-      <version>3.2.1</version>
-    </dependency>
-    <dependency> <!-- Version check: 2010-08-28 -->
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
-      <version>1.4</version>
+    <dependency> <!-- Version check: 2012-12-02 -->
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.4</version>
     </dependency>
     <dependency>
       <groupId>dom4j</groupId>
