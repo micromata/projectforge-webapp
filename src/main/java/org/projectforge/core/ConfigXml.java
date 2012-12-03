@@ -237,7 +237,7 @@ public class ConfigXml
     databaseDirectory = "database";
     loggingDirectory = "logs";
     workingDirectory = "work";
-    fontsDirectory = "resources" + File.separator + "fonts";
+    fontsDirectory = resourceDir + File.separator + "fonts";
     tempDirectory = "tmp";
     servletContextPath = null;
     domain = null;
@@ -312,6 +312,8 @@ public class ConfigXml
       ensureDir(new File(loggingDirectory));
       this.workingDirectory = FileHelper.getAbsolutePath(applicationHomeDir, this.workingDirectory);
       ensureDir(new File(workingDirectory));
+      this.resourceDir = FileHelper.getAbsolutePath(applicationHomeDir, this.resourceDir);
+      ensureDir(new File(resourceDir));
       this.fontsDirectory = FileHelper.getAbsolutePath(applicationHomeDir, this.fontsDirectory);
       ensureDir(new File(fontsDirectory));
       this.tempDirectory = FileHelper.getAbsolutePath(applicationHomeDir, this.tempDirectory);
