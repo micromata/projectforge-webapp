@@ -877,7 +877,7 @@ public class ConfigXml
   }
 
   /**
-   * Default value: "resources/fonts".
+   * Default value: "resources/fonts" (absolute path).
    * @return the fontsDirectory
    */
   public String getFontsDirectory()

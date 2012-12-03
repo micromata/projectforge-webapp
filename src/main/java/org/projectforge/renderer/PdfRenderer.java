@@ -88,7 +88,7 @@ public class PdfRenderer
   private String getFontResourcePath()
   {
     if (fontResourcePath == null) {
-      final File dir = new File(configXml.getResourcePath(), fontResourceDir);
+      final File dir = new File(configXml.getFontsDirectory());
       if (dir.exists() == false) {
         log.error("Application's font dir does not exist: " + dir.getAbsolutePath());
       }
