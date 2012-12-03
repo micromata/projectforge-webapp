@@ -32,8 +32,11 @@ import net.ftlines.wicket.fullcalendar.callback.DroppedEvent;
 import net.ftlines.wicket.fullcalendar.callback.ResizedEvent;
 import net.ftlines.wicket.fullcalendar.callback.SelectedRange;
 
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.plugins.poll.PollDO;
@@ -51,7 +54,7 @@ public class PollEventEditPage extends AbstractSecuredPage
 {
   private static final long serialVersionUID = 2988767055605267801L;
 
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(PollEventEditPage.class);
+  // private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(PollEventEditPage.class);
 
   private MyFullCalendarConfig config;
 
@@ -60,6 +63,8 @@ public class PollEventEditPage extends AbstractSecuredPage
   private final IModel<PollDO> pollDoModel;
 
   private Collection<PollEventDO> events;
+
+  private RepeatingView eventEntries;
 
   public PollEventEditPage(final PageParameters parameters, IModel<PollDO> pollDoModel)
   {
@@ -83,6 +88,13 @@ public class PollEventEditPage extends AbstractSecuredPage
     super.onInitialize();
     final Form<Void> form = new Form<Void>("form");
     body.add(form);
+
+    form.add(new Label("title", pollDoModel.getObject().getTitle()));
+    form.add(new Label("location", pollDoModel.getObject().getLocation()));
+    eventEntries = new RepeatingView("eventEntries");
+    eventEntries.setOutputMarkupId(true);
+    form.add(eventEntries);
+
     final PollEventEventsProvider eventProvider = new PollEventEventsProvider(this, pollDoModel);
     if (events != null) {
       if (events.isEmpty() == false) {
@@ -110,6 +122,27 @@ public class PollEventEditPage extends AbstractSecuredPage
       protected void onDateRangeSelected(final SelectedRange range, final CalendarResponse response)
       {
         eventProvider.addEvent(range, response);
+        IModel<SelectedRange> model = new IModel<SelectedRange>() {
+
+          @Override
+          public void detach()
+          {
+          }
+
+          @Override
+          public void setObject(SelectedRange object)
+          {
+          }
+
+          @Override
+          public SelectedRange getObject()
+          {
+            return range;
+          }
+        };
+        PollEventEntryPanel entry = new PollEventEntryPanel(eventEntries.newChildId(), model);
+        eventEntries.add(entry);
+        AjaxRequestTarget.get().add(form);
       }
 
       /**

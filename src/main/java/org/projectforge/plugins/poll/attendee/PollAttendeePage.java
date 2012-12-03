@@ -27,16 +27,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.common.NumberHelper;
 import org.projectforge.plugins.poll.PollBasePage;
 import org.projectforge.plugins.poll.PollDO;
 import org.projectforge.plugins.poll.event.PollEventDO;
 import org.projectforge.plugins.poll.event.PollEventEditPage;
+import org.projectforge.plugins.poll.result.PollResultPage;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
@@ -61,6 +64,8 @@ public class PollAttendeePage extends PollBasePage
 
   private static final long serialVersionUID = 8780858653279140945L;
 
+  private static Integer SECURE_KEY_LENGTH = 50;
+
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
 
@@ -74,8 +79,6 @@ public class PollAttendeePage extends PollBasePage
   private MultiChoiceListHelper<GroupDO> assignGroupsListHelper;
 
   private MultiChoiceListHelper<PFUserDO> assignUsersListHelper;
-
-  private List<PFUserDO> assignUsersList;
 
   private List<PFUserDO> filteredSelectUserList;
 
@@ -258,7 +261,52 @@ public class PollAttendeePage extends PollBasePage
   @Override
   protected void onConfirm()
   {
-    // setResponsePage(new PollResultPage(getPageParameters(), pollDo, allEvents, pollAttendeeList));
+    List<PollAttendeeDO> pollAttendeeList = new ArrayList<PollAttendeeDO>();
+
+    List<PFUserDO> allUsers = new ArrayList<PFUserDO>();
+    if (assignGroupsListHelper.getFullList() != null) {
+      if (assignGroupsListHelper.getFullList().isEmpty() == false) {
+        for (GroupDO group : assignGroupsListHelper.getFullList()) {
+          for (PFUserDO user : group.getAssignedUsers()) {
+            if (allUsers.contains(user) == false) {
+              allUsers.add(user);
+            }
+          }
+        }
+      }
+    }
+    if (assignUsersListHelper.getFullList() != null) {
+      if (assignUsersListHelper.getFullList().isEmpty() == false) {
+        for (PFUserDO user : assignUsersListHelper.getFullList()) {
+          if (allUsers.contains(user) == false) {
+            allUsers.add(user);
+          }
+        }
+      }
+    }
+
+    if (allUsers != null) {
+      if (allUsers.isEmpty() == false) {
+        for (PFUserDO user : allUsers) {
+          PollAttendeeDO newAttendee = new PollAttendeeDO();
+          newAttendee.setUser(user);
+          pollAttendeeList.add(newAttendee);
+        }
+      }
+    }
+
+    String[] emails = StringUtils.split(emailList, ";");
+    if (emails != null) {
+      if (emails.length > 0) {
+        for (String email : emails) {
+          PollAttendeeDO newAttendee = new PollAttendeeDO();
+          newAttendee.setEmail(email.trim());
+          newAttendee.setSecureKey(NumberHelper.getSecureRandomUrlSaveString(SECURE_KEY_LENGTH));
+          pollAttendeeList.add(newAttendee);
+        }
+      }
+    }
+    setResponsePage(new PollResultPage(getPageParameters(), pollDo, allEvents, pollAttendeeList));
   }
 
   /**
