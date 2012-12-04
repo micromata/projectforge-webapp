@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.projectforge</groupId>
     <artifactId>projectforge-parent</artifactId>
-    <version>4.2rc1</version> <!-- automatically set -->
+    <version>4.2</version> <!-- automatically set -->
   </parent>
   <licenses>
     <license>
