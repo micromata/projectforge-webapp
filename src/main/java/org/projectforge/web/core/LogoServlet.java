@@ -33,8 +33,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.projectforge.core.ConfigurationListener;
 import org.projectforge.core.ConfigXml;
+import org.projectforge.core.ConfigurationListener;
 
 /**
  * Servlet for displaying a customizable logo image (see config.xml).
@@ -80,7 +80,12 @@ public class LogoServlet extends HttpServlet implements ConfigurationListener
       // Synchronization not really needed, multiple initialization works.
       final String logo = ConfigXml.getInstance().getLogoFile();
       if (logo != null) {
-        final String logoPath = ConfigXml.getInstance().getResourcePath() + "/images/" + logo;
+        final String logoPath;
+        if (new File(logo).isAbsolute() == true) {
+          logoPath = logo;
+        } else {
+          logoPath = ConfigXml.getInstance().getResourcePath() + "/images/" + logo;
+        }
         final File file = new File(logoPath);
         if (file.canRead() == true) {
           logoFile = file;
