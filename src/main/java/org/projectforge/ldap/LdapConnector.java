@@ -139,6 +139,7 @@ public class LdapConnector implements ConfigurationListener
       // Try to load SSL certificate.
       MyTrustManager.getInstance().addCertificate("ldap", new File(this.ldapConfig.getSslCertificateFile()));
     }
+    initialized = true;
   }
 
   /**
