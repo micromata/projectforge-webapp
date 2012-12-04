@@ -46,11 +46,26 @@ public class LdapConnector implements ConfigurationListener
 
   private LdapConfig ldapConfig;
 
+  private boolean initialized;
+
   /** Don't call this constructor unless you really know what you're doing. This LdapHelper is a singleton and is available via IOC. */
   public LdapConnector()
   {
-    ConfigXml.getInstance().register(this);
-    afterRead();
+  }
+
+  private void init()
+  {
+    if (initialized == true) {
+      return;
+    }
+    synchronized (this) {
+      if (initialized == true) {
+        return;
+      }
+      ConfigXml.getInstance().register(this);
+      afterRead();
+      initialized = true;
+    }
   }
 
   private Hashtable<String, String> createEnv(final String user, final String password)
@@ -82,11 +97,13 @@ public class LdapConnector implements ConfigurationListener
 
   public String getBase()
   {
+    init();
     return ldapConfig.getBaseDN();
   }
 
   public LdapContext createContext()
   {
+    init();
     final Hashtable<String, String> env;
     final String authentication = ldapConfig.getAuthentication();
     if ("none".equals(authentication) == false) {
@@ -105,6 +122,7 @@ public class LdapConnector implements ConfigurationListener
 
   public LdapContext createContext(final String username, final String password) throws NamingException
   {
+    init();
     final Hashtable<String, String> env = createEnv(username, password);
     final LdapContext ctx = new InitialLdapContext(env, null);
     return ctx;
