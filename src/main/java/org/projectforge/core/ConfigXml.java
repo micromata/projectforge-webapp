@@ -817,7 +817,12 @@ public class ConfigXml
   public String getResourcePath()
   {
     if (this.applicationsResourcePath == null) {
-      final File file = new File(applicationHomeDir, resourceDir);
+      final File file;
+      if (new File(resourceDir).isAbsolute() == true) {
+        file = new File(resourceDir);
+      } else {
+        file = new File(applicationHomeDir, resourceDir);
+      }
       this.applicationsResourcePath = file.getAbsolutePath();
     }
     return applicationsResourcePath;
