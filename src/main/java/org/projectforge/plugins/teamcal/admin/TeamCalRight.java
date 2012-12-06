@@ -43,12 +43,11 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
 {
   private static final long serialVersionUID = -2928342166476350773L;
 
-  private final UserGroupCache userGroupCache;
+  private transient UserGroupCache userGroupCache;
 
   public TeamCalRight()
   {
     super(TeamCalDao.USER_RIGHT_ID, UserRightCategory.PLUGINS, UserRightValue.TRUE);
-    userGroupCache = Registry.instance().getUserGroupCache();
   }
 
   /**
@@ -140,13 +139,13 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
 
   public boolean isMemberOfAtLeastOneGroup(final PFUserDO user, final Integer... groupIds)
   {
-    return UserRights.getUserGroupCache().isUserMemberOfAtLeastOneGroup(user.getId(), groupIds);
+    return getUserGroupCache().isUserMemberOfAtLeastOneGroup(user.getId(), groupIds);
   }
 
   public boolean hasFullAccess(final TeamCalDO calendar, final Integer userId)
   {
     final Integer[] groupIds = StringHelper.splitToIntegers(calendar.getFullAccessGroupIds(), ",");
-    if (userGroupCache.isUserMemberOfAtLeastOneGroup(userId, groupIds) == true) {
+    if (getUserGroupCache().isUserMemberOfAtLeastOneGroup(userId, groupIds) == true) {
       return true;
     }
     return containsUser(userId, calendar.getFullAccessUserIds());
@@ -155,7 +154,7 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
   public boolean hasReadonlyAccess(final TeamCalDO calendar, final Integer userId)
   {
     final Integer[] groupIds = StringHelper.splitToIntegers(calendar.getReadonlyAccessGroupIds(), ",");
-    if (userGroupCache.isUserMemberOfAtLeastOneGroup(userId, groupIds) == true) {
+    if (getUserGroupCache().isUserMemberOfAtLeastOneGroup(userId, groupIds) == true) {
       return true;
     }
     return containsUser(userId, calendar.getReadonlyAccessUserIds());
@@ -164,7 +163,7 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
   public boolean hasMinimalAccess(final TeamCalDO calendar, final Integer userId)
   {
     final Integer[] groupIds = StringHelper.splitToIntegers(calendar.getMinimalAccessGroupIds(), ",");
-    if (userGroupCache.isUserMemberOfAtLeastOneGroup(userId, groupIds) == true) {
+    if (getUserGroupCache().isUserMemberOfAtLeastOneGroup(userId, groupIds) == true) {
       return true;
     }
     return containsUser(userId, calendar.getMinimalAccessUserIds());
@@ -182,5 +181,13 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
       }
     }
     return false;
+  }
+
+  private UserGroupCache getUserGroupCache()
+  {
+    if (userGroupCache == null) {
+      userGroupCache = Registry.instance().getUserGroupCache();
+    }
+    return userGroupCache;
   }
 }
