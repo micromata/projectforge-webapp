@@ -127,6 +127,9 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
   @Override
   public boolean hasHistoryAccess(final PFUserDO user, final TeamCalDO obj)
   {
+    if (obj == null) {
+      return true;
+    }
     return hasInsertAccess(user, obj) == true;
   }
 
