@@ -42,7 +42,7 @@ public class PluginsRegistry
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(PluginsRegistry.class);
 
   /**
-   * Defines some built-in plugins.
+   * Defines some built-in plugins. Don't forget to add the pluginContext.xml files to TestConfiguration.
    */
   private final AbstractPlugin[] builtinPlugins = new AbstractPlugin[] { new ToDoPlugin(), new MemoPlugin()};
 
@@ -74,9 +74,6 @@ public class PluginsRegistry
 
   public PluginsRegistry()
   {
-    for (final AbstractPlugin plugin : builtinPlugins) {
-      plugins.add(plugin);
-    }
   }
 
   public void set(final SystemUpdater systemUpdater)
@@ -94,9 +91,12 @@ public class PluginsRegistry
   }
 
   /**
-   * Load plugins which are configured in config.xml.
+   * Load built-in plugins and plugins which are configured in config.xml.
    */
-  public void loadAdditionalPlugins() {
+  public void loadPlugins() {
+    for (final AbstractPlugin plugin : builtinPlugins) {
+      plugins.add(plugin);
+    }
     final ConfigXml xmlConfiguration = ConfigXml.getInstance();
     final String[] pluginMainClasses = xmlConfiguration.getPluginMainClasses();
     if (pluginMainClasses != null) {
