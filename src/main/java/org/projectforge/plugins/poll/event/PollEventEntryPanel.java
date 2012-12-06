@@ -9,12 +9,9 @@
 
 package org.projectforge.plugins.poll.event;
 
-import net.ftlines.wicket.fullcalendar.callback.SelectedRange;
-
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.model.IModel;
 import org.joda.time.DateTime;
 import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
@@ -31,18 +28,17 @@ public class PollEventEntryPanel extends Panel
    * @param id
    * @param model
    */
-  public PollEventEntryPanel(String id, IModel<SelectedRange> model)
+  public PollEventEntryPanel(final String id, final PollEventDO poll)
   {
-    super(id, model);
+    super(id);
 
-    SelectedRange range = model.getObject();
-    DateTime start = range.getStart();
-    DateTime end = range.getEnd();
+    final DateTime start = poll.getStartDate();
+    final DateTime end = poll.getEndDate();
 
-    add(new Label("startDate", "Start: " + DateFormatUtils.format(start.getMillis(), "dd.MM.yyyy HH:mm")));
-    add(new Label("endDate", "Ende: " + DateFormatUtils.format(end.getMillis(), "dd.MM.yyyy HH:mm")));
+    add(new Label("startDate", "Start: " + DateFormatUtils.format(start.getMillis(), "dd.MM.yyyy HH:mm")));  // TODO Max i18n
+    add(new Label("endDate", "Ende: " + DateFormatUtils.format(end.getMillis(), "dd.MM.yyyy HH:mm"))); // TODO Max i18n!!
 
-    IconButtonPanel iconButton = new IconButtonPanel("delete", IconType.MINUS_THICK);
+    final IconButtonPanel iconButton = new IconButtonPanel("delete", IconType.MINUS_THICK);
     add(iconButton);
   }
 }

@@ -87,7 +87,7 @@ public class PollAttendeePage extends PollBasePage
   /**
    * @param parameters
    */
-  public PollAttendeePage(PageParameters parameters, PollDO pollDo, Collection<PollEventDO> allEvents)
+  public PollAttendeePage(final PageParameters parameters, final PollDO pollDo, final Collection<PollEventDO> allEvents)
   {
     super(parameters);
     this.pollDo = pollDo;
@@ -104,6 +104,7 @@ public class PollAttendeePage extends PollBasePage
 
     gridBuilder.newGrid8();
 
+    // TODO Max: Wieso sollten alle Gruppen vorausgewählt sein?
     // preset assigned groups of current user
     final Collection<Integer> presetGroups = userDao.getAssignedGroups(PFUserContext.getUser());
     final GroupsProvider groupsProvider = new GroupsProvider();
@@ -120,14 +121,14 @@ public class PollAttendeePage extends PollBasePage
 
     // remove users, which already exist in preset groups.
     filteredSelectUserList = getFilteredUserList(presetGroups.toArray(new Integer[presetGroups.size()]));
-    UsersProvider usersProvider = new UsersProvider() {
+    final UsersProvider usersProvider = new UsersProvider() {
       private static final long serialVersionUID = 3309912250935701295L;
 
       /**
        * @see org.projectforge.web.user.UsersProvider#query(java.lang.String, int, com.vaynberg.wicket.select2.Response)
        */
       @Override
-      public void query(String term, int page, Response<PFUserDO> response)
+      public void query(final String term, final int page, final Response<PFUserDO> response)
       {
         // response.setResults(filteredSelectUserList);
         super.query(term, page, response);
@@ -150,12 +151,12 @@ public class PollAttendeePage extends PollBasePage
       private static final long serialVersionUID = 7953707980102077562L;
 
       @Override
-      protected void onUpdate(AjaxRequestTarget target)
+      protected void onUpdate(final AjaxRequestTarget target)
       {
         // create array of ids to use userGroupCache.isMemberOfAtLeastOneGroup
-        Integer[] groupIds = new Integer[assignGroupsListHelper.getAssignedItems().size()];
+        final Integer[] groupIds = new Integer[assignGroupsListHelper.getAssignedItems().size()];
         int index = 0;
-        for (GroupDO group : assignGroupsListHelper.getAssignedItems()) {
+        for (final GroupDO group : assignGroupsListHelper.getAssignedItems()) {
           groupIds[index] = group.getId();
           index++;
         }
@@ -163,14 +164,14 @@ public class PollAttendeePage extends PollBasePage
         // List<PFUserDO> la = assignUsersList;
 
         // // remove users, which exist in assigned groups.
-        List<PFUserDO> deleteList = new ArrayList<PFUserDO>();
+        final List<PFUserDO> deleteList = new ArrayList<PFUserDO>();
 
         filteredSelectUserList = getFilteredUserList(groupIds);
         // update user select list
         if (filteredSelectUserList != null) {
           if (filteredSelectUserList.isEmpty() == false) {
-            List<PFUserDO> addList = new ArrayList<PFUserDO>();
-            for (PFUserDO user : filteredSelectUserList) {
+            final List<PFUserDO> addList = new ArrayList<PFUserDO>();
+            for (final PFUserDO user : filteredSelectUserList) {
               if (userGroupCache.isUserMemberOfAtLeastOneGroup(user.getId(), groupIds) == true) {
                 deleteList.add(user);
               } else {
@@ -179,14 +180,14 @@ public class PollAttendeePage extends PollBasePage
             }
             // delete form user select list
             if (deleteList.isEmpty() == false) {
-              for (PFUserDO u : deleteList) {
+              for (final PFUserDO u : deleteList) {
                 filteredSelectUserList.remove(u);
               }
               deleteList.clear();
             }
             // add to user select list
             if (addList.isEmpty() == false) {
-              for (PFUserDO u : addList) {
+              for (final PFUserDO u : addList) {
 
                 if (filteredSelectUserList.contains(u) == false)
                   filteredSelectUserList.add(u);
@@ -226,11 +227,11 @@ public class PollAttendeePage extends PollBasePage
    * 
    * @return
    */
-  private List<PFUserDO> getFilteredUserList(Integer groupIds[])
+  private List<PFUserDO> getFilteredUserList(final Integer groupIds[])
   {
-    UsersProvider preUsersProvider = new UsersProvider();
-    List<PFUserDO> newList = new ArrayList<PFUserDO>();
-    for (PFUserDO user : preUsersProvider.getSortedUsers()) {
+    final UsersProvider preUsersProvider = new UsersProvider();
+    final List<PFUserDO> newList = new ArrayList<PFUserDO>();
+    for (final PFUserDO user : preUsersProvider.getSortedUsers()) {
       if (userGroupCache.isUserMemberOfAtLeastOneGroup(user.getId(), groupIds) == false && newList.contains(user) == false) {
         newList.add(user);
       }
@@ -238,10 +239,10 @@ public class PollAttendeePage extends PollBasePage
     return newList;
   }
 
-  private TextField<String> getNewEMailField(String wicketId)
+  private TextField<String> getNewEMailField(final String wicketId)
   {
-    PropertyModel<String> mailModel = new PropertyModel<String>(this, "emailList");
-    TextField<String> eMailField = new TextField<String>(wicketId, mailModel);
+    final PropertyModel<String> mailModel = new PropertyModel<String>(this, "emailList");
+    final TextField<String> eMailField = new TextField<String>(wicketId, mailModel);
     return eMailField;
   };
 
@@ -261,13 +262,13 @@ public class PollAttendeePage extends PollBasePage
   @Override
   protected void onConfirm()
   {
-    List<PollAttendeeDO> pollAttendeeList = new ArrayList<PollAttendeeDO>();
+    final List<PollAttendeeDO> pollAttendeeList = new ArrayList<PollAttendeeDO>();
 
-    List<PFUserDO> allUsers = new ArrayList<PFUserDO>();
+    final List<PFUserDO> allUsers = new ArrayList<PFUserDO>();
     if (assignGroupsListHelper.getFullList() != null) {
       if (assignGroupsListHelper.getFullList().isEmpty() == false) {
-        for (GroupDO group : assignGroupsListHelper.getFullList()) {
-          for (PFUserDO user : group.getAssignedUsers()) {
+        for (final GroupDO group : assignGroupsListHelper.getFullList()) {
+          for (final PFUserDO user : group.getAssignedUsers()) {
             if (allUsers.contains(user) == false) {
               allUsers.add(user);
             }
@@ -277,7 +278,7 @@ public class PollAttendeePage extends PollBasePage
     }
     if (assignUsersListHelper.getFullList() != null) {
       if (assignUsersListHelper.getFullList().isEmpty() == false) {
-        for (PFUserDO user : assignUsersListHelper.getFullList()) {
+        for (final PFUserDO user : assignUsersListHelper.getFullList()) {
           if (allUsers.contains(user) == false) {
             allUsers.add(user);
           }
@@ -287,19 +288,19 @@ public class PollAttendeePage extends PollBasePage
 
     if (allUsers != null) {
       if (allUsers.isEmpty() == false) {
-        for (PFUserDO user : allUsers) {
-          PollAttendeeDO newAttendee = new PollAttendeeDO();
+        for (final PFUserDO user : allUsers) {
+          final PollAttendeeDO newAttendee = new PollAttendeeDO();
           newAttendee.setUser(user);
           pollAttendeeList.add(newAttendee);
         }
       }
     }
 
-    String[] emails = StringUtils.split(emailList, ";");
+    final String[] emails = StringUtils.split(emailList, ";");
     if (emails != null) {
       if (emails.length > 0) {
-        for (String email : emails) {
-          PollAttendeeDO newAttendee = new PollAttendeeDO();
+        for (final String email : emails) {
+          final PollAttendeeDO newAttendee = new PollAttendeeDO();
           newAttendee.setEmail(email.trim());
           newAttendee.setSecureKey(NumberHelper.getSecureRandomUrlSaveString(SECURE_KEY_LENGTH));
           pollAttendeeList.add(newAttendee);

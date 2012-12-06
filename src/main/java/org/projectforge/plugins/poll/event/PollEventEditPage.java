@@ -32,7 +32,7 @@ import net.ftlines.wicket.fullcalendar.callback.DroppedEvent;
 import net.ftlines.wicket.fullcalendar.callback.ResizedEvent;
 import net.ftlines.wicket.fullcalendar.callback.SelectedRange;
 
-import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
@@ -66,13 +66,15 @@ public class PollEventEditPage extends AbstractSecuredPage
 
   private RepeatingView eventEntries;
 
-  public PollEventEditPage(final PageParameters parameters, IModel<PollDO> pollDoModel)
+  private PollEventEventsProvider eventProvider;
+
+  public PollEventEditPage(final PageParameters parameters, final IModel<PollDO> pollDoModel)
   {
     super(parameters);
     this.pollDoModel = pollDoModel;
   }
 
-  public PollEventEditPage(final PageParameters parameters, IModel<PollDO> pollDoModel, Collection<PollEventDO> events)
+  public PollEventEditPage(final PageParameters parameters, final IModel<PollDO> pollDoModel, final Collection<PollEventDO> events)
   {
     super(parameters);
     this.pollDoModel = pollDoModel;
@@ -91,14 +93,31 @@ public class PollEventEditPage extends AbstractSecuredPage
 
     form.add(new Label("title", pollDoModel.getObject().getTitle()));
     form.add(new Label("location", pollDoModel.getObject().getLocation()));
-    eventEntries = new RepeatingView("eventEntries");
-    eventEntries.setOutputMarkupId(true);
-    form.add(eventEntries);
+    final WebMarkupContainer entryContainer = new WebMarkupContainer("entryContainer") {
+      private static final long serialVersionUID = -2897780301098962428L;
 
-    final PollEventEventsProvider eventProvider = new PollEventEventsProvider(this, pollDoModel);
+      /**
+       * @see org.apache.wicket.Component#onBeforeRender()
+       */
+      @Override
+      protected void onBeforeRender()
+      {
+        super.onBeforeRender();
+        eventEntries.removeAll();
+        for(final PollEventDO pollEvent : eventProvider.getAllEvents()) {
+          eventEntries.add(new PollEventEntryPanel(eventEntries.newChildId(), pollEvent));
+        }
+      }
+    };
+    entryContainer.setOutputMarkupId(true);
+    form.add(entryContainer);
+    eventEntries = new RepeatingView("eventEntries");
+    entryContainer.add(eventEntries);
+
+    eventProvider = new PollEventEventsProvider(this, pollDoModel);
     if (events != null) {
       if (events.isEmpty() == false) {
-        for (PollEventDO event : events) {
+        for (final PollEventDO event : events) {
           eventProvider.addEvent(new SelectedRange(event.getStartDate(), event.getEndDate(), false), null);
         }
       }
@@ -122,27 +141,7 @@ public class PollEventEditPage extends AbstractSecuredPage
       protected void onDateRangeSelected(final SelectedRange range, final CalendarResponse response)
       {
         eventProvider.addEvent(range, response);
-        IModel<SelectedRange> model = new IModel<SelectedRange>() {
-
-          @Override
-          public void detach()
-          {
-          }
-
-          @Override
-          public void setObject(SelectedRange object)
-          {
-          }
-
-          @Override
-          public SelectedRange getObject()
-          {
-            return range;
-          }
-        };
-        PollEventEntryPanel entry = new PollEventEntryPanel(eventEntries.newChildId(), model);
-        eventEntries.add(entry);
-        AjaxRequestTarget.get().add(form);
+        response.getTarget().add(entryContainer);
       }
 
       /**
@@ -152,6 +151,7 @@ public class PollEventEditPage extends AbstractSecuredPage
       @Override
       protected boolean onEventResized(final ResizedEvent event, final CalendarResponse response)
       {
+        response.getTarget().add(entryContainer);
         return eventProvider.resizeEvent(event, response);
       }
 
@@ -162,6 +162,7 @@ public class PollEventEditPage extends AbstractSecuredPage
       @Override
       protected boolean onEventDropped(final DroppedEvent event, final CalendarResponse response)
       {
+        response.getTarget().add(entryContainer);
         return eventProvider.dropEvent(event, response);
       }
 
@@ -172,6 +173,7 @@ public class PollEventEditPage extends AbstractSecuredPage
       @Override
       protected void onEventClicked(final ClickedEvent event, final CalendarResponse response)
       {
+        response.getTarget().add(entryContainer);
         eventProvider.eventClicked(event, response);
       }
     };
