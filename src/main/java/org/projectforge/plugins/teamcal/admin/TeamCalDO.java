@@ -31,6 +31,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
@@ -74,10 +75,10 @@ public class TeamCalDO extends DefaultBaseDO
   {
   }
 
-  @Column(length = Constants.LENGTH_TITLE)
   /**
    * @return the title
    */
+  @Column(length = Constants.LENGTH_TITLE)
   public String getTitle()
   {
     return title;
@@ -260,10 +261,8 @@ public class TeamCalDO extends DefaultBaseDO
   @Override
   public int hashCode()
   {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + this.getId();
-    return result;
+    final HashCodeBuilder hcb = new HashCodeBuilder().append(this.getId());
+    return hcb.hashCode();
   }
 
   /**

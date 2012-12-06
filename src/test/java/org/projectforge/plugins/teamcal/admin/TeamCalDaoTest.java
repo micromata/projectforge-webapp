@@ -85,8 +85,8 @@ public class TeamCalDaoTest extends PluginTestBase
     checkSelectAccess(true, fullUser1, fullUser3, readonlyUser1, readonlyUser3, minimalUser1, minimalUser3);
     checkSelectAccess(false, noAccessUser);
 
-    checkUpdateAccess(cal, true, fullUser1, fullUser3);
-    checkUpdateAccess(cal, false, readonlyUser1, readonlyUser3, minimalUser1, minimalUser3, noAccessUser);
+    checkUpdateAccess(cal, true, owner, getUser(TEST_ADMIN_USER));
+    checkUpdateAccess(cal, false, fullUser1, fullUser3, readonlyUser1, readonlyUser3, minimalUser1, minimalUser3, noAccessUser);
   }
 
   private void checkSelectAccess(final boolean access, final PFUserDO... users)

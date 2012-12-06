@@ -63,13 +63,12 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
   }
 
   /**
-   * @return true if user is assignee or reporter. If not, the task access is checked.
    * @see org.projectforge.user.UserRightAccessCheck#hasSelectAccess(org.projectforge.user.PFUserDO, java.lang.Object)
    */
   @Override
   public boolean hasSelectAccess(final PFUserDO user, final TeamCalDO obj)
   {
-    if (isOwner(user, obj) == true) {
+    if (isOwner(user, obj) == true || UserRights.getAccessChecker().isUserMemberOfAdminGroup(user) == true) {
       // User has full access to his own calendars.
       return true;
     }
