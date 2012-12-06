@@ -330,6 +330,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     final ConfigurableListableBeanFactory beanFactory = webApplicationContext.getBeanFactory();
     beanFactory.autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
     final LocalSessionFactoryBean localSessionFactoryBean = (LocalSessionFactoryBean) beanFactory.getBean("&sessionFactory");
+
     // if ("true".equals(System.getProperty(SYSTEM_PROPERTY_HSQLDB_18_UPDATE)) == true) {
     // try {
     // log.info("Send SHUTDOWN COMPACT to upgrade data-base version:");
@@ -368,8 +369,8 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     daoRegistry.init();
 
     final PluginsRegistry pluginsRegistry = PluginsRegistry.instance();
-    pluginsRegistry.set(systemUpdater);
     pluginsRegistry.set(beanFactory, getResourceSettings());
+    pluginsRegistry.set(systemUpdater);
     pluginsRegistry.initialize();
 
     for (final Map.Entry<String, Class< ? extends WebPage>> mountPage : WebRegistry.instance().getMountPages().entrySet()) {

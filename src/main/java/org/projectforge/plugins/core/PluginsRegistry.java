@@ -50,7 +50,7 @@ public class PluginsRegistry
 
   private IResourceSettings resourceSettings;
 
-  private  ConfigurableListableBeanFactory beanFactory;
+  private ConfigurableListableBeanFactory beanFactory;
 
   private final List<AbstractPlugin> plugins = new ArrayList<AbstractPlugin>();
 
@@ -93,8 +93,10 @@ public class PluginsRegistry
     this.resourceSettings = resourceSettings;
   }
 
-  public void initialize()
-  {
+  /**
+   * Load plugins which are configured in config.xml.
+   */
+  public void loadAdditionalPlugins() {
     final ConfigXml xmlConfiguration = ConfigXml.getInstance();
     final String[] pluginMainClasses = xmlConfiguration.getPluginMainClasses();
     if (pluginMainClasses != null) {
@@ -116,9 +118,13 @@ public class PluginsRegistry
         }
       }
     }
+  }
+
+  public void initialize()
+  {
     for (final AbstractPlugin plugin : plugins) {
-      beanFactory.autowireBeanProperties(plugin, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
       plugin.setResourceSettings(resourceSettings);
+      beanFactory.autowireBeanProperties(plugin, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
       plugin.init();
     }
   }

@@ -49,6 +49,7 @@ public class AutoSessionFactoryBean extends AnnotationSessionFactoryBean
       config.addAnnotatedClass(entityClass);
     }
     final PluginsRegistry pluginsRegistry = PluginsRegistry.instance();
+    pluginsRegistry.loadAdditionalPlugins();
     for (final AbstractPlugin plugin : pluginsRegistry.getPlugins()) {
       final Class< ? >[] persistentEntities = plugin.getPersistentEntities();
       if (persistentEntities != null) {
@@ -71,7 +72,7 @@ public class AutoSessionFactoryBean extends AnnotationSessionFactoryBean
     super.setSchemaUpdate(false);
     try {
       super.afterPropertiesSet();
-    } catch (Exception ex) {
+    } catch (final Exception ex) {
       throw new RuntimeException(ex);
     }
     if (schemaUpdate == true) {
@@ -81,7 +82,7 @@ public class AutoSessionFactoryBean extends AnnotationSessionFactoryBean
   }
 
   @Override
-  public void setSchemaUpdate(boolean schemaUpdate)
+  public void setSchemaUpdate(final boolean schemaUpdate)
   {
     super.setSchemaUpdate(schemaUpdate);
     this.schemaUpdate = schemaUpdate;
