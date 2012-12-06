@@ -25,6 +25,7 @@ package org.projectforge.test;
 
 import java.io.File;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 import org.projectforge.core.ConfigXmlTest;
@@ -48,7 +49,8 @@ public class TestConfiguration
   private static final Logger log = Logger.getLogger(TestConfiguration.class);
 
   private static final String[] TEST_CONTEXT_FILES = new String[] { "test-applicationContext-main.xml", "applicationContext-hibernate.xml",
-    "applicationContext-business.xml", "applicationContext-web.xml", "applicationContext-ldap.xml", "classpath*:**/pluginContext.xml"};
+    "applicationContext-business.xml", "applicationContext-web.xml", "applicationContext-ldap.xml",
+    "org/projectforge/plugins/memo/pluginContext.xml", "org/projectforge/plugins/todo/pluginContext.xml"};
 
   private static final String[] CMD_CONTEXT_FILES = new String[] { "cmd-applicationContext-main.xml", "applicationContext-hibernate.xml",
     "applicationContext-business.xml", "applicationContext-ldap.xml"};
@@ -65,9 +67,20 @@ public class TestConfiguration
 
   public static synchronized void initAsTestConfiguration()
   {
+    initAsTestConfiguration((String[]) null);
+  }
+
+  public static synchronized void initAsTestConfiguration(final String... additionalContextFiles)
+  {
     System.setProperty("base.dir", new File("./tmp").getAbsoluteFile().toString());
     ConfigXmlTest.createTestConfiguration();
-    init(TEST_CONTEXT_FILES);
+    final String[] contextFiles;
+    if (additionalContextFiles != null && additionalContextFiles.length > 0) {
+      contextFiles = (String[]) ArrayUtils.addAll(TEST_CONTEXT_FILES, additionalContextFiles);
+    } else {
+      contextFiles = TEST_CONTEXT_FILES;
+    }
+    init(contextFiles);
   }
 
   public static synchronized void initAsCmdLineConfiguration()

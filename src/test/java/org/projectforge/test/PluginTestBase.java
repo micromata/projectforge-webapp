@@ -40,7 +40,17 @@ import org.springframework.beans.BeansException;
  */
 public class PluginTestBase extends AbstractTestBase
 {
+  public static void init(final String additionalContextFile, final AbstractPlugin... plugins) throws BeansException, IOException
+  {
+    init(new String[] { additionalContextFile}, plugins);
+  }
+
   public static void init(final AbstractPlugin... plugins) throws BeansException, IOException
+  {
+    init((String[])null, plugins);
+  }
+
+  public static void init(final String[] additionalContextFiles, final AbstractPlugin... plugins) throws BeansException, IOException
   {
     final List<String> persistentEntries = new ArrayList<String>();
     final PluginsRegistry pluginsRegistry = PluginsRegistry.instance();
@@ -50,7 +60,7 @@ public class PluginTestBase extends AbstractTestBase
         persistentEntries.add(persistentEntry.getName());
       }
     }
-    preInit();
+    preInit(additionalContextFiles);
     pluginsRegistry.set(getTestConfiguration().getBean("systemUpdater", SystemUpdater.class));
     pluginsRegistry.set(getTestConfiguration().getBeanFactory(), Mockito.mock(IResourceSettings.class));
     pluginsRegistry.initialize();

@@ -40,6 +40,7 @@ import org.springframework.beans.BeansException;
 public class TeamCalDaoTest extends PluginTestBase
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalDaoTest.class);
+
   private TeamCalDao teamCalDao;
 
   private Integer calId;
@@ -47,7 +48,7 @@ public class TeamCalDaoTest extends PluginTestBase
   @BeforeClass
   public static void setup() throws BeansException, IOException
   {
-    init(new TeamCalPlugin());
+    init("org/projectforge/plugins/teamcal/pluginContext.xml", new TeamCalPlugin());
   }
 
   @Test

@@ -143,11 +143,11 @@ public class AbstractTestBase
     return testConfiguration;
   }
 
-  protected static void preInit()
+  protected static void preInit(final String... additionalContextFiles)
   {
     TimeZone.setDefault(DateHelper.UTC);
     log.info("user.timezone is: " + System.getProperty("user.timezone"));
-    TestConfiguration.initAsTestConfiguration();
+    TestConfiguration.initAsTestConfiguration(additionalContextFiles);
     testConfiguration = TestConfiguration.getConfiguration();
     final DaoRegistry daoRegistry = TestConfiguration.getConfiguration().getBean("daoRegistry", DaoRegistry.class);
     daoRegistry.init();
@@ -201,7 +201,6 @@ public class AbstractTestBase
             deleteFrom(hibernateTemplate, table);
           }
         }
-        deleteFrom(hibernateTemplate, "ToDoDO");
         deleteFrom(hibernateTemplate, "TimesheetDO");
         deleteFrom(hibernateTemplate, "HRPlanningEntryDO");
         deleteFrom(hibernateTemplate, "HRPlanningDO");
