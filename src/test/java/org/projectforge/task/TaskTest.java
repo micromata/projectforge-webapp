@@ -296,6 +296,7 @@ public class TaskTest extends TestBase
   @Test
   public void checkAccess()
   {
+    logon(TEST_ADMIN_USER);
     final TaskDO task = initTestDB.addTask("checkAccessTestTask", "root");
     initTestDB.addGroup("checkAccessTestGroup", new String[] { TEST_USER});
     initTestDB.createGroupTaskAccess(getGroup("checkAccessTestGroup"), getTask("checkAccessTestTask"), AccessType.TASKS, true, true, true,
