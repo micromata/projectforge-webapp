@@ -33,6 +33,7 @@ import org.projectforge.database.HibernateUtils;
 import org.projectforge.jdbc.PropertyDataSource;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
@@ -47,7 +48,7 @@ public class TestConfiguration
   private static final Logger log = Logger.getLogger(TestConfiguration.class);
 
   private static final String[] TEST_CONTEXT_FILES = new String[] { "test-applicationContext-main.xml", "applicationContext-hibernate.xml",
-    "applicationContext-business.xml", "applicationContext-web.xml", "applicationContext-ldap.xml"};
+    "applicationContext-business.xml", "applicationContext-web.xml", "applicationContext-ldap.xml", "classpath*:**/pluginContext.xml"};
 
   private static final String[] CMD_CONTEXT_FILES = new String[] { "cmd-applicationContext-main.xml", "applicationContext-hibernate.xml",
     "applicationContext-business.xml", "applicationContext-ldap.xml"};
@@ -108,6 +109,11 @@ public class TestConfiguration
       throw new RuntimeException(msg);
     }
     return testConfiguration;
+  }
+
+  public ConfigurableListableBeanFactory getBeanFactory()
+  {
+    return ctx.getBeanFactory();
   }
 
   public boolean isInitialized()
