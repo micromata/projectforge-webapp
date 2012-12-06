@@ -48,6 +48,10 @@ public class PluginsRegistry
 
   private static PluginsRegistry instance;
 
+  private IResourceSettings resourceSettings;
+
+  private  ConfigurableListableBeanFactory beanFactory;
+
   private final List<AbstractPlugin> plugins = new ArrayList<AbstractPlugin>();
 
   public synchronized static PluginsRegistry instance()
@@ -73,6 +77,24 @@ public class PluginsRegistry
     for (final AbstractPlugin plugin : builtinPlugins) {
       plugins.add(plugin);
     }
+  }
+
+  public void set(final SystemUpdater systemUpdater)
+  {
+    for (final AbstractPlugin plugin : plugins) {
+      systemUpdater.register(plugin.getInitializationUpdateEntry());
+      systemUpdater.register(plugin.getUpdateEntries());
+    }
+  }
+
+  public void set(final ConfigurableListableBeanFactory beanFactory, final IResourceSettings resourceSettings)
+  {
+    this.beanFactory = beanFactory;
+    this.resourceSettings = resourceSettings;
+  }
+
+  public void initialize()
+  {
     final ConfigXml xmlConfiguration = ConfigXml.getInstance();
     final String[] pluginMainClasses = xmlConfiguration.getPluginMainClasses();
     if (pluginMainClasses != null) {
@@ -94,27 +116,9 @@ public class PluginsRegistry
         }
       }
     }
-  }
-
-  public void set(final SystemUpdater systemUpdater)
-  {
     for (final AbstractPlugin plugin : plugins) {
-      systemUpdater.register(plugin.getInitializationUpdateEntry());
-      systemUpdater.register(plugin.getUpdateEntries());
-    }
-  }
-
-  public void set(final ConfigurableListableBeanFactory beanFactory, final IResourceSettings resourceSettings)
-  {
-    for (final AbstractPlugin plugin : plugins) {
-      plugin.setResourceSettings(resourceSettings);
       beanFactory.autowireBeanProperties(plugin, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
-    }
-  }
-
-  public void initialize()
-  {
-    for (final AbstractPlugin plugin : plugins) {
+      plugin.setResourceSettings(resourceSettings);
       plugin.init();
     }
   }
