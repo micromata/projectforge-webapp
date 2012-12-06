@@ -32,6 +32,7 @@ import net.ftlines.wicket.fullcalendar.callback.DroppedEvent;
 import net.ftlines.wicket.fullcalendar.callback.ResizedEvent;
 import net.ftlines.wicket.fullcalendar.callback.SelectedRange;
 
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
@@ -68,6 +69,8 @@ public class PollEventEditPage extends AbstractSecuredPage
 
   private PollEventEventsProvider eventProvider;
 
+  private WebMarkupContainer entryContainer;
+
   public PollEventEditPage(final PageParameters parameters, final IModel<PollDO> pollDoModel)
   {
     super(parameters);
@@ -93,7 +96,7 @@ public class PollEventEditPage extends AbstractSecuredPage
 
     form.add(new Label("title", pollDoModel.getObject().getTitle()));
     form.add(new Label("location", pollDoModel.getObject().getLocation()));
-    final WebMarkupContainer entryContainer = new WebMarkupContainer("entryContainer") {
+    entryContainer = new WebMarkupContainer("entryContainer") {
       private static final long serialVersionUID = -2897780301098962428L;
 
       /**
@@ -105,7 +108,20 @@ public class PollEventEditPage extends AbstractSecuredPage
         super.onBeforeRender();
         eventEntries.removeAll();
         for(final PollEventDO pollEvent : eventProvider.getAllEvents()) {
-          eventEntries.add(new PollEventEntryPanel(eventEntries.newChildId(), pollEvent));
+          eventEntries.add(new PollEventEntryPanel(eventEntries.newChildId(), pollEvent) {
+            private static final long serialVersionUID = -3844278068979559030L;
+
+            /**
+             * @see org.projectforge.plugins.poll.event.PollEventEntryPanel#onDeleteClick(org.apache.wicket.ajax.AjaxRequestTarget)
+             */
+            @Override
+            protected void onDeleteClick(final AjaxRequestTarget target)
+            {
+              eventProvider.removeElement(pollEvent);
+              target.appendJavaScript("$('#" + calendar.getMarkupId() + "').fullCalendar('removeEvents', " + pollEvent.getId() + ");");
+              target.add(entryContainer);
+            }
+          });
         }
       }
     };

@@ -10,17 +10,18 @@
 package org.projectforge.plugins.poll.event;
 
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.joda.time.DateTime;
-import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
+import org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
  * 
  */
-public class PollEventEntryPanel extends Panel
+public abstract class PollEventEntryPanel extends Panel
 {
   private static final long serialVersionUID = 8389532050901086582L;
 
@@ -38,7 +39,22 @@ public class PollEventEntryPanel extends Panel
     add(new Label("startDate", "Start: " + DateFormatUtils.format(start.getMillis(), "dd.MM.yyyy HH:mm")));  // TODO Max i18n
     add(new Label("endDate", "Ende: " + DateFormatUtils.format(end.getMillis(), "dd.MM.yyyy HH:mm"))); // TODO Max i18n!!
 
-    final IconButtonPanel iconButton = new IconButtonPanel("delete", IconType.MINUS_THICK);
+    final AjaxIconButtonPanel iconButton = new AjaxIconButtonPanel("delete", IconType.MINUS_THICK){
+      private static final long serialVersionUID = -2464985733387718199L;
+      /**
+       * @see org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
+       */
+      @Override
+      protected void onSubmit(final AjaxRequestTarget target)
+      {
+        onDeleteClick(target);
+      }
+    };
     add(iconButton);
   }
+
+  /**
+   * @param target
+   */
+  protected abstract void onDeleteClick(AjaxRequestTarget target);
 }

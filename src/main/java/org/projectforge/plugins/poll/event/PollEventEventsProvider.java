@@ -168,6 +168,14 @@ public class PollEventEventsProvider extends MyFullCalendarEventsProvider
   }
 
   /**
+   * 
+   * @param event
+   */
+  public void removeElement(final PollEventDO event) {
+    pollEventCache.remove(event);
+  }
+
+  /**
    * @param event
    * @param response
    */
