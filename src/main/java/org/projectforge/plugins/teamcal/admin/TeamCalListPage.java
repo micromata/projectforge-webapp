@@ -41,7 +41,6 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
@@ -66,17 +65,10 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
   @SpringBean(name = "teamCalDao")
   private TeamCalDao teamCalDao;
 
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
-
   @SpringBean(name = "userDao")
   private UserDao userDao;
 
   private String iCalTarget;
-
-  private final TeamCalRight right;
-
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalListPage.class);
 
   /**
    * 
@@ -84,7 +76,6 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
   public TeamCalListPage(final PageParameters parameters)
   {
     super(parameters, "plugins.teamcal");
-    right = new TeamCalRight();
   }
 
   /**
@@ -206,21 +197,8 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
   @Override
   protected IModel<TeamCalDO> getModel(final TeamCalDO object)
   {
-    final DetachableDOModel<TeamCalDO, TeamCalDao> det = new DetachableDOModel<TeamCalDO, TeamCalDao>(object, getBaseDao());
-    TeamCalDO teamcal = det.getObject();
-    if (right.isOwner(getUser(), object)
-        ||right.hasAccessGroup(teamcal.getFullAccessGroup(), userGroupCache, getUser()) == true
-        || right.hasAccessGroup(teamcal.getReadOnlyAccessGroup(), userGroupCache, getUser()) == true)
-      return det;
-    if (right.hasAccessGroup(teamcal.getMinimalAccessGroup(), userGroupCache, getUser()) == true) {
-      teamcal = new TeamCalDO();
-      teamcal.setId(object.getId());
-      teamcal.setMinimalAccessGroup(object.getMinimalAccessGroup());
-      teamcal.setOwner(object.getOwner());
-      teamcal.setTitle(object.getTitle());
-      det.setObject(teamcal);
-    }
-    return det;
+    final DetachableDOModel<TeamCalDO, TeamCalDao> model = new DetachableDOModel<TeamCalDO, TeamCalDao>(object, getBaseDao());
+    return model;
   }
 
   /**

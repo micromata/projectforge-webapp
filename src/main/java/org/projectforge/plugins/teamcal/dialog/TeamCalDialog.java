@@ -51,7 +51,6 @@ import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
-import org.projectforge.plugins.teamcal.admin.TeamCalRight;
 import org.projectforge.plugins.teamcal.event.TeamCalEventProvider;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarCollection;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFilter;
@@ -445,7 +444,6 @@ public class TeamCalDialog extends PFDialog
         {
           super.onBeforeRender();
           final List<TeamCalDO> result = newFilter.calcAssignedtItems(teamCalDao, newFilter.getCurrentCollection());
-          final TeamCalRight teamCalRight = new TeamCalRight();
           final PFUserDO user = PFUserContext.getUser();
           final List<TeamCalDO> filteredList = new ArrayList<TeamCalDO>();
           filteredList.add(0, timeSheetCalendar);
@@ -454,14 +452,8 @@ public class TeamCalDialog extends PFDialog
             final Iterator<TeamCalDO> it = result.iterator();
             while (it.hasNext()) {
               final TeamCalDO teamCal = it.next();
-              if (teamCalRight.isOwner(user, teamCal) == true) {
+              if (teamCalDao.hasUpdateAccess(user, teamCal, null, false) == true) {
                 filteredList.add(teamCal);
-              } else {
-                if (teamCal.getFullAccessGroup() != null) {
-                  if (teamCalRight.isMemberOfAtLeastOneGroup(user, teamCal.getFullAccessGroupId()) == true) {
-                    filteredList.add(teamCal);
-                  }
-                }
               }
             }
           }
@@ -506,7 +498,7 @@ public class TeamCalDialog extends PFDialog
           currentAjaxCallback.callback(target);
           collectionChoice.getDropDownChoice().setChoices(newFilter.getTeamCalCalendarCollection());
           collectionChoice.getDropDownChoice()
-              .setDefaultModel(new PropertyModel<TeamCalCalendarCollection>(newFilter, "currentCollection"));
+          .setDefaultModel(new PropertyModel<TeamCalCalendarCollection>(newFilter, "currentCollection"));
           addToTarget(target, collectionChoice.getDropDownChoice(), bottomContainer, select);
         }
 

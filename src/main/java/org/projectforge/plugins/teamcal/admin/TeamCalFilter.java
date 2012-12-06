@@ -35,16 +35,16 @@ public class TeamCalFilter extends BaseSearchFilter implements Serializable
 {
   private static final long serialVersionUID = 7410573665085873058L;
 
-  private boolean own, fullAccess, readOnlyAccess, minimalAccess;
+  private boolean own, fullAccess, readonlyAccess, minimalAccess;
 
   public TeamCalFilter(){
-    own = fullAccess = readOnlyAccess = minimalAccess = true;
+    own = fullAccess = readonlyAccess = minimalAccess = true;
   }
 
   public TeamCalFilter(final BaseSearchFilter filter)
   {
     super(filter);
-    own = fullAccess = readOnlyAccess = minimalAccess = true;
+    own = fullAccess = readonlyAccess = minimalAccess = true;
   }
 
   /**
@@ -64,20 +64,21 @@ public class TeamCalFilter extends BaseSearchFilter implements Serializable
   }
 
   /**
-   * @return the readOnlyAccess
+   * @return the readonlyAccess
    */
-  public boolean isReadOnlyAccess()
+  public boolean isReadonlyAccess()
   {
-    return readOnlyAccess;
+    return readonlyAccess;
   }
 
   /**
-   * @param readOnlyAccess the readOnlyAccess to set
+   * @param readonlyAccess the readOnlyAccess to set
    * @return this for chaining.
    */
-  public void setReadOnlyAccess(final boolean readOnlyAccess)
+  public TeamCalFilter setReadonlyAccess(final boolean readonlyAccess)
   {
-    this.readOnlyAccess = readOnlyAccess;
+    this.readonlyAccess = readonlyAccess;
+    return this;
   }
 
   /**
@@ -92,9 +93,10 @@ public class TeamCalFilter extends BaseSearchFilter implements Serializable
    * @param minimalAccess the minimalAccess to set
    * @return this for chaining.
    */
-  public void setMinimalAccess(final boolean minimalAccess)
+  public TeamCalFilter setMinimalAccess(final boolean minimalAccess)
   {
     this.minimalAccess = minimalAccess;
+    return this;
   }
 
   /**
@@ -109,9 +111,10 @@ public class TeamCalFilter extends BaseSearchFilter implements Serializable
    * @param fullAccess the fullAccess to set
    * @return this for chaining.
    */
-  public void setFullAccess(final boolean fullAccess)
+  public TeamCalFilter setFullAccess(final boolean fullAccess)
   {
     this.fullAccess = fullAccess;
+    return this;
   }
 
 }

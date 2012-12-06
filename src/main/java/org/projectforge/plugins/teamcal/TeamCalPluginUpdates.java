@@ -46,31 +46,49 @@ public class TeamCalPluginUpdates
   {
     return new UpdateEntryImpl(TeamCalPlugin.ID, "1.0.0", "2012-05-09", "Adds tables T_PLUGIN_CALENDAR_*.") {
 
+      final Table calendarTable = new Table(TeamCalDO.class);
+
+      final Table eventTable = new Table(TeamEventDO.class);
+
+      final String[] calendarAttributes = { "owner", "fullAccessGroupIds", "fullAccessUserIds", "readonlyAccessGroupIds",
+          "readonlyAccessUserIds", "minimalAccessGroupIds", "minimalAccessUserIds", "description", "title"};
+
+      final String[] eventAttributes = { "subject", "location", "allDay", "calendar", "startDate", "endDate", "note", "attendees",
+          "recurrenceInterval", "recurrenceAmount", "recurrenceEndDate"};
+
+      {
+        calendarTable.addDefaultBaseDOAttributes().addAttributes(calendarAttributes);
+        eventTable.addDefaultBaseDOAttributes().addAttributes(eventAttributes);
+      }
+
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        final Table calendarTable = new Table(TeamCalDO.class);
-        final Table eventTable = new Table(TeamEventDO.class);
         // Does the data-base table already exist?
-        return dao.doesExist(calendarTable) == true && dao.doesExist(eventTable) == true ? UpdatePreCheckStatus.ALREADY_UPDATED
-            : UpdatePreCheckStatus.OK;
+        if (dao.doesExist(calendarTable) == true //
+            && dao.doesTableAttributesExist(calendarTable, calendarAttributes) == true //
+            && dao.doesExist(eventTable) == true //
+            && dao.doesTableAttributesExist(eventTable, eventAttributes) == true) {
+          return UpdatePreCheckStatus.ALREADY_UPDATED;
+        } else {
+          return UpdatePreCheckStatus.OK;
+        }
       }
 
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        final Table calendarTable = new Table(TeamCalDO.class);
-        final Table eventTable = new Table(TeamEventDO.class);
-        //         Create initial data-base table:
+        // Create initial data-base table:
         if (dao.doesExist(calendarTable) == false) {
-          calendarTable.addDefaultBaseDOAttributes().addAttributes("owner", "fullAccessGroup", "readOnlyAccessGroup", "minimalAccessGroup",
-              "description", "title");
           dao.createTable(calendarTable);
+        } else if (dao.doesTableAttributesExist(calendarTable, calendarAttributes) == false) {
+          dao.addTableAttributes(calendarTable, calendarTable.getAttributes());
         }
         if (dao.doesExist(eventTable) == false) {
-          eventTable.addDefaultBaseDOAttributes().addAttributes("subject", "location", "calendar", "startDate", "endDate",
-              "note", "attendees", "recurrenceInterval", "recurrenceAmount", "recurrenceEndDate");
           dao.createTable(eventTable);
+        }
+        if (dao.doesTableAttributesExist(eventTable, eventAttributes) == false) {
+          dao.addTableAttributes(eventTable, eventTable.getAttributes());
         }
         dao.createMissingIndices();
         return UpdateRunningStatus.DONE;

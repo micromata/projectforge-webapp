@@ -23,6 +23,8 @@
 
 package org.projectforge.plugins.teamcal.admin;
 
+import java.util.Collection;
+
 import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.ExternalLink;
@@ -34,9 +36,12 @@ import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.WebConfiguration;
-import org.projectforge.web.user.GroupSelectPanel;
+import org.projectforge.web.common.MultiChoiceListHelper;
+import org.projectforge.web.user.GroupsComparator;
+import org.projectforge.web.user.GroupsProvider;
+import org.projectforge.web.user.UsersComparator;
+import org.projectforge.web.user.UsersProvider;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.JodaDatePanel;
@@ -45,6 +50,8 @@ import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
+
+import com.vaynberg.wicket.select2.Select2MultiChoice;
 
 /**
  * Creates a top form-panel to add filter functions or other options.
@@ -58,9 +65,6 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
 
   private static final long serialVersionUID = 1379614008604844519L;
 
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
-
   @SpringBean(name = "userDao")
   private UserDao userDao;
 
@@ -70,6 +74,10 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
   private boolean access = false;
 
   private JodaDatePanel datePanel;
+
+  MultiChoiceListHelper<PFUserDO> fullAccessUsersListHelper, readonlyAccessUsersListHelper, minimalAccessUsersListHelper;
+
+  MultiChoiceListHelper<GroupDO> fullAccessGroupsListHelper, readonlyAccessGroupsListHelper, minimalAccessGroupsListHelper;
 
   /**
    * @param parentPage
@@ -92,22 +100,8 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
 
     // checking visibility rights
     final TeamCalRight right = new TeamCalRight();
-    if (isNew() == true || data.getOwner() == null) {
+    if (isNew() == true || right.hasUpdateAccess(getUser(), data, data) == true) {
       access = true;
-    } else {
-      if (right.hasUpdateAccess(getUser(), data, data) == true)
-        access = true;
-      else if (right.hasAccessGroup(data.getReadOnlyAccessGroup(), userGroupCache, getUser()) == true)
-        access = false;
-      else if (right.hasAccessGroup(data.getMinimalAccessGroup(), userGroupCache, getUser()) == true) {
-        final TeamCalDO newTeamCalDO = new TeamCalDO();
-        newTeamCalDO.setId(data.getId());
-        newTeamCalDO.setMinimalAccessGroup(data.getMinimalAccessGroup());
-        newTeamCalDO.setOwner(data.getOwner());
-        newTeamCalDO.setTitle(data.getTitle());
-        data = newTeamCalDO;
-        access = false;
-      } else access = false;
     }
 
     // set title
@@ -118,8 +112,9 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
         title.add(WicketUtils.setFocus());
       }
       fs.add(title);
-      if (access == false)
+      if (access == false) {
         title.setEnabled(false);
+      }
     }
 
     // set description
@@ -127,54 +122,21 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.description"));
       final MaxLengthTextArea descr = new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "description"));
       fs.add(descr).setAutogrow();
-      if (access == false)
+      if (access == false) {
         descr.setEnabled(false);
+      }
     }
 
+    gridBuilder.newGrid8();
     // set owner
     {
-      if (data.getOwner() == null)
+      if (data.getOwner() == null) {
         data.setOwner(getUser());
+      }
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.owner")).setLabelFor(this);
       fs.add(new Label(fs.newChildId(), data.getOwner().getUsername() + ""));
     }
 
-    gridBuilder.newGrid8();
-    if (access == true) {
-      // set access groups
-      {
-        // set full access group chooser
-        final FieldsetPanel fsFullAccess = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess"), true);
-        final PropertyModel<GroupDO> model = new PropertyModel<GroupDO>(data, "fullAccessGroup");
-        final GroupSelectPanel fullAccess = new GroupSelectPanel(fsFullAccess.newChildId(), model, parentPage, "fullAccessGroupId");
-        fsFullAccess.add(fullAccess);
-        fsFullAccess.setLabelFor(fullAccess);
-        fullAccess.init();
-        if (access == false)
-          fullAccess.setEnabled(false);
-
-        // set read-only access chooser
-        final FieldsetPanel fsReadOnly = gridBuilder.newFieldset(getString("plugins.teamcal.readOnlyAccess"), true);
-        final GroupSelectPanel readOnly = new GroupSelectPanel(fsReadOnly.newChildId(), new PropertyModel<GroupDO>(data,
-            "readOnlyAccessGroup"), parentPage, "readOnlyAccessGroupId");
-        fsReadOnly.add(readOnly);
-        fsReadOnly.setLabelFor(readOnly);
-        readOnly.init();
-        if (access == false)
-          readOnly.setEnabled(false);
-
-        // set minimal access chooser
-        final FieldsetPanel fsMinimal = gridBuilder.newFieldset(getString("plugins.teamcal.minimalAccess"), true);
-        final GroupSelectPanel minimalAccess = new GroupSelectPanel(fsMinimal.newChildId(), new PropertyModel<GroupDO>(data,
-            "minimalAccessGroup"), parentPage, "minimalAccessGroupId");
-        fsMinimal.add(minimalAccess);
-        fsMinimal.setLabelFor(minimalAccess);
-        fsMinimal.addHelpIcon(getString("plugins.teamcal.minimalAccess.hint"));
-        minimalAccess.init();
-        if (access == false)
-          minimalAccess.setEnabled(false);
-      }
-    }
     if (accessChecker.isRestrictedUser() == false && WebConfiguration.isDevelopmentMode() == true) {
       final FieldsetPanel fsSubscribe = gridBuilder.newFieldset(getString("plugins.teamcal.subscribe"), true).setNoLabelFor();
       final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, createICalTarget());
@@ -184,6 +146,113 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       if (isNew() == true)
         fsSubscribe.setVisible(false);
     }
+
+    if (access == true) {
+      gridBuilder.newGrid8(true);
+      // set access users
+      {
+        // Full access users
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess.users"));//.setLabelSide(false);
+        final UsersProvider usersProvider = new UsersProvider();
+        final Collection<PFUserDO> fullAccessUsers = new UsersProvider().getSortedUsers(getData().getFullAccessUserIds());
+        fullAccessUsersListHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator()).setFullList(
+            usersProvider.getSortedUsers());
+        if (fullAccessUsers != null) {
+          for (final PFUserDO user : fullAccessUsers) {
+            fullAccessUsersListHelper.addOriginalAssignedItem(user).assignItem(user);
+          }
+        }
+        final Select2MultiChoice<PFUserDO> users = new Select2MultiChoice<PFUserDO>(fs.getSelect2MultiChoiceId(),
+            new PropertyModel<Collection<PFUserDO>>(this.fullAccessUsersListHelper, "assignedItems"), usersProvider);
+        fs.add(users);
+      }
+      {
+        // Read-only access users
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.readonlyAccess.users"));//.setLabelSide(false);
+        final UsersProvider usersProvider = new UsersProvider();
+        final Collection<PFUserDO> readOnlyAccessUsers = new UsersProvider().getSortedUsers(getData().getReadonlyAccessUserIds());
+        readonlyAccessUsersListHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator()).setFullList(
+            usersProvider.getSortedUsers());
+        if (readOnlyAccessUsers != null) {
+          for (final PFUserDO user : readOnlyAccessUsers) {
+            readonlyAccessUsersListHelper.addOriginalAssignedItem(user).assignItem(user);
+          }
+        }
+        final Select2MultiChoice<PFUserDO> users = new Select2MultiChoice<PFUserDO>(fs.getSelect2MultiChoiceId(),
+            new PropertyModel<Collection<PFUserDO>>(this.readonlyAccessUsersListHelper, "assignedItems"), usersProvider);
+        fs.add(users);
+      }
+      {
+        // Minimal access users
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.minimalAccess.users"), true);//.setLabelSide(false);
+        final UsersProvider usersProvider = new UsersProvider();
+        final Collection<PFUserDO> minimalAccessUsers = new UsersProvider().getSortedUsers(getData().getMinimalAccessUserIds());
+        minimalAccessUsersListHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator()).setFullList(
+            usersProvider.getSortedUsers());
+        if (minimalAccessUsers != null) {
+          for (final PFUserDO user : minimalAccessUsers) {
+            minimalAccessUsersListHelper.addOriginalAssignedItem(user).assignItem(user);
+          }
+        }
+        final Select2MultiChoice<PFUserDO> users = new Select2MultiChoice<PFUserDO>(fs.getSelect2MultiChoiceId(),
+            new PropertyModel<Collection<PFUserDO>>(this.minimalAccessUsersListHelper, "assignedItems"), usersProvider);
+        fs.addHelpIcon(getString("plugins.teamcal.minimalAccess.users.hint"));
+        fs.add(users);
+      }
+
+      gridBuilder.newGrid8();
+      // set access groups
+      {
+        // Full access groups
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess.groups"));//.setLabelSide(false);
+        final GroupsProvider groupsProvider = new GroupsProvider();
+        final Collection<GroupDO> fullAccessGroups = new GroupsProvider().getSortedGroups(getData().getFullAccessGroupIds());
+        fullAccessGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
+            groupsProvider.getSortedGroups());
+        if (fullAccessGroups != null) {
+          for (final GroupDO group : fullAccessGroups) {
+            fullAccessGroupsListHelper.addOriginalAssignedItem(group).assignItem(group);
+          }
+        }
+        final Select2MultiChoice<GroupDO> groups = new Select2MultiChoice<GroupDO>(fs.getSelect2MultiChoiceId(),
+            new PropertyModel<Collection<GroupDO>>(this.fullAccessGroupsListHelper, "assignedItems"), groupsProvider);
+        fs.add(groups);
+      }
+      {
+        // Read-only access groups
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.readonlyAccess.groups"));//.setLabelSide(false);
+        final GroupsProvider groupsProvider = new GroupsProvider();
+        final Collection<GroupDO> readOnlyAccessGroups = new GroupsProvider().getSortedGroups(getData().getReadonlyAccessGroupIds());
+        readonlyAccessGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
+            groupsProvider.getSortedGroups());
+        if (readOnlyAccessGroups != null) {
+          for (final GroupDO group : readOnlyAccessGroups) {
+            readonlyAccessGroupsListHelper.addOriginalAssignedItem(group).assignItem(group);
+          }
+        }
+        final Select2MultiChoice<GroupDO> groups = new Select2MultiChoice<GroupDO>(fs.getSelect2MultiChoiceId(),
+            new PropertyModel<Collection<GroupDO>>(this.readonlyAccessGroupsListHelper, "assignedItems"), groupsProvider);
+        fs.add(groups);
+      }
+      {
+        // Minimal access groups
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.minimalAccess.groups"), true);//.setLabelSide(false);
+        final GroupsProvider groupsProvider = new GroupsProvider();
+        final Collection<GroupDO> minimalAccessGroups = new GroupsProvider().getSortedGroups(getData().getMinimalAccessGroupIds());
+        minimalAccessGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
+            groupsProvider.getSortedGroups());
+        if (minimalAccessGroups != null) {
+          for (final GroupDO group : minimalAccessGroups) {
+            minimalAccessGroupsListHelper.addOriginalAssignedItem(group).assignItem(group);
+          }
+        }
+        final Select2MultiChoice<GroupDO> groups = new Select2MultiChoice<GroupDO>(fs.getSelect2MultiChoiceId(),
+            new PropertyModel<Collection<GroupDO>>(this.minimalAccessGroupsListHelper, "assignedItems"), groupsProvider);
+        fs.addHelpIcon(getString("plugins.teamcal.minimalAccess.groups.hint"));
+        fs.add(groups);
+      }
+    }
+
   }
 
   /**

@@ -24,12 +24,12 @@
 package org.projectforge.plugins.teamcal.event;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.projectforge.access.OperationType;
+import org.projectforge.plugins.teamcal.admin.TeamCalDO;
+import org.projectforge.plugins.teamcal.admin.TeamCalRight;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRightAccessCheck;
 import org.projectforge.user.UserRightCategory;
 import org.projectforge.user.UserRightValue;
-import org.projectforge.user.UserRights;
 
 /**
  * Every user has access to own to-do's or to-do's he's assigned to. All other users have access if the to-do is assigned to a task and the
@@ -40,6 +40,8 @@ import org.projectforge.user.UserRights;
 public class TeamEventRight extends UserRightAccessCheck<TeamEventDO>
 {
   private static final long serialVersionUID = 4076952301071024285L;
+
+  private final TeamCalRight teamCalRight = new TeamCalRight();
 
   public TeamEventRight()
   {
@@ -64,7 +66,23 @@ public class TeamEventRight extends UserRightAccessCheck<TeamEventDO>
   @Override
   public boolean hasSelectAccess(final PFUserDO user, final TeamEventDO obj)
   {
-    return hasAccess(user, obj, OperationType.SELECT);
+    final TeamCalDO calendar = obj.getCalendar();
+    if (calendar == null) {
+      return false;
+    }
+    if (ObjectUtils.equals(user.getId(), calendar.getOwnerId()) == true) {
+      // User has full access to it's own calendars.
+      return true;
+    }
+    final Integer userId = user.getId();
+    if (teamCalRight.hasFullAccess(calendar, userId) == true || teamCalRight.hasReadonlyAccess(calendar, userId) == true) {
+      return true;
+    } else if (teamCalRight.hasMinimalAccess(calendar, userId) == true) {
+      // Clear fields for users with minimal access.
+      obj.clearFields();
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -79,81 +97,77 @@ public class TeamEventRight extends UserRightAccessCheck<TeamEventDO>
   }
 
   /**
-   * If user is not reporter or assignee and task is given the access to task is assumed, meaning if the user has the right to insert sub
-   * tasks he is allowed to insert to-do's to.
+   * Same as {@link #hasUpdateAccess(PFUserDO, TeamEventDO, TeamEventDO)}
    * @see org.projectforge.user.UserRightAccessCheck#hasInsertAccess(org.projectforge.user.PFUserDO, java.lang.Object)
    */
   @Override
   public boolean hasInsertAccess(final PFUserDO user, final TeamEventDO obj)
   {
-    return hasAccess(user, obj, OperationType.INSERT);
+    return hasUpdateAccess(user, obj, null);
   }
 
   /**
-   * If user is not reporter or assignee and task is given the access to task is assumed, meaning if the user has the right to delete the
-   * tasks he is allowed to delete to-do's to.
+   * Same as {@link #hasUpdateAccess(PFUserDO, TeamEventDO, TeamEventDO)}
    * @see org.projectforge.user.UserRightAccessCheck#hasDeleteAccess(org.projectforge.user.PFUserDO, java.lang.Object)
    */
   @Override
   public boolean hasDeleteAccess(final PFUserDO user, final TeamEventDO obj)
   {
-    return hasAccess(user, obj, OperationType.DELETE);
-  }
-
-  @Override
-  public boolean hasAccess(final PFUserDO user, final TeamEventDO obj, final TeamEventDO oldObj, final OperationType operationType)
-  {
-    return hasAccess(user, obj, operationType) == true || hasAccess(user, oldObj, operationType) == true;
+    return hasUpdateAccess(user, obj, null);
   }
 
   /**
+   * Owners of the given calendar and users with full access hav update access to the given calendar: obj.getCalendar().
    * @see org.projectforge.user.UserRightAccessCheck#hasUpdateAccess(org.projectforge.user.PFUserDO, java.lang.Object, java.lang.Object)
    */
   @Override
   public boolean hasUpdateAccess(final PFUserDO user, final TeamEventDO obj, final TeamEventDO oldObj)
   {
-    if (ObjectUtils.equals(user.getId(), obj.getCalendar().getOwnerId()) == true) {
+    final TeamCalDO calendar = obj.getCalendar();
+    if (calendar == null) {
+      return false;
+    }
+    return hasUpdateAccess(user, calendar);
+  }
+
+  public boolean hasUpdateAccess(final PFUserDO user, final TeamCalDO calendar) {
+    if (ObjectUtils.equals(user.getId(), calendar.getOwnerId()) == true) {
       // User has full access to it's own calendars.
       return true;
     }
-    if (isMemberOfAtLeastOneGroup(user, obj.getCalendar().getFullAccessGroupId()) == true) {
-      // User is member of at least one group.
+    final Integer userId = user.getId();
+    if (teamCalRight.hasFullAccess(calendar, userId) == true) {
       return true;
     }
     return false;
   }
 
   /**
+   * Owners of the given calendar and users with full and read-only access have update access to the given calendar: obj.getCalendar().
    * @see org.projectforge.user.UserRightAccessCheck#hasHistoryAccess(org.projectforge.user.PFUserDO, java.lang.Object)
    */
   @Override
   public boolean hasHistoryAccess(final PFUserDO user, final TeamEventDO obj)
   {
-    if (obj != null)
-      return hasUpdateAccess(user, obj, null);
-    else return false;
-  }
-
-  private boolean isMemberOfAtLeastOneGroup(final PFUserDO user, final Integer... groupIds)
-  {
-    return UserRights.getUserGroupCache().isUserMemberOfAtLeastOneGroup(user.getId(), groupIds);
-  }
-
-  private boolean hasAccess(final PFUserDO user, final TeamEventDO event, final OperationType operationType)
-  {
-    if (event == null) {
-      return true;
-    }
-    if (ObjectUtils.equals(user.getId(), event.getCalendar().getOwnerId()) == true) {
-      return true;
-    }
-    if (UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), event.getCalendar().getFullAccessGroupId()) == true) {
-      return true;
-    }
-    if ((UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), event.getCalendar().getReadOnlyAccessGroupId()) == true || UserRights
-        .getUserGroupCache().isUserMemberOfGroup(user.getId(), event.getCalendar().getMinimalAccessGroupId()) == true)
-        && operationType.equals(OperationType.DELETE))
+    final TeamCalDO calendar = obj.getCalendar();
+    if (calendar == null) {
       return false;
-    else return true;
+    }
+    if (ObjectUtils.equals(user.getId(), calendar.getOwnerId()) == true) {
+      // User has full access to it's own calendars.
+      return true;
+    }
+    final Integer userId = user.getId();
+    if (teamCalRight.hasFullAccess(calendar, userId) == true || teamCalRight.hasReadonlyAccess(calendar, userId) == true) {
+      return true;
+    }
+    return false;
+  }
+
+  public boolean hasMinimalAccess(final TeamEventDO event, final Integer userId) {
+    if (event.getCalendar() == null) {
+      return true;
+    }
+    return teamCalRight.hasMinimalAccess(event.getCalendar(), userId);
   }
 }

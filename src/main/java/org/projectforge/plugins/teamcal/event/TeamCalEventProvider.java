@@ -55,8 +55,6 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalEventProvider.class);
 
-  private UserGroupCache userGroupCache;
-
   private final TeamEventDao teamEventDao;
 
   private int days;
@@ -82,7 +80,6 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
     this.teamCalDao = teamCalDao;
     this.filter = filter;
     this.teamEventDao = teamEventDao;
-    this.userGroupCache = userGroupCache;
     this.eventRight = new TeamEventRight();
   }
 
@@ -154,10 +151,10 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
           event.setStart(startDate);
           event.setEnd(endDate);
 
-          final String title = teamEvent.getSubject();
+          final String title;
           String durationString = "";
           if (longFormat == true) {
-            Period duration = new Period(startDate, endDate);
+            final Period duration = new Period(startDate, endDate);
             // String day = duration.getDays() + "";
 
             int hourInt = duration.getHours();
@@ -166,47 +163,33 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
             }
             final String hour = hourInt < 10 ? "0" + hourInt : "" + hourInt;
 
-            int minuteInt = duration.getMinutes();
+            final int minuteInt = duration.getMinutes();
             final String minute = minuteInt < 10 ? "0" + minuteInt : "" + minuteInt;
 
             if (event.isAllDay() == false)
               durationString = "\n" + getString("plugins.teamevent.duration") + ": " + hour + ":" + minute;
-            event.setTitle(getString("plugins.teamevent.subject")
+            title = getString("plugins.teamevent.subject")
                 + ": "
-                + title
+                + teamEvent.getSubject()
                 + "\n"
                 + getString("plugins.teamevent.note")
                 + ": "
                 + (teamEvent.getNote() == null ? "" : teamEvent.getNote())
-                + durationString);
-            if (right.hasAccessGroup(teamEvent.getCalendar().getMinimalAccessGroup(), userGroupCache, user) == true) {
-              // for minimal access
-              event.setTitle(getString("plugins.teamevent.subject") + ": " + title);
-              event.setEditable(false);
-            }
+                + durationString;
+          } else {
+            title = teamEvent.getSubject();
+          }
+          if (right.hasMinimalAccess(teamEvent.getCalendar(), user.getId()) == true) {
+            // for minimal access
+            event.setTitle("");
+            event.setEditable(false);
           } else {
             event.setTitle(title);
-            if (right.hasAccessGroup(teamEvent.getCalendar().getMinimalAccessGroup(), userGroupCache, user) == true) {
-              event.setEditable(false);
-            }
           }
           events.put(teamEvent.getId() + "", event);
         }
       }
     }
-  }
-
-  public void setUserGroupCache(final UserGroupCache userGroupCache)
-  {
-    this.userGroupCache = userGroupCache;
-  }
-
-  /**
-   * @return the log
-   */
-  public static org.apache.log4j.Logger getLog()
-  {
-    return log;
   }
 
   /**

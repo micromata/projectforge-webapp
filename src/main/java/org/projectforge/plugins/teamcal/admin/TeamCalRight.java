@@ -23,12 +23,9 @@
 
 package org.projectforge.plugins.teamcal.admin;
 
-import java.util.Collection;
-import java.util.Iterator;
-
 import org.apache.commons.lang.ObjectUtils;
-import org.projectforge.access.OperationType;
-import org.projectforge.user.GroupDO;
+import org.projectforge.common.StringHelper;
+import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserRightAccessCheck;
@@ -46,9 +43,12 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
 {
   private static final long serialVersionUID = -2928342166476350773L;
 
+  private final UserGroupCache userGroupCache;
+
   public TeamCalRight()
   {
     super(TeamCalDao.USER_RIGHT_ID, UserRightCategory.PLUGINS, UserRightValue.TRUE);
+    userGroupCache = Registry.instance().getUserGroupCache();
   }
 
   /**
@@ -70,12 +70,11 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
   public boolean hasSelectAccess(final PFUserDO user, final TeamCalDO obj)
   {
     if (isOwner(user, obj) == true) {
-      // User has full access to it's own calendars.
+      // User has full access to his own calendars.
       return true;
     }
-    if (UserRights.getUserGroupCache().isUserMemberOfAtLeastOneGroup(user.getId(), obj.getFullAccessGroupId(),
-        obj.getReadOnlyAccessGroupId(), obj.getMinimalAccessGroupId()) == true) {
-      // User is member of at least one group.
+    final Integer userId = user.getId();
+    if (hasFullAccess(obj, userId) == true || hasReadonlyAccess(obj, userId) == true || hasMinimalAccess(obj, userId) == true) {
       return true;
     }
     return false;
@@ -93,45 +92,23 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
   }
 
   /**
-   * If user is not reporter or assignee and task is given the access to task is assumed, meaning if the user has the right to insert sub
-   * tasks he is allowed to insert to-do's to.
+   * Owners and administrators are able to insert new calendars.
    * @see org.projectforge.user.UserRightAccessCheck#hasInsertAccess(org.projectforge.user.PFUserDO, java.lang.Object)
    */
   @Override
   public boolean hasInsertAccess(final PFUserDO user, final TeamCalDO obj)
   {
-    return hasSelectAccess(user, obj);
+    return isOwner(user, obj) == true || UserRights.getAccessChecker().isUserMemberOfAdminGroup(user) == true;
   }
 
   /**
+   * Owners and administrators are able to update calendars.
    * @see org.projectforge.user.UserRightAccessCheck#hasUpdateAccess(org.projectforge.user.PFUserDO, java.lang.Object, java.lang.Object)
    */
   @Override
   public boolean hasUpdateAccess(final PFUserDO user, final TeamCalDO obj, final TeamCalDO oldObj)
   {
-    if (ObjectUtils.equals(user.getId(), obj.getOwnerId()) == true) {
-      // User has full access to it's own calendars.
-      return true;
-    }
-    if (isMemberOfAtLeastOneGroup(user, obj.getFullAccessGroupId()) == true) {
-      // User is member of at least one group.
-      return true;
-    }
-    return false;
-  }
-
-  public boolean hasAccessGroup(final GroupDO group, final UserGroupCache userGroupCache, final PFUserDO user)
-  {
-    if (group != null) {
-      final Collection<Integer> groups = userGroupCache.getUserGroups(user);
-      final Iterator<Integer> it = groups.iterator();
-      while (it.hasNext()) {
-        final int id = it.next();
-        if (id == 0 || group.getId() == id)
-          return true;
-      }
-    }
-    return false;
+    return hasInsertAccess(user, obj) == true;
   }
 
   /**
@@ -142,25 +119,7 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
   @Override
   public boolean hasDeleteAccess(final PFUserDO user, final TeamCalDO obj)
   {
-    return hasAccess(user, obj, OperationType.DELETE);
-  }
-
-  private boolean hasAccess(final PFUserDO user, final TeamCalDO teamCal, final OperationType operationType)
-  {
-    if (teamCal == null) {
-      return true;
-    }
-    if (ObjectUtils.equals(user.getId(), teamCal.getOwnerId()) == true) {
-      return true;
-    }
-    if (UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), teamCal.getFullAccessGroupId()) == true) {
-      return true;
-    }
-    if ((UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), teamCal.getReadOnlyAccessGroupId()) == true || UserRights
-        .getUserGroupCache().isUserMemberOfGroup(user.getId(), teamCal.getMinimalAccessGroupId()) == true)
-        && operationType.equals(OperationType.DELETE))
-      return false;
-    else return true;
+    return hasInsertAccess(user, obj) == true;
   }
 
   /**
@@ -169,9 +128,7 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
   @Override
   public boolean hasHistoryAccess(final PFUserDO user, final TeamCalDO obj)
   {
-    if (obj != null)
-      return hasUpdateAccess(user, obj, null);
-    else return false;
+    return hasInsertAccess(user, obj) == true;
   }
 
   public boolean isOwner(final PFUserDO user, final TeamCalDO cal)
@@ -182,5 +139,46 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
   public boolean isMemberOfAtLeastOneGroup(final PFUserDO user, final Integer... groupIds)
   {
     return UserRights.getUserGroupCache().isUserMemberOfAtLeastOneGroup(user.getId(), groupIds);
+  }
+
+  public boolean hasFullAccess(final TeamCalDO calendar, final Integer userId)
+  {
+    final Integer[] groupIds = StringHelper.splitToIntegers(calendar.getFullAccessGroupIds(), ",");
+    if (userGroupCache.isUserMemberOfAtLeastOneGroup(userId, groupIds) == true) {
+      return true;
+    }
+    return containsUser(userId, calendar.getFullAccessUserIds());
+  }
+
+  public boolean hasReadonlyAccess(final TeamCalDO calendar, final Integer userId)
+  {
+    final Integer[] groupIds = StringHelper.splitToIntegers(calendar.getReadonlyAccessGroupIds(), ",");
+    if (userGroupCache.isUserMemberOfAtLeastOneGroup(userId, groupIds) == true) {
+      return true;
+    }
+    return containsUser(userId, calendar.getReadonlyAccessUserIds());
+  }
+
+  public boolean hasMinimalAccess(final TeamCalDO calendar, final Integer userId)
+  {
+    final Integer[] groupIds = StringHelper.splitToIntegers(calendar.getMinimalAccessGroupIds(), ",");
+    if (userGroupCache.isUserMemberOfAtLeastOneGroup(userId, groupIds) == true) {
+      return true;
+    }
+    return containsUser(userId, calendar.getMinimalAccessUserIds());
+  }
+
+  private boolean containsUser(final Integer userId, final String userIdsString)
+  {
+    final Integer[] userIds = StringHelper.splitToIntegers(userIdsString, ",");
+    for (final Integer id : userIds) {
+      if (id == null) {
+        continue;
+      }
+      if (id.equals(userId) == true) {
+        return true;
+      }
+    }
+    return false;
   }
 }

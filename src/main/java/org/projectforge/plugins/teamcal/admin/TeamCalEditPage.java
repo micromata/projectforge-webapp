@@ -26,8 +26,8 @@ package org.projectforge.plugins.teamcal.admin;
 import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.AbstractSecuredBasePage;
 import org.projectforge.web.wicket.EditPage;
 
 /**
@@ -35,7 +35,7 @@ import org.projectforge.web.wicket.EditPage;
  * 
  */
 @EditPage(defaultReturnPage = TeamCalListPage.class)
-public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm, TeamCalDao> implements ISelectCallerPage
+public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm, TeamCalDao>
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalEditPage.class);
 
@@ -54,46 +54,16 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
     init();
   }
 
-  /**
-   * required to find the component which called the request. components are marked with ids.
-   * 
-   * @see org.projectforge.web.fibu.ISelectCallerPage#select(java.lang.String, java.lang.Object)
-   */
   @Override
-  public void select(final String property, final Object selectedValue)
+  public AbstractSecuredBasePage onSaveOrUpdate()
   {
-    if ("fullAccessGroupId".equals(property) == true) {
-      teamCalDao.setFullAccessGroup(getData(), (Integer) selectedValue);
-    } else if ("readOnlyAccessGroupId".equals(property)) {
-      teamCalDao.setReadOnlyAccessGroup(getData(), (Integer) selectedValue);
-    } else if ("minimalAccessGroupId".equals(property)) {
-      teamCalDao.setMinimalAccessGroup(getData(), (Integer) selectedValue);
-    }
-  }
-
-  /**
-   * @see #select
-   * 
-   * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
-   */
-  @Override
-  public void unselect(final String property)
-  {
-    if ("fullAccessGroupId".equals(property)) {
-      getData().setFullAccessGroup(null);
-    } else if ("readOnlyAccessGroupId".equals(property)) {
-      getData().setReadOnlyAccessGroup(null);
-    } else if ("minimalAccessGroupId".equals(property)) {
-      getData().setMinimalAccessGroup(null);
-    }
-  }
-
-  /**
-   * @see org.projectforge.web.fibu.ISelectCallerPage#cancelSelection(java.lang.String)
-   */
-  @Override
-  public void cancelSelection(final String property)
-  {
+    teamCalDao.setFullAccessUsers(getData(), form.fullAccessUsersListHelper.getAssignedItems());
+    teamCalDao.setReadonlyAccessUsers(getData(), form.readonlyAccessUsersListHelper.getAssignedItems());
+    teamCalDao.setMinimalAccessUsers(getData(), form.minimalAccessUsersListHelper.getAssignedItems());
+    teamCalDao.setFullAccessGroups(getData(), form.fullAccessGroupsListHelper.getAssignedItems());
+    teamCalDao.setReadonlyAccessGroups(getData(), form.readonlyAccessGroupsListHelper.getAssignedItems());
+    teamCalDao.setMinimalAccessGroups(getData(), form.minimalAccessGroupsListHelper.getAssignedItems());
+    return super.onSaveOrUpdate();
   }
 
   /**

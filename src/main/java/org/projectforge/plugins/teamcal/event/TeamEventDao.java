@@ -38,9 +38,6 @@ import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
-import org.projectforge.plugins.teamcal.admin.TeamCalRight;
-import org.projectforge.user.PFUserContext;
-import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRightId;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,16 +55,13 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamEventDao.class);
 
-  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "subject", "location", "calendar.id", "calendar.title",
-    "note", "attendees"};
-
-  private final TeamCalRight right;
+  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "subject", "location", "calendar.id", "calendar.title", "note",
+  "attendees"};
 
   public TeamEventDao()
   {
     super(TeamEventDO.class);
     userRightId = USER_RIGHT_ID;
-    right = new TeamCalRight();
   }
 
   @Override
@@ -89,14 +83,13 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     } else {
       teamEventFilter = new TeamEventFilter(filter);
     }
-
-    if (teamEventFilter.getTeamCals().isEmpty())
+    if (teamEventFilter.getTeamCals().isEmpty()) {
       return null;
-
+    }
     final QueryFilter qFilter = buildQueryFilter(teamEventFilter);
 
     final List<TeamEventDO> list = getList(qFilter);
-    return hideByAccess(list);
+    return list;
   }
 
   public QueryFilter buildQueryFilter(final TeamEventFilter filter)
@@ -110,25 +103,16 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     }
     // limit events to load to chosen date view.
     if (filter.getStartDate() != null && filter.getEndDate() != null) {
-      queryFilter.add(
-          Restrictions.or(
-              (Restrictions.or(
-                  Restrictions.between("startDate", filter.getStartDate(), filter.getEndDate()),
-                  Restrictions.between("endDate", filter.getStartDate(), filter.getEndDate()))
-                  ),
-                  // get events whose duration overlap with chosen duration.
-                  (Restrictions.and(
-                      Restrictions.le("startDate", filter.getStartDate()),
-                      Restrictions.ge("endDate", filter.getEndDate()))
-                      ))
-          );
-    } else
-      if (filter.getStartDate() != null) {
-        queryFilter.add(Restrictions.ge("startDate", filter.getStartDate()));
-      } else
-        if (filter.getEndDate() != null) {
-          queryFilter.add(Restrictions.le("startDate", filter.getEndDate()));
-        }
+      queryFilter.add(Restrictions.or(
+          (Restrictions.or(Restrictions.between("startDate", filter.getStartDate(), filter.getEndDate()),
+              Restrictions.between("endDate", filter.getStartDate(), filter.getEndDate()))),
+              // get events whose duration overlap with chosen duration.
+              (Restrictions.and(Restrictions.le("startDate", filter.getStartDate()), Restrictions.ge("endDate", filter.getEndDate())))));
+    } else if (filter.getStartDate() != null) {
+      queryFilter.add(Restrictions.ge("startDate", filter.getStartDate()));
+    } else if (filter.getEndDate() != null) {
+      queryFilter.add(Restrictions.le("startDate", filter.getEndDate()));
+    }
     queryFilter.addOrder(Order.desc("startDate"));
     if (log.isDebugEnabled() == true) {
       log.debug(ToStringBuilder.reflectionToString(filter));
@@ -142,7 +126,8 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
    * @param filter
    * @return
    */
-  public List<TeamEventDO> getIcsExportList(final TeamEventFilter filter) {
+  public List<TeamEventDO> getIcsExportList(final TeamEventFilter filter)
+  {
     // limit loading results
     final DateTime now = DateTime.now();
     final Date eventDateLimit = now.minusYears(1).toDate();
@@ -156,27 +141,8 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     con.add(Restrictions.eq("deleted", filter.isDeleted()));
     queryFilter.add(con);
     final List<TeamEventDO> list = super.getList(queryFilter);
-    if (list == null || list.size() == 0)
+    if (list == null || list.size() == 0) {
       return new ArrayList<TeamEventDO>();
-
-    return hideByAccess(list);
-  }
-
-  private List<TeamEventDO> hideByAccess(final List<TeamEventDO> list) {
-    final PFUserDO user = PFUserContext.getUser();
-    for (final TeamEventDO teamEvent : list) {
-      if (right.isOwner(user, teamEvent.getCalendar()) == true
-          || right.hasAccessGroup(teamEvent.getCalendar().getFullAccessGroup(), userGroupCache, user) == true
-          || right.hasAccessGroup(teamEvent.getCalendar().getReadOnlyAccessGroup(), userGroupCache, user) == true) {
-        // do nothing
-      } else
-        if (right.hasAccessGroup(teamEvent.getCalendar().getMinimalAccessGroup(), userGroupCache, user) == true) {
-          teamEvent.setSubject("");
-          teamEvent.setAttendees("");
-          teamEvent.setLocation("");
-          teamEvent.setNote("");
-        } else
-          list.remove(teamEvent);
     }
     return list;
   }

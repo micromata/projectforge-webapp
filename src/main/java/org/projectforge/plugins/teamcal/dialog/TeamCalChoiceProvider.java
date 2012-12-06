@@ -32,7 +32,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.plugins.teamcal.admin.TeamCalFilter;
 
 import com.vaynberg.wicket.select2.Response;
 import com.vaynberg.wicket.select2.TextChoiceProvider;
@@ -83,9 +83,7 @@ public class TeamCalChoiceProvider extends TextChoiceProvider<TeamCalDO>
   public void query(String term, final int page, final Response<TeamCalDO> response)
   {
     // add all access groups
-    final boolean ownTeamCals = true;
-    final List<TeamCalDO> fullAccessTeamCals = getTeamCalDao().getTeamCalsByAccess(PFUserContext.getUser(), ownTeamCals,
-        TeamCalDao.FULL_ACCESS_GROUP, TeamCalDao.READONLY_ACCESS_GROUP, TeamCalDao.MINIMAL_ACCESS_GROUP);
+    final List<TeamCalDO> fullAccessTeamCals = getTeamCalDao().getList(new TeamCalFilter());
     final List<TeamCalDO> result = new ArrayList<TeamCalDO>();
     term = term.toLowerCase();
 

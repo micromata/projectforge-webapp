@@ -23,6 +23,7 @@
 
 package org.projectforge.plugins.teamcal.event;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -39,7 +40,7 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.common.DatePrecision;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
-import org.projectforge.plugins.teamcal.admin.TeamCalRight;
+import org.projectforge.plugins.teamcal.admin.TeamCalFilter;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
@@ -84,6 +85,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
   private FieldsetPanel startDateField;
 
+  final TeamEventRight right = new TeamEventRight();
+
   /**
    * @param parentPage
    * @param data
@@ -106,22 +109,22 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     final TeamCalDO teamCal = data.getCalendar();
 
     // setting access view
-    final TeamCalRight right = new TeamCalRight();
     if (isNew() == true || teamCal.getOwner() == null) {
       access = true;
     } else {
-      if (right.hasUpdateAccess(getUser(), teamCal, teamCal) == true)
+      if (right.hasUpdateAccess(getUser(), data, data) == true) {
         access = true;
-      else if (right.hasAccessGroup(teamCal.getReadOnlyAccessGroup(), userGroupCache, getUser()) == true)
+      } else {
         access = false;
-      else if (right.hasAccessGroup(teamCal.getMinimalAccessGroup(), userGroupCache, getUser()) == true) {
-        final TeamEventDO newTeamEventDO = new TeamEventDO();
-        newTeamEventDO.setId(data.getId());
-        newTeamEventDO.setStartDate(data.getStartDate());
-        newTeamEventDO.setEndDate(data.getEndDate());
-        data = newTeamEventDO;
-        access = false;
-      } else access = false;
+        if (right.hasMinimalAccess(data, getUserId()) == true) {
+          final TeamEventDO newTeamEventDO = new TeamEventDO();
+          newTeamEventDO.setId(data.getId());
+          newTeamEventDO.setStartDate(data.getStartDate());
+          newTeamEventDO.setEndDate(data.getEndDate());
+          data = newTeamEventDO;
+          access = false;
+        }
+      }
     }
 
     // add teamCal drop down
@@ -219,8 +222,13 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       final Label teamCalTitle = new Label(fieldSet.newChildId(), new PropertyModel<String>(data, "calendar.getTitle()"));
       fieldSet.add(teamCalTitle);
     } else {
-      final boolean ownTeamCals = true;
-      final List<TeamCalDO> list = teamCalDao.getTeamCalsByAccess(getUser(), ownTeamCals, TeamCalDao.FULL_ACCESS_GROUP);
+      final List<TeamCalDO> result = teamCalDao.getList(new TeamCalFilter());
+      final List<TeamCalDO> list = new ArrayList<TeamCalDO>();
+      for (final TeamCalDO cal : result) {
+        if (right.hasUpdateAccess(getUser(), cal) == true) {
+          result.add(cal);
+        }
+      }
       final PropertyModel<TeamCalDO> selectModel = new PropertyModel<TeamCalDO>(data, "calendar");
       final DropDownChoice<TeamCalDO> teamCalDrop = new DropDownChoice<TeamCalDO>(fieldSet.getDropDownChoiceId(), selectModel, list,
           getLabeledList(list)) {

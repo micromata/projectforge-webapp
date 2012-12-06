@@ -89,6 +89,14 @@ public class TeamEventDO extends DefaultBaseDO
 
   private String attendees;
 
+  /**
+   * Clear fields for viewers with minimal access. If you add new fields don't forget to clear these fields here.
+   */
+  public void clearFields()
+  {
+    subject = location = note = attendees = null;
+  }
+
   public TeamEventDO()
   {
 
