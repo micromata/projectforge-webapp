@@ -26,6 +26,7 @@ package org.projectforge.database;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 
 import javax.sql.DataSource;
 
@@ -288,6 +289,11 @@ public class DatabaseUpdateDao
     }
   }
 
+  public void buildAddTableAttributesStatement(final StringBuffer buf, final String table, final Collection<TableAttribute> attributes)
+  {
+    buildAddTableAttributesStatement(buf, table, attributes.toArray(new TableAttribute[0]));
+  }
+
   public boolean addTableAttributes(final String table, final TableAttribute... attributes)
   {
     final StringBuffer buf = new StringBuffer();
@@ -297,6 +303,19 @@ public class DatabaseUpdateDao
   }
 
   public boolean addTableAttributes(final Table table, final TableAttribute... attributes)
+  {
+    return addTableAttributes(table.getName(), attributes);
+  }
+
+  public boolean addTableAttributes(final String table, final Collection<TableAttribute> attributes)
+  {
+    final StringBuffer buf = new StringBuffer();
+    buildAddTableAttributesStatement(buf, table, attributes);
+    execute(buf.toString());
+    return true;
+  }
+
+  public boolean addTableAttributes(final Table table, final Collection<TableAttribute> attributes)
   {
     return addTableAttributes(table.getName(), attributes);
   }
@@ -390,6 +409,7 @@ public class DatabaseUpdateDao
    * Without access checking.
    * @see #fixDBHistoryEntries()
    */
+  @SuppressWarnings({ "unchecked", "rawtypes"})
   public int internalFixDBHistoryEntries()
   {
     log.info("Fix all broken history entries (if exist).");
