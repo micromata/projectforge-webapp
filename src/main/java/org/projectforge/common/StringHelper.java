@@ -488,6 +488,19 @@ public class StringHelper
     return buf.toString();
   }
 
+  public static Integer[] splitToIntegers(final String str, final String delim)
+  {
+    final StringTokenizer tokenizer = new StringTokenizer(str, delim);
+    final Integer[] result = new Integer[tokenizer.countTokens()];
+    int i = 0;
+    while (tokenizer.hasMoreTokens() == true) {
+      final String token = tokenizer.nextToken();
+      final Integer value = NumberHelper.parseInteger(token);
+      result[i++] = value;
+    }
+    return result;
+  }
+
   public static int[] splitToInts(final String str, final String delim)
   {
     final StringTokenizer tokenizer = new StringTokenizer(str, delim);
