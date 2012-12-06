@@ -49,7 +49,7 @@ public class AutoSessionFactoryBean extends AnnotationSessionFactoryBean
       config.addAnnotatedClass(entityClass);
     }
     final PluginsRegistry pluginsRegistry = PluginsRegistry.instance();
-    pluginsRegistry.loadAdditionalPlugins();
+    pluginsRegistry.loadPlugins();
     for (final AbstractPlugin plugin : pluginsRegistry.getPlugins()) {
       final Class< ? >[] persistentEntities = plugin.getPersistentEntities();
       if (persistentEntities != null) {
