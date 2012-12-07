@@ -172,6 +172,9 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
   private boolean containsUser(final Integer userId, final String userIdsString)
   {
     final Integer[] userIds = StringHelper.splitToIntegers(userIdsString, ",");
+    if (userIds == null) {
+      return false;
+    }
     for (final Integer id : userIds) {
       if (id == null) {
         continue;
