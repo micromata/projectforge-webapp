@@ -206,4 +206,13 @@ public class PollEventEventsProvider extends MyFullCalendarEventsProvider
   public Collection<PollEventDO> getAllEvents() {
     return pollEventCache.keySet();
   }
+
+  /**
+   * @param pollEvent
+   * @return
+   */
+  public Event getEventForPollEvent(final PollEventDO pollEvent)
+  {
+    return pollEventCache.get(pollEvent);
+  }
 }

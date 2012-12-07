@@ -117,9 +117,9 @@ public class PollEventEditPage extends AbstractSecuredPage
             @Override
             protected void onDeleteClick(final AjaxRequestTarget target)
             {
-              eventProvider.removeElement(pollEvent);
-              target.appendJavaScript("$('#" + calendar.getMarkupId() + "').fullCalendar('removeEvents', " + pollEvent.getId() + ");");
+              target.appendJavaScript("$('#" + calendar.getMarkupId() + "').fullCalendar('removeEvents', " + eventProvider.getEventForPollEvent(pollEvent).getId() + ");");
               target.add(entryContainer);
+              eventProvider.removeElement(pollEvent);
             }
           });
         }
