@@ -151,7 +151,16 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     WicketUtils.addTooltip(firstHourDropDownChoice, getString("calendar.option.firstHour.tooltip"));
     fs.add(firstHourDropDownChoice);
     {
-      final IconButtonPanel refreshButtonPanel = new IconButtonPanel(fs.newChildId(), IconType.ARROW_REFRESH, getString("refresh"))
+      final IconButtonPanel refreshButtonPanel = new IconButtonPanel(fs.newChildId(), IconType.ARROW_REFRESH, getString("refresh")) {
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.IconButtonPanel#onSubmit()
+         */
+        @Override
+        protected void onSubmit()
+        {
+          setResponsePage(getPage().getClass(), getPage().getPageParameters());
+        }
+      }
       .setLight();
       fs.add(refreshButtonPanel);
       setDefaultButton(refreshButtonPanel.getButton());
