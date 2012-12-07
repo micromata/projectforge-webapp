@@ -89,7 +89,7 @@ public class TeamCalCalendarForm extends CalendarForm
     fs.add(calendarButtonPanel);
     setDefaultButton(calendarButtonPanel.getButton());
 
-    if (filter.getCurrentCollection() != null){
+    if (filter.getCurrentCollection() != null) {
       final IChoiceRenderer<TeamCalCalendarCollection> teamCalCollectionRenderer = new IChoiceRenderer<TeamCalCalendarCollection>() {
         private static final long serialVersionUID = 4804134958242438331L;
 
@@ -106,10 +106,11 @@ public class TeamCalCalendarForm extends CalendarForm
         }
       };
 
-      final IModel<List<TeamCalCalendarCollection>> choicesModel = new PropertyModel<List<TeamCalCalendarCollection>>(filter, "teamCalCalendarCollection");
+      final IModel<List<TeamCalCalendarCollection>> choicesModel = new PropertyModel<List<TeamCalCalendarCollection>>(filter,
+          "teamCalCalendarCollection");
       final IModel<TeamCalCalendarCollection> currentModel = new PropertyModel<TeamCalCalendarCollection>(filter, "currentCollection");
       final DropDownChoicePanel<TeamCalCalendarCollection> collectionChoice = new DropDownChoicePanel<TeamCalCalendarCollection>(
-          "collectionList", currentModel, choicesModel, teamCalCollectionRenderer, false);
+          fs.newChildId(), currentModel, choicesModel, teamCalCollectionRenderer, false);
       fs.add(collectionChoice);
       collectionChoice.getDropDownChoice().setOutputMarkupId(true);
 
@@ -191,10 +192,7 @@ public class TeamCalCalendarForm extends CalendarForm
     for (final Integer id : getSelectedCalendars())
       calendarIds = calendarIds + id + ";";
 
-    final String additionals = "&teamCals="
-        + calendarIds
-        + "&timesheetRequired="
-        + true;
+    final String additionals = "&teamCals=" + calendarIds + "&timesheetRequired=" + true;
     return additionals;
   }
 }
