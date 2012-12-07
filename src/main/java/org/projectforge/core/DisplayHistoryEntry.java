@@ -54,7 +54,7 @@ public class DisplayHistoryEntry implements Serializable
 
   private PFUserDO user;
 
-  private HistoryEntryType entryType;
+  private final HistoryEntryType entryType;
 
   private String propertyName;
 
@@ -64,12 +64,12 @@ public class DisplayHistoryEntry implements Serializable
 
   private String newValue;
 
-  private Timestamp timestamp;
+  private final Timestamp timestamp;
 
-  public DisplayHistoryEntry(UserGroupCache userCache, HistoryEntry entry)
+  public DisplayHistoryEntry(final UserGroupCache userCache, final HistoryEntry entry)
   {
     this.timestamp = entry.getTimestamp();
-    Integer userId = NumberHelper.parseInteger(entry.getUserName());
+    final Integer userId = NumberHelper.parseInteger(entry.getUserName());
     if (userId != null) {
       this.user = userCache.getUser(userId);
     }
@@ -79,19 +79,19 @@ public class DisplayHistoryEntry implements Serializable
     // entry.getEntityId();
   }
 
-  private PFUserDO getUser(UserGroupCache userCache, String userId)
+  private PFUserDO getUser(final UserGroupCache userCache, final String userId)
   {
     if (StringUtils.isBlank(userId) == true) {
       return null;
     }
-    Integer id = NumberHelper.parseInteger(userId);
+    final Integer id = NumberHelper.parseInteger(userId);
     if (id == null) {
       return null;
     }
     return userCache.getUser(id);
   }
 
-  public DisplayHistoryEntry(UserGroupCache userCache, HistoryEntry entry, PropertyDelta prop, Session session)
+  public DisplayHistoryEntry(final UserGroupCache userCache, final HistoryEntry entry, final PropertyDelta prop, final Session session)
   {
     this(userCache, entry);
     this.propertyType = prop.getPropertyType();
@@ -113,7 +113,7 @@ public class DisplayHistoryEntry implements Serializable
     if (newObjectValue == null) {
       newObjectValue = prop.getNewObjectValue(session);
     }
-    String propType = prop.getPropertyType();
+    final String propType = prop.getPropertyType();
     if (prop instanceof CollectionPropertyDelta) {
       this.oldValue = String.valueOf(toShortNameOfList(oldObjectValue));
       this.newValue = String.valueOf(toShortNameOfList(newObjectValue));
@@ -129,7 +129,7 @@ public class DisplayHistoryEntry implements Serializable
     this.propertyName = prop.getPropertyName();
   }
 
-  private String formatDate(Object objectValue)
+  private String formatDate(final Object objectValue)
   {
     if (objectValue == null) {
       return "";
@@ -142,11 +142,11 @@ public class DisplayHistoryEntry implements Serializable
     return String.valueOf(objectValue);
   }
 
-  private Object toShortNameOfList(Object value)
+  private Object toShortNameOfList(final Object value)
   {
     if (value instanceof Collection<?>) {
       return CollectionUtils.collect((Collection< ? >) value, new Transformer() {
-        public Object transform(Object input)
+        public Object transform(final Object input)
         {
           return toShortName(input);
         }
@@ -155,7 +155,7 @@ public class DisplayHistoryEntry implements Serializable
     return value;
   }
 
-  String toShortName(Object object)
+  String toShortName(final Object object)
   {
     return String.valueOf(object instanceof ShortDisplayNameCapable ? ((ShortDisplayNameCapable) object).getShortDisplayName() : object);
   }
@@ -177,11 +177,29 @@ public class DisplayHistoryEntry implements Serializable
   }
 
   /**
+   * @param newValue the newValue to set
+   * @return this for chaining.
+   */
+  public void setNewValue(final String newValue)
+  {
+    this.newValue = newValue;
+  }
+
+  /**
    * @return the oldValue
    */
   public String getOldValue()
   {
     return oldValue;
+  }
+
+  /**
+   * @param oldValue the oldValue to set
+   * @return this for chaining.
+   */
+  public void setOldValue(final String oldValue)
+  {
+    this.oldValue = oldValue;
   }
 
   /**
@@ -191,12 +209,12 @@ public class DisplayHistoryEntry implements Serializable
   {
     return propertyName;
   }
-  
+
   /**
    * Use-full for prepending id of childs (e. g. entries in a collection displayed in the history table of the parent object). Example: AuftragDO -> AuftragsPositionDO.
    * @param propertyName
    */
-  public void setPropertyName(String propertyName)
+  public void setPropertyName(final String propertyName)
   {
     this.propertyName = propertyName;
   }
@@ -223,6 +241,7 @@ public class DisplayHistoryEntry implements Serializable
    * Returns string containing all fields (except the password, via ReflectionToStringBuilder).
    * @return
    */
+  @Override
   public String toString()
   {
     return new ReflectionToStringBuilder(this).toString();
