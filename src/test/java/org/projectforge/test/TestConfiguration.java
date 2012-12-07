@@ -28,6 +28,7 @@ import java.io.File;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
+import org.projectforge.common.StringHelper;
 import org.projectforge.core.ConfigXmlTest;
 import org.projectforge.core.Configuration;
 import org.projectforge.database.HibernateUtils;
@@ -107,8 +108,8 @@ public class TestConfiguration
   {
     if (testConfiguration == null) {
       testConfiguration = new TestConfiguration(contextFiles);
-    } else if (testConfiguration.contextFiles.equals(contextFiles) == false) {
-      final String msg = "Already initialized with incompatible context files: " + testConfiguration.contextFiles;
+    } else if (ArrayUtils.isEquals(testConfiguration.contextFiles, contextFiles) == false) {
+      final String msg = "Already initialized with incompatible context files: " + StringHelper.listToString(", ", testConfiguration.contextFiles);
       log.fatal(msg);
       throw new RuntimeException(msg);
     }
