@@ -61,6 +61,7 @@ import org.projectforge.web.dialog.PFDialog;
 import org.projectforge.web.timesheet.TimesheetEventsProvider;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel;
+import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
 import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
@@ -252,6 +253,28 @@ public class TeamCalDialog extends PFDialog
           for (final TeamCalDO calendar : selectedCalendars) {
             final WebMarkupContainer container = new WebMarkupContainer(calendarRepeater.newChildId());
             calendarRepeater.add(container);
+            IModel<Boolean> model = Model.of(newFilter.getCurrentCollection().getTeamCalsVisibleList().contains(calendar.getId()));
+            final CheckBoxPanel checkBoxPanel = new CheckBoxPanel("isVisible", model, "");
+            checkBoxPanel.getCheckBox().add(new AjaxFormComponentUpdatingBehavior("onChange") {
+              private static final long serialVersionUID = 3523446385818267608L;
+
+              @Override
+              protected void onUpdate(final AjaxRequestTarget target)
+              {
+                Boolean newSelection = checkBoxPanel.getCheckBox().getConvertedInput();
+                if (newSelection == true) {
+                  if (newFilter.getCurrentCollection().getTeamCalsVisibleList().contains(calendar.getId()) == false) {
+                    newFilter.getCurrentCollection().getTeamCalsVisibleList().add(calendar.getId());
+                  }
+                }
+                if (newSelection == false) {
+                  if (newFilter.getCurrentCollection().getTeamCalsVisibleList().contains(calendar.getId()) == true) {
+                    newFilter.getCurrentCollection().getTeamCalsVisibleList().remove(calendar.getId());
+                  }
+                }
+              }
+            });
+            container.add(checkBoxPanel);
             container.add(new Label("name", calendar.getTitle()));
             final ColorPickerPanel picker = new ColorPickerPanel("colorPicker", newFilter.getColor(calendar.getId(),
                 newFilter.getCurrentCollection())) {
@@ -498,7 +521,7 @@ public class TeamCalDialog extends PFDialog
           currentAjaxCallback.callback(target);
           collectionChoice.getDropDownChoice().setChoices(newFilter.getTeamCalCalendarCollection());
           collectionChoice.getDropDownChoice()
-          .setDefaultModel(new PropertyModel<TeamCalCalendarCollection>(newFilter, "currentCollection"));
+              .setDefaultModel(new PropertyModel<TeamCalCalendarCollection>(newFilter, "currentCollection"));
           addToTarget(target, collectionChoice.getDropDownChoice(), bottomContainer, select);
         }
 

@@ -12,6 +12,9 @@
       <br/><br/><h3><wicket:message key="plugins.teamcal.selectColor" /></h3>
       <div wicket:id="repeaterContainer">
         <div wicket:id="repeater" style="clear: both; margin: 10px 0px;">
+          <div style="float: left; margin-right: 10px;">
+            <input type="checkbox" wicket:id="isVisible"></input>
+          </div>
           <div style="float: left; margin-right: 10px;" wicket:id="colorPicker"></div>
           <span style="height: 26px; vertical-align: middle; line-height: 24px;" wicket:id="name"></span>
         </div>

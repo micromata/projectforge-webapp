@@ -60,8 +60,7 @@ public class TeamCalCalendarFilter extends CalendarFilter
     super();
     if (this.teamCalCalendarCollection != null)
       this.teamCalCalendarCollection.clear();
-    else
-      this.teamCalCalendarCollection = new ArrayList<TeamCalCalendarCollection>();
+    else this.teamCalCalendarCollection = new ArrayList<TeamCalCalendarCollection>();
 
     for (final TeamCalCalendarCollection tCCC : filter.teamCalCalendarCollection)
       this.teamCalCalendarCollection.add(tCCC);
@@ -99,7 +98,7 @@ public class TeamCalCalendarFilter extends CalendarFilter
     for (final TeamCalCalendarCollection tCCC : teamCalCalendarCollection) {
       if (tCCC.getCalendarMap().containsKey(pk)) {
         // init
-        if (lastEntry == 0){
+        if (lastEntry == 0) {
           lastEntry = tCCC.getID();
         }
 
@@ -113,6 +112,7 @@ public class TeamCalCalendarFilter extends CalendarFilter
 
     // default color
     updateCalendarColor(pk, color, collection);
+    collection.getTeamCalsVisibleList().add(pk);
   }
 
   public void updateCalendarColor(final Integer pk, final String color, TeamCalCalendarCollection collection)
@@ -162,8 +162,7 @@ public class TeamCalCalendarFilter extends CalendarFilter
 
     if (this.teamCalCalendarCollection != null)
       this.teamCalCalendarCollection.clear();
-    else
-      this.teamCalCalendarCollection = new ArrayList<TeamCalCalendarCollection>();
+    else this.teamCalCalendarCollection = new ArrayList<TeamCalCalendarCollection>();
 
     for (final TeamCalCalendarCollection collection : updatedFilter.teamCalCalendarCollection) {
       this.teamCalCalendarCollection.add(new TeamCalCalendarCollection(collection));

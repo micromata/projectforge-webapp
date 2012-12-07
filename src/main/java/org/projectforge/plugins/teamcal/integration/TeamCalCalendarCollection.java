@@ -25,60 +25,82 @@ package org.projectforge.plugins.teamcal.integration;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
- *
+ * 
  */
 public class TeamCalCalendarCollection implements Serializable
 {
   private static final long serialVersionUID = -3111538883621120582L;
 
-  private final Long id;
+  private Long id;
 
   private String teamCalCalendarCollectionName;
 
+  private final HashSet<Integer> visibleList;
+
   private HashMap<Integer, String> calendarMap;
 
-  public TeamCalCalendarCollection() {
+  public TeamCalCalendarCollection()
+  {
     id = System.currentTimeMillis();
+    visibleList = new HashSet<Integer>();
   }
 
-  public TeamCalCalendarCollection(final TeamCalCalendarCollection oldCollection) {
-    if (oldCollection.id != null)
+  public TeamCalCalendarCollection(final TeamCalCalendarCollection oldCollection)
+  {
+    this();
+    if (oldCollection.id != null) {
       id = oldCollection.id;
-    else
-      id = System.currentTimeMillis();
+    }
 
-    if (oldCollection.getTeamCalCalendarColletionName() != null)
+    if (oldCollection.getTeamCalCalendarColletionName() != null) {
       teamCalCalendarCollectionName = oldCollection.teamCalCalendarCollectionName;
+    }
 
-    if (oldCollection.getCalendarMap() != null)
+    if (oldCollection.getCalendarMap() != null) {
       calendarMap = new HashMap<Integer, String>(oldCollection.calendarMap);
+    }
+
+    if (oldCollection.visibleList != null) {
+      visibleList.addAll(oldCollection.visibleList);
+    }
+
   }
 
-  public void setCalendarMap(final HashMap<Integer, String> calendarMap) {
-    this.calendarMap =  calendarMap;
+  public void setCalendarMap(final HashMap<Integer, String> calendarMap)
+  {
+    this.calendarMap = calendarMap;
   }
 
-  public HashMap<Integer, String> getCalendarMap() {
+  public HashMap<Integer, String> getCalendarMap()
+  {
     return calendarMap;
   }
 
-  public void setTeamCalCalendarCollectionName(final String name) {
+  public void setTeamCalCalendarCollectionName(final String name)
+  {
     this.teamCalCalendarCollectionName = name;
   }
 
-  public String getTeamCalCalendarColletionName() {
+  public String getTeamCalCalendarColletionName()
+  {
     return teamCalCalendarCollectionName;
   }
 
-  public void addNewCalendar(final Integer calendarPk, final String colorCode) {
+  public void addNewCalendar(final Integer calendarPk, final String colorCode)
+  {
     calendarMap.put(calendarPk, colorCode);
+    visibleList.add(calendarPk);
   }
 
-  public void removeCalendar(final Integer calendarPk) {
+  public void removeCalendar(final Integer calendarPk)
+  {
     calendarMap.remove(calendarPk);
+    visibleList.remove(calendarPk);
   }
 
   /**
@@ -99,6 +121,11 @@ public class TeamCalCalendarCollection implements Serializable
     int result = 1;
     result = prime * result + ((id == null) ? 0 : id.hashCode());
     return result;
+  }
+
+  public Set<Integer> getTeamCalsVisibleList()
+  {
+    return visibleList;
   }
 
   /**

@@ -100,7 +100,14 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
   protected void buildEvents(final DateTime start, final DateTime end)
   {
     final TeamEventFilter eventFilter = new TeamEventFilter();
-    final List<TeamCalDO> selectedCalendars = filter.calcAssignedtItems(teamCalDao, filter.getCurrentCollection());
+    List<TeamCalDO> selectedCalendars = new ArrayList<TeamCalDO>();
+    if (filter.getCurrentCollection() != null && filter.getCurrentCollection().getTeamCalsVisibleList() != null) {
+      for (Integer id : filter.getCurrentCollection().getTeamCalsVisibleList()) {
+        selectedCalendars.add(teamCalDao.getById(id));
+      }
+    } else {
+      selectedCalendars = filter.calcAssignedtItems(teamCalDao, filter.getCurrentCollection());
+    }
     eventFilter.setTeamCals(selectedCalendars);
     eventFilter.setStartDate(start.toDate());
     eventFilter.setEndDate(end.toDate());
