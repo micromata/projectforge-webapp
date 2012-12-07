@@ -201,6 +201,7 @@ public class AbstractTestBase
             deleteFrom(hibernateTemplate, table);
           }
         }
+        deleteFrom(hibernateTemplate, "ToDoDO");
         deleteFrom(hibernateTemplate, "TimesheetDO");
         deleteFrom(hibernateTemplate, "HRPlanningEntryDO");
         deleteFrom(hibernateTemplate, "HRPlanningDO");
