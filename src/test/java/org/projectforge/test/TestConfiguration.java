@@ -109,9 +109,14 @@ public class TestConfiguration
     if (testConfiguration == null) {
       testConfiguration = new TestConfiguration(contextFiles);
     } else if (ArrayUtils.isEquals(testConfiguration.contextFiles, contextFiles) == false) {
-      final String msg = "Already initialized with incompatible context files: " + StringHelper.listToString(", ", testConfiguration.contextFiles);
-      log.fatal(msg);
-      throw new RuntimeException(msg);
+      final String msg = "Already initialized with incompatible context files: "
+          + StringHelper.listToString(", ",
+              testConfiguration.contextFiles
+              + ". New context files: "
+              + StringHelper.listToString(",", contextFiles)
+              + ". This is OK if the test case is started in fork-mode.");
+      log.warn(msg);
+      testConfiguration = new TestConfiguration(contextFiles);
     }
   }
 
