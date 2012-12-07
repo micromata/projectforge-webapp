@@ -541,12 +541,30 @@
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.11</version>
+        <executions>
+          <execution>
+            <id>normal</id>
+            <configuration>
+              <!--forkMode>always</forkMode -->
+              <argLine>-Xms512m -Xmx1024m -XX:MaxPermSize=512m</argLine>
+              <includes>
+                <include>**/*Test.java</include>
+              </includes>
+            </configuration>
+          </execution>
+          <execution>
+            <id>plugins</id>
+            <configuration>
+              <forkMode>always</forkMode>
+              <argLine>-Xms512m -Xmx1024m -XX:MaxPermSize=512m</argLine>
+              <includes>
+                <include>**/*TestPlugin.java</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
         <configuration>
-          <!--forkMode>always</forkMode -->
           <argLine>-Xms512m -Xmx1024m -XX:MaxPermSize=512m</argLine>
-          <includes>
-            <include>**/*Test.java</include>
-          </includes>
         </configuration>
       </plugin>
       <plugin>
