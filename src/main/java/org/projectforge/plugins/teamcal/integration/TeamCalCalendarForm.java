@@ -123,7 +123,7 @@ public class TeamCalCalendarForm extends CalendarForm
         @Override
         protected void onUpdate(final AjaxRequestTarget target)
         {
-          setResponsePage(getParentPage());
+          setResponsePage(getParentPage().getClass());
         }
       });
     }
