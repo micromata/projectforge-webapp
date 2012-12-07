@@ -26,9 +26,12 @@ package org.projectforge.plugins.teamcal.admin;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.criterion.Restrictions;
+import org.projectforge.common.StringHelper;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.core.DisplayHistoryEntry;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserContext;
@@ -39,6 +42,7 @@ import org.projectforge.web.user.GroupsProvider;
 import org.projectforge.web.user.UsersProvider;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 /**
  * 
@@ -102,31 +106,6 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
       queryFilter.add(Restrictions.eq("owner", user));
     }
     final List<TeamCalDO> result = getList(queryFilter);
-    //    if (queryResult == null) {
-    //      return null;
-    //    }
-    //    // Now add only entries to which the user has access and selected to see:
-    //    final List<TeamCalDO> result = new ArrayList<TeamCalDO>();
-    //    for (final TeamCalDO calendar : queryResult) {
-    //      if (myFilter.isOwn() == true) {
-    //        if (calendar.getOwnerId() != null && calendar.getOwnerId().equals(loggedInUserId) == true) {
-    //          result.add(calendar);
-    //          continue;
-    //        }
-    //      }
-    //      if (myFilter.isFullAccess() == true && right.hasFullAccess(calendar, loggedInUserId) == true) {
-    //        result.add(calendar);
-    //        continue;
-    //      }
-    //      if (myFilter.isReadonlyAccess() == true && right.hasReadonlyAccess(calendar, loggedInUserId) == true) {
-    //        result.add(calendar);
-    //        continue;
-    //      }
-    //      if (myFilter.isMinimalAccess() == true && right.hasMinimalAccess(calendar, loggedInUserId) == true) {
-    //        result.add(calendar);
-    //        continue;
-    //      }
-    //    }
     return result;
   }
 
@@ -219,4 +198,48 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
   {
     return new UsersProvider().getSortedUsers(calendar.getMinimalAccessUserIds());
   }
+
+  /**
+   * @see org.projectforge.core.BaseDao#getDisplayHistoryEntries(org.projectforge.core.ExtendedBaseDO)
+   */
+  @Override
+  public List<DisplayHistoryEntry> getDisplayHistoryEntries(final TeamCalDO obj)
+  {
+    final List<DisplayHistoryEntry> list = super.getDisplayHistoryEntries(obj);
+    if (CollectionUtils.isEmpty(list) == true) {
+      return list;
+    }
+    for (final DisplayHistoryEntry entry : list) {
+      if (entry.getPropertyName() == null) {
+        continue;
+      } else if (entry.getPropertyName().endsWith("GroupIds") == true) {
+        final GroupsProvider gp = new GroupsProvider();
+        final String oldValue = entry.getOldValue();
+        if (StringUtils.isNotBlank(oldValue) == true && "null".equals(oldValue) == false) {
+          final List<String> oldGroupNames = gp.getGroupNames(oldValue);
+          entry.setOldValue(StringHelper.listToString(oldGroupNames, ", ", true));
+        }
+        final String newValue = entry.getNewValue();
+        if (StringUtils.isNotBlank(newValue) == true && "null".equals(newValue) == false) {
+          final List<String> newGroupNames = gp.getGroupNames(newValue);
+          entry.setNewValue(StringHelper.listToString(newGroupNames, ", ", true));
+        }
+      } else if (entry.getPropertyName().endsWith("UserIds") == true) {
+        final UsersProvider up = new UsersProvider();
+        final String oldValue = entry.getOldValue();
+        if (StringUtils.isNotBlank(oldValue) == true && "null".equals(oldValue) == false) {
+          final List<String> oldGroupNames = up.getUserNames(oldValue);
+          entry.setOldValue(StringHelper.listToString(oldGroupNames, ", ", true));
+        }
+        final String newValue = entry.getNewValue();
+        if (StringUtils.isNotBlank(newValue) == true && "null".equals(newValue) == false) {
+          final List<String> newGroupNames = up.getUserNames(newValue);
+          entry.setNewValue(StringHelper.listToString(newGroupNames, ", ", true));
+        }
+      }
+    }
+    return list;
+  }
+
+
 }
