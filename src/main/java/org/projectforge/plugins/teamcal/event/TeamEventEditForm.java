@@ -226,7 +226,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       final List<TeamCalDO> list = new ArrayList<TeamCalDO>();
       for (final TeamCalDO cal : result) {
         if (right.hasUpdateAccess(getUser(), cal) == true) {
-          result.add(cal);
+          list.add(cal);
         }
       }
       final PropertyModel<TeamCalDO> selectModel = new PropertyModel<TeamCalDO>(data, "calendar");

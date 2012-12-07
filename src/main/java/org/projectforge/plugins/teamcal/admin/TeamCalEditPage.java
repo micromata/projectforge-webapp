@@ -24,11 +24,14 @@
 package org.projectforge.plugins.teamcal.admin;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.plugins.teamcal.event.TeamEventListPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredBasePage;
 import org.projectforge.web.wicket.EditPage;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
@@ -52,6 +55,26 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
   {
     super(parameters, "plugins.teamcal");
     init();
+    addTopMenuPanel();
+  }
+
+  @SuppressWarnings("serial")
+  private void addTopMenuPanel()
+  {
+    if (isNew() == false) {
+      final Integer id = form.getData().getId();
+      final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+        @Override
+        public void onClick()
+        {
+          final PageParameters params = new PageParameters();
+          //params.set(PARAM_PARENT_TASK_ID, id);
+          final TeamEventListPage eventListPage = new TeamEventListPage(params);
+          setResponsePage(eventListPage);
+        };
+      }, getString("plugins.teamcal.events"));
+      addContentMenuEntry(menu);
+    }
   }
 
   @Override
