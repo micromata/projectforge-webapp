@@ -37,9 +37,9 @@ import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 import org.springframework.beans.BeansException;
 
-public class TeamCalDaoTestPlugin extends PluginTestBase
+public class TeamCalDaoTestFork extends PluginTestBase
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalDaoTestPlugin.class);
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalDaoTestFork.class);
 
   private TeamCalDao teamCalDao;
 

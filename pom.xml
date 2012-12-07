@@ -558,7 +558,7 @@
               <forkMode>always</forkMode>
               <argLine>-Xms512m -Xmx1024m -XX:MaxPermSize=512m</argLine>
               <includes>
-                <include>**/*TestPlugin.java</include>
+                <include>**/*TestFork.java</include>
               </includes>
             </configuration>
           </execution>
