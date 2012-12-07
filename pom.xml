@@ -544,6 +544,10 @@
         <executions>
           <execution>
             <id>normal</id>
+            <phase>test</phase>
+            <goals>
+              <goal>test</goal>
+            </goals>
             <configuration>
               <!--forkMode>always</forkMode -->
               <argLine>-Xms512m -Xmx1024m -XX:MaxPermSize=512m</argLine>
@@ -554,6 +558,10 @@
           </execution>
           <execution>
             <id>plugins</id>
+            <phase>test</phase>
+            <goals>
+              <goal>test</goal>
+            </goals>
             <configuration>
               <forkMode>always</forkMode>
               <argLine>-Xms512m -Xmx1024m -XX:MaxPermSize=512m</argLine>
