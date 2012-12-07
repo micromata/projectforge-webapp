@@ -58,15 +58,19 @@ public class TeamCalCalendarFilter extends CalendarFilter
   public TeamCalCalendarFilter(final TeamCalCalendarFilter filter)
   {
     super();
-    if (this.teamCalCalendarCollection != null)
+    if (this.teamCalCalendarCollection != null) {
       this.teamCalCalendarCollection.clear();
-    else this.teamCalCalendarCollection = new ArrayList<TeamCalCalendarCollection>();
+    } else {
+      this.teamCalCalendarCollection = new ArrayList<TeamCalCalendarCollection>();
+    }
 
-    for (final TeamCalCalendarCollection tCCC : filter.teamCalCalendarCollection)
+    for (final TeamCalCalendarCollection tCCC : filter.teamCalCalendarCollection) {
       this.teamCalCalendarCollection.add(tCCC);
+    }
 
-    if (filter.getCurrentCollection() != null)
+    if (filter.getCurrentCollection() != null) {
       this.currentCollection = new TeamCalCalendarCollection(filter.getCurrentCollection());
+    }
   }
 
   public Set<Integer> getCalendarPk(TeamCalCalendarCollection collection)
@@ -160,9 +164,11 @@ public class TeamCalCalendarFilter extends CalendarFilter
       this.currentCollection = new TeamCalCalendarCollection(updatedFilter.getCurrentCollection());
     }
 
-    if (this.teamCalCalendarCollection != null)
+    if (this.teamCalCalendarCollection != null) {
       this.teamCalCalendarCollection.clear();
-    else this.teamCalCalendarCollection = new ArrayList<TeamCalCalendarCollection>();
+    } else {
+      this.teamCalCalendarCollection = new ArrayList<TeamCalCalendarCollection>();
+    }
 
     for (final TeamCalCalendarCollection collection : updatedFilter.teamCalCalendarCollection) {
       this.teamCalCalendarCollection.add(new TeamCalCalendarCollection(collection));
