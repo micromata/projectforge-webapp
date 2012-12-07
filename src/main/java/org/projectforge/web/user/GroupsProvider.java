@@ -53,6 +53,28 @@ public class GroupsProvider extends TextChoiceProvider<GroupDO>
   private Collection<GroupDO> sortedGroups;
 
   /**
+   * @param groupIds
+   * @return
+   */
+  public List<String> getGroupNames(final String groupIds)
+  {
+    if (StringUtils.isEmpty(groupIds) == true) {
+      return null;
+    }
+    final int[] ids = StringHelper.splitToInts(groupIds, ",", false);
+    final List<String> list = new ArrayList<String>();
+    for (final int id : ids) {
+      final GroupDO group = getUserGroupCache().getGroup(id);
+      if (group != null) {
+        list.add(group.getName());
+      } else {
+        log.warn("Group with id '" + id + "' not found in UserGroupCache. groupIds string was: " + groupIds);
+      }
+    }
+    return list;
+  }
+
+  /**
    * 
    * @param groupIds
    * @return
