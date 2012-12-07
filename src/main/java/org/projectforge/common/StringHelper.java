@@ -490,6 +490,9 @@ public class StringHelper
 
   public static Integer[] splitToIntegers(final String str, final String delim)
   {
+    if (str == null) {
+      return null;
+    }
     final StringTokenizer tokenizer = new StringTokenizer(str, delim);
     final Integer[] result = new Integer[tokenizer.countTokens()];
     int i = 0;
