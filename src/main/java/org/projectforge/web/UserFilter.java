@@ -359,16 +359,17 @@ public class UserFilter implements Filter
     final HttpServletRequest hreq = (HttpServletRequest) req;
     final String uri = hreq.getRequestURI();
     // If you have an NPE you have probably forgotten to call setServletContext on applications start-up.
+    // Paranoia setting. May-be there could be a vulnerability with request parameters:
     if (uri.contains("?") == false) {
-      // Paranoia setting. May-be there could be a vulnerability with request parameters.
-      if (uri.startsWith(IGNORE_PREFIX_WICKET) && StringHelper.endsWith(uri, ".js", ".css", ".gif", ".png") == true) {
-        // No access checking for Wicket resources.
-        return true;
-      } else if (StringHelper.startsWith(uri, IGNORE_PREFIX_DOC, IGNORE_PREFIX_SITE_DOC) == true
-          && StringHelper.endsWith(uri, ".html", ".pdf", ".js", ".css", ".gif", ".png") == true) {
-        // No access checking for documentation (including site doc).
-        return true;
-      } else if (StringHelper.startsWith(uri, IGNORE_PREFIX_LOGO, IGNORE_PREFIX_SMS_REVEIVE_SERVLET) == true) {
+      // if (uri.startsWith(IGNORE_PREFIX_WICKET) && StringHelper.endsWith(uri, ".js", ".css", ".gif", ".png") == true) {
+      // No access checking for Wicket resources.
+      // return true;
+      // } else if (StringHelper.startsWith(uri, IGNORE_PREFIX_DOC, IGNORE_PREFIX_SITE_DOC) == true
+      // && StringHelper.endsWith(uri, ".html", ".pdf", ".js", ".css", ".gif", ".png") == true) {
+      // No access checking for documentation (including site doc).
+      // return true;
+      // } else
+      if (StringHelper.startsWith(uri, IGNORE_PREFIX_LOGO, IGNORE_PREFIX_SMS_REVEIVE_SERVLET) == true) {
         // No access checking for logo and sms receiver servlet.
         // The sms receiver servlet has its own authentification (key).
         return true;
