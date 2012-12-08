@@ -47,6 +47,7 @@ public class TeamCalDaoTestFork extends PluginTestBase
   @BeforeClass
   public static void setup() throws BeansException, IOException
   {
+    tablesToDeleteAfterTests = new String[] { "org.projectforge.plugins.teamcal.event.TeamEventDO", "org.projectforge.plugins.teamcal.admin.TeamCalDO"};
     TeamCalTestHelper.setup();
   }
 
@@ -58,7 +59,7 @@ public class TeamCalDaoTestFork extends PluginTestBase
     calId = cal.getId();
     logon(testHelper.getOwner());
     Assert.assertEquals("teamCal.title", teamCalDao.getById(calId).getTitle());
-    checkSelectAccess(true, testHelper.getFullUser1(), testHelper.getFullUser3(), testHelper.getReadonlyUser1(),
+    checkSelectAccess(true, testHelper.getOwner(), testHelper.getFullUser1(), testHelper.getFullUser3(), testHelper.getReadonlyUser1(),
         testHelper.getReadonlyUser3(), testHelper.getMinimalUser1(), testHelper.getMinimalUser3());
     checkSelectAccess(false, testHelper.getNoAccessUser());
 
