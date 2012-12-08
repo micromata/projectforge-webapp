@@ -92,10 +92,9 @@ public class TeamCalPlugin extends AbstractPlugin
 
     addMountPage("teamCalendar", TeamCalCalendarPage.class);
     // Register the menu entry as sub menu entry of the misc menu:
-    final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
-    registerMenuItem(new MenuItemDef(parentMenu, ID, 7, "plugins.teamcal.menu", TeamCalCalendarPage.class));
-    registerMenuItem(new MenuItemDef(parentMenu, ID + "List", 8, "plugins.teamcal.title.list", TeamCalListPage.class));
-
+    final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.COMMON);
+    // registerMenuItem(new MenuItemDef(parentMenu, ID, 7, "plugins.teamcal.menu", TeamCalCalendarPage.class));
+    registerMenuItem(new MenuItemDef(parentMenu, ID + "List", 11, "plugins.teamcal.title.list", TeamCalListPage.class));
     final MenuItemDef menuItemDef = MenuItemRegistry.instance().get(MenuItemDefId.CALENDAR);
     menuItemDef.setPageClass(TeamCalCalendarPage.class);
     WicketApplication.setDefaultPage(TeamCalCalendarPage.class);
