@@ -100,7 +100,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
 
   public static final String RESOURCE_BUNDLE_NAME = "I18nResources";
 
-  static final Class< ? extends WebPage> DEFAULT_PAGE = CalendarPage.class;
+  static Class< ? extends WebPage> DEFAULT_PAGE = CalendarPage.class;
 
   private static Boolean developmentMode;
 
@@ -154,6 +154,15 @@ public class WicketApplication extends WebApplication implements WicketApplicati
   public static Class< ? extends WebPage> internalGetDefaultPage()
   {
     return DEFAULT_PAGE;
+  }
+
+  /**
+   * Use this method only if you want to change the default page (if no other is defined in config.xml).
+   * @param defaultPage
+   */
+  public static void setDefaultPage(final Class< ? extends WebPage> defaultPage)
+  {
+    DEFAULT_PAGE = defaultPage;
   }
 
   public static String getBookmarkableMountPath(final Class< ? extends Page> pageClass)
