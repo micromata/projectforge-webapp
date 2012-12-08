@@ -64,6 +64,9 @@ public class BaseSearchFilter implements Serializable
 
   public BaseSearchFilter(final BaseSearchFilter filter)
   {
+    if (filter == null) {
+      return;
+    }
     this.searchString = filter.searchString;
     this.deleted = filter.deleted;
     this.ignoreDeleted = filter.ignoreDeleted;
