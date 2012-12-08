@@ -439,6 +439,15 @@ public class MenuItemDef implements Serializable
   }
 
   /**
+   * @param pageClass the pageClass to set
+   * @return this for chaining.
+   */
+  public void setPageClass(final Class< ? extends Page> pageClass)
+  {
+    this.pageClass = pageClass;
+  }
+
+  /**
    * @return Wicket page or null for non Wicket pages.
    */
   public Class< ? extends Page> getMobilePageClass()
