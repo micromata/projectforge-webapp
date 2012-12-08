@@ -30,10 +30,9 @@ import junit.framework.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectforge.access.AccessException;
-import org.projectforge.plugins.teamcal.TeamCalPlugin;
+import org.projectforge.plugins.teamcal.TeamCalTestHelper;
 import org.projectforge.registry.Registry;
 import org.projectforge.test.PluginTestBase;
-import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 import org.springframework.beans.BeansException;
 
@@ -48,46 +47,24 @@ public class TeamCalDaoTestFork extends PluginTestBase
   @BeforeClass
   public static void setup() throws BeansException, IOException
   {
-    init("org/projectforge/plugins/teamcal/pluginContext.xml", new TeamCalPlugin());
+    TeamCalTestHelper.setup();
   }
 
   @Test
   public void accessTest()
   {
-    logon(TEST_ADMIN_USER);
-    final PFUserDO owner = initTestDB.addUser("TeamCalOwnerUser");
-    final PFUserDO fullUser1 = initTestDB.addUser("TeamCalFullUser1");
-    final PFUserDO fullUser2 = initTestDB.addUser("TeamCalFullUser2");
-    final PFUserDO fullUser3 = initTestDB.addUser("TeamCalFullUser3");
-    final PFUserDO readonlyUser1 = initTestDB.addUser("TeamCalReadonlyUser1");
-    final PFUserDO readonlyUser2 = initTestDB.addUser("TeamCalReadonlyUser2");
-    final PFUserDO readonlyUser3 = initTestDB.addUser("TeamCalReadonlyUser3");
-    final PFUserDO minimalUser1 = initTestDB.addUser("TeamCalMinimalUser1");
-    final PFUserDO minimalUser2 = initTestDB.addUser("TeamCalMinimalUser2");
-    final PFUserDO minimalUser3 = initTestDB.addUser("TeamCalMinimalUser3");
-    final PFUserDO noAccessUser = initTestDB.addUser("TeamCalNoAccessUser");
+    final TeamCalTestHelper testHelper = new TeamCalTestHelper();
+    final TeamCalDO cal = testHelper.prepareUsersAndGroups("teamCal", this, getTeamCalDao());
+    calId = cal.getId();
+    logon(testHelper.getOwner());
+    Assert.assertEquals("teamCal.title", teamCalDao.getById(calId).getTitle());
+    checkSelectAccess(true, testHelper.getFullUser1(), testHelper.getFullUser3(), testHelper.getReadonlyUser1(),
+        testHelper.getReadonlyUser3(), testHelper.getMinimalUser1(), testHelper.getMinimalUser3());
+    checkSelectAccess(false, testHelper.getNoAccessUser());
 
-    final GroupDO fullGroup1 = initTestDB.addGroup("TeamCalFullGroup1", fullUser1.getUsername());
-    final GroupDO readonlyGroup1 = initTestDB.addGroup("TeamCalReadonlyGroup1", readonlyUser1.getUsername());
-    final GroupDO minimalGroup1 = initTestDB.addGroup("TeamCalMinimalGroup", minimalUser1.getUsername());
-
-    logon(owner);
-    final TeamCalDO cal = new TeamCalDO();
-    cal.setOwner(owner);
-    cal.setFullAccessGroupIds("" + fullGroup1.getId());
-    cal.setReadonlyAccessGroupIds("" + readonlyGroup1.getId());
-    cal.setMinimalAccessGroupIds("" + minimalGroup1.getId());
-    cal.setFullAccessUserIds("" + fullUser3.getId());
-    cal.setReadonlyAccessUserIds("" + readonlyUser3.getId());
-    cal.setMinimalAccessUserIds("" + minimalUser3.getId());
-    cal.setTitle("title");
-    calId = (Integer) getTeamCalDao().save(cal);
-    Assert.assertEquals("title", teamCalDao.getById(calId).getTitle());
-    checkSelectAccess(true, fullUser1, fullUser3, readonlyUser1, readonlyUser3, minimalUser1, minimalUser3);
-    checkSelectAccess(false, noAccessUser);
-
-    checkUpdateAccess(cal, true, owner, getUser(TEST_ADMIN_USER));
-    checkUpdateAccess(cal, false, fullUser1, fullUser3, readonlyUser1, readonlyUser3, minimalUser1, minimalUser3, noAccessUser);
+    checkUpdateAccess(cal, true, testHelper.getOwner(), getUser(TEST_ADMIN_USER));
+    checkUpdateAccess(cal, false, testHelper.getFullUser1(), testHelper.getFullUser3(), testHelper.getReadonlyUser1(),
+        testHelper.getReadonlyUser3(), testHelper.getMinimalUser1(), testHelper.getMinimalUser3(), testHelper.getNoAccessUser());
   }
 
   private void checkSelectAccess(final boolean access, final PFUserDO... users)
@@ -95,7 +72,7 @@ public class TeamCalDaoTestFork extends PluginTestBase
     for (final PFUserDO user : users) {
       logon(user);
       try {
-        Assert.assertEquals("title", teamCalDao.getById(calId).getTitle());
+        Assert.assertEquals("teamCal.title", teamCalDao.getById(calId).getTitle());
         if (access == false) {
           Assert.fail("Select-AccessException expected for user: " + user.getUsername());
         }
