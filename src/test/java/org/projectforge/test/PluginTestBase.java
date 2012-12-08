@@ -47,7 +47,7 @@ public class PluginTestBase extends AbstractTestBase
 
   public static void init(final AbstractPlugin... plugins) throws BeansException, IOException
   {
-    init((String[])null, plugins);
+    init((String[]) null, plugins);
   }
 
   public static void init(final String[] additionalContextFiles, final AbstractPlugin... plugins) throws BeansException, IOException
@@ -64,7 +64,9 @@ public class PluginTestBase extends AbstractTestBase
     pluginsRegistry.set(getTestConfiguration().getBean("systemUpdater", SystemUpdater.class));
     pluginsRegistry.set(getTestConfiguration().getBeanFactory(), Mockito.mock(IResourceSettings.class));
     pluginsRegistry.initialize();
-    tablesToDeleteAfterTests = persistentEntries.toArray(new String[0]);
+    if (tablesToDeleteAfterTests == null) {
+      tablesToDeleteAfterTests = persistentEntries.toArray(new String[0]);
+    }
     init(true);
   }
 
