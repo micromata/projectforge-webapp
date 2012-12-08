@@ -40,7 +40,9 @@ import org.projectforge.registry.RegistryEntry;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.MenuItemDef;
 import org.projectforge.web.MenuItemDefId;
+import org.projectforge.web.MenuItemRegistry;
 import org.projectforge.web.calendar.CalendarFeed;
+import org.projectforge.web.wicket.WicketApplication;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -94,6 +96,9 @@ public class TeamCalPlugin extends AbstractPlugin
     registerMenuItem(new MenuItemDef(parentMenu, ID, 7, "plugins.teamcal.menu", TeamCalCalendarPage.class));
     registerMenuItem(new MenuItemDef(parentMenu, ID + "List", 8, "plugins.teamcal.title.list", TeamCalListPage.class));
 
+    final MenuItemDef menuItemDef = MenuItemRegistry.instance().get(MenuItemDefId.CALENDAR);
+    menuItemDef.setPageClass(TeamCalCalendarPage.class);
+    WicketApplication.setDefaultPage(TeamCalCalendarPage.class);
     // .setMobileMenu(ToDoMobileListPage.class, 10));
 
     // Define the access management:
