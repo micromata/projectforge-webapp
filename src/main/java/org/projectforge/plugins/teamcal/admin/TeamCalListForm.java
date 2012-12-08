@@ -71,6 +71,8 @@ public class TeamCalListForm extends AbstractListForm<TeamCalFilter, TeamCalList
       checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
           new PropertyModel<Boolean>(getSearchFilter(), "own"), getString("plugins.teamcal.own")));
       checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
+          new PropertyModel<Boolean>(getSearchFilter(), "foreign"), getString("plugins.teamcal.others")));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
           new PropertyModel<Boolean>(getSearchFilter(), "fullAccess"), getString("plugins.teamcal.fullAccess")));
       checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
           new PropertyModel<Boolean>(getSearchFilter(), "readonlyAccess"), getString("plugins.teamcal.readonlyAccess")));

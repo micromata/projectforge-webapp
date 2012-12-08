@@ -29,8 +29,10 @@ import java.util.List;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
@@ -98,9 +100,11 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
       }
     };
 
-    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("plugins.teamcal.title"), getSortable("title", sortable), "title", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("plugins.teamcal.title"), getSortable("title", sortable), "title",
+        cellItemListener) {
       /**
-       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item, java.lang.String, org.apache.wicket.model.IModel)
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
        */
       @Override
       public void populateItem(final Item<ICellPopulator<TeamCalDO>> item, final String componentId, final IModel<TeamCalDO> rowModel)
@@ -115,17 +119,46 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
       }
     });
 
-    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("plugins.teamcal.description"), getSortable("description", sortable),
-        "description", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("plugins.teamcal.owner"), getSortable("owner", sortable), "owner.username",
-        cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("plugins.teamcal.description"),
+        getSortable("description", sortable), "description", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("plugins.teamcal.owner"), getSortable("owner", sortable),
+        "owner.username", cellItemListener));
+    columns.add(new AbstractColumn<TeamCalDO>(new Model<String>(getString("plugins.teamcal.access"))) {
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
+       */
+      @Override
+      public void populateItem(final Item<ICellPopulator<TeamCalDO>> item, final String componentId, final IModel<TeamCalDO> rowModel)
+      {
+        final TeamCalDO teamCal = rowModel.getObject();
+        final TeamCalRight right = (TeamCalRight)teamCalDao.getUserRight();
+        String label;
+        if (right.isOwner(getUser(), teamCal) == true) {
+          label = getString("plugins.teamcal.owner");
+        } else if (right.hasFullAccess(teamCal, getUserId()) == true) {
+          label = getString("plugins.teamcal.fullAccess");
+        } else if (right.hasReadonlyAccess(teamCal, getUserId()) == true) {
+          label = getString("plugins.teamcal.readonlyAccess");
+        } else if (right.hasMinimalAccess(teamCal, getUserId()) == true) {
+          label = getString("plugins.teamcal.minimalAccess");
+        } else {
+          label = "???";
+        }
+        item.add(new Label(componentId, label));
+        final StringBuffer cssStyle = getCssStyle(teamCal.getId(), teamCal.isDeleted());
+        if (cssStyle.length() > 0) {
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        }
+      }
+    });
     columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("lastUpdate"), getSortable("lastUpdate", sortable), "lastUpdate",
         cellItemListener));
     // ics export buttons
-    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("plugins.teamcal.subscribe.column"), getSortable("", sortable), "pk",
-        cellItemListener) {
+    columns.add(new AbstractColumn<TeamCalDO>(new Model<String>(getString("plugins.teamcal.subscribe.column"))) {
       /**
-       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item, java.lang.String, org.apache.wicket.model.IModel)
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
        */
       @Override
       public void populateItem(final Item<ICellPopulator<TeamCalDO>> item, final String componentId, final IModel<TeamCalDO> rowModel)

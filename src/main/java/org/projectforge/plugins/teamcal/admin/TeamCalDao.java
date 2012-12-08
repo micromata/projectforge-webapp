@@ -23,11 +23,11 @@
 
 package org.projectforge.plugins.teamcal.admin;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.criterion.Restrictions;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
@@ -98,14 +98,26 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
     else {
       myFilter = new TeamCalFilter(filter);
     }
-    final Integer loggedInUserId = PFUserContext.getUserId();
     final QueryFilter queryFilter = new QueryFilter(myFilter);
-    if (myFilter.isOwn() == true) {
-      final PFUserDO user = new PFUserDO();
-      user.setId(loggedInUserId);
-      queryFilter.add(Restrictions.eq("owner", user));
+    final List<TeamCalDO> list = getList(queryFilter);
+    final List<TeamCalDO> result = new ArrayList<TeamCalDO>();
+    final TeamCalRight right = (TeamCalRight) getUserRight();
+    final PFUserDO user = PFUserContext.getUser();
+    final Integer userId = user.getId();
+    for (final TeamCalDO cal : list) {
+      final boolean isOwn = right.isOwner(user, cal);
+      if (myFilter.isOwn() == true && isOwn == true) {
+        // Calendar matches the filter:
+        result.add(cal);
+      } else if (myFilter.isForeign() == true && isOwn == false) {
+        if ((myFilter.isFullAccess() == true && right.hasFullAccess(cal, userId) == true)
+            || (myFilter.isReadonlyAccess() == true && right.hasReadonlyAccess(cal, userId) == true)
+            || (myFilter.isMinimalAccess() == true && right.hasMinimalAccess(cal, userId) == true)) {
+          // Calendar matches the filter:
+          result.add(cal);
+        }
+      }
     }
-    final List<TeamCalDO> result = getList(queryFilter);
     return result;
   }
 
@@ -240,6 +252,5 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
     }
     return list;
   }
-
 
 }

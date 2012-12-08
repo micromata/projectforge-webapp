@@ -29,22 +29,23 @@ import org.projectforge.core.BaseSearchFilter;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
- *
+ * 
  */
 public class TeamCalFilter extends BaseSearchFilter implements Serializable
 {
   private static final long serialVersionUID = 7410573665085873058L;
 
-  private boolean own, fullAccess, readonlyAccess, minimalAccess;
+  private boolean own, foreign, fullAccess, readonlyAccess, minimalAccess;
 
-  public TeamCalFilter(){
-    own = fullAccess = readonlyAccess = minimalAccess = true;
+  public TeamCalFilter()
+  {
+    this(null);
   }
 
   public TeamCalFilter(final BaseSearchFilter filter)
   {
     super(filter);
-    own = fullAccess = readonlyAccess = minimalAccess = true;
+    own = foreign = fullAccess = readonlyAccess = minimalAccess = true;
   }
 
   /**
@@ -58,9 +59,28 @@ public class TeamCalFilter extends BaseSearchFilter implements Serializable
   /**
    * @param own the own to set
    */
-  public void setOwn(final boolean own)
+  public TeamCalFilter setOwn(final boolean own)
   {
     this.own = own;
+    return this;
+  }
+
+  /**
+   * @return the foreign
+   */
+  public boolean isForeign()
+  {
+    return foreign;
+  }
+
+  /**
+   * @param foreign the foreign to set
+   * @return this for chaining.
+   */
+  public TeamCalFilter setForeign(final boolean foreign)
+  {
+    this.foreign = foreign;
+    return this;
   }
 
   /**

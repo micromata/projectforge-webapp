@@ -34,8 +34,6 @@ import org.projectforge.user.UserRightValue;
 import org.projectforge.user.UserRights;
 
 /**
- * Every user has access to own to-do's or to-do's he's assigned to. All other users have access if the to-do is assigned to a task and the
- * user has the task access.
  * @author Kai Reinhard (k.reinhard@me.de)
  * 
  */
@@ -137,6 +135,11 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
     return ObjectUtils.equals(user.getId(), cal.getOwnerId()) == true;
   }
 
+  public boolean isOwner(final Integer userId, final TeamCalDO cal)
+  {
+    return ObjectUtils.equals(userId, cal.getOwnerId()) == true;
+  }
+
   public boolean isMemberOfAtLeastOneGroup(final PFUserDO user, final Integer... groupIds)
   {
     return getUserGroupCache().isUserMemberOfAtLeastOneGroup(user.getId(), groupIds);
@@ -144,34 +147,41 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
 
   public boolean hasFullAccess(final TeamCalDO calendar, final Integer userId)
   {
-    final Integer[] groupIds = StringHelper.splitToIntegers(calendar.getFullAccessGroupIds(), ",");
-    if (getUserGroupCache().isUserMemberOfAtLeastOneGroup(userId, groupIds) == true) {
+    if (isOwner(userId, calendar) == true) {
       return true;
     }
-    return containsUser(userId, calendar.getFullAccessUserIds());
+    final Integer[] groupIds = StringHelper.splitToIntegers(calendar.getFullAccessGroupIds(), ",");
+    final Integer[] userIds = StringHelper.splitToIntegers(calendar.getFullAccessUserIds(), ",");
+    return hasAccess(groupIds, userIds, userId);
   }
 
   public boolean hasReadonlyAccess(final TeamCalDO calendar, final Integer userId)
   {
-    final Integer[] groupIds = StringHelper.splitToIntegers(calendar.getReadonlyAccessGroupIds(), ",");
-    if (getUserGroupCache().isUserMemberOfAtLeastOneGroup(userId, groupIds) == true) {
-      return true;
+    if (hasFullAccess(calendar, userId) == true) {
+      // User has full access (which is more than read-only access).
+      return false;
     }
-    return containsUser(userId, calendar.getReadonlyAccessUserIds());
+    final Integer[] groupIds = StringHelper.splitToIntegers(calendar.getReadonlyAccessGroupIds(), ",");
+    final Integer[] userIds = StringHelper.splitToIntegers(calendar.getReadonlyAccessUserIds(), ",");
+    return hasAccess(groupIds, userIds, userId);
   }
 
   public boolean hasMinimalAccess(final TeamCalDO calendar, final Integer userId)
   {
+    if (hasFullAccess(calendar, userId) == true || hasReadonlyAccess(calendar, userId) == true) {
+      // User has full access or read-only access (which is more than minimal access).
+      return false;
+    }
     final Integer[] groupIds = StringHelper.splitToIntegers(calendar.getMinimalAccessGroupIds(), ",");
+    final Integer[] userIds = StringHelper.splitToIntegers(calendar.getMinimalAccessUserIds(), ",");
+    return hasAccess(groupIds, userIds, userId);
+  }
+
+  private boolean hasAccess(final Integer[] groupIds, final Integer[] userIds, final Integer userId)
+  {
     if (getUserGroupCache().isUserMemberOfAtLeastOneGroup(userId, groupIds) == true) {
       return true;
     }
-    return containsUser(userId, calendar.getMinimalAccessUserIds());
-  }
-
-  private boolean containsUser(final Integer userId, final String userIdsString)
-  {
-    final Integer[] userIds = StringHelper.splitToIntegers(userIdsString, ",");
     if (userIds == null) {
       return false;
     }
