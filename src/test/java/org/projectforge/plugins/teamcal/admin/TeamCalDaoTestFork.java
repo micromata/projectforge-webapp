@@ -47,7 +47,6 @@ public class TeamCalDaoTestFork extends PluginTestBase
   @BeforeClass
   public static void setup() throws BeansException, IOException
   {
-    tablesToDeleteAfterTests = new String[] { "org.projectforge.plugins.teamcal.event.TeamEventDO", "org.projectforge.plugins.teamcal.admin.TeamCalDO"};
     TeamCalTestHelper.setup();
   }
 

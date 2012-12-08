@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.wicket.settings.IResourceSettings;
 import org.mockito.Mockito;
 import org.projectforge.admin.SystemUpdater;
@@ -64,8 +66,11 @@ public class PluginTestBase extends AbstractTestBase
     pluginsRegistry.set(getTestConfiguration().getBean("systemUpdater", SystemUpdater.class));
     pluginsRegistry.set(getTestConfiguration().getBeanFactory(), Mockito.mock(IResourceSettings.class));
     pluginsRegistry.initialize();
-    if (tablesToDeleteAfterTests == null) {
-      tablesToDeleteAfterTests = persistentEntries.toArray(new String[0]);
+    if (tablesToDeleteAfterTests == null && CollectionUtils.isNotEmpty(persistentEntries) == true) {
+      // Put the persistent entries in reverse order to delete:
+      final String[] entries = persistentEntries.toArray(new String[0]);
+      ArrayUtils.reverse(entries);
+      tablesToDeleteAfterTests = entries;
     }
     init(true);
   }
