@@ -67,7 +67,9 @@ import org.projectforge.lucene.ClassicAnalyzer;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
+import org.projectforge.user.UserRight;
 import org.projectforge.user.UserRightId;
+import org.projectforge.user.UserRights;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Isolation;
@@ -1422,6 +1424,15 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   public boolean hasDeleteAccess(final PFUserDO user, final O obj, final O dbObj, final boolean throwException)
   {
     return hasAccess(user, obj, dbObj, OperationType.DELETE, throwException);
+  }
+
+  public UserRight getUserRight()
+  {
+    if (userRightId != null) {
+      return UserRights.instance().getRight(userRightId);
+    } else {
+      return null;
+    }
   }
 
   /**
