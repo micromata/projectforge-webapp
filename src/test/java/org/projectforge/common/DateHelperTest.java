@@ -153,7 +153,7 @@ public class DateHelperTest extends TestBase
     assertEquals(DateTimeConstants.SUNDAY, DateHelper.convertCalendarDayOfWeekToJoda(Calendar.SUNDAY));
   }
 
-  private Date createDate(final int year, final int month, final int day, final int hour, final int minute, final int second,
+  public static Date createDate(final int year, final int month, final int day, final int hour, final int minute, final int second,
       final int millisecond)
   {
     final Calendar cal = Calendar.getInstance(Configuration.getInstance().getDefaultTimeZone());
