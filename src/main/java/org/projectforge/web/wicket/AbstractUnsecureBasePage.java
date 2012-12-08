@@ -36,6 +36,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.AbstractLink;
+import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -123,13 +124,20 @@ public abstract class AbstractUnsecureBasePage extends WebPage
     if (WebConfiguration.isDevelopmentMode() == false) {
       developmentSystem.setVisible(false);
     }
-    final AbstractLink link = DocumentationPage.addNewsLink(body, "footerNewsLink");
-    link.add(new Label("version", "Version " + AppVersion.VERSION.toString() + ", " + AppVersion.RELEASE_DATE).setRenderBodyOnly(true));
     final PFUserDO user = PFUserContext.getUser();
-    body.add(new Label("username", user != null ? getString("loggedInUserInfo")
-        + " <span class=\"username\">"
-        + escapeHtml(user.getUserDisplayname())
-        + "</span>" : getString("notLoggedIn")).setEscapeModelStrings(false));
+    AbstractLink link;
+    if (user == null) {
+      body.add(new Label("username", getString("notLoggedIn")).setEscapeModelStrings(false));
+      link = new ExternalLink("footerNewsLink", "http://www.projectforge.org/pf-en/News");
+      body.add(link);
+    } else {
+      link = DocumentationPage.addNewsLink(body, "footerNewsLink");
+      body.add(new Label("username", getString("loggedInUserInfo")
+          + " <span class=\"username\">"
+          + escapeHtml(user.getUserDisplayname())
+          + "</span>").setEscapeModelStrings(false));
+    }
+    link.add(new Label("version", "Version " + AppVersion.VERSION.toString() + ", " + AppVersion.RELEASE_DATE).setRenderBodyOnly(true));
   }
 
   @Override
@@ -276,7 +284,8 @@ public abstract class AbstractUnsecureBasePage extends WebPage
     return MessageFormat.format(getString(key), params);
   }
 
-  private void initializeContextMenu(final IHeaderResponse response) {
+  private void initializeContextMenu(final IHeaderResponse response)
+  {
 
     // context menu
     final Map<String, String> i18nKeyMap = new HashMap<String, String>();
