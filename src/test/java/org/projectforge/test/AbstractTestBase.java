@@ -132,7 +132,7 @@ public class AbstractTestBase
 
   protected AccessChecker accessChecker;
 
-  protected static InitTestDB initTestDB;
+  public static InitTestDB initTestDB;
 
   protected int mCount = 0;
 
@@ -162,7 +162,7 @@ public class AbstractTestBase
   /**
    * Init and reinitialise context before each run
    */
-  protected static void init(final boolean createTestData) throws BeansException, IOException
+  public static void init(final boolean createTestData) throws BeansException, IOException
   {
     clearDatabase();
 
@@ -268,7 +268,7 @@ public class AbstractTestBase
     }
   }
 
-  protected PFUserDO logon(final String username)
+  public PFUserDO logon(final String username)
   {
     final PFUserDO user = userDao.getInternalByName(username);
     if (user == null) {
@@ -278,7 +278,7 @@ public class AbstractTestBase
     return user;
   }
 
-  protected void logon(final PFUserDO user)
+  public void logon(final PFUserDO user)
   {
     PFUserContext.setUser(user);
   }
