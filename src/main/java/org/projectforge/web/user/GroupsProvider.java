@@ -33,6 +33,9 @@ import org.projectforge.common.NumberHelper;
 import org.projectforge.common.StringHelper;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.GroupDO;
+import org.projectforge.user.GroupDao;
+import org.projectforge.user.PFUserContext;
+import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 
 import com.vaynberg.wicket.select2.Response;
@@ -45,6 +48,8 @@ public class GroupsProvider extends TextChoiceProvider<GroupDO>
   private static final long serialVersionUID = 6228672635966093252L;
 
   transient UserGroupCache userGroupCache;
+
+  transient GroupDao groupDao;
 
   private int pageSize = 20;
 
@@ -114,8 +119,9 @@ public class GroupsProvider extends TextChoiceProvider<GroupDO>
     if (sortedGroups == null) {
       final Collection<GroupDO> allGroups = getUserGroupCache().getAllGroups();
       sortedGroups = new TreeSet<GroupDO>(groupsComparator);
+      final PFUserDO loggedInUser = PFUserContext.getUser();
       for (final GroupDO group : allGroups) {
-        if (group.isDeleted() == false) {
+        if (group.isDeleted() == false && getGroupDao().hasSelectAccess(loggedInUser, group, false) == true) {
           sortedGroups.add(group);
         }
       }
@@ -213,5 +219,16 @@ public class GroupsProvider extends TextChoiceProvider<GroupDO>
       userGroupCache = Registry.instance().getUserGroupCache();
     }
     return userGroupCache;
+  }
+
+  /**
+   * @return the groupDao
+   */
+  private GroupDao getGroupDao()
+  {
+    if (groupDao == null) {
+      groupDao = Registry.instance().getDao(GroupDao.class);
+    }
+    return groupDao;
   }
 }
