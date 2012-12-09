@@ -284,7 +284,7 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
     return buf.toString();
   }
 
-  private String getTitle(final TimesheetDO timesheet)
+  public static String getTitle(final TimesheetDO timesheet)
   {
     final Kost2DO kost2 = timesheet.getKost2();
     final TaskDO task = timesheet.getTask();
@@ -316,7 +316,7 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
     return buf.toString();
   }
 
-  private String getToolTip(final TimesheetDO timesheet)
+  public static String getToolTip(final TimesheetDO timesheet)
   {
     final String location = timesheet.getLocation();
     final String description = timesheet.getShortDescription();
