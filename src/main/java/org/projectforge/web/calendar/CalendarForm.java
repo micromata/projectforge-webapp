@@ -29,12 +29,10 @@ import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.joda.time.DateMidnight;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.core.Configuration;
-import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserDao;
@@ -160,14 +158,26 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
         {
           setResponsePage(getPage().getClass(), getPage().getPageParameters());
         }
-      }
-      .setLight();
+      }.setLight();
       fs.add(refreshButtonPanel);
       setDefaultButton(refreshButtonPanel.getButton());
     }
     addControlButtons(fs);
     if (accessChecker.isRestrictedUser() == false && WebConfiguration.isDevelopmentMode() == true) {
-      final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, setICalTarget());
+      final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          final String iCalTarget = CalendarFeed.getUrl() + additionalInformation();
+          return iCalTarget;
+        };
+      }) {
+        @Override
+        public boolean isVisible()
+        {
+          return getTimesheetsUser() != null;
+        };
+      };
       final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(fs.newChildId(), IconType.SUBSCRIPTION,
           getString(setIcsImportButtonTooltip()), iCalExportLink).setLight();
 
@@ -188,30 +198,13 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
   }
 
   /**
-   * @param contextPath
-   * @return
-   */
-  protected String setICalTarget()
-  {
-    final PFUserDO user = PFUserContext.getUser();
-    final String authenticationKey = userDao.getAuthenticationToken(user.getId());
-    final String contextPath = WebApplication.get().getServletContext().getContextPath();
-    final String iCalTarget = contextPath
-        + "/export/ProjectForge.ics?timesheetUser="
-        + user.getUsername()
-        + "&token="
-        + authenticationKey
-        + additionalInformation();
-    return iCalTarget;
-  }
-
-  /**
    * If it is necessary to change the tool tip.
    * 
    * @param i18nKey
    * @return
    */
-  protected String setIcsImportButtonTooltip() {
+  protected String setIcsImportButtonTooltip()
+  {
     return "timesheet.iCalExport";
   }
 
@@ -222,7 +215,11 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
    */
   protected String additionalInformation()
   {
-    return "";
+    final PFUserDO timesheetUser = getTimesheetsUser();
+    if (timesheetUser != null) {
+      return "&timesheetUser=" + timesheetUser.getId();
+    }
+    return null;
   }
 
   /**

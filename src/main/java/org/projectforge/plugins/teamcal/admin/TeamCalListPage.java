@@ -37,12 +37,9 @@ import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.user.PFUserContext;
-import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserDao;
+import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFeedHook;
 import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
@@ -66,11 +63,6 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
 
   @SpringBean(name = "teamCalDao")
   private TeamCalDao teamCalDao;
-
-  @SpringBean(name = "userDao")
-  private UserDao userDao;
-
-  private String iCalTarget;
 
   /**
    * 
@@ -132,7 +124,7 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
       public void populateItem(final Item<ICellPopulator<TeamCalDO>> item, final String componentId, final IModel<TeamCalDO> rowModel)
       {
         final TeamCalDO teamCal = rowModel.getObject();
-        final TeamCalRight right = (TeamCalRight)teamCalDao.getUserRight();
+        final TeamCalRight right = (TeamCalRight) teamCalDao.getUserRight();
         String label;
         if (right.isOwner(getUser(), teamCal) == true) {
           label = getString("plugins.teamcal.owner");
@@ -165,7 +157,7 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
       {
         if (accessChecker.isRestrictedUser() == false && WebConfiguration.isDevelopmentMode() == true) {
           final TeamCalDO teamCal = rowModel.getObject();
-          createICalTarget(teamCal.getId());
+          final String iCalTarget = TeamCalCalendarFeedHook.getUrl(String.valueOf(teamCal.getId()));;
           final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, iCalTarget);
           final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(componentId, IconType.SUBSCRIPTION,
               getString("plugins.teamcal.subscribe"), iCalExportLink).setLight();
@@ -178,27 +170,6 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
       }
     });
     return columns;
-  }
-
-  /**
-   * creates an URL for ics export.
-   * 
-   * @param id
-   */
-  public void createICalTarget(final Integer id)
-  {
-    final PFUserDO user = PFUserContext.getUser();
-    final String authenticationKey = userDao.getAuthenticationToken(user.getId());
-    final String contextPath = WebApplication.get().getServletContext().getContextPath();
-    iCalTarget = contextPath
-        + "/export/ProjectForge.ics?timesheetUser="
-        + user.getUsername()
-        + "&token="
-        + authenticationKey
-        + "&teamCals="
-        + id
-        + "&timesheetRequired="
-        + false;
   }
 
   protected TeamCalFilter getFilter()

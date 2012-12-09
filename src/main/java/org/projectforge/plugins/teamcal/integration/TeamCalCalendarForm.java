@@ -32,10 +32,7 @@ import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
-import org.apache.wicket.protocol.http.WebApplication;
 import org.projectforge.plugins.teamcal.dialog.TeamCalDialog;
-import org.projectforge.user.PFUserContext;
-import org.projectforge.user.PFUserDO;
 import org.projectforge.web.calendar.CalendarFilter;
 import org.projectforge.web.calendar.CalendarForm;
 import org.projectforge.web.calendar.CalendarPage;
@@ -87,7 +84,6 @@ public class TeamCalCalendarForm extends CalendarForm
     };
     calendarButtonPanel.setLight();
     fs.add(calendarButtonPanel);
-    setDefaultButton(calendarButtonPanel.getButton());
 
     if (filter.getCurrentCollection() != null) {
       final IChoiceRenderer<TeamCalCalendarCollection> teamCalCollectionRenderer = new IChoiceRenderer<TeamCalCalendarCollection>() {
@@ -138,24 +134,6 @@ public class TeamCalCalendarForm extends CalendarForm
     return "plugins.teamcal.subscribe.teamcalendar";
   }
 
-  /**
-   * @see org.projectforge.web.calendar.CalendarForm#setICalTarget()
-   */
-  @Override
-  protected String setICalTarget()
-  {
-    final PFUserDO user = PFUserContext.getUser();
-    final String authenticationKey = userDao.getAuthenticationToken(user.getId());
-    final String contextPath = WebApplication.get().getServletContext().getContextPath();
-    final String iCalTarget = contextPath
-        + "/export/ProjectForge.ics?timesheetUser="
-        + user.getUsername()
-        + "&token="
-        + authenticationKey
-        + additionalInformation();
-    return iCalTarget;
-  }
-
   @Override
   public CalendarFilter getFilter()
   {
@@ -180,19 +158,5 @@ public class TeamCalCalendarForm extends CalendarForm
   public Set<Integer> getSelectedCalendars()
   {
     return filter.getCalendarPk(filter.getCurrentCollection());
-  }
-
-  /**
-   * add information to ics export url
-   */
-  @Override
-  protected String additionalInformation()
-  {
-    String calendarIds = "";
-    for (final Integer id : getSelectedCalendars())
-      calendarIds = calendarIds + id + ";";
-
-    final String additionals = "&teamCals=" + calendarIds + "&timesheetRequired=" + true;
-    return additionals;
   }
 }

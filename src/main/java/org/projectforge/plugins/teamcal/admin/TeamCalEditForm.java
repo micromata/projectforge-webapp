@@ -29,13 +29,11 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
+import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFeedHook;
 import org.projectforge.user.GroupDO;
-import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserDao;
 import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.common.MultiChoiceListHelper;
 import org.projectforge.web.user.GroupsComparator;
@@ -64,9 +62,6 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalEditForm.class);
 
   private static final long serialVersionUID = 1379614008604844519L;
-
-  @SpringBean(name = "userDao")
-  private UserDao userDao;
 
   @SpringBean(name = "accessChecker")
   protected AccessChecker accessChecker;
@@ -139,7 +134,8 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
 
     if (accessChecker.isRestrictedUser() == false && WebConfiguration.isDevelopmentMode() == true) {
       final FieldsetPanel fsSubscribe = gridBuilder.newFieldset(getString("plugins.teamcal.subscribe"), true).setNoLabelFor();
-      final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, createICalTarget());
+      final String iCalTarget = TeamCalCalendarFeedHook.getUrl(String.valueOf(this.getData().getId()));
+      final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, iCalTarget);
       final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(fsSubscribe.newChildId(), IconType.SUBSCRIPTION,
           getString("plugins.teamcal.subscribe"), iCalExportLink).setLight();
       fsSubscribe.add(exportICalButtonPanel);
@@ -152,7 +148,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       // set access users
       {
         // Full access users
-        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess.users"));//.setLabelSide(false);
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess.users"));// .setLabelSide(false);
         final UsersProvider usersProvider = new UsersProvider();
         final Collection<PFUserDO> fullAccessUsers = new UsersProvider().getSortedUsers(getData().getFullAccessUserIds());
         fullAccessUsersListHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator()).setFullList(
@@ -168,7 +164,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       }
       {
         // Read-only access users
-        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.readonlyAccess.users"));//.setLabelSide(false);
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.readonlyAccess.users"));// .setLabelSide(false);
         final UsersProvider usersProvider = new UsersProvider();
         final Collection<PFUserDO> readOnlyAccessUsers = new UsersProvider().getSortedUsers(getData().getReadonlyAccessUserIds());
         readonlyAccessUsersListHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator()).setFullList(
@@ -184,7 +180,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       }
       {
         // Minimal access users
-        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.minimalAccess.users"), true);//.setLabelSide(false);
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.minimalAccess.users"), true);// .setLabelSide(false);
         final UsersProvider usersProvider = new UsersProvider();
         final Collection<PFUserDO> minimalAccessUsers = new UsersProvider().getSortedUsers(getData().getMinimalAccessUserIds());
         minimalAccessUsersListHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator()).setFullList(
@@ -204,7 +200,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       // set access groups
       {
         // Full access groups
-        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess.groups"));//.setLabelSide(false);
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess.groups"));// .setLabelSide(false);
         final GroupsProvider groupsProvider = new GroupsProvider();
         final Collection<GroupDO> fullAccessGroups = new GroupsProvider().getSortedGroups(getData().getFullAccessGroupIds());
         fullAccessGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
@@ -220,7 +216,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       }
       {
         // Read-only access groups
-        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.readonlyAccess.groups"));//.setLabelSide(false);
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.readonlyAccess.groups"));// .setLabelSide(false);
         final GroupsProvider groupsProvider = new GroupsProvider();
         final Collection<GroupDO> readOnlyAccessGroups = new GroupsProvider().getSortedGroups(getData().getReadonlyAccessGroupIds());
         readonlyAccessGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
@@ -236,7 +232,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       }
       {
         // Minimal access groups
-        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.minimalAccess.groups"), true);//.setLabelSide(false);
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.minimalAccess.groups"), true);// .setLabelSide(false);
         final GroupsProvider groupsProvider = new GroupsProvider();
         final Collection<GroupDO> minimalAccessGroups = new GroupsProvider().getSortedGroups(getData().getMinimalAccessGroupIds());
         minimalAccessGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
@@ -252,27 +248,6 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
         fs.add(groups);
       }
     }
-
-  }
-
-  /**
-   * create ics export url
-   */
-  private String createICalTarget()
-  {
-    final PFUserDO user = PFUserContext.getUser();
-    final String authenticationKey = userDao.getAuthenticationToken(user.getId());
-    final String contextPath = WebApplication.get().getServletContext().getContextPath();
-    final String iCalTarget = contextPath
-        + "/export/ProjectForge.ics?timesheetUser="
-        + user.getUsername()
-        + "&token="
-        + authenticationKey
-        + "&teamCals="
-        + this.getData().getId()
-        + "&timesheetRequired="
-        + false;
-    return iCalTarget;
   }
 
   /**

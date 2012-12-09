@@ -44,7 +44,7 @@ import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDao;
 import org.projectforge.plugins.teamcal.event.TeamEventFilter;
 import org.projectforge.registry.Registry;
-import org.projectforge.user.PFUserDO;
+import org.projectforge.web.calendar.CalendarFeed;
 import org.projectforge.web.calendar.CalendarFeedHook;
 
 /**
@@ -55,92 +55,95 @@ import org.projectforge.web.calendar.CalendarFeedHook;
  */
 public class TeamCalCalendarFeedHook implements CalendarFeedHook
 {
+  // TODO: Oups, this is an hook (singleton), this does result in side-effects, doesn't it?
+  // private String[] teamCalIds;
 
-  private String[] teamCalIds;
+  public static final String getUrl(final String teamCalIds)
+  {
+    return CalendarFeed.getUrl("&teamCals=" + teamCalIds);
+  }
 
   /**
    * @see org.projectforge.web.calendar.CalendarFeedHook#onInit()
    */
-  @Override
-  public void onInit(final HttpServletRequest req)
-  {
-    final String teamCals = req.getParameter("teamCals");
-    if (teamCals != null) {
-      teamCalIds = StringUtils.split(teamCals, ";");
-    }
-  }
+  // @Override
+  // public void onInit(final HttpServletRequest req)
+  // {
+  // final String teamCals = req.getParameter("teamCals");
+  // if (teamCals != null) {
+  // teamCalIds = StringUtils.split(teamCals, ";");
+  // }
+  // }
 
   /**
    * @see org.projectforge.web.calendar.CalendarFeedHook#getEvents(net.fortuna.ical4j.model.TimeZone, java.util.Calendar)
    */
   @Override
-  public List<VEvent> getEvents(final PFUserDO user, final TimeZone timezone, final Calendar cal)
+  public List<VEvent> getEvents(final HttpServletRequest req, final TimeZone timezone, final Calendar cal)
   {
-    {
-      final List<VEvent> events = new LinkedList<VEvent>();
-      if (teamCalIds != null) {
-        final TeamEventDao teamEventDao = (TeamEventDao) Registry.instance().getDao(TeamEventDao.class);
-        final TeamEventFilter eventFilter = new TeamEventFilter();
-        eventFilter.setUser(user);
-        eventFilter.setDeleted(false);
-        eventFilter.setEndDate(cal.getTime());
-        for (int i = 0; i < teamCalIds.length; i++) {
-          final Integer id = Integer.valueOf(teamCalIds[i]);
-          eventFilter.setTeamCalId(id);
+    final String teamCals = req.getParameter("teamCals");
+    if (teamCals == null) {
+      return null;
+    }
+    final String[] teamCalIds = StringUtils.split(teamCals, ";");
+    if (teamCalIds == null) {
+      return null;
+    }
+    final List<VEvent> events = new LinkedList<VEvent>();
+    final TeamEventDao teamEventDao = (TeamEventDao) Registry.instance().getDao(TeamEventDao.class);
+    final TeamEventFilter eventFilter = new TeamEventFilter();
+    // Does this make any sense? TODO: eventFilter.setUser(user);
+    eventFilter.setDeleted(false);
+    eventFilter.setEndDate(cal.getTime());
+    for (int i = 0; i < teamCalIds.length; i++) {
+      final Integer id = Integer.valueOf(teamCalIds[i]);
+      eventFilter.setTeamCalId(id);
 
-          final List<TeamEventDO> teamEvents = teamEventDao.getIcsExportList(eventFilter);
-          if (teamEvents != null && teamEvents.size() > 0) {
-            for (final TeamEventDO teamEvent : teamEvents) {
-              final Date date = new Date(teamEvent.getStartDate().getTime());
-              final VEvent vEvent;
-              if (teamEvent.isAllDay() == true) {
-                final DtStart dtStart = new DtStart(timezone);
-                final net.fortuna.ical4j.model.Date fortunaStartDate = new net.fortuna.ical4j.model.Date(date);
-                dtStart.setDate(fortunaStartDate);
+      final List<TeamEventDO> teamEvents = teamEventDao.getIcsExportList(eventFilter);
+      if (teamEvents != null && teamEvents.size() > 0) {
+        for (final TeamEventDO teamEvent : teamEvents) {
+          final Date date = new Date(teamEvent.getStartDate().getTime());
+          final VEvent vEvent;
+          if (teamEvent.isAllDay() == true) {
+            final DtStart dtStart = new DtStart(timezone);
+            final net.fortuna.ical4j.model.Date fortunaStartDate = new net.fortuna.ical4j.model.Date(date);
+            dtStart.setDate(fortunaStartDate);
 
-                final DtEnd dtEnd = new DtEnd(timezone);
-                final org.joda.time.DateTime jodaTime = new org.joda.time.DateTime(teamEvent.getEndDate().getTime());
+            final DtEnd dtEnd = new DtEnd(timezone);
+            final org.joda.time.DateTime jodaTime = new org.joda.time.DateTime(teamEvent.getEndDate().getTime());
 
-                // requires plus 1 because one day will be omitted by calendar.
-                final net.fortuna.ical4j.model.Date fortunaEndDate = new net.fortuna.ical4j.model.Date(jodaTime.plusDays(1).getMillis());
-                dtEnd.setDate(fortunaEndDate);
-                String calendarName = "";
-                if (teamCalIds.length > 1) {
-                  calendarName = " ("
-                      + teamEvent.getCalendar().getTitle()
-                      + ")";
-                }
-                vEvent = new VEvent(fortunaStartDate, fortunaEndDate, teamEvent.getSubject()
-                    + calendarName);
-                vEvent.getProperties().add(new Uid(fortunaStartDate.toString()));
-              } else {
-                cal.setTime(date);
-                final DateTime startTime = getCalTime(timezone, cal);
-
-                date.setTime(teamEvent.getEndDate().getTime());
-                cal.setTime(date);
-                final DateTime stopTime = getCalTime(timezone, cal);
-                String calendarName = "";
-                if (teamCalIds.length > 1) {
-                  calendarName = " ("
-                      + teamEvent.getCalendar().getTitle()
-                      + ")";
-                }
-                vEvent = new VEvent(startTime, stopTime, teamEvent.getSubject() + calendarName);
-                vEvent.getProperties().add(new Uid(startTime.toString()));
-              }
-
-              vEvent.getProperties().add(new Location(teamEvent.getLocation()));
-              vEvent.getProperties().add(new Name(teamEvent.getCalendar().getTitle()));
-
-              events.add(vEvent);
+            // requires plus 1 because one day will be omitted by calendar.
+            final net.fortuna.ical4j.model.Date fortunaEndDate = new net.fortuna.ical4j.model.Date(jodaTime.plusDays(1).getMillis());
+            dtEnd.setDate(fortunaEndDate);
+            String calendarName = "";
+            if (teamCalIds.length > 1) {
+              calendarName = " (" + teamEvent.getCalendar().getTitle() + ")";
             }
+            vEvent = new VEvent(fortunaStartDate, fortunaEndDate, teamEvent.getSubject() + calendarName);
+            vEvent.getProperties().add(new Uid(fortunaStartDate.toString()));
+          } else {
+            cal.setTime(date);
+            final DateTime startTime = getCalTime(timezone, cal);
+
+            date.setTime(teamEvent.getEndDate().getTime());
+            cal.setTime(date);
+            final DateTime stopTime = getCalTime(timezone, cal);
+            String calendarName = "";
+            if (teamCalIds.length > 1) {
+              calendarName = " (" + teamEvent.getCalendar().getTitle() + ")";
+            }
+            vEvent = new VEvent(startTime, stopTime, teamEvent.getSubject() + calendarName);
+            vEvent.getProperties().add(new Uid(startTime.toString()));
           }
 
+          vEvent.getProperties().add(new Location(teamEvent.getLocation()));
+          vEvent.getProperties().add(new Name(teamEvent.getCalendar().getTitle()));
+
+          events.add(vEvent);
         }
       }
-      return events;
     }
+    return events;
   }
 
   /**

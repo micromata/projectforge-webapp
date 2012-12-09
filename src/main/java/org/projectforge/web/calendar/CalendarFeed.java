@@ -51,7 +51,8 @@ import net.fortuna.ical4j.model.property.Version;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
-import org.joda.time.DateTimeZone;
+import org.apache.wicket.protocol.http.WebApplication;
+import org.projectforge.common.NumberHelper;
 import org.projectforge.registry.Registry;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
@@ -60,9 +61,8 @@ import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 
-
 /**
- * Feed Servlet, which generates a 'text/calendar' output of the last four mounts. Currenty relevant informations are date, start- and stop
+ * Feed Servlet, which generates a 'text/calendar' output of the last four mounts. Currently relevant informations are date, start- and stop
  * time and last but not least the location of an event.
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -75,21 +75,52 @@ public class CalendarFeed extends HttpServlet
 
   private static final int PERIOD_IN_MONTHS = 4;
 
-  private PFUserDO user = null;
-
-  private boolean timesheetRequired;
+  private static final String PARAM_NAME_TIMESHEET_USER = "timesheetUser";
 
   private static final List<CalendarFeedHook> feedHooks = new LinkedList<CalendarFeedHook>();
+
+  public static String getUrl()
+  {
+    return getUrl(null);
+  }
+
+  public static String getUrlParameterTimesheetUser(final PFUserDO timesheetUser)
+  {
+    if (timesheetUser == null) {
+      return null;
+    }
+    return "&" + PARAM_NAME_TIMESHEET_USER + "=" + timesheetUser.getId();
+  }
+
+  /**
+   * 
+   * @param additionalParams Request parameters such as "&calId=42", may be null.
+   * @return
+   */
+  public static String getUrl(final String additionalParams)
+  {
+    final PFUserDO user = PFUserContext.getUser();
+    final UserDao userDao = (UserDao) Registry.instance().getDao(UserDao.class);
+    final String authenticationKey = userDao.getAuthenticationToken(user.getId());
+    final String contextPath = WebApplication.get().getServletContext().getContextPath();
+    final StringBuffer buf = new StringBuffer();
+    buf.append(contextPath).append("/export/ProjectForge.ics?user=").append(user.getUsername()).append("&token=").append(authenticationKey);
+    if (additionalParams != null) {
+      buf.append(additionalParams);
+    }
+    return buf.toString();
+  }
 
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException
   {
-    if (StringUtils.isBlank(req.getParameter("timesheetUser")) || StringUtils.isBlank(req.getParameter("token"))) {
+    if (StringUtils.isBlank(req.getParameter("user")) || StringUtils.isBlank(req.getParameter("token"))) {
       resp.sendError(HttpStatus.SC_BAD_REQUEST);
       return;
     }
 
-    final Calendar calendar = createCal(req, req.getParameter("timesheetUser"), req.getParameter("token"), req.getParameter("timesheetRequired"));
+    final Calendar calendar = createCal(req, req.getParameter("user"), req.getParameter("token"),
+        req.getParameter(PARAM_NAME_TIMESHEET_USER));
 
     if (calendar == null) {
       resp.sendError(HttpStatus.SC_BAD_REQUEST);
@@ -113,49 +144,42 @@ public class CalendarFeed extends HttpServlet
    * @param userKey
    * @return a calendar, null if authentication fails
    */
-  public Calendar createCal(final HttpServletRequest req, final String userName, final String authKey, final String timesheetRequired)
+  public Calendar createCal(final HttpServletRequest req, final String userName, final String authKey, final String timesheetUserParam)
   {
     final UserDao userDao = (UserDao) Registry.instance().getDao(UserDao.class);
-    final TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
-    user = userDao.getUserByAuthenticationToken(userName, authKey);
+    final PFUserDO loggedInUser = userDao.getUserByAuthenticationToken(userName, authKey);
 
-    if (user == null) {
+    if (loggedInUser == null) {
       return null;
     }
+    try {
+      PFUserContext.setUser(loggedInUser);
+      PFUserDO timesheetUser = null;
+      if (StringUtils.isNotBlank(timesheetUserParam) == true) {
+        final Integer timesheetUserId = NumberHelper.parseInteger(timesheetUserParam);
+        if (timesheetUserId != null) {
+          timesheetUser = userDao.getUserGroupCache().getUser(timesheetUserId);
+        }
+      }
+      // creating a new calendar
+      final Calendar calendar = new Calendar();
+      final Locale locale = PFUserContext.getLocale();
+      calendar.getProperties().add(
+          new ProdId("-//" + loggedInUser.getDisplayUsername() + "//ProjectForge//" + locale.toString().toUpperCase()));
+      calendar.getProperties().add(Version.VERSION_2_0);
+      calendar.getProperties().add(CalScale.GREGORIAN);
 
-    for(final CalendarFeedHook hook: feedHooks) {
-      hook.onInit(req);
+      // setup event is needed for empty calendars
+      calendar.getComponents().add(new VEvent(new net.fortuna.ical4j.model.Date(0), "SETUP EVENT"));
+
+      // adding events
+      for (final VEvent event : getEvents(req, timesheetUser)) {
+        calendar.getComponents().add(event);
+      }
+      return calendar;
+    } finally {
+      PFUserContext.setUser(null);
     }
-
-    if (timesheetRequired == null)
-      this.timesheetRequired = true;
-    else
-      if (timesheetRequired.equals("true") == true)
-        this.timesheetRequired = true;
-      else
-        this.timesheetRequired = false;
-
-    PFUserContext.setUser(user);
-
-    @SuppressWarnings("unused")
-    final TimeZone timeZone = registry.getTimeZone(user.getTimeZone());
-
-    // creating a new calendar
-    final Calendar calendar = new Calendar();
-    final Locale locale = PFUserContext.getLocale();
-    calendar.getProperties().add(
-        new ProdId("-//" + user.getDisplayUsername() + "//ProjectForge//" + locale.toString().toUpperCase()));
-    calendar.getProperties().add(Version.VERSION_2_0);
-    calendar.getProperties().add(CalScale.GREGORIAN);
-
-    // setup event is needed for empty calendars
-    calendar.getComponents().add(new VEvent(new net.fortuna.ical4j.model.Date(0), "SETUP EVENT"));
-
-    // adding events
-    for (final VEvent event : getEvents()) {
-      calendar.getComponents().add(event);
-    }
-    return calendar;
   }
 
   /**
@@ -163,32 +187,29 @@ public class CalendarFeed extends HttpServlet
    * 
    * @return
    */
-  private List<VEvent> getEvents()
+  private List<VEvent> getEvents(final HttpServletRequest req, final PFUserDO timesheetUser)
   {
     final List<VEvent> events = new ArrayList<VEvent>();
+    final java.util.TimeZone javaTimezone = PFUserContext.getTimeZone();
     final TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
-    final DateTimeZone timeZonee = DateTimeZone.forID(user.getTimeZone());
-    final TimeZone timezone = registry.getTimeZone(timeZonee.getID());
-    final java.util.Calendar cal = java.util.Calendar.getInstance(timeZonee.toTimeZone());
+    final TimeZone timezone = registry.getTimeZone(javaTimezone.getID());
+    final java.util.Calendar cal = java.util.Calendar.getInstance(javaTimezone);
 
-    // initializes timesheet filter
-    final TimesheetFilter filter = new TimesheetFilter();
-    filter.setUserId(user.getId());
-    filter.setDeleted(false);
-    filter.setStopTime(cal.getTime());
+    if (timesheetUser != null) {
+      // initializes timesheet filter
+      final TimesheetFilter filter = new TimesheetFilter();
+      filter.setUserId(timesheetUser.getId());
+      filter.setDeleted(false);
+      filter.setStopTime(cal.getTime());
+      // calculates the offset of the calendar
+      final int offset = cal.get(java.util.Calendar.MONTH) - PERIOD_IN_MONTHS;
+      if (offset < 0) {
+        setCalDate(cal, cal.get(java.util.Calendar.YEAR) - 1, 12 + offset);
+      } else {
+        setCalDate(cal, cal.get(java.util.Calendar.YEAR), offset);
+      }
+      filter.setStartTime(cal.getTime());
 
-    // calculates the offset of the calendar
-    final int offset = cal.get(java.util.Calendar.MONTH) - PERIOD_IN_MONTHS;
-
-    if (offset < 0) {
-      setCalDate(cal, cal.get(java.util.Calendar.YEAR) - 1, 12 + offset);
-    } else {
-      setCalDate(cal, cal.get(java.util.Calendar.YEAR), offset);
-    }
-
-    filter.setStartTime(cal.getTime());
-
-    if (timesheetRequired == true) {
       final TimesheetDao timesheetDao = (TimesheetDao) Registry.instance().getDao(TimesheetDao.class);
       final List<TimesheetDO> timesheetList = timesheetDao.getList(filter);
 
@@ -206,8 +227,7 @@ public class CalendarFeed extends HttpServlet
         final VEvent vEvent;
         if (feedHooks.size() > 0) {
           vEvent = new VEvent(startTime, stopTime, timesheet.getShortDescription() + " (timesheet)");
-        }
-        else {
+        } else {
           vEvent = new VEvent(startTime, stopTime, timesheet.getShortDescription());
         }
         vEvent.getProperties().add(new Uid(startTime.toString()));
@@ -217,20 +237,14 @@ public class CalendarFeed extends HttpServlet
       }
     }
 
-    for(final CalendarFeedHook hook: feedHooks) {
-      events.addAll(hook.getEvents(user, timezone, cal));
+    for (final CalendarFeedHook hook : feedHooks) {
+      final List<VEvent> list = hook.getEvents(req, timezone, cal);
+      if (list != null) {
+        events.addAll(list);
+      }
     }
 
     return events;
-  }
-
-
-  /**
-   * @return
-   */
-  public boolean isTimesheetRequired()
-  {
-    return this.timesheetRequired;
   }
 
   /**
@@ -261,8 +275,8 @@ public class CalendarFeed extends HttpServlet
     cal.set(java.util.Calendar.MONTH, mounth);
   }
 
-
-  public static void registerFeedHook(final CalendarFeedHook hook) {
+  public static void registerFeedHook(final CalendarFeedHook hook)
+  {
     feedHooks.add(hook);
   }
 

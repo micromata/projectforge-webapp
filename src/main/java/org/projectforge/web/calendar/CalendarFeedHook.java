@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VEvent;
 
-import org.projectforge.user.PFUserDO;
+import org.projectforge.user.PFUserContext;
 
 /**
  * @author Johannes Unterstein(j.unterstein@micromata.de)
@@ -43,13 +43,14 @@ public interface CalendarFeedHook
    * 
    * @param req
    */
-  void onInit(HttpServletRequest req);
+  // Does this make sense? (a hook is a singleton and side-effects are expected). TODO
+  // void onInit(HttpServletRequest req);
 
   /**
-   * @param user
-   * @param timezone
+   * @param req
+   * @param timezone The time zone of the ics framework (build from {@link PFUserContext#getTimeZone()}.
    * @param cal
    */
-  List<VEvent> getEvents(PFUserDO user, final TimeZone timezone, final java.util.Calendar cal);
+  public List<VEvent> getEvents(final HttpServletRequest req, TimeZone timeZone, final java.util.Calendar cal);
 
 }
