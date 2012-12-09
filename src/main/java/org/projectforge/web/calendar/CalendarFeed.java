@@ -52,6 +52,7 @@ import net.fortuna.ical4j.model.property.Version;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.protocol.http.WebApplication;
+import org.projectforge.access.AccessException;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.registry.Registry;
 import org.projectforge.timesheet.TimesheetDO;
@@ -59,7 +60,9 @@ import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.timesheet.TimesheetFilter;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserDao;
+import org.projectforge.user.UserRights;
 import org.projectforge.web.timesheet.TimesheetEventsProvider;
 
 /**
@@ -71,6 +74,7 @@ import org.projectforge.web.timesheet.TimesheetEventsProvider;
  */
 public class CalendarFeed extends HttpServlet
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(CalendarFeed.class);
 
   private static final long serialVersionUID = 1480433876190009435L;
 
@@ -188,8 +192,12 @@ public class CalendarFeed extends HttpServlet
    * 
    * @return
    */
-  private List<VEvent> getEvents(final HttpServletRequest req, final PFUserDO timesheetUser)
+  private List<VEvent> getEvents(final HttpServletRequest req, PFUserDO timesheetUser)
   {
+    final PFUserDO loggedInUser = PFUserContext.getUser();
+    if (loggedInUser == null) {
+      throw new AccessException("No logged-in-user found!");
+    }
     final List<VEvent> events = new ArrayList<VEvent>();
     final java.util.TimeZone javaTimezone = PFUserContext.getTimeZone();
     final TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
@@ -206,6 +214,11 @@ public class CalendarFeed extends HttpServlet
     }
 
     if (timesheetUser != null) {
+      if (loggedInUser.getId().equals(timesheetUser.getId()) == false && isOtherUsersAllowed() == false) {
+        // Only project managers, controllers and administrative staff is allowed to subscribe time-sheets of other users.
+        log.warn("User tried to get time-sheets of other user: " + timesheetUser);
+        timesheetUser = loggedInUser;
+      }
       // initializes timesheet filter
       final TimesheetFilter filter = new TimesheetFilter();
       filter.setUserId(timesheetUser.getId());
@@ -276,6 +289,12 @@ public class CalendarFeed extends HttpServlet
     cal.clear();
     cal.set(java.util.Calendar.YEAR, year);
     cal.set(java.util.Calendar.MONTH, mounth);
+  }
+
+  private boolean isOtherUsersAllowed()
+  {
+    return UserRights.getAccessChecker().isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP,
+        ProjectForgeGroup.PROJECT_MANAGER);
   }
 
   public static void registerFeedHook(final CalendarFeedHook hook)
