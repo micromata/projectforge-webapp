@@ -51,7 +51,6 @@ import org.projectforge.fibu.KostFormatter;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.fibu.kost.Kost2Dao;
 import org.projectforge.user.PFUserContext;
-import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
@@ -60,6 +59,7 @@ import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 @ListPage(editPage = Kost2EditPage.class)
@@ -71,9 +71,6 @@ public class Kost2ListPage extends AbstractListPage<Kost2ListForm, Kost2Dao, Kos
 
   @SpringBean(name = "kost2Dao")
   private Kost2Dao kost2Dao;
-
-  @SpringBean(name = "htmlHelper")
-  private HtmlHelper htmlHelper;
 
   public Kost2ListPage(final PageParameters parameters)
   {
@@ -135,12 +132,7 @@ public class Kost2ListPage extends AbstractListPage<Kost2ListForm, Kost2Dao, Kos
       public void populateItem(final Item<ICellPopulator<Kost2DO>> item, final String componentId, final IModel<Kost2DO> rowModel)
       {
         final Kost2DO kost2 = rowModel.getObject();
-        final StringBuffer buf = new StringBuffer();
-        if (kost2.getKost2Art() != null && kost2.getKost2Art().isFakturiert() == true) {
-          htmlHelper.appendImageTag(getResponse(), buf, "/images/accept.png", null);
-        }
-        final Label label = new Label(componentId, buf.toString());
-        label.setEscapeModelStrings(false);
+        final Label label = WicketUtils.createBooleanLabel(getResponse(), componentId, kost2.getKost2Art() != null && kost2.getKost2Art().isFakturiert() == true);
         item.add(label);
         cellItemListener.populateItem(item, componentId, rowModel);
       }
