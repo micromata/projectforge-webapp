@@ -142,10 +142,11 @@ public class Registry
     return entry != null ? entry.getDao() : null;
   }
 
-  public BaseDao< ? > getDao(final Class< ? extends BaseDao< ? >> daoClass)
+  @SuppressWarnings("unchecked")
+  public <T extends BaseDao< ? >> T getDao(final Class<T> daoClass)
   {
     final RegistryEntry entry = getEntry(daoClass);
-    return entry != null ? entry.getDao() : null;
+    return entry != null ? (T)entry.getDao() : null;
   }
 
   void setTaskTree(final TaskTree taskTree)
