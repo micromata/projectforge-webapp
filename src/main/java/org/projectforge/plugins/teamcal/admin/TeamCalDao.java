@@ -100,21 +100,31 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
     }
     final QueryFilter queryFilter = new QueryFilter(myFilter);
     final List<TeamCalDO> list = getList(queryFilter);
+    if (myFilter.isDeleted() == true) {
+      // No further filtering, show all deleted calendars.
+      return list;
+    }
     final List<TeamCalDO> result = new ArrayList<TeamCalDO>();
     final TeamCalRight right = (TeamCalRight) getUserRight();
     final PFUserDO user = PFUserContext.getUser();
     final Integer userId = user.getId();
     for (final TeamCalDO cal : list) {
       final boolean isOwn = right.isOwner(user, cal);
-      if (myFilter.isOwn() == true && isOwn == true) {
-        // Calendar matches the filter:
-        result.add(cal);
-      } else if (myFilter.isForeign() == true && isOwn == false) {
-        if ((myFilter.isFullAccess() == true && right.hasFullAccess(cal, userId) == true)
-            || (myFilter.isReadonlyAccess() == true && right.hasReadonlyAccess(cal, userId) == true)
-            || (myFilter.isMinimalAccess() == true && right.hasMinimalAccess(cal, userId) == true)) {
+      if (isOwn == true) {
+        // User is owner.
+        if (myFilter.isAll() == true || myFilter.isOwn() == true) {
           // Calendar matches the filter:
           result.add(cal);
+        }
+      } else {
+        // User is not owner.
+        if (myFilter.isAll() == true || myFilter.isOthers() == true) {
+          if ((myFilter.isFullAccess() == true && right.hasFullAccess(cal, userId) == true)
+              || (myFilter.isReadonlyAccess() == true && right.hasReadonlyAccess(cal, userId) == true)
+              || (myFilter.isMinimalAccess() == true && right.hasMinimalAccess(cal, userId) == true)) {
+            // Calendar matches the filter:
+            result.add(cal);
+          }
         }
       }
     }

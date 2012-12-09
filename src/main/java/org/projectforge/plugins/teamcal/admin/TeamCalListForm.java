@@ -24,15 +24,17 @@
 package org.projectforge.plugins.teamcal.admin;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.RadioGroupPanel;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
- *
+ * 
  */
 public class TeamCalListForm extends AbstractListForm<TeamCalFilter, TeamCalListPage>
 {
@@ -40,7 +42,8 @@ public class TeamCalListForm extends AbstractListForm<TeamCalFilter, TeamCalList
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalListForm.class);
 
-  public TeamCalListForm(final TeamCalListPage parentPage){
+  public TeamCalListForm(final TeamCalListPage parentPage)
+  {
     super(parentPage);
   }
 
@@ -56,29 +59,73 @@ public class TeamCalListForm extends AbstractListForm<TeamCalFilter, TeamCalList
   /**
    * @see org.projectforge.web.wicket.AbstractListForm#init()
    */
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
     super.init();
     gridBuilder.newColumnsPanel();
     gridBuilder.newColumnPanel(DivType.COL_66);
-    //        getSearchFilter().setOwnerId(getUserId());
+    // getSearchFilter().setOwnerId(getUserId());
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
       fs.setOutputMarkupId(true);
 
-      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
-          new PropertyModel<Boolean>(getSearchFilter(), "own"), getString("plugins.teamcal.own")));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
-          new PropertyModel<Boolean>(getSearchFilter(), "foreign"), getString("plugins.teamcal.others")));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
-          new PropertyModel<Boolean>(getSearchFilter(), "fullAccess"), getString("plugins.teamcal.fullAccess")));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
-          new PropertyModel<Boolean>(getSearchFilter(), "readonlyAccess"), getString("plugins.teamcal.readonlyAccess")));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
-          new PropertyModel<Boolean>(getSearchFilter(), "minimalAccess"), getString("plugins.teamcal.minimalAccess")));
+      {
+        final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
+        final RadioGroupPanel<TeamCalFilter.OwnerType> radioGroup = new RadioGroupPanel<TeamCalFilter.OwnerType>(
+            radioGroupPanel.newChildId(), "ownerType", new PropertyModel<TeamCalFilter.OwnerType>(getSearchFilter(), "ownerType")) {
+          /**
+           * @see org.projectforge.web.wicket.flowlayout.RadioGroupPanel#wantOnSelectionChangedNotifications()
+           */
+          @Override
+          protected boolean wantOnSelectionChangedNotifications()
+          {
+            return true;
+          }
+
+          /**
+           * @see org.projectforge.web.wicket.flowlayout.RadioGroupPanel#onSelectionChanged(java.lang.Object)
+           */
+          @Override
+          protected void onSelectionChanged(final Object newSelection)
+          {
+            parentPage.refresh();
+          }
+
+          /**
+           * @see org.apache.wicket.Component#isVisible()
+           */
+          @Override
+          public boolean isVisible()
+          {
+            return getSearchFilter().isDeleted() == false;
+          }
+        };
+        radioGroupPanel.add(radioGroup);
+        radioGroup.add(new Model<TeamCalFilter.OwnerType>(TeamCalFilter.OwnerType.ALL), getString("filter.all"));
+        radioGroup.add(new Model<TeamCalFilter.OwnerType>(TeamCalFilter.OwnerType.OWN), getString("plugins.teamcal.own"));
+        radioGroup.add(new Model<TeamCalFilter.OwnerType>(TeamCalFilter.OwnerType.OTHERS), getString("plugins.teamcal.others"));
+      }
+      DivPanel checkBoxPanel = new DivPanel(fs.newChildId(), DivType.CHECKBOX) {
+        @Override
+        public boolean isVisible()
+        {
+
+          // Show check box panel only if user selects others calendar.
+          return getSearchFilter().isDeleted() == false && (getSearchFilter().isAll() == true || getSearchFilter().isOthers() == true);
+        }
+      };
       fs.add(checkBoxPanel);
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+          "fullAccess"), getString("plugins.teamcal.fullAccess")));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+          "readonlyAccess"), getString("plugins.teamcal.readonlyAccess")));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+          "minimalAccess"), getString("plugins.teamcal.minimalAccess")));
+      fs.add(checkBoxPanel);
+      checkBoxPanel = fs.addNewCheckBoxDiv();
+      checkBoxPanel.add(createOnlyDeletedCheckBoxPanel(checkBoxPanel.newChildId()));
     }
     {
       // DropDownChoice page size

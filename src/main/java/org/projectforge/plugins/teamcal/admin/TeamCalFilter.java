@@ -35,7 +35,14 @@ public class TeamCalFilter extends BaseSearchFilter implements Serializable
 {
   private static final long serialVersionUID = 7410573665085873058L;
 
-  private boolean own, foreign, fullAccess, readonlyAccess, minimalAccess;
+  public enum OwnerType
+  {
+    ALL, OWN, OTHERS;
+  }
+
+  private boolean fullAccess, readonlyAccess, minimalAccess;
+
+  protected OwnerType calOwner;
 
   public TeamCalFilter()
   {
@@ -45,42 +52,50 @@ public class TeamCalFilter extends BaseSearchFilter implements Serializable
   public TeamCalFilter(final BaseSearchFilter filter)
   {
     super(filter);
-    own = foreign = fullAccess = readonlyAccess = minimalAccess = true;
+    fullAccess = readonlyAccess = minimalAccess = true;
+    calOwner = OwnerType.ALL;
   }
 
   /**
-   * @return the own
+   * @return the filterType
+   */
+  public OwnerType getOwnerType()
+  {
+    return calOwner;
+  }
+
+  /**
+   * @param calOwner the filterType to set
+   * @return this for chaining.
+   */
+  public TeamCalFilter setOwnerType(final OwnerType calOwner)
+  {
+    this.calOwner = calOwner;
+    return this;
+  }
+
+  /**
+   * @return true if calOwner == {@link OwnerType#OWN}
+   */
+  public boolean isAll()
+  {
+    return calOwner == OwnerType.ALL;
+  }
+
+  /**
+   * @return true if calOwner == {@link OwnerType#OWN}
    */
   public boolean isOwn()
   {
-    return own;
+    return calOwner == OwnerType.OWN;
   }
 
   /**
-   * @param own the own to set
+   * @return true if calOwner == {@link OwnerType#OTHERS}
    */
-  public TeamCalFilter setOwn(final boolean own)
+  public boolean isOthers()
   {
-    this.own = own;
-    return this;
-  }
-
-  /**
-   * @return the foreign
-   */
-  public boolean isForeign()
-  {
-    return foreign;
-  }
-
-  /**
-   * @param foreign the foreign to set
-   * @return this for chaining.
-   */
-  public TeamCalFilter setForeign(final boolean foreign)
-  {
-    this.foreign = foreign;
-    return this;
+    return calOwner == OwnerType.OTHERS;
   }
 
   /**
@@ -136,5 +151,4 @@ public class TeamCalFilter extends BaseSearchFilter implements Serializable
     this.fullAccess = fullAccess;
     return this;
   }
-
 }
