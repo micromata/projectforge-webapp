@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 import org.hibernate.criterion.Conjunction;
@@ -41,7 +42,6 @@ import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.user.UserRightId;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 /**
  * 
@@ -84,7 +84,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     } else {
       teamEventFilter = new TeamEventFilter(filter);
     }
-    if (CollectionUtils.isEmpty(teamEventFilter.getTeamCals()) == true) {
+    if (CollectionUtils.isEmpty(teamEventFilter.getTeamCals()) == true && teamEventFilter.getTeamCalId() == null) {
       return null;
     }
     final QueryFilter qFilter = buildQueryFilter(teamEventFilter);
@@ -97,7 +97,9 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
   {
     final QueryFilter queryFilter = new QueryFilter(filter);
     final Collection<TeamCalDO> cals = filter.getTeamCals();
-    if (cals != null) {
+    if (CollectionUtils.isNotEmpty(cals) == true) {
+      queryFilter.add(Restrictions.in("calendar", cals));
+    } else if (filter.getTeamCalId() != null) {
       final TeamCalDO teamCal = new TeamCalDO();
       teamCal.setId(filter.getTeamCalId());
       queryFilter.add(Restrictions.eq("calendar", teamCal));

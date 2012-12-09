@@ -113,8 +113,8 @@ IListPageColumnsCreator<TeamEventDO>
         "subject", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<TeamEventDO>(getString("plugins.teamevent.beginDate"),
         getSortable("startDate", sortable), "startDate", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<TeamEventDO>(getString("plugins.teamevent.endDate"), getSortable("stopDate", sortable),
-        "stopDate", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<TeamEventDO>(getString("plugins.teamevent.endDate"), getSortable("endDate", sortable),
+        "endDate", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<TeamEventDO>(getString("plugins.teamevent.allDay"), getSortable("allDay", sortable),
         "allDay", cellItemListener) {
       @Override
@@ -127,6 +127,16 @@ IListPageColumnsCreator<TeamEventDO>
       }
     });
     return columns;
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#onSearchSubmit()
+   */
+  @Override
+  protected boolean onSearchSubmit()
+  {
+    getFilter().setTeamCals(form.calendarsListHelper.getAssignedItems());
+    return super.onSearchSubmit();
   }
 
   protected TeamEventFilter getFilter()

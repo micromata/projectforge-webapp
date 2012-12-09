@@ -47,7 +47,7 @@ public class TeamCalsProvider extends TextChoiceProvider<TeamCalDO>
 
   private Collection<TeamCalDO> sortedCals;
 
-  private TeamCalCache teamCalCache;
+  private transient TeamCalCache teamCalCache;
 
   /**
    * @param calIds

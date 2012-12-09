@@ -23,14 +23,23 @@
 
 package org.projectforge.plugins.teamcal.event;
 
+import java.util.Collection;
+
 import org.apache.log4j.Logger;
+import org.apache.wicket.model.PropertyModel;
+import org.projectforge.plugins.teamcal.admin.TeamCalDO;
+import org.projectforge.plugins.teamcal.admin.TeamCalsComparator;
+import org.projectforge.plugins.teamcal.admin.TeamCalsProvider;
+import org.projectforge.web.common.MultiChoiceListHelper;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
+import com.vaynberg.wicket.select2.Select2MultiChoice;
+
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
- *
+ * 
  */
 public class TeamEventListForm extends AbstractListForm<TeamEventFilter, TeamEventListPage>
 {
@@ -38,7 +47,10 @@ public class TeamEventListForm extends AbstractListForm<TeamEventFilter, TeamEve
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamEventListForm.class);
 
-  public TeamEventListForm(final TeamEventListPage parentPage){
+  MultiChoiceListHelper<TeamCalDO> calendarsListHelper;
+
+  public TeamEventListForm(final TeamEventListPage parentPage)
+  {
     super(parentPage);
   }
 
@@ -63,6 +75,22 @@ public class TeamEventListForm extends AbstractListForm<TeamEventFilter, TeamEve
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
       fs.setOutputMarkupId(true);
+    }
+    {
+      // Team calendar
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.calendar"));// .setLabelSide(false);
+      final TeamCalsProvider calendarProvider = new TeamCalsProvider();
+      calendarsListHelper = new MultiChoiceListHelper<TeamCalDO>().setComparator(new TeamCalsComparator()).setFullList(
+          calendarProvider.getSortedCalenders());
+      final Collection<TeamCalDO> list = getFilter().getTeamCals();
+      if (list != null) {
+        for (final TeamCalDO cal : list) {
+          calendarsListHelper.addOriginalAssignedItem(cal).assignItem(cal);
+        }
+      }
+      final Select2MultiChoice<TeamCalDO> calendars = new Select2MultiChoice<TeamCalDO>(fs.getSelect2MultiChoiceId(),
+          new PropertyModel<Collection<TeamCalDO>>(this.calendarsListHelper, "assignedItems"), calendarProvider);
+      fs.add(calendars);
     }
     {
       // DropDownChoice page size
