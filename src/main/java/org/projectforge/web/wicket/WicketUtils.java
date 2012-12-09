@@ -66,6 +66,7 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.ConfigXml;
+import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.URLHelper;
 import org.projectforge.web.WebConfig;
 import org.projectforge.web.calendar.DateTimeFormatter;
@@ -1053,6 +1054,16 @@ public class WicketUtils
   public static String createMultipleFieldsetLabel(final String... labels)
   {
     return StringHelper.listToString("/", labels);
+  }
+
+  public static Label createBooleanLabel(final Response response, final String componentId, final boolean value) {
+    final StringBuffer buf = new StringBuffer();
+    if (value == true) {
+      HtmlHelper.getInstance().appendImageTag(response, buf, "/images/accept.png", null);
+    }
+    final Label label = new Label(componentId, buf.toString());
+    label.setEscapeModelStrings(false);
+    return label;
   }
 
   /**
