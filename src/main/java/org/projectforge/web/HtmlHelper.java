@@ -40,6 +40,13 @@ public class HtmlHelper
 
   public static final String IMAGE_INFO_ICON = "/images/information.png";
 
+  private static final HtmlHelper instance = new HtmlHelper();
+
+  public static HtmlHelper getInstance()
+  {
+    return instance;
+  }
+
   /**
    * Only xml characters will be escaped (for compatibility with fop rendering engine).
    * @return
@@ -139,12 +146,14 @@ public class HtmlHelper
     return buf.toString();
   }
 
-  public HtmlHelper appendImageTag(final Response response, final StringBuffer buf, final String src, final String width, final String height)
+  public HtmlHelper appendImageTag(final Response response, final StringBuffer buf, final String src, final String width,
+      final String height)
   {
     return appendImageTag(response, buf, src, width, height, null, null);
   }
 
-  public HtmlHelper appendImageTag(final Response response, final StringBuffer buf, final String src, final String width, final String height, final String tooltip)
+  public HtmlHelper appendImageTag(final Response response, final StringBuffer buf, final String src, final String width,
+      final String height, final String tooltip)
   {
     return appendImageTag(response, buf, src, width, height, tooltip, null);
   }
@@ -168,8 +177,8 @@ public class HtmlHelper
    * @param tooltip If null, than this attribute will be ignored.
    * @param align If null, than this attribute will be ignored.
    */
-  public HtmlHelper appendImageTag(final Response response, final StringBuffer buf, final String src, final String width, final String height,
-      final String tooltip, final HtmlAlignment align)
+  public HtmlHelper appendImageTag(final Response response, final StringBuffer buf, final String src, final String width,
+      final String height, final String tooltip, final HtmlAlignment align)
   {
 
     final HtmlTagBuilder tag = new HtmlTagBuilder(buf, "img");
