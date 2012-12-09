@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.Location;
@@ -135,10 +136,13 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
             vEvent = new VEvent(startTime, stopTime, teamEvent.getSubject() + calendarName);
             vEvent.getProperties().add(new Uid(startTime.toString()));
           }
-
-          vEvent.getProperties().add(new Location(teamEvent.getLocation()));
+          if (StringUtils.isNotBlank(teamEvent.getLocation()) == true) {
+            vEvent.getProperties().add(new Location(teamEvent.getLocation()));
+          }
           vEvent.getProperties().add(new Name(teamEvent.getCalendar().getTitle()));
-
+          if (StringUtils.isNotBlank(teamEvent.getNote()) == true) {
+            vEvent.getProperties().add(new Description(teamEvent.getNote()));
+          }
           events.add(vEvent);
         }
       }

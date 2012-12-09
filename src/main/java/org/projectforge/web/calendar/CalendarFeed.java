@@ -60,6 +60,7 @@ import org.projectforge.timesheet.TimesheetFilter;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
+import org.projectforge.web.timesheet.TimesheetEventsProvider;
 
 /**
  * Feed Servlet, which generates a 'text/calendar' output of the last four mounts. Currently relevant informations are date, start- and stop
@@ -195,6 +196,15 @@ public class CalendarFeed extends HttpServlet
     final TimeZone timezone = registry.getTimeZone(javaTimezone.getID());
     final java.util.Calendar cal = java.util.Calendar.getInstance(javaTimezone);
 
+    boolean eventsExist = false;
+    for (final CalendarFeedHook hook : feedHooks) {
+      final List<VEvent> list = hook.getEvents(req, timezone, cal);
+      if (list != null && list.size() > 0) {
+        events.addAll(list);
+        eventsExist = true;
+      }
+    }
+
     if (timesheetUser != null) {
       // initializes timesheet filter
       final TimesheetFilter filter = new TimesheetFilter();
@@ -225,22 +235,15 @@ public class CalendarFeed extends HttpServlet
         final DateTime stopTime = getCalTime(timezone, cal);
 
         final VEvent vEvent;
-        if (feedHooks.size() > 0) {
-          vEvent = new VEvent(startTime, stopTime, timesheet.getShortDescription() + " (timesheet)");
+        if (eventsExist == true) {
+          vEvent = new VEvent(startTime, stopTime, TimesheetEventsProvider.getTitle(timesheet) + " (timesheet)");
         } else {
-          vEvent = new VEvent(startTime, stopTime, timesheet.getShortDescription());
+          vEvent = new VEvent(startTime, stopTime, TimesheetEventsProvider.getTitle(timesheet));
         }
         vEvent.getProperties().add(new Uid(startTime.toString()));
         vEvent.getProperties().add(new Location(timesheet.getLocation()));
 
         events.add(vEvent);
-      }
-    }
-
-    for (final CalendarFeedHook hook : feedHooks) {
-      final List<VEvent> list = hook.getEvents(req, timezone, cal);
-      if (list != null) {
-        events.addAll(list);
       }
     }
 
