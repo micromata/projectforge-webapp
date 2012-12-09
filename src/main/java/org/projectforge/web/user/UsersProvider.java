@@ -32,7 +32,9 @@ import org.apache.commons.lang.StringUtils;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.common.StringHelper;
 import org.projectforge.registry.Registry;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
 
 import com.vaynberg.wicket.select2.Response;
@@ -45,6 +47,8 @@ public class UsersProvider extends TextChoiceProvider<PFUserDO>
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UsersProvider.class);
 
   private transient UserGroupCache userGroupCache;
+
+  private transient UserDao userDao;
 
   private int pageSize = 20;
 
@@ -79,8 +83,9 @@ public class UsersProvider extends TextChoiceProvider<PFUserDO>
     if (sortedUsers == null) {
       sortedUsers = new TreeSet<PFUserDO>(usersComparator);
       final Collection<PFUserDO> allusers = getUserGroupCache().getAllUsers();
+      final PFUserDO loggedInUser = PFUserContext.getUser();
       for (final PFUserDO user : allusers) {
-        if (user.isDeleted() == false && user.isDeactivated() == false) {
+        if (user.isDeleted() == false && user.isDeactivated() == false && getUserDao().hasSelectAccess(loggedInUser, user, false) == true) {
           sortedUsers.add(user);
         }
       }
@@ -213,5 +218,16 @@ public class UsersProvider extends TextChoiceProvider<PFUserDO>
       userGroupCache = Registry.instance().getUserGroupCache();
     }
     return userGroupCache;
+  }
+
+  /**
+   * @return the userDao
+   */
+  private UserDao getUserDao()
+  {
+    if (userDao == null) {
+      userDao = Registry.instance().getDao(UserDao.class);
+    }
+    return userDao;
   }
 }
