@@ -30,6 +30,7 @@ import java.util.List;
 import net.ftlines.wicket.fullcalendar.Event;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
@@ -102,7 +103,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
     final TeamEventFilter eventFilter = new TeamEventFilter();
     List<TeamCalDO> selectedCalendars = new ArrayList<TeamCalDO>();
     if (filter.getCurrentCollection() != null && filter.getCurrentCollection().getTeamCalsVisibleList() != null) {
-      for (Integer id : filter.getCurrentCollection().getTeamCalsVisibleList()) {
+      for (final Integer id : filter.getCurrentCollection().getTeamCalsVisibleList()) {
         selectedCalendars.add(teamCalDao.getById(id));
       }
     } else {
@@ -175,14 +176,13 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
 
             if (event.isAllDay() == false)
               durationString = "\n" + getString("plugins.teamevent.duration") + ": " + hour + ":" + minute;
-            title = getString("plugins.teamevent.subject")
-                + ": "
-                + teamEvent.getSubject()
-                + "\n"
-                + getString("plugins.teamevent.note")
-                + ": "
-                + (teamEvent.getNote() == null ? "" : teamEvent.getNote())
-                + durationString;
+            final StringBuffer buf = new StringBuffer();
+            buf.append(getString("plugins.teamevent.subject")).append(": ").append(teamEvent.getSubject());
+            if (StringUtils.isNotBlank(teamEvent.getNote()) == true) {
+              buf.append("\n").append(getString("plugins.teamevent.note")).append(": ").append(      teamEvent.getNote());
+            }
+            buf.append(durationString);
+            title = buf.toString();
           } else {
             title = teamEvent.getSubject();
           }
