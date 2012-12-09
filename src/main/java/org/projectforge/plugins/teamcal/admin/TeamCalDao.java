@@ -263,4 +263,14 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
     return list;
   }
 
+  /**
+   * Calls {@link TeamCalCache#setExpired()}.
+   * @see org.projectforge.core.BaseDao#afterSaveOrModify(org.projectforge.core.ExtendedBaseDO)
+   */
+  @Override
+  protected void afterSaveOrModify(final TeamCalDO obj)
+  {
+    super.afterSaveOrModify(obj);
+    TeamCalCache.getInstance().setExpired();
+  }
 }
