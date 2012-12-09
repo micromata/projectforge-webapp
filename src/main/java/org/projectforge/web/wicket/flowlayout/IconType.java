@@ -32,7 +32,7 @@ public enum IconType
   ALERT("alert"), ARROW_REFRESH("arrowrefresh-1-e"), CIRCLE_MINUS("circle-minus"), CIRCLE_ARROW_EAST("circle-arrow-e"), CIRCLE_ARROW_WEST(
       "circle-arrow-w"), CIRCLE_CLOSE("circle-close"), CIRCLE_PLUS("circle-plus"), CLIPBOARD("clipboard"), CLOCK("clock"), DOCUMENT(
           "document"), FOLDER_OPEN("folder-open"), HELP("help"), JIRA_SUPPORT("star"), KEYBOARD("calculator"), MINUS_THICK("minusthick"), MODIFIED(
-              "alert"), PLUS_THICK("plusthick"), //
+              "alert"), PLUS_THICK("plusthick"), SEARCH("search"), //
               /** RSS feed symbol. */
               SUBSCRIPTION("signal-diag"), TRASH("trash"), CALENDAR("calendar"), WRENCH("wrench");
 
