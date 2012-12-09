@@ -31,17 +31,13 @@ import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulato
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
-import org.apache.wicket.markup.html.link.ExternalLink;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.user.PFUserContext;
-import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserDao;
-import org.projectforge.web.WebConfiguration;
+import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
@@ -50,32 +46,27 @@ import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
-import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
-import org.projectforge.web.wicket.flowlayout.IconType;
+import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
 @ListPage(editPage = TeamEventEditPage.class)
-public class TeamEventListPage extends AbstractListPage<TeamEventListForm, TeamEventDao, TeamEventDO> implements IListPageColumnsCreator<TeamEventDO>
+public class TeamEventListPage extends AbstractListPage<TeamEventListForm, TeamEventDao, TeamEventDO> implements
+IListPageColumnsCreator<TeamEventDO>
 {
   private static final long serialVersionUID = 1749480610890950450L;
 
   @SpringBean(name = "teamEventDao")
   private TeamEventDao teamEventDao;
 
-  @SpringBean(name = "userDao")
-  private UserDao userDao;
-
-  private String iCalTarget;
-
   /**
    * 
    */
   public TeamEventListPage(final PageParameters parameters)
   {
-    super(parameters, "plugins.teamcal");
+    super(parameters, "plugins.teamevent");
   }
 
   /**
@@ -98,9 +89,10 @@ public class TeamEventListPage extends AbstractListPage<TeamEventListForm, TeamE
       }
     };
 
-    columns.add(new CellItemListenerPropertyColumn<TeamEventDO>(getString("plugins.teamcal.title"), getSortable("title", sortable), "title", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<TeamEventDO>(getString("plugins.teamcal.calendar"), null, "calendar", cellItemListener) {
       /**
-       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item, java.lang.String, org.apache.wicket.model.IModel)
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
        */
       @Override
       public void populateItem(final Item<ICellPopulator<TeamEventDO>> item, final String componentId, final IModel<TeamEventDO> rowModel)
@@ -110,62 +102,31 @@ public class TeamEventListPage extends AbstractListPage<TeamEventListForm, TeamE
         if (cssStyle.length() > 0) {
           item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
-        item.add(new ListSelectActionPanel(componentId, rowModel, TeamEventEditPage.class, teamEvent.getId(), returnToPage, teamEvent.getSubject()));
+        final TeamCalDO calendar = teamEvent.getCalendar();
+        item.add(new ListSelectActionPanel(componentId, rowModel, TeamEventEditPage.class, teamEvent.getId(), returnToPage,
+            calendar != null ? calendar.getTitle() : ""));
         addRowClick(item);
       }
     });
 
-    columns.add(new CellItemListenerPropertyColumn<TeamEventDO>(getString("plugins.teamcal.description"), getSortable("description", sortable),
-        "description", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<TeamEventDO>(getString("plugins.teamcal.owner"), getSortable("owner", sortable), "owner.username",
-        cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<TeamEventDO>(getString("lastUpdate"), getSortable("lastUpdate", sortable), "lastUpdate",
-        cellItemListener));
-    // ics export buttons
-    columns.add(new CellItemListenerPropertyColumn<TeamEventDO>(getString("plugins.teamcal.subscribe.column"), getSortable("", sortable), "pk",
-        cellItemListener) {
-      /**
-       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item, java.lang.String, org.apache.wicket.model.IModel)
-       */
+    columns.add(new CellItemListenerPropertyColumn<TeamEventDO>(getString("plugins.teamevent.subject"), getSortable("subject", sortable),
+        "subject", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<TeamEventDO>(getString("plugins.teamevent.beginDate"),
+        getSortable("startDate", sortable), "startDate", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<TeamEventDO>(getString("plugins.teamevent.endDate"), getSortable("stopDate", sortable),
+        "stopDate", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<TeamEventDO>(getString("plugins.teamevent.allDay"), getSortable("allDay", sortable),
+        "allDay", cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<TeamEventDO>> item, final String componentId, final IModel<TeamEventDO> rowModel)
       {
-        if (accessChecker.isRestrictedUser() == false && WebConfiguration.isDevelopmentMode() == true) {
-          final TeamEventDO teamEvent = rowModel.getObject();
-          createICalTarget(teamEvent.getId());
-          final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, iCalTarget);
-          final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(componentId, IconType.SUBSCRIPTION,
-              getString("plugins.teamcal.subscribe"), iCalExportLink).setLight();
-          item.add(exportICalButtonPanel);
-          final StringBuffer cssStyle = getCssStyle(teamEvent.getId(), teamEvent.isDeleted());
-          if (cssStyle.length() > 0) {
-            item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
-          }
-        }
+        final TeamEventDO event = rowModel.getObject();
+        final Label label = WicketUtils.createBooleanLabel(getResponse(), componentId, event.isAllDay() == true);
+        item.add(label);
+        cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
     return columns;
-  }
-
-  /**
-   * creates an URL for ics export.
-   * 
-   * @param id
-   */
-  public void createICalTarget(final Integer id)
-  {
-    final PFUserDO user = PFUserContext.getUser();
-    final String authenticationKey = userDao.getAuthenticationToken(user.getId());
-    final String contextPath = WebApplication.get().getServletContext().getContextPath();
-    iCalTarget = contextPath
-        + "/export/ProjectForge.ics?timesheetUser="
-        + user.getUsername()
-        + "&token="
-        + authenticationKey
-        + "&teamEvents="
-        + id
-        + "&timesheetRequired="
-        + false;
   }
 
   protected TeamEventFilter getFilter()

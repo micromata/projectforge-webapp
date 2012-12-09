@@ -41,6 +41,7 @@ import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.user.UserRightId;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 /**
  * 
@@ -83,7 +84,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     } else {
       teamEventFilter = new TeamEventFilter(filter);
     }
-    if (teamEventFilter.getTeamCals().isEmpty()) {
+    if (CollectionUtils.isEmpty(teamEventFilter.getTeamCals()) == true) {
       return null;
     }
     final QueryFilter qFilter = buildQueryFilter(teamEventFilter);

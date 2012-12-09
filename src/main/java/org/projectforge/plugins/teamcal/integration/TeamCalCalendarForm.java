@@ -33,6 +33,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
 import org.projectforge.plugins.teamcal.dialog.TeamCalDialog;
+import org.projectforge.plugins.teamcal.event.TeamEventListPage;
 import org.projectforge.web.calendar.CalendarFilter;
 import org.projectforge.web.calendar.CalendarForm;
 import org.projectforge.web.calendar.CalendarPage;
@@ -64,6 +65,7 @@ public class TeamCalCalendarForm extends CalendarForm
   /**
    * @see org.projectforge.web.calendar.CalendarForm#addControlButtons(org.projectforge.web.wicket.flowlayout.FieldsetPanel)
    */
+  @SuppressWarnings("serial")
   @Override
   protected void addControlButtons(final FieldsetPanel fs)
   {
@@ -84,6 +86,22 @@ public class TeamCalCalendarForm extends CalendarForm
     };
     calendarButtonPanel.setLight();
     fs.add(calendarButtonPanel);
+
+    {
+      final IconButtonPanel searchButtonPanel = new IconButtonPanel(fs.newChildId(), IconType.SEARCH,
+          getString("search")) {
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.IconButtonPanel#onSubmit()
+         */
+        @Override
+        protected void onSubmit()
+        {
+          setResponsePage(TeamEventListPage.class);
+        }
+      };
+      searchButtonPanel.setLight();
+      fs.add(searchButtonPanel);
+    }
 
     if (filter.getCurrentCollection() != null) {
       final IChoiceRenderer<TeamCalCalendarCollection> teamCalCollectionRenderer = new IChoiceRenderer<TeamCalCalendarCollection>() {

@@ -24,9 +24,7 @@
 package org.projectforge.plugins.teamcal.event;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.AbstractListForm;
-import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
@@ -62,21 +60,9 @@ public class TeamEventListForm extends AbstractListForm<TeamEventFilter, TeamEve
     super.init();
     gridBuilder.newColumnsPanel();
     gridBuilder.newColumnPanel(DivType.COL_66);
-    //        getSearchFilter().setOwnerId(getUserId());
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
       fs.setOutputMarkupId(true);
-
-      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
-          new PropertyModel<Boolean>(getSearchFilter(), "own"), getString("plugins.teamcal.own")));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
-          new PropertyModel<Boolean>(getSearchFilter(), "fullAccess"), getString("plugins.teamcal.fullAccess")));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
-          new PropertyModel<Boolean>(getSearchFilter(), "readonlyAccess"), getString("plugins.teamcal.readonlyAccess")));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
-          new PropertyModel<Boolean>(getSearchFilter(), "minimalAccess"), getString("plugins.teamcal.minimalAccess")));
-      fs.add(checkBoxPanel);
     }
     {
       // DropDownChoice page size
