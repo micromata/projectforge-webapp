@@ -629,7 +629,7 @@ AbstractSecuredPage implements ISelectCallerPage
   }
 
   /**
-   * Does nothing at default. If overload, don't forget to call super.cancelSelection(String) if no property matches.
+   *  Handles modifiedByUserId. If overload, don't forget to call super.select(String) if no property matches.
    * @see org.projectforge.web.wicket.AbstractListPage#select(java.lang.String, java.lang.Object)
    */
   public void select(final String property, final Object selectedValue)
@@ -644,7 +644,7 @@ AbstractSecuredPage implements ISelectCallerPage
   }
 
   /**
-   * 
+   * Handles modifiedByUserId. If overload, don't forget to call super.select(String) if no property matches.
    * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
    */
   public void unselect(final String property)
