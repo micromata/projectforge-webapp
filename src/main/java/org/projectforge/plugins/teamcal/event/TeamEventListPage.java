@@ -24,8 +24,10 @@
 package org.projectforge.plugins.teamcal.event;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
@@ -38,6 +40,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
+import org.projectforge.plugins.teamcal.admin.TeamCalsProvider;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
@@ -56,6 +59,8 @@ import org.projectforge.web.wicket.WicketUtils;
 public class TeamEventListPage extends AbstractListPage<TeamEventListForm, TeamEventDao, TeamEventDO> implements
 IListPageColumnsCreator<TeamEventDO>
 {
+  public static final String PARAM_CALENDARS = "cals";
+
   private static final long serialVersionUID = 1749480610890950450L;
 
   @SpringBean(name = "teamEventDao")
@@ -67,6 +72,15 @@ IListPageColumnsCreator<TeamEventDO>
   public TeamEventListPage(final PageParameters parameters)
   {
     super(parameters, "plugins.teamevent");
+  }
+
+  protected void onFormInit()
+  {
+    final String str = WicketUtils.getAsString(getPageParameters(), PARAM_CALENDARS);
+    if (StringUtils.isNotBlank(str) == true) {
+      final Collection<TeamCalDO> teamCals = new TeamCalsProvider().getSortedCalendars(str);
+      getFilter().setTeamCals(teamCals);
+    }
   }
 
   /**

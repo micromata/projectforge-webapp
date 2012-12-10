@@ -70,6 +70,7 @@ public class TeamEventListForm extends AbstractListForm<TeamEventFilter, TeamEve
   protected void init()
   {
     super.init();
+    getParentPage().onFormInit();
     gridBuilder.newColumnsPanel();
     gridBuilder.newColumnPanel(DivType.COL_66);
     {

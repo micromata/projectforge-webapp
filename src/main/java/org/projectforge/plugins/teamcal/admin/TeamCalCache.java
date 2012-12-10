@@ -79,6 +79,24 @@ public class TeamCalCache extends AbstractCache
     return set;
   }
 
+  public Collection<TeamCalDO> getCalendars(final Collection<Integer> calIds)
+  {
+    final Set<TeamCalDO> set = new TreeSet<TeamCalDO>(new TeamCalsComparator());
+    if (calIds != null) {
+      for (final Integer calId : calIds) {
+        final TeamCalDO cal = getCalendar(calId);
+        if (cal == null) {
+          log.warn("Calendar with id " + calId + " not found in cache.");
+          continue;
+        }
+        if (teamCalRight.hasSelectAccess(PFUserContext.getUser()) == true) {
+          set.add(cal);
+        }
+      }
+    }
+    return set;
+  }
+
   /**
    * This method will be called by CacheHelper and is synchronized via getData();
    */

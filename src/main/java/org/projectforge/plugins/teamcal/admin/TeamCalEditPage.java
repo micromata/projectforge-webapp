@@ -67,10 +67,8 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
         @Override
         public void onClick()
         {
-          final PageParameters params = new PageParameters();
-          //params.set(PARAM_PARENT_TASK_ID, id);
-          final TeamEventListPage eventListPage = new TeamEventListPage(params);
-          setResponsePage(eventListPage);
+          final TeamEventListPage teamEventListPage = new TeamEventListPage(new PageParameters().add(TeamEventListPage.PARAM_CALENDARS, String.valueOf(id)));
+          setResponsePage(teamEventListPage);
         };
       }, getString("plugins.teamcal.events"));
       addContentMenuEntry(menu);

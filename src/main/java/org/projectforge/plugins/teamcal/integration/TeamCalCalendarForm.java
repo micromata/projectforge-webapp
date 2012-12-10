@@ -32,6 +32,8 @@ import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.projectforge.common.StringHelper;
 import org.projectforge.plugins.teamcal.dialog.TeamCalDialog;
 import org.projectforge.plugins.teamcal.event.TeamEventListPage;
 import org.projectforge.web.calendar.CalendarFilter;
@@ -96,7 +98,10 @@ public class TeamCalCalendarForm extends CalendarForm
         @Override
         protected void onSubmit()
         {
-          setResponsePage(TeamEventListPage.class);
+          final Set<Integer> visibleCalsSet = filter.getCurrentCollection().getTeamCalsVisibleList();
+          final String calendars = StringHelper.objectColToString(visibleCalsSet, ",");
+          final TeamEventListPage teamEventListPage = new TeamEventListPage(new PageParameters().add(TeamEventListPage.PARAM_CALENDARS, calendars));
+          setResponsePage(teamEventListPage);
         }
       };
       searchButtonPanel.setLight();
