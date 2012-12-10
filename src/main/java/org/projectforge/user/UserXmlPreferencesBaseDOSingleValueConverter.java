@@ -38,9 +38,9 @@ public class UserXmlPreferencesBaseDOSingleValueConverter implements SingleValue
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UserXmlPreferencesBaseDOSingleValueConverter.class);
 
-  private final Class< ? extends BaseDao< ? >> daoClass ;
+  private final Class< ? extends BaseDao< ? >> daoClass;
 
-  private final Class<? extends BaseDO<?>> doClass;
+  private final Class< ? extends BaseDO< ? >> doClass;
 
   /**
    * Marshals only the id and unmarshals by loading the instance by id from the dao.
@@ -48,7 +48,8 @@ public class UserXmlPreferencesBaseDOSingleValueConverter implements SingleValue
    * @param doClass Class of the DO which will be converted.
    * @see BaseDao#getOrLoad(Integer)
    */
-  public UserXmlPreferencesBaseDOSingleValueConverter(final Class< ? extends BaseDao< ? >> daoClass, final Class<? extends BaseDO<?>> doClass)
+  public UserXmlPreferencesBaseDOSingleValueConverter(final Class< ? extends BaseDao< ? >> daoClass,
+      final Class< ? extends BaseDO< ? >> doClass)
   {
     this.daoClass = daoClass;
     this.doClass = doClass;
@@ -67,7 +68,12 @@ public class UserXmlPreferencesBaseDOSingleValueConverter implements SingleValue
     if (obj == null) {
       return null;
     }
-    return String.valueOf(((BaseDO< ? >) obj).getId());
+    try {
+      return String.valueOf(((BaseDO< ? >) obj).getId());
+    } catch (final Exception ex) {
+      log.warn(ex.getMessage(), ex);
+      return "";
+    }
   }
 
   @Override
@@ -77,7 +83,7 @@ public class UserXmlPreferencesBaseDOSingleValueConverter implements SingleValue
       return null;
     }
     final Integer id = Integer.parseInt(str);
-    final BaseDao<?> dao = Registry.instance().getDao(daoClass);
+    final BaseDao< ? > dao = Registry.instance().getDao(daoClass);
     if (dao == null) {
       log.error("Could not get dao '" + daoClass + "'. It's not registerd in the Registry.");
       return null;
