@@ -166,6 +166,8 @@ public abstract class PFDialog extends Panel
       jsFunction = "function() {}";
     }
     target.appendJavaScript("openDialog('" + dialogContainer.getMarkupId() + "', " + jsFunction + ");");
+    // necessary to re-init tool tips
+    target.appendJavaScript("initTooltips();");
   }
 
   /**
@@ -233,7 +235,7 @@ public abstract class PFDialog extends Panel
       @Override
       protected void onError(final AjaxRequestTarget target, final Form< ? > form)
       {
-        if(ajaxCallback instanceof AjaxFormSubmitCallback) {
+        if (ajaxCallback instanceof AjaxFormSubmitCallback) {
           ((AjaxFormSubmitCallback) ajaxCallback).onError(target, form);
         }
       }
