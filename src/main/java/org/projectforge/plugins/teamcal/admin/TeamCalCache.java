@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.projectforge.common.AbstractCache;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserContext;
+import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRights;
 
 /**
@@ -71,8 +72,26 @@ public class TeamCalCache extends AbstractCache
   {
     checkRefresh();
     final Set<TeamCalDO> set = new TreeSet<TeamCalDO>(new TeamCalsComparator());
+    final PFUserDO loggedInUser = PFUserContext.getUser();
     for (final TeamCalDO cal : calendarMap.values()) {
-      if (teamCalRight.hasSelectAccess(PFUserContext.getUser()) == true) {
+      if (teamCalRight.hasSelectAccess(loggedInUser) == true) {
+        set.add(cal);
+      }
+    }
+    return set;
+  }
+
+  /**
+   * Get ordered calendars (by title and id).
+   * @return All accessible calendars of the context user (as owner or with full, read-only or minimal access).
+   */
+  public Collection<TeamCalDO> getAllOwnCalendars()
+  {
+    checkRefresh();
+    final Set<TeamCalDO> set = new TreeSet<TeamCalDO>(new TeamCalsComparator());
+    final Integer loggedInUserId = PFUserContext.getUserId();
+    for (final TeamCalDO cal : calendarMap.values()) {
+      if (teamCalRight.isOwner(loggedInUserId, cal) == true) {
         set.add(cal);
       }
     }

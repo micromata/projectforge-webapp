@@ -27,12 +27,14 @@ import java.util.Collection;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.projectforge.plugins.teamcal.admin.TeamCalCache;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalsComparator;
 import org.projectforge.plugins.teamcal.admin.TeamCalsProvider;
@@ -42,6 +44,8 @@ import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
+import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -123,8 +127,8 @@ public class TeamEventListForm extends AbstractListForm<TeamEventFilter, TeamEve
       fs.add(dependentFormComponents[0] = startDate);
       fs.setLabelFor(startDate);
       fs.add(new DivTextPanel(fs.newChildId(), " - "));
-      endDate = new DatePanel(fs.newChildId(), new PropertyModel<Date>(getSearchFilter(), "endDate"), DatePanelSettings.get().withSelectPeriodMode(
-          true));
+      endDate = new DatePanel(fs.newChildId(), new PropertyModel<Date>(getSearchFilter(), "endDate"), DatePanelSettings.get()
+          .withSelectPeriodMode(true));
       fs.add(dependentFormComponents[1] = endDate);
       {
         final SubmitLink unselectPeriod = new SubmitLink(IconLinkPanel.LINK_ID) {
@@ -150,6 +154,8 @@ public class TeamEventListForm extends AbstractListForm<TeamEventFilter, TeamEve
           return WicketUtils.getUTCDates(getSearchFilter().getStartDate(), getSearchFilter().getEndDate());
         }
       }));
+      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+      checkBoxPanel.add(createOnlyDeletedCheckBoxPanel(checkBoxPanel.newChildId()));
     }
     {
       // Team calendar
@@ -171,6 +177,25 @@ public class TeamEventListForm extends AbstractListForm<TeamEventFilter, TeamEve
       // DropDownChoice page size
       gridBuilder.newColumnPanel(DivType.COL_33);
       addPageSizeFieldset();
+    }
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("templates"), true).setNoLabelFor();
+      fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("all")) {
+        @Override
+        public final void onSubmit()
+        {
+          final Collection<TeamCalDO> assignedItems = TeamCalCache.getInstance().getAllAccessibleCalendars();
+          calendarsListHelper.setAssignedItems(assignedItems);
+        }
+      }, getString("selectAll"), SingleButtonPanel.GREY));
+      fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("own")) {
+        @Override
+        public final void onSubmit()
+        {
+          final Collection<TeamCalDO> assignedItems = TeamCalCache.getInstance().getAllOwnCalendars();
+          calendarsListHelper.setAssignedItems(assignedItems);
+        }
+      }, getString("plugins.teamcal.own"), SingleButtonPanel.GREY));
     }
   }
 
