@@ -26,6 +26,7 @@ package org.projectforge.common;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -143,10 +144,40 @@ public class StringHelper
     if (sort == true) {
       Collections.sort(list);
     }
+    return colToString(list, delimiter);
+  }
+
+  /**
+   * For example ["Micromata", "IT-Services", "Computer"] -> "Computer, IT-Services, Micromata".
+   * @param list List of input strings.
+   * @param delimiter The delimiter of the single string in output string.
+   * @param sort If true, the given list will be first sorted.
+   * @return
+   */
+  public static String colToString(final Collection<String> col, final String delimiter)
+  {
     final StringBuffer buf = new StringBuffer();
     boolean first = true;
-    for (final String item : list) {
+    for (final String item : col) {
       first = append(buf, first, item, delimiter);
+    }
+    return buf.toString();
+  }
+
+  /**
+   * For example ["Micromata", "IT-Services", "Computer"] -> "Computer, IT-Services, Micromata".
+   * @param list List of input strings.
+   * @param delimiter The delimiter of the single string in output string.
+   * @param sort If true, the given list will be first sorted.
+   * @return
+   */
+  public static String objectColToString(final Collection<?> col, final String delimiter)
+  {
+    final StringBuffer buf = new StringBuffer();
+    boolean first = true;
+    for (final Object item : col) {
+      final String str = item != null ? item.toString() : "";
+      first = append(buf, first, str, delimiter);
     }
     return buf.toString();
   }
