@@ -71,7 +71,7 @@ import org.projectforge.web.wicket.flowlayout.InputPanel;
 import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
 
 public abstract class AbstractListForm<F extends BaseSearchFilter, P extends AbstractListPage< ? , ? , ? >> extends
-AbstractSecuredForm<F, P>
+    AbstractSecuredForm<F, P>
 {
   private static final long serialVersionUID = 1304394324524767035L;
 
@@ -115,7 +115,7 @@ AbstractSecuredForm<F, P>
 
   public static DropDownChoice<Integer> getPageSizeDropDownChoice(final String id, final Locale locale, final IModel<Integer> model,
       final int minValue, final int maxValue)
-      {
+  {
     final LabelValueChoiceRenderer<Integer> pageSizeChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
     final NumberFormat nf = NumberFormat.getInstance(locale);
     for (final int size : new int[] { 3, 5, 10, 25, 50, 100, 200, 500, 1000}) {
@@ -127,7 +127,7 @@ AbstractSecuredForm<F, P>
         pageSizeChoiceRenderer);
     pageSizeChoice.setNullValid(false);
     return pageSizeChoice;
-      }
+  }
 
   public AbstractListForm(final P parentPage)
   {
@@ -167,11 +167,11 @@ AbstractSecuredForm<F, P>
           final RepeatingView repeater = new RepeatingView(FieldsetPanel.DESCRIPTION_SUFFIX_ID);
           fs.setDescriptionSuffix(repeater);
           IconPanel icon = new IconPanel(repeater.newChildId(), IconType.CIRCLE_PLUS, getString("filter.extendedSearch"))
-          .setOnClick("javascript:showExtendedFilter();");
+              .setOnClick("javascript:showExtendedFilter();");
           icon.setMarkupId("showExtendedFilter");
           repeater.add(icon);
           icon = new IconPanel(repeater.newChildId(), IconType.CIRCLE_MINUS, getString("filter.extendedSearch"))
-          .setOnClick("javascript:hideExtendedFilter();");
+              .setOnClick("javascript:hideExtendedFilter();");
           icon.setMarkupId("hideExtendedFilter");
           repeater.add(icon);
         }
@@ -198,7 +198,8 @@ AbstractSecuredForm<F, P>
         modifiedSearchExpressionLabel.setEscapeModelStrings(false);
         div.add(modifiedSearchExpressionLabel);
 
-        fs.addHelpIcon(getString("tooltip.lucene.link"), FieldSetIconPosition.TOP_RIGHT).setOnClickLocation(WebConstants.DOC_LINK_HANDBUCH_LUCENE, true);
+        fs.addHelpIcon(getString("tooltip.lucene.link"), FieldSetIconPosition.TOP_RIGHT).setOnClickLocation(
+            WebConstants.DOC_LINK_HANDBUCH_LUCENE, true);
         final String helpKeyboardImageTooltip = getHelpKeyboardImageTooltip();
         if (helpKeyboardImageTooltip != null) {
           fs.addKeyboardHelpIcon(helpKeyboardImageTooltip);
@@ -458,7 +459,9 @@ AbstractSecuredForm<F, P>
   @SuppressWarnings("unchecked")
   public F getSearchFilter()
   {
-    if (this.searchFilter == null) {
+    if (this.searchFilter != null) {
+      return this.searchFilter;
+    } else {
       if (getParentPage().isStoreFilter() == true) {
         final Object filter = getParentPage().getUserPrefEntry(this.getClass().getName() + ":Filter");
         if (filter != null) {
