@@ -96,13 +96,11 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
   public QueryFilter buildQueryFilter(final TeamEventFilter filter)
   {
     final QueryFilter queryFilter = new QueryFilter(filter);
-    final Collection<TeamCalDO> cals = filter.getTeamCals();
+    final Collection<Integer> cals = filter.getTeamCals();
     if (CollectionUtils.isNotEmpty(cals) == true) {
-      queryFilter.add(Restrictions.in("calendar", cals));
+      queryFilter.add(Restrictions.in("calendar.id", cals));
     } else if (filter.getTeamCalId() != null) {
-      final TeamCalDO teamCal = new TeamCalDO();
-      teamCal.setId(filter.getTeamCalId());
-      queryFilter.add(Restrictions.eq("calendar", teamCal));
+      queryFilter.add(Restrictions.eq("calendar,id", filter.getTeamCalId()));
     }
     // limit events to load to chosen date view.
     if (filter.getStartDate() != null && filter.getEndDate() != null) {

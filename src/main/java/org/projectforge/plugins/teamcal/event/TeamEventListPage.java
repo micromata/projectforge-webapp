@@ -82,7 +82,7 @@ IListPageColumnsCreator<TeamEventDO>
     final String str = WicketUtils.getAsString(getPageParameters(), PARAM_CALENDARS);
     if (StringUtils.isNotBlank(str) == true) {
       final Collection<TeamCalDO> teamCals = new TeamCalsProvider().getSortedCalendars(str);
-      getFilter().setTeamCals(teamCals);
+      getFilter().setTeamCals(TeamCalsProvider.getCalIdList(teamCals));
     }
   }
 
@@ -152,7 +152,7 @@ IListPageColumnsCreator<TeamEventDO>
   @Override
   protected boolean onSearchSubmit()
   {
-    getFilter().setTeamCals(form.calendarsListHelper.getAssignedItems());
+    getFilter().setTeamCals(TeamCalsProvider.getCalIdList(form.calendarsListHelper.getAssignedItems()));
     return super.onSearchSubmit();
   }
 

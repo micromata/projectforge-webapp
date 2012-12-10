@@ -163,9 +163,10 @@ public class TeamEventListForm extends AbstractListForm<TeamEventFilter, TeamEve
       final TeamCalsProvider calendarProvider = new TeamCalsProvider();
       calendarsListHelper = new MultiChoiceListHelper<TeamCalDO>().setComparator(new TeamCalsComparator()).setFullList(
           calendarProvider.getSortedCalenders());
-      final Collection<TeamCalDO> list = getFilter().getTeamCals();
+      final Collection<Integer> list = getFilter().getTeamCals();
       if (list != null) {
-        for (final TeamCalDO cal : list) {
+        for (final Integer calId : list) {
+          final TeamCalDO cal = TeamCalCache.getInstance().getCalendar(calId);
           calendarsListHelper.addOriginalAssignedItem(cal).assignItem(cal);
         }
       }

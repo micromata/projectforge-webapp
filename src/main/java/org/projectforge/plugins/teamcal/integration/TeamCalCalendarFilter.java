@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.jfree.util.Log;
+import org.projectforge.plugins.teamcal.admin.TeamCalCache;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.web.calendar.CalendarFilter;
@@ -145,14 +147,26 @@ public class TeamCalCalendarFilter extends CalendarFilter
     return result;
   }
 
-  /**
-   * @return
-   */
-  public List<TeamCalDO> calcAssignedtItems(final TeamCalDao dao, final TeamCalCalendarCollection collection)
+  public List<Integer> getSelectedCalIds(final TeamCalDao dao, final TeamCalCalendarCollection collection)
+  {
+    final List<Integer> result = new LinkedList<Integer>();
+    for (final Integer calendarId : getCalendarPk(collection)) {
+      result.add(calendarId);
+    }
+    return result;
+  }
+
+  public List<TeamCalDO> getSelectedCals(final TeamCalDao dao, final TeamCalCalendarCollection collection)
   {
     final List<TeamCalDO> result = new LinkedList<TeamCalDO>();
+    final TeamCalCache cache = TeamCalCache.getInstance();
     for (final Integer calendarId : getCalendarPk(collection)) {
-      result.add(dao.getById(calendarId));
+      final TeamCalDO cal = cache.getCalendar(calendarId);
+      if (cal != null) {
+        result.add(cal);
+      } else {
+        Log.warn("Calendar with id " + calendarId + " not found.");
+      }
     }
     return result;
   }

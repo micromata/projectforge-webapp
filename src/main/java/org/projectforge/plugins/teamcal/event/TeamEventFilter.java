@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.Date;
 
 import org.projectforge.core.BaseSearchFilter;
-import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.user.PFUserDO;
 
 /**
@@ -43,7 +42,7 @@ public class TeamEventFilter extends BaseSearchFilter implements Serializable
 
   private Integer teamCalId;
 
-  private Collection<TeamCalDO> teamCals;
+  private Collection<Integer> teamCals;
 
   private Date startDate;
 
@@ -130,7 +129,7 @@ public class TeamEventFilter extends BaseSearchFilter implements Serializable
   /**
    * @return the teamCals
    */
-  public Collection<TeamCalDO> getTeamCals()
+  public Collection<Integer> getTeamCals()
   {
     return teamCals;
   }
@@ -138,7 +137,7 @@ public class TeamEventFilter extends BaseSearchFilter implements Serializable
   /**
    * @param teamCals the teamCals to set
    */
-  public void setTeamCals(final Collection<TeamCalDO> teamCals)
+  public void setTeamCals(final Collection<Integer> teamCals)
   {
     this.teamCals = teamCals;
   }

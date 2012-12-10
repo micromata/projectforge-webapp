@@ -253,7 +253,7 @@ public class TeamCalDialog extends PFDialog
           for (final TeamCalDO calendar : selectedCalendars) {
             final WebMarkupContainer container = new WebMarkupContainer(calendarRepeater.newChildId());
             calendarRepeater.add(container);
-            IModel<Boolean> model = Model.of(newFilter.getCurrentCollection().getTeamCalsVisibleList().contains(calendar.getId()));
+            final IModel<Boolean> model = Model.of(newFilter.getCurrentCollection().getTeamCalsVisibleList().contains(calendar.getId()));
             final CheckBoxPanel checkBoxPanel = new CheckBoxPanel("isVisible", model, "");
             checkBoxPanel.getCheckBox().add(new AjaxFormComponentUpdatingBehavior("onChange") {
               private static final long serialVersionUID = 3523446385818267608L;
@@ -261,7 +261,7 @@ public class TeamCalDialog extends PFDialog
               @Override
               protected void onUpdate(final AjaxRequestTarget target)
               {
-                Boolean newSelection = checkBoxPanel.getCheckBox().getConvertedInput();
+                final Boolean newSelection = checkBoxPanel.getCheckBox().getConvertedInput();
                 if (newSelection == true) {
                   if (newFilter.getCurrentCollection().getTeamCalsVisibleList().contains(calendar.getId()) == false) {
                     newFilter.getCurrentCollection().getTeamCalsVisibleList().add(calendar.getId());
@@ -329,7 +329,7 @@ public class TeamCalDialog extends PFDialog
         protected void onUpdate(final AjaxRequestTarget target)
         {
           selectedCalendars.clear();
-          selectedCalendars.addAll(newFilter.calcAssignedtItems(teamCalDao, newFilter.getCurrentCollection()));
+          selectedCalendars.addAll(newFilter.getSelectedCals(teamCalDao, newFilter.getCurrentCollection()));
           addToTarget(target, collectionChoice.getDropDownChoice(), repeaterContainer, select, teamCalChoice);
         }
       });
@@ -358,7 +358,7 @@ public class TeamCalDialog extends PFDialog
               newFilter.getTeamCalCalendarCollection().add(addedCollection);
               newFilter.setCurrentCollection(addedCollection);
               selectedCalendars.clear();
-              selectedCalendars.addAll(newFilter.calcAssignedtItems(teamCalDao, addedCollection));
+              selectedCalendars.addAll(newFilter.getSelectedCals(teamCalDao, addedCollection));
             }
           };
           nameDialog.open(target);
@@ -403,7 +403,7 @@ public class TeamCalDialog extends PFDialog
       add(editCollectionButton);
 
       selectedCalendars.clear();
-      selectedCalendars.addAll(newFilter.calcAssignedtItems(teamCalDao, newFilter.getCurrentCollection()));
+      selectedCalendars.addAll(newFilter.getSelectedCals(teamCalDao, newFilter.getCurrentCollection()));
 
       // TEAMCAL CHOICE FIELD
       final TeamCalChoiceProvider teamProvider = new TeamCalChoiceProvider();
@@ -466,7 +466,7 @@ public class TeamCalDialog extends PFDialog
         protected void onBeforeRender()
         {
           super.onBeforeRender();
-          final List<TeamCalDO> result = newFilter.calcAssignedtItems(teamCalDao, newFilter.getCurrentCollection());
+          final List<TeamCalDO> result = newFilter.getSelectedCals(teamCalDao, newFilter.getCurrentCollection());
           final PFUserDO user = PFUserContext.getUser();
           final List<TeamCalDO> filteredList = new ArrayList<TeamCalDO>();
           filteredList.add(0, timeSheetCalendar);
@@ -521,7 +521,7 @@ public class TeamCalDialog extends PFDialog
           currentAjaxCallback.callback(target);
           collectionChoice.getDropDownChoice().setChoices(newFilter.getTeamCalCalendarCollection());
           collectionChoice.getDropDownChoice()
-              .setDefaultModel(new PropertyModel<TeamCalCalendarCollection>(newFilter, "currentCollection"));
+          .setDefaultModel(new PropertyModel<TeamCalCalendarCollection>(newFilter, "currentCollection"));
           addToTarget(target, collectionChoice.getDropDownChoice(), bottomContainer, select);
         }
 

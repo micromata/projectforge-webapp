@@ -49,6 +49,34 @@ public class TeamCalsProvider extends TextChoiceProvider<TeamCalDO>
 
   private transient TeamCalCache teamCalCache;
 
+  public static List<Integer> getCalIdList(final Collection<TeamCalDO> teamCals)
+  {
+    final List<Integer> list = new ArrayList<Integer>();
+    if (teamCals != null) {
+      for (final TeamCalDO cal : teamCals) {
+        list.add(cal.getId());
+      }
+    }
+    return list;
+  }
+
+  public static List<TeamCalDO> getCalList(final Collection<Integer> teamCalIds)
+  {
+    final List<TeamCalDO> list = new ArrayList<TeamCalDO>();
+    final TeamCalCache cache = TeamCalCache.getInstance();
+    if (teamCalIds != null) {
+      for (final Integer calId : teamCalIds) {
+        final TeamCalDO cal = cache.getCalendar(calId);
+        if (cal != null) {
+          list.add(cal);
+        } else {
+          log.warn("Calendar with id " + calId + " not found in cache.");
+        }
+      }
+    }
+    return list;
+  }
+
   /**
    * @param calIds
    * @return
@@ -72,7 +100,6 @@ public class TeamCalsProvider extends TextChoiceProvider<TeamCalDO>
   }
 
   /**
-   * 
    * @param calIds
    * @return
    */

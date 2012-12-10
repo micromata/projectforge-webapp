@@ -101,13 +101,13 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
   protected void buildEvents(final DateTime start, final DateTime end)
   {
     final TeamEventFilter eventFilter = new TeamEventFilter();
-    List<TeamCalDO> selectedCalendars = new ArrayList<TeamCalDO>();
+    List<Integer> selectedCalendars = new ArrayList<Integer>();
     if (filter.getCurrentCollection() != null && filter.getCurrentCollection().getTeamCalsVisibleList() != null) {
       for (final Integer id : filter.getCurrentCollection().getTeamCalsVisibleList()) {
-        selectedCalendars.add(teamCalDao.getById(id));
+        selectedCalendars.add(id);
       }
     } else {
-      selectedCalendars = filter.calcAssignedtItems(teamCalDao, filter.getCurrentCollection());
+      selectedCalendars = filter.getSelectedCalIds(teamCalDao, filter.getCurrentCollection());
     }
     eventFilter.setTeamCals(selectedCalendars);
     eventFilter.setStartDate(start.toDate());
@@ -116,8 +116,8 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
 
     final List<List<TeamEventDO>> eventLists = new ArrayList<List<TeamEventDO>>();
     if (selectedCalendars != null) {
-      for (final TeamCalDO calendar : selectedCalendars) {
-        eventFilter.setTeamCalId(calendar.getId());
+      for (final Integer calendarId : selectedCalendars) {
+        eventFilter.setTeamCalId(calendarId);
         eventLists.add(teamEventDao.getList(eventFilter));
       }
     }
