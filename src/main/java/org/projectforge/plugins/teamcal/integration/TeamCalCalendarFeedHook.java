@@ -56,25 +56,11 @@ import org.projectforge.web.calendar.CalendarFeedHook;
  */
 public class TeamCalCalendarFeedHook implements CalendarFeedHook
 {
-  // TODO: Oups, this is an hook (singleton), this does result in side-effects, doesn't it?
-  // private String[] teamCalIds;
 
   public static final String getUrl(final String teamCalIds)
   {
     return CalendarFeed.getUrl("&teamCals=" + teamCalIds);
   }
-
-  /**
-   * @see org.projectforge.web.calendar.CalendarFeedHook#onInit()
-   */
-  // @Override
-  // public void onInit(final HttpServletRequest req)
-  // {
-  // final String teamCals = req.getParameter("teamCals");
-  // if (teamCals != null) {
-  // teamCalIds = StringUtils.split(teamCals, ";");
-  // }
-  // }
 
   /**
    * @see org.projectforge.web.calendar.CalendarFeedHook#getEvents(net.fortuna.ical4j.model.TimeZone, java.util.Calendar)
@@ -91,7 +77,7 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
       return null;
     }
     final List<VEvent> events = new LinkedList<VEvent>();
-    final TeamEventDao teamEventDao = (TeamEventDao) Registry.instance().getDao(TeamEventDao.class);
+    final TeamEventDao teamEventDao = Registry.instance().getDao(TeamEventDao.class);
     final TeamEventFilter eventFilter = new TeamEventFilter();
     // Does this make any sense? TODO: eventFilter.setUser(user);
     eventFilter.setDeleted(false);

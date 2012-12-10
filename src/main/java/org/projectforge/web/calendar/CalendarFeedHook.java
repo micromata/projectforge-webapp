@@ -40,13 +40,6 @@ public interface CalendarFeedHook
 {
 
   /**
-   * 
-   * @param req
-   */
-  // Does this make sense? (a hook is a singleton and side-effects are expected). TODO
-  // void onInit(HttpServletRequest req);
-
-  /**
    * @param req
    * @param timezone The time zone of the ics framework (build from {@link PFUserContext#getTimeZone()}.
    * @param cal
