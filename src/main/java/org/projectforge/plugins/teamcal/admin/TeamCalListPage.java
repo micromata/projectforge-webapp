@@ -41,7 +41,6 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFeedHook;
 import org.projectforge.web.WebConfiguration;
-import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
@@ -213,15 +212,5 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
   {
     dataTable = createDataTable(createColumns(this, true), "lastUpdate", SortOrder.DESCENDING);
     form.add(dataTable);
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.AbstractListPage#redirectToEditPage(org.apache.wicket.request.mapper.parameter.PageParameters)
-   */
-  @Override
-  protected AbstractEditPage< ? , ? , ? > redirectToEditPage(final PageParameters params)
-  {
-    setResponsePage(new TeamCalEditPage(getPageParameters()));
-    return null;
   }
 }
