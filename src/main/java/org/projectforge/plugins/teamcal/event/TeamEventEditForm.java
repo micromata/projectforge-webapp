@@ -240,9 +240,11 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
         {
           final boolean check = super.isSelected(object, index, selected);
           final TeamCalDO team = data.getCalendar();
-          if (ObjectUtils.equals(object.getId(), team.getId()))
+          if (team != null && ObjectUtils.equals(object.getId(), team.getId())) {
             return true;
-          else return check;
+          } else {
+            return check;
+          }
         }
       };
       teamCalDrop.setNullValid(false);
