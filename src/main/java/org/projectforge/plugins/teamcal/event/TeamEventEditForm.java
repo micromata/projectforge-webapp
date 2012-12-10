@@ -41,7 +41,6 @@ import org.projectforge.common.DatePrecision;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalFilter;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteMaxLengthTextField;
@@ -71,9 +70,6 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
   @SpringBean(name = "teamEventDao")
   private TeamEventDao teamEventDao;
-
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
 
   private DateTimePanel startDateTimePanel;
 
