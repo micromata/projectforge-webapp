@@ -25,6 +25,7 @@ package org.projectforge.plugins.teamcal.event;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -39,6 +40,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.common.DateHolder;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalsProvider;
 import org.projectforge.web.wicket.AbstractListPage;
@@ -58,6 +60,8 @@ import org.projectforge.web.wicket.WicketUtils;
 public class TeamEventListPage extends AbstractListPage<TeamEventListForm, TeamEventDao, TeamEventDO> implements
 IListPageColumnsCreator<TeamEventDO>
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamEventListPage.class);
+
   public static final String PARAM_CALENDARS = "cals";
 
   private static final long serialVersionUID = 1749480610890950450L;
@@ -150,6 +154,32 @@ IListPageColumnsCreator<TeamEventDO>
   {
     getFilter().setTeamCals(form.calendarsListHelper.getAssignedItems());
     return super.onSearchSubmit();
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#select(java.lang.String, java.lang.Object)
+   */
+  @Override
+  public void select(final String property, final Object selectedValue)
+  {
+    if (property.startsWith("quickSelect.") == true) { // month".equals(property) == true) {
+      final Date date = (Date) selectedValue;
+      form.getSearchFilter().setStartDate(date);
+      final DateHolder dateHolder = new DateHolder(date);
+      if (property.endsWith(".month") == true) {
+        dateHolder.setEndOfMonth();
+      } else if (property.endsWith(".week") == true) {
+        dateHolder.setEndOfWeek();
+      } else {
+        log.error("Property '" + property + "' not supported for selection.");
+      }
+      form.getSearchFilter().setEndDate(dateHolder.getDate());
+      form.startDate.markModelAsChanged();
+      form.endDate.markModelAsChanged();
+      refresh();
+    } else {
+      super.select(property, selectedValue);
+    }
   }
 
   protected TeamEventFilter getFilter()
