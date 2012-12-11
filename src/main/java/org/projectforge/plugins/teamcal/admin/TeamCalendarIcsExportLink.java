@@ -24,6 +24,8 @@ import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 
 /**
+ * Representation for the subscribtion icon export link for our {@link TeamCalDO} ics exports
+ * 
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  * 
  */
