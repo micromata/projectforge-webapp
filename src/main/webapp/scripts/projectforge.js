@@ -130,6 +130,12 @@ $(function() {
 			initFileUpload();
 		});
 	}
+	$('.pf_preventClickBubble').on("contextmenu", function(e) {
+		e.stopImmediatePropagation();
+	});
+	$('.pf_preventClickBubble').click(function(e) {
+		e.stopImmediatePropagation();
+	});
 });
 
 function initFileUpload() {

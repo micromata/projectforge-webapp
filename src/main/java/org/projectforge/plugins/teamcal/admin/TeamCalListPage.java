@@ -33,13 +33,11 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColu
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFeedHook;
 import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
@@ -48,8 +46,6 @@ import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
-import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
-import org.projectforge.web.wicket.flowlayout.IconType;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
@@ -156,15 +152,7 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
       {
         if (accessChecker.isRestrictedUser() == false && WebConfiguration.isDevelopmentMode() == true) {
           final TeamCalDO teamCal = rowModel.getObject();
-          final String iCalTarget = TeamCalCalendarFeedHook.getUrl(String.valueOf(teamCal.getId()));;
-          final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, iCalTarget);
-          final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(componentId, IconType.SUBSCRIPTION,
-              getString("plugins.teamcal.subscribe"), iCalExportLink).setLight();
-          item.add(exportICalButtonPanel);
-          final StringBuffer cssStyle = getCssStyle(teamCal.getId(), teamCal.isDeleted());
-          if (cssStyle.length() > 0) {
-            item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
-          }
+          item.add(new TeamCalendarIcsExportLink(componentId, teamCal, getCssStyle(teamCal.getId(), teamCal.isDeleted()).toString()));
         }
       }
     });
