@@ -50,11 +50,14 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.event.TeamCalEventProvider;
+import org.projectforge.plugins.teamcal.event.TeamEventDao;
+import org.projectforge.plugins.teamcal.event.TeamEventRight;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFilter;
 import org.projectforge.plugins.teamcal.integration.TemplateCalendarProperties;
 import org.projectforge.plugins.teamcal.integration.TemplateEntry;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserRights;
 import org.projectforge.web.common.ColorPickerPanel;
 import org.projectforge.web.dialog.PFDialog;
 import org.projectforge.web.timesheet.TimesheetEventsProvider;
@@ -95,6 +98,8 @@ public class TeamCalDialog extends PFDialog
   @SpringBean
   private TeamCalDao teamCalDao;
 
+  private final TeamEventRight teamEventRight;
+
   /**
    * @param id
    * @param titleModel
@@ -106,6 +111,7 @@ public class TeamCalDialog extends PFDialog
     this.filter = filter;
     selectedCalendars = new LinkedList<TeamCalDO>();
     timeSheetCalendar = new TeamCalDO();
+    teamEventRight = (TeamEventRight)UserRights.instance().getRight(TeamEventDao.USER_RIGHT_ID);
   }
 
   /**
@@ -115,7 +121,7 @@ public class TeamCalDialog extends PFDialog
   public void open(final AjaxRequestTarget target)
   {
     // this assignment is wanted to prevent auto save "final" action
-    if (filter.getSelectedCalendar() == null || TimesheetEventsProvider.EVENT_CLASS_NAME.equals(filter.getSelectedCalendar())) {
+    if (filter.getSelectedCalendar() == null || TimesheetEventsProvider.EVENT_CLASS_NAME.equals(filter.getSelectedCalendar()) == true) {
       selectedDefaultCalendar = timeSheetCalendar;
     } else {
       // get teamCal
@@ -451,7 +457,14 @@ public class TeamCalDialog extends PFDialog
         {
           super.onBeforeRender();
           final TemplateEntry activeTemplateEntry = filter.getActiveTemplateEntry();
-          final List<TeamCalDO> result = activeTemplateEntry != null ? activeTemplateEntry.getCalendars() : new ArrayList<TeamCalDO>();
+          final List<TeamCalDO> result = new ArrayList<TeamCalDO>();
+          if (activeTemplateEntry != null) {
+            for (final TeamCalDO cal : activeTemplateEntry.getCalendars()) {
+              if (teamEventRight.hasUpdateAccess(PFUserContext.getUser(), cal) == true) {
+                result.add(cal);
+              }
+            }
+          }
           final PFUserDO user = PFUserContext.getUser();
           final List<TeamCalDO> filteredList = new ArrayList<TeamCalDO>();
           filteredList.add(0, timeSheetCalendar);
