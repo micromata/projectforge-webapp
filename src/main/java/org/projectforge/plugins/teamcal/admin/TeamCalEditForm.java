@@ -27,11 +27,9 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
-import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFeedHook;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.WebConfiguration;
@@ -46,8 +44,6 @@ import org.projectforge.web.wicket.components.JodaDatePanel;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
-import org.projectforge.web.wicket.flowlayout.IconType;
 
 import com.vaynberg.wicket.select2.Select2MultiChoice;
 
@@ -134,11 +130,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
 
     if (accessChecker.isRestrictedUser() == false && WebConfiguration.isDevelopmentMode() == true) {
       final FieldsetPanel fsSubscribe = gridBuilder.newFieldset(getString("plugins.teamcal.subscribe"), true).setNoLabelFor();
-      final String iCalTarget = TeamCalCalendarFeedHook.getUrl(String.valueOf(this.getData().getId()));
-      final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, iCalTarget);
-      final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(fsSubscribe.newChildId(), IconType.SUBSCRIPTION,
-          getString("plugins.teamcal.subscribe"), iCalExportLink).setLight();
-      fsSubscribe.add(exportICalButtonPanel);
+      fsSubscribe.add(new TeamCalendarIcsExportLink(fsSubscribe.newChildId(), getData()));
       if (isNew() == true)
         fsSubscribe.setVisible(false);
     }

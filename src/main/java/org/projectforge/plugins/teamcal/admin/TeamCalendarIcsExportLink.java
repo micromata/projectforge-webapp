@@ -32,7 +32,21 @@ public class TeamCalendarIcsExportLink extends Panel
   private static final long serialVersionUID = 7062414325369734614L;
 
   /**
+   * 
    * @param id
+   * @param teamCal
+   * @param cssStyle
+   */
+  public TeamCalendarIcsExportLink(final String id, final TeamCalDO teamCal)
+  {
+    this(id, teamCal, null);
+  }
+
+  /**
+   * 
+   * @param id
+   * @param teamCal
+   * @param cssStyle
    */
   public TeamCalendarIcsExportLink(final String id, final TeamCalDO teamCal, final String cssStyle)
   {
@@ -43,7 +57,7 @@ public class TeamCalendarIcsExportLink extends Panel
     final IconLinkPanel exportICalButtonPanel = new IconLinkPanel("exportLink", IconType.SUBSCRIPTION,
         getString("plugins.teamcal.subscribe"), iCalExportLink).setLight();
     add(exportICalButtonPanel);
-    if (cssStyle.length() > 0) {
+    if (cssStyle != null && cssStyle.length() > 0) {
       add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
     }
     final PFDialog dialog = new PFDialog("dialog", new ResourceModel("plugins.teamcal.calendar")) {
