@@ -26,6 +26,7 @@ package org.projectforge.plugins.teamcal.event;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import net.ftlines.wicket.fullcalendar.Event;
 
@@ -39,6 +40,7 @@ import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalRight;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFilter;
+import org.projectforge.plugins.teamcal.integration.TemplateEntry;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
@@ -67,18 +69,15 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
    */
   public static final String EVENT_CLASS_NAME = "teamEvent";
 
-  private final TeamCalDao teamCalDao;
-
   private final TeamEventRight eventRight;
 
   /**
    * @param parent component for i18n
    */
-  public TeamCalEventProvider(final Component parent, final TeamCalDao teamCalDao, final TeamEventDao teamEventDao,
-      final UserGroupCache userGroupCache, final TeamCalCalendarFilter filter)
+  public TeamCalEventProvider(final Component parent, final TeamEventDao teamEventDao, final UserGroupCache userGroupCache,
+      final TeamCalCalendarFilter filter)
   {
     super(parent);
-    this.teamCalDao = teamCalDao;
     this.filter = filter;
     this.teamEventDao = teamEventDao;
     this.eventRight = new TeamEventRight();
@@ -100,16 +99,17 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
   @Override
   protected void buildEvents(final DateTime start, final DateTime end)
   {
-    final TeamEventFilter eventFilter = new TeamEventFilter();
-    List<Integer> selectedCalendars = new ArrayList<Integer>();
-    if (filter.getCurrentCollection() != null && filter.getCurrentCollection().getTeamCalsVisibleList() != null) {
-      for (final Integer id : filter.getCurrentCollection().getTeamCalsVisibleList()) {
-        selectedCalendars.add(id);
-      }
-    } else {
-      selectedCalendars = filter.getSelectedCalIds(teamCalDao, filter.getCurrentCollection());
+    final TemplateEntry activeTemplateEntry = filter.getActiveTemplateEntry();
+    if (activeTemplateEntry == null) {
+      // Nothing to build.
+      return;
     }
-    eventFilter.setTeamCals(selectedCalendars);
+    final Set<Integer> selectedCalendars = activeTemplateEntry.getVisibleCalendarIds();
+    if (CollectionUtils.isEmpty(selectedCalendars) == true) {
+      // Nothing to build.
+      return;
+    }
+    final TeamEventFilter eventFilter = new TeamEventFilter();
     eventFilter.setStartDate(start.toDate());
     eventFilter.setEndDate(end.toDate());
     eventFilter.setUser(PFUserContext.getUser());
@@ -144,7 +144,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
           final Event event = new Event();
           event.setClassName(EVENT_CLASS_NAME);
           event.setId("" + teamEvent.getId());
-          event.setColor(filter.getColor(teamEvent.getCalendarId(), filter.getCurrentCollection()));
+          event.setColor(activeTemplateEntry.getColorCode(teamEvent.getCalendarId()));
 
           if (eventRight.hasUpdateAccess(PFUserContext.getUser(), teamEvent, null)) {
             event.setEditable(true);
@@ -179,7 +179,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
             final StringBuffer buf = new StringBuffer();
             buf.append(getString("plugins.teamevent.subject")).append(": ").append(teamEvent.getSubject());
             if (StringUtils.isNotBlank(teamEvent.getNote()) == true) {
-              buf.append("\n").append(getString("plugins.teamevent.note")).append(": ").append(      teamEvent.getNote());
+              buf.append("\n").append(getString("plugins.teamevent.note")).append(": ").append(teamEvent.getNote());
             }
             buf.append(durationString);
             title = buf.toString();

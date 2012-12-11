@@ -25,8 +25,6 @@ package org.projectforge.plugins.teamcal.dialog;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,8 +50,9 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.event.TeamCalEventProvider;
-import org.projectforge.plugins.teamcal.integration.TeamCalCalendarCollection;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFilter;
+import org.projectforge.plugins.teamcal.integration.TemplateCalendarProperties;
+import org.projectforge.plugins.teamcal.integration.TemplateEntry;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.common.ColorPickerPanel;
@@ -76,20 +75,20 @@ import de.micromata.wicket.ajax.AjaxCallback;
  */
 public class TeamCalDialog extends PFDialog
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalDialog.class);
+
   private static final long serialVersionUID = 8687197318833240410L;
 
   private final List<TeamCalDO> selectedCalendars;
 
   private TeamCalDO selectedDefaultCalendar;
 
-  private final TeamCalCalendarFilter newFilter;
-
-  private final TeamCalCalendarFilter oldFilter;
-
-  private DropDownChoicePanel<TeamCalCalendarCollection> collectionChoice;
+  private DropDownChoicePanel<TemplateEntry> templateChoice;
 
   // Adaption (fake) to display "Time Sheets" as selection option
   private final TeamCalDO timeSheetCalendar;
+
+  private final TeamCalCalendarFilter filter;
 
   private static final int TIMESHEET_CALENDAR_ID = -1;
 
@@ -104,8 +103,7 @@ public class TeamCalDialog extends PFDialog
   public TeamCalDialog(final String id, final IModel<String> titleModel, final TeamCalCalendarFilter filter)
   {
     super(id, titleModel);
-    this.oldFilter = filter;
-    this.newFilter = new TeamCalCalendarFilter(filter);
+    this.filter = filter;
     selectedCalendars = new LinkedList<TeamCalDO>();
     timeSheetCalendar = new TeamCalDO();
   }
@@ -116,13 +114,12 @@ public class TeamCalDialog extends PFDialog
   @Override
   public void open(final AjaxRequestTarget target)
   {
-    newFilter.updateTeamCalendarFilter(oldFilter);
     // this assignment is wanted to prevent auto save "final" action
-    if (newFilter.getSelectedCalendar() == null || TimesheetEventsProvider.EVENT_CLASS_NAME.equals(newFilter.getSelectedCalendar())) {
+    if (filter.getSelectedCalendar() == null || TimesheetEventsProvider.EVENT_CLASS_NAME.equals(filter.getSelectedCalendar())) {
       selectedDefaultCalendar = timeSheetCalendar;
     } else {
       // get teamCal
-      selectedDefaultCalendar = TeamCalEventProvider.getTeamCalForEncodedId(teamCalDao, newFilter.getSelectedCalendar());
+      selectedDefaultCalendar = TeamCalEventProvider.getTeamCalForEncodedId(teamCalDao, filter.getSelectedCalendar());
       if (selectedDefaultCalendar == null) {
         selectedDefaultCalendar = timeSheetCalendar;
       }
@@ -156,7 +153,10 @@ public class TeamCalDialog extends PFDialog
       @Override
       public void callback(final AjaxRequestTarget target)
       {
-
+        final TemplateEntry activeTemplateEntry = filter.getActiveTemplateEntry();
+        if (activeTemplateEntry != null) {
+          activeTemplateEntry.setDirty();
+        }
         TeamCalDialog.this.close(target);
       }
     }, getString("cancel"), SingleButtonPanel.CANCEL);
@@ -169,10 +169,13 @@ public class TeamCalDialog extends PFDialog
       public void callback(final AjaxRequestTarget target)
       {
         // set choice to time sheet, if selected calendar is not element of current collection.
-        if (newFilter.getCurrentCollection().getCalendarMap().keySet().contains(selectedDefaultCalendar.getId()) == false) {
-          newFilter.setSelectedCalendar(TimesheetEventsProvider.EVENT_CLASS_NAME);
+        final TemplateEntry activeTemplateEntry = filter.getActiveTemplateEntry();
+        if (activeTemplateEntry == null || activeTemplateEntry.contains(selectedDefaultCalendar.getId()) == false) {
+          filter.setSelectedCalendar(TimesheetEventsProvider.EVENT_CLASS_NAME);
         }
-        oldFilter.updateTeamCalendarFilter(newFilter);
+        if (activeTemplateEntry != null) {
+          activeTemplateEntry.setDirty();
+        }
         setResponsePage(getPage().getClass(), getPage().getPageParameters());
       }
     }, getString("change"), SingleButtonPanel.DEFAULT_SUBMIT);
@@ -222,18 +225,7 @@ public class TeamCalDialog extends PFDialog
       super.onInitialize();
       final RepeatingView calendarRepeater = new RepeatingView("repeater");
 
-      final WebMarkupContainer bottomContainer = new WebMarkupContainer("bottomContainer") {
-        private static final long serialVersionUID = -3088024211984625247L;
-
-        /**
-         * @see org.apache.wicket.Component#isVisible()
-         */
-        @Override
-        public boolean isVisible()
-        {
-          return newFilter.getTeamCalCalendarCollection().isEmpty() == false;
-        }
-      };
+      final WebMarkupContainer bottomContainer = new WebMarkupContainer("bottomContainer");
       bottomContainer.setOutputMarkupId(true);
       bottomContainer.setOutputMarkupPlaceholderTag(true);
       add(bottomContainer);
@@ -250,10 +242,11 @@ public class TeamCalDialog extends PFDialog
         {
           super.onBeforeRender();
           calendarRepeater.removeAll();
+          final TemplateEntry activeTemplateEntry = filter.getActiveTemplateEntry();
           for (final TeamCalDO calendar : selectedCalendars) {
             final WebMarkupContainer container = new WebMarkupContainer(calendarRepeater.newChildId());
             calendarRepeater.add(container);
-            final IModel<Boolean> model = Model.of(newFilter.getCurrentCollection().getTeamCalsVisibleList().contains(calendar.getId()));
+            final IModel<Boolean> model = Model.of(activeTemplateEntry.isVisible(calendar.getId()) == true);
             final CheckBoxPanel checkBoxPanel = new CheckBoxPanel("isVisible", model, "");
             checkBoxPanel.getCheckBox().add(new AjaxFormComponentUpdatingBehavior("onChange") {
               private static final long serialVersionUID = 3523446385818267608L;
@@ -262,28 +255,31 @@ public class TeamCalDialog extends PFDialog
               protected void onUpdate(final AjaxRequestTarget target)
               {
                 final Boolean newSelection = checkBoxPanel.getCheckBox().getConvertedInput();
-                if (newSelection == true) {
-                  if (newFilter.getCurrentCollection().getTeamCalsVisibleList().contains(calendar.getId()) == false) {
-                    newFilter.getCurrentCollection().getTeamCalsVisibleList().add(calendar.getId());
-                  }
-                }
-                if (newSelection == false) {
-                  if (newFilter.getCurrentCollection().getTeamCalsVisibleList().contains(calendar.getId()) == true) {
-                    newFilter.getCurrentCollection().getTeamCalsVisibleList().remove(calendar.getId());
-                  }
+                final TemplateCalendarProperties properties = activeTemplateEntry.getCalendarProperties(calendar.getId());
+                if (newSelection != properties.isVisible()) {
+                  properties.setVisible(newSelection);
+                  activeTemplateEntry.setDirty();
                 }
               }
             });
             container.add(checkBoxPanel);
             container.add(new Label("name", calendar.getTitle()));
-            final ColorPickerPanel picker = new ColorPickerPanel("colorPicker", newFilter.getColor(calendar.getId(),
-                newFilter.getCurrentCollection())) {
+            final ColorPickerPanel picker = new ColorPickerPanel("colorPicker", activeTemplateEntry.getColorCode(calendar.getId())) {
               private static final long serialVersionUID = 7221351523462540744L;
 
               @Override
               protected void onColorUpdate(final String selectedColor)
               {
-                newFilter.updateCalendarColor(calendar.getId(), selectedColor, newFilter.getCurrentCollection());
+                final TemplateCalendarProperties props = activeTemplateEntry.getCalendarProperties(calendar.getId());
+                if (props != null) {
+                  props.setColorCode(selectedColor);
+                } else {
+                  log.warn("TeamCalendarProperties not found: calendar.id='"
+                      + calendar.getId()
+                      + "' + for active template '"
+                      + activeTemplateEntry.getName()
+                      + "'.");
+                }
               }
             };
             container.add(picker);
@@ -294,32 +290,30 @@ public class TeamCalDialog extends PFDialog
       repeaterContainer.add(calendarRepeater);
       bottomContainer.add(repeaterContainer);
 
-      final IChoiceRenderer<TeamCalCalendarCollection> teamCalCollectionRenderer = new IChoiceRenderer<TeamCalCalendarCollection>() {
+      final IChoiceRenderer<TemplateEntry> teamCalCollectionRenderer = new IChoiceRenderer<TemplateEntry>() {
         private static final long serialVersionUID = 613794318110089990L;
 
         @Override
-        public String getIdValue(final TeamCalCalendarCollection object, final int index)
+        public String getIdValue(final TemplateEntry object, final int index)
         {
-          return object.getTeamCalCalendarColletionName();
+          return object.getName();
         }
 
         @Override
-        public Object getDisplayValue(final TeamCalCalendarCollection object)
+        public Object getDisplayValue(final TemplateEntry object)
         {
-          return object.getTeamCalCalendarColletionName();
+          return object.getName();
         }
       };
 
       // TEAMCALCALENDARCOLLECTION DROPDOWN
-      final IModel<List<TeamCalCalendarCollection>> choicesModel = new PropertyModel<List<TeamCalCalendarCollection>>(newFilter,
-          "teamCalCalendarCollection");
-      final IModel<TeamCalCalendarCollection> currentModel = new PropertyModel<TeamCalCalendarCollection>(newFilter, "currentCollection");
-      collectionChoice = new DropDownChoicePanel<TeamCalCalendarCollection>("collectionList", currentModel, choicesModel,
-          teamCalCollectionRenderer, false);
-      add(collectionChoice);
-      collectionChoice.getDropDownChoice().setOutputMarkupId(true);
+      final IModel<List<TemplateEntry>> choicesModel = new PropertyModel<List<TemplateEntry>>(filter, "templateEntries");
+      final IModel<TemplateEntry> currentModel = new PropertyModel<TemplateEntry>(filter, "activeTemplateEntry");
+      templateChoice = new DropDownChoicePanel<TemplateEntry>("templateList", currentModel, choicesModel, teamCalCollectionRenderer, false);
+      add(templateChoice);
+      templateChoice.getDropDownChoice().setOutputMarkupId(true);
 
-      collectionChoice.getDropDownChoice().add(new AjaxFormComponentUpdatingBehavior("onChange") {
+      templateChoice.getDropDownChoice().add(new AjaxFormComponentUpdatingBehavior("onChange") {
         private static final long serialVersionUID = 8999698636114154230L;
 
         /**
@@ -329,13 +323,14 @@ public class TeamCalDialog extends PFDialog
         protected void onUpdate(final AjaxRequestTarget target)
         {
           selectedCalendars.clear();
-          selectedCalendars.addAll(newFilter.getSelectedCals(teamCalDao, newFilter.getCurrentCollection()));
-          addToTarget(target, collectionChoice.getDropDownChoice(), repeaterContainer, select, teamCalChoice);
+          final TemplateEntry activeTemplateEntry = filter.getActiveTemplateEntry();
+          selectedCalendars.addAll(activeTemplateEntry.getCalendars());
+          addToTarget(target, templateChoice.getDropDownChoice(), repeaterContainer, select, teamCalChoice);
         }
       });
 
-      // ADD BUTTON FOR TCCC
-      final IconButtonPanel addCollectionButton = new AjaxIconButtonPanel("addCollection", IconType.PLUS_THICK, getString("add")) {
+      // ADD BUTTON FOR Template
+      final IconButtonPanel addTemplateButton = new AjaxIconButtonPanel("addTemplate", IconType.PLUS_THICK, getString("add")) {
         private static final long serialVersionUID = -8572571785540159369L;
 
         /**
@@ -352,24 +347,23 @@ public class TeamCalDialog extends PFDialog
             @Override
             public void callback(final AjaxRequestTarget target)
             {
-              final TeamCalCalendarCollection addedCollection = new TeamCalCalendarCollection();
-              addedCollection.setTeamCalCalendarCollectionName(currentName);
-              addedCollection.setCalendarMap(new HashMap<Integer, String>());
-              newFilter.getTeamCalCalendarCollection().add(addedCollection);
-              newFilter.setCurrentCollection(addedCollection);
+              final TemplateEntry newTemplate = new TemplateEntry();
+              newTemplate.setName(currentName);
+              filter.add(newTemplate);
+              filter.setActiveTemplateEntry(newTemplate);
               selectedCalendars.clear();
-              selectedCalendars.addAll(newFilter.getSelectedCals(teamCalDao, addedCollection));
+              selectedCalendars.addAll(newTemplate.getCalendars());
             }
           };
           nameDialog.open(target);
         }
       };
-      addCollectionButton.setDefaultFormProcessing(false);
-      addCollectionButton.setLight();
-      add(addCollectionButton);
+      addTemplateButton.setDefaultFormProcessing(false);
+      addTemplateButton.setLight();
+      add(addTemplateButton);
 
-      // EDIT BUTTON FOR TCCC
-      final IconButtonPanel editCollectionButton = new AjaxIconButtonPanel("editCollection", IconType.WRENCH, getString("edit")) {
+      // EDIT BUTTON
+      final IconButtonPanel editTemplateButton = new AjaxIconButtonPanel("editTemplate", IconType.WRENCH, getString("edit")) {
         private static final long serialVersionUID = -8572571785540159369L;
 
         /**
@@ -378,33 +372,22 @@ public class TeamCalDialog extends PFDialog
         @Override
         protected void onSubmit(final AjaxRequestTarget target)
         {
-          if (newFilter.getCurrentCollection() != null) {
-            // this callback is evaluated when the name dialog was entered!
-            currentAjaxCallback = new AjaxCallback() {
-              private static final long serialVersionUID = -6959790939627419710L;
-
-              @Override
-              public void callback(final AjaxRequestTarget target)
-              {
-                if (currentName.equals(newFilter.getCurrentCollection().getTeamCalCalendarColletionName()) == false) {
-                  newFilter.getTeamCalCalendarCollection().remove(newFilter.getCurrentCollection());
-                  newFilter.getCurrentCollection().setTeamCalCalendarCollectionName(currentName);
-                  newFilter.getTeamCalCalendarCollection().add(newFilter.getCurrentCollection());
-                }
-              }
-            };
-            currentName = newFilter.getCurrentCollection().getTeamCalCalendarColletionName();
+          final TemplateEntry activeTemplateEntry = filter.getActiveTemplateEntry();
+          if (activeTemplateEntry != null) {
+            currentName = activeTemplateEntry.getName();
             nameDialog.open(target);
           }
         }
       };
-      editCollectionButton.setDefaultFormProcessing(false);
-      editCollectionButton.setLight();
-      add(editCollectionButton);
+      editTemplateButton.setDefaultFormProcessing(false);
+      editTemplateButton.setLight();
+      add(editTemplateButton);
 
+      final TemplateEntry activeTemplateEntry = filter.getActiveTemplateEntry();
       selectedCalendars.clear();
-      selectedCalendars.addAll(newFilter.getSelectedCals(teamCalDao, newFilter.getCurrentCollection()));
-
+      if (activeTemplateEntry != null) {
+        selectedCalendars.addAll(activeTemplateEntry.getCalendars());
+      }
       // TEAMCAL CHOICE FIELD
       final TeamCalChoiceProvider teamProvider = new TeamCalChoiceProvider();
       teamCalChoice = new Select2MultiChoice<TeamCalDO>("choices", new PropertyModel<Collection<TeamCalDO>>(TeamCalDialog.this,
@@ -416,23 +399,24 @@ public class TeamCalDialog extends PFDialog
         @Override
         protected void onUpdate(final AjaxRequestTarget target)
         {
-          final Set<Integer> oldKeys = new HashSet<Integer>(newFilter.getCalendarPk(newFilter.getCurrentCollection()));
-          final List<Integer> newKeys = new LinkedList<Integer>();
+          final TemplateEntry activeTemplateEntry = filter.getActiveTemplateEntry();
+          final Set<Integer> oldCalIds = activeTemplateEntry.getCalendarIds();
+          final List<Integer> newIds = new LinkedList<Integer>();
           // add new keys
           for (final TeamCalDO calendar : selectedCalendars) {
-            if (oldKeys.contains(calendar.getId()) == false) {
-              newFilter.addCalendarPk(calendar.getId(), newFilter.getCurrentCollection());
+            if (oldCalIds.contains(calendar.getId()) == false) {
+              activeTemplateEntry.addNewCalendarProperties(calendar.getId());
             }
-            newKeys.add(calendar.getId());
+            newIds.add(calendar.getId());
           }
           // delete removed keys
-          for (final Integer key : oldKeys) {
-            if (newKeys.contains(key) == false) {
-              newFilter.removeCalendarPk(key, newFilter.getCurrentCollection());
+          for (final Integer key : oldCalIds) {
+            if (newIds.contains(key) == false) {
+              activeTemplateEntry.removeCalendarProperties(key);
             }
           }
           // because onBeforeRender is overwritten, just add the components
-          addToTarget(target, collectionChoice.getDropDownChoice(), repeaterContainer, select, teamCalChoice);
+          addToTarget(target, templateChoice.getDropDownChoice(), repeaterContainer, select, teamCalChoice);
         }
       });
       bottomContainer.add(teamCalChoice);
@@ -466,7 +450,8 @@ public class TeamCalDialog extends PFDialog
         protected void onBeforeRender()
         {
           super.onBeforeRender();
-          final List<TeamCalDO> result = newFilter.getSelectedCals(teamCalDao, newFilter.getCurrentCollection());
+          final TemplateEntry activeTemplateEntry = filter.getActiveTemplateEntry();
+          final List<TeamCalDO> result = activeTemplateEntry != null ? activeTemplateEntry.getCalendars() : new ArrayList<TeamCalDO>();
           final PFUserDO user = PFUserContext.getUser();
           final List<TeamCalDO> filteredList = new ArrayList<TeamCalDO>();
           filteredList.add(0, timeSheetCalendar);
@@ -492,9 +477,9 @@ public class TeamCalDialog extends PFDialog
         {
           super.onModelChanged();
           if (timeSheetCalendar.equals(selectedDefaultCalendar) || selectedDefaultCalendar == null) {
-            newFilter.setSelectedCalendar(TimesheetEventsProvider.EVENT_CLASS_NAME);
+            filter.setSelectedCalendar(TimesheetEventsProvider.EVENT_CLASS_NAME);
           } else {
-            newFilter.setSelectedCalendar(TeamCalEventProvider.EVENT_CLASS_NAME + "-" + selectedDefaultCalendar.getId());
+            filter.setSelectedCalendar(TeamCalEventProvider.EVENT_CLASS_NAME + "-" + selectedDefaultCalendar.getId());
           }
         }
       };
@@ -519,10 +504,9 @@ public class TeamCalDialog extends PFDialog
         {
           nameDialog.close(target);
           currentAjaxCallback.callback(target);
-          collectionChoice.getDropDownChoice().setChoices(newFilter.getTeamCalCalendarCollection());
-          collectionChoice.getDropDownChoice()
-          .setDefaultModel(new PropertyModel<TeamCalCalendarCollection>(newFilter, "currentCollection"));
-          addToTarget(target, collectionChoice.getDropDownChoice(), bottomContainer, select);
+          templateChoice.getDropDownChoice().setChoices(filter.getTemplateEntries());
+          templateChoice.getDropDownChoice().setDefaultModel(new PropertyModel<TemplateEntry>(filter, "activeTemplateEntry"));
+          addToTarget(target, templateChoice.getDropDownChoice(), bottomContainer, select);
         }
 
         /**

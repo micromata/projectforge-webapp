@@ -24,16 +24,11 @@
 package org.projectforge.plugins.teamcal.integration;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
-import org.jfree.util.Log;
-import org.projectforge.plugins.teamcal.admin.TeamCalCache;
-import org.projectforge.plugins.teamcal.admin.TeamCalDO;
-import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.web.calendar.CalendarFilter;
 
 /**
@@ -43,178 +38,131 @@ import org.projectforge.web.calendar.CalendarFilter;
  */
 public class TeamCalCalendarFilter extends CalendarFilter
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalCalendarFilter.class);
+
   private static final long serialVersionUID = -8318037558891653348L;
 
-  private static final String DEFAULT_COLOR = "#FAAF26";
+  static final String DEFAULT_COLOR = "#FAAF26";
 
-  private List<TeamCalCalendarCollection> teamCalCalendarCollection;
+  private static final Set<Integer> EMPTY_INT_SET = new HashSet<Integer>();
 
-  private TeamCalCalendarCollection currentCollection;
+  private final List<TemplateEntry> templateEntries;
+
+  private int activeTemplateEntryIndex = 0;
+
+  private transient TemplateEntry activeTemplateEntry = null;
 
   public TeamCalCalendarFilter()
   {
     super();
-    teamCalCalendarCollection = new ArrayList<TeamCalCalendarCollection>();
-  }
-
-  public TeamCalCalendarFilter(final TeamCalCalendarFilter filter)
-  {
-    super();
-    if (this.teamCalCalendarCollection != null) {
-      this.teamCalCalendarCollection.clear();
-    } else {
-      this.teamCalCalendarCollection = new ArrayList<TeamCalCalendarCollection>();
-    }
-
-    for (final TeamCalCalendarCollection tCCC : filter.teamCalCalendarCollection) {
-      this.teamCalCalendarCollection.add(tCCC);
-    }
-
-    if (filter.getCurrentCollection() != null) {
-      this.currentCollection = new TeamCalCalendarCollection(filter.getCurrentCollection());
-    }
-  }
-
-  public Set<Integer> getCalendarPk(TeamCalCalendarCollection collection)
-  {
-    collection = testSerializedMap(collection);
-    return collection.getCalendarMap().keySet();
+    templateEntries = new ArrayList<TemplateEntry>();
   }
 
   /**
-   * 
+   * Try to find a previous used color for the given calendar in any entry of this filter. If found multiple ones, the newest one is used.
+   * @param calId Id of the calendar to search for.
+   * @return Previous used color for the given calendar or DEFAULT_COLOR if not found.
    */
-  private TeamCalCalendarCollection testSerializedMap(TeamCalCalendarCollection collection)
-  {
-    if (collection == null) {
-      collection = new TeamCalCalendarCollection();
-    }
-    if (collection.getCalendarMap() == null) {
-      collection.setCalendarMap(new HashMap<Integer, String>());
-    }
-    return collection;
-  }
-
-  public void addCalendarPk(final Integer pk, final TeamCalCalendarCollection collection)
+  public String getUsedColor(final Integer calId)
   {
     String color = DEFAULT_COLOR;
     long lastEntry = 0;
-
+    if (calId == null) {
+      return color;
+    }
     // intelligent color choose
-    for (final TeamCalCalendarCollection tCCC : teamCalCalendarCollection) {
-      if (tCCC.getCalendarMap().containsKey(pk)) {
-        // init
-        if (lastEntry == 0) {
-          lastEntry = tCCC.getID();
-        }
-
-        // get color of last entry
-        if (tCCC.getID() <= lastEntry) {
-          lastEntry = tCCC.getID();
-          color = tCCC.getCalendarMap().get(pk);
+    for (final TemplateEntry entry : templateEntries) {
+      for (final TemplateCalendarProperties props : entry.getCalendarProperties()) {
+        if (calId.equals(props.getCalId()) == true) {
+          if (props.getMillisOfLastChange() > lastEntry) {
+            lastEntry = props.getMillisOfLastChange();
+            color = props.getColorCode();
+          }
         }
       }
     }
-
-    // default color
-    updateCalendarColor(pk, color, collection);
-    collection.getTeamCalsVisibleList().add(pk);
+    return color;
   }
 
-  public void updateCalendarColor(final Integer pk, final String color, TeamCalCalendarCollection collection)
+  /**
+   * @return the templateEntries
+   */
+  public List<TemplateEntry> getTemplateEntries()
   {
-    if (StringUtils.isNotBlank(color)) {
-      collection = testSerializedMap(collection);
-      collection.getCalendarMap().put(pk, color);
+    return templateEntries;
+  }
+
+  public void add(final TemplateEntry entry)
+  {
+    synchronized (templateEntries) {
+      templateEntries.add(entry);
+      Collections.sort(templateEntries);
     }
   }
 
-  public void removeCalendarPk(final Integer pk, TeamCalCalendarCollection collection)
+  /**
+   * @return the activeTemplateEntryIndex
+   */
+  public int getActiveTemplateEntryIndex()
   {
-    collection = testSerializedMap(collection);
-    if (collection.getCalendarMap().containsKey(pk)) {
-      collection.getCalendarMap().remove(pk);
-    }
+    return activeTemplateEntryIndex;
   }
 
-  public String getColor(final Integer pk, TeamCalCalendarCollection collection)
+  /**
+   * @param activeTemplateEntryIndex the activeTemplateEntryIndex to set
+   * @return this for chaining.
+   */
+  public TeamCalCalendarFilter setActiveTemplateEntryIndex(final int activeTemplateEntryIndex)
   {
-    collection = testSerializedMap(collection);
-    final String result = collection.getCalendarMap().get(pk);
-    if (StringUtils.isBlank(result)) {
-      return DEFAULT_COLOR;
-    }
-    return result;
+    this.activeTemplateEntryIndex = activeTemplateEntryIndex;
+    // Force to get active template entry by new index:
+    this.activeTemplateEntry = null;
+    return this;
   }
 
-  public List<Integer> getSelectedCalIds(final TeamCalDao dao, final TeamCalCalendarCollection collection)
+  /**
+   * @return the activeTemplateEntry
+   */
+  public TemplateEntry getActiveTemplateEntry()
   {
-    final List<Integer> result = new LinkedList<Integer>();
-    for (final Integer calendarId : getCalendarPk(collection)) {
-      result.add(calendarId);
-    }
-    return result;
-  }
-
-  public List<TeamCalDO> getSelectedCals(final TeamCalDao dao, final TeamCalCalendarCollection collection)
-  {
-    final List<TeamCalDO> result = new LinkedList<TeamCalDO>();
-    final TeamCalCache cache = TeamCalCache.getInstance();
-    for (final Integer calendarId : getCalendarPk(collection)) {
-      final TeamCalDO cal = cache.getCalendar(calendarId);
-      if (cal != null) {
-        result.add(cal);
-      } else {
-        Log.warn("Calendar with id " + calendarId + " not found.");
+    if (this.activeTemplateEntry == null) {
+      if (this.activeTemplateEntryIndex >= 0 && this.activeTemplateEntryIndex < this.templateEntries.size()) {
+        this.activeTemplateEntry = this.templateEntries.get(this.activeTemplateEntryIndex);
+        this.activeTemplateEntry.setDirty();
       }
     }
-    return result;
+    return this.activeTemplateEntry;
   }
 
-  public void updateTeamCalendarFilter(final TeamCalCalendarFilter updatedFilter)
+  /**
+   * @param activeTemplateEntry the activeTemplateEntry to set
+   * @return this for chaining.
+   */
+  public TeamCalCalendarFilter setActiveTemplateEntry(final TemplateEntry activeTemplateEntry)
   {
-    setSelectedCalendar(updatedFilter.getSelectedCalendar());
-    if (updatedFilter.getCurrentCollection() != null) {
-      this.currentCollection = new TeamCalCalendarCollection(updatedFilter.getCurrentCollection());
+    int i = 0;
+    for (final TemplateEntry entry : this.templateEntries) {
+      if (entry.equals(activeTemplateEntry) == true) {
+        this.activeTemplateEntryIndex = i;
+        this.activeTemplateEntry = entry;
+        this.activeTemplateEntry.setDirty();
+        break;
+      }
+      i++;
     }
+    return this;
+  }
 
-    if (this.teamCalCalendarCollection != null) {
-      this.teamCalCalendarCollection.clear();
+  public Set<Integer> getActiveVisibleCalendarIds()
+  {
+    if (getActiveTemplateEntry() != null) {
+      return this.activeTemplateEntry.getVisibleCalendarIds();
     } else {
-      this.teamCalCalendarCollection = new ArrayList<TeamCalCalendarCollection>();
+      if (EMPTY_INT_SET.isEmpty() == false) {
+        log.error("************** Oups, dear developers, don't add entries to the empty HashSet returned by this method!!!!");
+        EMPTY_INT_SET.clear();
+      }
+      return EMPTY_INT_SET;
     }
-
-    for (final TeamCalCalendarCollection collection : updatedFilter.teamCalCalendarCollection) {
-      this.teamCalCalendarCollection.add(new TeamCalCalendarCollection(collection));
-    }
-  }
-
-  public void addTeamCalCalendarCollection(final TeamCalCalendarCollection collection)
-  {
-    teamCalCalendarCollection.add(collection);
-  }
-
-  /**
-   * @return the currentCollection
-   */
-  public TeamCalCalendarCollection getCurrentCollection()
-  {
-    return currentCollection;
-  }
-
-  /**
-   * @param currentCollection the currentCollection to set
-   */
-  public void setCurrentCollection(final TeamCalCalendarCollection currentCollection)
-  {
-    this.currentCollection = currentCollection;
-  }
-
-  /**
-   * @return the teamCalCalendarCollection
-   */
-  public List<TeamCalCalendarCollection> getTeamCalCalendarCollection()
-  {
-    return teamCalCalendarCollection;
   }
 }

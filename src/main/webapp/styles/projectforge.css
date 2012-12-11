@@ -527,14 +527,14 @@ h2.box_head .subtitle {
   width: 400px;
 }
 
-.pf_teamCalDialog .teamCalCollection {
+.pf_teamCalDialog .teamCalTemplate {
   height: 37px;
 }
-.pf_teamCalDialog .teamCalCollection .left {
+.pf_teamCalDialog .teamCalTemplate .left {
   float: left;
 }
 
-.pf_teamCalDialog .teamCalCollection .right {
+.pf_teamCalDialog .teamCalTemplate .right {
   float: right;
 }
 

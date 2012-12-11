@@ -100,7 +100,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     if (CollectionUtils.isNotEmpty(cals) == true) {
       queryFilter.add(Restrictions.in("calendar.id", cals));
     } else if (filter.getTeamCalId() != null) {
-      queryFilter.add(Restrictions.eq("calendar,id", filter.getTeamCalId()));
+      queryFilter.add(Restrictions.eq("calendar.id", filter.getTeamCalId()));
     }
     // limit events to load to chosen date view.
     if (filter.getStartDate() != null && filter.getEndDate() != null) {

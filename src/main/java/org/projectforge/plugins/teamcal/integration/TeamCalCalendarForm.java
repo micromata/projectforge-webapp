@@ -98,7 +98,7 @@ public class TeamCalCalendarForm extends CalendarForm
         @Override
         protected void onSubmit()
         {
-          final Set<Integer> visibleCalsSet = filter.getCurrentCollection().getTeamCalsVisibleList();
+          final Set<Integer> visibleCalsSet = filter.getActiveVisibleCalendarIds();
           final String calendars = StringHelper.objectColToString(visibleCalsSet, ",");
           final TeamEventListPage teamEventListPage = new TeamEventListPage(new PageParameters().add(TeamEventListPage.PARAM_CALENDARS, calendars));
           setResponsePage(teamEventListPage);
@@ -108,32 +108,32 @@ public class TeamCalCalendarForm extends CalendarForm
       fs.add(searchButtonPanel);
     }
 
-    if (filter.getCurrentCollection() != null) {
-      final IChoiceRenderer<TeamCalCalendarCollection> teamCalCollectionRenderer = new IChoiceRenderer<TeamCalCalendarCollection>() {
+    if (filter.getActiveTemplateEntry() != null) {
+      final IChoiceRenderer<TemplateEntry> templateEntriesRenderer = new IChoiceRenderer<TemplateEntry>() {
         private static final long serialVersionUID = 4804134958242438331L;
 
         @Override
-        public String getIdValue(final TeamCalCalendarCollection object, final int index)
+        public String getIdValue(final TemplateEntry object, final int index)
         {
-          return object.getTeamCalCalendarColletionName();
+          return object.getName();
         }
 
         @Override
-        public Object getDisplayValue(final TeamCalCalendarCollection object)
+        public Object getDisplayValue(final TemplateEntry object)
         {
-          return object.getTeamCalCalendarColletionName();
+          return object.getName();
         }
       };
 
-      final IModel<List<TeamCalCalendarCollection>> choicesModel = new PropertyModel<List<TeamCalCalendarCollection>>(filter,
-          "teamCalCalendarCollection");
-      final IModel<TeamCalCalendarCollection> currentModel = new PropertyModel<TeamCalCalendarCollection>(filter, "currentCollection");
-      final DropDownChoicePanel<TeamCalCalendarCollection> collectionChoice = new DropDownChoicePanel<TeamCalCalendarCollection>(
-          fs.newChildId(), currentModel, choicesModel, teamCalCollectionRenderer, false);
-      fs.add(collectionChoice);
-      collectionChoice.getDropDownChoice().setOutputMarkupId(true);
+      final IModel<List<TemplateEntry>> choicesModel = new PropertyModel<List<TemplateEntry>>(filter,
+          "templateEntries");
+      final IModel<TemplateEntry> activeModel = new PropertyModel<TemplateEntry>(filter, "activeTemplateEntry");
+      final DropDownChoicePanel<TemplateEntry> templateChoice = new DropDownChoicePanel<TemplateEntry>(
+          fs.newChildId(), activeModel, choicesModel, templateEntriesRenderer, false);
+      fs.add(templateChoice);
+      templateChoice.getDropDownChoice().setOutputMarkupId(true);
 
-      collectionChoice.getDropDownChoice().add(new AjaxFormComponentUpdatingBehavior("onChange") {
+      templateChoice.getDropDownChoice().add(new AjaxFormComponentUpdatingBehavior("onChange") {
         private static final long serialVersionUID = 8999698636114154230L;
 
         /**
@@ -180,6 +180,6 @@ public class TeamCalCalendarForm extends CalendarForm
    */
   public Set<Integer> getSelectedCalendars()
   {
-    return filter.getCalendarPk(filter.getCurrentCollection());
+    return filter.getActiveVisibleCalendarIds();
   }
 }

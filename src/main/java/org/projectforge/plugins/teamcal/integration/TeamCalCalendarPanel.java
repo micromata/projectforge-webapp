@@ -33,6 +33,7 @@ import net.ftlines.wicket.fullcalendar.callback.ClickedEvent;
 import net.ftlines.wicket.fullcalendar.callback.SelectedRange;
 import net.ftlines.wicket.fullcalendar.callback.View;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -150,7 +151,7 @@ public class TeamCalCalendarPanel extends CalendarPanel
     if (filter instanceof TeamCalCalendarFilter) {
       // Colors are handled event based, this is just the default value
       final EventSource eventSource = new EventSource();
-      eventProvider = new TeamCalEventProvider(this, teamCalDao, teamEventDao, userGroupCache, (TeamCalCalendarFilter) filter);
+      eventProvider = new TeamCalEventProvider(this, teamEventDao, userGroupCache, (TeamCalCalendarFilter) filter);
       eventSource.setEventsProvider(eventProvider);
       eventSource.setBackgroundColor("#1AA118");
       eventSource.setColor("#000000");
@@ -167,7 +168,7 @@ public class TeamCalCalendarPanel extends CalendarPanel
   protected void onCallGetEventsHook(final View view, final CalendarResponse response)
   {
     final TeamCalCalendarForm tempForm = (TeamCalCalendarForm) ((TeamCalCalendarPage) getPage()).getForm();
-    if (tempForm != null && tempForm.getSelectedCalendars() != null && tempForm.getSelectedCalendars().size() > 0)
+    if (tempForm != null && CollectionUtils.isNotEmpty(tempForm.getSelectedCalendars()) == true)
       eventProvider.getEvents(view.getVisibleStart().toDateTime(), view.getVisibleEnd().toDateTime());
   }
 
