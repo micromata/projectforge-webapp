@@ -52,7 +52,8 @@ public class TeamCalendarIcsExportLink extends Panel
       @Override
       protected Component getDialogContent(final String wicketId)
       {
-        return new Label(wicketId, "Here we go Kai");
+        // TODO Kai: here we go
+        return new Label(wicketId, "dialog content");
       }
     };
     add(dialog);
