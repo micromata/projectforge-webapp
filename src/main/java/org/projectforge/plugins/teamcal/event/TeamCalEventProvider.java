@@ -23,7 +23,6 @@
 
 package org.projectforge.plugins.teamcal.event;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -104,23 +103,17 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
       // Nothing to build.
       return;
     }
-    final Set<Integer> selectedCalendars = activeTemplateEntry.getVisibleCalendarIds();
-    if (CollectionUtils.isEmpty(selectedCalendars) == true) {
+    final Set<Integer> visibleCalendars = activeTemplateEntry.getVisibleCalendarIds();
+    if (CollectionUtils.isEmpty(visibleCalendars) == true) {
       // Nothing to build.
       return;
     }
     final TeamEventFilter eventFilter = new TeamEventFilter();
+    eventFilter.setTeamCals(visibleCalendars);
     eventFilter.setStartDate(start.toDate());
     eventFilter.setEndDate(end.toDate());
     eventFilter.setUser(PFUserContext.getUser());
-
-    final List<List<TeamEventDO>> eventLists = new ArrayList<List<TeamEventDO>>();
-    if (selectedCalendars != null) {
-      for (final Integer calendarId : selectedCalendars) {
-        eventFilter.setTeamCalId(calendarId);
-        eventLists.add(teamEventDao.getList(eventFilter));
-      }
-    }
+    final List<TeamEventDO> teamEvents = teamEventDao.getList(eventFilter);
 
     boolean longFormat = false;
     days = Days.daysBetween(start, end).getDays();
@@ -131,70 +124,68 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
 
     final TeamCalRight right = new TeamCalRight();
     final PFUserDO user = PFUserContext.getUser();
-    if (CollectionUtils.isNotEmpty(eventLists) == true) {
-      for (final List<TeamEventDO> teamEvents : eventLists) {
-        for (final TeamEventDO teamEvent : teamEvents) {
-          final DateTime startDate = new DateTime(teamEvent.getStartDate(), PFUserContext.getDateTimeZone());
-          final DateTime endDate = new DateTime(teamEvent.getEndDate(), PFUserContext.getDateTimeZone());
-          if (endDate.isBefore(start) == true || startDate.isAfter(end) == true) {
-            // Event doesn't match time period start - end.
-            continue;
-          }
-
-          final Event event = new Event();
-          event.setClassName(EVENT_CLASS_NAME);
-          event.setId("" + teamEvent.getId());
-          event.setColor(activeTemplateEntry.getColorCode(teamEvent.getCalendarId()));
-
-          if (eventRight.hasUpdateAccess(PFUserContext.getUser(), teamEvent, null)) {
-            event.setEditable(true);
-          } else {
-            event.setEditable(false);
-          }
-
-          if (teamEvent.isAllDay()) {
-            event.setAllDay(true);
-          }
-
-          event.setStart(startDate);
-          event.setEnd(endDate);
-
-          final String title;
-          String durationString = "";
-          if (longFormat == true) {
-            final Period duration = new Period(startDate, endDate);
-            // String day = duration.getDays() + "";
-
-            int hourInt = duration.getHours();
-            if (duration.getDays() > 0) {
-              hourInt += duration.getDays() * 24;
-            }
-            final String hour = hourInt < 10 ? "0" + hourInt : "" + hourInt;
-
-            final int minuteInt = duration.getMinutes();
-            final String minute = minuteInt < 10 ? "0" + minuteInt : "" + minuteInt;
-
-            if (event.isAllDay() == false)
-              durationString = "\n" + getString("plugins.teamevent.duration") + ": " + hour + ":" + minute;
-            final StringBuffer buf = new StringBuffer();
-            buf.append(getString("plugins.teamevent.subject")).append(": ").append(teamEvent.getSubject());
-            if (StringUtils.isNotBlank(teamEvent.getNote()) == true) {
-              buf.append("\n").append(getString("plugins.teamevent.note")).append(": ").append(teamEvent.getNote());
-            }
-            buf.append(durationString);
-            title = buf.toString();
-          } else {
-            title = teamEvent.getSubject();
-          }
-          if (right.hasMinimalAccess(teamEvent.getCalendar(), user.getId()) == true) {
-            // for minimal access
-            event.setTitle("");
-            event.setEditable(false);
-          } else {
-            event.setTitle(title);
-          }
-          events.put(teamEvent.getId() + "", event);
+    if (CollectionUtils.isNotEmpty(teamEvents) == true) {
+      for (final TeamEventDO teamEvent : teamEvents) {
+        final DateTime startDate = new DateTime(teamEvent.getStartDate(), PFUserContext.getDateTimeZone());
+        final DateTime endDate = new DateTime(teamEvent.getEndDate(), PFUserContext.getDateTimeZone());
+        if (endDate.isBefore(start) == true || startDate.isAfter(end) == true) {
+          // Event doesn't match time period start - end.
+          continue;
         }
+
+        final Event event = new Event();
+        event.setClassName(EVENT_CLASS_NAME);
+        event.setId("" + teamEvent.getId());
+        event.setColor(activeTemplateEntry.getColorCode(teamEvent.getCalendarId()));
+
+        if (eventRight.hasUpdateAccess(PFUserContext.getUser(), teamEvent, null)) {
+          event.setEditable(true);
+        } else {
+          event.setEditable(false);
+        }
+
+        if (teamEvent.isAllDay()) {
+          event.setAllDay(true);
+        }
+
+        event.setStart(startDate);
+        event.setEnd(endDate);
+
+        final String title;
+        String durationString = "";
+        if (longFormat == true) {
+          final Period duration = new Period(startDate, endDate);
+          // String day = duration.getDays() + "";
+
+          int hourInt = duration.getHours();
+          if (duration.getDays() > 0) {
+            hourInt += duration.getDays() * 24;
+          }
+          final String hour = hourInt < 10 ? "0" + hourInt : "" + hourInt;
+
+          final int minuteInt = duration.getMinutes();
+          final String minute = minuteInt < 10 ? "0" + minuteInt : "" + minuteInt;
+
+          if (event.isAllDay() == false)
+            durationString = "\n" + getString("plugins.teamevent.duration") + ": " + hour + ":" + minute;
+          final StringBuffer buf = new StringBuffer();
+          buf.append(getString("plugins.teamevent.subject")).append(": ").append(teamEvent.getSubject());
+          if (StringUtils.isNotBlank(teamEvent.getNote()) == true) {
+            buf.append("\n").append(getString("plugins.teamevent.note")).append(": ").append(teamEvent.getNote());
+          }
+          buf.append(durationString);
+          title = buf.toString();
+        } else {
+          title = teamEvent.getSubject();
+        }
+        if (right.hasMinimalAccess(teamEvent.getCalendar(), user.getId()) == true) {
+          // for minimal access
+          event.setTitle("");
+          event.setEditable(false);
+        } else {
+          event.setTitle(title);
+        }
+        events.put(teamEvent.getId() + "", event);
       }
     }
   }
