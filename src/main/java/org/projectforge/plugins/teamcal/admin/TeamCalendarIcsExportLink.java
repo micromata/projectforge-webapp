@@ -19,9 +19,12 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFeedHook;
 import org.projectforge.web.dialog.PFDialog;
+import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
+
+import de.micromata.wicket.ajax.AjaxCallback;
 
 /**
  * Representation for the subscribtion icon export link for our {@link TeamCalDO} ics exports
@@ -73,6 +76,15 @@ public class TeamCalendarIcsExportLink extends Panel
       }
     };
     add(dialog);
+    dialog.appendNewAjaxActionButton(new AjaxCallback() {
+      private static final long serialVersionUID = 2079351698403799220L;
+
+      @Override
+      public void callback(final AjaxRequestTarget target)
+      {
+        dialog.close(target);
+      }
+    }, getString("close"), SingleButtonPanel.CANCEL);
     final AjaxIconButtonPanel dialogOpenLink = new AjaxIconButtonPanel("exportLink2", IconType.SUBSCRIPTION) {
       private static final long serialVersionUID = 3541449118975289501L;
 
