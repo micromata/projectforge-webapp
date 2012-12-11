@@ -405,7 +405,7 @@ public class TeamCalDialog extends PFDialog
           // add new keys
           for (final TeamCalDO calendar : selectedCalendars) {
             if (oldCalIds.contains(calendar.getId()) == false) {
-              activeTemplateEntry.addNewCalendarProperties(calendar.getId());
+              activeTemplateEntry.addNewCalendarProperties(filter, calendar.getId());
             }
             newIds.add(calendar.getId());
           }

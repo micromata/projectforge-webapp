@@ -39,7 +39,7 @@ public class TemplateCalendarProperties implements Serializable, Comparable<Temp
 
   private String colorCode = TeamCalCalendarFilter.DEFAULT_COLOR;
 
-  private boolean visible;
+  private boolean visible = true;
 
   private long millisOfLastChange = System.currentTimeMillis();
 

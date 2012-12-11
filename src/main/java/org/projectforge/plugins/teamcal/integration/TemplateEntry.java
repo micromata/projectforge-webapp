@@ -75,13 +75,15 @@ public class TemplateEntry implements Serializable, Comparable<TemplateEntry>
     return this;
   }
 
-  public void addNewCalendarProperties(final Integer calId)
+  public TemplateCalendarProperties addNewCalendarProperties(final TeamCalCalendarFilter filter, final Integer calId)
   {
     Validate.notNull(calId);
     final TemplateCalendarProperties props = new TemplateCalendarProperties();
     props.setCalId(calId);
+    props.setColorCode(filter.getUsedColor(calId));
     this.calendarProperties.add(props);
     this.visibleCalendarIds = null;
+    return props;
   }
 
   public void removeCalendarProperties(final Integer calId)
