@@ -40,7 +40,7 @@ import org.projectforge.plugins.teamcal.admin.TeamCalDO;
  * @author K. Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class TemplateEntry implements Serializable, Comparable<TemplateEntry>
+public class TemplateEntry implements Serializable, Comparable<TemplateEntry>, Cloneable
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TemplateEntry.class);
 
@@ -232,4 +232,21 @@ public class TemplateEntry implements Serializable, Comparable<TemplateEntry>
     return true;
   }
 
+  @Override
+  public TemplateEntry clone()
+  {
+    try {
+      final TemplateEntry cloned = (TemplateEntry) super.clone();
+      cloned.name = this.name;
+      for (final TemplateCalendarProperties props : this.calendarProperties) {
+        final TemplateCalendarProperties clonedProps = props.clone();
+        cloned.calendarProperties.add(clonedProps);
+      }
+      cloned.setDirty();
+      return cloned;
+    } catch (final CloneNotSupportedException ex) {
+      log.error(ex.getMessage(), ex);
+      return null;
+    }
+  }
 }

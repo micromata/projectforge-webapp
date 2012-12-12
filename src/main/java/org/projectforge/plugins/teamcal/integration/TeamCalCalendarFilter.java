@@ -165,4 +165,21 @@ public class TeamCalCalendarFilter extends CalendarFilter
       return EMPTY_INT_SET;
     }
   }
+
+  /**
+   * Copies all template entries (active template and list) of the given source to this. This method is used to make a backup copy for
+   * undoing changes in TeamCalDialog.
+   * @param src
+   */
+  public TeamCalCalendarFilter copyValuesFrom(final TeamCalCalendarFilter src)
+  {
+    this.templateEntries.clear();
+    for (final TemplateEntry srcEntry : src.templateEntries) {
+      final TemplateEntry entry = srcEntry.clone();
+      this.templateEntries.add(entry);
+    }
+    this.activeTemplateEntryIndex = src.activeTemplateEntryIndex;
+    this.activeTemplateEntry = null;
+    return this;
+  }
 }

@@ -93,6 +93,8 @@ public class TeamCalDialog extends PFDialog
 
   private final TeamCalCalendarFilter filter;
 
+  private TeamCalCalendarFilter backupFilter;
+
   private static final int TIMESHEET_CALENDAR_ID = -1;
 
   @SpringBean
@@ -111,7 +113,16 @@ public class TeamCalDialog extends PFDialog
     this.filter = filter;
     selectedCalendars = new LinkedList<TeamCalDO>();
     timeSheetCalendar = new TeamCalDO();
-    teamEventRight = (TeamEventRight)UserRights.instance().getRight(TeamEventDao.USER_RIGHT_ID);
+    teamEventRight = (TeamEventRight) UserRights.instance().getRight(TeamEventDao.USER_RIGHT_ID);
+    setOnCloseCallback(new AjaxCallback() {
+      private static final long serialVersionUID = -8154276568761839693L;
+
+      @Override
+      public void callback(final AjaxRequestTarget target)
+      {
+        close();
+      }
+    });
   }
 
   /**
@@ -130,6 +141,7 @@ public class TeamCalDialog extends PFDialog
         selectedDefaultCalendar = timeSheetCalendar;
       }
     }
+    backupFilter = new TeamCalCalendarFilter().copyValuesFrom(filter);
     super.open(target);
   }
 
@@ -152,17 +164,13 @@ public class TeamCalDialog extends PFDialog
     timeSheetCalendar.setTitle(getString("plugins.teamcal.timeSheetCalendar"));
     timeSheetCalendar.setId(TIMESHEET_CALENDAR_ID);
 
-    // close button
     appendNewAjaxActionButton(new AjaxCallback() {
       private static final long serialVersionUID = -8154276568761839693L;
 
       @Override
       public void callback(final AjaxRequestTarget target)
       {
-        final TemplateEntry activeTemplateEntry = filter.getActiveTemplateEntry();
-        if (activeTemplateEntry != null) {
-          activeTemplateEntry.setDirty();
-        }
+        filter.copyValuesFrom(backupFilter);
         TeamCalDialog.this.close(target);
       }
     }, getString("cancel"), SingleButtonPanel.CANCEL);
@@ -174,17 +182,22 @@ public class TeamCalDialog extends PFDialog
       @Override
       public void callback(final AjaxRequestTarget target)
       {
-        // set choice to time sheet, if selected calendar is not element of current collection.
-        final TemplateEntry activeTemplateEntry = filter.getActiveTemplateEntry();
-        if (activeTemplateEntry == null || activeTemplateEntry.contains(selectedDefaultCalendar.getId()) == false) {
-          filter.setSelectedCalendar(TimesheetEventsProvider.EVENT_CLASS_NAME);
-        }
-        if (activeTemplateEntry != null) {
-          activeTemplateEntry.setDirty();
-        }
-        setResponsePage(getPage().getClass(), getPage().getPageParameters());
+        close();
       }
-    }, getString("change"), SingleButtonPanel.DEFAULT_SUBMIT);
+    }, getString("close"), SingleButtonPanel.DEFAULT_SUBMIT);
+  }
+
+  private void close()
+  {
+    // set choice to time sheet, if selected calendar is not element of current collection.
+    final TemplateEntry activeTemplateEntry = filter.getActiveTemplateEntry();
+    if (activeTemplateEntry == null || activeTemplateEntry.contains(selectedDefaultCalendar.getId()) == false) {
+      filter.setSelectedCalendar(TimesheetEventsProvider.EVENT_CLASS_NAME);
+    }
+    if (activeTemplateEntry != null) {
+      activeTemplateEntry.setDirty();
+    }
+    setResponsePage(getPage().getClass(), getPage().getPageParameters());
   }
 
   /**

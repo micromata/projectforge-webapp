@@ -31,8 +31,10 @@ import java.io.Serializable;
  * @author K. Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class TemplateCalendarProperties implements Serializable, Comparable<TemplateCalendarProperties>
+public class TemplateCalendarProperties implements Serializable, Comparable<TemplateCalendarProperties>, Cloneable
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TemplateCalendarProperties.class);
+
   private static final long serialVersionUID = 6173766812848285792L;
 
   private Integer calId;
@@ -148,5 +150,21 @@ public class TemplateCalendarProperties implements Serializable, Comparable<Temp
       return 1;
     }
     return this.calId.compareTo(o.calId);
+  }
+
+  @Override
+  public TemplateCalendarProperties clone()
+  {
+    try {
+      final TemplateCalendarProperties cloned = (TemplateCalendarProperties) super.clone();
+      cloned.calId = this.calId;
+      cloned.colorCode = this.colorCode;
+      cloned.millisOfLastChange = this.millisOfLastChange;
+      cloned.visible = this.visible;
+      return cloned;
+    } catch (final CloneNotSupportedException ex) {
+      log.error(ex.getMessage(), ex);
+      return null;
+    }
   }
 }
