@@ -120,7 +120,7 @@ public class TeamCalDialog extends PFDialog
       @Override
       public void callback(final AjaxRequestTarget target)
       {
-        close();
+        myClose(target);
       }
     });
   }
@@ -170,6 +170,7 @@ public class TeamCalDialog extends PFDialog
       @Override
       public void callback(final AjaxRequestTarget target)
       {
+        // Restore values (valid at opening time of this dialog):
         filter.copyValuesFrom(backupFilter);
         TeamCalDialog.this.close(target);
       }
@@ -182,13 +183,18 @@ public class TeamCalDialog extends PFDialog
       @Override
       public void callback(final AjaxRequestTarget target)
       {
-        close();
+        myClose(target);
+        TeamCalDialog.this.close(target);
       }
     }, getString("close"), SingleButtonPanel.DEFAULT_SUBMIT);
   }
 
-  private void close()
+  private void myClose(final AjaxRequestTarget target)
   {
+    if (filter.isModified(backupFilter) == false) {
+      // Do nothing.
+      return;
+    }
     // set choice to time sheet, if selected calendar is not element of current collection.
     final TemplateEntry activeTemplateEntry = filter.getActiveTemplateEntry();
     if (activeTemplateEntry == null || activeTemplateEntry.contains(selectedDefaultCalendar.getId()) == false) {

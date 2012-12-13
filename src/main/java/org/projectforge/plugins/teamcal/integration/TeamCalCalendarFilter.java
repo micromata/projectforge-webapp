@@ -26,6 +26,7 @@ package org.projectforge.plugins.teamcal.integration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -181,5 +182,30 @@ public class TeamCalCalendarFilter extends CalendarFilter
     this.activeTemplateEntryIndex = src.activeTemplateEntryIndex;
     this.activeTemplateEntry = null;
     return this;
+  }
+
+  /**
+   * For avoiding reload of Calendar if no changes are detected. (Was für'n Aufwand für so'n kleines Feature...)
+   * @param other
+   * @return
+   */
+  public boolean isModified(final TeamCalCalendarFilter other)
+  {
+    if (this.activeTemplateEntryIndex != other.activeTemplateEntryIndex) {
+      return true;
+    }
+    if (templateEntries.size() != other.templateEntries.size()) {
+      return true;
+    }
+    final Iterator<TemplateEntry> it1 = this.templateEntries.iterator();
+    final Iterator<TemplateEntry> it2 = other.templateEntries.iterator();
+    while (it1.hasNext() == true) {
+      final TemplateEntry entry1 = it1.next();
+      final TemplateEntry entry2 = it2.next();
+      if (entry1.isModified(entry2) == true) {
+        return true;
+      }
+    }
+    return false;
   }
 }

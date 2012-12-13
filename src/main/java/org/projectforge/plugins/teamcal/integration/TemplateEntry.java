@@ -26,10 +26,12 @@ package org.projectforge.plugins.teamcal.integration;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.projectforge.plugins.teamcal.admin.TeamCalCache;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
@@ -235,18 +237,43 @@ public class TemplateEntry implements Serializable, Comparable<TemplateEntry>, C
   @Override
   public TemplateEntry clone()
   {
-    try {
-      final TemplateEntry cloned = (TemplateEntry) super.clone();
-      cloned.name = this.name;
-      for (final TemplateCalendarProperties props : this.calendarProperties) {
-        final TemplateCalendarProperties clonedProps = props.clone();
-        cloned.calendarProperties.add(clonedProps);
-      }
-      cloned.setDirty();
-      return cloned;
-    } catch (final CloneNotSupportedException ex) {
-      log.error(ex.getMessage(), ex);
-      return null;
+    //    try {
+    final TemplateEntry cloned = new TemplateEntry(); // super.clone();
+    cloned.name = this.name;
+    for (final TemplateCalendarProperties props : this.calendarProperties) {
+      final TemplateCalendarProperties clonedProps = props.clone();
+      cloned.calendarProperties.add(clonedProps);
     }
+    cloned.setDirty();
+    return cloned;
+    // } catch (final CloneNotSupportedException ex) {
+    // log.error(ex.getMessage(), ex);
+    // return null;
+    // }
+  }
+
+  /**
+   * For avoiding reload of Calendar if no changes are detected. (Was für'n Aufwand für so'n kleines Feature...)
+   * @param filter
+   * @return
+   */
+  public boolean isModified(final TemplateEntry other)
+  {
+    if (StringUtils.equals(this.name, other.name) == false) {
+      return true;
+    }
+    if (calendarProperties.size() != other.calendarProperties.size()) {
+      return true;
+    }
+    final Iterator<TemplateCalendarProperties> it1 = this.calendarProperties.iterator();
+    final Iterator<TemplateCalendarProperties> it2 = other.calendarProperties.iterator();
+    while (it1.hasNext() == true) {
+      final TemplateCalendarProperties entry1 = it1.next();
+      final TemplateCalendarProperties entry2 = it2.next();
+      if (entry1.isModified(entry2) == true) {
+        return true;
+      }
+    }
+    return false;
   }
 }

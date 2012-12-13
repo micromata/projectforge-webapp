@@ -25,6 +25,9 @@ package org.projectforge.plugins.teamcal.integration;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang.StringUtils;
+import org.projectforge.common.NumberHelper;
+
 /**
  * Persist the settings of one calendar entry in the filter.
  * @author M. Lauterbach (m.lauterbach@micromata.de)
@@ -166,5 +169,27 @@ public class TemplateCalendarProperties implements Serializable, Comparable<Temp
       log.error(ex.getMessage(), ex);
       return null;
     }
+  }
+
+  /**
+   * For avoiding reload of Calendar if no changes are detected. (Was für'n Aufwand für so'n kleines Feature...)
+   * @param filter
+   * @return
+   */
+  public boolean isModified(final TemplateCalendarProperties other)
+  {
+    if (NumberHelper.isEqual(this.calId, other.calId) == false) {
+      return true;
+    }
+    if (StringUtils.equals(this.colorCode, other.colorCode) == false) {
+      return true;
+    }
+    if (this.millisOfLastChange != other.millisOfLastChange) {
+      return true;
+    }
+    if (this.visible != other.visible) {
+      return true;
+    }
+    return false;
   }
 }
