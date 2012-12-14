@@ -10,18 +10,14 @@
 package org.projectforge.plugins.teamcal.admin;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
-import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFeedHook;
+import org.projectforge.plugins.teamcal.dialog.ICSExportDialog;
 import org.projectforge.web.dialog.PFDialog;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel;
-import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 
 import de.micromata.wicket.ajax.AjaxCallback;
@@ -57,24 +53,10 @@ public class TeamCalendarIcsExportLink extends Panel
   {
     super(id);
 
-    final String iCalTarget = TeamCalCalendarFeedHook.getUrl(String.valueOf(teamCal.getId()));
-    final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, iCalTarget);
-    final IconLinkPanel exportICalButtonPanel = new IconLinkPanel("exportLink", IconType.SUBSCRIPTION,
-        getString("plugins.teamcal.subscribe"), iCalExportLink).setLight();
-    add(exportICalButtonPanel);
     if (cssStyle != null && cssStyle.length() > 0) {
       add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
     }
-    final PFDialog dialog = new PFDialog("dialog", new ResourceModel("plugins.teamcal.calendar")) {
-      private static final long serialVersionUID = -8509068698727168517L;
-
-      @Override
-      protected Component getDialogContent(final String wicketId)
-      {
-        // TODO Kai: here we go
-        return new Label(wicketId, "dialog content");
-      }
-    };
+    final PFDialog dialog = new ICSExportDialog("dialog", new ResourceModel("plugins.teamcal.calendar"), teamCal);
     add(dialog);
     dialog.appendNewAjaxActionButton(new AjaxCallback() {
       private static final long serialVersionUID = 2079351698403799220L;
@@ -85,7 +67,7 @@ public class TeamCalendarIcsExportLink extends Panel
         dialog.close(target);
       }
     }, getString("close"), SingleButtonPanel.CANCEL);
-    final AjaxIconButtonPanel dialogOpenLink = new AjaxIconButtonPanel("exportLink2", IconType.SUBSCRIPTION) {
+    final AjaxIconButtonPanel dialogOpenLink = new AjaxIconButtonPanel("exportLink", IconType.SUBSCRIPTION) {
       private static final long serialVersionUID = 3541449118975289501L;
 
       /**

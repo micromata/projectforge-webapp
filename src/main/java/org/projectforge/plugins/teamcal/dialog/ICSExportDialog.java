@@ -10,16 +10,17 @@
 package org.projectforge.plugins.teamcal.dialog;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.Page;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
+import org.apache.wicket.request.Url;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFeedHook;
 import org.projectforge.web.dialog.PFDialog;
 import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
@@ -29,19 +30,16 @@ public class ICSExportDialog extends PFDialog
 {
   private static final long serialVersionUID = -3840971062603541903L;
 
-  private final String iCalTarget;
-
-  private final Page page;
+  private final TeamCalDO teamCal;
 
   /**
    * @param id
    * @param titleModel
    */
-  public ICSExportDialog(String id, IModel<String> titleModel, Integer teamCalId, Page page)
+  public ICSExportDialog(String id, IModel<String> titleModel, TeamCalDO teamCal)
   {
     super(id, titleModel);
-    iCalTarget = TeamCalCalendarFeedHook.getUrl(String.valueOf(teamCalId));
-    this.page = page;
+    this.teamCal = teamCal;
   }
 
   /**
@@ -54,22 +52,13 @@ public class ICSExportDialog extends PFDialog
 
     mainContainer.add(new Label(mainContainer.newChildId(), "Download URL"));
 
+    String iCalTarget = TeamCalCalendarFeedHook.getUrl(String.valueOf(teamCal.getId()));
+    mainContainer.add(new Label(mainContainer.newChildId(), RequestCycle.get().getUrlRenderer()
+        .renderFullUrl(Url.parse(urlFor(getPage().getClass(), null).toString()))
+        + iCalTarget));
+
     final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, iCalTarget);
-    mainContainer.add(new Label(mainContainer.newChildId(), iCalExportLink.getPageRelativePath()));
-
-    Button link = new Button(mainContainer.newChildId(), Model.of(".ics Download")) {
-      private static final long serialVersionUID = 4504857470420395891L;
-
-      /**
-       * @see org.apache.wicket.markup.html.form.Button#onSubmit()
-       */
-      @Override
-      public void onSubmit()
-      {
-        super.onSubmit();
-      }
-    };
-    link.setVisible(true);
+    IconLinkPanel link = new IconLinkPanel(mainContainer.newChildId(), IconType.SUBSCRIPTION, iCalExportLink);
     mainContainer.add(link);
 
     return mainContainer;
