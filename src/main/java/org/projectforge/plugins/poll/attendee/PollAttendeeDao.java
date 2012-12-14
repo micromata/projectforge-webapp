@@ -32,7 +32,7 @@ import org.projectforge.user.UserRightId;
  */
 public class PollAttendeeDao extends BaseDao<PollAttendeeDO>
 {
-  public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_POLL_ATTENDEE", "plugin16", "plugins.poll.attendee");
+  public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_POLL_ATTENDEE", "plugin18", "plugins.poll.attendee");
 
   /**
    * @param clazz

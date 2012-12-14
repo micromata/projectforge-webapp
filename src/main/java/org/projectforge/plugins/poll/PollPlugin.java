@@ -27,11 +27,13 @@ import org.projectforge.admin.UpdateEntry;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.plugins.poll.attendee.PollAttendeeDO;
 import org.projectforge.plugins.poll.attendee.PollAttendeeDao;
+import org.projectforge.plugins.poll.attendee.PollAttendeePage;
 import org.projectforge.plugins.poll.event.PollEventDO;
 import org.projectforge.plugins.poll.event.PollEventDao;
 import org.projectforge.plugins.poll.event.PollEventEditPage;
 import org.projectforge.plugins.poll.result.PollResultDO;
 import org.projectforge.plugins.poll.result.PollResultDao;
+import org.projectforge.plugins.poll.result.PollResultPage;
 import org.projectforge.plugins.teamcal.TeamCalPluginUpdates;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.user.UserPrefArea;
@@ -82,10 +84,10 @@ public class PollPlugin extends AbstractPlugin
     final RegistryEntry resultEntry = new RegistryEntry("pollResult", PollResultDao.class, pollResultDao, "plugins.poll");
 
     // The CalendarDao is automatically available by the scripting engine!
-    register(entry);
-    register(eventEntry);
-    register(attendeeEntry);
-    register(resultEntry);
+     register(entry);
+     register(eventEntry);
+     register(attendeeEntry);
+     register(resultEntry);
 
     // Register the web part:
     // registerWeb(ID, TeamCalListPage.class, TeamCalEditPage.class);
@@ -95,6 +97,8 @@ public class PollPlugin extends AbstractPlugin
 
     addMountPage("newPoll", NewPollPage.class);
     addMountPage("pollEvent", PollEventEditPage.class);
+    addMountPage("pollAttendees", PollAttendeePage.class);
+    addMountPage("pollResult", PollResultPage.class);
     // Register the menu entry as sub menu entry of the misc menu:
     // final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
     // registerMenuItem(new MenuItemDef(parentMenu, ID, 7, "plugins.poll.menu", TeamCalCalendarPage.class));

@@ -25,11 +25,10 @@ package org.projectforge.plugins.poll.attendee;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -41,7 +40,6 @@ import org.projectforge.plugins.poll.event.PollEventDO;
 import org.projectforge.plugins.poll.event.PollEventEditPage;
 import org.projectforge.plugins.poll.result.PollResultPage;
 import org.projectforge.user.GroupDO;
-import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
@@ -52,7 +50,6 @@ import org.projectforge.web.user.UsersComparator;
 import org.projectforge.web.user.UsersProvider;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
-import com.vaynberg.wicket.select2.Response;
 import com.vaynberg.wicket.select2.Select2MultiChoice;
 
 /**
@@ -74,13 +71,13 @@ public class PollAttendeePage extends PollBasePage
 
   private final PollDO pollDo;
 
-  private final Collection<PollEventDO> allEvents;
+  private final HashSet<PollEventDO> allEvents;
 
   private MultiChoiceListHelper<GroupDO> assignGroupsListHelper;
 
   private MultiChoiceListHelper<PFUserDO> assignUsersListHelper;
 
-  private List<PFUserDO> filteredSelectUserList;
+  // private List<PFUserDO> filteredSelectUserList;
 
   private String emailList;
 
@@ -91,7 +88,8 @@ public class PollAttendeePage extends PollBasePage
   {
     super(parameters);
     this.pollDo = pollDo;
-    this.allEvents = allEvents;
+    this.allEvents = new HashSet<PollEventDO>();
+    this.allEvents.addAll(allEvents);
   }
 
   /**
@@ -104,104 +102,29 @@ public class PollAttendeePage extends PollBasePage
 
     gridBuilder.newGrid8();
 
-    // TODO Max: Wieso sollten alle Gruppen vorausgewählt sein?
-    // preset assigned groups of current user
-    final Collection<Integer> presetGroups = userDao.getAssignedGroups(PFUserContext.getUser());
-    final GroupsProvider groupsProvider = new GroupsProvider();
-    assignGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
-        groupsProvider.getSortedGroups());
-    if (presetGroups != null) {
-      for (final Integer groupId : presetGroups) {
-        final GroupDO group = userGroupCache.getGroup(groupId);
-        if (group != null) {
-          assignGroupsListHelper.addOriginalAssignedItem(group).assignItem(group);
-        }
-      }
-    }
-
     // remove users, which already exist in preset groups.
-    filteredSelectUserList = getFilteredUserList(presetGroups.toArray(new Integer[presetGroups.size()]));
-    final UsersProvider usersProvider = new UsersProvider() {
-      private static final long serialVersionUID = 3309912250935701295L;
-
-      /**
-       * @see org.projectforge.web.user.UsersProvider#query(java.lang.String, int, com.vaynberg.wicket.select2.Response)
-       */
-      @Override
-      public void query(final String term, final int page, final Response<PFUserDO> response)
-      {
-        // response.setResults(filteredSelectUserList);
-        super.query(term, page, response);
-      }
-    };
+    // filteredSelectUserList = getFilteredUserList(presetGroups.toArray(new Integer[presetGroups.size()]));
+    final UsersProvider usersProvider = new UsersProvider();
     // User select
     final FieldsetPanel fsUserSelect = gridBuilder.newFieldset(getString("plugins.poll.attendee.users"), true);
     assignUsersListHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator()).setFullList(
         usersProvider.getSortedUsers());
     final Select2MultiChoice<PFUserDO> users = new Select2MultiChoice<PFUserDO>(fsUserSelect.getSelect2MultiChoiceId(),
         new PropertyModel<Collection<PFUserDO>>(this.assignUsersListHelper, "assignedItems"), usersProvider);
-    users.setOutputMarkupId(true);
     fsUserSelect.add(users);
 
     // Group select
+    // final Collection<Integer> presetGroups = userDao.getAssignedGroups(PFUserContext.getUser());
+    final GroupsProvider groupsProvider = new GroupsProvider();
+    assignGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
+        new ArrayList<GroupDO>());// groupsProvider.getSortedGroups());
     final FieldsetPanel fsGroupSelect = gridBuilder.newFieldset(getString("plugins.poll.attendee.groups"), true);
     final Select2MultiChoice<GroupDO> groups = new Select2MultiChoice<GroupDO>(fsGroupSelect.getSelect2MultiChoiceId(),
         new PropertyModel<Collection<GroupDO>>(this.assignGroupsListHelper, "assignedItems"), groupsProvider);
-    groups.add(new AjaxFormComponentUpdatingBehavior("onChange") {
-      private static final long serialVersionUID = 7953707980102077562L;
-
-      @Override
-      protected void onUpdate(final AjaxRequestTarget target)
-      {
-        // create array of ids to use userGroupCache.isMemberOfAtLeastOneGroup
-        final Integer[] groupIds = new Integer[assignGroupsListHelper.getAssignedItems().size()];
-        int index = 0;
-        for (final GroupDO group : assignGroupsListHelper.getAssignedItems()) {
-          groupIds[index] = group.getId();
-          index++;
-        }
-
-        // List<PFUserDO> la = assignUsersList;
-
-        // // remove users, which exist in assigned groups.
-        final List<PFUserDO> deleteList = new ArrayList<PFUserDO>();
-
-        filteredSelectUserList = getFilteredUserList(groupIds);
-        // update user select list
-        if (filteredSelectUserList != null) {
-          if (filteredSelectUserList.isEmpty() == false) {
-            final List<PFUserDO> addList = new ArrayList<PFUserDO>();
-            for (final PFUserDO user : filteredSelectUserList) {
-              if (userGroupCache.isUserMemberOfAtLeastOneGroup(user.getId(), groupIds) == true) {
-                deleteList.add(user);
-              } else {
-                addList.add(user);
-              }
-            }
-            // delete form user select list
-            if (deleteList.isEmpty() == false) {
-              for (final PFUserDO u : deleteList) {
-                filteredSelectUserList.remove(u);
-              }
-              deleteList.clear();
-            }
-            // add to user select list
-            if (addList.isEmpty() == false) {
-              for (final PFUserDO u : addList) {
-
-                if (filteredSelectUserList.contains(u) == false)
-                  filteredSelectUserList.add(u);
-              }
-            }
-          }
-          // target.add(users);
-        }
-      }
-    });
     fsGroupSelect.add(groups);
 
     // TODO Email select
-    final FieldsetPanel fsEMail = gridBuilder.newFieldset(getString("plugins.poll.new.description"), true);
+    final FieldsetPanel fsEMail = gridBuilder.newFieldset(getString("email"), true);
     // May be repeating input field for every mail address
     // final RepeatingView emailRepeater = new RepeatingView(fsEMail.newChildId());
     // emailRepeater.add(getNewEMailField(emailRepeater.newChildId()));
@@ -222,23 +145,6 @@ public class PollAttendeePage extends PollBasePage
 
   }
 
-  /**
-   * returns list without users which already exist in assigned group.
-   * 
-   * @return
-   */
-  private List<PFUserDO> getFilteredUserList(final Integer groupIds[])
-  {
-    final UsersProvider preUsersProvider = new UsersProvider();
-    final List<PFUserDO> newList = new ArrayList<PFUserDO>();
-    for (final PFUserDO user : preUsersProvider.getSortedUsers()) {
-      if (userGroupCache.isUserMemberOfAtLeastOneGroup(user.getId(), groupIds) == false && newList.contains(user) == false) {
-        newList.add(user);
-      }
-    }
-    return newList;
-  }
-
   private TextField<String> getNewEMailField(final String wicketId)
   {
     final PropertyModel<String> mailModel = new PropertyModel<String>(this, "emailList");
@@ -252,8 +158,7 @@ public class PollAttendeePage extends PollBasePage
   @Override
   protected String getTitle()
   {
-    // TODO add i18nKey
-    return "PollAttendeePage";
+    return getString("plugins.poll.attendee");
   }
 
   /**
@@ -265,9 +170,9 @@ public class PollAttendeePage extends PollBasePage
     final List<PollAttendeeDO> pollAttendeeList = new ArrayList<PollAttendeeDO>();
 
     final List<PFUserDO> allUsers = new ArrayList<PFUserDO>();
-    if (assignGroupsListHelper.getFullList() != null) {
-      if (assignGroupsListHelper.getFullList().isEmpty() == false) {
-        for (final GroupDO group : assignGroupsListHelper.getFullList()) {
+    if (assignGroupsListHelper.getAssignedItems() != null) {
+      if (assignGroupsListHelper.getAssignedItems().isEmpty() == false) {
+        for (final GroupDO group : assignGroupsListHelper.getAssignedItems()) {
           for (final PFUserDO user : group.getAssignedUsers()) {
             if (allUsers.contains(user) == false) {
               allUsers.add(user);
@@ -276,9 +181,9 @@ public class PollAttendeePage extends PollBasePage
         }
       }
     }
-    if (assignUsersListHelper.getFullList() != null) {
-      if (assignUsersListHelper.getFullList().isEmpty() == false) {
-        for (final PFUserDO user : assignUsersListHelper.getFullList()) {
+    if (assignUsersListHelper.getAssignedItems() != null) {
+      if (assignUsersListHelper.getAssignedItems().isEmpty() == false) {
+        for (final PFUserDO user : assignUsersListHelper.getAssignedItems()) {
           if (allUsers.contains(user) == false) {
             allUsers.add(user);
           }
@@ -307,7 +212,12 @@ public class PollAttendeePage extends PollBasePage
         }
       }
     }
-    setResponsePage(new PollResultPage(getPageParameters(), pollDo, allEvents, pollAttendeeList));
+
+    if (pollAttendeeList.isEmpty() == true) {
+      this.error(getString(""));
+    } else {
+      setResponsePage(new PollResultPage(getPageParameters(), pollDo, allEvents, pollAttendeeList));
+    }
   }
 
   /**

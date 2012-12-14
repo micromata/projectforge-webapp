@@ -57,6 +57,7 @@ public class NewPollPage extends PollBasePage
   {
     super(parameters);
     pollDoModel = new Model<PollDO>(new PollDO());
+    pollDoModel.getObject().setOwner(getUser());
   }
 
   /**

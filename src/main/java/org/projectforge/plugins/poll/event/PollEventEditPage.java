@@ -107,7 +107,7 @@ public class PollEventEditPage extends AbstractSecuredPage
       {
         super.onBeforeRender();
         eventEntries.removeAll();
-        for(final PollEventDO pollEvent : eventProvider.getAllEvents()) {
+        for (final PollEventDO pollEvent : eventProvider.getAllEvents()) {
           eventEntries.add(new PollEventEntryPanel(eventEntries.newChildId(), pollEvent) {
             private static final long serialVersionUID = -3844278068979559030L;
 
@@ -117,7 +117,11 @@ public class PollEventEditPage extends AbstractSecuredPage
             @Override
             protected void onDeleteClick(final AjaxRequestTarget target)
             {
-              target.appendJavaScript("$('#" + calendar.getMarkupId() + "').fullCalendar('removeEvents', " + eventProvider.getEventForPollEvent(pollEvent).getId() + ");");
+              target.appendJavaScript("$('#"
+                  + calendar.getMarkupId()
+                  + "').fullCalendar('removeEvents', "
+                  + eventProvider.getEventForPollEvent(pollEvent).getId()
+                  + ");");
               target.add(entryContainer);
               eventProvider.removeElement(pollEvent);
             }
@@ -125,10 +129,10 @@ public class PollEventEditPage extends AbstractSecuredPage
         }
       }
     };
-    entryContainer.setOutputMarkupId(true);
-    form.add(entryContainer);
     eventEntries = new RepeatingView("eventEntries");
     entryContainer.add(eventEntries);
+    entryContainer.setOutputMarkupId(true);
+    form.add(entryContainer);
 
     eventProvider = new PollEventEventsProvider(this, pollDoModel);
     if (events != null) {
@@ -227,7 +231,7 @@ public class PollEventEditPage extends AbstractSecuredPage
   @Override
   protected String getTitle()
   {
-    return getString("plugins.poll.title");
+    return getString("plugins.poll.event");
   }
 
 }
