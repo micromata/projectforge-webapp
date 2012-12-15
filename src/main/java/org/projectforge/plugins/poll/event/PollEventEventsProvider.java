@@ -26,6 +26,7 @@ package org.projectforge.plugins.poll.event;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import net.ftlines.wicket.fullcalendar.CalendarResponse;
 import net.ftlines.wicket.fullcalendar.Event;
@@ -52,6 +53,8 @@ public class PollEventEventsProvider extends MyFullCalendarEventsProvider
 
   private final PollDO poll;
 
+  private final Random randomizer;
+
   /**
    * @param parent
    */
@@ -60,6 +63,7 @@ public class PollEventEventsProvider extends MyFullCalendarEventsProvider
     super(parent);
     this.poll = poll;
     pollEventCache = new HashMap<PollEventDO, Event>();
+    randomizer = new Random(System.currentTimeMillis());
   }
 
   /**
@@ -73,7 +77,9 @@ public class PollEventEventsProvider extends MyFullCalendarEventsProvider
       Event event = pollEventCache.get(iterationEvent);
       if (event == null) {
         event = new Event();
-        event.setId("" + System.currentTimeMillis());
+        // randomizer is needed if the system adds events and the machine is able to add
+        // more than one element per millisecond -> double entries for one id is not allowed!
+        event.setId("" + (System.currentTimeMillis() % randomizer.nextInt()));
         event.setStart(iterationEvent.getStartDate());
         event.setEnd(iterationEvent.getEndDate());
         event.setTitle("");
@@ -115,7 +121,9 @@ public class PollEventEventsProvider extends MyFullCalendarEventsProvider
    */
   private void clearSelection(final CalendarResponse response)
   {
-    response.clearSelection().refetchEvents();
+    if(response != null) {
+      response.clearSelection().refetchEvents();
+    }
   }
 
   /**

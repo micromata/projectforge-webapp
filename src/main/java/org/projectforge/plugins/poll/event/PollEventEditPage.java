@@ -40,6 +40,7 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.plugins.poll.NewPollFrontendModel;
+import org.projectforge.plugins.poll.NewPollPage;
 import org.projectforge.plugins.poll.PollDO;
 import org.projectforge.plugins.poll.attendee.PollAttendeePage;
 import org.projectforge.web.calendar.MyFullCalendar;
@@ -69,12 +70,17 @@ public class PollEventEditPage extends AbstractSecuredPage
 
   private final NewPollFrontendModel model;
 
+  public PollEventEditPage(final PageParameters parameters) {
+    super(parameters);
+    NewPollPage.redirectToNewPollPage(parameters);
+    this.model = null;
+  }
+
   public PollEventEditPage(final PageParameters parameters, final NewPollFrontendModel model)
   {
     super(parameters);
     this.model = model;
   }
-
 
   /**
    * @see org.apache.wicket.Component#onInitialize()
