@@ -110,15 +110,16 @@ public class PollAttendeePage extends PollBasePage
     final FieldsetPanel fsUserSelect = gridBuilder.newFieldset(getString("plugins.poll.attendee.users"), true);
     assignUsersListHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator()).setFullList(
         usersProvider.getSortedUsers());
+    assignUsersListHelper.setAssignedItems(model.getUserDoFromAttendees());
     final Select2MultiChoice<PFUserDO> users = new Select2MultiChoice<PFUserDO>(fsUserSelect.getSelect2MultiChoiceId(),
         new PropertyModel<Collection<PFUserDO>>(this.assignUsersListHelper, "assignedItems"), usersProvider);
     fsUserSelect.add(users);
 
     // Group select
-    // final Collection<Integer> presetGroups = userDao.getAssignedGroups(PFUserContext.getUser());
     final GroupsProvider groupsProvider = new GroupsProvider();
     assignGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
-        new ArrayList<GroupDO>());// groupsProvider.getSortedGroups());
+        new ArrayList<GroupDO>());
+    assignGroupsListHelper.setAssignedItems(model.getPollGroupList());
     final FieldsetPanel fsGroupSelect = gridBuilder.newFieldset(getString("plugins.poll.attendee.groups"), true);
     final Select2MultiChoice<GroupDO> groups = new Select2MultiChoice<GroupDO>(fsGroupSelect.getSelect2MultiChoiceId(),
         new PropertyModel<Collection<GroupDO>>(this.assignGroupsListHelper, "assignedItems"), groupsProvider);
@@ -171,6 +172,8 @@ public class PollAttendeePage extends PollBasePage
     final List<PollAttendeeDO> pollAttendeeList = new ArrayList<PollAttendeeDO>();
 
     final List<PFUserDO> allUsers = new ArrayList<PFUserDO>();
+    final List<PollAttendeeDO> userAttendees = new ArrayList<PollAttendeeDO>();
+
     if (assignGroupsListHelper.getAssignedItems() != null) {
       if (assignGroupsListHelper.getAssignedItems().isEmpty() == false) {
         for (final GroupDO group : assignGroupsListHelper.getAssignedItems()) {
@@ -198,6 +201,7 @@ public class PollAttendeePage extends PollBasePage
         final PollAttendeeDO newAttendee = new PollAttendeeDO();
         newAttendee.setUser(user);
         pollAttendeeList.add(newAttendee);
+        userAttendees.add(newAttendee);
       }
     }
 
@@ -217,7 +221,12 @@ public class PollAttendeePage extends PollBasePage
       this.error(getString("")); // TODO Max: .. something is missing, isn´t it?
     } else {
       model.getPollAttendeeList().clear();
-      model.getPollAttendeeList().addAll(pollAttendeeList);
+      model.getCalculatedAttendeeList().clear();
+      model.getPollGroupList().clear();
+
+      model.getPollAttendeeList().addAll(userAttendees);
+      model.getCalculatedAttendeeList().addAll(pollAttendeeList);
+      model.getPollGroupList().addAll(assignGroupsListHelper.getAssignedItems());
       setResponsePage(new PollResultPage(getPageParameters(), model));
     }
   }

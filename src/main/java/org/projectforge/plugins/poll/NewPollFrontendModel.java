@@ -15,6 +15,8 @@ import java.util.List;
 
 import org.projectforge.plugins.poll.attendee.PollAttendeeDO;
 import org.projectforge.plugins.poll.event.PollEventDO;
+import org.projectforge.user.GroupDO;
+import org.projectforge.user.PFUserDO;
 
 /**
  * Data object which is <b>only</b> used for the model chaining in the "new poll" workflow which contains:<br/>
@@ -36,6 +38,10 @@ public class NewPollFrontendModel implements Serializable
 
   private final List<PollAttendeeDO> pollAttendeeList;
 
+  private final List<GroupDO> pollGroupList;
+
+  private final List<PollAttendeeDO> calculatedUserList;
+
   /**
    * 
    */
@@ -44,6 +50,8 @@ public class NewPollFrontendModel implements Serializable
     this.pollDo = pollDo;
     this.allEvents = new LinkedList<PollEventDO>();
     this.pollAttendeeList = new LinkedList<PollAttendeeDO>();
+    this.pollGroupList = new LinkedList<GroupDO>();
+    this.calculatedUserList = new LinkedList<PollAttendeeDO>();
   }
 
   /**
@@ -70,4 +78,29 @@ public class NewPollFrontendModel implements Serializable
     return pollAttendeeList;
   }
 
+  /**
+   * @return the pollGroupList
+   */
+  public List<GroupDO> getPollGroupList()
+  {
+    return pollGroupList;
+  }
+
+  /**
+   * @return the calculatedUserList
+   */
+  public List<PollAttendeeDO> getCalculatedAttendeeList()
+  {
+    return calculatedUserList;
+  }
+
+  public List<PFUserDO> getUserDoFromAttendees() {
+    final List<PFUserDO> result = new LinkedList<PFUserDO>();
+    for(final PollAttendeeDO attendee : getPollAttendeeList()) {
+      if(attendee.getUser() != null) {
+        result.add(attendee.getUser());
+      }
+    }
+    return result;
+  }
 }

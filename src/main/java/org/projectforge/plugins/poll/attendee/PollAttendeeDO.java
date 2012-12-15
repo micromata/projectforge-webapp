@@ -139,4 +139,19 @@ public class PollAttendeeDO extends DefaultBaseDO
     this.secureKey = secureKey;
     return this;
   }
+
+  /**
+   * @see org.projectforge.core.AbstractBaseDO#toString()
+   */
+  @Override
+  public String toString()
+  {
+    String result = null;
+    if(user != null){
+      result = user.getFullname();
+    } else {
+      result = email;
+    }
+    return result;
+  }
 }

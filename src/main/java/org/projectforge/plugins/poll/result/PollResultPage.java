@@ -23,8 +23,12 @@
 
 package org.projectforge.plugins.poll.result;
 
-import org.apache.commons.lang.time.DateFormatUtils;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.plugins.poll.NewPollFrontendModel;
@@ -33,10 +37,15 @@ import org.projectforge.plugins.poll.PollBasePage;
 import org.projectforge.plugins.poll.PollDao;
 import org.projectforge.plugins.poll.attendee.PollAttendeeDO;
 import org.projectforge.plugins.poll.attendee.PollAttendeeDao;
+import org.projectforge.plugins.poll.attendee.PollAttendeeDisabledChoiceProvider;
 import org.projectforge.plugins.poll.attendee.PollAttendeePage;
 import org.projectforge.plugins.poll.event.PollEventDO;
 import org.projectforge.plugins.poll.event.PollEventDao;
+import org.projectforge.plugins.poll.event.PollEventDisabledChoiceProvider;
+import org.projectforge.web.common.MultiChoiceListHelper;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+
+import com.vaynberg.wicket.select2.Select2MultiChoice;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
@@ -97,37 +106,54 @@ public class PollResultPage extends PollBasePage
     fsDescription.add(new Label(fsDescription.newChildId(), model.getPollDo().getDescription()));
 
     final FieldsetPanel fsUsers = gridBuilder.newFieldset(getString("plugins.poll.attendee.users"), true).setLabelFor(this);
-    String userList = "";
-    if (model.getPollAttendeeList().isEmpty() == false) {
-      for (final PollAttendeeDO attendee : model.getPollAttendeeList()) {
-        if (attendee.getUser() != null)
-          userList += attendee.getUser().getFullname() + "; ";
-      }
-    }
-    fsUsers.add(new Label(fsUsers.newChildId(), userList));
+
+    final List<PollAttendeeDO> modelList = model.getPollAttendeeList();
+    createDisabledChoices(fsUsers, modelList, true);
 
     gridBuilder.newGrid16();
 
-    // TODO http://www.wicket-library.com/wicket-examples/mailtemplate/?0
+    // TODO http://www.wicket-library.com/wicket-examples/mailtemplate/?0 --> why?
     final FieldsetPanel fsEMails = gridBuilder.newFieldset(getString("plugins.poll.attendee.emails"), true).setLabelFor(this);
-    if (model.getPollAttendeeList().isEmpty() == false) {
-      final SideWaysPanel sideWay = new SideWaysPanel(fsEMails.newChildId(), 6, 6);
-      fsEMails.add(sideWay);
-      for (final PollAttendeeDO attendee : model.getPollAttendeeList()) {
-        if (attendee.getEmail() != null)
-          sideWay.addLabels(attendee.getEmail(), "");
-      }
-    }
+    createDisabledChoices(fsEMails, model.getPollAttendeeList(), false);
 
-    if (model.getAllEvents().isEmpty() == false) {
-      final FieldsetPanel fsEvents = gridBuilder.newFieldset(getString("plugins.poll.attendee.events"), true).setLabelFor(this);
-      final SideWaysPanel sideWay = new SideWaysPanel(fsEvents.newChildId(), 6, 5);
-      fsEvents.add(sideWay);
-      for (final PollEventDO event : model.getAllEvents()) {
-        sideWay.addLabels("Start: " + DateFormatUtils.format(event.getStartDate().getMillis(), "dd.MM.yyyy HH:mm"), "Ende: "
-            + DateFormatUtils.format(event.getEndDate().getMillis(), "dd.MM.yyyy HH:mm"));
+    final FieldsetPanel fsEvents = gridBuilder.newFieldset(getString("plugins.poll.attendee.events"), true).setLabelFor(this);
+    createDisabledChoices(fsEvents, model.getAllEvents());
+  }
+
+  /**
+   * @param fieldset
+   * @param modelList
+   * @param b
+   */
+  private void createDisabledChoices(final FieldsetPanel fieldset, final List<PollAttendeeDO> rawList, final boolean isUser)
+  {
+    final List<PollAttendeeDO> modelList = new LinkedList<PollAttendeeDO>();
+    for(final PollAttendeeDO attendee : rawList) {
+      if(attendee.getUser() != null && isUser == true) {
+        modelList.add(attendee);
+      } else if(attendee.getEmail() != null && isUser == false) {
+        modelList.add(attendee);
       }
     }
+    final MultiChoiceListHelper<PollAttendeeDO> assignHelper = new MultiChoiceListHelper<PollAttendeeDO>().setAssignedItems(modelList);
+    final Select2MultiChoice<PollAttendeeDO> multiChoices = new Select2MultiChoice<PollAttendeeDO>(fieldset.getSelect2MultiChoiceId(),
+        new PropertyModel<Collection<PollAttendeeDO>>(assignHelper, "assignedItems"), new PollAttendeeDisabledChoiceProvider(modelList));
+    fieldset.add(multiChoices);
+    multiChoices.setEnabled(false);
+  }
+
+  /**
+   * @param fieldset
+   * @param modelList
+   * @param b
+   */
+  private void createDisabledChoices(final FieldsetPanel fieldset, final List<PollEventDO> modelList)
+  {
+    final MultiChoiceListHelper<PollEventDO> assignHelper = new MultiChoiceListHelper<PollEventDO>().setAssignedItems(modelList);
+    final Select2MultiChoice<PollEventDO> multiChoices = new Select2MultiChoice<PollEventDO>(fieldset.getSelect2MultiChoiceId(),
+        new PropertyModel<Collection<PollEventDO>>(assignHelper, "assignedItems"), new PollEventDisabledChoiceProvider(modelList));
+    fieldset.add(multiChoices);
+    multiChoices.setEnabled(false);
   }
 
   /**

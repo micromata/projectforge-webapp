@@ -30,9 +30,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.joda.time.DateTime;
+import org.projectforge.common.DateFormatType;
+import org.projectforge.common.DateFormats;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.plugins.poll.PollDO;
 
@@ -115,5 +118,15 @@ public class PollEventDO extends DefaultBaseDO
   {
     this.endDate = endDate;
     return this;
+  }
+
+  /**
+   * @see org.projectforge.core.AbstractBaseDO#toString()
+   */
+  @Override
+  public String toString()
+  {
+    final String pattern = DateFormats.getFormatString(DateFormatType.TIMESTAMP_MINUTES);
+    return DateFormatUtils.format(startDate.getMillis(), pattern) + " - " + DateFormatUtils.format(endDate.getMillis(), pattern);
   }
 }
