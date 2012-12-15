@@ -34,6 +34,7 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.plugins.poll.NewPollPage;
 import org.projectforge.plugins.poll.PollBasePage;
 import org.projectforge.plugins.poll.PollDO;
 import org.projectforge.plugins.poll.event.PollEventDO;
@@ -80,6 +81,13 @@ public class PollAttendeePage extends PollBasePage
   // private List<PFUserDO> filteredSelectUserList;
 
   private String emailList;
+
+  public PollAttendeePage(final PageParameters parameters) {
+    super(parameters);
+    NewPollPage.redirectToNewPollPage(parameters);
+    pollDo = null;
+    allEvents = null;
+  }
 
   /**
    * @param parameters

@@ -31,6 +31,7 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.plugins.poll.NewPollPage;
 import org.projectforge.plugins.poll.PollBasePage;
 import org.projectforge.plugins.poll.PollDO;
 import org.projectforge.plugins.poll.PollDao;
@@ -65,8 +66,19 @@ public class PollResultPage extends PollBasePage
   private final HashSet<PollEventDO> allEvents;
 
   private final List<PollAttendeeDO> pollAttendeeList;
+  /**
+   * 
+   */
+  public PollResultPage(final PageParameters parameters)
+  {
+    super(parameters);
+    NewPollPage.redirectToNewPollPage(parameters);
+    pollDo = null;
+    allEvents = null;
+    pollAttendeeList = null;
+  }
 
-  public PollResultPage(PageParameters parameters, PollDO pollDo, HashSet<PollEventDO> allEvents, List<PollAttendeeDO> pollAttendeeList)
+  public PollResultPage(final PageParameters parameters, final PollDO pollDo, final HashSet<PollEventDO> allEvents, final List<PollAttendeeDO> pollAttendeeList)
   {
     super(parameters);
 
@@ -85,19 +97,19 @@ public class PollResultPage extends PollBasePage
 
     gridBuilder.newGrid16();
 
-    FieldsetPanel fsTitle = gridBuilder.newFieldset(getString("plugins.poll.new.title"), true).setLabelFor(this);
+    final FieldsetPanel fsTitle = gridBuilder.newFieldset(getString("plugins.poll.new.title"), true).setLabelFor(this);
     fsTitle.add(new Label(fsTitle.newChildId(), pollDo.getTitle()));
 
-    FieldsetPanel fsLocation = gridBuilder.newFieldset(getString("plugins.poll.new.location"), true).setLabelFor(this);
+    final FieldsetPanel fsLocation = gridBuilder.newFieldset(getString("plugins.poll.new.location"), true).setLabelFor(this);
     fsLocation.add(new Label(fsLocation.newChildId(), pollDo.getLocation()));
 
-    FieldsetPanel fsDescription = gridBuilder.newFieldset(getString("plugins.poll.new.description"), true).setLabelFor(this);
+    final FieldsetPanel fsDescription = gridBuilder.newFieldset(getString("plugins.poll.new.description"), true).setLabelFor(this);
     fsDescription.add(new Label(fsDescription.newChildId(), pollDo.getDescription()));
 
-    FieldsetPanel fsUsers = gridBuilder.newFieldset(getString("plugins.poll.attendee.users"), true).setLabelFor(this);
+    final FieldsetPanel fsUsers = gridBuilder.newFieldset(getString("plugins.poll.attendee.users"), true).setLabelFor(this);
     String userList = "";
     if (pollAttendeeList != null) {
-      for (PollAttendeeDO attendee : pollAttendeeList) {
+      for (final PollAttendeeDO attendee : pollAttendeeList) {
         if (attendee.getUser() != null)
           userList += attendee.getUser().getFullname() + "; ";
       }
@@ -107,21 +119,21 @@ public class PollResultPage extends PollBasePage
     gridBuilder.newGrid16();
 
     // TODO http://www.wicket-library.com/wicket-examples/mailtemplate/?0
-    FieldsetPanel fsEMails = gridBuilder.newFieldset(getString("plugins.poll.attendee.emails"), true).setLabelFor(this);
+    final FieldsetPanel fsEMails = gridBuilder.newFieldset(getString("plugins.poll.attendee.emails"), true).setLabelFor(this);
     if (pollAttendeeList != null) {
-      SideWaysPanel sideWay = new SideWaysPanel(fsEMails.newChildId(), 6, 6);
+      final SideWaysPanel sideWay = new SideWaysPanel(fsEMails.newChildId(), 6, 6);
       fsEMails.add(sideWay);
-      for (PollAttendeeDO attendee : pollAttendeeList) {
+      for (final PollAttendeeDO attendee : pollAttendeeList) {
         if (attendee.getEmail() != null)
           sideWay.addLabels(attendee.getEmail(), "");
       }
     }
 
     if (allEvents != null) {
-      FieldsetPanel fsEvents = gridBuilder.newFieldset(getString("plugins.poll.attendee.events"), true).setLabelFor(this);
-      SideWaysPanel sideWay = new SideWaysPanel(fsEvents.newChildId(), 6, 5);
+      final FieldsetPanel fsEvents = gridBuilder.newFieldset(getString("plugins.poll.attendee.events"), true).setLabelFor(this);
+      final SideWaysPanel sideWay = new SideWaysPanel(fsEvents.newChildId(), 6, 5);
       fsEvents.add(sideWay);
-      for (PollEventDO event : allEvents) {
+      for (final PollEventDO event : allEvents) {
         sideWay.addLabels("Start: " + DateFormatUtils.format(event.getStartDate().getMillis(), "dd.MM.yyyy HH:mm"), "Ende: "
             + DateFormatUtils.format(event.getEndDate().getMillis(), "dd.MM.yyyy HH:mm"));
       }
@@ -144,7 +156,7 @@ public class PollResultPage extends PollBasePage
   protected void onConfirm()
   {
     pollDao.save(pollDo);
-    List<PollEventDO> pollEvents = new ArrayList<PollEventDO>();
+    final List<PollEventDO> pollEvents = new ArrayList<PollEventDO>();
     pollEvents.addAll(allEvents);
     pollEventDao.save(pollEvents);
     pollAttendeeDao.save(pollAttendeeList);

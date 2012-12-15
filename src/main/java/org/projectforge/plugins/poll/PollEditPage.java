@@ -24,8 +24,6 @@
 package org.projectforge.plugins.poll;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.request.cycle.RequestCycle;
-import org.apache.wicket.request.flow.RedirectToUrlException;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.wicket.AbstractEditPage;
@@ -56,7 +54,7 @@ public class PollEditPage extends AbstractEditPage<PollDO, PollEditForm, PollDao
     super(parameters, "plugins.poll");
     init();
     if(form.isNew() == true) {
-      throw new RedirectToUrlException(RequestCycle.get().urlFor(NewPollPage.class, parameters).toString());
+      NewPollPage.redirectToNewPollPage(parameters);
     }
   }
 

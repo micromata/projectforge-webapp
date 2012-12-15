@@ -28,6 +28,8 @@ import java.util.List;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.request.flow.RedirectToUrlException;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.plugins.poll.event.PollEventEditPage;
@@ -53,7 +55,7 @@ public class NewPollPage extends PollBasePage
   /**
    * @param parameters
    */
-  public NewPollPage(PageParameters parameters)
+  public NewPollPage(final PageParameters parameters)
   {
     super(parameters);
     pollDoModel = new Model<PollDO>(new PollDO());
@@ -71,7 +73,7 @@ public class NewPollPage extends PollBasePage
     gridBuilder.newGrid8();
 
     final FieldsetPanel fsTitle = gridBuilder.newFieldset(getString("plugins.poll.new.title"), true);
-    MaxLengthTextField titleField = new MaxLengthTextField(fsTitle.getTextFieldId(), new PropertyModel<String>(pollDoModel, "title"));
+    final MaxLengthTextField titleField = new MaxLengthTextField(fsTitle.getTextFieldId(), new PropertyModel<String>(pollDoModel, "title"));
     titleField.setRequired(true);
     fsTitle.add(titleField);
 
@@ -89,7 +91,7 @@ public class NewPollPage extends PollBasePage
     fsLocation.add(locationTextField);
 
     final FieldsetPanel fsDescription = gridBuilder.newFieldset(getString("plugins.poll.new.description"), true);
-    MaxLengthTextArea descriptionField = new MaxLengthTextArea(fsDescription.getTextAreaId(), new PropertyModel<String>(pollDoModel,
+    final MaxLengthTextArea descriptionField = new MaxLengthTextArea(fsDescription.getTextAreaId(), new PropertyModel<String>(pollDoModel,
         "description"));
     fsDescription.add(descriptionField);
 
@@ -120,5 +122,9 @@ public class NewPollPage extends PollBasePage
   protected void onCancel()
   {
     setResponsePage(CalendarPage.class);
+  }
+
+  public static void redirectToNewPollPage(final PageParameters parameters) {
+    throw new RedirectToUrlException(RequestCycle.get().urlFor(NewPollPage.class, parameters).toString());
   }
 }
