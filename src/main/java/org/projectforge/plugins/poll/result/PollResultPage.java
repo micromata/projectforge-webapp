@@ -107,14 +107,13 @@ public class PollResultPage extends PollBasePage
 
     final FieldsetPanel fsUsers = gridBuilder.newFieldset(getString("plugins.poll.attendee.users"), true).setLabelFor(this);
 
-    final List<PollAttendeeDO> modelList = model.getPollAttendeeList();
-    createDisabledChoices(fsUsers, modelList, true);
+    createDisabledChoices(fsUsers, model.getCalculatedAttendeeList(), true);
 
     gridBuilder.newGrid16();
 
     // TODO http://www.wicket-library.com/wicket-examples/mailtemplate/?0 --> why?
     final FieldsetPanel fsEMails = gridBuilder.newFieldset(getString("plugins.poll.attendee.emails"), true).setLabelFor(this);
-    createDisabledChoices(fsEMails, model.getPollAttendeeList(), false);
+    createDisabledChoices(fsEMails, model.getCalculatedAttendeeList(), false);
 
     final FieldsetPanel fsEvents = gridBuilder.newFieldset(getString("plugins.poll.attendee.events"), true).setLabelFor(this);
     createDisabledChoices(fsEvents, model.getAllEvents());

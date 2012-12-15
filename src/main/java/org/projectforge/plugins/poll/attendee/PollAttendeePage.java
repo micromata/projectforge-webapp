@@ -23,9 +23,9 @@
 
 package org.projectforge.plugins.poll.attendee;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.markup.html.form.TextField;
@@ -117,8 +117,7 @@ public class PollAttendeePage extends PollBasePage
 
     // Group select
     final GroupsProvider groupsProvider = new GroupsProvider();
-    assignGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
-        new ArrayList<GroupDO>());
+    assignGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator());
     assignGroupsListHelper.setAssignedItems(model.getPollGroupList());
     final FieldsetPanel fsGroupSelect = gridBuilder.newFieldset(getString("plugins.poll.attendee.groups"), true);
     final Select2MultiChoice<GroupDO> groups = new Select2MultiChoice<GroupDO>(fsGroupSelect.getSelect2MultiChoiceId(),
@@ -169,18 +168,16 @@ public class PollAttendeePage extends PollBasePage
   @Override
   protected void onConfirm()
   {
-    final List<PollAttendeeDO> pollAttendeeList = new ArrayList<PollAttendeeDO>();
-
-    final List<PFUserDO> allUsers = new ArrayList<PFUserDO>();
-    final List<PollAttendeeDO> userAttendees = new ArrayList<PollAttendeeDO>();
+    final Set<PollAttendeeDO> allAttendeeList = new HashSet<PollAttendeeDO>();
+    final Set<PollAttendeeDO> userAttendees = new HashSet<PollAttendeeDO>();
+    final Set<GroupDO> assignedGroups = new HashSet<GroupDO>();
 
     if (assignGroupsListHelper.getAssignedItems() != null) {
       if (assignGroupsListHelper.getAssignedItems().isEmpty() == false) {
         for (final GroupDO group : assignGroupsListHelper.getAssignedItems()) {
+          assignedGroups.add(group);
           for (final PFUserDO user : group.getAssignedUsers()) {
-            if (allUsers.contains(user) == false) {
-              allUsers.add(user);
-            }
+            allAttendeeList.add(createAttendee(user));
           }
         }
       }
@@ -189,19 +186,10 @@ public class PollAttendeePage extends PollBasePage
     if (assignUsersListHelper.getAssignedItems() != null) {
       if (assignUsersListHelper.getAssignedItems().isEmpty() == false) {
         for (final PFUserDO user : assignUsersListHelper.getAssignedItems()) {
-          if (allUsers.contains(user) == false) {
-            allUsers.add(user);
-          }
+          final PollAttendeeDO attendee = createAttendee(user);
+          allAttendeeList.add(attendee);
+          userAttendees.add(attendee);
         }
-      }
-    }
-
-    if (allUsers.isEmpty() == false) {
-      for (final PFUserDO user : allUsers) {
-        final PollAttendeeDO newAttendee = new PollAttendeeDO();
-        newAttendee.setUser(user);
-        pollAttendeeList.add(newAttendee);
-        userAttendees.add(newAttendee);
       }
     }
 
@@ -212,12 +200,12 @@ public class PollAttendeePage extends PollBasePage
           final PollAttendeeDO newAttendee = new PollAttendeeDO();
           newAttendee.setEmail(email.trim());
           newAttendee.setSecureKey(NumberHelper.getSecureRandomUrlSaveString(SECURE_KEY_LENGTH));
-          pollAttendeeList.add(newAttendee);
+          allAttendeeList.add(newAttendee);
         }
       }
     }
 
-    if (pollAttendeeList.isEmpty() == true) {
+    if (allAttendeeList.isEmpty() == true) {
       this.error(getString("")); // TODO Max: .. something is missing, isn´t it?
     } else {
       model.getPollAttendeeList().clear();
@@ -225,10 +213,16 @@ public class PollAttendeePage extends PollBasePage
       model.getPollGroupList().clear();
 
       model.getPollAttendeeList().addAll(userAttendees);
-      model.getCalculatedAttendeeList().addAll(pollAttendeeList);
-      model.getPollGroupList().addAll(assignGroupsListHelper.getAssignedItems());
+      model.getCalculatedAttendeeList().addAll(allAttendeeList);
+      model.getPollGroupList().addAll(assignedGroups);
       setResponsePage(new PollResultPage(getPageParameters(), model));
     }
+  }
+
+  private PollAttendeeDO createAttendee(final PFUserDO user) {
+    final PollAttendeeDO newAttendee = new PollAttendeeDO();
+    newAttendee.setUser(user);
+    return newAttendee;
   }
 
   /**
