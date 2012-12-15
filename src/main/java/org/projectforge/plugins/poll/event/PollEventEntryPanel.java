@@ -14,6 +14,8 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.joda.time.DateTime;
+import org.projectforge.common.DateFormatType;
+import org.projectforge.common.DateFormats;
 import org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 
@@ -36,8 +38,9 @@ public abstract class PollEventEntryPanel extends Panel
     final DateTime start = poll.getStartDate();
     final DateTime end = poll.getEndDate();
 
-    add(new Label("startDate", "Start: " + DateFormatUtils.format(start.getMillis(), "dd.MM.yyyy HH:mm")));  // TODO Max i18n
-    add(new Label("endDate", "Ende: " + DateFormatUtils.format(end.getMillis(), "dd.MM.yyyy HH:mm"))); // TODO Max i18n!!
+    final String pattern = DateFormats.getFormatString(DateFormatType.TIMESTAMP_MINUTES);
+    add(new Label("startDate", "Start: " + DateFormatUtils.format(start.getMillis(), pattern)));
+    add(new Label("endDate", "Ende: " + DateFormatUtils.format(end.getMillis(), pattern)));
 
     final AjaxIconButtonPanel iconButton = new AjaxIconButtonPanel("delete", IconType.MINUS_THICK){
       private static final long serialVersionUID = -2464985733387718199L;
