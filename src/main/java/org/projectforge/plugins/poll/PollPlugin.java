@@ -28,9 +28,11 @@ import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.plugins.poll.attendee.PollAttendeeDO;
 import org.projectforge.plugins.poll.attendee.PollAttendeeDao;
 import org.projectforge.plugins.poll.attendee.PollAttendeePage;
+import org.projectforge.plugins.poll.attendee.PollAttendeeRight;
 import org.projectforge.plugins.poll.event.PollEventDO;
 import org.projectforge.plugins.poll.event.PollEventDao;
 import org.projectforge.plugins.poll.event.PollEventEditPage;
+import org.projectforge.plugins.poll.event.PollEventRight;
 import org.projectforge.plugins.poll.result.PollResultDO;
 import org.projectforge.plugins.poll.result.PollResultDao;
 import org.projectforge.plugins.poll.result.PollResultPage;
@@ -105,6 +107,8 @@ public class PollPlugin extends AbstractPlugin
 
     // Define the access management:
     registerRight(new PollRight());
+    registerRight(new PollAttendeeRight());
+    registerRight(new PollEventRight());
 
     // All the i18n stuff:
     addResourceBundle(RESOURCE_BUNDLE_NAME);

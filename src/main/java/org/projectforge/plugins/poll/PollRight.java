@@ -39,6 +39,9 @@ import org.projectforge.user.UserRights;
 
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
+ * @author M. Lauterbach (m.lauterbach@micromata.de)
+ * 
+ * TODO Max check right please
  * 
  */
 public class PollRight extends UserRightAccessCheck<PollDO>
@@ -50,7 +53,7 @@ public class PollRight extends UserRightAccessCheck<PollDO>
    * @param id
    * @param category
    */
-  public PollRight(UserRightId id, UserRightCategory category)
+  public PollRight(final UserRightId id, final UserRightCategory category)
   {
     super(id, category);
   }

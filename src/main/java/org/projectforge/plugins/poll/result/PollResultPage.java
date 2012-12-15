@@ -23,6 +23,7 @@
 
 package org.projectforge.plugins.poll.result;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -170,12 +171,11 @@ public class PollResultPage extends PollBasePage
   @Override
   protected void onConfirm()
   {
-    // TODO ju: uncomment
-    //    pollDao.save(pollDo);
-    //    final List<PollEventDO> pollEvents = new ArrayList<PollEventDO>();
-    //    pollEvents.addAll(allEvents);
-    //    pollEventDao.save(pollEvents);
-    //    pollAttendeeDao.save(pollAttendeeList);
+    pollDao.save(model.getPollDo());
+    final List<PollEventDO> pollEvents = new ArrayList<PollEventDO>();
+    pollEvents.addAll(model.getAllEvents());
+    pollEventDao.save(pollEvents);
+    pollAttendeeDao.save(model.getCalculatedAttendeeList());
 
     // PollResultDO pollResult = new PollResultDO();
     // pollResult.setPollAttendee(pollAttendeeList);

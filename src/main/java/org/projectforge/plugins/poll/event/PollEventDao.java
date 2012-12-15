@@ -24,7 +24,7 @@
 package org.projectforge.plugins.poll.event;
 
 import org.projectforge.core.BaseDao;
-import org.projectforge.plugins.poll.PollDao;
+import org.projectforge.user.UserRightId;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
@@ -32,6 +32,7 @@ import org.projectforge.plugins.poll.PollDao;
  */
 public class PollEventDao extends BaseDao<PollEventDO>
 {
+  public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_POLL_EVENT", "plugin20", "plugins.poll.event");
 
   /**
    * @param clazz
@@ -39,7 +40,7 @@ public class PollEventDao extends BaseDao<PollEventDO>
   protected PollEventDao()
   {
     super(PollEventDO.class);
-    userRightId = PollDao.USER_RIGHT_ID;
+    userRightId = USER_RIGHT_ID;
   }
 
   /**
