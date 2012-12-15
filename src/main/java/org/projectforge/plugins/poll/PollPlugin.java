@@ -37,6 +37,8 @@ import org.projectforge.plugins.poll.result.PollResultPage;
 import org.projectforge.plugins.teamcal.TeamCalPluginUpdates;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.user.UserPrefArea;
+import org.projectforge.web.MenuItemDef;
+import org.projectforge.web.MenuItemDefId;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
@@ -51,7 +53,7 @@ public class PollPlugin extends AbstractPlugin
   static UserPrefArea USER_PREF_AREA;
 
   private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { PollDO.class, PollEventDO.class, PollAttendeeDO.class,
-      PollResultDO.class};
+    PollResultDO.class};
 
   /**
    * This dao should be defined in pluginContext.xml (as resources) for proper initialization.
@@ -84,24 +86,21 @@ public class PollPlugin extends AbstractPlugin
     final RegistryEntry resultEntry = new RegistryEntry("pollResult", PollResultDao.class, pollResultDao, "plugins.poll");
 
     // The CalendarDao is automatically available by the scripting engine!
-     register(entry);
-     register(eventEntry);
-     register(attendeeEntry);
-     register(resultEntry);
+    register(entry);
+    register(eventEntry);
+    register(attendeeEntry);
+    register(resultEntry);
 
     // Register the web part:
-    // registerWeb(ID, TeamCalListPage.class, TeamCalEditPage.class);
-    // registerWeb("pollEvent");
-    // registerWeb("attendeeEvent", TeamEventEditPage.class, TeamEventEditPage.class);
-    // registerWeb("resultEvent", TeamEventEditPage.class, TeamEventEditPage.class);
+    registerWeb("poll", PollListPage.class, PollEditPage.class);
 
     addMountPage("newPoll", NewPollPage.class);
     addMountPage("pollEvent", PollEventEditPage.class);
     addMountPage("pollAttendees", PollAttendeePage.class);
     addMountPage("pollResult", PollResultPage.class);
     // Register the menu entry as sub menu entry of the misc menu:
-    // final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
-    // registerMenuItem(new MenuItemDef(parentMenu, ID, 7, "plugins.poll.menu", TeamCalCalendarPage.class));
+    final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
+    registerMenuItem(new MenuItemDef(parentMenu, ID, 13, "plugins.poll.menu", PollListPage.class));
     // registerMenuItem(new MenuItemDef(parentMenu, ID + "List", 8, "plugins.teamcal.title.list", TeamCalListPage.class));
 
     // Define the access management:

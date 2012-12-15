@@ -21,34 +21,53 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.plugins.poll.result;
+package org.projectforge.plugins.poll;
 
-import org.projectforge.core.BaseDao;
-import org.projectforge.plugins.poll.PollDao;
+import org.apache.log4j.Logger;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.access.AccessChecker;
+import org.projectforge.web.wicket.AbstractEditForm;
 
 /**
+ * 
+ * @author Johannes Unterstein (j.unterstein@micromata.de)
  * @author M. Lauterbach (m.lauterbach@micromata.de)
  * 
  */
-public class PollResultDao extends BaseDao<PollResultDO>
+public class PollEditForm extends AbstractEditForm<PollDO, PollEditPage>
 {
+  private static final long serialVersionUID = 1268981578238971117L;
+
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(PollEditForm.class);
+
+  @SpringBean(name = "accessChecker")
+  protected AccessChecker accessChecker;
 
   /**
-   * @param clazz
+   * @param parentPage
+   * @param data
    */
-  protected PollResultDao()
+  public PollEditForm(final PollEditPage parentPage, final PollDO data)
   {
-    super(PollResultDO.class);
-    userRightId = PollDao.USER_RIGHT_ID;
+    super(parentPage, data);
   }
 
   /**
-   * @see org.projectforge.core.BaseDao#newInstance()
+   * @see org.projectforge.web.wicket.AbstractEditForm#init()
    */
   @Override
-  public PollResultDO newInstance()
+  protected void init()
   {
-    return new PollResultDO();
+    super.init();
+    //    gridBuilder.newGrid8();
   }
 
+  /**
+   * @see org.projectforge.web.wicket.AbstractEditForm#getLogger()
+   */
+  @Override
+  protected Logger getLogger()
+  {
+    return log;
+  }
 }
