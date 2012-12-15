@@ -38,8 +38,8 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.repeater.RepeatingView;
-import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.projectforge.plugins.poll.NewPollFrontendModel;
 import org.projectforge.plugins.poll.PollDO;
 import org.projectforge.plugins.poll.attendee.PollAttendeePage;
 import org.projectforge.web.calendar.MyFullCalendar;
@@ -61,28 +61,20 @@ public class PollEventEditPage extends AbstractSecuredPage
 
   private MyFullCalendar calendar;
 
-  private final IModel<PollDO> pollDoModel;
-
-  private Collection<PollEventDO> events;
-
   private RepeatingView eventEntries;
 
   private PollEventEventsProvider eventProvider;
 
   private WebMarkupContainer entryContainer;
 
-  public PollEventEditPage(final PageParameters parameters, final IModel<PollDO> pollDoModel)
+  private final NewPollFrontendModel model;
+
+  public PollEventEditPage(final PageParameters parameters, final NewPollFrontendModel model)
   {
     super(parameters);
-    this.pollDoModel = pollDoModel;
+    this.model = model;
   }
 
-  public PollEventEditPage(final PageParameters parameters, final IModel<PollDO> pollDoModel, final Collection<PollEventDO> events)
-  {
-    super(parameters);
-    this.pollDoModel = pollDoModel;
-    this.events = events;
-  }
 
   /**
    * @see org.apache.wicket.Component#onInitialize()
@@ -94,8 +86,8 @@ public class PollEventEditPage extends AbstractSecuredPage
     final Form<Void> form = new Form<Void>("form");
     body.add(form);
 
-    form.add(new Label("title", pollDoModel.getObject().getTitle()));
-    form.add(new Label("location", pollDoModel.getObject().getLocation()));
+    form.add(new Label("title", model.getPollDo().getTitle()));
+    form.add(new Label("location", model.getPollDo().getLocation()));
     entryContainer = new WebMarkupContainer("entryContainer") {
       private static final long serialVersionUID = -2897780301098962428L;
 
@@ -134,12 +126,10 @@ public class PollEventEditPage extends AbstractSecuredPage
     entryContainer.setOutputMarkupId(true);
     form.add(entryContainer);
 
-    eventProvider = new PollEventEventsProvider(this, pollDoModel);
-    if (events != null) {
-      if (events.isEmpty() == false) {
-        for (final PollEventDO event : events) {
-          eventProvider.addEvent(new SelectedRange(event.getStartDate(), event.getEndDate(), false), null);
-        }
+    eventProvider = new PollEventEventsProvider(this, model.getPollDo());
+    if (model.getAllEvents().isEmpty() == false) {
+      for (final PollEventDO event : model.getAllEvents()) {
+        eventProvider.addEvent(new SelectedRange(event.getStartDate(), event.getEndDate(), false), null);
       }
     }
     config = new MyFullCalendarConfig(this);
@@ -208,7 +198,7 @@ public class PollEventEditPage extends AbstractSecuredPage
       @Override
       public final void onSubmit()
       {
-        onNextButtonClick(pollDoModel.getObject(), eventProvider.getAllEvents());
+        onNextButtonClick(model.getPollDo(), eventProvider.getAllEvents());
       }
     };
     nextButton.setDefaultFormProcessing(false);
@@ -222,7 +212,9 @@ public class PollEventEditPage extends AbstractSecuredPage
    */
   protected void onNextButtonClick(final PollDO pollDo, final Collection<PollEventDO> allEvents)
   {
-    setResponsePage(new PollAttendeePage(getPageParameters(), pollDo, allEvents));
+    model.getAllEvents().clear();
+    model.getAllEvents().addAll(allEvents);
+    setResponsePage(new PollAttendeePage(getPageParameters(), model));
   }
 
   /**

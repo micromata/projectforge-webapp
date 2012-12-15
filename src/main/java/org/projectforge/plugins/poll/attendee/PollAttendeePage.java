@@ -25,7 +25,6 @@ package org.projectforge.plugins.poll.attendee;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -34,10 +33,9 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.plugins.poll.NewPollFrontendModel;
 import org.projectforge.plugins.poll.NewPollPage;
 import org.projectforge.plugins.poll.PollBasePage;
-import org.projectforge.plugins.poll.PollDO;
-import org.projectforge.plugins.poll.event.PollEventDO;
 import org.projectforge.plugins.poll.event.PollEventEditPage;
 import org.projectforge.plugins.poll.result.PollResultPage;
 import org.projectforge.user.GroupDO;
@@ -70,10 +68,6 @@ public class PollAttendeePage extends PollBasePage
   @SpringBean(name = "userDao")
   private UserDao userDao;
 
-  private final PollDO pollDo;
-
-  private final HashSet<PollEventDO> allEvents;
-
   private MultiChoiceListHelper<GroupDO> assignGroupsListHelper;
 
   private MultiChoiceListHelper<PFUserDO> assignUsersListHelper;
@@ -82,22 +76,21 @@ public class PollAttendeePage extends PollBasePage
 
   private String emailList;
 
+  private final NewPollFrontendModel model;
+
   public PollAttendeePage(final PageParameters parameters) {
     super(parameters);
     NewPollPage.redirectToNewPollPage(parameters);
-    pollDo = null;
-    allEvents = null;
+    this.model = null;
   }
 
   /**
    * @param parameters
    */
-  public PollAttendeePage(final PageParameters parameters, final PollDO pollDo, final Collection<PollEventDO> allEvents)
+  public PollAttendeePage(final PageParameters parameters, final NewPollFrontendModel model)
   {
     super(parameters);
-    this.pollDo = pollDo;
-    this.allEvents = new HashSet<PollEventDO>();
-    this.allEvents.addAll(allEvents);
+    this.model = model;
   }
 
   /**
@@ -189,6 +182,7 @@ public class PollAttendeePage extends PollBasePage
         }
       }
     }
+
     if (assignUsersListHelper.getAssignedItems() != null) {
       if (assignUsersListHelper.getAssignedItems().isEmpty() == false) {
         for (final PFUserDO user : assignUsersListHelper.getAssignedItems()) {
@@ -199,13 +193,11 @@ public class PollAttendeePage extends PollBasePage
       }
     }
 
-    if (allUsers != null) {
-      if (allUsers.isEmpty() == false) {
-        for (final PFUserDO user : allUsers) {
-          final PollAttendeeDO newAttendee = new PollAttendeeDO();
-          newAttendee.setUser(user);
-          pollAttendeeList.add(newAttendee);
-        }
+    if (allUsers.isEmpty() == false) {
+      for (final PFUserDO user : allUsers) {
+        final PollAttendeeDO newAttendee = new PollAttendeeDO();
+        newAttendee.setUser(user);
+        pollAttendeeList.add(newAttendee);
       }
     }
 
@@ -222,9 +214,11 @@ public class PollAttendeePage extends PollBasePage
     }
 
     if (pollAttendeeList.isEmpty() == true) {
-      this.error(getString(""));
+      this.error(getString("")); // TODO Max: .. something is missing, isn´t it?
     } else {
-      setResponsePage(new PollResultPage(getPageParameters(), pollDo, allEvents, pollAttendeeList));
+      model.getPollAttendeeList().clear();
+      model.getPollAttendeeList().addAll(pollAttendeeList);
+      setResponsePage(new PollResultPage(getPageParameters(), model));
     }
   }
 
@@ -234,7 +228,7 @@ public class PollAttendeePage extends PollBasePage
   @Override
   protected void onCancel()
   {
-    setResponsePage(new PollEventEditPage(getPageParameters(), new PropertyModel<PollDO>(PollAttendeePage.this, "pollDo"), allEvents));
+    setResponsePage(new PollEventEditPage(getPageParameters(), model));
   }
 
 }

@@ -25,8 +25,6 @@ package org.projectforge.plugins.poll;
 
 import java.util.List;
 
-import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.flow.RedirectToUrlException;
@@ -50,7 +48,7 @@ public class NewPollPage extends PollBasePage
   @SpringBean(name = "pollDao")
   private PollDao pollDao;
 
-  private final IModel<PollDO> pollDoModel;
+  private final NewPollFrontendModel model;
 
   /**
    * @param parameters
@@ -58,8 +56,8 @@ public class NewPollPage extends PollBasePage
   public NewPollPage(final PageParameters parameters)
   {
     super(parameters);
-    pollDoModel = new Model<PollDO>(new PollDO());
-    pollDoModel.getObject().setOwner(getUser());
+    model = new NewPollFrontendModel(new PollDO());
+    model.getPollDo().setOwner(getUser());
   }
 
   /**
@@ -73,13 +71,13 @@ public class NewPollPage extends PollBasePage
     gridBuilder.newGrid8();
 
     final FieldsetPanel fsTitle = gridBuilder.newFieldset(getString("plugins.poll.new.title"), true);
-    final MaxLengthTextField titleField = new MaxLengthTextField(fsTitle.getTextFieldId(), new PropertyModel<String>(pollDoModel, "title"));
+    final MaxLengthTextField titleField = new MaxLengthTextField(fsTitle.getTextFieldId(), new PropertyModel<String>(model.getPollDo(), "title"));
     titleField.setRequired(true);
     fsTitle.add(titleField);
 
     final FieldsetPanel fsLocation = gridBuilder.newFieldset(getString("plugins.poll.new.location"), true);
     final PFAutoCompleteMaxLengthTextField locationTextField = new PFAutoCompleteMaxLengthTextField(fsLocation.getTextFieldId(),
-        new PropertyModel<String>(pollDoModel, "location")) {
+        new PropertyModel<String>(model.getPollDo(), "location")) {
       private static final long serialVersionUID = 2008897410054999896L;
 
       @Override
@@ -91,7 +89,7 @@ public class NewPollPage extends PollBasePage
     fsLocation.add(locationTextField);
 
     final FieldsetPanel fsDescription = gridBuilder.newFieldset(getString("plugins.poll.new.description"), true);
-    final MaxLengthTextArea descriptionField = new MaxLengthTextArea(fsDescription.getTextAreaId(), new PropertyModel<String>(pollDoModel,
+    final MaxLengthTextArea descriptionField = new MaxLengthTextArea(fsDescription.getTextAreaId(), new PropertyModel<String>(model.getPollDo(),
         "description"));
     fsDescription.add(descriptionField);
 
@@ -112,7 +110,7 @@ public class NewPollPage extends PollBasePage
   @Override
   protected void onConfirm()
   {
-    setResponsePage(new PollEventEditPage(getPageParameters(), pollDoModel));
+    setResponsePage(new PollEventEditPage(getPageParameters(), model));
   }
 
   /**

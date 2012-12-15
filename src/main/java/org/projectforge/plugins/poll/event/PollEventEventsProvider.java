@@ -36,7 +36,6 @@ import net.ftlines.wicket.fullcalendar.callback.SelectedRange;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
-import org.apache.wicket.model.IModel;
 import org.joda.time.DateTime;
 import org.projectforge.plugins.poll.PollDO;
 import org.projectforge.web.calendar.MyFullCalendarEventsProvider;
@@ -49,17 +48,17 @@ public class PollEventEventsProvider extends MyFullCalendarEventsProvider
 {
   private static final long serialVersionUID = -1869612916168574011L;
 
-  private final IModel<PollDO> pollModel;
-
   private final Map<PollEventDO, Event> pollEventCache;
+
+  private final PollDO poll;
 
   /**
    * @param parent
    */
-  public PollEventEventsProvider(final Component parent, final IModel<PollDO> model)
+  public PollEventEventsProvider(final Component parent, final PollDO poll)
   {
     super(parent);
-    this.pollModel = model;
+    this.poll = poll;
     pollEventCache = new HashMap<PollEventDO, Event>();
   }
 
@@ -103,7 +102,7 @@ public class PollEventEventsProvider extends MyFullCalendarEventsProvider
   public void addEvent(final SelectedRange range, final CalendarResponse response)
   {
     final PollEventDO newEvent = new PollEventDO();
-    newEvent.setPoll(pollModel.getObject());
+    newEvent.setPoll(poll);
     newEvent.setStartDate(range.getStart());
     newEvent.setEndDate(range.getEnd());
     pollEventCache.put(newEvent, null);
