@@ -57,7 +57,7 @@ public abstract class AbstractUnsecureBasePage extends WebPage
 {
   private static final long serialVersionUID = 7396310612549535899L;
 
-  private static final PackageTextTemplate jsTemplate = new PackageTextTemplate(AbstractUnsecureBasePage.class, "ContextMenu.js.template");
+  private static PackageTextTemplate jsTemplate;
 
   protected WebMarkupContainer body, html;
 
@@ -291,6 +291,17 @@ public abstract class AbstractUnsecureBasePage extends WebPage
     final Map<String, String> i18nKeyMap = new HashMap<String, String>();
     i18nKeyMap.put("newTab", getString("contextMenu.newTab"));
     i18nKeyMap.put("cancel", getString("contextMenu.cancel"));
-    response.renderOnDomReadyJavaScript(jsTemplate.asString(i18nKeyMap));
+    response.renderOnDomReadyJavaScript(getJstemplate().asString(i18nKeyMap));
+  }
+
+  /**
+   * @return the jstemplate
+   */
+  private static PackageTextTemplate getJstemplate()
+  {
+    if (jsTemplate == null) {
+      jsTemplate = new PackageTextTemplate(AbstractUnsecureBasePage.class, "ContextMenu.js.template");
+    }
+    return jsTemplate;
   }
 }
