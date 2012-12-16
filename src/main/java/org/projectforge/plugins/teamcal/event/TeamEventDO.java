@@ -42,12 +42,27 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.calendar.TimePeriod;
-import org.projectforge.common.RecurrenceInterval;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.database.Constants;
+import org.projectforge.plugins.teamcal.TeamCalConfig;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 
 /**
+ * Overview of used (and may-be planned) fields:
+ * <ul>
+ * <li><b>ATTENDEE</b>: ATTENDEE;MEMBER="mailto:DEV-GROUP@example.com": mailto:joecool@example.com</li>
+ * <li><b>CONTACT</b>: CONTACT:Jim Dolittle\, ABC Industries\, +1-919-555-1234</li>
+ * <li><b>DTEND</b> - End date (DATE-TIME)</li>
+ * <li><b>DTSTAMP</b> - Time of creation (DATE-TIME)</li>
+ * <li><b>DTSTART</b> - Start date (DATE-TIME)</li>
+ * <li><b>EXDATE</b> - exception dates of recurrence (list of DATE-TIME)</li>
+ * <li><b>LAST-MODIFIED</b> - (DATE-TIME)</li>
+ * <li><b>PARTSTAT</b>=DECLINED:mailto:jsmith@example.com</li>
+ * <li><b>ORGANIZER</b>: ORGANIZER;CN=John Smith:mailto:jsmith@example.com</li>
+ * <li><b>RDATE</b> - Dates of recurrence</li>
+ * <li><b>RRULE</b> - Rule of recurrence: RRULE:FREQ=DAILY;UNTIL=19971224T000000Z</li>
+ * <li><b>UID</b>: UID:19960401T080045Z-4000F192713-0052@example.com
+ * </ul>
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * @author M. Lauterbach (m.lauterbach@micromata.de)
  * 
@@ -78,11 +93,9 @@ public class TeamEventDO extends DefaultBaseDO
   @IndexedEmbedded(depth = 1)
   private TeamCalDO calendar;
 
-  private RecurrenceInterval recurrenceInterval;
+  private String recurrenceRule, recurrenceExDate;
 
-  private Integer recurrenceAmount;
-
-  private Date recurrenceEndDate;
+  private Date recurrenceUntil;
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String note;
@@ -100,6 +113,12 @@ public class TeamEventDO extends DefaultBaseDO
   public TeamEventDO()
   {
 
+  }
+
+  @Transient
+  public String getUid()
+  {
+    return String.valueOf(getId()) + "@" + TeamCalConfig.get().getDomain();
   }
 
   @Column(length = Constants.LENGTH_SUBJECT)
@@ -259,59 +278,63 @@ public class TeamEventDO extends DefaultBaseDO
   }
 
   /**
-   * @return the recurrenceInterval
+   * RRULE (rfc5545)
+   * @return the recurrence
    */
-  @Column(name = "recurrence_interval")
-  public RecurrenceInterval getRecurrenceInterval()
+  public String getRecurrenceRule()
   {
-    return recurrenceInterval;
+    return recurrenceRule;
   }
 
   /**
-   * @param recurrenceInterval the recurrenceInterval to set
+   * @param recurrenceRule the recurrence to set
    * @return this for chaining.
    */
-  public TeamEventDO setRecurrenceInterval(final RecurrenceInterval recurrenceInterval)
+  public TeamEventDO setRecurrenceRule(final String recurrenceRule)
   {
-    this.recurrenceInterval = recurrenceInterval;
+    this.recurrenceRule = recurrenceRule;
     return this;
   }
 
   /**
-   * @return the recurrenceAmount
+   * EXDATE (rfc5545)
+   * @return the recurrenceExDate
    */
-  @Column(name = "recurrence_amount")
-  public Integer getRecurrenceAmount()
+  @Column(name = "recurrence_ex_date")
+  public String getRecurrenceExDate()
   {
-    return recurrenceAmount;
+    return recurrenceExDate;
   }
 
   /**
-   * @param recurrenceAmount the recurrenceAmount to set
+   * @param recurrenceExDate the recurrenceExDate to set
    * @return this for chaining.
    */
-  public TeamEventDO setRecurrenceAmount(final Integer recurrenceAmount)
+  public TeamEventDO setRecurrenceExDate(final String recurrenceExDate)
   {
-    this.recurrenceAmount = recurrenceAmount;
+    this.recurrenceExDate = recurrenceExDate;
     return this;
   }
 
   /**
+   * If not given the recurrence will never ends.
    * @return the recurrenceEndDate
    */
-  @Column(name = "recurrence_end_date")
-  public Date getRecurrenceEndDate()
+  @Column(name = "recurrence_until")
+  public Date getRecurrenceUntil()
   {
-    return recurrenceEndDate;
+    return recurrenceUntil;
   }
 
   /**
-   * @param recurrenceEndDate the recurrenceEndDate to set
+   * Please note: Do not set this property manually! It's set automatically by the recurrence rule! Otherwise the display of calendar events
+   * may be incorrect.
+   * @param recurrenceUntil the recurrenceEndDate to set
    * @return this for chaining.
    */
-  public TeamEventDO setRecurrenceEndDate(final Date recurrenceEndDate)
+  public TeamEventDO setRecurrenceUntil(final Date recurrenceUntil)
   {
-    this.recurrenceEndDate = recurrenceEndDate;
+    this.recurrenceUntil = recurrenceUntil;
     return this;
   }
 
@@ -330,9 +353,6 @@ public class TeamEventDO extends DefaultBaseDO
     return getTimePeriod().getDuration();
   }
 
-  /**
-   * @see java.lang.Object#hashCode()
-   */
   @Override
   public int hashCode()
   {
@@ -342,19 +362,15 @@ public class TeamEventDO extends DefaultBaseDO
     result = prime * result + ((attendees == null) ? 0 : attendees.hashCode());
     result = prime * result + ((calendar == null) ? 0 : calendar.hashCode());
     result = prime * result + ((endDate == null) ? 0 : endDate.hashCode());
+    result = prime * result + ((recurrenceExDate == null) ? 0 : recurrenceExDate.hashCode());
     result = prime * result + ((location == null) ? 0 : location.hashCode());
     result = prime * result + ((note == null) ? 0 : note.hashCode());
-    result = prime * result + ((recurrenceAmount == null) ? 0 : recurrenceAmount.hashCode());
-    result = prime * result + ((recurrenceEndDate == null) ? 0 : recurrenceEndDate.hashCode());
-    result = prime * result + ((recurrenceInterval == null) ? 0 : recurrenceInterval.hashCode());
+    result = prime * result + ((recurrenceRule == null) ? 0 : recurrenceRule.hashCode());
     result = prime * result + ((startDate == null) ? 0 : startDate.hashCode());
     result = prime * result + ((subject == null) ? 0 : subject.hashCode());
     return result;
   }
 
-  /**
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
   @Override
   public boolean equals(final Object obj)
   {
@@ -382,6 +398,11 @@ public class TeamEventDO extends DefaultBaseDO
         return false;
     } else if (!endDate.equals(other.endDate))
       return false;
+    if (recurrenceExDate == null) {
+      if (other.recurrenceExDate != null)
+        return false;
+    } else if (!recurrenceExDate.equals(other.recurrenceExDate))
+      return false;
     if (location == null) {
       if (other.location != null)
         return false;
@@ -392,17 +413,10 @@ public class TeamEventDO extends DefaultBaseDO
         return false;
     } else if (!note.equals(other.note))
       return false;
-    if (recurrenceAmount == null) {
-      if (other.recurrenceAmount != null)
+    if (recurrenceRule == null) {
+      if (other.recurrenceRule != null)
         return false;
-    } else if (!recurrenceAmount.equals(other.recurrenceAmount))
-      return false;
-    if (recurrenceEndDate == null) {
-      if (other.recurrenceEndDate != null)
-        return false;
-    } else if (!recurrenceEndDate.equals(other.recurrenceEndDate))
-      return false;
-    if (recurrenceInterval != other.recurrenceInterval)
+    } else if (!recurrenceRule.equals(other.recurrenceRule))
       return false;
     if (startDate == null) {
       if (other.startDate != null)
@@ -416,5 +430,4 @@ public class TeamEventDO extends DefaultBaseDO
       return false;
     return true;
   }
-
 }

@@ -1,19 +1,28 @@
 <wicket:panel xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
   <div class="pf_teamCalDialog">
-    <h3><wicket:message key="plugins.teamcal.selectTemplate" /></h3>
+    <h3>
+      <wicket:message key="plugins.teamcal.selectTemplate" />
+    </h3>
     <div class="teamCalTemplate">
-      <span class="left" wicket:id="templateList"></span>
-      <span class="right" wicket:id="addTemplate"></span>
-      <span class="right" wicket:id="editTemplate"></span>
+      <span class="left" wicket:id="templateList"></span> <span class="right" wicket:id="addTemplate"></span> <span class="right"
+        wicket:id="editTemplate"></span>
     </div>
     <div>
-      <h3><wicket:message key="label.options" /></h3>
-      TODO: * TeamCalEventEdit bei Neuanlage auch in Zeitberichtsanlage springen und umgekehrt. * Optionen in TeamCalDialog schieben. * Wiederkehr * Erinnerungen * Attendees.
+      <h3>
+        <wicket:message key="label.options" />
+      </h3>
+      TODO: * TeamCalEventEdit bei Neuanlage auch in Zeitberichtsanlage springen und umgekehrt. * Optionen in TeamCalDialog schieben. * Wiederkehr *
+      Erinnerungen * Attendees. * Löschen von Filtereinträgen.
     </div>
     <div wicket:id="bottomContainer">
-      <h3><wicket:message key="plugins.teamcal.selectCalendar" /></h3>
-      <input type="hidden" wicket:id="choices" style="width: 100%;"/>
-      <br/><br/><h3><wicket:message key="plugins.teamcal.selectColor" /></h3>
+      <h3>
+        <wicket:message key="plugins.teamcal.selectCalendar" />
+      </h3>
+      <input type="hidden" wicket:id="choices" style="width: 100%;" /> <br />
+      <br />
+      <h3>
+        <wicket:message key="plugins.teamcal.selectColor" />
+      </h3>
       <div wicket:id="repeaterContainer">
         <div wicket:id="repeater" style="clear: both; margin: 10px 0px;">
           <div style="float: left; margin-right: 10px;">
@@ -23,7 +32,10 @@
           <span style="height: 26px; vertical-align: middle; line-height: 24px;" wicket:id="name"></span>
         </div>
       </div>
-      <br/><h3><wicket:message key="plugins.teamcal.selectDefaultCalendar" /></h3>
+      <br />
+      <h3>
+        <wicket:message key="plugins.teamcal.selectDefaultCalendar" />
+      </h3>
       <form wicket:id="defaultForm">
         <select wicket:id="defaultSelect">
           <wicket:container wicket:id="options">
