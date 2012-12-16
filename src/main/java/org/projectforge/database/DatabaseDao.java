@@ -40,12 +40,11 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.SearchFactory;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.ExtendedBaseDO;
 import org.projectforge.core.ReindexSettings;
-import org.projectforge.registry.Registry;
-import org.projectforge.registry.RegistryEntry;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Isolation;
@@ -82,12 +81,6 @@ public class DatabaseDao extends HibernateDaoSupport
   }
 
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ)
-  public String rebuildDatabaseSearchIndices()
-  {
-    return rebuildDatabaseSearchIndices(new ReindexSettings());
-  }
-
-  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ)
   public String rebuildDatabaseSearchIndices(final Class< ? > clazz, final ReindexSettings settings)
   {
     if (currentReindexRun != null) {
@@ -106,37 +99,8 @@ public class DatabaseDao extends HibernateDaoSupport
     }
   }
 
-  @Transactional(readOnly = false, propagation = Propagation.SUPPORTS, isolation = Isolation.REPEATABLE_READ)
-  public String rebuildDatabaseSearchIndices(final ReindexSettings settings)
-  {
-    if (currentReindexRun != null) {
-      return "Another re-index job is already running. The job was started at: "
-          + DateTimeFormatter.instance().getFormattedDateTime(currentReindexRun);
-    }
-    synchronized (this) {
-      try {
-        currentReindexRun = new Date();
-        final StringBuffer buf = new StringBuffer();
-        for (final RegistryEntry entry : Registry.instance().getOrderedList()) {
-          try {
-            if (entry.getNestedDOClasses() != null) {
-              for (final Class< ? > nestedDOClass : entry.getNestedDOClasses()) {
-                reindex(nestedDOClass, settings, buf);
-              }
-            }
-            reindex(entry.getDOClass(), settings, buf);
-          } catch (final Exception ex) {
-            log.error("While rebuilding data-base-search-index for '" + entry.getId() + "': " + ex.getMessage(), ex);
-          }
-        }
-        return buf.toString();
-      } finally {
-        currentReindexRun = null;
-      }
-    }
-  }
-
-  private void reindex(final Class< ? > clazz, final ReindexSettings settings, final StringBuffer buf)
+  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ)
+  public void reindex(final Class< ? > clazz, final ReindexSettings settings, final StringBuffer buf)
   {
     buf.append(ClassUtils.getShortClassName(clazz));
     final File file = new File(ConfigXml.getInstance().getApplicationHomeDir() + "/hibernate-search/" + clazz.getName() + "/write.lock");
@@ -177,7 +141,7 @@ public class DatabaseDao extends HibernateDaoSupport
         + scrollMode
         + "...");
     final int batchSize = 1000;// NumberUtils.createInteger(System.getProperty("hibernate.search.worker.batch_size")
-    final FullTextSession fullTextSession = Search.createFullTextSession(session);
+    final FullTextSession fullTextSession = Search.getFullTextSession(session);
     fullTextSession.setFlushMode(FlushMode.MANUAL);
     fullTextSession.setCacheMode(CacheMode.IGNORE);
     int index = 0;
@@ -206,6 +170,8 @@ public class DatabaseDao extends HibernateDaoSupport
           session.flush(); // clear every batchSize since the queue is processed
       }
     }
+    final SearchFactory searchFactory = fullTextSession.getSearchFactory();
+    searchFactory.optimize(clazz);
     log.info("Re-indexing of " + index + " objects of type " + clazz.getName() + " done.");
   }
 

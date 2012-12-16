@@ -36,7 +36,7 @@ import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationDO;
 import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.ConfigurationParam;
-import org.projectforge.database.DatabaseDao;
+import org.projectforge.core.HibernateSearchReindexer;
 import org.projectforge.database.InitDatabaseDao;
 import org.projectforge.database.XmlDump;
 import org.projectforge.database.xstream.XStreamSavingConverter;
@@ -63,8 +63,8 @@ public class SetupPage extends AbstractUnsecureBasePage
   @SpringBean(name = "configurationDao")
   private ConfigurationDao configurationDao;
 
-  @SpringBean(name = "databaseDao")
-  private DatabaseDao databaseDao;
+  @SpringBean(name = "hibernateSearchReindexer")
+  private HibernateSearchReindexer hibernateSearchReindexer;
 
   @SpringBean(name = "taskTree")
   private TaskTree taskTree;
@@ -185,7 +185,7 @@ public class SetupPage extends AbstractUnsecureBasePage
         @Override
         public void run()
         {
-          databaseDao.rebuildDatabaseSearchIndices();
+          hibernateSearchReindexer.rebuildDatabaseSearchIndices();
         }
       }.start();
       if (counter > 0) {

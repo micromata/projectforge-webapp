@@ -32,6 +32,7 @@ import org.projectforge.access.AccessException;
 import org.projectforge.core.ConfigurationDO;
 import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.ConfigurationParam;
+import org.projectforge.core.HibernateSearchReindexer;
 import org.projectforge.database.xstream.XStreamSavingConverter;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskNode;
@@ -66,9 +67,9 @@ public class InitDatabaseDao extends HibernateDaoSupport
 
   private ConfigurationDao configurationDao;
 
-  private DatabaseDao databaseDao;
-
   private DatabaseUpdateDao databaseUpdateDao;
+
+  private HibernateSearchReindexer hibernateSearchReindexer;
 
   private UserGroupCache userGroupCache;
 
@@ -89,14 +90,18 @@ public class InitDatabaseDao extends HibernateDaoSupport
     this.configurationDao = configurationDao;
   }
 
-  public void setDatabaseDao(final DatabaseDao databaseDao)
-  {
-    this.databaseDao = databaseDao;
-  }
-
   public void setDatabaseUpdateDao(final DatabaseUpdateDao databaseUpdateDao)
   {
     this.databaseUpdateDao = databaseUpdateDao;
+  }
+
+  /**
+   * @param hibernateSearchReindexer the hibernateSearchReindexer to set
+   * @return this for chaining.
+   */
+  public void setHibernateSearchReindexer(final HibernateSearchReindexer hibernateSearchReindexer)
+  {
+    this.hibernateSearchReindexer = hibernateSearchReindexer;
   }
 
   public void setUserDao(final UserDao userDao)
@@ -233,7 +238,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
       @Override
       public void run()
       {
-        databaseDao.rebuildDatabaseSearchIndices();
+        hibernateSearchReindexer.rebuildDatabaseSearchIndices();
       }
     }.start();
     taskTree.setExpired();

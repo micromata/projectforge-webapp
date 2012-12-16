@@ -45,9 +45,9 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
+import org.projectforge.core.HibernateSearchReindexer;
 import org.projectforge.core.ReindexSettings;
 import org.projectforge.core.SystemDao;
-import org.projectforge.database.DatabaseDao;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.XmlDump;
 import org.projectforge.meb.MebMailClient;
@@ -84,11 +84,11 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
   @SpringBean(name = "systemDao")
   private SystemDao systemDao;
 
-  @SpringBean(name = "databaseDao")
-  private DatabaseDao databaseDao;
-
   @SpringBean(name = "databaseUpdateDao")
   private DatabaseUpdateDao databaseUpdateDao;
+
+  @SpringBean(name = "hibernateSearchReindexer")
+  private HibernateSearchReindexer hibernateSearchReindexer;
 
   @SpringBean(name = "mebMailClient")
   private MebMailClient mebMailClient;
@@ -284,7 +284,7 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
     log.info("Administration: re-index.");
     checkAccess();
     final ReindexSettings settings = new ReindexSettings(form.reindexFromDate, form.reindexNewestNEntries);
-    final String tables = databaseDao.rebuildDatabaseSearchIndices(settings);
+    final String tables = hibernateSearchReindexer.rebuildDatabaseSearchIndices(settings);
     setResponsePage(new MessagePage("administration.databaseSearchIndicesRebuild", tables));
   }
 
