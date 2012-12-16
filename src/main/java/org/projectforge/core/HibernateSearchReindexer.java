@@ -23,10 +23,23 @@
 
 package org.projectforge.core;
 
+import java.util.Date;
+
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.projectforge.database.DatabaseDao;
 import org.projectforge.mail.Mail;
 import org.projectforge.mail.SendMail;
+import org.projectforge.registry.Registry;
+import org.projectforge.registry.RegistryEntry;
+import org.projectforge.web.calendar.DateTimeFormatter;
+import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate3.HibernateTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 public class HibernateSearchReindexer
 {
@@ -42,6 +55,10 @@ public class HibernateSearchReindexer
 
   private DatabaseDao databaseDao;
 
+  private Date currentReindexRun = null;
+
+  private HibernateTemplate hibernate;
+
   public void execute()
   {
     log.info("Re-index job started.");
@@ -49,7 +66,7 @@ public class HibernateSearchReindexer
       log.error("Job not configured, aborting.");
       return;
     }
-    final String result = databaseDao.rebuildDatabaseSearchIndices();
+    final String result = rebuildDatabaseSearchIndices();
     if (result.contains("*") == true) {
       log.fatal(ERROR_MSG);
       final String recipients = configuration.getStringValue(ConfigurationParam.SYSTEM_ADMIN_E_MAIL);
@@ -66,18 +83,79 @@ public class HibernateSearchReindexer
     log.info("Re-index job finished successfully.");
   }
 
-  public void setConfiguration(Configuration configuration)
+  @SuppressWarnings({ "unchecked", "rawtypes"})
+  public String rebuildDatabaseSearchIndices(final ReindexSettings settings)
+  {
+    if (currentReindexRun != null) {
+      return "Another re-index job is already running. The job was started at: "
+          + DateTimeFormatter.instance().getFormattedDateTime(currentReindexRun);
+    }
+    synchronized (this) {
+      try {
+        currentReindexRun = new Date();
+        final StringBuffer buf = new StringBuffer();
+        for (final RegistryEntry entry : Registry.instance().getOrderedList()) {
+          try {
+            if (entry.getNestedDOClasses() != null) {
+              for (final Class< ? > nestedDOClass : entry.getNestedDOClasses()) {
+                // PF-378: Performance of run of full re-indexing the data-base is very slow for large data-bases
+                // Single transactions needed, otherwise the full run will be very slow for large data-bases.
+                final TransactionTemplate tx = new TransactionTemplate(new HibernateTransactionManager(hibernate.getSessionFactory()));
+                tx.execute(new TransactionCallback() {
+                  // The call-back is needed, otherwise a lot of transactions are left open until last run is completed:
+                  public Object doInTransaction(final TransactionStatus status)
+                  {
+                    hibernate.execute(new HibernateCallback() {
+                      public Object doInHibernate(final Session session) throws HibernateException
+                      {
+                        databaseDao.reindex(nestedDOClass, settings, buf);
+                        status.setRollbackOnly();
+                        return null;
+                      }
+                    });
+                    return null;
+                  }
+                });
+              }
+            }
+            databaseDao.reindex(entry.getDOClass(), settings, buf);
+          } catch (final Exception ex) {
+            log.error("While rebuilding data-base-search-index for '" + entry.getId() + "': " + ex.getMessage(), ex);
+          }
+        }
+        return buf.toString();
+      } finally {
+        currentReindexRun = null;
+      }
+    }
+  }
+
+  public String rebuildDatabaseSearchIndices()
+  {
+    return rebuildDatabaseSearchIndices(new ReindexSettings());
+  }
+
+  public void setConfiguration(final Configuration configuration)
   {
     this.configuration = configuration;
   }
 
-  public void setSendMail(SendMail sendMail)
+  public void setSendMail(final SendMail sendMail)
   {
     this.sendMail = sendMail;
   }
 
-  public void setDatabaseDao(DatabaseDao databaseDao)
+  public void setDatabaseDao(final DatabaseDao databaseDao)
   {
     this.databaseDao = databaseDao;
+  }
+
+  /**
+   * @param hibernate the hibernate to set
+   * @return this for chaining.
+   */
+  public void setHibernate(final HibernateTemplate hibernate)
+  {
+    this.hibernate = hibernate;
   }
 }
