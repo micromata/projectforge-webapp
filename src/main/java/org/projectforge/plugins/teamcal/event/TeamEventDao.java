@@ -35,6 +35,7 @@ import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
+import org.projectforge.calendar.CalendarUtils;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
@@ -69,6 +70,50 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
   protected String[] getAdditionalSearchFields()
   {
     return ADDITIONAL_SEARCH_FIELDS;
+  }
+
+  /**
+   * Sets midnight (UTC) of all day events.
+   * @see org.projectforge.core.BaseDao#onSaveOrModify(org.projectforge.core.ExtendedBaseDO)
+   */
+  @Override
+  protected void onSaveOrModify(final TeamEventDO event)
+  {
+    super.onSaveOrModify(event);
+    if (event.isAllDay() == false) {
+      return;
+    } else {
+      final Date startDate = event.getStartDate();
+      if (startDate != null) {
+        event.setStartDate(CalendarUtils.getUTCMidnightTimestamp(startDate));
+      }
+      final Date endDate = event.getEndDate();
+      if (endDate != null) {
+        event.setEndDate(CalendarUtils.getUTCMidnightTimestamp(endDate));
+      }
+    }
+  }
+
+  /**
+   * Sets midnight (with user's time zone) of all day events.
+   * @see org.projectforge.core.BaseDao#afterLoad(org.projectforge.core.ExtendedBaseDO)
+   */
+  @Override
+  protected void afterLoad(final TeamEventDO event)
+  {
+    super.afterLoad(event);
+    if (event.isAllDay() == false) {
+      return;
+    } else {
+      final Date startDate = event.getStartDate();
+      if (startDate != null) {
+        event.setStartDate(CalendarUtils.getMidnightTimestampFromUTC(startDate));
+      }
+      final Date endDate = event.getEndDate();
+      if (endDate != null) {
+        event.setEndDate(CalendarUtils.getMidnightTimestampFromUTC(endDate));
+      }
+    }
   }
 
   /**
