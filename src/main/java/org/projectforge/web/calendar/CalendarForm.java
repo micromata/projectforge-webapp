@@ -168,7 +168,8 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
         @Override
         public String getObject()
         {
-          final String iCalTarget = CalendarFeed.getUrl() + additionalInformation();
+          final PFUserDO timesheetUser = getTimesheetsUser();
+          final String iCalTarget = CalendarFeed.getUrl4Timesheets(timesheetUser != null ? timesheetUser.getId() : null);
           return iCalTarget;
         };
       }) {
@@ -206,20 +207,6 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
   protected String setIcsImportButtonTooltip()
   {
     return "timesheet.iCalExport";
-  }
-
-  /**
-   * add additional information to ics export url.
-   * 
-   * @return
-   */
-  protected String additionalInformation()
-  {
-    final PFUserDO timesheetUser = getTimesheetsUser();
-    if (timesheetUser != null) {
-      return "&timesheetUser=" + timesheetUser.getId();
-    }
-    return null;
   }
 
   /**
