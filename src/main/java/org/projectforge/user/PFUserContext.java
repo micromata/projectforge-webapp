@@ -111,10 +111,10 @@ public class PFUserContext
   }
 
   /**
-   * @return The locale of the user if exists, otherwise default timezone of PFUserDO
+   * @return The timeZone of the user if exists, otherwise default timezone of the Configuration
    * @see #getUser()
    * @see PFUserDO#getTimeZoneObject()
-   * @see PFUserDO#DEFAULT_TIME_ZONE
+   * @see Configuration#getDefaultTimeZone()
    */
   public final static TimeZone getTimeZone()
   {
