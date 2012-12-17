@@ -308,12 +308,4 @@ public class TemplateEntry implements Serializable, Comparable<TemplateEntry>, C
       return TeamCalEventProvider.EVENT_CLASS_NAME;
     }
   }
-
-  public static String calcCalendarStringForCalendar(final TeamCalDO calendar) {
-    if (TeamCalDialog.TIMESHEET_CALENDAR.equals(calendar) || calendar == null) {
-      return TimesheetEventsProvider.EVENT_CLASS_NAME;
-    } else {
-      return TeamCalEventProvider.EVENT_CLASS_NAME;
-    }
-  }
 }
