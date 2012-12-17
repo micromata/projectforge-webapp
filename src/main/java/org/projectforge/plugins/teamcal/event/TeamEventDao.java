@@ -36,6 +36,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.projectforge.calendar.CalendarUtils;
+import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
@@ -80,9 +81,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
   protected void onSaveOrModify(final TeamEventDO event)
   {
     super.onSaveOrModify(event);
-    if (event.isAllDay() == false) {
-      return;
-    } else {
+    if (event.isAllDay() == true) {
       final Date startDate = event.getStartDate();
       if (startDate != null) {
         event.setStartDate(CalendarUtils.getUTCMidnightTimestamp(startDate));
@@ -92,6 +91,9 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
         event.setEndDate(CalendarUtils.getUTCMidnightTimestamp(endDate));
       }
     }
+    // Update recurrenceUntil date (for database queries):
+    final Date recurrenceUntil = ICal4JUtils.calculateRecurrenceUntil(event.getRecurrenceRule());
+    event.setRecurrenceUntil(recurrenceUntil);
   }
 
   /**
@@ -133,7 +135,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
       return null;
     }
     final QueryFilter qFilter = buildQueryFilter(teamEventFilter);
-
+    log.warn("***** TODO: get all day events separate (due to UTC-date) and get recurrence events.");
     final List<TeamEventDO> list = getList(qFilter);
     return list;
   }

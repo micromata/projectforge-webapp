@@ -23,7 +23,6 @@
 
 package org.projectforge.plugins.teamcal.event;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 
 import javax.persistence.Column;
@@ -95,7 +94,7 @@ public class TeamEventDO extends DefaultBaseDO
 
   private String recurrenceRule, recurrenceExDate;
 
-  private Date recurrenceUntil;
+  private java.util.Date recurrenceUntil;
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String note;
@@ -321,7 +320,7 @@ public class TeamEventDO extends DefaultBaseDO
    * @return the recurrenceEndDate
    */
   @Column(name = "recurrence_until")
-  public Date getRecurrenceUntil()
+  public java.util.Date getRecurrenceUntil()
   {
     return recurrenceUntil;
   }
@@ -329,10 +328,12 @@ public class TeamEventDO extends DefaultBaseDO
   /**
    * Please note: Do not set this property manually! It's set automatically by the recurrence rule! Otherwise the display of calendar events
    * may be incorrect.
+   * <br/>
+   * This field exist only for data-base query purposes.
    * @param recurrenceUntil the recurrenceEndDate to set
    * @return this for chaining.
    */
-  public TeamEventDO setRecurrenceUntil(final Date recurrenceUntil)
+  public TeamEventDO setRecurrenceUntil(final java.util.Date recurrenceUntil)
   {
     this.recurrenceUntil = recurrenceUntil;
     return this;

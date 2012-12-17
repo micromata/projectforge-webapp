@@ -23,14 +23,18 @@
 
 package org.projectforge.calendar;
 
+import java.text.ParseException;
 import java.util.Date;
 
+import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.TimeZoneRegistry;
 import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.Uid;
 
+import org.apache.commons.lang.StringUtils;
 import org.projectforge.user.PFUserContext;
 
 /**
@@ -38,6 +42,8 @@ import org.projectforge.user.PFUserContext;
  */
 public class ICal4JUtils
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ICal4JUtils.class);
+
   private static TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
 
   /**
@@ -77,4 +83,31 @@ public class ICal4JUtils
     vEvent.getProperties().add(new Uid(uid));
     return vEvent;
   }
+
+  public static Recur calculateRecurrence(final String rruleString)
+  {
+    try {
+      final RRule rule = new RRule(rruleString);
+      return rule.getRecur();
+    } catch (final ParseException ex) {
+      log.error("Exception encountered while parsing rrule '" + rruleString + "': " + ex.getMessage(), ex);
+      return null;
+    }
+  }
+
+  public static Date calculateRecurrenceUntil(final String rruleString)
+  {
+    if (StringUtils.isBlank(rruleString) == true) {
+      return null;
+    }
+    final Recur recur = calculateRecurrence(rruleString);
+    if (recur == null) {
+      return null;
+    }
+    return recur.getUntil();
+  }
+
+  // public static void createRecurrence() {
+  // final Recur recur = new Recur();
+  // }
 }
