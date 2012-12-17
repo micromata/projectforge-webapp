@@ -35,6 +35,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.projectforge.plugins.teamcal.admin.TeamCalCache;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
+import org.projectforge.plugins.teamcal.dialog.TeamCalDialog;
+import org.projectforge.plugins.teamcal.event.TeamCalEventProvider;
+import org.projectforge.web.timesheet.TimesheetEventsProvider;
 
 /**
  * Persist the settings of one calendar entry in the filter.
@@ -53,6 +56,8 @@ public class TemplateEntry implements Serializable, Comparable<TemplateEntry>, C
   private Set<Integer> visibleCalendarIds;
 
   private String name;
+
+  private Integer defaultCalendarId;
 
   Set<TemplateCalendarProperties> getCalendarProperties()
   {
@@ -275,5 +280,39 @@ public class TemplateEntry implements Serializable, Comparable<TemplateEntry>, C
       }
     }
     return false;
+  }
+
+  /**
+   * @return the defaultCalendarId
+   */
+  public Integer getDefaultCalendarId()
+  {
+    return defaultCalendarId;
+  }
+
+  /**
+   * @param defaultCalendarId the defaultCalendarId to set
+   * @return this for chaining.
+   */
+  public TemplateEntry setDefaultCalendarId(final Integer defaultCalendarId)
+  {
+    this.defaultCalendarId = defaultCalendarId;
+    return this;
+  }
+
+  public static String calcCalendarStringForCalendar(final Integer calendarId) {
+    if (TeamCalDialog.TIMESHEET_CALENDAR_ID.equals(calendarId) || calendarId == null) {
+      return TimesheetEventsProvider.EVENT_CLASS_NAME;
+    } else {
+      return TeamCalEventProvider.EVENT_CLASS_NAME;
+    }
+  }
+
+  public static String calcCalendarStringForCalendar(final TeamCalDO calendar) {
+    if (TeamCalDialog.TIMESHEET_CALENDAR.equals(calendar) || calendar == null) {
+      return TimesheetEventsProvider.EVENT_CLASS_NAME;
+    } else {
+      return TeamCalEventProvider.EVENT_CLASS_NAME;
+    }
   }
 }

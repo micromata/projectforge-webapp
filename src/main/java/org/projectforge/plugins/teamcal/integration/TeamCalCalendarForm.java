@@ -142,6 +142,7 @@ public class TeamCalCalendarForm extends CalendarForm
         @Override
         protected void onUpdate(final AjaxRequestTarget target)
         {
+          filter.setSelectedCalendar(TemplateEntry.calcCalendarStringForCalendar(activeModel.getObject().getDefaultCalendarId()));
           setResponsePage(getParentPage().getClass());
         }
       });

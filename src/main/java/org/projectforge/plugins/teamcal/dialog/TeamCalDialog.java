@@ -49,7 +49,6 @@ import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
-import org.projectforge.plugins.teamcal.event.TeamCalEventProvider;
 import org.projectforge.plugins.teamcal.event.TeamEventDao;
 import org.projectforge.plugins.teamcal.event.TeamEventRight;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFilter;
@@ -60,7 +59,6 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRights;
 import org.projectforge.web.common.ColorPickerPanel;
 import org.projectforge.web.dialog.PFDialog;
-import org.projectforge.web.timesheet.TimesheetEventsProvider;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
@@ -84,18 +82,16 @@ public class TeamCalDialog extends PFDialog
 
   private final List<TeamCalDO> selectedCalendars;
 
-  private TeamCalDO selectedDefaultCalendar;
-
   private DropDownChoicePanel<TemplateEntry> templateChoice;
 
   // Adaption (fake) to display "Time Sheets" as selection option
-  private final TeamCalDO timeSheetCalendar;
+  public static final TeamCalDO TIMESHEET_CALENDAR = new TeamCalDO();
 
   private final TeamCalCalendarFilter filter;
 
   private TeamCalCalendarFilter backupFilter;
 
-  private static final int TIMESHEET_CALENDAR_ID = -1;
+  public static final Integer TIMESHEET_CALENDAR_ID = -1;
 
   @SpringBean
   private TeamCalDao teamCalDao;
@@ -112,7 +108,6 @@ public class TeamCalDialog extends PFDialog
     super(id, titleModel);
     this.filter = filter;
     selectedCalendars = new LinkedList<TeamCalDO>();
-    timeSheetCalendar = new TeamCalDO();
     teamEventRight = (TeamEventRight) UserRights.instance().getRight(TeamEventDao.USER_RIGHT_ID);
     setOnCloseCallback(new AjaxCallback() {
       private static final long serialVersionUID = -8154276568761839693L;
@@ -131,16 +126,6 @@ public class TeamCalDialog extends PFDialog
   @Override
   public void open(final AjaxRequestTarget target)
   {
-    // this assignment is wanted to prevent auto save "final" action
-    if (filter.getSelectedCalendar() == null || TimesheetEventsProvider.EVENT_CLASS_NAME.equals(filter.getSelectedCalendar()) == true) {
-      selectedDefaultCalendar = timeSheetCalendar;
-    } else {
-      // get teamCal
-      selectedDefaultCalendar = TeamCalEventProvider.getTeamCalForEncodedId(teamCalDao, filter.getSelectedCalendar());
-      if (selectedDefaultCalendar == null) {
-        selectedDefaultCalendar = timeSheetCalendar;
-      }
-    }
     backupFilter = new TeamCalCalendarFilter().copyValuesFrom(filter);
     super.open(target);
   }
@@ -161,8 +146,8 @@ public class TeamCalDialog extends PFDialog
   protected void onInitialize()
   {
     super.onInitialize();
-    timeSheetCalendar.setTitle(getString("plugins.teamcal.timeSheetCalendar"));
-    timeSheetCalendar.setId(TIMESHEET_CALENDAR_ID);
+    TIMESHEET_CALENDAR.setTitle(getString("plugins.teamcal.timeSheetCalendar"));
+    TIMESHEET_CALENDAR.setId(TIMESHEET_CALENDAR_ID);
 
     appendNewAjaxActionButton(new AjaxCallback() {
       private static final long serialVersionUID = -8154276568761839693L;
@@ -195,11 +180,7 @@ public class TeamCalDialog extends PFDialog
       // Do nothing.
       return;
     }
-    // set choice to time sheet, if selected calendar is not element of current collection.
     final TemplateEntry activeTemplateEntry = filter.getActiveTemplateEntry();
-    if (activeTemplateEntry == null || activeTemplateEntry.contains(selectedDefaultCalendar.getId()) == false) {
-      filter.setSelectedCalendar(TimesheetEventsProvider.EVENT_CLASS_NAME);
-    }
     if (activeTemplateEntry != null) {
       activeTemplateEntry.setDirty();
     }
@@ -223,7 +204,7 @@ public class TeamCalDialog extends PFDialog
   {
     private static final long serialVersionUID = -135497846745050310L;
 
-    private Select<TeamCalDO> select;
+    private Select<Integer> select;
 
     private Select2MultiChoice<TeamCalDO> teamCalChoice;
 
@@ -464,17 +445,20 @@ public class TeamCalDialog extends PFDialog
       });
       bottomContainer.add(teamCalChoice);
 
-      final IOptionRenderer<TeamCalDO> renderer = new IOptionRenderer<TeamCalDO>() {
+      final IOptionRenderer<Integer> renderer = new IOptionRenderer<Integer>() {
         private static final long serialVersionUID = 4233157357375064338L;
 
         @Override
-        public String getDisplayValue(final TeamCalDO object)
+        public String getDisplayValue(final Integer object)
         {
-          return object.getTitle();
+          if(TIMESHEET_CALENDAR_ID.equals(object)) {
+            return TIMESHEET_CALENDAR.getTitle();
+          }
+          return teamCalDao.getById(object).getTitle();
         }
 
         @Override
-        public IModel<TeamCalDO> getModel(final TeamCalDO value)
+        public IModel<Integer> getModel(final Integer value)
         {
           return Model.of(value);
         }
@@ -483,7 +467,8 @@ public class TeamCalDialog extends PFDialog
       // TEAMCAL DROPDOWN
       final Form<Void> defaultForm = new Form<Void>("defaultForm");
       add(defaultForm);
-      select = new Select<TeamCalDO>("defaultSelect", new PropertyModel<TeamCalDO>(TeamCalDialog.this, "selectedDefaultCalendar")) {
+      final IModel<TemplateEntry> activeTemplateEntryModel = new PropertyModel<TemplateEntry>(filter, "activeTemplateEntry");
+      select = new Select<Integer>("defaultSelect", new PropertyModel<Integer>(activeTemplateEntryModel, "defaultCalendarId")) {
         private static final long serialVersionUID = -1826120411566623945L;
 
         /**
@@ -503,35 +488,22 @@ public class TeamCalDialog extends PFDialog
             }
           }
           final PFUserDO user = PFUserContext.getUser();
-          final List<TeamCalDO> filteredList = new ArrayList<TeamCalDO>();
-          filteredList.add(0, timeSheetCalendar);
+          final List<Integer> filteredList = new ArrayList<Integer>();
+          filteredList.add(0, TIMESHEET_CALENDAR_ID);
           if (result != null) {
             // remove teamCals where user has less than full access or is not owner.
             final Iterator<TeamCalDO> it = result.iterator();
             while (it.hasNext()) {
               final TeamCalDO teamCal = it.next();
               if (teamCalDao.hasUpdateAccess(user, teamCal, null, false) == true) {
-                filteredList.add(teamCal);
+                filteredList.add(teamCal.getId());
               }
             }
           }
-          final SelectOptions<TeamCalDO> options = new SelectOptions<TeamCalDO>("options", filteredList, renderer);
+          final SelectOptions<Integer> options = new SelectOptions<Integer>("options", filteredList, renderer);
           select.addOrReplace(options);
         }
 
-        /**
-         * @see org.apache.wicket.Component#onModelChanged()
-         */
-        @Override
-        protected void onModelChanged()
-        {
-          super.onModelChanged();
-          if (timeSheetCalendar.equals(selectedDefaultCalendar) || selectedDefaultCalendar == null) {
-            filter.setSelectedCalendar(TimesheetEventsProvider.EVENT_CLASS_NAME);
-          } else {
-            filter.setSelectedCalendar(TeamCalEventProvider.EVENT_CLASS_NAME + "-" + selectedDefaultCalendar.getId());
-          }
-        }
       };
       select.add(new AjaxFormComponentUpdatingBehavior("onChange") {
         private static final long serialVersionUID = -5677673442072775133L;
@@ -539,7 +511,7 @@ public class TeamCalDialog extends PFDialog
         @Override
         protected void onUpdate(final AjaxRequestTarget target)
         {
-          // just update the model
+          filter.setSelectedCalendar(TemplateEntry.calcCalendarStringForCalendar(filter.getActiveTemplateEntry().getDefaultCalendarId()));
         }
       });
       select.setOutputMarkupId(true);

@@ -96,18 +96,20 @@ public class TeamCalCalendarPanel extends CalendarPanel
     handleDateRangeSelection(this, getWebPage(), range, teamCalDao, selectedCalendar);
   }
 
-  public static void handleDateRangeSelection(final Component caller, final WebPage returnPage, final SelectedRange range,
+  private void handleDateRangeSelection(final Component caller, final WebPage returnPage, final SelectedRange range,
       final TeamCalDao teamCalDao, final String calendarId)
   {
-    final TeamCalDO calendar = TeamCalEventProvider.getTeamCalForEncodedId(teamCalDao, calendarId);
-    final TeamEventDO event = new TeamEventDO();
-    event.setAllDay(range.isAllDay());
-    event.setStartDate(new Timestamp(DateHelper.getDateTimeAsMillis(range.getStart()))).setEndDate(
-        new Timestamp(DateHelper.getDateTimeAsMillis(range.getEnd())));
-    event.setCalendar(calendar);
-    final TeamEventEditPage page = new TeamEventEditPage(new PageParameters(), event);
-    page.setReturnToPage(new TeamCalCalendarPage(returnPage.getPageParameters()));
-    caller.setResponsePage(page);
+    if(filter instanceof TeamCalCalendarFilter) {
+      final TeamCalDO calendar = teamCalDao.getById(((TeamCalCalendarFilter)filter).getActiveTemplateEntry().getDefaultCalendarId());
+      final TeamEventDO event = new TeamEventDO();
+      event.setAllDay(range.isAllDay());
+      event.setStartDate(new Timestamp(DateHelper.getDateTimeAsMillis(range.getStart()))).setEndDate(
+          new Timestamp(DateHelper.getDateTimeAsMillis(range.getEnd())));
+      event.setCalendar(calendar);
+      final TeamEventEditPage page = new TeamEventEditPage(new PageParameters(), event);
+      page.setReturnToPage(new TeamCalCalendarPage(returnPage.getPageParameters()));
+      caller.setResponsePage(page);
+    }
   }
 
   /**

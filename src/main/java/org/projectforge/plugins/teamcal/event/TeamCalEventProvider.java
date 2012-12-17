@@ -35,8 +35,6 @@ import org.apache.wicket.Component;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Period;
-import org.projectforge.plugins.teamcal.admin.TeamCalDO;
-import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalRight;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFilter;
 import org.projectforge.plugins.teamcal.integration.TemplateEntry;
@@ -188,26 +186,6 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
         events.put(teamEvent.getId() + "", event);
       }
     }
-  }
-
-  /**
-   * @param selectedCalendar
-   * @return
-   */
-  public static TeamCalDO getTeamCalForEncodedId(final TeamCalDao teamCalDao, String selectedCalendar)
-  {
-    if (selectedCalendar == null) {
-      return null;
-    }
-    if (selectedCalendar.contains("-")) {
-      selectedCalendar = selectedCalendar.substring(selectedCalendar.indexOf("-") + 1);
-    }
-    try {
-      return teamCalDao.getById(Integer.valueOf(selectedCalendar));
-    } catch (final NumberFormatException ex) {
-      log.warn("Unable to get teamCalDao for id " + selectedCalendar);
-    }
-    return null;
   }
 
 }
