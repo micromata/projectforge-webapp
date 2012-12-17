@@ -255,6 +255,9 @@ public class TeamCalDialog extends PFDialog
       bottomContainer.setOutputMarkupPlaceholderTag(true);
       add(bottomContainer);
 
+      // hide if no templates available
+      bottomContainer.setVisible(filter.getTemplateEntries().isEmpty() == false);
+
       // COLOR TABLE
       final WebMarkupContainer repeaterContainer = new WebMarkupContainer("repeaterContainer") {
         private static final long serialVersionUID = 7750294984025761480L;
@@ -331,7 +334,7 @@ public class TeamCalDialog extends PFDialog
         }
       };
 
-      // TEAMCALCALENDARCOLLECTION DROPDOWN
+      // TEMPLATEENTRY DROPDOWN
       final IModel<List<TemplateEntry>> choicesModel = new PropertyModel<List<TemplateEntry>>(filter, "templateEntries");
       final IModel<TemplateEntry> currentModel = new PropertyModel<TemplateEntry>(filter, "activeTemplateEntry");
       templateChoice = new DropDownChoicePanel<TemplateEntry>("templateList", currentModel, choicesModel, teamCalCollectionRenderer, false);
@@ -401,12 +404,27 @@ public class TeamCalDialog extends PFDialog
           if (activeTemplateEntry != null) {
             currentName = activeTemplateEntry.getName();
             nameDialog.open(target);
+            // this callback is evaluated when the name dialog was entered!
+            currentAjaxCallback = new AjaxCallback() {
+              private static final long serialVersionUID = -6959790939627419710L;
+
+              @Override
+              public void callback(final AjaxRequestTarget target)
+              {
+                if (currentName.equals(filter.getActiveTemplateEntry().getName()) == false) {
+                  filter.getActiveTemplateEntry().setName(currentName);
+                }
+              }
+            };
           }
         }
       };
       editTemplateButton.setDefaultFormProcessing(false);
       editTemplateButton.setLight();
       add(editTemplateButton);
+
+      // hide if no templates available
+      editTemplateButton.setVisible(filter.getTemplateEntries().isEmpty() == false);
 
       final TemplateEntry activeTemplateEntry = filter.getActiveTemplateEntry();
       selectedCalendars.clear();
@@ -464,7 +482,7 @@ public class TeamCalDialog extends PFDialog
 
       // TEAMCAL DROPDOWN
       final Form<Void> defaultForm = new Form<Void>("defaultForm");
-      bottomContainer.add(defaultForm);
+      add(defaultForm);
       select = new Select<TeamCalDO>("defaultSelect", new PropertyModel<TeamCalDO>(TeamCalDialog.this, "selectedDefaultCalendar")) {
         private static final long serialVersionUID = -1826120411566623945L;
 
@@ -538,6 +556,8 @@ public class TeamCalDialog extends PFDialog
           currentAjaxCallback.callback(target);
           templateChoice.getDropDownChoice().setChoices(filter.getTemplateEntries());
           templateChoice.getDropDownChoice().setDefaultModel(new PropertyModel<TemplateEntry>(filter, "activeTemplateEntry"));
+          bottomContainer.setVisible(filter.getTemplateEntries().isEmpty() == false);
+          editTemplateButton.setVisible(filter.getTemplateEntries().isEmpty() == false);
           addToTarget(target, templateChoice.getDropDownChoice(), bottomContainer, select);
         }
 
