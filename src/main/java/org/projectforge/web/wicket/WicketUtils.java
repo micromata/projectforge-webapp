@@ -50,6 +50,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.protocol.http.RequestUtils;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
+import org.apache.wicket.request.Url;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.string.StringValue;
@@ -67,6 +68,7 @@ import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.web.HtmlHelper;
+import org.projectforge.web.LoginPage;
 import org.projectforge.web.URLHelper;
 import org.projectforge.web.WebConfig;
 import org.projectforge.web.calendar.DateTimeFormatter;
@@ -89,6 +91,8 @@ public class WicketUtils
 
   private static String APPLICATION_CONTEXT = "/ProjectForge";
 
+  private static String absoluteContextPath;
+
   public static final String WICKET_APPLICATION_PATH = "wa/";
 
   public static String getContextPath()
@@ -99,6 +103,27 @@ public class WicketUtils
   static void setContextPath(final String contextPath)
   {
     APPLICATION_CONTEXT = contextPath;
+    absoluteContextPath = null;
+  }
+
+  /**
+   * Examples: https://www.projectforge.org/demo or https://www.acme.com/ProjectForge.
+   * @return Absolute context path of the web application.
+   */
+  public static String getAbsoluteContextPath()
+  {
+    if (absoluteContextPath == null) {
+      final RequestCycle requestCycle = RequestCycle.get();
+      final String url = requestCycle.getUrlRenderer().renderFullUrl(Url.parse(requestCycle.urlFor(LoginPage.class, null).toString()));
+      final String basePath = "/" + WICKET_APPLICATION_PATH;
+      final int pos = url.indexOf(basePath);
+      if (pos < 0) {
+        log.warn("Couln't get base url of '" + url + "'. Sub string '" + basePath + "' expected.");
+        return url;
+      }
+      absoluteContextPath = url.substring(0, pos);
+    }
+    return absoluteContextPath;
   }
 
   public static HttpServletRequest getHttpServletRequest(final Request request)
@@ -1056,7 +1081,8 @@ public class WicketUtils
     return StringHelper.listToString("/", labels);
   }
 
-  public static Label createBooleanLabel(final Response response, final String componentId, final boolean value) {
+  public static Label createBooleanLabel(final Response response, final String componentId, final boolean value)
+  {
     final StringBuffer buf = new StringBuffer();
     if (value == true) {
       HtmlHelper.getInstance().appendImageTag(response, buf, "/images/accept.png", null);
