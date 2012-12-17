@@ -56,21 +56,25 @@ public class ICal4JUtils
 
   public static VEvent createEvent(final Date startDate, final Date endDate, final String uid, final String summary, final boolean allDay)
   {
+    final TimeZone timezone = getUserTimeZone();
     VEvent vEvent;
     if (allDay == true) {
-      final net.fortuna.ical4j.model.Date fortunaStartDate = new net.fortuna.ical4j.model.Date(startDate);
-      final org.joda.time.DateTime jodaTime = new org.joda.time.DateTime(endDate);
+      final Date startUtc = CalendarUtils.getUTCMidnightDate(startDate);
+      final Date endUtc = CalendarUtils.getUTCMidnightDate(endDate);
+      final net.fortuna.ical4j.model.Date fortunaStartDate = new net.fortuna.ical4j.model.Date(startUtc);
+      final org.joda.time.DateTime jodaTime = new org.joda.time.DateTime(endUtc);
       // requires plus 1 because one day will be omitted by calendar.
       final net.fortuna.ical4j.model.Date fortunaEndDate = new net.fortuna.ical4j.model.Date(jodaTime.plusDays(1).toDate());
       vEvent = new VEvent(fortunaStartDate, fortunaEndDate, summary);
     } else {
       final net.fortuna.ical4j.model.DateTime fortunaStartDate = new net.fortuna.ical4j.model.DateTime(startDate);
+      fortunaStartDate.setTimeZone(timezone);
       final net.fortuna.ical4j.model.DateTime fortunaEndDate = new net.fortuna.ical4j.model.DateTime(endDate);
+      fortunaEndDate.setTimeZone(timezone);
       vEvent = new VEvent(fortunaStartDate, fortunaEndDate, summary);
+      vEvent.getProperties().add(timezone.getVTimeZone().getTimeZoneId());
     }
     vEvent.getProperties().add(new Uid(uid));
-    // TODO: timezone doesn't work yet.
-    vEvent.getProperties().add(getUserTimeZone().getVTimeZone().getTimeZoneId());
     return vEvent;
   }
 }
