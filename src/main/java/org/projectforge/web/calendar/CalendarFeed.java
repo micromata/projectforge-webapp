@@ -46,7 +46,6 @@ import net.fortuna.ical4j.model.property.Version;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.protocol.http.WebApplication;
 import org.projectforge.access.AccessException;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.NumberHelper;
@@ -61,6 +60,7 @@ import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRights;
 import org.projectforge.web.timesheet.TimesheetEventsProvider;
+import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * Feed Servlet, which generates a 'text/calendar' output of the last four mounts. Currently relevant informations are date, start- and stop
@@ -86,27 +86,25 @@ public class CalendarFeed extends HttpServlet
     return getUrl(null);
   }
 
-  public static String getUrlParameterTimesheetUser(final PFUserDO timesheetUser)
+  /**
+   * @return The url for downloading timesheets (including context), e. g. /ProjectForge/export/ProjectForge.ics?user=....
+   */
+  public static String getUrl4Timesheets(final Integer timesheetUserId)
   {
-    if (timesheetUser == null) {
-      return null;
-    }
-    return "&" + PARAM_NAME_TIMESHEET_USER + "=" + timesheetUser.getId();
+    return WicketUtils.getContextPath() + getUrl("&timesheetUser=" + timesheetUserId);
   }
 
   /**
-   * 
    * @param additionalParams Request parameters such as "&calId=42", may be null.
-   * @return
+   * @return The url for downloading calendars (without context), e. g. /export/ProjectForge.ics?user=...
    */
   public static String getUrl(final String additionalParams)
   {
     final PFUserDO user = PFUserContext.getUser();
     final UserDao userDao = Registry.instance().getDao(UserDao.class);
     final String authenticationKey = userDao.getAuthenticationToken(user.getId());
-    final String contextPath = WebApplication.get().getServletContext().getContextPath();
     final StringBuffer buf = new StringBuffer();
-    buf.append(contextPath).append("/export/ProjectForge.ics?user=").append(user.getUsername()).append("&token=").append(authenticationKey);
+    buf.append("/export/ProjectForge.ics?user=").append(user.getUsername()).append("&token=").append(authenticationKey);
     if (additionalParams != null) {
       buf.append(additionalParams);
     }
