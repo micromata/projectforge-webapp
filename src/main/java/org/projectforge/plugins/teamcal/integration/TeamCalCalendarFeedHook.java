@@ -58,6 +58,11 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
     return CalendarFeed.getUrl("&teamCals=" + teamCalIds);
   }
 
+  public static final String getUrl(final Integer teamCalId)
+  {
+    return getUrl(teamCalId != null ? teamCalId.toString() : "");
+  }
+
   /**
    * @see org.projectforge.web.calendar.CalendarFeedHook#getEvents(net.fortuna.ical4j.model.TimeZone, java.util.Calendar)
    */
