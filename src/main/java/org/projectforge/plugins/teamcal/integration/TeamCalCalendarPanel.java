@@ -100,7 +100,11 @@ public class TeamCalCalendarPanel extends CalendarPanel
       final TeamCalDao teamCalDao, final String calendarId)
   {
     if(filter instanceof TeamCalCalendarFilter) {
-      final TeamCalDO calendar = teamCalDao.getById(((TeamCalCalendarFilter)filter).getActiveTemplateEntry().getDefaultCalendarId());
+      final TemplateEntry activeTemplateEntry = ((TeamCalCalendarFilter)filter).getActiveTemplateEntry();
+      if(activeTemplateEntry.getDefaultCalendarId() == null && activeTemplateEntry.getCalendars().size() > 0) {
+        activeTemplateEntry.setDefaultCalendarId(activeTemplateEntry.getCalendars().get(0).getId());
+      }
+      final TeamCalDO calendar = teamCalDao.getById(activeTemplateEntry.getDefaultCalendarId());
       final TeamEventDO event = new TeamEventDO();
       event.setAllDay(range.isAllDay());
       event.setStartDate(new Timestamp(DateHelper.getDateTimeAsMillis(range.getStart()))).setEndDate(
