@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.projectforge.user.PFUserContext;
 import org.projectforge.web.calendar.CalendarFilter;
 
 /**
@@ -90,25 +91,35 @@ public class TeamCalCalendarFilter extends CalendarFilter
    */
   public List<TemplateEntry> getTemplateEntries()
   {
+    if (templateEntries.size() == 0) {
+      createDefaultEntry();
+    }
     return templateEntries;
   }
 
+  /**
+   * Adds new entry and sets the new entry as active entry.
+   * @param entry
+   */
   public void add(final TemplateEntry entry)
   {
     synchronized (templateEntries) {
       templateEntries.add(entry);
       Collections.sort(templateEntries);
-      // TODO kai: müsste hier nicht activeTemplateEntryIndex neu berechnet werden
-      // da sich die Reihenfolge ändern könnte? Bzw. active auf das neue Element setzen?
+      setActiveTemplateEntry(entry);
     }
   }
 
-  public void remove(final TemplateEntry entry) {
+  public void remove(final TemplateEntry entry)
+  {
     synchronized (templateEntries) {
       final int index = templateEntries.indexOf(entry);
       templateEntries.remove(entry);
-      if(index == activeTemplateEntryIndex) {
+      if (index == activeTemplateEntryIndex) {
         activeTemplateEntryIndex = 0;
+      }
+      if (templateEntries.size() == 0) {
+        createDefaultEntry();
       }
     }
     activeTemplateEntry = null;
@@ -143,6 +154,9 @@ public class TeamCalCalendarFilter extends CalendarFilter
       if (this.activeTemplateEntryIndex >= 0 && this.activeTemplateEntryIndex < this.templateEntries.size()) {
         this.activeTemplateEntry = this.templateEntries.get(this.activeTemplateEntryIndex);
         this.activeTemplateEntry.setDirty();
+      } else {
+        // No filter entry given, create the standard filter:
+        createDefaultEntry();
       }
     }
     return this.activeTemplateEntry;
@@ -220,5 +234,12 @@ public class TeamCalCalendarFilter extends CalendarFilter
       }
     }
     return false;
+  }
+
+  private void createDefaultEntry()
+  {
+    final TemplateEntry newTemplate = new TemplateEntry();
+    newTemplate.setName(PFUserContext.getLocalizedString("default"));
+    add(newTemplate);
   }
 }

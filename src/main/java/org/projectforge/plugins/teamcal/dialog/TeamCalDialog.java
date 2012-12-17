@@ -359,7 +359,6 @@ public class TeamCalDialog extends PFDialog
               final TemplateEntry newTemplate = new TemplateEntry();
               newTemplate.setName(currentName);
               filter.add(newTemplate);
-              filter.setActiveTemplateEntry(newTemplate);
               selectedCalendars.clear();
               selectedCalendars.addAll(newTemplate.getCalendars());
             }
@@ -405,7 +404,7 @@ public class TeamCalDialog extends PFDialog
       add(editTemplateButton);
 
       //
-      // EDIT BUTTON
+      // DELETE BUTTON
       final IconButtonPanel deleteTemplateButton = new AjaxIconButtonPanel("deleteTemplate", IconType.TRASH, getString("delete")) {
         private static final long serialVersionUID = -8572571785540159369L;
 
@@ -416,6 +415,8 @@ public class TeamCalDialog extends PFDialog
         protected void onSubmit(final AjaxRequestTarget target)
         {
           filter.remove(filter.getActiveTemplateEntry());
+          selectedCalendars.clear();
+          selectedCalendars.addAll(filter.getActiveTemplateEntry().getCalendars());
           addToTarget(target, templateChoice.getDropDownChoice(), repeaterContainer, select, teamCalChoice);
         }
       };
