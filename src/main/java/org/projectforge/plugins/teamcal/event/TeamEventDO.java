@@ -115,12 +115,6 @@ public class TeamEventDO extends DefaultBaseDO
 
   }
 
-  @Transient
-  public String getUid()
-  {
-    return String.valueOf(getId()) + "@" + TeamCalConfig.get().getDomain();
-  }
-
   @Column(length = Constants.LENGTH_SUBJECT)
   public String getSubject()
   {
