@@ -41,6 +41,7 @@ import net.fortuna.ical4j.model.property.Name;
 import net.fortuna.ical4j.model.property.Uid;
 
 import org.apache.commons.lang.StringUtils;
+import org.projectforge.plugins.teamcal.TeamCalConfig;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDao;
 import org.projectforge.plugins.teamcal.event.TeamEventFilter;
@@ -56,6 +57,8 @@ import org.projectforge.web.calendar.CalendarFeedHook;
  */
 public class TeamCalCalendarFeedHook implements CalendarFeedHook
 {
+  // Don't change this, otherwise the synchronization with older entries may fail.
+  private static final String UID_PREFIX = "pf-event";
 
   public static final String getUrl(final String teamCalIds)
   {
@@ -91,6 +94,7 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
         for (final TeamEventDO teamEvent : teamEvents) {
           final Date date = new Date(teamEvent.getStartDate().getTime());
           final VEvent vEvent;
+          final String uid = TeamCalConfig.get().createUid(UID_PREFIX, teamEvent.getId());
           if (teamEvent.isAllDay() == true) {
             final DtStart dtStart = new DtStart(timezone);
             final net.fortuna.ical4j.model.Date fortunaStartDate = new net.fortuna.ical4j.model.Date(date);
@@ -107,7 +111,7 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
               calendarName = " (" + teamEvent.getCalendar().getTitle() + ")";
             }
             vEvent = new VEvent(fortunaStartDate, fortunaEndDate, teamEvent.getSubject() + calendarName);
-            vEvent.getProperties().add(new Uid(fortunaStartDate.toString()));
+            vEvent.getProperties().add(new Uid(uid));
           } else {
             cal.setTime(date);
             final DateTime startTime = getCalTime(timezone, cal);
@@ -120,7 +124,7 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
               calendarName = " (" + teamEvent.getCalendar().getTitle() + ")";
             }
             vEvent = new VEvent(startTime, stopTime, teamEvent.getSubject() + calendarName);
-            vEvent.getProperties().add(new Uid(startTime.toString()));
+            vEvent.getProperties().add(new Uid(uid));
           }
           if (StringUtils.isNotBlank(teamEvent.getLocation()) == true) {
             vEvent.getProperties().add(new Location(teamEvent.getLocation()));

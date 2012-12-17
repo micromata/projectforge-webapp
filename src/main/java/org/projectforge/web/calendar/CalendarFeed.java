@@ -54,6 +54,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.projectforge.access.AccessException;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.plugins.teamcal.TeamCalConfig;
 import org.projectforge.registry.Registry;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
@@ -74,6 +75,9 @@ import org.projectforge.web.timesheet.TimesheetEventsProvider;
  */
 public class CalendarFeed extends HttpServlet
 {
+  // Don't change this, otherwise the synchronization with older entries may fail.
+  private static final String UID_PREFIX = "pf-ts";
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(CalendarFeed.class);
 
   private static final long serialVersionUID = 1480433876190009435L;
@@ -105,7 +109,7 @@ public class CalendarFeed extends HttpServlet
   public static String getUrl(final String additionalParams)
   {
     final PFUserDO user = PFUserContext.getUser();
-    final UserDao userDao = (UserDao) Registry.instance().getDao(UserDao.class);
+    final UserDao userDao = Registry.instance().getDao(UserDao.class);
     final String authenticationKey = userDao.getAuthenticationToken(user.getId());
     final String contextPath = WebApplication.get().getServletContext().getContextPath();
     final StringBuffer buf = new StringBuffer();
@@ -151,7 +155,7 @@ public class CalendarFeed extends HttpServlet
    */
   public Calendar createCal(final HttpServletRequest req, final String userName, final String authKey, final String timesheetUserParam)
   {
-    final UserDao userDao = (UserDao) Registry.instance().getDao(UserDao.class);
+    final UserDao userDao = Registry.instance().getDao(UserDao.class);
     final PFUserDO loggedInUser = userDao.getUserByAuthenticationToken(userName, authKey);
 
     if (loggedInUser == null) {
@@ -233,7 +237,7 @@ public class CalendarFeed extends HttpServlet
       }
       filter.setStartTime(cal.getTime());
 
-      final TimesheetDao timesheetDao = (TimesheetDao) Registry.instance().getDao(TimesheetDao.class);
+      final TimesheetDao timesheetDao = Registry.instance().getDao(TimesheetDao.class);
       final List<TimesheetDO> timesheetList = timesheetDao.getList(filter);
 
       // iterate over all timesheets and adds each event to the calendar
@@ -253,7 +257,7 @@ public class CalendarFeed extends HttpServlet
         } else {
           vEvent = new VEvent(startTime, stopTime, TimesheetEventsProvider.getTitle(timesheet));
         }
-        vEvent.getProperties().add(new Uid(startTime.toString()));
+        vEvent.getProperties().add(new Uid(TeamCalConfig.get().createUid(UID_PREFIX, timesheet.getId())));
         vEvent.getProperties().add(new Location(timesheet.getLocation()));
 
         events.add(vEvent);
