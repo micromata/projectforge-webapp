@@ -10,17 +10,15 @@
 package org.projectforge.plugins.teamcal.dialog;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.link.ExternalLink;
-import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.markup.html.form.TextArea;
+import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.request.Url;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFeedHook;
 import org.projectforge.web.dialog.PFDialog;
-import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
-import org.projectforge.web.wicket.flowlayout.IconType;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
@@ -36,7 +34,7 @@ public class ICSExportDialog extends PFDialog
    * @param id
    * @param titleModel
    */
-  public ICSExportDialog(String id, IModel<String> titleModel, TeamCalDO teamCal)
+  public ICSExportDialog(final String id, final IModel<String> titleModel, final TeamCalDO teamCal)
   {
     super(id, titleModel);
     this.teamCal = teamCal;
@@ -46,21 +44,38 @@ public class ICSExportDialog extends PFDialog
    * @see org.projectforge.web.dialog.PFDialog#getDialogContent(java.lang.String)
    */
   @Override
-  protected Component getDialogContent(String wicketId)
+  protected Component getDialogContent(final String wicketId)
   {
-    RepeatingView mainContainer = new RepeatingView(wicketId);
+    return new Content(wicketId);
+  }
 
-    mainContainer.add(new Label(mainContainer.newChildId(), "Download URL"));
+  private class Content extends Panel
+  {
+    private static final long serialVersionUID = 5506421088716142887L;
 
-    String iCalTarget = TeamCalCalendarFeedHook.getUrl(String.valueOf(teamCal.getId()));
-    mainContainer.add(new Label(mainContainer.newChildId(), RequestCycle.get().getUrlRenderer()
-        .renderFullUrl(Url.parse(urlFor(getPage().getClass(), null).toString()))
-        + iCalTarget));
+    /**
+     * @param id
+     */
+    public Content(final String id)
+    {
+      super(id);
+      // final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, iCalTarget);
+      // IconLinkPanel link = new IconLinkPanel(mainContainer.newChildId(), IconType.SUBSCRIPTION, iCalExportLink);
+      // mainContainer.add(link);
+    }
 
-    final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, iCalTarget);
-    IconLinkPanel link = new IconLinkPanel(mainContainer.newChildId(), IconType.SUBSCRIPTION, iCalExportLink);
-    mainContainer.add(link);
+    /**
+     * @see org.apache.wicket.Component#onInitialize()
+     */
+    @Override
+    protected void onInitialize()
+    {
+      super.onInitialize();
 
-    return mainContainer;
+      final String iCalTarget = TeamCalCalendarFeedHook.getUrl(String.valueOf(teamCal.getId()));
+      final String url = RequestCycle.get().getUrlRenderer().renderFullUrl(Url.parse(urlFor(getPage().getClass(), null).toString()))
+          + iCalTarget;
+      add(new TextArea<String>("url", Model.of(url)));
+    }
   }
 }
