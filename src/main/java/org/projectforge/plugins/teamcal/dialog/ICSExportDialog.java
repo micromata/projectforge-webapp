@@ -14,11 +14,10 @@ import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.request.Url;
-import org.apache.wicket.request.cycle.RequestCycle;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFeedHook;
 import org.projectforge.web.dialog.PFDialog;
+import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
@@ -72,9 +71,8 @@ public class ICSExportDialog extends PFDialog
     {
       super.onInitialize();
 
-      final String iCalTarget = TeamCalCalendarFeedHook.getUrl(String.valueOf(teamCal.getId()));
-      final String url = RequestCycle.get().getUrlRenderer().renderFullUrl(Url.parse(urlFor(getPage().getClass(), null).toString()))
-          + iCalTarget;
+      final String iCalTarget = TeamCalCalendarFeedHook.getUrl(teamCal.getId());
+      final String url = WicketUtils.getAbsoluteContextPath() + iCalTarget;
       add(new TextArea<String>("url", Model.of(url)));
     }
   }
