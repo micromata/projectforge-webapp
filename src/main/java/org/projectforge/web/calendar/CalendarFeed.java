@@ -75,9 +75,6 @@ import org.projectforge.web.timesheet.TimesheetEventsProvider;
  */
 public class CalendarFeed extends HttpServlet
 {
-  // Don't change this, otherwise the synchronization with older entries may fail.
-  private static final String UID_PREFIX = "pf-ts";
-
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(CalendarFeed.class);
 
   private static final long serialVersionUID = 1480433876190009435L;
@@ -257,7 +254,7 @@ public class CalendarFeed extends HttpServlet
         } else {
           vEvent = new VEvent(startTime, stopTime, TimesheetEventsProvider.getTitle(timesheet));
         }
-        vEvent.getProperties().add(new Uid(TeamCalConfig.get().createUid(UID_PREFIX, timesheet.getId())));
+        vEvent.getProperties().add(new Uid(TeamCalConfig.get().createTimesheetUid(timesheet.getId())));
         vEvent.getProperties().add(new Location(timesheet.getLocation()));
 
         events.add(vEvent);

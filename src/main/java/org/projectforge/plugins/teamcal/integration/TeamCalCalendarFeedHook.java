@@ -57,9 +57,6 @@ import org.projectforge.web.calendar.CalendarFeedHook;
  */
 public class TeamCalCalendarFeedHook implements CalendarFeedHook
 {
-  // Don't change this, otherwise the synchronization with older entries may fail.
-  private static final String UID_PREFIX = "pf-event";
-
   public static final String getUrl(final String teamCalIds)
   {
     return CalendarFeed.getUrl("&teamCals=" + teamCalIds);
@@ -94,7 +91,7 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
         for (final TeamEventDO teamEvent : teamEvents) {
           final Date date = new Date(teamEvent.getStartDate().getTime());
           final VEvent vEvent;
-          final String uid = TeamCalConfig.get().createUid(UID_PREFIX, teamEvent.getId());
+          final String uid = TeamCalConfig.get().createEventUid(teamEvent.getId());
           if (teamEvent.isAllDay() == true) {
             final DtStart dtStart = new DtStart(timezone);
             final net.fortuna.ical4j.model.Date fortunaStartDate = new net.fortuna.ical4j.model.Date(date);

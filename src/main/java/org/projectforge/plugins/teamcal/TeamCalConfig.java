@@ -28,6 +28,12 @@ import org.projectforge.core.ConfigurationData;
 
 public class TeamCalConfig implements ConfigurationData
 {
+  // Don't change this, otherwise the synchronization with older entries may fail.
+  private static final String EVENT_UID_PREFIX = "pf-event";
+
+  // Don't change this, otherwise the synchronization with older entries may fail.
+  private static final String TIMESHEET_UID_PREFIX = "pf-ts";
+
   private static TeamCalConfig config;
 
   public static TeamCalConfig get()
@@ -79,5 +85,23 @@ public class TeamCalConfig implements ConfigurationData
   public String createUid(final String prefix, final String id)
   {
     return prefix + "-" + id + "@" + getDomain();
+  }
+
+  /**
+   * @param id
+   * @return
+   */
+  public String createEventUid(final Integer id)
+  {
+    return createUid(EVENT_UID_PREFIX, id);
+  }
+
+  /**
+   * @param id
+   * @return
+   */
+  public String createTimesheetUid(final Integer id)
+  {
+    return createUid(TIMESHEET_UID_PREFIX, id);
   }
 }
