@@ -91,7 +91,7 @@ public class CalendarPanel extends Panel
 
   private TimesheetEventsProvider timesheetEventsProvider;
 
-  private CalendarFilter filter;
+  protected CalendarFilter filter;
 
   private boolean refresh;
 
