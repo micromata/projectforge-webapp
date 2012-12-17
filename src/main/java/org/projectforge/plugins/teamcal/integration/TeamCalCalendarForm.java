@@ -22,7 +22,6 @@
 /////////////////////////////////////////////////////////////////////////////
 
 package org.projectforge.plugins.teamcal.integration;
-
 import java.util.List;
 import java.util.Set;
 
@@ -44,6 +43,7 @@ import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
+
 
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
@@ -86,7 +86,7 @@ public class TeamCalCalendarForm extends CalendarForm
         dialog.open(target);
       }
     };
-    calendarButtonPanel.setLight();
+    calendarButtonPanel.setLight().setDefaultFormProcessing(false);
     fs.add(calendarButtonPanel);
 
     {
@@ -104,7 +104,7 @@ public class TeamCalCalendarForm extends CalendarForm
           setResponsePage(teamEventListPage);
         }
       };
-      searchButtonPanel.setLight();
+      searchButtonPanel.setLight().setDefaultFormProcessing(false);
       fs.add(searchButtonPanel);
     }
 
