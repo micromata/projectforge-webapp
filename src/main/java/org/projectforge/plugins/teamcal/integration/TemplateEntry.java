@@ -245,6 +245,7 @@ public class TemplateEntry implements Serializable, Comparable<TemplateEntry>, C
     //    try {
     final TemplateEntry cloned = new TemplateEntry(); // super.clone();
     cloned.name = this.name;
+    cloned.defaultCalendarId = this.defaultCalendarId;
     for (final TemplateCalendarProperties props : this.calendarProperties) {
       final TemplateCalendarProperties clonedProps = props.clone();
       cloned.calendarProperties.add(clonedProps);
