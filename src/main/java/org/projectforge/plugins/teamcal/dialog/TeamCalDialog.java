@@ -404,6 +404,25 @@ public class TeamCalDialog extends PFDialog
       editTemplateButton.setLight();
       add(editTemplateButton);
 
+      //
+      // EDIT BUTTON
+      final IconButtonPanel deleteTemplateButton = new AjaxIconButtonPanel("deleteTemplate", IconType.TRASH, getString("delete")) {
+        private static final long serialVersionUID = -8572571785540159369L;
+
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
+         */
+        @Override
+        protected void onSubmit(final AjaxRequestTarget target)
+        {
+          filter.remove(filter.getActiveTemplateEntry());
+          addToTarget(target, templateChoice.getDropDownChoice(), repeaterContainer, select, teamCalChoice);
+        }
+      };
+      deleteTemplateButton.setDefaultFormProcessing(false);
+      deleteTemplateButton.setLight();
+      add(deleteTemplateButton);
+
       // hide if no templates available
       editTemplateButton.setVisible(filter.getTemplateEntries().isEmpty() == false);
 

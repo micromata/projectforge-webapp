@@ -98,7 +98,20 @@ public class TeamCalCalendarFilter extends CalendarFilter
     synchronized (templateEntries) {
       templateEntries.add(entry);
       Collections.sort(templateEntries);
+      // TODO kai: müsste hier nicht activeTemplateEntryIndex neu berechnet werden
+      // da sich die Reihenfolge ändern könnte? Bzw. active auf das neue Element setzen?
     }
+  }
+
+  public void remove(final TemplateEntry entry) {
+    synchronized (templateEntries) {
+      final int index = templateEntries.indexOf(entry);
+      templateEntries.remove(entry);
+      if(index == activeTemplateEntryIndex) {
+        activeTemplateEntryIndex = 0;
+      }
+    }
+    activeTemplateEntry = null;
   }
 
   /**
