@@ -33,7 +33,7 @@ public class TeamCalConfig implements ConfigurationData
   public static TeamCalConfig get()
   {
     if (config == null) {
-      config = (TeamCalConfig)ConfigXml.getInstance().getPluginConfig(TeamCalConfig.class);
+      config = (TeamCalConfig) ConfigXml.getInstance().getPluginConfig(TeamCalConfig.class);
     }
     return config;
   }
@@ -58,5 +58,26 @@ public class TeamCalConfig implements ConfigurationData
   {
     this.domain = domain;
     return this;
+  }
+
+  /**
+   * @param prefix
+   * @param id
+   * @see #createUid(String, String)
+   */
+  public String createUid(final String prefix, final Integer id)
+  {
+    return createUid(prefix, id != null ? id.toString() : "");
+  }
+
+  /**
+   * Creates a world wide unique event id for ical events for better synchronization.
+   * @param prefix
+   * @param id
+   * @return uid of the format: "${prefix}-${id}@${domain}", e. g. "pf-event-1234@projectforge.org".
+   */
+  public String createUid(final String prefix, final String id)
+  {
+    return prefix + "-" + id + "@" + getDomain();
   }
 }
