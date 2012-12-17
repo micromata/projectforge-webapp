@@ -25,7 +25,6 @@ package org.projectforge.web.calendar;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -37,22 +36,19 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.TimeZone;
-import net.fortuna.ical4j.model.TimeZoneRegistry;
-import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.ProdId;
-import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.projectforge.access.AccessException;
+import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.plugins.teamcal.TeamCalConfig;
 import org.projectforge.registry.Registry;
@@ -200,10 +196,8 @@ public class CalendarFeed extends HttpServlet
       throw new AccessException("No logged-in-user found!");
     }
     final List<VEvent> events = new ArrayList<VEvent>();
-    final java.util.TimeZone javaTimezone = PFUserContext.getTimeZone();
-    final TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
-    final TimeZone timezone = registry.getTimeZone(javaTimezone.getID());
-    final java.util.Calendar cal = java.util.Calendar.getInstance(javaTimezone);
+    final TimeZone timezone = ICal4JUtils.getUserTimeZone();
+    final java.util.Calendar cal = java.util.Calendar.getInstance(PFUserContext.getTimeZone());
 
     boolean eventsExist = false;
     for (final CalendarFeedHook hook : feedHooks) {
@@ -239,42 +233,22 @@ public class CalendarFeed extends HttpServlet
 
       // iterate over all timesheets and adds each event to the calendar
       for (final TimesheetDO timesheet : timesheetList) {
-
-        final Date date = new Date(timesheet.getStartTime().getTime());
-        cal.setTime(date);
-        final DateTime startTime = getCalTime(timezone, cal);
-
-        date.setTime(timesheet.getStopTime().getTime());
-        cal.setTime(date);
-        final DateTime stopTime = getCalTime(timezone, cal);
-
-        final VEvent vEvent;
+        final String uid = TeamCalConfig.get().createTimesheetUid(timesheet.getId());
+        String summary;
         if (eventsExist == true) {
-          vEvent = new VEvent(startTime, stopTime, TimesheetEventsProvider.getTitle(timesheet) + " (timesheet)");
+          summary = TimesheetEventsProvider.getTitle(timesheet) + " (ts)";
         } else {
-          vEvent = new VEvent(startTime, stopTime, TimesheetEventsProvider.getTitle(timesheet));
+          summary = TimesheetEventsProvider.getTitle(timesheet);
         }
-        vEvent.getProperties().add(new Uid(TeamCalConfig.get().createTimesheetUid(timesheet.getId())));
-        vEvent.getProperties().add(new Location(timesheet.getLocation()));
-
+        final VEvent vEvent = ICal4JUtils.createEvent(timesheet.getStartTime(), timesheet.getStopTime(), uid, summary);
+        if (StringUtils.isNotBlank(timesheet.getLocation()) == true) {
+          vEvent.getProperties().add(new Location(timesheet.getLocation()));
+        }
         events.add(vEvent);
       }
     }
 
     return events;
-  }
-
-  /**
-   * 
-   * @param timezone
-   * @param cal
-   * @return relevant DateTime for a calendar, using user timezone
-   */
-  private DateTime getCalTime(final TimeZone timezone, final java.util.Calendar cal)
-  {
-    final DateTime startTime = new DateTime(cal.getTime());
-    startTime.setTimeZone(timezone);
-    return startTime;
   }
 
   /**
