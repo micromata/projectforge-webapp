@@ -87,7 +87,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
 
   protected static final String[] MY_BOOKMARKABLE_INITIAL_PROPERTIES = mergeStringArrays(BOOKMARKABLE_INITIAL_PROPERTIES, new String[] {
       "f.listType|lt", "f.uptodate", "f.outdated", "f.leaved", "f.active", "f.nonActive", "f.uninteresting", "f.personaIngrata",
-  "f.departed"});
+      "f.departed"});
 
   @SpringBean(name = "addressDao")
   private AddressDao addressDao;
@@ -125,11 +125,13 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
     phoneCallSupported = ConfigXml.getInstance().isTelephoneSystemUrlConfigured() == true;
   }
 
+  @Override
   @SuppressWarnings("serial")
   public List<IColumn<AddressDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final List<IColumn<AddressDO>> columns = new ArrayList<IColumn<AddressDO>>();
     final CellItemListener<AddressDO> cellItemListener = new CellItemListener<AddressDO>() {
+      @Override
       public void populateItem(final Item<ICellPopulator<AddressDO>> item, final String componentId, final IModel<AddressDO> rowModel)
       {
         final AddressDO address = rowModel.getObject();
@@ -259,13 +261,11 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
       }, getString("address.tooltip.writeSMS"));
       addContentMenuEntry(menuEntry);
     }
-    if (WebConfiguration.isDevelopmentMode() == true)
-    {
+    if (WebConfiguration.isDevelopmentMode() == true) {
       // final Import vcards
       final BookmarkablePageLink<AddressImportPage> importVCardsLink = new BookmarkablePageLink<AddressImportPage>(
           ContentMenuEntryPanel.LINK_ID, AddressImportPage.class);
 
-      // TODO i18n
       final ContentMenuEntryPanel importVCardsButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), importVCardsLink,
           getString("address.book.vCardImport")).setTooltip(getString("address.book.vCardImport.tooltip"));
       addContentMenuEntry(importVCardsButton);

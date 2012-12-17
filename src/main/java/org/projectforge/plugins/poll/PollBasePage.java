@@ -47,6 +47,8 @@ public abstract class PollBasePage extends AbstractSecuredPage
 
   protected Form<String> form;
 
+  private String backButtonTitle;
+
   /**
    * @param parameters
    */
@@ -76,7 +78,8 @@ public abstract class PollBasePage extends AbstractSecuredPage
         PollBasePage.this.onCancel();
       }
     };
-    SingleButtonPanel cancelPanel = new SingleButtonPanel("cancel", cancel, getString("cancel"), SingleButtonPanel.CANCEL);
+    SingleButtonPanel cancelPanel = new SingleButtonPanel("cancel", cancel, setCancelButtonTitle(getString("cancel")),
+        SingleButtonPanel.CANCEL);
 
     // Confirm button
     Button confirm = new Button(SingleButtonPanel.WICKET_ID) {
@@ -136,5 +139,4 @@ public abstract class PollBasePage extends AbstractSecuredPage
   {
     return null;
   }
-
 }

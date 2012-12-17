@@ -32,7 +32,7 @@ import org.projectforge.user.UserRightId;
  */
 public class PollDao extends BaseDao<PollDO>
 {
-  public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_POLL", "plugin16", "plugins.poll");
+  public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_POLL", "plugin30", "plugins.poll");
 
   /**
    * @param clazz

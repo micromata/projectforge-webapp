@@ -70,7 +70,8 @@ public class PollEventEditPage extends AbstractSecuredPage
 
   private final NewPollFrontendModel model;
 
-  public PollEventEditPage(final PageParameters parameters) {
+  public PollEventEditPage(final PageParameters parameters)
+  {
     super(parameters);
     NewPollPage.redirectToNewPollPage(parameters);
     this.model = null;
@@ -128,6 +129,26 @@ public class PollEventEditPage extends AbstractSecuredPage
       }
     };
     eventEntries = new RepeatingView("eventEntries");
+
+    final Button nextButton = new Button(SingleButtonPanel.WICKET_ID) {
+      private static final long serialVersionUID = -7779593314951993472L;
+
+      @Override
+      public final void onSubmit()
+      {
+        if (eventProvider.getAllEvents().isEmpty() == false) {
+          onNextButtonClick(model.getPollDo(), eventProvider.getAllEvents());
+        } else {
+          this.error("");
+        }
+      }
+    };
+    nextButton.setDefaultFormProcessing(false);
+    final SingleButtonPanel nextButtonPanel = new SingleButtonPanel("continueButton", nextButton, getString("next"),
+        SingleButtonPanel.DEFAULT_SUBMIT);
+    nextButtonPanel.setOutputMarkupId(true);
+    form.add(nextButtonPanel);
+
     entryContainer.add(eventEntries);
     entryContainer.setOutputMarkupId(true);
     form.add(entryContainer);
@@ -198,19 +219,7 @@ public class PollEventEditPage extends AbstractSecuredPage
     eventSource.setEventsProvider(eventProvider);
     config.add(eventSource);
     form.add(calendar);
-    final Button nextButton = new Button(SingleButtonPanel.WICKET_ID) {
-      private static final long serialVersionUID = -7779593314951993472L;
 
-      @Override
-      public final void onSubmit()
-      {
-        onNextButtonClick(model.getPollDo(), eventProvider.getAllEvents());
-      }
-    };
-    nextButton.setDefaultFormProcessing(false);
-    final SingleButtonPanel nextButtonPanel = new SingleButtonPanel("continueButton", nextButton, getString("next"),
-        SingleButtonPanel.DEFAULT_SUBMIT);
-    form.add(nextButtonPanel);
   }
 
   /**

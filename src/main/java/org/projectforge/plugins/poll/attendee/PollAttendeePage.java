@@ -34,10 +34,10 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.plugins.poll.NewPollFrontendModel;
+import org.projectforge.plugins.poll.NewPollOverviewPage;
 import org.projectforge.plugins.poll.NewPollPage;
 import org.projectforge.plugins.poll.PollBasePage;
 import org.projectforge.plugins.poll.event.PollEventEditPage;
-import org.projectforge.plugins.poll.result.PollResultPage;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
@@ -78,7 +78,8 @@ public class PollAttendeePage extends PollBasePage
 
   private final NewPollFrontendModel model;
 
-  public PollAttendeePage(final PageParameters parameters) {
+  public PollAttendeePage(final PageParameters parameters)
+  {
     super(parameters);
     NewPollPage.redirectToNewPollPage(parameters);
     this.model = null;
@@ -126,22 +127,6 @@ public class PollAttendeePage extends PollBasePage
 
     // TODO Email select
     final FieldsetPanel fsEMail = gridBuilder.newFieldset(getString("email"), true);
-    // May be repeating input field for every mail address
-    // final RepeatingView emailRepeater = new RepeatingView(fsEMail.newChildId());
-    // emailRepeater.add(getNewEMailField(emailRepeater.newChildId()));
-    //
-    // Button addEmailButton = new Button(SingleButtonPanel.WICKET_ID) {
-    // private static final long serialVersionUID = 2351870376486149681L;
-    //
-    // @Override
-    // public void onSubmit()
-    // {
-    // emailRepeater.add(getNewEMailField(emailRepeater.newChildId()));
-    // }
-    // };
-    // SingleButtonPanel addEmailButtonPanel = new SingleButtonPanel("cancel", addEmailButton, getString("cancel"),
-    // SingleButtonPanel.SEND_RIGHT);
-    // fsEMail.add(emailRepeater);
     fsEMail.add(getNewEMailField(fsEMail.getTextFieldId()));
 
   }
@@ -206,7 +191,7 @@ public class PollAttendeePage extends PollBasePage
     }
 
     if (allAttendeeList.isEmpty() == true) {
-      this.error(getString("")); // TODO Max: .. something is missing, isn´t it?
+      this.error(getString("plugins.poll.error"));
     } else {
       model.getPollAttendeeList().clear();
       model.getCalculatedAttendeeList().clear();
@@ -215,11 +200,12 @@ public class PollAttendeePage extends PollBasePage
       model.getPollAttendeeList().addAll(userAttendees);
       model.getCalculatedAttendeeList().addAll(allAttendeeList);
       model.getPollGroupList().addAll(assignedGroups);
-      setResponsePage(new PollResultPage(getPageParameters(), model));
+      setResponsePage(new NewPollOverviewPage(getPageParameters(), model));
     }
   }
 
-  private PollAttendeeDO createAttendee(final PFUserDO user) {
+  private PollAttendeeDO createAttendee(final PFUserDO user)
+  {
     final PollAttendeeDO newAttendee = new PollAttendeeDO();
     newAttendee.setUser(user);
     return newAttendee;
@@ -234,4 +220,12 @@ public class PollAttendeePage extends PollBasePage
     setResponsePage(new PollEventEditPage(getPageParameters(), model));
   }
 
+  /**
+   * @see org.projectforge.plugins.poll.PollBasePage#setCancelButtonTitle(java.lang.String)
+   */
+  @Override
+  protected String setCancelButtonTitle(String title)
+  {
+    return getString("back");
+  }
 }
