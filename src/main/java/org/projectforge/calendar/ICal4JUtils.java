@@ -84,15 +84,34 @@ public class ICal4JUtils
     return vEvent;
   }
 
-  public static Recur calculateRecurrence(final String rruleString)
+  /**
+   * 
+   * @param rruleString
+   * @return null if rruleString is empty, otherwise new RRule object.
+   */
+  public static RRule calculateRecurrenceRule(final String rruleString)
   {
+    if (StringUtils.isBlank(rruleString) == true) {
+      return null;
+    }
     try {
       final RRule rule = new RRule(rruleString);
-      return rule.getRecur();
+      return rule;
     } catch (final ParseException ex) {
       log.error("Exception encountered while parsing rrule '" + rruleString + "': " + ex.getMessage(), ex);
       return null;
     }
+  }
+
+  /**
+   * @param rruleString
+   * @see ICal4JUtils#calculateRecurrenceRule(String)
+   * @see RRule#getRecur()
+   */
+  public static Recur calculateRecurrence(final String rruleString)
+  {
+    final RRule rule = calculateRecurrenceRule(rruleString);
+    return rule != null ? rule.getRecur() : null;
   }
 
   public static Date calculateRecurrenceUntil(final String rruleString)

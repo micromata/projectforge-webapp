@@ -33,6 +33,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.property.RRule;
+
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
@@ -40,6 +43,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
+import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.calendar.TimePeriod;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.database.Constants;
@@ -91,6 +95,8 @@ public class TeamEventDO extends DefaultBaseDO
 
   @IndexedEmbedded(depth = 1)
   private TeamCalDO calendar;
+
+  private transient RRule recurrenceRuleObject;
 
   private String recurrenceRule, recurrenceExDate;
 
@@ -292,7 +298,49 @@ public class TeamEventDO extends DefaultBaseDO
   public TeamEventDO setRecurrenceRule(final String recurrenceRule)
   {
     this.recurrenceRule = recurrenceRule;
+    this.recurrenceRuleObject = null;
+    recalculate();
     return this;
+  }
+
+  /**
+   * Will be renewed if {@link #setRecurrenceRule(String)} is called.
+   * @return the recurrenceRuleObject
+   */
+  @Transient
+  public RRule getRecurrenceRuleObject()
+  {
+    if (recurrenceRuleObject == null) {
+      recalculate();
+    }
+    return recurrenceRuleObject;
+  }
+
+  /**
+   * The recurrenceUntil date is calculated by the recurrenceRule string if given, otherwise the date is set to null.
+   * @see org.projectforge.core.AbstractBaseDO#recalculate()
+   */
+  @Override
+  public void recalculate()
+  {
+    super.recalculate();
+    recurrenceRuleObject = ICal4JUtils.calculateRecurrenceRule(recurrenceRule);
+    if (recurrenceRuleObject == null || recurrenceRuleObject.getRecur() == null) {
+      this.recurrenceUntil = null;
+      return;
+    }
+    this.recurrenceUntil = recurrenceRuleObject.getRecur().getUntil();
+  }
+
+  /**
+   * Will be renewed if {@link #setRecurrenceRule(String)} is called.
+   * @return the recurrenceRuleObject
+   */
+  @Transient
+  public Recur getRecurrenceObject()
+  {
+    final RRule rrule = getRecurrenceRuleObject();
+    return rrule != null ? rrule.getRecur() : null;
   }
 
   /**
@@ -327,8 +375,7 @@ public class TeamEventDO extends DefaultBaseDO
 
   /**
    * Please note: Do not set this property manually! It's set automatically by the recurrence rule! Otherwise the display of calendar events
-   * may be incorrect.
-   * <br/>
+   * may be incorrect. <br/>
    * This field exist only for data-base query purposes.
    * @param recurrenceUntil the recurrenceEndDate to set
    * @return this for chaining.
