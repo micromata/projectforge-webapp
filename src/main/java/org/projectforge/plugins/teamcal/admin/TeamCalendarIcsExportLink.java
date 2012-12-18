@@ -15,6 +15,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.projectforge.plugins.teamcal.dialog.ICSExportDialog;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.web.dialog.PFDialog;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel;
@@ -66,7 +67,7 @@ public class TeamCalendarIcsExportLink extends Panel
       {
         dialog.close(target);
       }
-    }, getString("close"), SingleButtonPanel.CANCEL);
+    }, PFUserContext.getLocalizedString("close"), SingleButtonPanel.CANCEL);
     final AjaxIconButtonPanel dialogOpenLink = new AjaxIconButtonPanel("exportLink", IconType.SUBSCRIPTION) {
       private static final long serialVersionUID = 3541449118975289501L;
 
