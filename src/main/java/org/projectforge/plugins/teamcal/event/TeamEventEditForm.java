@@ -36,6 +36,7 @@ import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DatePrecision;
 import org.projectforge.common.RecurrenceInterval;
@@ -196,14 +197,28 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     {
       // Gantt object type:
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.recurrence"));
-      final RecurrenceInterval[] intervals = new RecurrenceInterval[] { RecurrenceInterval.NONE, RecurrenceInterval.DAY,
-          RecurrenceInterval.WEEK, RecurrenceInterval.MONTH, RecurrenceInterval.YEAR};
+      final RecurrenceInterval[] intervals = ICal4JUtils.getSupportedRecurrenceIntervals();
       final LabelValueChoiceRenderer<RecurrenceInterval> intervalChoiceRenderer = new LabelValueChoiceRenderer<RecurrenceInterval>(fs,
           intervals);
       final DropDownChoice<RecurrenceInterval> intervalChoice = new DropDownChoice<RecurrenceInterval>(fs.getDropDownChoiceId(),
           new PropertyModel<RecurrenceInterval>(this, "interval"), intervalChoiceRenderer.getValues(), intervalChoiceRenderer);
       intervalChoice.setNullValid(false);
       fs.add(intervalChoice);
+    }
+    {
+      // Until
+    }
+    {
+      // Count (day, weeks, months, ...)
+    }
+    {
+      // customized weekly: day of week
+    }
+    {
+      // customized monthly: day of month (1-31, at 1st, 2nd, ..., last week day)
+    }
+    {
+      // customized yearly: month of year and see day of month.
     }
     gridBuilder.newGrid8();
     gridBuilder.newFormHeading(getString("plugins.teamcal.attendees"));

@@ -47,8 +47,8 @@ public class ICal4JUtils
 
   private static TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
 
-  private static final RecurrenceInterval[] SUPPORTED_INTERVALS = new RecurrenceInterval[] { RecurrenceInterval.DAY,
-    RecurrenceInterval.WEEK, RecurrenceInterval.MONTH, RecurrenceInterval.YEAR};
+  private static final RecurrenceInterval[] SUPPORTED_INTERVALS = new RecurrenceInterval[] { RecurrenceInterval.NONE,
+    RecurrenceInterval.DAY, RecurrenceInterval.WEEK, RecurrenceInterval.MONTH, RecurrenceInterval.YEAR, RecurrenceInterval.CUSTOMIZED};
 
   /**
    * @return The timeZone (ical4j) built of the default java timeZone of the user.
