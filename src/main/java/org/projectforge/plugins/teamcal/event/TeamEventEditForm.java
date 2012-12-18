@@ -38,6 +38,7 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DatePrecision;
+import org.projectforge.common.RecurrenceInterval;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalFilter;
@@ -81,6 +82,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
   private FieldsetPanel startDateField;
 
+  private final RecurrenceInterval interval = RecurrenceInterval.NONE;
+
   final TeamEventRight right = new TeamEventRight();
 
   /**
@@ -99,11 +102,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   protected void init()
   {
     super.init();
-
     gridBuilder.newGrid8();
-
     final TeamCalDO teamCal = data.getCalendar();
-
     // setting access view
     if (isNew() == true || teamCal.getOwner() == null) {
       access = true;
@@ -122,10 +122,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
         }
       }
     }
-
     // add teamCal drop down
     initTeamCalPicker(gridBuilder.newFieldset(getString("plugins.teamevent.teamCal"), true));
-
     {
       // SUBJECT
       final FieldsetPanel fieldSet = gridBuilder.newFieldset(getString("plugins.teamevent.subject"));
@@ -135,7 +133,6 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       if (access == false)
         fieldSet.setEnabled(false);
     }
-
     {
       // NOTE
       final FieldsetPanel fieldSet = gridBuilder.newFieldset(getString("plugins.teamevent.note"));
@@ -144,30 +141,25 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       if (access == false)
         fieldSet.setEnabled(false);
     }
-
     {
       // LOCATION
       final FieldsetPanel fieldSet = gridBuilder.newFieldset(getString("plugins.teamevent.location"));
       @SuppressWarnings("serial")
       final PFAutoCompleteMaxLengthTextField locationTextField = new PFAutoCompleteMaxLengthTextField(fieldSet.getTextFieldId(),
           new PropertyModel<String>(data, "location")) {
-
         @Override
         protected List<String> getChoices(final String input)
         {
           return teamEventDao.getAutocompletion("location", input);
         }
-
       };
       fieldSet.add(locationTextField);
       if (access == false)
         fieldSet.setEnabled(false);
     }
-
     gridBuilder.newGrid8();
     // add date panel
     initDatePanel();
-
     {
       // ALL DAY CHECKBOX
       final FieldsetPanel fieldSet = gridBuilder.newFieldset("", true).setNoLabelFor();
@@ -195,6 +187,26 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       if (access == false)
         fieldSet.setEnabled(false);
     }
+
+    // ///////////////////////////////
+    // Recurrence
+    // ///////////////////////////////
+    gridBuilder.newGrid8();
+    gridBuilder.newFormHeading(getString("plugins.teamcal.recurrence"));
+    {
+      // Gantt object type:
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.recurrence"));
+      final RecurrenceInterval[] intervals = new RecurrenceInterval[] { RecurrenceInterval.NONE, RecurrenceInterval.DAY,
+          RecurrenceInterval.WEEK, RecurrenceInterval.MONTH, RecurrenceInterval.YEAR};
+      final LabelValueChoiceRenderer<RecurrenceInterval> intervalChoiceRenderer = new LabelValueChoiceRenderer<RecurrenceInterval>(fs,
+          intervals);
+      final DropDownChoice<RecurrenceInterval> intervalChoice = new DropDownChoice<RecurrenceInterval>(fs.getDropDownChoiceId(),
+          new PropertyModel<RecurrenceInterval>(this, "interval"), intervalChoiceRenderer.getValues(), intervalChoiceRenderer);
+      intervalChoice.setNullValid(false);
+      fs.add(intervalChoice);
+    }
+    gridBuilder.newGrid8();
+    gridBuilder.newFormHeading(getString("plugins.teamcal.attendees"));
   }
 
   private void setDateDropChoiceVisible(final boolean visible)

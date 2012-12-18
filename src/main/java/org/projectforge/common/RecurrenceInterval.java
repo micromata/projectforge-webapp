@@ -31,14 +31,14 @@ import org.projectforge.core.I18nEnum;
  */
 public enum RecurrenceInterval implements I18nEnum
 {
-  YEAR("year"), QUARTER_YEAR("quarteryear"), MONTH("month"), WEEK("week"), DAY("day"), HOUR("hour");
+  YEAR("yearly"), QUARTER_YEAR("quarteryearly"), MONTH("monthly"), WEEK("weekly"), DAY("daily"), HOUR("hourly"), NONE("none");
 
   private String key;
 
   @Override
   public String getI18nKey()
   {
-    return "common.recurranceintervall." + key;
+    return "common.recurrenceintervall." + key;
   }
 
   /**

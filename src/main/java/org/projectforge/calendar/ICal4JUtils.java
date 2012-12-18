@@ -35,6 +35,7 @@ import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.Uid;
 
 import org.apache.commons.lang.StringUtils;
+import org.projectforge.common.RecurrenceInterval;
 import org.projectforge.user.PFUserContext;
 
 /**
@@ -45,6 +46,9 @@ public class ICal4JUtils
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ICal4JUtils.class);
 
   private static TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
+
+  private static final RecurrenceInterval[] SUPPORTED_INTERVALS = new RecurrenceInterval[] { RecurrenceInterval.DAY,
+    RecurrenceInterval.WEEK, RecurrenceInterval.MONTH, RecurrenceInterval.YEAR};
 
   /**
    * @return The timeZone (ical4j) built of the default java timeZone of the user.
@@ -124,6 +128,11 @@ public class ICal4JUtils
       return null;
     }
     return recur.getUntil();
+  }
+
+  public static RecurrenceInterval[] getSupportedRecurrenceIntervals()
+  {
+    return SUPPORTED_INTERVALS;
   }
 
   // public static void createRecurrence() {
