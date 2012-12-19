@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import net.fortuna.ical4j.model.Recur;
+
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -83,7 +85,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
   private FieldsetPanel startDateField;
 
-  private final RecurrenceInterval interval = RecurrenceInterval.NONE;
+  TeamEventRecurrenceData recurrenceData;
 
   final TeamEventRight right = new TeamEventRight();
 
@@ -103,6 +105,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   protected void init()
   {
     super.init();
+    final Recur recur = data.getRecurrenceObject();
+    recurrenceData = new TeamEventRecurrenceData(recur);
     gridBuilder.newGrid8();
     final TeamCalDO teamCal = data.getCalendar();
     // setting access view
@@ -201,7 +205,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       final LabelValueChoiceRenderer<RecurrenceInterval> intervalChoiceRenderer = new LabelValueChoiceRenderer<RecurrenceInterval>(fs,
           intervals);
       final DropDownChoice<RecurrenceInterval> intervalChoice = new DropDownChoice<RecurrenceInterval>(fs.getDropDownChoiceId(),
-          new PropertyModel<RecurrenceInterval>(this, "interval"), intervalChoiceRenderer.getValues(), intervalChoiceRenderer);
+          new PropertyModel<RecurrenceInterval>(recurrenceData, "interval"), intervalChoiceRenderer.getValues(), intervalChoiceRenderer);
       intervalChoice.setNullValid(false);
       fs.add(intervalChoice);
     }

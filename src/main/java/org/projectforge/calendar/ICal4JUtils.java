@@ -48,7 +48,8 @@ public class ICal4JUtils
   private static TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
 
   private static final RecurrenceInterval[] SUPPORTED_INTERVALS = new RecurrenceInterval[] { RecurrenceInterval.NONE,
-    RecurrenceInterval.DAY, RecurrenceInterval.WEEK, RecurrenceInterval.MONTH, RecurrenceInterval.YEAR, RecurrenceInterval.CUSTOMIZED};
+    RecurrenceInterval.DAILY, RecurrenceInterval.WEEKLY, RecurrenceInterval.MONTHLY, RecurrenceInterval.YEARLY,
+    RecurrenceInterval.CUSTOMIZED};
 
   /**
    * @return The timeZone (ical4j) built of the default java timeZone of the user.
@@ -138,4 +139,47 @@ public class ICal4JUtils
   // public static void createRecurrence() {
   // final Recur recur = new Recur();
   // }
+
+  /**
+   * @param recur
+   * @return
+   */
+  public static RecurrenceInterval getFrequency(final Recur recur)
+  {
+    if (recur == null) {
+      return null;
+    }
+    final String freq = recur.getFrequency();
+    if (Recur.WEEKLY.equals(freq) == true) {
+      return RecurrenceInterval.WEEKLY;
+    } else if (Recur.MONTHLY.equals(freq) == true) {
+      return RecurrenceInterval.MONTHLY;
+    } else if (Recur.DAILY.equals(freq) == true) {
+      return RecurrenceInterval.DAILY;
+    } else if (Recur.YEARLY.equals(freq) == true) {
+      return RecurrenceInterval.YEARLY;
+    }
+    return null;
+  }
+
+  /**
+   * @param recur
+   * @return
+   */
+  public static String getFrequency(final RecurrenceInterval interval)
+  {
+    if (interval == null) {
+      return null;
+    }
+    if (interval == RecurrenceInterval.WEEKLY) {
+      return Recur.WEEKLY;
+    } else if (interval == RecurrenceInterval.DAILY) {
+      return Recur.DAILY;
+    } else if (interval == RecurrenceInterval.MONTHLY) {
+      return Recur.MONTHLY;
+    } else if (interval == RecurrenceInterval.YEARLY) {
+      return Recur.YEARLY;
+    }
+    return null;
+  }
 }

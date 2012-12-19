@@ -31,7 +31,7 @@ import org.projectforge.core.I18nEnum;
  */
 public enum RecurrenceInterval implements I18nEnum
 {
-  YEAR("yearly"), QUARTER_YEAR("quarteryearly"), MONTH("monthly"), WEEK("weekly"), DAY("daily"), HOUR("hourly"), CUSTOMIZED("customized"), NONE("none");
+  YEARLY("yearly"), MONTHLY("monthly"), WEEKLY("weekly"), DAILY("daily"), HOURLY("hourly"), CUSTOMIZED("customized"), NONE("none");
 
   private String key;
 
