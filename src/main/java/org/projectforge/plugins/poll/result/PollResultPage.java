@@ -25,16 +25,16 @@ package org.projectforge.plugins.poll.result;
 
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.plugins.poll.NewPollFrontendModel;
-import org.projectforge.plugins.poll.NewPollPage;
 import org.projectforge.plugins.poll.PollBasePage;
 import org.projectforge.plugins.poll.PollDao;
 import org.projectforge.plugins.poll.attendee.PollAttendeeDao;
 import org.projectforge.plugins.poll.event.PollEventDao;
 
 /**
- * @author M. Lauterbach (m.lauterbach@micromata.de)
  * 
+ * @author M. Lauterbach (m.lauterbach@micromata.de)
+ * @author Johannes Unterstein (j.unterstein@micromata.de)
+ *
  */
 public class PollResultPage extends PollBasePage
 {
@@ -52,23 +52,12 @@ public class PollResultPage extends PollBasePage
   @SpringBean(name = "pollResultDao")
   private PollResultDao pollResultDao;
 
-  private final NewPollFrontendModel model;
-
   /**
    * 
    */
   public PollResultPage(final PageParameters parameters)
   {
     super(parameters);
-    NewPollPage.redirectToNewPollPage(parameters);
-    this.model = null;
-  }
-
-  public PollResultPage(final PageParameters parameters, final NewPollFrontendModel model)
-  {
-    super(parameters);
-    this.model = model;
-
   }
 
   /**
