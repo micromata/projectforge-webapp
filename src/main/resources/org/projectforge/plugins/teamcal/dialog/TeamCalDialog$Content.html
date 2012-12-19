@@ -11,15 +11,16 @@
       <h3>
         <wicket:message key="label.options" />
       </h3>
-      TODO: * TeamCalEventEdit bei Neuanlage auch in Zeitberichtsanlage springen und umgekehrt. * Optionen in TeamCalDialog schieben. * Wiederkehr *
-      Erinnerungen * Attendees * ics in PF als read-only abonnieren (z. B. von icloud) und Rechte vergeben für Abonnement weiterer User über PF.
+      <span style="color: red; font-weight: bold;"
+        title="* TeamCalEventEdit bei Neuanlage auch in Zeitberichtsanlage springen und umgekehrt. * Optionen in TeamCalDialog schieben. * Wiederkehr *
+      Erinnerungen * Attendees * ics in PF als read-only abonnieren (z. B. von icloud) und Rechte vergeben für Abonnement weiterer User über PF. * Button Anmeldescreen.
+       * Scrollbar bei vielen Kalendern?">TODO</span>
     </div>
     <div wicket:id="bottomContainer">
       <h3>
         <wicket:message key="plugins.teamcal.selectCalendar" />
       </h3>
-      <input type="hidden" wicket:id="choices" style="width: 100%;" /> <br />
-      <br />
+      <input type="hidden" wicket:id="choices" style="width: 100%;" /> <br /> <br />
       <h3>
         <wicket:message key="plugins.teamcal.selectColor" />
       </h3>
@@ -34,16 +35,16 @@
       </div>
       <br />
     </div>
-      <h3>
-        <wicket:message key="plugins.teamcal.selectDefaultCalendar" />
-      </h3>
-      <form wicket:id="defaultForm">
-        <select wicket:id="defaultSelect">
-          <wicket:container wicket:id="options">
-            <option wicket:id="option">Option Label</option>
-          </wicket:container>
-        </select>
-      </form>
+    <h3>
+      <wicket:message key="plugins.teamcal.selectDefaultCalendar" />
+    </h3>
+    <form wicket:id="defaultForm">
+      <select wicket:id="defaultSelect">
+        <wicket:container wicket:id="options">
+          <option wicket:id="option">Option Label</option>
+        </wicket:container>
+      </select>
+    </form>
   </div>
   <div wicket:id="nameDialog"></div>
 </wicket:panel>
