@@ -50,10 +50,7 @@ import org.projectforge.web.calendar.MyFullCalendarEventsProvider;
  */
 public class TeamCalEventProvider extends MyFullCalendarEventsProvider
 {
-
   private static final long serialVersionUID = -5609599079385073490L;
-
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalEventProvider.class);
 
   private final TeamEventDao teamEventDao;
 
@@ -165,11 +162,11 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
           final String minute = minuteInt < 10 ? "0" + minuteInt : "" + minuteInt;
 
           if (event.isAllDay() == false)
-            durationString = "\n" + getString("plugins.teamevent.duration") + ": " + hour + ":" + minute;
+            durationString = "\n" + getString("plugins.teamcal.event.duration") + ": " + hour + ":" + minute;
           final StringBuffer buf = new StringBuffer();
-          buf.append(getString("plugins.teamevent.subject")).append(": ").append(teamEvent.getSubject());
+          buf.append(getString("plugins.teamcal.event.subject")).append(": ").append(teamEvent.getSubject());
           if (StringUtils.isNotBlank(teamEvent.getNote()) == true) {
-            buf.append("\n").append(getString("plugins.teamevent.note")).append(": ").append(teamEvent.getNote());
+            buf.append("\n").append(getString("plugins.teamcal.event.note")).append(": ").append(teamEvent.getNote());
           }
           buf.append(durationString);
           title = buf.toString();

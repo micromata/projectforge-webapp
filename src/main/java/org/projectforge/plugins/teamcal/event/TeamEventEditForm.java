@@ -33,6 +33,7 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.Model;
@@ -45,17 +46,24 @@ import org.projectforge.common.RecurrenceInterval;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalFilter;
+import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteMaxLengthTextField;
+import org.projectforge.web.wicket.components.DatePanel;
+import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.DateTimePanel;
 import org.projectforge.web.wicket.components.DateTimePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
+import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.HtmlCommentPanel;
+import org.projectforge.web.wicket.flowlayout.InputPanel;
 
 /**
  * form to edit team events.
@@ -87,6 +95,12 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
   TeamEventRecurrenceData recurrenceData;
 
+  private DivPanel customizedCheckBoxPanel;
+
+  private WebMarkupContainer recurrencePanel;
+
+  private FieldsetPanel recurrenceFieldset, recurrenceUntilDateFieldset, recurrenceCountFieldset;
+
   final TeamEventRight right = new TeamEventRight();
 
   /**
@@ -101,6 +115,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   /**
    * @see org.projectforge.web.wicket.AbstractEditForm#init()
    */
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
@@ -128,10 +143,10 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       }
     }
     // add teamCal drop down
-    initTeamCalPicker(gridBuilder.newFieldset(getString("plugins.teamevent.teamCal"), true));
+    initTeamCalPicker(gridBuilder.newFieldset(getString("plugins.teamcal.event.teamCal"), true));
     {
       // SUBJECT
-      final FieldsetPanel fieldSet = gridBuilder.newFieldset(getString("plugins.teamevent.subject"));
+      final FieldsetPanel fieldSet = gridBuilder.newFieldset(getString("plugins.teamcal.event.subject"));
       final MaxLengthTextField subjectField = new MaxLengthTextField(fieldSet.getTextFieldId(), new PropertyModel<String>(data, "subject"));
       subjectField.setRequired(true);
       fieldSet.add(subjectField);
@@ -140,7 +155,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     }
     {
       // NOTE
-      final FieldsetPanel fieldSet = gridBuilder.newFieldset(getString("plugins.teamevent.note"));
+      final FieldsetPanel fieldSet = gridBuilder.newFieldset(getString("plugins.teamcal.event.note"));
       final MaxLengthTextArea noteField = new MaxLengthTextArea(fieldSet.getTextAreaId(), new PropertyModel<String>(data, "note"));
       fieldSet.add(noteField);
       if (access == false)
@@ -148,8 +163,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     }
     {
       // LOCATION
-      final FieldsetPanel fieldSet = gridBuilder.newFieldset(getString("plugins.teamevent.location"));
-      @SuppressWarnings("serial")
+      final FieldsetPanel fieldSet = gridBuilder.newFieldset(getString("plugins.teamcal.event.location"));
       final PFAutoCompleteMaxLengthTextField locationTextField = new PFAutoCompleteMaxLengthTextField(fieldSet.getTextFieldId(),
           new PropertyModel<String>(data, "location")) {
         @Override
@@ -170,10 +184,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       final FieldsetPanel fieldSet = gridBuilder.newFieldset("", true).setNoLabelFor();
       final DivPanel divPanel = fieldSet.addNewCheckBoxDiv();
       final CheckBoxPanel checkBox = new CheckBoxPanel(divPanel.newChildId(), new PropertyModel<Boolean>(data, "allDay"),
-          getString("plugins.teamevent.allDay"));
+          getString("plugins.teamcal.event.allDay"));
       checkBox.getCheckBox().add(new AjaxFormComponentUpdatingBehavior("onChange") {
-        private static final long serialVersionUID = 3523446385818267608L;
-
         @Override
         protected void onUpdate(final AjaxRequestTarget target)
         {
@@ -197,23 +209,85 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     // Recurrence
     // ///////////////////////////////
     gridBuilder.newGrid8();
-    gridBuilder.newFormHeading(getString("plugins.teamcal.recurrence"));
+    gridBuilder.newFormHeading(getString("plugins.teamcal.event.recurrence"));
     {
-      // Gantt object type:
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.recurrence"));
+      // Recurrence interval type:
+      recurrenceFieldset = gridBuilder.newFieldset(getString("plugins.teamcal.event.recurrence"), true);
+      recurrencePanel = gridBuilder.getPanel().getDiv();
+      recurrencePanel.setOutputMarkupId(true);
       final RecurrenceInterval[] intervals = ICal4JUtils.getSupportedRecurrenceIntervals();
-      final LabelValueChoiceRenderer<RecurrenceInterval> intervalChoiceRenderer = new LabelValueChoiceRenderer<RecurrenceInterval>(fs,
-          intervals);
-      final DropDownChoice<RecurrenceInterval> intervalChoice = new DropDownChoice<RecurrenceInterval>(fs.getDropDownChoiceId(),
-          new PropertyModel<RecurrenceInterval>(recurrenceData, "interval"), intervalChoiceRenderer.getValues(), intervalChoiceRenderer);
+      final LabelValueChoiceRenderer<RecurrenceInterval> intervalChoiceRenderer = new LabelValueChoiceRenderer<RecurrenceInterval>(
+          recurrenceFieldset, intervals);
+      final DropDownChoice<RecurrenceInterval> intervalChoice = new DropDownChoice<RecurrenceInterval>(
+          recurrenceFieldset.getDropDownChoiceId(), new PropertyModel<RecurrenceInterval>(recurrenceData, "interval"),
+          intervalChoiceRenderer.getValues(), intervalChoiceRenderer);
       intervalChoice.setNullValid(false);
-      fs.add(intervalChoice);
+      recurrenceFieldset.add(intervalChoice);
+      recurrenceFieldset.getFieldset().setOutputMarkupId(true);
+      intervalChoice.add(new AjaxFormComponentUpdatingBehavior("onChange") {
+        @Override
+        protected void onUpdate(final AjaxRequestTarget target)
+        {
+          setRecurrenceComponentsVisibility(target);
+        }
+      });
+      customizedCheckBoxPanel = recurrenceFieldset.addNewCheckBoxDiv();
+      final CheckBoxPanel checkBox = new CheckBoxPanel(customizedCheckBoxPanel.newChildId(), new PropertyModel<Boolean>(recurrenceData,
+          "customized"), getString("plugins.teamcal.event.recurrence.customized"));
+      checkBox.getCheckBox().add(new AjaxFormComponentUpdatingBehavior("onChange") {
+        @Override
+        protected void onUpdate(final AjaxRequestTarget target)
+        {
+          setRecurrenceComponentsVisibility(target);
+        }
+      });
+      customizedCheckBoxPanel.add(checkBox);
     }
     {
-      // Until
+      // Count (day, weeks, months, ...). Only visible if recurrenceData.interval != NONE.
+      recurrenceCountFieldset = gridBuilder.newFieldset("", true);
+      DivTextPanel panel = new DivTextPanel(recurrenceCountFieldset.newChildId(), HtmlHelper.escapeHtml(
+          getString("plugins.teamcal.event.recurrence.customized.all"), false) + "&nbsp;");
+      panel.getLabel().setEscapeModelStrings(false);
+      recurrenceCountFieldset.add(panel);
+      final MinMaxNumberField<Integer> countNumberField = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(
+          recurrenceData, "count"), 0, 1000);
+      WicketUtils.setSize(countNumberField, 1);
+      recurrenceCountFieldset.add(countNumberField);
+      panel = new DivTextPanel(recurrenceCountFieldset.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          final RecurrenceInterval interval = recurrenceData.getInterval();
+          if (interval == RecurrenceInterval.DAILY) {
+            return "&nbsp;" + HtmlHelper.escapeHtml(getString("plugins.teamcal.event.recurrence.customized.day"), false);
+          } else if (interval == RecurrenceInterval.WEEKLY) {
+            return "&nbsp;" + HtmlHelper.escapeHtml(getString("plugins.teamcal.event.recurrence.customized.week"), false);
+          } else if (interval == RecurrenceInterval.MONTHLY) {
+            return "&nbsp;" + HtmlHelper.escapeHtml(getString("plugins.teamcal.event.recurrence.customized.month"), false);
+          } else if (interval == RecurrenceInterval.YEARLY) {
+            return "&nbsp;" + HtmlHelper.escapeHtml(getString("plugins.teamcal.event.recurrence.customized.year"), false);
+          }
+          return "";
+        }
+      });
+      panel.getLabel().setEscapeModelStrings(false);
+      recurrenceCountFieldset.add(panel);
+      recurrenceCountFieldset.getFieldset().setOutputMarkupId(true);
     }
     {
-      // Count (day, weeks, months, ...)
+      // Until. Only visible if recurrenceData.interval != NONE.
+      recurrenceUntilDateFieldset = gridBuilder.newFieldset(getString("plugins.teamcal.event.recurrence.until"), true);
+      recurrenceUntilDateFieldset.add(new DatePanel(recurrenceUntilDateFieldset.newChildId(), new PropertyModel<Date>(recurrenceData,
+          "until"), DatePanelSettings.get().withTargetType(java.sql.Date.class)));
+      recurrenceUntilDateFieldset.getFieldset().setOutputMarkupId(true);
+      recurrenceUntilDateFieldset.add(new HtmlCommentPanel(recurrenceUntilDateFieldset.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return WicketUtils.getUTCDate("until", recurrenceData.getUntil());
+        }
+      }));
     }
     {
       // customized weekly: day of week
@@ -226,6 +300,26 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     }
     gridBuilder.newGrid8();
     gridBuilder.newFormHeading(getString("plugins.teamcal.attendees"));
+    setRecurrenceComponentsVisibility(null);
+    gridBuilder.newGrid8();
+    gridBuilder.newFormHeading(getString("plugins.teamcal.event.reminder"));
+    setRecurrenceComponentsVisibility(null);
+  }
+
+  private void setRecurrenceComponentsVisibility(final AjaxRequestTarget target)
+  {
+    if (recurrenceData.getInterval() == RecurrenceInterval.NONE) {
+      customizedCheckBoxPanel.setVisible(false);
+      recurrenceUntilDateFieldset.setVisible(false);
+      recurrenceCountFieldset.setVisible(false);
+    } else {
+      customizedCheckBoxPanel.setVisible(true);
+      recurrenceUntilDateFieldset.setVisible(true);
+      recurrenceCountFieldset.setVisible(recurrenceData.isCustomized());
+    }
+    if (target != null) {
+      target.add(recurrencePanel);
+    }
   }
 
   private void setDateDropChoiceVisible(final boolean visible)
@@ -287,7 +381,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
    */
   private void initDatePanel()
   {
-    startDateField = gridBuilder.newFieldset(getString("plugins.teamevent.beginDate"), true);
+    startDateField = gridBuilder.newFieldset(getString("plugins.teamcal.event.beginDate"), true);
     startDateField.getFieldset().setOutputMarkupId(true);
     startDateTimePanel = new DateTimePanel(startDateField.newChildId(), new PropertyModel<Date>(data, "startDate"),
         (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withTargetType(java.sql.Timestamp.class)
@@ -295,7 +389,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     startDateField.add(startDateTimePanel);
     dateFieldToolTip(startDateTimePanel);
 
-    endDateField = gridBuilder.newFieldset(getString("plugins.teamevent.endDate"), true);
+    endDateField = gridBuilder.newFieldset(getString("plugins.teamcal.event.endDate"), true);
     endDateField.getFieldset().setOutputMarkupId(true);
     endDateTimePanel = new DateTimePanel(endDateField.newChildId(), new PropertyModel<Date>(data, "endDate"),
         (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withTargetType(java.sql.Timestamp.class)

@@ -74,7 +74,7 @@ IListPageColumnsCreator<TeamEventDO>
    */
   public TeamEventListPage(final PageParameters parameters)
   {
-    super(parameters, "plugins.teamevent");
+    super(parameters, "plugins.teamcal.event");
   }
 
   protected void onFormInit()
@@ -126,13 +126,13 @@ IListPageColumnsCreator<TeamEventDO>
       }
     });
 
-    columns.add(new CellItemListenerPropertyColumn<TeamEventDO>(getString("plugins.teamevent.subject"), getSortable("subject", sortable),
+    columns.add(new CellItemListenerPropertyColumn<TeamEventDO>(getString("plugins.teamcal.event.subject"), getSortable("subject", sortable),
         "subject", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<TeamEventDO>(getString("plugins.teamevent.beginDate"),
+    columns.add(new CellItemListenerPropertyColumn<TeamEventDO>(getString("plugins.teamcal.event.beginDate"),
         getSortable("startDate", sortable), "startDate", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<TeamEventDO>(getString("plugins.teamevent.endDate"), getSortable("endDate", sortable),
+    columns.add(new CellItemListenerPropertyColumn<TeamEventDO>(getString("plugins.teamcal.event.endDate"), getSortable("endDate", sortable),
         "endDate", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<TeamEventDO>(getString("plugins.teamevent.allDay"), getSortable("allDay", sortable),
+    columns.add(new CellItemListenerPropertyColumn<TeamEventDO>(getString("plugins.teamcal.event.allDay"), getSortable("allDay", sortable),
         "allDay", cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<TeamEventDO>> item, final String componentId, final IModel<TeamEventDO> rowModel)

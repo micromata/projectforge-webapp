@@ -162,6 +162,7 @@ public class TeamCalDialog extends PFDialog
     }, getString("cancel"), SingleButtonPanel.CANCEL);
 
     // confirm
+    // TODO: Tooltip über schließen: Kannst final auch irgendwo hinneklicken
     appendNewAjaxActionButton(new AjaxCallback() {
       private static final long serialVersionUID = -8741086877308855477L;
 
@@ -471,7 +472,7 @@ public class TeamCalDialog extends PFDialog
         @Override
         public String getDisplayValue(final Integer object)
         {
-          if(TIMESHEET_CALENDAR_ID.equals(object)) {
+          if (TIMESHEET_CALENDAR_ID.equals(object)) {
             return TIMESHEET_CALENDAR.getTitle();
           }
           return teamCalDao.getById(object).getTitle();

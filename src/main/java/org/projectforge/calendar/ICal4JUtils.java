@@ -48,8 +48,7 @@ public class ICal4JUtils
   private static TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
 
   private static final RecurrenceInterval[] SUPPORTED_INTERVALS = new RecurrenceInterval[] { RecurrenceInterval.NONE,
-    RecurrenceInterval.DAILY, RecurrenceInterval.WEEKLY, RecurrenceInterval.MONTHLY, RecurrenceInterval.YEARLY,
-    RecurrenceInterval.CUSTOMIZED};
+    RecurrenceInterval.DAILY, RecurrenceInterval.WEEKLY, RecurrenceInterval.MONTHLY, RecurrenceInterval.YEARLY};
 
   /**
    * @return The timeZone (ical4j) built of the default java timeZone of the user.
@@ -181,5 +180,15 @@ public class ICal4JUtils
       return Recur.YEARLY;
     }
     return null;
+  }
+
+  public static java.sql.Date getSqlDate(final net.fortuna.ical4j.model.Date ical4jDate)
+  {
+    return new java.sql.Date(ical4jDate.getTime());
+  }
+
+  public static net.fortuna.ical4j.model.Date getICal4jDate(final java.sql.Date sqlDate)
+  {
+    return new net.fortuna.ical4j.model.Date(sqlDate);
   }
 }

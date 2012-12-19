@@ -23,8 +23,9 @@
 
 package org.projectforge.plugins.teamcal.event;
 
+import java.io.Serializable;
+import java.sql.Date;
 
-import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.Recur;
 
 import org.projectforge.calendar.ICal4JUtils;
@@ -33,13 +34,17 @@ import org.projectforge.common.RecurrenceInterval;
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class TeamEventRecurrenceData
+public class TeamEventRecurrenceData implements Serializable
 {
+  private static final long serialVersionUID = -6258614682123676951L;
+
   private RecurrenceInterval interval = RecurrenceInterval.NONE;
 
   private Date until;
 
-  private int count;
+  private int count = 1;
+
+  private boolean customized;
 
   public TeamEventRecurrenceData()
   {
@@ -51,7 +56,7 @@ public class TeamEventRecurrenceData
       return;
     }
     this.count = recur.getCount();
-    this.until = recur.getUntil();
+    this.until = ICal4JUtils.getSqlDate(recur.getUntil());
     this.interval = ICal4JUtils.getFrequency(recur);
   }
 
@@ -106,6 +111,24 @@ public class TeamEventRecurrenceData
   public TeamEventRecurrenceData setCount(final int count)
   {
     this.count = count;
+    return this;
+  }
+
+  /**
+   * @return the customized
+   */
+  public boolean isCustomized()
+  {
+    return customized;
+  }
+
+  /**
+   * @param customized the customized to set
+   * @return this for chaining.
+   */
+  public TeamEventRecurrenceData setCustomized(final boolean customized)
+  {
+    this.customized = customized;
     return this;
   }
 }

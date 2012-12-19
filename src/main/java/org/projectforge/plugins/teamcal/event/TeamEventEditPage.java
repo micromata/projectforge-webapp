@@ -47,7 +47,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
    */
   public TeamEventEditPage(final PageParameters parameters)
   {
-    super(parameters, "plugins.teamevent");
+    super(parameters, "plugins.teamcal.event");
     super.init();
   }
 
@@ -56,7 +56,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
    */
   public TeamEventEditPage(final PageParameters parameters, final TeamEventDO event)
   {
-    super(parameters, "plugins.teamevent");
+    super(parameters, "plugins.teamcal.event");
     super.init(event);
   }
 
@@ -67,7 +67,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   protected void update()
   {
     if (getData().getStartDate().after(getData().getEndDate()) || isZeroDuration() == false) {
-      error(getString("plugins.teamevent.duration.error"));
+      error(getString("plugins.teamcal.event.duration.error"));
     } else {
       super.update();
     }
@@ -104,7 +104,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   protected void create()
   {
     if (getData().getStartDate().after(getData().getEndDate()) || isZeroDuration() == false) {
-      error(getString("plugins.teamevent.duration.error"));
+      error(getString("plugins.teamcal.event.duration.error"));
     } else {
       super.create();
     }
