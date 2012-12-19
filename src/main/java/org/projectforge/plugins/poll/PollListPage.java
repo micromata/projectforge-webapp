@@ -36,12 +36,14 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.plugins.teamcal.admin.TeamCalEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
+import org.projectforge.web.wicket.ListSelectActionPanel;
 
 /**
  * 
@@ -87,7 +89,22 @@ public class PollListPage extends AbstractListPage<PollListForm, PollDao, PollDO
     };
 
     columns.add(new CellItemListenerPropertyColumn<PollDO>(getString("plugins.poll.new.title"), getSortable("title", sortable), "title",
-        cellItemListener));
+        cellItemListener) {
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item, java.lang.String, org.apache.wicket.model.IModel)
+       */
+      @Override
+      public void populateItem(final Item<ICellPopulator<PollDO>> item, final String componentId, final IModel<PollDO> rowModel)
+      {
+        final PollDO poll = rowModel.getObject();
+        final StringBuffer cssStyle = getCssStyle(poll.getId(), poll.isDeleted());
+        if (cssStyle.length() > 0) {
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        }
+        item.add(new ListSelectActionPanel(componentId, rowModel, TeamCalEditPage.class, poll.getId(), returnToPage, poll.getTitle()));
+        addRowClick(item);
+      }
+    });
     columns.add(new CellItemListenerPropertyColumn<PollDO>(getString("plugins.poll.new.description"), getSortable("description", sortable),
         "description", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<PollDO>(getString("plugins.poll.new.location"), getSortable("location", sortable),
