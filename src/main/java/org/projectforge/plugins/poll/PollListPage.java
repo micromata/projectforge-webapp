@@ -36,7 +36,6 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.plugins.teamcal.admin.TeamCalEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
@@ -101,7 +100,7 @@ public class PollListPage extends AbstractListPage<PollListForm, PollDao, PollDO
         if (cssStyle.length() > 0) {
           item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
-        item.add(new ListSelectActionPanel(componentId, rowModel, TeamCalEditPage.class, poll.getId(), returnToPage, poll.getTitle()));
+        item.add(new ListSelectActionPanel(componentId, rowModel, PollEditPage.class, poll.getId(), returnToPage, poll.getTitle()));
         addRowClick(item);
       }
     });
