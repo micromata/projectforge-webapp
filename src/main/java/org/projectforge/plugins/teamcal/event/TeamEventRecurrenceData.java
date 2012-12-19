@@ -47,6 +47,9 @@ public class TeamEventRecurrenceData
 
   public TeamEventRecurrenceData(final Recur recur)
   {
+    if (recur == null) {
+      return;
+    }
     this.count = recur.getCount();
     this.until = recur.getUntil();
     this.interval = ICal4JUtils.getFrequency(recur);
