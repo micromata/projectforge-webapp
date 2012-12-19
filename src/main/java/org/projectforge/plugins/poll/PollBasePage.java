@@ -47,12 +47,10 @@ public abstract class PollBasePage extends AbstractSecuredPage
 
   protected Form<String> form;
 
-  private String backButtonTitle;
-
   /**
    * @param parameters
    */
-  public PollBasePage(PageParameters parameters)
+  public PollBasePage(final PageParameters parameters)
   {
     super(parameters);
   }
@@ -69,7 +67,7 @@ public abstract class PollBasePage extends AbstractSecuredPage
     gridBuilder = new GridBuilder(flowform, getMySession());
 
     // Cancel button
-    Button cancel = new Button(SingleButtonPanel.WICKET_ID) {
+    final Button cancel = new Button(SingleButtonPanel.WICKET_ID) {
       static final long serialVersionUID = -7779593314951993472L;
 
       @Override
@@ -78,11 +76,11 @@ public abstract class PollBasePage extends AbstractSecuredPage
         PollBasePage.this.onCancel();
       }
     };
-    SingleButtonPanel cancelPanel = new SingleButtonPanel("cancel", cancel, setCancelButtonTitle(getString("cancel")),
+    final SingleButtonPanel cancelPanel = new SingleButtonPanel("cancel", cancel, setCancelButtonTitle(getString("cancel")),
         SingleButtonPanel.CANCEL);
 
     // Confirm button
-    Button confirm = new Button(SingleButtonPanel.WICKET_ID) {
+    final Button confirm = new Button(SingleButtonPanel.WICKET_ID) {
       static final long serialVersionUID = -7779593314951993472L;
 
       @Override
@@ -91,7 +89,7 @@ public abstract class PollBasePage extends AbstractSecuredPage
         PollBasePage.this.onConfirm();
       }
     };
-    SingleButtonPanel confirmPanel = new SingleButtonPanel("confirm", confirm, getString("plugins.poll.new.continue"),
+    final SingleButtonPanel confirmPanel = new SingleButtonPanel("confirm", confirm, getString("plugins.poll.new.continue"),
         SingleButtonPanel.DEFAULT_SUBMIT);
 
     form = new Form<String>("pollForm");
@@ -121,12 +119,12 @@ public abstract class PollBasePage extends AbstractSecuredPage
 
   protected abstract void onCancel();
 
-  protected String setCancelButtonTitle(String title)
+  protected String setCancelButtonTitle(final String title)
   {
     return title;
   }
 
-  protected String setConfirmButtonTitle(String title)
+  protected String setConfirmButtonTitle(final String title)
   {
     return title;
   }
