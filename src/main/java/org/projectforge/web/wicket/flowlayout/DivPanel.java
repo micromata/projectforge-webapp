@@ -169,4 +169,12 @@ public class DivPanel extends Panel
     add(checkBox);
     return checkBox;
   }
+
+  /**
+   * @return the div
+   */
+  public WebMarkupContainer getDiv()
+  {
+    return div;
+  }
 }
