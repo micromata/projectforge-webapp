@@ -88,6 +88,11 @@ public abstract class MyFullCalendarEventsProvider implements EventProvider
     return events.values();
   }
 
+  public void resetEventCache() {
+    this.lastStart = null;
+    this.lastEnd = null;
+  }
+
   @Override
   public Event getEventForId(final String id) throws EventNotFoundException
   {
