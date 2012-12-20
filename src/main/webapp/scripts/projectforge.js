@@ -122,12 +122,12 @@ $(function() {
 	});
 	
 	initColorPicker();
-	initFileUpload();
+	doAfterAjaxHandling();
 	
 	if(typeof(Wicket) != "undefined") {
 		Wicket.Ajax.registerPostCallHandler(function() {
 			// handle after AJAX actions
-			initFileUpload();
+			doAfterAjaxHandling();
 		});
 	}
 	$('.pf_preventClickBubble').on("contextmenu", function(e) {
@@ -138,7 +138,7 @@ $(function() {
 	});
 });
 
-function initFileUpload() {
+function doAfterAjaxHandling() {
 	var $uploadProxy = $('.pf_uploadField button[name="fileUploadProxy"], .pf_uploadField .label');
 	$uploadProxy.unbind('click').click(function (e) {
 		$(this).siblings('input[type="file"]').click();
@@ -147,6 +147,8 @@ function initFileUpload() {
 		$(this).siblings('.label').val(/([^\\\/]+)$/.exec(this.value)[1]); // Extract the filename
 		$(this).siblings('.label').change();
 	});
+	$("fieldset > div > input[type=checkbox]").addClass("checkbox");
+	$(".jqui_checkbox").buttonset();
 }
 
 function initColorPicker() {
