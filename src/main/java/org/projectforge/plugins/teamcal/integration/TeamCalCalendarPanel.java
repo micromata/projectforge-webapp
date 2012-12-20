@@ -168,14 +168,24 @@ public class TeamCalCalendarPanel extends CalendarPanel
   }
 
   /**
+   * @see org.projectforge.web.calendar.CalendarPanel#onRefreshEventProvider()
+   */
+  @Override
+  protected void onRefreshEventProvider()
+  {
+    eventProvider.resetEventCache();
+  }
+
+  /**
    * @see org.projectforge.web.calendar.CalendarPanel#onCallGetEventsHook()
    */
   @Override
   protected void onCallGetEventsHook(final View view, final CalendarResponse response)
   {
     final TeamCalCalendarForm tempForm = (TeamCalCalendarForm) ((TeamCalCalendarPage) getPage()).getForm();
-    if (tempForm != null && CollectionUtils.isNotEmpty(tempForm.getSelectedCalendars()) == true)
+    if (tempForm != null && CollectionUtils.isNotEmpty(tempForm.getSelectedCalendars()) == true) {
       eventProvider.getEvents(view.getVisibleStart().toDateTime(), view.getVisibleEnd().toDateTime());
+    }
   }
 
   /**
