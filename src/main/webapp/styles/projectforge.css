@@ -584,3 +584,7 @@ h2.box_head .subtitle {
   float: right;
   padding: 0 6 3 0;
 }
+.pf_teamCalDialog .pf_dialogScroll {
+  max-height: 200px;
+  overflow: auto;
+}
