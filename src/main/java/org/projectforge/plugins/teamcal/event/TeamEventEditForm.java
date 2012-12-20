@@ -36,11 +36,15 @@ import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.DateHelper;
+import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
 import org.projectforge.common.RecurrenceInterval;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
@@ -102,6 +106,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   private FieldsetPanel recurrenceFieldset, recurrenceUntilDateFieldset, recurrenceCountFieldset;
 
   final TeamEventRight right = new TeamEventRight();
+
+  private final FormComponent< ? >[] dependentFormComponents = new FormComponent[6];
 
   /**
    * @param parentPage
@@ -304,6 +310,29 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     gridBuilder.newGrid8();
     gridBuilder.newFormHeading(getString("plugins.teamcal.event.reminder"));
     setRecurrenceComponentsVisibility(null);
+
+    add(new IFormValidator() {
+      @Override
+      public FormComponent< ? >[] getDependentFormComponents()
+      {
+        return dependentFormComponents;
+      }
+
+      @Override
+      public void validate(final Form< ? > form)
+      {
+        final DateTimePanel startDateTimePanel = (DateTimePanel) dependentFormComponents[0];
+        final DateHolder startDate = new DateHolder(startDateTimePanel.getConvertedInput());
+        final DateTimePanel endDateTimePanel = (DateTimePanel) dependentFormComponents[3];
+        final DateHolder endDate = new DateHolder(endDateTimePanel.getConvertedInput());
+        data.setStartDate(startDate.getTimestamp());
+        data.setEndDate(endDate.getTimestamp());
+        if (data.getDuration() < 60000) {
+          // Duration is less than 60 seconds.
+          error(getString("plugins.teamcal.event.duration.error"));
+        }
+      }
+    });
   }
 
   private void setRecurrenceComponentsVisibility(final AjaxRequestTarget target)
@@ -385,17 +414,23 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     startDateField.getFieldset().setOutputMarkupId(true);
     startDateTimePanel = new DateTimePanel(startDateField.newChildId(), new PropertyModel<Date>(data, "startDate"),
         (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withTargetType(java.sql.Timestamp.class)
-        .withRequired(true), DatePrecision.MINUTE_15);
+        .withRequired(true), DatePrecision.MINUTE);
     startDateField.add(startDateTimePanel);
     dateFieldToolTip(startDateTimePanel);
+    dependentFormComponents[0] = startDateTimePanel;
+    dependentFormComponents[1] = startDateTimePanel.getHourOfDayDropDownChoice();
+    dependentFormComponents[2] = startDateTimePanel.getMinuteDropDownChoice();
 
     endDateField = gridBuilder.newFieldset(getString("plugins.teamcal.event.endDate"), true);
     endDateField.getFieldset().setOutputMarkupId(true);
     endDateTimePanel = new DateTimePanel(endDateField.newChildId(), new PropertyModel<Date>(data, "endDate"),
         (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withTargetType(java.sql.Timestamp.class)
-        .withRequired(true), DatePrecision.MINUTE_15);
+        .withRequired(true), DatePrecision.MINUTE);
     endDateField.add(endDateTimePanel);
     dateFieldToolTip(endDateTimePanel);
+    dependentFormComponents[3] = endDateTimePanel;
+    dependentFormComponents[4] = endDateTimePanel.getHourOfDayDropDownChoice();
+    dependentFormComponents[5] = endDateTimePanel.getMinuteDropDownChoice();
 
     if (access == false) {
       endDateField.setEnabled(false);

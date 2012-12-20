@@ -60,33 +60,6 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
     super.init(event);
   }
 
-  /**
-   * @see org.projectforge.web.wicket.AbstractEditPage#update()
-   */
-  @Override
-  protected void update()
-  {
-    if (getData().getStartDate().after(getData().getEndDate()) || isZeroDuration() == false) {
-      error(getString("plugins.teamcal.event.duration.error"));
-    } else {
-      super.update();
-    }
-  }
-
-  /**
-   * false, if there is no duration and all day is not selected.
-   * 
-   * @return
-   */
-  private boolean isZeroDuration() {
-    final long startDate = getData().getStartDate().getTime();
-    final long endDate = getData().getEndDate().getTime();
-    if (startDate == endDate && getData().isAllDay() == false)
-      return false;
-    else
-      return true;
-  }
-
   @Override
   public void setResponsePage()
   {
@@ -96,20 +69,6 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       ((CalendarPage) returnToPage).setStartDate(getData().getStartDate());
     }
   }
-
-  /**
-   * @see org.projectforge.web.wicket.AbstractEditPage#create()
-   */
-  @Override
-  protected void create()
-  {
-    if (getData().getStartDate().after(getData().getEndDate()) || isZeroDuration() == false) {
-      error(getString("plugins.teamcal.event.duration.error"));
-    } else {
-      super.create();
-    }
-  }
-
 
   /**
    * @see org.projectforge.web.wicket.AbstractEditPage#getBaseDao()
