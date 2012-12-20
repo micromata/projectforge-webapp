@@ -36,7 +36,6 @@ import org.projectforge.plugins.poll.event.PollEventRight;
 import org.projectforge.plugins.poll.result.PollResultDO;
 import org.projectforge.plugins.poll.result.PollResultDao;
 import org.projectforge.plugins.poll.result.PollResultPage;
-import org.projectforge.plugins.teamcal.TeamCalPluginUpdates;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.MenuItemDef;
@@ -55,7 +54,7 @@ public class PollPlugin extends AbstractPlugin
   static UserPrefArea USER_PREF_AREA;
 
   private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { PollDO.class, PollEventDO.class, PollAttendeeDO.class,
-      PollResultDO.class};
+    PollResultDO.class};
 
   /**
    * This dao should be defined in pluginContext.xml (as resources) for proper initialization.
@@ -149,6 +148,6 @@ public class PollPlugin extends AbstractPlugin
   @Override
   public UpdateEntry getInitializationUpdateEntry()
   {
-    return TeamCalPluginUpdates.getInitializationUpdateEntry();
+    return PollPluginUpdates.getInitializationUpdateEntry();
   }
 }
