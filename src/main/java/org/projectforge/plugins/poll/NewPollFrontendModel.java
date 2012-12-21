@@ -36,7 +36,7 @@ public class NewPollFrontendModel implements Serializable
 {
   private static final long serialVersionUID = -6709402512895730321L;
 
-  private final PollDO pollDo;
+  private PollDO pollDo;
 
   private List<PollEventDO> allEvents;
 
@@ -46,11 +46,16 @@ public class NewPollFrontendModel implements Serializable
 
   private final List<PollAttendeeDO> calculatedUserList;
 
+  private boolean exist;
+
   @SpringBean(name = "pollAttendeeDao")
   private PollAttendeeDao pollAttendeeDao;
 
   @SpringBean(name = "pollEventDao")
   private PollEventDao pollEventDao;
+
+  @SpringBean(name = "pollDao")
+  private PollDao pollDao;
 
   /**
    * 
@@ -59,6 +64,7 @@ public class NewPollFrontendModel implements Serializable
   {
     Injector.get().inject(this);
     this.pollDo = pollDo;
+    this.exist = false;
     this.allEvents = new LinkedList<PollEventDO>();
     this.pollAttendeeList = new LinkedList<PollAttendeeDO>();
     this.pollGroupList = new LinkedList<GroupDO>();
@@ -67,9 +73,21 @@ public class NewPollFrontendModel implements Serializable
 
   public void initModelByPoll()
   {
-    // TODO check if poll id exist
-    pollAttendeeList = pollAttendeeDao.getListByPoll(pollDo);
-    allEvents = pollEventDao.getListByPoll(pollDo);
+    try {
+      pollDo = pollDao.getById(pollDo.getId());
+      if (pollDo != null) {
+        pollAttendeeList = pollAttendeeDao.getListByPoll(pollDo);
+        allEvents = pollEventDao.getListByPoll(pollDo);
+        exist = true;
+      }
+    } catch (Exception ex) {
+      // TODO log entry
+    }
+  }
+
+  public boolean isExisting()
+  {
+    return exist;
   }
 
   /**
