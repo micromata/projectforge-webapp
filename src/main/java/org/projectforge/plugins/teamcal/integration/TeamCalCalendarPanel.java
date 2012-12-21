@@ -246,7 +246,7 @@ public class TeamCalCalendarPanel extends CalendarPanel
       dbTeamEvent.setEndDate(new Timestamp(newEndTimeMillis));
     }
 
-    if(1== 1 || RecurrencyUtil.isEventRecurrent(dbTeamEvent)) {
+    if(RecurrencyUtil.isEventRecurrent(dbTeamEvent)) {
       // at this point the dbTeamEvent is already updated in time
       recurrenceChangeDialog.open(response.getTarget(), dbTeamEvent);
       return;

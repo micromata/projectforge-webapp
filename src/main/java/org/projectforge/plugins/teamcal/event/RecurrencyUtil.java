@@ -9,6 +9,8 @@
 
 package org.projectforge.plugins.teamcal.event;
 
+import org.apache.commons.lang.StringUtils;
+
 
 
 /**
@@ -22,6 +24,6 @@ public class RecurrencyUtil
   public static boolean isEventRecurrent(final TeamEventDO event)
   {
     // TODO kai: is this correct?
-    return true; // StringUtils.isNotBlank(event.getRecurrenceRule());
+    return StringUtils.isNotBlank(event.getRecurrenceRule());
   }
 }
