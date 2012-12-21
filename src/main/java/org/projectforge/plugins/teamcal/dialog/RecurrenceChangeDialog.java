@@ -23,8 +23,10 @@ import org.projectforge.web.wicket.components.SingleButtonPanel;
 import de.micromata.wicket.ajax.AjaxCallback;
 
 /**
+ * Dialog which appears, when a user tries to modify an recurrent event
  * 
  * @author Johannes Unterstein (j.unterstein@micromata.de)
+ * @author M. Lauterbach (m.lauterbach@micromata.de)
  * 
  */
 public class RecurrenceChangeDialog extends PFDialog
