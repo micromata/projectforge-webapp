@@ -73,15 +73,15 @@ public class PollPluginUpdates
           dao.createTable(pollTable);
         }
         if (dao.doesExist(eventTable) == false) {
-          eventTable.addDefaultBaseDOAttributes().addAttributes("pollId", "startDate", "endDate");
+          eventTable.addDefaultBaseDOAttributes().addAttributes("poll", "startDate", "endDate");
           dao.createTable(eventTable);
         }
         if (dao.doesExist(attendeeTable) == false) {
-          attendeeTable.addDefaultBaseDOAttributes().addAttributes("user", "email", "pollId", "secureKey");
+          attendeeTable.addDefaultBaseDOAttributes().addAttributes("user", "email", "poll", "secureKey");
           dao.createTable(attendeeTable);
         }
         if (dao.doesExist(resultTable) == false) {
-          resultTable.addDefaultBaseDOAttributes().addAttributes("pollEventId", "pollAttendeeId", "result");
+          resultTable.addDefaultBaseDOAttributes().addAttributes("pollEvent", "pollAttendee", "result");
           dao.createTable(resultTable);
         }
         dao.createMissingIndices();

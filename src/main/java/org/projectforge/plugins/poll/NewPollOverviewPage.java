@@ -69,8 +69,14 @@ public class NewPollOverviewPage extends PollBasePage
   public NewPollOverviewPage(final PageParameters parameters)
   {
     super(parameters);
-    NewPollPage.redirectToNewPollPage(parameters);
-    this.model = null;
+    if (parameters == null) {
+      NewPollPage.redirectToNewPollPage(parameters);
+      this.model = null;
+    } else {
+      Integer id = new Integer(parameters.get("id").toString());
+      this.model = new NewPollFrontendModel(pollDao.getById(id));
+      this.model.initModelByPoll();
+    }
   }
 
   public NewPollOverviewPage(final PageParameters parameters, final NewPollFrontendModel model)

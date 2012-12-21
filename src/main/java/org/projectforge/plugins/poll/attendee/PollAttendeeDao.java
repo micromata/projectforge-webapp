@@ -23,7 +23,12 @@
 
 package org.projectforge.plugins.poll.attendee;
 
+import java.util.List;
+
+import org.hibernate.criterion.Restrictions;
 import org.projectforge.core.BaseDao;
+import org.projectforge.core.QueryFilter;
+import org.projectforge.plugins.poll.PollDO;
 import org.projectforge.user.UserRightId;
 
 /**
@@ -32,7 +37,7 @@ import org.projectforge.user.UserRightId;
  */
 public class PollAttendeeDao extends BaseDao<PollAttendeeDO>
 {
-  public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_POLL_ATTENDEE", "plugin31", "plugins.poll.attendee");
+  public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_POLL_ATTENDEE", "plugin31", "plugins.poll");
 
   /**
    * @param clazz
@@ -50,6 +55,19 @@ public class PollAttendeeDao extends BaseDao<PollAttendeeDO>
   public PollAttendeeDO newInstance()
   {
     return new PollAttendeeDO();
+  }
+
+  /**
+   * get list of attendees by poll id, without deleted.
+   * 
+   * @param poll
+   * @return
+   */
+  public List<PollAttendeeDO> getListByPoll(PollDO poll)
+  {
+    QueryFilter qFilter = new QueryFilter();
+    qFilter.add(Restrictions.and(Restrictions.eq("poll", poll), Restrictions.eq("deleted", false)));
+    return getList(qFilter);
   }
 
 }

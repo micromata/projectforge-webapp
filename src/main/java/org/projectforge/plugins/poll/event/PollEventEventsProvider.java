@@ -23,6 +23,7 @@
 
 package org.projectforge.plugins.poll.event;
 
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -80,8 +81,8 @@ public class PollEventEventsProvider extends MyFullCalendarEventsProvider
         // randomizer is needed if the system adds events and the machine is able to add
         // more than one element per millisecond -> double entries for one id is not allowed!
         event.setId("" + (System.currentTimeMillis() % randomizer.nextInt()));
-        event.setStart(iterationEvent.getStartDate());
-        event.setEnd(iterationEvent.getEndDate());
+        event.setStart(new DateTime(iterationEvent.getStartDate().getTime()));
+        event.setEnd(new DateTime(iterationEvent.getEndDate().getTime()));
         event.setTitle("");
         pollEventCache.put(iterationEvent, event);
       }
@@ -109,8 +110,8 @@ public class PollEventEventsProvider extends MyFullCalendarEventsProvider
   {
     final PollEventDO newEvent = new PollEventDO();
     newEvent.setPoll(poll);
-    newEvent.setStartDate(range.getStart());
-    newEvent.setEndDate(range.getEnd());
+    newEvent.setStartDate(new Timestamp(range.getStart().getMillis()));
+    newEvent.setEndDate(new Timestamp(range.getEnd().getMillis()));
     pollEventCache.put(newEvent, null);
     clearSelection(response);
   }
@@ -121,7 +122,7 @@ public class PollEventEventsProvider extends MyFullCalendarEventsProvider
    */
   private void clearSelection(final CalendarResponse response)
   {
-    if(response != null) {
+    if (response != null) {
       response.clearSelection().refetchEvents();
     }
   }
@@ -158,12 +159,12 @@ public class PollEventEventsProvider extends MyFullCalendarEventsProvider
     if (event != null) {
       final PollEventDO eventDO = searchById(event.getId());
       if (eventDO != null) {
-        if(newStartTime != null) {
-          eventDO.setStartDate(newStartTime);
+        if (newStartTime != null) {
+          eventDO.setStartDate(new Timestamp(newStartTime.getMillis()));
           event.setStart(newStartTime);
         }
-        if(newEndTime != null) {
-          eventDO.setEndDate(newEndTime);
+        if (newEndTime != null) {
+          eventDO.setEndDate(new Timestamp(newEndTime.getMillis()));
           event.setEnd(newEndTime);
         }
         clearSelection(response);
@@ -178,7 +179,8 @@ public class PollEventEventsProvider extends MyFullCalendarEventsProvider
    * 
    * @param event
    */
-  public void removeElement(final PollEventDO event) {
+  public void removeElement(final PollEventDO event)
+  {
     pollEventCache.remove(event);
   }
 
@@ -210,7 +212,8 @@ public class PollEventEventsProvider extends MyFullCalendarEventsProvider
     return result;
   }
 
-  public Collection<PollEventDO> getAllEvents() {
+  public Collection<PollEventDO> getAllEvents()
+  {
     return pollEventCache.keySet();
   }
 

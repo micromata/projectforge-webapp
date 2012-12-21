@@ -23,6 +23,8 @@
 
 package org.projectforge.plugins.poll.event;
 
+import java.sql.Timestamp;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -31,9 +33,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.hibernate.search.annotations.DateBridge;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
-import org.joda.time.DateTime;
+import org.hibernate.search.annotations.Resolution;
 import org.projectforge.common.DateFormatType;
 import org.projectforge.common.DateFormats;
 import org.projectforge.core.DefaultBaseDO;
@@ -53,9 +58,13 @@ public class PollEventDO extends DefaultBaseDO
   @IndexedEmbedded(depth = 1)
   private PollDO poll;
 
-  private DateTime startDate;
+  @Field(index = Index.UN_TOKENIZED)
+  @DateBridge(resolution = Resolution.MINUTE)
+  private Timestamp startDate;
 
-  private DateTime endDate;
+  @Field(index = Index.UN_TOKENIZED)
+  @DateBridge(resolution = Resolution.MINUTE)
+  private Timestamp endDate;
 
   public PollEventDO()
   {
@@ -86,7 +95,7 @@ public class PollEventDO extends DefaultBaseDO
   /**
    * @return the startDate
    */
-  public DateTime getStartDate()
+  public Timestamp getStartDate()
   {
     return startDate;
   }
@@ -95,7 +104,7 @@ public class PollEventDO extends DefaultBaseDO
    * @param startDate the startDate to set
    * @return this for chaining.
    */
-  public PollEventDO setStartDate(final DateTime startDate)
+  public PollEventDO setStartDate(final Timestamp startDate)
   {
     this.startDate = startDate;
     return this;
@@ -105,7 +114,7 @@ public class PollEventDO extends DefaultBaseDO
   /**
    * @return the endDate
    */
-  public DateTime getEndDate()
+  public Timestamp getEndDate()
   {
     return endDate;
   }
@@ -114,7 +123,7 @@ public class PollEventDO extends DefaultBaseDO
    * @param endDate the endDate to set
    * @return this for chaining.
    */
-  public PollEventDO setEndDate(final DateTime endDate)
+  public PollEventDO setEndDate(final Timestamp endDate)
   {
     this.endDate = endDate;
     return this;
@@ -127,6 +136,6 @@ public class PollEventDO extends DefaultBaseDO
   public String toString()
   {
     final String pattern = DateFormats.getFormatString(DateFormatType.TIMESTAMP_MINUTES);
-    return DateFormatUtils.format(startDate.getMillis(), pattern) + " - " + DateFormatUtils.format(endDate.getMillis(), pattern);
+    return DateFormatUtils.format(startDate.getTime(), pattern) + " - " + DateFormatUtils.format(endDate.getTime(), pattern);
   }
 }

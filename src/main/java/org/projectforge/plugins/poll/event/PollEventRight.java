@@ -9,6 +9,7 @@
 
 package org.projectforge.plugins.poll.event;
 
+import org.projectforge.access.OperationType;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRightAccessCheck;
 import org.projectforge.user.UserRightCategory;
@@ -48,5 +49,16 @@ public class PollEventRight extends UserRightAccessCheck<PollEventDO>
   public boolean hasSelectAccess(final PFUserDO user, final PollEventDO obj)
   {
     return true; // TODO
+  }
+
+  /**
+   * @see org.projectforge.user.UserRightAccessCheck#hasAccess(org.projectforge.user.PFUserDO, java.lang.Object, java.lang.Object,
+   *      org.projectforge.access.OperationType)
+   */
+  @Override
+  public boolean hasAccess(PFUserDO user, PollEventDO obj, PollEventDO oldObj, OperationType operationType)
+  {
+    // TODO
+    return true;
   }
 }

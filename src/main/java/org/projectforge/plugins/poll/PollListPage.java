@@ -90,7 +90,8 @@ public class PollListPage extends AbstractListPage<PollListForm, PollDao, PollDO
     columns.add(new CellItemListenerPropertyColumn<PollDO>(getString("plugins.poll.new.title"), getSortable("title", sortable), "title",
         cellItemListener) {
       /**
-       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item, java.lang.String, org.apache.wicket.model.IModel)
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
        */
       @Override
       public void populateItem(final Item<ICellPopulator<PollDO>> item, final String componentId, final IModel<PollDO> rowModel)
@@ -100,7 +101,7 @@ public class PollListPage extends AbstractListPage<PollListForm, PollDao, PollDO
         if (cssStyle.length() > 0) {
           item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
-        item.add(new ListSelectActionPanel(componentId, rowModel, PollEditPage.class, poll.getId(), returnToPage, poll.getTitle()));
+        item.add(new ListSelectActionPanel(componentId, rowModel, NewPollOverviewPage.class, poll.getId(), returnToPage, poll.getTitle()));
         addRowClick(item);
       }
     });

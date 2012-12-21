@@ -13,8 +13,12 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.wicket.injection.Injector;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.plugins.poll.attendee.PollAttendeeDO;
+import org.projectforge.plugins.poll.attendee.PollAttendeeDao;
 import org.projectforge.plugins.poll.event.PollEventDO;
+import org.projectforge.plugins.poll.event.PollEventDao;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 
@@ -34,24 +38,38 @@ public class NewPollFrontendModel implements Serializable
 
   private final PollDO pollDo;
 
-  private final List<PollEventDO> allEvents;
+  private List<PollEventDO> allEvents;
 
-  private final List<PollAttendeeDO> pollAttendeeList;
+  private List<PollAttendeeDO> pollAttendeeList;
 
   private final List<GroupDO> pollGroupList;
 
   private final List<PollAttendeeDO> calculatedUserList;
+
+  @SpringBean(name = "pollAttendeeDao")
+  private PollAttendeeDao pollAttendeeDao;
+
+  @SpringBean(name = "pollEventDao")
+  private PollEventDao pollEventDao;
 
   /**
    * 
    */
   public NewPollFrontendModel(final PollDO pollDo)
   {
+    Injector.get().inject(this);
     this.pollDo = pollDo;
     this.allEvents = new LinkedList<PollEventDO>();
     this.pollAttendeeList = new LinkedList<PollAttendeeDO>();
     this.pollGroupList = new LinkedList<GroupDO>();
     this.calculatedUserList = new LinkedList<PollAttendeeDO>();
+  }
+
+  public void initModelByPoll()
+  {
+    // TODO check if poll id exist
+    pollAttendeeList = pollAttendeeDao.getListByPoll(pollDo);
+    allEvents = pollEventDao.getListByPoll(pollDo);
   }
 
   /**
@@ -94,10 +112,11 @@ public class NewPollFrontendModel implements Serializable
     return calculatedUserList;
   }
 
-  public List<PFUserDO> getUserDoFromAttendees() {
+  public List<PFUserDO> getUserDoFromAttendees()
+  {
     final List<PFUserDO> result = new LinkedList<PFUserDO>();
-    for(final PollAttendeeDO attendee : getPollAttendeeList()) {
-      if(attendee.getUser() != null) {
+    for (final PollAttendeeDO attendee : getPollAttendeeList()) {
+      if (attendee.getUser() != null) {
         result.add(attendee.getUser());
       }
     }

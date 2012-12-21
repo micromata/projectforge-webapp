@@ -39,6 +39,7 @@ import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.joda.time.DateTime;
 import org.projectforge.plugins.poll.NewPollFrontendModel;
 import org.projectforge.plugins.poll.NewPollPage;
 import org.projectforge.plugins.poll.PollDO;
@@ -95,6 +96,8 @@ public class PollEventEditPage extends AbstractSecuredPage
 
     form.add(new Label("title", model.getPollDo().getTitle()));
     form.add(new Label("location", model.getPollDo().getLocation()));
+    eventEntries = new RepeatingView("eventEntries");
+    eventEntries.setVisible(true);
     entryContainer = new WebMarkupContainer("entryContainer") {
       private static final long serialVersionUID = -2897780301098962428L;
 
@@ -128,7 +131,6 @@ public class PollEventEditPage extends AbstractSecuredPage
         }
       }
     };
-    eventEntries = new RepeatingView("eventEntries");
 
     final Button nextButton = new Button(SingleButtonPanel.WICKET_ID) {
       private static final long serialVersionUID = -7779593314951993472L;
@@ -156,7 +158,7 @@ public class PollEventEditPage extends AbstractSecuredPage
     eventProvider = new PollEventEventsProvider(this, model.getPollDo());
     if (model.getAllEvents().isEmpty() == false) {
       for (final PollEventDO event : model.getAllEvents()) {
-        eventProvider.addEvent(new SelectedRange(event.getStartDate(), event.getEndDate(), false), null);
+        eventProvider.addEvent(new SelectedRange(new DateTime(event.getStartDate()), new DateTime(event.getEndDate()), false), null);
       }
     }
     config = new MyFullCalendarConfig(this);

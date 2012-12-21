@@ -23,7 +23,12 @@
 
 package org.projectforge.plugins.poll.event;
 
+import java.util.List;
+
+import org.hibernate.criterion.Restrictions;
 import org.projectforge.core.BaseDao;
+import org.projectforge.core.QueryFilter;
+import org.projectforge.plugins.poll.PollDO;
 import org.projectforge.user.UserRightId;
 
 /**
@@ -52,4 +57,10 @@ public class PollEventDao extends BaseDao<PollEventDO>
     return new PollEventDO();
   }
 
+  public List<PollEventDO> getListByPoll(PollDO poll)
+  {
+    QueryFilter qFilter = new QueryFilter();
+    qFilter.add(Restrictions.and(Restrictions.eq("poll", poll), Restrictions.eq("deleted", false)));
+    return getList(qFilter);
+  }
 }

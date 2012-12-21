@@ -35,15 +35,16 @@ public abstract class PollEventEntryPanel extends Panel
   {
     super(id);
 
-    final DateTime start = poll.getStartDate();
-    final DateTime end = poll.getEndDate();
+    final DateTime start = new DateTime(poll.getStartDate());
+    final DateTime end = new DateTime(poll.getEndDate());
 
     final String pattern = DateFormats.getFormatString(DateFormatType.TIMESTAMP_MINUTES);
     add(new Label("startDate", "Start: " + DateFormatUtils.format(start.getMillis(), pattern)));
     add(new Label("endDate", "Ende: " + DateFormatUtils.format(end.getMillis(), pattern)));
 
-    final AjaxIconButtonPanel iconButton = new AjaxIconButtonPanel("delete", IconType.MINUS_THICK){
+    final AjaxIconButtonPanel iconButton = new AjaxIconButtonPanel("delete", IconType.MINUS_THICK) {
       private static final long serialVersionUID = -2464985733387718199L;
+
       /**
        * @see org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
        */

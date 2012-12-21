@@ -9,6 +9,7 @@
 
 package org.projectforge.plugins.poll.attendee;
 
+import org.projectforge.access.OperationType;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRightAccessCheck;
 import org.projectforge.user.UserRightCategory;
@@ -48,5 +49,16 @@ public class PollAttendeeRight extends UserRightAccessCheck<PollAttendeeDO>
   public boolean hasInsertAccess(final PFUserDO user, final PollAttendeeDO obj)
   {
     return true; // TODO
+  }
+
+  /**
+   * @see org.projectforge.user.UserRightAccessCheck#hasAccess(org.projectforge.user.PFUserDO, java.lang.Object, java.lang.Object,
+   *      org.projectforge.access.OperationType)
+   */
+  @Override
+  public boolean hasAccess(PFUserDO user, PollAttendeeDO obj, PollAttendeeDO oldObj, OperationType operationType)
+  {
+    // return super.hasAccess(user, obj, oldObj, operationType);
+    return true;
   }
 }

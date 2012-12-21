@@ -23,10 +23,27 @@
 
 package org.projectforge.plugins.poll;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.form.RequiredTextField;
+import org.apache.wicket.markup.html.form.TextArea;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
+import org.projectforge.plugins.poll.attendee.PollAttendeeDO;
+import org.projectforge.plugins.poll.attendee.PollAttendeeDao;
+import org.projectforge.user.PFUserDO;
+import org.projectforge.web.common.MultiChoiceListHelper;
+import org.projectforge.web.user.UsersComparator;
+import org.projectforge.web.user.UsersProvider;
 import org.projectforge.web.wicket.AbstractEditForm;
+import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+
+import com.vaynberg.wicket.select2.Select2MultiChoice;
 
 /**
  * 
@@ -42,6 +59,12 @@ public class PollEditForm extends AbstractEditForm<PollDO, PollEditPage>
 
   @SpringBean(name = "accessChecker")
   protected AccessChecker accessChecker;
+
+  @SpringBean(name = "pollAttendeeDao")
+  protected PollAttendeeDao pollAttendeeDao;
+
+  // @SpringBean(name = "pollEventDao")
+  // protected PollEventDao pollEventDao;
 
   /**
    * @param parentPage
@@ -59,7 +82,57 @@ public class PollEditForm extends AbstractEditForm<PollDO, PollEditPage>
   protected void init()
   {
     super.init();
-    //    gridBuilder.newGrid8();
+
+    Collection<PFUserDO> attendeePFUserList = new ArrayList<PFUserDO>();
+    Collection<String> emailList = new ArrayList<String>();
+    for (PollAttendeeDO attendee : pollAttendeeDao.getListByPoll(data)) {
+      if (attendee.getUser() != null) {
+        attendeePFUserList.add(attendee.getUser());
+      } else {
+        if (attendee.getEmail() != null) {
+          emailList.add(attendee.getEmail());
+        }
+      }
+    }
+
+    gridBuilder.newGrid8();
+
+    // new title
+    FieldsetPanel fsTitle = gridBuilder.newFieldset("Titel", true);
+    RequiredTextField<String> title = new RequiredTextField<String>(fsTitle.getTextFieldId(), new PropertyModel<String>(this.data, "title"));
+    fsTitle.add(title);
+
+    // new location
+    FieldsetPanel fsLocation = gridBuilder.newFieldset("Ort", true);
+    PFAutoCompleteTextField<String> location = new PFAutoCompleteTextField<String>(fsLocation.getTextFieldId(), new PropertyModel<String>(
+        this.data, "location")) {
+      private static final long serialVersionUID = -2309992819521957913L;
+
+      @Override
+      protected List<String> getChoices(String input)
+      {
+        return getBaseDao().getAutocompletion("location", input);
+      }
+    };
+    fsLocation.add(location);
+
+    // new description
+    FieldsetPanel fsDesc = gridBuilder.newFieldset("Beschreibung", true);
+    TextArea<String> desc = new TextArea<String>(fsDesc.getTextAreaId(), new PropertyModel<String>(this.data, "description"));
+    fsDesc.add(desc);
+
+    // attendee list
+    FieldsetPanel fsAttendee = gridBuilder.newFieldset("Teilnehmer", true);
+    final UsersProvider usersProvider = new UsersProvider();
+    MultiChoiceListHelper<PFUserDO> attendeeHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator())
+        .setFullList(usersProvider.getSortedUsers());
+    attendeeHelper.setAssignedItems(attendeePFUserList);
+    Select2MultiChoice<PFUserDO> attendees = new Select2MultiChoice<PFUserDO>(fsAttendee.getSelect2MultiChoiceId(),
+        new PropertyModel<Collection<PFUserDO>>(attendeeHelper, "assignedItems"), usersProvider);
+    fsAttendee.add(attendees);
+
+    // new email list
+    // TODO email list
   }
 
   /**
