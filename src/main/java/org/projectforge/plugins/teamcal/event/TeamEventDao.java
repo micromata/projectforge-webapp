@@ -23,10 +23,16 @@
 
 package org.projectforge.plugins.teamcal.event;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+
+import net.fortuna.ical4j.model.DateList;
+import net.fortuna.ical4j.model.Period;
+import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.parameter.Value;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -57,6 +63,8 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
   public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_CALENDAR_EVENT", "plugin15", "plugins.teamcalendar.event");
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamEventDao.class);
+
+  private static final long ONE_DAY = 1000 * 60 * 60 * 24;
 
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "subject", "location", "calendar.id", "calendar.title", "note",
   "attendees"};
@@ -127,20 +135,91 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
   {
     final TeamEventFilter teamEventFilter;
     if (filter instanceof TeamEventFilter) {
-      teamEventFilter = (TeamEventFilter) filter;
+      teamEventFilter = ((TeamEventFilter) filter).clone();
     } else {
       teamEventFilter = new TeamEventFilter(filter);
     }
     if (CollectionUtils.isEmpty(teamEventFilter.getTeamCals()) == true && teamEventFilter.getTeamCalId() == null) {
       return null;
     }
-    final QueryFilter qFilter = buildQueryFilter(teamEventFilter);
-    log.warn("***** TODO: get all day events separate (due to UTC-date) and get recurrence events.");
-    final List<TeamEventDO> list = getList(qFilter);
-    return list;
+    QueryFilter qFilter = buildQueryFilter(teamEventFilter);
+    List<TeamEventDO> list = getList(qFilter);
+    final List<TeamEventDO> result = new ArrayList<TeamEventDO>(list.size());
+    final Date startDate = teamEventFilter.getStartDate();
+    final Date endDate = teamEventFilter.getEndDate();
+    if (list != null) {
+      for (final TeamEventDO event : list) {
+        if (event.hasRecurrence() == true) {
+          // This event will be handled below.
+          continue;
+        }
+        if (matches(startDate, endDate, event.isAllDay(), teamEventFilter) == true) {
+          result.add(event);
+        }
+      }
+    }
+    teamEventFilter.setOnlyRecurrence(true);
+    qFilter = buildQueryFilter(teamEventFilter);
+    qFilter.add(Restrictions.isNotNull("recurrenceRule"));
+
+    list = getList(qFilter);
+    final net.fortuna.ical4j.model.Date ical4jStartDate  = ICal4JUtils.getICal4jDate(teamEventFilter.getStartDate());
+    final net.fortuna.ical4j.model.Date ical4jEndDate  = ICal4JUtils.getICal4jDate(teamEventFilter.getEndDate());
+    if (list != null) {
+      for (final TeamEventDO event : list) {
+        if (event.hasRecurrence() == false) {
+          // This event was handled above.
+          continue;
+        }
+        final Recur recur = ICal4JUtils.calculateRecurrence(event.getRecurrenceRule());
+        if (recur == null) {
+          continue;
+        }
+        final DateList dateList = recur.getDates(ical4jStartDate, ical4jEndDate,  Value.PERIOD);
+        for (final Object date : dateList) {
+          final Period period = (Period)date;
+          if (matches(period.getStart(), period.getEnd(), event.isAllDay(), teamEventFilter) == false) {
+            continue;
+          }
+          final TeamEventDO nextEvent = event.clone();
+          nextEvent.setStartDate(new Timestamp(period.getStart().getTime()));
+          nextEvent.setEndDate(new Timestamp(period.getEnd().getTime()));
+          result.add(nextEvent);
+        }
+      }
+    }
+    log.warn("***** TODO: get recurrence events. raw list: " + list.size() + ", result: " + result.size());
+    return result;
   }
 
-  public QueryFilter buildQueryFilter(final TeamEventFilter filter)
+  private boolean matches(final Date eventStartDate, final Date eventEndDate, final boolean allDay, final TeamEventFilter teamEventFilter)
+  {
+    final Date startDate = teamEventFilter.getStartDate();
+    final Date endDate = teamEventFilter.getEndDate();
+    if (allDay == true) {
+      // Check date match:
+      // TODO
+      return true;
+    } else {
+      // Check start and stop date due to extension of time period of buildQueryFilter:
+      if (startDate != null && eventEndDate.before(startDate) == true) {
+        return false;
+      }
+      if (endDate != null && eventStartDate.after(endDate) == true) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * The time period of the filter will be extended by one day. This is needed due to all day events which are stored in UTC. The additional
+   * events in the result list not matching the time period have to be removed by caller!
+   * @param filter
+   * @param allDay
+   * @return
+   */
+  private QueryFilter buildQueryFilter(final TeamEventFilter filter)
   {
     final QueryFilter queryFilter = new QueryFilter(filter);
     final Collection<Integer> cals = filter.getTeamCals();
@@ -149,17 +228,33 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     } else if (filter.getTeamCalId() != null) {
       queryFilter.add(Restrictions.eq("calendar.id", filter.getTeamCalId()));
     }
+    // Following period extension is needed due to all day events which are stored in UTC. The additional events in the result list not
+    // matching the time period have to be removed by caller!
+    Date startDate = filter.getStartDate();
+    if (startDate != null) {
+      startDate = new Date(startDate.getTime() - ONE_DAY);
+    }
+    Date endDate = filter.getEndDate();
+    if (endDate != null) {
+      endDate = new Date(endDate.getTime() + ONE_DAY);
+    }
     // limit events to load to chosen date view.
-    if (filter.getStartDate() != null && filter.getEndDate() != null) {
-      queryFilter.add(Restrictions.or(
-          (Restrictions.or(Restrictions.between("startDate", filter.getStartDate(), filter.getEndDate()),
-              Restrictions.between("endDate", filter.getStartDate(), filter.getEndDate()))),
-              // get events whose duration overlap with chosen duration.
-              (Restrictions.and(Restrictions.le("startDate", filter.getStartDate()), Restrictions.ge("endDate", filter.getEndDate())))));
-    } else if (filter.getStartDate() != null) {
-      queryFilter.add(Restrictions.ge("startDate", filter.getStartDate()));
-    } else if (filter.getEndDate() != null) {
-      queryFilter.add(Restrictions.le("startDate", filter.getEndDate()));
+    if (startDate != null && endDate != null) {
+      if (filter.isOnlyRecurrence() == false) {
+        queryFilter.add(Restrictions.or(
+            (Restrictions.or(Restrictions.between("startDate", startDate, endDate), Restrictions.between("endDate", startDate, endDate))),
+            // get events whose duration overlap with chosen duration.
+            (Restrictions.and(Restrictions.le("startDate", startDate), Restrictions.ge("endDate", endDate)))));
+      } else {
+        queryFilter.add(
+            // "startDate" < endDate && ("recurrenceUntil" == null || "recurrenceUnti" > startDate)
+            (Restrictions.and(Restrictions.lt("startDate", endDate),
+                Restrictions.or(Restrictions.isNull("recurrenceUntil"), Restrictions.gt("recurrenceUntil", startDate)))));
+      }
+    } else if (startDate != null) {
+      queryFilter.add(Restrictions.ge("startDate", startDate));
+    } else if (endDate != null) {
+      queryFilter.add(Restrictions.le("startDate", endDate));
     }
     queryFilter.addOrder(Order.desc("startDate"));
     if (log.isDebugEnabled() == true) {

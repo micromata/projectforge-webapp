@@ -36,6 +36,7 @@ import javax.persistence.Transient;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.property.RRule;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
@@ -73,7 +74,7 @@ import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 @Entity
 @Indexed
 @Table(name = "T_PLUGIN_CALENDAR_EVENT")
-public class TeamEventDO extends DefaultBaseDO
+public class TeamEventDO extends DefaultBaseDO implements Cloneable
 {
   private static final long serialVersionUID = -9205582135590380919L;
 
@@ -317,6 +318,15 @@ public class TeamEventDO extends DefaultBaseDO
   }
 
   /**
+   * @return true if any recurrenceRule is given, otherwise false.
+   */
+  @Transient
+  public boolean hasRecurrence()
+  {
+    return StringUtils.isNotBlank(this.recurrenceRule);
+  }
+
+  /**
    * The recurrenceUntil date is calculated by the recurrenceRule string if given, otherwise the date is set to null.
    * @see org.projectforge.core.AbstractBaseDO#recalculate()
    */
@@ -477,5 +487,24 @@ public class TeamEventDO extends DefaultBaseDO
     } else if (!subject.equals(other.subject))
       return false;
     return true;
+  }
+
+  /**
+   * @see java.lang.Object#clone()
+   */
+  @Override
+  public TeamEventDO clone()
+  {
+    final TeamEventDO clone = new TeamEventDO();
+    clone.startDate = this.startDate;
+    clone.endDate = this.endDate;
+    clone.allDay = this.allDay;
+    clone.subject = this.subject;
+    clone.location = this.location;
+    clone.attendees = this.attendees;
+    clone.recurrenceExDate = this.recurrenceExDate;
+    clone.recurrenceRule = this.recurrenceRule;
+    clone.recurrenceUntil = this.recurrenceUntil;
+    return clone;
   }
 }

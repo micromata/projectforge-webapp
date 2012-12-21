@@ -187,8 +187,8 @@ public class ICal4JUtils
     return new java.sql.Date(ical4jDate.getTime());
   }
 
-  public static net.fortuna.ical4j.model.Date getICal4jDate(final java.sql.Date sqlDate)
+  public static net.fortuna.ical4j.model.Date getICal4jDate(final java.util.Date javaDate)
   {
-    return new net.fortuna.ical4j.model.Date(sqlDate);
+    return new net.fortuna.ical4j.model.Date(javaDate);
   }
 }

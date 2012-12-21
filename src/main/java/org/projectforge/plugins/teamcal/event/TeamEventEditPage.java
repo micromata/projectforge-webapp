@@ -28,6 +28,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.AbstractSecuredBasePage;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
@@ -68,6 +69,17 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       // Display the date of this time sheet in the CalendarPage (usefull if the time sheet was moved).
       ((CalendarPage) returnToPage).setStartDate(getData().getStartDate());
     }
+  }
+  
+  /**
+   * @see org.projectforge.web.wicket.AbstractEditPage#onSaveOrUpdate()
+   */
+  @Override
+  public AbstractSecuredBasePage onSaveOrUpdate()
+  {
+    super.onSaveOrUpdate();
+    
+    return null;
   }
 
   /**

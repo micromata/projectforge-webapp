@@ -32,9 +32,9 @@ import org.projectforge.user.PFUserDO;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
- *
+ * 
  */
-public class TeamEventFilter extends BaseSearchFilter implements Serializable
+public class TeamEventFilter extends BaseSearchFilter implements Serializable, Cloneable
 {
   private static final long serialVersionUID = 2554610661216573080L;
 
@@ -48,6 +48,8 @@ public class TeamEventFilter extends BaseSearchFilter implements Serializable
 
   private Date endDate;
 
+  private boolean onlyRecurrence;
+
   /**
    * @param filter
    */
@@ -56,7 +58,8 @@ public class TeamEventFilter extends BaseSearchFilter implements Serializable
     super(filter);
   }
 
-  public TeamEventFilter() {
+  public TeamEventFilter()
+  {
   }
 
   /**
@@ -142,5 +145,38 @@ public class TeamEventFilter extends BaseSearchFilter implements Serializable
     this.teamCals = teamCals;
   }
 
+  /**
+   * Only for internal purposes.
+   * @return the onlyRecurrence
+   */
+  public boolean isOnlyRecurrence()
+  {
+    return onlyRecurrence;
+  }
 
+  /**
+   * Only for internal purposes.
+   * @param onlyRecurrence the onlyRecurrence to set
+   * @return this for chaining.
+   */
+  public TeamEventFilter setOnlyRecurrence(final boolean onlyRecurrence)
+  {
+    this.onlyRecurrence = onlyRecurrence;
+    return this;
+  }
+
+  /**
+   * @see java.lang.Object#clone()
+   */
+  @Override
+  public TeamEventFilter clone()
+  {
+    final TeamEventFilter clone = new TeamEventFilter(this);
+    clone.startDate = (Date) this.startDate.clone();
+    clone.endDate = (Date) this.endDate.clone();
+    clone.teamCalId = this.teamCalId;
+    clone.teamCals = this.teamCals;
+    clone.user = this.user;
+    return clone;
+  }
 }
