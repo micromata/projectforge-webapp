@@ -26,6 +26,8 @@ import org.apache.wicket.request.Request;
 
 public abstract class EventDroppedCallback extends AbstractAjaxCallbackWithClientsideRevert implements CallbackWithHandler
 {
+  public static final String NO_CONTEXTMENU_INDICATOR = "noContextMenu";
+
   private static final long serialVersionUID = 9220878749378414280L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(EventDroppedCallback.class);
@@ -38,7 +40,7 @@ public abstract class EventDroppedCallback extends AbstractAjaxCallbackWithClien
   private static final String COPY_EDIT = CalendarDropMode.COPY_EDIT.getI18nKey();
   private static final String CANCEL = CalendarDropMode.CANCEL.getI18nKey();
 
-  private static final String CALLBACK_POST_SCRIPT = "}; $.contextMenu.create("
+  private static final String CALLBACK_POST_SCRIPT = "}; if(jQuery.inArray('" + NO_CONTEXTMENU_INDICATOR + "', event.className) < 0) { $.contextMenu.create("
       + "["
       + "{ '" + MOVE_SAVE + "' : function(menuItem,menu) { triggerAjaxEvent('" + CalendarDropMode.MOVE_SAVE.getAjaxTarget() + "'); } },"
       + "{ '" + MOVE_EDIT + "' : function(menuItem,menu) { triggerAjaxEvent('" + CalendarDropMode.MOVE_EDIT.getAjaxTarget() + "'); } },"
@@ -49,7 +51,7 @@ public abstract class EventDroppedCallback extends AbstractAjaxCallbackWithClien
       + "{ '" + CANCEL + "' : function(menuItem,menu) { menu.hide(); } }"
       + "],"
       + "{hideCallback: function () {this.menu.remove(); revertFunc(); } }"
-      + ").show(this, originalEvent);";
+      + ").show(this, originalEvent); } else { triggerAjaxEvent('" + CalendarDropMode.NONE.getAjaxTarget() + "'); }";
 
   private final Config config;
 

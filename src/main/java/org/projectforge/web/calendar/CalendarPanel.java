@@ -226,7 +226,7 @@ public class CalendarPanel extends Panel
               + clickedEvent.getSource().getUuid());
         }
         if (eventId != null) {
-          if (TimesheetEventsProvider.EVENT_CLASS_NAME.equals(eventClassName) == true) {
+          if (TimesheetEventsProvider.EVENT_CLASS_NAME.startsWith(eventClassName) == true) {
             // User clicked on a time sheet, show the time sheet:
             final Integer id = NumberHelper.parseInteger(eventId);
             final PageParameters parameters = new PageParameters();
@@ -235,14 +235,14 @@ public class CalendarPanel extends Panel
             timesheetEditPage.setReturnToPage((WebPage) getPage());
             setResponsePage(timesheetEditPage);
             return;
-          } else if (TimesheetEventsProvider.BREAK_EVENT_CLASS_NAME.equals(eventClassName) == true) {
+          } else if (TimesheetEventsProvider.BREAK_EVENT_CLASS_NAME.startsWith(eventClassName) == true) {
             // User clicked on a break (between time sheets), create new time sheet with times of the break:
             final TimesheetDO breaksTimesheet = timesheetEventsProvider.getBreakTimesheet(eventId);
             final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(breaksTimesheet);
             timesheetEditPage.setReturnToPage((WebPage) getPage());
             setResponsePage(timesheetEditPage);
             return;
-          } else if (BirthdayEventsProvider.EVENT_CLASS_NAME.equals(eventClassName) == true) {
+          } else if (BirthdayEventsProvider.EVENT_CLASS_NAME.startsWith(eventClassName) == true) {
             // User clicked on birthday, show the address:
             final Integer id = NumberHelper.parseInteger(eventId);
             final PageParameters parameters = new PageParameters();

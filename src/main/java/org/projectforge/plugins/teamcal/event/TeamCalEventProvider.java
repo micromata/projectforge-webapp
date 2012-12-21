@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.ftlines.wicket.fullcalendar.Event;
+import net.ftlines.wicket.fullcalendar.callback.EventDroppedCallback;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -145,6 +146,11 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
 
         event.setStart(startDate);
         event.setEnd(endDate);
+
+        // no contextmenu for recurrent events please
+        if (RecurrencyUtil.isEventRecurrent(teamEvent)) {
+          event.setClassName(event.getClassName() + " " + EventDroppedCallback.NO_CONTEXTMENU_INDICATOR);
+        }
 
         final String title;
         String durationString = "";

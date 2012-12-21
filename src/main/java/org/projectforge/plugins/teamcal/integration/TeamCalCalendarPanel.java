@@ -36,6 +36,7 @@ import net.ftlines.wicket.fullcalendar.callback.View;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.joda.time.DateTime;
@@ -43,6 +44,8 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
+import org.projectforge.plugins.teamcal.dialog.RecurrenceChangeDialog;
+import org.projectforge.plugins.teamcal.event.RecurrencyUtil;
 import org.projectforge.plugins.teamcal.event.TeamCalEventProvider;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDao;
@@ -77,6 +80,8 @@ public class TeamCalCalendarPanel extends CalendarPanel
 
   private TeamCalEventProvider eventProvider;
 
+  private RecurrenceChangeDialog recurrenceChangeDialog;
+
   /**
    * @param id
    * @param currentDatePanel
@@ -84,6 +89,17 @@ public class TeamCalCalendarPanel extends CalendarPanel
   public TeamCalCalendarPanel(final String id, final JodaDatePanel currentDatePanel)
   {
     super(id, currentDatePanel);
+  }
+
+  /**
+   * @see org.apache.wicket.Component#onInitialize()
+   */
+  @Override
+  protected void onInitialize()
+  {
+    super.onInitialize();
+    recurrenceChangeDialog = new RecurrenceChangeDialog("recurrenceChangeDialog", new ResourceModel("plugins.teamcal.event.recurrence.change.title"));
+    add(recurrenceChangeDialog);
   }
 
   /**
@@ -228,6 +244,12 @@ public class TeamCalCalendarPanel extends CalendarPanel
     }
     if (newEndDate != null) {
       dbTeamEvent.setEndDate(new Timestamp(newEndTimeMillis));
+    }
+
+    if(1== 1 || RecurrencyUtil.isEventRecurrent(dbTeamEvent)) {
+      // at this point the dbTeamEvent is already updated in time
+      recurrenceChangeDialog.open(response.getTarget(), dbTeamEvent);
+      return;
     }
 
     // clone event if mode is copy_*
