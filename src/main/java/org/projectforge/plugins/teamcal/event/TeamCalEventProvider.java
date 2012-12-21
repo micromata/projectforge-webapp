@@ -148,7 +148,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
         event.setEnd(endDate);
 
         // no contextmenu for recurrent events please
-        if (RecurrencyUtil.isEventRecurrent(teamEvent)) {
+        if (teamEvent.hasRecurrence() == true) {
           event.setClassName(event.getClassName() + " " + EventDroppedCallback.NO_CONTEXTMENU_INDICATOR);
         }
 

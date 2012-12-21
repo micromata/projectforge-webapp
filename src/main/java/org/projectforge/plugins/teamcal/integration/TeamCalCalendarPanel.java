@@ -45,7 +45,6 @@ import org.projectforge.common.NumberHelper;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.dialog.RecurrenceChangeDialog;
-import org.projectforge.plugins.teamcal.event.RecurrencyUtil;
 import org.projectforge.plugins.teamcal.event.TeamCalEventProvider;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDao;
@@ -98,7 +97,8 @@ public class TeamCalCalendarPanel extends CalendarPanel
   protected void onInitialize()
   {
     super.onInitialize();
-    recurrenceChangeDialog = new RecurrenceChangeDialog("recurrenceChangeDialog", new ResourceModel("plugins.teamcal.event.recurrence.change.title"));
+    recurrenceChangeDialog = new RecurrenceChangeDialog("recurrenceChangeDialog", new ResourceModel(
+        "plugins.teamcal.event.recurrence.change.title"));
     add(recurrenceChangeDialog);
   }
 
@@ -115,9 +115,9 @@ public class TeamCalCalendarPanel extends CalendarPanel
   private void handleDateRangeSelection(final Component caller, final WebPage returnPage, final SelectedRange range,
       final TeamCalDao teamCalDao, final String calendarId)
   {
-    if(filter instanceof TeamCalCalendarFilter) {
-      final TemplateEntry activeTemplateEntry = ((TeamCalCalendarFilter)filter).getActiveTemplateEntry();
-      if(activeTemplateEntry.getDefaultCalendarId() == null && activeTemplateEntry.getCalendars().size() > 0) {
+    if (filter instanceof TeamCalCalendarFilter) {
+      final TemplateEntry activeTemplateEntry = ((TeamCalCalendarFilter) filter).getActiveTemplateEntry();
+      if (activeTemplateEntry.getDefaultCalendarId() == null && activeTemplateEntry.getCalendars().size() > 0) {
         activeTemplateEntry.setDefaultCalendarId(activeTemplateEntry.getCalendars().get(0).getId());
       }
       final TeamCalDO calendar = teamCalDao.getById(activeTemplateEntry.getDefaultCalendarId());
@@ -246,7 +246,7 @@ public class TeamCalCalendarPanel extends CalendarPanel
       dbTeamEvent.setEndDate(new Timestamp(newEndTimeMillis));
     }
 
-    if(RecurrencyUtil.isEventRecurrent(dbTeamEvent)) {
+    if (dbTeamEvent.hasRecurrence() == true) {
       // at this point the dbTeamEvent is already updated in time
       recurrenceChangeDialog.open(response.getTarget(), dbTeamEvent);
       return;
