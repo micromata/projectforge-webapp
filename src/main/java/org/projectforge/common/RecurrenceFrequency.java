@@ -29,7 +29,7 @@ import org.projectforge.core.I18nEnum;
 /**
  * Some objects need the attribute of a recurrence. This will be given as an interval.
  */
-public enum RecurrenceInterval implements I18nEnum
+public enum RecurrenceFrequency implements I18nEnum
 {
   YEARLY("yearly"), MONTHLY("monthly"), WEEKLY("weekly"), DAILY("daily"), HOURLY("hourly"), NONE("none");
 
@@ -38,7 +38,7 @@ public enum RecurrenceInterval implements I18nEnum
   @Override
   public String getI18nKey()
   {
-    return "common.recurrenceintervall." + key;
+    return "common.recurrence.frequency" + key;
   }
 
   /**
@@ -50,13 +50,13 @@ public enum RecurrenceInterval implements I18nEnum
     return key;
   }
 
-  RecurrenceInterval(final String key)
+  RecurrenceFrequency(final String key)
   {
     this.key = key;
   }
 
-  public boolean isIn(final RecurrenceInterval... recurrance) {
-    for (final RecurrenceInterval rc : recurrance) {
+  public boolean isIn(final RecurrenceFrequency... recurrance) {
+    for (final RecurrenceFrequency rc : recurrance) {
       if (this == rc) {
         return true;
       }
