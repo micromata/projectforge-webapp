@@ -9,7 +9,6 @@
 
 package org.projectforge.web.timesheet;
 
-import org.apache.wicket.Component;
 import org.projectforge.timesheet.TimesheetDO;
 
 /**
@@ -22,12 +21,11 @@ public interface TimesheetPluginComponentHook
 {
 
   /**
-   * Offers the possibility to render an action button which can perform several actions with for given
-   * timesheet.
+   * Offers the possibility to render an action button which can perform several actions with for given timesheet.
    * 
    * @param wicketId
    * @param timesheet
    * @return
    */
-  Component renderActionButtonsToTimesheetEditPage(String wicketId, TimesheetDO timesheet);
+  void renderComponentsToTimesheetEditForm(TimesheetEditForm form, TimesheetDO timesheet);
 }

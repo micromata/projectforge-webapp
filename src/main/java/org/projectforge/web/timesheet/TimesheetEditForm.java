@@ -40,7 +40,6 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.validation.IFormValidator;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -121,7 +120,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
 
   DropDownChoicePanel<Integer> cost2ChoicePanel;
 
-  private FieldsetPanel cost2ChoiceFieldset;
+  private FieldsetPanel cost2ChoiceFieldset, templatesRow;
 
   private ConsumptionBarPanel consumptionBarPanel;
 
@@ -367,19 +366,17 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
       };
       actionButtons.add(2, cloneButtonPanel);
     }
-    // TODO kai: place hook rendering
-    renderHookComponents(actionButtons.getRepeatingView());
   }
 
   /**
    * @param gridBuilder
    */
-  private void renderHookComponents(final RepeatingView repeater)
+  private void renderHookComponents()
   {
     final List<TimesheetPluginComponentHook> hooks = TimesheetEditPage.getPluginHooks();
-    if(hooks != null && hooks.isEmpty() == false) {
-      for(final TimesheetPluginComponentHook hook : hooks) {
-        repeater.add(hook.renderActionButtonsToTimesheetEditPage(repeater.newChildId(), getData()));
+    if (hooks != null && hooks.isEmpty() == false) {
+      for (final TimesheetPluginComponentHook hook : hooks) {
+        hook.renderComponentsToTimesheetEditForm(this, getData());
       }
     }
   }
@@ -387,7 +384,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
   @SuppressWarnings("serial")
   private void addTemplatesRow()
   {
-    final FieldsetPanel fs = gridBuilder.newFieldset(getString("templates"), true).setNoLabelFor();
+    templatesRow = gridBuilder.newFieldset(getString("templates"), true).setNoLabelFor();
     final String[] templateNames = userPrefDao.getPrefNames(UserPrefArea.TIMESHEET_TEMPLATE);
     if (templateNames != null && templateNames.length > 0) {
       // DropDownChoice templates
@@ -397,8 +394,8 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
       for (final String name : templateNames) {
         templateNamesChoiceRenderer.addValue(name, name);
       }
-      final DropDownChoice<String> templateNamesChoice = new DropDownChoice<String>(fs.getDropDownChoiceId(), new PropertyModel<String>(
-          this, "templateName"), templateNamesChoiceRenderer.getValues(), templateNamesChoiceRenderer) {
+      final DropDownChoice<String> templateNamesChoice = new DropDownChoice<String>(templatesRow.getDropDownChoiceId(),
+          new PropertyModel<String>(this, "templateName"), templateNamesChoiceRenderer.getValues(), templateNamesChoiceRenderer) {
         @Override
         protected boolean wantOnSelectionChangedNotifications()
         {
@@ -434,7 +431,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
         }
       };
       templateNamesChoice.setNullValid(true);
-      fs.add(templateNamesChoice);
+      templatesRow.add(templateNamesChoice);
     }
     final AjaxSubmitLink link = new AjaxSubmitLink(IconLinkPanel.LINK_ID) {
       @Override
@@ -452,9 +449,14 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
       }
     };
     link.setDefaultFormProcessing(false);
-    fs.add(new IconLinkPanel(fs.newChildId(), IconType.FOLDER_OPEN, getString("timesheet.recent.select"), link));
+    templatesRow.add(new IconLinkPanel(templatesRow.newChildId(), IconType.FOLDER_OPEN, getString("timesheet.recent.select"), link));
     recentSheetsModalWindow = new ModalWindow(RECENT_SHEETS_DIALOG_ID);
     add(recentSheetsModalWindow);
+  }
+
+  public FieldsetPanel getTemplatesRow()
+  {
+    return this.templatesRow;
   }
 
   private void updateCost2ChoiceVisibility()
@@ -542,6 +544,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
   @Override
   public void onBeforeRender()
   {
+    renderHookComponents();
     super.onBeforeRender();
     final DateHolder stopDateHolder = new DateHolder(data.getStopTime(), DatePrecision.MINUTE_15);
     stopHourOfDay = stopDateHolder.getHourOfDay();
@@ -597,12 +600,13 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
   }
 
   /**
-   * @see org.projectforge.web.wicket.autocompletion.AutoCompleteIgnoreForm#ignore(org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField, java.lang.String)
+   * @see org.projectforge.web.wicket.autocompletion.AutoCompleteIgnoreForm#ignore(org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField,
+   *      java.lang.String)
    */
   @Override
   public void ignore(final PFAutoCompleteTextField< ? > autoCompleteField, final String ignoreText)
   {
-    if(locationTextField != null && locationTextField.equals(autoCompleteField) == true) {
+    if (locationTextField != null && locationTextField.equals(autoCompleteField) == true) {
       filter.addIgnoredLocation(ignoreText);
     }
   }

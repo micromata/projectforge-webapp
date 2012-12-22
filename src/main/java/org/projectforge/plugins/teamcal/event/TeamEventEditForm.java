@@ -340,29 +340,6 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
         }
       }
     });
-    {
-      final Button switchToTimesheetButton = new Button("button") {
-        @Override
-        public final void onSubmit()
-        {
-          final TeamEventDO event = getData();
-          final TimesheetDO timesheet = new TimesheetDO();
-          if (event != null) {
-            timesheet.setStartDate(event.getStartDate());
-            timesheet.setStopTime(event.getEndDate());
-          }
-          WebPage returnToPage = parentPage.getReturnToPage();
-          if (returnToPage == null) {
-            returnToPage = new TeamCalCalendarPage(new PageParameters());
-          }
-          setResponsePage(new TimesheetEditPage(timesheet).setReturnToPage(returnToPage));
-        }
-      };
-      switchToTimesheetButton.setDefaultFormProcessing(false); // No validation of the form components
-      final SingleButtonPanel switchToTimesheetButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), switchToTimesheetButton,
-          new ResourceModel("plugins.teamcal.switchToTimesheetButton"));
-      actionButtons.add(0, switchToTimesheetButtonPanel);
-    }
   }
 
   private void setRecurrenceComponentsVisibility(final AjaxRequestTarget target)
@@ -430,6 +407,33 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       teamCalDrop.setNullValid(false);
       teamCalDrop.setRequired(true);
       fieldSet.add(teamCalDrop);
+      if (isNew() == false) {
+        // Show switch button only for new events.
+        return;
+      }
+      {
+        final Button switchToTimesheetButton = new Button("button") {
+          @Override
+          public final void onSubmit()
+          {
+            final TeamEventDO event = getData();
+            final TimesheetDO timesheet = new TimesheetDO();
+            if (event != null) {
+              timesheet.setStartDate(event.getStartDate());
+              timesheet.setStopTime(event.getEndDate());
+            }
+            WebPage returnToPage = parentPage.getReturnToPage();
+            if (returnToPage == null) {
+              returnToPage = new TeamCalCalendarPage(new PageParameters());
+            }
+            setResponsePage(new TimesheetEditPage(timesheet).setReturnToPage(returnToPage));
+          }
+        };
+        switchToTimesheetButton.setDefaultFormProcessing(false); // No validation of the form components
+        final SingleButtonPanel switchToTimesheetButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), switchToTimesheetButton,
+            new ResourceModel("plugins.teamcal.switchToTimesheetButton"), SingleButtonPanel.GREY);
+        fieldSet.add(switchToTimesheetButtonPanel);
+      }
     }
   }
 
