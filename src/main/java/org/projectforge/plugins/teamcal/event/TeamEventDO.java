@@ -305,6 +305,17 @@ public class TeamEventDO extends DefaultBaseDO implements Cloneable
   }
 
   /**
+   * @param recurData
+   * @return this for chaining.
+   */
+  @Transient
+  public TeamEventDO setRecurrence(final TeamEventRecurrenceData recurData) {
+    final String rruleString = ICal4JUtils.calculateRRule(recurData);
+    setRecurrenceRule(rruleString);
+    return this;
+  }
+
+  /**
    * Will be renewed if {@link #setRecurrenceRule(String)} is called.
    * @return the recurrenceRuleObject
    */
