@@ -137,8 +137,8 @@ public class ICal4JUtils
       return null;
     }
     final Recur recur = new Recur();
-    recur.setUntil(getICal4jDate(recurData.getUntil())); // Has to be set before count (sets count = -1).
-    recur.setCount(recurData.getCount());
+    recur.setUntil(getICal4jDate(recurData.getUntil()));
+    recur.setInterval(recurData.getInterval());
     recur.setFrequency(getCal4JFrequencyString(recurData.getFrequency()));
     final RRule rrule = new RRule(recur);
     return rrule.getValue();

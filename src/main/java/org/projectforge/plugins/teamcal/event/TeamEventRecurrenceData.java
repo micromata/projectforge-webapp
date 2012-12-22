@@ -42,7 +42,7 @@ public class TeamEventRecurrenceData implements Serializable
 
   private Date until;
 
-  private int count = 1;
+  private int interval = 1;
 
   private boolean customized;
 
@@ -55,7 +55,7 @@ public class TeamEventRecurrenceData implements Serializable
     if (recur == null) {
       return;
     }
-    this.count = recur.getCount();
+    this.interval = recur.getInterval();
     this.until = ICal4JUtils.getSqlDate(recur.getUntil());
     this.frequency = ICal4JUtils.getFrequency(recur);
   }
@@ -97,25 +97,20 @@ public class TeamEventRecurrenceData implements Serializable
   }
 
   /**
-   * @return the count
+   * @return the interval
    */
-  public int getCount()
+  public int getInterval()
   {
-    return count;
+    return interval;
   }
 
   /**
-   * Please note: If given count is 1 then -1 will be set because 1 is default.
-   * @param count the count to set
+   * @param interval the interval to set
    * @return this for chaining.
    */
-  public TeamEventRecurrenceData setCount(final int count)
+  public TeamEventRecurrenceData setInterval(final int interval)
   {
-    if (count != 1) {
-      this.count = count;
-    } else {
-      this.count = -1;
-    }
+    this.interval = interval;
     return this;
   }
 
