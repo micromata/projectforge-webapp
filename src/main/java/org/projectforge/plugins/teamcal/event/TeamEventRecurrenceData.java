@@ -105,12 +105,17 @@ public class TeamEventRecurrenceData implements Serializable
   }
 
   /**
+   * If given interval is greater than 1 then the interval is set, otherwise the interval is set to -1 (default).
    * @param interval the interval to set
    * @return this for chaining.
    */
   public TeamEventRecurrenceData setInterval(final int interval)
   {
-    this.interval = interval;
+    if (interval > 1) {
+      this.interval = interval;
+    } else {
+      this.interval = -1;
+    }
     return this;
   }
 

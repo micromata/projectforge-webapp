@@ -198,7 +198,14 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     final Date endDate = teamEventFilter.getEndDate();
     if (allDay == true) {
       // Check date match:
-      // TODO
+      if (startDate != null && eventEndDate.before(startDate) == true) {
+        // TODO Check same day (UTC vs. local)
+        return true; // false
+      }
+      if (endDate != null && eventStartDate.after(endDate) == true) {
+        // TODO Check same day (UTC vs. local)
+        return true; // false
+      }
       return true;
     } else {
       // Check start and stop date due to extension of time period of buildQueryFilter:
