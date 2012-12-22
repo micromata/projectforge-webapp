@@ -38,7 +38,7 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
-import org.projectforge.common.RecurrenceInterval;
+import org.projectforge.common.RecurrenceFrequency;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.database.Constants;
 
@@ -71,7 +71,7 @@ public class LiquidityEntryDO extends DefaultBaseDO
   @Field(index = Index.UN_TOKENIZED)
   private BigDecimal ammount;
 
-  private RecurrenceInterval recurranceInterval;
+  private RecurrenceFrequency recurranceInterval;
 
   @Column(length = Constants.LENGTH_TITLE)
   public String getSubject()
@@ -91,7 +91,7 @@ public class LiquidityEntryDO extends DefaultBaseDO
 
   @Enumerated(EnumType.STRING)
   @Column(length = 20)
-  public RecurrenceInterval getRecurranceInterval()
+  public RecurrenceFrequency getRecurranceInterval()
   {
     return recurranceInterval;
   }
@@ -99,7 +99,7 @@ public class LiquidityEntryDO extends DefaultBaseDO
   /**
    * @return this for chaining.
    */
-  public LiquidityEntryDO setRecurranceInterval(final RecurrenceInterval recurranceInterval)
+  public LiquidityEntryDO setRecurranceInterval(final RecurrenceFrequency recurranceInterval)
   {
     this.recurranceInterval = recurranceInterval;
     return this;
