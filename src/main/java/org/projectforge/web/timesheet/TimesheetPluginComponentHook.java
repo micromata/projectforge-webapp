@@ -10,6 +10,7 @@
 package org.projectforge.web.timesheet;
 
 import org.apache.wicket.Component;
+import org.projectforge.timesheet.TimesheetDO;
 
 /**
  * Hook which is used to display plugin components at time sheet pages and components.
@@ -20,5 +21,13 @@ import org.apache.wicket.Component;
 public interface TimesheetPluginComponentHook
 {
 
-  Component renderActionButtonsToTimesheetEditPage(String wicketId);
+  /**
+   * Offers the possibility to render an action button which can perform several actions with for given
+   * timesheet.
+   * 
+   * @param wicketId
+   * @param timesheet
+   * @return
+   */
+  Component renderActionButtonsToTimesheetEditPage(String wicketId, TimesheetDO timesheet);
 }

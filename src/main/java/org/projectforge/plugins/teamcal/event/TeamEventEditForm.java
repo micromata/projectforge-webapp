@@ -35,12 +35,14 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.DateHelper;
@@ -50,8 +52,10 @@ import org.projectforge.common.RecurrenceFrequency;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalFilter;
+import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.HtmlHelper;
+import org.projectforge.web.timesheet.TimesheetEditPage;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteMaxLengthTextField;
@@ -63,6 +67,7 @@ import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
+import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
@@ -334,6 +339,25 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
         }
       }
     });
+    {
+      final Button switchToTimesheetButton = new Button("button") {
+        @Override
+        public final void onSubmit()
+        {
+          final TeamEventDO event = getData();
+          final TimesheetDO timesheet = new TimesheetDO();
+          if(event != null) {
+            timesheet.setStartDate(event.getStartDate());
+            timesheet.setStopTime(event.getEndDate());
+          }
+          setResponsePage(new TimesheetEditPage(timesheet));
+        }
+      };
+      switchToTimesheetButton.setDefaultFormProcessing(false); // No validation of the form components
+      final SingleButtonPanel switchToTimesheetButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), switchToTimesheetButton,
+          new ResourceModel("plugins.teamcal.switchToTimesheetButton"));
+      actionButtons.add(0, switchToTimesheetButtonPanel);
+    }
   }
 
   private void setRecurrenceComponentsVisibility(final AjaxRequestTarget target)
