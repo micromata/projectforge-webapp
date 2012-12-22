@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
@@ -43,6 +44,7 @@ import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.DateHelper;
@@ -52,6 +54,7 @@ import org.projectforge.common.RecurrenceFrequency;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalFilter;
+import org.projectforge.plugins.teamcal.integration.TeamCalCalendarPage;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.HtmlHelper;
@@ -327,9 +330,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       @Override
       public void validate(final Form< ? > form)
       {
-        final DateTimePanel startDateTimePanel = (DateTimePanel) dependentFormComponents[0];
         final DateHolder startDate = new DateHolder(startDateTimePanel.getConvertedInput());
-        final DateTimePanel endDateTimePanel = (DateTimePanel) dependentFormComponents[3];
         final DateHolder endDate = new DateHolder(endDateTimePanel.getConvertedInput());
         data.setStartDate(startDate.getTimestamp());
         data.setEndDate(endDate.getTimestamp());
@@ -346,11 +347,15 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
         {
           final TeamEventDO event = getData();
           final TimesheetDO timesheet = new TimesheetDO();
-          if(event != null) {
+          if (event != null) {
             timesheet.setStartDate(event.getStartDate());
             timesheet.setStopTime(event.getEndDate());
           }
-          setResponsePage(new TimesheetEditPage(timesheet));
+          WebPage returnToPage = parentPage.getReturnToPage();
+          if (returnToPage == null) {
+            returnToPage = new TeamCalCalendarPage(new PageParameters());
+          }
+          setResponsePage(new TimesheetEditPage(timesheet).setReturnToPage(returnToPage));
         }
       };
       switchToTimesheetButton.setDefaultFormProcessing(false); // No validation of the form components
