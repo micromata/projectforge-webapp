@@ -277,7 +277,12 @@ public class DateHelper implements Serializable
 
   public static String formatIsoTimestamp(final Date date)
   {
-    return getIsoTimestampFormat(PFUserContext.getTimeZone()).format(date);
+    return formatIsoTimestamp(date, PFUserContext.getTimeZone());
+  }
+
+  public static String formatIsoTimestamp(final Date date, final TimeZone timeZone)
+  {
+    return getIsoTimestampFormat(timeZone).format(date);
   }
 
   /**
