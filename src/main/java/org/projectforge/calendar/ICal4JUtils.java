@@ -33,6 +33,7 @@ import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.Uid;
+import net.fortuna.ical4j.util.Dates;
 
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.common.RecurrenceFrequency;
@@ -137,7 +138,10 @@ public class ICal4JUtils
       return null;
     }
     final Recur recur = new Recur();
-    recur.setUntil(getICal4jDate(recurData.getUntil()));
+    final net.fortuna.ical4j.model.Date untilDate = getICal4jDate(recurData.getUntil(), recurData.getTimeZone());
+    if (untilDate != null) {
+      recur.setUntil(untilDate);
+    }
     recur.setInterval(recurData.getInterval());
     recur.setFrequency(getCal4JFrequencyString(recurData.getFrequency()));
     final RRule rrule = new RRule(recur);
@@ -214,11 +218,21 @@ public class ICal4JUtils
     return new java.sql.Date(ical4jDate.getTime());
   }
 
-  public static net.fortuna.ical4j.model.Date getICal4jDate(final java.util.Date javaDate)
+  public static net.fortuna.ical4j.model.Date getICal4jDate(final java.util.Date javaDate, final java.util.TimeZone timeZone)
   {
     if (javaDate == null) {
       return null;
     }
-    return new net.fortuna.ical4j.model.Date(javaDate);
+    return new MyIcal4JUTCDate(javaDate, timeZone);
+  }
+
+  public static class MyIcal4JUTCDate extends net.fortuna.ical4j.model.Date
+  {
+    private static final long serialVersionUID = 341788808291157447L;
+
+    MyIcal4JUTCDate(final java.util.Date javaDate, final java.util.TimeZone timeZone)
+    {
+      super(javaDate.getTime(), Dates.PRECISION_DAY, timeZone);
+    }
   }
 }

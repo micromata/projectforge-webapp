@@ -25,6 +25,7 @@ package org.projectforge.plugins.teamcal.event;
 
 import java.io.Serializable;
 import java.sql.Date;
+import java.util.TimeZone;
 
 import net.fortuna.ical4j.model.Recur;
 
@@ -46,11 +47,14 @@ public class TeamEventRecurrenceData implements Serializable
 
   private boolean customized;
 
-  public TeamEventRecurrenceData()
+  private TimeZone timeZone;
+
+  public TeamEventRecurrenceData(final TimeZone timeZone)
   {
+    this.timeZone = timeZone;
   }
 
-  public TeamEventRecurrenceData(final Recur recur)
+  public TeamEventRecurrenceData(final Recur recur, final TimeZone timeZone)
   {
     if (recur == null) {
       return;
@@ -135,5 +139,13 @@ public class TeamEventRecurrenceData implements Serializable
   {
     this.customized = customized;
     return this;
+  }
+
+  /**
+   * @return the timeZone
+   */
+  public TimeZone getTimeZone()
+  {
+    return timeZone;
   }
 }

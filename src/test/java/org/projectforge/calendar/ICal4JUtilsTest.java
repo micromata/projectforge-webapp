@@ -38,16 +38,23 @@ import org.projectforge.plugins.teamcal.event.TeamEventRecurrenceData;
 public class ICal4JUtilsTest
 {
   @Test
+  public void testSqlDate()
+  {
+    final net.fortuna.ical4j.model.Date date = ICal4JUtils.getICal4jDate(DateHelper.parseIsoDate("2012-12-22", DateHelper.EUROPE_BERLIN),
+        DateHelper.EUROPE_BERLIN);
+    Assert.assertEquals("20121222", date.toString());
+  }
+
+  @Test
   public void testRRule()
   {
     TeamEventDO event = createEvent(DateHelper.EUROPE_BERLIN, "2012-12-21 8:30:00.0", "2012-12-21 9:00:00.0", null, 1, null);
     Assert.assertNull(event.getRecurrenceObject());
     event = createEvent(DateHelper.EUROPE_BERLIN, "2012-12-21 8:30:00.0", "2012-12-21 9:00:00.0", RecurrenceFrequency.WEEKLY, 1, null);
     Assert.assertEquals("FREQ=WEEKLY", event.getRecurrenceRule());
-    // event = createEvent(DateHelper.EUROPE_BERLIN, "2012-12-21 8:30:00.0", "2012-12-21 9:00:00.0", RecurrenceFrequency.WEEKLY, 2,
-    // "2013-01-31");
-    // Assert.assertEquals("FREQ=WEEKLY;INTERVAL=2", event.getRecurrenceRule());
-    // Assert.assertNull(event.getRecurrenceUntil());
+    event = createEvent(DateHelper.EUROPE_BERLIN, "2012-12-21 8:30:00.0", "2012-12-21 9:00:00.0", RecurrenceFrequency.WEEKLY, 2,
+        "2013-01-31");
+    Assert.assertEquals("FREQ=WEEKLY;UNTIL=20130131;INTERVAL=2", event.getRecurrenceRule());
   }
 
   private TeamEventDO createEvent(final TimeZone timeZone, final String startDate, final String endDate,
@@ -57,7 +64,7 @@ public class ICal4JUtilsTest
     final Timestamp endTimestamp = new Timestamp(DateHelper.parseIsoTimestamp(endDate, timeZone).getTime());
     final TeamEventDO event = new TeamEventDO();
     event.setStartDate(startTimestamp).setEndDate(endTimestamp);
-    final TeamEventRecurrenceData recurData = new TeamEventRecurrenceData();
+    final TeamEventRecurrenceData recurData = new TeamEventRecurrenceData(timeZone);
     recurData.setFrequency(frequency);
     recurData.setInterval(interval);
     if (recurrenceUntil != null) {
