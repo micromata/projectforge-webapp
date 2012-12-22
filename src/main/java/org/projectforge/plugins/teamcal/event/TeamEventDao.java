@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import net.fortuna.ical4j.model.DateList;
 import net.fortuna.ical4j.model.Period;
@@ -47,6 +48,7 @@ import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserRightId;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -163,8 +165,9 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     qFilter.add(Restrictions.isNotNull("recurrenceRule"));
 
     list = getList(qFilter);
-    final net.fortuna.ical4j.model.Date ical4jStartDate  = ICal4JUtils.getICal4jDate(teamEventFilter.getStartDate());
-    final net.fortuna.ical4j.model.Date ical4jEndDate  = ICal4JUtils.getICal4jDate(teamEventFilter.getEndDate());
+    final TimeZone timeZone = PFUserContext.getTimeZone();
+    final net.fortuna.ical4j.model.Date ical4jStartDate  = ICal4JUtils.getICal4jDate(teamEventFilter.getStartDate(), timeZone);
+    final net.fortuna.ical4j.model.Date ical4jEndDate  = ICal4JUtils.getICal4jDate(teamEventFilter.getEndDate(), timeZone);
     if (list != null) {
       for (final TeamEventDO event : list) {
         if (event.hasRecurrence() == false) {

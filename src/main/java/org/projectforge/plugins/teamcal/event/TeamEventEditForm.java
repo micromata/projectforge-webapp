@@ -50,6 +50,7 @@ import org.projectforge.common.RecurrenceFrequency;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalFilter;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
@@ -127,7 +128,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   {
     super.init();
     final Recur recur = data.getRecurrenceObject();
-    recurrenceData = new TeamEventRecurrenceData(recur);
+    recurrenceData = new TeamEventRecurrenceData(recur, PFUserContext.getTimeZone());
     gridBuilder.newGrid8();
     final TeamCalDO teamCal = data.getCalendar();
     // setting access view
