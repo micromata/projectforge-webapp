@@ -35,7 +35,8 @@ import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.Uid;
 
 import org.apache.commons.lang.StringUtils;
-import org.projectforge.common.RecurrenceInterval;
+import org.projectforge.common.RecurrenceFrequency;
+import org.projectforge.plugins.teamcal.event.TeamEventRecurrenceData;
 import org.projectforge.user.PFUserContext;
 
 /**
@@ -47,8 +48,8 @@ public class ICal4JUtils
 
   private static TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
 
-  private static final RecurrenceInterval[] SUPPORTED_INTERVALS = new RecurrenceInterval[] { RecurrenceInterval.NONE,
-    RecurrenceInterval.DAILY, RecurrenceInterval.WEEKLY, RecurrenceInterval.MONTHLY, RecurrenceInterval.YEARLY};
+  private static final RecurrenceFrequency[] SUPPORTED_INTERVALS = new RecurrenceFrequency[] { RecurrenceFrequency.NONE,
+    RecurrenceFrequency.DAILY, RecurrenceFrequency.WEEKLY, RecurrenceFrequency.MONTHLY, RecurrenceFrequency.YEARLY};
 
   /**
    * @return The timeZone (ical4j) built of the default java timeZone of the user.
@@ -130,33 +131,56 @@ public class ICal4JUtils
     return recur.getUntil();
   }
 
-  public static RecurrenceInterval[] getSupportedRecurrenceIntervals()
+  public static String calculateRRule(final TeamEventRecurrenceData recurData)
+  {
+    if (recurData == null || recurData.getFrequency() == null) {
+      return null;
+    }
+    final Recur recur = new Recur();
+    recur.setUntil(getICal4jDate(recurData.getUntil())); // Has to be set before count (sets count = -1).
+    recur.setCount(recurData.getCount());
+    recur.setFrequency(getCal4JFrequencyString(recurData.getFrequency()));
+    final RRule rrule = new RRule(recur);
+    return rrule.getValue();
+  }
+
+  public static String getCal4JFrequencyString(final RecurrenceFrequency interval)
+  {
+    if (interval == RecurrenceFrequency.DAILY) {
+      return Recur.DAILY;
+    } else if (interval == RecurrenceFrequency.WEEKLY) {
+      return Recur.WEEKLY;
+    } else if (interval == RecurrenceFrequency.MONTHLY) {
+      return Recur.MONTHLY;
+    } else if (interval == RecurrenceFrequency.YEARLY) {
+      return Recur.YEARLY;
+    }
+    return null;
+  }
+
+  public static RecurrenceFrequency[] getSupportedRecurrenceIntervals()
   {
     return SUPPORTED_INTERVALS;
   }
-
-  // public static void createRecurrence() {
-  // final Recur recur = new Recur();
-  // }
 
   /**
    * @param recur
    * @return
    */
-  public static RecurrenceInterval getFrequency(final Recur recur)
+  public static RecurrenceFrequency getFrequency(final Recur recur)
   {
     if (recur == null) {
       return null;
     }
     final String freq = recur.getFrequency();
     if (Recur.WEEKLY.equals(freq) == true) {
-      return RecurrenceInterval.WEEKLY;
+      return RecurrenceFrequency.WEEKLY;
     } else if (Recur.MONTHLY.equals(freq) == true) {
-      return RecurrenceInterval.MONTHLY;
+      return RecurrenceFrequency.MONTHLY;
     } else if (Recur.DAILY.equals(freq) == true) {
-      return RecurrenceInterval.DAILY;
+      return RecurrenceFrequency.DAILY;
     } else if (Recur.YEARLY.equals(freq) == true) {
-      return RecurrenceInterval.YEARLY;
+      return RecurrenceFrequency.YEARLY;
     }
     return null;
   }
@@ -165,18 +189,18 @@ public class ICal4JUtils
    * @param recur
    * @return
    */
-  public static String getFrequency(final RecurrenceInterval interval)
+  public static String getFrequency(final RecurrenceFrequency interval)
   {
     if (interval == null) {
       return null;
     }
-    if (interval == RecurrenceInterval.WEEKLY) {
+    if (interval == RecurrenceFrequency.WEEKLY) {
       return Recur.WEEKLY;
-    } else if (interval == RecurrenceInterval.DAILY) {
+    } else if (interval == RecurrenceFrequency.DAILY) {
       return Recur.DAILY;
-    } else if (interval == RecurrenceInterval.MONTHLY) {
+    } else if (interval == RecurrenceFrequency.MONTHLY) {
       return Recur.MONTHLY;
-    } else if (interval == RecurrenceInterval.YEARLY) {
+    } else if (interval == RecurrenceFrequency.YEARLY) {
       return Recur.YEARLY;
     }
     return null;
@@ -184,11 +208,17 @@ public class ICal4JUtils
 
   public static java.sql.Date getSqlDate(final net.fortuna.ical4j.model.Date ical4jDate)
   {
+    if (ical4jDate == null) {
+      return null;
+    }
     return new java.sql.Date(ical4jDate.getTime());
   }
 
   public static net.fortuna.ical4j.model.Date getICal4jDate(final java.util.Date javaDate)
   {
+    if (javaDate == null) {
+      return null;
+    }
     return new net.fortuna.ical4j.model.Date(javaDate);
   }
 }
