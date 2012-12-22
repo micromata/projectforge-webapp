@@ -225,7 +225,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       final LabelValueChoiceRenderer<RecurrenceFrequency> intervalChoiceRenderer = new LabelValueChoiceRenderer<RecurrenceFrequency>(
           recurrenceFieldset, intervals);
       final DropDownChoice<RecurrenceFrequency> intervalChoice = new DropDownChoice<RecurrenceFrequency>(
-          recurrenceFieldset.getDropDownChoiceId(), new PropertyModel<RecurrenceFrequency>(recurrenceData, "interval"),
+          recurrenceFieldset.getDropDownChoiceId(), new PropertyModel<RecurrenceFrequency>(recurrenceData, "frequency"),
           intervalChoiceRenderer.getValues(), intervalChoiceRenderer);
       intervalChoice.setNullValid(false);
       recurrenceFieldset.add(intervalChoice);
