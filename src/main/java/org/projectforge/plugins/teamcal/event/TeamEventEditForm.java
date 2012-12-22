@@ -46,7 +46,7 @@ import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
-import org.projectforge.common.RecurrenceInterval;
+import org.projectforge.common.RecurrenceFrequency;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalFilter;
@@ -221,11 +221,11 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       recurrenceFieldset = gridBuilder.newFieldset(getString("plugins.teamcal.event.recurrence"), true);
       recurrencePanel = gridBuilder.getPanel().getDiv();
       recurrencePanel.setOutputMarkupId(true);
-      final RecurrenceInterval[] intervals = ICal4JUtils.getSupportedRecurrenceIntervals();
-      final LabelValueChoiceRenderer<RecurrenceInterval> intervalChoiceRenderer = new LabelValueChoiceRenderer<RecurrenceInterval>(
+      final RecurrenceFrequency[] intervals = ICal4JUtils.getSupportedRecurrenceIntervals();
+      final LabelValueChoiceRenderer<RecurrenceFrequency> intervalChoiceRenderer = new LabelValueChoiceRenderer<RecurrenceFrequency>(
           recurrenceFieldset, intervals);
-      final DropDownChoice<RecurrenceInterval> intervalChoice = new DropDownChoice<RecurrenceInterval>(
-          recurrenceFieldset.getDropDownChoiceId(), new PropertyModel<RecurrenceInterval>(recurrenceData, "interval"),
+      final DropDownChoice<RecurrenceFrequency> intervalChoice = new DropDownChoice<RecurrenceFrequency>(
+          recurrenceFieldset.getDropDownChoiceId(), new PropertyModel<RecurrenceFrequency>(recurrenceData, "interval"),
           intervalChoiceRenderer.getValues(), intervalChoiceRenderer);
       intervalChoice.setNullValid(false);
       recurrenceFieldset.add(intervalChoice);
@@ -264,14 +264,14 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
         @Override
         public String getObject()
         {
-          final RecurrenceInterval interval = recurrenceData.getInterval();
-          if (interval == RecurrenceInterval.DAILY) {
+          final RecurrenceFrequency interval = recurrenceData.getFrequency();
+          if (interval == RecurrenceFrequency.DAILY) {
             return "&nbsp;" + HtmlHelper.escapeHtml(getString("plugins.teamcal.event.recurrence.customized.day"), false);
-          } else if (interval == RecurrenceInterval.WEEKLY) {
+          } else if (interval == RecurrenceFrequency.WEEKLY) {
             return "&nbsp;" + HtmlHelper.escapeHtml(getString("plugins.teamcal.event.recurrence.customized.week"), false);
-          } else if (interval == RecurrenceInterval.MONTHLY) {
+          } else if (interval == RecurrenceFrequency.MONTHLY) {
             return "&nbsp;" + HtmlHelper.escapeHtml(getString("plugins.teamcal.event.recurrence.customized.month"), false);
-          } else if (interval == RecurrenceInterval.YEARLY) {
+          } else if (interval == RecurrenceFrequency.YEARLY) {
             return "&nbsp;" + HtmlHelper.escapeHtml(getString("plugins.teamcal.event.recurrence.customized.year"), false);
           }
           return "";
@@ -337,7 +337,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
   private void setRecurrenceComponentsVisibility(final AjaxRequestTarget target)
   {
-    if (recurrenceData.getInterval() == RecurrenceInterval.NONE) {
+    if (recurrenceData.getFrequency() == RecurrenceFrequency.NONE) {
       customizedCheckBoxPanel.setVisible(false);
       recurrenceUntilDateFieldset.setVisible(false);
       recurrenceCountFieldset.setVisible(false);

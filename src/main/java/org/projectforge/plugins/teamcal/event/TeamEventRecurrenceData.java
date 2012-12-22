@@ -29,7 +29,7 @@ import java.sql.Date;
 import net.fortuna.ical4j.model.Recur;
 
 import org.projectforge.calendar.ICal4JUtils;
-import org.projectforge.common.RecurrenceInterval;
+import org.projectforge.common.RecurrenceFrequency;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -38,7 +38,7 @@ public class TeamEventRecurrenceData implements Serializable
 {
   private static final long serialVersionUID = -6258614682123676951L;
 
-  private RecurrenceInterval interval = RecurrenceInterval.NONE;
+  private RecurrenceFrequency frequency = RecurrenceFrequency.NONE;
 
   private Date until;
 
@@ -57,24 +57,24 @@ public class TeamEventRecurrenceData implements Serializable
     }
     this.count = recur.getCount();
     this.until = ICal4JUtils.getSqlDate(recur.getUntil());
-    this.interval = ICal4JUtils.getFrequency(recur);
+    this.frequency = ICal4JUtils.getFrequency(recur);
   }
 
   /**
-   * @return the interval
+   * @return the frequency
    */
-  public RecurrenceInterval getInterval()
+  public RecurrenceFrequency getFrequency()
   {
-    return interval;
+    return frequency;
   }
 
   /**
-   * @param interval the interval to set
+   * @param frequency the interval to set
    * @return this for chaining.
    */
-  public TeamEventRecurrenceData setInterval(final RecurrenceInterval interval)
+  public TeamEventRecurrenceData setFrequency(final RecurrenceFrequency frequency)
   {
-    this.interval = interval;
+    this.frequency = frequency;
     return this;
   }
 
@@ -105,12 +105,17 @@ public class TeamEventRecurrenceData implements Serializable
   }
 
   /**
+   * Please note: If given count is 1 then -1 will be set because 1 is default.
    * @param count the count to set
    * @return this for chaining.
    */
   public TeamEventRecurrenceData setCount(final int count)
   {
-    this.count = count;
+    if (count != 1) {
+      this.count = count;
+    } else {
+      this.count = -1;
+    }
     return this;
   }
 
