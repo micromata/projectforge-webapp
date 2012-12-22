@@ -9,6 +9,8 @@
 
 package org.projectforge.plugins.teamcal.integration;
 
+import java.io.Serializable;
+
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.model.Model;
@@ -27,8 +29,9 @@ import org.projectforge.web.wicket.components.SingleButtonPanel;
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  * 
  */
-public class TeamcalTimesheetPluginComponentHook implements TimesheetPluginComponentHook
+public class TeamcalTimesheetPluginComponentHook implements TimesheetPluginComponentHook, Serializable
 {
+  private static final long serialVersionUID = -8986533310341503141L;
 
   /**
    * @see org.projectforge.web.timesheet.TimesheetPluginComponentHook#renderActionButtonsToTimesheetEditPage(java.lang.String)
