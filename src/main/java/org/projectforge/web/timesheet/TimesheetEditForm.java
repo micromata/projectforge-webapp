@@ -379,7 +379,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
     final List<TimesheetPluginComponentHook> hooks = TimesheetEditPage.getPluginHooks();
     if(hooks != null && hooks.isEmpty() == false) {
       for(final TimesheetPluginComponentHook hook : hooks) {
-        repeater.add(hook.renderComponentToTimesheetEditPage(repeater.newChildId()));
+        repeater.add(hook.renderActionButtonsToTimesheetEditPage(repeater.newChildId()));
       }
     }
   }

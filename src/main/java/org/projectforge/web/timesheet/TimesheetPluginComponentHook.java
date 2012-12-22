@@ -20,5 +20,5 @@ import org.apache.wicket.Component;
 public interface TimesheetPluginComponentHook
 {
 
-  Component renderComponentToTimesheetEditPage(String wicketId);
+  Component renderActionButtonsToTimesheetEditPage(String wicketId);
 }
