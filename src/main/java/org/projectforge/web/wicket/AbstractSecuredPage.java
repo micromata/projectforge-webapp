@@ -155,6 +155,14 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
     return this;
   }
 
+  /**
+   * @return the returnToPage
+   */
+  public WebPage getReturnToPage()
+  {
+    return returnToPage;
+  }
+
   protected void addContentMenuEntry(final ContentMenuEntryPanel panel)
   {
     this.contentMenu.add(panel);

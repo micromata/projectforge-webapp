@@ -23,6 +23,8 @@
 
 package org.projectforge.web.wicket;
 
+import org.apache.wicket.markup.html.WebPage;
+
 public abstract class AbstractSecuredForm<F, P extends AbstractSecuredBasePage> extends AbstractForm<F, P>
 {
   private static final long serialVersionUID = 5034574268522349613L;
@@ -60,5 +62,10 @@ public abstract class AbstractSecuredForm<F, P extends AbstractSecuredBasePage> 
   public void putUserPrefEntry(final String key, final Object value, final boolean persistent)
   {
     parentPage.putUserPrefEntry(key, value, persistent);
+  }
+
+  public WebPage getReturnToPage()
+  {
+    return ((AbstractSecuredPage)this.parentPage).getReturnToPage();
   }
 }
