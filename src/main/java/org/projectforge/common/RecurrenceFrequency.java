@@ -38,7 +38,7 @@ public enum RecurrenceFrequency implements I18nEnum
   @Override
   public String getI18nKey()
   {
-    return "common.recurrence.frequency" + key;
+    return "common.recurrence.frequency." + key;
   }
 
   /**
