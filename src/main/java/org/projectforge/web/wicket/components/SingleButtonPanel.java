@@ -27,6 +27,7 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.projectforge.common.StringHelper;
 
@@ -79,7 +80,7 @@ public class SingleButtonPanel extends Panel
    * @param label
    * @param classnames css class names
    */
-  public SingleButtonPanel(final String id, final Button button, final Model<String> label, final String... classnames)
+  public SingleButtonPanel(final String id, final Button button, final IModel<String> label, final String... classnames)
   {
     super(id);
     this.button = button;

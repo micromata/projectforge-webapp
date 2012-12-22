@@ -118,6 +118,8 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
 
+  private static final List<TimesheetPluginComponentHook> PLUGIN_HOOKS = new ArrayList<TimesheetPluginComponentHook>();
+
   public TimesheetEditPage(final TimesheetDO timesheet)
   {
     super(new PageParameters(), "timesheet");
@@ -396,5 +398,13 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
   protected Logger getLogger()
   {
     return log;
+  }
+
+  public static void addPluginHook(final TimesheetPluginComponentHook hook) {
+    PLUGIN_HOOKS.add(hook);
+  }
+
+  public static List<TimesheetPluginComponentHook> getPluginHooks() {
+    return Collections.unmodifiableList(PLUGIN_HOOKS);
   }
 }

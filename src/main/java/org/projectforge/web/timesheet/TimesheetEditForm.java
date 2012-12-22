@@ -40,6 +40,7 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.validation.IFormValidator;
+import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -365,6 +366,21 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
         }
       };
       actionButtons.add(2, cloneButtonPanel);
+    }
+    // TODO kai: place hook rendering
+    renderHookComponents(actionButtons.getRepeatingView());
+  }
+
+  /**
+   * @param gridBuilder
+   */
+  private void renderHookComponents(final RepeatingView repeater)
+  {
+    final List<TimesheetPluginComponentHook> hooks = TimesheetEditPage.getPluginHooks();
+    if(hooks != null && hooks.isEmpty() == false) {
+      for(final TimesheetPluginComponentHook hook : hooks) {
+        repeater.add(hook.renderComponentToTimesheetEditPage(repeater.newChildId()));
+      }
     }
   }
 
