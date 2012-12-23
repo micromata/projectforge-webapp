@@ -24,6 +24,9 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.CompoundPropertyModel;
 
 /**
+ * The panel which includes the drop behavior for ics files. If the dropped ics was sucessfully importet, the hook method
+ * {@link #onIcsImport(AjaxRequestTarget, Calendar)} is called.
+ * 
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  * 
  */
