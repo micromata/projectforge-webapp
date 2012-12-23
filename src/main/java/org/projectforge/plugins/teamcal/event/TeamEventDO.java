@@ -74,7 +74,7 @@ import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 @Entity
 @Indexed
 @Table(name = "T_PLUGIN_CALENDAR_EVENT")
-public class TeamEventDO extends DefaultBaseDO implements Cloneable
+public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
 {
   private static final long serialVersionUID = -9205582135590380919L;
 
