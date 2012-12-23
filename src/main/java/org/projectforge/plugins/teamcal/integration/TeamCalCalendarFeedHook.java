@@ -95,7 +95,7 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
           } else {
             summary = teamEvent.getSubject();
           }
-          final VEvent vEvent = ICal4JUtils.createEvent(teamEvent.getStartDate(), teamEvent.getEndDate(), uid, summary,
+          final VEvent vEvent = ICal4JUtils.createVEvent(teamEvent.getStartDate(), teamEvent.getEndDate(), uid, summary,
               teamEvent.isAllDay());
           if (StringUtils.isNotBlank(teamEvent.getLocation()) == true) {
             vEvent.getProperties().add(new Location(teamEvent.getLocation()));
