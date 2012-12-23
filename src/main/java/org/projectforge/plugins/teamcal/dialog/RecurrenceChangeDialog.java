@@ -16,6 +16,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.plugins.teamcal.event.TeamEvent;
+import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDao;
 import org.projectforge.web.dialog.PFDialog;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
@@ -37,6 +38,8 @@ public class RecurrenceChangeDialog extends PFDialog
   private static final long serialVersionUID = 7266725860088619248L;
 
   private TeamEvent event;
+
+  private SingleButtonPanel allFutureEventsButtonPanel;
 
   @SpringBean
   private TeamEventDao teamEventDao;
@@ -68,6 +71,18 @@ public class RecurrenceChangeDialog extends PFDialog
       }
     };
     appendNewAjaxActionButton(cancelCallback, getString("cancel"), SingleButtonPanel.CANCEL);
+    // add all change callback
+    final AjaxCallback allCallback = new AjaxCallback() {
+      private static final long serialVersionUID = 7852511931690947544L;
+
+      @Override
+      public void callback(final AjaxRequestTarget target)
+      {
+        onChangeAllEventsSelected(target, event);
+      }
+    };
+    appendNewAjaxActionButton(allCallback, getString("plugins.teamcal.event.recurrence.change.all"), SingleButtonPanel.GREY);
+
     // add future only change callback
     final AjaxCallback futureCallback = new AjaxCallback() {
       private static final long serialVersionUID = 7852511931690947544L;
@@ -78,7 +93,8 @@ public class RecurrenceChangeDialog extends PFDialog
         onChangeFutureOnlyEventsSelected(target, event);
       }
     };
-    appendNewAjaxActionButton(futureCallback, getString("plugins.teamcal.event.recurrence.change.future"), SingleButtonPanel.DEFAULT_SUBMIT);
+    allFutureEventsButtonPanel = appendNewAjaxActionButton(futureCallback, getString("plugins.teamcal.event.recurrence.change.future"),
+        SingleButtonPanel.GREY);
 
     // add future only change callback
     final AjaxCallback singleCallback = new AjaxCallback() {
@@ -90,7 +106,7 @@ public class RecurrenceChangeDialog extends PFDialog
         onChangeSingleEventSelected(target, event);
       }
     };
-    appendNewAjaxActionButton(singleCallback, getString("plugins.teamcal.event.recurrence.change.single"), SingleButtonPanel.DEFAULT_SUBMIT);
+    appendNewAjaxActionButton(singleCallback, getString("plugins.teamcal.event.recurrence.change.single"), SingleButtonPanel.GREY);
   }
 
   /**
@@ -115,7 +131,19 @@ public class RecurrenceChangeDialog extends PFDialog
   public void open(final AjaxRequestTarget target, final TeamEvent event)
   {
     this.event = event;
+    if (event instanceof TeamEventDO) {
+      // All future events are the same as all events, because the user selected the first event:
+      allFutureEventsButtonPanel.getButton().setVisible(false);
+    } else {
+      allFutureEventsButtonPanel.getButton().setVisible(true);
+    }
+    target.add(getButtonForm());
     super.open(target);
+  }
+
+  protected void onChangeAllEventsSelected(final AjaxRequestTarget target, final TeamEvent event)
+  {
+    // TODO kai: implement change of all events here
   }
 
   protected void onChangeFutureOnlyEventsSelected(final AjaxRequestTarget target, final TeamEvent event)

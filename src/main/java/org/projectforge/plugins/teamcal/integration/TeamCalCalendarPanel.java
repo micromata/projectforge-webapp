@@ -46,10 +46,12 @@ import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.dialog.RecurrenceChangeDialog;
 import org.projectforge.plugins.teamcal.event.TeamCalEventId;
 import org.projectforge.plugins.teamcal.event.TeamCalEventProvider;
+import org.projectforge.plugins.teamcal.event.TeamEvent;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDao;
 import org.projectforge.plugins.teamcal.event.TeamEventEditPage;
 import org.projectforge.plugins.teamcal.event.TeamEventRight;
+import org.projectforge.plugins.teamcal.event.TeamRecurrenceEvent;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
@@ -224,41 +226,47 @@ public class TeamCalCalendarPanel extends CalendarPanel
       final CalendarResponse response)
   {
     final TeamCalEventId id = new TeamCalEventId(event.getId(), PFUserContext.getTimeZone());
-    final TeamEventDO dbTeamEvent = teamEventDao.internalGetById(id.getDataBaseId());
-    if (dbTeamEvent == null) {
+    final TeamEvent teamEvent = eventProvider.getTeamEvent(id.toString());
+    if (teamEvent == null) {
       return;
+    }
+    TeamEventDO teamEventDO;
+    if (teamEvent instanceof TeamEventDO) {
+      teamEventDO = (TeamEventDO) teamEvent;
+    } else {
+      teamEventDO = ((TeamRecurrenceEvent) teamEvent).getMaster();
     }
     final Long newStartTimeMillis = newStartDate != null ? DateHelper.getDateTimeAsMillis(newStartDate) : null;
     final Long newEndTimeMillis = newEndDate != null ? DateHelper.getDateTimeAsMillis(newEndDate) : null;
     final PFUserDO loggedInUser = ((AbstractSecuredBasePage) getPage()).getUser();
-    if (teamEventDao.hasUpdateAccess(loggedInUser, dbTeamEvent, dbTeamEvent, false) == false) {
+    if (teamEventDao.hasUpdateAccess(loggedInUser, teamEventDO, teamEventDO, false) == false) {
       // User has no update access, therefore ignore this request...
       event.setEditable(false);
       event.setTitle("");
       return;
     }
 
+    if (teamEventDO.hasRecurrence() == true) {
+      // at this point the dbTeamEvent is already updated in time
+      recurrenceChangeDialog.open(response.getTarget(), teamEvent);
+      return;
+    }
+    teamEventDO = teamEventDao.getById(teamEventDO.getId());
     // update start and end date
     if (newStartDate != null) {
-      dbTeamEvent.setStartDate(new Timestamp(newStartTimeMillis));
+      teamEventDO.setStartDate(new Timestamp(newStartTimeMillis));
     }
     if (newEndDate != null) {
-      dbTeamEvent.setEndDate(new Timestamp(newEndTimeMillis));
-    }
-
-    if (dbTeamEvent.hasRecurrence() == true) {
-      // at this point the dbTeamEvent is already updated in time
-      recurrenceChangeDialog.open(response.getTarget(), dbTeamEvent);
-      return;
+      teamEventDO.setEndDate(new Timestamp(newEndTimeMillis));
     }
 
     // clone event if mode is copy_*
     if (CalendarDropMode.COPY_EDIT.equals(dropMode) || CalendarDropMode.COPY_SAVE.equals(dropMode)) {
-      dbTeamEvent.setId(null);
-      dbTeamEvent.setDeleted(false);
+      teamEventDO.setId(null);
+      teamEventDO.setDeleted(false);
 
       // and save the new event -> correct time is set already
-      teamEventDao.save(dbTeamEvent);
+      teamEventDao.save(teamEventDO);
     }
 
     if (dropMode == null || CalendarDropMode.MOVE_EDIT.equals(dropMode) || CalendarDropMode.COPY_EDIT.equals(dropMode)) {
@@ -266,20 +274,20 @@ public class TeamCalCalendarPanel extends CalendarPanel
 
       // add start date
       if (newStartDate != null) {
-        dbTeamEvent.setStartDate(new Timestamp(newStartTimeMillis));
+        teamEventDO.setStartDate(new Timestamp(newStartTimeMillis));
       }
       // add end date
       if (newEndDate != null) {
-        dbTeamEvent.setEndDate(new Timestamp(newEndTimeMillis));
+        teamEventDO.setEndDate(new Timestamp(newEndTimeMillis));
       }
-      final TeamEventEditPage teamEventEditPage = new TeamEventEditPage(new PageParameters(), dbTeamEvent);
+      final TeamEventEditPage teamEventEditPage = new TeamEventEditPage(new PageParameters(), teamEventDO);
       teamEventEditPage.setReturnToPage(getWebPage());
       setResponsePage(teamEventEditPage);
     } else if (CalendarDropMode.MOVE_SAVE.equals(dropMode) || CalendarDropMode.COPY_SAVE.equals(dropMode)) {
       // second mode: "quick save mode"
       if (CalendarDropMode.MOVE_SAVE.equals(dropMode)) {
         // we need update only in "move" mode, in "copy" mode it was saved a few lines above
-        teamEventDao.update(dbTeamEvent);
+        teamEventDao.update(teamEventDO);
       }
       setResponsePage(getWebPage().getClass(), getWebPage().getPageParameters());
     } else {

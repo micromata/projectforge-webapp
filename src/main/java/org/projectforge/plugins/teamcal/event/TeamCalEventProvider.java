@@ -24,7 +24,9 @@
 package org.projectforge.plugins.teamcal.event;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -60,6 +62,8 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
   private int days;
 
   private final TeamCalCalendarFilter filter;
+
+  private final Map<String, TeamEvent> teamEventMap = new HashMap<String, TeamEvent>();
 
   /**
    * the name of the event class.
@@ -134,6 +138,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
         } else {
           eventDO = ((TeamRecurrenceEvent) teamEvent).getMaster();
         }
+        teamEventMap.put(id.toString(), teamEvent);
         final Event event = new Event();
         event.setClassName(EVENT_CLASS_NAME);
         event.setId("" + id);
@@ -195,5 +200,10 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
         events.put(id + "", event);
       }
     }
+  }
+
+  public TeamEvent getTeamEvent(final String id)
+  {
+    return teamEventMap.get(id);
   }
 }

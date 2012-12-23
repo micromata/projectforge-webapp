@@ -70,7 +70,7 @@ public class TeamCalEventId
     }
     final String idStr = idString.substring(0, pos);
     databaseId = NumberHelper.parseInteger(idStr);
-    final String dateString = idString.substring(pos);
+    final String dateString = idString.substring(pos + 1);
     try {
       date = getDateFormat().parse(dateString);
     } catch (final ParseException ex) {
