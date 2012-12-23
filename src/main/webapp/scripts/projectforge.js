@@ -124,7 +124,7 @@ $(function() {
 	initColorPicker();
 	doAfterAjaxHandling();
 	
-	if(typeof(Wicket) != "undefined") {
+	if(typeof(Wicket) != "undefined" && typeof(Wicket.Ajax) != "undefined") {
 		Wicket.Ajax.registerPostCallHandler(function() {
 			// handle after AJAX actions
 			doAfterAjaxHandling();
@@ -180,3 +180,77 @@ function pf_deleteClick(element, content, liElement) {
 		$(li).remove();
 	}
 }
+
+/**
+ * Drag and drop inspired by http://www.sitepoint.com/html5-file-drag-and-drop, <br/>
+ * but was mixed and enhanced with jQuery and the HTML5 file API by Johannes.
+ */
+(function () {
+
+	$(function() {
+		// call initialization file only if API is available
+		if (window.File && window.FileList && window.FileReader) {
+			initDragAndDrop();
+		}
+	});
+
+	// initialize drag and drop
+	function initDragAndDrop() {
+		var fileselect = $(".pf_dnd .pf_fileselect");
+		var filedrag = $(".pf_dnd .pf_filedrag");
+		// file select
+		$(fileselect).on("change", fileSelectHandler);
+		try {
+			// is XHR2 available?
+			var xhr = new XMLHttpRequest();
+			if (xhr.upload) {
+				// file drop
+				$(filedrag).on("dragover", fileDragHover);
+				$(filedrag).on("dragleave", fileDragHover);
+				$(filedrag).on("drop", fileSelectHandler);
+				$(filedrag).show();
+				$(fileselect).hide();
+			}
+		} catch (e) { /* just do nothing, no XHR2 available */ };
+	}
+
+	// file drag hover
+	function fileDragHover(e) {
+		e.stopPropagation();
+		e.preventDefault();
+		if(e.type == "dragover") {
+			$(e.target).addClass("hover");
+		} else {
+			$(e.target).removeClass("hover");
+		}
+	}
+
+	// file selection
+	function fileSelectHandler(e) {
+		// cancel event and hover styling
+		fileDragHover(e);
+		// fetch file object
+		var files = e.originalEvent.target.files || e.originalEvent.dataTransfer.files;
+		if(files == null || files.length != 1) {
+			// TODO ju: error handling
+			return;
+		}
+		var file = files[0];
+		if(file == null || file.size > 204800 || file.type != "text/calendar") { /* 200kbyte max */
+			// TODO ju: error handling
+			return;
+		}
+		try {
+			var reader = new FileReader();
+			reader.onload = function (event) {
+				var result = event.target.result;
+				var hiddenForm = $(e.originalEvent.target).closest(".pf_dnd").children(".pf_hiddenForm");
+				hiddenForm.children(".pf_text").val(result);
+				hiddenForm.children(".pf_submit").click();
+			}
+			reader.readAsText(file);
+		} catch (e) {
+			// TODO ju: error handling
+		}
+	}
+})();

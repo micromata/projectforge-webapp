@@ -25,6 +25,8 @@ package org.projectforge.plugins.teamcal.integration;
 import java.util.List;
 import java.util.Set;
 
+import net.fortuna.ical4j.model.Calendar;
+
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
@@ -38,6 +40,7 @@ import org.projectforge.plugins.teamcal.event.TeamEventListPage;
 import org.projectforge.web.calendar.CalendarFilter;
 import org.projectforge.web.calendar.CalendarForm;
 import org.projectforge.web.calendar.CalendarPage;
+import org.projectforge.web.wicket.components.DropFileContainer;
 import org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -144,6 +147,15 @@ public class TeamCalCalendarForm extends CalendarForm
         {
           filter.setSelectedCalendar(TemplateEntry.calcCalendarStringForCalendar(activeModel.getObject().getDefaultCalendarId()));
           setResponsePage(getParentPage().getClass());
+        }
+      });
+      fs.add(new DropFileContainer(fs.newChildId()) {
+
+        @Override
+        protected void onIcsImport(final AjaxRequestTarget target, final Calendar calendar)
+        {
+          // TODO kai: do fancy stuff with the calendar
+          System.out.println(calendar);
         }
       });
     }
