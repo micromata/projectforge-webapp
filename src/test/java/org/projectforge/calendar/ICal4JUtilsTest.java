@@ -23,6 +23,8 @@
 
 package org.projectforge.calendar;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
 import junit.framework.Assert;
@@ -31,6 +33,7 @@ import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.parameter.Value;
 
 import org.junit.Test;
+import org.projectforge.common.DateFormats;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.RecurrenceFrequency;
 
@@ -40,13 +43,19 @@ public class ICal4JUtilsTest
   @Test
   public void recurTests()
   {
+    final TimeZone timeZone = DateHelper.EUROPE_BERLIN;
     final Recur recur = new Recur();
     recur.setFrequency(ICal4JUtils.getCal4JFrequencyString(RecurrenceFrequency.WEEKLY));
-    recur.setUntil(getDate("2013-01-31", DateHelper.EUROPE_BERLIN));
+    recur.setUntil(getDate("2013-01-31", timeZone));
     recur.setInterval(2);
-    final DateList dateList = recur.getDates(getDate("2013-01-01", DateHelper.EUROPE_BERLIN),
-        getDate("2012-01-02", DateHelper.EUROPE_BERLIN), getDate("2013-03-31", DateHelper.EUROPE_BERLIN), Value.TIME);
-    Assert.assertEquals("20130101T000000,20130115T000000,20130129T000000", dateList.toString());
+    final DateList dateList = recur.getDates(getDate("2013-01-01", timeZone),
+        getDate("2012-01-02", timeZone), getDate("2013-03-31", timeZone), Value.TIME);
+    Assert.assertEquals(3, dateList.size());
+    final DateFormat df = new SimpleDateFormat(DateFormats.ISO_TIMESTAMP_MINUTES);
+    df.setTimeZone(timeZone);
+    Assert.assertEquals("2013-01-01 00:00", df.format(dateList.get(0)));
+    Assert.assertEquals("2013-01-15 00:00", df.format(dateList.get(1)));
+    Assert.assertEquals("2013-01-29 00:00", df.format(dateList.get(2)));
   }
 
   @Test
@@ -56,7 +65,6 @@ public class ICal4JUtilsTest
         DateHelper.EUROPE_BERLIN);
     Assert.assertEquals("20121222", date.toString());
   }
-
 
   private net.fortuna.ical4j.model.Date getDate(final String dateString, final TimeZone timeZone)
   {
