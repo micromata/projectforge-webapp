@@ -104,4 +104,13 @@ public class TeamCalConfig implements ConfigurationData
   {
     return createUid(TIMESHEET_UID_PREFIX, id);
   }
+
+  /**
+   * Only for internal test purposes.
+   * @param config
+   */
+  public static void __internalSetConfig(final TeamCalConfig newConfig)
+  {
+    config = newConfig;
+  }
 }
