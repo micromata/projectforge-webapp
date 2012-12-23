@@ -23,8 +23,6 @@
 
 package org.projectforge.plugins.teamcal.event;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -39,7 +37,6 @@ import org.apache.wicket.Component;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Period;
-import org.projectforge.common.DateFormats;
 import org.projectforge.plugins.teamcal.admin.TeamCalRight;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFilter;
 import org.projectforge.plugins.teamcal.integration.TemplateEntry;
@@ -126,25 +123,16 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
     final TeamCalRight right = new TeamCalRight();
     final PFUserDO user = PFUserContext.getUser();
     final TimeZone timeZone = PFUserContext.getTimeZone();
-    final DateFormat shortDayFormat = new SimpleDateFormat(DateFormats.COMPACT_DATE);
-    shortDayFormat.setTimeZone(timeZone);
     if (CollectionUtils.isNotEmpty(teamEvents) == true) {
       for (final TeamEvent teamEvent : teamEvents) {
         final DateTime startDate = new DateTime(teamEvent.getStartDate(), PFUserContext.getDateTimeZone());
         final DateTime endDate = new DateTime(teamEvent.getEndDate(), PFUserContext.getDateTimeZone());
-        if (endDate.isBefore(start) == true || startDate.isAfter(end) == true) {
-          // Event doesn't match time period start - end.
-          continue;
-        }
-
         final TeamEventDO eventDO;
-        final String id;
+        final TeamCalEventId id = new TeamCalEventId(teamEvent, timeZone);
         if (teamEvent instanceof TeamEventDO) {
-          eventDO = (TeamEventDO)teamEvent;
-          id = "" + eventDO.getId();
+          eventDO = (TeamEventDO) teamEvent;
         } else {
-          eventDO = ((TeamRecurrenceEvent)teamEvent).getMaster();
-          id = "" + eventDO.getId() + "-" + shortDayFormat.format(teamEvent.getStartDate());
+          eventDO = ((TeamRecurrenceEvent) teamEvent).getMaster();
         }
         final Event event = new Event();
         event.setClassName(EVENT_CLASS_NAME);
@@ -157,7 +145,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
           event.setEditable(false);
         }
 
-        if (teamEvent.isAllDay()) {
+        if (teamEvent.isAllDay() == true) {
           event.setAllDay(true);
         }
 
@@ -184,8 +172,9 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
           final int minuteInt = duration.getMinutes();
           final String minute = minuteInt < 10 ? "0" + minuteInt : "" + minuteInt;
 
-          if (event.isAllDay() == false)
+          if (event.isAllDay() == false) {
             durationString = "\n" + getString("plugins.teamcal.event.duration") + ": " + hour + ":" + minute;
+          }
           final StringBuffer buf = new StringBuffer();
           buf.append(getString("plugins.teamcal.event.subject")).append(": ").append(teamEvent.getSubject());
           if (StringUtils.isNotBlank(teamEvent.getNote()) == true) {

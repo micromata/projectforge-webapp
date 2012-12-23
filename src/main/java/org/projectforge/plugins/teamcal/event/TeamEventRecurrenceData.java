@@ -60,8 +60,14 @@ public class TeamEventRecurrenceData implements Serializable
       return;
     }
     this.interval = recur.getInterval();
+    if (this.interval < 1) {
+      this.interval = 1;
+    }
     this.until = ICal4JUtils.getSqlDate(recur.getUntil());
     this.frequency = ICal4JUtils.getFrequency(recur);
+    if (this.interval > 1) {
+      this.customized = true;
+    }
   }
 
   /**

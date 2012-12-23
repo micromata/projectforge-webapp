@@ -63,7 +63,7 @@ public class TeamEventUtils
 
   public static String calculateRRule(final TeamEventRecurrenceData recurData)
   {
-    if (recurData == null || recurData.getFrequency() == null) {
+    if (recurData == null || recurData.getFrequency() == null || recurData.getFrequency() == RecurrenceFrequency.NONE) {
       return null;
     }
     final Recur recur = new Recur();
