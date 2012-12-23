@@ -61,6 +61,8 @@ public abstract class PFDialog extends Panel
 
   private final IModel<String> titleModel;
 
+  private Form<String> buttonForm;
+
   /**
    * List to create action buttons in the desired order before creating the RepeatingView.
    */
@@ -116,7 +118,7 @@ public abstract class PFDialog extends Panel
     dialogContainer.add(feedbackContainer);
     feedbackContainer.add(new FeedbackPanel("feedback", containerFeedbackMessageFilter));
     // lower button form
-    final Form<String> buttonForm = new Form<String>("buttonForm", Model.of("")) {
+    buttonForm = new Form<String>("buttonForm", Model.of("")) {
       private static final long serialVersionUID = 4536735016945915848L;
 
       /**
@@ -129,6 +131,7 @@ public abstract class PFDialog extends Panel
       }
     };
     dialogContainer.add(buttonForm);
+    buttonForm.setOutputMarkupId(true);
     buttonForm.add(actionButtons.getRepeatingView());
     this.onCloseBehavior = new MDefaultAjaxBehavior() {
 
@@ -146,6 +149,14 @@ public abstract class PFDialog extends Panel
       }
     };
     add(this.onCloseBehavior);
+  }
+
+  /**
+   * @return the buttonForm
+   */
+  public Form<String> getButtonForm()
+  {
+    return buttonForm;
   }
 
   /**
@@ -206,11 +217,11 @@ public abstract class PFDialog extends Panel
     return this;
   }
 
-  public PFDialog appendNewAjaxActionButton(final AjaxCallback ajaxCallback, final String label, final String... classnames)
+  public SingleButtonPanel appendNewAjaxActionButton(final AjaxCallback ajaxCallback, final String label, final String... classnames)
   {
     final SingleButtonPanel result = addNewAjaxActionButton(ajaxCallback, label, null, classnames);
     this.actionButtons.add(result);
-    return this;
+    return result;
   }
 
   public PFDialog prependNewAjaxActionButton(final AjaxCallback ajaxCallback, final String label, final String... classnames)
