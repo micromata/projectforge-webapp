@@ -36,6 +36,7 @@ import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.RRule;
 
+import org.projectforge.calendar.CalendarUtils;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.RecurrenceFrequency;
 
@@ -44,6 +45,8 @@ import org.projectforge.common.RecurrenceFrequency;
  */
 public class TeamEventUtils
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamEventUtils.class);
+
   private static final RecurrenceFrequency[] SUPPORTED_INTERVALS = new RecurrenceFrequency[] { RecurrenceFrequency.NONE,
     RecurrenceFrequency.DAILY, RecurrenceFrequency.WEEKLY, RecurrenceFrequency.MONTHLY, RecurrenceFrequency.YEARLY};
 
@@ -88,6 +91,17 @@ public class TeamEventUtils
     final net.fortuna.ical4j.model.Date ical4jStartDate = ICal4JUtils.getICal4jDate(startDate, timeZone);
     final net.fortuna.ical4j.model.Date ical4jEndDate = ICal4JUtils.getICal4jDate(endDate, timeZone);
     final net.fortuna.ical4j.model.Date seed = ICal4JUtils.getICal4jDate(event.getStartDate(), timeZone);
+    if (ical4jStartDate == null || ical4jEndDate == null || seed == null) {
+      log.error("Can't get recurrence events of event "
+          + event.getId()
+          + ". Not all three dates are given: startDate="
+          + ical4jStartDate
+          + ", endDate="
+          + ical4jEndDate
+          + ", seed="
+          + seed);
+      return null;
+    }
     final DateList dateList = recur.getDates(seed, ical4jStartDate, ical4jEndDate, Value.TIME);
     final Collection<TeamEvent> col = new ArrayList<TeamEvent>();
     if (dateList != null) {
@@ -95,8 +109,15 @@ public class TeamEventUtils
         final DateTime dateTime = (DateTime) obj;
         final Calendar startDay = Calendar.getInstance(timeZone);
         startDay.setTime(dateTime);
-        final TeamRecurrenceEvent recurEvent = new TeamRecurrenceEvent(event, startDay);
-        col.add(recurEvent);
+        final Calendar masterStartDate = Calendar.getInstance(timeZone);
+        masterStartDate.setTime(event.getStartDate());
+        if (CalendarUtils.isSameDay(startDay, masterStartDate) == true) {
+          // Put event itself to the list.
+          col.add(event);
+        } else {
+          final TeamRecurrenceEvent recurEvent = new TeamRecurrenceEvent(event, startDay);
+          col.add(recurEvent);
+        }
       }
     }
     return col;

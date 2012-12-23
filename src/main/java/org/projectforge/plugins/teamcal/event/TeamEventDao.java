@@ -24,6 +24,7 @@
 package org.projectforge.plugins.teamcal.event;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -38,6 +39,7 @@ import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.projectforge.calendar.CalendarUtils;
 import org.projectforge.calendar.ICal4JUtils;
+import org.projectforge.common.DateHelper;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
@@ -123,6 +125,48 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
   }
 
   /**
+   * @param filter
+   * @return list of team events (same as {@link #getList(BaseSearchFilter)} but with all calculated and matching recurrence events.
+   */
+  public List<TeamEvent> getEventList(final TeamEventFilter filter)
+  {
+    List<TeamEventDO> list = getList(filter);
+    final List<TeamEvent> result = new ArrayList<TeamEvent>();
+    result.addAll(list);
+
+    final TeamEventFilter teamEventFilter = filter.clone().setOnlyRecurrence(true);
+    final QueryFilter qFilter = buildQueryFilter(teamEventFilter);
+    qFilter.add(Restrictions.isNotNull("recurrenceRule"));
+    list = getList(qFilter);
+    final TimeZone timeZone = PFUserContext.getTimeZone();
+    if (list != null) {
+      for (final TeamEventDO eventDO : list) {
+        if (eventDO.hasRecurrence() == false) {
+          log.warn("Shouldn't occur! Please contact developer.");
+          // This event was handled above.
+          continue;
+        }
+        final Collection<TeamEvent> events = TeamEventUtils.getRecurrenceEvents(teamEventFilter.getStartDate(),
+            teamEventFilter.getEndDate(), eventDO, timeZone);
+        if (events == null) {
+          continue;
+        }
+        for (final TeamEvent event : events) {
+          if (event instanceof TeamEventDO) {
+            // TeamEventDO objects were already added.
+            continue;
+          }
+          if (matches(event.getStartDate(), event.getEndDate(), event.isAllDay(), teamEventFilter) == false) {
+            continue;
+          }
+          result.add(event);
+        }
+      }
+    }
+    return result;
+  }
+
+  /**
    * @see org.projectforge.core.BaseDao#getList(org.projectforge.core.BaseSearchFilter)
    */
   @Override
@@ -138,53 +182,18 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     if (CollectionUtils.isEmpty(teamEventFilter.getTeamCals()) == true && teamEventFilter.getTeamCalId() == null) {
       return null;
     }
-    QueryFilter qFilter = buildQueryFilter(teamEventFilter);
-    List<TeamEventDO> list = getList(qFilter);
+    final QueryFilter qFilter = buildQueryFilter(teamEventFilter);
+    final List<TeamEventDO> list = getList(qFilter);
     final List<TeamEventDO> result = new ArrayList<TeamEventDO>(list.size());
     final Date startDate = teamEventFilter.getStartDate();
     final Date endDate = teamEventFilter.getEndDate();
     if (list != null) {
       for (final TeamEventDO event : list) {
-        if (event.hasRecurrence() == true) {
-          // This event will be handled below.
-          continue;
-        }
         if (matches(startDate, endDate, event.isAllDay(), teamEventFilter) == true) {
           result.add(event);
         }
       }
     }
-    teamEventFilter.setOnlyRecurrence(true);
-    qFilter = buildQueryFilter(teamEventFilter);
-    qFilter.add(Restrictions.isNotNull("recurrenceRule"));
-
-    list = getList(qFilter);
-    final TimeZone timeZone = PFUserContext.getTimeZone();
-    final net.fortuna.ical4j.model.Date ical4jStartDate = ICal4JUtils.getICal4jDate(teamEventFilter.getStartDate(), timeZone);
-    final net.fortuna.ical4j.model.Date ical4jEndDate = ICal4JUtils.getICal4jDate(teamEventFilter.getEndDate(), timeZone);
-    if (list != null) {
-      for (final TeamEventDO event : list) {
-        if (event.hasRecurrence() == false) {
-          // This event was handled above.
-          continue;
-        }
-        // final DateList dateList = ICal4JUtils.getRecurrenceDates(ical4jStartDate, ical4jEndDate, event);
-        // if (dateList == null) {
-        // continue;
-        // }
-        // for (final Object date : dateList) {
-        // final Period period = (Period) date;
-        // if (matches(period.getStart(), period.getEnd(), event.isAllDay(), teamEventFilter) == false) {
-        // continue;
-        // }
-        // final TeamEventDO nextEvent = event.clone();
-        // nextEvent.setStartDate(new Timestamp(period.getStart().getTime()));
-        // nextEvent.setEndDate(new Timestamp(period.getEnd().getTime()));
-        // result.add(nextEvent);
-        // }
-      }
-    }
-    log.warn("***** TODO: get recurrence events. raw list: " + list.size() + ", result: " + result.size());
     return result;
   }
 
@@ -194,13 +203,25 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     final Date endDate = teamEventFilter.getEndDate();
     if (allDay == true) {
       // Check date match:
+      final Calendar utcCal = Calendar.getInstance(DateHelper.UTC);
+      utcCal.setTime(eventStartDate);
       if (startDate != null && eventEndDate.before(startDate) == true) {
-        // TODO Check same day (UTC vs. local)
-        return true; // false
+        // Check same day (eventStartDate in UTC and startDate of filter in user's time zone):
+        final Calendar userCal = Calendar.getInstance(PFUserContext.getTimeZone());
+        userCal.setTime(startDate);
+        if (CalendarUtils.isSameDay(utcCal, utcCal) == true) {
+          return true;
+        }
+        return false;
       }
       if (endDate != null && eventStartDate.after(endDate) == true) {
-        // TODO Check same day (UTC vs. local)
-        return true; // false
+        // Check same day (eventEndDate in UTC and endDate of filter in user's time zone):
+        final Calendar userCal = Calendar.getInstance(PFUserContext.getTimeZone());
+        userCal.setTime(endDate);
+        if (CalendarUtils.isSameDay(utcCal, utcCal) == true) {
+          return true;
+        }
+        return false;
       }
       return true;
     } else {

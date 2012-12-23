@@ -111,7 +111,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
   private WebMarkupContainer recurrencePanel;
 
-  private FieldsetPanel recurrenceFieldset, recurrenceUntilDateFieldset, recurrenceCountFieldset;
+  private FieldsetPanel recurrenceFieldset, recurrenceUntilDateFieldset, recurrenceIntervalFieldset;
 
   final TeamEventRight right = new TeamEventRight();
 
@@ -258,17 +258,17 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       customizedCheckBoxPanel.add(checkBox);
     }
     {
-      // Count (day, weeks, months, ...). Only visible if recurrenceData.interval != NONE.
-      recurrenceCountFieldset = gridBuilder.newFieldset("", true);
-      DivTextPanel panel = new DivTextPanel(recurrenceCountFieldset.newChildId(), HtmlHelper.escapeHtml(
+      // Interval (day, weeks, months, ...). Only visible if recurrenceData.interval != NONE.
+      recurrenceIntervalFieldset = gridBuilder.newFieldset("", true);
+      DivTextPanel panel = new DivTextPanel(recurrenceIntervalFieldset.newChildId(), HtmlHelper.escapeHtml(
           getString("plugins.teamcal.event.recurrence.customized.all"), false) + "&nbsp;");
       panel.getLabel().setEscapeModelStrings(false);
-      recurrenceCountFieldset.add(panel);
-      final MinMaxNumberField<Integer> countNumberField = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(
-          recurrenceData, "count"), 0, 1000);
-      WicketUtils.setSize(countNumberField, 1);
-      recurrenceCountFieldset.add(countNumberField);
-      panel = new DivTextPanel(recurrenceCountFieldset.newChildId(), new Model<String>() {
+      recurrenceIntervalFieldset.add(panel);
+      final MinMaxNumberField<Integer> intervalNumberField = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(
+          recurrenceData, "interval"), 0, 1000);
+      WicketUtils.setSize(intervalNumberField, 1);
+      recurrenceIntervalFieldset.add(intervalNumberField);
+      panel = new DivTextPanel(recurrenceIntervalFieldset.newChildId(), new Model<String>() {
         @Override
         public String getObject()
         {
@@ -286,8 +286,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
         }
       });
       panel.getLabel().setEscapeModelStrings(false);
-      recurrenceCountFieldset.add(panel);
-      recurrenceCountFieldset.getFieldset().setOutputMarkupId(true);
+      recurrenceIntervalFieldset.add(panel);
+      recurrenceIntervalFieldset.getFieldset().setOutputMarkupId(true);
     }
     {
       // Until. Only visible if recurrenceData.interval != NONE.
@@ -346,11 +346,11 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     if (recurrenceData.getFrequency() == RecurrenceFrequency.NONE) {
       customizedCheckBoxPanel.setVisible(false);
       recurrenceUntilDateFieldset.setVisible(false);
-      recurrenceCountFieldset.setVisible(false);
+      recurrenceIntervalFieldset.setVisible(false);
     } else {
       customizedCheckBoxPanel.setVisible(true);
       recurrenceUntilDateFieldset.setVisible(true);
-      recurrenceCountFieldset.setVisible(recurrenceData.isCustomized());
+      recurrenceIntervalFieldset.setVisible(recurrenceData.isCustomized());
     }
     if (target != null) {
       target.add(recurrencePanel);

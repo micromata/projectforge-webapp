@@ -65,12 +65,14 @@ public class TeamEventUtilsTest
     event = createEvent(timeZone, "2012-12-21 8:30", "2012-12-21 9:00", RecurrenceFrequency.WEEKLY, 1, null);
     Assert.assertEquals("FREQ=WEEKLY", event.getRecurrenceRule());
     Collection<TeamEvent> events = getRecurrenceEvents("2012-12-01", "2013-01-31", timeZone, event);
-    assertEvents(events, timeZone, "2012-12-21 08:30", "2012-12-28 08:30", "2013-01-04 08:30", "2013-01-11 08:30", "2013-01-18 08:30", "2013-01-25 08:30");
+    assertEvents(events, timeZone, "2012-12-21 08:30", "2012-12-28 08:30", "2013-01-04 08:30", "2013-01-11 08:30", "2013-01-18 08:30",
+        "2013-01-25 08:30");
 
     event = createEvent(timeZone, "2012-12-21 18:30", "2012-12-22 9:00", RecurrenceFrequency.WEEKLY, 2, "2013-01-31");
     Assert.assertEquals("FREQ=WEEKLY;UNTIL=20130131;INTERVAL=2", event.getRecurrenceRule());
     events = getRecurrenceEvents("2012-12-01", "2013-03-31", timeZone, event);
     assertEvents(events, timeZone, "2012-12-21 18:30", "2013-01-04 18:30", "2013-01-18 18:30");
+    Assert.assertTrue(events.iterator().next() instanceof TeamEventDO);
   }
 
   private TeamEventDO createEvent(final TimeZone timeZone, final String startDate, final String endDate,
@@ -142,10 +144,12 @@ public class TeamEventUtilsTest
     final DateFormat df = new SimpleDateFormat(DateFormats.ISO_TIMESTAMP_MINUTES);
     df.setTimeZone(timeZone);
     for (final TeamEvent event : events) {
-      final long duration = ((TeamRecurrenceEvent) event).getMaster().getDuration();
+      if (event instanceof TeamRecurrenceEvent) {
+        final long duration = ((TeamRecurrenceEvent) event).getMaster().getDuration();
+        Assert.assertEquals(duration, event.getEndDate().getTime() - event.getStartDate().getTime());
+      }
       final String startDate = startDates[i];
       Assert.assertEquals(startDate, df.format(event.getStartDate()));
-      Assert.assertEquals(duration, event.getEndDate().getTime() - event.getStartDate().getTime());
       ++i;
     }
   }

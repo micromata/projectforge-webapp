@@ -70,7 +70,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       ((CalendarPage) returnToPage).setStartDate(getData().getStartDate());
     }
   }
-  
+
   /**
    * @see org.projectforge.web.wicket.AbstractEditPage#onSaveOrUpdate()
    */
@@ -78,7 +78,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   public AbstractSecuredBasePage onSaveOrUpdate()
   {
     super.onSaveOrUpdate();
-    
+    getData().setRecurrence(form.recurrenceData);
     return null;
   }
 

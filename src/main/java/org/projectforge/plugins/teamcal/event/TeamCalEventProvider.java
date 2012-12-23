@@ -23,9 +23,12 @@
 
 package org.projectforge.plugins.teamcal.event;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
 import net.ftlines.wicket.fullcalendar.Event;
 import net.ftlines.wicket.fullcalendar.callback.EventDroppedCallback;
@@ -36,6 +39,7 @@ import org.apache.wicket.Component;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Period;
+import org.projectforge.common.DateFormats;
 import org.projectforge.plugins.teamcal.admin.TeamCalRight;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFilter;
 import org.projectforge.plugins.teamcal.integration.TemplateEntry;
@@ -47,6 +51,7 @@ import org.projectforge.web.calendar.MyFullCalendarEventsProvider;
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  * @author M. Lauterbach (m.lauterbach@micromata.de)
+ * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
 public class TeamCalEventProvider extends MyFullCalendarEventsProvider
@@ -109,7 +114,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
     eventFilter.setStartDate(start.toDate());
     eventFilter.setEndDate(end.toDate());
     eventFilter.setUser(PFUserContext.getUser());
-    final List<TeamEventDO> teamEvents = teamEventDao.getList(eventFilter);
+    final List<TeamEvent> teamEvents = teamEventDao.getEventList(eventFilter);
 
     boolean longFormat = false;
     days = Days.daysBetween(start, end).getDays();
@@ -120,8 +125,11 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
 
     final TeamCalRight right = new TeamCalRight();
     final PFUserDO user = PFUserContext.getUser();
+    final TimeZone timeZone = PFUserContext.getTimeZone();
+    final DateFormat shortDayFormat = new SimpleDateFormat(DateFormats.COMPACT_DATE);
+    shortDayFormat.setTimeZone(timeZone);
     if (CollectionUtils.isNotEmpty(teamEvents) == true) {
-      for (final TeamEventDO teamEvent : teamEvents) {
+      for (final TeamEvent teamEvent : teamEvents) {
         final DateTime startDate = new DateTime(teamEvent.getStartDate(), PFUserContext.getDateTimeZone());
         final DateTime endDate = new DateTime(teamEvent.getEndDate(), PFUserContext.getDateTimeZone());
         if (endDate.isBefore(start) == true || startDate.isAfter(end) == true) {
@@ -129,12 +137,21 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
           continue;
         }
 
+        final TeamEventDO eventDO;
+        final String id;
+        if (teamEvent instanceof TeamEventDO) {
+          eventDO = (TeamEventDO)teamEvent;
+          id = "" + eventDO.getId();
+        } else {
+          eventDO = ((TeamRecurrenceEvent)teamEvent).getMaster();
+          id = "" + eventDO.getId() + "-" + shortDayFormat.format(teamEvent.getStartDate());
+        }
         final Event event = new Event();
         event.setClassName(EVENT_CLASS_NAME);
-        event.setId("" + teamEvent.getId());
-        event.setColor(activeTemplateEntry.getColorCode(teamEvent.getCalendarId()));
+        event.setId("" + id);
+        event.setColor(activeTemplateEntry.getColorCode(eventDO.getCalendarId()));
 
-        if (eventRight.hasUpdateAccess(PFUserContext.getUser(), teamEvent, null)) {
+        if (eventRight.hasUpdateAccess(PFUserContext.getUser(), eventDO, null)) {
           event.setEditable(true);
         } else {
           event.setEditable(false);
@@ -148,7 +165,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
         event.setEnd(endDate);
 
         // no contextmenu for recurrent events please
-        if (teamEvent.hasRecurrence() == true) {
+        if (eventDO.hasRecurrence() == true) {
           event.setClassName(event.getClassName() + " " + EventDroppedCallback.NO_CONTEXTMENU_INDICATOR);
         }
 
@@ -179,16 +196,15 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
         } else {
           title = teamEvent.getSubject();
         }
-        if (right.hasMinimalAccess(teamEvent.getCalendar(), user.getId()) == true) {
+        if (right.hasMinimalAccess(eventDO.getCalendar(), user.getId()) == true) {
           // for minimal access
           event.setTitle("");
           event.setEditable(false);
         } else {
           event.setTitle(title);
         }
-        events.put(teamEvent.getId() + "", event);
+        events.put(id + "", event);
       }
     }
   }
-
 }
