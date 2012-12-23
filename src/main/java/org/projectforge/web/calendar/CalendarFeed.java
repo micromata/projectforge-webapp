@@ -199,7 +199,7 @@ public class CalendarFeed extends HttpServlet
 
     boolean eventsExist = false;
     for (final CalendarFeedHook hook : feedHooks) {
-      final List<VEvent> list = hook.getEvents(req, timezone, cal);
+      final List<VEvent> list = hook.getEvents(req, timezone);
       if (list != null && list.size() > 0) {
         events.addAll(list);
         eventsExist = true;

@@ -116,7 +116,6 @@ public class CalendarUtils
     return getMidnightCalendarFromUTC(date, PFUserContext.getTimeZone());
   }
 
-
   /**
    * Converts a given date (in user's timeZone) to midnight of UTC timeZone.
    * @param date
@@ -130,6 +129,17 @@ public class CalendarUtils
     final Calendar usersCal = Calendar.getInstance(timeZone);
     copyCalendarDay(utcCal, usersCal);
     return usersCal;
+  }
+
+  public static Date getEndOfDay(final Date date, final TimeZone timeZone)
+  {
+    final Calendar cal = Calendar.getInstance(timeZone);
+    cal.setTime(date);
+    cal.set(Calendar.HOUR_OF_DAY, 23);
+    cal.set(Calendar.MINUTE, 59);
+    cal.set(Calendar.SECOND, 59);
+    cal.set(Calendar.MILLISECOND, 999);
+    return cal.getTime();
   }
 
   public static int daysBetween(final Calendar cal1, final Calendar cal2)

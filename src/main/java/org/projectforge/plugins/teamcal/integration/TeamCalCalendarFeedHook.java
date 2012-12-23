@@ -23,19 +23,23 @@
 
 package org.projectforge.plugins.teamcal.integration;
 
-import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.Name;
+import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
+import org.projectforge.calendar.CalendarUtils;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.plugins.teamcal.TeamCalConfig;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
@@ -67,7 +71,7 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
    * @see org.projectforge.web.calendar.CalendarFeedHook#getEvents(net.fortuna.ical4j.model.TimeZone, java.util.Calendar)
    */
   @Override
-  public List<VEvent> getEvents(final HttpServletRequest req, final TimeZone timezone, final Calendar cal)
+  public List<VEvent> getEvents(final HttpServletRequest req, final TimeZone timeZone)
   {
     final String teamCals = req.getParameter("teamCals");
     if (teamCals == null) {
@@ -81,11 +85,13 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
     final TeamEventDao teamEventDao = Registry.instance().getDao(TeamEventDao.class);
     final TeamEventFilter eventFilter = new TeamEventFilter();
     eventFilter.setDeleted(false);
-    eventFilter.setEndDate(cal.getTime());
+    final DateTime now = DateTime.now();
+    final Date eventDateLimit = now.minusYears(1).toDate();
+    eventFilter.setStartDate(eventDateLimit);
     for (int i = 0; i < teamCalIds.length; i++) {
       final Integer id = Integer.valueOf(teamCalIds[i]);
       eventFilter.setTeamCalId(id);
-      final List<TeamEventDO> teamEvents = teamEventDao.getIcsExportList(eventFilter);
+      final List<TeamEventDO> teamEvents = teamEventDao.getList(eventFilter);
       if (teamEvents != null && teamEvents.size() > 0) {
         for (final TeamEventDO teamEvent : teamEvents) {
           final String uid = TeamCalConfig.get().createEventUid(teamEvent.getId());
@@ -103,6 +109,14 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
           vEvent.getProperties().add(new Name(teamEvent.getCalendar().getTitle()));
           if (StringUtils.isNotBlank(teamEvent.getNote()) == true) {
             vEvent.getProperties().add(new Description(teamEvent.getNote()));
+          }
+          if (teamEvent.hasRecurrence() == true) {
+            final Recur recur = teamEvent.getRecurrenceObject();
+            if (recur.getUntil() != null) {
+              recur.setUntil(ICal4JUtils.getICal4jDateTime(CalendarUtils.getEndOfDay(recur.getUntil(), timeZone), timeZone));
+            }
+            final RRule rrule = new RRule(recur);
+            vEvent.getProperties().add(rrule);
           }
           events.add(vEvent);
         }

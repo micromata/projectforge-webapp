@@ -33,17 +33,14 @@ import java.util.TimeZone;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
-import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import org.joda.time.DateTime;
 import org.projectforge.calendar.CalendarUtils;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.DateHelper;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
-import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserRightId;
 import org.springframework.transaction.annotation.Propagation;
@@ -185,11 +182,9 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     final QueryFilter qFilter = buildQueryFilter(teamEventFilter);
     final List<TeamEventDO> list = getList(qFilter);
     final List<TeamEventDO> result = new ArrayList<TeamEventDO>(list.size());
-    final Date startDate = teamEventFilter.getStartDate();
-    final Date endDate = teamEventFilter.getEndDate();
     if (list != null) {
       for (final TeamEventDO event : list) {
-        if (matches(startDate, endDate, event.isAllDay(), teamEventFilter) == true) {
+        if (matches(event.getStartDate(), event.getEndDate(), event.isAllDay(), teamEventFilter) == true) {
           result.add(event);
         }
       }
@@ -285,33 +280,6 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
       log.debug(ToStringBuilder.reflectionToString(filter));
     }
     return queryFilter;
-  }
-
-  /**
-   * get events not older than one year.
-   * 
-   * @param filter
-   * @return
-   */
-  public List<TeamEventDO> getIcsExportList(final TeamEventFilter filter)
-  {
-    // limit loading results
-    final DateTime now = DateTime.now();
-    final Date eventDateLimit = now.minusYears(1).toDate();
-
-    final QueryFilter queryFilter = new QueryFilter();
-    final TeamCalDO teamCal = new TeamCalDO();
-    teamCal.setId(filter.getTeamCalId());
-    final Conjunction con = Restrictions.conjunction();
-    con.add(Restrictions.ge("startDate", eventDateLimit));
-    con.add(Restrictions.eq("calendar", teamCal));
-    con.add(Restrictions.eq("deleted", filter.isDeleted()));
-    queryFilter.add(con);
-    final List<TeamEventDO> list = super.getList(queryFilter);
-    if (list == null || list.size() == 0) {
-      return new ArrayList<TeamEventDO>();
-    }
-    return list;
   }
 
   @Override

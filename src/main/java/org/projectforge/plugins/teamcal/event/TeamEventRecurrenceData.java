@@ -24,11 +24,12 @@
 package org.projectforge.plugins.teamcal.event;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.util.Date;
 import java.util.TimeZone;
 
 import net.fortuna.ical4j.model.Recur;
 
+import org.projectforge.calendar.CalendarUtils;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.RecurrenceFrequency;
 
@@ -64,7 +65,7 @@ public class TeamEventRecurrenceData implements Serializable
     if (this.interval < 1) {
       this.interval = 1;
     }
-    this.until = ICal4JUtils.getSqlDate(recur.getUntil());
+    this.until = CalendarUtils.getEndOfDay(recur.getUntil(), timeZone);
     this.frequency = ICal4JUtils.getFrequency(recur);
     if (this.interval > 1) {
       this.customized = true;

@@ -44,6 +44,6 @@ public interface CalendarFeedHook
    * @param timezone The time zone of the ics framework (build from {@link PFUserContext#getTimeZone()}.
    * @param cal
    */
-  public List<VEvent> getEvents(final HttpServletRequest req, TimeZone timeZone, final java.util.Calendar cal);
+  public List<VEvent> getEvents(final HttpServletRequest req, TimeZone timeZone);
 
 }

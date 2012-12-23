@@ -172,8 +172,12 @@ public class TeamEventFilter extends BaseSearchFilter implements Serializable, C
   public TeamEventFilter clone()
   {
     final TeamEventFilter clone = new TeamEventFilter(this);
-    clone.startDate = (Date) this.startDate.clone();
-    clone.endDate = (Date) this.endDate.clone();
+    if (this.startDate != null) {
+      clone.startDate = (Date) this.startDate.clone();
+    }
+    if (this.endDate != null) {
+      clone.endDate = (Date) this.endDate.clone();
+    }
     clone.teamCalId = this.teamCalId;
     clone.teamCals = this.teamCals;
     clone.user = this.user;
