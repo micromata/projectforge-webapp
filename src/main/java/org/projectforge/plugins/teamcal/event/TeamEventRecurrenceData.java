@@ -56,6 +56,7 @@ public class TeamEventRecurrenceData implements Serializable
 
   public TeamEventRecurrenceData(final Recur recur, final TimeZone timeZone)
   {
+    this.timeZone = timeZone;
     if (recur == null) {
       return;
     }

@@ -15,7 +15,7 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.plugins.teamcal.event.TeamEventDO;
+import org.projectforge.plugins.teamcal.event.TeamEvent;
 import org.projectforge.plugins.teamcal.event.TeamEventDao;
 import org.projectforge.web.dialog.PFDialog;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
@@ -27,6 +27,7 @@ import de.micromata.wicket.ajax.AjaxCallback;
  * 
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  * @author M. Lauterbach (m.lauterbach@micromata.de)
+ * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
 public class RecurrenceChangeDialog extends PFDialog
@@ -35,7 +36,7 @@ public class RecurrenceChangeDialog extends PFDialog
 
   private static final long serialVersionUID = 7266725860088619248L;
 
-  private TeamEventDO eventDo;
+  private TeamEvent event;
 
   @SpringBean
   private TeamEventDao teamEventDao;
@@ -74,7 +75,7 @@ public class RecurrenceChangeDialog extends PFDialog
       @Override
       public void callback(final AjaxRequestTarget target)
       {
-        onChangeFutureOnlyEventsSelected(target, eventDo);
+        onChangeFutureOnlyEventsSelected(target, event);
       }
     };
     appendNewAjaxActionButton(futureCallback, getString("plugins.teamcal.event.recurrence.change.future"), SingleButtonPanel.DEFAULT_SUBMIT);
@@ -86,7 +87,7 @@ public class RecurrenceChangeDialog extends PFDialog
       @Override
       public void callback(final AjaxRequestTarget target)
       {
-        onChangeSingleEventSelected(target, eventDo);
+        onChangeSingleEventSelected(target, event);
       }
     };
     appendNewAjaxActionButton(singleCallback, getString("plugins.teamcal.event.recurrence.change.single"), SingleButtonPanel.DEFAULT_SUBMIT);
@@ -111,18 +112,18 @@ public class RecurrenceChangeDialog extends PFDialog
     throw new UnsupportedOperationException();
   }
 
-  public void open(final AjaxRequestTarget target, final TeamEventDO eventDo)
+  public void open(final AjaxRequestTarget target, final TeamEvent event)
   {
-    this.eventDo = eventDo;
+    this.event = event;
     super.open(target);
   }
 
-  protected void onChangeFutureOnlyEventsSelected(final AjaxRequestTarget target, final TeamEventDO event)
+  protected void onChangeFutureOnlyEventsSelected(final AjaxRequestTarget target, final TeamEvent event)
   {
     // TODO kai: implement change of all future events here
   }
 
-  protected void onChangeSingleEventSelected(final AjaxRequestTarget target, final TeamEventDO event)
+  protected void onChangeSingleEventSelected(final AjaxRequestTarget target, final TeamEvent event)
   {
     // TODO kai: implement change of single event here
   }

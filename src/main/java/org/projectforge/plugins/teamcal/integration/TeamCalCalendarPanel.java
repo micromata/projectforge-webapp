@@ -41,10 +41,10 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.joda.time.DateTime;
 import org.projectforge.common.DateHelper;
-import org.projectforge.common.NumberHelper;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.dialog.RecurrenceChangeDialog;
+import org.projectforge.plugins.teamcal.event.TeamCalEventId;
 import org.projectforge.plugins.teamcal.event.TeamCalEventProvider;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDao;
@@ -141,10 +141,10 @@ public class TeamCalCalendarPanel extends CalendarPanel
       final String eventId, final String eventClassName)
   {
     // User clicked on teamEvent
-    final Integer id = NumberHelper.parseInteger(event.getId());
-    if (new TeamEventRight().hasUpdateAccess(PFUserContext.getUser(), teamEventDao.getById(id), null)) {
+    final TeamCalEventId id = new TeamCalEventId(event.getId(), PFUserContext.getTimeZone());
+    if (new TeamEventRight().hasUpdateAccess(PFUserContext.getUser(), teamEventDao.getById(id.getDataBaseId()), null)) {
       final PageParameters parameters = new PageParameters();
-      parameters.add(AbstractEditPage.PARAMETER_KEY_ID, id);
+      parameters.add(AbstractEditPage.PARAMETER_KEY_ID, id.getDataBaseId());
       final TeamEventEditPage teamEventPage = new TeamEventEditPage(parameters);
       setResponsePage(teamEventPage);
       teamEventPage.setReturnToPage((WebPage) getPage());
@@ -223,8 +223,8 @@ public class TeamCalCalendarPanel extends CalendarPanel
   private void modifyEvent(final Event event, final DateTime newStartDate, final DateTime newEndDate, final CalendarDropMode dropMode,
       final CalendarResponse response)
   {
-    final Integer id = NumberHelper.parseInteger(event.getId());
-    final TeamEventDO dbTeamEvent = teamEventDao.internalGetById(id);
+    final TeamCalEventId id = new TeamCalEventId(event.getId(), PFUserContext.getTimeZone());
+    final TeamEventDO dbTeamEvent = teamEventDao.internalGetById(id.getDataBaseId());
     if (dbTeamEvent == null) {
       return;
     }
