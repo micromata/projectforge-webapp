@@ -39,6 +39,8 @@ import org.projectforge.user.PFUserDO;
  */
 public class DateFormats
 {
+  public static final String COMPACT_DATE = "yyyyMMdd";
+
   public static final String ISO_DATE = "yyyy-MM-dd";
 
   public static final String ISO_TIMESTAMP_MINUTES = "yyyy-MM-dd HH:mm";
