@@ -95,6 +95,41 @@ public class CalendarUtils
     return usersCal;
   }
 
+  public static int daysBetween(final Calendar cal1, final Calendar cal2)
+  {
+    final Calendar from, to;
+    boolean positive = true;
+    if (cal1.getTimeInMillis() < cal2.getTimeInMillis()) {
+      from = cal1;
+      to = cal2;
+    } else {
+      from = cal2;
+      to = cal1;
+      positive = false;
+    }
+    int result = 0;
+    final int toYear = to.get(Calendar.YEAR);
+    final Calendar cal = (Calendar)from.clone();
+
+    int endlessLoopProtection = 0;
+    while (cal.get(Calendar.YEAR) < toYear) {
+      final int fromDay = cal.get(Calendar.DAY_OF_YEAR);
+      cal.set(Calendar.MONTH, Calendar.DECEMBER);
+      cal.set(Calendar.DAY_OF_MONTH, 31);
+      result += cal.get(Calendar.DAY_OF_YEAR) - fromDay + 1;
+      cal.add(Calendar.DAY_OF_MONTH, 1);
+      if (++endlessLoopProtection > 5000) {
+        throw new IllegalArgumentException("Days between doesn's support more than 5000 years");
+      }
+    }
+    result += to.get(Calendar.DAY_OF_YEAR) - cal.get(Calendar.DAY_OF_YEAR);
+    if (positive == true) {
+      return result;
+    } else {
+      return -result;
+    }
+  }
+
   private static void copyCalendarDay(final Calendar src, final Calendar dest)
   {
     copyCalField(src, dest, Calendar.YEAR);
