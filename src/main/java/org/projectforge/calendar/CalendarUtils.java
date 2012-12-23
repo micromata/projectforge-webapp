@@ -26,8 +26,10 @@ package org.projectforge.calendar;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.projectforge.common.DateHelper;
+import org.projectforge.user.PFUserContext;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -63,7 +65,18 @@ public class CalendarUtils
    */
   public static Calendar getUTCMidnightCalendar(final Date date)
   {
-    final Calendar usersCal = DateHelper.getCalendar();
+    return getUTCMidnightCalendar(date, PFUserContext.getTimeZone());
+  }
+
+  /**
+   * Converts a given date (in user's timeZone) to midnight of UTC timeZone.
+   * @param date
+   * @param timeZone
+   * @return
+   */
+  public static Calendar getUTCMidnightCalendar(final Date date, final TimeZone timeZone)
+  {
+    final Calendar usersCal = Calendar.getInstance(timeZone);
     usersCal.setTime(date);
     final Calendar utcCal = DateHelper.getUTCCalendar();
     copyCalendarDay(usersCal, utcCal);
@@ -82,15 +95,39 @@ public class CalendarUtils
   }
 
   /**
+   * Converts a given date (in UTC) to midnight of user's timeZone.
+   * @param date
+   * @param timeZone
+   * @return
+   */
+  public static Timestamp getMidnightTimestampFromUTC(final Date date, final TimeZone timeZone)
+  {
+    final Calendar cal = getMidnightCalendarFromUTC(date, timeZone);
+    return new Timestamp(cal.getTimeInMillis());
+  }
+
+  /**
    * Converts a given date (in user's timeZone) to midnight of UTC timeZone.
    * @param date
    * @return
    */
   public static Calendar getMidnightCalendarFromUTC(final Date date)
   {
+    return getMidnightCalendarFromUTC(date, PFUserContext.getTimeZone());
+  }
+
+
+  /**
+   * Converts a given date (in user's timeZone) to midnight of UTC timeZone.
+   * @param date
+   * @param timeZone
+   * @return
+   */
+  public static Calendar getMidnightCalendarFromUTC(final Date date, final TimeZone timeZone)
+  {
     final Calendar utcCal = DateHelper.getUTCCalendar();
     utcCal.setTime(date);
-    final Calendar usersCal = DateHelper.getCalendar();
+    final Calendar usersCal = Calendar.getInstance(timeZone);
     copyCalendarDay(utcCal, usersCal);
     return usersCal;
   }
