@@ -588,3 +588,7 @@ h2.box_head .subtitle {
   max-height: 200px;
   overflow: auto;
 }
+
+.pf_loginButton {
+  padding: 0px 15px 15px;
+}
