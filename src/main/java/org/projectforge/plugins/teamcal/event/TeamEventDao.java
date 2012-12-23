@@ -23,17 +23,11 @@
 
 package org.projectforge.plugins.teamcal.event;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
-
-import net.fortuna.ical4j.model.DateList;
-import net.fortuna.ical4j.model.Period;
-import net.fortuna.ical4j.model.Recur;
-import net.fortuna.ical4j.model.parameter.Value;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -166,29 +160,28 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
 
     list = getList(qFilter);
     final TimeZone timeZone = PFUserContext.getTimeZone();
-    final net.fortuna.ical4j.model.Date ical4jStartDate  = ICal4JUtils.getICal4jDate(teamEventFilter.getStartDate(), timeZone);
-    final net.fortuna.ical4j.model.Date ical4jEndDate  = ICal4JUtils.getICal4jDate(teamEventFilter.getEndDate(), timeZone);
+    final net.fortuna.ical4j.model.Date ical4jStartDate = ICal4JUtils.getICal4jDate(teamEventFilter.getStartDate(), timeZone);
+    final net.fortuna.ical4j.model.Date ical4jEndDate = ICal4JUtils.getICal4jDate(teamEventFilter.getEndDate(), timeZone);
     if (list != null) {
       for (final TeamEventDO event : list) {
         if (event.hasRecurrence() == false) {
           // This event was handled above.
           continue;
         }
-        final Recur recur = ICal4JUtils.calculateRecurrence(event.getRecurrenceRule());
-        if (recur == null) {
-          continue;
-        }
-        final DateList dateList = recur.getDates(ical4jStartDate, ical4jEndDate,  Value.PERIOD);
-        for (final Object date : dateList) {
-          final Period period = (Period)date;
-          if (matches(period.getStart(), period.getEnd(), event.isAllDay(), teamEventFilter) == false) {
-            continue;
-          }
-          final TeamEventDO nextEvent = event.clone();
-          nextEvent.setStartDate(new Timestamp(period.getStart().getTime()));
-          nextEvent.setEndDate(new Timestamp(period.getEnd().getTime()));
-          result.add(nextEvent);
-        }
+        // final DateList dateList = ICal4JUtils.getRecurrenceDates(ical4jStartDate, ical4jEndDate, event);
+        // if (dateList == null) {
+        // continue;
+        // }
+        // for (final Object date : dateList) {
+        // final Period period = (Period) date;
+        // if (matches(period.getStart(), period.getEnd(), event.isAllDay(), teamEventFilter) == false) {
+        // continue;
+        // }
+        // final TeamEventDO nextEvent = event.clone();
+        // nextEvent.setStartDate(new Timestamp(period.getStart().getTime()));
+        // nextEvent.setEndDate(new Timestamp(period.getEnd().getTime()));
+        // result.add(nextEvent);
+        // }
       }
     }
     log.warn("***** TODO: get recurrence events. raw list: " + list.size() + ", result: " + result.size());

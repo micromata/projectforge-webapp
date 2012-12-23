@@ -24,19 +24,30 @@
 package org.projectforge.calendar;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.TimeZone;
 
 import junit.framework.Assert;
 import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.component.VEvent;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.RecurrenceFrequency;
+import org.projectforge.plugins.teamcal.TeamCalConfig;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.plugins.teamcal.event.TeamEventRecurrenceData;
 
 public class ICal4JUtilsTest
 {
+  @BeforeClass
+  public static void setUp()
+  {
+    TeamCalConfig.__internalSetConfig(new TeamCalConfig().setDomain("projectforge.priv"));
+  }
+
   @Test
   public void testSqlDate()
   {
@@ -48,13 +59,21 @@ public class ICal4JUtilsTest
   @Test
   public void testRRule()
   {
-    TeamEventDO event = createEvent(DateHelper.EUROPE_BERLIN, "2012-12-21 8:30:00.0", "2012-12-21 9:00:00.0", null, 1, null);
+    testRRule(DateHelper.EUROPE_BERLIN);
+    testRRule(DateHelper.UTC);
+    testRRule(TimeZone.getTimeZone("America/Los_Angeles"));
+  }
+
+  private void testRRule(final TimeZone timeZone)
+  {
+    TeamEventDO event = createEvent(timeZone, "2012-12-21 8:30:00.0", "2012-12-21 9:00:00.0", null, 1, null);
     Assert.assertNull(event.getRecurrenceObject());
-    event = createEvent(DateHelper.EUROPE_BERLIN, "2012-12-21 8:30:00.0", "2012-12-21 9:00:00.0", RecurrenceFrequency.WEEKLY, 1, null);
+    event = createEvent(timeZone, "2012-12-21 8:30:00.0", "2012-12-21 9:00:00.0", RecurrenceFrequency.WEEKLY, 1, null);
     Assert.assertEquals("FREQ=WEEKLY", event.getRecurrenceRule());
-    event = createEvent(DateHelper.EUROPE_BERLIN, "2012-12-21 8:30:00.0", "2012-12-21 9:00:00.0", RecurrenceFrequency.WEEKLY, 2,
-        "2013-01-31");
+    event = createEvent(timeZone, "2012-12-21 8:30:00.0", "2012-12-21 9:00:00.0", RecurrenceFrequency.WEEKLY, 2, "2013-01-31");
     Assert.assertEquals("FREQ=WEEKLY;UNTIL=20130131;INTERVAL=2", event.getRecurrenceRule());
+    final Collection<VEvent> events = getRecurrenceDates("2012-12-01", "2013-01-31", timeZone, event);
+    assertEvents(events, 60, "2012-12-21 08:30:00", "2013-01-04 08:30:00", "2013-01184 08:30:00");
   }
 
   private TeamEventDO createEvent(final TimeZone timeZone, final String startDate, final String endDate,
@@ -96,6 +115,29 @@ public class ICal4JUtilsTest
     } else {
       final String utcString = DateHelper.formatIsoDate(event.getRecurrenceUntil(), DateHelper.UTC);
       Assert.assertEquals(utcRecurrenceUntil, utcString);
+    }
+  }
+
+  private Collection<VEvent> getRecurrenceDates(final String startDateString, final String endDateString, final TimeZone timeZone,
+      final TeamEventDO... events)
+      {
+    final java.util.Date startDate = DateHelper.parseIsoDate(startDateString, timeZone);
+    final java.util.Date endDate = DateHelper.parseIsoDate(endDateString, timeZone);
+    final Collection<TeamEventDO> col = new ArrayList<TeamEventDO>();
+    for (final TeamEventDO event : events) {
+      col.add(event);
+    }
+    return ICal4JUtils.getRecurrenceDates(startDate, endDate, col, timeZone);
+      }
+
+  private void assertEvents(final Collection<VEvent> events, final long duration, final String... startDates)
+  {
+    Assert.assertEquals(startDates.length, events.size());
+    int i = 0;
+    for (final VEvent event : events) {
+      final String startDate = startDates[i];
+      Assert.assertEquals(startDate, event.getStartDate().toString());
+      ++i;
     }
   }
 }
