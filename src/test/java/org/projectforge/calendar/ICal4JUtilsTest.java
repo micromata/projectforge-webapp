@@ -23,29 +23,30 @@
 
 package org.projectforge.calendar;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.TimeZone;
 
 import junit.framework.Assert;
+import net.fortuna.ical4j.model.DateList;
 import net.fortuna.ical4j.model.Recur;
-import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.parameter.Value;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.RecurrenceFrequency;
-import org.projectforge.plugins.teamcal.TeamCalConfig;
-import org.projectforge.plugins.teamcal.event.TeamEventDO;
-import org.projectforge.plugins.teamcal.event.TeamEventRecurrenceData;
 
 public class ICal4JUtilsTest
 {
-  @BeforeClass
-  public static void setUp()
+
+  @Test
+  public void recurTests()
   {
-    TeamCalConfig.__internalSetConfig(new TeamCalConfig().setDomain("projectforge.priv"));
+    final Recur recur = new Recur();
+    recur.setFrequency(ICal4JUtils.getCal4JFrequencyString(RecurrenceFrequency.WEEKLY));
+    recur.setUntil(getDate("2013-01-31", DateHelper.EUROPE_BERLIN));
+    recur.setInterval(2);
+    final DateList dateList = recur.getDates(getDate("2013-01-01", DateHelper.EUROPE_BERLIN),
+        getDate("2012-01-02", DateHelper.EUROPE_BERLIN), getDate("2013-03-31", DateHelper.EUROPE_BERLIN), Value.TIME);
+    Assert.assertEquals("20130101T000000,20130115T000000,20130129T000000", dateList.toString());
   }
 
   @Test
@@ -56,88 +57,10 @@ public class ICal4JUtilsTest
     Assert.assertEquals("20121222", date.toString());
   }
 
-  @Test
-  public void testRRule()
-  {
-    testRRule(DateHelper.EUROPE_BERLIN);
-    testRRule(DateHelper.UTC);
-    testRRule(TimeZone.getTimeZone("America/Los_Angeles"));
-  }
 
-  private void testRRule(final TimeZone timeZone)
+  private net.fortuna.ical4j.model.Date getDate(final String dateString, final TimeZone timeZone)
   {
-    TeamEventDO event = createEvent(timeZone, "2012-12-21 8:30:00.0", "2012-12-21 9:00:00.0", null, 1, null);
-    Assert.assertNull(event.getRecurrenceObject());
-    event = createEvent(timeZone, "2012-12-21 8:30:00.0", "2012-12-21 9:00:00.0", RecurrenceFrequency.WEEKLY, 1, null);
-    Assert.assertEquals("FREQ=WEEKLY", event.getRecurrenceRule());
-    event = createEvent(timeZone, "2012-12-21 8:30:00.0", "2012-12-21 9:00:00.0", RecurrenceFrequency.WEEKLY, 2, "2013-01-31");
-    Assert.assertEquals("FREQ=WEEKLY;UNTIL=20130131;INTERVAL=2", event.getRecurrenceRule());
-    final Collection<VEvent> events = getRecurrenceDates("2012-12-01", "2013-01-31", timeZone, event);
-    //assertEvents(events, 60, "2012-12-21 08:30:00", "2013-01-04 08:30:00", "2013-01184 08:30:00");
-  }
-
-  private TeamEventDO createEvent(final TimeZone timeZone, final String startDate, final String endDate,
-      final RecurrenceFrequency frequency, final int interval, final String recurrenceUntil)
-  {
-    final Timestamp startTimestamp = new Timestamp(DateHelper.parseIsoTimestamp(startDate, timeZone).getTime());
-    final Timestamp endTimestamp = new Timestamp(DateHelper.parseIsoTimestamp(endDate, timeZone).getTime());
-    final TeamEventDO event = new TeamEventDO();
-    event.setStartDate(startTimestamp).setEndDate(endTimestamp);
-    final TeamEventRecurrenceData recurData = new TeamEventRecurrenceData(timeZone);
-    recurData.setFrequency(frequency);
-    recurData.setInterval(interval);
-    if (recurrenceUntil != null) {
-      final java.sql.Date recurrenceUntilDate = new java.sql.Date(DateHelper.parseIsoDate(recurrenceUntil, timeZone).getTime());
-      recurData.setUntil(recurrenceUntilDate);
-    }
-    event.setRecurrence(recurData);
-    assertRecurrence(event, timeZone, frequency, interval, recurrenceUntil);
-    return event;
-  }
-
-  private void assertRecurrence(final TeamEventDO event, final TimeZone timeZone, final RecurrenceFrequency frequency, final int interval,
-      final String utcRecurrenceUntil)
-  {
-    final Recur recur = event.getRecurrenceObject();
-    if (frequency == null) {
-      Assert.assertNull(recur);
-      Assert.assertNull(event.getRecurrenceUntil());
-      return;
-    }
-    Assert.assertEquals(frequency, ICal4JUtils.getFrequency(recur));
-    if (recur.getInterval() > 1) {
-      Assert.assertEquals(interval, recur.getInterval());
-    } else {
-      Assert.assertEquals(-1, recur.getInterval());
-    }
-    if (utcRecurrenceUntil == null) {
-      Assert.assertNull(event.getRecurrenceUntil());
-    } else {
-      final String utcString = DateHelper.formatIsoDate(event.getRecurrenceUntil(), DateHelper.UTC);
-      Assert.assertEquals(utcRecurrenceUntil, utcString);
-    }
-  }
-
-  private Collection<VEvent> getRecurrenceDates(final String startDateString, final String endDateString, final TimeZone timeZone,
-      final TeamEventDO... events)
-      {
-    final java.util.Date startDate = DateHelper.parseIsoDate(startDateString, timeZone);
-    final java.util.Date endDate = DateHelper.parseIsoDate(endDateString, timeZone);
-    final Collection<TeamEventDO> col = new ArrayList<TeamEventDO>();
-    for (final TeamEventDO event : events) {
-      col.add(event);
-    }
-    return ICal4JUtils.getRecurrenceDates(startDate, endDate, col, timeZone);
-      }
-
-  private void assertEvents(final Collection<VEvent> events, final long duration, final String... startDates)
-  {
-    Assert.assertEquals(startDates.length, events.size());
-    int i = 0;
-    for (final VEvent event : events) {
-      final String startDate = startDates[i];
-      Assert.assertEquals(startDate, event.getStartDate().toString());
-      ++i;
-    }
+    final java.util.Date date = DateHelper.parseIsoDate(dateString, timeZone);
+    return ICal4JUtils.getICal4jDate(date, timeZone);
   }
 }

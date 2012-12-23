@@ -24,14 +24,8 @@
 package org.projectforge.calendar;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 
-import net.fortuna.ical4j.filter.Filter;
-import net.fortuna.ical4j.filter.PeriodRule;
-import net.fortuna.ical4j.filter.Rule;
-import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.TimeZoneRegistry;
@@ -42,14 +36,10 @@ import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.util.Dates;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
 import org.projectforge.common.DateFormats;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.RecurrenceFrequency;
-import org.projectforge.plugins.teamcal.event.TeamEventDO;
-import org.projectforge.plugins.teamcal.event.TeamEventRecurrenceData;
 import org.projectforge.user.PFUserContext;
-import org.springframework.util.CollectionUtils;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -59,9 +49,6 @@ public class ICal4JUtils
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ICal4JUtils.class);
 
   private static TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
-
-  private static final RecurrenceFrequency[] SUPPORTED_INTERVALS = new RecurrenceFrequency[] { RecurrenceFrequency.NONE,
-    RecurrenceFrequency.DAILY, RecurrenceFrequency.WEEKLY, RecurrenceFrequency.MONTHLY, RecurrenceFrequency.YEARLY};
 
   /**
    * @return The timeZone (ical4j) built of the default java timeZone of the user.
@@ -116,17 +103,6 @@ public class ICal4JUtils
     return vEvent;
   }
 
-  public static VEvent createVEvent(final TeamEventDO eventDO, final TimeZone timezone)
-  {
-    final VEvent vEvent = createVEvent(eventDO.getStartDate(), eventDO.getEndDate(), eventDO.getUid(), eventDO.getSubject(),
-        eventDO.isAllDay(), timezone);
-    if (eventDO.hasRecurrence() == true) {
-      final RRule rrule = eventDO.getRecurrenceRuleObject();
-      vEvent.getProperties().add(rrule);
-    }
-    return vEvent;
-  }
-
   /**
    * 
    * @param rruleString
@@ -169,50 +145,6 @@ public class ICal4JUtils
     return recur.getUntil();
   }
 
-  public static String calculateRRule(final TeamEventRecurrenceData recurData)
-  {
-    if (recurData == null || recurData.getFrequency() == null) {
-      return null;
-    }
-    final Recur recur = new Recur();
-    final net.fortuna.ical4j.model.Date untilDate = getICal4jDate(recurData.getUntil(), recurData.getTimeZone());
-    if (untilDate != null) {
-      recur.setUntil(untilDate);
-    }
-    recur.setInterval(recurData.getInterval());
-    recur.setFrequency(getCal4JFrequencyString(recurData.getFrequency()));
-    final RRule rrule = new RRule(recur);
-    return rrule.getValue();
-  }
-
-  public static Collection<VEvent> getRecurrenceDates(final Date startDate, final Date endDate, final Collection<TeamEventDO> events,
-      final java.util.TimeZone timeZone)
-      {
-    final net.fortuna.ical4j.model.DateTime ical4jStartDate = getICal4jDateTime(startDate, timeZone);
-    final net.fortuna.ical4j.model.DateTime ical4jEndDate = getICal4jDateTime(endDate, timeZone);
-    return getRecurrenceDates(ical4jStartDate, ical4jEndDate, events, timeZone);
-      }
-
-  @SuppressWarnings("unchecked")
-  public static Collection<VEvent> getRecurrenceDates(final net.fortuna.ical4j.model.DateTime startDate,
-      final net.fortuna.ical4j.model.DateTime endDate, final Collection<TeamEventDO> events, final java.util.TimeZone javaTimeZone)
-      {
-    if (CollectionUtils.isEmpty(events) == true) {
-      return null;
-    }
-    Validate.notNull(startDate);
-    Validate.notNull(endDate);
-    final Period period = new Period(startDate, endDate);
-    final Filter filter = new Filter(new Rule[] { new PeriodRule(period)}, Filter.MATCH_ALL);
-    final Collection<VEvent> col = new ArrayList<VEvent>();
-    final TimeZone timeZone = getTimeZone(javaTimeZone);
-    for (final TeamEventDO event : events) {
-      col.add(createVEvent(event, timeZone));
-    }
-    final Collection< ? > eventsMatched = filter.filter(col);
-    return (Collection<VEvent>) eventsMatched;
-      }
-
   public static String getCal4JFrequencyString(final RecurrenceFrequency interval)
   {
     if (interval == RecurrenceFrequency.DAILY) {
@@ -225,11 +157,6 @@ public class ICal4JUtils
       return Recur.YEARLY;
     }
     return null;
-  }
-
-  public static RecurrenceFrequency[] getSupportedRecurrenceIntervals()
-  {
-    return SUPPORTED_INTERVALS;
   }
 
   /**
