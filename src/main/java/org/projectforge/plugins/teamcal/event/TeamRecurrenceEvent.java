@@ -62,9 +62,18 @@ public class TeamRecurrenceEvent implements TeamEvent, Serializable
     startDay.set(Calendar.SECOND, masterEndDate.get(Calendar.SECOND));
     final int daysBetween = CalendarUtils.daysBetween(masterStartDate, masterEndDate);
     if (daysBetween > 0) {
+      // The event ends at another day:
       startDay.add(Calendar.DAY_OF_YEAR, daysBetween);
     }
     this.endDate = startDay.getTime();
+  }
+
+  /**
+   * @return the master
+   */
+  public TeamEventDO getMaster()
+  {
+    return master;
   }
 
   /**
