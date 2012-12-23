@@ -46,7 +46,6 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
@@ -230,7 +229,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       recurrenceFieldset = gridBuilder.newFieldset(getString("plugins.teamcal.event.recurrence"), true);
       recurrencePanel = gridBuilder.getPanel().getDiv();
       recurrencePanel.setOutputMarkupId(true);
-      final RecurrenceFrequency[] intervals = ICal4JUtils.getSupportedRecurrenceIntervals();
+      final RecurrenceFrequency[] intervals = TeamEventUtils.getSupportedRecurrenceIntervals();
       final LabelValueChoiceRenderer<RecurrenceFrequency> intervalChoiceRenderer = new LabelValueChoiceRenderer<RecurrenceFrequency>(
           recurrenceFieldset, intervals);
       final DropDownChoice<RecurrenceFrequency> intervalChoice = new DropDownChoice<RecurrenceFrequency>(

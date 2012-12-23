@@ -310,7 +310,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
    */
   @Transient
   public TeamEventDO setRecurrence(final TeamEventRecurrenceData recurData) {
-    final String rruleString = ICal4JUtils.calculateRRule(recurData);
+    final String rruleString = TeamEventUtils.calculateRRule(recurData);
     setRecurrenceRule(rruleString);
     return this;
   }
