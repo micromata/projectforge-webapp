@@ -238,7 +238,7 @@ public class CalendarFeed extends HttpServlet
         } else {
           summary = TimesheetEventsProvider.getTitle(timesheet);
         }
-        final VEvent vEvent = ICal4JUtils.createEvent(timesheet.getStartTime(), timesheet.getStopTime(), uid, summary);
+        final VEvent vEvent = ICal4JUtils.createVEvent(timesheet.getStartTime(), timesheet.getStopTime(), uid, summary);
         if (StringUtils.isNotBlank(timesheet.getLocation()) == true) {
           vEvent.getProperties().add(new Location(timesheet.getLocation()));
         }
