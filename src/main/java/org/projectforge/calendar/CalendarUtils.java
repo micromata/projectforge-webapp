@@ -109,7 +109,7 @@ public class CalendarUtils
     }
     int result = 0;
     final int toYear = to.get(Calendar.YEAR);
-    final Calendar cal = (Calendar)from.clone();
+    final Calendar cal = (Calendar) from.clone();
 
     int endlessLoopProtection = 0;
     while (cal.get(Calendar.YEAR) < toYear) {
@@ -128,6 +128,11 @@ public class CalendarUtils
     } else {
       return -result;
     }
+  }
+
+  public static boolean isSameDay(final Calendar cal1, final Calendar cal2)
+  {
+    return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) && cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
   }
 
   private static void copyCalendarDay(final Calendar src, final Calendar dest)
