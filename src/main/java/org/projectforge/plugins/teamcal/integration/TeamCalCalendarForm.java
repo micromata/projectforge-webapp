@@ -36,11 +36,11 @@ import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.common.StringHelper;
 import org.projectforge.plugins.teamcal.dialog.TeamCalDialog;
+import org.projectforge.plugins.teamcal.event.DropIcsPanel;
 import org.projectforge.plugins.teamcal.event.TeamEventListPage;
 import org.projectforge.web.calendar.CalendarFilter;
 import org.projectforge.web.calendar.CalendarForm;
 import org.projectforge.web.calendar.CalendarPage;
-import org.projectforge.web.wicket.components.DropFileContainer;
 import org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -149,7 +149,7 @@ public class TeamCalCalendarForm extends CalendarForm
           setResponsePage(getParentPage().getClass());
         }
       });
-      fs.add(new DropFileContainer(fs.newChildId()) {
+      fs.add(new DropIcsPanel(fs.newChildId()) {
 
         @Override
         protected void onIcsImport(final AjaxRequestTarget target, final Calendar calendar)

@@ -30,6 +30,8 @@ import java.util.TimeZone;
 
 import javax.servlet.ServletContext;
 
+import net.fortuna.ical4j.util.CompatibilityHints;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Application;
 import org.apache.wicket.ConverterLocator;
@@ -430,6 +432,11 @@ public class WicketApplication extends WebApplication implements WicketApplicati
       log.error(ex.getMessage(), ex);
     }
     getPageSettings().setRecreateMountedPagesAfterExpiry(false);
+
+    // initialize ical4j to be more "relaxed"
+    CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_PARSING, true);
+    CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_UNFOLDING, true);
+    CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_VALIDATION, true);
   }
 
   @Override

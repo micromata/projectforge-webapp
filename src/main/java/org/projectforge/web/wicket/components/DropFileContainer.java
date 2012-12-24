@@ -10,22 +10,17 @@
 package org.projectforge.web.wicket.components;
 
 import java.io.Serializable;
-import java.io.StringReader;
 
-import net.fortuna.ical4j.data.CalendarBuilder;
-import net.fortuna.ical4j.model.Calendar;
-
-import org.apache.log4j.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxSubmitLink;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.CompoundPropertyModel;
 
 /**
- * The panel which includes the drop behavior for ics files. If the dropped ics was sucessfully importet, the hook method
- * {@link #onIcsImport(AjaxRequestTarget, Calendar)} is called.
+ * The panel which includes the drop behavior for several files. If the dropped file (string) was sucessfully importet, the hook method
+ * {@link #onStringImport(AjaxRequestTarget, String)} is called.
  * 
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  * 
@@ -33,8 +28,6 @@ import org.apache.wicket.model.CompoundPropertyModel;
 public abstract class DropFileContainer extends Panel
 {
   private static final long serialVersionUID = 3622467918922963503L;
-
-  private static final Logger log = Logger.getLogger(DropFileContainer.class);
 
   /**
    * @param id
@@ -53,34 +46,26 @@ public abstract class DropFileContainer extends Panel
     super.onInitialize();
     final Form<FormBean> hiddenForm = new Form<FormBean>("hiddenForm", new CompoundPropertyModel<FormBean>(new FormBean()));
     add(hiddenForm);
-    hiddenForm.add(new TextField<String>("importIcs"));
+    hiddenForm.add(new TextArea<String>("importString"));
     hiddenForm.add(new AjaxSubmitLink("submitButton") {
       private static final long serialVersionUID = 6140567784494429257L;
 
       @Override
       protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
       {
-        final CalendarBuilder builder = new CalendarBuilder();
-        try {
-          // TODO ju: following "import" does not work correctly
-          final Calendar calendar = builder.build(new StringReader(hiddenForm.getModel().getObject().importIcs));
-          onIcsImport(target, calendar);
-        } catch (final Exception ex) {
-          // TODO ju: error handling
-          log.fatal(ex);
-        }
+        onStringImport(target, hiddenForm.getModel().getObject().importString);
       }
 
       @Override
       protected void onError(final AjaxRequestTarget target, final Form< ? > form)
       {
-        // TODO ju: error handling
+        // nothing to do here
       }
 
     });
   }
 
-  protected abstract void onIcsImport(final AjaxRequestTarget target, final Calendar calendar);
+  protected abstract void onStringImport(final AjaxRequestTarget target, final String string);
 
   /**
    * Just the form model
@@ -90,6 +75,6 @@ public abstract class DropFileContainer extends Panel
   {
     private static final long serialVersionUID = 4250094235574838882L;
 
-    private String importIcs;
+    private String importString;
   }
 }
