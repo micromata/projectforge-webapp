@@ -36,6 +36,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.AppVersion;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.MySession;
 import org.projectforge.web.wicket.WicketApplicationInterface;
@@ -47,6 +48,10 @@ import org.projectforge.web.wicket.WicketUtils;
  */
 public abstract class AbstractMobilePage extends WebPage
 {
+  public static final String JQUERY_MOBILE_VERSION = "1.2.0";
+
+  public static final String JQUERY_VERSION = "1.8.2";
+
   private static final long serialVersionUID = -6221091194614601467L;
 
   protected final static String TOP_RIGHT_BUTTON_ID = "topRightButton";
@@ -126,12 +131,21 @@ public abstract class AbstractMobilePage extends WebPage
   {
     super.renderHead(response);
     response.renderString(WicketUtils.getCssForFavicon(getUrl("/favicon.ico")));
-    response.renderCSSReference("mobile/jquery.mobile/jquery.mobile-1.1.0.min.css");
+    if (WebConfiguration.isDevelopmentMode() == true) {
+      response.renderCSSReference("mobile/jquery.mobile/jquery.mobile-" + JQUERY_MOBILE_VERSION + ".css");
+    } else {
+      response.renderCSSReference("mobile/jquery.mobile/jquery.mobile-" + JQUERY_MOBILE_VERSION + ".min.css");
+    }
     response.renderCSSReference("mobile/projectforge.css");
-    response.renderCSSReference("mobile/projectforge.css");
-    response.renderJavaScriptReference("scripts/jquery/1.7.1/jquery.min.js");
-    // response.renderJavaScriptReference("mobile/jquery.mobile/myconfig.js");
-    response.renderJavaScriptReference("mobile/jquery.mobile/jquery.mobile-1.1.0.min.js");
+    if (WebConfiguration.isDevelopmentMode() == true) {
+      response.renderJavaScriptReference("scripts/jquery/" + JQUERY_VERSION + "/jquery-" + JQUERY_VERSION + ".js");
+      // response.renderJavaScriptReference("mobile/jquery.mobile/myconfig.js");
+      response.renderJavaScriptReference("mobile/jquery.mobile/jquery.mobile-" + JQUERY_MOBILE_VERSION + ".js");
+    } else {
+      response.renderJavaScriptReference("scripts/jquery/" + JQUERY_VERSION + "/jquery-" + JQUERY_VERSION + ".min.js");
+      // response.renderJavaScriptReference("mobile/jquery.mobile/myconfig.js");
+      response.renderJavaScriptReference("mobile/jquery.mobile/jquery.mobile-" + JQUERY_MOBILE_VERSION + ".min.js");
+    }
   }
 
   @Override
@@ -247,7 +261,7 @@ public abstract class AbstractMobilePage extends WebPage
    */
   protected void addTopCenter()
   {
-    //headerContainer.add(new Label(AbstractMobilePage.TOP_CENTER_ID, AppVersion.APP_TITLE));
+    // headerContainer.add(new Label(AbstractMobilePage.TOP_CENTER_ID, AppVersion.APP_TITLE));
     headerContainer.add(new Label(AbstractMobilePage.TOP_CENTER_ID, getTitle()));
   }
 
