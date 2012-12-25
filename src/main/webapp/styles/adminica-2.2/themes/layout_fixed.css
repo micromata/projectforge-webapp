@@ -1,0 +1,30 @@
+#wrapper{
+	position:relative;
+	margin: auto;
+	width: 960px !important;
+	}
+
+
+#wrapper .sidebar{
+	position:absolute;
+	}
+
+
+#wrapper .sidebar.fixed{
+	position: fixed;
+	left: auto;
+}
+
+.dropdown_menu ul{
+}
+
+.sidebar{
+	top:0;
+	position: fixed;
+}
+
+.navbar.navbar-fixed-top .container-fluid,
+.navbar.navbar-fixed-bottom .container-fluid{
+	width: 960px !important;
+	margin: auto;
+}

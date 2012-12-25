@@ -1,0 +1,63 @@
+/* Colours:
+	Top grad (light): #1C5EA0
+	Bottom grad (darker): #064792
+	a link: #1389ff
+	a hover: #52a9ff
+	tab bg (dark): #253a55
+ */
+
+a.logo, a#login_logo {
+    background: transparent url("../../images/interface/adminica_logo_blue-trans.png") no-repeat
+    }
+
+a#login_logo {
+    background-position: 0 -15px
+    }
+
+/* Coloured Header Gradients, eg. Sortable Boxes, Tab Boxes, Date-picker, etc. */
+.grad_skin,
+.alert_badge,
+.calendar_grad, .dropdown_menu > ul > li.current > a, .box_head, .tab_header, .tab_sider, #login_box #bar, #search_side, .wizard .wizard_steps ul, .dataTables_wrapper .ui-widget-header, .ui-button .ui-state-active, .ui-widget-header .ui-state-active, .ui-buttonset .ui-button.ui-state-active, .ui-multiselect .ui-widget-header, .ui-slider .ui-slider-range, .slider-content .selected .title, .fc-header .fc-state-active, .fc-header .ui-state-active,.dataTables_wrapper .dataTables_paginate span span.ui-state-disabled,
+.ui-progressbar .ui-progressbar-value,
+.stackbar.stack_view > ul > li > a > span,
+div.stackbar.stack_view > ul > li > a > span::before  {
+    background-color: #1C5EA0;
+	background-image:         linear-gradient(top, #1C5EA0, #064792);
+
+    border-color: #064792;
+}
+ ul.drawer{
+    background-color: #1C5EA0;
+    border-color:#064792;
+ }
+
+
+.grad_skin_reverse{
+    background-color: #1C5EA0;
+	background-image:         linear-gradient(top, #064792, #1C5EA0);
+
+    border-color: #064792;
+    }
+
+
+/* Links, hovers, tabs*/
+div.main_container p a, #sidebar h3 a, #topbar h3 a, .text a, body #template_options a, a.show_all_tabs  {
+    color: #1389ff
+}
+
+div.main_container p a:hover,#sidebar h3 a:hover, #topbar h3 a:hover, .text a:hover, body #template_options a:hover, a.show_all_tabs:hover {
+    color: #52a9ff;
+    border-color: #52a9ff;
+}
+
+#sidebar form#search_side:hover,.dataTables_wrapper .ui-widget-header select li ul.drawer li a .dataTables_wrapper .ui-widget-header input, .dropdown_menu ul li ul.dropdown li ul.slideout li a, div.main_container .dropdown_menu ul li.current:first-child a div.main_container .dropdown_menu ul li.current a{
+	border-color: #253a55
+}
+
+
+.dropdown_menu ul li a:hover, .dropdown_menu ul li ul.dropdown li a.has_slide:hover,.dataTables_wrapper .dataTables_paginate span span.ui-state-disabled {
+	color: #064792;
+}
+.dropdown_menu ul li ul.dropdown li.current{
+	border-color: #064792
+}
