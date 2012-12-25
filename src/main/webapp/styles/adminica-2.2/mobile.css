@@ -1,0 +1,216 @@
+/*--------------------------------
+iPhone and iPad formatting
+--------------------------------*/
+/*  iPad Portrait and Landscape */
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+  #template_options {
+    position: relative!important;
+  }
+  .sidebar div.cog {
+    line-height: 40px!important;
+    width: 40px!important;
+    right: -40px !important;
+  }
+}
+/*  iPhone Landscape */
+@media screen and (min-width: 321px) and (max-width: 480px) {
+  #wrapper {
+    min-width: 300px;
+  }
+  a.logo {
+    display: none;
+    float: none!important;
+    margin: auto !important;
+  }
+  .dropdown_menu {
+    margin: 0;
+  }
+  .dropdown_menu ul {
+    display: none;
+  }
+  .dropdown_menu #mobile_nav {
+    display: block;
+  }
+  #topbar .user_box {
+    margin: 10px auto 0;
+    float: none;
+  }
+  body div.main_container {
+    margin: 10px 0 10px 1%!important;
+    padding: 20px 2% 5px!important;
+    width: 94% !important;
+  }
+  .grid_100,
+  .grid_1,
+  .grid_2,
+  .grid_3,
+  .grid_4,
+  .grid_5,
+  .grid_6,
+  .grid_7,
+  .grid_8,
+  .grid_9,
+  .grid_10,
+  .grid_11,
+  .grid_12,
+  .grid_13,
+  .grid_14,
+  .grid_15,
+  .grid_16,
+  .col_100,
+  .col_80,
+  .col_70,
+  .col_30,
+  .col_50,
+  .col_33,
+  .col_66,
+  .col_25,
+  .col_75,
+  .col_60,
+  .col_40,
+  .col_20 {
+    width: 100%!important;
+    margin: 0 !important;
+  }
+  body div.full_size {
+    padding: none !important;
+  }
+  #template_options {
+    position: relative !important;
+  }
+  div.main_container .box,
+  div.main_container .flat_area {
+    width: 100%!important;
+    margin-left: 0!important;
+    margin-right: 0 !important;
+  }
+  .sidebar,
+  .stackbar {
+    display: none !important;
+  }
+  #topbar {
+    display: block !important;
+  }
+  #template_options h3 {
+    float: none!important;
+    display: block!important;
+    clear: both !important;
+  }
+  #template_options div {
+    display: block;
+  }
+  div.full_size {
+    padding: 0 !important;
+  }
+  div.full_size .box {
+    margin: -20px -2% -5px !important;
+    padding: 0!important;
+    width: 104% !important;
+  }
+  body {
+    padding-bottom: 0 !important;
+  }
+  #loading_overlay .loading_message {
+    margin-left: -76px;
+  }
+}
+/*  iPhone Portrait */
+@media screen and (max-width: 320px) {
+  #wrapper {
+    min-width: 100px;
+  }
+  a.logo {
+    display: none;
+    float: none!important;
+    margin: auto !important;
+  }
+  .dropdown_menu {
+    margin: 0;
+  }
+  .dropdown_menu ul {
+    display: none;
+  }
+  .dropdown_menu #mobile_nav {
+    display: block;
+  }
+  #topbar .user_box {
+    margin: 10px auto 0;
+    float: none;
+  }
+  body div.main_container {
+    margin: 10px 1%!important;
+    padding: 20px 2% 5px!important;
+    width: 94% !important;
+  }
+  .grid_100,
+  .grid_1,
+  .grid_2,
+  .grid_3,
+  .grid_4,
+  .grid_5,
+  .grid_6,
+  .grid_7,
+  .grid_8,
+  .grid_9,
+  .grid_10,
+  .grid_11,
+  .grid_12,
+  .grid_13,
+  .grid_14,
+  .grid_15,
+  .grid_16,
+  .col_100,
+  .col_80,
+  .col_70,
+  .col_30,
+  .col_50,
+  .col_33,
+  .col_66,
+  .col_25,
+  .col_75,
+  .col_60,
+  .col_40,
+  .col_20 {
+    width: 100%!important;
+    margin: 0 !important;
+  }
+  body .dropdown_menu ul li.current:first-child a {
+    border-left-width: 1px !important;
+  }
+  #template_options {
+    position: relative !important;
+  }
+  #template_options h3 {
+    float: none!important;
+    display: block!important;
+    clear: both !important;
+  }
+  #template_options div {
+    display: block;
+  }
+  .sidebar,
+  .stackbar {
+    display: none !important;
+  }
+  #topbar {
+    display: block !important;
+  }
+  div.main_container .box,
+  div.main_container .flat_area {
+    width: 100% !important;
+  }
+  div.full_size {
+    padding: 0 !important;
+  }
+  div.full_size .box {
+    margin: -20px -2% -5px !important;
+    padding: 0!important;
+    width: 104% !important;
+  }
+  body {
+    padding-bottom: 0 !important;
+  }
+  #loading_overlay .loading_message {
+    margin-left: -76px;
+  }
+}

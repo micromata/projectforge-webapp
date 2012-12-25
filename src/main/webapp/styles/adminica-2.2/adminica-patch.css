@@ -1,0 +1,145 @@
+body #sidebar {
+	border-top-right-radius: 0px;
+	top: 75px !important;
+}
+
+.display_none {
+	
+}
+
+div.dialog_content .box,div.dialog_content .block {
+	opacity: 1;
+}
+
+#nav_top>ul>li>a>img.gear {
+	padding-right: 10px;
+}
+
+#sidebar div.cog {
+	top: 0px;
+	border-top-right-radius: 5px;
+}
+
+#nav_top {
+	margin: -57px 160px 10px 30px;
+}
+
+#nav_top>ul>li>ul,#nav_top ul li ul.dropdown {
+	width: 180px;
+}
+
+#topbar .user_box {
+	z-index: 1000;
+	width: 150px;
+}
+
+ul.tab_header {
+	letter-spacing: normal;
+}
+
+div.jqui_radios,div.jqui_checkbox {
+	float: left;
+}
+
+div.field_div {
+	float: left;
+	width: 100%;
+}
+
+div.field_div span,div.field_div input,div.field_div div,div.field_div a,div.field_div div input,div.field_div select
+	{
+	float: left;
+}
+
+button,select {
+	letter-spacing: normal;
+}
+
+fieldset .text {
+	height: 32px;
+}
+
+.col_100,.col_50,.col_33,.col_66,.col_25,.col_75,.col_60,.col_40 {
+	margin-right: -2px; /* Avoid line break for smaller zoom */
+}
+
+/*---------------------------------------------------
+  Changes of Markus Thoene */
+
+/* reduce field set height: */
+fieldset .text {
+	height: 20px;
+	line-height: 20px;
+	padding: 0;
+}
+
+/* reduce distances of select boxes: */
+select {
+	margin-bottom: 0px;
+	margin-top: 1px;
+}
+
+/* Adapt width of select boxes: */
+fieldset.label_side>div>select {
+	width: auto;
+	max-width: 80%;
+}
+
+/* Reduce distances of text fields: */
+input.text {
+	margin-top: 0px;
+}
+/* used for text between date-picker fields in field sets: */
+div.field_div div span {
+	padding-top: 3px;
+}
+
+/* timesheetList: previous/next month/week/day buttons: */
+div.field_div>div>span>span {
+	display: inline-block;
+	margin: -7px 0 0;
+}
+
+/* timesheet: position of total duration: */
+fieldset>div>div>span {
+	margin-top: 5px;
+	display: inline-block;
+}
+
+/* Distances between progress bars. */
+div.progress-done {
+	margin-right: 3px;
+	margin-top: 2px;
+}
+
+fieldset.label_side {
+	margin-left: 1px;
+	margin-bottom: 0px;
+	padding-bottom: 0px;
+}
+
+/* Doubled lines removed: */
+fieldset {
+	border-bottom-width: 0px;
+}
+
+/* left of text-input fields in field sets. */
+div.field_div  a {
+	padding-top: 4px;
+}
+
+fieldset.label_side>label { /* [main.css z1178]*/
+	padding: 13px 20px 8px;
+}
+
+fieldset.label_side>div { /* [main.css z1198]*/
+	padding: 10px 20px;
+}
+
+div.tasktree {
+	padding-top: -5px;
+}
+
+div.margin_top_10 {
+	margin-top: 10px;
+}
