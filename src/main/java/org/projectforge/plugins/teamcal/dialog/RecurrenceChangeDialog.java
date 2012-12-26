@@ -9,15 +9,20 @@
 
 package org.projectforge.plugins.teamcal.dialog;
 
+import java.sql.Timestamp;
+
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.plugins.teamcal.event.TeamEvent;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDao;
+import org.projectforge.plugins.teamcal.event.TeamEventEditPage;
+import org.projectforge.plugins.teamcal.event.TeamRecurrenceEvent;
 import org.projectforge.web.dialog.PFDialog;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 
@@ -38,6 +43,8 @@ public class RecurrenceChangeDialog extends PFDialog
   private static final long serialVersionUID = 7266725860088619248L;
 
   private TeamEvent event;
+
+  private Timestamp newStartDate, newEndDate;
 
   private SingleButtonPanel allFutureEventsButtonPanel;
 
@@ -81,7 +88,7 @@ public class RecurrenceChangeDialog extends PFDialog
         onChangeAllEventsSelected(target, event);
       }
     };
-    appendNewAjaxActionButton(allCallback, getString("plugins.teamcal.event.recurrence.change.all"), SingleButtonPanel.GREY);
+    appendNewAjaxActionButton(allCallback, getString("plugins.teamcal.event.recurrence.change.all"));
 
     // add future only change callback
     final AjaxCallback futureCallback = new AjaxCallback() {
@@ -93,8 +100,7 @@ public class RecurrenceChangeDialog extends PFDialog
         onChangeFutureOnlyEventsSelected(target, event);
       }
     };
-    allFutureEventsButtonPanel = appendNewAjaxActionButton(futureCallback, getString("plugins.teamcal.event.recurrence.change.future"),
-        SingleButtonPanel.GREY);
+    allFutureEventsButtonPanel = appendNewAjaxActionButton(futureCallback, getString("plugins.teamcal.event.recurrence.change.future"));
 
     // add future only change callback
     final AjaxCallback singleCallback = new AjaxCallback() {
@@ -106,7 +112,7 @@ public class RecurrenceChangeDialog extends PFDialog
         onChangeSingleEventSelected(target, event);
       }
     };
-    appendNewAjaxActionButton(singleCallback, getString("plugins.teamcal.event.recurrence.change.single"), SingleButtonPanel.GREY);
+    appendNewAjaxActionButton(singleCallback, getString("plugins.teamcal.event.recurrence.change.single"));
   }
 
   /**
@@ -128,9 +134,11 @@ public class RecurrenceChangeDialog extends PFDialog
     throw new UnsupportedOperationException();
   }
 
-  public void open(final AjaxRequestTarget target, final TeamEvent event)
+  public void open(final AjaxRequestTarget target, final TeamEvent event, final Timestamp newStartDate, final Timestamp newEndDate)
   {
     this.event = event;
+    this.newStartDate = newStartDate;
+    this.newEndDate = newEndDate;
     if (event instanceof TeamEventDO) {
       // All future events are the same as all events, because the user selected the first event:
       allFutureEventsButtonPanel.getButton().setVisible(false);
@@ -143,7 +151,24 @@ public class RecurrenceChangeDialog extends PFDialog
 
   protected void onChangeAllEventsSelected(final AjaxRequestTarget target, final TeamEvent event)
   {
-    // TODO kai: implement change of all events here
+    Integer id;
+    if (event instanceof TeamEventDO) {
+      id = ((TeamEventDO) event).getId();
+    } else {
+      id = ((TeamRecurrenceEvent) event).getMaster().getId();
+    }
+    final TeamEventDO teamEventDO = teamEventDao.getById(id);
+    if (newStartDate != null) {
+      final long move = newStartDate.getTime() - event.getStartDate().getTime();
+      teamEventDO.setStartDate(new Timestamp(teamEventDO.getStartDate().getTime() + move));
+    }
+    if (newEndDate != null) {
+      final long move = newEndDate.getTime() - event.getEndDate().getTime();
+      teamEventDO.setEndDate(new Timestamp(teamEventDO.getEndDate().getTime() + move));
+    }
+    final TeamEventEditPage teamEventEditPage = new TeamEventEditPage(new PageParameters(), teamEventDO);
+    teamEventEditPage.setReturnToPage(getWebPage());
+    setResponsePage(teamEventEditPage);
   }
 
   protected void onChangeFutureOnlyEventsSelected(final AjaxRequestTarget target, final TeamEvent event)

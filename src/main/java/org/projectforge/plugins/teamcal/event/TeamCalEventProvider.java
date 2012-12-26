@@ -181,7 +181,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
             durationString = "\n" + getString("plugins.teamcal.event.duration") + ": " + hour + ":" + minute;
           }
           final StringBuffer buf = new StringBuffer();
-          buf.append(getString("plugins.teamcal.event.subject")).append(": ").append(teamEvent.getSubject());
+          buf.append(teamEvent.getSubject());
           if (StringUtils.isNotBlank(teamEvent.getNote()) == true) {
             buf.append("\n").append(getString("plugins.teamcal.event.note")).append(": ").append(teamEvent.getNote());
           }

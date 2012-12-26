@@ -248,7 +248,8 @@ public class TeamCalCalendarPanel extends CalendarPanel
 
     if (teamEventDO.hasRecurrence() == true) {
       // at this point the dbTeamEvent is already updated in time
-      recurrenceChangeDialog.open(response.getTarget(), teamEvent);
+      recurrenceChangeDialog.open(response.getTarget(), teamEvent, newStartTimeMillis != null ? new Timestamp(newStartTimeMillis) : null,
+          newEndTimeMillis != null ? new Timestamp(newEndTimeMillis) : null);
       return;
     }
     teamEventDO = teamEventDao.getById(teamEventDO.getId());
