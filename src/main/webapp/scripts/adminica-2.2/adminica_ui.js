@@ -175,36 +175,6 @@ function adminicaUi(){
 }
 
 function adminicaInit(){
-
-	$("#nav_top, .indent, .flat_area").animate({opacity: 1	});
-
-	$("#login_box > div > span").hide().delay(400).fadeIn();
-
-	$(".box").animate({
-		opacity: 1
-		}, function(){
-			$(".block").animate({
-			opacity: 1
-		});
-	});
-
-	// fade in once page is fully loaded
-	//hideLoadingOverlay();
-
-	$("#login_box").delay(10).slideDown(100, function() { // Kai
-		document.getElementById('username').focus(); // Kai
-	});
-
-}
-
-function hideLoadingOverlay(){
-	$("#loading_overlay .loading_message").delay(200).fadeOut(function(){});
-	$("#loading_overlay").delay(300).fadeOut();
-}
-
-function showLoadingOverlay(){
-	$("#loading_overlay .loading_message").show();
-	$("#loading_overlay").show();
 }
 
 function columnHeight(){
@@ -262,7 +232,6 @@ function navCurrent(){
 
 	var nav1 = $("#wrapper").data("adminica-nav-top");
 	var nav2 = $("#wrapper").data("adminica-nav-inner");
-
 	$('#nav_top > ul > li').eq(nav1 - 1).addClass("current").find("li").eq(nav2 - 1).addClass("current");
 
 	$('#nav_top > ul > li.current > a > img').each(function(){
