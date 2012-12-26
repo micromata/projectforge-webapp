@@ -72,6 +72,17 @@ public class IconLinkPanel extends Panel
   }
 
   /**
+   * Sets "light" as class attribute for having light grey colored buttons.
+   * @return this for chaining.
+   */
+  public IconLinkPanel setLight()
+  {
+    icon.add(AttributeModifier.append("class", "icon-white"));
+    return this;
+  }
+
+
+  /**
    * Sets the css style for an absolute position at the right top.
    * @return this for chaining.
    */
