@@ -44,6 +44,7 @@ import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.DateTimePanel;
 import org.projectforge.web.wicket.components.JodaDatePanel;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.ComponentSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
@@ -146,10 +147,11 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     };
     firstHourDropDownChoice.setNullValid(false);
     firstHourDropDownChoice.setRequired(true);
+    WicketUtils.setSize(firstHourDropDownChoice, ComponentSize.MINI);
     WicketUtils.addTooltip(firstHourDropDownChoice, getString("calendar.option.firstHour.tooltip"));
     fs.add(firstHourDropDownChoice);
     {
-      final IconButtonPanel refreshButtonPanel = new IconButtonPanel(fs.newChildId(), IconType.ARROW_REFRESH, getString("refresh")) {
+      final IconButtonPanel refreshButtonPanel = new IconButtonPanel(fs.newChildId(), IconType.REFRESH, getString("refresh")) {
         /**
          * @see org.projectforge.web.wicket.flowlayout.IconButtonPanel#onSubmit()
          */
@@ -158,7 +160,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
         {
           setResponsePage(getPage().getClass(), getPage().getPageParameters());
         }
-      }.setLight();
+      };
       fs.add(refreshButtonPanel);
       setDefaultButton(refreshButtonPanel.getButton());
     }
@@ -180,7 +182,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
         };
       };
       final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(fs.newChildId(), IconType.SUBSCRIPTION,
-          getString(setIcsImportButtonTooltip()), iCalExportLink).setLight();
+          getString(setIcsImportButtonTooltip()), iCalExportLink);
 
       fs.add(exportICalButtonPanel);
     }
