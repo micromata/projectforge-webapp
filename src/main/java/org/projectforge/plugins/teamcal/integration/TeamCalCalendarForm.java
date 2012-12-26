@@ -149,6 +149,7 @@ public class TeamCalCalendarForm extends CalendarForm
           setResponsePage(getParentPage().getClass());
         }
       });
+
       fieldset.add(new DropIcsPanel(fieldset.newChildId()) {
 
         @Override
