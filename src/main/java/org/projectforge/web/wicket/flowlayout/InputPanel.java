@@ -108,4 +108,13 @@ public class InputPanel extends Panel implements ComponentWrapperPanel
     field.add(AttributeModifier.replace("type", attr));
     return this;
   }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel#getFormComponent()
+   */
+  @Override
+  public FormComponent< ? > getFormComponent()
+  {
+    return this.field;
+  }
 }
