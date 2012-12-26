@@ -78,6 +78,7 @@ import org.projectforge.web.mobile.MenuMobilePage;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.TooltipImage;
+import org.projectforge.web.wicket.flowlayout.ComponentSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.GridBuilder;
@@ -740,6 +741,11 @@ public class WicketUtils
         AttributeModifier.replace("type", "text/javascript")));
   }
 
+  public static void setSize(final Component component, final ComponentSize size)
+  {
+    component.add(AttributeModifier.append("class", size.getClassAttrValue()));
+  }
+
   /**
    * @param parent Only for i18n needed.
    * @param startTime Start time or null.
@@ -1102,9 +1108,9 @@ public class WicketUtils
   {
     for (final Behavior behavior : comp.getBehaviors()) {
       if (behavior instanceof AttributeAppender && name.equals(((AttributeAppender) behavior).getAttribute()) == true) {
-        return (AttributeAppender)behavior;
+        return (AttributeAppender) behavior;
       } else if (behavior instanceof AttributeModifier && name.equals(((AttributeModifier) behavior).getAttribute()) == true) {
-        return (AttributeModifier)behavior;
+        return (AttributeModifier) behavior;
       }
     }
     return null;
