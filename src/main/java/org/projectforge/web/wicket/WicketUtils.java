@@ -869,7 +869,7 @@ public class WicketUtils
       } else if (text.contains(" - ") == true) {
         return text;
       } else {
-        return " - " + text;
+        return text;
       }
     } else {
       if (text == null) {
@@ -1098,13 +1098,13 @@ public class WicketUtils
    * @param comp
    * @param name Name of attribute.
    */
-  public static Behavior getAttributeModifier(final Component comp, final String name)
+  public static AttributeModifier getAttributeModifier(final Component comp, final String name)
   {
     for (final Behavior behavior : comp.getBehaviors()) {
       if (behavior instanceof AttributeAppender && name.equals(((AttributeAppender) behavior).getAttribute()) == true) {
-        return behavior;
+        return (AttributeAppender)behavior;
       } else if (behavior instanceof AttributeModifier && name.equals(((AttributeModifier) behavior).getAttribute()) == true) {
-        return behavior;
+        return (AttributeModifier)behavior;
       }
     }
     return null;
