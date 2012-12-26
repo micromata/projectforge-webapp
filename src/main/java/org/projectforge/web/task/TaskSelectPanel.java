@@ -29,6 +29,7 @@ import java.util.ListIterator;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
@@ -270,5 +271,14 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
   {
     divContainer.setOutputMarkupId(true);
     return divContainer.getMarkupId();
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel#getFormComponent()
+   */
+  @Override
+  public FormComponent< ? > getFormComponent()
+  {
+    return null;
   }
 }

@@ -86,4 +86,13 @@ public class ListMultipleChoicePanel<T> extends Panel implements ComponentWrappe
     listChoice.setOutputMarkupId(true);
     return listChoice.getMarkupId();
   }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel#getFormComponent()
+   */
+  @Override
+  public FormComponent< ? > getFormComponent()
+  {
+    return listChoice;
+  }
 }

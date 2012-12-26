@@ -47,17 +47,17 @@ public class SingleButtonPanel extends Panel
    */
   public static final String WICKET_ID = "button";
 
-  public static final String CANCEL = "red";
+  public static final String CANCEL = "btn-danger";
 
-  public static final String DEFAULT_SUBMIT = "green";
+  public static final String DEFAULT_SUBMIT = "btn-success";
 
-  public static final String DELETE = "blue";
+  public static final String DELETE = "btn-warning";
 
-  public static final String GREY = "grey";
+  public static final String GREY = "btn-info";
 
-  public static final String RED = "red";
+  public static final String RED = "btn-danger";
 
-  public static final String RESET = "red";
+  public static final String RESET = "btn-danger";
 
   public static final String SEND_RIGHT = "send_right";
 
@@ -87,7 +87,7 @@ public class SingleButtonPanel extends Panel
     add(button);
     button.add(new Label("label", label).setRenderBodyOnly(true));
     if (classnames != null) {
-      button.add(AttributeModifier.replace("class", StringHelper.listToString(" ", classnames)));
+      button.add(AttributeModifier.append("class", StringHelper.listToString(" ", classnames)));
     }
   }
 

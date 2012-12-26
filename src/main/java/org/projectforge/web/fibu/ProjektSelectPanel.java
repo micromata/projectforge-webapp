@@ -24,6 +24,7 @@
 package org.projectforge.web.fibu;
 
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -179,5 +180,14 @@ public class ProjektSelectPanel extends AbstractSelectPanel<ProjektDO> implement
   {
     projektAsStringLabel.setOutputMarkupId(true);
     return projektAsStringLabel.getMarkupId();
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel#getFormComponent()
+   */
+  @Override
+  public FormComponent< ? > getFormComponent()
+  {
+    return null;
   }
 }

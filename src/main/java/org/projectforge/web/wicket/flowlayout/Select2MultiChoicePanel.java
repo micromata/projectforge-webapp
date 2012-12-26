@@ -84,4 +84,13 @@ public class Select2MultiChoicePanel<T> extends Panel implements ComponentWrappe
     WicketUtils.addTooltip(select2MultiChoice, tooltip);
     return this;
   }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel#getFormComponent()
+   */
+  @Override
+  public FormComponent< ? > getFormComponent()
+  {
+    return select2MultiChoice;
+  }
 }

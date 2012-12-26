@@ -54,9 +54,9 @@ public class DropDownChoicePanel<T> extends Panel implements ComponentWrapperPan
    * @param values
    * @param renderer
    */
-  public DropDownChoicePanel(final String id,  final IModel<T> model, final List< ? extends T> values, final IChoiceRenderer<T> renderer)
+  public DropDownChoicePanel(final String id, final IModel<T> model, final List< ? extends T> values, final IChoiceRenderer<T> renderer)
   {
-    this(id, new DropDownChoice<T>(WICKET_ID,  model, values, renderer), false);
+    this(id, new DropDownChoice<T>(WICKET_ID, model, values, renderer), false);
   }
 
   /**
@@ -70,7 +70,7 @@ public class DropDownChoicePanel<T> extends Panel implements ComponentWrapperPan
   public DropDownChoicePanel(final String id, final IModel<T> model, final IModel<List<T>> values, final IChoiceRenderer<T> renderer,
       final boolean submitOnChange)
   {
-    this(id,  new DropDownChoice<T>(WICKET_ID, model, values, renderer), submitOnChange);
+    this(id, new DropDownChoice<T>(WICKET_ID, model, values, renderer), submitOnChange);
   }
 
   /**
@@ -84,7 +84,7 @@ public class DropDownChoicePanel<T> extends Panel implements ComponentWrapperPan
   public DropDownChoicePanel(final String id, final IModel<T> model, final List< ? extends T> values, final IChoiceRenderer<T> renderer,
       final boolean submitOnChange)
   {
-    this(id,  new DropDownChoice<T>(WICKET_ID, model, values, renderer), submitOnChange);
+    this(id, new DropDownChoice<T>(WICKET_ID, model, values, renderer), submitOnChange);
   }
 
   /**
@@ -172,5 +172,14 @@ public class DropDownChoicePanel<T> extends Panel implements ComponentWrapperPan
   {
     WicketUtils.addTooltip(dropDownChoice, tooltip);
     return this;
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel#getFormComponent()
+   */
+  @Override
+  public FormComponent< ? > getFormComponent()
+  {
+    return dropDownChoice;
   }
 }

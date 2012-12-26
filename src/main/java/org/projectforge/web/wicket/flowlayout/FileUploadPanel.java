@@ -23,6 +23,7 @@
 
 package org.projectforge.web.wicket.flowlayout;
 
+import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.markup.html.panel.Panel;
 
@@ -75,6 +76,15 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
    * @return the field
    */
   public FileUploadField getField()
+  {
+    return fileUploadField;
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel#getFormComponent()
+   */
+  @Override
+  public FormComponent< ? > getFormComponent()
   {
     return fileUploadField;
   }

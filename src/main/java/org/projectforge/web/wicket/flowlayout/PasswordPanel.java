@@ -23,7 +23,7 @@
 
 package org.projectforge.web.wicket.flowlayout;
 
-import org.apache.wicket.Component;
+import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.panel.Panel;
 
 /**
@@ -37,9 +37,9 @@ public class PasswordPanel extends Panel implements ComponentWrapperPanel
 
   private static final long serialVersionUID = -4126462093466172226L;
 
-  private Component field;
+  private FormComponent<?> field;
 
-  public PasswordPanel(final String id, final Component field)
+  public PasswordPanel(final String id, final FormComponent<?> field)
   {
     super(id);
     add(this.field = field);
@@ -53,5 +53,14 @@ public class PasswordPanel extends Panel implements ComponentWrapperPanel
   {
     field.setOutputMarkupId(true);
     return field.getMarkupId();
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel#getFormComponent()
+   */
+  @Override
+  public FormComponent< ? > getFormComponent()
+  {
+    return field;
   }
 }

@@ -25,6 +25,7 @@ package org.projectforge.web.wicket.components;
 
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.joda.time.DateMidnight;
@@ -105,6 +106,15 @@ public class JodaDatePanel extends Panel implements ComponentWrapperPanel
   public String getComponentOutputId()
   {
     return dateField.getMarkupId();
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel#getFormComponent()
+   */
+  @Override
+  public FormComponent< ? > getFormComponent()
+  {
+    return dateField;
   }
 }
 

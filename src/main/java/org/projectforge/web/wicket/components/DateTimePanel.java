@@ -30,6 +30,7 @@ import org.apache.commons.lang.ClassUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.datetime.markup.html.form.DateTextField;
 import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.FormComponentPanel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
@@ -347,6 +348,15 @@ public class DateTimePanel extends FormComponentPanel<Date> implements Component
   public DropDownChoice<Integer> getHourOfDayDropDownChoice()
   {
     return hourOfDayDropDownChoice;
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel#getFormComponent()
+   */
+  @Override
+  public FormComponent< ? > getFormComponent()
+  {
+    return datePanel.getDateField();
   }
 
 }
