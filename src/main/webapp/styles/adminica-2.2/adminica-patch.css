@@ -3,14 +3,6 @@ body #sidebar {
 	top: 75px !important;
 }
 
-.display_none {
-	
-}
-
-div.dialog_content .box,div.dialog_content .block {
-	opacity: 1;
-}
-
 #nav_top>ul>li>a>img.gear {
 	padding-right: 10px;
 }
