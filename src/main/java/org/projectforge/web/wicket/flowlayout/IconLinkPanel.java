@@ -26,6 +26,7 @@ package org.projectforge.web.wicket.flowlayout;
 import java.io.Serializable;
 
 import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.projectforge.web.wicket.WicketUtils;
@@ -42,6 +43,8 @@ public class IconLinkPanel extends Panel
   public static final String LINK_ID = "link";
 
   private final AbstractLink link;
+
+  private final WebMarkupContainer icon;
 
   public IconLinkPanel(final String id, final IconType type, final AbstractLink link)
   {
@@ -63,16 +66,9 @@ public class IconLinkPanel extends Panel
     if (tooltip != null) {
       WicketUtils.addTooltip(link, tooltip);
     }
-  }
-
-  /**
-   * Sets "light" as class attribute for having light grey colored buttons.
-   * @return this for chaining.
-   */
-  public IconLinkPanel setLight()
-  {
-    link.add(AttributeModifier.append("class", "light"));
-    return this;
+    icon = new WebMarkupContainer("icon");
+    icon.add(AttributeModifier.append("class", type.getClassAttrValue()));
+    link.add(icon);
   }
 
   /**

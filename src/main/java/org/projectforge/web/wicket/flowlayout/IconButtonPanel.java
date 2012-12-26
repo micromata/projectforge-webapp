@@ -27,6 +27,7 @@ import java.io.Serializable;
 
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.Model;
@@ -43,7 +44,7 @@ public class IconButtonPanel extends Panel
 
   private final Button button;
 
-  private WebMarkupContainer div;
+  private WebMarkupContainer icon;
 
   public IconButtonPanel(final String id, final IconType type)
   {
@@ -83,7 +84,7 @@ public class IconButtonPanel extends Panel
    */
   public IconButtonPanel setLight()
   {
-    button.add(AttributeModifier.append("class", "light"));
+    button.add(AttributeModifier.append("class", "icon-white"));
     return this;
   }
 
@@ -127,10 +128,10 @@ public class IconButtonPanel extends Panel
 
   private void init(final IconType type, final String tooltip)
   {
-    button.add(AttributeModifier.append("class", "icon-only div-icon"));
-    div = new WebMarkupContainer("div");
-    button.add(div);
-    div.add(AttributeModifier.append("class", type.getClassAttrValue()));
+    icon = new WebMarkupContainer("icon");
+    button.add(icon);
+    button.add(new Label("text").setVisible(false));
+    icon.add(AttributeModifier.append("class", type.getClassAttrValue()));
     if (tooltip != null) {
       WicketUtils.addTooltip(button, tooltip);
     }
