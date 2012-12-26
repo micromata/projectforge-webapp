@@ -145,6 +145,31 @@ public abstract class AbstractUnsecureBasePage extends WebPage
   {
     super.renderHead(response);
     response.renderString(WicketUtils.getCssForFavicon(getUrl("/favicon.ico")));
+    response.renderCSSReference("styles/adminica-2.2/main.css");
+    response.renderCSSReference("styles/adminica-2.2/grid.css");
+    response.renderCSSReference("styles/adminica-2.2/mobile.css");
+    response.renderCSSReference("styles/adminica-2.2/themes/switcher.css");
+    response.renderCSSReference("styles/adminica-2.2/colours.css");
+    // response.renderCSSReference("styles/adminica-2.2/themes/theme_base.css");
+    response.renderCSSReference("styles/adminica-2.2/themes/skin_light.css");
+    response.renderCSSReference("styles/adminica-2.2/themes/bg_noise_zero.css");
+    response.renderCSSReference("styles/adminica-2.2/themes/nav_top.css");
+    response.renderCSSReference("styles/adminica-2.2/adminica-patch.css");
+    response.renderCSSReference("include/bootstrap/css/bootstrap.min.css");
+    response.renderCSSReference("styles/projectforge.css");
+
+    // if (WebConfiguration.isDevelopmentMode() == true) {
+    response.renderJavaScriptReference("scripts/adminica-2.2/prefixfree/prefixfree.js");
+    response.renderJavaScriptReference("scripts/adminica-2.2/adminica_ui.js");
+    response.renderJavaScriptReference("scripts/adminica-2.2/adminica_mobile.js");
+    response.renderJavaScriptReference("scripts/adminica-2.2/adminica_load.js");
+    // } else {
+    // response.renderJavaScriptReference("scripts/adminica-2.2/prefixfree/prefixfree-min.js");
+    // response.renderJavaScriptReference("scripts/adminica-2.2/bootstrap/bootstrap.min.js");
+    // response.renderJavaScriptReference("scripts/adminica-2.2/adminica_ui.js"); // modified (can't use compressed version).
+    // response.renderJavaScriptReference("scripts/adminica-2.2/adminica_mobile-min.js");
+    // response.renderJavaScriptReference("scripts/adminica-2.2/adminica_load-min.js");
+    // }
     response.renderJavaScriptReference("scripts/projectforge.js");
     initializeContextMenu(response);
   }
