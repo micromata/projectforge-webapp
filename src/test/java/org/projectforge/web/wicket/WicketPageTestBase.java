@@ -149,8 +149,8 @@ public class WicketPageTestBase extends TestBase
     // assert rendered page class
     tester.assertRenderedPage(LoginPage.class);
     final FormTester form = tester.newFormTester("body:form");
-    form.setValue("username", username);
-    form.setValue("password", password);
+    form.setValue(findComponentByLabel(form, "username"), username);
+    form.setValue(findComponentByLabel(form, "password"), password);
     form.submit(KEY_LOGINPAGE_BUTTON_LOGIN);
     if (checkDefaultPage == true) {
       tester.assertRenderedPage(WicketUtils.getDefaultPage());
