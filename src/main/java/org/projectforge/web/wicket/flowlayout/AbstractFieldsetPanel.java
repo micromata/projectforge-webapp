@@ -23,11 +23,13 @@
 
 package org.projectforge.web.wicket.flowlayout;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
+import org.apache.wicket.feedback.FeedbackMessage;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.FormComponent;
@@ -39,6 +41,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.projectforge.common.StringHelper;
 import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
@@ -67,6 +70,8 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
   protected String labelText;
 
   protected RepeatingView repeater;
+
+  private final List<FormComponent< ? >> allFormComponents = new ArrayList<FormComponent< ? >>();
 
   private Object storeObject;
 
@@ -143,15 +148,78 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
       }
       childAdded = true;
       checkLabelFor(childs);
+      for (final Component child : childs) {
+        addFormComponent(child);
+      }
       return addChild(childs);
     } else {
       childAdded = true;
       checkLabelFor(childs);
       for (final Component component : childs) {
         modifyAddedChild(component);
+        addFormComponent(component);
       }
       return repeater.add(childs);
     }
+  }
+
+  private void addFormComponent(final Component component)
+  {
+    if (component instanceof FormComponent< ? >) {
+      this.allFormComponents.add((FormComponent< ? >) component);
+    } else if (component instanceof ComponentWrapperPanel) {
+      final FormComponent< ? > fc = ((ComponentWrapperPanel) component).getFormComponent();
+      if (fc != null) {
+        this.allFormComponents.add(fc);
+      }
+    }
+  }
+
+  /**
+   * Checks all child form components and calls {@link FormComponent#isValid()}.
+   * @return true if all childs are valid, otherwise false (if any child is invalid);
+   */
+  public boolean isValid()
+  {
+    for (final FormComponent< ? > formComponent : allFormComponents) {
+      if (formComponent.isValid() == false) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * @return true if any form child has a feedback message.
+   * @see org.apache.wicket.Component#hasFeedbackMessage()
+   */
+  public boolean hasFormChildsFeedbackMessage()
+  {
+    for (final FormComponent< ? > formComponent : allFormComponents) {
+      if (formComponent.hasFeedbackMessage() == true) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public String getFormChildsFeedbackMessages(final boolean markAsRendered)
+  {
+    if (hasFormChildsFeedbackMessage() == false) {
+      return null;
+    }
+    final StringBuffer buf = new StringBuffer();
+    boolean first = true;
+    for (final FormComponent< ? > formComponent : allFormComponents) {
+      if (formComponent.hasFeedbackMessage() == true) {
+        final FeedbackMessage feedbackMessage = formComponent.getFeedbackMessage();
+        if (markAsRendered == true) {
+          feedbackMessage.markRendered();
+        }
+        first = StringHelper.append(buf, first, feedbackMessage.getMessage().toString(), "\n");
+      }
+    }
+    return buf.toString();
   }
 
   /**
@@ -306,7 +374,8 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
     return DropDownChoicePanel.WICKET_ID;
   }
 
-  public <C> Select2MultiChoicePanel<C> add(final Select2MultiChoice<C> select2MultiChoice) {
+  public <C> Select2MultiChoicePanel<C> add(final Select2MultiChoice<C> select2MultiChoice)
+  {
     final Select2MultiChoicePanel<C> select2MultiChoicePanel = new Select2MultiChoicePanel<C>(newChildId(), select2MultiChoice);
     add(select2MultiChoicePanel);
     return select2MultiChoicePanel;

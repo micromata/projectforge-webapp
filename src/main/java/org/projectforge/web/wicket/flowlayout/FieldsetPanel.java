@@ -43,6 +43,8 @@ import org.projectforge.web.wicket.components.JiraIssuesPanel;
  */
 public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
 {
+  public static final String FIELD_SET_CLASS = "control-group";
+
   /**
    * Please use this only and only if you haven't multiple children. Please use {@link #newChildId()} instead.
    */
@@ -56,11 +58,11 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
 
   private final WebMarkupContainer div;
 
-  private boolean labelSide = true;
+  private Label feedbackMessageLabel;
+
+  private String feedbackMessage;
 
   private Component labelSuffix, descriptionSuffix;
-
-  private DivPanel fieldDiv;
 
   private boolean initialized;
 
@@ -137,14 +139,29 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
 
   /**
    */
+  public FieldsetPanel(final String id, final String labeltext)
+  {
+    this(id, labeltext, null, false);
+  }
+
+  /**
+   */
+  public FieldsetPanel(final String id, final String labeltext, final boolean multipleChildren)
+  {
+    this(id, labeltext, null, multipleChildren);
+  }
+
+  /**
+   */
   @SuppressWarnings("serial")
-  private FieldsetPanel(final String id, final String labeltext, final String description, final boolean multipleChildren)
+  public FieldsetPanel(final String id, final String labeltext, final String description, final boolean multipleChildren)
   {
     super(id);
     this.labelText = labeltext;
     this.multipleChildren = multipleChildren;
     fieldset = new WebMarkupContainer("fieldset");
     superAdd(fieldset);
+    fieldset.add(AttributeModifier.append("class", FIELD_SET_CLASS));
     fieldset.add((label = new WebMarkupContainer("label")));
     label.add(new Label("labeltext", new Model<String>() {
       @Override
@@ -159,16 +176,33 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
       label.add(WicketUtils.getInvisibleComponent("labeldescription"));
     }
     fieldset.add(div = new WebMarkupContainer("div"));
+    div.add(feedbackMessageLabel = new Label("feedbackMessage", new Model<String>() {
+      /**
+       * @see org.apache.wicket.model.Model#getObject()
+       */
+      @Override
+      public String getObject()
+      {
+        return feedbackMessage;
+      }
+    }) {
+      /**
+       * @see org.apache.wicket.Component#isVisible()
+       */
+      @Override
+      public boolean isVisible()
+      {
+        return feedbackMessage != null;
+      }
+    });
   }
 
   /**
-   * 
-   * @param labelSide
-   * @return this for chaining.
+   * NOP (method has no effect).
+   * @Deprecated
    */
   public FieldsetPanel setLabelSide(final boolean labelSide)
   {
-    this.labelSide = labelSide;
     return this;
   }
 
@@ -200,7 +234,7 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
    */
   public FieldsetPanel setNowrap()
   {
-    fieldDiv.add(AttributeModifier.append("style", "white-space: nowrap;"));
+    //fieldDiv.add(AttributeModifier.append("style", "white-space: nowrap;"));
     return this;
   }
 
@@ -348,6 +382,24 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
   }
 
   /**
+   * @return the feedbackMessage
+   */
+  public Label getFeedbackMessageLabel()
+  {
+    return feedbackMessageLabel;
+  }
+
+  /**
+   * @param feedbackMessage
+   * @return this for chaining.
+   */
+  public FieldsetPanel setFeedbackMessage(final String feedbackMessage)
+  {
+    this.feedbackMessage = feedbackMessage;
+    return this;
+  }
+
+  /**
    * Creates and add a new RepeatingView as div-child if not already exist.
    * @see RepeatingView#newChildId()
    */
@@ -356,10 +408,10 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
   {
     if (multipleChildren == true) {
       if (repeater == null) {
-        fieldDiv = new DivPanel(FIELDS_ID, DivType.FIELD_DIV);
-        div.add(fieldDiv);
-        repeater = new RepeatingView(DivPanel.CHILD_ID);
-        fieldDiv.add(repeater);
+        //fieldDiv = div;//new DivPanel(FIELDS_ID, DivType.FIELD_DIV);
+        //div.add(fieldDiv);
+        repeater = new RepeatingView(FIELDS_ID);
+        div.add(repeater);
       }
       return repeater.newChildId();
     } else {
@@ -397,9 +449,6 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
       // Can't be done in onInitialize() because this component is added to its parent in constructor and onInitialize() is some times
       // called before the setter methods (e. g. for labelSide) are called.
       initialized = true;
-      if (labelSide == true) {
-        fieldset.add(AttributeModifier.append("class", "label_side"));
-      }
       if (labelSuffix == null) {
         label.add(labelSuffix = WicketUtils.getInvisibleComponent("labelSuffix"));
       }

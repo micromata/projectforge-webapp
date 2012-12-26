@@ -136,13 +136,12 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
   private GridBuilder newGrid(final DivType gridType, final String id, final boolean clearfix)
   {
     gridSize = gridType;
-    final DivPanel divPanel = new DivPanel(id, gridType, DivType.BOX, DivType.NO_TITLE);
+    final DivPanel divPanel = new DivPanel(id, gridType, DivType.BOX);
     if (clearfix == true) {
       divPanel.add(AttributeModifier.append("style", "clear: left;"));
     }
     getParent().add(divPanel);
-    gridPanel = new DivPanel(DivPanel.CHILD_ID, DivType.TOGGLE_CONTAINER);
-    divPanel.add(gridPanel);
+    gridPanel = divPanel;
     blockPanel = columnsPanel = columnPanel = null;
     current = gridPanel;
     return this;
@@ -153,7 +152,7 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
    */
   public GridBuilder newBlockPanel()
   {
-    blockPanel = new DivPanel(gridPanel.newChildId(), DivType.BLOCK);
+    blockPanel = new DivPanel(gridPanel.newChildId(), DivType.BLOCK_LINES);
     gridPanel.add(blockPanel);
     columnsPanel = columnPanel = null;
     current = blockPanel;
