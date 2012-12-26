@@ -87,6 +87,7 @@ public class TemplateCalendarProperties implements Serializable, Comparable<Temp
   public TemplateCalendarProperties setColorCode(final String colorCode)
   {
     this.colorCode = colorCode;
+    updateMillisOfLastChange();
     return this;
   }
 

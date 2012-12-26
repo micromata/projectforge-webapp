@@ -67,23 +67,29 @@ public class TeamCalCalendarFilter extends CalendarFilter
    */
   public String getUsedColor(final Integer calId)
   {
-    String color = DEFAULT_COLOR;
+    String lastCalendarColor = null;
+    String lastColor = DEFAULT_COLOR;
+    long lastCalendarEntry = 0;
     long lastEntry = 0;
     if (calId == null) {
-      return color;
+      return lastCalendarColor;
     }
     // intelligent color choose
     for (final TemplateEntry entry : templateEntries) {
       for (final TemplateCalendarProperties props : entry.getCalendarProperties()) {
         if (calId.equals(props.getCalId()) == true) {
-          if (props.getMillisOfLastChange() > lastEntry) {
-            lastEntry = props.getMillisOfLastChange();
-            color = props.getColorCode();
+          if (props.getMillisOfLastChange() > lastCalendarEntry) {
+            lastCalendarEntry = props.getMillisOfLastChange();
+            lastCalendarColor = props.getColorCode();
           }
+        }
+        if (props.getMillisOfLastChange() > lastEntry) {
+          lastEntry = props.getMillisOfLastChange();
+          lastColor = props.getColorCode();
         }
       }
     }
-    return color;
+    return lastCalendarColor != null ? lastCalendarColor : lastColor;
   }
 
   /**
