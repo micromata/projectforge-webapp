@@ -89,7 +89,7 @@ public class TeamCalCalendarForm extends CalendarForm
         dialog.open(target);
       }
     };
-    calendarButtonPanel.setLight().setDefaultFormProcessing(false);
+    calendarButtonPanel.setDefaultFormProcessing(false);
     fs.add(calendarButtonPanel);
 
     {
@@ -107,7 +107,7 @@ public class TeamCalCalendarForm extends CalendarForm
           setResponsePage(teamEventListPage);
         }
       };
-      searchButtonPanel.setLight().setDefaultFormProcessing(false);
+      searchButtonPanel.setDefaultFormProcessing(false);
       fs.add(searchButtonPanel);
     }
 
