@@ -23,6 +23,8 @@
 
 package org.projectforge.web.wicket.flowlayout;
 
+import org.apache.wicket.markup.html.form.FormComponent;
+
 
 /**
  * Wrapper for using e. g. form components inside RepeatingViews.
@@ -35,4 +37,6 @@ public interface ComponentWrapperPanel
    * @return the markup id of the wrapped component.
    */
   public String getComponentOutputId();
+
+  public FormComponent<?> getFormComponent();
 }
