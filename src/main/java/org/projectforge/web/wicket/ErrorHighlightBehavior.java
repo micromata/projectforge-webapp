@@ -25,37 +25,45 @@ package org.projectforge.web.wicket;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
-import org.apache.wicket.behavior.AbstractBehavior;
+import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.form.FormComponent;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
  * Set class attribute of tag to error or appends " error" if class attribute does already exist.
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class ErrorHighlightBehavior extends AbstractBehavior
+public class ErrorHighlightBehavior extends Behavior
 {
   private static final long serialVersionUID = -7296498608817410487L;
 
   @Override
-  public void onComponentTag(Component component, ComponentTag tag)
+  public void onComponentTag(final Component component, final ComponentTag tag)
   {
-    if (component instanceof FormComponent< ? > == false) {
-      return;
-    }
-    FormComponent< ? > fc = (FormComponent< ? >) component;
-    if (fc instanceof AbstractSelectPanel< ? > == true) {
-      // Do ignore the AbstractSelectPanels, otherwise the icons looks not very pretty on colored background.
-      return;
-    }
-    if (fc.isValid() == false) {
-      String value = tag.getAttribute("class");
-      if (StringUtils.isEmpty(value) == true) {
-        tag.put("class", "error");
-      } else {
-        tag.put("class", value + " error");
+    if (component instanceof FormComponent< ? >) {
+      final FormComponent< ? > fc = (FormComponent< ? >) component;
+      if (fc instanceof AbstractSelectPanel< ? > == true) {
+        // Do ignore the AbstractSelectPanels, otherwise the icons looks not very pretty on colored background.
+        return;
       }
+      if (fc.isValid() == true) {
+        return;
+      }
+    } else if (component.getParent() != null && component.getParent() instanceof FieldsetPanel) {
+      final FieldsetPanel fs = (FieldsetPanel) component.getParent();
+      if (fs.isValid() == true) {
+        return;
+      }
+    } else {
+      return;
+    }
+    final String value = tag.getAttribute("class");
+    if (StringUtils.isEmpty(value) == true) {
+      tag.put("class", "error");
+    } else {
+      tag.put("class", value + " error");
     }
   }
 }

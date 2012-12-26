@@ -24,35 +24,59 @@
 package org.projectforge.web.wicket;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.behavior.AbstractBehavior;
+import org.apache.wicket.behavior.Behavior;
+import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.projectforge.web.HtmlHelper;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
  * Validation message to show as html div element.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class ValidationMsgBehavior extends AbstractBehavior
+public class ValidationMsgBehavior extends Behavior
 {
   private static final long serialVersionUID = 6188770593311749751L;
 
+  /**
+   * @see org.apache.wicket.behavior.Behavior#onComponentTag(org.apache.wicket.Component, org.apache.wicket.markup.ComponentTag)
+   */
   @Override
-  public void onRendered(final Component component)
+  public void onComponentTag(final Component component, final ComponentTag tag)
   {
-    if (component instanceof FormComponent<?> == false) {
-      return;
-    }
-    final FormComponent< ? > fc = (FormComponent< ? >) component;
-    if (fc.isValid() == false) {
-      String error;
-      if (fc.hasFeedbackMessage() == true) {
-        error = fc.getFeedbackMessage().getMessage().toString();
-      } else {
-        error = "Your input is invalid.";
+    if (component instanceof FormComponent< ? >) {
+      final FormComponent< ? > fc = (FormComponent< ? >) component;
+      if (fc.isValid() == false) {
+        String error;
+        if (fc.hasFeedbackMessage() == true) {
+          error = fc.getFeedbackMessage().getMessage().toString();
+        } else {
+          error = component.getString("validation.error.generic");
+        }
+        // TODO: validationMsg muss raus, wenn altes Layout entfernt wurde.
+        fc.getResponse().write("<div class=\"error validationMsg\">" + HtmlHelper.escapeXml(error) + "</div>");
       }
-      // TODO: validationMsg muss raus, wenn altes Layout entfernt wurde.
-      fc.getResponse().write("<div class=\"error validationMsg\">" + HtmlHelper.escapeXml(error) + "</div>");
     }
+    if (component.getParent() != null && component.getParent() instanceof FieldsetPanel) {
+      final FieldsetPanel fsPanel = (FieldsetPanel) component.getParent();
+      if (fsPanel.isValid() == false) {
+        String feedbackMessage;
+        if (fsPanel.hasFormChildsFeedbackMessage() == true) {
+          feedbackMessage = fsPanel.getFormChildsFeedbackMessages(true);
+        } else {
+          feedbackMessage = component.getString("validation.error.generic");
+        }
+        fsPanel.setFeedbackMessage(feedbackMessage);
+      }
+    }
+  }
+
+  /**
+   * @see org.apache.wicket.behavior.Behavior#afterRender(org.apache.wicket.Component)
+   */
+  @Override
+  public void afterRender(final Component component)
+  {
   }
 }

@@ -31,6 +31,7 @@ import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.util.visit.IVisit;
 import org.apache.wicket.util.visit.IVisitor;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
  * Visitor for highlighting form components with validation errors. A border around the error fields with error highlighting and validation
@@ -55,6 +56,18 @@ public class ShinyFormVisitor implements IVisitor<Component, Void>, Serializable
   @Override
   public void component(final Component component, final IVisit<Void> visit)
   {
+    if (component instanceof FieldsetPanel == true) {
+      final FieldsetPanel fsPanel = (FieldsetPanel) component;
+      if (fsPanel.isValid() == false) {
+        if (visited.contains(component) == false) {
+          visited.add(component);
+          fsPanel.getFieldset().add(new ValidationMsgBehavior());
+          fsPanel.getFieldset().add(new ErrorHighlightBehavior());
+        }
+      }
+      visit.dontGoDeeper();
+      return;
+    }
     if (component instanceof FormComponent< ? > == false) {
       return;
     }
@@ -66,12 +79,12 @@ public class ShinyFormVisitor implements IVisitor<Component, Void>, Serializable
         component.add(new ErrorHighlightBehavior());
       }
     }
-    //    if (fc.isValid() == false && hasInvalidParent(fc.getParent()) == false) {
-    //      component.setComponentBorder(new ValidationErrorBorder());
-    //    } else if (component.getComponentBorder() != null) {
-    //      // Clear component border.
-    //      component.setComponentBorder(null);
-    //    }
+    // if (fc.isValid() == false && hasInvalidParent(fc.getParent()) == false) {
+    // component.setComponentBorder(new ValidationErrorBorder());
+    // } else if (component.getComponentBorder() != null) {
+    // // Clear component border.
+    // component.setComponentBorder(null);
+    // }
     visit.dontGoDeeper();
     return;
   }
@@ -81,6 +94,9 @@ public class ShinyFormVisitor implements IVisitor<Component, Void>, Serializable
   {
     if (component == null) {
       return false;
+    }
+    if (component instanceof FieldsetPanel && ((FieldsetPanel) component).isValid() == false) {
+      return true;
     }
     if (component instanceof FormComponent< ? > && ((FormComponent< ? >) component).isValid() == false) {
       return true;
