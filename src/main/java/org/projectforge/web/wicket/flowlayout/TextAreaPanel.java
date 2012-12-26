@@ -24,7 +24,8 @@
 package org.projectforge.web.wicket.flowlayout;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.Component;
+import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.panel.Panel;
 
 /**
@@ -38,9 +39,9 @@ public class TextAreaPanel extends Panel implements ComponentWrapperPanel
 
   private static final long serialVersionUID = -4126462093466172226L;
 
-  private Component field;
+  private TextArea<?> field;
 
-  public TextAreaPanel(final String id, final Component field)
+  public TextAreaPanel(final String id, final TextArea<?> field)
   {
     super(id);
     field.add(AttributeModifier.append("class", "textarea"));
@@ -74,5 +75,14 @@ public class TextAreaPanel extends Panel implements ComponentWrapperPanel
   {
     field.setOutputMarkupId(true);
     return field.getMarkupId();
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel#getFormComponent()
+   */
+  @Override
+  public FormComponent< ? > getFormComponent()
+  {
+    return field;
   }
 }
