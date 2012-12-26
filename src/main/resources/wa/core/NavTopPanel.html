@@ -5,30 +5,30 @@
 
 <body>
   <wicket:panel>
-    <div id="nav_top" class="clearfix round_top">
+    <div id="nav_top" class="dropdown_menu clearfix round_top">
       <ul class="clearfix">
         <!-- add class 'open_multiple' to change to from accordion to toggles -->
-        <li><a href="#"><img src="images/icons/small/white/cog_3.png" class="gear" /></a>
+        <li><a href="#"><img src="images/icons/small/white/cog_3.png" class="gear" /><span> </span></a>
           <ul>
-            <li><a href="#" wicket:id="goMobile"><span class="label"><wicket:message key="menu.mobileMenu" /></span></a></li>
-            <li><a href="wa/layoutSettings" wicket:id="layoutSettingsMenuLink"><span class="label"><wicket:message
+            <li><a href="#" wicket:id="goMobile"><span><wicket:message key="menu.mobileMenu" /></span></a></li>
+            <li><a href="wa/layoutSettings" wicket:id="layoutSettingsMenuLink"><span><wicket:message
                     key="menu.gear.layoutsettings" /></span></a></li>
-            <li><a href="wa/customizeMenu" wicket:id="customizeMenuLink"><span class="label"><wicket:message
+            <li><a href="wa/customizeMenu" wicket:id="customizeMenuLink"><span><wicket:message
                     key="menu.gear.customizeMenu" /></span></a></li>
-            <li><a href="wa/feedback" wicket:id="feedbackLink"><span class="label"><wicket:message key="menu.gear.feedback" /></span></a></li>
-            <li><a href="#" wicket:id="showBookmarkLink"><span class="label"><wicket:message key="menu.gear.showBookmark" /></span></a></li>
+            <li><a href="wa/feedback" wicket:id="feedbackLink"><span><wicket:message key="menu.gear.feedback" /></span></a></li>
+            <li><a href="#" wicket:id="showBookmarkLink"><span><wicket:message key="menu.gear.showBookmark" /></span></a></li>
           </ul></li>
-        <li wicket:id="menuRepeater"><a href="#" wicket:id="link"><span wicket:id="label">[Generic]</span><span class="alert badge alert_red"
+        <li wicket:id="menuRepeater"><a href="#" wicket:id="link"><span wicket:id="label">[Generic]</span><span class="badge badge-important"
             wicket:id="suffix">[5]</span></a>
           <ul wicket:id="subMenu">
-            <li wicket:id="subMenuRepeater"><a href="#" wicket:id="link"><span wicket:id="label" class="label">[Addresses]</span><span
-                class="alert badge alert_red" wicket:id="suffix">[5]</span></a>
+            <li wicket:id="subMenuRepeater"><a href="#" wicket:id="link"><span wicket:id="label">[Addresses]</span><span
+                class="badge badge-important" wicket:id="suffix">[5]</span></a>
               <ul class="drawer" wicket:id="subsubMenu">
                 <li wicket:id="subsubMenuRepeater"><a wicket:id="link"><span wicket:id="label">[label]</span></a></li>
               </ul></li>
           </ul></li>
       </ul>
-      <div wicket:id="alertMessageContainer" class="alert alert_red">
+      <div wicket:id="alertMessageContainer" class="badge badge-important">
         <img height="24" width="24" src="images/icons/small/white/alarm_bell.png"><span wicket:id="alertMessage">This is an Alert!</span>
       </div>
     </div>
@@ -76,7 +76,7 @@
       <li><a href="#"><img src="images/icons/small/grey/blocks_images.png" /><span>Tables</span></a>
         <ul class="">
           <li><a href="tables.html"><span>DataTables</span></a></li>
-          <li><a href="tables_static.html"><span>Regular Tables</span><span class="alert badge alert_black">new</span></a></li>
+          <li><a href="tables_static.html"><span>Regular Tables</span><span class="badge badge-invers">new</span></a></li>
         </ul></li>
       <li><a href="#"><img src="images/icons/small/grey/file_cabinet.png" /><span>Org</span></a>
         <ul class="">
@@ -84,8 +84,8 @@
           <li><a href="contacts.html"><img src="images/icons/small/grey/users.png" /><span>Contacts</span></a></li>
         </ul></li>
       <li><a href="calendar.html"><img src="images/icons/small/grey/month_calendar.png" /><span>Cal</span><span
-          class="alert badge alert_blue">new</span></a></li>
-      <li><a href="charts.html"><img src="images/icons/small/grey/graph.png" /><span>Charts</span><span class="alert badge alert_green">new</span></a></li>
+          class="badge badge-info">new</span></a></li>
+      <li><a href="charts.html"><img src="images/icons/small/grey/graph.png" /><span>Charts</span><span class="badge badge-success">new</span></a></li>
       <li><a href="login.php" class="dialog_button" data-dialog="logout"><img src="images/icons/small/grey/locked_2.png" /></a></li>
     </ul>
     <div class="display_none">

@@ -12,58 +12,53 @@
       </div>
     </div>
     <div class="isolate">
-      <div id="login_box" class="center" style="display: none;">
+      <div id="login_box" class="center">
         <div class="main_container clearfix">
-          <div class="box">
-            <div class="block">
+          <div class="box grid16">
+            <div class="block lines">
               <div class="section">
-                <div class="alert dissmissible alert_light">
-                  <img src="images/logo-top-right.png" style="float: right; right: 10px; top: 0px"> <img width="24" height="24"
-                    src="images/icons/small/grey/locked.png"> <strong><wicket:message key="login.title" /></strong><br />
-                  <wicket:message key="login.welcome" />
-                </div>
-                <div class="alert dissmissible alert_red" wicket:id="administratorLoginNeeded">
+                <img src="images/logo-top-right.png" style="float: right; right: 10px; top: 0px"> <img width="24" height="24"
+                  src="images/icons/small/grey/locked.png"> <strong><wicket:message key="login.title" /></strong><br />
+                <wicket:message key="login.welcome" />
+              </div>
+              <div class="section">
+                <div class="alert alert-block" wicket:id="administratorLoginNeeded">
                   <img height="24" width="24" src="images/icons/small/white/alarm_bell.png">
                   <wicket:message key="login.adminLoginRequired" />
                 </div>
-                <div class="alert dissmissible alert_red" wicket:id="errors">
+                <div class="alert alert-error" wicket:id="errors">
                   <img height="24" width="24" src="images/icons/small/white/alarm_bell.png"> <span wicket:id="msg">[login failed]</span>
                 </div>
-                <div class="alert alert_blue" wicket:id="messageOfTheDay">
+                <div class="alert alert-info" wicket:id="messageOfTheDay">
                   <img height="24" width="24" src="images/icons/small/white/alert_2.png"> <span wicket:id="msg">[Have a lot of fun!]</span>
                 </div>
               </div>
-              <form wicket:id="form" class="validate_form">
-                <fieldset>
-                  <label for="username"><wicket:message key="username" /></label>
-                  <div>
-                    <input type="text" id="username" wicket:id="username" class="text" />
+            </div>
+            <div class="block lines">
+              <form wicket:id="form" class="form-horizontal">
+                <div class="alert alert-error" wicket:id="feedback">
+                  <img height="24" width="24" src="images/icons/small/white/alarm_bell.png">
+                </div>
+                <div class="section">
+                  <wicket:container wicket:id="username">
+                  [Username]
+                  </wicket:container>
+                  <wicket:container wicket:id="password">
+                  [Password]
+                  </wicket:container>
+                  <wicket:container wicket:id="stayLoggedIn">
+                  [stay logged in: yes|no]
+                  </wicket:container>
+                  <div class="controls" style="margin-left: 18px; margin-top: 10px;">
+                    <wicket:container wicket:id="loginButton">[login button]</wicket:container>
                   </div>
-                </fieldset>
-                <fieldset>
-                  <label for="password"><wicket:message key="password" /></label>
-                  <div>
-                    <input type="password" id="password" wicket:id="password" class="text" />
-                  </div>
-                </fieldset>
-                <fieldset>
-                  <label for="stayLoggedIn"><wicket:message key="login.stayLoggedIn" /><span><img style="vertical-align: middle;"
-                      wicket:message="title:login.stayLoggedIn.tooltip" src="images/icons/small/grey/help.png" /></span></label>
-                  <wicket:container wicket:id="stayLoggedIn" />
-                </fieldset>
-                <div class="button_cell clearfix pf_loginButton">
-                  <wicket:container wicket:id="loginButton">[login button]</wicket:container>
                 </div>
               </form>
             </div>
           </div>
         </div>
-        <div class="main_container clearfix" style="display: none;"></div>
       </div>
     </div>
-    <script type="text/javascript">
-					$(".validate_form").validate();
-				</script>
   </wicket:extend>
 </body>
 </html>

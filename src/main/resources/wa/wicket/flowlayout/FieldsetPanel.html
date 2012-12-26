@@ -6,12 +6,14 @@
 <body>
   <h1>Represents a fieldset in a form.</h1>
   <wicket:panel>
-    <fieldset wicket:id="fieldset">
-      <label wicket:id="label"><span wicket:id="labeltext">[field name]</span> <wicket:container wicket:id="labelSuffix">[suffix]</wicket:container><span><span
-          wicket:id="labeldescription">[description]</span>
-        <wicket:container wicket:id="descriptionSuffix">[suffix]</wicket:container></span></label>
-      <div wicket:id="div"><wicket:container wicket:id="fields">[field(s)]</wicket:container></div>
-    </fieldset>
+    <div wicket:id="fieldset">
+      <label wicket:id="label" class="control-label"><span wicket:id="labeltext">[field name]</span> <wicket:container wicket:id="labelSuffix">[suffix]</wicket:container><span
+          wicket:id="labeldescription" class="help-inline">[description]</span> <wicket:container wicket:id="descriptionSuffix">[suffix]</wicket:container></label>
+      <div wicket:id="div" class="controls">
+        <wicket:container wicket:id="fields">[field(s)]</wicket:container>
+        <span wicket:id="feedbackMessage" class="help-inline">[Feedback message]</span>
+      </div>
+    </div>
   </wicket:panel>
 </body>
 </html>
