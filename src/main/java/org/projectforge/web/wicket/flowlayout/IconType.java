@@ -29,12 +29,12 @@ package org.projectforge.web.wicket.flowlayout;
  */
 public enum IconType
 {
-  ALERT("alert"), REFRESH("refresh"), CIRCLE_MINUS("circle-minus"), CIRCLE_ARROW_EAST("circle-arrow-e"), CIRCLE_ARROW_WEST(
-      "circle-arrow-w"), CIRCLE_CLOSE("circle-close"), CIRCLE_PLUS("circle-plus"), CLIPBOARD("clipboard"), CLOCK("clock"), DOCUMENT(
-          "document"), FOLDER_OPEN("folder-open"), HELP("help"), JIRA_SUPPORT("star"), KEYBOARD("calculator"), MINUS_THICK("minusthick"), MODIFIED(
-              "alert"), PLUS_THICK("plusthick"), SEARCH("search"), //
+  ALERT("question-sign"), REFRESH("refresh"), CIRCLE_MINUS("question-sign"), CIRCLE_ARROW_EAST("question-sign"), CIRCLE_ARROW_WEST(
+      "question-sign"), CIRCLE_CLOSE("question-sign"), CIRCLE_PLUS("question-sign"), CLIPBOARD("question-sign"), CLOCK("question-sign"), DOCUMENT(
+          "question-sign"), DOWNLOAD("download"), FOLDER_OPEN("folder-open"), HELP("info-sign"), JIRA_SUPPORT("star"), KEYBOARD("question-sign"), MINUS_THICK(
+              "question-sign"), MODIFIED("question-sign"), PLUS_THICK("question-sign"), SEARCH("search"), //
               /** RSS feed symbol. */
-              SUBSCRIPTION("signal-diag"), TRASH("trash"), CALENDAR("calendar"), WRENCH("wrench");
+              SUBSCRIPTION("question-sign"), TRASH("trash"), CALENDAR("calendar"), WRENCH("wrench");
 
   private String cssIdentifier;
 

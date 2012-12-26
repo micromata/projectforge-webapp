@@ -43,7 +43,6 @@ import org.projectforge.web.calendar.CalendarForm;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
-import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 
@@ -68,15 +67,16 @@ public class TeamCalCalendarForm extends CalendarForm
   }
 
   /**
-   * @see org.projectforge.web.calendar.CalendarForm#addControlButtons(org.projectforge.web.wicket.flowlayout.FieldsetPanel)
+   * @see org.projectforge.web.calendar.CalendarForm#init()
    */
   @SuppressWarnings("serial")
   @Override
-  protected void addControlButtons(final FieldsetPanel fs)
+  protected void init()
   {
-    final TeamCalDialog dialog = new TeamCalDialog(fs.newChildId(), new ResourceModel("plugins.teamcal.title.list"), filter);
-    fs.add(dialog);
-    final IconButtonPanel calendarButtonPanel = new AjaxIconButtonPanel(fs.newChildId(), IconType.CALENDAR,
+    super.init();
+    final TeamCalDialog dialog = new TeamCalDialog(fieldset.newChildId(), new ResourceModel("plugins.teamcal.title.list"), filter);
+    fieldset.add(dialog);
+    final IconButtonPanel calendarButtonPanel = new AjaxIconButtonPanel(buttonGroupPanel.newChildId(), IconType.CALENDAR,
         getString("plugins.teamcal.calendar.edit")) {
       private static final long serialVersionUID = -8572571785540159369L;
 
@@ -90,10 +90,10 @@ public class TeamCalCalendarForm extends CalendarForm
       }
     };
     calendarButtonPanel.setDefaultFormProcessing(false);
-    fs.add(calendarButtonPanel);
+    buttonGroupPanel.addButton(calendarButtonPanel);
 
     {
-      final IconButtonPanel searchButtonPanel = new IconButtonPanel(fs.newChildId(), IconType.SEARCH,
+      final IconButtonPanel searchButtonPanel = new IconButtonPanel(buttonGroupPanel.newChildId(), IconType.SEARCH,
           getString("search")) {
         /**
          * @see org.projectforge.web.wicket.flowlayout.IconButtonPanel#onSubmit()
@@ -108,7 +108,7 @@ public class TeamCalCalendarForm extends CalendarForm
         }
       };
       searchButtonPanel.setDefaultFormProcessing(false);
-      fs.add(searchButtonPanel);
+      buttonGroupPanel.addButton(searchButtonPanel);
     }
 
     if (filter.getActiveTemplateEntry() != null) {
@@ -132,8 +132,8 @@ public class TeamCalCalendarForm extends CalendarForm
           "templateEntries");
       final IModel<TemplateEntry> activeModel = new PropertyModel<TemplateEntry>(filter, "activeTemplateEntry");
       final DropDownChoicePanel<TemplateEntry> templateChoice = new DropDownChoicePanel<TemplateEntry>(
-          fs.newChildId(), activeModel, choicesModel, templateEntriesRenderer, false);
-      fs.add(templateChoice);
+          fieldset.newChildId(), activeModel, choicesModel, templateEntriesRenderer, false);
+      fieldset.add(templateChoice);
       templateChoice.getDropDownChoice().setOutputMarkupId(true);
 
       templateChoice.getDropDownChoice().add(new AjaxFormComponentUpdatingBehavior("onChange") {
@@ -149,7 +149,7 @@ public class TeamCalCalendarForm extends CalendarForm
           setResponsePage(getParentPage().getClass());
         }
       });
-      fs.add(new DropIcsPanel(fs.newChildId()) {
+      fieldset.add(new DropIcsPanel(fieldset.newChildId()) {
 
         @Override
         protected void onIcsImport(final AjaxRequestTarget target, final Calendar calendar)

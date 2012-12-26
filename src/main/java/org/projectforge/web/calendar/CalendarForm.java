@@ -43,6 +43,7 @@ import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.DateTimePanel;
 import org.projectforge.web.wicket.components.JodaDatePanel;
+import org.projectforge.web.wicket.flowlayout.ButtonGroupPanel;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 import org.projectforge.web.wicket.flowlayout.ComponentSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
@@ -78,6 +79,10 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
 
   private Label durationLabel;
 
+  protected ButtonGroupPanel buttonGroupPanel;
+
+  protected FieldsetPanel fieldset;
+
   @SuppressWarnings("serial")
   @Override
   protected void init()
@@ -90,17 +95,17 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     gridBuilder.newGrid16();
     gridBuilder.getPanel().addCssClasses(DivType.MARGIN_TOP_10); // Add additional margin at the top.
     gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_75);
-    FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
+    fieldset = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
     if (isOtherUsersAllowed() == true) {
-      final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(this, "timesheetsUser"),
+      final UserSelectPanel userSelectPanel = new UserSelectPanel(fieldset.newChildId(), new PropertyModel<PFUserDO>(this, "timesheetsUser"),
           parentPage, "userId");
-      fs.add(userSelectPanel);
+      fieldset.add(userSelectPanel);
       userSelectPanel.init().withAutoSubmit(true).setLabel(new Model<String>(getString("user")));
     }
-    currentDatePanel = new JodaDatePanel(fs.newChildId(), new PropertyModel<DateMidnight>(filter, "startDate")).setAutosubmit(true);
+    currentDatePanel = new JodaDatePanel(fieldset.newChildId(), new PropertyModel<DateMidnight>(filter, "startDate")).setAutosubmit(true);
     currentDatePanel.getDateField().setOutputMarkupId(true);
-    fs.add(currentDatePanel);
-    final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+    fieldset.add(currentDatePanel);
+    final DivPanel checkBoxPanel = fieldset.addNewCheckBoxDiv();
     if (accessChecker.isRestrictedUser(getUser()) == false) {
       if (isOtherUsersAllowed() == false) {
         showTimesheets = getFilter().getUserId() != null;
@@ -133,7 +138,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     }
     checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "slot30"),
         getString("calendar.option.slot30"), true).setTooltip(getString("calendar.option.slot30.tooltip")));
-    final DropDownChoice<Integer> firstHourDropDownChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(),
+    final DropDownChoice<Integer> firstHourDropDownChoice = new DropDownChoice<Integer>(fieldset.getDropDownChoiceId(),
         new PropertyModel<Integer>(filter, "firstHour"), DateTimePanel.getHourOfDayRenderer().getValues(),
         DateTimePanel.getHourOfDayRenderer()) {
       /**
@@ -149,9 +154,11 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     firstHourDropDownChoice.setRequired(true);
     WicketUtils.setSize(firstHourDropDownChoice, ComponentSize.MINI);
     WicketUtils.addTooltip(firstHourDropDownChoice, getString("calendar.option.firstHour.tooltip"));
-    fs.add(firstHourDropDownChoice);
+    fieldset.add(firstHourDropDownChoice);
+    buttonGroupPanel = new ButtonGroupPanel(fieldset.newChildId());
+    fieldset.add(buttonGroupPanel);
     {
-      final IconButtonPanel refreshButtonPanel = new IconButtonPanel(fs.newChildId(), IconType.REFRESH, getString("refresh")) {
+      final IconButtonPanel refreshButtonPanel = new IconButtonPanel(buttonGroupPanel.newChildId(), IconType.REFRESH, getString("refresh")) {
         /**
          * @see org.projectforge.web.wicket.flowlayout.IconButtonPanel#onSubmit()
          */
@@ -161,10 +168,9 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
           setResponsePage(getPage().getClass(), getPage().getPageParameters());
         }
       };
-      fs.add(refreshButtonPanel);
+      buttonGroupPanel.addButton(refreshButtonPanel);
       setDefaultButton(refreshButtonPanel.getButton());
     }
-    addControlButtons(fs);
     if (accessChecker.isRestrictedUser() == false && WebConfiguration.isDevelopmentMode() == true) {
       final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, new Model<String>() {
         @Override
@@ -181,13 +187,13 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
           return getTimesheetsUser() != null;
         };
       };
-      final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(fs.newChildId(), IconType.SUBSCRIPTION,
+      final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(buttonGroupPanel.newChildId(), IconType.DOWNLOAD,
           getString(setIcsImportButtonTooltip()), iCalExportLink);
 
-      fs.add(exportICalButtonPanel);
+      buttonGroupPanel.addButton(exportICalButtonPanel);
     }
     gridBuilder.newColumnPanel(DivType.COL_25);
-    fs = gridBuilder.newFieldset(getString("timesheet.duration")).setNoLabelFor();
+    final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.duration")).setNoLabelFor();
     final DivTextPanel durationPanel = new DivTextPanel(fs.newChildId(), new Label(DivTextPanel.WICKET_ID, new Model<String>() {
       @Override
       public String getObject()
