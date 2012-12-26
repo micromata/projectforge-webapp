@@ -43,7 +43,7 @@ public class WicketUtilsTest
     assertEquals("", WicketUtils.createTooltip(null, null));
     assertEquals("", WicketUtils.createTooltip("  ", null));
     assertEquals("The title", WicketUtils.createTooltip("The title", null));
-    assertEquals(" - The text", WicketUtils.createTooltip("", "The text"));
+    assertEquals("The text", WicketUtils.createTooltip("", "The text"));
     assertEquals("The title - The text", WicketUtils.createTooltip("The title", "The text"));
   }
 
