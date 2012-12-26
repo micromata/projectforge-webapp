@@ -61,6 +61,7 @@ import org.projectforge.web.common.ColorPickerPanel;
 import org.projectforge.web.dialog.PFDialog;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel;
+import org.projectforge.web.wicket.flowlayout.ButtonGroupPanel;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
 import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
@@ -339,8 +340,10 @@ public class TeamCalDialog extends PFDialog
         }
       });
 
+      final ButtonGroupPanel buttonGroup = new ButtonGroupPanel("buttonGroup");
+      add(buttonGroup);
       // ADD BUTTON FOR Template
-      final IconButtonPanel addTemplateButton = new AjaxIconButtonPanel("addTemplate", IconType.PLUS_THICK, getString("add")) {
+      final IconButtonPanel addTemplateButton = new AjaxIconButtonPanel(buttonGroup.newChildId(), IconType.PLUS, getString("add")) {
         private static final long serialVersionUID = -8572571785540159369L;
 
         /**
@@ -368,11 +371,10 @@ public class TeamCalDialog extends PFDialog
         }
       };
       addTemplateButton.setDefaultFormProcessing(false);
-      addTemplateButton.setLight();
-      add(addTemplateButton);
+      buttonGroup.addButton(addTemplateButton);
 
       // EDIT BUTTON
-      final IconButtonPanel editTemplateButton = new AjaxIconButtonPanel("editTemplate", IconType.WRENCH, getString("edit")) {
+      final IconButtonPanel editTemplateButton = new AjaxIconButtonPanel(buttonGroup.newChildId(), IconType.EDIT, getString("edit")) {
         private static final long serialVersionUID = -8572571785540159369L;
 
         /**
@@ -401,12 +403,11 @@ public class TeamCalDialog extends PFDialog
         }
       };
       editTemplateButton.setDefaultFormProcessing(false);
-      editTemplateButton.setLight();
-      add(editTemplateButton);
+      buttonGroup.addButton(editTemplateButton);
 
       //
       // DELETE BUTTON
-      final IconButtonPanel deleteTemplateButton = new AjaxIconButtonPanel("deleteTemplate", IconType.TRASH, getString("delete")) {
+      final IconButtonPanel deleteTemplateButton = new AjaxIconButtonPanel(buttonGroup.newChildId(), IconType.TRASH, getString("delete")) {
         private static final long serialVersionUID = -8572571785540159369L;
 
         /**
@@ -422,8 +423,7 @@ public class TeamCalDialog extends PFDialog
         }
       };
       deleteTemplateButton.setDefaultFormProcessing(false);
-      deleteTemplateButton.setLight();
-      add(deleteTemplateButton);
+      buttonGroup.addButton(deleteTemplateButton);
 
       // hide if no templates available
       editTemplateButton.setVisible(filter.getTemplateEntries().isEmpty() == false);

@@ -84,7 +84,7 @@ public class IconButtonPanel extends Panel
    */
   public IconButtonPanel setLight()
   {
-    button.add(AttributeModifier.append("class", "icon-white"));
+    icon.add(AttributeModifier.append("class", "icon-white"));
     return this;
   }
 
