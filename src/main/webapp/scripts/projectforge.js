@@ -43,15 +43,10 @@ function preventBubble(e) {
 	}
 	return false;
 }
-function initTooltips() {
-	// Enable all title attributes as tooltip:
-	$(':*[title]').tooltip({
-		track : true,
-		delay : 0,
-		fade : 250,
-		showURL : false,
-		showBody : " - "
-	});
+function initializeComponents() {
+	// Enable tool-tips, button sets etc.
+	$('[title]').tooltip({'data-placement':"right"});
+	$("div.radio-jquery-ui").buttonset();
 }
 function showBookmark() {
 	$("#bookmark").toggle("normal");
