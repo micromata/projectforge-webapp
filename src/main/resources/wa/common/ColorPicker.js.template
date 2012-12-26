@@ -1,12 +1,9 @@
 $(function() {
-	$('#${markupId}').ColorPicker({
-		onSubmit: function(hsb, hex, rgb, el) {
-			$(el).val(hex);
-			$(el).change();
-			$(el).ColorPickerHide();
-		},
-		onBeforeShow: function () {
-			$(this).ColorPickerSetColor(this.value);
-		}
-	});
+	$("#${markupId}").spectrum({
+    showPalette: true,
+    palette: [
+        ['black', 'white', 'blanchedalmond'],
+        ['rgb(255, 128, 0);', 'hsv 100 70 50', 'lightyellow']
+    ]
+});
 });

@@ -23,15 +23,12 @@
 
 package org.projectforge.web.common;
 
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
-import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.template.JavaScriptTemplate;
@@ -72,23 +69,6 @@ public class ColorPickerPanel extends Panel
   protected void onInitialize()
   {
     super.onInitialize();
-    final WebMarkupContainer preview = new WebMarkupContainer("preview") {
-      private static final long serialVersionUID = 1L;
-
-      /**
-       * @see org.apache.wicket.Component#onBeforeRender()
-       */
-      @Override
-      protected void onBeforeRender()
-      {
-        super.onBeforeRender();
-        // update color please
-        add(new AttributeModifier("style", Model.of("background-color: " + selectedColor)));
-      }
-    };
-    preview.setOutputMarkupId(true);
-    add(preview);
-
     final Form<Void> colorForm = new Form<Void>("colorForm");
     add(colorForm);
     final TextField<String> colorField = new TextField<String>("color", new PropertyModel<String>(this, "selectedColor"));
@@ -102,7 +82,6 @@ public class ColorPickerPanel extends Panel
       protected void onUpdate(final AjaxRequestTarget target)
       {
         onColorUpdate(selectedColor);
-        target.add(preview);
       }
     });
     colorForm.add(colorField);
