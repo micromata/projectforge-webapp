@@ -58,7 +58,7 @@ public class NavSidePanel extends NavAbstractPanel
         // Now we add a new menu area (title with sub menus):
         final WebMarkupContainer menuContainer = new WebMarkupContainer(menuRepeater.newChildId());
         menuRepeater.add(menuContainer);
-        menuContainer.add(new Label("label", getString(menuEntry.getI18nKey())).setRenderBodyOnly(true));
+        menuContainer.add(new Label("label", getString(menuEntry.getI18nKey())));
         final Label areaSuffixLabel = getSuffixLabel(menuEntry);
         menuContainer.add(areaSuffixLabel);
 

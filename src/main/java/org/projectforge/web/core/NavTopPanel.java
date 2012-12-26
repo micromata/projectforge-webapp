@@ -151,7 +151,6 @@ public class NavTopPanel extends NavAbstractPanel
           subMenuContainer.setVisible(false);
           continue;
         }
-
         final RepeatingView subMenuRepeater = new RepeatingView("subMenuRepeater");
         subMenuContainer.add(subMenuRepeater);
         for (final MenuEntry subMenuEntry : menuEntry.getSubMenuEntries()) {
