@@ -1,9 +1,16 @@
 $(function() {
 	$("#${markupId}").spectrum({
     showPalette: true,
+    showInput: true,
+    showInitial: true,
+    showButtons: false,
+    preferredFormat: "hex",
     palette: [
-        ['black', 'white', 'blanchedalmond'],
-        ['rgb(255, 128, 0);', 'hsv 100 70 50', 'lightyellow']
+        ['white', 'grey', 'black'],
+        ['yellow', 'orange', 'red'],
+        ['lightblue', 'blue', 'darkblue'],
+        ['lightgreen', 'green', 'darkgreen'],
+        ['brown', 'gold', 'magenta']
     ]
 });
 });
