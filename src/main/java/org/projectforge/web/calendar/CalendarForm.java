@@ -26,7 +26,6 @@ package org.projectforge.web.calendar;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.link.ExternalLink;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -41,6 +40,8 @@ import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.bootstrap.GridPanel;
+import org.projectforge.web.wicket.bootstrap.GridType;
 import org.projectforge.web.wicket.components.DateTimePanel;
 import org.projectforge.web.wicket.components.JodaDatePanel;
 import org.projectforge.web.wicket.flowlayout.ButtonGroupPanel;
@@ -48,7 +49,6 @@ import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 import org.projectforge.web.wicket.flowlayout.ComponentSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.GridBuilder;
 import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
@@ -89,22 +89,20 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
   {
     super.init();
     addFeedbackPanel();
-    final RepeatingView repeater = new RepeatingView("flowform");
-    add(repeater);
-    gridBuilder = newGridBuilder(repeater);
-    gridBuilder.newGrid16();
-    gridBuilder.getPanel().addCssClasses(DivType.MARGIN_TOP_10); // Add additional margin at the top.
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_75);
-    fieldset = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
+    final GridPanel grid = new GridPanel("grid", GridType.ROW_FLUID);
+    add(grid);
+    GridPanel panel = grid.add(GridType.SPAN8);
+    fieldset = new FieldsetPanel(panel, getString("label.options"), true);
     if (isOtherUsersAllowed() == true) {
-      final UserSelectPanel userSelectPanel = new UserSelectPanel(fieldset.newChildId(), new PropertyModel<PFUserDO>(this, "timesheetsUser"),
-          parentPage, "userId");
+      final UserSelectPanel userSelectPanel = new UserSelectPanel(fieldset.newChildId(),
+          new PropertyModel<PFUserDO>(this, "timesheetsUser"), parentPage, "userId");
       fieldset.add(userSelectPanel);
       userSelectPanel.init().withAutoSubmit(true).setLabel(new Model<String>(getString("user")));
     }
     currentDatePanel = new JodaDatePanel(fieldset.newChildId(), new PropertyModel<DateMidnight>(filter, "startDate")).setAutosubmit(true);
     currentDatePanel.getDateField().setOutputMarkupId(true);
     fieldset.add(currentDatePanel);
+
     final DivPanel checkBoxPanel = fieldset.addNewCheckBoxDiv();
     if (accessChecker.isRestrictedUser(getUser()) == false) {
       if (isOtherUsersAllowed() == false) {
@@ -138,6 +136,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     }
     checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "slot30"),
         getString("calendar.option.slot30"), true).setTooltip(getString("calendar.option.slot30.tooltip")));
+
     final DropDownChoice<Integer> firstHourDropDownChoice = new DropDownChoice<Integer>(fieldset.getDropDownChoiceId(),
         new PropertyModel<Integer>(filter, "firstHour"), DateTimePanel.getHourOfDayRenderer().getValues(),
         DateTimePanel.getHourOfDayRenderer()) {
@@ -192,8 +191,8 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
 
       buttonGroupPanel.addButton(exportICalButtonPanel);
     }
-    gridBuilder.newColumnPanel(DivType.COL_25);
-    final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.duration")).setNoLabelFor();
+    panel = grid.add(GridType.SPAN4);
+    final FieldsetPanel fs = new FieldsetPanel(panel, getString("timesheet.duration"), true);
     final DivTextPanel durationPanel = new DivTextPanel(fs.newChildId(), new Label(DivTextPanel.WICKET_ID, new Model<String>() {
       @Override
       public String getObject()

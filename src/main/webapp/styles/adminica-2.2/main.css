@@ -418,3 +418,10 @@ li.has_drawer.open > a {
   display: block;
   width: 100%;
 }
+/*--------------------------------
+        Utilities
+--------------------------------*/
+.display_none {
+  display: none !important;
+}
+

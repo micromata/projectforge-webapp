@@ -13,7 +13,8 @@ body #sidebar {
 }
 
 #nav_top {
-	margin: -57px 160px 10px 30px;
+	margin-left: 45px;
+	margin-top: -30px;
 }
 
 #nav_top>ul>li>ul,#nav_top ul li ul.dropdown {

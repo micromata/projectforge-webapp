@@ -34,6 +34,7 @@ import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.bootstrap.GridPanel;
 import org.projectforge.web.wicket.components.JiraIssuesPanel;
 
 /**
@@ -138,6 +139,19 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
   }
 
   /**
+   * Adds this FieldsetPanel to the parent panel.
+   * @param parent
+   * @param label
+   * @param description Description below or beside the label of the field-set.
+   * @param multipleChildren If true then multiple children are expected an organized in a RepeatingView.
+   */
+  public FieldsetPanel(final GridPanel parent, final String labelText, final boolean multipleChildren)
+  {
+    this(parent.newChildId(), labelText, multipleChildren);
+    parent.add(this);
+  }
+
+  /**
    */
   public FieldsetPanel(final String id, final String labeltext)
   {
@@ -176,6 +190,9 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
       label.add(WicketUtils.getInvisibleComponent("labeldescription"));
     }
     fieldset.add(div = new WebMarkupContainer("div"));
+    if (multipleChildren == true) {
+      div.add(AttributeModifier.append("class", "controls-row"));
+    }
     div.add(feedbackMessageLabel = new Label("feedbackMessage", new Model<String>() {
       /**
        * @see org.apache.wicket.model.Model#getObject()
@@ -234,7 +251,7 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
    */
   public FieldsetPanel setNowrap()
   {
-    //fieldDiv.add(AttributeModifier.append("style", "white-space: nowrap;"));
+    // fieldDiv.add(AttributeModifier.append("style", "white-space: nowrap;"));
     return this;
   }
 
@@ -408,8 +425,8 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
   {
     if (multipleChildren == true) {
       if (repeater == null) {
-        //fieldDiv = div;//new DivPanel(FIELDS_ID, DivType.FIELD_DIV);
-        //div.add(fieldDiv);
+        // fieldDiv = div;//new DivPanel(FIELDS_ID, DivType.FIELD_DIV);
+        // div.add(fieldDiv);
         repeater = new RepeatingView(FIELDS_ID);
         div.add(repeater);
       }

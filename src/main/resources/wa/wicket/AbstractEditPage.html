@@ -11,56 +11,50 @@
 					}
 				</script>
 
-    <div class="box tabs">
-      <ul class="tab_header clearfix">
-        <li><a href="#editform"><span wicket:id="tabTitle">[Edit item]</span></a></li>
-        <li><a href="#history"><wicket:message key="label.historyOfChanges" /></a></li>
+    <div class="tabbable">
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#editform" data-toggle="tab"><span wicket:id="tabTitle">[Edit item]</span></a></li>
+        <li><a href="#history" data-toggle="tab"><wicket:message key="label.historyOfChanges" /></a></li>
       </ul>
+    </div>
+    <div class="tab-content">
+      <div id="editform" class="tab-pane active">
+        <form wicket:id="form" class="form-horizontal">
+          <div class="alert alert_red feedback" wicket:id="feedback"></div>
 
-      <div class="toggle_container">
-        <div id="editform" class="section">
-          <form wicket:id="form" class="form-horizontal">
-            <div class="alert alert_red feedback" wicket:id="feedback"></div>
-
-            <wicket:container wicket:id="flowform">[the form fields]</wicket:container>
-            <wicket:child />
-            <div class="button_cell clearfix">
-              <wicket:container wicket:id="buttons">[action buttons]</wicket:container>
-            </div>
-          </form>
-
-        </div>
+          <wicket:container wicket:id="flowform">[the form fields]</wicket:container>
+          <wicket:child />
+          <div class="button_cell clearfix">
+            <wicket:container wicket:id="buttons">[action buttons]</wicket:container>
+          </div>
+        </form>
       </div>
-      <div class="toggle_container">
-        <div id="history" class="section">
-          <div class="box grid_16 round_all">
-            <div class="block">
-              <div class="col_50">
-                <fieldset>
-                  <label><wicket:message key="timeOfLastUpdate" /></label>
-                  <div>
-                    <wicket:container wicket:id="timeOfLastUpdate">[08.10.2009 13:27:02]</wicket:container>
-                  </div>
-                </fieldset>
+      <div id="history" class="tab-pane">
+        <div class="row-fluid">
+          <div class="span6">
+            <fieldset>
+              <label><wicket:message key="timeOfLastUpdate" /></label>
+              <div>
+                <wicket:container wicket:id="timeOfLastUpdate">[08.10.2009 13:27:02]</wicket:container>
               </div>
-              <div class="col_50">
-                <fieldset>
-                  <label><wicket:message key="timeOfCreation" /></label>
-                  <div>
-                    <wicket:container wicket:id="timeOfCreation">[08.10.2009 13:27:02]</wicket:container>
-                  </div>
-                </fieldset>
+            </fieldset>
+          </div>
+          <div class="span6">
+            <fieldset>
+              <label><wicket:message key="timeOfCreation" /></label>
+              <div>
+                <wicket:container wicket:id="timeOfCreation">[08.10.2009 13:27:02]</wicket:container>
               </div>
-            </div>
-            <table class="dataview" wicket:id="historyTable">
-              <tr>
-                <td>[history table]</td>
-              </tr>
-            </table>
-
-            <!-- history END -->
+            </fieldset>
           </div>
         </div>
+        <table class="dataview" wicket:id="historyTable">
+          <tr>
+            <td>[history table]</td>
+          </tr>
+        </table>
+
+        <!-- history END -->
       </div>
     </div>
   </wicket:extend>
