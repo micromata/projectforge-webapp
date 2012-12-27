@@ -44,9 +44,9 @@ public class GroupListForm extends AbstractListForm<GroupFilter, GroupListPage>
   protected void init()
   {
     super.init();
-    gridBuilder.newColumnsPanel();
+    gridBuilder.newNestedRowPanel();
     {
-      gridBuilder.newColumnPanel(DivType.COL_60);
+      gridBuilder.newNestedPanel(DivType.COL_60);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
       if (Login.getInstance().hasExternalUsermanagementSystem() == true) {
         {
@@ -66,7 +66,7 @@ public class GroupListForm extends AbstractListForm<GroupFilter, GroupListPage>
     }
     {
       // DropDownChoice page size
-      gridBuilder.newColumnPanel(DivType.COL_40);
+      gridBuilder.newNestedPanel(DivType.COL_40);
       addPageSizeFieldset();
     }
   }

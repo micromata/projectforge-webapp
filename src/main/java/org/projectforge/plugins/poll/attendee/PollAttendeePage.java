@@ -102,7 +102,7 @@ public class PollAttendeePage extends PollBasePage
   {
     super.onInitialize();
 
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid6();
 
     // remove users, which already exist in preset groups.
     // filteredSelectUserList = getFilteredUserList(presetGroups.toArray(new Integer[presetGroups.size()]));

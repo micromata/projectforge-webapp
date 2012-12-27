@@ -74,7 +74,7 @@ public class TimesheetMassUpdateForm extends AbstractMassEditForm<TimesheetDO, T
   {
     super.init();
     timesheetPageSupport = new TimesheetPageSupport(parentPage, gridBuilder, timesheetDao, data);
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task"), true);
       final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(data, "task"), parentPage,

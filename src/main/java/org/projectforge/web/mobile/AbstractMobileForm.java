@@ -26,8 +26,8 @@ package org.projectforge.web.mobile;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.projectforge.web.wicket.MySession;
+import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.GridBuilder;
 import org.projectforge.web.wicket.mobileflowlayout.MobileGridBuilder;
 
 public abstract class AbstractMobileForm<F, P extends AbstractMobilePage> extends Form<F>

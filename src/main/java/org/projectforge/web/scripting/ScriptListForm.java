@@ -41,16 +41,16 @@ public class ScriptListForm extends AbstractListForm<BaseSearchFilter, ScriptLis
   protected void init()
   {
     super.init();
-    gridBuilder.newColumnsPanel();
+    gridBuilder.newNestedRowPanel();
     {
-      gridBuilder.newColumnPanel(DivType.COL_60);
+      gridBuilder.newNestedPanel(DivType.COL_60);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
       checkBoxPanel.add(createOnlyDeletedCheckBoxPanel(checkBoxPanel.newChildId()));
     }
     {
       // DropDownChoice page size
-      gridBuilder.newColumnPanel(DivType.COL_40);
+      gridBuilder.newNestedPanel(DivType.COL_40);
       addPageSizeFieldset();
     }
   }

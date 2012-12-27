@@ -131,8 +131,8 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
   {
     super.init();
     /* GRID8 - BLOCK */
-    gridBuilder.newGrid16();
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newGrid12();
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // Number
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.nummer"), true);
@@ -144,7 +144,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         fs.addHelpIcon(getString("fibu.tooltip.nummerWirdAutomatischVergeben"));
       }
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // Net sum
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.nettoSumme"));
@@ -167,13 +167,13 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       subject.add(WicketUtils.setFocus());
       fs.add(subject);
     }
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // reference
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.reference"));
       fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "referenz")));
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // DropDownChoice status
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("status"));
@@ -202,7 +202,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       kundeSelectPanel.init();
       fs.addHelpIcon(getString("fibu.auftrag.hint.kannVonProjektKundenAbweichen"));
     }
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // date
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.datum"));
@@ -211,7 +211,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       angebotsDatumPanel.setRequired(true);
       fs.add(angebotsDatumPanel);
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // Bindungsfrist
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.bindungsFrist"));
@@ -219,7 +219,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
           .get().withTargetType(java.sql.Date.class));
       fs.add(bindungsFristPanel);
     }
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // contact person
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("contactPerson"));
@@ -229,7 +229,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       fs.add(contactPersonSelectPanel);
       contactPersonSelectPanel.init();
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // Beauftragungsdatum
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.beauftragungsdatum"));
@@ -237,21 +237,20 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
           DatePanelSettings.get().withTargetType(java.sql.Date.class));
       fs.add(beauftragungsDatumPanel);
     }
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // comment
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));
       fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "bemerkung"))).setAutogrow();
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // status comment
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.statusBeschreibung"));
       fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "statusBeschreibung"))).setAutogrow();
     }
-    positionsRepeater = new RepeatingView(flowform.newChildId());
-    flowform.add(positionsRepeater);
-    gridBuilder.newGrid16();
+    positionsRepeater = gridBuilder.newRepeatingView();
+    gridBuilder.newGrid12();
     {
       // email
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("email"), true);
@@ -278,7 +277,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
     DivPanel content = null, columns, column;
     for (final AuftragsPositionDO position : data.getPositionen()) {
       final boolean abgeschlossenUndNichtFakturiert = position.isAbgeschlossenUndNichtVollstaendigFakturiert();
-      final ToggleContainerPanel positionsPanel = new ToggleContainerPanel(positionsRepeater.newChildId(), DivType.GRID16,
+      final ToggleContainerPanel positionsPanel = new ToggleContainerPanel(positionsRepeater.newChildId(), DivType.GRID12,
           DivType.ROUND_ALL) {
         /**
          * @see org.projectforge.web.wicket.flowlayout.ToggleContainerPanel#wantsOnStatusChangedNotification()

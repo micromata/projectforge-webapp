@@ -61,9 +61,9 @@ public class HRListForm extends AbstractListForm<HRFilter, HRListPage>
   {
     final HRFilter filter = getSearchFilter();
     super.init();
-    gridBuilder.newColumnsPanel();
+    gridBuilder.newNestedRowPanel();
     {
-      gridBuilder.newColumnPanel(DivType.COL_60);
+      gridBuilder.newNestedPanel(DivType.COL_60);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("timePeriod"), true);
       startDate = new DatePanel(fs.newChildId(),  new PropertyModel<Date>(filter, "startTime"),
           DatePanelSettings.get().withSelectPeriodMode(true).withRequired(true));
@@ -100,7 +100,7 @@ public class HRListForm extends AbstractListForm<HRFilter, HRListPage>
     }
     {
       // DropDownChoice page size
-      gridBuilder.newColumnPanel(DivType.COL_40);
+      gridBuilder.newNestedPanel(DivType.COL_40);
       addPageSizeFieldset();
     }
     gridBuilder.newBlockPanel();

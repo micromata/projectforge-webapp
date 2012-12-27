@@ -50,7 +50,7 @@ public class LicenseListForm extends AbstractListForm<BaseSearchFilter, LicenseL
   protected void init()
   {
     super.init();
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_60);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_60);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(parentPage.getString("label.options")).setNoLabelFor();
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
@@ -58,7 +58,7 @@ public class LicenseListForm extends AbstractListForm<BaseSearchFilter, LicenseL
     }
     {
       // DropDownChoice page size
-      gridBuilder.newColumnPanel(DivType.COL_40);
+      gridBuilder.newNestedPanel(DivType.COL_40);
       addPageSizeFieldset();
     }
   }

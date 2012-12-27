@@ -117,8 +117,8 @@ public class TeamEventListForm extends AbstractListForm<TeamEventFilter, TeamEve
         }
       }
     });
-    gridBuilder.newColumnsPanel();
-    gridBuilder.newColumnPanel(DivType.COL_66);
+    gridBuilder.newNestedRowPanel();
+    gridBuilder.newNestedPanel(DivType.COL_66);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
       fs.setOutputMarkupId(true);
@@ -176,7 +176,7 @@ public class TeamEventListForm extends AbstractListForm<TeamEventFilter, TeamEve
     }
     {
       // DropDownChoice page size
-      gridBuilder.newColumnPanel(DivType.COL_33);
+      gridBuilder.newNestedPanel(DivType.COL_33);
       addPageSizeFieldset();
     }
     {

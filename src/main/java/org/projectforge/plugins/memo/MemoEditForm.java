@@ -53,7 +53,7 @@ public class MemoEditForm extends AbstractEditForm<MemoDO, MemoEditPage>
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
     {
       // Subject
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.memo.subject"));

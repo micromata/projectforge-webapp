@@ -39,10 +39,10 @@ import org.projectforge.admin.UpdatePreCheckStatus;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.GridBuilder;
 import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
 import org.projectforge.web.wicket.flowlayout.RadioGroupPanel;
 
@@ -71,10 +71,8 @@ public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdat
   protected void init()
   {
     addFeedbackPanel();
-    final RepeatingView repeater = new RepeatingView("flowform");
-    add(repeater);
-    gridBuilder = newGridBuilder(repeater);
-    gridBuilder.newGrid16();
+    gridBuilder = newGridBuilder(this, "flowform");
+    gridBuilder.newGrid12();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset("Show all");
       final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();

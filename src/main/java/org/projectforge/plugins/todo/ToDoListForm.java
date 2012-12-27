@@ -51,7 +51,7 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
   protected void init()
   {
     super.init();
-    gridBuilder.newColumnsPanel();
+    gridBuilder.newNestedRowPanel();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task")).setNoLabelFor();
       final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new Model<TaskDO>() {
@@ -75,7 +75,7 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
       taskSelectPanel.init();
       taskSelectPanel.setRequired(false);
     }
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // Assignee
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.todo.assignee"));
@@ -100,7 +100,7 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
       assigneeSelectPanel.setDefaultFormProcessing(false);
       assigneeSelectPanel.init().withAutoSubmit(true);
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // Reporter
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.todo.reporter"));
@@ -126,7 +126,7 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
       reporterSelectPanel.setDefaultFormProcessing(false);
       reporterSelectPanel.init().withAutoSubmit(true);
     }
-    gridBuilder.newColumnPanel(DivType.COL_66);
+    gridBuilder.newNestedPanel(DivType.COL_66);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
@@ -146,7 +146,7 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
     }
     {
       // DropDownChoice page size
-      gridBuilder.newColumnPanel(DivType.COL_33);
+      gridBuilder.newNestedPanel(DivType.COL_33);
       addPageSizeFieldset();
     }
   }

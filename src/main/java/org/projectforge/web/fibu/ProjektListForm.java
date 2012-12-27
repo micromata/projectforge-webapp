@@ -40,9 +40,9 @@ public class ProjektListForm extends AbstractListForm<ProjektListFilter, Projekt
   protected void init()
   {
     super.init();
-    gridBuilder.newColumnsPanel();
+    gridBuilder.newNestedRowPanel();
     {
-      gridBuilder.newColumnPanel(DivType.COL_60);
+      gridBuilder.newNestedPanel(DivType.COL_60);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"));
       // DropDownChoice listType
       final LabelValueChoiceRenderer<String> typeChoiceRenderer = new LabelValueChoiceRenderer<String>();
@@ -55,7 +55,7 @@ public class ProjektListForm extends AbstractListForm<ProjektListFilter, Projekt
     }
     {
       // DropDownChoice page size
-      gridBuilder.newColumnPanel(DivType.COL_40);
+      gridBuilder.newNestedPanel(DivType.COL_40);
       addPageSizeFieldset();
     }
   }

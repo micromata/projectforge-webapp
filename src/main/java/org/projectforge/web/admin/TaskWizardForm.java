@@ -65,14 +65,14 @@ public class TaskWizardForm extends AbstractStandardForm<TaskWizardForm, TaskWiz
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
     int number = 1;
     {
       gridBuilder.newFormHeading(getString("wizard"));
       final DivPanel section = gridBuilder.newSectionPanel();
       section.add(new DivTextPanel(section.newChildId(), getString("task.wizard.intro")));
     }
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
     {
       final DivPanel section = gridBuilder.newSectionPanel();
       section.add(new Heading3Panel(section.newChildId(), String.valueOf(number++) + ". " + getString("task")));
@@ -103,7 +103,7 @@ public class TaskWizardForm extends AbstractStandardForm<TaskWizardForm, TaskWiz
     // Manager group
     createGroupComponents(number++, "managerGroup");
 
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
     {
       final DivPanel section = gridBuilder.newSectionPanel();
       section.add(new Heading3Panel(section.newChildId(), getString("task.wizard.action")));
@@ -152,7 +152,7 @@ public class TaskWizardForm extends AbstractStandardForm<TaskWizardForm, TaskWiz
   @SuppressWarnings("serial")
   private void createGroupComponents(final int number, final String key)
   {
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
     final DivPanel section = gridBuilder.newSectionPanel();
     section.add(new Heading3Panel(section.newChildId(), String.valueOf(number) + ". " + getString("task.wizard." + key)));
     section.add(new DivTextPanel(section.newChildId(), getString("task.wizard." + key + ".intro")));

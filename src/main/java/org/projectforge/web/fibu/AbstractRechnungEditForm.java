@@ -199,8 +199,8 @@ extends AbstractEditForm<O, P>
     onInit();
 
     /* GRID8 - BLOCK */
-    gridBuilder.newGrid8();
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newGrid6();
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // Date
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.datum"));
@@ -210,7 +210,7 @@ extends AbstractEditForm<O, P>
       datumPanel.setRequired(true);
       fs.add(datumPanel);
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // Net sum
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.netto"));
@@ -225,7 +225,7 @@ extends AbstractEditForm<O, P>
       fs.setNoLabelFor();
       ajaxUpdateComponents.add(netPanel.getLabel4Ajax());
     }
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // Vat amount
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.vatAmount"));
@@ -240,7 +240,7 @@ extends AbstractEditForm<O, P>
       fs.setNoLabelFor();
       ajaxUpdateComponents.add(vatPanel.getLabel4Ajax());
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // Brutto
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.brutto"));
@@ -256,7 +256,7 @@ extends AbstractEditForm<O, P>
       ajaxUpdateComponents.add(grossPanel.getLabel4Ajax());
     }
     {
-      gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+      gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
       // Fälligkeit und Zahlungsziel
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.faelligkeit"), true);
       faelligkeitPanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "faelligkeit"), DatePanelSettings.get()
@@ -299,7 +299,7 @@ extends AbstractEditForm<O, P>
         }
       });
     }
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // Bezahldatum
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.bezahlDatum"));
@@ -308,7 +308,7 @@ extends AbstractEditForm<O, P>
       dependentFormComponents[1] = bezahlDatumPanel.getDateField();
       fs.add(bezahlDatumPanel);
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // Zahlbetrag
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.zahlBetrag"));
@@ -325,20 +325,20 @@ extends AbstractEditForm<O, P>
       fs.add(zahlBetragField);
     }
     /* GRID16 - BLOCK */
-    gridBuilder.newGrid16();
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newGrid12();
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // Bemerkung
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));
       fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "bemerkung"))).setAutogrow();
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // Besonderheiten
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.besonderheiten"));
       fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "besonderheiten"))).setAutogrow();
     }
-    flowform.add(positionsRepeater = new RepeatingView(flowform.newChildId()));
+    positionsRepeater = gridBuilder.newRepeatingView();
     if (costConfigured == true) {
       costEditModalWindow = new ModalWindow(COST_EDIT_DIALOG_ID);
       add(costEditModalWindow);
@@ -376,7 +376,7 @@ extends AbstractEditForm<O, P>
       }
       final List<Component> ajaxUpdatePositionComponents = new ArrayList<Component>();
       final RechnungsPositionDO rechnungsPosition = (position instanceof RechnungsPositionDO) ? (RechnungsPositionDO) position : null;
-      final ToggleContainerPanel positionsPanel = new ToggleContainerPanel(positionsRepeater.newChildId(), DivType.GRID16,
+      final ToggleContainerPanel positionsPanel = new ToggleContainerPanel(positionsRepeater.newChildId(), DivType.GRID12,
           DivType.ROUND_ALL) {
         /**
          * @see org.projectforge.web.wicket.flowlayout.ToggleContainerPanel#wantsOnStatusChangedNotification()

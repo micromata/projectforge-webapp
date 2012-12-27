@@ -33,7 +33,6 @@ import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.link.Link;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -54,12 +53,12 @@ import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
+import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.GridBuilder;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
 import org.projectforge.web.wicket.flowlayout.TextLinkPanel;
@@ -172,10 +171,8 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
         return parentPage.result;
       }
     }));
-    final RepeatingView repeater = new RepeatingView("flowform");
-    add(repeater);
-    gridBuilder = newGridBuilder(repeater);
-    gridBuilder.newGrid16().newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder = newGridBuilder(this, "flowform");
+    gridBuilder.newGrid12().newNestedRowPanel().newNestedPanel(DivType.COL_50);
     FieldsetPanel fs = gridBuilder.newFieldset(getString("address.phoneCall.number"), true);
     numberTextField = new PFAutoCompleteTextField<AddressDO>(InputPanel.WICKET_ID, new Model() {
       @Override
@@ -281,7 +278,7 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
       fs.add(myCurrentPhoneIdChoice);
       fs.addHelpIcon(getString("address.myCurrentPhoneId.tooltip"));
     }
-    addressPanel = gridBuilder.newColumnPanel(DivType.COL_50).getPanel();
+    addressPanel = gridBuilder.newNestedPanel(DivType.COL_50).getPanel();
     {
       final Link<String> addressViewLink = new Link<String>(TextLinkPanel.LINK_ID) {
         @Override

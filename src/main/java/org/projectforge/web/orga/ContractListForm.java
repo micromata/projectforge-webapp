@@ -45,9 +45,9 @@ public class ContractListForm extends AbstractListForm<ContractListFilter, Contr
   {
     super.init();
     final ContractDao contractDao = getParentPage().getBaseDao();
-    gridBuilder.newColumnsPanel();
+    gridBuilder.newNestedRowPanel();
     {
-      gridBuilder.newColumnPanel(DivType.COL_60);
+      gridBuilder.newNestedPanel(DivType.COL_60);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true);
       // DropDownChoice years
       final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(contractDao.getYears(), true);
@@ -66,7 +66,7 @@ public class ContractListForm extends AbstractListForm<ContractListFilter, Contr
     }
     {
       // DropDownChoice page size
-      gridBuilder.newColumnPanel(DivType.COL_40);
+      gridBuilder.newNestedPanel(DivType.COL_40);
       addPageSizeFieldset();
     }
   }

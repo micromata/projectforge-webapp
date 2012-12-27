@@ -87,7 +87,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
   {
     super.init();
 
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid6();
 
     // checking visibility rights
     final TeamCalRight right = new TeamCalRight();
@@ -118,7 +118,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       }
     }
 
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid6();
     // set owner
     {
       if (data.getOwner() == null) {
@@ -136,7 +136,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
     }
 
     if (access == true) {
-      gridBuilder.newGrid8(true);
+      gridBuilder.newGrid6(true);
       // set access users
       {
         // Full access users
@@ -188,7 +188,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
         fs.add(users);
       }
 
-      gridBuilder.newGrid8();
+      gridBuilder.newGrid6();
       // set access groups
       {
         // Full access groups

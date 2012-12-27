@@ -95,7 +95,7 @@ public class PollEditForm extends AbstractEditForm<PollDO, PollEditPage>
       }
     }
 
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid6();
 
     // new title
     FieldsetPanel fsTitle = gridBuilder.newFieldset("Titel", true);

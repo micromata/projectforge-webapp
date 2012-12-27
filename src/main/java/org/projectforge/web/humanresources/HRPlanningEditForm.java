@@ -161,8 +161,8 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
         }
       }
     });
-    gridBuilder.newGrid16();
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newGrid12();
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // User
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("user"));
@@ -173,7 +173,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
       userSelectPanel.setRequired(true);
       userSelectPanel.init();
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // Start Date
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.startTime"), true);
@@ -281,8 +281,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
         });
       }
     }
-    entriesRepeater = new RepeatingView(flowform.newChildId());
-    flowform.add(entriesRepeater);
+    entriesRepeater = gridBuilder.newRepeatingView();
     refresh();
     WicketUtils.addShowDeleteRowQuestionDialog(this, hrPlanningEntryDao);
   }
@@ -315,7 +314,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
         // Don't show deleted/undeleted entries.
         continue;
       }
-      final ToggleContainerPanel positionsPanel = new ToggleContainerPanel(entriesRepeater.newChildId(), DivType.GRID16, DivType.ROUND_ALL);
+      final ToggleContainerPanel positionsPanel = new ToggleContainerPanel(entriesRepeater.newChildId(), DivType.GRID12, DivType.ROUND_ALL);
       positionsPanel.getContainer().setOutputMarkupId(true);
       entriesRepeater.add(positionsPanel);
       String heading = escapeHtml(entry.getProjektNameOrStatus());
@@ -429,7 +428,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
     if (getBaseDao().hasInsertAccess(getUser()) == true && showDeletedOnly == false) {
       if (content == null) {
         // No entries
-        content = new DivPanel(entriesRepeater.newChildId(), DivType.GRID16, DivType.ROUND_ALL);
+        content = new DivPanel(entriesRepeater.newChildId(), DivType.GRID12, DivType.ROUND_ALL);
         entriesRepeater.add(content);
       }
       content.add(columns = new DivPanel(content.newChildId(), DivType.BLOCK, DivType.CLEARFIX));

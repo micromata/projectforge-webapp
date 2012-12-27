@@ -92,7 +92,7 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
       }
     });
 
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
 
     {
       // Title of skill

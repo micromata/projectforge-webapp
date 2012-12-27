@@ -72,7 +72,7 @@ public class ProjektEditForm extends AbstractEditForm<ProjektDO, ProjektEditPage
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
     {
       // Number
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt.nummer"));

@@ -56,7 +56,7 @@ public class FeedbackForm extends AbstractStandardForm<SendFeedbackData, Feedbac
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("feedback.receiver"), true).setNoLabelFor();
       fs.add(new DivTextPanel(fs.newChildId(), data.getReceiver()));

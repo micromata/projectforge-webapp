@@ -59,7 +59,7 @@ public class BookListForm extends AbstractListForm<BookListFilter, BookListPage>
     super.init();
 
     {
-      gridBuilder.newColumnPanel(DivType.COL_60);
+      gridBuilder.newNestedPanel(DivType.COL_60);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
       checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
@@ -73,7 +73,7 @@ public class BookListForm extends AbstractListForm<BookListFilter, BookListPage>
     }
     {
       // DropDownChoice page size
-      gridBuilder.newColumnPanel(DivType.COL_40);
+      gridBuilder.newNestedPanel(DivType.COL_40);
       addPageSizeFieldset();
     }
   }

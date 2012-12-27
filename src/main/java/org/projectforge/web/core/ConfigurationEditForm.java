@@ -72,7 +72,7 @@ public class ConfigurationEditForm extends AbstractEditForm<ConfigurationDO, Con
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
     {
       // Parameter name
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.parameter")).setNoLabelFor();

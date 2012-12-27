@@ -60,9 +60,9 @@ public class AuftragListForm extends AbstractListForm<AuftragListFilter, Auftrag
   protected void init()
   {
     super.init();
-    gridBuilder.newColumnsPanel();
+    gridBuilder.newNestedRowPanel();
     {
-      gridBuilder.newColumnPanel(DivType.COL_60);
+      gridBuilder.newNestedPanel(DivType.COL_60);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true);
 
       // DropDownChoice years
@@ -133,7 +133,7 @@ public class AuftragListForm extends AbstractListForm<AuftragListFilter, Auftrag
     }
     {
       // DropDownChoice page size
-      gridBuilder.newColumnPanel(DivType.COL_40);
+      gridBuilder.newNestedPanel(DivType.COL_40);
       addPageSizeFieldset();
     }
 

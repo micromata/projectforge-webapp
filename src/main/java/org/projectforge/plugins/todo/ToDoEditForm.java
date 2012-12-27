@@ -129,7 +129,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
     }
 
     /* GRID16 - BLOCK */
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
     if (isNew() == true) {
       // Favorites
       final String[] templateNames = userPrefDao.getPrefNames(ToDoPlugin.USER_PREF_AREA);
@@ -195,7 +195,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
       }
       fs.add(subject);
     }
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // ToDo type
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.todo.type"));
@@ -217,7 +217,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
           java.sql.Date.class)));
     }
 
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // Priority
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("priority"));

@@ -61,7 +61,7 @@ public class CustomerEditForm extends AbstractEditForm<KundeDO, CustomerEditPage
   {
     super.init();
     /* GRID16 - BLOCK */
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
     {
       // Number
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde.nummer"));

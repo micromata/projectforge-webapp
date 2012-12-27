@@ -63,8 +63,8 @@ public class PostausgangEditForm extends AbstractEditForm<PostausgangDO, Postaus
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid16();
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newGrid12();
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // Date
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("date"));
@@ -88,7 +88,7 @@ public class PostausgangEditForm extends AbstractEditForm<PostausgangDO, Postaus
       });
       fs.add(datumPanel);
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // Status drop down box:
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("orga.post.type"));

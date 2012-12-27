@@ -54,7 +54,7 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
   protected void init()
   {
     super.init();
-    gridBuilder.newColumnsPanel();
+    gridBuilder.newNestedRowPanel();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task")).setNoLabelFor();
       final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new Model<TaskDO>() {
@@ -78,7 +78,7 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
       taskSelectPanel.init();
       taskSelectPanel.setRequired(false);
     }
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // Group
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("group")).setNoLabelFor();
@@ -103,7 +103,7 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
       groupSelectPanel.setDefaultFormProcessing(false);
       groupSelectPanel.init();
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // User
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("user"), true).setNoLabelFor();
@@ -129,7 +129,7 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
       assigneeSelectPanel.init().withAutoSubmit(true);
       fs.addHelpIcon(getString("access.tooltip.filter.user"));
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
@@ -144,7 +144,7 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
               getString("access.tooltip.filter.includeDescendentTasks")));
       checkBoxPanel.add(createOnlyDeletedCheckBoxPanel(checkBoxPanel.newChildId()));
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // DropDownChoice page size
       addPageSizeFieldset();

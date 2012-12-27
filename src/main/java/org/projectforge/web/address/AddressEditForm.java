@@ -60,7 +60,7 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
     super.init();
     addressEditSupport = new AddressPageSupport(this, gridBuilder, (AddressDao) getBaseDao(), personalAddressDao, data);
     /* GRID8 - BLOCK */
-    gridBuilder.newGrid8().newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newGrid6().newNestedRowPanel().newNestedPanel(DivType.COL_50);
     addressEditSupport.addName();
     addressEditSupport.addFirstName();
     final FieldsetPanel fs = (FieldsetPanel)addressEditSupport.addFormOfAddress();
@@ -73,7 +73,7 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
     // /////////////////
     // Second box
     // /////////////////
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     addressEditSupport.addOrganization();
     addressEditSupport.addDivision();
     addressEditSupport.addPosition();
@@ -83,24 +83,24 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
     // /////////////////
     // Status
     // /////////////////
-    gridBuilder.newGrid8().newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newGrid6().newNestedRowPanel().newNestedPanel(DivType.COL_50);
     addressEditSupport.addContactStatus();
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     addressEditSupport.addAddressStatus();
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     addressEditSupport.addBirthday();
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     addressEditSupport.addLanguage();
 
     // /////////////////
     // Phone numbers
     // /////////////////
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     addPhoneNumber("businessPhone", "address.phone", "address.business", "favoriteBusinessPhone", FieldType.PHONE_NO);
     addPhoneNumber("fax", "address.phoneType.fax", "address.business", "favoriteFax", FieldType.PHONE_NO);
     addPhoneNumber("mobilePhone", "address.phoneType.mobile", "address.business", "favoriteMobilePhone", FieldType.MOBILE_PHONE_NO);
 
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     addPhoneNumber("privatePhone", "address.phone", "address.private", "favoritePrivatePhone", FieldType.PHONE_NO);
     addPhoneNumber("privateMobilePhone", "address.phoneType.mobile", "address.private", "favoritePrivateMobilePhone",
         FieldType.MOBILE_PHONE_NO);
@@ -108,18 +108,18 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
     // /////////////////
     // Addresses
     // /////////////////
-    gridBuilder.newGrid8(true);
+    gridBuilder.newGrid6(true);
     addAddress(addressEditSupport.getBusinessAddressParameters());
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid6();
     addAddress(addressEditSupport.getPostalAddressParameters());
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid6();
     addAddress(addressEditSupport.getPrivateAddressParameters());
 
-    gridBuilder.newGrid8().newBlockPanel();
+    gridBuilder.newGrid6().newBlockPanel();
     addressEditSupport.addFingerPrint();
     addressEditSupport.addPublicKey();
 
-    gridBuilder.newGrid16(true).newBlockPanel();
+    gridBuilder.newGrid12(true).newBlockPanel();
     addressEditSupport.addComment();
   }
 
@@ -135,15 +135,15 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
 
   private void addAddress(final AddressParameters params)
   {
-    gridBuilder.newColumnsPanel().newColumnPanel(null);
+    gridBuilder.newNestedRowPanel().newNestedPanel(null);
     addressEditSupport.addAddressText(params.addressType, params.addressTextProperty);
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     addressEditSupport.addZipCode(params.zipCodeProperty);
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     addressEditSupport.addCity(params.cityProperty);
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     addressEditSupport.addCountry(params.countryProperty);
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     addressEditSupport.addState(params.stateProperty);
   }
 

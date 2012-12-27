@@ -29,10 +29,10 @@ import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.util.lang.Bytes;
 import org.projectforge.web.wicket.AbstractForm;
+import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.FileUploadPanel;
-import org.projectforge.web.wicket.flowlayout.GridBuilder;
 
 public class SetupImportForm extends AbstractForm<SetupImportForm, SetupPage>
 {
@@ -53,10 +53,8 @@ public class SetupImportForm extends AbstractForm<SetupImportForm, SetupPage>
   protected void init()
   {
     addFeedbackPanel();
-    final RepeatingView repeater = new RepeatingView("flowform");
-    add(repeater);
-    final GridBuilder gridBuilder = newGridBuilder(repeater);
-    gridBuilder.newGrid16().newColumnsPanel();
+    final GridBuilder gridBuilder = newGridBuilder(this, "flowform");
+    gridBuilder.newGrid12().newNestedRowPanel();
     gridBuilder.newFormHeading(getString("import"));
     {
       // Upload dump file

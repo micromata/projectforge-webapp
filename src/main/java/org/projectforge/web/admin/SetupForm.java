@@ -39,6 +39,7 @@ import org.projectforge.database.InitDatabaseDao;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
@@ -46,7 +47,6 @@ import org.projectforge.web.wicket.components.TimeZonePanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.GridBuilder;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 import org.projectforge.web.wicket.flowlayout.ParTextPanel;
 import org.projectforge.web.wicket.flowlayout.PasswordPanel;
@@ -90,10 +90,8 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
   protected void init()
   {
     addFeedbackPanel();
-    final RepeatingView repeater = new RepeatingView("flowform");
-    add(repeater);
-    final GridBuilder gridBuilder = newGridBuilder(repeater);
-    gridBuilder.newGrid16().newColumnsPanel();
+    final GridBuilder gridBuilder = newGridBuilder(this, "flowform");
+    gridBuilder.newGrid12().newNestedRowPanel();
     gridBuilder.newFormHeading(getString("administration.setup.heading"));
     final DivPanel section = gridBuilder.newSectionPanel();
     section.add(new ParTextPanel(section.newChildId(), getString("administration.setup.heading.subtitle")));

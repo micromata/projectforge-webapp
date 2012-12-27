@@ -71,7 +71,7 @@ public class GroupEditForm extends AbstractEditForm<GroupDO, GroupEditPage>
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid6();
     {
       // Name
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("name"));
@@ -108,7 +108,7 @@ public class GroupEditForm extends AbstractEditForm<GroupDO, GroupEditPage>
       WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("group.localGroup"), "localGroup", new PropertyModel<Boolean>(data,
           "localGroup"), getString("group.localGroup.tooltip"));
     }
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid6();
     {
       // Assigned users
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("group.assignedUsers"), true).setLabelSide(false);

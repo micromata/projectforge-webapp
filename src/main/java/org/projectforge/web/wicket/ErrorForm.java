@@ -24,15 +24,14 @@
 package org.projectforge.web.wicket;
 
 import org.apache.wicket.markup.html.form.Button;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.GridBuilder;
 import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
 import org.projectforge.web.wicket.flowlayout.TextPanel;
 
@@ -77,10 +76,8 @@ public class ErrorForm extends AbstractForm<ErrorPageData, ErrorPage>
         return parentPage.errorMessage;
       }
     }));
-    final RepeatingView repeater = new RepeatingView("flowform");
-    add(repeater);
-    gridBuilder = newGridBuilder(repeater);
-    gridBuilder.newGrid16();
+    gridBuilder = newGridBuilder(this, "flowform");
+    gridBuilder.newGrid12();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("feedback.receiver"), true).setNoLabelFor();
       fs.add(new DivTextPanel(fs.newChildId(), data.getReceiver()));

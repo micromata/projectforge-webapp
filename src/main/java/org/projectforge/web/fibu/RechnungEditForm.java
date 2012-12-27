@@ -72,7 +72,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
   protected void onInit()
   {
     /* GRID16 - BLOCK */
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
     {
       // Subject
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.betreff"));
@@ -81,7 +81,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
       fs.add(subject);
     }
     /* GRID8 - BLOCK */
-    gridBuilder.newGrid8().newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newGrid6().newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // Number
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.nummer"), true);
@@ -93,7 +93,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
         fs.addHelpIcon(getString("fibu.tooltip.nummerWirdAutomatischVergeben"));
       }
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // Status
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.status"));

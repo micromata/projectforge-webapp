@@ -25,6 +25,7 @@ package org.projectforge.web.wicket.flowlayout;
 
 import java.io.Serializable;
 
+import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.projectforge.web.BrowserScreenWidthType;
@@ -44,6 +45,8 @@ public abstract class AbstractGridBuilder<T extends AbstractFieldsetPanel< ? >> 
 
   protected DivPanel parentDivPanel;
 
+  protected Component parent;
+
   public AbstractGridBuilder(final RepeatingView parent, final MySession session)
   {
     this(session);
@@ -56,7 +59,7 @@ public abstract class AbstractGridBuilder<T extends AbstractFieldsetPanel< ? >> 
     this.parentDivPanel = parent;
   }
 
-  private AbstractGridBuilder(final MySession session)
+  protected AbstractGridBuilder(final MySession session)
   {
     this.browserScreenWidthType = session.getBrowserScreenWidthType();
     if (this.browserScreenWidthType == null) {
@@ -73,7 +76,9 @@ public abstract class AbstractGridBuilder<T extends AbstractFieldsetPanel< ? >> 
    */
   public String getString(final String i18nKey)
   {
-    if (this.parentRepeatingView != null) {
+    if (this.parent != null) {
+      return this.parent.getString(i18nKey);
+    } else if (this.parentRepeatingView != null) {
       return this.parentRepeatingView.getString(i18nKey);
     } else {
       return this.parentDivPanel.getString(i18nKey);
@@ -89,18 +94,9 @@ public abstract class AbstractGridBuilder<T extends AbstractFieldsetPanel< ? >> 
     }
   }
 
-  protected String newParentChildId()
-  {
-    if (parentRepeatingView != null) {
-      return parentRepeatingView.newChildId();
-    } else {
-      return parentDivPanel.newChildId();
-    }
-  }
-
   public abstract T newFieldset(final String label);
 
-  public abstract T newFieldset(final FieldProperties<?> fieldProperties);
+  public abstract T newFieldset(final FieldProperties< ? > fieldProperties);
 
   public abstract T newFieldset(final String label, final boolean multipleChildren);
 

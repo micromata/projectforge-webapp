@@ -89,7 +89,7 @@ public class MebEditForm extends AbstractEditForm<MebEntryDO, MebEditPage>
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
     {
       // Date
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("date")).setNoLabelFor();

@@ -40,9 +40,9 @@ public class UserPrefListForm extends AbstractListForm<UserPrefListFilter, UserP
   protected void init()
   {
     super.init();
-    gridBuilder.newColumnsPanel();
+    gridBuilder.newNestedRowPanel();
     {
-      gridBuilder.newColumnPanel(DivType.COL_60);
+      gridBuilder.newNestedPanel(DivType.COL_60);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"));
       // DropDownChoice area
       final DropDownChoice<UserPrefArea> areaDropDownChoice = UserPrefEditForm.createAreaDropdownChoice(this, fs.getDropDownChoiceId(),
@@ -51,7 +51,7 @@ public class UserPrefListForm extends AbstractListForm<UserPrefListFilter, UserP
     }
     {
       // DropDownChoice page size
-      gridBuilder.newColumnPanel(DivType.COL_40);
+      gridBuilder.newNestedPanel(DivType.COL_40);
       addPageSizeFieldset();
     }
   }

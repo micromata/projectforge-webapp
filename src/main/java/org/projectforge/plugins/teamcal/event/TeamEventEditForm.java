@@ -136,7 +136,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     super.init();
     final Recur recur = data.getRecurrenceObject();
     recurrenceData = new TeamEventRecurrenceData(recur, PFUserContext.getTimeZone());
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid6();
     final TeamCalDO teamCal = data.getCalendar();
     // setting access view
     if (isNew() == true || teamCal.getOwner() == null) {
@@ -190,7 +190,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       if (access == false)
         fieldSet.setEnabled(false);
     }
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid6();
     // add date panel
     initDatePanel();
     {
@@ -222,7 +222,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     // ///////////////////////////////
     // Recurrence
     // ///////////////////////////////
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid6();
     gridBuilder.newFormHeading(getString("plugins.teamcal.event.recurrence"));
     {
       // Recurrence interval type:
@@ -312,10 +312,10 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     {
       // customized yearly: month of year and see day of month.
     }
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid6();
     gridBuilder.newFormHeading(getString("plugins.teamcal.attendees"));
     setRecurrenceComponentsVisibility(null);
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid6();
     gridBuilder.newFormHeading(getString("plugins.teamcal.event.reminder"));
     setRecurrenceComponentsVisibility(null);
 

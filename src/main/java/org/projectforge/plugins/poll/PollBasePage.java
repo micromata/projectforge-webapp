@@ -28,12 +28,11 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.MySession;
+import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
-import org.projectforge.web.wicket.flowlayout.GridBuilder;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
@@ -62,9 +61,6 @@ public abstract class PollBasePage extends AbstractSecuredPage
   protected void onInitialize()
   {
     super.onInitialize();
-
-    final RepeatingView flowform = new RepeatingView("flowform");
-    gridBuilder = new GridBuilder(flowform, getMySession());
 
     // Cancel button
     final Button cancel = new Button(SingleButtonPanel.WICKET_ID) {
@@ -96,7 +92,9 @@ public abstract class PollBasePage extends AbstractSecuredPage
     body.add(form);
     form.add(cancelPanel);
     form.add(confirmPanel);
-    form.add(flowform);
+
+
+    gridBuilder = new GridBuilder(form, "flowform", getMySession());
 
     final ContainerFeedbackMessageFilter containerFeedbackMessageFilter = new ContainerFeedbackMessageFilter(this);
     final WebMarkupContainer feedbackContainer = new WebMarkupContainer("feedbackContainer") {

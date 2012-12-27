@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.apache.wicket.markup.html.link.Link;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -56,11 +55,11 @@ import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.AbstractStandardFormPage;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.projectforge.web.wicket.components.SourceCodePanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.GridBuilder;
 
 public class ScriptExecutePage extends AbstractStandardFormPage implements ISelectCallerPage
 {
@@ -111,10 +110,8 @@ public class ScriptExecutePage extends AbstractStandardFormPage implements ISele
     form = new ScriptExecuteForm(this, loadScript());
     body.add(form);
     form.init();
-    final RepeatingView repeater = new RepeatingView("results");
-    body.add(repeater);
-    resultGridBuilder = form.newGridBuilder(repeater);
-    resultGridBuilder.newGrid16();
+    resultGridBuilder = form.newGridBuilder(body, "results");
+    resultGridBuilder.newGrid12();
     {
       scriptResultFieldsetPanel = new FieldsetPanel(resultGridBuilder.getPanel(), getString("scripting.script.result")) {
         /**

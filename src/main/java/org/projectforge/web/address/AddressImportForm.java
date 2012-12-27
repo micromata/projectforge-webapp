@@ -90,7 +90,7 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
   protected void onInitialize()
   {
     super.onInitialize();
-    gridBuilder.newGrid16().newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newGrid12().newNestedRowPanel().newNestedPanel(DivType.COL_50);
     final FieldsetPanel newFieldset = gridBuilder.newFieldset(getString("address.book.vCardImport.fileUploadPanel"));
 
     final FileUploadField uploadField = new FileUploadField(FileUploadPanel.WICKET_ID, new PropertyModel<List<FileUpload>>(this, "uploads"));

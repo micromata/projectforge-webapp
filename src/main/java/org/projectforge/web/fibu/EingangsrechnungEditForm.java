@@ -59,14 +59,14 @@ AbstractRechnungEditForm<EingangsrechnungDO, EingangsrechnungsPositionDO, Eingan
   protected void onInit()
   {
     /* GRID16 - BLOCK */
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
     {
       // Subject
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.betreff"));
       fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "betreff")));
     }
     /* GRID8 - BLOCK */
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid6();
     {
       // Creditor
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.creditor"));
@@ -100,7 +100,7 @@ AbstractRechnungEditForm<EingangsrechnungDO, EingangsrechnungsPositionDO, Eingan
   @Override
   protected void addCellAfterFaelligkeit()
   {
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     // DropDownChoice payment type
     final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.payment.type"));
     final LabelValueChoiceRenderer<PaymentType> paymentTypeChoiceRenderer = new LabelValueChoiceRenderer<PaymentType>(this,

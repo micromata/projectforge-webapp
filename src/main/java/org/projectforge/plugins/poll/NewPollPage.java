@@ -68,7 +68,7 @@ public class NewPollPage extends PollBasePage
   {
     super.onInitialize();
 
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid6();
 
     final FieldsetPanel fsTitle = gridBuilder.newFieldset(getString("plugins.poll.new.title"), true);
     final MaxLengthTextField titleField = new MaxLengthTextField(fsTitle.getTextFieldId(), new PropertyModel<String>(model.getPollDo(), "title"));

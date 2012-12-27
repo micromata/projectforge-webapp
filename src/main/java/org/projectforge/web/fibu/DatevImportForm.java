@@ -61,7 +61,7 @@ public class DatevImportForm extends AbstractStandardForm<DatevImportFilter, Dat
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("file"), "*.xsl", true);
       fileUploadField = new FileUploadField(FileUploadPanel.WICKET_ID);
@@ -136,7 +136,7 @@ public class DatevImportForm extends AbstractStandardForm<DatevImportFilter, Dat
         };
       };
     }
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
     final DivPanel panel = gridBuilder.getPanel();
     storagePanel = new DatevImportStoragePanel(DivPanel.CHILD_ID, parentPage, filter);
     panel.add(storagePanel);

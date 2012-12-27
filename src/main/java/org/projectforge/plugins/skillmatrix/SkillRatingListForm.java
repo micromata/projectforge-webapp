@@ -54,7 +54,7 @@ public class SkillRatingListForm extends AbstractListForm<SkillRatingFilter, Ski
     super.init();
     {
       // Required experience
-      gridBuilder.newColumnPanel(DivType.COL_60);
+      gridBuilder.newNestedPanel(DivType.COL_60);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.search.reqiuredExperience")).setNoLabelFor();
       fs.getFieldset().setOutputMarkupId(true);
       final LabelValueChoiceRenderer<SkillRating> ratingChoiceRenderer = new LabelValueChoiceRenderer<SkillRating>(this,
@@ -66,7 +66,7 @@ public class SkillRatingListForm extends AbstractListForm<SkillRatingFilter, Ski
     }
     {
       // DropDownChoice page size
-      gridBuilder.newColumnPanel(DivType.COL_40);
+      gridBuilder.newNestedPanel(DivType.COL_40);
       addPageSizeFieldset();
     }
   }

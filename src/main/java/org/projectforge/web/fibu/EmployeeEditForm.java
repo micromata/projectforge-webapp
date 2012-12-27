@@ -59,7 +59,7 @@ public class EmployeeEditForm extends AbstractEditForm<EmployeeDO, EmployeeEditP
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid6();
     {
       // User
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.employee.user"));
@@ -94,7 +94,7 @@ public class EmployeeEditForm extends AbstractEditForm<EmployeeDO, EmployeeEditP
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("address.positionText"));
       fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "position")));
     }
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid6();
     {
       // Weekly hours
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.employee.wochenstunden"));
@@ -115,7 +115,7 @@ public class EmployeeEditForm extends AbstractEditForm<EmployeeDO, EmployeeEditP
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.employee.austrittsdatum"));
       fs.add(new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "austrittsDatum"), new DatePanelSettings()));
     }
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
     {
       // Comment
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));

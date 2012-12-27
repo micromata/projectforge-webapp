@@ -53,6 +53,7 @@ import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.user.UserSelectPanel;
+import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.DateTimePanel;
 import org.projectforge.web.wicket.components.DateTimePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
@@ -62,7 +63,6 @@ import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldSetIconPosition;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.GridBuilder;
 import org.projectforge.web.wicket.flowlayout.HiddenInputPanel;
 import org.projectforge.web.wicket.flowlayout.HtmlCommentPanel;
 import org.projectforge.web.wicket.flowlayout.IconPanel;
@@ -71,7 +71,7 @@ import org.projectforge.web.wicket.flowlayout.InputPanel;
 import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
 
 public abstract class AbstractListForm<F extends BaseSearchFilter, P extends AbstractListPage< ? , ? , ? >> extends
-    AbstractSecuredForm<F, P>
+AbstractSecuredForm<F, P>
 {
   private static final long serialVersionUID = 1304394324524767035L;
 
@@ -115,7 +115,7 @@ public abstract class AbstractListForm<F extends BaseSearchFilter, P extends Abs
 
   public static DropDownChoice<Integer> getPageSizeDropDownChoice(final String id, final Locale locale, final IModel<Integer> model,
       final int minValue, final int maxValue)
-  {
+      {
     final LabelValueChoiceRenderer<Integer> pageSizeChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
     final NumberFormat nf = NumberFormat.getInstance(locale);
     for (final int size : new int[] { 3, 5, 10, 25, 50, 100, 200, 500, 1000}) {
@@ -127,7 +127,7 @@ public abstract class AbstractListForm<F extends BaseSearchFilter, P extends Abs
         pageSizeChoiceRenderer);
     pageSizeChoice.setNullValid(false);
     return pageSizeChoice;
-  }
+      }
 
   public AbstractListForm(final P parentPage)
   {
@@ -156,10 +156,8 @@ public abstract class AbstractListForm<F extends BaseSearchFilter, P extends Abs
     if (isFilterVisible() == false) {
       add(WicketUtils.getInvisibleComponent("filter"));
     } else {
-      final RepeatingView filter = new RepeatingView("filter");
-      add(filter);
-      gridBuilder = newGridBuilder(filter);
-      gridBuilder.newGrid16();
+      gridBuilder = newGridBuilder(this, "filter");
+      gridBuilder.newGrid12();
       {
         // Fieldset search filter
         final FieldsetPanel fs = gridBuilder.newFieldset(getString("searchFilter"), true);
@@ -167,11 +165,11 @@ public abstract class AbstractListForm<F extends BaseSearchFilter, P extends Abs
           final RepeatingView repeater = new RepeatingView(FieldsetPanel.DESCRIPTION_SUFFIX_ID);
           fs.setDescriptionSuffix(repeater);
           IconPanel icon = new IconPanel(repeater.newChildId(), IconType.CIRCLE_PLUS, getString("filter.extendedSearch"))
-              .setOnClick("javascript:showExtendedFilter();");
+          .setOnClick("javascript:showExtendedFilter();");
           icon.setMarkupId("showExtendedFilter");
           repeater.add(icon);
           icon = new IconPanel(repeater.newChildId(), IconType.CIRCLE_MINUS, getString("filter.extendedSearch"))
-              .setOnClick("javascript:hideExtendedFilter();");
+          .setOnClick("javascript:hideExtendedFilter();");
           icon.setMarkupId("hideExtendedFilter");
           repeater.add(icon);
         }
@@ -270,11 +268,11 @@ public abstract class AbstractListForm<F extends BaseSearchFilter, P extends Abs
   @SuppressWarnings("serial")
   private void addExtendedFilter()
   {
-    extendedFilter = new DivPanel(gridBuilder.newColumnsPanelId());
-    gridBuilder.addColumnsPanel(extendedFilter);
+    extendedFilter = new DivPanel(gridBuilder.newPanelId());
+    gridBuilder.addNestedRowPanel(extendedFilter);
     extendedFilter.setMarkupId("extendedFilter");
     {
-      gridBuilder.newColumnPanel(DivType.COL_60);
+      gridBuilder.newNestedPanel(DivType.COL_60);
       final FieldsetPanel fieldset = gridBuilder.newFieldset(getString("timePeriod"), getString("lastUpdate"), true);
       fieldset.add(new HiddenInputPanel(fieldset.newChildId(), new HiddenField<Boolean>(InputPanel.WICKET_ID, new PropertyModel<Boolean>(
           searchFilter, "useModificationFilter"))).setHtmlId("useModificationFilter"));
@@ -326,7 +324,7 @@ public abstract class AbstractListForm<F extends BaseSearchFilter, P extends Abs
     }
 
     {
-      gridBuilder.newColumnPanel(DivType.COL_40);
+      gridBuilder.newNestedPanel(DivType.COL_40);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("modifiedBy"), getString("user"));
 
       final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new Model<PFUserDO>() {

@@ -52,7 +52,7 @@ public class BankAccountEditForm extends AbstractEditForm<BankAccountDO, BankAcc
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid16().newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newGrid12().newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // Name
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.banking.account.name"));
@@ -63,7 +63,7 @@ public class BankAccountEditForm extends AbstractEditForm<BankAccountDO, BankAcc
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.banking.account.number"));
       fs.add(new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "accountNumber")));
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // Bank
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.banking.bank"));
@@ -74,7 +74,7 @@ public class BankAccountEditForm extends AbstractEditForm<BankAccountDO, BankAcc
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.banking.bankIdentificationCode"));
       fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "bankIdentificationCode")));
     }
-    gridBuilder.newColumnsPanel();
+    gridBuilder.newNestedRowPanel();
     {
       // Text description
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"));

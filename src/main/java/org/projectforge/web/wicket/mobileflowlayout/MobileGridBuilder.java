@@ -51,6 +51,15 @@ public class MobileGridBuilder extends AbstractGridBuilder<MobileFieldsetPanel>
     this.parentDivPanel = parent;
   }
 
+  private String newParentChildId()
+  {
+    if (this.parentRepeatingView != null) {
+      return this.parentRepeatingView.newChildId();
+    } else {
+      return this.parentDivPanel.newChildId();
+    }
+  }
+
   public CollapsiblePanel newCollapsiblePanel(final String heading)
   {
     final CollapsiblePanel collapsiblePanel = new CollapsiblePanel(newParentChildId(), heading);

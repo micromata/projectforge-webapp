@@ -123,7 +123,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
         }
       }
     });
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
     {
       // Parent task
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task.parentTask"));
@@ -148,7 +148,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
         WicketUtils.setFocus(title);
       }
     }
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // Status drop down box:
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("status"));
@@ -158,7 +158,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
       statusChoice.setNullValid(false).setRequired(true);
       fs.add(statusChoice);
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // Priority drop down box:
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("priority"));
@@ -168,7 +168,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
       priorityChoice.setNullValid(true);
       fs.add(priorityChoice);
     }
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // Assigned user:
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task.assignedUser"));
@@ -182,7 +182,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
       fs.add(responsibleUserSelectPanel);
       responsibleUserSelectPanel.init();
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // Max hours:
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task.maxHours"));
@@ -212,9 +212,9 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
     // ///////////////////////////////
     // GANTT
     // ///////////////////////////////
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid6();
     gridBuilder.newFormHeading(getString("task.gantt.settings"));
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // Gantt object type:
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.objectType"));
@@ -225,7 +225,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
       objectTypeChoice.setNullValid(true);
       fs.add(objectTypeChoice);
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // Progress
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task.progress")).setUnit("%");
@@ -241,7 +241,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
       WicketUtils.setSize(progressField, 3);
       fs.add(progressField);
     }
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // Gantt: start date
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.startDate"));
@@ -249,7 +249,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
           .withTargetType(java.sql.Date.class).withSelectProperty("startDate"));
       fs.add(startDatePanel);
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // Gantt: duration
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.duration")).setNoLabelFor();
@@ -259,7 +259,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
       fs.add(durationField);
       dependentFormComponents[0] = durationField;
     }
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // Gantt: end date
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.endDate"));
@@ -268,7 +268,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
       fs.add(endDatePanel);
       dependentFormComponents[1] = endDatePanel;
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // Gantt: predecessor offset
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.predecessorOffset")).setUnit(getString("days"));
@@ -302,7 +302,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
     // ///////////////////////////////
     // FINANCE ADMINISTRATION
     // ///////////////////////////////
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid6();
     gridBuilder.newFormHeading(getString("financeAdministration"));
 
     final boolean hasKost2AndTimesheetBookingAccess = ((TaskDao) getBaseDao()).hasAccessForKost2AndTimesheetBookingStatus(
@@ -393,7 +393,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
       fs.addHelpIcon(getString("task.protectionOfPrivacy.tooltip"));
     }
 
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
     {
       // Description:
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"), true);

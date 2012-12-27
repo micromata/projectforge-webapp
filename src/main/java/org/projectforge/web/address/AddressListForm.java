@@ -40,10 +40,10 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
+import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.GridBuilder;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 import org.projectforge.web.wicket.flowlayout.RadioGroupPanel;
 
@@ -64,7 +64,7 @@ public class AddressListForm extends AbstractListForm<AddressListFilter, Address
       final GridBuilder gridBuilder, final AddressFilter searchFilter)
   {
     {
-      gridBuilder.newColumnPanel(DivType.COL_60);
+      gridBuilder.newNestedPanel(DivType.COL_60);
       final FieldsetPanel fs = gridBuilder.newFieldset(parentPage.getString("label.options")).setNoLabelFor();
       final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
       final RadioGroupPanel<String> radioGroup = new RadioGroupPanel<String>(radioGroupPanel.newChildId(), "listtype", new PropertyModel<String>(
@@ -96,11 +96,11 @@ public class AddressListForm extends AbstractListForm<AddressListFilter, Address
     }
     {
       // DropDownChoice page size
-      gridBuilder.newColumnPanel(DivType.COL_40);
+      gridBuilder.newNestedPanel(DivType.COL_40);
       form.addPageSizeFieldset();
     }
     {
-      gridBuilder.addColumnPanel(new DivPanel(gridBuilder.newColumnPanelId()) {
+      gridBuilder.addRowChildPanel(new DivPanel(gridBuilder.newRowChildPanelId()) {
         @Override
         public boolean isVisible()
         {
@@ -121,7 +121,7 @@ public class AddressListForm extends AbstractListForm<AddressListFilter, Address
           new PropertyModel<Boolean>(searchFilter, "departed"), parentPage.getString("address.contactStatus.departed")));
     }
     {
-      gridBuilder.addColumnPanel(new DivPanel(gridBuilder.newColumnPanelId()) {
+      gridBuilder.addRowChildPanel(new DivPanel(gridBuilder.newRowChildPanelId()) {
         @Override
         public boolean isVisible()
         {
@@ -144,7 +144,7 @@ public class AddressListForm extends AbstractListForm<AddressListFilter, Address
   protected void init()
   {
     super.init();
-    gridBuilder.newColumnsPanel();
+    gridBuilder.newNestedRowPanel();
     addFilter(parentPage, this, gridBuilder, getSearchFilter());
   }
 

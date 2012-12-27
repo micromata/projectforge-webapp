@@ -73,6 +73,7 @@ import org.projectforge.web.common.MultiChoiceListHelper;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
@@ -84,7 +85,6 @@ import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.GridBuilder;
 import org.projectforge.web.wicket.flowlayout.RadioGroupPanel;
 
 import com.vaynberg.wicket.select2.Select2MultiChoice;
@@ -342,7 +342,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       ldapUserValues = new LdapUserValues();
     }
     final boolean adminAccess = accessChecker.isLoggedInUserMemberOfAdminGroup();
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid6();
     {
       // User
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("user"));
@@ -390,7 +390,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       addPassswordFields();
     }
 
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid6();
     createLastLoginAndDeleteAllStayLogins(gridBuilder, data, (UserDao) getBaseDao(), this);
     createLocale(gridBuilder, data);
     createDateFormat(gridBuilder, data);
@@ -400,7 +400,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     createPhoneIds(gridBuilder, data);
     createMEBPhoneNumbers(gridBuilder, data);
 
-    gridBuilder.newGrid16(true);
+    gridBuilder.newGrid12(true);
     addAssignedGroups(adminAccess);
     if (adminAccess == true && Login.getInstance().hasExternalUsermanagementSystem() == true) {
       addLdapStuff();
@@ -409,17 +409,17 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       addRights();
     }
 
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
     createDescription(gridBuilder, data);
   }
 
   @SuppressWarnings("serial")
   private void addLdapStuff()
   {
-    gridBuilder.newGrid16(true);
+    gridBuilder.newGrid12(true);
     gridBuilder.newFormHeading(getString("ldap"));
-    gridBuilder.newColumnsPanel();
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel();
+    gridBuilder.newNestedPanel(DivType.COL_50);
     WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("user.localUser"), "localUser", new PropertyModel<Boolean>(data, "localUser"),
         getString("user.localUser.tooltip"));
     if (LdapUserDao.isPosixAccountsConfigured() == false) {
@@ -467,7 +467,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       fs.add(gidNumberField);
       dependentLdapFormComponents[1] = gidNumberField;
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("user.restrictedUser"), "restrictedUser", new PropertyModel<Boolean>(data,
         "restrictedUser"), getString("user.restrictedUser.tooltip"));
     if (LdapUserDao.isPosixAccountsConfigured() == true) {
@@ -645,16 +645,16 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
         continue;
       }
       if (first == true) {
-        gridBuilder.newGrid16();
+        gridBuilder.newGrid12();
         gridBuilder.newFormHeading(getString("access.rights"));
         rightsData = new UserRightsEditData();
         first = false;
       }
       if (odd == true) {
-        gridBuilder.newColumnsPanel();
+        gridBuilder.newNestedRowPanel();
       }
       odd = !odd;
-      gridBuilder.newColumnPanel(DivType.COL_50);
+      gridBuilder.newNestedPanel(DivType.COL_50);
       rightsData.addRight(rightVO);
       final String label = getString(right.getId().getI18nKey());
       final FieldsetPanel fs = gridBuilder.newFieldset(label);

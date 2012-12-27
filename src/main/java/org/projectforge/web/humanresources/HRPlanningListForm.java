@@ -87,9 +87,9 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
     if (hrPlanningEntryDao.hasLoggedInUserSelectAccess(false) == false) {
       filter.setUserId(getUser().getId());
     }
-    gridBuilder.newColumnsPanel();
+    gridBuilder.newNestedRowPanel();
     {
-      gridBuilder.newColumnPanel(DivType.COL_60);
+      gridBuilder.newNestedPanel(DivType.COL_60);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("timePeriod"), true);
       startDate = new DatePanel(fs.newChildId(), new PropertyModel<Date>(filter, "startTime"), DatePanelSettings.get()
           .withSelectPeriodMode(true).withRequired(true));
@@ -132,7 +132,7 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
     }
     {
       // DropDownChoice page size
-      gridBuilder.newColumnPanel(DivType.COL_40);
+      gridBuilder.newNestedPanel(DivType.COL_40);
       addPageSizeFieldset();
     }
     boolean showProjectSelectPanel = false;
@@ -140,9 +140,9 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
     if (projektDao.hasLoggedInUserSelectAccess(false) == true) {
       // Project
       showProjectSelectPanel = true;
-      gridBuilder.newColumnsPanel();
+      gridBuilder.newNestedRowPanel();
       if (hasFullAccess == true) {
-        gridBuilder.newColumnPanel(DivType.COL_60);
+        gridBuilder.newNestedPanel(DivType.COL_60);
       }
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt"));
       final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel(fs.newChildId(), new Model<ProjektDO>() {
@@ -158,7 +158,7 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
     if (hasFullAccess == true) {
       // User
       if (showProjectSelectPanel == true) {
-        gridBuilder.newColumnPanel(DivType.COL_40);
+        gridBuilder.newNestedPanel(DivType.COL_40);
       }
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("user"));
       final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new Model<PFUserDO>() {
@@ -183,7 +183,7 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
       userSelectPanel.init().withAutoSubmit(true);
     }
     {
-      gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_60);
+      gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_60);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
       checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
@@ -197,7 +197,7 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
     }
     {
       // Total hours
-      gridBuilder.newColumnPanel(DivType.COL_40);
+      gridBuilder.newNestedPanel(DivType.COL_40);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.totalDuration"), true).setNoLabelFor();
       fs.add(new TextPanel(fs.newChildId(), new Model<String>() {
         @Override

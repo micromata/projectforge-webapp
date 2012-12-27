@@ -76,7 +76,7 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("searchFilter"));
       final TextField<String> searchField = new TextField<String>(fs.getTextFieldId(), new PropertyModel<String>(filter, "searchString"));
@@ -91,7 +91,7 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
       taskSelectPanel.init();
       taskSelectPanel.setRequired(false);
     }
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("filter.lastModified"), true);
       final DatePanel modifiedStartDatePanel = new DatePanel(fs.newChildId(),
@@ -153,7 +153,7 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
       lastDaysChoice.setRequired(false);
       fs.add(lastDaysChoice);
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("modifiedBy"));
       final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(filter, "modifiedByUser"),
@@ -161,7 +161,7 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
       fs.add(userSelectPanel);
       userSelectPanel.init().withAutoSubmit(true);
     }
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("search.area"));
       // DropDownChoice: area
@@ -184,7 +184,7 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
       areaChoice.setRequired(false);
       fs.add(areaChoice);
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // DropDownChoice pageSize
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.pageSize"));

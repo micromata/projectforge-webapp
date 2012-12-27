@@ -25,7 +25,6 @@ package org.projectforge.web.address;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.markup.html.link.Link;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
@@ -37,12 +36,12 @@ import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
+import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.projectforge.web.wicket.components.ExternalLinkPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.GridBuilder;
 import org.projectforge.web.wicket.flowlayout.Heading1Panel;
 import org.projectforge.web.wicket.flowlayout.Heading3Panel;
 import org.projectforge.web.wicket.flowlayout.ParTextPanel;
@@ -135,13 +134,11 @@ public class AddressViewPage extends AbstractSecuredPage
       addContentMenuEntry(menu);
     }
 
-    final RepeatingView flowform = new RepeatingView("flowform");
-    body.add(flowform);
-    gridBuilder = new GridBuilder(flowform, getMySession());
+    gridBuilder = new GridBuilder(body, "flowform", getMySession());
 
     final String name = address.getFullNameWithTitleAndForm();
 
-    gridBuilder.newGrid8(true).newBlockPanel();
+    gridBuilder.newGrid6(true).newBlockPanel();
     DivPanel section = gridBuilder.newSectionPanel();
     section.add(new Heading1Panel(section.newChildId(), name));
     appendFieldset("organization", address.getOrganization());
@@ -165,7 +162,7 @@ public class AddressViewPage extends AbstractSecuredPage
         address.getPrivateMobilePhone(), null, firstRow);
 
     if (StringUtils.isNotBlank(address.getComment()) == true) {
-      gridBuilder.newGrid16();
+      gridBuilder.newGrid12();
       section = gridBuilder.newSectionPanel();
       section.add(new Heading3Panel(section.newChildId(), getString("comment")));
       final ParTextPanel textPanel = new ParTextPanel(section.newChildId(), HtmlHelper.escapeHtml(address.getComment(), true));
@@ -182,7 +179,7 @@ public class AddressViewPage extends AbstractSecuredPage
       return firstRow;
     }
     if (firstRow == true) {
-      gridBuilder.newGrid8().newBlockPanel();
+      gridBuilder.newGrid6().newBlockPanel();
     }
     final DivPanel section = gridBuilder.newSectionPanel();
     if (firstRow == true) {

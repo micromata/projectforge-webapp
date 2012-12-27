@@ -27,13 +27,12 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.UserException;
+import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
-import org.projectforge.web.wicket.flowlayout.GridBuilder;
 import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
 
 public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends AbstractEditPage< ? , ? , ? >> extends
@@ -74,8 +73,6 @@ AbstractSecuredForm<O, P>
 
   protected GridBuilder gridBuilder;
 
-  protected RepeatingView flowform;
-
   public AbstractEditForm(final P parentPage, final O data)
   {
     super(parentPage);
@@ -88,9 +85,7 @@ AbstractSecuredForm<O, P>
   {
     super.init();
     feedbackPanel = addFeedbackPanel();
-    flowform = new RepeatingView("flowform");
-    add(flowform);
-    gridBuilder = newGridBuilder(flowform);
+    gridBuilder = newGridBuilder(this, "flowform");
 
     actionButtons = new MyComponentsRepeater<SingleButtonPanel>("buttons");
     add(actionButtons.getRepeatingView());

@@ -26,6 +26,7 @@ package org.projectforge.web.wicket;
 import java.text.MessageFormat;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
@@ -34,8 +35,7 @@ import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.util.lang.Bytes;
 import org.apache.wicket.validation.ValidationError;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.GridBuilder;
+import org.projectforge.web.wicket.bootstrap.GridBuilder;
 
 public abstract class AbstractForm<F, P extends AbstractUnsecureBasePage> extends Form<F>
 {
@@ -192,16 +192,8 @@ public abstract class AbstractForm<F, P extends AbstractUnsecureBasePage> extend
   /**
    * @see GridBuilder#GridBuilder(RepeatingView, MySession)
    */
-  public GridBuilder newGridBuilder(final RepeatingView parent)
+  public GridBuilder newGridBuilder(final WebMarkupContainer parent, final String id)
   {
-    return new GridBuilder(parent, getMySession());
-  }
-
-  /**
-   * @see GridBuilder#GridBuilder(DivPanel, MySession)
-   */
-  public GridBuilder newGridBuilder(final DivPanel parent)
-  {
-    return new GridBuilder(parent, getMySession());
+    return new GridBuilder(parent, id, getMySession());
   }
 }

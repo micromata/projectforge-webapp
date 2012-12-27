@@ -54,9 +54,9 @@ AbstractListForm<F, P>
   @SuppressWarnings("serial")
   protected void init(final int[] years)
   {
-    gridBuilder.newColumnsPanel();
+    gridBuilder.newNestedRowPanel();
     {
-      gridBuilder.newColumnPanel(DivType.COL_60);
+      gridBuilder.newNestedPanel(DivType.COL_60);
       { // DropDownChoice years
         final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true);
         final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(years, true);
@@ -128,10 +128,10 @@ AbstractListForm<F, P>
     }
     {
       // DropDownChoice page size
-      gridBuilder.newColumnPanel(DivType.COL_40);
+      gridBuilder.newNestedPanel(DivType.COL_40);
       addPageSizeFieldset();
     }
-    gridBuilder.newColumnsPanel();
+    gridBuilder.newNestedRowPanel();
     {
       // Statistics
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("statistics"), true).setNoLabelFor();

@@ -64,8 +64,8 @@ public class TeamCalListForm extends AbstractListForm<TeamCalFilter, TeamCalList
   protected void init()
   {
     super.init();
-    gridBuilder.newColumnsPanel();
-    gridBuilder.newColumnPanel(DivType.COL_66);
+    gridBuilder.newNestedRowPanel();
+    gridBuilder.newNestedPanel(DivType.COL_66);
     // getSearchFilter().setOwnerId(getUserId());
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
@@ -129,7 +129,7 @@ public class TeamCalListForm extends AbstractListForm<TeamCalFilter, TeamCalList
     }
     {
       // DropDownChoice page size
-      gridBuilder.newColumnPanel(DivType.COL_33);
+      gridBuilder.newNestedPanel(DivType.COL_33);
       addPageSizeFieldset();
     }
   }

@@ -42,16 +42,16 @@ public class MebListForm extends AbstractListForm<MebListFilter, MebListPage>
   protected void init()
   {
     super.init();
-    gridBuilder.newColumnsPanel();
+    gridBuilder.newNestedRowPanel();
     {
-      gridBuilder.newColumnPanel(DivType.COL_60);
+      gridBuilder.newNestedPanel(DivType.COL_60);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.hint")).setNoLabelFor();
       fs.add(new TextPanel(fs.newChildId(), PFUserContext.getLocalizedMessage("meb.intro",
           Configuration.getInstance().getStringValue(ConfigurationParam.MEB_SMS_RECEIVING_PHONE_NUMBER))));
     }
     {
       // DropDownChoice page size
-      gridBuilder.newColumnPanel(DivType.COL_40);
+      gridBuilder.newNestedPanel(DivType.COL_40);
       addPageSizeFieldset();
     }
   }

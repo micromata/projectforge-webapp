@@ -57,9 +57,9 @@ public class AccountingRecordListForm extends AbstractListForm<AccountingRecordL
     if (isFilterVisible() == false) {
       return;
     }
-    gridBuilder.newColumnsPanel();
+    gridBuilder.newNestedRowPanel();
     {
-      gridBuilder.newColumnPanel(DivType.COL_60);
+      gridBuilder.newNestedPanel(DivType.COL_60);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true);
       // DropDownChoices from
       final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(buchungssatzDao.getYears(), false);
@@ -91,7 +91,7 @@ public class AccountingRecordListForm extends AbstractListForm<AccountingRecordL
     }
     {
       // DropDownChoice page size
-      gridBuilder.newColumnPanel(DivType.COL_40);
+      gridBuilder.newNestedPanel(DivType.COL_40);
       addPageSizeFieldset();
     }
     {

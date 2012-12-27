@@ -52,7 +52,7 @@ public class MyAccountEditForm extends AbstractEditForm<PFUserDO, MyAccountEditP
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid6();
     {
       // User
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("user")).setNoLabelFor();
@@ -66,7 +66,7 @@ public class MyAccountEditForm extends AbstractEditForm<PFUserDO, MyAccountEditP
     UserEditForm.createJIRAUsername(gridBuilder, data);
     final FieldsetPanel fs = gridBuilder.newFieldset(getString("user.assignedGroups")).setNoLabelFor();
     fs.add(new DivTextPanel(fs.newChildId(), userGroupCache.getGroupnames(data.getId())));
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid6();
     UserEditForm.createLastLoginAndDeleteAllStayLogins(gridBuilder, data, (UserDao) getBaseDao(), this);
     UserEditForm.createLocale(gridBuilder, data);
     UserEditForm.createDateFormat(gridBuilder, data);
@@ -75,7 +75,7 @@ public class MyAccountEditForm extends AbstractEditForm<PFUserDO, MyAccountEditP
     UserEditForm.createTimeZone(gridBuilder, data);
     UserEditForm.createPhoneIds(gridBuilder, data);
     UserEditForm.createMEBPhoneNumbers(gridBuilder, data);
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
     UserEditForm.createDescription(gridBuilder, data);
   }
 

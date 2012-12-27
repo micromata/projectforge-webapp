@@ -110,7 +110,7 @@ public class BookEditForm extends AbstractEditForm<BookDO, BookEditPage>
       }
     });
 
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
     {
       // Title
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("book.title"));
@@ -125,7 +125,7 @@ public class BookEditForm extends AbstractEditForm<BookDO, BookEditPage>
       final MaxLengthTextField authors = new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "authors"));
       fs.add(dependentFormComponents[0] = authors);
     }
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // DropDownChoice bookType
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("book.type"));
@@ -170,7 +170,7 @@ public class BookEditForm extends AbstractEditForm<BookDO, BookEditPage>
       });
       fs.add(dependentFormComponents[2] = signature);
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // ISBN
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("book.isbn"));

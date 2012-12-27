@@ -25,9 +25,8 @@ package org.projectforge.web.wicket;
 
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Button;
-import org.apache.wicket.markup.repeater.RepeatingView;
+import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
-import org.projectforge.web.wicket.flowlayout.GridBuilder;
 import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
 
 public class AbstractStandardForm<F, P extends AbstractStandardFormPage> extends AbstractForm<F, P>
@@ -49,9 +48,7 @@ public class AbstractStandardForm<F, P extends AbstractStandardFormPage> extends
     super.init();
     addFeedbackPanel();
     addMessageField();
-    final RepeatingView repeater = new RepeatingView("flowform");
-    add(repeater);
-    gridBuilder = newGridBuilder(repeater);
+    gridBuilder = newGridBuilder(this, "flowform");
     actionButtons = new MyComponentsRepeater<SingleButtonPanel>("buttons");
     add(actionButtons.getRepeatingView());
   }

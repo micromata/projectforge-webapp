@@ -40,9 +40,9 @@ public class Kost2ListForm extends AbstractListForm<Kost2ListFilter, Kost2ListPa
   protected void init()
   {
     super.init();
-    gridBuilder.newColumnsPanel();
+    gridBuilder.newNestedRowPanel();
     {
-      gridBuilder.newColumnPanel(DivType.COL_60);
+      gridBuilder.newNestedPanel(DivType.COL_60);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true);
       // DropDownChoice listType
       final LabelValueChoiceRenderer<String> typeChoiceRenderer = new LabelValueChoiceRenderer<String>();
@@ -57,7 +57,7 @@ public class Kost2ListForm extends AbstractListForm<Kost2ListFilter, Kost2ListPa
     }
     {
       // DropDownChoice page size
-      gridBuilder.newColumnPanel(DivType.COL_40);
+      gridBuilder.newNestedPanel(DivType.COL_40);
       addPageSizeFieldset();
     }
   }

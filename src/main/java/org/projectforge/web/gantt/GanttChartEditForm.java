@@ -105,7 +105,7 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task"));
       final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(data, "task"), parentPage,
@@ -121,14 +121,14 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
       taskSelectPanel.init();
       taskSelectPanel.setRequired(true);
     }
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.name"));
       final RequiredMaxLengthTextField name = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "name"));
       WicketUtils.setStrong(name);
       fs.add(name);
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.owner"));
       final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(data, "owner"), parentPage,
@@ -136,7 +136,7 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
       fs.add(userSelectPanel);
       userSelectPanel.init();
     }
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("title"));
       final RequiredMaxLengthTextField title = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(getSettings(),
@@ -144,7 +144,7 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
       WicketUtils.setStrong(title);
       fs.add(title);
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // read-access:
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("access.read"));
@@ -155,13 +155,13 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
       readAccessChoice.setNullValid(false);
       fs.add(readAccessChoice);
     }
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // Width
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.settings.width"));
       fs.add(new MinMaxNumberField<Integer>(fs.getTextFieldId(), new PropertyModel<Integer>(data.getStyle(), "width"), 100, 10000));
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // write-access:
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("access.write"));
@@ -172,14 +172,14 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
       writeAccessChoice.setNullValid(false);
       fs.add(writeAccessChoice);
     }
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // Total label width:
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.settings.totalLabelWidth"));
       fs.add(new MinMaxNumberField<Double>(fs.getTextFieldId(), new PropertyModel<Double>(data.getStyle(), "totalLabelWidth"), 10.0,
           10000.0));
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // Options
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
@@ -201,7 +201,7 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
         }
       });
     }
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // Time period
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("timePeriod"), true).setNoLabelFor();
@@ -213,7 +213,7 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
           .get().withSelectProperty("toDate"));
       fs.add(toDatePanel);
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("export"), true);
       final LabelValueChoiceRenderer<String> exportFormatChoiceRenderer = new LabelValueChoiceRenderer<String>();

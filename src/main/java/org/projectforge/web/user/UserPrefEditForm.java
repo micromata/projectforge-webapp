@@ -116,8 +116,8 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
     super.init();
 
     /* GRID16 - BLOCK */
-    gridBuilder.newGrid16();
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    gridBuilder.newGrid12();
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // Name
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("userPref.name"));
@@ -144,7 +144,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
       name.add(WicketUtils.setFocus());
       fs.add(new InputPanel(fs.newChildId(), name));
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
+    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // User
       data.setUser(PFUserContext.getUser());

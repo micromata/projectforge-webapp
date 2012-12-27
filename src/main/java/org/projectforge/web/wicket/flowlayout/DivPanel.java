@@ -31,6 +31,8 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
+import org.projectforge.web.wicket.bootstrap.GridSize;
+import org.projectforge.web.wicket.bootstrap.GridType;
 
 /**
  * Represents a entry of a group panel. This can be a label, text field or other form components.
@@ -55,11 +57,10 @@ public class DivPanel extends Panel
   /**
    * @param id
    */
+  @Deprecated
   public DivPanel(final String id, final DivType... cssClasses)
   {
-    super(id);
-    div = new WebMarkupContainer("div");
-    super.add(div);
+    this(id);
     addCssClasses(cssClasses);
   }
 
@@ -67,6 +68,49 @@ public class DivPanel extends Panel
   {
     if (cssClasses != null) {
       for (final DivType cssClass : cssClasses) {
+        if (cssClass != null) {
+          div.add(AttributeModifier.append("class", cssClass.getClassAttrValue()));
+        }
+      }
+    }
+    return this;
+  }
+
+  /**
+   * @param id
+   */
+  public DivPanel(final String id)
+  {
+    super(id);
+    div = new WebMarkupContainer("div");
+    super.add(div);
+  }
+
+  /**
+   * @param id
+   */
+  public DivPanel(final String id, final GridType... cssClasses)
+  {
+    this(id);
+    addCssClasses(cssClasses);
+  }
+
+  /**
+   * @param id
+   */
+  public DivPanel(final String id, final GridSize divSize, final GridType... cssClasses)
+  {
+    super(id);
+    div = new WebMarkupContainer("div");
+    super.add(div);
+    div.add(AttributeModifier.append("class", divSize.getClassAttrValue()));
+    addCssClasses(cssClasses);
+  }
+
+  public DivPanel addCssClasses(final GridType... cssClasses)
+  {
+    if (cssClasses != null) {
+      for (final GridType cssClass : cssClasses) {
         if (cssClass != null) {
           div.add(AttributeModifier.append("class", cssClass.getClassAttrValue()));
         }

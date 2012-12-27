@@ -105,9 +105,9 @@ public class TimesheetListForm extends AbstractListForm<TimesheetListFilter, Tim
       }
     });
     final TimesheetFilter filter = getSearchFilter();
-    gridBuilder.newColumnsPanel();
+    gridBuilder.newNestedRowPanel();
     {
-      gridBuilder.newColumnPanel(DivType.COL_60);
+      gridBuilder.newNestedPanel(DivType.COL_60);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task")).setNoLabelFor();
       final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new Model<TaskDO>() {
         @Override
@@ -132,7 +132,7 @@ public class TimesheetListForm extends AbstractListForm<TimesheetListFilter, Tim
     }
     {
       // Duration
-      gridBuilder.newColumnPanel(DivType.COL_40);
+      gridBuilder.newNestedPanel(DivType.COL_40);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.totalDuration")).setNoLabelFor();
       fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
         @Override
@@ -149,7 +149,7 @@ public class TimesheetListForm extends AbstractListForm<TimesheetListFilter, Tim
       }));
     }
     {
-      gridBuilder.newColumnPanel(DivType.COL_60);
+      gridBuilder.newNestedPanel(DivType.COL_60);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("timePeriod"), true);
       startDate = new DatePanel(fs.newChildId(), new PropertyModel<Date>(filter, "startTime"), DatePanelSettings.get()
           .withSelectPeriodMode(true));
@@ -193,11 +193,11 @@ public class TimesheetListForm extends AbstractListForm<TimesheetListFilter, Tim
     }
     {
       // DropDownChoice page size
-      gridBuilder.newColumnPanel(DivType.COL_40);
+      gridBuilder.newNestedPanel(DivType.COL_40);
       addPageSizeFieldset();
     }
     {
-      gridBuilder.newColumnPanel(DivType.COL_60);
+      gridBuilder.newNestedPanel(DivType.COL_60);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
       checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
@@ -211,7 +211,7 @@ public class TimesheetListForm extends AbstractListForm<TimesheetListFilter, Tim
     }
     {
       // Assignee
-      gridBuilder.newColumnPanel(DivType.COL_40);
+      gridBuilder.newNestedPanel(DivType.COL_40);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("user"));
       final UserSelectPanel assigneeSelectPanel = new UserSelectPanel(fs.newChildId(), new Model<PFUserDO>() {
         @Override

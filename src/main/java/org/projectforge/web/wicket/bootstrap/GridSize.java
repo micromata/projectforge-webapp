@@ -21,28 +21,42 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.web.wicket.flowlayout;
+package org.projectforge.web.wicket.bootstrap;
+
+import org.projectforge.common.StringHelper;
 
 /**
  * Used for defining class attribute value for elements.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public enum DivType
+public enum GridSize
 {
-  ACCORDION_BOX("accordion_box"), BLOCK("block"), BLOCK_LINES("block lines"), BOX("box"), CLEARFIX("clearfix mm_clear"), COL_25("span3"), COL_33(
-      "span4"), COL_40("span4"), COL_50("span6"), COL_60("span8"), COL_66("span8"), COL_75("span9"), COL_100("span12"), COLUMNS(
-          "columns"), CHECKBOX("jqui_checkbox"), FIELD_DIV("field_div"), GRID4("span4"), GRID6("span6"), GRID12("span12"), MARGIN_TOP_10(
-              "margin_top_10"), RADIOBOX("radio-jquery-ui"), ROUND_ALL("round_all"), ROW_FLUID("row-fluid"), SECTION("section"), TOGGLE_CONTAINER(
-                  "toggle_container");
+  SPAN1("span1"), SPAN2("span2"), SPAN3("span3"), SPAN4("span4"), SPAN6("span6"), SPAN8("span8"), SPAN9("span9"), SPAN12("span12");
 
   private String classAttrValue;
+
+  public static String gridTypesToClassString(final GridSize... gridTypes)
+  {
+    if (gridTypes == null || gridTypes.length == 0) {
+      return null;
+    }
+    if (gridTypes.length == 1) {
+      return gridTypes[0].classAttrValue;
+    }
+    boolean first = true;
+    final StringBuffer buf = new StringBuffer();
+    for (final GridSize gridType : gridTypes) {
+      first = StringHelper.append(buf, first, gridType.classAttrValue, " ");
+    }
+    return buf.toString();
+  }
 
   public String getClassAttrValue()
   {
     return classAttrValue;
   }
 
-  private DivType(final String classAttrValue)
+  private GridSize(final String classAttrValue)
   {
     this.classAttrValue = classAttrValue;
   }

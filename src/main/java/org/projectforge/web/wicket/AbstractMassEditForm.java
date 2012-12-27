@@ -28,10 +28,9 @@ import java.io.Serializable;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
+import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
-import org.projectforge.web.wicket.flowlayout.GridBuilder;
 import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
 
 public abstract class AbstractMassEditForm<O extends Serializable, P extends AbstractMassEditPage> extends AbstractSecuredForm<O, P>
@@ -70,9 +69,7 @@ public abstract class AbstractMassEditForm<O extends Serializable, P extends Abs
     feedbackPanel.setOutputMarkupId(true);
     add(feedbackPanel);
 
-    final RepeatingView flowform = new RepeatingView("flowform");
-    add(flowform);
-    gridBuilder = newGridBuilder(flowform);
+    gridBuilder = newGridBuilder(this, "flowform");
 
     actionButtons = new MyComponentsRepeater<SingleButtonPanel>("buttons");
     add(actionButtons.getRepeatingView());

@@ -29,7 +29,6 @@ import java.util.Date;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.form.Button;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.AppVersion;
@@ -40,6 +39,7 @@ import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.WicketApplication;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
@@ -47,7 +47,6 @@ import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.GridBuilder;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 
@@ -80,11 +79,9 @@ public class AdminForm extends AbstractForm<AdminForm, AdminPage>
   {
     addFeedbackPanel();
 
-    final RepeatingView repeater = new RepeatingView("flowform");
-    add(repeater);
-    gridBuilder = newGridBuilder(repeater);
+    gridBuilder = newGridBuilder(this, "flowform");
 
-    gridBuilder.newGrid8().newBlockPanel();
+    gridBuilder.newGrid6().newBlockPanel();
     gridBuilder.newFormHeading(getString("system.admin.group.title.systemChecksAndFunctionality"));
     final Configuration cfg = Configuration.getInstance();
     {
@@ -192,7 +189,7 @@ public class AdminForm extends AbstractForm<AdminForm, AdminPage>
           AppVersion.NUMBER)));
     }
 
-    gridBuilder.newGrid8().newBlockPanel();
+    gridBuilder.newGrid6().newBlockPanel();
     gridBuilder.newFormHeading(getString("system.admin.group.title.databaseActions"));
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.group.title.databaseActions.userprefs"), true)
@@ -285,7 +282,7 @@ public class AdminForm extends AbstractForm<AdminForm, AdminPage>
       fs.add(new SingleButtonPanel(fs.newChildId(), button, "BookDO", SingleButtonPanel.GREY));
     }
 
-    gridBuilder.newGrid16().newBlockPanel();
+    gridBuilder.newGrid12().newBlockPanel();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.group.title.misc.logEntries"), true);
       final MaxLengthTextArea logEntries = new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(this, "logEntries"),

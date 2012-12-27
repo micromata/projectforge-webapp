@@ -64,7 +64,7 @@ public class AccountingRecordEditForm extends AbstractEditForm<BuchungssatzDO, A
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid6();
     {
       // Date
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("date"));
@@ -124,7 +124,7 @@ public class AccountingRecordEditForm extends AbstractEditForm<BuchungssatzDO, A
       WicketUtils.setReadonly(belegField);
       fs.add(belegField);
     }
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid6();
     {
       // Cost 1 / cost2
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost1") + "/" + getString("fibu.kost2"), true);
@@ -165,7 +165,7 @@ public class AccountingRecordEditForm extends AbstractEditForm<BuchungssatzDO, A
       WicketUtils.setReadonly(mengeField);
       fs.add(mengeField);
     }
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
     {
       // Comment
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));

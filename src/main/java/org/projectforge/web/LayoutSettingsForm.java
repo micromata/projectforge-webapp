@@ -27,9 +27,9 @@ import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.AbstractStandardForm;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.RadioGroupPanel;
 
@@ -51,7 +51,7 @@ public class LayoutSettingsForm extends AbstractStandardForm<LayoutSettingsData,
   {
     super.init();
     data.setBrowserScreenWidthType(getMySession().getBrowserScreenWidthType());
-    gridBuilder.newGrid16().newBlockPanel();
+    gridBuilder.newGridPanel(0, GridSize.SPAN12);
     final FieldsetPanel fs = gridBuilder.newFieldset(getString("layout.settings.browserScreenWidth")).setLabelSide(false).setNoLabelFor();
     final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
     final RadioGroupPanel<BrowserScreenWidthType> radioGroup = new RadioGroupPanel<BrowserScreenWidthType>(radioGroupPanel.newChildId(),
@@ -81,17 +81,18 @@ public class LayoutSettingsForm extends AbstractStandardForm<LayoutSettingsData,
     addRadioBox(radioGroup, BrowserScreenWidthType.NARROW);
     addRadioBox(radioGroup, BrowserScreenWidthType.NORMAL);
     addRadioBox(radioGroup, BrowserScreenWidthType.WIDE);
-    gridBuilder.newGrid8().newColumnsPanel().newColumnPanel(DivType.COL_50);
-    gridBuilder.newFormHeading(getString("layout.settings.test") + " 1.1");
-    addContent();
-    gridBuilder.newColumnPanel(DivType.COL_50);
-    gridBuilder.newFormHeading(getString("layout.settings.test") + " 1.2");
-    addContent();
-    gridBuilder.newGrid8().newColumnsPanel().newColumnPanel(DivType.COL_50);
-    gridBuilder.newFormHeading(getString("layout.settings.test") + " 2.1");
-    addContent();
-    gridBuilder.newColumnPanel(DivType.COL_50);
-    gridBuilder.newFormHeading(getString("layout.settings.test") + " 2.2");
+    gridBuilder.newSplitScreen4Columns();
+    addCell("1.1");
+    gridBuilder.nextScreen4Columns();
+    addCell("1.2");
+    gridBuilder.nextScreen4Columns();
+    addCell("2.1");
+    gridBuilder.nextScreen4Columns();
+    addCell("2.2");
+  }
+
+  private void addCell(final String number) {
+    gridBuilder.newFormHeading(getString("layout.settings.test") + " " + number);
     addContent();
   }
 

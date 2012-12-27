@@ -98,7 +98,7 @@ public class NewPollOverviewPage extends PollBasePage
   {
     super.onInitialize();
 
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid6();
 
     final FieldsetPanel fsTitle = gridBuilder.newFieldset(getString("plugins.poll.new.title"), true).setLabelFor(this);
     TextField<String> title = new TextField<String>(fsTitle.getTextFieldId(), new PropertyModel<String>(model.getPollDo(), "title"));
@@ -117,7 +117,7 @@ public class NewPollOverviewPage extends PollBasePage
     description.setEnabled(this.model.isExisting());
     fsDescription.add(description);
 
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
 
     if (this.model.isExisting() == true) {
       createEnabledChoices();

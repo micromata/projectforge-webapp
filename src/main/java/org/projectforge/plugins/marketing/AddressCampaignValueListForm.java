@@ -70,7 +70,7 @@ public class AddressCampaignValueListForm extends AbstractListForm<AddressCampai
     this.addressCampaignId = searchFilter.getAddressCampaignId();
     this.addressCampaignValue = searchFilter.getAddressCampaignValue();
     final List<AddressCampaignDO> addressCampaignList = addressCampaignDao.getList(new AddressCampaignValueFilter());
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_60);
+    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_60);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.marketing.addressCampaign"));
       final LabelValueChoiceRenderer<Integer> addressCampaignRenderer = new LabelValueChoiceRenderer<Integer>();
@@ -117,7 +117,7 @@ public class AddressCampaignValueListForm extends AbstractListForm<AddressCampai
       fs.add(addressCampaignChoice);
     }
     {
-      gridBuilder.newColumnPanel(DivType.COL_40);
+      gridBuilder.newNestedPanel(DivType.COL_40);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("value"));
       final LabelValueChoiceRenderer<String> choiceRenderer = getValueLabelValueChoiceRenderer();
       addressCampaignValueDropDownChoice = new DropDownChoice<String>(fs.getDropDownChoiceId(), new PropertyModel<String>(this,

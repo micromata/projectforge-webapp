@@ -64,11 +64,11 @@ import org.projectforge.web.timesheet.TimesheetListPage;
 import org.projectforge.web.wicket.AbstractStandardFormPage;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.GridBuilder;
 import org.projectforge.web.wicket.flowlayout.TextStyle;
 
 public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implements ISelectCallerPage
@@ -136,11 +136,9 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
       }, getString("exportAsPdf"));
       addContentMenuEntry(exportAsPdf);
     }
-    final RepeatingView repeater = new RepeatingView("fields");
-    body.add(repeater);
-    gridBuilder = form.newGridBuilder(repeater);
+    gridBuilder = form.newGridBuilder(body, "fields");
     final DivType colType = costConfigured == true ? DivType.COL_33 : DivType.COL_50;
-    gridBuilder.newGrid16().newColumnsPanel().newColumnPanel(colType);
+    gridBuilder.newGrid12().newNestedRowPanel().newNestedPanel(colType);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.user")).setNoLabelFor();
       fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
@@ -156,7 +154,7 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
       }));
     }
     if (costConfigured == true) {
-      gridBuilder.newColumnPanel(colType);
+      gridBuilder.newNestedPanel(colType);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost1")).setNoLabelFor();
       fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
         /**
@@ -173,7 +171,7 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
         }
       }));
     }
-    gridBuilder.newColumnPanel(colType);
+    gridBuilder.newNestedPanel(colType);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.workingDays")).setNoLabelFor();
       fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {

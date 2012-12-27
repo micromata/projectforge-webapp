@@ -25,14 +25,13 @@ package org.projectforge.web.user;
 
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.PasswordTextField;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.GridBuilder;
 import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
 
 public class ChangePasswordForm extends AbstractForm<ChangePasswordForm, ChangePasswordPage>
@@ -56,10 +55,8 @@ public class ChangePasswordForm extends AbstractForm<ChangePasswordForm, ChangeP
   {
     super.init();
     addFeedbackPanel();
-    final RepeatingView repeater = new RepeatingView("flowform");
-    add(repeater);
-    gridBuilder = newGridBuilder(repeater);
-    gridBuilder.newGrid8();
+    gridBuilder = newGridBuilder(this, "flowform");
+    gridBuilder.newGrid6();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("user.changePassword.oldPassword"));
       final PasswordTextField oldPassword = new PasswordTextField(fs.getTextFieldId(), new PropertyModel<String>(this, "oldPassword"));

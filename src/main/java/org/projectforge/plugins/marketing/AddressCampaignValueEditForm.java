@@ -63,7 +63,7 @@ public class AddressCampaignValueEditForm extends AbstractEditForm<AddressCampai
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid12();
     {
       // Heading
       gridBuilder.newFormHeading(getString("plugins.marketing.addressCampaignValue") + ": " + data.getAddressCampaign().getTitle());
