@@ -137,7 +137,7 @@
   <classpathentry kind="var" path="M2_REPO/jfree/jcommon/1.0.15/jcommon-1.0.15.jar"/>
   <classpathentry kind="var" path="M2_REPO/jfree/jfreechart/1.0.13/jfreechart-1.0.13.jar"/>
   <classpathentry kind="var" path="M2_REPO/xerces/xercesImpl/2.8.1/xercesImpl-2.8.1.jar" sourcepath="M2_REPO/xerces/xercesImpl/2.8.1/xercesImpl-2.8.1-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/mnode/ical4j/ical4j/1.0.3/ical4j-1.0.3.jar" sourcepath="M2_REPO/org/mnode/ical4j/ical4j/1.0.3/ical4j-1.0.3-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/mnode/ical4j/ical4j/1.0.4/ical4j-1.0.4.jar" sourcepath="M2_REPO/org/mnode/ical4j/ical4j/1.0.4/ical4j-1.0.4-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/backport-util-concurrent/backport-util-concurrent/3.1/backport-util-concurrent-3.1.jar" sourcepath="M2_REPO/backport-util-concurrent/backport-util-concurrent/3.1/backport-util-concurrent-3.1-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/mnode/ical4j/ical4j-vcard/0.9.5/ical4j-vcard-0.9.5.jar" sourcepath="M2_REPO/org/mnode/ical4j/ical4j-vcard/0.9.5/ical4j-vcard-0.9.5-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/junit/junit/4.7/junit-4.7.jar" sourcepath="M2_REPO/junit/junit/4.7/junit-4.7-sources.jar"/>
