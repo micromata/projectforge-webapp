@@ -23,12 +23,14 @@
 
 package org.projectforge.web.wicket.flowlayout;
 
+import java.io.Serializable;
+
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public interface DivPanelVisibility
+public interface DivPanelVisibility extends Serializable
 {
   public boolean isVisible();
 }

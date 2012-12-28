@@ -31,8 +31,8 @@ import org.projectforge.address.AddressDao;
 import org.projectforge.address.PersonalAddressDao;
 import org.projectforge.web.address.AddressPageSupport.AddressParameters;
 import org.projectforge.web.wicket.AbstractEditForm;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
@@ -60,7 +60,7 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
     super.init();
     addressEditSupport = new AddressPageSupport(this, gridBuilder, (AddressDao) getBaseDao(), personalAddressDao, data);
     /* GRID8 - BLOCK */
-    gridBuilder.newGrid6().newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50, true).newSubSplitPanel(GridSize.COL50);
     addressEditSupport.addName();
     addressEditSupport.addFirstName();
     final FieldsetPanel fs = (FieldsetPanel)addressEditSupport.addFormOfAddress();
@@ -73,7 +73,7 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
     // /////////////////
     // Second box
     // /////////////////
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
     addressEditSupport.addOrganization();
     addressEditSupport.addDivision();
     addressEditSupport.addPosition();
@@ -83,24 +83,24 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
     // /////////////////
     // Status
     // /////////////////
-    gridBuilder.newGrid6().newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50, true).newSubSplitPanel(GridSize.COL50);
     addressEditSupport.addContactStatus();
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
     addressEditSupport.addAddressStatus();
-    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
     addressEditSupport.addBirthday();
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
     addressEditSupport.addLanguage();
 
     // /////////////////
     // Phone numbers
     // /////////////////
-    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
     addPhoneNumber("businessPhone", "address.phone", "address.business", "favoriteBusinessPhone", FieldType.PHONE_NO);
     addPhoneNumber("fax", "address.phoneType.fax", "address.business", "favoriteFax", FieldType.PHONE_NO);
     addPhoneNumber("mobilePhone", "address.phoneType.mobile", "address.business", "favoriteMobilePhone", FieldType.MOBILE_PHONE_NO);
 
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
     addPhoneNumber("privatePhone", "address.phone", "address.private", "favoritePrivatePhone", FieldType.PHONE_NO);
     addPhoneNumber("privateMobilePhone", "address.phoneType.mobile", "address.private", "favoritePrivateMobilePhone",
         FieldType.MOBILE_PHONE_NO);
@@ -108,18 +108,18 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
     // /////////////////
     // Addresses
     // /////////////////
-    gridBuilder.newGrid6(true);
+    gridBuilder.newSplitPanel(GridSize.COL50, true).newSubSplitPanel(GridSize.COL100);
     addAddress(addressEditSupport.getBusinessAddressParameters());
-    gridBuilder.newGrid6();
+    gridBuilder.newSubSplitPanel(GridSize.COL100);
     addAddress(addressEditSupport.getPostalAddressParameters());
-    gridBuilder.newGrid6();
+    gridBuilder.newSplitPanel(GridSize.COL50, true).newSubSplitPanel(GridSize.COL100);
     addAddress(addressEditSupport.getPrivateAddressParameters());
 
-    gridBuilder.newGrid6().newBlockPanel();
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
     addressEditSupport.addFingerPrint();
     addressEditSupport.addPublicKey();
 
-    gridBuilder.newGrid12(true).newBlockPanel();
+    gridBuilder.newGridPanel();
     addressEditSupport.addComment();
   }
 
@@ -135,15 +135,14 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
 
   private void addAddress(final AddressParameters params)
   {
-    gridBuilder.newNestedRowPanel().newNestedPanel(null);
     addressEditSupport.addAddressText(params.addressType, params.addressTextProperty);
-    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
     addressEditSupport.addZipCode(params.zipCodeProperty);
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
     addressEditSupport.addCity(params.cityProperty);
-    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
     addressEditSupport.addCountry(params.countryProperty);
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
     addressEditSupport.addState(params.stateProperty);
   }
 
