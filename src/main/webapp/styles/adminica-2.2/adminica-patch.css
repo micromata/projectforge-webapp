@@ -2,6 +2,12 @@ body #sidebar {
 	border-top-right-radius: 0px;
 	top: 75px !important;
 }
+
+#sidebar div.cog {
+	top: 0px;
+	border-top-right-radius: 5px;
+}
+
 #nav_top {
 	margin-left: 45px;
 	margin-top: -30px;
