@@ -38,11 +38,11 @@ import org.projectforge.orga.PostausgangDO;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteMaxLengthTextField;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
@@ -63,8 +63,7 @@ public class PostausgangEditForm extends AbstractEditForm<PostausgangDO, Postaus
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid12();
-    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Date
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("date"));
@@ -88,7 +87,7 @@ public class PostausgangEditForm extends AbstractEditForm<PostausgangDO, Postaus
       });
       fs.add(datumPanel);
     }
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Status drop down box:
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("orga.post.type"));
@@ -99,7 +98,7 @@ public class PostausgangEditForm extends AbstractEditForm<PostausgangDO, Postaus
       typeChoice.setRequired(true);
       fs.add(typeChoice);
     }
-    gridBuilder.newBlockPanel();
+    gridBuilder.newGridPanel();
     {
       // Receiver
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("orga.postausgang.empfaenger"));
