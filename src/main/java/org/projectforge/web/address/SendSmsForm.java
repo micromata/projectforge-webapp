@@ -94,8 +94,6 @@ public class SendSmsForm extends AbstractStandardForm<SendSmsData, SendSmsPage>
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid12().newNestedRowPanel();
-
     FieldsetPanel fs = gridBuilder.newFieldset(getString("address.sendSms.phoneNumber"));
     final PFAutoCompleteTextField<String> numberTextField = new PFAutoCompleteTextField<String>(InputPanel.WICKET_ID,
         new PropertyModel<String>(data, "phoneNumber")) {
