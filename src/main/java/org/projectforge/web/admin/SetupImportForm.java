@@ -54,7 +54,6 @@ public class SetupImportForm extends AbstractForm<SetupImportForm, SetupPage>
   {
     addFeedbackPanel();
     final GridBuilder gridBuilder = newGridBuilder(this, "flowform");
-    gridBuilder.newGrid12().newNestedRowPanel();
     gridBuilder.newFormHeading(getString("import"));
     {
       // Upload dump file

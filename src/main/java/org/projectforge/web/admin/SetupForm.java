@@ -91,10 +91,9 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
   {
     addFeedbackPanel();
     final GridBuilder gridBuilder = newGridBuilder(this, "flowform");
-    gridBuilder.newGrid12().newNestedRowPanel();
     gridBuilder.newFormHeading(getString("administration.setup.heading"));
-    final DivPanel section = gridBuilder.newSectionPanel();
-    section.add(new ParTextPanel(section.newChildId(), getString("administration.setup.heading.subtitle")));
+    final DivPanel panel = gridBuilder.getPanel();
+    panel.add(new ParTextPanel(panel.newChildId(), getString("administration.setup.heading.subtitle")));
     {
       // RadioChoice mode
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.setup.target"));

@@ -287,7 +287,7 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
    */
   public String newRowId()
   {
-    return gridPanel[currentLevel].newChildId();
+    return rowPanel[currentLevel].newChildId();
   }
 
   /**
@@ -295,7 +295,7 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
    */
   public String newGridPanelId()
   {
-    return rowPanel[currentLevel].newChildId();
+    return gridPanel[currentLevel].newChildId();
   }
 
   /**

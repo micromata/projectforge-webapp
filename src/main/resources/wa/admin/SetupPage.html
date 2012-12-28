@@ -5,13 +5,15 @@
 
 <body>
   <wicket:extend>
-    <div class="box tabs" style="margin-top: 80px;">
-      <ul class="tab_header clearfix">
-        <li><a href="#setupform"><wicket:message key="administration.setup" /></a></li>
-        <li><a href="#upload"><wicket:message key="import" /></a></li>
+    <div class="tabbable">
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#setupform" data-toggle="tab"><wicket:message key="administration.setup" /></a></li>
+        <li><a href="#upload" data-toggle="tab"><wicket:message key="import" /></a></li>
       </ul>
+    </div>
+    <div class="tab-content">
+      <div id="setupform" class="tab-pane active">
 
-      <div class="toggle_container">
         <div id="setupform" class="section">
           <form wicket:id="setupform">
             <div class="alert alert_red feedback" wicket:id="feedback"></div>
@@ -22,16 +24,15 @@
           </form>
         </div>
       </div>
-      <div class="toggle_container">
-        <div id="upload" class="section">
-          <form wicket:id="importform">
-            <div class="alert alert_red feedback" wicket:id="feedback"></div>
-            <wicket:container wicket:id="flowform">[the form fields]</wicket:container>
-            <div class="button_cell clearfix">
-              <wicket:container wicket:id="buttons">[action buttons]</wicket:container>
-            </div>
-          </form>
-        </div>
+
+      <div id="upload" class="tab-pane active">
+        <form wicket:id="importform">
+          <div class="alert alert_red feedback" wicket:id="feedback"></div>
+          <wicket:container wicket:id="flowform">[the form fields]</wicket:container>
+          <div class="button_cell clearfix">
+            <wicket:container wicket:id="buttons">[action buttons]</wicket:container>
+          </div>
+        </form>
       </div>
     </div>
   </wicket:extend>

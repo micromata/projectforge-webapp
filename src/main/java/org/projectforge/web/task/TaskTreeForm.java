@@ -34,10 +34,10 @@ import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldSetIconPosition;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.IconPanel;
@@ -72,9 +72,8 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
     super.init();
     addFeedbackPanel();
     gridBuilder = newGridBuilder(this, "flowform");
-    gridBuilder.newGrid12().newNestedRowPanel();
     {
-      gridBuilder.newNestedPanel(DivType.COL_50);
+      gridBuilder.newSplitPanel(GridSize.COL50);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("searchFilter"), true);
       final TextField<String> searchField = new TextField<String>(InputPanel.WICKET_ID, new PropertyModel<String>(getSearchFilter(),
           "searchString"));
@@ -85,7 +84,7 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
           WebConstants.DOC_LINK_HANDBUCH_LUCENE, true), FieldSetIconPosition.TOP_RIGHT);
     }
     {
-      gridBuilder.newNestedPanel(DivType.COL_50);
+      gridBuilder.newSplitPanel(GridSize.COL50);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
       checkBoxPanel.add(new MyCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "notOpened"),

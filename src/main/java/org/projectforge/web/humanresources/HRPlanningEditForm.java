@@ -62,6 +62,7 @@ import org.projectforge.web.fibu.ProjektSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DateTimePanelSettings;
 import org.projectforge.web.wicket.components.JiraIssuesPanel;
@@ -161,8 +162,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
         }
       }
     });
-    gridBuilder.newGrid12();
-    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // User
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("user"));
@@ -173,7 +173,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
       userSelectPanel.setRequired(true);
       userSelectPanel.init();
     }
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Start Date
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.startTime"), true);
@@ -281,6 +281,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
         });
       }
     }
+    gridBuilder.newGridPanel();
     entriesRepeater = gridBuilder.newRepeatingView();
     refresh();
     WicketUtils.addShowDeleteRowQuestionDialog(this, hrPlanningEntryDao);

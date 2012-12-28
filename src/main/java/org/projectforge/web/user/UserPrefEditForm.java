@@ -54,12 +54,12 @@ import org.projectforge.web.fibu.ProjektSelectPanel;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
@@ -115,9 +115,8 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
   {
     super.init();
 
-    /* GRID16 - BLOCK */
-    gridBuilder.newGrid12();
-    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    /* GRID 50% - BLOCK */
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Name
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("userPref.name"));
@@ -144,14 +143,14 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
       name.add(WicketUtils.setFocus());
       fs.add(new InputPanel(fs.newChildId(), name));
     }
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // User
       data.setUser(PFUserContext.getUser());
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("user"));
       fs.add(new DivTextPanel(fs.newChildId(), data.getUser().getFullname()));
     }
-    gridBuilder.newBlockPanel();
+    gridBuilder.newGridPanel();
     {
       // Area
       final FieldsetPanel fieldset = new FieldsetPanel(gridBuilder.getPanel(), getString("userPref.area")) {

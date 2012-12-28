@@ -38,9 +38,9 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.web.calendar.QuickSelectMonthPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractStandardForm;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class MonthlyEmployeeReportForm extends AbstractStandardForm<MonthlyEmployeeReportFilter, MonthlyEmployeeReportPage>
@@ -64,7 +64,7 @@ public class MonthlyEmployeeReportForm extends AbstractStandardForm<MonthlyEmplo
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid12().newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.user"));
       final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(filter, "user"), parentPage,
@@ -73,7 +73,7 @@ public class MonthlyEmployeeReportForm extends AbstractStandardForm<MonthlyEmplo
       fs.add(userSelectPanel);
       userSelectPanel.init();
     }
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("calendar.month"), true);
       yearChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(filter, "year"),
