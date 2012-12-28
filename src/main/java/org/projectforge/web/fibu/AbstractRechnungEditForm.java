@@ -200,7 +200,7 @@ extends AbstractEditForm<O, P>
     onInit();
 
     // GRID 50% - BLOCK
-    gridBuilder.newSplitPanel(GridSize.COL50);
+    gridBuilder.newSplitPanel(GridSize.COL50, true);
     gridBuilder.newSubSplitPanel(GridSize.COL50);
     {
       // Date
@@ -326,14 +326,13 @@ extends AbstractEditForm<O, P>
       fs.add(zahlBetragField);
     }
     // GRID 100% - BLOCK
-    gridBuilder.newGridPanel();
-    gridBuilder.newSubSplitPanel(GridSize.COL50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Bemerkung
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));
       fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "bemerkung"))).setAutogrow();
     }
-    gridBuilder.newSubSplitPanel(GridSize.COL50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Besonderheiten
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.besonderheiten"));
