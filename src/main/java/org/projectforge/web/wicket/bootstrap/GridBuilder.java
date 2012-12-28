@@ -79,16 +79,6 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
     this(parent, id, session, true);
   }
 
-  /**
-   * @param splitDepth the splitDepth to set (default is 1)
-   * @return this for chaining.
-   */
-  public GridBuilder setSplitDepth(final int splitDepth)
-  {
-    this.splitDepth = splitDepth;
-    return this;
-  }
-
   public GridBuilder newGridPanel(final GridType... gridTypes)
   {
     return newGridPanel(0, GridSize.SPAN12, gridTypes);
@@ -96,6 +86,16 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
 
   public GridBuilder newSplitPanel(final GridSize size, final GridType... gridTypes)
   {
+    return newSplitPanel(size, false, gridTypes);
+  }
+
+  public GridBuilder newSplitPanel(final GridSize size, final boolean hasSubSplitPanel, final GridType... gridTypes)
+  {
+    if (hasSubSplitPanel == true) {
+      splitDepth = 2;
+    } else {
+      splitDepth = 1;
+    }
     if (browserScreenWidthType == BrowserScreenWidthType.NARROW) {
       if (splitDepth == 1) {
         return newGridPanel(0, GridSize.COL100, gridTypes);
@@ -116,7 +116,7 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
   public GridBuilder newSubSplitPanel(final GridSize size, final GridType... gridTypes)
   {
     if (splitDepth < 2) {
-      throw new IllegalArgumentException("Dear developer: please call gridBuilder.setSplitDepth(2) first!");
+      throw new IllegalArgumentException("Dear developer: please call gridBuilder.newSplitPanel(GridSize, true, ...) first!");
     }
     if (browserScreenWidthType == BrowserScreenWidthType.NARROW) {
       return newGridPanel(0, GridSize.COL100, gridTypes);
