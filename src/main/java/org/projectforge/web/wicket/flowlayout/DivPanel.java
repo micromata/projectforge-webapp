@@ -52,7 +52,11 @@ public class DivPanel extends Panel
 
   WebMarkupContainer div;
 
+  private GridSize gridSize = null;
+
   private boolean childAdded;
+
+  private DivPanelVisibility visibility;
 
   /**
    * @param id
@@ -101,10 +105,29 @@ public class DivPanel extends Panel
   public DivPanel(final String id, final GridSize divSize, final GridType... cssClasses)
   {
     super(id);
+    this.gridSize = divSize;
     div = new WebMarkupContainer("div");
     super.add(div);
     div.add(AttributeModifier.append("class", divSize.getClassAttrValue()));
     addCssClasses(cssClasses);
+  }
+
+  /**
+   * @param visibility the visibility to set
+   * @return this for chaining.
+   */
+  public DivPanel setVisibility(final DivPanelVisibility visibility)
+  {
+    this.visibility = visibility;
+    return this;
+  }
+
+  /**
+   * @return the gridSize
+   */
+  public GridSize getGridSize()
+  {
+    return gridSize;
   }
 
   public DivPanel addCssClasses(final GridType... cssClasses)
@@ -220,5 +243,18 @@ public class DivPanel extends Panel
   public WebMarkupContainer getDiv()
   {
     return div;
+  }
+
+  /**
+   * @see org.apache.wicket.Component#isVisible()
+   */
+  @Override
+  public boolean isVisible()
+  {
+    if (visibility != null) {
+      return visibility.isVisible();
+    } else {
+      return super.isVisible();
+    }
   }
 }

@@ -54,10 +54,10 @@ import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
@@ -172,7 +172,7 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
       }
     }));
     gridBuilder = newGridBuilder(this, "flowform");
-    gridBuilder.newGrid12().newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     FieldsetPanel fs = gridBuilder.newFieldset(getString("address.phoneCall.number"), true);
     numberTextField = new PFAutoCompleteTextField<AddressDO>(InputPanel.WICKET_ID, new Model() {
       @Override
@@ -278,7 +278,7 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
       fs.add(myCurrentPhoneIdChoice);
       fs.addHelpIcon(getString("address.myCurrentPhoneId.tooltip"));
     }
-    addressPanel = gridBuilder.newNestedPanel(DivType.COL_50).getPanel();
+    addressPanel = gridBuilder.newSplitPanel(GridSize.COL50).getPanel();
     {
       final Link<String> addressViewLink = new Link<String>(TextLinkPanel.LINK_ID) {
         @Override
@@ -342,7 +342,7 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
     }
     final String url = ConfigXml.getInstance().getTelephoneSystemOperatorPanelUrl();
     if (url != null) {
-      final DivPanel section = gridBuilder.newBlockPanel().getPanel();
+      final DivPanel section = gridBuilder.newGridPanel().getPanel();
       final TextPanel showOperatorPanel = new TextPanel(section.newChildId(), url);
       showOperatorPanel.getLabel().setEscapeModelStrings(false);
       section.add(showOperatorPanel);

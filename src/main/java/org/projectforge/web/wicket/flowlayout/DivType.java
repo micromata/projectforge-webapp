@@ -29,11 +29,11 @@ package org.projectforge.web.wicket.flowlayout;
  */
 public enum DivType
 {
-  ACCORDION_BOX("accordion_box"), BLOCK("block"), BLOCK_LINES("block lines"), BOX("box"), CLEARFIX("clearfix mm_clear"), COL_25("span3"), COL_33(
-      "span4"), COL_40("span4"), COL_50("span6"), COL_60("span8"), COL_66("span8"), COL_75("span9"), COL_100("span12"), COLUMNS(
-          "columns"), CHECKBOX("jqui_checkbox"), FIELD_DIV("field_div"), GRID4("span4"), GRID6("span6"), GRID12("span12"), MARGIN_TOP_10(
-              "margin_top_10"), RADIOBOX("radio-jquery-ui"), ROUND_ALL("round_all"), ROW_FLUID("row-fluid"), SECTION("section"), TOGGLE_CONTAINER(
-                  "toggle_container");
+  @Deprecated ACCORDION_BOX("accordion_box"),@Deprecated BLOCK("block"), @Deprecated BLOCK_LINES("block lines"),@Deprecated BOX("box"),@Deprecated CLEARFIX("clearfix mm_clear"),@Deprecated COL_25("span3"),@Deprecated COL_33(
+      "span4"),@Deprecated COL_40("span4"),@Deprecated COL_50("span6"),@Deprecated COL_60("span8"),@Deprecated COL_66("span8"),@Deprecated COL_75("span9"),@Deprecated COL_100("span12"),@Deprecated COLUMNS("columns"), CHECKBOX(
+          "jqui_checkbox"), FIELD_DIV("field_div"), GRID4("span4"), GRID6("span6"), GRID12("span12"), MARGIN_TOP_10("margin_top_10"), RADIOBOX(
+              "radio-jquery-ui"),@Deprecated ROUND_ALL("round_all"), @Deprecated SECTION("section"), @Deprecated
+              TOGGLE_CONTAINER("toggle_container");
 
   private String classAttrValue;
 

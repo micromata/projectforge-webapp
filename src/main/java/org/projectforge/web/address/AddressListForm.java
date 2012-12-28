@@ -41,8 +41,9 @@ import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.DivPanelVisibility;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 import org.projectforge.web.wicket.flowlayout.RadioGroupPanel;
@@ -64,11 +65,11 @@ public class AddressListForm extends AbstractListForm<AddressListFilter, Address
       final GridBuilder gridBuilder, final AddressFilter searchFilter)
   {
     {
-      gridBuilder.newNestedPanel(DivType.COL_60);
+      gridBuilder.newSplitPanel(GridSize.COL66);
       final FieldsetPanel fs = gridBuilder.newFieldset(parentPage.getString("label.options")).setNoLabelFor();
       final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
-      final RadioGroupPanel<String> radioGroup = new RadioGroupPanel<String>(radioGroupPanel.newChildId(), "listtype", new PropertyModel<String>(
-          searchFilter, "listType")) {
+      final RadioGroupPanel<String> radioGroup = new RadioGroupPanel<String>(radioGroupPanel.newChildId(), "listtype",
+          new PropertyModel<String>(searchFilter, "listType")) {
         /**
          * @see org.projectforge.web.wicket.flowlayout.RadioGroupPanel#wantOnSelectionChangedNotifications()
          */
@@ -96,17 +97,19 @@ public class AddressListForm extends AbstractListForm<AddressListFilter, Address
     }
     {
       // DropDownChoice page size
-      gridBuilder.newNestedPanel(DivType.COL_40);
+      gridBuilder.newSplitPanel(GridSize.COL33);
       form.addPageSizeFieldset();
     }
     {
-      gridBuilder.addRowChildPanel(new DivPanel(gridBuilder.newRowChildPanelId()) {
+      gridBuilder.newSplitPanel(GridSize.COL66);
+      gridBuilder.getRowPanel().setVisibility(new DivPanelVisibility() {
+
         @Override
         public boolean isVisible()
         {
           return searchFilter.isFilter();
         }
-      }, DivType.COL_60);
+      });
       final FieldsetPanel fieldset = gridBuilder.newFieldset(parentPage.getString("address.contactStatus")).setNoLabelFor();
       final DivPanel checkBoxPanel = fieldset.addNewCheckBoxDiv();
       checkBoxPanel.add(form.createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(searchFilter, "active"),
@@ -121,13 +124,7 @@ public class AddressListForm extends AbstractListForm<AddressListFilter, Address
           new PropertyModel<Boolean>(searchFilter, "departed"), parentPage.getString("address.contactStatus.departed")));
     }
     {
-      gridBuilder.addRowChildPanel(new DivPanel(gridBuilder.newRowChildPanelId()) {
-        @Override
-        public boolean isVisible()
-        {
-          return searchFilter.isFilter();
-        }
-      }, DivType.COL_40);
+      gridBuilder.newSplitPanel(GridSize.COL33);
       final FieldsetPanel fieldset = gridBuilder.newFieldset(parentPage.getString("address.addressStatus")).setNoLabelFor();
       final DivPanel checkBoxPanel = fieldset.addNewCheckBoxDiv();
       checkBoxPanel.add(form.createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
@@ -144,7 +141,6 @@ public class AddressListForm extends AbstractListForm<AddressListFilter, Address
   protected void init()
   {
     super.init();
-    gridBuilder.newNestedRowPanel();
     addFilter(parentPage, this, gridBuilder, getSearchFilter());
   }
 
@@ -155,7 +151,7 @@ public class AddressListForm extends AbstractListForm<AddressListFilter, Address
 
   @SuppressWarnings("serial")
   @Override
-  protected TextField<?> createSearchTextField()
+  protected TextField< ? > createSearchTextField()
   {
     @SuppressWarnings({ "unchecked", "rawtypes"})
     final PFAutoCompleteTextField<AddressDO> searchField = new PFAutoCompleteTextField<AddressDO>(InputPanel.WICKET_ID, new Model() {

@@ -63,6 +63,7 @@ import org.projectforge.fibu.kost.KostZuweisungDO;
 import org.projectforge.fibu.kost.KostZuweisungenCopyHelper;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
@@ -198,9 +199,9 @@ extends AbstractEditForm<O, P>
 
     onInit();
 
-    /* GRID8 - BLOCK */
-    gridBuilder.newGrid6();
-    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    // GRID 50% - BLOCK
+    gridBuilder.newSplitPanel(GridSize.COL50);
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
     {
       // Date
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.datum"));
@@ -210,7 +211,7 @@ extends AbstractEditForm<O, P>
       datumPanel.setRequired(true);
       fs.add(datumPanel);
     }
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
     {
       // Net sum
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.netto"));
@@ -225,7 +226,7 @@ extends AbstractEditForm<O, P>
       fs.setNoLabelFor();
       ajaxUpdateComponents.add(netPanel.getLabel4Ajax());
     }
-    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
     {
       // Vat amount
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.vatAmount"));
@@ -240,7 +241,7 @@ extends AbstractEditForm<O, P>
       fs.setNoLabelFor();
       ajaxUpdateComponents.add(vatPanel.getLabel4Ajax());
     }
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSubSplitPanel( GridSize.COL50);
     {
       // Brutto
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.brutto"));
@@ -256,7 +257,7 @@ extends AbstractEditForm<O, P>
       ajaxUpdateComponents.add(grossPanel.getLabel4Ajax());
     }
     {
-      gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
+      gridBuilder.newSubSplitPanel(GridSize.COL50);
       // Fälligkeit und Zahlungsziel
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.faelligkeit"), true);
       faelligkeitPanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "faelligkeit"), DatePanelSettings.get()
@@ -299,7 +300,7 @@ extends AbstractEditForm<O, P>
         }
       });
     }
-    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
     {
       // Bezahldatum
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.bezahlDatum"));
@@ -308,7 +309,7 @@ extends AbstractEditForm<O, P>
       dependentFormComponents[1] = bezahlDatumPanel.getDateField();
       fs.add(bezahlDatumPanel);
     }
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
     {
       // Zahlbetrag
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.zahlBetrag"));
@@ -324,15 +325,15 @@ extends AbstractEditForm<O, P>
       dependentFormComponents[3] = zahlBetragField;
       fs.add(zahlBetragField);
     }
-    /* GRID16 - BLOCK */
-    gridBuilder.newGrid12();
-    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    // GRID 100% - BLOCK
+    gridBuilder.newGridPanel();
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
     {
       // Bemerkung
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));
       fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "bemerkung"))).setAutogrow();
     }
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
     {
       // Besonderheiten
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.besonderheiten"));

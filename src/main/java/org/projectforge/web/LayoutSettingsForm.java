@@ -50,8 +50,8 @@ public class LayoutSettingsForm extends AbstractStandardForm<LayoutSettingsData,
   protected void init()
   {
     super.init();
+    gridBuilder.setSplitDepth(2);
     data.setBrowserScreenWidthType(getMySession().getBrowserScreenWidthType());
-    gridBuilder.newGridPanel(0, GridSize.SPAN12);
     final FieldsetPanel fs = gridBuilder.newFieldset(getString("layout.settings.browserScreenWidth")).setLabelSide(false).setNoLabelFor();
     final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
     final RadioGroupPanel<BrowserScreenWidthType> radioGroup = new RadioGroupPanel<BrowserScreenWidthType>(radioGroupPanel.newChildId(),
@@ -81,17 +81,26 @@ public class LayoutSettingsForm extends AbstractStandardForm<LayoutSettingsData,
     addRadioBox(radioGroup, BrowserScreenWidthType.NARROW);
     addRadioBox(radioGroup, BrowserScreenWidthType.NORMAL);
     addRadioBox(radioGroup, BrowserScreenWidthType.WIDE);
-    gridBuilder.newSplitScreen4Columns();
+    gridBuilder.newSplitPanel(GridSize.COL50).newSubSplitPanel(GridSize.COL50);
     addCell("1.1");
-    gridBuilder.nextScreen4Columns();
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
     addCell("1.2");
-    gridBuilder.nextScreen4Columns();
+    gridBuilder.newSplitPanel(GridSize.COL50).newSubSplitPanel(GridSize.COL50);
     addCell("2.1");
-    gridBuilder.nextScreen4Columns();
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
     addCell("2.2");
+    gridBuilder.newSplitPanel(GridSize.COL50).newSubSplitPanel(GridSize.COL50);
+    addCell("3.1");
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
+    addCell("3.2");
+    gridBuilder.newSplitPanel(GridSize.COL50).newSubSplitPanel(GridSize.COL50);
+    addCell("4.1");
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
+    addCell("4.2");
   }
 
-  private void addCell(final String number) {
+  private void addCell(final String number)
+  {
     gridBuilder.newFormHeading(getString("layout.settings.test") + " " + number);
     addContent();
   }

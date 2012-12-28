@@ -21,44 +21,14 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.web.wicket.bootstrap;
+package org.projectforge.web.wicket.flowlayout;
 
-import org.projectforge.common.StringHelper;
 
 /**
- * Used for defining class attribute value for elements.
  * @author Kai Reinhard (k.reinhard@micromata.de)
+ * 
  */
-public enum GridType
+public interface DivPanelVisibility
 {
-  CONTAINER("container"), CONTAINER_FLUID("container-fluid"), OFFSET1("offset1"), OFFSET2("offste2"), OFFSET3("offset3"), ROW("row"), ROW_FLUID(
-      "row-fluid");
-
-  private String classAttrValue;
-
-  public static String gridTypesToClassString(final GridType... gridTypes)
-  {
-    if (gridTypes == null || gridTypes.length == 0) {
-      return null;
-    }
-    if (gridTypes.length == 1) {
-      return gridTypes[0].classAttrValue;
-    }
-    boolean first = true;
-    final StringBuffer buf = new StringBuffer();
-    for (final GridType gridType : gridTypes) {
-      first = StringHelper.append(buf, first, gridType.classAttrValue, " ");
-    }
-    return buf.toString();
-  }
-
-  public String getClassAttrValue()
-  {
-    return classAttrValue;
-  }
-
-  private GridType(final String classAttrValue)
-  {
-    this.classAttrValue = classAttrValue;
-  }
+  public boolean isVisible();
 }

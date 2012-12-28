@@ -33,8 +33,8 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
@@ -51,7 +51,6 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
   protected void init()
   {
     super.init();
-    gridBuilder.newNestedRowPanel();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task")).setNoLabelFor();
       final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new Model<TaskDO>() {
@@ -75,7 +74,7 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
       taskSelectPanel.init();
       taskSelectPanel.setRequired(false);
     }
-    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL66);
     {
       // Assignee
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.todo.assignee"));
@@ -100,7 +99,7 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
       assigneeSelectPanel.setDefaultFormProcessing(false);
       assigneeSelectPanel.init().withAutoSubmit(true);
     }
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel( GridSize.COL33);
     {
       // Reporter
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.todo.reporter"));
@@ -126,7 +125,7 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
       reporterSelectPanel.setDefaultFormProcessing(false);
       reporterSelectPanel.init().withAutoSubmit(true);
     }
-    gridBuilder.newNestedPanel(DivType.COL_66);
+    gridBuilder.newSplitPanel(GridSize.COL66);;
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
@@ -146,7 +145,7 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
     }
     {
       // DropDownChoice page size
-      gridBuilder.newNestedPanel(DivType.COL_33);
+      gridBuilder.newSplitPanel(GridSize.COL33);
       addPageSizeFieldset();
     }
   }

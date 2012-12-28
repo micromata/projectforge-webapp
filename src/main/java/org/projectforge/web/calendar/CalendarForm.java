@@ -41,8 +41,7 @@ import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
-import org.projectforge.web.wicket.bootstrap.GridPanel;
-import org.projectforge.web.wicket.bootstrap.GridType;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DateTimePanel;
 import org.projectforge.web.wicket.components.JodaDatePanel;
 import org.projectforge.web.wicket.flowlayout.ButtonGroupPanel;
@@ -89,10 +88,9 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
   {
     super.init();
     addFeedbackPanel();
-    final GridPanel grid = new GridPanel("grid", GridType.ROW_FLUID);
-    add(grid);
-    GridPanel panel = grid.add(GridType.SPAN8);
-    fieldset = new FieldsetPanel(panel, getString("label.options"), true);
+    gridBuilder = new GridBuilder(this, "grid", getMySession());
+    gridBuilder.newSplitPanel(GridSize.SPAN8);
+    fieldset = gridBuilder.newFieldset(getString("label.options"), true);
     if (isOtherUsersAllowed() == true) {
       final UserSelectPanel userSelectPanel = new UserSelectPanel(fieldset.newChildId(),
           new PropertyModel<PFUserDO>(this, "timesheetsUser"), parentPage, "userId");
@@ -191,8 +189,8 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
 
       buttonGroupPanel.addButton(exportICalButtonPanel);
     }
-    panel = grid.add(GridType.SPAN4);
-    final FieldsetPanel fs = new FieldsetPanel(panel, getString("timesheet.duration"), true);
+    gridBuilder.newSplitPanel(GridSize.SPAN4);
+    final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.duration"), true);
     final DivTextPanel durationPanel = new DivTextPanel(fs.newChildId(), new Label(DivTextPanel.WICKET_ID, new Model<String>() {
       @Override
       public String getObject()

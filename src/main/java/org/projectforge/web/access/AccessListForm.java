@@ -36,8 +36,8 @@ import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.GroupSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPage>
@@ -54,7 +54,6 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
   protected void init()
   {
     super.init();
-    gridBuilder.newNestedRowPanel();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task")).setNoLabelFor();
       final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new Model<TaskDO>() {
@@ -78,7 +77,7 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
       taskSelectPanel.init();
       taskSelectPanel.setRequired(false);
     }
-    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Group
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("group")).setNoLabelFor();
@@ -103,7 +102,7 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
       groupSelectPanel.setDefaultFormProcessing(false);
       groupSelectPanel.init();
     }
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // User
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("user"), true).setNoLabelFor();
@@ -129,7 +128,7 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
       assigneeSelectPanel.init().withAutoSubmit(true);
       fs.addHelpIcon(getString("access.tooltip.filter.user"));
     }
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
@@ -144,7 +143,7 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
               getString("access.tooltip.filter.includeDescendentTasks")));
       checkBoxPanel.add(createOnlyDeletedCheckBoxPanel(checkBoxPanel.newChildId()));
     }
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // DropDownChoice page size
       addPageSizeFieldset();

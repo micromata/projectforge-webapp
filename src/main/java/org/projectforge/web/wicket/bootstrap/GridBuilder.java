@@ -44,93 +44,177 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
 
   public static final int MAX_LEVEL = 2;
 
+  private final DivPanel mainContainer;
+
   private final DivPanel[] rowPanel = new DivPanel[MAX_LEVEL + 1];
 
   private final DivPanel[] gridPanel = new DivPanel[MAX_LEVEL + 1];
 
-  private DivPanel currentGridPanel;
+  private int currentLevel = 0;
 
-  private int fourColumnsCounter;
+  private int splitDepth = 1;
 
-  public GridBuilder(final MarkupContainer parent, final String id, final MySession session)
+  // Counts the length of grid panels of current row. After reaching full length, a new row will be created automatically.
+  private final int lengthCounter[] = new int[MAX_LEVEL + 1];
+
+  private final boolean fluid;
+
+  /**
+   * @param parent
+   * @param id
+   * @param session
+   * @param fluid Default is true.
+   */
+  public GridBuilder(final MarkupContainer parent, final String id, final MySession session, final boolean fluid)
   {
     super(session);
     this.parent = parent;
-    rowPanel[0] = new DivPanel(id, GridType.ROW_FLUID);
-    parent.add(rowPanel[0]);
+    this.fluid = fluid;
+    mainContainer = new DivPanel(id, fluid == true ? GridType.CONTAINER_FLUID : GridType.CONTAINER);
+    parent.add(mainContainer);
   }
 
-  public GridBuilder newSplitScreen2Columns()
+  public GridBuilder(final MarkupContainer parent, final String id, final MySession session)
   {
-    newGridPanel(0, GridSize.SPAN12).newRowPanel(1).newGridPanel(1, GridSize.SPAN6);
+    this(parent, id, session, true);
+  }
+
+  /**
+   * @param splitDepth the splitDepth to set (default is 1)
+   * @return this for chaining.
+   */
+  public GridBuilder setSplitDepth(final int splitDepth)
+  {
+    this.splitDepth = splitDepth;
     return this;
   }
 
-  public GridBuilder newSplitScreen4Columns()
+  public GridBuilder newGridPanel(final GridType... gridTypes)
   {
-    newSplitScreen2Columns();
-    newRowPanel(2).newGridPanel(2, GridSize.SPAN6);
-    fourColumnsCounter = 0;
-    return this;
+    return newGridPanel(0, GridSize.SPAN12, gridTypes);
   }
 
-  public GridBuilder nextScreen4Columns()
+  public GridBuilder newSplitPanel(final GridSize size, final GridType... gridTypes)
   {
-    ++fourColumnsCounter;
-    if (fourColumnsCounter % 2 == 0) {
-      newGridPanel(1, GridSize.SPAN6).newRowPanel(2).newGridPanel(2, GridSize.SPAN6);
+    if (browserScreenWidthType == BrowserScreenWidthType.NARROW) {
+      return this;
+    } else if (browserScreenWidthType == BrowserScreenWidthType.NORMAL) {
+      if (splitDepth == 1) {
+        return newGridPanel(0, size, gridTypes);
+      } else {
+        return this;
+      }
     } else {
-      newGridPanel(2, GridSize.SPAN6);
+      return newGridPanel(0, size, gridTypes);
     }
+  }
+
+  public GridBuilder newSubSplitPanel(final GridSize size, final GridType... gridTypes)
+  {
+    if (splitDepth < 2) {
+      throw new IllegalArgumentException("Dear developer: please call gridBuilder.setSplitDepth(2) first!");
+    }
+    if (browserScreenWidthType == BrowserScreenWidthType.NARROW) {
+      return this;
+    } else if (browserScreenWidthType == BrowserScreenWidthType.NORMAL) {
+      return newGridPanel(1, size, gridTypes);
+    } else {
+      return newGridPanel(1, size, gridTypes);
+    }
+  }
+
+  /**
+   * Sets the gridPanel of the given level as current level. You can only set a lower level than current level, otherwise an exception will
+   * be thrown.
+   * @param level the currentLevel to set
+   * @return this for chaining.
+   */
+  public GridBuilder setCurrentLevel(final int level)
+  {
+    if (level > this.currentLevel) {
+      throw new IllegalArgumentException("You can only set a lower level than current level, current level is "
+          + this.currentLevel
+          + ", desired level is "
+          + level);
+    }
+    if (level < 0) {
+      throw new IllegalArgumentException("Level must be a positive value: " + level);
+    }
+    this.currentLevel = level;
+    setNullPanel(level, level + 1);
     return this;
   }
 
-  public GridBuilder newGridPanel(final int level, final GridSize size, final GridType... gridTypes)
+  /**
+   * If row panel of this level doesn't exist it will be created.
+   * @param level
+   * @param size
+   * @param gridTypes
+   * @return this for chaining.
+   */
+  private GridBuilder newGridPanel(final int level, final GridSize size, final GridType... gridTypes)
   {
-    if (levelSupportedByResolution(level) == false) {
-      // Not supported by this screens.
-      return this;
-    }
     validateGridPanelLevel(level);
+    currentLevel = level;
+    if (rowPanel[level] == null) {
+      newRowPanel(level);
+    }
+    lengthCounter[level] += size.getLength();
+    if (lengthCounter[level] > 12) {
+      newRowPanel(level);
+      lengthCounter[level] = size.getLength();
+    }
     final DivPanel divPanel = new DivPanel(rowPanel[level].newChildId(), size, gridTypes);
-    return newGridPanel(level, divPanel);
+    return addGridPanel(level, divPanel);
   }
 
-  public GridBuilder newGridPanel(final int level, final DivPanel divPanel)
+  /**
+   * If you use this method, the lengthCounter won't be incremented and you use to call setCurrentLevel(level -1) manually.
+   * @param level
+   * @param divPanel
+   * @return
+   */
+  private GridBuilder addGridPanel(final int level, final DivPanel divPanel)
   {
-    if (levelSupportedByResolution(level) == false) {
-      // Not supported by this screens.
-      return this;
-    }
     validateGridPanelLevel(level);
-    currentGridPanel = divPanel;
-    gridPanel[level] = currentGridPanel;
-    rowPanel[level].add(currentGridPanel);
+    currentLevel = level;
+    if (rowPanel[level] == null) {
+      newRowPanel(level);
+    }
+    gridPanel[level] = divPanel;
+    rowPanel[level].add(divPanel);
     setNullPanel(level + 1, level + 1);
     return this;
   }
 
-  public GridBuilder newRowPanel(final int level, final GridType... gridTypes)
+  private String newRowPanelId(final int level)
   {
-    if (levelSupportedByResolution(level) == false) {
-      // Not supported by this screens.
-      return this;
-    }
     validateRowPanelLevel(level);
-    final DivPanel rowPanel = new DivPanel(gridPanel[level - 1].newChildId(), GridType.ROW_FLUID);
-    rowPanel.addCssClasses(gridTypes);
-    return newRowPanel(level, rowPanel);
+    if (level > 0) {
+      return gridPanel[level - 1].newChildId();
+    } else {
+      return mainContainer.newChildId();
+    }
   }
 
-  public GridBuilder newRowPanel(final int level, final DivPanel rowPanel)
+  private GridBuilder newRowPanel(final int level, final GridType... gridTypes)
   {
-    if (levelSupportedByResolution(level) == false) {
-      // Not supported by this screens.
-      return this;
-    }
+    validateRowPanelLevel(level);
+    final DivPanel rowPanel = new DivPanel(newRowPanelId(level), fluid == true ? GridType.ROW_FLUID : GridType.ROW);
+    rowPanel.addCssClasses(gridTypes);
+    return addRowPanel(level, rowPanel);
+  }
+
+  private GridBuilder addRowPanel(final int level, final DivPanel rowPanel)
+  {
     validateRowPanelLevel(level);
     this.rowPanel[level] = rowPanel;
-    gridPanel[level - 1].add(rowPanel);
+    lengthCounter[level] = 0;
+    if (level > 0) {
+      gridPanel[level - 1].add(rowPanel);
+    } else {
+      mainContainer.add(rowPanel);
+    }
     setNullPanel(level + 1, level);
     return this;
   }
@@ -195,24 +279,30 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
   }
 
   /**
-   * @return new child id (Wicket) id of the current grid panel.
-   * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#newPanelId()
+   * @return new child id (Wicket id) of the current grid panel.
    */
-  @Deprecated
-  public String newPanelId()
+  public String newRowId()
   {
-    return currentGridPanel.newChildId();
+    return gridPanel[currentLevel].newChildId();
+  }
+
+  /**
+   * @return new child id (Wicket id) of the current row panel.
+   */
+  public String newGridPanelId()
+  {
+    return rowPanel[currentLevel].newChildId();
   }
 
   /**
    * If you need to implement isVisible() of DivPanel etc. you can use this method instead of {@link #newNestedRowPanel()}.
-   * @param colPanel Please use {@link #newPanelId()} as component id.
+   * @param colPanel Please use {@link #newRowId()} as component id.
    * @return new columns panel for wide screens and gridPanel itself for all other screens.
    */
   @Deprecated
   public GridBuilder addNestedRowPanel(final DivPanel nestedRowPanel)
   {
-    return newRowPanel(1, nestedRowPanel);
+    return addRowPanel(1, nestedRowPanel);
   }
 
   /**
@@ -220,7 +310,7 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
   @Deprecated
   public GridBuilder newNestedRowPanel()
   {
-    return newRowPanel(1);
+    return newRowPanel(0);
   }
 
   /**
@@ -229,7 +319,7 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
   @Deprecated
   public GridBuilder newNestedPanel(final DivType length)
   {
-    return newGridPanel(1, getSize(length));
+    return newGridPanel(0, getSize(length));
   }
 
   /**
@@ -252,7 +342,7 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
   public GridBuilder addRowChildPanel(final DivPanel gridPanel, final DivType length)
   {
     gridPanel.addCssClasses(length);
-    return newGridPanel(0, gridPanel);
+    return addGridPanel(0, gridPanel);
   }
 
   /**
@@ -260,7 +350,15 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
    */
   public DivPanel getPanel()
   {
-    return currentGridPanel;
+    if (currentLevel == 0 && gridPanel[currentLevel] == null) {
+      newGridPanel(0, GridSize.SPAN12);
+    }
+    return gridPanel[currentLevel];
+  }
+
+  public DivPanel getRowPanel()
+  {
+    return rowPanel[currentLevel];
   }
 
   /**
@@ -268,8 +366,8 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
    */
   public FormHeadingPanel newFormHeading(final String label)
   {
-    final FormHeadingPanel formHeading = new FormHeadingPanel(currentGridPanel.newChildId(), label);
-    currentGridPanel.add(formHeading);
+    final FormHeadingPanel formHeading = new FormHeadingPanel(getPanel().newChildId(), label);
+    getPanel().add(formHeading);
     return formHeading;
   }
 
@@ -280,13 +378,13 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
   @Deprecated
   public DivPanel newSectionPanel()
   {
-    return currentGridPanel;
+    return getPanel();
   }
 
-  @Deprecated
-  public RepeatingView newRepeatingView() {
-    final RepeatingView repeater = new RepeatingView(currentGridPanel.newChildId());
-    currentGridPanel.add(repeater);
+  public RepeatingView newRepeatingView()
+  {
+    final RepeatingView repeater = new RepeatingView(getPanel().newChildId());
+    getPanel().add(repeater);
     return repeater;
   }
 
@@ -296,7 +394,7 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
   @Override
   public FieldsetPanel newFieldset(final FieldProperties< ? > fieldProperties)
   {
-    return new FieldsetPanel(currentGridPanel, fieldProperties);
+    return new FieldsetPanel(getPanel(), fieldProperties);
   }
 
   /**
@@ -305,7 +403,7 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
   @Override
   public FieldsetPanel newFieldset(final String label)
   {
-    return new FieldsetPanel(currentGridPanel, label);
+    return new FieldsetPanel(getPanel(), label);
   }
 
   /**
@@ -314,7 +412,7 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
   @Override
   public FieldsetPanel newFieldset(final String label, final boolean multipleChildren)
   {
-    return new FieldsetPanel(currentGridPanel, label, multipleChildren);
+    return new FieldsetPanel(getPanel(), label, multipleChildren);
   }
 
   /**
@@ -323,7 +421,7 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
   @Override
   public FieldsetPanel newFieldset(final String labelText, final String labelDescription)
   {
-    return new FieldsetPanel(currentGridPanel, labelText, labelDescription);
+    return new FieldsetPanel(getPanel(), labelText, labelDescription);
   }
 
   /**
@@ -332,15 +430,15 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
   @Override
   public FieldsetPanel newFieldset(final String labelText, final String labelDescription, final boolean multipleChildren)
   {
-    return new FieldsetPanel(currentGridPanel, labelText, labelDescription, multipleChildren);
+    return new FieldsetPanel(getPanel(), labelText, labelDescription, multipleChildren);
   }
 
   private void validateRowPanelLevel(final int level)
   {
-    if (level < 1 || level > MAX_LEVEL) {
+    if (level < 0 || level > MAX_LEVEL) {
       throw new IllegalArgumentException("Level '" + "' not supported. Value must be between 1 and " + MAX_LEVEL);
     }
-    if (gridPanel[level - 1] == null) {
+    if (level > 0 && gridPanel[level - 1] == null) {
       throw new IllegalArgumentException("Can't add row panel of level '"
           + level
           + "'. Grid panel of level "
@@ -349,25 +447,10 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
     }
   }
 
-  private boolean levelSupportedByResolution(final int level)
-  {
-    if (browserScreenWidthType == BrowserScreenWidthType.NORMAL
-        && level >= 2
-        || browserScreenWidthType == BrowserScreenWidthType.NARROW
-        && level >= 1) {
-      // Not supported by this screens.
-      return false;
-    }
-    return true;
-  }
-
   private void validateGridPanelLevel(final int level)
   {
     if (level < 0 || level > MAX_LEVEL) {
       throw new IllegalArgumentException("Level '" + level + "' not supported. Value must be between 0 and " + MAX_LEVEL);
-    }
-    if (rowPanel[level] == null) {
-      throw new IllegalArgumentException("Can't add grid panel of level '" + level + "'. Row panel of same level doesn't exist!");
     }
   }
 
@@ -375,12 +458,14 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
   {
     for (int i = rowFromLevel; i <= MAX_LEVEL; i++) {
       rowPanel[i] = null;
+      lengthCounter[i] = 0;
     }
     for (int i = gridFromLevel; i <= MAX_LEVEL; i++) {
       gridPanel[i] = null;
     }
   }
 
+  @SuppressWarnings("deprecation")
   private GridSize getSize(final DivType divType)
   {
     GridSize size;

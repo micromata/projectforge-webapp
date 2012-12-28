@@ -40,6 +40,7 @@ import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteMaxLengthTextField;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
@@ -47,7 +48,6 @@ import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
@@ -83,9 +83,8 @@ public class ContractEditForm extends AbstractEditForm<ContractDO, ContractEditP
   protected void init()
   {
     super.init();
-    /* GRID8 - BLOCK */
-    gridBuilder.newGrid6();
-    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    // GRID 50% - BLOCK
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Number
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("legalAffaires.contract.number"), true);
@@ -98,7 +97,6 @@ public class ContractEditForm extends AbstractEditForm<ContractDO, ContractEditP
         fs.addHelpIcon(getString("fibu.tooltip.nummerWirdAutomatischVergeben"));
       }
     }
-    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // Date
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("date"));
@@ -106,7 +104,6 @@ public class ContractEditForm extends AbstractEditForm<ContractDO, ContractEditP
           java.sql.Date.class));
       fs.add(datePanel);
     }
-    gridBuilder.newBlockPanel();
     {
       // Title
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("title"));
@@ -136,13 +133,12 @@ public class ContractEditForm extends AbstractEditForm<ContractDO, ContractEditP
       fs.add(statusChoice);
 
     }
-    gridBuilder.newGrid6();
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Reference
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.reference"));
       fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "reference")));
     }
-    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
     {
       // Resubmission date
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("resubmissionOnDate"));
@@ -150,7 +146,6 @@ public class ContractEditForm extends AbstractEditForm<ContractDO, ContractEditP
           .withTargetType(java.sql.Date.class));
       fs.add(resubmissionDatePanel);
     }
-    gridBuilder.newNestedPanel(DivType.COL_50);
     {
       // Due date
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("dueDate"));
@@ -158,7 +153,6 @@ public class ContractEditForm extends AbstractEditForm<ContractDO, ContractEditP
           java.sql.Date.class));
       fs.add(dueDatePanel);
     }
-    gridBuilder.newBlockPanel();
     {
       // Signing date
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("legalAffaires.contract.signing"), getString("date"));
@@ -177,8 +171,7 @@ public class ContractEditForm extends AbstractEditForm<ContractDO, ContractEditP
           .withTargetType(java.sql.Date.class));
       fs.add(validUntilDatePanel);
     }
-    /* GRID8 */
-    gridBuilder.newGrid6();
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // CocontractorA
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("legalAffaires.contract.coContractorA"));
@@ -195,7 +188,7 @@ public class ContractEditForm extends AbstractEditForm<ContractDO, ContractEditP
       fs.add(createAutocompleteTextField("signerA"));
     }
     /* GRID8 */
-    gridBuilder.newGrid6();
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // CocontractorB
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("legalAffaires.contract.coContractorB"));
@@ -212,7 +205,7 @@ public class ContractEditForm extends AbstractEditForm<ContractDO, ContractEditP
       fs.add(createAutocompleteTextField("signerB"));
     }
     /* GRID16 */
-    gridBuilder.newGrid12();
+    gridBuilder.newGridPanel();
     {
       // Text with JIRA support
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("text"), true);

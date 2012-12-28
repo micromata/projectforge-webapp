@@ -23,41 +23,49 @@
 
 package org.projectforge.web.wicket.bootstrap;
 
-import org.projectforge.common.StringHelper;
 
 /**
- * Used for defining class attribute value for elements.
+ * Used for defining class attribute value for elements (bootstrap grid sizes).
+ * <ul>
+ * <li>COL25 is an alias for SPAN3</li>
+ * <li>COL33 is an alias for SPAN4</li>
+ * <li>COL50 is an alias for SPAN6</li>
+ * <li>COL66 is an alias for SPAN8</li>
+ * <li>COL75 is an alias for SPAN9</li>
+ * <li>COL100 is an alias for SPAN12</li>
+ * </ul>
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 public enum GridSize
 {
-  SPAN1("span1"), SPAN2("span2"), SPAN3("span3"), SPAN4("span4"), SPAN6("span6"), SPAN8("span8"), SPAN9("span9"), SPAN12("span12");
+  SPAN1(1), SPAN2(2), SPAN3(3), SPAN4(4), SPAN6(6), SPAN8(8), SPAN9(9), SPAN12(12), COL25(SPAN3), COL33(SPAN4), COL50(SPAN6), COL66(SPAN8), COL75(SPAN9), COL100(SPAN12);
 
-  private String classAttrValue;
+  private final String classAttrValue;
 
-  public static String gridTypesToClassString(final GridSize... gridTypes)
-  {
-    if (gridTypes == null || gridTypes.length == 0) {
-      return null;
-    }
-    if (gridTypes.length == 1) {
-      return gridTypes[0].classAttrValue;
-    }
-    boolean first = true;
-    final StringBuffer buf = new StringBuffer();
-    for (final GridSize gridType : gridTypes) {
-      first = StringHelper.append(buf, first, gridType.classAttrValue, " ");
-    }
-    return buf.toString();
-  }
+  private final int length;
 
   public String getClassAttrValue()
   {
     return classAttrValue;
   }
 
-  private GridSize(final String classAttrValue)
+  /**
+   * @return the length
+   */
+  public int getLength()
   {
-    this.classAttrValue = classAttrValue;
+    return length;
+  }
+
+  private GridSize(final int length)
+  {
+    this.length = length;
+    this.classAttrValue = "span" + length;
+  }
+
+  private GridSize(final GridSize master)
+  {
+    this.length = master.length;
+    this.classAttrValue = master.classAttrValue;
   }
 }

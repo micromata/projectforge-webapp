@@ -54,13 +54,13 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DateTimePanel;
 import org.projectforge.web.wicket.components.DateTimePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldSetIconPosition;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.HiddenInputPanel;
@@ -157,7 +157,6 @@ AbstractSecuredForm<F, P>
       add(WicketUtils.getInvisibleComponent("filter"));
     } else {
       gridBuilder = newGridBuilder(this, "filter");
-      gridBuilder.newGrid12();
       {
         // Fieldset search filter
         final FieldsetPanel fs = gridBuilder.newFieldset(getString("searchFilter"), true);
@@ -268,11 +267,10 @@ AbstractSecuredForm<F, P>
   @SuppressWarnings("serial")
   private void addExtendedFilter()
   {
-    extendedFilter = new DivPanel(gridBuilder.newPanelId());
-    gridBuilder.addNestedRowPanel(extendedFilter);
+    gridBuilder.newSplitPanel(GridSize.COL66);
+    extendedFilter = gridBuilder.getRowPanel();
     extendedFilter.setMarkupId("extendedFilter");
     {
-      gridBuilder.newNestedPanel(DivType.COL_60);
       final FieldsetPanel fieldset = gridBuilder.newFieldset(getString("timePeriod"), getString("lastUpdate"), true);
       fieldset.add(new HiddenInputPanel(fieldset.newChildId(), new HiddenField<Boolean>(InputPanel.WICKET_ID, new PropertyModel<Boolean>(
           searchFilter, "useModificationFilter"))).setHtmlId("useModificationFilter"));
@@ -324,7 +322,7 @@ AbstractSecuredForm<F, P>
     }
 
     {
-      gridBuilder.newNestedPanel(DivType.COL_40);
+      gridBuilder.newSplitPanel(GridSize.COL33);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("modifiedBy"), getString("user"));
 
       final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new Model<PFUserDO>() {
@@ -348,6 +346,7 @@ AbstractSecuredForm<F, P>
       userSelectPanel.setDefaultFormProcessing(false);
       userSelectPanel.init().withAutoSubmit(true);
     }
+    gridBuilder.setCurrentLevel(0); // Go back to main row panel.
   }
 
   /**
