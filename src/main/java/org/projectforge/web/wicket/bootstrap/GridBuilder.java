@@ -97,7 +97,11 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
   public GridBuilder newSplitPanel(final GridSize size, final GridType... gridTypes)
   {
     if (browserScreenWidthType == BrowserScreenWidthType.NARROW) {
-      return this;
+      if (splitDepth == 1) {
+        return newGridPanel(0, GridSize.COL100, gridTypes);
+      } else {
+        return this;
+      }
     } else if (browserScreenWidthType == BrowserScreenWidthType.NORMAL) {
       if (splitDepth == 1) {
         return newGridPanel(0, size, gridTypes);
@@ -115,9 +119,9 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
       throw new IllegalArgumentException("Dear developer: please call gridBuilder.setSplitDepth(2) first!");
     }
     if (browserScreenWidthType == BrowserScreenWidthType.NARROW) {
-      return this;
+      return newGridPanel(0, GridSize.COL100, gridTypes);
     } else if (browserScreenWidthType == BrowserScreenWidthType.NORMAL) {
-      return newGridPanel(1, size, gridTypes);
+      return newGridPanel(0, size, gridTypes);
     } else {
       return newGridPanel(1, size, gridTypes);
     }
