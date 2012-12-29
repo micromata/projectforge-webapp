@@ -277,8 +277,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
     DivPanel content = null, columns, column;
     for (final AuftragsPositionDO position : data.getPositionen()) {
       final boolean abgeschlossenUndNichtFakturiert = position.isAbgeschlossenUndNichtVollstaendigFakturiert();
-      final ToggleContainerPanel positionsPanel = new ToggleContainerPanel(positionsRepeater.newChildId(), DivType.GRID12,
-          DivType.ROUND_ALL) {
+      final ToggleContainerPanel positionsPanel = new ToggleContainerPanel(positionsRepeater.newChildId()) {
         /**
          * @see org.projectforge.web.wicket.flowlayout.ToggleContainerPanel#wantsOnStatusChangedNotification()
          */

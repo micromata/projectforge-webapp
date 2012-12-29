@@ -47,6 +47,7 @@ function initializeComponents() {
 	// Enable tool-tips, button sets etc.
 	$('[title]').tooltip({'data-placement':"right"});
 	$("div.radio-jquery-ui").buttonset();
+	$("div.collapse").collapse();
 }
 function showBookmark() {
 	$("#bookmark").toggle("normal");

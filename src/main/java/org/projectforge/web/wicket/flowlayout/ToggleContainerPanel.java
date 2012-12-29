@@ -46,9 +46,9 @@ public class ToggleContainerPanel extends Panel
 
   public static final String HEADING_ID = "heading";
 
-  private Component heading, toggleLink;
+  private Component heading;
 
-  private final WebMarkupContainer panel, toggleContainer;
+  private final WebMarkupContainer panel, toggleContainer,  toggleLink;
 
   /**
    * @param id
@@ -57,6 +57,7 @@ public class ToggleContainerPanel extends Panel
   {
     super(id);
     panel = new WebMarkupContainer("panel");
+    panel.setOutputMarkupId(true);
     super.add(panel);
     if (cssClasses != null) {
       for (final DivType cssClass : cssClasses) {
@@ -64,7 +65,10 @@ public class ToggleContainerPanel extends Panel
       }
     }
     panel.add(toggleContainer = new WebMarkupContainer("toggleContainer"));
+    toggleContainer.setOutputMarkupId(true);
     panel.add(toggleLink = new WebMarkupContainer("toggleLink"));
+    toggleLink.add(AttributeModifier.replace("data-parent", "#" + panel.getMarkupId()));
+    toggleLink.add(AttributeModifier.replace("href", "#" + toggleContainer.getMarkupId()));
     if (wantsOnStatusChangedNotification()) {
       toggleLink.add(new JavaScriptEventToggleBehavior() {
         private static final long serialVersionUID = -3739318529449433236L;
@@ -80,7 +84,7 @@ public class ToggleContainerPanel extends Panel
         @Override
         protected String getJavaScriptConditionForNewState()
         {
-          return "\'+ ! $(this).hasClass(\"toggle_closed\")+\'"; // invert current closed class value to display the new state!
+          return "\'+ ! $(this).hasClass(\"collapsed\")+\'"; // invert current closed class value to display the new state!
         }
       });
     }
@@ -88,7 +92,7 @@ public class ToggleContainerPanel extends Panel
 
   public ToggleContainerPanel setHeading(final String heading)
   {
-    panel.add(this.heading = new Label(HEADING_ID, heading));
+    toggleLink.add(this.heading = new Label(HEADING_ID, heading));
     return this;
   }
 
@@ -99,7 +103,7 @@ public class ToggleContainerPanel extends Panel
   public ToggleContainerPanel setHeading(final Component heading)
   {
     this.heading = heading;
-    panel.add(heading);
+    toggleLink.add(heading);
     return this;
   }
 
@@ -160,9 +164,8 @@ public class ToggleContainerPanel extends Panel
    */
   public ToggleContainerPanel setClosed()
   {
-    toggleContainer.add(AttributeModifier.append("style", "display: none;"));
-    heading.add(AttributeModifier.append("class", "round_all"));
-    toggleLink.add(AttributeModifier.append("class", "toggle_closed"));
+    toggleContainer.add(AttributeModifier.append("class", "in"));
+    toggleLink.add(AttributeModifier.append("class", "collapsed"));
     return this;
   }
 }

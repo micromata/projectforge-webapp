@@ -6,11 +6,17 @@
 <body>
   <h1>Represents a container.</h1>
   <wicket:panel>
-    <div wicket:id="panel">
-      <h2 class="box_head" wicket:id="heading">[heading]</h2>
-      <a wicket:id="toggleLink" href="#" class="toggle"></a>
-      <div class="toggle_container grey" wicket:id="toggleContainer">
-        <wicket:container wicket:id="content">[Toggle container.]</wicket:container>
+    <div wicket:id="panel" class="collapse">
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a wicket:id="toggleLink" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne"><span
+            wicket:id="heading">[heading]</span> </a>
+        </div>
+        <div id="collapseOne" class="accordion-body collapse" wicket:id="toggleContainer">
+          <div class="accordion-inner">
+            <wicket:container wicket:id="content">[Toggle container.]</wicket:container>
+          </div>
+        </div>
       </div>
     </div>
   </wicket:panel>
