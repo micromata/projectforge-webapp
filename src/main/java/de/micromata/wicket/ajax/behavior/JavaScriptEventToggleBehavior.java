@@ -23,11 +23,8 @@
 
 package de.micromata.wicket.ajax.behavior;
 
-import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxEventBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.IAjaxCallDecorator;
-import org.apache.wicket.ajax.calldecorator.AjaxCallDecorator;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.util.string.StringValue;
 
@@ -41,6 +38,8 @@ import org.apache.wicket.util.string.StringValue;
  */
 public abstract class JavaScriptEventToggleBehavior extends AjaxEventBehavior
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(JavaScriptEventToggleBehavior.class);
+
   private static final long serialVersionUID = -5357558488585073864L;
 
   private static final String CONDITION = "condition";
@@ -48,6 +47,7 @@ public abstract class JavaScriptEventToggleBehavior extends AjaxEventBehavior
   public JavaScriptEventToggleBehavior()
   {
     this("onClick");
+    log.error("******* TODO: Migrate.");
   }
 
   public JavaScriptEventToggleBehavior(final String event)
@@ -100,22 +100,22 @@ public abstract class JavaScriptEventToggleBehavior extends AjaxEventBehavior
   /**
    * @see org.apache.wicket.ajax.AbstractDefaultAjaxBehavior#getAjaxCallDecorator()
    */
-  @Override
-  protected IAjaxCallDecorator getAjaxCallDecorator()
-  {
-    return new AjaxCallDecorator() {
-      private static final long serialVersionUID = -4937878321650138366L;
-
-      @Override
-      public CharSequence decorateScript(final Component c, final CharSequence script)
-      {
-        String javaScript = "var data = $(this).data(\"" + CONDITION + "\"); var result = null;";
-        javaScript += "result = ! data;"; // switch data object via javaScript
-        javaScript += "if(result != null) { $(this).data(\"" + CONDITION + "\", result); };";
-        return script + javaScript;
-      }
-    };
-  }
+  // @Override
+  // protected IAjaxCallDecorator getAjaxCallDecorator()
+  // {
+  // return new AjaxCallDecorator() {
+  // private static final long serialVersionUID = -4937878321650138366L;
+  //
+  // @Override
+  // public CharSequence decorateScript(final Component c, final CharSequence script)
+  // {
+  // String javaScript = "var data = $(this).data(\"" + CONDITION + "\"); var result = null;";
+  // javaScript += "result = ! data;"; // switch data object via javaScript
+  // javaScript += "if(result != null) { $(this).data(\"" + CONDITION + "\", result); };";
+  // return script + javaScript;
+  // }
+  // };
+  // }
 
   /**
    * Hook method which is called, when an ajax call is recognized, but the page parameters could not be interpreted properly.
