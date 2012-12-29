@@ -30,11 +30,14 @@ import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.IAutoCompleteRenderer;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptReferenceHeaderItem;
+import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.handler.TextRequestHandler;
 import org.apache.wicket.util.string.Strings;
 import org.projectforge.web.core.JsonBuilder;
+import org.projectforge.web.wicket.WicketRenderHeadUtils;
 
 public abstract class PFAutoCompleteBehavior<T> extends AbstractDefaultAjaxBehavior
 {
@@ -59,7 +62,8 @@ public abstract class PFAutoCompleteBehavior<T> extends AbstractDefaultAjaxBehav
   public void renderHead(final Component component, final IHeaderResponse response)
   {
     super.renderHead(component, response);
-    response.renderJavaScriptReference("scripts/jquery.wicket-autocomplete.js");
+    WicketRenderHeadUtils.renderMainJavaScriptIncludes(response);
+    response.render(JavaScriptReferenceHeaderItem.forUrl("scripts/jquery.wicket-autocomplete.js"));
     renderAutocompleteHead(response);
   }
 
@@ -104,7 +108,7 @@ public abstract class PFAutoCompleteBehavior<T> extends AbstractDefaultAjaxBehav
     }
     final String initJS = buf.toString();
     // String initJS = String.format("new Wicket.AutoComplete('%s','%s',%s,%s);", id, getCallbackUrl(), constructSettingsJS(), indicatorId);
-    response.renderOnDomReadyJavaScript(initJS);
+    response.render(OnDomReadyHeaderItem.forScript(initJS));
   }
 
   protected final List<String> getSettingsJS()

@@ -87,7 +87,7 @@ public class MyDateConverter extends MyAbstractDateConverter
   @Override
   protected DateTimeFormatter getFormat(final Locale locale)
   {
-    final DateTimeFormatter dtf = DateTimeFormat.forPattern(getDatePattern(locale)).withLocale(getLocale()).withPivotYear(2000);
+    final DateTimeFormatter dtf = DateTimeFormat.forPattern(getDatePattern(locale)).withLocale(locale).withPivotYear(2000);
     return dtf;
   }
 

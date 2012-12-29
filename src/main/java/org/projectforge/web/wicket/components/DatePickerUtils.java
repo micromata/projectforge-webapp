@@ -26,7 +26,8 @@ package org.projectforge.web.wicket.components;
 import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.projectforge.common.DateFormatType;
 import org.projectforge.common.DateFormats;
 import org.projectforge.web.I18nCore;
@@ -41,7 +42,7 @@ public class DatePickerUtils
   {
     final String datePickerLocalizationFile = I18nCore.getDatePickerLocalizationFile(locale);
     if (datePickerLocalizationFile != null) {
-      response.renderJavaScriptReference(datePickerLocalizationFile);
+      response.render(JavaScriptHeaderItem.forUrl(datePickerLocalizationFile));
     }
     final StringBuffer buf = new StringBuffer();
     final String loc = I18nCore.getDatePickerLocale(locale);
@@ -56,8 +57,8 @@ public class DatePickerUtils
     // }
     buf.append("  });\n");
     buf.append("});");
-    response.renderJavaScript(buf, "datepicker");
-    response.renderJavaScript(getDatePickerInitJavaScript(id, autosubmit), null);
+    response.render(JavaScriptHeaderItem.forScript(buf, "datepicker"));
+    response.render(JavaScriptHeaderItem.forScript(getDatePickerInitJavaScript(id, autosubmit), null));
   }
 
   public static String getDatePickerInitJavaScript(final String id, final boolean autosubmit)

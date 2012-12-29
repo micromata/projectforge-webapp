@@ -212,7 +212,7 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
     boolean first = true;
     for (final FormComponent< ? > formComponent : allFormComponents) {
       if (formComponent.hasFeedbackMessage() == true) {
-        final FeedbackMessage feedbackMessage = formComponent.getFeedbackMessage();
+        final FeedbackMessage feedbackMessage = formComponent.getFeedbackMessages().first();
         if (markAsRendered == true) {
           feedbackMessage.markRendered();
         }

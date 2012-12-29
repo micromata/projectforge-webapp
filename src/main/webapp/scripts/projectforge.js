@@ -120,12 +120,12 @@ $(function() {
 	initColorPicker();
 	doAfterAjaxHandling();
 	
-	if(typeof(Wicket) != "undefined" && typeof(Wicket.Ajax) != "undefined") {
+	/*if(typeof(Wicket) != "undefined" && typeof(Wicket.Ajax) != "undefined") {
 		Wicket.Ajax.registerPostCallHandler(function() {
 			// handle after AJAX actions
 			doAfterAjaxHandling();
 		});
-	}
+	}*/
 	$('.pf_preventClickBubble').on("contextmenu", function(e) {
 		e.stopImmediatePropagation();
 	});

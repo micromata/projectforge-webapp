@@ -27,11 +27,12 @@ import java.util.Date;
 
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.datetime.markup.html.form.DateTextField;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.FormComponentPanel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
+import org.projectforge.web.wicket.WicketRenderHeadUtils;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.converter.MyDateConverter;
 import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
@@ -96,6 +97,7 @@ public class DatePanel extends FormComponentPanel<Date> implements ComponentWrap
   public void renderHead(final IHeaderResponse response)
   {
     super.renderHead(response);
+    WicketRenderHeadUtils.renderMainJavaScriptIncludes(response);
     DatePickerUtils.renderHead(response, getLocale(), dateField.getMarkupId(), autosubmit);
   }
 

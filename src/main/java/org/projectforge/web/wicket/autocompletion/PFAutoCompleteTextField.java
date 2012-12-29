@@ -32,7 +32,8 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteBehavior;
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.IAutoCompleteRenderer;
 import org.apache.wicket.markup.ComponentTag;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -128,7 +129,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
       public void renderHead(final Component component, final IHeaderResponse response)
       {
         super.renderHead(component, response);
-        response.renderOnDomReadyJavaScript("$('#"+component.getMarkupId()+"').data('callback', '" + deleteBehavior.getCallbackUrl() + "');");
+        response.render(OnDomReadyHeaderItem.forScript("$('#"+component.getMarkupId()+"').data('callback', '" + deleteBehavior.getCallbackUrl() + "');"));
       }
 
       @Override
