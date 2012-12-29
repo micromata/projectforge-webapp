@@ -27,8 +27,6 @@ public abstract class EventDroppedCallback extends AbstractAjaxCallbackWithClien
 
   public static final String NO_CONTEXTMENU_INDICATOR = "noContextMenu";
 
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(EventDroppedCallback.class);
-
   private static final String CALLBACK_PRE_SCRIPT = "var triggerAjaxEvent = function (which) { ";
 
   private static final String MOVE_SAVE = CalendarDropMode.MOVE_SAVE.getI18nKey();
@@ -89,26 +87,15 @@ public abstract class EventDroppedCallback extends AbstractAjaxCallbackWithClien
   @Override
   protected String configureCallbackScript(final String script, final String urlTail)
   {
-    return script.replace(urlTail, "&eventId=\"+event.id+\"&sourceId=\"+event.source.data."
+    final String str = "&eventId='+event.id+'&sourceId='+event.source.data."
         + EventSource.Const.UUID
-        + "+\"&dayDelta=\"+dayDelta+\"&minuteDelta=\"+minuteDelta+\"&allDay=\"+allDay+\"");
+        + "+'&dayDelta='+dayDelta+'&minuteDelta='+minuteDelta+'&allDay='+allDay+'";
+    if (config.isEnableContextMenu() == false) { // do not show context menu
+      return script.replace(urlTail, str);
+    } else { // do show context menu
+      return CALLBACK_PRE_SCRIPT + script.replace(urlTail, str + "&which='+which+'") + i18nCallbackScript(CALLBACK_POST_SCRIPT);
+    }
   }
-
-  //  @Override
-  //  protected String configureCallbackScript(final String script, final String urlTail)
-  //  {
-  //    final String modScript = script.replace(urlTail, "&eventId=\"+event.id+\"&sourceId=\"+event.source.data."
-  //        + EventSource.Const.UUID
-  //        + "+\"&dayDelta=\"+dayDelta+\"&minuteDelta=\"+minuteDelta+\"&allDay=\"+allDay+\"");
-  //
-  //    if (config.isEnableContextMenu() == false) { // do not show context menu
-  //      return modScript;
-  //    } else { // do show context menu
-  //      return CALLBACK_PRE_SCRIPT + modScript + "&which=\"+which+\"" + i18nCallbackScript(CALLBACK_POST_SCRIPT);
-  //    }
-  //
-  //  }
-
 
   /**
    * @param callbackPostScript
