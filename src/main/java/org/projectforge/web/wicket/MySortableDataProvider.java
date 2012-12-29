@@ -34,7 +34,7 @@ import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvid
 import org.apache.wicket.model.IModel;
 import org.projectforge.common.MyBeanComparator;
 
-public abstract class MySortableDataProvider<O> extends SortableDataProvider<O>
+public abstract class MySortableDataProvider<O> extends SortableDataProvider<O, String>
 {
   private static final long serialVersionUID = -3144475230940819703L;
 
@@ -59,7 +59,8 @@ public abstract class MySortableDataProvider<O> extends SortableDataProvider<O>
   /**
    * @see org.apache.wicket.markup.repeater.data.IDataProvider#iterator(int, int)
    */
-  public Iterator<O> iterator(final int first, final int count)
+  @Override
+  public Iterator<? extends O> iterator(final long first, final long count)
   {
     final SortParam sp = getSort();
     final List<O> list = getList();
@@ -67,10 +68,10 @@ public abstract class MySortableDataProvider<O> extends SortableDataProvider<O>
       return null;
     }
     if (sp != null && "NOSORT".equals(sp.getProperty()) == false) {
-      final Comparator<O> comp = getComparator(sp.getProperty(), sp.isAscending());
+      final Comparator<O> comp = getComparator(sp.getProperty().toString(), sp.isAscending());
       Collections.sort(list, comp);
     }
-    return list.subList(first, first + count).iterator();
+    return list.subList((int)first, (int)(first + count)).iterator();
   }
 
   protected Comparator<O> getComparator(final String sortProperty, final boolean ascending)
@@ -81,7 +82,7 @@ public abstract class MySortableDataProvider<O> extends SortableDataProvider<O>
   /**
    * @see org.apache.wicket.markup.repeater.data.IDataProvider#size()
    */
-  public int size()
+  public long size()
   {
     return getList() != null ? getList().size() : 0;
   }

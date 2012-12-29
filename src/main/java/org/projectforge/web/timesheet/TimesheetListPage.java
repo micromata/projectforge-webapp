@@ -231,13 +231,13 @@ IListPageColumnsCreator<TimesheetDO>
   @Override
   protected void createDataTable()
   {
-    final List<IColumn<TimesheetDO>> columns = createColumns(this, !isMassUpdateMode(), isMassUpdateMode(), form.getSearchFilter(),
+    final List<IColumn<TimesheetDO, String>> columns = createColumns(this, !isMassUpdateMode(), isMassUpdateMode(), form.getSearchFilter(),
         taskTree, userFormatter, dateTimeFormatter);
     dataTable = createDataTable(columns, "startTime", SortOrder.DESCENDING);
     form.add(dataTable);
   }
 
-  public List<IColumn<TimesheetDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<TimesheetDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     return createColumns(returnToPage, sortable, false, form.getSearchFilter(), taskTree, userFormatter, dateTimeFormatter);
   }
@@ -250,11 +250,11 @@ IListPageColumnsCreator<TimesheetDO>
    *          description is used.
    */
   @SuppressWarnings("serial")
-  protected static final List<IColumn<TimesheetDO>> createColumns(final WebPage page, final boolean sortable,
+  protected static final List<IColumn<TimesheetDO, String>> createColumns(final WebPage page, final boolean sortable,
       final boolean isMassUpdateMode, final TimesheetFilter timesheetFilter, final TaskTree taskTree, final UserFormatter userFormatter,
       final DateTimeFormatter dateTimeFormatter)
       {
-    final List<IColumn<TimesheetDO>> columns = new ArrayList<IColumn<TimesheetDO>>();
+    final List<IColumn<TimesheetDO, String>> columns = new ArrayList<IColumn<TimesheetDO, String>>();
     final CellItemListener<TimesheetDO> cellItemListener = new CellItemListener<TimesheetDO>() {
       public void populateItem(final Item<ICellPopulator<TimesheetDO>> item, final String componentId, final IModel<TimesheetDO> rowModel)
       {
@@ -539,7 +539,7 @@ IListPageColumnsCreator<TimesheetDO>
    */
   @SuppressWarnings("serial")
   @Override
-  protected ISortableDataProvider<TimesheetDO> createSortableDataProvider(final String sortProperty, final SortOrder sortOrder)
+  protected ISortableDataProvider<TimesheetDO, String> createSortableDataProvider(final String sortProperty, final SortOrder sortOrder)
   {
     return new ListPageSortableDataProvider(sortProperty, sortOrder) {
       @Override

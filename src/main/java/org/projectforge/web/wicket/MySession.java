@@ -27,10 +27,10 @@ import java.io.Serializable;
 import java.util.TimeZone;
 
 import org.apache.wicket.Session;
+import org.apache.wicket.core.request.ClientInfo;
 import org.apache.wicket.protocol.http.ClientProperties;
 import org.apache.wicket.protocol.http.WebSession;
 import org.apache.wicket.protocol.http.request.WebClientInfo;
-import org.apache.wicket.request.ClientInfo;
 import org.apache.wicket.request.Request;
 import org.projectforge.Version;
 import org.projectforge.core.Configuration;

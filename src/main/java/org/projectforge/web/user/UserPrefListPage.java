@@ -81,7 +81,7 @@ public class UserPrefListPage extends AbstractListPage<UserPrefListForm, UserPre
   @Override
   protected void init()
   {
-    final List<IColumn<UserPrefDO>> columns = new ArrayList<IColumn<UserPrefDO>>();
+    final List<IColumn<UserPrefDO, String>> columns = new ArrayList<IColumn<UserPrefDO, String>>();
 
     final CellItemListener<UserPrefDO> cellItemListener = new CellItemListener<UserPrefDO>() {
       public void populateItem(final Item<ICellPopulator<UserPrefDO>> item, final String componentId, final IModel<UserPrefDO> rowModel)

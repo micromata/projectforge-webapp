@@ -78,10 +78,10 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
 
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<PFUserDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<PFUserDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final boolean updateAccess = userDao.hasLoggedInUserAccess(null, null, OperationType.UPDATE, false);
-    final List<IColumn<PFUserDO>> columns = new ArrayList<IColumn<PFUserDO>>();
+    final List<IColumn<PFUserDO, String>> columns = new ArrayList<IColumn<PFUserDO, String>>();
     final CellItemListener<PFUserDO> cellItemListener = new CellItemListener<PFUserDO>() {
       public void populateItem(final Item<ICellPopulator<PFUserDO>> item, final String componentId, final IModel<PFUserDO> rowModel)
       {
@@ -142,7 +142,7 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
         cellItemListener));
     if (updateAccess == true) {
       // Show these columns only for admin users:
-      columns.add(new AbstractColumn<PFUserDO>(new Model<String>(getString("user.assignedGroups"))) {
+      columns.add(new AbstractColumn<PFUserDO, String>(new Model<String>(getString("user.assignedGroups"))) {
         public void populateItem(final Item<ICellPopulator<PFUserDO>> cellItem, final String componentId, final IModel<PFUserDO> rowModel)
         {
           final PFUserDO user = rowModel.getObject();
@@ -152,7 +152,7 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
           cellItemListener.populateItem(cellItem, componentId, rowModel);
         }
       });
-      columns.add(new AbstractColumn<PFUserDO>(new Model<String>(getString("access.rights"))) {
+      columns.add(new AbstractColumn<PFUserDO, String>(new Model<String>(getString("access.rights"))) {
         public void populateItem(final Item<ICellPopulator<PFUserDO>> cellItem, final String componentId, final IModel<PFUserDO> rowModel)
         {
           final PFUserDO user = rowModel.getObject();
@@ -186,7 +186,8 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
       });
 
       if (LdapUserDao.isPosixAccountsConfigured() == true) {
-        columns.add(new CellItemListenerPropertyColumn<PFUserDO>(getString("user.ldapValues"), "ldapValues", "ldapValues", cellItemListener));
+        columns
+        .add(new CellItemListenerPropertyColumn<PFUserDO>(getString("user.ldapValues"), "ldapValues", "ldapValues", cellItemListener));
       }
     }
     return columns;

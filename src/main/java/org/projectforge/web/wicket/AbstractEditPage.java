@@ -135,7 +135,7 @@ AbstractSecuredPage implements IEditPage<O, D>
       showModificationTimes = false;
     }
     body.add(new Label("tabTitle", getTitle()).setRenderBodyOnly(true));
-    final List<IColumn<DisplayHistoryEntry>> columns = new ArrayList<IColumn<DisplayHistoryEntry>>();
+    final List<IColumn<DisplayHistoryEntry, String>> columns = new ArrayList<IColumn<DisplayHistoryEntry, String>>();
     final CellItemListener<DisplayHistoryEntry> cellItemListener = new CellItemListener<DisplayHistoryEntry>() {
       public void populateItem(final Item<ICellPopulator<DisplayHistoryEntry>> item, final String componentId,
           final IModel<DisplayHistoryEntry> rowModel)
@@ -181,7 +181,7 @@ AbstractSecuredPage implements IEditPage<O, D>
       }
     });
     final IDataProvider<DisplayHistoryEntry> dataProvider = new ListDataProvider<DisplayHistoryEntry>(getHistory());
-    final DataTable<DisplayHistoryEntry> dataTable = new DataTable<DisplayHistoryEntry>("historyTable", columns, dataProvider, 100) {
+    final DataTable<DisplayHistoryEntry, String> dataTable = new DataTable<DisplayHistoryEntry, String>("historyTable", columns, dataProvider, 100) {
       @Override
       protected Item<DisplayHistoryEntry> newRowItem(final String id, final int index, final IModel<DisplayHistoryEntry> model)
       {

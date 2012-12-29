@@ -25,7 +25,8 @@ package org.projectforge.web.wicket;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.behavior.Behavior;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.OnLoadHeaderItem;
 
 public class FocusOnLoadBehavior extends Behavior
 {
@@ -49,6 +50,6 @@ public class FocusOnLoadBehavior extends Behavior
   public void renderHead(final Component component, final IHeaderResponse response)
   {
     super.renderHead(component, response);
-    response.renderOnLoadJavaScript("document.getElementById('" + component.getMarkupId() + "').focus()");
+    response.render(OnLoadHeaderItem.forScript("document.getElementById('" + component.getMarkupId() + "').focus()"));
   }
 }

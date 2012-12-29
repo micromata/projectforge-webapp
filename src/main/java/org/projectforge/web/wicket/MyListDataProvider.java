@@ -57,7 +57,7 @@ public abstract class MyListDataProvider<T extends Serializable> implements IDat
   /**
    * @see IDataProvider#size()
    */
-  public int size()
+  public long size()
   {
     return getList().size();
   }
@@ -65,7 +65,7 @@ public abstract class MyListDataProvider<T extends Serializable> implements IDat
   /**
    * @see IDataProvider#model(Object)
    */
-  public IModel<T> model(T object)
+  public IModel<T> model(final T object)
   {
     return new Model<T>(object);
   }
@@ -77,9 +77,9 @@ public abstract class MyListDataProvider<T extends Serializable> implements IDat
   {
     this.list = null;
   }
-  
+
   protected abstract List<T> loadList();
-  
+
   protected List<T> getList()
   {
     if (list == null) {

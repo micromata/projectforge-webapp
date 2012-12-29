@@ -24,8 +24,8 @@
 package org.projectforge.web.wicket;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.core.util.resource.locator.ResourceStreamLocator;
 import org.apache.wicket.util.resource.IResourceStream;
-import org.apache.wicket.util.resource.locator.ResourceStreamLocator;
 
 /**
  * The web sources are not located in java sub directory org/projectforge/web, so this prefix will be replaced by "pf".

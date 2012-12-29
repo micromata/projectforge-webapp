@@ -36,5 +36,5 @@ import org.projectforge.core.BaseDO;
  */
 public interface IListPageColumnsCreator<O extends BaseDO< ? >>
 {
-  public List<IColumn<O>> createColumns(final WebPage returnToPage, final boolean sortable);
+  public List<IColumn<O, String>> createColumns(final WebPage returnToPage, final boolean sortable);
 }

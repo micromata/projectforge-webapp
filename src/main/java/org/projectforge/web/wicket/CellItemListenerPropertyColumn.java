@@ -41,7 +41,7 @@ import org.projectforge.web.calendar.DateTimeFormatter;
  * 
  */
 @SuppressWarnings("serial")
-public class CellItemListenerPropertyColumn<T> extends PropertyColumn<T>
+public class CellItemListenerPropertyColumn<T> extends PropertyColumn<T, String>
 {
   protected CellItemListener<T> cellItemListener;
 
@@ -106,7 +106,7 @@ public class CellItemListenerPropertyColumn<T> extends PropertyColumn<T>
     } else if (object instanceof I18nEnum) {
       item.add(new Label(componentId, PFUserContext.getLocalizedString(((I18nEnum) object).getI18nKey())).setRenderBodyOnly(true));
     } else if (object instanceof java.sql.Date) {
-      item.add(new Label(componentId, DateTimeFormatter.instance().getFormattedDate((java.sql.Date)object)).setRenderBodyOnly(true));
+      item.add(new Label(componentId, DateTimeFormatter.instance().getFormattedDate(object)).setRenderBodyOnly(true));
     } else if (object instanceof Date) {
       item.add(new Label(componentId, DateTimeFormatter.instance().getFormattedDateTime((Date)object)).setRenderBodyOnly(true));
     } else {

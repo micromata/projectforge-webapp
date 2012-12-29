@@ -69,9 +69,9 @@ public class GroupListPage extends AbstractListPage<GroupListForm, GroupDao, Gro
 
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<GroupDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<GroupDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<GroupDO>> columns = new ArrayList<IColumn<GroupDO>>();
+    final List<IColumn<GroupDO, String>> columns = new ArrayList<IColumn<GroupDO, String>>();
     final CellItemListener<GroupDO> cellItemListener = new CellItemListener<GroupDO>() {
       public void populateItem(final Item<ICellPopulator<GroupDO>> item, final String componentId, final IModel<GroupDO> rowModel)
       {

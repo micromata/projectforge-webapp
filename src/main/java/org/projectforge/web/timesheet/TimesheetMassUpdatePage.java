@@ -89,19 +89,19 @@ public class TimesheetMassUpdatePage extends AbstractMassEditPage implements ISe
     }
     body.add(form);
     form.init();
-    final List<IColumn<TimesheetDO>> columns = TimesheetListPage.createColumns(this, false, true, null, taskTree,
+    final List<IColumn<TimesheetDO, String>> columns = TimesheetListPage.createColumns(this, false, true, null, taskTree,
         userFormatter, dateTimeFormatter);
     @SuppressWarnings("serial")
-    final SortableDataProvider<TimesheetDO> sortableDataProvider = new SortableDataProvider<TimesheetDO>() {
-      public Iterator<TimesheetDO> iterator(final int first, final int count)
+    final SortableDataProvider<TimesheetDO, String> sortableDataProvider = new SortableDataProvider<TimesheetDO, String>() {
+      public Iterator<TimesheetDO> iterator(final long first, final long count)
       {
         final SortParam sp = getSort();
-        final Comparator<TimesheetDO> comp = new MyBeanComparator<TimesheetDO>(sp.getProperty(), sp.isAscending());
+        final Comparator<TimesheetDO> comp = new MyBeanComparator<TimesheetDO>(sp.getProperty().toString(), sp.isAscending());
         Collections.sort(timesheets, comp);
-        return timesheets.subList(first, first + count).iterator();
+        return timesheets.subList((int)first, (int)(first + count)).iterator();
       }
 
-      public int size()
+      public long size()
       {
         return timesheets != null ? timesheets.size() : 0;
       }
@@ -119,7 +119,7 @@ public class TimesheetMassUpdatePage extends AbstractMassEditPage implements ISe
     };
     sortableDataProvider.setSort("startTime", SortOrder.DESCENDING);
 
-    final DefaultDataTable<TimesheetDO> dataTable = new DefaultDataTable<TimesheetDO>("table", columns, sortableDataProvider, 1000);
+    final DefaultDataTable<TimesheetDO, String> dataTable = new DefaultDataTable<TimesheetDO, String>("table", columns, sortableDataProvider, 1000);
     body.add(dataTable);
   }
 

@@ -86,7 +86,7 @@ AbstractSecuredPage implements ISelectCallerPage
 
   protected F form;
 
-  protected DataTable<O> dataTable;
+  protected DataTable<O, String> dataTable;
 
   protected List<O> list;
 
@@ -557,10 +557,10 @@ AbstractSecuredPage implements ISelectCallerPage
    * @param ascending
    * @return
    */
-  protected DataTable<O> createDataTable(final List<IColumn<O>> columns, final String sortProperty, final SortOrder sortOrder)
+  protected DataTable<O, String> createDataTable(final List<IColumn<O, String>> columns, final String sortProperty, final SortOrder sortOrder)
   {
     final int pageSize = form.getPageSize();
-    return new DefaultDataTable<O>("table", columns, createSortableDataProvider(sortProperty, sortOrder), pageSize);
+    return new DefaultDataTable<O, String>("table", columns, createSortableDataProvider(sortProperty, sortOrder), pageSize);
     // return new AjaxFallbackDefaultDataTable<O>("table", columns, createSortableDataProvider(sortProperty, ascending), pageSize);
   }
 
@@ -569,7 +569,7 @@ AbstractSecuredPage implements ISelectCallerPage
    * @param sortProperty
    * @param ascending
    */
-  protected ISortableDataProvider<O> createSortableDataProvider(final String sortProperty, final SortOrder sortOrder)
+  protected ISortableDataProvider<O, String> createSortableDataProvider(final String sortProperty, final SortOrder sortOrder)
   {
     return new ListPageSortableDataProvider(sortProperty, sortOrder);
   }

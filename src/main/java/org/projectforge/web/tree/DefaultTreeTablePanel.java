@@ -308,7 +308,7 @@ public abstract class DefaultTreeTablePanel<T extends TreeTableNode> extends Pan
           } else {
             prependJavascriptBuf.append(WicketAjaxUtils.appendChild(treeTableBody.getMarkupId(), "tr", newRow.getMarkupId()));
           }
-          target.addComponent(newRow);
+          target.add(newRow);
         }
       }
       {
@@ -359,7 +359,7 @@ public abstract class DefaultTreeTablePanel<T extends TreeTableNode> extends Pan
     if (oldImage != currentImage) {
       prependJavascriptBuf.append(WicketAjaxUtils.replaceChild(link.getMarkupId(), oldImage.getMarkupId(), "img", currentImage
           .getMarkupId()));
-      target.addComponent(currentImage);
+      target.add(currentImage);
     }
   }
 

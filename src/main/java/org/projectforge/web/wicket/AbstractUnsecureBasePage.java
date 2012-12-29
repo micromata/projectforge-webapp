@@ -30,7 +30,11 @@ import java.util.Map;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.ComponentTag;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.CssHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptHeaderItem;
+import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
+import org.apache.wicket.markup.head.StringHeaderItem;
 import org.apache.wicket.markup.html.TransparentWebMarkupContainer;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
@@ -144,33 +148,34 @@ public abstract class AbstractUnsecureBasePage extends WebPage
   public void renderHead(final IHeaderResponse response)
   {
     super.renderHead(response);
-    response.renderString(WicketUtils.getCssForFavicon(getUrl("/favicon.ico")));
-    response.renderCSSReference("styles/adminica-2.2/main.css");
-    // response.renderCSSReference("styles/adminica-2.2/grid.css");
-    response.renderCSSReference("styles/adminica-2.2/mobile.css");
-    // response.renderCSSReference("styles/adminica-2.2/themes/switcher.css");
-    // response.renderCSSReference("styles/adminica-2.2/colours.css");
-    // response.renderCSSReference("styles/adminica-2.2/themes/theme_base.css");
-    // response.renderCSSReference("styles/adminica-2.2/themes/skin_light.css");
-    // response.renderCSSReference("styles/adminica-2.2/themes/bg_noise_zero.css");
-    response.renderCSSReference("styles/adminica-2.2/themes/nav_top.css");
-    response.renderCSSReference("styles/adminica-2.2/adminica-patch.css");
-    response.renderCSSReference("include/bootstrap/css/bootstrap.min.css");
-    response.renderCSSReference("styles/projectforge.css");
+    WicketRenderHeadUtils.renderMainJavaScriptIncludes(response);
+    response.render(StringHeaderItem.forString(WicketUtils.getCssForFavicon(getUrl("/favicon.ico"))));
+    response.render(CssHeaderItem.forUrl("styles/adminica-2.2/main.css"));
+    // response.render(CssHeaderItem.forUrl("styles/adminica-2.2/grid.css"));
+    response.render(CssHeaderItem.forUrl("styles/adminica-2.2/mobile.css"));
+    // response.render(CssHeaderItem.forUrl("styles/adminica-2.2/themes/switcher.css"));
+    // response.render(CssHeaderItem.forUrl("styles/adminica-2.2/colours.css"));
+    // response.render(CssHeaderItem.forUrl("styles/adminica-2.2/themes/theme_base.css"));
+    // response.render(CssHeaderItem.forUrl("styles/adminica-2.2/themes/skin_light.css"));
+    // response.render(CssHeaderItem.forUrl("styles/adminica-2.2/themes/bg_noise_zero.css"));
+    response.render(CssHeaderItem.forUrl("styles/adminica-2.2/themes/nav_top.css"));
+    response.render(CssHeaderItem.forUrl("styles/adminica-2.2/adminica-patch.css"));
+    response.render(CssHeaderItem.forUrl("include/bootstrap/css/bootstrap.min.css"));
+    response.render(CssHeaderItem.forUrl("styles/projectforge.css"));
 
     // if (WebConfiguration.isDevelopmentMode() == true) {
-    response.renderJavaScriptReference("scripts/adminica-2.2/prefixfree/prefixfree.js");
-    response.renderJavaScriptReference("scripts/adminica-2.2/adminica_ui.js");
-    response.renderJavaScriptReference("scripts/adminica-2.2/adminica_mobile.js");
-    response.renderJavaScriptReference("scripts/adminica-2.2/adminica_load.js");
+    response.render(JavaScriptHeaderItem.forUrl("scripts/adminica-2.2/prefixfree/prefixfree.js"));
+    response.render(JavaScriptHeaderItem.forUrl("scripts/adminica-2.2/adminica_ui.js"));
+    response.render(JavaScriptHeaderItem.forUrl("scripts/adminica-2.2/adminica_mobile.js"));
+    response.render(JavaScriptHeaderItem.forUrl("scripts/adminica-2.2/adminica_load.js"));
     // } else {
-    // response.renderJavaScriptReference("scripts/adminica-2.2/prefixfree/prefixfree-min.js");
-    // response.renderJavaScriptReference("scripts/adminica-2.2/bootstrap/bootstrap.min.js");
-    // response.renderJavaScriptReference("scripts/adminica-2.2/adminica_ui.js"); // modified (can't use compressed version).
-    // response.renderJavaScriptReference("scripts/adminica-2.2/adminica_mobile-min.js");
-    // response.renderJavaScriptReference("scripts/adminica-2.2/adminica_load-min.js");
+    // response.render(JavaScriptHeaderItem.forUrl("scripts/adminica-2.2/prefixfree/prefixfree-min.js"));
+    // response.render(JavaScriptHeaderItem.forUrl("scripts/adminica-2.2/bootstrap/bootstrap.min.js"));
+    // response.render(JavaScriptHeaderItem.forUrl("scripts/adminica-2.2/adminica_ui.js")); // modified (can't use compressed version).
+    // response.render(JavaScriptHeaderItem.forUrl("scripts/adminica-2.2/adminica_mobile-min.js"));
+    // response.render(JavaScriptHeaderItem.forUrl("scripts/adminica-2.2/adminica_load-min.js"));
     // }
-    response.renderJavaScriptReference("scripts/projectforge.js");
+    response.render(JavaScriptHeaderItem.forUrl("scripts/projectforge.js"));
     initializeContextMenu(response);
   }
 
@@ -316,7 +321,7 @@ public abstract class AbstractUnsecureBasePage extends WebPage
     final Map<String, String> i18nKeyMap = new HashMap<String, String>();
     i18nKeyMap.put("newTab", getString("contextMenu.newTab"));
     i18nKeyMap.put("cancel", getString("contextMenu.cancel"));
-    response.renderOnDomReadyJavaScript(getJstemplate().asString(i18nKeyMap));
+    response.render(OnDomReadyHeaderItem.forScript(getJstemplate().asString(i18nKeyMap)));
   }
 
   /**

@@ -35,8 +35,9 @@ import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulato
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.HeadersToolbar;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
-import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -127,7 +128,7 @@ public class TimesheetEditSelectRecentDialogPanel extends Panel
   @SuppressWarnings({ "serial"})
   private void addRecentSheetsTable()
   {
-    final List<IColumn<TimesheetDO>> columns = new ArrayList<IColumn<TimesheetDO>>();
+    final List<IColumn<TimesheetDO, String>> columns = new ArrayList<IColumn<TimesheetDO, String>>();
     final CellItemListener<TimesheetDO> cellItemListener = new CellItemListener<TimesheetDO>() {
       public void populateItem(final Item<ICellPopulator<TimesheetDO>> item, final String componentId, final IModel<TimesheetDO> rowModel)
       {
@@ -210,7 +211,7 @@ public class TimesheetEditSelectRecentDialogPanel extends Panel
     columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(getString("timesheet.description"), null, "shortDescription",
         cellItemListener));
     final IDataProvider<TimesheetDO> dataProvider = new ListDataProvider<TimesheetDO>(parentPage.getRecentTimesheets());
-    final DataTable<TimesheetDO> dataTable = new DataTable<TimesheetDO>("table", columns, dataProvider, 100) {
+    final DataTable<TimesheetDO, String> dataTable = new DataTable<TimesheetDO, String>("table", columns, dataProvider, 100) {
       @Override
       protected Item<TimesheetDO> newRowItem(final String id, final int index, final IModel<TimesheetDO> model)
       {
@@ -266,7 +267,7 @@ public class TimesheetEditSelectRecentDialogPanel extends Panel
           + "  $(\".datatable td\").click( function() {\n"
           + "    $(this).parent().find(\"a:first\").click();\n"
           + "  });\n";
-      response.renderOnDomReadyJavaScript(initJS);
+      response.render(OnDomReadyHeaderItem.forScript(initJS));
     }
   }
 }

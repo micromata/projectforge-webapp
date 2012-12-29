@@ -50,7 +50,7 @@ public class ValidationMsgBehavior extends Behavior
       if (fc.isValid() == false) {
         String error;
         if (fc.hasFeedbackMessage() == true) {
-          error = fc.getFeedbackMessage().getMessage().toString();
+          error = fc.getFeedbackMessages().first().getMessage().toString();
         } else {
           error = component.getString("validation.error.generic");
         }
