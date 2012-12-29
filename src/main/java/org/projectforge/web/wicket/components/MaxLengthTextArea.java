@@ -23,20 +23,13 @@
 
 package org.projectforge.web.wicket.components;
 
-import java.lang.reflect.Field;
-
-import org.apache.commons.lang.ClassUtils;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.validation.validator.StringValidator;
-import org.projectforge.database.HibernateUtils;
 
 public class MaxLengthTextArea extends TextArea<String>
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MaxLengthTextArea.class);
-
   private static final long serialVersionUID = 1507157818607697767L;
 
   /**
@@ -52,14 +45,7 @@ public class MaxLengthTextArea extends TextArea<String>
   public MaxLengthTextArea(final String id, final IModel<String> model)
   {
     super(id, model);
-    Integer length = null;
-    if (ClassUtils.isAssignable(model.getClass(), PropertyModel.class)) {
-      final PropertyModel< ? > propertyModel = (PropertyModel< ? >) model;
-      length = HibernateUtils.getPropertyLength(propertyModel.getObjectClass().getName(), propertyModel.getPropertyField().getName());
-      if (length == null) {
-        log.warn("No length validation for: " + model);
-      }
-    }
+    final Integer length = MaxLengthTextField.getMaxLength(model);
     init(id, length);
   }
 
@@ -74,18 +60,8 @@ public class MaxLengthTextArea extends TextArea<String>
   public MaxLengthTextArea(final String id, final IModel<String> model, final int maxLength)
   {
     super(id, model);
-    if (ClassUtils.isAssignable(model.getClass(), PropertyModel.class)) {
-      final PropertyModel< ? > propertyModel = (PropertyModel< ? >) model;
-      final Field propertyField = propertyModel.getPropertyField();
-      if (propertyField != null) {
-        final Integer dbMaxLength = HibernateUtils.getPropertyLength(propertyModel.getObjectClass().getName(),
-            propertyField.getName());
-        if (dbMaxLength != null && dbMaxLength < maxLength) {
-          log.warn("Data base length of given property is less than given maxLength: " + model);
-        }
-      }
-    }
-    init(id, maxLength);
+    final Integer length = MaxLengthTextField.getMaxLength(model, maxLength);
+    init(id, length);
   }
 
   private void init(final String id, final Integer maxLength)

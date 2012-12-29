@@ -24,13 +24,14 @@
 package org.projectforge.web.wicket.components;
 
 import org.apache.commons.lang.ClassUtils;
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.model.ChainingModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.util.convert.IConverter;
 import org.apache.wicket.validation.validator.StringValidator;
+import org.projectforge.common.BeanHelper;
 import org.projectforge.database.HibernateUtils;
 
 public class MaxLengthTextField extends TextField<String>
@@ -57,14 +58,7 @@ public class MaxLengthTextField extends TextField<String>
   public MaxLengthTextField(final String id, final IModel<String> model)
   {
     super(id, model);
-    Integer length = null;
-    if (ClassUtils.isAssignable(model.getClass(), PropertyModel.class)) {
-      final PropertyModel< ? > propertyModel = (PropertyModel< ? >) model;
-      length = HibernateUtils.getPropertyLength(propertyModel.getObjectClass().getName(), propertyModel.getPropertyField().getName());
-      if (length == null) {
-        log.warn("No length validation for: " + model);
-      }
-    }
+    final Integer length = getMaxLength(model);
     init(id, length);
   }
 
@@ -85,22 +79,15 @@ public class MaxLengthTextField extends TextField<String>
   public MaxLengthTextField(final String id, final IModel<String> model, final int maxLength)
   {
     super(id, model);
-    if (ClassUtils.isAssignable(model.getClass(), PropertyModel.class)) {
-      final PropertyModel< ? > propertyModel = (PropertyModel< ? >) model;
-      final Integer dbMaxLength = HibernateUtils.getPropertyLength(propertyModel.getObjectClass().getName(), propertyModel
-          .getPropertyField().getName());
-      if (dbMaxLength != null && dbMaxLength < maxLength) {
-        log.warn("Data base length of given property is less than given maxLength: " + model);
-      }
-    }
-    init(id, maxLength);
+    final Integer length = getMaxLength(model, maxLength);
+    init(id, length);
   }
 
   private void init(final String id, final Integer maxLength)
   {
     if (maxLength != null) {
       add(StringValidator.maximumLength(maxLength));
-      add(AttributeModifier.replace("maxlength", String.valueOf(maxLength)));
+      // add(AttributeModifier.replace("maxlength", String.valueOf(maxLength))); // Field maxlength is produced by StringValidator.
     }
   }
 
@@ -127,5 +114,45 @@ public class MaxLengthTextField extends TextField<String>
   {
     this.converter = converter;
     return this;
+  }
+
+  /**
+   * The field length (if defined by Hibernate). The entity is the target class of the PropertyModel and the field name is the expression of
+   * the given PropertyModel.
+   * @param model If not from type PropertyModel then null is returned.
+   * @return
+   */
+  public static Integer getMaxLength(final IModel<String> model)
+  {
+    Integer length = null;
+    if (ClassUtils.isAssignable(model.getClass(), PropertyModel.class)) {
+      final PropertyModel< ? > propertyModel = (PropertyModel< ? >) model;
+      final Object entity = BeanHelper.getFieldValue(propertyModel, ChainingModel.class, "target");
+      if (entity == null) {
+        log.warn("Oups, can't get private field 'target' of PropertyModel!.");
+      } else {
+        length = HibernateUtils.getPropertyLength(entity.getClass().getName(), propertyModel.getPropertyField().getName());
+      }
+      if (length == null) {
+        log.warn("No length validation for: " + model);
+      }
+    }
+    return length;
+  }
+
+  /**
+   * The field length (if defined by Hibernate). The entity is the target class of the PropertyModel and the field name is the expression of
+   * the given PropertyModel.
+   * @param model If not from type PropertyModel then null is returned.
+   * @return
+   */
+  public static Integer getMaxLength(final IModel<String> model, final Integer maxLength)
+  {
+    final Integer dbLength = getMaxLength(model);
+    if (dbLength != null && dbLength < maxLength) {
+      log.warn("Data base length of given property is less than given maxLength: " + model);
+      return dbLength;
+    }
+    return maxLength;
   }
 }

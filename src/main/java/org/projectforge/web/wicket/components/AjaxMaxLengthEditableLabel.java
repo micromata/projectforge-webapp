@@ -23,15 +23,11 @@
 
 package org.projectforge.web.wicket.components;
 
-import org.apache.commons.lang.ClassUtils;
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.util.convert.IConverter;
 import org.apache.wicket.validation.validator.StringValidator;
-import org.projectforge.database.HibernateUtils;
 
 @SuppressWarnings("serial")
 public class AjaxMaxLengthEditableLabel extends AjaxEditableLabel<String>
@@ -56,14 +52,7 @@ public class AjaxMaxLengthEditableLabel extends AjaxEditableLabel<String>
   public AjaxMaxLengthEditableLabel(final String id, final IModel<String> model)
   {
     super(id, model);
-    Integer length = null;
-    if (ClassUtils.isAssignable(model.getClass(), PropertyModel.class)) {
-      final PropertyModel< ? > propertyModel = (PropertyModel< ? >) model;
-      length = HibernateUtils.getPropertyLength(propertyModel.getObjectClass().getName(), propertyModel.getPropertyField().getName());
-      if (length == null) {
-        log.warn("No length validation for: " + model);
-      }
-    }
+    final Integer length = MaxLengthTextField.getMaxLength(model);
     init(id, length);
   }
 
@@ -84,22 +73,15 @@ public class AjaxMaxLengthEditableLabel extends AjaxEditableLabel<String>
   public AjaxMaxLengthEditableLabel(final String id, final IModel<String> model, final int maxLength)
   {
     super(id, model);
-    if (ClassUtils.isAssignable(model.getClass(), PropertyModel.class)) {
-      final PropertyModel< ? > propertyModel = (PropertyModel< ? >) model;
-      final Integer dbMaxLength = HibernateUtils.getPropertyLength(propertyModel.getObjectClass().getName(), propertyModel
-          .getPropertyField().getName());
-      if (dbMaxLength != null && dbMaxLength < maxLength) {
-        log.warn("Data base length of given property is less than given maxLength: " + model);
-      }
-    }
-    init(id, maxLength);
+    final Integer length = MaxLengthTextField.getMaxLength(model, maxLength);
+    init(id, length);
   }
 
   private void init(final String id, final Integer maxLength)
   {
     if (maxLength != null) {
       add(StringValidator.maximumLength(maxLength));
-      add(AttributeModifier.replace("maxlength", String.valueOf(maxLength)));
+      // add(AttributeModifier.replace("maxlength", String.valueOf(maxLength))); // Done by StringValidator
     }
   }
 
