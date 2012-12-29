@@ -300,7 +300,7 @@ extends AbstractEditForm<O, P>
         }
       });
     }
-    gridBuilder.newSubSplitPanel(GridSize.COL50);
+    gridBuilder.clear().newSubSplitPanel(GridSize.COL50);
     {
       // Bezahldatum
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.bezahlDatum"));
@@ -338,6 +338,7 @@ extends AbstractEditForm<O, P>
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.besonderheiten"));
       fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "besonderheiten"))).setAutogrow();
     }
+    gridBuilder.newGridPanel();
     positionsRepeater = gridBuilder.newRepeatingView();
     if (costConfigured == true) {
       costEditModalWindow = new ModalWindow(COST_EDIT_DIALOG_ID);
@@ -376,8 +377,7 @@ extends AbstractEditForm<O, P>
       }
       final List<Component> ajaxUpdatePositionComponents = new ArrayList<Component>();
       final RechnungsPositionDO rechnungsPosition = (position instanceof RechnungsPositionDO) ? (RechnungsPositionDO) position : null;
-      final ToggleContainerPanel positionsPanel = new ToggleContainerPanel(positionsRepeater.newChildId(), DivType.GRID12,
-          DivType.ROUND_ALL) {
+      final ToggleContainerPanel positionsPanel = new ToggleContainerPanel(positionsRepeater.newChildId()) {
         /**
          * @see org.projectforge.web.wicket.flowlayout.ToggleContainerPanel#wantsOnStatusChangedNotification()
          */

@@ -27,17 +27,31 @@ import java.math.BigDecimal;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.link.Link;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.projectforge.common.NumberHelper;
+import org.projectforge.fibu.KundeDO;
+import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.RechnungDO;
 import org.projectforge.fibu.RechnungStatus;
+import org.projectforge.fibu.RechnungTyp;
 import org.projectforge.fibu.RechnungsPositionDO;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.PresizedImage;
 import org.projectforge.web.wicket.WebConstants;
+import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.bootstrap.GridSize;
+import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
+import org.projectforge.web.wicket.components.MaxLengthTextField;
+import org.projectforge.web.wicket.components.MinMaxNumberField;
+import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.InputPanel;
 
 public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, RechnungsPositionDO, RechnungEditPage>
 {
@@ -56,8 +70,8 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
 
   @Override
   protected void onInit()
-  {/*
-    gridBuilder.newGridPanel(GridSize.COL100);
+  {
+    gridBuilder.newGridPanel();
     {
       // Subject
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.betreff"));
@@ -66,7 +80,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
       fs.add(subject);
     }
     // GRID 50% - BLOCK
-    gridBuilder.newGridPanel(GridSize.COL50).newGridPanel(1, GridSize.COL50);
+    gridBuilder.newSplitPanel(GridSize.COL50, true).newSubSplitPanel(GridSize.COL50);
     {
       // Number
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.nummer"), true);
@@ -78,7 +92,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
         fs.addHelpIcon(getString("fibu.tooltip.nummerWirdAutomatischVergeben"));
       }
     }
-    gridBuilder.newGridPanel(1, GridSize.COL50);
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
     {
       // Status
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.status"));
@@ -92,6 +106,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     }
     {
       // Type
+      gridBuilder.newSubSplitPanel(GridSize.COL100);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.typ"));
       final LabelValueChoiceRenderer<RechnungTyp> typeChoiceRenderer = new LabelValueChoiceRenderer<RechnungTyp>(this, RechnungTyp.values());
       final DropDownChoice<RechnungTyp> typeChoice = new DropDownChoice<RechnungTyp>(fs.getDropDownChoiceId(),
@@ -117,7 +132,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
           parentPage, "projektId");
       fs.add(projektSelectPanel);
       projektSelectPanel.init();
-    }*/
+    }
   }
 
   @SuppressWarnings("serial")

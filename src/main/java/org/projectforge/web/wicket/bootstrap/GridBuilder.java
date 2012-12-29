@@ -149,6 +149,12 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
     return this;
   }
 
+  public GridBuilder clear()
+  {
+    lengthCounter[currentLevel] = 1000;
+    return this;
+  }
+
   /**
    * If row panel of this level doesn't exist it will be created.
    * @param level

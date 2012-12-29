@@ -92,7 +92,7 @@ public class ToggleContainerPanel extends Panel
 
   public ToggleContainerPanel setHeading(final String heading)
   {
-    toggleLink.add(this.heading = new Label(HEADING_ID, heading));
+    toggleLink.add(this.heading = new Label(HEADING_ID, heading).setRenderBodyOnly(true));
     return this;
   }
 
