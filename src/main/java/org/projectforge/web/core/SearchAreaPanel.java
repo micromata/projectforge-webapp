@@ -117,7 +117,7 @@ public class SearchAreaPanel extends Panel
     }
     final List< ? > columns = listPageColumnsCreator.createColumns(page, false);
     @SuppressWarnings({ "rawtypes", "unchecked"})
-    final DataTable< ? > dataTable = new DefaultDataTable("dataTable", columns, new MySortableDataProvider("NOSORT", SortOrder.DESCENDING) {
+    final DataTable< ?, String > dataTable = new DefaultDataTable("dataTable", columns, new MySortableDataProvider("NOSORT", SortOrder.DESCENDING) {
       @Override
       public List< ? > getList()
       {

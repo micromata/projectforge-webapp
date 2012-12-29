@@ -63,7 +63,7 @@ public class ScriptListPage extends AbstractListPage<ScriptListForm, ScriptDao, 
   @Override
   protected void init()
   {
-    final List<IColumn<ScriptDO>> columns = new ArrayList<IColumn<ScriptDO>>();
+    final List<IColumn<ScriptDO, String>> columns = new ArrayList<IColumn<ScriptDO, String>>();
     final CellItemListener<ScriptDO> cellItemListener = new CellItemListener<ScriptDO>() {
       public void populateItem(final Item<ICellPopulator<ScriptDO>> item, final String componentId, final IModel<ScriptDO> rowModel)
       {
@@ -92,7 +92,7 @@ public class ScriptListPage extends AbstractListPage<ScriptListForm, ScriptDao, 
     });
     columns.add(new CellItemListenerPropertyColumn<ScriptDO>(new Model<String>(getString("description")), "description", "description",
         cellItemListener));
-    columns.add(new AbstractColumn<ScriptDO>(new Model<String>(getString("scripting.script.parameter"))) {
+    columns.add(new AbstractColumn<ScriptDO, String>(new Model<String>(getString("scripting.script.parameter"))) {
       public void populateItem(final Item<ICellPopulator<ScriptDO>> cellItem, final String componentId, final IModel<ScriptDO> rowModel)
       {
         final ScriptDO script = rowModel.getObject();

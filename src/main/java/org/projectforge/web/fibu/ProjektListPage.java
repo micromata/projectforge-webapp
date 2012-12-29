@@ -83,9 +83,9 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
 
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<ProjektDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<ProjektDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<ProjektDO>> columns = new ArrayList<IColumn<ProjektDO>>();
+    final List<IColumn<ProjektDO, String>> columns = new ArrayList<IColumn<ProjektDO, String>>();
     final CellItemListener<ProjektDO> cellItemListener = new CellItemListener<ProjektDO>() {
       public void populateItem(final Item<ICellPopulator<ProjektDO>> item, final String componentId, final IModel<ProjektDO> rowModel)
       {

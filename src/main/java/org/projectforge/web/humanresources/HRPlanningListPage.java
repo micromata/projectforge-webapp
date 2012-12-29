@@ -94,7 +94,7 @@ ISelectCallerPage
   @Override
   protected void init()
   {
-    final List<IColumn<HRPlanningEntryDO>> columns = new ArrayList<IColumn<HRPlanningEntryDO>>();
+    final List<IColumn<HRPlanningEntryDO, String>> columns = new ArrayList<IColumn<HRPlanningEntryDO, String>>();
     final CellItemListener<HRPlanningEntryDO> cellItemListener = new CellItemListener<HRPlanningEntryDO>() {
       public void populateItem(final Item<ICellPopulator<HRPlanningEntryDO>> item, final String componentId,
           final IModel<HRPlanningEntryDO> rowModel)

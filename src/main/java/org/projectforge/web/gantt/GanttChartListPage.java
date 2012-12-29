@@ -71,7 +71,7 @@ public class GanttChartListPage extends AbstractListPage<GanttChartListForm, Gan
   @Override
   protected void init()
   {
-    final List<IColumn<GanttChartDO>> columns = new ArrayList<IColumn<GanttChartDO>>();
+    final List<IColumn<GanttChartDO, String>> columns = new ArrayList<IColumn<GanttChartDO, String>>();
 
     final CellItemListener<GanttChartDO> cellItemListener = new CellItemListener<GanttChartDO>() {
       public void populateItem(final Item<ICellPopulator<GanttChartDO>> item, final String componentId, final IModel<GanttChartDO> rowModel)

@@ -23,7 +23,8 @@
 
 package org.projectforge.web.core;
 
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptReferenceHeaderItem;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -153,7 +154,7 @@ public class SearchPage extends AbstractStandardFormPage implements ISelectCalle
   public void renderHead(final IHeaderResponse response)
   {
     super.renderHead(response);
-    response.renderJavaScriptReference("scripts/zoom.js");
+    response.render(JavaScriptReferenceHeaderItem.forUrl("scripts/zoom.js"));
   }
 
   @Override

@@ -71,7 +71,7 @@ public class ConfigurationListPage extends AbstractListPage<ConfigurationListFor
   {
     newItemMenuEntry.setVisible(false);
     configurationDao.checkAndUpdateDatabaseEntries();
-    final List<IColumn<ConfigurationDO>> columns = new ArrayList<IColumn<ConfigurationDO>>();
+    final List<IColumn<ConfigurationDO, String>> columns = new ArrayList<IColumn<ConfigurationDO, String>>();
     final CellItemListener<ConfigurationDO> cellItemListener = new CellItemListener<ConfigurationDO>() {
       public void populateItem(final Item<ICellPopulator<ConfigurationDO>> item, final String componentId, final IModel<ConfigurationDO> rowModel)
       {

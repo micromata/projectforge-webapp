@@ -70,9 +70,9 @@ public class CustomerListPage extends AbstractListPage<CustomerListForm, KundeDa
    */
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<KundeDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<KundeDO,String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<KundeDO>> columns = new ArrayList<IColumn<KundeDO>>();
+    final List<IColumn<KundeDO, String>> columns = new ArrayList<IColumn<KundeDO, String>>();
 
     final CellItemListener<KundeDO> cellItemListener = new CellItemListener<KundeDO>() {
       public void populateItem(final Item<ICellPopulator<KundeDO>> item, final String componentId, final IModel<KundeDO> rowModel)

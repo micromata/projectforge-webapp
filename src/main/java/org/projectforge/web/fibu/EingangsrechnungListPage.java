@@ -108,9 +108,9 @@ IListPageColumnsCreator<EingangsrechnungDO>
 
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<EingangsrechnungDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<EingangsrechnungDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<EingangsrechnungDO>> columns = new ArrayList<IColumn<EingangsrechnungDO>>();
+    final List<IColumn<EingangsrechnungDO, String>> columns = new ArrayList<IColumn<EingangsrechnungDO, String>>();
     final CellItemListener<EingangsrechnungDO> cellItemListener = new CellItemListener<EingangsrechnungDO>() {
       public void populateItem(final Item<ICellPopulator<EingangsrechnungDO>> item, final String componentId, final IModel<EingangsrechnungDO> rowModel)
       {

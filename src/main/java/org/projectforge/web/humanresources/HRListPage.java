@@ -114,7 +114,7 @@ public class HRListPage extends AbstractListPage<HRListForm, HRDao, HRViewUserDa
     if (dataTable != null) {
       form.remove(dataTable);
     }
-    final List<IColumn<HRViewUserData>> columns = new ArrayList<IColumn<HRViewUserData>>();
+    final List<IColumn<HRViewUserData, String>> columns = new ArrayList<IColumn<HRViewUserData, String>>();
     final CellItemListener<HRViewUserData> cellItemListener = new CellItemListener<HRViewUserData>() {
       public void populateItem(final Item<ICellPopulator<HRViewUserData>> item, final String componentId,
           final IModel<HRViewUserData> rowModel)

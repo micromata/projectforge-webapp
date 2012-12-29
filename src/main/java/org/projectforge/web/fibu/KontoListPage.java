@@ -66,9 +66,9 @@ public class KontoListPage extends AbstractListPage<KontoListForm, KontoDao, Kon
 
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<KontoDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<KontoDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<KontoDO>> columns = new ArrayList<IColumn<KontoDO>>();
+    final List<IColumn<KontoDO, String>> columns = new ArrayList<IColumn<KontoDO, String>>();
     final CellItemListener<KontoDO> cellItemListener = new CellItemListener<KontoDO>() {
       public void populateItem(final Item<ICellPopulator<KontoDO>> item, final String componentId, final IModel<KontoDO> rowModel)
       {

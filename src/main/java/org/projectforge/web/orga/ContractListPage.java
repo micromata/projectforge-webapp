@@ -65,9 +65,9 @@ public class ContractListPage extends AbstractListPage<ContractListForm, Contrac
    */
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<ContractDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<ContractDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<ContractDO>> columns = new ArrayList<IColumn<ContractDO>>();
+    final List<IColumn<ContractDO, String>> columns = new ArrayList<IColumn<ContractDO, String>>();
 
     final CellItemListener<ContractDO> cellItemListener = new CellItemListener<ContractDO>() {
       public void populateItem(final Item<ICellPopulator<ContractDO>> item, final String componentId, final IModel<ContractDO> rowModel)

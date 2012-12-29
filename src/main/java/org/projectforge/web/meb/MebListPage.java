@@ -71,9 +71,9 @@ public class MebListPage extends AbstractListPage<MebListForm, MebDao, MebEntryD
    */
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<MebEntryDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<MebEntryDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<MebEntryDO>> columns = new ArrayList<IColumn<MebEntryDO>>();
+    final List<IColumn<MebEntryDO, String>> columns = new ArrayList<IColumn<MebEntryDO, String>>();
     final CellItemListener<MebEntryDO> cellItemListener = new CellItemListener<MebEntryDO>() {
       public void populateItem(final Item<ICellPopulator<MebEntryDO>> item, final String componentId, final IModel<MebEntryDO> rowModel)
       {

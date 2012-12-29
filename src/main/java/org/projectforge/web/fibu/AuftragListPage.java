@@ -96,9 +96,9 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
 
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<AuftragDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<AuftragDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<AuftragDO>> columns = new ArrayList<IColumn<AuftragDO>>();
+    final List<IColumn<AuftragDO,String>> columns = new ArrayList<IColumn<AuftragDO, String>>();
     final CellItemListener<AuftragDO> cellItemListener = new CellItemListener<AuftragDO>() {
       public void populateItem(final Item<ICellPopulator<AuftragDO>> item, final String componentId, final IModel<AuftragDO> rowModel)
       {
@@ -139,7 +139,7 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
     columns.add(new CellItemListenerPropertyColumn<AuftragDO>(getString("fibu.kunde"), "kundeAsString", "kundeAsString", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<AuftragDO>(getString("fibu.projekt"), "projekt.name", "projekt.name", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<AuftragDO>(getString("fibu.auftrag.titel"), "titel", "titel", cellItemListener));
-    columns.add(new AbstractColumn<AuftragDO>(new Model<String>(getString("fibu.auftrag.positions"))) {
+    columns.add(new AbstractColumn<AuftragDO, String>(new Model<String>(getString("fibu.auftrag.positions"))) {
       public void populateItem(final Item<ICellPopulator<AuftragDO>> cellItem, final String componentId, final IModel<AuftragDO> rowModel)
       {
         final AuftragDO auftrag = rowModel.getObject();

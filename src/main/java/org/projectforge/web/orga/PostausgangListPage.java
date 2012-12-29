@@ -66,9 +66,9 @@ IListPageColumnsCreator<PostausgangDO>
    */
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<PostausgangDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<PostausgangDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<PostausgangDO>> columns = new ArrayList<IColumn<PostausgangDO>>();
+    final List<IColumn<PostausgangDO, String>> columns = new ArrayList<IColumn<PostausgangDO, String>>();
     final CellItemListener<PostausgangDO> cellItemListener = new CellItemListener<PostausgangDO>() {
       public void populateItem(final Item<ICellPopulator<PostausgangDO>> item, final String componentId,
           final IModel<PostausgangDO> rowModel)

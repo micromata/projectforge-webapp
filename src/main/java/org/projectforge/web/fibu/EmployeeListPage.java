@@ -68,9 +68,9 @@ public class EmployeeListPage extends AbstractListPage<EmployeeListForm, Employe
   }
 
   @SuppressWarnings("serial")
-  public List<IColumn<EmployeeDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<EmployeeDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<EmployeeDO>> columns = new ArrayList<IColumn<EmployeeDO>>();
+    final List<IColumn<EmployeeDO, String>> columns = new ArrayList<IColumn<EmployeeDO, String>>();
 
     final CellItemListener<EmployeeDO> cellItemListener = new CellItemListener<EmployeeDO>() {
       public void populateItem(final Item<ICellPopulator<EmployeeDO>> item, final String componentId, final IModel<EmployeeDO> rowModel)
@@ -139,7 +139,7 @@ public class EmployeeListPage extends AbstractListPage<EmployeeListForm, Employe
   @Override
   protected void init()
   {
-    final List<IColumn<EmployeeDO>> columns = createColumns(this, true);
+    final List<IColumn<EmployeeDO, String>> columns = createColumns(this, true);
     dataTable = createDataTable(columns, "user.lastname", SortOrder.ASCENDING);
     form.add(dataTable);
   }

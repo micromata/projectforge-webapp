@@ -124,16 +124,16 @@ IListPageColumnsCreator<BuchungssatzDO>
   @Override
   protected void init()
   {
-    final List<IColumn<BuchungssatzDO>> columns = createColumns(this, true);
+    final List<IColumn<BuchungssatzDO,String>> columns = createColumns(this, true);
     dataTable = createDataTable(columns, "formattedSatzNummer", SortOrder.ASCENDING);
     form.add(dataTable);
   }
 
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<BuchungssatzDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<BuchungssatzDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<BuchungssatzDO>> columns = new ArrayList<IColumn<BuchungssatzDO>>();
+    final List<IColumn<BuchungssatzDO, String>> columns = new ArrayList<IColumn<BuchungssatzDO, String>>();
     final CellItemListener<BuchungssatzDO> cellItemListener = new CellItemListener<BuchungssatzDO>() {
       public void populateItem(final Item<ICellPopulator<BuchungssatzDO>> item, final String componentId,
           final IModel<BuchungssatzDO> rowModel)

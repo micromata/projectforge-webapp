@@ -28,7 +28,10 @@ import java.text.MessageFormat;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.wicket.Application;
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.CssReferenceHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptReferenceHeaderItem;
+import org.apache.wicket.markup.head.StringHeaderItem;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
@@ -130,21 +133,21 @@ public abstract class AbstractMobilePage extends WebPage
   public void renderHead(final IHeaderResponse response)
   {
     super.renderHead(response);
-    response.renderString(WicketUtils.getCssForFavicon(getUrl("/favicon.ico")));
+    response.render(StringHeaderItem.forString(WicketUtils.getCssForFavicon(getUrl("/favicon.ico"))));
     if (WebConfiguration.isDevelopmentMode() == true) {
-      response.renderCSSReference("mobile/jquery.mobile/jquery.mobile-" + JQUERY_MOBILE_VERSION + ".css");
+      response.render(CssReferenceHeaderItem.forUrl("mobile/jquery.mobile/jquery.mobile-" + JQUERY_MOBILE_VERSION + ".css"));
     } else {
-      response.renderCSSReference("mobile/jquery.mobile/jquery.mobile-" + JQUERY_MOBILE_VERSION + ".min.css");
+      response.render(CssReferenceHeaderItem.forUrl("mobile/jquery.mobile/jquery.mobile-" + JQUERY_MOBILE_VERSION + ".min.css"));
     }
-    response.renderCSSReference("mobile/projectforge.css");
+    response.render(CssReferenceHeaderItem.forUrl("mobile/projectforge.css"));
     if (WebConfiguration.isDevelopmentMode() == true) {
-      response.renderJavaScriptReference("scripts/jquery/" + JQUERY_VERSION + "/jquery-" + JQUERY_VERSION + ".js");
+      response.render(JavaScriptReferenceHeaderItem.forUrl("scripts/jquery/" + JQUERY_VERSION + "/jquery-" + JQUERY_VERSION + ".js"));
       // response.renderJavaScriptReference("mobile/jquery.mobile/myconfig.js");
-      response.renderJavaScriptReference("mobile/jquery.mobile/jquery.mobile-" + JQUERY_MOBILE_VERSION + ".js");
+      response.render(JavaScriptReferenceHeaderItem.forUrl("mobile/jquery.mobile/jquery.mobile-" + JQUERY_MOBILE_VERSION + ".js"));
     } else {
-      response.renderJavaScriptReference("scripts/jquery/" + JQUERY_VERSION + "/jquery-" + JQUERY_VERSION + ".min.js");
+      response.render(JavaScriptReferenceHeaderItem.forUrl("scripts/jquery/" + JQUERY_VERSION + "/jquery-" + JQUERY_VERSION + ".min.js"));
       // response.renderJavaScriptReference("mobile/jquery.mobile/myconfig.js");
-      response.renderJavaScriptReference("mobile/jquery.mobile/jquery.mobile-" + JQUERY_MOBILE_VERSION + ".min.js");
+      response.render(JavaScriptReferenceHeaderItem.forUrl("mobile/jquery.mobile/jquery.mobile-" + JQUERY_MOBILE_VERSION + ".min.js"));
     }
   }
 

@@ -89,9 +89,9 @@ public class Kost2ListPage extends AbstractListPage<Kost2ListForm, Kost2Dao, Kos
 
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<Kost2DO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<Kost2DO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<Kost2DO>> columns = new ArrayList<IColumn<Kost2DO>>();
+    final List<IColumn<Kost2DO, String>> columns = new ArrayList<IColumn<Kost2DO, String>>();
     final CellItemListener<Kost2DO> cellItemListener = new CellItemListener<Kost2DO>() {
       public void populateItem(final Item<ICellPopulator<Kost2DO>> item, final String componentId, final IModel<Kost2DO> rowModel)
       {

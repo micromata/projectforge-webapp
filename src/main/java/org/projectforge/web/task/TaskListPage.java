@@ -228,7 +228,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
   }
 
   @SuppressWarnings("serial")
-  public List<IColumn<TaskDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<TaskDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final CellItemListener<TaskDO> cellItemListener = new CellItemListener<TaskDO>() {
       public void populateItem(final Item<ICellPopulator<TaskDO>> item, final String componentId, final IModel<TaskDO> rowModel)
@@ -240,7 +240,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
         }
       }
     };
-    final List<IColumn<TaskDO>> columns = new ArrayList<IColumn<TaskDO>>();
+    final List<IColumn<TaskDO, String>> columns = new ArrayList<IColumn<TaskDO, String>>();
     columns.add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("task")), getSortable("title", sortable), "title",
         cellItemListener) {
       @Override

@@ -28,8 +28,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.wicket.request.mapper.parameter.INamedParameters.NamedPair;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.request.mapper.parameter.PageParameters.NamedPair;
 
 /**
  * Stores the recent called mobile page including it's parameters. So after re-login through the mobile client the user is redirected to his

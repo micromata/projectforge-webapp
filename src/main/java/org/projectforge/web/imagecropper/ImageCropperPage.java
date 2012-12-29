@@ -27,7 +27,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.CssReferenceHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptReferenceHeaderItem;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -127,9 +129,9 @@ public class ImageCropperPage extends AbstractSecuredPage
   public void renderHead(final IHeaderResponse response)
   {
     super.renderHead(response);
-    response.renderCSSReference("imagecropper/history/history.css");
-    response.renderJavaScriptReference("imagecropper/history/history.js");
-    response.renderJavaScriptReference("imagecropper/AC_OETags.js");
+    response.render(CssReferenceHeaderItem.forUrl("imagecropper/history/history.css"));
+    response.render(JavaScriptReferenceHeaderItem.forUrl("imagecropper/history/history.js"));
+    response.render(JavaScriptReferenceHeaderItem.forUrl("imagecropper/AC_OETags.js"));
   }
 
   /**

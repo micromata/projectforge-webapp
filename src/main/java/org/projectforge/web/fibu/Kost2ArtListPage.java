@@ -65,9 +65,9 @@ IListPageColumnsCreator<Kost2ArtDO>
 
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<Kost2ArtDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<Kost2ArtDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<Kost2ArtDO>> columns = new ArrayList<IColumn<Kost2ArtDO>>();
+    final List<IColumn<Kost2ArtDO, String>> columns = new ArrayList<IColumn<Kost2ArtDO, String>>();
     final CellItemListener<Kost2ArtDO> cellItemListener = new CellItemListener<Kost2ArtDO>() {
       public void populateItem(final Item<ICellPopulator<Kost2ArtDO>> item, final String componentId, final IModel<Kost2ArtDO> rowModel)
       {
