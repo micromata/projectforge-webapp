@@ -23,9 +23,14 @@
 
 package org.projectforge.web.wicket.flowlayout;
 
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptReferenceHeaderItem;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.request.resource.PackageResourceReference;
+import org.projectforge.web.wicket.WicketApplication;
+import org.projectforge.web.wicket.WicketRenderHeadUtils;
 import org.projectforge.web.wicket.WicketUtils;
 
 import com.vaynberg.wicket.select2.Select2MultiChoice;
@@ -42,6 +47,17 @@ public class Select2MultiChoicePanel<T> extends Panel implements ComponentWrappe
   public static final String WICKET_ID = "select2MultiChoice";
 
   private final Select2MultiChoice<T> select2MultiChoice;
+
+  /**
+   * @see org.apache.wicket.Component#renderHead(org.apache.wicket.markup.head.IHeaderResponse)
+   */
+  @Override
+  public void renderHead(final IHeaderResponse response)
+  {
+    super.renderHead(response);
+    WicketRenderHeadUtils.renderMainJavaScriptIncludes(response);
+    response.render(JavaScriptReferenceHeaderItem.forReference(new PackageResourceReference(WicketApplication.class, "select2/select2.js")));
+  }
 
   /**
    * @param id

@@ -85,6 +85,8 @@ import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
+import com.vaynberg.wicket.select2.ApplicationSettings;
+
 /**
  * Application object for your web application. If you want to run this application without deploying, run the Start class.
  * 
@@ -326,6 +328,10 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     getComponentInstantiationListeners().add(new SpringComponentInjector(this));
     getApplicationSettings().setInternalErrorPage(ErrorPage.class);
     // getRequestCycleSettings().setGatherExtendedBrowserInfo(true); // For getting browser width and height.
+
+    // Select2:
+    final ApplicationSettings select2Settings = ApplicationSettings.get();
+    select2Settings.setIncludeJavascript(false);
 
     final XmlWebApplicationContext webApplicationContext = (XmlWebApplicationContext) WebApplicationContextUtils
         .getWebApplicationContext(getServletContext());
