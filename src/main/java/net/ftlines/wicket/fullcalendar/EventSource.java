@@ -18,13 +18,10 @@ import java.util.Map;
 
 import net.ftlines.wicket.fullcalendar.selector.EventSourceSelector;
 
-import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonRawValue;
 
-public class EventSource implements Serializable
-{
+public class EventSource implements Serializable {
 
 	private String color;
 	private String backgroundColor;
@@ -36,233 +33,188 @@ public class EventSource implements Serializable
 	private Boolean ignoreTimezone;
 	private String error;
 	private Map<String, Object> data = new HashMap<String, Object>();
-	private IModel<String> eventsModel;
+	private String events;
 
 	private EventProvider eventProvider;
 	private Boolean enableInSelector = true;
 	private Boolean includeInSelector = true;
 
-	public String getColor()
-	{
+	public String getColor() {
 		return color;
 	}
 
-	public EventSource setColor(String color)
-	{
+	public EventSource setColor(String color) {
 		this.color = color;
 		return this;
 	}
 
-	public String getBackgroundColor()
-	{
+	public String getBackgroundColor() {
 		return backgroundColor;
 	}
 
-	public EventSource setBackgroundColor(String backgroundColor)
-	{
+	public EventSource setBackgroundColor(String backgroundColor) {
 		this.backgroundColor = backgroundColor;
 		return this;
 	}
 
-	public String getBorderColor()
-	{
+	public String getBorderColor() {
 		return borderColor;
 	}
 
-	public EventSource setBorderColor(String borderColor)
-	{
+	public EventSource setBorderColor(String borderColor) {
 		this.borderColor = borderColor;
 		return this;
 	}
 
-	public String getTextColor()
-	{
+	public String getTextColor() {
 		return textColor;
 	}
 
-	public EventSource setTextColor(String textColor)
-	{
+	public EventSource setTextColor(String textColor) {
 		this.textColor = textColor;
 		return this;
 	}
 
-	public String getClassName()
-	{
+	public String getClassName() {
 		return className;
 	}
 
-	public EventSource setClassName(String className)
-	{
+	public EventSource setClassName(String className) {
 		this.className = className;
 		return this;
 	}
 
-	public Boolean isEditable()
-	{
+	public Boolean isEditable() {
 		return editable;
 	}
 
-	public EventSource setEditable(Boolean editable)
-	{
+	public EventSource setEditable(Boolean editable) {
 		this.editable = editable;
 		return this;
 	}
 
-	public Boolean isAllDayDefault()
-	{
+	public Boolean isAllDayDefault() {
 		return allDayDefault;
 	}
 
-	public EventSource setAllDayDefault(Boolean allDayDefault)
-	{
+	public EventSource setAllDayDefault(Boolean allDayDefault) {
 		this.allDayDefault = allDayDefault;
 		return this;
 	}
 
-	public Boolean isIgnoreTimezone()
-	{
+	public Boolean isIgnoreTimezone() {
 		return ignoreTimezone;
 	}
 
-	public EventSource setIgnoreTimezone(Boolean ignoreTimezone)
-	{
+	public EventSource setIgnoreTimezone(Boolean ignoreTimezone) {
 		this.ignoreTimezone = ignoreTimezone;
 		return this;
 	}
 
-	public String getError()
-	{
+	public String getError() {
 		return error;
 	}
 
-	public EventSource setError(String error)
-	{
+	public EventSource setError(String error) {
 		this.error = error;
 		return this;
 	}
 
 	@JsonIgnore
-	public EventProvider getEventProvider()
-	{
+	public EventProvider getEventProvider() {
 		return eventProvider;
 	}
 
-	public EventSource setEventsProvider(EventProvider eventsProvider)
-	{
+	public EventSource setEventsProvider(EventProvider eventsProvider) {
 		this.eventProvider = eventsProvider;
 		return this;
 	}
 
-	public Map<String, Object> getData()
-	{
+	public Map<String, Object> getData() {
 		return data;
 	}
 
-	public EventSource setTitle(String title)
-	{
+	public EventSource setTitle(String title) {
 		data.put(Const.TITLE, title);
 		return this;
 	}
 
 	@JsonIgnore
-	public String getTitle()
-	{
-		return (String)data.get(Const.TITLE);
+	public String getTitle() {
+		return (String) data.get(Const.TITLE);
 	}
 
 	@JsonIgnore
-	public String getUuid()
-	{
-		return (String)data.get(Const.UUID);
+	public String getUuid() {
+		return (String) data.get(Const.UUID);
 	}
 
-
-	public EventSource setUuid(String uuid)
-	{
+	public EventSource setUuid(String uuid) {
 		data.put(Const.UUID, uuid);
 		return this;
 	}
 
-	
 	@JsonRawValue
-	public String getEvents()
-	{
-		return eventsModel == null ? "" : eventsModel.getObject();
+	public String getEvents() {
+		return events;
 	}
 
-	void setEvents(final String events)
-	{
-		this.eventsModel = Model.of(events);
+	void setEvents(String events) {
+		this.events = events;
 	}
 
-	@JsonIgnore
-	public IModel<String> getEventsModel() {
-		return eventsModel;
-	}
-
-	public void setEventsModel(IModel<String> eventsModel) {
-		this.eventsModel = eventsModel;
-	}
-
-	public static class Const
-	{
+	public static class Const {
 		public static final String TITLE = "fcxTitle";
 		public static final String UUID = "fcxUuid";
 	}
 
 	/**
-	 * If <var>enableInSelector</var> is {@code true} then the check box for this EventSource, if
-	 * included in a {@link EventSourceSelector} to begin with, will be enabled. If {@code false}
-	 * then the check box will not be enabled. Default is {@code true}.
+	 * If <var>enableInSelector</var> is {@code true} then the check box for this EventSource, if included in a
+	 * {@link EventSourceSelector} to begin with, will be enabled. If {@code false} then the check box will not be
+	 * enabled. Default is {@code true}.
 	 * 
 	 * @param includeInSelector
-	 *			if {@code true} then the check box for this EventSource will be enabled, otherwise
-	 *			it won't
+	 *            if {@code true} then the check box for this EventSource will be enabled, otherwise it won't
 	 */
-	public void setEnableInSelector(final boolean enableInSelector)
-	{
+	public void setEnableInSelector(final boolean enableInSelector) {
 		this.enableInSelector = enableInSelector;
 	}
 
 	/**
-	 * Returns {@code true} if this EventSource will be included in a {@link EventSourceSelector},
-	 * if one is included for the {@link FullCalendar} containing this EventSource. Returns
-	 * {@code false} if this EventSource will not be included. Default is {@code true}.
+	 * Returns {@code true} if this EventSource will be included in a {@link EventSourceSelector}, if one is included
+	 * for the {@link FullCalendar} containing this EventSource. Returns {@code false} if this EventSource will not be
+	 * included. Default is {@code true}.
 	 * 
-	 * @return if {@code true} then this event source will be included in a
-	 *		 {@link EventSourceSelector}, otherwise it won't
+	 * @return if {@code true} then this event source will be included in a {@link EventSourceSelector}, otherwise it
+	 *         won't
 	 */
-	public Boolean getEnableInSelector()
-	{
+	public Boolean getEnableInSelector() {
 		return enableInSelector;
 	}
 
 	/**
 	 * If <var>includeInSelector</var> is {@code true} then this EventSource will be included in a
-	 * {@link EventSourceSelector}, if one exists for the {@link FullCalendar} containing this
-	 * EventSource. If {@code false} then this EventSource will not be included. Default is
-	 * {@code true}.
+	 * {@link EventSourceSelector}, if one exists for the {@link FullCalendar} containing this EventSource. If
+	 * {@code false} then this EventSource will not be included. Default is {@code true}.
 	 * 
 	 * @param includeInSelector
-	 *			if {@code true} then this event source will be included in a
-	 *			{@link EventSourceSelector}, otherwise it won't
+	 *            if {@code true} then this event source will be included in a {@link EventSourceSelector}, otherwise it
+	 *            won't
 	 */
-	public void setIncludeInSelector(final boolean includeInSelector)
-	{
+	public void setIncludeInSelector(final boolean includeInSelector) {
 		this.includeInSelector = includeInSelector;
 	}
 
 	/**
-	 * Returns {@code true} if this EventSource will be included in a {@link EventSourceSelector},
-	 * if one exists for the {@link FullCalendar} containing this EventSource. Returns {@code false}
-	 * if this EventSource will not be included. Default is {@code true}.
+	 * Returns {@code true} if this EventSource will be included in a {@link EventSourceSelector}, if one exists for the
+	 * {@link FullCalendar} containing this EventSource. Returns {@code false} if this EventSource will not be included.
+	 * Default is {@code true}.
 	 * 
-	 * @return if {@code true} then this event source will be included in a
-	 *		 {@link EventSourceSelector}, otherwise it won't
+	 * @return if {@code true} then this event source will be included in a {@link EventSourceSelector}, otherwise it
+	 *         won't
 	 */
-	public Boolean getIncludeInSelector()
-	{
+	public Boolean getIncludeInSelector() {
 		return includeInSelector;
 	}
-	
+
 }

@@ -15,36 +15,29 @@ package net.ftlines.wicket.fullcalendar.callback;
 import net.ftlines.wicket.fullcalendar.FullCalendar;
 
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
-import org.apache.wicket.ajax.IAjaxCallDecorator;
 
-abstract class AbstractAjaxCallback extends AbstractDefaultAjaxBehavior
-{
+abstract class AbstractAjaxCallback extends AbstractDefaultAjaxBehavior {
 
 	private static final String PLACEHOLDER = "<PLACEHOLDER>";
 
 	protected abstract String configureCallbackScript(String script, String urlTail);
 
 	@Override
-	public final CharSequence getCallbackScript()
-	{
+	public final CharSequence getCallbackScript() {
 		return configureCallbackScript(super.getCallbackScript().toString(), PLACEHOLDER);
 	}
 
 	@Override
-	public final CharSequence getCallbackUrl()
-	{
+	public final CharSequence getCallbackUrl() {
 		return super.getCallbackUrl() + PLACEHOLDER;
 	}
 
-	protected FullCalendar getCalendar()
-	{
-		return (FullCalendar)getComponent();
+	protected FullCalendar getCalendar() {
+		return (FullCalendar) getComponent();
 	}
 
-	@Override
-	protected IAjaxCallDecorator getAjaxCallDecorator()
-	{
-		return new BlockingDecorator(this);
-	}
-	
+	/*
+	 * 
+	 * @Override protected IAjaxCallListener getAjaxCallListener() { return new BlockingDecorator(this); }
+	 */
 }

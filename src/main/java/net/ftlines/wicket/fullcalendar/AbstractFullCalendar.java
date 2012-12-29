@@ -12,45 +12,48 @@
 
 package net.ftlines.wicket.fullcalendar;
 
+import org.apache.wicket.MarkupContainer;
+import org.apache.wicket.ajax.WicketAjaxJQueryResourceReference;
+import org.apache.wicket.markup.head.CssReferenceHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptHeaderItem;
+import org.apache.wicket.markup.head.JavaScriptReferenceHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
-import org.apache.wicket.markup.html.IHeaderResponse;
-import org.apache.wicket.markup.html.WebComponent;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.request.resource.ResourceReference;
 
-abstract class AbstractFullCalendar extends WebComponent implements IHeaderContributor
-{
-  private static final long serialVersionUID = 3923921991488032508L;
+abstract class AbstractFullCalendar extends MarkupContainer implements IHeaderContributor {
+	public AbstractFullCalendar(String id) {
+		super(id);
+	}
 
-  public AbstractFullCalendar(final String id)
-  {
-    super(id);
-  }
+	// TODO see if it makes sense to switch these to Css/JavaScriptResourceReference
+	private static final ResourceReference CSS = new PackageResourceReference(AbstractFullCalendar.class,
+		"res/fullcalendar.css");
+	private static final ResourceReference JS = new PackageResourceReference(AbstractFullCalendar.class,
+		"res/fullcalendar.js");
+	private static final ResourceReference JS_EXT = new PackageResourceReference(AbstractFullCalendar.class,
+		"res/fullcalendar.ext.js");
+	private static final ResourceReference JS_MIN = new PackageResourceReference(AbstractFullCalendar.class,
+		"res/fullcalendar.min.js");
 
-  // TODO see if it makes sense to switch these to Css/JavaScriptResourceReference
-  private static final String CSS = "scripts/fullcalendar/fullcalendar.css";
+	@Override
+	public void renderHead(IHeaderResponse response) {
 
-  private static final String JS = "scripts/fullcalendar/fullcalendar.js";
+		response.render(JavaScriptHeaderItem.forReference(WicketAjaxJQueryResourceReference.get()));
 
-  private static final ResourceReference JS_EXT = new PackageResourceReference(AbstractFullCalendar.class, "res/fullcalendar.ext.js");
+		response.render(CssReferenceHeaderItem.forReference(CSS));
 
-  private static final String JS_MIN = "scripts/fullcalendar/fullcalendar.min.js";
+		if (getApplication().usesDeploymentConfig()) {
+			response.render(JavaScriptReferenceHeaderItem.forReference(JS_MIN));
+		} else {
+			response.render(JavaScriptReferenceHeaderItem.forReference(JS));
+		}
+		response.render(JavaScriptReferenceHeaderItem.forReference(JS_EXT));
 
-  @Override
-  public void renderHead(final IHeaderResponse response)
-  {
+	}
 
-    response.renderCSSReference(CSS);
-    if (getApplication().usesDeploymentConfig()) {
-      response.renderJavaScriptReference(JS_MIN);
-    } else {
-      response.renderJavaScriptReference(JS);
-    }
-    response.renderJavaScriptReference(JS_EXT);
-  }
-
-  public final String toJson(final Object value)
-  {
-    return Json.toJson(value);
-  }
+	public final String toJson(Object value) {
+		return Json.toJson(value);
+	}
 }

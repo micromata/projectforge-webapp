@@ -17,34 +17,23 @@ import net.ftlines.wicket.fullcalendar.Event;
 import net.ftlines.wicket.fullcalendar.EventSource;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.model.AbstractReadOnlyModel;
-import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.Request;
 
-public abstract class EventResizedCallback extends AbstractAjaxCallbackWithClientsideRevert
-	implements
-		CallbackWithHandler
-{
+public abstract class EventResizedCallback extends AbstractAjaxCallbackWithClientsideRevert implements
+	CallbackWithHandler {
 	@Override
-	protected String configureCallbackScript(String script, String urlTail)
-	{
-		return script.replace(urlTail, "&eventId='+event.id+'&sourceId='+event.source.data." + EventSource.Const.UUID +
-			"+'&dayDelta='+dayDelta+'&minuteDelta='+minuteDelta+'");
-	}
-
-	public IModel<String> getHandlerScript()
-	{
-		return new AbstractReadOnlyModel<String>() {
-			@Override
-			public String getObject() {
-				return "function(event, dayDelta, minuteDelta,  revertFunc) { " + getCallbackScript() + "}";
-			}
-		};
+	protected String configureCallbackScript(String script, String urlTail) {
+		return script.replace(urlTail, "&eventId=\"+event.id+\"&sourceId=\"+event.source.data."
+			+ EventSource.Const.UUID + "+\"&dayDelta=\"+dayDelta+\"&minuteDelta=\"+minuteDelta+\"");
 	}
 
 	@Override
-	protected boolean onEvent(AjaxRequestTarget target)
-	{
+	public String getHandlerScript() {
+		return "function(event, dayDelta, minuteDelta,  revertFunc) { " + getCallbackScript() + "}";
+	}
+
+	@Override
+	protected boolean onEvent(AjaxRequestTarget target) {
 		Request r = getCalendar().getRequest();
 		String eventId = r.getRequestParameters().getParameterValue("eventId").toString();
 		String sourceId = r.getRequestParameters().getParameterValue("sourceId").toString();
@@ -63,8 +52,7 @@ public abstract class EventResizedCallback extends AbstractAjaxCallbackWithClien
 	protected abstract boolean onEventResized(ResizedEvent event, CalendarResponse response);
 
 	@Override
-	protected String getRevertScript()
-	{
+	protected String getRevertScript() {
 		return "revertFunc();";
 	}
 

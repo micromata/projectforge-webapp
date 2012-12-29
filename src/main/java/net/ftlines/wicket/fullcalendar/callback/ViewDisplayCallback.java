@@ -16,15 +16,11 @@ import net.ftlines.wicket.fullcalendar.CalendarResponse;
 import net.ftlines.wicket.fullcalendar.ViewType;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.model.AbstractReadOnlyModel;
-import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.Request;
-import org.apache.wicket.util.string.StringValue;
 import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
-import org.projectforge.user.PFUserContext;
 
 /**
  * A base callback that passes back calendar's starting date
@@ -32,54 +28,37 @@ import org.projectforge.user.PFUserContext;
  * @author igor
  * 
  */
-public abstract class ViewDisplayCallback extends AbstractAjaxCallback implements CallbackWithHandler
-{
-  @Override
-  protected String configureCallbackScript(final String script, final String urlTail)
-  {
-    return script
-        .replace(
-            urlTail,
-            "&view='+v.name+'&start='+fullCalendarExtIsoDate(v.start)+'&end='+fullCalendarExtIsoDate(v.end)+'&visibleStart='+fullCalendarExtIsoDate(v.visStart)+'&visibleEnd='+fullCalendarExtIsoDate(v.visEnd)+'");
-  }
+public abstract class ViewDisplayCallback extends AbstractAjaxCallback implements CallbackWithHandler {
+	@Override
+	protected String configureCallbackScript(String script, String urlTail) {
+		return script
+			.replace(
+				urlTail,
+				"&view=\"+v.name+\"&start=\"+fullCalendarExtIsoDate(v.start)+\"&end=\"+fullCalendarExtIsoDate(v.end)+\"&visibleStart=\"+fullCalendarExtIsoDate(v.visStart)+\"&visibleEnd=\"+fullCalendarExtIsoDate(v.visEnd)+\"");
+	}
 
-  public IModel<String> getHandlerScript()
-  {
-    return new AbstractReadOnlyModel<String>() {
-      @Override
-      public String getObject()
-      {
-        return String.format("function(v) {%s;}", getCallbackScript());
-      }
-    };
-  }
+	@Override
+	public String getHandlerScript() {
+		return String.format("function(v) {%s;}", getCallbackScript());
+	}
 
-  @Override
-  protected void respond(final AjaxRequestTarget target)
-  {
-    final Request r = target.getPage().getRequest();
-    final ViewType type = ViewType.forCode(r.getRequestParameters().getParameterValue("view").toString());
-    // Kai Reinhard: User's time zone needed.
-    final DateTimeFormatter fmt = ISODateTimeFormat.dateTimeParser().withZone(PFUserContext.getDateTimeZone());
-    final DateMidnight start = parseDateTime(r, fmt, "start");
-    final DateMidnight end = parseDateTime(r, fmt, "end");
-    final DateMidnight visibleStart = fmt.parseDateTime(r.getRequestParameters().getParameterValue("visibleStart").toString())
-        .toDateMidnight();
-    final DateMidnight visibleEnd = fmt.parseDateTime(r.getRequestParameters().getParameterValue("visibleEnd").toString()).toDateMidnight();
-    final View view = new View(type, start, end, visibleStart, visibleEnd);
-    final CalendarResponse response = new CalendarResponse(getCalendar(), target);
-    onViewDisplayed(view, response);
-  }
+	@Override
+	protected void respond(AjaxRequestTarget target) {
+		Request r = target.getPage().getRequest();
+		ViewType type = ViewType.forCode(r.getRequestParameters().getParameterValue("view").toString());
+		DateTimeFormatter fmt = ISODateTimeFormat.dateTimeParser().withZone(DateTimeZone.UTC);
+		DateMidnight start = fmt.parseDateTime(r.getRequestParameters().getParameterValue("start").toString())
+			.toDateMidnight();
+		DateMidnight end = fmt.parseDateTime(r.getRequestParameters().getParameterValue("end").toString())
+			.toDateMidnight();
+		DateMidnight visibleStart = fmt.parseDateTime(
+			r.getRequestParameters().getParameterValue("visibleStart").toString()).toDateMidnight();
+		DateMidnight visibleEnd = fmt
+			.parseDateTime(r.getRequestParameters().getParameterValue("visibleEnd").toString()).toDateMidnight();
+		View view = new View(type, start, end, visibleStart, visibleEnd);
+		CalendarResponse response = new CalendarResponse(getCalendar(), target);
+		onViewDisplayed(view, response);
+	}
 
-  private DateMidnight parseDateTime(final Request r, final DateTimeFormatter fmt, final String param)
-  {
-    final StringValue sval = r.getRequestParameters().getParameterValue(param);
-    if (sval.toString("").contains("-") == true) {
-      return fmt.parseDateTime(r.getRequestParameters().getParameterValue("start").toString()).toDateMidnight();
-    } else {
-      return new DateTime(sval.toLong()).toDateMidnight();
-    }
-  }
-
-  protected abstract void onViewDisplayed(View view, CalendarResponse response);
+	protected abstract void onViewDisplayed(View view, CalendarResponse response);
 }

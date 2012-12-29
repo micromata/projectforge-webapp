@@ -32,36 +32,29 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
 import org.joda.time.format.ISODateTimeFormat;
 
-class Json
-{
-	private Json()
-	{
+class Json {
+	private Json() {
 
 	}
 
-	private static class MyJsonFactory extends MappingJsonFactory
-	{
+	private static class MyJsonFactory extends MappingJsonFactory {
 		@Override
-		public JsonGenerator createJsonGenerator(Writer out) throws IOException
-		{
+		public JsonGenerator createJsonGenerator(Writer out) throws IOException {
 			return super.createJsonGenerator(out).useDefaultPrettyPrinter();
 		}
 
 		@Override
-		public JsonGenerator createJsonGenerator(File f, JsonEncoding enc) throws IOException
-		{
+		public JsonGenerator createJsonGenerator(File f, JsonEncoding enc) throws IOException {
 			return super.createJsonGenerator(f, enc).useDefaultPrettyPrinter();
 		}
 
 		@Override
-		public JsonGenerator createJsonGenerator(OutputStream out, JsonEncoding enc) throws IOException
-		{
+		public JsonGenerator createJsonGenerator(OutputStream out, JsonEncoding enc) throws IOException {
 			return super.createJsonGenerator(out, enc).useDefaultPrettyPrinter();
 		}
 	}
 
-	public static String toJson(Object object)
-	{
+	public static String toJson(Object object) {
 		ObjectMapper mapper = new ObjectMapper(new MyJsonFactory());
 		SimpleModule module = new SimpleModule("fullcalendar", new Version(1, 0, 0, null));
 		module.addSerializer(new DateTimeSerializer());
@@ -70,62 +63,50 @@ class Json
 		mapper.getSerializationConfig().setSerializationInclusion(Inclusion.NON_NULL);
 
 		String json = null;
-		try
-		{
+		try {
 			json = mapper.writeValueAsString(object);
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			throw new RuntimeException("Error encoding object: " + object + " into JSON string", e);
 		}
 		return json;
 	}
 
-	public static class DateTimeSerializer extends JsonSerializer<DateTime>
-	{
+	public static class DateTimeSerializer extends JsonSerializer<DateTime> {
 		@Override
 		public void serialize(DateTime value, JsonGenerator jgen, SerializerProvider provider) throws IOException,
-			JsonProcessingException
-		{
+			JsonProcessingException {
 			jgen.writeString(ISODateTimeFormat.dateTime().print(value));
 		}
 
 		@Override
-		public Class<DateTime> handledType()
-		{
+		public Class<DateTime> handledType() {
 			return DateTime.class;
 		}
 
 	}
 
-	public static class LocalTimeSerializer extends JsonSerializer<LocalTime>
-	{
+	public static class LocalTimeSerializer extends JsonSerializer<LocalTime> {
 		@Override
 		public void serialize(LocalTime value, JsonGenerator jgen, SerializerProvider provider) throws IOException,
-			JsonProcessingException
-		{
+			JsonProcessingException {
 			jgen.writeString(value.toString("h:mmaa"));
 		}
 
 		@Override
-		public Class<LocalTime> handledType()
-		{
+		public Class<LocalTime> handledType() {
 			return LocalTime.class;
 		}
 
 	}
 
-	public static class Script implements Serializable
-	{
+	public static class Script implements Serializable {
 		private String code;
 
-		public Script(String value)
-		{
+		public Script(String value) {
 			this.code = value;
 		}
 
-		public String getDeclaration()
-		{
+		public String getDeclaration() {
 			return code;
 		}
 

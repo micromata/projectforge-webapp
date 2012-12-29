@@ -17,75 +17,61 @@ import java.util.Date;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.util.string.Strings;
 
-public class CalendarResponse
-{
+public class CalendarResponse {
 	private final FullCalendar calendar;
 	private final AjaxRequestTarget target;
 
-	public CalendarResponse(FullCalendar calendar, AjaxRequestTarget target)
-	{
+	public CalendarResponse(FullCalendar calendar, AjaxRequestTarget target) {
 		this.calendar = calendar;
 		this.target = target;
 	}
 
-	public CalendarResponse refetchEvents()
-	{
+	public CalendarResponse refetchEvents() {
 		return execute(q("refetchEvents"));
 	}
 
-	public CalendarResponse refetchEvents(EventSource source)
-	{
+	public CalendarResponse refetchEvents(EventSource source) {
 		toggleEventSource(source, false);
 		return toggleEventSource(source, true);
 	}
 
-	public CalendarResponse refetchEvent(EventSource source, Event event)
-	{
+	public CalendarResponse refetchEvent(EventSource source, Event event) {
 		// for now we have an unoptimized implementation
-		// later we can replace this by searching for the affected event in the clientside buffer
+		// later we can replace this by searching for the affected event in the
+		// clientside buffer
 		// and refetching it
 
 		return refetchEvents(source);
 	}
 
-
-	public CalendarResponse toggleEventSource(EventSource source, boolean enabled)
-	{
+	public CalendarResponse toggleEventSource(EventSource source, boolean enabled) {
 		return execute(q("toggleSource"), q(source.getUuid()), String.valueOf(enabled));
 	}
 
-	public CalendarResponse removeEvent(Event event)
-	{
+	public CalendarResponse removeEvent(Event event) {
 		return execute(q("removeEvents"), q(event.getId()));
 	}
-	
-	public CalendarResponse gotoDate(Date date)
-	{
+
+	public CalendarResponse gotoDate(Date date) {
 		return execute(q("gotoDate"), "new Date(" + date.getTime() + ")");
 	}
 
-	public AjaxRequestTarget getTarget()
-	{
+	public AjaxRequestTarget getTarget() {
 		return target;
 	}
 
-	private CalendarResponse execute(String... args)
-	{
+	private CalendarResponse execute(String... args) {
 		String js = String.format("$('#%s').fullCalendarExt(" + Strings.join(",", args) + ");", calendar.getMarkupId());
 		target.appendJavaScript(js);
 		return this;
 	}
 
-	private static final String q(Object o)
-	{
-		if (o == null)
-		{
+	private static final String q(Object o) {
+		if (o == null) {
 			return "null";
 		}
-		else
-		{
-			return "'" + o.toString() + "'";
-		}
+
+		return "'" + o.toString() + "'";
 	}
 
 	/**
@@ -94,10 +80,8 @@ public class CalendarResponse
 	 * @return this for chaining
 	 * 
 	 */
-	public CalendarResponse clearSelection()
-	{
+	public CalendarResponse clearSelection() {
 		return execute(q("unselect"));
 	}
-
 
 }

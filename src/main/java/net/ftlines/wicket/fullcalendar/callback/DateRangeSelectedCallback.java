@@ -15,55 +15,46 @@ package net.ftlines.wicket.fullcalendar.callback;
 import net.ftlines.wicket.fullcalendar.CalendarResponse;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.model.AbstractReadOnlyModel;
-import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.Request;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-public abstract class DateRangeSelectedCallback extends AbstractAjaxCallback implements CallbackWithHandler
-{
+public abstract class DateRangeSelectedCallback extends AbstractAjaxCallback implements CallbackWithHandler {
 	private final boolean ignoreTimezone;
 
 	/**
-	 * If <var>ignoreTimezone</var> is {@code true}, then the remote client's time zone will be
-	 * ignored when determining the selected date range, resulting in a range with the selected
-	 * start and end values, but in the server's time zone.
+	 * If <var>ignoreTimezone</var> is {@code true}, then the remote client\"s time zone will be ignored when
+	 * determining the selected date range, resulting in a range with the selected start and end values, but in the
+	 * server\"s time zone.
 	 * 
 	 * @param ignoreTimezone
-	 *			whether or not to ignore the remote client's time zone when determining the
-	 *			selected date range
+	 *            whether or not to ignore the remote client\"s time zone when determining the selected date range
 	 */
-	public DateRangeSelectedCallback(final boolean ignoreTimezone)
-	{
+	public DateRangeSelectedCallback(final boolean ignoreTimezone) {
 		this.ignoreTimezone = ignoreTimezone;
 	}
-	
-	@Override
-	protected String configureCallbackScript(String script, String urlTail)
-	{
-		return script.replace(urlTail,
-			"&timezoneOffset='+startDate.getTimezoneOffset()+'&startDate='+startDate.getTime()+'&endDate='+endDate.getTime()+'&allDay='+allDay+'");
-	}
 
-	public IModel<String> getHandlerScript()
-	{
-		return new AbstractReadOnlyModel<String>() {
-			@Override
-			public String getObject() {
-				return "function(startDate, endDate, allDay) { " + getCallbackScript() + "}";
-			}
-		};
+	@Override
+	protected String configureCallbackScript(String script, String urlTail) {
+		return script
+			.replace(
+				urlTail,
+				"&timezoneOffset=\"+startDate.getTimezoneOffset()+\"&startDate=\"+startDate.getTime()+\"&endDate=\"+endDate.getTime()+\"&allDay=\"+allDay+\"");
 	}
 
 	@Override
-	protected void respond(AjaxRequestTarget target)
-	{
+	public String getHandlerScript() {
+		return "function(startDate, endDate, allDay) { " + getCallbackScript() + "}";
+	}
+
+	@Override
+	protected void respond(AjaxRequestTarget target) {
 		Request r = getCalendar().getRequest();
+
 		DateTime start = new DateTime(r.getRequestParameters().getParameterValue("startDate").toLong());
 		DateTime end = new DateTime(r.getRequestParameters().getParameterValue("endDate").toLong());
-		if (ignoreTimezone)
-		{
+
+		if (ignoreTimezone) {
 			// Convert to same DateTime in local time zone.
 			int remoteOffset = -r.getRequestParameters().getParameterValue("timezoneOffset").toInt();
 			int localOffset = DateTimeZone.getDefault().getOffset(null) / 60000;

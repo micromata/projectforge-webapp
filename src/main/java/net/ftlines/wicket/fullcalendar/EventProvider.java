@@ -17,8 +17,7 @@ import java.util.Collection;
 
 import org.joda.time.DateTime;
 
-public interface EventProvider extends Serializable
-{
+public interface EventProvider extends Serializable {
 	Collection<Event> getEvents(DateTime start, DateTime end);
 
 	Event getEventForId(String id) throws EventNotFoundException;
