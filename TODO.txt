@@ -1,0 +1,29 @@
+Bootstrap-Umbau
+---------------
+
+- Dialoge
+- Setup-Bildschirm für Neuinstallation
+- Icons ToggleContainer
+- Layout innerhalb ToggleContainer
+- Nowrap für control-groups
+- Feldbreiten für control-groups 100%
+- Checkboxengröße/breite
+- Layout: Zeilenabstände, Schriftgröße Tabellen
+- Runde Boxen um SPAN*-Container (class lines / box einführen)
+- Hilfe-Icons bei Textfields
+- RechnungEditPage: Anzeige von Aufträgen, Icon deplatziert
+- Layout-Farben: Tabpane
+- Mit iPhone/iPad prüfen
+- Tabellen (insbesonder Änderungshistorie: padding-left)
+- Sidemenu: badge: margin-left
+- Hauptmenus: Style Schrift: nicht fett
+- Oben rechts Userbox: Farbiger Kasten
+- Select2 in UserEditPage
+
+
+Wicket6-Migration
+-----------------
+- Fullcalendar
+- JavaScriptEventToggleBehavior
+
+- TaskTreePage auf Wicket Tree umstellen
