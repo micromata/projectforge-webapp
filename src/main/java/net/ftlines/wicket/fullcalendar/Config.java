@@ -27,6 +27,8 @@ import org.joda.time.LocalTime;
 
 public class Config implements Serializable
 {
+  private static final long serialVersionUID = -2771140384990605191L;
+
   /** Use these to specify calendar column formats */
   public static enum ColumnFormat
   {
@@ -82,6 +84,8 @@ public class Config implements Serializable
   private Integer slotMinutes;
 
   private Float aspectRatio;
+
+  private boolean enableContextMenu; // Micromata
 
   private boolean ignoreTimezone = false;
 
@@ -390,6 +394,25 @@ public class Config implements Serializable
   public boolean isIgnoreTimezone()
   {
     return ignoreTimezone;
+  }
+
+  /**
+   * @author Micromata
+   * @return
+   */
+  @JsonIgnore
+  public boolean isEnableContextMenu()
+  {
+    return enableContextMenu;
+  }
+
+  /**
+   * @author Micromata
+   * @param enableContextMenu
+   */
+  public void setEnableContextMenu(final boolean enableContextMenu)
+  {
+    this.enableContextMenu = enableContextMenu;
   }
 
 }
