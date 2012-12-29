@@ -23,45 +23,43 @@
             aren't stripped! Please go to deployment-mode or set strip Wicket tags to true (StartSettings for Jetty main or context.xml otherwise)!</span></li>
       </ul>
     </div>
-    <div class="box grid_16 round_all">
-      <div class="block">
-        <div class="columns clearfix">
-          <div class="col_50">
-            <h2>
-              <wicket:message key="menu.customize.title" />
-            </h2>
-            <div id="cust-menu">
-              <ul>
-                <wicket:container wicket:id="custMenuEntry" />
-              </ul>
-            </div>
-          </div>
-          <div class="col_50">
-            <h2>
-              <wicket:message key="menu.customize.completeMenu" />
-            </h2>
-            <div id="compl-menu">
-              <ul>
-                <wicket:container wicket:id="completeMenuEntry" />
-              </ul>
-            </div>
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span6">
+          <h2>
+            <wicket:message key="menu.customize.title" />
+          </h2>
+          <div id="cust-menu">
+            <ul>
+              <wicket:container wicket:id="custMenuEntry" />
+            </ul>
           </div>
         </div>
-        <div class="button_cell clearfix">
-          <form wicket:id="form">
-            <input id="menuAsXml" type="hidden" wicket:id="menuAsXml" />
-            <button class="grey icon_only text_only" onclick="javascript:return createCustomMenuEntry();">
-              <wicket:message key="menu.customize.create">[create]</wicket:message>
-            </button>
-            <button class="green icon_only text_only" wicket:id="updateButton" onclick="javascript:return beforeSaveCustomMenuEntry();">
-              <wicket:message key="update">[update]</wicket:message>
-            </button>
-          </form>
+        <div class="span6">
+          <h2>
+            <wicket:message key="menu.customize.completeMenu" />
+          </h2>
+          <div id="compl-menu">
+            <ul>
+              <wicket:container wicket:id="completeMenuEntry" />
+            </ul>
+          </div>
         </div>
       </div>
-      <div class="block">
-        <wicket:message key="menu.customize.help" />
+      <div class="button_cell clearfix">
+        <form wicket:id="form">
+          <input id="menuAsXml" type="hidden" wicket:id="menuAsXml" />
+          <button class="grey icon_only text_only" onclick="javascript:return createCustomMenuEntry();">
+            <wicket:message key="menu.customize.create">[create]</wicket:message>
+          </button>
+          <button class="green icon_only text_only" wicket:id="updateButton" onclick="javascript:return beforeSaveCustomMenuEntry();">
+            <wicket:message key="update">[update]</wicket:message>
+          </button>
+        </form>
       </div>
+    </div>
+    <div class="block">
+      <wicket:message key="menu.customize.help" />
     </div>
     <script type="text/javascript" wicket:id="i18nVars">
 					var enterNewName = "Enter a new name";
