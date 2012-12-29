@@ -25,305 +25,371 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.annotate.JsonRawValue;
 import org.joda.time.LocalTime;
 
-public class Config implements Serializable {
-	/** Use these to specify calendar column formats */
-	public static enum ColumnFormat {
-		day, week, month;
-	}
+public class Config implements Serializable
+{
+  /** Use these to specify calendar column formats */
+  public static enum ColumnFormat
+  {
+    day, week, month;
+  }
 
-	private List<EventSource> eventSources = new ArrayList<EventSource>();
-	private Header header = new Header();
-	private ButtonText buttonText = new ButtonText();
-	private String loading;
-	private Boolean editable;
-	private String eventDrop;
-	private String eventResize;
-	private String eventClick;
+  private final List<EventSource> eventSources = new ArrayList<EventSource>();
 
-	private String viewDisplay;
-	private Boolean selectable;
-	private Boolean selectHelper;
-	/** A callback that will fire after a selection is made */
-	private String select;
-	private String defaultView;
-	@JsonProperty
-	private Map<ColumnFormat, String> columnFormat = new HashMap<Config.ColumnFormat, String>();
+  private final Header header = new Header();
 
-	private LocalTime minTime;
-	private LocalTime maxTime;
-	private Integer firstHour;
-	private Boolean allDaySlot;
+  private final ButtonText buttonText = new ButtonText();
 
-	private String timeFormat;
+  private String loading;
 
-	private String eventRender;
+  private Boolean editable;
 
-	private Boolean disableDragging;
-	private Boolean disableResizing;
-	private Integer slotMinutes;
-	private Float aspectRatio;
-	private boolean ignoreTimezone = false;
+  private String eventDrop;
 
-	public Config add(EventSource eventSource) {
-		eventSources.add(eventSource);
-		return this;
-	}
+  private String eventResize;
 
-	public Collection<EventSource> getEventSources() {
-		return Collections.unmodifiableList(eventSources);
-	}
+  private String eventClick;
 
-	public Header getHeader() {
-		return header;
-	}
+  private String viewDisplay;
 
-	@JsonRawValue
-	public String getEventResize() {
-		return eventResize;
-	}
+  private Boolean selectable;
 
-	public void setEventResize(String eventResize) {
-		this.eventResize = eventResize;
-	}
+  private Boolean selectHelper;
 
-	@JsonRawValue
-	public String getLoading() {
-		return loading;
-	}
+  /** A callback that will fire after a selection is made */
+  private String select;
 
-	public void setLoading(String loading) {
-		this.loading = loading;
-	}
+  private String defaultView;
 
-	public Boolean isEditable() {
-		return editable;
-	}
+  @JsonProperty
+  private final Map<ColumnFormat, String> columnFormat = new HashMap<Config.ColumnFormat, String>();
 
-	public void setEditable(Boolean editable) {
-		this.editable = editable;
-	}
+  private LocalTime minTime;
 
-	@JsonRawValue
-	public String getEventDrop() {
-		return eventDrop;
-	}
+  private LocalTime maxTime;
 
-	public void setEventDrop(String eventDrop) {
-		this.eventDrop = eventDrop;
-	}
+  private Integer firstHour;
 
-	public Boolean isSelectable() {
-		return selectable;
-	}
+  private Boolean allDaySlot;
 
-	public void setSelectable(Boolean selectable) {
-		this.selectable = selectable;
-	}
+  private String timeFormat;
 
-	public Boolean isSelectHelper() {
-		return selectHelper;
-	}
+  private String eventRender;
 
-	public void setSelectHelper(Boolean selectHelper) {
-		this.selectHelper = selectHelper;
-	}
+  private Boolean disableDragging;
 
-	@JsonRawValue
-	public String getSelect() {
-		return select;
-	}
+  private Boolean disableResizing;
 
-	public void setSelect(String select) {
-		this.select = select;
-	}
+  private Integer slotMinutes;
 
-	@JsonRawValue
-	public String getEventClick() {
-		return eventClick;
-	}
+  private Float aspectRatio;
 
-	public void setEventClick(String eventClick) {
-		this.eventClick = eventClick;
-	}
+  private boolean ignoreTimezone = false;
 
-	/**
-	 * @return the defaultView
-	 */
-	public String getDefaultView() {
-		return defaultView;
-	}
+  public Config add(final EventSource eventSource)
+  {
+    eventSources.add(eventSource);
+    return this;
+  }
 
-	/**
-	 * See <a href="http://arshaw.com/fullcalendar/docs/views/Available_Views/">http ://arshaw.com/
-	 * fullcalendar/docs/views/Available_Views/</a> for the list of possible values.
-	 * 
-	 * @param defaultView
-	 *            the defaultView to set
-	 */
-	public void setDefaultView(String defaultView) {
-		this.defaultView = defaultView;
-	}
+  public Collection<EventSource> getEventSources()
+  {
+    return Collections.unmodifiableList(eventSources);
+  }
 
-	@JsonIgnore
-	public String getColumnFormatDay() {
-		return columnFormat.get(ColumnFormat.day);
-	}
+  public Header getHeader()
+  {
+    return header;
+  }
 
-	public void setColumnFormatDay(String format) {
-		columnFormat.put(ColumnFormat.day, format);
-	}
+  @JsonRawValue
+  public String getEventResize()
+  {
+    return eventResize;
+  }
 
-	@JsonIgnore
-	public String getColumnFormatWeek() {
-		return columnFormat.get(ColumnFormat.week);
-	}
+  public void setEventResize(final String eventResize)
+  {
+    this.eventResize = eventResize;
+  }
 
-	public void setColumnFormatWeek(String format) {
-		columnFormat.put(ColumnFormat.week, format);
-	}
+  @JsonRawValue
+  public String getLoading()
+  {
+    return loading;
+  }
 
-	@JsonIgnore
-	public String getColumnFormatMonth() {
-		return columnFormat.get(ColumnFormat.month);
-	}
+  public void setLoading(final String loading)
+  {
+    this.loading = loading;
+  }
 
-	public void setColumnFormatMonth(String format) {
-		columnFormat.put(ColumnFormat.month, format);
-	}
+  public Boolean isEditable()
+  {
+    return editable;
+  }
 
-	public ButtonText getButtonText() {
-		return buttonText;
-	}
+  public void setEditable(final Boolean editable)
+  {
+    this.editable = editable;
+  }
 
-	public LocalTime getMinTime() {
-		return minTime;
-	}
+  @JsonRawValue
+  public String getEventDrop()
+  {
+    return eventDrop;
+  }
 
-	public void setMinTime(LocalTime minTime) {
-		this.minTime = minTime;
-	}
+  public void setEventDrop(final String eventDrop)
+  {
+    this.eventDrop = eventDrop;
+  }
 
-	public LocalTime getMaxTime() {
-		return maxTime;
-	}
+  public Boolean isSelectable()
+  {
+    return selectable;
+  }
 
-	public void setMaxTime(LocalTime maxTime) {
-		this.maxTime = maxTime;
-	}
+  public void setSelectable(final Boolean selectable)
+  {
+    this.selectable = selectable;
+  }
 
-	public Integer getFirstHour() {
-		return firstHour;
-	}
+  public Boolean isSelectHelper()
+  {
+    return selectHelper;
+  }
 
-	public void setFirstHour(Integer firstHour) {
-		this.firstHour = firstHour;
-	}
+  public void setSelectHelper(final Boolean selectHelper)
+  {
+    this.selectHelper = selectHelper;
+  }
 
-	public Boolean getAllDaySlot() {
-		return allDaySlot;
-	}
+  @JsonRawValue
+  public String getSelect()
+  {
+    return select;
+  }
 
-	public void setAllDaySlot(Boolean allDaySlot) {
-		this.allDaySlot = allDaySlot;
-	}
+  public void setSelect(final String select)
+  {
+    this.select = select;
+  }
 
-	public String getTimeFormat() {
-		return timeFormat;
-	}
+  @JsonRawValue
+  public String getEventClick()
+  {
+    return eventClick;
+  }
 
-	public void setTimeFormat(String timeFormat) {
-		this.timeFormat = timeFormat;
-	}
+  public void setEventClick(final String eventClick)
+  {
+    this.eventClick = eventClick;
+  }
 
-	@JsonRawValue
-	public String getEventRender() {
-		return eventRender;
-	}
+  /**
+   * @return the defaultView
+   */
+  public String getDefaultView()
+  {
+    return defaultView;
+  }
 
-	public void setEventRender(String eventRenderer) {
-		this.eventRender = eventRenderer;
-	}
+  /**
+   * See <a href="http://arshaw.com/fullcalendar/docs/views/Available_Views/">http ://arshaw.com/
+   * fullcalendar/docs/views/Available_Views/</a> for the list of possible values.
+   * 
+   * @param defaultView the defaultView to set
+   */
+  public void setDefaultView(final String defaultView)
+  {
+    this.defaultView = defaultView;
+  }
 
-	public Boolean getDisableDragging() {
-		return disableDragging;
-	}
+  @JsonIgnore
+  public String getColumnFormatDay()
+  {
+    return columnFormat.get(ColumnFormat.day);
+  }
 
-	public void setDisableDragging(Boolean disableDragging) {
-		this.disableDragging = disableDragging;
-	}
+  public void setColumnFormatDay(final String format)
+  {
+    columnFormat.put(ColumnFormat.day, format);
+  }
 
-	public Boolean getDisableResizing() {
-		return disableResizing;
-	}
+  @JsonIgnore
+  public String getColumnFormatWeek()
+  {
+    return columnFormat.get(ColumnFormat.week);
+  }
 
-	public void setDisableResizing(Boolean disableResizing) {
-		this.disableResizing = disableResizing;
-	}
+  public void setColumnFormatWeek(final String format)
+  {
+    columnFormat.put(ColumnFormat.week, format);
+  }
 
-	@JsonRawValue
-	public String getViewDisplay() {
-		return viewDisplay;
-	}
+  @JsonIgnore
+  public String getColumnFormatMonth()
+  {
+    return columnFormat.get(ColumnFormat.month);
+  }
 
-	public void setViewDisplay(String viewDisplay) {
-		this.viewDisplay = viewDisplay;
-	}
+  public void setColumnFormatMonth(final String format)
+  {
+    columnFormat.put(ColumnFormat.month, format);
+  }
 
-	public void setSlotMinutes(Integer slotMinutes) {
-		this.slotMinutes = slotMinutes;
-	}
+  public ButtonText getButtonText()
+  {
+    return buttonText;
+  }
 
-	public Integer getSlotMinutes() {
-		return slotMinutes;
-	}
+  public LocalTime getMinTime()
+  {
+    return minTime;
+  }
 
-	/**
-	 * See <a href="http://arshaw.com/fullcalendar/docs/display/aspectRatio/">http ://arshaw.com/
-	 * fullcalendar/docs/display/aspectRatio/</a>
-	 * 
-	 * @param aspectRatio
-	 *            the aspectRatio to set
-	 */
-	public void setAspectRatio(Float aspectRatio) {
-		this.aspectRatio = aspectRatio;
-	}
+  public void setMinTime(final LocalTime minTime)
+  {
+    this.minTime = minTime;
+  }
 
-	/**
-	 * See <a href="http://arshaw.com/fullcalendar/docs/display/aspectRatio/">http ://arshaw.com/
-	 * fullcalendar/docs/display/aspectRatio/</a>
-	 * 
-	 * @return the aspectRatio
-	 */
-	public Float getAspectRatio() {
-		return aspectRatio;
-	}
+  public LocalTime getMaxTime()
+  {
+    return maxTime;
+  }
 
-	/**
-	 * If <var>ignoreTimezone</var> is {@code true}, then the remote client's time zone will be ignored when determining
-	 * selected date ranges, resulting in ranges with the selected start and end values, but in the server's time zone.
-	 * The default value is {@code false}.
-	 * <p>
-	 * Not currently used on the client side.
-	 * 
-	 * @param ignoreTimezone
-	 *            whether or not to ignore the remote client's time zone when determining selected date ranges
-	 */
-	public void setIgnoreTimezone(final boolean ignoreTimezone) {
-		this.ignoreTimezone = ignoreTimezone;
-	}
+  public void setMaxTime(final LocalTime maxTime)
+  {
+    this.maxTime = maxTime;
+  }
 
-	/**
-	 * If <var>ignoreTimezone</var> is {@code true}, then the remote client's time zone will be ignored when determining
-	 * selected date ranges, resulting in ranges with the selected start and end values, but in the server's time zone.
-	 * The default value is {@code false}.
-	 * <p>
-	 * Not currently used on the client side.
-	 * 
-	 * @return whether or not to ignore the remote client's time zone when determining selected date ranges
-	 */
-	@JsonIgnore
-	public boolean isIgnoreTimezone() {
-		return ignoreTimezone;
-	}
+  public Integer getFirstHour()
+  {
+    return firstHour;
+  }
+
+  public void setFirstHour(final Integer firstHour)
+  {
+    this.firstHour = firstHour;
+  }
+
+  public Boolean getAllDaySlot()
+  {
+    return allDaySlot;
+  }
+
+  public void setAllDaySlot(final Boolean allDaySlot)
+  {
+    this.allDaySlot = allDaySlot;
+  }
+
+  public String getTimeFormat()
+  {
+    return timeFormat;
+  }
+
+  public void setTimeFormat(final String timeFormat)
+  {
+    this.timeFormat = timeFormat;
+  }
+
+  @JsonRawValue
+  public String getEventRender()
+  {
+    return eventRender;
+  }
+
+  public void setEventRender(final String eventRenderer)
+  {
+    this.eventRender = eventRenderer;
+  }
+
+  public Boolean getDisableDragging()
+  {
+    return disableDragging;
+  }
+
+  public void setDisableDragging(final Boolean disableDragging)
+  {
+    this.disableDragging = disableDragging;
+  }
+
+  public Boolean getDisableResizing()
+  {
+    return disableResizing;
+  }
+
+  public void setDisableResizing(final Boolean disableResizing)
+  {
+    this.disableResizing = disableResizing;
+  }
+
+  @JsonRawValue
+  public String getViewDisplay()
+  {
+    return viewDisplay;
+  }
+
+  public void setViewDisplay(final String viewDisplay)
+  {
+    this.viewDisplay = viewDisplay;
+  }
+
+  public void setSlotMinutes(final Integer slotMinutes)
+  {
+    this.slotMinutes = slotMinutes;
+  }
+
+  public Integer getSlotMinutes()
+  {
+    return slotMinutes;
+  }
+
+  /**
+   * See <a href="http://arshaw.com/fullcalendar/docs/display/aspectRatio/">http ://arshaw.com/ fullcalendar/docs/display/aspectRatio/</a>
+   * 
+   * @param aspectRatio the aspectRatio to set
+   */
+  public void setAspectRatio(final Float aspectRatio)
+  {
+    this.aspectRatio = aspectRatio;
+  }
+
+  /**
+   * See <a href="http://arshaw.com/fullcalendar/docs/display/aspectRatio/">http ://arshaw.com/ fullcalendar/docs/display/aspectRatio/</a>
+   * 
+   * @return the aspectRatio
+   */
+  public Float getAspectRatio()
+  {
+    return aspectRatio;
+  }
+
+  /**
+   * If <var>ignoreTimezone</var> is {@code true}, then the remote client's time zone will be ignored when determining selected date ranges,
+   * resulting in ranges with the selected start and end values, but in the server's time zone. The default value is {@code false}.
+   * <p>
+   * Not currently used on the client side.
+   * 
+   * @param ignoreTimezone whether or not to ignore the remote client's time zone when determining selected date ranges
+   */
+  public void setIgnoreTimezone(final boolean ignoreTimezone)
+  {
+    this.ignoreTimezone = ignoreTimezone;
+  }
+
+  /**
+   * If <var>ignoreTimezone</var> is {@code true}, then the remote client's time zone will be ignored when determining selected date ranges,
+   * resulting in ranges with the selected start and end values, but in the server's time zone. The default value is {@code false}.
+   * <p>
+   * Not currently used on the client side.
+   * 
+   * @return whether or not to ignore the remote client's time zone when determining selected date ranges
+   */
+  @JsonIgnore
+  public boolean isIgnoreTimezone()
+  {
+    return ignoreTimezone;
+  }
 
 }
