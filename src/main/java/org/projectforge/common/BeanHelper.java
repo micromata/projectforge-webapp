@@ -449,6 +449,39 @@ public class BeanHelper
     return result;
   }
 
+  /**
+   * @param obj
+   * @param clazz Class of object or superclass at which the fieldname is declared
+   * @param fieldname
+   * @return
+   */
+  public static Object getFieldValue(final Object obj, final Class<?> clazz, final String fieldname)
+  {
+    if (obj == null) {
+      return null;
+    }
+    try {
+      final Field field = clazz.getDeclaredField(fieldname);
+      field.setAccessible(true);
+      return getFieldValue(obj, field);
+    } catch (final SecurityException ex) {
+      log.error("Exception encountered while getting field '"
+          + fieldname
+          + "' of object from type '"
+          + clazz.getName()
+          + "': "
+          + ex, ex);
+    } catch (final NoSuchFieldException ex) {
+      log.error("Exception encountered while getting field '"
+          + fieldname
+          + "' of object from type '"
+          + clazz.getName()
+          + "': "
+          + ex, ex);
+    }
+    return null;
+  }
+
   public static Object getFieldValue(final Object obj, final Field field)
   {
     try {
@@ -478,7 +511,6 @@ public class BeanHelper
    * @param properties
    * @return true if any property is different between src and dest object.
    */
-  @SuppressWarnings("unchecked")
   public static boolean copyProperties(final Object src, final Object dest, final String... properties)
   {
     return copyProperties(src, dest, false, properties);
@@ -516,7 +548,7 @@ public class BeanHelper
       } else {
         if (ObjectUtils.equals(srcValue, destValue) == false) {
           if (whitespaceEqualsNull == true && (srcValue instanceof String || destValue instanceof String)) {
-            if (StringUtils.isEmpty((String)srcValue) == false || StringUtils.isEmpty((String)destValue) == false) {
+            if (StringUtils.isEmpty((String) srcValue) == false || StringUtils.isEmpty((String) destValue) == false) {
               // Do not copy this property if srcValue and destValue are empty ("" or null):
               BeanHelper.setProperty(dest, property, srcValue);
               modified = true;
