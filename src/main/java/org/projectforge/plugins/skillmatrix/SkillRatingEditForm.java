@@ -35,6 +35,7 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.core.BaseSearchFilter;
@@ -114,7 +115,7 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
           final boolean isDeleted = skillRatingDO.getSkill().isDeleted();
           final boolean sameSkill = skillRatingDO.getSkill().getTitle() == skillTextField.getConvertedInput().getTitle();
           final boolean sameSkillRating = skillRatingDO.getCreated().equals(data.getCreated());
-          if(isDeleted == false && sameSkill && sameSkillRating == false) {
+          if (isDeleted == false && sameSkill && sameSkillRating == false) {
             error(getString("plugins.skillmatrix.error.skillRatingExistsAlready"));
             break;
           }
@@ -181,7 +182,7 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
                 error(getString("plugins.skillmatrix.error.skillNotFound"));
               }
               getModel().setObject(skill);
-              final AjaxRequestTarget target = AjaxRequestTarget.get();
+              final AjaxRequestTarget target = RequestCycle.get().find(AjaxRequestTarget.class);
               if (target != null) {
                 target.add(SkillRatingEditForm.this.fs.getFieldset());
               }

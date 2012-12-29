@@ -38,7 +38,8 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptReferenceHeaderItem;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.SubmitLink;
@@ -87,7 +88,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
 
   protected static final String[] MY_BOOKMARKABLE_INITIAL_PROPERTIES = mergeStringArrays(BOOKMARKABLE_INITIAL_PROPERTIES, new String[] {
       "f.listType|lt", "f.uptodate", "f.outdated", "f.leaved", "f.active", "f.nonActive", "f.uninteresting", "f.personaIngrata",
-      "f.departed"});
+  "f.departed"});
 
   @SpringBean(name = "addressDao")
   private AddressDao addressDao;
@@ -113,7 +114,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
   public void renderHead(final IHeaderResponse response)
   {
     super.renderHead(response);
-    response.renderJavaScriptReference("scripts/zoom.js");
+    response.render(JavaScriptReferenceHeaderItem.forUrl("scripts/zoom.js"));
   }
 
   @Override
@@ -127,9 +128,9 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
 
   @Override
   @SuppressWarnings("serial")
-  public List<IColumn<AddressDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<AddressDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<AddressDO>> columns = new ArrayList<IColumn<AddressDO>>();
+    final List<IColumn<AddressDO, String>> columns = new ArrayList<IColumn<AddressDO, String>>();
     final CellItemListener<AddressDO> cellItemListener = new CellItemListener<AddressDO>() {
       @Override
       public void populateItem(final Item<ICellPopulator<AddressDO>> item, final String componentId, final IModel<AddressDO> rowModel)
@@ -247,7 +248,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
   protected void init()
   {
     personalAddressMap = personalAddressDao.getPersonalAddressByAddressId();
-    final List<IColumn<AddressDO>> columns = createColumns(this, true);
+    final List<IColumn<AddressDO, String>> columns = createColumns(this, true);
     dataTable = createDataTable(columns, "name", SortOrder.ASCENDING);
     form.add(dataTable);
 

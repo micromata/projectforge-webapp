@@ -65,9 +65,9 @@ IListPageColumnsCreator<AddressCampaignDO>
   }
 
   @SuppressWarnings("serial")
-  public List<IColumn<AddressCampaignDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<AddressCampaignDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<AddressCampaignDO>> columns = new ArrayList<IColumn<AddressCampaignDO>>();
+    final List<IColumn<AddressCampaignDO, String>> columns = new ArrayList<IColumn<AddressCampaignDO, String>>();
     final CellItemListener<AddressCampaignDO> cellItemListener = new CellItemListener<AddressCampaignDO>() {
       public void populateItem(final Item<ICellPopulator<AddressCampaignDO>> item, final String componentId,
           final IModel<AddressCampaignDO> rowModel)

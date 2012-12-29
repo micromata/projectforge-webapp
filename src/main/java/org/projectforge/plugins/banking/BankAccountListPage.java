@@ -66,7 +66,7 @@ public class BankAccountListPage extends AbstractListPage<BankAccountListForm, B
   @Override
   protected void init()
   {
-    final List<IColumn<BankAccountDO>> columns = new ArrayList<IColumn<BankAccountDO>>();
+    final List<IColumn<BankAccountDO, String>> columns = new ArrayList<IColumn<BankAccountDO, String>>();
     final CellItemListener<BankAccountDO> cellItemListener = new CellItemListener<BankAccountDO>() {
       public void populateItem(final Item<ICellPopulator<BankAccountDO>> item, final String componentId, final IModel<BankAccountDO> rowModel)
       {

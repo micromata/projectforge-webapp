@@ -64,22 +64,23 @@ public class AddressCampaignValueMassUpdatePage extends AbstractMassEditPage
     form = new AddressCampaignValueMassUpdateForm(this, addressCampaign);
     body.add(form);
     form.init();
-    final List<IColumn<AddressDO>> columns = AddressCampaignValueListPage.createColumns(this, false, true, null, personalAddressMap,
+    final List<IColumn<AddressDO, String>> columns = AddressCampaignValueListPage.createColumns(this, false, true, null, personalAddressMap,
         addressCampaignValueMap);
     @SuppressWarnings("serial")
-    final SortableDataProvider<AddressDO> sortableDataProvider = new SortableDataProvider<AddressDO>() {
-      public Iterator<AddressDO> iterator(final int first, final int count)
+    final SortableDataProvider<AddressDO, String> sortableDataProvider = new SortableDataProvider<AddressDO, String>() {
+      @Override
+      public Iterator< ? extends AddressDO> iterator(final long first, final long count)
       {
         final SortParam sp = getSort();
         if (addresses == null) {
           return null;
         }
-        final Comparator<AddressDO> comp = new MyBeanComparator<AddressDO>(sp.getProperty(), sp.isAscending());
+        final Comparator<AddressDO> comp = new MyBeanComparator<AddressDO>(sp.getProperty().toString(), sp.isAscending());
         Collections.sort(addresses, comp);
-        return addresses.subList(first, first + count).iterator();
+        return addresses.subList((int)first, (int)(first + count)).iterator();
       }
 
-      public int size()
+      public long size()
       {
         return addresses != null ? addresses.size() : 0;
       }
@@ -97,7 +98,7 @@ public class AddressCampaignValueMassUpdatePage extends AbstractMassEditPage
     };
     sortableDataProvider.setSort("name", SortOrder.DESCENDING);
 
-    final DefaultDataTable<AddressDO> dataTable = new DefaultDataTable<AddressDO>("table", columns, sortableDataProvider, 1000);
+    final DefaultDataTable<AddressDO, String> dataTable = new DefaultDataTable<AddressDO, String>("table", columns, sortableDataProvider, 1000);
     body.add(dataTable);
   }
 

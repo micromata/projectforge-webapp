@@ -75,9 +75,9 @@ public class BookListPage extends AbstractListPage<BookListForm, BookDao, BookDO
   }
 
   @SuppressWarnings("serial")
-  public List<IColumn<BookDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<BookDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<BookDO>> columns = new ArrayList<IColumn<BookDO>>();
+    final List<IColumn<BookDO, String>> columns = new ArrayList<IColumn<BookDO, String>>();
     final CellItemListener<BookDO> cellItemListener = new CellItemListener<BookDO>() {
       public void populateItem(final Item<ICellPopulator<BookDO>> item, final String componentId, final IModel<BookDO> rowModel)
       {

@@ -14,27 +14,31 @@ package net.ftlines.wicket.fullcalendar.selector;
 
 import net.ftlines.wicket.fullcalendar.FullCalendar;
 
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.OnLoadHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
-import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebComponent;
 
 public class EventSourceSelector extends WebComponent implements IHeaderContributor
 {
+  private static final long serialVersionUID = 5516169746302074185L;
+  private final FullCalendar calendar;
 
-	private final FullCalendar calendar;
+  public EventSourceSelector(final String id, final FullCalendar calendar)
+  {
+    super(id);
+    this.calendar = calendar;
+    setOutputMarkupId(true);
+  }
 
-	public EventSourceSelector(String id, FullCalendar calendar)
-	{
-		super(id);
-		this.calendar = calendar;
-		setOutputMarkupId(true);
-	}
-
-	@Override
-	public void renderHead(IHeaderResponse response)
-	{
-		response.renderOnLoadJavaScript("$('#" + calendar.getMarkupId() +
-			"').fullCalendarExt('createEventSourceSelector', '" + getMarkupId() + "');");
-	}
+  @Override
+  public void renderHead(final IHeaderResponse response)
+  {
+    response.render(OnLoadHeaderItem.forScript("$('#"
+        + calendar.getMarkupId()
+        + "').fullCalendarExt('createEventSourceSelector', '"
+        + getMarkupId()
+        + "');"));
+  }
 
 }

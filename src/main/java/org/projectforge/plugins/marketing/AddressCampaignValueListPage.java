@@ -100,23 +100,23 @@ IListPageColumnsCreator<AddressDO>
     newItemMenuEntry.setVisibilityAllowed(false);
   }
 
-  public List<IColumn<AddressDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<AddressDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     return createColumns(returnToPage, sortable, false);
   }
 
-  public List<IColumn<AddressDO>> createColumns(final WebPage returnToPage, final boolean sortable, final boolean massUpdateMode)
+  public List<IColumn<AddressDO, String>> createColumns(final WebPage returnToPage, final boolean sortable, final boolean massUpdateMode)
   {
     return createColumns(returnToPage, sortable, massUpdateMode, form.getSearchFilter(), personalAddressMap, addressCampaignValueMap);
   }
 
   @SuppressWarnings("serial")
-  protected static final List<IColumn<AddressDO>> createColumns(final WebPage page, final boolean sortable, final boolean massUpdateMode,
+  protected static final List<IColumn<AddressDO, String>> createColumns(final WebPage page, final boolean sortable, final boolean massUpdateMode,
       final AddressCampaignValueFilter searchFilter, final Map<Integer, PersonalAddressDO> personalAddressMap,
       final Map<Integer, AddressCampaignValueDO> addressCampaignValueMap)
       {
 
-    final List<IColumn<AddressDO>> columns = new ArrayList<IColumn<AddressDO>>();
+    final List<IColumn<AddressDO, String>> columns = new ArrayList<IColumn<AddressDO, String>>();
     final CellItemListener<AddressDO> cellItemListener = new CellItemListener<AddressDO>() {
       public void populateItem(final Item<ICellPopulator<AddressDO>> item, final String componentId, final IModel<AddressDO> rowModel)
       {
@@ -185,7 +185,7 @@ IListPageColumnsCreator<AddressDO>
         "organization", sortable), "organization", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(page.getString("address.contactStatus")), getSortable(
         "contactStatus", sortable), "contactStatus", cellItemListener));
-    columns.add(new AbstractColumn<AddressDO>(new Model<String>(page.getString("address.addressText"))) {
+    columns.add(new AbstractColumn<AddressDO, String>(new Model<String>(page.getString("address.addressText"))) {
       @Override
       public void populateItem(final Item<ICellPopulator<AddressDO>> item, final String componentId, final IModel<AddressDO> rowModel)
       {
@@ -204,7 +204,7 @@ IListPageColumnsCreator<AddressDO>
     });
     columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(page.getString("address.addressStatus")), getSortable(
         "addressStatus", sortable), "addressStatus", cellItemListener));
-    columns.add(new AbstractColumn<AddressDO>(new Model<String>(page.getString("value"))) {
+    columns.add(new AbstractColumn<AddressDO, String>(new Model<String>(page.getString("value"))) {
       @Override
       public void populateItem(final Item<ICellPopulator<AddressDO>> item, final String componentId, final IModel<AddressDO> rowModel)
       {
@@ -220,7 +220,7 @@ IListPageColumnsCreator<AddressDO>
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new AbstractColumn<AddressDO>(new Model<String>(page.getString("comment"))) {
+    columns.add(new AbstractColumn<AddressDO, String>(new Model<String>(page.getString("comment"))) {
       @Override
       public void populateItem(final Item<ICellPopulator<AddressDO>> item, final String componentId, final IModel<AddressDO> rowModel)
       {
@@ -326,7 +326,7 @@ IListPageColumnsCreator<AddressDO>
   @Override
   protected void createDataTable()
   {
-    final List<IColumn<AddressDO>> columns = createColumns(this, !isMassUpdateMode(), isMassUpdateMode());
+    final List<IColumn<AddressDO, String>> columns = createColumns(this, !isMassUpdateMode(), isMassUpdateMode());
     dataTable = createDataTable(columns, "name", SortOrder.ASCENDING);
     form.add(dataTable);
   }

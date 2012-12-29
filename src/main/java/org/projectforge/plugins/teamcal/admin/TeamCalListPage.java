@@ -72,9 +72,9 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
    */
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<TeamCalDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<TeamCalDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<TeamCalDO>> columns = new ArrayList<IColumn<TeamCalDO>>();
+    final List<IColumn<TeamCalDO, String>> columns = new ArrayList<IColumn<TeamCalDO, String>>();
 
     final CellItemListener<TeamCalDO> cellItemListener = new CellItemListener<TeamCalDO>() {
       public void populateItem(final Item<ICellPopulator<TeamCalDO>> item, final String componentId, final IModel<TeamCalDO> rowModel)
@@ -110,7 +110,7 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
         getSortable("description", sortable), "description", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("plugins.teamcal.owner"), getSortable("owner", sortable),
         "owner.username", cellItemListener));
-    columns.add(new AbstractColumn<TeamCalDO>(new Model<String>(getString("plugins.teamcal.access"))) {
+    columns.add(new AbstractColumn<TeamCalDO, String>(new Model<String>(getString("plugins.teamcal.access"))) {
       /**
        * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
        *      java.lang.String, org.apache.wicket.model.IModel)
@@ -142,7 +142,7 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
     columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("lastUpdate"), getSortable("lastUpdate", sortable), "lastUpdate",
         cellItemListener));
     // ics export buttons
-    columns.add(new AbstractColumn<TeamCalDO>(new Model<String>(getString("plugins.teamcal.subscribe.column"))) {
+    columns.add(new AbstractColumn<TeamCalDO, String>(new Model<String>(getString("plugins.teamcal.subscribe.column"))) {
       /**
        * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
        *      java.lang.String, org.apache.wicket.model.IModel)

@@ -83,9 +83,9 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
   }
 
   @SuppressWarnings("serial")
-  public List<IColumn<ToDoDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<ToDoDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<ToDoDO>> columns = new ArrayList<IColumn<ToDoDO>>();
+    final List<IColumn<ToDoDO, String>> columns = new ArrayList<IColumn<ToDoDO, String>>();
     final CellItemListener<ToDoDO> cellItemListener = new CellItemListener<ToDoDO>() {
       public void populateItem(final Item<ICellPopulator<ToDoDO>> item, final String componentId, final IModel<ToDoDO> rowModel)
       {

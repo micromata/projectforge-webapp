@@ -66,9 +66,9 @@ public class MemoListPage extends AbstractListPage<MemoListForm, MemoDao, MemoDO
   }
 
   @SuppressWarnings("serial")
-  public List<IColumn<MemoDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<MemoDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<MemoDO>> columns = new ArrayList<IColumn<MemoDO>>();
+    final List<IColumn<MemoDO, String>> columns = new ArrayList<IColumn<MemoDO, String>>();
     final CellItemListener<MemoDO> cellItemListener = new CellItemListener<MemoDO>() {
       public void populateItem(final Item<ICellPopulator<MemoDO>> item, final String componentId, final IModel<MemoDO> rowModel)
       {

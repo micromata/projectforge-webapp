@@ -67,9 +67,9 @@ public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, Ski
    */
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<SkillDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<SkillDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<SkillDO>> columns = new ArrayList<IColumn<SkillDO>>();
+    final List<IColumn<SkillDO, String>> columns = new ArrayList<IColumn<SkillDO, String>>();
     final CellItemListener<SkillDO> cellItemListener = new CellItemListener<SkillDO>() {
       private static final long serialVersionUID = 3628573642359696336L;
 

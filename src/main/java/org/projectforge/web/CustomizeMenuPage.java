@@ -24,7 +24,8 @@
 package org.projectforge.web;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptReferenceHeaderItem;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
@@ -169,8 +170,8 @@ public class CustomizeMenuPage extends AbstractSecuredPage
   public void renderHead(final IHeaderResponse response)
   {
     super.renderHead(response);
-    response.renderJavaScriptReference("scripts/jquery.jstree/jquery.jstree.js");
-    response.renderJavaScriptReference("scripts/jquery.jstree/jquery.hotkeys.js");
+    response.render(JavaScriptReferenceHeaderItem.forUrl("scripts/jquery.jstree/jquery.jstree.js"));
+    response.render(JavaScriptReferenceHeaderItem.forUrl("scripts/jquery.jstree/jquery.hotkeys.js"));
   }
 
   @Override

@@ -36,7 +36,9 @@ import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.extensions.markup.html.form.select.IOptionRenderer;
 import org.apache.wicket.extensions.markup.html.form.select.Select;
 import org.apache.wicket.extensions.markup.html.form.select.SelectOptions;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.head.CssHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptReferenceHeaderItem;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
@@ -107,8 +109,8 @@ public class TeamCalDialog extends PFDialog
   public void renderHead(final IHeaderResponse response)
   {
     super.renderHead(response);
-    response.renderCSSReference("scripts/spectrum/spectrum.css");
-    response.renderJavaScriptReference("scripts/spectrum/spectrum.js");
+    response.render(CssHeaderItem.forUrl("scripts/spectrum/spectrum.css"));
+    response.render(JavaScriptReferenceHeaderItem.forUrl("scripts/spectrum/spectrum.js"));
   }
 
   /**

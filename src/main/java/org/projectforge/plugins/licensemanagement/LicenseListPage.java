@@ -66,9 +66,9 @@ public class LicenseListPage extends AbstractListPage<LicenseListForm, LicenseDa
   }
 
   @SuppressWarnings("serial")
-  public List<IColumn<LicenseDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<LicenseDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<LicenseDO>> columns = new ArrayList<IColumn<LicenseDO>>();
+    final List<IColumn<LicenseDO, String>> columns = new ArrayList<IColumn<LicenseDO, String>>();
     final CellItemListener<LicenseDO> cellItemListener = new CellItemListener<LicenseDO>() {
       public void populateItem(final Item<ICellPopulator<LicenseDO>> item, final String componentId, final IModel<LicenseDO> rowModel)
       {
@@ -101,7 +101,7 @@ public class LicenseListPage extends AbstractListPage<LicenseListForm, LicenseDa
         "version", sortable), "version", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<LicenseDO>(new Model<String>(getString("plugins.licensemanagement.numberOfLicenses")), getSortable(
         "numberOfLicenses", sortable), "numberOfLicenses", cellItemListener));
-    columns.add(new AbstractColumn<LicenseDO>(new Model<String>(getString("plugins.licensemanagement.owner"))) {
+    columns.add(new AbstractColumn<LicenseDO, String>(new Model<String>(getString("plugins.licensemanagement.owner"))) {
       public void populateItem(final Item<ICellPopulator<LicenseDO>> cellItem, final String componentId, final IModel<LicenseDO> rowModel)
       {
         final LicenseDO license = rowModel.getObject();

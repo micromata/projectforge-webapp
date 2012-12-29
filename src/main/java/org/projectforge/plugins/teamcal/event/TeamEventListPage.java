@@ -91,9 +91,9 @@ IListPageColumnsCreator<TeamEventDO>
    */
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<TeamEventDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<TeamEventDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<TeamEventDO>> columns = new ArrayList<IColumn<TeamEventDO>>();
+    final List<IColumn<TeamEventDO, String>> columns = new ArrayList<IColumn<TeamEventDO, String>>();
 
     final CellItemListener<TeamEventDO> cellItemListener = new CellItemListener<TeamEventDO>() {
       public void populateItem(final Item<ICellPopulator<TeamEventDO>> item, final String componentId, final IModel<TeamEventDO> rowModel)

@@ -221,8 +221,8 @@ public class LoginPage extends AbstractUnsecureBasePage
    * @param targetUrlAfterLogin
    * @return i18n key of the validation error message if not successfully logged in, otherwise null.
    */
-  public static String internalCheckLogin(final WebPage page, final UserDao userDao, final String username,
-      final String password, final boolean userWantsToStayLoggedIn, final Class< ? extends WebPage> defaultPage)
+  public static String internalCheckLogin(final WebPage page, final UserDao userDao, final String username, final String password,
+      final boolean userWantsToStayLoggedIn, final Class< ? extends WebPage> defaultPage)
   {
     final LoginResult loginResult = Login.getInstance().checkLogin(username, password);
     final PFUserDO user = loginResult.getUser();
@@ -250,17 +250,14 @@ public class LoginPage extends AbstractUnsecureBasePage
     if (UserFilter.isUpdateRequiredFirst() == true) {
       throw new RestartResponseException(SystemUpdatePage.class);
     }
-    if (page.continueToOriginalDestination() == false) {
-      // Redirect only if not a redirect is set by Wicket.
-      throw new RestartResponseException(defaultPage);
-    }
-    return null;
+    page.continueToOriginalDestination();
+    // Redirect only if not a redirect is set by Wicket.
+    throw new RestartResponseException(defaultPage);
   }
 
   protected String checkLogin()
   {
-    return internalCheckLogin(this, userDao, form.getUsername(), form.getPassword(), form.isStayLoggedIn(),
-        WicketUtils.getDefaultPage());
+    return internalCheckLogin(this, userDao, form.getUsername(), form.getPassword(), form.isStayLoggedIn(), WicketUtils.getDefaultPage());
   }
 
   @Override

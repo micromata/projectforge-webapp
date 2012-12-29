@@ -71,9 +71,9 @@ public class PollListPage extends AbstractListPage<PollListForm, PollDao, PollDO
    */
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<PollDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<PollDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<PollDO>> columns = new ArrayList<IColumn<PollDO>>();
+    final List<IColumn<PollDO, String>> columns = new ArrayList<IColumn<PollDO, String>>();
 
     final CellItemListener<PollDO> cellItemListener = new CellItemListener<PollDO>() {
       @Override

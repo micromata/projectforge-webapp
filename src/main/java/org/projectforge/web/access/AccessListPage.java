@@ -82,9 +82,9 @@ IListPageColumnsCreator<GroupTaskAccessDO>
 
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<GroupTaskAccessDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<GroupTaskAccessDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<GroupTaskAccessDO>> columns = new ArrayList<IColumn<GroupTaskAccessDO>>();
+    final List<IColumn<GroupTaskAccessDO, String>> columns = new ArrayList<IColumn<GroupTaskAccessDO, String>>();
     final CellItemListener<GroupTaskAccessDO> cellItemListener = new CellItemListener<GroupTaskAccessDO>() {
       public void populateItem(final Item<ICellPopulator<GroupTaskAccessDO>> item, final String componentId,
           final IModel<GroupTaskAccessDO> rowModel)

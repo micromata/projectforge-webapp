@@ -76,9 +76,9 @@ IListPageColumnsCreator<SkillRatingDO>
    */
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<SkillRatingDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<SkillRatingDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<SkillRatingDO>> columns = new ArrayList<IColumn<SkillRatingDO>>();
+    final List<IColumn<SkillRatingDO, String>> columns = new ArrayList<IColumn<SkillRatingDO, String>>();
     final CellItemListener<SkillRatingDO> cellItemListener = new CellItemListener<SkillRatingDO>() {
       public void populateItem(final Item<ICellPopulator<SkillRatingDO>> item, final String componentId,
           final IModel<SkillRatingDO> rowModel)
