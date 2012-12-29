@@ -58,7 +58,7 @@ public abstract class ListAndEditPagesTestBase extends WicketPageTestBase
     loginTestAdmin();
     startListPage();
     if (getNumberOfExistingListElements() != null) {
-      final DataTable< ? > table = (DataTable< ? >) tester.getComponentFromLastRenderedPage(PATH_LISTPAGE_TABLE);
+      final DataTable< ?, String > table = (DataTable< ? ,String >) tester.getComponentFromLastRenderedPage(PATH_LISTPAGE_TABLE);
       Assert.assertEquals(getNumberOfExistingListElements().intValue(), table.getRowCount());
     }
     // Now, add a new element:
@@ -75,7 +75,7 @@ public abstract class ListAndEditPagesTestBase extends WicketPageTestBase
     // Now check list page
     tester.assertRenderedPage(getListPageClass());
     if (getNumberOfExistingListElements() != null) {
-      final DataTable< ? > table = (DataTable< ? >) tester.getComponentFromLastRenderedPage(PATH_LISTPAGE_TABLE);
+      final DataTable< ? , String> table = (DataTable< ?, String >) tester.getComponentFromLastRenderedPage(PATH_LISTPAGE_TABLE);
       Assert.assertEquals(getNumberOfExistingListElements() + 1, table.getRowCount());
     }
     startListPage("id:" + id);
@@ -90,7 +90,7 @@ public abstract class ListAndEditPagesTestBase extends WicketPageTestBase
     // Now check list page again after object was deleted:
     tester.assertRenderedPage(getListPageClass());
     if (getNumberOfExistingListElements() != null) {
-      final DataTable< ? > table = (DataTable< ? >) tester.getComponentFromLastRenderedPage(PATH_LISTPAGE_TABLE);
+      final DataTable< ?, String > table = (DataTable< ? , String>) tester.getComponentFromLastRenderedPage(PATH_LISTPAGE_TABLE);
       Assert.assertEquals(getNumberOfExistingListElements().intValue(), table.getRowCount());
     }
   }

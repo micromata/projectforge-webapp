@@ -62,7 +62,7 @@ public class AddressPagesTest extends ListAndEditPagesTestBase
     FormTester form = tester.newFormTester(PATH_EDITPAGE_FORM);
     form.submit(findComponentByLabel(form, KEY_EDITPAGE_BUTTON_CREATE));
     tester.assertRenderedPage(AddressListPage.class);
-    final DataTable<AddressDO> table = (DataTable<AddressDO>) tester.getComponentFromLastRenderedPage(PATH_LISTPAGE_TABLE);
+    final DataTable<AddressDO, String> table = (DataTable<AddressDO, String>) tester.getComponentFromLastRenderedPage(PATH_LISTPAGE_TABLE);
     Assert.assertEquals(1, table.getRowCount());
 
     // Check view page
