@@ -23,9 +23,9 @@ import org.apache.wicket.request.Request;
 
 public abstract class EventDroppedCallback extends AbstractAjaxCallbackWithClientsideRevert implements CallbackWithHandler
 {
-  public static final String NO_CONTEXTMENU_INDICATOR = "noContextMenu";
-
   private static final long serialVersionUID = 9220878749378414280L;
+
+  public static final String NO_CONTEXTMENU_INDICATOR = "noContextMenu";
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(EventDroppedCallback.class);
 
@@ -89,17 +89,26 @@ public abstract class EventDroppedCallback extends AbstractAjaxCallbackWithClien
   @Override
   protected String configureCallbackScript(final String script, final String urlTail)
   {
-    final String modScript = script.replace(urlTail, "&eventId=\"+event.id+\"&sourceId=\"+event.source.data."
+    return script.replace(urlTail, "&eventId=\"+event.id+\"&sourceId=\"+event.source.data."
         + EventSource.Const.UUID
         + "+\"&dayDelta=\"+dayDelta+\"&minuteDelta=\"+minuteDelta+\"&allDay=\"+allDay+\"");
-
-    if (config.isEnableContextMenu() == false) { // do not show context menu
-      return modScript;
-    } else { // do show context menu
-      return CALLBACK_PRE_SCRIPT + modScript + "&which=\"+which+\"" + i18nCallbackScript(CALLBACK_POST_SCRIPT);
-    }
-
   }
+
+  //  @Override
+  //  protected String configureCallbackScript(final String script, final String urlTail)
+  //  {
+  //    final String modScript = script.replace(urlTail, "&eventId=\"+event.id+\"&sourceId=\"+event.source.data."
+  //        + EventSource.Const.UUID
+  //        + "+\"&dayDelta=\"+dayDelta+\"&minuteDelta=\"+minuteDelta+\"&allDay=\"+allDay+\"");
+  //
+  //    if (config.isEnableContextMenu() == false) { // do not show context menu
+  //      return modScript;
+  //    } else { // do show context menu
+  //      return CALLBACK_PRE_SCRIPT + modScript + "&which=\"+which+\"" + i18nCallbackScript(CALLBACK_POST_SCRIPT);
+  //    }
+  //
+  //  }
+
 
   /**
    * @param callbackPostScript
