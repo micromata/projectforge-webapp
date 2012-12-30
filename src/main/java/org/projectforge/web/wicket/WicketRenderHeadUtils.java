@@ -23,32 +23,57 @@
 
 package org.projectforge.web.wicket;
 
+import org.apache.wicket.markup.head.CssReferenceHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.head.JavaScriptHeaderItem;
-import org.projectforge.web.WebConfiguration;
+import org.apache.wicket.markup.head.JavaScriptReferenceHeaderItem;
 
 public class WicketRenderHeadUtils
 {
+  private static final String[] JAVASCRIPT_FILES = { //
+    "scripts/jquery/1.8.2/jquery-1.8.2.js", //
+    "include/bootstrap/js/bootstrap.js", //
+    "scripts/jqueryui/1.9.2/jquery-ui-1.9.2.custom.js", //
+    "scripts/contextmenu/jquery.contextmenu.js", //
+    "scripts/adminica-2.2/prefixfree/prefixfree.js", //
+    "scripts/adminica-2.2/adminica_ui.js", //
+    "scripts/adminica-2.2/adminica_mobile.js", //
+    "scripts/adminica-2.2/adminica_load.js", //
+    "scripts/projectforge.js", //
+    "scripts/projectforge-forms.js" //
+  };
+
+  private static final String[] CSS_FILES = { //
+    "styles/google-fonts/google-fonts.css", //
+    // "http://fonts.googleapis.com/css?family=Droid+Sans:regular&amp;subset=latin", //
+    "styles/jqueryui/1.9.2/cupertino/jquery-ui-1.9.2.custom.css", //
+    "styles/table.css", //
+    "scripts/contextmenu/css/jquery.contextmenu.css", //
+    "styles/adminica-2.2/main.css", //
+    // "styles/adminica-2.2/mobile.css", //
+    "styles/adminica-2.2/themes/nav_top.css", //
+    "styles/adminica-2.2/adminica-patch.css", //
+    "include/bootstrap/css/bootstrap.css", //
+    "styles/projectforge-form.css", // before projectforge.css!
+    "styles/projectforge.css" //
+  };
+
   /**
    * Jquery, bootstrap, jqueryui and uquery.contextmenu.js.
    */
   public static void renderMainJavaScriptIncludes(final IHeaderResponse response)
   {
-    // Load JQuery
-    if (WebConfiguration.isDevelopmentMode() == true) {
-      renderHeadJavaScriptUrl(response, "scripts/jquery/1.8.2/jquery-1.8.2.js");
-      renderHeadJavaScriptUrl(response, "include/bootstrap/js/bootstrap.js");
-      renderHeadJavaScriptUrl(response, "scripts/jqueryui/1.9.2/jquery-ui-1.9.2.custom.js");
-    } else {
-      renderHeadJavaScriptUrl(response, "scripts/jquery/1.8.2/jquery-1.8.2.min.js");
-      renderHeadJavaScriptUrl(response, "include/bootstrap/js/bootstrap.min.js");
-      renderHeadJavaScriptUrl(response, "scripts/jqueryui/1.9.2/jquery-ui-1.9.2.custom.min.js");
+    for (final String url : JAVASCRIPT_FILES) {
+      response.render(JavaScriptReferenceHeaderItem.forUrl(url));
     }
-    renderHeadJavaScriptUrl(response, "scripts/contextmenu/jquery.contextmenu.js");
   }
 
-  public static void renderHeadJavaScriptUrl(final IHeaderResponse response, final String url)
+  /**
+   * Jquery, bootstrap, jqueryui and uquery.contextmenu.js.
+   */
+  public static void renderMainCSSIncludes(final IHeaderResponse response)
   {
-    response.render(JavaScriptHeaderItem.forUrl(url));
+    for (final String url : CSS_FILES) {
+      response.render(CssReferenceHeaderItem.forUrl(url));
+    }
   }
 }
