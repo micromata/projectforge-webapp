@@ -119,13 +119,13 @@ $(function() {
 	
 	initColorPicker();
 	doAfterAjaxHandling();
-	
-	/*if(typeof(Wicket) != "undefined" && typeof(Wicket.Ajax) != "undefined") {
-		Wicket.Ajax.registerPostCallHandler(function() {
+
+	if(typeof(Wicket) != "undefined" && typeof(Wicket.Event) != "undefined") {
+		Wicket.Event.subscribe('/ajax/call/complete', function(jqEvent, attributes, jqXHR, errorThrown, textStatus) {
 			// handle after AJAX actions
 			doAfterAjaxHandling();
 		});
-	}*/
+	}
 	$('.pf_preventClickBubble').on("contextmenu", function(e) {
 		e.stopImmediatePropagation();
 	});
