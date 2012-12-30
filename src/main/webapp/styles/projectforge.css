@@ -580,21 +580,8 @@ h2.box_head .subtitle {
 }
 
 div.controls {
-	/*overflow-x: scroll;*/
-	white-space: nowrap;;
+	float: left;
 }
-
 div.controls div {
 	display: inline-block;
 }
-white-space
-
-
-:
-
- 
-
-nowrap
-
-
-;
