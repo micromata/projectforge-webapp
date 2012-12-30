@@ -1,0 +1,7 @@
+
+div.controls {
+	float: left;
+}
+div.controls div {
+	display: inline-block;
+}
