@@ -149,8 +149,14 @@ public class MaxLengthTextField extends TextField<String>
   public static Integer getMaxLength(final IModel<String> model, final Integer maxLength)
   {
     final Integer dbLength = getMaxLength(model);
-    if (dbLength != null && dbLength < maxLength) {
-      log.warn("Data base length of given property is less than given maxLength: " + model);
+    if (dbLength != null) {
+      if (maxLength != null) {
+        if (dbLength < maxLength) {
+          log.warn("Data base length of given property is less than given maxLength: " + model);
+        } else if (dbLength > maxLength) {
+          return maxLength;
+        }
+      }
       return dbLength;
     }
     return maxLength;
