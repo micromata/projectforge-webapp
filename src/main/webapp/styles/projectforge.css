@@ -239,17 +239,12 @@ input.userselectpanel {
 }
 
 div.contentMenu {
-	display: inline-block;
-	margin-left: 15px;
-	height: 40px;
+	padding-left: 45px;
 }
 
 div.contentRightMenu {
-	display: inline-block;
-	top: 8px;
-	right: 15px;
+	padding-right: 4px;
 	float: right;
-	height: 40px;
 }
 
 div.contentMenu .toolbarbutton,div.contentRightMenu .toolbarbutton {

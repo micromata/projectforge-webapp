@@ -12,7 +12,7 @@ Sidebar and Topbar
 
 #sidebar {
 	position: fixed;
-	top: 70px;
+	top: 68px;
 	margin: 0;
 	z-index: 10;
 	border-top-right-radius: 0px;
@@ -43,22 +43,26 @@ Sidebar and Topbar
 	margin-left: 0.5em;
 }
 
-.sidebar div.cog{
+.sidebar div.cog {
 	display: block;
-	color:#fff;
+	color: #fff;
 	font-weight: bold;
 	font-size: 16px;
 	position: absolute;
-	line-height:35px;
-	width:35px;
-	top:-3px;
-	right:-35px;
+	line-height: 35px;
+	width: 35px;
+	top: -3px;
+	right: -35px;
 	text-align: center;
-	background-color:rgba(0,0,0,0.75);
+	background-color: rgba(0, 0, 0, 0.75);
 	background-color: #000\9;
 	border-bottom-right-radius: 5px;
 	top: 0px;
 	border-top-right-radius: 5px;
+}
+
+#navbar {
+	height: 40px;
 }
 
 /*------User Box --------*/
@@ -67,7 +71,6 @@ div.user_box {
 	width: 200px;
 	margin-right: 9px;
 	margin-top: 10px;
-	margin-bottom: 10px;
 	color: #fff;
 	padding: 5px;
 	padding-right: 0;
@@ -272,6 +275,7 @@ li:last-child ul.drawer li:last-child a {
 	position: relative;
 	z-index: 500;
 	letter-spacing: 0;
+	margin_bottom: 20px;
 }
 
 .dropdown_menu ul {
