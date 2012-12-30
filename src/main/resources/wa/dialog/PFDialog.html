@@ -1,19 +1,17 @@
 <wicket:panel xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
   <div class="display_none">
     <div wicket:id="dialogContainer" class="dialog_content narrow">
-      <div class="block">
-        <div class="section">
-          <div wicket:id="feedbackContainer">
-            <div class="alert alert_red feedback" wicket:id="feedback"></div>
-          </div>
-          <wicket:container wicket:id="dialogContent" />
+      <div class="container-fluid">
+        <div wicket:id="feedbackContainer" class="row-fluid">
+          <div class="alert alert_red feedback span12" wicket:id="feedback"></div>
         </div>
-        <form wicket:id="buttonForm">
-            <div class="button_bar clearfix">
-                <wicket:container wicket:id="actionButtons" />
-            </div>
-        </form>
+        <wicket:container wicket:id="dialogContent" />
       </div>
+      <form wicket:id="buttonForm">
+        <div class="button_bar clearfix">
+          <wicket:container wicket:id="actionButtons" />
+        </div>
+      </form>
     </div>
   </div>
 </wicket:panel>
