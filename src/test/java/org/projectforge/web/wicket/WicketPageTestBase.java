@@ -77,7 +77,6 @@ public class WicketPageTestBase extends TestBase
       super.init();
       final ClassPathXmlApplicationContext context = getTestConfiguration().getApplicationContext();
       getComponentInstantiationListeners().add(new SpringComponentInjector(this, context, true));
-      getResourceSettings().setResourceStreamLocator(new MyResourceStreamLocator());
       getResourceSettings().getStringResourceLoaders().add(new BundleStringResourceLoader(WicketApplication.RESOURCE_BUNDLE_NAME));
       final ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
       beanFactory.autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
