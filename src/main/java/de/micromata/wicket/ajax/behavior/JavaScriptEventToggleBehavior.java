@@ -23,8 +23,11 @@
 
 package de.micromata.wicket.ajax.behavior;
 
+import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxEventBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.attributes.AjaxCallListener;
+import org.apache.wicket.ajax.attributes.AjaxRequestAttributes;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.util.string.StringValue;
 
@@ -47,7 +50,6 @@ public abstract class JavaScriptEventToggleBehavior extends AjaxEventBehavior
   public JavaScriptEventToggleBehavior()
   {
     this("onClick");
-    log.error("******* TODO: Migrate.");
   }
 
   public JavaScriptEventToggleBehavior(final String event)
@@ -65,6 +67,7 @@ public abstract class JavaScriptEventToggleBehavior extends AjaxEventBehavior
     final StringValue conditionValue = RequestCycle.get().getRequest().getQueryParameters().getParameterValue(CONDITION);
     if (conditionValue != null) {
       final String conditionString = conditionValue.toString();
+      log.info("******** conditionString=" + conditionString);
       if ("true".equals(conditionString)) {
         onToggleCall(target, true);
       } else if ("false".equals(conditionString)) {
@@ -98,8 +101,29 @@ public abstract class JavaScriptEventToggleBehavior extends AjaxEventBehavior
   }
 
   /**
-   * @see org.apache.wicket.ajax.AbstractDefaultAjaxBehavior#getAjaxCallDecorator()
+   * @see org.apache.wicket.ajax.AjaxEventBehavior#updateAjaxAttributes(org.apache.wicket.ajax.attributes.AjaxRequestAttributes)
    */
+  @SuppressWarnings("serial")
+  @Override
+  protected void updateAjaxAttributes(final AjaxRequestAttributes attributes)
+  {
+    super.updateAjaxAttributes(attributes);
+    // TODO: Johannes: das hier war vorher getAjaxCallDecorator (s. u.). Wicket scheint hier viel geändert zu haben.
+    final AjaxCallListener myAjaxCallListener = new AjaxCallListener() {
+
+      @Override
+      public CharSequence getBeforeHandler(final Component component)
+      {
+        String javaScript = "var data = $(this).data(\"" + CONDITION + "\"); var result = null;";
+        javaScript += "result = ! data;"; // switch data object via javaScript
+        javaScript += "if(result != null) { $(this).data(\"" + CONDITION + "\", result); };alert(result)";
+        return javaScript;
+      }
+    };
+    attributes.getAjaxCallListeners().add(myAjaxCallListener);
+  }
+
+  // TODO: remove antipattern: "maybe Dave need this code later"
   // @Override
   // protected IAjaxCallDecorator getAjaxCallDecorator()
   // {
