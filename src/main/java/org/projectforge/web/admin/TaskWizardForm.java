@@ -65,16 +65,15 @@ public class TaskWizardForm extends AbstractStandardForm<TaskWizardForm, TaskWiz
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid12();
     int number = 1;
     {
       gridBuilder.newFormHeading(getString("wizard"));
-      final DivPanel section = gridBuilder.newSectionPanel();
+      final DivPanel section = gridBuilder.getPanel();
       section.add(new DivTextPanel(section.newChildId(), getString("task.wizard.intro")));
     }
-    gridBuilder.newGrid12();
+    gridBuilder.newGridPanel();
     {
-      final DivPanel section = gridBuilder.newSectionPanel();
+      final DivPanel section = gridBuilder.getPanel();
       section.add(new Heading3Panel(section.newChildId(), String.valueOf(number++) + ". " + getString("task")));
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task"), true);
       final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(this, "task"), parentPage,
@@ -103,9 +102,9 @@ public class TaskWizardForm extends AbstractStandardForm<TaskWizardForm, TaskWiz
     // Manager group
     createGroupComponents(number++, "managerGroup");
 
-    gridBuilder.newGrid12();
+    gridBuilder.newGridPanel();
     {
-      final DivPanel section = gridBuilder.newSectionPanel();
+      final DivPanel section = gridBuilder.getPanel();
       section.add(new Heading3Panel(section.newChildId(), getString("task.wizard.action")));
       section.add(new DivTextPanel(section.newChildId(), new Model<String>() {
         /**
@@ -152,8 +151,8 @@ public class TaskWizardForm extends AbstractStandardForm<TaskWizardForm, TaskWiz
   @SuppressWarnings("serial")
   private void createGroupComponents(final int number, final String key)
   {
-    gridBuilder.newGrid12();
-    final DivPanel section = gridBuilder.newSectionPanel();
+    gridBuilder.newGridPanel();
+    final DivPanel section = gridBuilder.getPanel();
     section.add(new Heading3Panel(section.newChildId(), String.valueOf(number) + ". " + getString("task.wizard." + key)));
     section.add(new DivTextPanel(section.newChildId(), getString("task.wizard." + key + ".intro")));
     {

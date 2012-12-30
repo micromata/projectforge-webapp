@@ -102,8 +102,6 @@ public class PollAttendeePage extends PollBasePage
   {
     super.onInitialize();
 
-    gridBuilder.newGrid6();
-
     // remove users, which already exist in preset groups.
     // filteredSelectUserList = getFilteredUserList(presetGroups.toArray(new Integer[presetGroups.size()]));
     final UsersProvider usersProvider = new UsersProvider();
@@ -224,7 +222,7 @@ public class PollAttendeePage extends PollBasePage
    * @see org.projectforge.plugins.poll.PollBasePage#setCancelButtonTitle(java.lang.String)
    */
   @Override
-  protected String setCancelButtonTitle(String title)
+  protected String setCancelButtonTitle(final String title)
   {
     return getString("back");
   }

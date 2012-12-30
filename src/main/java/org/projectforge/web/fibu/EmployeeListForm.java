@@ -27,8 +27,8 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.fibu.EmployeeFilter;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class EmployeeListForm extends AbstractListForm<EmployeeFilter, EmployeeListPage>
@@ -41,9 +41,8 @@ public class EmployeeListForm extends AbstractListForm<EmployeeFilter, EmployeeL
   protected void init()
   {
     super.init();
-    gridBuilder.newNestedRowPanel();
     {
-      gridBuilder.newNestedPanel(DivType.COL_60);
+      gridBuilder.newSplitPanel(GridSize.COL66);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"));
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
       checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
@@ -52,7 +51,7 @@ public class EmployeeListForm extends AbstractListForm<EmployeeFilter, EmployeeL
     }
     {
       // DropDownChoice page size
-      gridBuilder.newNestedPanel(DivType.COL_40);
+      gridBuilder.newSplitPanel(GridSize.COL33);
       addPageSizeFieldset();
     }
   }

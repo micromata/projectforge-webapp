@@ -41,6 +41,7 @@ import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
@@ -50,7 +51,6 @@ import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChartEditPage>
@@ -105,7 +105,7 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid12();
+    gridBuilder.newGridPanel();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task"));
       final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(data, "task"), parentPage,
@@ -121,14 +121,14 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
       taskSelectPanel.init();
       taskSelectPanel.setRequired(true);
     }
-    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.name"));
       final RequiredMaxLengthTextField name = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "name"));
       WicketUtils.setStrong(name);
       fs.add(name);
     }
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.owner"));
       final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(data, "owner"), parentPage,
@@ -136,7 +136,7 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
       fs.add(userSelectPanel);
       userSelectPanel.init();
     }
-    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("title"));
       final RequiredMaxLengthTextField title = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(getSettings(),
@@ -144,7 +144,7 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
       WicketUtils.setStrong(title);
       fs.add(title);
     }
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // read-access:
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("access.read"));
@@ -155,13 +155,13 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
       readAccessChoice.setNullValid(false);
       fs.add(readAccessChoice);
     }
-    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Width
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.settings.width"));
       fs.add(new MinMaxNumberField<Integer>(fs.getTextFieldId(), new PropertyModel<Integer>(data.getStyle(), "width"), 100, 10000));
     }
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // write-access:
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("access.write"));
@@ -172,14 +172,14 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
       writeAccessChoice.setNullValid(false);
       fs.add(writeAccessChoice);
     }
-    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Total label width:
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.settings.totalLabelWidth"));
       fs.add(new MinMaxNumberField<Double>(fs.getTextFieldId(), new PropertyModel<Double>(data.getStyle(), "totalLabelWidth"), 10.0,
           10000.0));
     }
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Options
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
@@ -201,7 +201,7 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
         }
       });
     }
-    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Time period
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("timePeriod"), true).setNoLabelFor();
@@ -213,7 +213,7 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
           .get().withSelectProperty("toDate"));
       fs.add(toDatePanel);
     }
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("export"), true);
       final LabelValueChoiceRenderer<String> exportFormatChoiceRenderer = new LabelValueChoiceRenderer<String>();
@@ -236,7 +236,7 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
         }
       }, getString("export"), SingleButtonPanel.GREY));
     }
-    gridBuilder.newBlockPanel();
+    gridBuilder.newGridPanel();
     {
       final DivPanel panel = gridBuilder.getPanel();
       ganttChartEditTreeTablePanel = new GanttChartEditTreeTablePanel(panel.newChildId(), this, getData());

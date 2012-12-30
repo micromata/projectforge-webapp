@@ -43,11 +43,11 @@ import org.projectforge.web.fibu.ProjektSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.HtmlCommentPanel;
 import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
@@ -87,9 +87,8 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
     if (hrPlanningEntryDao.hasLoggedInUserSelectAccess(false) == false) {
       filter.setUserId(getUser().getId());
     }
-    gridBuilder.newNestedRowPanel();
     {
-      gridBuilder.newNestedPanel(DivType.COL_60);
+      gridBuilder.newSplitPanel(GridSize.COL66);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("timePeriod"), true);
       startDate = new DatePanel(fs.newChildId(), new PropertyModel<Date>(filter, "startTime"), DatePanelSettings.get()
           .withSelectPeriodMode(true).withRequired(true));
@@ -132,7 +131,7 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
     }
     {
       // DropDownChoice page size
-      gridBuilder.newNestedPanel(DivType.COL_40);
+      gridBuilder.newSplitPanel(GridSize.COL33);
       addPageSizeFieldset();
     }
     boolean showProjectSelectPanel = false;
@@ -140,9 +139,10 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
     if (projektDao.hasLoggedInUserSelectAccess(false) == true) {
       // Project
       showProjectSelectPanel = true;
-      gridBuilder.newNestedRowPanel();
       if (hasFullAccess == true) {
-        gridBuilder.newNestedPanel(DivType.COL_60);
+        gridBuilder.newSplitPanel(GridSize.COL66);
+      } else {
+        gridBuilder.newGridPanel();
       }
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt"));
       final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel(fs.newChildId(), new Model<ProjektDO>() {
@@ -158,7 +158,7 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
     if (hasFullAccess == true) {
       // User
       if (showProjectSelectPanel == true) {
-        gridBuilder.newNestedPanel(DivType.COL_40);
+        gridBuilder.newSplitPanel(GridSize.COL33);
       }
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("user"));
       final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new Model<PFUserDO>() {
@@ -183,7 +183,7 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
       userSelectPanel.init().withAutoSubmit(true);
     }
     {
-      gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_60);
+      gridBuilder.newSplitPanel(GridSize.COL66);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
       checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
@@ -197,7 +197,7 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
     }
     {
       // Total hours
-      gridBuilder.newNestedPanel(DivType.COL_40);
+      gridBuilder.newSplitPanel(GridSize.COL33);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.totalDuration"), true).setNoLabelFor();
       fs.add(new TextPanel(fs.newChildId(), new Model<String>() {
         @Override

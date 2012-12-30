@@ -37,6 +37,7 @@ import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.projectforge.web.wicket.components.ExternalLinkPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
@@ -138,8 +139,8 @@ public class AddressViewPage extends AbstractSecuredPage
 
     final String name = address.getFullNameWithTitleAndForm();
 
-    gridBuilder.newGrid6(true).newBlockPanel();
-    DivPanel section = gridBuilder.newSectionPanel();
+    gridBuilder.newSplitPanel(GridSize.COL50);
+    DivPanel section = gridBuilder.getPanel();
     section.add(new Heading1Panel(section.newChildId(), name));
     appendFieldset("organization", address.getOrganization());
     appendFieldset("address.division", address.getDivision());
@@ -162,8 +163,8 @@ public class AddressViewPage extends AbstractSecuredPage
         address.getPrivateMobilePhone(), null, firstRow);
 
     if (StringUtils.isNotBlank(address.getComment()) == true) {
-      gridBuilder.newGrid12();
-      section = gridBuilder.newSectionPanel();
+      gridBuilder.newGridPanel();
+      section = gridBuilder.getPanel();
       section.add(new Heading3Panel(section.newChildId(), getString("comment")));
       final ParTextPanel textPanel = new ParTextPanel(section.newChildId(), HtmlHelper.escapeHtml(address.getComment(), true));
       textPanel.getLabel().setEscapeModelStrings(false);
@@ -179,9 +180,9 @@ public class AddressViewPage extends AbstractSecuredPage
       return firstRow;
     }
     if (firstRow == true) {
-      gridBuilder.newGrid6().newBlockPanel();
+      gridBuilder.newSplitPanel(GridSize.COL50);
     }
-    final DivPanel section = gridBuilder.newSectionPanel();
+    final DivPanel section = gridBuilder.getPanel();
     if (firstRow == true) {
       section.add(new Heading1Panel(section.newChildId(), getString("address.addresses")));
     }

@@ -27,8 +27,8 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
@@ -51,7 +51,7 @@ public class AddressCampaignListForm extends AbstractListForm<BaseSearchFilter, 
   protected void init()
   {
     super.init();
-    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_60);
+    gridBuilder.newSplitPanel(GridSize.COL66);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
@@ -60,7 +60,7 @@ public class AddressCampaignListForm extends AbstractListForm<BaseSearchFilter, 
     }
     {
       // DropDownChoice page size
-      gridBuilder.newNestedPanel(DivType.COL_40);
+      gridBuilder.newSplitPanel(GridSize.COL33);
       addPageSizeFieldset();
     }
   }

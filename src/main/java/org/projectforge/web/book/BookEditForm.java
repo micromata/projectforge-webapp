@@ -44,13 +44,13 @@ import org.projectforge.book.BookType;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
@@ -110,7 +110,7 @@ public class BookEditForm extends AbstractEditForm<BookDO, BookEditPage>
       }
     });
 
-    gridBuilder.newGrid12();
+    gridBuilder.newGridPanel();
     {
       // Title
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("book.title"));
@@ -125,7 +125,7 @@ public class BookEditForm extends AbstractEditForm<BookDO, BookEditPage>
       final MaxLengthTextField authors = new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "authors"));
       fs.add(dependentFormComponents[0] = authors);
     }
-    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // DropDownChoice bookType
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("book.type"));
@@ -170,7 +170,7 @@ public class BookEditForm extends AbstractEditForm<BookDO, BookEditPage>
       });
       fs.add(dependentFormComponents[2] = signature);
     }
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // ISBN
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("book.isbn"));
@@ -193,7 +193,7 @@ public class BookEditForm extends AbstractEditForm<BookDO, BookEditPage>
       final MaxLengthTextField editor = new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "editor"));
       fs.add(dependentFormComponents[4] = editor);
     }
-    gridBuilder.newBlockPanel();
+    gridBuilder.newGridPanel();
     {
       // Abstract
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("book.abstract"));

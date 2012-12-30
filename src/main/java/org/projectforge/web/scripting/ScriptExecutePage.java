@@ -111,7 +111,7 @@ public class ScriptExecutePage extends AbstractStandardFormPage implements ISele
     body.add(form);
     form.init();
     resultGridBuilder = form.newGridBuilder(body, "results");
-    resultGridBuilder.newGrid12();
+    resultGridBuilder.newGridPanel();
     {
       scriptResultFieldsetPanel = new FieldsetPanel(resultGridBuilder.getPanel(), getString("scripting.script.result")) {
         /**

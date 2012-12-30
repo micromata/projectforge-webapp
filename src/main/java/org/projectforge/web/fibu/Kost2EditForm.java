@@ -77,7 +77,7 @@ public class Kost2EditForm extends AbstractEditForm<Kost2DO, Kost2EditPage>
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid12();
+    gridBuilder.newGridPanel();
     {
       // Project
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt"));

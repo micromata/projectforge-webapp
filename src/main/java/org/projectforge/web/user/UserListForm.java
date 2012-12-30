@@ -29,9 +29,9 @@ import org.apache.wicket.model.PropertyModel;
 import org.projectforge.user.Login;
 import org.projectforge.user.PFUserFilter;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class UserListForm extends AbstractListForm<PFUserFilter, UserListPage>
@@ -44,9 +44,8 @@ public class UserListForm extends AbstractListForm<PFUserFilter, UserListPage>
   protected void init()
   {
     super.init();
-    gridBuilder.newNestedRowPanel();
     {
-      gridBuilder.newNestedPanel(DivType.COL_60);
+      gridBuilder.newSplitPanel(GridSize.COL66);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
 
       {
@@ -96,7 +95,7 @@ public class UserListForm extends AbstractListForm<PFUserFilter, UserListPage>
     }
     {
       // DropDownChoice page size
-      gridBuilder.newNestedPanel(DivType.COL_40);
+      gridBuilder.newSplitPanel(GridSize.COL33);
       addPageSizeFieldset();
     }
   }

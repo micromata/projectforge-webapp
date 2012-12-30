@@ -33,6 +33,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.plugins.poll.event.PollEventEditPage;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteMaxLengthTextField;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -68,7 +69,7 @@ public class NewPollPage extends PollBasePage
   {
     super.onInitialize();
 
-    gridBuilder.newGrid6();
+    gridBuilder.newSplitPanel(GridSize.COL50);
 
     final FieldsetPanel fsTitle = gridBuilder.newFieldset(getString("plugins.poll.new.title"), true);
     final MaxLengthTextField titleField = new MaxLengthTextField(fsTitle.getTextFieldId(), new PropertyModel<String>(model.getPollDo(), "title"));

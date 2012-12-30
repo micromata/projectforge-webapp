@@ -60,7 +60,7 @@ public class Kost1EditForm extends AbstractEditForm<Kost1DO, Kost1EditPage>
   {
     super.init();
     /* GRID16 - BLOCK */
-    gridBuilder.newGrid12();
+    gridBuilder.newGridPanel();
     {
       // Number range
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost.kostentraeger"), true);

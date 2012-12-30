@@ -31,10 +31,10 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.fibu.kost.BuchungssatzDao;
 import org.projectforge.fibu.kost.BusinessAssessment;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.YearListCoiceRenderer;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class AccountingRecordListForm extends AbstractListForm<AccountingRecordListFilter, AccountingRecordListPage>
@@ -57,9 +57,8 @@ public class AccountingRecordListForm extends AbstractListForm<AccountingRecordL
     if (isFilterVisible() == false) {
       return;
     }
-    gridBuilder.newNestedRowPanel();
     {
-      gridBuilder.newNestedPanel(DivType.COL_60);
+      gridBuilder.newSplitPanel(GridSize.COL66);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true);
       // DropDownChoices from
       final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(buchungssatzDao.getYears(), false);
@@ -91,7 +90,7 @@ public class AccountingRecordListForm extends AbstractListForm<AccountingRecordL
     }
     {
       // DropDownChoice page size
-      gridBuilder.newNestedPanel(DivType.COL_40);
+      gridBuilder.newSplitPanel(GridSize.COL33);
       addPageSizeFieldset();
     }
     {

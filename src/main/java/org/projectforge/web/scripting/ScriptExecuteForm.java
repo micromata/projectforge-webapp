@@ -139,7 +139,7 @@ public class ScriptExecuteForm extends AbstractStandardForm<ScriptDO, ScriptExec
   {
     super.init();
     prefillParameters();
-    gridBuilder.newGrid12();
+    gridBuilder.newGridPanel();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("scripting.script.name")).setNoLabelFor();
       fs.add(new DivTextPanel(fs.newChildId(), data.getName()));

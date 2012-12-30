@@ -29,6 +29,7 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.wicket.AbstractEditForm;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
@@ -52,7 +53,7 @@ public class MyAccountEditForm extends AbstractEditForm<PFUserDO, MyAccountEditP
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid6();
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // User
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("user")).setNoLabelFor();
@@ -66,7 +67,7 @@ public class MyAccountEditForm extends AbstractEditForm<PFUserDO, MyAccountEditP
     UserEditForm.createJIRAUsername(gridBuilder, data);
     final FieldsetPanel fs = gridBuilder.newFieldset(getString("user.assignedGroups")).setNoLabelFor();
     fs.add(new DivTextPanel(fs.newChildId(), userGroupCache.getGroupnames(data.getId())));
-    gridBuilder.newGrid6();
+    gridBuilder.newSplitPanel(GridSize.COL50);
     UserEditForm.createLastLoginAndDeleteAllStayLogins(gridBuilder, data, (UserDao) getBaseDao(), this);
     UserEditForm.createLocale(gridBuilder, data);
     UserEditForm.createDateFormat(gridBuilder, data);
@@ -75,7 +76,7 @@ public class MyAccountEditForm extends AbstractEditForm<PFUserDO, MyAccountEditP
     UserEditForm.createTimeZone(gridBuilder, data);
     UserEditForm.createPhoneIds(gridBuilder, data);
     UserEditForm.createMEBPhoneNumbers(gridBuilder, data);
-    gridBuilder.newGrid12();
+    gridBuilder.newGridPanel();
     UserEditForm.createDescription(gridBuilder, data);
   }
 

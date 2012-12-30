@@ -43,19 +43,17 @@ import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.joda.time.DateTime;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.address.AddressStatus;
 import org.projectforge.address.ContactStatus;
 import org.projectforge.address.FormOfAddress;
-import org.projectforge.address.PersonalAddressDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.EditPage;
-import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.FileUploadPanel;
 
@@ -68,9 +66,6 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
   private static final long serialVersionUID = -1691614676645602272L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressImportForm.class);
-
-  @SpringBean(name = "personalAddressDao")
-  private PersonalAddressDao personalAddressDao;
 
   private final List<FileUpload> uploads = new LinkedList<FileUpload>();
 
@@ -90,7 +85,7 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
   protected void onInitialize()
   {
     super.onInitialize();
-    gridBuilder.newGrid12().newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     final FieldsetPanel newFieldset = gridBuilder.newFieldset(getString("address.book.vCardImport.fileUploadPanel"));
 
     final FileUploadField uploadField = new FileUploadField(FileUploadPanel.WICKET_ID, new PropertyModel<List<FileUpload>>(this, "uploads"));

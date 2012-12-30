@@ -61,7 +61,7 @@ public class EmployeeSalaryEditForm extends AbstractEditForm<EmployeeSalaryDO, E
   {
     super.init();
     /* GRID16 - BLOCK */
-    gridBuilder.newGrid12();
+    gridBuilder.newGridPanel();
     {
       // Employee
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.employee"));

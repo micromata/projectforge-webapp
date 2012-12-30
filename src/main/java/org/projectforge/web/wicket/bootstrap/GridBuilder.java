@@ -29,7 +29,6 @@ import org.projectforge.web.BrowserScreenWidthType;
 import org.projectforge.web.wicket.MySession;
 import org.projectforge.web.wicket.flowlayout.AbstractGridBuilder;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldProperties;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.FormHeadingPanel;
@@ -228,66 +227,6 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
     setNullPanel(level + 1, level);
     return this;
   }
-
-  /**
-   * Generates new grid panel. For narrow screens a grid12 panel will be created.
-   * @return grid12 panel for narrow screens, otherwise grid6.
-   */
-  @Deprecated
-  public GridBuilder newGrid6()
-  {
-    return newGrid6(false);
-  }
-
-  /**
-   * Generates new grid panel. For narrow screens a grid12 panel will be created.
-   * @param clearfix If true then css class clearfix will be added.
-   * @return grid12 panel for narrow screens, otherwise grid6.
-   */
-  @Deprecated
-  public GridBuilder newGrid6(final boolean clearfix)
-  {
-    return newGridPanel(0, GridSize.SPAN6);
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#newGrid12()
-   */
-  @Deprecated
-  public GridBuilder newGrid12()
-  {
-    return newGrid12(false);
-  }
-
-  /**
-   * @return grid16 panel.
-   */
-  @Deprecated
-  public GridBuilder newGrid12(final boolean clearfix)
-  {
-    return newGrid(DivType.GRID12, clearfix);
-  }
-
-  @Deprecated
-  private GridBuilder newGrid(final DivType gridType, final boolean clearfix)
-  {
-    if (gridType == DivType.GRID12) {
-      return newGridPanel(0, GridSize.SPAN12);
-    } else {
-      return newGridPanel(0, GridSize.SPAN6);
-    }
-  }
-
-  /**
-   * @return new block panel.
-   * @deprecated does nothing (no replacement).
-   */
-  @Deprecated
-  public GridBuilder newBlockPanel()
-  {
-    return this;
-  }
-
   /**
    * @return new child id (Wicket id) of the current grid panel.
    */
@@ -302,57 +241,6 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
   public String newGridPanelId()
   {
     return gridPanel[currentLevel].newChildId();
-  }
-
-  /**
-   * If you need to implement isVisible() of DivPanel etc. you can use this method instead of {@link #newNestedRowPanel()}.
-   * @param colPanel Please use {@link #newRowId()} as component id.
-   * @return new columns panel for wide screens and gridPanel itself for all other screens.
-   */
-  @Deprecated
-  public GridBuilder addNestedRowPanel(final DivPanel nestedRowPanel)
-  {
-    return addRowPanel(1, nestedRowPanel);
-  }
-
-  /**
-   */
-  @Deprecated
-  public GridBuilder newNestedRowPanel()
-  {
-    return newRowPanel(0);
-  }
-
-  /**
-   * @param length {@link DivType#COL_25}, {@link DivType#COL_33}, ...
-   */
-  @Deprecated
-  public GridBuilder newNestedPanel(final DivType length)
-  {
-    return newGridPanel(0, getSize(length));
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#newRowChildPanelId()
-   */
-  @Deprecated
-  public String newRowChildPanelId()
-  {
-    return rowPanel[0].newChildId();
-  }
-
-  /**
-   * If you need to implement isVisible() of DivPanel etc. you can use this method instead of {@link #newNestedPanel(DivType)}.
-   * @param gridPanel Please use {@link #newRowChildPanelId()} as component id.
-   * @param length {@link DivType#COL_25}, {@link DivType#COL_33}, ... Please don't set the width directly to the given DivPanel because the
-   *          layout manager can't handle different screen resolutions anymore properly.
-   * @return new columns panel for wide screens and gridPanel itself for all other screens.
-   */
-  @Deprecated
-  public GridBuilder addRowChildPanel(final DivPanel gridPanel, final DivType length)
-  {
-    gridPanel.addCssClasses(length);
-    return addGridPanel(0, gridPanel);
   }
 
   /**
@@ -379,16 +267,6 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
     final FormHeadingPanel formHeading = new FormHeadingPanel(getPanel().newChildId(), label);
     getPanel().add(formHeading);
     return formHeading;
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#newSectionPanel()
-   * @deprecated no operation.
-   */
-  @Deprecated
-  public DivPanel newSectionPanel()
-  {
-    return getPanel();
   }
 
   public RepeatingView newRepeatingView()
@@ -473,25 +351,5 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
     for (int i = gridFromLevel; i <= MAX_LEVEL; i++) {
       gridPanel[i] = null;
     }
-  }
-
-  @SuppressWarnings("deprecation")
-  private GridSize getSize(final DivType divType)
-  {
-    GridSize size;
-    if (divType == DivType.COL_75) {
-      size = GridSize.SPAN9;
-    } else if (divType == DivType.COL_66 || divType == DivType.COL_60) {
-      size = GridSize.SPAN8;
-    } else if (divType == DivType.COL_50) {
-      size = GridSize.SPAN6;
-    } else if (divType == DivType.COL_40 || divType == DivType.COL_33) {
-      size = GridSize.SPAN4;
-    } else if (divType == DivType.COL_25) {
-      size = GridSize.SPAN3;
-    } else {
-      size = GridSize.SPAN12;
-    }
-    return size;
   }
 }

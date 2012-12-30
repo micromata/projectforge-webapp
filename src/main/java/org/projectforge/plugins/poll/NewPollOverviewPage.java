@@ -78,7 +78,7 @@ public class NewPollOverviewPage extends PollBasePage
       NewPollPage.redirectToNewPollPage(parameters);
       this.model = null;
     } else {
-      Integer id = new Integer(parameters.get("id").toString());
+      final Integer id = new Integer(parameters.get("id").toString());
       this.model = new NewPollFrontendModel(pollDao.getById(id));
       this.model.initModelByPoll();
     }
@@ -98,26 +98,24 @@ public class NewPollOverviewPage extends PollBasePage
   {
     super.onInitialize();
 
-    gridBuilder.newGrid6();
-
     final FieldsetPanel fsTitle = gridBuilder.newFieldset(getString("plugins.poll.new.title"), true).setLabelFor(this);
-    TextField<String> title = new TextField<String>(fsTitle.getTextFieldId(), new PropertyModel<String>(model.getPollDo(), "title"));
+    final TextField<String> title = new TextField<String>(fsTitle.getTextFieldId(), new PropertyModel<String>(model.getPollDo(), "title"));
     title.setEnabled(this.model.isExisting());
     fsTitle.add(title);
 
     final FieldsetPanel fsLocation = gridBuilder.newFieldset(getString("plugins.poll.new.location"), true).setLabelFor(this);
-    TextField<String> location = new TextField<String>(fsLocation.getTextFieldId(),
+    final TextField<String> location = new TextField<String>(fsLocation.getTextFieldId(),
         new PropertyModel<String>(model.getPollDo(), "location"));
     location.setEnabled(this.model.isExisting());
     fsLocation.add(location);
 
     final FieldsetPanel fsDescription = gridBuilder.newFieldset(getString("plugins.poll.new.description"), true).setLabelFor(this);
-    TextArea<String> description = new TextArea<String>(fsDescription.getTextAreaId(), new PropertyModel<String>(this.model.getPollDo(),
+    final TextArea<String> description = new TextArea<String>(fsDescription.getTextAreaId(), new PropertyModel<String>(this.model.getPollDo(),
         "description"));
     description.setEnabled(this.model.isExisting());
     fsDescription.add(description);
 
-    gridBuilder.newGrid12();
+    gridBuilder.newGridPanel();
 
     if (this.model.isExisting() == true) {
       createEnabledChoices();
@@ -161,10 +159,10 @@ public class NewPollOverviewPage extends PollBasePage
     final UsersProvider usersProvider = new UsersProvider();
     // User select
     final FieldsetPanel fsUserSelect = gridBuilder.newFieldset(getString("plugins.poll.attendee.users"), true);
-    MultiChoiceListHelper<PFUserDO> assignUsersListHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator())
+    final MultiChoiceListHelper<PFUserDO> assignUsersListHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator())
         .setFullList(usersProvider.getSortedUsers());
-    HashSet<PFUserDO> attendeess = new HashSet<PFUserDO>();
-    for (PollAttendeeDO attendee : model.getPollAttendeeList()) {
+    final HashSet<PFUserDO> attendeess = new HashSet<PFUserDO>();
+    for (final PollAttendeeDO attendee : model.getPollAttendeeList()) {
       if (attendee.getUser() != null) {
         attendeess.add(attendee.getUser());
       } else {

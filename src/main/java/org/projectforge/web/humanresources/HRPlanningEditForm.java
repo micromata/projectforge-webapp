@@ -315,7 +315,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
         // Don't show deleted/undeleted entries.
         continue;
       }
-      final ToggleContainerPanel positionsPanel = new ToggleContainerPanel(entriesRepeater.newChildId(), DivType.GRID12, DivType.ROUND_ALL);
+      final ToggleContainerPanel positionsPanel = new ToggleContainerPanel(entriesRepeater.newChildId());//, DivType.GRID12, DivType.ROUND_ALL);
       positionsPanel.getContainer().setOutputMarkupId(true);
       entriesRepeater.add(positionsPanel);
       String heading = escapeHtml(entry.getProjektNameOrStatus());
@@ -329,7 +329,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
       positionsPanel.setHeading(new HtmlCodePanel(ToggleContainerPanel.HEADING_ID, heading));
       content = new DivPanel(ToggleContainerPanel.CONTENT_ID);
       positionsPanel.add(content);
-      content.add(columns = new DivPanel(content.newChildId(), DivType.BLOCK));
+      content.add(columns = new DivPanel(content.newChildId()));//, DivType.BLOCK));
       {
         // DropDownChoice status / project
         final FieldsetPanel fs = new FieldsetPanel(columns, WicketUtils.createMultipleFieldsetLabel(getString("status"),
@@ -377,8 +377,8 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
 
         });
       }
-      content.add(columns = new DivPanel(content.newChildId(), DivType.COLUMNS));
-      columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_50));
+      content.add(columns = new DivPanel(content.newChildId()));//, DivType.COLUMNS));
+      columns.add(column = new DivPanel(columns.newChildId()));//, GridSize.COL50));
       {
         // DropDownChoice Priority
         final FieldsetPanel fs = new FieldsetPanel(column, getString("hr.planning.priority"));
@@ -388,7 +388,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
         priorityChoice.setNullValid(true).setEnabled(!entry.isDeleted());
         fs.add(priorityChoice);
       }
-      columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_50));
+      columns.add(column = new DivPanel(columns.newChildId(), GridSize.COL50));
       {
         // DropDownChoice probability
         final FieldsetPanel fs = new FieldsetPanel(column, getString("hr.planning.probability"));
@@ -403,8 +403,8 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
         probabilityChoice.setNullValid(true).setEnabled(!entry.isDeleted());
         fs.add(probabilityChoice);
       }
-      content.add(columns = new DivPanel(content.newChildId(), DivType.COLUMNS));
-      columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_50));
+      content.add(columns = new DivPanel(content.newChildId()));//, DivType.COLUMNS));
+      columns.add(column = new DivPanel(columns.newChildId()));//, GridSize.COL50));
       {
         // Hours
         final FieldsetPanel fs = new FieldsetPanel(column, getString("hours")).setNoLabelFor();
@@ -412,7 +412,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
         fs.add(table);
         table.init(entry);
       }
-      columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_50));
+      columns.add(column = new DivPanel(columns.newChildId(), GridSize.COL50));
       {
         // Description
         final FieldsetPanel fs = new FieldsetPanel(column, getString("hr.planning.description"), true);
@@ -429,10 +429,10 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
     if (getBaseDao().hasInsertAccess(getUser()) == true && showDeletedOnly == false) {
       if (content == null) {
         // No entries
-        content = new DivPanel(entriesRepeater.newChildId(), DivType.GRID12, DivType.ROUND_ALL);
+        content = new DivPanel(entriesRepeater.newChildId());//, DivType.GRID12, DivType.ROUND_ALL);
         entriesRepeater.add(content);
       }
-      content.add(columns = new DivPanel(content.newChildId(), DivType.BLOCK, DivType.CLEARFIX));
+      content.add(columns = new DivPanel(content.newChildId()));//, DivType.BLOCK, DivType.CLEARFIX));
       final Button addEntryButton = new Button(SingleButtonPanel.WICKET_ID) {
         @Override
         public final void onSubmit()

@@ -30,10 +30,10 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.fibu.EmployeeSalaryDao;
 import org.projectforge.fibu.EmployeeSalaryFilter;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.YearListCoiceRenderer;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class EmployeeSalaryListForm extends AbstractListForm<EmployeeSalaryFilter, EmployeeSalaryListPage>
@@ -49,9 +49,8 @@ public class EmployeeSalaryListForm extends AbstractListForm<EmployeeSalaryFilte
   protected void init()
   {
     super.init();
-    gridBuilder.newNestedRowPanel();
     {
-      gridBuilder.newNestedPanel(DivType.COL_60);
+      gridBuilder.newSplitPanel(GridSize.COL66);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true);
       // DropDownChoice years
       final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(employeeSalaryDao.getYears(), true);
@@ -68,7 +67,7 @@ public class EmployeeSalaryListForm extends AbstractListForm<EmployeeSalaryFilte
     }
     {
       // DropDownChoice page size
-      gridBuilder.newNestedPanel(DivType.COL_40);
+      gridBuilder.newSplitPanel(GridSize.COL33);
       addPageSizeFieldset();
     }
   }

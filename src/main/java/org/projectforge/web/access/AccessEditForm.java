@@ -55,7 +55,7 @@ public class AccessEditForm extends AbstractEditForm<GroupTaskAccessDO, AccessEd
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid12();
+    gridBuilder.newGridPanel();
     {
       // Task
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task"));

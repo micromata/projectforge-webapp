@@ -74,8 +74,8 @@ public class ScriptingForm extends AbstractStandardForm<ScriptDO, ScriptingPage>
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid12();
-    reportPathPanel = gridBuilder.newSectionPanel();
+    gridBuilder.newGridPanel();
+    reportPathPanel = gridBuilder.getPanel();
     reportPathPanel.add(new Heading1Panel(reportPathPanel.newChildId(), new Model<String>() {
       /**
        * @see org.apache.wicket.model.Model#getObject()

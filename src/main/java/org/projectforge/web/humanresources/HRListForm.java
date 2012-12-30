@@ -32,11 +32,11 @@ import org.projectforge.humanresources.HRFilter;
 import org.projectforge.web.calendar.QuickSelectWeekPanel;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.HtmlCommentPanel;
 
@@ -61,9 +61,8 @@ public class HRListForm extends AbstractListForm<HRFilter, HRListPage>
   {
     final HRFilter filter = getSearchFilter();
     super.init();
-    gridBuilder.newNestedRowPanel();
     {
-      gridBuilder.newNestedPanel(DivType.COL_60);
+      gridBuilder.newSplitPanel(GridSize.COL66);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("timePeriod"), true);
       startDate = new DatePanel(fs.newChildId(),  new PropertyModel<Date>(filter, "startTime"),
           DatePanelSettings.get().withSelectPeriodMode(true).withRequired(true));
@@ -100,10 +99,10 @@ public class HRListForm extends AbstractListForm<HRFilter, HRListPage>
     }
     {
       // DropDownChoice page size
-      gridBuilder.newNestedPanel(DivType.COL_40);
+      gridBuilder.newSplitPanel(GridSize.COL33);
       addPageSizeFieldset();
     }
-    gridBuilder.newBlockPanel();
+    gridBuilder.newGridPanel();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();

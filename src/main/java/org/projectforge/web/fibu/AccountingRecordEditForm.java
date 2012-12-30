@@ -36,6 +36,7 @@ import org.projectforge.fibu.kost.SHType;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.I18nEnumAutoCompleteTextField;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
@@ -64,7 +65,7 @@ public class AccountingRecordEditForm extends AbstractEditForm<BuchungssatzDO, A
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid6();
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Date
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("date"));
@@ -124,7 +125,7 @@ public class AccountingRecordEditForm extends AbstractEditForm<BuchungssatzDO, A
       WicketUtils.setReadonly(belegField);
       fs.add(belegField);
     }
-    gridBuilder.newGrid6();
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Cost 1 / cost2
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost1") + "/" + getString("fibu.kost2"), true);
@@ -165,7 +166,7 @@ public class AccountingRecordEditForm extends AbstractEditForm<BuchungssatzDO, A
       WicketUtils.setReadonly(mengeField);
       fs.add(mengeField);
     }
-    gridBuilder.newGrid12();
+    gridBuilder.newGridPanel();
     {
       // Comment
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));

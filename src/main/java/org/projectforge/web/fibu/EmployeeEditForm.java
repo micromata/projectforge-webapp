@@ -34,6 +34,7 @@ import org.projectforge.fibu.kost.Kost1DO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
@@ -59,7 +60,7 @@ public class EmployeeEditForm extends AbstractEditForm<EmployeeDO, EmployeeEditP
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid6();
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // User
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.employee.user"));
@@ -94,7 +95,7 @@ public class EmployeeEditForm extends AbstractEditForm<EmployeeDO, EmployeeEditP
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("address.positionText"));
       fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "position")));
     }
-    gridBuilder.newGrid6();
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Weekly hours
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.employee.wochenstunden"));
@@ -115,7 +116,7 @@ public class EmployeeEditForm extends AbstractEditForm<EmployeeDO, EmployeeEditP
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.employee.austrittsdatum"));
       fs.add(new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "austrittsDatum"), new DatePanelSettings()));
     }
-    gridBuilder.newGrid12();
+    gridBuilder.newGridPanel();
     {
       // Comment
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));

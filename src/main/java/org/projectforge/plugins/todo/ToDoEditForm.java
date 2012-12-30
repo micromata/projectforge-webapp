@@ -54,6 +54,7 @@ import org.projectforge.web.user.GroupSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
@@ -64,7 +65,6 @@ import org.projectforge.web.wicket.flowlayout.ButtonPanel;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 import org.projectforge.web.wicket.flowlayout.DialogPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 
@@ -129,7 +129,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
     }
 
     /* GRID16 - BLOCK */
-    gridBuilder.newGrid12();
+    gridBuilder.newGridPanel();
     if (isNew() == true) {
       // Favorites
       final String[] templateNames = userPrefDao.getPrefNames(ToDoPlugin.USER_PREF_AREA);
@@ -195,7 +195,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
       }
       fs.add(subject);
     }
-    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // ToDo type
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.todo.type"));
@@ -217,7 +217,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
           java.sql.Date.class)));
     }
 
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Priority
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("priority"));
@@ -252,7 +252,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
       fs.add(reporterUserSelectPanel);
       reporterUserSelectPanel.init();
     }
-    gridBuilder.newBlockPanel();
+    gridBuilder.newGridPanel();
     {
       // Task
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task"), true);

@@ -26,10 +26,10 @@ package org.projectforge.plugins.banking;
 import org.apache.log4j.Logger;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.AbstractEditForm;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
@@ -52,7 +52,7 @@ public class BankAccountEditForm extends AbstractEditForm<BankAccountDO, BankAcc
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid12().newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Name
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.banking.account.name"));
@@ -63,7 +63,7 @@ public class BankAccountEditForm extends AbstractEditForm<BankAccountDO, BankAcc
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.banking.account.number"));
       fs.add(new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "accountNumber")));
     }
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Bank
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.banking.bank"));
@@ -74,7 +74,7 @@ public class BankAccountEditForm extends AbstractEditForm<BankAccountDO, BankAcc
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.banking.bankIdentificationCode"));
       fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "bankIdentificationCode")));
     }
-    gridBuilder.newNestedRowPanel();
+    gridBuilder.newGridPanel();
     {
       // Text description
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"));

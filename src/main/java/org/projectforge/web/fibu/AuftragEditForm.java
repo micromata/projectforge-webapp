@@ -78,7 +78,6 @@ import org.projectforge.web.wicket.converter.CurrencyConverter;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.HtmlCodePanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
@@ -328,13 +327,13 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       }
       content = new DivPanel(ToggleContainerPanel.CONTENT_ID);
       positionsPanel.add(content);
-      content.add(columns = new DivPanel(content.newChildId(), DivType.BLOCK));
+      content.add(columns = new DivPanel(content.newChildId()));
       {
         final FieldsetPanel fs = new FieldsetPanel(columns, getString("fibu.auftrag.titel"));
         fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(position, "titel")));
       }
-      content.add(columns = new DivPanel(content.newChildId(), DivType.COLUMNS));
-      columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_33));
+      content.add(columns = new DivPanel(content.newChildId()));
+      columns.add(column = new DivPanel(columns.newChildId(), GridSize.COL33));
       {
         // DropDownChoice type
         final FieldsetPanel fs = new FieldsetPanel(column, getString("fibu.auftrag.position.art"));
@@ -346,14 +345,14 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         artChoice.setRequired(true);
         fs.add(artChoice);
       }
-      columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_33));
+      columns.add(column = new DivPanel(columns.newChildId(), GridSize.COL33));
       {
         // Person days
         final FieldsetPanel fs = new FieldsetPanel(column, getString("projectmanagement.personDays"));
         fs.add(new MinMaxNumberField<BigDecimal>(InputPanel.WICKET_ID, new PropertyModel<BigDecimal>(position, "personDays"),
             BigDecimal.ZERO, MAX_PERSON_DAYS));
       }
-      columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_33));
+      columns.add(column = new DivPanel(columns.newChildId(), GridSize.COL33));
       {
         // Net sum
         final FieldsetPanel fs = new FieldsetPanel(column, getString("fibu.auftrag.nettoSumme"));
@@ -369,8 +368,8 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
           fs.setWarningBackground();
         }
       }
-      content.add(columns = new DivPanel(content.newChildId(), DivType.COLUMNS));
-      columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_33));
+      content.add(columns = new DivPanel(content.newChildId()));
+      columns.add(column = new DivPanel(columns.newChildId(), GridSize.COL33));
       final Set<RechnungsPositionVO> orderPositions = rechnungCache.getRechnungsPositionVOSetByAuftragsPositionId(position.getId());
       final boolean showInvoices = CollectionUtils.isNotEmpty(orderPositions);
       {
@@ -384,7 +383,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
           fs.add(AbstractUnsecureBasePage.createInvisibleDummyComponent(fs.newChildId()));
         }
       }
-      columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_33));
+      columns.add(column = new DivPanel(columns.newChildId(), GridSize.COL33));
       {
         // invoiced
         final FieldsetPanel fs = new FieldsetPanel(column, getString("fibu.fakturiert"), true).setNoLabelFor();
@@ -399,7 +398,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
               getString("fibu.auftrag.vollstaendigFakturiert")));
         }
       }
-      columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_33));
+      columns.add(column = new DivPanel(columns.newChildId(), GridSize.COL33));
       {
         // DropDownChoice status
         final FieldsetPanel fs = new FieldsetPanel(column, getString("status"));
@@ -414,7 +413,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
           fs.setWarningBackground();
         }
       }
-      content.add(columns = new DivPanel(content.newChildId(), DivType.COLUMNS));
+      content.add(columns = new DivPanel(content.newChildId()));
       {
         // Task
         final FieldsetPanel fs = new FieldsetPanel(columns, getString("task"));
@@ -437,7 +436,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       }
     }
     if (hasInsertAccess == true) {
-      content.add(columns = new DivPanel(content.newChildId(), DivType.BLOCK));
+      content.add(columns = new DivPanel(content.newChildId()));
       final Button addPositionButton = new Button(SingleButtonPanel.WICKET_ID) {
         @Override
         public final void onSubmit()

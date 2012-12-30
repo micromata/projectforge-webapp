@@ -72,7 +72,7 @@ public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdat
   {
     addFeedbackPanel();
     gridBuilder = newGridBuilder(this, "flowform");
-    gridBuilder.newGrid12();
+    gridBuilder.newGridPanel();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset("Show all");
       final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();

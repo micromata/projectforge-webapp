@@ -51,7 +51,7 @@ public abstract class BusinessAssessment4Fieldset implements Serializable
   @SuppressWarnings("serial")
   public BusinessAssessment4Fieldset(final GridBuilder gridBuilder)
   {
-    gridBuilder.newBlockPanel();
+    gridBuilder.newGridPanel();
     final FieldsetPanel fs = new FieldsetPanel(gridBuilder.getPanel(), gridBuilder.getString("fibu.businessAssessment"), true) {
       @Override
       public boolean isVisible() {
@@ -110,7 +110,7 @@ public abstract class BusinessAssessment4Fieldset implements Serializable
     icon.setMarkupId("hideBusinessAssessment").setOutputMarkupId(true);
     repeater.add(icon);
 
-    gridBuilder.newBlockPanel();
+    gridBuilder.newGridPanel();
     final DivPanel businessAssessmentPanel = gridBuilder.getPanel();
     businessAssessmentPanel.setMarkupId("businessAssessment");
     businessAssessmentPanel.add(AttributeModifier.append("style", "display: none;"));

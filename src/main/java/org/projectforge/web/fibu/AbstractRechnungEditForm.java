@@ -77,7 +77,6 @@ import org.projectforge.web.wicket.flowlayout.ButtonType;
 import org.projectforge.web.wicket.flowlayout.DialogPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.HtmlCodePanel;
 import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
@@ -300,7 +299,7 @@ extends AbstractEditForm<O, P>
         }
       });
     }
-    gridBuilder.clear().newSubSplitPanel(GridSize.COL50);
+    gridBuilder.clear().newSplitPanel(GridSize.COL50, true).newSubSplitPanel(GridSize.COL50);
     {
       // Bezahldatum
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.bezahlDatum"));
@@ -417,13 +416,13 @@ extends AbstractEditForm<O, P>
       }
       content = new DivPanel(ToggleContainerPanel.CONTENT_ID);
       positionsPanel.add(content);
-      content.add(columns = new DivPanel(content.newChildId(), DivType.BLOCK));
-      final DivType divType = (rechnungsPosition != null) ? DivType.COL_25 : DivType.COL_33;
+      content.add(columns = new DivPanel(content.newChildId()));
+      final GridSize gridSize = (rechnungsPosition != null) ? GridSize.COL25 : GridSize.COL33;
       {
-        columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_50));
+        columns.add(column = new DivPanel(columns.newChildId(), GridSize.COL50));
         if (rechnungsPosition != null) {
           // Order
-          column.add(subcolumn = new DivPanel(column.newChildId(), DivType.COL_25));
+          column.add(subcolumn = new DivPanel(column.newChildId(), GridSize.COL25));
           final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.auftrag"), true).setLabelSide(false);
           fieldset.add(new InputPanel(fieldset.newChildId(), new AuftragsPositionFormComponent(InputPanel.WICKET_ID,
               new PropertyModel<AuftragsPositionDO>(position, "auftragsPosition"), false)));
@@ -453,7 +452,7 @@ extends AbstractEditForm<O, P>
         }
         {
           // Menge
-          column.add(subcolumn = new DivPanel(column.newChildId(), divType));
+          column.add(subcolumn = new DivPanel(column.newChildId(), gridSize));
           final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.rechnung.menge")).setLabelSide(false);
           final TextField<BigDecimal> amountTextField = new MinMaxNumberField<BigDecimal>(InputPanel.WICKET_ID,
               new PropertyModel<BigDecimal>(position, "menge"), BigDecimal.ZERO, NumberHelper.BILLION);
@@ -468,7 +467,7 @@ extends AbstractEditForm<O, P>
         }
         {
           // Net price
-          column.add(subcolumn = new DivPanel(column.newChildId(), divType));
+          column.add(subcolumn = new DivPanel(column.newChildId(), gridSize));
           final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.rechnung.position.einzelNetto")).setLabelSide(false);
           final TextField<BigDecimal> netTextField = new TextField<BigDecimal>(InputPanel.WICKET_ID, new PropertyModel<BigDecimal>(
               position, "einzelNetto")) {
@@ -490,7 +489,7 @@ extends AbstractEditForm<O, P>
         }
         {
           // VAT
-          column.add(subcolumn = new DivPanel(column.newChildId(), divType));
+          column.add(subcolumn = new DivPanel(column.newChildId(), gridSize));
           final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.rechnung.mehrwertSteuerSatz")).setLabelSide(false);
           final TextField<BigDecimal> vatTextField = new MinMaxNumberField<BigDecimal>(InputPanel.WICKET_ID, new PropertyModel<BigDecimal>(
               position, "vat"), BigDecimal.ZERO, NumberHelper.HUNDRED) {
@@ -512,8 +511,8 @@ extends AbstractEditForm<O, P>
         }
       }
       {
-        columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_50));
-        column.add(subcolumn = new DivPanel(column.newChildId(), DivType.COL_33));
+        columns.add(column = new DivPanel(columns.newChildId(), GridSize.COL50));
+        column.add(subcolumn = new DivPanel(column.newChildId(), GridSize.COL33));
         {
           final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.common.netto")).setLabelSide(false).setNoLabelFor();
           final TextPanel netTextPanel = new TextPanel(fieldset.newChildId(), new Model<String>() {
@@ -528,7 +527,7 @@ extends AbstractEditForm<O, P>
         }
       }
       {
-        column.add(subcolumn = new DivPanel(column.newChildId(), DivType.COL_33));
+        column.add(subcolumn = new DivPanel(column.newChildId(), GridSize.COL33));
         {
           final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.common.vatAmount")).setLabelSide(false)
               .setNoLabelFor();
@@ -544,7 +543,7 @@ extends AbstractEditForm<O, P>
         }
       }
       {
-        column.add(subcolumn = new DivPanel(column.newChildId(), DivType.COL_33));
+        column.add(subcolumn = new DivPanel(column.newChildId(), GridSize.COL33));
         {
           final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.common.brutto")).setLabelSide(false).setNoLabelFor();
           final TextPanel grossTextPanel = new TextPanel(fieldset.newChildId(), new Model<String>() {
@@ -558,11 +557,11 @@ extends AbstractEditForm<O, P>
           ajaxUpdatePositionComponents.add(grossTextPanel.getLabel4Ajax());
         }
       }
-      content.add(columns = new DivPanel(content.newChildId(), DivType.BLOCK));
+      content.add(columns = new DivPanel(content.newChildId()));
       {
         // Text
         if (costConfigured == true) {
-          columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_50));
+          columns.add(column = new DivPanel(columns.newChildId(), GridSize.COL50));
         } else {
           columns.add(column = new DivPanel(columns.newChildId())); // Full width.
         }
@@ -573,14 +572,14 @@ extends AbstractEditForm<O, P>
       if (costConfigured == true) {
         {
           // Cost assignments
-          columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_50));
+          columns.add(column = new DivPanel(columns.newChildId(), GridSize.COL50));
           {
-            column.add(subcolumn = new DivPanel(column.newChildId(), DivType.COL_50));
+            column.add(subcolumn = new DivPanel(column.newChildId(), GridSize.COL50));
             final RechnungCostTablePanel costTable = new RechnungCostTablePanel(subcolumn.newChildId(), position);
             subcolumn.add(costTable);
             ajaxUpdatePositionComponents.add(costTable.refresh().getTable());
 
-            column.add(subcolumn = new DivPanel(column.newChildId(), DivType.COL_50));
+            column.add(subcolumn = new DivPanel(column.newChildId(), GridSize.COL50));
             final BigDecimal fehlbetrag = position.getKostZuweisungNetFehlbetrag();
             if (hasInsertAccess == true) {
               ButtonType buttonType;
@@ -615,7 +614,7 @@ extends AbstractEditForm<O, P>
       }
     }
     if (hasInsertAccess == true) {
-      content.add(columns = new DivPanel(content.newChildId(), DivType.BLOCK));
+      content.add(columns = new DivPanel(content.newChildId()));
       columns.add(column = new DivPanel(columns.newChildId())); // Full width.
       final Button addPositionButton = new Button(SingleButtonPanel.WICKET_ID) {
         @Override

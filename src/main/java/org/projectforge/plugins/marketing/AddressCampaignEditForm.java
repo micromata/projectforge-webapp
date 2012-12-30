@@ -56,7 +56,6 @@ public class AddressCampaignEditForm extends AbstractEditForm<AddressCampaignDO,
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid12();
     {
       // Title
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("title"));

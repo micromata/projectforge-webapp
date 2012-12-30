@@ -26,8 +26,8 @@ package org.projectforge.web.fibu;
 import org.apache.log4j.Logger;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class ProjektListForm extends AbstractListForm<ProjektListFilter, ProjektListPage>
@@ -40,9 +40,8 @@ public class ProjektListForm extends AbstractListForm<ProjektListFilter, Projekt
   protected void init()
   {
     super.init();
-    gridBuilder.newNestedRowPanel();
     {
-      gridBuilder.newNestedPanel(DivType.COL_60);
+      gridBuilder.newSplitPanel(GridSize.COL66);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"));
       // DropDownChoice listType
       final LabelValueChoiceRenderer<String> typeChoiceRenderer = new LabelValueChoiceRenderer<String>();
@@ -55,7 +54,7 @@ public class ProjektListForm extends AbstractListForm<ProjektListFilter, Projekt
     }
     {
       // DropDownChoice page size
-      gridBuilder.newNestedPanel(DivType.COL_40);
+      gridBuilder.newSplitPanel(GridSize.COL33);
       addPageSizeFieldset();
     }
   }

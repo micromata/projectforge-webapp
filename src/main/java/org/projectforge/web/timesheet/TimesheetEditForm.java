@@ -220,7 +220,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
       }
     });
     parentPage.preInit();
-    gridBuilder.newGrid12();
+    gridBuilder.newGridPanel();
     if (isNew() == true) {
       addTemplatesRow();
     } else {

@@ -65,7 +65,6 @@ import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 
 /**
  * 
@@ -284,7 +283,7 @@ public class HRListPage extends AbstractListPage<HRListForm, HRDao, HRViewUserDa
   @Override
   protected void addBottomPanel(final String id)
   {
-    final DivPanel panel = new DivPanel(id, DivType.GRID12, DivType.BOX, DivType.ROUND_ALL);
+    final DivPanel panel = new DivPanel(id);// DivType.GRID12, DivType.BOX, DivType.ROUND_ALL);
     form.add(panel);
     resourceLinkPanel = new HRListResourceLinkPanel(DivPanel.CHILD_ID, this, hrDao, userFormatter) {
       @Override

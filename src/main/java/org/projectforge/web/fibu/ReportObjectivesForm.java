@@ -88,7 +88,7 @@ public class ReportObjectivesForm extends AbstractStandardForm<ReportObjectivesF
       }
     });
     filter = getFilter();
-    gridBuilder.newGrid12();
+    gridBuilder.newGridPanel();
     {
       final FieldsetPanel fs = new FieldsetPanel(gridBuilder.getPanel(), getString("file"), "*.xml", true) {
         @Override

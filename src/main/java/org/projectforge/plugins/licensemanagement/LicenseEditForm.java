@@ -41,6 +41,7 @@ import org.projectforge.web.user.UsersProvider;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteMaxLengthTextField;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
@@ -49,7 +50,6 @@ import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 
@@ -80,7 +80,6 @@ public class LicenseEditForm extends AbstractEditForm<LicenseDO, LicenseEditPage
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid12();
     {
       // Organization
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("organization"));
@@ -156,7 +155,7 @@ public class LicenseEditForm extends AbstractEditForm<LicenseDO, LicenseEditPage
           new PropertyModel<Collection<PFUserDO>>(this.assignOwnersListHelper, "assignedItems"), usersProvider);
       fs.add(ownersChoice);
     }
-    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Valid since
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.licensemanagement.validSince"));
@@ -164,7 +163,7 @@ public class LicenseEditForm extends AbstractEditForm<LicenseDO, LicenseEditPage
           .get().withTargetType(java.sql.Date.class).withSelectProperty("validSince"));
       fs.add(validSinceDatePanel);
     }
-    gridBuilder.newNestedPanel(DivType.COL_40);
+    gridBuilder.newSplitPanel(GridSize.COL33);
     {
       // Valid until
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.licensemanagement.validUntil"));
@@ -172,7 +171,7 @@ public class LicenseEditForm extends AbstractEditForm<LicenseDO, LicenseEditPage
           .get().withTargetType(java.sql.Date.class).withSelectProperty("validUntil"));
       fs.add(validUntilDatePanel);
     }
-    gridBuilder.newNestedRowPanel();
+    gridBuilder.newGridPanel();
     {
       // License holder
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.licensemanagement.licenseHolder"), true);

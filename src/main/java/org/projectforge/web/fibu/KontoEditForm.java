@@ -54,7 +54,7 @@ public class KontoEditForm extends AbstractEditForm<KontoDO, KontoEditPage>
   {
     super.init();
     /* GRID16 - BLOCK */
-    gridBuilder.newGrid12();
+    gridBuilder.newGridPanel();
     {
       // Number
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.konto.nummer"));

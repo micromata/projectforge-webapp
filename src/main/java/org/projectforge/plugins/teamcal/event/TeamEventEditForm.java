@@ -61,6 +61,7 @@ import org.projectforge.web.timesheet.TimesheetEditPage;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteMaxLengthTextField;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.DateTimePanel;
@@ -136,7 +137,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     super.init();
     final Recur recur = data.getRecurrenceObject();
     recurrenceData = new TeamEventRecurrenceData(recur, PFUserContext.getTimeZone());
-    gridBuilder.newGrid6();
+    gridBuilder.newSplitPanel(GridSize.COL50);
     final TeamCalDO teamCal = data.getCalendar();
     // setting access view
     if (isNew() == true || teamCal.getOwner() == null) {
@@ -190,7 +191,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       if (access == false)
         fieldSet.setEnabled(false);
     }
-    gridBuilder.newGrid6();
+    gridBuilder.newSplitPanel(GridSize.COL50);
     // add date panel
     initDatePanel();
     {
@@ -222,7 +223,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     // ///////////////////////////////
     // Recurrence
     // ///////////////////////////////
-    gridBuilder.newGrid6();
+    gridBuilder.newSplitPanel(GridSize.COL50);
     gridBuilder.newFormHeading(getString("plugins.teamcal.event.recurrence"));
     {
       // Recurrence interval type:
@@ -312,10 +313,10 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     {
       // customized yearly: month of year and see day of month.
     }
-    gridBuilder.newGrid6();
+    gridBuilder.newSplitPanel(GridSize.COL50);
     gridBuilder.newFormHeading(getString("plugins.teamcal.attendees"));
     setRecurrenceComponentsVisibility(null);
-    gridBuilder.newGrid6();
+    gridBuilder.newSplitPanel(GridSize.COL50);
     gridBuilder.newFormHeading(getString("plugins.teamcal.event.reminder"));
     setRecurrenceComponentsVisibility(null);
 

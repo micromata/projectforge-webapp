@@ -37,10 +37,10 @@ import org.projectforge.fibu.AuftragsPositionsArt;
 import org.projectforge.fibu.AuftragsStatistik;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.WebConstants;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.YearListCoiceRenderer;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.TextStyle;
 
@@ -60,9 +60,8 @@ public class AuftragListForm extends AbstractListForm<AuftragListFilter, Auftrag
   protected void init()
   {
     super.init();
-    gridBuilder.newNestedRowPanel();
     {
-      gridBuilder.newNestedPanel(DivType.COL_60);
+      gridBuilder.newSplitPanel(GridSize.COL66);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true);
 
       // DropDownChoice years
@@ -133,13 +132,13 @@ public class AuftragListForm extends AbstractListForm<AuftragListFilter, Auftrag
     }
     {
       // DropDownChoice page size
-      gridBuilder.newNestedPanel(DivType.COL_40);
+      gridBuilder.newSplitPanel(GridSize.COL33);
       addPageSizeFieldset();
     }
 
     {
       // Statistics
-      gridBuilder.newBlockPanel();
+      gridBuilder.newGridPanel();
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("statistics"), true).setNoLabelFor();
       fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
         @Override

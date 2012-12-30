@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -64,8 +65,7 @@ public class TeamCalListForm extends AbstractListForm<TeamCalFilter, TeamCalList
   protected void init()
   {
     super.init();
-    gridBuilder.newNestedRowPanel();
-    gridBuilder.newNestedPanel(DivType.COL_66);
+    gridBuilder.newSplitPanel(GridSize.COL66);
     // getSearchFilter().setOwnerId(getUserId());
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
@@ -129,7 +129,7 @@ public class TeamCalListForm extends AbstractListForm<TeamCalFilter, TeamCalList
     }
     {
       // DropDownChoice page size
-      gridBuilder.newNestedPanel(DivType.COL_33);
+      gridBuilder.newSplitPanel(GridSize.COL33);
       addPageSizeFieldset();
     }
   }

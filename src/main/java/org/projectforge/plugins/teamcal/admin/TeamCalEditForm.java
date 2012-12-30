@@ -40,6 +40,7 @@ import org.projectforge.web.user.UsersComparator;
 import org.projectforge.web.user.UsersProvider;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.JodaDatePanel;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
@@ -87,7 +88,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
   {
     super.init();
 
-    gridBuilder.newGrid6();
+    gridBuilder.newSplitPanel(GridSize.COL50);
 
     // checking visibility rights
     final TeamCalRight right = new TeamCalRight();
@@ -118,7 +119,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       }
     }
 
-    gridBuilder.newGrid6();
+    gridBuilder.newSplitPanel(GridSize.COL50);
     // set owner
     {
       if (data.getOwner() == null) {
@@ -136,7 +137,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
     }
 
     if (access == true) {
-      gridBuilder.newGrid6(true);
+      gridBuilder.newSplitPanel(GridSize.COL50);
       // set access users
       {
         // Full access users
@@ -188,7 +189,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
         fs.add(users);
       }
 
-      gridBuilder.newGrid6();
+      gridBuilder.newSplitPanel(GridSize.COL50);
       // set access groups
       {
         // Full access groups

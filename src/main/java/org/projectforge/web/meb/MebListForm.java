@@ -28,7 +28,7 @@ import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.wicket.AbstractListForm;
-import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.TextPanel;
 
@@ -42,16 +42,15 @@ public class MebListForm extends AbstractListForm<MebListFilter, MebListPage>
   protected void init()
   {
     super.init();
-    gridBuilder.newNestedRowPanel();
     {
-      gridBuilder.newNestedPanel(DivType.COL_60);
+      gridBuilder.newSplitPanel(GridSize.COL66);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.hint")).setNoLabelFor();
       fs.add(new TextPanel(fs.newChildId(), PFUserContext.getLocalizedMessage("meb.intro",
           Configuration.getInstance().getStringValue(ConfigurationParam.MEB_SMS_RECEIVING_PHONE_NUMBER))));
     }
     {
       // DropDownChoice page size
-      gridBuilder.newNestedPanel(DivType.COL_40);
+      gridBuilder.newSplitPanel(GridSize.COL33);
       addPageSizeFieldset();
     }
   }

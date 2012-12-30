@@ -59,7 +59,7 @@ public class Kost2ArtEditForm extends AbstractEditForm<Kost2ArtDO, Kost2ArtEditP
   protected void init()
   {
     super.init();
-    gridBuilder.newGrid12();
+    gridBuilder.newGridPanel();
     {
       // Number
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost2art.nummer"));

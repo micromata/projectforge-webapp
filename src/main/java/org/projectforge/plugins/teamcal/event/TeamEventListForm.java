@@ -42,12 +42,12 @@ import org.projectforge.web.calendar.QuickSelectPanel;
 import org.projectforge.web.common.MultiChoiceListHelper;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.HtmlCommentPanel;
 import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
@@ -117,8 +117,7 @@ public class TeamEventListForm extends AbstractListForm<TeamEventFilter, TeamEve
         }
       }
     });
-    gridBuilder.newNestedRowPanel();
-    gridBuilder.newNestedPanel(DivType.COL_66);
+    gridBuilder.newSplitPanel(GridSize.COL66);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
       fs.setOutputMarkupId(true);
@@ -176,7 +175,7 @@ public class TeamEventListForm extends AbstractListForm<TeamEventFilter, TeamEve
     }
     {
       // DropDownChoice page size
-      gridBuilder.newNestedPanel(DivType.COL_33);
+      gridBuilder.newSplitPanel(GridSize.COL33);
       addPageSizeFieldset();
     }
     {

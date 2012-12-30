@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.wicket.AbstractListForm;
-import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class UserPrefListForm extends AbstractListForm<UserPrefListFilter, UserPrefListPage>
@@ -40,9 +40,8 @@ public class UserPrefListForm extends AbstractListForm<UserPrefListFilter, UserP
   protected void init()
   {
     super.init();
-    gridBuilder.newNestedRowPanel();
     {
-      gridBuilder.newNestedPanel(DivType.COL_60);
+      gridBuilder.newSplitPanel(GridSize.COL66);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"));
       // DropDownChoice area
       final DropDownChoice<UserPrefArea> areaDropDownChoice = UserPrefEditForm.createAreaDropdownChoice(this, fs.getDropDownChoiceId(),
@@ -51,7 +50,7 @@ public class UserPrefListForm extends AbstractListForm<UserPrefListFilter, UserP
     }
     {
       // DropDownChoice page size
-      gridBuilder.newNestedPanel(DivType.COL_40);
+      gridBuilder.newSplitPanel(GridSize.COL33);
       addPageSizeFieldset();
     }
   }

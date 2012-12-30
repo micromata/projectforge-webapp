@@ -40,6 +40,7 @@ import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.WicketApplication;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
@@ -81,7 +82,7 @@ public class AdminForm extends AbstractForm<AdminForm, AdminPage>
 
     gridBuilder = newGridBuilder(this, "flowform");
 
-    gridBuilder.newGrid6().newBlockPanel();
+    gridBuilder.newSplitPanel(GridSize.COL50);
     gridBuilder.newFormHeading(getString("system.admin.group.title.systemChecksAndFunctionality"));
     final Configuration cfg = Configuration.getInstance();
     {
@@ -189,7 +190,7 @@ public class AdminForm extends AbstractForm<AdminForm, AdminPage>
           AppVersion.NUMBER)));
     }
 
-    gridBuilder.newGrid6().newBlockPanel();
+    gridBuilder.newSplitPanel(GridSize.COL50);
     gridBuilder.newFormHeading(getString("system.admin.group.title.databaseActions"));
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.group.title.databaseActions.userprefs"), true)
@@ -282,7 +283,7 @@ public class AdminForm extends AbstractForm<AdminForm, AdminPage>
       fs.add(new SingleButtonPanel(fs.newChildId(), button, "BookDO", SingleButtonPanel.GREY));
     }
 
-    gridBuilder.newGrid12().newBlockPanel();
+    gridBuilder.newGridPanel();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.group.title.misc.logEntries"), true);
       final MaxLengthTextArea logEntries = new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(this, "logEntries"),
@@ -301,8 +302,8 @@ public class AdminForm extends AbstractForm<AdminForm, AdminPage>
         }
       }.getButtonPanel());
     }
-    gridBuilder.newBlockPanel();
-    final DivPanel section = gridBuilder.newSectionPanel();
+    gridBuilder.newGridPanel();
+    final DivPanel section = gridBuilder.getPanel();
     final DivTextPanel logMessages = new DivTextPanel(section.newChildId(), new Model<String>() {
       @Override
       public String getObject()

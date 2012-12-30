@@ -29,9 +29,9 @@ import org.apache.wicket.model.PropertyModel;
 import org.projectforge.user.GroupFilter;
 import org.projectforge.user.Login;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class GroupListForm extends AbstractListForm<GroupFilter, GroupListPage>
@@ -44,9 +44,8 @@ public class GroupListForm extends AbstractListForm<GroupFilter, GroupListPage>
   protected void init()
   {
     super.init();
-    gridBuilder.newNestedRowPanel();
     {
-      gridBuilder.newNestedPanel(DivType.COL_60);
+      gridBuilder.newSplitPanel(GridSize.COL66);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
       if (Login.getInstance().hasExternalUsermanagementSystem() == true) {
         {
@@ -66,7 +65,7 @@ public class GroupListForm extends AbstractListForm<GroupFilter, GroupListPage>
     }
     {
       // DropDownChoice page size
-      gridBuilder.newNestedPanel(DivType.COL_40);
+      gridBuilder.newSplitPanel(GridSize.COL33);
       addPageSizeFieldset();
     }
   }

@@ -30,6 +30,7 @@ import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
@@ -56,7 +57,7 @@ public class ChangePasswordForm extends AbstractForm<ChangePasswordForm, ChangeP
     super.init();
     addFeedbackPanel();
     gridBuilder = newGridBuilder(this, "flowform");
-    gridBuilder.newGrid6();
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("user.changePassword.oldPassword"));
       final PasswordTextField oldPassword = new PasswordTextField(fs.getTextFieldId(), new PropertyModel<String>(this, "oldPassword"));

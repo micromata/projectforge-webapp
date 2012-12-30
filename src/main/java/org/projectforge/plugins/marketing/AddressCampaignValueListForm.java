@@ -31,8 +31,8 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.address.AddressListForm;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
@@ -70,7 +70,7 @@ public class AddressCampaignValueListForm extends AbstractListForm<AddressCampai
     this.addressCampaignId = searchFilter.getAddressCampaignId();
     this.addressCampaignValue = searchFilter.getAddressCampaignValue();
     final List<AddressCampaignDO> addressCampaignList = addressCampaignDao.getList(new AddressCampaignValueFilter());
-    gridBuilder.newNestedRowPanel().newNestedPanel(DivType.COL_60);
+    gridBuilder.newSplitPanel(GridSize.COL66);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.marketing.addressCampaign"));
       final LabelValueChoiceRenderer<Integer> addressCampaignRenderer = new LabelValueChoiceRenderer<Integer>();
@@ -117,7 +117,7 @@ public class AddressCampaignValueListForm extends AbstractListForm<AddressCampai
       fs.add(addressCampaignChoice);
     }
     {
-      gridBuilder.newNestedPanel(DivType.COL_40);
+      gridBuilder.newSplitPanel(GridSize.COL33);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("value"));
       final LabelValueChoiceRenderer<String> choiceRenderer = getValueLabelValueChoiceRenderer();
       addressCampaignValueDropDownChoice = new DropDownChoice<String>(fs.getDropDownChoiceId(), new PropertyModel<String>(this,

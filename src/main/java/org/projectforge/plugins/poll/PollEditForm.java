@@ -41,6 +41,7 @@ import org.projectforge.web.user.UsersComparator;
 import org.projectforge.web.user.UsersProvider;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 import com.vaynberg.wicket.select2.Select2MultiChoice;
@@ -83,9 +84,9 @@ public class PollEditForm extends AbstractEditForm<PollDO, PollEditPage>
   {
     super.init();
 
-    Collection<PFUserDO> attendeePFUserList = new ArrayList<PFUserDO>();
-    Collection<String> emailList = new ArrayList<String>();
-    for (PollAttendeeDO attendee : pollAttendeeDao.getListByPoll(data)) {
+    final Collection<PFUserDO> attendeePFUserList = new ArrayList<PFUserDO>();
+    final Collection<String> emailList = new ArrayList<String>();
+    for (final PollAttendeeDO attendee : pollAttendeeDao.getListByPoll(data)) {
       if (attendee.getUser() != null) {
         attendeePFUserList.add(attendee.getUser());
       } else {
@@ -95,21 +96,21 @@ public class PollEditForm extends AbstractEditForm<PollDO, PollEditPage>
       }
     }
 
-    gridBuilder.newGrid6();
+    gridBuilder.newSplitPanel(GridSize.COL50);
 
     // new title
-    FieldsetPanel fsTitle = gridBuilder.newFieldset("Titel", true);
-    RequiredTextField<String> title = new RequiredTextField<String>(fsTitle.getTextFieldId(), new PropertyModel<String>(this.data, "title"));
+    final FieldsetPanel fsTitle = gridBuilder.newFieldset("Titel", true);
+    final RequiredTextField<String> title = new RequiredTextField<String>(fsTitle.getTextFieldId(), new PropertyModel<String>(this.data, "title"));
     fsTitle.add(title);
 
     // new location
-    FieldsetPanel fsLocation = gridBuilder.newFieldset("Ort", true);
-    PFAutoCompleteTextField<String> location = new PFAutoCompleteTextField<String>(fsLocation.getTextFieldId(), new PropertyModel<String>(
+    final FieldsetPanel fsLocation = gridBuilder.newFieldset("Ort", true);
+    final PFAutoCompleteTextField<String> location = new PFAutoCompleteTextField<String>(fsLocation.getTextFieldId(), new PropertyModel<String>(
         this.data, "location")) {
       private static final long serialVersionUID = -2309992819521957913L;
 
       @Override
-      protected List<String> getChoices(String input)
+      protected List<String> getChoices(final String input)
       {
         return getBaseDao().getAutocompletion("location", input);
       }
@@ -117,17 +118,17 @@ public class PollEditForm extends AbstractEditForm<PollDO, PollEditPage>
     fsLocation.add(location);
 
     // new description
-    FieldsetPanel fsDesc = gridBuilder.newFieldset("Beschreibung", true);
-    TextArea<String> desc = new TextArea<String>(fsDesc.getTextAreaId(), new PropertyModel<String>(this.data, "description"));
+    final FieldsetPanel fsDesc = gridBuilder.newFieldset("Beschreibung", true);
+    final TextArea<String> desc = new TextArea<String>(fsDesc.getTextAreaId(), new PropertyModel<String>(this.data, "description"));
     fsDesc.add(desc);
 
     // attendee list
-    FieldsetPanel fsAttendee = gridBuilder.newFieldset("Teilnehmer", true);
+    final FieldsetPanel fsAttendee = gridBuilder.newFieldset("Teilnehmer", true);
     final UsersProvider usersProvider = new UsersProvider();
-    MultiChoiceListHelper<PFUserDO> attendeeHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator())
+    final MultiChoiceListHelper<PFUserDO> attendeeHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator())
         .setFullList(usersProvider.getSortedUsers());
     attendeeHelper.setAssignedItems(attendeePFUserList);
-    Select2MultiChoice<PFUserDO> attendees = new Select2MultiChoice<PFUserDO>(fsAttendee.getSelect2MultiChoiceId(),
+    final Select2MultiChoice<PFUserDO> attendees = new Select2MultiChoice<PFUserDO>(fsAttendee.getSelect2MultiChoiceId(),
         new PropertyModel<Collection<PFUserDO>>(attendeeHelper, "assignedItems"), usersProvider);
     fsAttendee.add(attendees);
 

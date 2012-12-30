@@ -29,10 +29,10 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.StringHelper;
 import org.projectforge.orga.PostausgangDao;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.YearListCoiceRenderer;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class PostausgangListForm extends AbstractListForm<PostausgangListFilter, PostausgangListPage>
@@ -48,9 +48,8 @@ public class PostausgangListForm extends AbstractListForm<PostausgangListFilter,
   protected void init()
   {
     super.init();
-    gridBuilder.newNestedRowPanel();
     {
-      gridBuilder.newNestedPanel(DivType.COL_60);
+      gridBuilder.newSplitPanel(GridSize.COL66);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true);
       // DropDownChoice years
       final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(postausgangDao.getYears(), true);
@@ -71,7 +70,7 @@ public class PostausgangListForm extends AbstractListForm<PostausgangListFilter,
     }
     {
       // DropDownChoice page size
-      gridBuilder.newNestedPanel(DivType.COL_40);
+      gridBuilder.newSplitPanel(GridSize.COL33);
       addPageSizeFieldset();
     }
   }

@@ -77,7 +77,7 @@ public class ErrorForm extends AbstractForm<ErrorPageData, ErrorPage>
       }
     }));
     gridBuilder = newGridBuilder(this, "flowform");
-    gridBuilder.newGrid12();
+    gridBuilder.newGridPanel();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("feedback.receiver"), true).setNoLabelFor();
       fs.add(new DivTextPanel(fs.newChildId(), data.getReceiver()));

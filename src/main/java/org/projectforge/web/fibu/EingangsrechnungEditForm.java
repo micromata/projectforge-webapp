@@ -36,9 +36,9 @@ import org.projectforge.fibu.kost.AccountingConfig;
 import org.projectforge.registry.Registry;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 
@@ -58,15 +58,13 @@ AbstractRechnungEditForm<EingangsrechnungDO, EingangsrechnungsPositionDO, Eingan
   @Override
   protected void onInit()
   {
-    /* GRID16 - BLOCK */
-    gridBuilder.newGrid12();
     {
       // Subject
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.betreff"));
       fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "betreff")));
     }
-    /* GRID8 - BLOCK */
-    gridBuilder.newGrid6();
+    /* GRID50 - BLOCK */
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Creditor
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.creditor"));
@@ -100,7 +98,7 @@ AbstractRechnungEditForm<EingangsrechnungDO, EingangsrechnungsPositionDO, Eingan
   @Override
   protected void addCellAfterFaelligkeit()
   {
-    gridBuilder.newNestedPanel(DivType.COL_50);
+    gridBuilder.newSplitPanel(GridSize.COL50);
     // DropDownChoice payment type
     final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.payment.type"));
     final LabelValueChoiceRenderer<PaymentType> paymentTypeChoiceRenderer = new LabelValueChoiceRenderer<PaymentType>(this,
