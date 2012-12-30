@@ -32,8 +32,6 @@ public abstract class PFAutoCompleteMaxLengthTextField extends PFAutoCompleteTex
 {
   private static final long serialVersionUID = -1269934405480896598L;
 
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(PFAutoCompleteMaxLengthTextField.class);
-
   /**
    * 
    * @param id
