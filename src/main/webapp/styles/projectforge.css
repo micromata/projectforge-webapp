@@ -1,15 +1,3 @@
-.mm_left {
-	float: left;
-}
-
-.mm_right {
-	float: right;
-}
-
-.mm_clear {
-	clear: both;
-}
-
 input.warning {
 	background-color: #FDD;
 }
@@ -251,17 +239,17 @@ input.userselectpanel {
 }
 
 div.contentMenu {
+	display: inline-block;
 	margin-left: 15px;
 	height: 40px;
-	clear: both;
 }
 
 div.contentRightMenu {
+	display: inline-block;
 	top: 8px;
 	right: 15px;
-	position: absolute;
+	float: right;
 	height: 40px;
-	clear: both;
 }
 
 div.contentMenu .toolbarbutton,div.contentRightMenu .toolbarbutton {
@@ -358,14 +346,6 @@ div.contentMenu .toolbarbutton,div.contentRightMenu .toolbarbutton {
 	text-align: right;
 }
 
-form input.number {
-	width: 5em !important;
-}
-
-form input.datepicker {
-	width: 6em !important;
-}
-
 /* Errorhandling */
 ul.feedbackPanel {
 	margin: 0;
@@ -383,10 +363,6 @@ div.modifiedSearchExpressionLabel {
 	color: #666666;
 }
 
-form input.phone {
-	width: 10em !important;
-}
-
 ul.top-right>li {
 	margin: 0 1px 0 0;
 	padding: 4px 10px;
@@ -399,10 +375,6 @@ ul.top-right ul {
 
 .ui-button {
 	font-size: 90%;
-}
-
-.form-horizontal .placeholder {
-	margin-left: 18px;
 }
 
 td.ui-datepicker-today {
@@ -420,10 +392,6 @@ td.fc-sun,td.fc-sat,td.fc-holiday {
 
 .fc .fc-event {
 	text-shadow: none;
-}
-
-.dialog_content .section {
-	min-height: 75px;
 }
 
 h2.box_head .subtitle {
@@ -457,13 +425,6 @@ h2.box_head .subtitle {
 	height: 24px !important;
 }
 
-/**
- * Color picker styles
- */
-.colorpicker,.colorpicker div {
-	z-index: 2000;
-}
-
 .pf_colorPreview {
 	width: 24px;
 	height: 24px;
@@ -482,7 +443,7 @@ h2.box_head .subtitle {
 	background-color: black;
 	z-index: 1;
 	opacity: 0;
-	filter: alpha(opacity =   0);
+	filter: alpha(opacity =     0);
 }
 
 .pf_teamCalDialog {

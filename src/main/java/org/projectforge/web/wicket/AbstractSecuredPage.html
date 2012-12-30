@@ -4,23 +4,12 @@
 </head>
 <body>
   <wicket:extend>
-    <div id="topbar" class="clearfix">
-
+    <div id="topbar">
       <div class="logo" style="border-bottom: 1px solid #D9DFE1; padding: 1em 2em; text-align: right; background-color: #ffffff;">
         <img id="logo-left" wicket:id="logoLeftImage" src="/secure/Logo.jpg" style="border: none; float: left;" /> <img id="logo-right"
           src="images/logo-top-right.png" style="border: none;" />
       </div>
-
-      <div class="user_box dark_box clearfix">
-        <!--           <h2 wicket:id="username">[John Smith]</h2> -->
-        <ul>
-          <li><a wicket:id="myAccountLink" href="/myAccount"><wicket:message key="menu.myAccount" /></a><span class="divider">|</span></li>
-          <li><a class="logout" wicket:id="logoutLink" href="/login?logout=true"><wicket:message key="menu.logout" /></a></li>
-        </ul>
-      </div>
-      <!-- #user_box -->
     </div>
-    <!-- #topbar -->
     <div id="sidebar" class="sidebar pjax_links fixed">
       <div class="cog">
         &nbsp;<span class="badge badge-important" wicket:id="totalMenuCounter">[8]</span>
@@ -29,20 +18,28 @@
         [main menu]
         </wicket:panel>
     </div>
-    <!-- #sidebar -->
+    <div class="user_box">
+      <!--           <h2 wicket:id="username">[John Smith]</h2> -->
+      <ul>
+        <li><a wicket:id="myAccountLink" href="/myAccount"><wicket:message key="menu.myAccount" /></a><span class="divider">|</span></li>
+        <li><a class="logout" wicket:id="logoutLink" href="/login?logout=true"><wicket:message key="menu.logout" /></a></li>
+      </ul>
+    </div>
     <wicket:panel wicket:id="favoriteMenu">
         [main menu]
         </wicket:panel>
-      <div class="contentMenu clearfix" wicket:id="contentMenu">
+    <div class="contentMenus" wicket:id="contentMenus">
+      <div class="contentMenu" wicket:id="contentMenu">
         <wicket:container wicket:id="contentMenuRepeater">
           [menu entries]
           </wicket:container>
       </div>
-      <div class="contentRightMenu clearfix" wicket:id="contentRightMenu">
+      <div class="contentRightMenu" wicket:id="contentRightMenu">
         <wicket:container wicket:id="contentRightMenuRepeater">
           [menu entries]
           </wicket:container>
       </div>
+    </div>
     <wicket:child>
       <h2>This is the content!</h2>
     </wicket:child>

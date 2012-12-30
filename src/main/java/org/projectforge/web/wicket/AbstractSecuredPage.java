@@ -122,24 +122,32 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
       };
     };
     body.add(logoutLink);
+    final WebMarkupContainer contentMenusContainer = new WebMarkupContainer("contentMenus") {
+      @Override
+      public boolean isVisible()
+      {
+        return contentMenuContainer.isVisible() || contentRightMenuContainer.isVisible();
+      };
+    };
+    body.add(contentMenusContainer);
     contentMenuContainer = new WebMarkupContainer("contentMenu") {
       @Override
       public boolean isVisible()
       {
-        return contentMenu.hasEntries() == true || contentRightMenu.hasEntries() == true;
+        return contentMenu.hasEntries() == true;
       };
     };
-    body.add(contentMenuContainer);
+    contentMenusContainer.add(contentMenuContainer);
     contentMenu = new MyComponentsRepeater<ContentMenuEntryPanel>("contentMenuRepeater");
     contentMenuContainer.add(contentMenu.getRepeatingView());
     contentRightMenuContainer = new WebMarkupContainer("contentRightMenu") {
       @Override
       public boolean isVisible()
       {
-        return contentMenu.hasEntries() == true || contentRightMenu.hasEntries() == true;
+        return contentRightMenu.hasEntries() == true;
       };
     };
-    body.add(contentRightMenuContainer);
+    contentMenusContainer.add(contentRightMenuContainer);
     contentRightMenu = new MyComponentsRepeater<ContentMenuEntryPanel>("contentRightMenuRepeater");
     contentRightMenuContainer.add(contentRightMenu.getRepeatingView());
   }

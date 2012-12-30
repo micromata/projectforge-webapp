@@ -5,3 +5,20 @@ div.controls {
 div.controls div {
 	display: inline-block;
 }
+
+
+form input.number {
+	width: 5em !important;
+}
+
+form input.datepicker {
+	width: 6em !important;
+}
+
+form input.phone {
+	width: 10em !important;
+}
+
+.form-horizontal .placeholder {
+	margin-left: 18px;
+}
