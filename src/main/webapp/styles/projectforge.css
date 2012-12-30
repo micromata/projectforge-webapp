@@ -402,7 +402,7 @@ ul.top-right ul {
 }
 
 .form-horizontal .placeholder {
- margin-left: 18px;
+	margin-left: 18px;
 }
 
 td.ui-datepicker-today {
@@ -434,34 +434,36 @@ h2.box_head .subtitle {
  * adaption of adminica for select2
  */
 .select2-container ul li a {
-  padding-top: 0px;
+	padding-top: 0px;
 }
-.select2-choices{
-  overflow:hidden!important;
-  float:left;
-  width:100%!important;
+
+.select2-choices {
+	overflow: hidden !important;
+	float: left;
+	width: 100% !important;
 }
-.select2-container{
-  overflow:hidden;
-  height:auto!important;
-  border-right: 1px solid #AAA;
+
+.select2-container {
+	overflow: hidden;
+	height: auto !important;
+	border-right: 1px solid #AAA;
 }
 
 .select2-container-active {
-  border-right: 1px solid #5897fb ;
+	border-right: 1px solid #5897fb;
 }
 
 .select2-input {
-  height: 24px!important;
+	height: 24px !important;
 }
 
 /**
  * Color picker styles
  */
-.colorpicker,
-.colorpicker div {
-	z-index:2000;
+.colorpicker,.colorpicker div {
+	z-index: 2000;
 }
+
 .pf_colorPreview {
 	width: 24px;
 	height: 24px;
@@ -480,27 +482,28 @@ h2.box_head .subtitle {
 	background-color: black;
 	z-index: 1;
 	opacity: 0;
-	filter: alpha(opacity=0);
+	filter: alpha(opacity =   0);
 }
 
 .pf_teamCalDialog {
-  width: 400px;
+	width: 400px;
 }
 
 .pf_teamCalDialog .teamCalTemplate {
-  height: 37px;
+	height: 37px;
 }
+
 .pf_teamCalDialog .teamCalTemplate .left {
-  float: left;
+	float: left;
 }
 
 .pf_teamCalDialog .teamCalTemplate .right {
-  float: right;
+	float: right;
 }
 
 .pf_teamCalDialog.pf_export textarea {
-  width: 100%;
-  height: 75px;
+	width: 100%;
+	height: 75px;
 }
 
 /**
@@ -520,15 +523,15 @@ h2.box_head .subtitle {
 }
 
 .pf_uploadField input[type="file"] {
-	width:0;
+	width: 0;
 	height: 0;
 	padding: 0;
 	margin: 0;
-	visibility:hidden;
+	visibility: hidden;
 }
 
 .pf_uploadField button[name="fileUploadProxy"] {
-	margin: 0!important;
+	margin: 0 !important;
 	float: right;
 	width: 25%;
 	clear: none;
@@ -540,34 +543,58 @@ h2.box_head .subtitle {
 	width: 73.5%;
 	margin: 0 0 10px 0;
 }
+
 .pf_deleteLink {
-  float: right;
-  padding: 0 6 3 0;
+	float: right;
+	padding: 0 6 3 0;
 }
+
 .pf_teamCalDialog .pf_dialogScroll {
-  max-height: 200px;
-  overflow: auto;
+	max-height: 200px;
+	overflow: auto;
 }
 
 /* Used in list pages, appended to search fields. */
 .pf_filedrag {
-  display: none;
-  font-weight: bold;
-  text-align: center;
-  padding: 5px 0;
-  margin: 0 5px;
-  color: #555;
-  border: 2px dashed #555;
-  border-radius: 7px;
-  cursor: default;
-  width: 100px;
+	display: none;
+	font-weight: bold;
+	text-align: center;
+	padding: 5px 0;
+	margin: 0 5px;
+	color: #555;
+	border: 2px dashed #555;
+	border-radius: 7px;
+	cursor: default;
+	width: 100px;
 }
+
 .pf_filedrag.hover {
-  color: #f00;
-  border-color: #f00;
-  border-style: solid;
-  box-shadow: inset 0 3px 4px #888;
+	color: #f00;
+	border-color: #f00;
+	border-style: solid;
+	box-shadow: inset 0 3px 4px #888;
 }
+
 .pf_hiddenForm {
 	display: none;
 }
+
+div.controls {
+	/*overflow-x: scroll;*/
+	white-space: nowrap;;
+}
+
+div.controls div {
+	display: inline-block;
+}
+white-space
+
+
+:
+
+ 
+
+nowrap
+
+
+;
