@@ -2,10 +2,8 @@ Bootstrap-Umbau
 ---------------
 
 - Dialoge
-- Setup-Bildschirm für Neuinstallation
 - Icons ToggleContainer
 - Layout innerhalb ToggleContainer
-- Nowrap für control-groups
 - Feldbreiten für control-groups 100%
 - Checkboxengröße/breite
 - Layout: Zeilenabstände, Schriftgröße Tabellen
@@ -18,12 +16,33 @@ Bootstrap-Umbau
 - Sidemenu: badge: margin-left
 - Hauptmenus: Style Schrift: nicht fett
 - Oben rechts Userbox: Farbiger Kasten
-- Select2 in UserEditPage
+- TestArea: autogrow
+- TeamCalDialog: Wenn man irgendwo außerhalb klickt, sollte der sich auch wieder schließen.
+- CalendarPage springt im Datum
 
+- zindex: DatePanel, Main-Menu-sub-menues (on iPhone)
+
+Konkrete Masken
+---------------
+- LizenzEditForm: Select2 zu schmal
+- AddressViewPage
+- AdminPage
+- SetupPage für Neuinstallation
+- TaskWizzard
+- AuftragsEditForm
+- *RechnungsEditForm
+- GanttChartEditForm
+- HRListPage
+- HRPlanningEditForm
+- TaskEditForm
+- UserEditForm
 
 Wicket6-Migration
 -----------------
+- Alle htmls zu Javas schieben.
 - Fullcalendar
 - JavaScriptEventToggleBehavior
-
+- ToggleContainer
 - TaskTreePage auf Wicket Tree umstellen
+
+- JS and CSS: minifiing and concatenating
