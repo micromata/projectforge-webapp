@@ -172,7 +172,7 @@ public abstract class PFDialog extends Panel
     }
     String jsFunction = "";
     if (this.onCloseCallback != null) {
-      jsFunction = "function() { wicketAjaxGet('" + onCloseBehavior.getCallbackUrl() + "'); }";
+      jsFunction = "function() { Wicket.Ajax.get({'u': '" + onCloseBehavior.getCallbackUrl() + "'}); }";
     } else {
       jsFunction = "function() {}";
     }
