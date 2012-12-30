@@ -51,6 +51,7 @@ public class WicketRenderHeadUtils
     // "styles/adminica-2.2/mobile.css", //
     "include/bootstrap/css/bootstrap.css", //
     "styles/projectforge-main.css", //
+    "styles/projectforge-bootstrap.css", //
     "styles/projectforge-form.css", // before projectforge.css!
     "styles/projectforge.css" //
   };
