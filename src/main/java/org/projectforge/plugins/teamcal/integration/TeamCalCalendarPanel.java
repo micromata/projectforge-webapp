@@ -35,9 +35,12 @@ import net.ftlines.wicket.fullcalendar.callback.View;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.wicket.Component;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptReferenceHeaderItem;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.joda.time.DateTime;
 import org.projectforge.common.DateHelper;
@@ -60,6 +63,8 @@ import org.projectforge.web.calendar.CalendarPanel;
 import org.projectforge.web.calendar.MyFullCalendarConfig;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredBasePage;
+import org.projectforge.web.wicket.WicketApplication;
+import org.projectforge.web.wicket.WicketRenderHeadUtils;
 import org.projectforge.web.wicket.components.JodaDatePanel;
 
 /**
@@ -90,6 +95,17 @@ public class TeamCalCalendarPanel extends CalendarPanel
   public TeamCalCalendarPanel(final String id, final JodaDatePanel currentDatePanel)
   {
     super(id, currentDatePanel);
+  }
+
+  /**
+   * @see org.apache.wicket.Component#renderHead(org.apache.wicket.markup.head.IHeaderResponse)
+   */
+  @Override
+  public void renderHead(final IHeaderResponse response)
+  {
+    super.renderHead(response);
+    WicketRenderHeadUtils.renderMainJavaScriptIncludes(response);
+    response.render(JavaScriptReferenceHeaderItem.forReference(new PackageResourceReference(WicketApplication.class, "select2/select2.js")));
   }
 
   /**
