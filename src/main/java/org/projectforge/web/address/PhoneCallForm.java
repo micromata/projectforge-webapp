@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.SubmitLink;
@@ -51,20 +52,18 @@ import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.AbstractEditPage;
-import org.projectforge.web.wicket.AbstractForm;
+import org.projectforge.web.wicket.AbstractStandardForm;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
-import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
-import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
 import org.projectforge.web.wicket.flowlayout.TextLinkPanel;
 import org.projectforge.web.wicket.flowlayout.TextPanel;
 
-public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
+public class PhoneCallForm extends AbstractStandardForm<Object, PhoneCallPage>
 {
   private static final long serialVersionUID = -2138017238114715368L;
 
@@ -91,13 +90,6 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
   Date lastSuccessfulPhoneCall;
 
   private RecentQueue<String> recentSearchTermsQueue;
-
-  private GridBuilder gridBuilder;
-
-  /**
-   * List to create content menu in the desired order before creating the RepeatingView.
-   */
-  protected MyComponentsRepeater<SingleButtonPanel> actionButtons;
 
   public PhoneCallForm(final PhoneCallPage parentPage)
   {
@@ -140,12 +132,13 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
     this.address = address;
   }
 
+  /**
+   * @see org.projectforge.web.wicket.AbstractStandardForm#createMessageComponent()
+   */
+  @SuppressWarnings("serial")
   @Override
-  @SuppressWarnings({ "serial", "unchecked", "rawtypes"})
-  protected void init()
+  protected Component createMessageComponent()
   {
-    super.init();
-    addFeedbackPanel();
     final DivPanel messagePanel = new DivPanel("message") {
       /**
        * @see org.apache.wicket.Component#isVisible()
@@ -163,7 +156,6 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
         parentPage.result = null;
       }
     };
-    add(messagePanel);
     messagePanel.add(new TextPanel(DivPanel.CHILD_ID, new Model<String>() {
       @Override
       public String getObject()
@@ -171,7 +163,14 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
         return parentPage.result;
       }
     }));
-    gridBuilder = newGridBuilder(this, "flowform");
+    return messagePanel;
+  }
+
+  @Override
+  @SuppressWarnings({ "serial", "unchecked", "rawtypes"})
+  protected void init()
+  {
+    super.init();
     gridBuilder.newSplitPanel(GridSize.COL50);
     FieldsetPanel fs = gridBuilder.newFieldset(getString("address.phoneCall.number"), true);
     numberTextField = new PFAutoCompleteTextField<AddressDO>(InputPanel.WICKET_ID, new Model() {
@@ -325,8 +324,6 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
       addPhoneNumber("privatePhone", getString(PhoneType.PRIVATE.getI18nKey()));
       addPhoneNumber("privateMobilePhone", getString(PhoneType.PRIVATE_MOBILE.getI18nKey()));
     }
-    actionButtons = new MyComponentsRepeater<SingleButtonPanel>("buttons");
-    add(actionButtons.getRepeatingView());
     {
       final Button callButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("call")) {
         @Override
@@ -347,16 +344,6 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
       showOperatorPanel.getLabel().setEscapeModelStrings(false);
       section.add(showOperatorPanel);
     }
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.AbstractForm#onBeforeRender()
-   */
-  @Override
-  public void onBeforeRender()
-  {
-    super.onBeforeRender();
-    actionButtons.render();
   }
 
   private void addLineBreak()

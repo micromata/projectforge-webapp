@@ -23,8 +23,10 @@
 
 package org.projectforge.web.wicket;
 
+import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Button;
+import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
@@ -37,17 +39,37 @@ public class AbstractStandardForm<F, P extends AbstractStandardFormPage> extends
 
   protected MyComponentsRepeater<SingleButtonPanel> actionButtons;
 
+  private WebMarkupContainer feedbackAndMessagesPanel;
+
+  protected FeedbackPanel feedbackPanel;
+
+  protected Component messagesComponent;
+
   public AbstractStandardForm(final P parentPage)
   {
     super(parentPage);
   }
 
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
     super.init();
-    addFeedbackPanel();
-    addMessageField();
+    feedbackAndMessagesPanel = new WebMarkupContainer("feedbackAndMessagesPanel") {
+      /**
+       * @see org.apache.wicket.Component#isVisible()
+       */
+      @Override
+      public boolean isVisible()
+      {
+        return isMessageAndFeedbackPanelVisible();
+      }
+    };
+    add(feedbackAndMessagesPanel);
+    feedbackPanel = createFeedbackPanel();
+    feedbackAndMessagesPanel.add(feedbackPanel);
+    messagesComponent = createMessageComponent();
+    feedbackAndMessagesPanel.add(messagesComponent);
     gridBuilder = newGridBuilder(this, "flowform");
     actionButtons = new MyComponentsRepeater<SingleButtonPanel>("buttons");
     add(actionButtons.getRepeatingView());
@@ -63,11 +85,19 @@ public class AbstractStandardForm<F, P extends AbstractStandardFormPage> extends
   }
 
   /**
-   * Adds invisible field as default.
+   * Adds invisible container as default.
    */
-  protected void addMessageField()
+  protected Component createMessageComponent()
   {
-    add(new WebMarkupContainer("message").setVisible(false));
+    return new WebMarkupContainer("message").setVisible(false);
+  }
+
+  /**
+   * @return true if the embedded feedback and/or message container is visible.
+   */
+  protected boolean isMessageAndFeedbackPanelVisible()
+  {
+    return feedbackPanel.isVisible() || messagesComponent.isVisible();
   }
 
   /**

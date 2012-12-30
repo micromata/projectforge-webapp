@@ -84,7 +84,8 @@ AbstractSecuredForm<O, P>
   protected void init()
   {
     super.init();
-    feedbackPanel = addFeedbackPanel();
+    feedbackPanel = createFeedbackPanel();
+    add(feedbackPanel);
     gridBuilder = newGridBuilder(this, "flowform");
 
     actionButtons = new MyComponentsRepeater<SingleButtonPanel>("buttons");

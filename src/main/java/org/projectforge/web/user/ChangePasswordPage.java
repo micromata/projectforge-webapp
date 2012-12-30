@@ -29,10 +29,10 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.Login;
 import org.projectforge.user.UserDao;
-import org.projectforge.web.wicket.AbstractSecuredPage;
+import org.projectforge.web.wicket.AbstractStandardFormPage;
 import org.projectforge.web.wicket.MessagePage;
 
-public class ChangePasswordPage extends AbstractSecuredPage
+public class ChangePasswordPage extends AbstractStandardFormPage
 {
   private static final long serialVersionUID = -2506732790809310722L;
 

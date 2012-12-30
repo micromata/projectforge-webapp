@@ -70,7 +70,7 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
   protected void init()
   {
     super.init();
-    addFeedbackPanel();
+    add(createFeedbackPanel());
     gridBuilder = newGridBuilder(this, "flowform");
     {
       gridBuilder.newSplitPanel(GridSize.COL50);

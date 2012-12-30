@@ -36,10 +36,9 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.core.Configuration;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.WebConfiguration;
-import org.projectforge.web.wicket.AbstractForm;
+import org.projectforge.web.wicket.AbstractStandardForm;
 import org.projectforge.web.wicket.WicketApplication;
 import org.projectforge.web.wicket.WicketUtils;
-import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
@@ -51,7 +50,7 @@ import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 
-public class AdminForm extends AbstractForm<AdminForm, AdminPage>
+public class AdminForm extends AbstractStandardForm<AdminForm, AdminPage>
 {
   private static final long serialVersionUID = -2450673501083584299L;
 
@@ -67,8 +66,6 @@ public class AdminForm extends AbstractForm<AdminForm, AdminPage>
 
   protected DatePanel reindexFromDatePanel;
 
-  private GridBuilder gridBuilder;
-
   public AdminForm(final AdminPage parentPage)
   {
     super(parentPage);
@@ -78,10 +75,7 @@ public class AdminForm extends AbstractForm<AdminForm, AdminPage>
   @SuppressWarnings("serial")
   protected void init()
   {
-    addFeedbackPanel();
-
-    gridBuilder = newGridBuilder(this, "flowform");
-
+    super.init();
     gridBuilder.newSplitPanel(GridSize.COL50);
     gridBuilder.newFormHeading(getString("system.admin.group.title.systemChecksAndFunctionality"));
     final Configuration cfg = Configuration.getInstance();

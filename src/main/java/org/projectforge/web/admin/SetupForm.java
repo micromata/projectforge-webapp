@@ -89,7 +89,7 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
   @SuppressWarnings("serial")
   protected void init()
   {
-    addFeedbackPanel();
+    add(createFeedbackPanel());
     final GridBuilder gridBuilder = newGridBuilder(this, "flowform");
     gridBuilder.newFormHeading(getString("administration.setup.heading"));
     final DivPanel panel = gridBuilder.getPanel();

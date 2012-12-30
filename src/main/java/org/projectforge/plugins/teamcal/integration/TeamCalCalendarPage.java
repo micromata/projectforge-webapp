@@ -59,11 +59,11 @@ public class TeamCalCalendarPage extends CalendarPage
   @Override
   protected CalendarPanel initCalenderPanel()
   {
-    final TeamCalCalendarPanel result = new TeamCalCalendarPanel("cal", form.getCurrentDatePanel());
-    result.setOutputMarkupId(true);
-    form.add(result);
-    result.init(getFilter());
-    return result;
+    final TeamCalCalendarPanel calendar = new TeamCalCalendarPanel("cal", form.getCurrentDatePanel());
+    calendar.setOutputMarkupId(true);
+    body.add(calendar);
+    calendar.init(getFilter());
+    return calendar;
   }
 
   /**

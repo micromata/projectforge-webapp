@@ -75,7 +75,7 @@ public abstract class AbstractForm<F, P extends AbstractUnsecureBasePage> extend
   }
 
   @SuppressWarnings("serial")
-  protected FeedbackPanel addFeedbackPanel()
+  protected FeedbackPanel createFeedbackPanel()
   {
     final FeedbackPanel feedbackPanel = new FeedbackPanel("feedback") {
       /**
@@ -88,7 +88,6 @@ public abstract class AbstractForm<F, P extends AbstractUnsecureBasePage> extend
       }
     };
     feedbackPanel.setOutputMarkupId(true);
-    add(feedbackPanel);
     return feedbackPanel;
   }
 

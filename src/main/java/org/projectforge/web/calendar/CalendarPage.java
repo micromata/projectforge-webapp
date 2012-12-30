@@ -29,9 +29,9 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.joda.time.DateMidnight;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.fibu.ISelectCallerPage;
-import org.projectforge.web.wicket.AbstractSecuredPage;
+import org.projectforge.web.wicket.AbstractStandardFormPage;
 
-public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPage
+public class CalendarPage extends AbstractStandardFormPage implements ISelectCallerPage
 {
   private static final long serialVersionUID = 8710165041912824126L;
 
@@ -84,11 +84,11 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
    */
   protected CalendarPanel initCalenderPanel()
   {
-    final CalendarPanel result = new CalendarPanel("cal", form.getCurrentDatePanel());
-    result.setOutputMarkupId(true);
-    form.add(result);
-    result.init(getFilter());
-    return result;
+    final CalendarPanel calendar = new CalendarPanel("cal", form.getCurrentDatePanel());
+    calendar.setOutputMarkupId(true);
+    body.add(calendar);
+    calendar.init(getFilter());
+    return calendar;
   }
 
   /**

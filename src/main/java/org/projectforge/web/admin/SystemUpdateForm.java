@@ -70,7 +70,7 @@ public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdat
   @SuppressWarnings("serial")
   protected void init()
   {
-    addFeedbackPanel();
+    add(createFeedbackPanel());
     gridBuilder = newGridBuilder(this, "flowform");
     gridBuilder.newGridPanel();
     {

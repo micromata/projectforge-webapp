@@ -66,7 +66,7 @@ public class ErrorForm extends AbstractForm<ErrorPageData, ErrorPage>
   protected void init()
   {
     super.init();
-    addFeedbackPanel();
+    add(createFeedbackPanel());
     final DivPanel errorMessagePanel = new DivPanel("errorMessage");
     add(errorMessagePanel);
     errorMessagePanel.add(new TextPanel(DivPanel.CHILD_ID, new Model<String>() {

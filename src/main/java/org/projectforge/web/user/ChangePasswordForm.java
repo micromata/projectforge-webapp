@@ -27,23 +27,17 @@ import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.projectforge.web.wicket.AbstractForm;
+import org.projectforge.web.wicket.AbstractStandardForm;
 import org.projectforge.web.wicket.WicketUtils;
-import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
 
-public class ChangePasswordForm extends AbstractForm<ChangePasswordForm, ChangePasswordPage>
+public class ChangePasswordForm extends AbstractStandardForm<ChangePasswordForm, ChangePasswordPage>
 {
   private static final long serialVersionUID = -3424973755250980758L;
 
   private String oldPassword, newPassword, passwordRepeat;
-
-  private GridBuilder gridBuilder;
-
-  protected MyComponentsRepeater<SingleButtonPanel> actionButtons;
 
   public ChangePasswordForm(final ChangePasswordPage parentPage)
   {
@@ -55,8 +49,6 @@ public class ChangePasswordForm extends AbstractForm<ChangePasswordForm, ChangeP
   protected void init()
   {
     super.init();
-    addFeedbackPanel();
-    gridBuilder = newGridBuilder(this, "flowform");
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("user.changePassword.oldPassword"));
@@ -78,8 +70,6 @@ public class ChangePasswordForm extends AbstractForm<ChangePasswordForm, ChangeP
       fs.add(passwordRepeat);
     }
 
-    actionButtons = new MyComponentsRepeater<SingleButtonPanel>("buttons");
-    add(actionButtons.getRepeatingView());
     {
       final Button cancelButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("cancel")) {
         @Override

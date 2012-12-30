@@ -38,7 +38,7 @@ import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.user.UserSelectPanel;
-import org.projectforge.web.wicket.AbstractForm;
+import org.projectforge.web.wicket.AbstractStandardForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.bootstrap.GridSize;
@@ -54,7 +54,7 @@ import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 
-public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
+public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarPage>
 {
   private static final long serialVersionUID = -145923669780937370L;
 
@@ -68,8 +68,6 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
   protected UserDao userDao;
 
   private CalendarFilter filter;
-
-  private GridBuilder gridBuilder;
 
   @SuppressWarnings("unused")
   private boolean showTimesheets;
@@ -87,8 +85,6 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
   protected void init()
   {
     super.init();
-    addFeedbackPanel();
-    gridBuilder = new GridBuilder(this, "grid", getMySession());
     gridBuilder.newSplitPanel(GridSize.SPAN8);
     fieldset = gridBuilder.newFieldset(getString("label.options"), true);
     if (isOtherUsersAllowed() == true) {

@@ -40,9 +40,9 @@ import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
 import org.projectforge.web.calendar.DateTimeFormatter;
-import org.projectforge.web.wicket.AbstractSecuredPage;
+import org.projectforge.web.wicket.AbstractStandardFormPage;
 
-public class PhoneCallPage extends AbstractSecuredPage
+public class PhoneCallPage extends AbstractStandardFormPage
 {
   private static final long serialVersionUID = -5040319693295350276L;
 

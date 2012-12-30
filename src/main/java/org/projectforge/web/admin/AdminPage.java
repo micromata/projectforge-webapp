@@ -61,13 +61,13 @@ import org.projectforge.user.UserXmlPreferencesMigrationDao;
 import org.projectforge.web.MenuBuilder;
 import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.fibu.ISelectCallerPage;
-import org.projectforge.web.wicket.AbstractSecuredPage;
+import org.projectforge.web.wicket.AbstractStandardFormPage;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.MessagePage;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketApplication;
 
-public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
+public class AdminPage extends AbstractStandardFormPage implements ISelectCallerPage
 {
   private static final long serialVersionUID = 8345068133036236305L;
 

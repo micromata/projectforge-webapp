@@ -52,7 +52,7 @@ public class SetupImportForm extends AbstractForm<SetupImportForm, SetupPage>
   @SuppressWarnings("serial")
   protected void init()
   {
-    addFeedbackPanel();
+    add(createFeedbackPanel());
     final GridBuilder gridBuilder = newGridBuilder(this, "flowform");
     gridBuilder.newFormHeading(getString("import"));
     {

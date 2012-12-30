@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -168,11 +169,11 @@ public class SendSmsForm extends AbstractStandardForm<SendSmsData, SendSmsPage>
   }
 
   /**
-   * @see org.projectforge.web.wicket.AbstractStandardForm#addMessageField()
+   * @see org.projectforge.web.wicket.AbstractStandardForm#createMessageComponent()
    */
-  @SuppressWarnings("serial")
   @Override
-  protected void addMessageField()
+  @SuppressWarnings("serial")
+  protected Component createMessageComponent()
   {
     final DivPanel messagePanel = new DivPanel("message") {
       /**
@@ -191,7 +192,6 @@ public class SendSmsForm extends AbstractStandardForm<SendSmsData, SendSmsPage>
         parentPage.result = null;
       }
     };
-    add(messagePanel);
     messagePanel.add(new TextPanel(DivPanel.CHILD_ID, new Model<String>() {
       @Override
       public String getObject()
@@ -199,6 +199,7 @@ public class SendSmsForm extends AbstractStandardForm<SendSmsData, SendSmsPage>
         return parentPage.result;
       }
     }));
+    return messagePanel;
   }
 
   @SuppressWarnings("unchecked")
