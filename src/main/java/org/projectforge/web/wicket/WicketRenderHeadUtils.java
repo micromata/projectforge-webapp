@@ -38,8 +38,7 @@ public class WicketRenderHeadUtils
     "scripts/adminica-2.2/adminica_ui.js", //
     "scripts/adminica-2.2/adminica_mobile.js", //
     "scripts/adminica-2.2/adminica_load.js", //
-    "scripts/projectforge.js", //
-    "scripts/projectforge-forms.js" //
+    "scripts/projectforge.js" //
   };
 
   private static final String[] CSS_FILES = { //
