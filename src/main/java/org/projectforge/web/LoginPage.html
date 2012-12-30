@@ -1,0 +1,73 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+  <wicket:extend>
+    <div id="topbar" class="clearfix">
+      <div class="logo" style="border-bottom: 1px solid #D9DFE1; padding: 1em 2em; text-align: right; background-color: #ffffff;">
+        <img id="logo-left" wicket:id="logoLeftImage" src="/secure/Logo.jpg" style="border: none; float: left;" /> <img id="logo-right"
+          src="images/logo-top-right.png" style="border: none;" />
+      </div>
+    </div>
+    <div class="row-fluid">
+      <div class="span6 offset3">
+        <h3>
+          <wicket:message key="login.title" />
+        </h3>
+        <p>
+          <wicket:message key="login.welcome" />
+        </p>
+      </div>
+    </div>
+    <div class="row-fluid" wicket:id="administratorLoginNeeded">
+      <div class="span6 offset3">
+        <div class="alert alert-block">
+          <img height="24" width="24" src="images/icons/small/white/alarm_bell.png">
+          <wicket:message key="login.adminLoginRequired" />
+        </div>
+      </div>
+    </div>
+    <div class="row-fluid" wicket:id="errors">
+      <div class="span6 offset3">
+        <div class="alert alert-error">
+          <img height="24" width="24" src="images/icons/small/white/alarm_bell.png"> <span wicket:id="msg">[login failed]</span>
+        </div>
+      </div>
+    </div>
+    <div class="row-fluid" wicket:id="messageOfTheDay">
+      <div class="span6 offset3">
+        <div class="alert alert-info">
+          <img height="24" width="24" src="images/icons/small/white/alert_2.png"> <span wicket:id="msg">[Have a lot of fun!]</span>
+        </div>
+      </div>
+    </div>
+    <form wicket:id="form" class="form-horizontal">
+      <div class="row-fluid">
+        <div class="span6 offset3">
+          <div class="alert alert-error" wicket:id="feedback">
+            <img height="24" width="24" src="images/icons/small/white/alarm_bell.png">
+          </div>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span6 offset3">
+          <wicket:container wicket:id="username">
+                  [Username]
+                  </wicket:container>
+          <wicket:container wicket:id="password">
+                  [Password]
+                  </wicket:container>
+          <wicket:container wicket:id="stayLoggedIn">
+                  [stay logged in: yes|no]
+                  </wicket:container>
+          <div class="controls" style="margin-left: 18px; margin-top: 10px;">
+            <wicket:container wicket:id="loginButton">[login button]</wicket:container>
+          </div>
+        </div>
+      </div>
+    </form>
+  </wicket:extend>
+</body>
+</html>

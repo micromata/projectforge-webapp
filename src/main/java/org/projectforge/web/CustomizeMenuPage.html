@@ -1,0 +1,228 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+  <wicket:extend>
+    <wicket:fragment wicket:id="custMenuEntryFragment">
+      <li wicket:id="li"><a href="#" wicket:id="label">[menu label]</a>
+        <ul wicket:id="subMenu">
+          <wicket:container wicket:id="subMenuEntry" />
+        </ul></li>
+    </wicket:fragment>
+    <wicket:fragment wicket:id="completeMenuEntryFragment">
+      <li wicket:id="li"><a href="#"><span wicket:id="label">[menu label]</span></a>
+        <ul wicket:id="subMenu">
+          <wicket:container wicket:id="subMenuEntry" />
+        </ul></li>
+    </wicket:fragment>
+    <div class="alert alert_red feedback" wicket:id="hintForDevelopers">
+      <ul class="feedbackPanel">
+        <li class="feedbackPanelERROR"><span class="feedbackPanelERROR">Please note: This menu isn't visible because the wicket tags
+            aren't stripped! Please go to deployment-mode or set strip Wicket tags to true (StartSettings for Jetty main or context.xml otherwise)!</span></li>
+      </ul>
+    </div>
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span6">
+          <h2>
+            <wicket:message key="menu.customize.title" />
+          </h2>
+          <div id="cust-menu">
+            <ul>
+              <wicket:container wicket:id="custMenuEntry" />
+            </ul>
+          </div>
+        </div>
+        <div class="span6">
+          <h2>
+            <wicket:message key="menu.customize.completeMenu" />
+          </h2>
+          <div id="compl-menu">
+            <ul>
+              <wicket:container wicket:id="completeMenuEntry" />
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="button_cell clearfix">
+        <form wicket:id="form">
+          <input id="menuAsXml" type="hidden" wicket:id="menuAsXml" />
+          <button class="grey icon_only text_only" onclick="javascript:return createCustomMenuEntry();">
+            <wicket:message key="menu.customize.create">[create]</wicket:message>
+          </button>
+          <button class="green icon_only text_only" wicket:id="updateButton" onclick="javascript:return beforeSaveCustomMenuEntry();">
+            <wicket:message key="update">[update]</wicket:message>
+          </button>
+        </form>
+      </div>
+    </div>
+    <div class="block">
+      <wicket:message key="menu.customize.help" />
+    </div>
+    <script type="text/javascript" wicket:id="i18nVars">
+					var enterNewName = "Enter a new name";
+					var create = "Create";
+					var remove = "Remove";
+					var rename = "Rename";
+				</script>
+    <script type="text/javascript">
+					$(function() {
+						$("#cust-menu")
+								.jstree(
+										{
+											"core" : {
+												strings : {
+													new_node : enterNewName,
+												}
+											},
+											"dnd" : {
+												"drag_finish" : function(data) {
+													var id = $(data.o).attr(
+															"id");
+													var newId = id.replace(
+															"o-", "c-");
+													var title = $(data.o)
+															.text();
+													var name = $(data.r).attr(
+															"id");
+													var position = "inside";
+													if (isMenuLink($(data.r)
+															.attr("id"))) {
+														position = "before";
+													}
+													this
+															.create(
+																	$(data.r),
+																	position,
+																	{
+																		attr : {
+																			id : newId,
+																			rel : "leaf"
+																		},
+																		data : title
+																	}, null,
+																	true);
+												}
+											},
+											"themes" : {
+												"theme" : "apple",
+												"dots" : false,
+												"icons" : true
+											},
+											"types" : {
+												"types" : {
+													"leaf" : {
+														"valid_children" : "none",
+														"icon" : {
+															"image" : "../images/jstree-star.png"
+														}
+													},
+													"default" : {
+														"max_children" : -1,
+														"max_depth" : 3,
+														"valid_children" : "all"
+													}
+												}
+											},
+											"contextmenu" : {
+												"items" : {
+													"create" : {
+														"label" : create,
+														"separator_before" : false,
+														"separator_after" : true,
+														"action" : function(obj) {
+															var id = $(obj)
+																	.attr("id");
+															var position = "inside";
+															if (isMenuLink(id)) {
+																position = "before";
+															}
+															this
+																	.create(
+																			obj,
+																			position,
+																			null,
+																			false);
+														}
+													},
+													"rename" : {
+														"separator_before" : false,
+														"separator_after" : false,
+														"label" : rename,
+														"icon" : "../images/jstree-edit.png",
+														"action" : function(obj) {
+															this.rename(obj);
+														}
+													},
+													"remove" : {
+														"separator_before" : false,
+														"icon" : "../images/jstree-remove.png",
+														"separator_after" : false,
+														"label" : remove,
+														"action" : function(obj) {
+															if (this
+																	.is_selected(obj)) {
+																this.remove();
+															} else {
+																this
+																		.remove(obj);
+															}
+														}
+													}
+												}
+											},
+											"plugins" : [ "themes",
+													"html_data", "ui", "dnd",
+													"crrm", "types", "hotkeys",
+													"xml_data", "contextmenu" ]
+										});
+					});
+					$(function() {
+						$("#compl-menu")
+								.jstree(
+										{
+											"themes" : {
+												"theme" : "apple",
+												"dots" : false,
+												"icons" : true
+											},
+											"types" : {
+												"types" : {
+													"leaf" : {
+														"icon" : {
+															"image" : "../images/jstree-star.png"
+														}
+													}
+												}
+											},
+											"plugins" : [ "themes",
+													"html_data", "ui", "types",
+													"hotkeys" ]
+										});
+					});
+					function createCustomMenuEntry() {
+						$("#cust-menu").jstree("create", "#new", "last",
+								enterNewName);
+						return false;
+					}
+					function removeCustomMenuEntry(id) {
+						$("#cust-menu").jstree("remove", id);
+					}
+					function renameCustomMenuEntry(id) {
+						$("#cust-menu").jstree("rename", id);
+					}
+					function beforeSaveCustomMenuEntry() {
+						var menuAsXml = $("#cust-menu").jstree("get_xml",
+								"nest", "-1", [ "id" ]);
+						$('#menuAsXml').val(menuAsXml);
+						return true;
+					}
+					function isMenuLink(id) {
+						return (id && id.match(/^c/));
+					}
+				</script>
+  </wicket:extend>
+</body>
+</html>

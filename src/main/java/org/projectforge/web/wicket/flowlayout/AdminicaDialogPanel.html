@@ -1,0 +1,29 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+  <h1>Represents a dialog.</h1>
+  <wicket:panel>
+    <div class="display_none">
+      <div id="dialog_form" class="dialog_content" title="Dialog with Form fields" wicket:id="dialog">
+        <div class="block">
+          <wicket:container wicket:id="content">
+          [Content goes here...]</wicket:container>
+          <div class="button_bar clearfix">
+            <button class="dark green close_dialog">
+              <div class="ui-icon ui-icon-check"></div>
+              <span>Submit</span>
+            </button>
+            <button class="dark red close_dialog">
+              <div class="ui-icon ui-icon-closethick"></div>
+              <span><wicket:message key="cancel" /></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </wicket:panel>
+</body>
+</html>

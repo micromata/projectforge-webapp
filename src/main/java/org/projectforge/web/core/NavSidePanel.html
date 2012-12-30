@@ -1,0 +1,18 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+  <wicket:panel>
+    <ul class="side_accordion">
+      <!-- add class 'open_multiple' to change to from accordion to toggles -->
+      <li wicket:id="menuRepeater"><a href="#"><span wicket:id="label">[Generic]</span><span class="badge badge-important" wicket:id="suffix">[5]</span></a>
+        <ul class="drawer" wicket:id="subMenu">
+          <li wicket:id="subMenuRepeater"><a wicket:id="link"><span wicket:id="label">[Addresses]</span><span class="badge badge-important"
+              wicket:id="suffix">[5]</span></a></li>
+        </ul></li>
+    </ul>
+  </wicket:panel>
+</body>
+</html>

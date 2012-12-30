@@ -56,6 +56,9 @@ public class WicketRenderHeadUtils
     "styles/projectforge.css" //
   };
 
+  private static final String[] SELECT2_JAVASCRIPT_FILES = { //
+  "scripts/select2/select2.js"};
+
   /**
    * Jquery, bootstrap, jqueryui and uquery.contextmenu.js.
    */
@@ -73,6 +76,17 @@ public class WicketRenderHeadUtils
   {
     for (final String url : CSS_FILES) {
       response.render(CssReferenceHeaderItem.forUrl(url));
+    }
+  }
+
+  /**
+   * Renders all main JavaScript files and "select2.js".
+   */
+  public static void renderSelect2JavaScriptIncludes(final IHeaderResponse response)
+  {
+    renderMainJavaScriptIncludes(response);
+    for (final String url : SELECT2_JAVASCRIPT_FILES) {
+      response.render(JavaScriptReferenceHeaderItem.forUrl(url));
     }
   }
 }

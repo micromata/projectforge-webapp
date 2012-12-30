@@ -1,0 +1,24 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+  <h1>Represents a container.</h1>
+  <wicket:panel>
+    <div wicket:id="panel" class="collapse">
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a wicket:id="toggleLink" class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne"><i class="icon-arrow-down"></i><span
+            wicket:id="heading">[heading]</span> </a>
+        </div>
+        <div id="collapseOne" class="accordion-body collapse" wicket:id="toggleContainer">
+          <div class="accordion-inner">
+            <wicket:container wicket:id="content">[Toggle container.]</wicket:container>
+          </div>
+        </div>
+      </div>
+    </div>
+  </wicket:panel>
+</body>
+</html>

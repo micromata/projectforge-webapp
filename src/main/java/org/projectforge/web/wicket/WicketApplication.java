@@ -319,7 +319,6 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     final MyAuthorizationStrategy authStrategy = new MyAuthorizationStrategy();
     getSecuritySettings().setAuthorizationStrategy(authStrategy);
     getSecuritySettings().setUnauthorizedComponentInstantiationListener(authStrategy);
-    getResourceSettings().setResourceStreamLocator(new MyResourceStreamLocator());
     // Prepend the resource bundle for overwriting some Wicket default localizations (such as StringValidator.*)
     getResourceSettings().getStringResourceLoaders().add(new BundleStringResourceLoader(RESOURCE_BUNDLE_NAME));
     getResourceSettings().setThrowExceptionOnMissingResource(false); // Don't throw MissingResourceException for missing i18n keys.
