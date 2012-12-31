@@ -435,19 +435,27 @@ jQuery.autocomplete = function(input, options) {
 		// if an AJAX url has been supplied, try loading the data now
 		} else if( (typeof options.url == "string") && (options.url.length > 0) ){
 		  search = q;
-      var request = new Wicket.Ajax.Request(options.url+"&q="+q, doUpdateChoices, false, true, false, "wicket-autocomplete|k");
-      request.get();			
+		  var attrs = {
+					u: options.url+'&q='+q,
+					dt: 'json', // datatype
+					wr: false, // not Wicket's <ajax-response>
+					sh: [function(attributes, jqXHR, data, textStatus) {
+						  doUpdateChoices(data);
+					}
+					]
+					};
+          var request = Wicket.Ajax.get(attrs);
+          //var call = new Wicket.Ajax.ajax(attrs)
 		// if there's been no data found, remove the loading class
 		} else {
 			$input.removeClass(options.loadingClass);
 		}
 	};
 
-  function doUpdateChoices(resp) {
-    var data = eval('(' + resp + ')');
-    Wicket.Log.info("resp: " + resp + ", q=" + search);
-    Wicket.Log.info("Response processed successfully.");
-    Wicket.Ajax.invokePostCallHandlers();
+  function doUpdateChoices(data) {
+// Wicket.Log.info("data: " + data + ", q=" + search);
+// Wicket.Log.info("Response processed successfully.");
+// Wicket.Ajax.invokePostCallHandlers();
     addToCache(search, data);
     receiveData(search, data);
   }
