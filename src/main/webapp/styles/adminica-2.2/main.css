@@ -20,7 +20,7 @@ Sidebar and Topbar
 	left: -200px;
 	padding: 10px 10px 10px 20px;
 	z-index: 999; /* Important, do not change */
-	background-color: rgba(0, 0, 0, 0.75) !important;
+	background-color: rgba(0, 0, 0, 0.5) !important;
 	background-color: #000\9;
 	background-image: none !important;
 	border: 0;
@@ -53,7 +53,7 @@ Sidebar and Topbar
 	top: -3px;
 	right: -35px;
 	text-align: center;
-	background-color: rgba(0, 0, 0, 0.75);
+	background-color: rgba(0, 0, 0, 0.5);
 	background-color: #000\9;
 	border-bottom-right-radius: 5px;
 	top: 0px;

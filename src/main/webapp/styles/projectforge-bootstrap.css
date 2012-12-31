@@ -30,6 +30,10 @@ form div.row-fluid {
 	margin-bottom: 5px;
 }
 
+form div.has-sub-rows {
+	border: none;
+}
+
 input,textarea {
 	background: rgba(0, 0, 0, 0.05) !important;
 }

@@ -23,6 +23,9 @@
 
 package org.projectforge.web.wicket.bootstrap;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.projectforge.web.BrowserScreenWidthType;
@@ -57,6 +60,8 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
   private final int lengthCounter[] = new int[MAX_LEVEL + 1];
 
   private final boolean fluid;
+
+  private Set<String> rowsPanelHelperSet;
 
   /**
    * @param parent
@@ -118,7 +123,21 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
         return this;
       }
     } else {
-      return newGridPanel(0, size, gridTypes);
+      newGridPanel(0, size, gridTypes);
+      if (hasSubSplitPanel == true) {
+        // Set the class attribute "row-has-childs":
+        if (rowsPanelHelperSet == null) {
+          rowsPanelHelperSet = new HashSet<String>();
+          rowPanel[0].addCssClasses(GridType.ROW_HAS_CHILDS);
+          rowsPanelHelperSet.add(rowPanel[0].getMarkupId());
+        } else {
+          if (rowsPanelHelperSet.contains(rowPanel[0].getMarkupId()) == false) {
+            rowPanel[0].addCssClasses(GridType.ROW_HAS_CHILDS);
+            rowsPanelHelperSet.add(rowPanel[0].getMarkupId());
+          }
+        }
+      }
+      return this;
     }
   }
 
