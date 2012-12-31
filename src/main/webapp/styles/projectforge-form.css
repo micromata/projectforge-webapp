@@ -1,11 +1,10 @@
-
 div.controls {
 	float: left;
 }
+
 div.controls div {
 	display: inline-block;
 }
-
 
 form input.number {
 	width: 5em !important;
@@ -21,4 +20,12 @@ form input.phone {
 
 .form-horizontal .placeholder {
 	margin-left: 18px;
+}
+
+form div.button_bar {
+	border-color: #d9e1e5;
+	text-shadow: 0 1px 0 #fff;
+	background-color: #eee;
+	margin-left: 20px;
+	margin-bottom: 10px;
 }

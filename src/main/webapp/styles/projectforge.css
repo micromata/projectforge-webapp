@@ -238,11 +238,17 @@ input.userselectpanel {
 	margin: 0;
 }
 
+div.contentMenus {
+	height: 35px;
+}
+
 div.contentMenu {
+	display: inline-block;
 	padding-left: 45px;
 }
 
 div.contentRightMenu {
+	display: inline-block;
 	padding-right: 4px;
 	float: right;
 }
@@ -438,7 +444,7 @@ h2.box_head .subtitle {
 	background-color: black;
 	z-index: 1;
 	opacity: 0;
-	filter: alpha(opacity =     0);
+	filter: alpha(opacity =       0);
 }
 
 .pf_teamCalDialog {

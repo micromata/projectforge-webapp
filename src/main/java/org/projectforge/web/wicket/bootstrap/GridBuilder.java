@@ -88,10 +88,20 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
     return newSplitPanel(size, false, gridTypes);
   }
 
-  public GridBuilder newSplitPanel(final GridSize size, final boolean hasSubSplitPanel, final GridType... gridTypes)
+  public GridBuilder newSplitPanel(final GridSize size, final boolean hasSubSplitPanel, GridType... gridTypes)
   {
     if (hasSubSplitPanel == true) {
       splitDepth = 2;
+      if (gridTypes == null) {
+        gridTypes = new GridType[] { GridType.HAS_CHILDS};
+      } else {
+        final GridType[] types = new GridType[gridTypes.length + 1];
+        for (int i = 0; i < gridTypes.length; i++) {
+          types[i] = gridTypes[i];
+        }
+        types[gridTypes.length] = GridType.HAS_CHILDS;
+        gridTypes = types;
+      }
     } else {
       splitDepth = 1;
     }
@@ -168,12 +178,26 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
     if (rowPanel[level] == null) {
       newRowPanel(level);
     }
+    boolean firstPanelOfRow = false;
+    if (lengthCounter[level] == 0) {
+      firstPanelOfRow = true;
+    }
     lengthCounter[level] += size.getLength();
     if (lengthCounter[level] > 12) {
       newRowPanel(level);
       lengthCounter[level] = size.getLength();
+      firstPanelOfRow = true;
+    } else {
+      if (firstPanelOfRow == false && gridPanel[level] != null) {
+        gridPanel[level].addCssClasses(GridType.HAS_SIBLINGS);
+      }
     }
     final DivPanel divPanel = new DivPanel(rowPanel[level].newChildId(), size, gridTypes);
+    if (firstPanelOfRow == false) {
+      divPanel.addCssClasses(GridType.NOT_FIRST);
+    } else {
+      divPanel.addCssClasses(GridType.FIRST);
+    }
     return addGridPanel(level, divPanel);
   }
 
@@ -227,6 +251,7 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
     setNullPanel(level + 1, level);
     return this;
   }
+
   /**
    * @return new child id (Wicket id) of the current grid panel.
    */

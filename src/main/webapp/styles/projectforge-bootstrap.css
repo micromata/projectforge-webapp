@@ -7,3 +7,57 @@
 	right: -5px;
 	z-index: 10;
 }
+
+form div.span12,div.span9,div.span8,div.span6,div.span4,div.span3 {
+	
+}
+
+/*form div.not-first {
+	border-left: 1px solid #bbb;
+}*/
+form div.has-siblings {
+	border-right: 1px solid #bbb;
+}
+
+form div.has-childs {
+	border-right: none;
+}
+
+form div.row-fluid {
+	background-color: #fff;
+	border: 1px solid #bbb;
+	border-radius: 3px;
+	margin-bottom: 5px;
+}
+
+input,textarea {
+	background: rgba(0, 0, 0, 0.05) !important;
+}
+
+div.tabbable {
+	background-color: #fff;
+}
+
+div.tabbable>ul.nav {
+	background-attachment: scroll;
+	background-clip: border-box;
+	background-color: rgb(76, 87, 102);
+	background-image: -webkit-linear-gradient(top, rgb(76, 87, 102),
+		rgb(49, 56, 65) );
+	background-origin: padding-box;
+}
+
+div.tabbable>ul.nav>li {
+	background-image: -webkit-linear-gradient(top, rgb(230, 236, 239),
+		rgb(208, 214, 218) );
+	background-color: #E6ECEF;
+}
+
+div.tabbable>ul.nav>li>a {
+	color: #000 !important;
+	text-shadow: rgb(255, 255, 255) 0px 1px 0px;
+}
+
+div.tab-pane {
+	background-color: #fff;
+}

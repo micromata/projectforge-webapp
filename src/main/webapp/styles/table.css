@@ -14,7 +14,7 @@ table.dataview {
 	border-collapse: collapse;
 	border: 1px solid #d9dfe1;
 	width: 100%;
-	letter-spacing: normal;
+	font-size: 0.9em;
 }
 
 table.dataview caption {

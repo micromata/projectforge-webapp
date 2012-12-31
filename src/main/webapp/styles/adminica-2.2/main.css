@@ -259,6 +259,10 @@ li:last-child ul.drawer li:last-child a {
 	width: 180px;
 }
 
+#nav_top img.gear {
+	margin-right: -15px;
+}
+
 .dropdown_menu {
 	display: block;
 	position: relative;
