@@ -6,28 +6,26 @@ Bootstrap-Umbau
 - Layout innerhalb ToggleContainer
 - Feldbreiten für control-groups 100%
 - Checkboxengröße/breite
-- Layout: Zeilenabstände, Schriftgröße Tabellen
-- Runde Boxen um SPAN*-Container (class lines / box einführen)
 - Hilfe-Icons bei Textfields
 - RechnungEditPage: Anzeige von Aufträgen, Icon deplatziert
-- Layout-Farben: Tabpane
 - Mit iPhone/iPad prüfen
 - Tabellen (insbesonder Änderungshistorie: padding-left)
-- Sidemenu: badge: margin-left
-- Hauptmenus: Style Schrift: nicht fett
-- Oben rechts Userbox: Farbiger Kasten
 - TestArea: autogrow
 - TeamCalDialog: Wenn man irgendwo außerhalb klickt, sollte der sich auch wieder schließen.
 - CalendarPage springt im Datum
+- context menu auf Tabellenzeilen klappt nicht: abbrechen
 
 - zindex: DatePanel, Main-Menu-sub-menues (on iPhone)
+- Autocompletion doesn't work (locations, time zones...)
+- unbenutzte css- und js-Pakete entfernen.
+- unbenutzte Bilder entfernen.
 
 Konkrete Masken
 ---------------
 - LizenzEditForm: Select2 zu schmal
 - AddressViewPage
 - AdminPage
-- SetupPage für Neuinstallation
+- SetupPage für Neuinstallation (Helpicon für E-Mails deplatziert)
 - TaskWizzard
 - AuftragsEditForm
 - *RechnungsEditForm
@@ -39,7 +37,6 @@ Konkrete Masken
 
 Wicket6-Migration
 -----------------
-- Alle htmls zu Javas schieben.
 - Fullcalendar
 - JavaScriptEventToggleBehavior
 - ToggleContainer
