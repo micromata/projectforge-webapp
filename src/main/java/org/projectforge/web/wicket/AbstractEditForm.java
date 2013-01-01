@@ -73,6 +73,8 @@ AbstractSecuredForm<O, P>
 
   protected GridBuilder gridBuilder;
 
+  private O origData;
+
   public AbstractEditForm(final P parentPage, final O data)
   {
     super(parentPage);
@@ -258,9 +260,12 @@ AbstractSecuredForm<O, P>
           setDefaultButton(cancelButton);
         }
       } else {
+        if (origData == null) {
+          origData = getBaseDao().getById(getData().getId());
+        }
         createButtonPanel.setVisible(false);
         if (getData().isDeleted() == true) {
-          undeleteButtonPanel.setVisible(baseDao.hasLoggedInUserUpdateAccess(getData(), getData(), false));
+          undeleteButtonPanel.setVisible(baseDao.hasLoggedInUserUpdateAccess(origData, origData, false));
           if (undeleteButtonPanel.isVisible() == true) {
             setDefaultButton(undeleteButton);
           }
@@ -272,14 +277,14 @@ AbstractSecuredForm<O, P>
           undeleteButtonPanel.setVisible(false);
           if (parentPage.getBaseDao().isHistorizable() == true) {
             deleteButtonPanel.setVisible(false);
-            markAsDeletedButtonPanel.setVisible(baseDao.hasLoggedInUserDeleteAccess(getData(), getData(), false));
+            markAsDeletedButtonPanel.setVisible(baseDao.hasLoggedInUserDeleteAccess(origData, origData, false));
           } else {
-            deleteButtonPanel.setVisible(baseDao.hasLoggedInUserDeleteAccess(getData(), getData(), false));
+            deleteButtonPanel.setVisible(baseDao.hasLoggedInUserDeleteAccess(origData, origData, false));
             markAsDeletedButtonPanel.setVisible(false);
           }
-          updateButtonPanel.setVisible(baseDao.hasLoggedInUserUpdateAccess(getData(), getData(), false));
+          updateButtonPanel.setVisible(baseDao.hasLoggedInUserUpdateAccess(origData, origData, false));
           if (parentPage.isUpdateAndNextSupported() == true) {
-            updateAndNextButtonPanel.setVisible(baseDao.hasLoggedInUserUpdateAccess(getData(), getData(), false));
+            updateAndNextButtonPanel.setVisible(updateButtonPanel.isVisible());
           } else {
             updateAndNextButton.setVisible(false);
           }
