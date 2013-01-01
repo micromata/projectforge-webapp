@@ -1,7 +1,3 @@
-div.controls {
-	float: left;
-}
-
 div.controls div {
 	display: inline-block;
 }
@@ -36,4 +32,18 @@ input.warning {
 
 input.userselectpanel {
 	width: 200px !important;
+}
+
+form.form-horizontal label.control-label {
+	width: 100px;
+}
+
+form.form-horizontal div.controls {
+	margin-left: 120px;
+	width: -webkit-calc(100%-120px);
+}
+
+form.form-horizontal div.controls input,form.form-horizontal div.controls textarea
+	{
+	width: 99%;
 }

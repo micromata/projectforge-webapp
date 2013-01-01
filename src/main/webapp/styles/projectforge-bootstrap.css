@@ -23,11 +23,12 @@ form div.has-childs {
 	border-right: none;
 }
 
-form div.row-fluid {
+form div.row-fluid,div.rounded-box {
 	background-color: #fff;
 	border: 1px solid #bbb;
 	border-radius: 3px;
 	margin-bottom: 5px;
+	padding-top: 5px;
 }
 
 form div.has-sub-rows {
@@ -69,4 +70,14 @@ div.tab-pane {
 div.alert {
 	margin-left: 10px;
 	margin-right: 10px;
+}
+
+div.login-panel {
+	width: 50em;
+	margin-top: 2em;
+	margin-left: auto;
+	margin-right: auto;
+}
+div.login-header {
+	padding: 15px;
 }
