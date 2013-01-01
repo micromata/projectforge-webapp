@@ -29,3 +29,11 @@ form div.button_bar {
 	margin-left: 20px;
 	margin-bottom: 10px;
 }
+
+input.warning {
+	background-color: #FDD;
+}
+
+input.userselectpanel {
+	width: 200px !important;
+}

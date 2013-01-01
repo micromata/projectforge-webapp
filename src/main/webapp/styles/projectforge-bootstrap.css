@@ -65,3 +65,8 @@ div.tabbable>ul.nav>li>a {
 div.tab-pane {
 	background-color: #fff;
 }
+
+div.alert {
+	margin-left: 10px;
+	margin-right: 10px;
+}

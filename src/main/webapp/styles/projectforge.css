@@ -1,7 +1,3 @@
-input.warning {
-	background-color: #FDD;
-}
-
 .taskStatus_opened {
 	color: #518732;
 }
@@ -151,10 +147,6 @@ div.progress-overbooked-min div {
 	/*background-color: #FFFFFF;*/
 	padding-left: 10px;
 	padding-right: 10px;
-}
-
-input.userselectpanel {
-	width: 200px !important;
 }
 
 /* Autocomplete */
