@@ -3,7 +3,7 @@
 // Project ProjectForge Community Edition
 //         www.projectforge.org
 //
-// Copyright (C) 2001-2012 Kai Reinhard (k.reinhard@micromata.de)
+// Copyright (C) 2001-2013 Kai Reinhard (k.reinhard@micromata.de)
 //
 // ProjectForge is dual-licensed.
 //
@@ -26,6 +26,7 @@ package org.projectforge.web.mobile;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.AppVersion;
+import org.projectforge.ProjectForgeVersion;
 import org.projectforge.web.wicket.WicketUtils;
 
 public class AboutMobilePage extends AbstractMobilePage
@@ -41,7 +42,7 @@ public class AboutMobilePage extends AbstractMobilePage
   {
     super(parameters);
     pageContainer.add(new Label("text", getString("mobile.about.text")).setEscapeModelStrings(false));
-    pageContainer.add(new Label("copyright", "©2001-2012 by Kai Reinhard, Micromata GmbH, Germany"));
+    pageContainer.add(new Label("copyright", "©2001-" + ProjectForgeVersion.YEAR + " by Kai Reinhard, Micromata GmbH, Germany"));
   }
 
   @Override
