@@ -281,12 +281,6 @@ public class CalendarPanel extends Panel
     };
     calendar.setMarkupId("calendar");
     add(calendar);
-    final DateMidnight startDate = filter.getStartDate();
-    if (startDate != null) {
-      config.setYear(startDate.getYear());
-      config.setMonth(startDate.getMonthOfYear() - 1);
-      config.setDate(startDate.getDayOfMonth());
-    }
     setConfig();
 
     // Time sheets
