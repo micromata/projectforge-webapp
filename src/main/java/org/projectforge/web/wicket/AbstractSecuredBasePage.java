@@ -23,7 +23,6 @@
 
 package org.projectforge.web.wicket;
 
-import org.apache.wicket.MetaDataKey;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -40,10 +39,6 @@ import org.projectforge.web.user.ChangePasswordPage;
  */
 public abstract class AbstractSecuredBasePage extends AbstractUnsecureBasePage
 {
-  @SuppressWarnings("serial")
-  public static final MetaDataKey<AbstractSecuredBasePage> SECURED_BASE_PAGE = new MetaDataKey<AbstractSecuredBasePage>() {
-  };
-
   private static final long serialVersionUID = 3225994698301133706L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AbstractSecuredBasePage.class);
@@ -60,16 +55,6 @@ public abstract class AbstractSecuredBasePage extends AbstractUnsecureBasePage
     if (isAccess4restrictedUsersAllowed() == false && (getUser() == null || getUser().isRestrictedUser() == true)) {
       throw new RestartResponseException(ChangePasswordPage.class);
     }
-  }
-
-  /**
-   * Set the current page as meta data in the current request cycle. Work around because since Wicket 1.5 the exception handler doesn't have
-   * access to the current page.
-   * @see WicketApplication#init()
-   */
-  public void setRequestCycleMetaData()
-  {
-    getRequestCycle().setMetaData(SECURED_BASE_PAGE, this);
   }
 
   /**

@@ -417,7 +417,6 @@ AbstractSecuredForm<F, P>
   protected void onSubmit()
   {
     super.onSubmit();
-    parentPage.setRequestCycleMetaData();
     if (modificationSince != null) {
       final int pos = modificationSince.indexOf(':');
       final Integer number;

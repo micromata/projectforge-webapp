@@ -61,7 +61,6 @@ import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.CronSetup;
-import org.projectforge.core.ProjectForgeException;
 import org.projectforge.core.SystemInfoCache;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.HibernateUtils;
@@ -291,13 +290,6 @@ public class WicketApplication extends WebApplication implements WicketApplicati
         // return super.onException(cycle, ex);
         // }
         // return null;
-        final AbstractSecuredBasePage page = cycle.getMetaData(AbstractSecuredBasePage.SECURED_BASE_PAGE);
-        if (page != null && rootCause instanceof ProjectForgeException) {
-          // Show exception message as error message in feedback panel.
-          final String msg = ErrorPage.getExceptionMessage(page, (ProjectForgeException) rootCause, true);
-          page.error(msg);
-          return new RenderPageRequestHandler(new PageProvider(page));
-        }
         if (isDevelopmentSystem() == true) {
           log.error(ex.getMessage(), ex);
           if (rootCause instanceof SQLException) {
