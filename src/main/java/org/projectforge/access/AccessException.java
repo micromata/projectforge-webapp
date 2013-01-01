@@ -28,7 +28,7 @@ import java.util.ResourceBundle;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.projectforge.core.MessageParam;
 import org.projectforge.core.MessageParamType;
-import org.projectforge.core.ProjectForgeException;
+import org.projectforge.core.UserException;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
@@ -39,7 +39,7 @@ import org.projectforge.user.PFUserDO;
  * This class will be thrown by AccessChecker, if no access is given for the demanded action by an user.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class AccessException extends ProjectForgeException
+public class AccessException extends UserException
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AccessException.class);
 
@@ -59,10 +59,6 @@ public class AccessException extends ProjectForgeException
 
   protected String message = null;
 
-  protected String i18nKey = null;
-
-  protected Object[] params = null;
-
   protected OperationType operationType = null;
 
   protected Class< ? > clazz = null;
@@ -74,9 +70,9 @@ public class AccessException extends ProjectForgeException
 
   public AccessException(final PFUserDO user, final String i18nKey, final Object... params)
   {
+    super(i18nKey, params);
     this.user = user;
     this.i18nKey = i18nKey;
-    this.params = params;
     log.info("AccessException: " + this);
   }
 
@@ -87,10 +83,10 @@ public class AccessException extends ProjectForgeException
 
   public AccessException(final PFUserDO user, final AccessType accessType, final OperationType operationType)
   {
+    super(I18N_KEY_STANDARD);
     this.user = user;
     this.accessType = accessType;
     this.operationType = operationType;
-    this.i18nKey = I18N_KEY_STANDARD;
     log.info("AccessException: " + this);
   }
 
@@ -101,11 +97,11 @@ public class AccessException extends ProjectForgeException
 
   public AccessException(final PFUserDO user, final Integer taskId, final AccessType accessType, final OperationType operationType)
   {
+    super(I18N_KEY_STANDARD_WITH_TASK);
     this.user = user;
     this.taskId = taskId;
     this.accessType = accessType;
     this.operationType = operationType;
-    this.i18nKey = I18N_KEY_STANDARD_WITH_TASK;
     log.info("AccessException: " + this);
   }
 
@@ -113,11 +109,11 @@ public class AccessException extends ProjectForgeException
    * The order of the args is task id, accessType and operationType.
    * @return the arguments for the message formatter from type Object[3].
    */
-  public Object[] getMessageArgs(ResourceBundle bundle)
+  public Object[] getMessageArgs(final ResourceBundle bundle)
   {
-    Object[] result = new Object[3];
+    final Object[] result = new Object[3];
     if (taskTree != null && this.taskId != null) {
-      TaskDO task = taskTree.getTaskById(taskId);
+      final TaskDO task = taskTree.getTaskById(taskId);
       if (task != null) {
         result[0] = task.getTitle();
       } else {
@@ -137,9 +133,9 @@ public class AccessException extends ProjectForgeException
 
   public MessageParam[] getMessageArgs()
   {
-    MessageParam[] result = new MessageParam[3];
+    final MessageParam[] result = new MessageParam[3];
     if (taskTree != null && this.taskId != null) {
-      TaskDO task = taskTree.getTaskById(taskId);
+      final TaskDO task = taskTree.getTaskById(taskId);
       if (task != null) {
         result[0] = new MessageParam(task.getTitle());
       } else {
@@ -157,24 +153,6 @@ public class AccessException extends ProjectForgeException
     return result;
   }
 
-  public String getI18nKey()
-  {
-    return this.i18nKey;
-  }
-
-  public void setI18nKey(String i18nKey)
-  {
-    this.i18nKey = i18nKey;
-  }
-
-  /**
-   * The optional params of the i18n message.
-   */
-  public Object[] getParams()
-  {
-    return this.params;
-  }
-
   public PFUserDO getUser()
   {
     return this.user;
@@ -190,14 +168,9 @@ public class AccessException extends ProjectForgeException
     return accessType;
   }
 
-  public void setAccessType(AccessType accessType)
+  public void setAccessType(final AccessType accessType)
   {
     this.accessType = accessType;
-  }
-
-  public String getMessage()
-  {
-    return this.message;
   }
 
   public TaskNode getTaskNode()
@@ -217,7 +190,7 @@ public class AccessException extends ProjectForgeException
   /**
    * @param clazz The clazz to set.
    */
-  public void setClazz(Class< ? > clazz)
+  public void setClazz(final Class< ? > clazz)
   {
     this.clazz = clazz;
   }
@@ -233,7 +206,7 @@ public class AccessException extends ProjectForgeException
   /**
    * @param operationType The operationType to set.
    */
-  public void setOperationType(OperationType operationType)
+  public void setOperationType(final OperationType operationType)
   {
     this.operationType = operationType;
   }
@@ -241,7 +214,7 @@ public class AccessException extends ProjectForgeException
   /**
    * @param message The message to set.
    */
-  public void setMessage(String message)
+  public void setMessage(final String message)
   {
     this.message = message;
   }
@@ -249,7 +222,7 @@ public class AccessException extends ProjectForgeException
   /**
    * @param user The user to set.
    */
-  public void setUser(PFUserDO user)
+  public void setUser(final PFUserDO user)
   {
     this.user = user;
   }
@@ -259,7 +232,7 @@ public class AccessException extends ProjectForgeException
     return taskTree;
   }
 
-  public void setTaskTree(TaskTree taskTree)
+  public void setTaskTree(final TaskTree taskTree)
   {
     this.taskTree = taskTree;
   }
@@ -267,13 +240,13 @@ public class AccessException extends ProjectForgeException
   @Override
   public String toString()
   {
-    ToStringBuilder builder = new ToStringBuilder(this);
+    final ToStringBuilder builder = new ToStringBuilder(this);
     if (user != null) {
       builder.append("user", String.valueOf(user.getId()) + ":" + user.getUsername());
     }
     if (taskId != null) {
-      TaskDO task = taskTree != null ? taskTree.getTaskById(taskId) : null;
-      String ts = task != null ? ":" + task.getShortDisplayName() : "";
+      final TaskDO task = taskTree != null ? taskTree.getTaskById(taskId) : null;
+      final String ts = task != null ? ":" + task.getShortDisplayName() : "";
       builder.append("task", String.valueOf(taskId) + ts);
     }
     if (accessType != null) {
