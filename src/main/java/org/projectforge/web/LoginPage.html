@@ -11,48 +11,34 @@
           src="images/logo-top-right.png" style="border: none;" />
       </div>
     </div>
-    <div class="row-fluid">
-      <div class="span6 offset3">
+    <div class="loginpanel">
+      <div>
         <h3>
           <wicket:message key="login.title" />
         </h3>
-        <p>
-          <wicket:message key="login.welcome" />
-        </p>
+        <p wicket:id="welcome">[Have a lot of fun with ProjectForge 2013!]</p>
       </div>
-    </div>
-    <div class="row-fluid" wicket:id="administratorLoginNeeded">
-      <div class="span6 offset3">
+      <div wicket:id="administratorLoginNeeded">
         <div class="alert alert-block">
           <img height="24" width="24" src="images/icons/small/white/alarm_bell.png">
           <wicket:message key="login.adminLoginRequired" />
         </div>
       </div>
-    </div>
-    <div class="row-fluid" wicket:id="errors">
-      <div class="span6 offset3">
+      <div wicket:id="errors">
         <div class="alert alert-error">
           <img height="24" width="24" src="images/icons/small/white/alarm_bell.png"> <span wicket:id="msg">[login failed]</span>
         </div>
       </div>
-    </div>
-    <div class="row-fluid" wicket:id="messageOfTheDay">
-      <div class="span6 offset3">
+      <div wicket:id="messageOfTheDay">
         <div class="alert alert-info">
           <img height="24" width="24" src="images/icons/small/white/alert_2.png"> <span wicket:id="msg">[Have a lot of fun!]</span>
         </div>
       </div>
-    </div>
-    <form wicket:id="form" class="form-horizontal">
-      <div class="row-fluid">
-        <div class="span6 offset3">
-          <div class="alert alert-error" wicket:id="feedback">
-            <img height="24" width="24" src="images/icons/small/white/alarm_bell.png">
-          </div>
+      <form wicket:id="form" class="form-horizontal">
+        <div class="alert alert-error" wicket:id="feedback">
+          <img height="24" width="24" src="images/icons/small/white/alarm_bell.png">
         </div>
-      </div>
-      <div class="row-fluid">
-        <div class="span6 offset3">
+        <div>
           <wicket:container wicket:id="username">
                   [Username]
                   </wicket:container>
@@ -66,8 +52,8 @@
             <wicket:container wicket:id="loginButton">[login button]</wicket:container>
           </div>
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
   </wicket:extend>
 </body>
 </html>
