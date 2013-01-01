@@ -30,7 +30,6 @@ import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.link.AbstractLink;
@@ -48,7 +47,6 @@ import org.projectforge.web.MenuEntry;
 import org.projectforge.web.mobile.MenuMobilePage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.FeedbackPage;
-import org.projectforge.web.wicket.WicketApplication;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DialogPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
@@ -76,29 +74,6 @@ public class NavTopPanel extends NavAbstractPanel
 
   public void init(final AbstractSecuredPage page)
   {
-    @SuppressWarnings("serial")
-    final Model<String> alertMessageModel = new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        if (WicketApplication.getAlertMessage() == null) {
-          return "neverDisplayed";
-        }
-        return WicketApplication.getAlertMessage();
-      }
-    };
-    @SuppressWarnings("serial")
-    final WebMarkupContainer alertMessageContainer = new WebMarkupContainer("alertMessageContainer") {
-      @Override
-      public boolean isVisible()
-      {
-        return (WicketApplication.getAlertMessage() != null);
-      }
-    };
-    add(alertMessageContainer);
-    final Label alertMessageLabel = new Label("alertMessage", alertMessageModel);
-    alertMessageContainer.add(alertMessageLabel.setRenderBodyOnly(true));
-
     if (page.getMySession().isMobileUserAgent() == true) {
       add(new BookmarkablePageLink<Void>("goMobile", MenuMobilePage.class));
     } else {

@@ -436,7 +436,7 @@ h2.box_head .subtitle {
 	background-color: black;
 	z-index: 1;
 	opacity: 0;
-	filter: alpha(opacity =       0);
+	filter: alpha(opacity = 0);
 }
 
 .pf_teamCalDialog {
@@ -531,4 +531,25 @@ h2.box_head .subtitle {
 
 div.pf_hiddenForm {
 	display: none !important;
+}
+
+div.global-alert-message {
+	background-color: #9E253B;
+	color: #fff;
+	border-bottom-left-radius: 9px;
+	border-bottom-right-radius: 9px;
+	border-bottom-style: solid;
+	border-bottom-width: 2px;
+	border-left-style: solid;
+	border-left-width: 2px;
+	border-right-style: solid;
+	border-right-width: 2px;
+	border-top-left-radius: 9px;
+	border-top-right-radius: 9px;
+	border-top-style: solid;
+	border-top-width: 2px;
+	text-shadow: rgba(0, 0, 0, 0.246094) 0px -1px 0px;
+	margin: 0px 20px 5px 20px;
+	padding: 5px;
+	font-weight: bold;
 }

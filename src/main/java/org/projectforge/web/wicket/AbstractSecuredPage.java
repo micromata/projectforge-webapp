@@ -150,6 +150,27 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
     contentMenusContainer.add(contentRightMenuContainer);
     contentRightMenu = new MyComponentsRepeater<ContentMenuEntryPanel>("contentRightMenuRepeater");
     contentRightMenuContainer.add(contentRightMenu.getRepeatingView());
+
+    final Model<String> alertMessageModel = new Model<String>() {
+      @Override
+      public String getObject()
+      {
+        if (WicketApplication.getAlertMessage() == null) {
+          return "neverDisplayed";
+        }
+        return WicketApplication.getAlertMessage();
+      }
+    };
+    final WebMarkupContainer alertMessageContainer = new WebMarkupContainer("alertMessageContainer") {
+      @Override
+      public boolean isVisible()
+      {
+        return (WicketApplication.getAlertMessage() != null);
+      }
+    };
+    body.add(alertMessageContainer);
+    final Label alertMessageLabel = new Label("alertMessage", alertMessageModel);
+    alertMessageContainer.add(alertMessageLabel.setRenderBodyOnly(true));
   }
 
   /**
