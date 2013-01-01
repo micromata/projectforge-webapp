@@ -133,9 +133,6 @@ public class MaxLengthTextField extends TextField<String>
       } else {
         length = HibernateUtils.getPropertyLength(entity.getClass().getName(), propertyModel.getPropertyField().getName());
       }
-      if (length == null) {
-        log.warn("No length validation for: " + model);
-      }
     }
     return length;
   }
