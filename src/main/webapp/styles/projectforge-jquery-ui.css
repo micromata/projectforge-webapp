@@ -1,0 +1,20 @@
+.ui-tooltip {
+	max-width: 600px;
+}
+
+.ui-button {
+	font-size: 90%;
+}
+
+#ui-datepicker-div {
+  z-index: 1000!important;
+}
+
+td.ui-datepicker-today {
+	background: #F7BE81;
+}
+
+button.ui-datepicker-current,button.ui-datepicker-close {
+	background: #FFFFFF;
+}
+
