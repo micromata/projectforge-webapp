@@ -39,8 +39,8 @@ form.form-horizontal label.control-label {
 }
 
 form.form-horizontal div.controls {
-	margin-left: 120px;
-	width: -webkit-calc(100% -120px);
+	margin-left: 140px;
+	width: -webkit-calc(100% -140px);
 }
 
 form.form-horizontal div.controls input,form.form-horizontal div.controls textarea

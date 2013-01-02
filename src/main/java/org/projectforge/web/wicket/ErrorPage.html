@@ -6,11 +6,13 @@
 
 <body>
   <wicket:extend>
-    <div class="grid_16">
-      <div class="alert alert_red feedback" wicket:id="feedback"></div>
-      <div class="alert alert_red feedback" wicket:id="errorMessage"></div>
+    <div class="row-fluid">
+      <div class="span12">
+        <div class="alert alert_error" wicket:id="feedback"></div>
+        <div class="alert alert_error" wicket:id="errorMessage"></div>
+      </div>
     </div>
-    <form wicket:id="form" name="form">
+    <form wicket:id="form" name="form" class="form-horizontal">
       <wicket:container wicket:id="flowform">[the form fields]</wicket:container>
       <div class="button_bar">
         <wicket:container wicket:id="buttons">[action buttons]</wicket:container>
