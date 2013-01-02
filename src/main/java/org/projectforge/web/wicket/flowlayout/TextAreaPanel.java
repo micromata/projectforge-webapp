@@ -74,14 +74,20 @@ public class TextAreaPanel extends Panel implements ComponentWrapperPanel
   }
 
   /**
+   * @return
+   */
+  public TextAreaPanel setAutogrow()
+  {
+    this.autogrow = true;
+    return this;
+  }
+
+  /**
    * class="autogrow"
    * @return this for chaining.
    */
   public TextAreaPanel setAutogrow(final int minHeight, final int maxHeight)
   {
-    if (this.autogrow == false) {
-      throw new IllegalArgumentException("Please call TextAreaPanel(id, field, true) for enabling autogrow for this text area panel.");
-    }
     this.autogrowMinHeight = minHeight;
     this.autogrowMaxHeight = maxHeight;
     return this;

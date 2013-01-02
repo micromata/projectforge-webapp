@@ -56,7 +56,8 @@ function initializeComponents() {
 	});
 	$("div.radio-jquery-ui").buttonset();
 	$("div.collapse").collapse();
-	$("textarea.autogrow").autoGrow();
+	if ($("textarea.autogrow").length)
+		$("textarea.autogrow").autoGrow();
 }
 function showBookmark() {
 	$("#bookmark").toggle("normal");
@@ -151,8 +152,8 @@ function doAfterAjaxHandling() {
 		e.preventDefault();
 	}).siblings('input[type="file"]').change(function(e) {
 		$(this).siblings('.label').val(/([^\\\/]+)$/.exec(this.value)[1]); // Extract
-																			// the
-																			// filename
+		// the
+		// filename
 		$(this).siblings('.label').change();
 	});
 	$("fieldset > div > input[type=checkbox]").addClass("checkbox");

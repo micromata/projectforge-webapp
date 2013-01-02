@@ -338,7 +338,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.description"), true);
       final IModel<String> model = new PropertyModel<String>(data, "description");
-      fs.add(descriptionArea = new MaxLengthTextArea(TextAreaPanel.WICKET_ID, model));
+      fs.add(descriptionArea = new MaxLengthTextArea(TextAreaPanel.WICKET_ID, model)).setAutogrow();
       fs.addJIRAField(model);
     }
     {
