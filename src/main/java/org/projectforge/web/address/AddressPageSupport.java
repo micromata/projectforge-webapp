@@ -54,6 +54,8 @@ import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.flowlayout.AbstractFieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.AbstractGridBuilder;
+import org.projectforge.web.wicket.flowlayout.ComponentSize;
+import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
 import org.projectforge.web.wicket.flowlayout.FieldProperties;
 import org.projectforge.web.wicket.flowlayout.FieldType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -181,7 +183,9 @@ class AddressPageSupport implements Serializable
     final AbstractFieldsetPanel< ? > fs = gridBuilder.newFieldset(props);
     final LabelValueChoiceRenderer<FormOfAddress> formChoiceRenderer = new LabelValueChoiceRenderer<FormOfAddress>(form,
         FormOfAddress.values());
-    fs.addDropDownChoice(props.getModel(), formChoiceRenderer.getValues(), formChoiceRenderer).setRequired(true).setNullValid(false);
+    final DropDownChoicePanel<?> panel = fs.addDropDownChoice(props.getModel(), formChoiceRenderer.getValues(), formChoiceRenderer)
+        .setRequired(true).setNullValid(false);
+    WicketUtils.setSize(panel.getDropDownChoice(), ComponentSize.SMALL);
     return fs;
   }
 
