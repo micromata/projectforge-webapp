@@ -94,7 +94,7 @@ public class ErrorForm extends AbstractForm<ErrorPageData, ErrorPage>
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("errorpage.feedback.description"), true);
       final MaxLengthTextArea description = new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "description"), 4000);
       WicketUtils.setFocus(description);
-      fs.add(description).setAutogrow();
+      fs.add(description, true);
     }
     actionButtons = new MyComponentsRepeater<SingleButtonPanel>("buttons");
     add(actionButtons.getRepeatingView());

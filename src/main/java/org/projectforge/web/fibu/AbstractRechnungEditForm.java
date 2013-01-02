@@ -329,13 +329,13 @@ extends AbstractEditForm<O, P>
     {
       // Bemerkung
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));
-      fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "bemerkung"))).setAutogrow();
+      fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "bemerkung")), true);
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Besonderheiten
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.besonderheiten"));
-      fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "besonderheiten"))).setAutogrow();
+      fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "besonderheiten")), true);
     }
     gridBuilder.newGridPanel();
     positionsRepeater = gridBuilder.newRepeatingView();
@@ -566,7 +566,7 @@ extends AbstractEditForm<O, P>
           columns.add(column = new DivPanel(columns.newChildId())); // Full width.
         }
         final FieldsetPanel fieldset = new FieldsetPanel(column, getString("fibu.rechnung.text"));
-        fieldset.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(position, "text"))).setAutogrow();
+        fieldset.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(position, "text")), true);
       }
 
       if (costConfigured == true) {

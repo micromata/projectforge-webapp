@@ -111,7 +111,7 @@ public class Kost2ArtEditForm extends AbstractEditForm<Kost2ArtDO, Kost2ArtEditP
     {
       // Description
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"));
-      fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "description"))).setAutogrow();
+      fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "description")), true);
     }
   }
 

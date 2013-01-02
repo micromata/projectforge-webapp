@@ -69,7 +69,7 @@ public class FeedbackForm extends AbstractStandardForm<SendFeedbackData, Feedbac
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"), true);
       final MaxLengthTextArea description = new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "description"), 4000);
       WicketUtils.setFocus(description);
-      fs.add(description).setAutogrow();
+      fs.add(description, true);
     }
     {
       addCancelButton(new Button(SingleButtonPanel.WICKET_ID, new Model<String>("cancel")) {

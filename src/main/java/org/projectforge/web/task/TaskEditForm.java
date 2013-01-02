@@ -398,7 +398,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
       // Description:
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"), true);
       final IModel<String> model = new PropertyModel<String>(data, "description");
-      fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, model)).setAutogrow();
+      fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, model), true);
       fs.addJIRAField(model);
     }
   }

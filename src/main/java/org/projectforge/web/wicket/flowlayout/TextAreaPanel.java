@@ -24,9 +24,11 @@
 package org.projectforge.web.wicket.flowlayout;
 
 import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.projectforge.web.wicket.WicketRenderHeadUtils;
 
 /**
  * Represents an icon.
@@ -39,22 +41,36 @@ public class TextAreaPanel extends Panel implements ComponentWrapperPanel
 
   private static final long serialVersionUID = -4126462093466172226L;
 
-  private TextArea<?> field;
+  private TextArea< ? > field;
 
-  public TextAreaPanel(final String id, final TextArea<?> field)
+  private boolean autogrow = false;
+
+  private int autogrowMinHeight = -1;
+
+  private int autogrowMaxHeight = -1;
+
+  public TextAreaPanel(final String id, final TextArea< ? > field)
+  {
+    this(id, field, false);
+  }
+
+  public TextAreaPanel(final String id, final TextArea< ? > field, final boolean autogrow)
   {
     super(id);
-    field.add(AttributeModifier.append("class", "textarea"));
+    this.autogrow = autogrow;
     add(this.field = field);
   }
 
   /**
-   * class="autogrow"
-   * @return this for chaining.
+   * @see org.apache.wicket.Component#renderHead(org.apache.wicket.markup.head.IHeaderResponse)
    */
-  public TextAreaPanel setAutogrow()
+  @Override
+  public void renderHead(final IHeaderResponse response)
   {
-    return setAutogrow(0, 500);
+    super.renderHead(response);
+    if (autogrow == true) {
+      WicketRenderHeadUtils.renderAutogrowJavaScriptIncludes(response);
+    }
   }
 
   /**
@@ -63,8 +79,30 @@ public class TextAreaPanel extends Panel implements ComponentWrapperPanel
    */
   public TextAreaPanel setAutogrow(final int minHeight, final int maxHeight)
   {
-    field.add(AttributeModifier.append("class", "expand" + minHeight + "-" + maxHeight));
+    if (this.autogrow == false) {
+      throw new IllegalArgumentException("Please call TextAreaPanel(id, field, true) for enabling autogrow for this text area panel.");
+    }
+    this.autogrowMinHeight = minHeight;
+    this.autogrowMaxHeight = maxHeight;
     return this;
+  }
+
+  /**
+   * @see org.apache.wicket.Component#onConfigure()
+   */
+  @Override
+  protected void onConfigure()
+  {
+    super.onConfigure();
+    if (autogrow == true) {
+      field.add(AttributeModifier.append("class", "autogrow"));
+      if (autogrowMinHeight > 0) {
+        field.add(AttributeModifier.append("autogrowMinHeight", autogrowMinHeight));
+      }
+      if (autogrowMaxHeight > 0) {
+        field.add(AttributeModifier.append("autogrowMaxHeight", autogrowMaxHeight));
+      }
+    }
   }
 
   /**

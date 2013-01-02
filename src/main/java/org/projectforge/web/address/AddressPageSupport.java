@@ -398,7 +398,7 @@ class AddressPageSupport implements Serializable
     final FieldProperties<String> props = getCommentProperties();
     final AbstractFieldsetPanel< ? > fs = gridBuilder.newFieldset(props);
     final MaxLengthTextArea comment = new MaxLengthTextArea(TextAreaPanel.WICKET_ID, props.getModel());
-    fs.add(comment).setAutogrow();
+    fs.add(comment, true);
     return fs;
   }
 

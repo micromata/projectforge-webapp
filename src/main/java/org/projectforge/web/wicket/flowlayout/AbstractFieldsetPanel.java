@@ -287,7 +287,17 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
    */
   public TextAreaPanel add(final TextArea< ? > textArea)
   {
-    final TextAreaPanel panel = new TextAreaPanel(newChildId(), textArea);
+    return add(textArea, false);
+  }
+
+  /**
+   * @param textArea
+   * @return The created InputPanel.
+   * @see TextAreaPanel#TextAreaPanel(String, Component)
+   */
+  public TextAreaPanel add(final TextArea< ? > textArea, final boolean autogrow)
+  {
+    final TextAreaPanel panel = new TextAreaPanel(newChildId(), textArea, autogrow);
     if (textArea.getLabel() == null) {
       textArea.setLabel(new Model<String>(labelText));
     }

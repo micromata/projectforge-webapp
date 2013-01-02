@@ -56,6 +56,7 @@ function initializeComponents() {
 	});
 	$("div.radio-jquery-ui").buttonset();
 	$("div.collapse").collapse();
+	$("textarea.autogrow").autoGrow();
 }
 function showBookmark() {
 	$("#bookmark").toggle("normal");
