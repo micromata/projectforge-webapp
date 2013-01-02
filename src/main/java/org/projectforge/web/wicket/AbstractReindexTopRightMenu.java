@@ -51,7 +51,7 @@ public abstract class AbstractReindexTopRightMenu implements Serializable
         rebuildDatabaseIndex(true);
       };
     }, getString("menu.reindexNewestDatabaseEntries"));
-    WicketUtils.addTooltip(reindex, getString("menu.reindexNewestDatabaseEntries.tooltip"));
+    reindex.setTooltip(getString("menu.reindexNewestDatabaseEntries.tooltip"));
     page.addContentRightMenuEntry(reindex);
     if (enableFullReindex == true) {
       final ContentMenuEntryPanel  reindexAll = new ContentMenuEntryPanel(page.getNewContentRightMenuChildId(), new Link<Object>("link") {
@@ -61,7 +61,7 @@ public abstract class AbstractReindexTopRightMenu implements Serializable
           rebuildDatabaseIndex(false);
         };
       }, getString("menu.reindexAllDatabaseEntries"));
-      WicketUtils.addTooltip(reindexAll, getString("menu.reindexAllDatabaseEntries.tooltip"));
+      reindexAll.setTooltip(getString("menu.reindexAllDatabaseEntries.tooltip"));
       page.addContentRightMenuEntry(reindexAll);
     }
   }
