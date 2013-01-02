@@ -4,25 +4,21 @@ Bootstrap-Umbau
 - Dialoge
 - Icons ToggleContainer
 - Layout innerhalb ToggleContainer
-- Feldbreiten für control-groups 100%
-- Checkboxengröße/breite
 - Hilfe-Icons bei Textfields
 - RechnungEditPage: Anzeige von Aufträgen, Icon deplatziert
 - Mit iPhone/iPad prüfen
-- Tabellen (insbesonder Änderungshistorie: padding-left)
 - TestArea: autogrow
 - TeamCalDialog: Wenn man irgendwo außerhalb klickt, sollte der sich auch wieder schließen.
-- CalendarPage springt im Datum
 - context menu auf Tabellenzeilen klappt nicht: abbrechen
 
 - zindex: DatePanel, Main-Menu-sub-menues (on iPhone)
-- Autocompletion doesn't work (locations, time zones...)
+- Autocompletion: deletion of objects doesn't work (locations)
 - unbenutzte css- und js-Pakete entfernen.
 - unbenutzte Bilder entfernen.
 
 Konkrete Masken
 ---------------
-- LizenzEditForm: Select2 zu schmal
+- LoginPage: Component error messages has to be removed.
 - AddressViewPage
 - AdminPage
 - SetupPage für Neuinstallation (Helpicon für E-Mails deplatziert)
@@ -34,6 +30,7 @@ Konkrete Masken
 - HRPlanningEditForm
 - TaskEditForm
 - UserEditForm
+- ErrorPage
 
 Wicket6-Migration
 -----------------
@@ -42,4 +39,4 @@ Wicket6-Migration
 - ToggleContainer
 - TaskTreePage auf Wicket Tree umstellen
 
-- JS and CSS: minifiing and concatenating
+- JS and CSS: minifiing and concatenating (https://github.com/WiQuery/wiquery)
