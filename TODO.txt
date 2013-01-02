@@ -7,7 +7,6 @@ Bootstrap-Umbau
 - Hilfe-Icons bei Textfields
 - RechnungEditPage: Anzeige von Aufträgen, Icon deplatziert
 - Mit iPhone/iPad prüfen
-- TestArea: autogrow
 - J.: TeamCalDialog: Wenn man irgendwo außerhalb klickt, sollte der sich auch wieder schließen.
 - J.: context menu auf Tabellenzeilen klappt nicht: abbrechen
 
