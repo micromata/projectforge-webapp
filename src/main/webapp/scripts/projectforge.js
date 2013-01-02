@@ -20,9 +20,13 @@ function rowClick(row) {
 }
 
 function rowCheckboxClick(row, event) {
-	if(!event) event = window.event; // For ie.
+	if (!event)
+		event = window.event; // For ie.
 	var t = event.target || event.srcElement;
-	if(t.type != "checkbox") { /* disables tableRowClickFunction if you are over the checkbox */
+	if (t.type != "checkbox") { /*
+								 * disables tableRowClickFunction if you are
+								 * over the checkbox
+								 */
 		cb = $(row).find("input[type='checkbox']");
 		cb.attr('checked', !cb.is(':checked'));
 	}
@@ -45,7 +49,11 @@ function preventBubble(e) {
 }
 function initializeComponents() {
 	// Enable tool-tips, button sets etc.
-	$('[title]').tooltip({track: true});
+	$('[title]').tooltip({
+		track : true
+	}).on("focusin", function() {
+		$(this).tooltip("close");
+	});
 	$("div.radio-jquery-ui").buttonset();
 	$("div.collapse").collapse();
 }
@@ -99,14 +107,14 @@ document.onclick = mclose;
 
 function openDialog(element, closeScript) {
 	$('#' + element).dialog({
-		'resizable': false,
-		'draggable': false,
-		'width': 'auto',
-		'height': 'auto',
-		'position': 'center',
-		'modal': true,
-		close: closeScript
-		}).dialog('open');
+		'resizable' : false,
+		'draggable' : false,
+		'width' : 'auto',
+		'height' : 'auto',
+		'position' : 'center',
+		'modal' : true,
+		close : closeScript
+	}).dialog('open');
 }
 
 $(function() {
@@ -116,12 +124,13 @@ $(function() {
 	$(".dialog_content").live("dialogclose", function(event, ui) {
 		enableScroll();
 	});
-	
+
 	initColorPicker();
 	doAfterAjaxHandling();
 
-	if(typeof(Wicket) != "undefined" && typeof(Wicket.Event) != "undefined") {
-		Wicket.Event.subscribe('/ajax/call/complete', function(jqEvent, attributes, jqXHR, errorThrown, textStatus) {
+	if (typeof (Wicket) != "undefined" && typeof (Wicket.Event) != "undefined") {
+		Wicket.Event.subscribe('/ajax/call/complete', function(jqEvent,
+				attributes, jqXHR, errorThrown, textStatus) {
 			// handle after AJAX actions
 			doAfterAjaxHandling();
 		});
@@ -136,11 +145,13 @@ $(function() {
 
 function doAfterAjaxHandling() {
 	var $uploadProxy = $('.pf_uploadField button[name="fileUploadProxy"], .pf_uploadField .label');
-	$uploadProxy.unbind('click').click(function (e) {
+	$uploadProxy.unbind('click').click(function(e) {
 		$(this).siblings('input[type="file"]').click();
 		e.preventDefault();
-	}).siblings('input[type="file"]').change(function (e) {
-		$(this).siblings('.label').val(/([^\\\/]+)$/.exec(this.value)[1]); // Extract the filename
+	}).siblings('input[type="file"]').change(function(e) {
+		$(this).siblings('.label').val(/([^\\\/]+)$/.exec(this.value)[1]); // Extract
+																			// the
+																			// filename
 		$(this).siblings('.label').change();
 	});
 	$("fieldset > div > input[type=checkbox]").addClass("checkbox");
@@ -157,7 +168,7 @@ function disableScroll() {
 	var before = $(document).width();
 	$("html").css("overflow", "hidden");
 	var after = $(document).width();
-	$("body").css("padding-right", after-before);
+	$("body").css("padding-right", after - before);
 }
 
 function enableScroll() {
@@ -169,7 +180,7 @@ function pf_deleteClick(element, content, liElement) {
 	var callback = $(element).data("callback");
 	callback = callback + "&delete=" + content;
 	var wcal = wicketAjaxGet(callback);
-	if(wcal == true) {
+	if (wcal == true) {
 		var li = $(liElement).parents('li');
 		$(li).data("me").flushCache();
 		$(li).data("me").clearHideTimeout();
@@ -178,10 +189,11 @@ function pf_deleteClick(element, content, liElement) {
 }
 
 /**
- * Drag and drop inspired by http://www.sitepoint.com/html5-file-drag-and-drop, <br/>
- * but was mixed and enhanced with jQuery and the HTML5 file API by Johannes.
+ * Drag and drop inspired by http://www.sitepoint.com/html5-file-drag-and-drop,
+ * <br/> but was mixed and enhanced with jQuery and the HTML5 file API by
+ * Johannes.
  */
-(function () {
+(function() {
 
 	$(function() {
 		// call initialization file only if API is available
@@ -207,14 +219,16 @@ function pf_deleteClick(element, content, liElement) {
 				$(filedrag).show();
 				$(fileselect).hide();
 			}
-		} catch (e) { /* just do nothing, no XHR2 available */ };
+		} catch (e) { /* just do nothing, no XHR2 available */
+		}
+		;
 	}
 
 	// file drag hover
 	function fileDragHover(e) {
 		e.stopPropagation();
 		e.preventDefault();
-		if(e.type == "dragover") {
+		if (e.type == "dragover") {
 			$(e.target).addClass("hover");
 		} else {
 			$(e.target).removeClass("hover");
@@ -226,21 +240,26 @@ function pf_deleteClick(element, content, liElement) {
 		// cancel event and hover styling
 		fileDragHover(e);
 		// fetch file object
-		var files = e.originalEvent.target.files || e.originalEvent.dataTransfer.files;
-		if(files == null || files.length != 1) {
+		var files = e.originalEvent.target.files
+				|| e.originalEvent.dataTransfer.files;
+		if (files == null || files.length != 1) {
 			// TODO ju: error handling
 			return;
 		}
 		var file = files[0];
-		if(file == null || file.size > 204800 || file.type != "text/calendar") { /* 200kbyte max */
+		if (file == null || file.size > 204800 || file.type != "text/calendar") { /*
+																					 * 200kbyte
+																					 * max
+																					 */
 			// TODO ju: error handling
 			return;
 		}
 		try {
 			var reader = new FileReader();
-			reader.onload = function (event) {
+			reader.onload = function(event) {
 				var result = event.target.result;
-				var hiddenForm = $(e.originalEvent.target).closest(".pf_dnd").children(".pf_hiddenForm");
+				var hiddenForm = $(e.originalEvent.target).closest(".pf_dnd")
+						.children(".pf_hiddenForm");
 				hiddenForm.children(".pf_text").val(result);
 				hiddenForm.children(".pf_submit").click();
 			}

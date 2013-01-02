@@ -8,6 +8,10 @@
 	z-index: 10;
 }
 
+.ui-tooltip {
+	width: 800px;
+}
+
 form div.span12,div.span9,div.span8,div.span6,div.span4,div.span3 {
 	
 }
