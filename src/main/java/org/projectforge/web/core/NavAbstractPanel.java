@@ -24,6 +24,7 @@
 package org.projectforge.web.core;
 
 import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
@@ -62,7 +63,7 @@ public abstract class NavAbstractPanel extends Panel
     super(id);
   }
 
-  protected AbstractLink getMenuEntryLink(final MenuEntry menuEntry, final boolean renderLabelBodyOnly)
+  protected AbstractLink getMenuEntryLink(final MenuEntry menuEntry, final WebMarkupContainer suffixParent)
   {
     final AbstractLink link;
     if (menuEntry.isWicketPage() == true) {
@@ -79,7 +80,7 @@ public abstract class NavAbstractPanel extends Panel
       link.add(AttributeModifier.replace("target", "_blank"));
     }
     final String i18nKey = menuEntry.getI18nKey();
-    link.add(new Label("label", i18nKey != null ? getString(i18nKey) : menuEntry.getName()).setRenderBodyOnly(renderLabelBodyOnly));
+    link.add(new Label("label", i18nKey != null ? getString(i18nKey) : menuEntry.getName()).setRenderBodyOnly(true));
     final Label menuSuffixLabel = getSuffixLabel(menuEntry);
     link.add(menuSuffixLabel);
     return link;

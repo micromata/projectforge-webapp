@@ -25,6 +25,7 @@ package org.projectforge.web.core;
 
 import java.util.Collection;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
@@ -80,7 +81,8 @@ public class NavTopPanel extends NavAbstractPanel
       add(new WebMarkupContainer("goMobile").setVisible(false));
     }
     final BookmarkablePageLink<Void> customizeMenuLink = new BookmarkablePageLink<Void>("customizeMenuLink", CustomizeMenuPage.class);
-    final BookmarkablePageLink<Void> layoutSettingsMenuLink = new BookmarkablePageLink<Void>("layoutSettingsMenuLink", LayoutSettingsPage.class);
+    final BookmarkablePageLink<Void> layoutSettingsMenuLink = new BookmarkablePageLink<Void>("layoutSettingsMenuLink",
+        LayoutSettingsPage.class);
     if (UserRights.getAccessChecker().isRestrictedUser() == true) {
       // Not visibible for restricted users:
       customizeMenuLink.setVisible(false);
@@ -117,22 +119,28 @@ public class NavTopPanel extends NavAbstractPanel
         // Now we add a new menu area (title with sub menus):
         final WebMarkupContainer menuItem = new WebMarkupContainer(menuRepeater.newChildId());
         menuRepeater.add(menuItem);
-        final AbstractLink link = getMenuEntryLink(menuEntry, false);
+        final AbstractLink link = getMenuEntryLink(menuEntry, menuItem);
         menuItem.add(link);
 
         final WebMarkupContainer subMenuContainer = new WebMarkupContainer("subMenu");
         menuItem.add(subMenuContainer);
+        final WebMarkupContainer caret = new WebMarkupContainer("caret");
+        link.add(caret);
         if (menuEntry.hasSubMenuEntries() == false) {
           subMenuContainer.setVisible(false);
+          caret.setVisible(false);
           continue;
         }
+        menuItem.add(AttributeModifier.append("class", "dropdown"));
+        link.add(AttributeModifier.append("class", "dropdown-toggle"));
+        link.add(AttributeModifier.append("data-toggle", "dropdown"));
         final RepeatingView subMenuRepeater = new RepeatingView("subMenuRepeater");
         subMenuContainer.add(subMenuRepeater);
         for (final MenuEntry subMenuEntry : menuEntry.getSubMenuEntries()) {
           // Now we add the next menu entry to the area:
           final WebMarkupContainer subMenuItem = new WebMarkupContainer(subMenuRepeater.newChildId());
           subMenuRepeater.add(subMenuItem);
-          final AbstractLink subLink = getMenuEntryLink(subMenuEntry, false);
+          final AbstractLink subLink = getMenuEntryLink(subMenuEntry, subMenuItem);
           subMenuItem.add(subLink);
 
           final WebMarkupContainer subsubMenuContainer = new WebMarkupContainer("subsubMenu");
@@ -147,7 +155,7 @@ public class NavTopPanel extends NavAbstractPanel
             // Now we add the next menu entry to the sub menu:
             final WebMarkupContainer subsubMenuItem = new WebMarkupContainer(subsubMenuRepeater.newChildId());
             subsubMenuRepeater.add(subsubMenuItem);
-            final AbstractLink subsubLink = getMenuEntryLink(subsubMenuEntry, false);
+            final AbstractLink subsubLink = getMenuEntryLink(subsubMenuEntry, subsubMenuItem);
             subsubMenuItem.add(subsubLink);
           }
         }

@@ -1,14 +1,6 @@
 /*--------------------------------
 Sidebar and Topbar
 --------------------------------*/
-#topbar {
-	display: block;
-	margin-top: -10px;
-	z-index: 10;
-	position: relative;
-	width: 100%;
-	padding-top: 10px;
-}
 
 #sidebar {
 	position: fixed;
@@ -34,11 +26,6 @@ Sidebar and Topbar
 	width: 175px;
 }
 
-.sidebar a.logo {
-	margin-bottom: 5px;
-	margin-left: -7px;
-}
-
 #sidebar ul li .badge {
 	margin-left: 0.5em;
 }
@@ -58,10 +45,6 @@ Sidebar and Topbar
 	border-bottom-right-radius: 5px;
 	top: 0px;
 	border-top-right-radius: 5px;
-}
-
-#navbar {
-	height: 40px;
 }
 
 /*------User Box --------*/
@@ -243,24 +226,6 @@ ul.drawer li:first-child a {
 
 li:last-child ul.drawer li:last-child a {
 	border-bottom-width: 0 !important;
-}
-/*------ Top Navigation --------*/
-#nav_top {
-	border-bottom: 0px solid #fff;
-	margin-left: 45px;
-	margin-top: 0px;
-	margin-right: 15em;
-	border-radius: 0;
-	border-top-left-radius: 3px;
-	border-top-right-radius: 3px;
-}
-
-#nav_top>ul>li>ul,#nav_top ul li ul.dropdown {
-	width: 180px;
-}
-
-#nav_top img.gear {
-	margin-right: -15px;
 }
 
 .dropdown_menu {

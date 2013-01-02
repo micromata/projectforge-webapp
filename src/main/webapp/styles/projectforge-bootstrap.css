@@ -3,9 +3,13 @@
 	border-width: 2px;
 	background-color: #9E253B;
 	position: absolute;
-	top: -5px;
+	top: -2px;
 	right: -5px;
 	z-index: 10;
+	line-height: 0.9em;
+	font-size: 0.9em;
+	padding-left: 5px;
+	padding-right: 5px;
 }
 
 form div.span12,div.span9,div.span8,div.span6,div.span4,div.span3 {
@@ -78,6 +82,33 @@ div.login-panel {
 	margin-left: auto;
 	margin-right: auto;
 }
+
 div.login-header {
 	padding: 15px;
+}
+
+div.navbar {
+ padding-left: 45px;
+ width: auto;
+}
+
+div.navbar-inner {
+ padding-left: 0px;	
+ padding-right: 0px;	
+}
+
+ul.nav li {
+	position: relative; /* Needed for badges */
+}
+
+ul.nav>li>a {
+	padding-left: 5px !important;
+	padding-right: 5px !important;
+}
+
+ul.nav li.dropdown:hover ul.dropdown-menu {
+	display: block;
+}
+ul.dropdown-menu {
+	margin-top: 0px; /* Needed, otherwise menu disappears for 2px. */
 }
