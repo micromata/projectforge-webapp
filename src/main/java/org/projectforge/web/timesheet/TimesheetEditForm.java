@@ -79,6 +79,7 @@ import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.AbstractFieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.ComponentSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
@@ -302,6 +303,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
           DateTimePanel.getHourOfDayRenderer());
       stopHourOfDayDropDownChoice.setNullValid(false);
       stopHourOfDayDropDownChoice.setRequired(true);
+      WicketUtils.setSize(stopHourOfDayDropDownChoice, ComponentSize.LENGTH_2);
       fs.add(stopHourOfDayDropDownChoice);
       dependentFormComponentsWithCost2[1] = dependentFormComponentsWithoutCost2[1] = stopHourOfDayDropDownChoice;
       final DropDownChoice<Integer> stopMinuteDropDownChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(),
@@ -309,6 +311,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
           DateTimePanel.getMinutesRenderer(DatePrecision.MINUTE_15));
       stopMinuteDropDownChoice.setNullValid(false);
       stopMinuteDropDownChoice.setRequired(true);
+      WicketUtils.setSize(stopMinuteDropDownChoice, ComponentSize.LENGTH_2);
       fs.add(stopMinuteDropDownChoice);
       dependentFormComponentsWithCost2[2] = dependentFormComponentsWithoutCost2[2] = stopMinuteDropDownChoice;
     }

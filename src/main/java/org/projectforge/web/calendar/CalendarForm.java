@@ -145,7 +145,7 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
     };
     firstHourDropDownChoice.setNullValid(false);
     firstHourDropDownChoice.setRequired(true);
-    WicketUtils.setSize(firstHourDropDownChoice, ComponentSize.MINI);
+    WicketUtils.setSize(firstHourDropDownChoice, ComponentSize.LENGTH_2);
     WicketUtils.addTooltip(firstHourDropDownChoice, getString("calendar.option.firstHour.tooltip"));
     fieldset.add(firstHourDropDownChoice);
     buttonGroupPanel = new ButtonGroupPanel(fieldset.newChildId());

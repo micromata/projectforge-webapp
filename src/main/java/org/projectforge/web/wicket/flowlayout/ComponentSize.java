@@ -29,7 +29,7 @@ package org.projectforge.web.wicket.flowlayout;
  */
 public enum ComponentSize
 {
-  MINI("mini"), SMALL("small"), MEDIUM("medium"), LARGE("large"), XLARGE("xlarge"), XXLARGE("xxlarge");
+  LENGTH_2("length-2"), MINI("mini"), SMALL("small"), MEDIUM("medium"), LARGE("large"), XLARGE("xlarge"), XXLARGE("xxlarge");
 
   private String classAttrValue;
 

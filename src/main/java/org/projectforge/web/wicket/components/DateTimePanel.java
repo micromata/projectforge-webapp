@@ -39,6 +39,8 @@ import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
 import org.projectforge.common.StringHelper;
 import org.projectforge.common.TimeNotation;
+import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.flowlayout.ComponentSize;
 import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
 
 /**
@@ -139,11 +141,13 @@ public class DateTimePanel extends FormComponentPanel<Date> implements Component
         getHourOfDayRenderer().getValues(), getHourOfDayRenderer());
     hourOfDayDropDownChoice.setNullValid(!settings.required);
     hourOfDayDropDownChoice.setRequired(settings.required);
+    WicketUtils.setSize(hourOfDayDropDownChoice, ComponentSize.LENGTH_2);
     add(hourOfDayDropDownChoice);
     minuteDropDownChoice = new DropDownChoice<Integer>("minute", new PropertyModel<Integer>(this, "minute"), getMinutesRenderer(
         dateHolder.getPrecision()).getValues(), getMinutesRenderer(dateHolder.getPrecision()));
     minuteDropDownChoice.setNullValid(!settings.required);
     minuteDropDownChoice.setRequired(settings.required);
+    WicketUtils.setSize(minuteDropDownChoice, ComponentSize.LENGTH_2);
     add(minuteDropDownChoice);
     if (settings.tabIndex != null) {
       datePanel.dateField.add(AttributeModifier.replace("tabindex", String.valueOf(settings.tabIndex)));
