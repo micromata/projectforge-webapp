@@ -366,18 +366,7 @@ ul.top-right ul {
 	right: 0px;
 }
 
-.ui-button {
-	font-size: 90%;
-}
-
-td.ui-datepicker-today {
-	background: #F7BE81;
-}
-
-button.ui-datepicker-current,button.ui-datepicker-close {
-	background: #FFFFFF;
-}
-
+/* BEGIN: Fullcalendar */
 /* Any change here should be done also in HolidayEventsProvider.java */
 td.fc-sun,td.fc-sat,td.fc-holiday {
 	background: #FFE5E5;
@@ -386,6 +375,7 @@ td.fc-sun,td.fc-sat,td.fc-holiday {
 .fc .fc-event {
 	text-shadow: none;
 }
+/* END: Fullcalendar */
 
 h2.box_head .subtitle {
 	font-weight: normal;
