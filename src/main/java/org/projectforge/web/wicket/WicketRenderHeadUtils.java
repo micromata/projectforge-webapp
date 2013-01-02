@@ -26,38 +26,63 @@ package org.projectforge.web.wicket;
 import org.apache.wicket.markup.head.CssReferenceHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptReferenceHeaderItem;
+import org.projectforge.web.WebConfiguration;
 
 public class WicketRenderHeadUtils
 {
-  private static final String[] JAVASCRIPT_FILES = { //
-    "scripts/jquery/1.8.2/jquery-1.8.2.js", //
-    "include/bootstrap/js/bootstrap.js", //
-    "scripts/jqueryui/1.9.2/jquery-ui-1.9.2.custom.js", //
-    "scripts/contextmenu/jquery.contextmenu.js", //
-    "scripts/adminica-2.2/prefixfree/prefixfree.js", //
-    "scripts/adminica-2.2/adminica_ui.js", //
-    "scripts/adminica-2.2/adminica_mobile.js", //
-    "scripts/adminica-2.2/adminica_load.js", //
-    "scripts/projectforge.js" //
+  private static final String[][] JAVASCRIPT_FILES_DEF = { //
+    { "scripts/jquery/1.8.2/jquery-1.8.2", ".min"},//
+    { "include/bootstrap/js/bootstrap", ".min"}, //
+    { "scripts/jqueryui/1.9.2/jquery-ui-1.9.2.custom", ".min"}, //
+    { "scripts/contextmenu/jquery.contextmenu", ""}, //
+    { "scripts/adminica-2.2/prefixfree/prefixfree", "-min"}, //
+    { "scripts/adminica-2.2/adminica_ui", ""}, // modified!
+    { "scripts/adminica-2.2/adminica_mobile", "-min"}, //
+    { "scripts/adminica-2.2/adminica_load", ""}, // modified!
+    { "scripts/projectforge", ""} //
   };
 
-  private static final String[] CSS_FILES = { //
-    "styles/google-fonts/google-fonts.css", //
+  private static final String[] JAVASCRIPT_FILES;
+
+  private static final String[][] CSS_FILES_DEF = { //
+    { "styles/google-fonts/google-fonts", ""}, //
     // "http://fonts.googleapis.com/css?family=Droid+Sans:regular&amp;subset=latin", //
-    "styles/jqueryui/1.9.2/cupertino/jquery-ui-1.9.2.custom.css", //
-    "styles/table.css", //
-    "scripts/contextmenu/css/jquery.contextmenu.css", //
-    "styles/adminica-2.2/main.css", //
-    // "styles/adminica-2.2/mobile.css", //
-    "include/bootstrap/css/bootstrap.css", //
-    "styles/projectforge-main.css", //
-    "styles/projectforge-bootstrap.css", //
-    "styles/projectforge-form.css", // before projectforge.css!
-    "styles/projectforge.css" //
+    { "styles/jqueryui/1.9.2/cupertino/jquery-ui-1.9.2.custom", ".min"}, //
+    { "styles/table", ""}, //
+    { "scripts/contextmenu/css/jquery.contextmenu", ""}, //
+    { "styles/adminica-2.2/main", ""}, //
+    // "styles/adminica-2.2/mobile", //
+    { "include/bootstrap/css/bootstrap", ".min"}, //
+    { "styles/projectforge-main", ""}, //
+    { "styles/projectforge-bootstrap", ""}, //
+    { "styles/projectforge-form", ""}, // before projectforge.css!
+    { "styles/projectforge", ""} //
   };
+
+  private static final String[] CSS_FILES;
 
   private static final String[] SELECT2_JAVASCRIPT_FILES = { //
   "scripts/select2/select2.js"};
+
+  static {
+    JAVASCRIPT_FILES = new String[JAVASCRIPT_FILES_DEF.length];
+    CSS_FILES = new String[CSS_FILES_DEF.length];
+    if (WebConfiguration.isDevelopmentMode() == true) {
+      for (int i = 0; i < JAVASCRIPT_FILES_DEF.length; i++) {
+        JAVASCRIPT_FILES[i] = JAVASCRIPT_FILES_DEF[i][0] + ".js";
+      }
+      for (int i = 0; i < CSS_FILES_DEF.length; i++) {
+        CSS_FILES[i] = CSS_FILES_DEF[i][0] + ".css";
+      }
+    } else {
+      for (int i = 0; i < JAVASCRIPT_FILES_DEF.length; i++) {
+        JAVASCRIPT_FILES[i] = JAVASCRIPT_FILES_DEF[i][0] + JAVASCRIPT_FILES_DEF[i][1] + ".js";
+      }
+      for (int i = 0; i < CSS_FILES_DEF.length; i++) {
+        CSS_FILES[i] = CSS_FILES_DEF[i][0] + CSS_FILES_DEF[i][1] + ".css";
+      }
+    }
+  }
 
   /**
    * Jquery, bootstrap, jqueryui and uquery.contextmenu.js.
