@@ -45,7 +45,7 @@ function preventBubble(e) {
 }
 function initializeComponents() {
 	// Enable tool-tips, button sets etc.
-	$('[title]').tooltip({'data-placement':"right"});
+	$('[title]').tooltip({track: true});
 	$("div.radio-jquery-ui").buttonset();
 	$("div.collapse").collapse();
 }
