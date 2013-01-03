@@ -259,10 +259,8 @@ function pf_deleteClick(element, content, liElement) {
 			return;
 		}
 		var file = files[0];
-		if (file == null || file.size > 204800 || file.type != "text/calendar") { /*
-																					 * 200kbyte
-																					 * max
-																					 */
+		if (file == null || file.size > 204800 || file.type != "text/calendar") {
+		/*  200 kbyte max */
 			// TODO ju: error handling
 			return;
 		}
