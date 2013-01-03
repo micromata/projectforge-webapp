@@ -99,7 +99,24 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
       assigneeSelectPanel.setDefaultFormProcessing(false);
       assigneeSelectPanel.init().withAutoSubmit(true);
     }
-    gridBuilder.newSplitPanel( GridSize.COL33);
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
+      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "opened"),
+          getString(ToDoStatus.OPENED.getI18nKey())));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
+          new PropertyModel<Boolean>(getSearchFilter(), "reopened"), getString(ToDoStatus.RE_OPENED.getI18nKey())));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+          "inprogress"), getString(ToDoStatus.IN_PROGRESS.getI18nKey())));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "closed"),
+          getString(ToDoStatus.CLOSED.getI18nKey())));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+          "postponed"), getString(ToDoStatus.POSTPONED.getI18nKey())));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+          "onlyRecent"), getString("plugins.todo.status.onlyRecent"), getString("plugins.todo.status.onlyRecent.tooltip")));
+      checkBoxPanel.add(createOnlyDeletedCheckBoxPanel(checkBoxPanel.newChildId()));
+    }
+    gridBuilder.newSplitPanel(GridSize.COL33);
     {
       // Reporter
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.todo.reporter"));
@@ -125,27 +142,8 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
       reporterSelectPanel.setDefaultFormProcessing(false);
       reporterSelectPanel.init().withAutoSubmit(true);
     }
-    gridBuilder.newSplitPanel(GridSize.COL66);;
-    {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
-      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "opened"),
-          getString(ToDoStatus.OPENED.getI18nKey())));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
-          new PropertyModel<Boolean>(getSearchFilter(), "reopened"), getString(ToDoStatus.RE_OPENED.getI18nKey())));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
-          "inprogress"), getString(ToDoStatus.IN_PROGRESS.getI18nKey())));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "closed"),
-          getString(ToDoStatus.CLOSED.getI18nKey())));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
-          "postponed"), getString(ToDoStatus.POSTPONED.getI18nKey())));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
-          "onlyRecent"), getString("plugins.todo.status.onlyRecent"), getString("plugins.todo.status.onlyRecent.tooltip")));
-      checkBoxPanel.add(createOnlyDeletedCheckBoxPanel(checkBoxPanel.newChildId()));
-    }
     {
       // DropDownChoice page size
-      gridBuilder.newSplitPanel(GridSize.COL33);
       addPageSizeFieldset();
     }
   }
