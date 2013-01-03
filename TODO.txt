@@ -27,7 +27,6 @@ Konkrete Masken
 - HRPlanningEditForm
 - TaskEditForm
 - UserEditForm
-- ErrorPage
 
 Wicket6-Migration
 -----------------

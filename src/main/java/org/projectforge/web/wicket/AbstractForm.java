@@ -29,11 +29,9 @@ import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.util.lang.Bytes;
-import org.apache.wicket.validation.ValidationError;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
 
@@ -139,11 +137,6 @@ public abstract class AbstractForm<F, P extends AbstractUnsecureBasePage> extend
   public void addFieldRequiredError(final String fieldKey)
   {
     error(MessageFormat.format(getString("validation.error.fieldRequired"), getString(fieldKey)));
-  }
-
-  public void addFormComponentError(final FormComponent< ? > component, final String msgKey)
-  {
-    component.error(new ValidationError().addMessageKey(msgKey));
   }
 
   public void addComponentError(final Component component, final String msgKey)

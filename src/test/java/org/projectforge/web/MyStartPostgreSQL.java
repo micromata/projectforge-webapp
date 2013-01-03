@@ -56,7 +56,7 @@ public class MyStartPostgreSQL
     settings.setSchemaUpdate(SCHEMA_UPDATE);
     //settings.setUsingCookies(false);
     settings.setDevelopment(DEVELOPMENT_MODE);
-    settings.setLaunchBrowserAfterStartup(true);
+    settings.setLaunchBrowserAfterStartup(false);
     // Set the url of ProjectForge's storage web server:
     System.setProperty(StorageConstants.SYSTEM_PROPERTY_URL, "http://localhost:8081/");
     final StartHelper startHelper = new StartHelper(settings);
