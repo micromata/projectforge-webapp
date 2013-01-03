@@ -375,6 +375,11 @@ td.fc-sun,td.fc-sat,td.fc-holiday {
 .fc .fc-event {
 	text-shadow: none;
 }
+.fc-header-title>h2 {
+	font-weight: bold;
+	font-size: 1.1em;
+	line-height: 20px;
+}
 /* END: Fullcalendar */
 
 h2.box_head .subtitle {
