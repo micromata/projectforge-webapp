@@ -56,8 +56,9 @@ function initializeComponents() {
 	});
 	$("div.radio-jquery-ui").buttonset();
 	$("div.collapse").collapse();
-	if ($("textarea.autogrow").length)
+	if ($("textarea.autogrow").length) {
 		$("textarea.autogrow").autoGrow();
+	}
 }
 function showBookmark() {
 	$("#bookmark").toggle("normal");
@@ -158,6 +159,7 @@ function doAfterAjaxHandling() {
 	});
 	$("fieldset > div > input[type=checkbox]").addClass("checkbox");
 	$(".jqui_checkbox").buttonset();
+	initializeComponents();
 }
 
 function initColorPicker() {

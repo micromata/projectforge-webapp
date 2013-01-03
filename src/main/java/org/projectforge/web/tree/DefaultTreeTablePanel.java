@@ -319,7 +319,7 @@ public abstract class DefaultTreeTablePanel<T extends TreeTableNode> extends Pan
       if (javaScript.length() > 0) {
         target.prependJavaScript(javaScript);
       }
-      target.appendJavaScript("updateEvenOdd();initializeComponents();");
+      target.appendJavaScript("updateEvenOdd();");
     } else {
       // Remove all childs
       final StringBuffer prependJavascriptBuf = new StringBuffer();

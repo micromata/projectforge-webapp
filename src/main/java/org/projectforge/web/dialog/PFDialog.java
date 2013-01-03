@@ -177,8 +177,6 @@ public abstract class PFDialog extends Panel
       jsFunction = "function() {}";
     }
     target.appendJavaScript("openDialog('" + dialogContainer.getMarkupId() + "', " + jsFunction + ");");
-    // necessary to re-init tool tips
-    target.appendJavaScript("initializeComponents();");
   }
 
   /**
