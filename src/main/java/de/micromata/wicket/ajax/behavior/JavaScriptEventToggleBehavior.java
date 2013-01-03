@@ -87,7 +87,7 @@ public abstract class JavaScriptEventToggleBehavior extends AjaxEventBehavior
    */
   protected String getJavaScriptConditionForNewState()
   {
-    return "$(\"#\"+attrs['c']).data(\"" + CONDITION + "\")"; // invert current data value to display the new state!
+    return "! $(\"#\"+attrs['c']).data(\"" + CONDITION + "\")"; // invert current data value to display the new state!
   }
 
   /**

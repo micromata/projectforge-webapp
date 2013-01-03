@@ -324,6 +324,8 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       positionsPanel.setHeading(new HtmlCodePanel(ToggleContainerPanel.HEADING_ID, heading.toString()));
       if (data.getUiStatus().isClosed(position.getNumber()) == true) {
         positionsPanel.setClosed();
+      } else {
+        positionsPanel.setOpen();
       }
       content = new DivPanel(ToggleContainerPanel.CONTENT_ID);
       positionsPanel.add(content);

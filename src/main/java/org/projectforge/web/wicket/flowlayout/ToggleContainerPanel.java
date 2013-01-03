@@ -65,8 +65,6 @@ public class ToggleContainerPanel extends Panel
     panel.add(toggleContainer = new WebMarkupContainer("toggleContainer"));
     toggleContainer.setOutputMarkupId(true);
     panel.add(toggleLink = new WebMarkupContainer("toggleLink"));
-    toggleLink.add(AttributeModifier.replace("data-parent", "#" + panel.getMarkupId()));
-    toggleLink.add(AttributeModifier.replace("href", "#" + toggleContainer.getMarkupId()));
     if (wantsOnStatusChangedNotification()) {
       toggleLink.add(new JavaScriptEventToggleBehavior() {
         private static final long serialVersionUID = -3739318529449433236L;
@@ -78,6 +76,7 @@ public class ToggleContainerPanel extends Panel
         }
       });
     }
+    setOpen();
   }
 
   public ToggleContainerPanel setHeading(final String heading)
@@ -152,10 +151,19 @@ public class ToggleContainerPanel extends Panel
    * Has only effect before rendering this component the first time. Must be called after heading was set.
    * @return this for chaining.
    */
+  public ToggleContainerPanel setOpen()
+  {
+    toggleContainer.add(AttributeModifier.replace("class", "in collapse"));
+    return this;
+  }
+
+  /**
+   * Has only effect before rendering this component the first time. Must be called after heading was set.
+   * @return this for chaining.
+   */
   public ToggleContainerPanel setClosed()
   {
-    toggleContainer.add(AttributeModifier.append("class", "in"));
-    toggleLink.add(AttributeModifier.append("class", "collapsed"));
+    toggleContainer.add(AttributeModifier.replace("class", "collapse"));
     return this;
   }
 }
