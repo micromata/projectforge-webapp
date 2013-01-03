@@ -2,6 +2,7 @@
 table {
 	border-collapse: collapse;
 	border-spacing: 0;
+	font-size: 12px;
 }
 
 caption,th,td {
@@ -14,12 +15,10 @@ table.dataview {
 	border-collapse: collapse;
 	border: 1px solid #d9dfe1;
 	width: 100%;
-	font-size: 0.9em;
 }
 
 table.dataview caption {
 	font-weight: bold;
-	font-size: 1.4em;
 	color: #009c0e;
 	margin: 0;
 	padding: 0.5em;
@@ -38,7 +37,6 @@ table.dataview thead tr td,table.dataview thead tr th {
 		color-stop(1, #D9DFE1) );
 	background: -moz-linear-gradient(top, #F0F5F7, #D9DFE1);
 	border-bottom-color: #8994A0;
-	font-size: 1.2em;
 }
 
 table.dataview thead tr td:first-child,table.dataview thead tr th:first-child,table.dataview tbody tr td:first-child,table.dataview tbody tr th:first-child,table.dataview tfoot tr td:first-child,table.dataview tfoot tr th:first-child
@@ -53,7 +51,6 @@ table.dataview thead tr td:last-child,table.dataview thead tr th:last-child,tabl
 
 table.dataview thead tr td.tableform {
 	border-bottom: 1em solid #fff;
-	font-size: 1em;
 }
 
 table.dataview tfoot tr td,table.dataview tfoot tr th {
@@ -63,13 +60,11 @@ table.dataview tfoot tr td,table.dataview tfoot tr th {
 	border-top: 1px solid #d9dfe1;
 	border-bottom: 1px solid #d9dfe1;
 	background: #F0F5F7;
-	font-size: 1.2em;
 }
 
 table.dataview tfoot tr td.tableform,table.dataview tfoot tr th.tableform
 	{
 	border-top: 1em solid #fff;
-	font-size: 1em;
 }
 
 table.dataview tbody tr td,table.dataview tbody tr th {
@@ -77,7 +72,6 @@ table.dataview tbody tr td,table.dataview tbody tr th {
 	padding: 0.6em;
 	border: 4px solid #fff;
 	/*background:transparent url('../img/tab.png') repeat-x 0% 90%;*/
-	font-size: 1.2em;
 }
 
 table.dataview tbody tr.even td,table.dataview tbody tr.even th {
@@ -126,7 +120,6 @@ table.dataview th a {
 
 .tablelinks a {
 	white-space: nowrap;
-	font-size: 0.8em;
 	color: #5C6970;
 	background: #F0F5F7;
 	padding: 0.1em 0.5em;
@@ -185,6 +178,7 @@ table.costassignment tbody td {
 }
 
 table.business-assessment {
+	
 }
 
 table.business-assessment td.indent-0 {
@@ -199,12 +193,15 @@ table.business-assessment td.indent-1 {
 table.business-assessment td.indent-2 {
 	padding-left: 35px;
 }
+
 table.business-assessment td.indent-3 {
 	padding-left: 50px;
 }
+
 table.business-assessment td.indent-4 {
 	padding-left: 65px;
 }
+
 table.dataview a {
 	color: blue;
 }
