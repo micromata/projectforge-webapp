@@ -174,25 +174,36 @@ public class NavTopPanel extends NavAbstractPanel
         subMenuContainer.add(subMenuRepeater);
         for (final MenuEntry subMenuEntry : menuEntry.getSubMenuEntries()) {
           // Now we add the next menu entry to the area:
-          final WebMarkupContainer subMenuItem = new WebMarkupContainer(subMenuRepeater.newChildId());
-          subMenuRepeater.add(subMenuItem);
-          final AbstractLink subLink = getMenuEntryLink(subMenuEntry, subMenuItem);
-          subMenuItem.add(subLink);
-
-          final WebMarkupContainer subsubMenuContainer = new WebMarkupContainer("subsubMenu");
-          subMenuItem.add(subsubMenuContainer);
           if (subMenuEntry.hasSubMenuEntries() == false) {
-            subsubMenuContainer.setVisible(false);
+            final WebMarkupContainer subMenuItem = new WebMarkupContainer(subMenuRepeater.newChildId());
+            subMenuRepeater.add(subMenuItem);
+            // Subsubmenu entries aren't yet supported, show only the sub entries without children, otherwise only the children are
+            // displayed.
+            final AbstractLink subLink = getMenuEntryLink(subMenuEntry, subMenuItem);
+            subMenuItem.add(subLink);
             continue;
           }
-          final RepeatingView subsubMenuRepeater = new RepeatingView("subsubMenuRepeater");
-          subsubMenuContainer.add(subsubMenuRepeater);
+
+          // final WebMarkupContainer subsubMenuContainer = new WebMarkupContainer("subsubMenu");
+          // subMenuItem.add(subsubMenuContainer);
+          // if (subMenuEntry.hasSubMenuEntries() == false) {
+          // subsubMenuContainer.setVisible(false);
+          // continue;
+          // }
+          // final RepeatingView subsubMenuRepeater = new RepeatingView("subsubMenuRepeater");
+          // subsubMenuContainer.add(subsubMenuRepeater);
           for (final MenuEntry subsubMenuEntry : subMenuEntry.getSubMenuEntries()) {
             // Now we add the next menu entry to the sub menu:
-            final WebMarkupContainer subsubMenuItem = new WebMarkupContainer(subsubMenuRepeater.newChildId());
-            subsubMenuRepeater.add(subsubMenuItem);
-            final AbstractLink subsubLink = getMenuEntryLink(subsubMenuEntry, subsubMenuItem);
-            subsubMenuItem.add(subsubLink);
+            final WebMarkupContainer subMenuItem = new WebMarkupContainer(subMenuRepeater.newChildId());
+            subMenuRepeater.add(subMenuItem);
+            // Subsubmenu entries aren't yet supported, show only the sub entries without children, otherwise only the children are
+            // displayed.
+            final AbstractLink subLink = getMenuEntryLink(subsubMenuEntry, subMenuItem);
+            subMenuItem.add(subLink);
+            // final WebMarkupContainer subsubMenuItem = new WebMarkupContainer(subsubMenuRepeater.newChildId());
+            // subsubMenuRepeater.add(subsubMenuItem);
+            // final AbstractLink subsubLink = getMenuEntryLink(subsubMenuEntry, subsubMenuItem);
+            // subsubMenuItem.add(subsubLink);
           }
         }
       }
