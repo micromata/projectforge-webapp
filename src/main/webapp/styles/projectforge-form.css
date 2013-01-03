@@ -46,14 +46,19 @@ form.form-horizontal div.controls {
 form.form-horizontal div.controls input,form.form-horizontal div.controls textarea
 	{
 	width: 99%;
-	margin-top:2px;
+	margin-top: 2px;
 }
-select
-	{
+
+input[type='checkbox'] {
+	width: 1px !important; /* Otherwise it's 100% and horizontal scrollbars occurs. */
+}
+
+select {
 	font-size: 100%;
 	height: 20px;
-	margin-top:2px;
+	margin-top: 2px;
 }
+
 .input-length-2 {
 	width: 4em;
 }
