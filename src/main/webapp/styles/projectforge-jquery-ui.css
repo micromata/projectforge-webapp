@@ -6,8 +6,24 @@
 	font-size: 90%;
 }
 
+div.jqui_checkbox .ui-button-text,div.radio-jquery-ui .ui-button-text {
+	font-weight: normal;
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+}
+
+.ui-state-default,.ui-widget-content .ui-state-default,.ui-widget-header .ui-state-default
+	{
+	color: #aaaaaa;
+}
+
+.ui-state-active,.ui-widget-content .ui-state-active,.ui-widget-header .ui-state-active
+	{
+	color: #ffffff;
+}
+
 #ui-datepicker-div {
-  z-index: 1000!important;
+	z-index: 1000 !important;
 }
 
 td.ui-datepicker-today {
@@ -17,4 +33,3 @@ td.ui-datepicker-today {
 button.ui-datepicker-current,button.ui-datepicker-close {
 	background: #FFFFFF;
 }
-

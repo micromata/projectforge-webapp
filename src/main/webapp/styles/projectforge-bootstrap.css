@@ -13,7 +13,6 @@
 }
 
 form div.span12,div.span9,div.span8,div.span6,div.span4,div.span3 {
-	
 }
 
 /*form div.not-first {
@@ -31,16 +30,10 @@ form div.row-fluid,div.rounded-box {
 	background-color: #fff;
 	border: 1px solid #bbb;
 	border-radius: 3px;
-	margin-bottom: 5px;
-	padding-top: 5px;
 }
 
 form div.has-sub-rows {
 	border: none;
-}
-
-input,textarea {
-	background: rgba(0, 0, 0, 0.05) !important;
 }
 
 div.tabbable {

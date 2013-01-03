@@ -375,13 +375,13 @@ td.fc-sun,td.fc-sat,td.fc-holiday {
 .fc .fc-event {
 	text-shadow: none;
 }
+
 .fc-header-title>h2 {
 	font-weight: bold;
 	font-size: 1.1em;
 	line-height: 20px;
 }
 /* END: Fullcalendar */
-
 h2.box_head .subtitle {
 	font-weight: normal;
 	font-size: .9em;
@@ -396,13 +396,14 @@ h2.box_head .subtitle {
 .select2-choices {
 	overflow: hidden !important;
 	float: left;
-	width: 100% !important;
+	width: 99% !important;
+	border-radius: 4px;
+	background: rgba(0, 0, 0, 0.05) !important;
 }
 
 .select2-container {
 	overflow: hidden;
 	height: auto !important;
-	border-right: 1px solid #AAA;
 }
 
 .select2-container-active {
@@ -431,7 +432,7 @@ h2.box_head .subtitle {
 	background-color: black;
 	z-index: 1;
 	opacity: 0;
-	filter: alpha(opacity = 0);
+	filter: alpha(opacity =   0);
 }
 
 .pf_teamCalDialog {
