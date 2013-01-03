@@ -1,3 +1,7 @@
+$(document).ready(function() {
+	adminicaUi();
+});
+
 function adminicaUi(){
 
 	//jQuery UI elements (more info can be found at http://jqueryui.com/demos/)
@@ -172,9 +176,6 @@ function adminicaUi(){
 		columnHeight();
 		centerContent();
 	});
-}
-
-function adminicaInit(){
 }
 
 function columnHeight(){
