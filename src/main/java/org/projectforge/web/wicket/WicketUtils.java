@@ -81,6 +81,7 @@ import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.TooltipImage;
 import org.projectforge.web.wicket.flowlayout.ComponentSize;
+import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.IconPanel;
@@ -742,8 +743,11 @@ public class WicketUtils
         AttributeModifier.replace("type", "text/javascript")));
   }
 
-  public static void setSize(final Component component, final ComponentSize size)
+  public static void setSize(Component component, final ComponentSize size)
   {
+    if (component instanceof ComponentWrapperPanel) {
+      component = ((ComponentWrapperPanel) component).getFormComponent();
+    }
     component.add(AttributeModifier.append("class", size.getClassAttrValue()));
   }
 

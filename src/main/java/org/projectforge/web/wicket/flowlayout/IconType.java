@@ -34,7 +34,7 @@ public enum IconType
           "question-sign"), DOWNLOAD("download"), EDIT("pencil"), FOLDER_OPEN("folder-open"), HELP("info-sign"), JIRA_SUPPORT("star"), KEYBOARD(
               "question-sign"), MINUS_THICK("question-sign"), MODIFIED("question-sign"), PLUS("plus"), SEARCH("search"), //
               /** RSS feed symbol. */
-              SUBSCRIPTION("question-sign"), TRASH("trash"), CALENDAR("calendar"), WRENCH("wrench");
+              SUBSCRIPTION("globe"), TRASH("trash"), CALENDAR("calendar"), WRENCH("wrench");
 
   private String cssIdentifier;
 

@@ -265,7 +265,7 @@ AbstractSecuredForm<F, P>
     final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.pageSize"));
     final DropDownChoicePanel< ? > panel = fs.add(getPageSizeDropDownChoice(fs.getDropDownChoiceId(), getLocale(), new PropertyModel<Integer>(
         this, "pageSize"), 25, 1000));
-    WicketUtils.setSize(panel.getDropDownChoice(), ComponentSize.MINI);
+    WicketUtils.setSize(panel, ComponentSize.MINI);
   }
 
   @SuppressWarnings("serial")
