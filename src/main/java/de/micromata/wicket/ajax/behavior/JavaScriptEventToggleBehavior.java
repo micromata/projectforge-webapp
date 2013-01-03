@@ -23,7 +23,6 @@
 
 package de.micromata.wicket.ajax.behavior;
 
-import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxEventBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.attributes.AjaxCallListener;
@@ -81,15 +80,6 @@ public abstract class JavaScriptEventToggleBehavior extends AjaxEventBehavior
   }
 
   /**
-   * @see org.apache.wicket.behavior.AbstractAjaxBehavior#getCallbackUrl()
-   */
-  @Override
-  public CharSequence getCallbackUrl()
-  {
-    return super.getCallbackUrl() + "&" + CONDITION + "=" + getJavaScriptConditionForNewState();
-  }
-
-  /**
    * Default implementation uses html data attributes for remembering the toggle status. You can overwrite this method to use other
    * conditions, like the existing of dedicated css classes.
    * 
@@ -97,49 +87,30 @@ public abstract class JavaScriptEventToggleBehavior extends AjaxEventBehavior
    */
   protected String getJavaScriptConditionForNewState()
   {
-    return "\'+ ! $(this).data(\"" + CONDITION + "\")+\'"; // invert current data value to display the new state!
+    return "$(\"#\"+attrs['c']).data(\"" + CONDITION + "\")"; // invert current data value to display the new state!
   }
 
   /**
    * @see org.apache.wicket.ajax.AjaxEventBehavior#updateAjaxAttributes(org.apache.wicket.ajax.attributes.AjaxRequestAttributes)
    */
-  @SuppressWarnings("serial")
   @Override
   protected void updateAjaxAttributes(final AjaxRequestAttributes attributes)
   {
     super.updateAjaxAttributes(attributes);
-    // TODO: Johannes: das hier war vorher getAjaxCallDecorator (s. u.). Wicket scheint hier viel geändert zu haben.
-    final AjaxCallListener myAjaxCallListener = new AjaxCallListener() {
+    final AjaxCallListener myAjaxCallListener = new AjaxCallListener();
 
-      @Override
-      public CharSequence getBeforeHandler(final Component component)
-      {
-        String javaScript = "var data = $(this).data(\"" + CONDITION + "\"); var result = null;";
-        javaScript += "result = ! data;"; // switch data object via javaScript
-        javaScript += "if(result != null) { $(this).data(\"" + CONDITION + "\", result); };alert(result)";
-        return javaScript;
-      }
-    };
+    // create javascript according to new wicket 6 behaviors
+    String javaScript = "var element = $(\"#\"+attrs['c']); var data = element.data('" + CONDITION + "'); var result = null;";
+    javaScript += "result = ! data;"; // switch data object via javaScript
+    javaScript += "if(result != null) { element.data('" + CONDITION + "', result); };";
+
+    myAjaxCallListener.onPrecondition(javaScript);
     attributes.getAjaxCallListeners().add(myAjaxCallListener);
-  }
 
-  // TODO: remove antipattern: "maybe Dave need this code later"
-  // @Override
-  // protected IAjaxCallDecorator getAjaxCallDecorator()
-  // {
-  // return new AjaxCallDecorator() {
-  // private static final long serialVersionUID = -4937878321650138366L;
-  //
-  // @Override
-  // public CharSequence decorateScript(final Component c, final CharSequence script)
-  // {
-  // String javaScript = "var data = $(this).data(\"" + CONDITION + "\"); var result = null;";
-  // javaScript += "result = ! data;"; // switch data object via javaScript
-  // javaScript += "if(result != null) { $(this).data(\"" + CONDITION + "\", result); };";
-  // return script + javaScript;
-  // }
-  // };
-  // }
+    // create url param
+    String conditionParam = "return {'"+ CONDITION +"': " + getJavaScriptConditionForNewState() + "}";
+    attributes.getDynamicExtraParameters().add(conditionParam);
+  }
 
   /**
    * Hook method which is called, when an ajax call is recognized, but the page parameters could not be interpreted properly.

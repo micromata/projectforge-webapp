@@ -78,14 +78,6 @@ public class ToggleContainerPanel extends Panel
         {
           ToggleContainerPanel.this.onToggleStatusChanged(target, toggleStatus);
         }
-        /**
-         * @see de.micromata.wicket.ajax.behavior.JavaScriptEventToggleBehavior#getJavaScriptConditionForNewState()
-         */
-        @Override
-        protected String getJavaScriptConditionForNewState()
-        {
-          return "\'+ ! $(this).hasClass(\"collapsed\")+\'"; // invert current closed class value to display the new state!
-        }
       });
     }
   }
@@ -159,7 +151,6 @@ public class ToggleContainerPanel extends Panel
 
   /**
    * Has only effect before rendering this component the first time. Must be called after heading was set.
-   * @param closed the closed to set
    * @return this for chaining.
    */
   public ToggleContainerPanel setClosed()
