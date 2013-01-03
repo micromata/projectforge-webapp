@@ -60,7 +60,9 @@ import org.projectforge.web.wicket.components.DateTimePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.ComponentSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
 import org.projectforge.web.wicket.flowlayout.FieldSetIconPosition;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.HiddenInputPanel;
@@ -261,7 +263,9 @@ AbstractSecuredForm<F, P>
   {
     // DropDownChoice page size
     final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.pageSize"));
-    fs.add(getPageSizeDropDownChoice(fs.getDropDownChoiceId(), getLocale(), new PropertyModel<Integer>(this, "pageSize"), 25, 1000));
+    final DropDownChoicePanel< ? > panel = fs.add(getPageSizeDropDownChoice(fs.getDropDownChoiceId(), getLocale(), new PropertyModel<Integer>(
+        this, "pageSize"), 25, 1000));
+    WicketUtils.setSize(panel.getDropDownChoice(), ComponentSize.MINI);
   }
 
   @SuppressWarnings("serial")
