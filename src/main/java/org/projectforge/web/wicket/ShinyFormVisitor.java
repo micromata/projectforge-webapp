@@ -61,7 +61,7 @@ public class ShinyFormVisitor implements IVisitor<Component, Void>, Serializable
       if (fsPanel.isValid() == false) {
         if (visited.contains(component) == false) {
           visited.add(component);
-          fsPanel.getFieldset().add(new ValidationMsgBehavior());
+          //fsPanel.getFieldset().add(new ValidationMsgBehavior());
           fsPanel.getFieldset().add(new ErrorHighlightBehavior());
         }
       }
@@ -75,7 +75,7 @@ public class ShinyFormVisitor implements IVisitor<Component, Void>, Serializable
     if (fc.isValid() == false && hasInvalidParent(fc.getParent()) == false) {
       if (visited.contains(component) == false) {
         visited.add(component);
-        component.add(new ValidationMsgBehavior());
+        //component.add(new ValidationMsgBehavior());
         component.add(new ErrorHighlightBehavior());
       }
     }
