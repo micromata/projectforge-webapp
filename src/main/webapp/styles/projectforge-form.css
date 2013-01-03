@@ -49,7 +49,7 @@ form.form-horizontal div.controls input,form.form-horizontal div.controls textar
 	margin-top: 2px;
 }
 
-input[type='checkbox'] {
+input[type='checkbox'], input[type='radio'] {
 	width: 1px !important; /* Otherwise it's 100% and horizontal scrollbars occurs. */
 }
 
