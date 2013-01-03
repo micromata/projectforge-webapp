@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
@@ -44,10 +43,8 @@ import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.template.PackageTextTemplate;
 import org.projectforge.AppVersion;
-import org.projectforge.Version;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.web.UserAgentBrowser;
 import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.doc.DocumentationPage;
 
@@ -87,24 +84,8 @@ public abstract class AbstractUnsecureBasePage extends WebPage
   {
     super(parameters);
 
-    final MySession session = ((MySession) getSession());
     html = new TransparentWebMarkupContainer("html");
     add(html);
-    if (session.getUserAgentBrowser() == UserAgentBrowser.IE) {
-      final Version version = session.getUserAgentBrowserVersion();
-      if (version != null) {
-        final int major = version.getMajorRelease();
-        if (major < 7) {
-          html.add(AttributeModifier.append("class", "no-js ie6"));
-        } else if (major == 7) {
-          html.add(AttributeModifier.append("class", "no-js ie7"));
-        } else if (major == 8) {
-          html.add(AttributeModifier.append("class", "no-js ie8"));
-        } else if (major == 9) {
-          html.add(AttributeModifier.append("class", "no-js ie9"));
-        }
-      }
-    }
     add(new Label("windowTitle", new Model<String>() {
       @Override
       public String getObject()
