@@ -35,10 +35,8 @@ public class WicketRenderHeadUtils
     { "include/bootstrap/js/bootstrap", ".min"}, //
     { "scripts/jqueryui/1.9.2/jquery-ui-1.9.2.custom", ".min"}, //
     { "scripts/contextmenu/jquery.contextmenu", ""}, //
-    { "scripts/adminica-2.2/prefixfree/prefixfree", "-min"}, //
+    //{ "scripts/adminica-2.2/prefixfree/prefixfree", "-min"}, //
     { "scripts/adminica-2.2/adminica_ui", ""}, // modified!
-    { "scripts/adminica-2.2/adminica_mobile", "-min"}, //
-    { "scripts/adminica-2.2/adminica_load", ""}, // modified!
     { "scripts/projectforge", ""} //
   };
 
@@ -51,7 +49,6 @@ public class WicketRenderHeadUtils
     { "styles/table", ""}, //
     { "scripts/contextmenu/css/jquery.contextmenu", ""}, //
     { "styles/adminica-2.2/main", ""}, //
-    // "styles/adminica-2.2/mobile", //
     { "include/bootstrap/css/bootstrap", ".min"}, //
     { "include/bootstrap/css/bootstrap-responsive", ".min"}, //
     { "styles/projectforge-main", ""}, //

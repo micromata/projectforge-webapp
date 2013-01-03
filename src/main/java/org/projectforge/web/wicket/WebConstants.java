@@ -61,29 +61,7 @@ public class WebConstants
 
   public static final String IMAGE_ARROW_DOWN = DIR + "arrow-down.png";
 
-  public static final String IMAGE_BIRTHDAY = DIR + "cake.png";
-
-  public static final String IMAGE_BIRTHDAY_DELETE = DIR + "cake_delete.png";
-
-  public static final String IMAGE_BULLET_STAR = DIR + "bullet_star.png";
-
-  public static final String IMAGE_BUTTON_ASSIGN_TO_LEFT = DIR + "button_assignToLeft.png";
-
-  public static final String IMAGE_BUTTON_ASSIGN_TO_RIGHT = DIR + "button_assignToRight.png";
-
   public static final String IMAGE_BUTTON_CANCEL = DIR + "button_cancel.png";
-
-  public static final String IMAGE_CALENDAR_NEXT_MONTH = DIR + "css_img/rightInactive.png";
-
-  public static final String IMAGE_CALENDAR_PREVIOUS_MONTH = DIR + "css_img/leftInactive.png";
-
-  public static final String IMAGE_CALENDAR_SELECT_WEEK = DIR + "button_calendar_week.png";
-
-  public static final String IMAGE_CALENDAR = DIR + "calendar.png";
-
-  public static final String IMAGE_CLOCK = DIR + "clock.png";
-
-  public static final String IMAGE_CLOCK_DELETE = DIR + "clock_delete.png";
 
   public static final String IMAGE_COG = DIR + "cog.png";
 
@@ -95,39 +73,19 @@ public class WebConstants
 
   public static final String IMAGE_DATABASE_UPDATE = DIR + "database_update.png";
 
-  public static final String IMAGE_DATE_SELECT = DIR + "button_selectDate.png";
-
-  public static final String IMAGE_DATE_UNSELECT = DIR + "button_unselectDate.png";
-
   public static final String IMAGE_DELETE = DIR + "trash.png";
 
   public static final String IMAGE_DENY = DIR + "deny.png";
 
-  public static final String IMAGE_EDIT = DIR + "pencil.png";
-
-  public static final String IMAGE_EXCLAMATION = DIR + "exclamation.png";
-
   public static final String IMAGE_EYE = DIR + "eye.png";
 
-  public static final String IMAGE_EXPORT_EXCEL = DIR + "page_white_excel.png";
-
-  public static final String IMAGE_EXPORT_PDF = DIR + "page_white_acrobat.png";
-
-  public static final String IMAGE_FEEDBACK = DIR + "comment.png";
-
   public static final String IMAGE_FIND = DIR + "find.png";
-
-  public static final String IMAGE_GANTT = DIR + "gantt.png";
 
   public static final String IMAGE_GROUP_SELECT = DIR + "button_selectGroup.png";
 
   public static final String IMAGE_GROUP_UNSELECT = DIR + "button_unselectGroup.png";
 
-  public static final String IMAGE_HELP = DIR + "help.png";
-
   public static final String IMAGE_HELP_KEYBOARD = DIR + "keyboard.png";
-
-  public static final String IMAGE_INFO = DIR + "information.png";
 
   public static final String IMAGE_KOST2_SELECT = DIR + "coins_add.png";
 
@@ -136,12 +94,6 @@ public class WebConstants
   public static final String IMAGE_KUNDE_SELECT = DIR + "button_selectCustomer.png";
 
   public static final String IMAGE_KUNDE_UNSELECT = DIR + "button_unselectCustomer.png";
-
-  public static final String IMAGE_NEW = DIR + "new.png";
-
-  public static final String IMAGE_PAGE_COPY = DIR + "page_copy.png";
-
-  public static final String IMAGE_PAGE_PASTE = DIR + "page_paste.png";
 
   public static final String IMAGE_PHONE = DIR + "telephone.png";
 
@@ -166,10 +118,6 @@ public class WebConstants
   public static final String IMAGE_QUICKSELECT_PREVIOUS_MONTH = DIR + "button_previous_month.png";
 
   public static final String IMAGE_QUICKSELECT_PREVIOUS_WEEK = DIR + "button_previous_week.png";
-
-  public static final String IMAGE_STAR_PLUS = DIR + "star_plus.png";
-
-  public static final String IMAGE_TABLE_ROW_ADD = DIR + "table_row_insert.png";
 
   public static final String IMAGE_TASK_SELECT = DIR + "button_selectTask.png";
 

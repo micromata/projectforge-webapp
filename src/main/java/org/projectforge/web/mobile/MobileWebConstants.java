@@ -25,21 +25,4 @@ package org.projectforge.web.mobile;
 
 public class MobileWebConstants
 {
-  private static final String IMAGES = "/mobile/images/";
-
-  private static final String THUMBS = "/mobile/thumbs/";
-
-  public static final String IMAGE_HOME = IMAGES + "home.png";
-
-  public static final String THUMB_IMAGE_CALENDAR = THUMBS + "calendar.png";
-
-  public static final String THUMB_IMAGE_CLOCK = THUMBS + "clock.png";
-
-  public static final String THUMB_IMAGE_CONTACTS = THUMBS + "contacts.png";
-
-  public static final String THUMB_IMAGE_HELP = THUMBS + "help.png";
-
-  public static final String THUMB_IMAGE_SETTINGS = THUMBS + "settings.png";
-
-  public static final String THUMB_IMAGE_START = THUMBS + "start.png";
 }
