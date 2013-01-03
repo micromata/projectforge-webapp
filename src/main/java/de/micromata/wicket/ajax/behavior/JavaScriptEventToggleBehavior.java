@@ -108,7 +108,7 @@ public abstract class JavaScriptEventToggleBehavior extends AjaxEventBehavior
     attributes.getAjaxCallListeners().add(myAjaxCallListener);
 
     // create url param
-    String conditionParam = "return {'"+ CONDITION +"': " + getJavaScriptConditionForNewState() + "}";
+    final String conditionParam = "return {'" + CONDITION + "': " + getJavaScriptConditionForNewState() + "}";
     attributes.getDynamicExtraParameters().add(conditionParam);
   }
 

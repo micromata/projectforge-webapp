@@ -46,9 +46,7 @@ public class ToggleContainerPanel extends Panel
 
   public static final String HEADING_ID = "heading";
 
-  private Component heading;
-
-  private final WebMarkupContainer panel, toggleContainer,  toggleLink;
+  private final WebMarkupContainer panel, toggleContainer, toggleLink;
 
   /**
    * @param id
@@ -84,7 +82,7 @@ public class ToggleContainerPanel extends Panel
 
   public ToggleContainerPanel setHeading(final String heading)
   {
-    toggleLink.add(this.heading = new Label(HEADING_ID, heading).setRenderBodyOnly(true));
+    toggleLink.add(new Label(HEADING_ID, heading).setRenderBodyOnly(true));
     return this;
   }
 
@@ -94,7 +92,6 @@ public class ToggleContainerPanel extends Panel
    */
   public ToggleContainerPanel setHeading(final Component heading)
   {
-    this.heading = heading;
     toggleLink.add(heading);
     return this;
   }
@@ -116,7 +113,8 @@ public class ToggleContainerPanel extends Panel
    * 
    * @return
    */
-  protected boolean wantsOnStatusChangedNotification() {
+  protected boolean wantsOnStatusChangedNotification()
+  {
     return false;
   }
 
@@ -125,9 +123,10 @@ public class ToggleContainerPanel extends Panel
    * 
    * @param target
    * @param toggleClosed this represents the <b>new</b> state of the toggle. <br/>
-   * true if toggle is closed, false otherwise.
+   *          true if toggle is closed, false otherwise.
    */
-  protected void onToggleStatusChanged(final AjaxRequestTarget target, final boolean toggleClosed) {
+  protected void onToggleStatusChanged(final AjaxRequestTarget target, final boolean toggleClosed)
+  {
 
   }
 
