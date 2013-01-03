@@ -79,7 +79,11 @@ public class NavSidePanel extends NavAbstractPanel
           final WebMarkupContainer subMenuItem = new WebMarkupContainer(subMenuRepeater.newChildId());
           subMenuRepeater.add(subMenuItem);
           final AbstractLink link = getMenuEntryLink(subMenuEntry, null);
-          subMenuItem.add(link);
+          if (link != null) {
+            subMenuItem.add(link);
+          } else {
+            subMenuItem.setVisible(false);
+          }
         }
       }
     }

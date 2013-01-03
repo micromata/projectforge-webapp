@@ -156,6 +156,10 @@ public class NavTopPanel extends NavAbstractPanel
         final WebMarkupContainer menuItem = new WebMarkupContainer(menuRepeater.newChildId());
         menuRepeater.add(menuItem);
         final AbstractLink link = getMenuEntryLink(menuEntry, menuItem);
+        if (link == null) {
+          menuItem.setVisible(false);
+          continue;
+        }
         menuItem.add(link);
 
         final WebMarkupContainer subMenuContainer = new WebMarkupContainer("subMenu");
@@ -180,6 +184,10 @@ public class NavTopPanel extends NavAbstractPanel
             // Subsubmenu entries aren't yet supported, show only the sub entries without children, otherwise only the children are
             // displayed.
             final AbstractLink subLink = getMenuEntryLink(subMenuEntry, subMenuItem);
+            if (subLink == null) {
+              subMenuItem.setVisible(false);
+              continue;
+            }
             subMenuItem.add(subLink);
             continue;
           }
@@ -199,6 +207,10 @@ public class NavTopPanel extends NavAbstractPanel
             // Subsubmenu entries aren't yet supported, show only the sub entries without children, otherwise only the children are
             // displayed.
             final AbstractLink subLink = getMenuEntryLink(subsubMenuEntry, subMenuItem);
+            if (subLink == null) {
+              subMenuItem.setVisible(false);
+              continue;
+            }
             subMenuItem.add(subLink);
             // final WebMarkupContainer subsubMenuItem = new WebMarkupContainer(subsubMenuRepeater.newChildId());
             // subsubMenuRepeater.add(subsubMenuItem);

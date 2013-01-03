@@ -74,7 +74,12 @@ public abstract class NavAbstractPanel extends Panel
         link = new BookmarkablePageLink<String>("link", menuEntry.getPageClass(), params);
       }
     } else {
-      link = new ExternalLink("link", WicketUtils.getUrl(getResponse(), menuEntry.getUrl(), true));
+      final String url = menuEntry.getUrl();
+      if (url == null && menuEntry.hasSubMenuEntries() == false) {
+        // Don't show this entry.
+        return null;
+      }
+      link = new ExternalLink("link", WicketUtils.getUrl(getResponse(), url, true));
     }
     if (menuEntry.isNewWindow() == true) {
       link.add(AttributeModifier.replace("target", "_blank"));
