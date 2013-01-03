@@ -94,7 +94,6 @@ public class TeamCalendarIcsExportLink extends Panel
         dialog.open(target);
       }
     };
-    dialogOpenLink.setLight();
     add(dialogOpenLink);
   }
 

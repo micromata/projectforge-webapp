@@ -183,7 +183,7 @@ class AddressPageSupport implements Serializable
     final AbstractFieldsetPanel< ? > fs = gridBuilder.newFieldset(props);
     final LabelValueChoiceRenderer<FormOfAddress> formChoiceRenderer = new LabelValueChoiceRenderer<FormOfAddress>(form,
         FormOfAddress.values());
-    final DropDownChoicePanel<?> panel = fs.addDropDownChoice(props.getModel(), formChoiceRenderer.getValues(), formChoiceRenderer)
+    final DropDownChoicePanel< ? > panel = fs.addDropDownChoice(props.getModel(), formChoiceRenderer.getValues(), formChoiceRenderer)
         .setRequired(true).setNullValid(false);
     WicketUtils.setSize(panel.getDropDownChoice(), ComponentSize.SMALL);
     return fs;
@@ -302,8 +302,10 @@ class AddressPageSupport implements Serializable
     final AbstractFieldsetPanel< ? > fs = gridBuilder.newFieldset(props);
     final LabelValueChoiceRenderer<ContactStatus> contactStatusChoiceRenderer = new LabelValueChoiceRenderer<ContactStatus>(form,
         ContactStatus.values());
-    fs.addDropDownChoice(props.getModel(), contactStatusChoiceRenderer.getValues(), contactStatusChoiceRenderer).setRequired(true)
-    .setNullValid(false);
+    final DropDownChoicePanel< ? > panel = fs
+        .addDropDownChoice(props.getModel(), contactStatusChoiceRenderer.getValues(), contactStatusChoiceRenderer).setRequired(true)
+        .setNullValid(false);
+    WicketUtils.setSize(panel, ComponentSize.MEDIUM);
     return fs;
   }
 
@@ -318,8 +320,9 @@ class AddressPageSupport implements Serializable
     final AbstractFieldsetPanel< ? > fs = gridBuilder.newFieldset(props);
     final LabelValueChoiceRenderer<AddressStatus> addressStatusChoiceRenderer = new LabelValueChoiceRenderer<AddressStatus>(form,
         AddressStatus.values());
-    fs.addDropDownChoice(props.getModel(), addressStatusChoiceRenderer.getValues(), addressStatusChoiceRenderer).setRequired(true)
-    .setNullValid(false);
+    final DropDownChoicePanel< ? > panel = fs.addDropDownChoice(props.getModel(), addressStatusChoiceRenderer.getValues(), addressStatusChoiceRenderer).setRequired(true)
+        .setNullValid(false);
+    WicketUtils.setSize(panel, ComponentSize.MEDIUM);
     return fs;
   }
 

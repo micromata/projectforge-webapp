@@ -84,13 +84,11 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
     // Status
     // /////////////////
     gridBuilder.newSplitPanel(GridSize.COL50, true).newSubSplitPanel(GridSize.COL50);
-    addressEditSupport.addContactStatus();
-    gridBuilder.newSubSplitPanel(GridSize.COL50);
-    addressEditSupport.addAddressStatus();
-    gridBuilder.newSubSplitPanel(GridSize.COL50);
     addressEditSupport.addBirthday();
-    gridBuilder.newSubSplitPanel(GridSize.COL50);
     addressEditSupport.addLanguage();
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
+    addressEditSupport.addContactStatus();
+    addressEditSupport.addAddressStatus();
 
     // /////////////////
     // Phone numbers
@@ -115,7 +113,7 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
     gridBuilder.newSplitPanel(GridSize.COL50, true).newSubSplitPanel(GridSize.COL100);
     addAddress(addressEditSupport.getPrivateAddressParameters());
 
-    gridBuilder.newSubSplitPanel(GridSize.COL50);
+    gridBuilder.newSubSplitPanel(GridSize.COL100);
     addressEditSupport.addFingerPrint();
     addressEditSupport.addPublicKey();
 
@@ -138,11 +136,9 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
     addressEditSupport.addAddressText(params.addressType, params.addressTextProperty);
     gridBuilder.newSubSplitPanel(GridSize.COL50);
     addressEditSupport.addZipCode(params.zipCodeProperty);
-    gridBuilder.newSubSplitPanel(GridSize.COL50);
     addressEditSupport.addCity(params.cityProperty);
     gridBuilder.newSubSplitPanel(GridSize.COL50);
     addressEditSupport.addCountry(params.countryProperty);
-    gridBuilder.newSubSplitPanel(GridSize.COL50);
     addressEditSupport.addState(params.stateProperty);
   }
 

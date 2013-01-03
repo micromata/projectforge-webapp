@@ -132,8 +132,9 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
     if (accessChecker.isRestrictedUser() == false && WebConfiguration.isDevelopmentMode() == true) {
       final FieldsetPanel fsSubscribe = gridBuilder.newFieldset(getString("plugins.teamcal.subscribe"), true).setNoLabelFor();
       fsSubscribe.add(new TeamCalendarIcsExportLink(fsSubscribe.newChildId(), getData()));
-      if (isNew() == true)
+      if (isNew() == true) {
         fsSubscribe.setVisible(false);
+      }
     }
 
     if (access == true) {
