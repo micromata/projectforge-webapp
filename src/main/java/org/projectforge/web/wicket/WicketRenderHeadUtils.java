@@ -35,7 +35,6 @@ public class WicketRenderHeadUtils
     { "include/bootstrap/js/bootstrap", ".min"}, //
     { "scripts/jqueryui/1.9.2/jquery-ui-1.9.2.custom", ".min"}, //
     { "scripts/contextmenu/jquery.contextmenu", ""}, //
-    //{ "scripts/adminica-2.2/prefixfree/prefixfree", "-min"}, //
     { "scripts/adminica-2.2/adminica_ui", ""}, // modified!
     { "scripts/projectforge", ""} //
   };
