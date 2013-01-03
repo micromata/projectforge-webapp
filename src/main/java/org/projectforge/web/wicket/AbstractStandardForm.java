@@ -72,7 +72,18 @@ public class AbstractStandardForm<F, P extends AbstractStandardFormPage> extends
     feedbackAndMessagesPanel.add(messagesComponent);
     gridBuilder = newGridBuilder(this, "flowform");
     actionButtons = new MyComponentsRepeater<SingleButtonPanel>("buttons");
-    add(actionButtons.getRepeatingView());
+    final WebMarkupContainer buttonBar = new WebMarkupContainer("buttonBar") {
+      /**
+       * @see org.apache.wicket.Component#isVisible()
+       */
+      @Override
+      public boolean isVisible()
+      {
+        return actionButtons.hasEntries();
+      }
+    };
+    add(buttonBar);
+    buttonBar.add(actionButtons.getRepeatingView());
   }
 
   protected SingleButtonPanel addCancelButton(final Button cancelButton)
