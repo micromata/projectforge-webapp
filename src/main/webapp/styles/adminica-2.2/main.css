@@ -47,60 +47,6 @@ Sidebar and Topbar
 	border-top-right-radius: 5px;
 }
 
-/*------User Box --------*/
-div.user_box {
-	float: right;
-	width: 200px;
-	margin-right: 9px;
-	margin-top: 10px;
-	color: #fff;
-	padding: 5px;
-	padding-right: 0;
-	z-index: 1000;
-	width: 150px;
-	border: 1px solid rgba(0, 0, 0, 0.5) !important;
-	border-radius: 3px;
-	-webkit-border-radius: 3px;
-	background-color: #4c5766;
-	border-color: #313841;
-	color: #fff;
-	text-shadow: 0 1px 0 #000;
-}
-
-.user_box ul {
-	padding: 0;
-	margin: 0;
-}
-
-.user_box ul li {
-	position: relative;
-	float: left;
-	margin: 0;
-	display: inline;
-	list-style: none;
-	line-height: 12px;
-	zoom: 1;
-}
-
-.user_box ul li a {
-	font-size: 11px;
-	color: #aaa;
-	zoom: 1;
-}
-
-.user_box ul li a:hover {
-	color: #fff;
-	text-decoration: none;
-}
-
-.user_box ul li a:hover {
-	color: #fff;
-}
-
-.user_box ul li span {
-	color: #666;
-	margin: 0 4px;
-}
 /*------ Side Accordion and list --------*/
 .side_accordion,.side_links {
 	margin-bottom: 10px;

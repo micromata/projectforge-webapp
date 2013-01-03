@@ -129,15 +129,10 @@ public abstract class AbstractUnsecureBasePage extends WebPage
     final PFUserDO user = PFUserContext.getUser();
     AbstractLink link;
     if (user == null) {
-      body.add(new Label("username", getString("notLoggedIn")).setEscapeModelStrings(false));
       link = new ExternalLink("footerNewsLink", "http://www.projectforge.org/pf-en/News");
       body.add(link);
     } else {
       link = DocumentationPage.addNewsLink(body, "footerNewsLink");
-      body.add(new Label("username", getString("loggedInUserInfo")
-          + " <span class=\"username\">"
-          + escapeHtml(user.getUserDisplayname())
-          + "</span>").setEscapeModelStrings(false));
     }
     link.add(new Label("version", "Version " + AppVersion.VERSION.toString() + ", " + AppVersion.RELEASE_DATE).setRenderBodyOnly(true));
   }

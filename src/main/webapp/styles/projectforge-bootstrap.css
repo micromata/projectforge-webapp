@@ -89,12 +89,13 @@ div.login-header {
 
 div.navbar {
  padding-left: 45px;
+ padding-right: 5px;
  width: auto;
 }
 
 div.navbar-inner {
  padding-left: 0px;	
- padding-right: 0px;	
+ padding-right: 5px;	
 }
 
 ul.nav li {

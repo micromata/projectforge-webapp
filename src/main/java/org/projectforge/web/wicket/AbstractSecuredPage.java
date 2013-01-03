@@ -27,14 +27,9 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.image.ContextImage;
-import org.apache.wicket.markup.html.link.BookmarkablePageLink;
-import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.request.http.WebRequest;
-import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.projectforge.web.LoginPage;
 import org.projectforge.web.Menu;
 import org.projectforge.web.MenuEntry;
 import org.projectforge.web.core.LogoServlet;
@@ -42,8 +37,6 @@ import org.projectforge.web.core.MenuSuffixLabel;
 import org.projectforge.web.core.NavSidePanel;
 import org.projectforge.web.core.NavTopPanel;
 import org.projectforge.web.fibu.ISelectCallerPage;
-import org.projectforge.web.user.ChangePasswordPage;
-import org.projectforge.web.user.MyAccountEditPage;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
 
@@ -104,24 +97,6 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
     final NavTopPanel favoriteMenuPanel = new NavTopPanel("favoriteMenu", userXmlPreferencesCache, accessChecker);
     body.add(favoriteMenuPanel);
     favoriteMenuPanel.init(this);
-    // body.add(new Label("username", getUser().getFullname()));
-    if (accessChecker.isRestrictedUser() == true) {
-      // Show ChangePaswordPage as my account for restricted users.
-      final BookmarkablePageLink<Void> changePasswordLink = new BookmarkablePageLink<Void>("myAccountLink", ChangePasswordPage.class);
-      body.add(changePasswordLink);
-    } else {
-      final BookmarkablePageLink<Void> myAccountLink = new BookmarkablePageLink<Void>("myAccountLink", MyAccountEditPage.class);
-      body.add(myAccountLink);
-    }
-    final Link<String> logoutLink = new Link<String>("logoutLink") {
-      @Override
-      public void onClick()
-      {
-        LoginPage.logout((MySession) getSession(), (WebRequest) getRequest(), (WebResponse) getResponse(), userXmlPreferencesCache);
-        setResponsePage(LoginPage.class);
-      };
-    };
-    body.add(logoutLink);
     final WebMarkupContainer contentMenusContainer = new WebMarkupContainer("contentMenus") {
       @Override
       public boolean isVisible()

@@ -31,23 +31,32 @@ import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.http.WebRequest;
+import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.access.AccessChecker;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserRights;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.CustomizeMenuPage;
 import org.projectforge.web.FavoritesMenu;
 import org.projectforge.web.LayoutSettingsPage;
+import org.projectforge.web.LoginPage;
 import org.projectforge.web.MenuEntry;
 import org.projectforge.web.mobile.MenuMobilePage;
+import org.projectforge.web.user.ChangePasswordPage;
+import org.projectforge.web.user.MyAccountEditPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.FeedbackPage;
+import org.projectforge.web.wicket.MySession;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DialogPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
@@ -67,9 +76,15 @@ public class NavTopPanel extends NavAbstractPanel
 
   private ModalWindow bookmarkModalWindow;
 
+  private final AccessChecker accessChecker;
+
+  private final UserXmlPreferencesCache userXmlPreferencesCache;
+
   public NavTopPanel(final String id, final UserXmlPreferencesCache userXmlPreferencesCache, final AccessChecker accessChecker)
   {
     super(id);
+    this.userXmlPreferencesCache = userXmlPreferencesCache;
+    this.accessChecker = accessChecker;
     this.favoritesMenu = FavoritesMenu.get(userXmlPreferencesCache, accessChecker);
   }
 
@@ -107,6 +122,27 @@ public class NavTopPanel extends NavAbstractPanel
       bookmarkModalWindow = new ModalWindow(BOOKMARK_DIALOG_ID);
       bookmarkModalWindow.setInitialHeight(200);
       add(bookmarkModalWindow);
+    }
+    {
+      add(new Label("user", PFUserContext.getUser().getFullname()));
+      if (accessChecker.isRestrictedUser() == true) {
+        // Show ChangePaswordPage as my account for restricted users.
+        final BookmarkablePageLink<Void> changePasswordLink = new BookmarkablePageLink<Void>("myAccountLink", ChangePasswordPage.class);
+        add(changePasswordLink);
+      } else {
+        final BookmarkablePageLink<Void> myAccountLink = new BookmarkablePageLink<Void>("myAccountLink", MyAccountEditPage.class);
+        add(myAccountLink);
+      }
+      @SuppressWarnings("serial")
+      final Link<String> logoutLink = new Link<String>("logoutLink") {
+        @Override
+        public void onClick()
+        {
+          LoginPage.logout((MySession) getSession(), (WebRequest) getRequest(), (WebResponse) getResponse(), userXmlPreferencesCache);
+          setResponsePage(LoginPage.class);
+        };
+      };
+      add(logoutLink);
     }
     getMenu();
 
