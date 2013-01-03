@@ -10,12 +10,9 @@ Bootstrap-Umbau
 - J.: context menu auf Tabellenzeilen klappt nicht: abbrechen
 
 - J.: Autocompletion: deletion of objects doesn't work (locations)
-- unbenutzte css- und js-Pakete entfernen.
-- unbenutzte Bilder entfernen.
 
 Konkrete Masken
 ---------------
-- LoginPage: Component error messages has to be removed.
 - AddressViewPage
 - AdminPage
 - SetupPage für Neuinstallation (Helpicon für E-Mails deplatziert)
@@ -32,7 +29,11 @@ Wicket6-Migration
 -----------------
 - Fullcalendar, StalePage, wiederholter PF-Dialog, Context-Menü
 - J.: JavaScriptEventToggleBehavior
-- ToggleContainer
 - TaskTreePage auf Wicket Tree umstellen
 
 - JS and CSS: minifiing and concatenating (https://github.com/WiQuery/wiquery)
+
+
+Themenspeicher
+--------------
+- http://haineault.com/media/jquery/ui-timepickr/page/
