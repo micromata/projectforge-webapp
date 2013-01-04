@@ -25,6 +25,7 @@ package org.projectforge.plugins.todo;
 
 import org.projectforge.admin.UpdateEntry;
 import org.projectforge.plugins.core.AbstractPlugin;
+import org.projectforge.registry.DaoRegistry;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.MenuItemDef;
@@ -64,10 +65,10 @@ public class ToDoPlugin extends AbstractPlugin
     ToDoPluginUpdates.dao = databaseUpdateDao;
     final RegistryEntry entry = new RegistryEntry(ID, ToDoDao.class, toDoDao, "plugins.todo");
     // The ToDoDao is automatically available by the scripting engine!
-    register(entry);
+    register(entry); // Insert at second position after Address entry (for SearchPage).
 
     // Register the web part:
-    registerWeb(ID, ToDoListPage.class, ToDoEditPage.class);
+    registerWeb(ID, ToDoListPage.class, ToDoEditPage.class, DaoRegistry.ADDRESS, false); // Insert at second position after Address entry (for SearchPage).
 
     // Register the menu entry as sub menu entry of the misc menu:
     final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);

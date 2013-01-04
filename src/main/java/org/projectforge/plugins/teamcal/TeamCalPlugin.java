@@ -38,6 +38,7 @@ import org.projectforge.plugins.teamcal.event.TeamEventRight;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFeedHook;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarPage;
 import org.projectforge.plugins.teamcal.integration.TeamcalTimesheetPluginComponentHook;
+import org.projectforge.registry.DaoRegistry;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.MenuItemDef;
@@ -91,7 +92,9 @@ public class TeamCalPlugin extends AbstractPlugin
 
     // Register the web part:
     registerWeb(ID, TeamCalListPage.class, TeamCalEditPage.class);
-    registerWeb("teamEvent", TeamEventListPage.class, TeamEventEditPage.class);
+    registerWeb(ID, TeamCalListPage.class, TeamCalEditPage.class, DaoRegistry.ADDRESS, false); // At second position (after Address entry)
+    // for SearchPage.
+    registerWeb("teamEvent", TeamEventListPage.class, TeamEventEditPage.class, ID, false); // At position after entry.
 
     addMountPage("teamCalendar", TeamCalCalendarPage.class);
     // Register the menu entry as sub menu entry of the misc menu:
