@@ -137,17 +137,19 @@ public class SearchPage extends AbstractStandardFormPage implements ISelectCalle
 
   private void addArea(final WebRegistryEntry webRegistryEntry)
   {
-    //    final Panel panel = new AjaxLazyLoadPanel(areaRepeater.newChildId()) {
-    //      @Override
-    //      public final Component getLazyLoadComponent(final String id)
-    //      {
-    //        log.info("getLazyLoadComponent(" + id +")");
-    //        final SearchAreaPanel searchAreaPanel = new SearchAreaPanel(SearchPage.this, id, form.filter, webRegistryEntry);
-    //        return searchAreaPanel;
-    //      }
-    //    };
+    // final Panel panel = new AjaxLazyLoadPanel(areaRepeater.newChildId()) {
+    // @Override
+    // public final Component getLazyLoadComponent(final String id)
+    // {
+    // log.info("getLazyLoadComponent(" + id +")");
+    // final SearchAreaPanel searchAreaPanel = new SearchAreaPanel(SearchPage.this, id, form.filter, webRegistryEntry);
+    // return searchAreaPanel;
+    // }
+    // };
     final Panel panel = new SearchAreaPanel(SearchPage.this, areaRepeater.newChildId(), form.filter, webRegistryEntry);
-    areaRepeater.add(panel);
+    if (panel.isVisible()) {
+      areaRepeater.add(panel);
+    }
   }
 
   @Override
