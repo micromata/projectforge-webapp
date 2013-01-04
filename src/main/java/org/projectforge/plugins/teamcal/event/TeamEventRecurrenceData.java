@@ -65,7 +65,9 @@ public class TeamEventRecurrenceData implements Serializable
     if (this.interval < 1) {
       this.interval = 1;
     }
-    this.until = CalendarUtils.getEndOfDay(recur.getUntil(), timeZone);
+    if (recur.getUntil() != null) {
+      this.until = CalendarUtils.getEndOfDay(recur.getUntil(), timeZone);
+    }
     this.frequency = ICal4JUtils.getFrequency(recur);
     if (this.interval > 1) {
       this.customized = true;
