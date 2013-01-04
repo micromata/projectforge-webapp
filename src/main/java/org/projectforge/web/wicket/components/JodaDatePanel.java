@@ -29,6 +29,7 @@ import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.joda.time.DateMidnight;
+import org.projectforge.web.wicket.WicketRenderHeadUtils;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
 
@@ -66,6 +67,7 @@ public class JodaDatePanel extends Panel implements ComponentWrapperPanel
   public void renderHead(final IHeaderResponse response)
   {
     super.renderHead(response);
+    WicketRenderHeadUtils.renderMainJavaScriptIncludes(response);
     DatePickerUtils.renderHead(response, getLocale(), dateField.getMarkupId(), autosubmit);
   }
 
@@ -117,4 +119,3 @@ public class JodaDatePanel extends Panel implements ComponentWrapperPanel
     return dateField;
   }
 }
-
