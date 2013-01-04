@@ -158,7 +158,6 @@ public class SearchPage extends AbstractStandardFormPage implements ISelectCalle
       @Override
       public final Component getLazyLoadComponent(final String id)
       {
-        log.info("getLazyLoadComponent(" + id +")");
         final SearchAreaPanel searchAreaPanel = new SearchAreaPanel(SearchPage.this, id, form.filter, webRegistryEntry);
         return searchAreaPanel;
       }

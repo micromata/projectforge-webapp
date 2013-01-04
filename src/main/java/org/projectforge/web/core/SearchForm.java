@@ -103,6 +103,37 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("search.area"));
+      // DropDownChoice: area
+      final LabelValueChoiceRenderer<String> areaChoiceRenderer = new LabelValueChoiceRenderer<String>();
+      for (final RegistryEntry entry : Registry.instance().getOrderedList()) {
+        if (isSearchable(entry) == true) {
+          areaChoiceRenderer.addValue(entry.getId(), getString(entry.getI18nTitleHeading()));
+        }
+      }
+      areaChoiceRenderer.sortLabels();
+      areaChoiceRenderer.addValue(0, SearchPageFilter.ALL, getString("filter.all"));
+      final DropDownChoice<String> areaChoice = new DropDownChoice<String>(fs.getDropDownChoiceId(), new PropertyModel<String>(filter,
+          "area"), areaChoiceRenderer.getValues(), areaChoiceRenderer) {
+        @Override
+        protected boolean wantOnSelectionChangedNotifications()
+        {
+          return true;
+        }
+      };
+      areaChoice.setRequired(false);
+      fs.add(areaChoice);
+    }
+    {
+      // DropDownChoice pageSize
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.pageSize"));
+      final DropDownChoice<Integer> pageSizeChoice = AbstractListForm.getPageSizeDropDownChoice(fs.getDropDownChoiceId(), getLocale(),
+          new PropertyModel<Integer>(filter, "maxRows"), 3, 100);
+      fs.add(pageSizeChoice);
+    }
+
+    gridBuilder.newSplitPanel(GridSize.COL50);
+    {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("filter.lastModified"), true);
       final DatePanel modifiedStartDatePanel = new DatePanel(fs.newChildId(),
           new PropertyModel<Date>(filter, "startTimeOfLastModification"), DatePanelSettings.get().withSelectPeriodMode(true));
@@ -163,44 +194,12 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
       lastDaysChoice.setRequired(false);
       fs.add(lastDaysChoice);
     }
-    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("modifiedBy"));
       final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(filter, "modifiedByUser"),
           parentPage, "userId");
       fs.add(userSelectPanel);
       userSelectPanel.init().withAutoSubmit(true);
-    }
-    gridBuilder.newSplitPanel(GridSize.COL50);
-    {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("search.area"));
-      // DropDownChoice: area
-      final LabelValueChoiceRenderer<String> areaChoiceRenderer = new LabelValueChoiceRenderer<String>();
-      for (final RegistryEntry entry : Registry.instance().getOrderedList()) {
-        if (isSearchable(entry) == true) {
-          areaChoiceRenderer.addValue(entry.getId(), getString(entry.getI18nTitleHeading()));
-        }
-      }
-      areaChoiceRenderer.sortLabels();
-      areaChoiceRenderer.addValue(0, SearchPageFilter.ALL, getString("filter.all"));
-      final DropDownChoice<String> areaChoice = new DropDownChoice<String>(fs.getDropDownChoiceId(), new PropertyModel<String>(filter,
-          "area"), areaChoiceRenderer.getValues(), areaChoiceRenderer) {
-        @Override
-        protected boolean wantOnSelectionChangedNotifications()
-        {
-          return true;
-        }
-      };
-      areaChoice.setRequired(false);
-      fs.add(areaChoice);
-    }
-    gridBuilder.newSplitPanel(GridSize.COL50);
-    {
-      // DropDownChoice pageSize
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.pageSize"));
-      final DropDownChoice<Integer> pageSizeChoice = AbstractListForm.getPageSizeDropDownChoice(fs.getDropDownChoiceId(), getLocale(),
-          new PropertyModel<Integer>(filter, "maxRows"), 3, 100);
-      fs.add(pageSizeChoice);
     }
     {
       final Button resetButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("reset")) {
