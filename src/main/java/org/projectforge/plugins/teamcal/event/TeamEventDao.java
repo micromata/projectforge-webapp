@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 import org.hibernate.criterion.Order;
@@ -41,6 +42,9 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
+import org.projectforge.plugins.teamcal.admin.TeamCalCache;
+import org.projectforge.plugins.teamcal.admin.TeamCalDO;
+import org.projectforge.plugins.teamcal.admin.TeamCalsProvider;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserRightId;
 import org.springframework.transaction.annotation.Propagation;
@@ -177,7 +181,17 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
       teamEventFilter = new TeamEventFilter(filter);
     }
     if (CollectionUtils.isEmpty(teamEventFilter.getTeamCals()) == true && teamEventFilter.getTeamCalId() == null) {
-      return null;
+      // May-be called by SeachPage
+      if (StringUtils.isNotBlank(teamEventFilter.getSearchString()) == true) {
+        final Collection <TeamCalDO> ownCalendars = TeamCalCache.getInstance().getAllOwnCalendars();
+        if (CollectionUtils.isEmpty(ownCalendars) == true) {
+          // No calendars accessible, nothing to search.
+          return null;
+        }
+        teamEventFilter.setTeamCals(TeamCalsProvider.getCalIdList(ownCalendars));
+      } else {
+        return null;
+      }
     }
     final QueryFilter qFilter = buildQueryFilter(teamEventFilter);
     final List<TeamEventDO> list = getList(qFilter);
