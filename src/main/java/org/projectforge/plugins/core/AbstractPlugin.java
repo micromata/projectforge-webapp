@@ -48,6 +48,7 @@ import org.projectforge.web.MenuItemDef;
 import org.projectforge.web.MenuItemDefId;
 import org.projectforge.web.MenuItemRegistry;
 import org.projectforge.web.registry.WebRegistry;
+import org.projectforge.web.registry.WebRegistryEntry;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 
 import de.micromata.hibernate.history.Historizable;
@@ -179,21 +180,6 @@ public abstract class AbstractPlugin
   }
 
   /**
-   * Registers the given entry.
-   * @param existingEntry A previous added entry, at which the new entry should be inserted.
-   * @param insertBefore If true then the given entry will be added before the existing entry, otherwise after.
-   * @param entry The entry to register.
-   * @return The registered registry entry for chaining.
-   * @see Registry#register(RegistryEntry, boolean, RegistryEntry)
-   */
-  protected RegistryEntry register(final RegistryEntry existingEntry, final boolean insertBefore, final RegistryEntry entry)
-  {
-    Validate.notNull(entry);
-    Registry.instance().register(existingEntry, insertBefore, entry);
-    return entry;
-  }
-
-  /**
    * Use this method if your entities don't support the general search page (e. g. if you have no data-base entities which implements
    * {@link Historizable}).
    * @param id
@@ -207,14 +193,17 @@ public abstract class AbstractPlugin
   }
 
   /**
+   * 
    * @param id
-   * @param listPageColumnsCreatorClass Needed for displaying the result-sets by the general search page.
+   * @param existingEntryId
+   * @param insertBefore
    * @return this for chaining.
-   * @see WebRegistry#register(String, Class)
+   * @see WebRegistry#register(WebRegistryEntry, boolean, WebRegistryEntry)
    */
-  protected AbstractPlugin registerWeb(final String id, final Class< ? extends IListPageColumnsCreator< ? >> listPageColumnsCreatorClass)
+  protected AbstractPlugin registerWeb(final String id, final String existingEntryId, final boolean insertBefore)
   {
-    WebRegistry.instance().register(id, listPageColumnsCreatorClass);
+    final WebRegistryEntry existingEntry = WebRegistry.instance().getEntry(id);
+    WebRegistry.instance().register(existingEntry, insertBefore, new WebRegistryEntry(id));
     return this;
   }
 
@@ -231,10 +220,34 @@ public abstract class AbstractPlugin
   protected AbstractPlugin registerWeb(final String id, final Class< ? extends WebPage> pageListClass,
       final Class< ? extends WebPage> pageEditClass)
   {
+    registerWeb(id, pageEditClass, pageEditClass, null, false);
+    return this;
+  }
+
+  /**
+   * @param id
+   * @param pageListClass list page to mount. Needed for displaying the result-sets by the general search page if the list page implements
+   *          {@link IListPageColumnsCreator}.
+   * @param pageEditClass edit page to mount.
+   * @return this for chaining.
+   * @see WebRegistry#register(String, Class)
+   * @see WebRegistry#addMountPages(String, Class, Class)
+   */
+  @SuppressWarnings("unchecked")
+  protected AbstractPlugin registerWeb(final String id, final Class< ? extends WebPage> pageListClass,
+      final Class< ? extends WebPage> pageEditClass, final String existingEntryId, final boolean insertBefore)
+  {
+    WebRegistryEntry entry;
     if (IListPageColumnsCreator.class.isAssignableFrom(pageListClass) == true) {
-      WebRegistry.instance().register(id, (Class< ? extends IListPageColumnsCreator< ? >>) pageListClass);
+      entry = new WebRegistryEntry(id, (Class< ? extends IListPageColumnsCreator< ? >>) pageListClass);
     } else {
-      WebRegistry.instance().register(id);
+      entry = new WebRegistryEntry(id);
+    }
+    if (existingEntryId != null) {
+      final WebRegistryEntry existingEntry = WebRegistry.instance().getEntry(existingEntryId);
+      WebRegistry.instance().register(existingEntry, insertBefore, entry);
+    } else {
+      WebRegistry.instance().register(entry);
     }
     WebRegistry.instance().addMountPages(id, pageListClass, pageEditClass);
     return this;
