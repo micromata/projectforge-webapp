@@ -100,7 +100,7 @@ public class CustomerListPage extends AbstractListPage<CustomerListForm, KundeDa
       {
         final KundeDO kunde = rowModel.getObject();
         if (isSelectMode() == false) {
-          item.add(new ListSelectActionPanel(componentId, rowModel, CustomerEditPage.class, kunde.getId(), CustomerListPage.this, String
+          item.add(new ListSelectActionPanel(componentId, rowModel, CustomerEditPage.class, kunde.getId(), returnToPage, String
               .valueOf(kunde.getKost())));
         } else {
           item.add(new ListSelectActionPanel(componentId, rowModel, caller, selectProperty, kunde.getId(), String.valueOf(kunde.getKost())));

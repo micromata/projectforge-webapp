@@ -92,7 +92,7 @@ IListPageColumnsCreator<PostausgangDO>
       {
         final PostausgangDO postausgang = rowModel.getObject();
         item.add(new ListSelectActionPanel(componentId, rowModel, PostausgangEditPage.class, postausgang.getId(),
-            PostausgangListPage.this, DateTimeFormatter.instance().getFormattedDate(postausgang.getDatum())));
+            returnToPage, DateTimeFormatter.instance().getFormattedDate(postausgang.getDatum())));
         cellItemListener.populateItem(item, componentId, rowModel);
         addRowClick(item);
       }

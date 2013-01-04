@@ -86,7 +86,7 @@ public class ContractListPage extends AbstractListPage<ContractListForm, Contrac
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
       {
         final ContractDO contract = (ContractDO) rowModel.getObject();
-        item.add(new ListSelectActionPanel(componentId, rowModel, ContractEditPage.class, contract.getId(), ContractListPage.this,
+        item.add(new ListSelectActionPanel(componentId, rowModel, ContractEditPage.class, contract.getId(), returnToPage,
             NumberHelper.getAsString(contract.getNumber())));
         cellItemListener.populateItem(item, componentId, rowModel);
         addRowClick(item);

@@ -130,7 +130,7 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
       public void populateItem(final Item<ICellPopulator<AuftragDO>> item, final String componentId, final IModel<AuftragDO> rowModel)
       {
         final AuftragDO auftrag = rowModel.getObject();
-        item.add(new ListSelectActionPanel(componentId, rowModel, AuftragEditPage.class, auftrag.getId(), AuftragListPage.this, String
+        item.add(new ListSelectActionPanel(componentId, rowModel, AuftragEditPage.class, auftrag.getId(), returnToPage, String
             .valueOf(auftrag.getNummer())));
         cellItemListener.populateItem(item, componentId, rowModel);
         addRowClick(item);
