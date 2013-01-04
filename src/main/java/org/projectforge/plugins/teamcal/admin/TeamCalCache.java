@@ -74,7 +74,7 @@ public class TeamCalCache extends AbstractCache
     final Set<TeamCalDO> set = new TreeSet<TeamCalDO>(new TeamCalsComparator());
     final PFUserDO loggedInUser = PFUserContext.getUser();
     for (final TeamCalDO cal : calendarMap.values()) {
-      if (teamCalRight.hasSelectAccess(loggedInUser) == true) {
+      if (teamCalRight.hasSelectAccess(loggedInUser, cal) == true && cal.isDeleted() == false) {
         set.add(cal);
       }
     }
