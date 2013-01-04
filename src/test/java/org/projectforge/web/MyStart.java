@@ -35,21 +35,21 @@ import org.projectforge.webserver.StartSettings;
  */
 public class MyStart
 {
-  /**
-   * Should be set to true only at first start:
-   */
-  private static final boolean SCHEMA_UPDATE = true;
+	/**
+	 * Should be set to true only at first start:
+	 */
+	private static final boolean SCHEMA_UPDATE = true;
 
-  private static final String BASE_DIR = System.getProperty("user.dir") + "/testsystem/";
+	private static final String BASE_DIR = System.getProperty("user.dir") + "/testsystem/";
 
-  public static void main(final String[] args) throws Exception
-  {
-    final StartSettings settings = new StartSettings(DatabaseDialect.HSQL, BASE_DIR);
-    settings.setSchemaUpdate(SCHEMA_UPDATE);
-    settings.setLaunchBrowserAfterStartup(true);
-    // Set the url of ProjectForge's storage web server:
-    System.setProperty(StorageConstants.SYSTEM_PROPERTY_URL, "http://localhost:8081/");
-    final StartHelper startHelper = new StartHelper(settings);
-    startHelper.start();
-  }
+	public static void main(final String[] args) throws Exception
+	{
+		final StartSettings settings = new StartSettings(DatabaseDialect.HSQL, BASE_DIR);
+		settings.setSchemaUpdate(SCHEMA_UPDATE);settings.setPort(8081);
+		settings.setLaunchBrowserAfterStartup(true);
+		// Set the url of ProjectForge's storage web server:
+		System.setProperty(StorageConstants.SYSTEM_PROPERTY_URL, "http://localhost:8081/");
+		final StartHelper startHelper = new StartHelper(settings);
+		startHelper.start();
+	}
 }
