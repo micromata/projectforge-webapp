@@ -153,7 +153,8 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO> implements Co
               getModel().setObject(null);
               return null;
             }
-            final int ind = value.indexOf(": ");
+            // ### FORMAT ###
+            final int ind = value.indexOf(" (");
             final String username = ind >= 0 ? value.substring(0, ind) : value;
             final PFUserDO user = userDao.getUserGroupCache().getUser(username);
             if (user == null) {
@@ -274,6 +275,7 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO> implements Co
     if (user == null) {
       return "";
     }
+    // PLEASE NOTE: If you change the format don't forget to change the format above (search ### FORMAT ###)
     return user.getUsername() + " (" + user.getFullname() + ", " + user.getEmail() + ")";
   }
 
