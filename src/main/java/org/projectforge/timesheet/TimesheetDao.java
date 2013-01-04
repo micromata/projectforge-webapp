@@ -237,7 +237,9 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
   public List<TimesheetDO> getListForSearchDao(final BaseSearchFilter filter)
   {
     final TimesheetFilter timesheetFilter = new TimesheetFilter(filter);
-    timesheetFilter.setUserId(PFUserContext.getUserId());
+    if (filter.getModifiedByUserId() == null) {
+      timesheetFilter.setUserId(PFUserContext.getUserId());
+    }
     return getList(timesheetFilter);
   }
 
