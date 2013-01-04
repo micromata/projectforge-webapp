@@ -84,22 +84,15 @@ div.navbar {
  padding-left: 45px;
  padding-right: 5px;
  width: auto;
- margin-bottom: 10px;
- height: 35px;
- line-height: 25px;
+ margin-bottom: 5px;
 }
 
 div.navbar-inner {
  padding-left: 0px;	
  padding-right: 5px;	
- height: 35px;
- line-height: 25px;
- min-height: 30px;
 }
 
 div.navbar-inner>div.container {
- height: 35px;
- line-height: 25px;
 }
 
 ul.nav li {
@@ -109,6 +102,7 @@ ul.nav li {
 ul.nav>li>a {
 	padding-left: 5px !important;
 	padding-right: 5px !important;
+	padding-bottom: 0px !important;
 }
 
 ul.nav li.dropdown:hover ul.dropdown-menu {
