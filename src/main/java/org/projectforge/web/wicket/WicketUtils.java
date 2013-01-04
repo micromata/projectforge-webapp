@@ -757,6 +757,19 @@ public class WicketUtils
   }
 
   /**
+   * Sets the html attribute placeholder.
+   * @param component
+   * @param value
+   */
+  public static void setPlaceHolderAttribute(Component component, final String value)
+  {
+    if (component instanceof ComponentWrapperPanel) {
+      component = ((ComponentWrapperPanel) component).getFormComponent();
+    }
+    component.add(AttributeModifier.replace("placeholder", value));
+  }
+
+  /**
    * @param parent Only for i18n needed.
    * @param startTime Start time or null.
    * @param stopTime Stop time or null.
