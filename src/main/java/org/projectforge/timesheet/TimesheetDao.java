@@ -231,6 +231,17 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
   }
 
   /**
+   * @see org.projectforge.core.BaseDao#getListForSearchDao(org.projectforge.core.BaseSearchFilter)
+   */
+  @Override
+  public List<TimesheetDO> getListForSearchDao(final BaseSearchFilter filter)
+  {
+    final TimesheetFilter timesheetFilter = new TimesheetFilter(filter);
+    timesheetFilter.setUserId(PFUserContext.getUserId());
+    return getList(timesheetFilter);
+  }
+
+  /**
    * Gets the list filtered by the given filter.
    * @param filter
    * @return

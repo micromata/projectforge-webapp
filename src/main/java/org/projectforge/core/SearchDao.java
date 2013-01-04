@@ -57,7 +57,7 @@ public class SearchDao extends HibernateDaoSupport
     } else {
       filter.setUseModificationFilter(false);
     }
-    final List<ExtendedBaseDO> list = baseDao.getList(filter);
+    final List<ExtendedBaseDO> list = baseDao.getListForSearchDao(filter);
     final List<SearchResultData> result = new ArrayList<SearchResultData>();
     if (list == null || list.size() == 0) {
       return result;

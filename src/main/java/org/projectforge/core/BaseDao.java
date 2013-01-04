@@ -325,6 +325,17 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   }
 
   /**
+   * This method is used by the searchDao and calls {@link #getList(BaseSearchFilter)} by default.
+   * @param filter
+   * @return
+   * @see #getList(BaseSearchFilter)
+   */
+  public List<O> getListForSearchDao(final BaseSearchFilter filter)
+  {
+    return getList(filter);
+  }
+
+  /**
    * Builds query filter by simply calling constructor of QueryFilter with given search filter and calls getList(QueryFilter). Override this
    * method for building more complex query filters.
    * @param filter
