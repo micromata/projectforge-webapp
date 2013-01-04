@@ -25,6 +25,7 @@ package org.projectforge.web.core;
 
 import java.util.Collection;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
@@ -34,11 +35,13 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextArea;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.http.WebRequest;
 import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -57,6 +60,7 @@ import org.projectforge.web.user.MyAccountEditPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.FeedbackPage;
 import org.projectforge.web.wicket.MySession;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DialogPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
@@ -103,6 +107,27 @@ public class NavTopPanel extends NavAbstractPanel
       customizeMenuLink.setVisible(false);
       layoutSettingsMenuLink.setVisible(false);
     }
+    @SuppressWarnings("serial")
+    final Form<String> searchForm = new Form<String>("searchForm") {
+      private String searchString;
+
+      /**
+       * @see org.apache.wicket.markup.html.form.Form#onSubmit()
+       */
+      @Override
+      protected void onSubmit()
+      {
+        if (StringUtils.isNotBlank(searchString) == true) {
+          final SearchPage searchPage = new SearchPage(new PageParameters(), searchString);
+          setResponsePage(searchPage);
+        }
+        super.onSubmit();
+      }
+    };
+    add(searchForm);
+    final TextField<String> searchField = new TextField<String>("searchField", new PropertyModel<String>(searchForm, "searchString"));
+    WicketUtils.setPlaceHolderAttribute(searchField, getString("search.search"));
+    searchForm.add(searchField);
     add(customizeMenuLink);
     add(layoutSettingsMenuLink);
     add(new BookmarkablePageLink<Void>("feedbackLink", FeedbackPage.class));

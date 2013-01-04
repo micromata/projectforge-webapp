@@ -26,6 +26,7 @@ package org.projectforge.web.core;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.TextField;
@@ -63,8 +64,18 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
 
   public SearchForm(final SearchPage parentPage)
   {
+    this(parentPage, null);
+  }
+
+  public SearchForm(final SearchPage parentPage, final String searchString)
+  {
     super(parentPage);
-    filter = (SearchPageFilter) getParentPage().getUserPrefEntry(SearchPageFilter.class, USER_PREF_KEY_FILTER);
+    if (StringUtils.isNotBlank(searchString) == true) {
+      filter = new SearchPageFilter();
+      filter.setSearchString(searchString);
+    } else {
+      filter = (SearchPageFilter) getParentPage().getUserPrefEntry(SearchPageFilter.class, USER_PREF_KEY_FILTER);
+    }
     if (filter == null) {
       filter = new SearchPageFilter();
       getParentPage().putUserPrefEntry(USER_PREF_KEY_FILTER, filter, true);

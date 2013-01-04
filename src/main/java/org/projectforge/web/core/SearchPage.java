@@ -23,6 +23,7 @@
 
 package org.projectforge.web.core;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptReferenceHeaderItem;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -59,12 +60,25 @@ public class SearchPage extends AbstractStandardFormPage implements ISelectCalle
 
   public SearchPage(final PageParameters parameters)
   {
+    this(parameters, null);
+  }
+
+  /**
+   * @param parameters
+   * @param searchString if given all areas will be searched.
+   */
+  public SearchPage(final PageParameters parameters, final String searchString)
+  {
     super(parameters);
-    form = new SearchForm(this);
+    form = new SearchForm(this, searchString);
     body.add(form);
     form.init();
     areaRepeater = new RepeatingView("areaRepeater");
     body.add(areaRepeater);
+    if (StringUtils.isNotBlank(searchString) == true) {
+      // User wants to search, so show results directly:
+      refreshed = false;
+    }
   }
 
   @Override
