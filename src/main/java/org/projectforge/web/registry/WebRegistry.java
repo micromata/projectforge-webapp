@@ -195,6 +195,12 @@ public class WebRegistry
     return register(new WebRegistryEntry(id, listPageColumnsCreatorClass), insertBefore, entry);
   }
 
+  /**
+   * @param existingEntry
+   * @param insertBefore If true then the given entry will be inserted before the existing entry, otherwise after.
+   * @param entry
+   * @return
+   */
   public WebRegistryEntry register(final WebRegistryEntry existingEntry, final boolean insertBefore, final WebRegistryEntry entry)
   {
     Validate.notNull(existingEntry);
@@ -279,19 +285,50 @@ public class WebRegistry
 
   private WebRegistry()
   {
+    // This order is used by SearchPage:
+    register(DaoRegistry.ADDRESS, AddressListPage.class);
+    addMountPages(DaoRegistry.ADDRESS, AddressListPage.class, AddressEditPage.class);
+    addMountPage(DaoRegistry.ADDRESS + "View", AddressViewPage.class);
+
+    register(DaoRegistry.BOOK, BookListPage.class);
+    addMountPages(DaoRegistry.BOOK, BookListPage.class, BookEditPage.class);
+
+    register(DaoRegistry.TASK, TaskListPage.class);
+    addMountPages(DaoRegistry.TASK, TaskListPage.class, TaskEditPage.class);
+
+    register(DaoRegistry.TIMESHEET, TimesheetListPage.class);
+    addMountPages(DaoRegistry.TIMESHEET, TimesheetListPage.class, TimesheetEditPage.class);
+
+    register(DaoRegistry.USER, UserListPage.class);
+    addMountPages(DaoRegistry.USER, UserListPage.class, UserEditPage.class);
+
+    register(DaoRegistry.GROUP, GroupListPage.class);
+    addMountPages(DaoRegistry.GROUP, GroupListPage.class, GroupEditPage.class);
+
+    register(DaoRegistry.ORDERBOOK, AuftragListPage.class);
+    addMountPages(DaoRegistry.ORDERBOOK, AuftragListPage.class, AuftragEditPage.class);
+
+    register(DaoRegistry.CONTRACT, ContractListPage.class);
+    addMountPages(DaoRegistry.CONTRACT, ContractListPage.class, ContractEditPage.class);
+
+    register(DaoRegistry.INCOMING_INVOICE, EingangsrechnungListPage.class);
+    addMountPages(DaoRegistry.INCOMING_INVOICE, EingangsrechnungListPage.class, EingangsrechnungEditPage.class);
+
+    register(DaoRegistry.OUTGOING_INVOICE, RechnungListPage.class);
+    addMountPages(DaoRegistry.OUTGOING_INVOICE, RechnungListPage.class, RechnungEditPage.class);
+
+    register(DaoRegistry.INCOMING_MAIL, PosteingangListPage.class);
+    addMountPages(DaoRegistry.INCOMING_MAIL, PosteingangListPage.class, PosteingangEditPage.class);
+
+    register(DaoRegistry.OUTGOING_MAIL, PostausgangListPage.class);
+    addMountPages(DaoRegistry.OUTGOING_MAIL, PostausgangListPage.class, PostausgangEditPage.class);
+
     register(DaoRegistry.ACCESS, AccessListPage.class);
     addMountPages(DaoRegistry.ACCESS, AccessListPage.class, AccessEditPage.class);
     register(DaoRegistry.ACCOUNT, KontoListPage.class);
     addMountPages(DaoRegistry.ACCOUNT, KontoListPage.class, KontoEditPage.class);
     register(DaoRegistry.ACCOUNTING_RECORD, AccountingRecordListPage.class);
     addMountPages(DaoRegistry.ACCOUNTING_RECORD, AccountingRecordListPage.class, AccountingRecordEditPage.class);
-    register(DaoRegistry.ADDRESS, AddressListPage.class);
-    addMountPages(DaoRegistry.ADDRESS, AddressListPage.class, AddressEditPage.class);
-    addMountPage(DaoRegistry.ADDRESS + "View", AddressViewPage.class);
-    register(DaoRegistry.BOOK, BookListPage.class);
-    addMountPages(DaoRegistry.BOOK, BookListPage.class, BookEditPage.class);
-    register(DaoRegistry.CONTRACT, ContractListPage.class);
-    addMountPages(DaoRegistry.CONTRACT, ContractListPage.class, ContractEditPage.class);
     register(DaoRegistry.COST1, Kost1ListPage.class);
     addMountPages(DaoRegistry.COST1, Kost1ListPage.class, Kost1EditPage.class);
     register(DaoRegistry.COST2, Kost2ListPage.class);
@@ -302,28 +339,10 @@ public class WebRegistry
     addMountPages(DaoRegistry.CUSTOMER, CustomerListPage.class, CustomerEditPage.class);
     register(DaoRegistry.EMPLOYEE, EmployeeListPage.class);
     addMountPages(DaoRegistry.EMPLOYEE, EmployeeListPage.class, EmployeeEditPage.class);
-    register(DaoRegistry.GROUP, GroupListPage.class);
-    addMountPages(DaoRegistry.GROUP, GroupListPage.class, GroupEditPage.class);
-    register(DaoRegistry.INCOMING_INVOICE, EingangsrechnungListPage.class);
-    addMountPages(DaoRegistry.INCOMING_INVOICE, EingangsrechnungListPage.class, EingangsrechnungEditPage.class);
-    register(DaoRegistry.INCOMING_MAIL, PosteingangListPage.class);
-    addMountPages(DaoRegistry.INCOMING_MAIL, PosteingangListPage.class, PosteingangEditPage.class);
     register(DaoRegistry.MEB, MebListPage.class);
     addMountPages(DaoRegistry.MEB, MebListPage.class, MebEditPage.class);
     register(DaoRegistry.PROJECT, ProjektListPage.class);
     addMountPages(DaoRegistry.PROJECT, ProjektListPage.class, ProjektEditPage.class);
-    register(DaoRegistry.ORDERBOOK, AuftragListPage.class);
-    addMountPages(DaoRegistry.ORDERBOOK, AuftragListPage.class, AuftragEditPage.class);
-    register(DaoRegistry.OUTGOING_INVOICE, RechnungListPage.class);
-    addMountPages(DaoRegistry.OUTGOING_INVOICE, RechnungListPage.class, RechnungEditPage.class);
-    register(DaoRegistry.OUTGOING_MAIL, PostausgangListPage.class);
-    addMountPages(DaoRegistry.OUTGOING_MAIL, PostausgangListPage.class, PostausgangEditPage.class);
-    register(DaoRegistry.TASK, TaskListPage.class);
-    addMountPages(DaoRegistry.TASK, TaskListPage.class, TaskEditPage.class);
-    register(DaoRegistry.TIMESHEET, TimesheetListPage.class);
-    addMountPages(DaoRegistry.TIMESHEET, TimesheetListPage.class, TimesheetEditPage.class);
-    register(DaoRegistry.USER, UserListPage.class);
-    addMountPages(DaoRegistry.USER, UserListPage.class, UserEditPage.class);
 
     addMountPages(DaoRegistry.EMPLOYEE_SALARY, EmployeeSalaryListPage.class, EmployeeSalaryEditPage.class);
     addMountPages(DaoRegistry.GANTT, GanttChartListPage.class, GanttChartEditPage.class);
