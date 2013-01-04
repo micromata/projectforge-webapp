@@ -62,7 +62,7 @@ public class LicenseManagementPlugin extends AbstractPlugin
   {
     // DatabaseUpdateDao is needed by the updater:
     LicenseManagementPluginUpdates.dao = databaseUpdateDao;
-    final RegistryEntry entry = new RegistryEntry(ID, LicenseDao.class, licenseDao, "plugins.licenseManagement");
+    final RegistryEntry entry = new RegistryEntry(ID, LicenseDao.class, licenseDao, "plugins.licensemanagement");
     // The LicenseDao is automatically available by the scripting engine!
     register(entry);
 
