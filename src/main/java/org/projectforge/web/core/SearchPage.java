@@ -24,6 +24,8 @@
 package org.projectforge.web.core;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.Component;
+import org.apache.wicket.extensions.ajax.markup.html.AjaxLazyLoadPanel;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptReferenceHeaderItem;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -151,19 +153,17 @@ public class SearchPage extends AbstractStandardFormPage implements ISelectCalle
 
   private void addArea(final WebRegistryEntry webRegistryEntry)
   {
-    // final Panel panel = new AjaxLazyLoadPanel(areaRepeater.newChildId()) {
-    // @Override
-    // public final Component getLazyLoadComponent(final String id)
-    // {
-    // log.info("getLazyLoadComponent(" + id +")");
-    // final SearchAreaPanel searchAreaPanel = new SearchAreaPanel(SearchPage.this, id, form.filter, webRegistryEntry);
-    // return searchAreaPanel;
-    // }
-    // };
-    final Panel panel = new SearchAreaPanel(SearchPage.this, areaRepeater.newChildId(), form.filter, webRegistryEntry);
-    if (panel.isVisible()) {
-      areaRepeater.add(panel);
-    }
+    @SuppressWarnings("serial")
+    final Panel panel = new AjaxLazyLoadPanel(areaRepeater.newChildId()) {
+      @Override
+      public final Component getLazyLoadComponent(final String id)
+      {
+        log.info("getLazyLoadComponent(" + id +")");
+        final SearchAreaPanel searchAreaPanel = new SearchAreaPanel(SearchPage.this, id, form.filter, webRegistryEntry);
+        return searchAreaPanel;
+      }
+    };
+    areaRepeater.add(panel);
   }
 
   @Override
