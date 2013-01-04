@@ -103,8 +103,6 @@ public abstract class AbstractUnsecureBasePage extends WebPage
     };
     add(body);
     final WebMarkupContainer developmentSystem = new WebMarkupContainer("developmentSystem");
-    developmentSystem.setOutputMarkupId(true);
-    developmentSystem.setMarkupId("pf_develHint");
     body.add(developmentSystem);
     if (WebConfiguration.isDevelopmentMode() == false) {
       developmentSystem.setVisible(false);
@@ -118,8 +116,6 @@ public abstract class AbstractUnsecureBasePage extends WebPage
       link = DocumentationPage.addNewsLink(body, "footerNewsLink");
     }
     link.add(new Label("version", "Version " + AppVersion.VERSION.toString() + ", " + AppVersion.RELEASE_DATE).setRenderBodyOnly(true));
-    link.setOutputMarkupId(true);
-    link.setMarkupId("pf_footerNewsLink");
   }
 
   @Override

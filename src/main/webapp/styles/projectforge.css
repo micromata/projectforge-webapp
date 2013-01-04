@@ -284,6 +284,7 @@ div.contentMenu .toolbarbutton,div.contentRightMenu .toolbarbutton {
 }
 
 #footer {
+	padding-left: 10px;
 	background-color: #4c5766;
 	border-color: #313841;
 	color: #fff;
@@ -322,17 +323,20 @@ div.contentMenu .toolbarbutton,div.contentRightMenu .toolbarbutton {
 	padding-right: 5px;
 }
 
-#footer ul#pf_copyHint {
-	float:left;
-	list-style:none;
-	margin:2px 10px;
+#footer div.left {
+	width: 50%;
+	float: left;
 }
-#footer ul#pf_copyHint li {
-	float:left;
+
+#footer div.left .username {
+	font-weight: bold;
+	color: white;
 }
-#footer #pf_footerNewsLink {
-	float:right;
-	margin:2px 10px
+
+#footer div.right {
+	width: 50%;
+	float: left;
+	text-align: right;
 }
 
 /* Errorhandling */
@@ -371,13 +375,13 @@ td.fc-sun,td.fc-sat,td.fc-holiday {
 .fc .fc-event {
 	text-shadow: none;
 }
+
 .fc-header-title>h2 {
 	font-weight: bold;
 	font-size: 1.1em;
 	line-height: 20px;
 }
 /* END: Fullcalendar */
-
 h2.box_head .subtitle {
 	font-weight: normal;
 	font-size: .9em;
@@ -392,13 +396,14 @@ h2.box_head .subtitle {
 .select2-choices {
 	overflow: hidden !important;
 	float: left;
-	width: 100% !important;
+	width: 99% !important;
+	border-radius: 4px;
+	background: rgba(0, 0, 0, 0.05) !important;
 }
 
 .select2-container {
 	overflow: hidden;
 	height: auto !important;
-	border-right: 1px solid #AAA;
 }
 
 .select2-container-active {
@@ -427,7 +432,7 @@ h2.box_head .subtitle {
 	background-color: black;
 	z-index: 1;
 	opacity: 0;
-	filter: alpha(opacity = 0);
+	filter: alpha(opacity =   0);
 }
 
 .pf_teamCalDialog {
@@ -543,20 +548,4 @@ div.global-alert-message {
 	margin: 0px 20px 5px 20px;
 	padding: 5px;
 	font-weight: bold;
-}
-
-/* Devel Modus */
-
-#pf_develHint {
-	position:absolute;
-	z-index: 99999;
-	left: 0px; 
-	top: 25px; 
-	width: 100%;
-}
-#pf_develHint p {
-	text-align: center; 
-	font-weight: bold; 
-	color: red; 
-	font-size: 16px;
 }

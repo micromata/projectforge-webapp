@@ -45,7 +45,7 @@ public class WicketRenderHeadUtils
     { "styles/google-fonts/google-fonts", ""}, //
     // "http://fonts.googleapis.com/css?family=Droid+Sans:regular&amp;subset=latin", //
     { "styles/jqueryui/1.9.2/cupertino/jquery-ui-1.9.2.custom", ".min"}, //
-    //  { "styles/table", ""}, //
+    { "styles/table", ""}, //
     { "scripts/contextmenu/css/jquery.contextmenu", ""}, //
     { "styles/adminica-2.2/main", ""}, //
     { "include/bootstrap/css/bootstrap", ".min"}, //
