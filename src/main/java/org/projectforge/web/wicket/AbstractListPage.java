@@ -68,6 +68,8 @@ AbstractSecuredPage implements ISelectCallerPage
 
   public static final String PARAMETER_HIGHLIGHTED_ROW = "row";
 
+  private boolean calledBySearchPage;
+
   protected static final String[] BOOKMARKABLE_INITIAL_PROPERTIES = new String[] { "f.searchString|s", "f.useModificationFilter|mod",
     "f.modifiedByUserId|mUser", "f.startTimeOfLastModification|mStart", "f.stopTimeOfLastModification|mStop", "f.deleted|del", "pageSize"};
 
@@ -706,6 +708,23 @@ AbstractSecuredPage implements ISelectCallerPage
   protected static String getSortable(final String propertyName, final boolean sortable)
   {
     return sortable ? propertyName : null;
+  }
+
+  /**
+   * ONLY for internal purposes to tell the IListPageColumnsCreator that it's instantiated by the SearchAreaPanel.
+   * @param calledBySearchPage the calledBySearchForm to set
+   */
+  public void setCalledBySearchPage(final boolean calledBySearchPage)
+  {
+    this.calledBySearchPage = calledBySearchPage;
+  }
+
+  /**
+   * @return the calledBySearchForm
+   */
+  public boolean isCalledBySearchPage()
+  {
+    return calledBySearchPage;
   }
 
   public class ListPageSortableDataProvider extends MySortableDataProvider<O>
