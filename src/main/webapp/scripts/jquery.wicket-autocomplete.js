@@ -144,7 +144,7 @@ jQuery.autocomplete = function(input, options) {
 					$input.get(0).focus();
 					e.preventDefault();
 					if (options.autoSubmit == true)
-						document.forms[0].submit();
+						input.form.submit();
 				}
 				break;
 			case KEY.ESC:
@@ -420,7 +420,7 @@ jQuery.autocomplete = function(input, options) {
 				e.stopPropagation();
 				selectItem(this)
 				if (options.autoSubmit == true)
-					document.forms[0].submit();
+					input.form.submit();
 			});
 		}
 		return ul;
