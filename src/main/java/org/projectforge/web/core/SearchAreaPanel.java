@@ -47,6 +47,7 @@ import org.projectforge.core.SearchResultData;
 import org.projectforge.database.StatisticsCache;
 import org.projectforge.task.TaskDependentFilter;
 import org.projectforge.web.registry.WebRegistryEntry;
+import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.MySortableDataProvider;
 import org.springframework.util.CollectionUtils;
@@ -78,7 +79,11 @@ public class SearchAreaPanel extends Panel
     final IListPageColumnsCreator< ? > listPageColumnsCreator = listPageColumnsCreatorClass == null ? null
         : (IListPageColumnsCreator< ? >) BeanHelper.newInstance(listPageColumnsCreatorClass, PageParameters.class, new PageParameters());
     if (listPageColumnsCreator == null) {
+      setVisible(false);
       return;
+    }
+    if (listPageColumnsCreator instanceof AbstractListPage) {
+      ((AbstractListPage< ? , ? , ? >) listPageColumnsCreator).setCalledBySearchPage(true);
     }
     final Integer number = statisticsCache.getNumberOfEntities(webRegistryEntry.getDOClass());
     final Class< ? extends BaseSearchFilter> registeredFilterClass = webRegistryEntry.getSearchFilterClass();
@@ -90,6 +95,7 @@ public class SearchAreaPanel extends Panel
         && filter.getStartTimeOfLastModification() == null
         && filter.getStopTimeOfLastModification() == null) {
       // Don't search to large tables if to less filter settings are given.
+      setVisible(false);
       return;
     }
     final BaseSearchFilter baseSearchFilter;
@@ -100,8 +106,10 @@ public class SearchAreaPanel extends Panel
     } else {
       baseSearchFilter = filter;
     }
-    final List<SearchResultData> searchResult = searchDao.getEntries(baseSearchFilter, webRegistryEntry.getDOClass(), webRegistryEntry.getDao());
+    final List<SearchResultData> searchResult = searchDao.getEntries(baseSearchFilter, webRegistryEntry.getDOClass(),
+        webRegistryEntry.getDao());
     if (CollectionUtils.isEmpty(searchResult) == true) {
+      setVisible(false);
       return;
     }
     final List<ExtendedBaseDO<Integer>> list = new ArrayList<ExtendedBaseDO<Integer>>();
@@ -117,7 +125,8 @@ public class SearchAreaPanel extends Panel
     }
     final List< ? > columns = listPageColumnsCreator.createColumns(page, false);
     @SuppressWarnings({ "rawtypes", "unchecked"})
-    final DataTable< ?, String > dataTable = new DefaultDataTable("dataTable", columns, new MySortableDataProvider("NOSORT", SortOrder.DESCENDING) {
+    final DataTable< ? , String> dataTable = new DefaultDataTable("dataTable", columns, new MySortableDataProvider("NOSORT",
+        SortOrder.DESCENDING) {
       @Override
       public List< ? > getList()
       {
