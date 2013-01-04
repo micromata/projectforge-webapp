@@ -83,7 +83,7 @@ public class TeamCalPlugin extends AbstractPlugin
     // DatabaseUpdateDao is needed by the updater:
     TeamCalPluginUpdates.dao = databaseUpdateDao;
     final RegistryEntry entry = new RegistryEntry(ID, TeamCalDao.class, teamCalDao, "plugins.teamcal");
-    final RegistryEntry eventEntry = new RegistryEntry("teamEvent", TeamEventDao.class, teamEventDao, "plugins.teamcal");
+    final RegistryEntry eventEntry = new RegistryEntry("teamEvent", TeamEventDao.class, teamEventDao, "plugins.teamcal.event");
 
     // The CalendarDao is automatically available by the scripting engine!
     register(entry);
