@@ -59,7 +59,7 @@ public class SearchDao extends HibernateDaoSupport
     }
     final List<ExtendedBaseDO> list = baseDao.getList(filter);
     final List<SearchResultData> result = new ArrayList<SearchResultData>();
-    if (list.size() == 0) {
+    if (list == null || list.size() == 0) {
       return result;
     }
     // TODO: Search for history entries.
