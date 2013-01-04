@@ -141,21 +141,24 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
     });
     columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("lastUpdate"), getSortable("lastUpdate", sortable), "lastUpdate",
         cellItemListener));
-    // ics export buttons
-    columns.add(new AbstractColumn<TeamCalDO, String>(new Model<String>(getString("plugins.teamcal.subscribe.column"))) {
-      /**
-       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
-       *      java.lang.String, org.apache.wicket.model.IModel)
-       */
-      @Override
-      public void populateItem(final Item<ICellPopulator<TeamCalDO>> item, final String componentId, final IModel<TeamCalDO> rowModel)
-      {
-        if (accessChecker.isRestrictedUser() == false && WebConfiguration.isDevelopmentMode() == true) {
-          final TeamCalDO teamCal = rowModel.getObject();
-          item.add(new TeamCalendarIcsExportLink(componentId, teamCal, getCssStyle(teamCal.getId(), teamCal.isDeleted()).toString()));
+    if (isCalledBySearchPage() == false) {
+      // Don't call by search page, because there is no form to show the popup-dialog.
+      // ics export buttons
+      columns.add(new AbstractColumn<TeamCalDO, String>(new Model<String>(getString("plugins.teamcal.subscribe.column"))) {
+        /**
+         * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+         *      java.lang.String, org.apache.wicket.model.IModel)
+         */
+        @Override
+        public void populateItem(final Item<ICellPopulator<TeamCalDO>> item, final String componentId, final IModel<TeamCalDO> rowModel)
+        {
+          if (accessChecker.isRestrictedUser() == false && WebConfiguration.isDevelopmentMode() == true) {
+            final TeamCalDO teamCal = rowModel.getObject();
+            item.add(new TeamCalendarIcsExportLink(componentId, teamCal, getCssStyle(teamCal.getId(), teamCal.isDeleted()).toString()));
+          }
         }
-      }
-    });
+      });
+    }
     return columns;
   }
 
