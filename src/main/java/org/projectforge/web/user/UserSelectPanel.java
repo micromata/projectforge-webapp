@@ -105,7 +105,7 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO> implements Co
         if (user == null) {
           return "";
         }
-        return formatUser(user);
+        return formatUser(user, true);
       }
 
       @Override
@@ -114,7 +114,7 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO> implements Co
         if (user == null) {
           return "";
         }
-        return user.getUsername() + ": " + user.getFullname();
+        return formatUser(user, false);
       }
 
       @Override
@@ -133,7 +133,7 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO> implements Co
         final PFUserDO user = getConverter(getType()).convertToObject(getInput(), getLocale());
         setConvertedInput(user);
         if (user != null && (currentUser == null || user.getId() != currentUser.getId())) {
-          getRecentUsers().append(formatUser(user));
+          getRecentUsers().append(formatUser(user, true));
         }
         currentUser = user;
       }
@@ -235,7 +235,7 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO> implements Co
     userTextField.modelChanged();
     final PFUserDO user = getModelObject();
     if (user != null) {
-      getRecentUsers().append(formatUser(user));
+      getRecentUsers().append(formatUser(user, true));
     }
   }
 
@@ -270,13 +270,18 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO> implements Co
     return this.recentUsers;
   }
 
-  private String formatUser(final PFUserDO user)
+  private String formatUser(final PFUserDO user, final boolean showEmail)
   {
     if (user == null) {
       return "";
     }
-    // PLEASE NOTE: If you change the format don't forget to change the format above (search ### FORMAT ###)
-    return user.getUsername() + " (" + user.getFullname() + ", " + user.getEmail() + ")";
+    if (showEmail == true) {
+      // PLEASE NOTE: If you change the format don't forget to change the format above (search ### FORMAT ###)
+      return user.getUsername() + " (" + user.getFullname() + ", " + user.getEmail() + ")";
+    } else {
+      // PLEASE NOTE: If you change the format don't forget to change the format above (search ### FORMAT ###)
+      return user.getUsername() + " (" + user.getFullname() + ")";
+    }
   }
 
   /**
