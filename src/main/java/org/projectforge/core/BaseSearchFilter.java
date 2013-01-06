@@ -67,6 +67,11 @@ public class BaseSearchFilter implements Serializable
     if (filter == null) {
       return;
     }
+    copyBaseSearchFieldsFrom(filter);
+  }
+
+  public void copyBaseSearchFieldsFrom(final BaseSearchFilter filter)
+  {
     this.searchString = filter.searchString;
     this.deleted = filter.deleted;
     this.ignoreDeleted = filter.ignoreDeleted;
