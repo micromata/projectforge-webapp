@@ -560,3 +560,8 @@ div.global-alert-message {
 	color: red; 
 	font-size: 16px;
 }
+
+/* SearchPage */
+.hasMoreEntries {
+	color: red;
+}

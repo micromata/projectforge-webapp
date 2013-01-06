@@ -27,12 +27,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.wicket.Component;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DefaultDataTable;
-import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -47,6 +48,7 @@ import org.projectforge.core.SearchResultData;
 import org.projectforge.database.StatisticsCache;
 import org.projectforge.task.TaskDependentFilter;
 import org.projectforge.web.registry.WebRegistryEntry;
+import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.MySortableDataProvider;
@@ -64,6 +66,8 @@ public class SearchAreaPanel extends Panel
   @SpringBean(name = "statisticsCache")
   private StatisticsCache statisticsCache;
 
+  private WebRegistryEntry webRegistryEntry;
+
   /**
    * @param page Needed, because in constructor this panel is not yet added to a page.
    * @param id
@@ -74,6 +78,7 @@ public class SearchAreaPanel extends Panel
   public SearchAreaPanel(final WebPage page, final String id, final SearchPageFilter filter, final WebRegistryEntry webRegistryEntry)
   {
     super(id);
+    this.webRegistryEntry = webRegistryEntry;
     final long millis = System.currentTimeMillis();
     final Class< ? extends IListPageColumnsCreator< ? >> listPageColumnsCreatorClass = webRegistryEntry.getListPageColumnsCreatorClass();
     final IListPageColumnsCreator< ? > listPageColumnsCreator = listPageColumnsCreatorClass == null ? null
@@ -140,10 +145,35 @@ public class SearchAreaPanel extends Panel
       }
     }, filter.getMaxRows());
     add(dataTable);
+    final Label hasMoreEntries = new Label("hasMoreEntries", getString("moreEntriesAvailable"));
+    add(hasMoreEntries.setVisible(false));
+    Component showMoreEntrieslink = null;
     if (hasMore == true) {
-      add(new WebMarkupContainer("hasMoreEntries"));
-    } else {
-      add(new Label("hasMoreEntries", "[invisible]").setVisible(false));
+      final int maxRows = filter.getMaxRows();
+      if (maxRows < SearchForm.MAX_PAGE_SIZE) {
+        showMoreEntrieslink = new Link<Void>("showMoreEntrieslink") {
+          /**
+           * @see org.apache.wicket.markup.html.link.Link#onClick()
+           */
+          @Override
+          public void onClick()
+          {
+            for (final int number : AbstractListForm.PAGE_SIZES) {
+              if (number > maxRows) {
+                filter.setMaxRows(number);
+                break;
+              }
+            }
+            filter.setArea(webRegistryEntry.getId());
+          }
+        };
+        add(showMoreEntrieslink);
+      } else {
+        hasMoreEntries.setVisible(true);
+      }
+    }
+    if (showMoreEntrieslink == null) {
+      add(new Label("showMoreEntrieslink", "[invisible]").setVisible(false));
     }
     final long duration = System.currentTimeMillis() - millis;
     add(new Label("areaTitle", page.getString(webRegistryEntry.getI18nTitleHeading()) + " (" + NumberFormatter.format(duration) + " ms)"));
