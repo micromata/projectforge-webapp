@@ -28,6 +28,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.AttributeModifier;
@@ -183,7 +184,7 @@ AbstractSecuredForm<F, P>
           @Override
           public String getObject()
           {
-            return getModifiedSearchExpressionLabel();
+            return getModifiedSearchExpressionLabel(AbstractListForm.this, searchFilter.getSearchString());
           }
         };
         final DivPanel div = new DivPanel(fs.newChildId());
@@ -577,9 +578,15 @@ AbstractSecuredForm<F, P>
     }
   }
 
-  protected String getModifiedSearchExpressionLabel()
+  /**
+   * For displaying the modified search string for lucene, e. g. "modified searchstring: micromata*"
+   * @param component Needed for {@link Component#getString(String)}.
+   * @param searchString
+   * @return
+   */
+  public static String getModifiedSearchExpressionLabel(final Component component, final String searchString)
   {
-    return getString("search.lucene.expression") + " " + escapeHtml(BaseDao.modifySearchString(searchFilter.getSearchString()));
+    return component.getString("search.lucene.expression") + " " + StringEscapeUtils.escapeHtml(BaseDao.modifySearchString(searchString));
   }
 
   /**
