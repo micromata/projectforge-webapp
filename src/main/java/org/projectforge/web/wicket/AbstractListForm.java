@@ -114,7 +114,7 @@ AbstractSecuredForm<F, P>
 
   private SingleButtonPanel nextButtonPanel;
 
-  public static final int[] PAGE_SIZES =  new int[] { 3, 5, 10, 25, 50, 100, 200, 500, 1000};
+  public static final int[] PAGE_SIZES = new int[] { 3, 5, 10, 25, 50, 100, 200, 500, 1000};
 
   public static DropDownChoice<Integer> getPageSizeDropDownChoice(final String id, final Locale locale, final IModel<Integer> model,
       final int minValue, final int maxValue)
@@ -590,6 +590,11 @@ AbstractSecuredForm<F, P>
   void setFilter(final Object filter)
   {
     searchFilter = (F) filter;
+  }
+
+  void copySearchFieldsFrom(final BaseSearchFilter baseFilter)
+  {
+    searchFilter.copyBaseSearchFieldsFrom(baseFilter);
   }
 
   /**
