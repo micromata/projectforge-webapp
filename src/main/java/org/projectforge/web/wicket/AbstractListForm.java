@@ -114,12 +114,14 @@ AbstractSecuredForm<F, P>
 
   private SingleButtonPanel nextButtonPanel;
 
+  public static final int[] PAGE_SIZES =  new int[] { 3, 5, 10, 25, 50, 100, 200, 500, 1000};
+
   public static DropDownChoice<Integer> getPageSizeDropDownChoice(final String id, final Locale locale, final IModel<Integer> model,
       final int minValue, final int maxValue)
       {
     final LabelValueChoiceRenderer<Integer> pageSizeChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
     final NumberFormat nf = NumberFormat.getInstance(locale);
-    for (final int size : new int[] { 3, 5, 10, 25, 50, 100, 200, 500, 1000}) {
+    for (final int size : PAGE_SIZES) {
       if (size >= minValue && size <= maxValue) {
         pageSizeChoiceRenderer.addValue(size, nf.format(size));
       }
