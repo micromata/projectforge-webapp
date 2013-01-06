@@ -49,6 +49,7 @@ import org.projectforge.common.ReflectionHelper;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
+import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.UserException;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
@@ -170,6 +171,15 @@ AbstractSecuredPage implements ISelectCallerPage
     setup();
     preInit();
     evaluateInitialPageParameters(parameters);
+  }
+
+  /**
+   * Copies all fields of the given filter to the current filter of the form.
+   * @param filter
+   */
+  public void copySearchFieldsFrom(final BaseSearchFilter filter)
+  {
+    form.copySearchFieldsFrom(filter);
   }
 
   /**
@@ -559,12 +569,13 @@ AbstractSecuredPage implements ISelectCallerPage
    * @param ascending
    * @return
    */
-  protected DataTable<O, String> createDataTable(final List<IColumn<O, String>> columns, final String sortProperty, final SortOrder sortOrder)
-  {
+  protected DataTable<O, String> createDataTable(final List<IColumn<O, String>> columns, final String sortProperty,
+      final SortOrder sortOrder)
+      {
     final int pageSize = form.getPageSize();
     return new DefaultDataTable<O, String>("table", columns, createSortableDataProvider(sortProperty, sortOrder), pageSize);
     // return new AjaxFallbackDefaultDataTable<O>("table", columns, createSortableDataProvider(sortProperty, ascending), pageSize);
-  }
+      }
 
   /**
    * At default a new SortableDOProvider is returned. Overload this method e. g. for avoiding LazyInitializationExceptions due to sorting.
@@ -631,7 +642,7 @@ AbstractSecuredPage implements ISelectCallerPage
   }
 
   /**
-   *  Handles modifiedByUserId. If overload, don't forget to call super.select(String) if no property matches.
+   * Handles modifiedByUserId. If overload, don't forget to call super.select(String) if no property matches.
    * @see org.projectforge.web.wicket.AbstractListPage#select(java.lang.String, java.lang.Object)
    */
   public void select(final String property, final Object selectedValue)
