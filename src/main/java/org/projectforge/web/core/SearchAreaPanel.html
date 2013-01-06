@@ -22,9 +22,11 @@
         </tbody>
       </table>
       <div class="button_bar">
-        <a class="hasMoreEntries" href="#" wicket:id="showMoreEntrieslink"> <wicket:message key="moreEntriesAvailable" />
-        </a><span class="hasMoreEntries" wicket:id="hasMoreEntries">[Is shown if hasMoreEntriesLink isn't shown because maximum size of result is already chosen.]</span>
-        <!-- a href="#" wicket:id="listPageLink">[List of time sheets]</a-->
+        <a class="hasMoreEntries" href="#" wicket:id="showMoreEntrieslink"> <wicket:message key="moreEntriesAvailable" /> |
+        </a><span class="hasMoreEntries" wicket:id="hasMoreEntries">[Is shown if hasMoreEntriesLink isn't shown because maximum size of result is
+          already chosen.]</span> <a href="#" wicket:id="listPageLink"><wicket:message key="search.toDetailedSearch" /></a> |
+        <wicket:message key="search.timeOfSearch" />: <wicket:container wicket:id="timeOfSearch">[23]</wicket:container>ms
+      
       </div>
     </div>
   </wicket:panel>

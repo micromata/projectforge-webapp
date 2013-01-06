@@ -66,8 +66,6 @@ public class SearchAreaPanel extends Panel
   @SpringBean(name = "statisticsCache")
   private StatisticsCache statisticsCache;
 
-  private WebRegistryEntry webRegistryEntry;
-
   /**
    * @param page Needed, because in constructor this panel is not yet added to a page.
    * @param id
@@ -78,7 +76,6 @@ public class SearchAreaPanel extends Panel
   public SearchAreaPanel(final WebPage page, final String id, final SearchPageFilter filter, final WebRegistryEntry webRegistryEntry)
   {
     super(id);
-    this.webRegistryEntry = webRegistryEntry;
     final long millis = System.currentTimeMillis();
     final Class< ? extends IListPageColumnsCreator< ? >> listPageColumnsCreatorClass = webRegistryEntry.getListPageColumnsCreatorClass();
     final IListPageColumnsCreator< ? > listPageColumnsCreator = listPageColumnsCreatorClass == null ? null
@@ -145,7 +142,7 @@ public class SearchAreaPanel extends Panel
       }
     }, filter.getMaxRows());
     add(dataTable);
-    final Label hasMoreEntries = new Label("hasMoreEntries", getString("moreEntriesAvailable"));
+    final Label hasMoreEntries = new Label("hasMoreEntries", page.getString("moreEntriesAvailable"));
     add(hasMoreEntries.setVisible(false));
     Component showMoreEntrieslink = null;
     if (hasMore == true) {
@@ -175,7 +172,24 @@ public class SearchAreaPanel extends Panel
     if (showMoreEntrieslink == null) {
       add(new Label("showMoreEntrieslink", "[invisible]").setVisible(false));
     }
+    if (listPageColumnsCreator instanceof AbstractListPage< ? , ? , ? >) {
+      add(new Link<Void>("listPageLink") {
+        /**
+         * @see org.apache.wicket.markup.html.link.Link#onClick()
+         */
+        @Override
+        public void onClick()
+        {
+          final AbstractListPage< ? , ? , ? > listPage = (AbstractListPage< ? , ? , ? >) listPageColumnsCreator;
+          listPage.copySearchFieldsFrom(filter);
+          setResponsePage(listPage);
+        }
+      });
+    } else {
+      add(new Label("listPageLink", "[invisible]").setVisible(false));
+    }
     final long duration = System.currentTimeMillis() - millis;
-    add(new Label("areaTitle", page.getString(webRegistryEntry.getI18nTitleHeading()) + " (" + NumberFormatter.format(duration) + " ms)"));
+    add(new Label("areaTitle", page.getString(webRegistryEntry.getI18nTitleHeading())));
+    add(new Label("timeOfSearch", NumberFormatter.format(duration)));
   }
 }
