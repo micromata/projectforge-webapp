@@ -27,6 +27,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.TextField;
@@ -48,6 +50,7 @@ import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.HtmlCommentPanel;
@@ -61,6 +64,8 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
   private static final long serialVersionUID = 2638309407446431727L;
 
   SearchPageFilter filter;
+
+  private Label modifiedSearchExpressionLabel;
 
   final static int MIN_PAGE_SIZE = 3;
 
@@ -92,10 +97,29 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
   {
     super.init();
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("searchFilter"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("searchFilter"), true);
       final TextField<String> searchField = new TextField<String>(fs.getTextFieldId(), new PropertyModel<String>(filter, "searchString"));
       WicketUtils.setFocus(searchField);
       fs.add(searchField);
+      final Model<String> modifiedSearchExpressionModel = new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return AbstractListForm.getModifiedSearchExpressionLabel(SearchForm.this, filter.getSearchString());
+        }
+      };
+      final DivPanel div = new DivPanel(fs.newChildId());
+      div.add(AttributeModifier.append("class", "modifiedSearchExpressionLabel"));
+      fs.add(div);
+      modifiedSearchExpressionLabel = new Label(DivPanel.CHILD_ID, modifiedSearchExpressionModel) {
+        @Override
+        public boolean isVisible()
+        {
+          return StringUtils.isNotBlank(filter.getSearchString()) == true;
+        }
+      };
+      modifiedSearchExpressionLabel.setEscapeModelStrings(false);
+      div.add(modifiedSearchExpressionLabel);
     }
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task"));
