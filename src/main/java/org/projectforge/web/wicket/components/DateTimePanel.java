@@ -293,10 +293,6 @@ public class DateTimePanel extends FormComponentPanel<Date> implements Component
   @Override
   protected void convertInput()
   {
-    if (isNull == true) {
-      setConvertedInput(null);
-      return;
-    }
     final Date date = datePanel.getConvertedInput();
     if (date != null) {
       isNull = false;
