@@ -38,7 +38,7 @@ import org.projectforge.xml.stream.XmlObject;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 /**
- * This class It's also provides the configuration of the parameters which are stored via ConfigurationDao. Those parameters are cached. <br/>
+ * This class also provides the configuration of the parameters which are stored via ConfigurationDao. Those parameters are cached. <br/>
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
