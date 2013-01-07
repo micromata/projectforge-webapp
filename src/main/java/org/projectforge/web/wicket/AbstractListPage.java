@@ -471,6 +471,10 @@ AbstractSecuredPage implements ISelectCallerPage
     if (list == null) {
       try {
         list = (List<O>) getBaseDao().getList(form.getSearchFilter());
+        if (list == null) {
+          // An error occured:
+          form.addError("search.error");
+        }
       } catch (final Exception ex) {
         if (ex instanceof UserException) {
           final UserException userException = (UserException) ex;
