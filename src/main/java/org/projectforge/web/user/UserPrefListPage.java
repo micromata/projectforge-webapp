@@ -113,7 +113,7 @@ public class UserPrefListPage extends AbstractListPage<UserPrefListForm, UserPre
         cellItemListener));
     columns.add(new UserPropertyColumn<UserPrefDO>(getString("user"), "user.fullname", "user", cellItemListener)
         .withUserFormatter(userFormatter));
-    columns.add(new CellItemListenerPropertyColumn<UserPrefDO>(new Model<String>(getString("filter.lastModified")), "lastUpdate",
+    columns.add(new CellItemListenerPropertyColumn<UserPrefDO>(new Model<String>(getString("lastUpdate")), "lastUpdate",
         "lastUpdate", cellItemListener));
     dataTable = createDataTable(columns, null, SortOrder.DESCENDING);
     form.add(dataTable);
