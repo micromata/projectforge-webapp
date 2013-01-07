@@ -58,7 +58,7 @@ import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.FileUploadPanel;
 
 /**
- * @author Maximilian Lauterbach (m.lauterbach@micromata.de)
+ * @author M. Lauterbach (m.lauterbach@micromata.de)
  * 
  */
 public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImportPage>
@@ -156,14 +156,16 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
 
           // /// CHECK FOR EXISTING ENTRIES
           final BaseSearchFilter af = new BaseSearchFilter();
-          af.setSearchString(data.getName() + " " + data.getFirstName() + " ");
+          af.setSearchString(data.getName() + " " + data.getFirstName() + " "
+              + data.getMobilePhone() + " " + data.getEmail() + " " + data.getBusinessPhone() + " " + data.getPrivateMobilePhone()
+              + " " + data.getPrivateEmail() + " " + data.getPrivatePhone());
           final AddressDao dao = (AddressDao) getBaseDao();
           final QueryFilter queryFilter = new QueryFilter(af);
           final List<AddressDO> list = dao.internalGetList(queryFilter);
 
           // //// SAVING
           /*
-           * if list is > 0 there are entries with the same name.
+           * if list is > 0 there are entries with equal information.
            */
           if (list.size() == 0) {
             final PageParameters params = new PageParameters();
@@ -194,7 +196,8 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
             addressEditPage.newEditForm(parentPage, getData());
             setResponsePage(addressEditPage);
           } else {
-            feedbackPanel.error(getString("address.book.vCardImport.existingEntry"));
+            // compare new with first match
+            setResponsePage(new AddressComparePage(getPage().getPageParameters(), data, list.get(0)));
           }
         } catch (final IOException ex) {
           log.fatal("Exception encountered " + ex, ex);
