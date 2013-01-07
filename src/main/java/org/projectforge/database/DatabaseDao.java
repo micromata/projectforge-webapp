@@ -42,6 +42,7 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.projectforge.calendar.DayHolder;
+import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.ExtendedBaseDO;
 import org.projectforge.core.ReindexSettings;
@@ -50,6 +51,8 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import de.micromata.hibernate.history.HistoryEntry;
 
 /**
  * Creates index creation script and re-indexes data-base.
@@ -118,7 +121,8 @@ public class DatabaseDao extends HibernateDaoSupport
       }
       buf.append(" ").append(message);
     } else {
-      reindex(clazz, settings);
+      final int numberOfReindexedObjects = reindex(clazz, settings);
+      buf.append(" (").append(numberOfReindexedObjects).append(")");
     }
     buf.append(", ");
   }
@@ -127,7 +131,7 @@ public class DatabaseDao extends HibernateDaoSupport
    * 
    * @param clazz
    */
-  private void reindex(final Class< ? > clazz, final ReindexSettings settings)
+  private int reindex(final Class< ? > clazz, final ReindexSettings settings)
   {
     final Session session = getSession();
     Criteria criteria = createCriteria(session, clazz, settings, true);
@@ -173,6 +177,7 @@ public class DatabaseDao extends HibernateDaoSupport
     final SearchFactory searchFactory = fullTextSession.getSearchFactory();
     searchFactory.optimize(clazz);
     log.info("Re-indexing of " + index + " objects of type " + clazz.getName() + " done.");
+    return index;
   }
 
   private Criteria createCriteria(final Session session, final Class< ? > clazz, final ReindexSettings settings, final boolean rowCount)
@@ -181,11 +186,17 @@ public class DatabaseDao extends HibernateDaoSupport
     if (rowCount == true) {
       criteria.setProjection(Projections.rowCount());
     } else {
-      if (settings.getLastNEntries() != null) {
-        criteria.addOrder(Order.desc("lastUpdate")).setMaxResults(settings.getLastNEntries());
+      String lastUpdateProperty = null;
+      if (AbstractBaseDO.class.isAssignableFrom(clazz) == true) {
+        lastUpdateProperty = "lastUpdate";
+      } else if (HistoryEntry.class.isAssignableFrom(clazz) == true) {
+        lastUpdateProperty = "timestamp";
       }
-      if (settings.getFromDate() != null) {
-        criteria.add(Restrictions.ge("lastUpdate", settings.getFromDate()));
+      if (settings.getLastNEntries() != null) {
+        criteria.addOrder(Order.desc("id")).setMaxResults(settings.getLastNEntries());
+      }
+      if (lastUpdateProperty != null && settings.getFromDate() != null) {
+        criteria.add(Restrictions.ge(lastUpdateProperty, settings.getFromDate()));
       }
     }
     return criteria;
