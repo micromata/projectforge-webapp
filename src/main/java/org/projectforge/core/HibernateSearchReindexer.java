@@ -41,6 +41,8 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import de.micromata.hibernate.history.HistoryEntry;
+
 public class HibernateSearchReindexer
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(HibernateSearchReindexer.class);
@@ -83,7 +85,6 @@ public class HibernateSearchReindexer
     log.info("Re-index job finished successfully.");
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes"})
   public String rebuildDatabaseSearchIndices(final ReindexSettings settings)
   {
     if (currentReindexRun != null) {
@@ -94,40 +95,50 @@ public class HibernateSearchReindexer
       try {
         currentReindexRun = new Date();
         final StringBuffer buf = new StringBuffer();
+        // Re-index: HistoryEntry:
+        reindex(HistoryEntry.class, settings, buf);
+        // Re-index of all ProjectForge entities:
         for (final RegistryEntry entry : Registry.instance().getOrderedList()) {
-          try {
-            if (entry.getNestedDOClasses() != null) {
-              for (final Class< ? > nestedDOClass : entry.getNestedDOClasses()) {
-                // PF-378: Performance of run of full re-indexing the data-base is very slow for large data-bases
-                // Single transactions needed, otherwise the full run will be very slow for large data-bases.
-                final TransactionTemplate tx = new TransactionTemplate(new HibernateTransactionManager(hibernate.getSessionFactory()));
-                tx.execute(new TransactionCallback() {
-                  // The call-back is needed, otherwise a lot of transactions are left open until last run is completed:
-                  public Object doInTransaction(final TransactionStatus status)
-                  {
-                    hibernate.execute(new HibernateCallback() {
-                      public Object doInHibernate(final Session session) throws HibernateException
-                      {
-                        databaseDao.reindex(nestedDOClass, settings, buf);
-                        status.setRollbackOnly();
-                        return null;
-                      }
-                    });
-                    return null;
-                  }
-                });
-              }
+          if (entry.getNestedDOClasses() != null) {
+            for (final Class< ? > nestedDOClass : entry.getNestedDOClasses()) {
+              reindex(nestedDOClass, settings, buf);
             }
-            databaseDao.reindex(entry.getDOClass(), settings, buf);
-          } catch (final Exception ex) {
-            log.error("While rebuilding data-base-search-index for '" + entry.getId() + "': " + ex.getMessage(), ex);
           }
+          reindex(entry.getDOClass(), settings, buf);
         }
         return buf.toString();
       } finally {
         currentReindexRun = null;
       }
     }
+  }
+
+  @SuppressWarnings({ "rawtypes", "unchecked"})
+  private void reindex(final Class< ? > clazz, final ReindexSettings settings, final StringBuffer buf)
+  {
+    // PF-378: Performance of run of full re-indexing the data-base is very slow for large data-bases
+    // Single transactions needed, otherwise the full run will be very slow for large data-bases.
+    final TransactionTemplate tx = new TransactionTemplate(new HibernateTransactionManager(hibernate.getSessionFactory()));
+    tx.execute(new TransactionCallback() {
+      // The call-back is needed, otherwise a lot of transactions are left open until last run is completed:
+      public Object doInTransaction(final TransactionStatus status)
+      {
+        try {
+          hibernate.execute(new HibernateCallback() {
+            public Object doInHibernate(final Session session) throws HibernateException
+            {
+              databaseDao.reindex(clazz, settings, buf);
+              status.setRollbackOnly();
+              return null;
+            }
+          });
+        } catch (final Exception ex) {
+          buf.append(" (an error occured, see log file for further information.), ");
+          log.error("While rebuilding data-base-search-index for '" + clazz.getName() + "': " + ex.getMessage(), ex);
+        }
+        return null;
+      }
+    });
   }
 
   public String rebuildDatabaseSearchIndices()
