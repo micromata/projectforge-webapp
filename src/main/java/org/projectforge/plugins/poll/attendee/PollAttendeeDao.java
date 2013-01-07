@@ -66,7 +66,9 @@ public class PollAttendeeDao extends BaseDao<PollAttendeeDO>
   public List<PollAttendeeDO> getListByPoll(PollDO poll)
   {
     QueryFilter qFilter = new QueryFilter();
-    qFilter.add(Restrictions.and(Restrictions.eq("poll", poll), Restrictions.eq("deleted", false)));
+    if(poll != null && poll.getId() != null) {
+      qFilter.add(Restrictions.and(Restrictions.eq("poll", poll), Restrictions.eq("deleted", false)));
+    }
     return getList(qFilter);
   }
 
