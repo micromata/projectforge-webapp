@@ -70,56 +70,56 @@ public class AddressCompareForm extends AbstractEditForm<AddressDO, AddressCompa
     fsName.add(new TextField<String>(fsName.getTextFieldId(), new PropertyModel<String>(address, "name")));
     fsName.setEnabled(enabled);
     if (StringUtils.equals(dataOld.getName(), data.getName()) == true) {
-      setMark(fsName);
+      setMark(fsName, enabled);
     }
 
     final FieldsetPanel fsFirstName = gridBuilder.newFieldset("FirstName", true);
     fsFirstName.add(new TextField<String>(fsFirstName.getTextFieldId(), new PropertyModel<String>(address, "firstName")));
     fsFirstName.setEnabled(enabled);
     if (StringUtils.equals(dataOld.getFirstName(), data.getFirstName()) == true) {
-      setMark(fsFirstName);
+      setMark(fsFirstName, enabled);
     }
 
     final FieldsetPanel fsEmailBusiness = gridBuilder.newFieldset("Mail gesch.", true);
     fsEmailBusiness.add(new TextField<String>(fsEmailBusiness.getTextFieldId(), new PropertyModel<String>(address, "email")));
     fsEmailBusiness.setEnabled(enabled);
     if (StringUtils.equals(dataOld.getEmail(), data.getEmail()) == true) {
-      setMark(fsEmailBusiness);
+      setMark(fsEmailBusiness, enabled);
     }
 
     final FieldsetPanel fsBusinessPhone = gridBuilder.newFieldset("Tele gesch.", true);
     fsBusinessPhone.add(new TextField<String>(fsBusinessPhone.getTextFieldId(), new PropertyModel<String>(address, "businessPhone")));
     fsBusinessPhone.setEnabled(enabled);
     if (StringUtils.equals(dataOld.getBusinessPhone(), data.getBusinessPhone()) == true) {
-      setMark(fsBusinessPhone);
+      setMark(fsBusinessPhone, enabled);
     }
 
     final FieldsetPanel fsMobilBusiness = gridBuilder.newFieldset("Mobil gesch.", true);
     fsMobilBusiness.add(new TextField<String>(fsMobilBusiness.getTextFieldId(), new PropertyModel<String>(address, "mobilePhone")));
     fsMobilBusiness.setEnabled(enabled);
     if (StringUtils.equals(dataOld.getMobilePhone(), data.getMobilePhone()) == true) {
-      setMark(fsMobilBusiness);
+      setMark(fsMobilBusiness, enabled);
     }
 
     final FieldsetPanel fsEmailPrivate = gridBuilder.newFieldset("Mail priv.", true);
     fsEmailPrivate.add(new TextField<String>(fsEmailPrivate.getTextFieldId(), new PropertyModel<String>(address, "privateEmail")));
     fsEmailPrivate.setEnabled(enabled);
     if (StringUtils.equals(dataOld.getPrivateEmail(), data.getPrivateEmail()) == true) {
-      setMark(fsEmailPrivate);
+      setMark(fsEmailPrivate, enabled);
     }
 
     final FieldsetPanel fsPrivatePhone = gridBuilder.newFieldset("Tele priv.", true);
     fsPrivatePhone.add(new TextField<String>(fsPrivatePhone.getTextFieldId(), new PropertyModel<String>(address, "privatePhone")));
     fsPrivatePhone.setEnabled(enabled);
     if (StringUtils.equals(dataOld.getPrivatePhone(), data.getPrivatePhone()) == true) {
-      setMark(fsPrivatePhone);
+      setMark(fsPrivatePhone, enabled);
     }
 
     final FieldsetPanel fsMobilPrivate = gridBuilder.newFieldset("Mobil priv.", true);
     fsMobilPrivate.add(new TextField<String>(fsMobilPrivate.getTextFieldId(), new PropertyModel<String>(address, "privateMobilePhone")));
     fsMobilPrivate.setEnabled(enabled);
     if (StringUtils.equals(dataOld.getPrivateMobilePhone(), data.getPrivateMobilePhone()) == true) {
-      setMark(fsMobilPrivate);
+      setMark(fsMobilPrivate, enabled);
     }
   }
 
@@ -128,8 +128,10 @@ public class AddressCompareForm extends AbstractEditForm<AddressDO, AddressCompa
    * 
    * @param panel
    */
-  private void setMark(final FieldsetPanel panel) {
-    panel.add(new AttributeModifier("style", new Model<String>("background: lightcyan;")));
+  private void setMark(final FieldsetPanel panel, final boolean paint) {
+    if (paint == true) {
+      panel.getFieldset().get(0).add(new AttributeModifier("style", new Model<String>("background: lightcyan;")));
+    }
   }
 
   /**
