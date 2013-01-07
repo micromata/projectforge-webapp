@@ -44,28 +44,33 @@ public class SearchFilter extends BaseSearchFilter
     this.maxRows = 3;
   }
 
+  public void updateUseModificationFilterFlag() {
+    this.useModificationFilter = this.modifiedByUserId != null || this.startTimeOfModification != null || this.stopTimeOfModification != null;
+  }
+
+
   @Override
-  public void setStartTimeOfLastModification(final Date startTimeOfLastModification)
+  public void setStartTimeOfModification(final Date startTimeOfLastModification)
   {
     if (startTimeOfLastModification == null) {
-      super.setStartTimeOfLastModification(null);
+      super.setStartTimeOfModification(null);
       return;
     }
     final DateHolder dh = new DateHolder(startTimeOfLastModification, DatePrecision.MILLISECOND);
     dh.setBeginOfDay();
-    super.setStartTimeOfLastModification(dh.getDate());
+    super.setStartTimeOfModification(dh.getDate());
   }
 
   @Override
-  public void setStopTimeOfLastModification(final Date stopTimeOfLastModification)
+  public void setStopTimeOfModification(final Date stopTimeOfLastModification)
   {
     if (stopTimeOfLastModification == null) {
-      super.setStopTimeOfLastModification(null);
+      super.setStopTimeOfModification(null);
       return;
     }
     final DateHolder dh = new DateHolder(stopTimeOfLastModification, DatePrecision.MILLISECOND);
     dh.setEndOfDay();
-    super.setStopTimeOfLastModification(dh.getDate());
+    super.setStopTimeOfModification(dh.getDate());
   }
 
   public PFUserDO getModifiedByUser()
@@ -73,7 +78,7 @@ public class SearchFilter extends BaseSearchFilter
     return modifiedByUser;
   }
 
-  public void setModifiedByUser(PFUserDO modifiedByUser)
+  public void setModifiedByUser(final PFUserDO modifiedByUser)
   {
     this.modifiedByUser = modifiedByUser;
     this.modifiedByUserId = modifiedByUser != null ? modifiedByUser.getId() : null;
@@ -89,30 +94,31 @@ public class SearchFilter extends BaseSearchFilter
     return task != null ? task.getId() : null;
   }
 
-  public void setTask(TaskDO task)
+  public void setTask(final TaskDO task)
   {
     this.task = task;
   }
 
   /**
-   * @return true, if no field for search is set (ignores task).
+   * @return true, if no field for search is set (ignores task and searchHistory).
    */
   public boolean isEmpty()
   {
     return StringUtils.isEmpty(searchString) == true
         && modifiedByUserId == null
-        && startTimeOfLastModification == null
-        && stopTimeOfLastModification == null;
+        && startTimeOfModification == null
+        && stopTimeOfModification == null;
   }
 
+  @Override
   public void reset()
   {
     super.reset();
     this.searchString = "";
     this.useModificationFilter = false;
     this.modifiedByUserId = null;
-    this.startTimeOfLastModification = null;
-    this.stopTimeOfLastModification = null;
+    this.startTimeOfModification = null;
+    this.stopTimeOfModification = null;
     this.task = null;
   }
 }
