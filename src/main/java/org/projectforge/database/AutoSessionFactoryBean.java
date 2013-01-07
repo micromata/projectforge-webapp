@@ -23,12 +23,20 @@
 
 package org.projectforge.database;
 
+import java.lang.annotation.ElementType;
+
 import org.hibernate.HibernateException;
 import org.hibernate.cfg.AnnotationConfiguration;
+import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Store;
+import org.hibernate.search.cfg.SearchMapping;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.plugins.core.PluginsRegistry;
 import org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean;
+
+import de.micromata.hibernate.history.HistoryEntry;
+import de.micromata.hibernate.history.delta.PropertyDelta;
 
 /**
  * @author Wolfgang Jung (w.jung@micromata.de)
@@ -59,6 +67,20 @@ public class AutoSessionFactoryBean extends AnnotationSessionFactoryBean
         }
       }
     }
+
+    // Add the hibernate history entities programmatically:
+    final SearchMapping mapping = new SearchMapping();
+    mapping.entity(HistoryEntry.class).indexed() //
+    .property("id", ElementType.METHOD).documentId().name("id")//
+    // Needed in BaseDao for FullTextQuery.setProjection("entityId"):
+    .property("entityId", ElementType.METHOD).field().store(Store.YES) //
+    .property("delta", ElementType.METHOD).indexEmbedded() //
+    // PropertyDelta:
+    .entity(PropertyDelta.class) //
+    .property("id", ElementType.METHOD).documentId().name("id")//
+    .property("oldValue", ElementType.METHOD).field().index(Index.TOKENIZED).store(Store.NO) //
+    .property("newValue", ElementType.METHOD).field().index(Index.TOKENIZED).store(Store.NO); //
+    config.getProperties().put("hibernate.search.model_mapping", mapping);
     super.postProcessAnnotationConfiguration(config);
   }
 
