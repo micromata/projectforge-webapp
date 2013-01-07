@@ -50,6 +50,7 @@ import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -122,7 +123,10 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
       div.add(modifiedSearchExpressionLabel);
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true);
+      final DivPanel checkBoxesPanel = fs.addNewCheckBoxDiv();
+      checkBoxesPanel.add(new CheckBoxPanel(checkBoxesPanel.newChildId(), new PropertyModel<Boolean>(filter, "searchHistory"),
+          getString("search.searchHistory")).setTooltip(getString("search.searchHistory.tooltip")));
       final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(filter, "task"), parentPage,
           "taskId");
       fs.add(taskSelectPanel);
@@ -142,13 +146,7 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
       areaChoiceRenderer.sortLabels();
       areaChoiceRenderer.addValue(0, SearchPageFilter.ALL, getString("filter.all"));
       final DropDownChoice<String> areaChoice = new DropDownChoice<String>(fs.getDropDownChoiceId(), new PropertyModel<String>(filter,
-          "area"), areaChoiceRenderer.getValues(), areaChoiceRenderer) {
-        @Override
-        protected boolean wantOnSelectionChangedNotifications()
-        {
-          return true;
-        }
-      };
+          "area"), areaChoiceRenderer.getValues(), areaChoiceRenderer);
       areaChoice.setRequired(false);
       fs.add(areaChoice);
     }
@@ -163,18 +161,18 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("search.periodOfModification"), true);
-      final DatePanel modifiedStartDatePanel = new DatePanel(fs.newChildId(),
-          new PropertyModel<Date>(filter, "startTimeOfLastModification"), DatePanelSettings.get().withSelectPeriodMode(true));
+      final DatePanel modifiedStartDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(filter, "startTimeOfModification"),
+          DatePanelSettings.get().withSelectPeriodMode(true));
       fs.add(modifiedStartDatePanel);
       fs.add(new DivTextPanel(fs.newChildId(), " - "));
-      final DatePanel modifiedStopDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(filter, "stopTimeOfLastModification"),
+      final DatePanel modifiedStopDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(filter, "stopTimeOfModification"),
           DatePanelSettings.get().withSelectPeriodMode(true));
       fs.add(modifiedStopDatePanel);
       fs.add(new HtmlCommentPanel(fs.newChildId(), new Model<String>() {
         @Override
         public String getObject()
         {
-          return WicketUtils.getUTCDates(filter.getStartTimeOfLastModification(), filter.getStopTimeOfLastModification());
+          return WicketUtils.getUTCDates(filter.getStartTimeOfModification(), filter.getStopTimeOfModification());
         }
       }));
       // DropDownChoice: time period
@@ -194,8 +192,8 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
             return;
           }
           if (newSelection == MAGIC_NUMBER_LAST_DAYS_FOR_WITHOUT_TIME_SETTINGS) { // Magic number for
-            filter.setStartTimeOfLastModification(null);
-            filter.setStopTimeOfLastModification(null);
+            filter.setStartTimeOfModification(null);
+            filter.setStopTimeOfModification(null);
             modifiedStartDatePanel.markModelAsChanged();
             modifiedStopDatePanel.markModelAsChanged();
             filter.setLastDays(null);
@@ -203,10 +201,10 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
           }
           final DateHolder dh = new DateHolder(new Date(), DatePrecision.MILLISECOND);
           dh.setEndOfDay();
-          filter.setStopTimeOfLastModification(dh.getDate());
+          filter.setStopTimeOfModification(dh.getDate());
           dh.setBeginOfDay();
           dh.add(Calendar.DAY_OF_YEAR, -newSelection);
-          filter.setStartTimeOfLastModification(dh.getDate());
+          filter.setStartTimeOfModification(dh.getDate());
           filter.setLastDays(null);
           modifiedStartDatePanel.markModelAsChanged();
           modifiedStopDatePanel.markModelAsChanged();

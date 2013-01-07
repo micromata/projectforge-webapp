@@ -94,17 +94,19 @@ public class SearchAreaPanel extends Panel
     if (number > MAXIMUM_ENTRIES_WITHOUT_FILTER_SETTINGS
         && (filter.getSearchString() == null || filter.getSearchString().length() < 3)
         && (isTaskDependentFilter == false || filter.getTask() == null)
-        && filter.getStartTimeOfLastModification() == null
-        && filter.getStopTimeOfLastModification() == null) {
+        && filter.getStartTimeOfModification() == null
+        && filter.getStopTimeOfModification() == null) {
       // Don't search to large tables if to less filter settings are given.
       setVisible(false);
       return;
     }
+    filter.updateUseModificationFilterFlag();
     final BaseSearchFilter baseSearchFilter;
     if (isTaskDependentFilter == true) {
       baseSearchFilter = (BaseSearchFilter) BeanHelper.newInstance(registeredFilterClass, new Class< ? >[] { BaseSearchFilter.class},
           filter);
       ((TaskDependentFilter) baseSearchFilter).setTaskId(filter.getTaskId());
+      baseSearchFilter.copyBaseSearchFieldsFrom(filter);
     } else {
       baseSearchFilter = filter;
     }
@@ -153,9 +155,9 @@ public class SearchAreaPanel extends Panel
     }
     final Label hasMoreEntries;
     if (hasError == true) {
-      hasMoreEntries = new Label("hasMoreEntries", page.getString("search.error"));
+      hasMoreEntries = new Label("hasMoreEntries", page.getString("search.error") + " | ");
     } else {
-      hasMoreEntries = new Label("hasMoreEntries", page.getString("moreEntriesAvailable"));
+      hasMoreEntries = new Label("hasMoreEntries", page.getString("moreEntriesAvailable") + " | ");
       hasMoreEntries.setVisible(false);
     }
     add(hasMoreEntries);
