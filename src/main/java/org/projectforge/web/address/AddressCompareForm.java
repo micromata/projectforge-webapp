@@ -130,7 +130,12 @@ public class AddressCompareForm extends AbstractEditForm<AddressDO, AddressCompa
    */
   private void setMark(final FieldsetPanel panel, final boolean paint) {
     if (paint == true) {
-      panel.getFieldset().get(0).add(new AttributeModifier("style", new Model<String>("background: lightcyan;")));
+      panel.getFieldset().get(0).add(new AttributeModifier("style",
+          new Model<String>("background: #FCF8E3; border: 1px solid #FBEED5; border-radius: 4px; padding-left: 5px; padding-right: 10px; padding-bottom: 4px;")));
+    }
+    else {
+      panel.getFieldset().get(0).add(new AttributeModifier("style",
+          new Model<String>("border: 1px solid whiteSmoke; border-radius: 4px; padding-left: 5px; padding-right: 10px; padding-bottom: 4px;")));
     }
   }
 
