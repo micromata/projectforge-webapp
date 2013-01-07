@@ -294,13 +294,13 @@ AbstractSecuredForm<F, P>
         @Override
         public Date getStartTime()
         {
-          return searchFilter.getStartTimeOfLastModification();
+          return searchFilter.getStartTimeOfModification();
         }
 
         @Override
         public Date getStopTime()
         {
-          return searchFilter.getStopTimeOfLastModification();
+          return searchFilter.getStopTimeOfModification();
         }
       });
       fieldset.add(comment);
@@ -448,9 +448,9 @@ AbstractSecuredForm<F, P>
         dateHolder.add(Calendar.DAY_OF_YEAR, -number);
         dateHolder.setBeginOfDay();
       }
-      searchFilter.setStartTimeOfLastModification(dateHolder.getDate());
+      searchFilter.setStartTimeOfModification(dateHolder.getDate());
       startDateTimePanel.markModelAsChanged();
-      searchFilter.setStopTimeOfLastModification(null);
+      searchFilter.setStopTimeOfModification(null);
       stopDateTimePanel.markModelAsChanged();
       modificationSince = null;
     }
