@@ -162,7 +162,7 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
 
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("filter.lastModified"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("search.periodOfModification"), true);
       final DatePanel modifiedStartDatePanel = new DatePanel(fs.newChildId(),
           new PropertyModel<Date>(filter, "startTimeOfLastModification"), DatePanelSettings.get().withSelectPeriodMode(true));
       fs.add(modifiedStartDatePanel);
