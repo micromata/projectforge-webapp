@@ -24,6 +24,7 @@
 package org.projectforge.plugins.poll.attendee;
 
 import org.projectforge.access.OperationType;
+import org.projectforge.plugins.poll.PollRight;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRightAccessCheck;
 import org.projectforge.user.UserRightCategory;
@@ -31,11 +32,13 @@ import org.projectforge.user.UserRightValue;
 
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
- * 
+ * @author M. Lauterbach (m.lauterbach@micromata.de)
  */
 public class PollAttendeeRight extends UserRightAccessCheck<PollAttendeeDO>
 {
   private static final long serialVersionUID = 5546777247602641113L;
+
+  private final PollRight pollRight;
 
   /**
    * @param id
@@ -45,6 +48,7 @@ public class PollAttendeeRight extends UserRightAccessCheck<PollAttendeeDO>
   public PollAttendeeRight()
   {
     super(PollAttendeeDao.USER_RIGHT_ID, UserRightCategory.PLUGINS, UserRightValue.TRUE);
+    pollRight = new PollRight();
   }
 
   /**
@@ -53,7 +57,20 @@ public class PollAttendeeRight extends UserRightAccessCheck<PollAttendeeDO>
   @Override
   public boolean hasSelectAccess(final PFUserDO user, final PollAttendeeDO obj)
   {
-    return true; // TODO
+    // new poll
+    if (obj.getPoll() == null) {
+      return true;
+    }
+
+    if (pollRight.isOwner(user, obj.getPoll()) == true) {
+      return true;
+    } else {
+      if (pollRight.isVerifiedUser(user, null, obj.getPoll()) == true) {
+        return true;
+      } else {
+        return false;
+      }
+    }
   }
 
   /**
@@ -62,7 +79,12 @@ public class PollAttendeeRight extends UserRightAccessCheck<PollAttendeeDO>
   @Override
   public boolean hasInsertAccess(final PFUserDO user, final PollAttendeeDO obj)
   {
-    return true; // TODO
+    // new entry if obj.getPoll() == null
+    if (obj.getPoll() == null || pollRight.isOwner(user, obj.getPoll()) == true) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**
@@ -70,9 +92,13 @@ public class PollAttendeeRight extends UserRightAccessCheck<PollAttendeeDO>
    *      org.projectforge.access.OperationType)
    */
   @Override
-  public boolean hasAccess(PFUserDO user, PollAttendeeDO obj, PollAttendeeDO oldObj, OperationType operationType)
+  public boolean hasAccess(final PFUserDO user, final PollAttendeeDO obj, final PollAttendeeDO oldObj, final OperationType operationType)
   {
-    // return super.hasAccess(user, obj, oldObj, operationType);
-    return true;
+    // new entry if obj == null
+    if (obj == null || pollRight.isOwner(user, obj.getPoll()) == true) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

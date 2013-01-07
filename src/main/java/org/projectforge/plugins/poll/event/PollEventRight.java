@@ -23,7 +23,10 @@
 
 package org.projectforge.plugins.poll.event;
 
+import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.OperationType;
+import org.projectforge.plugins.poll.PollRight;
+import org.projectforge.plugins.poll.attendee.PollAttendeeDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRightAccessCheck;
 import org.projectforge.user.UserRightCategory;
@@ -31,11 +34,17 @@ import org.projectforge.user.UserRightValue;
 
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
+ * @author M. Lauterbach (m.lauterbach@micromata.de)
  * 
  */
 public class PollEventRight extends UserRightAccessCheck<PollEventDO>
 {
   private static final long serialVersionUID = 5546777247602641113L;
+
+  @SpringBean(name = "pollAttendeeDao")
+  private PollAttendeeDao pollAttendeeDao;
+
+  private final PollRight pollRight;
 
   /**
    * @param id
@@ -45,6 +54,7 @@ public class PollEventRight extends UserRightAccessCheck<PollEventDO>
   public PollEventRight()
   {
     super(PollEventDao.USER_RIGHT_ID, UserRightCategory.PLUGINS, UserRightValue.TRUE);
+    pollRight = new PollRight();
   }
 
   /**
@@ -53,7 +63,24 @@ public class PollEventRight extends UserRightAccessCheck<PollEventDO>
   @Override
   public boolean hasInsertAccess(final PFUserDO user, final PollEventDO obj)
   {
-    return true; // TODO
+    if (pollRight.isOwner(user, obj.getPoll()) == true) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public boolean hasSelectAccess(final PFUserDO user, final String secureKey, final PollEventDO pollEvent)
+  {
+    if (pollRight.isOwner(user, pollEvent.getPoll()) == true) {
+      return true;
+    } else {
+      if (pollRight.isVerifiedUser(user, secureKey, pollEvent.getPoll()) == true) {
+        return true;
+      } else {
+        return false;
+      }
+    }
   }
 
   /**
@@ -62,7 +89,11 @@ public class PollEventRight extends UserRightAccessCheck<PollEventDO>
   @Override
   public boolean hasSelectAccess(final PFUserDO user, final PollEventDO obj)
   {
-    return true; // TODO
+    if (pollRight.isOwner(user, obj.getPoll()) == true) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**
@@ -70,9 +101,21 @@ public class PollEventRight extends UserRightAccessCheck<PollEventDO>
    *      org.projectforge.access.OperationType)
    */
   @Override
-  public boolean hasAccess(PFUserDO user, PollEventDO obj, PollEventDO oldObj, OperationType operationType)
+  public boolean hasAccess(final PFUserDO user, final PollEventDO obj, final PollEventDO oldObj, final OperationType operationType)
   {
-    // TODO
-    return true;
+    if (pollRight.isOwner(user, obj.getPoll()) == true) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public boolean hasAccess(final PFUserDO user, final PollEventDO obj, final Integer autenticationKey)
+  {
+    if (pollRight.isOwner(user, obj.getPoll()) == true) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

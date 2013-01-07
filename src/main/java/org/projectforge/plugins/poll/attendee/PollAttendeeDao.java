@@ -29,6 +29,7 @@ import org.hibernate.criterion.Restrictions;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.plugins.poll.PollDO;
+import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRightId;
 
 /**
@@ -63,13 +64,33 @@ public class PollAttendeeDao extends BaseDao<PollAttendeeDO>
    * @param poll
    * @return
    */
-  public List<PollAttendeeDO> getListByPoll(PollDO poll)
+  public List<PollAttendeeDO> getListByPoll(final PollDO poll)
   {
-    QueryFilter qFilter = new QueryFilter();
+    final QueryFilter qFilter = new QueryFilter();
     if(poll != null && poll.getId() != null) {
       qFilter.add(Restrictions.and(Restrictions.eq("poll", poll), Restrictions.eq("deleted", false)));
     }
     return getList(qFilter);
   }
 
+  /**
+   * Verify if key is able to access poll data.
+   * 
+   * @param user
+   * @param secureKey
+   * @param poll - poll to check
+   * @return
+   */
+  public boolean verifyUserOrKey(final PFUserDO user, final String secureKey, final PollDO poll)
+  {
+    final QueryFilter qFilter = new QueryFilter();
+    if (user != null) {
+      qFilter.add(Restrictions.and(Restrictions.and(Restrictions.eq("poll", poll), Restrictions.eq("user", user)),
+          Restrictions.eq("deleted", false)));
+    } else {
+      qFilter.add(Restrictions.and(Restrictions.and(Restrictions.eq("poll", poll), Restrictions.eq("secureKey", secureKey)),
+          Restrictions.eq("deleted", false)));
+    }
+    return !getList(qFilter).isEmpty();
+  }
 }

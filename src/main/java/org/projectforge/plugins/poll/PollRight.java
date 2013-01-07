@@ -23,31 +23,30 @@
 
 package org.projectforge.plugins.poll;
 
-import java.util.Collection;
-import java.util.Iterator;
-
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.OperationType;
-import org.projectforge.user.GroupDO;
+import org.projectforge.plugins.poll.attendee.PollAttendeeDao;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserRightAccessCheck;
 import org.projectforge.user.UserRightCategory;
 import org.projectforge.user.UserRightId;
 import org.projectforge.user.UserRightValue;
-import org.projectforge.user.UserRights;
 
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  * @author M. Lauterbach (m.lauterbach@micromata.de)
  * 
- * TODO Max check right please
+ *         TODO Max check right please
  * 
  */
 public class PollRight extends UserRightAccessCheck<PollDO>
 {
 
   private static final long serialVersionUID = -8240264359189297034L;
+
+  @SpringBean(name = "pollAttendeeDao")
+  private PollAttendeeDao pollAttendeeDao;
 
   /**
    * @param id
@@ -82,7 +81,7 @@ public class PollRight extends UserRightAccessCheck<PollDO>
   public boolean hasSelectAccess(final PFUserDO user, final PollDO obj)
   {
     if (isOwner(user, obj) == true) {
-      // User has full access to it's own calendars.
+      // User has full access to it's own polls.
       return true;
     }
     return false;
@@ -116,23 +115,9 @@ public class PollRight extends UserRightAccessCheck<PollDO>
   @Override
   public boolean hasUpdateAccess(final PFUserDO user, final PollDO obj, final PollDO oldObj)
   {
-    if (ObjectUtils.equals(user.getId(), obj.getOwner().getId()) == true) {
-      // User has full access to it's own calendars.
+    if (isOwner(user, obj) == true) {
+      // User has full access to it's own polls.
       return true;
-    }
-    return false;
-  }
-
-  public boolean hasAccessGroup(final GroupDO group, final UserGroupCache userGroupCache, final PFUserDO user)
-  {
-    if (group != null) {
-      final Collection<Integer> groups = userGroupCache.getUserGroups(user);
-      final Iterator<Integer> it = groups.iterator();
-      while (it.hasNext()) {
-        final int id = it.next();
-        if (id == 0 || group.getId() == id)
-          return true;
-      }
     }
     return false;
   }
@@ -153,15 +138,11 @@ public class PollRight extends UserRightAccessCheck<PollDO>
     if (poll == null) {
       return true;
     }
-    if (ObjectUtils.equals(user.getId(), poll.getOwner().getId()) == true) {
+    if (isOwner(user, poll) == true) {
       return true;
     }
     // TODO set rights
-    // if ((UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), teamCal.getReadOnlyAccessGroupId()) == true || UserRights
-    // .getUserGroupCache().isUserMemberOfGroup(user.getId(), teamCal.getMinimalAccessGroupId()) == true)
-    // && operationType.equals(OperationType.DELETE))
-    // return false;
-    else return true;
+    else return false;
   }
 
   /**
@@ -175,13 +156,17 @@ public class PollRight extends UserRightAccessCheck<PollDO>
     else return false;
   }
 
-  public boolean isOwner(final PFUserDO user, final PollDO cal)
+  public boolean isOwner(final PFUserDO user, final PollDO poll)
   {
-    return ObjectUtils.equals(user.getId(), cal.getOwner().getId()) == true;
+    return ObjectUtils.equals(user.getId(), poll.getOwner().getId()) == true;
   }
 
-  public boolean isMemberOfAtLeastOneGroup(final PFUserDO user, final Integer... groupIds)
+  public boolean isVerifiedUser(final PFUserDO user, final String secureKey, final PollDO poll)
   {
-    return UserRights.getUserGroupCache().isUserMemberOfAtLeastOneGroup(user.getId(), groupIds);
+    if (pollAttendeeDao.verifyUserOrKey(user, secureKey, poll) == true) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
