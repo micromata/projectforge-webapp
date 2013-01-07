@@ -72,6 +72,7 @@ public enum MenuItemDefId
   PERSONAL_STATISTICS("personalStatistics"), //
   PHONE_CALL("phoneCall"), //
   PROJECT_LIST("fibu.projekte"), //
+  SEND_SMS("sendSms"), //
   SCRIPT_LIST("scriptList"), //
   SCRIPTING("scripting"), //
   SEARCH("search"), //

@@ -58,6 +58,7 @@ import org.projectforge.web.access.AccessListPage;
 import org.projectforge.web.address.AddressListPage;
 import org.projectforge.web.address.AddressMobileListPage;
 import org.projectforge.web.address.PhoneCallPage;
+import org.projectforge.web.address.SendSmsPage;
 import org.projectforge.web.admin.AdminPage;
 import org.projectforge.web.admin.SystemUpdatePage;
 import org.projectforge.web.book.BookListPage;
@@ -252,7 +253,8 @@ public class MenuItemRegistry
     reg.register(common, MenuItemDefId.ADDRESS_LIST, 40, AddressListPage.class).setMobileMenu(AddressMobileListPage.class, 100); // Visible
     // for all.
     reg.register(common, MenuItemDefId.PHONE_CALL, 50, PhoneCallPage.class);
-    final MenuItemDef meb = new MenuItemDef(common, MenuItemDefId.MEB.getId(), 50, MenuItemDefId.MEB.getI18nKey(), MebListPage.class) {
+    reg.register(common, MenuItemDefId.SEND_SMS, 60, SendSmsPage.class);
+    final MenuItemDef meb = new MenuItemDef(common, MenuItemDefId.MEB.getId(), 70, MenuItemDefId.MEB.getI18nKey(), MebListPage.class) {
       @Override
       protected void afterMenuEntryCreation(final MenuEntry createdMenuEntry, final MenuBuilderContext context)
       {
