@@ -50,9 +50,17 @@ public class BaseSearchFilter implements Serializable
 
   protected Integer modifiedByUserId;
 
+  @Deprecated
   protected Date startTimeOfLastModification;
 
+  @Deprecated
   protected Date stopTimeOfLastModification;
+
+  protected Date startTimeOfModification;
+
+  protected Date stopTimeOfModification;
+
+  private boolean searchHistory;
 
   private String errorMessage;
 
@@ -78,8 +86,9 @@ public class BaseSearchFilter implements Serializable
     this.maxRows = filter.maxRows;
     this.useModificationFilter = filter.useModificationFilter;
     this.modifiedByUserId = filter.modifiedByUserId;
-    this.startTimeOfLastModification = filter.startTimeOfLastModification;
-    this.stopTimeOfLastModification = filter.stopTimeOfLastModification;
+    this.startTimeOfModification = filter.startTimeOfModification;
+    this.stopTimeOfModification = filter.stopTimeOfModification;
+    this.searchHistory = filter.searchHistory;
   }
 
   public void reset()
@@ -87,6 +96,7 @@ public class BaseSearchFilter implements Serializable
     deleted = false;
     ignoreDeleted = false;
     searchString = "";
+    searchHistory = false;
   }
 
   public boolean isSearchNotEmpty()
@@ -143,24 +153,42 @@ public class BaseSearchFilter implements Serializable
     this.modifiedByUserId = modifiedByUserId;
   }
 
-  public Date getStartTimeOfLastModification()
+  public Date getStartTimeOfModification()
   {
-    return startTimeOfLastModification;
+    return startTimeOfModification;
   }
 
-  public void setStartTimeOfLastModification(final Date startTimeOfLastModification)
+  public void setStartTimeOfModification(final Date startTimeOfModification)
   {
-    this.startTimeOfLastModification = startTimeOfLastModification;
+    this.startTimeOfModification = startTimeOfModification;
   }
 
-  public Date getStopTimeOfLastModification()
+  public Date getStopTimeOfModification()
   {
-    return stopTimeOfLastModification;
+    return stopTimeOfModification;
   }
 
-  public void setStopTimeOfLastModification(final Date stopTimeOfLastModification)
+  public void setStopTimeOfModification(final Date stopTimeOfModification)
   {
-    this.stopTimeOfLastModification = stopTimeOfLastModification;
+    this.stopTimeOfModification = stopTimeOfModification;
+  }
+
+  /**
+   * If true the history entries are included in the search.
+   * @return the searchHistory
+   */
+  public boolean isSearchHistory()
+  {
+    return searchHistory;
+  }
+
+  /**
+   * @param searchHistory the searchHistory to set
+   * @return this for chaining.
+   */
+  public void setSearchHistory(final boolean searchHistory)
+  {
+    this.searchHistory = searchHistory;
   }
 
   /**
