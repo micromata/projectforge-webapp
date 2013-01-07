@@ -51,8 +51,8 @@ public class SearchDao extends HibernateDaoSupport
       return null;
     }
     if (filter.getModifiedByUserId() != null
-        || filter.getStartTimeOfLastModification() != null
-        || filter.getStopTimeOfLastModification() != null) {
+        || filter.getStartTimeOfModification() != null
+        || filter.getStopTimeOfModification() != null) {
       filter.setUseModificationFilter(true);
     } else {
       filter.setUseModificationFilter(false);
