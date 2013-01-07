@@ -132,6 +132,8 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    */
   private static final String ESCAPE_CHARS = "+-";
 
+  private static final String[] HISTORY_SEARCH_FIELDS = { "delta.oldValue", "delta.newValue"};
+
   protected Class<O> clazz;
 
   protected AccessChecker accessChecker;
@@ -384,61 +386,89 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     }
 
     List<O> list = null;
-    final Criteria criteria = filter.buildCriteria(getSession(), clazz);
-    if (searchFilter.isSearchNotEmpty() == true) {
-      String searchString = "";
-      try {
-        final FullTextSession fullTextSession = Search.getFullTextSession(getSession());
+    if (searchFilter.isSearchHistory() == false) {
+      final Criteria criteria = filter.buildCriteria(getSession(), clazz);
+      if (searchFilter.isSearchNotEmpty() == true) {
+        final String[] searchString = { ""};
         final String[] searchFields = searchFilter.getSearchFields() != null ? searchFilter.getSearchFields() : getSearchFields();
-        final MultiFieldQueryParser parser = new MultiFieldQueryParser(LUCENE_VERSION, searchFields, new ClassicAnalyzer(Version.LUCENE_31));
-        parser.setAllowLeadingWildcard(true);
-        org.apache.lucene.search.Query query = null;
         try {
-          searchString = modifySearchString(searchFilter.getSearchString());
-          query = parser.parse(searchString);
-        } catch (final org.apache.lucene.queryParser.ParseException ex) {
+          final FullTextSession fullTextSession = Search.getFullTextSession(getSession());
+          final org.apache.lucene.search.Query query = createFullTextQuery(criteria, searchFields, filter, searchFilter, searchString);
+          if (query == null) {
+            // An error occured:
+            return new ArrayList<O>();
+          }
+          final FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery(query, clazz);
+          fullTextQuery.setCriteriaQuery(criteria);
+          list = fullTextQuery.list(); // return a list of managed objects
+        } catch (final Exception ex) {
           final String errorMsg = "Lucene error message: "
               + ex.getMessage()
               + " (for "
               + this.getClass().getSimpleName()
               + ": "
-              + searchString
-              + ").";
+              + searchString[0]
+                  + ").";
           filter.setErrorMessage(errorMsg);
           log.info(errorMsg);
-          return new ArrayList<O>();
         }
-        final FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery(query, clazz);
-        fullTextQuery.setCriteriaQuery(criteria);
-        list = fullTextQuery.list(); // return a list of managed objects
-      } catch (final Exception ex) {
-        final String errorMsg = "Lucene error message: "
-            + ex.getMessage()
-            + " (for "
-            + this.getClass().getSimpleName()
-            + ": "
-            + searchString
-            + ").";
-        filter.setErrorMessage(errorMsg);
-        log.info(errorMsg);
+      } else {
+        list = criteria.list();
       }
-    } else {
-      list = criteria.list();
-    }
-    if (list != null) {
-      list = selectUnique(list);
-      if (searchFilter.useModificationFilter == true) {
-        final Set<Integer> idSet = getModifiedEntries(getSession(), searchFilter);
-        final List<O> result = new ArrayList<O>();
-        for (final O entry : list) {
-          if (contains(idSet, entry) == true) {
-            result.add(entry);
+      if (list != null) {
+        list = selectUnique(list);
+        if (list.size() > 0 && searchFilter.isUseModificationFilter() == true) {
+          // Search now all history entries which were modified by the given user and/or in the given time period.
+          final Set<Integer> idSet = getHistoryEntries(getSession(), searchFilter, false);
+          final List<O> result = new ArrayList<O>();
+          for (final O entry : list) {
+            if (contains(idSet, entry) == true) {
+              result.add(entry);
+            }
           }
+          list = result;
         }
-        return result;
       }
+    } else if (searchFilter.isSearchNotEmpty() == true) {
+      // Search now all history for the given search string.
+      final Set<Integer> idSet = getHistoryEntries(getSession(), searchFilter, true);
+      if (CollectionUtils.isEmpty(idSet) == true) {
+        return new ArrayList<O>();
+      }
+      final Criteria criteria = filter.buildCriteria(getSession(), clazz);
+      criteria.add(Restrictions.in("id", idSet));
+      list = criteria.list();
+    } else {
+      // History search without search string.
+      list = new ArrayList<O>();
     }
     return list;
+  }
+
+  private org.apache.lucene.search.Query createFullTextQuery(final Criteria criteria, final String[] searchFields,
+      final QueryFilter queryFilter, final BaseSearchFilter searchFilter, final String[] searchString)
+  {
+    final MultiFieldQueryParser parser = new MultiFieldQueryParser(LUCENE_VERSION, searchFields, new ClassicAnalyzer(Version.LUCENE_31));
+    parser.setAllowLeadingWildcard(true);
+    org.apache.lucene.search.Query query = null;
+    try {
+      searchString[0] = modifySearchString(searchFilter.getSearchString());
+      query = parser.parse(searchString[0]);
+    } catch (final org.apache.lucene.queryParser.ParseException ex) {
+      final String errorMsg = "Lucene error message: "
+          + ex.getMessage()
+          + " (for "
+          + this.getClass().getSimpleName()
+          + ": "
+          + searchString
+          + ").";
+      if (queryFilter != null) {
+        queryFilter.setErrorMessage(errorMsg);
+      }
+      log.info(errorMsg);
+      return null;
+    }
+    return query;
   }
 
   /**
@@ -1580,48 +1610,86 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     throw new UnsupportedOperationException("Mass update is not supported by this dao for: " + clazz.getName());
   }
 
-  private Set<Integer> getModifiedEntries(final Session session, final BaseSearchFilter filter)
+  private Set<Integer> getHistoryEntries(final Session session, final BaseSearchFilter filter, final boolean searchStringInHistory)
   {
-    log.debug("Searching in " + clazz);
     if (hasLoggedInUserSelectAccess(false) == false || hasLoggedInUserHistoryAccess(false) == false) {
       // User has in general no access to history entries of the given object type (clazz).
       return null;
     }
     final Set<Integer> idSet = new HashSet<Integer>();
-    getModifiedEntries(session, filter, idSet, clazz);
-    if (getAdditionalHistorySearchDOs() != null) {
-      for (final Class< ? > aclazz : getAdditionalHistorySearchDOs()) {
-        getModifiedEntries(session, filter, idSet, aclazz);
+    getHistoryEntries(session, filter, idSet, clazz, searchStringInHistory);
+    if (searchStringInHistory == false) {
+      if (getAdditionalHistorySearchDOs() != null) {
+        for (final Class< ? > aclazz : getAdditionalHistorySearchDOs()) {
+          getHistoryEntries(session, filter, idSet, aclazz, searchStringInHistory);
+        }
       }
     }
     return idSet;
   }
 
-  private void getModifiedEntries(final Session session, final BaseSearchFilter filter, final Set<Integer> idSet, final Class< ? > clazz)
+  @SuppressWarnings("unchecked")
+  private void getHistoryEntries(final Session session, final BaseSearchFilter filter, final Set<Integer> idSet, final Class< ? > clazz,
+      final boolean searchStringInHistory)
   {
-    log.debug("Searching in " + clazz);
+    if (log.isDebugEnabled() == true) {
+      log.debug("Searching in " + clazz);
+    }
     // First get all history entries matching the filter and the given class.
     final String className = ClassUtils.getShortClassName(clazz);
     final Criteria crit = session.createCriteria(HistoryEntry.class);
     crit.add(Restrictions.eq("className", className));
-    if (filter.getStartTimeOfLastModification() != null && filter.getStopTimeOfLastModification() != null) {
-      crit.add(Restrictions.between("timestamp", filter.getStartTimeOfLastModification(), filter.getStopTimeOfLastModification()));
-    } else if (filter.getStartTimeOfLastModification() != null) {
-      crit.add(Restrictions.ge("timestamp", filter.getStartTimeOfLastModification()));
-    } else if (filter.getStopTimeOfLastModification() != null) {
-      crit.add(Restrictions.le("timestamp", filter.getStopTimeOfLastModification()));
+    if (filter.getStartTimeOfModification() != null && filter.getStopTimeOfModification() != null) {
+      crit.add(Restrictions.between("timestamp", filter.getStartTimeOfModification(), filter.getStopTimeOfModification()));
+    } else if (filter.getStartTimeOfModification() != null) {
+      crit.add(Restrictions.ge("timestamp", filter.getStartTimeOfModification()));
+    } else if (filter.getStopTimeOfModification() != null) {
+      crit.add(Restrictions.le("timestamp", filter.getStopTimeOfModification()));
     }
     if (filter.getModifiedByUserId() != null) {
       crit.add(Restrictions.eq("userName", filter.getModifiedByUserId().toString()));
     }
-    crit.setCacheable(true);
-    crit.setCacheRegion("historyItemCache");
-    crit.setProjection(Projections.property("entityId"));
-    @SuppressWarnings("unchecked")
-    final List<Integer> idList = crit.list();
-    if (idList != null && idList.size() > 0) {
-      for (final Integer id : idList) {
-        idSet.add(id);
+    if (searchStringInHistory == true) {
+      final String[] searchString = { ""};
+      try {
+        final FullTextSession fullTextSession = Search.getFullTextSession(getSession());
+        final org.apache.lucene.search.Query query = createFullTextQuery(crit, HISTORY_SEARCH_FIELDS, null, filter, searchString);
+        if (query == null) {
+          // An error occured:
+          return;
+        }
+        final FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery(query, HistoryEntry.class);
+        fullTextQuery.setCriteriaQuery(crit);
+        fullTextQuery.setCacheable(true);
+        // crit.setCacheRegion("historyItemCache");
+        fullTextQuery.setProjection("entityId");
+        final List<Object[]> result = fullTextQuery.list();
+        if (result != null && result.size() > 0) {
+          for (final Object[] oa : result) {
+            final Integer entityId = (Integer) oa[0];
+            idSet.add(entityId);
+          }
+        }
+      } catch (final Exception ex) {
+        final String errorMsg = "Lucene error message: "
+            + ex.getMessage()
+            + " (for "
+            + this.getClass().getSimpleName()
+            + ": "
+            + searchString[0]
+                + ").";
+        filter.setErrorMessage(errorMsg);
+        log.info(errorMsg);
+      }
+    } else {
+      crit.setCacheable(true);
+      // crit.setCacheRegion("historyItemCache");
+      crit.setProjection(Projections.property("entityId"));
+      final List<Integer> idList = crit.list();
+      if (idList != null && idList.size() > 0) {
+        for (final Integer id : idList) {
+          idSet.add(id);
+        }
       }
     }
   }
