@@ -52,7 +52,7 @@ import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.MySortableDataProvider;
-import org.springframework.util.CollectionUtils;
+import org.projectforge.web.wicket.WicketUtils;
 
 public class SearchAreaPanel extends Panel
 {
@@ -110,40 +110,55 @@ public class SearchAreaPanel extends Panel
     }
     final List<SearchResultData> searchResult = searchDao.getEntries(baseSearchFilter, webRegistryEntry.getDOClass(),
         webRegistryEntry.getDao());
-    if (CollectionUtils.isEmpty(searchResult) == true) {
+    boolean hasError = false;
+    if (searchResult == null) {
+      // An error occured!
+      hasError = true;
+    } else if (searchResult.size() == 0) {
+      // No hits.
       setVisible(false);
       return;
     }
-    final List<ExtendedBaseDO<Integer>> list = new ArrayList<ExtendedBaseDO<Integer>>();
     boolean hasMore = false;
-    for (final SearchResultData data : searchResult) {
-      if (data.getDataObject() != null) {
-        list.add(data.getDataObject());
-      } else {
-        // Empty entry means: more entries found.
-        hasMore = true;
-        break;
+    if (hasError == true) {
+      add(WicketUtils.getInvisibleComponent("dataTable"));
+    } else {
+      final List<ExtendedBaseDO<Integer>> list = new ArrayList<ExtendedBaseDO<Integer>>();
+      for (final SearchResultData data : searchResult) {
+        if (data.getDataObject() != null) {
+          list.add(data.getDataObject());
+        } else {
+          // Empty entry means: more entries found.
+          hasMore = true;
+          break;
+        }
       }
-    }
-    final List< ? > columns = listPageColumnsCreator.createColumns(page, false);
-    @SuppressWarnings({ "rawtypes", "unchecked"})
-    final DataTable< ? , String> dataTable = new DefaultDataTable("dataTable", columns, new MySortableDataProvider("NOSORT",
-        SortOrder.DESCENDING) {
-      @Override
-      public List< ? > getList()
-      {
-        return list;
-      }
+      final List< ? > columns = listPageColumnsCreator.createColumns(page, false);
+      @SuppressWarnings({ "rawtypes", "unchecked"})
+      final DataTable< ? , String> dataTable = new DefaultDataTable("dataTable", columns, new MySortableDataProvider("NOSORT",
+          SortOrder.DESCENDING) {
+        @Override
+        public List< ? > getList()
+        {
+          return list;
+        }
 
-      @Override
-      protected IModel< ? > getModel(final Object object)
-      {
-        return new Model((Serializable) object);
-      }
-    }, filter.getMaxRows());
-    add(dataTable);
-    final Label hasMoreEntries = new Label("hasMoreEntries", page.getString("moreEntriesAvailable"));
-    add(hasMoreEntries.setVisible(false));
+        @Override
+        protected IModel< ? > getModel(final Object object)
+        {
+          return new Model((Serializable) object);
+        }
+      }, filter.getMaxRows());
+      add(dataTable);
+    }
+    final Label hasMoreEntries;
+    if (hasError == true) {
+      hasMoreEntries = new Label("hasMoreEntries", page.getString("search.error"));
+    } else {
+      hasMoreEntries = new Label("hasMoreEntries", page.getString("moreEntriesAvailable"));
+      hasMoreEntries.setVisible(false);
+    }
+    add(hasMoreEntries);
     Component showMoreEntrieslink = null;
     if (hasMore == true) {
       final int maxRows = filter.getMaxRows();

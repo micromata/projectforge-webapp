@@ -58,8 +58,12 @@ public class SearchDao extends HibernateDaoSupport
       filter.setUseModificationFilter(false);
     }
     final List<ExtendedBaseDO> list = baseDao.getListForSearchDao(filter);
+    if (list == null) {
+      // An error occured.
+      return null;
+    }
     final List<SearchResultData> result = new ArrayList<SearchResultData>();
-    if (list == null || list.size() == 0) {
+    if (list.size() == 0) {
       return result;
     }
     // TODO: Search for history entries.
