@@ -27,6 +27,7 @@ import java.io.File;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.lang.ClassUtils;
 import org.hibernate.CacheMode;
@@ -42,10 +43,12 @@ import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.projectforge.calendar.DayHolder;
+import org.projectforge.common.DateHelper;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.ExtendedBaseDO;
 import org.projectforge.core.ReindexSettings;
+import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Isolation;
@@ -88,50 +91,77 @@ public class DatabaseDao extends HibernateDaoSupport
   {
     if (currentReindexRun != null) {
       return "Another re-index job is already running. The job was started at: "
-          + DateTimeFormatter.instance().getFormattedDateTime(currentReindexRun);
+          + DateTimeFormatter.instance().getFormattedDateTime(currentReindexRun, Locale.ENGLISH, DateHelper.UTC) + " (UTC)";
+    }
+    final StringBuffer buf = new StringBuffer();
+    reindex(clazz, settings, buf);
+    return buf.toString();
+  }
+
+  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ)
+  public void reindex(final Class< ? > clazz, final ReindexSettings settings, final StringBuffer buf)
+  {
+    if (currentReindexRun != null) {
+      buf.append(" (cancelled due to another running index-job)");
+      return;
     }
     synchronized (this) {
       try {
         currentReindexRun = new Date();
-        final StringBuffer buf = new StringBuffer();
-        reindex(clazz, settings, buf);
-        return buf.toString();
+        buf.append(ClassUtils.getShortClassName(clazz));
+        final File file = new File(ConfigXml.getInstance().getApplicationHomeDir() + "/hibernate-search/" + clazz.getName() + "/write.lock");
+        if (file.exists() == true) {
+          final Date lastModified = new Date(file.lastModified());
+          final String message;
+          if (System.currentTimeMillis() - file.lastModified() > 60000) { // Last modified date is older than 60 seconds.
+            message = "(*** write.lock with last modification '"
+                + DateTimeFormatter.instance().getFormattedDateTime(lastModified)
+                + "' exists (skip re-index). May-be your admin should delete this file (see log). ***)";
+            log.error(file.getAbsoluteFile() + " " + message);
+          } else {
+            message = "(*** write.lock temporarily exists (skip re-index). ***)";
+            log.info(file.getAbsolutePath() + " " + message);
+          }
+          buf.append(" ").append(message);
+        } else {
+          reindex(clazz, settings);
+        }
+        buf.append(", ");
       } finally {
         currentReindexRun = null;
       }
     }
   }
 
-  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ)
-  public void reindex(final Class< ? > clazz, final ReindexSettings settings, final StringBuffer buf)
-  {
-    buf.append(ClassUtils.getShortClassName(clazz));
-    final File file = new File(ConfigXml.getInstance().getApplicationHomeDir() + "/hibernate-search/" + clazz.getName() + "/write.lock");
-    if (file.exists() == true) {
-      final Date lastModified = new Date(file.lastModified());
-      final String message;
-      if (System.currentTimeMillis() - file.lastModified() > 60000) { // Last modified date is older than 60 seconds.
-        message = "(*** write.lock with last modification '"
-            + DateTimeFormatter.instance().getFormattedDateTime(lastModified)
-            + "' exists (skip re-index). May-be your admin should delete this file (see log). ***)";
-        log.error(file.getAbsoluteFile() + " " + message);
-      } else {
-        message = "(*** write.lock temporarily exists (skip re-index). ***)";
-        log.info(file.getAbsolutePath() + " " + message);
-      }
-      buf.append(" ").append(message);
-    } else {
-      final int numberOfReindexedObjects = reindex(clazz, settings);
-      buf.append(" (").append(numberOfReindexedObjects).append(")");
-    }
-    buf.append(", ");
-  }
-
   /**
    * 
    * @param clazz
    */
-  private int reindex(final Class< ? > clazz, final ReindexSettings settings)
+  private long reindex(final Class< ? > clazz, final ReindexSettings settings)
+  {
+    if (settings.getLastNEntries() != null || settings.getFromDate() != null) {
+      // OK, only partly re-index required:
+      return reindexObjects(clazz, settings);
+    }
+    // OK, full re-index required:
+    if (isIn(clazz, HistoryEntry.class, TimesheetDO.class) == true) {
+      // MassIndexer throws LazyInitializationException for some classes, so use it only for the important classes (with most entries):
+      return reindexMassIndexer(clazz);
+    }
+    return reindexObjects(clazz, null);
+  }
+
+  private boolean isIn(final Class< ? > clazz, final Class< ? >... classes)
+  {
+    for (final Class< ? > cls : classes) {
+      if (clazz.equals(cls) == true) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private long reindexObjects(final Class< ? > clazz, final ReindexSettings settings)
   {
     final Session session = getSession();
     Criteria criteria = createCriteria(session, clazz, settings, true);
@@ -148,7 +178,7 @@ public class DatabaseDao extends HibernateDaoSupport
     final FullTextSession fullTextSession = Search.getFullTextSession(session);
     fullTextSession.setFlushMode(FlushMode.MANUAL);
     fullTextSession.setCacheMode(CacheMode.IGNORE);
-    int index = 0;
+    long index = 0;
     if (scrollMode == true) {
       // Scroll-able results will avoid loading too many objects in memory
       criteria = createCriteria(fullTextSession, clazz, settings, false);
@@ -180,23 +210,53 @@ public class DatabaseDao extends HibernateDaoSupport
     return index;
   }
 
+  /**
+   * 
+   * @param clazz
+   */
+  private long reindexMassIndexer(final Class< ? > clazz)
+  {
+    final Session session = getSession();
+    final Criteria criteria = createCriteria(session, clazz, null, true);
+    final Long number = (Long) criteria.uniqueResult(); // Get number of objects to re-index (select count(*) from).
+    log.info("Starting (mass) re-indexing of " + number + " entries of type " + clazz.getName() + "...");
+    final FullTextSession fullTextSession = Search.getFullTextSession(session);
+    try {
+      fullTextSession.createIndexer(clazz)//
+      .batchSizeToLoadObjects(25) //
+      //.cacheMode(CacheMode.NORMAL) //
+      .threadsToLoadObjects(5) //
+      //.threadsForIndexWriter(1) //
+      .threadsForSubsequentFetching(20) //
+      .startAndWait();
+    } catch (final InterruptedException ex) {
+      log.error("Exception encountered while reindexing: " + ex.getMessage(), ex);
+    }
+    final SearchFactory searchFactory = fullTextSession.getSearchFactory();
+    searchFactory.optimize(clazz);
+    log.info("Re-indexing of " + number + " objects of type " + clazz.getName() + " done.");
+    return number;
+  }
+
   private Criteria createCriteria(final Session session, final Class< ? > clazz, final ReindexSettings settings, final boolean rowCount)
   {
     final Criteria criteria = session.createCriteria(clazz);
     if (rowCount == true) {
       criteria.setProjection(Projections.rowCount());
     } else {
-      String lastUpdateProperty = null;
-      if (AbstractBaseDO.class.isAssignableFrom(clazz) == true) {
-        lastUpdateProperty = "lastUpdate";
-      } else if (HistoryEntry.class.isAssignableFrom(clazz) == true) {
-        lastUpdateProperty = "timestamp";
-      }
-      if (settings.getLastNEntries() != null) {
-        criteria.addOrder(Order.desc("id")).setMaxResults(settings.getLastNEntries());
-      }
-      if (lastUpdateProperty != null && settings.getFromDate() != null) {
-        criteria.add(Restrictions.ge(lastUpdateProperty, settings.getFromDate()));
+      if (settings != null) {
+        if (settings.getLastNEntries() != null) {
+          criteria.addOrder(Order.desc("id")).setMaxResults(settings.getLastNEntries());
+        }
+        String lastUpdateProperty = null;
+        if (AbstractBaseDO.class.isAssignableFrom(clazz) == true) {
+          lastUpdateProperty = "lastUpdate";
+        } else if (HistoryEntry.class.isAssignableFrom(clazz) == true) {
+          lastUpdateProperty = "timestamp";
+        }
+        if (lastUpdateProperty != null && settings.getFromDate() != null) {
+          criteria.add(Restrictions.ge(lastUpdateProperty, settings.getFromDate()));
+        }
       }
     }
     return criteria;
