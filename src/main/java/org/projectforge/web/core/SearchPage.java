@@ -32,8 +32,6 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.task.TaskDO;
-import org.projectforge.task.TaskTree;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.fibu.ISelectCallerPage;
@@ -48,9 +46,6 @@ public class SearchPage extends AbstractStandardFormPage implements ISelectCalle
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SearchPage.class);
 
   private final SearchForm form;
-
-  @SpringBean(name = "taskTree")
-  private TaskTree taskTree;
 
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
@@ -90,10 +85,7 @@ public class SearchPage extends AbstractStandardFormPage implements ISelectCalle
 
   public void select(final String property, final Object selectedValue)
   {
-    if ("taskId".equals(property) == true) {
-      final TaskDO task = taskTree.getTaskById((Integer) selectedValue);
-      form.filter.setTask(task);
-    } else if ("userId".equals(property) == true) {
+    if ("userId".equals(property) == true) {
       final PFUserDO user = userGroupCache.getUser((Integer) selectedValue);
       form.filter.setModifiedByUser(user);
     } else {
@@ -103,11 +95,7 @@ public class SearchPage extends AbstractStandardFormPage implements ISelectCalle
 
   public void unselect(final String property)
   {
-    if ("taskId".equals(property) == true) {
-      form.filter.setTask(null);
-    } else {
-      log.error("Property '" + property + "' not supported for unselection.");
-    }
+    log.error("Property '" + property + "' not supported for unselection.");
   }
 
   @Override

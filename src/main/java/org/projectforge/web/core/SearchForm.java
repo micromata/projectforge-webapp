@@ -38,9 +38,7 @@ import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
 import org.projectforge.registry.Registry;
 import org.projectforge.registry.RegistryEntry;
-import org.projectforge.task.TaskDO;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.AbstractStandardForm;
@@ -127,11 +125,6 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
       final DivPanel checkBoxesPanel = fs.addNewCheckBoxDiv();
       checkBoxesPanel.add(new CheckBoxPanel(checkBoxesPanel.newChildId(), new PropertyModel<Boolean>(filter, "searchHistory"),
           getString("search.searchHistory")).setTooltip(getString("search.searchHistory.tooltip")));
-      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(filter, "task"), parentPage,
-          "taskId");
-      fs.add(taskSelectPanel);
-      taskSelectPanel.init();
-      taskSelectPanel.setRequired(false);
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
