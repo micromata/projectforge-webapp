@@ -31,7 +31,7 @@ import org.projectforge.web.WebConfiguration;
 public class WicketRenderHeadUtils
 {
   private static final String[][] JAVASCRIPT_FILES_DEF = { //
-    { "scripts/jquery/1.8.2/jquery-1.8.2", ".min"},//
+    // { "scripts/jquery/1.8.2/jquery-1.8.2", ".min"}, // Wicket delivers jQuery version
     { "include/bootstrap/js/bootstrap", ".min"}, //
     { "scripts/jqueryui/1.9.2/jquery-ui-1.9.2.custom", ".min"}, //
     { "scripts/contextmenu/jquery.contextmenu", ""}, //
