@@ -329,7 +329,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   /**
    * This method is used by the searchDao and calls {@link #getList(BaseSearchFilter)} by default.
    * @param filter
-   * @return
+   * @return A list of found entries or empty list. PLEASE NOTE: Returns null only if any error occured.
    * @see #getList(BaseSearchFilter)
    */
   public List<O> getListForSearchDao(final BaseSearchFilter filter)
@@ -341,7 +341,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    * Builds query filter by simply calling constructor of QueryFilter with given search filter and calls getList(QueryFilter). Override this
    * method for building more complex query filters.
    * @param filter
-   * @return
+   * @return A list of found entries or empty list. PLEASE NOTE: Returns null only if any error occured.
    */
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public List<O> getList(final BaseSearchFilter filter)
