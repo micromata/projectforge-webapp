@@ -176,7 +176,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     final Collection<TeamCalDO> ownCalendars = TeamCalCache.getInstance().getAllOwnCalendars();
     if (CollectionUtils.isEmpty(ownCalendars) == true) {
       // No calendars accessible, nothing to search.
-      return null;
+      return new ArrayList<TeamEventDO>();
     }
     teamEventFilter.setTeamCals(TeamCalsProvider.getCalIdList(ownCalendars));
     return getList(teamEventFilter);
@@ -196,7 +196,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
       teamEventFilter = new TeamEventFilter(filter);
     }
     if (CollectionUtils.isEmpty(teamEventFilter.getTeamCals()) == true && teamEventFilter.getTeamCalId() == null) {
-      return null;
+      return new ArrayList<TeamEventDO>();
     }
     final QueryFilter qFilter = buildQueryFilter(teamEventFilter);
     final List<TeamEventDO> list = getList(qFilter);
