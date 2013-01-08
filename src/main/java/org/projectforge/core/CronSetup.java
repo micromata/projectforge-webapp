@@ -78,8 +78,8 @@ public class CronSetup
         mebJobExecutor = null; // MEB is not configured.
       }
       // run every hour at *:00: 0 0 * * * ?
-      createCron("hourlyJob", CronHourlyJob.class, "0 0 * * * ?", cfg.getCronExpressionHourlyJob(), "databaseUpdateDao",
-          databaseUpdateDao);
+      createCron("hourlyJob", CronHourlyJob.class, "0 0 * * * ?", cfg.getCronExpressionHourlyJob(), "databaseUpdateDao", databaseUpdateDao,
+          "hibernateSearchReindexer", hibernateSearchReindexer);
       // run every morning at 2:30 AM (UTC): 0 30 2 * * ?
       createCron("nightlyJob", CronNightlyJob.class, "0 30 2 * * ?", cfg.getCronExpressionNightlyJob(), "hibernateSearchReindexer",
           hibernateSearchReindexer, "mebJobExecutor", mebJobExecutor);
