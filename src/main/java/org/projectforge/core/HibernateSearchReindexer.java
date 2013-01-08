@@ -85,7 +85,7 @@ public class HibernateSearchReindexer
     log.info("Re-index job finished successfully.");
   }
 
-  public String rebuildDatabaseSearchIndices(final ReindexSettings settings)
+  public String rebuildDatabaseSearchIndices(final ReindexSettings settings, final Class< ? >... classes)
   {
     if (currentReindexRun != null) {
       return "Another re-index job is already running. The job was started at: "
@@ -95,16 +95,22 @@ public class HibernateSearchReindexer
       try {
         currentReindexRun = new Date();
         final StringBuffer buf = new StringBuffer();
-        // Re-index: HistoryEntry:
-        reindex(HistoryEntry.class, settings, buf);
-        // Re-index of all ProjectForge entities:
-        for (final RegistryEntry entry : Registry.instance().getOrderedList()) {
-          if (entry.getNestedDOClasses() != null) {
-            for (final Class< ? > nestedDOClass : entry.getNestedDOClasses()) {
-              reindex(nestedDOClass, settings, buf);
-            }
+        if (classes != null && classes.length > 0) {
+          for (final Class< ? > cls : classes) {
+            reindex(cls, settings, buf);
           }
-          reindex(entry.getDOClass(), settings, buf);
+        } else {
+          // Re-index: HistoryEntry:
+          reindex(HistoryEntry.class, settings, buf);
+          // Re-index of all ProjectForge entities:
+          for (final RegistryEntry entry : Registry.instance().getOrderedList()) {
+            if (entry.getNestedDOClasses() != null) {
+              for (final Class< ? > nestedDOClass : entry.getNestedDOClasses()) {
+                reindex(nestedDOClass, settings, buf);
+              }
+            }
+            reindex(entry.getDOClass(), settings, buf);
+          }
         }
         return buf.toString();
       } finally {
