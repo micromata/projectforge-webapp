@@ -61,6 +61,7 @@ public class CronNightlyJob extends AbstractCronJob
     log.info("Nightly job job finished.");
   }
 
+  @Override
   protected void wire(final JobExecutionContext context)
   {
     hibernateSearchReindexer = (HibernateSearchReindexer) wire(context, "hibernateSearchReindexer");
