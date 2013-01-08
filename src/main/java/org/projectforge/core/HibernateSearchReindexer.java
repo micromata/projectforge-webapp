@@ -88,8 +88,9 @@ public class HibernateSearchReindexer
   public String rebuildDatabaseSearchIndices(final ReindexSettings settings, final Class< ? >... classes)
   {
     if (currentReindexRun != null) {
-      return "Another re-index job is already running. The job was started at: "
-          + DateTimeFormatter.instance().getFormattedDateTime(currentReindexRun);
+      final String date = DateTimeFormatter.instance().getFormattedDateTime(currentReindexRun);
+      log.info("Re-indexing of '" + classes + "' cancelled due to another already running re-index job started at " + date + ":");
+      return "Another re-index job is already running. The job was started at: " + date;
     }
     synchronized (this) {
       try {
