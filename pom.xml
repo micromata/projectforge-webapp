@@ -314,7 +314,7 @@
       <!-- see: http://repository.jboss.org/nexus/content/groups/public/org/hibernate/hibernate-search/ -->
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-search</artifactId>
-      <version>3.4.1.Final</version>
+      <version>3.4.2.Final</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
