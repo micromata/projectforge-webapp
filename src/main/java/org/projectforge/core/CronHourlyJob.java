@@ -23,9 +23,14 @@
 
 package org.projectforge.core;
 
+import java.util.Calendar;
+
+import org.projectforge.common.DateHelper;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+
+import de.micromata.hibernate.history.HistoryEntry;
 
 /**
  * Job should be scheduled hourly.
@@ -37,6 +42,8 @@ public class CronHourlyJob extends AbstractCronJob
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(CronHourlyJob.class);
 
   private DatabaseUpdateDao databaseUpdateDao;
+
+  private HibernateSearchReindexer hibernateSearchReindexer;
 
   public void execute(final JobExecutionContext context) throws JobExecutionException
   {
@@ -56,11 +63,22 @@ public class CronHourlyJob extends AbstractCronJob
     } catch (final Throwable ex) {
       log.error("While executing fix job for data base history entries: " + ex.getMessage(), ex);
     }
+    try {
+      log.info("Starting (re-)indexing of history entries of the last 24 hours.");
+      final Calendar cal = Calendar.getInstance(DateHelper.UTC);
+      cal.add(Calendar.DAY_OF_YEAR, -1);
+      final ReindexSettings settings = new ReindexSettings(cal.getTime(), null);
+      hibernateSearchReindexer.rebuildDatabaseSearchIndices(settings, HistoryEntry.class);
+    } catch (final Throwable ex) {
+      log.error("While executing fix job for data base history entries: " + ex.getMessage(), ex);
+    }
     log.info("Hourly job job finished.");
   }
 
+  @Override
   protected void wire(final JobExecutionContext context)
   {
     databaseUpdateDao = (DatabaseUpdateDao) wire(context, "databaseUpdateDao");
+    hibernateSearchReindexer = (HibernateSearchReindexer) wire(context, "hibernateSearchReindexer");
   }
 }
