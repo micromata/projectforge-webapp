@@ -24,10 +24,13 @@
 package org.projectforge.core;
 
 import java.util.Date;
+import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.projectforge.common.DateHelper;
+import org.projectforge.common.StringHelper;
 import org.projectforge.database.DatabaseDao;
 import org.projectforge.mail.Mail;
 import org.projectforge.mail.SendMail;
@@ -88,8 +91,15 @@ public class HibernateSearchReindexer
   public String rebuildDatabaseSearchIndices(final ReindexSettings settings, final Class< ? >... classes)
   {
     if (currentReindexRun != null) {
-      final String date = DateTimeFormatter.instance().getFormattedDateTime(currentReindexRun);
-      log.info("Re-indexing of '" + classes + "' cancelled due to another already running re-index job started at " + date + ":");
+      final StringBuffer buf = new StringBuffer();
+      if (classes != null && classes.length > 0) {
+        boolean first = true;
+        for (final Class< ? > cls : classes) {
+          first = StringHelper.append(buf, first, cls.getName(), ", ");
+        }
+      }
+      final String date = DateTimeFormatter.instance().getFormattedDateTime(currentReindexRun, Locale.ENGLISH, DateHelper.UTC);
+      log.info("Re-indexing of '" + buf.toString() + "' cancelled due to another already running re-index job started at " + date + " (UTC):");
       return "Another re-index job is already running. The job was started at: " + date;
     }
     synchronized (this) {
