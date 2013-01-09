@@ -49,7 +49,7 @@ public class MyStartPostgreSQL
 
   public static void main(final String[] args) throws Exception
   {
-    // Please don't forget to add your Postgresql driver, such as postgresql-8.3-603.jdbc3.jar
+    // Please don't forget to add your Postgresql driver, such as postgresql-9.0-802.jdbc3.jar
     // Open Run/Debug configurations dialog (Eclipse context menu of this class) and add external jar to classpath.
     final StartSettings settings = new StartSettings(DatabaseDialect.PostgreSQL, BASE_DIR);
     settings.setJdbcUser(JDBC_USER);
