@@ -79,3 +79,11 @@ select {
 .input-length-2 {
 	width: 4em;
 }
+
+.input-length-4 {
+	width: 8em;
+}
+
+.input-length-10 {
+	width: 8em;
+}

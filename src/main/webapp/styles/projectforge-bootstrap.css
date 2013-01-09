@@ -16,10 +16,10 @@ form div.span12,div.span9,div.span8,div.span6,div.span4,div.span3 {
 }
 
 /*form div.not-first {
-	border-left: 1px solid #bbb;
+	border-left: 1px solid #eee;
 }*/
 form div.has-siblings {
-	border-right: 1px solid #bbb;
+	border-right: 1px solid #eee;
 }
 
 form div.has-childs {
@@ -28,7 +28,7 @@ form div.has-childs {
 
 form div.row-fluid,div.rounded-box {
 	background-color: #fff;
-	border: 1px solid #bbb;
+	border: 1px solid #eee;
 	border-radius: 3px;
 }
 
