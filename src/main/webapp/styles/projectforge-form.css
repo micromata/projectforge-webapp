@@ -10,6 +10,7 @@ form {
 	padding-top: 5px;
 	padding-bottom: 5px;
 	margin-bottom: 0px;
+	padding-right: 8px;
 }
 
 form input.number {
@@ -56,13 +57,19 @@ form.form-horizontal label.control-label {
 
 form.form-horizontal div.controls {
 	margin-left: 140px;
+	width: -moz-calc(100% -140px);
 	width: -webkit-calc(100% -140px);
+	width: -o-calc(100% -140px);
+	width: calc(100% -140px);
 }
 
 form.form-horizontal div.controls input,form.form-horizontal div.controls textarea
 	{
-	width: 99%;
+	padding-left: 0px;
+	padding-right: 0px;
+	width: 100%;
 	margin-top: 2px;
+	width: 100%;
 }
 
 input[type='checkbox'],input[type='radio'] {
