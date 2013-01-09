@@ -29,9 +29,7 @@ package org.projectforge.web.wicket.flowlayout;
  */
 public enum DivType
 {
-  @Deprecated
-  BLOCK_LINES("block lines"), @Deprecated
-  CHECKBOX("jqui_checkbox"), MARGIN_TOP_10("margin_top_10"), RADIOBOX("radio-jquery-ui");
+  CHECKBOX("jqui_checkbox"), RADIOBOX("radio-jquery-ui");
 
   private String classAttrValue;
 
