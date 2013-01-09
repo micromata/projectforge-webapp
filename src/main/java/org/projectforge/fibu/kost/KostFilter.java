@@ -90,13 +90,8 @@ public class KostFilter extends BaseSearchFilter implements Serializable
     return this.listType;
   }
 
-  public void setListType(String listType)
+  public void setListType(final String listType)
   {
-    if (listType.equals("deleted") == true) {
-      deleted = true;
-    } else {
-      deleted = false;
-    }
     this.listType = listType;
   }
 }
