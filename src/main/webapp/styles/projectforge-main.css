@@ -6,3 +6,7 @@ body {
 	font-variant: normal;
 	font-weight: normal;
 }
+
+div.main {
+	margin-bottom: 30px;
+}
