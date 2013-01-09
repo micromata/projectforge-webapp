@@ -386,7 +386,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     }
 
     List<O> list = null;
-    if (searchFilter.isSearchHistory() == false) {
+    {
       final Criteria criteria = filter.buildCriteria(getSession(), clazz);
       if (searchFilter.isSearchNotEmpty() == true) {
         final String[] searchString = { ""};
@@ -429,16 +429,23 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
           list = result;
         }
       }
-    } else if (searchFilter.isSearchNotEmpty() == true) {
+    }
+    if (searchFilter.isSearchHistory() == true && searchFilter.isSearchNotEmpty() == true) {
       // Search now all history for the given search string.
       final Set<Integer> idSet = getHistoryEntries(getSession(), searchFilter, true);
-      if (CollectionUtils.isEmpty(idSet) == true) {
-        return new ArrayList<O>();
+      if (CollectionUtils.isNotEmpty(idSet) == true) {
+        for (final O entry : list) {
+          if (idSet.contains(entry.getId()) == true) {
+            idSet.remove(entry.getId()); // Object does already exist in list.
+          }
+        }
+        final Criteria criteria = filter.buildCriteria(getSession(), clazz);
+        criteria.add(Restrictions.in("id", idSet));
+        final List<O> historyMatchingEntities = criteria.list();
+        list.addAll(historyMatchingEntities);
       }
-      final Criteria criteria = filter.buildCriteria(getSession(), clazz);
-      criteria.add(Restrictions.in("id", idSet));
-      list = criteria.list();
-    } else {
+    }
+    if (list == null) {
       // History search without search string.
       list = new ArrayList<O>();
     }
