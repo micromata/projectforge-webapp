@@ -29,7 +29,6 @@ import org.apache.wicket.model.PropertyModel;
 import org.projectforge.user.GroupFilter;
 import org.projectforge.user.Login;
 import org.projectforge.web.wicket.AbstractListForm;
-import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -40,39 +39,27 @@ public class GroupListForm extends AbstractListForm<GroupFilter, GroupListPage>
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(GroupListForm.class);
 
-  @Override
-  protected void init()
-  {
-    super.init();
-    {
-      gridBuilder.newSplitPanel(GridSize.COL66);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
-      if (Login.getInstance().hasExternalUsermanagementSystem() == true) {
-        {
-          // DropDownChoice localGroup
-          final LabelValueChoiceRenderer<Boolean> localGroupRenderer = new LabelValueChoiceRenderer<Boolean>();
-          localGroupRenderer.addValue(false, getString("group.localGroup.not"));
-          localGroupRenderer.addValue(true, getString("group.localGroup"));
-          final DropDownChoice<Boolean> localGroupChoice = new DropDownChoice<Boolean>(fs.getDropDownChoiceId(),
-              new PropertyModel<Boolean>(getSearchFilter(), "localGroup"), localGroupRenderer.getValues(), localGroupRenderer);
-          localGroupChoice.setNullValid(true);
-          fs.add(localGroupChoice, true).setTooltip(getString("group.localGroup"));
-        }
-      }
-      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
-          new PropertyModel<Boolean>(getSearchFilter(), "deleted"), getString("onlyDeleted")));
-    }
-    {
-      // DropDownChoice page size
-      gridBuilder.newSplitPanel(GridSize.COL33);
-      addPageSizeFieldset();
-    }
-  }
-
   public GroupListForm(final GroupListPage parentPage)
   {
     super(parentPage);
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListForm#onOptionsPanelCreate(org.projectforge.web.wicket.flowlayout.FieldsetPanel, org.projectforge.web.wicket.flowlayout.DivPanel)
+   */
+  @Override
+  protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
+  {
+    if (Login.getInstance().hasExternalUsermanagementSystem() == true) {
+      // DropDownChoice localGroup
+      final LabelValueChoiceRenderer<Boolean> localGroupRenderer = new LabelValueChoiceRenderer<Boolean>();
+      localGroupRenderer.addValue(false, getString("group.localGroup.not"));
+      localGroupRenderer.addValue(true, getString("group.localGroup"));
+      final DropDownChoice<Boolean> localGroupChoice = new DropDownChoice<Boolean>(optionsFieldsetPanel.getDropDownChoiceId(),
+          new PropertyModel<Boolean>(getSearchFilter(), "localGroup"), localGroupRenderer.getValues(), localGroupRenderer);
+      localGroupChoice.setNullValid(true);
+      optionsFieldsetPanel.add(localGroupChoice, true).setTooltip(getString("group.localGroup"));
+    }
   }
 
   @Override

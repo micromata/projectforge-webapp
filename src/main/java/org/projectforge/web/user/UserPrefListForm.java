@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.wicket.AbstractListForm;
-import org.projectforge.web.wicket.bootstrap.GridSize;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class UserPrefListForm extends AbstractListForm<UserPrefListFilter, UserPrefListPage>
@@ -36,28 +36,21 @@ public class UserPrefListForm extends AbstractListForm<UserPrefListFilter, UserP
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UserPrefListForm.class);
 
-  @Override
-  protected void init()
-  {
-    super.init();
-    {
-      gridBuilder.newSplitPanel(GridSize.COL66);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"));
-      // DropDownChoice area
-      final DropDownChoice<UserPrefArea> areaDropDownChoice = UserPrefEditForm.createAreaDropdownChoice(this, fs.getDropDownChoiceId(),
-          getSearchFilter(), "area", true);
-      fs.add(areaDropDownChoice);
-    }
-    {
-      // DropDownChoice page size
-      gridBuilder.newSplitPanel(GridSize.COL33);
-      addPageSizeFieldset();
-    }
-  }
-
   public UserPrefListForm(final UserPrefListPage parentPage)
   {
     super(parentPage);
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListForm#onOptionsPanelCreate(org.projectforge.web.wicket.flowlayout.FieldsetPanel, org.projectforge.web.wicket.flowlayout.DivPanel)
+   */
+  @Override
+  protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
+  {
+    // DropDownChoice area
+    final DropDownChoice<UserPrefArea> areaDropDownChoice = UserPrefEditForm.createAreaDropdownChoice(this, optionsFieldsetPanel.getDropDownChoiceId(),
+        getSearchFilter(), "area", true);
+    optionsFieldsetPanel.add(areaDropDownChoice);
   }
 
   @Override
@@ -70,5 +63,14 @@ public class UserPrefListForm extends AbstractListForm<UserPrefListFilter, UserP
   protected Logger getLogger()
   {
     return log;
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListForm#showOptionsPanel()
+   */
+  @Override
+  protected boolean showOptionsPanel()
+  {
+    return true;
   }
 }

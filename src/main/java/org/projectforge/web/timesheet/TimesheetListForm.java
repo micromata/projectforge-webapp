@@ -130,85 +130,6 @@ public class TimesheetListForm extends AbstractListForm<TimesheetListFilter, Tim
       taskSelectPanel.setRequired(false);
     }
     {
-      // Duration
-      gridBuilder.newSplitPanel(GridSize.COL33);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.totalDuration")).setNoLabelFor();
-      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
-        @Override
-        public String getObject()
-        {
-          long duration = 0;
-          if (parentPage.getList() != null) {
-            for (final TimesheetDO sheet : parentPage.getList()) {
-              duration += sheet.getDuration();
-            }
-          }
-          return dateTimeFormatter.getPrettyFormattedDuration(duration);
-        }
-      }));
-    }
-    {
-      gridBuilder.newSplitPanel(GridSize.COL66);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timePeriod"), true);
-      startDate = new DatePanel(fs.newChildId(), new PropertyModel<Date>(filter, "startTime"), DatePanelSettings.get()
-          .withSelectPeriodMode(true));
-      fs.add(dependentFormComponents[0] = startDate);
-      fs.setLabelFor(startDate);
-      fs.add(new DivTextPanel(fs.newChildId(), " - "));
-      stopDate = new DatePanel(fs.newChildId(), new PropertyModel<Date>(filter, "stopTime"), DatePanelSettings.get().withSelectPeriodMode(
-          true));
-      fs.add(dependentFormComponents[1] = stopDate);
-      {
-        final SubmitLink unselectPeriod = new SubmitLink(IconLinkPanel.LINK_ID) {
-          @Override
-          public void onSubmit()
-          {
-            getSearchFilter().setStartTime(null);
-            getSearchFilter().setStopTime(null);
-            clearInput();
-            parentPage.refresh();
-          };
-        };
-        unselectPeriod.setDefaultFormProcessing(false);
-        fs.add(new IconLinkPanel(fs.newChildId(), IconType.CIRCLE_CLOSE, getString("calendar.tooltip.unselectPeriod"), unselectPeriod));
-      }
-      final QuickSelectPanel quickSelectPanel = new QuickSelectPanel(fs.newChildId(), parentPage, "quickSelect", startDate);
-      fs.add(quickSelectPanel);
-      quickSelectPanel.init();
-      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
-        @Override
-        public String getObject()
-        {
-          return WicketUtils.getCalendarWeeks(TimesheetListForm.this, filter.getStartTime(), filter.getStopTime());
-        }
-      }));
-      fs.add(new HtmlCommentPanel(fs.newChildId(), new Model<String>() {
-        @Override
-        public String getObject()
-        {
-          return WicketUtils.getUTCDates(filter.getStartTime(), filter.getStopTime());
-        }
-      }));
-    }
-    {
-      // DropDownChoice page size
-      gridBuilder.newSplitPanel(GridSize.COL33);
-      addPageSizeFieldset();
-    }
-    {
-      gridBuilder.newSplitPanel(GridSize.COL66);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
-      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
-          "longFormat"), getString("longFormat")));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
-          "recursive"), getString("task.recursive")));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
-          new PropertyModel<Boolean>(getSearchFilter(), "deleted"), getString("onlyDeleted")));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "marked"),
-          getString("timesheet.filter.withTimeperiodCollision")));
-    }
-    {
       // Assignee
       gridBuilder.newSplitPanel(GridSize.COL33);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("user"));
@@ -233,6 +154,82 @@ public class TimesheetListForm extends AbstractListForm<TimesheetListFilter, Tim
       assigneeSelectPanel.setDefaultFormProcessing(false);
       assigneeSelectPanel.init().withAutoSubmit(true);
     }
+    {
+      gridBuilder.newSplitPanel(GridSize.COL66);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timePeriod"), true);
+      startDate = new DatePanel(fs.newChildId(), new PropertyModel<Date>(filter, "startTime"), DatePanelSettings.get()
+          .withSelectPeriodMode(true));
+      fs.add(dependentFormComponents[0] = startDate);
+      fs.setLabelFor(startDate);
+      fs.add(new DivTextPanel(fs.newChildId(), " - "));
+      stopDate = new DatePanel(fs.newChildId(), new PropertyModel<Date>(filter, "stopTime"), DatePanelSettings.get().withSelectPeriodMode(
+          true));
+      fs.add(dependentFormComponents[1] = stopDate);
+      {
+        final SubmitLink unselectPeriod = new SubmitLink(IconLinkPanel.LINK_ID) {
+          @Override
+          public void onSubmit()
+          {
+            getSearchFilter().setStartTime(null);
+            getSearchFilter().setStopTime(null);
+            clearInput();
+            parentPage.refresh();
+          };
+        };
+        unselectPeriod.setDefaultFormProcessing(false);
+        fs.add(new IconLinkPanel(fs.newChildId(), IconType.REMOVE, getString("calendar.tooltip.unselectPeriod"), unselectPeriod));
+      }
+      final QuickSelectPanel quickSelectPanel = new QuickSelectPanel(fs.newChildId(), parentPage, "quickSelect", startDate);
+      fs.add(quickSelectPanel);
+      quickSelectPanel.init();
+      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return WicketUtils.getCalendarWeeks(TimesheetListForm.this, filter.getStartTime(), filter.getStopTime());
+        }
+      }));
+      fs.add(new HtmlCommentPanel(fs.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return WicketUtils.getUTCDates(filter.getStartTime(), filter.getStopTime());
+        }
+      }));
+    }
+    {
+      // Duration
+      gridBuilder.newSplitPanel(GridSize.COL33);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.totalDuration")).setNoLabelFor();
+      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          long duration = 0;
+          if (parentPage.getList() != null) {
+            for (final TimesheetDO sheet : parentPage.getList()) {
+              duration += sheet.getDuration();
+            }
+          }
+          return dateTimeFormatter.getPrettyFormattedDuration(duration);
+        }
+      }));
+    }
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListForm#onOptionsPanelCreate(org.projectforge.web.wicket.flowlayout.FieldsetPanel,
+   *      org.projectforge.web.wicket.flowlayout.DivPanel)
+   */
+  @Override
+  protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
+  {
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+        "longFormat"), getString("longFormat")));
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+        "recursive"), getString("task.recursive")));
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "marked"),
+        getString("timesheet.filter.withTimeperiodCollision")));
   }
 
   /**
