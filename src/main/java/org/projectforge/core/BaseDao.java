@@ -393,7 +393,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
         final String[] searchFields = searchFilter.getSearchFields() != null ? searchFilter.getSearchFields() : getSearchFields();
         try {
           final FullTextSession fullTextSession = Search.getFullTextSession(getSession());
-          final org.apache.lucene.search.Query query = createFullTextQuery(criteria, searchFields, filter, searchFilter, searchString);
+          final org.apache.lucene.search.Query query = createFullTextQuery(searchFields, filter, searchFilter, searchString);
           if (query == null) {
             // An error occured:
             return new ArrayList<O>();
@@ -452,7 +452,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     return list;
   }
 
-  private org.apache.lucene.search.Query createFullTextQuery(final Criteria criteria, final String[] searchFields,
+  private org.apache.lucene.search.Query createFullTextQuery(final String[] searchFields,
       final QueryFilter queryFilter, final BaseSearchFilter searchFilter, final String[] searchString)
   {
     final MultiFieldQueryParser parser = new MultiFieldQueryParser(LUCENE_VERSION, searchFields, new ClassicAnalyzer(Version.LUCENE_31));
@@ -1660,21 +1660,20 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       final String[] searchString = { ""};
       try {
         final FullTextSession fullTextSession = Search.getFullTextSession(getSession());
-        final org.apache.lucene.search.Query query = createFullTextQuery(crit, HISTORY_SEARCH_FIELDS, null, filter, searchString);
+        final org.apache.lucene.search.Query query = createFullTextQuery(HISTORY_SEARCH_FIELDS, null, filter, searchString);
         if (query == null) {
           // An error occured:
           return;
         }
         final FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery(query, HistoryEntry.class);
-        fullTextQuery.setCriteriaQuery(crit);
         fullTextQuery.setCacheable(true);
         // crit.setCacheRegion("historyItemCache");
-        fullTextQuery.setProjection("entityId");
-        final List<Object[]> result = fullTextQuery.list();
+        //fullTextQuery.setProjection("entityId"); Doesn't work, because critera is ignored.
+        fullTextQuery.setCriteriaQuery(crit);
+        final List<HistoryEntry> result = fullTextQuery.list();
         if (result != null && result.size() > 0) {
-          for (final Object[] oa : result) {
-            final Integer entityId = (Integer) oa[0];
-            idSet.add(entityId);
+          for (final HistoryEntry entry : result) {
+            idSet.add(entry.getEntityId());
           }
         }
       } catch (final Exception ex) {
