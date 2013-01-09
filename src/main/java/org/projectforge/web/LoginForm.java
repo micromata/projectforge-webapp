@@ -72,7 +72,7 @@ public class LoginForm extends AbstractForm<LoginForm, LoginPage>
       fs.add(password);
     }
     {
-      final FieldsetPanel fs = new FieldsetPanel("stayLoggedIn", getString("login.stayLoggedIn"));
+      final FieldsetPanel fs = new FieldsetPanel("stayLoggedIn", getString("login.stayLoggedIn")).setNoLabelFor();
       add(fs);
       final DivPanel radioBoxDiv = fs.addNewRadioBoxDiv();
       final RadioGroupPanel<Boolean> radioGroup = new RadioGroupPanel<Boolean>(DivPanel.CHILD_ID, "stayLoggedIn", new PropertyModel<Boolean>(
