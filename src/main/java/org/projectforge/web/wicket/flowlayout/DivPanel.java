@@ -61,7 +61,6 @@ public class DivPanel extends Panel
   /**
    * @param id
    */
-  @Deprecated
   public DivPanel(final String id, final DivType... cssClasses)
   {
     this(id);
