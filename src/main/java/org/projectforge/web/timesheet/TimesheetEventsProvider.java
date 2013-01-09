@@ -23,6 +23,7 @@
 
 package org.projectforge.web.timesheet;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -197,6 +198,9 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
     if (calFilter.isShowStatistics() == true) {
       // Show statistics: duration of every day is shown as all day event.
       DateTime day = start;
+      final Calendar cal = DateHelper.getCalendar();
+      cal.setTime(start.toDate());
+      final int numberOfDaysInYear = cal.getActualMaximum(Calendar.DAY_OF_YEAR);
       int paranoiaCounter = 0;
       do {
         if (++paranoiaCounter > 1000) {
@@ -219,7 +223,11 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
           // Show week of year at top of first day of week.
           long weekDuration = 0;
           for (short i = 0; i < 7; i++) {
-            weekDuration += durationsPerDayOfYear[dayOfYear + i];
+            int d = dayOfYear + i;
+            if (d > numberOfDaysInYear) {
+              d -= numberOfDaysInYear;
+            }
+            weekDuration += durationsPerDayOfYear[d];
           }
           final StringBuffer buf = new StringBuffer();
           buf.append(getString("calendar.weekOfYearShortLabel")).append(DateHelper.getWeekOfYear(day));
