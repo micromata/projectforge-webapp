@@ -73,7 +73,10 @@ public class AutoSessionFactoryBean extends AnnotationSessionFactoryBean
     mapping.entity(HistoryEntry.class).indexed() //
     .property("id", ElementType.METHOD).documentId().name("id")//
     // Needed in BaseDao for FullTextQuery.setProjection("entityId"):
-    .property("entityId", ElementType.METHOD).field().store(Store.YES) //
+    //.property("entityId", ElementType.METHOD).field().store(Store.YES) //
+    // .property("className", ElementType.METHOD).field().store(Store.YES) //
+    // .property("timestamp", ElementType.METHOD).field().store(Store.YES).dateBridge(Resolution.MINUTE) //
+    // .property("userName", ElementType.METHOD).field().store(Store.YES) //
     .property("delta", ElementType.METHOD).indexEmbedded() //
     // PropertyDelta:
     .entity(PropertyDelta.class) //
