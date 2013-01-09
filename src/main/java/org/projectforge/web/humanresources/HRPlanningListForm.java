@@ -99,7 +99,7 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
           .withSelectPeriodMode(true).withRequired(true));
       fs.add(stopDate);
       {
-        fs.add(new IconLinkPanel(fs.newChildId(), IconType.CIRCLE_CLOSE, getString("calendar.tooltip.unselectPeriod"), new SubmitLink(
+        fs.add(new IconLinkPanel(fs.newChildId(), IconType.REMOVE, getString("calendar.tooltip.unselectPeriod"), new SubmitLink(
             IconLinkPanel.LINK_ID) {
           @Override
           public void onSubmit()
@@ -130,9 +130,23 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
       }));
     }
     {
-      // DropDownChoice page size
+      // Total hours
       gridBuilder.newSplitPanel(GridSize.COL33);
-      addPageSizeFieldset();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.totalDuration"), true).setNoLabelFor();
+      fs.add(new TextPanel(fs.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          BigDecimal duration = new BigDecimal(0);
+          if (parentPage.getList() != null) {
+            for (final HRPlanningEntryDO sheet : parentPage.getList()) {
+              final BigDecimal temp = sheet.getTotalHours();
+              duration = duration.add(temp);
+            }
+          }
+          return duration.toString();
+        }
+      }));
     }
     boolean showProjectSelectPanel = false;
     final boolean hasFullAccess = parentPage.hasFullAccess();
@@ -182,43 +196,25 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
       userSelectPanel.setDefaultFormProcessing(false);
       userSelectPanel.init().withAutoSubmit(true);
     }
-    {
-      gridBuilder.newSplitPanel(GridSize.COL66);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
-      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
-          "groupEntries"), getString("hr.planning.filter.groupEntries")));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
-          "onlyMyProjects"), getString("hr.planning.filter.onlyMyProjects")));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
-          "longFormat"), getString("longFormat")));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
-          new PropertyModel<Boolean>(getSearchFilter(), "deleted"), getString("onlyDeleted")));
-    }
-    {
-      // Total hours
-      gridBuilder.newSplitPanel(GridSize.COL33);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.totalDuration"), true).setNoLabelFor();
-      fs.add(new TextPanel(fs.newChildId(), new Model<String>() {
-        @Override
-        public String getObject()
-        {
-          BigDecimal duration = new BigDecimal(0);
-          if (parentPage.getList() != null) {
-            for (final HRPlanningEntryDO sheet : parentPage.getList()) {
-              final BigDecimal temp = sheet.getTotalHours();
-              duration = duration.add(temp);
-            }
-          }
-          return duration.toString();
-        }
-      }));
-    }
   }
 
   public HRPlanningListForm(final HRPlanningListPage parentPage)
   {
     super(parentPage);
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListForm#onOptionsPanelCreate(org.projectforge.web.wicket.flowlayout.FieldsetPanel, org.projectforge.web.wicket.flowlayout.DivPanel)
+   */
+  @Override
+  protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
+  {
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+        "groupEntries"), getString("hr.planning.filter.groupEntries")));
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+        "onlyMyProjects"), getString("hr.planning.filter.onlyMyProjects")));
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+        "longFormat"), getString("longFormat")));
   }
 
   @Override

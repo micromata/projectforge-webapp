@@ -28,8 +28,9 @@ import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.orga.ContractDao;
 import org.projectforge.web.wicket.AbstractListForm;
-import org.projectforge.web.wicket.bootstrap.GridSize;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.YearListCoiceRenderer;
+import org.projectforge.web.wicket.flowlayout.ComponentSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
@@ -39,40 +40,32 @@ public class ContractListForm extends AbstractListForm<ContractListFilter, Contr
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ContractListForm.class);
 
-  @SuppressWarnings("serial")
-  @Override
-  protected void init()
-  {
-    super.init();
-    final ContractDao contractDao = getParentPage().getBaseDao();
-    {
-      gridBuilder.newSplitPanel(GridSize.COL66);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true);
-      // DropDownChoice years
-      final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(contractDao.getYears(), true);
-      final DropDownChoice<Integer> yearChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(this,
-          "year"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer) {
-        @Override
-        protected boolean wantOnSelectionChangedNotifications()
-        {
-          return true;
-        }
-      };
-      yearChoice.setNullValid(false);
-      fs.add(yearChoice);
-      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-      checkBoxPanel.add(createOnlyDeletedCheckBoxPanel(checkBoxPanel.newChildId()));
-    }
-    {
-      // DropDownChoice page size
-      gridBuilder.newSplitPanel(GridSize.COL33);
-      addPageSizeFieldset();
-    }
-  }
-
   public ContractListForm(final ContractListPage parentPage)
   {
     super(parentPage);
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListForm#onOptionsPanelCreate(org.projectforge.web.wicket.flowlayout.FieldsetPanel, org.projectforge.web.wicket.flowlayout.DivPanel)
+   */
+  @SuppressWarnings("serial")
+  @Override
+  protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
+  {
+    // DropDownChoice years
+    final ContractDao contractDao = getParentPage().getBaseDao();
+    final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(contractDao.getYears(), true);
+    final DropDownChoice<Integer> yearChoice = new DropDownChoice<Integer>(optionsFieldsetPanel.getDropDownChoiceId(), new PropertyModel<Integer>(this,
+        "year"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer) {
+      @Override
+      protected boolean wantOnSelectionChangedNotifications()
+      {
+        return true;
+      }
+    };
+    yearChoice.setNullValid(false);
+    WicketUtils.setSize(yearChoice, ComponentSize.LENGTH_10);
+    optionsFieldsetPanel.add(yearChoice);
   }
 
   public Integer getYear()

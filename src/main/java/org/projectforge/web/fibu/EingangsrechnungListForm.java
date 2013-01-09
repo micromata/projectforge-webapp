@@ -36,9 +36,9 @@ public class EingangsrechnungListForm extends AbstractRechnungListForm<Eingangsr
   @Override
   protected void init()
   {
-    super.init();
     final EingangsrechnungDao eingangsrechnungDao = getParentPage().getBaseDao();
-    init(eingangsrechnungDao.getYears());
+    this.years = eingangsrechnungDao.getYears();
+    super.init();
   }
 
   @Override

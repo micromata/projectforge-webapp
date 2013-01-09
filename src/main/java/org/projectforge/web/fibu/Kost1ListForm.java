@@ -27,8 +27,8 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.AbstractListForm;
-import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class Kost1ListForm extends AbstractListForm<Kost1ListFilter, Kost1ListPage>
@@ -37,31 +37,23 @@ public class Kost1ListForm extends AbstractListForm<Kost1ListFilter, Kost1ListPa
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(Kost1ListForm.class);
 
+  /**
+   * @see org.projectforge.web.wicket.AbstractListForm#onOptionsPanelCreate(org.projectforge.web.wicket.flowlayout.FieldsetPanel, org.projectforge.web.wicket.flowlayout.DivPanel)
+   */
   @Override
-  protected void init()
+  protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
   {
-    super.init();
-    {
-      gridBuilder.newSplitPanel(GridSize.COL66);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true);
-      // DropDownChoice listType
-      final LabelValueChoiceRenderer<String> typeChoiceRenderer = new LabelValueChoiceRenderer<String>();
-      typeChoiceRenderer.addValue("all", getString("filter.all"));
-      typeChoiceRenderer.addValue("active", getString("fibu.kost.status.active"));
-      typeChoiceRenderer.addValue("nonactive", getString("fibu.kost.status.nonactive"));
-      typeChoiceRenderer.addValue("notEnded", getString("notEnded"));
-      typeChoiceRenderer.addValue("ended", getString("ended"));
-      typeChoiceRenderer.addValue("deleted", getString("deleted"));
-      final DropDownChoice<String> typeChoice = new DropDownChoice<String>(fs.getDropDownChoiceId(), new PropertyModel<String>(this,
-          "searchFilter.listType"), typeChoiceRenderer.getValues(), typeChoiceRenderer);
-      typeChoice.setNullValid(false);
-      fs.add(typeChoice, true);
-    }
-    {
-      // DropDownChoice page size
-      gridBuilder.newSplitPanel(GridSize.COL33);
-      addPageSizeFieldset();
-    }
+    // DropDownChoice listType
+    final LabelValueChoiceRenderer<String> typeChoiceRenderer = new LabelValueChoiceRenderer<String>();
+    typeChoiceRenderer.addValue("all", getString("filter.all"));
+    typeChoiceRenderer.addValue("active", getString("fibu.kost.status.active"));
+    typeChoiceRenderer.addValue("nonactive", getString("fibu.kost.status.nonactive"));
+    typeChoiceRenderer.addValue("notEnded", getString("notEnded"));
+    typeChoiceRenderer.addValue("ended", getString("ended"));
+    final DropDownChoice<String> typeChoice = new DropDownChoice<String>(optionsFieldsetPanel.getDropDownChoiceId(), new PropertyModel<String>(this,
+        "searchFilter.listType"), typeChoiceRenderer.getValues(), typeChoiceRenderer);
+    typeChoice.setNullValid(false);
+    optionsFieldsetPanel.add(typeChoice, true);
   }
 
   public Kost1ListForm(final Kost1ListPage parentPage)

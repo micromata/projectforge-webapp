@@ -26,9 +26,6 @@ package org.projectforge.web.fibu;
 import org.apache.log4j.Logger;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.web.wicket.AbstractListForm;
-import org.projectforge.web.wicket.bootstrap.GridSize;
-import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 
 public class KontoListForm extends AbstractListForm<BaseSearchFilter, KontoListPage>
@@ -36,23 +33,6 @@ public class KontoListForm extends AbstractListForm<BaseSearchFilter, KontoListP
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(KontoListForm.class);
 
   private static final long serialVersionUID = -5969136444233092172L;
-
-  @Override
-  protected void init()
-  {
-    super.init();
-    {
-      gridBuilder.newSplitPanel(GridSize.COL66);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"));
-      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-      checkBoxPanel.add(createOnlyDeletedCheckBoxPanel(checkBoxPanel.newChildId()));
-    }
-    {
-      // DropDownChoice page size
-      gridBuilder.newSplitPanel(GridSize.COL33);
-      addPageSizeFieldset();
-    }
-  }
 
   public KontoListForm(final KontoListPage parentPage)
   {

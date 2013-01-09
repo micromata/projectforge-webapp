@@ -336,7 +336,7 @@ public class DatevImportStoragePanel extends Panel
       firstCell.add(checkBox);
       final IconType iconType;
       if (element.isNew() == true) {
-        iconType = IconType.CIRCLE_PLUS;
+        iconType = IconType.PLUS_SIGN;
       } else if (element.isModified() == true) {
         iconType = IconType.MODIFIED;
       } else {

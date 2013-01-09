@@ -26,8 +26,8 @@ package org.projectforge.web.fibu;
 import org.apache.log4j.Logger;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.AbstractListForm;
-import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class ProjektListForm extends AbstractListForm<ProjektListFilter, ProjektListPage>
@@ -36,32 +36,24 @@ public class ProjektListForm extends AbstractListForm<ProjektListFilter, Projekt
 
   private static final long serialVersionUID = -5969136444233092172L;
 
-  @Override
-  protected void init()
-  {
-    super.init();
-    {
-      gridBuilder.newSplitPanel(GridSize.COL66);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"));
-      // DropDownChoice listType
-      final LabelValueChoiceRenderer<String> typeChoiceRenderer = new LabelValueChoiceRenderer<String>();
-      typeChoiceRenderer.addValue("all", getString("filter.all"));
-      typeChoiceRenderer.addValue("notEnded", getString("notEnded"));
-      typeChoiceRenderer.addValue("ended", getString("ended"));
-      typeChoiceRenderer.addValue("deleted", getString("deleted"));
-      fs.addDropDownChoice(new PropertyModel<String>(this, "searchFilter.listType"), typeChoiceRenderer.getValues(), typeChoiceRenderer,
-          true).setNullValid(false);
-    }
-    {
-      // DropDownChoice page size
-      gridBuilder.newSplitPanel(GridSize.COL33);
-      addPageSizeFieldset();
-    }
-  }
-
   public ProjektListForm(final ProjektListPage parentPage)
   {
     super(parentPage);
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListForm#onOptionsPanelCreate(org.projectforge.web.wicket.flowlayout.FieldsetPanel, org.projectforge.web.wicket.flowlayout.DivPanel)
+   */
+  @Override
+  protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
+  {
+    // DropDownChoice listType
+    final LabelValueChoiceRenderer<String> typeChoiceRenderer = new LabelValueChoiceRenderer<String>();
+    typeChoiceRenderer.addValue("all", getString("filter.all"));
+    typeChoiceRenderer.addValue("notEnded", getString("notEnded"));
+    typeChoiceRenderer.addValue("ended", getString("ended"));
+    optionsFieldsetPanel.addDropDownChoice(new PropertyModel<String>(this, "searchFilter.listType"), typeChoiceRenderer.getValues(), typeChoiceRenderer,
+        true).setNullValid(false);
   }
 
   @Override

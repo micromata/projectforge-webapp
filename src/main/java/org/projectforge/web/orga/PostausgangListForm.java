@@ -29,10 +29,12 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.StringHelper;
 import org.projectforge.orga.PostausgangDao;
 import org.projectforge.web.wicket.AbstractListForm;
-import org.projectforge.web.wicket.bootstrap.GridSize;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.YearListCoiceRenderer;
+import org.projectforge.web.wicket.flowlayout.ComponentSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class PostausgangListForm extends AbstractListForm<PostausgangListFilter, PostausgangListPage>
@@ -44,40 +46,34 @@ public class PostausgangListForm extends AbstractListForm<PostausgangListFilter,
   @SpringBean(name = "postausgangDao")
   private PostausgangDao postausgangDao;
 
-  @Override
-  protected void init()
-  {
-    super.init();
-    {
-      gridBuilder.newSplitPanel(GridSize.COL66);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true);
-      // DropDownChoice years
-      final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(postausgangDao.getYears(), true);
-      fs.addDropDownChoice(new PropertyModel<Integer>(this, "year"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer, true)
-      .setNullValid(false);
-
-      // DropDownChoice months
-      final LabelValueChoiceRenderer<Integer> monthChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
-      monthChoiceRenderer.addValue(-1, StringHelper.format2DigitNumber(1) + "-" + 12);
-      for (int i = 0; i <= 11; i++) {
-        monthChoiceRenderer.addValue(i, StringHelper.format2DigitNumber(i + 1));
-      }
-      fs.addDropDownChoice(new PropertyModel<Integer>(this, "month"), monthChoiceRenderer.getValues(), monthChoiceRenderer, true)
-      .setNullValid(true).setRequired(false);
-
-      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-      checkBoxPanel.add(createOnlyDeletedCheckBoxPanel(checkBoxPanel.newChildId()));
-    }
-    {
-      // DropDownChoice page size
-      gridBuilder.newSplitPanel(GridSize.COL33);
-      addPageSizeFieldset();
-    }
-  }
-
   public PostausgangListForm(final PostausgangListPage parentPage)
   {
     super(parentPage);
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListForm#onOptionsPanelCreate(org.projectforge.web.wicket.flowlayout.FieldsetPanel,
+   *      org.projectforge.web.wicket.flowlayout.DivPanel)
+   */
+  @Override
+  protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
+  {
+    // DropDownChoice years
+    final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(postausgangDao.getYears(), true);
+    final DropDownChoicePanel<Integer> yearChoice = optionsFieldsetPanel.addDropDownChoice(new PropertyModel<Integer>(this, "year"),
+        yearListChoiceRenderer.getYears(), yearListChoiceRenderer, true).setNullValid(false);
+    WicketUtils.setSize(yearChoice.getDropDownChoice(), ComponentSize.LENGTH_4);
+
+    // DropDownChoice months
+    final LabelValueChoiceRenderer<Integer> monthChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
+    monthChoiceRenderer.addValue(-1, StringHelper.format2DigitNumber(1) + "-" + 12);
+    for (int i = 0; i <= 11; i++) {
+      monthChoiceRenderer.addValue(i, StringHelper.format2DigitNumber(i + 1));
+    }
+    final DropDownChoicePanel<Integer> monthChoice = optionsFieldsetPanel
+        .addDropDownChoice(new PropertyModel<Integer>(this, "month"), monthChoiceRenderer.getValues(), monthChoiceRenderer, true)
+        .setNullValid(true).setRequired(false);
+    WicketUtils.setSize(monthChoice.getDropDownChoice(), ComponentSize.LENGTH_2);
   }
 
   public Integer getYear()

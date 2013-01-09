@@ -30,10 +30,12 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.fibu.EmployeeSalaryDao;
 import org.projectforge.fibu.EmployeeSalaryFilter;
 import org.projectforge.web.wicket.AbstractListForm;
-import org.projectforge.web.wicket.bootstrap.GridSize;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.YearListCoiceRenderer;
+import org.projectforge.web.wicket.flowlayout.ComponentSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class EmployeeSalaryListForm extends AbstractListForm<EmployeeSalaryFilter, EmployeeSalaryListPage>
@@ -45,31 +47,25 @@ public class EmployeeSalaryListForm extends AbstractListForm<EmployeeSalaryFilte
   @SpringBean(name = "employeeSalaryDao")
   private EmployeeSalaryDao employeeSalaryDao;
 
+  /**
+   * @see org.projectforge.web.wicket.AbstractListForm#onOptionsPanelCreate(org.projectforge.web.wicket.flowlayout.FieldsetPanel,
+   *      org.projectforge.web.wicket.flowlayout.DivPanel)
+   */
   @Override
-  protected void init()
+  protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
   {
-    super.init();
-    {
-      gridBuilder.newSplitPanel(GridSize.COL66);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true);
-      // DropDownChoice years
-      final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(employeeSalaryDao.getYears(), true);
-      fs.addDropDownChoice(new PropertyModel<Integer>(this, "year"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer, true)
-      .setNullValid(false);
-      // DropDownChoice months
-      final LabelValueChoiceRenderer<Integer> monthChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
-      for (int i = 0; i <= 11; i++) {
-        monthChoiceRenderer.addValue(i, StringHelper.format2DigitNumber(i + 1));
-      }
-      fs.addDropDownChoice(new PropertyModel<Integer>(this, "month"), monthChoiceRenderer.getValues(), monthChoiceRenderer, true).setNullValid(true);
-      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-      checkBoxPanel.add(createOnlyDeletedCheckBoxPanel(checkBoxPanel.newChildId()));
+    final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(employeeSalaryDao.getYears(), true);
+    final DropDownChoicePanel<Integer> yearChoice = optionsFieldsetPanel.addDropDownChoice(new PropertyModel<Integer>(this, "year"),
+        yearListChoiceRenderer.getYears(), yearListChoiceRenderer, true).setNullValid(false);
+    WicketUtils.setSize(yearChoice.getDropDownChoice(), ComponentSize.LENGTH_4);
+    // DropDownChoice months
+    final LabelValueChoiceRenderer<Integer> monthChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
+    for (int i = 0; i <= 11; i++) {
+      monthChoiceRenderer.addValue(i, StringHelper.format2DigitNumber(i + 1));
     }
-    {
-      // DropDownChoice page size
-      gridBuilder.newSplitPanel(GridSize.COL33);
-      addPageSizeFieldset();
-    }
+    final DropDownChoicePanel<Integer> monthChoice = optionsFieldsetPanel.addDropDownChoice(new PropertyModel<Integer>(this, "month"),
+        monthChoiceRenderer.getValues(), monthChoiceRenderer, true).setNullValid(true);
+    WicketUtils.setSize(monthChoice.getDropDownChoice(), ComponentSize.LENGTH_2);
   }
 
   public EmployeeSalaryListForm(final EmployeeSalaryListPage parentPage)

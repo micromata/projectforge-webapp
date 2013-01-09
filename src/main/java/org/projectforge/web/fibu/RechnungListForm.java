@@ -36,9 +36,9 @@ public class RechnungListForm extends AbstractRechnungListForm<RechnungListFilte
   @Override
   protected void init()
   {
-    super.init();
     final RechnungDao rechnungDao = getParentPage().getBaseDao();
-    init(rechnungDao.getYears());
+    this.years = rechnungDao.getYears();
+    super.init();
   }
 
   @Override
