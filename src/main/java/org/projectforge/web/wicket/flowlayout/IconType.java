@@ -29,12 +29,31 @@ package org.projectforge.web.wicket.flowlayout;
  */
 public enum IconType
 {
-  ALERT("question-sign"), REFRESH("refresh"), CIRCLE_MINUS("question-sign"), CIRCLE_ARROW_EAST("question-sign"), CIRCLE_ARROW_WEST(
-      "question-sign"), CIRCLE_CLOSE("question-sign"), CIRCLE_PLUS("question-sign"), CLIPBOARD("question-sign"), CLOCK("question-sign"), DOCUMENT(
-          "question-sign"), DOWNLOAD("download"), EDIT("pencil"), FOLDER_OPEN("folder-open"), HELP("info-sign"), JIRA_SUPPORT("star"), KEYBOARD(
-              "question-sign"), MINUS_THICK("question-sign"), MODIFIED("question-sign"), PLUS("plus"), SEARCH("search"), //
-              /** RSS feed symbol. */
-              SUBSCRIPTION("globe"), TRASH("trash"), CALENDAR("calendar"), WRENCH("wrench");
+  ALERT("question-sign"), //
+  REFRESH("refresh"), //
+  CIRCLE_ARROW_EAST("question-sign"), //
+  CIRCLE_ARROW_WEST("question-sign"), //
+  CLIPBOARD("question-sign"), //
+  CLOCK("question-sign"), //
+  DOCUMENT("question-sign"), //
+  DOWNLOAD("download"), //
+  EDIT("pencil"), //
+  FOLDER_OPEN("folder-open"), //
+  HELP("info-sign"), //
+  JIRA_SUPPORT("star"), //
+  KEYBOARD("question-sign"), //
+  MINUS_SIGN("minus-sign"), //
+  MINUS_THICK("question-sign"), //
+  MODIFIED("question-sign"), //
+  PLUS("plus"), //
+  PLUS_SIGN("plus-sign"), //
+  REMOVE("remove"), //
+  SEARCH("search"), // //
+  /** RSS feed symbol. */
+  SUBSCRIPTION("globe"), //
+  TRASH("trash"), //
+  CALENDAR("calendar"), //
+  WRENCH("wrench");
 
   private String cssIdentifier;
 
