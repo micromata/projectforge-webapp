@@ -33,6 +33,7 @@ import org.projectforge.web.address.AddressListForm;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
@@ -140,6 +141,16 @@ public class AddressCampaignValueListForm extends AbstractListForm<AddressCampai
       fs.add(addressCampaignValueDropDownChoice);
     }
     AddressListForm.addFilter(parentPage, this, gridBuilder, getSearchFilter());
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListForm#onOptionsPanelCreate(org.projectforge.web.wicket.flowlayout.FieldsetPanel,
+   *      org.projectforge.web.wicket.flowlayout.DivPanel)
+   */
+  @Override
+  protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
+  {
+    AddressListForm.onOptionsPanelCreate(parentPage, optionsFieldsetPanel, searchFilter);
   }
 
   protected void refresh()

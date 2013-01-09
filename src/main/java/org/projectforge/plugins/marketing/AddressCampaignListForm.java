@@ -24,12 +24,8 @@
 package org.projectforge.plugins.marketing;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.model.PropertyModel;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.web.wicket.AbstractListForm;
-import org.projectforge.web.wicket.bootstrap.GridSize;
-import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
  * The list formular for the list view (this example has no filter settings). See ToDoListPage for seeing how to use filter settings.
@@ -45,24 +41,6 @@ public class AddressCampaignListForm extends AbstractListForm<BaseSearchFilter, 
   public AddressCampaignListForm(final AddressCampaignListPage parentPage)
   {
     super(parentPage);
-  }
-
-  @Override
-  protected void init()
-  {
-    super.init();
-    gridBuilder.newSplitPanel(GridSize.COL66);
-    {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
-      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
-          new PropertyModel<Boolean>(getSearchFilter(), "deleted"), getString("onlyDeleted")));
-    }
-    {
-      // DropDownChoice page size
-      gridBuilder.newSplitPanel(GridSize.COL33);
-      addPageSizeFieldset();
-    }
   }
 
   @Override

@@ -26,9 +26,6 @@ package org.projectforge.plugins.licensemanagement;
 import org.apache.log4j.Logger;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.web.wicket.AbstractListForm;
-import org.projectforge.web.wicket.bootstrap.GridSize;
-import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
  * The list formular for the list view (this example has no filter settings). See ToDoListPage for seeing how to use filter settings.
@@ -44,23 +41,6 @@ public class LicenseListForm extends AbstractListForm<BaseSearchFilter, LicenseL
   public LicenseListForm(final LicenseListPage parentPage)
   {
     super(parentPage);
-  }
-
-  @Override
-  protected void init()
-  {
-    super.init();
-    gridBuilder.newSplitPanel(GridSize.COL66);
-    {
-      final FieldsetPanel fs = gridBuilder.newFieldset(parentPage.getString("label.options")).setNoLabelFor();
-      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-      checkBoxPanel.add(createOnlyDeletedCheckBoxPanel(checkBoxPanel.newChildId()));
-    }
-    {
-      // DropDownChoice page size
-      gridBuilder.newSplitPanel(GridSize.COL33);
-      addPageSizeFieldset();
-    }
   }
 
   @Override

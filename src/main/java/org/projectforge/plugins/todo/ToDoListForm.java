@@ -51,29 +51,6 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
   protected void init()
   {
     super.init();
-    {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task")).setNoLabelFor();
-      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new Model<TaskDO>() {
-        @Override
-        public TaskDO getObject()
-        {
-          return taskTree.getTaskById(getSearchFilter().getTaskId());
-        }
-      }, parentPage, "taskId") {
-        @Override
-        protected void selectTask(final TaskDO task)
-        {
-          super.selectTask(task);
-          if (task != null) {
-            getSearchFilter().setTaskId(task.getId());
-          }
-          parentPage.refresh();
-        }
-      };
-      fs.add(taskSelectPanel);
-      taskSelectPanel.init();
-      taskSelectPanel.setRequired(false);
-    }
     gridBuilder.newSplitPanel(GridSize.COL66);
     {
       // Assignee
@@ -98,23 +75,6 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
       fs.add(assigneeSelectPanel);
       assigneeSelectPanel.setDefaultFormProcessing(false);
       assigneeSelectPanel.init().withAutoSubmit(true);
-    }
-    {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
-      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "opened"),
-          getString(ToDoStatus.OPENED.getI18nKey())));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
-          new PropertyModel<Boolean>(getSearchFilter(), "reopened"), getString(ToDoStatus.RE_OPENED.getI18nKey())));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
-          "inprogress"), getString(ToDoStatus.IN_PROGRESS.getI18nKey())));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "closed"),
-          getString(ToDoStatus.CLOSED.getI18nKey())));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
-          "postponed"), getString(ToDoStatus.POSTPONED.getI18nKey())));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
-          "onlyRecent"), getString("plugins.todo.status.onlyRecent"), getString("plugins.todo.status.onlyRecent.tooltip")));
-      checkBoxPanel.add(createOnlyDeletedCheckBoxPanel(checkBoxPanel.newChildId()));
     }
     gridBuilder.newSplitPanel(GridSize.COL33);
     {
@@ -143,14 +103,57 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
       reporterSelectPanel.init().withAutoSubmit(true);
     }
     {
-      // DropDownChoice page size
-      addPageSizeFieldset();
+      gridBuilder.newSplitPanel(GridSize.COL100);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task")).setNoLabelFor();
+      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new Model<TaskDO>() {
+        @Override
+        public TaskDO getObject()
+        {
+          return taskTree.getTaskById(getSearchFilter().getTaskId());
+        }
+      }, parentPage, "taskId") {
+        @Override
+        protected void selectTask(final TaskDO task)
+        {
+          super.selectTask(task);
+          if (task != null) {
+            getSearchFilter().setTaskId(task.getId());
+          }
+          parentPage.refresh();
+        }
+      };
+      fs.add(taskSelectPanel);
+      taskSelectPanel.init();
+      taskSelectPanel.setRequired(false);
     }
   }
 
   public ToDoListForm(final ToDoListPage parentPage)
   {
     super(parentPage);
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListForm#onOptionsPanelCreate(org.projectforge.web.wicket.flowlayout.FieldsetPanel,
+   *      org.projectforge.web.wicket.flowlayout.DivPanel)
+   */
+  @Override
+  protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
+  {
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
+        getSearchFilter(), "opened"), getString(ToDoStatus.OPENED.getI18nKey())));
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
+        getSearchFilter(), "reopened"), getString(ToDoStatus.RE_OPENED.getI18nKey())));
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
+        getSearchFilter(), "inprogress"), getString(ToDoStatus.IN_PROGRESS.getI18nKey())));
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
+        getSearchFilter(), "closed"), getString(ToDoStatus.CLOSED.getI18nKey())));
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
+        getSearchFilter(), "postponed"), getString(ToDoStatus.POSTPONED.getI18nKey())));
+    optionsCheckBoxesPanel
+    .add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(),
+        new PropertyModel<Boolean>(getSearchFilter(), "onlyRecent"), getString("plugins.todo.status.onlyRecent"),
+        getString("plugins.todo.status.onlyRecent.tooltip")));
   }
 
   @Override

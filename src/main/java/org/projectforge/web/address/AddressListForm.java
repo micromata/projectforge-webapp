@@ -37,6 +37,7 @@ import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.address.AddressFilter;
 import org.projectforge.common.StringHelper;
+import org.projectforge.plugins.marketing.AddressCampaignValueListForm;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
@@ -58,16 +59,14 @@ public class AddressListForm extends AbstractListForm<AddressListFilter, Address
   private AddressDao addressDao;
 
   /**
-   * Used by AddressCampaignValueListForm.
+   * Used by {@link AddressCampaignValueListForm}.
    */
   @SuppressWarnings("serial")
-  public static void addFilter(final AbstractListPage< ? , ? , ? > parentPage, final AbstractListForm< ? , ? > form,
-      final GridBuilder gridBuilder, final AddressFilter searchFilter)
+  public static void onOptionsPanelCreate(final AbstractListPage< ? , ? , ? > parentPage, final FieldsetPanel optionsFieldsetPanel,
+      final AddressFilter searchFilter)
   {
     {
-      gridBuilder.newSplitPanel(GridSize.COL66);
-      final FieldsetPanel fs = gridBuilder.newFieldset(parentPage.getString("label.options")).setNoLabelFor();
-      final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
+      final DivPanel radioGroupPanel = optionsFieldsetPanel.addNewRadioBoxDiv();
       final RadioGroupPanel<String> radioGroup = new RadioGroupPanel<String>(radioGroupPanel.newChildId(), "listtype",
           new PropertyModel<String>(searchFilter, "listType")) {
         /**
@@ -92,14 +91,17 @@ public class AddressListForm extends AbstractListForm<AddressListFilter, Address
       radioGroup.add(new Model<String>("filter"), parentPage.getString("filter"));
       radioGroup.add(new Model<String>("newest"), parentPage.getString("filter.newest"));
       radioGroup.add(new Model<String>("myFavorites"), parentPage.getString("address.filter.myFavorites"));
-      radioGroup
-      .add(new Model<String>("deleted"), parentPage.getString(I18N_ONLY_DELETED), parentPage.getString(I18N_ONLY_DELETED_TOOLTIP));
     }
-    {
-      // DropDownChoice page size
-      gridBuilder.newSplitPanel(GridSize.COL33);
-      form.addPageSizeFieldset();
-    }
+
+  }
+
+  /**
+   * Used by {@link AddressCampaignValueListForm}.
+   */
+  @SuppressWarnings("serial")
+  public static void addFilter(final AbstractListPage< ? , ? , ? > parentPage, final AbstractListForm< ? , ? > form,
+      final GridBuilder gridBuilder, final AddressFilter searchFilter)
+  {
     {
       gridBuilder.newSplitPanel(GridSize.COL66);
       gridBuilder.getRowPanel().setVisibility(new DivPanelVisibility() {
@@ -142,6 +144,16 @@ public class AddressListForm extends AbstractListForm<AddressListFilter, Address
   {
     super.init();
     addFilter(parentPage, this, gridBuilder, getSearchFilter());
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListForm#onOptionsPanelCreate(org.projectforge.web.wicket.flowlayout.FieldsetPanel,
+   *      org.projectforge.web.wicket.flowlayout.DivPanel)
+   */
+  @Override
+  protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
+  {
+    onOptionsPanelCreate(parentPage, optionsFieldsetPanel, searchFilter);
   }
 
   public AddressListForm(final AddressListPage parentPage)

@@ -39,7 +39,6 @@ import org.projectforge.book.BookFilter;
 import org.projectforge.common.StringHelper;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
-import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
@@ -53,28 +52,18 @@ public class BookListForm extends AbstractListForm<BookListFilter, BookListPage>
   @SpringBean(name = "bookDao")
   private BookDao bookDao;
 
+  /**
+   * @see org.projectforge.web.wicket.AbstractListForm#onOptionsPanelCreate(org.projectforge.web.wicket.flowlayout.FieldsetPanel, org.projectforge.web.wicket.flowlayout.DivPanel)
+   */
   @Override
-  protected void init()
+  protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
   {
-    super.init();
-    {
-      gridBuilder.newSplitPanel(GridSize.COL66);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
-      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
-          new PropertyModel<Boolean>(getSearchFilter(), "present"), getString("book.status.present")));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "missed"),
-          getString("book.status.missed")));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
-          new PropertyModel<Boolean>(getSearchFilter(), "disposed"), getString("book.status.disposed")));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
-          new PropertyModel<Boolean>(getSearchFilter(), "deleted"), getString("deleted")));
-    }
-    {
-      // DropDownChoice page size
-      gridBuilder.newSplitPanel(GridSize.COL33);
-      addPageSizeFieldset();
-    }
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(),
+        new PropertyModel<Boolean>(getSearchFilter(), "present"), getString("book.status.present")));
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "missed"),
+        getString("book.status.missed")));
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(),
+        new PropertyModel<Boolean>(getSearchFilter(), "disposed"), getString("book.status.disposed")));
   }
 
   public BookListForm(final BookListPage parentPage)

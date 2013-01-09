@@ -54,30 +54,7 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
   protected void init()
   {
     super.init();
-    {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task")).setNoLabelFor();
-      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new Model<TaskDO>() {
-        @Override
-        public TaskDO getObject()
-        {
-          return taskTree.getTaskById(getSearchFilter().getTaskId());
-        }
-      }, parentPage, "taskId") {
-        @Override
-        protected void selectTask(final TaskDO task)
-        {
-          super.selectTask(task);
-          if (task != null) {
-            getSearchFilter().setTaskId(task.getId());
-          }
-          parentPage.refresh();
-        }
-      };
-      fs.add(taskSelectPanel);
-      taskSelectPanel.init();
-      taskSelectPanel.setRequired(false);
-    }
-    gridBuilder.newSplitPanel(GridSize.COL50);
+    gridBuilder.newSplitPanel(GridSize.COL66);
     {
       // Group
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("group")).setNoLabelFor();
@@ -102,7 +79,7 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
       groupSelectPanel.setDefaultFormProcessing(false);
       groupSelectPanel.init();
     }
-    gridBuilder.newSplitPanel(GridSize.COL50);
+    gridBuilder.newSplitPanel(GridSize.COL33);
     {
       // User
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("user"), true).setNoLabelFor();
@@ -128,31 +105,52 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
       assigneeSelectPanel.init().withAutoSubmit(true);
       fs.addHelpIcon(getString("access.tooltip.filter.user"));
     }
-    gridBuilder.newSplitPanel(GridSize.COL50);
+    gridBuilder.newGridPanel();
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
-      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
-          new PropertyModel<Boolean>(getSearchFilter(), "inherit"), getString("inherit")).setTooltip(
-              getString("access.tooltip.filter.inherit")));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
-          new PropertyModel<Boolean>(getSearchFilter(), "includeAncestorTasks"), getString("access.filter.includeAncestorTasks")).setTooltip(
-              getString("access.tooltip.filter.includeAncestorTasks")));
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
-          new PropertyModel<Boolean>(getSearchFilter(), "includeDescendentTasks"), getString("access.filter.includeDescendentTasks")).setTooltip(
-              getString("access.tooltip.filter.includeDescendentTasks")));
-      checkBoxPanel.add(createOnlyDeletedCheckBoxPanel(checkBoxPanel.newChildId()));
-    }
-    gridBuilder.newSplitPanel(GridSize.COL50);
-    {
-      // DropDownChoice page size
-      addPageSizeFieldset();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task")).setNoLabelFor();
+      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new Model<TaskDO>() {
+        @Override
+        public TaskDO getObject()
+        {
+          return taskTree.getTaskById(getSearchFilter().getTaskId());
+        }
+      }, parentPage, "taskId") {
+        @Override
+        protected void selectTask(final TaskDO task)
+        {
+          super.selectTask(task);
+          if (task != null) {
+            getSearchFilter().setTaskId(task.getId());
+          }
+          parentPage.refresh();
+        }
+      };
+      fs.add(taskSelectPanel);
+      taskSelectPanel.init();
+      taskSelectPanel.setRequired(false);
     }
   }
 
   public AccessListForm(final AccessListPage parentPage)
   {
     super(parentPage);
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListForm#onOptionsPanelCreate(org.projectforge.web.wicket.flowlayout.FieldsetPanel, org.projectforge.web.wicket.flowlayout.DivPanel)
+   */
+  @Override
+  protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
+  {
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(),
+        new PropertyModel<Boolean>(getSearchFilter(), "inherit"), getString("inherit")).setTooltip(
+            getString("access.tooltip.filter.inherit")));
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(),
+        new PropertyModel<Boolean>(getSearchFilter(), "includeAncestorTasks"), getString("access.filter.includeAncestorTasks")).setTooltip(
+            getString("access.tooltip.filter.includeAncestorTasks")));
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(),
+        new PropertyModel<Boolean>(getSearchFilter(), "includeDescendentTasks"), getString("access.filter.includeDescendentTasks")).setTooltip(
+            getString("access.tooltip.filter.includeDescendentTasks")));
   }
 
   @Override

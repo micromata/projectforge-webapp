@@ -42,7 +42,6 @@ import org.projectforge.web.calendar.QuickSelectPanel;
 import org.projectforge.web.common.MultiChoiceListHelper;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.WicketUtils;
-import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
@@ -117,67 +116,6 @@ public class TeamEventListForm extends AbstractListForm<TeamEventFilter, TeamEve
         }
       }
     });
-    gridBuilder.newSplitPanel(GridSize.COL66);
-    {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
-      fs.setOutputMarkupId(true);
-      startDate = new DatePanel(fs.newChildId(), new PropertyModel<Date>(getSearchFilter(), "startDate"), DatePanelSettings.get()
-          .withSelectPeriodMode(true));
-      fs.add(dependentFormComponents[0] = startDate);
-      fs.setLabelFor(startDate);
-      fs.add(new DivTextPanel(fs.newChildId(), " - "));
-      endDate = new DatePanel(fs.newChildId(), new PropertyModel<Date>(getSearchFilter(), "endDate"), DatePanelSettings.get()
-          .withSelectPeriodMode(true));
-      fs.add(dependentFormComponents[1] = endDate);
-      {
-        final SubmitLink unselectPeriod = new SubmitLink(IconLinkPanel.LINK_ID) {
-          @Override
-          public void onSubmit()
-          {
-            getSearchFilter().setStartDate(null);
-            getSearchFilter().setEndDate(null);
-            clearInput();
-            parentPage.refresh();
-          };
-        };
-        unselectPeriod.setDefaultFormProcessing(false);
-        fs.add(new IconLinkPanel(fs.newChildId(), IconType.CIRCLE_CLOSE, getString("calendar.tooltip.unselectPeriod"), unselectPeriod));
-      }
-      final QuickSelectPanel quickSelectPanel = new QuickSelectPanel(fs.newChildId(), parentPage, "quickSelect", startDate);
-      fs.add(quickSelectPanel);
-      quickSelectPanel.init();
-      fs.add(new HtmlCommentPanel(fs.newChildId(), new Model<String>() {
-        @Override
-        public String getObject()
-        {
-          return WicketUtils.getUTCDates(getSearchFilter().getStartDate(), getSearchFilter().getEndDate());
-        }
-      }));
-      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-      checkBoxPanel.add(createOnlyDeletedCheckBoxPanel(checkBoxPanel.newChildId()));
-    }
-    {
-      // Team calendar
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.calendar"));// .setLabelSide(false);
-      final TeamCalsProvider calendarProvider = new TeamCalsProvider();
-      calendarsListHelper = new MultiChoiceListHelper<TeamCalDO>().setComparator(new TeamCalsComparator()).setFullList(
-          calendarProvider.getSortedCalenders());
-      final Collection<Integer> list = getFilter().getTeamCals();
-      if (list != null) {
-        for (final Integer calId : list) {
-          final TeamCalDO cal = TeamCalCache.getInstance().getCalendar(calId);
-          calendarsListHelper.addOriginalAssignedItem(cal).assignItem(cal);
-        }
-      }
-      final Select2MultiChoice<TeamCalDO> calendars = new Select2MultiChoice<TeamCalDO>(fs.getSelect2MultiChoiceId(),
-          new PropertyModel<Collection<TeamCalDO>>(this.calendarsListHelper, "assignedItems"), calendarProvider);
-      fs.add(calendars);
-    }
-    {
-      // DropDownChoice page size
-      gridBuilder.newSplitPanel(GridSize.COL33);
-      addPageSizeFieldset();
-    }
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("templates"), true).setNoLabelFor();
       fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("all")) {
@@ -196,6 +134,67 @@ public class TeamEventListForm extends AbstractListForm<TeamEventFilter, TeamEve
           calendarsListHelper.setAssignedItems(assignedItems);
         }
       }, getString("plugins.teamcal.own"), SingleButtonPanel.GREY));
+    }
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListForm#onOptionsPanelCreate(org.projectforge.web.wicket.flowlayout.FieldsetPanel, org.projectforge.web.wicket.flowlayout.DivPanel)
+   */
+  @SuppressWarnings("serial")
+  @Override
+  protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
+  {
+    {
+      optionsFieldsetPanel.setOutputMarkupId(true);
+      startDate = new DatePanel(optionsFieldsetPanel.newChildId(), new PropertyModel<Date>(getSearchFilter(), "startDate"), DatePanelSettings.get()
+          .withSelectPeriodMode(true));
+      optionsFieldsetPanel.add(dependentFormComponents[0] = startDate);
+      optionsFieldsetPanel.setLabelFor(startDate);
+      optionsFieldsetPanel.add(new DivTextPanel(optionsFieldsetPanel.newChildId(), " - "));
+      endDate = new DatePanel(optionsFieldsetPanel.newChildId(), new PropertyModel<Date>(getSearchFilter(), "endDate"), DatePanelSettings.get()
+          .withSelectPeriodMode(true));
+      optionsFieldsetPanel.add(dependentFormComponents[1] = endDate);
+      {
+        final SubmitLink unselectPeriod = new SubmitLink(IconLinkPanel.LINK_ID) {
+          @Override
+          public void onSubmit()
+          {
+            getSearchFilter().setStartDate(null);
+            getSearchFilter().setEndDate(null);
+            clearInput();
+            parentPage.refresh();
+          };
+        };
+        unselectPeriod.setDefaultFormProcessing(false);
+        optionsFieldsetPanel.add(new IconLinkPanel(optionsFieldsetPanel.newChildId(), IconType.REMOVE, getString("calendar.tooltip.unselectPeriod"), unselectPeriod));
+      }
+      final QuickSelectPanel quickSelectPanel = new QuickSelectPanel(optionsFieldsetPanel.newChildId(), parentPage, "quickSelect", startDate);
+      optionsFieldsetPanel.add(quickSelectPanel);
+      quickSelectPanel.init();
+      optionsFieldsetPanel.add(new HtmlCommentPanel(optionsFieldsetPanel.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return WicketUtils.getUTCDates(getSearchFilter().getStartDate(), getSearchFilter().getEndDate());
+        }
+      }));
+    }
+    {
+      // Team calendar
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.calendar"));// .setLabelSide(false);
+      final TeamCalsProvider calendarProvider = new TeamCalsProvider();
+      calendarsListHelper = new MultiChoiceListHelper<TeamCalDO>().setComparator(new TeamCalsComparator()).setFullList(
+          calendarProvider.getSortedCalenders());
+      final Collection<Integer> list = getFilter().getTeamCals();
+      if (list != null) {
+        for (final Integer calId : list) {
+          final TeamCalDO cal = TeamCalCache.getInstance().getCalendar(calId);
+          calendarsListHelper.addOriginalAssignedItem(cal).assignItem(cal);
+        }
+      }
+      final Select2MultiChoice<TeamCalDO> calendars = new Select2MultiChoice<TeamCalDO>(fs.getSelect2MultiChoiceId(),
+          new PropertyModel<Collection<TeamCalDO>>(this.calendarsListHelper, "assignedItems"), calendarProvider);
+      fs.add(calendars);
     }
   }
 

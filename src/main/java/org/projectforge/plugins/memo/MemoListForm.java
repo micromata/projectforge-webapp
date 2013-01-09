@@ -44,16 +44,6 @@ public class MemoListForm extends AbstractListForm<BaseSearchFilter, MemoListPag
   }
 
   @Override
-  protected void init()
-  {
-    super.init();
-    {
-      // DropDownChoice page size
-      addPageSizeFieldset();
-    }
-  }
-
-  @Override
   protected BaseSearchFilter newSearchFilterInstance()
   {
     return new BaseSearchFilter();
