@@ -51,7 +51,6 @@ public abstract class BusinessAssessment4Fieldset implements Serializable
   @SuppressWarnings("serial")
   public BusinessAssessment4Fieldset(final GridBuilder gridBuilder)
   {
-    gridBuilder.newGridPanel();
     final FieldsetPanel fs = new FieldsetPanel(gridBuilder.getPanel(), gridBuilder.getString("fibu.businessAssessment"), true) {
       @Override
       public boolean isVisible() {
@@ -102,10 +101,10 @@ public abstract class BusinessAssessment4Fieldset implements Serializable
       }
     };
     fs.setDescriptionSuffix(repeater);
-    IconPanel icon = new IconPanel(repeater.newChildId(), IconType.CIRCLE_PLUS).setOnClick("javascript:showBusinessAssessment();");
+    IconPanel icon = new IconPanel(repeater.newChildId(), IconType.PLUS_SIGN).setOnClick("javascript:showBusinessAssessment();");
     icon.setMarkupId("showBusinessAssessment").setOutputMarkupId(true);
     repeater.add(icon);
-    icon = new IconPanel(repeater.newChildId(), IconType.CIRCLE_MINUS).setOnClick("javascript:hideBusinessAssessment();").appendAttribute(
+    icon = new IconPanel(repeater.newChildId(), IconType.MINUS_SIGN).setOnClick("javascript:hideBusinessAssessment();").appendAttribute(
         "style", "display: none;");
     icon.setMarkupId("hideBusinessAssessment").setOutputMarkupId(true);
     repeater.add(icon);
