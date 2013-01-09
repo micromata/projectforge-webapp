@@ -63,6 +63,7 @@ import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 import org.projectforge.web.wicket.flowlayout.ComponentSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldSetIconPosition;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.HiddenInputPanel;
@@ -101,6 +102,8 @@ AbstractSecuredForm<F, P>
 
   @SpringBean(name = "userGroupCache")
   protected UserGroupCache userGroupCache;
+
+  private FieldsetPanel optionsFieldsetPanel;
 
   /**
    * List to create action buttons in the desired order before creating the RepeatingView.
@@ -168,11 +171,11 @@ AbstractSecuredForm<F, P>
         if (parentPage.getBaseDao().isHistorizable() == true) {
           final RepeatingView repeater = new RepeatingView(FieldsetPanel.DESCRIPTION_SUFFIX_ID);
           fs.setDescriptionSuffix(repeater);
-          IconPanel icon = new IconPanel(repeater.newChildId(), IconType.CIRCLE_PLUS, getString("filter.extendedSearch"))
+          IconPanel icon = new IconPanel(repeater.newChildId(), IconType.PLUS_SIGN, getString("filter.extendedSearch"))
           .setOnClick("javascript:showExtendedFilter();");
           icon.setMarkupId("showExtendedFilter");
           repeater.add(icon);
-          icon = new IconPanel(repeater.newChildId(), IconType.CIRCLE_MINUS, getString("filter.extendedSearch"))
+          icon = new IconPanel(repeater.newChildId(), IconType.MINUS_SIGN, getString("filter.extendedSearch"))
           .setOnClick("javascript:hideExtendedFilter();");
           icon.setMarkupId("hideExtendedFilter");
           repeater.add(icon);
@@ -211,6 +214,28 @@ AbstractSecuredForm<F, P>
     if (parentPage.getBaseDao().isHistorizable() == true && isFilterVisible() == true) {
       addExtendedFilter();
     }
+    if (showOptionsPanel() == true) {
+      gridBuilder.newSplitPanel(GridSize.COL66);
+      optionsFieldsetPanel = gridBuilder.newFieldset(parentPage.getString("label.options"), true).setNoLabelFor();
+      final DivPanel optionsCheckBoxesPanel = new DivPanel(optionsFieldsetPanel.newChildId(), DivType.CHECKBOX);
+      onOptionsPanelCreate(optionsFieldsetPanel, optionsCheckBoxesPanel);
+      if (showHistorySearchAndDeleteCheckbox() == true) {
+        optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
+            getSearchFilter(), "deleted"), getString(I18N_ONLY_DELETED), getString(I18N_ONLY_DELETED_TOOLTIP)));
+        optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
+            getSearchFilter(), "searchHistory"), getString("search.searchHistory"), getString("search.searchHistory.additional.tooltip")));
+      }
+      if (optionsCheckBoxesPanel.hasChilds() == true) {
+        optionsFieldsetPanel.add(optionsCheckBoxesPanel);
+      }
+      gridBuilder.newSplitPanel(GridSize.COL33);
+    } else {
+      gridBuilder.newGridPanel();
+    }
+    // DropDownChoice page size
+    final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.pageSize"));
+    fs.add(getPageSizeDropDownChoice(fs.getDropDownChoiceId(), getLocale(), new PropertyModel<Integer>(this, "pageSize"), 25, 1000));
+
     final WebMarkupContainer buttonCell = new WebMarkupContainer("buttonCell");
     add(buttonCell);
     actionButtons = new MyComponentsRepeater<Component>("actionButtons");
@@ -260,13 +285,6 @@ AbstractSecuredForm<F, P>
     addActionButton(searchButtonPanel);
 
     setComponentsVisibility();
-  }
-
-  public void addPageSizeFieldset()
-  {
-    // DropDownChoice page size
-    final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.pageSize"));
-    fs.add(getPageSizeDropDownChoice(fs.getDropDownChoiceId(), getLocale(), new PropertyModel<Integer>(this, "pageSize"), 25, 1000));
   }
 
   @SuppressWarnings("serial")
@@ -352,6 +370,16 @@ AbstractSecuredForm<F, P>
       userSelectPanel.init().withAutoSubmit(true);
     }
     gridBuilder.setCurrentLevel(0); // Go back to main row panel.
+  }
+
+  /**
+   * Here you can add elements to the given FieldsetPanel or optionsPanel. The optionsPanel is not yet added to the FieldsetPanel.
+   * @param optionsFieldsetPanel
+   * @param optionsPanel
+   */
+  protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
+  {
+
   }
 
   /**
@@ -495,25 +523,6 @@ AbstractSecuredForm<F, P>
     return this.searchFilter;
   }
 
-  @SuppressWarnings("serial")
-  protected CheckBoxPanel createOnlyDeletedCheckBoxPanel(final String id)
-  {
-    return new CheckBoxPanel(id, new PropertyModel<Boolean>(getSearchFilter(), "deleted"), getString(I18N_ONLY_DELETED)) {
-      @Override
-      protected boolean wantOnSelectionChangedNotifications()
-      {
-        return true;
-      };
-
-      @Override
-      protected void onSelectionChanged(final Boolean newSelection)
-      {
-        parentPage.refresh();
-      };
-
-    }.setTooltip(getString(I18N_ONLY_DELETED_TOOLTIP));
-  }
-
   public CheckBoxPanel createAutoRefreshCheckBoxPanel(final String id, final IModel<Boolean> model, final String label)
   {
     return createAutoRefreshCheckBoxPanel(id, model, label, null);
@@ -638,4 +647,14 @@ AbstractSecuredForm<F, P>
 
   /** This class uses the logger of the extended class. */
   protected abstract Logger getLogger();
+
+  protected boolean showOptionsPanel()
+  {
+    return parentPage.getBaseDao().isHistorizable();
+  }
+
+  protected boolean showHistorySearchAndDeleteCheckbox()
+  {
+    return parentPage.getBaseDao().isHistorizable();
+  }
 }
