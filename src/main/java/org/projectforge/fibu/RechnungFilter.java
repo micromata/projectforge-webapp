@@ -68,7 +68,7 @@ public class RechnungFilter extends BaseSearchFilter implements Serializable
     return showKostZuweisungStatus;
   }
 
-  public void setShowKostZuweisungStatus(boolean showKostZuweisungStatus)
+  public void setShowKostZuweisungStatus(final boolean showKostZuweisungStatus)
   {
     this.showKostZuweisungStatus = showKostZuweisungStatus;
   }
@@ -112,13 +112,8 @@ public class RechnungFilter extends BaseSearchFilter implements Serializable
     return this.listType;
   }
 
-  public void setListType(String listType)
+  public void setListType(final String listType)
   {
-    if ("deleted".equals(listType) == true) {
-      deleted = true;
-    } else {
-      deleted = false;
-    }
     this.listType = listType;
   }
 
@@ -131,7 +126,7 @@ public class RechnungFilter extends BaseSearchFilter implements Serializable
     return year;
   }
 
-  public void setYear(int year)
+  public void setYear(final int year)
   {
     this.year = year;
   }
@@ -145,7 +140,7 @@ public class RechnungFilter extends BaseSearchFilter implements Serializable
     return month;
   }
 
-  public void setMonth(int month)
+  public void setMonth(final int month)
   {
     this.month = month;
   }

@@ -60,9 +60,9 @@ public class AuftragFilter extends BaseSearchFilter implements Serializable
   protected String listType = FILTER_ALL;
 
   protected AuftragsPositionsArt auftragsPositionsArt;
-  
+
   public static final String[] LIST = { FILTER_ALL, FILTER_AKQUISE, FILTER_BEAUFTRAGT, FILTER_NOCH_NICHT_VOLLSTAENDIG_FAKTURIERT, FILTER_BEAUFTRAGT_NOCH_NICHT_VOLLSTAENDIG_FAKTURIERT ,
-      FILTER_ABGESCHLOSSEN_NF, FILTER_VOLLSTAENDIG_FAKTURIERT, FILTER_ABGELEHNT, FILTER_ERSETZT};
+    FILTER_ABGESCHLOSSEN_NF, FILTER_VOLLSTAENDIG_FAKTURIERT, FILTER_ABGELEHNT, FILTER_ERSETZT};
 
   public AuftragFilter()
   {
@@ -130,11 +130,6 @@ public class AuftragFilter extends BaseSearchFilter implements Serializable
       listType = FILTER_ALL;
       return;
     }
-    if (listType.equals("deleted") == true) {
-      deleted = true;
-    } else {
-      deleted = false;
-    }
     this.listType = listType;
   }
 
@@ -147,11 +142,11 @@ public class AuftragFilter extends BaseSearchFilter implements Serializable
     return year;
   }
 
-  public void setYear(int year)
+  public void setYear(final int year)
   {
     this.year = year;
   }
-  
+
   /**
    * null represents all.
    * @return
@@ -160,8 +155,8 @@ public class AuftragFilter extends BaseSearchFilter implements Serializable
   {
     return auftragsPositionsArt;
   }
-  
-  public void setAuftragsPositionsArt(AuftragsPositionsArt auftragsPositionsArt)
+
+  public void setAuftragsPositionsArt(final AuftragsPositionsArt auftragsPositionsArt)
   {
     this.auftragsPositionsArt = auftragsPositionsArt;
   }
