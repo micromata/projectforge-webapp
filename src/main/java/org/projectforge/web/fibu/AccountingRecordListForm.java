@@ -31,9 +31,11 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.fibu.kost.BuchungssatzDao;
 import org.projectforge.fibu.kost.BusinessAssessment;
 import org.projectforge.web.wicket.AbstractListForm;
-import org.projectforge.web.wicket.bootstrap.GridSize;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.YearListCoiceRenderer;
+import org.projectforge.web.wicket.flowlayout.ComponentSize;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
@@ -58,43 +60,8 @@ public class AccountingRecordListForm extends AbstractListForm<AccountingRecordL
       return;
     }
     {
-      gridBuilder.newSplitPanel(GridSize.COL66);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true);
-      // DropDownChoices from
-      final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(buchungssatzDao.getYears(), false);
-      final DropDownChoice<Integer> fromYearChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(this,
-          "fromYear"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer);
-      fromYearChoice.setNullValid(false).setRequired(true);
-      fs.add(fromYearChoice);
-      final LabelValueChoiceRenderer<Integer> monthChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
-      for (int i = 0; i <= 11; i++) {
-        monthChoiceRenderer.addValue(i, StringHelper.format2DigitNumber(i + 1));
-      }
-      final DropDownChoice<Integer> fromMonthChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(
-          this, "fromMonth"), monthChoiceRenderer.getValues(), monthChoiceRenderer);
-      fromMonthChoice.setNullValid(true);
-      fs.add(fromMonthChoice);
-
-      fs.add(new DivTextPanel(fs.newChildId(), " - "));
-
-      // DropDownChoices to
-      final DropDownChoice<Integer> toYearChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(this,
-          "toYear"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer);
-      toYearChoice.setNullValid(false).setRequired(true);
-      fs.add(toYearChoice);
-
-      final DropDownChoice<Integer> toMonthChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(this,
-          "toMonth"), monthChoiceRenderer.getValues(), monthChoiceRenderer);
-      toMonthChoice.setNullValid(true);
-      fs.add(toMonthChoice);
-    }
-    {
-      // DropDownChoice page size
-      gridBuilder.newSplitPanel(GridSize.COL33);
-      addPageSizeFieldset();
-    }
-    {
       // Statistics
+      gridBuilder.newGridPanel();
       new BusinessAssessment4Fieldset(gridBuilder) {
         /**
          * @see org.projectforge.web.fibu.BusinessAssessment4Fieldset#getBusinessAssessment()
@@ -106,6 +73,46 @@ public class AccountingRecordListForm extends AbstractListForm<AccountingRecordL
         }
       };
     }
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListForm#onOptionsPanelCreate(org.projectforge.web.wicket.flowlayout.FieldsetPanel,
+   *      org.projectforge.web.wicket.flowlayout.DivPanel)
+   */
+  @Override
+  protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
+  {
+    // DropDownChoices from
+    final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(buchungssatzDao.getYears(), false);
+    final DropDownChoice<Integer> fromYearChoice = new DropDownChoice<Integer>(optionsFieldsetPanel.getDropDownChoiceId(),
+        new PropertyModel<Integer>(this, "fromYear"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer);
+    fromYearChoice.setNullValid(false).setRequired(true);
+    WicketUtils.setSize(fromYearChoice, ComponentSize.LENGTH_4);
+    optionsFieldsetPanel.add(fromYearChoice);
+    final LabelValueChoiceRenderer<Integer> monthChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
+    for (int i = 0; i <= 11; i++) {
+      monthChoiceRenderer.addValue(i, StringHelper.format2DigitNumber(i + 1));
+    }
+    final DropDownChoice<Integer> fromMonthChoice = new DropDownChoice<Integer>(optionsFieldsetPanel.getDropDownChoiceId(),
+        new PropertyModel<Integer>(this, "fromMonth"), monthChoiceRenderer.getValues(), monthChoiceRenderer);
+    fromMonthChoice.setNullValid(true);
+    WicketUtils.setSize(fromMonthChoice, ComponentSize.LENGTH_2);
+    optionsFieldsetPanel.add(fromMonthChoice);
+
+    optionsFieldsetPanel.add(new DivTextPanel(optionsFieldsetPanel.newChildId(), " - "));
+
+    // DropDownChoices to
+    final DropDownChoice<Integer> toYearChoice = new DropDownChoice<Integer>(optionsFieldsetPanel.getDropDownChoiceId(),
+        new PropertyModel<Integer>(this, "toYear"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer);
+    toYearChoice.setNullValid(false).setRequired(true);
+    WicketUtils.setSize(toYearChoice, ComponentSize.LENGTH_4);
+    optionsFieldsetPanel.add(toYearChoice);
+
+    final DropDownChoice<Integer> toMonthChoice = new DropDownChoice<Integer>(optionsFieldsetPanel.getDropDownChoiceId(),
+        new PropertyModel<Integer>(this, "toMonth"), monthChoiceRenderer.getValues(), monthChoiceRenderer);
+    toMonthChoice.setNullValid(true);
+    WicketUtils.setSize(toMonthChoice, ComponentSize.LENGTH_2);
+    optionsFieldsetPanel.add(toMonthChoice);
   }
 
   /**

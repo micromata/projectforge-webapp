@@ -34,10 +34,11 @@ import org.projectforge.fibu.RechnungFilter;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.WebConstants;
-import org.projectforge.web.wicket.bootstrap.GridSize;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.YearListCoiceRenderer;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.ComponentSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -51,85 +52,13 @@ AbstractListForm<F, P>
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AbstractRechnungListForm.class);
 
+  protected int[] years;
+
+  @Override
   @SuppressWarnings("serial")
-  protected void init(final int[] years)
+  protected void init()
   {
-    {
-      gridBuilder.newSplitPanel(GridSize.COL66);
-      { // DropDownChoice years
-        final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true);
-        final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(years, true);
-        final DropDownChoice<Integer> yearChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(
-            this, "year"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer);
-        yearChoice.setNullValid(false);
-        fs.add(yearChoice, true);
-
-        // // DropDownChoice months
-        final LabelValueChoiceRenderer<Integer> monthChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
-        monthChoiceRenderer.addValue(-1, "");
-        for (int i = 0; i <= 11; i++) {
-          monthChoiceRenderer.addValue(i, StringHelper.format2DigitNumber(i + 1));
-        }
-        final DropDownChoice<Integer> monthChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(
-            this, "month"), monthChoiceRenderer.getValues(), monthChoiceRenderer);
-        monthChoice.setNullValid(false);
-        fs.add(monthChoice, true);
-
-        final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
-        final RadioGroupPanel<String> radioGroup = new RadioGroupPanel<String>(radioGroupPanel.newChildId(), "listtype",
-            new PropertyModel<String>(getSearchFilter(), "listType")) {
-          /**
-           * @see org.projectforge.web.wicket.flowlayout.RadioGroupPanel#wantOnSelectionChangedNotifications()
-           */
-          @Override
-          protected boolean wantOnSelectionChangedNotifications()
-          {
-            return true;
-          }
-
-          /**
-           * @see org.projectforge.web.wicket.flowlayout.RadioGroupPanel#onSelectionChanged(java.lang.Object)
-           */
-          @Override
-          protected void onSelectionChanged(final Object newSelection)
-          {
-            parentPage.refresh();
-          }
-        };
-        radioGroupPanel.add(radioGroup);
-        radioGroup.add(new Model<String>("all"), getString("filter.all"));
-        radioGroup.add(new Model<String>("unbezahlt"), getString("fibu.rechnung.filter.unbezahlt"));
-        radioGroup.add(new Model<String>("ueberfaellig"), getString("fibu.rechnung.filter.ueberfaellig"));
-        radioGroup.add(new Model<String>("deleted"), getString("deleted"));
-
-        final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-        checkBoxPanel.add(new CheckBoxPanel(DivPanel.CHILD_ID, new PropertyModel<Boolean>(getSearchFilter(),
-            "showKostZuweisungStatus"), getString("fibu.rechnung.showKostZuweisungstatus")) {
-          /**
-           * @see org.projectforge.web.wicket.flowlayout.CheckBoxPanel#wantOnSelectionChangedNotifications()
-           */
-          @Override
-          protected boolean wantOnSelectionChangedNotifications()
-          {
-            return true;
-          }
-
-          /**
-           * @see org.projectforge.web.wicket.flowlayout.CheckBoxPanel#onSelectionChanged()
-           */
-          @Override
-          protected void onSelectionChanged(final Boolean newSelection)
-          {
-            parentPage.refresh();
-          }
-        });
-      }
-    }
-    {
-      // DropDownChoice page size
-      gridBuilder.newSplitPanel(GridSize.COL33);
-      addPageSizeFieldset();
-    }
+    super.init();
     gridBuilder.newGridPanel();
     {
       // Statistics
@@ -192,6 +121,82 @@ AbstractListForm<F, P>
         }
       }));
     }
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListForm#onOptionsPanelCreate(org.projectforge.web.wicket.flowlayout.FieldsetPanel,
+   *      org.projectforge.web.wicket.flowlayout.DivPanel)
+   */
+  @SuppressWarnings("serial")
+  @Override
+  protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
+  {
+    // DropDownChoice years
+    final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(years, true);
+    final DropDownChoice<Integer> yearChoice = new DropDownChoice<Integer>(optionsFieldsetPanel.getDropDownChoiceId(), new PropertyModel<Integer>(this,
+        "year"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer);
+    yearChoice.setNullValid(false);
+    WicketUtils.setSize(yearChoice, ComponentSize.LENGTH_4);
+    optionsFieldsetPanel.add(yearChoice, true);
+
+    // // DropDownChoice months
+    final LabelValueChoiceRenderer<Integer> monthChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
+    monthChoiceRenderer.addValue(-1, "");
+    for (int i = 0; i <= 11; i++) {
+      monthChoiceRenderer.addValue(i, StringHelper.format2DigitNumber(i + 1));
+    }
+    final DropDownChoice<Integer> monthChoice = new DropDownChoice<Integer>(optionsFieldsetPanel.getDropDownChoiceId(), new PropertyModel<Integer>(this,
+        "month"), monthChoiceRenderer.getValues(), monthChoiceRenderer);
+    monthChoice.setNullValid(false);
+    WicketUtils.setSize(monthChoice, ComponentSize.LENGTH_2);
+    optionsFieldsetPanel.add(monthChoice, true);
+
+    final DivPanel radioGroupPanel = optionsFieldsetPanel.addNewRadioBoxDiv();
+    final RadioGroupPanel<String> radioGroup = new RadioGroupPanel<String>(radioGroupPanel.newChildId(), "listtype",
+        new PropertyModel<String>(getSearchFilter(), "listType")) {
+      /**
+       * @see org.projectforge.web.wicket.flowlayout.RadioGroupPanel#wantOnSelectionChangedNotifications()
+       */
+      @Override
+      protected boolean wantOnSelectionChangedNotifications()
+      {
+        return true;
+      }
+
+      /**
+       * @see org.projectforge.web.wicket.flowlayout.RadioGroupPanel#onSelectionChanged(java.lang.Object)
+       */
+      @Override
+      protected void onSelectionChanged(final Object newSelection)
+      {
+        parentPage.refresh();
+      }
+    };
+    radioGroupPanel.add(radioGroup);
+    radioGroup.add(new Model<String>("all"), getString("filter.all"));
+    radioGroup.add(new Model<String>("unbezahlt"), getString("fibu.rechnung.filter.unbezahlt"));
+    radioGroup.add(new Model<String>("ueberfaellig"), getString("fibu.rechnung.filter.ueberfaellig"));
+
+    optionsCheckBoxesPanel.add(new CheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "showKostZuweisungStatus"),
+        getString("fibu.rechnung.showKostZuweisungstatus")) {
+      /**
+       * @see org.projectforge.web.wicket.flowlayout.CheckBoxPanel#wantOnSelectionChangedNotifications()
+       */
+      @Override
+      protected boolean wantOnSelectionChangedNotifications()
+      {
+        return true;
+      }
+
+      /**
+       * @see org.projectforge.web.wicket.flowlayout.CheckBoxPanel#onSelectionChanged()
+       */
+      @Override
+      protected void onSelectionChanged(final Boolean newSelection)
+      {
+        parentPage.refresh();
+      }
+    });
   }
 
   protected abstract AbstractRechnungsStatistik< ? > getStats();

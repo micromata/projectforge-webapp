@@ -37,9 +37,11 @@ import org.projectforge.fibu.AuftragsPositionsArt;
 import org.projectforge.fibu.AuftragsStatistik;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.WebConstants;
-import org.projectforge.web.wicket.bootstrap.GridSize;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.YearListCoiceRenderer;
+import org.projectforge.web.wicket.flowlayout.ComponentSize;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.TextStyle;
@@ -60,82 +62,6 @@ public class AuftragListForm extends AbstractListForm<AuftragListFilter, Auftrag
   protected void init()
   {
     super.init();
-    {
-      gridBuilder.newSplitPanel(GridSize.COL66);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true);
-
-      // DropDownChoice years
-      final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(auftragDao.getYears(), true);
-      final DropDownChoice<Integer> yearChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(this,
-          "year"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer) {
-        @Override
-        protected boolean wantOnSelectionChangedNotifications()
-        {
-          return true;
-        }
-
-        @Override
-        protected void onSelectionChanged(final Integer newSelection)
-        {
-          parentPage.refresh();
-        }
-      };
-      yearChoice.setNullValid(false);
-      fs.add(yearChoice);
-
-      // DropDownChoice listType
-      final LabelValueChoiceRenderer<String> typeChoiceRenderer = new LabelValueChoiceRenderer<String>();
-      for (final String str : AuftragFilter.LIST) {
-        typeChoiceRenderer.addValue(str, getString("fibu.auftrag.filter.type." + str));
-      }
-      typeChoiceRenderer.addValue("deleted", getString("deleted"));
-      final DropDownChoice<String> typeChoice = new DropDownChoice<String>(fs.getDropDownChoiceId(), new PropertyModel<String>(this,
-          "searchFilter.listType"), typeChoiceRenderer.getValues(), typeChoiceRenderer) {
-        @Override
-        protected boolean wantOnSelectionChangedNotifications()
-        {
-          return true;
-        }
-
-        @Override
-        protected void onSelectionChanged(final String newSelection)
-        {
-          parentPage.refresh();
-        }
-      };
-      typeChoice.setNullValid(false);
-      fs.add(typeChoice);
-
-      // DropDownChoice Auftragsart
-      final LabelValueChoiceRenderer<Integer> auftragsPositionsArtChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
-      auftragsPositionsArtChoiceRenderer.addValue(-1, getString("filter.all"));
-      for (final AuftragsPositionsArt art : AuftragsPositionsArt.values()) {
-        auftragsPositionsArtChoiceRenderer.addValue(art.ordinal(), getString(art.getI18nKey()));
-      }
-      final DropDownChoice<Integer> auftragsPositionsArtChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(),
-          new PropertyModel<Integer>(this, "auftragsPositionsArt"), auftragsPositionsArtChoiceRenderer.getValues(),
-          auftragsPositionsArtChoiceRenderer) {
-        @Override
-        protected boolean wantOnSelectionChangedNotifications()
-        {
-          return true;
-        }
-
-        @Override
-        protected void onSelectionChanged(final Integer newSelection)
-        {
-          parentPage.refresh();
-        }
-      };
-      auftragsPositionsArtChoice.setNullValid(false);
-      fs.add(auftragsPositionsArtChoice);
-    }
-    {
-      // DropDownChoice page size
-      gridBuilder.newSplitPanel(GridSize.COL33);
-      addPageSizeFieldset();
-    }
-
     {
       // Statistics
       gridBuilder.newGridPanel();
@@ -208,6 +134,80 @@ public class AuftragListForm extends AbstractListForm<AuftragListFilter, Auftrag
         }
       });
     }
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListForm#onOptionsPanelCreate(org.projectforge.web.wicket.flowlayout.FieldsetPanel, org.projectforge.web.wicket.flowlayout.DivPanel)
+   */
+  @SuppressWarnings("serial")
+  @Override
+  protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
+  {
+    // DropDownChoice years
+    final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(auftragDao.getYears(), true);
+    final DropDownChoice<Integer> yearChoice = new DropDownChoice<Integer>(optionsFieldsetPanel.getDropDownChoiceId(), new PropertyModel<Integer>(this,
+        "year"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer) {
+      @Override
+      protected boolean wantOnSelectionChangedNotifications()
+      {
+        return true;
+      }
+
+      @Override
+      protected void onSelectionChanged(final Integer newSelection)
+      {
+        parentPage.refresh();
+      }
+    };
+    yearChoice.setNullValid(false);
+    WicketUtils.setSize(yearChoice, ComponentSize.LENGTH_4);
+    optionsFieldsetPanel.add(yearChoice);
+
+    // DropDownChoice listType
+    final LabelValueChoiceRenderer<String> typeChoiceRenderer = new LabelValueChoiceRenderer<String>();
+    for (final String str : AuftragFilter.LIST) {
+      typeChoiceRenderer.addValue(str, getString("fibu.auftrag.filter.type." + str));
+    }
+    final DropDownChoice<String> typeChoice = new DropDownChoice<String>(optionsFieldsetPanel.getDropDownChoiceId(), new PropertyModel<String>(this,
+        "searchFilter.listType"), typeChoiceRenderer.getValues(), typeChoiceRenderer) {
+      @Override
+      protected boolean wantOnSelectionChangedNotifications()
+      {
+        return true;
+      }
+
+      @Override
+      protected void onSelectionChanged(final String newSelection)
+      {
+        parentPage.refresh();
+      }
+    };
+    typeChoice.setNullValid(false);
+    optionsFieldsetPanel.add(typeChoice);
+
+    // DropDownChoice Auftragsart
+    final LabelValueChoiceRenderer<Integer> auftragsPositionsArtChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
+    auftragsPositionsArtChoiceRenderer.addValue(-1, getString("filter.all"));
+    for (final AuftragsPositionsArt art : AuftragsPositionsArt.values()) {
+      auftragsPositionsArtChoiceRenderer.addValue(art.ordinal(), getString(art.getI18nKey()));
+    }
+    final DropDownChoice<Integer> auftragsPositionsArtChoice = new DropDownChoice<Integer>(optionsFieldsetPanel.getDropDownChoiceId(),
+        new PropertyModel<Integer>(this, "auftragsPositionsArt"), auftragsPositionsArtChoiceRenderer.getValues(),
+        auftragsPositionsArtChoiceRenderer) {
+      @Override
+      protected boolean wantOnSelectionChangedNotifications()
+      {
+        return true;
+      }
+
+      @Override
+      protected void onSelectionChanged(final Integer newSelection)
+      {
+        parentPage.refresh();
+      }
+    };
+    auftragsPositionsArtChoice.setNullValid(false);
+    optionsFieldsetPanel.add(auftragsPositionsArtChoice);
   }
 
   protected void refresh()
