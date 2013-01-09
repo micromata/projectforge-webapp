@@ -210,17 +210,4 @@ public class AddressFilter extends BaseSearchFilter implements Serializable
   {
     this.listType = listType;
   }
-
-  @Override
-  public boolean isDeleted()
-  {
-    return "deleted".equals(listType);
-  }
-
-  @Override
-  public void setDeleted(final boolean deleted)
-  {
-    super.setDeleted(deleted);
-    listType = "deleted";
-  }
 }
