@@ -28,6 +28,7 @@ import java.lang.annotation.ElementType;
 import org.hibernate.HibernateException;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.cfg.SearchMapping;
 import org.projectforge.core.ConfigXml;
@@ -72,11 +73,12 @@ public class AutoSessionFactoryBean extends AnnotationSessionFactoryBean
     final SearchMapping mapping = new SearchMapping();
     mapping.entity(HistoryEntry.class).indexed() //
     .property("id", ElementType.METHOD).documentId().name("id")//
+    .property("userName", ElementType.METHOD).field().index(Index.UN_TOKENIZED).store(Store.NO) //
+    // Must be tokenized for using lower case (MultiFieldQueryParser uses lower case strings):
+    .property("className", ElementType.METHOD).field().index(Index.TOKENIZED).store(Store.NO) //
+    .property("timestamp", ElementType.METHOD).field().store(Store.NO).dateBridge(Resolution.MINUTE) //
     // Needed in BaseDao for FullTextQuery.setProjection("entityId"):
-    //.property("entityId", ElementType.METHOD).field().store(Store.YES) //
-    // .property("className", ElementType.METHOD).field().store(Store.YES) //
-    // .property("timestamp", ElementType.METHOD).field().store(Store.YES).dateBridge(Resolution.MINUTE) //
-    // .property("userName", ElementType.METHOD).field().store(Store.YES) //
+    .property("entityId", ElementType.METHOD).field().store(Store.YES) //
     .property("delta", ElementType.METHOD).indexEmbedded() //
     // PropertyDelta:
     .entity(PropertyDelta.class) //
