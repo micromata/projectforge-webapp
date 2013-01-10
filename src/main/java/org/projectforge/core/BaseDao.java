@@ -443,10 +443,12 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
             idSet.remove(entry.getId()); // Object does already exist in list.
           }
         }
-        final Criteria criteria = filter.buildCriteria(getSession(), clazz);
-        criteria.add(Restrictions.in("id", idSet));
-        final List<O> historyMatchingEntities = criteria.list();
-        list.addAll(historyMatchingEntities);
+        if (idSet.isEmpty() == false) {
+          final Criteria criteria = filter.buildCriteria(getSession(), clazz);
+          criteria.add(Restrictions.in("id", idSet));
+          final List<O> historyMatchingEntities = criteria.list();
+          list.addAll(historyMatchingEntities);
+        }
       }
     }
     if (list == null) {
@@ -576,7 +578,8 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
         buf.append(modified);
         if (modified.endsWith("*") == false && StringUtils.containsNone(modified, ESCAPE_CHARS) == true) {
           if (andSearch == false || tokens.length > 1) {
-            // Don't append '*' if used by SearchForm and only one token is given. It's will be appended automatically by BaseDao before the search is executed.
+            // Don't append '*' if used by SearchForm and only one token is given. It's will be appended automatically by BaseDao before the
+            // search is executed.
             buf.append('*');
           }
         }
@@ -1696,7 +1699,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
         }
         final FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery(query, HistoryEntry.class);
         fullTextQuery.setCacheable(true);
-        // crit.setCacheRegion("historyItemCache");
+        fullTextQuery.setCacheRegion("historyItemCache");
         fullTextQuery.setProjection("entityId");
         final List<Object[]> result = fullTextQuery.list();
         if (result != null && result.size() > 0) {
@@ -1729,7 +1732,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
         crit.add(Restrictions.eq("userName", filter.getModifiedByUserId().toString()));
       }
       crit.setCacheable(true);
-      // crit.setCacheRegion("historyItemCache");
+      crit.setCacheRegion("historyItemCache");
       crit.setProjection(Projections.property("entityId"));
       final List<Integer> idList = crit.list();
       if (idList != null && idList.size() > 0) {
