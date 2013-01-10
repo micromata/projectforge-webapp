@@ -51,6 +51,8 @@ public class DateFormats
 
   public static final String EXCEL_ISO_DATE = "YYYY-MM-DD";
 
+  public static final String LUCENE_TIMESTAMP_MINUTE = "yyyyMMddHHmm";
+
   /**
    * Check weather the given dateString has month or day first. If not analyzable then true is returned as default value.
    * @param dateString
