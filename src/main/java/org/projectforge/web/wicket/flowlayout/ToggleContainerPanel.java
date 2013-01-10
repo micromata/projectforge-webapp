@@ -153,7 +153,7 @@ public class ToggleContainerPanel extends Panel
    */
   public ToggleContainerPanel setOpen()
   {
-    toggleContainer.add(AttributeModifier.replace("class", "collapse"));
+    toggleContainer.add(AttributeModifier.replace("class", "in collapse"));
     return this;
   }
 
@@ -163,7 +163,7 @@ public class ToggleContainerPanel extends Panel
    */
   public ToggleContainerPanel setClosed()
   {
-    toggleContainer.add(AttributeModifier.replace("class", "in collapse"));
+    toggleContainer.add(AttributeModifier.replace("class", "collapse"));
     return this;
   }
 }

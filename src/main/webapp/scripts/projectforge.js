@@ -55,7 +55,6 @@ function initializeComponents() {
 		$(this).tooltip("close");
 	});
 	$("div.radio-jquery-ui").buttonset();
-	$("div.collapse").collapse();
 	if ($("textarea.autogrow").length) {
 		$("textarea.autogrow").autoGrow();
 	}
