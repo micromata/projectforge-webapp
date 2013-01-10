@@ -1,5 +1,6 @@
 <ehcache>
   <defaultCache maxElementsInMemory="100" eternal="false" timeToIdleSeconds="600" timeToLiveSeconds="600" overflowToDisk="false" />
+  <cache name="historyItemCache" maxElementsInMemory="1000" />
   <cache name="de.micromata.common.hibernate.BasicUserDO" maxElementsInMemory="1000" />
   <cache name="de.micromata.common.user.OrgUnitDO" maxElementsInMemory="1000" />
   <cache name="de.micromata.common.user.OrgUnitTypeDO" maxElementsInMemory="1000" />
