@@ -261,4 +261,14 @@ public class EingangsrechnungDao extends BaseDao<EingangsrechnungDO>
   {
     this.kontoDao = kontoDao;
   }
+
+
+  /**
+   * @see org.projectforge.core.BaseDao#useOwnCriteriaCacheRegion()
+   */
+  @Override
+  protected boolean useOwnCriteriaCacheRegion()
+  {
+    return true;
+  }
 }

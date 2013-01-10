@@ -551,4 +551,13 @@ public class TaskDao extends BaseDao<TaskDO>
   {
     return new TaskDO();
   }
+
+  /**
+   * @see org.projectforge.core.BaseDao#useOwnCriteriaCacheRegion()
+   */
+  @Override
+  protected boolean useOwnCriteriaCacheRegion()
+  {
+    return true;
+  }
 }

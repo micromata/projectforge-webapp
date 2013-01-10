@@ -342,4 +342,13 @@ public class ToDoDao extends BaseDao<ToDoDO>
   {
     this.taskTree = taskTree;
   }
+
+  /**
+   * @see org.projectforge.core.BaseDao#useOwnCriteriaCacheRegion()
+   */
+  @Override
+  protected boolean useOwnCriteriaCacheRegion()
+  {
+    return true;
+  }
 }

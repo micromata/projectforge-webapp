@@ -458,4 +458,14 @@ public class RechnungDao extends BaseDao<RechnungDO>
   {
     return new RechnungDO();
   }
+
+
+  /**
+   * @see org.projectforge.core.BaseDao#useOwnCriteriaCacheRegion()
+   */
+  @Override
+  protected boolean useOwnCriteriaCacheRegion()
+  {
+    return true;
+  }
 }

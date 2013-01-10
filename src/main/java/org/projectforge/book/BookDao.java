@@ -55,7 +55,7 @@ public class BookDao extends BaseDao<BookDO>
   // private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(BookDao.class);
 
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "lendOutBy.username", "lendOutBy.firstname",
-      "lendOutBy.lastname", "task.title"};
+    "lendOutBy.lastname", "task.title"};
 
   private UserDao userDao;
 
@@ -68,12 +68,12 @@ public class BookDao extends BaseDao<BookDO>
     this.configuration = configuration;
   }
 
-  public void setUserDao(UserDao userDao)
+  public void setUserDao(final UserDao userDao)
   {
     this.userDao = userDao;
   }
 
-  public void setTaskDao(TaskDao taskDao)
+  public void setTaskDao(final TaskDao taskDao)
   {
     this.taskDao = taskDao;
   }
@@ -98,7 +98,7 @@ public class BookDao extends BaseDao<BookDO>
   }
 
   @Override
-  public List<BookDO> getList(BaseSearchFilter filter)
+  public List<BookDO> getList(final BaseSearchFilter filter)
   {
     final BookFilter myFilter;
     if (filter instanceof BookFilter) {
@@ -106,7 +106,7 @@ public class BookDao extends BaseDao<BookDO>
     } else {
       myFilter = new BookFilter(filter);
     }
-    QueryFilter queryFilter = new QueryFilter(myFilter);
+    final QueryFilter queryFilter = new QueryFilter(myFilter);
     if (StringUtils.isBlank(myFilter.getSearchString()) == true) {
       Collection<BookStatus> col = null;
       if (myFilter.isPresent() == true || myFilter.isMissed() == true || myFilter.isDisposed() == true) {
@@ -126,7 +126,7 @@ public class BookDao extends BaseDao<BookDO>
       }
       myFilter.setIgnoreDeleted(false);
       if (col != null) {
-        Criterion inCrit = Restrictions.in("status", col);
+        final Criterion inCrit = Restrictions.in("status", col);
         if (myFilter.isDeleted() == true) {
           queryFilter.add(Restrictions.or(inCrit, Restrictions.eq("deleted", true)));
           myFilter.setIgnoreDeleted(true);
@@ -168,7 +168,7 @@ public class BookDao extends BaseDao<BookDO>
   }
 
   @Override
-  protected void onSaveOrModify(BookDO obj)
+  protected void onSaveOrModify(final BookDO obj)
   {
     if (obj.getTaskId() == null) {
       setTask(obj, getDefaultTaskId());
@@ -180,9 +180,9 @@ public class BookDao extends BaseDao<BookDO>
    * @param taskId If null, then task will be set to null;
    * @see BaseDao#getOrLoad(Integer)
    */
-  public void setTask(final BookDO book, Integer taskId)
+  public void setTask(final BookDO book, final Integer taskId)
   {
-    TaskDO task = taskDao.getOrLoad(taskId);
+    final TaskDO task = taskDao.getOrLoad(taskId);
     book.setTask(task);
   }
 
@@ -191,9 +191,9 @@ public class BookDao extends BaseDao<BookDO>
    * @param lendOutById If null, then task will be set to null;
    * @see BaseDao#getOrLoad(Integer)
    */
-  public void setLendOutBy(final BookDO book, Integer lendOutById)
+  public void setLendOutBy(final BookDO book, final Integer lendOutById)
   {
-    PFUserDO user = userDao.getOrLoad(lendOutById);
+    final PFUserDO user = userDao.getOrLoad(lendOutById);
     book.setLendOutBy(user);
   }
 
@@ -248,5 +248,15 @@ public class BookDao extends BaseDao<BookDO>
   public BookDO newInstance()
   {
     return new BookDO();
+  }
+
+
+  /**
+   * @see org.projectforge.core.BaseDao#useOwnCriteriaCacheRegion()
+   */
+  @Override
+  protected boolean useOwnCriteriaCacheRegion()
+  {
+    return true;
   }
 }

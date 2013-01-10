@@ -273,4 +273,13 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
     super.afterSaveOrModify(obj);
     TeamCalCache.getInstance().setExpired();
   }
+
+  /**
+   * @see org.projectforge.core.BaseDao#useOwnCriteriaCacheRegion()
+   */
+  @Override
+  protected boolean useOwnCriteriaCacheRegion()
+  {
+    return true;
+  }
 }

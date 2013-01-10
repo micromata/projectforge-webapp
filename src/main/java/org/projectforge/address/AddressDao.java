@@ -576,4 +576,13 @@ public class AddressDao extends BaseDao<AddressDO>
   {
     return new AddressDO();
   }
+
+  /**
+   * @see org.projectforge.core.BaseDao#useOwnCriteriaCacheRegion()
+   */
+  @Override
+  protected boolean useOwnCriteriaCacheRegion()
+  {
+    return true;
+  }
 }

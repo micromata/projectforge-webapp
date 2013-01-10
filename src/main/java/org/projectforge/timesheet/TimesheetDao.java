@@ -887,4 +887,13 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
   {
     return new TimesheetDO();
   }
+
+  /**
+   * @see org.projectforge.core.BaseDao#useOwnCriteriaCacheRegion()
+   */
+  @Override
+  protected boolean useOwnCriteriaCacheRegion()
+  {
+    return true;
+  }
 }

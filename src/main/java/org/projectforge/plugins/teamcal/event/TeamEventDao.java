@@ -315,4 +315,12 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     return log;
   }
 
+  /**
+   * @see org.projectforge.core.BaseDao#useOwnCriteriaCacheRegion()
+   */
+  @Override
+  protected boolean useOwnCriteriaCacheRegion()
+  {
+    return true;
+  }
 }

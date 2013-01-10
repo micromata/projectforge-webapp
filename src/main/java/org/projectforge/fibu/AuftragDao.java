@@ -617,4 +617,13 @@ public class AuftragDao extends BaseDao<AuftragDO>
   {
     return new AuftragDO();
   }
+
+  /**
+   * @see org.projectforge.core.BaseDao#useOwnCriteriaCacheRegion()
+   */
+  @Override
+  protected boolean useOwnCriteriaCacheRegion()
+  {
+    return true;
+  }
 }
