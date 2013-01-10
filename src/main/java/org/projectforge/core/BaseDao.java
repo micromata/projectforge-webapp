@@ -392,6 +392,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     List<O> list = null;
     {
       final Criteria criteria = filter.buildCriteria(getSession(), clazz);
+      setCacheRegion(criteria);
       if (searchFilter.isSearchNotEmpty() == true) {
         final String searchString = modifySearchString(searchFilter.getSearchString());
         final String[] searchFields = searchFilter.getSearchFields() != null ? searchFilter.getSearchFields() : getSearchFields();
@@ -445,6 +446,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
         }
         if (idSet.isEmpty() == false) {
           final Criteria criteria = filter.buildCriteria(getSession(), clazz);
+          setCacheRegion(criteria);
           criteria.add(Restrictions.in("id", idSet));
           final List<O> historyMatchingEntities = criteria.list();
           list.addAll(historyMatchingEntities);
@@ -1719,22 +1721,23 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
         log.info(errorMsg);
       }
     } else {
-      final Criteria crit = session.createCriteria(HistoryEntry.class);
-      crit.add(Restrictions.eq("className", className));
+      final Criteria criteria = session.createCriteria(HistoryEntry.class);
+      setCacheRegion(criteria);
+      criteria.add(Restrictions.eq("className", className));
       if (filter.getStartTimeOfModification() != null && filter.getStopTimeOfModification() != null) {
-        crit.add(Restrictions.between("timestamp", filter.getStartTimeOfModification(), filter.getStopTimeOfModification()));
+        criteria.add(Restrictions.between("timestamp", filter.getStartTimeOfModification(), filter.getStopTimeOfModification()));
       } else if (filter.getStartTimeOfModification() != null) {
-        crit.add(Restrictions.ge("timestamp", filter.getStartTimeOfModification()));
+        criteria.add(Restrictions.ge("timestamp", filter.getStartTimeOfModification()));
       } else if (filter.getStopTimeOfModification() != null) {
-        crit.add(Restrictions.le("timestamp", filter.getStopTimeOfModification()));
+        criteria.add(Restrictions.le("timestamp", filter.getStopTimeOfModification()));
       }
       if (filter.getModifiedByUserId() != null) {
-        crit.add(Restrictions.eq("userName", filter.getModifiedByUserId().toString()));
+        criteria.add(Restrictions.eq("userName", filter.getModifiedByUserId().toString()));
       }
-      crit.setCacheable(true);
-      crit.setCacheRegion("historyItemCache");
-      crit.setProjection(Projections.property("entityId"));
-      final List<Integer> idList = crit.list();
+      criteria.setCacheable(true);
+      criteria.setCacheRegion("historyItemCache");
+      criteria.setProjection(Projections.property("entityId"));
+      final List<Integer> idList = criteria.list();
       if (idList != null && idList.size() > 0) {
         for (final Integer id : idList) {
           idSet.add(id);
@@ -1762,5 +1765,24 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   public boolean isHistorizable()
   {
     return Historizable.class.isAssignableFrom(clazz);
+  }
+
+  /**
+   * If true then a eh cache region is used for this dao for every criteria search of this class. <br/>
+   * Please note: If you write your own criteria searches in extended classes, don't forget to call {@link #setCacheRegion(Criteria)}.
+   * @return false at default.
+   */
+  protected boolean useOwnCriteriaCacheRegion()
+  {
+    return false;
+  }
+
+  private void setCacheRegion(final Criteria criteria)
+  {
+    criteria.setCacheable(true);
+    if (useOwnCriteriaCacheRegion() == false) {
+      return;
+    }
+    criteria.setCacheRegion(this.getClass().getName());
   }
 }
