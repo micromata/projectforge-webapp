@@ -27,6 +27,8 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -61,6 +63,8 @@ import org.projectforge.access.AccessChecker;
 import org.projectforge.access.AccessException;
 import org.projectforge.access.OperationType;
 import org.projectforge.common.BeanHelper;
+import org.projectforge.common.DateFormats;
+import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.database.DatabaseDao;
 import org.projectforge.lucene.ClassicAnalyzer;
@@ -389,11 +393,11 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     {
       final Criteria criteria = filter.buildCriteria(getSession(), clazz);
       if (searchFilter.isSearchNotEmpty() == true) {
-        final String[] searchString = { ""};
+        final String searchString = modifySearchString(searchFilter.getSearchString());
         final String[] searchFields = searchFilter.getSearchFields() != null ? searchFilter.getSearchFields() : getSearchFields();
         try {
           final FullTextSession fullTextSession = Search.getFullTextSession(getSession());
-          final org.apache.lucene.search.Query query = createFullTextQuery(searchFields, filter, searchFilter, searchString);
+          final org.apache.lucene.search.Query query = createFullTextQuery(searchFields, filter, searchString);
           if (query == null) {
             // An error occured:
             return new ArrayList<O>();
@@ -407,8 +411,8 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
               + " (for "
               + this.getClass().getSimpleName()
               + ": "
-              + searchString[0]
-                  + ").";
+              + searchString
+              + ").";
           filter.setErrorMessage(errorMsg);
           log.info(errorMsg);
         }
@@ -452,15 +456,14 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     return list;
   }
 
-  private org.apache.lucene.search.Query createFullTextQuery(final String[] searchFields,
-      final QueryFilter queryFilter, final BaseSearchFilter searchFilter, final String[] searchString)
+  private org.apache.lucene.search.Query createFullTextQuery(final String[] searchFields, final QueryFilter queryFilter,
+      final String searchString)
   {
     final MultiFieldQueryParser parser = new MultiFieldQueryParser(LUCENE_VERSION, searchFields, new ClassicAnalyzer(Version.LUCENE_31));
     parser.setAllowLeadingWildcard(true);
     org.apache.lucene.search.Query query = null;
     try {
-      searchString[0] = modifySearchString(searchFilter.getSearchString());
-      query = parser.parse(searchString[0]);
+      query = parser.parse(searchString);
     } catch (final org.apache.lucene.queryParser.ParseException ex) {
       final String errorMsg = "Lucene error message: "
           + ex.getMessage()
@@ -1644,23 +1647,34 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     }
     // First get all history entries matching the filter and the given class.
     final String className = ClassUtils.getShortClassName(clazz);
-    final Criteria crit = session.createCriteria(HistoryEntry.class);
-    crit.add(Restrictions.eq("className", className));
-    if (filter.getStartTimeOfModification() != null && filter.getStopTimeOfModification() != null) {
-      crit.add(Restrictions.between("timestamp", filter.getStartTimeOfModification(), filter.getStopTimeOfModification()));
-    } else if (filter.getStartTimeOfModification() != null) {
-      crit.add(Restrictions.ge("timestamp", filter.getStartTimeOfModification()));
-    } else if (filter.getStopTimeOfModification() != null) {
-      crit.add(Restrictions.le("timestamp", filter.getStopTimeOfModification()));
-    }
-    if (filter.getModifiedByUserId() != null) {
-      crit.add(Restrictions.eq("userName", filter.getModifiedByUserId().toString()));
-    }
     if (searchStringInHistory == true) {
-      final String[] searchString = { ""};
+      final StringBuffer buf = new StringBuffer();
+      buf.append("(+className:").append(className);
+      if (filter.getStartTimeOfModification() != null || filter.getStopTimeOfModification() != null) {
+        final DateFormat df = new SimpleDateFormat(DateFormats.LUCENE_TIMESTAMP_MINUTE);
+        df.setTimeZone(DateHelper.UTC);
+        buf.append(" +timestamp:[");
+        if (filter.getStartTimeOfModification() != null) {
+          buf.append(df.format(filter.getStartTimeOfModification()));
+        } else {
+          buf.append("000000000000");
+        }
+        buf.append(" TO ");
+        if (filter.getStopTimeOfModification() != null) {
+          buf.append(df.format(filter.getStopTimeOfModification()));
+        } else {
+          buf.append("999999999999");
+        }
+        buf.append("]");
+      }
+      if (filter.getModifiedByUserId() != null) {
+        buf.append(" +userName:").append(filter.getModifiedByUserId());
+      }
+      buf.append(") AND (");
+      final String searchString = buf.toString() + modifySearchString(filter.getSearchString()) + ")";
       try {
         final FullTextSession fullTextSession = Search.getFullTextSession(getSession());
-        final org.apache.lucene.search.Query query = createFullTextQuery(HISTORY_SEARCH_FIELDS, null, filter, searchString);
+        final org.apache.lucene.search.Query query = createFullTextQuery(HISTORY_SEARCH_FIELDS, null, searchString);
         if (query == null) {
           // An error occured:
           return;
@@ -1668,12 +1682,11 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
         final FullTextQuery fullTextQuery = fullTextSession.createFullTextQuery(query, HistoryEntry.class);
         fullTextQuery.setCacheable(true);
         // crit.setCacheRegion("historyItemCache");
-        //fullTextQuery.setProjection("entityId"); Doesn't work, because critera is ignored.
-        fullTextQuery.setCriteriaQuery(crit);
-        final List<HistoryEntry> result = fullTextQuery.list();
+        fullTextQuery.setProjection("entityId");
+        final List<Object[]> result = fullTextQuery.list();
         if (result != null && result.size() > 0) {
-          for (final HistoryEntry entry : result) {
-            idSet.add(entry.getEntityId());
+          for (final Object[] oa : result) {
+            idSet.add((Integer) oa[0]);
           }
         }
       } catch (final Exception ex) {
@@ -1682,12 +1695,24 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
             + " (for "
             + this.getClass().getSimpleName()
             + ": "
-            + searchString[0]
-                + ").";
+            + searchString
+            + ").";
         filter.setErrorMessage(errorMsg);
         log.info(errorMsg);
       }
     } else {
+      final Criteria crit = session.createCriteria(HistoryEntry.class);
+      crit.add(Restrictions.eq("className", className));
+      if (filter.getStartTimeOfModification() != null && filter.getStopTimeOfModification() != null) {
+        crit.add(Restrictions.between("timestamp", filter.getStartTimeOfModification(), filter.getStopTimeOfModification()));
+      } else if (filter.getStartTimeOfModification() != null) {
+        crit.add(Restrictions.ge("timestamp", filter.getStartTimeOfModification()));
+      } else if (filter.getStopTimeOfModification() != null) {
+        crit.add(Restrictions.le("timestamp", filter.getStopTimeOfModification()));
+      }
+      if (filter.getModifiedByUserId() != null) {
+        crit.add(Restrictions.eq("userName", filter.getModifiedByUserId().toString()));
+      }
       crit.setCacheable(true);
       // crit.setCacheRegion("historyItemCache");
       crit.setProjection(Projections.property("entityId"));
