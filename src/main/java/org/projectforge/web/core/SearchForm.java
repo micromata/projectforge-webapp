@@ -88,6 +88,9 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
       filter = new SearchPageFilter();
       getParentPage().putUserPrefEntry(USER_PREF_KEY_FILTER, filter, true);
     }
+    if (filter.getArea() == null) {
+      filter.setArea(SearchPageFilter.ALL);
+    }
   }
 
   @Override
