@@ -36,6 +36,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
+import org.projectforge.core.BaseDao;
 import org.projectforge.registry.Registry;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.user.PFUserDO;
@@ -78,18 +79,20 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
   public SearchForm(final SearchPage parentPage, final String searchString)
   {
     super(parentPage);
-    if (StringUtils.isNotBlank(searchString) == true) {
-      filter = new SearchPageFilter();
-      filter.setSearchString(searchString);
-    } else {
-      filter = (SearchPageFilter) getParentPage().getUserPrefEntry(SearchPageFilter.class, USER_PREF_KEY_FILTER);
-    }
+    filter = (SearchPageFilter) getParentPage().getUserPrefEntry(SearchPageFilter.class, USER_PREF_KEY_FILTER);
     if (filter == null) {
       filter = new SearchPageFilter();
       getParentPage().putUserPrefEntry(USER_PREF_KEY_FILTER, filter, true);
     }
     if (filter.getArea() == null) {
       filter.setArea(SearchPageFilter.ALL);
+    }
+    if (StringUtils.isNotBlank(searchString) == true) {
+      filter.setSearchString(BaseDao.modifySearchString(searchString, true));
+      filter.setModifiedByUser(null);
+      filter.setStartTimeOfModification(null);
+      filter.setStopTimeOfModification(null);
+      filter.setSearchHistory(false);
     }
   }
 
