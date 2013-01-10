@@ -524,16 +524,25 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   }
 
   /**
+   * @see #modifySearchString(String, boolean)
+   */
+  public static String modifySearchString(final String searchString)
+  {
+    return modifySearchString(searchString, false);
+  }
+
+  /**
    * If the search string starts with "'" then the searchString will be returned without leading "'". If the search string consists only of
    * alphanumeric characters and allowed chars and spaces the wild card character '*' will be appended for enable ...* search. Otherwise the
    * searchString itself will be returned.
    * @param searchString
-   * @return
+   * @param andSearch If true then all terms must match (AND search), otherwise OR will used (default)
    * @see #ALLOWED_CHARS
    * @see #ALLOWED_BEGINNING_CHARS
    * @see #ESCAPE_CHARS
+   * @return The modified search string or the original one if no modification was done.
    */
-  public static String modifySearchString(final String searchString)
+  public static String modifySearchString(final String searchString, final boolean andSearch)
   {
     if (searchString == null) {
       return "";
@@ -561,9 +570,15 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       }
       if (ArrayUtils.contains(luceneReservedWords, token) == false) {
         final String modified = modifySearchToken(token);
+        if (tokens.length > 1 && andSearch == true && StringUtils.containsNone(modified, ESCAPE_CHARS) == true) {
+          buf.append("+");
+        }
         buf.append(modified);
         if (modified.endsWith("*") == false && StringUtils.containsNone(modified, ESCAPE_CHARS) == true) {
-          buf.append('*');
+          if (andSearch == false || tokens.length > 1) {
+            // Don't append '*' if used by SearchForm and only one token is given. It's will be appended automatically by BaseDao before the search is executed.
+            buf.append('*');
+          }
         }
       } else {
         buf.append(token);
