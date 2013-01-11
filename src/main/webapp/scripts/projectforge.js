@@ -159,14 +159,6 @@ function doAfterAjaxHandling() {
 	$("fieldset > div > input[type=checkbox]").addClass("checkbox");
 	$(".jqui_checkbox").buttonset();
 	initializeComponents();
-	$(".collapse").each(function() {
-		var arrow = $(this).siblings('a').children("i");
-		if($(this).hasClass("in")) {
-			$(arrow).removeClass().addClass("icon-arrow-up");
-		} else {
-			$(arrow).removeClass().addClass("icon-arrow-down");
-		}
-	});
 }
 
 function initColorPicker() {

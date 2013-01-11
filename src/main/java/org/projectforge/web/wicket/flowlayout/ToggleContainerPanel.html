@@ -6,10 +6,10 @@
 <body>
   <h1>Represents a container.</h1>
   <wicket:panel>
-    <div wicket:id="panel">
-      <a wicket:id="toggleLink" href="#" onClick="$(this).siblings('.collapse').collapse('toggle'); return false;">
-        <i class="icon-arrow-down"></i> <span wicket:id="heading">[heading]</span>
-      </a>
+    <div wicket:id="panel" class="toggle-container">
+      <div class="collapse-header" wicket:id="heading">
+        <i class="icon-plus icon-white" wicket:id="icon"></i> <span wicket:id="text">[heading text]</span>
+      </div>
       <div class="collapse" wicket:id="toggleContainer">
         <wicket:container wicket:id="content">[Toggle container.]</wicket:container>
       </div>

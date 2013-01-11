@@ -45,9 +45,11 @@ public class ToggleContainerPanel extends Panel
 
   public static final String CONTENT_ID = "content";
 
-  public static final String HEADING_ID = "heading";
+  public static final String HEADING_TEXT_ID = "text";
 
-  private final WebMarkupContainer panel, toggleContainer, toggleLink;
+  private final WebMarkupContainer panel, toggleContainer, toggleHeading, iconContainer;
+
+  private ToggleStatus toggleStatus = ToggleStatus.OPENED;
 
   /**
    * @param id
@@ -65,9 +67,11 @@ public class ToggleContainerPanel extends Panel
     }
     panel.add(toggleContainer = new WebMarkupContainer("toggleContainer"));
     toggleContainer.setOutputMarkupId(true);
-    panel.add(toggleLink = new WebMarkupContainer("toggleLink"));
+    panel.add(toggleHeading = new WebMarkupContainer("heading"));
+    toggleHeading
+    .add(AttributeModifier.replace("onClick", "$('#" + toggleContainer.getMarkupId() + "').collapse('toggle'); return false;"));
     if (wantsOnStatusChangedNotification()) {
-      toggleLink.add(new JavaScriptEventToggleBehavior() {
+      toggleHeading.add(new JavaScriptEventToggleBehavior() {
         private static final long serialVersionUID = -3739318529449433236L;
 
         @Override
@@ -77,22 +81,33 @@ public class ToggleContainerPanel extends Panel
         }
       });
     }
+    toggleHeading.add(iconContainer = new WebMarkupContainer("icon"));
+    iconContainer.setOutputMarkupId(true);
     setOpen();
+  }
+
+  private void setIcon()
+  {
+    if (toggleStatus == ToggleStatus.OPENED) {
+      iconContainer.add(AttributeModifier.replace("class", "icon-minus icon-white"));
+    } else {
+      iconContainer.add(AttributeModifier.replace("class", "icon-plus icon-white"));
+    }
   }
 
   public ToggleContainerPanel setHeading(final String heading)
   {
-    toggleLink.add(new Label(HEADING_ID, heading).setRenderBodyOnly(true));
+    toggleHeading.add(new Label(HEADING_TEXT_ID, heading).setRenderBodyOnly(true));
     return this;
   }
 
   /**
-   * @param heading Must have the component id {@link #HEADING_ID}.
+   * @param heading Must have the component id {@link #HEADING_TEXT_ID}.
    * @return
    */
   public ToggleContainerPanel setHeading(final Component heading)
   {
-    toggleLink.add(heading);
+    toggleHeading.add(heading);
     return this;
   }
 
@@ -120,13 +135,16 @@ public class ToggleContainerPanel extends Panel
 
   /**
    * Hook method when the toggle status of this {@link ToggleContainerPanel} was changed.
+   * Don't forget to call super!
    * 
    * @param target
    * @param toggleClosed this represents the <b>new</b> state of the toggle.
    */
   protected void onToggleStatusChanged(final AjaxRequestTarget target, final ToggleStatus toggleStatus)
   {
-
+    this.toggleStatus = toggleStatus;
+    target.add(iconContainer);
+    setIcon();
   }
 
   /**
@@ -153,7 +171,9 @@ public class ToggleContainerPanel extends Panel
    */
   public ToggleContainerPanel setOpen()
   {
+    toggleStatus = ToggleStatus.OPENED;
     toggleContainer.add(AttributeModifier.replace("class", "in collapse"));
+    setIcon();
     return this;
   }
 
@@ -163,7 +183,9 @@ public class ToggleContainerPanel extends Panel
    */
   public ToggleContainerPanel setClosed()
   {
+    toggleStatus = ToggleStatus.CLOSED;
     toggleContainer.add(AttributeModifier.replace("class", "collapse"));
+    setIcon();
     return this;
   }
 }

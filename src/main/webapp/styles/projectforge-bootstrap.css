@@ -13,6 +13,7 @@
 }
 
 form div.span12,div.span9,div.span8,div.span6,div.span4,div.span3 {
+	
 }
 
 /*form div.not-first {
@@ -81,18 +82,19 @@ div.login-header {
 }
 
 div.navbar {
- padding-left: 45px;
- padding-right: 5px;
- width: auto;
- margin-bottom: 5px;
+	padding-left: 45px;
+	padding-right: 5px;
+	width: auto;
+	margin-bottom: 5px;
 }
 
 div.navbar-inner {
- padding-left: 0px;	
- padding-right: 5px;	
+	padding-left: 0px;
+	padding-right: 5px;
 }
 
 div.navbar-inner>div.container {
+	
 }
 
 ul.nav li {
@@ -108,6 +110,18 @@ ul.nav>li>a {
 ul.nav li.dropdown:hover ul.dropdown-menu {
 	display: block;
 }
+
 ul.dropdown-menu {
 	margin-top: 0px; /* Needed, otherwise menu disappears for 2px. */
+}
+
+/* Collapse / Toggle container */
+div.toggle-container {
+	border: 1px solid #bbb;
+	border-radius: 3px;
+}
+
+div.toggle-container div.collapse-header {
+	color: #fff;
+	background-color: #4C5766;
 }

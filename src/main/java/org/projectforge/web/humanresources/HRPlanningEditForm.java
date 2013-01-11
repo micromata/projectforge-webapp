@@ -326,7 +326,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
       if (NumberHelper.isNotZero(totalHours) == true) {
         heading += ": " + NumberHelper.formatFraction2(totalHours);
       }
-      positionsPanel.setHeading(new HtmlCodePanel(ToggleContainerPanel.HEADING_ID, heading));
+      positionsPanel.setHeading(new HtmlCodePanel(ToggleContainerPanel.HEADING_TEXT_ID, heading));
       content = new DivPanel(ToggleContainerPanel.CONTENT_ID);
       positionsPanel.add(content);
       content.add(columns = new DivPanel(content.newChildId()));//, DivType.BLOCK));

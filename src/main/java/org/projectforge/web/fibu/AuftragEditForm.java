@@ -295,6 +295,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         @Override
         protected void onToggleStatusChanged(final AjaxRequestTarget target, final ToggleStatus toggleStatus)
         {
+          super.onToggleStatusChanged(target, toggleStatus);
           if (toggleStatus == ToggleStatus.OPENED) {
             data.getUiStatus().openPosition(position.getNumber());
           } else {
@@ -323,7 +324,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         heading.append(": ").append(StringUtils.abbreviate(position.getTitel(), 80));
       }
       heading.append("<span>");
-      positionsPanel.setHeading(new HtmlCodePanel(ToggleContainerPanel.HEADING_ID, heading.toString()));
+      positionsPanel.setHeading(new HtmlCodePanel(ToggleContainerPanel.HEADING_TEXT_ID, heading.toString()));
       if (data.getUiStatus().isClosed(position.getNumber()) == true) {
         positionsPanel.setClosed();
       } else {
