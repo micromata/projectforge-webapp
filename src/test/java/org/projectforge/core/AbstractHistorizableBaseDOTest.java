@@ -47,7 +47,8 @@ public class AbstractHistorizableBaseDOTest
 
     final AuftragDO order = new AuftragDO();
     set = order.getNonHistorizableAttributes();
-    Assert.assertEquals(3, set.size());
+    Assert.assertEquals(4, set.size());
+    Assert.assertTrue(order.isNonHistorizableAttribute("uiStatus"));
     Assert.assertTrue(order.isNonHistorizableAttribute("uiStatusAsXml"));
     Assert.assertFalse(order.isNonHistorizableAttribute("subject"));
   }
