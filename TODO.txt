@@ -1,19 +1,32 @@
+BaseDao searches now history at default! -> News
+
+UserPrefListPage: userPref.area.teamcal.favorite not found (i18n key)
+Tooltips und insbesondere für SearchFields verbessern.
+
+Prio 1 (Johannes):
+------------------
+- PageStaleException für FullCalendar.
+- Contextmenu (verschieben von Zeitberichten und rechte Maustaste in Listenansichten)
+
+Prio 2 (Johannes):
+------------------
+- Johannes: Autocompletion: deletion of objects doesn't work (locations)
+- Wiederholter Aufruf von PF-Dialog auf TeamCalSeite (ist ggf. gleiche Ursache wie StalePageException)
+
+Prio 3 (Johannes):
+------------------
+- TeamCalDialog: Wenn man irgendwo außerhalb klickt, sollte der sich auch wieder schließen.
+
+
 Bootstrap-Umbau
 ---------------
-
 - Dialoge
-- Icons ToggleContainer
-- Layout innerhalb ToggleContainer
 - Hilfe-Icons bei Textfields
 - RechnungEditPage: Anzeige von Aufträgen, Icon deplatziert
-- J.: TeamCalDialog: Wenn man irgendwo außerhalb klickt, sollte der sich auch wieder schließen.
-- J.: context menu auf Tabellenzeilen klappt nicht: abbrechen
-- J.: Autocompletion: deletion of objects doesn't work (locations)
-- K.: Fieldsets with subtitle (remove Fieldset-Constructor).
+- Fieldsets with subtitle (remove Fieldset-Constructor).
 
 Konkrete Masken
 ---------------
-- Extended filter
 - TaskEditPage
 - AddressViewPage
 - AdminPage
@@ -30,8 +43,6 @@ Konkrete Masken
 
 Wicket6-Migration
 -----------------
-- Fullcalendar, StalePage, wiederholter PF-Dialog, Context-Menü
-- J.: JavaScriptEventToggleBehavior
 - TaskTreePage auf Wicket Tree umstellen
 
 - JS and CSS: minifiing and concatenating (https://github.com/WiQuery/wiquery)
