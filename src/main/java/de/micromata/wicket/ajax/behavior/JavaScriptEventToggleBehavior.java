@@ -66,7 +66,6 @@ public abstract class JavaScriptEventToggleBehavior extends AjaxEventBehavior
     final StringValue conditionValue = RequestCycle.get().getRequest().getQueryParameters().getParameterValue(CONDITION);
     if (conditionValue != null) {
       final String conditionString = conditionValue.toString();
-      log.info("******** conditionString=" + conditionString);
       if ("true".equals(conditionString)) {
         onToggleCall(target, true);
       } else if ("false".equals(conditionString)) {
