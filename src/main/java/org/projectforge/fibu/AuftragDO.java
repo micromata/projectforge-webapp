@@ -51,6 +51,7 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.core.AbstractHistorizableBaseDO;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.PFPersistancyBehavior;
 import org.projectforge.user.PFUserDO;
@@ -123,7 +124,7 @@ public class AuftragDO extends DefaultBaseDO
   protected AuftragUIStatus uiStatus;
 
   static {
-    invalidHistorizableProperties.add("uiStatusAsXml");
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(AuftragDO.class, "uiStatusAsXml");
   }
 
   /**

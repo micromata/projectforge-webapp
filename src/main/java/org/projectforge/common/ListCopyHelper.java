@@ -25,6 +25,9 @@ package org.projectforge.common;
 
 import java.util.List;
 
+import org.projectforge.core.AbstractBaseDO;
+import org.projectforge.core.ModificationStatus;
+
 /**
  * Some helper methods ...
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -36,35 +39,35 @@ public abstract class ListCopyHelper<T>
    * @param dest
    * @return true, if any modification was detected, false if src and dest are equal.
    */
-  public boolean copy(final List<T> srcList, final List<T> destList, final Object... objects)
+  public ModificationStatus copy(final List<T> srcList, final List<T> destList, final Object... objects)
   {
     final int srcSize = srcList != null ? srcList.size() : 0;
     final int destSize = destList != null ? destList.size() : 0;
     int index = 0;
-    boolean modified = false;
+    ModificationStatus modStatus = ModificationStatus.NONE;
     do {
       if (index < srcSize) {
         final T srcEntry = srcList.get(index);
         if (index < destSize) {
           final T destEntry = destList.get(index);
-          if (copyFrom(srcEntry, destEntry, objects) == true) {
-            modified = true;
-          }
+          final ModificationStatus st = copyFrom(srcEntry, destEntry, objects);
+          modStatus = AbstractBaseDO.getModificationStatus(modStatus, st);
         } else {
           appendDestEntry(destList, srcEntry, objects);
-          modified = true;
+          modStatus = ModificationStatus.MAJOR;
         }
       } else if (index < destSize) {
         final T destEntry = destList.get(index);
         removeDestEntry(destList, destEntry, index, objects);
+        modStatus = ModificationStatus.MAJOR;
       } else {
         break;
       }
     } while (++index <= srcSize || index <= destSize); // Paranoia setting: endless loop protection
-    return modified;
+    return modStatus;
   }
 
-  protected abstract boolean copyFrom(T srcEntry, T destEntry, final Object... objects);
+  protected abstract ModificationStatus copyFrom(T srcEntry, T destEntry, final Object... objects);
 
   protected abstract void appendDestEntry(final List<T> destList, final T srcEntry, final Object... objects);
 

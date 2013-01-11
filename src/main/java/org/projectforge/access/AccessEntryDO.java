@@ -40,6 +40,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDO;
+import org.projectforge.core.ModificationStatus;
 
 
 /**
@@ -75,11 +76,11 @@ public class AccessEntryDO implements Comparable<AccessEntryDO>, Serializable, B
     return id;
   }
 
-  public void setId(Integer id)
+  public void setId(final Integer id)
   {
-    this.id = (Integer) id;
+    this.id = id;
   }
-  
+
   /**
    * @return Always false.
    * @see org.projectforge.core.BaseDO#isMinorChange()
@@ -94,7 +95,7 @@ public class AccessEntryDO implements Comparable<AccessEntryDO>, Serializable, B
    * Throws UnsupportedOperationException.
    * @see org.projectforge.core.BaseDO#setMinorChange(boolean)
    */
-  public void setMinorChange(boolean value)
+  public void setMinorChange(final boolean value)
   {
     throw new UnsupportedOperationException();
   }
@@ -103,18 +104,18 @@ public class AccessEntryDO implements Comparable<AccessEntryDO>, Serializable, B
   {
   }
 
-  public AccessEntryDO(AccessType accessType)
+  public AccessEntryDO(final AccessType accessType)
   {
     this.accessType = accessType;
   }
 
-  public AccessEntryDO(AccessType type, boolean accessSelect, boolean accessInsert, boolean accessUpdate, boolean accessDelete)
+  public AccessEntryDO(final AccessType type, final boolean accessSelect, final boolean accessInsert, final boolean accessUpdate, final boolean accessDelete)
   {
     this.accessType = type;
     setAccess(accessSelect, accessInsert, accessUpdate, accessDelete);
   }
 
-  public boolean hasPermission(OperationType opType)
+  public boolean hasPermission(final OperationType opType)
   {
     if (opType == OperationType.SELECT) {
       return this.accessSelect;
@@ -136,12 +137,12 @@ public class AccessEntryDO implements Comparable<AccessEntryDO>, Serializable, B
     return this.accessType;
   }
 
-  public void setAccessType(AccessType type)
+  public void setAccessType(final AccessType type)
   {
     this.accessType = type;
   }
 
-  public void setAccess(boolean accessSelect, boolean accessInsert, boolean accessUpdate, boolean accessDelete)
+  public void setAccess(final boolean accessSelect, final boolean accessInsert, final boolean accessUpdate, final boolean accessDelete)
   {
     this.accessSelect = accessSelect;
     this.accessInsert = accessInsert;
@@ -157,7 +158,7 @@ public class AccessEntryDO implements Comparable<AccessEntryDO>, Serializable, B
     return this.accessSelect;
   }
 
-  public void setAccessSelect(boolean value)
+  public void setAccessSelect(final boolean value)
   {
     this.accessSelect = value;
   }
@@ -168,7 +169,7 @@ public class AccessEntryDO implements Comparable<AccessEntryDO>, Serializable, B
     return this.accessInsert;
   }
 
-  public void setAccessInsert(boolean value)
+  public void setAccessInsert(final boolean value)
   {
     this.accessInsert = value;
   }
@@ -179,7 +180,7 @@ public class AccessEntryDO implements Comparable<AccessEntryDO>, Serializable, B
     return this.accessUpdate;
   }
 
-  public void setAccessUpdate(boolean value)
+  public void setAccessUpdate(final boolean value)
   {
     this.accessUpdate = value;
   }
@@ -190,7 +191,7 @@ public class AccessEntryDO implements Comparable<AccessEntryDO>, Serializable, B
     return this.accessDelete;
   }
 
-  public void setAccessDelete(boolean value)
+  public void setAccessDelete(final boolean value)
   {
     this.accessDelete = value;
   }
@@ -198,16 +199,16 @@ public class AccessEntryDO implements Comparable<AccessEntryDO>, Serializable, B
   /*
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
-  public int compareTo(AccessEntryDO o)
+  public int compareTo(final AccessEntryDO o)
   {
     return this.accessType.compareTo(o.accessType);
   }
 
   @Override
-  public boolean equals(Object o)
+  public boolean equals(final Object o)
   {
     if (o instanceof AccessEntryDO) {
-      AccessEntryDO other = (AccessEntryDO) o;
+      final AccessEntryDO other = (AccessEntryDO) o;
       if (ObjectUtils.equals(this.getAccessType(), other.getAccessType()) == false)
         return false;
       if (ObjectUtils.equals(this.getId(), other.getId()) == false)
@@ -220,16 +221,17 @@ public class AccessEntryDO implements Comparable<AccessEntryDO>, Serializable, B
   @Override
   public int hashCode()
   {
-    HashCodeBuilder hcb = new HashCodeBuilder();
+    final HashCodeBuilder hcb = new HashCodeBuilder();
     if (getAccessType() != null)
       hcb.append(getAccessType().ordinal());
     hcb.append(getId());
     return hcb.toHashCode();
   }
 
+  @Override
   public String toString()
   {
-    ToStringBuilder sb = new ToStringBuilder(this);
+    final ToStringBuilder sb = new ToStringBuilder(this);
     sb.append("id", getId());
     sb.append("type", this.accessType);
     sb.append("select", this.accessSelect);
@@ -244,17 +246,17 @@ public class AccessEntryDO implements Comparable<AccessEntryDO>, Serializable, B
    * modified. Null values will be excluded.
    * @param src
    */
-  public boolean copyValuesFrom(BaseDO<? extends Serializable> src, String... ignoreFields)
+  public ModificationStatus copyValuesFrom(final BaseDO<? extends Serializable> src, final String... ignoreFields)
   {
     return AbstractBaseDO.copyValues(src, this, ignoreFields);
   }
 
-  public Object getAttribute(String key)
+  public Object getAttribute(final String key)
   {
     throw new UnsupportedOperationException();
   }
 
-  public void setAttribute(String key, Object value)
+  public void setAttribute(final String key, final Object value)
   {
     throw new UnsupportedOperationException();
   }

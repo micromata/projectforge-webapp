@@ -50,8 +50,10 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
+import org.projectforge.core.AbstractHistorizableBaseDO;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.DefaultBaseDO;
+import org.projectforge.core.ModificationStatus;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.GroupDO;
 
@@ -67,7 +69,7 @@ public class GroupTaskAccessDO extends DefaultBaseDO
   private static final long serialVersionUID = -8819516962428533352L;
 
   static {
-    invalidHistorizableProperties.add("accessEntries");
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(GroupTaskAccessDO.class, "accessEntries");
   }
 
   @IndexedEmbedded(depth = 1)
@@ -89,11 +91,11 @@ public class GroupTaskAccessDO extends DefaultBaseDO
    * @return The specified access or null if not found.
    */
   @Transient
-  public AccessEntryDO getAccessEntry(AccessType accessType)
+  public AccessEntryDO getAccessEntry(final AccessType accessType)
   {
     if (this.accessEntries == null)
       return null;
-    for (AccessEntryDO entry : this.accessEntries) {
+    for (final AccessEntryDO entry : this.accessEntries) {
       if (entry.getAccessType() == accessType) {
         return entry;
       }
@@ -102,9 +104,9 @@ public class GroupTaskAccessDO extends DefaultBaseDO
   }
 
   @Transient
-  public boolean hasPermission(AccessType accessType, OperationType opType)
+  public boolean hasPermission(final AccessType accessType, final OperationType opType)
   {
-    AccessEntryDO entry = getAccessEntry(accessType);
+    final AccessEntryDO entry = getAccessEntry(accessType);
     if (entry == null) {
       return false;
     } else {
@@ -126,7 +128,7 @@ public class GroupTaskAccessDO extends DefaultBaseDO
   @Transient
   public List<AccessEntryDO> getOrderedEntries()
   {
-    List<AccessEntryDO> list = new ArrayList<AccessEntryDO>();
+    final List<AccessEntryDO> list = new ArrayList<AccessEntryDO>();
     AccessEntryDO entry = getAccessEntry(AccessType.TASK_ACCESS_MANAGEMENT);
     if (entry != null)
       list.add(entry);
@@ -185,7 +187,7 @@ public class GroupTaskAccessDO extends DefaultBaseDO
     return this;
   }
 
-  public AccessEntryDO ensureAndGetAccessEntry(AccessType accessType)
+  public AccessEntryDO ensureAndGetAccessEntry(final AccessType accessType)
   {
     if (this.accessEntries == null) {
       setAccessEntries(new HashSet<AccessEntryDO>());
@@ -199,10 +201,10 @@ public class GroupTaskAccessDO extends DefaultBaseDO
   }
 
   @Override
-  public boolean equals(Object o)
+  public boolean equals(final Object o)
   {
     if (o instanceof GroupTaskAccessDO) {
-      GroupTaskAccessDO other = (GroupTaskAccessDO) o;
+      final GroupTaskAccessDO other = (GroupTaskAccessDO) o;
       if (ObjectUtils.equals(this.getGroupId(), other.getGroupId()) == false)
         return false;
       if (ObjectUtils.equals(this.getTaskId(), other.getTaskId()) == false)
@@ -215,7 +217,7 @@ public class GroupTaskAccessDO extends DefaultBaseDO
   @Override
   public int hashCode()
   {
-    HashCodeBuilder hcb = new HashCodeBuilder();
+    final HashCodeBuilder hcb = new HashCodeBuilder();
     hcb.append(getTaskId());
     hcb.append(getGroupId());
     return hcb.toHashCode();
@@ -245,7 +247,7 @@ public class GroupTaskAccessDO extends DefaultBaseDO
     return recursive;
   }
 
-  public void setRecursive(boolean recursive)
+  public void setRecursive(final boolean recursive)
   {
     this.recursive = recursive;
   }
@@ -267,30 +269,31 @@ public class GroupTaskAccessDO extends DefaultBaseDO
    * @param src
    */
   @Override
-  public boolean copyValuesFrom(BaseDO< ? extends Serializable> source, String... ignoreFields)
+  public ModificationStatus copyValuesFrom(final BaseDO< ? extends Serializable> source, final String... ignoreFields)
   {
-    boolean modified = super.copyValuesFrom(source, ignoreFields);
-    GroupTaskAccessDO src = (GroupTaskAccessDO) source;
+    ModificationStatus modificationStatus = super.copyValuesFrom(source, ignoreFields);
+    final GroupTaskAccessDO src = (GroupTaskAccessDO) source;
     if (src.getAccessEntries() != null) {
-      for (AccessEntryDO srcEntry : src.getAccessEntries()) {
-        AccessEntryDO destEntry = ensureAndGetAccessEntry(srcEntry.getAccessType());
-        if (destEntry.copyValuesFrom(srcEntry) == true)
-          modified = true;
+      for (final AccessEntryDO srcEntry : src.getAccessEntries()) {
+        final AccessEntryDO destEntry = ensureAndGetAccessEntry(srcEntry.getAccessType());
+        final ModificationStatus st = destEntry.copyValuesFrom(srcEntry);
+        modificationStatus = getModificationStatus(modificationStatus, st);
       }
-      Iterator<AccessEntryDO> iterator = getAccessEntries().iterator();
+      final Iterator<AccessEntryDO> iterator = getAccessEntries().iterator();
       while (iterator.hasNext()) {
-        AccessEntryDO destEntry = iterator.next();
+        final AccessEntryDO destEntry = iterator.next();
         if (src.getAccessEntry(destEntry.getAccessType()) == null) {
           iterator.remove();
         }
       }
     }
-    return modified;
+    return modificationStatus;
   }
 
+  @Override
   public String toString()
   {
-    ToStringBuilder tos = new ToStringBuilder(this);
+    final ToStringBuilder tos = new ToStringBuilder(this);
     tos.append("id", getId());
     tos.append("task", getTaskId());
     tos.append("group", getGroupId());
@@ -300,13 +303,6 @@ public class GroupTaskAccessDO extends DefaultBaseDO
       tos.append("entries", "LazyCollection");
     }
     return tos.toString();
-  }
-
-  @SuppressWarnings("unchecked")
-  @Transient
-  public Set getHistorizableAttributes()
-  {
-    return null;
   }
 
   public AccessEntryDO ensureAndGetTasksEntry()

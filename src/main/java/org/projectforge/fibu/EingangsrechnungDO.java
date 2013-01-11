@@ -45,6 +45,7 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
+import org.projectforge.core.AbstractHistorizableBaseDO;
 
 /**
  * Eingehende Rechnungen.
@@ -70,7 +71,7 @@ public class EingangsrechnungDO extends AbstractRechnungDO<EingangsrechnungsPosi
   private PaymentType paymentType;
 
   static {
-    invalidHistorizableProperties.add("uiStatusAsXml");
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(EingangsrechnungDO.class, "uiStatusAsXml");
   }
 
   @Column(length = 255)

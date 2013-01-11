@@ -90,7 +90,7 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
     return deleted;
   }
 
-  public void setDeleted(boolean deleted)
+  public void setDeleted(final boolean deleted)
   {
     this.deleted = deleted;
   }
@@ -101,7 +101,7 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
     return created;
   }
 
-  public void setCreated(Date created)
+  public void setCreated(final Date created)
   {
     this.created = created;
   }
@@ -123,7 +123,7 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
     return lastUpdate;
   }
 
-  public void setLastUpdate(Date lastUpdate)
+  public void setLastUpdate(final Date lastUpdate)
   {
     this.lastUpdate = lastUpdate;
   }
@@ -143,7 +143,7 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
     return minorChange;
   }
 
-  public void setMinorChange(boolean value)
+  public void setMinorChange(final boolean value)
   {
     this.minorChange = value;
   }
@@ -157,12 +157,12 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
     return selected;
   }
 
-  public void setSelected(boolean selected)
+  public void setSelected(final boolean selected)
   {
     this.selected = selected;
   }
 
-  public Object getAttribute(String key)
+  public Object getAttribute(final String key)
   {
     if (attributeMap == null) {
       return null;
@@ -170,7 +170,7 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
     return attributeMap.get(key);
   }
 
-  public void setAttribute(String key, Object value)
+  public void setAttribute(final String key, final Object value)
   {
     synchronized (attributeMap) {
       if (attributeMap == null) {
@@ -184,6 +184,7 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
    * Returns string containing all fields (except the password, via ReflectionToStringBuilder).
    * @return
    */
+  @Override
   public String toString()
   {
     return ReflectionToString.asString(this);
@@ -196,7 +197,7 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
    * @param ignoreFields Does not copy these properties (by field name).
    * @return true, if any modifications are detected, otherwise false;
    */
-  public boolean copyValuesFrom(BaseDO< ? extends Serializable> src, String... ignoreFields)
+  public ModificationStatus copyValuesFrom(final BaseDO< ? extends Serializable> src, final String... ignoreFields)
   {
     return copyValues(src, this, ignoreFields);
   }
@@ -210,7 +211,7 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
    * @return true, if any modifications are detected, otherwise false;
    */
   @SuppressWarnings("unchecked")
-  public static boolean copyValues(BaseDO src, BaseDO dest, String... ignoreFields)
+  public static ModificationStatus copyValues(final BaseDO src, final BaseDO dest, final String... ignoreFields)
   {
     if (ClassUtils.isAssignable(src.getClass(), dest.getClass()) == false) {
       throw new RuntimeException("Try to copyValues from different BaseDO classes: this from type "
@@ -234,13 +235,15 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
    * @return true, if any modifications are detected, otherwise false;
    */
   @SuppressWarnings("unchecked")
-  private static boolean copyDeclaredFields(final Class< ? > srcClazz, final BaseDO src, final BaseDO dest, final String... ignoreFields)
+  private static ModificationStatus copyDeclaredFields(final Class< ? > srcClazz, final BaseDO< ? > src, final BaseDO< ? > dest,
+      final String... ignoreFields)
   {
     final Field[] fields = srcClazz.getDeclaredFields();
     AccessibleObject.setAccessible(fields, true);
-    boolean modified = false;
+    ModificationStatus modificationStatus = null;
     for (final Field field : fields) {
-      if ((ignoreFields != null && ArrayUtils.contains(ignoreFields, field.getName()) == true) || accept(field) == false) {
+      final String fieldName = field.getName();
+      if ((ignoreFields != null && ArrayUtils.contains(ignoreFields, fieldName) == true) || accept(field) == false) {
         continue;
       }
       try {
@@ -249,18 +252,18 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
         if (field.getType().isPrimitive() == true) {
           if (ObjectUtils.equals(destFieldValue, srcFieldValue) == false) {
             field.set(dest, srcFieldValue);
-            modified = true;
+            modificationStatus = getModificationStatus(modificationStatus, src, fieldName);
           }
           continue;
         } else if (srcFieldValue == null) {
           if (field.getType() == String.class) {
             if (StringUtils.isNotEmpty((String) destFieldValue) == true) {
               field.set(dest, null);
-              modified = true;
+              modificationStatus = getModificationStatus(modificationStatus, src, fieldName);
             }
           } else if (destFieldValue != null) {
             field.set(dest, null);
-            modified = true;
+            modificationStatus = getModificationStatus(modificationStatus, src, fieldName);
           } else {
             // dest was already null
           }
@@ -292,7 +295,7 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
               log.debug("Removing collection entry: " + o);
             }
             destColl.remove(o);
-            modified = true;
+            modificationStatus = getModificationStatus(modificationStatus, src, fieldName);
           }
           for (final Object srcEntry : srcColl) {
             if (destColl.contains(srcEntry) == false) {
@@ -300,30 +303,29 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
                 log.debug("Adding new collection entry: " + srcEntry);
               }
               destColl.add(srcEntry);
-              modified = true;
+              modificationStatus = getModificationStatus(modificationStatus, src, fieldName);
             } else if (srcEntry instanceof BaseDO) {
               final PFPersistancyBehavior behavior = field.getAnnotation(PFPersistancyBehavior.class);
               if (behavior != null && behavior.autoUpdateCollectionEntries() == true) {
-                BaseDO destEntry = null;
+                BaseDO< ? > destEntry = null;
                 for (final Object entry : destColl) {
                   if (entry.equals(srcEntry) == true) {
-                    destEntry = (BaseDO) entry;
+                    destEntry = (BaseDO< ? >) entry;
                     break;
                   }
                 }
                 Validate.notNull(destEntry);
-                if (destEntry.copyValuesFrom((BaseDO) srcEntry) == true) {
-                  modified = true;
-                }
+                final ModificationStatus st = destEntry.copyValuesFrom((BaseDO< ? >) srcEntry);
+                modificationStatus = getModificationStatus(modificationStatus, st);
               }
             }
           }
         } else if (srcFieldValue instanceof BaseDO) {
           final Serializable srcFieldValueId = HibernateUtils.getIdentifier((BaseDO< ? >) srcFieldValue);
           if (srcFieldValueId != null) {
-            if (destFieldValue == null || ObjectUtils.equals(srcFieldValueId, ((BaseDO) destFieldValue).getId()) == false) {
+            if (destFieldValue == null || ObjectUtils.equals(srcFieldValueId, ((BaseDO< ? >) destFieldValue).getId()) == false) {
               field.set(dest, srcFieldValue);
-              modified = true;
+              modificationStatus = getModificationStatus(modificationStatus, src, fieldName);
             }
           } else {
             log.error("Can't get id though can't copy the BaseDO (see error message above about HHH-3502).");
@@ -331,39 +333,61 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
         } else if (srcFieldValue instanceof java.sql.Date) {
           if (destFieldValue == null) {
             field.set(dest, srcFieldValue);
-            modified = true;
+            modificationStatus = getModificationStatus(modificationStatus, src, fieldName);
           } else {
             final DayHolder srcDay = new DayHolder((Date) srcFieldValue);
             final DayHolder destDay = new DayHolder((Date) destFieldValue);
             if (srcDay.isSameDay(destDay) == false) {
               field.set(dest, srcDay.getSQLDate());
-              modified = true;
+              modificationStatus = getModificationStatus(modificationStatus, src, fieldName);
             }
           }
         } else if (srcFieldValue instanceof Date) {
           if (destFieldValue == null || ((Date) srcFieldValue).getTime() != ((Date) destFieldValue).getTime()) {
             field.set(dest, srcFieldValue);
-            modified = true;
+            modificationStatus = getModificationStatus(modificationStatus, src, fieldName);
           }
         } else if (srcFieldValue instanceof BigDecimal) {
           if (destFieldValue == null || ((BigDecimal) srcFieldValue).compareTo((BigDecimal) destFieldValue) != 0) {
             field.set(dest, srcFieldValue);
-            modified = true;
+            modificationStatus = getModificationStatus(modificationStatus, src, fieldName);
           }
         } else if (ObjectUtils.equals(destFieldValue, srcFieldValue) == false) {
           field.set(dest, srcFieldValue);
-          modified = true;
+          modificationStatus = getModificationStatus(modificationStatus, src, fieldName);
         }
-      } catch (IllegalAccessException ex) {
+      } catch (final IllegalAccessException ex) {
         throw new InternalError("Unexpected IllegalAccessException: " + ex.getMessage());
       }
     }
     final Class< ? > superClazz = srcClazz.getSuperclass();
     if (superClazz != null) {
-      if (copyDeclaredFields(superClazz, src, dest, ignoreFields) == true)
-        modified = true;
+      final ModificationStatus st = copyDeclaredFields(superClazz, src, dest, ignoreFields);
+      modificationStatus = getModificationStatus(modificationStatus, st);
     }
-    return modified;
+    return modificationStatus;
+  }
+
+  protected static ModificationStatus getModificationStatus(final ModificationStatus currentStatus, final BaseDO< ? > src,
+      final String modifiedField)
+  {
+    if (currentStatus == ModificationStatus.MAJOR
+        || src instanceof AbstractHistorizableBaseDO == false
+        || ((AbstractHistorizableBaseDO< ? >) src).isNonHistorizableAttribute(modifiedField) == false) {
+      return ModificationStatus.MAJOR;
+    }
+    return ModificationStatus.MINOR;
+  }
+
+  public static ModificationStatus getModificationStatus(final ModificationStatus currentStatus, final ModificationStatus status)
+  {
+    if (currentStatus == ModificationStatus.MAJOR || status == ModificationStatus.MAJOR) {
+      return ModificationStatus.MAJOR;
+    }
+    if (currentStatus == ModificationStatus.MINOR || status == ModificationStatus.MINOR) {
+      return ModificationStatus.MINOR;
+    }
+    return ModificationStatus.NONE;
   }
 
   /**
@@ -377,7 +401,7 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
    * @param field The Field to test.
    * @return Whether or not to consider the given <code>Field</code>.
    */
-  protected static boolean accept(Field field)
+  protected static boolean accept(final Field field)
   {
     if (field.getName().indexOf(ClassUtils.INNER_CLASS_SEPARATOR_CHAR) != -1) {
       // Reject field from inner class.

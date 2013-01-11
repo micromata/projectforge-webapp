@@ -24,11 +24,17 @@
 package org.projectforge.core;
 
 import java.io.Serializable;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
+
+import org.projectforge.common.BeanHelper;
 
 import de.micromata.hibernate.history.ExtendedHistorizable;
 
@@ -41,19 +47,23 @@ public abstract class AbstractHistorizableBaseDO<I extends Serializable> extends
 {
   private static final long serialVersionUID = -5980671510045450615L;
 
-  protected static final Set<String> invalidHistorizableProperties;
-  
-  static {
-    invalidHistorizableProperties = new HashSet<String>();
-    invalidHistorizableProperties.add("lastUpdate");
-    invalidHistorizableProperties.add("created");
-  }
-  
-  public static Set<String> getInvalidHistorizableProperties()
-  {
-    return invalidHistorizableProperties;
-  }
+  private static final Map<Class< ? >, Set<String>> nonHistorizableProperties = new HashMap<Class< ? >, Set<String>>();
 
+  protected static void putNonHistorizableProperty(final Class< ? > cls, final String property)
+  {
+    final Field[] fields = BeanHelper.getAllDeclaredFields(cls);
+    AccessibleObject.setAccessible(fields, true);
+    boolean found = false;
+    for (final Field field : fields) {
+      if (property.equals(field.getName()) == true) {
+        found = true;
+      }
+    }
+    if (found == false) {
+      throw new IllegalArgumentException("Property '" + property + "' not found in class '" + cls.getName() + "'.");
+    }
+    getNonHistorizableAttributes(cls).add(property);
+  }
 
   @Transient
   public Set<String> getHistorizableAttributes()
@@ -64,6 +74,23 @@ public abstract class AbstractHistorizableBaseDO<I extends Serializable> extends
   @Transient
   public Set<String> getNonHistorizableAttributes()
   {
-    return invalidHistorizableProperties;
+    return getNonHistorizableAttributes(this.getClass());
+  }
+
+  public boolean isNonHistorizableAttribute(final String property)
+  {
+    return getNonHistorizableAttributes().contains(property);
+  }
+
+  private static Set<String> getNonHistorizableAttributes(final Class< ? > cls)
+  {
+    Set<String> result = nonHistorizableProperties.get(cls);
+    if (result == null) {
+      result = new HashSet<String>();
+      result.add("lastUpdate");
+      result.add("created");
+      nonHistorizableProperties.put(cls, result);
+    }
+    return result;
   }
 }

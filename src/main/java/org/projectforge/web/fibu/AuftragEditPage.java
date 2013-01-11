@@ -30,6 +30,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.OperationType;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.core.ModificationStatus;
 import org.projectforge.fibu.AuftragDO;
 import org.projectforge.fibu.AuftragDao;
 import org.projectforge.fibu.AuftragsPositionDO;
@@ -183,12 +184,12 @@ public class AuftragEditPage extends AbstractEditPage<AuftragDO, AuftragEditForm
   }
 
   @Override
-  public AbstractSecuredBasePage afterUpdate(final boolean modified)
+  public AbstractSecuredBasePage afterUpdate(final ModificationStatus modified)
   {
     if (form.isSendEMailNotification() == false) {
       return null;
     }
-    if (modified == true) {
+    if (modified == ModificationStatus.MAJOR) {
       sendNotificationIfRequired(OperationType.UPDATE);
     }
     return null;

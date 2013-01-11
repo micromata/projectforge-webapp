@@ -39,6 +39,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDO;
+import org.projectforge.core.ModificationStatus;
 import org.projectforge.core.UserPrefParameter;
 
 /**
@@ -86,9 +87,9 @@ public class UserPrefEntryDO implements BaseDO<Integer>, Serializable
     return id;
   }
 
-  public void setId(Integer id)
+  public void setId(final Integer id)
   {
-    this.id = (Integer) id;
+    this.id = id;
   }
 
   @Column(length = 255)
@@ -97,7 +98,7 @@ public class UserPrefEntryDO implements BaseDO<Integer>, Serializable
     return parameter;
   }
 
-  public void setParameter(String parameter)
+  public void setParameter(final String parameter)
   {
     this.parameter = parameter;
   }
@@ -108,7 +109,7 @@ public class UserPrefEntryDO implements BaseDO<Integer>, Serializable
     return value;
   }
 
-  public void setValue(String value)
+  public void setValue(final String value)
   {
     this.value = value;
   }
@@ -211,7 +212,7 @@ public class UserPrefEntryDO implements BaseDO<Integer>, Serializable
    * Throws UnsupportedOperationException.
    * @see org.projectforge.core.BaseDO#setMinorChange(boolean)
    */
-  public void setMinorChange(boolean value)
+  public void setMinorChange(final boolean value)
   {
     throw new UnsupportedOperationException();
   }
@@ -221,7 +222,7 @@ public class UserPrefEntryDO implements BaseDO<Integer>, Serializable
   }
 
   @Override
-  public boolean equals(Object o)
+  public boolean equals(final Object o)
   {
     if (o instanceof UserPrefEntryDO) {
       final UserPrefEntryDO other = (UserPrefEntryDO) o;
@@ -243,6 +244,7 @@ public class UserPrefEntryDO implements BaseDO<Integer>, Serializable
     return hcb.toHashCode();
   }
 
+  @Override
   public String toString()
   {
     final ToStringBuilder sb = new ToStringBuilder(this);
@@ -256,17 +258,17 @@ public class UserPrefEntryDO implements BaseDO<Integer>, Serializable
    * @param src
    * @see AbstractBaseDO#copyValues(BaseDO, BaseDO, String...)
    */
-  public boolean copyValuesFrom(BaseDO< ? extends Serializable> src, String... ignoreFields)
+  public ModificationStatus copyValuesFrom(final BaseDO< ? extends Serializable> src, final String... ignoreFields)
   {
     return AbstractBaseDO.copyValues(src, this, ignoreFields);
   }
 
-  public Object getAttribute(String key)
+  public Object getAttribute(final String key)
   {
     throw new UnsupportedOperationException();
   }
 
-  public void setAttribute(String key, Object value)
+  public void setAttribute(final String key, final Object value)
   {
     throw new UnsupportedOperationException();
   }

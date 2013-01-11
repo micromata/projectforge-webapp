@@ -54,6 +54,7 @@ import org.hibernate.search.annotations.Store;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDO;
+import org.projectforge.core.ModificationStatus;
 
 /**
  * Stores preferences of the user for any objects such as list filters or templates for adding new objects (time sheets etc.).
@@ -88,9 +89,9 @@ public class UserPrefDO extends AbstractBaseDO<Integer>
     return id;
   }
 
-  public void setId(Integer id)
+  public void setId(final Integer id)
   {
-    this.id = (Integer) id;
+    this.id = id;
   }
 
   @Column(length = 255, nullable = false)
@@ -99,7 +100,7 @@ public class UserPrefDO extends AbstractBaseDO<Integer>
     return name;
   }
 
-  public void setName(String name)
+  public void setName(final String name)
   {
     this.name = name;
   }
@@ -111,7 +112,7 @@ public class UserPrefDO extends AbstractBaseDO<Integer>
     return user;
   }
 
-  public void setUser(PFUserDO user)
+  public void setUser(final PFUserDO user)
   {
     this.user = user;
   }
@@ -122,7 +123,7 @@ public class UserPrefDO extends AbstractBaseDO<Integer>
     return area;
   }
 
-  public void setArea(UserPrefArea area)
+  public void setArea(final UserPrefArea area)
   {
     this.area = area;
   }
@@ -155,7 +156,7 @@ public class UserPrefDO extends AbstractBaseDO<Integer>
   public Set<UserPrefEntryDO> getSortedUserPrefEntries()
   {
     final SortedSet<UserPrefEntryDO> result = new TreeSet<UserPrefEntryDO>(new Comparator<UserPrefEntryDO>() {
-      public int compare(UserPrefEntryDO o1, UserPrefEntryDO o2)
+      public int compare(final UserPrefEntryDO o1, final UserPrefEntryDO o2)
       {
         return StringHelper.compareTo(o1.orderString, o2.orderString);
       }
@@ -164,7 +165,7 @@ public class UserPrefDO extends AbstractBaseDO<Integer>
     return result;
   }
 
-  public void setUserPrefEntries(Set<UserPrefEntryDO> userPrefEntries)
+  public void setUserPrefEntries(final Set<UserPrefEntryDO> userPrefEntries)
   {
     this.prefEntries = userPrefEntries;
   }
@@ -182,15 +183,15 @@ public class UserPrefDO extends AbstractBaseDO<Integer>
    * @param src
    */
   @Override
-  public boolean copyValuesFrom(BaseDO< ? extends Serializable> source, String... ignoreFields)
+  public ModificationStatus copyValuesFrom(final BaseDO< ? extends Serializable> source, final String... ignoreFields)
   {
-    boolean modified = super.copyValuesFrom(source, ignoreFields);
+    ModificationStatus modificationStatus = super.copyValuesFrom(source, ignoreFields);
     final UserPrefDO src = (UserPrefDO) source;
     if (src.getUserPrefEntries() != null) {
       for (final UserPrefEntryDO srcEntry : src.getUserPrefEntries()) {
         final UserPrefEntryDO destEntry = ensureAndGetAccessEntry(srcEntry.getParameter());
-        if (destEntry.copyValuesFrom(srcEntry) == true)
-          modified = true;
+        final ModificationStatus st = destEntry.copyValuesFrom(srcEntry);
+        modificationStatus = getModificationStatus(modificationStatus, st);
       }
       final Iterator<UserPrefEntryDO> iterator = getUserPrefEntries().iterator();
       while (iterator.hasNext()) {
@@ -200,7 +201,7 @@ public class UserPrefDO extends AbstractBaseDO<Integer>
         }
       }
     }
-    return modified;
+    return modificationStatus;
   }
 
   public UserPrefEntryDO ensureAndGetAccessEntry(final String parameter)

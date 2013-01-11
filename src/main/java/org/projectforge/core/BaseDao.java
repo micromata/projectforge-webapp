@@ -995,7 +995,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    * @see #internalUpdate(ExtendedBaseDO, boolean)
    */
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ)
-  public boolean update(final O obj) throws AccessException
+  public ModificationStatus update(final O obj) throws AccessException
   {
     Validate.notNull(obj);
     if (obj.getId() == null) {
@@ -1013,7 +1013,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    * @see #internalUpdate(ExtendedBaseDO, boolean)
    */
   @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
-  public boolean internalUpdate(final O obj)
+  public ModificationStatus internalUpdate(final O obj)
   {
     return internalUpdate(obj, false);
   }
@@ -1026,7 +1026,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    * @return true, if modifications were done, false if no modification detected.
    */
   @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
-  public boolean internalUpdate(final O obj, final boolean checkAccess)
+  public ModificationStatus internalUpdate(final O obj, final boolean checkAccess)
   {
     onSaveOrModify(obj);
     if (checkAccess == true) {
@@ -1045,8 +1045,8 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     }
     final boolean wantsReindexAllDependentObjects = wantsReindexAllDependentObjects(obj, dbObj);
     // Copy all values of modified user to database object, ignore field 'deleted'.
-    final boolean result = copyValues(obj, dbObj, "deleted");
-    if (result == true) {
+    final ModificationStatus result = copyValues(obj, dbObj, "deleted");
+    if (result != ModificationStatus.NONE) {
       dbObj.setLastUpdate();
       log.info("Object updated: " + dbObj.toString());
     } else {
@@ -1514,7 +1514,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    * @return true, if any field was modified, otherwise false.
    * @see BaseDO#copyValuesFrom(BaseDO, String...)
    */
-  protected boolean copyValues(final O src, final O dest, final String... ignoreFields)
+  protected ModificationStatus copyValues(final O src, final O dest, final String... ignoreFields)
   {
     return dest.copyValuesFrom(src, ignoreFields);
   }

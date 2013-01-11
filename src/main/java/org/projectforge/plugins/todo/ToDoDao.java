@@ -39,6 +39,7 @@ import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.DisplayHistoryEntry;
+import org.projectforge.core.ModificationStatus;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.database.Table;
 import org.projectforge.mail.Mail;
@@ -241,7 +242,7 @@ public class ToDoDao extends BaseDao<ToDoDO>
       // To-do is changed by other user than assignee, so set recent flag for this to-do for the assignee.
       final ToDoDO copyOfDBObj = new ToDoDO();
       copyOfDBObj.copyValuesFrom(dbObj, "deleted");
-      if (copyOfDBObj.copyValuesFrom(obj, "deleted") == true) {
+      if (copyOfDBObj.copyValuesFrom(obj, "deleted") == ModificationStatus.MAJOR) {
         // Modifications done:
         obj.setRecent(true);
       }

@@ -42,6 +42,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
+import org.projectforge.core.AbstractHistorizableBaseDO;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.Priority;
 import org.projectforge.core.UserPrefParameter;
@@ -112,8 +113,7 @@ public class ToDoDO extends DefaultBaseDO
   private Date resubmission;
 
   static {
-    // Field recent should not be listed in the history of changes:
-    invalidHistorizableProperties.add("recent");
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(ToDoDO.class, "recent");
   }
 
   @Column(length = Constants.LENGTH_TITLE)
@@ -126,7 +126,7 @@ public class ToDoDO extends DefaultBaseDO
    * @param title
    * @return this for chaining.
    */
-  public ToDoDO setSubject(String subject)
+  public ToDoDO setSubject(final String subject)
   {
     this.subject = subject;
     return this;
@@ -213,7 +213,7 @@ public class ToDoDO extends DefaultBaseDO
     return group;
   }
 
-  public void setGroup(GroupDO group)
+  public void setGroup(final GroupDO group)
   {
     this.group = group;
   }
@@ -233,7 +233,7 @@ public class ToDoDO extends DefaultBaseDO
   /**
    * @return this for chaining.
    */
-  public ToDoDO setDescription(String description)
+  public ToDoDO setDescription(final String description)
   {
     this.description = description;
     return this;
@@ -248,7 +248,7 @@ public class ToDoDO extends DefaultBaseDO
   /**
    * @return this for chaining.
    */
-  public ToDoDO setComment(String comment)
+  public ToDoDO setComment(final String comment)
   {
     this.comment = comment;
     return this;
@@ -264,7 +264,7 @@ public class ToDoDO extends DefaultBaseDO
   /**
    * @return this for chaining.
    */
-  public ToDoDO setType(ToDoType type)
+  public ToDoDO setType(final ToDoType type)
   {
     this.type = type;
     return this;
@@ -280,7 +280,7 @@ public class ToDoDO extends DefaultBaseDO
   /**
    * @return this for chaining.
    */
-  public ToDoDO setStatus(ToDoStatus status)
+  public ToDoDO setStatus(final ToDoStatus status)
   {
     this.status = status;
     return this;
@@ -331,7 +331,7 @@ public class ToDoDO extends DefaultBaseDO
   /**
    * @return this for chaining.
    */
-  public ToDoDO setDueDate(Date dueDate)
+  public ToDoDO setDueDate(final Date dueDate)
   {
     this.dueDate = dueDate;
     return this;
@@ -346,7 +346,7 @@ public class ToDoDO extends DefaultBaseDO
   /**
    * @return this for chaining.
    */
-  public ToDoDO setResubmission(Date resubmission)
+  public ToDoDO setResubmission(final Date resubmission)
   {
     this.resubmission = resubmission;
     return this;

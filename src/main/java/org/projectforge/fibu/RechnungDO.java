@@ -46,6 +46,7 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
+import org.projectforge.core.AbstractHistorizableBaseDO;
 
 /**
  * Geplante und gestellte Rechnungen.
@@ -77,7 +78,7 @@ public class RechnungDO extends AbstractRechnungDO<RechnungsPositionDO> implemen
   private RechnungTyp typ;
 
   static {
-    invalidHistorizableProperties.add("uiStatusAsXml");
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(RechnungDO.class, "uiStatusAsXml");
   }
 
   /**

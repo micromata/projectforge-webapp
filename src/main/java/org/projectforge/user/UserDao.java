@@ -45,6 +45,7 @@ import org.projectforge.common.NumberHelper;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.DisplayHistoryEntry;
+import org.projectforge.core.ModificationStatus;
 import org.projectforge.core.QueryFilter;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -519,11 +520,11 @@ public class UserDao extends BaseDao<PFUserDO>
     final PFUserDO contextUser = PFUserContext.getUser();
     Validate.isTrue(user.getId().equals(contextUser.getId()) == true);
     final PFUserDO dbUser = getHibernateTemplate().load(clazz, user.getId(), LockMode.PESSIMISTIC_WRITE);
-    if (copyValues(user, dbUser, "deleted", "password", "lastLogin", "loginFailures", "orgUnit", "role", "username", "stayLoggedInKey",
-        "authenticationToken", "rights") == true) {
+    if (copyValues(user, dbUser, "deleted", "password", "lastLogin", "loginFailures", "username", "stayLoggedInKey", "authenticationToken",
+        "rights") != ModificationStatus.NONE) {
       dbUser.setLastUpdate();
       log.info("Object updated: " + dbUser.toString());
-      copyValues(user, contextUser, "deleted", "password", "lastLogin", "loginFailures", "orgUnit", "role", "username", "stayLoggedInKey",
+      copyValues(user, contextUser, "deleted", "password", "lastLogin", "loginFailures", "username", "stayLoggedInKey",
           "authenticationToken", "rights");
     } else {
       log.info("No modifications detected (no update needed): " + dbUser.toString());

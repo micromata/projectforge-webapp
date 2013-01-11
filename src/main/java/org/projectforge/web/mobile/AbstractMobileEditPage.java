@@ -29,6 +29,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDao;
+import org.projectforge.core.ModificationStatus;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.EditPageSupport;
@@ -157,7 +158,7 @@ extends AbstractSecuredMobilePage implements IEditPage<O, D>
   }
 
   @Override
-  public WebPage afterUpdate(final boolean modified)
+  public WebPage afterUpdate(final ModificationStatus modified)
   {
     return null;
   }

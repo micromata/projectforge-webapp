@@ -55,9 +55,11 @@ import org.joda.time.DateTimeZone;
 import org.projectforge.common.ReflectionToString;
 import org.projectforge.common.TimeNotation;
 import org.projectforge.core.AbstractBaseDO;
+import org.projectforge.core.AbstractHistorizableBaseDO;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.DefaultBaseDO;
+import org.projectforge.core.ModificationStatus;
 import org.projectforge.core.ShortDisplayNameCapable;
 
 /**
@@ -77,9 +79,9 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   private static final String NOPASSWORD = "--- none ---";
 
   static {
-    invalidHistorizableProperties.add("loginFailures");
-    invalidHistorizableProperties.add("lastLogin");
-    invalidHistorizableProperties.add("stayLoggedInKey");
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(PFUserDO.class, "loginFailures");
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(PFUserDO.class, "lastLogin");
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(PFUserDO.class, "stayLoggedInKey");
   }
 
   private transient Map<String, Object> attributeMap;
@@ -387,19 +389,19 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   }
 
   @Override
-  public boolean copyValuesFrom(final BaseDO< ? extends Serializable> src, String... ignoreFields)
+  public ModificationStatus copyValuesFrom(final BaseDO< ? extends Serializable> src, String... ignoreFields)
   {
     ignoreFields = (String[]) ArrayUtils.add(ignoreFields, "password"); // NPE save considering ignoreFields
     final PFUserDO user = (PFUserDO) src;
-    boolean modified = AbstractBaseDO.copyValues(user, this, ignoreFields);
+    ModificationStatus modificationStatus = AbstractBaseDO.copyValues(user, this, ignoreFields);
     if (user.getPassword() != null) {
       setPassword(user.getPassword());
       checkAndFixPassword();
       if (getPassword() != null) {
-        modified = true;
+        modificationStatus = ModificationStatus.MAJOR;
       }
     }
-    return modified;
+    return modificationStatus;
   }
 
   /**

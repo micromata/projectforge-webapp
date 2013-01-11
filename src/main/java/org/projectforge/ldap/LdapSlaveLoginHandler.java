@@ -30,6 +30,7 @@ import java.util.List;
 import javax.naming.NameNotFoundException;
 
 import org.apache.commons.lang.StringUtils;
+import org.projectforge.core.ModificationStatus;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.LoginDefaultHandler;
 import org.projectforge.user.LoginResult;
@@ -279,8 +280,8 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
                 userDao.internalUndelete(dbUser);
                 ++undeleted;
               }
-              final boolean modified = userDao.internalUpdate(dbUser);
-              if (modified == true) {
+              final ModificationStatus modificationStatus = userDao.internalUpdate(dbUser);
+              if (modificationStatus != ModificationStatus.NONE) {
                 ++updated;
               } else {
                 ++unmodified;

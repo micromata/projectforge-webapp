@@ -65,5 +65,5 @@ public interface BaseDO<I extends Serializable>
    * @param src
    * @return true, if any modifications are detected, otherwise false;
    */
-  public boolean copyValuesFrom(BaseDO< ? extends Serializable> src, String... ignoreFields);
+  public ModificationStatus copyValuesFrom(BaseDO< ? extends Serializable> src, String... ignoreFields);
 }

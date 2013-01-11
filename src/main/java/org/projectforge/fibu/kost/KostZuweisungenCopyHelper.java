@@ -26,6 +26,7 @@ package org.projectforge.fibu.kost;
 import java.util.List;
 
 import org.projectforge.common.ListCopyHelper;
+import org.projectforge.core.ModificationStatus;
 import org.projectforge.fibu.AbstractRechnungsPositionDO;
 
 public class KostZuweisungenCopyHelper extends ListCopyHelper<KostZuweisungDO>
@@ -36,19 +37,19 @@ public class KostZuweisungenCopyHelper extends ListCopyHelper<KostZuweisungDO>
    * @see org.projectforge.common.ListCopyHelper#copy(java.util.List, java.util.List, java.lang.Object[])
    */
   @Override
-  public boolean copy(final List<KostZuweisungDO> srcList, final List<KostZuweisungDO> destList, final Object... objects)
+  public ModificationStatus copy(final List<KostZuweisungDO> srcList, final List<KostZuweisungDO> destList, final Object... objects)
   {
     throw new IllegalArgumentException("Please call mycopy with AbstractRechnungsPositionDO instead!");
   }
 
-  public boolean mycopy(final List<KostZuweisungDO> srcList, final List<KostZuweisungDO> destList,
+  public ModificationStatus mycopy(final List<KostZuweisungDO> srcList, final List<KostZuweisungDO> destList,
       final AbstractRechnungsPositionDO destPosition)
   {
     return super.copy(srcList, destList, destPosition);
   }
 
   @Override
-  protected boolean copyFrom(final KostZuweisungDO srcEntry, final KostZuweisungDO destEntry, final Object... objects)
+  protected ModificationStatus copyFrom(final KostZuweisungDO srcEntry, final KostZuweisungDO destEntry, final Object... objects)
   {
     return destEntry.copyValuesFrom(srcEntry, IGNORE_FIELDS);
   }

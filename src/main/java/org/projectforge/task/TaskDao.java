@@ -39,6 +39,7 @@ import org.projectforge.access.AccessType;
 import org.projectforge.access.OperationType;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.core.ModificationStatus;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.core.UserException;
 import org.projectforge.database.DatabaseSupport;
@@ -484,19 +485,19 @@ public class TaskDao extends BaseDao<TaskDO>
   }
 
   @Override
-  protected boolean copyValues(final TaskDO src, final TaskDO dest, final String... ignoreFields)
+  protected ModificationStatus copyValues(final TaskDO src, final TaskDO dest, final String... ignoreFields)
   {
-    boolean modified = super.copyValues(src, dest, ignoreFields);
+    ModificationStatus modified = super.copyValues(src, dest, ignoreFields);
     // Priority value is null-able (may be was not copied from super.copyValues):
     if (ObjectUtils.equals(dest.getPriority(), src.getPriority()) == false) {
       dest.setPriority(src.getPriority());
-      modified = true;
+      modified = ModificationStatus.MAJOR;
     }
     // User object is null-able:
     if (src.getResponsibleUser() == null) {
       if (dest.getResponsibleUser() != null) {
         dest.setResponsibleUser(src.getResponsibleUser());
-        modified = true;
+        modified = ModificationStatus.MAJOR;
       }
     }
     return modified;

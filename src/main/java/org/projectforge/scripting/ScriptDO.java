@@ -35,6 +35,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
+import org.projectforge.core.AbstractHistorizableBaseDO;
 import org.projectforge.core.DefaultBaseDO;
 
 
@@ -53,8 +54,8 @@ public class ScriptDO extends DefaultBaseDO
   public static final int PARAMETER_NAME_MAX_LENGTH = 100;
 
   static {
-    invalidHistorizableProperties.add("script");
-    invalidHistorizableProperties.add("scriptBackup");
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(ScriptDO.class, "script");
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(ScriptDO.class, "scriptBackup");
   }
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
