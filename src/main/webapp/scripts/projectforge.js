@@ -59,6 +59,14 @@ function initializeComponents() {
 		$("textarea.autogrow").autoGrow();
 	}
 }
+/* Only used if the ToggleContainer works without Ajax (wantOnToggleNotification = false) */
+function toggleCollapseIcon(icon, iconStatusOpened, iconOpened, iconClosed) {
+	if($(icon).hasClass(iconStatusOpened)) {
+		$(icon).removeClass().addClass(iconClosed);
+	} else {
+		$(icon).removeClass().addClass(iconOpened);
+	}}
+
 function showBookmark() {
 	$("#bookmark").toggle("normal");
 }
@@ -251,7 +259,7 @@ function pf_deleteClick(element, content, liElement) {
 		}
 		var file = files[0];
 		if (file == null || file.size > 204800 || file.type != "text/calendar") {
-		/*  200 kbyte max */
+			/* 200 kbyte max */
 			// TODO ju: error handling
 			return;
 		}

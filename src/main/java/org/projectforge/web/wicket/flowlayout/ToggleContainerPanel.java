@@ -26,14 +26,12 @@ package org.projectforge.web.wicket.flowlayout;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
+import org.apache.wicket.ajax.AjaxEventBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
-
-import de.micromata.wicket.ajax.behavior.JavaScriptEventToggleBehavior;
-import de.micromata.wicket.ajax.behavior.ToggleStatus;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -47,6 +45,12 @@ public class ToggleContainerPanel extends Panel
 
   public static final String HEADING_TEXT_ID = "text";
 
+  private static final String ICON_STATUS_OPENED = "icon-minus";
+
+  private static final String ICON_OPENED = "icon-minus icon-white";
+
+  private static final String ICON_CLOSED = "icon-plus icon-white";
+
   private final WebMarkupContainer panel, toggleContainer, toggleHeading, iconContainer;
 
   private ToggleStatus toggleStatus = ToggleStatus.OPENED;
@@ -54,6 +58,7 @@ public class ToggleContainerPanel extends Panel
   /**
    * @param id
    */
+  @SuppressWarnings("serial")
   public ToggleContainerPanel(final String id, final DivType... cssClasses)
   {
     super(id);
@@ -68,30 +73,59 @@ public class ToggleContainerPanel extends Panel
     panel.add(toggleContainer = new WebMarkupContainer("toggleContainer"));
     toggleContainer.setOutputMarkupId(true);
     panel.add(toggleHeading = new WebMarkupContainer("heading"));
-    toggleHeading
-    .add(AttributeModifier.replace("onClick", "$('#" + toggleContainer.getMarkupId() + "').collapse('toggle'); return false;"));
-    if (wantsOnStatusChangedNotification()) {
-      toggleHeading.add(new JavaScriptEventToggleBehavior() {
-        private static final long serialVersionUID = -3739318529449433236L;
-
-        @Override
-        protected void onToggleCall(final AjaxRequestTarget target, final ToggleStatus toggleStatus)
-        {
-          ToggleContainerPanel.this.onToggleStatusChanged(target, toggleStatus);
-        }
-      });
-    }
     toggleHeading.add(iconContainer = new WebMarkupContainer("icon"));
     iconContainer.setOutputMarkupId(true);
     setOpen();
+
+    if (wantsOnStatusChangedNotification()) {
+      final AjaxEventBehavior behavior = new AjaxEventBehavior("onClick") {
+        @Override
+        protected void onEvent(final AjaxRequestTarget target)
+        {
+          if (toggleStatus == ToggleStatus.OPENED) {
+            target.appendJavaScript("$('#" + toggleContainer.getMarkupId() + "').collapse('hide')");
+            toggleStatus = ToggleStatus.CLOSED;
+          } else {
+            target.appendJavaScript("$('#" + toggleContainer.getMarkupId() + "').collapse('show')");
+            toggleStatus = ToggleStatus.OPENED;
+          }
+          ToggleContainerPanel.this.onToggleStatusChanged(target, toggleStatus);
+          target.add(iconContainer);
+          setIcon();
+        }
+      };
+      toggleHeading.add(behavior);
+    } else {
+      toggleHeading.add(AttributeModifier.replace("onClick", "$('#"
+          + toggleContainer.getMarkupId()
+          + "').collapse('toggle'); toggleCollapseIcon($('#"
+          + iconContainer.getMarkupId()
+          + "'), '"
+          + ICON_STATUS_OPENED
+          + "','"
+          + ICON_OPENED
+          + "','"
+          + ICON_CLOSED
+          + "'); return false;"));
+    }
+  }
+
+  /**
+   * Appends class "highlight" to the heading class: "collapse-header highlight"
+   * @return
+   */
+  public ToggleContainerPanel setHighlightedHeader()
+  {
+    toggleHeading.add(AttributeModifier.append("class", "highlight"));
+    return this;
   }
 
   private void setIcon()
   {
     if (toggleStatus == ToggleStatus.OPENED) {
-      iconContainer.add(AttributeModifier.replace("class", "icon-minus icon-white"));
+      iconContainer.add(AttributeModifier.replace("class", ICON_OPENED));
     } else {
-      iconContainer.add(AttributeModifier.replace("class", "icon-plus icon-white"));
+      iconContainer.add(AttributeModifier.replace("class", ICON_CLOSED));
     }
   }
 
@@ -135,16 +169,12 @@ public class ToggleContainerPanel extends Panel
 
   /**
    * Hook method when the toggle status of this {@link ToggleContainerPanel} was changed.
-   * Don't forget to call super!
    * 
    * @param target
    * @param toggleClosed this represents the <b>new</b> state of the toggle.
    */
   protected void onToggleStatusChanged(final AjaxRequestTarget target, final ToggleStatus toggleStatus)
   {
-    this.toggleStatus = toggleStatus;
-    target.add(iconContainer);
-    setIcon();
   }
 
   /**
@@ -188,4 +218,9 @@ public class ToggleContainerPanel extends Panel
     setIcon();
     return this;
   }
+
+  public enum ToggleStatus
+  {
+    OPENED, CLOSED
+  };
 }
