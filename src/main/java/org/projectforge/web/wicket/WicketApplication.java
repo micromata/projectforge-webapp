@@ -378,9 +378,12 @@ public class WicketApplication extends WebApplication implements WicketApplicati
       mountPage(path, pageClass);
       mountedPages.put(pageClass, path);
     }
-    if (isDevelopmentSystem() == true && isStripWicketTags() == true) {
-      log.info("Strip Wicket tags also in development mode at default (see context.xml).");
-      Application.get().getMarkupSettings().setStripWicketTags(true);
+    if (isDevelopmentSystem() == true) {
+      if (isStripWicketTags() == true) {
+        log.info("Strip Wicket tags also in development mode at default (see context.xml).");
+        Application.get().getMarkupSettings().setStripWicketTags(true);
+      }
+      getDebugSettings().setOutputMarkupContainerClassName(true);
     }
     log.info("Default TimeZone is: " + TimeZone.getDefault());
     if ("UTC".equals(TimeZone.getDefault().getID()) == false) {
