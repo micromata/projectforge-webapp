@@ -86,6 +86,8 @@ import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 import org.projectforge.web.wicket.flowlayout.TextStyle;
 import org.projectforge.web.wicket.flowlayout.ToggleContainerPanel;
 
+import de.micromata.wicket.ajax.behavior.ToggleStatus;
+
 public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage>
 {
   private static final long serialVersionUID = 3150725003240437752L;
@@ -291,12 +293,12 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
          *      boolean)
          */
         @Override
-        protected void onToggleStatusChanged(final AjaxRequestTarget target, final boolean toggleClosed)
+        protected void onToggleStatusChanged(final AjaxRequestTarget target, final ToggleStatus toggleStatus)
         {
-          if (toggleClosed == true) {
-            data.getUiStatus().closePosition(position.getNumber());
-          } else {
+          if (toggleStatus == ToggleStatus.OPENED) {
             data.getUiStatus().openPosition(position.getNumber());
+          } else {
+            data.getUiStatus().closePosition(position.getNumber());
           }
         }
       };

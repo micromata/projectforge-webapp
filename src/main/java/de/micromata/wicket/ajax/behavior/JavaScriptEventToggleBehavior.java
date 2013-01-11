@@ -40,8 +40,6 @@ import org.apache.wicket.util.string.StringValue;
  */
 public abstract class JavaScriptEventToggleBehavior extends AjaxEventBehavior
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(JavaScriptEventToggleBehavior.class);
-
   private static final long serialVersionUID = -5357558488585073864L;
 
   private static final String CONDITION = "condition";
@@ -67,9 +65,9 @@ public abstract class JavaScriptEventToggleBehavior extends AjaxEventBehavior
     if (conditionValue != null) {
       final String conditionString = conditionValue.toString();
       if ("true".equals(conditionString)) {
-        onToggleCall(target, true);
+        onToggleCall(target, ToggleStatus.OPENED);
       } else if ("false".equals(conditionString)) {
-        onToggleCall(target, false);
+        onToggleCall(target, ToggleStatus.CLOSED);
       } else {
         onUnregonizedCall(target);
       }
@@ -123,7 +121,7 @@ public abstract class JavaScriptEventToggleBehavior extends AjaxEventBehavior
    * This method is called when the toggle status of the added component is changed
    * 
    * @param target
-   * @param toggleStatus displays if the toggler is now active (toggleStatus = true), or inactive (toggleStatus = false)
+   * @param toggleStatus displays if the toggler is now open or closed.
    */
-  protected abstract void onToggleCall(AjaxRequestTarget target, boolean toggleStatus);
+  protected abstract void onToggleCall(AjaxRequestTarget target, ToggleStatus toggleStatus);
 }

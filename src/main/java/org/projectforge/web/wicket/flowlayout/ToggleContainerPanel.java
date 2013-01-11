@@ -33,6 +33,7 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 
 import de.micromata.wicket.ajax.behavior.JavaScriptEventToggleBehavior;
+import de.micromata.wicket.ajax.behavior.ToggleStatus;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -70,7 +71,7 @@ public class ToggleContainerPanel extends Panel
         private static final long serialVersionUID = -3739318529449433236L;
 
         @Override
-        protected void onToggleCall(final AjaxRequestTarget target, final boolean toggleStatus)
+        protected void onToggleCall(final AjaxRequestTarget target, final ToggleStatus toggleStatus)
         {
           ToggleContainerPanel.this.onToggleStatusChanged(target, toggleStatus);
         }
@@ -121,10 +122,9 @@ public class ToggleContainerPanel extends Panel
    * Hook method when the toggle status of this {@link ToggleContainerPanel} was changed.
    * 
    * @param target
-   * @param toggleClosed this represents the <b>new</b> state of the toggle. <br/>
-   *          true if toggle is closed, false otherwise.
+   * @param toggleClosed this represents the <b>new</b> state of the toggle.
    */
-  protected void onToggleStatusChanged(final AjaxRequestTarget target, final boolean toggleClosed)
+  protected void onToggleStatusChanged(final AjaxRequestTarget target, final ToggleStatus toggleStatus)
   {
 
   }
