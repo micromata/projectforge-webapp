@@ -74,6 +74,10 @@ table.dataview tbody tr td,table.dataview tbody tr th {
 	/*background:transparent url('../img/tab.png') repeat-x 0% 90%;*/
 }
 
+table.dataview tbody tr td div {
+	display: inline;
+}
+
 table.dataview tbody tr.even td,table.dataview tbody tr.even th {
 	border-top: none;
 	border-bottom: none;
