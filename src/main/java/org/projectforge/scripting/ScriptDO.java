@@ -54,8 +54,7 @@ public class ScriptDO extends DefaultBaseDO
   public static final int PARAMETER_NAME_MAX_LENGTH = 100;
 
   static {
-    AbstractHistorizableBaseDO.putNonHistorizableProperty(ScriptDO.class, "script");
-    AbstractHistorizableBaseDO.putNonHistorizableProperty(ScriptDO.class, "scriptBackup");
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(ScriptDO.class, "script", "scriptBackup");
   }
 
   @Field(index = Index.TOKENIZED, store = Store.NO)

@@ -49,20 +49,26 @@ public abstract class AbstractHistorizableBaseDO<I extends Serializable> extends
 
   private static final Map<Class< ? >, Set<String>> nonHistorizableProperties = new HashMap<Class< ? >, Set<String>>();
 
-  protected static void putNonHistorizableProperty(final Class< ? > cls, final String property)
+  protected static void putNonHistorizableProperty(final Class< ? > cls, final String... properties)
   {
     final Field[] fields = BeanHelper.getAllDeclaredFields(cls);
     AccessibleObject.setAccessible(fields, true);
-    boolean found = false;
-    for (final Field field : fields) {
-      if (property.equals(field.getName()) == true) {
-        found = true;
+    for (final String property : properties) {
+      boolean found = false;
+      for (final Field field : fields) {
+        if (property.equals(field.getName()) == true) {
+          found = true;
+          if (getNonHistorizableAttributes(cls).contains(property) == true) {
+            throw new IllegalArgumentException("Property '" + property + "' was already added to class '" + cls.getName() + "'. May-be a wrong class-name is used?");
+          }
+          getNonHistorizableAttributes(cls).add(property);
+          break;
+        }
+      }
+      if (found == false) {
+        throw new IllegalArgumentException("Property '" + property + "' not found in class '" + cls.getName() + "'.");
       }
     }
-    if (found == false) {
-      throw new IllegalArgumentException("Property '" + property + "' not found in class '" + cls.getName() + "'.");
-    }
-    getNonHistorizableAttributes(cls).add(property);
   }
 
   @Transient

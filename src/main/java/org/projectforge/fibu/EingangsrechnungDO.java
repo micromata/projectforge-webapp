@@ -71,7 +71,7 @@ public class EingangsrechnungDO extends AbstractRechnungDO<EingangsrechnungsPosi
   private PaymentType paymentType;
 
   static {
-    AbstractHistorizableBaseDO.putNonHistorizableProperty(EingangsrechnungDO.class, "uiStatusAsXml");
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(EingangsrechnungDO.class, "uiStatusAsXml", "uiStatus");
   }
 
   @Column(length = 255)

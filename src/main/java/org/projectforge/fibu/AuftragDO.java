@@ -73,7 +73,7 @@ public class AuftragDO extends DefaultBaseDO
   private Integer nummer;
 
   /** Dies sind die alten Auftragsnummern oder Kundenreferenzen. */
-  @Fields( { @Field(index = Index.TOKENIZED, name = "referenz_tokenized", store = Store.NO),
+  @Fields({ @Field(index = Index.TOKENIZED, name = "referenz_tokenized", store = Store.NO),
     @Field(index = Index.UN_TOKENIZED, store = Store.NO)})
   private String referenz;
 
@@ -124,7 +124,7 @@ public class AuftragDO extends DefaultBaseDO
   protected AuftragUIStatus uiStatus;
 
   static {
-    AbstractHistorizableBaseDO.putNonHistorizableProperty(AuftragDO.class, "uiStatusAsXml");
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(AuftragDO.class, "uiStatusAsXml", "uiStatus");
   }
 
   /**

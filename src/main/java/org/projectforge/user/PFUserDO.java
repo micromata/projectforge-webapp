@@ -79,9 +79,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   private static final String NOPASSWORD = "--- none ---";
 
   static {
-    AbstractHistorizableBaseDO.putNonHistorizableProperty(PFUserDO.class, "loginFailures");
-    AbstractHistorizableBaseDO.putNonHistorizableProperty(PFUserDO.class, "lastLogin");
-    AbstractHistorizableBaseDO.putNonHistorizableProperty(PFUserDO.class, "stayLoggedInKey");
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(PFUserDO.class, "loginFailures", "lastLogin", "stayLoggedInKey");
   }
 
   private transient Map<String, Object> attributeMap;
@@ -842,8 +840,9 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   }
 
   /**
-   * LDAP values as key-value-pairs, e. g. gidNumber=1000,uidNumber=1001,homeDirectory="/home/kai",shell="/bin/bash". For handling of string values see {@link org.apache.commons.csv.writer.CSVWriter}.
-   * This field is handled by the ldap package and has no further effect in ProjectForge's core package.
+   * LDAP values as key-value-pairs, e. g. gidNumber=1000,uidNumber=1001,homeDirectory="/home/kai",shell="/bin/bash". For handling of string
+   * values see {@link org.apache.commons.csv.writer.CSVWriter}. This field is handled by the ldap package and has no further effect in
+   * ProjectForge's core package.
    * @return the ldapValues
    */
   @Column(name = "ldap_values", length = 4000)

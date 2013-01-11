@@ -78,7 +78,7 @@ public class RechnungDO extends AbstractRechnungDO<RechnungsPositionDO> implemen
   private RechnungTyp typ;
 
   static {
-    AbstractHistorizableBaseDO.putNonHistorizableProperty(RechnungDO.class, "uiStatusAsXml");
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(RechnungDO.class, "uiStatusAsXml", "uiStatus");
   }
 
   /**
