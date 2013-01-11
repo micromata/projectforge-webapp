@@ -87,8 +87,6 @@ import org.projectforge.web.wicket.flowlayout.TextPanel;
 import org.projectforge.web.wicket.flowlayout.TextStyle;
 import org.projectforge.web.wicket.flowlayout.ToggleContainerPanel;
 
-import de.micromata.wicket.ajax.behavior.ToggleStatus;
-
 public abstract class AbstractRechnungEditForm<O extends AbstractRechnungDO<T>, T extends AbstractRechnungsPositionDO, P extends AbstractEditPage< ? , ? , ? >>
 extends AbstractEditForm<O, P>
 {
@@ -395,7 +393,6 @@ extends AbstractEditForm<O, P>
         @Override
         protected void onToggleStatusChanged(final AjaxRequestTarget target, final ToggleStatus toggleStatus)
         {
-          super.onToggleStatusChanged(target, toggleStatus);
           if (toggleStatus == ToggleStatus.OPENED) {
             data.getUiStatus().openPosition(position.getNumber());
           } else {
