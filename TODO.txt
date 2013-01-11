@@ -5,7 +5,6 @@ Tooltips und insbesondere für SearchFields verbessern.
 
 Prio 1 (Johannes):
 ------------------
-- PageStaleException für FullCalendar.
 - Contextmenu (verschieben von Zeitberichten und rechte Maustaste in Listenansichten)
 
 Prio 2 (Johannes):

@@ -17,43 +17,57 @@ import net.ftlines.wicket.fullcalendar.Event;
 import net.ftlines.wicket.fullcalendar.EventSource;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.model.AbstractReadOnlyModel;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.Request;
 
 public abstract class EventResizedCallback extends AbstractAjaxCallbackWithClientsideRevert implements
-	CallbackWithHandler {
-	@Override
-	protected String configureCallbackScript(String script, String urlTail) {
-		return script.replace(urlTail, "&eventId=\"+event.id+\"&sourceId=\"+event.source.data."
-			+ EventSource.Const.UUID + "+\"&dayDelta=\"+dayDelta+\"&minuteDelta=\"+minuteDelta+\"");
-	}
+CallbackWithHandler {
+  private static final long serialVersionUID = 3307986562432075839L;
 
-	@Override
-	public String getHandlerScript() {
-		return "function(event, dayDelta, minuteDelta,  revertFunc) { " + getCallbackScript() + "}";
-	}
+  @Override
+  protected String configureCallbackScript(final String script, final String urlTail) {
+    return script.replace(urlTail, "&eventId=\"+event.id+\"&sourceId=\"+event.source.data."
+        + EventSource.Const.UUID + "+\"&dayDelta=\"+dayDelta+\"&minuteDelta=\"+minuteDelta+\"");
+  }
 
-	@Override
-	protected boolean onEvent(AjaxRequestTarget target) {
-		Request r = getCalendar().getRequest();
-		String eventId = r.getRequestParameters().getParameterValue("eventId").toString();
-		String sourceId = r.getRequestParameters().getParameterValue("sourceId").toString();
+  @SuppressWarnings("serial")
+  @Override
+  public IModel<String> getHandlerScript() {
+    return new AbstractReadOnlyModel<String>() {
+      /**
+       * @see org.apache.wicket.model.AbstractReadOnlyModel#getObject()
+       */
+      @Override
+      public String getObject()
+      {
+        return "function(event, dayDelta, minuteDelta,  revertFunc) { " + getCallbackScript() + "}";
+      }
+    };
+  }
 
-		EventSource source = getCalendar().getEventManager().getEventSource(sourceId);
-		Event event = source.getEventProvider().getEventForId(eventId);
+  @Override
+  protected boolean onEvent(final AjaxRequestTarget target) {
+    final Request r = getCalendar().getRequest();
+    final String eventId = r.getRequestParameters().getParameterValue("eventId").toString();
+    final String sourceId = r.getRequestParameters().getParameterValue("sourceId").toString();
 
-		int dayDelta = r.getRequestParameters().getParameterValue("dayDelta").toInt();
-		int minuteDelta = r.getRequestParameters().getParameterValue("minuteDelta").toInt();
+    final EventSource source = getCalendar().getEventManager().getEventSource(sourceId);
+    final Event event = source.getEventProvider().getEventForId(eventId);
 
-		return onEventResized(new ResizedEvent(source, event, dayDelta, minuteDelta), new CalendarResponse(
-			getCalendar(), target));
+    final int dayDelta = r.getRequestParameters().getParameterValue("dayDelta").toInt();
+    final int minuteDelta = r.getRequestParameters().getParameterValue("minuteDelta").toInt();
 
-	}
+    return onEventResized(new ResizedEvent(source, event, dayDelta, minuteDelta), new CalendarResponse(
+        getCalendar(), target));
 
-	protected abstract boolean onEventResized(ResizedEvent event, CalendarResponse response);
+  }
 
-	@Override
-	protected String getRevertScript() {
-		return "revertFunc();";
-	}
+  protected abstract boolean onEventResized(ResizedEvent event, CalendarResponse response);
+
+  @Override
+  protected String getRevertScript() {
+    return "revertFunc();";
+  }
 
 }

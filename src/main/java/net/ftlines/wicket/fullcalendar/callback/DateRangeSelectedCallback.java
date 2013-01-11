@@ -15,58 +15,72 @@ package net.ftlines.wicket.fullcalendar.callback;
 import net.ftlines.wicket.fullcalendar.CalendarResponse;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.model.AbstractReadOnlyModel;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.Request;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 public abstract class DateRangeSelectedCallback extends AbstractAjaxCallback implements CallbackWithHandler {
-	private final boolean ignoreTimezone;
+  private static final long serialVersionUID = 7927720428216612850L;
+  private final boolean ignoreTimezone;
 
-	/**
-	 * If <var>ignoreTimezone</var> is {@code true}, then the remote client\"s time zone will be ignored when
-	 * determining the selected date range, resulting in a range with the selected start and end values, but in the
-	 * server\"s time zone.
-	 * 
-	 * @param ignoreTimezone
-	 *            whether or not to ignore the remote client\"s time zone when determining the selected date range
-	 */
-	public DateRangeSelectedCallback(final boolean ignoreTimezone) {
-		this.ignoreTimezone = ignoreTimezone;
-	}
+  /**
+   * If <var>ignoreTimezone</var> is {@code true}, then the remote client\"s time zone will be ignored when
+   * determining the selected date range, resulting in a range with the selected start and end values, but in the
+   * server\"s time zone.
+   * 
+   * @param ignoreTimezone
+   *            whether or not to ignore the remote client\"s time zone when determining the selected date range
+   */
+  public DateRangeSelectedCallback(final boolean ignoreTimezone) {
+    this.ignoreTimezone = ignoreTimezone;
+  }
 
-	@Override
-	protected String configureCallbackScript(String script, String urlTail) {
-		return script
-			.replace(
-				urlTail,
-				"&timezoneOffset=\"+startDate.getTimezoneOffset()+\"&startDate=\"+startDate.getTime()+\"&endDate=\"+endDate.getTime()+\"&allDay=\"+allDay+\"");
-	}
+  @Override
+  protected String configureCallbackScript(final String script, final String urlTail) {
+    return script
+        .replace(
+            urlTail,
+            "&timezoneOffset=\"+startDate.getTimezoneOffset()+\"&startDate=\"+startDate.getTime()+\"&endDate=\"+endDate.getTime()+\"&allDay=\"+allDay+\"");
+  }
 
-	@Override
-	public String getHandlerScript() {
-		return "function(startDate, endDate, allDay) { " + getCallbackScript() + "}";
-	}
+  @Override
+  public IModel<String> getHandlerScript() {
+    return new AbstractReadOnlyModel<String>() {
+      private static final long serialVersionUID = 4021933370930781184L;
 
-	@Override
-	protected void respond(AjaxRequestTarget target) {
-		Request r = getCalendar().getRequest();
+      /**
+       * @see org.apache.wicket.model.AbstractReadOnlyModel#getObject()
+       */
+      @Override
+      public String getObject()
+      {
+        return "function(startDate, endDate, allDay) { " + getCallbackScript() + "}";
+      }
+    };
+  }
 
-		DateTime start = new DateTime(r.getRequestParameters().getParameterValue("startDate").toLong());
-		DateTime end = new DateTime(r.getRequestParameters().getParameterValue("endDate").toLong());
+  @Override
+  protected void respond(final AjaxRequestTarget target) {
+    final Request r = getCalendar().getRequest();
 
-		if (ignoreTimezone) {
-			// Convert to same DateTime in local time zone.
-			int remoteOffset = -r.getRequestParameters().getParameterValue("timezoneOffset").toInt();
-			int localOffset = DateTimeZone.getDefault().getOffset(null) / 60000;
-			int minutesAdjustment = remoteOffset - localOffset;
-			start = start.plusMinutes(minutesAdjustment);
-			end = end.plusMinutes(minutesAdjustment);
-		}
-		boolean allDay = r.getRequestParameters().getParameterValue("allDay").toBoolean();
-		onSelect(new SelectedRange(start, end, allDay), new CalendarResponse(getCalendar(), target));
+    DateTime start = new DateTime(r.getRequestParameters().getParameterValue("startDate").toLong());
+    DateTime end = new DateTime(r.getRequestParameters().getParameterValue("endDate").toLong());
 
-	}
+    if (ignoreTimezone) {
+      // Convert to same DateTime in local time zone.
+      final int remoteOffset = -r.getRequestParameters().getParameterValue("timezoneOffset").toInt();
+      final int localOffset = DateTimeZone.getDefault().getOffset(null) / 60000;
+      final int minutesAdjustment = remoteOffset - localOffset;
+      start = start.plusMinutes(minutesAdjustment);
+      end = end.plusMinutes(minutesAdjustment);
+    }
+    final boolean allDay = r.getRequestParameters().getParameterValue("allDay").toBoolean();
+    onSelect(new SelectedRange(start, end, allDay), new CalendarResponse(getCalendar(), target));
 
-	protected abstract void onSelect(SelectedRange range, CalendarResponse response);
+  }
+
+  protected abstract void onSelect(SelectedRange range, CalendarResponse response);
 
 }

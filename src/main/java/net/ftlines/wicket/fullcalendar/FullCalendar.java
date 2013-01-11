@@ -30,12 +30,15 @@ import net.ftlines.wicket.fullcalendar.callback.ViewDisplayCallback;
 import org.apache.wicket.behavior.IBehaviorListener;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
+import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.Strings;
 import org.apache.wicket.util.template.PackageTextTemplate;
 import org.apache.wicket.util.template.TextTemplate;
 
 public class FullCalendar extends AbstractFullCalendar implements IBehaviorListener {
+  private static final long serialVersionUID = 6517344280923639300L;
+
   private static final TextTemplate EVENTS = new PackageTextTemplate(FullCalendar.class, "FullCalendar.events.tpl");
 
   private final Config config;
@@ -76,6 +79,7 @@ public class FullCalendar extends AbstractFullCalendar implements IBehaviorListe
     setupCallbacks();
   }
 
+  @SuppressWarnings("serial")
   private void setupCallbacks() {
 
     if (getEvents != null)
@@ -84,75 +88,72 @@ public class FullCalendar extends AbstractFullCalendar implements IBehaviorListe
     getEvents = new GetEventsCallback();
     add(getEvents);
     for (final EventSource source : config.getEventSources()) {
-      source.setEvents(EVENTS.asString(new MicroMap<String, String>("url", getEvents.getUrl(source))));
+      source.setEventsModel(new AbstractReadOnlyModel<String>() {
+        @Override
+        public String getObject()
+        {
+          return EVENTS.asString(new MicroMap<String, String>("url", getEvents.getUrl(source)));
+        }
+      });
     }
 
-    if (Strings.isEmpty(config.getEventClick())) {
+    if (Strings.isEmpty(config.getEventClick()) == true) {
       add(eventClicked = new EventClickedCallback() {
         @Override
-        protected void onClicked(final ClickedEvent event, final CalendarResponse response) {
+        protected void onClicked(final ClickedEvent event, final CalendarResponse response)
+        {
           onEventClicked(event, response);
         }
       });
+      config.setEventClickModel(eventClicked.getHandlerScript());
     }
 
-    if (eventClicked != null) {
-      config.setEventClick(eventClicked.getHandlerScript());
-    }
-
-    if (Strings.isEmpty(config.getSelect())) {
+    if (Strings.isEmpty(config.getSelect()) == true) {
       add(dateRangeSelected = new DateRangeSelectedCallback(config.isIgnoreTimezone()) {
         @Override
-        protected void onSelect(final SelectedRange range, final CalendarResponse response) {
+        protected void onSelect(final SelectedRange range, final CalendarResponse response)
+        {
           FullCalendar.this.onDateRangeSelected(range, response);
         }
       });
+      config.setSelectModel(dateRangeSelected.getHandlerScript());
     }
 
-    if (dateRangeSelected != null) {
-      config.setSelect(dateRangeSelected.getHandlerScript());
-    }
-
-    if (Strings.isEmpty(config.getEventDrop())) {
+    if (Strings.isEmpty(config.getEventDrop()) == true) {
       add(eventDropped = new EventDroppedCallback(config) {
 
         @Override
-        protected boolean onEventDropped(final DroppedEvent event, final CalendarResponse response) {
+        protected boolean onEventDropped(final DroppedEvent event, final CalendarResponse response)
+        {
           return FullCalendar.this.onEventDropped(event, response);
         }
       });
+      config.setEventDropModel(eventDropped.getHandlerScript());
     }
 
-    if (eventDropped != null) {
-      config.setEventDrop(eventDropped.getHandlerScript());
-    }
-
-    if (Strings.isEmpty(config.getEventResize())) {
+    if (Strings.isEmpty(config.getEventResize()) == true) {
       add(eventResized = new EventResizedCallback() {
 
         @Override
-        protected boolean onEventResized(final ResizedEvent event, final CalendarResponse response) {
+        protected boolean onEventResized(final ResizedEvent event, final CalendarResponse response)
+        {
           return FullCalendar.this.onEventResized(event, response);
         }
 
       });
+
+      config.setEventResizeModel(eventResized.getHandlerScript());
     }
 
-    if (eventResized != null) {
-      config.setEventResize(eventResized.getHandlerScript());
-    }
-
-    if (Strings.isEmpty(config.getViewDisplay())) {
+    if (Strings.isEmpty(config.getViewDisplay()) == true) {
       add(viewDisplay = new ViewDisplayCallback() {
         @Override
-        protected void onViewDisplayed(final View view, final CalendarResponse response) {
+        protected void onViewDisplayed(final View view, final CalendarResponse response)
+        {
           FullCalendar.this.onViewDisplayed(view, response);
         }
       });
-    }
-
-    if (viewDisplay != null) {
-      config.setViewDisplay(viewDisplay.getHandlerScript());
+      config.setViewDisplayModel(viewDisplay.getHandlerScript());
     }
 
     getPage().dirty();

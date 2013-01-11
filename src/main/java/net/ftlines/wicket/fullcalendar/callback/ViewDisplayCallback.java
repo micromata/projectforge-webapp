@@ -16,6 +16,8 @@ import net.ftlines.wicket.fullcalendar.CalendarResponse;
 import net.ftlines.wicket.fullcalendar.ViewType;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.model.AbstractReadOnlyModel;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.Request;
 import org.joda.time.DateMidnight;
 import org.joda.time.format.DateTimeFormatter;
@@ -29,6 +31,8 @@ import org.projectforge.user.PFUserContext;
  * 
  */
 public abstract class ViewDisplayCallback extends AbstractAjaxCallback implements CallbackWithHandler {
+  private static final long serialVersionUID = 7815962750349404797L;
+
   @Override
   protected String configureCallbackScript(final String script, final String urlTail) {
     return script
@@ -37,9 +41,19 @@ public abstract class ViewDisplayCallback extends AbstractAjaxCallback implement
             "&view=\"+v.name+\"&start=\"+fullCalendarExtIsoDate(v.start)+\"&end=\"+fullCalendarExtIsoDate(v.end)+\"&visibleStart=\"+fullCalendarExtIsoDate(v.visStart)+\"&visibleEnd=\"+fullCalendarExtIsoDate(v.visEnd)+\"");
   }
 
+  @SuppressWarnings("serial")
   @Override
-  public String getHandlerScript() {
-    return String.format("function(v) {%s;}", getCallbackScript());
+  public IModel<String> getHandlerScript() {
+    return new AbstractReadOnlyModel<String>() {
+      /**
+       * @see org.apache.wicket.model.AbstractReadOnlyModel#getObject()
+       */
+      @Override
+      public String getObject()
+      {
+        return String.format("function(v) {%s;}", getCallbackScript());
+      }
+    };
   }
 
   @Override
