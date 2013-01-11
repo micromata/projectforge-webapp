@@ -28,9 +28,9 @@
 ;(function($){
 	$.contextMenu = {
 
-		offsetX:-40,
-		offsetY:-60,
-		appendTo:'#nav_top',
+		offsetX:0,
+		offsetY:0,
+		appendTo:'body',
 		direction:'down',
 		constrainToScreen:true,
 				
@@ -101,7 +101,7 @@
 					}
 				}
 			}
-			var $wrapper = $('<ul class="contextmenu"/>');
+			var $wrapper = $('<ul class="dropdown-menu contextmenu"/>');
 			var $innerWrapper = $('<li class="has_dropdown"></li>');
 			$wrapper.append($innerWrapper);
 			$innerWrapper.append($container);
@@ -216,7 +216,9 @@
                 			: null
                 			)
 	                	);
-	                	cmenu.hideCallback.call(cmenu);
+	                	if(cmenu.hideCallback != undefined) {
+	                	  cmenu.hideCallback.call(cmenu);
+	                	}
 	                }
 	                if (cmenu.shadow) {
 	                    cmenu.shadowObj[cmenu.hideTransition](cmenu.hideSpeed);
