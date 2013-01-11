@@ -138,6 +138,7 @@ public class PollEventEditPage extends AbstractSecuredPage
       @Override
       public final void onSubmit()
       {
+        // temporary disabled
         //        if (eventProvider.getAllEvents().isEmpty() == false) {
         onNextButtonClick(model.getPollDo(), eventProvider.getAllEvents());
         //        } else {

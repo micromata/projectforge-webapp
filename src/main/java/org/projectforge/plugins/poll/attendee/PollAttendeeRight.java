@@ -58,7 +58,7 @@ public class PollAttendeeRight extends UserRightAccessCheck<PollAttendeeDO>
   public boolean hasSelectAccess(final PFUserDO user, final PollAttendeeDO obj)
   {
     // new poll
-    if (obj.getPoll() == null) {
+    if (obj == null || obj.getPoll() == null) {
       return true;
     }
 
@@ -80,7 +80,9 @@ public class PollAttendeeRight extends UserRightAccessCheck<PollAttendeeDO>
   public boolean hasInsertAccess(final PFUserDO user, final PollAttendeeDO obj)
   {
     // new entry if obj.getPoll() == null
-    if (obj.getPoll() == null || pollRight.isOwner(user, obj.getPoll()) == true) {
+    if (obj == null
+        || obj.getPoll() == null
+        || pollRight.isOwner(user, obj.getPoll()) == true) {
       return true;
     } else {
       return false;

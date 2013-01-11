@@ -63,7 +63,7 @@ public class PollEventRight extends UserRightAccessCheck<PollEventDO>
   @Override
   public boolean hasInsertAccess(final PFUserDO user, final PollEventDO obj)
   {
-    if (pollRight.isOwner(user, obj.getPoll()) == true) {
+    if (obj == null || pollRight.isOwner(user, obj.getPoll()) == true) {
       return true;
     } else {
       return false;
@@ -89,7 +89,7 @@ public class PollEventRight extends UserRightAccessCheck<PollEventDO>
   @Override
   public boolean hasSelectAccess(final PFUserDO user, final PollEventDO obj)
   {
-    if (pollRight.isOwner(user, obj.getPoll()) == true) {
+    if (obj == null || pollRight.isOwner(user, obj.getPoll()) == true) {
       return true;
     } else {
       return false;
@@ -103,7 +103,7 @@ public class PollEventRight extends UserRightAccessCheck<PollEventDO>
   @Override
   public boolean hasAccess(final PFUserDO user, final PollEventDO obj, final PollEventDO oldObj, final OperationType operationType)
   {
-    if (pollRight.isOwner(user, obj.getPoll()) == true) {
+    if (obj == null || pollRight.isOwner(user, obj.getPoll()) == true) {
       return true;
     } else {
       return false;
@@ -112,7 +112,7 @@ public class PollEventRight extends UserRightAccessCheck<PollEventDO>
 
   public boolean hasAccess(final PFUserDO user, final PollEventDO obj, final Integer autenticationKey)
   {
-    if (pollRight.isOwner(user, obj.getPoll()) == true) {
+    if (obj == null || pollRight.isOwner(user, obj.getPoll()) == true) {
       return true;
     } else {
       return false;
