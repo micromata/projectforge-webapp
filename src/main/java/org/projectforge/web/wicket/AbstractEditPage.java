@@ -50,6 +50,7 @@ import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.DisplayHistoryEntry;
 import org.projectforge.core.ExtendedBaseDO;
+import org.projectforge.core.ModificationStatus;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.admin.WizardPage;
 import org.projectforge.web.calendar.DateTimeFormatter;
@@ -276,11 +277,11 @@ AbstractSecuredPage implements IEditPage<O, D>
 
   /**
    * Will be called directly after storing the data object (update).
-   * @param modified true, if the object was modified, otherwise false.If a not null resolution is returned, then the resolution will be
-   *          returned to stripes controller.
+   * @param modificationStatus MINOR or MAJOR, if the object was modified, otherwise NONE. If a not null web page is returned, then the
+   *          web page will be set as response page.
    * @see BaseDao#update(ExtendedBaseDO)
    */
-  public AbstractSecuredBasePage afterUpdate(final boolean modified)
+  public AbstractSecuredBasePage afterUpdate(final ModificationStatus modificationStatus)
   {
     // Do nothing at default.
     return null;

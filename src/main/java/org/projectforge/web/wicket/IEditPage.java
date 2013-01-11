@@ -27,6 +27,7 @@ import org.apache.wicket.markup.html.WebPage;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.ExtendedBaseDO;
+import org.projectforge.core.ModificationStatus;
 import org.projectforge.web.task.TaskTreePage;
 
 /**
@@ -81,11 +82,11 @@ public interface IEditPage<O extends AbstractBaseDO< ? >, D extends BaseDao<O>>
 
   /**
    * Will be called directly after storing the data object (update).
-   * @param modified true, if the object was modified, otherwise false.If a not null resolution is returned, then the resolution will be
-   *          returned to stripes controller.
+   * @param modificationStatus MINOR or MAJOR, if the object was modified, otherwise NONE. If a not null web page is returned, then the
+   *          web page will be set as response page.
    * @see BaseDao#update(ExtendedBaseDO)
    */
-  public WebPage afterUpdate(boolean modified);
+  public WebPage afterUpdate(ModificationStatus modificationStatus);
 
   /**
    * Will be called directly after deleting the data object (delete or update deleted=true). Any return value is not yet supported.

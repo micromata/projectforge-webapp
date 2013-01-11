@@ -29,6 +29,7 @@ import org.apache.wicket.markup.html.WebPage;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.IManualIndex;
+import org.projectforge.core.ModificationStatus;
 import org.projectforge.core.UserException;
 import org.springframework.dao.DataIntegrityViolationException;
 
@@ -127,7 +128,7 @@ public class EditPageSupport<O extends AbstractBaseDO< ? >, D extends BaseDao<O>
           editPage.setResponsePageAndHighlightedRow(page);
           return;
         }
-        boolean modified = false;
+        ModificationStatus modified = ModificationStatus.NONE;
         try {
           modified = baseDao.update(data);
         } catch (final DataIntegrityViolationException ex) {
