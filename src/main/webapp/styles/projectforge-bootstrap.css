@@ -124,4 +124,9 @@ div.toggle-container {
 div.toggle-container div.collapse-header {
 	color: #fff;
 	background-color: #4C5766;
+	cursor: pointer;
+}
+
+div.toggle-container div.collapse-header.highlight {
+	background-color: #E44;
 }
