@@ -46,7 +46,7 @@ public class AddressComparePage extends AbstractEditPage<AddressDO, AddressCompa
    */
   public AddressComparePage(final PageParameters parameters, final AddressDO dataNew, final AddressDO dataOld)
   {
-    super(parameters, "asdf");
+    super(parameters, "asdf"); // TODO i18n
     this.dataNew = dataNew;
     this.dataOld = dataOld;
     init();

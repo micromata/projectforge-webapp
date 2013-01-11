@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -42,17 +43,12 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.joda.time.DateTime;
 import org.projectforge.address.AddressDO;
-import org.projectforge.address.AddressDao;
 import org.projectforge.address.AddressStatus;
 import org.projectforge.address.ContactStatus;
 import org.projectforge.address.FormOfAddress;
-import org.projectforge.core.BaseSearchFilter;
-import org.projectforge.core.QueryFilter;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.EditPage;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.FileUploadPanel;
@@ -111,94 +107,113 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
       } else {
         try {
           final File file = upload.writeToTempFile();
+          final List<AddressDO> newAddresses = new ArrayList<AddressDO>();
 
           final FileInputStream fis = new FileInputStream(file);
           final VCardBuilder builder = new VCardBuilder(fis);
-          final VCard card = builder.build();
 
-          // //// SET BASE DATA
-          setName(card.getProperty(net.fortuna.ical4j.vcard.Property.Id.N));
-          setOrganization(card.getProperty(net.fortuna.ical4j.vcard.Property.Id.ORG));
-          setBirth(card.getProperty(net.fortuna.ical4j.vcard.Property.Id.BDAY));
-          setNote(card.getProperty(net.fortuna.ical4j.vcard.Property.Id.NOTE));
+          AddressDO newAddress = null;
+          for (final VCard card : builder.buildAll()) {
+            newAddress = new AddressDO();
 
-          // //// SET ADDITIONAL DATA
-          final List<Property> li = card.getProperties();
-          setProperties(li);
-
-          // handle item entries
-          final VCardItemElementHandler ih = new VCardItemElementHandler(new FileInputStream(file));
-          if (!ih.getItemList().isEmpty())
-            setProperties(ih.getItemList());
-
-          data.setAddressStatus(AddressStatus.UPTODATE);
-          data.setDeleted(false);
-          data.setLastUpdate(DateTime.now().toDate());
-          data.setCreated(DateTime.now().toDate());
-          data.setContactStatus(ContactStatus.ACTIVE);
-          data.setForm(FormOfAddress.UNKNOWN);
-
-          // //// CHECK IF THERE IS SOMETHING MORE TO ADD
-          if (data.getAddressText() == null || data.getAddressText() == "") {
-            setOtherPropertiesToWork(li);
-            if (!ih.getItemList().isEmpty() && data.getAddressText() == null || data.getAddressText() == "") {
-              setOtherPropertiesToWork(ih.getItemList());
+            // //// SET BASE DATA
+            if (card.getProperty(net.fortuna.ical4j.vcard.Property.Id.N) != null) {
+              setName(card.getProperty(net.fortuna.ical4j.vcard.Property.Id.N), newAddress);
             }
-          } else if (data.getPrivateAddressText() == null || data.getPrivateAddressText() == "") {
-            setOtherPropertiesToPrivate(li);
-            if (!ih.getItemList().isEmpty() && data.getPostalAddressText() == null || data.getPostalAddressText() == "")
-              setOtherPropertiesToPrivate(ih.getItemList());
-          } else {
-            setPostalProperties(li);
-            if (!ih.getItemList().isEmpty() && data.getPostalAddressText() == null || data.getPostalAddressText() == "")
-              setPostalProperties(ih.getItemList());
+            if (card.getProperty(net.fortuna.ical4j.vcard.Property.Id.ORG) != null) {
+              setOrganization(card.getProperty(net.fortuna.ical4j.vcard.Property.Id.ORG), newAddress);
+            }
+            if (card.getProperty(net.fortuna.ical4j.vcard.Property.Id.BDAY) != null) {
+              setBirth(card.getProperty(net.fortuna.ical4j.vcard.Property.Id.BDAY), newAddress);
+            }
+            if (card.getProperty(net.fortuna.ical4j.vcard.Property.Id.NOTE) != null) {
+              setNote(card.getProperty(net.fortuna.ical4j.vcard.Property.Id.NOTE), newAddress);
+            }
+
+            // //// SET ADDITIONAL DATA
+            final List<Property> li = card.getProperties();
+            setProperties(li, newAddress);
+
+            // handle item entries
+            final VCardItemElementHandler ih = new VCardItemElementHandler(new FileInputStream(file));
+            if (!ih.getItemList().isEmpty())
+              setProperties(ih.getItemList(), newAddress);
+
+            newAddress.setAddressStatus(AddressStatus.UPTODATE);
+            newAddress.setDeleted(false);
+            newAddress.setLastUpdate(DateTime.now().toDate());
+            newAddress.setCreated(DateTime.now().toDate());
+            newAddress.setContactStatus(ContactStatus.ACTIVE);
+            newAddress.setForm(FormOfAddress.UNKNOWN);
+
+            // //// CHECK IF THERE IS SOMETHING MORE TO ADD
+            if (newAddress.getAddressText() == null || newAddress.getAddressText() == "") {
+              setOtherPropertiesToWork(li, newAddress);
+              if (!ih.getItemList().isEmpty() && newAddress.getAddressText() == null || newAddress.getAddressText() == "") {
+                setOtherPropertiesToWork(ih.getItemList(), newAddress);
+              }
+            } else if (newAddress.getPrivateAddressText() == null || newAddress.getPrivateAddressText() == "") {
+              setOtherPropertiesToPrivate(li, newAddress);
+              if (!ih.getItemList().isEmpty() && newAddress.getPostalAddressText() == null || newAddress.getPostalAddressText() == "")
+                setOtherPropertiesToPrivate(ih.getItemList(), newAddress);
+            } else {
+              setPostalProperties(li, newAddress);
+              if (!ih.getItemList().isEmpty() && newAddress.getPostalAddressText() == null || newAddress.getPostalAddressText() == "")
+                setPostalProperties(ih.getItemList(), newAddress);
+            }
+            newAddresses.add(newAddress);
+          }
+
+          for (final AddressDO address : newAddresses) {
+            getBaseDao().save(address);
           }
 
           // /// CHECK FOR EXISTING ENTRIES
-          final BaseSearchFilter af = new BaseSearchFilter();
-          af.setSearchString(data.getName() + " " + data.getFirstName() + " "
-              + data.getMobilePhone() + " " + data.getEmail() + " " + data.getBusinessPhone() + " " + data.getPrivateMobilePhone()
-              + " " + data.getPrivateEmail() + " " + data.getPrivatePhone());
-          final AddressDao dao = (AddressDao) getBaseDao();
-          final QueryFilter queryFilter = new QueryFilter(af);
-          final List<AddressDO> list = dao.internalGetList(queryFilter);
+          // TODO shift to dao
+          //          final BaseSearchFilter af = new BaseSearchFilter();
+          //          af.setSearchString(getSearchString(newAddress));
+          //          final AddressDao dao = (AddressDao) getBaseDao();
+          //          final QueryFilter queryFilter = new QueryFilter(af);
+          //          final List<AddressDO> list = dao.internalGetList(queryFilter);
 
           // //// SAVING
           /*
            * if list is > 0 there are entries with equal information.
            */
-          if (list.size() == 0) {
-            final PageParameters params = new PageParameters();
-
-            // inner class to set the right return page.
-            @EditPage(defaultReturnPage = AddressListPage.class)
-            class MyEditPage extends AddressEditPage
-            {
-
-              /**
-               * @param parameters
-               */
-              public MyEditPage(final PageParameters parameters)
-              {
-                super(parameters);
-              }
-
-              /**
-               * @see org.projectforge.web.wicket.AbstractEditPage#init(org.projectforge.core.AbstractBaseDO)
-               */
-              @Override
-              protected void init(final AddressDO data)
-              {
-                super.init(AddressImportForm.this.getData());
-              }
-            }
-            final AddressEditPage addressEditPage = new MyEditPage(params);
-            addressEditPage.newEditForm(parentPage, getData());
-            setResponsePage(addressEditPage);
-          } else {
-            // compare new with first match
-            setResponsePage(new AddressComparePage(getPage().getPageParameters(), data, list.get(0)));
-          }
+          //          if (list.size() == 0) {
+          //            final PageParameters params = new PageParameters();
+          //
+          //            // inner class to set the right return page.
+          //            //            @EditPage(defaultReturnPage = AddressListPage.class)
+          //            class MyEditPage extends AddressListPage
+          //            {
+          //
+          //              /**
+          //               * @param parameters
+          //               */
+          //              public MyEditPage(final PageParameters parameters)
+          //              {
+          //                super(parameters);
+          //              }
+          //
+          //              /**
+          //               * @see org.projectforge.web.wicket.AbstractEditPage#init(org.projectforge.core.AbstractBaseDO)
+          //               */
+          //              @Override
+          //              protected void init()
+          //              {
+          //                super.init();
+          //                data = AddressImportForm.this.getData();
+          //              }
+          //            }
+          //            //            final AddressListPage listPage = new AddressListPage(params);
+          //            //            final AddressEditPage addressEditPage = new Address//new MyEditPage(params);
+          //            //                addressEditPage.newEditForm(parentPage, getData());
+          //            setResponsePage(new MyEditPage(params));
+          //          } else {
+          //            // compare new with first match
+          //            setResponsePage(new AddressComparePage(getPage().getPageParameters(), data, list.get(0)));
+          //          }
         } catch (final IOException ex) {
           log.fatal("Exception encountered " + ex, ex);
         } catch (final ParserException ex) {
@@ -210,30 +225,54 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
   }
 
   /**
+   * @return
+   */
+  private String getSearchString(final AddressDO address)
+  {
+    // default search string
+    String searchString = address.getName() + " " + address.getFirstName() + " ";
+
+    // extended search string
+    if (address.getMobilePhone() != null && address.getMobilePhone() != "") {
+      searchString += "\"" + address.getMobilePhone() + "\"" + " ";
+    }
+    if (address.getEmail() != null && address.getEmail() != "") {
+      searchString += address.getEmail() + " ";
+    }
+    if (address.getBusinessPhone() != null && address.getBusinessPhone() != "") {
+      searchString += "\"" + address.getBusinessPhone() + "\"" + " ";
+    }
+    if (address.getPrivateEmail() != null && address.getPrivateEmail() != "") {
+      searchString += address.getPrivateEmail() + " ";
+    }
+    return searchString;
+  }
+
+  /**
    * @param property
    */
-  private void setNote(final Property property)
+  private void setNote(final Property property, final AddressDO address)
   {
-    data.setComment(property.getValue());
+    address.setComment(property.getValue());
   }
 
   /**
    * @param li
    */
-  private void setProperties(final List<Property> li)
+  private void setProperties(final List<Property> li, final AddressDO address)
   {
     for (final Property property : li) {
       final List<Parameter> lii = property.getParameters(Id.TYPE);
       for (final Parameter param : lii) {
         if (param.getValue().equals("HOME"))
-          setHomeData(property);
+          setHomeData(property, address);
         else if (param.getValue().equals("WORK"))
-          setWorkData(property);
+          setWorkData(property, address);
       }
     }
   }
 
-  private void setPostalProperties(final List<Property> li)
+  private void setPostalProperties(final List<Property> li, final AddressDO address)
   {
     for (final Property property : li) {
       final List<Parameter> lii = property.getParameters(Id.TYPE);
@@ -244,22 +283,22 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
             final String str[] = StringUtils.split(property.getValue(), ';');
             final int size = str.length;
             if (size >= 1)
-              data.setPostalAddressText(str[0]);
+              address.setPostalAddressText(str[0]);
             if (size >= 2)
-              data.setPostalCity(str[1]);
+              address.setPostalCity(str[1]);
             if (size >= 3)
-              data.setPostalZipCode(str[2]);
+              address.setPostalZipCode(str[2]);
             if (size >= 4)
-              data.setPostalCountry(str[3]);
+              address.setPostalCountry(str[3]);
             if (size >= 5)
-              data.setPostalState(str[4]);
+              address.setPostalState(str[4]);
           }
         }
       }
     }
   }
 
-  private void setOtherPropertiesToWork(final List<Property> li)
+  private void setOtherPropertiesToWork(final List<Property> li, final AddressDO address)
   {
     for (final Property property : li) {
       final List<Parameter> lii = property.getParameters(Id.TYPE);
@@ -270,22 +309,22 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
             final String str[] = StringUtils.split(property.getValue(), ';');
             final int size = str.length;
             if (size >= 1)
-              data.setAddressText(str[0]);
+              address.setAddressText(str[0]);
             if (size >= 2)
-              data.setCity(str[1]);
+              address.setCity(str[1]);
             if (size >= 3)
-              data.setZipCode(str[2]);
+              address.setZipCode(str[2]);
             if (size >= 4)
-              data.setCountry(str[3]);
+              address.setCountry(str[3]);
             if (size >= 5)
-              data.setState(str[4]);
+              address.setState(str[4]);
           }
         }
       }
     }
   }
 
-  private void setOtherPropertiesToPrivate(final List<Property> li)
+  private void setOtherPropertiesToPrivate(final List<Property> li, final AddressDO address)
   {
     for (final Property property : li) {
       final List<Parameter> lii = property.getParameters(Id.TYPE);
@@ -297,19 +336,19 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
             final int size = str.length;
             // street
             if (size >= 1)
-              data.setPrivateAddressText(str[0]);
+              address.setPrivateAddressText(str[0]);
             // city
             if (size >= 2)
-              data.setPrivateCity(str[1]);
+              address.setPrivateCity(str[1]);
             // zip code
             if (size >= 3)
-              data.setPrivateZipCode(str[2]);
+              address.setPrivateZipCode(str[2]);
             // country
             if (size >= 4)
-              data.setPrivateCountry(str[3]);
+              address.setPrivateCountry(str[3]);
             // state
             if (size >= 5)
-              data.setPrivateState(str[4]);
+              address.setPrivateState(str[4]);
           }
         }
       }
@@ -319,40 +358,40 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
   /**
    * @param property
    */
-  private void setBirth(final Property property)
+  private void setBirth(final Property property, final AddressDO address)
   {
     if (property != null)
-      data.setBirthday(new Date(DateTime.parse(property.getValue()).getMillis()));
+      address.setBirthday(new Date(DateTime.parse(property.getValue()).getMillis()));
   }
 
-  private void setName(final Property property)
+  private void setName(final Property property, final AddressDO address)
   {
     final String str[] = StringUtils.split(property.getValue(), ';');
-    data.setName(str[0]);
-    data.setFirstName(str[1]);
+    address.setName(str[0]);
+    address.setFirstName(str[1]);
     if (str.length >= 3)
-      data.setTitle(str[2]);
+      address.setTitle(str[2]);
   }
 
-  private void setOrganization(final Property property)
+  private void setOrganization(final Property property, final AddressDO address)
   {
     final String org = StringUtils.substringBefore(property.getValue(), ";");
-    data.setOrganization(org);
+    address.setOrganization(org);
     final String division = StringUtils.substringAfter(property.getValue(), ";");
-    data.setDivision(division);
+    address.setDivision(division);
   }
 
   /**
-   * Create home data
+   * Create home newAddress
    * 
    * @param property
    */
-  private void setHomeData(final Property property)
+  private void setHomeData(final Property property, final AddressDO address)
   {
     boolean telCheck = true; // to seperate phone and mobil number
     // //// SET HOME EMAIL
     if (property.getId().toString().equals("EMAIL"))
-      data.setPrivateEmail(property.getValue());
+      address.setPrivateEmail(property.getValue());
 
     // //// SET HOME PHONE
     if (property.getId().toString().equals("TEL")) {
@@ -363,19 +402,19 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
 
           // phone number first, mobil number second
           if (telCheck) {
-            data.setPrivatePhone(tel);
+            address.setPrivatePhone(tel);
             telCheck = false;
             break;
           } else {
-            data.setPrivateMobilePhone(tel);
+            address.setPrivateMobilePhone(tel);
             break;
           }
         }
-        if (data.getPrivatePhone() == null && property.toString().contains("FAX") == false) {
-          data.setPrivatePhone(getTel(property.getValue()));
+        if (address.getPrivatePhone() == null && property.toString().contains("FAX") == false) {
+          address.setPrivatePhone(getTel(property.getValue()));
         } else {
-          if (data.getPrivateMobilePhone() == null && property.toString().contains("FAX") == false) {
-            data.setPrivateMobilePhone(getTel(property.getValue()));
+          if (address.getPrivateMobilePhone() == null && property.toString().contains("FAX") == false) {
+            address.setPrivateMobilePhone(getTel(property.getValue()));
           }
         }
       }
@@ -388,15 +427,15 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
       final String str[] = StringUtils.split(property.getValue(), ';');
       final int size = str.length;
       if (size >= 1)
-        data.setPrivateAddressText(str[0]);
+        address.setPrivateAddressText(str[0]);
       if (size >= 2)
-        data.setPrivateCity(str[1]);
+        address.setPrivateCity(str[1]);
       if (size >= 3)
-        data.setPrivateZipCode(str[2]);
+        address.setPrivateZipCode(str[2]);
       if (size >= 4)
-        data.setPrivateCountry(str[3]);
+        address.setPrivateCountry(str[3]);
       if (size >= 5)
-        data.setPrivateState(str[4]);
+        address.setPrivateState(str[4]);
     }
 
     // //// SET HOME URL -> no space for home url
@@ -417,7 +456,7 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
     return tel;
   }
 
-  private void setWorkData(final Property property)
+  private void setWorkData(final Property property, final AddressDO address)
   {
     boolean telCheck = true; // to seperate phone and mobil number
 
@@ -430,23 +469,23 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
 
           // phone number first, mobil number second
           if (telCheck) {
-            data.setBusinessPhone(tel);
+            address.setBusinessPhone(tel);
             telCheck = false;
             break;
           } else {
-            data.setMobilePhone(tel);
+            address.setMobilePhone(tel);
             break;
           }
         }
         // //// SET WORK FAX
         if (p.getValue().toString().equals("FAX")) {
-          data.setFax(getTel(property.getValue()));
+          address.setFax(getTel(property.getValue()));
         }
-        if (data.getBusinessPhone() == null && property.toString().contains("FAX") == false) {
-          data.setBusinessPhone(getTel(property.getValue()));
+        if (address.getBusinessPhone() == null && property.toString().contains("FAX") == false) {
+          address.setBusinessPhone(getTel(property.getValue()));
         } else {
-          if (data.getMobilePhone() == null && property.toString().contains("FAX") == false) {
-            data.setMobilePhone(getTel(property.getValue()));
+          if (address.getMobilePhone() == null && property.toString().contains("FAX") == false) {
+            address.setMobilePhone(getTel(property.getValue()));
           }
         }
       }
@@ -454,26 +493,26 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
 
     // //// SET WORK EMAIL
     if (property.getId().toString().equals("EMAIL"))
-      data.setEmail(property.getValue());
+      address.setEmail(property.getValue());
 
     // //// SET WORK ADDRESS
     if (property.getId().toString().equals("ADR")) {
       final String str[] = StringUtils.split(property.getValue(), ';');
       final int size = str.length;
       if (size >= 1)
-        data.setAddressText(str[0]);
+        address.setAddressText(str[0]);
       if (size >= 2)
-        data.setCity(str[1]);
+        address.setCity(str[1]);
       if (size >= 3)
-        data.setZipCode(str[2]);
+        address.setZipCode(str[2]);
       if (size >= 4)
-        data.setCountry(str[3]);
+        address.setCountry(str[3]);
       if (size >= 5)
-        data.setState(str[4]);
+        address.setState(str[4]);
     }
 
     // //// SET WORK URL
     if (property.getId().toString().equals("URL"))
-      data.setWebsite(property.getValue());
+      address.setWebsite(property.getValue());
   }
 }
