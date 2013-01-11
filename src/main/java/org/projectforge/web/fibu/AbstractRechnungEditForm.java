@@ -346,6 +346,27 @@ extends AbstractEditForm<O, P>
       add(new WebMarkupContainer(COST_EDIT_DIALOG_ID).setVisible(false));
     }
     refresh();
+    if (getBaseDao().hasInsertAccess(getUser()) == true) {
+      final DivPanel panel = gridBuilder.newGridPanel().getPanel();
+      final Button addPositionButton = new Button(SingleButtonPanel.WICKET_ID) {
+        @Override
+        public final void onSubmit()
+        {
+          final T position = newPositionInstance();
+          data.addPosition(position);
+          if (position.getNumber() > 1) {
+            final T predecessor = data.getPosition(position.getNumber() - 2);
+            if (predecessor != null) {
+              position.setVat(predecessor.getVat()); // Preset the vat from the predecessor position.
+            }
+          }
+          refresh();
+        }
+      };
+      final SingleButtonPanel addPositionButtonPanel = new SingleButtonPanel(panel.newChildId(), addPositionButton, getString("add"));
+      addPositionButtonPanel.setTooltip(getString("fibu.rechnung.tooltip.addPosition"));
+      panel.add(addPositionButtonPanel);
+    }
   }
 
   protected void addCellAfterFaelligkeit()
@@ -614,28 +635,6 @@ extends AbstractEditForm<O, P>
           }
         }
       }
-    }
-    if (hasInsertAccess == true) {
-      content.add(columns = new DivPanel(content.newChildId()));
-      columns.add(column = new DivPanel(columns.newChildId())); // Full width.
-      final Button addPositionButton = new Button(SingleButtonPanel.WICKET_ID) {
-        @Override
-        public final void onSubmit()
-        {
-          final T position = newPositionInstance();
-          data.addPosition(position);
-          if (position.getNumber() > 1) {
-            final T predecessor = data.getPosition(position.getNumber() - 2);
-            if (predecessor != null) {
-              position.setVat(predecessor.getVat()); // Preset the vat from the predecessor position.
-            }
-          }
-          refresh();
-        }
-      };
-      final SingleButtonPanel addPositionButtonPanel = new SingleButtonPanel(column.newChildId(), addPositionButton, getString("add"));
-      addPositionButtonPanel.setTooltip(getString("fibu.rechnung.tooltip.addPosition"));
-      column.add(addPositionButtonPanel);
     }
   }
 

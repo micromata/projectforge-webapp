@@ -250,6 +250,21 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
     }
     gridBuilder.newGridPanel();
     positionsRepeater = gridBuilder.newRepeatingView();
+    refresh();
+    if (getBaseDao().hasInsertAccess(getUser()) == true) {
+      final DivPanel panel = gridBuilder.newGridPanel().getPanel();
+      final Button addPositionButton = new Button(SingleButtonPanel.WICKET_ID) {
+        @Override
+        public final void onSubmit()
+        {
+          getData().addPosition(new AuftragsPositionDO());
+          refresh();
+        }
+      };
+      final SingleButtonPanel addPositionButtonPanel = new SingleButtonPanel(panel.newChildId(), addPositionButton, getString("add"));
+      addPositionButtonPanel.setTooltip(getString("fibu.auftrag.tooltip.addPosition"));
+      panel.add(addPositionButtonPanel);
+    }
     {
       // email
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("email"), true);
@@ -261,14 +276,12 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       fs.setLabelFor(radioGroup.getRadioGroup());
       fs.addHelpIcon(getString("label.sendEMailNotification"));
     }
-    refresh();
   }
 
   @SuppressWarnings("serial")
   void refresh()
   {
     positionsRepeater.removeAll();
-    final boolean hasInsertAccess = getBaseDao().hasInsertAccess(getUser());
     if (CollectionUtils.isEmpty(data.getPositionen()) == true) {
       // Ensure that at least one position is available:
       data.addPosition(new AuftragsPositionDO());
@@ -432,20 +445,6 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         final FieldsetPanel fs = new FieldsetPanel(columns, getString("comment"));
         fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(position, "bemerkung")));
       }
-    }
-    if (hasInsertAccess == true) {
-      content.add(columns = new DivPanel(content.newChildId()));
-      final Button addPositionButton = new Button(SingleButtonPanel.WICKET_ID) {
-        @Override
-        public final void onSubmit()
-        {
-          getData().addPosition(new AuftragsPositionDO());
-          refresh();
-        }
-      };
-      final SingleButtonPanel addPositionButtonPanel = new SingleButtonPanel(columns.newChildId(), addPositionButton, getString("add"));
-      addPositionButtonPanel.setTooltip(getString("fibu.auftrag.tooltip.addPosition"));
-      columns.add(addPositionButtonPanel);
     }
   }
 
