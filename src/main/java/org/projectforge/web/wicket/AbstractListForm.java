@@ -293,6 +293,9 @@ AbstractSecuredForm<F, P>
     gridBuilder.newSplitPanel(GridSize.COL66);
     extendedFilter = gridBuilder.getRowPanel();
     extendedFilter.setMarkupId("extendedFilter");
+    if (searchFilter.isUseModificationFilter() == false) {
+      extendedFilter.add(AttributeModifier.append("style", "display: none;"));
+    }
     {
       final FieldsetPanel fieldset = gridBuilder.newFieldset(getString("search.periodOfModification"), true);
       fieldset.add(new HiddenInputPanel(fieldset.newChildId(), new HiddenField<Boolean>(InputPanel.WICKET_ID, new PropertyModel<Boolean>(
