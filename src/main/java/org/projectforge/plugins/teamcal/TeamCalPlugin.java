@@ -40,7 +40,6 @@ import org.projectforge.plugins.teamcal.integration.TeamCalCalendarPage;
 import org.projectforge.plugins.teamcal.integration.TeamcalTimesheetPluginComponentHook;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.registry.RegistryEntry;
-import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.MenuItemDef;
 import org.projectforge.web.MenuItemDefId;
 import org.projectforge.web.MenuItemRegistry;
@@ -57,8 +56,6 @@ public class TeamCalPlugin extends AbstractPlugin
   public static final String ID = "teamCal";
 
   public static final String RESOURCE_BUNDLE_NAME = TeamCalPlugin.class.getPackage().getName() + ".TeamCalI18nResources";
-
-  static UserPrefArea USER_PREF_AREA;
 
   private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { TeamCalDO.class, TeamEventDO.class};
 
@@ -113,8 +110,6 @@ public class TeamCalPlugin extends AbstractPlugin
     // All the i18n stuff:
     addResourceBundle(RESOURCE_BUNDLE_NAME);
 
-    // Register favorite entries (the user can modify these templates/favorites via 'own settings'):
-    USER_PREF_AREA = registerUserPrefArea("TEAMCAL_FAVORITE", TeamCalDO.class, "teamcal.favorite");
     CalendarFeed.registerFeedHook(new TeamCalCalendarFeedHook());
 
     TimesheetEditPage.addPluginHook(new TeamcalTimesheetPluginComponentHook());
