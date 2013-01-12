@@ -43,7 +43,6 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.form.validation.IFormValidator;
-import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -77,9 +76,10 @@ import org.projectforge.web.wicket.flowlayout.ButtonType;
 import org.projectforge.web.wicket.flowlayout.DialogPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
+import org.projectforge.web.wicket.flowlayout.FieldSetIconPosition;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.HtmlCodePanel;
-import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
+import org.projectforge.web.wicket.flowlayout.IconPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
@@ -240,7 +240,7 @@ extends AbstractEditForm<O, P>
       fs.setNoLabelFor();
       ajaxUpdateComponents.add(vatPanel.getLabel4Ajax());
     }
-    gridBuilder.newSubSplitPanel( GridSize.COL50);
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
     {
       // Brutto
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.brutto"));
@@ -449,8 +449,7 @@ extends AbstractEditForm<O, P>
           final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.auftrag"), true).setLabelSide(false);
           fieldset.add(new InputPanel(fieldset.newChildId(), new AuftragsPositionFormComponent(InputPanel.WICKET_ID,
               new PropertyModel<AuftragsPositionDO>(position, "auftragsPosition"), false)));
-          fieldset.add(new IconLinkPanel(fieldset.newChildId(), IconType.GOTO, getString("show"), new Link<Void>(
-              IconLinkPanel.LINK_ID) {
+          fieldset.add(new IconPanel(fieldset.newIconChildId(), IconType.GOTO, getString("show")) {
             /**
              * @see org.apache.wicket.markup.html.link.Link#onClick()
              */
@@ -471,7 +470,7 @@ extends AbstractEditForm<O, P>
             {
               return rechnungsPosition.getAuftragsPosition() != null;
             }
-          }).setTopRight());
+          }.enableAjaxOnClick(), FieldSetIconPosition.TOP_RIGHT);
         }
         {
           // Menge
