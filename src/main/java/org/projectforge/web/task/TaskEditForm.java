@@ -158,17 +158,6 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
       statusChoice.setNullValid(false).setRequired(true);
       fs.add(statusChoice);
     }
-    gridBuilder.newSplitPanel(GridSize.COL50);
-    {
-      // Priority drop down box:
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("priority"));
-      final LabelValueChoiceRenderer<Priority> priorityChoiceRenderer = new LabelValueChoiceRenderer<Priority>(fs, Priority.values());
-      final DropDownChoice<Priority> priorityChoice = new DropDownChoice<Priority>(fs.getDropDownChoiceId(), new PropertyModel<Priority>(
-          data, "priority"), priorityChoiceRenderer.getValues(), priorityChoiceRenderer);
-      priorityChoice.setNullValid(true);
-      fs.add(priorityChoice);
-    }
-    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Assigned user:
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task.assignedUser"));
@@ -183,6 +172,15 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
       responsibleUserSelectPanel.init();
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
+    {
+      // Priority drop down box:
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("priority"));
+      final LabelValueChoiceRenderer<Priority> priorityChoiceRenderer = new LabelValueChoiceRenderer<Priority>(fs, Priority.values());
+      final DropDownChoice<Priority> priorityChoice = new DropDownChoice<Priority>(fs.getDropDownChoiceId(), new PropertyModel<Priority>(
+          data, "priority"), priorityChoiceRenderer.getValues(), priorityChoiceRenderer);
+      priorityChoice.setNullValid(true);
+      fs.add(priorityChoice);
+    }
     {
       // Max hours:
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task.maxHours"));
@@ -212,9 +210,9 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
     // ///////////////////////////////
     // GANTT
     // ///////////////////////////////
-    gridBuilder.newSplitPanel(GridSize.COL50);
+    gridBuilder.newSplitPanel(GridSize.COL50, true);
     gridBuilder.newFormHeading(getString("task.gantt.settings"));
-    gridBuilder.newSplitPanel(GridSize.COL50);
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
     {
       // Gantt object type:
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.objectType"));
@@ -225,7 +223,23 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
       objectTypeChoice.setNullValid(true);
       fs.add(objectTypeChoice);
     }
-    gridBuilder.newSplitPanel(GridSize.COL50);
+    {
+      // Gantt: start date
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.startDate"));
+      final DatePanel startDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "startDate"), DatePanelSettings.get()
+          .withTargetType(java.sql.Date.class).withSelectProperty("startDate"));
+      fs.add(startDatePanel);
+    }
+    {
+      // Gantt: end date
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.endDate"));
+      final DatePanel endDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "endDate"), DatePanelSettings.get()
+          .withTargetType(java.sql.Date.class).withSelectProperty("endDate"));
+      fs.add(endDatePanel);
+      dependentFormComponents[1] = endDatePanel;
+    }
+
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
     {
       // Progress
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task.progress")).setUnit("%");
@@ -241,15 +255,6 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
       WicketUtils.setSize(progressField, 3);
       fs.add(progressField);
     }
-    gridBuilder.newSplitPanel(GridSize.COL50);
-    {
-      // Gantt: start date
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.startDate"));
-      final DatePanel startDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "startDate"), DatePanelSettings.get()
-          .withTargetType(java.sql.Date.class).withSelectProperty("startDate"));
-      fs.add(startDatePanel);
-    }
-    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Gantt: duration
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.duration")).setNoLabelFor();
@@ -259,16 +264,6 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
       fs.add(durationField);
       dependentFormComponents[0] = durationField;
     }
-    gridBuilder.newSplitPanel(GridSize.COL50);
-    {
-      // Gantt: end date
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.endDate"));
-      final DatePanel endDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "endDate"), DatePanelSettings.get()
-          .withTargetType(java.sql.Date.class).withSelectProperty("endDate"));
-      fs.add(endDatePanel);
-      dependentFormComponents[1] = endDatePanel;
-    }
-    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Gantt: predecessor offset
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.predecessorOffset")).setUnit(getString("days"));
@@ -277,7 +272,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
       WicketUtils.setSize(ganttPredecessorField, 6);
       fs.add(ganttPredecessorField);
     }
-    gridBuilder.newGridPanel();
+    gridBuilder.newSubSplitPanel(GridSize.COL100);
     {
       // Gantt relation type:
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.relationType"));
