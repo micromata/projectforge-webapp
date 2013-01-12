@@ -221,6 +221,9 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
    */
   public FieldsetPanel setLabelSide(final boolean labelSide)
   {
+    if (labelSide == false) {
+      fieldset.add(AttributeModifier.append("class", "vertical"));
+    }
     return this;
   }
 

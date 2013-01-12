@@ -12,28 +12,28 @@
 	padding-right: 5px;
 }
 
-form div.span12,div.span9,div.span8,div.span6,div.span4,div.span3 {
+div.span12,div.span9,div.span8,div.span6,div.span4,div.span3 {
 	
 }
 
-/*form div.not-first {
+/*div.not-first {
 	border-left: 1px solid #eee;
 }*/
-form div.has-siblings {
+div.has-siblings {
 	border-right: 1px solid #eee;
 }
 
-form div.has-childs {
+div.has-childs {
 	border-right: none;
 }
 
-form div.row-fluid,div.rounded-box {
+div.row-fluid,div.rounded-box {
 	background-color: #fff;
 	border: 1px solid #eee;
 	border-radius: 3px;
 }
 
-form div.has-sub-rows {
+div.has-sub-rows {
 	border: none;
 }
 
@@ -129,4 +129,23 @@ div.toggle-container div.collapse-header {
 
 div.toggle-container div.collapse-header.highlight {
 	background-color: #E44;
+}
+
+h1, h2, h3 {
+	color: #555;
+}
+
+h1 {
+	font-size: 20px;
+	line-height: 25px;
+}
+
+h2 {
+	font-size: 16px;
+	line-height: 18px;
+}
+
+h3 {
+	font-size: 14px;
+	line-height: 16px;
 }

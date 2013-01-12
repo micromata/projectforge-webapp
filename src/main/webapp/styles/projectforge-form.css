@@ -6,14 +6,6 @@ form {
 	margin-bottom: 5px;
 }
 
-.form-horizontal .control-group {
-	padding-top: 5px;
-	padding-bottom: 5px;
-	margin-bottom: 0px;
-	padding-right: 8px;
-	position: relative;
-}
-
 form input.number {
 	width: 5em !important;
 }
@@ -52,7 +44,20 @@ input.userselectpanel {
 	width: 200px !important;
 }
 
-form.form-horizontal label.control-label {
+div.controls {
+	margin-left: 140px;
+	width: -moz-calc(100% -140px);
+	width: -webkit-calc(100% -140px);
+	width: -o-calc(100% -140px);
+	width: calc(100% -140px);
+}
+
+div.control-group.vertical div.controls {
+	margin-left: 0px;
+	width: 100%;
+}
+
+label.control-label {
 	position: absolute;
 	width: 140px;
 	font-size: 12px;
@@ -62,7 +67,7 @@ form.form-horizontal label.control-label {
 	padding-top: 0px;
 }
 
-form.form-horizontal label.control-label .help-inline {
+label.control-label .help-inline {
 	font-weight: normal;
 	font-size: 11px;
 	padding-left: 0px;
@@ -73,20 +78,34 @@ form.form-horizontal label.control-label .help-inline {
 	margin-bottom: 0px;
 }
 
-form.form-horizontal div.controls {
-	margin-left: 140px;
-	width: -moz-calc(100% -140px);
-	width: -webkit-calc(100% -140px);
-	width: -o-calc(100% -140px);
-	width: calc(100% -140px);
+div.control-group.vertical label.control-label {
+	position: static;
+	width: 100%;
+	font-size: 12px;
+	font-weight: bold;
+	text-align: left;
+	margin-bottom: 0px;
+	padding-left: 3px;
+	padding-top: 0px;
+	display: block;
 }
 
-form.form-horizontal div.controls-row {
+div.control-group.vertical label.control-label .help-inline {
+	font-weight: normal;
+	font-size: 11px;
+	padding-left: 0px;
+	display: block;
+	color: #999;
+	padding-top: 0px;
+	margin-top: -7px;
+	margin-bottom: 0px;
+}
+
+div.controls-row {
 	
 }
 
-form.form-horizontal div.controls input,form.form-horizontal div.controls textarea
-	{
+div.controls input,div.controls textarea {
 	padding-left: 0px;
 	padding-right: 0px;
 	padding-top: 0px;
@@ -118,25 +137,33 @@ select {
 	width: 8em;
 }
 
-form.form-horizontal div.control-group i.top-left {
+div.control-group {
+	padding-top: 5px;
+	padding-bottom: 5px;
+	margin-bottom: 0px;
+	padding-right: 8px;
+	position: relative;
+}
+
+div.control-group i.top-left {
 	position: absolute;
 	left: 0px;
 	top: 0px;
 }
 
-form.form-horizontal div.control-group i.top-right {
+div.control-group i.top-right {
 	position: absolute;
 	left: 120px;
 	top: 0px;
 }
 
-form.form-horizontal div.control-group i.bottom-left {
+div.control-group i.bottom-left {
 	position: absolute;
 	left: 0px;
 	bottom: 0px;
 }
 
-form.form-horizontal div.control-group i.bottom-right {
+div.control-group i.bottom-right {
 	position: absolute;
 	left: 120px;
 	bottom: 0px;
