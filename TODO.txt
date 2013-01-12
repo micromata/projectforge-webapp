@@ -1,8 +1,3 @@
-BaseDao searches now history at default! -> News
-
-UserPrefListPage: userPref.area.teamcal.favorite not found (i18n key)
-Tooltips und insbesondere für SearchFields verbessern.
-
 Prio 1 (Johannes):
 ------------------
 - Contextmenu (verschieben von Zeitberichten und rechte Maustaste in Listenansichten)
@@ -20,25 +15,17 @@ Prio 3 (Johannes):
 Bootstrap-Umbau
 ---------------
 - Dialoge
-- Hilfe-Icons bei Textfields
-- RechnungEditPage: Anzeige von Aufträgen, Icon deplatziert
-- Fieldsets with subtitle (remove Fieldset-Constructor).
+- Tooltips und insbesondere für SearchFields verbessern.
+
 
 Konkrete Masken
 ---------------
-- TaskEditPage
-- AddressViewPage
-- AdminPage
-- SetupPage für Neuinstallation (Helpicon für E-Mails deplatziert)
-- TaskWizzard
 - AuftragsEditForm
 - *RechnungsEditForm
 - GanttChartEditForm
 - HRListPage
 - HRPlanningEditForm
-- TaskEditForm
-- UserEditForm
-- UpdateForm
+- AbstractListPage.html: quick-select-hint/grid_16
 
 Wicket6-Migration
 -----------------
