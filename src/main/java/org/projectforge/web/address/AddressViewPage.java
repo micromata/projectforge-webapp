@@ -136,7 +136,6 @@ public class AddressViewPage extends AbstractSecuredPage
     }
 
     gridBuilder = new GridBuilder(body, "flowform", getMySession());
-
     final String name = address.getFullNameWithTitleAndForm();
 
     gridBuilder.newSplitPanel(GridSize.COL50);
