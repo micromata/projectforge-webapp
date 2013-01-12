@@ -166,14 +166,14 @@ public class DatevImportStoragePanel extends Panel
       }
     };
     cont.add(toggleLink);
-    toggleLink.add(new IconPanel("zoomInImage", IconType.PLUS) {
+    toggleLink.add(new IconPanel("zoomInImage", IconType.ZOOM_IN) {
       @Override
       public boolean isVisible()
       {
         return !sheet.isOpen();
       }
     });
-    toggleLink.add(new IconPanel("zoomOutImage", IconType.MINUS_THICK) {
+    toggleLink.add(new IconPanel("zoomOutImage", IconType.ZOOM_OUT) {
       @Override
       public boolean isVisible()
       {

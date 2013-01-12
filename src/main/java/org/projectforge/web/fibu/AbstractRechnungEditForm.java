@@ -449,7 +449,7 @@ extends AbstractEditForm<O, P>
           final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.auftrag"), true).setLabelSide(false);
           fieldset.add(new InputPanel(fieldset.newChildId(), new AuftragsPositionFormComponent(InputPanel.WICKET_ID,
               new PropertyModel<AuftragsPositionDO>(position, "auftragsPosition"), false)));
-          fieldset.add(new IconLinkPanel(fieldset.newChildId(), IconType.CIRCLE_ARROW_EAST, getString("show"), new Link<Void>(
+          fieldset.add(new IconLinkPanel(fieldset.newChildId(), IconType.GOTO, getString("show"), new Link<Void>(
               IconLinkPanel.LINK_ID) {
             /**
              * @see org.apache.wicket.markup.html.link.Link#onClick()
