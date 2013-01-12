@@ -26,13 +26,11 @@ package org.projectforge.web.wicket;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.image.ContextImage;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.web.Menu;
 import org.projectforge.web.MenuEntry;
-import org.projectforge.web.core.LogoServlet;
 import org.projectforge.web.core.MenuSuffixLabel;
 import org.projectforge.web.core.NavSidePanel;
 import org.projectforge.web.core.NavTopPanel;
@@ -66,12 +64,6 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
   public AbstractSecuredPage(final PageParameters parameters)
   {
     super(parameters);
-    final String logoServlet = LogoServlet.getBaseUrl();
-    if (logoServlet != null) {
-      body.add(new ContextImage("logoLeftImage", logoServlet));
-    } else {
-      body.add(new Label("logoLeftImage", "[invisible]").setVisible(false));
-    }
     final NavSidePanel menuPanel = new NavSidePanel("mainMenu");
     body.add(menuPanel);
     menuPanel.init();

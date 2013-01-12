@@ -33,7 +33,6 @@ import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.image.ContextImage;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.http.WebRequest;
 import org.apache.wicket.request.http.WebResponse;
@@ -51,7 +50,6 @@ import org.projectforge.user.UserDao;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.admin.SetupPage;
 import org.projectforge.web.admin.SystemUpdatePage;
-import org.projectforge.web.core.LogoServlet;
 import org.projectforge.web.mobile.LoginMobilePage;
 import org.projectforge.web.wicket.AbstractUnsecureBasePage;
 import org.projectforge.web.wicket.MySession;
@@ -165,12 +163,6 @@ public class LoginPage extends AbstractUnsecureBasePage
     if (initDatabaseDao.isEmpty() == true) {
       log.info("Data-base is empty: redirect to SetupPage...");
       throw new RestartResponseException(SetupPage.class);
-    }
-    final String logoServlet = LogoServlet.getBaseUrl();
-    if (logoServlet != null) {
-      body.add(new ContextImage("logoLeftImage", logoServlet));
-    } else {
-      body.add(new Label("logoLeftImage", "[invisible]").setVisible(false));
     }
     form = new LoginForm(this);
     body.add(AttributeModifier.replace("class", "loginpage"));

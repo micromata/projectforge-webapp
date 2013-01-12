@@ -36,6 +36,7 @@ import org.apache.wicket.markup.html.TransparentWebMarkupContainer;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.image.ContextImage;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.model.Model;
@@ -46,6 +47,7 @@ import org.projectforge.AppVersion;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.WebConfiguration;
+import org.projectforge.web.core.LogoServlet;
 import org.projectforge.web.doc.DocumentationPage;
 
 /**
@@ -102,6 +104,12 @@ public abstract class AbstractUnsecureBasePage extends WebPage
       }
     };
     add(body);
+    final String logoServlet = LogoServlet.getBaseUrl();
+    if (logoServlet != null) {
+      body.add(new ContextImage("logoLeftImage", logoServlet));
+    } else {
+      body.add(new Label("logoLeftImage", "[invisible]").setVisible(false));
+    }
     final WebMarkupContainer developmentSystem = new WebMarkupContainer("developmentSystem");
     developmentSystem.setOutputMarkupId(true);
     developmentSystem.setMarkupId("pf_develHint");
