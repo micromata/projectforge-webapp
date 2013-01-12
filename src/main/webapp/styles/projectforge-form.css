@@ -11,6 +11,7 @@ form {
 	padding-bottom: 5px;
 	margin-bottom: 0px;
 	padding-right: 8px;
+	position: relative;
 }
 
 form input.number {
@@ -44,7 +45,7 @@ input.warning {
 }
 
 input,textarea {
-	background: rgba(0, 0, 0, 0.05) !important;
+	background: rgba(0, 0, 0, 0.03) !important;
 }
 
 input.userselectpanel {
@@ -52,7 +53,24 @@ input.userselectpanel {
 }
 
 form.form-horizontal label.control-label {
-	width: 100px;
+	position: absolute;
+	width: 140px;
+	font-size: 12px;
+	font-weight: bold;
+	text-align: left;
+	padding-left: 3px;
+	padding-top: 0px;
+}
+
+form.form-horizontal label.control-label .help-inline {
+	font-weight: normal;
+	font-size: 11px;
+	padding-left: 0px;
+	display: block;
+	color: #999;
+	padding-top: 0px;
+	margin-top: -7px;
+	margin-bottom: 0px;
 }
 
 form.form-horizontal div.controls {
@@ -63,11 +81,16 @@ form.form-horizontal div.controls {
 	width: calc(100% -140px);
 }
 
+form.form-horizontal div.controls-row {
+	
+}
+
 form.form-horizontal div.controls input,form.form-horizontal div.controls textarea
 	{
 	padding-left: 0px;
 	padding-right: 0px;
-	width: 100%;
+	padding-top: 0px;
+	padding-bottom: 0px;
 	margin-top: 2px;
 	width: 100%;
 }
@@ -93,4 +116,32 @@ select {
 
 .input-length-10 {
 	width: 8em;
+}
+
+form.form-horizontal div.control-group i.top-left { /* Doesn't work.
+	position: absolute; */
+	left: 0px;
+	top: 0px;
+}
+
+form.form-horizontal div.control-group i.top-right {
+	/* Doesn't work, see TimesheetEditPage */
+	position: absolute;
+	left: 120px;
+	top: 0px;
+}
+
+form.form-horizontal div.control-group i.bottom-left {
+	/* Doesn't work, see AddressListPage */
+	position: absolute;
+	left: 0px;
+	bottom: 0px;
+}
+
+form.form-horizontal div.control-group i.bottom-right {
+	/* Doesn't work, see TimesheetEditPage */
+	position: absolute;
+	left: 120px;
+	bottom: 0px;
+	z-index: 9999999;
 }
