@@ -80,7 +80,7 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
       searchField.add(WicketUtils.setFocus());
       WicketUtils.addTooltip(searchField, getString("search.string.info.title"), getParentPage().getSearchToolTip());
       fs.add(new InputPanel(fs.newChildId(), searchField));
-      fs.add(new IconPanel(fs.newChildId(), IconType.HELP, getString("tooltip.lucene.link")).setOnClickLocation(
+      fs.add(new IconPanel(fs.newIconChildId(), IconType.HELP, getString("tooltip.lucene.link")).setOnClickLocation(
           WebConstants.DOC_LINK_HANDBUCH_LUCENE, true), FieldSetIconPosition.TOP_RIGHT);
     }
     {
