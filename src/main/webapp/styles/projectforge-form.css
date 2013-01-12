@@ -118,28 +118,25 @@ select {
 	width: 8em;
 }
 
-form.form-horizontal div.control-group i.top-left { /* Doesn't work.
-	position: absolute; */
+form.form-horizontal div.control-group i.top-left {
+	position: absolute;
 	left: 0px;
 	top: 0px;
 }
 
 form.form-horizontal div.control-group i.top-right {
-	/* Doesn't work, see TimesheetEditPage */
 	position: absolute;
 	left: 120px;
 	top: 0px;
 }
 
 form.form-horizontal div.control-group i.bottom-left {
-	/* Doesn't work, see AddressListPage */
 	position: absolute;
 	left: 0px;
 	bottom: 0px;
 }
 
 form.form-horizontal div.control-group i.bottom-right {
-	/* Doesn't work, see TimesheetEditPage */
 	position: absolute;
 	left: 120px;
 	bottom: 0px;
