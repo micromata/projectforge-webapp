@@ -78,7 +78,6 @@ import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldSetIconPosition;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.HtmlCodePanel;
 import org.projectforge.web.wicket.flowlayout.IconPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
@@ -86,6 +85,7 @@ import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 import org.projectforge.web.wicket.flowlayout.TextPanel;
 import org.projectforge.web.wicket.flowlayout.TextStyle;
 import org.projectforge.web.wicket.flowlayout.ToggleContainerPanel;
+import org.projectforge.web.wicket.flowlayout.ToggleContainerPanel.ToggleStatus;
 
 public abstract class AbstractRechnungEditForm<O extends AbstractRechnungDO<T>, T extends AbstractRechnungsPositionDO, P extends AbstractEditPage< ? , ? , ? >>
 extends AbstractEditForm<O, P>
@@ -255,6 +255,31 @@ extends AbstractEditForm<O, P>
       fs.setNoLabelFor();
       ajaxUpdateComponents.add(grossPanel.getLabel4Ajax());
     }
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
+    {
+      // Bezahldatum
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.bezahlDatum"));
+      final DatePanel bezahlDatumPanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "bezahlDatum"), DatePanelSettings
+          .get().withTargetType(java.sql.Date.class));
+      dependentFormComponents[1] = bezahlDatumPanel.getDateField();
+      fs.add(bezahlDatumPanel);
+    }
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
+    {
+      // Zahlbetrag
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.zahlBetrag"));
+      final TextField<BigDecimal> zahlBetragField = new TextField<BigDecimal>(InputPanel.WICKET_ID, new PropertyModel<BigDecimal>(data,
+          "zahlBetrag")) {
+        @SuppressWarnings({ "rawtypes", "unchecked"})
+        @Override
+        public IConverter getConverter(final Class type)
+        {
+          return new CurrencyConverter();
+        }
+      };
+      dependentFormComponents[3] = zahlBetragField;
+      fs.add(zahlBetragField);
+    }
     {
       gridBuilder.newSubSplitPanel(GridSize.COL50);
       // Fälligkeit und Zahlungsziel
@@ -299,32 +324,7 @@ extends AbstractEditForm<O, P>
         }
       });
     }
-    gridBuilder.clear().newSplitPanel(GridSize.COL50, true).newSubSplitPanel(GridSize.COL50);
-    {
-      // Bezahldatum
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.bezahlDatum"));
-      final DatePanel bezahlDatumPanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "bezahlDatum"), DatePanelSettings
-          .get().withTargetType(java.sql.Date.class));
-      dependentFormComponents[1] = bezahlDatumPanel.getDateField();
-      fs.add(bezahlDatumPanel);
-    }
-    gridBuilder.newSubSplitPanel(GridSize.COL50);
-    {
-      // Zahlbetrag
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.zahlBetrag"));
-      final TextField<BigDecimal> zahlBetragField = new TextField<BigDecimal>(InputPanel.WICKET_ID, new PropertyModel<BigDecimal>(data,
-          "zahlBetrag")) {
-        @SuppressWarnings({ "rawtypes", "unchecked"})
-        @Override
-        public IConverter getConverter(final Class type)
-        {
-          return new CurrencyConverter();
-        }
-      };
-      dependentFormComponents[3] = zahlBetragField;
-      fs.add(zahlBetragField);
-    }
-    // GRID 100% - BLOCK
+    // GRID 50% - BLOCK
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Bemerkung
@@ -419,19 +419,12 @@ extends AbstractEditForm<O, P>
           } else {
             data.getUiStatus().closePosition(position.getNumber());
           }
+          setHeading(getPositionHeading(rechnungsPosition, this));
         }
       };
       positionsPanel.getContainer().setOutputMarkupId(true);
+      positionsPanel.setHeading(getPositionHeading(rechnungsPosition, positionsPanel));
       positionsRepeater.add(positionsPanel);
-      final StringBuffer heading = new StringBuffer();
-      heading.append(escapeHtml(getString("fibu.auftrag.position.short"))).append(" #").append(position.getNumber());
-      heading.append(": ").append("<span class=\"subtitle\">");
-      heading.append(CurrencyFormatter.format(position.getNetSum()));
-      if (StringHelper.isNotBlank(position.getText()) == true) {
-        heading.append(" ").append(StringUtils.abbreviate(position.getText(), 80));
-      }
-      heading.append("<span>");
-      positionsPanel.setHeading(new HtmlCodePanel(ToggleContainerPanel.HEADING_TEXT_ID, heading.toString()));
       if (data.getUiStatus().isClosed(position.getNumber()) == true) {
         positionsPanel.setClosed();
       } else {
@@ -635,6 +628,20 @@ extends AbstractEditForm<O, P>
         }
       }
     }
+  }
+
+  protected String getPositionHeading(final AbstractRechnungsPositionDO position, final ToggleContainerPanel positionsPanel)
+  {
+    if (positionsPanel.getToggleStatus() == ToggleStatus.OPENED) {
+      return getString("label.position.short") + " #" + position.getNumber();
+    }
+    final StringBuffer heading = new StringBuffer();
+    heading.append(escapeHtml(getString("label.position.short"))).append(" #").append(position.getNumber());
+    heading.append(": ").append(CurrencyFormatter.format(position.getNetSum()));
+    if (StringHelper.isNotBlank(position.getText()) == true) {
+      heading.append(" ").append(StringUtils.abbreviate(position.getText(), 80));
+    }
+    return heading.toString();
   }
 
   /**

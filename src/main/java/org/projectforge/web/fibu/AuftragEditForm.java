@@ -79,12 +79,12 @@ import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.HtmlCodePanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 import org.projectforge.web.wicket.flowlayout.RadioGroupPanel;
 import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 import org.projectforge.web.wicket.flowlayout.TextStyle;
 import org.projectforge.web.wicket.flowlayout.ToggleContainerPanel;
+import org.projectforge.web.wicket.flowlayout.ToggleContainerPanel.ToggleStatus;
 
 public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage>
 {
@@ -311,31 +311,19 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
           } else {
             data.getUiStatus().closePosition(position.getNumber());
           }
+          setHeading(getPositionHeading(position, this));
         }
       };
       if (position.isAbgeschlossenUndNichtVollstaendigFakturiert()) {
         positionsPanel.setHighlightedHeader();
       }
       positionsRepeater.add(positionsPanel);
-      final StringBuffer heading = new StringBuffer();
-      heading.append(escapeHtml(getString("fibu.auftrag.position.short"))).append(" #").append(position.getNumber());
-      heading.append(": ");
-      heading.append(CurrencyFormatter.format(position.getNettoSumme()));
-      if (position.getStatus() != null) {
-        heading.append(", ").append(getString(position.getStatus().getI18nKey()));
-      }
-      if (position.isVollstaendigFakturiert() == false) {
-        heading.append(" (").append(getString("fibu.fakturiert.not")).append(")");
-      }
-      if (StringHelper.isNotBlank(position.getTitel()) == true) {
-        heading.append(": ").append(StringUtils.abbreviate(position.getTitel(), 80));
-      }
-      positionsPanel.setHeading(new HtmlCodePanel(ToggleContainerPanel.HEADING_TEXT_ID, heading.toString()));
       if (data.getUiStatus().isClosed(position.getNumber()) == true) {
         positionsPanel.setClosed();
       } else {
         positionsPanel.setOpen();
       }
+      positionsPanel.setHeading(getPositionHeading(position, positionsPanel));
       content = new DivPanel(ToggleContainerPanel.CONTENT_ID);
       positionsPanel.add(content);
       content.add(columns = new DivPanel(content.newChildId()));
@@ -446,6 +434,26 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(position, "bemerkung")));
       }
     }
+  }
+
+  protected String getPositionHeading(final AuftragsPositionDO position, final ToggleContainerPanel positionsPanel)
+  {
+    if (positionsPanel.getToggleStatus() == ToggleStatus.OPENED) {
+      return getString("label.position.short") + " #" + position.getNumber();
+    }
+    final StringBuffer heading = new StringBuffer();
+    heading.append(escapeHtml(getString("label.position.short"))).append(" #").append(position.getNumber());
+    heading.append(": ").append(CurrencyFormatter.format(position.getNettoSumme()));
+    if (position.getStatus() != null) {
+      heading.append(", ").append(getString(position.getStatus().getI18nKey()));
+    }
+    if (position.isVollstaendigFakturiert() == false) {
+      heading.append(" (").append(getString("fibu.fakturiert.not")).append(")");
+    }
+    if (StringHelper.isNotBlank(position.getTitel()) == true) {
+      heading.append(": ").append(StringUtils.abbreviate(position.getTitel(), 80));
+    }
+    return heading.toString();
   }
 
   @Override
