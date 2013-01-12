@@ -59,6 +59,8 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
 
   private final WebMarkupContainer div;
 
+  private RepeatingView iconContainer;
+
   private Label feedbackMessageLabel;
 
   private String feedbackMessage;
@@ -106,8 +108,7 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
    * Adds this FieldsetPanel to the parent panel.
    * @param parent
    * @param label
-   * @param multipleChildren If true then multiple children are expected an organized in a RepeatingView. Please note, if you add help or
-   *          additional icons multipleChilds has to be true.
+   * @param multipleChildren If true then multiple children are expected an organized in a RepeatingView.
    */
   public FieldsetPanel(final DivPanel parent, final String label, final boolean multipleChildren)
   {
@@ -185,7 +186,7 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
       };
     }).setRenderBodyOnly(true));
     if (description != null) {
-      label.add(new Label("labeldescription", description).setRenderBodyOnly(true));
+      label.add(new Label("labeldescription", description));
     } else {
       label.add(WicketUtils.getInvisibleComponent("labeldescription"));
     }
@@ -334,7 +335,7 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
    */
   public IconPanel addHelpIcon(final String tooltip, final FieldSetIconPosition iconPosition)
   {
-    final IconPanel icon = new IconPanel(newChildId(), IconType.HELP, tooltip);
+    final IconPanel icon = new IconPanel(newIconChildId(), IconType.HELP, tooltip);
     add(icon, iconPosition);
     return icon;
   }
@@ -346,7 +347,7 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
    */
   public IconPanel addHelpIcon(final IModel<String> tooltip)
   {
-    final IconPanel icon = new IconPanel(newChildId(), IconType.HELP, tooltip);
+    final IconPanel icon = new IconPanel(newIconChildId(), IconType.HELP, tooltip);
     add(icon, FieldSetIconPosition.TOP_RIGHT);
     return icon;
   }
@@ -358,7 +359,7 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
    */
   public FieldsetPanel addKeyboardHelpIcon(final String tooltip)
   {
-    return add(new IconPanel(newChildId(), IconType.KEYBOARD, tooltip), FieldSetIconPosition.BOTTOM_RIGHT);
+    return add(new IconPanel(newIconChildId(), IconType.KEYBOARD, tooltip), FieldSetIconPosition.BOTTOM_RIGHT);
   }
 
   /**
@@ -393,9 +394,21 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
 
   public FieldsetPanel add(final IconPanel icon, final FieldSetIconPosition iconPosition)
   {
-    icon.getDiv().add(AttributeModifier.append("style", iconPosition.getStyleAttrValue()));
-    add(icon);
+    icon.getDiv().add(AttributeModifier.append("class", iconPosition.getStyleAttrValue()));
+    if (iconContainer == null) {
+      throw new IllegalArgumentException("No icons container given! May-be you forget to call newIconChildId() before adding an image.");
+    }
+    iconContainer.add(icon).setRenderBodyOnly(true);
     return this;
+  }
+
+  public String newIconChildId()
+  {
+    if (iconContainer == null) {
+      iconContainer = new RepeatingView("icons");
+      fieldset.add(iconContainer);
+    }
+    return iconContainer.newChildId();
   }
 
   /**
@@ -471,6 +484,9 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
       }
       if (descriptionSuffix == null) {
         label.add(descriptionSuffix = WicketUtils.getInvisibleComponent("descriptionSuffix"));
+      }
+      if (iconContainer == null) {
+        fieldset.add(new WebMarkupContainer("icons").setVisible(false));
       }
     }
     super.onBeforeRender();

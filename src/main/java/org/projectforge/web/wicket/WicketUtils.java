@@ -652,14 +652,14 @@ public class WicketUtils
    */
   public static IconPanel getJIRASupportTooltipIcon(final FieldsetPanel fieldset)
   {
-    return getJIRASupportTooltipIcon(fieldset, fieldset.newChildId());
+    return getJIRASupportTooltipIcon(fieldset, fieldset.newIconChildId());
   }
 
   /**
    */
   public static IconPanel getAlertTooltipIcon(final FieldsetPanel fieldset, final String tooltip)
   {
-    final IconPanel icon = new IconPanel(fieldset.newChildId(), IconType.ALERT, tooltip);
+    final IconPanel icon = new IconPanel(fieldset.newIconChildId(), IconType.ALERT, tooltip);
     return icon;
   }
 

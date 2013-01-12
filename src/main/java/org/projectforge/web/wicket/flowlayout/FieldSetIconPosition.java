@@ -29,19 +29,20 @@ package org.projectforge.web.wicket.flowlayout;
  */
 public enum FieldSetIconPosition
 {
-  BOTTOM_RIGHT("position: absolute; left: 125px; bottom: 0px;"), //
-  TOP_LEFT("position: absolute; left: 0px; top: 0px;"), //
-  TOP_RIGHT("position: absolute; left: 125px; top: 0px;");
+  BOTTOM_LEFT("bottom-left"), //
+  BOTTOM_RIGHT("bottom-right"), //
+  TOP_LEFT("top-left"), //
+  TOP_RIGHT("top-right");
 
-  private String styleAttrValue;
+  private String classAttrValue;
 
   public String getStyleAttrValue()
   {
-    return styleAttrValue;
+    return classAttrValue;
   }
 
   private FieldSetIconPosition(final String styleAttrValue)
   {
-    this.styleAttrValue = styleAttrValue;
+    this.classAttrValue = styleAttrValue;
   }
 }

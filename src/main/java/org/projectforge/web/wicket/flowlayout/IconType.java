@@ -29,22 +29,23 @@ package org.projectforge.web.wicket.flowlayout;
  */
 public enum IconType
 {
-  ALERT("question-sign"), //
+  ALERT("icon-warning-sign"), //
   REFRESH("refresh"), //
-  CIRCLE_ARROW_EAST("question-sign"), //
-  CIRCLE_ARROW_WEST("question-sign"), //
-  CLIPBOARD("question-sign"), //
-  CLOCK("question-sign"), //
-  DOCUMENT("question-sign"), //
+  //CIRCLE_ARROW_EAST("question-sign"), //
+  //CIRCLE_ARROW_WEST("question-sign"), //
+  //CLIPBOARD("question-sign"), //
+  //CLOCK("question-sign"), //
+  DOCUMENT("icon-file"), //
   DOWNLOAD("download"), //
   EDIT("pencil"), //
   FOLDER_OPEN("folder-open"), //
+  GOTO("icon-hand-right"), //
   HELP("info-sign"), //
   JIRA_SUPPORT("star"), //
-  KEYBOARD("question-sign"), //
+  KEYBOARD("icon-th"), //
   MINUS_SIGN("minus-sign"), //
-  MINUS_THICK("question-sign"), //
-  MODIFIED("question-sign"), //
+  //MINUS_THICK("question-sign"), //
+  MODIFIED("icon-star-empty"), //
   PLUS("plus"), //
   PLUS_SIGN("plus-sign"), //
   REMOVE("remove"), //
@@ -53,7 +54,9 @@ public enum IconType
   SUBSCRIPTION("globe"), //
   TRASH("trash"), //
   CALENDAR("calendar"), //
-  WRENCH("wrench");
+  WRENCH("wrench"), //
+  ZOOM_IN("zoom-in"), //
+  ZOOM_OUT("zoom-out");
 
   private String cssIdentifier;
 

@@ -40,7 +40,6 @@ import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.HiddenField;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -169,16 +168,14 @@ AbstractSecuredForm<F, P>
         // Fieldset search filter
         final FieldsetPanel fs = gridBuilder.newFieldset(getString("searchFilter"), true);
         if (parentPage.getBaseDao().isHistorizable() == true) {
-          final RepeatingView repeater = new RepeatingView(FieldsetPanel.DESCRIPTION_SUFFIX_ID);
-          fs.setDescriptionSuffix(repeater);
-          IconPanel icon = new IconPanel(repeater.newChildId(), IconType.PLUS_SIGN, getString("filter.extendedSearch"))
+          IconPanel icon = new IconPanel(fs.newIconChildId(), IconType.PLUS_SIGN, getString("filter.extendedSearch"))
           .setOnClick("javascript:showExtendedFilter();");
           icon.setMarkupId("showExtendedFilter");
-          repeater.add(icon);
-          icon = new IconPanel(repeater.newChildId(), IconType.MINUS_SIGN, getString("filter.extendedSearch"))
+          fs.add(icon, FieldSetIconPosition.BOTTOM_LEFT);
+          icon = new IconPanel(fs.newIconChildId(), IconType.MINUS_SIGN, getString("filter.extendedSearch"))
           .setOnClick("javascript:hideExtendedFilter();");
           icon.setMarkupId("hideExtendedFilter");
-          repeater.add(icon);
+          fs.add(icon, FieldSetIconPosition.BOTTOM_LEFT);
         }
         final TextField< ? > searchTextField = createSearchTextField();
         fs.add(searchTextField);
