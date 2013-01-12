@@ -62,7 +62,6 @@ public class IconLinkPanel extends Panel
     super(id);
     this.link = link;
     add(link);
-    appendAttribute("class", type.getClassAttrValue());
     if (tooltip != null) {
       WicketUtils.addTooltip(link, tooltip);
     }
@@ -78,37 +77,6 @@ public class IconLinkPanel extends Panel
   public IconLinkPanel setLight()
   {
     icon.add(AttributeModifier.append("class", "icon-white"));
-    return this;
-  }
-
-
-  /**
-   * Sets the css style for an absolute position at the right top.
-   * @return this for chaining.
-   */
-  public IconLinkPanel setTopRight()
-  {
-    IconPanel.setTopRight(link);
-    return this;
-  }
-
-  /**
-   * Sets the css style for an absolute position at the right top.
-   * @return this for chaining.
-   */
-  public IconLinkPanel setTopLeft()
-  {
-    IconPanel.setTopLeft(link);
-    return this;
-  }
-
-  /**
-   * Sets the css style for an absolute position at the right bottom.
-   * @return this for chaining.
-   */
-  public IconLinkPanel setBottomRight()
-  {
-    IconPanel.setBottomRight(link);
     return this;
   }
 
