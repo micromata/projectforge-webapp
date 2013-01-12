@@ -1574,6 +1574,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   {
     final ReindexSettings settings = DatabaseDao.createReindexSettings(true);
     databaseDao.rebuildDatabaseSearchIndices(clazz, settings);
+    databaseDao.rebuildDatabaseSearchIndices(HistoryEntry.class, settings);
   }
 
   /**
