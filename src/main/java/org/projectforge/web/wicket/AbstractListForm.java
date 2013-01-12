@@ -172,7 +172,7 @@ AbstractSecuredForm<F, P>
           .setOnClick("javascript:showExtendedFilter();");
           icon.setMarkupId("showExtendedFilter");
           fs.add(icon, FieldSetIconPosition.BOTTOM_LEFT);
-          icon = new IconPanel(fs.newIconChildId(), IconType.MINUS_SIGN, getString("filter.extendedSearch"))
+          icon = new IconPanel(fs.newIconChildId(), IconType.MINUS_SIGN)
           .setOnClick("javascript:hideExtendedFilter();");
           icon.setMarkupId("hideExtendedFilter");
           fs.add(icon, FieldSetIconPosition.BOTTOM_LEFT);
@@ -187,16 +187,19 @@ AbstractSecuredForm<F, P>
             return getModifiedSearchExpressionLabel(AbstractListForm.this, searchFilter.getSearchString());
           }
         };
-        final DivPanel div = new DivPanel(fs.newChildId());
-        div.add(AttributeModifier.append("class", "modifiedSearchExpressionLabel"));
-        fs.add(div);
-        modifiedSearchExpressionLabel = new Label(DivPanel.CHILD_ID, modifiedSearchExpressionModel) {
+        final DivPanel div = new DivPanel(fs.newChildId()) {
+          /**
+           * @see org.projectforge.web.wicket.flowlayout.DivPanel#isVisible()
+           */
           @Override
           public boolean isVisible()
           {
             return StringUtils.isNotBlank(searchFilter.getSearchString()) == true;
           }
         };
+        div.add(AttributeModifier.append("class", "modifiedSearchExpressionLabel"));
+        fs.add(div);
+        modifiedSearchExpressionLabel = new Label(DivPanel.CHILD_ID, modifiedSearchExpressionModel);
         modifiedSearchExpressionLabel.setEscapeModelStrings(false);
         div.add(modifiedSearchExpressionLabel);
 
@@ -213,7 +216,7 @@ AbstractSecuredForm<F, P>
     }
     if (showOptionsPanel() == true) {
       gridBuilder.newSplitPanel(GridSize.COL66);
-      optionsFieldsetPanel = gridBuilder.newFieldset(parentPage.getString("label.options"), true).setNoLabelFor();
+      optionsFieldsetPanel = gridBuilder.newFieldset(getOptionsLabel(), true).setNoLabelFor();
       final DivPanel optionsCheckBoxesPanel = new DivPanel(optionsFieldsetPanel.newChildId(), DivType.CHECKBOX);
       onOptionsPanelCreate(optionsFieldsetPanel, optionsCheckBoxesPanel);
       if (showHistorySearchAndDeleteCheckbox() == true) {
@@ -282,6 +285,11 @@ AbstractSecuredForm<F, P>
     addActionButton(searchButtonPanel);
 
     setComponentsVisibility();
+  }
+
+  protected String getOptionsLabel()
+  {
+    return getString("label.options");
   }
 
   @SuppressWarnings("serial")
