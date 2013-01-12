@@ -27,13 +27,15 @@ import java.io.Serializable;
 
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
+import org.apache.wicket.ajax.AjaxEventBehavior;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.projectforge.web.wicket.WicketUtils;
 
 /**
- * Represents an icon.
+ * Represents an icon. Supports Ajax onclick behavior if {@link #enableAjaxOnClick()} is called.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
@@ -70,23 +72,22 @@ public class IconPanel extends Panel
     }
   }
 
-  static final void setTopRight(final Component component)
-  {
-    component.add(AttributeModifier.append("style", "position: absolute; right: 0px; top: 0px;"));
-  }
-
-  static final void setTopLeft(final Component component)
-  {
-    component.add(AttributeModifier.append("style", "position: absolute; left: 0px; top: 0px;"));
-  }
-
   /**
-   * Sets the css style for an absolute position at the right bottom.
-   * @return this for chaining.
+   * Enable Ajax onclick event. If clicked by the user {@link #onClick()} is called.
    */
-  static final void setBottomRight(final Component component)
+  @SuppressWarnings("serial")
+  public IconPanel enableAjaxOnClick()
   {
-    component.add(AttributeModifier.append("style", "position: absolute; right: 0px; bottom: 0px;"));
+    appendAttribute("style", "cursor: pointer;");
+    final AjaxEventBehavior behavior = new AjaxEventBehavior("onClick") {
+      @Override
+      protected void onEvent(final AjaxRequestTarget target)
+      {
+        IconPanel.this.onClick();
+      }
+    };
+    div.add(behavior);
+    return this;
   }
 
   /**
@@ -146,5 +147,12 @@ public class IconPanel extends Panel
   {
     div.add(AttributeModifier.append(attributeName, value));
     return this;
+  }
+
+  /**
+   * Don't forget to call {@link #enableAjaxOnClick()}.
+   */
+  public void onClick()
+  {
   }
 }
