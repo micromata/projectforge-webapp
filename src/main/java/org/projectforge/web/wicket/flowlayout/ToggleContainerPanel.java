@@ -32,6 +32,7 @@ import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.model.Model;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -52,6 +53,12 @@ public class ToggleContainerPanel extends Panel
   private static final String ICON_CLOSED = "icon-plus icon-white";
 
   private final WebMarkupContainer panel, toggleContainer, toggleHeading, iconContainer;
+
+  private Component heading;
+
+  private String headingText;
+
+  private boolean headingChanged;
 
   private ToggleStatus toggleStatus = ToggleStatus.OPENED;
 
@@ -89,7 +96,11 @@ public class ToggleContainerPanel extends Panel
             target.appendJavaScript("$('#" + toggleContainer.getMarkupId() + "').collapse('show')");
             toggleStatus = ToggleStatus.OPENED;
           }
+          headingChanged = false;
           ToggleContainerPanel.this.onToggleStatusChanged(target, toggleStatus);
+          if (headingChanged == true) {
+            target.add(heading);
+          }
           target.add(iconContainer);
           setIcon();
         }
@@ -129,9 +140,25 @@ public class ToggleContainerPanel extends Panel
     }
   }
 
+  @SuppressWarnings("serial")
   public ToggleContainerPanel setHeading(final String heading)
   {
-    toggleHeading.add(new Label(HEADING_TEXT_ID, heading).setRenderBodyOnly(true));
+    if (this.heading == null) {
+      toggleHeading.add(this.heading = new Label(HEADING_TEXT_ID, new Model<String>() {
+        /**
+         * @see org.apache.wicket.model.Model#getObject()
+         */
+        @Override
+        public String getObject()
+        {
+          return ToggleContainerPanel.this.headingText;
+        }
+      }).setOutputMarkupId(true));
+    }
+    if (heading.equals(this.headingText) == false) {
+      headingChanged = true;
+    }
+    this.headingText = heading;
     return this;
   }
 
@@ -141,6 +168,10 @@ public class ToggleContainerPanel extends Panel
    */
   public ToggleContainerPanel setHeading(final Component heading)
   {
+    if (this.heading != null) {
+      throw new IllegalArgumentException("Can't set heading component twice!");
+    }
+    this.heading = heading;
     toggleHeading.add(heading);
     return this;
   }
@@ -217,6 +248,14 @@ public class ToggleContainerPanel extends Panel
     toggleContainer.add(AttributeModifier.replace("class", "collapse"));
     setIcon();
     return this;
+  }
+
+  /**
+   * @return the toggleStatus
+   */
+  public ToggleStatus getToggleStatus()
+  {
+    return toggleStatus;
   }
 
   public enum ToggleStatus
