@@ -41,7 +41,7 @@ form div.button_bar {
 }
 
 input.warning {
-	background-color: #FDD;
+	background-color: #FDD !important;
 }
 
 input,textarea {
