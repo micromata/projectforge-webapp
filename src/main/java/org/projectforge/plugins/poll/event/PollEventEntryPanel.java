@@ -56,7 +56,7 @@ public abstract class PollEventEntryPanel extends Panel
     add(new Label("startDate", "Start: " + DateFormatUtils.format(start.getMillis(), pattern)));
     add(new Label("endDate", "Ende: " + DateFormatUtils.format(end.getMillis(), pattern)));
 
-    final AjaxIconButtonPanel iconButton = new AjaxIconButtonPanel("delete", IconType.MINUS_THICK) {
+    final AjaxIconButtonPanel iconButton = new AjaxIconButtonPanel("delete", IconType.REMOVE) {
       private static final long serialVersionUID = -2464985733387718199L;
 
       /**
