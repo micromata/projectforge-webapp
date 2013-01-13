@@ -422,13 +422,13 @@ extends AbstractEditForm<O, P>
         }
       };
       positionsPanel.getContainer().setOutputMarkupId(true);
-      positionsPanel.setHeading(getPositionHeading(position, positionsPanel));
       positionsRepeater.add(positionsPanel);
       if (data.getUiStatus().isClosed(position.getNumber()) == true) {
         positionsPanel.setClosed();
       } else {
         positionsPanel.setOpen();
       }
+      positionsPanel.setHeading(getPositionHeading(position, positionsPanel));
       final DivPanel content = new DivPanel(ToggleContainerPanel.CONTENT_ID);
       positionsPanel.add(content);
       final GridBuilder posGridBuilder = new GridBuilder(content, content.newChildId(), getMySession(), true);
