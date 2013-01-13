@@ -44,7 +44,7 @@ public class PollPluginUpdates
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
-    return new UpdateEntryImpl(PollPlugin.ID, "1.0.0", "2012-05-09", "Adds tables T_PLUGIN_POLL_*.") {
+    return new UpdateEntryImpl(PollPlugin.ID, "1.0.0", "2013-01-13", "Adds tables T_PLUGIN_POLL_*.") {
 
       @Override
       public UpdatePreCheckStatus runPreCheck()
