@@ -31,6 +31,8 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
+import org.projectforge.debug.StackTraceHolder;
+import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.bootstrap.GridType;
 
@@ -57,6 +59,8 @@ public class DivPanel extends Panel
   private boolean childAdded;
 
   private DivPanelVisibility visibility;
+
+  private StackTraceHolder debugStackTrace;
 
   /**
    * @param id
@@ -85,6 +89,9 @@ public class DivPanel extends Panel
   public DivPanel(final String id)
   {
     super(id);
+    if (WebConfiguration.isDevelopmentMode() == true) {
+      debugStackTrace = new StackTraceHolder();
+    }
     div = new WebMarkupContainer("div");
     super.add(div);
   }
@@ -104,6 +111,9 @@ public class DivPanel extends Panel
   public DivPanel(final String id, final GridSize divSize, final GridType... cssClasses)
   {
     super(id);
+    if (WebConfiguration.isDevelopmentMode() == true) {
+      debugStackTrace = new StackTraceHolder();
+    }
     this.gridSize = divSize;
     div = new WebMarkupContainer("div");
     super.add(div);
@@ -242,6 +252,18 @@ public class DivPanel extends Panel
   public WebMarkupContainer getDiv()
   {
     return div;
+  }
+
+  /**
+   * @see org.apache.wicket.Component#onBeforeRender()
+   */
+  @Override
+  protected void onBeforeRender()
+  {
+    super.onBeforeRender();
+    if (debugStackTrace != null && hasChilds() == false) {
+      throw new IllegalArgumentException("DivPanel has now childs! Please add any content to this DivPanel. It was intantiate here:" + debugStackTrace);
+    }
   }
 
   /**
