@@ -62,6 +62,7 @@ import org.projectforge.web.fibu.ProjektSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DateTimePanelSettings;
@@ -284,6 +285,20 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
     gridBuilder.newGridPanel();
     entriesRepeater = gridBuilder.newRepeatingView();
     refresh();
+    if (getBaseDao().hasInsertAccess(getUser()) == true && showDeletedOnly == false) {
+      final DivPanel panel = gridBuilder.newGridPanel().getPanel();
+      final Button addPositionButton = new Button(SingleButtonPanel.WICKET_ID) {
+        @Override
+        public final void onSubmit()
+        {
+          getData().addEntry(new HRPlanningEntryDO());
+          refresh();
+        }
+      };
+      final SingleButtonPanel addPositionButtonPanel = new SingleButtonPanel(panel.newChildId(), addPositionButton, getString("add"));
+      addPositionButtonPanel.setTooltip(getString("hr.planning.tooltip.addEntry"));
+      panel.add(addPositionButtonPanel);
+    }
     WicketUtils.addShowDeleteRowQuestionDialog(this, hrPlanningEntryDao);
   }
 
@@ -294,7 +309,6 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
       // Do nothing.
       return;
     }
-    DivPanel content = null, columns, column;
     if (data.hasDeletedEntries() == false) {
       this.showDeletedOnly = false;
     }
@@ -315,7 +329,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
         // Don't show deleted/undeleted entries.
         continue;
       }
-      final ToggleContainerPanel positionsPanel = new ToggleContainerPanel(entriesRepeater.newChildId());//, DivType.GRID12, DivType.ROUND_ALL);
+      final ToggleContainerPanel positionsPanel = new ToggleContainerPanel(entriesRepeater.newChildId());
       positionsPanel.getContainer().setOutputMarkupId(true);
       entriesRepeater.add(positionsPanel);
       String heading = escapeHtml(entry.getProjektNameOrStatus());
@@ -327,12 +341,12 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
         heading += ": " + NumberHelper.formatFraction2(totalHours);
       }
       positionsPanel.setHeading(new HtmlCodePanel(ToggleContainerPanel.HEADING_TEXT_ID, heading));
-      content = new DivPanel(ToggleContainerPanel.CONTENT_ID);
+      final DivPanel content = new DivPanel(ToggleContainerPanel.CONTENT_ID);
       positionsPanel.add(content);
-      content.add(columns = new DivPanel(content.newChildId()));//, DivType.BLOCK));
+      final GridBuilder posGridBuilder = new GridBuilder(content, content.newChildId(), getMySession(), true);
       {
         // DropDownChoice status / project
-        final FieldsetPanel fs = new FieldsetPanel(columns, WicketUtils.createMultipleFieldsetLabel(getString("status"),
+        final FieldsetPanel fs = posGridBuilder.newFieldset(WicketUtils.createMultipleFieldsetLabel(getString("status"),
             getString("fibu.projekt")), true);
         final LabelValueChoiceRenderer<HRPlanningEntryStatus> statusChoiceRenderer = new LabelValueChoiceRenderer<HRPlanningEntryStatus>(
             fs, HRPlanningEntryStatus.values());
@@ -377,21 +391,20 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
 
         });
       }
-      content.add(columns = new DivPanel(content.newChildId()));//, DivType.COLUMNS));
-      columns.add(column = new DivPanel(columns.newChildId()));//, GridSize.COL50));
+      posGridBuilder.newSplitPanel(GridSize.COL50);
       {
         // DropDownChoice Priority
-        final FieldsetPanel fs = new FieldsetPanel(column, getString("hr.planning.priority"));
+        final FieldsetPanel fs = posGridBuilder.newFieldset(getString("hr.planning.priority"));
         final LabelValueChoiceRenderer<Priority> priorityChoiceRenderer = new LabelValueChoiceRenderer<Priority>(fs, Priority.values());
         final DropDownChoice<Priority> priorityChoice = new DropDownChoice<Priority>(fs.getDropDownChoiceId(), new PropertyModel<Priority>(
             entry, "priority"), priorityChoiceRenderer.getValues(), priorityChoiceRenderer);
         priorityChoice.setNullValid(true).setEnabled(!entry.isDeleted());
         fs.add(priorityChoice);
       }
-      columns.add(column = new DivPanel(columns.newChildId(), GridSize.COL50));
+      posGridBuilder.newSplitPanel(GridSize.COL50);
       {
         // DropDownChoice probability
-        final FieldsetPanel fs = new FieldsetPanel(column, getString("hr.planning.probability"));
+        final FieldsetPanel fs = posGridBuilder.newFieldset(getString("hr.planning.probability"));
         final LabelValueChoiceRenderer<Integer> probabilityChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
         probabilityChoiceRenderer.addValue(25, "25%");
         probabilityChoiceRenderer.addValue(50, "50%");
@@ -403,19 +416,18 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
         probabilityChoice.setNullValid(true).setEnabled(!entry.isDeleted());
         fs.add(probabilityChoice);
       }
-      content.add(columns = new DivPanel(content.newChildId()));//, DivType.COLUMNS));
-      columns.add(column = new DivPanel(columns.newChildId()));//, GridSize.COL50));
+      posGridBuilder.newSplitPanel(GridSize.COL50);
       {
         // Hours
-        final FieldsetPanel fs = new FieldsetPanel(column, getString("hours")).setNoLabelFor();
+        final FieldsetPanel fs = posGridBuilder.newFieldset(getString("hours")).setNoLabelFor();
         final HRPlanningEditTablePanel table = new HRPlanningEditTablePanel(fs.newChildId());
         fs.add(table);
         table.init(entry);
       }
-      columns.add(column = new DivPanel(columns.newChildId(), GridSize.COL50));
+      posGridBuilder.newSplitPanel(GridSize.COL50);
       {
         // Description
-        final FieldsetPanel fs = new FieldsetPanel(column, getString("hr.planning.description"), true);
+        final FieldsetPanel fs = posGridBuilder.newFieldset(getString("hr.planning.description"), true);
         final IModel<String> model = new PropertyModel<String>(entry, "description");
         final MaxLengthTextArea description = new MaxLengthTextArea(TextAreaPanel.WICKET_ID, model);
         if (entry.isDeleted() == true) {
@@ -425,25 +437,6 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
         fs.add(new JiraIssuesPanel(fs.newChildId(), entry.getDescription()));
         fs.addJIRAField(model);
       }
-    }
-    if (getBaseDao().hasInsertAccess(getUser()) == true && showDeletedOnly == false) {
-      if (content == null) {
-        // No entries
-        content = new DivPanel(entriesRepeater.newChildId());//, DivType.GRID12, DivType.ROUND_ALL);
-        entriesRepeater.add(content);
-      }
-      content.add(columns = new DivPanel(content.newChildId()));//, DivType.BLOCK, DivType.CLEARFIX));
-      final Button addEntryButton = new Button(SingleButtonPanel.WICKET_ID) {
-        @Override
-        public final void onSubmit()
-        {
-          getData().addEntry(new HRPlanningEntryDO());
-          refresh();
-        }
-      };
-      final SingleButtonPanel addPositionButtonPanel = new SingleButtonPanel(columns.newChildId(), addEntryButton, getString("add"));
-      addPositionButtonPanel.setTooltip(getString("hr.planning.tooltip.addEntry"));
-      columns.add(addPositionButtonPanel);
     }
   }
 
