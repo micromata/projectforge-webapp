@@ -20,11 +20,8 @@ Bootstrap-Umbau
 
 Konkrete Masken
 ---------------
-- AuftragsEditForm
-- *RechnungsEditForm
-- GanttChartEditForm
-- HRListPage
-- HRPlanningEditForm
+- *RechnungsEditForm: Cost dialog
+- GanttChartEditForm: refresh button, context menu
 - AbstractListPage.html: quick-select-hint/grid_16
 
 Wicket6-Migration
