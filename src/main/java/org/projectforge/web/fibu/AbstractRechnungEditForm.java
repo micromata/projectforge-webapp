@@ -62,6 +62,7 @@ import org.projectforge.fibu.kost.KostZuweisungDO;
 import org.projectforge.fibu.kost.KostZuweisungenCopyHelper;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
@@ -182,7 +183,6 @@ extends AbstractEditForm<O, P>
     if (Configuration.getInstance().isCostConfigured() == true) {
       costConfigured = true;
     }
-
     if (isNew() == false && getData().isDeleted() == false && getBaseDao().hasInsertAccess(getUser()) == true) {
       // Clone button for existing and not deleted invoices:
       final Button cloneButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("clone")) {
@@ -387,7 +387,6 @@ extends AbstractEditForm<O, P>
       position.setVat(Configuration.getInstance().getPercentValue(ConfigurationParam.FIBU_DEFAULT_VAT));
       data.addPosition(position);
     }
-    DivPanel content = null, columns, column, subcolumn;
     for (final T position : data.getPositionen()) {
       // Fetch all kostZuweisungen:
       if (CollectionUtils.isNotEmpty(position.getKostZuweisungen()) == true) {
@@ -419,27 +418,27 @@ extends AbstractEditForm<O, P>
           } else {
             data.getUiStatus().closePosition(position.getNumber());
           }
-          setHeading(getPositionHeading(rechnungsPosition, this));
+          setHeading(getPositionHeading(position, this));
         }
       };
       positionsPanel.getContainer().setOutputMarkupId(true);
-      positionsPanel.setHeading(getPositionHeading(rechnungsPosition, positionsPanel));
+      positionsPanel.setHeading(getPositionHeading(position, positionsPanel));
       positionsRepeater.add(positionsPanel);
       if (data.getUiStatus().isClosed(position.getNumber()) == true) {
         positionsPanel.setClosed();
       } else {
         positionsPanel.setOpen();
       }
-      content = new DivPanel(ToggleContainerPanel.CONTENT_ID);
+      final DivPanel content = new DivPanel(ToggleContainerPanel.CONTENT_ID);
       positionsPanel.add(content);
-      content.add(columns = new DivPanel(content.newChildId()));
+      final GridBuilder posGridBuilder = new GridBuilder(content, content.newChildId(), getMySession(), true);
       final GridSize gridSize = (rechnungsPosition != null) ? GridSize.COL25 : GridSize.COL33;
       {
-        columns.add(column = new DivPanel(columns.newChildId(), GridSize.COL50));
+        posGridBuilder.newSplitPanel(GridSize.COL50, true);
         if (rechnungsPosition != null) {
           // Order
-          column.add(subcolumn = new DivPanel(column.newChildId(), GridSize.COL25));
-          final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.auftrag"), true).setLabelSide(false);
+          posGridBuilder.newSubSplitPanel(gridSize); // COL25
+          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.auftrag"), true).setLabelSide(false);
           fieldset.add(new InputPanel(fieldset.newChildId(), new AuftragsPositionFormComponent(InputPanel.WICKET_ID,
               new PropertyModel<AuftragsPositionDO>(position, "auftragsPosition"), false)));
           fieldset.add(new IconPanel(fieldset.newIconChildId(), IconType.GOTO, getString("show")) {
@@ -467,8 +466,8 @@ extends AbstractEditForm<O, P>
         }
         {
           // Menge
-          column.add(subcolumn = new DivPanel(column.newChildId(), gridSize));
-          final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.rechnung.menge")).setLabelSide(false);
+          posGridBuilder.newSubSplitPanel(gridSize);
+          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.rechnung.menge")).setLabelSide(false);
           final TextField<BigDecimal> amountTextField = new MinMaxNumberField<BigDecimal>(InputPanel.WICKET_ID,
               new PropertyModel<BigDecimal>(position, "menge"), BigDecimal.ZERO, NumberHelper.BILLION);
           amountTextField.add(new AjaxFormComponentUpdatingBehavior("onblur") {
@@ -482,8 +481,8 @@ extends AbstractEditForm<O, P>
         }
         {
           // Net price
-          column.add(subcolumn = new DivPanel(column.newChildId(), gridSize));
-          final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.rechnung.position.einzelNetto")).setLabelSide(false);
+          posGridBuilder.newSubSplitPanel(gridSize);
+          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.rechnung.position.einzelNetto")).setLabelSide(false);
           final TextField<BigDecimal> netTextField = new TextField<BigDecimal>(InputPanel.WICKET_ID, new PropertyModel<BigDecimal>(
               position, "einzelNetto")) {
             @SuppressWarnings({ "rawtypes", "unchecked"})
@@ -504,8 +503,8 @@ extends AbstractEditForm<O, P>
         }
         {
           // VAT
-          column.add(subcolumn = new DivPanel(column.newChildId(), gridSize));
-          final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.rechnung.mehrwertSteuerSatz")).setLabelSide(false);
+          posGridBuilder.newSubSplitPanel(gridSize);
+          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.rechnung.mehrwertSteuerSatz")).setLabelSide(false);
           final TextField<BigDecimal> vatTextField = new MinMaxNumberField<BigDecimal>(InputPanel.WICKET_ID, new PropertyModel<BigDecimal>(
               position, "vat"), BigDecimal.ZERO, NumberHelper.HUNDRED) {
             @SuppressWarnings({ "rawtypes", "unchecked"})
@@ -526,10 +525,10 @@ extends AbstractEditForm<O, P>
         }
       }
       {
-        columns.add(column = new DivPanel(columns.newChildId(), GridSize.COL50));
-        column.add(subcolumn = new DivPanel(column.newChildId(), GridSize.COL33));
+        posGridBuilder.newSplitPanel(GridSize.COL50, true);
+        posGridBuilder.newSubSplitPanel(GridSize.COL33);
         {
-          final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.common.netto")).setLabelSide(false).setNoLabelFor();
+          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.common.netto")).setLabelSide(false).setNoLabelFor();
           final TextPanel netTextPanel = new TextPanel(fieldset.newChildId(), new Model<String>() {
             @Override
             public String getObject()
@@ -542,10 +541,9 @@ extends AbstractEditForm<O, P>
         }
       }
       {
-        column.add(subcolumn = new DivPanel(column.newChildId(), GridSize.COL33));
+        posGridBuilder.newSubSplitPanel(GridSize.COL33);
         {
-          final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.common.vatAmount")).setLabelSide(false)
-              .setNoLabelFor();
+          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.common.vatAmount")).setLabelSide(false).setNoLabelFor();
           final TextPanel vatTextPanel = new TextPanel(fieldset.newChildId(), new Model<String>() {
             @Override
             public String getObject()
@@ -558,9 +556,9 @@ extends AbstractEditForm<O, P>
         }
       }
       {
-        column.add(subcolumn = new DivPanel(column.newChildId(), GridSize.COL33));
+        posGridBuilder.newSubSplitPanel(GridSize.COL33);
         {
-          final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.common.brutto")).setLabelSide(false).setNoLabelFor();
+          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.common.brutto")).setLabelSide(false).setNoLabelFor();
           final TextPanel grossTextPanel = new TextPanel(fieldset.newChildId(), new Model<String>() {
             @Override
             public String getObject()
@@ -572,29 +570,29 @@ extends AbstractEditForm<O, P>
           ajaxUpdatePositionComponents.add(grossTextPanel.getLabel4Ajax());
         }
       }
-      content.add(columns = new DivPanel(content.newChildId()));
       {
         // Text
         if (costConfigured == true) {
-          columns.add(column = new DivPanel(columns.newChildId(), GridSize.COL50));
+          posGridBuilder.newSplitPanel(GridSize.COL50);
         } else {
-          columns.add(column = new DivPanel(columns.newChildId())); // Full width.
+          posGridBuilder.newGridPanel();
         }
-        final FieldsetPanel fieldset = new FieldsetPanel(column, getString("fibu.rechnung.text"));
+        final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.rechnung.text"));
         fieldset.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(position, "text")), true);
       }
-
       if (costConfigured == true) {
         {
           // Cost assignments
-          columns.add(column = new DivPanel(columns.newChildId(), GridSize.COL50));
+          posGridBuilder.newSplitPanel(GridSize.COL50, true);
           {
-            column.add(subcolumn = new DivPanel(column.newChildId(), GridSize.COL50));
-            final RechnungCostTablePanel costTable = new RechnungCostTablePanel(subcolumn.newChildId(), position);
-            subcolumn.add(costTable);
+            posGridBuilder.newSubSplitPanel(GridSize.COL50);
+            DivPanel panel = posGridBuilder.getPanel();
+            final RechnungCostTablePanel costTable = new RechnungCostTablePanel(panel.newChildId(), position);
+            panel.add(costTable);
             ajaxUpdatePositionComponents.add(costTable.refresh().getTable());
 
-            column.add(subcolumn = new DivPanel(column.newChildId(), GridSize.COL50));
+            posGridBuilder.newSubSplitPanel(GridSize.COL50);
+            panel = posGridBuilder.getPanel();
             final BigDecimal fehlbetrag = position.getKostZuweisungNetFehlbetrag();
             if (hasInsertAccess == true) {
               ButtonType buttonType;
@@ -617,12 +615,12 @@ extends AbstractEditForm<O, P>
                 }
               };
               editCostButton.setDefaultFormProcessing(false);
-              subcolumn.add(new ButtonPanel(subcolumn.newChildId(), getString("edit"), editCostButton, buttonType));
+              panel.add(new ButtonPanel(panel.newChildId(), getString("edit"), editCostButton, buttonType));
             } else {
-              subcolumn.add(new TextPanel(subcolumn.newChildId(), " "));
+              panel.add(new TextPanel(panel.newChildId(), " "));
             }
             if (NumberHelper.isNotZero(fehlbetrag) == true) {
-              subcolumn.add(new TextPanel(subcolumn.newChildId(), CurrencyFormatter.format(fehlbetrag), TextStyle.RED));
+              panel.add(new TextPanel(panel.newChildId(), CurrencyFormatter.format(fehlbetrag), TextStyle.RED));
             }
           }
         }
