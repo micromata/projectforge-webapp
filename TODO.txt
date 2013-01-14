@@ -5,7 +5,7 @@ Prio 1 (Johannes):
 Prio 2 (Johannes):
 ------------------
 - Johannes: Autocompletion: deletion of objects doesn't work (locations)
-- Wiederholter Aufruf von PF-Dialog auf TeamCalSeite (ist ggf. gleiche Ursache wie StalePageException)
+- Wiederholter Aufruf von PF-Dialog auf TeamCalSeite
 
 Bootstrap-Umbau
 ---------------
