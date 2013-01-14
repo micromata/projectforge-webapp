@@ -9,8 +9,7 @@ Prio 2 (Johannes):
 
 Prio 3 (Johannes):
 ------------------
-- TeamCalDialog: Wenn man irgendwo außerhalb klickt, sollte der sich auch wieder schließen.
-
+- JQuery-Mobile-Katharina-Bug
 
 Bootstrap-Umbau
 ---------------
