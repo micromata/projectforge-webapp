@@ -55,7 +55,7 @@ public abstract class ModalDialog extends Panel
 
   protected GridBuilder gridBuilder;
 
-  private final WebMarkupContainer mainContainer;
+  private final WebMarkupContainer mainContainer, bodyContainer;
 
   private boolean keyboard;
 
@@ -75,6 +75,8 @@ public abstract class ModalDialog extends Panel
     actionButtons = new MyComponentsRepeater<Component>("actionButtons");
     mainContainer = new WebMarkupContainer("mainContainer");
     add(mainContainer.setOutputMarkupId(true));
+    bodyContainer = new WebMarkupContainer("body");
+    bodyContainer.setOutputMarkupId(true);
   }
 
   /**
@@ -126,7 +128,8 @@ public abstract class ModalDialog extends Panel
     return this;
   }
 
-  public String getMainContainerMarkupId() {
+  public String getMainContainerMarkupId()
+  {
     return mainContainer.getMarkupId(true);
   }
 
@@ -155,10 +158,25 @@ public abstract class ModalDialog extends Panel
     mainContainer.add(new Label("title", title));
   }
 
+  public ModalDialog clearContent()
+  {
+    bodyContainer.removeAll();
+    gridBuilder = new GridBuilder(bodyContainer, "flowform");
+    return this;
+  }
+
+  /**
+   * Does nothing at default.
+   */
+  public void redraw()
+  {
+  }
+
   @SuppressWarnings("serial")
   protected void init(final Form< ? > form)
   {
     mainContainer.add(form);
+    form.add(bodyContainer);
     appendNewAjaxActionButton(new AjaxFormSubmitCallback() {
 
       @Override
@@ -175,7 +193,7 @@ public abstract class ModalDialog extends Panel
       }
     }, closeButtonLabel != null ? closeButtonLabel : getString("close"), SingleButtonPanel.GREY);
     form.add(actionButtons.getRepeatingView());
-    gridBuilder = new GridBuilder(form, "flowform");
+    gridBuilder = new GridBuilder(bodyContainer, "flowform");
   }
 
   /**
