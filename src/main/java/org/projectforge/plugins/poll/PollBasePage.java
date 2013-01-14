@@ -71,6 +71,12 @@ public abstract class PollBasePage extends AbstractSecuredPage
       {
         PollBasePage.this.onCancel();
       }
+
+      @Override
+      public final void onError()
+      {
+        PollBasePage.this.onCancel();
+      }
     };
     final SingleButtonPanel cancelPanel = new SingleButtonPanel("cancel", cancel, setCancelButtonTitle(getString("cancel")),
         SingleButtonPanel.CANCEL);
