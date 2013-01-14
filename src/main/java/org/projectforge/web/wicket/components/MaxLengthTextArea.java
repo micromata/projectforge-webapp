@@ -32,6 +32,8 @@ public class MaxLengthTextArea extends TextArea<String>
 {
   private static final long serialVersionUID = 1507157818607697767L;
 
+  private Integer maxLength;
+
   /**
    * Tries to get the length definition of the Hibernate configuration. If not available then a warning will be logged. <br/>
    * Example:
@@ -69,6 +71,15 @@ public class MaxLengthTextArea extends TextArea<String>
     if (maxLength != null) {
       add(StringValidator.maximumLength(maxLength));
       // add(AttributeModifier.replace("maxlength", String.valueOf(maxLength))); // Not supported by html textarea!
+      this.maxLength = maxLength;
     }
+  }
+
+  /**
+   * @return the maxLength
+   */
+  public Integer getMaxLength()
+  {
+    return maxLength;
   }
 }
