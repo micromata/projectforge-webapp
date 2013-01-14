@@ -120,7 +120,7 @@ public class NewPollPage extends PollBasePage
   @Override
   protected void onCancel()
   {
-    setResponsePage(CalendarPage.class);
+    setResponsePage(getApplication().getHomePage());
   }
 
   public static void redirectToNewPollPage(final PageParameters parameters) {
