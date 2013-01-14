@@ -24,25 +24,19 @@
 package org.projectforge.web.scripting;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.markup.html.form.AjaxButton;
-import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.scripting.ScriptDO;
 import org.projectforge.scripting.ScriptParameterType;
 import org.projectforge.web.HtmlHelper;
+import org.projectforge.web.dialog.ModalDialog;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
-import org.projectforge.web.wicket.components.SingleButtonPanel;
-import org.projectforge.web.wicket.flowlayout.DialogPanel;
-import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
@@ -54,7 +48,7 @@ public class ScriptEditForm extends AbstractEditForm<ScriptDO, ScriptEditPage>
 
   private static final String SHOW_BACKUP_SCRIPT_DIALOG_ID = "showBackupScriptModalWindow";
 
-  private ModalWindow showBackupScriptModalWindow;
+  protected ModalDialog showBackupScriptDialog;
 
   public ScriptEditForm(final ScriptEditPage parentPage, final ScriptDO data)
   {
@@ -94,8 +88,7 @@ public class ScriptEditForm extends AbstractEditForm<ScriptDO, ScriptEditPage>
       fs.add(script);
       fs.addHelpIcon(getString("fieldNotHistorizable"));
     }
-    showBackupScriptModalWindow = new ModalWindow(SHOW_BACKUP_SCRIPT_DIALOG_ID);
-    add(showBackupScriptModalWindow);
+    addShowBackupScriptDialog();
   }
 
   private void addParameterSettings(final int idx)
@@ -117,51 +110,28 @@ public class ScriptEditForm extends AbstractEditForm<ScriptDO, ScriptEditPage>
     fs.add(typeChoice);
   }
 
-  protected void showBackupScriptModalWindow(final AjaxRequestTarget target)
+  @SuppressWarnings("serial")
+  protected void addShowBackupScriptDialog()
   {
-    // Close dialog
-    final DialogPanel showBackuScriptDialog = new DialogPanel(showBackupScriptModalWindow, getString("scripting.scriptBackup"));
-    showBackupScriptModalWindow.setContent(showBackuScriptDialog);
-
-    final DivPanel content = new DivPanel(showBackuScriptDialog.newChildId());
-    showBackuScriptDialog.add(content);
-    final FieldsetPanel fs = new FieldsetPanel(content, getString("scripting.scriptBackup"));
-    final String esc = HtmlHelper.escapeHtml(data.getScriptBackup(), true);
-    final DivTextPanel scriptBackup = new DivTextPanel(fs.newChildId(), esc);
-    scriptBackup.getLabel().setEscapeModelStrings(false);
-    fs.add(scriptBackup);
-
-    @SuppressWarnings("serial")
-    final AjaxButton okButton = new AjaxButton(SingleButtonPanel.WICKET_ID, new Model<String>("ok")) {
-
+    showBackupScriptDialog = new ModalDialog(SHOW_BACKUP_SCRIPT_DIALOG_ID) {
       @Override
-      protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
+      public void init()
       {
-        showBackupScriptModalWindow.close(target);
-      }
-
-      /**
-       * @see org.apache.wicket.ajax.markup.html.form.AjaxButton#onError(org.apache.wicket.ajax.AjaxRequestTarget,
-       *      org.apache.wicket.markup.html.form.Form)
-       */
-      @Override
-      protected void onError(final AjaxRequestTarget target, final Form< ? > form)
-      {
+        setTitle(getString("scripting.scriptBackup"));
+        init(new Form<String>(getFormId()));
+        {
+          final FieldsetPanel fs = gridBuilder.newFieldset(getString("scripting.scriptBackup")).setLabelSide(false);
+          final String esc = HtmlHelper.escapeHtml(data.getScriptBackup(), true);
+          final DivTextPanel scriptBackup = new DivTextPanel(fs.newChildId(), esc);
+          scriptBackup.getLabel().setEscapeModelStrings(false);
+          fs.add(scriptBackup);
+        }
       }
     };
-    okButton.setDefaultFormProcessing(false); // No validation
-    final SingleButtonPanel okButtonPanel = new SingleButtonPanel(showBackuScriptDialog.newButtonChildId(), okButton, getString("ok"),
-        SingleButtonPanel.DEFAULT_SUBMIT);
-    showBackuScriptDialog.addButton(okButtonPanel);
-    showBackupScriptModalWindow.setCloseButtonCallback(new ModalWindow.CloseButtonCallback() {
-      private static final long serialVersionUID = 6761625465164911336L;
+    showBackupScriptDialog.setOutputMarkupId(true);
+    add(showBackupScriptDialog);
+    showBackupScriptDialog.init();
 
-      public boolean onCloseButtonClicked(final AjaxRequestTarget target)
-      {
-        return true;
-      }
-    });
-    showBackupScriptModalWindow.show(target);
   }
 
   @Override
