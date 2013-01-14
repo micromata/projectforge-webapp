@@ -95,7 +95,7 @@ public class WicketRenderHeadUtils
   }
 
   /**
-   * Jquery, bootstrap, jqueryui and uquery.contextmenu.js.
+   * Bbootstrap, jqueryui and uquery.contextmenu.js.
    */
   public static void renderMainJavaScriptIncludes(final IHeaderResponse response)
   {
@@ -105,7 +105,7 @@ public class WicketRenderHeadUtils
   }
 
   /**
-   * Jquery, bootstrap, jqueryui and uquery.contextmenu.js.
+   * Bootstrap, jqueryui and uquery.contextmenu.js.
    */
   public static void renderMainCSSIncludes(final IHeaderResponse response)
   {
@@ -126,7 +126,7 @@ public class WicketRenderHeadUtils
   }
 
   /**
-   * Jquery, bootstrap, jqueryui and uquery.contextmenu.js.
+   * Bootstrap, jqueryui and uquery.contextmenu.js.
    */
   public static void renderAutogrowJavaScriptIncludes(final IHeaderResponse response)
   {
