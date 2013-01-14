@@ -25,9 +25,11 @@ package org.projectforge.web.wicket;
 
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.common.ReflectionHelper;
 import org.projectforge.web.fibu.ISelectCallerPage;
@@ -42,6 +44,8 @@ import org.projectforge.web.wicket.components.PlainLabel;
 public class ListSelectActionPanel extends Panel
 {
   public static final String LABEL_ID = "label";
+
+  public static final String LINK_ID = "select";
 
   /**
    * Constructor for list view in selection mode.
@@ -115,7 +119,7 @@ public class ListSelectActionPanel extends Panel
   {
     super(id, model);
     setRenderBodyOnly(true);
-    final Link< ? > link = new Link<Void>("select") {
+    final Link< ? > link = new Link<Void>(LINK_ID) {
       @Override
       public void onClick()
       {
@@ -131,6 +135,18 @@ public class ListSelectActionPanel extends Panel
         setResponsePage(editPage);
       };
     };
+    add(link);
+    add(label);
+  }
+
+  public ListSelectActionPanel(final String id, final AbstractLink link, final Model<String> label)
+  {
+    this(id, link, new Label(LABEL_ID, label));
+  }
+
+  public ListSelectActionPanel(final String id, final AbstractLink link, final Label label)
+  {
+    super(id);
     add(link);
     add(label);
   }
