@@ -131,7 +131,7 @@ div.toggle-container div.collapse-header.highlight {
 	background-color: #E44;
 }
 
-h1, h2, h3 {
+h1,h2,h3 {
 	color: #555;
 }
 
@@ -148,4 +148,10 @@ h2 {
 h3 {
 	font-size: 14px;
 	line-height: 16px;
+}
+
+.big-modal {
+	width: 1000px;
+	margin-left: -500px;
+	width: 1000px;
 }
