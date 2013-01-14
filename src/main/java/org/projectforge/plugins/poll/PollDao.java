@@ -34,6 +34,9 @@ public class PollDao extends BaseDao<PollDO>
 {
   public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_POLL", "plugin30", "plugins.poll");
 
+  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "location", "description", "title", "owner.username", "owner.firstname",
+  "owner.lastname"};
+
   /**
    * @param clazz
    */
@@ -41,6 +44,12 @@ public class PollDao extends BaseDao<PollDO>
   {
     super(PollDO.class);
     userRightId = USER_RIGHT_ID;
+  }
+
+  @Override
+  protected String[] getAdditionalSearchFields()
+  {
+    return ADDITIONAL_SEARCH_FIELDS;
   }
 
   /**

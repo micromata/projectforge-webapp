@@ -78,7 +78,7 @@ public abstract class PollBasePage extends AbstractSecuredPage
         PollBasePage.this.onCancel();
       }
     };
-    final SingleButtonPanel cancelPanel = new SingleButtonPanel("cancel", cancel, setCancelButtonTitle(getString("cancel")),
+    final SingleButtonPanel cancelPanel = new SingleButtonPanel("cancel", cancel, getString("cancel"),
         SingleButtonPanel.CANCEL);
 
     // Confirm button
@@ -94,11 +94,41 @@ public abstract class PollBasePage extends AbstractSecuredPage
     final SingleButtonPanel confirmPanel = new SingleButtonPanel("confirm", confirm, getString("plugins.poll.new.continue"),
         SingleButtonPanel.DEFAULT_SUBMIT);
 
+    // back button
+    final Button back = new Button(SingleButtonPanel.WICKET_ID) {
+      static final long serialVersionUID = -7779593314951993472L;
+
+      @Override
+      public final void onSubmit()
+      {
+        PollBasePage.this.onBack();
+      }
+    };
+    final SingleButtonPanel backPanel = new SingleButtonPanel("back", back, getString("back"),
+        SingleButtonPanel.DEFAULT_SUBMIT);
+    backPanel.setVisible(isBackButtonVisible());
+
+    // delete button
+    final Button delete = new Button(SingleButtonPanel.WICKET_ID) {
+      static final long serialVersionUID = -7779593314951993472L;
+
+      @Override
+      public final void onSubmit()
+      {
+        PollBasePage.this.onDelete();
+      }
+
+    };
+    final SingleButtonPanel deletePanel = new SingleButtonPanel("delete", delete, getString("plugins.poll.new.delete"),
+        SingleButtonPanel.DEFAULT_SUBMIT);
+    deletePanel.setVisible(isDeleteButtonVisible());
+
     form = new Form<String>("pollForm");
     body.add(form);
     form.add(cancelPanel);
     form.add(confirmPanel);
-
+    form.add(backPanel);
+    form.add(deletePanel);
 
     gridBuilder = new GridBuilder(form, "flowform");
 
@@ -119,19 +149,29 @@ public abstract class PollBasePage extends AbstractSecuredPage
     feedbackContainer.add(new FeedbackPanel("feedback", containerFeedbackMessageFilter));
   }
 
+  /**
+   * @return
+   */
+  protected boolean isDeleteButtonVisible()
+  {
+    return false;
+  }
+
+  /**
+   * @return
+   */
+  protected boolean isBackButtonVisible()
+  {
+    return true;
+  }
+
+  protected void onDelete() {};
+
+  protected abstract void onBack();
+
   protected abstract void onConfirm();
 
   protected abstract void onCancel();
-
-  protected String setCancelButtonTitle(final String title)
-  {
-    return title;
-  }
-
-  protected String setConfirmButtonTitle(final String title)
-  {
-    return title;
-  }
 
   /**
    * @see org.projectforge.web.wicket.AbstractUnsecureBasePage#getTitle()

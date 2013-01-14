@@ -219,11 +219,11 @@ public class PollAttendeePage extends PollBasePage
   }
 
   /**
-   * @see org.projectforge.plugins.poll.PollBasePage#setCancelButtonTitle(java.lang.String)
+   * @see org.projectforge.plugins.poll.PollBasePage#onBack()
    */
   @Override
-  protected String setCancelButtonTitle(final String title)
+  protected void onBack()
   {
-    return getString("back");
+    setResponsePage(new PollEventEditPage(getPageParameters(), model));
   }
 }

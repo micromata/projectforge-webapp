@@ -139,11 +139,11 @@ public class PollEventEditPage extends AbstractSecuredPage
       public final void onSubmit()
       {
         // temporary disabled
-        //        if (eventProvider.getAllEvents().isEmpty() == false) {
-        onNextButtonClick(model.getPollDo(), eventProvider.getAllEvents());
-        //        } else {
-        //          this.error("No entries selected."); // TODO
-        //        }
+        if (eventProvider.getAllEvents().isEmpty() == false) {
+          onNextButtonClick(model.getPollDo(), eventProvider.getAllEvents());
+        } else {
+          this.error("No entries selected."); // TODO
+        }
       }
     };
     nextButton.setDefaultFormProcessing(false);

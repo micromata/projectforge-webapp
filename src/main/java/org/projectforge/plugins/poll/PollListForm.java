@@ -60,8 +60,6 @@ public class PollListForm extends AbstractListForm<BaseSearchFilter, PollListPag
   protected void init()
   {
     super.init();
-    //    gridBuilder.newColumnsPanel();
-    //    gridBuilder.newColumnPanel(GridSize.COL66);
   }
 
   /**

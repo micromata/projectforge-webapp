@@ -94,4 +94,13 @@ public class PollResultPage extends PollBasePage
   {
   }
 
+  /**
+   * @see org.projectforge.plugins.poll.PollBasePage#onBack()
+   */
+  @Override
+  protected void onBack()
+  {
+    //    setResponsePage()
+  }
+
 }

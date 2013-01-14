@@ -56,7 +56,7 @@ public class PollListPage extends AbstractListPage<PollListForm, PollDao, PollDO
   private static final long serialVersionUID = 1749480610890950450L;
 
   @SpringBean(name = "pollDao")
-  private PollDao PollDao;
+  private PollDao pollDao;
 
   /**
    * 
@@ -122,7 +122,7 @@ public class PollListPage extends AbstractListPage<PollListForm, PollDao, PollDO
   @Override
   protected PollDao getBaseDao()
   {
-    return PollDao;
+    return pollDao;
   }
 
   /**

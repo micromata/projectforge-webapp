@@ -97,6 +97,15 @@ public class NewPollPage extends PollBasePage
   }
 
   /**
+   * @see org.projectforge.plugins.poll.PollBasePage#isBackButtonVisible()
+   */
+  @Override
+  protected boolean isBackButtonVisible()
+  {
+    return false;
+  }
+
+  /**
    * @see org.projectforge.web.wicket.AbstractUnsecureBasePage#getTitle()
    */
   @Override
@@ -111,7 +120,11 @@ public class NewPollPage extends PollBasePage
   @Override
   protected void onConfirm()
   {
-    setResponsePage(new PollEventEditPage(getPageParameters(), model));
+    if (model.getPollDo().getTitle() == null) {
+      error("Bitte geben Sie einen Titel ein."); // TODO
+    } else {
+      setResponsePage(new PollEventEditPage(getPageParameters(), model));
+    }
   }
 
   /**
@@ -125,5 +138,14 @@ public class NewPollPage extends PollBasePage
 
   public static void redirectToNewPollPage(final PageParameters parameters) {
     throw new RedirectToUrlException(RequestCycle.get().urlFor(NewPollPage.class, parameters).toString());
+  }
+
+  /**
+   * @see org.projectforge.plugins.poll.PollBasePage#onBack()
+   */
+  @Override
+  protected void onBack()
+  {
+    // TODO do something here
   }
 }

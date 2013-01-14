@@ -122,7 +122,7 @@ public class NewPollOverviewPage extends PollBasePage
     } else {
       final FieldsetPanel fsUsers = gridBuilder.newFieldset(getString("plugins.poll.attendee.users"), true).setLabelFor(this);
 
-      createDisabledChoices(fsUsers, model.getCalculatedAttendeeList(), true);
+      createDisabledChoices(fsUsers, model.getCalculatedAttendeeList(), false);
     }
 
     final FieldsetPanel fsEMails = gridBuilder.newFieldset(getString("plugins.poll.attendee.emails"), true).setLabelFor(this);
@@ -210,9 +210,6 @@ public class NewPollOverviewPage extends PollBasePage
     pollEventDao.save(pollEvents);
     pollAttendeeDao.save(model.getCalculatedAttendeeList());
 
-    // PollResultDO pollResult = new PollResultDO();
-    // pollResult.setPollAttendee(pollAttendeeList);
-    // pollResult.setPollEvent(pollEvents);
     setResponsePage(PollListPage.class);
   }
 
@@ -222,7 +219,27 @@ public class NewPollOverviewPage extends PollBasePage
   @Override
   protected void onCancel()
   {
+    setResponsePage(PollListPage.class);
+  }
+
+  /**
+   * @see org.projectforge.plugins.poll.PollBasePage#onBack()
+   */
+  @Override
+  protected void onBack()
+  {
     setResponsePage(new PollAttendeePage(getPageParameters(), model));
   }
 
+  /**
+   * @see org.projectforge.plugins.poll.PollBasePage#onDelete()
+   */
+  @Override
+  protected void onDelete()
+  {
+    if (model != null && model.getPollDo() != null) {
+      model.getPollDo().setDeleted(true);
+      pollDao.save(model.getPollDo());
+    }
+  }
 }
