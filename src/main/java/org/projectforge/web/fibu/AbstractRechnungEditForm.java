@@ -431,7 +431,7 @@ extends AbstractEditForm<O, P>
       positionsPanel.setHeading(getPositionHeading(position, positionsPanel));
       final DivPanel content = new DivPanel(ToggleContainerPanel.CONTENT_ID);
       positionsPanel.add(content);
-      final GridBuilder posGridBuilder = new GridBuilder(content, content.newChildId(), getMySession(), true);
+      final GridBuilder posGridBuilder = new GridBuilder(content, content.newChildId(), true);
       final GridSize gridSize = (rechnungsPosition != null) ? GridSize.COL25 : GridSize.COL33;
       {
         posGridBuilder.newSplitPanel(GridSize.COL50, true);

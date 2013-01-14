@@ -135,7 +135,7 @@ public class AddressViewPage extends AbstractSecuredPage
       addContentMenuEntry(menu);
     }
 
-    gridBuilder = new GridBuilder(body, "flowform", getMySession());
+    gridBuilder = new GridBuilder(body, "flowform");
     final String name = address.getFullNameWithTitleAndForm();
 
     gridBuilder.newSplitPanel(GridSize.COL50);

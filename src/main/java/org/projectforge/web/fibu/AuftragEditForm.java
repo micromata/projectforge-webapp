@@ -327,7 +327,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
 
       final DivPanel content = new DivPanel(ToggleContainerPanel.CONTENT_ID);
       positionsPanel.add(content);
-      final GridBuilder posGridBuilder = new GridBuilder(content, content.newChildId(), getMySession(), true);
+      final GridBuilder posGridBuilder = new GridBuilder(content, content.newChildId(), true);
       posGridBuilder.newGridPanel();
       {
         final FieldsetPanel fs = posGridBuilder.newFieldset(getString("fibu.auftrag.titel"));

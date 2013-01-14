@@ -32,7 +32,6 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.projectforge.web.wicket.AbstractUnsecureBasePage;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
 
 /**
@@ -105,8 +104,7 @@ public abstract class ModalDialog extends Panel
   protected void init(final Form< ? > form)
   {
     mainContainer.add(form);
-    final AbstractUnsecureBasePage page = (AbstractUnsecureBasePage) getPage();
-    gridBuilder = new GridBuilder(form, "flowform", page.getMySession());
+    gridBuilder = new GridBuilder(form, "flowform");
   }
 
   protected void handleCloseEvent(final AjaxRequestTarget target)

@@ -94,7 +94,7 @@ public abstract class PollBasePage extends AbstractSecuredPage
     form.add(confirmPanel);
 
 
-    gridBuilder = new GridBuilder(form, "flowform", getMySession());
+    gridBuilder = new GridBuilder(form, "flowform");
 
     final ContainerFeedbackMessageFilter containerFeedbackMessageFilter = new ContainerFeedbackMessageFilter(this);
     final WebMarkupContainer feedbackContainer = new WebMarkupContainer("feedbackContainer") {
