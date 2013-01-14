@@ -29,8 +29,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
-import org.apache.wicket.ajax.markup.html.form.AjaxButton;
-import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
@@ -54,6 +52,7 @@ import org.projectforge.web.FavoritesMenu;
 import org.projectforge.web.LayoutSettingsPage;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.MenuEntry;
+import org.projectforge.web.dialog.ModalDialog;
 import org.projectforge.web.mobile.MenuMobilePage;
 import org.projectforge.web.user.ChangePasswordPage;
 import org.projectforge.web.user.MyAccountEditPage;
@@ -61,9 +60,6 @@ import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.FeedbackPage;
 import org.projectforge.web.wicket.MySession;
 import org.projectforge.web.wicket.WicketUtils;
-import org.projectforge.web.wicket.components.SingleButtonPanel;
-import org.projectforge.web.wicket.flowlayout.DialogPanel;
-import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
@@ -78,11 +74,11 @@ public class NavTopPanel extends NavAbstractPanel
 
   private final FavoritesMenu favoritesMenu;
 
-  private ModalWindow bookmarkModalWindow;
-
   private final AccessChecker accessChecker;
 
   private final UserXmlPreferencesCache userXmlPreferencesCache;
+
+  private ModalDialog bookmarkDialog;
 
   public NavTopPanel(final String id, final UserXmlPreferencesCache userXmlPreferencesCache, final AccessChecker accessChecker)
   {
@@ -140,13 +136,15 @@ public class NavTopPanel extends NavAbstractPanel
         @Override
         public void onClick(final AjaxRequestTarget target)
         {
-          showBookmarkModalWindow(target);
+          target.appendJavaScript(bookmarkDialog.getOpenJavaScript());
+          // Redraw the content:
+          bookmarkDialog.redraw();
+          // The content was changed:
+          target.add(bookmarkDialog.getGridContentContainer());
         }
       };
       add(showBookmarkLink);
-      bookmarkModalWindow = new ModalWindow(BOOKMARK_DIALOG_ID);
-      bookmarkModalWindow.setInitialHeight(200);
-      add(bookmarkModalWindow);
+      addBookmarkDialog();
     }
     {
       add(new Label("user", PFUserContext.getUser().getFullname()));
@@ -248,52 +246,35 @@ public class NavTopPanel extends NavAbstractPanel
   }
 
   @SuppressWarnings("serial")
-  protected void showBookmarkModalWindow(final AjaxRequestTarget target)
+  private void addBookmarkDialog()
   {
-    // Close dialog
-    final DialogPanel closeDialog = new DialogPanel(bookmarkModalWindow, getString("bookmark.title"));
-    bookmarkModalWindow.setContent(closeDialog);
-
-    final DivPanel content = new DivPanel(closeDialog.newChildId());
-    closeDialog.add(content);
-    FieldsetPanel fs = new FieldsetPanel(content, getString("bookmark.directPageLink")).setLabelSide(false);
-    final AbstractSecuredPage page = (AbstractSecuredPage) getPage();
-    fs.add(new TextArea<String>(fs.getTextAreaId(), new Model<String>(page.getPageAsLink())));
-    final PageParameters params = page.getBookmarkableInitialParameters();
-    if (params.isEmpty() == false) {
-      fs = new FieldsetPanel(content, getString(page.getTitleKey4BookmarkableInitialParameters())).setLabelSide(false);
-      fs.add(new TextArea<String>(fs.getTextAreaId(), new Model<String>(page.getPageAsLink(params))));
-      bookmarkModalWindow.setInitialHeight(400);
-    }
-
-    final AjaxButton closeButton = new AjaxButton(SingleButtonPanel.WICKET_ID, new Model<String>("close")) {
-
+    bookmarkDialog = new ModalDialog(BOOKMARK_DIALOG_ID) {
       @Override
-      protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
+      public void init()
       {
-        bookmarkModalWindow.close(target);
+        setTitle(getString("bookmark.title"));
+        init(new Form<String>(getFormId()));
+        gridBuilder.newFormHeading(""); // Otherwise it's empty and an IllegalArgumentException is thrown.
       }
 
-      /**
-       * @see org.apache.wicket.ajax.markup.html.form.AjaxButton#onError(org.apache.wicket.ajax.AjaxRequestTarget,
-       *      org.apache.wicket.markup.html.form.Form)
-       */
       @Override
-      protected void onError(final AjaxRequestTarget target, final Form< ? > form)
+      public void redraw()
       {
+        clearContent();
+        final AbstractSecuredPage page = (AbstractSecuredPage) NavTopPanel.this.getPage();
+        {
+          final FieldsetPanel fs = gridBuilder.newFieldset(getString("bookmark.directPageLink")).setLabelSide(false);
+          fs.add(new TextArea<String>(fs.getTextAreaId(), new Model<String>(page.getPageAsLink())));
+        }
+        final PageParameters params = page.getBookmarkableInitialParameters();
+        if (params.isEmpty() == false) {
+          final FieldsetPanel fs = gridBuilder.newFieldset(getString(page.getTitleKey4BookmarkableInitialParameters())).setLabelSide(false);
+          fs.add(new TextArea<String>(fs.getTextAreaId(), new Model<String>(page.getPageAsLink(params))));
+        }
       }
     };
-    closeButton.setDefaultFormProcessing(false); // No validation
-    final SingleButtonPanel closeButtonPanel = new SingleButtonPanel(closeDialog.newButtonChildId(), closeButton, getString("close"),
-        SingleButtonPanel.DEFAULT_SUBMIT);
-    closeDialog.addButton(closeButtonPanel);
-
-    bookmarkModalWindow.setCloseButtonCallback(new ModalWindow.CloseButtonCallback() {
-      public boolean onCloseButtonClicked(final AjaxRequestTarget target)
-      {
-        return true;
-      }
-    });
-    bookmarkModalWindow.show(target);
+    bookmarkDialog.setOutputMarkupId(true);
+    add(bookmarkDialog);
+    bookmarkDialog.init();
   }
 }
