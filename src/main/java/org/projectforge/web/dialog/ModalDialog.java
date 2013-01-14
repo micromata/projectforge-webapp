@@ -57,6 +57,8 @@ public abstract class ModalDialog extends Panel
 
   private final WebMarkupContainer mainContainer;
 
+  private boolean keyboard;
+
   /**
    * List to create action buttons in the desired order before creating the RepeatingView.
    */
@@ -82,6 +84,16 @@ public abstract class ModalDialog extends Panel
     return this;
   }
 
+  /**
+   * @param keyboard the keyboard to set
+   * @return this for chaining.
+   */
+  public ModalDialog setKeyboard(final boolean keyboard)
+  {
+    this.keyboard = keyboard;
+    return this;
+  }
+
   @SuppressWarnings("serial")
   public ModalDialog wantsNotificationOnClose()
   {
@@ -95,22 +107,32 @@ public abstract class ModalDialog extends Panel
     return this;
   }
 
+  public ModalDialog addAjaxEventBehavior(final AjaxEventBehavior behavior)
+  {
+    mainContainer.add(behavior);
+    return this;
+  }
+
+  public String getMainContainerMarkupId() {
+    return mainContainer.getMarkupId(true);
+  }
+
   @Override
   public void renderHead(final IHeaderResponse response)
   {
     super.renderHead(response);
-    final String script = "$('#" + getMarkupId(true) + "').modal({keyboard: true, show: false })";
+    final String script = "$('#" + getMainContainerMarkupId() + "').modal({keyboard: " + keyboard + ", show: false })";
     response.render(OnDomReadyHeaderItem.forScript(script));
   }
 
   public String getOpenJavaScript()
   {
-    return "$('#" + mainContainer.getMarkupId() + "').modal('show');";
+    return "$('#" + getMainContainerMarkupId() + "').modal('show');";
   }
 
   public String getCloseJavaScript()
   {
-    return "$('#" + mainContainer.getMarkupId() + "').modal('hide');";
+    return "$('#" + getMainContainerMarkupId() + "').modal('hide');";
   }
 
   public abstract void init();

@@ -27,13 +27,13 @@ import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
-import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.visit.IVisit;
@@ -87,7 +87,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
 
   private ModalDialog closeToDoDialog;
 
-  private TextArea<String> closeToDialogComment;
+  private MaxLengthTextArea commentTextArea, closeToDialogCommentTextArea;
 
   public ToDoEditForm(final ToDoEditPage parentPage, final ToDoDO data)
   {
@@ -99,35 +99,6 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
   protected void init()
   {
     super.init();
-    if (isNew() == false
-        && getData().getStatus() != ToDoStatus.CLOSED
-        && getData().isDeleted() == false
-        && getBaseDao().hasLoggedInUserUpdateAccess(getData(), getData(), false)) {
-      // Close button:
-      final AjaxButton closeButton = new AjaxButton(ButtonPanel.BUTTON_ID, this) {
-        @Override
-        protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
-        {
-          target.appendJavaScript(closeToDoDialog.getOpenJavaScript());
-          // repaint the feedback panel so that it is hidden:
-          target.add(((ToDoEditForm) form).getFeedbackPanel());
-        }
-
-        @Override
-        protected void onError(final AjaxRequestTarget target, final Form< ? > form)
-        {
-          target.add(((ToDoEditForm) form).getFeedbackPanel());
-        }
-      };
-      final SingleButtonPanel closeButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), closeButton,
-          getString("plugins.todo.button.close"));
-      actionButtons.add(2, closeButtonPanel);
-      addCloseToDoModalWindow();
-    } else {
-      add(new WebMarkupContainer(CLOSE_DIALOG_ID).setVisible(false));
-    }
-
-    /* GRID16 - BLOCK */
     gridBuilder.newGridPanel();
     if (isNew() == true) {
       // Favorites
@@ -279,7 +250,8 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
     {
       // Comment
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));
-      fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "comment"))).setAutogrow();
+      commentTextArea = new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "comment"));
+      fs.add(commentTextArea).setAutogrow();
     }
     {
       // Options
@@ -296,6 +268,42 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
       checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(this, "saveAsTemplate"),
           getString("userPref.saveAsTemplate")));
     }
+    if (isNew() == false
+        && getData().getStatus() != ToDoStatus.CLOSED
+        && getData().isDeleted() == false
+        && getBaseDao().hasLoggedInUserUpdateAccess(getData(), getData(), false)) {
+      // Close button:
+      final AjaxButton closeButton = new AjaxButton(ButtonPanel.BUTTON_ID, this) {
+        @Override
+        protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
+        {
+          // repaint the feedback panel so that it is hidden:
+          target.add(((ToDoEditForm) form).getFeedbackPanel());
+          getData().setComment(commentTextArea.getConvertedInput());
+          closeToDialogCommentTextArea.modelChanged();
+          target.add(closeToDialogCommentTextArea);
+          target.appendJavaScript(closeToDoDialog.getOpenJavaScript());
+          // Focus doesn't yet work:
+          // + "$('#"
+          // + closeToDoDialog.getMainContainerMarkupId()
+          // + "').on('shown', function () { $('"
+          // + closeToDialogCommentTextArea.getMarkupId()
+          // + "').focus(); })");
+        }
+
+        @Override
+        protected void onError(final AjaxRequestTarget target, final Form< ? > form)
+        {
+          target.add(((ToDoEditForm) form).getFeedbackPanel());
+        }
+      };
+      final SingleButtonPanel closeButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), closeButton,
+          getString("plugins.todo.button.close"));
+      actionButtons.add(2, closeButtonPanel);
+      addCloseToDoModalWindow();
+    } else {
+      add(new WebMarkupContainer(CLOSE_DIALOG_ID).setVisible(false));
+    }
   }
 
   @SuppressWarnings("serial")
@@ -310,8 +318,11 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
         init(new Form<String>(getFormId()));
         {
           final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));
-          closeToDialogComment = new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(getData(), "comment"));
-          fs.add(new TextAreaPanel(fs.newChildId(), closeToDialogComment).setAutogrow());
+          closeToDialogCommentTextArea = new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "comment"),
+              commentTextArea.getMaxLength());
+          closeToDialogCommentTextArea.setOutputMarkupId(true).add(AttributeModifier.replace("tabindex", "-1"));
+          fs.add(new TextAreaPanel(fs.newChildId(), closeToDialogCommentTextArea));
+          WicketUtils.setHeight(closeToDialogCommentTextArea, 20);
         }
       }
 
@@ -334,4 +345,5 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
   {
     return log;
   }
+
 }
