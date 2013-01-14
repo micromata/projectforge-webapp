@@ -29,7 +29,6 @@ import java.util.Set;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.projectforge.web.BrowserScreenWidthType;
-import org.projectforge.web.wicket.MySession;
 import org.projectforge.web.wicket.flowlayout.AbstractGridBuilder;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldProperties;
@@ -66,21 +65,20 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
   /**
    * @param parent
    * @param id
-   * @param session
    * @param fluid Default is true.
    */
-  public GridBuilder(final MarkupContainer parent, final String id, final MySession session, final boolean fluid)
+  public GridBuilder(final MarkupContainer parent, final String id, final boolean fluid)
   {
-    super(session);
+    super();
     this.parent = parent;
     this.fluid = fluid;
     mainContainer = new DivPanel(id, fluid == true ? GridType.CONTAINER_FLUID : GridType.CONTAINER);
     parent.add(mainContainer);
   }
 
-  public GridBuilder(final MarkupContainer parent, final String id, final MySession session)
+  public GridBuilder(final MarkupContainer parent, final String id)
   {
-    this(parent, id, session, true);
+    this(parent, id, true);
   }
 
   public GridBuilder newGridPanel(final GridType... gridTypes)

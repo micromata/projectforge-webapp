@@ -186,6 +186,6 @@ public abstract class AbstractForm<F, P extends AbstractUnsecureBasePage> extend
    */
   public GridBuilder newGridBuilder(final WebMarkupContainer parent, final String id)
   {
-    return new GridBuilder(parent, id, getMySession());
+    return new GridBuilder(parent, id);
   }
 }

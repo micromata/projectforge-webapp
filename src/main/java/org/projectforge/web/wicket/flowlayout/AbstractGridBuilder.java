@@ -47,28 +47,25 @@ public abstract class AbstractGridBuilder<T extends AbstractFieldsetPanel< ? >> 
 
   protected Component parent;
 
-  public AbstractGridBuilder(final RepeatingView parent, final MySession session)
+  public AbstractGridBuilder(final RepeatingView parent)
   {
-    this(session);
+    this();
     this.parentRepeatingView = parent;
   }
 
-  public AbstractGridBuilder(final DivPanel parent, final MySession session)
+  public AbstractGridBuilder(final DivPanel parent)
   {
-    this(session);
+    this();
     this.parentDivPanel = parent;
-  }
-
-  protected AbstractGridBuilder(final MySession session)
-  {
-    this.browserScreenWidthType = session.getBrowserScreenWidthType();
-    if (this.browserScreenWidthType == null) {
-      this.browserScreenWidthType = BrowserScreenWidthType.NORMAL;
-    }
   }
 
   protected AbstractGridBuilder()
   {
+    final MySession session = MySession.get();
+    this.browserScreenWidthType = session.getBrowserScreenWidthType();
+    if (this.browserScreenWidthType == null) {
+      this.browserScreenWidthType = BrowserScreenWidthType.NORMAL;
+    }
   }
 
   /**
