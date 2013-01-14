@@ -26,7 +26,6 @@ package org.projectforge.web.task;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
-import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.StringHelper;
@@ -168,7 +167,6 @@ public class TaskTreePage extends AbstractSecuredPage
     form.init();
     form.add(taskTreeTablePanel);
     taskTreeTablePanel.init();
-    body.add(new FeedbackPanel("feedback").setOutputMarkupId(true));
   }
 
   public void refresh()

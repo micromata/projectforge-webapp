@@ -54,7 +54,7 @@ public class LoginForm extends AbstractForm<LoginForm, LoginPage>
   @SuppressWarnings("serial")
   protected void init()
   {
-    add(new FeedbackPanel("feedback").setOutputMarkupId(true).setVisible(false));
+    add(new FeedbackPanel("feedback").setOutputMarkupId(true));
     {
       final FieldsetPanel fs = new FieldsetPanel("username", getString("username"));
       add(fs);
