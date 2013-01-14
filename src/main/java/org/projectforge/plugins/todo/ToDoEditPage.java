@@ -26,7 +26,6 @@ package org.projectforge.plugins.todo;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.PFUserContext;
@@ -82,20 +81,6 @@ public class ToDoEditPage extends AbstractEditPage<ToDoDO, ToDoEditForm, ToDoDao
         toDoDao.update(getData());
       }
     }
-  }
-
-  @Override
-  public WebPage afterDelete()
-  {
-    sendNotification();
-    return null;
-  }
-
-  @Override
-  public WebPage afterUndelete()
-  {
-    sendNotification();
-    return null;
   }
 
   private void sendNotification()

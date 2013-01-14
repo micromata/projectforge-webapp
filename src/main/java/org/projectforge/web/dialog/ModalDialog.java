@@ -24,8 +24,10 @@
 package org.projectforge.web.dialog;
 
 import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxEventBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -33,12 +35,17 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
+import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
+
+import de.micromata.wicket.ajax.AjaxCallback;
+import de.micromata.wicket.ajax.AjaxFormSubmitCallback;
 
 /**
  * Base component for the ProjectForge modal dialogs.<br/>
  * This dialog is modal.<br/>
  * 
- * 
+ * @author Johannes Unterstein (j.unterstein@micromata.de)
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
@@ -51,11 +58,17 @@ public abstract class ModalDialog extends Panel
   private final WebMarkupContainer mainContainer;
 
   /**
+   * List to create action buttons in the desired order before creating the RepeatingView.
+   */
+  protected MyComponentsRepeater<Component> actionButtons;
+
+  /**
    * @param id
    */
   public ModalDialog(final String id)
   {
     super(id);
+    actionButtons = new MyComponentsRepeater<Component>("actionButtons");
     mainContainer = new WebMarkupContainer("mainContainer");
     add(mainContainer.setOutputMarkupId(true));
   }
@@ -70,7 +83,8 @@ public abstract class ModalDialog extends Panel
   }
 
   @SuppressWarnings("serial")
-  public ModalDialog wantsNotificationOnClose() {
+  public ModalDialog wantsNotificationOnClose()
+  {
     mainContainer.add(new AjaxEventBehavior("hidden") {
       @Override
       protected void onEvent(final AjaxRequestTarget target)
@@ -94,6 +108,11 @@ public abstract class ModalDialog extends Panel
     return "$('#" + mainContainer.getMarkupId() + "').modal('show');";
   }
 
+  public String getCloseJavaScript()
+  {
+    return "$('#" + mainContainer.getMarkupId() + "').modal('hide');";
+  }
+
   public abstract void init();
 
   public void setTitle(final String title)
@@ -101,18 +120,117 @@ public abstract class ModalDialog extends Panel
     mainContainer.add(new Label("title", title));
   }
 
+  @SuppressWarnings("serial")
   protected void init(final Form< ? > form)
   {
     mainContainer.add(form);
+    appendNewAjaxActionButton(new AjaxFormSubmitCallback() {
+
+      @Override
+      public void callback(final AjaxRequestTarget target)
+      {
+        onCloseButtonSubmit(target);
+        target.appendJavaScript(getCloseJavaScript());
+      }
+
+      @Override
+      public void onError(final AjaxRequestTarget target, final Form< ? > form)
+      {
+        onError(target, form);
+      }
+    }, getString("close"), SingleButtonPanel.GREY);
+    form.add(actionButtons.getRepeatingView());
     gridBuilder = new GridBuilder(form, "flowform");
   }
 
+  /**
+   * Called if {@link #wantsNotificationOnClose()} was chosen and the dialog is closed (by pressing esc, clicking outside or clicking the
+   * upper right cross).
+   * @param target
+   */
   protected void handleCloseEvent(final AjaxRequestTarget target)
   {
+  }
+
+  /**
+   * Called if user hit the close button.
+   * @param target
+   */
+  protected void onCloseButtonSubmit(final AjaxRequestTarget target)
+  {
+  }
+
+  protected void onError(final AjaxRequestTarget target, final Form< ? > form)
+  {
+  }
+
+  /**
+   * @see org.apache.wicket.Component#onBeforeRender()
+   */
+  @Override
+  protected void onBeforeRender()
+  {
+    super.onBeforeRender();
+    actionButtons.render();
   }
 
   public String getFormId()
   {
     return "form";
+  }
+
+  public ModalDialog appendNewAjaxActionButton(final AjaxCallback ajaxCallback, final String label, final Form< ? > form,
+      final String... classnames)
+  {
+    final SingleButtonPanel result = addNewAjaxActionButton(ajaxCallback, label, form, classnames);
+    this.actionButtons.add(result);
+    return this;
+  }
+
+  public ModalDialog prependNewAjaxActionButton(final AjaxCallback ajaxCallback, final String label, final Form< ? > form,
+      final String... classnames)
+  {
+    final SingleButtonPanel result = addNewAjaxActionButton(ajaxCallback, label, form, classnames);
+    this.actionButtons.add(0, result);
+    return this;
+  }
+
+  public SingleButtonPanel appendNewAjaxActionButton(final AjaxCallback ajaxCallback, final String label, final String... classnames)
+  {
+    final SingleButtonPanel result = addNewAjaxActionButton(ajaxCallback, label, null, classnames);
+    this.actionButtons.add(result);
+    return result;
+  }
+
+  public ModalDialog prependNewAjaxActionButton(final AjaxCallback ajaxCallback, final String label, final String... classnames)
+  {
+    final SingleButtonPanel result = addNewAjaxActionButton(ajaxCallback, label, null, classnames);
+    this.actionButtons.add(0, result);
+    return this;
+  }
+
+  private SingleButtonPanel addNewAjaxActionButton(final AjaxCallback ajaxCallback, final String label, final Form< ? > form,
+      final String... classnames)
+  {
+    final AjaxButton button = new AjaxButton("button", form) {
+      private static final long serialVersionUID = -5306532706450731336L;
+
+      @Override
+      protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
+      {
+        ajaxCallback.callback(target);
+      }
+
+      @Override
+      protected void onError(final AjaxRequestTarget target, final Form< ? > form)
+      {
+        if (ajaxCallback instanceof AjaxFormSubmitCallback) {
+          ((AjaxFormSubmitCallback) ajaxCallback).onError(target, form);
+        }
+      }
+    };
+    final SingleButtonPanel buttonPanel = new SingleButtonPanel(this.actionButtons.newChildId(), button, label, classnames);
+    buttonPanel.add(button);
+    return buttonPanel;
   }
 }

@@ -29,13 +29,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
-import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextArea;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.visit.IVisit;
@@ -49,6 +47,7 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefDO;
 import org.projectforge.user.UserPrefDao;
+import org.projectforge.web.dialog.ModalDialog;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.GroupSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
@@ -63,7 +62,6 @@ import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.ButtonPanel;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
-import org.projectforge.web.wicket.flowlayout.DialogPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
@@ -84,12 +82,12 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
 
   protected boolean saveAsTemplate, sendNotification = true, sendShortMessage;
 
-  private boolean redirectAfterCloseDialog;
-
   @SuppressWarnings("unused")
   private String templateName; // Used by Wicket
 
-  private ModalWindow closeModalWindow;
+  private ModalDialog closeToDoDialog;
+
+  private TextArea<String> closeToDialogComment;
 
   public ToDoEditForm(final ToDoEditPage parentPage, final ToDoDO data)
   {
@@ -110,7 +108,9 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
         @Override
         protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
         {
-          showCloseModalWindow(target);
+          target.appendJavaScript(closeToDoDialog.getOpenJavaScript());
+          // repaint the feedback panel so that it is hidden:
+          target.add(((ToDoEditForm) form).getFeedbackPanel());
         }
 
         @Override
@@ -122,8 +122,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
       final SingleButtonPanel closeButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), closeButton,
           getString("plugins.todo.button.close"));
       actionButtons.add(2, closeButtonPanel);
-      closeModalWindow = new ModalWindow(CLOSE_DIALOG_ID);
-      add(closeModalWindow);
+      addCloseToDoModalWindow();
     } else {
       add(new WebMarkupContainer(CLOSE_DIALOG_ID).setVisible(false));
     }
@@ -141,8 +140,8 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
         for (final String name : templateNames) {
           templateNamesChoiceRenderer.addValue(name, name);
         }
-        final DropDownChoice<String> templateNamesChoice = new DropDownChoice<String>(fs.getDropDownChoiceId(),
-            new PropertyModel<String>(this, "templateName"), templateNamesChoiceRenderer.getValues(), templateNamesChoiceRenderer) {
+        final DropDownChoice<String> templateNamesChoice = new DropDownChoice<String>(fs.getDropDownChoiceId(), new PropertyModel<String>(
+            this, "templateName"), templateNamesChoiceRenderer.getValues(), templateNamesChoiceRenderer) {
           @Override
           protected boolean wantOnSelectionChangedNotifications()
           {
@@ -299,89 +298,35 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
     }
   }
 
-  protected void showCloseModalWindow(final AjaxRequestTarget target)
+  @SuppressWarnings("serial")
+  private void addCloseToDoModalWindow()
   {
-    redirectAfterCloseDialog = false;
-    // Close dialog
-    final DialogPanel closeDialog = new DialogPanel(closeModalWindow, getString("plugins.todo.closeDialog.heading"));
-    closeModalWindow.setContent(closeDialog);
-
-    final DivPanel content = new DivPanel(closeDialog.newChildId());
-    closeDialog.add(content);
-    final FieldsetPanel fs = new FieldsetPanel(content, getString("comment"));
-    final TextArea<String> comment = new TextArea<String>(TextAreaPanel.WICKET_ID, new PropertyModel<String>(getData(), "comment"));
-    WicketUtils.setHeight(comment, 40);
-    WicketUtils.setFocus(comment);
-    fs.add(new TextAreaPanel(fs.newChildId(), comment).setAutogrow());
-
-    @SuppressWarnings("serial")
-    final AjaxButton cancelButton = new AjaxButton(SingleButtonPanel.WICKET_ID, new Model<String>("cancel")) {
+    closeToDoDialog = new ModalDialog(CLOSE_DIALOG_ID) {
 
       @Override
-      protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
+      public void init()
       {
-        closeModalWindow.close(target);
-      }
-
-      /**
-       * @see org.apache.wicket.ajax.markup.html.form.AjaxButton#onError(org.apache.wicket.ajax.AjaxRequestTarget,
-       *      org.apache.wicket.markup.html.form.Form)
-       */
-      @Override
-      protected void onError(final AjaxRequestTarget target, final Form< ? > form)
-      {
-      }
-    };
-    cancelButton.setDefaultFormProcessing(false); // No validation
-    final SingleButtonPanel cancelButtonPanel = new SingleButtonPanel(closeDialog.newButtonChildId(), cancelButton, getString("cancel"),
-        SingleButtonPanel.CANCEL);
-    closeDialog.addButton(cancelButtonPanel);
-
-    @SuppressWarnings("serial")
-    final AjaxButton closeButton = new AjaxButton(SingleButtonPanel.WICKET_ID, new Model<String>("close")) {
-
-      @Override
-      protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
-      {
-        getData().setStatus(ToDoStatus.CLOSED);
-        redirectAfterCloseDialog = true;
-        closeModalWindow.close(target);
-      }
-
-      /**
-       * @see org.apache.wicket.ajax.markup.html.form.AjaxButton#onError(org.apache.wicket.ajax.AjaxRequestTarget,
-       *      org.apache.wicket.markup.html.form.Form)
-       */
-      @Override
-      protected void onError(final AjaxRequestTarget target, final Form< ? > form)
-      {
-      }
-    };
-    final SingleButtonPanel closeButtonPanel = new SingleButtonPanel(closeDialog.newButtonChildId(), closeButton,
-        getString("plugins.todo.button.close"), SingleButtonPanel.DEFAULT_SUBMIT);
-    closeDialog.addButton(closeButtonPanel);
-
-    closeModalWindow.setWindowClosedCallback(new ModalWindow.WindowClosedCallback() {
-      private static final long serialVersionUID = 2633814101880954425L;
-
-      public void onClose(final AjaxRequestTarget target)
-      {
-        if (redirectAfterCloseDialog == true) {
-          parentPage.updateAndClose();
-          redirectAfterCloseDialog = false;
+        setTitle(getString("plugins.todo.closeDialog.heading"));
+        init(new Form<String>(getFormId()));
+        {
+          final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));
+          closeToDialogComment = new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(getData(), "comment"));
+          fs.add(new TextAreaPanel(fs.newChildId(), closeToDialogComment).setAutogrow());
         }
       }
 
-    });
-    closeModalWindow.setCloseButtonCallback(new ModalWindow.CloseButtonCallback() {
-      private static final long serialVersionUID = 6761625465164911336L;
-
-      public boolean onCloseButtonClicked(final AjaxRequestTarget target)
+      /**
+       * @see org.projectforge.web.dialog.ModalDialog#onCloseButtonSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
+       */
+      @Override
+      protected void onCloseButtonSubmit(final AjaxRequestTarget target)
       {
-        return true;
-      }
-    });
-    closeModalWindow.show(target);
+        getData().setStatus(ToDoStatus.CLOSED);
+        parentPage.updateAndClose();
+      };
+    };
+    add(closeToDoDialog);
+    closeToDoDialog.init();
   }
 
   @Override
