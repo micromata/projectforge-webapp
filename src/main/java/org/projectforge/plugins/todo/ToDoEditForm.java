@@ -87,7 +87,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
 
   private ModalDialog closeToDoDialog;
 
-  private MaxLengthTextArea commentTextArea, closeToDialogCommentTextArea;
+  private MaxLengthTextArea commentTextArea, closeToDoDialogCommentTextArea;
 
   public ToDoEditForm(final ToDoEditPage parentPage, final ToDoDO data)
   {
@@ -280,8 +280,8 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
           // repaint the feedback panel so that it is hidden:
           target.add(((ToDoEditForm) form).getFeedbackPanel());
           getData().setComment(commentTextArea.getConvertedInput());
-          closeToDialogCommentTextArea.modelChanged();
-          target.add(closeToDialogCommentTextArea);
+          closeToDoDialogCommentTextArea.modelChanged();
+          target.add(closeToDoDialogCommentTextArea);
           target.appendJavaScript(closeToDoDialog.getOpenJavaScript());
           // Focus doesn't yet work:
           // + "$('#"
@@ -300,14 +300,14 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
       final SingleButtonPanel closeButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), closeButton,
           getString("plugins.todo.button.close"));
       actionButtons.add(2, closeButtonPanel);
-      addCloseToDoModalWindow();
+      addCloseToDoDialog();
     } else {
       add(new WebMarkupContainer(CLOSE_DIALOG_ID).setVisible(false));
     }
   }
 
   @SuppressWarnings("serial")
-  private void addCloseToDoModalWindow()
+  private void addCloseToDoDialog()
   {
     closeToDoDialog = new ModalDialog(CLOSE_DIALOG_ID) {
 
@@ -318,11 +318,11 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
         init(new Form<String>(getFormId()));
         {
           final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));
-          closeToDialogCommentTextArea = new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "comment"),
+          closeToDoDialogCommentTextArea = new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "comment"),
               commentTextArea.getMaxLength());
-          closeToDialogCommentTextArea.setOutputMarkupId(true).add(AttributeModifier.replace("tabindex", "-1"));
-          fs.add(new TextAreaPanel(fs.newChildId(), closeToDialogCommentTextArea));
-          WicketUtils.setHeight(closeToDialogCommentTextArea, 20);
+          closeToDoDialogCommentTextArea.setOutputMarkupId(true).add(AttributeModifier.replace("tabindex", "-1"));
+          fs.add(new TextAreaPanel(fs.newChildId(), closeToDoDialogCommentTextArea));
+          WicketUtils.setHeight(closeToDoDialogCommentTextArea, 20);
         }
       }
 
