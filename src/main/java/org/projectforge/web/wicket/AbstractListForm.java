@@ -147,16 +147,7 @@ AbstractSecuredForm<F, P>
   protected void init()
   {
     super.init();
-    final FeedbackPanel feedbackPanel = new FeedbackPanel("feedback") {
-      /**
-       * @see org.apache.wicket.Component#isVisible()
-       */
-      @Override
-      public boolean isVisible()
-      {
-        return hasError();
-      }
-    };
+    final FeedbackPanel feedbackPanel = new FeedbackPanel("feedback");
     feedbackPanel.setOutputMarkupId(true);
     add(feedbackPanel);
 

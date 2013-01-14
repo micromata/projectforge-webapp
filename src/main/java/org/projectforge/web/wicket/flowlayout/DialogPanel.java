@@ -50,20 +50,12 @@ public class DialogPanel extends Panel
   /**
    * @param id
    */
-  @SuppressWarnings("serial")
   public DialogPanel(final ModalWindow modalWindow, final String title)
   {
     super(modalWindow.getContentId());
     modalWindow.setTitle(title);
     super.add(ajaxForm = new Form<Void>("form"));
-    ajaxForm.add(new FeedbackPanel("feedback") {
-      @Override
-      public boolean isVisible()
-      {
-        return hasErrorMessage();
-
-      }
-    }.setOutputMarkupId(true));
+    ajaxForm.add(new FeedbackPanel("feedback").setOutputMarkupId(true));
     content = new RepeatingView("content");
     ajaxForm.add(content);
     buttons = new MyComponentsRepeater<Component>("buttons");

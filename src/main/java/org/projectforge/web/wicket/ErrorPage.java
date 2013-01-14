@@ -158,17 +158,7 @@ public class ErrorPage extends AbstractSecuredPage
     form.setVisible(visible);
     final Label errorMessageLabel = new Label("errorMessage", errorMessage);
     body.add(errorMessageLabel.setVisible(errorMessage != null));
-    @SuppressWarnings("serial")
-    final FeedbackPanel feedbackPanel = new FeedbackPanel("feedback") {
-      /**
-       * @see org.apache.wicket.Component#isVisible()
-       */
-      @Override
-      public boolean isVisible()
-      {
-        return form.hasError();
-      }
-    };
+    final FeedbackPanel feedbackPanel = new FeedbackPanel("feedback");
     feedbackPanel.setOutputMarkupId(true);
     body.add(feedbackPanel);
   }

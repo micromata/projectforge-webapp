@@ -56,16 +56,7 @@ public abstract class AbstractMassEditForm<O extends Serializable, P extends Abs
   protected void init()
   {
     super.init();
-    feedbackPanel = new FeedbackPanel("feedback") {
-      /**
-       * @see org.apache.wicket.Component#isVisible()
-       */
-      @Override
-      public boolean isVisible()
-      {
-        return hasError();
-      }
-    };
+    feedbackPanel = new FeedbackPanel("feedback");
     feedbackPanel.setOutputMarkupId(true);
     add(feedbackPanel);
 
