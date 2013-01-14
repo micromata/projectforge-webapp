@@ -29,18 +29,14 @@ import java.util.List;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
-import org.apache.wicket.behavior.Behavior;
-import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.HeadersToolbar;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
-import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.panel.Fragment;
-import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.OddEvenItem;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
@@ -53,18 +49,20 @@ import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.common.OutputType;
+import org.projectforge.web.dialog.ModalDialog;
 import org.projectforge.web.task.TaskFormatter;
 import org.projectforge.web.task.TaskPropertyColumn;
 import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
+import org.projectforge.web.wicket.ListSelectActionPanel;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.TablePanel;
 
-public class TimesheetEditSelectRecentDialogPanel extends Panel
+public class TimesheetEditSelectRecentDialogPanel extends ModalDialog
 {
   private static final long serialVersionUID = -9175062586210446142L;
-
-  private final ModalWindow modalWindow;
 
   private final boolean showCost2Column;
 
@@ -82,47 +80,29 @@ public class TimesheetEditSelectRecentDialogPanel extends Panel
    * @param modalWindow
    * @param title
    */
-  public TimesheetEditSelectRecentDialogPanel(final ModalWindow modalWindow, final String title, final TimesheetEditPage parentPage,
+  public TimesheetEditSelectRecentDialogPanel(final String id, final String title, final TimesheetEditPage parentPage,
       final TimesheetEditForm form, final boolean showCost2Column, final TimesheetDao timesheetDao, final TaskTree taskTree,
       final UserFormatter userFormatter)
   {
-    super(modalWindow.getContentId());
-    modalWindow.setTitle(title);
+    super(id);
+    setTitle(title);
     this.parentPage = parentPage;
     this.form = form;
-    this.modalWindow = modalWindow;
     this.showCost2Column = showCost2Column;
     this.timesheetDao = timesheetDao;
     this.taskTree = taskTree;
     this.userFormatter = userFormatter;
+    setBigWindow();
   }
 
-  void show(final AjaxRequestTarget target)
+  /**
+   * @see org.projectforge.web.dialog.ModalDialog#init()
+   */
+  @Override
+  public void init()
   {
-    modalWindow.setInitialHeight(800);
-    modalWindow.setInitialWidth(1000);
-    modalWindow.setMinimalHeight(800);
-    modalWindow.setMinimalWidth(1000);
-    modalWindow.setContent(this);
-
+    init(new Form<String>(getFormId()));
     addRecentSheetsTable();
-    modalWindow.setWindowClosedCallback(new ModalWindow.WindowClosedCallback() {
-      private static final long serialVersionUID = 2633814101880954425L;
-
-      public void onClose(final AjaxRequestTarget target)
-      {
-      }
-
-    });
-    modalWindow.setCloseButtonCallback(new ModalWindow.CloseButtonCallback() {
-      private static final long serialVersionUID = 6761625465164911336L;
-
-      public boolean onCloseButtonClicked(final AjaxRequestTarget target)
-      {
-        return true;
-      }
-    });
-    modalWindow.show(target);
   }
 
   @SuppressWarnings({ "serial"})
@@ -154,10 +134,8 @@ public class TimesheetEditSelectRecentDialogPanel extends Panel
             final IModel<TimesheetDO> rowModel)
         {
           final TimesheetDO timesheet = rowModel.getObject();
-          final Fragment fragment = new Fragment(componentId, "selectRecentSheet", TimesheetEditSelectRecentDialogPanel.this);
-          item.add(fragment);
-          fragment.add(createRecentTimeSheetSelectionLink(timesheet));
-          fragment.add(new Label("label", new Model<String>() {
+          final ListSelectActionPanel actionPanel = new ListSelectActionPanel(componentId,
+              createRecentTimeSheetSelectionLink(timesheet), new Model<String>() {
             @Override
             public String getObject()
             {
@@ -173,7 +151,8 @@ public class TimesheetEditSelectRecentDialogPanel extends Panel
               }
               return buf.toString();
             }
-          }));
+          });
+          item.add(actionPanel);
           item.add(AttributeModifier.append("style", new Model<String>("white-space: nowrap;")));
           final Item< ? > row = item.findParent(Item.class);
           WicketUtils.addRowClick(row);
@@ -193,12 +172,11 @@ public class TimesheetEditSelectRecentDialogPanel extends Panel
         {
           final TimesheetDO timesheet = rowModel.getObject();
           final TaskDO task = rowModel.getObject().getTask();
-          final Fragment fragment = new Fragment(componentId, "selectRecentSheet", TimesheetEditSelectRecentDialogPanel.this);
-          item.add(fragment);
-          fragment.add(createRecentTimeSheetSelectionLink(timesheet));
           final Label label = new Label("label", task != null ? task.getTitle() : "");
-          fragment.add(label);
+          final ListSelectActionPanel actionPanel = new ListSelectActionPanel(componentId, createRecentTimeSheetSelectionLink(timesheet),
+              label);
           WicketUtils.addTooltip(label, TaskFormatter.instance().getTaskPath(task.getId(), false, OutputType.HTML));
+          item.add(actionPanel);
           final Item< ? > row = item.findParent(Item.class);
           WicketUtils.addRowClick(row);
           cellItemListener.populateItem(item, componentId, rowModel);
@@ -210,8 +188,11 @@ public class TimesheetEditSelectRecentDialogPanel extends Panel
     });
     columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(getString("timesheet.description"), null, "shortDescription",
         cellItemListener));
+    final DivPanel panel = gridBuilder.getPanel();
+    final TablePanel table = new TablePanel(panel.newChildId());
+    panel.add(table);
     final IDataProvider<TimesheetDO> dataProvider = new ListDataProvider<TimesheetDO>(parentPage.getRecentTimesheets());
-    final DataTable<TimesheetDO, String> dataTable = new DataTable<TimesheetDO, String>("table", columns, dataProvider, 100) {
+    final DataTable<TimesheetDO, String> dataTable = new DataTable<TimesheetDO, String>(TablePanel.TABLE_ID, columns, dataProvider, 100) {
       @Override
       protected Item<TimesheetDO> newRowItem(final String id, final int index, final IModel<TimesheetDO> model)
       {
@@ -220,8 +201,7 @@ public class TimesheetEditSelectRecentDialogPanel extends Panel
     };
     final HeadersToolbar headersToolbar = new HeadersToolbar(dataTable, null);
     dataTable.addTopToolbar(headersToolbar);
-    add(dataTable);
-    dataTable.add(new DataTableBehavior());
+    table.add(dataTable);
   }
 
   /**
@@ -232,7 +212,7 @@ public class TimesheetEditSelectRecentDialogPanel extends Panel
   @SuppressWarnings("serial")
   private AjaxLink<Void> createRecentTimeSheetSelectionLink(final TimesheetDO timesheet)
   {
-    return new AjaxLink<Void>("selectRecent") {
+    return new AjaxLink<Void>(ListSelectActionPanel.LINK_ID) {
       @Override
       public void onClick(final AjaxRequestTarget target)
       {
@@ -250,24 +230,24 @@ public class TimesheetEditSelectRecentDialogPanel extends Panel
           form.userSelectPanel.markTextFieldModelAsChanged();
           // updateStopDate();
           form.refresh();
-          modalWindow.close(target);
+          // modalWindow.close(target);
           parentPage.setResponsePage(parentPage);
         }
       }
     };
   }
 
-  class DataTableBehavior extends Behavior implements IHeaderContributor
+  /**
+   * @see org.projectforge.web.dialog.ModalDialog#renderHead(org.apache.wicket.markup.head.IHeaderResponse)
+   */
+  @Override
+  public void renderHead(final IHeaderResponse response)
   {
-    private static final long serialVersionUID = -3295144120585281383L;
-
-    public void renderHead(final IHeaderResponse response)
-    {
-      final String initJS = "// Mache alle Zeilen von recentSheets klickbar\n"
-          + "  $(\".datatable td\").click( function() {\n"
-          + "    $(this).parent().find(\"a:first\").click();\n"
-          + "  });\n";
-      response.render(OnDomReadyHeaderItem.forScript(initJS));
-    }
+    super.renderHead(response);
+    final String initJS = // Mache alle Zeilen von recentSheets klickbar\n"
+        "  $(\".dataview td\").click( function() {\n" //
+        + "    $(this).parent().find(\"a:first\").click();\n"
+        + "  });\n";
+    response.render(OnDomReadyHeaderItem.forScript(initJS));
   }
 }

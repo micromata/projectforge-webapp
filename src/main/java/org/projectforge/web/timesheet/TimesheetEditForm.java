@@ -32,7 +32,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxSubmitLink;
-import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
@@ -63,6 +62,7 @@ import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.user.UserPrefDO;
 import org.projectforge.user.UserPrefDao;
+import org.projectforge.web.dialog.ModalDialog;
 import org.projectforge.web.task.TaskListPage;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.UserFormatter;
@@ -97,6 +97,8 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
   private static final String USERPREF_KEY = "TimesheetEditForm.userPrefs";
 
   private static final String RECENT_SHEETS_DIALOG_ID = "recentSheetsModalWindow";
+
+  ModalDialog recentSheetsModalDialog;
 
   @SpringBean(name = "taskTree")
   private TaskTree taskTree;
@@ -139,8 +141,6 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
   private final FormComponent< ? >[] dependentFormComponentsWithCost2 = new FormComponent[4];
 
   private final FormComponent< ? >[] dependentFormComponentsWithoutCost2 = new FormComponent[3];
-
-  private ModalWindow recentSheetsModalWindow;
 
   private final boolean cost2Exists;
 
@@ -436,14 +436,12 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
       templateNamesChoice.setNullValid(true);
       templatesRow.add(templateNamesChoice);
     }
+    // Needed as submit link because the modal dialog reloads the page and otherwise any previous change will be lost.
     final AjaxSubmitLink link = new AjaxSubmitLink(IconLinkPanel.LINK_ID) {
       @Override
       protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
       {
-        final TimesheetEditSelectRecentDialogPanel dialog = new TimesheetEditSelectRecentDialogPanel(recentSheetsModalWindow,
-            getString("timesheet.recent.select"), parentPage, TimesheetEditForm.this, cost2ChoiceFieldset != null, timesheetDao, taskTree,
-            userFormatter);
-        dialog.show(target);
+        target.appendJavaScript(recentSheetsModalDialog.getOpenJavaScript());
       }
 
       @Override
@@ -453,8 +451,10 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
     };
     link.setDefaultFormProcessing(false);
     templatesRow.add(new IconLinkPanel(templatesRow.newChildId(), IconType.FOLDER_OPEN, getString("timesheet.recent.select"), link));
-    recentSheetsModalWindow = new ModalWindow(RECENT_SHEETS_DIALOG_ID);
-    add(recentSheetsModalWindow);
+    recentSheetsModalDialog = new TimesheetEditSelectRecentDialogPanel(RECENT_SHEETS_DIALOG_ID, getString("timesheet.recent.select"),
+        parentPage, TimesheetEditForm.this, cost2Exists, timesheetDao, taskTree, userFormatter);
+    add(recentSheetsModalDialog);
+    recentSheetsModalDialog.init();
   }
 
   public FieldsetPanel getTemplatesRow()
