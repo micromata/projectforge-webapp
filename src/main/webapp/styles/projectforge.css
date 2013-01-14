@@ -580,3 +580,7 @@ div.global-alert-message {
 .dropdown-menu.contextmenu li {
   list-style-type: none;
 }
+
+.pf_left {
+    float: left;
+}
