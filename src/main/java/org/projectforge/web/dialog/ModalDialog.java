@@ -59,6 +59,8 @@ public abstract class ModalDialog extends Panel
 
   private boolean keyboard;
 
+  private String closeButtonLabel;
+
   /**
    * List to create action buttons in the desired order before creating the RepeatingView.
    */
@@ -91,6 +93,17 @@ public abstract class ModalDialog extends Panel
   public ModalDialog setKeyboard(final boolean keyboard)
   {
     this.keyboard = keyboard;
+    return this;
+  }
+
+  /**
+   * Close is used as default:
+   * @param closeButtonLabel the closeButtonLabel to set
+   * @return this for chaining.
+   */
+  public ModalDialog setCloseButtonLabel(final String closeButtonLabel)
+  {
+    this.closeButtonLabel = closeButtonLabel;
     return this;
   }
 
@@ -160,7 +173,7 @@ public abstract class ModalDialog extends Panel
       {
         onError(target, form);
       }
-    }, getString("close"), SingleButtonPanel.GREY);
+    }, closeButtonLabel != null ? closeButtonLabel : getString("close"), SingleButtonPanel.GREY);
     form.add(actionButtons.getRepeatingView());
     gridBuilder = new GridBuilder(form, "flowform");
   }

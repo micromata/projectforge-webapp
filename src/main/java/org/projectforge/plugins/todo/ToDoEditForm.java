@@ -337,7 +337,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
       };
     };
     add(closeToDoDialog);
-    closeToDoDialog.init();
+    closeToDoDialog.setCloseButtonLabel(getString("plugins.todo.button.close")).init();
   }
 
   @Override
