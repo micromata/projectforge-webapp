@@ -59,8 +59,6 @@ public class SingleButtonPanel extends Panel
 
   public static final String RESET = "btn-danger";
 
-  public static final String SEND_RIGHT = "send_right";
-
   /**
    * 
    * @param id
