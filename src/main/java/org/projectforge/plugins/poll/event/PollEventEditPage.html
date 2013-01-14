@@ -1,6 +1,6 @@
 <wicket:extend xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
-  <form wicket:id="form">
-    <div class="row">
+  <form wicket:id="form" class="container-fluid">
+    <div class="row-fluid">
       <div class="span4">
         <div class="section">
             <h3><wicket:message key="title" /></h3>
@@ -18,7 +18,7 @@
           <div style="float: right;" wicket:id="continueButton"></div>
         </div>
       </div>
-      <div class="span12">
+      <div class="span8">
         <div id="loading" style="position: absolute; left: 200px;"><wicket:message key="loading" /></div>
         <div wicket:id="cal"></div>
       </div>
