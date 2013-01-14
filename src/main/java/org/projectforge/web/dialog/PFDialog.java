@@ -50,7 +50,9 @@ import de.micromata.wicket.ajax.MDefaultAjaxBehavior;
  * 
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  * 
+ * Use ModalDialog instead. This dialog isn't bootstrap styled.
  */
+@Deprecated
 public abstract class PFDialog extends Panel
 {
   private static final long serialVersionUID = -2542957111789393810L;

@@ -34,7 +34,9 @@ import org.apache.wicket.markup.repeater.RepeatingView;
  * Represents a entry of a group panel. This can be a label, text field or other form components.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
+ * Use ModalDialog instead. This dialog isn't bootstrap styled.
  */
+@Deprecated
 public class DialogPanel extends Panel
 {
   private static final long serialVersionUID = 6130552547273354134L;
