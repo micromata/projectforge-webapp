@@ -571,3 +571,12 @@ div.global-alert-message {
 .hasMoreEntries {
 	color: red;
 }
+
+
+.dropdown-menu.contextmenu ul.dropdown {
+  margin: 0;
+}
+
+.dropdown-menu.contextmenu li {
+  list-style-type: none;
+}
