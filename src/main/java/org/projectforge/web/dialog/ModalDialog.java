@@ -34,6 +34,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.projectforge.web.core.NavTopPanel;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
@@ -55,7 +56,7 @@ public abstract class ModalDialog extends Panel
 
   protected GridBuilder gridBuilder;
 
-  private final WebMarkupContainer mainContainer, bodyContainer;
+  private final WebMarkupContainer mainContainer, gridContentContainer;
 
   private boolean keyboard;
 
@@ -75,8 +76,8 @@ public abstract class ModalDialog extends Panel
     actionButtons = new MyComponentsRepeater<Component>("actionButtons");
     mainContainer = new WebMarkupContainer("mainContainer");
     add(mainContainer.setOutputMarkupId(true));
-    bodyContainer = new WebMarkupContainer("body");
-    bodyContainer.setOutputMarkupId(true);
+    gridContentContainer = new WebMarkupContainer("gridContent");
+    gridContentContainer.setOutputMarkupId(true);
   }
 
   /**
@@ -133,6 +134,15 @@ public abstract class ModalDialog extends Panel
     return mainContainer.getMarkupId(true);
   }
 
+  /**
+   * The content where the GridBuilder puts its content.
+   * @return the gridContentContainer
+   */
+  public WebMarkupContainer getGridContentContainer()
+  {
+    return gridContentContainer;
+  }
+
   @Override
   public void renderHead(final IHeaderResponse response)
   {
@@ -158,10 +168,15 @@ public abstract class ModalDialog extends Panel
     mainContainer.add(new Label("title", title));
   }
 
+  /**
+   * The gridContentContainer is cleared (all child elements are removed). This is useful for Ajax dialogs with dynamic content (see
+   * {@link NavTopPanel} for an example).
+   * @return
+   */
   public ModalDialog clearContent()
   {
-    bodyContainer.removeAll();
-    gridBuilder = new GridBuilder(bodyContainer, "flowform");
+    gridContentContainer.removeAll();
+    gridBuilder = new GridBuilder(gridContentContainer, "flowform");
     return this;
   }
 
@@ -176,7 +191,7 @@ public abstract class ModalDialog extends Panel
   protected void init(final Form< ? > form)
   {
     mainContainer.add(form);
-    form.add(bodyContainer);
+    form.add(gridContentContainer);
     appendNewAjaxActionButton(new AjaxFormSubmitCallback() {
 
       @Override
@@ -193,7 +208,7 @@ public abstract class ModalDialog extends Panel
       }
     }, closeButtonLabel != null ? closeButtonLabel : getString("close"), SingleButtonPanel.GREY);
     form.add(actionButtons.getRepeatingView());
-    gridBuilder = new GridBuilder(bodyContainer, "flowform");
+    gridBuilder = new GridBuilder(gridContentContainer, "flowform");
   }
 
   /**
