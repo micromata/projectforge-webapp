@@ -46,8 +46,6 @@ public class ScriptEditForm extends AbstractEditForm<ScriptDO, ScriptEditPage>
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ScriptEditForm.class);
 
-  private static final String SHOW_BACKUP_SCRIPT_DIALOG_ID = "showBackupScriptModalWindow";
-
   protected ModalDialog showBackupScriptDialog;
 
   public ScriptEditForm(final ScriptEditPage parentPage, final ScriptDO data)
@@ -113,7 +111,7 @@ public class ScriptEditForm extends AbstractEditForm<ScriptDO, ScriptEditPage>
   @SuppressWarnings("serial")
   protected void addShowBackupScriptDialog()
   {
-    showBackupScriptDialog = new ModalDialog(SHOW_BACKUP_SCRIPT_DIALOG_ID) {
+    showBackupScriptDialog = new ModalDialog(parentPage.newModalDialogId()) {
       @Override
       public void init()
       {
@@ -129,7 +127,7 @@ public class ScriptEditForm extends AbstractEditForm<ScriptDO, ScriptEditPage>
       }
     };
     showBackupScriptDialog.setBigWindow().setOutputMarkupId(true);
-    add(showBackupScriptDialog);
+    parentPage.add(showBackupScriptDialog);
     showBackupScriptDialog.init();
 
   }

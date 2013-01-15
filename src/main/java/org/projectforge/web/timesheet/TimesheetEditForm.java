@@ -32,7 +32,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxSubmitLink;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
@@ -96,8 +95,6 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TimesheetEditForm.class);
 
   private static final String USERPREF_KEY = "TimesheetEditForm.userPrefs";
-
-  private static final String RECENT_SHEETS_DIALOG_ID = "recentSheetsModalWindow";
 
   ModalDialog recentSheetsModalDialog;
 
@@ -225,8 +222,6 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
     gridBuilder.newGridPanel();
     if (isNew() == true) {
       addTemplatesRow();
-    } else {
-      add(new Label(RECENT_SHEETS_DIALOG_ID, "invisible").setVisible(false));
     }
     {
       // Task
@@ -451,10 +446,11 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
       }
     };
     link.setDefaultFormProcessing(false);
-    templatesRow.add(new IconLinkPanel(templatesRow.newChildId(), IconType.FOLDER_OPEN, new ResourceModel("timesheet.recent.select"), link));
-    recentSheetsModalDialog = new TimesheetEditSelectRecentDialogPanel(RECENT_SHEETS_DIALOG_ID, getString("timesheet.recent.select"),
+    templatesRow
+    .add(new IconLinkPanel(templatesRow.newChildId(), IconType.FOLDER_OPEN, new ResourceModel("timesheet.recent.select"), link));
+    recentSheetsModalDialog = new TimesheetEditSelectRecentDialogPanel(parentPage.newModalDialogId(), getString("timesheet.recent.select"),
         parentPage, TimesheetEditForm.this, cost2Exists, timesheetDao, taskTree, userFormatter);
-    add(recentSheetsModalDialog);
+    parentPage.add(recentSheetsModalDialog);
     recentSheetsModalDialog.init();
   }
 
