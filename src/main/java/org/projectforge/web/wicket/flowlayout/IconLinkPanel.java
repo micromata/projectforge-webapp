@@ -29,6 +29,7 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.model.IModel;
 import org.projectforge.web.wicket.WicketUtils;
 
 /**
@@ -42,9 +43,18 @@ public class IconLinkPanel extends Panel
 
   public static final String LINK_ID = "link";
 
-  private final AbstractLink link;
+  private AbstractLink link;
 
-  private final WebMarkupContainer icon;
+  private WebMarkupContainer icon;
+
+  private final IconType type;
+
+  private final IModel<String> tooltip;
+
+  public IconLinkPanel(final String id, final IconType type)
+  {
+    this(id, type, (IModel<String>)null);
+  }
 
   public IconLinkPanel(final String id, final IconType type, final AbstractLink link)
   {
@@ -57,17 +67,36 @@ public class IconLinkPanel extends Panel
    * @param link Must have component id {@link #LINK_ID}
    * @param tooltip
    */
-  public IconLinkPanel(final String id, final IconType type, final String tooltip, final AbstractLink link)
+  public IconLinkPanel(final String id, final IconType type, final IModel<String> tooltip, final AbstractLink link)
+  {
+    this(id, type, tooltip);
+    setLink(link);
+  }
+
+  /**
+   * @param id
+   * @param type
+   * @param link Must have component id {@link #LINK_ID}
+   * @param tooltip
+   */
+  public IconLinkPanel(final String id, final IconType type, final IModel<String> tooltip)
   {
     super(id);
+    this.type = type;
+    this.tooltip = tooltip;
+  }
+
+  public IconLinkPanel setLink(final AbstractLink link)
+  {
     this.link = link;
     add(link);
-    if (tooltip != null) {
-      WicketUtils.addTooltip(link, tooltip);
-    }
     icon = new WebMarkupContainer("icon");
     icon.add(AttributeModifier.append("class", type.getClassAttrValue()));
     link.add(icon);
+    if (tooltip != null) {
+      WicketUtils.addTooltip(link, tooltip);
+    }
+    return this;
   }
 
   /**
