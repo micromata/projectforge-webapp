@@ -70,8 +70,6 @@ public class NavTopPanel extends NavAbstractPanel
 {
   private static final long serialVersionUID = -7858806882044188339L;
 
-  private static final String BOOKMARK_DIALOG_ID = "bookmarkModalWindow";
-
   private final FavoritesMenu favoritesMenu;
 
   private final AccessChecker accessChecker;
@@ -140,7 +138,7 @@ public class NavTopPanel extends NavAbstractPanel
           // Redraw the content:
           bookmarkDialog.redraw();
           // The content was changed:
-          target.add(bookmarkDialog.getGridContentContainer());
+          bookmarkDialog.addContent(target);
         }
       };
       add(showBookmarkLink);
@@ -248,7 +246,8 @@ public class NavTopPanel extends NavAbstractPanel
   @SuppressWarnings("serial")
   private void addBookmarkDialog()
   {
-    bookmarkDialog = new ModalDialog(BOOKMARK_DIALOG_ID) {
+    final AbstractSecuredPage parentPage = (AbstractSecuredPage)getPage();
+    bookmarkDialog = new ModalDialog(parentPage.newModalDialogId()) {
       @Override
       public void init()
       {
@@ -274,7 +273,7 @@ public class NavTopPanel extends NavAbstractPanel
       }
     };
     bookmarkDialog.setOutputMarkupId(true);
-    add(bookmarkDialog);
+    parentPage.add(bookmarkDialog);
     bookmarkDialog.init();
   }
 }
