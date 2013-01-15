@@ -128,7 +128,7 @@ public class ScriptEditForm extends AbstractEditForm<ScriptDO, ScriptEditPage>
         }
       }
     };
-    showBackupScriptDialog.setOutputMarkupId(true);
+    showBackupScriptDialog.setBigWindow().setOutputMarkupId(true);
     add(showBackupScriptDialog);
     showBackupScriptDialog.init();
 
