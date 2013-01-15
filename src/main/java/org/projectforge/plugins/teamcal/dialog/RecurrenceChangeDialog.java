@@ -37,6 +37,8 @@ import org.projectforge.plugins.teamcal.event.TeamEventEditPage;
 import org.projectforge.plugins.teamcal.event.TeamRecurrenceEvent;
 import org.projectforge.web.dialog.ModalDialog;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 
 import de.micromata.wicket.ajax.AjaxCallback;
 
@@ -78,7 +80,9 @@ public class RecurrenceChangeDialog extends ModalDialog
   {
     final Form<Void> form = new Form<Void>(getFormId());
     init(form);
-    gridBuilder.newFormHeading(getString("plugins.teamcal.event.recurrence.change.content"));
+    final DivPanel content = gridBuilder.getPanel();
+    final DivTextPanel textPanel = new DivTextPanel(content.newChildId(), getString("plugins.teamcal.event.recurrence.change.content"));
+    content.add(textPanel);
 
     setCloseButtonLabel(getString("cancel"));
     // add all change callback
