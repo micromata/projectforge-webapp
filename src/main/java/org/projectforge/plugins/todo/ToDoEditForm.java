@@ -30,7 +30,6 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
-import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
@@ -71,8 +70,6 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
   private static final long serialVersionUID = -6208809585214296635L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ToDoEditForm.class);
-
-  private static final String CLOSE_DIALOG_ID = "closeToDoModalWindow";
 
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
@@ -301,15 +298,13 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
           getString("plugins.todo.button.close"));
       actionButtons.add(2, closeButtonPanel);
       addCloseToDoDialog();
-    } else {
-      add(new WebMarkupContainer(CLOSE_DIALOG_ID).setVisible(false));
     }
   }
 
   @SuppressWarnings("serial")
   private void addCloseToDoDialog()
   {
-    closeToDoDialog = new ModalDialog(CLOSE_DIALOG_ID) {
+    closeToDoDialog = new ModalDialog(parentPage.newModalDialogId()) {
 
       @Override
       public void init()
@@ -336,7 +331,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
         parentPage.updateAndClose();
       };
     };
-    add(closeToDoDialog);
+    parentPage.add(closeToDoDialog);
     closeToDoDialog.setCloseButtonLabel(getString("plugins.todo.button.close")).init();
   }
 

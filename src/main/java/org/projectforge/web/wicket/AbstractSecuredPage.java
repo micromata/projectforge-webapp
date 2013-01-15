@@ -26,6 +26,7 @@ package org.projectforge.web.wicket;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -34,6 +35,7 @@ import org.projectforge.web.MenuEntry;
 import org.projectforge.web.core.MenuSuffixLabel;
 import org.projectforge.web.core.NavSidePanel;
 import org.projectforge.web.core.NavTopPanel;
+import org.projectforge.web.dialog.ModalDialog;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
@@ -60,12 +62,16 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
    */
   protected WebPage returnToPage;
 
+  private final RepeatingView modalDialogs;
+
   @SuppressWarnings("serial")
   public AbstractSecuredPage(final PageParameters parameters)
   {
     super(parameters);
     final NavSidePanel menuPanel = new NavSidePanel("mainMenu");
     body.add(menuPanel);
+    modalDialogs = new RepeatingView("modalDialogs");
+    body.add(modalDialogs);
     menuPanel.init();
     final Label sideMenuSuffixLabel = new MenuSuffixLabel("totalMenuCounter", new Model<Integer>() {
       @Override
@@ -277,5 +283,15 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
     } else {
       return null;
     }
+  }
+
+  public String newModalDialogId()
+  {
+    return modalDialogs.newChildId();
+  }
+
+  public void add(final ModalDialog modalDialog)
+  {
+    modalDialogs.add(modalDialog);
   }
 }
