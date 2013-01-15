@@ -26,13 +26,15 @@ package org.projectforge.plugins.teamcal.admin;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
+import org.projectforge.plugins.teamcal.dialog.ICSExportDialog;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.common.MultiChoiceListHelper;
 import org.projectforge.web.user.GroupsComparator;
 import org.projectforge.web.user.GroupsProvider;
@@ -44,7 +46,9 @@ import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.JodaDatePanel;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
+import org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
 
 import com.vaynberg.wicket.select2.Select2MultiChoice;
 
@@ -71,6 +75,8 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
 
   MultiChoiceListHelper<GroupDO> fullAccessGroupsListHelper, readonlyAccessGroupsListHelper, minimalAccessGroupsListHelper;
 
+  private ICSExportDialog icsExportDialog;
+
   /**
    * @param parentPage
    * @param data
@@ -83,6 +89,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
   /**
    * @see org.projectforge.web.wicket.AbstractEditForm#init()
    */
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
@@ -129,12 +136,20 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       fs.add(new Label(fs.newChildId(), data.getOwner().getUsername() + ""));
     }
 
-    if (accessChecker.isRestrictedUser() == false && WebConfiguration.isDevelopmentMode() == true) {
-      final FieldsetPanel fsSubscribe = gridBuilder.newFieldset(getString("plugins.teamcal.subscribe"), true).setNoLabelFor();
-      fsSubscribe.add(new TeamCalendarIcsExportLink(fsSubscribe.newChildId(), getData()));
-      if (isNew() == true) {
-        fsSubscribe.setVisible(false);
-      }
+    if (accessChecker.isRestrictedUser() == false && isNew() == false) {
+      icsExportDialog = new ICSExportDialog(parentPage.newModalDialogId(), new ResourceModel("plugins.teamcal.download"));
+      parentPage.add(icsExportDialog);
+      icsExportDialog.init();
+      icsExportDialog.redraw(getData());
+      final FieldsetPanel fsSubscribe = gridBuilder.newFieldset(getString("plugins.teamcal.abonnement"), true).setNoLabelFor();
+      fsSubscribe.add(new AjaxIconLinkPanel(fsSubscribe.newChildId(), IconType.ABONNEMENT, new ResourceModel(
+          "plugins.teamcal.abonnement.tooltip")) {
+        @Override
+        public void onClick(final AjaxRequestTarget target)
+        {
+          icsExportDialog.open(target);
+        };
+      });
     }
 
     if (access == true) {
