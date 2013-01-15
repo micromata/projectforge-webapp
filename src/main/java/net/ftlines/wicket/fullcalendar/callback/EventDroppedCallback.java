@@ -27,55 +27,6 @@ public abstract class EventDroppedCallback extends AbstractAjaxCallbackWithClien
 {
   private static final long serialVersionUID = 9220878749378414280L;
 
-  public static final String NO_CONTEXTMENU_INDICATOR = "noContextMenu";
-
-  private static final String CALLBACK_PRE_SCRIPT = "var triggerAjaxEvent = function (which) { ";
-
-  private static final String MOVE_SAVE = CalendarDropMode.MOVE_SAVE.getI18nKey();
-
-  private static final String MOVE_EDIT = CalendarDropMode.MOVE_EDIT.getI18nKey();
-
-  private static final String COPY_SAVE = CalendarDropMode.COPY_SAVE.getI18nKey();
-
-  private static final String COPY_EDIT = CalendarDropMode.COPY_EDIT.getI18nKey();
-
-  private static final String CANCEL = CalendarDropMode.CANCEL.getI18nKey();
-
-  private static final String CALLBACK_POST_SCRIPT = "}; if(jQuery.inArray('"
-      + NO_CONTEXTMENU_INDICATOR
-      + "', event.className) < 0) { $.contextMenu.create("
-      + "["
-      + "{ '"
-      + MOVE_SAVE
-      + "' : function(menuItem,menu) { triggerAjaxEvent('"
-      + CalendarDropMode.MOVE_SAVE.getAjaxTarget()
-      + "'); } },"
-      + "{ '"
-      + MOVE_EDIT
-      + "' : function(menuItem,menu) { triggerAjaxEvent('"
-      + CalendarDropMode.MOVE_EDIT.getAjaxTarget()
-      + "'); } },"
-      + "$.contextMenu.separator,"
-      + "{ '"
-      + COPY_SAVE
-      + "' : function(menuItem,menu) { triggerAjaxEvent('"
-      + CalendarDropMode.COPY_SAVE.getAjaxTarget()
-      + "'); } },"
-      + "{ '"
-      + COPY_EDIT
-      + "' : function(menuItem,menu) { triggerAjaxEvent('"
-      + CalendarDropMode.COPY_EDIT.getAjaxTarget()
-      + "'); } },"
-      + "$.contextMenu.separator,"
-      + "{ '"
-      + CANCEL
-      + "' : function(menuItem,menu) { menu.hide(); } }"
-      + "],"
-      + "{hideCallback: function () {this.menu.remove(); revertFunc(); } }"
-      + ").show(this, originalEvent); } else { triggerAjaxEvent('"
-      + CalendarDropMode.NONE.getAjaxTarget()
-      + "'); }";
-
   private final Config config;
 
   /**
@@ -89,30 +40,14 @@ public abstract class EventDroppedCallback extends AbstractAjaxCallbackWithClien
   @Override
   protected String configureCallbackScript(final String script, final String urlTail)
   {
-    final String str = "&eventId=\"+event.id+\"&sourceId=\"+event.source.data."
+    final String url = "&eventId=\"+event.id+\"&sourceId=\"+event.source.data."
         + EventSource.Const.UUID
         + "+\"&dayDelta=\"+dayDelta+\"&minuteDelta=\"+minuteDelta+\"&allDay=\"+allDay+\"";
     if (config.isEnableContextMenu() == false) { // do not show context menu
-      return script.replace(urlTail, str);
+      return script.replace(urlTail, url);
     } else { // do show context menu
-      return CALLBACK_PRE_SCRIPT + script.replace(urlTail, str + "&which=\"+which+\"") + i18nCallbackScript(CALLBACK_POST_SCRIPT);
+      return EventDroppedCallbackScriptGenerator.getEventDroppedJavascript(getComponent(), url, script, urlTail);
     }
-  }
-
-  /**
-   * @param callbackPostScript
-   * @return
-   */
-  private String i18nCallbackScript(final String callbackPostScript)
-  {
-    String result = callbackPostScript;
-    final Component component = getComponent();
-    result = result.replace(MOVE_SAVE, component.getString(MOVE_SAVE));
-    result = result.replace(MOVE_EDIT, component.getString(MOVE_EDIT));
-    result = result.replace(COPY_SAVE, component.getString(COPY_SAVE));
-    result = result.replace(COPY_EDIT, component.getString(COPY_EDIT));
-    result = result.replace(CANCEL, component.getString(CANCEL));
-    return result;
   }
 
   @SuppressWarnings("serial")

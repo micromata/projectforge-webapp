@@ -1,6 +1,5 @@
 Prio 1 (Johannes):
 ------------------
-- Clean up Calendar Contextmenu Javascript generation
 
 Prio 2 (Johannes):
 ------------------
