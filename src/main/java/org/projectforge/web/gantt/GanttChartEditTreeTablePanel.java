@@ -441,7 +441,6 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
           addColumn(item, dropDownMenu, "white-space: nowrap; width: 32px;");
           dropDownMenu.add(new PresizedImage("cogImage", getResponse(), WebConstants.IMAGE_COG));
           dropDownMenu.add(new PresizedImage("arrowDownImage", getResponse(), WebConstants.IMAGE_ARROW_DOWN));
-          final WebMarkupContainer ul = new WebMarkupContainer("ul");
           final RepeatingView menuRepeater = new RepeatingView("menuEntriesRepeater");
           dropDownMenu.add(menuRepeater);
           menuRepeater.add(new ContextMenuEntry(menuRepeater.newChildId(), "mark") {
