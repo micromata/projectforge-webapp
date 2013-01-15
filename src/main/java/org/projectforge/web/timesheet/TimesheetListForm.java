@@ -32,6 +32,7 @@ import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
@@ -177,7 +178,7 @@ public class TimesheetListForm extends AbstractListForm<TimesheetListFilter, Tim
           };
         };
         unselectPeriod.setDefaultFormProcessing(false);
-        fs.add(new IconLinkPanel(fs.newChildId(), IconType.REMOVE, getString("calendar.tooltip.unselectPeriod"), unselectPeriod));
+        fs.add(new IconLinkPanel(fs.newChildId(), IconType.REMOVE, new ResourceModel("calendar.tooltip.unselectPeriod"), unselectPeriod));
       }
       final QuickSelectPanel quickSelectPanel = new QuickSelectPanel(fs.newChildId(), parentPage, "quickSelect", startDate);
       fs.add(quickSelectPanel);
@@ -224,12 +225,12 @@ public class TimesheetListForm extends AbstractListForm<TimesheetListFilter, Tim
   @Override
   protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
   {
-    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
-        "longFormat"), getString("longFormat")));
-    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
-        "recursive"), getString("task.recursive")));
-    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "marked"),
-        getString("timesheet.filter.withTimeperiodCollision")));
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
+        getSearchFilter(), "longFormat"), getString("longFormat")));
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
+        getSearchFilter(), "recursive"), getString("task.recursive")));
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
+        getSearchFilter(), "marked"), getString("timesheet.filter.withTimeperiodCollision")));
   }
 
   /**

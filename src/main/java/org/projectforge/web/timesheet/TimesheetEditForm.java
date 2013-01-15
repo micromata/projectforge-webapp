@@ -42,6 +42,7 @@ import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.validator.AbstractValidator;
@@ -450,7 +451,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
       }
     };
     link.setDefaultFormProcessing(false);
-    templatesRow.add(new IconLinkPanel(templatesRow.newChildId(), IconType.FOLDER_OPEN, getString("timesheet.recent.select"), link));
+    templatesRow.add(new IconLinkPanel(templatesRow.newChildId(), IconType.FOLDER_OPEN, new ResourceModel("timesheet.recent.select"), link));
     recentSheetsModalDialog = new TimesheetEditSelectRecentDialogPanel(RECENT_SHEETS_DIALOG_ID, getString("timesheet.recent.select"),
         parentPage, TimesheetEditForm.this, cost2Exists, timesheetDao, taskTree, userFormatter);
     add(recentSheetsModalDialog);
