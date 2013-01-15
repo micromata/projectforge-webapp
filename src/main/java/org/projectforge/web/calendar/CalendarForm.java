@@ -28,6 +28,7 @@ import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.joda.time.DateMidnight;
 import org.projectforge.access.AccessChecker;
@@ -181,7 +182,7 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
         };
       };
       final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(buttonGroupPanel.newChildId(), IconType.DOWNLOAD,
-          getString(setIcsImportButtonTooltip()), iCalExportLink);
+          new ResourceModel(setIcsImportButtonTooltip()), iCalExportLink);
 
       buttonGroupPanel.addButton(exportICalButtonPanel);
     }
