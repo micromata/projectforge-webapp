@@ -35,7 +35,6 @@ import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
-import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
@@ -60,6 +59,7 @@ import org.projectforge.fibu.AuftragsPositionDO;
 import org.projectforge.fibu.RechnungsPositionDO;
 import org.projectforge.fibu.kost.KostZuweisungDO;
 import org.projectforge.fibu.kost.KostZuweisungenCopyHelper;
+import org.projectforge.web.dialog.ModalDialog;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
@@ -74,7 +74,6 @@ import org.projectforge.web.wicket.converter.BigDecimalPercentConverter;
 import org.projectforge.web.wicket.converter.CurrencyConverter;
 import org.projectforge.web.wicket.flowlayout.ButtonPanel;
 import org.projectforge.web.wicket.flowlayout.ButtonType;
-import org.projectforge.web.wicket.flowlayout.DialogPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldSetIconPosition;
@@ -105,7 +104,7 @@ extends AbstractEditForm<O, P>
 
   private boolean costConfigured;
 
-  private ModalWindow costEditModalWindow;
+  private CostEditModalDialog costEditModalDialog;
 
   private final List<Component> ajaxUpdateComponents = new ArrayList<Component>();
 
@@ -340,8 +339,7 @@ extends AbstractEditForm<O, P>
     gridBuilder.newGridPanel();
     positionsRepeater = gridBuilder.newRepeatingView();
     if (costConfigured == true) {
-      costEditModalWindow = new ModalWindow(COST_EDIT_DIALOG_ID);
-      add(costEditModalWindow);
+      addCostEditModalDialog();
     } else {
       add(new WebMarkupContainer(COST_EDIT_DIALOG_ID).setVisible(false));
     }
@@ -605,7 +603,11 @@ extends AbstractEditForm<O, P>
                 @Override
                 protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
                 {
-                  showCostEditModalWindow(target, position, costTable);
+                  target.appendJavaScript(costEditModalDialog.getOpenJavaScript());
+                  // Redraw the content:
+                  costEditModalDialog.redraw(position, costTable);
+                  // The content was changed:
+                  target.add(costEditModalDialog.getGridContentContainer());
                 }
 
                 @Override
@@ -652,88 +654,63 @@ extends AbstractEditForm<O, P>
 
   }
 
-  protected void showCostEditModalWindow(final AjaxRequestTarget target, final AbstractRechnungsPositionDO position,
-      final RechnungCostTablePanel costTable)
+  protected void addCostEditModalDialog()
   {
-    // Cost edit dialog
-    final DialogPanel costEditDialog = new DialogPanel(costEditModalWindow, getString("fibu.rechnung.showEditableKostZuweisungen"));
-    costEditModalWindow.setContent(costEditDialog);
+    costEditModalDialog = new CostEditModalDialog();
+    final String title = (isNew() == true) ? "create" : "update";
+    costEditModalDialog.setCloseButtonLabel(getString(title)).wantsNotificationOnClose().setOutputMarkupId(true);
+    add(costEditModalDialog);
+    costEditModalDialog.init();
+  }
 
-    final DivPanel content = new DivPanel(costEditDialog.newChildId());
-    costEditDialog.add(content);
-    final RechnungCostEditTablePanel rechnungCostEditTablePanel = new RechnungCostEditTablePanel(content.newChildId());
-    content.add(rechnungCostEditTablePanel);
-    rechnungCostEditTablePanel.add(position);
+  private class CostEditModalDialog extends ModalDialog
+  {
+    private static final long serialVersionUID = 7113006438653862995L;
 
-    @SuppressWarnings("serial")
-    final AjaxButton cancelButton = new AjaxButton(SingleButtonPanel.WICKET_ID, new Model<String>("cancel")) {
+    private RechnungCostEditTablePanel rechnungCostEditTablePanel;
 
-      @Override
-      protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
+    private AbstractRechnungsPositionDO position;
+
+    private RechnungCostTablePanel costTable;
+
+    CostEditModalDialog()
+    {
+      super(COST_EDIT_DIALOG_ID);
+    }
+
+    @Override
+    public void init()
+    {
+      setTitle(getString("fibu.rechnung.showEditableKostZuweisungen"));
+      init(new Form<String>(getFormId()));
+      gridBuilder.newFormHeading(""); // Otherwise it's empty and an IllegalArgumentException is thrown.
+    }
+
+    public void redraw(final AbstractRechnungsPositionDO position, final RechnungCostTablePanel costTable)
+    {
+      this.position = position;
+      this.costTable = costTable;
+      clearContent();
       {
-        costEditModalWindow.close(target);
+        final DivPanel panel = gridBuilder.getPanel();
+        rechnungCostEditTablePanel = new RechnungCostEditTablePanel(panel.newChildId());
+        panel.add(rechnungCostEditTablePanel);
+        rechnungCostEditTablePanel.add(position);
       }
+    }
 
-      /**
-       * @see org.apache.wicket.ajax.markup.html.form.AjaxButton#onError(org.apache.wicket.ajax.AjaxRequestTarget,
-       *      org.apache.wicket.markup.html.form.Form)
-       */
-      @Override
-      protected void onError(final AjaxRequestTarget target, final Form< ? > form)
-      {
-      }
-    };
-    cancelButton.setDefaultFormProcessing(false); // No validation
-    final SingleButtonPanel cancelButtonPanel = new SingleButtonPanel(costEditDialog.newButtonChildId(), cancelButton, getString("cancel"),
-        SingleButtonPanel.CANCEL);
-    costEditDialog.addButton(cancelButtonPanel);
-
-    final String label = (isNew() == true) ? "create" : "update";
-    @SuppressWarnings("serial")
-    final AjaxButton submitButton = new AjaxButton(SingleButtonPanel.WICKET_ID, new Model<String>(label)) {
-
-      @Override
-      protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
-      {
-        // Copy edited values to DO object.
-        final AbstractRechnungsPositionDO srcPosition = rechnungCostEditTablePanel.getPosition();
-        final KostZuweisungenCopyHelper kostZuweisungCopyHelper = new KostZuweisungenCopyHelper();
-        kostZuweisungCopyHelper.mycopy(srcPosition.getKostZuweisungen(), position.getKostZuweisungen(), position);
-        target.add(costTable.refresh().getTable());
-        costEditModalWindow.close(target);
-      }
-
-      /**
-       * @see org.apache.wicket.ajax.markup.html.form.AjaxButton#onError(org.apache.wicket.ajax.AjaxRequestTarget,
-       *      org.apache.wicket.markup.html.form.Form)
-       */
-      @Override
-      protected void onError(final AjaxRequestTarget target, final Form< ? > form)
-      {
-      }
-    };
-    final SingleButtonPanel submitButtonPanel = new SingleButtonPanel(costEditDialog.newButtonChildId(), submitButton, getString(label),
-        SingleButtonPanel.DEFAULT_SUBMIT);
-    costEditDialog.addButton(submitButtonPanel);
-
-    costEditModalWindow.setWindowClosedCallback(new ModalWindow.WindowClosedCallback() {
-      private static final long serialVersionUID = 2633814101880954425L;
-
-      public void onClose(final AjaxRequestTarget target)
-      {
-      }
-
-    });
-    costEditModalWindow.setCloseButtonCallback(new ModalWindow.CloseButtonCallback() {
-      private static final long serialVersionUID = 6761625465164911336L;
-
-      public boolean onCloseButtonClicked(final AjaxRequestTarget target)
-      {
-        return true;
-      }
-    });
-    costEditModalWindow.show(target);
-
+    /**
+     * @see org.projectforge.web.dialog.ModalDialog#handleCloseEvent(org.apache.wicket.ajax.AjaxRequestTarget)
+     */
+    @Override
+    protected void handleCloseEvent(final AjaxRequestTarget target)
+    {
+      // Copy edited values to DO object.
+      final AbstractRechnungsPositionDO srcPosition = rechnungCostEditTablePanel.getPosition();
+      final KostZuweisungenCopyHelper kostZuweisungCopyHelper = new KostZuweisungenCopyHelper();
+      kostZuweisungCopyHelper.mycopy(srcPosition.getKostZuweisungen(), position.getKostZuweisungen(), position);
+      target.add(costTable.refresh().getTable());
+    }
   }
 
   protected abstract void cloneRechnung();
