@@ -126,7 +126,7 @@ public abstract class EventDroppedCallback extends AbstractAjaxCallbackWithClien
       @Override
       public String getObject()
       {
-        return "function(event, dayDelta, minuteDelta, allDay, revertFunc) { " + getCallbackScript() + "}";
+        return "function(event, dayDelta, minuteDelta, allDay, revertFunc, originalEvent) { " + getCallbackScript() + "}";
       }
     };
   }

@@ -1,6 +1,6 @@
 Prio 1 (Johannes):
 ------------------
-- Contextmenu (verschieben von Zeitberichten und rechte Maustaste in Listenansichten)
+- Clean up Calendar Contextmenu Javascript generation
 
 Prio 2 (Johannes):
 ------------------

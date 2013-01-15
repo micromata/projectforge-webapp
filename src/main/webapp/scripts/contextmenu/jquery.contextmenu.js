@@ -46,7 +46,7 @@
 		itemHoverClassName:'context-menu-item-hover',
 		disabledItemClassName:'context-menu-item-disabled',
 		disabledItemHoverClassName:'context-menu-item-disabled-hover',
-		separatorClassName:'context-menu-separator',
+		separatorClassName:'divider',
 		innerDivClassName:'context-menu-item-inner',
 		themePrefix:'context-menu-theme-',
 		theme:'default',
