@@ -57,11 +57,13 @@ public abstract class ModalDialog extends Panel
 
   protected GridBuilder gridBuilder;
 
-  private final WebMarkupContainer mainContainer, gridContentContainer;
+  private final WebMarkupContainer mainContainer, gridContentContainer, buttonBarContainer;
 
   private boolean keyboard;
 
   private String closeButtonLabel;
+
+  private Form< ? > form;
 
   /**
    * List to create action buttons in the desired order before creating the RepeatingView.
@@ -79,6 +81,8 @@ public abstract class ModalDialog extends Panel
     add(mainContainer.setOutputMarkupId(true));
     gridContentContainer = new WebMarkupContainer("gridContent");
     gridContentContainer.setOutputMarkupId(true);
+    buttonBarContainer = new WebMarkupContainer("buttonBar");
+    buttonBarContainer.setOutputMarkupId(true);
   }
 
   /**
@@ -153,8 +157,22 @@ public abstract class ModalDialog extends Panel
     target.appendJavaScript("$('#" + getMainContainerMarkupId() + "').modal('hide');");
   }
 
-  public void addContent(final AjaxRequestTarget target) {
+  /**
+   * Add the content to the AjaxRequestTarget if the content is changed.
+   * @param target
+   */
+  public void addContent(final AjaxRequestTarget target)
+  {
     target.add(gridContentContainer);
+  }
+
+  /**
+   * Add the button bar to the AjaxRequestTarget if the buttons or their visibility are changed.
+   * @param target
+   */
+  public void addButtonBar(final AjaxRequestTarget target)
+  {
+    target.add(buttonBarContainer);
   }
 
   public abstract void init();
@@ -201,8 +219,10 @@ public abstract class ModalDialog extends Panel
   @SuppressWarnings("serial")
   protected void init(final Form< ? > form)
   {
+    this.form = form;
     mainContainer.add(form);
     form.add(gridContentContainer);
+    form.add(buttonBarContainer);
     appendNewAjaxActionButton(new AjaxFormSubmitCallback() {
 
       @Override
@@ -218,7 +238,7 @@ public abstract class ModalDialog extends Panel
         onError(target, form);
       }
     }, closeButtonLabel != null ? closeButtonLabel : getString("close"), SingleButtonPanel.GREY);
-    form.add(actionButtons.getRepeatingView());
+    buttonBarContainer.add(actionButtons.getRepeatingView());
     gridBuilder = new GridBuilder(gridContentContainer, "flowform");
   }
 
@@ -258,38 +278,21 @@ public abstract class ModalDialog extends Panel
     return "form";
   }
 
-  public ModalDialog appendNewAjaxActionButton(final AjaxCallback ajaxCallback, final String label, final Form< ? > form,
-      final String... classnames)
-  {
-    final SingleButtonPanel result = addNewAjaxActionButton(ajaxCallback, label, form, classnames);
-    this.actionButtons.add(result);
-    return this;
-  }
-
-  public ModalDialog prependNewAjaxActionButton(final AjaxCallback ajaxCallback, final String label, final Form< ? > form,
-      final String... classnames)
-  {
-    final SingleButtonPanel result = addNewAjaxActionButton(ajaxCallback, label, form, classnames);
-    this.actionButtons.add(0, result);
-    return this;
-  }
-
   public SingleButtonPanel appendNewAjaxActionButton(final AjaxCallback ajaxCallback, final String label, final String... classnames)
   {
-    final SingleButtonPanel result = addNewAjaxActionButton(ajaxCallback, label, null, classnames);
+    final SingleButtonPanel result = addNewAjaxActionButton(ajaxCallback, label, classnames);
     this.actionButtons.add(result);
     return result;
   }
 
-  public ModalDialog prependNewAjaxActionButton(final AjaxCallback ajaxCallback, final String label, final String... classnames)
+  public SingleButtonPanel prependNewAjaxActionButton(final AjaxCallback ajaxCallback, final String label, final String... classnames)
   {
-    final SingleButtonPanel result = addNewAjaxActionButton(ajaxCallback, label, null, classnames);
+    final SingleButtonPanel result = addNewAjaxActionButton(ajaxCallback, label, classnames);
     this.actionButtons.add(0, result);
-    return this;
+    return result;
   }
 
-  private SingleButtonPanel addNewAjaxActionButton(final AjaxCallback ajaxCallback, final String label, final Form< ? > form,
-      final String... classnames)
+  private SingleButtonPanel addNewAjaxActionButton(final AjaxCallback ajaxCallback, final String label, final String... classnames)
   {
     final AjaxButton button = new AjaxButton("button", form) {
       private static final long serialVersionUID = -5306532706450731336L;
