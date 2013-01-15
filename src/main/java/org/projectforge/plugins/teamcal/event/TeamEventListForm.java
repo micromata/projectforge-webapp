@@ -34,6 +34,7 @@ import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.ResourceModel;
 import org.projectforge.plugins.teamcal.admin.TeamCalCache;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalsComparator;
@@ -166,7 +167,7 @@ public class TeamEventListForm extends AbstractListForm<TeamEventFilter, TeamEve
           };
         };
         unselectPeriod.setDefaultFormProcessing(false);
-        optionsFieldsetPanel.add(new IconLinkPanel(optionsFieldsetPanel.newChildId(), IconType.REMOVE, getString("calendar.tooltip.unselectPeriod"), unselectPeriod));
+        optionsFieldsetPanel.add(new IconLinkPanel(optionsFieldsetPanel.newChildId(), IconType.REMOVE, new ResourceModel("calendar.tooltip.unselectPeriod"), unselectPeriod));
       }
       final QuickSelectPanel quickSelectPanel = new QuickSelectPanel(optionsFieldsetPanel.newChildId(), parentPage, "quickSelect", startDate);
       optionsFieldsetPanel.add(quickSelectPanel);

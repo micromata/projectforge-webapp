@@ -23,71 +23,49 @@
 
 package org.projectforge.plugins.teamcal.dialog;
 
-import org.apache.wicket.Component;
+import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextArea;
-import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFeedHook;
-import org.projectforge.web.dialog.PFDialog;
+import org.projectforge.web.dialog.ModalDialog;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
  * 
  */
-public class ICSExportDialog extends PFDialog
+public class ICSExportDialog extends ModalDialog
 {
   private static final long serialVersionUID = -3840971062603541903L;
-
-  private final TeamCalDO teamCal;
 
   /**
    * @param id
    * @param titleModel
    */
-  public ICSExportDialog(final String id, final IModel<String> titleModel, final TeamCalDO teamCal)
+  public ICSExportDialog(final String id, final IModel<String> titleModel)
   {
-    super(id, titleModel);
-    this.teamCal = teamCal;
+    super(id);
+    setTitle(titleModel);
+    setBigWindow();
   }
 
-  /**
-   * @see org.projectforge.web.dialog.PFDialog#getDialogContent(java.lang.String)
-   */
-  @Override
-  protected Component getDialogContent(final String wicketId)
-  {
-    return new Content(wicketId);
-  }
-
-  private class Content extends Panel
-  {
-    private static final long serialVersionUID = 5506421088716142887L;
-
-    /**
-     * @param id
-     */
-    public Content(final String id)
+  public void redraw(final TeamCalDO teamCal) {
+    clearContent();
     {
-      super(id);
-      // final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, iCalTarget);
-      // IconLinkPanel link = new IconLinkPanel(mainContainer.newChildId(), IconType.SUBSCRIPTION, iCalExportLink);
-      // mainContainer.add(link);
-    }
-
-    /**
-     * @see org.apache.wicket.Component#onInitialize()
-     */
-    @Override
-    protected void onInitialize()
-    {
-      super.onInitialize();
-
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("calendar.abonnement.url")).setLabelSide(false);
       final String iCalTarget = TeamCalCalendarFeedHook.getUrl(teamCal.getId());
       final String url = WicketUtils.getAbsoluteContextPath() + iCalTarget;
-      add(new TextArea<String>("url", Model.of(url)));
+      fs.add(new TextArea<String>(fs.getTextAreaId(), Model.of(url)));
     }
+  }
+
+  @Override
+  public void init()
+  {
+    init(new Form<String>(getFormId()));
+    gridBuilder.newFormHeading("invisible");
   }
 }

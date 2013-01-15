@@ -34,6 +34,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.model.IModel;
 import org.projectforge.web.core.NavTopPanel;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
@@ -134,15 +135,6 @@ public abstract class ModalDialog extends Panel
     return mainContainer.getMarkupId(true);
   }
 
-  /**
-   * The content where the GridBuilder puts its content.
-   * @return the gridContentContainer
-   */
-  public WebMarkupContainer getGridContentContainer()
-  {
-    return gridContentContainer;
-  }
-
   @Override
   public void renderHead(final IHeaderResponse response)
   {
@@ -151,14 +143,18 @@ public abstract class ModalDialog extends Panel
     response.render(OnDomReadyHeaderItem.forScript(script));
   }
 
-  public void open(AjaxRequestTarget target)
+  public void open(final AjaxRequestTarget target)
   {
     target.appendJavaScript("$('#" + getMainContainerMarkupId() + "').modal('show');");
   }
 
-  public void close(AjaxRequestTarget target)
+  public void close(final AjaxRequestTarget target)
   {
     target.appendJavaScript("$('#" + getMainContainerMarkupId() + "').modal('hide');");
+  }
+
+  public void addContent(final AjaxRequestTarget target) {
+    target.add(gridContentContainer);
   }
 
   public abstract void init();
@@ -168,6 +164,16 @@ public abstract class ModalDialog extends Panel
    * @return this for chaining.
    */
   public ModalDialog setTitle(final String title)
+  {
+    mainContainer.add(new Label("title", title));
+    return this;
+  }
+
+  /**
+   * @param title
+   * @return this for chaining.
+   */
+  public ModalDialog setTitle(final IModel<String> title)
   {
     mainContainer.add(new Label("title", title));
     return this;
