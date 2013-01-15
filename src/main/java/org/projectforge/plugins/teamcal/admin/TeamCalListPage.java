@@ -168,7 +168,7 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
                 icsExportDialog.addContent(target);
                 icsExportDialog.open(target);
               };
-            });// teamCal, getCssStyle(teamCal.getId(), teamCal.isDeleted()).toString()));
+            });
           }
         }
       });
