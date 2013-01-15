@@ -601,7 +601,7 @@ extends AbstractEditForm<O, P>
                 @Override
                 protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
                 {
-                  costEditModalDialog.close(target);
+                  costEditModalDialog.open(target);
                   // Redraw the content:
                   costEditModalDialog.redraw(position, costTable);
                   // The content was changed:
