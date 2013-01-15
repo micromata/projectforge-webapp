@@ -96,8 +96,6 @@ extends AbstractEditForm<O, P>
 
   private static final Component[] COMPONENT_ARRAY = new Component[0];
 
-  private static final String COST_EDIT_DIALOG_ID = "editCostDialog";
-
   protected RepeatingView positionsRepeater;
 
   protected SingleButtonPanel cloneButtonPanel;
@@ -340,8 +338,6 @@ extends AbstractEditForm<O, P>
     positionsRepeater = gridBuilder.newRepeatingView();
     if (costConfigured == true) {
       addCostEditModalDialog();
-    } else {
-      add(new WebMarkupContainer(COST_EDIT_DIALOG_ID).setVisible(false));
     }
     refresh();
     if (getBaseDao().hasInsertAccess(getUser()) == true) {
@@ -605,7 +601,7 @@ extends AbstractEditForm<O, P>
                   // Redraw the content:
                   costEditModalDialog.redraw(position, costTable);
                   // The content was changed:
-                  target.add(costEditModalDialog.getGridContentContainer());
+                  costEditModalDialog.addContent(target);
                 }
 
                 @Override
@@ -657,7 +653,7 @@ extends AbstractEditForm<O, P>
     costEditModalDialog = new CostEditModalDialog();
     final String title = (isNew() == true) ? "create" : "update";
     costEditModalDialog.setCloseButtonLabel(getString(title)).wantsNotificationOnClose().setOutputMarkupId(true);
-    add(costEditModalDialog);
+    parentPage.add(costEditModalDialog);
     costEditModalDialog.init();
   }
 
@@ -673,7 +669,7 @@ extends AbstractEditForm<O, P>
 
     CostEditModalDialog()
     {
-      super(COST_EDIT_DIALOG_ID);
+      super(parentPage.newModalDialogId());
     }
 
     @Override
