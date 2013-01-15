@@ -11,6 +11,6 @@ $(function() {
 	};
 	var menu1 = [ {'${newTab}': function(menuItem,menu) { newTabFunction(this) } },
 	              $.contextMenu.separator,
-	              {'${cancel}': function(menuItem,menu) { /* nothing to do here */ } } ];
+	              {'${cancel}': function(menuItem,menu) { menu.hide(); } } ];
 	$('.withContextMenu').contextMenu(menu1); 
 });
