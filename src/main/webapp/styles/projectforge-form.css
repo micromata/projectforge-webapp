@@ -114,7 +114,7 @@ div.controls input,div.controls textarea {
 	width: 100%;
 }
 
-input[type='checkbox'],input[type='radio'] {
+div.controls input[type='checkbox'],input[type='radio'] {
 	width: 1px !important;
 	/* Otherwise it's 100% and horizontal scrollbars occurs. */
 }
