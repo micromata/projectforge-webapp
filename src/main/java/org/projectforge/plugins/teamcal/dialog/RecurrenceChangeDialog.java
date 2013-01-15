@@ -25,11 +25,9 @@ package org.projectforge.plugins.teamcal.dialog;
 
 import java.sql.Timestamp;
 
-import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.plugins.teamcal.event.TeamEvent;
@@ -37,7 +35,7 @@ import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDao;
 import org.projectforge.plugins.teamcal.event.TeamEventEditPage;
 import org.projectforge.plugins.teamcal.event.TeamRecurrenceEvent;
-import org.projectforge.web.dialog.PFDialog;
+import org.projectforge.web.dialog.ModalDialog;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 
 import de.micromata.wicket.ajax.AjaxCallback;
@@ -50,7 +48,7 @@ import de.micromata.wicket.ajax.AjaxCallback;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class RecurrenceChangeDialog extends PFDialog
+public class RecurrenceChangeDialog extends ModalDialog
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(RecurrenceChangeDialog.class);
 
@@ -71,27 +69,18 @@ public class RecurrenceChangeDialog extends PFDialog
    */
   public RecurrenceChangeDialog(final String id, final IModel<String> titleModel)
   {
-    super(id, titleModel);
+    super(id);
+    setTitle(titleModel);
   }
 
-  /**
-   * @see org.projectforge.web.dialog.PFDialog#onInitialize()
-   */
   @Override
-  protected void onInitialize()
+  public void init()
   {
-    super.onInitialize();
-    // add future only change callback
-    final AjaxCallback cancelCallback = new AjaxCallback() {
-      private static final long serialVersionUID = 7852511931690947544L;
+    final Form<Void> form = new Form<Void>(getFormId());
+    init(form);
+    gridBuilder.newFormHeading(getString("plugins.teamcal.event.recurrence.change.content"));
 
-      @Override
-      public void callback(final AjaxRequestTarget target)
-      {
-        close(target);
-      }
-    };
-    appendNewAjaxActionButton(cancelCallback, getString("cancel"), SingleButtonPanel.CANCEL);
+    setCloseButtonLabel(getString("cancel"));
     // add all change callback
     final AjaxCallback allCallback = new AjaxCallback() {
       private static final long serialVersionUID = 7852511931690947544L;
@@ -127,15 +116,15 @@ public class RecurrenceChangeDialog extends PFDialog
       }
     };
     appendNewAjaxActionButton(singleCallback, getString("plugins.teamcal.event.recurrence.change.single"));
+
   }
 
   /**
-   * @see org.projectforge.web.dialog.PFDialog#getDialogContent(java.lang.String)
+   * @see org.projectforge.web.dialog.ModalDialog#handleCloseEvent(org.apache.wicket.ajax.AjaxRequestTarget)
    */
   @Override
-  protected Component getDialogContent(final String wicketId)
+  protected void handleCloseEvent(final AjaxRequestTarget target)
   {
-    return new Label(wicketId, new ResourceModel("plugins.teamcal.event.recurrence.change.content"));
   }
 
   /**
@@ -159,7 +148,7 @@ public class RecurrenceChangeDialog extends PFDialog
     } else {
       allFutureEventsButtonPanel.getButton().setVisible(true);
     }
-    target.add(getButtonForm());
+    addButtonBar(target);
     super.open(target);
   }
 

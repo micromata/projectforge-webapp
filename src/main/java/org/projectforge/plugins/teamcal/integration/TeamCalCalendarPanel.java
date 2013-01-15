@@ -61,6 +61,7 @@ import org.projectforge.web.calendar.CalendarPanel;
 import org.projectforge.web.calendar.MyFullCalendarConfig;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredBasePage;
+import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.WicketRenderHeadUtils;
 import org.projectforge.web.wicket.components.JodaDatePanel;
 
@@ -111,9 +112,11 @@ public class TeamCalCalendarPanel extends CalendarPanel
   protected void onInitialize()
   {
     super.onInitialize();
-    recurrenceChangeDialog = new RecurrenceChangeDialog("recurrenceChangeDialog", new ResourceModel(
+    final AbstractSecuredPage parentPage = (AbstractSecuredPage) getPage();
+    recurrenceChangeDialog = new RecurrenceChangeDialog(parentPage.newModalDialogId(), new ResourceModel(
         "plugins.teamcal.event.recurrence.change.title"));
-    add(recurrenceChangeDialog);
+    parentPage.add(recurrenceChangeDialog);
+    recurrenceChangeDialog.init();
   }
 
   /**
