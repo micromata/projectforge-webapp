@@ -139,7 +139,6 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
   @Override
 	public void renderHead(IHeaderResponse response) {
     super.renderHead(response);
-    System.out.println(this.getMarkupId());
     response.render(OnDomReadyHeaderItem.forScript("$('#" + this.getMarkupId() + "').data('callback', '" + deleteBehavior.getCallbackUrl() + "');"));
   }
 
