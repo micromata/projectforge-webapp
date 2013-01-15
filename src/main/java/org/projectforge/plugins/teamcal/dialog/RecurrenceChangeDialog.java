@@ -128,7 +128,7 @@ public class RecurrenceChangeDialog extends ModalDialog
   }
 
   /**
-   * @see org.projectforge.web.dialog.PFDialog#open(org.apache.wicket.ajax.AjaxRequestTarget)
+   * @see org.projectforge.web.dialog.ModalDialog#open(org.apache.wicket.ajax.AjaxRequestTarget)
    */
   @Override
   public void open(final AjaxRequestTarget target)
