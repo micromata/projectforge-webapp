@@ -29,6 +29,7 @@ package org.projectforge.web.wicket.flowlayout;
  */
 public enum IconType
 {
+  ABONNEMENT("globe"), //
   ALERT("warning-sign"), //
   REFRESH("refresh"), //
   //CIRCLE_ARROW_EAST("question-sign"), //
@@ -51,7 +52,6 @@ public enum IconType
   REMOVE("remove"), //
   SEARCH("search"), // //
   /** RSS feed symbol. */
-  SUBSCRIPTION("globe"), //
   TRASH("trash"), //
   CALENDAR("calendar"), //
   WRENCH("wrench"), //
