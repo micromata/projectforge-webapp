@@ -439,17 +439,11 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
         {
           final WebMarkupContainer dropDownMenu = new WebMarkupContainer("dropDownMenu");
           addColumn(item, dropDownMenu, "white-space: nowrap; width: 32px;");
-          final WebMarkupContainer parentLi = new WebMarkupContainer("parentLi");
-          dropDownMenu.add(parentLi);
-          final String id = "m" + ganttObject.getId();
-          parentLi.add(AttributeModifier.replace("onmouseover", "mopen('" + id + "')"));
-          parentLi.add(new PresizedImage("cogImage", getResponse(), WebConstants.IMAGE_COG));
-          parentLi.add(new PresizedImage("arrowDownImage", getResponse(), WebConstants.IMAGE_ARROW_DOWN));
+          dropDownMenu.add(new PresizedImage("cogImage", getResponse(), WebConstants.IMAGE_COG));
+          dropDownMenu.add(new PresizedImage("arrowDownImage", getResponse(), WebConstants.IMAGE_ARROW_DOWN));
           final WebMarkupContainer ul = new WebMarkupContainer("ul");
-          ul.add(AttributeModifier.replace("id", id));
-          parentLi.add(ul);
           final RepeatingView menuRepeater = new RepeatingView("menuEntriesRepeater");
-          ul.add(menuRepeater);
+          dropDownMenu.add(menuRepeater);
           menuRepeater.add(new ContextMenuEntry(menuRepeater.newChildId(), "mark") {
             @Override
             void onSubmit()

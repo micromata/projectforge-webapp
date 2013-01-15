@@ -33,13 +33,13 @@
             <td wicket:id="tree" style="font-size: 80%;">[Browse tree functionality]</td>
             <!-- td wicket:id="actionIcons"><span wicket:id="copy">[copy]</span><span wicket:id="editLink">[edit]</span></td-->
             <td wicket:id="dropDownMenu">
-              <ul class="dropdown-menu">
-                <li wicket:id="parentLi" onmouseover="mopen('m1')" onmouseout="mclosetime()"><img src="images/cog.png" wicket:id="cogImage" /><img
-                  src="images/arrow-down.png" wicket:id="arrowDownImage" />
-                  <ul wicket:id="ul" id="m1" onmouseover="mcancelclosetime()">
-                    <li wicket:id="menuEntriesRepeater"><a wicket:id="menuEntry"><span wicket:id="label">[copy]</span></a></li>
-                  </ul></li>
-              </ul>
+              <div class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#"><img src="images/cog.png" wicket:id="cogImage" /><img
+                  src="images/arrow-down.png" wicket:id="arrowDownImage" /></a>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                  <li wicket:id="menuEntriesRepeater"><a wicket:id="menuEntry"><span wicket:id="label">[copy]</span></a></li>
+                </ul>
+              </div>
             </td>
             <td><input type="checkbox" wicket:id="visible" /></td>
             <td><span wicket:id="title" /></td>
