@@ -168,7 +168,7 @@ public class TeamCalCalendarForm extends CalendarForm
   @Override
   protected String setIcsImportButtonTooltip()
   {
-    return "plugins.teamcal.subscribe.teamcalendar";
+    return "plugins.teamcal.abonnement.timesheets";
   }
 
   @Override
