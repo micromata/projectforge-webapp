@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.ProjektDao;
@@ -99,7 +100,7 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
           .withSelectPeriodMode(true).withRequired(true));
       fs.add(stopDate);
       {
-        fs.add(new IconLinkPanel(fs.newChildId(), IconType.REMOVE, getString("calendar.tooltip.unselectPeriod"), new SubmitLink(
+        fs.add(new IconLinkPanel(fs.newChildId(), IconType.REMOVE, new ResourceModel("calendar.tooltip.unselectPeriod"), new SubmitLink(
             IconLinkPanel.LINK_ID) {
           @Override
           public void onSubmit()
