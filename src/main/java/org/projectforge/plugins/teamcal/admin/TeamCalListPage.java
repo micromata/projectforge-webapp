@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
@@ -36,9 +37,10 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.web.WebConfiguration;
+import org.projectforge.plugins.teamcal.dialog.ICSExportDialog;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
@@ -46,6 +48,8 @@ import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
@@ -58,6 +62,8 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
 
   @SpringBean(name = "teamCalDao")
   private TeamCalDao teamCalDao;
+
+  private ICSExportDialog icsExportDialog;
 
   /**
    * 
@@ -144,7 +150,7 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
     if (isCalledBySearchPage() == false) {
       // Don't call by search page, because there is no form to show the popup-dialog.
       // ics export buttons
-      columns.add(new AbstractColumn<TeamCalDO, String>(new Model<String>(getString("plugins.teamcal.subscribe.column"))) {
+      columns.add(new AbstractColumn<TeamCalDO, String>(new Model<String>(getString("plugins.teamcal.abonnement"))) {
         /**
          * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
          *      java.lang.String, org.apache.wicket.model.IModel)
@@ -152,9 +158,17 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
         @Override
         public void populateItem(final Item<ICellPopulator<TeamCalDO>> item, final String componentId, final IModel<TeamCalDO> rowModel)
         {
-          if (accessChecker.isRestrictedUser() == false && WebConfiguration.isDevelopmentMode() == true) {
+          if (accessChecker.isRestrictedUser() == false) {
             final TeamCalDO teamCal = rowModel.getObject();
-            item.add(new TeamCalendarIcsExportLink(componentId, teamCal, getCssStyle(teamCal.getId(), teamCal.isDeleted()).toString()));
+            item.add(new AjaxIconLinkPanel(componentId, IconType.ABONNEMENT, new ResourceModel("plugins.teamcal.abonnement.tooltip")) {
+              @Override
+              public void onClick(final AjaxRequestTarget target)
+              {
+                icsExportDialog.redraw(teamCal);
+                icsExportDialog.addContent(target);
+                icsExportDialog.open(target);
+              };
+            });// teamCal, getCssStyle(teamCal.getId(), teamCal.isDeleted()).toString()));
           }
         }
       });
@@ -203,5 +217,8 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
   {
     dataTable = createDataTable(createColumns(this, true), "lastUpdate", SortOrder.DESCENDING);
     form.add(dataTable);
+    icsExportDialog = new ICSExportDialog(newModalDialogId(), new ResourceModel("plugins.teamcal.download"));
+    add(icsExportDialog);
+    icsExportDialog.init();
   }
 }
