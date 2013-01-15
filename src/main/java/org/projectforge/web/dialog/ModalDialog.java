@@ -163,9 +163,14 @@ public abstract class ModalDialog extends Panel
 
   public abstract void init();
 
-  public void setTitle(final String title)
+  /**
+   * @param title
+   * @return this for chaining.
+   */
+  public ModalDialog setTitle(final String title)
   {
     mainContainer.add(new Label("title", title));
+    return this;
   }
 
   /**
