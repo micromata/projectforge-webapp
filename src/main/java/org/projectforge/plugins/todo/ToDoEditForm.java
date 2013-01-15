@@ -282,7 +282,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
           getData().setComment(commentTextArea.getConvertedInput());
           closeToDoDialogCommentTextArea.modelChanged();
           target.add(closeToDoDialogCommentTextArea);
-          target.appendJavaScript(closeToDoDialog.getOpenJavaScript());
+          closeToDoDialog.open(target);
           // Focus doesn't yet work:
           // + "$('#"
           // + closeToDoDialog.getMainContainerMarkupId()

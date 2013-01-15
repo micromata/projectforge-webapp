@@ -61,8 +61,6 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
   /**
    * @param id
    * @param model
-   * @param type
-   * @param settings
    */
   protected PFAutoCompleteTextField(final String id, final IModel<T> model)
   {
@@ -122,16 +120,6 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
     deleteBehavior = new AbstractDefaultAjaxBehavior() {
       private static final long serialVersionUID = 3014042180471042845L;
 
-      /**
-       * @see org.apache.wicket.ajax.AbstractDefaultAjaxBehavior#renderHead(org.apache.wicket.Component, org.apache.wicket.markup.html.IHeaderResponse)
-       */
-      @Override
-      public void renderHead(final Component component, final IHeaderResponse response)
-      {
-        super.renderHead(component, response);
-        response.render(OnDomReadyHeaderItem.forScript("$('#"+component.getMarkupId()+"').data('callback', '" + deleteBehavior.getCallbackUrl() + "');"));
-      }
-
       @Override
       protected void respond(final AjaxRequestTarget target)
       {
@@ -146,6 +134,13 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
       }
     };
     add(deleteBehavior);
+  }
+
+  @Override
+	public void renderHead(IHeaderResponse response) {
+    super.renderHead(response);
+    System.out.println(this.getMarkupId());
+    response.render(OnDomReadyHeaderItem.forScript("$('#" + this.getMarkupId() + "').data('callback', '" + deleteBehavior.getCallbackUrl() + "');"));
   }
 
   @SuppressWarnings("serial")
@@ -355,7 +350,6 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
 
   /**
    * Fluent.
-   * @see PFAutoCompleteSettings#withScrollHeight(boolean)
    */
   public PFAutoCompleteTextField<T> withScrollHeight(final int scrollHeight)
   {
@@ -405,7 +399,6 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
 
   /**
    * Fluent.
-   * @see PFAutoCompleteSettings#withDeletableItem(boolean)
    */
   public PFAutoCompleteTextField<T> withDeletableItem(final boolean deletableItem)
   {

@@ -136,7 +136,7 @@ public class NavTopPanel extends NavAbstractPanel
         @Override
         public void onClick(final AjaxRequestTarget target)
         {
-          target.appendJavaScript(bookmarkDialog.getOpenJavaScript());
+          bookmarkDialog.open(target);
           // Redraw the content:
           bookmarkDialog.redraw();
           // The content was changed:

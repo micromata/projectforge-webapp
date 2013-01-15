@@ -57,7 +57,7 @@ public class ScriptEditPage extends AbstractEditPage<ScriptDO, ScriptEditForm, S
         @Override
         public void onClick(final AjaxRequestTarget target)
         {
-          target.appendJavaScript(form.showBackupScriptDialog.getOpenJavaScript());
+          form.showBackupScriptDialog.open(target);
         }
       };
       final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), showBackupScriptButton,

@@ -151,14 +151,14 @@ public abstract class ModalDialog extends Panel
     response.render(OnDomReadyHeaderItem.forScript(script));
   }
 
-  public String getOpenJavaScript()
+  public void open(AjaxRequestTarget target)
   {
-    return "$('#" + getMainContainerMarkupId() + "').modal('show');";
+    target.appendJavaScript("$('#" + getMainContainerMarkupId() + "').modal('show');");
   }
 
-  public String getCloseJavaScript()
+  public void close(AjaxRequestTarget target)
   {
-    return "$('#" + getMainContainerMarkupId() + "').modal('hide');";
+    target.appendJavaScript("$('#" + getMainContainerMarkupId() + "').modal('hide');");
   }
 
   public abstract void init();
@@ -203,7 +203,7 @@ public abstract class ModalDialog extends Panel
       public void callback(final AjaxRequestTarget target)
       {
         onCloseButtonSubmit(target);
-        target.appendJavaScript(getCloseJavaScript());
+        close(target);
       }
 
       @Override

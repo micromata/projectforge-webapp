@@ -405,8 +405,6 @@ extends AbstractEditForm<O, P>
         }
 
         /**
-         * @see org.projectforge.web.wicket.flowlayout.ToggleContainerPanel#onToggleStatusChanged(org.apache.wicket.ajax.AjaxRequestTarget,
-         *      boolean)
          */
         @Override
         protected void onToggleStatusChanged(final AjaxRequestTarget target, final ToggleStatus toggleStatus)
@@ -603,7 +601,7 @@ extends AbstractEditForm<O, P>
                 @Override
                 protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
                 {
-                  target.appendJavaScript(costEditModalDialog.getOpenJavaScript());
+                  costEditModalDialog.close(target);
                   // Redraw the content:
                   costEditModalDialog.redraw(position, costTable);
                   // The content was changed:

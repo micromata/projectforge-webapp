@@ -441,7 +441,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
       @Override
       protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
       {
-        target.appendJavaScript(recentSheetsModalDialog.getOpenJavaScript());
+        recentSheetsModalDialog.open(target);
       }
 
       @Override
