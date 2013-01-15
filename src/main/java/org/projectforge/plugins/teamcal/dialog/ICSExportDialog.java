@@ -23,6 +23,7 @@
 
 package org.projectforge.plugins.teamcal.dialog;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.model.IModel;
@@ -52,13 +53,16 @@ public class ICSExportDialog extends ModalDialog
     setBigWindow();
   }
 
-  public void redraw(final TeamCalDO teamCal) {
+  public void redraw(final TeamCalDO teamCal)
+  {
     clearContent();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("calendar.abonnement.url")).setLabelSide(false);
       final String iCalTarget = TeamCalCalendarFeedHook.getUrl(teamCal.getId());
       final String url = WicketUtils.getAbsoluteContextPath() + iCalTarget;
-      fs.add(new TextArea<String>(fs.getTextAreaId(), Model.of(url)));
+      final TextArea<String> textArea = new TextArea<String>(fs.getTextAreaId(), Model.of(url));
+      fs.add(textArea);
+      textArea.add(AttributeModifier.replace("onClick", "$(this).select();"));
     }
   }
 
