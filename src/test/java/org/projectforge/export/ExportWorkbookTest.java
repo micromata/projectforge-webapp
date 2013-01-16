@@ -49,6 +49,7 @@ public class ExportWorkbookTest
   {
     // Needed if this tests runs before the ConfigurationTest.
     ConfigXmlTest.createTestConfiguration();
+    TestConfiguration.initAsTestConfiguration();
   }
 
   @Test
