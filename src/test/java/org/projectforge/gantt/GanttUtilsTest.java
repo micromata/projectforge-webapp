@@ -24,8 +24,8 @@
 package org.projectforge.gantt;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
@@ -36,6 +36,7 @@ import org.junit.Test;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.common.DateHelper;
 import org.projectforge.core.ConfigXmlTest;
+import org.projectforge.test.TestConfiguration;
 
 public class GanttUtilsTest
 {
@@ -50,6 +51,7 @@ public class GanttUtilsTest
   {
     // Needed if this tests runs before the ConfigurationTest.
     ConfigXmlTest.createTestConfiguration();
+    TestConfiguration.initAsTestConfiguration();
   }
 
   @Test
@@ -128,7 +130,7 @@ public class GanttUtilsTest
     a2.setRelationType(GanttRelationType.START_FINISH).setDuration(null).setPredecessorOffset(4);
     assertDates("End date is calculated from predecessor.", "2010-09-02", "2010-09-07", a2);
     a2.setDuration(TWO);
-   // assertDates("End date is calculated from predecessor and duration is fixed.", "2010-09-03", "2010-09-07", a2);
+    // assertDates("End date is calculated from predecessor and duration is fixed.", "2010-09-03", "2010-09-07", a2);
 
   }
 
@@ -149,7 +151,7 @@ public class GanttUtilsTest
   @Test
   public void compareTo()
   {
-    GanttTaskImpl a1 = new GanttTaskImpl(1).setTitle("B");
+    final GanttTaskImpl a1 = new GanttTaskImpl(1).setTitle("B");
     assertEquals(0, GanttUtils.GANTT_OBJECT_COMPARATOR.compare(a1, a1));
     GanttTaskImpl a2 = new GanttTaskImpl(1).setTitle("A");
     assertEquals(0, GanttUtils.GANTT_OBJECT_COMPARATOR.compare(a1, a1)); // Same id
