@@ -43,17 +43,17 @@ public class XmlDumpTest extends TestBase
 
   private XmlDump xmlDump;
 
-  public void setInitDatabaseDao(InitDatabaseDao initDatabaseDao)
+  public void setInitDatabaseDao(final InitDatabaseDao initDatabaseDao)
   {
     this.initDatabaseDao = initDatabaseDao;
   }
 
-  public void setUserGroupCache(UserGroupCache userGroupCache)
+  public void setUserGroupCache(final UserGroupCache userGroupCache)
   {
     this.userGroupCache = userGroupCache;
   }
 
-  public void setXmlDump(XmlDump xmlDump)
+  public void setXmlDump(final XmlDump xmlDump)
   {
     this.xmlDump = xmlDump;
   }
@@ -61,6 +61,7 @@ public class XmlDumpTest extends TestBase
   @BeforeClass
   public static void setUp() throws Exception
   {
+    preInit();
     init(false);
   }
 
