@@ -48,6 +48,8 @@ public class EventDroppedCallbackScriptGenerator
 
   private static final String CANCEL = CalendarDropMode.CANCEL.getI18nKey();
 
+  private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+
   private static final PackageTextTemplate JS_TEMPLATE = new PackageTextTemplate(EventDroppedCallbackScriptGenerator.class, "EventDroppedCallbackScriptGenerator.js.template");
 
   /**
@@ -82,6 +84,6 @@ public class EventDroppedCallbackScriptGenerator
    * @return
    */
   public static String getEventDroppedJavascript(Component component, String url, String script, String urlTail) {
-    return JS_TEMPLATE.asString(buildMap(component, script.replace(urlTail, url + "&which=\"+which+\""))).replace("\n", "").replace("  ", " ");
+    return JS_TEMPLATE.asString(buildMap(component, script.replace(urlTail, url + "&which=\"+which+\""))).replace(LINE_SEPARATOR, "").replace("  ", " ");
   }
 }
