@@ -52,6 +52,7 @@ public class GanttChartXLabelBarRendererTest
   {
     // Needed if this tests runs before the ConfigurationTest.
     ConfigXmlTest.createTestConfiguration();
+    TestConfiguration.initAsTestConfiguration();
   }
 
   @Test
@@ -78,9 +79,9 @@ public class GanttChartXLabelBarRendererTest
       final FileOutputStream out = new FileOutputStream(file);
       out.write(ba);
       out.close();
-    } catch (FileNotFoundException ex) {
+    } catch (final FileNotFoundException ex) {
       log.fatal("Exception encountered " + ex, ex);
-    } catch (IOException ex) {
+    } catch (final IOException ex) {
       log.fatal("Exception encountered " + ex, ex);
     }
   }
