@@ -34,6 +34,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectforge.access.AccessException;
 import org.projectforge.test.TestBase;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 
@@ -45,12 +46,12 @@ public class InitDatabaseDaoTest extends TestBase
 
   private UserGroupCache userGroupCache;
 
-  public void setInitDatabaseDao(InitDatabaseDao initDatabaseDao)
+  public void setInitDatabaseDao(final InitDatabaseDao initDatabaseDao)
   {
     this.initDatabaseDao = initDatabaseDao;
   }
 
-  public void setUserGroupCache(UserGroupCache userGroupCache)
+  public void setUserGroupCache(final UserGroupCache userGroupCache)
   {
     this.userGroupCache = userGroupCache;
   }
@@ -58,6 +59,7 @@ public class InitDatabaseDaoTest extends TestBase
   @BeforeClass
   public static void setUp() throws Exception
   {
+    preInit();
     init(false);
   }
 
@@ -67,11 +69,14 @@ public class InitDatabaseDaoTest extends TestBase
     final String encryptedPassword = userDao.encryptPassword(DEFAULT_ADMIN_PASSWORD);
     userGroupCache.setExpired(); // Force reload (because it's may be expired due to previous tests).
     assertTrue(initDatabaseDao.isEmpty());
+    final PFUserDO admin = new PFUserDO();
+    admin.setId(1);
+    PFUserContext.setUser(admin);
     initDatabaseDao.initializeEmptyDatabase(InitDatabaseDao.DEFAULT_ADMIN_USER, encryptedPassword, null);
-    PFUserDO user = userDao.authenticateUser(InitDatabaseDao.DEFAULT_ADMIN_USER, encryptedPassword);
+    final PFUserDO user = userDao.authenticateUser(InitDatabaseDao.DEFAULT_ADMIN_USER, encryptedPassword);
     assertNotNull(user);
     assertEquals(InitDatabaseDao.DEFAULT_ADMIN_USER, user.getUsername());
-    Collection<Integer> col = userGroupCache.getUserGroups(user);
+    final Collection<Integer> col = userGroupCache.getUserGroups(user);
     assertEquals(4, col.size());
     assertTrue(userGroupCache.isUserMemberOfAdminGroup(user.getId()));
     assertTrue(userGroupCache.isUserMemberOfFinanceGroup(user.getId()));
@@ -80,7 +85,7 @@ public class InitDatabaseDaoTest extends TestBase
     try {
       initDatabaseDao.initializeEmptyDatabase(InitDatabaseDao.DEFAULT_ADMIN_USER, encryptedPassword, null);
       fail("AccessException expected.");
-    } catch (AccessException ex) {
+    } catch (final AccessException ex) {
       exception = true;
       // Everything fine.
     }
@@ -90,7 +95,7 @@ public class InitDatabaseDaoTest extends TestBase
     try {
       initDatabaseDao.initializeEmptyDatabaseWithTestData(InitDatabaseDao.DEFAULT_ADMIN_USER, encryptedPassword, null);
       fail("AccessException expected.");
-    } catch (AccessException ex) {
+    } catch (final AccessException ex) {
       exception = true;
       // Everything fine.
     }
