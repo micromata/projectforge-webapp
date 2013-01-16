@@ -36,17 +36,18 @@ import org.projectforge.test.TestBase;
 public class TaskTreeTableTest extends TestBase
 {
   private static final Logger log = Logger.getLogger(TaskTreeTableTest.class);
-  
+
   private TaskDao taskDao;
-  
-  public void setTaskDao(TaskDao taskDao)
+
+  public void setTaskDao(final TaskDao taskDao)
   {
     this.taskDao = taskDao;
   }
-  
+
   @Test
   public void testTreeTable()
   {
+    logon(TEST_ADMIN_USER);
     initTestDB.addTask("TreeTable1", "root");
     initTestDB.addTask("TreeTable1.1", "TreeTable1");
     initTestDB.addTask("TreeTable1.1.1", "TreeTable1.1");
@@ -58,12 +59,12 @@ public class TaskTreeTableTest extends TestBase
     initTestDB.createGroupTaskAccess(getGroup("TreeTableTest"), getTask("TreeTable1"), AccessType.TASKS, true, true, true, true);
     initTestDB.createGroupTaskAccess(getGroup("TreeTableTest"), getTask("TreeTable2"), AccessType.TASKS, true, true, true, true);
     logon("TreeTableTest");
-    TaskTreeTable treeTable = new TaskTreeTable(taskDao.getTaskTree());
-    TaskFilter filter = new TaskFilter();
+    final TaskTreeTable treeTable = new TaskTreeTable(taskDao.getTaskTree());
+    final TaskFilter filter = new TaskFilter();
     filter.setOpened(true);
     filter.setNotOpened(true);
-    List<TaskTreeTableNode> nodes = treeTable.getNodeList(filter);
-    for (TaskTreeTableNode node : nodes) {
+    final List<TaskTreeTableNode> nodes = treeTable.getNodeList(filter);
+    for (final TaskTreeTableNode node : nodes) {
       log.debug(node);
     }
     /*assertEquals(2, nodes.size());
