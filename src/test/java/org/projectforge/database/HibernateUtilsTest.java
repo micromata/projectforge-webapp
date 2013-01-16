@@ -53,6 +53,7 @@ public class HibernateUtilsTest extends TestBase
   @BeforeClass
   public static void setUp() throws Exception
   {
+    preInit();
     init(false);
   }
 }
