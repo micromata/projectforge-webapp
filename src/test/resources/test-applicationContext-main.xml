@@ -27,7 +27,7 @@
       </props>
     </property>
     <property name="maxActive">
-      <value>5</value>
+      <value>100</value>
     </property>
     <property name="defaultAutoCommit">
       <value>true</value>
