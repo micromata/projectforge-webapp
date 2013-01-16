@@ -29,20 +29,28 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
+import org.projectforge.test.TestConfiguration;
 
 
 public class AbstractBaseDOTest
 {
+  @BeforeClass
+  public static void setUp()
+  {
+    TestConfiguration.initAsTestConfiguration();
+  }
+
   @Test
   public void determinePropertyName() throws NoSuchMethodException
   {
     FooDO obj = createFooDO(21, 22, false, true, "Hurzel");
-    String created = DateHelper.getForTestCase(obj.getCreated());
-    String lastUpdate = DateHelper.getForTestCase(obj.getLastUpdate());
+    final String created = DateHelper.getForTestCase(obj.getCreated());
+    final String lastUpdate = DateHelper.getForTestCase(obj.getLastUpdate());
 
     FooDO src = createFooDO(19, 20, true, false, "Test");
 
@@ -64,10 +72,10 @@ public class AbstractBaseDOTest
     assertEquals(lastUpdate, DateHelper.getForTestCase(obj.getLastUpdate()));
   }
 
-  private FooDO createFooDO(int createdDayOfMonth, int lastUpdateDateOfMonth, boolean deleted, boolean testBoolean, String testString)
+  private FooDO createFooDO(final int createdDayOfMonth, final int lastUpdateDateOfMonth, final boolean deleted, final boolean testBoolean, final String testString)
   {
-    FooDO obj = new FooDO();
-    DateHolder dateHolder = new DateHolder(DatePrecision.SECOND, Locale.GERMAN);
+    final FooDO obj = new FooDO();
+    final DateHolder dateHolder = new DateHolder(DatePrecision.SECOND, Locale.GERMAN);
     obj.setId(42);
     dateHolder.setDate(1970, Calendar.NOVEMBER, createdDayOfMonth, 4, 50, 0);
     obj.setCreated(dateHolder.getDate());
