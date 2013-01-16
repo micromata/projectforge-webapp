@@ -235,7 +235,7 @@ public abstract class ModalDialog extends Panel
       @Override
       public void onError(final AjaxRequestTarget target, final Form< ? > form)
       {
-        onError(target, form);
+        ModalDialog.this.onError(target, form);
       }
     }, closeButtonLabel != null ? closeButtonLabel : getString("close"), SingleButtonPanel.GREY);
     buttonBarContainer.add(actionButtons.getRepeatingView());
