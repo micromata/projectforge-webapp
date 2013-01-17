@@ -212,6 +212,8 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
               // Need to set organizational unit for detecting the change of deactivated flag. The updateLdapUser needs the organizational
               // unit of the original ldap object:
               updatedLdapUser.setOrganizationalUnit(ldapUser.getOrganizationalUnit());
+              // Otherwise the NT password will be deleted in copy function below:
+              updatedLdapUser.setSambaNTPassword(ldapUser.getSambaNTPassword());
               if (user.isDeleted() == true || user.isLocalUser() == true) {
                 // Deleted and local users shouldn't be synchronized with LDAP:
                 ldapUserDao.delete(ctx, updatedLdapUser);
