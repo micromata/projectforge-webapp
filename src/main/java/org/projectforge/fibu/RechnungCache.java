@@ -65,6 +65,7 @@ public class RechnungCache extends AbstractCache
   /**
    * This method will be called by CacheHelper and is synchronized via getData();
    */
+  @Override
   @SuppressWarnings("unchecked")
   protected void refresh()
   {
@@ -72,7 +73,7 @@ public class RechnungCache extends AbstractCache
     // This method must not be synchronized because it works with a new copy of maps.
     final Map<Integer, Set<RechnungsPositionVO>> mapByAuftragId = new HashMap<Integer, Set<RechnungsPositionVO>>();
     final Map<Integer, Set<RechnungsPositionVO>> mapByAuftragsPositionId = new HashMap<Integer, Set<RechnungsPositionVO>>();
-    final List<RechnungsPositionDO> list = hibernateTemplate.find("from RechnungsPositionDO t where t.auftragsPosition is not null");
+    final List<RechnungsPositionDO> list = hibernateTemplate.find("from RechnungsPositionDO t left join fetch t.auftragsPosition left join fetch t.auftragsPosition.auftrag where t.auftragsPosition is not null");
     for (final RechnungsPositionDO pos : list) {
       if (pos.getAuftragsPosition() == null || pos.getAuftragsPosition().getAuftrag() == null) {
         log.error("Assigned order position expected: " + pos);
@@ -106,7 +107,7 @@ public class RechnungCache extends AbstractCache
     log.info("Initializing of RechnungCache done.");
   }
 
-  public void setHibernateTemplate(HibernateTemplate hibernateTemplate)
+  public void setHibernateTemplate(final HibernateTemplate hibernateTemplate)
   {
     this.hibernateTemplate = hibernateTemplate;
   }
