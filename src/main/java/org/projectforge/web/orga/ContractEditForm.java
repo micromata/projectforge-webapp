@@ -27,7 +27,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
@@ -91,7 +90,8 @@ public class ContractEditForm extends AbstractEditForm<ContractDO, ContractEditP
       fs.add(new DivTextPanel(fs.newChildId(), "C-"));
       final MinMaxNumberField<Integer> number = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data,
           "number"), 0, 99999999);
-      number.setMaxLength(8).add(AttributeModifier.append("style", "width: 6em !important;"));
+      number.setMaxLength(8);
+      WicketUtils.setSize(number, 6);
       fs.add(number);
       if (NumberHelper.greaterZero(getData().getNumber()) == false) {
         fs.addHelpIcon(getString("fibu.tooltip.nummerWirdAutomatischVergeben"));
