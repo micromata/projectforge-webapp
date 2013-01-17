@@ -28,6 +28,7 @@ import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.common.StringHelper;
+import org.projectforge.core.Configuration;
 import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.fibu.AbstractRechnungsStatistik;
 import org.projectforge.fibu.RechnungFilter;
@@ -133,8 +134,8 @@ AbstractListForm<F, P>
   {
     // DropDownChoice years
     final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(years, true);
-    final DropDownChoice<Integer> yearChoice = new DropDownChoice<Integer>(optionsFieldsetPanel.getDropDownChoiceId(), new PropertyModel<Integer>(this,
-        "year"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer);
+    final DropDownChoice<Integer> yearChoice = new DropDownChoice<Integer>(optionsFieldsetPanel.getDropDownChoiceId(),
+        new PropertyModel<Integer>(this, "year"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer);
     yearChoice.setNullValid(false);
     WicketUtils.setSize(yearChoice, ComponentSize.LENGTH_4);
     optionsFieldsetPanel.add(yearChoice, true);
@@ -145,8 +146,8 @@ AbstractListForm<F, P>
     for (int i = 0; i <= 11; i++) {
       monthChoiceRenderer.addValue(i, StringHelper.format2DigitNumber(i + 1));
     }
-    final DropDownChoice<Integer> monthChoice = new DropDownChoice<Integer>(optionsFieldsetPanel.getDropDownChoiceId(), new PropertyModel<Integer>(this,
-        "month"), monthChoiceRenderer.getValues(), monthChoiceRenderer);
+    final DropDownChoice<Integer> monthChoice = new DropDownChoice<Integer>(optionsFieldsetPanel.getDropDownChoiceId(),
+        new PropertyModel<Integer>(this, "month"), monthChoiceRenderer.getValues(), monthChoiceRenderer);
     monthChoice.setNullValid(false);
     WicketUtils.setSize(monthChoice, ComponentSize.LENGTH_2);
     optionsFieldsetPanel.add(monthChoice, true);
@@ -177,26 +178,28 @@ AbstractListForm<F, P>
     radioGroup.add(new Model<String>("unbezahlt"), getString("fibu.rechnung.filter.unbezahlt"));
     radioGroup.add(new Model<String>("ueberfaellig"), getString("fibu.rechnung.filter.ueberfaellig"));
 
-    optionsCheckBoxesPanel.add(new CheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "showKostZuweisungStatus"),
-        getString("fibu.rechnung.showKostZuweisungstatus")) {
-      /**
-       * @see org.projectforge.web.wicket.flowlayout.CheckBoxPanel#wantOnSelectionChangedNotifications()
-       */
-      @Override
-      protected boolean wantOnSelectionChangedNotifications()
-      {
-        return true;
-      }
+    if (Configuration.getInstance().isCostConfigured() == true) {
+      optionsCheckBoxesPanel.add(new CheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+          "showKostZuweisungStatus"), getString("fibu.rechnung.showKostZuweisungstatus")) {
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.CheckBoxPanel#wantOnSelectionChangedNotifications()
+         */
+        @Override
+        protected boolean wantOnSelectionChangedNotifications()
+        {
+          return true;
+        }
 
-      /**
-       * @see org.projectforge.web.wicket.flowlayout.CheckBoxPanel#onSelectionChanged()
-       */
-      @Override
-      protected void onSelectionChanged(final Boolean newSelection)
-      {
-        parentPage.refresh();
-      }
-    });
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.CheckBoxPanel#onSelectionChanged()
+         */
+        @Override
+        protected void onSelectionChanged(final Boolean newSelection)
+        {
+          parentPage.refresh();
+        }
+      });
+    }
   }
 
   protected abstract AbstractRechnungsStatistik< ? > getStats();
