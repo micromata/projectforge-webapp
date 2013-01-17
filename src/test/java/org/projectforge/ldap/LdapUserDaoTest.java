@@ -30,6 +30,8 @@ import org.junit.Test;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.user.PFUserDO;
 
+import arlut.csd.crypto.SmbEncrypt;
+
 public class LdapUserDaoTest
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapUserDaoTest.class);
@@ -49,6 +51,7 @@ public class LdapUserDaoTest
     ldapRealTestHelper = new LdapRealTestHelper().setup();
     ldapUserDao = ldapRealTestHelper.ldapUserDao;
     ConfigXml.getInstance().getLdapConfig().setPosixAccountsConfig(new LdapPosixAccountsConfig().setDefaultGidNumber(1000));
+    ConfigXml.getInstance().getLdapConfig().setSambaAccountsConfig(new LdapSambaAccountsConfig().setSambaSIDPrefix("123-123-123"));
   }
 
   @After
@@ -257,5 +260,73 @@ public class LdapUserDaoTest
     // Delete user
     ldapUserDao.delete(initialLdapUser1);
     ldapUserDao.delete(initialLdapUser2);
+  }
+
+  @Test
+  public void sambaAccountUsers()
+  {
+    if (ldapRealTestHelper.isAvailable() == false) {
+      log.info("No LDAP server configured for tests. Skipping test.");
+      return;
+    }
+    String uid = "test-user-46";
+    PFUserDO user = new PFUserDO().setUsername(uid).setLastname("Reinhard").setFirstname("Kai").setOrganization("Micromata GmbH")
+        .setEmail("k.reinhard@acme.com");
+    user.setId(46);
+    final LdapUser initialLdapUser1 = PFUserDOConverter.convert(user);
+    initialLdapUser1.setOrganizationalUnit(getPath());
+    String sambaNTPassword = SmbEncrypt.NTUNICODEHash("qwert123");
+    initialLdapUser1.setSambaSIDNumber(1042).setSambaNTPassword(sambaNTPassword);
+    ldapUserDao.createOrUpdate(getPath(), initialLdapUser1);
+    LdapUser ldapUser = ldapUserDao.findByUsername(uid, getPath());
+    Assert.assertNotNull(ldapUser);
+    LdapTestUtils.assertSambaAccountValues(ldapUser, 1042, null);
+    ldapUserDao.changePassword(ldapUser, null, "qwert123");
+    ldapUser = ldapUserDao.findByUsername(uid, getPath());
+    LdapTestUtils.assertSambaAccountValues(ldapUser, 1042, sambaNTPassword);
+
+    uid = "test-user-47";
+    user = new PFUserDO().setUsername(uid).setLastname("Reinhard").setFirstname("Kai").setOrganization("Micromata GmbH")
+        .setEmail("k.reinhard@acme.com");
+    user.setId(47);
+    final LdapUser initialLdapUser2 = PFUserDOConverter.convert(user);
+    initialLdapUser2.setOrganizationalUnit(getPath());
+    ldapUserDao.createOrUpdate(getPath(), initialLdapUser2);
+    ldapUser = ldapUserDao.findByUsername(uid, getPath());
+    Assert.assertNotNull(ldapUser);
+    LdapTestUtils.assertPosixAccountValues(ldapUser, null, null, null, null);
+    sambaNTPassword = SmbEncrypt.NTUNICODEHash("hallo");
+    ldapUser.setSambaSIDNumber(1047).setSambaNTPassword(sambaNTPassword);
+    ldapUserDao.createOrUpdate(getPath(), ldapUser);
+    ldapUser = ldapUserDao.findByUsername(uid, getPath());
+    LdapTestUtils.assertSambaAccountValues(ldapUser, 1047, null);
+
+    // Delete user
+    ldapUserDao.delete(initialLdapUser1);
+    ldapUserDao.delete(initialLdapUser2);
+
+  }
+
+  @Test
+  public void testObjectClassesInitialization()
+  {
+    if (ldapRealTestHelper.isAvailable() == false) {
+      log.info("No LDAP server configured for tests. Skipping test.");
+      return;
+    }
+    ldapUserDao.initializeObjectClasses();
+    Assert.assertArrayEquals(new String[] { "top", "inetOrgPerson"}, LdapUserDao.ALL_OBJECT_CLASSES);
+    Assert.assertArrayEquals(new String[] { "top", "inetOrgPerson", "posixAccount"}, LdapUserDao.ALL_OBJECT_CLASSES_WITH_POSIX_ACCOUNT);
+    Assert.assertArrayEquals(new String[] { "top", "inetOrgPerson", "posixAccount", "sambaSamAccount"},
+        LdapUserDao.ALL_OBJECT_CLASSES_WITH_SAMBA_AND_POSIX_ACCOUNT);
+    Assert.assertArrayEquals(new String[] { "top", "inetOrgPerson", "sambaSamAccount"}, LdapUserDao.ALL_OBJECT_CLASSES_WITH_SAMBA_ACCOUNT);
+    String[] objectClasses = ldapUserDao.getAdditionalObjectClasses(new LdapUser());
+    Assert.assertArrayEquals(LdapUserDao.ALL_OBJECT_CLASSES, objectClasses);
+    objectClasses = ldapUserDao.getAdditionalObjectClasses(new LdapUser().setUidNumber(42));
+    Assert.assertArrayEquals(LdapUserDao.ALL_OBJECT_CLASSES_WITH_POSIX_ACCOUNT, objectClasses);
+    objectClasses = ldapUserDao.getAdditionalObjectClasses(new LdapUser().setSambaSIDNumber(42));
+    Assert.assertArrayEquals(LdapUserDao.ALL_OBJECT_CLASSES_WITH_SAMBA_ACCOUNT, objectClasses);
+    objectClasses = ldapUserDao.getAdditionalObjectClasses(new LdapUser().setUidNumber(42).setSambaSIDNumber(42));
+    Assert.assertArrayEquals(LdapUserDao.ALL_OBJECT_CLASSES_WITH_SAMBA_AND_POSIX_ACCOUNT, objectClasses);
   }
 }

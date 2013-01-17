@@ -28,8 +28,8 @@ import org.projectforge.user.PFUserDO;
 
 public class LdapTestUtils
 {
-  public static void assertUser(final PFUserDO user, final String username, final String firstname, final String lastname, final String email,
-      final String organization, final String description)
+  public static void assertUser(final PFUserDO user, final String username, final String firstname, final String lastname,
+      final String email, final String organization, final String description)
   {
     Assert.assertEquals(username, user.getUsername());
     Assert.assertEquals(firstname, user.getFirstname());
@@ -57,8 +57,8 @@ public class LdapTestUtils
         .setOrganization(organization).setDescription(description);
   }
 
-  public static void assertUser(final LdapUser user, final String username, final String firstname, final String lastname, final String email,
-      final String organization, final String description)
+  public static void assertUser(final LdapUser user, final String username, final String firstname, final String lastname,
+      final String email, final String organization, final String description)
   {
     Assert.assertEquals(username, user.getUid());
     Assert.assertEquals(firstname, user.getGivenName());
@@ -76,5 +76,15 @@ public class LdapTestUtils
     Assert.assertEquals(gid, ldapUser.getGidNumber());
     Assert.assertEquals(homeDirectory, ldapUser.getHomeDirectory());
     Assert.assertEquals(loginShell, ldapUser.getLoginShell());
+  }
+
+  public static void assertSambaAccountValues(final LdapUser ldapUser, final Integer sambaSIDNumber, final String sambaNTPassword)
+  {
+    Assert.assertEquals(sambaSIDNumber, ldapUser.getSambaSIDNumber());
+    if (sambaNTPassword == null) {
+      Assert.assertNull(ldapUser.getSambaNTPassword());
+    } else {
+      Assert.assertEquals(sambaNTPassword, ldapUser.getSambaNTPassword());
+    }
   }
 }

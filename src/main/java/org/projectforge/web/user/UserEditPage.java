@@ -96,7 +96,7 @@ public class UserEditPage extends AbstractEditPage<PFUserDO, UserEditForm, UserD
       getData().setPassword(form.getEncryptedPassword());
     }
     getData().setPersonalPhoneIdentifiers(userDao.getNormalizedPersonalPhoneIdentifiers(getData()));
-    if (form.ldapUserValues.isPosixAccountValuesEmpty() == false) {
+    if (form.ldapUserValues.isValuesEmpty() == false) {
       final String xml = PFUserDOConverter.getLdapValuesAsXml(form.ldapUserValues);
       getData().setLdapValues(xml);
     }

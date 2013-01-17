@@ -26,6 +26,7 @@ package org.projectforge.web.user;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -54,6 +55,8 @@ import org.projectforge.common.TimeNotation;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
 import org.projectforge.ldap.LdapPosixAccountsUtils;
+import org.projectforge.ldap.LdapSambaAccountsConfig;
+import org.projectforge.ldap.LdapSambaAccountsUtils;
 import org.projectforge.ldap.LdapUserDao;
 import org.projectforge.ldap.LdapUserValues;
 import org.projectforge.ldap.PFUserDOConverter;
@@ -123,7 +126,15 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
 
   private TextField< ? > usernameTextField;
 
-  private final FormComponent< ? >[] dependentLdapFormComponents = new FormComponent< ? >[4];
+  private MinMaxNumberField<Integer> uidNumberField;
+
+  private MinMaxNumberField<Integer> gidNumberField;
+
+  private MaxLengthTextField homeDirectoryField;
+
+  private MaxLengthTextField loginShellField;
+
+  private MinMaxNumberField<Integer> sambaSIDNumberField;
 
   public UserEditForm(final UserEditPage parentPage, final PFUserDO data)
   {
@@ -421,96 +432,95 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     gridBuilder.newSplitPanel(GridSize.COL50);
     WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("user.localUser"), "localUser", new PropertyModel<Boolean>(data, "localUser"),
         getString("user.localUser.tooltip"));
-    if (LdapUserDao.isPosixAccountsConfigured() == false) {
+    final boolean posixConfigured = LdapUserDao.isPosixAccountsConfigured();
+    final boolean sambaConfigured = LdapUserDao.isSambaAccountsConfigured();
+    if (posixConfigured == false && sambaConfigured == false) {
       return;
     }
+    final List<FormComponent< ? >> dependentLdapFormComponentsList = new LinkedList<FormComponent< ? >>();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.uidNumber"), getString("ldap.posixAccount"), true);
-      final MinMaxNumberField<Integer> uidNumberField = new MinMaxNumberField<Integer>(fs.getTextFieldId(), new PropertyModel<Integer>(
-          ldapUserValues, "uidNumber"), 1, 65535);
+      uidNumberField = new MinMaxNumberField<Integer>(fs.getTextFieldId(), new PropertyModel<Integer>(ldapUserValues, "uidNumber"), 1,
+          65535);
       WicketUtils.setSize(uidNumberField, 6);
       fs.add(uidNumberField);
       fs.addHelpIcon(gridBuilder.getString("ldap.uidNumber.tooltip"));
-      dependentLdapFormComponents[0] = uidNumberField;
-      if (ldapUserValues.isPosixAccountValuesEmpty() == true) {
-        final AjaxButton createButton = new AjaxButton(SingleButtonPanel.WICKET_ID, this) {
-          @Override
-          protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
-          {
-            data.setUsername(usernameTextField.getRawInput());
-            LdapPosixAccountsUtils.setDefaultValues(ldapUserValues, data);
-            for (final FormComponent< ? > component : dependentLdapFormComponents) {
-              component.setEnabled(true);
-            }
-            this.setVisible(false);
-            target.add(this, dependentLdapFormComponents[0], dependentLdapFormComponents[1], dependentLdapFormComponents[2],
-                dependentLdapFormComponents[3]);
-          }
-
-          @Override
-          protected void onError(final AjaxRequestTarget target, final Form< ? > form)
-          {
-            target.add(UserEditForm.this.feedbackPanel);
-          }
-        };
-        createButton.setDefaultFormProcessing(false);
+      dependentLdapFormComponentsList.add(uidNumberField);
+      if (ldapUserValues.isPosixValuesEmpty() == true) {
+        final Button createButton = newCreateButton(dependentLdapFormComponentsList, true, sambaConfigured);
         fs.add(new SingleButtonPanel(fs.newChildId(), createButton, gridBuilder.getString("create"), SingleButtonPanel.GREY));
-        WicketUtils.addTooltip(createButton, gridBuilder.getString("ldap.posixAccount.createDefault.tooltip"));
+        WicketUtils.addTooltip(createButton, gridBuilder.getString("ldap.uidNumber.createDefault.tooltip"));
       }
     }
-    {
+    if (posixConfigured == true) {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.gidNumber"), getString("ldap.posixAccount"));
-      final MinMaxNumberField<Integer> gidNumberField = new MinMaxNumberField<Integer>(fs.getTextFieldId(), new PropertyModel<Integer>(
-          ldapUserValues, "gidNumber"), 1, 65535);
+      gidNumberField = new MinMaxNumberField<Integer>(fs.getTextFieldId(), new PropertyModel<Integer>(ldapUserValues, "gidNumber"), 1,
+          65535);
       WicketUtils.setSize(gidNumberField, 6);
       fs.add(gidNumberField);
-      dependentLdapFormComponents[1] = gidNumberField;
+      dependentLdapFormComponentsList.add(gidNumberField);
+    }
+    final LdapSambaAccountsConfig ldapSambaAccountsConfig = ConfigXml.getInstance().getLdapConfig().getSambaAccountsConfig();
+    if (ldapSambaAccountsConfig != null && ldapSambaAccountsConfig.getSambaSIDPrefix() != null) {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.sambaSID"), true);
+      final DivTextPanel textPanel = new DivTextPanel(fs.newChildId(), ldapSambaAccountsConfig.getSambaSIDPrefix() + "-");
+      fs.add(textPanel);
+      sambaSIDNumberField = new MinMaxNumberField<Integer>(fs.getTextFieldId(),
+          new PropertyModel<Integer>(ldapUserValues, "sambaSIDNumber"), 1, 65535);
+      fs.add(sambaSIDNumberField);
+      sambaSIDNumberField.setOutputMarkupId(true);
+      WicketUtils.setSize(sambaSIDNumberField, 5);
+      fs.addHelpIcon(getString("ldap.sambaSID.tooltip"));
+      if (ldapUserValues.getSambaSIDNumber() == null) {
+        final Button createButton = newCreateButton(dependentLdapFormComponentsList, false, true);
+        fs.add(new SingleButtonPanel(fs.newChildId(), createButton, gridBuilder.getString("create"), SingleButtonPanel.GREY));
+        WicketUtils.addTooltip(createButton, gridBuilder.getString("ldap.sambaSIDNumber.createDefault.tooltip"));
+      }
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
     WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("user.restrictedUser"), "restrictedUser", new PropertyModel<Boolean>(data,
         "restrictedUser"), getString("user.restrictedUser.tooltip"));
-    if (LdapUserDao.isPosixAccountsConfigured() == true) {
+    if (posixConfigured == true) {
       {
         final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.homeDirectory"), getString("ldap.posixAccount"));
-        final MaxLengthTextField homeDirectoryField = new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(ldapUserValues,
-            "homeDirectory"), 255);
+        homeDirectoryField = new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(ldapUserValues, "homeDirectory"), 255);
         fs.add(homeDirectoryField);
-        dependentLdapFormComponents[2] = homeDirectoryField;
+        dependentLdapFormComponentsList.add(homeDirectoryField);
       }
       {
         final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.loginShell"), getString("ldap.posixAccount"));
-        final MaxLengthTextField loginShellField = new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(ldapUserValues,
-            "loginShell"), 100);
+        loginShellField = new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(ldapUserValues, "loginShell"), 100);
         fs.add(loginShellField);
-        dependentLdapFormComponents[3] = loginShellField;
+        dependentLdapFormComponentsList.add(loginShellField);
       }
-      if (ldapUserValues.isPosixAccountValuesEmpty() == true) {
-        for (final FormComponent< ? > component : dependentLdapFormComponents) {
+      if (ldapUserValues.isValuesEmpty() == true) {
+        for (final FormComponent< ? > component : dependentLdapFormComponentsList) {
           component.setEnabled(false);
         }
       }
+    }
+    if (sambaConfigured == true) {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.sambaNTPassword"), getString("ldap.sambaNTPassword.subtitle"));
+      final DivTextPanel sambaNTPassword = new DivTextPanel(fs.newChildId(), "*****");
+      fs.add(sambaNTPassword);
+      fs.addHelpIcon(getString("ldap.sambaNTPassword.tooltip"));
     }
     add(new IFormValidator() {
       @Override
       public FormComponent< ? >[] getDependentFormComponents()
       {
-        return dependentLdapFormComponents;
+        return (FormComponent< ? >[]) dependentLdapFormComponentsList.toArray();
       }
 
-      @SuppressWarnings("unchecked")
       @Override
       public void validate(final Form< ? > form)
       {
-        final MinMaxNumberField<Integer> uidNumberField = (MinMaxNumberField<Integer>) dependentLdapFormComponents[0];
-        final MinMaxNumberField<Integer> gidNumberField = (MinMaxNumberField<Integer>) dependentLdapFormComponents[1];
-        final MaxLengthTextField homeDirectoryField = (MaxLengthTextField) dependentLdapFormComponents[2];
-        final MaxLengthTextField loginShellField = (MaxLengthTextField) dependentLdapFormComponents[3];
         final LdapUserValues values = new LdapUserValues();
         values.setUidNumber(uidNumberField.getConvertedInput());
         values.setGidNumber(gidNumberField.getConvertedInput());
         values.setHomeDirectory(homeDirectoryField.getConvertedInput());
         values.setLoginShell(loginShellField.getConvertedInput());
-        if (StringUtils.isBlank(data.getLdapValues()) == true && values.isPosixAccountValuesEmpty() == true) {
+        if (StringUtils.isBlank(data.getLdapValues()) == true && values.isValuesEmpty() == true) {
           // Nothing to validate: all fields are zero and posix account wasn't set for this user before.
           return;
         }
@@ -532,7 +542,48 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
         }
       }
     });
+  }
 
+  @SuppressWarnings("serial")
+  private Button newCreateButton(final List<FormComponent< ? >> dependentLdapFormComponentsList, final boolean updatePosixAccount,
+      final boolean updateSambaAccount)
+  {
+    final AjaxButton createButton = new AjaxButton(SingleButtonPanel.WICKET_ID, this) {
+      @Override
+      protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
+      {
+        data.setUsername(usernameTextField.getRawInput());
+        if (updatePosixAccount == true) {
+          LdapPosixAccountsUtils.setDefaultValues(ldapUserValues, data);
+          if (updateSambaAccount == true) {
+            LdapSambaAccountsUtils.setDefaultValues(ldapUserValues, data);
+            sambaSIDNumberField.modelChanged();
+            target.add(sambaSIDNumberField);
+          }
+        } else if (updateSambaAccount == true) {
+          LdapSambaAccountsUtils.setDefaultValues(ldapUserValues, data);
+          sambaSIDNumberField.modelChanged();
+          target.add(sambaSIDNumberField);
+        }
+        for (final FormComponent< ? > component : dependentLdapFormComponentsList) {
+          component.modelChanged();
+          component.setEnabled(true);
+        }
+        this.setVisible(false);
+        for (final FormComponent< ? > comp : dependentLdapFormComponentsList) {
+          target.add(comp);
+        }
+        target.add(this, UserEditForm.this.feedbackPanel);
+      }
+
+      @Override
+      protected void onError(final AjaxRequestTarget target, final Form< ? > form)
+      {
+        target.add(UserEditForm.this.feedbackPanel);
+      }
+    };
+    createButton.setDefaultFormProcessing(false);
+    return createButton;
   }
 
   @SuppressWarnings("serial")
@@ -650,7 +701,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
         first = false;
       }
       if (odd == true) {
-        //gridBuilder.newNestedRowPanel();
+        // gridBuilder.newNestedRowPanel();
       }
       odd = !odd;
       gridBuilder.newSplitPanel(GridSize.COL50);
