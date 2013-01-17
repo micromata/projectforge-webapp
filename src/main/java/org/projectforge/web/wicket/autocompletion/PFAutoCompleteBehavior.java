@@ -125,7 +125,6 @@ public abstract class PFAutoCompleteBehavior<T> extends AbstractDefaultAjaxBehav
     addSetting(result, "selectOnly", settings.isSelectOnly());
     addSetting(result, "maxItemsToShow", settings.getMaxItemsToShow());
     addSetting(result, "autoFill", settings.isAutoFill());
-    addSetting(result, "width", settings.getWidth());
     addSetting(result, "autoSubmit", settings.isAutoSubmit());
     addSetting(result, "scroll", settings.isScroll());
     addSetting(result, "scrollHeight", settings.getScrollHeight());
