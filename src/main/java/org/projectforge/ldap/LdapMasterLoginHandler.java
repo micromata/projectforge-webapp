@@ -41,6 +41,8 @@ import org.projectforge.user.LoginResult;
 import org.projectforge.user.LoginResultStatus;
 import org.projectforge.user.PFUserDO;
 
+import arlut.csd.crypto.SmbEncrypt;
+
 /**
  * TODO: nested groups.<br/>
  * This LDAP login handler has read-write access to the LDAP server and acts as master of the user and group data. All changes of
@@ -70,6 +72,9 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
    */
   private Set<Integer> usersWithoutLdapPasswords = new HashSet<Integer>();
 
+  // Caches all Samba NT password of the LDAP users by user id.
+  private Map<Integer, String> sambaNTPasswords = new HashMap<Integer, String>();
+
   private boolean refreshInProgress;
 
   /**
@@ -98,14 +103,27 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
       return loginResult;
     }
     // User is now logged-in successfully.
-    LdapUser ldapUser = ldapUserDao.authenticate(username, password, userBase);
-    if (ldapUser == null) {
+    final LdapUser authLdapUser = ldapUserDao.authenticate(username, password, userBase);
+    final PFUserDO user = loginResult.getUser();
+    final LdapUser ldapUser = PFUserDOConverter.convert(user);
+    ldapUser.setOrganizationalUnit(userBase);
+    if (authLdapUser == null) {
       log.info("User's credentials in LDAP not up-to-date: " + username + ". Updating LDAP entry...");
-      final PFUserDO user = loginResult.getUser();
-      ldapUser = PFUserDOConverter.convert(user);
-      ldapUser.setOrganizationalUnit(userBase);
       ldapUserDao.createOrUpdate(userBase, ldapUser);
       ldapUserDao.changePassword(ldapUser, null, password);
+    } else {
+      final String sambaNTPassword = sambaNTPasswords.get(loginResult.getUser().getId());
+      if (sambaNTPassword != null) {
+        if ("".equals(sambaNTPassword) == true) {
+          // sambaNTPassword needed to be set (isn't yet set):
+          ldapUserDao.changePassword(ldapUser, null, password);
+        } else {
+          if (sambaNTPassword.equals(SmbEncrypt.NTUNICODEHash(password)) == false) {
+            // sambaNTPassword needed to be updated:
+            ldapUserDao.changePassword(ldapUser, null, password);
+          }
+        }
+      }
     }
     return loginResult;
   }
@@ -173,6 +191,7 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
         final List<LdapUser> updatedLdapUsers = new ArrayList<LdapUser>();
         int error = 0, unmodified = 0, created = 0, updated = 0, deleted = 0, renamed = 0;
         final Set<Integer> shadowUsersWithoutLdapPasswords = new HashSet<Integer>();
+        final Map<Integer, String> shadowSambaNTPasswords = new HashMap<Integer, String>();
         final boolean sambaConfigured = ldapConfig.getSambaAccountsConfig() != null;
         for (final PFUserDO user : users) {
           final LdapUser updatedLdapUser = PFUserDOConverter.convert(user);
@@ -229,6 +248,14 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
                   }
                 } else {
                   shadowUsersWithoutLdapPasswords.add(user.getId()); // Password isn't given for the current user.
+                  if (ldapUser.getSambaSIDNumber() != null) {
+                    final String sambaNTPassword = ldapUser.getSambaNTPassword();
+                    if (StringUtils.isNotBlank(sambaNTPassword) == true) {
+                      shadowSambaNTPasswords.put(user.getId(), sambaNTPassword);
+                    } else {
+                      shadowSambaNTPasswords.put(user.getId(), ""); // Empty password
+                    }
+                  }
                 }
               }
             }
@@ -242,6 +269,7 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
           }
         }
         usersWithoutLdapPasswords = shadowUsersWithoutLdapPasswords;
+        sambaNTPasswords = shadowSambaNTPasswords;
         log.info(""
             + shadowUsersWithoutLdapPasswords.size()
             + " users without password in the LDAP system (login required for these users for updating the LDAP password).");

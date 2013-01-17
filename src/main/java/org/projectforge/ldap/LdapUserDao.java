@@ -509,7 +509,9 @@ public class LdapUserDao extends LdapDao<String, LdapUser>
   {
     list = ldapPersonDao.getModificationItems(list, user);
     createAndAddModificationItems(list, "cn", user.getCommonName());
-    if (isPosixAccountsConfigured() == true && PFUserDOConverter.isPosixAccountValuesEmpty(user) == false) {
+    final boolean modifyPosixAccount = isPosixAccountsConfigured() == true && PFUserDOConverter.isPosixAccountValuesEmpty(user) == false;
+    final boolean modifySambaAccount = isSambaAccountsConfigured() == true && PFUserDOConverter.isSambaAccountValuesEmpty(user) == false;
+    if (modifyPosixAccount == true || modifySambaAccount == true) {
       if (user.getObjectClasses() != null) {
         final List<String> missedObjectClasses = LdapUtils.getMissedObjectClasses(getAdditionalObjectClasses(user), getObjectClass(),
             user.getObjectClasses());
@@ -518,22 +520,14 @@ public class LdapUserDao extends LdapDao<String, LdapUser>
             list.add(createModificationItem(DirContext.ADD_ATTRIBUTE, "objectClass", missedObjectClass));
           }
         }
-      }
+      }}
+    if (modifyPosixAccount == true) {
       createAndAddModificationItems(list, "uidNumber", String.valueOf(user.getUidNumber()));
       createAndAddModificationItems(list, "gidNumber", String.valueOf(user.getGidNumber()));
       createAndAddModificationItems(list, "homeDirectory", user.getHomeDirectory());
       createAndAddModificationItems(list, "loginShell", user.getLoginShell());
     }
-    if (isSambaAccountsConfigured() == true && PFUserDOConverter.isSambaAccountValuesEmpty(user) == false) {
-      if (user.getObjectClasses() != null) {
-        final List<String> missedObjectClasses = LdapUtils.getMissedObjectClasses(getAdditionalObjectClasses(user), getObjectClass(),
-            user.getObjectClasses());
-        if (CollectionUtils.isNotEmpty(missedObjectClasses) == true) {
-          for (final String missedObjectClass : missedObjectClasses) {
-            list.add(createModificationItem(DirContext.ADD_ATTRIBUTE, "objectClass", missedObjectClass));
-          }
-        }
-      }
+    if (modifySambaAccount == true) {
       createAndAddModificationItems(list, "sambaSID", ldapConfig.getSambaAccountsConfig().getSambaSID(user.getSambaSIDNumber()));
     }
     return list;

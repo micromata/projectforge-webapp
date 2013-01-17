@@ -23,8 +23,12 @@
 
 package org.projectforge.ldap;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.common.BeanHelper;
+import org.projectforge.common.ListHelper;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.user.PFUserDO;
@@ -156,6 +160,11 @@ public class PFUserDOConverter
     } else {
       ldapUser.setLoginShell(posixAccountsConfig.getDefaultLoginShell());
     }
+    if (values.getSambaSIDNumber() != null) {
+      ldapUser.setSambaSIDNumber(values.getSambaSIDNumber());
+    } else {
+      ldapUser.setSambaSIDNumber(null);
+    }
   }
 
   public static LdapUserValues readLdapUserValues(final String ldapValuesAsXml)
@@ -177,19 +186,27 @@ public class PFUserDOConverter
   {
     final LdapConfig ldapConfig = ConfigXml.getInstance().getLdapConfig();
     final LdapPosixAccountsConfig posixAccountsConfig = ldapConfig != null ? ldapConfig.getPosixAccountsConfig() : null;
-    if (posixAccountsConfig == null) {
-      // No posix account default values configured
-      return null;
+    final LdapSambaAccountsConfig sambaAccountsConfig = ldapConfig != null ? ldapConfig.getSambaAccountsConfig() : null;
+    LdapUserValues values = null;
+    if (posixAccountsConfig != null) {
+      values = new LdapUserValues();
+      if (ldapUser.getUidNumber() != null) {
+        values.setUidNumber(ldapUser.getUidNumber());
+      }
+      if (ldapUser.getGidNumber() != null) {
+        values.setGidNumber(ldapUser.getGidNumber());
+      }
+      values.setHomeDirectory(ldapUser.getHomeDirectory());
+      values.setLoginShell(ldapUser.getLoginShell());
     }
-    final LdapUserValues values = new LdapUserValues();
-    if (ldapUser.getUidNumber() != null) {
-      values.setUidNumber(ldapUser.getUidNumber());
+    if (sambaAccountsConfig != null) {
+      if (values == null) {
+        values = new LdapUserValues();
+      }
+      if (ldapUser.getSambaSIDNumber() != null) {
+        values.setSambaSIDNumber(ldapUser.getSambaSIDNumber());
+      }
     }
-    if (ldapUser.getGidNumber() != null) {
-      values.setGidNumber(ldapUser.getGidNumber());
-    }
-    values.setHomeDirectory(ldapUser.getHomeDirectory());
-    values.setLoginShell(ldapUser.getLoginShell());
     return getLdapValuesAsXml(values);
   }
 
@@ -234,13 +251,16 @@ public class PFUserDOConverter
     setMailNullArray(src);
     setMailNullArray(dest);
     boolean modified;
+    final List<String> properties = new LinkedList<String>();
+    ListHelper.addAll(properties, "commonName", "givenName", "surname", "mail", "description", "organization", "deactivated",
+        "restrictedUser");
     if (LdapUserDao.isPosixAccountsConfigured() == true && isPosixAccountValuesEmpty(src) == false) {
-      modified = BeanHelper.copyProperties(src, dest, true, "commonName", "givenName", "surname", "mail", "description", "organization",
-          "deactivated", "restrictedUser", "uidNumber", "gidNumber", "homeDirectory", "loginShell");
-    } else {
-      modified = BeanHelper.copyProperties(src, dest, true, "commonName", "givenName", "surname", "mail", "description", "organization",
-          "deactivated", "restrictedUser");
+      ListHelper.addAll(properties, "uidNumber", "gidNumber", "homeDirectory", "loginShell");
     }
+    if (LdapUserDao.isSambaAccountsConfigured() == true && isSambaAccountValuesEmpty(src) == false) {
+      ListHelper.addAll(properties, "sambaSIDNumber", "sambaNTPassword");
+    }
+    modified = BeanHelper.copyProperties(src, dest, true, properties.toArray(new String[0]));
     return modified;
   }
 
