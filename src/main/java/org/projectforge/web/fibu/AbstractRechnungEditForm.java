@@ -670,6 +670,7 @@ extends AbstractEditForm<O, P>
     CostEditModalDialog()
     {
       super(parentPage.newModalDialogId());
+      setBigWindow();
     }
 
     @Override
