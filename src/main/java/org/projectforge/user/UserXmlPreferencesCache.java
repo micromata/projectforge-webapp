@@ -189,9 +189,11 @@ public class UserXmlPreferencesCache extends AbstractCache
   @Override
   protected void refresh()
   {
+    log.info("Flushing all user preferences to data-base....");
     for (final Integer userId : allPreferences.keySet()) {
       flushToDB(userId, false);
     }
+    log.info("Flushing of user preferences to data-base done.");
   }
 
   /**
