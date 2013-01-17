@@ -338,11 +338,11 @@ div.contentMenu .toolbarbutton,div.contentRightMenu .toolbarbutton {
 }
 
 /* Errorhandling */
-ul.feedbackPanel {
+div>ul.feedbackPanel {
 	margin: 0;
-	letter-spacing: normal;
-	color: #00000;
+	color: #fff;
 	text-shadow: none;
+	background-color: #9e253b;
 }
 
 ul.feedbackPanel li.feedbackPanelERROR {
@@ -433,7 +433,7 @@ h2.box_head .subtitle {
 	background-color: black;
 	z-index: 1;
 	opacity: 0;
-	filter: alpha(opacity =   0);
+	filter: alpha(opacity =     0);
 }
 
 .pf_teamCalDialog {
@@ -572,15 +572,14 @@ div.global-alert-message {
 	color: red;
 }
 
-
 .dropdown-menu.contextmenu ul.dropdown {
-  margin: 0;
+	margin: 0;
 }
 
 .dropdown-menu.contextmenu li {
-  list-style-type: none;
+	list-style-type: none;
 }
 
 .pf_left {
-    float: left;
+	float: left;
 }
