@@ -509,7 +509,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       @Override
       public FormComponent< ? >[] getDependentFormComponents()
       {
-        return (FormComponent< ? >[]) dependentLdapFormComponentsList.toArray();
+        return dependentLdapFormComponentsList.toArray(new FormComponent[0]);
       }
 
       @Override
