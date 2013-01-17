@@ -28,9 +28,9 @@ package org.projectforge.ldap;
  */
 public class LdapUser extends LdapPerson
 {
-  private Integer uidNumber, gidNumber;
+  private Integer uidNumber, gidNumber, sambaSIDNumber;
 
-  private String loginShell, homeDirectory;
+  private String loginShell, homeDirectory, sambaNTPassword;
 
   /**
    * @return The uid number of object class posixAccount.
@@ -85,6 +85,42 @@ public class LdapUser extends LdapPerson
   public LdapUser setHomeDirectory(final String homeDirectory)
   {
     this.homeDirectory = homeDirectory;
+    return this;
+  }
+
+  /**
+   * @return the sambaSID (without prefix {@link LdapSambaAccountsConfig#getSambaSIDPrefix()}.
+   */
+  public Integer getSambaSIDNumber()
+  {
+    return sambaSIDNumber;
+  }
+
+  /**
+   * @param sambaSIDNumber the sambaSIDNumber to set
+   * @return this for chaining.
+   */
+  public LdapUser setSambaSIDNumber(final Integer sambaSIDNumber)
+  {
+    this.sambaSIDNumber = sambaSIDNumber;
+    return this;
+  }
+
+  /**
+   * @return the sambaNTPassword
+   */
+  public String getSambaNTPassword()
+  {
+    return sambaNTPassword;
+  }
+
+  /**
+   * @param sambaNTPassword the sambaNTPassword to set
+   * @return this for chaining.
+   */
+  public LdapUser setSambaNTPassword(final String sambaNTPassword)
+  {
+    this.sambaNTPassword = sambaNTPassword;
     return this;
   }
 }

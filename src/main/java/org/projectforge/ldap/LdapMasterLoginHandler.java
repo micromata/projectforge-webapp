@@ -173,6 +173,7 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
         final List<LdapUser> updatedLdapUsers = new ArrayList<LdapUser>();
         int error = 0, unmodified = 0, created = 0, updated = 0, deleted = 0, renamed = 0;
         final Set<Integer> shadowUsersWithoutLdapPasswords = new HashSet<Integer>();
+        final boolean sambaConfigured = ldapConfig.getSambaAccountsConfig() != null;
         for (final PFUserDO user : users) {
           final LdapUser updatedLdapUser = PFUserDOConverter.convert(user);
           try {
@@ -211,7 +212,13 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
                 } else {
                   unmodified++;
                 }
+                boolean passwordsGiven = false;
                 if (ldapUser.isPasswordGiven() == true) {
+                  if (sambaConfigured == false || StringUtils.isNotBlank(ldapUser.getSambaNTPassword()) == true) {
+                    passwordsGiven = true;
+                  }
+                }
+                if (passwordsGiven == true) {
                   if (updatedLdapUser.isDeactivated()) {
                     log.warn("User password for deactivated user is set: " + ldapUser);
                     ldapUserDao.deactivateUser(ctx, updatedLdapUser);

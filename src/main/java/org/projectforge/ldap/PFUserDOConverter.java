@@ -111,6 +111,11 @@ public class PFUserDOConverter
         && ldapUser.getGidNumber() == null;
   }
 
+  public static boolean isSambaAccountValuesEmpty(final LdapUser ldapUser)
+  {
+    return ldapUser.getSambaSIDNumber() == null;
+  }
+
   /**
    * Sets the LDAP values such as posix account properties of the given ldapUser configured in the given xml string.
    * @param ldapUser

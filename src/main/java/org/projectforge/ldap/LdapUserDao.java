@@ -24,6 +24,7 @@
 package org.projectforge.ldap;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.naming.NameNotFoundException;
@@ -40,6 +41,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.ConfigXml;
+
+import arlut.csd.crypto.SmbEncrypt;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -66,9 +69,17 @@ public class LdapUserDao extends LdapDao<String, LdapUser>
 
   private LdapPersonDao ldapPersonDao;
 
-  private static String[] ADDITIONAL_POSIX_OBJECT_CLASSES;
+  static String[] ALL_OBJECT_CLASSES;
+
+  static String[] ALL_OBJECT_CLASSES_WITH_POSIX_ACCOUNT;
+
+  static String[] ALL_OBJECT_CLASSES_WITH_SAMBA_ACCOUNT;
+
+  static String[] ALL_OBJECT_CLASSES_WITH_SAMBA_AND_POSIX_ACCOUNT;
 
   private static String POSIX_OBJECT_CLASS = "posixAccount";
+
+  private static String SAMBA_OBJECT_CLASS = "sambaSamAccount";
 
   public static boolean isDeactivated(final LdapUser user)
   {
@@ -94,6 +105,16 @@ public class LdapUserDao extends LdapDao<String, LdapUser>
     return posixAccountsConfig != null;
   }
 
+  public static boolean isSambaAccountsConfigured()
+  {
+    final LdapConfig ldapConfig = ConfigXml.getInstance().getLdapConfig();
+    if (ldapConfig == null) {
+      return false;
+    }
+    final LdapSambaAccountsConfig sambaAccountsConfig = ldapConfig.getSambaAccountsConfig();
+    return sambaAccountsConfig != null;
+  }
+
   public LdapUserDao()
   {
     useUidInDn = true;
@@ -114,19 +135,30 @@ public class LdapUserDao extends LdapDao<String, LdapUser>
   @Override
   protected String[] getAdditionalObjectClasses()
   {
-    if (isPosixAccountsConfigured() == true) {
-      if (ADDITIONAL_POSIX_OBJECT_CLASSES == null) {
-        final String[] personObjectClasses = ldapPersonDao.getAdditionalObjectClasses();
-        ADDITIONAL_POSIX_OBJECT_CLASSES = new String[personObjectClasses.length + 1];
-        for (int i = 0; i < personObjectClasses.length; i++) {
-          ADDITIONAL_POSIX_OBJECT_CLASSES[i] = personObjectClasses[i];
-        }
-        ADDITIONAL_POSIX_OBJECT_CLASSES[personObjectClasses.length] = POSIX_OBJECT_CLASS;
-      }
-      return ADDITIONAL_POSIX_OBJECT_CLASSES;
-    } else {
-      return ldapPersonDao.getAdditionalObjectClasses();
+    throw new UnsupportedOperationException("Call getAdditionalObjectClasses(LdapUser) instead.");
+  }
+
+  void initializeObjectClasses()
+  {
+    if (ALL_OBJECT_CLASSES != null) {
+      // Already initialized.
+      return;
     }
+    final List<String> additionalObjectClassesList = new LinkedList<String>();
+    for (final String additionalObjectClass : ldapPersonDao.getAdditionalObjectClasses()) {
+      additionalObjectClassesList.add(additionalObjectClass);
+    }
+    ALL_OBJECT_CLASSES = additionalObjectClassesList.toArray(new String[0]);
+    additionalObjectClassesList.add(POSIX_OBJECT_CLASS);
+    ALL_OBJECT_CLASSES_WITH_POSIX_ACCOUNT = additionalObjectClassesList.toArray(new String[0]);
+    additionalObjectClassesList.add(SAMBA_OBJECT_CLASS);
+    ALL_OBJECT_CLASSES_WITH_SAMBA_AND_POSIX_ACCOUNT = additionalObjectClassesList.toArray(new String[0]);
+    additionalObjectClassesList.clear();
+    for (final String additionalObjectClass : ldapPersonDao.getAdditionalObjectClasses()) {
+      additionalObjectClassesList.add(additionalObjectClass);
+    }
+    additionalObjectClassesList.add(SAMBA_OBJECT_CLASS);
+    ALL_OBJECT_CLASSES_WITH_SAMBA_ACCOUNT = additionalObjectClassesList.toArray(new String[0]);
   }
 
   /**
@@ -135,17 +167,21 @@ public class LdapUserDao extends LdapDao<String, LdapUser>
   @Override
   protected String[] getAdditionalObjectClasses(final LdapUser obj)
   {
-    if (isPosixAccountsConfigured() == true) {
-      if (PFUserDOConverter.isPosixAccountValuesEmpty(obj) == true) {
-        // Get additional object classes without posixAccount because no posix account value is given.
-        return ldapPersonDao.getAdditionalObjectClasses();
-      } else {
-        // Get additional object classes including the posixAccount because posix account values are given.
-        return getAdditionalObjectClasses();
-      }
-    } else {
-      return ldapPersonDao.getAdditionalObjectClasses();
+    final boolean posixAccount = isPosixAccountsConfigured() == true && PFUserDOConverter.isPosixAccountValuesEmpty(obj) == false;
+    final boolean sambaAccount = isSambaAccountsConfigured() == true && PFUserDOConverter.isSambaAccountValuesEmpty(obj) == false;
+    if (ALL_OBJECT_CLASSES == null) {
+      initializeObjectClasses();
     }
+    if (posixAccount == true) {
+      if (sambaAccount == true) {
+        return ALL_OBJECT_CLASSES_WITH_SAMBA_AND_POSIX_ACCOUNT;
+      }
+      return ALL_OBJECT_CLASSES_WITH_POSIX_ACCOUNT;
+    }
+    if (sambaAccount == true) {
+      return ALL_OBJECT_CLASSES_WITH_SAMBA_ACCOUNT;
+    }
+    return ALL_OBJECT_CLASSES;
   }
 
   /**
@@ -174,13 +210,23 @@ public class LdapUserDao extends LdapDao<String, LdapUser>
   {
     final LdapUser user = new LdapUser();
     ldapPersonDao.mapToObject(dn, user, attributes);
-    if (isPosixAccountsConfigured() == true) {
-      String no = LdapUtils.getAttributeStringValue(attributes, "uidNumber");
+    final boolean posixAccountsConfigured = isPosixAccountsConfigured();
+    final boolean sambaAccountsConfigured = isSambaAccountsConfigured();
+    if (posixAccountsConfigured == true || sambaAccountsConfigured == true) {
+      final String no = LdapUtils.getAttributeStringValue(attributes, "uidNumber");
       user.setUidNumber(NumberHelper.parseInteger(no));
-      no = LdapUtils.getAttributeStringValue(attributes, "gidNumber");
+    }
+    if (posixAccountsConfigured == true) {
+      final String no = LdapUtils.getAttributeStringValue(attributes, "gidNumber");
       user.setGidNumber(NumberHelper.parseInteger(no));
       user.setHomeDirectory(LdapUtils.getAttributeStringValue(attributes, "homeDirectory"));
       user.setLoginShell(LdapUtils.getAttributeStringValue(attributes, "loginShell"));
+    }
+    if (sambaAccountsConfigured == true) {
+      final String sambaSID = LdapUtils.getAttributeStringValue(attributes, "sambaSID");
+      final Integer sambaSIDNumber = ldapConfig.getSambaAccountsConfig().getSambaSIDNumber(sambaSID);
+      user.setSambaSIDNumber(sambaSIDNumber);
+      user.setSambaNTPassword(LdapUtils.getAttributeStringValue(attributes, "sambaNTPassword"));
     }
     if (dn != null) {
       if (dn.contains(DEACTIVATED_SUB_CONTEXT2) == true) {
@@ -377,23 +423,16 @@ public class LdapUserDao extends LdapDao<String, LdapUser>
   {
     log.info("Change password for " + getObjectClass() + ": " + buildDn(null, user));
     final List<ModificationItem> modificationItems = new ArrayList<ModificationItem>();
-    // Replace the "unicdodePwd" attribute with a new value
-    // Password must be both Unicode and a quoted string
-    // try {
-    // final String oldQuotedPassword = "\"" + oldPassword + "\"";
-    // final byte[] oldUnicodePassword = oldQuotedPassword.getBytes("UTF-16LE");
-    // final String newQuotedPassword = "\"" + newPassword + "\"";
-    // final byte[] newUnicodePassword = newQuotedPassword.getBytes("UTF-16LE");
     if (oldPassword != null) {
       modificationItems.add(new ModificationItem(DirContext.REMOVE_ATTRIBUTE, new BasicAttribute("userPassword", oldPassword)));
       modificationItems.add(new ModificationItem(DirContext.ADD_ATTRIBUTE, new BasicAttribute("userPassword", newPassword)));
     } else {
       modificationItems.add(new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("userPassword", newPassword)));
     }
-    // } catch (final UnsupportedEncodingException ex) {
-    // log.error("While encoding passwords with UTF-16LE: " + ex.getMessage(), ex);
-    // throw new RuntimeException(ex);
-    // }
+    if (isSambaAccountsConfigured() == true && user.getSambaSIDNumber() != null) {
+      final String sambaNTPassword = SmbEncrypt.NTUNICODEHash(newPassword);
+      modificationItems.add(new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("sambaNTPassword", sambaNTPassword)));
+    }
     // Perform the update
     modify(user, modificationItems);
   }
@@ -484,6 +523,18 @@ public class LdapUserDao extends LdapDao<String, LdapUser>
       createAndAddModificationItems(list, "gidNumber", String.valueOf(user.getGidNumber()));
       createAndAddModificationItems(list, "homeDirectory", user.getHomeDirectory());
       createAndAddModificationItems(list, "loginShell", user.getLoginShell());
+    }
+    if (isSambaAccountsConfigured() == true && PFUserDOConverter.isSambaAccountValuesEmpty(user) == false) {
+      if (user.getObjectClasses() != null) {
+        final List<String> missedObjectClasses = LdapUtils.getMissedObjectClasses(getAdditionalObjectClasses(user), getObjectClass(),
+            user.getObjectClasses());
+        if (CollectionUtils.isNotEmpty(missedObjectClasses) == true) {
+          for (final String missedObjectClass : missedObjectClasses) {
+            list.add(createModificationItem(DirContext.ADD_ATTRIBUTE, "objectClass", missedObjectClass));
+          }
+        }
+      }
+      createAndAddModificationItems(list, "sambaSID", ldapConfig.getSambaAccountsConfig().getSambaSID(user.getSambaSIDNumber()));
     }
     return list;
   }

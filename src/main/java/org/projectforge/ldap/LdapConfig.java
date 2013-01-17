@@ -54,6 +54,9 @@ public class LdapConfig
   @XmlField(alias = "posixAccounts")
   private LdapPosixAccountsConfig posixAccountsConfig;
 
+  @XmlField(alias = "sambaAccounts")
+  private LdapSambaAccountsConfig sambaAccountsConfig;
+
   /**
    * e.g. ldap.acme.com
    */
@@ -256,6 +259,23 @@ public class LdapConfig
   public void setPosixAccountsConfig(final LdapPosixAccountsConfig posixAccountsConfig)
   {
     this.posixAccountsConfig = posixAccountsConfig;
+  }
+
+  /**
+   * @return the sambaAccountsConfig
+   */
+  public LdapSambaAccountsConfig getSambaAccountsConfig()
+  {
+    return sambaAccountsConfig;
+  }
+
+  /**
+   * @param sambaAccountsConfig the sambaAccountsConfig to set
+   * @return this for chaining.
+   */
+  public void setSambaAccountsConfig(final LdapSambaAccountsConfig sambaAccountsConfig)
+  {
+    this.sambaAccountsConfig = sambaAccountsConfig;
   }
 
   /**

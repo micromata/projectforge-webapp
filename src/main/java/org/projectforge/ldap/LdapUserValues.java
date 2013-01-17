@@ -50,12 +50,28 @@ public class LdapUserValues implements Serializable
   @XmlField(asAttribute = true)
   private String loginShell;
 
-  public boolean isPosixAccountValuesEmpty()
+  private Integer sambaSIDNumber;
+
+  public boolean isValuesEmpty()
+  {
+    return getUidNumber() == null
+        && StringUtils.isBlank(getHomeDirectory()) == true
+        && StringUtils.isBlank(getLoginShell()) == true
+        && getSambaSIDNumber() == null
+        && getGidNumber() == null;
+  }
+
+  public boolean isPosixValuesEmpty()
   {
     return getUidNumber() == null
         && StringUtils.isBlank(getHomeDirectory()) == true
         && StringUtils.isBlank(getLoginShell()) == true
         && getGidNumber() == null;
+  }
+
+  public boolean isSambaValuesEmpty()
+  {
+    return getSambaSIDNumber() != null;
   }
 
   public String getHomeDirectory()
@@ -99,6 +115,24 @@ public class LdapUserValues implements Serializable
   public LdapUserValues setLoginShell(final String loginShell)
   {
     this.loginShell = loginShell;
+    return this;
+  }
+
+  /**
+   * @return the sambaSID without {@link LdapSambaAccountsConfig#getSambaSIDPrefix()}.
+   */
+  public Integer getSambaSIDNumber()
+  {
+    return sambaSIDNumber;
+  }
+
+  /**
+   * @param sambaSIDNumber the sambaSID to set
+   * @return this for chaining.
+   */
+  public LdapUserValues setSambaSIDNumber(final Integer sambaSIDNumber)
+  {
+    this.sambaSIDNumber = sambaSIDNumber;
     return this;
   }
 }
