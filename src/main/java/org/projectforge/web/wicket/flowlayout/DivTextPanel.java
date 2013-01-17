@@ -88,6 +88,14 @@ public class DivTextPanel extends Panel
   }
 
   /**
+   * @return the div
+   */
+  public WebMarkupContainer getDiv()
+  {
+    return div;
+  }
+
+  /**
    * @see org.apache.wicket.Component#setMarkupId(java.lang.String)
    */
   @Override
