@@ -85,21 +85,22 @@ public class ConsumptionBarPanel extends Panel
     final int percentage = maxValue != null ? usage.divide(maxValue, 2, BigDecimal.ROUND_HALF_UP).multiply(NumberHelper.HUNDRED).intValue()
         : 0;
     final int width = percentage <= 100 ? percentage : 10000 / percentage;
+    bar.add(AttributeModifier.replace("class", "progress"));
     if (percentage <= 80 || (taskNodeFinished == true && percentage <= 100)) {
       if (percentage > 0) {
-        bar.add(AttributeModifier.replace("class", "progress-done"));
+        bar.add(AttributeModifier.append("class", "progress-done"));
       } else {
-        bar.add(AttributeModifier.replace("class", "progress-none"));
+        bar.add(AttributeModifier.append("class", "progress-none"));
         progressLabel.setVisible(false);
       }
     } else if (percentage <= 90) {
-      bar.add(AttributeModifier.replace("class", "progress-80"));
+      bar.add(AttributeModifier.append("class", "progress-80"));
     } else if (percentage <= 100) {
-      bar.add(AttributeModifier.replace("class", "progress-90"));
+      bar.add(AttributeModifier.append("class", "progress-90"));
     } else if (taskNodeFinished == true && percentage <= 110) {
-      bar.add(AttributeModifier.replace("class", "progress-overbooked-min"));
+      bar.add(AttributeModifier.append("class", "progress-overbooked-min"));
     } else {
-      bar.add(AttributeModifier.replace("class", "progress-overbooked"));
+      bar.add(AttributeModifier.append("class", "progress-overbooked"));
     }
     if (maxValue == null && (usage == null || usage.compareTo(BigDecimal.ZERO) == 0)) {
       bar.setVisible(false);

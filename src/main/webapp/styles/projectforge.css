@@ -33,98 +33,69 @@
 	color: #EC4031;
 }
 
-div.progress-none {
+div.progress {
+	margin-top: 5px;
+	margin-bottom: 0px;
+	line-height: 10px;
 	width: 50px;
 	height: 8px;
-	background-color: #eeeeee;
 	border-width: 1px;
 	border-style: solid;
 	border-color: #aaaaaa;
+	display: inline-block !important;
+	width: 50px;
+}
+
+div.progress div {
+	display: block !important;
+	border-width: 0px 1px 0px 0px;
+	border-color: #aaaaaa;
+	border-style: solid;
+	height: 8px;
+}
+
+div.progress-none {
+	background-color: #eeeeee;
 }
 
 div.progress-done {
-	width: 50px;
-	height: 8px;
 	background-color: #eeeeee;
-	border-width: 1px;
-	border-style: solid;
-	border-color: black;
 }
 
 div.progress-done div {
-	height: 8px;
 	background-color: #099900;
-	border-width: 0px 1px 0px 0px;
-	border-style: solid;
-	border-color: black;
 }
 
 div.progress-80 {
-	width: 50px;
-	height: 8px;
 	background-color: #eeeeee;
-	border-width: 1px;
-	border-style: solid;
-	border-color: black;
 }
 
 div.progress-80 div {
-	height: 8px;
 	background-color: #ffff00;
-	border-width: 0px 1px 0px 0px;
-	border-style: solid;
-	border-color: black;
 }
 
 div.progress-90 {
-	width: 50px;
-	height: 8px;
 	background-color: #eeeeee;
-	border-width: 1px;
-	border-style: solid;
-	border-color: black;
 }
 
 div.progress-90 div {
-	height: 8px;
 	background-color: #ff8000;
-	border-width: 0px 1px 0px 0px;
-	border-style: solid;
-	border-color: black;
 }
 
 div.progress-overbooked {
-	width: 50px;
-	height: 8px;
 	background-color: #ff0000;
-	border-width: 1px;
-	border-style: solid;
-	border-color: black;
 }
 
 div.progress-overbooked div {
-	height: 8px;
 	background-color: #ff8000;
-	border-width: 0px 1px 0px 0px;
-	border-style: solid;
-	border-color: black;
 }
 
 div.progress-overbooked-min {
-	width: 50px;
-	height: 8px;
 	background-color: #ff0000;
-	border-width: 1px;
-	border-style: solid;
-	border-color: black;
 }
 
 div.progress-overbooked-min div {
-	height: 8px;
 	background-color: #eeeeee;
-	border-width: 0px 1px 0px 0px;
-	border-style: solid;
-	border-color: black;
 }
 
 /* Zoom of phone numbers. */
@@ -433,7 +404,7 @@ h2.box_head .subtitle {
 	background-color: black;
 	z-index: 1;
 	opacity: 0;
-	filter: alpha(opacity =     0);
+	filter: alpha(opacity =           0);
 }
 
 .pf_teamCalDialog {
