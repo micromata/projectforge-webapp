@@ -96,7 +96,7 @@ public class SingleButtonPanel extends Panel
   public SingleButtonPanel setClassnames(final String... classnames)
   {
     if (classnames != null) {
-      button.add(AttributeModifier.replace("class", StringHelper.listToString(" ", classnames)));
+      button.add(AttributeModifier.append("class", StringHelper.listToString(" ", classnames)));
     }
     return this;
   }
