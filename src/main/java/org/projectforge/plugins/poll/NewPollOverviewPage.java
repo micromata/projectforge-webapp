@@ -100,35 +100,41 @@ public class NewPollOverviewPage extends PollBasePage
 
     final FieldsetPanel fsTitle = gridBuilder.newFieldset(getString("plugins.poll.new.title"), true).setLabelFor(this);
     final TextField<String> title = new TextField<String>(fsTitle.getTextFieldId(), new PropertyModel<String>(model.getPollDo(), "title"));
-    title.setEnabled(this.model.isExisting());
+    title.setEnabled(this.model.isNew());
     fsTitle.add(title);
 
     final FieldsetPanel fsLocation = gridBuilder.newFieldset(getString("plugins.poll.new.location"), true).setLabelFor(this);
     final TextField<String> location = new TextField<String>(fsLocation.getTextFieldId(),
         new PropertyModel<String>(model.getPollDo(), "location"));
-    location.setEnabled(this.model.isExisting());
+    location.setEnabled(this.model.isNew());
     fsLocation.add(location);
 
     final FieldsetPanel fsDescription = gridBuilder.newFieldset(getString("plugins.poll.new.description"), true).setLabelFor(this);
     final TextArea<String> description = new TextArea<String>(fsDescription.getTextAreaId(), new PropertyModel<String>(this.model.getPollDo(),
         "description"));
-    description.setEnabled(this.model.isExisting());
+    description.setEnabled(this.model.isNew());
     fsDescription.add(description);
 
     gridBuilder.newGridPanel();
 
-    if (this.model.isExisting() == true) {
+    if (this.model.isNew() == true) {
       createEnabledChoices();
     } else {
       final FieldsetPanel fsUsers = gridBuilder.newFieldset(getString("plugins.poll.attendee.users"), true).setLabelFor(this);
 
-      //      createDisabledChoices(fsUsers, model.getCalculatedAttendeeList(), true);
-      createDisabledChoices(fsUsers, model.getPollAttendeeList(), true);
+      if (model.isNew() == false) {
+        createDisabledChoices(fsUsers, model.getCalculatedAttendeeList(), true);
+      } else {
+        createDisabledChoices(fsUsers, model.getPollAttendeeList(), true);
+      }
     }
 
     final FieldsetPanel fsEMails = gridBuilder.newFieldset(getString("plugins.poll.attendee.emails"), true).setLabelFor(this);
-    //    createDisabledChoices(fsEMails, model.getCalculatedAttendeeList(), false);
-    createDisabledChoices(fsEMails, model.getPollAttendeeList(), false);
+    if (model.isNew() == false) {
+      createDisabledChoices(fsEMails, model.getCalculatedAttendeeList(), false);
+    } else {
+      createDisabledChoices(fsEMails, model.getPollAttendeeList(), false);
+    }
 
     final FieldsetPanel fsEvents = gridBuilder.newFieldset(getString("plugins.poll.attendee.events"), true).setLabelFor(this);
     createDisabledChoices(fsEvents, model.getAllEvents());
@@ -209,7 +215,7 @@ public class NewPollOverviewPage extends PollBasePage
     pollDao.saveOrUpdate(model.getPollDo());
     final List<PollEventDO> pollEvents = new ArrayList<PollEventDO>();
     pollEvents.addAll(model.getAllEvents());
-    if (model.isExisting() == false) {
+    if (model.isNew() == false) {
       for (final PollEventDO event : pollEvents) {
         event.setPoll(model.getPollDo());
       }

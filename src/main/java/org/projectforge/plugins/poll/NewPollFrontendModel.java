@@ -60,7 +60,7 @@ public class NewPollFrontendModel implements Serializable
 
   private final List<PollAttendeeDO> calculatedUserList;
 
-  private boolean exist;
+  private boolean isNew;
 
   @SpringBean(name = "pollAttendeeDao")
   private PollAttendeeDao pollAttendeeDao;
@@ -78,7 +78,7 @@ public class NewPollFrontendModel implements Serializable
   {
     Injector.get().inject(this);
     this.pollDo = pollDo;
-    this.exist = false;
+    this.isNew = false;
     this.allEvents = new LinkedList<PollEventDO>();
     this.pollAttendeeList = new LinkedList<PollAttendeeDO>();
     this.pollGroupList = new LinkedList<GroupDO>();
@@ -92,16 +92,16 @@ public class NewPollFrontendModel implements Serializable
       if (pollDo != null) {
         pollAttendeeList = pollAttendeeDao.getListByPoll(pollDo);
         allEvents = pollEventDao.getListByPoll(pollDo);
-        exist = true;
+        isNew = true;
       }
     } catch (Exception ex) {
       // TODO log entry
     }
   }
 
-  public boolean isExisting()
+  public boolean isNew()
   {
-    return exist;
+    return isNew;
   }
 
   /**

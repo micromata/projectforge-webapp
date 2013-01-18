@@ -82,6 +82,8 @@ public class PollAttendeePage extends PollBasePage
     super(parameters);
     NewPollPage.redirectToNewPollPage(parameters);
     this.model = null;
+
+    // TODO Max: set model back to isNew, if something changed
   }
 
   /**
@@ -128,6 +130,13 @@ public class PollAttendeePage extends PollBasePage
 
   private TextField<String> getNewEMailField(final String wicketId)
   {
+    if (model.getPollAttendeeList() != null) {
+      for (final PollAttendeeDO attendee : model.getPollAttendeeList()) {
+        if (attendee.getEmail() != null) {
+          emailList += attendee.getEmail() + "; ";
+        }
+      }
+    }
     final PropertyModel<String> mailModel = new PropertyModel<String>(this, "emailList");
     final TextField<String> eMailField = new TextField<String>(wicketId, mailModel);
     return eMailField;
