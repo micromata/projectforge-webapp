@@ -1,10 +1,3 @@
-Prio 1 (Johannes):
-------------------
-
-Prio 2 (Johannes):
-------------------
-- Wiederholter Aufruf von PF-Dialog auf TeamCalSeite
-
 Bootstrap-Umbau
 ---------------
 - Dialoge
@@ -13,15 +6,15 @@ Bootstrap-Umbau
 
 Konkrete Masken
 ---------------
-- *RechnungsEditForm: Cost dialog
+- ICS Download in ModalDialog,
 - GanttChartEditForm: refresh button, context menu
+- jquery.mobile: About dialog braucht home knopf
 
 Wicket6-Migration
 -----------------
 - TaskTreePage auf Wicket Tree umstellen
 
 - JS and CSS: minifiing and concatenating (https://github.com/WiQuery/wiquery)
-
 
 Themenspeicher
 --------------
