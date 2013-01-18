@@ -31,7 +31,6 @@ import org.apache.wicket.request.flow.RedirectToUrlException;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.plugins.poll.event.PollEventEditPage;
-import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteMaxLengthTextField;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
@@ -121,7 +120,7 @@ public class NewPollPage extends PollBasePage
   protected void onConfirm()
   {
     if (model.getPollDo().getTitle() == null) {
-      error("Bitte geben Sie einen Titel ein."); // TODO
+      error(getString("plugins.poll.new.error"));
     } else {
       setResponsePage(new PollEventEditPage(getPageParameters(), model));
     }
@@ -133,7 +132,7 @@ public class NewPollPage extends PollBasePage
   @Override
   protected void onCancel()
   {
-    setResponsePage(getApplication().getHomePage());
+    setResponsePage(PollListPage.class);
   }
 
   public static void redirectToNewPollPage(final PageParameters parameters) {
@@ -146,6 +145,6 @@ public class NewPollPage extends PollBasePage
   @Override
   protected void onBack()
   {
-    // TODO do something here
+    // do nothing here
   }
 }

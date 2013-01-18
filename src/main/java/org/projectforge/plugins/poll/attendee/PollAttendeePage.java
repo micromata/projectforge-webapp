@@ -72,8 +72,6 @@ public class PollAttendeePage extends PollBasePage
 
   private MultiChoiceListHelper<PFUserDO> assignUsersListHelper;
 
-  // private List<PFUserDO> filteredSelectUserList;
-
   private String emailList;
 
   private final NewPollFrontendModel model;
@@ -102,10 +100,8 @@ public class PollAttendeePage extends PollBasePage
   {
     super.onInitialize();
 
-    // remove users, which already exist in preset groups.
-    // filteredSelectUserList = getFilteredUserList(presetGroups.toArray(new Integer[presetGroups.size()]));
-    final UsersProvider usersProvider = new UsersProvider();
     // User select
+    final UsersProvider usersProvider = new UsersProvider();
     final FieldsetPanel fsUserSelect = gridBuilder.newFieldset(getString("plugins.poll.attendee.users"), true);
     assignUsersListHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator()).setFullList(
         usersProvider.getSortedUsers());
@@ -123,7 +119,7 @@ public class PollAttendeePage extends PollBasePage
         new PropertyModel<Collection<GroupDO>>(this.assignGroupsListHelper, "assignedItems"), groupsProvider);
     fsGroupSelect.add(groups);
 
-    // TODO Email select
+    // TODO fancy email select
     final FieldsetPanel fsEMail = gridBuilder.newFieldset(getString("email"), true);
     fsEMail.add(getNewEMailField(fsEMail.getTextFieldId()));
 
@@ -189,7 +185,7 @@ public class PollAttendeePage extends PollBasePage
     }
 
     if (allAttendeeList.isEmpty() == true) {
-      this.error(getString("plugins.poll.error"));
+      this.error(getString("plugins.poll.attendee.error"));
     } else {
       model.getPollAttendeeList().clear();
       model.getCalculatedAttendeeList().clear();
