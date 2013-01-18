@@ -69,9 +69,6 @@ public abstract class AbstractMobilePage extends WebPage
 
   protected WebMarkupContainer pageContainer;
 
-  // iWebKit doesn't work completely with wicket tags such as wicket:panel etc.
-  private static Boolean stripTags;
-
   private boolean topButtonsRendered;
 
   public AbstractMobilePage()
@@ -93,9 +90,6 @@ public abstract class AbstractMobilePage extends WebPage
   public AbstractMobilePage(final PageParameters parameters)
   {
     super(parameters);
-    if (stripTags == null) {
-      stripTags = Application.get().getMarkupSettings().getStripWicketTags();
-    }
     add(pageContainer = new WebMarkupContainer("page"));
     pageContainer.add(headerContainer = new WebMarkupContainer("header"));
     add(new Label("windowTitle", new Model<String>() {
@@ -159,19 +153,7 @@ public abstract class AbstractMobilePage extends WebPage
       addTopCenter();
       addTopRightButton();
     }
-    if (stripTags == false) {
-      Application.get().getMarkupSettings().setStripWicketTags(true);
-    }
     alreadySubmitted = false;
-  }
-
-  @Override
-  protected void onAfterRender()
-  {
-    super.onAfterRender();
-    if (stripTags == false) {
-      Application.get().getMarkupSettings().setStripWicketTags(false);
-    }
   }
 
   public MySession getMySession()
