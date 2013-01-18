@@ -122,11 +122,13 @@ public class NewPollOverviewPage extends PollBasePage
     } else {
       final FieldsetPanel fsUsers = gridBuilder.newFieldset(getString("plugins.poll.attendee.users"), true).setLabelFor(this);
 
-      createDisabledChoices(fsUsers, model.getCalculatedAttendeeList(), false);
+      //      createDisabledChoices(fsUsers, model.getCalculatedAttendeeList(), true);
+      createDisabledChoices(fsUsers, model.getPollAttendeeList(), true);
     }
 
     final FieldsetPanel fsEMails = gridBuilder.newFieldset(getString("plugins.poll.attendee.emails"), true).setLabelFor(this);
-    createDisabledChoices(fsEMails, model.getCalculatedAttendeeList(), false);
+    //    createDisabledChoices(fsEMails, model.getCalculatedAttendeeList(), false);
+    createDisabledChoices(fsEMails, model.getPollAttendeeList(), false);
 
     final FieldsetPanel fsEvents = gridBuilder.newFieldset(getString("plugins.poll.attendee.events"), true).setLabelFor(this);
     createDisabledChoices(fsEvents, model.getAllEvents());
@@ -204,11 +206,19 @@ public class NewPollOverviewPage extends PollBasePage
   @Override
   protected void onConfirm()
   {
-    pollDao.save(model.getPollDo());
+    pollDao.saveOrUpdate(model.getPollDo());
     final List<PollEventDO> pollEvents = new ArrayList<PollEventDO>();
     pollEvents.addAll(model.getAllEvents());
-    pollEventDao.save(pollEvents);
-    pollAttendeeDao.save(model.getCalculatedAttendeeList());
+    if (model.isExisting() == false) {
+      for (final PollEventDO event : pollEvents) {
+        event.setPoll(model.getPollDo());
+      }
+      for (final PollAttendeeDO attendee : model.getCalculatedAttendeeList()) {
+        attendee.setPoll(model.getPollDo());
+      }
+    }
+    pollEventDao.saveOrUpdate(pollEvents);
+    pollAttendeeDao.saveOrUpdate(model.getCalculatedAttendeeList());
 
     setResponsePage(PollListPage.class);
   }

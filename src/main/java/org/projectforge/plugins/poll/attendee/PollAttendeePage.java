@@ -37,6 +37,7 @@ import org.projectforge.plugins.poll.NewPollFrontendModel;
 import org.projectforge.plugins.poll.NewPollOverviewPage;
 import org.projectforge.plugins.poll.NewPollPage;
 import org.projectforge.plugins.poll.PollBasePage;
+import org.projectforge.plugins.poll.PollListPage;
 import org.projectforge.plugins.poll.event.PollEventEditPage;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
@@ -185,7 +186,7 @@ public class PollAttendeePage extends PollBasePage
     }
 
     if (allAttendeeList.isEmpty() == true) {
-      this.error(getString("plugins.poll.attendee.error"));
+      feedBackPanel.error(getString("plugins.poll.attendee.error"));
     } else {
       model.getPollAttendeeList().clear();
       model.getCalculatedAttendeeList().clear();
@@ -211,7 +212,7 @@ public class PollAttendeePage extends PollBasePage
   @Override
   protected void onCancel()
   {
-    setResponsePage(new PollEventEditPage(getPageParameters(), model));
+    setResponsePage(PollListPage.class);
   }
 
   /**

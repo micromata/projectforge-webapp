@@ -120,7 +120,7 @@ public class NewPollPage extends PollBasePage
   protected void onConfirm()
   {
     if (model.getPollDo().getTitle() == null) {
-      error(getString("plugins.poll.new.error"));
+      this.feedBackPanel.error(getString("plugins.poll.new.error"));
     } else {
       setResponsePage(new PollEventEditPage(getPageParameters(), model));
     }

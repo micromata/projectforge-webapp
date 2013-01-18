@@ -46,6 +46,8 @@ public abstract class PollBasePage extends AbstractSecuredPage
 
   protected Form<String> form;
 
+  protected FeedbackPanel feedBackPanel;
+
   /**
    * @param parameters
    */
@@ -90,6 +92,12 @@ public abstract class PollBasePage extends AbstractSecuredPage
       {
         PollBasePage.this.onConfirm();
       }
+
+      @Override
+      public final void onError()
+      {
+        PollBasePage.this.onConfirm();
+      }
     };
     final SingleButtonPanel confirmPanel = new SingleButtonPanel("confirm", confirm, getString("plugins.poll.new.continue"),
         SingleButtonPanel.DEFAULT_SUBMIT);
@@ -100,6 +108,12 @@ public abstract class PollBasePage extends AbstractSecuredPage
 
       @Override
       public final void onSubmit()
+      {
+        PollBasePage.this.onBack();
+      }
+
+      @Override
+      public final void onError()
       {
         PollBasePage.this.onBack();
       }
@@ -118,6 +132,11 @@ public abstract class PollBasePage extends AbstractSecuredPage
         PollBasePage.this.onDelete();
       }
 
+      @Override
+      public final void onError()
+      {
+        PollBasePage.this.onDelete();
+      }
     };
     final SingleButtonPanel deletePanel = new SingleButtonPanel("delete", delete, getString("plugins.poll.new.delete"),
         SingleButtonPanel.DEFAULT_SUBMIT);
@@ -145,8 +164,9 @@ public abstract class PollBasePage extends AbstractSecuredPage
         return MySession.get().getFeedbackMessages().hasMessage(containerFeedbackMessageFilter);
       }
     };
+    feedBackPanel = new FeedbackPanel("feedback", containerFeedbackMessageFilter);
+    feedbackContainer.add(feedBackPanel);
     form.add(feedbackContainer);
-    feedbackContainer.add(new FeedbackPanel("feedback", containerFeedbackMessageFilter));
   }
 
   /**
