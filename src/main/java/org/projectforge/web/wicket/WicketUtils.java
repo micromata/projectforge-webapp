@@ -914,7 +914,7 @@ public class WicketUtils
     }
     component.add(AttributeModifier.replace("data-content", text));
     component.add(AttributeModifier.replace("rel", "popup-tooltip"));
-    component.add(AttributeModifier.replace("data-trigger", "hover"));
+    component.add(AttributeModifier.replace("data-trigger", "manual"));
     return component;
   }
 
