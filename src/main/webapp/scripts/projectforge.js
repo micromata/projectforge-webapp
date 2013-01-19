@@ -58,33 +58,76 @@ function initializeComponents() {
 	if ($("textarea.autogrow").length) {
 		$("textarea.autogrow").autoGrow();
 	}
+
 	$('[rel=\'popup-tooltip\']')
 			.popover(
 					{
 						placement : function(tip, element) {
-							var offset = $(element).offset();
-							height = $(document).outerHeight();
-							width = $(document).outerWidth();
-//							compWidth = $(element).outerWidth();
-//							compHeight = $(element).outerHeight();
-//							tipWidth = $(tip)-outerWidth();
-//							tipHeight = $(tip)-outerHeight();
-//							bottomSpace = height - offset.top - compHeight;
-//							topSpace = offset.top;
-//							leftSpace = offset.left;
-//							rightSpace = width - offset.left - compWidth;
-//							vert = 0.5 * compHeight - offset.top;
-//							vertPlacement = vert > 0 ? 'bottom' : 'top';
-//							horiz = 0.5 * width - offset.left;
-//							horizPlacement = horiz > 0 ? 'right' : 'left';
-//							placement = Math.abs(horiz) > Math.abs(vert) ? horizPlacement
-//									: vertPlacement;
-							$(tip).offset({top: 300, left: 300});
-//							console.log(placement + ", height=" + height + ", width=" + width + ", top=" + offset.top + ", left=" + offset.left + ", compWidth=" + compWidth);
-							return 'bottom';//placement;
+							var $element, above, actualHeight, actualWidth, below, boundBottom, boundLeft, boundRight, boundTop, elementAbove, elementBelow, elementLeft, elementRight, isWithinBounds, left, pos, right;
+							isWithinBounds = function(elementPosition) {
+								return boundTop < elementPosition.top
+										&& boundLeft < elementPosition.left
+										&& boundRight > (elementPosition.left + actualWidth)
+										&& boundBottom > (elementPosition.top + actualHeight);
+							};
+							$element = $(element);
+							pos = $.extend({}, $element.offset(), {
+								width : element.offsetWidth,
+								height : element.offsetHeight
+							});
+							actualWidth = $(tip).outerWidth();
+							actualHeight = $(tip).outerHeight();
+							boundTop = $(document).scrollTop();
+							boundLeft = $(document).scrollLeft();
+							boundRight = boundLeft + $(window).width();
+							boundBottom = boundTop + $(window).height();
+							elementAbove = {
+								top : pos.top - actualHeight,
+								left : pos.left + pos.width / 2 - actualWidth
+										/ 2
+							};
+							elementBelow = {
+								top : pos.top + pos.height,
+								left : pos.left + pos.width / 2 - actualWidth
+										/ 2
+							};
+							elementLeft = {
+								top : pos.top + pos.height / 2 - actualHeight
+										/ 2,
+								left : pos.left - actualWidth
+							};
+							elementRight = {
+								top : pos.top + pos.height / 2 - actualHeight
+										/ 2,
+								left : pos.left + pos.width
+							};
+							above = isWithinBounds(elementAbove);
+							below = isWithinBounds(elementBelow);
+							left = isWithinBounds(elementLeft);
+							right = isWithinBounds(elementRight);
+							if (above) {
+								return "top";
+							} else {
+								if (below) {
+									return "bottom";
+								} else {
+									if (left) {
+										return "left";
+									} else {
+										if (right) {
+											return "right";
+										} else {
+											return "right";
+										}
+									}
+								}
+							}
 						}
-					});// hover(function() {
-	// $(this).popover('show');
+					});
+	// .hover(function() {
+	// element = $(this).popover('show');
+	// console.log(element);
+	// // $(this).tip.offset({top: 300, left: 300});
 	// }, function() {
 	// $(this).popover('hide');
 	// });
