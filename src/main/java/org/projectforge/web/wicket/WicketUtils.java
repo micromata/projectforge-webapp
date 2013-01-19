@@ -32,7 +32,6 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
@@ -862,51 +861,9 @@ public class WicketUtils
     return datumChoiceRenderer;
   }
 
-  /**
-   * Should be called for every component for which a tooltip (title attribute) is set. Adds a style attribute for the given component
-   * (font-style: italic;). <br/>
-   * Will be ignored for instances of FormComponent.
-   * @param component
-   */
-  public static Component setStyleHasTooltip(final Component component)
-  {
-    if (FormComponent.class.isAssignableFrom(component.getClass()) == true
-        || ContextImage.class.isAssignableFrom(component.getClass()) == true) {
-      return component;
-    }
-    component.add(AttributeModifier.append("class", "hastooltip"));
-    return component;
-  }
-
   public static String getHighlightedRowCssStyle()
   {
     return "background-color: #ffcccc;";
-  }
-
-  /**
-   * Current implementation of tool tip is the format &lt;title&gt; - &lt;text&gt;. The title will be shown in bold letters. Should be used
-   * whenever a tool tip is shown. <br/>
-   * Use addTooltip(...) methods.
-   * @param title Can be null.
-   * @param text Can be null.
-   */
-  public static String createTooltip(final String title, final String text)
-  {
-    if (StringUtils.isBlank(title) == true) {
-      if (text == null) {
-        return "";
-      } else if (text.contains(" - ") == true) {
-        return text;
-      } else {
-        return text;
-      }
-    } else {
-      if (text == null) {
-        return title;
-      } else {
-        return title + " - " + text;
-      }
-    }
   }
 
   /**
@@ -919,7 +876,7 @@ public class WicketUtils
    */
   public static Component addTooltip(final Component component, final String title, final String text)
   {
-    return addTooltip(component, title, text, false);
+    return addTooltip(component, Model.of(title), Model.of(text));
   }
 
   /**
@@ -931,63 +888,33 @@ public class WicketUtils
    */
   public static Component addTooltip(final Component component, final String text)
   {
-    return addTooltip(component, null, text, false);
+    return addTooltip(component, null, Model.of(text));
   }
 
   /**
    * Adds a SimpleAttributeModifier("title", ...) to the given component. Does not modify the given tool tip text!
    * @param component
    * @param text
-   * @see #setStyleHasTooltip(Component)
    */
-  public static Component addTooltip(final Component component, final IModel<String> text)
+  public static Component addTooltip(final Component component,  final IModel<String> text)
   {
-    return addTooltip(component, text, false);
+    return addTooltip(component, null, text);
   }
 
   /**
    * Adds a SimpleAttributeModifier("title", ...) to the given component. Does not modify the given tool tip text!
-   * @param component
-   * @param text
-   * @see #setStyleHasTooltip(Component)
-   */
-  public static Component addTooltip(final Component component, final IModel<String> text, final boolean suppressStyleChange)
-  {
-    component.add(new AttributeModifier("title", text));
-    if (suppressStyleChange == false) {
-      setStyleHasTooltip(component);
-    }
-    return component;
-  }
-
-  /**
-   * Adds a SimpleAttributeModifier("title", ...) to the given component.
-   * @param component
-   * @param text
-   * @param suppressStyleChange If true then the style attribute will not be modified. Default is false.
-   * @see #createTooltip(String, String)
-   * @see #setStyleHasTooltip(Component)
-   */
-  public static Component addTooltip(final Component component, final String text, final boolean suppressStyleChange)
-  {
-    return addTooltip(component, null, text, suppressStyleChange);
-  }
-
-  /**
-   * Adds a SimpleAttributeModifier("title", ...) to the given component.
    * @param component
    * @param title
    * @param text
-   * @param suppressStyleChange If true then the style attribute will not be modified. Default is false.
-   * @see #createTooltip(String, String)
-   * @see #setStyleHasTooltip(Component)
    */
-  public static Component addTooltip(final Component component, final String title, final String text, final boolean suppressStyleChange)
+  public static Component addTooltip(final Component component, final IModel<String> title, final IModel<String> text)
   {
-    component.add(AttributeModifier.replace("title", createTooltip(title, text)));
-    if (suppressStyleChange == false) {
-      setStyleHasTooltip(component);
+    if (title != null && title.getObject() != null) {
+      component.add(AttributeModifier.replace("data-original-title", title));
     }
+    component.add(AttributeModifier.replace("data-content", text));
+    component.add(AttributeModifier.replace("rel", "popup-tooltip"));
+    component.add(AttributeModifier.replace("data-trigger", "hover"));
     return component;
   }
 

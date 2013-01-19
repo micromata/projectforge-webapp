@@ -58,14 +58,48 @@ function initializeComponents() {
 	if ($("textarea.autogrow").length) {
 		$("textarea.autogrow").autoGrow();
 	}
+	$('[rel=\'popup-tooltip\']')
+			.popover(
+					{
+						placement : function(tip, element) {
+							var offset = $(element).offset();
+							height = $(document).outerHeight();
+							width = $(document).outerWidth();
+//							compWidth = $(element).outerWidth();
+//							compHeight = $(element).outerHeight();
+//							tipWidth = $(tip)-outerWidth();
+//							tipHeight = $(tip)-outerHeight();
+//							bottomSpace = height - offset.top - compHeight;
+//							topSpace = offset.top;
+//							leftSpace = offset.left;
+//							rightSpace = width - offset.left - compWidth;
+//							vert = 0.5 * compHeight - offset.top;
+//							vertPlacement = vert > 0 ? 'bottom' : 'top';
+//							horiz = 0.5 * width - offset.left;
+//							horizPlacement = horiz > 0 ? 'right' : 'left';
+//							placement = Math.abs(horiz) > Math.abs(vert) ? horizPlacement
+//									: vertPlacement;
+							$(tip).offset({top: 300, left: 300});
+//							console.log(placement + ", height=" + height + ", width=" + width + ", top=" + offset.top + ", left=" + offset.left + ", compWidth=" + compWidth);
+							return 'bottom';//placement;
+						}
+					});// hover(function() {
+	// $(this).popover('show');
+	// }, function() {
+	// $(this).popover('hide');
+	// });
 }
-/* Only used if the ToggleContainer works without Ajax (wantOnToggleNotification = false) */
+/*
+ * Only used if the ToggleContainer works without Ajax (wantOnToggleNotification =
+ * false)
+ */
 function toggleCollapseIcon(icon, iconStatusOpened, iconOpened, iconClosed) {
-	if($(icon).hasClass(iconStatusOpened)) {
+	if ($(icon).hasClass(iconStatusOpened)) {
 		$(icon).removeClass().addClass(iconClosed);
 	} else {
 		$(icon).removeClass().addClass(iconOpened);
-	}}
+	}
+}
 
 function showBookmark() {
 	$("#bookmark").toggle("normal");

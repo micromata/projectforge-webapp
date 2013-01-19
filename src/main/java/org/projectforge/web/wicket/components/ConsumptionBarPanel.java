@@ -118,7 +118,7 @@ public class ConsumptionBarPanel extends Panel
       buf.append(" (").append(percentage).append("%)");
     }
     tooltip = buf.toString();
-    WicketUtils.addTooltip(bar, tooltip, true);
+    WicketUtils.addTooltip(bar, tooltip);
     showTimesheetsLink.add(bar);
     bar.add(progressLabel);
   }
