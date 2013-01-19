@@ -101,6 +101,9 @@ MyPopover.prototype = $
 								left : 0,
 								display : 'block'
 							}).insertAfter(this.$element);
+							if (this.getContent().length > 100) {
+								$tip.addClass('big');
+							}
 							pos = this.getPosition(inside);
 							boundTop = $(document).scrollTop();
 							boundLeft = $(document).scrollLeft();
@@ -110,14 +113,21 @@ MyPopover.prototype = $
 							tipHeight = $tip[0].offsetHeight
 							if (mouseX + tipWidth + 5 < boundRight
 									|| mouseX - tipWidth - 5 < boundLeft) {
+								// Bottom, if enough space at bottom of mouse
+								// position or not enough space above mouse
+								// position:
 								posX = mouseX + 5;
 							} else {
+								// Position is in top of mouse position:
 								posX = mouseX - tipWidth - 5;
 							}
 							if (mouseY + tipHeight + 5 < boundBottom
 									|| mouseY - tipHeight - 5 < boundTop) {
+								// Right if enough space right of mouse position
+								// or not enough space left of mouse position:
 								posY = mouseY + 5;
 							} else {
+								// Position is left of mouse position:
 								posY = mouseY - tipHeight - 5;
 							}
 							tp = {
@@ -149,9 +159,8 @@ $.fn.mypopover.defaults = $
 				{},
 				$.fn.tooltip.defaults,
 				{
-					placement : 'bottom',
+					width : 'normal',
 					trigger : 'manual',
-					content : '',
 					template : '<div class="popover"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"></div></div></div>'
 				})
 
