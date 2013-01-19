@@ -155,3 +155,7 @@ h3 {
 	margin-left: -500px;
 	width: 1000px;
 }
+
+.popover.big {
+	width: 600px;
+}
