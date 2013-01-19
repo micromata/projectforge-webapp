@@ -33,7 +33,8 @@ public class WicketRenderHeadUtils
   private static final String[][] JAVASCRIPT_FILES_DEF = { //
     // { "scripts/jquery/1.8.2/jquery-1.8.2", ".min"}, // Wicket delivers jQuery version
     { "include/bootstrap/js/bootstrap", ".min"}, //
-    { "scripts/jqueryui/1.9.2/jquery-ui-1.9.2.custom", ".min"}, //
+    // Needed: core, widget, button, datepicker:
+    { "scripts/jqueryui/jquery-ui-1.10.0.custom", ".min"}, //
     { "scripts/contextmenu/jquery.contextmenu", ""}, //
     { "scripts/adminica-2.2/adminica_ui", ""}, // modified!
     { "scripts/projectforge", ""} //
@@ -44,7 +45,7 @@ public class WicketRenderHeadUtils
   private static final String[][] CSS_FILES_DEF = { //
     { "styles/google-fonts/google-fonts", ""}, //
     // "http://fonts.googleapis.com/css?family=Droid+Sans:regular&amp;subset=latin", //
-    { "styles/jqueryui/1.9.2/cupertino/jquery-ui-1.9.2.custom", ".min"}, //
+    { "styles/jqueryui/1.10.0/ui-lightness/jquery-ui-1.10.0.custom", ".min"}, //
     { "styles/table", ""}, //
     { "scripts/contextmenu/css/jquery.contextmenu", ""}, //
     { "styles/adminica-2.2/main", ""}, //
