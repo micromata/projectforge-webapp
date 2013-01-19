@@ -58,80 +58,141 @@ function initializeComponents() {
 	if ($("textarea.autogrow").length) {
 		$("textarea.autogrow").autoGrow();
 	}
+	$('[rel=\'popup-tooltip\']').hover(function() {
+		$(this).mypopover('myshow');
+	}, function() {
+		$(this).mypopover('hide');
+	});
 
-	$('[rel=\'popup-tooltip\']')
-			.popover(
-					{
-						placement : function(tip, element) {
-							var $element, above, actualHeight, actualWidth, below, boundBottom, boundLeft, boundRight, boundTop, elementAbove, elementBelow, elementLeft, elementRight, isWithinBounds, left, pos, right;
-							isWithinBounds = function(elementPosition) {
-								return boundTop < elementPosition.top
-										&& boundLeft < elementPosition.left
-										&& boundRight > (elementPosition.left + actualWidth)
-										&& boundBottom > (elementPosition.top + actualHeight);
-							};
-							$element = $(element);
-							pos = $.extend({}, $element.offset(), {
-								width : element.offsetWidth,
-								height : element.offsetHeight
-							});
-							actualWidth = $(tip).outerWidth();
-							actualHeight = $(tip).outerHeight();
-							boundTop = $(document).scrollTop();
-							boundLeft = $(document).scrollLeft();
-							boundRight = boundLeft + $(window).width();
-							boundBottom = boundTop + $(window).height();
-							elementAbove = {
-								top : pos.top - actualHeight,
-								left : pos.left + pos.width / 2 - actualWidth
-										/ 2
-							};
-							elementBelow = {
-								top : pos.top + pos.height,
-								left : pos.left + pos.width / 2 - actualWidth
-										/ 2
-							};
-							elementLeft = {
-								top : pos.top + pos.height / 2 - actualHeight
-										/ 2,
-								left : pos.left - actualWidth
-							};
-							elementRight = {
-								top : pos.top + pos.height / 2 - actualHeight
-										/ 2,
-								left : pos.left + pos.width
-							};
-							above = isWithinBounds(elementAbove);
-							below = isWithinBounds(elementBelow);
-							left = isWithinBounds(elementLeft);
-							right = isWithinBounds(elementRight);
-							if (above) {
-								return "top";
-							} else {
-								if (below) {
-									return "bottom";
-								} else {
-									if (left) {
-										return "left";
-									} else {
-										if (right) {
-											return "right";
-										} else {
-											return "right";
-										}
-									}
-								}
-							}
-						}
-					});
-	// .hover(function() {
-	// element = $(this).popover('show');
-	// console.log(element);
-	// // $(this).tip.offset({top: 300, left: 300});
-	// }, function() {
-	// $(this).popover('hide');
-	// });
 }
+
+// ///////////////////////////////////
+//
+// BOOTSTRAP based popover
+//
+// ///////////////////////////////////
+var MyPopover = function(element, options) {
+	this.init('mypopover', element, options)
+}
+
+MyPopover.prototype = $
+		.extend(
+				$.fn.popover.Constructor.prototype,
+				{
+
+					constructor : MyPopover
+
+					,
+					myshow : function() {
+						var $tip, inside, pos, tipWidth, tipHeight, tp
+
+						if (this.hasContent() && this.enabled) {
+							$tip = this.tip()
+							this.setContent()
+
+							if (this.options.animation) {
+								$tip.addClass('fade')
+							}
+							$tip.detach().css({
+								top : 0,
+								left : 0,
+								display : 'block'
+							}).insertAfter(this.$element)
+							pos = this.getPosition(inside)
+							tipWidth = $tip[0].offsetWidth
+							tipHeight = $tip[0].offsetHeight
+
+								tp = {
+									top : pos.top + pos.height,
+									left : pos.left + pos.width / 2
+											- tipWidth / 2
+								}
+							$tip.offset(tp).addClass(placement).addClass('in')
+						}
+
+		// var $tip = this.tip()
+		// this.show();
+		//
+		// var $element, above, actualHeight, actualWidth, below, boundBottom,
+		// boundLeft, boundRight, boundTop, elementAbove, elementBelow,
+		// elementLeft, elementRight, isWithinBounds, left, pos, right;
+		// isWithinBounds = function(elementPosition) {
+		// return boundTop < elementPosition.top
+		// && boundLeft < elementPosition.left
+		// && boundRight > (elementPosition.left + actualWidth)
+		// && boundBottom > (elementPosition.top + actualHeight);
+		// };
+		// $element = $(element);
+		// pos = $.extend({}, $element.offset(), {
+		// width : element.offsetWidth,
+		// height : element.offsetHeight
+		// });
+		// actualWidth = $(tip).outerWidth();
+		// actualHeight = $(tip).outerHeight();
+		// boundTop = $(document).scrollTop();
+		// boundLeft = $(document).scrollLeft();
+		// boundRight = boundLeft + $(window).width();
+		// boundBottom = boundTop + $(window).height();
+		// elementAbove = {
+		// top : pos.top - actualHeight,
+		// left : pos.left + pos.width / 2 - actualWidth / 2
+		// };
+		// elementBelow = {
+		// top : pos.top + pos.height,
+		// left : pos.left + pos.width / 2 - actualWidth / 2
+		// };
+		// elementLeft = {
+		// top : pos.top + pos.height / 2 - actualHeight / 2,
+		// left : pos.left - actualWidth
+		// };
+		// elementRight = {
+		// top : pos.top + pos.height / 2 - actualHeight / 2,
+		// left : pos.left + pos.width
+		// };
+		// above = isWithinBounds(elementAbove);
+		// below = isWithinBounds(elementBelow);
+		// left = isWithinBounds(elementLeft);
+		// right = isWithinBounds(elementRight);
+		//
+		//						$tip.offset({
+		//							top : 200,
+		//							left : 400
+		//						});
+					}
+				})
+
+$.fn.mypopover = function(option) {
+	return this
+			.each(function() {
+				var $this = $(this), data = $this.data('mypopover'), options = typeof option == 'object'
+						&& option
+				if (!data)
+					$this.data('mypopover',
+							(data = new MyPopover(this, options)))
+				if (typeof option == 'string')
+					data[option]()
+			})
+}
+
+$.fn.mypopover.Constructor = MyPopover
+
+$.fn.mypopover.defaults = $
+		.extend(
+				{},
+				$.fn.tooltip.defaults,
+				{
+					placement : 'bottom',
+					trigger : 'manual',
+					content : '',
+					template : '<div class="popover"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"></div></div></div>'
+				})
+
+// ///////////////////////////////////
+//
+// END BOOTSTRAP based popover
+//
+// ///////////////////////////////////
+
 /*
  * Only used if the ToggleContainer works without Ajax (wantOnToggleNotification =
  * false)
