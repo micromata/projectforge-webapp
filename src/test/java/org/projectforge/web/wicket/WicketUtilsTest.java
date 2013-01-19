@@ -23,7 +23,6 @@
 
 package org.projectforge.web.wicket;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -36,17 +35,6 @@ import org.junit.Test;
 
 public class WicketUtilsTest
 {
-
-  @Test
-  public void createTooltip()
-  {
-    assertEquals("", WicketUtils.createTooltip(null, null));
-    assertEquals("", WicketUtils.createTooltip("  ", null));
-    assertEquals("The title", WicketUtils.createTooltip("The title", null));
-    assertEquals("The text", WicketUtils.createTooltip("", "The text"));
-    assertEquals("The title - The text", WicketUtils.createTooltip("The title", "The text"));
-  }
-
   @Test
   public void isParent()
   {
