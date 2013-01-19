@@ -1,3 +1,5 @@
+var mouseX, mouseY;
+
 function showConfirmDialog(text) {
 	return window.confirm(text);
 }
@@ -58,7 +60,9 @@ function initializeComponents() {
 	if ($("textarea.autogrow").length) {
 		$("textarea.autogrow").autoGrow();
 	}
-	$('[rel=\'popup-tooltip\']').hover(function() {
+	$('[rel=\'popup-tooltip\']').hover(function(event) {
+		mouseX = event.pageX;
+		mouseY = event.pageY;
 		$(this).mypopover('myshow');
 	}, function() {
 		$(this).mypopover('hide');
@@ -84,80 +88,44 @@ MyPopover.prototype = $
 
 					,
 					myshow : function() {
-						var $tip, inside, pos, tipWidth, tipHeight, tp
-
+						var $tip, inside, pos, tipWidth, tipHeight, posX, posY, boundTop, boundBottom, boundLeft, boundRight, tp
 						if (this.hasContent() && this.enabled) {
-							$tip = this.tip()
-							this.setContent()
+							$tip = this.tip();
+							this.setContent();
 
 							if (this.options.animation) {
-								$tip.addClass('fade')
+								$tip.addClass('fade');
 							}
 							$tip.detach().css({
 								top : 0,
 								left : 0,
 								display : 'block'
-							}).insertAfter(this.$element)
-							pos = this.getPosition(inside)
+							}).insertAfter(this.$element);
+							pos = this.getPosition(inside);
+							boundTop = $(document).scrollTop();
+							boundLeft = $(document).scrollLeft();
+							boundRight = boundLeft + $(window).width();
+							boundBottom = boundTop + $(window).height();
 							tipWidth = $tip[0].offsetWidth
 							tipHeight = $tip[0].offsetHeight
-
-								tp = {
-									top : pos.top + pos.height,
-									left : pos.left + pos.width / 2
-											- tipWidth / 2
-								}
-							$tip.offset(tp).addClass(placement).addClass('in')
+							if (mouseX + tipWidth + 5 < boundRight
+									|| mouseX - tipWidth - 5 < boundLeft) {
+								posX = mouseX + 5;
+							} else {
+								posX = mouseX - tipWidth - 5;
+							}
+							if (mouseY + tipHeight + 5 < boundBottom
+									|| mouseY - tipHeight - 5 < boundTop) {
+								posY = mouseY + 5;
+							} else {
+								posY = mouseY - tipHeight - 5;
+							}
+							tp = {
+								top : posY,
+								left : posX
+							}
+							$tip.offset(tp).addClass('in')
 						}
-
-		// var $tip = this.tip()
-		// this.show();
-		//
-		// var $element, above, actualHeight, actualWidth, below, boundBottom,
-		// boundLeft, boundRight, boundTop, elementAbove, elementBelow,
-		// elementLeft, elementRight, isWithinBounds, left, pos, right;
-		// isWithinBounds = function(elementPosition) {
-		// return boundTop < elementPosition.top
-		// && boundLeft < elementPosition.left
-		// && boundRight > (elementPosition.left + actualWidth)
-		// && boundBottom > (elementPosition.top + actualHeight);
-		// };
-		// $element = $(element);
-		// pos = $.extend({}, $element.offset(), {
-		// width : element.offsetWidth,
-		// height : element.offsetHeight
-		// });
-		// actualWidth = $(tip).outerWidth();
-		// actualHeight = $(tip).outerHeight();
-		// boundTop = $(document).scrollTop();
-		// boundLeft = $(document).scrollLeft();
-		// boundRight = boundLeft + $(window).width();
-		// boundBottom = boundTop + $(window).height();
-		// elementAbove = {
-		// top : pos.top - actualHeight,
-		// left : pos.left + pos.width / 2 - actualWidth / 2
-		// };
-		// elementBelow = {
-		// top : pos.top + pos.height,
-		// left : pos.left + pos.width / 2 - actualWidth / 2
-		// };
-		// elementLeft = {
-		// top : pos.top + pos.height / 2 - actualHeight / 2,
-		// left : pos.left - actualWidth
-		// };
-		// elementRight = {
-		// top : pos.top + pos.height / 2 - actualHeight / 2,
-		// left : pos.left + pos.width
-		// };
-		// above = isWithinBounds(elementAbove);
-		// below = isWithinBounds(elementBelow);
-		// left = isWithinBounds(elementLeft);
-		// right = isWithinBounds(elementRight);
-		//
-		//						$tip.offset({
-		//							top : 200,
-		//							left : 400
-		//						});
 					}
 				})
 
