@@ -31,15 +31,12 @@ import org.apache.commons.lang.Validate;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.web.task.TaskTreeTableNode;
-import org.projectforge.web.tree.TreeTableFilter;
-import org.projectforge.web.tree.TreeTableNode;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 @XStreamAlias("TaskFilter")
-public class TaskFilter extends BaseSearchFilter implements TreeTableFilter<TreeTableNode>
+public class TaskFilter extends BaseSearchFilter
 {
   // private static final Logger log = Logger.getLogger(TimesheetFilter.class);
 
@@ -155,19 +152,18 @@ public class TaskFilter extends BaseSearchFilter implements TreeTableFilter<Tree
    * Don't forget to call resetMatch before!
    * @see org.projectforge.web.tree.TreeTableFilter#match(org.projectforge.web.tree.TreeTableNode)
    */
-  public boolean match(final TreeTableNode n)
+  public boolean match(final TaskNode node)
   {
-    final TaskTreeTableNode node = (TaskTreeTableNode) n;
-    Validate.notNull(node.getTaskNode());
-    Validate.notNull(node.getTaskNode().getTask());
-    final TaskDO task = node.getTaskNode().getTask();
+    Validate.notNull(node);
+    Validate.notNull(node.getTask());
+    final TaskDO task = node.getTask();
     if (StringUtils.isBlank(this.searchString) == true) {
-      return isVisibleByStatus(node, task);
+      return isVisibleByStatus(node, task) || node.isRootNode() == true;
     } else {
       if (isVisibleBySearchString(node, task) == true) {
-        return isVisibleByStatus(node, task);
+        return isVisibleByStatus(node, task) || node.isRootNode() == true;
       } else {
-        if (node.getParent() != null && isAncestorVisibleBySearchString(node.getParent()) == true) {
+        if (node.getParent() != null && node.getParent().isRootNode() == false && isAncestorVisibleBySearchString(node.getParent()) == true) {
           // Otherwise the node is only visible by his status if the parent node is visible:
           return isVisibleByStatus(node, task);
         } else {
@@ -177,9 +173,9 @@ public class TaskFilter extends BaseSearchFilter implements TreeTableFilter<Tree
     }
   }
 
-  private boolean isAncestorVisibleBySearchString(final TreeTableNode node)
+  private boolean isAncestorVisibleBySearchString(final TaskNode node)
   {
-    if (tasksMatched.contains(node.getHashId()) == true) {
+    if (tasksMatched.contains(node.getId()) == true) {
       return true;
     } else if (node.getParent() != null) {
       return isAncestorVisibleBySearchString(node.getParent());
@@ -192,20 +188,19 @@ public class TaskFilter extends BaseSearchFilter implements TreeTableFilter<Tree
    * @param task
    * @return true if the search string matches at least one field of the task of if this methods returns true for any descendant.
    */
-  private boolean isVisibleBySearchString(final TaskTreeTableNode node, final TaskDO task)
+  private boolean isVisibleBySearchString(final TaskNode node, final TaskDO task)
   {
     final Boolean cachedVisibility = taskVisibility.get(task.getId());
     if (cachedVisibility != null) {
       return cachedVisibility;
     }
-    if (isVisibleByStatus(node, task) == false) {
+    if (isVisibleByStatus(node, task) == false && node.isRootNode() == false) {
       taskVisibility.put(task.getId(), false);
       return false;
     }
     final PFUserDO user = Registry.instance().getUserGroupCache().getUser(task.getResponsibleUserId());
     final String username = user != null ? user.getFullname() + " " + user.getUsername() : null;
-    if (isVisibleByStatus(node, task) == true
-        && StringUtils.containsIgnoreCase(task.getTitle(), this.searchString) == true
+    if (StringUtils.containsIgnoreCase(task.getTitle(), this.searchString) == true
         || StringUtils.containsIgnoreCase(task.getReference(), this.searchString) == true
         || StringUtils.containsIgnoreCase(task.getDescription(), this.searchString) == true
         || StringUtils.containsIgnoreCase(task.getShortDisplayName(), this.searchString) == true
@@ -214,12 +209,9 @@ public class TaskFilter extends BaseSearchFilter implements TreeTableFilter<Tree
       taskVisibility.put(task.getId(), true);
       tasksMatched.add(task.getId());
       return true;
-    } else if (node.hasChilds() == true) {
-      for (final TreeTableNode cn : node.getChilds()) {
-        final TaskTreeTableNode childNode = (TaskTreeTableNode) cn;
-        Validate.notNull(childNode.getTaskNode());
-        Validate.notNull(childNode.getTaskNode().getTask());
-        final TaskDO childTask = childNode.getTaskNode().getTask();
+    } else if (node.hasChilds() == true && node.isRootNode() == false) {
+      for (final TaskNode childNode : node.getChilds()) {
+        final TaskDO childTask = childNode.getTask();
         if (isVisibleBySearchString(childNode, childTask) == true) {
           taskVisibility.put(childTask.getId(), true);
           return true;
@@ -230,16 +222,16 @@ public class TaskFilter extends BaseSearchFilter implements TreeTableFilter<Tree
     return false;
   }
 
-  private boolean isVisibleByStatus(final TaskTreeTableNode node, final TaskDO task)
+  private boolean isVisibleByStatus(final TaskNode node, final TaskDO task)
   {
     if (isDeleted() == false && task.isDeleted() == true) {
       return false;
     }
     if (task.getStatus() == TaskStatus.N) {
       return isNotOpened();
-    } else if (node.getStatus() == TaskStatus.O) {
+    } else if (task.getStatus() == TaskStatus.O) {
       return isOpened();
-    } else if (node.getStatus() == TaskStatus.C) {
+    } else if (task.getStatus() == TaskStatus.C) {
       return isClosed();
     }
     return node.isDeleted() == isDeleted();
