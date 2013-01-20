@@ -39,6 +39,7 @@ import org.dom4j.Element;
 import org.projectforge.access.AccessType;
 import org.projectforge.access.GroupTaskAccessDO;
 import org.projectforge.access.OperationType;
+import org.projectforge.core.IdObject;
 import org.projectforge.core.UserException;
 import org.projectforge.fibu.ProjektDO;
 
@@ -46,7 +47,7 @@ import org.projectforge.fibu.ProjektDO;
  * Represents a single task as part of the TaskTree. The data of a task node is stored in the database.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class TaskNode implements Serializable
+public class TaskNode implements IdObject<Integer>, Serializable
 {
   private static final long serialVersionUID = -3759574521842841341L;
 
@@ -450,7 +451,7 @@ public class TaskNode implements Serializable
     if (o instanceof TaskNode) {
       final TaskNode other = (TaskNode) o;
       return ObjectUtils.equals(this.getParentId(), other.getParentId()) == true
-      && ObjectUtils.equals(this.getTask().getTitle(), other.getTask().getTitle()) == true;
+          && ObjectUtils.equals(this.getTask().getTitle(), other.getTask().getTitle()) == true;
     }
     return false;
   }
