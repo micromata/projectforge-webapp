@@ -61,15 +61,6 @@ public class AboutMobilePage extends AbstractMobilePage
   }
 
   /**
-   * Adds home link as default.
-   */
-  @Override
-  protected void addTopLeftButton()
-  {
-    headerContainer.add(WicketUtils.getInvisibleComponent(TOP_LEFT_BUTTON_ID));
-  }
-
-  /**
    * Invisible
    */
   @Override
