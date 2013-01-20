@@ -36,6 +36,7 @@ import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
@@ -257,7 +258,7 @@ public class PhoneCallForm extends AbstractStandardForm<Object, PhoneCallPage>
       }
     }
     fs.add(numberTextField);
-    fs.addKeyboardHelpIcon(getString("address.directCall.number.tooltip"));
+    fs.addKeyboardHelpIcon(new ResourceModel("tooltip.autocompletion.title"), new ResourceModel("address.directCall.number.tooltip"));
 
     {
       // DropDownChoice myCurrentPhoneId
@@ -275,7 +276,7 @@ public class PhoneCallForm extends AbstractStandardForm<Object, PhoneCallPage>
           new PropertyModel(this, "myCurrentPhoneId"), myCurrentPhoneIdChoiceRenderer.getValues(), myCurrentPhoneIdChoiceRenderer);
       myCurrentPhoneIdChoice.setNullValid(false).setRequired(true);
       fs.add(myCurrentPhoneIdChoice);
-      fs.addHelpIcon(getString("address.myCurrentPhoneId.tooltip"));
+      fs.addHelpIcon(new ResourceModel("address.myCurrentPhoneId.tooltip.title"), new ResourceModel("address.myCurrentPhoneId.tooltip.content"));
     }
     addressPanel = gridBuilder.newSplitPanel(GridSize.COL50).getPanel();
     {

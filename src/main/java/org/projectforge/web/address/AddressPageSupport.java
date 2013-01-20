@@ -35,6 +35,7 @@ import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.ResourceModel;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.address.AddressStatus;
@@ -360,7 +361,7 @@ class AddressPageSupport implements Serializable
     language.setFavoriteLanguages(addressDao.getUsedCommunicationLanguages());
     fs.add(language);
     if (mobile == false) {
-      ((FieldsetPanel) fs).addKeyboardHelpIcon(getString("tooltip.autocomplete.language"));
+      ((FieldsetPanel) fs).addKeyboardHelpIcon(new ResourceModel("tooltip.autocompletion.title"), new ResourceModel("tooltip.autocomplete.language"));
     }
     return fs;
   }

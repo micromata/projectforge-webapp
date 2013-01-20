@@ -291,7 +291,8 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
         }
       };
       final ContentMenuEntryPanel exportVCardsButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), exportVCardsLink,
-          getString("address.book.vCardExport")).setTooltip(getString("address.book.vCardExport.tooltip"));
+          getString("address.book.vCardExport")).setTooltip(getString("address.book.vCardExport.tooltip.title"),
+              getString("address.book.vCardExport.tooltip.content"));
       addContentMenuEntry(exportVCardsButton);
     }
     {
@@ -312,7 +313,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
         }
       };
       final ContentMenuEntryPanel excelExportButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), excelExportLink,
-          getString("address.book.export")).setTooltip(getString("address.book.export.tooltip"));
+          getString("address.book.export")).setTooltip(getString("address.book.export"), getString("address.book.export.tooltip"));
       addContentMenuEntry(excelExportButton);
     }
     {
@@ -335,7 +336,8 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
         }
       };
       final ContentMenuEntryPanel exportPhoneListButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), exportPhoneListLink,
-          getString("address.book.exportFavoritePhoneList")).setTooltip(getString("address.book.exportFavoritePhoneList.tooltip"));
+          getString("address.book.exportFavoritePhoneList")).setTooltip(getString("address.book.exportFavoritePhoneList.tooltip.title"),
+              getString("address.book.exportFavoritePhoneList.tooltip.content"));
       addContentMenuEntry(exportPhoneListButton);
     }
     {
@@ -361,7 +363,8 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
         }
       };
       final ContentMenuEntryPanel appleScriptButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), appleScriptLink,
-          getString("address.book.export.appleScript4Notes")).setTooltip(getString("address.book.export.appleScript4Notes.tooltip"));
+          getString("address.book.export.appleScript4Notes")).setTooltip(getString("address.book.export.appleScript4Notes"),
+              getString("address.book.export.appleScript4Notes.tooltip"));
       addContentMenuEntry(appleScriptButton);
     }
   }

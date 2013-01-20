@@ -77,7 +77,7 @@ public class TaskPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
       item.add(new Label(componentId, ""));
     } else {
       final Label label = new Label(componentId, task.getTitle());
-      final String taskPath = getTaskFormatter().getTaskPath(task.getId(), false, OutputType.HTML);
+      final String taskPath = getTaskFormatter().getTaskPath(task.getId(), false, OutputType.PLAIN);
       WicketUtils.addTooltip(label, taskPath);
       label.setEscapeModelStrings(false);
       item.add(label);
