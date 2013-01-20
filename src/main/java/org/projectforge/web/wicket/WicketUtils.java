@@ -910,10 +910,13 @@ public class WicketUtils
   public static Component addTooltip(final Component component, final IModel<String> title, final IModel<String> text)
   {
     if (title != null && title.getObject() != null) {
+      component.add(AttributeModifier.replace("rel", "mypopup"));
       component.add(AttributeModifier.replace("data-original-title", title));
+      component.add(AttributeModifier.replace("data-content", text));
+    } else {
+      component.add(AttributeModifier.replace("rel", "mytooltip"));
+      component.add(AttributeModifier.replace("title", text));
     }
-    component.add(AttributeModifier.replace("data-content", text));
-    component.add(AttributeModifier.replace("rel", "popup-tooltip"));
     return component;
   }
 

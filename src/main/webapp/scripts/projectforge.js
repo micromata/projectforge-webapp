@@ -50,25 +50,120 @@ function preventBubble(e) {
 	return false;
 }
 function initializeComponents() {
-	// Enable tool-tips, button sets etc.
-	$('[title]').tooltip({
-		track : true
-	}).on("focusin", function() {
-		$(this).tooltip("close");
-	});
 	$("div.radio-jquery-ui").buttonset();
 	if ($("textarea.autogrow").length) {
 		$("textarea.autogrow").autoGrow();
 	}
-	$('[rel=\'popup-tooltip\']').hover(function(event) {
+	$('[rel=\'mypopup\']').hover(function(event) {
 		mouseX = event.pageX;
 		mouseY = event.pageY;
 		$(this).mypopover('myshow');
 	}, function() {
 		$(this).mypopover('hide');
 	});
-
+	$('[rel=\'mytooltip\']').hover(function(event) {
+		mouseX = event.pageX;
+		mouseY = event.pageY;
+		$(this).mytooltip('myshow');
+	}, function() {
+		$(this).mytooltip('hide');
+	});
 }
+
+// ///////////////////////////////////
+//
+// BOOTSTRAP based tooltip
+//
+// ///////////////////////////////////
+var MyTooltip = function(element, options) {
+	this.init('mytooltip', element, options)
+}
+
+MyTooltip.prototype = $.extend($.fn.tooltip.Constructor.prototype, {
+	constructor : MyTooltip,
+	myshow : function() {
+		showMyTooltip(this);
+	}
+})
+
+$.fn.mytooltip = function(option) {
+	return this
+			.each(function() {
+				var $this = $(this), data = $this.data('mytooltip'), options = typeof option == 'object'
+						&& option
+				if (!data)
+					$this.data('mytooltip',
+							(data = new MyTooltip(this, options)))
+				if (typeof option == 'string')
+					data[option]()
+			})
+}
+
+$.fn.mytooltip.Constructor = MyTooltip
+
+$.fn.mytooltip.defaults = $
+		.extend(
+				{},
+				$.fn.tooltip.defaults,
+				{
+					animation : true,
+					selector : false,
+					trigger : 'manual',
+					template : '<div class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
+				})
+
+function showMyTooltip(obj) {
+	var $tip, inside, pos, tipWidth, tipHeight, posX, posY, boundTop, boundBottom, boundLeft, boundRight, tp
+	if (obj.hasContent() && obj.enabled) {
+		$tip = obj.tip();
+		obj.setContent();
+
+		if (obj.options.animation) {
+			$tip.addClass('fade');
+		}
+		$tip.detach().css({
+			top : 0,
+			left : 0,
+			display : 'block'
+		}).insertAfter(obj.$element);
+		pos = obj.getPosition(inside);
+		boundTop = $(document).scrollTop();
+		boundLeft = $(document).scrollLeft();
+		boundRight = boundLeft + $(window).width();
+		boundBottom = boundTop + $(window).height();
+		tipWidth = $tip[0].offsetWidth
+		tipHeight = $tip[0].offsetHeight
+		if (mouseX + tipWidth + 5 < boundRight
+				|| mouseX - tipWidth - 5 < boundLeft) {
+			// Bottom, if enough space at bottom of mouse
+			// position or not enough space above mouse
+			// position:
+			posX = mouseX + 5;
+		} else {
+			// Position is in top of mouse position:
+			posX = mouseX - tipWidth - 5;
+		}
+		if (mouseY + tipHeight + 5 < boundBottom
+				|| mouseY - tipHeight - 5 < boundTop) {
+			// Right if enough space right of mouse position
+			// or not enough space left of mouse position:
+			posY = mouseY + 5;
+		} else {
+			// Position is left of mouse position:
+			posY = mouseY - tipHeight - 5;
+		}
+		tp = {
+			top : posY,
+			left : posX
+		}
+		$tip.offset(tp).addClass('in')
+	}
+}
+// ///////////////////////////////////
+//
+// END BOOTSTRAP based tooltip
+//
+// ///////////////////////////////////
 
 // ///////////////////////////////////
 //
@@ -79,65 +174,15 @@ var MyPopover = function(element, options) {
 	this.init('mypopover', element, options)
 }
 
-MyPopover.prototype = $
-		.extend(
-				$.fn.popover.Constructor.prototype,
-				{
+MyPopover.prototype = $.extend($.fn.popover.Constructor.prototype, {
 
-					constructor : MyPopover
+	constructor : MyPopover
 
-					,
-					myshow : function() {
-						var $tip, inside, pos, tipWidth, tipHeight, posX, posY, boundTop, boundBottom, boundLeft, boundRight, tp
-						if (this.hasContent() && this.enabled) {
-							$tip = this.tip();
-							this.setContent();
-
-							if (this.options.animation) {
-								$tip.addClass('fade');
-							}
-							$tip.detach().css({
-								top : 0,
-								left : 0,
-								display : 'block'
-							}).insertAfter(this.$element);
-							if (this.getContent().length > 100) {
-								$tip.addClass('big');
-							}
-							pos = this.getPosition(inside);
-							boundTop = $(document).scrollTop();
-							boundLeft = $(document).scrollLeft();
-							boundRight = boundLeft + $(window).width();
-							boundBottom = boundTop + $(window).height();
-							tipWidth = $tip[0].offsetWidth
-							tipHeight = $tip[0].offsetHeight
-							if (mouseX + tipWidth + 5 < boundRight
-									|| mouseX - tipWidth - 5 < boundLeft) {
-								// Bottom, if enough space at bottom of mouse
-								// position or not enough space above mouse
-								// position:
-								posX = mouseX + 5;
-							} else {
-								// Position is in top of mouse position:
-								posX = mouseX - tipWidth - 5;
-							}
-							if (mouseY + tipHeight + 5 < boundBottom
-									|| mouseY - tipHeight - 5 < boundTop) {
-								// Right if enough space right of mouse position
-								// or not enough space left of mouse position:
-								posY = mouseY + 5;
-							} else {
-								// Position is left of mouse position:
-								posY = mouseY - tipHeight - 5;
-							}
-							tp = {
-								top : posY,
-								left : posX
-							}
-							$tip.offset(tp).addClass('in')
-						}
-					}
-				})
+	,
+	myshow : function() {
+		showMyTooltip(this);
+	}
+})
 
 $.fn.mypopover = function(option) {
 	return this
