@@ -34,6 +34,7 @@ import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.visit.IVisit;
 import org.apache.wicket.util.visit.IVisitor;
@@ -227,7 +228,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
           "taskId");
       fs.add(taskSelectPanel);
       taskSelectPanel.init();
-      fs.addHelpIcon(getString("plugins.todo.task.tooltip"));
+      fs.addHelpIcon(new ResourceModel("plugins.todo.task.tooltip.title"), new ResourceModel("plugins.todo.task.tooltip.content"));
     }
     {
       // Group
@@ -236,7 +237,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
           parentPage, "groupId");
       fs.add(groupSelectPanel);
       fs.setLabelFor(groupSelectPanel);
-      fs.addHelpIcon(getString("plugins.todo.group.tooltip"));
+      fs.addHelpIcon(new ResourceModel("plugins.todo.group.tooltip.title"), new ResourceModel("plugins.todo.group.tooltip.content"));
       groupSelectPanel.init();
     }
     {
