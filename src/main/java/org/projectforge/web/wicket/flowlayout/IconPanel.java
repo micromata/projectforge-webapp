@@ -32,6 +32,7 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.projectforge.web.wicket.WicketUtils;
 
 /**
@@ -52,23 +53,22 @@ public class IconPanel extends Panel
 
   public IconPanel(final String id, final IconType type, final String tooltip)
   {
-    super(id);
-    div = new WebMarkupContainer("div");
-    add(div);
-    appendAttribute("class", type.getClassAttrValue());
-    if (tooltip != null) {
-      WicketUtils.addTooltip(div, tooltip);
-    }
+    this(id, type, Model.of(tooltip));
   }
 
   public IconPanel(final String id, final IconType type, final IModel<String> tooltip)
+  {
+    this(id, type, null, tooltip);
+  }
+
+  public IconPanel(final String id, final IconType type, final IModel<String> title, final IModel<String> tooltip)
   {
     super(id);
     div = new WebMarkupContainer("div");
     add(div);
     appendAttribute("class", type.getClassAttrValue());
     if (tooltip != null) {
-      WicketUtils.addTooltip(div, tooltip);
+      WicketUtils.addTooltip(div, title, tooltip);
     }
   }
 

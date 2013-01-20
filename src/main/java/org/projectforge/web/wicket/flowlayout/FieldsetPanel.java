@@ -323,6 +323,31 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
 
   /**
    * Adds a help icon at the top right corner of the field set.
+   * @param title
+   * @param tooltip
+   * @return The created IconPanel.
+   */
+  public IconPanel addHelpIcon(final IModel<String> title, final IModel<String>tooltip)
+  {
+    return addHelpIcon(title, tooltip, FieldSetIconPosition.TOP_RIGHT);
+  }
+
+  /**
+   * Adds a help icon at the top right corner of the field set.
+   * @param title
+   * @param tooltip
+   * @param iconPosition
+   * @return The created IconPanel.
+   */
+  public IconPanel addHelpIcon(final IModel<String> title, final IModel<String>tooltip, final FieldSetIconPosition iconPosition)
+  {
+    final IconPanel icon = new IconPanel(newIconChildId(), IconType.HELP, title, tooltip);
+    add(icon, iconPosition);
+    return icon;
+  }
+
+  /**
+   * Adds a help icon at the top right corner of the field set.
    * @param tooltip
    * @return The created IconPanel.
    */
