@@ -159,3 +159,7 @@ h3 {
 .popover {
 	width: 600px;
 }
+
+.tooltip-inner {
+	text-align: left;
+}
