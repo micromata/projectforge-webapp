@@ -19,7 +19,7 @@ div.jqui_checkbox .ui-button-text,div.radio-jquery-ui .ui-button-text {
 
 .ui-state-active,.ui-widget-content .ui-state-active,.ui-widget-header .ui-state-active
 	{
-	color: #EB8F00;
+	color: #000;
 }
 
 #ui-datepicker-div {
