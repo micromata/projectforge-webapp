@@ -69,7 +69,7 @@ public class ErrorForm extends AbstractForm<ErrorPageData, ErrorPage>
     add(createFeedbackPanel());
     final DivPanel errorMessagePanel = new DivPanel("errorMessage");
     add(errorMessagePanel);
-    errorMessagePanel.add(new TextPanel(DivPanel.CHILD_ID, new Model<String>() {
+    errorMessagePanel.add(new TextPanel(errorMessagePanel.newChildId(), new Model<String>() {
       @Override
       public String getObject()
       {
@@ -79,19 +79,19 @@ public class ErrorForm extends AbstractForm<ErrorPageData, ErrorPage>
     gridBuilder = newGridBuilder(this, "flowform");
     gridBuilder.newGridPanel();
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("feedback.receiver"), true).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("feedback.receiver")).setNoLabelFor();
       fs.add(new DivTextPanel(fs.newChildId(), data.getReceiver()));
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("feedback.sender"), true).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("feedback.sender")).setNoLabelFor();
       fs.add(new DivTextPanel(fs.newChildId(), data.getSender()));
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("errorpage.feedback.messageNumber"), true).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("errorpage.feedback.messageNumber")).setNoLabelFor();
       fs.add(new DivTextPanel(fs.newChildId(), data.getMessageNumber()));
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("errorpage.feedback.description"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("errorpage.feedback.description"));
       final MaxLengthTextArea description = new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "description"), 4000);
       WicketUtils.setFocus(description);
       fs.add(description, true);

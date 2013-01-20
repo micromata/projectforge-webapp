@@ -180,7 +180,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       final Form< ? > form)
   {
     // Authentication token
-    final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("user.authenticationToken"), true).setNoLabelFor();
+    final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("user.authenticationToken")).setNoLabelFor();
     fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
       @Override
       public String getObject()
@@ -210,7 +210,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
   public static void createJIRAUsername(final GridBuilder gridBuilder, final PFUserDO user)
   {
     // JIRA user name
-    final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("user.jiraUsername"), true);
+    final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("user.jiraUsername"));
     fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(user, "jiraUsername")));
     fs.addHelpIcon(gridBuilder.getString("user.jiraUsername.tooltip"));
   }
@@ -219,7 +219,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       final Form< ? > form)
   {
     // Last login and deleteAllStayLoggedInSessions
-    final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("login.lastLogin"), true).setNoLabelFor();
+    final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("login.lastLogin")).setNoLabelFor();
     fs.add(new DivTextPanel(fs.newChildId(), DateTimeFormatter.instance().getFormattedDateTime(user.getLastLogin())));
     @SuppressWarnings("serial")
     final Button button = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("invalidateStayLoggedInSessions")) {
@@ -299,7 +299,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
   public static void createTimeZone(final GridBuilder gridBuilder, final PFUserDO user)
   {
     // Time zone
-    final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("timezone"), true);
+    final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("timezone"));
     final TimeZoneField timeZone = new TimeZoneField(fs.getTextFieldId(), new PropertyModel<TimeZone>(user, "timeZoneObject"));
     fs.addKeyboardHelpIcon(gridBuilder.getString("tooltip.autocomplete.timeZone"));
     fs.add(timeZone);
@@ -314,7 +314,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
   {
     if (StringUtils.isNotEmpty(ConfigXml.getInstance().getTelephoneSystemUrl()) == true) {
       // Personal phone identifiers
-      final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("user.personalPhoneIdentifiers"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("user.personalPhoneIdentifiers"));
       fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(user, "personalPhoneIdentifiers")));
       fs.addHelpIcon(new ResourceModel("user.personalPhoneIdentifiers.tooltip.title"), new ResourceModel(
           "user.personalPhoneIdentifiers.tooltip.content"));
@@ -330,7 +330,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
   {
     if (Configuration.getInstance().isMebConfigured() == true) {
       // MEB mobile phone numbers
-      final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("user.personalMebMobileNumbers"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("user.personalMebMobileNumbers"));
       fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(user, "personalMebMobileNumbers")));
       fs.addHelpIcon(
           new ResourceModel("user.personalMebMobileNumbers.tooltip.title"),
@@ -443,7 +443,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     }
     final List<FormComponent< ? >> dependentLdapFormComponentsList = new LinkedList<FormComponent< ? >>();
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.uidNumber"), getString("ldap.posixAccount"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.uidNumber"), getString("ldap.posixAccount"));
       uidNumberField = new MinMaxNumberField<Integer>(fs.getTextFieldId(), new PropertyModel<Integer>(ldapUserValues, "uidNumber"), 1,
           65535);
       WicketUtils.setSize(uidNumberField, 6);
@@ -466,7 +466,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     }
     final LdapSambaAccountsConfig ldapSambaAccountsConfig = ConfigXml.getInstance().getLdapConfig().getSambaAccountsConfig();
     if (ldapSambaAccountsConfig != null && ldapSambaAccountsConfig.getSambaSIDPrefix() != null) {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.sambaSID"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.sambaSID"));
       final DivTextPanel textPanel = new DivTextPanel(fs.newChildId(), ldapSambaAccountsConfig.getSambaSIDPrefix() + "-");
       fs.add(textPanel);
       sambaSIDNumberField = new MinMaxNumberField<Integer>(fs.getTextFieldId(),
@@ -594,7 +594,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
   private void addPassswordFields()
   {
     // Password
-    final FieldsetPanel fs = gridBuilder.newFieldset(getString("password"), getString("passwordRepeat"), true);
+    final FieldsetPanel fs = gridBuilder.newFieldset(getString("password"), getString("passwordRepeat"));
     final PasswordTextField passwordField = new PasswordTextField(fs.getTextFieldId(), new PropertyModel<String>(this, "password")) {
       @Override
       protected void onComponentTag(final ComponentTag tag)
@@ -732,7 +732,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
 
   private void addAssignedGroups(final boolean adminAccess)
   {
-    final FieldsetPanel fs = gridBuilder.newFieldset(getString("user.assignedGroups"), true).setLabelSide(false);
+    final FieldsetPanel fs = gridBuilder.newFieldset(getString("user.assignedGroups")).setLabelSide(false);
     final Collection<Integer> set = ((UserDao) getBaseDao()).getAssignedGroups(data);
     final GroupsProvider groupsProvider = new GroupsProvider();
     assignListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(

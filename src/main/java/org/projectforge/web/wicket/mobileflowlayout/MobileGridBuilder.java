@@ -91,28 +91,10 @@ public class MobileGridBuilder extends AbstractGridBuilder<MobileFieldsetPanel>
   }
 
   /**
-   * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#newFieldset(java.lang.String, boolean)
-   */
-  @Override
-  public MobileFieldsetPanel newFieldset(final String label, final boolean multipleChildren)
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
    * @see org.projectforge.web.wicket.flowlayout.AbstractGridBuilder#newFieldset(java.lang.String, java.lang.String)
    */
   @Override
   public MobileFieldsetPanel newFieldset(final String labelText, final String labelDescription)
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.flowlayout.AbstractGridBuilder#newFieldset(java.lang.String, java.lang.String, boolean)
-   */
-  @Override
-  public MobileFieldsetPanel newFieldset(final String labelText, final String labelDescription, final boolean multipleChildren)
   {
     throw new UnsupportedOperationException();
   }

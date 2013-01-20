@@ -269,7 +269,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
     }
     {
       // Time period
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timePeriod"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timePeriod"));
       final DateTimePanel startDateTimePanel = new DateTimePanel(fs.newChildId(), new PropertyModel<Date>(data, "startTime"),
           (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withTargetType(java.sql.Timestamp.class)
           .withRequired(true), DatePrecision.MINUTE_15);
@@ -312,7 +312,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
       dependentFormComponentsWithCost2[2] = dependentFormComponentsWithoutCost2[2] = stopMinuteDropDownChoice;
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task.consumption"), true).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task.consumption")).setNoLabelFor();
       consumptionBarId = fs.newChildId();
       fs.add(getConsumptionBar());
       fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
@@ -332,7 +332,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
       locationTextField.withDeletableItem(true);
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.description"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.description"));
       final IModel<String> model = new PropertyModel<String>(data, "description");
       fs.add(descriptionArea = new MaxLengthTextArea(TextAreaPanel.WICKET_ID, model)).setAutogrow();
       fs.addJIRAField(model);
@@ -383,7 +383,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
   @SuppressWarnings("serial")
   private void addTemplatesRow()
   {
-    templatesRow = gridBuilder.newFieldset(getString("templates"), true).setNoLabelFor();
+    templatesRow = gridBuilder.newFieldset(getString("templates")).setNoLabelFor();
     final String[] templateNames = userPrefDao.getPrefNames(UserPrefArea.TIMESHEET_TEMPLATE);
     if (templateNames != null && templateNames.length > 0) {
       // DropDownChoice templates

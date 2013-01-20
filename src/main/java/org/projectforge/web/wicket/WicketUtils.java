@@ -1137,7 +1137,7 @@ public class WicketUtils
   public static FieldsetPanel addYesNoRadioFieldset(final GridBuilder gridBuilder, final String label, final String groupName,
       final IModel<Boolean> model, final String tooltip)
   {
-    final FieldsetPanel fs = gridBuilder.newFieldset(label, true);
+    final FieldsetPanel fs = gridBuilder.newFieldset(label);
     final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
     final RadioGroupPanel<Boolean> radioGroup = new RadioGroupPanel<Boolean>(radioGroupPanel.newChildId(), groupName, model);
     radioGroupPanel.add(radioGroup);

@@ -31,8 +31,6 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
-import org.projectforge.debug.StackTraceHolder;
-import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.bootstrap.GridType;
 
@@ -45,22 +43,15 @@ public class DivPanel extends Panel
 {
   private static final long serialVersionUID = 6130552547273354134L;
 
-  /**
-   * Use this only if this panel contains only one child. Otherwise a RepeatingView is used and is added automatically.
-   */
-  public static final String CHILD_ID = "child";
-
   RepeatingView repeater;
 
   WebMarkupContainer div;
 
   private GridSize gridSize = null;
 
-  private boolean childAdded;
-
   private DivPanelVisibility visibility;
 
-  private StackTraceHolder debugStackTrace;
+  private int childCounter = 0;
 
   /**
    * @param id
@@ -71,29 +62,16 @@ public class DivPanel extends Panel
     addCssClasses(cssClasses);
   }
 
-  public DivPanel addCssClasses(final DivType... cssClasses)
-  {
-    if (cssClasses != null) {
-      for (final DivType cssClass : cssClasses) {
-        if (cssClass != null) {
-          div.add(AttributeModifier.append("class", cssClass.getClassAttrValue()));
-        }
-      }
-    }
-    return this;
-  }
-
   /**
    * @param id
    */
   public DivPanel(final String id)
   {
     super(id);
-    if (WebConfiguration.isDevelopmentMode() == true) {
-      debugStackTrace = new StackTraceHolder();
-    }
     div = new WebMarkupContainer("div");
     super.add(div);
+    repeater = new RepeatingView("child");
+    div.add(repeater);
   }
 
   /**
@@ -111,14 +89,25 @@ public class DivPanel extends Panel
   public DivPanel(final String id, final GridSize divSize, final GridType... cssClasses)
   {
     super(id);
-    if (WebConfiguration.isDevelopmentMode() == true) {
-      debugStackTrace = new StackTraceHolder();
-    }
     this.gridSize = divSize;
     div = new WebMarkupContainer("div");
     super.add(div);
     div.add(AttributeModifier.append("class", divSize.getClassAttrValue()));
     addCssClasses(cssClasses);
+    repeater = new RepeatingView("child");
+    div.add(repeater);
+  }
+
+  public DivPanel addCssClasses(final DivType... cssClasses)
+  {
+    if (cssClasses != null) {
+      for (final DivType cssClass : cssClasses) {
+        if (cssClass != null) {
+          div.add(AttributeModifier.append("class", cssClass.getClassAttrValue()));
+        }
+      }
+    }
+    return this;
   }
 
   /**
@@ -164,18 +153,9 @@ public class DivPanel extends Panel
   @Override
   public DivPanel add(final Component... childs)
   {
-    if (repeater == null) {
-      if (childAdded == true) {
-        throw new IllegalArgumentException("You can't add multiple children, please call newChildId instead for using a RepeatingView.");
-      }
-      childAdded = true;
-      div.add(childs);
-      return this;
-    } else {
-      childAdded = true;
-      repeater.add(childs);
-      return this;
-    }
+    repeater.add(childs);
+    return this;
+
   }
 
   /**
@@ -184,13 +164,8 @@ public class DivPanel extends Panel
   @Override
   public MarkupContainer remove(final Component component)
   {
-    if (repeater == null) {
-      div.remove(component);
-      return this;
-    } else {
-      repeater.remove(component);
-      return this;
-    }
+    repeater.remove(component);
+    return this;
   }
 
   /**
@@ -201,11 +176,6 @@ public class DivPanel extends Panel
   {
     div.replace(component);
     return this;
-  }
-
-  public boolean hasChilds()
-  {
-    return childAdded;
   }
 
   /**
@@ -224,10 +194,7 @@ public class DivPanel extends Panel
    */
   public String newChildId()
   {
-    if (repeater == null) {
-      repeater = new RepeatingView("child");
-      div.add(repeater);
-    }
+    childCounter++;
     return repeater.newChildId();
   }
 
@@ -255,18 +222,6 @@ public class DivPanel extends Panel
   }
 
   /**
-   * @see org.apache.wicket.Component#onBeforeRender()
-   */
-  @Override
-  protected void onBeforeRender()
-  {
-    super.onBeforeRender();
-    if (debugStackTrace != null && hasChilds() == false) {
-      throw new IllegalArgumentException("DivPanel has now childs! Please add any content to this DivPanel. It was intantiate here:" + debugStackTrace);
-    }
-  }
-
-  /**
    * @see org.apache.wicket.Component#isVisible()
    */
   @Override
@@ -277,5 +232,10 @@ public class DivPanel extends Panel
     } else {
       return super.isVisible();
     }
+  }
+
+  public boolean hasChilds()
+  {
+    return childCounter > 0;
   }
 }

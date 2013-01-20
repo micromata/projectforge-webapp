@@ -63,9 +63,7 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
 
   protected WebMarkupContainer label;
 
-  protected boolean labelFor, childAdded;
-
-  protected boolean multipleChildren;
+  protected boolean labelFor;
 
   protected String labelText;
 
@@ -142,25 +140,12 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
   @Override
   public MarkupContainer add(final Component... childs)
   {
-    if (repeater == null) {
-      if (childAdded == true) {
-        throw new IllegalArgumentException("You can't add multiple children, please call constructor with multipleChildren=true.");
-      }
-      childAdded = true;
-      checkLabelFor(childs);
-      for (final Component child : childs) {
-        addFormComponent(child);
-      }
-      return addChild(childs);
-    } else {
-      childAdded = true;
-      checkLabelFor(childs);
-      for (final Component component : childs) {
-        modifyAddedChild(component);
-        addFormComponent(component);
-      }
-      return repeater.add(childs);
+    checkLabelFor(childs);
+    for (final Component component : childs) {
+      modifyAddedChild(component);
+      addFormComponent(component);
     }
+    return repeater.add(childs);
   }
 
   private void addFormComponent(final Component component)
@@ -435,13 +420,7 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
       log.warn("No label set for field '" + labelText + "'. Please call setLabelFor(component) for this fieldset.");
     }
     super.onBeforeRender();
-    if (childAdded == false) {
-      childAdded = true;
-      addInvisibleChild();
-    }
   }
-
-  protected abstract void addInvisibleChild();
 
   protected abstract T getThis();
 

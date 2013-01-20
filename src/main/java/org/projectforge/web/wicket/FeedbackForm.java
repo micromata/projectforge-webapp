@@ -58,15 +58,15 @@ public class FeedbackForm extends AbstractStandardForm<SendFeedbackData, Feedbac
     super.init();
     gridBuilder.newGridPanel();
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("feedback.receiver"), true).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("feedback.receiver")).setNoLabelFor();
       fs.add(new DivTextPanel(fs.newChildId(), data.getReceiver()));
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("feedback.sender"), true).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("feedback.sender")).setNoLabelFor();
       fs.add(new DivTextPanel(fs.newChildId(), data.getSender()));
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"));
       final MaxLengthTextArea description = new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "description"), 4000);
       WicketUtils.setFocus(description);
       fs.add(description, true);

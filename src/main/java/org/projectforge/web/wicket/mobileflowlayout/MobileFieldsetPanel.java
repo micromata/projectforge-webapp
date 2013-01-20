@@ -30,7 +30,6 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.projectforge.web.mobile.CollapsiblePanel;
-import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.flowlayout.AbstractFieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.FieldProperties;
 import org.projectforge.web.wicket.flowlayout.FieldType;
@@ -43,18 +42,12 @@ import org.projectforge.web.wicket.flowlayout.InputPanel;
  */
 public class MobileFieldsetPanel extends AbstractFieldsetPanel<MobileFieldsetPanel>
 {
-  /**
-   * Please use this only and only if you haven't multiple children. Please use {@link #newChildId()} instead.
-   */
-  private static final String FIELDS_ID = "fields";
-
   private static final long serialVersionUID = 2845731250470151819L;
 
   @SuppressWarnings("serial")
   public MobileFieldsetPanel(final String id, final FieldProperties< ? > fieldProperties)
   {
     super(id);
-    this.multipleChildren = fieldProperties.isMultipleChildren();
     fieldset = new WebMarkupContainer("fieldset");
     superAdd(fieldset);
     this.labelText = fieldProperties.getLabel();
@@ -66,6 +59,8 @@ public class MobileFieldsetPanel extends AbstractFieldsetPanel<MobileFieldsetPan
         return getString(labelText);
       };
     }).setRenderBodyOnly(true));
+    repeater = new RepeatingView("fields");
+    fieldset.add(repeater);
   }
 
   /**
@@ -83,15 +78,6 @@ public class MobileFieldsetPanel extends AbstractFieldsetPanel<MobileFieldsetPan
   protected MarkupContainer addChild(final Component... childs)
   {
     return fieldset.add(childs);
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.flowlayout.AbstractFieldsetPanel#addInvisibleChild()
-   */
-  @Override
-  protected void addInvisibleChild()
-  {
-    add(WicketUtils.getInvisibleComponent(FIELDS_ID));
   }
 
   @Override
@@ -123,15 +109,7 @@ public class MobileFieldsetPanel extends AbstractFieldsetPanel<MobileFieldsetPan
   @Override
   public String newChildId()
   {
-    if (multipleChildren == true) {
-      if (repeater == null) {
-        repeater = new RepeatingView(FIELDS_ID);
-        fieldset.add(repeater);
-      }
-      return repeater.newChildId();
-    } else {
-      return FIELDS_ID;
-    }
+    return repeater.newChildId();
   }
 
 }

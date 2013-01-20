@@ -337,30 +337,12 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
   }
 
   /**
-   * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#newFieldset(java.lang.String, boolean)
-   */
-  @Override
-  public FieldsetPanel newFieldset(final String label, final boolean multipleChildren)
-  {
-    return new FieldsetPanel(getPanel(), label, multipleChildren);
-  }
-
-  /**
    * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#newFieldset(java.lang.String, java.lang.String)
    */
   @Override
   public FieldsetPanel newFieldset(final String labelText, final String labelDescription)
   {
     return new FieldsetPanel(getPanel(), labelText, labelDescription);
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#newFieldset(java.lang.String, java.lang.String, boolean)
-   */
-  @Override
-  public FieldsetPanel newFieldset(final String labelText, final String labelDescription, final boolean multipleChildren)
-  {
-    return new FieldsetPanel(getPanel(), labelText, labelDescription, multipleChildren);
   }
 
   private void validateRowPanelLevel(final int level)

@@ -46,11 +46,6 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
 {
   public static final String FIELD_SET_CLASS = "control-group";
 
-  /**
-   * Please use this only and only if you haven't multiple children. Please use {@link #newChildId()} instead.
-   */
-  private static final String FIELDS_ID = "fields";
-
   public static final String LABEL_SUFFIX_ID = "labelSuffix";
 
   public static final String DESCRIPTION_SUFFIX_ID = "descriptionSuffix";
@@ -69,6 +64,8 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
 
   private boolean initialized;
 
+  private int childCounter = 0;
+
   /**
    * Adds this FieldsetPanel to the parent panel.
    * @param parent
@@ -77,8 +74,7 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
   public FieldsetPanel(final DivPanel parent, final FieldProperties< ? > fieldProperties)
   {
     this(parent, getString(parent, fieldProperties.getLabel()), //
-        getString(parent, fieldProperties.getLabelDescription(), fieldProperties.isTranslateLabelDecsription()), //
-        fieldProperties.isMultipleChildren());
+        getString(parent, fieldProperties.getLabelDescription(), fieldProperties.isTranslateLabelDecsription()));
   }
 
   private static String getString(final Component parent, final String label)
@@ -101,18 +97,7 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
    */
   public FieldsetPanel(final DivPanel parent, final String label)
   {
-    this(parent, label, null, false);
-  }
-
-  /**
-   * Adds this FieldsetPanel to the parent panel.
-   * @param parent
-   * @param label
-   * @param multipleChildren If true then multiple children are expected an organized in a RepeatingView.
-   */
-  public FieldsetPanel(final DivPanel parent, final String label, final boolean multipleChildren)
-  {
-    this(parent, label, null, multipleChildren);
+    this(parent, label, null);
   }
 
   /**
@@ -123,19 +108,7 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
    */
   public FieldsetPanel(final DivPanel parent, final String labelText, final String description)
   {
-    this(parent, labelText, description, false);
-  }
-
-  /**
-   * Adds this FieldsetPanel to the parent panel.
-   * @param parent
-   * @param label
-   * @param description Description below or beside the label of the field-set.
-   * @param multipleChildren If true then multiple children are expected an organized in a RepeatingView.
-   */
-  public FieldsetPanel(final DivPanel parent, final String labelText, final String description, final boolean multipleChildren)
-  {
-    this(parent.newChildId(), labelText, description, multipleChildren);
+    this(parent.newChildId(), labelText, description);
     parent.add(this);
   }
 
@@ -144,11 +117,10 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
    * @param parent
    * @param label
    * @param description Description below or beside the label of the field-set.
-   * @param multipleChildren If true then multiple children are expected an organized in a RepeatingView.
    */
-  public FieldsetPanel(final GridPanel parent, final String labelText, final boolean multipleChildren)
+  public FieldsetPanel(final GridPanel parent, final String labelText)
   {
-    this(parent.newChildId(), labelText, multipleChildren);
+    this(parent.newChildId(), labelText);
     parent.add(this);
   }
 
@@ -156,24 +128,16 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
    */
   public FieldsetPanel(final String id, final String labeltext)
   {
-    this(id, labeltext, null, false);
-  }
-
-  /**
-   */
-  public FieldsetPanel(final String id, final String labeltext, final boolean multipleChildren)
-  {
-    this(id, labeltext, null, multipleChildren);
+    this(id, labeltext, null);
   }
 
   /**
    */
   @SuppressWarnings("serial")
-  public FieldsetPanel(final String id, final String labeltext, final String description, final boolean multipleChildren)
+  public FieldsetPanel(final String id, final String labeltext, final String description)
   {
     super(id);
     this.labelText = labeltext;
-    this.multipleChildren = multipleChildren;
     fieldset = new WebMarkupContainer("fieldset");
     superAdd(fieldset);
     fieldset.add(AttributeModifier.append("class", FIELD_SET_CLASS));
@@ -191,9 +155,6 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
       label.add(WicketUtils.getInvisibleComponent("labeldescription"));
     }
     fieldset.add(div = new WebMarkupContainer("div"));
-    if (multipleChildren == true) {
-      div.add(AttributeModifier.append("class", "controls-row"));
-    }
     div.add(feedbackMessageLabel = new Label("feedbackMessage", new Model<String>() {
       /**
        * @see org.apache.wicket.model.Model#getObject()
@@ -213,11 +174,14 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
         return feedbackMessage != null;
       }
     });
+    repeater = new RepeatingView("fields");
+    div.add(repeater);
   }
 
   /**
-   * NOP (method has no effect).
-   * @Deprecated
+   * Please note: only labelSide=false is supported and shouldn't be called twice. The label is placed above the input fields. Default is
+   * labelSide = true.
+   * @param labelSide
    */
   public FieldsetPanel setLabelSide(final boolean labelSide)
   {
@@ -327,7 +291,7 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
    * @param tooltip
    * @return The created IconPanel.
    */
-  public IconPanel addHelpIcon(final IModel<String> title, final IModel<String>tooltip)
+  public IconPanel addHelpIcon(final IModel<String> title, final IModel<String> tooltip)
   {
     return addHelpIcon(title, tooltip, FieldSetIconPosition.TOP_RIGHT);
   }
@@ -339,7 +303,7 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
    * @param iconPosition
    * @return The created IconPanel.
    */
-  public IconPanel addHelpIcon(final IModel<String> title, final IModel<String>tooltip, final FieldSetIconPosition iconPosition)
+  public IconPanel addHelpIcon(final IModel<String> title, final IModel<String> tooltip, final FieldSetIconPosition iconPosition)
   {
     final IconPanel icon = new IconPanel(newIconChildId(), IconType.HELP, title, tooltip);
     add(icon, iconPosition);
@@ -474,17 +438,10 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
   @Override
   public String newChildId()
   {
-    if (multipleChildren == true) {
-      if (repeater == null) {
-        // fieldDiv = div;//new DivPanel(FIELDS_ID, DivType.FIELD_DIV);
-        // div.add(fieldDiv);
-        repeater = new RepeatingView(FIELDS_ID);
-        div.add(repeater);
-      }
-      return repeater.newChildId();
-    } else {
-      return FIELDS_ID;
+    if (childCounter++ == 1) {
+      div.add(AttributeModifier.append("class", "controls-row"));
     }
+    return repeater.newChildId();
   }
 
   public FieldsetPanel setDivStyle(final DivType divType)
@@ -540,20 +497,16 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
   }
 
   /**
-   * @see org.projectforge.web.wicket.flowlayout.AbstractFieldsetPanel#addInvisibleChild()
-   */
-  @Override
-  protected void addInvisibleChild()
-  {
-    div.add(WicketUtils.getInvisibleComponent(FIELDS_ID));
-  }
-
-  /**
    * @see org.projectforge.web.wicket.flowlayout.AbstractFieldsetPanel#getThis()
    */
   @Override
   protected FieldsetPanel getThis()
   {
     return this;
+  }
+
+  public boolean hasChilds()
+  {
+    return childCounter > 0;
   }
 }

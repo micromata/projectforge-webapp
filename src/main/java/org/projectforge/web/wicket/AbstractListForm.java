@@ -151,20 +151,17 @@ AbstractSecuredForm<F, P>
     feedbackPanel.setOutputMarkupId(true);
     add(feedbackPanel);
 
-    if (isFilterVisible() == false) {
-      add(WicketUtils.getInvisibleComponent("filter"));
-    } else {
-      gridBuilder = newGridBuilder(this, "filter");
+    gridBuilder = newGridBuilder(this, "filter");
+    if (isFilterVisible() == true) {
       {
         // Fieldset search filter
-        final FieldsetPanel fs = gridBuilder.newFieldset(getString("searchFilter"), true);
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("searchFilter"));
         if (parentPage.getBaseDao().isHistorizable() == true) {
           IconPanel icon = new IconPanel(fs.newIconChildId(), IconType.PLUS_SIGN, getString("filter.extendedSearch"))
           .setOnClick("javascript:showExtendedFilter();");
           icon.setMarkupId("showExtendedFilter");
           fs.add(icon, FieldSetIconPosition.BOTTOM_LEFT);
-          icon = new IconPanel(fs.newIconChildId(), IconType.MINUS_SIGN)
-          .setOnClick("javascript:hideExtendedFilter();");
+          icon = new IconPanel(fs.newIconChildId(), IconType.MINUS_SIGN).setOnClick("javascript:hideExtendedFilter();");
           icon.setMarkupId("hideExtendedFilter");
           fs.add(icon, FieldSetIconPosition.BOTTOM_LEFT);
         }
@@ -190,7 +187,7 @@ AbstractSecuredForm<F, P>
         };
         div.add(AttributeModifier.append("class", "modifiedSearchExpressionLabel"));
         fs.add(div);
-        modifiedSearchExpressionLabel = new Label(DivPanel.CHILD_ID, modifiedSearchExpressionModel);
+        modifiedSearchExpressionLabel = new Label(div.newChildId(), modifiedSearchExpressionModel);
         modifiedSearchExpressionLabel.setEscapeModelStrings(false);
         div.add(modifiedSearchExpressionLabel);
 
@@ -207,7 +204,7 @@ AbstractSecuredForm<F, P>
     }
     if (showOptionsPanel() == true) {
       gridBuilder.newSplitPanel(GridSize.COL66);
-      optionsFieldsetPanel = gridBuilder.newFieldset(getOptionsLabel(), true).setNoLabelFor();
+      optionsFieldsetPanel = gridBuilder.newFieldset(getOptionsLabel()).setNoLabelFor();
       final DivPanel optionsCheckBoxesPanel = new DivPanel(optionsFieldsetPanel.newChildId(), DivType.CHECKBOX);
       onOptionsPanelCreate(optionsFieldsetPanel, optionsCheckBoxesPanel);
       if (showHistorySearchAndDeleteCheckbox() == true) {
@@ -293,7 +290,7 @@ AbstractSecuredForm<F, P>
       extendedFilter.add(AttributeModifier.append("style", "display: none;"));
     }
     {
-      final FieldsetPanel fieldset = gridBuilder.newFieldset(getString("search.periodOfModification"), true);
+      final FieldsetPanel fieldset = gridBuilder.newFieldset(getString("search.periodOfModification"));
       fieldset.add(new HiddenInputPanel(fieldset.newChildId(), new HiddenField<Boolean>(InputPanel.WICKET_ID, new PropertyModel<Boolean>(
           searchFilter, "useModificationFilter"))).setHtmlId("useModificationFilter"));
 

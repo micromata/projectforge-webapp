@@ -226,8 +226,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
     }
     if (data.getUserPrefEntries() != null) {
       for (final UserPrefEntryDO param : data.getSortedUserPrefEntries()) {
-        final FieldsetPanel fs = gridBuilder.newFieldset(param.getI18nKey() != null ? getString(param.getI18nKey()) : param.getParameter(),
-            true);
+        final FieldsetPanel fs = gridBuilder.newFieldset(param.getI18nKey() != null ? getString(param.getI18nKey()) : param.getParameter());
         if (StringUtils.isNotEmpty(param.getTooltipI18nKey()) == true) {
           fs.addHelpIcon(getString(param.getTooltipI18nKey()));
         }

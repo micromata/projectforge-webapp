@@ -47,18 +47,10 @@ public class FieldProperties<T extends Serializable>
 
   private String valueAsString;
 
-  private boolean multipleChildren;
-
   public FieldProperties(final String label, final IModel<T> model)
   {
     this.label = label;
     this.model = model;
-  }
-
-  public FieldProperties(final String label, final IModel<T> model, final boolean multipleChildren)
-  {
-    this(label, model);
-    this.multipleChildren = multipleChildren;
   }
 
   /**
@@ -125,15 +117,6 @@ public class FieldProperties<T extends Serializable>
   {
     this.valueAsString = valueAsString;
     return this;
-  }
-
-  /**
-   * Used by FieldsetPanels.
-   * @return the multipleChildren
-   */
-  public boolean isMultipleChildren()
-  {
-    return multipleChildren;
   }
 
   /**

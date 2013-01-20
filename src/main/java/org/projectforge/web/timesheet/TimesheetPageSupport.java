@@ -125,7 +125,7 @@ class TimesheetPageSupport implements Serializable
 
   public FieldProperties<String> getLocationProperties()
   {
-    return new FieldProperties<String>("timesheet.location", new PropertyModel<String>(timesheet, "location"), true);
+    return new FieldProperties<String>("timesheet.location", new PropertyModel<String>(timesheet, "location"));
   }
 
   private String getString(final String i18nKey)

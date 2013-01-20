@@ -95,9 +95,5 @@ public abstract class AbstractGridBuilder<T extends AbstractFieldsetPanel< ? >> 
 
   public abstract T newFieldset(final FieldProperties< ? > fieldProperties);
 
-  public abstract T newFieldset(final String label, final boolean multipleChildren);
-
   public abstract T newFieldset(final String labelText, final String labelDescription);
-
-  public abstract T newFieldset(final String labelText, final String labelDescription, final boolean multipleChildren);
 }

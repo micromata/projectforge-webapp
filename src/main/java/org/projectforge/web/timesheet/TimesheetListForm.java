@@ -157,7 +157,7 @@ public class TimesheetListForm extends AbstractListForm<TimesheetListFilter, Tim
     }
     {
       gridBuilder.newSplitPanel(GridSize.COL66);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timePeriod"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timePeriod"));
       startDate = new DatePanel(fs.newChildId(), new PropertyModel<Date>(filter, "startTime"), DatePanelSettings.get()
           .withSelectPeriodMode(true));
       fs.add(dependentFormComponents[0] = startDate);
