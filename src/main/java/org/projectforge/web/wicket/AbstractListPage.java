@@ -120,7 +120,7 @@ AbstractSecuredPage implements ISelectCallerPage
 
   protected RecentQueue<String> recentSearchTermsQueue;
 
-  protected static void addRowClick(final Item< ? > cellItem)
+  public static void addRowClick(final Item< ? > cellItem)
   {
     final Item< ? > row = (cellItem.findParent(Item.class));
     WicketUtils.addRowClick(row);
