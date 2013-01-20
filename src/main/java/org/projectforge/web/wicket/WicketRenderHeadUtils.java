@@ -55,6 +55,7 @@ public class WicketRenderHeadUtils
     { "styles/projectforge-bootstrap", ""}, //
     { "styles/projectforge-form", ""}, // before projectforge.css!
     { "styles/projectforge-jquery-ui", ""}, //
+    { "styles/projectforge-wicket", ""}, //
     { "styles/projectforge", ""} //
   };
 
