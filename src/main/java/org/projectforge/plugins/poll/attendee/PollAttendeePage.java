@@ -105,7 +105,7 @@ public class PollAttendeePage extends PollBasePage
 
     // User select
     final UsersProvider usersProvider = new UsersProvider();
-    final FieldsetPanel fsUserSelect = gridBuilder.newFieldset(getString("plugins.poll.attendee.users"), true);
+    final FieldsetPanel fsUserSelect = gridBuilder.newFieldset(getString("plugins.poll.attendee.users"));
     assignUsersListHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator()).setFullList(
         usersProvider.getSortedUsers());
     assignUsersListHelper.setAssignedItems(model.getUserDoFromAttendees());
@@ -117,13 +117,13 @@ public class PollAttendeePage extends PollBasePage
     final GroupsProvider groupsProvider = new GroupsProvider();
     assignGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator());
     assignGroupsListHelper.setAssignedItems(model.getPollGroupList());
-    final FieldsetPanel fsGroupSelect = gridBuilder.newFieldset(getString("plugins.poll.attendee.groups"), true);
+    final FieldsetPanel fsGroupSelect = gridBuilder.newFieldset(getString("plugins.poll.attendee.groups"));
     final Select2MultiChoice<GroupDO> groups = new Select2MultiChoice<GroupDO>(fsGroupSelect.getSelect2MultiChoiceId(),
         new PropertyModel<Collection<GroupDO>>(this.assignGroupsListHelper, "assignedItems"), groupsProvider);
     fsGroupSelect.add(groups);
 
     // TODO fancy email select
-    final FieldsetPanel fsEMail = gridBuilder.newFieldset(getString("email"), true);
+    final FieldsetPanel fsEMail = gridBuilder.newFieldset(getString("email"));
     fsEMail.add(getNewEMailField(fsEMail.getTextFieldId()));
 
   }

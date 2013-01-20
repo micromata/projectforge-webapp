@@ -121,13 +121,13 @@ public class LicenseEditForm extends AbstractEditForm<LicenseDO, LicenseEditPage
     }
     {
       // UpdateFromVersion
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.licensemanagement.updateFromVersion"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.licensemanagement.updateFromVersion"));
       fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "updateFromVersion")));
       fs.addHelpIcon(getString("plugins.licensemanagement.updateFromVersion.tooltip"));
     }
     {
       // Device
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.licensemanagement.device"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.licensemanagement.device"));
       fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "device")));
       fs.addHelpIcon(getString("plugins.licensemanagement.device.tooltip"));
     }
@@ -141,7 +141,7 @@ public class LicenseEditForm extends AbstractEditForm<LicenseDO, LicenseEditPage
     }
     {
       // Owners
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.licensemanagement.owner"), true).setLabelSide(false);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.licensemanagement.owner")).setLabelSide(false);
       final UsersProvider usersProvider = new UsersProvider();
       assignOwnersListHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator()).setFullList(
           usersProvider.getSortedUsers());
@@ -174,12 +174,12 @@ public class LicenseEditForm extends AbstractEditForm<LicenseDO, LicenseEditPage
     gridBuilder.newGridPanel();
     {
       // License holder
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.licensemanagement.licenseHolder"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.licensemanagement.licenseHolder"));
       fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "licenseHolder")));
     }
     {
       // Text key
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.licensemanagement.key"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.licensemanagement.key"));
       final LicenseManagementRight right = (LicenseManagementRight) UserRights.instance().getRight(LicenseDao.USER_RIGHT_ID);
       if (right.isLicenseKeyVisible(getUser(), data) == true) {
         fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "key"))).setAutogrow();

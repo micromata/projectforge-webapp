@@ -192,7 +192,7 @@ public class SendSmsForm extends AbstractStandardForm<SendSmsData, SendSmsPage>
         parentPage.result = null;
       }
     };
-    messagePanel.add(new TextPanel(DivPanel.CHILD_ID, new Model<String>() {
+    messagePanel.add(new TextPanel(messagePanel.newChildId(), new Model<String>() {
       @Override
       public String getObject()
       {

@@ -157,7 +157,7 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
     }
     {
       // Time zone
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.param.timezone"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.param.timezone"));
       final TimeZonePanel timeZone = new TimeZonePanel(fs.newChildId(), new PropertyModel<TimeZone>(this, "timeZone"));
       fs.setLabelFor(timeZone);
       fs.add(timeZone);
@@ -165,13 +165,13 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
     }
     {
       // E-Mail sysops
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.param.systemAdministratorEMail"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.param.systemAdministratorEMail"));
       fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(this, "sysopEMail"), ConfigurationDO.PARAM_LENGTH));
       fs.addHelpIcon(getString("administration.configuration.param.systemAdministratorEMail.description"));
     }
     {
       // E-Mail sysops
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.param.feedbackEMail"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.param.feedbackEMail"));
       fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(this, "feedbackEMail"), ConfigurationDO.PARAM_LENGTH));
       fs.addHelpIcon(getString("administration.configuration.param.feedbackEMail.description"));
     }

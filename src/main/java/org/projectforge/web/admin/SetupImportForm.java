@@ -57,7 +57,7 @@ public class SetupImportForm extends AbstractForm<SetupImportForm, SetupPage>
     gridBuilder.newFormHeading(getString("import"));
     {
       // Upload dump file
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.setup.dumpFile"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.setup.dumpFile"));
       fileUploadField = new FileUploadField(FileUploadPanel.WICKET_ID);
       fs.add(new FileUploadPanel(fs.newChildId(), fileUploadField));
     }

@@ -157,7 +157,7 @@ public class PhoneCallForm extends AbstractStandardForm<Object, PhoneCallPage>
         parentPage.result = null;
       }
     };
-    messagePanel.add(new TextPanel(DivPanel.CHILD_ID, new Model<String>() {
+    messagePanel.add(new TextPanel(messagePanel.newChildId(), new Model<String>() {
       @Override
       public String getObject()
       {
@@ -173,7 +173,7 @@ public class PhoneCallForm extends AbstractStandardForm<Object, PhoneCallPage>
   {
     super.init();
     gridBuilder.newSplitPanel(GridSize.COL50);
-    FieldsetPanel fs = gridBuilder.newFieldset(getString("address.phoneCall.number"), true);
+    FieldsetPanel fs = gridBuilder.newFieldset(getString("address.phoneCall.number"));
     numberTextField = new PFAutoCompleteTextField<AddressDO>(InputPanel.WICKET_ID, new Model() {
       @Override
       public Serializable getObject()
@@ -262,7 +262,7 @@ public class PhoneCallForm extends AbstractStandardForm<Object, PhoneCallPage>
 
     {
       // DropDownChoice myCurrentPhoneId
-      fs = gridBuilder.newFieldset(getString("address.myCurrentPhoneId"), true);
+      fs = gridBuilder.newFieldset(getString("address.myCurrentPhoneId"));
       final LabelValueChoiceRenderer<String> myCurrentPhoneIdChoiceRenderer = new LabelValueChoiceRenderer<String>();
       final String[] ids = userDao.getPersonalPhoneIdentifiers(PFUserContext.getUser());
       if (ids == null) {

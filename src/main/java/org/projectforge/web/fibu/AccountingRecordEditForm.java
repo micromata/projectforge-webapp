@@ -76,7 +76,7 @@ public class AccountingRecordEditForm extends AbstractEditForm<BuchungssatzDO, A
     }
     {
       // Year / month
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("calendar.year") + "/" + getString("calendar.month"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("calendar.year") + "/" + getString("calendar.month"));
       final MinMaxNumberField<Integer> yearField = new RequiredMinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(
           data, "year"), 1900, 2100).setConverter(new IntegerConverter(4));
       fs.add(yearField);
@@ -96,8 +96,7 @@ public class AccountingRecordEditForm extends AbstractEditForm<BuchungssatzDO, A
     }
     {
       // Amount / debit/credit
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.betrag") + "/" + getString("finance.accountingRecord.dc"),
-          true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.betrag") + "/" + getString("finance.accountingRecord.dc"));
       final MinMaxNumberField<BigDecimal> betragField = new MinMaxNumberField<BigDecimal>(InputPanel.WICKET_ID,
           new PropertyModel<BigDecimal>(data, "betrag"), new BigDecimal("-99999999"), new BigDecimal("99999999"));
       fs.add(betragField);
@@ -128,7 +127,7 @@ public class AccountingRecordEditForm extends AbstractEditForm<BuchungssatzDO, A
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Cost 1 / cost2
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost1") + "/" + getString("fibu.kost2"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost1") + "/" + getString("fibu.kost2"));
       final Kost1FormComponent kost1Component = new Kost1FormComponent(InputPanel.WICKET_ID, new PropertyModel<Kost1DO>(data, "kost1"),
           true);
       fs.add(kost1Component);
@@ -142,7 +141,7 @@ public class AccountingRecordEditForm extends AbstractEditForm<BuchungssatzDO, A
       // Cost 1 / cost2
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.buchungssatz.konto")
           + "/"
-          + getString("fibu.buchungssatz.gegenKonto"), true);
+          + getString("fibu.buchungssatz.gegenKonto"));
       final KontoFormComponent kontoComponent = new KontoFormComponent(InputPanel.WICKET_ID, new PropertyModel<KontoDO>(data, "konto"),
           true);
       fs.add(kontoComponent);

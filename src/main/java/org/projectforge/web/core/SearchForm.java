@@ -102,7 +102,7 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
   {
     super.init();
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("searchFilter"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("searchFilter"));
       final TextField<String> searchField = new TextField<String>(fs.getTextFieldId(), new PropertyModel<String>(filter, "searchString"));
       WicketUtils.setFocus(searchField);
       fs.add(searchField);
@@ -116,7 +116,7 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
       final DivPanel div = new DivPanel(fs.newChildId());
       div.add(AttributeModifier.append("class", "modifiedSearchExpressionLabel"));
       fs.add(div);
-      modifiedSearchExpressionLabel = new Label(DivPanel.CHILD_ID, modifiedSearchExpressionModel) {
+      modifiedSearchExpressionLabel = new Label(div.newChildId(), modifiedSearchExpressionModel) {
         @Override
         public boolean isVisible()
         {
@@ -127,7 +127,7 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
       div.add(modifiedSearchExpressionLabel);
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
       final DivPanel checkBoxesPanel = fs.addNewCheckBoxDiv();
       checkBoxesPanel.add(new CheckBoxPanel(checkBoxesPanel.newChildId(), new PropertyModel<Boolean>(filter, "searchHistory"),
           getString("search.searchHistory")).setTooltip(getString("search.searchHistory.additional.tooltip")));
@@ -159,7 +159,7 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
 
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("search.periodOfModification"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("search.periodOfModification"));
       final DatePanel modifiedStartDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(filter, "startTimeOfModification"),
           DatePanelSettings.get().withSelectPeriodMode(true));
       fs.add(modifiedStartDatePanel);

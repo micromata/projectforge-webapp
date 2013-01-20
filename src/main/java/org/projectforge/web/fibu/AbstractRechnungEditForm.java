@@ -280,7 +280,7 @@ extends AbstractEditForm<O, P>
     {
       gridBuilder.newSubSplitPanel(GridSize.COL50);
       // Fälligkeit und Zahlungsziel
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.faelligkeit"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.faelligkeit"));
       faelligkeitPanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "faelligkeit"), DatePanelSettings.get()
           .withTargetType(java.sql.Date.class));
       dependentFormComponents[2] = faelligkeitPanel.getDateField();
@@ -430,7 +430,7 @@ extends AbstractEditForm<O, P>
         if (rechnungsPosition != null) {
           // Order
           posGridBuilder.newSubSplitPanel(gridSize); // COL25
-          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.auftrag"), true).setLabelSide(false);
+          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.auftrag")).setLabelSide(false);
           fieldset.add(new InputPanel(fieldset.newChildId(), new AuftragsPositionFormComponent(InputPanel.WICKET_ID,
               new PropertyModel<AuftragsPositionDO>(position, "auftragsPosition"), false)));
           fieldset.add(new IconPanel(fieldset.newIconChildId(), IconType.GOTO, getString("show")) {

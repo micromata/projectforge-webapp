@@ -192,8 +192,7 @@ class AddressPageSupport implements Serializable
 
   public FieldProperties<FormOfAddress> getFormOfAddressProperties()
   {
-    // Multiple children not needed in mobile version.
-    return new FieldProperties<FormOfAddress>("address.form", new PropertyModel<FormOfAddress>(address, "form"), !mobile);
+    return new FieldProperties<FormOfAddress>("address.form", new PropertyModel<FormOfAddress>(address, "form"));
   }
 
   public AbstractFieldsetPanel< ? > addTitle()
@@ -350,7 +349,7 @@ class AddressPageSupport implements Serializable
 
   public FieldProperties<Date> getBirthdayProperties()
   {
-    return new FieldProperties<Date>("address.birthday", new PropertyModel<Date>(address, "birthday"), true);
+    return new FieldProperties<Date>("address.birthday", new PropertyModel<Date>(address, "birthday"));
   }
 
   public AbstractFieldsetPanel< ? > addLanguage()
@@ -368,7 +367,7 @@ class AddressPageSupport implements Serializable
 
   public FieldProperties<Locale> getLanguageProperties()
   {
-    return new FieldProperties<Locale>("language", new PropertyModel<Locale>(address, "communicationLanguage"), true);
+    return new FieldProperties<Locale>("language", new PropertyModel<Locale>(address, "communicationLanguage"));
   }
 
   public AbstractFieldsetPanel< ? > addFingerPrint()
@@ -425,7 +424,7 @@ class AddressPageSupport implements Serializable
   public FieldProperties<String> getPhoneNumberProperties(final String property, final String labelKey, final String labelDescriptionKey,
       final FieldType fieldType)
       {
-    return new FieldProperties<String>(labelKey, new PropertyModel<String>(address, property), true).setLabelDescription(
+    return new FieldProperties<String>(labelKey, new PropertyModel<String>(address, property)).setLabelDescription(
         labelDescriptionKey).setFieldType(fieldType);
       }
 

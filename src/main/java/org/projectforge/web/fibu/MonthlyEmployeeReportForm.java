@@ -75,7 +75,7 @@ public class MonthlyEmployeeReportForm extends AbstractStandardForm<MonthlyEmplo
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("calendar.month"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("calendar.month"));
       yearChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(filter, "year"),
           new ArrayList<Integer>()) {
         /**

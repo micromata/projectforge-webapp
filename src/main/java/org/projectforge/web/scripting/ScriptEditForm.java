@@ -80,7 +80,7 @@ public class ScriptEditForm extends AbstractEditForm<ScriptDO, ScriptEditPage>
       fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "description")));
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("scripting.script"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("scripting.script"));
       final MaxLengthTextArea script = new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "script"));
       WicketUtils.setHeight(script, 50);
       fs.add(script);
@@ -91,7 +91,7 @@ public class ScriptEditForm extends AbstractEditForm<ScriptDO, ScriptEditPage>
 
   private void addParameterSettings(final int idx)
   {
-    final FieldsetPanel fs = gridBuilder.newFieldset(getString("scripting.script.parameterName") + " " + idx, true);
+    final FieldsetPanel fs = gridBuilder.newFieldset(getString("scripting.script.parameterName") + " " + idx);
 
     final String parameterType = "parameter" + idx + "Type";
     final String parameterName = "parameter" + idx + "Name";

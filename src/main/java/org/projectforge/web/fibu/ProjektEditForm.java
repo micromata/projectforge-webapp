@@ -98,7 +98,7 @@ public class ProjektEditForm extends AbstractEditForm<ProjektDO, ProjektEditPage
     }
     {
       // Internal cost (digit 2-4)
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt.internKost2_4"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt.internKost2_4"));
       fs.add(new DivTextPanel(fs.newChildId(), "4."));
       final MinMaxNumberField<Integer> field = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data,
           "internKost2_4"), 0, 999) {

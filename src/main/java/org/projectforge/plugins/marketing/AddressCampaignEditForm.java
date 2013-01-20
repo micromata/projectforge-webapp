@@ -63,7 +63,7 @@ public class AddressCampaignEditForm extends AbstractEditForm<AddressCampaignDO,
     }
     {
       // Values
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("values"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("values"));
       valuesField = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "values"));
       fs.addHelpIcon(getString("plugins.marketing.addressCampaign.values.format"));
       fs.add(valuesField);

@@ -87,7 +87,7 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
   {
     super.init();
     gridBuilder.newSplitPanel(GridSize.SPAN8);
-    fieldset = gridBuilder.newFieldset(getString("label.options"), true);
+    fieldset = gridBuilder.newFieldset(getString("label.options"));
     if (isOtherUsersAllowed() == true) {
       final UserSelectPanel userSelectPanel = new UserSelectPanel(fieldset.newChildId(),
           new PropertyModel<PFUserDO>(this, "timesheetsUser"), parentPage, "userId");
@@ -187,7 +187,7 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
       buttonGroupPanel.addButton(exportICalButtonPanel);
     }
     gridBuilder.newSplitPanel(GridSize.SPAN4);
-    final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.duration"), true).setNoLabelFor();
+    final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.duration")).setNoLabelFor();
     final DivTextPanel durationPanel = new DivTextPanel(fs.newChildId(), new Label(DivTextPanel.WICKET_ID, new Model<String>() {
       @Override
       public String getObject()

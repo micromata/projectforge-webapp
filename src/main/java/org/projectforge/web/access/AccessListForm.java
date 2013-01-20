@@ -82,7 +82,7 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
     gridBuilder.newSplitPanel(GridSize.COL33);
     {
       // User
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("user"), true).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("user")).setNoLabelFor();
       final UserSelectPanel assigneeSelectPanel = new UserSelectPanel(fs.newChildId(), new Model<PFUserDO>() {
         @Override
         public PFUserDO getObject()

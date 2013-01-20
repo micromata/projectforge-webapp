@@ -99,12 +99,12 @@ public class PollEditForm extends AbstractEditForm<PollDO, PollEditPage>
     gridBuilder.newSplitPanel(GridSize.COL50);
 
     // new title
-    final FieldsetPanel fsTitle = gridBuilder.newFieldset("Titel", true);
+    final FieldsetPanel fsTitle = gridBuilder.newFieldset("Titel");
     final RequiredTextField<String> title = new RequiredTextField<String>(fsTitle.getTextFieldId(), new PropertyModel<String>(this.data, "title"));
     fsTitle.add(title);
 
     // new location
-    final FieldsetPanel fsLocation = gridBuilder.newFieldset("Ort", true);
+    final FieldsetPanel fsLocation = gridBuilder.newFieldset("Ort");
     final PFAutoCompleteTextField<String> location = new PFAutoCompleteTextField<String>(fsLocation.getTextFieldId(), new PropertyModel<String>(
         this.data, "location")) {
       private static final long serialVersionUID = -2309992819521957913L;
@@ -118,12 +118,12 @@ public class PollEditForm extends AbstractEditForm<PollDO, PollEditPage>
     fsLocation.add(location);
 
     // new description
-    final FieldsetPanel fsDesc = gridBuilder.newFieldset("Beschreibung", true);
+    final FieldsetPanel fsDesc = gridBuilder.newFieldset("Beschreibung");
     final TextArea<String> desc = new TextArea<String>(fsDesc.getTextAreaId(), new PropertyModel<String>(this.data, "description"));
     fsDesc.add(desc);
 
     // attendee list
-    final FieldsetPanel fsAttendee = gridBuilder.newFieldset("Teilnehmer", true);
+    final FieldsetPanel fsAttendee = gridBuilder.newFieldset("Teilnehmer");
     final UsersProvider usersProvider = new UsersProvider();
     final MultiChoiceListHelper<PFUserDO> attendeeHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator())
         .setFullList(usersProvider.getSortedUsers());

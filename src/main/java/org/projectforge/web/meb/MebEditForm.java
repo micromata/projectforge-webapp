@@ -131,7 +131,7 @@ public class MebEditForm extends AbstractEditForm<MebEntryDO, MebEditPage>
     }
     {
       // Actions
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("meb.actions"), true).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("meb.actions")).setNoLabelFor();
       fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("createTimesheet")) {
         @Override
         public final void onSubmit()

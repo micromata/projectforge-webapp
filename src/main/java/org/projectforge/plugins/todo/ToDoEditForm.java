@@ -223,7 +223,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
     gridBuilder.newGridPanel();
     {
       // Task
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task"));
       final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(data, "task"), parentPage,
           "taskId");
       fs.add(taskSelectPanel);
@@ -232,7 +232,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
     }
     {
       // Group
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("group"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("group"));
       final GroupSelectPanel groupSelectPanel = new GroupSelectPanel(fs.newChildId(), new PropertyModel<GroupDO>(data, "group"),
           parentPage, "groupId");
       fs.add(groupSelectPanel);
@@ -253,7 +253,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
     }
     {
       // Options
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
       if (ConfigXml.getInstance().isSendMailConfigured() == true) {
         checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(this, "sendNotification"),

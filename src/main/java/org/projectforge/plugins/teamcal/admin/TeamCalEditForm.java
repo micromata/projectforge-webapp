@@ -141,7 +141,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       parentPage.add(icsExportDialog);
       icsExportDialog.init();
       icsExportDialog.redraw(getData());
-      final FieldsetPanel fsSubscribe = gridBuilder.newFieldset(getString("plugins.teamcal.abonnement"), true).setNoLabelFor();
+      final FieldsetPanel fsSubscribe = gridBuilder.newFieldset(getString("plugins.teamcal.abonnement")).setNoLabelFor();
       fsSubscribe.add(new AjaxIconLinkPanel(fsSubscribe.newChildId(), IconType.ABONNEMENT, new ResourceModel(
           "plugins.teamcal.abonnement.tooltip")) {
         @Override
@@ -189,7 +189,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       }
       {
         // Minimal access users
-        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.minimalAccess.users"), true);// .setLabelSide(false);
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.minimalAccess.users"));// .setLabelSide(false);
         final UsersProvider usersProvider = new UsersProvider();
         final Collection<PFUserDO> minimalAccessUsers = new UsersProvider().getSortedUsers(getData().getMinimalAccessUserIds());
         minimalAccessUsersListHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator()).setFullList(
@@ -241,7 +241,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       }
       {
         // Minimal access groups
-        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.minimalAccess.groups"), true);// .setLabelSide(false);
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.minimalAccess.groups"));// .setLabelSide(false);
         final GroupsProvider groupsProvider = new GroupsProvider();
         final Collection<GroupDO> minimalAccessGroups = new GroupsProvider().getSortedGroups(getData().getMinimalAccessGroupIds());
         minimalAccessGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(

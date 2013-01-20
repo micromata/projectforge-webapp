@@ -74,7 +74,7 @@ public class EmployeeSalaryEditForm extends AbstractEditForm<EmployeeSalaryDO, E
     {
       // DropDownChoice months
       final FieldsetPanel fs = gridBuilder.newFieldset(
-          WicketUtils.createMultipleFieldsetLabel(getString("calendar.month"), getString("calendar.year")), true);
+          WicketUtils.createMultipleFieldsetLabel(getString("calendar.month"), getString("calendar.year")));
       final LabelValueChoiceRenderer<Integer> monthChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
       for (int i = 0; i <= 11; i++) {
         monthChoiceRenderer.addValue(i, StringHelper.format2DigitNumber(i + 1));

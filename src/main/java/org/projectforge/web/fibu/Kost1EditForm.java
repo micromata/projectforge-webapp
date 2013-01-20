@@ -63,7 +63,7 @@ public class Kost1EditForm extends AbstractEditForm<Kost1DO, Kost1EditPage>
     gridBuilder.newGridPanel();
     {
       // Number range
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost.kostentraeger"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost.kostentraeger"));
       nummernkreisField = new RequiredMinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data, "nummernkreis"), 0,
           9);
       if (isNew() == true) {

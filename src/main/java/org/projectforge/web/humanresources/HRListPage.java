@@ -285,7 +285,7 @@ public class HRListPage extends AbstractListPage<HRListForm, HRDao, HRViewUserDa
   {
     final DivPanel panel = new DivPanel(id);// DivType.GRID12, DivType.BOX, DivType.ROUND_ALL);
     form.add(panel);
-    resourceLinkPanel = new HRListResourceLinkPanel(DivPanel.CHILD_ID, this, hrDao, userFormatter) {
+    resourceLinkPanel = new HRListResourceLinkPanel(panel.newChildId(), this, hrDao, userFormatter) {
       @Override
       public boolean isVisible()
       {

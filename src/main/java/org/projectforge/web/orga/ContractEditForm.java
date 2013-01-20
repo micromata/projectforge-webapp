@@ -86,7 +86,7 @@ public class ContractEditForm extends AbstractEditForm<ContractDO, ContractEditP
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Number
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("legalAffaires.contract.number"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("legalAffaires.contract.number"));
       fs.add(new DivTextPanel(fs.newChildId(), "C-"));
       final MinMaxNumberField<Integer> number = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data,
           "number"), 0, 99999999);
@@ -162,7 +162,7 @@ public class ContractEditForm extends AbstractEditForm<ContractDO, ContractEditP
     }
     {
       // Validity
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("legalAffaires.contract.validity"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("legalAffaires.contract.validity"));
       validFromDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "validFrom"), DatePanelSettings.get()
           .withTargetType(java.sql.Date.class));
       fs.add(validFromDatePanel);
@@ -208,7 +208,7 @@ public class ContractEditForm extends AbstractEditForm<ContractDO, ContractEditP
     gridBuilder.newGridPanel();
     {
       // Text with JIRA support
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("text"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("text"));
       final IModel<String> model = new PropertyModel<String>(data, "text");
       fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, model));
       fs.addJIRAField(model);

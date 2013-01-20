@@ -75,7 +75,7 @@ public class LoginForm extends AbstractForm<LoginForm, LoginPage>
       final FieldsetPanel fs = new FieldsetPanel("stayLoggedIn", getString("login.stayLoggedIn")).setNoLabelFor();
       add(fs);
       final DivPanel radioBoxDiv = fs.addNewRadioBoxDiv();
-      final RadioGroupPanel<Boolean> radioGroup = new RadioGroupPanel<Boolean>(DivPanel.CHILD_ID, "stayLoggedIn", new PropertyModel<Boolean>(
+      final RadioGroupPanel<Boolean> radioGroup = new RadioGroupPanel<Boolean>(radioBoxDiv.newChildId(), "stayLoggedIn", new PropertyModel<Boolean>(
           this, "stayLoggedIn"));
       radioBoxDiv.add(radioGroup);
       WicketUtils.addYesNo(radioGroup);

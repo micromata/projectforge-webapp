@@ -80,7 +80,7 @@ public class AdminForm extends AbstractStandardForm<AdminForm, AdminPage>
     gridBuilder.newFormHeading(getString("system.admin.group.title.systemChecksAndFunctionality"));
     final Configuration cfg = Configuration.getInstance();
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.group.title.systemChecksAndFunctionality.miscChecks"), true)
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.group.title.systemChecksAndFunctionality.miscChecks"))
           .setNoLabelFor();
       fs.add(new MyButtonPanel(fs.newChildId(), "checkSystemIntegrity") {
         @Override
@@ -98,7 +98,7 @@ public class AdminForm extends AbstractStandardForm<AdminForm, AdminPage>
       }.getButtonPanel());
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.group.title.systemChecksAndFunctionality.caches"), true)
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.group.title.systemChecksAndFunctionality.caches"))
           .setNoLabelFor();
       fs.add(new MyButtonPanel(fs.newChildId(), "refreshCaches") {
         @Override
@@ -109,8 +109,8 @@ public class AdminForm extends AbstractStandardForm<AdminForm, AdminPage>
       }.getButtonPanel());
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.group.title.systemChecksAndFunctionality.configuration"),
-          true).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.group.title.systemChecksAndFunctionality.configuration"))
+          .setNoLabelFor();
       fs.add(new MyButtonPanel(fs.newChildId(), "rereadConfiguration") {
         @Override
         public void onSubmit()
@@ -127,7 +127,7 @@ public class AdminForm extends AbstractStandardForm<AdminForm, AdminPage>
       }.getButtonPanel());
     }
     if (cfg.isMebConfigured() == true) {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("meb.title.heading.short"), getString("meb.title.heading"), true)
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("meb.title.heading.short"), getString("meb.title.heading"))
           .setNoLabelFor();
       fs.add(new MyButtonPanel(fs.newChildId(), "checkUnseenMebMails") {
         @Override
@@ -153,7 +153,7 @@ public class AdminForm extends AbstractStandardForm<AdminForm, AdminPage>
       fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(this, "alertMessage"), 1000));
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset("", true).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset("").setNoLabelFor();
       fs.add(new MyButtonPanel(fs.newChildId(), "setAlertMessage") {
         @Override
         public void onSubmit()
@@ -187,7 +187,7 @@ public class AdminForm extends AbstractStandardForm<AdminForm, AdminPage>
     gridBuilder.newSplitPanel(GridSize.COL50);
     gridBuilder.newFormHeading(getString("system.admin.group.title.databaseActions"));
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.group.title.databaseActions.userprefs"), true)
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.group.title.databaseActions.userprefs"))
           .setNoLabelFor();
       fs.add(new MyButtonPanel(fs.newChildId(), "updateUserPrefs") {
         @Override
@@ -198,7 +198,7 @@ public class AdminForm extends AbstractStandardForm<AdminForm, AdminPage>
       }.getButtonPanel());
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.group.title.databaseActions.dataBaseIndices"), true)
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.group.title.databaseActions.dataBaseIndices"))
           .setNoLabelFor();
       fs.add(new MyButtonPanel(fs.newChildId(), "createMissingDatabaseIndices") {
         @Override
@@ -216,7 +216,7 @@ public class AdminForm extends AbstractStandardForm<AdminForm, AdminPage>
       }.getButtonPanel());
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.group.title.databaseActions.export"), true).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.group.title.databaseActions.export")).setNoLabelFor();
       final MyButtonPanel buttonPanel = new MyButtonPanel(fs.newChildId(), "dump") {
         @Override
         public void onSubmit()
@@ -237,13 +237,13 @@ public class AdminForm extends AbstractStandardForm<AdminForm, AdminPage>
     gridBuilder.newFormHeading(getString("system.admin.group.title.databaseSearchIndices"));
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.reindex.newestEntries"),
-          getString("system.admin.reindex.newestEntries.subtitle"), true);
+          getString("system.admin.reindex.newestEntries.subtitle"));
       fs.add(new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(this, "reindexNewestNEntries"), 0,
           Integer.MAX_VALUE));
       fs.addHelpIcon(getString("system.admin.reindex.newestEntries.tooltip"));
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.reindex.fromDate"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.reindex.fromDate"));
       final DatePanel datePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(this, "reindexFromDate"));
       fs.add(datePanel);
       fs.addHelpIcon(new Model<String>() {
@@ -264,7 +264,7 @@ public class AdminForm extends AbstractStandardForm<AdminForm, AdminPage>
     }
     if (WebConfiguration.isDevelopmentMode() == true) {
       gridBuilder.newFormHeading("Development modus");
-      final FieldsetPanel fs = gridBuilder.newFieldset("Create test objects", true).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset("Create test objects").setNoLabelFor();
       final Button button = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("BookDO")) {
         @Override
         public final void onSubmit()
@@ -279,7 +279,7 @@ public class AdminForm extends AbstractStandardForm<AdminForm, AdminPage>
 
     gridBuilder.newGridPanel();
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.group.title.misc.logEntries"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.group.title.misc.logEntries"));
       final MaxLengthTextArea logEntries = new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(this, "logEntries"),
           10000);
       logEntries.add(AttributeModifier.append("style", "width: 100%; height: 20em;"));
@@ -287,7 +287,7 @@ public class AdminForm extends AbstractStandardForm<AdminForm, AdminPage>
       fs.addHelpIcon(getString("system.admin.button.formatLogEntries.textarea.tooltip"));
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset("", true).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset("").setNoLabelFor();
       fs.add(new MyButtonPanel(fs.newChildId(), "formatLogEntries") {
         @Override
         public void onSubmit()

@@ -51,7 +51,7 @@ public abstract class BusinessAssessment4Fieldset implements Serializable
   @SuppressWarnings("serial")
   public BusinessAssessment4Fieldset(final GridBuilder gridBuilder)
   {
-    final FieldsetPanel fs = new FieldsetPanel(gridBuilder.getPanel(), gridBuilder.getString("fibu.businessAssessment"), true) {
+    final FieldsetPanel fs = new FieldsetPanel(gridBuilder.getPanel(), gridBuilder.getString("fibu.businessAssessment")) {
       @Override
       public boolean isVisible() {
         return BusinessAssessment4Fieldset.this.isVisible();

@@ -90,7 +90,7 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
     }
     {
       gridBuilder.newSplitPanel(GridSize.COL66);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timePeriod"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timePeriod"));
       startDate = new DatePanel(fs.newChildId(), new PropertyModel<Date>(filter, "startTime"), DatePanelSettings.get()
           .withSelectPeriodMode(true).withRequired(true));
       fs.add(startDate);
@@ -133,7 +133,7 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
     {
       // Total hours
       gridBuilder.newSplitPanel(GridSize.COL33);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.totalDuration"), true).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.totalDuration")).setNoLabelFor();
       fs.add(new TextPanel(fs.newChildId(), new Model<String>() {
         @Override
         public String getObject()

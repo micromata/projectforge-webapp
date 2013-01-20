@@ -83,7 +83,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     gridBuilder.newSplitPanel(GridSize.COL50, true).newSubSplitPanel(GridSize.COL50);
     {
       // Number
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.nummer"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.nummer"));
       final MinMaxNumberField<Integer> number = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data,
           "nummer"), 0, 99999999);
       number.setMaxLength(8).add(AttributeModifier.append("style", "width: 6em !important;"));
@@ -117,7 +117,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     }
     {
       // Customer
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde"));
       customerSelectPanel = new CustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"), new PropertyModel<String>(
           data, "kundeText"), parentPage, "kundeId");
       fs.add(customerSelectPanel);

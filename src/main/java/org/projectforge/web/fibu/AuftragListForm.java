@@ -65,7 +65,7 @@ public class AuftragListForm extends AbstractListForm<AuftragListFilter, Auftrag
     {
       // Statistics
       gridBuilder.newGridPanel();
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("statistics"), true).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("statistics")).setNoLabelFor();
       fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
         @Override
         public String getObject()

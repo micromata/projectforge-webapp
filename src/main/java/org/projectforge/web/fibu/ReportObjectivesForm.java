@@ -90,7 +90,7 @@ public class ReportObjectivesForm extends AbstractStandardForm<ReportObjectivesF
     filter = getFilter();
     gridBuilder.newGridPanel();
     {
-      final FieldsetPanel fs = new FieldsetPanel(gridBuilder.getPanel(), getString("file"), "*.xml", true) {
+      final FieldsetPanel fs = new FieldsetPanel(gridBuilder.getPanel(), getString("file"), "*.xml") {
         @Override
         public boolean isVisible()
         {
@@ -108,7 +108,7 @@ public class ReportObjectivesForm extends AbstractStandardForm<ReportObjectivesF
       }, getString("import"), SingleButtonPanel.GREY));
     }
     {
-      final FieldsetPanel fs = new FieldsetPanel(gridBuilder.getPanel(), getString("timePeriod"), true) {
+      final FieldsetPanel fs = new FieldsetPanel(gridBuilder.getPanel(), getString("timePeriod")) {
         @Override
         public boolean isVisible()
         {

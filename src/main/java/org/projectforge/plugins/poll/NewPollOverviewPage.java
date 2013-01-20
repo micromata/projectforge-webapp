@@ -98,18 +98,18 @@ public class NewPollOverviewPage extends PollBasePage
   {
     super.onInitialize();
 
-    final FieldsetPanel fsTitle = gridBuilder.newFieldset(getString("plugins.poll.new.title"), true).setLabelFor(this);
+    final FieldsetPanel fsTitle = gridBuilder.newFieldset(getString("plugins.poll.new.title"));
     final TextField<String> title = new TextField<String>(fsTitle.getTextFieldId(), new PropertyModel<String>(model.getPollDo(), "title"));
     title.setEnabled(this.model.isNew());
     fsTitle.add(title);
 
-    final FieldsetPanel fsLocation = gridBuilder.newFieldset(getString("plugins.poll.new.location"), true).setLabelFor(this);
+    final FieldsetPanel fsLocation = gridBuilder.newFieldset(getString("plugins.poll.new.location")).setLabelFor(this);
     final TextField<String> location = new TextField<String>(fsLocation.getTextFieldId(),
         new PropertyModel<String>(model.getPollDo(), "location"));
     location.setEnabled(this.model.isNew());
     fsLocation.add(location);
 
-    final FieldsetPanel fsDescription = gridBuilder.newFieldset(getString("plugins.poll.new.description"), true).setLabelFor(this);
+    final FieldsetPanel fsDescription = gridBuilder.newFieldset(getString("plugins.poll.new.description"));
     final TextArea<String> description = new TextArea<String>(fsDescription.getTextAreaId(), new PropertyModel<String>(this.model.getPollDo(),
         "description"));
     description.setEnabled(this.model.isNew());
@@ -120,7 +120,7 @@ public class NewPollOverviewPage extends PollBasePage
     if (this.model.isNew() == true) {
       createEnabledChoices();
     } else {
-      final FieldsetPanel fsUsers = gridBuilder.newFieldset(getString("plugins.poll.attendee.users"), true).setLabelFor(this);
+      final FieldsetPanel fsUsers = gridBuilder.newFieldset(getString("plugins.poll.attendee.users"));
 
       if (model.isNew() == false) {
         createDisabledChoices(fsUsers, model.getCalculatedAttendeeList(), true);
@@ -129,14 +129,14 @@ public class NewPollOverviewPage extends PollBasePage
       }
     }
 
-    final FieldsetPanel fsEMails = gridBuilder.newFieldset(getString("plugins.poll.attendee.emails"), true).setLabelFor(this);
+    final FieldsetPanel fsEMails = gridBuilder.newFieldset(getString("plugins.poll.attendee.emails"));
     if (model.isNew() == false) {
       createDisabledChoices(fsEMails, model.getCalculatedAttendeeList(), false);
     } else {
       createDisabledChoices(fsEMails, model.getPollAttendeeList(), false);
     }
 
-    final FieldsetPanel fsEvents = gridBuilder.newFieldset(getString("plugins.poll.attendee.events"), true).setLabelFor(this);
+    final FieldsetPanel fsEvents = gridBuilder.newFieldset(getString("plugins.poll.attendee.events"));
     createDisabledChoices(fsEvents, model.getAllEvents());
   }
 
@@ -166,7 +166,7 @@ public class NewPollOverviewPage extends PollBasePage
   {
     final UsersProvider usersProvider = new UsersProvider();
     // User select
-    final FieldsetPanel fsUserSelect = gridBuilder.newFieldset(getString("plugins.poll.attendee.users"), true);
+    final FieldsetPanel fsUserSelect = gridBuilder.newFieldset(getString("plugins.poll.attendee.users"));
     final MultiChoiceListHelper<PFUserDO> assignUsersListHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator())
         .setFullList(usersProvider.getSortedUsers());
     final HashSet<PFUserDO> attendeess = new HashSet<PFUserDO>();

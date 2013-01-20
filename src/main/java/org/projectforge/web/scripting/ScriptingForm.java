@@ -88,7 +88,7 @@ public class ScriptingForm extends AbstractStandardForm<ScriptDO, ScriptingPage>
     }));
     {
       // Upload dump file
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("file"), "*.xsl, *.jrxml", true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("file"), "*.xsl, *.jrxml");
       fileUploadField = new FileUploadField(FileUploadPanel.WICKET_ID);
       fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
         @Override

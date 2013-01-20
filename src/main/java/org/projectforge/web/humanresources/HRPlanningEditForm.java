@@ -177,7 +177,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Start Date
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.startTime"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.startTime"));
       final DatePanel weekDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "week"), DateTimePanelSettings.get()
           .withSelectStartStopTime(false).withTargetType(java.sql.Date.class));
       weekDatePanel.setRequired(true);
@@ -347,7 +347,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
       {
         // DropDownChoice status / project
         final FieldsetPanel fs = posGridBuilder.newFieldset(WicketUtils.createMultipleFieldsetLabel(getString("status"),
-            getString("fibu.projekt")), true);
+            getString("fibu.projekt")));
         final LabelValueChoiceRenderer<HRPlanningEntryStatus> statusChoiceRenderer = new LabelValueChoiceRenderer<HRPlanningEntryStatus>(
             fs, HRPlanningEntryStatus.values());
         final DropDownChoice<HRPlanningEntryStatus> statusChoice = new DropDownChoice<HRPlanningEntryStatus>(fs.getDropDownChoiceId(),
@@ -427,7 +427,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
       posGridBuilder.newSplitPanel(GridSize.COL50);
       {
         // Description
-        final FieldsetPanel fs = posGridBuilder.newFieldset(getString("hr.planning.description"), true);
+        final FieldsetPanel fs = posGridBuilder.newFieldset(getString("hr.planning.description"));
         final IModel<String> model = new PropertyModel<String>(entry, "description");
         final MaxLengthTextArea description = new MaxLengthTextArea(TextAreaPanel.WICKET_ID, model);
         if (entry.isDeleted() == true) {

@@ -66,56 +66,56 @@ public class AddressCompareForm extends AbstractEditForm<AddressDO, AddressCompa
   }
 
   private void initFields(final AddressDO address, final boolean enabled) {
-    final FieldsetPanel fsName = gridBuilder.newFieldset("Name", true);
+    final FieldsetPanel fsName = gridBuilder.newFieldset("Name");
     fsName.add(new TextField<String>(fsName.getTextFieldId(), new PropertyModel<String>(address, "name")));
     fsName.setEnabled(enabled);
     if (StringUtils.equals(dataOld.getName(), data.getName()) == true) {
       setMark(fsName, enabled);
     }
 
-    final FieldsetPanel fsFirstName = gridBuilder.newFieldset("FirstName", true);
+    final FieldsetPanel fsFirstName = gridBuilder.newFieldset("FirstName");
     fsFirstName.add(new TextField<String>(fsFirstName.getTextFieldId(), new PropertyModel<String>(address, "firstName")));
     fsFirstName.setEnabled(enabled);
     if (StringUtils.equals(dataOld.getFirstName(), data.getFirstName()) == true) {
       setMark(fsFirstName, enabled);
     }
 
-    final FieldsetPanel fsEmailBusiness = gridBuilder.newFieldset("Mail gesch.", true);
+    final FieldsetPanel fsEmailBusiness = gridBuilder.newFieldset("Mail gesch.");
     fsEmailBusiness.add(new TextField<String>(fsEmailBusiness.getTextFieldId(), new PropertyModel<String>(address, "email")));
     fsEmailBusiness.setEnabled(enabled);
     if (StringUtils.equals(dataOld.getEmail(), data.getEmail()) == true) {
       setMark(fsEmailBusiness, enabled);
     }
 
-    final FieldsetPanel fsBusinessPhone = gridBuilder.newFieldset("Tele gesch.", true);
+    final FieldsetPanel fsBusinessPhone = gridBuilder.newFieldset("Tele gesch.");
     fsBusinessPhone.add(new TextField<String>(fsBusinessPhone.getTextFieldId(), new PropertyModel<String>(address, "businessPhone")));
     fsBusinessPhone.setEnabled(enabled);
     if (StringUtils.equals(dataOld.getBusinessPhone(), data.getBusinessPhone()) == true) {
       setMark(fsBusinessPhone, enabled);
     }
 
-    final FieldsetPanel fsMobilBusiness = gridBuilder.newFieldset("Mobil gesch.", true);
+    final FieldsetPanel fsMobilBusiness = gridBuilder.newFieldset("Mobil gesch.");
     fsMobilBusiness.add(new TextField<String>(fsMobilBusiness.getTextFieldId(), new PropertyModel<String>(address, "mobilePhone")));
     fsMobilBusiness.setEnabled(enabled);
     if (StringUtils.equals(dataOld.getMobilePhone(), data.getMobilePhone()) == true) {
       setMark(fsMobilBusiness, enabled);
     }
 
-    final FieldsetPanel fsEmailPrivate = gridBuilder.newFieldset("Mail priv.", true);
+    final FieldsetPanel fsEmailPrivate = gridBuilder.newFieldset("Mail priv.");
     fsEmailPrivate.add(new TextField<String>(fsEmailPrivate.getTextFieldId(), new PropertyModel<String>(address, "privateEmail")));
     fsEmailPrivate.setEnabled(enabled);
     if (StringUtils.equals(dataOld.getPrivateEmail(), data.getPrivateEmail()) == true) {
       setMark(fsEmailPrivate, enabled);
     }
 
-    final FieldsetPanel fsPrivatePhone = gridBuilder.newFieldset("Tele priv.", true);
+    final FieldsetPanel fsPrivatePhone = gridBuilder.newFieldset("Tele priv.");
     fsPrivatePhone.add(new TextField<String>(fsPrivatePhone.getTextFieldId(), new PropertyModel<String>(address, "privatePhone")));
     fsPrivatePhone.setEnabled(enabled);
     if (StringUtils.equals(dataOld.getPrivatePhone(), data.getPrivatePhone()) == true) {
       setMark(fsPrivatePhone, enabled);
     }
 
-    final FieldsetPanel fsMobilPrivate = gridBuilder.newFieldset("Mobil priv.", true);
+    final FieldsetPanel fsMobilPrivate = gridBuilder.newFieldset("Mobil priv.");
     fsMobilPrivate.add(new TextField<String>(fsMobilPrivate.getTextFieldId(), new PropertyModel<String>(address, "privateMobilePhone")));
     fsMobilPrivate.setEnabled(enabled);
     if (StringUtils.equals(dataOld.getPrivateMobilePhone(), data.getPrivateMobilePhone()) == true) {

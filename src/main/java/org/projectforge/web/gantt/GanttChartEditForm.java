@@ -204,7 +204,7 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Time period
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timePeriod"), true).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timePeriod")).setNoLabelFor();
       final DatePanel fromDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(getSettings(), "fromDate"), DatePanelSettings
           .get().withSelectProperty("fromDate"));
       fs.add(fromDatePanel);
@@ -215,7 +215,7 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("export"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("export"));
       final LabelValueChoiceRenderer<String> exportFormatChoiceRenderer = new LabelValueChoiceRenderer<String>();
       exportFormatChoiceRenderer.addValue(EXPORT_JPG, getString("gantt.export.jpg"));
       exportFormatChoiceRenderer.addValue(EXPORT_MS_PROJECT_MPX, getString("gantt.export.msproject.mpx"));

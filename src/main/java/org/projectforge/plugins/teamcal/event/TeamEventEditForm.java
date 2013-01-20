@@ -158,7 +158,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       }
     }
     // add teamCal drop down
-    initTeamCalPicker(gridBuilder.newFieldset(getString("plugins.teamcal.event.teamCal"), true));
+    initTeamCalPicker(gridBuilder.newFieldset(getString("plugins.teamcal.event.teamCal")));
     {
       // SUBJECT
       final FieldsetPanel fieldSet = gridBuilder.newFieldset(getString("plugins.teamcal.event.subject"));
@@ -196,7 +196,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     initDatePanel();
     {
       // ALL DAY CHECKBOX
-      final FieldsetPanel fieldSet = gridBuilder.newFieldset("", true).setNoLabelFor();
+      final FieldsetPanel fieldSet = gridBuilder.newFieldset("").setNoLabelFor();
       final DivPanel divPanel = fieldSet.addNewCheckBoxDiv();
       final CheckBoxPanel checkBox = new CheckBoxPanel(divPanel.newChildId(), new PropertyModel<Boolean>(data, "allDay"),
           getString("plugins.teamcal.event.allDay"));
@@ -227,7 +227,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     gridBuilder.newFormHeading(getString("plugins.teamcal.event.recurrence"));
     {
       // Recurrence interval type:
-      recurrenceFieldset = gridBuilder.newFieldset(getString("plugins.teamcal.event.recurrence"), true);
+      recurrenceFieldset = gridBuilder.newFieldset(getString("plugins.teamcal.event.recurrence"));
       recurrencePanel = gridBuilder.getPanel().getDiv();
       recurrencePanel.setOutputMarkupId(true);
       final RecurrenceFrequency[] intervals = TeamEventUtils.getSupportedRecurrenceIntervals();
@@ -260,7 +260,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     }
     {
       // Interval (day, weeks, months, ...). Only visible if recurrenceData.interval != NONE.
-      recurrenceIntervalFieldset = gridBuilder.newFieldset("", true);
+      recurrenceIntervalFieldset = gridBuilder.newFieldset("");
       DivTextPanel panel = new DivTextPanel(recurrenceIntervalFieldset.newChildId(), HtmlHelper.escapeHtml(
           getString("plugins.teamcal.event.recurrence.customized.all"), false) + "&nbsp;");
       panel.getLabel().setEscapeModelStrings(false);
@@ -292,7 +292,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     }
     {
       // Until. Only visible if recurrenceData.interval != NONE.
-      recurrenceUntilDateFieldset = gridBuilder.newFieldset(getString("plugins.teamcal.event.recurrence.until"), true);
+      recurrenceUntilDateFieldset = gridBuilder.newFieldset(getString("plugins.teamcal.event.recurrence.until"));
       recurrenceUntilDateFieldset.add(new DatePanel(recurrenceUntilDateFieldset.newChildId(), new PropertyModel<Date>(recurrenceData,
           "until"), DatePanelSettings.get().withTargetType(java.sql.Date.class)));
       recurrenceUntilDateFieldset.getFieldset().setOutputMarkupId(true);
@@ -444,7 +444,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
    */
   private void initDatePanel()
   {
-    startDateField = gridBuilder.newFieldset(getString("plugins.teamcal.event.beginDate"), true);
+    startDateField = gridBuilder.newFieldset(getString("plugins.teamcal.event.beginDate"));
     startDateField.getFieldset().setOutputMarkupId(true);
     startDateTimePanel = new DateTimePanel(startDateField.newChildId(), new PropertyModel<Date>(data, "startDate"),
         (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withTargetType(java.sql.Timestamp.class)
@@ -455,7 +455,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     dependentFormComponents[1] = startDateTimePanel.getHourOfDayDropDownChoice();
     dependentFormComponents[2] = startDateTimePanel.getMinuteDropDownChoice();
 
-    endDateField = gridBuilder.newFieldset(getString("plugins.teamcal.event.endDate"), true);
+    endDateField = gridBuilder.newFieldset(getString("plugins.teamcal.event.endDate"));
     endDateField.getFieldset().setOutputMarkupId(true);
     endDateTimePanel = new DateTimePanel(endDateField.newChildId(), new PropertyModel<Date>(data, "endDate"),
         (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withTargetType(java.sql.Timestamp.class)

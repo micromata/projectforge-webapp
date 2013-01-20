@@ -135,7 +135,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Number
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.nummer"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.nummer"));
       final MinMaxNumberField<Integer> number = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data,
           "nummer"), 0, 99999999);
       number.setMaxLength(8).add(AttributeModifier.append("style", "width: 6em !important;"));
@@ -195,7 +195,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
     }
     {
       // customer
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde"), true).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde")).setNoLabelFor();
       kundeSelectPanel = new CustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"), new PropertyModel<String>(
           data, "kundeText"), parentPage, "kundeId");
       fs.add(kundeSelectPanel);
@@ -268,7 +268,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
     }
     {
       // email
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("email"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("email"));
       final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
       final RadioGroupPanel<Boolean> radioGroup = new RadioGroupPanel<Boolean>(radioGroupPanel.newChildId(), "sendEMailNotification",
           new PropertyModel<Boolean>(this, "sendEMailNotification"));
@@ -385,7 +385,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       posGridBuilder.newSplitPanel(GridSize.COL33);
       {
         // invoiced
-        final FieldsetPanel fs = posGridBuilder.newFieldset(getString("fibu.fakturiert"), true).setNoLabelFor();
+        final FieldsetPanel fs = posGridBuilder.newFieldset(getString("fibu.fakturiert")).setNoLabelFor();
         if (showInvoices == true) {
           fs.add(new DivTextPanel(fs.newChildId(), CurrencyFormatter.format(RechnungDao.getNettoSumme(orderPositions))));
         } else {

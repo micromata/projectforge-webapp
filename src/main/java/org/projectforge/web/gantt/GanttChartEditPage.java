@@ -49,7 +49,6 @@ import org.projectforge.web.wicket.BatikImage;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.EditPage;
 import org.projectforge.web.wicket.WicketUtils;
-import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.ImagePanel;
 import org.w3c.dom.Document;
 
@@ -161,16 +160,18 @@ public class GanttChartEditPage extends AbstractEditPage<GanttChartDO, GanttChar
     if (ganttChart != null) {
       final Document document = ganttChart.create();
       if (document != null) {
-        ganttImage = new ImagePanel(DivPanel.CHILD_ID, new BatikImage(ImagePanel.IMAGE_ID, document, getGanttChartStyle().getWidth()));
+        ganttImage = new ImagePanel(form.imagePanel.newChildId(), new BatikImage(ImagePanel.IMAGE_ID, document, getGanttChartStyle()
+            .getWidth()));
       } else {
-        ganttImage = WicketUtils.getInvisibleComponent(DivPanel.CHILD_ID);
+        ganttImage = null;
       }
     } else {
-      ganttImage = WicketUtils.getInvisibleComponent(DivPanel.CHILD_ID);
+      ganttImage = null;
     }
     if (oldGanttImage != null) {
-      form.imagePanel.replace(ganttImage);
-    } else {
+      form.imagePanel.remove(oldGanttImage);
+    }
+    if (ganttImage != null) {
       form.imagePanel.add(ganttImage);
     }
   }
