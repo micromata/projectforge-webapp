@@ -659,7 +659,14 @@ public class WicketUtils
    */
   public static IconPanel getAlertTooltipIcon(final FieldsetPanel fieldset, final String tooltip)
   {
-    final IconPanel icon = new IconPanel(fieldset.newIconChildId(), IconType.ALERT, tooltip);
+    return getAlertTooltipIcon(fieldset, null, Model.of(tooltip));
+  }
+
+  /**
+   */
+  public static IconPanel getAlertTooltipIcon(final FieldsetPanel fieldset, final IModel<String> title, final IModel<String> tooltip)
+  {
+    final IconPanel icon = new IconPanel(fieldset.newIconChildId(), IconType.ALERT, title, tooltip);
     return icon;
   }
 
