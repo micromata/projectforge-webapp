@@ -45,6 +45,7 @@ import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.ValidationError;
@@ -315,7 +316,8 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       // Personal phone identifiers
       final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("user.personalPhoneIdentifiers"), true);
       fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(user, "personalPhoneIdentifiers")));
-      fs.addHelpIcon(gridBuilder.getString("user.personalPhoneIdentifiers.tooltip"));
+      fs.addHelpIcon(new ResourceModel("user.personalPhoneIdentifiers.tooltip.title"), new ResourceModel(
+          "user.personalPhoneIdentifiers.tooltip.content"));
     }
   }
 
@@ -330,9 +332,11 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       // MEB mobile phone numbers
       final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("user.personalMebMobileNumbers"), true);
       fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(user, "personalMebMobileNumbers")));
-      fs.addHelpIcon(gridBuilder.getString("user.personalMebMobileNumbers.tooltip")
-          + "<br/>"
-          + gridBuilder.getString("user.personalMebMobileNumbers.format"));
+      fs.addHelpIcon(
+          new ResourceModel("user.personalMebMobileNumbers.tooltip.title"),
+          Model.of(gridBuilder.getString("user.personalMebMobileNumbers.tooltip.content")
+              + " "
+              + gridBuilder.getString("user.personalMebMobileNumbers.format")));
     }
   }
 

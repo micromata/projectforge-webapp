@@ -27,6 +27,7 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.model.IModel;
 import org.projectforge.web.wicket.WicketUtils;
 
 /**
@@ -84,6 +85,18 @@ public class ContentMenuEntryPanel extends Panel
    * @see WicketUtils#addTooltip(org.apache.wicket.Component, String, String)
    */
   public ContentMenuEntryPanel setTooltip(final String title, final String text)
+  {
+    WicketUtils.addTooltip(link, title, text);
+    return this;
+  }
+
+  /**
+   * @param title
+   * @param text
+   * @return this for chaining.
+   * @see WicketUtils#addTooltip(org.apache.wicket.Component, String, String)
+   */
+  public ContentMenuEntryPanel setTooltip(final IModel<String> title, final IModel<String> text)
   {
     WicketUtils.addTooltip(link, title, text);
     return this;

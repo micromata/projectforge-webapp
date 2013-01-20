@@ -391,6 +391,16 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
   }
 
   /**
+   * Adds a keyboard icon at the bottom right corner of the field set.
+   * @param tooltip
+   * @return this for chaining.
+   */
+  public FieldsetPanel addKeyboardHelpIcon(final IModel<String> title, final IModel<String> tooltip)
+  {
+    return add(new IconPanel(newIconChildId(), IconType.KEYBOARD, title, tooltip), FieldSetIconPosition.BOTTOM_RIGHT);
+  }
+
+  /**
    * Adds a JIRA icon at the bottom right corner of the field set (only if JIRA is configured, otherwise this method does nothing). This
    * method is automatically called by {@link #addJIRAField()}.
    * @param tooltip

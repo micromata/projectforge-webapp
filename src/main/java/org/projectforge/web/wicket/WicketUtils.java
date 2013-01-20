@@ -636,7 +636,8 @@ public class WicketUtils
    */
   public static IconPanel getJIRASupportTooltipIcon(final Component parent, final String id)
   {
-    final IconPanel icon = new IconPanel(id, IconType.JIRA_SUPPORT, parent.getString("tooltip.jiraSupport.field"));
+    final IconPanel icon = new IconPanel(id, IconType.JIRA_SUPPORT, Model.of(parent.getString("tooltip.jiraSupport.field.title")),
+        Model.of(parent.getString("tooltip.jiraSupport.field.content")));
     if (isJIRAConfigured() == false) {
       icon.setVisible(false);
     }
@@ -896,7 +897,7 @@ public class WicketUtils
    * @param component
    * @param text
    */
-  public static Component addTooltip(final Component component,  final IModel<String> text)
+  public static Component addTooltip(final Component component, final IModel<String> text)
   {
     return addTooltip(component, null, text);
   }

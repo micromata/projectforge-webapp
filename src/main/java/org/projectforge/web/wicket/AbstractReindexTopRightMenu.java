@@ -26,6 +26,7 @@ package org.projectforge.web.wicket;
 import java.io.Serializable;
 
 import org.apache.wicket.markup.html.link.Link;
+import org.apache.wicket.model.ResourceModel;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 /**
@@ -51,7 +52,7 @@ public abstract class AbstractReindexTopRightMenu implements Serializable
         rebuildDatabaseIndex(true);
       };
     }, getString("menu.reindexNewestDatabaseEntries"));
-    reindex.setTooltip(getString("menu.reindexNewestDatabaseEntries.tooltip"));
+    reindex.setTooltip(new ResourceModel("menu.reindexNewestDatabaseEntries.tooltip.title"), new ResourceModel("menu.reindexNewestDatabaseEntries.tooltip.content"));
     page.addContentRightMenuEntry(reindex);
     if (enableFullReindex == true) {
       final ContentMenuEntryPanel  reindexAll = new ContentMenuEntryPanel(page.getNewContentRightMenuChildId(), new Link<Object>("link") {
@@ -61,7 +62,7 @@ public abstract class AbstractReindexTopRightMenu implements Serializable
           rebuildDatabaseIndex(false);
         };
       }, getString("menu.reindexAllDatabaseEntries"));
-      reindexAll.setTooltip(getString("menu.reindexAllDatabaseEntries.tooltip"));
+      reindexAll.setTooltip(new ResourceModel("menu.reindexAllDatabaseEntries.tooltip.title"), new ResourceModel("menu.reindexAllDatabaseEntries.tooltip.content"));
       page.addContentRightMenuEntry(reindexAll);
     }
   }
