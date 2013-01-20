@@ -74,7 +74,7 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
     gridBuilder = newGridBuilder(this, "flowform");
     {
       gridBuilder.newSplitPanel(GridSize.COL50);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("searchFilter"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("searchFilter"));
       final TextField<String> searchField = new TextField<String>(InputPanel.WICKET_ID, new PropertyModel<String>(getSearchFilter(),
           "searchString"));
       searchField.add(WicketUtils.setFocus());

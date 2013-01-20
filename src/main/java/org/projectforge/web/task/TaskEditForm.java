@@ -196,7 +196,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
     gridBuilder.newGridPanel();
     {
       // Short description:
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("shortDescription"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("shortDescription"));
       final IModel<String> model = new PropertyModel<String>(data, "shortDescription");
       fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, model));
       fs.addJIRAField(model);
@@ -304,7 +304,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
         PFUserContext.getUser(), data);
     {
       // Cost 2 settings
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost2"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost2"));
       final ProjektDO projekt = taskTree.getProjekt(data.getId());
       if (projekt != null) {
         final DivTextPanel projektKostLabel = new DivTextPanel(fs.newChildId(), projekt.getKost() + ".*");
@@ -378,7 +378,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
     }
     {
       // Protection of privacy:
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task.protectionOfPrivacy"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task.protectionOfPrivacy"));
       final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
       final RadioGroupPanel<Boolean> radioGroup = new RadioGroupPanel<Boolean>(radioGroupPanel.newChildId(), "protectionOfPrivacy",
           new PropertyModel<Boolean>(data, "protectionOfPrivacy"));
@@ -391,7 +391,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
     gridBuilder.newGridPanel();
     {
       // Description:
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"));
       final IModel<String> model = new PropertyModel<String>(data, "description");
       fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, model), true);
       fs.addJIRAField(model);
