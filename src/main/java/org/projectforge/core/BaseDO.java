@@ -30,7 +30,7 @@ import java.io.Serializable;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public interface BaseDO<I extends Serializable>
+public interface BaseDO<I extends Serializable> extends IdObject<I>
 {
   public I getId();
 
