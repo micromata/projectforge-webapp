@@ -1,14 +1,16 @@
+Layout
+------
+- mypopover-Tooltip bei selectMe: title bar zu kurz (width: auto klappt nicht).
+
 Bootstrap-Umbau
 ---------------
 - Dialoge
-- Tooltips und insbesondere für SearchFields verbessern.
 
 
 Konkrete Masken
 ---------------
 - ICS Download in ModalDialog,
-- GanttChartEditForm: refresh button, context menu
-- jquery.mobile: About dialog braucht home knopf
+- GanttChartEditForm: refresh button
 
 Wicket6-Migration
 -----------------
@@ -19,3 +21,15 @@ Wicket6-Migration
 Themenspeicher
 --------------
 - http://haineault.com/media/jquery/ui-timepickr/page/
+- https://blogs.oracle.com/talkingjavadeployment/entry/native_packaging_for_javafx
+
+Erste Feedback
+--------------
+- Kalenderansicht heute Gelb ist grell, gerade wenn man mit der Tagesansicht arbeitet.
+- Das Menü oben war vorher leichter erkennbar (durch Kästen/senkrechte Striche) unterscheidbar, kann aber auch Gewöhnung sein.
+
+ToDo
+----
+- Kreditorenrechnungen: gelöschte Konten in Übersicht anzeigen (z. B. Klinger)
+- reportObjectives (browsen->NPE)
+- Alert icon (s. Adresskampagnen-EditForm)
