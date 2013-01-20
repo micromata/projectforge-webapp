@@ -892,9 +892,9 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
       {
         final TaskTreePage taskTreePage = new TaskTreePage(GanttChartEditTreeTablePanel.this, taskSelectProperty);
         if (predecessorTask != null) {
-          taskTreePage.setEventNode(predecessorTask.getId()); // Preselect node for highlighting.
+          taskTreePage.setHighlightedRowId(predecessorTask.getId()); // Preselect node for highlighting.
         } else if (task != null) {
-          taskTreePage.setEventNode(task.getId()); // Preselect node for highlighting.
+          taskTreePage.setHighlightedRowId(task.getId()); // Preselect node for highlighting.
         }
         setResponsePage(taskTreePage);
       }
