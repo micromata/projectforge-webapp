@@ -33,6 +33,7 @@ import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.ResourceModel;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridPanel;
 import org.projectforge.web.wicket.components.JiraIssuesPanel;
@@ -280,7 +281,7 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
    */
   public FieldsetPanel addAlertIcon(final String tooltip)
   {
-    final IconPanel icon = WicketUtils.getAlertTooltipIcon(this, tooltip);
+    final IconPanel icon = WicketUtils.getAlertTooltipIcon(this, new ResourceModel("common.attention"), Model.of(tooltip));
     add(icon, FieldSetIconPosition.TOP_LEFT);
     return this;
   }
