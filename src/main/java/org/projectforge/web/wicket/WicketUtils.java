@@ -913,10 +913,15 @@ public class WicketUtils
    * Adds a SimpleAttributeModifier("title", ...) to the given component. Does not modify the given tool tip text!
    * @param component
    * @param title
-   * @param text
+   * @param text If the string contains "\n" characters then html=true and &lt;br/&gt; are used.
    */
-  public static Component addTooltip(final Component component, final IModel<String> title, final IModel<String> text)
+  public static Component addTooltip(final Component component, final IModel<String> title,  IModel<String> text)
   {
+    if (text != null && text.getObject() != null && text.getObject().indexOf("\n") > 0) {
+      final String newText = HtmlHelper.escapeHtml(text.getObject(), true);
+      text = Model.of(newText);
+      component.add(AttributeModifier.replace("data-html", true));
+    }
     if (title != null && title.getObject() != null) {
       component.add(AttributeModifier.replace("rel", "mypopup"));
       component.add(AttributeModifier.replace("data-original-title", title));
