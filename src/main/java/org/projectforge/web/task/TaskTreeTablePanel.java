@@ -25,6 +25,7 @@ package org.projectforge.web.task;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -57,6 +58,7 @@ import org.projectforge.web.tree.TreeTableNode;
 import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
+@Deprecated
 class TaskTreeTablePanel extends DefaultTreeTablePanel<TaskTreeTableNode>
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TaskTreeTablePanel.class);
@@ -176,7 +178,7 @@ class TaskTreeTablePanel extends DefaultTreeTablePanel<TaskTreeTableNode>
   {
     final TaskFilter taskFilter = parentPage.form.getSearchFilter();
     taskFilter.resetMatch();
-    final List<TaskTreeTableNode> treeList = getTreeTable().getNodeList(taskFilter);
+    final List<TaskTreeTableNode> treeList = new LinkedList<TaskTreeTableNode>();//.getNodeList(taskFilter);
     if (parentPage.isShowRootNode() == true && StringUtils.isBlank(parentPage.getTaskFilter().getSearchString()) == true) {
       treeList.add(new TaskTreeTableNode(null, taskTree.getRootTaskNode()));
     }

@@ -189,7 +189,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
     }
     final Label label = new Label(componentId, new Model<String>(buf.toString()));
     if (kost2s != null) {
-      WicketUtils.addTooltip(label, StringHelper.listToString("<br/>", kost2s));
+      WicketUtils.addTooltip(label, StringHelper.listToString("\n", kost2s));
     }
     // label.setEscapeModelStrings(false);
     return label;

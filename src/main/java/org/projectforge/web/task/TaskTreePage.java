@@ -28,13 +28,19 @@ import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.access.AccessChecker;
 import org.projectforge.common.StringHelper;
+import org.projectforge.fibu.kost.KostCache;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskFilter;
 import org.projectforge.user.ProjectForgeGroup;
+import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.admin.TaskWizardPage;
+import org.projectforge.web.calendar.DateTimeFormatter;
+import org.projectforge.web.core.PriorityFormatter;
 import org.projectforge.web.fibu.ISelectCallerPage;
+import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.user.UserPrefListPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
@@ -59,8 +65,29 @@ public class TaskTreePage extends AbstractSecuredPage
 
   private static final String I18N_PREFIX = "task";
 
+  @SpringBean(name = "accessChecker")
+  private AccessChecker accessChecker;
+
+  @SpringBean(name = "userFormatter")
+  private UserFormatter userFormatter;
+
+  @SpringBean(name = "dateTimeFormatter")
+  private DateTimeFormatter dateTimeFormatter;
+
+  @SpringBean(name = "kostCache")
+  private KostCache kostCache;
+
+  @SpringBean(name = "priorityFormatter")
+  private PriorityFormatter priorityFormatter;
+
+  @SpringBean(name = "taskFormatter")
+  private TaskFormatter taskFormatter;
+
   @SpringBean(name = "taskDao")
   private TaskDao taskDao;
+
+  @SpringBean(name = "userGroupCache")
+  private UserGroupCache userGroupCache;
 
   protected ISelectCallerPage caller;
 
@@ -68,7 +95,7 @@ public class TaskTreePage extends AbstractSecuredPage
 
   TaskTreeForm form;
 
-  private final TaskTreeTablePanel taskTreeTablePanel;
+  private TaskTreeBuilder taskTreeBuilder;
 
   /**
    * Sibling page (if the user switches between tree and list view.
@@ -78,10 +105,10 @@ public class TaskTreePage extends AbstractSecuredPage
   public TaskTreePage(final PageParameters parameters)
   {
     super(parameters);
-    taskTreeTablePanel = new TaskTreeTablePanel("taskTree", this);
     if (WicketUtils.contains(parameters, AbstractListPage.PARAMETER_HIGHLIGHTED_ROW) == true) {
-      taskTreeTablePanel.setHighlightedRowId(WicketUtils.getAsInteger(parameters, AbstractListPage.PARAMETER_HIGHLIGHTED_ROW));
+      // taskTreeTablePanel.setHighlightedRowId(WicketUtils.getAsInteger(parameters, AbstractListPage.PARAMETER_HIGHLIGHTED_ROW));
     }
+    log.error("*********** TODO: highlighting of a table row! ***************");
     init();
   }
 
@@ -101,18 +128,19 @@ public class TaskTreePage extends AbstractSecuredPage
     super(new PageParameters());
     this.caller = caller;
     this.selectProperty = selectProperty;
-    taskTreeTablePanel = new TaskTreeTablePanel("taskTree", caller, selectProperty, this);
     init();
   }
 
   public void setHighlightedRowId(final Integer highlightedRowId)
   {
-    taskTreeTablePanel.setHighlightedRowId(highlightedRowId);
+    log.error("*********** TODO: highlighting of a table row! ***************");
+    // taskTreeTablePanel.setHighlightedRowId(highlightedRowId);
   }
 
   @SuppressWarnings("serial")
   private void init()
   {
+
     if (isSelectMode() == false) {
       ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
         @Override
@@ -165,26 +193,33 @@ public class TaskTreePage extends AbstractSecuredPage
     form = new TaskTreeForm(this);
     body.add(form);
     form.init();
-    form.add(taskTreeTablePanel);
-    taskTreeTablePanel.init();
+    taskTreeBuilder = new TaskTreeBuilder(taskDao.getTaskTree()).setSelectMode(isSelectMode()).setShowRootNode(isShowRootNode())
+        .setShowCost(kostCache.isKost2EntriesExists());
+    if (accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP,
+        ProjectForgeGroup.PROJECT_ASSISTANT, ProjectForgeGroup.PROJECT_MANAGER) == true) {
+      taskTreeBuilder.setShowOrders(true);
+    }
+    taskTreeBuilder.set(accessChecker, taskFormatter, priorityFormatter, userFormatter, dateTimeFormatter, userGroupCache);
+    taskTreeBuilder.setCaller(caller).setSelectProperty(selectProperty);
+    form.add(taskTreeBuilder.createTree("tree", this, form.getSearchFilter()));
   }
 
   public void refresh()
   {
-    taskTreeTablePanel.refresh();
+    form.getSearchFilter().resetMatch();
   }
 
   @Override
   protected void onBodyTag(final ComponentTag bodyTag)
   {
-    if (taskTreeTablePanel.getEventNode() != null) {
-      // Show the selected task entry on top:
-      bodyTag.put("onload", "javascript:self.location.href='#clickedEntry'");
-    }
+    // if (taskTreeTablePanel.getEventNode() != null) {
+    // // Show the selected task entry on top:
+    // bodyTag.put("onload", "javascript:self.location.href='#clickedEntry'");
+    // }
   }
 
   /**
-   * The root node will only be shown in select mode and for admin users.
+   * The root node will only be shown for admin users and financial staff.
    */
   boolean isShowRootNode()
   {
@@ -194,10 +229,11 @@ public class TaskTreePage extends AbstractSecuredPage
   void persistOpenNodes()
   {
     // final Set<Serializable> openedNodes = menu.getOpenNodes();
-    ((AbstractSecuredPage) getPage()).putUserPrefEntry(USER_PREFS_KEY_OPEN_TASKS, taskTreeTablePanel.getTreeTable().getOpenNodes(), true);
-    if (log.isDebugEnabled() == true) {
-      log.debug("Opened task nodes sucessfully persisted in the user's preferences.");
-    }
+    // ((AbstractSecuredPage) getPage()).putUserPrefEntry(USER_PREFS_KEY_OPEN_TASKS, taskTreeTablePanel.getTreeTable().getOpenNodes(),
+    // true);
+    // if (log.isDebugEnabled() == true) {
+    // log.debug("Opened task nodes sucessfully persisted in the user's preferences.");
+    // }
   }
 
   protected String getSearchToolTip()
@@ -260,10 +296,5 @@ public class TaskTreePage extends AbstractSecuredPage
   TaskFilter getTaskFilter()
   {
     return form.getSearchFilter();
-  }
-
-  public void setEventNode(final Integer id)
-  {
-    taskTreeTablePanel.setEventNode(id);
   }
 }

@@ -134,7 +134,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
       if (taskTree.isRootNode(data) == false) {
         parentTaskSelectPanel.setRequired(true);
       } else {
-        parentTaskSelectPanel.setVisible(false);
+        fs.setVisible(false);
       }
       parentTaskSelectPanel.setRequired(true);
     }

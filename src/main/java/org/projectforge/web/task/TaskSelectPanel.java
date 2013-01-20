@@ -173,7 +173,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
       {
         final TaskTreePage taskTreePage = new TaskTreePage(caller, selectProperty);
         if (getModelObject() != null) {
-          taskTreePage.setEventNode(getModelObject().getId()); // Preselect node for highlighting.
+          taskTreePage.setHighlightedRowId(getModelObject().getId()); // Preselect node for highlighting.
         }
         setResponsePage(taskTreePage);
       };
