@@ -35,9 +35,12 @@ import org.apache.wicket.extensions.markup.html.repeater.tree.ITreeProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
+import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskFilter;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
+import org.projectforge.user.PFUserContext;
+import org.projectforge.user.PFUserDO;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -49,6 +52,8 @@ public class TaskTreeProvider implements ITreeProvider<TaskNode>
 
   private final TaskTree taskTree;
 
+  private final TaskDao taskDao;
+
   private final TaskFilter taskFilter;
 
   private boolean showRootNode;
@@ -56,9 +61,10 @@ public class TaskTreeProvider implements ITreeProvider<TaskNode>
   /**
    * Construct.
    */
-  public TaskTreeProvider(final TaskTree taskTree, final TaskFilter taskFilter)
+  public TaskTreeProvider(final TaskTree taskTree, final TaskDao taskDao, final TaskFilter taskFilter)
   {
     this.taskTree = taskTree;
+    this.taskDao = taskDao;
     this.taskFilter = taskFilter;
     taskFilter.resetMatch();
   }
@@ -143,8 +149,9 @@ public class TaskTreeProvider implements ITreeProvider<TaskNode>
     if (nodes == null || nodes.isEmpty() == true) {
       return list.iterator();
     }
+    final PFUserDO user = PFUserContext.getUser();
     for (final TaskNode node : nodes) {
-      if (taskFilter.match(node) == true) {
+      if (taskFilter.match(node) == true && taskDao.hasSelectAccess(user, node.getTask(), false) == true) {
         list.add(node);
       }
     }

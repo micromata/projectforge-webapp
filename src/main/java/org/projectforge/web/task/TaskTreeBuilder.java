@@ -55,6 +55,7 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.fibu.AuftragsPositionVO;
+import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskFilter;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
@@ -101,6 +102,8 @@ public class TaskTreeBuilder implements Serializable
 
   private UserGroupCache userGroupCache;
 
+  private TaskDao taskDao;
+
   private TableTree<TaskNode, String> tree;
 
   private AbstractSecuredPage parentPage;
@@ -123,7 +126,7 @@ public class TaskTreeBuilder implements Serializable
     this.parentPage = parentPage;
     final List<IColumn<TaskNode, String>> columns = createColumns();
 
-    tree = new TableTree<TaskNode, String>(id, columns, new TaskTreeProvider(taskTree, taskFilter).setShowRootNode(showRootNode),
+    tree = new TableTree<TaskNode, String>(id, columns, new TaskTreeProvider(taskTree, taskDao, taskFilter).setShowRootNode(showRootNode),
         Integer.MAX_VALUE, TaskTreeExpansion.getExpansionModel()) {
       private static final long serialVersionUID = 1L;
 
@@ -345,11 +348,12 @@ public class TaskTreeBuilder implements Serializable
     return this;
   }
 
-  public TaskTreeBuilder set(final AccessChecker accessChecker, final TaskFormatter taskFormatter,
+  public TaskTreeBuilder set(final AccessChecker accessChecker, final TaskDao taskDao, final TaskFormatter taskFormatter,
       final PriorityFormatter priorityFormatter, final UserFormatter userFormatter, final DateTimeFormatter dateTimeFormatter,
       final UserGroupCache userGroupCache)
   {
     this.accessChecker = accessChecker;
+    this.taskDao = taskDao;
     this.taskFormatter = taskFormatter;
     this.priorityFormatter = priorityFormatter;
     this.userFormatter = userFormatter;

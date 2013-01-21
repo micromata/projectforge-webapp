@@ -195,7 +195,7 @@ public class TaskTreePage extends AbstractSecuredPage
         ProjectForgeGroup.PROJECT_ASSISTANT, ProjectForgeGroup.PROJECT_MANAGER) == true) {
       taskTreeBuilder.setShowOrders(true);
     }
-    taskTreeBuilder.set(accessChecker, taskFormatter, priorityFormatter, userFormatter, dateTimeFormatter, userGroupCache);
+    taskTreeBuilder.set(accessChecker, taskDao, taskFormatter, priorityFormatter, userFormatter, dateTimeFormatter, userGroupCache);
     taskTreeBuilder.setCaller(caller).setSelectProperty(selectProperty);
     form.add(taskTreeBuilder.createTree("tree", this, form.getSearchFilter()));
   }
