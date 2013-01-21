@@ -114,14 +114,14 @@ public class WicketRenderHeadUtils
    */
   public static void renderMainCSSIncludes(final IHeaderResponse response)
   {
+    for (final String url : CSS_FILES) {
+      response.render(CssReferenceHeaderItem.forUrl(url));
+    }
     if(LessWicketApplicationInstantiator.reference != null) {
       response.render(CssReferenceHeaderItem.forReference(LessWicketApplicationInstantiator.reference));
     } else {
       // TODO ju
       log.error("Unable to find main projectforge.css less file");
-    }
-    for (final String url : CSS_FILES) {
-      response.render(CssReferenceHeaderItem.forUrl(url));
     }
   }
 
