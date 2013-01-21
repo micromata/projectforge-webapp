@@ -265,9 +265,9 @@ IListPageColumnsCreator<TimesheetDO>
         } else {
           highlightedRowId = null;
         }
-        final StringBuffer cssStyle = getCssStyle(timesheet.getId(), highlightedRowId, timesheet.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        final StringBuffer cssClasses = getCssClasses(timesheet.getId(), highlightedRowId, timesheet.isDeleted());
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses));
         }
       }
     };

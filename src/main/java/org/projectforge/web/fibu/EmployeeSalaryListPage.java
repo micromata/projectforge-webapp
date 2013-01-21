@@ -85,9 +85,9 @@ public class EmployeeSalaryListPage extends AbstractListPage<EmployeeSalaryListF
           final IModel<EmployeeSalaryDO> rowModel)
       {
         final EmployeeSalaryDO employeeSalary = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(employeeSalary.getId(), employeeSalary.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        final StringBuffer cssClasses = getCssClasses(employeeSalary.getId(), employeeSalary.isDeleted());
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses));
         }
       }
     };

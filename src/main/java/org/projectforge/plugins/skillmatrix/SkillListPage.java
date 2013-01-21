@@ -76,9 +76,9 @@ public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, Ski
       public void populateItem(final Item<ICellPopulator<SkillDO>> item, final String componentId, final IModel<SkillDO> rowModel)
       {
         final SkillDO skill = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(skill.getId(), skill.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        final StringBuffer cssClasses = getCssClasses(skill.getId(), skill.isDeleted());
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses.toString()));
         }
       }
     };

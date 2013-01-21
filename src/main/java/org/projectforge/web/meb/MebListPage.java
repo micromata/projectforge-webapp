@@ -49,6 +49,7 @@ import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.RowCssClass;
 
 @ListPage(editPage = MebEditPage.class)
 public class MebListPage extends AbstractListPage<MebListForm, MebDao, MebEntryDO> implements IListPageColumnsCreator<MebEntryDO>
@@ -78,18 +79,18 @@ public class MebListPage extends AbstractListPage<MebListForm, MebDao, MebEntryD
       public void populateItem(final Item<ICellPopulator<MebEntryDO>> item, final String componentId, final IModel<MebEntryDO> rowModel)
       {
         final MebEntryDO meb = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(meb.getId(), meb.isDeleted());
+        final StringBuffer cssClasses = getCssClasses(meb.getId(), meb.isDeleted());
         if (meb.isDeleted() == true) {
           // Should not occur
         } else if (meb.getStatus() == MebEntryStatus.RECENT) {
-          cssStyle.append("font-weight: bold;");
+          cssClasses.append(RowCssClass.RECENT.getCssClass());
         } else if (meb.getStatus() == MebEntryStatus.IMPORTANT) {
-          cssStyle.append("font-weight: bold; color: red;");
+          cssClasses.append(RowCssClass.IMPORTANT_ROW.getCssClass());
         } else if (meb.getStatus() == MebEntryStatus.DONE) {
-          cssStyle.append("color: green;");
+          cssClasses.append(RowCssClass.SUCCESS_ROW.getCssClass());
         }
-        if (cssStyle.length() > 0) {
-          item.add( AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses));
         }
       }
     };

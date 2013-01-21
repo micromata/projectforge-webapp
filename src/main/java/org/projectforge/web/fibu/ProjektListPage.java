@@ -94,9 +94,9 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
           // Should not occur:
           return;
         }
-        final StringBuffer cssStyle = getCssStyle(projekt.getId(), projekt.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        final StringBuffer cssClasses = getCssClasses(projekt.getId(), projekt.isDeleted());
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses));
         }
       }
     };

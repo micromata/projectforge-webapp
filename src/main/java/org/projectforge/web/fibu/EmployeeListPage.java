@@ -76,9 +76,9 @@ public class EmployeeListPage extends AbstractListPage<EmployeeListForm, Employe
       public void populateItem(final Item<ICellPopulator<EmployeeDO>> item, final String componentId, final IModel<EmployeeDO> rowModel)
       {
         final EmployeeDO employee = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(employee.getId(), employee.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        final StringBuffer cssClasses = getCssClasses(employee.getId(), employee.isDeleted());
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses));
         }
       }
     };

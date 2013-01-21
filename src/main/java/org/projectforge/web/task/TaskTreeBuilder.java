@@ -168,9 +168,9 @@ public class TaskTreeBuilder implements Serializable
       public void populateItem(final Item<ICellPopulator<TaskNode>> item, final String componentId, final IModel<TaskNode> rowModel)
       {
         final TaskNode taskNode = rowModel.getObject();
-        final String cssStyle = TaskListPage.getCssStyle(taskNode.getTask(), highlightedTaskNodeId);
-        if (cssStyle != null) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle)));
+        final String cssClasses = TaskListPage.getCssClasses(taskNode.getTask(), highlightedTaskNodeId);
+        if (cssClasses != null) {
+          item.add(AttributeModifier.append("class", cssClasses));
         }
       }
     };
@@ -195,12 +195,10 @@ public class TaskTreeBuilder implements Serializable
       public void populateItem(final Item<ICellPopulator<TaskNode>> cellItem, final String componentId, final IModel<TaskNode> rowModel)
       {
         final NodeModel<TaskNode> nodeModel = (NodeModel<TaskNode>) rowModel;
-
         final Component nodeComponent = getTree().newNodeComponent(componentId, nodeModel.getWrappedModel());
-
         nodeComponent.add(new NodeBorder(nodeModel.getBranches()));
-
         cellItem.add(nodeComponent);
+        cellItemListener.populateItem(cellItem, componentId, rowModel);
       }
     });
     columns.add(new CellItemListenerPropertyColumn<TaskNode>(new ResourceModel("task.consumption"), null, "task", cellItemListener) {
@@ -378,6 +376,16 @@ public class TaskTreeBuilder implements Serializable
   public TaskTreeBuilder setSelectProperty(final String selectProperty)
   {
     this.selectProperty = selectProperty;
+    return this;
+  }
+
+  /**
+   * @param highlightedTaskNodeId the highlightedTaskNodeId to set
+   * @return this for chaining.
+   */
+  public TaskTreeBuilder setHighlightedTaskNodeId(final Integer highlightedTaskNodeId)
+  {
+    this.highlightedTaskNodeId = highlightedTaskNodeId;
     return this;
   }
 }

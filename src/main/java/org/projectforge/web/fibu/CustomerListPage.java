@@ -82,10 +82,10 @@ public class CustomerListPage extends AbstractListPage<CustomerListForm, KundeDa
           // Should not occur:
           return;
         }
-        final StringBuffer cssStyle = getCssStyle(kunde.getId(), kunde.isDeleted() == true
+        final StringBuffer cssClasses = getCssClasses(kunde.getId(), kunde.isDeleted() == true
             || kunde.getStatus().isIn(KundeStatus.ENDED) == true);
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses));
         }
       }
     };

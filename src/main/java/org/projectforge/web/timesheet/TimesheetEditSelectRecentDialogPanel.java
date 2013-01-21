@@ -56,6 +56,7 @@ import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.RowCssClass;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.TablePanel;
@@ -114,15 +115,14 @@ public class TimesheetEditSelectRecentDialogPanel extends ModalDialog
       {
         final TimesheetDO timesheet = rowModel.getObject();
         final int rowIndex = ((Item< ? >) item.findParent(Item.class)).getIndex();
-        String cssStyle = null;
+        String cssClasses = null;
         if (timesheet.isDeleted() == true) {
-          cssStyle = "text-decoration: line-through;";
+          cssClasses = RowCssClass.MARKED_AS_DELETED.getCssClass();
         } else if (rowIndex < TimesheetEditPage.SIZE_OF_FIRST_RECENT_BLOCK) {
-          cssStyle = "font-weight: bold; color:red;";
+          cssClasses = RowCssClass.IMPORTANT_ROW.getCssClass();
         }
-
-        if (cssStyle != null) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle)));
+        if (cssClasses != null) {
+          item.add(AttributeModifier.append("class", cssClasses));
         }
       }
     };

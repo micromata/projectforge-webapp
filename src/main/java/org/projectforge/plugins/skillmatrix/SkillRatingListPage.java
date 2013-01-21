@@ -84,9 +84,9 @@ IListPageColumnsCreator<SkillRatingDO>
           final IModel<SkillRatingDO> rowModel)
       {
         final SkillRatingDO skillRating = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(skillRating.getId(), skillRating.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        final StringBuffer cssClasses = getCssClasses(skillRating.getId(), skillRating.isDeleted());
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses.toString()));
         }
       }
     };

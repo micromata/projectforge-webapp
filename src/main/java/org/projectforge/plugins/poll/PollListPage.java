@@ -33,7 +33,6 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.wicket.AbstractListPage;
@@ -79,10 +78,10 @@ public class PollListPage extends AbstractListPage<PollListForm, PollDao, PollDO
       @Override
       public void populateItem(final Item<ICellPopulator<PollDO>> item, final String componentId, final IModel<PollDO> rowModel)
       {
-        final PollDO teamCal = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(teamCal.getId(), teamCal.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        final PollDO poll = rowModel.getObject();
+        final StringBuffer cssClasses = getCssClasses(poll.getId(), poll.isDeleted());
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses.toString()));
         }
       }
     };
@@ -97,11 +96,8 @@ public class PollListPage extends AbstractListPage<PollListForm, PollDao, PollDO
       public void populateItem(final Item<ICellPopulator<PollDO>> item, final String componentId, final IModel<PollDO> rowModel)
       {
         final PollDO poll = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(poll.getId(), poll.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
-        }
         item.add(new ListSelectActionPanel(componentId, rowModel, NewPollOverviewPage.class, poll.getId(), returnToPage, poll.getTitle()));
+        cellItemListener.populateItem(item, componentId, rowModel);
         addRowClick(item);
       }
     });

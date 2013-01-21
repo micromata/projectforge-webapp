@@ -119,9 +119,9 @@ public class HRListPage extends AbstractListPage<HRListForm, HRDao, HRViewUserDa
           final IModel<HRViewUserData> rowModel)
       {
         final HRViewUserData entry = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(entry.getPlanningId(), entry.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        final StringBuffer cssClasses = getCssClasses(entry.getPlanningId(), entry.isDeleted());
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses));
         }
       }
     };

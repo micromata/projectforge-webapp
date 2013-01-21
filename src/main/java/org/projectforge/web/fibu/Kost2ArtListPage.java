@@ -72,9 +72,9 @@ IListPageColumnsCreator<Kost2ArtDO>
       public void populateItem(final Item<ICellPopulator<Kost2ArtDO>> item, final String componentId, final IModel<Kost2ArtDO> rowModel)
       {
         final Kost2ArtDO kost2Art = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(kost2Art.getId(), kost2Art.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        final StringBuffer cssClasses = getCssClasses(kost2Art.getId(), kost2Art.isDeleted());
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses));
         }
       }
     };

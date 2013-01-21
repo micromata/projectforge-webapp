@@ -86,9 +86,9 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
       public void populateItem(final Item<ICellPopulator<PFUserDO>> item, final String componentId, final IModel<PFUserDO> rowModel)
       {
         final PFUserDO user = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(user.getId(), user.hasSystemAccess() == false);
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        final StringBuffer cssClasses = getCssClasses(user.getId(), user.hasSystemAccess() == false);
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses));
         }
       }
     };

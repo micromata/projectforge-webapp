@@ -76,9 +76,9 @@ public class GroupListPage extends AbstractListPage<GroupListForm, GroupDao, Gro
       public void populateItem(final Item<ICellPopulator<GroupDO>> item, final String componentId, final IModel<GroupDO> rowModel)
       {
         final GroupDO group = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(group.getId(), group.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        final StringBuffer cssClasses = getCssClasses(group.getId(), group.isDeleted());
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses));
         }
       }
     };

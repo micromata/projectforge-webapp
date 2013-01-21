@@ -71,9 +71,9 @@ public class BankAccountListPage extends AbstractListPage<BankAccountListForm, B
       public void populateItem(final Item<ICellPopulator<BankAccountDO>> item, final String componentId, final IModel<BankAccountDO> rowModel)
       {
         final BankAccountDO bankAccount = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(bankAccount.getId(), bankAccount.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
+        final StringBuffer cssClasses = getCssClasses(bankAccount.getId(), bankAccount.isDeleted());
+        if (cssClasses.length() > 0) {
+          item.add( AttributeModifier.append("class", cssClasses.toString()));
         }
       }
     };

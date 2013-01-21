@@ -218,7 +218,7 @@ AbstractSecuredPage implements ISelectCallerPage
    * @param isDeleted Is this entry deleted? Then the deleted style will be added.
    * @return
    */
-  protected static StringBuffer getCssStyle(final Serializable rowDataId, final Serializable highlightedRowId, final boolean isDeleted)
+  protected static StringBuffer getCssClasses(final Serializable rowDataId, final Serializable highlightedRowId, final boolean isDeleted)
   {
     final StringBuffer buf = new StringBuffer();
     if (rowDataId == null) {
@@ -228,10 +228,13 @@ AbstractSecuredPage implements ISelectCallerPage
       log.warn("Error in calling getCssStyle: Integer expected instead of " + rowDataId.getClass());
     }
     if (highlightedRowId != null && rowDataId != null && ObjectUtils.equals(highlightedRowId, rowDataId) == true) {
-      buf.append(WicketUtils.getHighlightedRowCssStyle());
+      buf.append(WicketUtils.getHighlightedRowCssClass());
     }
     if (isDeleted == true) {
-      buf.append("text-decoration: line-through;");
+      if (buf.length() > 0) {
+        buf.append(" ");
+      }
+      buf.append(RowCssClass.MARKED_AS_DELETED.getCssClass());
     }
     return buf;
   }
@@ -241,9 +244,9 @@ AbstractSecuredPage implements ISelectCallerPage
    * @param isDeleted Is this entry deleted? Then the deleted style will be added.
    * @return
    */
-  protected StringBuffer getCssStyle(final Serializable rowDataId, final boolean isDeleted)
+  protected StringBuffer getCssClasses(final Serializable rowDataId, final boolean isDeleted)
   {
-    return getCssStyle(rowDataId, this.highlightedRowId, isDeleted);
+    return getCssClasses(rowDataId, this.highlightedRowId, isDeleted);
   }
 
   /**

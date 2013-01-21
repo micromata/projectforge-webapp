@@ -57,8 +57,6 @@ import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
  */
 public class TaskTreePage extends AbstractSecuredPage
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TaskTreePage.class);
-
   private static final long serialVersionUID = -8406452960003792763L;
 
   static final String USER_PREFS_KEY_OPEN_TASKS = "openTasks";
@@ -105,11 +103,10 @@ public class TaskTreePage extends AbstractSecuredPage
   public TaskTreePage(final PageParameters parameters)
   {
     super(parameters);
-    if (WicketUtils.contains(parameters, AbstractListPage.PARAMETER_HIGHLIGHTED_ROW) == true) {
-      // taskTreeTablePanel.setHighlightedRowId(WicketUtils.getAsInteger(parameters, AbstractListPage.PARAMETER_HIGHLIGHTED_ROW));
-    }
-    log.error("*********** TODO: highlighting of a table row! ***************");
     init();
+    if (WicketUtils.contains(parameters, AbstractListPage.PARAMETER_HIGHLIGHTED_ROW) == true) {
+      taskTreeBuilder.setHighlightedTaskNodeId(WicketUtils.getAsInteger(parameters, AbstractListPage.PARAMETER_HIGHLIGHTED_ROW));
+    }
   }
 
   /**
@@ -133,8 +130,7 @@ public class TaskTreePage extends AbstractSecuredPage
 
   public void setHighlightedRowId(final Integer highlightedRowId)
   {
-    log.error("*********** TODO: highlighting of a table row! ***************");
-    // taskTreeTablePanel.setHighlightedRowId(highlightedRowId);
+    taskTreeBuilder.setHighlightedTaskNodeId(highlightedRowId);
   }
 
   @SuppressWarnings("serial")

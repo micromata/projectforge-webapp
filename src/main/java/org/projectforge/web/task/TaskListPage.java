@@ -113,11 +113,11 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
    */
   private TaskTreePage taskTreePage;
 
-  static String getCssStyle(final TaskDO task, final Integer preselectedTaskNode)
+  static String getCssClasses(final TaskDO task, final Integer preselectedTaskNode)
   {
-    final StringBuffer cssStyle = getCssStyle(task.getId(), preselectedTaskNode, task.isDeleted());
-    if (cssStyle.length() > 0) {
-      return cssStyle.toString();
+    final StringBuffer cssClasses = getCssClasses(task.getId(), preselectedTaskNode, task.isDeleted());
+    if (cssClasses.length() > 0) {
+      return cssClasses.toString();
     } else {
       return null;
     }
@@ -234,9 +234,9 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
       public void populateItem(final Item<ICellPopulator<TaskDO>> item, final String componentId, final IModel<TaskDO> rowModel)
       {
         final TaskDO task = rowModel.getObject();
-        final String cssStyle = TaskListPage.getCssStyle(task, (Integer) highlightedRowId);
-        if (cssStyle != null) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle)));
+        final String cssClasses = TaskListPage.getCssClasses(task, (Integer) highlightedRowId);
+        if (cssClasses != null) {
+          item.add(AttributeModifier.append("class", cssClasses.toString()));
         }
       }
     };

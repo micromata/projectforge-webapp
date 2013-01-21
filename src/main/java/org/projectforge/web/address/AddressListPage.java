@@ -70,6 +70,7 @@ import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.RowCssClass;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.projectforge.web.wicket.components.ExternalLinkPanel;
@@ -137,14 +138,14 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
       {
         final AddressDO address = rowModel.getObject();
         final PersonalAddressDO personalAddress = personalAddressMap.get(address.getId());
-        final StringBuffer cssStyle = getCssStyle(address.getId(), address.isDeleted());
+        final StringBuffer cssClasses = getCssClasses(address.getId(), address.isDeleted());
         if (address.isDeleted() == true) {
           // Do nothing further
         } else if (personalAddress != null && personalAddress.isFavoriteCard() == true) {
-          cssStyle.append("color: red;");
+          cssClasses.append(RowCssClass.FAVORITE_ENTRY.getCssClass());
         }
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses));
         }
       }
     };

@@ -86,9 +86,9 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
       public void populateItem(final Item<ICellPopulator<TeamCalDO>> item, final String componentId, final IModel<TeamCalDO> rowModel)
       {
         final TeamCalDO teamCal = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(teamCal.getId(), teamCal.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        final StringBuffer cssClasses = getCssClasses(teamCal.getId(), teamCal.isDeleted());
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses.toString()));
         }
       }
     };
@@ -103,11 +103,8 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
       public void populateItem(final Item<ICellPopulator<TeamCalDO>> item, final String componentId, final IModel<TeamCalDO> rowModel)
       {
         final TeamCalDO teamCal = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(teamCal.getId(), teamCal.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
-        }
         item.add(new ListSelectActionPanel(componentId, rowModel, TeamCalEditPage.class, teamCal.getId(), returnToPage, teamCal.getTitle()));
+        cellItemListener.populateItem(item, componentId, rowModel);
         addRowClick(item);
       }
     });
@@ -139,10 +136,7 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
           label = "???";
         }
         item.add(new Label(componentId, label));
-        final StringBuffer cssStyle = getCssStyle(teamCal.getId(), teamCal.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
-        }
+        cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
     columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("lastUpdate"), getSortable("lastUpdate", sortable), "lastUpdate",

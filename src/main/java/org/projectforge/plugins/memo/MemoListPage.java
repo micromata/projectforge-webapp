@@ -73,9 +73,9 @@ public class MemoListPage extends AbstractListPage<MemoListForm, MemoDao, MemoDO
       public void populateItem(final Item<ICellPopulator<MemoDO>> item, final String componentId, final IModel<MemoDO> rowModel)
       {
         final MemoDO memo = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(memo.getId(), memo.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        final StringBuffer cssClasses = getCssClasses(memo.getId(), memo.isDeleted());
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses.toString()));
         }
       }
     };

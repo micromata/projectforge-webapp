@@ -74,9 +74,9 @@ IListPageColumnsCreator<PostausgangDO>
           final IModel<PostausgangDO> rowModel)
       {
         final PostausgangDO postausgang = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(postausgang.getId(), postausgang.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        final StringBuffer cssClasses = getCssClasses(postausgang.getId(), postausgang.isDeleted());
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses));
         }
       }
     };

@@ -73,9 +73,9 @@ public class KontoListPage extends AbstractListPage<KontoListForm, KontoDao, Kon
       public void populateItem(final Item<ICellPopulator<KontoDO>> item, final String componentId, final IModel<KontoDO> rowModel)
       {
         final KontoDO konto = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(konto.getId(), konto.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        final StringBuffer cssClasses = getCssClasses(konto.getId(), konto.isDeleted());
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses));
         }
       }
     };

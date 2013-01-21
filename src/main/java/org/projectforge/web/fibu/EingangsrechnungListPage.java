@@ -59,6 +59,7 @@ import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.RowCssClass;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 @ListPage(editPage = EingangsrechnungEditPage.class)
@@ -115,16 +116,16 @@ IListPageColumnsCreator<EingangsrechnungDO>
       public void populateItem(final Item<ICellPopulator<EingangsrechnungDO>> item, final String componentId, final IModel<EingangsrechnungDO> rowModel)
       {
         final EingangsrechnungDO eingangsrechnung = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(eingangsrechnung.getId(), eingangsrechnung.isDeleted());
+        final StringBuffer cssClasses = getCssClasses(eingangsrechnung.getId(), eingangsrechnung.isDeleted());
         if (eingangsrechnung.isDeleted() == true) {
           // Do nothing further
         } else if (eingangsrechnung.isUeberfaellig() == true) {
-          cssStyle.append("color: red;");
+          cssClasses.append(RowCssClass.IMPORTANT_ROW.getCssClass());
         } else if (eingangsrechnung.isBezahlt() == false) {
-          cssStyle.append("color: blue;");
+          cssClasses.append(RowCssClass.BLUE.getCssClass());
         }
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses));
         }
       }
     };

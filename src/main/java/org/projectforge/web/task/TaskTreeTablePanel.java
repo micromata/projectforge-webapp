@@ -128,7 +128,7 @@ class TaskTreeTablePanel extends DefaultTreeTablePanel<TaskTreeTableNode>
   @Override
   protected String getCssStyle(final TaskTreeTableNode node)
   {
-    return TaskListPage.getCssStyle(node.getTask(), highlightedRowId);
+    return TaskListPage.getCssClasses(node.getTask(), highlightedRowId);
   }
 
   public String getImageUrl(final String image)

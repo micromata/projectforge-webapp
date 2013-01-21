@@ -55,6 +55,7 @@ import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.RowCssClass;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 @ListPage(editPage = ToDoEditPage.class)
@@ -90,12 +91,12 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
       public void populateItem(final Item<ICellPopulator<ToDoDO>> item, final String componentId, final IModel<ToDoDO> rowModel)
       {
         final ToDoDO toDo = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(toDo.getId(), toDo.isDeleted());
+        final StringBuffer cssClasses = getCssClasses(toDo.getId(), toDo.isDeleted());
         if (toDo.isRecent() == true && ObjectUtils.equals(getUserId(), toDo.getAssigneeId()) == true) {
-          cssStyle.append("color:red;");
+          cssClasses.append(RowCssClass.IMPORTANT_ROW.getCssClass());
         }
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses));
         }
       }
     };

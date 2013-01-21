@@ -62,6 +62,7 @@ import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.RowCssClass;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 
@@ -128,19 +129,19 @@ IListPageColumnsCreator<AddressDO>
           highlightedRowId = null;
         }
         final PersonalAddressDO personalAddress = personalAddressMap.get(address.getId());
-        final StringBuffer cssStyle = getCssStyle(address.getId(), highlightedRowId, address.isDeleted());
+        final StringBuffer cssClasses = getCssClasses(address.getId(), highlightedRowId, address.isDeleted());
         if (address.isDeleted() == true) {
           // Do nothing further
         } else if (personalAddress != null && personalAddress.isFavoriteCard() == true) {
-          cssStyle.append("color: red;");
+          cssClasses.append(RowCssClass.FAVORITE_ENTRY.getCssClass());
         }
         if (address.getAddressStatus().isIn(AddressStatus.LEAVED, AddressStatus.OUTDATED) == true
             || address.getContactStatus().isIn(ContactStatus.DEPARTED, ContactStatus.NON_ACTIVE, ContactStatus.PERSONA_INGRATA,
                 ContactStatus.UNINTERESTING, ContactStatus.DEPARTED) == true) {
-          cssStyle.append("text-decoration: line-through;");
+          cssClasses.append(RowCssClass.MARKED_AS_DELETED.getCssClass());
         }
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses.toString()));
         }
       }
     };

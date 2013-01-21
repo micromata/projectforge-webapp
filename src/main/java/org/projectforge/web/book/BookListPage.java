@@ -82,9 +82,9 @@ public class BookListPage extends AbstractListPage<BookListForm, BookDao, BookDO
       public void populateItem(final Item<ICellPopulator<BookDO>> item, final String componentId, final IModel<BookDO> rowModel)
       {
         final BookDO book = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(book.getId(), book.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        final StringBuffer cssClasses = getCssClasses(book.getId(), book.isDeleted());
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses));
         }
       }
     };

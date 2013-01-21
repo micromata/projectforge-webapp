@@ -37,7 +37,6 @@ import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHolder;
@@ -99,9 +98,9 @@ IListPageColumnsCreator<TeamEventDO>
       public void populateItem(final Item<ICellPopulator<TeamEventDO>> item, final String componentId, final IModel<TeamEventDO> rowModel)
       {
         final TeamEventDO teamEvent = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(teamEvent.getId(), teamEvent.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        final StringBuffer cssClasses = getCssClasses(teamEvent.getId(), teamEvent.isDeleted());
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses.toString()));
         }
       }
     };
@@ -115,13 +114,10 @@ IListPageColumnsCreator<TeamEventDO>
       public void populateItem(final Item<ICellPopulator<TeamEventDO>> item, final String componentId, final IModel<TeamEventDO> rowModel)
       {
         final TeamEventDO teamEvent = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(teamEvent.getId(), teamEvent.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
-        }
         final TeamCalDO calendar = teamEvent.getCalendar();
         item.add(new ListSelectActionPanel(componentId, rowModel, TeamEventEditPage.class, teamEvent.getId(), returnToPage,
             calendar != null ? calendar.getTitle() : ""));
+        cellItemListener.populateItem(item, componentId, rowModel);
         addRowClick(item);
       }
     });

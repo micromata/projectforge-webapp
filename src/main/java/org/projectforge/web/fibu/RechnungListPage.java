@@ -61,6 +61,7 @@ import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.RowCssClass;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 @ListPage(editPage = RechnungEditPage.class)
@@ -121,16 +122,16 @@ IListPageColumnsCreator<RechnungDO>
           // Should not occur:
           return;
         }
-        final StringBuffer cssStyle = getCssStyle(rechnung.getId(), rechnung.isDeleted());
+        final StringBuffer cssClasses = getCssClasses(rechnung.getId(), rechnung.isDeleted());
         if (rechnung.isDeleted() == true) {
           // Do nothing further
         } else if (rechnung.isUeberfaellig() == true) {
-          cssStyle.append("color: red;");
+          cssClasses.append(RowCssClass.IMPORTANT_ROW.getCssClass());
         } else if (rechnung.isBezahlt() == false) {
-          cssStyle.append("color: blue;");
+          cssClasses.append(RowCssClass.BLUE.getCssClass());
         }
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses));
         }
       }
     };

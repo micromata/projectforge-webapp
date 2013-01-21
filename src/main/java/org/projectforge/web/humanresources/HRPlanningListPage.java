@@ -100,9 +100,9 @@ ISelectCallerPage
           final IModel<HRPlanningEntryDO> rowModel)
       {
         final HRPlanningEntryDO entry = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(entry.getPlanning().getId(), entry.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        final StringBuffer cssClasses = getCssClasses(entry.getPlanning().getId(), entry.isDeleted());
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses));
         }
       }
     };

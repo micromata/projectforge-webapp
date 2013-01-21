@@ -77,9 +77,9 @@ public class GanttChartListPage extends AbstractListPage<GanttChartListForm, Gan
       public void populateItem(final Item<ICellPopulator<GanttChartDO>> item, final String componentId, final IModel<GanttChartDO> rowModel)
       {
         final GanttChartDO ganttChart = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(ganttChart.getId(), ganttChart.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        final StringBuffer cssClasses = getCssClasses(ganttChart.getId(), ganttChart.isDeleted());
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses));
         }
       }
     };

@@ -76,9 +76,9 @@ public class ConfigurationListPage extends AbstractListPage<ConfigurationListFor
       public void populateItem(final Item<ICellPopulator<ConfigurationDO>> item, final String componentId, final IModel<ConfigurationDO> rowModel)
       {
         final ConfigurationDO configuration = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(configuration.getId(), configuration.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        final StringBuffer cssClasses = getCssClasses(configuration.getId(), configuration.isDeleted());
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses));
         }
       }
     };

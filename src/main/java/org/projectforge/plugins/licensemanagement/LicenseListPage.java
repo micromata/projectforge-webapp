@@ -73,9 +73,9 @@ public class LicenseListPage extends AbstractListPage<LicenseListForm, LicenseDa
       public void populateItem(final Item<ICellPopulator<LicenseDO>> item, final String componentId, final IModel<LicenseDO> rowModel)
       {
         final LicenseDO license = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(license.getId(), license.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        final StringBuffer cssClasses = getCssClasses(license.getId(), license.isDeleted());
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses.toString()));
         }
       }
     };

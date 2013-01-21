@@ -68,9 +68,9 @@ public class ScriptListPage extends AbstractListPage<ScriptListForm, ScriptDao, 
       public void populateItem(final Item<ICellPopulator<ScriptDO>> item, final String componentId, final IModel<ScriptDO> rowModel)
       {
         final ScriptDO script = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(script.getId(), script.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        final StringBuffer cssClasses = getCssClasses(script.getId(), script.isDeleted());
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses));
         }
       }
     };

@@ -65,6 +65,7 @@ import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.RowCssClass;
 
 @ListPage(editPage = AuftragEditPage.class)
 public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDao, AuftragDO> implements IListPageColumnsCreator<AuftragDO>
@@ -109,18 +110,18 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
         }
         final boolean isDeleted = auftrag.isDeleted() == true
             || auftrag.getAuftragsStatus().isIn(AuftragsStatus.ABGELEHNT, AuftragsStatus.ERSETZT) == true;
-        final StringBuffer cssStyle = getCssStyle(auftrag.getId(), isDeleted);
+        final StringBuffer cssClasses = getCssClasses(auftrag.getId(), isDeleted);
         if (isDeleted) {
           // Do nothing further.
         } else if (auftrag.isAbgeschlossenUndNichtVollstaendigFakturiert() == true) {
-          cssStyle.append("font-weight:bold; color: red;");
+          cssClasses.append(RowCssClass.IMPORTANT_ROW.getCssClass());
         } else if (auftrag.getAuftragsStatus().isIn(AuftragsStatus.BEAUFTRAGT, AuftragsStatus.LOI) == true) {
-          cssStyle.append("color: green;");
+          cssClasses.append(RowCssClass.SUCCESS_ROW.getCssClass());
         } else if (auftrag.getAuftragsStatus().isIn(AuftragsStatus.ESKALATION) == true) {
-          cssStyle.append("font-weight:bold; color: red;");
+          cssClasses.append(RowCssClass.IMPORTANT_ROW.getCssClass());
         }
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses));
         }
       }
     };

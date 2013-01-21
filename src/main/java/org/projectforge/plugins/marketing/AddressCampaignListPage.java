@@ -73,9 +73,9 @@ IListPageColumnsCreator<AddressCampaignDO>
           final IModel<AddressCampaignDO> rowModel)
       {
         final AddressCampaignDO campaign = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(campaign.getId(), campaign.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        final StringBuffer cssClasses = getCssClasses(campaign.getId(), campaign.isDeleted());
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses.toString()));
         }
       }
     };

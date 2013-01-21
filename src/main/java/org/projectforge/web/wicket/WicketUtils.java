@@ -869,9 +869,9 @@ public class WicketUtils
     return datumChoiceRenderer;
   }
 
-  public static String getHighlightedRowCssStyle()
+  public static String getHighlightedRowCssClass()
   {
-    return "background-color: #ffcccc;";
+    return "highlighted";
   }
 
   /**

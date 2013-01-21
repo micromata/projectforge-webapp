@@ -90,9 +90,9 @@ IListPageColumnsCreator<GroupTaskAccessDO>
           final IModel<GroupTaskAccessDO> rowModel)
       {
         final GroupTaskAccessDO acces = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(acces.getId(), acces.isDeleted());
-        if (cssStyle.length() > 0) {
-          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+        final StringBuffer cssClasses = getCssClasses(acces.getId(), acces.isDeleted());
+        if (cssClasses.length() > 0) {
+          item.add(AttributeModifier.append("class", cssClasses));
         }
       }
     };
