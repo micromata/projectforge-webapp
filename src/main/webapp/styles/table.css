@@ -26,7 +26,8 @@ table.dataview caption {
 	caption-side: top;
 }
 
-table.dataview thead tr td,table.dataview thead tr th, table.tableTree thead tr th {
+table.dataview thead tr td,table.dataview thead tr th,table.tableTree thead tr th
+	{
 	color: #444;
 	padding: 0.6em;
 	border: 4px solid #fff;
@@ -208,4 +209,24 @@ table.business-assessment td.indent-4 {
 
 table.dataview a {
 	color: blue;
+}
+
+td.highlighted {
+	background-color: #ffcccc;
+}
+
+td.markedAsDeleted {
+	text-decoration: line-through;
+}
+
+td.favoriteEntry, td.importantRow {
+	color: red !important;
+}
+
+td.success {
+	color: green !important;
+}
+
+td.blue, td.recent {
+	color: blue !important;
 }
