@@ -14,8 +14,6 @@ Konkrete Masken
 
 Wicket6-Migration
 -----------------
-- TaskTreePage auf Wicket Tree umstellen
-
 - JS and CSS: minifiing and concatenating (https://github.com/WiQuery/wiquery)
 
 Themenspeicher
@@ -30,6 +28,9 @@ Erste Feedback
 
 ToDo
 ----
-- Kreditorenrechnungen: gelöschte Konten in Übersicht anzeigen (z. B. Klinger)
 - reportObjectives (browsen->NPE)
 - Alert icon (s. Adresskampagnen-EditForm)
+
+TaskTree
+--------
+- event row als oberste Zeile anzeigen
