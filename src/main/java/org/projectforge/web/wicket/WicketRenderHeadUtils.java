@@ -23,6 +23,7 @@
 
 package org.projectforge.web.wicket;
 
+import de.micromata.less.LessWicketApplicationInstantiator;
 import org.apache.wicket.markup.head.CssReferenceHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptReferenceHeaderItem;
@@ -46,17 +47,17 @@ public class WicketRenderHeadUtils
     { "styles/google-fonts/google-fonts", ""}, //
     // "http://fonts.googleapis.com/css?family=Droid+Sans:regular&amp;subset=latin", //
     { "styles/jqueryui/1.10.0/smoothness/jquery-ui-1.10.0.custom", ".min"}, //
-    { "styles/table", ""}, //
+    // { "styles/table", ""}, //
     { "scripts/contextmenu/css/jquery.contextmenu", ""}, //
     { "styles/adminica-2.2/main", ""}, //
-    { "include/bootstrap/css/bootstrap", ".min"}, //
-    { "include/bootstrap/css/bootstrap-responsive", ".min"}, //
-    { "styles/projectforge-main", ""}, //
-    { "styles/projectforge-bootstrap", ""}, //
-    { "styles/projectforge-form", ""}, // before projectforge.css!
-    { "styles/projectforge-jquery-ui", ""}, //
-    { "styles/projectforge-wicket", ""}, //
-    { "styles/projectforge", ""} //
+    // { "include/bootstrap/css/bootstrap", ".min"}, //
+    // { "include/bootstrap/css/bootstrap-responsive", ".min"}, //
+    // { "styles/projectforge-main", ""}, //
+    // { "styles/projectforge-bootstrap", ""}, //
+    // { "styles/projectforge-form", ""}, // before projectforge.css!
+    // { "styles/projectforge-jquery-ui", ""}, //
+    // { "styles/projectforge-wicket", ""}, //
+    // { "styles/projectforge", ""} //
   };
 
   private static final String[] CSS_FILES;
@@ -111,6 +112,7 @@ public class WicketRenderHeadUtils
    */
   public static void renderMainCSSIncludes(final IHeaderResponse response)
   {
+    response.render(CssReferenceHeaderItem.forReference(LessWicketApplicationInstantiator.reference));
     for (final String url : CSS_FILES) {
       response.render(CssReferenceHeaderItem.forUrl(url));
     }

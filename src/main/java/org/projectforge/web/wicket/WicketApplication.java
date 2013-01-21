@@ -30,6 +30,7 @@ import java.util.TimeZone;
 
 import javax.servlet.ServletContext;
 
+import de.micromata.less.LessWicketApplicationInstantiator;
 import net.fortuna.ical4j.util.CompatibilityHints;
 
 import org.apache.commons.lang.StringUtils;
@@ -428,6 +429,14 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_PARSING, true);
     CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_UNFOLDING, true);
     CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_VALIDATION, true);
+
+    // initialize styles compiler
+    try {
+      LessWicketApplicationInstantiator.instantiate(this, "styles", "projectforge.less", "projectforge.css");
+    } catch (Exception e) {
+      e.printStackTrace();
+      // TODO ju
+    }
   }
 
   @Override
