@@ -1,9 +1,0 @@
-#nav_top ul.contextmenu li ul.dropdown {
-	left: -1px;
-	right: auto;
-}
-
-ul.dropdown .context-menu-separator {
-	background-color: red;
-	height: 5px;
-}
