@@ -40,9 +40,25 @@ public class TableTreeExpansion<I extends Serializable, T extends IdObject<I>> i
 {
   private static final long serialVersionUID = 2780714125411794367L;
 
-  private final Set<I> ids = new HashSet<I>();
+  private Set<I> ids = new HashSet<I>();
 
   private boolean inverse;
+
+  /**
+   * @param ids the ids to set
+   */
+  public void setIds(final Set<I> ids)
+  {
+    this.ids = ids;
+  }
+
+  /**
+   * @return the ids
+   */
+  public Set<I> getIds()
+  {
+    return ids;
+  }
 
   public void expandAll()
   {
