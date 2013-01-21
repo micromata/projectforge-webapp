@@ -54,9 +54,6 @@ public class TaskFilter extends BaseSearchFilter
   @XStreamAsAttribute
   private boolean deleted;
 
-  @XStreamAsAttribute
-  private boolean ajaxSupport = true;
-
   /**
    * Used by match filter for avoiding multiple traversing of the tree. Should be empty before building a task node list!
    */
@@ -118,19 +115,6 @@ public class TaskFilter extends BaseSearchFilter
     this.opened = opened;
   }
 
-  /**
-   * If true then the explore icons will be implemented as ajax calls.
-   */
-  public boolean isAjaxSupport()
-  {
-    return ajaxSupport;
-  }
-
-  public void setAjaxSupport(final boolean ajaxSupport)
-  {
-    this.ajaxSupport = ajaxSupport;
-  }
-
   @Override
   public void reset()
   {
@@ -138,7 +122,6 @@ public class TaskFilter extends BaseSearchFilter
     notOpened = opened = true;
     closed = deleted = false;
     searchString = "";
-    ajaxSupport = true;
   }
 
   public void resetMatch()
