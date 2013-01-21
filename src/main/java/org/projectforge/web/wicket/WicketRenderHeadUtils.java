@@ -31,6 +31,8 @@ import org.projectforge.web.WebConfiguration;
 
 public class WicketRenderHeadUtils
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(WicketRenderHeadUtils.class);
+
   private static final String[][] JAVASCRIPT_FILES_DEF = { //
     // { "scripts/jquery/1.8.2/jquery-1.8.2", ".min"}, // Wicket delivers jQuery version
     { "include/bootstrap/js/bootstrap", ".min"}, //
@@ -112,7 +114,12 @@ public class WicketRenderHeadUtils
    */
   public static void renderMainCSSIncludes(final IHeaderResponse response)
   {
-    response.render(CssReferenceHeaderItem.forReference(LessWicketApplicationInstantiator.reference));
+    if(LessWicketApplicationInstantiator.reference != null) {
+      response.render(CssReferenceHeaderItem.forReference(LessWicketApplicationInstantiator.reference));
+    } else {
+      // TODO ju
+      log.error("Unable to find main projectforge.css less file");
+    }
     for (final String url : CSS_FILES) {
       response.render(CssReferenceHeaderItem.forUrl(url));
     }
