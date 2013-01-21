@@ -1,6 +1,6 @@
 Layout
 ------
-- mypopover-Tooltip bei selectMe: title bar zu kurz (width: auto klappt nicht).
+- Comboboxen im Firefox und IE fürchterlich.
 
 Bootstrap-Umbau
 ---------------
@@ -23,7 +23,6 @@ Themenspeicher
 
 Erste Feedback
 --------------
-- Kalenderansicht heute Gelb ist grell, gerade wenn man mit der Tagesansicht arbeitet.
 - Das Menü oben war vorher leichter erkennbar (durch Kästen/senkrechte Striche) unterscheidbar, kann aber auch Gewöhnung sein.
 
 ToDo
