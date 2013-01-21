@@ -79,7 +79,7 @@ public class LoginForm extends AbstractForm<LoginForm, LoginPage>
           this, "stayLoggedIn"));
       radioBoxDiv.add(radioGroup);
       WicketUtils.addYesNo(radioGroup);
-      WicketUtils.addTooltip(radioBoxDiv, getString("login.stayLoggedIn.tooltip"));
+      WicketUtils.addTooltip(radioBoxDiv, getString("login.stayLoggedIn"), getString("login.stayLoggedIn.tooltip"));
     }
     final Button loginButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("login")) {
       @Override
