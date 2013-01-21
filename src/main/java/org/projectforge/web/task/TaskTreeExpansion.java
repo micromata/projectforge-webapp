@@ -30,27 +30,48 @@ import org.apache.wicket.Session;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.projectforge.task.TaskNode;
+import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.wicket.tree.TableTreeExpansion;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
+@XStreamAlias("TaskTreeExpansion")
 public class TaskTreeExpansion extends TableTreeExpansion<Integer, TaskNode>
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TaskTreeExpansion.class);
+
   private static final long serialVersionUID = 5151537746424532422L;
 
-  public static TaskTreeExpansion get()
+  private static TaskTreeExpansion get()
   {
+    final UserXmlPreferencesCache userXmlPreferencesCache = UserXmlPreferencesCache.getDefaultInstance();
     TaskTreeExpansion expansion = Session.get().getMetaData(KEY);
     if (expansion == null) {
       expansion = new TaskTreeExpansion();
-
       Session.get().setMetaData(KEY, expansion);
+      try {
+        @SuppressWarnings("unchecked")
+        final Set<Integer> ids = (Set<Integer>) userXmlPreferencesCache.getEntry(TaskTreePage.USER_PREFS_KEY_OPEN_TASKS);
+        if (ids != null) {
+          expansion.setIds(ids);
+        } else {
+          // Persist the open entries in the data-base.
+          userXmlPreferencesCache.putEntry(TaskTreePage.USER_PREFS_KEY_OPEN_TASKS, expansion.getIds(), true);
+        }
+      } catch (final Exception ex) {
+        log.error(ex.getMessage(), ex);
+      }
     }
     return expansion;
   }
 
+  /**
+   * @return The expansion model. Any previous persisted state of open rows will be restored from {@link UserXmlPreferencesCache}.
+   */
   @SuppressWarnings("serial")
   public static IModel<Set<TaskNode>> getExpansionModel()
   {

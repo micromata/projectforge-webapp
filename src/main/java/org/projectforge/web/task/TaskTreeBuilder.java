@@ -46,7 +46,6 @@ import org.apache.wicket.extensions.markup.html.repeater.tree.theme.WindowsTheme
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.OddEvenItem;
@@ -68,6 +67,7 @@ import org.projectforge.web.fibu.OrderPositionsPanel;
 import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.user.UserPropertyColumn;
 import org.projectforge.web.wicket.AbstractListPage;
+import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DatePropertyColumn;
@@ -103,7 +103,7 @@ public class TaskTreeBuilder implements Serializable
 
   private TableTree<TaskNode, String> tree;
 
-  private WebPage parentPage;
+  private AbstractSecuredPage parentPage;
 
   private ISelectCallerPage caller;
 
@@ -118,7 +118,7 @@ public class TaskTreeBuilder implements Serializable
   }
 
   @SuppressWarnings("serial")
-  public AbstractTree<TaskNode> createTree(final String id, final WebPage parentPage, final TaskFilter taskFilter)
+  public AbstractTree<TaskNode> createTree(final String id, final AbstractSecuredPage parentPage, final TaskFilter taskFilter)
   {
     this.parentPage = parentPage;
     final List<IColumn<TaskNode, String>> columns = createColumns();

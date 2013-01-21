@@ -222,16 +222,6 @@ public class TaskTreePage extends AbstractSecuredPage
     return (accessChecker.isLoggedInUserMemberOfAdminGroup()) || accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP);
   }
 
-  void persistOpenNodes()
-  {
-    // final Set<Serializable> openedNodes = menu.getOpenNodes();
-    // ((AbstractSecuredPage) getPage()).putUserPrefEntry(USER_PREFS_KEY_OPEN_TASKS, taskTreeTablePanel.getTreeTable().getOpenNodes(),
-    // true);
-    // if (log.isDebugEnabled() == true) {
-    // log.debug("Opened task nodes sucessfully persisted in the user's preferences.");
-    // }
-  }
-
   protected String getSearchToolTip()
   {
     return getLocalizedMessage("search.string.info", getSearchFields());
