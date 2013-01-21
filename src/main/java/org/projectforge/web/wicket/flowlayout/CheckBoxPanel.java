@@ -64,7 +64,8 @@ public class CheckBoxPanel extends Panel
    * @param wantOnSelectionChangedNotifications if true then wantOnSelectionChangedNotifications method returns true.
    * @see CheckBox#wantOnSelectionChangedNotifications()
    */
-  public CheckBoxPanel(final String id, final IModel<Boolean> model, final String labelString, final boolean wantOnSelectionChangedNotifications)
+  public CheckBoxPanel(final String id, final IModel<Boolean> model, final String labelString,
+      final boolean wantOnSelectionChangedNotifications)
   {
     super(id);
     this.wantOnSelectionChangedNotifications = wantOnSelectionChangedNotifications;
@@ -106,6 +107,17 @@ public class CheckBoxPanel extends Panel
   }
 
   /**
+   * If activated then the check box is colored (red). This is useful for checkb-oxes which have an important rule on something other, e. g.
+   * "show only deleted" check-box in list view should be highlighted.
+   * @return
+   */
+  public CheckBoxPanel setWarning()
+  {
+    label.add(AttributeModifier.append("class", "warning"));
+    return this;
+  }
+
+  /**
    * @see CheckBox#onSelectionChanged()
    */
   protected void onSelectionChanged(final Boolean newSelection)
@@ -125,7 +137,8 @@ public class CheckBoxPanel extends Panel
     return checkBox;
   }
 
-  public CheckBoxPanel setSelected(final boolean selected) {
+  public CheckBoxPanel setSelected(final boolean selected)
+  {
     checkBox.setDefaultModelObject(selected);
     return this;
   }

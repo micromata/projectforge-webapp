@@ -209,7 +209,7 @@ AbstractSecuredForm<F, P>
       onOptionsPanelCreate(optionsFieldsetPanel, optionsCheckBoxesPanel);
       if (showHistorySearchAndDeleteCheckbox() == true) {
         optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
-            getSearchFilter(), "deleted"), getString(I18N_ONLY_DELETED), getString(I18N_ONLY_DELETED_TOOLTIP)));
+            getSearchFilter(), "deleted"), getString(I18N_ONLY_DELETED), getString(I18N_ONLY_DELETED_TOOLTIP)).setWarning());
         optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
             getSearchFilter(), "searchHistory"), getString("search.searchHistory"), getString("search.searchHistory.additional.tooltip")));
       }

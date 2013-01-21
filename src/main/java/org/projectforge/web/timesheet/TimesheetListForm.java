@@ -229,8 +229,9 @@ public class TimesheetListForm extends AbstractListForm<TimesheetListFilter, Tim
         getSearchFilter(), "longFormat"), getString("longFormat")));
     optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
         getSearchFilter(), "recursive"), getString("task.recursive")));
-    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
-        getSearchFilter(), "marked"), getString("timesheet.filter.withTimeperiodCollision")));
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(),
+        new PropertyModel<Boolean>(getSearchFilter(), "marked"), getString("timesheet.filter.withTimeperiodCollision"),
+        getString("timesheet.filter.withTimeperiodCollision.tooltip")).setWarning());
   }
 
   /**
