@@ -49,6 +49,9 @@ public class LdapUserDaoTest
   public void setup()
   {
     ldapRealTestHelper = new LdapRealTestHelper().setup();
+    if (ldapRealTestHelper.isAvailable() == false) {
+      return;
+    }
     ldapUserDao = ldapRealTestHelper.ldapUserDao;
     ConfigXml.getInstance().getLdapConfig().setPosixAccountsConfig(new LdapPosixAccountsConfig().setDefaultGidNumber(1000));
     ConfigXml.getInstance().getLdapConfig().setSambaAccountsConfig(new LdapSambaAccountsConfig().setSambaSIDPrefix("123-123-123"));
