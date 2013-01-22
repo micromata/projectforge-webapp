@@ -135,7 +135,7 @@ public class MonthlyEmployeeReport implements Serializable
 
   private EmployeeDO employee;
 
-  private long totalDuration;
+  private long totalDuration = 0, netDuration = 0;
 
   private Integer kost1Id;
 
@@ -260,8 +260,9 @@ public class MonthlyEmployeeReport implements Serializable
           } else {
             kost2Total.addMillis(entry.getWorkFractionMillis());
           }
-          // Reisezeiten: Kost2Art um Faktor erweitern
-          totalDuration += entry.getWorkFractionMillis();
+          // Travelling times etc. (see cost 2 type factor):
+          totalDuration += entry.getMillis();
+          netDuration += entry.getWorkFractionMillis();
         }
       }
       if (MapUtils.isNotEmpty(week.getTaskEntries()) == true) {
@@ -277,6 +278,7 @@ public class MonthlyEmployeeReport implements Serializable
             taskTotal.addMillis(entry.getMillis());
           }
           totalDuration += entry.getMillis();
+          netDuration += entry.getMillis();
         }
       }
     }
@@ -404,9 +406,23 @@ public class MonthlyEmployeeReport implements Serializable
     return totalDuration;
   }
 
+  /**
+   * The net duration may differ from total duration (e. g. for travelling times if a fraction is defined for used cost 2 types).
+   * @return the netDuration in ms.
+   */
+  public long getNetDuration()
+  {
+    return netDuration;
+  }
+
   public String getFormattedTotalDuration()
   {
     return MonthlyEmployeeReport.getFormattedDuration(totalDuration);
+  }
+
+  public String getFormattedNetDuration()
+  {
+    return MonthlyEmployeeReport.getFormattedDuration(netDuration);
   }
 
   public Integer getKost1Id()

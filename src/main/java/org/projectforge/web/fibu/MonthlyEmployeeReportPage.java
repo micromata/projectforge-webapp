@@ -30,6 +30,7 @@ import java.util.Map;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.SubmitLink;
@@ -303,8 +304,33 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
       for (final MonthlyEmployeeReportWeek week : report.getWeeks()) {
         colWeekRepeater.add(new Label(colWeekRepeater.newChildId(), week.getFormattedTotalDuration()));
       }
-      row.add(new Label("sum", report.getFormattedTotalDuration()).add(AttributeModifier.replace("style",
+      row.add(new Label("sum", report.getFormattedNetDuration()).add(AttributeModifier.replace("style",
           "font-weight: bold; color:red; text-align: right;")));
+    }
+    if (report.getTotalDuration() != report.getNetDuration()) {
+      // Net sum row.
+      final WebMarkupContainer row = new WebMarkupContainer(rowRepeater.newChildId());
+      rowRepeater.add(row);
+      if (rowCounter++ % 2 == 0) {
+        row.add(AttributeModifier.replace("class", "even"));
+      } else {
+        row.add(AttributeModifier.replace("class", "odd"));
+      }
+      final Component comp = new WebMarkupContainer("cost2").setVisible(false);
+      row.add(comp);
+      row.add(new Label("customer", "").setVisible(false));
+      row.add(new Label("project", "").setVisible(false));
+      final Label title = new Label("costType", getString("fibu.monthlyEmployeeReport.totalSum"));
+      row.add(title);
+      title.add(AttributeModifier.replace("colspan", "4"));
+      title.add(AttributeModifier.replace("style", "font-weight: bold; text-align: right;"));
+      final RepeatingView colWeekRepeater = new RepeatingView("colWeekRepeater");
+      row.add(colWeekRepeater);
+      for (@SuppressWarnings("unused") final MonthlyEmployeeReportWeek week : report.getWeeks()) {
+        colWeekRepeater.add(new Label(colWeekRepeater.newChildId(), ""));
+      }
+      row.add(new Label("sum", report.getFormattedTotalDuration()).add(AttributeModifier.replace("style",
+          "font-weight: bold; text-align: right;")));
     }
   }
 
@@ -352,7 +378,7 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
         // Entries for one task (not cost2).
         link.add(new Label("label", taskFormatter.getTaskPath(task.getId(), true, OutputType.PLAIN)));
       } else {
-        link.add(new Label("label", getString("totalSum")));
+        link.add(new Label("label", getString("sum")));
       }
       result.add(AttributeModifier.replace("colspan", "4"));
       row.add(new Label("customer", "").setVisible(false));
@@ -395,7 +421,8 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
     data.put("projektLabel", getString("fibu.projekt"));
     data.put("kost2ArtLabel", getString("fibu.kost2.art"));
     data.put("sumLabel", getString("sum"));
-    data.put("totalSumLabel", getString("totalSum"));
+    data.put("netSumLabel", getString("sum"));
+    data.put("totalSumLabel", getString("fibu.monthlyEmployeeReport.totalSum"));
     data.put("report", report);
     data.put("signatureEmployeeLabel", getString("timesheet.signatureEmployee") + ": " + employee.getFullname());
     data.put("signatureProjectLeaderLabel", getString("timesheet.signatureProjectLeader"));
