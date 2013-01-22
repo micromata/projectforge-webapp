@@ -75,7 +75,6 @@ import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.mobile.AbstractSecuredMobilePage;
 import org.projectforge.web.mobile.MenuMobilePage;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
-import org.projectforge.web.wicket.bootstrap.GridType;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.TooltipImage;
@@ -755,11 +754,6 @@ public class WicketUtils
     if (component instanceof ComponentWrapperPanel) {
       component = ((ComponentWrapperPanel) component).getFormComponent();
     }
-    component.add(AttributeModifier.append("class", size.getClassAttrValue()));
-  }
-
-  public static void setSize(final Component component, final GridType size)
-  {
     component.add(AttributeModifier.append("class", size.getClassAttrValue()));
   }
 
