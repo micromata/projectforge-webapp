@@ -678,7 +678,6 @@ extends AbstractEditForm<O, P>
     {
       setTitle(getString("fibu.rechnung.showEditableKostZuweisungen"));
       init(new Form<String>(getFormId()));
-      gridBuilder.newFormHeading(""); // Otherwise it's empty and an IllegalArgumentException is thrown.
     }
 
     public void redraw(final AbstractRechnungsPositionDO position, final RechnungCostTablePanel costTable)
