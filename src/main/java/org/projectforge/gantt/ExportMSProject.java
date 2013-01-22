@@ -36,7 +36,6 @@ import java.util.Map;
 import net.sf.mpxj.Day;
 import net.sf.mpxj.Duration;
 import net.sf.mpxj.ProjectCalendar;
-import net.sf.mpxj.ProjectCalendarException;
 import net.sf.mpxj.ProjectFile;
 import net.sf.mpxj.ProjectHeader;
 import net.sf.mpxj.RelationType;
@@ -123,11 +122,8 @@ public class ExportMSProject
       dh.add(Calendar.DAY_OF_MONTH, 1);
       if (dh.isWorkingDay() == false && dh.isHoliday() == true && dh.isWeekend() == false) {
         // Add this holiday to the calendar:
-        final ProjectCalendarException exception = calendar.addCalendarException();
         final Date date = dh.getSQLDate();
-        exception.setFromDate(date);
-        exception.setToDate(date);
-        exception.setWorking(false);
+        calendar.addCalendarException(date, date);
         if (log.isDebugEnabled() == true) {
           log.debug("Add holiday: " + date);
         }
@@ -154,7 +150,7 @@ public class ExportMSProject
     final ByteArrayOutputStream ba = new ByteArrayOutputStream();
     try {
       result.write(file, ba);
-    } catch (IOException ex) {
+    } catch (final IOException ex) {
       log.error("Exception encountered " + ex, ex);
     }
     return ba.toByteArray();
