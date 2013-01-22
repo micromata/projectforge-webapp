@@ -198,7 +198,9 @@ public abstract class AbstractSecuredBasePage extends AbstractUnsecureBasePage
     }
     final Object[] args = new Object[msgParams.length];
     for (int i = 0; i < msgParams.length; i++) {
-      if (msgParams[i].isI18nKey() == true) {
+      if (msgParams[i] == null) {
+        args[i] = "";
+      } else if (msgParams[i].isI18nKey() == true) {
         args[i] = getString(msgParams[i].getI18nKey());
       } else {
         args[i] = msgParams[i];
