@@ -36,6 +36,7 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.projectforge.web.core.NavTopPanel;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
@@ -62,6 +63,8 @@ public abstract class ModalDialog extends Panel
   private boolean keyboard;
 
   private String closeButtonLabel;
+
+  private SingleButtonPanel closeButtonPanel;
 
   private Form< ? > form;
 
@@ -112,6 +115,18 @@ public abstract class ModalDialog extends Panel
   public ModalDialog setCloseButtonLabel(final String closeButtonLabel)
   {
     this.closeButtonLabel = closeButtonLabel;
+    return this;
+  }
+
+  /**
+   * Should be called directly after {@link #init()}.
+   * @param tooltipTitle
+   * @param tooltipContent
+   * @see WicketUtils#addTooltip(Component, IModel, IModel)
+   */
+  public ModalDialog setCloseButtonTooltip(final IModel<String> tooltipTitle, final IModel<String> tooltipContent)
+  {
+    WicketUtils.addTooltip(this.closeButtonPanel.getButton(), tooltipTitle, tooltipContent);
     return this;
   }
 
@@ -223,7 +238,7 @@ public abstract class ModalDialog extends Panel
     mainContainer.add(form);
     form.add(gridContentContainer);
     form.add(buttonBarContainer);
-    appendNewAjaxActionButton(new AjaxFormSubmitCallback() {
+    closeButtonPanel = appendNewAjaxActionButton(new AjaxFormSubmitCallback() {
 
       @Override
       public void callback(final AjaxRequestTarget target)
