@@ -87,6 +87,7 @@ public class AccessException extends UserException
     this.user = user;
     this.accessType = accessType;
     this.operationType = operationType;
+    this.msgParams =  new MessageParam[] { new MessageParam(accessType), new MessageParam(operationType) };
     log.info("AccessException: " + this);
   }
 
@@ -102,16 +103,8 @@ public class AccessException extends UserException
     this.taskId = taskId;
     this.accessType = accessType;
     this.operationType = operationType;
+    this.msgParams =  new MessageParam[] { new MessageParam(taskId), new MessageParam(accessType), new MessageParam(operationType) };
     log.info("AccessException: " + this);
-  }
-
-  /**
-   * @see org.projectforge.core.UserException#getMsgParams()
-   */
-  @Override
-  public MessageParam[] getMsgParams()
-  {
-    return getMessageArgs();
   }
 
   /**

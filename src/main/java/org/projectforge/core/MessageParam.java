@@ -29,22 +29,30 @@ package org.projectforge.core;
  */
 public class MessageParam
 {
-  private Object value;
+  private final Object value;
 
-  private MessageParamType paramType;
+  private final MessageParamType paramType;
 
   /**
    */
-  public MessageParam(Object value)
+  public MessageParam(final Object value)
   {
     this.value = value;
     this.paramType = MessageParamType.VALUE;
   }
 
   /**
+   */
+  public MessageParam(final I18nEnum value)
+  {
+    this.value = value.getI18nKey();
+    this.paramType = MessageParamType.I18N_KEY;
+  }
+
+  /**
    * Will be interpreted as value.
    */
-  public MessageParam(String value)
+  public MessageParam(final String value)
   {
     this.value = value;
     this.paramType = MessageParamType.VALUE;
@@ -54,7 +62,7 @@ public class MessageParam
    * @value Value or i18n key, if paramType = I18N_KEY
    * @paramType
    */
-  public MessageParam(String value, MessageParamType paramType)
+  public MessageParam(final String value, final MessageParamType paramType)
   {
     this.value = value;
     this.paramType = paramType;
@@ -69,7 +77,8 @@ public class MessageParam
     if (isI18nKey() == true) {
       return (String) value;
     }
-    throw new IllegalArgumentException("getI18nKey is called, but paramType is not I18N_KEY or value is not an instance of java.lang.String");
+    throw new IllegalArgumentException(
+        "getI18nKey is called, but paramType is not I18N_KEY or value is not an instance of java.lang.String");
   }
 
   /**
@@ -79,14 +88,16 @@ public class MessageParam
   {
     return value;
   }
-  
+
   /**
    * @return True, if paramType is I18N_KEY and the value is an instance of java.lang.String
    */
-  public boolean isI18nKey() {
+  public boolean isI18nKey()
+  {
     return paramType == MessageParamType.I18N_KEY && value instanceof String;
   }
-  
+
+  @Override
   public String toString()
   {
     return String.valueOf(value);
