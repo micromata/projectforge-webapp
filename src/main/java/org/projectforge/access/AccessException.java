@@ -106,6 +106,15 @@ public class AccessException extends UserException
   }
 
   /**
+   * @see org.projectforge.core.UserException#getMsgParams()
+   */
+  @Override
+  public MessageParam[] getMsgParams()
+  {
+    return getMessageArgs();
+  }
+
+  /**
    * The order of the args is task id, accessType and operationType.
    * @return the arguments for the message formatter from type Object[3].
    */
