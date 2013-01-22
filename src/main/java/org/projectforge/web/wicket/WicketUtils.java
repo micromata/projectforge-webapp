@@ -869,9 +869,11 @@ public class WicketUtils
     return datumChoiceRenderer;
   }
 
-  public static String getHighlightedRowCssClass()
+  public static void append(final Component component, final RowCssClass... rowCssClasses)
   {
-    return "highlighted";
+    for (final RowCssClass rowCssClass : rowCssClasses) {
+      component.add(AttributeModifier.append("class", rowCssClass.getCssClass()));
+    }
   }
 
   /**
@@ -915,7 +917,7 @@ public class WicketUtils
    * @param title
    * @param text If the string contains "\n" characters then html=true and &lt;br/&gt; are used.
    */
-  public static Component addTooltip(final Component component, final IModel<String> title,  IModel<String> text)
+  public static Component addTooltip(final Component component, final IModel<String> title, IModel<String> text)
   {
     if (text != null && text.getObject() != null && text.getObject().indexOf("\n") > 0) {
       final String newText = HtmlHelper.escapeHtml(text.getObject(), true);

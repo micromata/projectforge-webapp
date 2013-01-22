@@ -119,10 +119,7 @@ public class HRListPage extends AbstractListPage<HRListForm, HRDao, HRViewUserDa
           final IModel<HRViewUserData> rowModel)
       {
         final HRViewUserData entry = rowModel.getObject();
-        final StringBuffer cssClasses = getCssClasses(entry.getPlanningId(), entry.isDeleted());
-        if (cssClasses.length() > 0) {
-          item.add(AttributeModifier.append("class", cssClasses));
-        }
+        appendCssClasses(item, entry.getPlanningId(), entry.isDeleted());
       }
     };
     columns.add(new UserPropertyColumn<HRViewUserData>(getString("timesheet.user"), "user.fullname", "user", cellItemListener) {

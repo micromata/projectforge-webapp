@@ -26,7 +26,6 @@ package org.projectforge.web.gantt;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -77,10 +76,7 @@ public class GanttChartListPage extends AbstractListPage<GanttChartListForm, Gan
       public void populateItem(final Item<ICellPopulator<GanttChartDO>> item, final String componentId, final IModel<GanttChartDO> rowModel)
       {
         final GanttChartDO ganttChart = rowModel.getObject();
-        final StringBuffer cssClasses = getCssClasses(ganttChart.getId(), ganttChart.isDeleted());
-        if (cssClasses.length() > 0) {
-          item.add(AttributeModifier.append("class", cssClasses));
-        }
+        appendCssClasses(item, ganttChart.getId(), ganttChart.isDeleted());
       }
     };
     columns.add(new CellItemListenerPropertyColumn<GanttChartDO>(new Model<String>(getString("gantt.name")), "name", "number",

@@ -213,40 +213,48 @@ AbstractSecuredPage implements ISelectCallerPage
   }
 
   /**
+   * @param item The item where to add the css classes.
    * @param rowDataId If the current row data is equals to the hightlightedRow then the style will contain highlighting.
    * @param highlightedRowId The current row to highlight (id of the data object behind the row).
    * @param isDeleted Is this entry deleted? Then the deleted style will be added.
    * @return
    */
-  protected static StringBuffer getCssClasses(final Serializable rowDataId, final Serializable highlightedRowId, final boolean isDeleted)
+  protected static void appendCssClasses(final Item<?> item, final Serializable rowDataId, final Serializable highlightedRowId, final boolean isDeleted)
   {
-    final StringBuffer buf = new StringBuffer();
     if (rowDataId == null) {
-      return buf;
+      return;
     }
     if (rowDataId instanceof Integer == false) {
       log.warn("Error in calling getCssStyle: Integer expected instead of " + rowDataId.getClass());
     }
     if (highlightedRowId != null && rowDataId != null && ObjectUtils.equals(highlightedRowId, rowDataId) == true) {
-      buf.append(WicketUtils.getHighlightedRowCssClass());
+      appendCssClasses(item, RowCssClass.HIGHLIGHTED);
     }
     if (isDeleted == true) {
-      if (buf.length() > 0) {
-        buf.append(" ");
-      }
-      buf.append(RowCssClass.MARKED_AS_DELETED.getCssClass());
+      appendCssClasses(item, RowCssClass.MARKED_AS_DELETED);
     }
-    return buf;
   }
 
   /**
+   * Adds some standard css classes such as {@link RowCssClass#MARKED_AS_DELETED} for deleted entries.
+   * @param item The item where to add the css classes.
    * @param rowDataId If the current row data is equals to the hightlightedRow then the style will contain highlighting.
    * @param isDeleted Is this entry deleted? Then the deleted style will be added.
    * @return
    */
-  protected StringBuffer getCssClasses(final Serializable rowDataId, final boolean isDeleted)
+  protected void appendCssClasses(final Item< ? > item, final Serializable rowDataId, final boolean isDeleted)
   {
-    return getCssClasses(rowDataId, this.highlightedRowId, isDeleted);
+    appendCssClasses(item, rowDataId, this.highlightedRowId, isDeleted);
+  }
+
+  /**
+   * @param item The item where to add the css classes.
+   * @param rowCssClasses The css class to append to the given item.
+   * @return
+   */
+  protected static void appendCssClasses(final Item< ? > item, final RowCssClass... rowCssClasses)
+  {
+    WicketUtils.append(item, rowCssClasses);
   }
 
   /**

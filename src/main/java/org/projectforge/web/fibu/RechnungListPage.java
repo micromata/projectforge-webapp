@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -122,16 +121,13 @@ IListPageColumnsCreator<RechnungDO>
           // Should not occur:
           return;
         }
-        final StringBuffer cssClasses = getCssClasses(rechnung.getId(), rechnung.isDeleted());
+        appendCssClasses(item, rechnung.getId(), rechnung.isDeleted());
         if (rechnung.isDeleted() == true) {
           // Do nothing further
         } else if (rechnung.isUeberfaellig() == true) {
-          cssClasses.append(RowCssClass.IMPORTANT_ROW.getCssClass());
+          appendCssClasses(item, RowCssClass.IMPORTANT_ROW);
         } else if (rechnung.isBezahlt() == false) {
-          cssClasses.append(RowCssClass.BLUE.getCssClass());
-        }
-        if (cssClasses.length() > 0) {
-          item.add(AttributeModifier.append("class", cssClasses));
+          appendCssClasses(item, RowCssClass.BLUE);
         }
       }
     };

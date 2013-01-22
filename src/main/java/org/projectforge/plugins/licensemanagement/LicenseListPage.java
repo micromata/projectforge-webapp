@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
@@ -73,10 +72,7 @@ public class LicenseListPage extends AbstractListPage<LicenseListForm, LicenseDa
       public void populateItem(final Item<ICellPopulator<LicenseDO>> item, final String componentId, final IModel<LicenseDO> rowModel)
       {
         final LicenseDO license = rowModel.getObject();
-        final StringBuffer cssClasses = getCssClasses(license.getId(), license.isDeleted());
-        if (cssClasses.length() > 0) {
-          item.add(AttributeModifier.append("class", cssClasses.toString()));
-        }
+        appendCssClasses(item, license.getId(), license.isDeleted());
       }
     };
 

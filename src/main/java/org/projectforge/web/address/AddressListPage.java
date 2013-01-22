@@ -138,14 +138,11 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
       {
         final AddressDO address = rowModel.getObject();
         final PersonalAddressDO personalAddress = personalAddressMap.get(address.getId());
-        final StringBuffer cssClasses = getCssClasses(address.getId(), address.isDeleted());
+        appendCssClasses(item, address.getId(), address.isDeleted());
         if (address.isDeleted() == true) {
           // Do nothing further
         } else if (personalAddress != null && personalAddress.isFavoriteCard() == true) {
-          cssClasses.append(RowCssClass.FAVORITE_ENTRY.getCssClass());
-        }
-        if (cssClasses.length() > 0) {
-          item.add(AttributeModifier.append("class", cssClasses));
+          appendCssClasses(item, RowCssClass.FAVORITE_ENTRY);
         }
       }
     };

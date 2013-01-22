@@ -26,7 +26,6 @@ package org.projectforge.plugins.teamcal.admin;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
@@ -86,10 +85,7 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
       public void populateItem(final Item<ICellPopulator<TeamCalDO>> item, final String componentId, final IModel<TeamCalDO> rowModel)
       {
         final TeamCalDO teamCal = rowModel.getObject();
-        final StringBuffer cssClasses = getCssClasses(teamCal.getId(), teamCal.isDeleted());
-        if (cssClasses.length() > 0) {
-          item.add(AttributeModifier.append("class", cssClasses.toString()));
-        }
+        appendCssClasses(item, teamCal.getId(), teamCal.isDeleted());
       }
     };
 

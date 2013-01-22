@@ -26,7 +26,6 @@ package org.projectforge.web.meb;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -79,24 +78,22 @@ public class MebListPage extends AbstractListPage<MebListForm, MebDao, MebEntryD
       public void populateItem(final Item<ICellPopulator<MebEntryDO>> item, final String componentId, final IModel<MebEntryDO> rowModel)
       {
         final MebEntryDO meb = rowModel.getObject();
-        final StringBuffer cssClasses = getCssClasses(meb.getId(), meb.isDeleted());
+        appendCssClasses(item, meb.getId(), meb.isDeleted());
         if (meb.isDeleted() == true) {
           // Should not occur
         } else if (meb.getStatus() == MebEntryStatus.RECENT) {
-          cssClasses.append(RowCssClass.RECENT.getCssClass());
+          appendCssClasses(item, RowCssClass.RECENT);
         } else if (meb.getStatus() == MebEntryStatus.IMPORTANT) {
-          cssClasses.append(RowCssClass.IMPORTANT_ROW.getCssClass());
+          appendCssClasses(item, RowCssClass.IMPORTANT_ROW);
         } else if (meb.getStatus() == MebEntryStatus.DONE) {
-          cssClasses.append(RowCssClass.SUCCESS_ROW.getCssClass());
-        }
-        if (cssClasses.length() > 0) {
-          item.add(AttributeModifier.append("class", cssClasses));
+          appendCssClasses(item, RowCssClass.SUCCESS_ROW);
         }
       }
     };
     columns.add(new CellItemListenerPropertyColumn<MebEntryDO>(new Model<String>(getString("date")), "date", "date", cellItemListener) {
       /**
-       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item, java.lang.String, org.apache.wicket.model.IModel)
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
        */
       @Override
       public void populateItem(final Item<ICellPopulator<MebEntryDO>> item, final String componentId, final IModel<MebEntryDO> rowModel)

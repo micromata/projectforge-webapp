@@ -26,7 +26,6 @@ package org.projectforge.web.fibu;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -70,7 +69,7 @@ public class CustomerListPage extends AbstractListPage<CustomerListForm, KundeDa
    */
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<KundeDO,String>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<KundeDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final List<IColumn<KundeDO, String>> columns = new ArrayList<IColumn<KundeDO, String>>();
 
@@ -82,11 +81,7 @@ public class CustomerListPage extends AbstractListPage<CustomerListForm, KundeDa
           // Should not occur:
           return;
         }
-        final StringBuffer cssClasses = getCssClasses(kunde.getId(), kunde.isDeleted() == true
-            || kunde.getStatus().isIn(KundeStatus.ENDED) == true);
-        if (cssClasses.length() > 0) {
-          item.add(AttributeModifier.append("class", cssClasses));
-        }
+        appendCssClasses(item, kunde.getId(), kunde.isDeleted() == true || kunde.getStatus().isIn(KundeStatus.ENDED) == true);
       }
     };
     columns.add(new CellItemListenerPropertyColumn<KundeDO>(new Model<String>(getString("fibu.kunde.nummer")), "kost", "kost",

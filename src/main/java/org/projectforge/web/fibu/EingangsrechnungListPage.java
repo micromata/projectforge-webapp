@@ -29,7 +29,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -113,19 +112,17 @@ IListPageColumnsCreator<EingangsrechnungDO>
   {
     final List<IColumn<EingangsrechnungDO, String>> columns = new ArrayList<IColumn<EingangsrechnungDO, String>>();
     final CellItemListener<EingangsrechnungDO> cellItemListener = new CellItemListener<EingangsrechnungDO>() {
-      public void populateItem(final Item<ICellPopulator<EingangsrechnungDO>> item, final String componentId, final IModel<EingangsrechnungDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<EingangsrechnungDO>> item, final String componentId,
+          final IModel<EingangsrechnungDO> rowModel)
       {
         final EingangsrechnungDO eingangsrechnung = rowModel.getObject();
-        final StringBuffer cssClasses = getCssClasses(eingangsrechnung.getId(), eingangsrechnung.isDeleted());
+        appendCssClasses(item, eingangsrechnung.getId(), eingangsrechnung.isDeleted());
         if (eingangsrechnung.isDeleted() == true) {
           // Do nothing further
         } else if (eingangsrechnung.isUeberfaellig() == true) {
-          cssClasses.append(RowCssClass.IMPORTANT_ROW.getCssClass());
+          appendCssClasses(item, RowCssClass.IMPORTANT_ROW);
         } else if (eingangsrechnung.isBezahlt() == false) {
-          cssClasses.append(RowCssClass.BLUE.getCssClass());
-        }
-        if (cssClasses.length() > 0) {
-          item.add(AttributeModifier.append("class", cssClasses));
+          appendCssClasses(item, RowCssClass.BLUE);
         }
       }
     };
@@ -159,8 +156,7 @@ IListPageColumnsCreator<EingangsrechnungDO>
       {
         final EingangsrechnungDO rechnung = (EingangsrechnungDO) rowModel.getObject();
         final KontoDO konto = kontoCache.getKonto(rechnung.getKontoId());
-        item
-        .add(new Label(componentId, konto != null ? konto.formatKonto() : ""));
+        item.add(new Label(componentId, konto != null ? konto.formatKonto() : ""));
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });

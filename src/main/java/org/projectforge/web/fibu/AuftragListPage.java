@@ -99,7 +99,7 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
   @Override
   public List<IColumn<AuftragDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<AuftragDO,String>> columns = new ArrayList<IColumn<AuftragDO, String>>();
+    final List<IColumn<AuftragDO, String>> columns = new ArrayList<IColumn<AuftragDO, String>>();
     final CellItemListener<AuftragDO> cellItemListener = new CellItemListener<AuftragDO>() {
       public void populateItem(final Item<ICellPopulator<AuftragDO>> item, final String componentId, final IModel<AuftragDO> rowModel)
       {
@@ -110,18 +110,15 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
         }
         final boolean isDeleted = auftrag.isDeleted() == true
             || auftrag.getAuftragsStatus().isIn(AuftragsStatus.ABGELEHNT, AuftragsStatus.ERSETZT) == true;
-        final StringBuffer cssClasses = getCssClasses(auftrag.getId(), isDeleted);
+        appendCssClasses(item, auftrag.getId(), auftrag.isDeleted());
         if (isDeleted) {
           // Do nothing further.
         } else if (auftrag.isAbgeschlossenUndNichtVollstaendigFakturiert() == true) {
-          cssClasses.append(RowCssClass.IMPORTANT_ROW.getCssClass());
+          appendCssClasses(item, RowCssClass.IMPORTANT_ROW);
         } else if (auftrag.getAuftragsStatus().isIn(AuftragsStatus.BEAUFTRAGT, AuftragsStatus.LOI) == true) {
-          cssClasses.append(RowCssClass.SUCCESS_ROW.getCssClass());
+          appendCssClasses(item, RowCssClass.SUCCESS_ROW);
         } else if (auftrag.getAuftragsStatus().isIn(AuftragsStatus.ESKALATION) == true) {
-          cssClasses.append(RowCssClass.IMPORTANT_ROW.getCssClass());
-        }
-        if (cssClasses.length() > 0) {
-          item.add(AttributeModifier.append("class", cssClasses));
+          appendCssClasses(item, RowCssClass.IMPORTANT_ROW);
         }
       }
     };

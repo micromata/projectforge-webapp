@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -139,10 +138,7 @@ IListPageColumnsCreator<BuchungssatzDO>
           final IModel<BuchungssatzDO> rowModel)
       {
         final BuchungssatzDO satz = rowModel.getObject();
-        final StringBuffer cssClasses = getCssClasses(satz.getId(), satz.isDeleted());
-        if (cssClasses.length() > 0) {
-          item.add(AttributeModifier.append("class", cssClasses));
-        }
+        appendCssClasses(item, satz.getId(), satz.isDeleted());
       }
     };
     columns.add(new CellItemListenerPropertyColumn<BuchungssatzDO>(new Model<String>(getString("fibu.buchungssatz.satznr")),

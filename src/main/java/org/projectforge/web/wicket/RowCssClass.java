@@ -30,7 +30,8 @@ package org.projectforge.web.wicket;
  */
 public enum RowCssClass
 {
-  BLUE("blue"), FAVORITE_ENTRY("favoriteEntry"), IMPORTANT_ROW("importantRow"), MARKED_AS_DELETED("markedAsDeleted"), RECENT("recent"), SUCCESS_ROW("success");
+  BLUE("blue"), FAVORITE_ENTRY("favoriteEntry"), HIGHLIGHTED("highlighted"), IMPORTANT_ROW("importantRow"), MARKED_AS_DELETED(
+      "markedAsDeleted"), RECENT("recent"), SUCCESS_ROW("success");
 
   private final String cssClass;
 

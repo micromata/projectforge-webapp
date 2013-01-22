@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
@@ -113,14 +112,9 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
    */
   private TaskTreePage taskTreePage;
 
-  static String getCssClasses(final TaskDO task, final Integer preselectedTaskNode)
+  static void appendCssClasses(final Item<?> item, final TaskDO task, final Integer preselectedTaskNode)
   {
-    final StringBuffer cssClasses = getCssClasses(task.getId(), preselectedTaskNode, task.isDeleted());
-    if (cssClasses.length() > 0) {
-      return cssClasses.toString();
-    } else {
-      return null;
-    }
+    appendCssClasses(item, task.getId(), preselectedTaskNode, task.isDeleted());
   }
 
   /**
@@ -234,10 +228,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
       public void populateItem(final Item<ICellPopulator<TaskDO>> item, final String componentId, final IModel<TaskDO> rowModel)
       {
         final TaskDO task = rowModel.getObject();
-        final String cssClasses = TaskListPage.getCssClasses(task, (Integer) highlightedRowId);
-        if (cssClasses != null) {
-          item.add(AttributeModifier.append("class", cssClasses.toString()));
-        }
+        appendCssClasses(item, task, (Integer) highlightedRowId);
       }
     };
     final List<IColumn<TaskDO, String>> columns = new ArrayList<IColumn<TaskDO, String>>();

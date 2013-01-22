@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -84,10 +83,7 @@ IListPageColumnsCreator<SkillRatingDO>
           final IModel<SkillRatingDO> rowModel)
       {
         final SkillRatingDO skillRating = rowModel.getObject();
-        final StringBuffer cssClasses = getCssClasses(skillRating.getId(), skillRating.isDeleted());
-        if (cssClasses.length() > 0) {
-          item.add(AttributeModifier.append("class", cssClasses.toString()));
-        }
+        appendCssClasses(item, skillRating.getId(), skillRating.isDeleted());
       }
     };
 

@@ -26,7 +26,6 @@ package org.projectforge.web.scripting;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
@@ -68,10 +67,7 @@ public class ScriptListPage extends AbstractListPage<ScriptListForm, ScriptDao, 
       public void populateItem(final Item<ICellPopulator<ScriptDO>> item, final String componentId, final IModel<ScriptDO> rowModel)
       {
         final ScriptDO script = rowModel.getObject();
-        final StringBuffer cssClasses = getCssClasses(script.getId(), script.isDeleted());
-        if (cssClasses.length() > 0) {
-          item.add(AttributeModifier.append("class", cssClasses));
-        }
+        appendCssClasses(item, script.getId(), script.isDeleted());
       }
     };
     columns.add(new CellItemListenerPropertyColumn<ScriptDO>(new Model<String>(getString("scripting.script.name")), "name", "name",

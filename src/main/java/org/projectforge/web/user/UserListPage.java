@@ -26,7 +26,6 @@ package org.projectforge.web.user;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
@@ -86,10 +85,7 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
       public void populateItem(final Item<ICellPopulator<PFUserDO>> item, final String componentId, final IModel<PFUserDO> rowModel)
       {
         final PFUserDO user = rowModel.getObject();
-        final StringBuffer cssClasses = getCssClasses(user.getId(), user.hasSystemAccess() == false);
-        if (cssClasses.length() > 0) {
-          item.add(AttributeModifier.append("class", cssClasses));
-        }
+        appendCssClasses(item, user.getId(), user.hasSystemAccess() == false);
       }
     };
     columns.add(new CellItemListenerPropertyColumn<PFUserDO>(getString("user.username"), getSortable("username", sortable), "username",

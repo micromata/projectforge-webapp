@@ -26,7 +26,6 @@ package org.projectforge.plugins.banking;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -71,10 +70,7 @@ public class BankAccountListPage extends AbstractListPage<BankAccountListForm, B
       public void populateItem(final Item<ICellPopulator<BankAccountDO>> item, final String componentId, final IModel<BankAccountDO> rowModel)
       {
         final BankAccountDO bankAccount = rowModel.getObject();
-        final StringBuffer cssClasses = getCssClasses(bankAccount.getId(), bankAccount.isDeleted());
-        if (cssClasses.length() > 0) {
-          item.add( AttributeModifier.append("class", cssClasses.toString()));
-        }
+        appendCssClasses(item, bankAccount.getId(), bankAccount.isDeleted());
       }
     };
     columns.add(new CellItemListenerPropertyColumn<BankAccountDO>(new Model<String>(getString("plugins.banking.account.number")),

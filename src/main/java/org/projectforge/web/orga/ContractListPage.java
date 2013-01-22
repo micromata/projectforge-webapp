@@ -26,7 +26,6 @@ package org.projectforge.web.orga;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -72,10 +71,7 @@ public class ContractListPage extends AbstractListPage<ContractListForm, Contrac
       public void populateItem(final Item<ICellPopulator<ContractDO>> item, final String componentId, final IModel<ContractDO> rowModel)
       {
         final ContractDO contract = rowModel.getObject();
-        final StringBuffer cssClasses = getCssClasses(contract.getId(), contract.isDeleted());
-        if (cssClasses.length() > 0) {
-          item.add(AttributeModifier.append("class", cssClasses));
-        }
+        appendCssClasses(item, contract.getId(), contract.isDeleted());
       }
     };
     columns.add(new CellItemListenerPropertyColumn<ContractDO>(getString("legalAffaires.contract.number"), "number", "number",

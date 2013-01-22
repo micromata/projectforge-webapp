@@ -30,7 +30,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -265,10 +264,7 @@ IListPageColumnsCreator<TimesheetDO>
         } else {
           highlightedRowId = null;
         }
-        final StringBuffer cssClasses = getCssClasses(timesheet.getId(), highlightedRowId, timesheet.isDeleted());
-        if (cssClasses.length() > 0) {
-          item.add(AttributeModifier.append("class", cssClasses));
-        }
+        appendCssClasses(item, timesheet.getId(), highlightedRowId, timesheet.isDeleted());
       }
     };
     if (page instanceof TimesheetMassUpdatePage) {

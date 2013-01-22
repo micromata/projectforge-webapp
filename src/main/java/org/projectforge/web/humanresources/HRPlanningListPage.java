@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -100,10 +99,7 @@ ISelectCallerPage
           final IModel<HRPlanningEntryDO> rowModel)
       {
         final HRPlanningEntryDO entry = rowModel.getObject();
-        final StringBuffer cssClasses = getCssClasses(entry.getPlanning().getId(), entry.isDeleted());
-        if (cssClasses.length() > 0) {
-          item.add(AttributeModifier.append("class", cssClasses));
-        }
+        appendCssClasses(item, entry.getPlanningId(), entry.isDeleted());
       }
     };
     columns.add(new UserPropertyColumn<HRPlanningEntryDO>(getString("timesheet.user"), "planning.user.fullname", "planning.user",

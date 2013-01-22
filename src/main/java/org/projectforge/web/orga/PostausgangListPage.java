@@ -26,7 +26,6 @@ package org.projectforge.web.orga;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -74,10 +73,7 @@ IListPageColumnsCreator<PostausgangDO>
           final IModel<PostausgangDO> rowModel)
       {
         final PostausgangDO postausgang = rowModel.getObject();
-        final StringBuffer cssClasses = getCssClasses(postausgang.getId(), postausgang.isDeleted());
-        if (cssClasses.length() > 0) {
-          item.add(AttributeModifier.append("class", cssClasses));
-        }
+        appendCssClasses(item, postausgang.getId(), postausgang.isDeleted());
       }
     };
     columns

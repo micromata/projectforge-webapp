@@ -112,9 +112,9 @@ IListPageColumnsCreator<AddressDO>
   }
 
   @SuppressWarnings("serial")
-  protected static final List<IColumn<AddressDO, String>> createColumns(final WebPage page, final boolean sortable, final boolean massUpdateMode,
-      final AddressCampaignValueFilter searchFilter, final Map<Integer, PersonalAddressDO> personalAddressMap,
-      final Map<Integer, AddressCampaignValueDO> addressCampaignValueMap)
+  protected static final List<IColumn<AddressDO, String>> createColumns(final WebPage page, final boolean sortable,
+      final boolean massUpdateMode, final AddressCampaignValueFilter searchFilter,
+      final Map<Integer, PersonalAddressDO> personalAddressMap, final Map<Integer, AddressCampaignValueDO> addressCampaignValueMap)
       {
 
     final List<IColumn<AddressDO, String>> columns = new ArrayList<IColumn<AddressDO, String>>();
@@ -129,19 +129,16 @@ IListPageColumnsCreator<AddressDO>
           highlightedRowId = null;
         }
         final PersonalAddressDO personalAddress = personalAddressMap.get(address.getId());
-        final StringBuffer cssClasses = getCssClasses(address.getId(), highlightedRowId, address.isDeleted());
+        appendCssClasses(item, address.getId(), highlightedRowId, address.isDeleted());
         if (address.isDeleted() == true) {
           // Do nothing further
         } else if (personalAddress != null && personalAddress.isFavoriteCard() == true) {
-          cssClasses.append(RowCssClass.FAVORITE_ENTRY.getCssClass());
+          appendCssClasses(item, RowCssClass.FAVORITE_ENTRY);
         }
         if (address.getAddressStatus().isIn(AddressStatus.LEAVED, AddressStatus.OUTDATED) == true
             || address.getContactStatus().isIn(ContactStatus.DEPARTED, ContactStatus.NON_ACTIVE, ContactStatus.PERSONA_INGRATA,
                 ContactStatus.UNINTERESTING, ContactStatus.DEPARTED) == true) {
-          cssClasses.append(RowCssClass.MARKED_AS_DELETED.getCssClass());
-        }
-        if (cssClasses.length() > 0) {
-          item.add(AttributeModifier.append("class", cssClasses.toString()));
+          appendCssClasses(item, RowCssClass.MARKED_AS_DELETED);
         }
       }
     };
@@ -280,8 +277,8 @@ IListPageColumnsCreator<AddressDO>
         {
           log.info("Exporting address list.");
           final List<AddressDO> list = getList();
-          final byte[] xls = addressCampaignValueExport.export(list,personalAddressMap, addressCampaignValueMap,
-              form.getSearchFilter().getAddressCampaign() != null ? form.getSearchFilter().getAddressCampaign().getTitle() : "");
+          final byte[] xls = addressCampaignValueExport.export(list, personalAddressMap, addressCampaignValueMap, form.getSearchFilter()
+              .getAddressCampaign() != null ? form.getSearchFilter().getAddressCampaign().getTitle() : "");
           if (xls == null || xls.length == 0) {
             form.addError("address.book.hasNoVCards");
             return;

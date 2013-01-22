@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -91,12 +90,11 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
       public void populateItem(final Item<ICellPopulator<ToDoDO>> item, final String componentId, final IModel<ToDoDO> rowModel)
       {
         final ToDoDO toDo = rowModel.getObject();
-        final StringBuffer cssClasses = getCssClasses(toDo.getId(), toDo.isDeleted());
-        if (toDo.isRecent() == true && ObjectUtils.equals(getUserId(), toDo.getAssigneeId()) == true) {
-          cssClasses.append(RowCssClass.IMPORTANT_ROW.getCssClass());
-        }
-        if (cssClasses.length() > 0) {
-          item.add(AttributeModifier.append("class", cssClasses));
+        appendCssClasses(item, toDo.getId(), toDo.isDeleted());
+        if (toDo.isDeleted() == false) {
+          if (toDo.isRecent() == true && ObjectUtils.equals(getUserId(), toDo.getAssigneeId()) == true) {
+            appendCssClasses(item, RowCssClass.IMPORTANT_ROW);
+          }
         }
       }
     };

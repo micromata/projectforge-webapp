@@ -171,10 +171,7 @@ public class TaskTreeBuilder implements Serializable
       public void populateItem(final Item<ICellPopulator<TaskNode>> item, final String componentId, final IModel<TaskNode> rowModel)
       {
         final TaskNode taskNode = rowModel.getObject();
-        final String cssClasses = TaskListPage.getCssClasses(taskNode.getTask(), highlightedTaskNodeId);
-        if (cssClasses != null) {
-          item.add(AttributeModifier.append("class", cssClasses));
-        }
+        TaskListPage.appendCssClasses(item, taskNode.getTask(), highlightedTaskNodeId);
       }
     };
     final List<IColumn<TaskNode, String>> columns = new ArrayList<IColumn<TaskNode, String>>();
