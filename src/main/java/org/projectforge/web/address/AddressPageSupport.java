@@ -55,8 +55,6 @@ import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.flowlayout.AbstractFieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.AbstractGridBuilder;
-import org.projectforge.web.wicket.flowlayout.ComponentSize;
-import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
 import org.projectforge.web.wicket.flowlayout.FieldProperties;
 import org.projectforge.web.wicket.flowlayout.FieldType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -184,9 +182,7 @@ class AddressPageSupport implements Serializable
     final AbstractFieldsetPanel< ? > fs = gridBuilder.newFieldset(props);
     final LabelValueChoiceRenderer<FormOfAddress> formChoiceRenderer = new LabelValueChoiceRenderer<FormOfAddress>(form,
         FormOfAddress.values());
-    final DropDownChoicePanel< ? > panel = fs.addDropDownChoice(props.getModel(), formChoiceRenderer.getValues(), formChoiceRenderer)
-        .setRequired(true).setNullValid(false);
-    WicketUtils.setSize(panel.getDropDownChoice(), ComponentSize.SMALL);
+    fs.addDropDownChoice(props.getModel(), formChoiceRenderer.getValues(), formChoiceRenderer).setRequired(true).setNullValid(false);
     return fs;
   }
 
@@ -302,10 +298,8 @@ class AddressPageSupport implements Serializable
     final AbstractFieldsetPanel< ? > fs = gridBuilder.newFieldset(props);
     final LabelValueChoiceRenderer<ContactStatus> contactStatusChoiceRenderer = new LabelValueChoiceRenderer<ContactStatus>(form,
         ContactStatus.values());
-    final DropDownChoicePanel< ? > panel = fs
-        .addDropDownChoice(props.getModel(), contactStatusChoiceRenderer.getValues(), contactStatusChoiceRenderer).setRequired(true)
-        .setNullValid(false);
-    WicketUtils.setSize(panel, ComponentSize.MEDIUM);
+    fs.addDropDownChoice(props.getModel(), contactStatusChoiceRenderer.getValues(), contactStatusChoiceRenderer).setRequired(true)
+    .setNullValid(false);
     return fs;
   }
 
@@ -320,9 +314,8 @@ class AddressPageSupport implements Serializable
     final AbstractFieldsetPanel< ? > fs = gridBuilder.newFieldset(props);
     final LabelValueChoiceRenderer<AddressStatus> addressStatusChoiceRenderer = new LabelValueChoiceRenderer<AddressStatus>(form,
         AddressStatus.values());
-    final DropDownChoicePanel< ? > panel = fs.addDropDownChoice(props.getModel(), addressStatusChoiceRenderer.getValues(), addressStatusChoiceRenderer).setRequired(true)
-        .setNullValid(false);
-    WicketUtils.setSize(panel, ComponentSize.MEDIUM);
+    fs.addDropDownChoice(props.getModel(), addressStatusChoiceRenderer.getValues(), addressStatusChoiceRenderer).setRequired(true)
+    .setNullValid(false);
     return fs;
   }
 
@@ -360,7 +353,8 @@ class AddressPageSupport implements Serializable
     language.setFavoriteLanguages(addressDao.getUsedCommunicationLanguages());
     fs.add(language);
     if (mobile == false) {
-      ((FieldsetPanel) fs).addKeyboardHelpIcon(new ResourceModel("tooltip.autocompletion.title"), new ResourceModel("tooltip.autocomplete.language"));
+      ((FieldsetPanel) fs).addKeyboardHelpIcon(new ResourceModel("tooltip.autocompletion.title"), new ResourceModel(
+          "tooltip.autocomplete.language"));
     }
     return fs;
   }
@@ -424,8 +418,8 @@ class AddressPageSupport implements Serializable
   public FieldProperties<String> getPhoneNumberProperties(final String property, final String labelKey, final String labelDescriptionKey,
       final FieldType fieldType)
       {
-    return new FieldProperties<String>(labelKey, new PropertyModel<String>(address, property)).setLabelDescription(
-        labelDescriptionKey).setFieldType(fieldType);
+    return new FieldProperties<String>(labelKey, new PropertyModel<String>(address, property)).setLabelDescription(labelDescriptionKey)
+        .setFieldType(fieldType);
       }
 
   @SuppressWarnings("serial")

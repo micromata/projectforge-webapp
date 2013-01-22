@@ -28,9 +28,7 @@ import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.orga.ContractDao;
 import org.projectforge.web.wicket.AbstractListForm;
-import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.YearListCoiceRenderer;
-import org.projectforge.web.wicket.flowlayout.ComponentSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
@@ -64,7 +62,6 @@ public class ContractListForm extends AbstractListForm<ContractListFilter, Contr
       }
     };
     yearChoice.setNullValid(false);
-    WicketUtils.setSize(yearChoice, ComponentSize.LENGTH_10);
     optionsFieldsetPanel.add(yearChoice);
   }
 

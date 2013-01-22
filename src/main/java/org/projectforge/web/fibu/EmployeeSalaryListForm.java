@@ -30,12 +30,9 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.fibu.EmployeeSalaryDao;
 import org.projectforge.fibu.EmployeeSalaryFilter;
 import org.projectforge.web.wicket.AbstractListForm;
-import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.YearListCoiceRenderer;
-import org.projectforge.web.wicket.flowlayout.ComponentSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class EmployeeSalaryListForm extends AbstractListForm<EmployeeSalaryFilter, EmployeeSalaryListPage>
@@ -55,17 +52,15 @@ public class EmployeeSalaryListForm extends AbstractListForm<EmployeeSalaryFilte
   protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
   {
     final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(employeeSalaryDao.getYears(), true);
-    final DropDownChoicePanel<Integer> yearChoice = optionsFieldsetPanel.addDropDownChoice(new PropertyModel<Integer>(this, "year"),
-        yearListChoiceRenderer.getYears(), yearListChoiceRenderer, true).setNullValid(false);
-    WicketUtils.setSize(yearChoice.getDropDownChoice(), ComponentSize.LENGTH_4);
+    optionsFieldsetPanel.addDropDownChoice(new PropertyModel<Integer>(this, "year"), yearListChoiceRenderer.getYears(),
+        yearListChoiceRenderer, true).setNullValid(false);
     // DropDownChoice months
     final LabelValueChoiceRenderer<Integer> monthChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
     for (int i = 0; i <= 11; i++) {
       monthChoiceRenderer.addValue(i, StringHelper.format2DigitNumber(i + 1));
     }
-    final DropDownChoicePanel<Integer> monthChoice = optionsFieldsetPanel.addDropDownChoice(new PropertyModel<Integer>(this, "month"),
-        monthChoiceRenderer.getValues(), monthChoiceRenderer, true).setNullValid(true);
-    WicketUtils.setSize(monthChoice.getDropDownChoice(), ComponentSize.LENGTH_2);
+    optionsFieldsetPanel.addDropDownChoice(new PropertyModel<Integer>(this, "month"), monthChoiceRenderer.getValues(), monthChoiceRenderer,
+        true).setNullValid(true);
   }
 
   public EmployeeSalaryListForm(final EmployeeSalaryListPage parentPage)

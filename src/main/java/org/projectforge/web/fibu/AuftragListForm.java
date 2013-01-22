@@ -37,10 +37,8 @@ import org.projectforge.fibu.AuftragsPositionsArt;
 import org.projectforge.fibu.AuftragsStatistik;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.WebConstants;
-import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.YearListCoiceRenderer;
-import org.projectforge.web.wicket.flowlayout.ComponentSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -160,7 +158,6 @@ public class AuftragListForm extends AbstractListForm<AuftragListFilter, Auftrag
       }
     };
     yearChoice.setNullValid(false);
-    WicketUtils.setSize(yearChoice, ComponentSize.LENGTH_4);
     optionsFieldsetPanel.add(yearChoice);
 
     // DropDownChoice listType

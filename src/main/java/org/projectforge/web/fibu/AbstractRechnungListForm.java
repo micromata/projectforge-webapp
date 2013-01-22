@@ -35,11 +35,9 @@ import org.projectforge.fibu.RechnungFilter;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.WebConstants;
-import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.YearListCoiceRenderer;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
-import org.projectforge.web.wicket.flowlayout.ComponentSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -137,7 +135,6 @@ AbstractListForm<F, P>
     final DropDownChoice<Integer> yearChoice = new DropDownChoice<Integer>(optionsFieldsetPanel.getDropDownChoiceId(),
         new PropertyModel<Integer>(this, "year"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer);
     yearChoice.setNullValid(false);
-    WicketUtils.setSize(yearChoice, ComponentSize.LENGTH_4);
     optionsFieldsetPanel.add(yearChoice, true);
 
     // // DropDownChoice months
@@ -149,7 +146,6 @@ AbstractListForm<F, P>
     final DropDownChoice<Integer> monthChoice = new DropDownChoice<Integer>(optionsFieldsetPanel.getDropDownChoiceId(),
         new PropertyModel<Integer>(this, "month"), monthChoiceRenderer.getValues(), monthChoiceRenderer);
     monthChoice.setNullValid(false);
-    WicketUtils.setSize(monthChoice, ComponentSize.LENGTH_2);
     optionsFieldsetPanel.add(monthChoice, true);
 
     final DivPanel radioGroupPanel = optionsFieldsetPanel.addNewRadioBoxDiv();

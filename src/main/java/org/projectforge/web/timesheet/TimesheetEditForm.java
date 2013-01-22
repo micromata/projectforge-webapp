@@ -299,7 +299,6 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
           DateTimePanel.getHourOfDayRenderer());
       stopHourOfDayDropDownChoice.setNullValid(false);
       stopHourOfDayDropDownChoice.setRequired(true);
-      WicketUtils.setSize(stopHourOfDayDropDownChoice, ComponentSize.LENGTH_2);
       fs.add(stopHourOfDayDropDownChoice);
       dependentFormComponentsWithCost2[1] = dependentFormComponentsWithoutCost2[1] = stopHourOfDayDropDownChoice;
       final DropDownChoice<Integer> stopMinuteDropDownChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(),
@@ -307,7 +306,6 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
           DateTimePanel.getMinutesRenderer(DatePrecision.MINUTE_15));
       stopMinuteDropDownChoice.setNullValid(false);
       stopMinuteDropDownChoice.setRequired(true);
-      WicketUtils.setSize(stopMinuteDropDownChoice, ComponentSize.LENGTH_2);
       fs.add(stopMinuteDropDownChoice);
       dependentFormComponentsWithCost2[2] = dependentFormComponentsWithoutCost2[2] = stopMinuteDropDownChoice;
     }

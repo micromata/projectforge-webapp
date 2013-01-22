@@ -60,7 +60,6 @@ import org.projectforge.web.wicket.components.DateTimePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
-import org.projectforge.web.wicket.flowlayout.ComponentSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldSetIconPosition;
@@ -132,7 +131,6 @@ AbstractSecuredForm<F, P>
     final DropDownChoice<Integer> pageSizeChoice = new DropDownChoice<Integer>(id, model, pageSizeChoiceRenderer.getValues(),
         pageSizeChoiceRenderer);
     pageSizeChoice.setNullValid(false);
-    WicketUtils.setSize(pageSizeChoice, ComponentSize.MINI);
     return pageSizeChoice;
       }
 
@@ -208,8 +206,9 @@ AbstractSecuredForm<F, P>
       final DivPanel optionsCheckBoxesPanel = new DivPanel(optionsFieldsetPanel.newChildId(), DivType.CHECKBOX);
       onOptionsPanelCreate(optionsFieldsetPanel, optionsCheckBoxesPanel);
       if (showHistorySearchAndDeleteCheckbox() == true) {
-        optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
-            getSearchFilter(), "deleted"), getString(I18N_ONLY_DELETED), getString(I18N_ONLY_DELETED_TOOLTIP)).setWarning());
+        optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(),
+            new PropertyModel<Boolean>(getSearchFilter(), "deleted"), getString(I18N_ONLY_DELETED), getString(I18N_ONLY_DELETED_TOOLTIP))
+            .setWarning());
         optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
             getSearchFilter(), "searchHistory"), getString("search.searchHistory"), getString("search.searchHistory.additional.tooltip")));
       }

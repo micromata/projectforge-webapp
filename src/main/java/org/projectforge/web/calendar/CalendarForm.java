@@ -47,7 +47,6 @@ import org.projectforge.web.wicket.components.DateTimePanel;
 import org.projectforge.web.wicket.components.JodaDatePanel;
 import org.projectforge.web.wicket.flowlayout.ButtonGroupPanel;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
-import org.projectforge.web.wicket.flowlayout.ComponentSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -146,7 +145,6 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
     };
     firstHourDropDownChoice.setNullValid(false);
     firstHourDropDownChoice.setRequired(true);
-    WicketUtils.setSize(firstHourDropDownChoice, ComponentSize.LENGTH_2);
     WicketUtils.addTooltip(firstHourDropDownChoice, getString("calendar.option.firstHour.tooltip"));
     fieldset.add(firstHourDropDownChoice);
     buttonGroupPanel = new ButtonGroupPanel(fieldset.newChildId());

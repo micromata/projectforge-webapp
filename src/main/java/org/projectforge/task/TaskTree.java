@@ -615,7 +615,7 @@ public class TaskTree extends AbstractCache implements Serializable
     }
     if (recursive == true) {
       final TaskNode node = getTaskNodeById(taskId);
-      if (node.hasChilds() == true) {
+      if (node != null && node.hasChilds() == true) {
         for (final TaskNode child : node.getChilds()) {
           if (hasOrderPositions(child.getId(), recursive) == true) {
             return true;

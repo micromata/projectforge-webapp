@@ -31,10 +31,8 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.fibu.kost.BuchungssatzDao;
 import org.projectforge.fibu.kost.BusinessAssessment;
 import org.projectforge.web.wicket.AbstractListForm;
-import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.YearListCoiceRenderer;
-import org.projectforge.web.wicket.flowlayout.ComponentSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -87,7 +85,6 @@ public class AccountingRecordListForm extends AbstractListForm<AccountingRecordL
     final DropDownChoice<Integer> fromYearChoice = new DropDownChoice<Integer>(optionsFieldsetPanel.getDropDownChoiceId(),
         new PropertyModel<Integer>(this, "fromYear"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer);
     fromYearChoice.setNullValid(false).setRequired(true);
-    WicketUtils.setSize(fromYearChoice, ComponentSize.LENGTH_4);
     optionsFieldsetPanel.add(fromYearChoice);
     final LabelValueChoiceRenderer<Integer> monthChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
     for (int i = 0; i <= 11; i++) {
@@ -96,7 +93,6 @@ public class AccountingRecordListForm extends AbstractListForm<AccountingRecordL
     final DropDownChoice<Integer> fromMonthChoice = new DropDownChoice<Integer>(optionsFieldsetPanel.getDropDownChoiceId(),
         new PropertyModel<Integer>(this, "fromMonth"), monthChoiceRenderer.getValues(), monthChoiceRenderer);
     fromMonthChoice.setNullValid(true);
-    WicketUtils.setSize(fromMonthChoice, ComponentSize.LENGTH_2);
     optionsFieldsetPanel.add(fromMonthChoice);
 
     optionsFieldsetPanel.add(new DivTextPanel(optionsFieldsetPanel.newChildId(), " - "));
@@ -105,13 +101,11 @@ public class AccountingRecordListForm extends AbstractListForm<AccountingRecordL
     final DropDownChoice<Integer> toYearChoice = new DropDownChoice<Integer>(optionsFieldsetPanel.getDropDownChoiceId(),
         new PropertyModel<Integer>(this, "toYear"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer);
     toYearChoice.setNullValid(false).setRequired(true);
-    WicketUtils.setSize(toYearChoice, ComponentSize.LENGTH_4);
     optionsFieldsetPanel.add(toYearChoice);
 
     final DropDownChoice<Integer> toMonthChoice = new DropDownChoice<Integer>(optionsFieldsetPanel.getDropDownChoiceId(),
         new PropertyModel<Integer>(this, "toMonth"), monthChoiceRenderer.getValues(), monthChoiceRenderer);
     toMonthChoice.setNullValid(true);
-    WicketUtils.setSize(toMonthChoice, ComponentSize.LENGTH_2);
     optionsFieldsetPanel.add(toMonthChoice);
   }
 
