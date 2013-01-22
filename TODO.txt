@@ -22,6 +22,8 @@ Konkrete Masken
 Wicket6-Migration
 -----------------
 - JS and CSS: minifiing and concatenating (https://github.com/WiQuery/wiquery)
+- Bruttoarbeitszeit
+- FullCalendar bei Reload Application wegen statischen Feldern.
 
 Themenspeicher
 --------------
@@ -36,6 +38,8 @@ ToDo
 ----
 - reportObjectives (browsen->NPE)
 - Alert icon (s. Adresskampagnen-EditForm)
+- Breite Spalte Duration bei Timesheet-Export
+- Datumpanel: Jahreszahl prüfen (z. B. zwischen 1900 und 2100).
 
 TaskTree
 --------
