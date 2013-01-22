@@ -92,17 +92,32 @@
         </td>
       </tr>
       <groovy> } </groovy>
+      <!-- Net sum -->
       <tr>
         <td number-columns-spanned="4" text-align="end">
-          <span color="#999999" use-font="bold">${totalSumLabel}</span>
+          <span color="#999999" use-font="bold">${sumLabel}</span>
         </td>
         <groovy> for (week in report.weeks) { </groovy>
         <td text-align="end">${week.formattedTotalDuration}</td>
         <groovy> } </groovy>
         <td text-align="end">
-          <span color="#FF0000" use-font="bold">${report.formattedTotalDuration}</span>
+          <span color="#FF0000" use-font="bold">${report.formattedNetDuration}</span>
         </td>
       </tr>
+      <groovy> if (report.totalDuration != report.netDuration) { </groovy>
+      <!-- Total sum (if differs from net duration) -->
+      <tr>
+        <td number-columns-spanned="4" text-align="end">
+          <span color="#999999" use-font="bold">${totalSumLabel}</span>
+        </td>
+        <groovy> for (week in report.weeks) { </groovy>
+        <td text-align="end"></td>
+        <groovy> } </groovy>
+        <td text-align="end">
+          <span use-font="bold">${report.formattedTotalDuration}</span>
+        </td>
+      </tr>
+      <groovy> } </groovy>
     </table-body>
   </table>
 
