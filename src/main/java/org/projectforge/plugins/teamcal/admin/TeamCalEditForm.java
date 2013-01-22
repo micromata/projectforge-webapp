@@ -110,6 +110,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       if (isNew() == true) {
         title.add(WicketUtils.setFocus());
       }
+      WicketUtils.setStrong(title);
       fs.add(title);
       if (access == false) {
         title.setEnabled(false);

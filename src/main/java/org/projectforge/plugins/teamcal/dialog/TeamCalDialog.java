@@ -61,11 +61,12 @@ import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRights;
 import org.projectforge.web.common.ColorPickerPanel;
-import org.projectforge.web.dialog.PFDialog;
+import org.projectforge.web.dialog.ModalDialog;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.ButtonGroupPanel;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
 import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
@@ -78,7 +79,7 @@ import de.micromata.wicket.ajax.AjaxCallback;
  * @author M. Lauterbach (m.lauterbach@micromata.de)
  * 
  */
-public class TeamCalDialog extends PFDialog
+public class TeamCalDialog extends ModalDialog
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalDialog.class);
 
@@ -120,49 +121,42 @@ public class TeamCalDialog extends PFDialog
    */
   public TeamCalDialog(final String id, final IModel<String> titleModel, final TeamCalCalendarFilter filter)
   {
-    super(id, titleModel);
+    super(id);
     this.filter = filter;
+    setTitle(titleModel);
+    setBigWindow();
     selectedCalendars = new LinkedList<TeamCalDO>();
     teamEventRight = (TeamEventRight) UserRights.instance().getRight(TeamEventDao.USER_RIGHT_ID);
-    setOnCloseCallback(new AjaxCallback() {
-      private static final long serialVersionUID = -8154276568761839693L;
-
-      @Override
-      public void callback(final AjaxRequestTarget target)
-      {
-        myClose(target);
-      }
-    });
   }
 
   /**
-   * @see org.projectforge.web.dialog.PFDialog#open(org.apache.wicket.ajax.AjaxRequestTarget)
+   * @see org.projectforge.web.dialog.ModalDialog#handleCloseEvent(org.apache.wicket.ajax.AjaxRequestTarget)
    */
   @Override
-  public void open(final AjaxRequestTarget target)
+  protected void handleCloseEvent(final AjaxRequestTarget target)
   {
-    backupFilter = new TeamCalCalendarFilter().copyValuesFrom(filter);
-    super.open(target);
+    myClose(target);
   }
 
   /**
-   * @see org.projectforge.web.dialog.PFDialog#isRefreshedOnOpen()
+   * @see org.projectforge.web.dialog.ModalDialog#onCloseButtonSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
    */
   @Override
-  protected boolean isRefreshedOnOpen()
+  protected void onCloseButtonSubmit(final AjaxRequestTarget target)
   {
-    return true;
+    myClose(target);
   }
 
-  /**
-   * @see org.projectforge.web.dialog.PFDialog#onInitialize()
-   */
   @Override
-  protected void onInitialize()
+  public void init()
   {
-    super.onInitialize();
+    init(new Form<String>(getFormId()));
     TIMESHEET_CALENDAR.setTitle(getString("plugins.teamcal.timeSheetCalendar"));
     TIMESHEET_CALENDAR.setId(TIMESHEET_CALENDAR_ID);
+
+    final DivPanel panel = gridBuilder.getPanel();
+    final Content content = new Content(panel.newChildId());
+    panel.add(content);
 
     appendNewAjaxActionButton(new AjaxCallback() {
       private static final long serialVersionUID = -8154276568761839693L;
@@ -172,22 +166,35 @@ public class TeamCalDialog extends PFDialog
       {
         // Restore values (valid at opening time of this dialog):
         filter.copyValuesFrom(backupFilter);
-        TeamCalDialog.this.close(target);
+        close(target);
       }
     }, getString("cancel"), SingleButtonPanel.CANCEL);
 
     // confirm
-    // TODO: Tooltip über schließen: Kannst final auch irgendwo hinneklicken
-    appendNewAjaxActionButton(new AjaxCallback() {
-      private static final long serialVersionUID = -8741086877308855477L;
+    setCloseButtonTooltip(null, new ResourceModel("plugins.teamcal.calendar.filterDialog.closeButton.tooltip"));
+  }
 
-      @Override
-      public void callback(final AjaxRequestTarget target)
-      {
-        myClose(target);
-        TeamCalDialog.this.close(target);
-      }
-    }, getString("close"), SingleButtonPanel.DEFAULT_SUBMIT);
+  // public void redraw(final AbstractRechnungsPositionDO position, final RechnungCostTablePanel costTable)
+  // {
+  // this.position = position;
+  // this.costTable = costTable;
+  // clearContent();
+  // {
+  // final DivPanel panel = gridBuilder.getPanel();
+  // rechnungCostEditTablePanel = new RechnungCostEditTablePanel(panel.newChildId());
+  // panel.add(rechnungCostEditTablePanel);
+  // rechnungCostEditTablePanel.add(position);
+  // }
+  // }
+
+  /**
+   * @see org.projectforge.web.dialog.PFDialog#open(org.apache.wicket.ajax.AjaxRequestTarget)
+   */
+  @Override
+  public void open(final AjaxRequestTarget target)
+  {
+    backupFilter = new TeamCalCalendarFilter().copyValuesFrom(filter);
+    super.open(target);
   }
 
   private void myClose(final AjaxRequestTarget target)
@@ -201,15 +208,6 @@ public class TeamCalDialog extends PFDialog
       activeTemplateEntry.setDirty();
     }
     setResponsePage(getPage().getClass(), getPage().getPageParameters());
-  }
-
-  /**
-   * @see org.projectforge.web.dialog.PFDialog#getDialogContent(java.lang.String)
-   */
-  @Override
-  protected Component getDialogContent(final String wicketId)
-  {
-    return new Content(wicketId);
   }
 
   /**

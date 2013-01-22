@@ -75,7 +75,8 @@ public class TeamCalCalendarForm extends CalendarForm
   {
     super.init();
     final TeamCalDialog dialog = new TeamCalDialog(fieldset.newChildId(), new ResourceModel("plugins.teamcal.title.list"), filter);
-    fieldset.add(dialog);
+    parentPage.add(dialog);
+    dialog.init();
     final IconButtonPanel calendarButtonPanel = new AjaxIconButtonPanel(buttonGroupPanel.newChildId(), IconType.CALENDAR,
         getString("plugins.teamcal.calendar.edit")) {
       private static final long serialVersionUID = -8572571785540159369L;
