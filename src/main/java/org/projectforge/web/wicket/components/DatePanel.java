@@ -23,6 +23,7 @@
 
 package org.projectforge.web.wicket.components;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import org.apache.wicket.AttributeModifier;
@@ -32,6 +33,9 @@ import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.FormComponentPanel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.validation.IValidatable;
+import org.apache.wicket.validation.IValidator;
+import org.apache.wicket.validation.ValidationError;
 import org.projectforge.web.wicket.WicketRenderHeadUtils;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.converter.MyDateConverter;
@@ -57,6 +61,8 @@ public class DatePanel extends FormComponentPanel<Date> implements ComponentWrap
 
   private boolean autosubmit;
 
+  private int minYear = 1900, maxYear = 2100;
+
   /**
    * @param id
    * @param label Only for displaying the field's name on validation messages.
@@ -73,6 +79,7 @@ public class DatePanel extends FormComponentPanel<Date> implements ComponentWrap
    * @param model
    * @param settings with target type etc.
    */
+  @SuppressWarnings("serial")
   public DatePanel(final String id, final IModel<Date> model, final DatePanelSettings settings)
   {
     super(id, model);
@@ -88,6 +95,45 @@ public class DatePanel extends FormComponentPanel<Date> implements ComponentWrap
     if (settings.tabIndex != null) {
       dateField.add(AttributeModifier.replace("tabindex", String.valueOf(settings.tabIndex)));
     }
+    dateField.add(new IValidator<Date>() {
+
+      @Override
+      public void validate(final IValidatable<Date> validatable)
+      {
+        final Date date = validatable.getValue();
+        if (date != null) {
+          final Calendar cal = Calendar.getInstance();
+          cal.setTime(date);
+          final int year = cal.get(Calendar.YEAR);
+          if (year < minYear || year > maxYear) {
+            validatable.error(new ValidationError().addKey("error.date.yearOutOfRange").setVariable("minimumYear", minYear)
+                .setVariable("maximumYear", maxYear));
+          }
+        }
+      }
+    });
+  }
+
+  /**
+   * Minimum year for validation (default is 1900).
+   * @param minYear the minYear to set
+   * @return this for chaining.
+   */
+  public DatePanel setMinYear(final int minYear)
+  {
+    this.minYear = minYear;
+    return this;
+  }
+
+  /**
+   * Maximum year for validation (default is 2100).
+   * @param maxYear the maxYear to set
+   * @return this for chaining.
+   */
+  public DatePanel setMaxYear(final int maxYear)
+  {
+    this.maxYear = maxYear;
+    return this;
   }
 
   /**
@@ -136,13 +182,6 @@ public class DatePanel extends FormComponentPanel<Date> implements ComponentWrap
   public void markModelAsChanged()
   {
     modelMarkedAsChanged = true;
-  }
-
-  @Override
-  public void validate()
-  {
-    dateField.validate();
-    super.validate();
   }
 
   @Override
