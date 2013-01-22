@@ -38,9 +38,11 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.web.calendar.QuickSelectMonthPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractStandardForm;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.flowlayout.ComponentSize;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class MonthlyEmployeeReportForm extends AbstractStandardForm<MonthlyEmployeeReportFilter, MonthlyEmployeeReportPage>
@@ -88,6 +90,7 @@ public class MonthlyEmployeeReportForm extends AbstractStandardForm<MonthlyEmplo
         }
       };
       yearChoice.setNullValid(false).setRequired(true);
+      WicketUtils.setSize(yearChoice, ComponentSize.LENGTH_4);
       fs.add(yearChoice);
       // DropDownChoice months
       final LabelValueChoiceRenderer<Integer> monthChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
@@ -106,6 +109,7 @@ public class MonthlyEmployeeReportForm extends AbstractStandardForm<MonthlyEmplo
         }
       };
       monthChoice.setNullValid(false).setRequired(true);
+      WicketUtils.setSize(monthChoice, ComponentSize.LENGTH_2);
       fs.add(monthChoice);
       final QuickSelectMonthPanel quickSelectPanel = new QuickSelectMonthPanel(fs.newChildId(), new Model<Date>() {
         /**
