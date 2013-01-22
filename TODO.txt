@@ -5,10 +5,6 @@ Johannes
 - JavaScript mergen, ähnlich CSS
 - CSS/Javascript minimieren
 
-Layout
-------
-- Comboboxen im Firefox und IE fürchterlich.
-
 Bootstrap-Umbau
 ---------------
 - Dialoge
