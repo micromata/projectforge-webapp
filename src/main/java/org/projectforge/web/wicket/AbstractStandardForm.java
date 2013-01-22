@@ -108,7 +108,7 @@ public class AbstractStandardForm<F, P extends AbstractStandardFormPage> extends
    */
   protected boolean isMessageAndFeedbackPanelVisible()
   {
-    return feedbackPanel.isVisible() || messagesComponent.isVisible();
+    return feedbackPanel.anyErrorMessage() || messagesComponent.isVisible();
   }
 
   /**
