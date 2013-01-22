@@ -61,7 +61,7 @@
     <groovy>}</groovy>
     <table-column column-width="6cm" />
     <table-column column-width="25mm" />
-    <table-column column-width="13mm" />
+    <table-column column-width="16mm" />
     <table-column column-width="proportional-column-width(1)" />
     <table-header>
       <tr border-bottom-line="true">
