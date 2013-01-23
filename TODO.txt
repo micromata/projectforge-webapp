@@ -1,7 +1,5 @@
 Johannes
 --------
-- Mounting Reihenfolge von CSS hübsch machen
-- Less Compiler Code Refaktorisieren
 - JavaScript mergen, ähnlich CSS
 - CSS/Javascript minimieren
 

@@ -23,11 +23,17 @@
 
 package de.micromata.less;
 
-import org.apache.wicket.protocol.http.WebApplication;
-import org.lesscss.LessCompiler;
-
 import java.io.File;
 import java.io.Serializable;
+
+import org.apache.wicket.RuntimeConfigurationType;
+import org.apache.wicket.markup.head.CssReferenceHeaderItem;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.protocol.http.WebApplication;
+import org.apache.wicket.util.listener.IChangeListener;
+import org.apache.wicket.util.watch.IModificationWatcher;
+import org.lesscss.LessCompiler;
+import org.lesscss.LessSource;
 
 /**
  * Compiler utility class for less resource files
@@ -39,27 +45,128 @@ public class LessWicketApplicationInstantiator implements Serializable
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LessWicketApplicationInstantiator.class);
 
-  public static LessResourceReference reference;
+  private static LessWicketApplicationInstantiator instance;
 
-  private LessWicketApplicationInstantiator()
+  private LessResourceReference reference;
+
+  private final WebApplication application;
+
+  private final String folder;
+
+  private final String lessPath;
+
+  private final String cssPath;
+
+  private final String relativeCssPath;
+
+  private File referenceFile;
+
+  private File lessTargetFile;
+
+  private File cssTargetFile;
+
+  /**
+   * 
+   * @param application
+   * @param folder
+   * @param lessPath
+   * @param cssPath
+   */
+  public LessWicketApplicationInstantiator(WebApplication application, String folder, String lessPath, String cssPath)
   {
+    this.application = application;
+    this.folder = folder;
+    this.lessPath = lessPath;
+    this.cssPath = cssPath;
+    this.relativeCssPath = folder + "/" + cssPath;
+    instance = this;
   }
 
-  public static void instantiate(WebApplication application, String folder, String lessPath, String cssPath) throws Exception
+  private void instantiateFiles() throws Exception
+  {
+    referenceFile = new File(application.getClass().getClassLoader().getResource("i18nKeys.properties").toURI()).getParentFile();
+    lessTargetFile = new File(referenceFile.getAbsolutePath() + "/" + folder + "/" + lessPath);
+    cssTargetFile = new File(lessTargetFile.getAbsolutePath().replace(lessPath, "") + cssPath);
+  }
+
+  /**
+   * compiles the saved .less to the wanted .css file
+   * 
+   * @return
+   * @throws Exception
+   */
+  private LessSource compile() throws Exception
   {
     // compile file
     LessCompiler lessCompiler = new LessCompiler();
 
-    final String relativeCssPath = folder + "/" + cssPath;
-    final File referenceFile = new File(application.getClass().getClassLoader().getResource("i18nKeys.properties").toURI()).getParentFile();
-    final File lessTargetFile = new File(referenceFile.getAbsolutePath() + "/" + folder + "/" + lessPath);
-    final File cssTargetFile = new File(lessTargetFile.getAbsolutePath().replace(lessPath, "") + cssPath);
+    // create new source
+    final LessSource mainLessSource = new LessSource(lessTargetFile);
 
     log.info("compiling " + lessTargetFile.getAbsolutePath() + " to " + cssTargetFile.getAbsolutePath());
-    lessCompiler.compile(lessTargetFile, cssTargetFile, false);
+    lessCompiler.compile(mainLessSource, cssTargetFile, false);
+    return mainLessSource;
+  }
 
-    // mount file
+  /**
+   * instantiates the actual less compilement
+   * 
+   * @throws Exception
+   */
+  public void instantiate() throws Exception
+  {
+    instantiateFiles();
+    final LessSource mainLessSource = compile();
+
+    if (RuntimeConfigurationType.DEVELOPMENT.equals(application.getConfigurationType())) {
+      // only add this fancy resource watcher in dev mode
+      final IModificationWatcher resourceWatcher = application.getResourceSettings().getResourceWatcher(true);
+      // add watchers
+      addWatcher(resourceWatcher, mainLessSource);
+      for (LessSource importedSource : mainLessSource.getImports().values()) {
+        addWatcher(resourceWatcher, importedSource);
+      }
+
+    }
+
+    // mount compiled css file
     reference = new LessResourceReference(relativeCssPath, cssTargetFile);
     application.mountResource(relativeCssPath, reference);
+  }
+
+  /**
+   * adds a resource watcher entry to the given less source
+   * 
+   * @param resourceWatcher
+   * @param importedSource
+   */
+  private void addWatcher(final IModificationWatcher resourceWatcher, final LessSource importedSource)
+  {
+    log.info("adding watcher to less file " + importedSource.getAbsolutePath());
+    resourceWatcher.add(new org.apache.wicket.util.file.File(new File(importedSource.getAbsolutePath())), new IChangeListener() {
+
+      @Override
+      public void onChange()
+      {
+        try {
+          compile();
+        } catch (Exception e) {
+          log.error("unable to compile less source during watcher for file " + importedSource.getAbsolutePath(), e);
+        }
+      }
+    });
+  }
+
+  /**
+   * Renders the compiled css reference to the given response
+   * @param response
+   */
+  public static void renderCompiledCssResource(final IHeaderResponse response)
+  {
+    if (instance != null && instance.reference != null) {
+      response.render(CssReferenceHeaderItem.forReference(instance.reference));
+    } else {
+      log.error("Unable to find compiled main projectforge.css less file");
+    }
   }
 }

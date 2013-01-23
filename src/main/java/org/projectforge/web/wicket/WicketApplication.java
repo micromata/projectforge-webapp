@@ -235,7 +235,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
   }
 
   /**
-   * @param msg
+   * @param alertMessage
    * @see #getAlertMessage()
    */
   public static void setAlertMessage(final String alertMessage)
@@ -255,8 +255,6 @@ public class WicketApplication extends WebApplication implements WicketApplicati
    * Own solution: uses development parameter of servlet context init parameter (see context.xml or server.xml).
    * @return DEVELOPMENT, if development variable of servlet context is set to "true" otherwise DEPLOYMENT.
    * @see org.apache.wicket.protocol.http.WebApplication#getConfigurationType()
-   * @see Application#DEPLOYMENT
-   * @see Application#DEVELOPMENT
    */
   @Override
   public RuntimeConfigurationType getConfigurationType()
@@ -432,10 +430,10 @@ public class WicketApplication extends WebApplication implements WicketApplicati
 
     // initialize styles compiler
     try {
-      LessWicketApplicationInstantiator.instantiate(this, "styles", "projectforge.less", "projectforge.css");
+      final LessWicketApplicationInstantiator lessInstantiator = new LessWicketApplicationInstantiator(this, "styles", "projectforge.less", "projectforge.css");
+      lessInstantiator.instantiate();
     } catch (Exception e) {
-      e.printStackTrace();
-      // TODO ju
+      log.error("Unable to instantiate wicket less compiler", e);
     }
   }
 

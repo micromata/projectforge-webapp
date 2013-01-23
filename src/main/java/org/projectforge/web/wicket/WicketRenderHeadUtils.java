@@ -117,12 +117,7 @@ public class WicketRenderHeadUtils
     for (final String url : CSS_FILES) {
       response.render(CssReferenceHeaderItem.forUrl(url));
     }
-    if(LessWicketApplicationInstantiator.reference != null) {
-      response.render(CssReferenceHeaderItem.forReference(LessWicketApplicationInstantiator.reference));
-    } else {
-      // TODO ju
-      log.error("Unable to find main projectforge.css less file");
-    }
+    LessWicketApplicationInstantiator.renderCompiledCssResource(response);
   }
 
   /**
