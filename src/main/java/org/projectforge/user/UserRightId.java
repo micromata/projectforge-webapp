@@ -54,6 +54,8 @@ public class UserRightId implements I18nEnum, Comparable<UserRightId>, Serializa
 
   public static UserRightId FIBU_COST_UNIT = new UserRightId("FIBU_COST_UNIT", "fibu5", "access.right.fibu.costUnit");
 
+  public static UserRightId FIBU_ACCOUNTS = new UserRightId("FIBU_ACCOUNTS", "fibu6", "access.right.fibu.accounts");
+
   public static UserRightId MISC_MEB = new UserRightId("MISC_MEB", "misc1", "access.right.misc.meb");
 
   public static UserRightId PM_GANTT = new UserRightId("PM_GANTT", "pm1", "access.right.pm.gantt");
@@ -70,11 +72,11 @@ public class UserRightId implements I18nEnum, Comparable<UserRightId>, Serializa
 
   public static UserRightId ORGA_OUTGOING_MAIL = new UserRightId("ORGA_OUTGOING_MAIL", "orga3", "access.right.orga.outgoingmail");
 
-  private String id;
+  private final String id;
 
-  private String orderString;
+  private final String orderString;
 
-  private String i18nKey;
+  private final String i18nKey;
 
   /**
    * @param id Must be unique (including all plugins).
@@ -87,7 +89,7 @@ public class UserRightId implements I18nEnum, Comparable<UserRightId>, Serializa
     this.orderString = orderString;
     this.i18nKey = i18nKey;
   }
-  
+
   public String getId()
   {
     return id;
@@ -98,12 +100,12 @@ public class UserRightId implements I18nEnum, Comparable<UserRightId>, Serializa
   {
     return i18nKey;
   }
-  
+
   public String getOrderString()
   {
     return orderString;
   }
-  
+
   @Override
   public String toString()
   {

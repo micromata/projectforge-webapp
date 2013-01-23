@@ -48,13 +48,13 @@ public class UserRights
    * FALSE, READONLY, READWRITE;
    */
   public static final UserRightValue[] FALSE_READONLY_READWRITE = new UserRightValue[] { UserRightValue.FALSE, UserRightValue.READONLY,
-      UserRightValue.READWRITE};
+    UserRightValue.READWRITE};
 
   /**
    * FALSE, READONLY, PARTLY_READWRITE, READWRITE;
    */
   public static final UserRightValue[] FALSE_READONLY_PARTLYREADWRITE_READWRITE = new UserRightValue[] { UserRightValue.FALSE,
-      UserRightValue.READONLY, UserRightValue.PARTLYREADWRITE, UserRightValue.READWRITE};
+    UserRightValue.READONLY, UserRightValue.PARTLYREADWRITE, UserRightValue.READWRITE};
 
   /**
    * READONLY, READWRITE;
@@ -69,20 +69,20 @@ public class UserRights
   public static final ProjectForgeGroup[] FIBU_GROUPS = { ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP};
 
   public static final ProjectForgeGroup[] FIBU_ORGA_GROUPS = { ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.ORGA_TEAM,
-      ProjectForgeGroup.CONTROLLING_GROUP};
+    ProjectForgeGroup.CONTROLLING_GROUP};
 
   public static final ProjectForgeGroup[] FIBU_ORGA_PM_GROUPS = { ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.ORGA_TEAM,
-      ProjectForgeGroup.CONTROLLING_GROUP, ProjectForgeGroup.PROJECT_MANAGER, ProjectForgeGroup.PROJECT_ASSISTANT};
+    ProjectForgeGroup.CONTROLLING_GROUP, ProjectForgeGroup.PROJECT_MANAGER, ProjectForgeGroup.PROJECT_ASSISTANT};
 
   private static UserRights instance;
 
-  private Map<UserRightId, UserRight> rights = new HashMap<UserRightId, UserRight>();
+  private final Map<UserRightId, UserRight> rights = new HashMap<UserRightId, UserRight>();
 
-  private Map<String, UserRightId> rightIds = new HashMap<String, UserRightId>();
+  private final Map<String, UserRightId> rightIds = new HashMap<String, UserRightId>();
 
-  private List<UserRight> orderedRights = new ArrayList<UserRight>();
+  private final List<UserRight> orderedRights = new ArrayList<UserRight>();
 
-  private AccessChecker accessChecker;
+  private final AccessChecker accessChecker;
 
   public static UserRights instance()
   {
@@ -135,22 +135,23 @@ public class UserRights
   private UserRights(final AccessChecker accessChecker)
   {
     this.accessChecker = accessChecker;
-    
 
-    
+
+
     addRight(UserRightCategory.FIBU, UserRightId.FIBU_EMPLOYEE_SALARY, FALSE_READONLY_READWRITE, FIBU_GROUPS).setAvailableGroupRightValues(
         ProjectForgeGroup.CONTROLLING_GROUP, UserRightValue.FALSE, UserRightValue.READONLY);
     addRight(UserRightCategory.FIBU, UserRightId.FIBU_AUSGANGSRECHNUNGEN, FALSE_READONLY_READWRITE, FIBU_ORGA_GROUPS)
-        .setReadOnlyForControlling();
+    .setReadOnlyForControlling();
     addRight(UserRightCategory.FIBU, UserRightId.FIBU_EINGANGSRECHNUNGEN, FALSE_READONLY_READWRITE, FIBU_ORGA_GROUPS)
-        .setReadOnlyForControlling();
+    .setReadOnlyForControlling();
     addRight(UserRightCategory.FIBU, UserRightId.FIBU_DATEV_IMPORT, FALSE_TRUE, FIBU_GROUPS);
     addRight(UserRightCategory.FIBU, UserRightId.FIBU_COST_UNIT, FALSE_READONLY_READWRITE, FIBU_ORGA_GROUPS).setReadOnlyForControlling();
+    addRight(UserRightCategory.FIBU, UserRightId.FIBU_ACCOUNTS, FALSE_READONLY_READWRITE, FIBU_ORGA_GROUPS).setReadOnlyForControlling();
     addRight(UserRightCategory.ORGA, UserRightId.ORGA_CONTRACTS, FALSE_READONLY_READWRITE, FIBU_ORGA_GROUPS).setReadOnlyForControlling();
     addRight(UserRightCategory.ORGA, UserRightId.ORGA_INCOMING_MAIL, FALSE_READONLY_READWRITE, FIBU_ORGA_GROUPS)
-        .setReadOnlyForControlling();
+    .setReadOnlyForControlling();
     addRight(UserRightCategory.ORGA, UserRightId.ORGA_OUTGOING_MAIL, FALSE_READONLY_READWRITE, FIBU_ORGA_GROUPS)
-        .setReadOnlyForControlling();
+    .setReadOnlyForControlling();
     addRight(new ProjektRight());
     addRight(new AuftragRight());
     addRight(new MebRight());
