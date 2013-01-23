@@ -41,6 +41,7 @@ import org.projectforge.core.Configuration;
 import org.projectforge.fibu.AuftragDao;
 import org.projectforge.fibu.EingangsrechnungDao;
 import org.projectforge.fibu.EmployeeSalaryDao;
+import org.projectforge.fibu.KontoDao;
 import org.projectforge.fibu.ProjektDao;
 import org.projectforge.fibu.RechnungDao;
 import org.projectforge.fibu.datev.DatevImportDao;
@@ -317,7 +318,7 @@ public class MenuItemRegistry
     {
       // COST
       // Only visible if cost is configured:
-      reg.register(cost, MenuItemDefId.ACCOUNT_LIST, 10, KontoListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
+      reg.register(cost, MenuItemDefId.ACCOUNT_LIST, 10, KontoListPage.class, KontoDao.USER_RIGHT_ID, READONLY_READWRITE);
       reg.register(cost, MenuItemDefId.COST1_LIST, 20, Kost1ListPage.class, Kost2Dao.USER_RIGHT_ID, READONLY_READWRITE);
       reg.register(cost, MenuItemDefId.COST2_LIST, 30, Kost2ListPage.class, Kost2Dao.USER_RIGHT_ID, READONLY_READWRITE);
       reg.register(cost, MenuItemDefId.COST2_TYPE_LIST, 40, Kost2ArtListPage.class, Kost2Dao.USER_RIGHT_ID, READONLY_READWRITE);
