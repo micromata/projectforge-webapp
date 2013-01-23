@@ -26,7 +26,6 @@ package de.micromata.less;
 import java.io.File;
 import java.io.Serializable;
 
-import org.apache.wicket.RuntimeConfigurationType;
 import org.apache.wicket.markup.head.CssReferenceHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.protocol.http.WebApplication;
@@ -34,6 +33,7 @@ import org.apache.wicket.util.listener.IChangeListener;
 import org.apache.wicket.util.watch.IModificationWatcher;
 import org.lesscss.LessCompiler;
 import org.lesscss.LessSource;
+import org.projectforge.core.Configuration;
 
 /**
  * Compiler utility class for less resource files
@@ -72,7 +72,7 @@ public class LessWicketApplicationInstantiator implements Serializable
    * @param lessPath
    * @param cssPath
    */
-  public LessWicketApplicationInstantiator(WebApplication application, String folder, String lessPath, String cssPath)
+  public LessWicketApplicationInstantiator(final WebApplication application, final String folder, final String lessPath, final String cssPath)
   {
     this.application = application;
     this.folder = folder;
@@ -98,7 +98,7 @@ public class LessWicketApplicationInstantiator implements Serializable
   private LessSource compile() throws Exception
   {
     // compile file
-    LessCompiler lessCompiler = new LessCompiler();
+    final LessCompiler lessCompiler = new LessCompiler();
 
     // create new source
     final LessSource mainLessSource = new LessSource(lessTargetFile);
@@ -118,12 +118,12 @@ public class LessWicketApplicationInstantiator implements Serializable
     instantiateFiles();
     final LessSource mainLessSource = compile();
 
-    if (RuntimeConfigurationType.DEVELOPMENT.equals(application.getConfigurationType())) {
+    if (Configuration.isDevelopmentMode() == true) {
       // only add this fancy resource watcher in dev mode
       final IModificationWatcher resourceWatcher = application.getResourceSettings().getResourceWatcher(true);
       // add watchers
       addWatcher(resourceWatcher, mainLessSource);
-      for (LessSource importedSource : mainLessSource.getImports().values()) {
+      for (final LessSource importedSource : mainLessSource.getImports().values()) {
         addWatcher(resourceWatcher, importedSource);
       }
 
@@ -150,7 +150,7 @@ public class LessWicketApplicationInstantiator implements Serializable
       {
         try {
           compile();
-        } catch (Exception e) {
+        } catch (final Exception e) {
           log.error("unable to compile less source during watcher for file " + importedSource.getAbsolutePath(), e);
         }
       }
