@@ -32,6 +32,8 @@ import org.apache.wicket.util.resource.FileResourceStream;
 import org.apache.wicket.util.resource.IResourceStream;
 
 /**
+ * Wicket adaption of LESS resource reference
+ *
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  */
 public class LessResourceReference extends ResourceReference
@@ -47,17 +49,17 @@ public class LessResourceReference extends ResourceReference
   @Override
   public IResource getResource()
   {
-    return new Hurzel(getName(), file);
+    return new LessPackageResource(getName(), file);
   }
 
-  private static class Hurzel extends PackageResource
+  private static class LessPackageResource extends PackageResource
   {
 
     private File file;
 
-    protected Hurzel(String name, File file)
+    protected LessPackageResource(String name, File file)
     {
-      super(Hurzel.class, name, null, null, null);
+      super(LessPackageResource.class, name, null, null, null);
       this.file = file;
     }
 
