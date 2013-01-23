@@ -74,7 +74,7 @@ public class TeamCalCalendarForm extends CalendarForm
   protected void init()
   {
     super.init();
-    final TeamCalDialog dialog = new TeamCalDialog(fieldset.newChildId(), new ResourceModel("plugins.teamcal.title.list"), filter);
+    final TeamCalDialog dialog = new TeamCalDialog(parentPage.newModalDialogId(), new ResourceModel("plugins.teamcal.title.list"), filter);
     parentPage.add(dialog);
     dialog.init();
     final IconButtonPanel calendarButtonPanel = new AjaxIconButtonPanel(buttonGroupPanel.newChildId(), IconType.CALENDAR,
@@ -88,6 +88,8 @@ public class TeamCalCalendarForm extends CalendarForm
       protected void onSubmit(final AjaxRequestTarget target)
       {
         dialog.open(target);
+        // Redraw the content:
+        dialog.redraw().addContent(target);
       }
     };
     calendarButtonPanel.setDefaultFormProcessing(false);

@@ -66,6 +66,8 @@ public abstract class ModalDialog extends Panel
 
   private SingleButtonPanel closeButtonPanel;
 
+  private boolean showCancelButton;
+
   private Form< ? > form;
 
   /**
@@ -94,6 +96,16 @@ public abstract class ModalDialog extends Panel
   public ModalDialog setBigWindow()
   {
     mainContainer.add(AttributeModifier.append("class", "big-modal"));
+    return this;
+  }
+
+  /**
+   * Display the cancel button.
+   * @return this for chaining.
+   */
+  public ModalDialog setShowCancelButton()
+  {
+    this.showCancelButton = true;
     return this;
   }
 
@@ -162,9 +174,10 @@ public abstract class ModalDialog extends Panel
     response.render(OnDomReadyHeaderItem.forScript(script));
   }
 
-  public void open(final AjaxRequestTarget target)
+  public ModalDialog open(final AjaxRequestTarget target)
   {
     target.appendJavaScript("$('#" + getMainContainerMarkupId() + "').modal('show');");
+    return this;
   }
 
   public void close(final AjaxRequestTarget target)
@@ -224,13 +237,6 @@ public abstract class ModalDialog extends Panel
     return this;
   }
 
-  /**
-   * Does nothing at default.
-   */
-  public void redraw()
-  {
-  }
-
   @SuppressWarnings("serial")
   protected void init(final Form< ? > form)
   {
@@ -238,6 +244,17 @@ public abstract class ModalDialog extends Panel
     mainContainer.add(form);
     form.add(gridContentContainer);
     form.add(buttonBarContainer);
+    if (showCancelButton == true) {
+      final SingleButtonPanel cancelButton = appendNewAjaxActionButton(new AjaxCallback() {
+        @Override
+        public void callback(final AjaxRequestTarget target)
+        {
+          onCancelButtonSubmit(target);
+          close(target);
+        }
+      }, getString("cancel"), SingleButtonPanel.CANCEL);
+      cancelButton.getButton().setDefaultFormProcessing(false);
+    }
     closeButtonPanel = appendNewAjaxActionButton(new AjaxFormSubmitCallback() {
 
       @Override
@@ -254,6 +271,7 @@ public abstract class ModalDialog extends Panel
       }
     }, closeButtonLabel != null ? closeButtonLabel : getString("close"), SingleButtonPanel.GREY);
     buttonBarContainer.add(actionButtons.getRepeatingView());
+    form.setDefaultButton(closeButtonPanel.getButton());
     gridBuilder = new GridBuilder(gridContentContainer, "flowform");
   }
 
@@ -263,6 +281,14 @@ public abstract class ModalDialog extends Panel
    * @param target
    */
   protected void handleCloseEvent(final AjaxRequestTarget target)
+  {
+  }
+
+  /**
+   * Called if user hit the cancel button.
+   * @param target
+   */
+  protected void onCancelButtonSubmit(final AjaxRequestTarget target)
   {
   }
 

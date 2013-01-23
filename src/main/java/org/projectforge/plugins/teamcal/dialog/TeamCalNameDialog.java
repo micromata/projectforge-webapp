@@ -23,30 +23,23 @@
 
 package org.projectforge.plugins.teamcal.dialog;
 
-import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
-import org.projectforge.web.dialog.PFDialog;
-import org.projectforge.web.wicket.components.SingleButtonPanel;
-
-import de.micromata.wicket.ajax.AjaxFormSubmitCallback;
+import org.projectforge.web.dialog.ModalDialog;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
 
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  * 
  */
-public abstract class TeamCalNameDialog extends PFDialog
+public abstract class TeamCalNameDialog extends ModalDialog
 {
   private static final long serialVersionUID = 8687197318833240410L;
 
   private final IModel<String> nameModel;
-
-  private Form<Void> form;
-
-  private TextField<String> nameField;
 
   /**
    * @param id
@@ -55,37 +48,28 @@ public abstract class TeamCalNameDialog extends PFDialog
    */
   public TeamCalNameDialog(final String id, final IModel<String> titleModel, final IModel<String> nameModel)
   {
-    super(id, titleModel);
+    super(id);
     this.nameModel = nameModel;
+    setTitle(titleModel);
   }
 
   /**
-   * @see org.projectforge.web.dialog.PFDialog#onInitialize()
+   * @see org.projectforge.web.dialog.ModalDialog#init()
    */
   @Override
-  protected void onInitialize()
+  public void init()
   {
-    super.onInitialize();
-    final AjaxFormSubmitCallback okCallback = new AjaxFormSubmitCallback() {
-      private static final long serialVersionUID = 7224559508934430123L;
+    init(new Form<String>(getFormId()));
+    setCloseButtonLabel(getString("save"));
+  }
 
-      /**
-       * @see de.micromata.wicket.ajax.AjaxFormSubmitCallback#onError(org.apache.wicket.ajax.AjaxRequestTarget,
-       *      org.apache.wicket.markup.html.form.Form)
-       */
-      @Override
-      public void onError(final AjaxRequestTarget target, final Form< ? > form)
-      {
-        TeamCalNameDialog.this.onError(target);
-      }
-
-      @Override
-      public void callback(final AjaxRequestTarget target)
-      {
-        onConfirm(target);
-      }
-    };
-    appendNewAjaxActionButton(okCallback, getString("save"), form, SingleButtonPanel.DEFAULT_SUBMIT);
+  /**
+   * @see org.projectforge.web.dialog.ModalDialog#onCloseButtonSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
+   */
+  @Override
+  protected void onCloseButtonSubmit(final AjaxRequestTarget target)
+  {
+    onConfirm(target);
   }
 
   /**
@@ -93,29 +77,13 @@ public abstract class TeamCalNameDialog extends PFDialog
    */
   protected abstract void onConfirm(AjaxRequestTarget target);
 
-  /**
-   * @param target
-   */
-  protected abstract void onError(AjaxRequestTarget target);
-
-  /**
-   * @see org.projectforge.web.dialog.PFDialog#open(org.apache.wicket.ajax.AjaxRequestTarget)
-   */
-  @Override
-  public void open(final AjaxRequestTarget target)
+  public TeamCalNameDialog redraw()
   {
-    nameField.setRequired(true);
-    target.add(form);
-    super.open(target);
-  }
-
-  /**
-   * @see org.projectforge.web.dialog.PFDialog#getDialogContent(java.lang.String)
-   */
-  @Override
-  protected Component getDialogContent(final String wicketId)
-  {
-    return new Content(wicketId);
+    clearContent();
+    final DivPanel panel = gridBuilder.getPanel();
+    final Content content = new Content(panel.newChildId());
+    panel.add(content);
+    return this;
   }
 
   /**
@@ -141,11 +109,9 @@ public abstract class TeamCalNameDialog extends PFDialog
     protected void onInitialize()
     {
       super.onInitialize();
-      form = new Form<Void>("form");
-      form.setOutputMarkupId(true);
-      add(form);
-      nameField = new TextField<String>("name", nameModel);
-      form.add(nameField);
+      final TextField<String> nameField = new TextField<String>("name", nameModel);
+      nameField.setRequired(true);
+      add(nameField);
     }
 
   }

@@ -124,18 +124,10 @@ public class RecurrenceChangeDialog extends ModalDialog
   }
 
   /**
-   * @see org.projectforge.web.dialog.ModalDialog#handleCloseEvent(org.apache.wicket.ajax.AjaxRequestTarget)
-   */
-  @Override
-  protected void handleCloseEvent(final AjaxRequestTarget target)
-  {
-  }
-
-  /**
    * @see org.projectforge.web.dialog.ModalDialog#open(org.apache.wicket.ajax.AjaxRequestTarget)
    */
   @Override
-  public void open(final AjaxRequestTarget target)
+  public RecurrenceChangeDialog open(final AjaxRequestTarget target)
   {
     log.error("Dear developer, please use open(target, eventDo).");
     throw new UnsupportedOperationException();

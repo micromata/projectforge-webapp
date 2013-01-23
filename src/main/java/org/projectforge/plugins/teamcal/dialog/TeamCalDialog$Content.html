@@ -4,8 +4,7 @@
       <wicket:message key="plugins.teamcal.selectTemplate" />
     </h3>
     <div class="teamCalTemplate">
-      <span class="left" wicket:id="templateList"></span>
-      <span class="right" wicket:id="buttonGroup">[delete | edit | add]</span>
+      <span class="left" wicket:id="templateList"></span> <span class="right" wicket:id="buttonGroup">[delete | edit | add]</span>
     </div>
     <div>
       <h3>
@@ -35,13 +34,11 @@
     <h3>
       <wicket:message key="plugins.teamcal.selectDefaultCalendar" />
     </h3>
-    <form wicket:id="defaultForm">
-      <select wicket:id="defaultSelect">
-        <wicket:container wicket:id="options">
-          <option wicket:id="option">Option Label</option>
-        </wicket:container>
-      </select>
-    </form>
+    <select wicket:id="defaultSelect">
+      <wicket:container wicket:id="options">
+        <option wicket:id="option">Option Label</option>
+      </wicket:container>
+    </select>
   </div>
   <div wicket:id="nameDialog"></div>
 </wicket:panel>

@@ -62,7 +62,6 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRights;
 import org.projectforge.web.common.ColorPickerPanel;
 import org.projectforge.web.dialog.ModalDialog;
-import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.ButtonGroupPanel;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
@@ -124,7 +123,7 @@ public class TeamCalDialog extends ModalDialog
     super(id);
     this.filter = filter;
     setTitle(titleModel);
-    setBigWindow();
+    setBigWindow().setShowCancelButton();
     selectedCalendars = new LinkedList<TeamCalDO>();
     teamEventRight = (TeamEventRight) UserRights.instance().getRight(TeamEventDao.USER_RIGHT_ID);
   }
@@ -139,6 +138,17 @@ public class TeamCalDialog extends ModalDialog
   }
 
   /**
+   * @see org.projectforge.web.dialog.ModalDialog#onCancelButtonSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
+   */
+  @Override
+  protected void onCancelButtonSubmit(final AjaxRequestTarget target)
+  {
+    // Restore values (valid at opening time of this dialog):
+    filter.copyValuesFrom(backupFilter);
+    close(target);
+  }
+
+  /**
    * @see org.projectforge.web.dialog.ModalDialog#onCloseButtonSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
    */
   @Override
@@ -147,54 +157,37 @@ public class TeamCalDialog extends ModalDialog
     myClose(target);
   }
 
+  /**
+   * @see org.projectforge.web.dialog.ModalDialog#init()
+   */
   @Override
   public void init()
   {
     init(new Form<String>(getFormId()));
     TIMESHEET_CALENDAR.setTitle(getString("plugins.teamcal.timeSheetCalendar"));
     TIMESHEET_CALENDAR.setId(TIMESHEET_CALENDAR_ID);
-
-    final DivPanel panel = gridBuilder.getPanel();
-    final Content content = new Content(panel.newChildId());
-    panel.add(content);
-
-    appendNewAjaxActionButton(new AjaxCallback() {
-      private static final long serialVersionUID = -8154276568761839693L;
-
-      @Override
-      public void callback(final AjaxRequestTarget target)
-      {
-        // Restore values (valid at opening time of this dialog):
-        filter.copyValuesFrom(backupFilter);
-        close(target);
-      }
-    }, getString("cancel"), SingleButtonPanel.CANCEL);
-
     // confirm
     setCloseButtonTooltip(null, new ResourceModel("plugins.teamcal.calendar.filterDialog.closeButton.tooltip"));
   }
 
-  // public void redraw(final AbstractRechnungsPositionDO position, final RechnungCostTablePanel costTable)
-  // {
-  // this.position = position;
-  // this.costTable = costTable;
-  // clearContent();
-  // {
-  // final DivPanel panel = gridBuilder.getPanel();
-  // rechnungCostEditTablePanel = new RechnungCostEditTablePanel(panel.newChildId());
-  // panel.add(rechnungCostEditTablePanel);
-  // rechnungCostEditTablePanel.add(position);
-  // }
-  // }
+  public TeamCalDialog redraw()
+  {
+    clearContent();
+    final DivPanel panel = gridBuilder.getPanel();
+    final Content content = new Content(panel.newChildId());
+    panel.add(content);
+    return this;
+  }
 
   /**
-   * @see org.projectforge.web.dialog.PFDialog#open(org.apache.wicket.ajax.AjaxRequestTarget)
+   * @see org.projectforge.web.dialog.ModalDialog#open(org.apache.wicket.ajax.AjaxRequestTarget)
    */
   @Override
-  public void open(final AjaxRequestTarget target)
+  public TeamCalDialog open(final AjaxRequestTarget target)
   {
     backupFilter = new TeamCalCalendarFilter().copyValuesFrom(filter);
     super.open(target);
+    return this;
   }
 
   private void myClose(final AjaxRequestTarget target)
@@ -380,6 +373,8 @@ public class TeamCalDialog extends ModalDialog
             }
           };
           nameDialog.open(target);
+          // Redraw the content:
+          nameDialog.redraw().addContent(target);
         }
       };
       addTemplateButton.setDefaultFormProcessing(false);
@@ -399,6 +394,8 @@ public class TeamCalDialog extends ModalDialog
           if (activeTemplateEntry != null) {
             currentName = activeTemplateEntry.getName();
             nameDialog.open(target);
+            // Redraw the content:
+            nameDialog.redraw().addContent(target);
             // this callback is evaluated when the name dialog was entered!
             currentAjaxCallback = new AjaxCallback() {
               private static final long serialVersionUID = -6959790939627419710L;
@@ -498,8 +495,6 @@ public class TeamCalDialog extends ModalDialog
       };
 
       // TEAMCAL DROPDOWN
-      final Form<Void> defaultForm = new Form<Void>("defaultForm");
-      add(defaultForm);
       final IModel<TemplateEntry> activeTemplateEntryModel = new PropertyModel<TemplateEntry>(filter, "activeTemplateEntry");
       select = new Select<Integer>("defaultSelect", new PropertyModel<Integer>(activeTemplateEntryModel, "defaultCalendarId")) {
         private static final long serialVersionUID = -1826120411566623945L;
@@ -548,10 +543,10 @@ public class TeamCalDialog extends ModalDialog
         }
       });
       select.setOutputMarkupId(true);
-      defaultForm.add(select);
+      add(select);
 
-      nameDialog = new TeamCalNameDialog("nameDialog", new ResourceModel("plugins.teamcal.title.list"), new PropertyModel<String>(
-          Content.this, "currentName")) {
+      nameDialog = new TeamCalNameDialog("nameDialog", new ResourceModel("plugins.teamcal.title.list"),
+          new PropertyModel<String>(Content.this, "currentName")) {
         private static final long serialVersionUID = 95566184649574010L;
 
         @Override
@@ -565,17 +560,9 @@ public class TeamCalDialog extends ModalDialog
           editTemplateButton.setVisible(filter.getTemplateEntries().isEmpty() == false);
           addToTarget(target, templateChoice.getDropDownChoice(), bottomContainer, select);
         }
-
-        /**
-         * @see org.projectforge.plugins.teamcal.dialog.TeamCalNameDialog#onError(org.apache.wicket.ajax.AjaxRequestTarget)
-         */
-        @Override
-        protected void onError(final AjaxRequestTarget target)
-        {
-          target.add(dialogContainer);
-        }
       };
       add(nameDialog);
+      nameDialog.init();
     }
 
     private void addToTarget(final AjaxRequestTarget target, final Component... components)

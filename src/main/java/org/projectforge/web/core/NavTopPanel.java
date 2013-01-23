@@ -76,7 +76,7 @@ public class NavTopPanel extends NavAbstractPanel
 
   private final UserXmlPreferencesCache userXmlPreferencesCache;
 
-  private ModalDialog bookmarkDialog;
+  private BookmarkDialog bookmarkDialog;
 
   public NavTopPanel(final String id, final UserXmlPreferencesCache userXmlPreferencesCache, final AccessChecker accessChecker)
   {
@@ -136,9 +136,7 @@ public class NavTopPanel extends NavAbstractPanel
         {
           bookmarkDialog.open(target);
           // Redraw the content:
-          bookmarkDialog.redraw();
-          // The content was changed:
-          bookmarkDialog.addContent(target);
+          bookmarkDialog.redraw().addContent(target);
         }
       };
       add(showBookmarkLink);
@@ -243,37 +241,48 @@ public class NavTopPanel extends NavAbstractPanel
     }
   }
 
-  @SuppressWarnings("serial")
   private void addBookmarkDialog()
   {
-    final AbstractSecuredPage parentPage = (AbstractSecuredPage)getPage();
-    bookmarkDialog = new ModalDialog(parentPage.newModalDialogId()) {
-      @Override
-      public void init()
-      {
-        setTitle(getString("bookmark.title"));
-        init(new Form<String>(getFormId()));
-        gridBuilder.newFormHeading(""); // Otherwise it's empty and an IllegalArgumentException is thrown.
-      }
-
-      @Override
-      public void redraw()
-      {
-        clearContent();
-        final AbstractSecuredPage page = (AbstractSecuredPage) NavTopPanel.this.getPage();
-        {
-          final FieldsetPanel fs = gridBuilder.newFieldset(getString("bookmark.directPageLink")).setLabelSide(false);
-          fs.add(new TextArea<String>(fs.getTextAreaId(), new Model<String>(page.getPageAsLink())));
-        }
-        final PageParameters params = page.getBookmarkableInitialParameters();
-        if (params.isEmpty() == false) {
-          final FieldsetPanel fs = gridBuilder.newFieldset(getString(page.getTitleKey4BookmarkableInitialParameters())).setLabelSide(false);
-          fs.add(new TextArea<String>(fs.getTextAreaId(), new Model<String>(page.getPageAsLink(params))));
-        }
-      }
-    };
+    final AbstractSecuredPage parentPage = (AbstractSecuredPage) getPage();
+    bookmarkDialog = new BookmarkDialog(parentPage.newModalDialogId());
     bookmarkDialog.setOutputMarkupId(true);
     parentPage.add(bookmarkDialog);
     bookmarkDialog.init();
+  }
+
+  @SuppressWarnings("serial")
+  private class BookmarkDialog extends ModalDialog
+  {
+    /**
+     * @param id
+     */
+    public BookmarkDialog(final String id)
+    {
+      super(id);
+    }
+
+    @Override
+    public void init()
+    {
+      setTitle(getString("bookmark.title"));
+      init(new Form<String>(getFormId()));
+      gridBuilder.newFormHeading(""); // Otherwise it's empty and an IllegalArgumentException is thrown.
+    }
+
+    private BookmarkDialog redraw()
+    {
+      clearContent();
+      final AbstractSecuredPage page = (AbstractSecuredPage) NavTopPanel.this.getPage();
+      {
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("bookmark.directPageLink")).setLabelSide(false);
+        fs.add(new TextArea<String>(fs.getTextAreaId(), new Model<String>(page.getPageAsLink())));
+      }
+      final PageParameters params = page.getBookmarkableInitialParameters();
+      if (params.isEmpty() == false) {
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString(page.getTitleKey4BookmarkableInitialParameters())).setLabelSide(false);
+        fs.add(new TextArea<String>(fs.getTextAreaId(), new Model<String>(page.getPageAsLink(params))));
+      }
+      return this;
+    }
   }
 }
