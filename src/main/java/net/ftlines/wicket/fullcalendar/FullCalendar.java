@@ -36,35 +36,53 @@ import org.apache.wicket.util.string.Strings;
 import org.apache.wicket.util.template.PackageTextTemplate;
 import org.apache.wicket.util.template.TextTemplate;
 
-public class FullCalendar extends AbstractFullCalendar implements IBehaviorListener {
+public class FullCalendar extends AbstractFullCalendar implements IBehaviorListener
+{
   private static final long serialVersionUID = 6517344280923639300L;
 
-  private static final TextTemplate EVENTS = new PackageTextTemplate(FullCalendar.class, "FullCalendar.events.tpl");
+  /**
+   * Field can't be static final because otherwise a severe Exception is thrown on the server's startup due to loading sessions from
+   * persistent storage.
+   */
+  private static TextTemplate EVENTS;
 
   private final Config config;
+
   private EventDroppedCallback eventDropped;
+
   private EventResizedCallback eventResized;
+
   private GetEventsCallback getEvents;
+
   private DateRangeSelectedCallback dateRangeSelected;
+
   private EventClickedCallback eventClicked;
+
   private ViewDisplayCallback viewDisplay;
 
-  public FullCalendar(final String id, final Config config) {
+  public FullCalendar(final String id, final Config config)
+  {
     super(id);
+    if (EVENTS == null) {
+      EVENTS = new PackageTextTemplate(FullCalendar.class, "FullCalendar.events.tpl");
+    }
     this.config = config;
     setVersioned(false);
   }
 
-  public Config getConfig() {
+  public Config getConfig()
+  {
     return config;
   }
 
-  public EventManager getEventManager() {
+  public EventManager getEventManager()
+  {
     return new EventManager(this);
   }
 
   @Override
-  protected void onInitialize() {
+  protected void onInitialize()
+  {
     super.onInitialize();
     for (final EventSource source : config.getEventSources()) {
 
@@ -74,13 +92,15 @@ public class FullCalendar extends AbstractFullCalendar implements IBehaviorListe
   }
 
   @Override
-  protected void onBeforeRender() {
+  protected void onBeforeRender()
+  {
     super.onBeforeRender();
     setupCallbacks();
   }
 
   @SuppressWarnings("serial")
-  private void setupCallbacks() {
+  private void setupCallbacks()
+  {
 
     if (getEvents != null)
       return;
@@ -160,7 +180,8 @@ public class FullCalendar extends AbstractFullCalendar implements IBehaviorListe
   }
 
   @Override
-  public void renderHead(final IHeaderResponse response) {
+  public void renderHead(final IHeaderResponse response)
+  {
     super.renderHead(response);
 
     String configuration = "$(\"#" + getMarkupId() + "\").fullCalendarExt(";
@@ -171,32 +192,39 @@ public class FullCalendar extends AbstractFullCalendar implements IBehaviorListe
 
   }
 
-  protected boolean onEventDropped(final DroppedEvent event, final CalendarResponse response) {
+  protected boolean onEventDropped(final DroppedEvent event, final CalendarResponse response)
+  {
     return false;
   }
 
-  protected boolean onEventResized(final ResizedEvent event, final CalendarResponse response) {
+  protected boolean onEventResized(final ResizedEvent event, final CalendarResponse response)
+  {
     return false;
   }
 
-  protected void onDateRangeSelected(final SelectedRange range, final CalendarResponse response) {
+  protected void onDateRangeSelected(final SelectedRange range, final CalendarResponse response)
+  {
 
   }
 
-  protected void onEventClicked(final ClickedEvent event, final CalendarResponse response) {
+  protected void onEventClicked(final ClickedEvent event, final CalendarResponse response)
+  {
 
   }
 
-  protected void onViewDisplayed(final View view, final CalendarResponse response) {
+  protected void onViewDisplayed(final View view, final CalendarResponse response)
+  {
 
   }
 
-  public AjaxConcurrency getAjaxConcurrency() {
+  public AjaxConcurrency getAjaxConcurrency()
+  {
     return AjaxConcurrency.QUEUE;
   }
 
   @Override
-  public void onRequest() {
+  public void onRequest()
+  {
     getEvents.onRequest();
 
   }
