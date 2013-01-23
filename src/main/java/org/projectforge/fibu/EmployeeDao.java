@@ -30,15 +30,14 @@ import java.util.StringTokenizer;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.Validate;
-import org.projectforge.access.OperationType;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.fibu.kost.Kost1DO;
 import org.projectforge.fibu.kost.Kost1Dao;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserDao;
+import org.projectforge.user.UserRightId;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,6 +48,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class EmployeeDao extends BaseDao<EmployeeDO>
 {
+  public static final UserRightId USER_RIGHT_ID = UserRightId.FIBU_EMPLOYEE;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(EmployeeDao.class);
 
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "user.firstname", "user.lastname", "user.description",
@@ -61,6 +62,7 @@ public class EmployeeDao extends BaseDao<EmployeeDO>
   public EmployeeDao()
   {
     super(EmployeeDO.class);
+    userRightId = USER_RIGHT_ID;
   }
 
   @Override
@@ -153,31 +155,6 @@ public class EmployeeDao extends BaseDao<EmployeeDO>
       });
     }
     return list;
-  }
-
-  /**
-   * @see org.projectforge.core.BaseDao#hasSelectAccess()
-   */
-  @Override
-  public boolean hasSelectAccess(final PFUserDO user, final boolean throwException)
-  {
-    return accessChecker.isUserMemberOfGroup(user, throwException, ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
-  }
-
-  @Override
-  public boolean hasSelectAccess(final PFUserDO user, final EmployeeDO obj, final boolean throwException)
-  {
-    return hasSelectAccess(user, throwException);
-  }
-
-  /**
-   * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
-   */
-  @Override
-  public boolean hasAccess(final PFUserDO user, final EmployeeDO obj, final EmployeeDO oldObj, final OperationType operationType,
-      final boolean throwException)
-  {
-    return accessChecker.isUserMemberOfGroup(user, throwException, ProjectForgeGroup.FINANCE_GROUP);
   }
 
   @Override

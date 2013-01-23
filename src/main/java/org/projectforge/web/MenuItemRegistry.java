@@ -40,6 +40,7 @@ import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
 import org.projectforge.fibu.AuftragDao;
 import org.projectforge.fibu.EingangsrechnungDao;
+import org.projectforge.fibu.EmployeeDao;
 import org.projectforge.fibu.EmployeeSalaryDao;
 import org.projectforge.fibu.KontoDao;
 import org.projectforge.fibu.ProjektDao;
@@ -295,7 +296,7 @@ public class MenuItemRegistry
         }
       };
       reg.register(projects);
-      reg.register(fibu, MenuItemDefId.EMPLOYEE_LIST, 60, EmployeeListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
+      reg.register(fibu, MenuItemDefId.EMPLOYEE_LIST, 60, EmployeeListPage.class, EmployeeDao.USER_RIGHT_ID, READONLY_READWRITE);
       reg.register(fibu, MenuItemDefId.EMPLOYEE_SALARY_LIST, 70, EmployeeSalaryListPage.class, EmployeeSalaryDao.USER_RIGHT_ID,
           READONLY_READWRITE);
     }

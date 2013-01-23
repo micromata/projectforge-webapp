@@ -138,6 +138,7 @@ public class UserRights
 
 
 
+    addRight(UserRightCategory.FIBU, UserRightId.FIBU_EMPLOYEE, FALSE_READONLY_READWRITE, FIBU_ORGA_GROUPS).setReadOnlyForControlling();
     addRight(UserRightCategory.FIBU, UserRightId.FIBU_EMPLOYEE_SALARY, FALSE_READONLY_READWRITE, FIBU_GROUPS).setAvailableGroupRightValues(
         ProjectForgeGroup.CONTROLLING_GROUP, UserRightValue.FALSE, UserRightValue.READONLY);
     addRight(UserRightCategory.FIBU, UserRightId.FIBU_AUSGANGSRECHNUNGEN, FALSE_READONLY_READWRITE, FIBU_ORGA_GROUPS)

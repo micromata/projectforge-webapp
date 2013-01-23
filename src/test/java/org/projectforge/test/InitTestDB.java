@@ -300,6 +300,7 @@ public class InitTestDB
     user//
     .addRight(new UserRightDO(UserRightId.FIBU_AUSGANGSRECHNUNGEN, UserRightValue.READWRITE)) //
     .addRight(new UserRightDO(UserRightId.FIBU_EINGANGSRECHNUNGEN, UserRightValue.READWRITE)) //
+    .addRight(new UserRightDO(UserRightId.FIBU_EMPLOYEE, UserRightValue.READWRITE)) //
     .addRight(new UserRightDO(UserRightId.FIBU_EMPLOYEE_SALARY, UserRightValue.READWRITE)) //
     .addRight(new UserRightDO(UserRightId.FIBU_ACCOUNTS, UserRightValue.READWRITE)) //
     .addRight(new UserRightDO(UserRightId.FIBU_COST_UNIT, UserRightValue.READWRITE)) //
@@ -312,6 +313,7 @@ public class InitTestDB
     user//
     .addRight(new UserRightDO(UserRightId.FIBU_AUSGANGSRECHNUNGEN, UserRightValue.READWRITE)) //
     .addRight(new UserRightDO(UserRightId.FIBU_EINGANGSRECHNUNGEN, UserRightValue.READWRITE)) //
+    .addRight(new UserRightDO(UserRightId.FIBU_EMPLOYEE, UserRightValue.READWRITE)) //
     .addRight(new UserRightDO(UserRightId.FIBU_EMPLOYEE_SALARY, UserRightValue.READWRITE)) //
     .addRight(new UserRightDO(UserRightId.FIBU_ACCOUNTS, UserRightValue.READWRITE)) //
     .addRight(new UserRightDO(UserRightId.FIBU_COST_UNIT, UserRightValue.READWRITE)) //

@@ -48,13 +48,15 @@ public class UserRightId implements I18nEnum, Comparable<UserRightId>, Serializa
   public static UserRightId FIBU_AUSGANGSRECHNUNGEN = new UserRightId("FIBU_AUSGANGSRECHNUNGEN", "fibu2",
       "access.right.fibu.ausgangsrechnungen");
 
-  public static UserRightId FIBU_EMPLOYEE_SALARY = new UserRightId("FIBU_EMPLOYEE_SALARY", "fibu3", "access.right.fibu.employeeSalaries");
+  public static UserRightId FIBU_EMPLOYEE = new UserRightId("FIBU_EMPLOYEE", "fibu3", "access.right.fibu.employee");
 
-  public static UserRightId FIBU_DATEV_IMPORT = new UserRightId("FIBU_DATEV_IMPORT", "fibu4", "access.right.fibu.datevImport");
+  public static UserRightId FIBU_EMPLOYEE_SALARY = new UserRightId("FIBU_EMPLOYEE_SALARY", "fibu4", "access.right.fibu.employeeSalaries");
 
-  public static UserRightId FIBU_COST_UNIT = new UserRightId("FIBU_COST_UNIT", "fibu5", "access.right.fibu.costUnit");
+  public static UserRightId FIBU_DATEV_IMPORT = new UserRightId("FIBU_DATEV_IMPORT", "fibu5", "access.right.fibu.datevImport");
 
-  public static UserRightId FIBU_ACCOUNTS = new UserRightId("FIBU_ACCOUNTS", "fibu6", "access.right.fibu.accounts");
+  public static UserRightId FIBU_COST_UNIT = new UserRightId("FIBU_COST_UNIT", "fibu6", "access.right.fibu.costUnit");
+
+  public static UserRightId FIBU_ACCOUNTS = new UserRightId("FIBU_ACCOUNTS", "fibu7", "access.right.fibu.accounts");
 
   public static UserRightId MISC_MEB = new UserRightId("MISC_MEB", "misc1", "access.right.misc.meb");
 

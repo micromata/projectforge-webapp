@@ -66,7 +66,7 @@ public class EmployeeEditForm extends AbstractEditForm<EmployeeDO, EmployeeEditP
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.employee.user"));
       final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(data, "user"), parentPage,
           "userId");
-      userSelectPanel.setRequired(true);
+      userSelectPanel.setShowSelectMeButton(false).setRequired(true);
       fs.add(userSelectPanel);
       userSelectPanel.init();
     }
