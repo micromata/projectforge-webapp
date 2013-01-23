@@ -72,6 +72,8 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO> implements Co
   // Only used for detecting changes:
   private PFUserDO currentUser;
 
+  private boolean showSelectMeButton = true;
+
   /**
    * @param id
    * @param model
@@ -201,6 +203,17 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO> implements Co
     this.defaultFormProcessing = defaultFormProcessing;
   }
 
+  /**
+   * Must be called befor {@link #init()}. If false then the select-me-button is never displayed (default is true).
+   * @param showSelectMeButton the showSelectMeButton to set
+   * @return this for chaining.
+   */
+  public UserSelectPanel setShowSelectMeButton(final boolean showSelectMeButton)
+  {
+    this.showSelectMeButton = showSelectMeButton;
+    return this;
+  }
+
   @Override
   @SuppressWarnings("serial")
   public UserSelectPanel init()
@@ -221,7 +234,7 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO> implements Co
       {
         // Is visible if no user is given or the given user is not the current logged in user.
         final PFUserDO user = getModelObject();
-        return user == null || user.getId().equals(PFUserContext.getUser().getId()) == false;
+        return showSelectMeButton == true && (user == null || user.getId().equals(PFUserContext.getUser().getId()) == false);
       }
     };
     add(selectMeButton);
