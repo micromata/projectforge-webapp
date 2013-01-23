@@ -37,6 +37,7 @@ import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.NumberHelper;
@@ -321,6 +322,7 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
       row.add(new Label("customer", "").setVisible(false));
       row.add(new Label("project", "").setVisible(false));
       final Label title = new Label("costType", getString("fibu.monthlyEmployeeReport.totalSum"));
+      WicketUtils.addTooltip(title, new ResourceModel("fibu.monthlyEmployeeReport.totalSum.tooltip"));
       row.add(title);
       title.add(AttributeModifier.replace("colspan", "4"));
       title.add(AttributeModifier.replace("style", "font-weight: bold; text-align: right;"));
