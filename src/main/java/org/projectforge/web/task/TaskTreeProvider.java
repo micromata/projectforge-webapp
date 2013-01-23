@@ -35,6 +35,7 @@ import org.apache.wicket.extensions.markup.html.repeater.tree.ITreeProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskFilter;
 import org.projectforge.task.TaskNode;
@@ -50,9 +51,9 @@ public class TaskTreeProvider implements ITreeProvider<TaskNode>
 {
   private static final long serialVersionUID = 1416146119319068085L;
 
-  private final TaskTree taskTree;
+  private transient TaskTree taskTree;
 
-  private final TaskDao taskDao;
+  private transient TaskDao taskDao;
 
   private final TaskFilter taskFilter;
 
@@ -61,10 +62,8 @@ public class TaskTreeProvider implements ITreeProvider<TaskNode>
   /**
    * Construct.
    */
-  public TaskTreeProvider(final TaskTree taskTree, final TaskDao taskDao, final TaskFilter taskFilter)
+  public TaskTreeProvider(final TaskFilter taskFilter)
   {
-    this.taskTree = taskTree;
-    this.taskDao = taskDao;
     this.taskFilter = taskFilter;
     taskFilter.resetMatch();
   }
@@ -80,6 +79,7 @@ public class TaskTreeProvider implements ITreeProvider<TaskNode>
   @Override
   public Iterator<TaskNode> getRoots()
   {
+    ensureTaskTree();
     return iterator(taskTree.getRootTaskNode().getChilds(), showRootNode);
   }
 
@@ -109,7 +109,7 @@ public class TaskTreeProvider implements ITreeProvider<TaskNode>
   @Override
   public IModel<TaskNode> model(final TaskNode taskNode)
   {
-    return new TaskNodeModel(taskTree, taskNode);
+    return new TaskNodeModel(taskNode);
   }
 
   private Iterator<TaskNode> iterator(final List<TaskNode> nodes)
@@ -119,6 +119,7 @@ public class TaskTreeProvider implements ITreeProvider<TaskNode>
 
   private Iterator<TaskNode> iterator(final List<TaskNode> nodes, final boolean appendRootNode)
   {
+    ensureTaskTree();
     final SortedSet<TaskNode> list = new TreeSet<TaskNode>(new Comparator<TaskNode>() {
       /**
        * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
@@ -172,18 +173,20 @@ public class TaskTreeProvider implements ITreeProvider<TaskNode>
 
     private final Integer id;
 
-    private final TaskTree taskTree;
+    private transient TaskTree taskTree;
 
-    public TaskNodeModel(final TaskTree taskTree, final TaskNode taskNode)
+    public TaskNodeModel(final TaskNode taskNode)
     {
       super(taskNode);
-      this.taskTree = taskTree;
       id = taskNode.getId();
     }
 
     @Override
     protected TaskNode load()
     {
+      if (taskTree == null) {
+        taskTree = Registry.instance().getTaskTree();
+      }
       return taskTree.getTaskNodeById(id);
     }
 
@@ -217,5 +220,15 @@ public class TaskTreeProvider implements ITreeProvider<TaskNode>
   {
     this.showRootNode = showRootNode;
     return this;
+  }
+
+  private void ensureTaskTree()
+  {
+    if (this.taskTree == null) {
+      this.taskTree = Registry.instance().getTaskTree();
+    }
+    if (this.taskDao == null) {
+      this.taskDao = Registry.instance().getDao(TaskDao.class);
+    }
   }
 }

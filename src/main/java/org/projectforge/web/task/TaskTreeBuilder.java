@@ -102,8 +102,6 @@ public class TaskTreeBuilder implements Serializable
 
   private UserGroupCache userGroupCache;
 
-  private TaskDao taskDao;
-
   private TableTree<TaskNode, String> tree;
 
   private AbstractSecuredPage parentPage;
@@ -126,7 +124,7 @@ public class TaskTreeBuilder implements Serializable
     this.parentPage = parentPage;
     final List<IColumn<TaskNode, String>> columns = createColumns();
 
-    tree = new TableTree<TaskNode, String>(id, columns, new TaskTreeProvider(taskTree, taskDao, taskFilter).setShowRootNode(showRootNode),
+    tree = new TableTree<TaskNode, String>(id, columns, new TaskTreeProvider(taskFilter).setShowRootNode(showRootNode),
         Integer.MAX_VALUE, TaskTreeExpansion.getExpansionModel()) {
       private static final long serialVersionUID = 1L;
 
@@ -350,7 +348,6 @@ public class TaskTreeBuilder implements Serializable
       final UserGroupCache userGroupCache)
   {
     this.accessChecker = accessChecker;
-    this.taskDao = taskDao;
     this.taskFormatter = taskFormatter;
     this.priorityFormatter = priorityFormatter;
     this.userFormatter = userFormatter;
