@@ -321,14 +321,15 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
       row.add(comp);
       row.add(new Label("customer", "").setVisible(false));
       row.add(new Label("project", "").setVisible(false));
-      final Label title = new Label("costType", getString("fibu.monthlyEmployeeReport.totalSum"));
+      final Label title = addCostType(row, getString("fibu.monthlyEmployeeReport.totalSum"));
       WicketUtils.addTooltip(title, new ResourceModel("fibu.monthlyEmployeeReport.totalSum.tooltip"));
-      row.add(title);
-      title.add(AttributeModifier.replace("colspan", "4"));
-      title.add(AttributeModifier.replace("style", "font-weight: bold; text-align: right;"));
+      final WebMarkupContainer tdContainer = title.findParent(WebMarkupContainer.class);
+      tdContainer.add(AttributeModifier.replace("colspan", "4"));
+      tdContainer.add(AttributeModifier.replace("style", "font-weight: bold; text-align: right;"));
       final RepeatingView colWeekRepeater = new RepeatingView("colWeekRepeater");
       row.add(colWeekRepeater);
-      for (@SuppressWarnings("unused") final MonthlyEmployeeReportWeek week : report.getWeeks()) {
+      for (@SuppressWarnings("unused")
+      final MonthlyEmployeeReportWeek week : report.getWeeks()) {
         colWeekRepeater.add(new Label(colWeekRepeater.newChildId(), ""));
       }
       row.add(new Label("sum", report.getFormattedTotalDuration()).add(AttributeModifier.replace("style",
@@ -374,7 +375,7 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
         row.add(new Label("customer", cost2.getDescription()).add(AttributeModifier.replace("colspan", "2")));
         row.add(new Label("project", "").setVisible(false));
       }
-      row.add(new Label("costType", costType.getName()));
+      addCostType(row, costType.getName());
     } else {
       if (task != null) {
         // Entries for one task (not cost2).
@@ -385,9 +386,23 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
       result.add(AttributeModifier.replace("colspan", "4"));
       row.add(new Label("customer", "").setVisible(false));
       row.add(new Label("project", "").setVisible(false));
-      row.add(new Label("costType", "").setVisible(false));
+      addCostType(row, null);
     }
     return result;
+  }
+
+  private Label addCostType(final WebMarkupContainer row, final String content)
+  {
+    final WebMarkupContainer costTypeContainer = new WebMarkupContainer("costType");
+    row.add(costTypeContainer);
+    if (content == null) {
+      costTypeContainer.setVisible(false);
+      return null;
+    } else {
+      final Label label = new Label("content", content);
+      costTypeContainer.add(label);
+      return label;
+    }
   }
 
   protected void exportAsPdf()
