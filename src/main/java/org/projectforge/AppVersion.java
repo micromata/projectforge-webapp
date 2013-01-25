@@ -29,7 +29,7 @@ public class AppVersion
 
   public static final String APP_TITLE = ProjectForgeVersion.APP_ID + " " + ProjectForgeVersion.YEAR;
 
-  public static final Version VERSION = ProjectForgeVersion.VERSION;
+  public static final Version VERSION = new Version(ProjectForgeVersion.VERSION_STRING);
 
   public static final String NUMBER = VERSION.toString();
 
