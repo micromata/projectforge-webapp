@@ -40,9 +40,9 @@ public class QuickSelectPanel extends AbstractSelectPanel<Date>
 {
   private static final long serialVersionUID = 8334141505387689261L;
 
-  private DatePanel datePanel;
+  private final DatePanel datePanel;
 
-  private ISelectCallerPage caller;
+  private final ISelectCallerPage caller;
 
   /**
    * @param id
@@ -57,6 +57,7 @@ public class QuickSelectPanel extends AbstractSelectPanel<Date>
     this.datePanel = datePanel;
   }
 
+  @Override
   @SuppressWarnings("serial")
   public QuickSelectPanel init()
   {
@@ -65,9 +66,7 @@ public class QuickSelectPanel extends AbstractSelectPanel<Date>
       @Override
       public Date getObject()
       {
-        datePanel.validate(); // Update model from form field.
-        final Date date = datePanel.getConvertedInput();
-        return date;
+        return getInputDate();
       }
     }, caller, selectProperty + ".month");
     add(quickSelectMonthPanel);
@@ -76,13 +75,17 @@ public class QuickSelectPanel extends AbstractSelectPanel<Date>
       @Override
       public Date getObject()
       {
-        datePanel.validate(); // Update model from form field.
-        final Date date = datePanel.getConvertedInput();
-        return date;
+        return getInputDate();
       }
     }, caller, selectProperty + ".week");
     add(quickSelectWeekPanel);
     quickSelectWeekPanel.init();
     return this;
+  }
+
+  public Date getInputDate() {
+    datePanel.getDateField().validate(); // Update model from form field.
+    final Date date = datePanel.getDateField().getConvertedInput();
+    return date;
   }
 }

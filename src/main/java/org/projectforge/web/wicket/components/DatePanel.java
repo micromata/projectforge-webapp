@@ -114,6 +114,13 @@ public class DatePanel extends FormComponentPanel<Date> implements ComponentWrap
     });
   }
 
+  @Override
+  public void validate()
+  {
+    dateField.validate();
+    super.validate();
+  }
+
   /**
    * Minimum year for validation (default is 1900).
    * @param minYear the minYear to set
