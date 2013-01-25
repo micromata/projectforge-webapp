@@ -82,8 +82,6 @@ public class PollAttendeePage extends PollBasePage
     super(parameters);
     NewPollPage.redirectToNewPollPage(parameters);
     this.model = null;
-
-    // TODO Max: set model back to isNew, if something changed
   }
 
   /**
@@ -102,6 +100,8 @@ public class PollAttendeePage extends PollBasePage
   protected void onInitialize()
   {
     super.onInitialize();
+
+    emailList = "";
 
     // User select
     final UsersProvider usersProvider = new UsersProvider();
@@ -140,7 +140,7 @@ public class PollAttendeePage extends PollBasePage
     final PropertyModel<String> mailModel = new PropertyModel<String>(this, "emailList");
     final TextField<String> eMailField = new TextField<String>(wicketId, mailModel);
     return eMailField;
-  };
+  }
 
   /**
    * @see org.projectforge.web.wicket.AbstractUnsecureBasePage#getTitle()
@@ -198,11 +198,11 @@ public class PollAttendeePage extends PollBasePage
       feedBackPanel.error(getString("plugins.poll.attendee.error"));
     } else {
       model.getPollAttendeeList().clear();
-      model.getCalculatedAttendeeList().clear();
+      //      model.getCalculatedAttendeeList().clear();
       model.getPollGroupList().clear();
 
-      model.getPollAttendeeList().addAll(userAttendees);
-      model.getCalculatedAttendeeList().addAll(allAttendeeList);
+      model.getPollAttendeeList().addAll(allAttendeeList);
+      //      model.getCalculatedAttendeeList().addAll(allAttendeeList);
       model.getPollGroupList().addAll(assignedGroups);
       setResponsePage(new NewPollOverviewPage(getPageParameters(), model));
     }

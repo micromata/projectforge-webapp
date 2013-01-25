@@ -23,12 +23,13 @@
 
 package org.projectforge.plugins.poll;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.PropertyModel;
@@ -68,6 +69,8 @@ public class NewPollOverviewPage extends PollBasePage
 
   private final NewPollFrontendModel model;
 
+  private boolean isModified;
+
   /**
    * 
    */
@@ -98,6 +101,8 @@ public class NewPollOverviewPage extends PollBasePage
   {
     super.onInitialize();
 
+    isModified = isModelModified();
+
     final FieldsetPanel fsTitle = gridBuilder.newFieldset(getString("plugins.poll.new.title"));
     final TextField<String> title = new TextField<String>(fsTitle.getTextFieldId(), new PropertyModel<String>(model.getPollDo(), "title"));
     title.setEnabled(this.model.isNew());
@@ -117,24 +122,24 @@ public class NewPollOverviewPage extends PollBasePage
 
     gridBuilder.newGridPanel();
 
-    if (this.model.isNew() == true) {
-      createEnabledChoices();
-    } else {
-      final FieldsetPanel fsUsers = gridBuilder.newFieldset(getString("plugins.poll.attendee.users"));
+    //    if (this.model.isNew() == true) {
+    final FieldsetPanel fsUsers = gridBuilder.newFieldset(getString("plugins.poll.attendee.users"));
 
-      if (model.isNew() == false) {
-        createDisabledChoices(fsUsers, model.getCalculatedAttendeeList(), true);
-      } else {
-        createDisabledChoices(fsUsers, model.getPollAttendeeList(), true);
-      }
-    }
+    //    if (model.isNew() == false && isModified == false) {
+    createDisabledChoices(fsUsers, model.getPollAttendeeList(), true);
+    //    } else {
+    //      createDisabledChoices(fsUsers, model.getCalculatedAttendeeList(), true);
+    //    }
+    //    } else {
+    //      createEnabledChoices();
+    //    }
 
     final FieldsetPanel fsEMails = gridBuilder.newFieldset(getString("plugins.poll.attendee.emails"));
-    if (model.isNew() == false) {
-      createDisabledChoices(fsEMails, model.getCalculatedAttendeeList(), false);
-    } else {
-      createDisabledChoices(fsEMails, model.getPollAttendeeList(), false);
-    }
+    //    if (model.isNew() == false && isModified == false) {
+    createDisabledChoices(fsEMails, model.getPollAttendeeList(), false);
+    //    } else {
+    //      createDisabledChoices(fsEMails, model.getCalculatedAttendeeList(), false);
+    //    }
 
     final FieldsetPanel fsEvents = gridBuilder.newFieldset(getString("plugins.poll.attendee.events"));
     createDisabledChoices(fsEvents, model.getAllEvents());
@@ -212,19 +217,21 @@ public class NewPollOverviewPage extends PollBasePage
   @Override
   protected void onConfirm()
   {
+    final boolean isNew = model.isNew();
+
     pollDao.saveOrUpdate(model.getPollDo());
-    final List<PollEventDO> pollEvents = new ArrayList<PollEventDO>();
-    pollEvents.addAll(model.getAllEvents());
-    if (model.isNew() == false) {
-      for (final PollEventDO event : pollEvents) {
+
+    // relate elements with poll
+    if (isNew == true || isModified == true) {
+      for (final PollEventDO event : model.getAllEvents()) {
         event.setPoll(model.getPollDo());
       }
-      for (final PollAttendeeDO attendee : model.getCalculatedAttendeeList()) {
+      for (final PollAttendeeDO attendee : model.getPollAttendeeList()) {
         attendee.setPoll(model.getPollDo());
       }
+      pollEventDao.saveOrUpdate(model.getAllEvents());
+      pollAttendeeDao.saveOrUpdate(model.getPollAttendeeList());
     }
-    pollEventDao.saveOrUpdate(pollEvents);
-    pollAttendeeDao.saveOrUpdate(model.getCalculatedAttendeeList());
 
     setResponsePage(PollListPage.class);
   }
@@ -256,6 +263,63 @@ public class NewPollOverviewPage extends PollBasePage
     if (model != null && model.getPollDo() != null) {
       model.getPollDo().setDeleted(true);
       pollDao.save(model.getPollDo());
+    }
+  }
+
+  /**
+   * Validate if something was changed.
+   * 
+   * @return
+   */
+  private boolean isModelModified() {
+    if (model.getPollDo().getId() != null) {
+      final PollDO poll = model.getPollDo();
+      final PollDO pollOld = pollDao.getById(model.getPollDo().getId());
+      final List<PollAttendeeDO> attendees = pollAttendeeDao.getListByPoll(poll);
+      final List<PollEventDO> events = pollEventDao.getListByPoll(poll);
+
+      // compare attendees
+      final boolean compareAttendees = compareLists(attendees, model.getPollAttendeeList());
+
+      // compare events
+      final boolean compareEvents = compareLists(events, model.getAllEvents());
+
+      // compare poll
+      final boolean comparePoll = ObjectUtils.equals(pollOld, poll);
+
+      if (compareAttendees == false || compareEvents == false || comparePoll == false) {
+        return false;
+      } else {
+        return true;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * compare lists and their elements.
+   * returns true, if lists are identical
+   * returns false, else.
+   * @param listA
+   * @param listB
+   * @return
+   */
+  private boolean compareLists(final List<?> listA, final List<?> listB) {
+    Iterator<?> itA;
+    final Iterator<?> itB;
+    if (listA.size() == listB.size()) {
+      itA = listA.iterator();
+      itB = listB.iterator();
+      do {
+        if (ObjectUtils.equals(itA.next(), itB.next()) == false) {
+          return false;
+        }
+      }
+      while (itA.hasNext());
+      return true;
+    } else {
+      return false;
     }
   }
 }

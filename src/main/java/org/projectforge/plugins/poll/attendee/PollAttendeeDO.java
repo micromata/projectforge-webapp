@@ -154,4 +154,55 @@ public class PollAttendeeDO extends DefaultBaseDO
     }
     return result;
   }
+
+  /**
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode()
+  {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((email == null) ? 0 : email.hashCode());
+    result = prime * result + ((poll == null) ? 0 : poll.hashCode());
+    result = prime * result + ((secureKey == null) ? 0 : secureKey.hashCode());
+    result = prime * result + ((user == null) ? 0 : user.hashCode());
+    return result;
+  }
+
+  /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(final Object obj)
+  {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    final PollAttendeeDO other = (PollAttendeeDO) obj;
+    if (email == null) {
+      if (other.email != null)
+        return false;
+    } else if (!email.equals(other.email))
+      return false;
+    if (poll == null) {
+      if (other.poll != null)
+        return false;
+    } else if (!poll.equals(other.poll))
+      return false;
+    if (secureKey == null) {
+      if (other.secureKey != null)
+        return false;
+    } else if (!secureKey.equals(other.secureKey))
+      return false;
+    if (user == null) {
+      if (other.user != null)
+        return false;
+    } else if (!user.equals(other.user))
+      return false;
+    return true;
+  }
 }
