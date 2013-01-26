@@ -182,7 +182,8 @@ AbstractSecuredPage implements IEditPage<O, D>
       }
     });
     final IDataProvider<DisplayHistoryEntry> dataProvider = new ListDataProvider<DisplayHistoryEntry>(getHistory());
-    final DataTable<DisplayHistoryEntry, String> dataTable = new DataTable<DisplayHistoryEntry, String>("historyTable", columns, dataProvider, 100) {
+    final DataTable<DisplayHistoryEntry, String> dataTable = new DataTable<DisplayHistoryEntry, String>("historyTable", columns,
+        dataProvider, 100) {
       @Override
       protected Item<DisplayHistoryEntry> newRowItem(final String id, final int index, final IModel<DisplayHistoryEntry> model)
       {
@@ -195,7 +196,7 @@ AbstractSecuredPage implements IEditPage<O, D>
         return showHistory;
       }
     };
-    final HeadersToolbar headersToolbar = new HeadersToolbar(dataTable, null);
+    final HeadersToolbar<String> headersToolbar = new HeadersToolbar<String>(dataTable, null);
     dataTable.addTopToolbar(headersToolbar);
     body.add(dataTable);
     final Label timeOfCreationLabel = new Label("timeOfCreation", dateTimeFormatter.getFormattedDateTime(data.getCreated()));
@@ -277,8 +278,8 @@ AbstractSecuredPage implements IEditPage<O, D>
 
   /**
    * Will be called directly after storing the data object (update).
-   * @param modificationStatus MINOR or MAJOR, if the object was modified, otherwise NONE. If a not null web page is returned, then the
-   *          web page will be set as response page.
+   * @param modificationStatus MINOR or MAJOR, if the object was modified, otherwise NONE. If a not null web page is returned, then the web
+   *          page will be set as response page.
    * @see BaseDao#update(ExtendedBaseDO)
    */
   public AbstractSecuredBasePage afterUpdate(final ModificationStatus modificationStatus)
@@ -305,6 +306,17 @@ AbstractSecuredPage implements IEditPage<O, D>
   {
     // Do nothing at default.
     return null;
+  }
+
+  /**
+   * Will be called by clone button. Sets the id of the form data object to null and deleted to false.
+   */
+  protected void cloneData()
+  {
+    final O data = getData();
+    getLogger().info("Clone of data chosen: " + data);
+    data.setId(null);
+    data.setDeleted(false);
   }
 
   /**

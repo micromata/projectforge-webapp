@@ -96,14 +96,15 @@ public class RechnungEditPage extends AbstractEditPage<RechnungDO, RechnungEditF
     return log;
   }
 
+
   /**
-   * Clones the data positions and reset the date and target date etc.
+   * @see org.projectforge.web.wicket.AbstractEditPage#cloneData()
    */
-  protected void cloneRechnung()
+  @Override
+  protected void cloneData()
   {
-    log.info("Clone of invoice chosen: " + getData());
+    super.cloneData();
     final RechnungDO rechnung = getData();
-    rechnung.setId(null);
     rechnung.setNummer(null);
     final Integer zahlungsZielInTagen = rechnung.getZahlungsZielInTagen();
     final DayHolder day = new DayHolder();
@@ -124,7 +125,6 @@ public class RechnungEditPage extends AbstractEditPage<RechnungDO, RechnungEditF
       }
     }
     form.refresh();
-    form.cloneButtonPanel.setVisible(false);
   }
 
   public void cancelSelection(final String property)

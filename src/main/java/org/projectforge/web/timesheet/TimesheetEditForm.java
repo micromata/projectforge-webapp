@@ -32,7 +32,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxSubmitLink;
-import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
@@ -77,9 +76,7 @@ import org.projectforge.web.wicket.components.DateTimePanel;
 import org.projectforge.web.wicket.components.DateTimePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
-import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.AbstractFieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.ComponentSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
@@ -341,28 +338,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
       checkBoxPanel.addCheckBox(new PropertyModel<Boolean>(this, "saveAsTemplate"), getString("userPref.saveAsTemplate"));
     }
-    if (isNew() == false) {
-      // Clone button for existing and not deleted invoices:
-      final Button cloneButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("clone")) {
-        @Override
-        public final void onSubmit()
-        {
-          parentPage.cloneTimesheet();
-        }
-      };
-      cloneButton.setDefaultFormProcessing(false);
-      final SingleButtonPanel cloneButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), cloneButton, getString("clone")) {
-        /**
-         * @see org.apache.wicket.Component#isVisible()
-         */
-        @Override
-        public boolean isVisible()
-        {
-          return isNew() == false;
-        }
-      };
-      actionButtons.add(2, cloneButtonPanel);
-    }
+    addCloneButton();
   }
 
   /**

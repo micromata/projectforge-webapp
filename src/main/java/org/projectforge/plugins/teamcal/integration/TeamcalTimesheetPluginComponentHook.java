@@ -63,6 +63,11 @@ public class TeamcalTimesheetPluginComponentHook implements TimesheetPluginCompo
       // May be the add button of time sheet list page was used.
       return;
     }
+    final FieldsetPanel fs = form.getTemplatesRow();
+    if (fs == null) {
+      // May-be clone button was pressed:
+      return;
+    }
     final Button switchButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("switch")) {
       private static final long serialVersionUID = 7264556996228603021L;
 
@@ -78,7 +83,6 @@ public class TeamcalTimesheetPluginComponentHook implements TimesheetPluginCompo
       }
     };
     switchButton.setDefaultFormProcessing(false);
-    final FieldsetPanel fs = form.getTemplatesRow();
     final SingleButtonPanel switchButtonPanel = new SingleButtonPanel(fs.newChildId(), switchButton, new ResourceModel(
         "plugins.teamcal.switchToTeamEventButton"), SingleButtonPanel.GREY);
     fs.add(switchButtonPanel);

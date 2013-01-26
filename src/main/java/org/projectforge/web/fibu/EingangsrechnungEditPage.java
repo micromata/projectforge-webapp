@@ -73,18 +73,20 @@ ISelectCallerPage
   }
 
   /**
-   * Clones the data positions and reset the date and target date etc.
+   * @see org.projectforge.web.wicket.AbstractEditPage#cloneData()
    */
-  protected void cloneRechnung()
+  @Override
+  protected void cloneData()
   {
-    log.info("Clone of invoice chosen: " + getData());
+    super.cloneData();
     final EingangsrechnungDO rechnung = getData();
-    rechnung.setId(null);
     final int zahlungsZielInTagen = rechnung.getZahlungsZielInTagen();
     final DayHolder day = new DayHolder();
     rechnung.setDatum(day.getSQLDate());
     day.add(Calendar.DAY_OF_MONTH, zahlungsZielInTagen);
     rechnung.setFaelligkeit(day.getSQLDate());
+    rechnung.setBezahlDatum(null);
+    rechnung.setZahlBetrag(null);
     final List<EingangsrechnungsPositionDO> positionen = getData().getPositionen();
     if (positionen != null) {
       rechnung.setPositionen(new ArrayList<EingangsrechnungsPositionDO>());
@@ -94,7 +96,6 @@ ISelectCallerPage
       }
     }
     form.refresh();
-    form.cloneButtonPanel.setVisible(false);
   }
 
   public void cancelSelection(final String property)

@@ -59,6 +59,8 @@ public class ContractEditForm extends AbstractEditForm<ContractDO, ContractEditP
 
   protected DatePanel datePanel, validFromDatePanel, validUntilDatePanel, dueDatePanel, resubmissionDatePanel, signingDatePanel;
 
+  protected MinMaxNumberField<Integer> numberField;
+
   public ContractEditForm(final ContractEditPage parentPage, final ContractDO data)
   {
     super(parentPage, data);
@@ -88,11 +90,11 @@ public class ContractEditForm extends AbstractEditForm<ContractDO, ContractEditP
       // Number
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("legalAffaires.contract.number"));
       fs.add(new DivTextPanel(fs.newChildId(), "C-"));
-      final MinMaxNumberField<Integer> number = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data,
+      numberField = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data,
           "number"), 0, 99999999);
-      number.setMaxLength(8);
-      WicketUtils.setSize(number, 6);
-      fs.add(number);
+      numberField.setMaxLength(8);
+      WicketUtils.setSize(numberField, 6);
+      fs.add(numberField);
       if (NumberHelper.greaterZero(getData().getNumber()) == false) {
         fs.addHelpIcon(getString("fibu.tooltip.nummerWirdAutomatischVergeben"));
       }
@@ -218,6 +220,7 @@ public class ContractEditForm extends AbstractEditForm<ContractDO, ContractEditP
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("filing"));
       fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "filing")));
     }
+    addCloneButton();
   }
 
   @Override

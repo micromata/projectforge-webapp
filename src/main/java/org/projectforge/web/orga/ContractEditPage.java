@@ -61,6 +61,19 @@ public class ContractEditPage extends AbstractEditPage<ContractDO, ContractEditF
     return null;
   }
 
+  /**
+   * @see org.projectforge.web.wicket.AbstractEditPage#cloneData()
+   */
+  @Override
+  protected void cloneData()
+  {
+    super.cloneData();
+    final ContractDO contract = getData();
+    contract.setNumber(null);
+    contract.setDate(new DayHolder().getSQLDate());
+    form.numberField.modelChanged();
+  }
+
   @Override
   protected ContractDao getBaseDao()
   {

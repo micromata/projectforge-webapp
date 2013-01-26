@@ -98,8 +98,6 @@ extends AbstractEditForm<O, P>
 
   protected RepeatingView positionsRepeater;
 
-  protected SingleButtonPanel cloneButtonPanel;
-
   private boolean costConfigured;
 
   private CostEditModalDialog costEditModalDialog;
@@ -180,18 +178,7 @@ extends AbstractEditForm<O, P>
     if (Configuration.getInstance().isCostConfigured() == true) {
       costConfigured = true;
     }
-    if (isNew() == false && getData().isDeleted() == false && getBaseDao().hasInsertAccess(getUser()) == true) {
-      // Clone button for existing and not deleted invoices:
-      final Button cloneButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("clone")) {
-        @Override
-        public final void onSubmit()
-        {
-          cloneRechnung();
-        }
-      };
-      cloneButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), cloneButton, getString("clone"));
-      actionButtons.add(2, cloneButtonPanel);
-    }
+    addCloneButton();
 
     onInit();
 
@@ -706,8 +693,6 @@ extends AbstractEditForm<O, P>
       target.add(costTable.refresh().getTable());
     }
   }
-
-  protected abstract void cloneRechnung();
 
   /**
    * @return null

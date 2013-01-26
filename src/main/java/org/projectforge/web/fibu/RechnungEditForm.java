@@ -162,12 +162,6 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     orderLink.add(new PresizedImage("linkImage", getResponse(), WebConstants.IMAGE_FIND));
   }
 
-  @Override
-  protected void cloneRechnung()
-  {
-    parentPage.cloneRechnung();
-  }
-
   @SuppressWarnings("unchecked")
   @Override
   protected void validation()

@@ -310,6 +310,35 @@ AbstractSecuredForm<O, P>
   }
 
   /**
+   * Adds a clone button (only if the data isn't new) and calls {@link AbstractEditPage#cloneData()}.
+   */
+  @SuppressWarnings("serial")
+  protected void addCloneButton() {
+    if (isNew() == false) {
+      // Clone button for existing and not deleted invoices:
+      final Button cloneButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("clone")) {
+        @Override
+        public final void onSubmit()
+        {
+          parentPage.cloneData();
+        }
+      };
+      final SingleButtonPanel cloneButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), cloneButton, getString("clone")) {
+        /**
+         * @see org.apache.wicket.Component#isVisible()
+         */
+        @Override
+        public boolean isVisible()
+        {
+          return isNew() == false;
+        }
+      };
+      actionButtons.add(2, cloneButtonPanel);
+    }
+
+  }
+
+  /**
    * Set the style class for the default buttons. Overwrite this, if you have a different default button than create, update or undelete
    * (don't call super!).
    */

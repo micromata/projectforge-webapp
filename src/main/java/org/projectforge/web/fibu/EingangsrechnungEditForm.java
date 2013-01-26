@@ -110,12 +110,6 @@ AbstractRechnungEditForm<EingangsrechnungDO, EingangsrechnungsPositionDO, Eingan
   }
 
   @Override
-  protected void cloneRechnung()
-  {
-    parentPage.cloneRechnung();
-  }
-
-  @Override
   protected Logger getLogger()
   {
     return log;

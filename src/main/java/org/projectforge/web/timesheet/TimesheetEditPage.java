@@ -287,14 +287,15 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
   /**
    * Sets the id of the current time sheet to null and the user to the logged in user and returns to the input page. This results in adding
    * a new time sheet. (Does not clone TimesheetEditAction!)
+   * @see org.projectforge.web.wicket.AbstractEditPage#cloneData()
    */
-  protected void cloneTimesheet()
+  @Override
+  protected void cloneData()
   {
+    super.cloneData();
     final TimesheetDO timesheet = getData();
-    log.info("Clone of time sheet chosen: " + timesheet);
-    timesheet.setId(null);
-    timesheet.setDeleted(false);
     getBaseDao().setUser(timesheet, getUser().getId());
+    form.userSelectPanel.markTextFieldModelAsChanged();
   }
 
   /**
