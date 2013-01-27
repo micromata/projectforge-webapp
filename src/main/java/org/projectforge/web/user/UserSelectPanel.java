@@ -28,8 +28,11 @@ import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.SubmitLink;
+import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
@@ -221,25 +224,50 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO> implements Co
     super.init();
 
     add(userTextField);
-    final SubmitLink selectMeButton = new SubmitLink("selectMe") {
-      @Override
-      public void onSubmit()
-      {
-        caller.select(selectProperty, PFUserContext.getUserId());
-        markTextFieldModelAsChanged();
-      }
+    final AbstractLink selectMeLink;
+    if (userTextField.getSettings().isAutoSubmit() == true) {
+      selectMeLink = new SubmitLink("selectMe") {
+        @Override
+        public void onSubmit()
+        {
+          caller.select(selectProperty, PFUserContext.getUserId());
+          markTextFieldModelAsChanged();
+        }
 
-      @Override
-      public boolean isVisible()
-      {
-        // Is visible if no user is given or the given user is not the current logged in user.
-        final PFUserDO user = getModelObject();
-        return showSelectMeButton == true && (user == null || user.getId().equals(PFUserContext.getUser().getId()) == false);
-      }
-    };
-    add(selectMeButton);
-    selectMeButton.setDefaultFormProcessing(defaultFormProcessing);
-    selectMeButton.add(new TooltipImage("selectMeHelp", getResponse(), WebConstants.IMAGE_USER_SELECT_ME, getString("tooltip.selectMe")));
+        @Override
+        public boolean isVisible()
+        {
+          // Is visible if no user is given or the given user is not the current logged in user.
+          final PFUserDO user = UserSelectPanel.this.getModelObject();
+          return showSelectMeButton == true && (user == null || user.getId().equals(PFUserContext.getUser().getId()) == false);
+        }
+      };
+      ((SubmitLink) selectMeLink).setDefaultFormProcessing(defaultFormProcessing);
+    } else {
+      selectMeLink = new AjaxLink<Void>("selectMe") {
+        @Override
+        public void onClick(final AjaxRequestTarget target)
+        {
+          UserSelectPanel.this.setModelObject(PFUserContext.getUser());
+          markTextFieldModelAsChanged();
+          target.add(this, userTextField); // For hiding entry.
+        }
+
+        /**
+         * @see org.apache.wicket.Component#isVisible()
+         */
+        @Override
+        public boolean isVisible()
+        {
+          // Is visible if no user is given or the given user is not the current logged in user.
+          final PFUserDO user = UserSelectPanel.this.getModelObject();
+          return showSelectMeButton == true && (user == null || user.getId().equals(PFUserContext.getUser().getId()) == false);
+        }
+      };
+      selectMeLink.setOutputMarkupId(true);
+    }
+    add(selectMeLink);
+    selectMeLink.add(new TooltipImage("selectMeHelp", getResponse(), WebConstants.IMAGE_USER_SELECT_ME, getString("tooltip.selectMe")));
     return this;
   }
 
