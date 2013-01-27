@@ -32,13 +32,10 @@ import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.joda.time.DateMidnight;
 import org.projectforge.access.AccessChecker;
-import org.projectforge.core.Configuration;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.WebConfiguration;
-import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractStandardForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
@@ -80,6 +77,12 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
 
   protected FieldsetPanel fieldset;
 
+  protected CalendarPageSupport createCalendarPageSupport()
+  {
+    final CalendarPageSupport calendarPageSupport = new CalendarPageSupport(parentPage, getFilter());
+    return calendarPageSupport;
+  }
+
   @SuppressWarnings("serial")
   @Override
   protected void init()
@@ -87,47 +90,16 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
     super.init();
     gridBuilder.newSplitPanel(GridSize.SPAN8);
     fieldset = gridBuilder.newFieldset(getString("label.options"));
-    if (isOtherUsersAllowed() == true) {
-      final UserSelectPanel userSelectPanel = new UserSelectPanel(fieldset.newChildId(),
-          new PropertyModel<PFUserDO>(this, "timesheetsUser"), parentPage, "userId");
-      fieldset.add(userSelectPanel);
-      userSelectPanel.init().withAutoSubmit(true).setLabel(new Model<String>(getString("user")));
-    }
+    final CalendarPageSupport calendarPageSupport = createCalendarPageSupport();
+    calendarPageSupport.addUserSelectPanel(fieldset, new PropertyModel<PFUserDO>(this, "timesheetsUser"), true);
     currentDatePanel = new JodaDatePanel(fieldset.newChildId(), new PropertyModel<DateMidnight>(filter, "startDate")).setAutosubmit(true);
     currentDatePanel.getDateField().setOutputMarkupId(true);
     fieldset.add(currentDatePanel);
 
     final DivPanel checkBoxPanel = fieldset.addNewCheckBoxDiv();
-    if (accessChecker.isRestrictedUser(getUser()) == false) {
-      if (isOtherUsersAllowed() == false) {
-        showTimesheets = getFilter().getUserId() != null;
-        checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(this, "showTimesheets"),
-            getString("calendar.option.timesheeets"), true) {
-          /**
-           * @see org.projectforge.web.wicket.flowlayout.CheckBoxPanel#onSelectionChanged()
-           */
-          @Override
-          protected void onSelectionChanged(final Boolean newSelection)
-          {
-            if (Boolean.TRUE.equals(newSelection) == true) {
-              getFilter().setUserId(getUserId());
-            } else {
-              getFilter().setUserId(null);
-            }
-          }
-        });
-      }
-      checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "showBreaks"),
-          getString("calendar.option.showBreaks"), true).setTooltip(getString("calendar.option.showBreaks.tooltip")));
-      checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "showPlanning"),
-          getString("calendar.option.planning"), true).setTooltip(getString("calendar.option.planning.tooltip")));
-      if (Configuration.getInstance().isAddressManagementConfigured() == true) {
-        checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "showBirthdays"),
-            getString("calendar.option.birthdays"), true));
-      }
-      checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "showStatistics"),
-          getString("calendar.option.statistics"), true).setTooltip(getString("calendar.option.statistics.tooltip")));
-    }
+
+    showTimesheets = getFilter().getUserId() != null;
+    calendarPageSupport.addOptions(checkBoxPanel, new PropertyModel<Boolean>(this, "showTimesheets"));
     checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "slot30"),
         getString("calendar.option.slot30"), true).setTooltip(getString("calendar.option.slot30.tooltip")));
 
@@ -179,8 +151,8 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
           return getTimesheetsUser() != null;
         };
       };
-      final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(buttonGroupPanel.newChildId(), IconType.DOWNLOAD,
-          new ResourceModel(setIcsImportButtonTooltip()), iCalExportLink);
+      final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(buttonGroupPanel.newChildId(), IconType.DOWNLOAD, new ResourceModel(
+          setIcsImportButtonTooltip()), iCalExportLink);
 
       buttonGroupPanel.addButton(exportICalButtonPanel);
     }
@@ -227,12 +199,6 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
   protected void onAfterInit(final GridBuilder gridBuilder)
   {
     // by default nothing happens here
-  }
-
-  private boolean isOtherUsersAllowed()
-  {
-    return accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP,
-        ProjectForgeGroup.PROJECT_MANAGER);
   }
 
   public CalendarForm(final CalendarPage parentPage)
