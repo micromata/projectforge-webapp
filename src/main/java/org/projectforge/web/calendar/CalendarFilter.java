@@ -24,7 +24,6 @@
 package org.projectforge.web.calendar;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import net.ftlines.wicket.fullcalendar.ViewType;
 
@@ -48,14 +47,6 @@ public class CalendarFilter implements Serializable
 
   @XStreamAsAttribute
   private String selectedCalendar;
-
-  /**
-   * Was used by old calendar.
-   */
-  @SuppressWarnings("unused")
-  @XStreamAsAttribute
-  @Deprecated
-  private Date current;
 
   @XStreamAsAttribute
   private Boolean showBirthdays;
