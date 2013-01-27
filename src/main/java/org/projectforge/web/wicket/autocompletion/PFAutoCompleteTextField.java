@@ -26,7 +26,6 @@ package org.projectforge.web.wicket.autocompletion;
 import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteBehavior;
@@ -127,7 +126,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
         final StringValue contentValue = RequestCycle.get().getRequest().getQueryParameters().getParameterValue(CONTENT);
         if (contentValue != null) {
           final String contentString = contentValue.toString();
-          if(getForm() instanceof AutoCompleteIgnoreForm) {
+          if (getForm() instanceof AutoCompleteIgnoreForm) {
             ((AutoCompleteIgnoreForm) getForm()).ignore(PFAutoCompleteTextField.this, contentString);
           } // else { just ignore }
         }
@@ -137,9 +136,14 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
   }
 
   @Override
-	public void renderHead(IHeaderResponse response) {
+  public void renderHead(final IHeaderResponse response)
+  {
     super.renderHead(response);
-    response.render(OnDomReadyHeaderItem.forScript("$('#" + this.getMarkupId() + "').data('callback', '" + deleteBehavior.getCallbackUrl() + "');"));
+    response.render(OnDomReadyHeaderItem.forScript("$('#"
+        + this.getMarkupId()
+        + "').data('callback', '"
+        + deleteBehavior.getCallbackUrl()
+        + "');"));
   }
 
   @SuppressWarnings("serial")
@@ -245,6 +249,14 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
   {
     settings.withAutoSubmit(autoSubmit);
     return this;
+  }
+
+  /**
+   * @return the settings
+   */
+  public PFAutoCompleteSettings getSettings()
+  {
+    return settings;
   }
 
   /**
