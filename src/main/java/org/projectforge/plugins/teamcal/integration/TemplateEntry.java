@@ -33,10 +33,10 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.ObjectUtils;
 import org.projectforge.plugins.teamcal.admin.TeamCalCache;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.dialog.TeamCalDialog;
-import org.projectforge.plugins.teamcal.event.TeamCalEventProvider;
 import org.projectforge.web.timesheet.TimesheetEventsProvider;
 
 /**
@@ -271,6 +271,9 @@ public class TemplateEntry implements Serializable, Comparable<TemplateEntry>, C
     if (calendarProperties.size() != other.calendarProperties.size()) {
       return true;
     }
+    if (ObjectUtils.equals(defaultCalendarId, other.defaultCalendarId) == false) {
+      return true;
+    }
     final Iterator<TemplateCalendarProperties> it1 = this.calendarProperties.iterator();
     final Iterator<TemplateCalendarProperties> it2 = other.calendarProperties.iterator();
     while (it1.hasNext() == true) {
@@ -305,7 +308,7 @@ public class TemplateEntry implements Serializable, Comparable<TemplateEntry>, C
     if (TeamCalDialog.TIMESHEET_CALENDAR_ID.equals(calendarId) || calendarId == null) {
       return TimesheetEventsProvider.EVENT_CLASS_NAME;
     } else {
-      return TeamCalEventProvider.EVENT_CLASS_NAME;
+      return String.valueOf(calendarId);
     }
   }
 }
