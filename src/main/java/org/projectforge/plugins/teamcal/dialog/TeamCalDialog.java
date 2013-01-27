@@ -126,6 +126,7 @@ public class TeamCalDialog extends ModalDialog
     setBigWindow().setShowCancelButton();
     selectedCalendars = new LinkedList<TeamCalDO>();
     teamEventRight = (TeamEventRight) UserRights.instance().getRight(TeamEventDao.USER_RIGHT_ID);
+    wantsNotificationOnClose();
   }
 
   /**
