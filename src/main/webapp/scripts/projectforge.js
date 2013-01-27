@@ -57,6 +57,7 @@ function initializeComponents() {
 	$('[rel=\'mypopup\']').hover(function(event) {
 		mouseX = event.pageX;
 		mouseY = event.pageY;
+		$("div.popover").remove();
 		$(this).mypopover('myshow');
 	}, function() {
 		$(this).mypopover('hide');
@@ -64,6 +65,7 @@ function initializeComponents() {
 	$('[rel=\'mytooltip\']').hover(function(event) {
 		mouseX = event.pageX;
 		mouseY = event.pageY;
+		$("div.tooltip").remove();
 		$(this).mytooltip('myshow');
 	}, function() {
 		$(this).mytooltip('hide');
