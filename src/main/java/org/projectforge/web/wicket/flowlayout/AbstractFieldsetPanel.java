@@ -29,6 +29,7 @@ import java.util.List;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
+import org.apache.wicket.extensions.markup.html.form.select.Select;
 import org.apache.wicket.feedback.FeedbackMessage;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
@@ -362,11 +363,35 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
   }
 
   /**
-   * @return The Wicket id of the embedded text fiel of {@link DropDownChoicePanel}.
+   * @return The Wicket id of the embedded select field of {@link DropDownChoicePanel}.
    */
   public String getDropDownChoiceId()
   {
     return DropDownChoicePanel.WICKET_ID;
+  }
+
+  /**
+   * @param id
+   * @param label
+   * @param select
+   * @return The created SelectPanel.
+   * @see SelectPanel#SelectPanel(String, Select)
+   */
+  public <C> SelectPanel<C> add(final Select<C> select)
+  {
+
+    final SelectPanel<C> selectPanel = new SelectPanel<C>(newChildId(), select);
+    selectPanel.getSelect().setLabel(new Model<String>(getLabel()));
+    add(selectPanel);
+    return selectPanel;
+  }
+
+  /**
+   * @return The Wicket id of the embedded select field of {@link DropDownChoicePanel}.
+   */
+  public String getSelectId()
+  {
+    return SelectPanel.WICKET_ID;
   }
 
   public <C> Select2MultiChoicePanel<C> add(final Select2MultiChoice<C> select2MultiChoice)
