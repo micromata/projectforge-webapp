@@ -31,9 +31,8 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import net.ftlines.wicket.fullcalendar.Event;
-import net.ftlines.wicket.fullcalendar.callback.EventDroppedCallback;
-
 import net.ftlines.wicket.fullcalendar.callback.EventDroppedCallbackScriptGenerator;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
@@ -158,10 +157,10 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
         event.setStart(startDate);
         event.setEnd(endDate);
 
-        // no contextmenu for recurrent events please
-        if (eventDO.hasRecurrence() == true) {
-          event.setClassName(event.getClassName() + " " + EventDroppedCallbackScriptGenerator.NO_CONTEXTMENU_INDICATOR);
-        }
+        // no contextmenu for events at all
+        //if (eventDO.hasRecurrence() == true) {
+        event.setClassName(event.getClassName() + " " + EventDroppedCallbackScriptGenerator.NO_CONTEXTMENU_INDICATOR);
+        //}
 
         final String title;
         String durationString = "";
