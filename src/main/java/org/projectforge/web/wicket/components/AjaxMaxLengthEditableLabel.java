@@ -32,8 +32,6 @@ import org.apache.wicket.validation.validator.StringValidator;
 @SuppressWarnings("serial")
 public class AjaxMaxLengthEditableLabel extends AjaxEditableLabel<String>
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AjaxMaxLengthEditableLabel.class);
-
   @SuppressWarnings("rawtypes")
   private IConverter converter;
 
