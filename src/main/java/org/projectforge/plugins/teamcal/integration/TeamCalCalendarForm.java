@@ -32,7 +32,6 @@ import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.common.StringHelper;
 import org.projectforge.plugins.teamcal.dialog.TeamCalDialog;
@@ -74,7 +73,7 @@ public class TeamCalCalendarForm extends CalendarForm
   protected void init()
   {
     super.init();
-    final TeamCalDialog dialog = new TeamCalDialog(parentPage.newModalDialogId(), new ResourceModel("plugins.teamcal.title.list"), filter);
+    final TeamCalDialog dialog = new TeamCalDialog(parentPage.newModalDialogId(), filter);
     parentPage.add(dialog);
     dialog.init();
     final IconButtonPanel calendarButtonPanel = new AjaxIconButtonPanel(buttonGroupPanel.newChildId(), IconType.CALENDAR,
