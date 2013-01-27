@@ -29,6 +29,7 @@ import java.util.List;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
+import org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel;
 import org.apache.wicket.extensions.markup.html.form.select.Select;
 import org.apache.wicket.feedback.FeedbackMessage;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -372,7 +373,6 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
 
   /**
    * @param id
-   * @param label
    * @param select
    * @return The created SelectPanel.
    * @see SelectPanel#SelectPanel(String, Select)
@@ -392,6 +392,28 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
   public String getSelectId()
   {
     return SelectPanel.WICKET_ID;
+  }
+
+  /**
+   * @param id
+   * @param ajaxEditableLabel
+   * @return The created AjaxEditableLabelPanel.
+   * @see SelectPanel#SelectPanel(String, Select)
+   */
+  public <C> AjaxEditableLabelPanel<C> add(final AjaxEditableLabel<C> ajaxEditableLabel)
+  {
+
+    final AjaxEditableLabelPanel<C> ajaxEditableLabelPanel = new AjaxEditableLabelPanel<C>(newChildId(), ajaxEditableLabel);
+    add(ajaxEditableLabelPanel);
+    return ajaxEditableLabelPanel;
+  }
+
+  /**
+   * @return The Wicket id of the embedded select field of {@link DropDownChoicePanel}.
+   */
+  public String getAjaxEditableLabelId()
+  {
+    return AjaxEditableLabelPanel.WICKET_ID;
   }
 
   public <C> Select2MultiChoicePanel<C> add(final Select2MultiChoice<C> select2MultiChoice)
