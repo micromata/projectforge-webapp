@@ -38,6 +38,7 @@ import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.Page;
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.behavior.Behavior;
+import org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
@@ -927,6 +928,15 @@ public class WicketUtils
       component.add(AttributeModifier.replace("title", text));
     }
     return component;
+  }
+
+  /**
+   * You need to use {@link AjaxEditableLabel#getLabel()}.
+   * @param label
+   * @return
+   */
+  public static Component addEditableLabelDefaultTooltip(final Component label) {
+    return addTooltip(label, label.getString("form.ajaxEditableLabel.tooltip"));
   }
 
   public static Component setWarningTooltip(final Component component)
