@@ -36,7 +36,7 @@ import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.ObjectUtils;
 import org.projectforge.plugins.teamcal.admin.TeamCalCache;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
-import org.projectforge.plugins.teamcal.dialog.TeamCalDialog;
+import org.projectforge.plugins.teamcal.dialog.TeamCalFilterDialog;
 import org.projectforge.web.timesheet.TimesheetEventsProvider;
 
 /**
@@ -305,7 +305,7 @@ public class TemplateEntry implements Serializable, Comparable<TemplateEntry>, C
   }
 
   public static String calcCalendarStringForCalendar(final Integer calendarId) {
-    if (TeamCalDialog.TIMESHEET_CALENDAR_ID.equals(calendarId) || calendarId == null) {
+    if (TeamCalFilterDialog.TIMESHEET_CALENDAR_ID.equals(calendarId) || calendarId == null) {
       return TimesheetEventsProvider.EVENT_CLASS_NAME;
     } else {
       return String.valueOf(calendarId);

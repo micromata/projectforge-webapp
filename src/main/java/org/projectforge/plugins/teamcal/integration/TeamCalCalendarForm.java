@@ -34,7 +34,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.common.StringHelper;
-import org.projectforge.plugins.teamcal.dialog.TeamCalDialog;
+import org.projectforge.plugins.teamcal.dialog.TeamCalFilterDialog;
 import org.projectforge.plugins.teamcal.event.DropIcsPanel;
 import org.projectforge.plugins.teamcal.event.TeamEventListPage;
 import org.projectforge.web.calendar.CalendarFilter;
@@ -73,7 +73,7 @@ public class TeamCalCalendarForm extends CalendarForm
   protected void init()
   {
     super.init();
-    final TeamCalDialog dialog = new TeamCalDialog(parentPage.newModalDialogId(), filter);
+    final TeamCalFilterDialog dialog = new TeamCalFilterDialog(parentPage.newModalDialogId(), filter);
     parentPage.add(dialog);
     dialog.init();
     final IconButtonPanel calendarButtonPanel = new AjaxIconButtonPanel(buttonGroupPanel.newChildId(), IconType.CALENDAR,
