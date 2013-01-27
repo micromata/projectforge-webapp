@@ -89,7 +89,7 @@ public class TeamCalDialog extends ModalDialog
   private DropDownChoicePanel<TemplateEntry> templateChoice;
 
   // Adaption (fake) to display "Time Sheets" as selection option
-  public static final TeamCalDO TIMESHEET_CALENDAR = new TeamCalDO();
+  private final TeamCalDO timesheetsCalendar = new TeamCalDO();
 
   private final TeamCalCalendarFilter filter;
 
@@ -118,15 +118,14 @@ public class TeamCalDialog extends ModalDialog
    * @param titleModel
    * @param filter
    */
-  public TeamCalDialog(final String id, final IModel<String> titleModel, final TeamCalCalendarFilter filter)
+  public TeamCalDialog(final String id, final TeamCalCalendarFilter filter)
   {
     super(id);
     this.filter = filter;
-    setTitle(titleModel);
-    setBigWindow().setShowCancelButton();
+    setTitle(new ResourceModel("teamcal.calendar.filterDialog.title"));
+    setBigWindow().setShowCancelButton().wantsNotificationOnClose();
     selectedCalendars = new LinkedList<TeamCalDO>();
     teamEventRight = (TeamEventRight) UserRights.instance().getRight(TeamEventDao.USER_RIGHT_ID);
-    wantsNotificationOnClose();
   }
 
   /**
@@ -165,8 +164,8 @@ public class TeamCalDialog extends ModalDialog
   public void init()
   {
     init(new Form<String>(getFormId()));
-    TIMESHEET_CALENDAR.setTitle(getString("plugins.teamcal.timeSheetCalendar"));
-    TIMESHEET_CALENDAR.setId(TIMESHEET_CALENDAR_ID);
+    timesheetsCalendar.setTitle(getString("plugins.teamcal.timeSheetCalendar"));
+    timesheetsCalendar.setId(TIMESHEET_CALENDAR_ID);
     // confirm
     setCloseButtonTooltip(null, new ResourceModel("plugins.teamcal.calendar.filterDialog.closeButton.tooltip"));
   }
@@ -483,7 +482,7 @@ public class TeamCalDialog extends ModalDialog
         public String getDisplayValue(final Integer object)
         {
           if (TIMESHEET_CALENDAR_ID.equals(object)) {
-            return TIMESHEET_CALENDAR.getTitle();
+            return timesheetsCalendar.getTitle();
           }
           return teamCalDao.getById(object).getTitle();
         }
