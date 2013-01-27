@@ -504,6 +504,11 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
     return div.add(childs);
   }
 
+  public WebMarkupContainer getControlsDiv()
+  {
+    return div;
+  }
+
   /**
    * @see org.projectforge.web.wicket.flowlayout.AbstractFieldsetPanel#getThis()
    */
