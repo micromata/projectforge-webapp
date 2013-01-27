@@ -320,6 +320,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     gridBuilder.newFormHeading(getString("plugins.teamcal.event.reminder"));
     setRecurrenceComponentsVisibility(null);
 
+    addCloneButton();
+
     add(new IFormValidator() {
       @Override
       public FormComponent< ? >[] getDependentFormComponents()
