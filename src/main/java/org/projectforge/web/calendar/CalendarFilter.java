@@ -241,21 +241,6 @@ public class CalendarFilter implements Serializable
   }
 
   /**
-   * Was used by old calendar.
-   */
-  @Deprecated
-  public Date getCurrent()
-  {
-    return null;
-  }
-
-  @Deprecated
-  public void setCurrent(final Date current)
-  {
-    this.current = current;
-  }
-
-  /**
    * @return the selectedCalendar
    */
   public String getSelectedCalendar()
