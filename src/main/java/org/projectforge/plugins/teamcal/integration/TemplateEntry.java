@@ -39,8 +39,10 @@ import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.dialog.TeamCalFilterDialog;
 import org.projectforge.web.timesheet.TimesheetEventsProvider;
 
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 /**
- * Persist the settings of one calendar entry in the filter.
+ * Persist the settings of one named filter entry.
  * @author M. Lauterbach (m.lauterbach@micromata.de)
  * @author K. Reinhard (k.reinhard@micromata.de)
  * 
@@ -55,9 +57,29 @@ public class TemplateEntry implements Serializable, Comparable<TemplateEntry>, C
 
   private Set<Integer> visibleCalendarIds;
 
+  @XStreamAsAttribute
   private String name;
 
+  @XStreamAsAttribute
   private Integer defaultCalendarId;
+
+  @XStreamAsAttribute
+  private Boolean showBirthdays;
+
+  @XStreamAsAttribute
+  private Boolean showStatistics;
+
+  @XStreamAsAttribute
+  private Boolean showTimesheets;
+
+  @XStreamAsAttribute
+  private Integer timesheetUserId;
+
+  @XStreamAsAttribute
+  private Boolean showBreaks = true;
+
+  @XStreamAsAttribute
+  private Boolean showPlanning;
 
   Set<TemplateCalendarProperties> getCalendarProperties()
   {
@@ -242,10 +264,16 @@ public class TemplateEntry implements Serializable, Comparable<TemplateEntry>, C
   @Override
   public TemplateEntry clone()
   {
-    //    try {
+    // try {
     final TemplateEntry cloned = new TemplateEntry(); // super.clone();
     cloned.name = this.name;
     cloned.defaultCalendarId = this.defaultCalendarId;
+    cloned.showBirthdays = this.showBirthdays;
+    cloned.showBreaks = this.showBreaks;
+    cloned.showPlanning = this.showPlanning;
+    cloned.showStatistics = this.showStatistics;
+    cloned.showTimesheets = this.showTimesheets;
+    cloned.timesheetUserId = this.timesheetUserId;
     for (final TemplateCalendarProperties props : this.calendarProperties) {
       final TemplateCalendarProperties clonedProps = props.clone();
       cloned.calendarProperties.add(clonedProps);
@@ -271,7 +299,12 @@ public class TemplateEntry implements Serializable, Comparable<TemplateEntry>, C
     if (calendarProperties.size() != other.calendarProperties.size()) {
       return true;
     }
-    if (ObjectUtils.equals(defaultCalendarId, other.defaultCalendarId) == false) {
+    if (ObjectUtils.equals(defaultCalendarId, other.defaultCalendarId) == false //
+        || ObjectUtils.equals(showBirthdays, other.showBirthdays) == false //
+        || ObjectUtils.equals(showBreaks, other.showBreaks) == false
+        || ObjectUtils.equals(showPlanning, other.showPlanning) == false
+        || ObjectUtils.equals(showStatistics, other.showStatistics) == false
+        || ObjectUtils.equals(timesheetUserId, other.timesheetUserId) == false) {
       return true;
     }
     final Iterator<TemplateCalendarProperties> it1 = this.calendarProperties.iterator();
@@ -304,7 +337,118 @@ public class TemplateEntry implements Serializable, Comparable<TemplateEntry>, C
     return this;
   }
 
-  public static String calcCalendarStringForCalendar(final Integer calendarId) {
+  /**
+   * @return the showBirthdays
+   */
+  public Boolean getShowBirthdays()
+  {
+    return showBirthdays;
+  }
+
+  /**
+   * @param showBirthdays the showBirthdays to set
+   * @return this for chaining.
+   */
+  public TemplateEntry setShowBirthdays(final Boolean showBirthdays)
+  {
+    this.showBirthdays = showBirthdays;
+    return this;
+  }
+
+  /**
+   * @return the showBreaks
+   */
+  public Boolean getShowBreaks()
+  {
+    return showBreaks;
+  }
+
+  /**
+   * @param showBreaks the showBreaks to set
+   * @return this for chaining.
+   */
+  public TemplateEntry setShowBreaks(final Boolean showBreaks)
+  {
+    this.showBreaks = showBreaks;
+    return this;
+  }
+
+  /**
+   * @return the showPlanning
+   */
+  public Boolean getShowPlanning()
+  {
+    return showPlanning;
+  }
+
+  /**
+   * @param showPlanning the showPlanning to set
+   * @return this for chaining.
+   */
+  public TemplateEntry setShowPlanning(final Boolean showPlanning)
+  {
+    this.showPlanning = showPlanning;
+    return this;
+  }
+
+  /**
+   * @return the showStatistics
+   */
+  public Boolean getShowStatistics()
+  {
+    return showStatistics;
+  }
+
+  /**
+   * @param showStatistics the showStatistics to set
+   * @return this for chaining.
+   */
+  public TemplateEntry setShowStatistics(final Boolean showStatistics)
+  {
+    this.showStatistics = showStatistics;
+    return this;
+  }
+
+  /**
+   * @return the timesheetUserId
+   */
+  public Integer getTimesheetUserId()
+  {
+    return timesheetUserId;
+  }
+
+  /**
+   * Only for users without access to display other's time-sheets.
+   * @return the showTimesheets
+   */
+  public Boolean getShowTimesheets()
+  {
+    return showTimesheets;
+  }
+
+  /**
+   * @param showTimesheets the showTimesheets to set
+   * @return this for chaining.
+   */
+  public TemplateEntry setShowTimesheets(final Boolean showTimesheets)
+  {
+    this.showTimesheets = showTimesheets;
+    return this;
+  }
+
+  /**
+   * Used for users with access to display own and other time-sheets.
+   * @param timesheetUserId the timesheetUserId to set
+   * @return this for chaining.
+   */
+  public TemplateEntry setTimesheetUserId(final Integer timesheetUserId)
+  {
+    this.timesheetUserId = timesheetUserId;
+    return this;
+  }
+
+  public static String calcCalendarStringForCalendar(final Integer calendarId)
+  {
     if (TeamCalFilterDialog.TIMESHEET_CALENDAR_ID.equals(calendarId) || calendarId == null) {
       return TimesheetEventsProvider.EVENT_CLASS_NAME;
     } else {

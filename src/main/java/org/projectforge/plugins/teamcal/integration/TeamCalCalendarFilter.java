@@ -242,6 +242,27 @@ public class TeamCalCalendarFilter extends CalendarFilter
     return false;
   }
 
+  public String getNewTemplateName(final String prefix)
+  {
+    if (templateEntries == null) {
+      return prefix;
+    }
+    String current = prefix;
+    for (int i = 1; i <= 10; i++) {
+      for (final TemplateEntry entry : templateEntries) {
+        if (current.equals(entry.getName()) == true) {
+          if (i == 10) {
+            // Don't try to get prefix + " 11", giving up:
+            return null;
+          }
+          current = prefix + " " + i;
+          break;
+        }
+      }
+    }
+    return current;
+  }
+
   private void createDefaultEntry()
   {
     final TemplateEntry newTemplate = new TemplateEntry();

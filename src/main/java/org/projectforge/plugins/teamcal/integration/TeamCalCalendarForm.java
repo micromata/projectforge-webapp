@@ -40,6 +40,7 @@ import org.projectforge.plugins.teamcal.event.TeamEventListPage;
 import org.projectforge.web.calendar.CalendarFilter;
 import org.projectforge.web.calendar.CalendarForm;
 import org.projectforge.web.calendar.CalendarPage;
+import org.projectforge.web.calendar.CalendarPageSupport;
 import org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
 import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
@@ -63,6 +64,15 @@ public class TeamCalCalendarForm extends CalendarForm
   public TeamCalCalendarForm(final CalendarPage parentPage)
   {
     super(parentPage);
+  }
+
+  /**
+   * @see org.projectforge.web.calendar.CalendarForm#createCalendarPageSupport()
+   */
+  @Override
+  protected CalendarPageSupport createCalendarPageSupport()
+  {
+    return new CalendarPageSupport(parentPage, filter).setShowOptions(false).setShowTimsheetsSelectors(false);
   }
 
   /**

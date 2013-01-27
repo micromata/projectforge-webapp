@@ -58,11 +58,15 @@ import org.projectforge.plugins.teamcal.event.TeamEventRight;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFilter;
 import org.projectforge.plugins.teamcal.integration.TemplateCalendarProperties;
 import org.projectforge.plugins.teamcal.integration.TemplateEntry;
+import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRights;
+import org.projectforge.web.calendar.CalendarPageSupport;
 import org.projectforge.web.common.ColorPickerPanel;
 import org.projectforge.web.dialog.ModalDialog;
+import org.projectforge.web.fibu.ISelectCallerPage;
+import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.AjaxMaxLengthEditableLabel;
@@ -108,12 +112,16 @@ public class TeamCalFilterDialog extends ModalDialog
 
   private Select2MultiChoice<TeamCalDO> teamCalsChoice;
 
+  private WebMarkupContainer optionsControls;
+
   public static final Integer TIMESHEET_CALENDAR_ID = -1;
 
   @SpringBean
   private TeamCalDao teamCalDao;
 
   private final TeamEventRight teamEventRight;
+
+  private CalendarPageSupport calendarPageSupport;
 
   /**
    * @param id
@@ -177,12 +185,14 @@ public class TeamCalFilterDialog extends ModalDialog
   public void init()
   {
     init(new Form<String>(getFormId()));
+    calendarPageSupport = new CalendarPageSupport((ISelectCallerPage) getPage(), filter);
     timesheetsCalendar.setTitle(getString("plugins.teamcal.timeSheetCalendar"));
     timesheetsCalendar.setId(TIMESHEET_CALENDAR_ID);
     // confirm
     setCloseButtonTooltip(null, new ResourceModel("plugins.teamcal.calendar.filterDialog.closeButton.tooltip"));
   }
 
+  @SuppressWarnings("serial")
   public TeamCalFilterDialog redraw()
   {
     clearContent();
@@ -190,6 +200,23 @@ public class TeamCalFilterDialog extends ModalDialog
     addFilterFieldset();
     gridBuilder.newSplitPanel(GridSize.COL50);
     addDefaultCalenderSelection();
+    gridBuilder.newGridPanel();
+
+    final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"));
+    optionsControls = fs.getControlsDiv();
+    optionsControls.setOutputMarkupId(true);
+    final UserSelectPanel timesheetUserSelectPanel = calendarPageSupport.addUserSelectPanel(fs, new PropertyModel<PFUserDO>(this,
+        "timesheetsUser"), false);
+    if (timesheetUserSelectPanel != null) {
+      timesheetUserSelectPanel.getFormComponent().add(new OnChangeAjaxBehavior() {
+        @Override
+        protected void onUpdate(final AjaxRequestTarget target)
+        {
+          final PFUserDO user = (PFUserDO) timesheetUserSelectPanel.getFormComponent().getModelObject();
+          setTimesheetsUser(user);
+        }
+      });
+    }
     gridBuilder.newGridPanel();
     addTeamCalsChoiceFieldset();
     final DivPanel panel = gridBuilder.getPanel();
@@ -310,8 +337,13 @@ public class TeamCalFilterDialog extends ModalDialog
       @Override
       protected void onSubmit(final AjaxRequestTarget target)
       {
+        final String newTemplateName = filter.getNewTemplateName(getString("plugins.teamcal.calendar.filterDialog.newTemplateName"));
+        if (newTemplateName == null) {
+          // Can't get new name. doing nothing.
+          return;
+        }
         final TemplateEntry newTemplate = new TemplateEntry();
-        newTemplate.setName(getString("plugins.teamcal.calendar.filterDialog.newTemplateName"));
+        newTemplate.setName(newTemplateName);
         filter.add(newTemplate);
         updateComponents(target);
       }
@@ -418,6 +450,7 @@ public class TeamCalFilterDialog extends ModalDialog
         if (activeTemplateEntry != null) {
           for (final TeamCalDO cal : activeTemplateEntry.getCalendars()) {
             if (teamEventRight.hasUpdateAccess(PFUserContext.getUser(), cal) == true) {
+              // User is allowed to insert events to this calendar:
               result.add(cal);
             }
           }
@@ -458,7 +491,30 @@ public class TeamCalFilterDialog extends ModalDialog
     final TemplateEntry activeTemplateEntry = filter.getActiveTemplateEntry();
     selectedCalendars.addAll(activeTemplateEntry.getCalendars());
     calendarColorPanel.redraw();
-    target.add(templateChoice.getDropDownChoice(), calendarColorPanel.main, templateName, defaultCalendarSelect);
+    target.add(templateChoice.getDropDownChoice(), teamCalsChoice, calendarColorPanel.main, templateName, defaultCalendarSelect, optionsControls);
+  }
+
+  public PFUserDO getTimesheetsUser()
+  {
+    final TemplateEntry activeTemplateEntry = filter.getActiveTemplateEntry();
+    if (activeTemplateEntry == null) {
+      return null;
+    }
+    final Integer userId = activeTemplateEntry.getTimesheetUserId();
+    return userId != null ? Registry.instance().getUserGroupCache().getUser(userId) : null;
+  }
+
+  public void setTimesheetsUser(final PFUserDO user)
+  {
+    final TemplateEntry activeTemplateEntry = filter.getActiveTemplateEntry();
+    if (activeTemplateEntry == null) {
+      return;
+    }
+    if (user == null) {
+      activeTemplateEntry.setTimesheetUserId(null);
+    } else {
+      activeTemplateEntry.setTimesheetUserId(user.getId());
+    }
   }
 
   /**
