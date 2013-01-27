@@ -2,11 +2,18 @@ Johannes
 --------
 - JavaScript mergen, ähnlich CSS
 - CSS/Javascript minimieren
+- ContextMenu für Ereignisse russ.
 
-Bootstrap-Umbau
----------------
-- Dialoge
-
+TeamCal
+-------
+- Named-Dialog russ.
+- TeamCalDialog designen.
+- TeamCalEdit: Ganztags-Knopp versaut DatePicker.
+- TeamCalEdit: Wenn Start-Datum geändert wird, dann EndeDatum mit ändern (falls dies bisher noch nicht geändert wurde)
+- Recurrency
+- Erinnerungen
+- Attendees, Einladungen
+- Droplet, Import
 
 Konkrete Masken
 ---------------
@@ -15,26 +22,22 @@ Konkrete Masken
 
 Wicket6-Migration
 -----------------
-- JS and CSS: minifiing and concatenating (https://github.com/WiQuery/wiquery)
-- Bruttoarbeitszeit
-- FullCalendar bei Reload Application wegen statischen Feldern.
+- CustomizeMenu geht nicht im IE
+- event row als oberste Zeile anzeigen
 
 Themenspeicher
 --------------
+- https://github.com/svenmeier/wicket-dnd (für Gantt und FavoriteMenu)
 - http://haineault.com/media/jquery/ui-timepickr/page/
 - https://blogs.oracle.com/talkingjavadeployment/entry/native_packaging_for_javafx
 
 Erste Feedback
 --------------
 - Das Menü oben war vorher leichter erkennbar (durch Kästen/senkrechte Striche) unterscheidbar, kann aber auch Gewöhnung sein.
+- Heute-Knopf auf Kalenderseite deutlicher anzeigen (ebenso im Datepicker).
 
 ToDo
 ----
 - reportObjectives (browsen->NPE)
 - Alert icon (s. Adresskampagnen-EditForm)
-- Breite Spalte Duration bei Timesheet-Export
-- Datumpanel: Jahreszahl prüfen (z. B. zwischen 1900 und 2100).
-
-TaskTree
---------
-- event row als oberste Zeile anzeigen
+- Addresses: Droplet, Import
