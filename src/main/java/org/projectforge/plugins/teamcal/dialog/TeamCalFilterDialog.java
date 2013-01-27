@@ -63,7 +63,9 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRights;
 import org.projectforge.web.common.ColorPickerPanel;
 import org.projectforge.web.dialog.ModalDialog;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridSize;
+import org.projectforge.web.wicket.components.AjaxMaxLengthEditableLabel;
 import org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.ButtonGroupPanel;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
@@ -81,13 +83,15 @@ import com.vaynberg.wicket.select2.Select2MultiChoice;
  * @author M. Lauterbach (m.lauterbach@micromata.de)
  * 
  */
-public class TeamCalDialog extends ModalDialog
+public class TeamCalFilterDialog extends ModalDialog
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalDialog.class);
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalFilterDialog.class);
 
   private static final long serialVersionUID = 8687197318833240410L;
 
   private final List<TeamCalDO> selectedCalendars;
+
+  private AjaxMaxLengthEditableLabel templateName;
 
   private DropDownChoicePanel<TemplateEntry> templateChoice;
 
@@ -116,7 +120,7 @@ public class TeamCalDialog extends ModalDialog
    * @param titleModel
    * @param filter
    */
-  public TeamCalDialog(final String id, final TeamCalCalendarFilter filter)
+  public TeamCalFilterDialog(final String id, final TeamCalCalendarFilter filter)
   {
     super(id);
     this.filter = filter;
@@ -179,7 +183,7 @@ public class TeamCalDialog extends ModalDialog
     setCloseButtonTooltip(null, new ResourceModel("plugins.teamcal.calendar.filterDialog.closeButton.tooltip"));
   }
 
-  public TeamCalDialog redraw()
+  public TeamCalFilterDialog redraw()
   {
     clearContent();
     gridBuilder.newSplitPanel(GridSize.COL50);
@@ -199,7 +203,7 @@ public class TeamCalDialog extends ModalDialog
    * @see org.projectforge.web.dialog.ModalDialog#open(org.apache.wicket.ajax.AjaxRequestTarget)
    */
   @Override
-  public TeamCalDialog open(final AjaxRequestTarget target)
+  public TeamCalFilterDialog open(final AjaxRequestTarget target)
   {
     backupFilter = new TeamCalCalendarFilter().copyValuesFrom(filter);
     super.open(target);
@@ -239,7 +243,44 @@ public class TeamCalDialog extends ModalDialog
       }
     };
 
-    final FieldsetPanel fs = gridBuilder.newFieldset(getString("filter"));
+    final FieldsetPanel fs = gridBuilder.newFieldset((String) null).setLabelSide(false);
+    templateName = new AjaxMaxLengthEditableLabel(fs.getAjaxEditableLabelId(), new Model<String>() {
+      @Override
+      public String getObject()
+      {
+        return filter.getActiveTemplateEntry().getName();
+      }
+
+      @Override
+      public void setObject(final String value)
+      {
+        filter.getActiveTemplateEntry().setName(value);
+      }
+    }, 40) {
+      /**
+       * @see org.apache.wicket.Component#onInitialize()
+       */
+      @Override
+      protected void onInitialize()
+      {
+        super.onInitialize();
+        getEditor().add(AttributeModifier.append("style", "width: 10em;"));
+        WicketUtils.setStrong(getLabel());
+        WicketUtils.addEditableLabelDefaultTooltip(getLabel());
+      }
+
+      /**
+       * @see org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
+       */
+      @Override
+      protected void onSubmit(final AjaxRequestTarget target)
+      {
+        super.onSubmit(target);
+        target.add(templateChoice.getDropDownChoice());
+      }
+    };
+    templateName.setType(String.class).setOutputMarkupId(true);
+    fs.add(templateName);
     // TEMPLATEENTRY DROPDOWN
     final IModel<List<TemplateEntry>> choicesModel = new PropertyModel<List<TemplateEntry>>(filter, "templateEntries");
     final IModel<TemplateEntry> currentModel = new PropertyModel<TemplateEntry>(filter, "activeTemplateEntry");
@@ -248,21 +289,16 @@ public class TeamCalDialog extends ModalDialog
     templateChoice.getDropDownChoice().setOutputMarkupId(true);
 
     templateChoice.getDropDownChoice().add(new AjaxFormComponentUpdatingBehavior("onChange") {
-      private static final long serialVersionUID = 8999698636114154230L;
-
       /**
        * @see org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior#onUpdate(org.apache.wicket.ajax.AjaxRequestTarget)
        */
       @Override
       protected void onUpdate(final AjaxRequestTarget target)
       {
-        selectedCalendars.clear();
-        final TemplateEntry activeTemplateEntry = filter.getActiveTemplateEntry();
-        selectedCalendars.addAll(activeTemplateEntry.getCalendars());
-        calendarColorPanel.redraw();
-        target.add(templateChoice.getDropDownChoice(), calendarColorPanel.main, defaultCalendarSelect);
+        updateComponents(target);
       }
     });
+    WicketUtils.addTooltip(templateChoice.getDropDownChoice(), getString("plugins.teamcal.filterDialog.changeFilter"));
 
     final ButtonGroupPanel buttonGroup = new ButtonGroupPanel(fs.newChildId());
     fs.add(buttonGroup);
@@ -274,24 +310,10 @@ public class TeamCalDialog extends ModalDialog
       @Override
       protected void onSubmit(final AjaxRequestTarget target)
       {
-        // currentName = "";
-        // // this callback is evaluated when the name dialog was entered!
-        // currentAjaxCallback = new AjaxCallback() {
-        // private static final long serialVersionUID = -6959790939627419710L;
-        //
-        // @Override
-        // public void callback(final AjaxRequestTarget target)
-        // {
-        // final TemplateEntry newTemplate = new TemplateEntry();
-        // newTemplate.setName(currentName);
-        // filter.add(newTemplate);
-        // selectedCalendars.clear();
-        // selectedCalendars.addAll(newTemplate.getCalendars());
-        // }
-        // };
-        // nameDialog.open(target);
-        // // Redraw the content:
-        // nameDialog.redraw().addContent(target);
+        final TemplateEntry newTemplate = new TemplateEntry();
+        newTemplate.setName(getString("plugins.teamcal.calendar.filterDialog.newTemplateName"));
+        filter.add(newTemplate);
+        updateComponents(target);
       }
     };
     addTemplateButton.setDefaultFormProcessing(false);
@@ -306,10 +328,7 @@ public class TeamCalDialog extends ModalDialog
       protected void onSubmit(final AjaxRequestTarget target)
       {
         filter.remove(filter.getActiveTemplateEntry());
-        selectedCalendars.clear();
-        selectedCalendars.addAll(filter.getActiveTemplateEntry().getCalendars());
-        calendarColorPanel.redraw();
-        target.add(templateChoice.getDropDownChoice(), calendarColorPanel.main, defaultCalendarSelect);
+        updateComponents(target);
       }
     };
     deleteTemplateButton.setDefaultFormProcessing(false);
@@ -329,7 +348,7 @@ public class TeamCalDialog extends ModalDialog
     // TEAMCAL CHOICE FIELD
     final TeamCalChoiceProvider teamProvider = new TeamCalChoiceProvider();
     teamCalsChoice = new Select2MultiChoice<TeamCalDO>(fs.getSelect2MultiChoiceId(), new PropertyModel<Collection<TeamCalDO>>(
-        TeamCalDialog.this, "selectedCalendars"), teamProvider);
+        TeamCalFilterDialog.this, "selectedCalendars"), teamProvider);
     teamCalsChoice.setOutputMarkupId(true);
     teamCalsChoice.add(new AjaxFormComponentUpdatingBehavior("onChange") {
       private static final long serialVersionUID = 1L;
@@ -354,7 +373,7 @@ public class TeamCalDialog extends ModalDialog
           }
         }
         calendarColorPanel.redraw();
-        target.add(templateChoice.getDropDownChoice(), calendarColorPanel.main, defaultCalendarSelect);
+        target.add(calendarColorPanel.main, defaultCalendarSelect);
       }
     });
     fs.add(teamCalsChoice);
@@ -431,6 +450,15 @@ public class TeamCalDialog extends ModalDialog
       }
     });
     fs.add(defaultCalendarSelect);
+  }
+
+  private void updateComponents(final AjaxRequestTarget target)
+  {
+    selectedCalendars.clear();
+    final TemplateEntry activeTemplateEntry = filter.getActiveTemplateEntry();
+    selectedCalendars.addAll(activeTemplateEntry.getCalendars());
+    calendarColorPanel.redraw();
+    target.add(templateChoice.getDropDownChoice(), calendarColorPanel.main, templateName, defaultCalendarSelect);
   }
 
   /**
@@ -511,6 +539,7 @@ public class TeamCalDialog extends ModalDialog
           }
         });
         container.add(checkBoxPanel);
+        WicketUtils.addTooltip(checkBoxPanel.getCheckBox(), getString("plugins.teamcal.filterDialog.calendarIsVisible.tooltip"));
         container.add(new Label("name", calendar.getTitle()));
         final ColorPickerPanel picker = new ColorPickerPanel("colorPicker", activeTemplateEntry.getColorCode(calendar.getId())) {
           @Override
