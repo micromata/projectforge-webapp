@@ -133,6 +133,9 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
   }
 
   /**
+   * @param id
+   * @param labeltext If null, then the label field is invisible.
+   * @param description
    */
   @SuppressWarnings("serial")
   public FieldsetPanel(final String id, final String labeltext, final String description)
@@ -143,17 +146,21 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
     superAdd(fieldset);
     fieldset.add(AttributeModifier.append("class", FIELD_SET_CLASS));
     fieldset.add((label = new WebMarkupContainer("label")));
-    label.add(new Label("labeltext", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return labelText;
-      };
-    }).setRenderBodyOnly(true));
-    if (description != null) {
-      label.add(new Label("labeldescription", description));
+    if (labelText != null) {
+      label.add(new Label("labeltext", new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return labelText;
+        };
+      }).setRenderBodyOnly(true));
+      if (description != null) {
+        label.add(new Label("labeldescription", description));
+      } else {
+        label.add(WicketUtils.getInvisibleComponent("labeldescription"));
+      }
     } else {
-      label.add(WicketUtils.getInvisibleComponent("labeldescription"));
+      label.setVisible(false);
     }
     fieldset.add(div = new WebMarkupContainer("div"));
     div.add(feedbackMessageLabel = new Label("feedbackMessage", new Model<String>() {
