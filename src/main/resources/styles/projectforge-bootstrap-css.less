@@ -115,6 +115,19 @@ ul.dropdown-menu {
 	margin-top: 0px; /* Needed, otherwise menu disappears for 2px. */
 }
 
+ul.dropdown-menu li.dropdown-submenu ul.dropdown-menu {
+  left: 100%;
+  position: absolute;
+  top: 0;
+  visibility: hidden;
+  margin-top: -1px;
+}
+
+ul.dropdown-menu li.dropdown-submenu:hover ul.dropdown-menu {
+  visibility: visible;
+  display: block;
+}
+
 /* Collapse / Toggle container */
 div.toggle-container {
 	border: 1px solid #bbb;
