@@ -60,7 +60,6 @@ import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRights;
 import org.projectforge.web.timesheet.TimesheetEventsProvider;
-import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * Feed Servlet, which generates a 'text/calendar' output of the last four mounts. Currently relevant informations are date, start- and stop
@@ -91,7 +90,7 @@ public class CalendarFeed extends HttpServlet
    */
   public static String getUrl4Timesheets(final Integer timesheetUserId)
   {
-    return WicketUtils.getContextPath() + getUrl("&timesheetUser=" + timesheetUserId);
+    return getUrl("&timesheetUser=" + timesheetUserId);
   }
 
   /**
@@ -158,7 +157,15 @@ public class CalendarFeed extends HttpServlet
       if (StringUtils.isNotBlank(timesheetUserParam) == true) {
         final Integer timesheetUserId = NumberHelper.parseInteger(timesheetUserParam);
         if (timesheetUserId != null) {
+          if (timesheetUserId.equals(loggedInUser.getId()) == false) {
+            log.error("Not yet allowed: all users are only allowed to download their own time-sheets.");
+            return null;
+          }
           timesheetUser = userDao.getUserGroupCache().getUser(timesheetUserId);
+          if (timesheetUser == null) {
+            log.error("Time-sheet user with id '" + timesheetUserParam + "' not found.");
+            return null;
+          }
         }
       }
       // creating a new calendar
