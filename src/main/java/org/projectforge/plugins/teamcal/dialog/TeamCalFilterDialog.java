@@ -311,11 +311,14 @@ public class TeamCalFilterDialog extends ModalDialog
     };
     templateName.setType(String.class).setOutputMarkupId(true);
     fs.add(templateName);
+    final DivPanel subPanel = new DivPanel(fs.newChildId());
+    subPanel.add(AttributeModifier.append("style", "float: right;"));
+    fs.add(subPanel);
     // TEMPLATEENTRY DROPDOWN
     final IModel<List<TemplateEntry>> choicesModel = new PropertyModel<List<TemplateEntry>>(filter, "templateEntries");
     final IModel<TemplateEntry> currentModel = new PropertyModel<TemplateEntry>(filter, "activeTemplateEntry");
-    templateChoice = new DropDownChoicePanel<TemplateEntry>(fs.newChildId(), currentModel, choicesModel, teamCalCollectionRenderer, false);
-    fs.add(templateChoice);
+    templateChoice = new DropDownChoicePanel<TemplateEntry>(subPanel.newChildId(), currentModel, choicesModel, teamCalCollectionRenderer, false);
+    subPanel.add(templateChoice);
     templateChoice.getDropDownChoice().setOutputMarkupId(true);
 
     templateChoice.getDropDownChoice().add(new AjaxFormComponentUpdatingBehavior("onChange") {
@@ -330,8 +333,8 @@ public class TeamCalFilterDialog extends ModalDialog
     });
     WicketUtils.addTooltip(templateChoice.getDropDownChoice(), getString("plugins.teamcal.filterDialog.changeFilter"));
 
-    final ButtonGroupPanel buttonGroup = new ButtonGroupPanel(fs.newChildId());
-    fs.add(buttonGroup);
+    final ButtonGroupPanel buttonGroup = new ButtonGroupPanel(subPanel.newChildId());
+    subPanel.add(buttonGroup);
     // ADD BUTTON FOR Template
     final IconButtonPanel addTemplateButton = new AjaxIconButtonPanel(buttonGroup.newChildId(), IconType.PLUS, getString("add")) {
       /**
