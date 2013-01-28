@@ -25,17 +25,13 @@ package org.projectforge.web.calendar;
 
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.joda.time.DateMidnight;
-import org.projectforge.access.AccessChecker;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
-import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.wicket.AbstractStandardForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
@@ -48,15 +44,11 @@ import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
-import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 
 public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarPage>
 {
   private static final long serialVersionUID = -145923669780937370L;
-
-  @SpringBean(name = "accessChecker")
-  private AccessChecker accessChecker;
 
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
@@ -64,10 +56,7 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
   @SpringBean(name = "userDao")
   protected UserDao userDao;
 
-  private CalendarFilter filter;
-
-  @SuppressWarnings("unused")
-  private boolean showTimesheets;
+  protected ICalendarFilter filter;
 
   private JodaDatePanel currentDatePanel;
 
@@ -79,7 +68,7 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
 
   protected CalendarPageSupport createCalendarPageSupport()
   {
-    final CalendarPageSupport calendarPageSupport = new CalendarPageSupport(parentPage, getFilter());
+    final CalendarPageSupport calendarPageSupport = new CalendarPageSupport(parentPage);
     return calendarPageSupport;
   }
 
@@ -98,8 +87,7 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
 
     final DivPanel checkBoxPanel = fieldset.addNewCheckBoxDiv();
 
-    showTimesheets = getFilter().getUserId() != null;
-    calendarPageSupport.addOptions(checkBoxPanel, new PropertyModel<Boolean>(this, "showTimesheets"));
+    calendarPageSupport.addOptions(checkBoxPanel, true, filter);
     checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "slot30"),
         getString("calendar.option.slot30"), true).setTooltip(getString("calendar.option.slot30.tooltip")));
 
@@ -135,27 +123,6 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
       buttonGroupPanel.addButton(refreshButtonPanel);
       setDefaultButton(refreshButtonPanel.getButton());
     }
-    if (accessChecker.isRestrictedUser() == false && WebConfiguration.isDevelopmentMode() == true) {
-      final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, new Model<String>() {
-        @Override
-        public String getObject()
-        {
-          final PFUserDO timesheetUser = getTimesheetsUser();
-          final String iCalTarget = CalendarFeed.getUrl4Timesheets(timesheetUser != null ? timesheetUser.getId() : null);
-          return iCalTarget;
-        };
-      }) {
-        @Override
-        public boolean isVisible()
-        {
-          return getTimesheetsUser() != null;
-        };
-      };
-      final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(buttonGroupPanel.newChildId(), IconType.DOWNLOAD, new ResourceModel(
-          setIcsImportButtonTooltip()), iCalExportLink);
-
-      buttonGroupPanel.addButton(exportICalButtonPanel);
-    }
     gridBuilder.newSplitPanel(GridSize.SPAN4);
     final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.duration")).setNoLabelFor();
     final DivTextPanel durationPanel = new DivTextPanel(fs.newChildId(), new Label(DivTextPanel.WICKET_ID, new Model<String>() {
@@ -168,27 +135,6 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
     durationLabel = durationPanel.getLabel4Ajax();
     fs.add(durationPanel);
     onAfterInit(gridBuilder);
-  }
-
-  /**
-   * If it is necessary to change the tool tip.
-   * 
-   * @param i18nKey
-   * @return
-   */
-  protected String setIcsImportButtonTooltip()
-  {
-    return "timesheet.iCalExport";
-  }
-
-  /**
-   * Hook method where child implementations could add buttons
-   * 
-   * @param fs
-   */
-  protected void addControlButtons(final FieldsetPanel fs)
-  {
-    // by default nothing happens here
   }
 
   /**
@@ -206,28 +152,28 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
     super(parentPage);
   }
 
-  public CalendarFilter getFilter()
+  public ICalendarFilter getFilter()
   {
     return filter;
   }
 
-  protected void setFilter(final CalendarFilter filter)
+  protected void setFilter(final ICalendarFilter filter)
   {
     this.filter = filter;
   }
 
   public PFUserDO getTimesheetsUser()
   {
-    final Integer userId = getFilter().getUserId();
+    final Integer userId = getFilter().getTimesheetUserId();
     return userId != null ? userGroupCache.getUser(userId) : null;
   }
 
   public void setTimesheetsUser(final PFUserDO user)
   {
     if (user == null) {
-      getFilter().setUserId(null);
+      getFilter().setTimesheetUserId(null);
     } else {
-      getFilter().setUserId(user.getId());
+      getFilter().setTimesheetUserId(user.getId());
     }
   }
 

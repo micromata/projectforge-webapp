@@ -91,7 +91,7 @@ public class CalendarPanel extends Panel
 
   private TimesheetEventsProvider timesheetEventsProvider;
 
-  protected CalendarFilter filter;
+  protected ICalendarFilter filter;
 
   private boolean refresh;
 
@@ -103,8 +103,13 @@ public class CalendarPanel extends Panel
     this.currentDatePanel = currentDatePanel;
   }
 
+  /**
+   * At default the filter is equals to the customized filter. For the team plug-in the filter is a different filter.
+   * @param filter
+   * @param filter
+   */
   @SuppressWarnings("serial")
-  public void init(final CalendarFilter filter)
+  public void init(final ICalendarFilter filter)
   {
     this.filter = filter;
     final MyFullCalendarConfig config = new MyFullCalendarConfig(this);
@@ -143,8 +148,8 @@ public class CalendarPanel extends Panel
             timesheet.setStartDate(DateHelper.getDateTimeAsMillis(range.getStart()))//
             .setStopTime(DateHelper.getDateTimeAsMillis(range.getEnd()));
           }
-          if (filter.getUserId() != null) {
-            timesheetDao.setUser(timesheet, filter.getUserId());
+          if (filter.getTimesheetUserId() != null) {
+            timesheetDao.setUser(timesheet, filter.getTimesheetUserId());
           }
           final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(timesheet);
           timesheetEditPage.setReturnToPage((WebPage) getPage());
@@ -335,7 +340,7 @@ public class CalendarPanel extends Panel
    * @param config
    * @param filter
    */
-  protected void onRegisterEventSourceHook(final MyFullCalendarConfig config, final CalendarFilter filter)
+  protected void onRegisterEventSourceHook(final MyFullCalendarConfig config, final ICalendarFilter filter)
   {
     // by default nothing happens here
   }

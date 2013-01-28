@@ -56,13 +56,13 @@ public class CalendarPage extends AbstractStandardFormPage implements ISelectCal
   {
     form = initCalendarForm(this);
     body.add(form);
-    final CalendarFilter filter = initCalendarFilter();
+    final ICalendarFilter filter = initCalendarFilter();
     form.setFilter(filter);
     form.init();
     calendarPanel = initCalenderPanel();
     if (pageParameters != null) {
       if (pageParameters.get("showTimesheets").isNull() == false) {
-        form.getFilter().setUserId(getUserId());
+        form.getFilter().setTimesheetUserId(getUserId());
       }
       if (pageParameters.get("showBirthdays").isNull() == false) {
         form.getFilter().setShowBirthdays(true);
@@ -95,7 +95,7 @@ public class CalendarPage extends AbstractStandardFormPage implements ISelectCal
    * 
    * @return
    */
-  protected CalendarFilter initCalendarFilter()
+  protected ICalendarFilter initCalendarFilter()
   {
     CalendarFilter filter = (CalendarFilter) getUserPrefEntry(USERPREF_KEY);
     if (filter == null) {
@@ -121,7 +121,7 @@ public class CalendarPage extends AbstractStandardFormPage implements ISelectCal
     return getString("calendar.title");
   }
 
-  protected CalendarFilter getFilter()
+  protected ICalendarFilter getFilter()
   {
     return form.getFilter();
   }
@@ -133,7 +133,7 @@ public class CalendarPage extends AbstractStandardFormPage implements ISelectCal
   public void select(final String property, final Object selectedValue)
   {
     if ("userId".equals(property) == true) {
-      getFilter().setUserId((Integer) selectedValue);
+      getFilter().setTimesheetUserId((Integer) selectedValue);
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }
@@ -142,7 +142,7 @@ public class CalendarPage extends AbstractStandardFormPage implements ISelectCal
   public void unselect(final String property)
   {
     if ("userId".equals(property) == true) {
-      getFilter().setUserId(null);
+      getFilter().setTimesheetUserId(null);
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }

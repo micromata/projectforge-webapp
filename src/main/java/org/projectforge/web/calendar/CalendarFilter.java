@@ -23,11 +23,6 @@
 
 package org.projectforge.web.calendar;
 
-import java.io.Serializable;
-
-import net.ftlines.wicket.fullcalendar.ViewType;
-
-import org.joda.time.DateMidnight;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.timesheet.TimesheetEventsProvider;
 
@@ -38,12 +33,9 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
  * Some settings for the SelectDateAction stored in the flow scope (configurable by the caller).
  */
 @XStreamAlias("dateFilter")
-public class CalendarFilter implements Serializable
+public class CalendarFilter extends AbstractCalendarFilter
 {
   private static final long serialVersionUID = -4154764049316136395L;
-
-  @XStreamAsAttribute
-  private DateMidnight startDate;
 
   @XStreamAsAttribute
   private String selectedCalendar;
@@ -55,49 +47,20 @@ public class CalendarFilter implements Serializable
   private Boolean showStatistics;
 
   @XStreamAsAttribute
-  private Boolean slot30;
-
-  @XStreamAsAttribute
-  private Integer userId;
+  private Integer timesheetUserId;
 
   @XStreamAsAttribute
   private Boolean showBreaks = true;
 
-  @XStreamAsAttribute
-  private Integer firstHour = 8;
 
   @XStreamAsAttribute
   private Boolean showPlanning;
 
-  @XStreamAsAttribute
-  private ViewType viewType;
-
   public CalendarFilter()
   {
-    startDate = new DateMidnight();
-    userId = PFUserContext.getUserId();
+    super();
+    timesheetUserId = PFUserContext.getUserId();
     selectedCalendar = TimesheetEventsProvider.EVENT_CLASS_NAME;
-  }
-
-  /**
-   * @return the startDate
-   */
-  public DateMidnight getStartDate()
-  {
-    return startDate;
-  }
-
-  /**
-   * @param startDate the startDate to set
-   * @return this for chaining.
-   */
-  public void setStartDate(final DateMidnight startDate)
-  {
-    if (startDate != null) {
-      this.startDate = startDate;
-    } else {
-      this.startDate = new DateMidnight();
-    }
   }
 
   public boolean isShowBirthdays()
@@ -105,9 +68,10 @@ public class CalendarFilter implements Serializable
     return showBirthdays == Boolean.TRUE;
   }
 
-  public void setShowBirthdays(final boolean showBirthdays)
+  public CalendarFilter setShowBirthdays(final boolean showBirthdays)
   {
     this.showBirthdays = showBirthdays;
+    return this;
   }
 
   /**
@@ -131,7 +95,7 @@ public class CalendarFilter implements Serializable
   /**
    * @return the showPlanning
    */
-  public Boolean isShowPlanning()
+  public boolean isShowPlanning()
   {
     return showPlanning == Boolean.TRUE;
   }
@@ -140,39 +104,40 @@ public class CalendarFilter implements Serializable
    * @param showPlanning the showPlanning to set
    * @return this for chaining.
    */
-  public CalendarFilter setShowPlanning(final Boolean showPlanning)
+  public CalendarFilter setShowPlanning(final boolean showPlanning)
   {
     this.showPlanning = showPlanning;
     return this;
   }
 
-  /**
-   * If true then the slot is 30 minutes otherwise 15 minutes.
-   * @return the slot30
-   */
-  public boolean isSlot30()
+  public Integer getTimesheetUserId()
   {
-    return slot30 == Boolean.TRUE;
+    return timesheetUserId;
   }
 
-  /**
-   * @param slot30 the slot30 to set
-   * @return this for chaining.
-   */
-  public CalendarFilter setSlot30(final boolean slot30)
+  public CalendarFilter setTimesheetUserId(final Integer timesheetUserId)
   {
-    this.slot30 = slot30;
+    this.timesheetUserId = timesheetUserId;
     return this;
   }
 
-  public Integer getUserId()
+  /**
+   * @see org.projectforge.web.calendar.ICalendarFilter#isShowTimesheets()
+   */
+  @Override
+  public boolean isShowTimesheets()
   {
-    return userId;
+    return this.timesheetUserId != null;
   }
 
-  public void setUserId(final Integer userId)
+  /**
+   * @see org.projectforge.web.calendar.ICalendarFilter#setShowTimesheets(boolean)
+   */
+  @Override
+  public CalendarFilter setShowTimesheets(final boolean showTimesheets)
   {
-    this.userId = userId;
+    this.timesheetUserId = PFUserContext.getUserId();
+    return this;
   }
 
   /**
@@ -189,45 +154,9 @@ public class CalendarFilter implements Serializable
    * @param showBreaks the showBreaks to set
    * @return this for chaining.
    */
-  public CalendarFilter setShowBreaks(final Boolean showBreaks)
+  public CalendarFilter setShowBreaks(final boolean showBreaks)
   {
     this.showBreaks = showBreaks;
-    return this;
-  }
-
-  /**
-   * @return the viewType
-   */
-  public ViewType getViewType()
-  {
-    return viewType != null ? viewType : ViewType.AGENDA_WEEK;
-  }
-
-  /**
-   * @param viewType the viewType to set
-   * @return this for chaining.
-   */
-  public CalendarFilter setViewType(final ViewType viewType)
-  {
-    this.viewType = viewType;
-    return this;
-  }
-
-  /**
-   * @return the firstHour to display in week mode of calendar.
-   */
-  public Integer getFirstHour()
-  {
-    return (firstHour != null && firstHour < 24) ? firstHour : 8;
-  }
-
-  /**
-   * @param firstHour the firstHour to set
-   * @return this for chaining.
-   */
-  public CalendarFilter setFirstHour(final Integer firstHour)
-  {
-    this.firstHour = firstHour;
     return this;
   }
 
@@ -243,9 +172,9 @@ public class CalendarFilter implements Serializable
    * @param selectedCalendar the selectedCalendar to set
    * @return this for chaining.
    */
-  public void setSelectedCalendar(final String selectedCalendar)
+  public CalendarFilter setSelectedCalendar(final String selectedCalendar)
   {
     this.selectedCalendar = selectedCalendar;
+    return this;
   }
-
 }

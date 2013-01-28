@@ -25,6 +25,8 @@ package org.projectforge.web.calendar;
 
 import java.io.Serializable;
 
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.OnChangeAjaxBehavior;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -49,14 +51,11 @@ public class CalendarPageSupport implements Serializable
 
   private boolean showTimsheetsSelectors = true, showOptions = true;
 
-  private final CalendarFilter filter;
-
   private UserSelectPanel userSelectPanel;
 
-  public CalendarPageSupport(final ISelectCallerPage parentPage, final CalendarFilter filter)
+  public CalendarPageSupport(final ISelectCallerPage parentPage)
   {
     this.parentPage = parentPage;
-    this.filter = filter;
     this.user = PFUserContext.getUser();
   }
 
@@ -67,43 +66,46 @@ public class CalendarPageSupport implements Serializable
     }
     userSelectPanel = new UserSelectPanel(fieldset.newChildId(), model, parentPage, "userId");
     fieldset.add(userSelectPanel);
-    userSelectPanel.init().withAutoSubmit(autosubmit).setLabel(new Model<String>(fieldset.getString("user")));
+    userSelectPanel.withAutoSubmit(autosubmit).setLabel(new Model<String>(fieldset.getString("user"))).init();
     return userSelectPanel;
   }
 
-  @SuppressWarnings("serial")
-  public void addOptions(final DivPanel checkBoxPanel, final IModel<Boolean> showTimesheetsModel)
+  public void addOptions(final DivPanel checkBoxDivPanel, final boolean autoSubmit,
+      final ICalendarFilter filter)
   {
     if (UserRights.getAccessChecker().isRestrictedUser(user) == true || showOptions == false) {
       return;
     }
     if (isOtherUsersAllowed() == false) {
-      checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), showTimesheetsModel, checkBoxPanel
-          .getString("calendar.option.timesheeets"), true) {
-        /**
-         * @see org.projectforge.web.wicket.flowlayout.CheckBoxPanel#onSelectionChanged()
-         */
+      addCheckBox(checkBoxDivPanel, filter, "showTimesheets", "calendar.option.timesheeets", null, autoSubmit);
+    }
+    addCheckBox(checkBoxDivPanel, filter, "showBreaks", "calendar.option.showBreaks", "calendar.option.showBreaks.tooltip", autoSubmit);
+    addCheckBox(checkBoxDivPanel, filter, "showPlanning", "calendar.option.planning", "calendar.option.planning.tooltip", autoSubmit);
+    if (Configuration.getInstance().isAddressManagementConfigured() == true) {
+      addCheckBox(checkBoxDivPanel, filter, "showBirthdays", "calendar.option.birthdays", null, autoSubmit);
+    }
+    addCheckBox(checkBoxDivPanel, filter, "showStatistics", "calendar.option.statistics", "calendar.option.statistics.tooltip", autoSubmit);
+  }
+
+  @SuppressWarnings("serial")
+  private void addCheckBox(final DivPanel checkBoxDivPanel, final ICalendarFilter filter, final String property, final String labelKey,
+      final String tooltipKey, final boolean autoSubmit)
+  {
+    final CheckBoxPanel checkBoxPanel = new CheckBoxPanel(checkBoxDivPanel.newChildId(), new PropertyModel<Boolean>(filter, property),
+        checkBoxDivPanel.getString(labelKey), autoSubmit);
+    if (autoSubmit == false) {
+      checkBoxPanel.getCheckBox().add(new OnChangeAjaxBehavior() {
         @Override
-        protected void onSelectionChanged(final Boolean newSelection)
+        protected void onUpdate(final AjaxRequestTarget target)
         {
-          if (Boolean.TRUE.equals(newSelection) == true) {
-            filter.setUserId(user.getId());
-          } else {
-            filter.setUserId(null);
-          }
+          // Do nothing (the model object is updated).
         }
       });
     }
-    checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "showBreaks"), checkBoxPanel
-        .getString("calendar.option.showBreaks"), true).setTooltip(checkBoxPanel.getString("calendar.option.showBreaks.tooltip")));
-    checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "showPlanning"), checkBoxPanel
-        .getString("calendar.option.planning"), true).setTooltip(checkBoxPanel.getString("calendar.option.planning.tooltip")));
-    if (Configuration.getInstance().isAddressManagementConfigured() == true) {
-      checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "showBirthdays"), checkBoxPanel
-          .getString("calendar.option.birthdays"), true));
+    if (tooltipKey != null) {
+      checkBoxPanel.setTooltip(checkBoxDivPanel.getString(tooltipKey));
     }
-    checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "showStatistics"), checkBoxPanel
-        .getString("calendar.option.statistics"), true).setTooltip(checkBoxPanel.getString("calendar.option.statistics.tooltip")));
+    checkBoxDivPanel.add(checkBoxPanel);
   }
 
   private boolean isOtherUsersAllowed()
