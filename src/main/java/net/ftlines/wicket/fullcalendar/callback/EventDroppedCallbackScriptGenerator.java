@@ -73,7 +73,7 @@ public class EventDroppedCallbackScriptGenerator
     result.put("COPY_EDIT", component.getString(COPY_EDIT));
     result.put("COPY_EDIT_TARGET", CalendarDropMode.COPY_EDIT.getAjaxTarget());
     result.put("CANCEL", component.getString(CANCEL));
-    result.put("NONE_TARGET", CalendarDropMode.NONE.getAjaxTarget());
+    result.put("NONE_TARGET", CalendarDropMode.MOVE_EDIT.getAjaxTarget());
     return result;
   }
 

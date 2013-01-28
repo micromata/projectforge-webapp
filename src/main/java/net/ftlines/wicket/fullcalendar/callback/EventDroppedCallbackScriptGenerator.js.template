@@ -1,7 +1,7 @@
 var triggerAjaxEvent = function (which) {
     ${ORIGINAL_CALLBACK}
 };
-if(jQuery.inArray("{NO_CONTEXTMENU_INDICATOR}", event.className) < 0) {
+if(jQuery.inArray("${NO_CONTEXTMENU_INDICATOR}", event.className) < 0) {
       $.contextMenu.create([
       { '${MOVE_SAVE}' : function(menuItem,menu) { triggerAjaxEvent('${MOVE_SAVE_TARGET}'); } },
       { '${MOVE_EDIT}' : function(menuItem,menu) { triggerAjaxEvent('${MOVE_EDIT_TARGET}'); } },

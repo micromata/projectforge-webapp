@@ -19,7 +19,7 @@ public enum CalendarDropMode
   MOVE_EDIT("calendar.dd.move.edit", "MoveEdit"), //
   COPY_SAVE("calendar.dd.copy.save", "CopySave"), //
   COPY_EDIT("calendar.dd.copy.edit", "CopyEdit"), //
-  CANCEL("cancel", "Cancel"), NONE("none", "None");
+  CANCEL("cancel", "Cancel");
 
   private String i18nKey;
 

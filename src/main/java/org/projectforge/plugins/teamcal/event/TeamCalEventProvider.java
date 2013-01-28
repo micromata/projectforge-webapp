@@ -31,8 +31,8 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import net.ftlines.wicket.fullcalendar.Event;
-import net.ftlines.wicket.fullcalendar.callback.EventDroppedCallbackScriptGenerator;
 
+import net.ftlines.wicket.fullcalendar.callback.EventDroppedCallbackScriptGenerator;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
@@ -140,7 +140,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
         }
         teamEventMap.put(id.toString(), teamEvent);
         final Event event = new Event();
-        event.setClassName(EVENT_CLASS_NAME);
+        event.setClassName(EVENT_CLASS_NAME + " " + EventDroppedCallbackScriptGenerator.NO_CONTEXTMENU_INDICATOR);
         event.setId("" + id);
         event.setColor(activeTemplateEntry.getColorCode(eventDO.getCalendarId()));
 
@@ -156,11 +156,6 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
 
         event.setStart(startDate);
         event.setEnd(endDate);
-
-        // no contextmenu for events at all
-        //if (eventDO.hasRecurrence() == true) {
-        event.setClassName(event.getClassName() + " " + EventDroppedCallbackScriptGenerator.NO_CONTEXTMENU_INDICATOR);
-        //}
 
         final String title;
         String durationString = "";
