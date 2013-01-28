@@ -239,7 +239,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
       {
         final TaskDO task = rowModel.getObject();
         final StringBuffer buf = new StringBuffer();
-        taskFormatter.appendFormattedTask(getResponse(), buf, task, true, false);
+        taskFormatter.appendFormattedTask(getRequestCycle(), buf, task, true, false);
         final Label formattedTaskLabel = new Label(ListSelectActionPanel.LABEL_ID, buf.toString());
         formattedTaskLabel.setEscapeModelStrings(false);
         if (isSelectMode() == false) {

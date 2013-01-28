@@ -439,8 +439,8 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
         {
           final WebMarkupContainer dropDownMenu = new WebMarkupContainer("dropDownMenu");
           addColumn(item, dropDownMenu, "white-space: nowrap; width: 32px;");
-          dropDownMenu.add(new PresizedImage("cogImage", getResponse(), WebConstants.IMAGE_COG));
-          dropDownMenu.add(new PresizedImage("arrowDownImage", getResponse(), WebConstants.IMAGE_ARROW_DOWN));
+          dropDownMenu.add(new PresizedImage("cogImage", WebConstants.IMAGE_COG));
+          dropDownMenu.add(new PresizedImage("arrowDownImage", WebConstants.IMAGE_ARROW_DOWN));
           final RepeatingView menuRepeater = new RepeatingView("menuEntriesRepeater");
           dropDownMenu.add(menuRepeater);
           menuRepeater.add(new ContextMenuEntry(menuRepeater.newChildId(), "mark") {
@@ -740,8 +740,8 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
   private void addTitleColumns(final Item<GanttTreeTableNode> item, final GanttTreeTableNode node, final GanttTask ganttObject,
       final TaskDO task)
   {
-    final AjaxRequiredMaxLengthEditableLabel titleField = new AjaxRequiredMaxLengthEditableLabel("title",
-        new PropertyModel<String>(ganttObject, "title"), HibernateUtils.getPropertyLength(TaskDO.class.getName(), "title"));
+    final AjaxRequiredMaxLengthEditableLabel titleField = new AjaxRequiredMaxLengthEditableLabel("title", new PropertyModel<String>(
+        ganttObject, "title"), HibernateUtils.getPropertyLength(TaskDO.class.getName(), "title"));
     titleField.setOutputMarkupId(true);
     // final RequiredMaxLengthTextField titleField = new RequiredMaxLengthTextField("title", new PropertyModel<String>(ganttObject,
     // "title"),
@@ -885,7 +885,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
     });
     panel.add(asStringLabel);
     final String taskSelectProperty = "predecessorId:" + ganttObject.getId();
-    final ImageSubmitLinkPanel selectSubmitLink = new ImageSubmitLinkPanel("select", getResponse(), form, WebConstants.IMAGE_TASK_SELECT,
+    final ImageSubmitLinkPanel selectSubmitLink = new ImageSubmitLinkPanel("select", form, WebConstants.IMAGE_TASK_SELECT,
         getString("tooltip.selectTask")) {
       @Override
       public void onSubmit()
@@ -900,8 +900,8 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
       }
     }.setDefaultFormProcessing(false);
     panel.add(selectSubmitLink);
-    final ImageSubmitLinkPanel unselectSubmitLink = new ImageSubmitLinkPanel("unselect", getResponse(), form,
-        WebConstants.IMAGE_TASK_UNSELECT, getString("tooltip.unselectTask")) {
+    final ImageSubmitLinkPanel unselectSubmitLink = new ImageSubmitLinkPanel("unselect", form, WebConstants.IMAGE_TASK_UNSELECT,
+        getString("tooltip.unselectTask")) {
       @Override
       public void onSubmit()
       {
@@ -916,7 +916,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
     }.setDefaultFormProcessing(false);
     panel.add(unselectSubmitLink);
 
-    new RejectSaveLinksFragment("rejectSavePredecessor", item, panel, task, task != null ? taskFormatter.getTaskPath(getResponse(),
+    new RejectSaveLinksFragment("rejectSavePredecessor", item, panel, task, task != null ? taskFormatter.getTaskPath(getRequestCycle(),
         task.getGanttPredecessorId()) : "") {
       @Override
       protected void onSave()
@@ -1157,8 +1157,8 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
       }
       this.dataComponent = dataComponent;
       addColumn(parent, this, "white-space: nowrap; width: 32px;");
-      rejectSubmitLink = new ImageSubmitLinkPanel("reject", getResponse(), form, WebConstants.IMAGE_BUTTON_CANCEL,
-          PFUserContext.getLocalizedMessage("gantt.tooltip.rejectValue", taskValueAsString)) {
+      rejectSubmitLink = new ImageSubmitLinkPanel("reject", form, WebConstants.IMAGE_BUTTON_CANCEL, PFUserContext.getLocalizedMessage(
+          "gantt.tooltip.rejectValue", taskValueAsString)) {
         @Override
         public void onSubmit()
         {
@@ -1171,7 +1171,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
         }
       }.setDefaultFormProcessing(false);
       add(rejectSubmitLink);
-      saveSubmitLink = new ImageSubmitLinkPanel("save", getResponse(), form, WebConstants.IMAGE_ACCEPT,
+      saveSubmitLink = new ImageSubmitLinkPanel("save", form, WebConstants.IMAGE_ACCEPT,
           GanttChartEditTreeTablePanel.this.getString("gantt.tooltip.saveTaskValue")) {
         @Override
         public void onSubmit()

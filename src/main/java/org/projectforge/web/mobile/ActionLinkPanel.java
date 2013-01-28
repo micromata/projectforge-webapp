@@ -78,7 +78,7 @@ public class ActionLinkPanel extends Panel // implements IField
   private ExternalLink getSmsLink(final String number)
   {
     final ExternalLink smsLink = new ExternalLink("sms", "sms:" + number);
-    smsLink.add(new PresizedImage("smsImage", getResponse(), ImageDef.SMS));
+    smsLink.add(new PresizedImage("smsImage", ImageDef.SMS));
     return smsLink;
   }
 

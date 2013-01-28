@@ -172,7 +172,7 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
             }
           }
           buf.append("\">");
-          htmlHelper.appendImageTag(getResponse(), buf, htmlHelper.getInfoImage());
+          htmlHelper.appendImageTag(getRequestCycle(), buf, htmlHelper.getInfoImage());
           buf.append("#").append(list.size());
           buf.append("</span>");
         }

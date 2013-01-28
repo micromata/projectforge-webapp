@@ -35,7 +35,6 @@ import org.projectforge.web.wicket.AbstractSelectPanel;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.TooltipImage;
 
-
 /**
  * This panel show the actual kost2 and buttons for select/unselect kost2s.
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -87,7 +86,7 @@ public class Kost2SelectPanel extends AbstractSelectPanel<Kost2DO>
     if (hasSelectAccess == false) {
       selectButton.setVisible(false);
     }
-    selectButton.add(new TooltipImage("selectHelp", getResponse(), WebConstants.IMAGE_KOST2_SELECT, getString("fibu.tooltip.selectKost2")));
+    selectButton.add(new TooltipImage("selectHelp", WebConstants.IMAGE_KOST2_SELECT, getString("fibu.tooltip.selectKost2")));
     final SubmitLink unselectButton = new SubmitLink("unselect") {
       @Override
       public void onSubmit()
@@ -103,8 +102,7 @@ public class Kost2SelectPanel extends AbstractSelectPanel<Kost2DO>
     };
     unselectButton.setDefaultFormProcessing(false);
     add(unselectButton);
-    unselectButton.add(new TooltipImage("unselectHelp", getResponse(), WebConstants.IMAGE_KOST2_UNSELECT,
-        getString("fibu.tooltip.unselectKost2")));
+    unselectButton.add(new TooltipImage("unselectHelp", WebConstants.IMAGE_KOST2_UNSELECT, getString("fibu.tooltip.unselectKost2")));
     return this;
   }
 

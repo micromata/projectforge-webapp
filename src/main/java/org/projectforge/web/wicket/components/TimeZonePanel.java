@@ -112,7 +112,7 @@ public class TimeZonePanel extends Panel
     final String tooltip = PFUserContext.getLocalizedString("tooltip.autocomplete.timeZone");
     WicketUtils.addTooltip(textField, tooltip);
     add(textField);
-    add(new TooltipImage("autocompleteDblClickHelpImage", getResponse(), WebConstants.IMAGE_HELP_KEYBOARD, tooltip));
+    add(new TooltipImage("autocompleteDblClickHelpImage", WebConstants.IMAGE_HELP_KEYBOARD, tooltip));
     setRenderBodyOnly(true);
   }
 

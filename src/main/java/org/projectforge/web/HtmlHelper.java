@@ -29,7 +29,7 @@ import java.net.URLEncoder;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
-import org.apache.wicket.request.Response;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.projectforge.web.wicket.WicketUtils;
 
 public class HtmlHelper
@@ -38,7 +38,7 @@ public class HtmlHelper
 
   public static final int TAB_WIDTH = 8;
 
-  public static final String IMAGE_INFO_ICON = "/images/information.png";
+  public static final String IMAGE_INFO_ICON = "images/information.png";
 
   private static final HtmlHelper instance = new HtmlHelper();
 
@@ -139,33 +139,33 @@ public class HtmlHelper
     }
   }
 
-  public String getImageTag(final Response response, final String src)
+  public String getImageTag(final RequestCycle requestCycle, final String src)
   {
     final StringBuffer buf = new StringBuffer();
-    appendImageTag(response, buf, src);
+    appendImageTag(requestCycle, buf, src);
     return buf.toString();
   }
 
-  public HtmlHelper appendImageTag(final Response response, final StringBuffer buf, final String src, final String width,
+  public HtmlHelper appendImageTag(final RequestCycle requestCycle, final StringBuffer buf, final String src, final String width,
       final String height)
   {
-    return appendImageTag(response, buf, src, width, height, null, null);
+    return appendImageTag(requestCycle, buf, src, width, height, null, null);
   }
 
-  public HtmlHelper appendImageTag(final Response response, final StringBuffer buf, final String src, final String width,
+  public HtmlHelper appendImageTag(final RequestCycle requestCycle, final StringBuffer buf, final String src, final String width,
       final String height, final String tooltip)
   {
-    return appendImageTag(response, buf, src, width, height, tooltip, null);
+    return appendImageTag(requestCycle, buf, src, width, height, tooltip, null);
   }
 
-  public HtmlHelper appendImageTag(final Response response, final StringBuffer buf, final String src)
+  public HtmlHelper appendImageTag(final RequestCycle requestCycle, final StringBuffer buf, final String src)
   {
-    return appendImageTag(response, buf, src, null, null, null, null);
+    return appendImageTag(requestCycle, buf, src, null, null, null, null);
   }
 
-  public HtmlHelper appendImageTag(final Response response, final StringBuffer buf, final String src, final String tooltip)
+  public HtmlHelper appendImageTag(final RequestCycle requestCycle, final StringBuffer buf, final String src, final String tooltip)
   {
-    return appendImageTag(response, buf, src, null, null, tooltip, null);
+    return appendImageTag(requestCycle, buf, src, null, null, tooltip, null);
   }
 
   /**
@@ -177,12 +177,12 @@ public class HtmlHelper
    * @param tooltip If null, than this attribute will be ignored.
    * @param align If null, than this attribute will be ignored.
    */
-  public HtmlHelper appendImageTag(final Response response, final StringBuffer buf, final String src, final String width,
+  public HtmlHelper appendImageTag(final RequestCycle requestCycle, final StringBuffer buf, final String src, final String width,
       final String height, final String tooltip, final HtmlAlignment align)
   {
 
     final HtmlTagBuilder tag = new HtmlTagBuilder(buf, "img");
-    tag.addAttribute("src", WicketUtils.getImageUrl(response, src));
+    tag.addAttribute("src", WicketUtils.getImageUrl(requestCycle, src));
     addTooltip(tag, tooltip);
     tag.addAttribute("width", width);
     tag.addAttribute("height", height);
@@ -196,8 +196,8 @@ public class HtmlHelper
 
   protected void addTooltip(final HtmlTagBuilder tag, final String tooltip)
   {
-    tag.addAttribute("alt", tooltip);
-    tag.addAttribute("title", tooltip);
+    tag.addAttribute("rel", "mytooltip");
+    tag.addAttribute("data-original-title", tooltip);
   }
 
   /**
@@ -207,10 +207,10 @@ public class HtmlHelper
    * @param href Will be modified via buildUrl.
    * @return
    */
-  public HtmlHelper appendAncorStartTag(final Response response, final StringBuffer buf, final String href)
+  public HtmlHelper appendAncorStartTag(final RequestCycle requestCycle, final StringBuffer buf, final String href)
   {
     final HtmlTagBuilder tag = new HtmlTagBuilder(buf, "a");
-    tag.addAttribute("href", WicketUtils.getImageUrl(response, href));
+    tag.addAttribute("href", WicketUtils.getImageUrl(requestCycle, href));
     tag.finishStartTag();
     return this;
   }

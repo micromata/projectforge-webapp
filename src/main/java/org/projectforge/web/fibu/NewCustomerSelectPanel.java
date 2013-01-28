@@ -220,7 +220,7 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
     };
     add(selectMeButton);
     selectMeButton.setDefaultFormProcessing(defaultFormProcessing);
-    selectMeButton.add(new TooltipImage("selectMeHelp", getResponse(), WebConstants.IMAGE_USER_SELECT_ME, getString("tooltip.selectMe")));
+    selectMeButton.add(new TooltipImage("selectMeHelp", WebConstants.IMAGE_USER_SELECT_ME, getString("tooltip.selectMe")));
     return this;
   }
 

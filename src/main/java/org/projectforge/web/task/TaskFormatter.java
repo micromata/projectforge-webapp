@@ -28,7 +28,7 @@ import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.Validate;
-import org.apache.wicket.request.Response;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.hibernate.Hibernate;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskNode;
@@ -76,9 +76,9 @@ public class TaskFormatter extends AbstractFormatter
    * @param taskId
    * @see #getTaskPath(Integer, boolean)
    */
-  public String getTaskPath(final Response response, final Integer taskId)
+  public String getTaskPath(final RequestCycle requestCycle, final Integer taskId)
   {
-    return getTaskPath(response, taskId, true);
+    return getTaskPath(requestCycle, taskId, true);
   }
 
   /**
@@ -86,9 +86,9 @@ public class TaskFormatter extends AbstractFormatter
    * @param taskId
    * @param enableLinks If true, every task title is associated with a link to EditTask.
    */
-  public String getTaskPath(final Response response, final Integer taskId, final boolean lineThroughDeletedTasks)
+  public String getTaskPath(final RequestCycle requestCycle, final Integer taskId, final boolean lineThroughDeletedTasks)
   {
-    return getTaskPath(response, taskId, null, lineThroughDeletedTasks);
+    return getTaskPath(requestCycle, taskId, null, lineThroughDeletedTasks);
   }
 
   /**
@@ -98,7 +98,7 @@ public class TaskFormatter extends AbstractFormatter
    * @param ancestorTaskId If not null, the path will shown between taskId and ancestorTaskId. If mainTaskId is not an ancestor of taskId,
    *          the whole path will be shown.
    */
-  public String getTaskPath(final Response response, final Integer taskId, final Integer ancestorTaskId,
+  public String getTaskPath(final RequestCycle requestCycle, final Integer taskId, final Integer ancestorTaskId,
       final boolean lineThroughDeletedTasks)
   {
     if (taskId == null || taskTree.getTaskNodeById(taskId) == null) {
@@ -113,7 +113,7 @@ public class TaskFormatter extends AbstractFormatter
         if (i++ > 0) {
           buf.append(" -&gt; ");
         }
-        appendFormattedTask(response, buf, task, false, lineThroughDeletedTasks);
+        appendFormattedTask(requestCycle, buf, task, false, lineThroughDeletedTasks);
       }
       return buf.toString();
     } else if (ancestorTaskId != null) {
@@ -188,15 +188,15 @@ public class TaskFormatter extends AbstractFormatter
    * @param enableLink If true, the task has a link to the EditTask.action.
    * @param showPathAsTooltip If true, an info icon with the whole task path as tooltip will be added.
    */
-  public void appendFormattedTask(final Response response, final StringBuffer buf, TaskDO task, final boolean showPathAsTooltip,
+  public void appendFormattedTask(final RequestCycle requestCycle, final StringBuffer buf, TaskDO task, final boolean showPathAsTooltip,
       final boolean lineThroughDeletedTask)
   {
     Validate.notNull(buf);
     Validate.notNull(task);
     if (showPathAsTooltip == true) {
-      final String taskPath = getTaskPath(response, task.getId(), null, false);
+      final String taskPath = getTaskPath(requestCycle, task.getId(), null, false);
       if (taskPath != null) {
-        htmlHelper.appendImageTag(response, buf, htmlHelper.getInfoImage(), taskPath);
+        htmlHelper.appendImageTag(requestCycle, buf, htmlHelper.getInfoImage(), taskPath);
       }
     }
     // if (enableLink == true) {

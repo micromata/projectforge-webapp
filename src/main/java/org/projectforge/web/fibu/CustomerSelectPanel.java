@@ -67,7 +67,7 @@ public class CustomerSelectPanel extends AbstractSelectPanel<KundeDO>
    * @param caller
    * @param selectProperty
    */
-  public CustomerSelectPanel(final String id,  final IModel<KundeDO> model, final PropertyModel<String> kundeText,
+  public CustomerSelectPanel(final String id, final IModel<KundeDO> model, final PropertyModel<String> kundeText,
       final ISelectCallerPage caller, final String selectProperty)
   {
     super(id, model, caller, selectProperty);
@@ -111,7 +111,7 @@ public class CustomerSelectPanel extends AbstractSelectPanel<KundeDO>
     };
     selectButton.setDefaultFormProcessing(false);
     add(selectButton);
-    selectButton.add(new TooltipImage("selectHelp", getResponse(), WebConstants.IMAGE_KUNDE_SELECT, getString("fibu.tooltip.selectKunde")));
+    selectButton.add(new TooltipImage("selectHelp", WebConstants.IMAGE_KUNDE_SELECT, getString("fibu.tooltip.selectKunde")));
     final SubmitLink unselectButton = new SubmitLink("unselect") {
       @Override
       public void onSubmit()
@@ -127,8 +127,7 @@ public class CustomerSelectPanel extends AbstractSelectPanel<KundeDO>
     };
     unselectButton.setDefaultFormProcessing(false);
     add(unselectButton);
-    unselectButton.add(new TooltipImage("unselectHelp", getResponse(), WebConstants.IMAGE_KUNDE_UNSELECT,
-        getString("fibu.tooltip.unselectKunde")));
+    unselectButton.add(new TooltipImage("unselectHelp", WebConstants.IMAGE_KUNDE_UNSELECT, getString("fibu.tooltip.unselectKunde")));
     // DropDownChoice favorites
     favoritesPanel = new FavoritesChoicePanel<KundeDO, KundeFavorite>("favorites", UserPrefArea.KUNDE_FAVORITE, tabIndex, "half select") {
       @Override

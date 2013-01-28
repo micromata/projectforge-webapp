@@ -130,7 +130,7 @@ IListPageColumnsCreator<TeamEventDO>
       public void populateItem(final Item<ICellPopulator<TeamEventDO>> item, final String componentId, final IModel<TeamEventDO> rowModel)
       {
         final TeamEventDO event = rowModel.getObject();
-        final Label label = WicketUtils.createBooleanLabel(getResponse(), componentId, event.isAllDay() == true);
+        final Label label = WicketUtils.createBooleanLabel(getRequestCycle(), componentId, event.isAllDay() == true);
         item.add(label);
         cellItemListener.populateItem(item, componentId, rowModel);
       }

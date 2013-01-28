@@ -34,7 +34,6 @@ import org.projectforge.web.wicket.AbstractSelectPanel;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.TooltipImage;
 
-
 /**
  * This panel show the buttons for selecting current, previous and following week inside an existing form. Calls caller.select("selectWeek",
  * offset): offset -1 for previous week, 0 for current week and +1 for following week.
@@ -47,7 +46,7 @@ public class QuickSelectWeekPanel extends AbstractSelectPanel<Date>
 
   private Date beginOfWeek;
 
-  private String selectProperty;
+  private final String selectProperty;
 
   /**
    * @param id
@@ -62,12 +61,14 @@ public class QuickSelectWeekPanel extends AbstractSelectPanel<Date>
     this.selectProperty = selectProperty;
   }
 
+  @Override
   @SuppressWarnings("serial")
   public QuickSelectWeekPanel init()
   {
     super.init();
     {
       final SubmitLink previousButton = new SubmitLink("previousWeek") {
+        @Override
         public void onSubmit()
         {
           final DateHolder dateHolder = new DateHolder(getModelObject());
@@ -79,11 +80,12 @@ public class QuickSelectWeekPanel extends AbstractSelectPanel<Date>
       };
       previousButton.setDefaultFormProcessing(false);
       add(previousButton);
-      previousButton.add(new TooltipImage("previousWeekImage", getResponse(), WebConstants.IMAGE_QUICKSELECT_PREVIOUS_WEEK,
+      previousButton.add(new TooltipImage("previousWeekImage", WebConstants.IMAGE_QUICKSELECT_PREVIOUS_WEEK,
           getString("calendar.quickselect.tooltip.selectPreviousWeek")));
     }
     {
       final SubmitLink currentWeekButton = new SubmitLink("currentWeek") {
+        @Override
         public void onSubmit()
         {
           final DateHolder dateHolder = new DateHolder();
@@ -94,11 +96,12 @@ public class QuickSelectWeekPanel extends AbstractSelectPanel<Date>
       };
       currentWeekButton.setDefaultFormProcessing(false);
       add(currentWeekButton);
-      currentWeekButton.add(new TooltipImage("currentWeekImage", getResponse(), WebConstants.IMAGE_QUICKSELECT_CURRENT_WEEK,
+      currentWeekButton.add(new TooltipImage("currentWeekImage", WebConstants.IMAGE_QUICKSELECT_CURRENT_WEEK,
           getString("calendar.quickselect.tooltip.selectCurrentWeek")));
     }
     {
       final SubmitLink followingWeekButton = new SubmitLink("followingWeek") {
+        @Override
         public void onSubmit()
         {
           final DateHolder dateHolder = new DateHolder(getModelObject());
@@ -109,7 +112,7 @@ public class QuickSelectWeekPanel extends AbstractSelectPanel<Date>
       };
       followingWeekButton.setDefaultFormProcessing(false);
       add(followingWeekButton);
-      followingWeekButton.add(new TooltipImage("followingWeekImage", getResponse(), WebConstants.IMAGE_QUICKSELECT_FOLLOWING_WEEK,
+      followingWeekButton.add(new TooltipImage("followingWeekImage", WebConstants.IMAGE_QUICKSELECT_FOLLOWING_WEEK,
           getString("calendar.quickselect.tooltip.selectNextWeek")));
     }
     return this;

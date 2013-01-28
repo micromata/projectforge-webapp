@@ -214,7 +214,7 @@ public abstract class AbstractMobilePage extends WebPage
    */
   public String getImageUrl(final String subpath)
   {
-    return WicketUtils.getImageUrl(getResponse(), subpath);
+    return WicketUtils.getImageUrl(getRequestCycle(), subpath);
   }
 
   /**
@@ -222,7 +222,7 @@ public abstract class AbstractMobilePage extends WebPage
    */
   public String getUrl(final String path, final boolean encodeUrl)
   {
-    return WicketUtils.getUrl(getResponse(), path, encodeUrl);
+    return WicketUtils.getUrl(getRequestCycle(), path, encodeUrl);
   }
 
   protected String getWindowTitle()

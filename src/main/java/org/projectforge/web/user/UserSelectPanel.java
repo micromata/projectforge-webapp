@@ -267,7 +267,7 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO> implements Co
       selectMeLink.setOutputMarkupId(true);
     }
     add(selectMeLink);
-    selectMeLink.add(new TooltipImage("selectMeHelp", getResponse(), WebConstants.IMAGE_USER_SELECT_ME, getString("tooltip.selectMe")));
+    selectMeLink.add(new TooltipImage("selectMeHelp", WebConstants.IMAGE_USER_SELECT_ME, getString("tooltip.selectMe")));
     return this;
   }
 

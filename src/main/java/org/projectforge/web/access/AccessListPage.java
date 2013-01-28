@@ -104,7 +104,7 @@ IListPageColumnsCreator<GroupTaskAccessDO>
         final GroupTaskAccessDO access = rowModel.getObject();
         final TaskDO task = access.getTask();
         final StringBuffer buf = new StringBuffer();
-        taskFormatter.appendFormattedTask(getResponse(), buf, task, true, false);
+        taskFormatter.appendFormattedTask(getRequestCycle(), buf, task, true, false);
         final Label formattedTaskLabel = new Label(ListSelectActionPanel.LABEL_ID, buf.toString());
         formattedTaskLabel.setEscapeModelStrings(false);
         item.add(new ListSelectActionPanel(componentId, rowModel, AccessEditPage.class, access.getId(), returnToPage, formattedTaskLabel));

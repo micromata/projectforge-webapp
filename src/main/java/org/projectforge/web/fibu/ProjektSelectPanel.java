@@ -104,8 +104,7 @@ public class ProjektSelectPanel extends AbstractSelectPanel<ProjektDO> implement
     if (hasSelectAccess == false) {
       selectButton.setVisible(false);
     }
-    selectButton.add(new TooltipImage("selectHelp", getResponse(), WebConstants.IMAGE_PROJEKT_SELECT,
-        getString("fibu.tooltip.selectProjekt")));
+    selectButton.add(new TooltipImage("selectHelp", WebConstants.IMAGE_PROJEKT_SELECT, getString("fibu.tooltip.selectProjekt")));
     final SubmitLink unselectButton = new SubmitLink("unselect") {
       @Override
       public void onSubmit()
@@ -121,8 +120,7 @@ public class ProjektSelectPanel extends AbstractSelectPanel<ProjektDO> implement
     };
     unselectButton.setDefaultFormProcessing(false);
     add(unselectButton);
-    unselectButton.add(new TooltipImage("unselectHelp", getResponse(), WebConstants.IMAGE_PROJEKT_UNSELECT,
-        getString("fibu.tooltip.unselectProjekt")));
+    unselectButton.add(new TooltipImage("unselectHelp", WebConstants.IMAGE_PROJEKT_UNSELECT, getString("fibu.tooltip.unselectProjekt")));
     // DropDownChoice favorites
     final FavoritesChoicePanel<ProjektDO, ProjektFavorite> favoritesPanel = new FavoritesChoicePanel<ProjektDO, ProjektFavorite>(
         "favorites", UserPrefArea.PROJEKT_FAVORITE, tabIndex, "select half") {

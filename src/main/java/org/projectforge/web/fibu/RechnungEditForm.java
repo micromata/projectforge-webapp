@@ -159,7 +159,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     if (position.getAuftragsPosition() == null) {
       orderLink.setVisible(false);
     }
-    orderLink.add(new PresizedImage("linkImage", getResponse(), WebConstants.IMAGE_FIND));
+    orderLink.add(new PresizedImage("linkImage", WebConstants.IMAGE_FIND));
   }
 
   @SuppressWarnings("unchecked")

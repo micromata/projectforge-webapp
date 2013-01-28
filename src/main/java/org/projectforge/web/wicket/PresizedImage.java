@@ -35,7 +35,6 @@ import java.util.TreeSet;
 import org.apache.commons.io.IOUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.image.ContextImage;
-import org.apache.wicket.request.Response;
 import org.projectforge.core.Configuration;
 import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.core.ImageDimension;
@@ -85,9 +84,9 @@ public class PresizedImage extends ContextImage
    * @param request
    * @param relativePath path relative to web apps image dir.
    */
-  public PresizedImage(final String id, final Response response, final ImageDef image)
+  public PresizedImage(final String id, final ImageDef image)
   {
-    this(id, response, image.getPath());
+    this(id, image.getPath());
   }
 
   /**
@@ -95,9 +94,9 @@ public class PresizedImage extends ContextImage
    * @param request
    * @param relativePath path relative to web apps image dir.
    */
-  public PresizedImage(final String id, final Response response, final String path)
+  public PresizedImage(final String id, final String path)
   {
-    super(id, WicketUtils.getImageUrl(response, path));
+    super(id, path);
     final Dimension dimension = registry.get(path);
     if (dimension == null) {
       if (WebConfiguration.isDevelopmentMode() == true) {

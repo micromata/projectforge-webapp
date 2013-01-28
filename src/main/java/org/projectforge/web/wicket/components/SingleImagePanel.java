@@ -23,7 +23,6 @@
 
 package org.projectforge.web.wicket.components;
 
-import org.apache.wicket.markup.html.image.ContextImage;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.projectforge.web.wicket.PresizedImage;
 
@@ -48,7 +47,7 @@ public class SingleImagePanel extends Panel
   public static SingleImagePanel createTooltipImage(final String id, final String imageUrl, final String tooltip)
   {
     final SingleImagePanel panel = new SingleImagePanel(id);
-    final ContextImage image = new TooltipImage("image", panel.getResponse(), imageUrl, tooltip);
+    final PresizedImage image = new TooltipImage("image", imageUrl, tooltip);
     panel.add(image);
     return panel;
   }
@@ -56,7 +55,7 @@ public class SingleImagePanel extends Panel
   public static SingleImagePanel createPresizedImage(final String id, final String imageUrl)
   {
     final SingleImagePanel panel = new SingleImagePanel(id);
-    final ContextImage image = new PresizedImage("image", panel.getResponse(), imageUrl);
+    final PresizedImage image = new PresizedImage("image", imageUrl);
     panel.add(image);
     return panel;
   }

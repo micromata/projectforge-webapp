@@ -80,7 +80,7 @@ public class ProjectEditCost2TypeTablePanel extends Panel
         }
         final CheckBox checkBox = new CheckBox("kost2artSelect", new PropertyModel<Boolean>(kost2Art, "selected"));
         colItem.add(checkBox);
-        final TooltipImage image = new TooltipImage("acceptImage", getResponse(), WebConstants.IMAGE_ACCEPT,
+        final TooltipImage image = new TooltipImage("acceptImage", WebConstants.IMAGE_ACCEPT,
             getString("fibu.projekt.edit.kost2DoesAlreadyExists"));
         colItem.add(image);
         if (kost2Art.isExistsAlready() == true) {

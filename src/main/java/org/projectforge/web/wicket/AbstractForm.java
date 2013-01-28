@@ -98,22 +98,6 @@ public abstract class AbstractForm<F, P extends AbstractUnsecureBasePage> extend
     visitChildren(shinyVisitor);
   }
 
-  /**
-   * @see AbstractUnsecureBasePage#getUrl(String)
-   */
-  public String getUrl(final String path)
-  {
-    return parentPage.getUrl(path, true);
-  }
-
-  /**
-   * @see AbstractUnsecureBasePage#getUrl(String, boolean)
-   */
-  public String getUrl(final String path, final boolean encodeUrl)
-  {
-    return parentPage.getUrl(path, encodeUrl);
-  }
-
   public void addError(final String msgKey)
   {
     error(getString(msgKey));

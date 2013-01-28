@@ -25,37 +25,35 @@ package org.projectforge.web.wicket.components;
 
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.request.Response;
 import org.projectforge.web.wicket.ImageDef;
 import org.projectforge.web.wicket.PresizedImage;
 import org.projectforge.web.wicket.WicketUtils;
-
 
 public class TooltipImage extends PresizedImage
 {
   private static final long serialVersionUID = 1333929048394636569L;
 
-  public TooltipImage(final String id, final Response response, final String relativePath, final String tooltip)
+  public TooltipImage(final String id, final String relativePath, final String tooltip)
   {
-    super(id, response, relativePath);
+    super(id, relativePath);
     WicketUtils.addTooltip(this, tooltip).add(AttributeModifier.replace("border", "0"));
   }
 
-  public TooltipImage(final String id, final Response response, final ImageDef imageDef, final String tooltip)
+  public TooltipImage(final String id, final ImageDef imageDef, final String tooltip)
   {
-    super(id, response, imageDef);
+    super(id, imageDef);
     WicketUtils.addTooltip(this, tooltip).add(AttributeModifier.replace("border", "0"));
   }
 
-  public TooltipImage(final String id, final Response response, final String relativePath, final IModel<String> tooltip)
+  public TooltipImage(final String id, final String relativePath, final IModel<String> tooltip)
   {
-    super(id, response, relativePath);
+    super(id, relativePath);
     WicketUtils.addTooltip(this, tooltip).add(AttributeModifier.replace("border", "0"));
   }
 
-  public TooltipImage(final String id, final Response response, final ImageDef imageDef, final IModel<String> tooltip)
+  public TooltipImage(final String id, final ImageDef imageDef, final IModel<String> tooltip)
   {
-    super(id, response, imageDef);
+    super(id, imageDef);
     WicketUtils.addTooltip(this, tooltip).add(AttributeModifier.replace("border", "0"));
   }
 }

@@ -47,13 +47,13 @@ public class ImagePanel extends Panel
   public ImagePanel(final String id, final ImageDef imageDef)
   {
     super(id, null);
-    addImage(new PresizedImage(IMAGE_ID, getResponse(), imageDef.getPath()));
+    addImage(new PresizedImage(IMAGE_ID, imageDef.getPath()));
   }
 
   public ImagePanel(final String id, final ImageDef imageDef, final String tooltip)
   {
     super(id, null);
-    addImage(new TooltipImage(IMAGE_ID, getResponse(), imageDef.getPath(), tooltip));
+    addImage(new TooltipImage(IMAGE_ID, imageDef.getPath(), tooltip));
   }
 
   public ImagePanel(final String id, final ContextImage image)
@@ -72,7 +72,7 @@ public class ImagePanel extends Panel
    * @param image
    * @return this for chaining.
    */
-  public ImagePanel addImage(final ContextImage image)
+  public ImagePanel addImage(final PresizedImage image)
   {
     add(image);
     return this;

@@ -51,6 +51,7 @@ import org.apache.wicket.protocol.http.RequestUtils;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
 import org.apache.wicket.request.Url;
+import org.apache.wicket.request.UrlUtils;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.string.StringValue;
@@ -241,35 +242,30 @@ public class WicketUtils
 
   /**
    * Get the url for the given path (without image path). Later, the path of the images is changeable.
-   * @param response Needed to encode url.
+   * @param requestCycle Needed to encode url.
    * @param subpath
    * @return
    */
-  public static String getImageUrl(final Response response, final String path)
+  public static String getImageUrl(final RequestCycle requestCycle, final String path)
   {
-    return getUrl(response, path, true);
+    return getUrl(requestCycle, path, true);
   }
 
   /**
    * Should be c:url equivalent, but isn't yet (works for now).
-   * @param response Needed to encode url.
+   * @param requestCycle Needed to encode url.
    * @param path
    * @param encodeUrl
    * @return path itself if not starts with '/' otherwise "/ProjectForge" + path with session id and params.
    */
-  public static String getUrl(final Response response, final String path, final boolean encodeUrl)
+  public static String getUrl(final RequestCycle requestCycle, final String path, final boolean encodeUrl)
   {
-    if (path == null) {
-      return null;
-    }
-    if (path.charAt(0) != '/') {
-      // Do not touch relative path:
-      return path;
-    }
+    String url = UrlUtils.rewriteToContextRelative(path, requestCycle);
     if (encodeUrl == true) {
-      return response.encodeURL(APPLICATION_CONTEXT + path).toString();
+      url = requestCycle.getResponse().encodeURL(url);
     }
-    return APPLICATION_CONTEXT + path;
+    log.info(url);
+    return url;
   }
 
   /**
@@ -606,9 +602,9 @@ public class WicketUtils
    * 
    * @return
    */
-  public static ContextImage getInvisibleDummyImage(final String id, final Response response)
+  public static ContextImage getInvisibleDummyImage(final String id, final RequestCycle requestCylce)
   {
-    final ContextImage image = new ContextImage(id, WicketUtils.getImageUrl(response, WebConstants.IMAGE_SPACER));
+    final ContextImage image = new ContextImage(id, WicketUtils.getImageUrl(requestCylce, WebConstants.IMAGE_SPACER));
     image.setVisible(false);
     return image;
   }
@@ -678,56 +674,52 @@ public class WicketUtils
   /**
    * Usage in markup: &lt;img wicket:id="addPositionImage" /&gt;
    * @param componentId
-   * @param response
    * @param tooltip
    * @return
    */
-  public static Component getAddRowImage(final String componentId, final Response response, final String tooltip)
+  public static Component getAddRowImage(final String componentId, final String tooltip)
   {
-    return new TooltipImage(componentId, response, WebConstants.IMAGE_ADD, tooltip);
+    return new TooltipImage(componentId, WebConstants.IMAGE_ADD, tooltip);
   }
 
   /**
    * Usage in markup: &lt;img wicket:id="deletePositionImage" /&gt;
    * @param parent Needed for i18n of tooltip.
    * @param componentId
-   * @param response
    * @param obj If the obj has an id then a mark-as-deleted tool tip will be shown, otherwise a delete tool tip.
    * @return
-   * @see #getMarkAsDeletedTooltipImage(MarkupContainer, String, Response, BaseDO)
-   * @see #getDeleteTooltipImage(MarkupContainer, String, Response, BaseDO)
+   * @see #getMarkAsDeletedTooltipImage(MarkupContainer, String, BaseDO)
+   * @see #getDeleteTooltipImage(MarkupContainer, String, BaseDO)
    */
-  public static Component getDeleteRowImage(final MarkupContainer parent, final String componentId, final Response response,
-      final BaseDO< ? > obj)
+  public static Component getDeleteRowImage(final MarkupContainer parent, final String componentId, final BaseDO< ? > obj)
   {
     if (obj.getId() != null) {
-      return getMarkAsDeletedTooltipImage(parent, componentId, response);
+      return getMarkAsDeletedTooltipImage(parent, componentId);
     } else {
-      return getDeleteTooltipImage(parent, componentId, response);
+      return getDeleteTooltipImage(parent, componentId);
     }
   }
 
-  public static Component getDeleteTooltipImage(final MarkupContainer parent, final String componentId, final Response response)
+  public static Component getDeleteTooltipImage(final MarkupContainer parent, final String componentId)
   {
-    return new TooltipImage(componentId, response, WebConstants.IMAGE_DELETE, parent.getString("tooltip.entry.markAsDeleted"));
+    return new TooltipImage(componentId, WebConstants.IMAGE_DELETE, parent.getString("tooltip.entry.markAsDeleted"));
   }
 
-  public static Component getMarkAsDeletedTooltipImage(final MarkupContainer parent, final String componentId, final Response response)
+  public static Component getMarkAsDeletedTooltipImage(final MarkupContainer parent, final String componentId)
   {
-    return new TooltipImage(componentId, response, WebConstants.IMAGE_DELETE, parent.getString("tooltip.entry.delete"));
+    return new TooltipImage(componentId,  WebConstants.IMAGE_DELETE, parent.getString("tooltip.entry.delete"));
   }
 
   /**
    * Usage in markup: &lt;img wicket:id="deletePositionImage" /&gt;
    * @param parent Needed for i18n of tooltip.
    * @param componentId
-   * @param response
    * @param obj If the obj has an id then a mark-as-deleted tool tip will be shown, otherwise a delete tool tip.
    * @return
    */
-  public static Component getUndeleteRowImage(final MarkupContainer parent, final String componentId, final Response response)
+  public static Component getUndeleteRowImage(final MarkupContainer parent, final String componentId)
   {
-    return new TooltipImage(componentId, response, WebConstants.IMAGE_UNDELETE, parent.getString("tooltip.entry.undelete"));
+    return new TooltipImage(componentId, WebConstants.IMAGE_UNDELETE, parent.getString("tooltip.entry.undelete"));
   }
 
   /**
@@ -935,7 +927,8 @@ public class WicketUtils
    * @param label
    * @return
    */
-  public static Component addEditableLabelDefaultTooltip(final Component label) {
+  public static Component addEditableLabelDefaultTooltip(final Component label)
+  {
     return addTooltip(label, label.getString("form.ajaxEditableLabel.tooltip"));
   }
 
@@ -1058,11 +1051,11 @@ public class WicketUtils
     return StringHelper.listToString("/", labels);
   }
 
-  public static Label createBooleanLabel(final Response response, final String componentId, final boolean value)
+  public static Label createBooleanLabel(final RequestCycle requestCycle, final String componentId, final boolean value)
   {
     final StringBuffer buf = new StringBuffer();
     if (value == true) {
-      HtmlHelper.getInstance().appendImageTag(response, buf, "/images/accept.png", null);
+      HtmlHelper.getInstance().appendImageTag(requestCycle, buf, "/images/accept.png", null);
     }
     final Label label = new Label(componentId, buf.toString());
     label.setEscapeModelStrings(false);

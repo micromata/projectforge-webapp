@@ -27,7 +27,6 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.request.Response;
 import org.projectforge.web.wicket.PresizedImage;
 
 /**
@@ -55,42 +54,40 @@ public abstract class ImageSubmitLinkPanel extends Panel
     add(submitLink);
   }
 
-  public ImageSubmitLinkPanel(final String id, final Response response, final String relativeImagePath)
+  public ImageSubmitLinkPanel(final String id, final String relativeImagePath)
   {
-    this(id, null);
-    submitLink. add(new PresizedImage("image", getResponse(), relativeImagePath));
+    this(id, (Form< ? >) null);
+    submitLink.add(new PresizedImage("image", relativeImagePath));
   }
 
-  public ImageSubmitLinkPanel(final String id, final Response response, final Form< ? > form, final String relativeImagePath)
+  public ImageSubmitLinkPanel(final String id, final Form< ? > form, final String relativeImagePath)
   {
     this(id, form);
-    submitLink.add(new PresizedImage("image", getResponse(), relativeImagePath));
+    submitLink.add(new PresizedImage("image", relativeImagePath));
   }
 
-  public ImageSubmitLinkPanel(final String id, final Response response, final String relativeImagePath, final String tooltip)
+  public ImageSubmitLinkPanel(final String id, final String relativeImagePath, final String tooltip)
   {
-    this(id, null);
-    submitLink.add(new TooltipImage("image", getResponse(), relativeImagePath, tooltip));
+    this(id, (Form< ? >) null);
+    submitLink.add(new TooltipImage("image", relativeImagePath, tooltip));
   }
 
-  public ImageSubmitLinkPanel(final String id, final Response response, final Form< ? > form, final String relativeImagePath,
-      final String tooltip)
-  {
-    this(id, form);
-    submitLink.add(new TooltipImage("image", getResponse(), relativeImagePath, tooltip));
-  }
-
-  public ImageSubmitLinkPanel(final String id, final Response response, final String relativeImagePath, final IModel<String> tooltip)
-  {
-    this(id, null);
-    submitLink.add(new TooltipImage("image", getResponse(), relativeImagePath, tooltip));
-  }
-
-  public ImageSubmitLinkPanel(final String id, final Response response, final Form< ? > form, final String relativeImagePath,
-      final IModel<String> tooltip)
+  public ImageSubmitLinkPanel(final String id, final Form< ? > form, final String relativeImagePath, final String tooltip)
   {
     this(id, form);
-    submitLink.add(new TooltipImage("image", getResponse(), relativeImagePath, tooltip));
+    submitLink.add(new TooltipImage("image", relativeImagePath, tooltip));
+  }
+
+  public ImageSubmitLinkPanel(final String id, final String relativeImagePath, final IModel<String> tooltip)
+  {
+    this(id, (Form< ? >) null);
+    submitLink.add(new TooltipImage("image", relativeImagePath, tooltip));
+  }
+
+  public ImageSubmitLinkPanel(final String id, final Form< ? > form, final String relativeImagePath, final IModel<String> tooltip)
+  {
+    this(id, form);
+    submitLink.add(new TooltipImage("image", relativeImagePath, tooltip));
   }
 
   public abstract void onSubmit();

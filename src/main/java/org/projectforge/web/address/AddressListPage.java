@@ -160,7 +160,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
         item.add(view);
         view.add(new ListSelectActionPanel(view.newChildId(), rowModel, AddressEditPage.class, address.getId(), returnToPage,
             DateTimeFormatter.instance().getFormattedDate(address.getLastUpdate())));
-        view.add(new ImageLinkPanel(view.newChildId(), getResponse(), WebConstants.IMAGE_PRINTER, getString("printView")) {
+        view.add(new ImageLinkPanel(view.newChildId(), WebConstants.IMAGE_PRINTER, getString("printView")) {
 
           @Override
           public void onClick()

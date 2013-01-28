@@ -38,8 +38,8 @@ public class AddressListPhoneNumberPanel extends Panel
   private static final long serialVersionUID = 2546695290892989291L;
 
   @SuppressWarnings("serial")
-  public AddressListPhoneNumberPanel(final String id,final AddressListPage parentPage, final Integer addressId, final PhoneType phoneType, final String phoneNumber,
-      final boolean favoriteNumber, final boolean sendSms, final String image, final boolean first)
+  public AddressListPhoneNumberPanel(final String id, final AddressListPage parentPage, final Integer addressId, final PhoneType phoneType,
+      final String phoneNumber, final boolean favoriteNumber, final boolean sendSms, final String image, final boolean first)
   {
     super(id);
     final WebMarkupContainer linkOrSpan;
@@ -69,7 +69,7 @@ public class AddressListPhoneNumberPanel extends Panel
       numberLabel.setRenderBodyOnly(true);
     }
     linkOrSpan.add(numberLabel);
-    linkOrSpan.add(new PresizedImage("phoneImage", getResponse(), image));
+    linkOrSpan.add(new PresizedImage("phoneImage", image));
     final Link<String> sendMessage = new Link<String>("sendMessageLink") {
       @Override
       public void onClick()

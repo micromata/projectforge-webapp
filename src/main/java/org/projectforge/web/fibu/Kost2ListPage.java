@@ -128,7 +128,7 @@ public class Kost2ListPage extends AbstractListPage<Kost2ListForm, Kost2Dao, Kos
       public void populateItem(final Item<ICellPopulator<Kost2DO>> item, final String componentId, final IModel<Kost2DO> rowModel)
       {
         final Kost2DO kost2 = rowModel.getObject();
-        final Label label = WicketUtils.createBooleanLabel(getResponse(), componentId, kost2.getKost2Art() != null && kost2.getKost2Art().isFakturiert() == true);
+        final Label label = WicketUtils.createBooleanLabel(getRequestCycle(), componentId, kost2.getKost2Art() != null && kost2.getKost2Art().isFakturiert() == true);
         item.add(label);
         cellItemListener.populateItem(item, componentId, rowModel);
       }

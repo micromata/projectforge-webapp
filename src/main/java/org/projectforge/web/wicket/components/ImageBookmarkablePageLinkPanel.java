@@ -52,21 +52,21 @@ public class ImageBookmarkablePageLinkPanel extends Panel
       final String relativeImagePath)
   {
     this(id, pageClass);
-    link.add(new PresizedImage("image", getResponse(), relativeImagePath));
+    link.add(new PresizedImage("image", relativeImagePath));
   }
 
   public ImageBookmarkablePageLinkPanel(final String id, final Class< ? extends WebPage> pageClass, final Response response,
       final String relativeImagePath, final String tooltip)
   {
     this(id, pageClass);
-    link.add(new TooltipImage("image", getResponse(), relativeImagePath, tooltip));
+    link.add(new TooltipImage("image", relativeImagePath, tooltip));
   }
 
   public ImageBookmarkablePageLinkPanel(final String id, final Class< ? extends WebPage> pageClass, final Response response,
       final String relativeImagePath, final IModel<String> tooltip)
   {
     this(id, pageClass);
-    link.add(new TooltipImage("image", getResponse(), relativeImagePath, tooltip));
+    link.add(new TooltipImage("image", relativeImagePath, tooltip));
   }
 
 }

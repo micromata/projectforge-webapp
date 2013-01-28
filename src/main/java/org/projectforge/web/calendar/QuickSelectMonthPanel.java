@@ -34,7 +34,6 @@ import org.projectforge.web.wicket.AbstractSelectPanel;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.TooltipImage;
 
-
 /**
  * This panel show the buttons for selecting current, previous and following month inside an existing form. Calls
  * caller.select("selectMonth", offset): offset -1 for previous month, 0 for current month and +1 for following month.
@@ -47,7 +46,7 @@ public class QuickSelectMonthPanel extends AbstractSelectPanel<Date>
 
   private Date beginOfMonth;
 
-  private String selectProperty;
+  private final String selectProperty;
 
   /**
    * @param id
@@ -62,12 +61,14 @@ public class QuickSelectMonthPanel extends AbstractSelectPanel<Date>
     this.selectProperty = selectProperty;
   }
 
+  @Override
   @SuppressWarnings("serial")
   public QuickSelectMonthPanel init()
   {
     super.init();
     {
       final SubmitLink previousButton = new SubmitLink("previousMonth") {
+        @Override
         public void onSubmit()
         {
           final DateHolder dateHolder = new DateHolder(getModelObject());
@@ -79,11 +80,12 @@ public class QuickSelectMonthPanel extends AbstractSelectPanel<Date>
       };
       previousButton.setDefaultFormProcessing(false);
       add(previousButton);
-      previousButton.add(new TooltipImage("previousMonthImage", getResponse(), WebConstants.IMAGE_QUICKSELECT_PREVIOUS_MONTH,
+      previousButton.add(new TooltipImage("previousMonthImage", WebConstants.IMAGE_QUICKSELECT_PREVIOUS_MONTH,
           getString("calendar.quickselect.tooltip.selectPreviousMonth")));
     }
     {
       final SubmitLink currentMonthButton = new SubmitLink("currentMonth") {
+        @Override
         public void onSubmit()
         {
           final DateHolder dateHolder = new DateHolder();
@@ -94,11 +96,12 @@ public class QuickSelectMonthPanel extends AbstractSelectPanel<Date>
       };
       currentMonthButton.setDefaultFormProcessing(false);
       add(currentMonthButton);
-      currentMonthButton.add(new TooltipImage("currentMonthImage", getResponse(), WebConstants.IMAGE_QUICKSELECT_CURRENT_MONTH,
+      currentMonthButton.add(new TooltipImage("currentMonthImage", WebConstants.IMAGE_QUICKSELECT_CURRENT_MONTH,
           getString("calendar.quickselect.tooltip.selectCurrentMonth")));
     }
     {
       final SubmitLink followingMonthButton = new SubmitLink("followingMonth") {
+        @Override
         public void onSubmit()
         {
           final DateHolder dateHolder = new DateHolder(getModelObject());
@@ -109,7 +112,7 @@ public class QuickSelectMonthPanel extends AbstractSelectPanel<Date>
       };
       followingMonthButton.setDefaultFormProcessing(false);
       add(followingMonthButton);
-      followingMonthButton.add(new TooltipImage("followingMonthImage", getResponse(), WebConstants.IMAGE_QUICKSELECT_FOLLOWING_MONTH,
+      followingMonthButton.add(new TooltipImage("followingMonthImage", WebConstants.IMAGE_QUICKSELECT_FOLLOWING_MONTH,
           getString("calendar.quickselect.tooltip.selectNextMonth")));
     }
     return this;

@@ -65,9 +65,9 @@ public class TreeIconsActionPanel<T extends Serializable> extends Panel
 
   private TreeTableNode treeNode;
 
-  private ContextImage folderImage;
+  private PresizedImage folderImage;
 
-  private ContextImage folderOpenImage;
+  private PresizedImage folderOpenImage;
 
   /**
    * Constructor for list view in selection mode.
@@ -83,9 +83,7 @@ public class TreeIconsActionPanel<T extends Serializable> extends Panel
   {
     super(id, model);
     this.treeTable = treeTable;
-    @SuppressWarnings("unchecked")
-    final
-    Link< ? > selectLink = new Link("select") {
+    final Link<Void> selectLink = new Link<Void>("select") {
       @Override
       public void onClick()
       {
@@ -110,7 +108,7 @@ public class TreeIconsActionPanel<T extends Serializable> extends Panel
   {
     super(id, model);
     this.treeTable = treeTable;
-    final BookmarkablePageLink< Void > bookmarkablePagelink = new BookmarkablePageLink<Void>("select", editClass);
+    final BookmarkablePageLink<Void> bookmarkablePagelink = new BookmarkablePageLink<Void>("select", editClass);
     bookmarkablePagelink.getPageParameters().add(AbstractEditPage.PARAMETER_KEY_ID, objectId);
     this.link = bookmarkablePagelink;
     add(link);
@@ -127,7 +125,7 @@ public class TreeIconsActionPanel<T extends Serializable> extends Panel
   {
     super(id, model);
     this.treeTable = treeTable;
-    final Link< Void > selectLink = new Link<Void>("select") {
+    final Link<Void> selectLink = new Link<Void>("select") {
       @Override
       public void onClick()
       {
@@ -168,7 +166,7 @@ public class TreeIconsActionPanel<T extends Serializable> extends Panel
     spacerImage.add(AttributeModifier.replace("width", String.valueOf(spacerWidth)));
     if (this.link.isVisible() == true) {
       link.add(spacerImage);
-      add(WicketUtils.getInvisibleDummyImage("spacer", getResponse()));
+      add(WicketUtils.getInvisibleDummyImage("spacer", getRequestCycle()));
     } else {
       add(spacerImage);
     }
@@ -277,9 +275,9 @@ public class TreeIconsActionPanel<T extends Serializable> extends Panel
       }
       folderLink.setVisible(treeNode.hasChilds() == true);
       iconSpan.add(folderLink);
-      folderImage = new PresizedImage("folderImage", getResponse(), WebConstants.IMAGE_TREE_ICON_FOLDER);
+      folderImage = new PresizedImage("folderImage", WebConstants.IMAGE_TREE_ICON_FOLDER);
       folderImage.setOutputMarkupId(true);
-      folderOpenImage = new PresizedImage("folderOpenImage", getResponse(), WebConstants.IMAGE_TREE_ICON_FOLDER_OPEN);
+      folderOpenImage = new PresizedImage("folderOpenImage", WebConstants.IMAGE_TREE_ICON_FOLDER_OPEN);
       folderOpenImage.setOutputMarkupId(true);
       folderLink.add(folderImage).add(folderOpenImage);
     }

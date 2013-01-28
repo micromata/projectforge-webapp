@@ -79,7 +79,11 @@ public abstract class NavAbstractPanel extends Panel
         // Don't show this entry.
         return null;
       }
-      link = new ExternalLink("link", WicketUtils.getUrl(getResponse(), url, true));
+      if (url != null) {
+        link = new ExternalLink("link", WicketUtils.getUrl(getRequestCycle(), url, true));
+      } else {
+        link = new ExternalLink("link", "#");
+      }
     }
     if (menuEntry.isNewWindow() == true) {
       link.add(AttributeModifier.replace("target", "_blank"));

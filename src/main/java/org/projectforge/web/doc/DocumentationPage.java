@@ -45,7 +45,7 @@ public class DocumentationPage extends AbstractSecuredPage
    */
   public static final AbstractLink addNewsLink(final WebMarkupContainer parentContainer, final String id)
   {
-    final AbstractLink link = new ExternalLink(id, WicketUtils.getUrl(parentContainer.getResponse(), "/secure/doc/News.html", true));
+    final AbstractLink link = new ExternalLink(id, WicketUtils.getUrl(parentContainer.getRequestCycle(), "secure/doc/News.html", true));
     parentContainer.add(link);
     return link;
   }
@@ -76,7 +76,7 @@ public class DocumentationPage extends AbstractSecuredPage
   {
     final WebMarkupContainer linkContainer = new WebMarkupContainer(id);
     linkContainer.add(AttributeModifier.replace("onclick",
-        "javascript:openDoc('" + WicketUtils.getUrl(parentContainer.getResponse(), "/secure/" + url, true) + "');"));
+        "javascript:openDoc('" + WicketUtils.getUrl(parentContainer.getRequestCycle(), "secure/" + url, true) + "');"));
     linkContainer.add(AttributeModifier.replace("onmouseover", "style.cursor='pointer'"));
     parentContainer.add(linkContainer);
   }

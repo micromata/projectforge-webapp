@@ -51,8 +51,7 @@ public class GroupSelectPanel extends AbstractSelectPanel<GroupDO>
    * @param caller
    * @param selectProperty
    */
-  public GroupSelectPanel(final String id, final IModel<GroupDO> model, final ISelectCallerPage caller,
-      final String selectProperty)
+  public GroupSelectPanel(final String id, final IModel<GroupDO> model, final ISelectCallerPage caller, final String selectProperty)
   {
     super(id, model, caller, selectProperty);
   }
@@ -93,7 +92,7 @@ public class GroupSelectPanel extends AbstractSelectPanel<GroupDO>
     };
     selectButton.setDefaultFormProcessing(defaultFormProcessing);
     add(selectButton);
-    selectButton.add(new TooltipImage("selectHelp", getResponse(), WebConstants.IMAGE_GROUP_SELECT, getString("tooltip.selectGroup")));
+    selectButton.add(new TooltipImage("selectHelp", WebConstants.IMAGE_GROUP_SELECT, getString("tooltip.selectGroup")));
     final SubmitLink unselectButton = new SubmitLink("unselect") {
       @Override
       public void onSubmit()
@@ -109,8 +108,7 @@ public class GroupSelectPanel extends AbstractSelectPanel<GroupDO>
     };
     unselectButton.setDefaultFormProcessing(defaultFormProcessing);
     add(unselectButton);
-    unselectButton.add(new TooltipImage("unselectHelp", getResponse(), WebConstants.IMAGE_GROUP_UNSELECT,
-        getString("tooltip.unselectGroup")));
+    unselectButton.add(new TooltipImage("unselectHelp", WebConstants.IMAGE_GROUP_UNSELECT, getString("tooltip.unselectGroup")));
     return this;
   }
 

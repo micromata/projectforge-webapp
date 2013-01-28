@@ -180,7 +180,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
     };
     selectButton.setDefaultFormProcessing(false);
     divContainer.add(selectButton);
-    selectButton.add(new TooltipImage("selectHelp", getResponse(), WebConstants.IMAGE_TASK_SELECT, getString("tooltip.selectTask")));
+    selectButton.add(new TooltipImage("selectHelp", WebConstants.IMAGE_TASK_SELECT, getString("tooltip.selectTask")));
     final SubmitLink unselectButton = new SubmitLink("unselect") {
       @Override
       public void onSubmit()
@@ -196,8 +196,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
     };
     unselectButton.setDefaultFormProcessing(false);
     divContainer.add(unselectButton);
-    unselectButton
-    .add(new TooltipImage("unselectHelp", getResponse(), WebConstants.IMAGE_TASK_UNSELECT, getString("tooltip.unselectTask")));
+    unselectButton.add(new TooltipImage("unselectHelp", WebConstants.IMAGE_TASK_UNSELECT, getString("tooltip.unselectTask")));
     // DropDownChoice favorites
     final FavoritesChoicePanel<TaskDO, TaskFavorite> favoritesPanel = new FavoritesChoicePanel<TaskDO, TaskFavorite>("favorites",
         UserPrefArea.TASK_FAVORITE, tabIndex, "full text") {

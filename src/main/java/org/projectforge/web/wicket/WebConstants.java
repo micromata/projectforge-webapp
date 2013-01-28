@@ -49,9 +49,9 @@ public class WebConstants
 
   public static final String PARAMETER_DATE = "date";
 
-  private static final String DIR = "/images/";
+  private static final String DIR = "images/";
 
-  public static final String DOC_LINK_HANDBUCH_LUCENE = "/secure/doc/Handbuch.html#label_volltextsuche";
+  public static final String DOC_LINK_HANDBUCH_LUCENE = "secure/doc/Handbuch.html#label_volltextsuche";
 
   public static final String I18N_KEY_FIELD_REQUIRED = "validation.error.fieldRequired";
 
