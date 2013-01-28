@@ -110,6 +110,10 @@ public class FavoritesMenu implements Serializable
 
   public void readFromXml(final String menuAsXml, final ParseMode mode)
   {
+    if (menu == null) {
+      log.error("User's menu is null, can't get FavoritesMenu!");
+      return;
+    }
     if (log.isDebugEnabled() == true) {
       log.debug("readFromXml: " + menuAsXml);
     }
