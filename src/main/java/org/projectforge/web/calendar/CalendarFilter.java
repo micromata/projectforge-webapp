@@ -23,6 +23,8 @@
 
 package org.projectforge.web.calendar;
 
+import java.util.Date;
+
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.timesheet.TimesheetEventsProvider;
 
@@ -36,6 +38,16 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 public class CalendarFilter extends AbstractCalendarFilter
 {
   private static final long serialVersionUID = -4154764049316136395L;
+
+  @SuppressWarnings("unused")
+  @Deprecated
+  @XStreamAsAttribute
+  private transient Date current;
+
+  @SuppressWarnings("unused")
+  @Deprecated
+  @XStreamAsAttribute
+  private transient Integer userId;
 
   @XStreamAsAttribute
   private String selectedCalendar;
