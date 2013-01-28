@@ -27,13 +27,8 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.RepeatingView;
-import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.projectforge.web.Menu;
-import org.projectforge.web.MenuEntry;
-import org.projectforge.web.core.MenuSuffixLabel;
-import org.projectforge.web.core.NavSidePanel;
 import org.projectforge.web.core.NavTopPanel;
 import org.projectforge.web.dialog.ModalDialog;
 import org.projectforge.web.fibu.ISelectCallerPage;
@@ -68,33 +63,11 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
   public AbstractSecuredPage(final PageParameters parameters)
   {
     super(parameters);
-    final NavSidePanel menuPanel = new NavSidePanel("mainMenu");
-    body.add(menuPanel);
     modalDialogs = new RepeatingView("modalDialogs");
     body.add(modalDialogs);
-    menuPanel.init();
-    final Label sideMenuSuffixLabel = new MenuSuffixLabel("totalMenuCounter", new Model<Integer>() {
-      @Override
-      public Integer getObject()
-      {
-        int counter = 0;
-        final Menu menu = menuPanel.getMenu();
-        if (menu.getMenuEntries() == null) {
-          return counter;
-        }
-        for (final MenuEntry menuEntry : menu.getMenuEntries()) {
-          final IModel<Integer> newCounterModel = menuEntry.getNewCounterModel();
-          if (newCounterModel != null && newCounterModel.getObject() != null) {
-            counter += newCounterModel.getObject();
-          }
-        }
-        return counter;
-      };
-    });
-    body.add(sideMenuSuffixLabel);
-    final NavTopPanel favoriteMenuPanel = new NavTopPanel("favoriteMenu", userXmlPreferencesCache, accessChecker);
-    body.add(favoriteMenuPanel);
-    favoriteMenuPanel.init(this);
+    final NavTopPanel topMenuPanel = new NavTopPanel("topMenu", userXmlPreferencesCache, accessChecker);
+    body.add(topMenuPanel);
+    topMenuPanel.init(this);
     final WebMarkupContainer contentMenusContainer = new WebMarkupContainer("contentMenus") {
       @Override
       public boolean isVisible()

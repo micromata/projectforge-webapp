@@ -11,10 +11,17 @@
           class="icon-bar"></span> <span class="icon-bar"></span>
         </a>
         <div class="nav-collapse collapse navbar-responsive-collapse">
-          <ul class="nav">
+          <ul class="nav" role="menu">
             <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><img src="images/icons/small/white/cog_3.png"
-                class="gear" /><b class="caret"></b></a>
+                class="gear" /><span class="badge badge-important" wicket:id="totalMenuCounter">[8]</span><b class="caret"></b></a>
               <ul class="dropdown-menu">
+                <li class="dropdown-submenu" wicket:id="completeMenuCategoryRepeater"><a href="#"><span wicket:id="menuCategoryLabel">[General]</span><span
+                    class="badge badge-important" wicket:id="suffix">[5]</span></a>
+                  <ul class="dropdown-menu">
+                    <li wicket:id="completeSubMenuRepeater"><a wicket:id="link"><span wicket:id="label">[Addresses]</span><span
+                        class="badge badge-important" wicket:id="suffix">[5]</span></a></li>
+                  </ul></li>
+                <li class="divider"></li>
                 <li><a href="#" wicket:id="goMobile"><wicket:message key="menu.mobileMenu" /></a></li>
                 <li><a href="wa/layoutSettings" wicket:id="layoutSettingsMenuLink"><wicket:message key="menu.gear.layoutsettings" /></a></li>
                 <li><a href="wa/customizeMenu" wicket:id="customizeMenuLink"><wicket:message key="menu.gear.customizeMenu" /></a></li>

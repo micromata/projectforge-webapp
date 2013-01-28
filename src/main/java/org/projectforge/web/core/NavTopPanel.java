@@ -38,6 +38,7 @@ import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.http.WebRequest;
@@ -68,9 +69,11 @@ import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
  */
 public class NavTopPanel extends NavAbstractPanel
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(NavTopPanel.class);
+
   private static final long serialVersionUID = -7858806882044188339L;
 
-  private final FavoritesMenu favoritesMenu;
+  private FavoritesMenu favoritesMenu;
 
   private final AccessChecker accessChecker;
 
@@ -83,11 +86,12 @@ public class NavTopPanel extends NavAbstractPanel
     super(id);
     this.userXmlPreferencesCache = userXmlPreferencesCache;
     this.accessChecker = accessChecker;
-    this.favoritesMenu = FavoritesMenu.get(userXmlPreferencesCache, accessChecker);
   }
 
   public void init(final AbstractSecuredPage page)
   {
+    getMenu();
+    this.favoritesMenu = FavoritesMenu.get(userXmlPreferencesCache, accessChecker);
     if (page.getMySession().isMobileUserAgent() == true) {
       add(new BookmarkablePageLink<Void>("goMobile", MenuMobilePage.class));
     } else {
@@ -163,9 +167,77 @@ public class NavTopPanel extends NavAbstractPanel
       };
       add(logoutLink);
     }
-    getMenu();
+    addCompleteMenu();
+    addFavoriteMenu();
+  }
 
-    // Main menu:
+  @SuppressWarnings("serial")
+  private void addCompleteMenu()
+  {
+    final Label totalMenuSuffixLabel = new MenuSuffixLabel("totalMenuCounter", new Model<Integer>() {
+      @Override
+      public Integer getObject()
+      {
+        int counter = 0;
+        if (menu.getMenuEntries() == null) {
+          return counter;
+        }
+        for (final MenuEntry menuEntry : menu.getMenuEntries()) {
+          final IModel<Integer> newCounterModel = menuEntry.getNewCounterModel();
+          if (newCounterModel != null && newCounterModel.getObject() != null) {
+            counter += newCounterModel.getObject();
+          }
+        }
+        return counter;
+      };
+    });
+    add(totalMenuSuffixLabel);
+
+    final RepeatingView completeMenuCategoryRepeater = new RepeatingView("completeMenuCategoryRepeater");
+    add(completeMenuCategoryRepeater);
+    if (menu.getMenuEntries() != null) {
+      for (final MenuEntry menuEntry : menu.getMenuEntries()) {
+        if (menuEntry.getSubMenuEntries() == null) {
+          continue;
+        }
+        // Now we add a new menu area (title with sub menus):
+        final WebMarkupContainer categoryContainer = new WebMarkupContainer(completeMenuCategoryRepeater.newChildId());
+        completeMenuCategoryRepeater.add(categoryContainer);
+        categoryContainer.add(new Label("menuCategoryLabel", getString(menuEntry.getI18nKey())));
+        final Label areaSuffixLabel = getSuffixLabel(menuEntry);
+        categoryContainer.add(areaSuffixLabel);
+
+        // final WebMarkupContainer subMenuContainer = new WebMarkupContainer("subMenu");
+        // categoryContainer.add(subMenuContainer);
+        if (menuEntry.hasSubMenuEntries() == false) {
+          // subMenuContainer.setVisible(false);
+          continue;
+        }
+
+        final RepeatingView completeSubMenuRepeater = new RepeatingView("completeSubMenuRepeater");
+        categoryContainer.add(completeSubMenuRepeater);
+        for (final MenuEntry subMenuEntry : menuEntry.getSubMenuEntries()) {
+          if (subMenuEntry.getSubMenuEntries() != null) {
+            log.error("Oups: sub sub menus not supported: " + menuEntry.getId() + " has child menus which are ignored.");
+          }
+          // Now we add the next menu entry to the area:
+          final WebMarkupContainer subMenuItem = new WebMarkupContainer(completeSubMenuRepeater.newChildId());
+          completeSubMenuRepeater.add(subMenuItem);
+          final AbstractLink link = getMenuEntryLink(subMenuEntry, null);
+          if (link != null) {
+            subMenuItem.add(link);
+          } else {
+            subMenuItem.setVisible(false);
+          }
+        }
+      }
+    }
+
+  }
+
+  private void addFavoriteMenu()
+  {
+    // Favorite menu:
     final RepeatingView menuRepeater = new RepeatingView("menuRepeater");
     add(menuRepeater);
     final Collection<MenuEntry> menuEntries = favoritesMenu.getMenuEntries();
