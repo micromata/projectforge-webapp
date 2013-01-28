@@ -264,7 +264,6 @@ public class WicketUtils
     if (encodeUrl == true) {
       url = requestCycle.getResponse().encodeURL(url);
     }
-    log.info(url);
     return url;
   }
 
