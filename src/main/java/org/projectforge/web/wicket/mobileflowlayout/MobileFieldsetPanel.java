@@ -59,8 +59,8 @@ public class MobileFieldsetPanel extends AbstractFieldsetPanel<MobileFieldsetPan
         return getString(labelText);
       };
     }).setRenderBodyOnly(true));
-    repeater = new RepeatingView("fields");
-    fieldset.add(repeater);
+    fieldsRepeater = new RepeatingView("fields");
+    fieldset.add(fieldsRepeater);
   }
 
   /**
@@ -109,7 +109,7 @@ public class MobileFieldsetPanel extends AbstractFieldsetPanel<MobileFieldsetPan
   @Override
   public String newChildId()
   {
-    return repeater.newChildId();
+    return fieldsRepeater.newChildId();
   }
 
 }

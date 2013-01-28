@@ -53,7 +53,7 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
 
   private static final long serialVersionUID = -6318707656650110365L;
 
-  private final WebMarkupContainer div;
+  private final WebMarkupContainer controls;
 
   private RepeatingView iconContainer;
 
@@ -162,8 +162,8 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
     } else {
       label.setVisible(false);
     }
-    fieldset.add(div = new WebMarkupContainer("div"));
-    div.add(feedbackMessageLabel = new Label("feedbackMessage", new Model<String>() {
+    fieldset.add(controls = new WebMarkupContainer("controls"));
+    controls.add(feedbackMessageLabel = new Label("feedbackMessage", new Model<String>() {
       /**
        * @see org.apache.wicket.model.Model#getObject()
        */
@@ -182,8 +182,8 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
         return feedbackMessage != null;
       }
     });
-    repeater = new RepeatingView("fields");
-    div.add(repeater);
+    fieldsRepeater = new RepeatingView("fields");
+    controls.add(fieldsRepeater);
   }
 
   /**
@@ -447,14 +447,20 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
   public String newChildId()
   {
     if (childCounter++ == 1) {
-      div.add(AttributeModifier.append("class", "controls-row"));
+      controls.add(AttributeModifier.append("class", "controls-row"));
     }
-    return repeater.newChildId();
+    return fieldsRepeater.newChildId();
+  }
+
+  public FieldsetPanel removeAllFields()
+  {
+    fieldsRepeater.removeAll();
+    return this;
   }
 
   public FieldsetPanel setDivStyle(final DivType divType)
   {
-    this.div.add(AttributeModifier.append("class", divType.getClassAttrValue()));
+    this.controls.add(AttributeModifier.append("class", divType.getClassAttrValue()));
     return this;
   }
 
@@ -501,12 +507,12 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
   @Override
   protected MarkupContainer addChild(final Component... childs)
   {
-    return div.add(childs);
+    return controls.add(childs);
   }
 
   public WebMarkupContainer getControlsDiv()
   {
-    return div;
+    return controls;
   }
 
   /**

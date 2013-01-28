@@ -69,7 +69,7 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
 
   protected String labelText;
 
-  protected RepeatingView repeater;
+  protected RepeatingView fieldsRepeater;
 
   private final List<FormComponent< ? >> allFormComponents = new ArrayList<FormComponent< ? >>();
 
@@ -147,7 +147,7 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
       modifyAddedChild(component);
       addFormComponent(component);
     }
-    return repeater.add(childs);
+    return fieldsRepeater.add(childs);
   }
 
   private void addFormComponent(final Component component)
