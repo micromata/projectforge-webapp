@@ -100,7 +100,7 @@ public class NewPollOverviewPage extends PollBasePage
   {
     super.onInitialize();
 
-    if (model.isNew() == true) {
+    if (model.isNew() == false) {
       isModified = isModelModified();
     }
 

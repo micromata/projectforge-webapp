@@ -166,11 +166,7 @@ public class PollDO extends DefaultBaseDO
   {
     final int prime = 31;
     int result = 1;
-    result = prime * result + (active ? 1231 : 1237);
-    result = prime * result + ((description == null) ? 0 : description.hashCode());
-    result = prime * result + ((location == null) ? 0 : location.hashCode());
-    result = prime * result + ((owner == null) ? 0 : owner.hashCode());
-    result = prime * result + ((title == null) ? 0 : title.hashCode());
+    result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
     return result;
   }
 
@@ -187,28 +183,14 @@ public class PollDO extends DefaultBaseDO
     if (getClass() != obj.getClass())
       return false;
     final PollDO other = (PollDO) obj;
-    if (active != other.active)
-      return false;
-    if (description == null) {
-      if (other.description != null)
+    if (getId() == null) {
+      if (other.getId() != null)
         return false;
-    } else if (!description.equals(other.description))
-      return false;
-    if (location == null) {
-      if (other.location != null)
-        return false;
-    } else if (!location.equals(other.location))
-      return false;
-    if (owner == null) {
-      if (other.owner != null)
-        return false;
-    } else if (!owner.equals(other.owner))
-      return false;
-    if (title == null) {
-      if (other.title != null)
-        return false;
-    } else if (!title.equals(other.title))
+      else
+        return super.equals(obj);
+    } else if (!getId().equals(other.getId()))
       return false;
     return true;
   }
+
 }
