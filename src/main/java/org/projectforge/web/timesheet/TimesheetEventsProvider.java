@@ -47,7 +47,7 @@ import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.timesheet.TimesheetFilter;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.HtmlHelper;
-import org.projectforge.web.calendar.CalendarFilter;
+import org.projectforge.web.calendar.ICalendarFilter;
 import org.projectforge.web.calendar.MyFullCalendarEventsProvider;
 
 /**
@@ -63,7 +63,7 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
 
   private final TimesheetDao timesheetDao;
 
-  private final CalendarFilter calFilter;
+  private final ICalendarFilter calFilter;
 
   private long totalDuration;
 
@@ -95,7 +95,7 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
    * @param calFilter
    * @see Component#getString(String)
    */
-  public TimesheetEventsProvider(final Component parent, final TimesheetDao timesheetDao, final CalendarFilter calFilter)
+  public TimesheetEventsProvider(final Component parent, final TimesheetDao timesheetDao, final ICalendarFilter calFilter)
   {
     super(parent);
     this.timesheetDao = timesheetDao;
@@ -115,7 +115,7 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
     for (int i = 0; i < durationsPerDayOfYear.length; i++) {
       durationsPerDayOfYear[i] = 0;
     }
-    final Integer userId = calFilter.getUserId();
+    final Integer userId = calFilter.getTimesheetUserId();
     if (userId == null) {
       return;
     }

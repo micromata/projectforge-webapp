@@ -37,7 +37,7 @@ import org.projectforge.humanresources.HRPlanningDao;
 import org.projectforge.humanresources.HRPlanningEntryDO;
 import org.projectforge.humanresources.HRPlanningFilter;
 import org.projectforge.user.PFUserContext;
-import org.projectforge.web.calendar.CalendarFilter;
+import org.projectforge.web.calendar.ICalendarFilter;
 import org.projectforge.web.calendar.MyFullCalendarEventsProvider;
 
 /**
@@ -53,7 +53,7 @@ public class HRPlanningEventsProvider extends MyFullCalendarEventsProvider
 
   private final HRPlanningDao hrPlanningDao;
 
-  private final CalendarFilter calendarFilter;
+  private final ICalendarFilter calendarFilter;
 
   /**
    * the name of the event class.
@@ -65,7 +65,7 @@ public class HRPlanningEventsProvider extends MyFullCalendarEventsProvider
    * @param hrPlanningDao
    * @see Component#getString(String)
    */
-  public HRPlanningEventsProvider(final Component parent, final CalendarFilter calendarFilter, final HRPlanningDao hrPlanningDao)
+  public HRPlanningEventsProvider(final Component parent, final ICalendarFilter calendarFilter, final HRPlanningDao hrPlanningDao)
   {
     super(parent);
     this.calendarFilter = calendarFilter;
@@ -83,7 +83,7 @@ public class HRPlanningEventsProvider extends MyFullCalendarEventsProvider
       return;
     }
     final HRPlanningFilter filter = new HRPlanningFilter();
-    filter.setUserId(calendarFilter.getUserId());
+    filter.setUserId(calendarFilter.getTimesheetUserId());
     filter.setStartTime(start.toDate());
     filter.setStopTime(end.toDate());
     final List<HRPlanningDO> list = hrPlanningDao.getList(filter);

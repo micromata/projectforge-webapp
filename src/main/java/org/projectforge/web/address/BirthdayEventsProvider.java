@@ -35,8 +35,8 @@ import org.projectforge.address.AddressDao;
 import org.projectforge.address.BirthdayAddress;
 import org.projectforge.common.DateFormatType;
 import org.projectforge.common.DateFormats;
-import org.projectforge.web.calendar.CalendarFilter;
 import org.projectforge.web.calendar.DateTimeFormatter;
+import org.projectforge.web.calendar.ICalendarFilter;
 import org.projectforge.web.calendar.MyFullCalendarEventsProvider;
 
 /**
@@ -54,7 +54,7 @@ public class BirthdayEventsProvider extends MyFullCalendarEventsProvider
 
   private final boolean dataProtection;
 
-  private final CalendarFilter filter;
+  private final ICalendarFilter filter;
 
   /**
    * the name of the event class.
@@ -67,7 +67,7 @@ public class BirthdayEventsProvider extends MyFullCalendarEventsProvider
    * @param dataProtection If true (default) then no ages will be shown, only the names.
    * @see Component#getString(String)
    */
-  public BirthdayEventsProvider(final Component parent, final CalendarFilter filter, final AddressDao addressDao, final boolean dataProtection)
+  public BirthdayEventsProvider(final Component parent, final ICalendarFilter filter, final AddressDao addressDao, final boolean dataProtection)
   {
     super(parent);
     this.filter = filter;
