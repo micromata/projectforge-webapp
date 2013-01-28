@@ -25,7 +25,6 @@ package org.projectforge.plugins.poll;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -101,7 +100,9 @@ public class NewPollOverviewPage extends PollBasePage
   {
     super.onInitialize();
 
-    isModified = isModelModified();
+    if (model.isNew() == true) {
+      isModified = isModelModified();
+    }
 
     final FieldsetPanel fsTitle = gridBuilder.newFieldset(getString("plugins.poll.new.title"));
     final TextField<String> title = new TextField<String>(fsTitle.getTextFieldId(), new PropertyModel<String>(model.getPollDo(), "title"));
@@ -224,10 +225,14 @@ public class NewPollOverviewPage extends PollBasePage
     // relate elements with poll
     if (isNew == true || isModified == true) {
       for (final PollEventDO event : model.getAllEvents()) {
-        event.setPoll(model.getPollDo());
+        if (event.getPoll() == null) {
+          event.setPoll(model.getPollDo());
+        }
       }
       for (final PollAttendeeDO attendee : model.getPollAttendeeList()) {
-        attendee.setPoll(model.getPollDo());
+        if (attendee.getPoll() == null) {
+          attendee.setPoll(model.getPollDo());
+        }
       }
       pollEventDao.saveOrUpdate(model.getAllEvents());
       pollAttendeeDao.saveOrUpdate(model.getPollAttendeeList());
@@ -288,9 +293,9 @@ public class NewPollOverviewPage extends PollBasePage
       final boolean comparePoll = ObjectUtils.equals(pollOld, poll);
 
       if (compareAttendees == false || compareEvents == false || comparePoll == false) {
-        return false;
-      } else {
         return true;
+      } else {
+        return false;
       }
     } else {
       return false;
@@ -299,24 +304,19 @@ public class NewPollOverviewPage extends PollBasePage
 
   /**
    * compare lists and their elements.
-   * returns true, if lists are identical
-   * returns false, else.
+   * returns true, if lists are identical, false else.
+   * 
    * @param listA
    * @param listB
    * @return
    */
   private boolean compareLists(final List<?> listA, final List<?> listB) {
-    Iterator<?> itA;
-    final Iterator<?> itB;
     if (listA.size() == listB.size()) {
-      itA = listA.iterator();
-      itB = listB.iterator();
-      do {
-        if (ObjectUtils.equals(itA.next(), itB.next()) == false) {
+      for (final Object obj : listB){
+        if (listA.contains(obj) == false) {
           return false;
         }
       }
-      while (itA.hasNext());
       return true;
     } else {
       return false;

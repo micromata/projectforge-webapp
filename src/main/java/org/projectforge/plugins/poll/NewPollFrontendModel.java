@@ -24,6 +24,7 @@
 package org.projectforge.plugins.poll;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -151,4 +152,27 @@ public class NewPollFrontendModel implements Serializable
     return result;
   }
 
+  /**
+   * Get user or email list.
+   * 
+   * @param choice true for user list, false for email list
+   * @return
+   */
+  public List<PollAttendeeDO> getUserOrEmailList(final boolean choice) {
+    final List<PollAttendeeDO> list = new ArrayList<PollAttendeeDO>();
+    if (pollAttendeeList != null) {
+      for (final PollAttendeeDO attendee : pollAttendeeList) {
+        if (choice == true) {
+          if (attendee.getUser() != null) {
+            list.add(attendee);
+          }
+        } else {
+          if (attendee.getEmail() != null) {
+            list.add(attendee);
+          }
+        }
+      }
+    }
+    return list;
+  }
 }

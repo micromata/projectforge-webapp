@@ -23,8 +23,10 @@
 
 package org.projectforge.plugins.poll.attendee;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -74,6 +76,8 @@ public class PollAttendeePage extends PollBasePage
   private MultiChoiceListHelper<PFUserDO> assignUsersListHelper;
 
   private String emailList;
+
+  private List<String> existingMailAddresses;
 
   private final NewPollFrontendModel model;
 
@@ -130,10 +134,12 @@ public class PollAttendeePage extends PollBasePage
 
   private TextField<String> getNewEMailField(final String wicketId)
   {
+    existingMailAddresses = new ArrayList<String>();
     if (model.getPollAttendeeList() != null) {
       for (final PollAttendeeDO attendee : model.getPollAttendeeList()) {
         if (attendee.getEmail() != null) {
           emailList += attendee.getEmail() + "; ";
+          existingMailAddresses.add(attendee.getEmail());
         }
       }
     }
@@ -182,20 +188,28 @@ public class PollAttendeePage extends PollBasePage
       }
     }
 
+    // add new email addresses, if available
     final String[] emails = StringUtils.split(emailList, ";");
     if (emails != null) {
       if (emails.length > 0) {
         for (final String email : emails) {
-          final PollAttendeeDO newAttendee = new PollAttendeeDO();
-          newAttendee.setEmail(email.trim());
-          newAttendee.setSecureKey(NumberHelper.getSecureRandomUrlSaveString(SECURE_KEY_LENGTH));
-          allAttendeeList.add(newAttendee);
+          if (existingMailAddresses.contains(email.trim()) == false) {
+            final PollAttendeeDO newAttendee = new PollAttendeeDO();
+            newAttendee.setEmail(email.trim());
+            newAttendee.setSecureKey(NumberHelper.getSecureRandomUrlSaveString(SECURE_KEY_LENGTH));
+            allAttendeeList.add(newAttendee);
+          }
         }
       }
     }
 
+    // add existing mail addresses
+    if (model.isNew() == false) {
+      allAttendeeList.addAll(model.getUserOrEmailList(false));
+    }
+
     if (allAttendeeList.isEmpty() == true) {
-      feedBackPanel.error(getString("plugins.poll.attendee.error"));
+      error(getString("plugins.poll.attendee.error"));
     } else {
       model.getPollAttendeeList().clear();
       //      model.getCalculatedAttendeeList().clear();
