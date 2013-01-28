@@ -30,6 +30,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -42,6 +44,7 @@ import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.hibernate.Hibernate;
@@ -62,10 +65,12 @@ import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.timesheet.TimesheetExport;
 import org.projectforge.timesheet.TimesheetFilter;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.HtmlHelper;
+import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.task.TaskPropertyColumn;
 import org.projectforge.web.user.UserFormatter;
@@ -131,6 +136,8 @@ IListPageColumnsCreator<TimesheetDO>
 
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
+
+  private TimesheetsICSExportDialog icsExportDialog;
 
   public TimesheetListPage(final PageParameters parameters)
   {
@@ -207,6 +214,28 @@ IListPageColumnsCreator<TimesheetDO>
       addContentMenuEntry(new ContentMenuEntryPanel(getNewContentMenuChildId(), exportExcelButton, getString("exportAsXls"))
       .setTooltip(getString("tooltip.export.excel")));
     }
+    if (WebConfiguration.isDevelopmentMode() == true) {
+      icsExportDialog = new TimesheetsICSExportDialog(newModalDialogId(), new ResourceModel("timesheet.iCalSubscription"));
+      add(icsExportDialog);
+      icsExportDialog.init(PFUserContext.getUserId());
+      icsExportDialog.redraw();
+      final AjaxLink<Void> icsExportDialogButton = new AjaxLink<Void>(ContentMenuEntryPanel.LINK_ID) {
+        /**
+         * @see org.apache.wicket.ajax.markup.html.AjaxLink#onClick(org.apache.wicket.ajax.AjaxRequestTarget)
+         */
+        @Override
+        public void onClick(final AjaxRequestTarget target)
+        {
+          icsExportDialog.open(target);
+        };
+
+      };
+      //      final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(buttonGroupPanel.newChildId(), IconType.DOWNLOAD,
+      //          getString("timesheet.iCalSubscription"), iCalExportLink);
+      addContentMenuEntry(new ContentMenuEntryPanel(getNewContentMenuChildId(), icsExportDialogButton, getString("timesheet.icsExport"))
+      .setTooltip(getString("timesheet.iCalSubscription")));
+    }
+
   }
 
   @Override
