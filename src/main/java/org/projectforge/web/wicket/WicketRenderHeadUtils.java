@@ -23,23 +23,21 @@
 
 package org.projectforge.web.wicket;
 
-import de.micromata.less.LessWicketApplicationInstantiator;
 import org.apache.wicket.markup.head.CssReferenceHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptReferenceHeaderItem;
 import org.projectforge.web.WebConfiguration;
 
+import de.micromata.less.LessWicketApplicationInstantiator;
+
 public class WicketRenderHeadUtils
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(WicketRenderHeadUtils.class);
-
   private static final String[][] JAVASCRIPT_FILES_DEF = { //
     // { "scripts/jquery/1.8.2/jquery-1.8.2", ".min"}, // Wicket delivers jQuery version
     { "include/bootstrap/js/bootstrap", ".min"}, //
     // Needed: core, widget, mouse, position, draggable, dropable, resizable, selectable, sortable, button, datepicker:
     { "scripts/jqueryui/jquery-ui-1.10.0.custom", ".min"}, //
     { "scripts/contextmenu/jquery.contextmenu", ""}, //
-    { "scripts/adminica-2.2/adminica_ui", ""}, // modified!
     { "scripts/projectforge", ""} //
   };
 
@@ -51,7 +49,6 @@ public class WicketRenderHeadUtils
     { "styles/jqueryui/1.10.0/smoothness/jquery-ui-1.10.0.custom", ".min"}, //
     // { "styles/table", ""}, //
     // { "scripts/contextmenu/css/jquery.contextmenu", ""}, //
-    { "styles/adminica-2.2/main", ""}, //
     // { "include/bootstrap/css/bootstrap", ".min"}, //
     // { "include/bootstrap/css/bootstrap-responsive", ".min"}, //
     // { "styles/projectforge-main", ""}, //
