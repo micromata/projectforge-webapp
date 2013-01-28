@@ -157,7 +157,7 @@ public class TreeIconsActionPanel<T extends Serializable> extends Panel
   public void init(final TreeTablePanel page, final TreeTableNode treeNode)
   {
     this.treeNode = treeNode;
-    final ContextImage spacerImage = new ContextImage("spacer", page.getImageUrl(WebConstants.IMAGE_SPACER));
+    final ContextImage spacerImage = new PresizedImage("spacer", WebConstants.IMAGE_SPACER);
     final boolean showExploreIcon = treeNode.hasChilds();
     int spacerWidth;
     if (showExploreIcon == true)
@@ -170,7 +170,7 @@ public class TreeIconsActionPanel<T extends Serializable> extends Panel
     } else {
       add(spacerImage);
     }
-    final ContextImage leafImage = new ContextImage("leaf", page.getImageUrl(WebConstants.IMAGE_TREE_ICON_LEAF));
+    final ContextImage leafImage = new PresizedImage("leaf", WebConstants.IMAGE_TREE_ICON_LEAF);
     leafImage.setVisible(treeNode.isLeaf());
     add(leafImage);
     final WebMarkupContainer iconSpan = new WebMarkupContainer("icons");
@@ -221,7 +221,7 @@ public class TreeIconsActionPanel<T extends Serializable> extends Panel
       exploreLink.setVisible(showExploreIcon);
       iconSpan.add(exploreLink);
       // Get string results in warnings (panel was added before)?
-      final ContextImage exploreImage = new ContextImage("explore", page.getImageUrl(WebConstants.IMAGE_TREE_ICON_EXPLOSION));
+      final ContextImage exploreImage = new PresizedImage("explore", WebConstants.IMAGE_TREE_ICON_EXPLOSION);
       exploreLink.add(exploreImage);
     }
     {
