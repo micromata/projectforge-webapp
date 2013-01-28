@@ -24,10 +24,10 @@
 package org.projectforge.plugins.teamcal.integration;
 
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.projectforge.web.calendar.CalendarFilter;
 import org.projectforge.web.calendar.CalendarForm;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.calendar.CalendarPanel;
+import org.projectforge.web.calendar.ICalendarFilter;
 
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
@@ -70,7 +70,7 @@ public class TeamCalCalendarPage extends CalendarPage
    * @see org.projectforge.web.calendar.CalendarPage#initCalendarFilter()
    */
   @Override
-  protected CalendarFilter initCalendarFilter()
+  protected ICalendarFilter initCalendarFilter()
   {
     TeamCalCalendarFilter filter = (TeamCalCalendarFilter) getUserPrefEntry(USERPREF_KEY);
     if (filter == null) {
@@ -82,7 +82,7 @@ public class TeamCalCalendarPage extends CalendarPage
   }
 
   @Override
-  protected CalendarFilter getFilter()
+  protected TeamCalCalendarFilter getFilter()
   {
     return form.getFilter();
   }

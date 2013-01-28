@@ -41,11 +41,8 @@ import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptReferenceHeaderItem;
 import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
-import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -56,14 +53,12 @@ import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.event.TeamEventDao;
 import org.projectforge.plugins.teamcal.event.TeamEventRight;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFilter;
-import org.projectforge.plugins.teamcal.integration.TemplateCalendarProperties;
 import org.projectforge.plugins.teamcal.integration.TemplateEntry;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRights;
 import org.projectforge.web.calendar.CalendarPageSupport;
-import org.projectforge.web.common.ColorPickerPanel;
 import org.projectforge.web.dialog.ModalDialog;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.user.UserSelectPanel;
@@ -72,7 +67,6 @@ import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.AjaxMaxLengthEditableLabel;
 import org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.ButtonGroupPanel;
-import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -85,12 +79,11 @@ import com.vaynberg.wicket.select2.Select2MultiChoice;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
+ * @author K. Reinhard (k.reinhard@micromata.de)
  * 
  */
 public class TeamCalFilterDialog extends ModalDialog
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalFilterDialog.class);
-
   private static final long serialVersionUID = 8687197318833240410L;
 
   private final List<TeamCalDO> selectedCalendars;
@@ -106,13 +99,15 @@ public class TeamCalFilterDialog extends ModalDialog
 
   private TeamCalCalendarFilter backupFilter;
 
-  private CalendarColorPanel calendarColorPanel;
+  private TeamCalFilterDialogCalendarColorPanel calendarColorPanel;
 
   private Select<Integer> defaultCalendarSelect;
 
   private Select2MultiChoice<TeamCalDO> teamCalsChoice;
 
   private WebMarkupContainer optionsControls;
+
+  private FieldsetPanel optionsFieldset;
 
   public static final Integer TIMESHEET_CALENDAR_ID = -1;
 
@@ -185,14 +180,13 @@ public class TeamCalFilterDialog extends ModalDialog
   public void init()
   {
     init(new Form<String>(getFormId()));
-    calendarPageSupport = new CalendarPageSupport((ISelectCallerPage) getPage(), filter);
+    calendarPageSupport = new CalendarPageSupport((ISelectCallerPage) getPage());
     timesheetsCalendar.setTitle(getString("plugins.teamcal.timeSheetCalendar"));
     timesheetsCalendar.setId(TIMESHEET_CALENDAR_ID);
     // confirm
     setCloseButtonTooltip(null, new ResourceModel("plugins.teamcal.calendar.filterDialog.closeButton.tooltip"));
   }
 
-  @SuppressWarnings("serial")
   public TeamCalFilterDialog redraw()
   {
     clearContent();
@@ -202,10 +196,24 @@ public class TeamCalFilterDialog extends ModalDialog
     addDefaultCalenderSelection();
     gridBuilder.newGridPanel();
 
-    final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"));
-    optionsControls = fs.getControlsDiv();
+    optionsFieldset = gridBuilder.newFieldset(getString("label.options"));
+    optionsControls = optionsFieldset.getControlsDiv();
     optionsControls.setOutputMarkupId(true);
-    final UserSelectPanel timesheetUserSelectPanel = calendarPageSupport.addUserSelectPanel(fs, new PropertyModel<PFUserDO>(this,
+    redrawOptionControls();
+    gridBuilder.newGridPanel();
+    addTeamCalsChoiceFieldset();
+    final DivPanel panel = gridBuilder.getPanel();
+    panel.add(new Heading3Panel(panel.newChildId(), getString("plugins.teamcal.selectColor")));
+    panel.add(calendarColorPanel = new TeamCalFilterDialogCalendarColorPanel(panel.newChildId()));
+    calendarColorPanel.redraw(filter.getActiveTemplateEntry(), selectedCalendars);
+    return this;
+  }
+
+  @SuppressWarnings("serial")
+  private void redrawOptionControls()
+  {
+    optionsFieldset.removeAllFields();
+    final UserSelectPanel timesheetUserSelectPanel = calendarPageSupport.addUserSelectPanel(optionsFieldset, new PropertyModel<PFUserDO>(this,
         "timesheetsUser"), false);
     if (timesheetUserSelectPanel != null) {
       timesheetUserSelectPanel.getFormComponent().add(new OnChangeAjaxBehavior() {
@@ -217,13 +225,8 @@ public class TeamCalFilterDialog extends ModalDialog
         }
       });
     }
-    gridBuilder.newGridPanel();
-    addTeamCalsChoiceFieldset();
-    final DivPanel panel = gridBuilder.getPanel();
-    panel.add(new Heading3Panel(panel.newChildId(), getString("plugins.teamcal.selectColor")));
-    panel.add(calendarColorPanel = new CalendarColorPanel(panel.newChildId()));
-    calendarColorPanel.redraw();
-    return this;
+    final DivPanel checkBoxPanel = optionsFieldset.addNewCheckBoxDiv();
+    calendarPageSupport.addOptions(checkBoxPanel, false, filter);
   }
 
   /**
@@ -404,8 +407,7 @@ public class TeamCalFilterDialog extends ModalDialog
             activeTemplateEntry.removeCalendarProperties(key);
           }
         }
-        calendarColorPanel.redraw();
-        target.add(calendarColorPanel.main, defaultCalendarSelect);
+        updateComponents(target);
       }
     });
     fs.add(teamCalsChoice);
@@ -490,8 +492,12 @@ public class TeamCalFilterDialog extends ModalDialog
     selectedCalendars.clear();
     final TemplateEntry activeTemplateEntry = filter.getActiveTemplateEntry();
     selectedCalendars.addAll(activeTemplateEntry.getCalendars());
-    calendarColorPanel.redraw();
-    target.add(templateChoice.getDropDownChoice(), teamCalsChoice, calendarColorPanel.main, templateName, defaultCalendarSelect, optionsControls);
+    redrawOptionControls();
+    calendarColorPanel.redraw(activeTemplateEntry, selectedCalendars);
+    teamCalsChoice.modelChanged();
+    templateChoice.getDropDownChoice().modelChanged();
+    target.add(templateChoice.getDropDownChoice(), teamCalsChoice, calendarColorPanel.main, templateName, defaultCalendarSelect,
+        optionsControls);
   }
 
   public PFUserDO getTimesheetsUser()
@@ -516,106 +522,4 @@ public class TeamCalFilterDialog extends ModalDialog
       activeTemplateEntry.setTimesheetUserId(user.getId());
     }
   }
-
-  /**
-   * Inner class to represent a single calendar color and visibility panel.
-   * 
-   */
-  private class CalendarColorPanel extends Panel
-  {
-    private static final long serialVersionUID = -4596590985776103813L;
-
-    private RepeatingView columnRepeater;
-
-    private final WebMarkupContainer main;
-
-    /**
-     * @param id
-     */
-    public CalendarColorPanel(final String id)
-    {
-      super(id);
-      main = new WebMarkupContainer("main");
-      main.setOutputMarkupId(true);
-      add(main);
-    }
-
-    /**
-     * @see org.apache.wicket.Component#onInitialize()
-     */
-    @Override
-    protected void onInitialize()
-    {
-      super.onInitialize();
-      columnRepeater = new RepeatingView("columnRepeater");
-      main.add(columnRepeater);
-    }
-
-    /**
-     * @see org.apache.wicket.Component#onBeforeRender()
-     */
-    @SuppressWarnings("serial")
-    protected void redraw()
-    {
-      columnRepeater.removeAll();
-      final int counter = selectedCalendars.size();
-      int rowsPerColumn = counter / 3;
-      if (counter % 3 > 0) {
-        ++rowsPerColumn; // Need one more row.
-      }
-      final TemplateEntry activeTemplateEntry = filter.getActiveTemplateEntry();
-      int rowCounter = 0;
-      WebMarkupContainer columnContainer;
-      RepeatingView rowRepeater = null;
-      for (final TeamCalDO calendar : selectedCalendars) {
-        if (rowCounter++ % rowsPerColumn == 0) {
-          // Start new column:
-          columnContainer = new WebMarkupContainer(columnRepeater.newChildId());
-          columnContainer.add(AttributeModifier.append("class", GridSize.COL33.getClassAttrValue()));
-          columnRepeater.add(columnContainer);
-          rowRepeater = new RepeatingView("rowRepeater");
-          columnContainer.add(rowRepeater);
-        }
-        final WebMarkupContainer container = new WebMarkupContainer(rowRepeater.newChildId());
-        rowRepeater.add(container);
-        final IModel<Boolean> model = Model.of(activeTemplateEntry.isVisible(calendar.getId()) == true);
-        final CheckBoxPanel checkBoxPanel = new CheckBoxPanel("isVisible", model, "");
-        checkBoxPanel.getCheckBox().add(new AjaxFormComponentUpdatingBehavior("onChange") {
-          private static final long serialVersionUID = 3523446385818267608L;
-
-          @Override
-          protected void onUpdate(final AjaxRequestTarget target)
-          {
-            final Boolean newSelection = checkBoxPanel.getCheckBox().getConvertedInput();
-            final TemplateCalendarProperties properties = activeTemplateEntry.getCalendarProperties(calendar.getId());
-            if (newSelection != properties.isVisible()) {
-              properties.setVisible(newSelection);
-              activeTemplateEntry.setDirty();
-            }
-          }
-        });
-        container.add(checkBoxPanel);
-        WicketUtils.addTooltip(checkBoxPanel.getCheckBox(), getString("plugins.teamcal.filterDialog.calendarIsVisible.tooltip"));
-        container.add(new Label("name", calendar.getTitle()));
-        final ColorPickerPanel picker = new ColorPickerPanel("colorPicker", activeTemplateEntry.getColorCode(calendar.getId())) {
-          @Override
-          protected void onColorUpdate(final String selectedColor)
-          {
-            final TemplateCalendarProperties props = activeTemplateEntry.getCalendarProperties(calendar.getId());
-            if (props != null) {
-              props.setColorCode(selectedColor);
-            } else {
-              log.warn("TeamCalendarProperties not found: calendar.id='"
-                  + calendar.getId()
-                  + "' + for active template '"
-                  + activeTemplateEntry.getName()
-                  + "'.");
-            }
-          }
-        };
-        container.add(picker);
-      }
-    }
-  }
-
 }

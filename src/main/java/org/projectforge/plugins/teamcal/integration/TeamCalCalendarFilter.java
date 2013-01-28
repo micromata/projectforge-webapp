@@ -31,18 +31,18 @@ import java.util.List;
 import java.util.Set;
 
 import org.projectforge.user.PFUserContext;
-import org.projectforge.web.calendar.CalendarFilter;
+import org.projectforge.web.calendar.AbstractCalendarFilter;
 
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  * @author M. Lauterbach (m.lauterbach@micromata.de)
  * 
  */
-public class TeamCalCalendarFilter extends CalendarFilter
+public class TeamCalCalendarFilter extends AbstractCalendarFilter
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalCalendarFilter.class);
+  private static final long serialVersionUID = 7361308619781209753L;
 
-  private static final long serialVersionUID = -8318037558891653348L;
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalCalendarFilter.class);
 
   static final String DEFAULT_COLOR = "#FAAF26";
 
@@ -268,5 +268,173 @@ public class TeamCalCalendarFilter extends CalendarFilter
     final TemplateEntry newTemplate = new TemplateEntry();
     newTemplate.setName(PFUserContext.getLocalizedString("default"));
     add(newTemplate);
+  }
+
+  /**
+   * @see org.projectforge.web.calendar.ICalendarFilter#isShowBirthdays()
+   */
+  @Override
+  public boolean isShowBirthdays()
+  {
+    if (getActiveTemplateEntry() == null) {
+      return false;
+    }
+    return activeTemplateEntry.isShowBirthdays();
+  }
+
+  /**
+   * @see org.projectforge.web.calendar.ICalendarFilter#setShowBirthdays(boolean)
+   */
+  @Override
+  public TeamCalCalendarFilter setShowBirthdays(final boolean showBirthdays)
+  {
+    if (getActiveTemplateEntry() != null) {
+      activeTemplateEntry.setShowBirthdays(showBirthdays);
+    }
+    return this;
+  }
+
+  /**
+   * @see org.projectforge.web.calendar.ICalendarFilter#isShowStatistics()
+   */
+  @Override
+  public boolean isShowStatistics()
+  {
+    if (getActiveTemplateEntry() == null) {
+      return false;
+    }
+    return activeTemplateEntry.isShowStatistics();
+  }
+
+  /**
+   * @see org.projectforge.web.calendar.ICalendarFilter#setShowStatistics(boolean)
+   */
+  @Override
+  public TeamCalCalendarFilter setShowStatistics(final boolean showStatistics)
+  {
+    if (getActiveTemplateEntry() != null) {
+      activeTemplateEntry.setShowStatistics(showStatistics);
+    }
+    return this;
+  }
+
+  /**
+   * @see org.projectforge.web.calendar.ICalendarFilter#isShowPlanning()
+   */
+  @Override
+  public boolean isShowPlanning()
+  {
+    if (getActiveTemplateEntry() == null) {
+      return false;
+    }
+    return activeTemplateEntry.isShowPlanning();
+  }
+
+  /**
+   * @see org.projectforge.web.calendar.ICalendarFilter#setShowPlanning(boolean)
+   */
+  @Override
+  public TeamCalCalendarFilter setShowPlanning(final boolean showPlanning)
+  {
+    if (getActiveTemplateEntry() != null) {
+      activeTemplateEntry.setShowPlanning(showPlanning);
+    }
+    return this;
+  }
+
+  /**
+   * @see org.projectforge.web.calendar.ICalendarFilter#getTimesheetUserId()
+   */
+  @Override
+  public Integer getTimesheetUserId()
+  {
+    if (getActiveTemplateEntry() == null) {
+      return null;
+    }
+    return activeTemplateEntry.getTimesheetUserId();
+  }
+
+  /**
+   * @see org.projectforge.web.calendar.ICalendarFilter#setTimesheetUserId(java.lang.Integer)
+   */
+  @Override
+  public TeamCalCalendarFilter setTimesheetUserId(final Integer timesheetUserId)
+  {
+    if (getActiveTemplateEntry() != null) {
+      activeTemplateEntry.setTimesheetUserId(timesheetUserId);
+    }
+    return this;
+  }
+
+  /**
+   * @see org.projectforge.web.calendar.ICalendarFilter#isShowTimesheets()
+   */
+  @Override
+  public boolean isShowTimesheets()
+  {
+    if (getActiveTemplateEntry() == null) {
+      return false;
+    }
+    return activeTemplateEntry.isShowTimesheets();
+  }
+
+  /**
+   * @see org.projectforge.web.calendar.ICalendarFilter#setShowTimesheets(boolean)
+   */
+  @Override
+  public TeamCalCalendarFilter setShowTimesheets(final boolean showTimesheets)
+  {
+    if (getActiveTemplateEntry() != null) {
+      activeTemplateEntry.setShowTimesheets(showTimesheets);
+    }
+    return this;
+  }
+
+  /**
+   * @see org.projectforge.web.calendar.ICalendarFilter#isShowBreaks()
+   */
+  @Override
+  public boolean isShowBreaks()
+  {
+    if (getActiveTemplateEntry() == null) {
+      return false;
+    }
+    return activeTemplateEntry.isShowBreaks();
+  }
+
+  /**
+   * @see org.projectforge.web.calendar.ICalendarFilter#setShowBreaks(boolean)
+   */
+  @Override
+  public TeamCalCalendarFilter setShowBreaks(final boolean showBreaks)
+  {
+    if (getActiveTemplateEntry() != null) {
+      activeTemplateEntry.setShowBreaks(showBreaks);
+    }
+    return this;
+  }
+
+  /**
+   * @see org.projectforge.web.calendar.ICalendarFilter#getSelectedCalendar()
+   */
+  @Override
+  public String getSelectedCalendar()
+  {
+    if (getActiveTemplateEntry() == null) {
+      return null;
+    }
+    return activeTemplateEntry.getSelectedCalendar();
+  }
+
+  /**
+   * @see org.projectforge.web.calendar.ICalendarFilter#setSelectedCalendar(java.lang.String)
+   */
+  @Override
+  public TeamCalCalendarFilter setSelectedCalendar(final String selectedCalendar)
+  {
+    if (getActiveTemplateEntry() != null) {
+      activeTemplateEntry.setSelectedCalendar(selectedCalendar);
+    }
+    return this;
   }
 }

@@ -32,7 +32,7 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
-import org.projectforge.plugins.teamcal.dialog.ICSExportDialog;
+import org.projectforge.plugins.teamcal.dialog.TeamCalICSExportDialog;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.common.MultiChoiceListHelper;
@@ -75,7 +75,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
 
   MultiChoiceListHelper<GroupDO> fullAccessGroupsListHelper, readonlyAccessGroupsListHelper, minimalAccessGroupsListHelper;
 
-  private ICSExportDialog icsExportDialog;
+  private TeamCalICSExportDialog icsExportDialog;
 
   /**
    * @param parentPage
@@ -138,7 +138,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
     }
 
     if (accessChecker.isRestrictedUser() == false && isNew() == false) {
-      icsExportDialog = new ICSExportDialog(parentPage.newModalDialogId(), new ResourceModel("plugins.teamcal.download"));
+      icsExportDialog = new TeamCalICSExportDialog(parentPage.newModalDialogId(), new ResourceModel("plugins.teamcal.download"));
       parentPage.add(icsExportDialog);
       icsExportDialog.init();
       icsExportDialog.redraw(getData());

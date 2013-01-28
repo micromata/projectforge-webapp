@@ -37,6 +37,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.projectforge.plugins.teamcal.admin.TeamCalCache;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.dialog.TeamCalFilterDialog;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.web.timesheet.TimesheetEventsProvider;
 
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -70,10 +71,10 @@ public class TemplateEntry implements Serializable, Comparable<TemplateEntry>, C
   private Boolean showStatistics;
 
   @XStreamAsAttribute
-  private Boolean showTimesheets;
+  private Integer timesheetUserId;
 
   @XStreamAsAttribute
-  private Integer timesheetUserId;
+  private String selectedCalendar;
 
   @XStreamAsAttribute
   private Boolean showBreaks = true;
@@ -272,7 +273,6 @@ public class TemplateEntry implements Serializable, Comparable<TemplateEntry>, C
     cloned.showBreaks = this.showBreaks;
     cloned.showPlanning = this.showPlanning;
     cloned.showStatistics = this.showStatistics;
-    cloned.showTimesheets = this.showTimesheets;
     cloned.timesheetUserId = this.timesheetUserId;
     for (final TemplateCalendarProperties props : this.calendarProperties) {
       final TemplateCalendarProperties clonedProps = props.clone();
@@ -340,16 +340,16 @@ public class TemplateEntry implements Serializable, Comparable<TemplateEntry>, C
   /**
    * @return the showBirthdays
    */
-  public Boolean getShowBirthdays()
+  public boolean isShowBirthdays()
   {
-    return showBirthdays;
+    return showBirthdays == Boolean.TRUE;
   }
 
   /**
    * @param showBirthdays the showBirthdays to set
    * @return this for chaining.
    */
-  public TemplateEntry setShowBirthdays(final Boolean showBirthdays)
+  public TemplateEntry setShowBirthdays(final boolean showBirthdays)
   {
     this.showBirthdays = showBirthdays;
     return this;
@@ -358,16 +358,16 @@ public class TemplateEntry implements Serializable, Comparable<TemplateEntry>, C
   /**
    * @return the showBreaks
    */
-  public Boolean getShowBreaks()
+  public boolean isShowBreaks()
   {
-    return showBreaks;
+    return showBreaks == Boolean.TRUE;
   }
 
   /**
    * @param showBreaks the showBreaks to set
    * @return this for chaining.
    */
-  public TemplateEntry setShowBreaks(final Boolean showBreaks)
+  public TemplateEntry setShowBreaks(final boolean showBreaks)
   {
     this.showBreaks = showBreaks;
     return this;
@@ -376,16 +376,16 @@ public class TemplateEntry implements Serializable, Comparable<TemplateEntry>, C
   /**
    * @return the showPlanning
    */
-  public Boolean getShowPlanning()
+  public boolean isShowPlanning()
   {
-    return showPlanning;
+    return showPlanning == Boolean.TRUE;
   }
 
   /**
    * @param showPlanning the showPlanning to set
    * @return this for chaining.
    */
-  public TemplateEntry setShowPlanning(final Boolean showPlanning)
+  public TemplateEntry setShowPlanning(final boolean showPlanning)
   {
     this.showPlanning = showPlanning;
     return this;
@@ -394,16 +394,16 @@ public class TemplateEntry implements Serializable, Comparable<TemplateEntry>, C
   /**
    * @return the showStatistics
    */
-  public Boolean getShowStatistics()
+  public boolean isShowStatistics()
   {
-    return showStatistics;
+    return showStatistics == Boolean.TRUE;
   }
 
   /**
    * @param showStatistics the showStatistics to set
    * @return this for chaining.
    */
-  public TemplateEntry setShowStatistics(final Boolean showStatistics)
+  public TemplateEntry setShowStatistics(final boolean showStatistics)
   {
     this.showStatistics = showStatistics;
     return this;
@@ -418,25 +418,6 @@ public class TemplateEntry implements Serializable, Comparable<TemplateEntry>, C
   }
 
   /**
-   * Only for users without access to display other's time-sheets.
-   * @return the showTimesheets
-   */
-  public Boolean getShowTimesheets()
-  {
-    return showTimesheets;
-  }
-
-  /**
-   * @param showTimesheets the showTimesheets to set
-   * @return this for chaining.
-   */
-  public TemplateEntry setShowTimesheets(final Boolean showTimesheets)
-  {
-    this.showTimesheets = showTimesheets;
-    return this;
-  }
-
-  /**
    * Used for users with access to display own and other time-sheets.
    * @param timesheetUserId the timesheetUserId to set
    * @return this for chaining.
@@ -444,6 +425,40 @@ public class TemplateEntry implements Serializable, Comparable<TemplateEntry>, C
   public TemplateEntry setTimesheetUserId(final Integer timesheetUserId)
   {
     this.timesheetUserId = timesheetUserId;
+    return this;
+  }
+
+  /**
+   * @see org.projectforge.web.calendar.ICalendarFilter#isShowTimesheets()
+   */
+  public boolean isShowTimesheets()
+  {
+    return this.timesheetUserId != null;
+  }
+
+  /**
+   * @see org.projectforge.web.calendar.ICalendarFilter#setShowTimesheets(boolean)
+   */
+  public TemplateEntry setShowTimesheets(final boolean showTimesheets)
+  {
+    this.timesheetUserId = PFUserContext.getUserId();
+    return this;
+  }
+
+  /**
+   * @see org.projectforge.web.calendar.ICalendarFilter#getSelectedCalendar()
+   */
+  public String getSelectedCalendar()
+  {
+    return selectedCalendar;
+  }
+
+  /**
+   * @see org.projectforge.web.calendar.ICalendarFilter#setSelectedCalendar(java.lang.String)
+   */
+  public TemplateEntry setSelectedCalendar(final String selectedCalendar)
+  {
+    this.selectedCalendar = selectedCalendar;
     return this;
   }
 

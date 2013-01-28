@@ -23,53 +23,43 @@
 
 package org.projectforge.plugins.teamcal.dialog;
 
-import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFeedHook;
-import org.projectforge.web.dialog.ModalDialog;
-import org.projectforge.web.wicket.WicketUtils;
-import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.calendar.AbstractICSExportDialog;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
  * 
  */
-public class ICSExportDialog extends ModalDialog
+public class TeamCalICSExportDialog extends AbstractICSExportDialog
 {
   private static final long serialVersionUID = -3840971062603541903L;
+
+  private TeamCalDO teamCal;
 
   /**
    * @param id
    * @param titleModel
    */
-  public ICSExportDialog(final String id, final IModel<String> titleModel)
+  public TeamCalICSExportDialog(final String id, final IModel<String> titleModel)
   {
-    super(id);
-    setTitle(titleModel);
-    setBigWindow();
+    super(id, titleModel);
   }
 
   public void redraw(final TeamCalDO teamCal)
   {
-    clearContent();
-    {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("calendar.abonnement.url")).setLabelSide(false);
-      final String iCalTarget = TeamCalCalendarFeedHook.getUrl(teamCal.getId());
-      final String url = WicketUtils.getAbsoluteContextPath() + iCalTarget;
-      final TextArea<String> textArea = new TextArea<String>(fs.getTextAreaId(), Model.of(url));
-      fs.add(textArea);
-      textArea.add(AttributeModifier.replace("onClick", "$(this).select();"));
-    }
+    this.teamCal = teamCal;
+    super.redraw();
   }
 
+  /**
+   * @see org.projectforge.web.calendar.AbstractICSExportDialog#getUrl()
+   */
   @Override
-  public void init()
+  protected String getUrl()
   {
-    init(new Form<String>(getFormId()));
-    gridBuilder.newFormHeading("invisible");
+    return TeamCalCalendarFeedHook.getUrl(teamCal.getId());
   }
+
 }

@@ -39,7 +39,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.plugins.teamcal.dialog.ICSExportDialog;
+import org.projectforge.plugins.teamcal.dialog.TeamCalICSExportDialog;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
@@ -62,7 +62,7 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
   @SpringBean(name = "teamCalDao")
   private TeamCalDao teamCalDao;
 
-  private ICSExportDialog icsExportDialog;
+  private TeamCalICSExportDialog icsExportDialog;
 
   /**
    * 
@@ -207,7 +207,7 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
   {
     dataTable = createDataTable(createColumns(this, true), "lastUpdate", SortOrder.DESCENDING);
     form.add(dataTable);
-    icsExportDialog = new ICSExportDialog(newModalDialogId(), new ResourceModel("plugins.teamcal.download"));
+    icsExportDialog = new TeamCalICSExportDialog(newModalDialogId(), new ResourceModel("plugins.teamcal.download"));
     add(icsExportDialog);
     icsExportDialog.init();
   }

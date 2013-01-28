@@ -58,6 +58,7 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.calendar.CalendarFilter;
 import org.projectforge.web.calendar.CalendarPanel;
+import org.projectforge.web.calendar.ICalendarFilter;
 import org.projectforge.web.calendar.MyFullCalendarConfig;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredBasePage;
@@ -182,10 +183,10 @@ public class TeamCalCalendarPanel extends CalendarPanel
   }
 
   /**
-   * @see org.projectforge.web.calendar.CalendarPanel#onRegisterEventSourceHook(org.projectforge.web.calendar.MyFullCalendarConfig)
+   * @see org.projectforge.web.calendar.CalendarPanel#onRegisterEventSourceHook(MyFullCalendarConfig, CalendarFilter, ICalendarFilter)
    */
   @Override
-  protected void onRegisterEventSourceHook(final MyFullCalendarConfig config, final CalendarFilter filter)
+  protected void onRegisterEventSourceHook(final MyFullCalendarConfig config, final ICalendarFilter filter)
   {
     if (filter instanceof TeamCalCalendarFilter) {
       // Colors are handled event based, this is just the default value

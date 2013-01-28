@@ -37,10 +37,10 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.plugins.teamcal.dialog.TeamCalFilterDialog;
 import org.projectforge.plugins.teamcal.event.DropIcsPanel;
 import org.projectforge.plugins.teamcal.event.TeamEventListPage;
-import org.projectforge.web.calendar.CalendarFilter;
 import org.projectforge.web.calendar.CalendarForm;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.calendar.CalendarPageSupport;
+import org.projectforge.web.calendar.ICalendarFilter;
 import org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
 import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
@@ -56,8 +56,6 @@ public class TeamCalCalendarForm extends CalendarForm
 
   private static final long serialVersionUID = -5838203593605203398L;
 
-  private TeamCalCalendarFilter filter;
-
   /**
    * @param parentPage
    */
@@ -72,7 +70,7 @@ public class TeamCalCalendarForm extends CalendarForm
   @Override
   protected CalendarPageSupport createCalendarPageSupport()
   {
-    return new CalendarPageSupport(parentPage, filter).setShowOptions(false).setShowTimsheetsSelectors(false);
+    return new CalendarPageSupport(parentPage).setShowOptions(false).setShowTimsheetsSelectors(false);
   }
 
   /**
@@ -83,7 +81,7 @@ public class TeamCalCalendarForm extends CalendarForm
   protected void init()
   {
     super.init();
-    final TeamCalFilterDialog dialog = new TeamCalFilterDialog(parentPage.newModalDialogId(), filter);
+    final TeamCalFilterDialog dialog = new TeamCalFilterDialog(parentPage.newModalDialogId(), (TeamCalCalendarFilter)filter);
     parentPage.add(dialog);
     dialog.init();
     final IconButtonPanel calendarButtonPanel = new AjaxIconButtonPanel(buttonGroupPanel.newChildId(), IconType.CALENDAR,
@@ -113,7 +111,7 @@ public class TeamCalCalendarForm extends CalendarForm
         @Override
         protected void onSubmit()
         {
-          final Set<Integer> visibleCalsSet = filter.getActiveVisibleCalendarIds();
+          final Set<Integer> visibleCalsSet = ((TeamCalCalendarFilter)filter).getActiveVisibleCalendarIds();
           final String calendars = StringHelper.objectColToString(visibleCalsSet, ",");
           final TeamEventListPage teamEventListPage = new TeamEventListPage(new PageParameters().add(TeamEventListPage.PARAM_CALENDARS, calendars));
           setResponsePage(teamEventListPage);
@@ -123,7 +121,7 @@ public class TeamCalCalendarForm extends CalendarForm
       buttonGroupPanel.addButton(searchButtonPanel);
     }
 
-    if (filter.getActiveTemplateEntry() != null) {
+    if (((TeamCalCalendarFilter)filter).getActiveTemplateEntry() != null) {
       final IChoiceRenderer<TemplateEntry> templateEntriesRenderer = new IChoiceRenderer<TemplateEntry>() {
         private static final long serialVersionUID = 4804134958242438331L;
 
@@ -174,31 +172,16 @@ public class TeamCalCalendarForm extends CalendarForm
     }
   }
 
-  /**
-   * @see org.projectforge.web.calendar.CalendarForm#setIcsImportButtonTooltip(java.lang.String)
-   */
   @Override
-  protected String setIcsImportButtonTooltip()
+  public TeamCalCalendarFilter getFilter()
   {
-    return "plugins.teamcal.abonnement.timesheets";
+    return (TeamCalCalendarFilter)filter;
   }
 
   @Override
-  public CalendarFilter getFilter()
+  protected void setFilter(final ICalendarFilter filter)
   {
-    if (this.filter == null && super.getFilter() != null) {
-      return super.getFilter();
-    }
-    return filter;
-  }
-
-  @Override
-  protected void setFilter(final CalendarFilter filter)
-  {
-    if (filter instanceof TeamCalCalendarFilter) {
-      this.filter = (TeamCalCalendarFilter) filter;
-    }
-    super.setFilter(filter);
+    this.filter = filter;
   }
 
   /**
@@ -206,6 +189,6 @@ public class TeamCalCalendarForm extends CalendarForm
    */
   public Set<Integer> getSelectedCalendars()
   {
-    return filter.getActiveVisibleCalendarIds();
+    return ((TeamCalCalendarFilter)filter).getActiveVisibleCalendarIds();
   }
 }
