@@ -23,9 +23,7 @@
                   </ul></li>
                 <li class="divider"></li>
                 <li><a href="#" wicket:id="goMobile"><wicket:message key="menu.mobileMenu" /></a></li>
-                <li><a href="wa/layoutSettings" wicket:id="layoutSettingsMenuLink"><wicket:message key="menu.gear.layoutsettings" /></a></li>
                 <li><a href="wa/customizeMenu" wicket:id="customizeMenuLink"><wicket:message key="menu.gear.customizeMenu" /></a></li>
-                <li><a href="wa/feedback" wicket:id="feedbackLink"><wicket:message key="menu.gear.feedback" /></a></li>
                 <li><a href="#" wicket:id="showBookmarkLink"><wicket:message key="menu.gear.showBookmark" /></a></li>
               </ul></li>
             <li wicket:id="menuRepeater"><a href="#" wicket:id="link"><span wicket:id="label">[Generic]</span><span
@@ -42,6 +40,9 @@
             <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><span wicket:id="user">[Kai Reinhard]</span><b
                 class="caret"></b></a>
               <ul class="dropdown-menu">
+                <li><a href="wa/layoutSettings" wicket:id="layoutSettingsMenuLink"><wicket:message key="menu.gear.layoutsettings" /></a></li>
+                <li><a href="wa/feedback" wicket:id="feedbackLink"><wicket:message key="menu.gear.feedback" /></a></li>
+                <li class="divider"></li>
                 <li><a wicket:id="myAccountLink" href="/myAccount"><wicket:message key="menu.myAccount" /></a></li>
                 <li><a wicket:id="logoutLink" href="/login?logout=true"><wicket:message key="menu.logout" /></a></li>
               </ul></li>
