@@ -189,7 +189,7 @@ AbstractSecuredForm<F, P>
         modifiedSearchExpressionLabel.setEscapeModelStrings(false);
         div.add(modifiedSearchExpressionLabel);
 
-        fs.addHelpIcon(getString("tooltip.lucene.link"), FieldSetIconPosition.TOP_RIGHT).setOnClickLocation(
+        fs.addHelpIcon(getString("tooltip.lucene.link"), FieldSetIconPosition.TOP_RIGHT).setOnClickLocation(getRequestCycle(),
             WebConstants.DOC_LINK_HANDBUCH_LUCENE, true);
         final String helpKeyboardImageTooltip = getHelpKeyboardImageTooltip();
         if (helpKeyboardImageTooltip != null) {
