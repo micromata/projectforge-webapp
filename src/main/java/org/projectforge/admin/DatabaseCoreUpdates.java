@@ -37,6 +37,7 @@ import org.projectforge.fibu.AuftragDO;
 import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KundeDO;
+import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.RechnungDO;
 import org.projectforge.registry.Registry;
 import org.projectforge.scripting.ScriptDO;
@@ -54,6 +55,36 @@ public class DatabaseCoreUpdates
   public static List<UpdateEntry> getUpdateEntries()
   {
     final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
+    // /////////////////////////////////////////////////////////////////
+    // 4.3.1
+    // /////////////////////////////////////////////////////////////////
+    list.add(new UpdateEntryImpl(
+        CORE_REGION_ID,
+        "4.3.1",
+        "2013-01-29",
+        "Adds t_fibu_projekt.konto") {
+      final Table projektTable = new Table(ProjektDO.class);
+
+      @Override
+      public UpdatePreCheckStatus runPreCheck()
+      {
+        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
+        return dao.doesTableAttributesExist(projektTable, "konto") == true //
+            ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
+      }
+
+      @Override
+      public UpdateRunningStatus runUpdate()
+      {
+        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
+        if (dao.doesTableAttributesExist(projektTable, "konto") == false) {
+          dao.addTableAttributes(projektTable, new TableAttribute(ProjektDO.class, "konto"));
+        }
+        return UpdateRunningStatus.DONE;
+      }
+    });
+
+
     // /////////////////////////////////////////////////////////////////
     // 4.2
     // /////////////////////////////////////////////////////////////////
@@ -270,7 +301,7 @@ public class DatabaseCoreUpdates
         dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "dateFormat"));
         dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "excelDateFormat"));
         dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "timeNotation"));
-        final UserDao userDao = (UserDao) Registry.instance().getDao(UserDao.class);
+        final UserDao userDao = Registry.instance().getDao(UserDao.class);
         dao.createMissingIndices();
         userDao.getUserGroupCache().setExpired();
         return UpdateRunningStatus.DONE;

@@ -88,6 +88,8 @@ public class ProjektDO extends DefaultBaseDO implements Historizable, ShortDispl
 
   private TaskDO task;
 
+  private KontoDO konto;
+
   @Transient
   public String getKost()
   {
@@ -119,7 +121,7 @@ public class ProjektDO extends DefaultBaseDO implements Historizable, ShortDispl
     return nummer;
   }
 
-  public ProjektDO setNummer(int nummer)
+  public ProjektDO setNummer(final int nummer)
   {
     this.nummer = nummer;
     return this;
@@ -141,7 +143,7 @@ public class ProjektDO extends DefaultBaseDO implements Historizable, ShortDispl
     return kunde;
   }
 
-  public ProjektDO setKunde(KundeDO kunde)
+  public ProjektDO setKunde(final KundeDO kunde)
   {
     this.kunde = kunde;
     return this;
@@ -164,7 +166,7 @@ public class ProjektDO extends DefaultBaseDO implements Historizable, ShortDispl
     return projektManagerGroup != null ? projektManagerGroup.getId() : null;
   }
 
-  public ProjektDO setProjektManagerGroup(GroupDO projektManagerGroup)
+  public ProjektDO setProjektManagerGroup(final GroupDO projektManagerGroup)
   {
     this.projektManagerGroup = projektManagerGroup;
     return this;
@@ -176,7 +178,7 @@ public class ProjektDO extends DefaultBaseDO implements Historizable, ShortDispl
     return name;
   }
 
-  public ProjektDO setName(String name)
+  public ProjektDO setName(final String name)
   {
     this.name = name;
     return this;
@@ -192,7 +194,7 @@ public class ProjektDO extends DefaultBaseDO implements Historizable, ShortDispl
     return identifier;
   }
 
-  public ProjektDO setIdentifier(String identifier)
+  public ProjektDO setIdentifier(final String identifier)
   {
     this.identifier = identifier;
     return this;
@@ -227,7 +229,7 @@ public class ProjektDO extends DefaultBaseDO implements Historizable, ShortDispl
     return internKost2_4;
   }
 
-  public ProjektDO setInternKost2_4(Integer internKost2_4)
+  public ProjektDO setInternKost2_4(final Integer internKost2_4)
   {
     this.internKost2_4 = internKost2_4;
     return this;
@@ -240,7 +242,7 @@ public class ProjektDO extends DefaultBaseDO implements Historizable, ShortDispl
     return status;
   }
 
-  public ProjektDO setStatus(ProjektStatus status)
+  public ProjektDO setStatus(final ProjektStatus status)
   {
     this.status = status;
     return this;
@@ -253,7 +255,7 @@ public class ProjektDO extends DefaultBaseDO implements Historizable, ShortDispl
     return description;
   }
 
-  public ProjektDO setDescription(String description)
+  public ProjektDO setDescription(final String description)
   {
     this.description = description;
     return this;
@@ -266,7 +268,7 @@ public class ProjektDO extends DefaultBaseDO implements Historizable, ShortDispl
     return task;
   }
 
-  public ProjektDO setTask(TaskDO task)
+  public ProjektDO setTask(final TaskDO task)
   {
     this.task = task;
     return this;
@@ -276,6 +278,28 @@ public class ProjektDO extends DefaultBaseDO implements Historizable, ShortDispl
   public Integer getTaskId()
   {
     return this.task != null ? task.getId() : null;
+  }
+
+  /**
+   * This Datev account number is used for the exports of invoices. If not given then the account number assigned to the KundeDO is used instead (default).
+   * @return
+   */
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "konto_id")
+  public KontoDO getKonto()
+  {
+    return konto;
+  }
+
+  public void setKonto(final KontoDO konto)
+  {
+    this.konto = konto;
+  }
+
+  @Transient
+  public Integer getKontoId()
+  {
+    return konto != null ? konto.getId() : null;
   }
 
   @Transient

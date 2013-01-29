@@ -204,6 +204,10 @@ public class KundeDO extends AbstractHistorizableBaseDO<Integer> implements Shor
     return KostFormatter.formatKunde(this);
   }
 
+  /**
+   * This Datev account number is used for the exports of invoices. This account numbers may-be overwritten by the ProjektDO which is assigned to an invoice.
+   * @return
+   */
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "konto_id")
   public KontoDO getKonto()
