@@ -782,6 +782,10 @@ public class TaskTree extends AbstractCache implements Serializable
   protected void refresh()
   {
     log.info("Initializing task tree ...");
+    if (taskDao == null) {
+      log.info("Can't initialize task tree, taskDao isn't set yet.");
+      return;
+    }
     TaskNode newRoot = null;
     taskMap = new HashMap<Integer, TaskNode>();
     final List<TaskDO> taskList = taskDao.internalLoadAll();
