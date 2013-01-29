@@ -72,7 +72,7 @@ public class HolidayEventsProvider extends MyFullCalendarEventsProvider
           color = "#EEEEEE";
           textColor = "#222222";
         } else {
-          backgroundColor = "#FFE5E5";
+          backgroundColor = "#f9dfde";
           color = "#EEEEEE";
           textColor = "#FF2222";
         }
