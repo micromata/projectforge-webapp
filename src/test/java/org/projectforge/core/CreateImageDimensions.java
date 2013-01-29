@@ -66,14 +66,13 @@ public class CreateImageDimensions
     final List<ImageDimension> dimensions = new ArrayList<ImageDimension>();
     for (final String subDir : SUB_DIRS) {
       final String path = PATH + subDir;
-      @SuppressWarnings("unchecked")
       final Collection<File> files = FileUtils.listFiles(new File(path), IMAGE_SUFFIXES, true);
       final File absolutePathFile = new File(PATH);
       final String absolutePath = absolutePathFile.getAbsolutePath();
       for (final File file : files) {
         final Image image = Toolkit.getDefaultToolkit().getImage(file.getAbsolutePath());
         final ImageIcon icon = new ImageIcon(image);
-        final String filename = file.getAbsolutePath().substring(absolutePath.length());
+        final String filename = file.getAbsolutePath().substring(absolutePath.length() + 1);
         final ImageDimension dimension = new ImageDimension(filename, icon.getIconWidth(), icon.getIconHeight());
         dimensions.add(dimension);
       }
