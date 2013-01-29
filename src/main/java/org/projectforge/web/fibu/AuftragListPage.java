@@ -51,7 +51,6 @@ import org.projectforge.fibu.AuftragsPositionDO;
 import org.projectforge.fibu.AuftragsStatus;
 import org.projectforge.fibu.RechnungCache;
 import org.projectforge.fibu.RechnungsPositionVO;
-import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.common.OutputType;
 import org.projectforge.web.task.TaskFormatter;
 import org.projectforge.web.user.UserFormatter;
@@ -66,6 +65,7 @@ import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 import org.projectforge.web.wicket.RowCssClass;
+import org.projectforge.web.wicket.WicketUtils;
 
 @ListPage(editPage = AuftragEditPage.class)
 public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDao, AuftragDO> implements IListPageColumnsCreator<AuftragDO>
@@ -86,9 +86,6 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
 
   @SpringBean(name = "taskFormatter")
   private TaskFormatter taskFormatter;
-
-  @SpringBean(name = "htmlHelper")
-  private HtmlHelper htmlHelper;
 
   public AuftragListPage(final PageParameters parameters)
   {
@@ -142,10 +139,9 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
       {
         final AuftragDO auftrag = rowModel.getObject();
         final List<AuftragsPositionDO> list = auftrag.getPositionen();
-        final StringBuffer buf = new StringBuffer();
+        final Label label = new Label(componentId, new Model<String>("#" + list.size()));
         if (list != null) {
-          buf.append("<span style=\"font-style: italic;\" title=\"").append(NumberFormatter.format(auftrag.getPersonDays())).append(" ")
-          .append(getString("projectmanagement.personDays.short")).append(" - ");
+          final StringBuffer buf = new StringBuffer();
           final Iterator<AuftragsPositionDO> it = list.iterator();
           while (it.hasNext() == true) {
             final AuftragsPositionDO pos = it.next();
@@ -154,13 +150,15 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
               buf.append("(").append(NumberFormatter.format(pos.getPersonDays())).append(" ")
               .append(getString("projectmanagement.personDays.short")).append(") ");
             }
-            buf.append(CurrencyFormatter.format(pos.getNettoSumme()));
-            if (StringUtils.isNotBlank(pos.getTitel()) == true) {
-              buf.append(": ").append(HtmlHelper.escapeXml(pos.getTitel()));
+            if (pos.getNettoSumme() != null) {
+              buf.append(CurrencyFormatter.format(pos.getNettoSumme()));
+              if (StringUtils.isNotBlank(pos.getTitel()) == true) {
+                buf.append(": ").append(pos.getTitel());
+              }
+              buf.append(": ");
             }
-            buf.append(": ");
             if (pos.getTaskId() != null) {
-              buf.append(taskFormatter.getTaskPath(pos.getTaskId(), true, OutputType.HTML));
+              buf.append(taskFormatter.getTaskPath(pos.getTaskId(), false, OutputType.HTML));
             } else {
               buf.append(getString("fibu.auftrag.position.noTaskGiven"));
             }
@@ -168,16 +166,13 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
               buf.append(", ").append(getString(pos.getStatus().getI18nKey()));
             }
             if (it.hasNext() == true) {
-              buf.append("<br/>");
+              buf.append("\n");
             }
           }
-          buf.append("\">");
-          htmlHelper.appendImageTag(getRequestCycle(), buf, htmlHelper.getInfoImage());
-          buf.append("#").append(list.size());
-          buf.append("</span>");
+          WicketUtils.addTooltip(label, NumberFormatter.format(auftrag.getPersonDays())
+              + " "
+              + getString("projectmanagement.personDays.short"), buf.toString());
         }
-        final Label label = new Label(componentId, new Model<String>(buf.toString()));
-        label.setEscapeModelStrings(false);
         cellItem.add(label);
         cellItemListener.populateItem(cellItem, componentId, rowModel);
       }
