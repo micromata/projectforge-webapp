@@ -33,6 +33,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.projectforge.web.wicket.WicketUtils;
 
 /**
@@ -107,13 +108,14 @@ public class IconPanel extends Panel
    * @param newWindow If true then a new browser with the given url is opened.
    * @return
    */
-  public IconPanel setOnClickLocation(final String location, final boolean newWindow)
+  public IconPanel setOnClickLocation(final RequestCycle requestCycle, final String location, final boolean newWindow)
   {
     appendAttribute("style", "cursor: pointer;");
+    final String url = WicketUtils.getUrl(requestCycle, location, false);
     if (newWindow == true) {
-      appendAttribute("onclick", "window.open('" + location + "'); return false;");
+      appendAttribute("onclick", "window.open('" + url + "'); return false;");
     } else {
-      appendAttribute("onclick", "location.href='" + location + "';");
+      appendAttribute("onclick", "location.href='" + url + "';");
     }
     return this;
   }
