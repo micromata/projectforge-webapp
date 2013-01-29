@@ -64,7 +64,6 @@ public class CalendarFilter extends AbstractCalendarFilter
   @XStreamAsAttribute
   private Boolean showBreaks = true;
 
-
   @XStreamAsAttribute
   private Boolean showPlanning;
 
@@ -148,7 +147,11 @@ public class CalendarFilter extends AbstractCalendarFilter
   @Override
   public CalendarFilter setShowTimesheets(final boolean showTimesheets)
   {
-    this.timesheetUserId = PFUserContext.getUserId();
+    if (showTimesheets == true) {
+      this.timesheetUserId = PFUserContext.getUserId();
+    } else {
+      this.timesheetUserId = null;
+    }
     return this;
   }
 
