@@ -99,7 +99,7 @@ public class OrderPositionsPanel extends Panel
           item.add(link);
           link.add(new Label("label", String.valueOf(orderPosition.getAuftragNummer())));
         } else {
-          buf.append("<br/>");
+          buf.append("\n");
         }
         buf.append("#").append(orderPosition.getNumber()).append(" (");
         if (orderPosition.getPersonDays() != null) {
