@@ -67,7 +67,7 @@ public class XlsContentProvider implements ContentProvider
 
   public static final int LENGTH_STD = 30;
 
-  public static final int LENGTH_TIMESTAMP = 10;
+  public static final int LENGTH_TIMESTAMP = 16;
 
   public static final int LENGTH_USER = 20;
 
@@ -91,15 +91,15 @@ public class XlsContentProvider implements ContentProvider
 
   protected ExportWorkbook workbook;
 
-  private Map<Object, CellFormat> formatMap = new HashMap<Object, CellFormat>();
+  private final Map<Object, CellFormat> formatMap = new HashMap<Object, CellFormat>();
 
-  private Map<Object, CellFormat> defaultFormatMap = new HashMap<Object, CellFormat>();
+  private final Map<Object, CellFormat> defaultFormatMap = new HashMap<Object, CellFormat>();
 
-  private Map<Integer, Integer> colWidthMap = new HashMap<Integer, Integer>();
+  private final Map<Integer, Integer> colWidthMap = new HashMap<Integer, Integer>();
 
   private boolean autoFormatCells = true;
 
-  public XlsContentProvider(ExportWorkbook workbook)
+  public XlsContentProvider(final ExportWorkbook workbook)
   {
     this.workbook = workbook;
     createFonts();
@@ -112,9 +112,9 @@ public class XlsContentProvider implements ContentProvider
     defaultFormatMap.put(java.sql.Timestamp.class, new CellFormat(DateFormats.getExcelFormatString(DateFormatType.TIMESTAMP_MILLIS)));
   }
 
-  public void updateSheetStyle(ExportSheet sheet)
+  public void updateSheetStyle(final ExportSheet sheet)
   {
-    for (Map.Entry<Integer, Integer> entry : colWidthMap.entrySet()) {
+    for (final Map.Entry<Integer, Integer> entry : colWidthMap.entrySet()) {
       sheet.setColumnWidth(entry.getKey(), entry.getValue());
     }
   }
@@ -123,7 +123,7 @@ public class XlsContentProvider implements ContentProvider
    * If true then first row and even/odd rows will be formatted with bordered cells.
    * @param autoFormatCells
    */
-  public void setAutoFormatCells(boolean autoFormatCells)
+  public void setAutoFormatCells(final boolean autoFormatCells)
   {
     this.autoFormatCells = autoFormatCells;
   }
@@ -132,11 +132,11 @@ public class XlsContentProvider implements ContentProvider
    * Highlights even and odd rows and sets first column bold if even and odd rows are configured.
    * @see org.projectforge.export.ContentProvider#updateRowStyle(org.projectforge.export.ExportRow)
    */
-  public void updateRowStyle(ExportRow row)
+  public void updateRowStyle(final ExportRow row)
   {
     if (autoFormatCells == true) {
-      for (ExportCell cell : row.getCells()) {
-        CellFormat format = cell.ensureAndGetCellFormat();
+      for (final ExportCell cell : row.getCells()) {
+        final CellFormat format = cell.ensureAndGetCellFormat();
         format.setFillForegroundColor(HSSFColor.WHITE.index);
         switch (row.getRowNum()) {
           /*
@@ -157,7 +157,7 @@ public class XlsContentProvider implements ContentProvider
     }
   }
 
-  public void updateCellStyle(ExportCell cell)
+  public void updateCellStyle(final ExportCell cell)
   {
     final CellFormat format = cell.ensureAndGetCellFormat();
     CellStyle cellStyle = reusableCellFormats.get(format);
@@ -175,14 +175,14 @@ public class XlsContentProvider implements ContentProvider
       cellStyle.setWrapText(true);
       final String dataFormat = format.getDataFormat();
       if (dataFormat != null) {
-        short df = workbook.getDataFormat(format.getDataFormat());
+        final short df = workbook.getDataFormat(format.getDataFormat());
         cellStyle.setDataFormat(df);
       }
     }
     cell.setCellStyle(cellStyle);
   }
 
-  public void setValue(ExportCell cell, Object value)
+  public void setValue(final ExportCell cell, final Object value)
   {
     setValue(cell, value, null);
   }
@@ -190,9 +190,9 @@ public class XlsContentProvider implements ContentProvider
   /**
    * 
    */
-  public void setValue(ExportCell cell, Object value, String property)
+  public void setValue(final ExportCell cell, final Object value, final String property)
   {
-    Cell poiCell = cell.getPoiCell();
+    final Cell poiCell = cell.getPoiCell();
     if (value instanceof Date) { // Attention: Time zone is not given!
       poiCell.setCellValue((Date) value);
     } else if (value instanceof DateHolder) {
@@ -263,32 +263,32 @@ public class XlsContentProvider implements ContentProvider
     return format.clone();
   }
 
-  public void putFormat(Object obj, CellFormat cellFormat)
+  public void putFormat(final Object obj, final CellFormat cellFormat)
   {
     formatMap.put(obj, cellFormat);
   }
 
-  public void putFormat(Enum< ? > col, CellFormat cellFormat)
+  public void putFormat(final Enum< ? > col, final CellFormat cellFormat)
   {
     putFormat(col.name(), cellFormat);
   }
 
-  public void putFormat(Object obj, String dataFormat)
+  public void putFormat(final Object obj, final String dataFormat)
   {
     formatMap.put(obj, new CellFormat(dataFormat));
   }
 
-  public void putFormat(Enum< ? > col, String dataFormat)
+  public void putFormat(final Enum< ? > col, final String dataFormat)
   {
     putFormat(col.name(), dataFormat);
   }
 
-  public void putColWidth(int colIdx, int charLength)
+  public void putColWidth(final int colIdx, final int charLength)
   {
     this.colWidthMap.put(colIdx, charLength * LENGHT_UNIT);
   }
 
-  public void setColWidths(int... charLengths)
+  public void setColWidths(final int... charLengths)
   {
     for (int colIdx = 0; colIdx < charLengths.length; colIdx++) {
       putColWidth(colIdx, charLengths[colIdx]);
