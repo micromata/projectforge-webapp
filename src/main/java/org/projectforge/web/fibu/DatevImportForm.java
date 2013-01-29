@@ -63,7 +63,7 @@ public class DatevImportForm extends AbstractStandardForm<DatevImportFilter, Dat
     super.init();
     gridBuilder.newGridPanel();
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("file"), "*.xsl");
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("file"), "*.xls");
       fileUploadField = new FileUploadField(FileUploadPanel.WICKET_ID);
       fs.add(new FileUploadPanel(fs.newChildId(), fileUploadField));
       fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("importAccounts")) {
