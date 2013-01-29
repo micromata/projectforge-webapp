@@ -83,7 +83,11 @@ public class HRPlanningEventsProvider extends MyFullCalendarEventsProvider
       return;
     }
     final HRPlanningFilter filter = new HRPlanningFilter();
-    filter.setUserId(calendarFilter.getTimesheetUserId());
+    Integer timesheetUserId = calendarFilter.getTimesheetUserId() ;
+    if (timesheetUserId == null) {
+      timesheetUserId = PFUserContext.getUserId();
+    }
+    filter.setUserId(timesheetUserId);
     filter.setStartTime(start.toDate());
     filter.setStopTime(end.toDate());
     final List<HRPlanningDO> list = hrPlanningDao.getList(filter);
