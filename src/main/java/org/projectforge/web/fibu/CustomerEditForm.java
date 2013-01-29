@@ -95,6 +95,7 @@ public class CustomerEditForm extends AbstractEditForm<KundeDO, CustomerEditPage
       final KontoSelectPanel kontoSelectPanel = new KontoSelectPanel(fs.newChildId(), new PropertyModel<KontoDO>(data, "konto"), null,
           "kontoId");
       kontoSelectPanel.setKontoNumberRanges(AccountingConfig.getInstance().getDebitorsAccountNumberRanges()).init();
+      fs.addHelpIcon(getString("fibu.kunde.konto.tooltip"));
       fs.add(kontoSelectPanel);
     }
     {
