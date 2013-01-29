@@ -30,10 +30,13 @@ import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
+import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.ProjektStatus;
+import org.projectforge.fibu.kost.AccountingConfig;
 import org.projectforge.fibu.kost.KostCache;
+import org.projectforge.registry.Registry;
 import org.projectforge.reporting.Kost2Art;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.GroupDO;
@@ -112,6 +115,15 @@ public class ProjektEditForm extends AbstractEditForm<ProjektDO, ProjektEditPage
       WicketUtils.setSize(field, 3);
       fs.add(field);
       fs.add(new DivTextPanel(fs.newChildId(), ".##.##"));
+    }
+    if (Registry.instance().getKontoCache().isEmpty() == false) {
+      // Show this field only if DATEV accounts does exist.
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.konto"));
+      final KontoSelectPanel kontoSelectPanel = new KontoSelectPanel(fs.newChildId(), new PropertyModel<KontoDO>(data, "konto"), null,
+          "kontoId");
+      kontoSelectPanel.setKontoNumberRanges(AccountingConfig.getInstance().getDebitorsAccountNumberRanges()).init();
+      fs.addHelpIcon(getString("fibu.projekt.konto.tooltip"));
+      fs.add(kontoSelectPanel);
     }
     {
       // Name

@@ -37,9 +37,12 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.fibu.KontoCache;
+import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.ProjektDao;
 import org.projectforge.fibu.kost.KostCache;
+import org.projectforge.registry.Registry;
 import org.projectforge.reporting.Kost2Art;
 import org.projectforge.reporting.impl.ProjektImpl;
 import org.projectforge.user.GroupDO;
@@ -66,6 +69,9 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
 
   @SpringBean(name = "kostCache")
   private KostCache kostCache;
+
+  @SpringBean(name = "kontoCache")
+  private KontoCache kontoCache;
 
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
@@ -126,6 +132,29 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
     columns.add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("fibu.kunde.division")), getSortable(
         "kunde.division", sortable), "kunde.division", cellItemListener));
     columns.add(new TaskPropertyColumn<ProjektDO>(getString("task"), getSortable("task.title", sortable), "task", cellItemListener));
+    if (Registry.instance().getKontoCache().isEmpty() == false) {
+      columns
+      .add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("fibu.konto")), null, "konto", cellItemListener) {
+        /**
+         * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+         *      java.lang.String, org.apache.wicket.model.IModel)
+         */
+        @Override
+        public void populateItem(final Item<ICellPopulator<ProjektDO>> item, final String componentId, final IModel<ProjektDO> rowModel)
+        {
+          final ProjektDO projekt = rowModel.getObject();
+          KontoDO konto = null;
+          if (projekt != null) {
+            konto = kontoCache.getKonto(projekt.getKontoId());
+            if (konto == null && projekt.getKunde() != null) {
+              konto = kontoCache.getKonto(projekt.getKunde().getKontoId());
+            }
+          }
+          item.add(new Label(componentId, konto != null ? konto.formatKonto() : ""));
+          cellItemListener.populateItem(item, componentId, rowModel);
+        }
+      });
+    }
     columns.add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("status")), getSortable("status", sortable),
         "status", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("fibu.projekt.projektManagerGroup")), null,
