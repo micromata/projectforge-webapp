@@ -216,6 +216,7 @@ public abstract class ModalDialog extends Panel
     }
     if ((resizable == null && bigWindow == true) || Boolean.TRUE.equals(resizable) == true) {
       script.append(".resizable({ alsoResize: '#").append(getMainContainerMarkupId())
+      // max-height of .modal-body is 600px, need to enlarge this setting for resizing.
       .append(", .modal-body', resize: function( event, ui ) {$('.modal-body').css('max-height', '4000px');}, minWidth: 300, minHeight: 200 })");
     }
     response.render(OnDomReadyHeaderItem.forScript(script));
