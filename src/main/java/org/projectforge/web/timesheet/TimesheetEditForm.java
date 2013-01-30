@@ -518,11 +518,20 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
   @Override
   public void onBeforeRender()
   {
-    renderHookComponents();
     super.onBeforeRender();
     final DateHolder stopDateHolder = new DateHolder(data.getStopTime(), DatePrecision.MINUTE_15);
     stopHourOfDay = stopDateHolder.getHourOfDay();
     stopMinute = stopDateHolder.getMinute();
+  }
+
+  /**
+   * @see org.apache.wicket.Component#onInitialize()
+   */
+  @Override
+  protected void onInitialize()
+  {
+    super.onInitialize();
+    renderHookComponents();
   }
 
   protected void refresh()
