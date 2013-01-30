@@ -128,7 +128,7 @@ public class TeamCalFilterDialog extends ModalDialog
     super(id);
     this.filter = filter;
     setTitle(new ResourceModel("plugins.teamcal.calendar.filterDialog.title"));
-    setBigWindow().setShowCancelButton().wantsNotificationOnClose();
+    setBigWindow().setShowCancelButton().wantsNotificationOnClose().setEscapeKeyEnabled(false);
     selectedCalendars = new LinkedList<TeamCalDO>();
     teamEventRight = (TeamEventRight) UserRights.instance().getRight(TeamEventDao.USER_RIGHT_ID);
   }
