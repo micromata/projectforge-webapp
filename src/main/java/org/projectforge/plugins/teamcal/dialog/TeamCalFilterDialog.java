@@ -109,6 +109,10 @@ public class TeamCalFilterDialog extends ModalDialog
 
   private FieldsetPanel optionsFieldset;
 
+  private WebMarkupContainer timesheetUserControls;
+
+  private FieldsetPanel timesheetUserFieldset;
+
   public static final Integer TIMESHEET_CALENDAR_ID = -1;
 
   @SpringBean
@@ -194,8 +198,16 @@ public class TeamCalFilterDialog extends ModalDialog
     addFilterFieldset();
     gridBuilder.newSplitPanel(GridSize.COL50);
     addDefaultCalenderSelection();
-    gridBuilder.newGridPanel();
-
+    if (calendarPageSupport.isOtherTimesheetsUsersAllowed() == true) {
+      gridBuilder.newSplitPanel(GridSize.COL50);
+      timesheetUserFieldset = gridBuilder.newFieldset(getString("timesheet.timesheets"));
+      timesheetUserControls = timesheetUserFieldset.getControlsDiv();
+      timesheetUserControls.setOutputMarkupId(true);
+      redrawTimesheetsUserControls();
+      gridBuilder.newSplitPanel(GridSize.COL50);
+    } else {
+      gridBuilder.newGridPanel();
+    }
     optionsFieldset = gridBuilder.newFieldset(getString("label.options"));
     optionsControls = optionsFieldset.getControlsDiv();
     optionsControls.setOutputMarkupId(true);
@@ -210,11 +222,11 @@ public class TeamCalFilterDialog extends ModalDialog
   }
 
   @SuppressWarnings("serial")
-  private void redrawOptionControls()
+  private void redrawTimesheetsUserControls()
   {
-    optionsFieldset.removeAllFields();
-    final UserSelectPanel timesheetUserSelectPanel = calendarPageSupport.addUserSelectPanel(optionsFieldset, new PropertyModel<PFUserDO>(this,
-        "timesheetsUser"), false);
+    timesheetUserFieldset.removeAllFields();
+    final UserSelectPanel timesheetUserSelectPanel = calendarPageSupport.addUserSelectPanel(timesheetUserFieldset,
+        new PropertyModel<PFUserDO>(this, "timesheetsUser"), false);
     if (timesheetUserSelectPanel != null) {
       timesheetUserSelectPanel.getFormComponent().add(new OnChangeAjaxBehavior() {
         @Override
@@ -225,6 +237,11 @@ public class TeamCalFilterDialog extends ModalDialog
         }
       });
     }
+  }
+
+  private void redrawOptionControls()
+  {
+    optionsFieldset.removeAllFields();
     final DivPanel checkBoxPanel = optionsFieldset.addNewCheckBoxDiv();
     calendarPageSupport.addOptions(checkBoxPanel, false, filter);
   }
@@ -317,7 +334,8 @@ public class TeamCalFilterDialog extends ModalDialog
     // TEMPLATEENTRY DROPDOWN
     final IModel<List<TemplateEntry>> choicesModel = new PropertyModel<List<TemplateEntry>>(filter, "templateEntries");
     final IModel<TemplateEntry> currentModel = new PropertyModel<TemplateEntry>(filter, "activeTemplateEntry");
-    templateChoice = new DropDownChoicePanel<TemplateEntry>(subPanel.newChildId(), currentModel, choicesModel, teamCalCollectionRenderer, false);
+    templateChoice = new DropDownChoicePanel<TemplateEntry>(subPanel.newChildId(), currentModel, choicesModel, teamCalCollectionRenderer,
+        false);
     subPanel.add(templateChoice);
     templateChoice.getDropDownChoice().setOutputMarkupId(true);
 
@@ -495,12 +513,13 @@ public class TeamCalFilterDialog extends ModalDialog
     selectedCalendars.clear();
     final TemplateEntry activeTemplateEntry = filter.getActiveTemplateEntry();
     selectedCalendars.addAll(activeTemplateEntry.getCalendars());
+    redrawTimesheetsUserControls();
     redrawOptionControls();
     calendarColorPanel.redraw(activeTemplateEntry, selectedCalendars);
     teamCalsChoice.modelChanged();
     templateChoice.getDropDownChoice().modelChanged();
     target.add(templateChoice.getDropDownChoice(), teamCalsChoice, calendarColorPanel.main, templateName, defaultCalendarSelect,
-        optionsControls);
+        timesheetUserControls, optionsControls);
   }
 
   public PFUserDO getTimesheetsUser()
