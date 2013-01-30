@@ -39,6 +39,7 @@ import org.projectforge.calendar.TimePeriod;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.OrderDirection;
+import org.projectforge.fibu.KostFormatter;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.task.TaskDO;
@@ -48,6 +49,7 @@ import org.projectforge.timesheet.TimesheetFilter;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.calendar.ICalendarFilter;
+import org.projectforge.web.calendar.MyEvent;
 import org.projectforge.web.calendar.MyFullCalendarEventsProvider;
 
 /**
@@ -168,7 +170,7 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
           lastStopTime = stopTime;
         }
         final long duration = timesheet.getDuration();
-        final Event event = new Event();
+        final MyEvent event = new MyEvent();
         final String id = "" + timesheet.getId();
         event.setClassName(EVENT_CLASS_NAME);
         event.setId(id);
@@ -193,6 +195,11 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
         }
         final int dayOfYear = startTime.getDayOfYear();
         addDurationOfDayOfYear(dayOfYear, duration);
+        event.setTooltip(
+            getString("timesheet"),
+            new String[][] { { title}, { timesheet.getLocation(), getString("timesheet.location")},
+              { KostFormatter.formatLong(timesheet.getKost2()), getString("fibu.kost2")},
+              { timesheet.getDescription(), getString("description")}});
       }
     }
     if (calFilter.isShowStatistics() == true) {

@@ -31,8 +31,8 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import net.ftlines.wicket.fullcalendar.Event;
-
 import net.ftlines.wicket.fullcalendar.callback.EventDroppedCallbackScriptGenerator;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
@@ -45,6 +45,7 @@ import org.projectforge.plugins.teamcal.integration.TemplateEntry;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
+import org.projectforge.web.calendar.MyEvent;
 import org.projectforge.web.calendar.MyFullCalendarEventsProvider;
 
 /**
@@ -139,7 +140,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
           eventDO = ((TeamRecurrenceEvent) teamEvent).getMaster();
         }
         teamEventMap.put(id.toString(), teamEvent);
-        final Event event = new Event();
+        final MyEvent event = new MyEvent();
         event.setClassName(EVENT_CLASS_NAME + " " + EventDroppedCallbackScriptGenerator.NO_CONTEXTMENU_INDICATOR);
         event.setId("" + id);
         event.setColor(activeTemplateEntry.getColorCode(eventDO.getCalendarId()));
@@ -157,19 +158,20 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
         event.setStart(startDate);
         event.setEnd(endDate);
 
+        event.setTooltip(eventDO.getCalendar().getTitle(), new String[][] { { eventDO.getSubject()},
+          { eventDO.getLocation(), getString("timesheet.location")}, { eventDO.getNote(), getString("plugins.teamcal.event.note")}});
         final String title;
         String durationString = "";
         if (longFormat == true) {
-          final Period duration = new Period(startDate, endDate);
           // String day = duration.getDays() + "";
-
-          int hourInt = duration.getHours();
-          if (duration.getDays() > 0) {
-            hourInt += duration.getDays() * 24;
+          final Period period = new Period(startDate, endDate);
+          int hourInt = period.getHours();
+          if (period.getDays() > 0) {
+            hourInt += period.getDays() * 24;
           }
           final String hour = hourInt < 10 ? "0" + hourInt : "" + hourInt;
 
-          final int minuteInt = duration.getMinutes();
+          final int minuteInt = period.getMinutes();
           final String minute = minuteInt < 10 ? "0" + minuteInt : "" + minuteInt;
 
           if (event.isAllDay() == false) {
