@@ -60,7 +60,7 @@ public abstract class ModalDialog extends Panel
 
   private final WebMarkupContainer mainContainer, gridContentContainer, buttonBarContainer;
 
-  private boolean keyboard;
+  private boolean escapeKeyEnabled = true;
 
   private String closeButtonLabel;
 
@@ -110,12 +110,12 @@ public abstract class ModalDialog extends Panel
   }
 
   /**
-   * @param keyboard the keyboard to set
+   * @param escapeKeyEnabled the keyboard to set (default is true).
    * @return this for chaining.
    */
-  public ModalDialog setKeyboard(final boolean keyboard)
+  public ModalDialog setEscapeKeyEnabled(final boolean escapeKeyEnabled)
   {
-    this.keyboard = keyboard;
+    this.escapeKeyEnabled = escapeKeyEnabled;
     return this;
   }
 
@@ -170,7 +170,7 @@ public abstract class ModalDialog extends Panel
   public void renderHead(final IHeaderResponse response)
   {
     super.renderHead(response);
-    final String script = "$('#" + getMainContainerMarkupId() + "').modal({keyboard: " + keyboard + ", show: false })";
+    final String script = "$('#" + getMainContainerMarkupId() + "').modal({keyboard: " + escapeKeyEnabled + ", show: false }); $('#" + getMainContainerMarkupId() + "').draggable()";
     response.render(OnDomReadyHeaderItem.forScript(script));
   }
 
