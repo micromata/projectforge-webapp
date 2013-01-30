@@ -211,13 +211,19 @@ public abstract class ModalDialog extends Panel
     final StringBuffer script = new StringBuffer();
     script.append("$('#").append(getMainContainerMarkupId()).append("').modal({keyboard: ").append(escapeKeyEnabled)
     .append(", show: false });");
-    if (draggable == true) {
-      script.append(" $('#").append(getMainContainerMarkupId()).append("').draggable()");
+    final boolean isResizable = (resizable == null && bigWindow == true) || Boolean.TRUE.equals(resizable) == true;
+    if (draggable == true || isResizable == true) {
+      script.append(" $('#").append(getMainContainerMarkupId()).append("')");
     }
-    if ((resizable == null && bigWindow == true) || Boolean.TRUE.equals(resizable) == true) {
-      script.append(".resizable({ alsoResize: '#").append(getMainContainerMarkupId())
+    if (draggable == true) {
+      script.append(".draggable()");
+    }
+    if (isResizable) {
+      script.append(".resizable({ alsoResize: '#")
+      .append(getMainContainerMarkupId())
       // max-height of .modal-body is 600px, need to enlarge this setting for resizing.
-      .append(", .modal-body', resize: function( event, ui ) {$('.modal-body').css('max-height', '4000px');}, minWidth: 300, minHeight: 200 })");
+      .append(
+          ", .modal-body', resize: function( event, ui ) {$('.modal-body').css('max-height', '4000px');}, minWidth: 300, minHeight: 200 })");
     }
     response.render(OnDomReadyHeaderItem.forScript(script));
   }
