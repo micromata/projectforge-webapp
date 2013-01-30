@@ -68,6 +68,12 @@ public abstract class ModalDialog extends Panel
 
   private boolean showCancelButton;
 
+  private boolean bigWindow;
+
+  private boolean draggable = true;
+
+  private Boolean resizable;
+
   private Form< ? > form;
 
   /**
@@ -91,11 +97,43 @@ public abstract class ModalDialog extends Panel
   }
 
   /**
+   * @see org.apache.wicket.Component#onInitialize()
+   */
+  @Override
+  protected void onInitialize()
+  {
+    super.onInitialize();
+    if (bigWindow == true) {
+      mainContainer.add(AttributeModifier.append("class", "big-modal"));
+    }
+  }
+
+  /**
    * Appends css class big-modal.
    */
   public ModalDialog setBigWindow()
   {
-    mainContainer.add(AttributeModifier.append("class", "big-modal"));
+    bigWindow = true;
+    return this;
+  }
+
+  /**
+   * @param draggable the draggable to set (default is true).
+   * @return this for chaining.
+   */
+  public ModalDialog setDraggable(final boolean draggable)
+  {
+    this.draggable = draggable;
+    return this;
+  }
+
+  /**
+   * @param resizable the resizable to set (default is true for bigWindows, otherwise false).
+   * @return this for chaining.
+   */
+  public ModalDialog setResizable(final boolean resizable)
+  {
+    this.resizable = resizable;
     return this;
   }
 
@@ -170,14 +208,16 @@ public abstract class ModalDialog extends Panel
   public void renderHead(final IHeaderResponse response)
   {
     super.renderHead(response);
-    final String script = "$('#"
-        + getMainContainerMarkupId()
-        + "').modal({keyboard: "
-        + escapeKeyEnabled
-        + ", show: false }); $('#"
-        + getMainContainerMarkupId()
-        + "').draggable()";// .resizable({ alsoResize: '#" + getMainContainerMarkupId() + ", .modal-body' })";
-    // resizable doesn't work.
+    final StringBuffer script = new StringBuffer();
+    script.append("$('#").append(getMainContainerMarkupId()).append("').modal({keyboard: ").append(escapeKeyEnabled)
+    .append(", show: false });");
+    if (draggable == true) {
+      script.append(" $('#").append(getMainContainerMarkupId()).append("').draggable()");
+    }
+    if ((resizable == null && bigWindow == true) || Boolean.TRUE.equals(resizable) == true) {
+      script.append(".resizable({ alsoResize: '#").append(getMainContainerMarkupId())
+      .append(", .modal-body', resize: function( event, ui ) {$('.modal-body').css('max-height', '4000px');}, minWidth: 300, minHeight: 200 })");
+    }
     response.render(OnDomReadyHeaderItem.forScript(script));
   }
 
