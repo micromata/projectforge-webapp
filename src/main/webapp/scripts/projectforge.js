@@ -58,7 +58,7 @@ function initializeComponents() {
 		mouseX = event.pageX;
 		mouseY = event.pageY;
 		// Avoid zombies:
-		$("div.popover").remove();
+		$("div.popover").hide();
 		$(this).mypopover('myshow');
 	}, function() {
 		$(this).mypopover('hide');
@@ -67,11 +67,24 @@ function initializeComponents() {
 		mouseX = event.pageX;
 		mouseY = event.pageY;
 		// Avoid zombies:
-		$("div.tooltip").remove();
+		$("div.tooltip").hide();
 		$(this).mytooltip('myshow');
 	}, function() {
 		$(this).mytooltip('hide');
 	});
+}
+
+function initMyPopover(element) {
+	element.mouseenter(function(event) {
+		mouseX = event.pageX;
+		mouseY = event.pageY;
+		// Avoid zombies:
+		$("div.tooltip").hide();
+		$(this).mypopover('myshow');
+	}).mouseleave(function(event) {
+		$(this).mypopover('hide');
+	});
+	return element;
 }
 
 // ///////////////////////////////////
