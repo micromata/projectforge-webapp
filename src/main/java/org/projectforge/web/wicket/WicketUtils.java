@@ -1001,6 +1001,18 @@ public class WicketUtils
     return component;
   }
 
+  /**
+   * Sets attribute font-size: style="font-size: 1.1em;";
+   * @param component
+   * @param size
+   * @return This for chaining.
+   */
+  public static Component setFontSizeLarge(final Component component)
+  {
+    component.add(AttributeModifier.append("style", "font-size: 1.5em;"));
+    return component;
+  }
+
   public static Component setStrong(final Component component)
   {
     component.add(AttributeModifier.append("style", "font-weight: bold;"));
