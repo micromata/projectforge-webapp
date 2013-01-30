@@ -32,6 +32,7 @@ import java.util.Map;
 import net.ftlines.wicket.fullcalendar.Config;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.model.Model;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.projectforge.user.PFUserContext;
@@ -85,6 +86,7 @@ public class MyFullCalendarConfig extends Config
     setMonthNamesShort(dateFormatSymbols.getShortMonths());
     setWeekMode("variable");
     setEnableContextMenu(true);
+    setEventRenderModel(Model.of("function(event, element) {if (event.tooltipTitle) {initMyPopover(element); element.mypopover({title: event.tooltipTitle, content: event.tooltipContent, html: true })}}"));
   }
 
   /**
