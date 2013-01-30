@@ -61,7 +61,7 @@ public class CalendarPageSupport implements Serializable
 
   public UserSelectPanel addUserSelectPanel(final FieldsetPanel fieldset, final IModel<PFUserDO> model, final boolean autosubmit)
   {
-    if (showTimsheetsSelectors == false || isOtherUsersAllowed() == false) {
+    if (showTimsheetsSelectors == false || isOtherTimesheetsUsersAllowed() == false) {
       return null;
     }
     userSelectPanel = new UserSelectPanel(fieldset.newChildId(), model, parentPage, "userId");
@@ -76,7 +76,7 @@ public class CalendarPageSupport implements Serializable
     if (UserRights.getAccessChecker().isRestrictedUser(user) == true || showOptions == false) {
       return;
     }
-    if (isOtherUsersAllowed() == false) {
+    if (isOtherTimesheetsUsersAllowed() == false) {
       addCheckBox(checkBoxDivPanel, filter, "showTimesheets", "calendar.option.timesheeets", null, autoSubmit);
     }
     addCheckBox(checkBoxDivPanel, filter, "showBreaks", "calendar.option.showBreaks", "calendar.option.showBreaks.tooltip", autoSubmit);
@@ -108,7 +108,11 @@ public class CalendarPageSupport implements Serializable
     checkBoxDivPanel.add(checkBoxPanel);
   }
 
-  private boolean isOtherUsersAllowed()
+  /**
+   * Has the logged-in user the permission to see time-sheets of other users?
+   * @return
+   */
+  public boolean isOtherTimesheetsUsersAllowed()
   {
     return UserRights.getAccessChecker().isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP,
         ProjectForgeGroup.PROJECT_MANAGER);
