@@ -170,7 +170,14 @@ public abstract class ModalDialog extends Panel
   public void renderHead(final IHeaderResponse response)
   {
     super.renderHead(response);
-    final String script = "$('#" + getMainContainerMarkupId() + "').modal({keyboard: " + escapeKeyEnabled + ", show: false }); $('#" + getMainContainerMarkupId() + "').draggable()";
+    final String script = "$('#"
+        + getMainContainerMarkupId()
+        + "').modal({keyboard: "
+        + escapeKeyEnabled
+        + ", show: false }); $('#"
+        + getMainContainerMarkupId()
+        + "').draggable()";// .resizable({ alsoResize: '#" + getMainContainerMarkupId() + ", .modal-body' })";
+    // resizable doesn't work.
     response.render(OnDomReadyHeaderItem.forScript(script));
   }
 
