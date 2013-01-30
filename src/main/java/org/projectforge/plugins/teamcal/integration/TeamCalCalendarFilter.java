@@ -267,6 +267,8 @@ public class TeamCalCalendarFilter extends AbstractCalendarFilter
   {
     final TemplateEntry newTemplate = new TemplateEntry();
     newTemplate.setName(PFUserContext.getLocalizedString("default"));
+    newTemplate.setTimesheetUserId(PFUserContext.getUserId()).setShowBirthdays(true).setShowBreaks(true).setShowPlanning(true)
+    .setShowStatistics(true);
     add(newTemplate);
   }
 
