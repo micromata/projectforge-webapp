@@ -51,6 +51,8 @@ import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.calendar.ICalendarFilter;
 import org.projectforge.web.calendar.MyEvent;
 import org.projectforge.web.calendar.MyFullCalendarEventsProvider;
+import org.projectforge.web.common.OutputType;
+import org.projectforge.web.task.TaskFormatter;
 
 /**
  * Creates events for FullCalendar.
@@ -161,7 +163,7 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
             breakEvent.setEditable(false);
             final String breakId = String.valueOf(++breaksCounter);
             breakEvent.setClassName(BREAK_EVENT_CLASS_NAME).setId(breakId).setStart(lastStopTime).setEnd(startTime)
-            .setTitle(getString("timesheet.break"));
+                .setTitle(getString("timesheet.break"));
             breakEvent.setTextColor("#666666").setBackgroundColor("#F9F9F9").setColor("#F9F9F9");
             events.put(breakId, breakEvent);
             final TimesheetDO breakTimesheet = new TimesheetDO().setStartDate(lastStopTime.toDate()).setStopTime(startTime.getMillis());
@@ -198,8 +200,9 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
         event.setTooltip(
             getString("timesheet"),
             new String[][] { { title}, { timesheet.getLocation(), getString("timesheet.location")},
-              { KostFormatter.formatLong(timesheet.getKost2()), getString("fibu.kost2")},
-              { timesheet.getDescription(), getString("description")}});
+                { KostFormatter.formatLong(timesheet.getKost2()), getString("fibu.kost2")},
+                { TaskFormatter.instance().getTaskPath(timesheet.getTaskId(), true, OutputType.PLAIN), getString("task")},
+                { timesheet.getDescription(), getString("description")}});
       }
     }
     if (calFilter.isShowStatistics() == true) {
