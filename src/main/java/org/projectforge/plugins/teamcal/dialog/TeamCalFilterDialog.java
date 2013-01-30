@@ -313,6 +313,7 @@ public class TeamCalFilterDialog extends ModalDialog
         super.onInitialize();
         getEditor().add(AttributeModifier.append("style", "width: 10em;"));
         WicketUtils.setStrong(getLabel());
+        WicketUtils.setFontSizeLarge(getLabel());
         WicketUtils.addEditableLabelDefaultTooltip(getLabel());
       }
 
