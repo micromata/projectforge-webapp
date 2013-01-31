@@ -31,7 +31,7 @@ public class CryptTest
   @Test
   public void encryption()
   {
-    encryption("hallo", "This is an text");
+    encryption("hallo", "This is a text");
     encryption("hallo", "");
     encryption("secret", "Another much longer text.\n dkfajsöflk djföldkjf öladksjf oaj0weajfü03ijvmü oerijvü093wjevm ü0qierjmv03üjw 19fjölfj asdölfjlökjaöojpiwejv03j w0vjreao");
   }

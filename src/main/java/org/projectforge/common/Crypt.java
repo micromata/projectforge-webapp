@@ -23,15 +23,16 @@
 
 package org.projectforge.common;
 
+import java.io.UnsupportedEncodingException;
 import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 /**
@@ -43,33 +44,39 @@ import org.apache.log4j.Logger;
 public class Crypt
 {
 
+  private static String cryptoAlgorithm;
+
   private final static Logger log = Logger.getLogger(Crypt.class);
 
   /**
-   * Encrypts the given str with AES. Please note, only the first 32 chars of the given passwords are used, if less then 32 chars are given,
-   * the password will be filled with 'x'. Each character is converted to one byte. So the effective key range is reduced.
-   * @param password (the first 32 chars are used).
+   * Encrypts the given str with AES. The password is first converted using SHA-256.
+   * @param password
    * @param str
    * @return The base64 encoded result (url safe).
    */
   public static String encrypt(final String password, final String data)
   {
-    try {
-      final Cipher cipher = Cipher.getInstance("AES");
-      final String password32 = StringUtils.rightPad(password, 32, "x");
-      final byte[] keyValue = new byte[32];
-      for (int i = 0; i < 32; i++) {
-        keyValue[i] = (byte) password32.charAt(i);
+    if ("NONE".equals(getEncryptionAlgorithm()) == false) {
+      try {
+        final Cipher cipher = Cipher.getInstance(cryptoAlgorithm);
+        final byte[] keyValue = getPassword(password);
+        final Key key = new SecretKeySpec(keyValue, cryptoAlgorithm);
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        final byte[] encVal = cipher.doFinal(data.getBytes("UTF-8"));
+        final String encryptedValue = Base64.encodeBase64URLSafeString(encVal);
+        return encryptedValue;
+      } catch (final Exception ex) {
+        log.error("Exception encountered while trying to encrypt with Algorithm 'AES' and the given password: " + ex.getMessage(), ex);
+        return null;
       }
-      final Key key = new SecretKeySpec(keyValue, "AES");
-      cipher.init(Cipher.ENCRYPT_MODE, key);
-      final byte[] encVal = cipher.doFinal(data.getBytes("UTF-8"));
-      final String encryptedValue = Base64.encodeBase64URLSafeString(encVal);
+    }
+    // Using base 64 at least:
+    try {
+      final String encryptedValue = Base64.encodeBase64URLSafeString(data.getBytes("UTF-8"));
       return encryptedValue;
-    } catch (final Exception ex) {
-      log.error(
-          "Exception encountered while trying to encrypt with Algorithm 'DES' and the user's authentication token: " + ex.getMessage(), ex);
-      return null;
+    } catch (final UnsupportedEncodingException ex) {
+      // Bummer, can't be true.
+      throw new RuntimeException("UTF-8 not supported as encoding: " + ex.getMessage(), ex);
     }
   }
 
@@ -80,23 +87,80 @@ public class Crypt
    */
   public static String decrypt(final String password, final String encryptedString)
   {
-    try {
-      final Cipher cipher = Cipher.getInstance("AES");
-      final String password32 = StringUtils.rightPad(password, 32, "x");
-      final byte[] keyValue = new byte[32];
-      for (int i = 0; i < 32; i++) {
-        keyValue[i] = (byte) password32.charAt(i);
+    if ("NONE".equals(getEncryptionAlgorithm()) == false) {
+      try {
+        final Cipher cipher = Cipher.getInstance(cryptoAlgorithm);
+        final byte[] keyValue = getPassword(password);
+        final Key key = new SecretKeySpec(keyValue, cryptoAlgorithm);
+        cipher.init(Cipher.DECRYPT_MODE, key);
+        final byte[] decordedValue = Base64.decodeBase64(encryptedString);
+        final byte[] decValue = cipher.doFinal(decordedValue);
+        final String decryptedValue = new String(decValue);
+        return decryptedValue;
+      } catch (final Exception ex) {
+        log.error("Exception encountered while trying to encrypt with Algorithm '"
+            + cryptoAlgorithm
+            + "' and the user's authentication token: "
+            + ex.getMessage(), ex);
       }
-      final Key key = new SecretKeySpec(keyValue, "AES");
-      cipher.init(Cipher.DECRYPT_MODE, key);
-      final byte[] decordedValue = Base64.decodeBase64(encryptedString);
-      final byte[] decValue = cipher.doFinal(decordedValue);
-      final String decryptedValue = new String(decValue);
-      return decryptedValue;
-    } catch (final Exception ex) {
-      log.error(
-          "Exception encountered while trying to encrypt with Algorithm 'DES' and the user's authentication token: " + ex.getMessage(), ex);
+    }
+    // Trying to use base 64 at least:
+    final byte[] decordedValue = Base64.decodeBase64(encryptedString);
+    final String decryptedValue = new String(decordedValue);
+    return decryptedValue;
+  }
+
+  private static byte[] getPassword(final String password)
+  {
+    try {
+      final MessageDigest digester = MessageDigest.getInstance("SHA-256");
+      digester.update(password.getBytes("UTF-8"));
+      final byte[] key = digester.digest();
+      if ("DES".equals(cryptoAlgorithm) == true) {
+        final byte[] shortKey = new byte[8];
+        for (int i = 0; i < 8; i++) {
+          shortKey[i] = key[i];
+        }
+        return shortKey;
+      }
+      return key;
+    } catch (final NoSuchAlgorithmException ex) {
+      log.error("Exception encountered while trying to create a SHA-256 password: " + ex.getMessage(), ex);
       return null;
+    } catch (final UnsupportedEncodingException ex) {
+      log.error("Exception encountered while trying to get bytes in UTF-8: " + ex.getMessage(), ex);
+      return null;
+    }
+  }
+
+  private static String getEncryptionAlgorithm()
+  {
+    if (cryptoAlgorithm != null) {
+      return cryptoAlgorithm;
+    }
+    if (isAlgorithmAvailable("AES") == true) {
+      cryptoAlgorithm = "AES";
+    } else
+      if (isAlgorithmAvailable("DES") == true) {
+        cryptoAlgorithm = "DES";
+      } else {
+        log.warn("Weather AEs nor DES algorithm found. Can't use any crypto algorithm.");
+        cryptoAlgorithm = "NONE";
+      }
+    return cryptoAlgorithm;
+  }
+
+  private static boolean isAlgorithmAvailable(final String algorithm)
+  {
+    try {
+      Cipher.getInstance(algorithm);
+      return true;
+    } catch (final NoSuchAlgorithmException ex) {
+      log.warn(algorithm + " encryption is not available in your Java runtime environment. Switching to more (unsafe) algorithms.");
+      return false;
+    } catch (final NoSuchPaddingException ex) {
+      log.warn(algorithm + " encryption is not available in your Java runtime environment. Switching to more (unsafe) algorithms.");
+      return false;
     }
   }
 
