@@ -48,29 +48,15 @@ public class PrintingHistoryFormatter extends DefaultHistoryFormatter
     super(resourceBundleName);
   }
 
-  /**
-   * Für alte Browser wird das alt-Attribute für den Tooltip missbraucht. Für neuere Browser gibt es das title-Attribute. Deshalb wird hier
-   * beides erzeugt.
-   * @param tip
-   * @return
-   */
-  private String getToolTip(final String tip)
-  {
-    return "alt=\"" + tip + "\" title=\"" + tip + "\"";
-  }
-
   @Override
-  public String formatUser(Session session, final Locale locale, Object changed, HistoryEntry historyEntry, PropertyDelta delta)
+  public String formatUser(final Session session, final Locale locale, final Object changed, final HistoryEntry historyEntry, final PropertyDelta delta)
   {
     final String[] users = StringUtils.split(historyEntry.getUserName(), ",");
     if (users != null && users.length > 0) {
       try {
         final PFUserDO user = (PFUserDO) session.load(PFUserDO.class, Integer.valueOf(users[0]));
-        final String orgUnit = escapeHtml(user.getOrganization());
-        return "<img src=\"/images/user.gif\" valign=\"middle\" width=\"20\" height=\"20\" border=\"0\" "
-            + getToolTip(orgUnit)
-            + " /> "
-            + escapeHtml(user.getFullname());
+        return "<img src=\"images/user.gif\" valign=\"middle\" width=\"20\" height=\"20\" border=\"0\"  /> "
+        + escapeHtml(user.getFullname());
       } catch (final HibernateException ex) {
         log.warn("Can't load history-user " + historyEntry.getUserName());
         return "unknown";
