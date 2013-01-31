@@ -472,6 +472,35 @@ public class UserDao extends BaseDao<PFUserDO>
   }
 
   /**
+   * Encrypts the given str with AES. The key is the current authenticationToken of the given user (by id) (first 16 bytes of it).
+   * @param userId
+   * @param data
+   * @return The base64 encoded result (url safe).
+   * @see Crypt#encrypt(String, String)
+   */
+  public String encrypt(final Integer userId, final String data)
+  {
+    final PFUserDO user = userGroupCache.getUser(userId); // for faster access (due to permanent usage e. g. by subscription of calendars
+    // (ics).
+    final String authenticationToken = StringUtils.rightPad(user.getAuthenticationToken(), 32, "x");
+    return Crypt.encrypt(authenticationToken, data);
+  }
+
+  /**
+   * @param userId
+   * @param encryptedString
+   * @return The decrypted string.
+   * @see Crypt#decrypt(String, String)
+   */
+  public String decrypt(final Integer userId, final String encryptedString)
+  {
+    final PFUserDO user = userGroupCache.getUser(userId); // for faster access (due to permanent usage e. g. by subscription of calendars
+    // (ics).
+    final String authenticationToken = StringUtils.rightPad(user.getAuthenticationToken(), 32, "x");
+    return Crypt.decrypt(authenticationToken, encryptedString);
+  }
+
+  /**
    * Checks the password quality of a new password. Password must have at least 6 characters and at minimum one letter and one non-letter
    * character.
    * @param newPassword
