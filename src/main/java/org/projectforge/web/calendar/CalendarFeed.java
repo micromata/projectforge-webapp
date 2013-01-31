@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -49,6 +50,7 @@ import org.apache.commons.lang.StringUtils;
 import org.projectforge.access.AccessException;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.common.StringHelper;
 import org.projectforge.plugins.teamcal.TeamCalConfig;
 import org.projectforge.registry.Registry;
 import org.projectforge.timesheet.TimesheetDO;
@@ -103,23 +105,42 @@ public class CalendarFeed extends HttpServlet
     final UserDao userDao = Registry.instance().getDao(UserDao.class);
     final String authenticationKey = userDao.getAuthenticationToken(user.getId());
     final StringBuffer buf = new StringBuffer();
-    buf.append("/export/ProjectForge.ics?user=").append(user.getUsername()).append("&token=").append(authenticationKey);
+    buf.append("token=").append(authenticationKey);
     if (additionalParams != null) {
       buf.append(additionalParams);
     }
-    return buf.toString();
+    final String encryptedParams = Registry.instance().getDao(UserDao.class).encrypt(buf.toString());
+    final String result = "/export/ProjectForge.ics?user=" + user.getId() + "&q=" + encryptedParams;
+    return result;
   }
 
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException
   {
-    if (StringUtils.isBlank(req.getParameter("user")) || StringUtils.isBlank(req.getParameter("token"))) {
+    if (StringUtils.isBlank(req.getParameter("user")) || StringUtils.isBlank(req.getParameter("q"))) {
       resp.sendError(HttpStatus.SC_BAD_REQUEST);
+      log.error("Bad request, parameters user and q not given. Query string is: " + req.getQueryString());
       return;
     }
-
-    final Calendar calendar = createCal(req, req.getParameter("user"), req.getParameter("token"),
-        req.getParameter(PARAM_NAME_TIMESHEET_USER));
+    final String encryptedParams = req.getParameter("q");
+    final Integer userId = NumberHelper.parseInteger(req.getParameter("user"));
+    if (userId == null) {
+      log.error("Bad request, parameter user is not an integer: " + req.getQueryString());
+      return;
+    }
+    final Registry registry = Registry.instance();
+    final PFUserDO user = registry.getUserGroupCache().getUser(userId);
+    if (user == null) {
+      log.error("Bad request, user not found: " + req.getQueryString());
+      return;
+    }
+    final String decryptedParams = registry.getDao(UserDao.class).decrypt(userId, encryptedParams);
+    if (decryptedParams == null) {
+      log.error("Bad request, can't decrypt parameter q (may-be the user's authentication token was changed): " + req.getQueryString());
+      return;
+    }
+    final Map<String, String> params = StringHelper.getKeyValues(decryptedParams, "&");
+    final Calendar calendar = createCal(req, userId, params.get("token"), params.get(PARAM_NAME_TIMESHEET_USER));
 
     if (calendar == null) {
       resp.sendError(HttpStatus.SC_BAD_REQUEST);
@@ -143,10 +164,10 @@ public class CalendarFeed extends HttpServlet
    * @param userKey
    * @return a calendar, null if authentication fails
    */
-  public Calendar createCal(final HttpServletRequest req, final String userName, final String authKey, final String timesheetUserParam)
+  public Calendar createCal(final HttpServletRequest req, final Integer userId, final String authKey, final String timesheetUserParam)
   {
     final UserDao userDao = Registry.instance().getDao(UserDao.class);
-    final PFUserDO loggedInUser = userDao.getUserByAuthenticationToken(userName, authKey);
+    final PFUserDO loggedInUser = userDao.getUserByAuthenticationToken(userId, authKey);
 
     if (loggedInUser == null) {
       return null;
