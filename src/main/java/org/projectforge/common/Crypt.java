@@ -27,9 +27,9 @@ import java.io.UnsupportedEncodingException;
 import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.Security;
 
 import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
@@ -45,7 +45,9 @@ public class Crypt
 {
   private final static Logger log = Logger.getLogger(Crypt.class);
 
-  private static final String CRYPTO_ALGORITHM = "AES/ECB/NoPadding";
+  private static final String CRYPTO_ALGORITHM = "AES/ECB/PKCS5Padding";
+
+  private static boolean initialized;
 
   /**
    * Encrypts the given str with AES. The password is first converted using SHA-256.
@@ -55,6 +57,7 @@ public class Crypt
    */
   public static String encrypt(final String password, final String data)
   {
+    initialize();
     try {
       // AES is sometimes not part of Java, therefore use bouncy castle provider:
       final Cipher cipher = Cipher.getInstance(CRYPTO_ALGORITHM, "BC"); // Bouncy castle
@@ -77,6 +80,7 @@ public class Crypt
    */
   public static String decrypt(final String password, final String encryptedString)
   {
+    initialize();
     try {
       final Cipher cipher = Cipher.getInstance(CRYPTO_ALGORITHM, "BC");
       final byte[] keyValue = getPassword(password);
@@ -108,17 +112,12 @@ public class Crypt
     }
   }
 
-  private static boolean isAlgorithmAvailable(final String algorithm)
-  {
-    try {
-      Cipher.getInstance(algorithm);
-      return true;
-    } catch (final NoSuchAlgorithmException ex) {
-      log.warn(algorithm + " encryption is not available in your Java runtime environment. Switching to more (unsafe) algorithms.");
-      return false;
-    } catch (final NoSuchPaddingException ex) {
-      log.warn(algorithm + " encryption is not available in your Java runtime environment. Switching to more (unsafe) algorithms.");
-      return false;
+  private static void initialize() {
+    synchronized (log) {
+      if (initialized == false) {
+        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+        initialized = true;
+      }
     }
   }
 
