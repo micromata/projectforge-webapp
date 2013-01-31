@@ -46,6 +46,6 @@ public enum ImageDef
 
   private class DIRS
   {
-    private static final String MAIN = "/images/";
+    private static final String MAIN = "images/";
   }
 }
