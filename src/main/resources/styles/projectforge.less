@@ -1,4 +1,5 @@
 @import "bootstrap/bootstrap";
+@import "bootstrap/responsive";
 
 
 @import "table-css";
@@ -8,3 +9,44 @@
 @import "projectforge-jquery-ui-css";
 @import "projectforge-css";
 @import "projectforge-wicket-css";
+
+div.controls input, div.controls textarea {
+	padding-left: 2%;
+	padding-right: 2%;
+	width: 96%;
+}
+label {
+	margin-top: 4px;
+}
+.dropdown-menu li > a {
+	padding: 3px 24px 3px 10px;
+}
+/* Adressen Eingabefelder rutschen bei bei schmalem Bildschirm untereinander. */ 
+label.control-label {
+	position: relative;
+	float: left;
+}
+div.controls {
+	display:inline-block;
+	margin-left:0;
+}
+
+div.control-group {
+	clear:left;
+	padding-left: 10px;
+}
+
+form input.phone{
+	width: 68% !important;
+}
+/* *************** */
+/* bug tooltip springt*/
+.btn-group > .btn + .btn {
+	margin-left: 0;
+}
+.pf_dnd{
+	display:inline-block!important;
+}
+div.main {
+	margin: 0 6px 30px 6px;
+}
