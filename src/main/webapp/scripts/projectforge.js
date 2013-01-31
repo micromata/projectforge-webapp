@@ -49,6 +49,56 @@ function preventBubble(e) {
 	}
 	return false;
 }
+
+(function() {
+	function submenueMakeClass() {
+		$.each($('.nav-collapse ul.nav > li.dropdown'), function(){
+			$(this).click(function() {
+				//$('.nav-collapse ul.nav li.dropdown li').removeClass('mm_open_sub'); //todo: Bug beheben, funktioniert so nicht korrekt
+				$('.nav-collapse ul.nav li').removeClass('mm_open');
+				$(this).addClass('mm_open');
+			});
+		});
+		$.each($('.nav-collapse ul.nav li.dropdown li a'), function(){
+			$(this).click(function() {
+				$('.nav-collapse ul.nav li.dropdown li').removeClass('mm_open_sub');
+				$(this).parent().addClass('mm_open_sub');
+			});
+		});
+	}
+	
+	$(function() {
+		submenueMakeClass();
+	});
+	
+})();
+
+(function() {
+	var timeoutMillis = 100;
+	var timeout = null;
+
+	$(function() {
+		adaptSize();
+	});
+	
+	$(window).resize(function() {
+		if(timeout != null) {
+			clearTimeout(timeout);
+		}
+		timeout = setTimeout(adaptSize, timeoutMillis);
+	});
+	
+	function adaptSize() {
+		$.each($('.controls'), function(){
+		   if($(this).parent().width() > 300){
+				$(this).css('width', $(this).parent().width()-150);
+			} else {
+				$(this).css('width', $(this).parent().width());
+			}
+		 });
+	}
+})();
+
 function initializeComponents() {
 	$("div.radio-jquery-ui").buttonset();
 	if ($("textarea.autogrow").length) {
