@@ -60,7 +60,7 @@ public class Crypt
     initialize();
     try {
       // AES is sometimes not part of Java, therefore use bouncy castle provider:
-      final Cipher cipher = Cipher.getInstance(CRYPTO_ALGORITHM, "BC"); // Bouncy castle
+      final Cipher cipher = Cipher.getInstance(CRYPTO_ALGORITHM);
       final byte[] keyValue = getPassword(password);
       final Key key = new SecretKeySpec(keyValue, "AES");
       cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -82,7 +82,7 @@ public class Crypt
   {
     initialize();
     try {
-      final Cipher cipher = Cipher.getInstance(CRYPTO_ALGORITHM, "BC");
+      final Cipher cipher = Cipher.getInstance(CRYPTO_ALGORITHM);
       final byte[] keyValue = getPassword(password);
       final Key key = new SecretKeySpec(keyValue, "AES");
       cipher.init(Cipher.DECRYPT_MODE, key);
@@ -99,12 +99,12 @@ public class Crypt
   private static byte[] getPassword(final String password)
   {
     try {
-      final MessageDigest digester = MessageDigest.getInstance("SHA-256");
+      final MessageDigest digester = MessageDigest.getInstance("MD5"); // 128 bit. 256 bit (SHA-256) doesn't work on Java versions without required security policy.
       digester.update(password.getBytes("UTF-8"));
       final byte[] key = digester.digest();
       return key;
     } catch (final NoSuchAlgorithmException ex) {
-      log.error("Exception encountered while trying to create a SHA-256 password: " + ex.getMessage(), ex);
+      log.error("Exception encountered while trying to create a MD5 password: " + ex.getMessage(), ex);
       return null;
     } catch (final UnsupportedEncodingException ex) {
       log.error("Exception encountered while trying to get bytes in UTF-8: " + ex.getMessage(), ex);
