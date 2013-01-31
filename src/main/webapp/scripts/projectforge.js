@@ -52,11 +52,11 @@ function preventBubble(e) {
 
 (function() {
 	function submenueMakeClass() {
-		$.each($('.nav-collapse ul.nav > li.dropdown'), function(){
+		$.each($('.nav-collapse ul.nav > li.dropdown > a'), function(){
 			$(this).click(function() {
-				//$('.nav-collapse ul.nav li.dropdown li').removeClass('mm_open_sub'); //todo: Bug beheben, funktioniert so nicht korrekt
+				$('.nav-collapse ul.nav li.dropdown li').removeClass('mm_open_sub');
 				$('.nav-collapse ul.nav li').removeClass('mm_open');
-				$(this).addClass('mm_open');
+				$(this).parent().addClass('mm_open');
 			});
 		});
 		$.each($('.nav-collapse ul.nav li.dropdown li a'), function(){
