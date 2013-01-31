@@ -504,7 +504,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       }
     }
     if (sambaConfigured == true) {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.sambaNTPassword"), getString("ldap.sambaNTPassword.subtitle"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.sambaNTPassword"), getString("ldap.sambaNTPassword.subtitle")).setNoLabelFor();
       final DivTextPanel sambaNTPassword = new DivTextPanel(fs.newChildId(), "*****");
       fs.add(sambaNTPassword);
       fs.addHelpIcon(getString("ldap.sambaNTPassword.tooltip"));
