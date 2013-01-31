@@ -60,6 +60,7 @@ public abstract class AbstractICSExportDialog extends ModalDialog
   {
     clearContent();
     {
+      gridBuilder.newSecurityAdviceBox(Model.of(getString("calendar.icsExport.securityAdvice")));
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("calendar.abonnement.url")).setLabelSide(false);
       final String iCalTarget = getUrl();
       final String url = WicketUtils.getAbsoluteContextPath() + iCalTarget;
