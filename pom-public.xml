@@ -158,9 +158,9 @@
       <version>${joda.version}</version>
     </dependency>
     <dependency> <!-- Version check: 2010-08-?? -->
-      <groupId>net.sf.mpxj</groupId>
+      <groupId>net.sourceforge</groupId>
       <artifactId>mpxj</artifactId>
-      <version>4.0.0</version>
+      <version>4.3.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.wicket</groupId>
@@ -208,6 +208,10 @@
           <groupId>org.apache.xmlgraphics</groupId>
           <artifactId>xmlgraphics-commons</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.apache.xmlgraphics</groupId>
+          <artifactId>batik-js</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency> <!-- Version check: 2010-08-28 -->
@@ -220,6 +224,11 @@
           <artifactId>xmlgraphics-commons</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk16</artifactId>
+      <version>1.46</version>
     </dependency>
     <dependency> <!-- Version check: 2010-08-28 -->
       <groupId>org.apache.xmlgraphics</groupId>
@@ -268,9 +277,9 @@
       </exclusions>
     </dependency>
     <dependency> <!-- Version check: 2010-08-28 -->
-      <groupId>jasperreports</groupId>
+      <groupId>net.sf.jasperreports</groupId>
       <artifactId>jasperreports</artifactId>
-      <version>3.1.3</version> <!-- 3.7.4!!! -->
+      <version>3.7.6</version> <!-- 3.7.4!!! -->
       <exclusions>
         <exclusion>
           <groupId>eclipse</groupId>
@@ -430,6 +439,11 @@
       <artifactId>backport-util-concurrent</artifactId>
       <version>3.1</version>
     </dependency>
+    <dependency> <!-- Version check: 17.01.2013 -->
+      <groupId>org.lesscss</groupId>
+      <artifactId>lesscss</artifactId>
+      <version>1.3.1</version>
+    </dependency>
 
   </dependencies>
   <build>
@@ -452,6 +466,7 @@
           <include>keystore</include>
           <include>**/*.properties</include>
           <include>**/*.css</include>
+          <include>**/*.less</include>
           <include>**/*.html</include>
           <include>**/*.js</include>
           <include>**/*.js.template</include>
