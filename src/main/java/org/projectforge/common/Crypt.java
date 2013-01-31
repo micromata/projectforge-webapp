@@ -115,7 +115,7 @@ public class Crypt
       final MessageDigest digester = MessageDigest.getInstance("SHA-256");
       digester.update(password.getBytes("UTF-8"));
       final byte[] key = digester.digest();
-      log.info("Key length is " + key.length);
+      log.info("Key length is " + key.length + ", cryptoAlgorithm is " + cryptoAlgorithm);
       if ("DES".equals(cryptoAlgorithm) == true) {
         final byte[] shortKey = new byte[8];
         for (int i = 0; i < 8; i++) {
