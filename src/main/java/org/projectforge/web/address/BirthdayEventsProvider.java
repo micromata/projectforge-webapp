@@ -35,6 +35,7 @@ import org.projectforge.address.AddressDao;
 import org.projectforge.address.BirthdayAddress;
 import org.projectforge.common.DateFormatType;
 import org.projectforge.common.DateFormats;
+import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.calendar.ICalendarFilter;
 import org.projectforge.web.calendar.MyFullCalendarEventsProvider;
@@ -99,8 +100,8 @@ public class BirthdayEventsProvider extends MyFullCalendarEventsProvider
       if (date == null && month == Calendar.FEBRUARY + 1 && dayOfMonth == 29) {
         date = getDate(from, end, month + 1, 1);
       }
-      if (date == null) {
-        log.warn("Date "
+      if (date == null && WebConfiguration.isDevelopmentMode() == true) {
+        log.info("Date "
             + birthdayAddress.getDayOfMonth()
             + "/"
             + (birthdayAddress.getMonth() + 1)
