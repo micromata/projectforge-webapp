@@ -424,10 +424,10 @@ public class UserDao extends BaseDao<PFUserDO>
    * @return
    */
   @SuppressWarnings("unchecked")
-  public PFUserDO getUserByAuthenticationToken(final String userName, final String authKey)
+  public PFUserDO getUserByAuthenticationToken(final Integer userId, final String authKey)
   {
-    final List<PFUserDO> list = getHibernateTemplate().find("from PFUserDO u where u.username = ? and u.authenticationToken = ?",
-        new Object[] { userName, authKey});
+    final List<PFUserDO> list = getHibernateTemplate().find("from PFUserDO u where u.id = ? and u.authenticationToken = ?",
+        new Object[] { userId, authKey});
     PFUserDO user = null;
     if (list != null && list.isEmpty() == false && list.get(0) != null) {
       user = list.get(0);
@@ -469,6 +469,17 @@ public class UserDao extends BaseDao<PFUserDO>
   private String createAuthenticationToken()
   {
     return NumberHelper.getSecureRandomUrlSaveString(AUTHENTICATION_TOKEN_LENGTH);
+  }
+
+  /**
+   * Uses the context user.
+   * @param data
+   * @return
+   * @see #encrypt(Integer, String)
+   */
+  public String encrypt(final String data)
+  {
+    return encrypt(PFUserContext.getUserId(), data);
   }
 
   /**
