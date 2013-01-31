@@ -28,12 +28,9 @@ import org.junit.Test;
 
 public class CryptTest
 {
-  private boolean aesAvailable;
-
   @Test
   public void encryption()
   {
-    aesAvailable = "AES".equals(Crypt.getEncryptionAlgorithm());
     encryption("hallo", "This is a text");
     encryption("hallo", "");
     encryption(
@@ -43,16 +40,6 @@ public class CryptTest
 
   private void encryption(final String password, final String data)
   {
-    if (aesAvailable == true) {
-      encryption(password, data, "AES");
-    }
-    encryption(password, data, "DES");
-    encryption(password, data, "NONE");
-  }
-
-  private void encryption(final String password, final String data, final String cryptoAlgorithm)
-  {
-    Crypt.cryptoAlgorithm = cryptoAlgorithm;
     final String encryptedString = Crypt.encrypt(password, data);
     final String decrpytedString = Crypt.decrypt(password, encryptedString);
     Assert.assertEquals(data, decrpytedString);
