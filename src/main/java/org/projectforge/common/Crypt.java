@@ -23,20 +23,82 @@
 
 package org.projectforge.common;
 
+import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 /**
  * 
  * @author Wolfgang Jung (W.Jung@micromata.de)
+ * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
 public class Crypt
 {
 
   private final static Logger log = Logger.getLogger(Crypt.class);
+
+  /**
+   * Encrypts the given str with AES. Please note, only the first 32 chars of the given passwords are used, if less then 32 chars are given,
+   * the password will be filled with 'x'. Each character is converted to one byte. So the effective key range is reduced.
+   * @param password (the first 32 chars are used).
+   * @param str
+   * @return The base64 encoded result (url safe).
+   */
+  public static String encrypt(final String password, final String data)
+  {
+    try {
+      final Cipher cipher = Cipher.getInstance("AES");
+      final String password32 = StringUtils.rightPad(password, 32, "x");
+      final byte[] keyValue = new byte[32];
+      for (int i = 0; i < 32; i++) {
+        keyValue[i] = (byte) password32.charAt(i);
+      }
+      final Key key = new SecretKeySpec(keyValue, "AES");
+      cipher.init(Cipher.ENCRYPT_MODE, key);
+      final byte[] encVal = cipher.doFinal(data.getBytes("UTF-8"));
+      final String encryptedValue = Base64.encodeBase64URLSafeString(encVal);
+      return encryptedValue;
+    } catch (final Exception ex) {
+      log.error(
+          "Exception encountered while trying to encrypt with Algorithm 'DES' and the user's authentication token: " + ex.getMessage(), ex);
+      return null;
+    }
+  }
+
+  /**
+   * @param password
+   * @param encryptedString
+   * @return
+   */
+  public static String decrypt(final String password, final String encryptedString)
+  {
+    try {
+      final Cipher cipher = Cipher.getInstance("AES");
+      final String password32 = StringUtils.rightPad(password, 32, "x");
+      final byte[] keyValue = new byte[32];
+      for (int i = 0; i < 32; i++) {
+        keyValue[i] = (byte) password32.charAt(i);
+      }
+      final Key key = new SecretKeySpec(keyValue, "AES");
+      cipher.init(Cipher.DECRYPT_MODE, key);
+      final byte[] decordedValue = Base64.decodeBase64(encryptedString);
+      final byte[] decValue = cipher.doFinal(decordedValue);
+      final String decryptedValue = new String(decValue);
+      return decryptedValue;
+    } catch (final Exception ex) {
+      log.error(
+          "Exception encountered while trying to encrypt with Algorithm 'DES' and the user's authentication token: " + ex.getMessage(), ex);
+      return null;
+    }
+  }
 
   /**
    * Encrypts the given String via SHA crypt algorithm.
