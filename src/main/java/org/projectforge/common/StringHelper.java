@@ -29,7 +29,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
@@ -43,6 +45,8 @@ import org.apache.commons.lang.Validate;
  */
 public class StringHelper
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(StringHelper.class);
+
   /**
    * Usage: final StringBuffer buf = new StringBuffer();<br/>
    * boolean first = true;<br/>
@@ -171,7 +175,7 @@ public class StringHelper
    * @param sort If true, the given list will be first sorted.
    * @return
    */
-  public static String objectColToString(final Collection<?> col, final String delimiter)
+  public static String objectColToString(final Collection< ? > col, final String delimiter)
   {
     final StringBuffer buf = new StringBuffer();
     boolean first = true;
@@ -639,5 +643,35 @@ public class StringHelper
       chars[2 * i + 1] = HEX_CHARS[buf[i] & 0x0F];
     }
     return new String(chars);
+  }
+
+  /**
+   * @param keyValues e. g. "name=Horst,street=Baker street"
+   * @param delimiter
+   * @return
+   */
+  public static Map<String, String> getKeyValues(final String keyValues, final String delimiter)
+  {
+    final Map<String, String> map = new HashMap<String, String>();
+    if (keyValues == null) {
+      return map;
+    }
+    final StringTokenizer tokenizer = new StringTokenizer(keyValues, delimiter);
+    while (tokenizer.hasMoreTokens() == true) {
+      final String token = tokenizer.nextToken();
+      final int pos = token.indexOf('=');
+      if (pos <= 0) {
+        log.error("Bad request, decrypted parameter is not from type key=value: " + token + ". String was: " + keyValues);
+        return null;
+      }
+      final String key = token.substring(0, pos);
+      String value;
+      if (pos == token.length() - 1) {
+        continue;
+      }
+      value = token.substring(pos + 1);
+      map.put(key, value);
+    }
+    return map;
   }
 }

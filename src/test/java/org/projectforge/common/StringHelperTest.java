@@ -31,6 +31,9 @@ import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import junit.framework.Assert;
 
 import org.junit.Test;
 
@@ -271,14 +274,32 @@ public class StringHelperTest
   }
 
   @Test
-  public void blank() {
-    testBlank(true, (String[])null);
+  public void blank()
+  {
+    testBlank(true, (String[]) null);
     testBlank(true, null, null);
     testBlank(true, null, "");
     testBlank(true, " ", null);
     testBlank(false, ".");
     testBlank(false, null, ".");
     testBlank(false, null, ".", null);
+  }
+
+  @Test
+  public void testSplitKeyValues()
+  {
+    Map<String, String> map = StringHelper.getKeyValues(null, "&");
+    Assert.assertEquals(0, map.size());
+    map = StringHelper.getKeyValues("name=horst", "&");
+    Assert.assertEquals(1, map.size());
+    Assert.assertEquals("horst", map.get("name"));
+    map = StringHelper.getKeyValues("name=horst&param=value", "&");
+    Assert.assertEquals(2, map.size());
+    Assert.assertEquals("horst", map.get("name"));
+    Assert.assertEquals("value", map.get("param"));
+    map = StringHelper.getKeyValues("name=&param=value&empty=", "&");
+    Assert.assertEquals(1, map.size());
+    Assert.assertEquals("value", map.get("param"));
   }
 
   private void testBlank(final boolean expectedValue, final String... strs)
