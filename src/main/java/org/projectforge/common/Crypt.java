@@ -104,8 +104,8 @@ public class Crypt
       }
     }
     // Trying to use base 64 at least:
-    final byte[] decordedValue = Base64.decodeBase64(encryptedString);
-    final String decryptedValue = new String(decordedValue);
+    final byte[] decodedValue = Base64.decodeBase64(encryptedString);
+    final String decryptedValue = new String(decodedValue);
     return decryptedValue;
   }
 
@@ -115,6 +115,7 @@ public class Crypt
       final MessageDigest digester = MessageDigest.getInstance("SHA-256");
       digester.update(password.getBytes("UTF-8"));
       final byte[] key = digester.digest();
+      log.info("Key length is " + key.length);
       if ("DES".equals(cryptoAlgorithm) == true) {
         final byte[] shortKey = new byte[8];
         for (int i = 0; i < 8; i++) {
