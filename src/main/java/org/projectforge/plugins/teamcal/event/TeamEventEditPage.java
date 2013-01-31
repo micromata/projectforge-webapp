@@ -23,9 +23,13 @@
 
 package org.projectforge.plugins.teamcal.event;
 
+import java.util.Date;
+
+import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.common.DateHelper;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredBasePage;
@@ -42,6 +46,10 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
 
   @SpringBean(name = "teamEventDao")
   private TeamEventDao teamEventDao;
+
+  private RecurrencyChangeType recurrencyChangeType;
+
+  private TeamEvent originalEvent;
 
   /**
    * @param parameters
@@ -61,12 +69,36 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
     super.init(event);
   }
 
+  /**
+   * @param parameters
+   */
+  public TeamEventEditPage(final PageParameters parameters, final TeamEventDO event, final TeamEvent originalEvent, final RecurrencyChangeType recurrencyChangeType)
+  {
+    super(parameters, "plugins.teamcal.event");
+    Validate.notNull(originalEvent);
+    Validate.notNull(recurrencyChangeType);
+    if (log.isDebugEnabled() == true) {
+      log.debug("TeamEvent is: " + originalEvent);
+    }
+    this.originalEvent = originalEvent;
+    this.recurrencyChangeType = recurrencyChangeType;
+    super.init(event);
+  }
+
+  /**
+   * @return the recurrencyChangeType
+   */
+  public RecurrencyChangeType getRecurrencyChangeType()
+  {
+    return recurrencyChangeType;
+  }
+
   @Override
   public void setResponsePage()
   {
     super.setResponsePage();
     if (returnToPage instanceof CalendarPage) {
-      // Display the date of this time sheet in the CalendarPage (usefull if the time sheet was moved).
+      // Display the date of this time sheet in the CalendarPage (useful if the time sheet was moved).
       ((CalendarPage) returnToPage).setStartDate(getData().getStartDate());
     }
   }
@@ -79,7 +111,33 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   {
     super.onSaveOrUpdate();
     getData().setRecurrence(form.recurrenceData);
-    return null;
+    if (recurrencyChangeType == null || recurrencyChangeType == RecurrencyChangeType.ALL) {
+      return null;
+    }
+    final Integer masterId = getData().getId(); // Store the id of the master entry.
+    getData().setId(null); // Clone object.
+    final TeamEventDO newEvent = getData();
+    final TeamEventDO masterEvent = teamEventDao.getById(masterId);
+    form.setData(masterEvent);
+    if (recurrencyChangeType == RecurrencyChangeType.ALL_FUTURE) {
+      // Set the end date of the master date one day before current date and save this event.
+      final Date recurrenceUntil = new Date(originalEvent.getStartDate().getTime() - 3600 * 1000);
+      if (log.isDebugEnabled() == true) {
+        log.debug("Recurrency until date of master entry will be set to: " + DateHelper.formatAsUTC(recurrenceUntil));
+        log.debug("The new event is: " + newEvent);
+      }
+      masterEvent.setRecurrenceUntil(recurrenceUntil); // Minus 1 hour.
+      throw new UnsupportedOperationException("Not yet implemented");
+    } else { // only current date
+      // Add current date to the master date as exlusion date and save this event (without recurrency settings).
+      masterEvent.addRecurrenceExDate(originalEvent.getStartDate());
+      if (log.isDebugEnabled() == true) {
+        log.debug("Recurrency ex date of master entry is now added: " + DateHelper.formatAsUTC(originalEvent.getStartDate()) + ". The new string is: " + masterEvent.getRecurrenceExDate());
+        log.debug("The new event is: " + newEvent);
+      }
+      throw new UnsupportedOperationException("Not yet implemented");
+    }
+    //return null;
   }
 
   /**

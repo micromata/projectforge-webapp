@@ -160,7 +160,15 @@ public class TeamCalCalendarPanel extends CalendarPanel
   {
     // User clicked on teamEvent
     final TeamCalEventId id = new TeamCalEventId(event.getId(), PFUserContext.getTimeZone());
-    if (new TeamEventRight().hasUpdateAccess(PFUserContext.getUser(), teamEventDao.getById(id.getDataBaseId()), null)) {
+    final TeamEventDO teamEventDO = teamEventDao.getById(id.getDataBaseId());
+    final TeamEvent teamEvent = eventProvider.getTeamEvent(id.toString());
+    if (new TeamEventRight().hasUpdateAccess(PFUserContext.getUser(), teamEventDO, null)) {
+      if (teamEventDO.hasRecurrence() == true) {
+        // at this point the dbTeamEvent is already updated in time
+        recurrenceChangeDialog.open(response.getTarget(), teamEvent, null, null);
+        return;
+      }
+
       final PageParameters parameters = new PageParameters();
       parameters.add(AbstractEditPage.PARAMETER_KEY_ID, id.getDataBaseId());
       final TeamEventEditPage teamEventPage = new TeamEventEditPage(parameters);

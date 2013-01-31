@@ -30,6 +30,7 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.plugins.teamcal.event.RecurrencyChangeType;
 import org.projectforge.plugins.teamcal.event.TeamEvent;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDao;
@@ -78,13 +79,13 @@ public class RecurrenceChangeDialog extends ModalDialog
   @Override
   public void init()
   {
+    setCloseButtonLabel(getString("cancel"));
     final Form<Void> form = new Form<Void>(getFormId());
     init(form);
     final DivPanel content = gridBuilder.getPanel();
     final DivTextPanel textPanel = new DivTextPanel(content.newChildId(), getString("plugins.teamcal.event.recurrence.change.content"));
     content.add(textPanel);
 
-    setCloseButtonLabel(getString("cancel"));
     // add all change callback
     final AjaxCallback allCallback = new AjaxCallback() {
       private static final long serialVersionUID = 7852511931690947544L;
@@ -150,6 +151,20 @@ public class RecurrenceChangeDialog extends ModalDialog
 
   protected void onChangeAllEventsSelected(final AjaxRequestTarget target, final TeamEvent event)
   {
+    onChangeEvents(target, event, RecurrencyChangeType.ALL);
+  }
+
+  protected void onChangeFutureOnlyEventsSelected(final AjaxRequestTarget target, final TeamEvent event)
+  {
+    onChangeEvents(target, event, RecurrencyChangeType.ALL_FUTURE);
+  }
+
+  protected void onChangeSingleEventSelected(final AjaxRequestTarget target, final TeamEvent event)
+  {
+    onChangeEvents(target, event, RecurrencyChangeType.ONLY_CURRENT);
+  }
+
+  private void onChangeEvents(final AjaxRequestTarget target, final TeamEvent event, final RecurrencyChangeType recurrencyChangeType) {
     Integer id;
     if (event instanceof TeamEventDO) {
       id = ((TeamEventDO) event).getId();
@@ -165,19 +180,9 @@ public class RecurrenceChangeDialog extends ModalDialog
       final long move = newEndDate.getTime() - event.getEndDate().getTime();
       teamEventDO.setEndDate(new Timestamp(teamEventDO.getEndDate().getTime() + move));
     }
-    final TeamEventEditPage teamEventEditPage = new TeamEventEditPage(new PageParameters(), teamEventDO);
+    final TeamEventEditPage teamEventEditPage = new TeamEventEditPage(new PageParameters(), teamEventDO, event, recurrencyChangeType);
     teamEventEditPage.setReturnToPage(getWebPage());
     setResponsePage(teamEventEditPage);
-  }
-
-  protected void onChangeFutureOnlyEventsSelected(final AjaxRequestTarget target, final TeamEvent event)
-  {
-    // TODO kai: implement change of all future events here
-  }
-
-  protected void onChangeSingleEventSelected(final AjaxRequestTarget target, final TeamEvent event)
-  {
-    // TODO kai: implement change of single event here
   }
 
 }

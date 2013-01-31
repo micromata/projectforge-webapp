@@ -265,8 +265,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
           getString("plugins.teamcal.event.recurrence.customized.all"), false) + "&nbsp;");
       panel.getLabel().setEscapeModelStrings(false);
       recurrenceIntervalFieldset.add(panel);
-      final MinMaxNumberField<Integer> intervalNumberField = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(
-          recurrenceData, "interval"), 0, 1000);
+      final MinMaxNumberField<Integer> intervalNumberField = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID,
+          new PropertyModel<Integer>(recurrenceData, "interval"), 0, 1000);
       WicketUtils.setSize(intervalNumberField, 1);
       recurrenceIntervalFieldset.add(intervalNumberField);
       panel = new DivTextPanel(recurrenceIntervalFieldset.newChildId(), new Model<String>() {
@@ -315,9 +315,17 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
     gridBuilder.newFormHeading(getString("plugins.teamcal.attendees"));
-    setRecurrenceComponentsVisibility(null);
     gridBuilder.newSplitPanel(GridSize.COL50);
     gridBuilder.newFormHeading(getString("plugins.teamcal.event.reminder"));
+
+    gridBuilder.newGridPanel();
+    if (parentPage.getRecurrencyChangeType() != null) {
+      final FieldsetPanel fs = gridBuilder.newFieldset((String) null).setLabelSide(false).setNoLabelFor();
+      fs.add(new DivTextPanel(fs.newChildId(), getString("plugins.teamcal.event.recurrence.change.text")
+          + " "
+          + getString(parentPage.getRecurrencyChangeType().getI18nKey()) + "."));
+    }
+
     setRecurrenceComponentsVisibility(null);
 
     addCloneButton();
@@ -524,4 +532,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     return log;
   }
 
+  void setData(final TeamEventDO data) {
+    this.data = data;
+  }
 }

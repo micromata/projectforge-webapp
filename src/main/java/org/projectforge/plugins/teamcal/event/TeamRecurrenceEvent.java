@@ -28,6 +28,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.projectforge.calendar.CalendarUtils;
+import org.projectforge.common.ReflectionToString;
 
 /**
  * Represents a recurrence event (created by a master TeamEventDO with recurrence rules).
@@ -49,13 +50,13 @@ public class TeamRecurrenceEvent implements TeamEvent, Serializable
   public TeamRecurrenceEvent(final TeamEventDO master, final Calendar startDay)
   {
     this.master = master;
-    final Calendar masterStartDate = (Calendar)startDay.clone(); // Clone time zone and local.
+    final Calendar masterStartDate = (Calendar) startDay.clone(); // Clone time zone and local.
     masterStartDate.setTime(master.getStartDate());
     startDay.set(Calendar.HOUR_OF_DAY, masterStartDate.get(Calendar.HOUR_OF_DAY));
     startDay.set(Calendar.MINUTE, masterStartDate.get(Calendar.MINUTE));
     startDay.set(Calendar.SECOND, masterStartDate.get(Calendar.SECOND));
     this.startDate = startDay.getTime();
-    final Calendar masterEndDate = (Calendar)startDay.clone(); // Clone time zone and local.
+    final Calendar masterEndDate = (Calendar) startDay.clone(); // Clone time zone and local.
     masterEndDate.setTime(master.getEndDate());
     startDay.set(Calendar.HOUR_OF_DAY, masterEndDate.get(Calendar.HOUR_OF_DAY));
     startDay.set(Calendar.MINUTE, masterEndDate.get(Calendar.MINUTE));
@@ -137,5 +138,14 @@ public class TeamRecurrenceEvent implements TeamEvent, Serializable
   public String getNote()
   {
     return master.getNote();
+  }
+
+  /**
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString()
+  {
+    return (new ReflectionToString(this)).toString();
   }
 }

@@ -24,6 +24,9 @@
 package org.projectforge.plugins.teamcal.event;
 
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -46,6 +49,7 @@ import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.calendar.TimePeriod;
+import org.projectforge.common.DateHelper;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.database.Constants;
 import org.projectforge.plugins.teamcal.TeamCalConfig;
@@ -76,6 +80,8 @@ import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 @Table(name = "T_PLUGIN_CALENDAR_EVENT")
 public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
 {
+  private static final String RECURRENCE_EXDATE_FORMAT = "yyyyMMdd";
+
   private static final long serialVersionUID = -9205582135590380919L;
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
@@ -309,7 +315,8 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
    * @return this for chaining.
    */
   @Transient
-  public TeamEventDO setRecurrence(final TeamEventRecurrenceData recurData) {
+  public TeamEventDO setRecurrence(final TeamEventRecurrenceData recurData)
+  {
     final String rruleString = TeamEventUtils.calculateRRule(recurData);
     setRecurrenceRule(rruleString);
     return this;
@@ -372,6 +379,19 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   public String getRecurrenceExDate()
   {
     return recurrenceExDate;
+  }
+
+  public TeamEventDO addRecurrenceExDate(final Date date)
+  {
+    final DateFormat df = new SimpleDateFormat(RECURRENCE_EXDATE_FORMAT);
+    df.setTimeZone(DateHelper.UTC);
+    final String exDate = df.format(date) + "Z";
+    if (recurrenceExDate == null) {
+      recurrenceExDate = exDate;
+    } else {
+      recurrenceExDate = recurrenceExDate + "," + exDate;
+    }
+    return this;
   }
 
   /**
