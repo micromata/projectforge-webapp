@@ -43,8 +43,7 @@ import org.apache.log4j.Logger;
  */
 public class Crypt
 {
-
-  private static String cryptoAlgorithm;
+  static String cryptoAlgorithm;
 
   private final static Logger log = Logger.getLogger(Crypt.class);
 
@@ -133,20 +132,19 @@ public class Crypt
     }
   }
 
-  private static String getEncryptionAlgorithm()
+  static String getEncryptionAlgorithm()
   {
     if (cryptoAlgorithm != null) {
       return cryptoAlgorithm;
     }
     if (isAlgorithmAvailable("AES") == true) {
       cryptoAlgorithm = "AES";
-    } else
-      if (isAlgorithmAvailable("DES") == true) {
-        cryptoAlgorithm = "DES";
-      } else {
-        log.warn("Weather AEs nor DES algorithm found. Can't use any crypto algorithm.");
-        cryptoAlgorithm = "NONE";
-      }
+    } else if (isAlgorithmAvailable("DES") == true) {
+      cryptoAlgorithm = "DES";
+    } else {
+      log.warn("Weather AEs nor DES algorithm found. Can't use any crypto algorithm.");
+      cryptoAlgorithm = "NONE";
+    }
     return cryptoAlgorithm;
   }
 
