@@ -88,7 +88,7 @@ public class Crypt
       cipher.init(Cipher.DECRYPT_MODE, key);
       final byte[] decordedValue = Base64.decodeBase64(encryptedString);
       final byte[] decValue = cipher.doFinal(decordedValue);
-      final String decryptedValue = new String(decValue);
+      final String decryptedValue = new String(decValue, "UTF-8");
       return decryptedValue;
     } catch (final Exception ex) {
       log.error("Exception encountered while trying to encrypt with Algorithm 'AES' and the given password: " + ex.getMessage(), ex);
