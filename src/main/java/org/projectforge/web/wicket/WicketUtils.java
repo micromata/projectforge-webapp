@@ -1066,7 +1066,7 @@ public class WicketUtils
   {
     final StringBuffer buf = new StringBuffer();
     if (value == true) {
-      HtmlHelper.getInstance().appendImageTag(requestCycle, buf, "/images/accept.png", null);
+      HtmlHelper.getInstance().appendImageTag(requestCycle, buf, "images/accept.png", null);
     }
     final Label label = new Label(componentId, buf.toString());
     label.setEscapeModelStrings(false);
