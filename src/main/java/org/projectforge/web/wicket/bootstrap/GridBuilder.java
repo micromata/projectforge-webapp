@@ -26,11 +26,16 @@ package org.projectforge.web.wicket.bootstrap;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.projectforge.web.BrowserScreenWidthType;
+import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.flowlayout.AbstractGridBuilder;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldProperties;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.FormHeadingPanel;
@@ -309,6 +314,22 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
     final FormHeadingPanel formHeading = new FormHeadingPanel(getPanel().newChildId(), label);
     getPanel().add(formHeading);
     return formHeading;
+  }
+
+  @SuppressWarnings("serial")
+  public DivTextPanel newSecurityAdviceBox(final IModel<String> content)
+  {
+    final DivTextPanel hintBox = new DivTextPanel(getPanel().newChildId(), new Model<String>() {
+      @Override
+      public String getObject()
+      {
+        return "<h4>" + getString("securityAdvice") + "</h4>" + HtmlHelper.escapeHtml(content.getObject(), true);
+      }
+    });
+    hintBox.getDiv().add(AttributeModifier.append("class", "alert alert-block"));
+    hintBox.getLabel().setEscapeModelStrings(false);
+    getPanel().add(hintBox);
+    return hintBox;
   }
 
   public RepeatingView newRepeatingView()
