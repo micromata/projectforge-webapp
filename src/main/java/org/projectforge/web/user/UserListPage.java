@@ -118,9 +118,9 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
         final PFUserDO user = rowModel.getObject();
         final StringBuffer buf = new StringBuffer();
         if (user.isDeactivated() == false) {
-          htmlHelper.appendImageTag(getRequestCycle(), buf, "/images/accept.png", null);
+          htmlHelper.appendImageTag(getRequestCycle(), buf, "images/accept.png", null);
         } else {
-          htmlHelper.appendImageTag(getRequestCycle(), buf, "/images/deny.png", null);
+          htmlHelper.appendImageTag(getRequestCycle(), buf, "images/deny.png", null);
         }
         final Label label = new Label(componentId, buf.toString());
         label.setEscapeModelStrings(false);
