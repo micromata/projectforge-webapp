@@ -82,6 +82,11 @@ public class CalendarFeed extends HttpServlet
 
   private static final List<CalendarFeedHook> feedHooks = new LinkedList<CalendarFeedHook>();
 
+  /**
+   *  setup event is needed for empty calendars
+   */
+  public static final String SETUP_EVENT = "SETUP EVENT";
+
   public static String getUrl()
   {
     return getUrl(null);
@@ -113,6 +118,7 @@ public class CalendarFeed extends HttpServlet
     final String result = "/export/ProjectForge.ics?user=" + user.getId() + "&q=" + encryptedParams;
     return result;
   }
+
 
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException
@@ -198,7 +204,7 @@ public class CalendarFeed extends HttpServlet
       calendar.getProperties().add(CalScale.GREGORIAN);
 
       // setup event is needed for empty calendars
-      calendar.getComponents().add(new VEvent(new net.fortuna.ical4j.model.Date(0), "SETUP EVENT"));
+      calendar.getComponents().add(new VEvent(new net.fortuna.ical4j.model.Date(0), SETUP_EVENT));
 
       // adding events
       for (final VEvent event : getEvents(params, timesheetUser)) {

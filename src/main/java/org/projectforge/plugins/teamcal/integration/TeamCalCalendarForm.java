@@ -22,6 +22,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 package org.projectforge.plugins.teamcal.integration;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -36,11 +37,13 @@ import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.common.StringHelper;
 import org.projectforge.plugins.teamcal.dialog.TeamCalFilterDialog;
 import org.projectforge.plugins.teamcal.event.DropIcsPanel;
 import org.projectforge.plugins.teamcal.event.TeamEventListPage;
+import org.projectforge.web.calendar.CalendarFeed;
 import org.projectforge.web.calendar.CalendarForm;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.calendar.CalendarPageSupport;
@@ -50,7 +53,6 @@ import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
 import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 
-
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  * @author M. Lauterbach (m.lauterbach@micromata.de)
@@ -59,6 +61,8 @@ public class TeamCalCalendarForm extends CalendarForm
 {
 
   private static final long serialVersionUID = -5838203593605203398L;
+
+  private ImportIcsDialog importIcsDialog;
 
   /**
    * @param parentPage
@@ -85,9 +89,12 @@ public class TeamCalCalendarForm extends CalendarForm
   protected void init()
   {
     super.init();
-    final TeamCalFilterDialog dialog = new TeamCalFilterDialog(parentPage.newModalDialogId(), (TeamCalCalendarFilter)filter);
+    final TeamCalFilterDialog dialog = new TeamCalFilterDialog(parentPage.newModalDialogId(), (TeamCalCalendarFilter) filter);
     parentPage.add(dialog);
     dialog.init();
+    importIcsDialog = new ImportIcsDialog(parentPage.newModalDialogId(), new ResourceModel("plugins.teamcal.import.ics.title"));
+    importIcsDialog.init();
+    parentPage.add(importIcsDialog);
     final IconButtonPanel calendarButtonPanel = new AjaxIconButtonPanel(buttonGroupPanel.newChildId(), IconType.CALENDAR,
         getString("plugins.teamcal.calendar.edit")) {
       private static final long serialVersionUID = -8572571785540159369L;
@@ -107,17 +114,17 @@ public class TeamCalCalendarForm extends CalendarForm
     buttonGroupPanel.addButton(calendarButtonPanel);
 
     {
-      final IconButtonPanel searchButtonPanel = new IconButtonPanel(buttonGroupPanel.newChildId(), IconType.SEARCH,
-          getString("search")) {
+      final IconButtonPanel searchButtonPanel = new IconButtonPanel(buttonGroupPanel.newChildId(), IconType.SEARCH, getString("search")) {
         /**
          * @see org.projectforge.web.wicket.flowlayout.IconButtonPanel#onSubmit()
          */
         @Override
         protected void onSubmit()
         {
-          final Set<Integer> visibleCalsSet = ((TeamCalCalendarFilter)filter).getActiveVisibleCalendarIds();
+          final Set<Integer> visibleCalsSet = ((TeamCalCalendarFilter) filter).getActiveVisibleCalendarIds();
           final String calendars = StringHelper.objectColToString(visibleCalsSet, ",");
-          final TeamEventListPage teamEventListPage = new TeamEventListPage(new PageParameters().add(TeamEventListPage.PARAM_CALENDARS, calendars));
+          final TeamEventListPage teamEventListPage = new TeamEventListPage(new PageParameters().add(TeamEventListPage.PARAM_CALENDARS,
+              calendars));
           setResponsePage(teamEventListPage);
         }
       };
@@ -125,7 +132,7 @@ public class TeamCalCalendarForm extends CalendarForm
       buttonGroupPanel.addButton(searchButtonPanel);
     }
 
-    if (((TeamCalCalendarFilter)filter).getActiveTemplateEntry() != null) {
+    if (((TeamCalCalendarFilter) filter).getActiveTemplateEntry() != null) {
       final IChoiceRenderer<TemplateEntry> templateEntriesRenderer = new IChoiceRenderer<TemplateEntry>() {
         private static final long serialVersionUID = 4804134958242438331L;
 
@@ -142,11 +149,10 @@ public class TeamCalCalendarForm extends CalendarForm
         }
       };
 
-      final IModel<List<TemplateEntry>> choicesModel = new PropertyModel<List<TemplateEntry>>(filter,
-          "templateEntries");
+      final IModel<List<TemplateEntry>> choicesModel = new PropertyModel<List<TemplateEntry>>(filter, "templateEntries");
       final IModel<TemplateEntry> activeModel = new PropertyModel<TemplateEntry>(filter, "activeTemplateEntry");
-      final DropDownChoicePanel<TemplateEntry> templateChoice = new DropDownChoicePanel<TemplateEntry>(
-          fieldset.newChildId(), activeModel, choicesModel, templateEntriesRenderer, false);
+      final DropDownChoicePanel<TemplateEntry> templateChoice = new DropDownChoicePanel<TemplateEntry>(fieldset.newChildId(), activeModel,
+          choicesModel, templateEntriesRenderer, false);
       fieldset.add(templateChoice);
       templateChoice.getDropDownChoice().setOutputMarkupId(true);
 
@@ -173,6 +179,7 @@ public class TeamCalCalendarForm extends CalendarForm
 
           @SuppressWarnings("unchecked")
           final List<Component> list = calendar.getComponents("VEVENT");
+          // if (calendar.getComponent(name))
 
           final List<VEvent> newEvents = new ArrayList<VEvent>();
           final List<VEvent> existingEvents = new ArrayList<VEvent>();
@@ -180,30 +187,18 @@ public class TeamCalCalendarForm extends CalendarForm
           for (final Component c : list) {
             final VEvent event = new VEvent(c.getProperties());
 
-            if (StringUtils.contains(event.getUid().toString(), '@')) {
-              existingEvents.add(event);
+            if (StringUtils.equals(event.getSummary().getValue(), CalendarFeed.SETUP_EVENT) == true) {
+              // skip setup event!
             } else {
-              newEvents.add(event);
+              if (StringUtils.contains(event.getUid().toString(), '@')) {
+                existingEvents.add(event);
+              } else {
+                newEvents.add(event);
+              }
             }
-
-            System.out.println(event);
-
-            //            final String beginDate = c.getProperty("DTSTART").toString();
-            //            final String endDate = c.getProperty("DTEND").toString();
-            //            final String summary = c.getProperty("SUMMARY").toString();
-            //            final String description = c.getProperty("DESCRIPTION").toString();
-            //            final String attendees = c.getProperty("ATTENDEE").toString();
-            //            final String externalUid = c.getProperty("UID").toString();
-            //
-            //            System.out.println(list.get(0));
-            //            System.out.println("beginDate: " + beginDate);
-            //            System.out.println("endDate: " + endDate);
-            //            System.out.println("summary: " + summary);
-            //            System.out.println("description: " + description);
-            //            System.out.println("attendees: " + attendees);
-            //            System.out.println("externalUid: " + externalUid);
-
           }
+
+          importIcsDialog.open(target, newEvents, existingEvents);
         }
       });
     }
@@ -212,7 +207,7 @@ public class TeamCalCalendarForm extends CalendarForm
   @Override
   public TeamCalCalendarFilter getFilter()
   {
-    return (TeamCalCalendarFilter)filter;
+    return (TeamCalCalendarFilter) filter;
   }
 
   @Override
@@ -226,6 +221,6 @@ public class TeamCalCalendarForm extends CalendarForm
    */
   public Set<Integer> getSelectedCalendars()
   {
-    return ((TeamCalCalendarFilter)filter).getActiveVisibleCalendarIds();
+    return ((TeamCalCalendarFilter) filter).getActiveVisibleCalendarIds();
   }
 }
