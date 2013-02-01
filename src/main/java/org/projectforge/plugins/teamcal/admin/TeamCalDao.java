@@ -33,6 +33,7 @@ import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.DisplayHistoryEntry;
 import org.projectforge.core.QueryFilter;
+import org.projectforge.plugins.teamcal.admin.TeamCalFilter.OwnerType;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
@@ -129,6 +130,13 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
       }
     }
     return result;
+  }
+
+  public List<TeamCalDO> getListByUser() {
+    final TeamCalFilter filter = new TeamCalFilter();
+    filter.setOwnerType(OwnerType.ALL);
+    filter.setFullAccess(true);
+    return getList(filter);
   }
 
   /**
