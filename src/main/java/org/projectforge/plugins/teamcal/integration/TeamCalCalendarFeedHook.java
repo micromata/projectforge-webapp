@@ -26,8 +26,7 @@ package org.projectforge.plugins.teamcal.integration;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.TimeZone;
@@ -71,9 +70,9 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
    * @see org.projectforge.web.calendar.CalendarFeedHook#getEvents(net.fortuna.ical4j.model.TimeZone, java.util.Calendar)
    */
   @Override
-  public List<VEvent> getEvents(final HttpServletRequest req, final TimeZone timeZone)
+  public List<VEvent> getEvents(final Map<String, String> params, final TimeZone timeZone)
   {
-    final String teamCals = req.getParameter("teamCals");
+    final String teamCals = params.get("teamCals");
     if (teamCals == null) {
       return null;
     }

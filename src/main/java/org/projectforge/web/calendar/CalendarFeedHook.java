@@ -24,8 +24,7 @@
 package org.projectforge.web.calendar;
 
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VEvent;
@@ -40,10 +39,10 @@ public interface CalendarFeedHook
 {
 
   /**
-   * @param req
+   * @param params
    * @param timezone The time zone of the ics framework (build from {@link PFUserContext#getTimeZone()}.
    * @param cal
    */
-  public List<VEvent> getEvents(final HttpServletRequest req, TimeZone timeZone);
+  public List<VEvent> getEvents(final Map<String, String> params, TimeZone timeZone);
 
 }

@@ -140,7 +140,7 @@ public class CalendarFeed extends HttpServlet
       return;
     }
     final Map<String, String> params = StringHelper.getKeyValues(decryptedParams, "&");
-    final Calendar calendar = createCal(req, userId, params.get("token"), params.get(PARAM_NAME_TIMESHEET_USER));
+    final Calendar calendar = createCal(params, userId, params.get("token"), params.get(PARAM_NAME_TIMESHEET_USER));
 
     if (calendar == null) {
       resp.sendError(HttpStatus.SC_BAD_REQUEST);
@@ -158,13 +158,13 @@ public class CalendarFeed extends HttpServlet
 
   /**
    * creates a calendar for the user, identified by his name and authentication key.
-   * @param req
+   * @param params
    * 
    * @param userName
    * @param userKey
    * @return a calendar, null if authentication fails
    */
-  public Calendar createCal(final HttpServletRequest req, final Integer userId, final String authKey, final String timesheetUserParam)
+  public Calendar createCal(final Map<String, String> params, final Integer userId, final String authKey, final String timesheetUserParam)
   {
     final UserDao userDao = Registry.instance().getDao(UserDao.class);
     final PFUserDO loggedInUser = userDao.getUserByAuthenticationToken(userId, authKey);
@@ -201,7 +201,7 @@ public class CalendarFeed extends HttpServlet
       calendar.getComponents().add(new VEvent(new net.fortuna.ical4j.model.Date(0), "SETUP EVENT"));
 
       // adding events
-      for (final VEvent event : getEvents(req, timesheetUser)) {
+      for (final VEvent event : getEvents(params, timesheetUser)) {
         calendar.getComponents().add(event);
       }
       return calendar;
@@ -215,7 +215,7 @@ public class CalendarFeed extends HttpServlet
    * 
    * @return
    */
-  private List<VEvent> getEvents(final HttpServletRequest req, PFUserDO timesheetUser)
+  private List<VEvent> getEvents(final Map<String, String> params, PFUserDO timesheetUser)
   {
     final PFUserDO loggedInUser = PFUserContext.getUser();
     if (loggedInUser == null) {
@@ -227,7 +227,7 @@ public class CalendarFeed extends HttpServlet
 
     boolean eventsExist = false;
     for (final CalendarFeedHook hook : feedHooks) {
-      final List<VEvent> list = hook.getEvents(req, timezone);
+      final List<VEvent> list = hook.getEvents(params, timezone);
       if (list != null && list.size() > 0) {
         events.addAll(list);
         eventsExist = true;

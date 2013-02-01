@@ -22,11 +22,15 @@
 /////////////////////////////////////////////////////////////////////////////
 
 package org.projectforge.plugins.teamcal.integration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.component.VEvent;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
@@ -166,7 +170,40 @@ public class TeamCalCalendarForm extends CalendarForm
         protected void onIcsImport(final AjaxRequestTarget target, final Calendar calendar)
         {
           // TODO kai: do fancy stuff with the calendar
-          System.out.println(calendar);
+
+          @SuppressWarnings("unchecked")
+          final List<Component> list = calendar.getComponents("VEVENT");
+
+          final List<VEvent> newEvents = new ArrayList<VEvent>();
+          final List<VEvent> existingEvents = new ArrayList<VEvent>();
+
+          for (final Component c : list) {
+            final VEvent event = new VEvent(c.getProperties());
+
+            if (StringUtils.contains(event.getUid().toString(), '@')) {
+              existingEvents.add(event);
+            } else {
+              newEvents.add(event);
+            }
+
+            System.out.println(event);
+
+            //            final String beginDate = c.getProperty("DTSTART").toString();
+            //            final String endDate = c.getProperty("DTEND").toString();
+            //            final String summary = c.getProperty("SUMMARY").toString();
+            //            final String description = c.getProperty("DESCRIPTION").toString();
+            //            final String attendees = c.getProperty("ATTENDEE").toString();
+            //            final String externalUid = c.getProperty("UID").toString();
+            //
+            //            System.out.println(list.get(0));
+            //            System.out.println("beginDate: " + beginDate);
+            //            System.out.println("endDate: " + endDate);
+            //            System.out.println("summary: " + summary);
+            //            System.out.println("description: " + description);
+            //            System.out.println("attendees: " + attendees);
+            //            System.out.println("externalUid: " + externalUid);
+
+          }
         }
       });
     }
