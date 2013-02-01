@@ -62,7 +62,7 @@ public class ImportIcsDialog extends ModalDialog
     super.open(target);
     clearContent();
     final List<EventCalendarPair> calendarPairs = new LinkedList<ImportIcsDialog.EventCalendarPair>();
-    final List<TeamCalDO> allCalendars = teamCalDao.getListByUser();
+    final List<TeamCalDO> allCalendars = teamCalDao.getAllCalendarsWithFullAccess();
 
     for (final VEvent event : newEvents) {
       final FieldsetPanel fs = gridBuilder.newFieldset(event.getSummary().getValue());

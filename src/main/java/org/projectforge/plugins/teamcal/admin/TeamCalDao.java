@@ -132,7 +132,13 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
     return result;
   }
 
-  public List<TeamCalDO> getListByUser() {
+  /**
+   * Gets a list of all calendars with full access of the current logged-in user as well as the calendars owned by the current logged-in
+   * user.
+   * @return
+   */
+  public List<TeamCalDO> getAllCalendarsWithFullAccess()
+  {
     final TeamCalFilter filter = new TeamCalFilter();
     filter.setOwnerType(OwnerType.ALL);
     filter.setFullAccess(true);
