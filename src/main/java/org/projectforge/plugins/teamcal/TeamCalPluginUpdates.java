@@ -54,7 +54,7 @@ public class TeamCalPluginUpdates
           "readonlyAccessUserIds", "minimalAccessGroupIds", "minimalAccessUserIds", "description", "title"};
 
       final String[] eventAttributes = { "subject", "location", "allDay", "calendar", "startDate", "endDate", "note", "attendees",
-          "recurrenceRule", "recurrenceExDate", "recurrenceUntil"};
+          "recurrenceRule", "recurrenceExDate", "recurrenceUntil", "externalUid"};
 
       {
         calendarTable.addDefaultBaseDOAttributes().addAttributes(calendarAttributes);
