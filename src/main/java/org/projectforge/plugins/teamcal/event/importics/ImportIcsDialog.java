@@ -70,11 +70,11 @@ public class ImportIcsDialog extends ModalDialog
       referencePair.event = event;
       calendarPairs.add(referencePair);
       if (event.getDescription() != null) {
-        fs.add(new Label(fs.newChildId(), "Description: " + event.getDescription().getValue()));
+        fs.add(new Label(fs.newChildId(), "Description: " + event.getDescription().getValue())); // TODO: i18n
       }
       fs.add(new Label(fs.newChildId(), " - "));
       fs.add(new Label(fs.newChildId(), new DateFormatUtils().format(event.getStartDate().getDate(), "dd.MM.yyyy HH:mm"))); // TODO richtiges Format!
-      fs.add(new Label(fs.newChildId(), " bis "));
+      fs.add(new Label(fs.newChildId(), " bis ")); // TODO: i18n
       final ChoiceRenderer<TeamCalDO> choice = new ChoiceRenderer<TeamCalDO>(){
         private static final long serialVersionUID = 424880918380768972L;
 
