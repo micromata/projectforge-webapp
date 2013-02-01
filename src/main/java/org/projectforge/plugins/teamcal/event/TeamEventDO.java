@@ -114,6 +114,8 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
 
   private String attendees;
 
+  private String externalUid;
+
   /**
    * Clear fields for viewers with minimal access. If you add new fields don't forget to clear these fields here.
    */
@@ -290,6 +292,24 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   }
 
   /**
+   * @return the externalUid
+   */
+  public String getExternalUid()
+  {
+    return externalUid;
+  }
+
+  /**
+   * @param externalUid the externalUid to set
+   * @return this for chaining.
+   */
+  public TeamEventDO setExternalUid(final String externalUid)
+  {
+    this.externalUid = externalUid;
+    return this;
+  }
+
+  /**
    * RRULE (rfc5545)
    * @return the recurrence
    */
@@ -442,6 +462,9 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
     return getTimePeriod().getDuration();
   }
 
+  /**
+   * @see java.lang.Object#hashCode()
+   */
   @Override
   public int hashCode()
   {
@@ -451,15 +474,20 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
     result = prime * result + ((attendees == null) ? 0 : attendees.hashCode());
     result = prime * result + ((calendar == null) ? 0 : calendar.hashCode());
     result = prime * result + ((endDate == null) ? 0 : endDate.hashCode());
-    result = prime * result + ((recurrenceExDate == null) ? 0 : recurrenceExDate.hashCode());
+    result = prime * result + ((externalUid == null) ? 0 : externalUid.hashCode());
     result = prime * result + ((location == null) ? 0 : location.hashCode());
     result = prime * result + ((note == null) ? 0 : note.hashCode());
+    result = prime * result + ((recurrenceExDate == null) ? 0 : recurrenceExDate.hashCode());
     result = prime * result + ((recurrenceRule == null) ? 0 : recurrenceRule.hashCode());
+    result = prime * result + ((recurrenceUntil == null) ? 0 : recurrenceUntil.hashCode());
     result = prime * result + ((startDate == null) ? 0 : startDate.hashCode());
     result = prime * result + ((subject == null) ? 0 : subject.hashCode());
     return result;
   }
 
+  /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(final Object obj)
   {
@@ -487,10 +515,10 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
         return false;
     } else if (!endDate.equals(other.endDate))
       return false;
-    if (recurrenceExDate == null) {
-      if (other.recurrenceExDate != null)
+    if (externalUid == null) {
+      if (other.externalUid != null)
         return false;
-    } else if (!recurrenceExDate.equals(other.recurrenceExDate))
+    } else if (!externalUid.equals(other.externalUid))
       return false;
     if (location == null) {
       if (other.location != null)
@@ -502,10 +530,20 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
         return false;
     } else if (!note.equals(other.note))
       return false;
+    if (recurrenceExDate == null) {
+      if (other.recurrenceExDate != null)
+        return false;
+    } else if (!recurrenceExDate.equals(other.recurrenceExDate))
+      return false;
     if (recurrenceRule == null) {
       if (other.recurrenceRule != null)
         return false;
     } else if (!recurrenceRule.equals(other.recurrenceRule))
+      return false;
+    if (recurrenceUntil == null) {
+      if (other.recurrenceUntil != null)
+        return false;
+    } else if (!recurrenceUntil.equals(other.recurrenceUntil))
       return false;
     if (startDate == null) {
       if (other.startDate != null)
@@ -536,6 +574,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
     clone.recurrenceExDate = this.recurrenceExDate;
     clone.recurrenceRule = this.recurrenceRule;
     clone.recurrenceUntil = this.recurrenceUntil;
+    clone.externalUid = this.externalUid;
     return clone;
   }
 }
