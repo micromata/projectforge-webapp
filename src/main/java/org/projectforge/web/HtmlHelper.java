@@ -58,7 +58,6 @@ public class HtmlHelper
   }
 
   /**
-   * Only xml characters will be escaped (for compatibility with fop rendering engine).
    * @param str The string to convert.
    * @param createLineBreaks If true then new lines will be replaced by newlines and &lt;br/&gt;
    * @return
