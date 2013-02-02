@@ -28,12 +28,19 @@ import java.util.LinkedList;
 import name.fraser.neil.plaintext.DiffMatchPatch;
 import name.fraser.neil.plaintext.DiffMatchPatch.Diff;
 
+import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.ajax.AjaxEventBehavior;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.projectforge.web.HtmlHelper;
+import org.projectforge.web.dialog.ModalDialog;
+import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.WicketUtils;
 
 /**
@@ -51,10 +58,18 @@ public class DiffTextPanel extends Panel
 
   private String prettyHtml;
 
+  private ModalDialog modalDialog;
+
+  private boolean showModalDialog = true;
+
+  private IModel<String> newText, oldText;
+
   @SuppressWarnings("serial")
   public DiffTextPanel(final String id, final IModel<String> newText, final IModel<String> oldText, final Behavior... behaviors)
   {
     super(id);
+    this.newText = newText;
+    this.oldText = oldText;
     label = new Label(WICKET_ID, new Model<String>() {
       @Override
       public String getObject()
@@ -70,6 +85,17 @@ public class DiffTextPanel extends Panel
     });
     label.add(behaviors).setEscapeModelStrings(false);
     add(label);
+  }
+
+  /**
+   * If set to true, then the user is able to click on this panel and a modal dialog will open with the old and new text to copy.
+   * @param showModalDialog the showModalDialog to set (default is true).
+   * @return this for chaining.
+   */
+  public DiffTextPanel setShowModalDialog(final boolean showModalDialog)
+  {
+    this.showModalDialog = showModalDialog;
+    return this;
   }
 
   /**
@@ -121,18 +147,67 @@ public class DiffTextPanel extends Panel
     return this;
   }
 
-  protected String getPrettyHtml(final LinkedList<Diff> diffs) {
+  /**
+   * @see org.apache.wicket.Component#onInitialize()
+   */
+  @SuppressWarnings("serial")
+  @Override
+  protected void onInitialize()
+  {
+    super.onInitialize();
+    if (showModalDialog == true && getPage() != null && getPage() instanceof AbstractSecuredPage) {
+      final AbstractSecuredPage parentPage = (AbstractSecuredPage) getPage();
+      modalDialog = new ModalDialog(parentPage.newModalDialogId()) {
+        @Override
+        public void init()
+        {
+          setTitle(getString("changes"));
+          init(new Form<String>(getFormId()));
+          {
+            final FieldsetPanel fs = gridBuilder.newFieldset(getString("history.oldValue")).setLabelSide(false);
+            final TextArea<String> textArea = new TextArea<String>(fs.getTextAreaId(), oldText);
+            fs.add(textArea);
+            textArea.add(AttributeModifier.replace("onClick", "$(this).select();"));
+          }
+          {
+            final FieldsetPanel fs = gridBuilder.newFieldset(getString("history.newValue")).setLabelSide(false);
+            final TextArea<String> textArea = new TextArea<String>(fs.getTextAreaId(), newText);
+            fs.add(textArea);
+            textArea.add(AttributeModifier.replace("onClick", "$(this).select();"));
+          }
+          setLazyBinding(false);
+        }
+      };
+      modalDialog.setBigWindow();
+      modalDialog.setLazyBinding(true);
+      parentPage.add(modalDialog);
+      final AjaxEventBehavior behavior = new AjaxEventBehavior("onClick") {
+        @Override
+        protected void onEvent(final AjaxRequestTarget target)
+        {
+          if (modalDialog.isLazyBinding() == true) {
+            // First call, have to initialize it.
+            modalDialog.init();
+          }
+          target.add(modalDialog.getMainContainer());
+          modalDialog.open(target);
+        }
+      };
+      label.add(behavior);
+    }
+  }
+
+  protected String getPrettyHtml(final LinkedList<Diff> diffs)
+  {
     final StringBuilder html = new StringBuilder();
     for (final Diff aDiff : diffs) {
       final String text = HtmlHelper.escapeHtml(aDiff.text, true);
       switch (aDiff.operation) {
         case INSERT:
-          html.append("<ins>").append(text)
-          .append("</ins>");
+          html.append("<ins>").append(text).append("</ins>");
           break;
         case DELETE:
-          html.append("<del>").append(text)
-          .append("</del>");
+          html.append("<del>").append(text).append("</del>");
           break;
         case EQUAL:
           html.append("<span>").append(text).append("</span>");
