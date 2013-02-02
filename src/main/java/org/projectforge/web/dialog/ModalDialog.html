@@ -1,16 +1,18 @@
 <wicket:panel xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
   <div class="modal hide" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" wicket:id="mainContainer">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-      <h3 id="myModalLabel" wicket:id="title">[title]</h3>
-    </div>
-    <form wicket:id="form">
-      <div class="modal-body" wicket:id="gridContent">
-        <wicket:container wicket:id="flowform">[The content]</wicket:container>
+    <wicket:container wicket:id="mainSubContainer">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel" wicket:id="title">[title]</h3>
       </div>
-      <div class="modal-footer" wicket:id="buttonBar">
-        <wicket:container wicket:id="actionButtons" />
-      </div>
-    </form>
+      <form wicket:id="form">
+        <div class="modal-body" wicket:id="gridContent">
+          <wicket:container wicket:id="flowform">[The content]</wicket:container>
+        </div>
+        <div class="modal-footer" wicket:id="buttonBar">
+          <wicket:container wicket:id="actionButtons" />
+        </div>
+      </form>
+    </wicket:container>
   </div>
 </wicket:panel>

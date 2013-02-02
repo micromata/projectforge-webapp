@@ -58,7 +58,7 @@ public abstract class ModalDialog extends Panel
 
   protected GridBuilder gridBuilder;
 
-  private final WebMarkupContainer mainContainer, gridContentContainer, buttonBarContainer;
+  private final WebMarkupContainer mainContainer, mainSubContainer, gridContentContainer, buttonBarContainer;
 
   private boolean escapeKeyEnabled = true;
 
@@ -73,6 +73,8 @@ public abstract class ModalDialog extends Panel
   private boolean draggable = true;
 
   private Boolean resizable;
+
+  private boolean lazyBinding;
 
   private Form< ? > form;
 
@@ -90,6 +92,7 @@ public abstract class ModalDialog extends Panel
     actionButtons = new MyComponentsRepeater<Component>("actionButtons");
     mainContainer = new WebMarkupContainer("mainContainer");
     add(mainContainer.setOutputMarkupId(true));
+    mainContainer.add(mainSubContainer = new WebMarkupContainer("mainSubContainer"));
     gridContentContainer = new WebMarkupContainer("gridContent");
     gridContentContainer.setOutputMarkupId(true);
     buttonBarContainer = new WebMarkupContainer("buttonBar");
@@ -115,6 +118,30 @@ public abstract class ModalDialog extends Panel
   {
     bigWindow = true;
     return this;
+  }
+
+  /**
+   * If true then only the div panel of the modal dialog is rendered without buttons and content. Default is false. Don't forget to call
+   * setLazyBinding(false) at the end of your init method.
+   * @param lazyBinding the lazyBinding to set
+   * @return this for chaining.
+   */
+  public ModalDialog setLazyBinding(final boolean lazyBinding)
+  {
+    this.lazyBinding = lazyBinding;
+    mainSubContainer.setVisible(!lazyBinding);
+    if (lazyBinding == false) {
+      actionButtons.render();
+    }
+    return this;
+  }
+
+  /**
+   * @return the lazyBinding
+   */
+  public boolean isLazyBinding()
+  {
+    return lazyBinding;
   }
 
   /**
@@ -265,7 +292,7 @@ public abstract class ModalDialog extends Panel
    */
   public ModalDialog setTitle(final String title)
   {
-    mainContainer.add(new Label("title", title));
+    mainSubContainer.add(new Label("title", title));
     return this;
   }
 
@@ -275,7 +302,7 @@ public abstract class ModalDialog extends Panel
    */
   public ModalDialog setTitle(final IModel<String> title)
   {
-    mainContainer.add(new Label("title", title));
+    mainSubContainer.add(new Label("title", title));
     return this;
   }
 
@@ -295,7 +322,7 @@ public abstract class ModalDialog extends Panel
   protected void init(final Form< ? > form)
   {
     this.form = form;
-    mainContainer.add(form);
+    mainSubContainer.add(form);
     form.add(gridContentContainer);
     form.add(buttonBarContainer);
     if (showCancelButton == true) {
@@ -365,7 +392,9 @@ public abstract class ModalDialog extends Panel
   protected void onBeforeRender()
   {
     super.onBeforeRender();
-    actionButtons.render();
+    if (lazyBinding == false) {
+      actionButtons.render();
+    }
   }
 
   public String getFormId()
@@ -409,5 +438,13 @@ public abstract class ModalDialog extends Panel
     final SingleButtonPanel buttonPanel = new SingleButtonPanel(this.actionButtons.newChildId(), button, label, classnames);
     buttonPanel.add(button);
     return buttonPanel;
+  }
+
+  /**
+   * @return the mainContainer
+   */
+  public WebMarkupContainer getMainContainer()
+  {
+    return mainContainer;
   }
 }
