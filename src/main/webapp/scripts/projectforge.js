@@ -108,7 +108,7 @@ function initializeComponents() {
 		mouseX = event.pageX;
 		mouseY = event.pageY;
 		// Avoid zombies:
-		$("div.popover").hide();
+		hideAllTooltips();
 		$(this).mypopover('myshow');
 	}, function() {
 		$(this).mypopover('hide');
@@ -117,11 +117,16 @@ function initializeComponents() {
 		mouseX = event.pageX;
 		mouseY = event.pageY;
 		// Avoid zombies:
-		$("div.tooltip").hide();
+		hideAllTooltips();
 		$(this).mytooltip('myshow');
 	}, function() {
 		$(this).mytooltip('hide');
 	});
+}
+
+function hideAllTooltips() {
+	$("div.popover").hide();
+	$("div.tooltip").hide();
 }
 
 function initMyPopover(element) {
