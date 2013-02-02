@@ -88,7 +88,7 @@ function preventBubble(e) {
 		timeout = setTimeout(adaptSize, timeoutMillis);
 	});
 	
-	function adaptSize() {
+	window.adaptSize = function adaptSize() {
 		$.each($('.controls'), function(){
 		   if($(this).parent().width() > 300){
 				$(this).css('width', $(this).parent().width()-150);
@@ -399,6 +399,7 @@ function doAfterAjaxHandling() {
 	$("fieldset > div > input[type=checkbox]").addClass("checkbox");
 	$(".jqui_checkbox").buttonset();
 	initializeComponents();
+    adaptSize();
 }
 
 function initColorPicker() {
