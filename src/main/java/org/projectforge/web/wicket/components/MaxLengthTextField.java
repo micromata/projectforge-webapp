@@ -23,6 +23,8 @@
 
 package org.projectforge.web.wicket.components;
 
+import java.lang.reflect.Field;
+
 import org.apache.commons.lang.ClassUtils;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextField;
@@ -131,7 +133,12 @@ public class MaxLengthTextField extends TextField<String>
       if (entity == null) {
         log.warn("Oups, can't get private field 'target' of PropertyModel!.");
       } else {
-        length = HibernateUtils.getPropertyLength(entity.getClass().getName(), propertyModel.getPropertyField().getName());
+        final Field field = propertyModel.getPropertyField();
+        if (field != null) {
+          length = HibernateUtils.getPropertyLength(entity.getClass().getName(), field.getName());
+        } else {
+          log.info("Can't get field '" + propertyModel.getPropertyExpression() + "'.");
+        }
       }
     }
     return length;
