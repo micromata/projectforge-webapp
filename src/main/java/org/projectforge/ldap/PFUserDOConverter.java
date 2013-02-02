@@ -117,7 +117,7 @@ public class PFUserDOConverter
 
   public static boolean isSambaAccountValuesEmpty(final LdapUser ldapUser)
   {
-    return ldapUser.getSambaSIDNumber() == null;
+    return ldapUser.getSambaSIDNumber() == null && ldapUser.getSambaPrimaryGroupSIDNumber() == null;
   }
 
   /**
@@ -165,6 +165,11 @@ public class PFUserDOConverter
     } else {
       ldapUser.setSambaSIDNumber(null);
     }
+    if (values.getSambaPrimaryGroupSIDNumber() != null) {
+      ldapUser.setSambaPrimaryGroupSIDNumber(values.getSambaPrimaryGroupSIDNumber());
+    } else {
+      ldapUser.setSambaPrimaryGroupSIDNumber(null);
+    }
   }
 
   public static LdapUserValues readLdapUserValues(final String ldapValuesAsXml)
@@ -205,6 +210,9 @@ public class PFUserDOConverter
       }
       if (ldapUser.getSambaSIDNumber() != null) {
         values.setSambaSIDNumber(ldapUser.getSambaSIDNumber());
+      }
+      if (ldapUser.getSambaPrimaryGroupSIDNumber() != null) {
+        values.setSambaPrimaryGroupSIDNumber(ldapUser.getSambaPrimaryGroupSIDNumber());
       }
     }
     return getLdapValuesAsXml(values);
@@ -258,7 +266,7 @@ public class PFUserDOConverter
       ListHelper.addAll(properties, "uidNumber", "gidNumber", "homeDirectory", "loginShell");
     }
     if (LdapUserDao.isSambaAccountsConfigured() == true && isSambaAccountValuesEmpty(src) == false) {
-      ListHelper.addAll(properties, "sambaSIDNumber", "sambaNTPassword");
+      ListHelper.addAll(properties, "sambaSIDNumber", "sambaPrimaryGroupSIDNumber",  "sambaNTPassword");
     }
     modified = BeanHelper.copyProperties(src, dest, true, properties.toArray(new String[0]));
     return modified;

@@ -52,13 +52,11 @@ public class LdapUserValues implements Serializable
 
   private Integer sambaSIDNumber;
 
+  private Integer sambaPrimaryGroupSIDNumber;
+
   public boolean isValuesEmpty()
   {
-    return getUidNumber() == null
-        && StringUtils.isBlank(getHomeDirectory()) == true
-        && StringUtils.isBlank(getLoginShell()) == true
-        && getSambaSIDNumber() == null
-        && getGidNumber() == null;
+    return isPosixValuesEmpty() == true && isSambaValuesEmpty() == true;
   }
 
   public boolean isPosixValuesEmpty()
@@ -71,7 +69,7 @@ public class LdapUserValues implements Serializable
 
   public boolean isSambaValuesEmpty()
   {
-    return getSambaSIDNumber() != null;
+    return getSambaSIDNumber() == null && sambaPrimaryGroupSIDNumber == null;
   }
 
   public String getHomeDirectory()
@@ -133,6 +131,24 @@ public class LdapUserValues implements Serializable
   public LdapUserValues setSambaSIDNumber(final Integer sambaSIDNumber)
   {
     this.sambaSIDNumber = sambaSIDNumber;
+    return this;
+  }
+
+  /**
+   * @return the sambaPrimaryGroupSIDNumber
+   */
+  public Integer getSambaPrimaryGroupSIDNumber()
+  {
+    return sambaPrimaryGroupSIDNumber;
+  }
+
+  /**
+   * @param sambaPrimaryGroupSIDNumber the sambaPrimaryGroupSIDNumber to set
+   * @return this for chaining.
+   */
+  public LdapUserValues setSambaPrimaryGroupSIDNumber(final Integer sambaPrimaryGroupSIDNumber)
+  {
+    this.sambaPrimaryGroupSIDNumber = sambaPrimaryGroupSIDNumber;
     return this;
   }
 }

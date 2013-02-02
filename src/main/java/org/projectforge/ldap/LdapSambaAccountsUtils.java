@@ -65,8 +65,12 @@ public class LdapSambaAccountsUtils
    * @param sambaSIDNumber
    * @return Returns true if any user (also deleted user) other than the given user has the given uidNumber, otherwise false.
    */
-  public static boolean isGivenNumberFree(final PFUserDO currentUser, final int sambaSIDNumber)
+  public static boolean isGivenNumberFree(final PFUserDO currentUser, final Integer sambaSIDNumber)
   {
+    if (sambaSIDNumber == null) {
+      // Nothing to check.
+      return true;
+    }
     final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
     final Collection<PFUserDO> allUsers = userGroupCache.getAllUsers();
     for (final PFUserDO user : allUsers) {
@@ -102,6 +106,9 @@ public class LdapSambaAccountsUtils
       ldapUserValues.setSambaSIDNumber(ldapUserValues.getUidNumber());
     } else {
       ldapUserValues.setSambaSIDNumber(getNextFreeSambaSIDNumber());
+    }
+    if (ldapSambaAccountsConfig.getDefaultSambaPrimaryGroupSID() != null) {
+      ldapUserValues.setSambaPrimaryGroupSIDNumber(ldapSambaAccountsConfig.getDefaultSambaPrimaryGroupSID());
     }
   }
 }

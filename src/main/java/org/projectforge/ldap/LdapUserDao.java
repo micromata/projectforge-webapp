@@ -112,7 +112,7 @@ public class LdapUserDao extends LdapDao<String, LdapUser>
       return false;
     }
     final LdapSambaAccountsConfig sambaAccountsConfig = ldapConfig.getSambaAccountsConfig();
-    return sambaAccountsConfig != null;
+    return sambaAccountsConfig != null && StringUtils.isNotBlank(sambaAccountsConfig.getSambaSIDPrefix()) == true;
   }
 
   public LdapUserDao()
@@ -226,6 +226,9 @@ public class LdapUserDao extends LdapDao<String, LdapUser>
       final String sambaSID = LdapUtils.getAttributeStringValue(attributes, "sambaSID");
       final Integer sambaSIDNumber = ldapConfig.getSambaAccountsConfig().getSambaSIDNumber(sambaSID);
       user.setSambaSIDNumber(sambaSIDNumber);
+      final String sambaPrimaryGroupSID = LdapUtils.getAttributeStringValue(attributes, "sambaPrimaryGroupSID");
+      final Integer sambaPrimaryGroupSIDNumber = ldapConfig.getSambaAccountsConfig().getSambaSIDNumber(sambaPrimaryGroupSID);
+      user.setSambaPrimaryGroupSIDNumber(sambaPrimaryGroupSIDNumber);
       user.setSambaNTPassword(LdapUtils.getAttributeStringValue(attributes, "sambaNTPassword"));
     }
     if (dn != null) {
@@ -529,6 +532,7 @@ public class LdapUserDao extends LdapDao<String, LdapUser>
     }
     if (modifySambaAccount == true) {
       createAndAddModificationItems(list, "sambaSID", ldapConfig.getSambaAccountsConfig().getSambaSID(user.getSambaSIDNumber()));
+      createAndAddModificationItems(list, "sambaPrimaryGroupSID", ldapConfig.getSambaAccountsConfig().getSambaPrimaryGroupSID(user.getSambaPrimaryGroupSIDNumber()));
     }
     return list;
   }

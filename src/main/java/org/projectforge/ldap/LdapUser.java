@@ -28,7 +28,7 @@ package org.projectforge.ldap;
  */
 public class LdapUser extends LdapPerson
 {
-  private Integer uidNumber, gidNumber, sambaSIDNumber;
+  private Integer uidNumber, gidNumber, sambaSIDNumber, sambaPrimaryGroupSIDNumber;
 
   private String loginShell, homeDirectory, sambaNTPassword;
 
@@ -103,6 +103,24 @@ public class LdapUser extends LdapPerson
   public LdapUser setSambaSIDNumber(final Integer sambaSIDNumber)
   {
     this.sambaSIDNumber = sambaSIDNumber;
+    return this;
+  }
+
+  /**
+   * @return the sambaPrimaryGroupSID
+   */
+  public Integer getSambaPrimaryGroupSIDNumber()
+  {
+    return sambaPrimaryGroupSIDNumber;
+  }
+
+  /**
+   * @param sambaPrimaryGroupSIDNumber the sambaPrimaryGroupSID to set
+   * @return this for chaining.
+   */
+  public LdapUser setSambaPrimaryGroupSIDNumber(final Integer sambaPrimaryGroupSIDNumber)
+  {
+    this.sambaPrimaryGroupSIDNumber = sambaPrimaryGroupSIDNumber;
     return this;
   }
 

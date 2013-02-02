@@ -27,6 +27,7 @@ import java.io.Serializable;
 
 import org.projectforge.common.NumberHelper;
 import org.projectforge.common.ReflectionToString;
+import org.projectforge.web.user.UserEditForm;
 
 /**
  * Bean used by ConfigXML (config.xml).
@@ -37,6 +38,8 @@ public class LdapSambaAccountsConfig implements Serializable
   private static final long serialVersionUID = -5861859244010004099L;
 
   private String sambaSIDPrefix = null;
+
+  private Integer defaultSambaPrimaryGroupSID = null;
 
   private String[] objectClasses = { "sambaSamAccount", "shadowAccount", "userSecurityInformation"};
 
@@ -84,6 +87,37 @@ public class LdapSambaAccountsConfig implements Serializable
   public LdapSambaAccountsConfig setSambaSIDPrefix(final String sambaSIDPrefix)
   {
     this.sambaSIDPrefix = sambaSIDPrefix;
+    return this;
+  }
+
+  /**
+   * @return the sambaPrimaryGroupSID containing the sambaSIDPrefix followed by "-" and given gid number.
+   */
+  public String getSambaPrimaryGroupSID(final Integer gid)
+  {
+    if (gid == null) {
+      return null;
+    }
+    final String prefix = sambaSIDPrefix != null ? sambaSIDPrefix : "S-000-000-000";
+    return prefix + "-" + gid;
+  }
+
+  /**
+   * This group SID is used for preselection of values in the {@link UserEditForm}.
+   * @return the defaultSambaPrimaryGroupSID
+   */
+  public Integer getDefaultSambaPrimaryGroupSID()
+  {
+    return defaultSambaPrimaryGroupSID;
+  }
+
+  /**
+   * @param defaultSambaPrimaryGroupSID the defaultSambaPrimaryGroupSID to set
+   * @return this for chaining.
+   */
+  public LdapSambaAccountsConfig setDefaultSambaPrimaryGroupSID(final Integer defaultSambaPrimaryGroupSID)
+  {
+    this.defaultSambaPrimaryGroupSID = defaultSambaPrimaryGroupSID;
     return this;
   }
 

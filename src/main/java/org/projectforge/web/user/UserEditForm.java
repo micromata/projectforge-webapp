@@ -137,6 +137,8 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
 
   private MinMaxNumberField<Integer> sambaSIDNumberField;
 
+  private MinMaxNumberField<Integer> sambaPrimaryGroupSIDNumberField;
+
   public UserEditForm(final UserEditPage parentPage, final PFUserDO data)
   {
     super(parentPage, data);
@@ -441,44 +443,64 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     if (posixConfigured == false && sambaConfigured == false) {
       return;
     }
-    final List<FormComponent< ? >> dependentLdapFormComponentsList = new LinkedList<FormComponent< ? >>();
-    {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.uidNumber"), getString("ldap.posixAccount"));
-      uidNumberField = new MinMaxNumberField<Integer>(fs.getTextFieldId(), new PropertyModel<Integer>(ldapUserValues, "uidNumber"), 1,
-          65535);
-      WicketUtils.setSize(uidNumberField, 6);
-      fs.add(uidNumberField);
-      fs.addHelpIcon(gridBuilder.getString("ldap.uidNumber.tooltip"));
-      dependentLdapFormComponentsList.add(uidNumberField);
-      if (ldapUserValues.isPosixValuesEmpty() == true) {
-        final Button createButton = newCreateButton(dependentLdapFormComponentsList, true, sambaConfigured);
-        fs.add(new SingleButtonPanel(fs.newChildId(), createButton, gridBuilder.getString("create"), SingleButtonPanel.GREY));
-        WicketUtils.addTooltip(createButton, gridBuilder.getString("ldap.uidNumber.createDefault.tooltip"));
+    final List<FormComponent< ? >> dependentLdapPosixFormComponentsList = new LinkedList<FormComponent< ? >>();
+    final List<FormComponent< ? >> dependentLdapSambaFormComponentsList = new LinkedList<FormComponent< ? >>();
+    if (posixConfigured == true) {
+      {
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.uidNumber"), getString("ldap.posixAccount"));
+        uidNumberField = new MinMaxNumberField<Integer>(fs.getTextFieldId(), new PropertyModel<Integer>(ldapUserValues, "uidNumber"), 1,
+            65535);
+        WicketUtils.setSize(uidNumberField, 6);
+        fs.add(uidNumberField);
+        fs.addHelpIcon(gridBuilder.getString("ldap.uidNumber.tooltip"));
+        dependentLdapPosixFormComponentsList.add(uidNumberField);
+        if (ldapUserValues.isPosixValuesEmpty() == true) {
+          final Button createButton = newCreateButton(dependentLdapPosixFormComponentsList, dependentLdapSambaFormComponentsList, true,
+              sambaConfigured);
+          fs.add(new SingleButtonPanel(fs.newChildId(), createButton, gridBuilder.getString("create"), SingleButtonPanel.GREY));
+          WicketUtils.addTooltip(createButton, gridBuilder.getString("ldap.uidNumber.createDefault.tooltip"));
+        }
+      }
+      {
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.gidNumber"), getString("ldap.posixAccount"));
+        gidNumberField = new MinMaxNumberField<Integer>(fs.getTextFieldId(), new PropertyModel<Integer>(ldapUserValues, "gidNumber"), 1,
+            65535);
+        WicketUtils.setSize(gidNumberField, 6);
+        fs.add(gidNumberField);
+        dependentLdapPosixFormComponentsList.add(gidNumberField);
       }
     }
-    if (posixConfigured == true) {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.gidNumber"), getString("ldap.posixAccount"));
-      gidNumberField = new MinMaxNumberField<Integer>(fs.getTextFieldId(), new PropertyModel<Integer>(ldapUserValues, "gidNumber"), 1,
-          65535);
-      WicketUtils.setSize(gidNumberField, 6);
-      fs.add(gidNumberField);
-      dependentLdapFormComponentsList.add(gidNumberField);
-    }
     final LdapSambaAccountsConfig ldapSambaAccountsConfig = ConfigXml.getInstance().getLdapConfig().getSambaAccountsConfig();
-    if (ldapSambaAccountsConfig != null && ldapSambaAccountsConfig.getSambaSIDPrefix() != null) {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.sambaSID"));
-      final DivTextPanel textPanel = new DivTextPanel(fs.newChildId(), ldapSambaAccountsConfig.getSambaSIDPrefix() + "-");
-      fs.add(textPanel);
-      sambaSIDNumberField = new MinMaxNumberField<Integer>(fs.getTextFieldId(),
-          new PropertyModel<Integer>(ldapUserValues, "sambaSIDNumber"), 1, 65535);
-      fs.add(sambaSIDNumberField);
-      sambaSIDNumberField.setOutputMarkupId(true);
-      WicketUtils.setSize(sambaSIDNumberField, 5);
-      fs.addHelpIcon(getString("ldap.sambaSID.tooltip"));
-      if (ldapUserValues.getSambaSIDNumber() == null) {
-        final Button createButton = newCreateButton(dependentLdapFormComponentsList, false, true);
-        fs.add(new SingleButtonPanel(fs.newChildId(), createButton, gridBuilder.getString("create"), SingleButtonPanel.GREY));
-        WicketUtils.addTooltip(createButton, gridBuilder.getString("ldap.sambaSIDNumber.createDefault.tooltip"));
+    if (sambaConfigured == true) {
+      {
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.sambaSID"));
+        final DivTextPanel textPanel = new DivTextPanel(fs.newChildId(), ldapSambaAccountsConfig.getSambaSIDPrefix() + "-");
+        fs.add(textPanel);
+        sambaSIDNumberField = new MinMaxNumberField<Integer>(fs.getTextFieldId(), new PropertyModel<Integer>(ldapUserValues,
+            "sambaSIDNumber"), 1, 65535);
+        fs.add(sambaSIDNumberField);
+        sambaSIDNumberField.setOutputMarkupId(true);
+        WicketUtils.setSize(sambaSIDNumberField, 5);
+        fs.addHelpIcon(getString("ldap.sambaSID.tooltip"));
+        dependentLdapSambaFormComponentsList.add(sambaSIDNumberField);
+        if (ldapUserValues.getSambaSIDNumber() == null) {
+          final Button createButton = newCreateButton(dependentLdapPosixFormComponentsList, dependentLdapSambaFormComponentsList, false,
+              true);
+          fs.add(new SingleButtonPanel(fs.newChildId(), createButton, gridBuilder.getString("create"), SingleButtonPanel.GREY));
+          WicketUtils.addTooltip(createButton, gridBuilder.getString("ldap.sambaSID.createDefault.tooltip"));
+        }
+      }
+      {
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.sambaPrimaryGroupSID"), getString("ldap.sambaAccount"));
+        final DivTextPanel textPanel = new DivTextPanel(fs.newChildId(), ldapSambaAccountsConfig.getSambaSIDPrefix() + "-");
+        fs.add(textPanel);
+        sambaPrimaryGroupSIDNumberField = new MinMaxNumberField<Integer>(fs.getTextFieldId(), new PropertyModel<Integer>(ldapUserValues,
+            "sambaPrimaryGroupSIDNumber"), 1, 65535);
+        fs.add(sambaPrimaryGroupSIDNumberField);
+        sambaPrimaryGroupSIDNumberField.setOutputMarkupId(true);
+        WicketUtils.setSize(sambaPrimaryGroupSIDNumberField, 5);
+        fs.addHelpIcon(getString("ldap.sambaPrimaryGroupSID.tooltip"));
+        dependentLdapSambaFormComponentsList.add(sambaPrimaryGroupSIDNumberField);
       }
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
@@ -489,67 +511,108 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
         final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.homeDirectory"), getString("ldap.posixAccount"));
         homeDirectoryField = new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(ldapUserValues, "homeDirectory"), 255);
         fs.add(homeDirectoryField);
-        dependentLdapFormComponentsList.add(homeDirectoryField);
+        dependentLdapPosixFormComponentsList.add(homeDirectoryField);
       }
       {
         final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.loginShell"), getString("ldap.posixAccount"));
         loginShellField = new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(ldapUserValues, "loginShell"), 100);
         fs.add(loginShellField);
-        dependentLdapFormComponentsList.add(loginShellField);
+        dependentLdapPosixFormComponentsList.add(loginShellField);
       }
-      if (ldapUserValues.isValuesEmpty() == true) {
-        for (final FormComponent< ? > component : dependentLdapFormComponentsList) {
+      if (ldapUserValues.isPosixValuesEmpty() == true) {
+        for (final FormComponent< ? > component : dependentLdapPosixFormComponentsList) {
           component.setEnabled(false);
         }
       }
     }
     if (sambaConfigured == true) {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.sambaNTPassword"), getString("ldap.sambaNTPassword.subtitle")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.sambaNTPassword"), getString("ldap.sambaNTPassword.subtitle"))
+          .setNoLabelFor();
       final DivTextPanel sambaNTPassword = new DivTextPanel(fs.newChildId(), "*****");
       fs.add(sambaNTPassword);
       fs.addHelpIcon(getString("ldap.sambaNTPassword.tooltip"));
-    }
-    add(new IFormValidator() {
-      @Override
-      public FormComponent< ? >[] getDependentFormComponents()
-      {
-        return dependentLdapFormComponentsList.toArray(new FormComponent[0]);
-      }
-
-      @Override
-      public void validate(final Form< ? > form)
-      {
-        final LdapUserValues values = new LdapUserValues();
-        values.setUidNumber(uidNumberField.getConvertedInput());
-        values.setGidNumber(gidNumberField.getConvertedInput());
-        values.setHomeDirectory(homeDirectoryField.getConvertedInput());
-        values.setLoginShell(loginShellField.getConvertedInput());
-        if (StringUtils.isBlank(data.getLdapValues()) == true && values.isValuesEmpty() == true) {
-          // Nothing to validate: all fields are zero and posix account wasn't set for this user before.
-          return;
+      if (ldapUserValues.isSambaValuesEmpty() == true) {
+        for (final FormComponent< ? > component : dependentLdapSambaFormComponentsList) {
+          component.setEnabled(false);
         }
-        if (values.getUidNumber() == null) {
-          uidNumberField.error(getLocalizedMessage(WebConstants.I18N_KEY_FIELD_REQUIRED, getString("ldap.uidNumber")));
-        } else {
-          if (LdapPosixAccountsUtils.isGivenNumberFree(data, values.getUidNumber()) == false) {
-            uidNumberField.error(getLocalizedMessage("ldap.uidNumber.alreadyInUse", LdapPosixAccountsUtils.getNextFreeUidNumber()));
+      }
+    }
+    if (posixConfigured == true) {
+      add(new IFormValidator() {
+        @Override
+        public FormComponent< ? >[] getDependentFormComponents()
+        {
+          return dependentLdapPosixFormComponentsList.toArray(new FormComponent[0]);
+        }
+
+        @Override
+        public void validate(final Form< ? > form)
+        {
+          final LdapUserValues values = new LdapUserValues();
+          values.setUidNumber(uidNumberField.getConvertedInput());
+          values.setGidNumber(gidNumberField.getConvertedInput());
+          values.setHomeDirectory(homeDirectoryField.getConvertedInput());
+          values.setLoginShell(loginShellField.getConvertedInput());
+          if (StringUtils.isBlank(data.getLdapValues()) == true && values.isPosixValuesEmpty() == true) {
+            // Nothing to validate: all fields are zero and posix account wasn't set for this user before.
+            return;
+          }
+          if (values.getUidNumber() == null) {
+            uidNumberField.error(getLocalizedMessage(WebConstants.I18N_KEY_FIELD_REQUIRED, getString("ldap.uidNumber")));
+          } else {
+            if (LdapPosixAccountsUtils.isGivenNumberFree(data, values.getUidNumber()) == false) {
+              uidNumberField.error(getLocalizedMessage("ldap.uidNumber.alreadyInUse", LdapPosixAccountsUtils.getNextFreeUidNumber()));
+            }
+          }
+          if (values.getGidNumber() == null) {
+            gidNumberField.error(getLocalizedMessage(WebConstants.I18N_KEY_FIELD_REQUIRED, getString("ldap.gidNumber")));
+          }
+          if (StringUtils.isBlank(values.getHomeDirectory()) == true) {
+            homeDirectoryField.error(getLocalizedMessage(WebConstants.I18N_KEY_FIELD_REQUIRED, getString("ldap.homeDirectory")));
+          }
+          if (StringUtils.isBlank(values.getLoginShell()) == true) {
+            loginShellField.error(getLocalizedMessage(WebConstants.I18N_KEY_FIELD_REQUIRED, getString("ldap.loginShell")));
           }
         }
-        if (values.getGidNumber() == null) {
-          gidNumberField.error(getLocalizedMessage(WebConstants.I18N_KEY_FIELD_REQUIRED, getString("ldap.gidNumber")));
+      });
+    }
+    if (sambaConfigured == true) {
+      add(new IFormValidator() {
+        @Override
+        public FormComponent< ? >[] getDependentFormComponents()
+        {
+          return dependentLdapSambaFormComponentsList.toArray(new FormComponent[0]);
         }
-        if (StringUtils.isBlank(values.getHomeDirectory()) == true) {
-          homeDirectoryField.error(getLocalizedMessage(WebConstants.I18N_KEY_FIELD_REQUIRED, getString("ldap.homeDirectory")));
+
+        @Override
+        public void validate(final Form< ? > form)
+        {
+          final LdapUserValues values = new LdapUserValues();
+          values.setSambaSIDNumber(sambaSIDNumberField.getConvertedInput());
+          values.setSambaPrimaryGroupSIDNumber(sambaPrimaryGroupSIDNumberField.getConvertedInput());
+          if (StringUtils.isBlank(data.getLdapValues()) == true && values.isSambaValuesEmpty() == true) {
+            // Nothing to validate: all fields are zero and posix account wasn't set for this user before.
+            return;
+          }
+          if (values.getSambaSIDNumber() == null) {
+            sambaSIDNumberField.error(getLocalizedMessage(WebConstants.I18N_KEY_FIELD_REQUIRED, getString("ldap.sambaSID")));
+          } else {
+            if (LdapSambaAccountsUtils.isGivenNumberFree(data, values.getSambaSIDNumber()) == false) {
+              sambaSIDNumberField.error(getLocalizedMessage("ldap.sambaSID.alreadyInUse",
+                  LdapSambaAccountsUtils.getNextFreeSambaSIDNumber()));
+            }
+          }
+          if (values.getSambaPrimaryGroupSIDNumber() != null && values.getSambaSIDNumber() == null) {
+            sambaSIDNumberField.error(getLocalizedMessage(WebConstants.I18N_KEY_FIELD_REQUIRED, getString("ldap.sambaSID")));
+          }
         }
-        if (StringUtils.isBlank(values.getLoginShell()) == true) {
-          loginShellField.error(getLocalizedMessage(WebConstants.I18N_KEY_FIELD_REQUIRED, getString("ldap.loginShell")));
-        }
-      }
-    });
+      });
+    }
   }
 
   @SuppressWarnings("serial")
-  private Button newCreateButton(final List<FormComponent< ? >> dependentLdapFormComponentsList, final boolean updatePosixAccount,
+  private Button newCreateButton(final List<FormComponent< ? >> dependentPosixLdapFormComponentsList,
+      final List<FormComponent< ? >> dependentSambaLdapFormComponentsList, final boolean updatePosixAccount,
       final boolean updateSambaAccount)
   {
     final AjaxButton createButton = new AjaxButton(SingleButtonPanel.WICKET_ID, this) {
@@ -562,19 +625,32 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
           if (updateSambaAccount == true) {
             LdapSambaAccountsUtils.setDefaultValues(ldapUserValues, data);
             sambaSIDNumberField.modelChanged();
-            target.add(sambaSIDNumberField);
+            sambaPrimaryGroupSIDNumberField.modelChanged();
+            target.add(sambaSIDNumberField, sambaPrimaryGroupSIDNumberField);
           }
         } else if (updateSambaAccount == true) {
           LdapSambaAccountsUtils.setDefaultValues(ldapUserValues, data);
           sambaSIDNumberField.modelChanged();
-          target.add(sambaSIDNumberField);
+          sambaPrimaryGroupSIDNumberField.modelChanged();
+          target.add(sambaSIDNumberField, sambaPrimaryGroupSIDNumberField);
         }
-        for (final FormComponent< ? > component : dependentLdapFormComponentsList) {
-          component.modelChanged();
-          component.setEnabled(true);
+        if (updatePosixAccount == true) {
+          for (final FormComponent< ? > component : dependentPosixLdapFormComponentsList) {
+            component.modelChanged();
+            component.setEnabled(true);
+          }
+        }
+        if (updateSambaAccount == true) {
+          for (final FormComponent< ? > component : dependentSambaLdapFormComponentsList) {
+            component.modelChanged();
+            component.setEnabled(true);
+          }
         }
         this.setVisible(false);
-        for (final FormComponent< ? > comp : dependentLdapFormComponentsList) {
+        for (final FormComponent< ? > comp : dependentPosixLdapFormComponentsList) {
+          target.add(comp);
+        }
+        for (final FormComponent< ? > comp : dependentSambaLdapFormComponentsList) {
           target.add(comp);
         }
         target.add(this, UserEditForm.this.feedbackPanel);
