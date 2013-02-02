@@ -654,7 +654,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
           target.add(comp);
         }
         target.add(this, UserEditForm.this.feedbackPanel);
-        target.appendJavaScript("hideAllTooltips();");
+        target.appendJavaScript("hideAllTooltips();"); // Otherwise a tooltip is left as zombie.
       }
 
       @Override
