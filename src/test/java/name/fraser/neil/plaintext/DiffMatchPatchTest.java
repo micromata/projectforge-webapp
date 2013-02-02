@@ -28,20 +28,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import name.fraser.neil.plaintext.diff_match_patch.Diff;
-import name.fraser.neil.plaintext.diff_match_patch.LinesToCharsResult;
-import name.fraser.neil.plaintext.diff_match_patch.Patch;
+import name.fraser.neil.plaintext.DiffMatchPatch.Diff;
+import name.fraser.neil.plaintext.DiffMatchPatch.LinesToCharsResult;
+import name.fraser.neil.plaintext.DiffMatchPatch.Patch;
 
-public class diff_match_patch_test extends TestCase {
+public class DiffMatchPatchTest extends TestCase {
 
-  private diff_match_patch dmp;
-  private diff_match_patch.Operation DELETE = diff_match_patch.Operation.DELETE;
-  private diff_match_patch.Operation EQUAL = diff_match_patch.Operation.EQUAL;
-  private diff_match_patch.Operation INSERT = diff_match_patch.Operation.INSERT;
+  private DiffMatchPatch dmp;
+  private DiffMatchPatch.Operation DELETE = DiffMatchPatch.Operation.DELETE;
+  private DiffMatchPatch.Operation EQUAL = DiffMatchPatch.Operation.EQUAL;
+  private DiffMatchPatch.Operation INSERT = DiffMatchPatch.Operation.INSERT;
 
   protected void setUp() {
     // Create an instance of the diff_match_patch object.
-    dmp = new diff_match_patch();
+    dmp = new DiffMatchPatch();
   }
 
 
@@ -890,10 +890,10 @@ public class diff_match_patch_test extends TestCase {
   private static String[] diff_rebuildtexts(LinkedList<Diff> diffs) {
     String[] text = {"", ""};
     for (Diff myDiff : diffs) {
-      if (myDiff.operation != diff_match_patch.Operation.INSERT) {
+      if (myDiff.operation != DiffMatchPatch.Operation.INSERT) {
         text[0] += myDiff.text;
       }
-      if (myDiff.operation != diff_match_patch.Operation.DELETE) {
+      if (myDiff.operation != DiffMatchPatch.Operation.DELETE) {
         text[1] += myDiff.text;
       }
     }
