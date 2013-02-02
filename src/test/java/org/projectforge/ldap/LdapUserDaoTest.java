@@ -279,14 +279,14 @@ public class LdapUserDaoTest
     final LdapUser initialLdapUser1 = PFUserDOConverter.convert(user);
     initialLdapUser1.setOrganizationalUnit(getPath());
     String sambaNTPassword = SmbEncrypt.NTUNICODEHash("qwert123");
-    initialLdapUser1.setSambaSIDNumber(1042).setSambaNTPassword(sambaNTPassword);
+    initialLdapUser1.setSambaSIDNumber(1042).setSambaPrimaryGroupSIDNumber(1001).setSambaNTPassword(sambaNTPassword);
     ldapUserDao.createOrUpdate(getPath(), initialLdapUser1);
     LdapUser ldapUser = ldapUserDao.findByUsername(uid, getPath());
     Assert.assertNotNull(ldapUser);
-    LdapTestUtils.assertSambaAccountValues(ldapUser, 1042, null);
+    LdapTestUtils.assertSambaAccountValues(ldapUser, 1042, 1001, null);
     ldapUserDao.changePassword(ldapUser, null, "qwert123");
     ldapUser = ldapUserDao.findByUsername(uid, getPath());
-    LdapTestUtils.assertSambaAccountValues(ldapUser, 1042, sambaNTPassword);
+    LdapTestUtils.assertSambaAccountValues(ldapUser, 1042, 1001, sambaNTPassword);
 
     uid = "test-user-47";
     user = new PFUserDO().setUsername(uid).setLastname("Reinhard").setFirstname("Kai").setOrganization("Micromata GmbH")
@@ -299,10 +299,10 @@ public class LdapUserDaoTest
     Assert.assertNotNull(ldapUser);
     LdapTestUtils.assertPosixAccountValues(ldapUser, null, null, null, null);
     sambaNTPassword = SmbEncrypt.NTUNICODEHash("hallo");
-    ldapUser.setSambaSIDNumber(1047).setSambaNTPassword(sambaNTPassword);
+    ldapUser.setSambaSIDNumber(1047).setSambaPrimaryGroupSIDNumber(1001).setSambaNTPassword(sambaNTPassword);
     ldapUserDao.createOrUpdate(getPath(), ldapUser);
     ldapUser = ldapUserDao.findByUsername(uid, getPath());
-    LdapTestUtils.assertSambaAccountValues(ldapUser, 1047, null);
+    LdapTestUtils.assertSambaAccountValues(ldapUser, 1047, 1001, null);
 
     // Delete user
     ldapUserDao.delete(initialLdapUser1);

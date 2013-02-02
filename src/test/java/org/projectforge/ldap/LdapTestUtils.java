@@ -78,9 +78,10 @@ public class LdapTestUtils
     Assert.assertEquals(loginShell, ldapUser.getLoginShell());
   }
 
-  public static void assertSambaAccountValues(final LdapUser ldapUser, final Integer sambaSIDNumber, final String sambaNTPassword)
+  public static void assertSambaAccountValues(final LdapUser ldapUser, final Integer sambaSIDNumber,  final Integer sambaPrimaryGroupSIDNumber, final String sambaNTPassword)
   {
     Assert.assertEquals(sambaSIDNumber, ldapUser.getSambaSIDNumber());
+    Assert.assertEquals(sambaPrimaryGroupSIDNumber, ldapUser.getSambaPrimaryGroupSIDNumber());
     if (sambaNTPassword == null) {
       Assert.assertNull(ldapUser.getSambaNTPassword());
     } else {
