@@ -86,6 +86,7 @@ public class ScriptingForm extends AbstractStandardForm<ScriptDO, ScriptingPage>
         return reportPathHeading;
       }
     }));
+    gridBuilder.newGridPanel();
     {
       // Upload dump file
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("file"), "*.xsl, *.jrxml");
