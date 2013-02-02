@@ -194,6 +194,7 @@ public class DiffTextPanel extends Panel
         }
       };
       label.add(behavior);
+      label.add(AttributeModifier.append("style", "cursor: pointer;"));
     }
   }
 
