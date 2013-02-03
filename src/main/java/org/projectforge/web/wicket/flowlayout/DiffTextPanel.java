@@ -28,7 +28,6 @@ import java.util.LinkedList;
 import name.fraser.neil.plaintext.DiffMatchPatch;
 import name.fraser.neil.plaintext.DiffMatchPatch.Diff;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxEventBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -77,8 +76,15 @@ public class DiffTextPanel extends Panel
       {
         if (prettyHtml == null) {
           final DiffMatchPatch diffMatchPatch = new DiffMatchPatch();
-          final LinkedList<Diff> diffs = diffMatchPatch.diff_main(StringUtils.defaultString(oldText.getObject()),
-              StringUtils.defaultString(newText.getObject()));
+          String newValue = newText.getObject();
+          if (newValue == null || "null".equals(newValue) == true) {
+            newValue = getString("label.null");
+          }
+          String oldValue = oldText.getObject();
+          if (oldValue == null || "null".equals(oldValue) == true) {
+            oldValue = getString("label.null");
+          }
+          final LinkedList<Diff> diffs = diffMatchPatch.diff_main(oldValue, newValue);
           diffMatchPatch.diff_cleanupSemantic(diffs);
           prettyHtml = getPrettyHtml(diffs);
         }
