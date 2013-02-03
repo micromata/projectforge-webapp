@@ -49,6 +49,8 @@ public class TextAreaPanel extends Panel implements ComponentWrapperPanel
 
   private int autogrowMaxHeight = -1;
 
+  private boolean rendered = false;
+
   public TextAreaPanel(final String id, final TextArea< ? > field)
   {
     this(id, field, false);
@@ -88,19 +90,21 @@ public class TextAreaPanel extends Panel implements ComponentWrapperPanel
    */
   public TextAreaPanel setAutogrow(final int minHeight, final int maxHeight)
   {
+    this.autogrow = true;
     this.autogrowMinHeight = minHeight;
     this.autogrowMaxHeight = maxHeight;
     return this;
   }
 
   /**
-   * @see org.apache.wicket.Component#onConfigure()
+   * @see org.apache.wicket.Component#onBeforeRender()
    */
   @Override
-  protected void onConfigure()
+  protected void onBeforeRender()
   {
-    super.onConfigure();
-    if (autogrow == true) {
+    super.onBeforeRender();
+    if (rendered == false && autogrow == true) {
+      // Doesn't work as part in onInitialize() for ModalDialogs. onInitialized is called before setAutogrow() is executed.
       field.add(AttributeModifier.append("class", "autogrow"));
       if (autogrowMinHeight > 0) {
         field.add(AttributeModifier.append("autogrowMinHeight", autogrowMinHeight));
@@ -109,6 +113,7 @@ public class TextAreaPanel extends Panel implements ComponentWrapperPanel
         field.add(AttributeModifier.append("autogrowMaxHeight", autogrowMaxHeight));
       }
     }
+    rendered = true;
   }
 
   /**
