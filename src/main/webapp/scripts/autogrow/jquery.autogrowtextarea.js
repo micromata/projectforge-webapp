@@ -19,7 +19,8 @@ jQuery.fn.autoGrow = function() {
 	return this.each(function() {
 
 		var createMirror = function(textarea) {
-			jQuery(textarea).after('<div class="autogrow-textarea-mirror"></div>');
+			if (jQuery(textarea).next().hasClass('autogrow-textarea-mirror') == false)
+				jQuery(textarea).after('<div class="autogrow-textarea-mirror"></div>');
 			return jQuery(textarea).next('.autogrow-textarea-mirror')[0];
 		}
 
@@ -50,6 +51,7 @@ jQuery.fn.autoGrow = function() {
 		var mirror = createMirror(this);
 		var minHeight = jQuery(this).attr("autogrowMinHeight"); // Kai Reinhard (KR)
 		var maxHeight = jQuery(this).attr("autogrowMaxHeight"); // (KR)
+		if (maxHeight) maxHeight *= 20; // maxHeight is pixel and Java parameter in em as well as minHeight.
 		
 		// Style the mirror
 		mirror.style.display = 'none';
