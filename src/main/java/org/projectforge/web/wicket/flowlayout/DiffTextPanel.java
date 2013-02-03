@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import name.fraser.neil.plaintext.DiffMatchPatch;
 import name.fraser.neil.plaintext.DiffMatchPatch.Diff;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxEventBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -76,7 +77,8 @@ public class DiffTextPanel extends Panel
       {
         if (prettyHtml == null) {
           final DiffMatchPatch diffMatchPatch = new DiffMatchPatch();
-          final LinkedList<Diff> diffs = diffMatchPatch.diff_main(oldText.getObject(), newText.getObject());
+          final LinkedList<Diff> diffs = diffMatchPatch.diff_main(StringUtils.defaultString(oldText.getObject()),
+              StringUtils.defaultString(newText.getObject()));
           diffMatchPatch.diff_cleanupSemantic(diffs);
           prettyHtml = getPrettyHtml(diffs);
         }
@@ -166,30 +168,30 @@ public class DiffTextPanel extends Panel
           {
             final FieldsetPanel fs = gridBuilder.newFieldset(getString("history.oldValue")).setLabelSide(false);
             final TextArea<String> textArea = new TextArea<String>(fs.getTextAreaId(), oldText);
-            fs.add(textArea);
+            fs.add(textArea).setAutogrow(1, 10);
             textArea.add(AttributeModifier.replace("onClick", "$(this).select();"));
           }
           {
             final FieldsetPanel fs = gridBuilder.newFieldset(getString("history.newValue")).setLabelSide(false);
             final TextArea<String> textArea = new TextArea<String>(fs.getTextAreaId(), newText);
-            fs.add(textArea);
+            fs.add(textArea).setAutogrow(1, 10);
             textArea.add(AttributeModifier.replace("onClick", "$(this).select();"));
           }
-          setLazyBinding(false);
         }
       };
       modalDialog.setBigWindow();
-      modalDialog.setLazyBinding(true);
+      modalDialog.setLazyBinding();
       parentPage.add(modalDialog);
       final AjaxEventBehavior behavior = new AjaxEventBehavior("onClick") {
         @Override
         protected void onEvent(final AjaxRequestTarget target)
         {
-          if (modalDialog.isLazyBinding() == true) {
+          if (modalDialog.isBound() == false) {
             // First call, have to initialize it.
             modalDialog.init();
+            target.add(modalDialog.getMainContainer());
+            modalDialog.bind(target);
           }
-          target.add(modalDialog.getMainContainer());
           modalDialog.open(target);
         }
       };
