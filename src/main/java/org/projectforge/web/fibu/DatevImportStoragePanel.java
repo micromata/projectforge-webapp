@@ -381,7 +381,8 @@ public class DatevImportStoragePanel extends Panel
           buf.append("=").append(delta.getNewValue());
           oldValue.append("=").append(delta.getOldValue());
         }
-        final DiffTextPanel diffTextPanel = new DiffTextPanel(cellRepeater.newChildId(), Model.of(buf.toString()), Model.of(oldValue.toString()));
+        final DiffTextPanel diffTextPanel = new DiffTextPanel("value", Model.of(buf.toString()), Model.of(oldValue
+            .toString()));
         addCell(cellRepeater, diffTextPanel, style);
       } else {
         addCell(cellRepeater, "", null);
@@ -404,7 +405,9 @@ public class DatevImportStoragePanel extends Panel
 
   private Component addCell(final RepeatingView cellRepeater, final Component comp, final String style)
   {
-    cellRepeater.add(comp);
+    final WebMarkupContainer cell = new WebMarkupContainer(cellRepeater.newChildId());
+    cellRepeater.add(cell);
+    cell.add(comp);
     if (style != null) {
       comp.add(AttributeModifier.replace("style", style));
     }
@@ -413,7 +416,7 @@ public class DatevImportStoragePanel extends Panel
 
   private Component addCell(final RepeatingView cellRepeater, final String value, final String style)
   {
-    final Component comp = new Label(cellRepeater.newChildId(), StringUtils.defaultString(value));
+    final Component comp = new Label("value", StringUtils.defaultString(value));
     return addCell(cellRepeater, comp, style);
   }
 
