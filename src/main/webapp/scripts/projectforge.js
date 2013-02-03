@@ -90,12 +90,18 @@ function preventBubble(e) {
 	
 	window.adaptSize = function adaptSize() {
 		$.each($('.controls'), function(){
-		   if($(this).parent().width() > 300){
-				$(this).css('width', $(this).parent().width()-150);
-			} else {
-				$(this).css('width', $(this).parent().width());
+			if($(this).parent().width() > 0) {
+				if($(this).parent().hasClass('vertical')){
+					$(this).css('width', $(this).parent().width()-10);
+				} else {
+					if($(this).parent().width() > 300){
+						$(this).css('width', $(this).parent().width()-160);
+					} else {
+						$(this).css('width', $(this).parent().width()-10);
+					}
+				}
 			}
-		 });
+		});
 	}
 })();
 
