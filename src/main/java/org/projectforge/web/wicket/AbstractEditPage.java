@@ -57,6 +57,7 @@ import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.task.TaskTreePage;
 import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.user.UserPropertyColumn;
+import org.projectforge.web.wicket.flowlayout.DiffTextPanel;
 
 public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends AbstractEditForm<O, ? >, D extends BaseDao<O>> extends
 AbstractSecuredPage implements IEditPage<O, D>
@@ -160,24 +161,8 @@ AbstractSecuredPage implements IEditPage<O, D>
       public void populateItem(final Item<ICellPopulator<DisplayHistoryEntry>> item, final String componentId,
           final IModel<DisplayHistoryEntry> rowModel)
       {
-        if (rowModel.getObject().getNewValue() == null) {
-          item.add(new Label(componentId, ""));
-        } else {
-          item.add(new Label(componentId, rowModel.getObject().getNewValue()));
-        }
-        cellItemListener.populateItem(item, componentId, rowModel);
-      }
-    });
-    columns.add(new CellItemListenerPropertyColumn<DisplayHistoryEntry>(getString("history.oldValue"), null, "oldValue", cellItemListener) {
-      @Override
-      public void populateItem(final Item<ICellPopulator<DisplayHistoryEntry>> item, final String componentId,
-          final IModel<DisplayHistoryEntry> rowModel)
-      {
-        if (rowModel.getObject().getOldValue() == null) {
-          item.add(new Label(componentId, ""));
-        } else {
-          item.add(new Label(componentId, rowModel.getObject().getOldValue()));
-        }
+        final DisplayHistoryEntry historyEntry = rowModel.getObject();
+        item.add(new DiffTextPanel(componentId, Model.of(historyEntry.getNewValue()), Model.of(historyEntry.getOldValue())));
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
