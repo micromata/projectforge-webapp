@@ -121,27 +121,30 @@ public abstract class ModalDialog extends Panel
   }
 
   /**
-   * If true then only the div panel of the modal dialog is rendered without buttons and content. Default is false. Don't forget to call
-   * setLazyBinding(false) at the end of your init method.
+   * Only the div panel of the modal dialog is rendered without buttons and content. Default is false.
    * @param lazyBinding the lazyBinding to set
    * @return this for chaining.
    */
-  public ModalDialog setLazyBinding(final boolean lazyBinding)
+  public ModalDialog setLazyBinding()
   {
-    this.lazyBinding = lazyBinding;
-    mainSubContainer.setVisible(!lazyBinding);
-    if (lazyBinding == false) {
-      actionButtons.render();
-    }
+    this.lazyBinding = true;
+    mainSubContainer.setVisible(false);
     return this;
   }
 
-  /**
-   * @return the lazyBinding
-   */
-  public boolean isLazyBinding()
+  public void bind(final AjaxRequestTarget target)
   {
-    return lazyBinding;
+    actionButtons.render();
+    mainSubContainer.setVisible(true);
+    target.appendJavaScript(getJavaScriptAction());
+  }
+
+  /**
+   * @return true if no lazy binding was used or bind() was already called.
+   */
+  public boolean isBound()
+  {
+    return mainSubContainer.isVisible();
   }
 
   /**
@@ -235,6 +238,14 @@ public abstract class ModalDialog extends Panel
   public void renderHead(final IHeaderResponse response)
   {
     super.renderHead(response);
+    if (lazyBinding == false) {
+      final String script = getJavaScriptAction();
+      response.render(OnDomReadyHeaderItem.forScript(script));
+    }
+  }
+
+  private String getJavaScriptAction()
+  {
     final StringBuffer script = new StringBuffer();
     script.append("$('#").append(getMainContainerMarkupId()).append("').modal({keyboard: ").append(escapeKeyEnabled)
     .append(", show: false });");
@@ -252,7 +263,7 @@ public abstract class ModalDialog extends Panel
       .append(
           ", .modal-body', resize: function( event, ui ) {$('.modal-body').css('max-height', '4000px');}, minWidth: 300, minHeight: 200 })");
     }
-    response.render(OnDomReadyHeaderItem.forScript(script));
+    return script.toString();
   }
 
   public ModalDialog open(final AjaxRequestTarget target)
