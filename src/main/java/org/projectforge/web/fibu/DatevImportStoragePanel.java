@@ -37,6 +37,7 @@ import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.common.ImportStatus;
 import org.projectforge.common.ImportStorage;
@@ -54,6 +55,7 @@ import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.PlainLabel;
+import org.projectforge.web.wicket.flowlayout.DiffTextPanel;
 import org.projectforge.web.wicket.flowlayout.IconPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 import org.springframework.util.CollectionUtils;
@@ -371,13 +373,16 @@ public class DatevImportStoragePanel extends Panel
       }
       if (element.getOldValue() != null && element.getPropertyChanges() != null) {
         final StringBuffer buf = new StringBuffer();
+        final StringBuffer oldValue = new StringBuffer();
         boolean first = true;
         for (final PropertyDelta delta : element.getPropertyChanges()) {
-          first = StringHelper.append(buf, first, delta.getPropertyName(), "; ");
-          buf.append("=").append(delta.getNewValue()).append(" [").append(getString("history.was")).append(": ")
-          .append(delta.getOldValue()).append("]");
+          StringHelper.append(buf, first, delta.getPropertyName(), "; ");
+          first = StringHelper.append(oldValue, first, delta.getPropertyName(), "; ");
+          buf.append("=").append(delta.getNewValue());
+          oldValue.append("=").append(delta.getOldValue());
         }
-        addCell(cellRepeater, buf.toString(), style);
+        final DiffTextPanel diffTextPanel = new DiffTextPanel(cellRepeater.newChildId(), Model.of(buf.toString()), Model.of(oldValue.toString()));
+        addCell(cellRepeater, diffTextPanel, style);
       } else {
         addCell(cellRepeater, "", null);
       }
@@ -397,14 +402,19 @@ public class DatevImportStoragePanel extends Panel
     }
   }
 
-  private Component addCell(final RepeatingView cellRepeater, final String value, final String style)
+  private Component addCell(final RepeatingView cellRepeater, final Component comp, final String style)
   {
-    final Component comp;
-    cellRepeater.add(comp = new Label(cellRepeater.newChildId(), StringUtils.defaultString(value)));
+    cellRepeater.add(comp);
     if (style != null) {
       comp.add(AttributeModifier.replace("style", style));
     }
     return comp;
+  }
+
+  private Component addCell(final RepeatingView cellRepeater, final String value, final String style)
+  {
+    final Component comp = new Label(cellRepeater.newChildId(), StringUtils.defaultString(value));
+    return addCell(cellRepeater, comp, style);
   }
 
   private Component addCell(final RepeatingView cellRepeater, final Integer value, final String style)
