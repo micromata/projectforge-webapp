@@ -106,8 +106,8 @@ public class GroupEditForm extends AbstractEditForm<GroupDO, GroupEditPage>
       fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(getData(), "description")));
     }
     if (Login.getInstance().hasExternalUsermanagementSystem() == true) {
-      WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("group.localGroup"), "localGroup", new PropertyModel<Boolean>(data,
-          "localGroup"), getString("group.localGroup.tooltip"));
+      gridBuilder.newFieldset(getString("group.localGroup")).addCheckBox(new PropertyModel<Boolean>(data,
+          "localGroup"), null).setTooltip(getString("group.localGroup.tooltip"));
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
     {

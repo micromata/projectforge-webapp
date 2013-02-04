@@ -86,10 +86,8 @@ import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.components.TimeZoneField;
-import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.RadioGroupPanel;
 
 import com.vaynberg.wicket.select2.Select2MultiChoice;
 
@@ -389,9 +387,9 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     createAuthenticationToken(gridBuilder, data, (UserDao) getBaseDao(), this);
     createJIRAUsername(gridBuilder, data);
     if (adminAccess == true) {
-      WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("user.hrPlanningEnabled"), "hrPlanning", new PropertyModel<Boolean>(data,
-          "hrPlanning"), getString("user.hrPlanningEnabled.tooltip"));
-      WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("user.activated"), "activated", new Model<Boolean>() {
+      gridBuilder.newFieldset(getString("user.hrPlanningEnabled")).addCheckBox(new PropertyModel<Boolean>(data,
+          "hrPlanning"), null).setTooltip(getString("user.hrPlanningEnabled.tooltip"));
+      gridBuilder.newFieldset(getString("user.activated")).addCheckBox(new Model<Boolean>() {
         @Override
         public Boolean getObject()
         {
@@ -403,7 +401,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
         {
           data.setDeactivated(!activated);
         };
-      }, getString("user.activated.tooltip"));
+      }, null).setTooltip(getString("user.activated.tooltip"));
       addPassswordFields();
     }
 
@@ -436,8 +434,8 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     gridBuilder.newGridPanel();
     gridBuilder.newFormHeading(getString("ldap"));
     gridBuilder.newSplitPanel(GridSize.COL50);
-    WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("user.localUser"), "localUser", new PropertyModel<Boolean>(data, "localUser"),
-        getString("user.localUser.tooltip"));
+    gridBuilder.newFieldset(getString("user.localUser")).addCheckBox(new PropertyModel<Boolean>(data,
+        "localUser"), null).setTooltip(getString("user.localUser.tooltip"));
     final boolean posixConfigured = LdapUserDao.isPosixAccountsConfigured();
     final boolean sambaConfigured = LdapUserDao.isSambaAccountsConfigured();
     if (posixConfigured == false && sambaConfigured == false) {
@@ -504,8 +502,8 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       }
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
-    WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("user.restrictedUser"), "restrictedUser", new PropertyModel<Boolean>(data,
-        "restrictedUser"), getString("user.restrictedUser.tooltip"));
+    gridBuilder.newFieldset(getString("user.restrictedUser")).addCheckBox(new PropertyModel<Boolean>(data,
+        "restrictedUser"), null).setTooltip(getString("user.restrictedUser.tooltip"));
     if (posixConfigured == true) {
       {
         final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.homeDirectory"), getString("ldap.posixAccount"));
@@ -790,12 +788,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       final String label = getString(right.getId().getI18nKey());
       final FieldsetPanel fs = gridBuilder.newFieldset(label);
       if (right.isBooleanType() == true) {
-        final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
-        final RadioGroupPanel<Boolean> radioGroup = new RadioGroupPanel<Boolean>(radioGroupPanel.newChildId(), "booleanValue",
-            new PropertyModel<Boolean>(rightVO, "booleanValue"));
-        radioGroupPanel.add(radioGroup);
-        WicketUtils.addYesNo(radioGroup);
-        fs.setLabelFor(radioGroup.getRadioGroup());
+        fs.addCheckBox(new PropertyModel<Boolean>(rightVO, "booleanValue"), null);
       } else {
         final LabelValueChoiceRenderer<UserRightValue> valueChoiceRenderer = new LabelValueChoiceRenderer<UserRightValue>(fs,
             availableValues);
