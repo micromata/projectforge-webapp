@@ -38,13 +38,11 @@ import org.projectforge.admin.UpdateEntry;
 import org.projectforge.admin.UpdatePreCheckStatus;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.AbstractForm;
-import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
-import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
-import org.projectforge.web.wicket.flowlayout.RadioGroupPanel;
 
 public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdatePage>
 {
@@ -75,30 +73,16 @@ public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdat
     gridBuilder.newGridPanel();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset("Show all");
-      final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
-      final RadioGroupPanel<Boolean> radioGroup = new RadioGroupPanel<Boolean>(radioGroupPanel.newChildId(), "showOldUpdateScripts",
-          new PropertyModel<Boolean>(this, "showOldUpdateScripts")) {
+      fs.add(new CheckBoxPanel(fs.newChildId(), new PropertyModel<Boolean>(this, "showOldUpdateScripts"), null, true) {
         /**
-         * @see org.projectforge.web.wicket.flowlayout.RadioGroupPanel#wantOnSelectionChangedNotifications()
+         * @see org.projectforge.web.wicket.flowlayout.CheckBoxPanel#onSelectionChanged(java.lang.Boolean)
          */
         @Override
-        protected boolean wantOnSelectionChangedNotifications()
-        {
-          return true;
-        }
-
-        /**
-         * @see org.projectforge.web.wicket.flowlayout.RadioGroupPanel#onSelectionChanged(java.lang.Object)
-         */
-        @Override
-        protected void onSelectionChanged(final Object newSelection)
+        protected void onSelectionChanged(final Boolean newSelection)
         {
           parentPage.refresh();
         }
-      };
-      radioGroupPanel.add(radioGroup);
-      WicketUtils.addYesNo(radioGroup);
-      fs.setLabelFor(radioGroup.getRadioGroup());
+      });
     }
     scripts = new WebMarkupContainer("scripts");
     add(scripts);
