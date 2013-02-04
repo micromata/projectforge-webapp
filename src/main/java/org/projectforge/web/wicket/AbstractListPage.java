@@ -53,7 +53,6 @@ import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.UserException;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
-import org.projectforge.web.wicket.flowlayout.IconPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 
 public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D extends org.projectforge.core.IDao< ? >, O> extends
@@ -322,7 +321,7 @@ AbstractSecuredPage implements ISelectCallerPage
         {
           redirectToEditPage(null);
         };
-      }, new IconPanel(ContentMenuEntryPanel.LABEL_ID, IconType.PLUS));
+      }, IconType.PLUS);
       newItemMenuEntry.setAccessKey(WebConstants.ACCESS_KEY_ADD).setTooltip(getString(WebConstants.ACCESS_KEY_ADD_TOOLTIP_TITLE),
           getString(WebConstants.ACCESS_KEY_ADD_TOOLTIP));
       contentMenuBarPanel.addMenuEntry(newItemMenuEntry);
