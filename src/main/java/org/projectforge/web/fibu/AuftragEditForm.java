@@ -81,7 +81,6 @@ import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
-import org.projectforge.web.wicket.flowlayout.RadioGroupPanel;
 import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 import org.projectforge.web.wicket.flowlayout.TextStyle;
 import org.projectforge.web.wicket.flowlayout.ToggleContainerPanel;
@@ -268,14 +267,8 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
     }
     {
       // email
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("email"));
-      final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
-      final RadioGroupPanel<Boolean> radioGroup = new RadioGroupPanel<Boolean>(radioGroupPanel.newChildId(), "sendEMailNotification",
-          new PropertyModel<Boolean>(this, "sendEMailNotification"));
-      radioGroupPanel.add(radioGroup);
-      WicketUtils.addYesNo(radioGroup);
-      fs.setLabelFor(radioGroup.getRadioGroup());
-      fs.addHelpIcon(getString("label.sendEMailNotification"));
+      gridBuilder.newFieldset(getString("email")).addCheckBox(new PropertyModel<Boolean>(this,
+          "sendEMailNotification"), null).setTooltip(getString("label.sendEMailNotification"));
     }
   }
 

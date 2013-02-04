@@ -31,16 +31,13 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.fibu.kost.Kost2ArtDO;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.components.RequiredMinMaxNumberField;
 import org.projectforge.web.wicket.converter.IntegerConverter;
-import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
-import org.projectforge.web.wicket.flowlayout.RadioGroupPanel;
 import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 
 public class Kost2ArtEditForm extends AbstractEditForm<Kost2ArtDO, Kost2ArtEditPage>
@@ -79,23 +76,12 @@ public class Kost2ArtEditForm extends AbstractEditForm<Kost2ArtDO, Kost2ArtEditP
     }
     {
       // Invoiced
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.fakturiert"));
-      final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
-      final RadioGroupPanel<Boolean> radioGroup = new RadioGroupPanel<Boolean>(radioGroupPanel.newChildId(), "invoiced",
-          new PropertyModel<Boolean>(data, "fakturiert"));
-      radioGroupPanel.add(radioGroup);
-      WicketUtils.addYesNo(radioGroup);
-      fs.setLabelFor(radioGroup.getRadioGroup());
+      gridBuilder.newFieldset(getString("fibu.fakturiert")).addCheckBox(new PropertyModel<Boolean>(data, "fakturiert"), null);
     }
     {
       // Invoiced
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost2art.projektStandard"));
-      final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
-      final RadioGroupPanel<Boolean> radioGroup = new RadioGroupPanel<Boolean>(radioGroupPanel.newChildId(), "projectStandard",
-          new PropertyModel<Boolean>(data, "projektStandard"));
-      radioGroupPanel.add(radioGroup);
-      WicketUtils.addYesNo(radioGroup);
-      fs.setLabelFor(radioGroup.getRadioGroup());
+      gridBuilder.newFieldset(getString("fibu.kost2art.projektStandard")).addCheckBox(new PropertyModel<Boolean>(data, "projektStandard"),
+          null);
     }
     {
       // Name

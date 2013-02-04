@@ -66,11 +66,9 @@ import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.converter.IntegerPercentConverter;
-import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
-import org.projectforge.web.wicket.flowlayout.RadioGroupPanel;
 import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 
 public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
@@ -378,14 +376,8 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
     }
     {
       // Protection of privacy:
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task.protectionOfPrivacy"));
-      final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
-      final RadioGroupPanel<Boolean> radioGroup = new RadioGroupPanel<Boolean>(radioGroupPanel.newChildId(), "protectionOfPrivacy",
-          new PropertyModel<Boolean>(data, "protectionOfPrivacy"));
-      radioGroupPanel.add(radioGroup);
-      WicketUtils.addYesNo(radioGroup);
-      fs.setLabelFor(radioGroup.getRadioGroup());
-      fs.addHelpIcon(getString("task.protectionOfPrivacy.tooltip"));
+      gridBuilder.newFieldset(getString("task.protectionOfPrivacy")).addCheckBox(new PropertyModel<Boolean>(data,
+          "protectionOfPrivacy"), null).setTooltip(getString("task.protectionOfPrivacy.tooltip"));
     }
 
     gridBuilder.newGridPanel();
