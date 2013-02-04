@@ -26,6 +26,7 @@ package org.projectforge.web.wicket.flowlayout;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
+import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.projectforge.web.wicket.WicketUtils;
@@ -37,7 +38,7 @@ import org.projectforge.web.wicket.WicketUtils;
  * 
  */
 @SuppressWarnings("serial")
-public class CheckBoxPanel extends Panel
+public class CheckBoxPanel extends Panel implements ComponentWrapperPanel
 {
   public static final String WICKET_ID = "checkBox";
 
@@ -50,7 +51,7 @@ public class CheckBoxPanel extends Panel
   /**
    * @param id
    * @param model
-   * @param labelString
+   * @param labelString If null then a classic checkbox is used.
    */
   public CheckBoxPanel(final String id, final IModel<Boolean> model, final String labelString)
   {
@@ -60,7 +61,7 @@ public class CheckBoxPanel extends Panel
   /**
    * @param id
    * @param model
-   * @param labelString
+   * @param labelString If null then a classic checkbox is used.
    * @param wantOnSelectionChangedNotifications if true then wantOnSelectionChangedNotifications method returns true.
    * @see CheckBox#wantOnSelectionChangedNotifications()
    */
@@ -102,7 +103,26 @@ public class CheckBoxPanel extends Panel
    */
   public CheckBoxPanel setTooltip(final String tooltip)
   {
-    WicketUtils.addTooltip(label, tooltip);
+    if (label.isVisible() == true) {
+      WicketUtils.addTooltip(label, tooltip);
+    } else {
+      WicketUtils.addTooltip(checkBox, tooltip);
+    }
+    return this;
+  }
+
+  /**
+   * Sets tool-tip for the label.
+   * @param tooltip
+   * @return this for chaining.
+   */
+  public CheckBoxPanel setTooltip(final String title, final String text)
+  {
+    if (label.isVisible() == true) {
+      WicketUtils.addTooltip(label, title, text);
+    } else {
+      WicketUtils.addTooltip(checkBox, title, text);
+    }
     return this;
   }
 
@@ -113,7 +133,11 @@ public class CheckBoxPanel extends Panel
    */
   public CheckBoxPanel setWarning()
   {
-    label.add(AttributeModifier.append("class", "warning"));
+    if (label.isVisible() == true) {
+      label.add(AttributeModifier.append("class", "warning"));
+    } else {
+      checkBox.add(AttributeModifier.append("class", "warning"));
+    }
     return this;
   }
 
@@ -141,5 +165,24 @@ public class CheckBoxPanel extends Panel
   {
     checkBox.setDefaultModelObject(selected);
     return this;
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel#getComponentOutputId()
+   */
+  @Override
+  public String getComponentOutputId()
+  {
+    checkBox.setOutputMarkupId(true);
+    return checkBox.getMarkupId();
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel#getFormComponent()
+   */
+  @Override
+  public FormComponent< ? > getFormComponent()
+  {
+    return checkBox;
   }
 }
