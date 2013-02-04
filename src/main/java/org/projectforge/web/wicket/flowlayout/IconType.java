@@ -31,6 +31,7 @@ public enum IconType
 {
   ABONNEMENT("globe"), //
   ALERT("warning-sign"), //
+  COG("cog"), //
   REFRESH("refresh"), //
   //CIRCLE_ARROW_EAST("question-sign"), //
   //CIRCLE_ARROW_WEST("question-sign"), //
