@@ -9,18 +9,7 @@
         [main menu]
         </wicket:panel>
     </div>
-    <div class="contentMenus" wicket:id="contentMenus">
-      <div class="contentMenu" wicket:id="contentMenu">
-        <wicket:container wicket:id="contentMenuRepeater">
-          [menu entries]
-          </wicket:container>
-      </div>
-      <div class="contentRightMenu" wicket:id="contentRightMenu">
-        <wicket:container wicket:id="contentRightMenuRepeater">
-          [menu entries]
-          </wicket:container>
-      </div>
-    </div>
+    <wicket:container wicket:id="menuBar">[Context dependent menu]</wicket:container>
     <div wicket:id="alertMessageContainer" class="global-alert-message">
       <i class="icon-bell icon-white"></i> <span wicket:id="alertMessage">This is an Alert!</span>
     </div>

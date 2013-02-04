@@ -27,6 +27,7 @@ import java.io.Serializable;
 
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.ResourceModel;
+import org.projectforge.web.core.MenuBarPanel;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 /**
@@ -43,27 +44,30 @@ public abstract class AbstractReindexTopRightMenu implements Serializable
   protected abstract String getString(final String i18nKey);
 
   @SuppressWarnings("serial")
-  protected AbstractReindexTopRightMenu(final AbstractSecuredPage page, final boolean enableFullReindex)
+  protected AbstractReindexTopRightMenu(final MenuBarPanel contentMenuBar, final boolean enableFullReindex)
   {
-    final ContentMenuEntryPanel  reindex = new ContentMenuEntryPanel(page.getNewContentRightMenuChildId(), new Link<Object>("link") {
+    final ContentMenuEntryPanel extendedMenu = contentMenuBar.ensureAndAddExtendetMenuEntry();
+    final ContentMenuEntryPanel reindex = new ContentMenuEntryPanel(extendedMenu.newSubMenuChildId(), new Link<Object>("link") {
       @Override
       public void onClick()
       {
         rebuildDatabaseIndex(true);
       };
     }, getString("menu.reindexNewestDatabaseEntries"));
-    reindex.setTooltip(new ResourceModel("menu.reindexNewestDatabaseEntries.tooltip.title"), new ResourceModel("menu.reindexNewestDatabaseEntries.tooltip.content"));
-    page.addContentRightMenuEntry(reindex);
+    reindex.setTooltip(new ResourceModel("menu.reindexNewestDatabaseEntries.tooltip.title"), new ResourceModel(
+        "menu.reindexNewestDatabaseEntries.tooltip.content"));
+    extendedMenu.addSubMenuEntry(reindex);
     if (enableFullReindex == true) {
-      final ContentMenuEntryPanel  reindexAll = new ContentMenuEntryPanel(page.getNewContentRightMenuChildId(), new Link<Object>("link") {
+      final ContentMenuEntryPanel reindexAll = new ContentMenuEntryPanel(extendedMenu.newSubMenuChildId(), new Link<Object>("link") {
         @Override
         public void onClick()
         {
           rebuildDatabaseIndex(false);
         };
       }, getString("menu.reindexAllDatabaseEntries"));
-      reindexAll.setTooltip(new ResourceModel("menu.reindexAllDatabaseEntries.tooltip.title"), new ResourceModel("menu.reindexAllDatabaseEntries.tooltip.content"));
-      page.addContentRightMenuEntry(reindexAll);
+      reindexAll.setTooltip(new ResourceModel("menu.reindexAllDatabaseEntries.tooltip.title"), new ResourceModel(
+          "menu.reindexAllDatabaseEntries.tooltip.content"));
+      extendedMenu.addSubMenuEntry(reindexAll);
     }
   }
 }

@@ -29,28 +29,18 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.projectforge.web.core.MenuBarPanel;
 import org.projectforge.web.core.NavTopPanel;
 import org.projectforge.web.dialog.ModalDialog;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
-import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
 
 /** All pages with required login should be derived from this page. */
 public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
 {
   private static final long serialVersionUID = -8721451198050398835L;
 
-  /**
-   * List to create content menu in the desired order before creating the RepeatingView.
-   */
-  protected MyComponentsRepeater<ContentMenuEntryPanel> contentMenu;
-
-  protected WebMarkupContainer contentMenuContainer, contentRightMenuContainer;
-
-  /**
-   * List to create content menu in the desired order before creating the RepeatingView.
-   */
-  protected MyComponentsRepeater<ContentMenuEntryPanel> contentRightMenu;
+  protected MenuBarPanel contentMenuBarPanel;
 
   /**
    * If set then return after save, update or cancel to this page. If not given then return to given list page.
@@ -68,35 +58,8 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
     final NavTopPanel topMenuPanel = new NavTopPanel("topMenu", userXmlPreferencesCache, accessChecker);
     body.add(topMenuPanel);
     topMenuPanel.init(this);
-    final WebMarkupContainer contentMenusContainer = new WebMarkupContainer("contentMenus") {
-      @Override
-      public boolean isVisible()
-      {
-        return contentMenuContainer.isVisible() || contentRightMenuContainer.isVisible();
-      };
-    };
-    body.add(contentMenusContainer);
-    contentMenuContainer = new WebMarkupContainer("contentMenu") {
-      @Override
-      public boolean isVisible()
-      {
-        return contentMenu.hasEntries() == true;
-      };
-    };
-    contentMenusContainer.add(contentMenuContainer);
-    contentMenu = new MyComponentsRepeater<ContentMenuEntryPanel>("contentMenuRepeater");
-    contentMenuContainer.add(contentMenu.getRepeatingView());
-    contentRightMenuContainer = new WebMarkupContainer("contentRightMenu") {
-      @Override
-      public boolean isVisible()
-      {
-        return contentRightMenu.hasEntries() == true;
-      };
-    };
-    contentMenusContainer.add(contentRightMenuContainer);
-    contentRightMenu = new MyComponentsRepeater<ContentMenuEntryPanel>("contentRightMenuRepeater");
-    contentRightMenuContainer.add(contentRightMenu.getRepeatingView());
-
+    contentMenuBarPanel = new MenuBarPanel("menuBar");
+    body.add(contentMenuBarPanel);
     final Model<String> alertMessageModel = new Model<String>() {
       @Override
       public String getObject()
@@ -140,31 +103,14 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
 
   protected void addContentMenuEntry(final ContentMenuEntryPanel panel)
   {
-    this.contentMenu.add(panel);
+    this.contentMenuBarPanel.add(panel);
   }
 
   protected String getNewContentMenuChildId()
   {
-    return this.contentMenu.newChildId();
+    return this.contentMenuBarPanel.newChildId();
   }
 
-  protected void addContentRightMenuEntry(final ContentMenuEntryPanel panel)
-  {
-    this.contentRightMenu.add(panel);
-  }
-
-  protected String getNewContentRightMenuChildId()
-  {
-    return this.contentRightMenu.newChildId();
-  }
-
-  @Override
-  protected void onBeforeRender()
-  {
-    contentMenu.render();
-    contentRightMenu.render();
-    super.onBeforeRender();
-  }
 
   /**
    * @return This page as link with the page parameters of this page.

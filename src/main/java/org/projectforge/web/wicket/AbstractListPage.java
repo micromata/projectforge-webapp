@@ -53,6 +53,8 @@ import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.UserException;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
+import org.projectforge.web.wicket.flowlayout.IconPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
 
 public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D extends org.projectforge.core.IDao< ? >, O> extends
 AbstractSecuredPage implements ISelectCallerPage
@@ -219,7 +221,8 @@ AbstractSecuredPage implements ISelectCallerPage
    * @param isDeleted Is this entry deleted? Then the deleted style will be added.
    * @return
    */
-  protected static void appendCssClasses(final Item<?> item, final Serializable rowDataId, final Serializable highlightedRowId, final boolean isDeleted)
+  protected static void appendCssClasses(final Item< ? > item, final Serializable rowDataId, final Serializable highlightedRowId,
+      final boolean isDeleted)
   {
     if (rowDataId == null) {
       return;
@@ -313,16 +316,16 @@ AbstractSecuredPage implements ISelectCallerPage
     body.add(form);
     form.init();
     if (isSelectMode() == false && (accessChecker.isDemoUser() == true || getBaseDao().hasInsertAccess(getUser()) == true)) {
-      newItemMenuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
+      newItemMenuEntry = new ContentMenuEntryPanel(contentMenuBarPanel.newChildId(), new Link<Object>("link") {
         @Override
         public void onClick()
         {
           redirectToEditPage(null);
         };
-      }, getString("add"));
+      }, new IconPanel(ContentMenuEntryPanel.LABEL_ID, IconType.PLUS));
       newItemMenuEntry.setAccessKey(WebConstants.ACCESS_KEY_ADD).setTooltip(getString(WebConstants.ACCESS_KEY_ADD_TOOLTIP_TITLE),
           getString(WebConstants.ACCESS_KEY_ADD_TOOLTIP));
-      addContentMenuEntry(newItemMenuEntry);
+      contentMenuBarPanel.addMenuEntry(newItemMenuEntry);
     }
     final Label hintQuickSelectLabel = new Label("hintQuickSelect", new Model<String>(getString("hint.selectMode.quickselect"))) {
       @Override
@@ -332,26 +335,26 @@ AbstractSecuredPage implements ISelectCallerPage
       }
     };
     if (isSupportsMassUpdate() == true) {
-      massUpdateMenuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
+      massUpdateMenuEntry = new ContentMenuEntryPanel(contentMenuBarPanel.newChildId(), new Link<Object>("link") {
         @Override
         public void onClick()
         {
           setMassUpdateMode(true);
         };
       }, getString("massUpdate"));
-      addContentMenuEntry(massUpdateMenuEntry);
+      contentMenuBarPanel.addMenuEntry(massUpdateMenuEntry);
 
       ExternalLink link = new ExternalLink("link", "#");
       link.add(AttributeModifier.replace("onclick", "javascript:selectAll();"));
-      selectAllMenuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), link, getString("selectAll"));
+      selectAllMenuEntry = new ContentMenuEntryPanel(contentMenuBarPanel.newChildId(), link, getString("selectAll"));
       selectAllMenuEntry.setVisible(false);
-      addContentMenuEntry(selectAllMenuEntry);
+      contentMenuBarPanel.addMenuEntry(selectAllMenuEntry);
 
       link = new ExternalLink("link", "#");
       link.add(AttributeModifier.replace("onclick", "javascript:deselectAll();"));
-      deselectAllMenuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), link, getString("deselectAll"));
+      deselectAllMenuEntry = new ContentMenuEntryPanel(contentMenuBarPanel.newChildId(), link, getString("deselectAll"));
       deselectAllMenuEntry.setVisible(false);
-      addContentMenuEntry(deselectAllMenuEntry);
+      contentMenuBarPanel.addMenuEntry(deselectAllMenuEntry);
     }
     form.add(hintQuickSelectLabel);
     addTopRightMenu();
@@ -510,7 +513,7 @@ AbstractSecuredPage implements ISelectCallerPage
   protected void addTopRightMenu()
   {
     if (isSelectMode() == false && ((getBaseDao() instanceof BaseDao< ? >) || providesOwnRebuildDatabaseIndex() == true)) {
-      new AbstractReindexTopRightMenu(this, accessChecker.isLoggedInUserMemberOfAdminGroup()) {
+      new AbstractReindexTopRightMenu(this.contentMenuBarPanel, accessChecker.isLoggedInUserMemberOfAdminGroup()) {
         @Override
         protected void rebuildDatabaseIndex(final boolean onlyNewest)
         {
