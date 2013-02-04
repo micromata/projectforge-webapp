@@ -32,6 +32,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.flowlayout.IconPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
 import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
 
 /**
@@ -86,11 +87,11 @@ public class ContentMenuEntryPanel extends Panel
     this.label = label;
   }
 
-  public ContentMenuEntryPanel(final String id, final AbstractLink link, final IconPanel iconPanel)
+  public ContentMenuEntryPanel(final String id, final AbstractLink link, final IconType iconType)
   {
     this(id);
     this.link = link;
-    labelComponent = iconPanel;
+    labelComponent = new IconPanel(LABEL_ID, iconType);
   }
 
   public ContentMenuEntryPanel(final String id, final String label)
@@ -100,10 +101,10 @@ public class ContentMenuEntryPanel extends Panel
     this.label = label;
   }
 
-  public ContentMenuEntryPanel(final String id, final IconPanel iconPanel)
+  public ContentMenuEntryPanel(final String id, final IconType iconType)
   {
     this(id);
-    labelComponent = iconPanel;
+    labelComponent = new IconPanel(LABEL_ID, iconType);
   }
 
   public String newSubMenuChildId()
