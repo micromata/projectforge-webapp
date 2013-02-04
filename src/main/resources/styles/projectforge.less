@@ -13,6 +13,25 @@
 tr.withContextMenu{
 	cursor:pointer;
 }
+table.dataview tbody tr.even td,
+table.dataview thead tr.even th,
+table tbody tr.even td, 
+table tbody tr.even th {
+	border-top: none;
+	border-bottom: none;
+	background: #F0F0F0;
+}
+table.dataview tbody tr.even:hover td,
+table.dataview tbody tr.even:hover th{
+	background:#d9dfe1;
+}
+
+table tbody tr.odd td, 
+table tbody tr.odd th {
+	border-top: none;
+	border-bottom: none;
+	background: #FFFFFF;
+}
 div.controls input, div.controls textarea {
 	padding-left: 4px;
 	padding-right: 4px;
@@ -71,11 +90,12 @@ margin-top: 6px;
 }
 
 // Links rendered as pills
-ul.nav nav-pills{
+ul.nav-pills{
 	margin-left:6px;
+	margin-bottom:4px;
 }
 ul.nav-pills > li{
-	margin-left:4px;
+	margin-right:4px;
 }
 ul.nav-pills > li > a {
   padding-top: 2px;
@@ -99,7 +119,6 @@ ul.nav-pills > .active > a:hover {
   color: @white;
   background-color: @linkColor;
 }
-
 
 /* Submenu nach unten ausklappen*/
 @media (max-width: 979px) {
