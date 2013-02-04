@@ -65,7 +65,13 @@ public class MenuBarPanel extends Panel
 
   public MenuBarPanel addMenuEntry(final ContentMenuEntryPanel menuEntry)
   {
-    contentMenu.add(menuEntry);
+    if (this.extendedMenuEntry != null) {
+      // Don't append entry after extended menu (should be the last entry).
+      final int size = contentMenu.size();
+      contentMenu.add(size - 1, menuEntry);
+    } else {
+      contentMenu.add(menuEntry);
+    }
     return this;
   }
 
@@ -73,7 +79,7 @@ public class MenuBarPanel extends Panel
   {
     if (extendedMenuEntry == null) {
       extendedMenuEntry = new ContentMenuEntryPanel(newChildId(), new IconPanel(ContentMenuEntryPanel.LABEL_ID, IconType.COG));
-      addMenuEntry(extendedMenuEntry);
+      contentMenu.add(extendedMenuEntry);
     }
     return extendedMenuEntry;
   }
