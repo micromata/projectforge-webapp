@@ -26,6 +26,7 @@ package org.projectforge.web.wicket;
 import java.util.MissingResourceException;
 
 import org.apache.commons.lang.ClassUtils;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.Page;
@@ -220,6 +221,36 @@ public class WicketPageTestBase extends TestBase
     return component[0];
   }
 
+  /**
+   * Searches ContentMenuEntryPanels.
+   * @param container
+   * @param accessKey
+   * @return Found component with the given label or null if no such component found.
+   * @see FormComponent#getModelObject()
+   * @see LabeledWebMarkupContainer#getLabel()
+   * @see ContentMenuEntryPanel#getLabel()
+   */
+  public Component findComponentByAccessKey(final MarkupContainer container, final char accessKey)
+  {
+    final Component[] component = new Component[1];
+    container.visitChildren(new IVisitor<Component, Void>() {
+      @Override
+      public void component(final Component object, final IVisit<Void> visit)
+      {
+        if (object instanceof AbstractLink) {
+          final AbstractLink link = (AbstractLink) object;
+          final AttributeModifier attrMod = WicketUtils.getAttributeModifier(link, "accesskey");
+          if (attrMod == null || attrMod.toString().contains("object=[n]") == false) {
+            return;
+          }
+          component[0] = object;
+          visit.stop();
+        }
+      }
+    });
+    return component[0];
+  }
+
   private boolean labelEquals(final String label, final String l1, final String l2)
   {
     if (label == null) {
@@ -243,6 +274,18 @@ public class WicketPageTestBase extends TestBase
   public Component findComponentByLabel(final WicketTester tester, final String containerPath, final String label)
   {
     return findComponentByLabel((MarkupContainer) tester.getComponentFromLastRenderedPage(containerPath), label);
+  }
+
+  /**
+   * 
+   * @param tester WicketTester with the last rendered page.
+   * @param containerPath path of the container to search in.
+   * @param label
+   * @see #findComponentByLabel(MarkupContainer, String)
+   */
+  public Component findComponentByAccessKey(final WicketTester tester, final String containerPath, final char accessKey)
+  {
+    return findComponentByAccessKey((MarkupContainer) tester.getComponentFromLastRenderedPage(containerPath), accessKey);
   }
 
   /**

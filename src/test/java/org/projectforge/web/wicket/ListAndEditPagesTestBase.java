@@ -40,11 +40,9 @@ public abstract class ListAndEditPagesTestBase extends WicketPageTestBase
 
   protected final String KEY_EDITPAGE_BUTTON_MARK_AS_DELETED = "markAsDeleted";
 
-  protected final String KEY_LISTPAGE_BUTTON_ADD = "add";
-
   protected final String KEY_LISTPAGE_SEARCH_INPUT_FIELD = "searchFilter";
 
-  protected final String PATH_CONTENT_MENU_REPEATER = "body:contentMenus:contentMenu:contentMenuRepeater";
+  protected final String PATH_CONTENT_MENU_REPEATER = "body:menuBar:repeater";
 
   protected final String PATH_EDITPAGE_FORM = "body:form";
 
@@ -52,6 +50,7 @@ public abstract class ListAndEditPagesTestBase extends WicketPageTestBase
 
   protected final String PATH_LISTPAGE_TABLE = "body:form:table";
 
+  @SuppressWarnings("unchecked")
   @Test
   public void baseTests()
   {
@@ -62,7 +61,7 @@ public abstract class ListAndEditPagesTestBase extends WicketPageTestBase
       Assert.assertEquals(getNumberOfExistingListElements().intValue(), table.getRowCount());
     }
     // Now, add a new element:
-    tester.clickLink(findComponentByLabel(tester, PATH_CONTENT_MENU_REPEATER, KEY_LISTPAGE_BUTTON_ADD));
+    tester.clickLink(findComponentByAccessKey(tester, PATH_CONTENT_MENU_REPEATER, 'n'));
     tester.assertRenderedPage(getEditPageClass());
 
     // Need new page to initialize model:

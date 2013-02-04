@@ -51,7 +51,7 @@ public class AddressPagesTest extends ListAndEditPagesTestBase
     tester.assertRenderedPage(AddressListPage.class);
 
     // Now, add a new address:
-    tester.clickLink(findComponentByLabel(tester, PATH_CONTENT_MENU_REPEATER, KEY_LISTPAGE_BUTTON_ADD));
+    tester.clickLink(findComponentByAccessKey(tester, PATH_CONTENT_MENU_REPEATER, 'n'));
     tester.assertRenderedPage(AddressEditPage.class);
     // Need new page to initialize model:
     final AddressEditPage editPage = new AddressEditPage(new PageParameters());
