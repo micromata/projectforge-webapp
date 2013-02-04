@@ -38,17 +38,14 @@ import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.components.TimeZonePanel;
 import org.projectforge.web.wicket.converter.BigDecimalPercentConverter;
-import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
-import org.projectforge.web.wicket.flowlayout.RadioGroupPanel;
 import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 
 public class ConfigurationEditForm extends AbstractEditForm<ConfigurationDO, ConfigurationEditPage>
@@ -101,11 +98,7 @@ public class ConfigurationEditForm extends AbstractEditForm<ConfigurationDO, Con
       } else if (data.getConfigurationType() == ConfigurationType.TEXT) {
         fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "stringValue")));
       } else if (data.getConfigurationType() == ConfigurationType.BOOLEAN) {
-        final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
-        final RadioGroupPanel<Boolean> radioGroup = new RadioGroupPanel<Boolean>(radioGroupPanel.newChildId(), "yes",
-            new PropertyModel<Boolean>(data, "booleanValue"));
-        radioGroupPanel.add(radioGroup);
-        WicketUtils.addYesNo(radioGroup);
+        fs.addCheckBox(new PropertyModel<Boolean>(data, "booleanValue"), null);
       } else if (data.getConfigurationType() == ConfigurationType.TIME_ZONE) {
         fs.add(new TimeZonePanel(fs.newChildId(), new PropertyModel<TimeZone>(data, "timeZone")));
       } else if (data.getConfigurationType() == ConfigurationType.TASK) {
