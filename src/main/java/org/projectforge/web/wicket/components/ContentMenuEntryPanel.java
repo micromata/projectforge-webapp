@@ -207,7 +207,7 @@ public class ContentMenuEntryPanel extends Panel
   @Override
   public boolean isVisible()
   {
-    return this.hasLink == true || subMenu.hasEntries();
+    return super.isVisible() && (this.hasLink == true || subMenu.hasEntries());
   }
 
   /**
