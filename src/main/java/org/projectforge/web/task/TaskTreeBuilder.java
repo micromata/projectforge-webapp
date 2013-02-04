@@ -49,6 +49,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.OddEvenItem;
+import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -174,28 +175,23 @@ public class TaskTreeBuilder implements Serializable
     };
     final List<IColumn<TaskNode, String>> columns = new ArrayList<IColumn<TaskNode, String>>();
 
-    columns.add(new CellItemListenerPropertyColumn<TaskNode>(Model.of(""), null, "id", cellItemListener) {
-      @Override
-      public void populateItem(final Item<ICellPopulator<TaskNode>> item, final String componentId, final IModel<TaskNode> rowModel)
-      {
-        final TaskNode taskNode = rowModel.getObject();
-        if (selectMode == false) {
-          item.add(new ListSelectActionPanel(componentId, rowModel, TaskEditPage.class, taskNode.getId(), parentPage, ""));
-        } else {
-          item.add(new ListSelectActionPanel(componentId, rowModel, caller, selectProperty, taskNode.getId(), ""));
-        }
-        cellItemListener.populateItem(item, componentId, rowModel);
-        AbstractListPage.addRowClick(item);
-      }
-    });
     columns.add(new TreeColumn<TaskNode, String>(new ResourceModel("task")) {
       @Override
       public void populateItem(final Item<ICellPopulator<TaskNode>> cellItem, final String componentId, final IModel<TaskNode> rowModel)
       {
+        final RepeatingView view = new RepeatingView(componentId);
+        cellItem.add(view);
+        final TaskNode taskNode = rowModel.getObject();
+        if (selectMode == false) {
+          view.add(new ListSelectActionPanel(view.newChildId(), rowModel, TaskEditPage.class, taskNode.getId(), parentPage, ""));
+        } else {
+          view.add(new ListSelectActionPanel(view.newChildId(), rowModel, caller, selectProperty, taskNode.getId(), ""));
+        }
+        AbstractListPage.addRowClick(cellItem);
         final NodeModel<TaskNode> nodeModel = (NodeModel<TaskNode>) rowModel;
-        final Component nodeComponent = getTree().newNodeComponent(componentId, nodeModel.getWrappedModel());
+        final Component nodeComponent = getTree().newNodeComponent(view.newChildId(), nodeModel.getWrappedModel());
         nodeComponent.add(new NodeBorder(nodeModel.getBranches()));
-        cellItem.add(nodeComponent);
+        view.add(nodeComponent);
         cellItemListener.populateItem(cellItem, componentId, rowModel);
       }
     });
