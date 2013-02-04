@@ -200,8 +200,9 @@ public class TaskEditPage extends AbstractEditPage<TaskDO, TaskEditForm, TaskDao
       if (form.getData().getId() != null) {
         showAccessRightsLink.getPageParameters().set(AccessListPage.PARAMETER_KEY_TASK_ID, form.getData().getId());
       }
-      menu = new ContentMenuEntryPanel(getNewContentRightMenuChildId(), showAccessRightsLink, getString("task.menu.showAccessRights"));
-      addContentRightMenuEntry(menu);
+      final ContentMenuEntryPanel extendedMenu = contentMenuBarPanel.ensureAndAddExtendetMenuEntry();
+      menu = new ContentMenuEntryPanel(extendedMenu.newSubMenuChildId(), showAccessRightsLink, getString("task.menu.showAccessRights"));
+      extendedMenu.addSubMenuEntry(menu);
     }
   }
 

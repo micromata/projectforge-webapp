@@ -168,7 +168,7 @@ public class TaskTreePage extends AbstractSecuredPage
         }, getString("wizard"));
         addContentMenuEntry(menuEntry);
       }
-      new AbstractReindexTopRightMenu(this, accessChecker.isLoggedInUserMemberOfAdminGroup()) {
+      new AbstractReindexTopRightMenu(contentMenuBarPanel, accessChecker.isLoggedInUserMemberOfAdminGroup()) {
         @Override
         protected void rebuildDatabaseIndex(final boolean onlyNewest)
         {
