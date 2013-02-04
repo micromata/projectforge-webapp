@@ -18,7 +18,6 @@ import net.fortuna.ical4j.model.component.VEvent;
 
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
@@ -26,12 +25,15 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.common.TimeNotation;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDao;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.web.dialog.ModalDialog;
-import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.bootstrap.GridSize;
+import org.projectforge.web.wicket.bootstrap.GridType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
@@ -48,6 +50,15 @@ public class ImportIcsDialog extends ModalDialog
   @SpringBean(name = "teamEventDao")
   private TeamEventDao teamEventDao;
 
+  private List<EventCalendarPair> calendarPairs;
+
+  private String userDateFormat;
+
+  // needed to convert TimeNotation to suitable date format
+  private static final String H12 = " hh:mm";
+
+  private static final String H24 = " HH:mm";
+
   /**
    * @param id
    */
@@ -55,27 +66,41 @@ public class ImportIcsDialog extends ModalDialog
   {
     super(id);
     setTitle(title);
+
+    // set date format
+    final String timeFormat = PFUserContext.getUser().getTimeNotation().equals(TimeNotation.H12) ? H12 : H24;
+    userDateFormat = PFUserContext.getUser().getDateFormat() + timeFormat;
+    if (userDateFormat == null){
+      userDateFormat = "dd.MM.yyyy HH:mm";
+    }
   }
 
   public void open(final AjaxRequestTarget target, final List<VEvent> newEvents, final List<VEvent> existingEvents)
   {
     super.open(target);
     clearContent();
-    final List<EventCalendarPair> calendarPairs = new LinkedList<ImportIcsDialog.EventCalendarPair>();
+    calendarPairs = new LinkedList<ImportIcsDialog.EventCalendarPair>();
+
+    // TODO Fall behandeln: "wenn noch keine kalender angelegt , z.b. neuen erzeugen."
     final List<TeamCalDO> allCalendars = teamCalDao.getAllCalendarsWithFullAccess();
 
     for (final VEvent event : newEvents) {
-      final FieldsetPanel fs = gridBuilder.newFieldset(event.getSummary().getValue());
+      gridBuilder.newSplitPanel(GridSize.COL100, GridType.ROW_FLUID);
+      final FieldsetPanel fsDesc = gridBuilder.newFieldset(event.getSummary().getValue()).setNoLabelFor();
       final EventCalendarPair referencePair = new EventCalendarPair();
       referencePair.event = event;
       calendarPairs.add(referencePair);
+      String desc = "";
       if (event.getDescription() != null) {
-        fs.add(new Label(fs.newChildId(), "Description: " + event.getDescription().getValue())); // TODO: i18n
+        desc = event.getDescription().getValue();
       }
-      fs.add(new Label(fs.newChildId(), " - "));
-      fs.add(new Label(fs.newChildId(), new DateFormatUtils().format(event.getStartDate().getDate(), "dd.MM.yyyy HH:mm"))); // TODO richtiges Format!
-      fs.add(new Label(fs.newChildId(), " bis ")); // TODO: i18n
-      final ChoiceRenderer<TeamCalDO> choice = new ChoiceRenderer<TeamCalDO>(){
+      fsDesc.add(new Label(fsDesc.newChildId(), getString("plugins.teamcal.description") + ": " + desc));
+
+      final FieldsetPanel fsDuration = gridBuilder.newFieldset("");
+      fsDuration.add(new Label(fsDuration.newChildId(), DateFormatUtils.format(event.getStartDate().getDate(), userDateFormat)));
+      fsDuration.add(new Label(fsDuration.newChildId(), " " + getString("until") + " "));
+      fsDuration.add(new Label(fsDuration.newChildId(), DateFormatUtils.format(event.getEndDate().getDate(), userDateFormat)));
+      final ChoiceRenderer<TeamCalDO> choice = new ChoiceRenderer<TeamCalDO>() {
         private static final long serialVersionUID = 424880918380768972L;
 
         /**
@@ -87,24 +112,49 @@ public class ImportIcsDialog extends ModalDialog
           return object.getTitle();
         }
       };
-      final FieldsetPanel fss = gridBuilder.newFieldset(getString("plugins.teamcal.title"));
-      final DropDownChoice<TeamCalDO> dropDown = new DropDownChoice<TeamCalDO>(fss.getDropDownChoiceId(), new PropertyModel<TeamCalDO>(referencePair, "calendar"), allCalendars, choice);
-      fss.add(dropDown);
+      final FieldsetPanel fsCalChoose = gridBuilder.newFieldset(getString("plugins.teamcal.title.heading"));
+      final DropDownChoice<TeamCalDO> dropDown = new DropDownChoice<TeamCalDO>(fsCalChoose.getDropDownChoiceId(),
+          new PropertyModel<TeamCalDO>(referencePair, "calendar"), allCalendars, choice);
+      fsCalChoose.add(dropDown);
     }
-    final DivPanel buttonParent = gridBuilder.getPanel();
-    // add SingleButton Panel
-    final AjaxButton button = new AjaxButton("TODO") {
-      /**
-       * @see org.apache.wicket.ajax.markup.html.form.AjaxButton#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget, org.apache.wicket.markup.html.form.Form)
-       */
-      @Override
-      protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
-      {
-        onSave(calendarPairs); // TODO add this
-      }
-    };
-    buttonParent.add(button);
     addContent(target);
+  }
+
+  @Override
+  protected void onCloseButtonSubmit(final AjaxRequestTarget target)
+  {
+    TeamEventDO teamEvent;
+    if (calendarPairs != null) {
+      for (final EventCalendarPair pair : calendarPairs) {
+        if (pair.calendar != null) {
+          final VEvent e = pair.event;
+          teamEvent = new TeamEventDO();
+          teamEvent.setCalendar(pair.calendar);
+          teamEvent.setCreated(e.getCreated().getDate());
+          teamEvent.setStartDate(new Timestamp(e.getStartDate().getDate().getTime()));
+          teamEvent.setEndDate(new Timestamp(e.getEndDate().getDate().getTime()));
+          teamEvent.setExternalUid(e.getUid().getValue());
+          if (e.getLocation() != null) {
+            teamEvent.setLocation(e.getLocation().getValue());
+          }
+          if (e.getDescription() != null) {
+            teamEvent.setNote(e.getDescription().getValue());
+          }
+          if (e.getSummary() != null) {
+            teamEvent.setSubject(e.getSummary().getValue());
+          } else {
+            teamEvent.setSubject(getString(""));
+          }
+
+          if (teamEvent.getStartDate().getTime() < teamEvent.getEndDate().getTime()) {
+            teamEventDao.saveOrUpdate(teamEvent);
+          }
+        } else {
+          // TODO ju: dialog feedback panel.
+          error(getString("plugins.teamcal.import.ics.noCalError"));
+        }
+      }
+    }
   }
 
   /**
@@ -113,33 +163,10 @@ public class ImportIcsDialog extends ModalDialog
   @Override
   public void init()
   {
-    setCloseButtonLabel(getString("cancel"));
+    setCloseButtonLabel(getString("save"));
+    setShowCancelButton();
     final Form<Void> form = new Form<Void>(getFormId());
     init(form);
-  }
-
-  private void onSave(final List<EventCalendarPair> pairs)
-  {
-    TeamEventDO teamEvent;
-    for (final EventCalendarPair pair : pairs) {
-      final VEvent e = pair.event;
-      teamEvent = new TeamEventDO();
-      teamEvent.setCalendar(pair.calendar);
-      teamEvent.setCreated(e.getCreated().getDate());
-      teamEvent.setStartDate(new Timestamp(e.getStartDate().getDate().getTime()));
-      teamEvent.setStartDate(new Timestamp(e.getEndDate().getDate().getTime()));
-      if (e.getLocation() != null) {
-        teamEvent.setLocation(e.getLocation().getValue());
-      }
-      if (e.getDescription() != null) {
-        teamEvent.setNote(e.getDescription().getValue());
-      }
-      if (e.getSummary() != null) {
-        teamEvent.setSubject(e.getSummary().getValue());
-      }
-      teamEventDao.saveOrUpdate(teamEvent);
-    }
-
   }
 
   private class EventCalendarPair implements Serializable
