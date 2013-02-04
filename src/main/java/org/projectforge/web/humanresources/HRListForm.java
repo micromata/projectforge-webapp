@@ -80,6 +80,15 @@ public class HRListForm extends AbstractListForm<HRFilter, HRListPage>
   }
 
   /**
+   * @see org.projectforge.web.wicket.AbstractListForm#isFilterVisible()
+   */
+  @Override
+  protected boolean isFilterVisible()
+  {
+    return false;
+  }
+
+  /**
    * @see org.projectforge.web.wicket.AbstractListForm#getOptionsLabel()
    */
   @Override
