@@ -25,7 +25,6 @@ package org.projectforge.web.core;
 
 import org.apache.wicket.markup.html.panel.Panel;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
-import org.projectforge.web.wicket.flowlayout.IconPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
 
@@ -78,7 +77,7 @@ public class MenuBarPanel extends Panel
   public ContentMenuEntryPanel ensureAndAddExtendetMenuEntry()
   {
     if (extendedMenuEntry == null) {
-      extendedMenuEntry = new ContentMenuEntryPanel(newChildId(), new IconPanel(ContentMenuEntryPanel.LABEL_ID, IconType.COG));
+      extendedMenuEntry = new ContentMenuEntryPanel(newChildId(), IconType.COG);
       contentMenu.add(extendedMenuEntry);
     }
     return extendedMenuEntry;
