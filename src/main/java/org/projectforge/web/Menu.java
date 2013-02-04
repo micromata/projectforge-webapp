@@ -27,7 +27,7 @@ import java.io.Serializable;
 import java.util.Collection;
 
 /**
- * Helper for the web menu. Use MenuTreeTable instead.
+ * Helper for the web menu.
  */
 public class Menu implements Serializable
 {
