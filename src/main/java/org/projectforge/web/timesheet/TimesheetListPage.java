@@ -192,6 +192,8 @@ IListPageColumnsCreator<TimesheetDO>
     final BookmarkablePageLink<Void> addTemplatesLink = UserPrefListPage.createLink("link", UserPrefArea.TIMESHEET_TEMPLATE);
     final ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), addTemplatesLink, getString("templates"));
     addContentMenuEntry(menuEntry);
+    final ContentMenuEntryPanel exportMenu = new ContentMenuEntryPanel(getNewContentMenuChildId(), getString("export"));
+    addContentMenuEntry(exportMenu);
     {
       final SubmitLink exportPDFButton = new SubmitLink(ContentMenuEntryPanel.LINK_ID, form) {
         @Override
@@ -200,7 +202,7 @@ IListPageColumnsCreator<TimesheetDO>
           exportPDF();
         };
       };
-      addContentMenuEntry(new ContentMenuEntryPanel(getNewContentMenuChildId(), exportPDFButton, getString("exportAsPdf"))
+      exportMenu.addSubMenuEntry(new ContentMenuEntryPanel(exportMenu.newSubMenuChildId(), exportPDFButton, getString("exportAsPdf"))
       .setTooltip(getString("tooltip.export.pdf")));
     }
     {
@@ -211,7 +213,7 @@ IListPageColumnsCreator<TimesheetDO>
           exportExcel();
         };
       };
-      addContentMenuEntry(new ContentMenuEntryPanel(getNewContentMenuChildId(), exportExcelButton, getString("exportAsXls"))
+      exportMenu.addSubMenuEntry(new ContentMenuEntryPanel(exportMenu.newSubMenuChildId(), exportExcelButton, getString("exportAsXls"))
       .setTooltip(getString("tooltip.export.excel")));
     }
     if (WebConfiguration.isDevelopmentMode() == true) {
@@ -232,7 +234,7 @@ IListPageColumnsCreator<TimesheetDO>
       };
       //      final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(buttonGroupPanel.newChildId(), IconType.DOWNLOAD,
       //          getString("timesheet.iCalSubscription"), iCalExportLink);
-      addContentMenuEntry(new ContentMenuEntryPanel(getNewContentMenuChildId(), icsExportDialogButton, getString("timesheet.icsExport"))
+      exportMenu.addSubMenuEntry(new ContentMenuEntryPanel(exportMenu.newSubMenuChildId(), icsExportDialogButton, getString("timesheet.icsExport"))
       .setTooltip(getString("timesheet.iCalSubscription")));
     }
 
