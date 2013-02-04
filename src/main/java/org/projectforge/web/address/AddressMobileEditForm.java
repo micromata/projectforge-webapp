@@ -86,10 +86,10 @@ public class AddressMobileEditForm extends AbstractMobileEditForm<AddressDO, Add
       pageSupport.addPhoneNumber(phone, "address.phone", null, FieldType.PHONE_NO);
     }
     if (mobile != null) {
-      pageSupport.addPhoneNumber(phone, "address.phoneType.mobile", null, FieldType.PHONE_NO);
+      pageSupport.addPhoneNumber(mobile, "address.phoneType.mobile", null, FieldType.MOBILE_PHONE_NO);
     }
     if (fax != null) {
-      pageSupport.addPhoneNumber(phone, "address.phoneType.fax", null, FieldType.PHONE_NO);
+      pageSupport.addPhoneNumber(fax, "address.phoneType.fax", null, FieldType.PHONE_NO);
     }
   }
 }
