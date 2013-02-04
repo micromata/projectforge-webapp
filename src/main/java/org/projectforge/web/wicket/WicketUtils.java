@@ -76,17 +76,14 @@ import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.mobile.AbstractSecuredMobilePage;
 import org.projectforge.web.mobile.MenuMobilePage;
-import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.TooltipImage;
 import org.projectforge.web.wicket.flowlayout.ComponentSize;
 import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
-import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.IconPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
-import org.projectforge.web.wicket.flowlayout.RadioGroupPanel;
 
 public class WicketUtils
 {
@@ -1143,31 +1140,5 @@ public class WicketUtils
     } else {
       return isParent(parent, p);
     }
-  }
-
-  /**
-   * Adds yes/no radio boxes.
-   * @param radioGroup Parent radio group (must be added to the parent's component, otherwise getString("yes/no") will result in warning
-   *          messages.
-   */
-  public static void addYesNo(final RadioGroupPanel<Boolean> radioGroup)
-  {
-    radioGroup.add(new Model<Boolean>(true), radioGroup.getString("yes"));
-    radioGroup.add(new Model<Boolean>(false), radioGroup.getString("no"));
-  }
-
-  public static FieldsetPanel addYesNoRadioFieldset(final GridBuilder gridBuilder, final String label, final String groupName,
-      final IModel<Boolean> model, final String tooltip)
-  {
-    final FieldsetPanel fs = gridBuilder.newFieldset(label);
-    final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
-    final RadioGroupPanel<Boolean> radioGroup = new RadioGroupPanel<Boolean>(radioGroupPanel.newChildId(), groupName, model);
-    radioGroupPanel.add(radioGroup);
-    WicketUtils.addYesNo(radioGroup);
-    fs.setLabelFor(radioGroup.getRadioGroup());
-    if (tooltip != null) {
-      fs.addHelpIcon(tooltip);
-    }
-    return fs;
   }
 }
