@@ -103,7 +103,7 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
 
   protected void addContentMenuEntry(final ContentMenuEntryPanel panel)
   {
-    this.contentMenuBarPanel.add(panel);
+    this.contentMenuBarPanel.addMenuEntry(panel);
   }
 
   protected String getNewContentMenuChildId()
