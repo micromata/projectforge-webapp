@@ -49,6 +49,7 @@ import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
 
 /**
  * Shows the task tree for selection.
@@ -147,7 +148,7 @@ public class TaskTreePage extends AbstractSecuredPage
           editPage.setReturnToPage(TaskTreePage.this);
           setResponsePage(editPage);
         };
-      }, getString("add"));
+      }, IconType.PLUS);
       menuEntry.setAccessKey(WebConstants.ACCESS_KEY_ADD).setTooltip(getString(WebConstants.ACCESS_KEY_ADD_TOOLTIP_TITLE),
           getString(WebConstants.ACCESS_KEY_ADD_TOOLTIP));
       addContentMenuEntry(menuEntry);
