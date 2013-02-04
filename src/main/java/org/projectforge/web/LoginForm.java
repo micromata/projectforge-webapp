@@ -32,9 +32,8 @@ import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
-import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.RadioGroupPanel;
 
 public class LoginForm extends AbstractForm<LoginForm, LoginPage>
 {
@@ -72,14 +71,11 @@ public class LoginForm extends AbstractForm<LoginForm, LoginPage>
       fs.add(password);
     }
     {
-      final FieldsetPanel fs = new FieldsetPanel("stayLoggedIn", getString("login.stayLoggedIn")).setNoLabelFor();
+      final FieldsetPanel fs = new FieldsetPanel("stayLoggedIn", getString("login.stayLoggedIn"));
       add(fs);
-      final DivPanel radioBoxDiv = fs.addNewRadioBoxDiv();
-      final RadioGroupPanel<Boolean> radioGroup = new RadioGroupPanel<Boolean>(radioBoxDiv.newChildId(), "stayLoggedIn", new PropertyModel<Boolean>(
-          this, "stayLoggedIn"));
-      radioBoxDiv.add(radioGroup);
-      WicketUtils.addYesNo(radioGroup);
-      WicketUtils.addTooltip(radioBoxDiv, getString("login.stayLoggedIn"), getString("login.stayLoggedIn.tooltip"));
+      final CheckBoxPanel stayLoggedInCheckBox = fs.addCheckBox(new PropertyModel<Boolean>(
+          this, "stayLoggedIn"), null);
+      stayLoggedInCheckBox.setTooltip(getString("login.stayLoggedIn"), getString("login.stayLoggedIn.tooltip"));
     }
     final Button loginButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("login")) {
       @Override
