@@ -24,11 +24,15 @@
 package org.projectforge.web.wicket.components;
 
 import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.Component;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.flowlayout.IconPanel;
+import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
 
 /**
  * Panel for using as content top menu entry (needed for css decoration).
@@ -41,19 +45,77 @@ public class ContentMenuEntryPanel extends Panel
 
   public static final String LINK_ID = "link";
 
-  private final AbstractLink link;
+  /**
+   * Should also be used for icon panels.
+   */
+  public static final String LABEL_ID = "label";
 
-  private final String label;
+  private AbstractLink link;
+
+  private boolean hasLink;
+
+  private String label;
+
+  private Component labelComponent;
+
+  private WebMarkupContainer li, caret;
+
+  private final WebMarkupContainer dropDownMenu;
+
+  /**
+   * List to create content menu in the desired order before creating the RepeatingView.
+   */
+  protected MyComponentsRepeater<ContentMenuEntryPanel> subMenu;
+
+  private ContentMenuEntryPanel(final String id)
+  {
+    super(id);
+    add(li = new WebMarkupContainer("li"));
+    add(li);
+    dropDownMenu = new WebMarkupContainer("dropdownMenu");
+    li.add(dropDownMenu);
+    subMenu = new MyComponentsRepeater<ContentMenuEntryPanel>("subMenu");
+    dropDownMenu.add(subMenu.getRepeatingView());
+  }
 
   public ContentMenuEntryPanel(final String id, final AbstractLink link, final String label)
   {
-    super(id);
+    this(id);
     this.link = link;
-    add(link);
+    labelComponent = new Label("label", label).setRenderBodyOnly(true);
     this.label = label;
-    final Label labelComp = new Label("label", label);
-    labelComp.setRenderBodyOnly(true);
-    link.add(labelComp);
+  }
+
+  public ContentMenuEntryPanel(final String id, final AbstractLink link, final IconPanel iconPanel)
+  {
+    this(id);
+    this.link = link;
+    labelComponent = iconPanel;
+  }
+
+  public ContentMenuEntryPanel(final String id, final String label)
+  {
+    this(id);
+    labelComponent = new Label("label", label).setRenderBodyOnly(true);
+    this.label = label;
+  }
+
+  public ContentMenuEntryPanel(final String id, final IconPanel iconPanel)
+  {
+    this(id);
+    labelComponent = iconPanel;
+  }
+
+  public String newSubMenuChildId()
+  {
+    return subMenu.newChildId();
+  }
+
+
+  public ContentMenuEntryPanel addSubMenuEntry(final ContentMenuEntryPanel menuEntry)
+  {
+    subMenu.add(menuEntry);
+    return this;
   }
 
   /**
@@ -100,6 +162,51 @@ public class ContentMenuEntryPanel extends Panel
   {
     WicketUtils.addTooltip(link, title, text);
     return this;
+  }
+
+  /**
+   * @see org.apache.wicket.Component#onInitialize()
+   */
+  @SuppressWarnings("serial")
+  @Override
+  protected void onInitialize()
+  {
+    super.onInitialize();
+    if (link == null) {
+      this.link = new AbstractLink(LINK_ID) {
+      };
+    } else {
+      this.hasLink = true;
+    }
+    li.add(link);
+    link.add(labelComponent);
+    caret = new WebMarkupContainer("caret");
+    if (subMenu.hasEntries() == true) {
+      // Children available.
+      link.add(AttributeModifier.append("class", "dropdown-toggle"));
+      link.add(AttributeModifier.append("data-toggle", "dropdown"));
+      li.add(AttributeModifier.append("class", "dropdown"));
+    } else {
+      dropDownMenu.setVisible(false);
+      caret.setVisible(false);
+    }
+    link.add(caret);
+  }
+
+  @Override
+  protected void onBeforeRender()
+  {
+    subMenu.render();
+    super.onBeforeRender();
+  }
+
+  /**
+   * @see org.apache.wicket.Component#isVisible()
+   */
+  @Override
+  public boolean isVisible()
+  {
+    return this.hasLink == true || subMenu.hasEntries();
   }
 
   /**
