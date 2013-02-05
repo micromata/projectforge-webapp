@@ -51,7 +51,9 @@ public class IconLinkPanel extends Panel
 
   private final IconType type;
 
-  private final IModel<String> tooltip;
+  private IModel<String> tooltipTitle;
+
+  private IModel<String> tooltip;
 
   private CSSColor color;
 
@@ -90,6 +92,7 @@ public class IconLinkPanel extends Panel
     super(id);
     this.type = type;
     this.tooltip = tooltip;
+    this.color = IconPanel.getColor(type);
   }
 
   public IconLinkPanel setLink(final AbstractLink link)
@@ -99,9 +102,19 @@ public class IconLinkPanel extends Panel
     icon = new WebMarkupContainer("icon");
     icon.add(AttributeModifier.append("class", type.getClassAttrValue()));
     link.add(icon);
-    if (tooltip != null) {
-      WicketUtils.addTooltip(link, tooltip);
-    }
+    return this;
+  }
+
+  public IconLinkPanel setTooltip(final IModel<String> tooltip)
+  {
+    this.tooltip = tooltip;
+    return this;
+  }
+
+  public IconLinkPanel setTooltip(final IModel<String> title, final IModel<String> tooltip)
+  {
+    this.tooltipTitle = title;
+    this.tooltip = tooltip;
     return this;
   }
 
@@ -149,6 +162,9 @@ public class IconLinkPanel extends Panel
     }
     if (this.buttonStyle == true) {
       icon.add(AttributeAppender.append("class", "btn"));
+    }
+    if (tooltip != null) {
+      WicketUtils.addTooltip(link, tooltipTitle, tooltip);
     }
     super.onInitialize();
   }

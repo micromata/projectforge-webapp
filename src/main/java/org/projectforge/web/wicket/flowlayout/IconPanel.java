@@ -51,6 +51,27 @@ public class IconPanel extends Panel
 
   private CSSColor color;
 
+  private IModel<String> tooltipTitle;
+
+  private IModel<String> tooltipText;
+
+  /**
+   * Get default color of icon type (if defined). E. g. red for {@link IconType#DENY}.
+   */
+  public static CSSColor getColor(final IconType type)
+  {
+    if (type == null) {
+      return null;
+    }
+    if (type.isIn(IconType.REMOVE_SIGN, IconType.DENY) == true) {
+      return CSSColor.RED;
+    }
+    if (type.isIn(IconType.ACCEPT) == true) {
+      return CSSColor.GREEN;
+    }
+    return null;
+  }
+
   public IconPanel(final String id, final IconType type)
   {
     this(id, type, (String) null);
@@ -72,9 +93,22 @@ public class IconPanel extends Panel
     div = new WebMarkupContainer("div");
     add(div);
     appendAttribute("class", type.getClassAttrValue());
-    if (tooltip != null) {
-      WicketUtils.addTooltip(div, title, tooltip);
-    }
+    this.tooltipTitle = title;
+    this.tooltipText = tooltip;
+    this.color = getColor(type);
+  }
+
+  public IconPanel setTooltip(final IModel<String> tooltip)
+  {
+    this.tooltipText = tooltip;
+    return this;
+  }
+
+  public IconPanel setTooltip(final IModel<String> title, final IModel<String> tooltip)
+  {
+    this.tooltipTitle = title;
+    this.tooltipText = tooltip;
+    return this;
   }
 
   /**
@@ -179,7 +213,10 @@ public class IconPanel extends Panel
   protected void onInitialize()
   {
     if (this.color != null) {
-      add(AttributeAppender.append("class", this.color.getCssClass()));
+      div.add(AttributeAppender.append("class", this.color.getCssClass()));
+    }
+    if (tooltipText != null) {
+      WicketUtils.addTooltip(div, tooltipTitle, tooltipText);
     }
     super.onInitialize();
   }
