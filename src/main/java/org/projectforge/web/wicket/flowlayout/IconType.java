@@ -23,6 +23,7 @@
 
 package org.projectforge.web.wicket.flowlayout;
 
+
 /**
  * Used by IconPanels.
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -30,42 +31,61 @@ package org.projectforge.web.wicket.flowlayout;
 public enum IconType
 {
   ABONNEMENT("globe"), //
+  ACCEPT("ok-sign"), //
   ALERT("warning-sign"), //
+  BUILDING("building"), //
   CALENDAR("calendar"), //
   COG("cog"), //
-  //CIRCLE_ARROW_EAST("question-sign"), //
-  //CIRCLE_ARROW_WEST("question-sign"), //
-  //CLIPBOARD("question-sign"), //
-  //CLOCK("question-sign"), //
+  DENY("minus-sign"), //
   DOCUMENT("file"), //
   DOWNLOAD("download"), //
   EDIT("pencil"), //
   FOLDER_OPEN("folder-open"), //
+  GLOBE("globe"), //
   GOTO("hand-right"), //
   HELP("info-sign"), //
+  HOME("home"), //
   JIRA_SUPPORT("star"), //
   KEYBOARD("th"), //
   MINUS_SIGN("minus-sign"), //
-  //MINUS_THICK("question-sign"), //
   MODIFIED("star-empty"), //
+  PHONE("phone"), //
+  PHONE_MOBILE("mobile-phone"), //
   PLUS("plus"), //
   PLUS_SIGN("plus-sign"), //
+  PRINT("print"), //
   REFRESH("refresh"), //
   REMOVE("remove"), //
   REMOVE_SIGN("remove-sign"), //
   SEARCH("search"), //
+  TABLET("tablet"), //
   TASK("tasks"), //
   TRASH("trash"), //
   USER("user"), //
   WRENCH("wrench"), //
   ZOOM_IN("zoom-in"), //
-  ZOOM_OUT("zoom-out");
+  ZOOM_OUT("zoom-out"), //
+
+  DELETE("trash"), //
+  INSERT("save"), //
+  SELECT("file"), //
+  UPDATE("edit");
 
   private String cssIdentifier;
 
   public String getClassAttrValue()
   {
     return "icon-" + cssIdentifier;
+  }
+
+  public boolean isIn(final IconType... type)
+  {
+    for (final IconType t : type) {
+      if (this == t) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private IconType(final String classAttrValue)
