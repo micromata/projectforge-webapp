@@ -355,7 +355,9 @@ public class AddressDao extends BaseDao<AddressDO>
    */
   public void exportVCard(final PrintWriter pw, final AddressDO addressDO)
   {
-    log.info("Exporting vCard for addressDo : " + addressDO != null ? addressDO.getId() : null);
+    if (log.isDebugEnabled() == true) {
+      log.debug("Exporting vCard for addressDo : " + addressDO != null ? addressDO.getId() : null);
+    }
     pw.println("BEGIN:VCARD");
     pw.println("VERSION:3.0");
     pw.print("N:");
@@ -395,7 +397,9 @@ public class AddressDao extends BaseDao<AddressDO>
       out(pw, addressDO.getCountry());
       pw.println();
     }
-    if (isGiven(addressDO.getPrivateAddressText()) == true || isGiven(addressDO.getPrivateCity()) == true || isGiven(addressDO.getPrivateZipCode()) == true) {
+    if (isGiven(addressDO.getPrivateAddressText()) == true
+        || isGiven(addressDO.getPrivateCity()) == true
+        || isGiven(addressDO.getPrivateZipCode()) == true) {
       pw.print("ADR;TYPE=HOME:;;");
       out(pw, addressDO.getPrivateAddressText());
       pw.print(';');
