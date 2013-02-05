@@ -39,6 +39,7 @@ import org.projectforge.plugins.teamcal.admin.TeamCalCache;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalsComparator;
 import org.projectforge.plugins.teamcal.admin.TeamCalsProvider;
+import org.projectforge.web.CSSColor;
 import org.projectforge.web.calendar.QuickSelectPanel;
 import org.projectforge.web.common.MultiChoiceListHelper;
 import org.projectforge.web.wicket.AbstractListForm;
@@ -139,7 +140,8 @@ public class TeamEventListForm extends AbstractListForm<TeamEventFilter, TeamEve
   }
 
   /**
-   * @see org.projectforge.web.wicket.AbstractListForm#onOptionsPanelCreate(org.projectforge.web.wicket.flowlayout.FieldsetPanel, org.projectforge.web.wicket.flowlayout.DivPanel)
+   * @see org.projectforge.web.wicket.AbstractListForm#onOptionsPanelCreate(org.projectforge.web.wicket.flowlayout.FieldsetPanel,
+   *      org.projectforge.web.wicket.flowlayout.DivPanel)
    */
   @SuppressWarnings("serial")
   @Override
@@ -147,13 +149,13 @@ public class TeamEventListForm extends AbstractListForm<TeamEventFilter, TeamEve
   {
     {
       optionsFieldsetPanel.setOutputMarkupId(true);
-      startDate = new DatePanel(optionsFieldsetPanel.newChildId(), new PropertyModel<Date>(getSearchFilter(), "startDate"), DatePanelSettings.get()
-          .withSelectPeriodMode(true));
+      startDate = new DatePanel(optionsFieldsetPanel.newChildId(), new PropertyModel<Date>(getSearchFilter(), "startDate"),
+          DatePanelSettings.get().withSelectPeriodMode(true));
       optionsFieldsetPanel.add(dependentFormComponents[0] = startDate);
       optionsFieldsetPanel.setLabelFor(startDate);
       optionsFieldsetPanel.add(new DivTextPanel(optionsFieldsetPanel.newChildId(), " - "));
-      endDate = new DatePanel(optionsFieldsetPanel.newChildId(), new PropertyModel<Date>(getSearchFilter(), "endDate"), DatePanelSettings.get()
-          .withSelectPeriodMode(true));
+      endDate = new DatePanel(optionsFieldsetPanel.newChildId(), new PropertyModel<Date>(getSearchFilter(), "endDate"), DatePanelSettings
+          .get().withSelectPeriodMode(true));
       optionsFieldsetPanel.add(dependentFormComponents[1] = endDate);
       {
         final SubmitLink unselectPeriod = new SubmitLink(IconLinkPanel.LINK_ID) {
@@ -167,9 +169,11 @@ public class TeamEventListForm extends AbstractListForm<TeamEventFilter, TeamEve
           };
         };
         unselectPeriod.setDefaultFormProcessing(false);
-        optionsFieldsetPanel.add(new IconLinkPanel(optionsFieldsetPanel.newChildId(), IconType.REMOVE, new ResourceModel("calendar.tooltip.unselectPeriod"), unselectPeriod));
+        optionsFieldsetPanel.add(new IconLinkPanel(optionsFieldsetPanel.newChildId(), IconType.REMOVE_SIGN, new ResourceModel(
+            "calendar.tooltip.unselectPeriod"), unselectPeriod).setColor(CSSColor.RED));
       }
-      final QuickSelectPanel quickSelectPanel = new QuickSelectPanel(optionsFieldsetPanel.newChildId(), parentPage, "quickSelect", startDate);
+      final QuickSelectPanel quickSelectPanel = new QuickSelectPanel(optionsFieldsetPanel.newChildId(), parentPage, "quickSelect",
+          startDate);
       optionsFieldsetPanel.add(quickSelectPanel);
       quickSelectPanel.init();
       optionsFieldsetPanel.add(new HtmlCommentPanel(optionsFieldsetPanel.newChildId(), new Model<String>() {
