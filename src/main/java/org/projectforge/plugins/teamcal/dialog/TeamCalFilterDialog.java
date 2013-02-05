@@ -208,7 +208,7 @@ public class TeamCalFilterDialog extends ModalDialog
     } else {
       gridBuilder.newGridPanel();
     }
-    optionsFieldset = gridBuilder.newFieldset(getString("label.options"));
+    optionsFieldset = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
     optionsControls = optionsFieldset.getControlsDiv();
     optionsControls.setOutputMarkupId(true);
     redrawOptionControls();
@@ -290,7 +290,7 @@ public class TeamCalFilterDialog extends ModalDialog
       }
     };
 
-    final FieldsetPanel fs = gridBuilder.newFieldset((String) null).setLabelSide(false);
+    final FieldsetPanel fs = gridBuilder.newFieldset((String) null).setLabelSide(false).setNoLabelFor();
     templateName = new AjaxMaxLengthEditableLabel(fs.getAjaxEditableLabelId(), new Model<String>() {
       @Override
       public String getObject()
