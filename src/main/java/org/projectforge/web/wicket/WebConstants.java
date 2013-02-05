@@ -125,12 +125,6 @@ public class WebConstants
 
   public static final String IMAGE_UNDELETE = DIR + "arrow_undo.png";
 
-  public static final String IMAGE_USER_SELECT = DIR + "button_selectUser.png";
-
-  public static final String IMAGE_USER_SELECT_ME = DIR + "button_selectMe.png";
-
-  public static final String IMAGE_USER_UNSELECT = DIR + "button_unselectUser.png";
-
   public static final String IMAGE_SPACER = DIR + "spacer.gif";
 
   public static final String IMAGE_TREE_ICON_LEAF = DIR + "leaf.gif";
