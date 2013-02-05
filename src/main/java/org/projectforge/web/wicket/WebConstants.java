@@ -55,8 +55,6 @@ public class WebConstants
 
   public static final String I18N_KEY_FIELD_REQUIRED = "validation.error.fieldRequired";
 
-  public static final String IMAGE_ACCEPT = DIR + "accept.png";
-
   public static final String IMAGE_ADD = DIR + "add.png";
 
   public static final String IMAGE_ARROW_DOWN = DIR + "arrow-down.png";
@@ -65,17 +63,7 @@ public class WebConstants
 
   public static final String IMAGE_COG = DIR + "cog.png";
 
-  public static final String IMAGE_DATABASE_DELETE = DIR + "database_delete.png";
-
-  public static final String IMAGE_DATABASE_INSERT = DIR + "database_insert.png";
-
-  public static final String IMAGE_DATABASE_SELECT = DIR + "database_select.png";
-
-  public static final String IMAGE_DATABASE_UPDATE = DIR + "database_update.png";
-
   public static final String IMAGE_DELETE = DIR + "trash.png";
-
-  public static final String IMAGE_DENY = DIR + "deny.png";
 
   public static final String IMAGE_EYE = DIR + "eye.png";
 
