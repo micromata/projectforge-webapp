@@ -235,7 +235,8 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
                 }
                 boolean passwordsGiven = false;
                 if (ldapUser.isPasswordGiven() == true) {
-                  if (sambaConfigured == false || StringUtils.isNotBlank(ldapUser.getSambaNTPassword()) == true) {
+                  // If the user has a Samba SID then the Samba NT password mustn't be blank:
+                  if (sambaConfigured == false || ldapUser.getSambaSIDNumber() == null || StringUtils.isNotBlank(ldapUser.getSambaNTPassword()) == true) {
                     passwordsGiven = true;
                   }
                 }
