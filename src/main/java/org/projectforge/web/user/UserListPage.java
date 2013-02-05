@@ -44,7 +44,6 @@ import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRightDO;
 import org.projectforge.user.UserRightId;
 import org.projectforge.user.UserRightValue;
-import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
@@ -53,14 +52,13 @@ import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.flowlayout.IconPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
 
 @ListPage(editPage = UserEditPage.class)
 public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUserDO> implements IListPageColumnsCreator<PFUserDO>
 {
   private static final long serialVersionUID = 4408701323868106520L;
-
-  @SpringBean(name = "htmlHelper")
-  private HtmlHelper htmlHelper;
 
   @SpringBean(name = "userDao")
   private UserDao userDao;
@@ -116,15 +114,11 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
       public void populateItem(final Item<ICellPopulator<PFUserDO>> item, final String componentId, final IModel<PFUserDO> rowModel)
       {
         final PFUserDO user = rowModel.getObject();
-        final StringBuffer buf = new StringBuffer();
         if (user.isDeactivated() == false) {
-          htmlHelper.appendImageTag(getRequestCycle(), buf, "images/accept.png", null);
+          item.add(new IconPanel(componentId, IconType.ACCEPT));
         } else {
-          htmlHelper.appendImageTag(getRequestCycle(), buf, "images/deny.png", null);
+          item.add(new IconPanel(componentId, IconType.DENY));
         }
-        final Label label = new Label(componentId, buf.toString());
-        label.setEscapeModelStrings(false);
-        item.add(label);
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
