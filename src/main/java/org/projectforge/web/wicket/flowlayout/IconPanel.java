@@ -29,11 +29,13 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxEventBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.cycle.RequestCycle;
+import org.projectforge.web.CSSColor;
 import org.projectforge.web.wicket.WicketUtils;
 
 /**
@@ -46,6 +48,8 @@ public class IconPanel extends Panel
   private static final long serialVersionUID = 3317775585548133768L;
 
   private final WebMarkupContainer div;
+
+  private CSSColor color;
 
   public IconPanel(final String id, final IconType type)
   {
@@ -71,6 +75,16 @@ public class IconPanel extends Panel
     if (tooltip != null) {
       WicketUtils.addTooltip(div, title, tooltip);
     }
+  }
+
+  /**
+   * @param color the color to set
+   * @return this for chaining.
+   */
+  public IconPanel setColor(final CSSColor color)
+  {
+    this.color = color;
+    return this;
   }
 
   /**
@@ -156,5 +170,17 @@ public class IconPanel extends Panel
    */
   public void onClick()
   {
+  }
+
+  /**
+   * @see org.apache.wicket.Component#onInitialize()
+   */
+  @Override
+  protected void onInitialize()
+  {
+    if (this.color != null) {
+      add(AttributeAppender.append("class", this.color.getCssClass()));
+    }
+    super.onInitialize();
   }
 }

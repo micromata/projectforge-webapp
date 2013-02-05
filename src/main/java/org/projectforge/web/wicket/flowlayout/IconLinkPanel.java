@@ -26,10 +26,12 @@ package org.projectforge.web.wicket.flowlayout;
 import java.io.Serializable;
 
 import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
+import org.projectforge.web.CSSColor;
 import org.projectforge.web.wicket.WicketUtils;
 
 /**
@@ -51,9 +53,13 @@ public class IconLinkPanel extends Panel
 
   private final IModel<String> tooltip;
 
+  private CSSColor color;
+
+  private boolean buttonStyle;
+
   public IconLinkPanel(final String id, final IconType type)
   {
-    this(id, type, (IModel<String>)null);
+    this(id, type, (IModel<String>) null);
   }
 
   public IconLinkPanel(final String id, final IconType type, final AbstractLink link)
@@ -100,12 +106,22 @@ public class IconLinkPanel extends Panel
   }
 
   /**
-   * Sets "light" as class attribute for having light grey colored buttons.
+   * @param color the color to set
    * @return this for chaining.
    */
-  public IconLinkPanel setLight()
+  public IconLinkPanel setColor(final CSSColor color)
   {
-    icon.add(AttributeModifier.append("class", "icon-white"));
+    this.color = color;
+    return this;
+  }
+
+  /**
+   * The css class "btn" will be added, so the link looks like a button.
+   * @return this for chaining.
+   */
+  public IconLinkPanel setButtonStyle()
+  {
+    this.buttonStyle = true;
     return this;
   }
 
@@ -120,5 +136,20 @@ public class IconLinkPanel extends Panel
   {
     link.add(AttributeModifier.append(attributeName, value));
     return this;
+  }
+
+  /**
+   * @see org.apache.wicket.Component#onInitialize()
+   */
+  @Override
+  protected void onInitialize()
+  {
+    if (this.color != null) {
+      icon.add(AttributeAppender.append("class", this.color.getCssClass()));
+    }
+    if (this.buttonStyle == true) {
+      icon.add(AttributeAppender.append("class", "btn"));
+    }
+    super.onInitialize();
   }
 }

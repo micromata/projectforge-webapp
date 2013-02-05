@@ -31,8 +31,8 @@ public enum IconType
 {
   ABONNEMENT("globe"), //
   ALERT("warning-sign"), //
+  CALENDAR("calendar"), //
   COG("cog"), //
-  REFRESH("refresh"), //
   //CIRCLE_ARROW_EAST("question-sign"), //
   //CIRCLE_ARROW_WEST("question-sign"), //
   //CLIPBOARD("question-sign"), //
@@ -50,11 +50,13 @@ public enum IconType
   MODIFIED("star-empty"), //
   PLUS("plus"), //
   PLUS_SIGN("plus-sign"), //
+  REFRESH("refresh"), //
   REMOVE("remove"), //
-  SEARCH("search"), // //
-  /** RSS feed symbol. */
+  REMOVE_SIGN("remove-sign"), //
+  SEARCH("search"), //
+  TASK("sitemap"), //
   TRASH("trash"), //
-  CALENDAR("calendar"), //
+  USER("user"), //
   WRENCH("wrench"), //
   ZOOM_IN("zoom-in"), //
   ZOOM_OUT("zoom-out");
