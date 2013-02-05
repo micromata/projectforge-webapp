@@ -27,7 +27,7 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.model.Model;
+import org.apache.wicket.model.IModel;
 
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
@@ -54,7 +54,7 @@ public class AjaxIconButtonPanel extends IconButtonPanel
    * @param type
    * @param tooltip
    */
-  public AjaxIconButtonPanel(final String id, final IconType type, final Model<String> tooltip)
+  public AjaxIconButtonPanel(final String id, final IconType type, final IModel<String> tooltip)
   {
     super(id, type, tooltip);
   }

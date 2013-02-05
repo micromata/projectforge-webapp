@@ -30,7 +30,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.model.Model;
+import org.apache.wicket.model.IModel;
 import org.projectforge.web.wicket.WicketUtils;
 
 /**
@@ -59,7 +59,7 @@ public class IconButtonPanel extends Panel
     init(type, tooltip);
   }
 
-  public IconButtonPanel(final String id, final IconType type, final Model<String> tooltip)
+  public IconButtonPanel(final String id, final IconType type, final IModel<String> tooltip)
   {
     super(id);
     button = createButton("button");
