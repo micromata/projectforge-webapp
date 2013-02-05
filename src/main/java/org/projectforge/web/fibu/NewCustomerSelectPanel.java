@@ -42,9 +42,7 @@ import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.wicket.AbstractSelectPanel;
-import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
-import org.projectforge.web.wicket.components.TooltipImage;
 import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
 
 /**
@@ -220,7 +218,7 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
     };
     add(selectMeButton);
     selectMeButton.setDefaultFormProcessing(defaultFormProcessing);
-    selectMeButton.add(new TooltipImage("selectMeHelp", WebConstants.IMAGE_USER_SELECT_ME, getString("tooltip.selectMe")));
+    //selectMeButton.add(new TooltipImage("selectMeHelp", WebConstants.IMAGE_USER_SELECT_ME, getString("tooltip.selectMe")));
     return this;
   }
 
