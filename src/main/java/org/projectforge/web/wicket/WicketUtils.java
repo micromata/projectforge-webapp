@@ -703,7 +703,7 @@ public class WicketUtils
 
   public static Component getMarkAsDeletedTooltipImage(final MarkupContainer parent, final String componentId)
   {
-    return new TooltipImage(componentId,  WebConstants.IMAGE_DELETE, parent.getString("tooltip.entry.delete"));
+    return new TooltipImage(componentId, WebConstants.IMAGE_DELETE, parent.getString("tooltip.entry.delete"));
   }
 
   /**
@@ -1059,15 +1059,19 @@ public class WicketUtils
     return StringHelper.listToString("/", labels);
   }
 
-  public static Label createBooleanLabel(final RequestCycle requestCycle, final String componentId, final boolean value)
+  /**
+   * If true then a tick-mark icon is returned, otherwise an invisible label.
+   * @param requestCycle
+   * @param componentId
+   * @param value
+   * @return
+   */
+  public static Component createBooleanLabel(final RequestCycle requestCycle, final String componentId, final boolean value)
   {
-    final StringBuffer buf = new StringBuffer();
     if (value == true) {
-      HtmlHelper.getInstance().appendImageTag(requestCycle, buf, "images/accept.png", null);
+      return new IconPanel(componentId, IconType.ACCEPT);
     }
-    final Label label = new Label(componentId, buf.toString());
-    label.setEscapeModelStrings(false);
-    return label;
+    return new Label(componentId, "invisible").setVisible(false);
   }
 
   /**
