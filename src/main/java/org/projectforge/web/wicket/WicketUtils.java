@@ -65,7 +65,6 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.common.StringHelper;
-import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.web.HtmlHelper;
@@ -78,7 +77,6 @@ import org.projectforge.web.mobile.AbstractSecuredMobilePage;
 import org.projectforge.web.mobile.MenuMobilePage;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
-import org.projectforge.web.wicket.components.TooltipImage;
 import org.projectforge.web.wicket.flowlayout.ComponentSize;
 import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -665,57 +663,6 @@ public class WicketUtils
   public static final boolean isJIRAConfigured()
   {
     return ConfigXml.getInstance().isJIRAConfigured();
-  }
-
-  /**
-   * Usage in markup: &lt;img wicket:id="addPositionImage" /&gt;
-   * @param componentId
-   * @param tooltip
-   * @return
-   */
-  public static Component getAddRowImage(final String componentId, final String tooltip)
-  {
-    return new TooltipImage(componentId, WebConstants.IMAGE_ADD, tooltip);
-  }
-
-  /**
-   * Usage in markup: &lt;img wicket:id="deletePositionImage" /&gt;
-   * @param parent Needed for i18n of tooltip.
-   * @param componentId
-   * @param obj If the obj has an id then a mark-as-deleted tool tip will be shown, otherwise a delete tool tip.
-   * @return
-   * @see #getMarkAsDeletedTooltipImage(MarkupContainer, String, BaseDO)
-   * @see #getDeleteTooltipImage(MarkupContainer, String, BaseDO)
-   */
-  public static Component getDeleteRowImage(final MarkupContainer parent, final String componentId, final BaseDO< ? > obj)
-  {
-    if (obj.getId() != null) {
-      return getMarkAsDeletedTooltipImage(parent, componentId);
-    } else {
-      return getDeleteTooltipImage(parent, componentId);
-    }
-  }
-
-  public static Component getDeleteTooltipImage(final MarkupContainer parent, final String componentId)
-  {
-    return new TooltipImage(componentId, WebConstants.IMAGE_DELETE, parent.getString("tooltip.entry.markAsDeleted"));
-  }
-
-  public static Component getMarkAsDeletedTooltipImage(final MarkupContainer parent, final String componentId)
-  {
-    return new TooltipImage(componentId, WebConstants.IMAGE_DELETE, parent.getString("tooltip.entry.delete"));
-  }
-
-  /**
-   * Usage in markup: &lt;img wicket:id="deletePositionImage" /&gt;
-   * @param parent Needed for i18n of tooltip.
-   * @param componentId
-   * @param obj If the obj has an id then a mark-as-deleted tool tip will be shown, otherwise a delete tool tip.
-   * @return
-   */
-  public static Component getUndeleteRowImage(final MarkupContainer parent, final String componentId)
-  {
-    return new TooltipImage(componentId, WebConstants.IMAGE_UNDELETE, parent.getString("tooltip.entry.undelete"));
   }
 
   /**
