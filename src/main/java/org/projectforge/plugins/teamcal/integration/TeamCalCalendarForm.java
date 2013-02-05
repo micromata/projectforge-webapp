@@ -90,32 +90,8 @@ public class TeamCalCalendarForm extends CalendarForm
   protected void init()
   {
     super.init();
-    final TeamCalFilterDialog dialog = new TeamCalFilterDialog(parentPage.newModalDialogId(), (TeamCalCalendarFilter) filter);
-    parentPage.add(dialog);
-    dialog.init();
-    importIcsDialog = new ImportIcsDialog(parentPage.newModalDialogId(), new ResourceModel("plugins.teamcal.import.ics.title"));
-    importIcsDialog.init();
-    parentPage.add(importIcsDialog);
-    final IconButtonPanel calendarButtonPanel = new AjaxIconButtonPanel(buttonGroupPanel.newChildId(), IconType.CALENDAR,
-        getString("plugins.teamcal.calendar.edit")) {
-      private static final long serialVersionUID = -8572571785540159369L;
-
-      /**
-       * @see org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
-       */
-      @Override
-      protected void onSubmit(final AjaxRequestTarget target)
-      {
-        dialog.open(target);
-        // Redraw the content:
-        dialog.redraw().addContent(target);
-      }
-    };
-    calendarButtonPanel.setDefaultFormProcessing(false);
-    buttonGroupPanel.addButton(calendarButtonPanel);
-
     {
-      final IconButtonPanel searchButtonPanel = new IconButtonPanel(buttonGroupPanel.newChildId(), IconType.SEARCH, getString("search")) {
+      final IconButtonPanel searchButtonPanel = new IconButtonPanel(buttonGroupPanel.newChildId(), IconType.SEARCH, new ResourceModel("search")) {
         /**
          * @see org.projectforge.web.wicket.flowlayout.IconButtonPanel#onSubmit()
          */
@@ -203,6 +179,38 @@ public class TeamCalCalendarForm extends CalendarForm
         }
       });
     }
+  }
+
+  /**
+   * @see org.apache.wicket.Component#onInitialize()
+   */
+  @Override
+  protected void onInitialize()
+  {
+    final TeamCalFilterDialog dialog = new TeamCalFilterDialog(parentPage.newModalDialogId(), (TeamCalCalendarFilter) filter);
+    parentPage.add(dialog);
+    dialog.init();
+    importIcsDialog = new ImportIcsDialog(parentPage.newModalDialogId(), new ResourceModel("plugins.teamcal.import.ics.title"));
+    parentPage.add(importIcsDialog);
+    importIcsDialog.init();
+    final IconButtonPanel calendarButtonPanel = new AjaxIconButtonPanel(buttonGroupPanel.newChildId(), IconType.CALENDAR,
+        new ResourceModel("plugins.teamcal.calendar.edit")) {
+      private static final long serialVersionUID = -8572571785540159369L;
+
+      /**
+       * @see org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
+       */
+      @Override
+      protected void onSubmit(final AjaxRequestTarget target)
+      {
+        dialog.open(target);
+        // Redraw the content:
+        dialog.redraw().addContent(target);
+      }
+    };
+    calendarButtonPanel.setDefaultFormProcessing(false);
+    buttonGroupPanel.addButton(calendarButtonPanel);
+    super.onInitialize();
   }
 
   @Override
