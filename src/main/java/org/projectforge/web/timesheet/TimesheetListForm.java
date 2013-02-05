@@ -39,6 +39,7 @@ import org.projectforge.task.TaskTree;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetFilter;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.web.CSSColor;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.calendar.QuickSelectPanel;
 import org.projectforge.web.task.TaskSelectPanel;
@@ -167,7 +168,7 @@ public class TimesheetListForm extends AbstractListForm<TimesheetListFilter, Tim
           true));
       fs.add(dependentFormComponents[1] = stopDate);
       {
-        final SubmitLink unselectPeriod = new SubmitLink(IconLinkPanel.LINK_ID) {
+        final SubmitLink unselectPeriodLink = new SubmitLink(IconLinkPanel.LINK_ID) {
           @Override
           public void onSubmit()
           {
@@ -177,8 +178,8 @@ public class TimesheetListForm extends AbstractListForm<TimesheetListFilter, Tim
             parentPage.refresh();
           };
         };
-        unselectPeriod.setDefaultFormProcessing(false);
-        fs.add(new IconLinkPanel(fs.newChildId(), IconType.REMOVE, new ResourceModel("calendar.tooltip.unselectPeriod"), unselectPeriod));
+        unselectPeriodLink.setDefaultFormProcessing(false);
+        fs.add(new IconLinkPanel(fs.newChildId(), IconType.REMOVE_SIGN, new ResourceModel("calendar.tooltip.unselectPeriod"), unselectPeriodLink).setColor(CSSColor.RED));
       }
       final QuickSelectPanel quickSelectPanel = new QuickSelectPanel(fs.newChildId(), parentPage, "quickSelect", startDate);
       fs.add(quickSelectPanel);
