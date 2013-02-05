@@ -77,6 +77,7 @@ import org.projectforge.web.fibu.Kost2ArtEditPage;
 import org.projectforge.web.fibu.Kost2ArtListPage;
 import org.projectforge.web.fibu.Kost2EditPage;
 import org.projectforge.web.fibu.Kost2ListPage;
+import org.projectforge.web.fibu.MonthlyEmployeeReportPage;
 import org.projectforge.web.fibu.ProjektEditPage;
 import org.projectforge.web.fibu.ProjektListPage;
 import org.projectforge.web.fibu.RechnungEditPage;
@@ -364,6 +365,7 @@ public class WebRegistry
     addMountPage("feedback", FeedbackPage.class);
     addMountPage("layoutSettings", LayoutSettingsPage.class);
     addMountPage(BOOKMARK_LOGIN, LoginPage.class);
+    addMountPage("monthlyEmployeeReport", MonthlyEmployeeReportPage.class);
     addMountPage("myAccount", MyAccountEditPage.class);
     addMountPage("personalStatistics", PersonalStatisticsPage.class);
     addMountPage("phoneCall", PhoneCallPage.class);
