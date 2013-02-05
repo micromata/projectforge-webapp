@@ -39,6 +39,7 @@ import org.projectforge.humanresources.HRPlanningEntryDao;
 import org.projectforge.humanresources.HRPlanningFilter;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
+import org.projectforge.web.CSSColor;
 import org.projectforge.web.calendar.QuickSelectPanel;
 import org.projectforge.web.fibu.ProjektSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
@@ -100,7 +101,7 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
           .withSelectPeriodMode(true).withRequired(true));
       fs.add(stopDate);
       {
-        fs.add(new IconLinkPanel(fs.newChildId(), IconType.REMOVE, new ResourceModel("calendar.tooltip.unselectPeriod"), new SubmitLink(
+        fs.add(new IconLinkPanel(fs.newChildId(), IconType.REMOVE_SIGN, new ResourceModel("calendar.tooltip.unselectPeriod"), new SubmitLink(
             IconLinkPanel.LINK_ID) {
           @Override
           public void onSubmit()
@@ -110,7 +111,7 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
             clearInput();
             parentPage.refresh();
           };
-        }));
+        }).setColor(CSSColor.RED));
       }
       final QuickSelectPanel quickSelectPanel = new QuickSelectPanel(fs.newChildId(), parentPage, "quickSelect", startDate);
       fs.add(quickSelectPanel);
