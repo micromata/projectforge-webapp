@@ -42,12 +42,13 @@ import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserXmlPreferencesCache;
+import org.projectforge.web.CSSColor;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractSelectPanel;
-import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
-import org.projectforge.web.wicket.components.TooltipImage;
 import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
+import org.projectforge.web.wicket.flowlayout.IconPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
 
 /**
  * This panel shows the actual user and buttons for select/unselect user.
@@ -267,7 +268,7 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO> implements Co
       selectMeLink.setOutputMarkupId(true);
     }
     add(selectMeLink);
-    selectMeLink.add(new TooltipImage("selectMeHelp", WebConstants.IMAGE_USER_SELECT_ME, getString("tooltip.selectMe")));
+    selectMeLink.add(new IconPanel("selectMeHelp", IconType.USER, getString("tooltip.selectMe")).setColor(CSSColor.GREEN));
     return this;
   }
 
