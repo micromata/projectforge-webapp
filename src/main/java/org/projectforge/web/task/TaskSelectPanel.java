@@ -42,15 +42,16 @@ import org.projectforge.task.TaskFavorite;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.UserPrefArea;
+import org.projectforge.web.CSSColor;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.AbstractSelectPanel;
-import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.FavoritesChoicePanel;
-import org.projectforge.web.wicket.components.TooltipImage;
 import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
+import org.projectforge.web.wicket.flowlayout.IconPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
 
 /**
  * Panel for showing and selecting one task.
@@ -180,7 +181,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
     };
     selectButton.setDefaultFormProcessing(false);
     divContainer.add(selectButton);
-    selectButton.add(new TooltipImage("selectHelp", WebConstants.IMAGE_TASK_SELECT, getString("tooltip.selectTask")));
+    selectButton.add(new IconPanel("selectHelp", IconType.TASK, getString("tooltip.selectTask")));
     final SubmitLink unselectButton = new SubmitLink("unselect") {
       @Override
       public void onSubmit()
@@ -196,7 +197,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
     };
     unselectButton.setDefaultFormProcessing(false);
     divContainer.add(unselectButton);
-    unselectButton.add(new TooltipImage("unselectHelp", WebConstants.IMAGE_TASK_UNSELECT, getString("tooltip.unselectTask")));
+    unselectButton.add(new IconPanel("unselectHelp", IconType.REMOVE_SIGN, getString("tooltip.unselectTask")).setColor(CSSColor.RED));
     // DropDownChoice favorites
     final FavoritesChoicePanel<TaskDO, TaskFavorite> favoritesPanel = new FavoritesChoicePanel<TaskDO, TaskFavorite>("favorites",
         UserPrefArea.TASK_FAVORITE, tabIndex, "full text") {
