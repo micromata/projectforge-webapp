@@ -54,7 +54,7 @@ public enum IconType
   REMOVE("remove"), //
   REMOVE_SIGN("remove-sign"), //
   SEARCH("search"), //
-  TASK("sitemap"), //
+  TASK("tasks"), //
   TRASH("trash"), //
   USER("user"), //
   WRENCH("wrench"), //
