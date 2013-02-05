@@ -34,13 +34,17 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.StringHelper;
 import org.projectforge.timesheet.TimesheetDao;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ProjectForgeGroup;
+import org.projectforge.user.UserRights;
 import org.projectforge.web.calendar.QuickSelectMonthPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractStandardForm;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class MonthlyEmployeeReportForm extends AbstractStandardForm<MonthlyEmployeeReportFilter, MonthlyEmployeeReportPage>
@@ -67,11 +71,17 @@ public class MonthlyEmployeeReportForm extends AbstractStandardForm<MonthlyEmplo
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.user"));
-      final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(filter, "user"), parentPage,
-          "user");
-      userSelectPanel.setRequired(true);
-      fs.add(userSelectPanel);
-      userSelectPanel.init();
+      if (UserRights.getAccessChecker().isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP,
+          ProjectForgeGroup.PROJECT_MANAGER) == true) {
+        final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(filter, "user"),
+            parentPage, "user");
+        userSelectPanel.setRequired(true);
+        fs.add(userSelectPanel);
+        userSelectPanel.init();
+      } else {
+        filter.setUser(PFUserContext.getUser());
+        fs.add(new DivTextPanel(fs.newChildId(), filter.getUser().getFullname()));
+      }
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
@@ -94,8 +104,8 @@ public class MonthlyEmployeeReportForm extends AbstractStandardForm<MonthlyEmplo
       for (int i = 0; i <= 11; i++) {
         monthChoiceRenderer.addValue(i, StringHelper.format2DigitNumber(i + 1));
       }
-      monthChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(filter,
-          "month"), monthChoiceRenderer.getValues(), monthChoiceRenderer) {
+      monthChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(filter, "month"),
+          monthChoiceRenderer.getValues(), monthChoiceRenderer) {
         /**
          * @see org.apache.wicket.markup.html.form.DropDownChoice#wantOnSelectionChangedNotifications()
          */
@@ -142,7 +152,8 @@ public class MonthlyEmployeeReportForm extends AbstractStandardForm<MonthlyEmplo
     }
   }
 
-  void setDate(final Date date) {
+  void setDate(final Date date)
+  {
     final DateHolder dh = new DateHolder(date);
     filter.setYear(dh.getYear());
     filter.setMonth(dh.getMonth());
