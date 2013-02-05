@@ -54,6 +54,7 @@ import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
@@ -73,6 +74,7 @@ import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.PFUserContext;
+import org.projectforge.web.CSSColor;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.task.TaskEditForm;
@@ -100,6 +102,8 @@ import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.components.SingleImagePanel;
 import org.projectforge.web.wicket.converter.IntegerPercentConverter;
+import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
 
 public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTreeTableNode> implements ISelectCallerPage
 {
@@ -885,8 +889,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
     });
     panel.add(asStringLabel);
     final String taskSelectProperty = "predecessorId:" + ganttObject.getId();
-    final ImageSubmitLinkPanel selectSubmitLink = new ImageSubmitLinkPanel("select", form, WebConstants.IMAGE_TASK_SELECT,
-        getString("tooltip.selectTask")) {
+    final IconLinkPanel selectSubmitLink = new IconLinkPanel("select", IconType.TASK, new SubmitLink(IconLinkPanel.LINK_ID) {
       @Override
       public void onSubmit()
       {
@@ -898,7 +901,8 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
         }
         setResponsePage(taskTreePage);
       }
-    }.setDefaultFormProcessing(false);
+    }.setDefaultFormProcessing(false));
+    selectSubmitLink.setTooltip(new ResourceModel("tooltip.selectTask"));
     panel.add(selectSubmitLink);
     final ImageSubmitLinkPanel unselectSubmitLink = new ImageSubmitLinkPanel("unselect", form, WebConstants.IMAGE_TASK_UNSELECT,
         getString("tooltip.unselectTask")) {
@@ -1134,9 +1138,9 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
   {
     private static final long serialVersionUID = 2462093138788881814L;
 
-    private final ImageSubmitLinkPanel rejectSubmitLink;
+    private final IconLinkPanel rejectSubmitLink;
 
-    private final ImageSubmitLinkPanel saveSubmitLink;
+    private final IconLinkPanel saveSubmitLink;
 
     @SuppressWarnings("unused")
     private final Component dataComponent;
@@ -1157,8 +1161,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
       }
       this.dataComponent = dataComponent;
       addColumn(parent, this, "white-space: nowrap; width: 32px;");
-      rejectSubmitLink = new ImageSubmitLinkPanel("reject", form, WebConstants.IMAGE_BUTTON_CANCEL, PFUserContext.getLocalizedMessage(
-          "gantt.tooltip.rejectValue", taskValueAsString)) {
+      rejectSubmitLink = new IconLinkPanel("reject", IconType.DENY, new SubmitLink(IconLinkPanel.LINK_ID, form) {
         @Override
         public void onSubmit()
         {
@@ -1169,17 +1172,18 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
             dataComponent.modelChanged();
           }
         }
-      }.setDefaultFormProcessing(false);
+      }.setDefaultFormProcessing(false)).setColor(CSSColor.RED);
+      rejectSubmitLink.setTooltip(Model.of(PFUserContext.getLocalizedMessage("gantt.tooltip.rejectValue", taskValueAsString)));
       add(rejectSubmitLink);
-      saveSubmitLink = new ImageSubmitLinkPanel("save", form, WebConstants.IMAGE_ACCEPT,
-          GanttChartEditTreeTablePanel.this.getString("gantt.tooltip.saveTaskValue")) {
+      saveSubmitLink = new IconLinkPanel("save", IconType.ACCEPT, new SubmitLink(IconLinkPanel.LINK_ID, form) {
         @Override
         public void onSubmit()
         {
           onSave();
         }
-      }.setDefaultFormProcessing(false);
+      }.setDefaultFormProcessing(false)).setColor(CSSColor.GREEN);
       add(saveSubmitLink);
+
     }
 
     private void setIconsVisible(final boolean visible)

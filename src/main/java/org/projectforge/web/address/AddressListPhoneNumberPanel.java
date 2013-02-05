@@ -30,8 +30,9 @@ import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.address.PhoneType;
-import org.projectforge.web.wicket.PresizedImage;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.flowlayout.IconPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
 
 public class AddressListPhoneNumberPanel extends Panel
 {
@@ -39,7 +40,7 @@ public class AddressListPhoneNumberPanel extends Panel
 
   @SuppressWarnings("serial")
   public AddressListPhoneNumberPanel(final String id, final AddressListPage parentPage, final Integer addressId, final PhoneType phoneType,
-      final String phoneNumber, final boolean favoriteNumber, final boolean sendSms, final String image, final boolean first)
+      final String phoneNumber, final boolean favoriteNumber, final boolean sendSms, final IconType icon, final boolean first)
   {
     super(id);
     final WebMarkupContainer linkOrSpan;
@@ -69,7 +70,7 @@ public class AddressListPhoneNumberPanel extends Panel
       numberLabel.setRenderBodyOnly(true);
     }
     linkOrSpan.add(numberLabel);
-    linkOrSpan.add(new PresizedImage("phoneImage", image));
+    linkOrSpan.add(new IconPanel("phoneImage", icon));
     final Link<String> sendMessage = new Link<String>("sendMessageLink") {
       @Override
       public void onClick()

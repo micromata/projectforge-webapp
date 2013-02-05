@@ -27,11 +27,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.wicket.Component;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
@@ -128,7 +128,7 @@ public class Kost2ListPage extends AbstractListPage<Kost2ListForm, Kost2Dao, Kos
       public void populateItem(final Item<ICellPopulator<Kost2DO>> item, final String componentId, final IModel<Kost2DO> rowModel)
       {
         final Kost2DO kost2 = rowModel.getObject();
-        final Label label = WicketUtils.createBooleanLabel(getRequestCycle(), componentId, kost2.getKost2Art() != null && kost2.getKost2Art().isFakturiert() == true);
+        final Component label = WicketUtils.createBooleanLabel(getRequestCycle(), componentId, kost2.getKost2Art() != null && kost2.getKost2Art().isFakturiert() == true);
         item.add(label);
         cellItemListener.populateItem(item, componentId, rowModel);
       }

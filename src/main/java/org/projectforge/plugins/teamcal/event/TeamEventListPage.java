@@ -33,7 +33,6 @@ import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulato
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -130,8 +129,7 @@ IListPageColumnsCreator<TeamEventDO>
       public void populateItem(final Item<ICellPopulator<TeamEventDO>> item, final String componentId, final IModel<TeamEventDO> rowModel)
       {
         final TeamEventDO event = rowModel.getObject();
-        final Label label = WicketUtils.createBooleanLabel(getRequestCycle(), componentId, event.isAllDay() == true);
-        item.add(label);
+        item.add(WicketUtils.createBooleanLabel(getRequestCycle(), componentId, event.isAllDay() == true));
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });

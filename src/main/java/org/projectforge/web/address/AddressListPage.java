@@ -49,6 +49,7 @@ import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
@@ -71,10 +72,10 @@ import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 import org.projectforge.web.wicket.RowCssClass;
-import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.projectforge.web.wicket.components.ExternalLinkPanel;
-import org.projectforge.web.wicket.components.ImageLinkPanel;
+import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
 
 @ListPage(editPage = AddressEditPage.class)
 public class AddressListPage extends AbstractListPage<AddressListForm, AddressDao, AddressDO> implements IListPageColumnsCreator<AddressDO>
@@ -160,7 +161,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
         item.add(view);
         view.add(new ListSelectActionPanel(view.newChildId(), rowModel, AddressEditPage.class, address.getId(), returnToPage,
             DateTimeFormatter.instance().getFormattedDate(address.getLastUpdate())));
-        view.add(new ImageLinkPanel(view.newChildId(), WebConstants.IMAGE_PRINTER, getString("printView")) {
+        view.add(new IconLinkPanel(view.newChildId(), IconType.PRINT, new ResourceModel("printView"), new Link<Void>(IconLinkPanel.LINK_ID) {
 
           @Override
           public void onClick()
@@ -170,7 +171,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
             final AddressViewPage addressViewPage = new AddressViewPage(params);
             setResponsePage(addressViewPage);
           }
-        });
+        }));
         addRowClick(item);
         cellItemListener.populateItem(item, componentId, rowModel);
       }
@@ -226,13 +227,13 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
         item.add(view);
         final Integer id = address.getId();
         boolean first = addPhoneNumber(view, id, PhoneType.BUSINESS, address.getBusinessPhone(),
-            (personalAddress != null && personalAddress.isFavoriteBusinessPhone() == true), false, WebConstants.IMAGE_PHONE, true);
+            (personalAddress != null && personalAddress.isFavoriteBusinessPhone() == true), false, IconType.BUILDING, true);
         first = addPhoneNumber(view, id, PhoneType.MOBILE, address.getMobilePhone(),
-            (personalAddress != null && personalAddress.isFavoriteMobilePhone() == true), true, WebConstants.IMAGE_PHONE_MOBILE, first);
+            (personalAddress != null && personalAddress.isFavoriteMobilePhone() == true), true, IconType.TABLET, first);
         first = addPhoneNumber(view, id, PhoneType.PRIVATE, address.getPrivatePhone(),
-            (personalAddress != null && personalAddress.isFavoritePrivatePhone() == true), false, WebConstants.IMAGE_PHONE_HOME, first);
+            (personalAddress != null && personalAddress.isFavoritePrivatePhone() == true), false, IconType.HOME, first);
         first = addPhoneNumber(view, id, PhoneType.PRIVATE_MOBILE, address.getPrivateMobilePhone(),
-            (personalAddress != null && personalAddress.isFavoritePrivateMobilePhone() == true), true, WebConstants.IMAGE_PHONE_MOBILE,
+            (personalAddress != null && personalAddress.isFavoritePrivateMobilePhone() == true), true, IconType.TABLET,
             first);
         cellItemListener.populateItem(item, componentId, rowModel);
         item.add(AttributeModifier.append("style", new Model<String>("white-space: nowrap;")));
@@ -371,7 +372,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
   }
 
   private boolean addPhoneNumber(final RepeatingView view, final Integer addressId, final PhoneType phoneType, final String phoneNumber,
-      final boolean favoriteNumber, final boolean sendSms, final String image, final boolean first)
+      final boolean favoriteNumber, final boolean sendSms, final IconType icon, final boolean first)
   {
     if (StringUtils.isBlank(phoneNumber) == true) {
       return first;
@@ -380,7 +381,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
       view.add(new Label(view.newChildId(), "<br/>").setEscapeModelStrings(false).setRenderBodyOnly(true));
     }
     final AddressListPhoneNumberPanel phoneNumberPanel = new AddressListPhoneNumberPanel(view.newChildId(), this, addressId, phoneType,
-        phoneNumber, favoriteNumber, sendSms, image, first);
+        phoneNumber, favoriteNumber, sendSms, icon, first);
     view.add(phoneNumberPanel);
     return false;
   }

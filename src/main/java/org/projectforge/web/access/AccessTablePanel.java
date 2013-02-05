@@ -32,8 +32,8 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.projectforge.access.AccessEntryDO;
 import org.projectforge.user.PFUserContext;
-import org.projectforge.web.wicket.WebConstants;
-import org.projectforge.web.wicket.components.SingleImagePanel;
+import org.projectforge.web.wicket.flowlayout.IconPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
 
 /**
  * Rows of access rights (without header).
@@ -62,10 +62,10 @@ public class AccessTablePanel extends Panel
       final WebMarkupContainer row = new WebMarkupContainer(rowRepeater.newChildId());
       rowRepeater.add(row);
       row.add(new Label("area", ""));
-      row.add(createHeadCell("selectAccess", WebConstants.IMAGE_DATABASE_SELECT, "access.tooltip.selectAccess").setRenderBodyOnly(false));
-      row.add(createHeadCell("insertAccess", WebConstants.IMAGE_DATABASE_INSERT, "access.tooltip.insertAccess").setRenderBodyOnly(false));
-      row.add(createHeadCell("updateAccess", WebConstants.IMAGE_DATABASE_UPDATE, "access.tooltip.updateAccess").setRenderBodyOnly(false));
-      row.add(createHeadCell("deleteAccess", WebConstants.IMAGE_DATABASE_DELETE, "access.tooltip.deleteAccess").setRenderBodyOnly(false));
+      row.add(createHeadCell("selectAccess", IconType.SELECT, "access.tooltip.selectAccess").setRenderBodyOnly(false));
+      row.add(createHeadCell("insertAccess", IconType.INSERT, "access.tooltip.insertAccess").setRenderBodyOnly(false));
+      row.add(createHeadCell("updateAccess", IconType.UPDATE, "access.tooltip.updateAccess").setRenderBodyOnly(false));
+      row.add(createHeadCell("deleteAccess", IconType.DELETE, "access.tooltip.deleteAccess").setRenderBodyOnly(false));
     }
     for (final AccessEntryDO accessEntry : accessEntries) {
       final WebMarkupContainer row = new WebMarkupContainer(rowRepeater.newChildId());
@@ -85,17 +85,17 @@ public class AccessTablePanel extends Panel
     return this;
   }
 
-  private Component createHeadCell(final String componentId, final String image, final String tooltip)
+  private Component createHeadCell(final String componentId, final IconType icon, final String tooltip)
   {
-    return SingleImagePanel.createTooltipImage(componentId, image, getLocalizedString(tooltip)).setRenderBodyOnly(false);
+    return new IconPanel(componentId, icon, getLocalizedString(tooltip));
   }
 
   private Component createTicker(final String componentId, final boolean value)
   {
     if (value == true) {
-      return SingleImagePanel.createPresizedImage(componentId, WebConstants.IMAGE_ACCEPT).setRenderBodyOnly(false);
+      return new IconPanel(componentId, IconType.ACCEPT);
     } else {
-      return SingleImagePanel.createPresizedImage(componentId, WebConstants.IMAGE_DENY).setRenderBodyOnly(false);
+      return new IconPanel(componentId, IconType.DENY);
     }
   }
 

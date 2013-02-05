@@ -45,8 +45,8 @@ import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
-import org.projectforge.web.wicket.WebConstants;
-import org.projectforge.web.wicket.components.SingleImagePanel;
+import org.projectforge.web.wicket.flowlayout.IconPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
 
 @ListPage(editPage = Kost2ArtEditPage.class)
 public class Kost2ArtListPage extends AbstractListPage<Kost2ArtListForm, Kost2ArtDao, Kost2ArtDO> implements
@@ -99,7 +99,7 @@ IListPageColumnsCreator<Kost2ArtDO>
       {
         final Kost2ArtDO kost2Art = rowModel.getObject();
         if (kost2Art.isFakturiert() == true) {
-          item.add(SingleImagePanel.createPresizedImage(componentId, WebConstants.IMAGE_ACCEPT));
+          item.add(new IconPanel(componentId, IconType.ACCEPT));
         } else {
           item.add(createInvisibleDummyComponent(componentId));
         }
@@ -115,7 +115,7 @@ IListPageColumnsCreator<Kost2ArtDO>
       {
         final Kost2ArtDO kost2Art = rowModel.getObject();
         if (kost2Art.isProjektStandard() == true) {
-          item.add(SingleImagePanel.createPresizedImage(componentId, WebConstants.IMAGE_ACCEPT));
+          item.add(new IconPanel(componentId, IconType.ACCEPT));
         } else {
           item.add(createInvisibleDummyComponent(componentId));
         }

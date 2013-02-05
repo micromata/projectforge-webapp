@@ -49,9 +49,9 @@ import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
-import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
-import org.projectforge.web.wicket.components.SingleImagePanel;
+import org.projectforge.web.wicket.flowlayout.IconPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
 
 @ListPage(editPage = AccessEditPage.class)
 public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, GroupTaskAccessDO> implements
@@ -99,7 +99,8 @@ IListPageColumnsCreator<GroupTaskAccessDO>
        *      java.lang.String, org.apache.wicket.model.IModel)
        */
       @Override
-      public void populateItem(final Item<ICellPopulator<GroupTaskAccessDO>> item, final String componentId, final IModel<GroupTaskAccessDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<GroupTaskAccessDO>> item, final String componentId,
+          final IModel<GroupTaskAccessDO> rowModel)
       {
         final GroupTaskAccessDO access = rowModel.getObject();
         final TaskDO task = access.getTask();
@@ -122,7 +123,7 @@ IListPageColumnsCreator<GroupTaskAccessDO>
       {
         final GroupTaskAccessDO access = rowModel.getObject();
         if (access.isRecursive() == true) {
-          item.add(SingleImagePanel.createPresizedImage(componentId, WebConstants.IMAGE_ACCEPT));
+          item.add(new IconPanel(componentId, IconType.ACCEPT));
         } else {
           item.add(createInvisibleDummyComponent(componentId));
         }

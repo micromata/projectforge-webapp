@@ -33,10 +33,11 @@ import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.ResourceModel;
 import org.projectforge.common.StringHelper;
 import org.projectforge.reporting.Kost2Art;
-import org.projectforge.web.wicket.WebConstants;
-import org.projectforge.web.wicket.components.TooltipImage;
+import org.projectforge.web.wicket.flowlayout.IconPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -80,8 +81,8 @@ public class ProjectEditCost2TypeTablePanel extends Panel
         }
         final CheckBox checkBox = new CheckBox("kost2artSelect", new PropertyModel<Boolean>(kost2Art, "selected"));
         colItem.add(checkBox);
-        final TooltipImage image = new TooltipImage("acceptImage", WebConstants.IMAGE_ACCEPT,
-            getString("fibu.projekt.edit.kost2DoesAlreadyExists"));
+        final IconPanel image = new IconPanel("acceptImage", IconType.ACCEPT);
+        image.setTooltip(new ResourceModel("fibu.projekt.edit.kost2DoesAlreadyExists"));
         colItem.add(image);
         if (kost2Art.isExistsAlready() == true) {
           checkBox.setVisible(false);

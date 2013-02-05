@@ -6,7 +6,7 @@
 <body>
   <wicket:panel wicket:id="phoneNumber">
     <a wicket:id="directCallLink" href="/phoneCall?addressId=2&phoneType=privateMobile" onmouseover="zoom('01234 56789'); return false;"
-      onmouseout="hide()"> <img wicket:id="phoneImage" src="/images/phone.png" />&nbsp;<span wicket:id="number">[phone number]</span></a>
+      onmouseout="hide()"> <i wicket:id="phoneImage"></i>&nbsp;<span wicket:id="number">[phone number]</span></a>
     <span wicket:id="phoneNumber" onmouseover="zoom('01234 56789'); return false;" onmouseout="hide()"> <img wicket:id="phoneImage"
       src="/images/phone.png" />&nbsp;<span wicket:id="number">[phone number]</span></span>
     <a wicket:id="sendMessageLink" wicket:message="title:address.tooltip.writeSMS" href="sendSms?addressId=2&phoneType=privateMobile"> <img
