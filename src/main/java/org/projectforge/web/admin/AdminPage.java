@@ -341,13 +341,13 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
       if (c == ',') {
         buf.append("<br/>");
         for (int j = 0; j < indent; j++) {
-          buf.append("&nbsp;&nbsp;");
+          buf.append("&nbsp;&nbsp;&nbsp;&nbsp;");
         }
       } else if (c == '[') {
         indent++;
         buf.append("<br/>");
         for (int j = 0; j < indent; j++) {
-          buf.append("&nbsp;&nbsp;");
+          buf.append("&nbsp;&nbsp;&nbsp;&nbsp;");
         }
       } else if (c == ']') {
         indent--;
