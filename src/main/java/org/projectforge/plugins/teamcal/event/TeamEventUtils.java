@@ -109,7 +109,7 @@ public class TeamEventUtils
     final DateList dateList = recur.getDates(seed, ical4jStartDate, ical4jEndDate, Value.TIME);
     final Collection<TeamEvent> col = new ArrayList<TeamEvent>();
     if (dateList != null) {
-      for (final Object obj : dateList) {
+      OuterLoop : for (final Object obj : dateList) {
         final DateTime dateTime = (DateTime) obj;
         final Calendar startDay = Calendar.getInstance(timeZone);
         startDay.setTime(dateTime);
@@ -119,7 +119,7 @@ public class TeamEventUtils
           for (final Calendar exDate : exDates) {
             if (CalendarUtils.isSameDay(startDay, exDate) == true) {
               // this date is part of ex dates, so don't use it.
-              continue;
+              continue OuterLoop;
             }
           }
         }
