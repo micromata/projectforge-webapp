@@ -148,7 +148,13 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
     super.setResponsePage();
     if (returnToPage instanceof CalendarPage) {
       // Display the date of this time sheet in the CalendarPage (useful if the time sheet was moved).
-      ((CalendarPage) returnToPage).setStartDate(getData().getStartDate());
+      if (newEvent != null) {
+        ((CalendarPage) returnToPage).setStartDate(newEvent.getStartDate());
+      } else if (eventOfCaller != null) {
+        ((CalendarPage) returnToPage).setStartDate(eventOfCaller.getStartDate());
+      } else {
+        ((CalendarPage) returnToPage).setStartDate(getData().getStartDate());
+      }
     }
   }
 
@@ -170,13 +176,14 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
     form.setData(masterEvent);
     if (recurrencyChangeType == RecurrencyChangeType.ALL_FUTURE) {
       // Set the end date of the master date one day before current date and save this event.
-      final Date recurrenceUntil = new Date(eventOfCaller.getStartDate().getTime() - 3600 * 1000);
+      final Date recurrenceUntil = new Date(eventOfCaller.getStartDate().getTime() - 24 * 3600 * 1000);
       newEvent = oldDataObject;
       if (log.isDebugEnabled() == true) {
         log.debug("Recurrency until date of master entry will be set to: " + DateHelper.formatAsUTC(recurrenceUntil));
         log.debug("The new event is: " + newEvent);
       }
-      masterEvent.setRecurrenceUntil(recurrenceUntil); // Minus 1 hour.
+      form.recurrenceData.setUntil(recurrenceUntil); // Minus 24 hour.
+      getData().setRecurrence(form.recurrenceData);
       return null;
     } else if (recurrencyChangeType == RecurrencyChangeType.ONLY_CURRENT) { // only current date
       // Add current date to the master date as exclusion date and save this event (without recurrency settings).

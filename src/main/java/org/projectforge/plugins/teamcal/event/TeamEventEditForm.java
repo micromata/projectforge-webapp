@@ -79,9 +79,10 @@ import org.projectforge.web.wicket.flowlayout.HtmlCommentPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 
 /**
- * form to edit team events.
+ * Form to edit team events.
  * 
  * @author M. Lauterbach (m.lauterbach@micromata.de)
+ * @author K. Reinhard (K.Reinhard@micromata.de)
  * 
  */
 public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEditPage>
