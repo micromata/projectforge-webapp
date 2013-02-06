@@ -324,8 +324,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
     gridBuilder.newFormHeading(getString("plugins.teamcal.attendees"));
-    gridBuilder.newSplitPanel(GridSize.COL50);
-    gridBuilder.newFormHeading(getString("plugins.teamcal.event.reminder"));
+    // gridBuilder.newSplitPanel(GridSize.COL50);
+    // gridBuilder.newFormHeading(getString("plugins.teamcal.event.reminder"));
 
     gridBuilder.newGridPanel();
     if (parentPage.getRecurrencyChangeType() != null) {
