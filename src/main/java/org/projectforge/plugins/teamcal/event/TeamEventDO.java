@@ -364,6 +364,12 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
     return StringUtils.isNotBlank(this.recurrenceRule);
   }
 
+  public TeamEventDO clearAllRecurrenceFields()
+  {
+    setRecurrence(null).setRecurrenceExDate(null).setRecurrenceUntil(null);
+    return this;
+  }
+
   /**
    * The recurrenceUntil date is calculated by the recurrenceRule string if given, otherwise the date is set to null.
    * @see org.projectforge.core.AbstractBaseDO#recalculate()

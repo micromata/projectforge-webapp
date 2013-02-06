@@ -234,6 +234,21 @@ public class ICal4JUtils
     return new MyIcal4JDate(javaDate, timeZone);
   }
 
+  public static net.fortuna.ical4j.model.Date parseICal4jDate(final String dateString)
+  {
+    if (dateString == null) {
+      return null;
+    }
+    net.fortuna.ical4j.model.Date date;
+    try {
+      date = new net.fortuna.ical4j.model.Date(dateString);
+    } catch (final ParseException ex) {
+      log.error("Unable to parse date string: '" + dateString + "': " + ex.getMessage(), ex);
+      return null;
+    }
+    return date;
+  }
+
   private static class MyIcal4JDate extends net.fortuna.ical4j.model.Date
   {
     private static final long serialVersionUID = 341788808291157447L;

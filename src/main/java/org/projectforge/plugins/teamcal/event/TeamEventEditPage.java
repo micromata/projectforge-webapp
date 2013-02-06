@@ -23,6 +23,7 @@
 
 package org.projectforge.plugins.teamcal.event;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 import org.apache.commons.lang.Validate;
@@ -30,13 +31,14 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHelper;
+import org.projectforge.core.ModificationStatus;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredBasePage;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
- *
+ * 
  */
 public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEditForm, TeamEventDao>
 {
@@ -49,7 +51,15 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
 
   private RecurrencyChangeType recurrencyChangeType;
 
-  private TeamEvent originalEvent;
+  /**
+   * Only given if called by recurrence dialog.
+   */
+  private TeamEvent eventOfCaller;
+
+  /**
+   * Used for recurrence events in {@link #onSaveOrUpdate()} and {@link #afterSaveOrUpdate()}
+   */
+  private TeamEventDO newEvent;
 
   /**
    * @param parameters
@@ -72,17 +82,56 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   /**
    * @param parameters
    */
-  public TeamEventEditPage(final PageParameters parameters, final TeamEventDO event, final TeamEvent originalEvent, final RecurrencyChangeType recurrencyChangeType)
+  public TeamEventEditPage(final PageParameters parameters, final TeamEvent event, final Timestamp newStartDate,
+      final Timestamp newEndDate, final RecurrencyChangeType recurrencyChangeType)
   {
     super(parameters, "plugins.teamcal.event");
-    Validate.notNull(originalEvent);
+    Validate.notNull(event);
     Validate.notNull(recurrencyChangeType);
+    // event contains the new start and/or stop date if modified.
     if (log.isDebugEnabled() == true) {
-      log.debug("TeamEvent is: " + originalEvent);
+      log.debug("TeamEvent is: newStartDate="
+          + newStartDate
+          + ", newEndDate="
+          + newEndDate
+          + ", event=["
+          + event
+          + "], event=["
+          + event
+          + "]");
     }
-    this.originalEvent = originalEvent;
+    this.eventOfCaller = event;
     this.recurrencyChangeType = recurrencyChangeType;
-    super.init(event);
+    Integer id;
+    if (event instanceof TeamEventDO) {
+      id = ((TeamEventDO) event).getId();
+    } else {
+      id = ((TeamRecurrenceEvent) event).getMaster().getId();
+    }
+    final TeamEventDO teamEventDO = teamEventDao.getById(id);
+    if (recurrencyChangeType == RecurrencyChangeType.ALL) {
+      // The user wants to edit all events, so check if the user changes start and/or end date. If so, move the date of the original event.
+      if (newStartDate != null) {
+        final long startDateMove = newStartDate.getTime() - event.getStartDate().getTime();
+        teamEventDO.setStartDate(new Timestamp(teamEventDO.getStartDate().getTime() + startDateMove));
+      }
+      if (newEndDate != null) {
+        final long endDateMove = newEndDate.getTime() - event.getEndDate().getTime();
+        teamEventDO.setEndDate(new Timestamp(teamEventDO.getEndDate().getTime() + endDateMove));
+      }
+    } else {
+      if (newStartDate != null) {
+        teamEventDO.setStartDate(newStartDate);
+      }
+      if (newEndDate != null) {
+        teamEventDO.setEndDate(newEndDate);
+      }
+    }
+    if (recurrencyChangeType == RecurrencyChangeType.ONLY_CURRENT) {
+      // The user wants to change only the current event, so remove all recurrency fields.
+      teamEventDO.clearAllRecurrenceFields();
+    }
+    super.init(teamEventDO);
   }
 
   /**
@@ -116,28 +165,45 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
     }
     final Integer masterId = getData().getId(); // Store the id of the master entry.
     getData().setId(null); // Clone object.
-    final TeamEventDO newEvent = getData();
+    final TeamEventDO oldDataObject = getData();
     final TeamEventDO masterEvent = teamEventDao.getById(masterId);
     form.setData(masterEvent);
     if (recurrencyChangeType == RecurrencyChangeType.ALL_FUTURE) {
       // Set the end date of the master date one day before current date and save this event.
-      final Date recurrenceUntil = new Date(originalEvent.getStartDate().getTime() - 3600 * 1000);
+      final Date recurrenceUntil = new Date(eventOfCaller.getStartDate().getTime() - 3600 * 1000);
+      newEvent = oldDataObject;
       if (log.isDebugEnabled() == true) {
         log.debug("Recurrency until date of master entry will be set to: " + DateHelper.formatAsUTC(recurrenceUntil));
         log.debug("The new event is: " + newEvent);
       }
       masterEvent.setRecurrenceUntil(recurrenceUntil); // Minus 1 hour.
-      throw new UnsupportedOperationException("Not yet implemented");
-    } else { // only current date
-      // Add current date to the master date as exlusion date and save this event (without recurrency settings).
-      masterEvent.addRecurrenceExDate(originalEvent.getStartDate());
+      return null;
+    } else if (recurrencyChangeType == RecurrencyChangeType.ONLY_CURRENT) { // only current date
+      // Add current date to the master date as exclusion date and save this event (without recurrency settings).
+      masterEvent.addRecurrenceExDate(eventOfCaller.getStartDate());
+      newEvent = oldDataObject;
       if (log.isDebugEnabled() == true) {
-        log.debug("Recurrency ex date of master entry is now added: " + DateHelper.formatAsUTC(originalEvent.getStartDate()) + ". The new string is: " + masterEvent.getRecurrenceExDate());
+        log.debug("Recurrency ex date of master entry is now added: "
+            + DateHelper.formatAsUTC(eventOfCaller.getStartDate())
+            + ". The new string is: "
+            + masterEvent.getRecurrenceExDate());
         log.debug("The new event is: " + newEvent);
       }
-      throw new UnsupportedOperationException("Not yet implemented");
+      return null;
     }
-    //return null;
+    return null;
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractEditPage#afterUpdate(org.projectforge.core.ModificationStatus)
+   */
+  @Override
+  public AbstractSecuredBasePage afterUpdate(final ModificationStatus modificationStatus)
+  {
+    if (newEvent != null) {
+      teamEventDao.save(newEvent);
+    }
+    return null;
   }
 
   /**
@@ -159,7 +225,8 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   }
 
   /**
-   * @see org.projectforge.web.wicket.AbstractEditPage#newEditForm(org.projectforge.web.wicket.AbstractEditPage, org.projectforge.core.AbstractBaseDO)
+   * @see org.projectforge.web.wicket.AbstractEditPage#newEditForm(org.projectforge.web.wicket.AbstractEditPage,
+   *      org.projectforge.core.AbstractBaseDO)
    */
   @Override
   protected TeamEventEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final TeamEventDO data)

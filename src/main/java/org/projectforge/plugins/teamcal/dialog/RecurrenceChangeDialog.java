@@ -29,13 +29,10 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.plugins.teamcal.event.RecurrencyChangeType;
 import org.projectforge.plugins.teamcal.event.TeamEvent;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
-import org.projectforge.plugins.teamcal.event.TeamEventDao;
 import org.projectforge.plugins.teamcal.event.TeamEventEditPage;
-import org.projectforge.plugins.teamcal.event.TeamRecurrenceEvent;
 import org.projectforge.web.dialog.ModalDialog;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
@@ -62,9 +59,6 @@ public class RecurrenceChangeDialog extends ModalDialog
   private Timestamp newStartDate, newEndDate;
 
   private SingleButtonPanel allFutureEventsButtonPanel;
-
-  @SpringBean
-  private TeamEventDao teamEventDao;
 
   /**
    * @param id
@@ -165,22 +159,7 @@ public class RecurrenceChangeDialog extends ModalDialog
   }
 
   private void onChangeEvents(final AjaxRequestTarget target, final TeamEvent event, final RecurrencyChangeType recurrencyChangeType) {
-    Integer id;
-    if (event instanceof TeamEventDO) {
-      id = ((TeamEventDO) event).getId();
-    } else {
-      id = ((TeamRecurrenceEvent) event).getMaster().getId();
-    }
-    final TeamEventDO teamEventDO = teamEventDao.getById(id);
-    if (newStartDate != null) {
-      final long move = newStartDate.getTime() - event.getStartDate().getTime();
-      teamEventDO.setStartDate(new Timestamp(teamEventDO.getStartDate().getTime() + move));
-    }
-    if (newEndDate != null) {
-      final long move = newEndDate.getTime() - event.getEndDate().getTime();
-      teamEventDO.setEndDate(new Timestamp(teamEventDO.getEndDate().getTime() + move));
-    }
-    final TeamEventEditPage teamEventEditPage = new TeamEventEditPage(new PageParameters(), teamEventDO, event, recurrencyChangeType);
+    final TeamEventEditPage teamEventEditPage = new TeamEventEditPage(new PageParameters(), event, newStartDate, newEndDate, recurrencyChangeType);
     teamEventEditPage.setReturnToPage(getWebPage());
     setResponsePage(teamEventEditPage);
   }

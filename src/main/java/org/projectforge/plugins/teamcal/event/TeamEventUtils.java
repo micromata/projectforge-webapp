@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.StringTokenizer;
 
 import net.fortuna.ical4j.model.DateList;
 import net.fortuna.ical4j.model.DateTime;
@@ -38,6 +40,7 @@ import net.fortuna.ical4j.model.property.RRule;
 
 import org.projectforge.calendar.CalendarUtils;
 import org.projectforge.calendar.ICal4JUtils;
+import org.projectforge.common.DateHelper;
 import org.projectforge.common.RecurrenceFrequency;
 
 /**
@@ -102,6 +105,7 @@ public class TeamEventUtils
           + seed);
       return null;
     }
+    final Collection<Calendar> exDates = getExDates(event.getRecurrenceExDate());
     final DateList dateList = recur.getDates(seed, ical4jStartDate, ical4jEndDate, Value.TIME);
     final Collection<TeamEvent> col = new ArrayList<TeamEvent>();
     if (dateList != null) {
@@ -111,6 +115,14 @@ public class TeamEventUtils
         startDay.setTime(dateTime);
         final Calendar masterStartDate = Calendar.getInstance(timeZone);
         masterStartDate.setTime(event.getStartDate());
+        if (exDates != null && exDates.size() > 0) {
+          for (final Calendar exDate : exDates) {
+            if (CalendarUtils.isSameDay(startDay, exDate) == true) {
+              // this date is part of ex dates, so don't use it.
+              continue;
+            }
+          }
+        }
         if (CalendarUtils.isSameDay(startDay, masterStartDate) == true) {
           // Put event itself to the list.
           col.add(event);
@@ -122,6 +134,25 @@ public class TeamEventUtils
     }
     return col;
       }
+
+  public static Collection<Calendar> getExDates(final String recurrenceExdate)
+  {
+    final Collection<Calendar> exDates = new LinkedList<Calendar>();
+    if (recurrenceExdate == null) {
+      return exDates;
+    }
+    final StringTokenizer tokenizer = new StringTokenizer(recurrenceExdate, ",");
+    while (tokenizer.hasMoreTokens() == true) {
+      final String dateString = tokenizer.nextToken().trim();
+      final net.fortuna.ical4j.model.Date date = ICal4JUtils.parseICal4jDate(dateString);
+      if (date != null) {
+        final Calendar cal = Calendar.getInstance(DateHelper.UTC);
+        cal.setTime(date);
+        exDates.add(cal);
+      }
+    }
+    return exDates;
+  }
 
   public static RecurrenceFrequency[] getSupportedRecurrenceIntervals()
   {

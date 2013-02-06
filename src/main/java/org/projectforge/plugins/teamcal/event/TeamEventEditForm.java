@@ -112,7 +112,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
   private WebMarkupContainer recurrencePanel;
 
-  private FieldsetPanel recurrenceFieldset, recurrenceUntilDateFieldset, recurrenceIntervalFieldset;
+  private FieldsetPanel recurrenceFieldset, recurrenceUntilDateFieldset, recurrenceIntervalFieldset, recurrenceExDateFieldset;
 
   final TeamEventRight right = new TeamEventRight();
 
@@ -313,6 +313,14 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     {
       // customized yearly: month of year and see day of month.
     }
+    {
+      // Until. Only visible if recurrenceData.interval != NONE.
+      recurrenceExDateFieldset = gridBuilder.newFieldset(getString("plugins.teamcal.event.recurrence.exDate"));
+      recurrenceExDateFieldset.add(new MaxLengthTextField(recurrenceExDateFieldset.getTextFieldId(), new PropertyModel<String>(data,
+          "recurrenceExDate")));
+      recurrenceExDateFieldset.getFieldset().setOutputMarkupId(true);
+      recurrenceExDateFieldset.addHelpIcon(getString("plugins.teamcal.event.recurrence.exDate.tooltip"));
+    }
     gridBuilder.newSplitPanel(GridSize.COL50);
     gridBuilder.newFormHeading(getString("plugins.teamcal.attendees"));
     gridBuilder.newSplitPanel(GridSize.COL50);
@@ -323,7 +331,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       final FieldsetPanel fs = gridBuilder.newFieldset((String) null).setLabelSide(false).setNoLabelFor();
       fs.add(new DivTextPanel(fs.newChildId(), getString("plugins.teamcal.event.recurrence.change.text")
           + " "
-          + getString(parentPage.getRecurrencyChangeType().getI18nKey()) + "."));
+          + getString(parentPage.getRecurrencyChangeType().getI18nKey())
+          + "."));
     }
 
     setRecurrenceComponentsVisibility(null);
@@ -357,10 +366,12 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     if (recurrenceData.getFrequency() == RecurrenceFrequency.NONE) {
       customizedCheckBoxPanel.setVisible(false);
       recurrenceUntilDateFieldset.setVisible(false);
+      recurrenceExDateFieldset.setVisible(false);
       recurrenceIntervalFieldset.setVisible(false);
     } else {
       customizedCheckBoxPanel.setVisible(true);
       recurrenceUntilDateFieldset.setVisible(true);
+      recurrenceExDateFieldset.setVisible(true);
       recurrenceIntervalFieldset.setVisible(recurrenceData.isCustomized());
     }
     if (target != null) {
@@ -532,7 +543,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     return log;
   }
 
-  void setData(final TeamEventDO data) {
+  void setData(final TeamEventDO data)
+  {
     this.data = data;
   }
 }
