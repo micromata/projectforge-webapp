@@ -99,7 +99,7 @@ extends AbstractSecuredMobilePage implements IEditPage<O, D>
     pageContainer.add(form);
     form.init();
     // add(new Label("title", getString(AbstractEditPage.getTitleKey(i18nPrefix, isNew()))));
-    this.editPageSupport = new EditPageSupport<O, D>(this, getBaseDao(), getData());
+    this.editPageSupport = new EditPageSupport<O, D>(this, getBaseDao());
   }
 
   /**
@@ -247,7 +247,8 @@ extends AbstractSecuredMobilePage implements IEditPage<O, D>
   {
   }
 
-  protected O getData()
+  @Override
+  public O getData()
   {
     if (form == null || form.getData() == null) {
       getLogger().error("Data of form is null. Maybe you have forgotten to call AbstractEditPage.init() in constructor.");

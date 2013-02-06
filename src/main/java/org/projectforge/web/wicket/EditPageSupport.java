@@ -43,15 +43,12 @@ public class EditPageSupport<O extends AbstractBaseDO< ? >, D extends BaseDao<O>
 
   private final D baseDao;
 
-  private final O data;
-
   private boolean updateAndNext;
 
-  public EditPageSupport(final IEditPage<O, D> editPage, final D baseDao, final O data)
+  public EditPageSupport(final IEditPage<O, D> editPage, final D baseDao)
   {
     this.editPage = editPage;
     this.baseDao = baseDao;
-    this.data = data;
   }
 
   /**
@@ -60,19 +57,19 @@ public class EditPageSupport<O extends AbstractBaseDO< ? >, D extends BaseDao<O>
   public void create()
   {
     if (log.isDebugEnabled() == true) {
-      log.debug("create in " + editPage.getClass() + ": " + data);
+      log.debug("create in " + editPage.getClass() + ": " + editPage.getData());
     }
-    synchronized (data) {
+    synchronized (editPage.getData()) {
       if (editPage.isAlreadySubmitted() == true) {
         log.info("Double click detection in " + editPage.getClass() + " create method. Do nothing.");
       } else {
         editPage.setAlreadySubmitted(true);
-        if (data.getId() != null && data instanceof IManualIndex == false) {
+        if (editPage.getData().getId() != null && editPage.getData() instanceof IManualIndex == false) {
           // User has used the back button?
           log.info("User has used the back button in "
               + editPage.getClass()
               + " after inserting a new object? Try to load the object from the data base and show edit page again.");
-          final O dbObj = baseDao.getById(data.getId());
+          final O dbObj = baseDao.getById(editPage.getData().getId());
           if (dbObj == null) {
             // Error while trying to insert Object and user has used the back button?
             log.info("User has used the back button "
@@ -81,7 +78,7 @@ public class EditPageSupport<O extends AbstractBaseDO< ? >, D extends BaseDao<O>
             editPage.clearIds();
             return;
           }
-          data.copyValuesFrom(dbObj);
+          editPage.getData().copyValuesFrom(dbObj);
           return;
         }
         WebPage page = editPage.onSaveOrUpdate();
@@ -90,7 +87,7 @@ public class EditPageSupport<O extends AbstractBaseDO< ? >, D extends BaseDao<O>
           return;
         }
         try {
-          baseDao.save(data);
+          baseDao.save(editPage.getData());
         } catch (final DataIntegrityViolationException ex) {
           log.error(ex.getMessage(), ex);
           throw new UserException("exception.constraintViolation");
@@ -116,9 +113,9 @@ public class EditPageSupport<O extends AbstractBaseDO< ? >, D extends BaseDao<O>
   public void update()
   {
     if (log.isDebugEnabled() == true) {
-      log.debug("update in " + editPage.getClass() + ": " + data);
+      log.debug("update in " + editPage.getClass() + ": " + editPage.getData());
     }
-    synchronized (data) {
+    synchronized (editPage.getData()) {
       if (editPage.isAlreadySubmitted() == true) {
         log.info("Double click detection in " + editPage.getClass() + " update method. Do nothing.");
       } else {
@@ -130,7 +127,7 @@ public class EditPageSupport<O extends AbstractBaseDO< ? >, D extends BaseDao<O>
         }
         ModificationStatus modified = ModificationStatus.NONE;
         try {
-          modified = baseDao.update(data);
+          modified = baseDao.update(editPage.getData());
         } catch (final DataIntegrityViolationException ex) {
           log.error(ex.getMessage(), ex);
           throw new UserException("exception.constraintViolation");
@@ -156,7 +153,7 @@ public class EditPageSupport<O extends AbstractBaseDO< ? >, D extends BaseDao<O>
   public void updateAndNext()
   {
     if (log.isDebugEnabled() == true) {
-      log.debug("update in " + editPage.getClass() + ": " + data);
+      log.debug("update in " + editPage.getClass() + ": " + editPage.getData());
     }
     update();
     updateAndNext = true;
@@ -176,9 +173,9 @@ public class EditPageSupport<O extends AbstractBaseDO< ? >, D extends BaseDao<O>
   public void undelete()
   {
     if (log.isDebugEnabled() == true) {
-      log.debug("undelete in " + editPage.getClass() + ": " + data);
+      log.debug("undelete in " + editPage.getClass() + ": " + editPage.getData());
     }
-    synchronized (data) {
+    synchronized (editPage.getData()) {
       if (editPage.isAlreadySubmitted() == true) {
         log.info("Double click detection in " + editPage.getClass() + " undelete method. Do nothing.");
       } else {
@@ -188,7 +185,7 @@ public class EditPageSupport<O extends AbstractBaseDO< ? >, D extends BaseDao<O>
           editPage.setResponsePageAndHighlightedRow(page);
           return;
         }
-        baseDao.undelete(data);
+        baseDao.undelete(editPage.getData());
       }
     }
     editPage.afterUndelete();
@@ -198,9 +195,9 @@ public class EditPageSupport<O extends AbstractBaseDO< ? >, D extends BaseDao<O>
   public void markAsDeleted()
   {
     if (log.isDebugEnabled() == true) {
-      log.debug("Mark object as deleted in " + editPage.getClass() + ": " + data);
+      log.debug("Mark object as deleted in " + editPage.getClass() + ": " + editPage.getData());
     }
-    synchronized (data) {
+    synchronized (editPage.getData()) {
       if (editPage.isAlreadySubmitted() == true) {
         log.info("Double click detection in " + editPage.getClass() + " markAsDeleted method. Do nothing.");
       } else {
@@ -210,7 +207,7 @@ public class EditPageSupport<O extends AbstractBaseDO< ? >, D extends BaseDao<O>
           editPage.setResponsePageAndHighlightedRow(page);
           return;
         }
-        baseDao.markAsDeleted(data);
+        baseDao.markAsDeleted(editPage.getData());
         editPage.afterDelete();
         editPage.setResponsePage();
       }
@@ -220,9 +217,9 @@ public class EditPageSupport<O extends AbstractBaseDO< ? >, D extends BaseDao<O>
   public void delete()
   {
     if (log.isDebugEnabled() == true) {
-      log.debug("delete in " + editPage.getClass() + ": " + data);
+      log.debug("delete in " + editPage.getClass() + ": " + editPage.getData());
     }
-    synchronized (data) {
+    synchronized (editPage.getData()) {
       if (editPage.isAlreadySubmitted() == true) {
         log.info("Double click detection in " + editPage.getClass() + " delete method. Do nothing.");
       } else {
@@ -232,7 +229,7 @@ public class EditPageSupport<O extends AbstractBaseDO< ? >, D extends BaseDao<O>
           editPage.setResponsePageAndHighlightedRow(page);
           return;
         }
-        baseDao.delete(data);
+        baseDao.delete(editPage.getData());
         editPage.afterDelete();
         editPage.setResponsePage();
       }

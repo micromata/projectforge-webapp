@@ -192,7 +192,7 @@ AbstractSecuredPage implements IEditPage<O, D>
     body.add(timeOfLastUpdateLabel);
     onPreEdit();
     evaluateInitialPageParameters(getPageParameters());
-    this.editPageSupport = new EditPageSupport<O, D>(this, getBaseDao(), getData());
+    this.editPageSupport = new EditPageSupport<O, D>(this, getBaseDao());
   }
 
   protected List<DisplayHistoryEntry> getHistory()
@@ -426,7 +426,8 @@ AbstractSecuredPage implements IEditPage<O, D>
    * Convenience method.
    * @see AbstractEditForm#getData()
    */
-  protected O getData()
+  @Override
+  public O getData()
   {
     if (form == null || form.getData() == null) {
       getLogger().error("Data of form is null. Maybe you have forgotten to call AbstractEditPage.init() in constructor.");
