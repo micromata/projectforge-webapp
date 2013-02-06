@@ -143,51 +143,53 @@ public class AddressDao extends BaseDao<AddressDO>
           // Show only favorites.
           return personalAddressDao.getMyAddresses();
         }
-        // First proceed contact status:
-        // Use filter only for non deleted entries:
-        if (myFilter.isActive() == true
-            || myFilter.isNonActive() == true
-            || myFilter.isUninteresting() == true
-            || myFilter.isDeparted() == true
-            || myFilter.isPersonaIngrata() == true) {
-          final Collection<ContactStatus> col = new ArrayList<ContactStatus>();
-          if (myFilter.isActive() == true) {
-            col.add(ContactStatus.ACTIVE);
-          }
-          if (myFilter.isNonActive() == true) {
-            col.add(ContactStatus.NON_ACTIVE);
-          }
-          if (myFilter.isUninteresting() == true) {
-            col.add(ContactStatus.UNINTERESTING);
-          }
-          if (myFilter.isDeparted() == true) {
-            col.add(ContactStatus.DEPARTED);
-          }
-          if (myFilter.isPersonaIngrata() == true) {
-            col.add(ContactStatus.PERSONA_INGRATA);
-          }
-          queryFilter.add(Restrictions.in("contactStatus", col));
-        }
-
-        // Proceed address status:
-        // Use filter only for non deleted books:
-        if (myFilter.isUptodate() == true || myFilter.isOutdated() == true || myFilter.isLeaved() == true) {
-          final Collection<AddressStatus> col = new ArrayList<AddressStatus>();
-          if (myFilter.isUptodate() == true) {
-            col.add(AddressStatus.UPTODATE);
-          }
-          if (myFilter.isOutdated() == true) {
-            col.add(AddressStatus.OUTDATED);
-          }
-          if (myFilter.isLeaved() == true) {
-            col.add(AddressStatus.LEAVED);
-          }
-          queryFilter.add(Restrictions.in("addressStatus", col));
-        }
       }
     } else {
       if (StringUtils.isNumeric(filter.getSearchString()) == true) {
         myFilter.setSearchString("*" + myFilter.getSearchString() + "*");
+      }
+    }
+    if ("filter".equals(myFilter.getListType()) == true) {
+      // Proceed contact status:
+      // Use filter only for non deleted entries:
+      if (myFilter.isActive() == true
+          || myFilter.isNonActive() == true
+          || myFilter.isUninteresting() == true
+          || myFilter.isDeparted() == true
+          || myFilter.isPersonaIngrata() == true) {
+        final Collection<ContactStatus> col = new ArrayList<ContactStatus>();
+        if (myFilter.isActive() == true) {
+          col.add(ContactStatus.ACTIVE);
+        }
+        if (myFilter.isNonActive() == true) {
+          col.add(ContactStatus.NON_ACTIVE);
+        }
+        if (myFilter.isUninteresting() == true) {
+          col.add(ContactStatus.UNINTERESTING);
+        }
+        if (myFilter.isDeparted() == true) {
+          col.add(ContactStatus.DEPARTED);
+        }
+        if (myFilter.isPersonaIngrata() == true) {
+          col.add(ContactStatus.PERSONA_INGRATA);
+        }
+        queryFilter.add(Restrictions.in("contactStatus", col));
+      }
+
+      // Proceed address status:
+      // Use filter only for non deleted books:
+      if (myFilter.isUptodate() == true || myFilter.isOutdated() == true || myFilter.isLeaved() == true) {
+        final Collection<AddressStatus> col = new ArrayList<AddressStatus>();
+        if (myFilter.isUptodate() == true) {
+          col.add(AddressStatus.UPTODATE);
+        }
+        if (myFilter.isOutdated() == true) {
+          col.add(AddressStatus.OUTDATED);
+        }
+        if (myFilter.isLeaved() == true) {
+          col.add(AddressStatus.LEAVED);
+        }
+        queryFilter.add(Restrictions.in("addressStatus", col));
       }
     }
     queryFilter.addOrder(Order.asc("name"));
