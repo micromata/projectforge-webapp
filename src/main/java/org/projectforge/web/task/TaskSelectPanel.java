@@ -25,7 +25,9 @@ package org.projectforge.web.task;
 
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
@@ -36,11 +38,10 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.apache.wicket.util.convert.IConverter;
 import org.hibernate.Hibernate;
-import org.projectforge.task.TaskDO;
-import org.projectforge.task.TaskFavorite;
-import org.projectforge.task.TaskNode;
-import org.projectforge.task.TaskTree;
+import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.task.*;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.CSSColor;
 import org.projectforge.web.fibu.ISelectCallerPage;
@@ -48,6 +49,7 @@ import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.AbstractSelectPanel;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.components.FavoritesChoicePanel;
 import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
 import org.projectforge.web.wicket.flowlayout.IconPanel;
@@ -61,6 +63,9 @@ import org.projectforge.web.wicket.flowlayout.IconType;
 public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements ComponentWrapperPanel
 {
   private static final long serialVersionUID = -7231190025292695850L;
+
+  @SpringBean(name = "taskDao")
+  private TaskDao taskDao;
 
   @SpringBean(name = "taskTree")
   private TaskTree taskTree;
@@ -155,6 +160,69 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
     };
     taskLink.setDefaultFormProcessing(false);
     divContainer.add(taskLink);
+    // search
+    PFAutoCompleteTextField<TaskDO> autoCompleteTextField = new PFAutoCompleteTextField<TaskDO>("seachTaskInput", getModel())
+    {
+      @Override
+      protected List<TaskDO> getChoices(final String input)
+      {
+        BaseSearchFilter filter = new BaseSearchFilter();
+        filter.setSearchString(input);
+        final List<TaskDO> result = taskDao.getList(filter);
+        return result;
+      }
+
+      @Override
+      protected String formatValue(final TaskDO value)
+      {
+        if(value == null) {
+          return "";
+        }
+        return value.getTitle();
+      }
+
+      @Override
+      protected String formatLabel(final TaskDO value)
+      {
+        if(value == null) {
+          return "";
+        }
+        return "" + value.getId();
+      }
+
+      @SuppressWarnings({ "unchecked", "rawtypes"})
+        @Override
+        public <C> IConverter<C> getConverter(final Class<C> type)
+        {
+          return new IConverter() {
+            @Override
+            public Object convertToObject(final String value, final Locale locale)
+            {
+
+              if (StringUtils.isEmpty(value) == true) {
+                getModel().setObject(null);
+                return null;
+              }
+              final TaskDO task = taskTree.getTaskById(Integer.valueOf(value));
+              if (task == null) {
+                error("hurzel"); // TODO
+              }
+              getModel().setObject(task);
+              return task;
+            }
+
+            @Override
+            public String convertToString(final Object value, final Locale locale)
+            {
+              if (value == null) {
+                return "";
+              }
+              final TaskDO task = (TaskDO) value;
+              return task.getTitle();
+            }
+          };
+        }
+    };
     WicketUtils.addTooltip(taskLink, getString("task.selectPanel.displayTask.tooltip"));
     taskLink.add(new Label("name", new Model<String>() {
       /**

@@ -11,7 +11,9 @@
       <wicket:container wicket:id="ancestorTasks">
         <a wicket:id="ancestorTaskLink"><span wicket:id="name">[ancestor task name]</span> <span style="font-weight: bold; color: red; font-size: 1.2em;">|</span> </a>
       </wicket:container>
-      <a wicket:id="taskLink"><span wicket:id="name">[task name]</span></a> <a wicket:id="select"><i wicket:id="selectHelp"></i></a>
+      <a wicket:id="taskLink"><span wicket:id="name">[task name]</span></a>
+      <input wicket:id="seachTaskInput" /> <i class="icon-search"></i> <!-- autocomplete -->
+      <a wicket:id="select"><i wicket:id="selectHelp"></i></a>
       <a wicket:id="unselect"><i wicket:id="unselectHelp"></i></a> <span wicket:id="favorites">[Show
         favorites]</span>
     </div>
