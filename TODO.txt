@@ -2,12 +2,10 @@ Johannes
 --------
 - JavaScript mergen, ähnlich CSS
 - CSS/Javascript minimieren
-- ContextMenu für Ereignisse russ.
+- Tooltipps für FullCalendar über Ajax nachladen?
 
 TeamCal
 -------
-- Named-Dialog russ.
-- TeamCalDialog designen.
 - TeamCalEdit: Ganztags-Knopp versaut DatePicker.
 - TeamCalEdit: Wenn Start-Datum geändert wird, dann EndeDatum mit ändern (falls dies bisher noch nicht geändert wurde)
 - Recurrency
@@ -17,8 +15,13 @@ TeamCal
 
 Konkrete Masken
 ---------------
-- ICS Download in ModalDialog,
 - GanttChartEditForm: refresh button
+- Layout Monatsbericht.
+
+Mobile Version
+--------------
+- Button zum Dis- und Enablen des Responsive-Modes
+- ModalWindows: bigWindows gehen nicht.
 
 Wicket6-Migration
 -----------------
@@ -30,11 +33,6 @@ Themenspeicher
 - https://github.com/svenmeier/wicket-dnd (für Gantt und FavoriteMenu)
 - http://haineault.com/media/jquery/ui-timepickr/page/
 - https://blogs.oracle.com/talkingjavadeployment/entry/native_packaging_for_javafx
-
-Erste Feedback
---------------
-- Das Menü oben war vorher leichter erkennbar (durch Kästen/senkrechte Striche) unterscheidbar, kann aber auch Gewöhnung sein.
-- Heute-Knopf auf Kalenderseite deutlicher anzeigen (ebenso im Datepicker).
 
 ToDo
 ----
