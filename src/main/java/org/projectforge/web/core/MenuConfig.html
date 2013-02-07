@@ -1,0 +1,277 @@
+<wicket:panel xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+  <script type='text/javascript' src='http://code.jquery.com/ui/1.10.0/jquery-ui.js'></script>
+  <script>
+  $(window).load(function(){
+		$.each($('#draggable ul li'), function(){
+			$(this).draggable( {
+			        stack: $(this),
+			        cursor: 'move',
+			        revert: false,
+			        helper: "clone",
+			        zIndex: 2000,
+			        connectToSortable: '#sortable',
+			        drag: function( event, ui ) 
+			        {
+			        	$('#pf_sortablecontainer').width($('#pf_sortablecontainer ul.nav').width())
+			        },
+			        start: function( event, ui ) {
+			        	$('#pf_sortablecontainer ul.nav').addClass('pf_redborder');
+			        },
+			        stop: function( event, ui ) {
+			        	$('#pf_sortablecontainer ul.nav').removeClass('pf_redborder');
+			        	$.each($('#pf_sortablecontainer .dropdown'), function(){
+			        		$(this).removeClass('open');
+						});
+			        }
+			    } );
+		});
+		$.each($('#pf_sortablecontainer .dropdown'), function(){
+			$(this).mouseenter(function() {
+					$(this).addClass('open');
+				});
+			$(this).mouseleave(function() {
+				$(this).removeClass('open');
+			});
+		});
+	    // $( '.mm_menueconfig' ).draggable( {
+	    //    containment: '#draggable',
+	    //    stack: '#draggable ul li',
+	    //    cursor: 'move',
+	    //    revert: false,
+	    //    connectToSortable: '#sortable'
+	    //} );
+	    $('.mm_menueconfig').click(function(){
+	    	$('.navbar-inner ul.nav:first-child').attr('id', 'sortable');
+	    	$( '#sortable' ).sortable( {
+		    	connectWith: '#sortable',
+		        tolerance: 'pointer',
+		        items: 'li',
+		        placeholder: "pf_sortable-placeholder",
+		        forcePlaceholderSize: true,
+		        receive: function( event, ui )
+		        {
+		            $(ui.draggable).appendTo( this );
+		        }
+		    } ).disableSelection();
+	    	
+	    	//$( '#sortable' ).droppable({
+	    	//    accept: 'li',
+	    	//    activeClass: 'ok',
+	    	//    drop: function(event, ui) {
+	    	//        // add dragged li to list
+	    	//        $(this).find('ul:first').append(ui.draggable);
+	    	//        // close open submenu
+	    	//        $('ul:not(".dropdown")').css({'display': 'none'});
+	    	//    },
+	    	//    over: function(event, ui) {
+	    	//        $(this).find('ul').css({'visibility': 'visible', 'display': 'block'});
+	    	//    }
+	    	//});
+	    });
+	    
+	    
+	    //$( '#sortable' ).sortable({
+	    //    revert: true
+	    //  });
+	    //  $( '#draggable ul li' ).draggable({
+	    //    connectToSortable: '#sortable',
+	    //    helper: "clone",
+	    //    revert: "invalid"
+	    //  });
+	    //  $( "ul, li" ).disableSelection();
+	    //  $('.navbar-inner ul.nav:first-child').attr('id', '#sortable');
+	    //  $('.navbar-inner ul.nav:first-child').before('<div style="width: 546px;display: inline-block;height: 40px;float: left;">');
+	    //  $('.navbar-inner ul.nav:first-child').after('</div>');
+  });
+  
+
+  </script>
+	<ul class="nav" role="menu">
+		<li class="dropdown mm_menueconfig">
+			<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+				<i class="icon-sitemap"></i>
+				<!-- <b class="caret"></b> -->
+			</a>
+			<ul class="dropdown-menu" id="draggable">
+				<li>
+					<a href="#"><span>Common</span></a>
+					<ul>
+						<li>
+							<a href="./teamCalendar">Calendar</a>
+						</li>
+						<li>
+							<a href="./teamCalList">List of calendars</a>
+						</li>
+						<li>
+							<a href="./bookList">Books</a>
+						</li>
+						<li>
+							<a href="./addressList">Addresses</a>
+						</li>
+						<li>
+							<a href="./sendSms">Send SMS</a>
+						</li>
+						<li>
+							<a href="./search">Search</a>
+						</li>
+					</ul>
+				</li>
+				<li>
+					<a href="#"><span>Project management</span></a>
+					<ul>
+						<li>
+							<a href="./taskTree">Tasks</a>
+						</li>
+						<li>
+							<a href="./timesheetList">Time sheets</a>
+						</li>
+						<li>
+							<a href="./monthlyEmployeeReport">Monthly employee report</a>
+						</li>
+						<li>
+							<a href="./personalStatistics">My statistics</a>
+						</li>
+						<li>
+							<a href="./hrList">HR planning</a>
+						</li>
+						<li>
+							<a href="./hrPlanningList">HR planning list</a>
+						</li>
+						<li>
+							<a href="./ganttList">Gantt</a>
+						</li>
+					</ul>
+				</li>
+				<li>
+					<a href="#"><span>Finance</span></a>
+					<ul>
+						<li>
+							<a href="./outgoingInvoiceList">Invoices</a>
+						</li>
+						<li>
+							<a href="./incomingInvoiceList">Incoming invoices</a>
+						</li>
+						<li>
+							<a href="./customerList">Customers</a>
+						</li>
+						<li>
+							<a href="./projectList">Projects</a>
+						</li>
+						<li>
+							<a href="./employeeList">Employees</a>
+						</li>
+						<li>
+							<a href="./employeeSalaryList">Salaries</a>
+						</li>
+						<li>
+							<a href="./orderBookList">Order book</a>
+						</li>
+					</ul>
+				</li>
+				<li>
+					<a href="#"><span>Cost</span></a>
+					<ul>
+						<li>
+							<a href="./accountList">Accounts</a>
+						</li>
+						<li>
+							<a href="./cost1List">Cost 1 ids</a>
+						</li>
+						<li>
+							<a href="./cost2List">Cost 2 ids</a>
+						</li>
+						<li>
+							<a href="./cost2TypeList">Cost 2 types</a>
+						</li>
+					</ul>
+				</li>
+				<li>
+					<a href="#"><span>Reporting</span></a>
+					<ul>
+						<li>
+							<a href="./accountingRecordList">Accounting records</a>
+						</li>
+						<li>
+							<a href="./reportObjectives">Report Objectives</a>
+						</li>
+						<li>
+							<a href="./scripting">Scripting</a>
+						</li>
+						<li>
+							<a href="./scriptList">List of scripts</a>
+						</li>
+						<li>
+							<a href="./datevImport">Datev import</a>
+						</li>
+					</ul>
+				</li>
+				<li class="mm_clear">
+					<a href="#"><span>Organization</span></a>
+					<ul>
+						<li>
+							<a href="./outgoingMailList">Outbox</a>
+						</li>
+						<li>
+							<a href="./incomingMailList">Inbox</a>
+						</li>
+					</ul>
+				</li>
+				<li>
+					<a href="#"><span>Administration</span></a>
+					<ul>
+						<li>
+							<a href="./myAccount">My account</a>
+						</li>
+						<li>
+							<a href="./userPrefList">My preferences</a>
+						</li>
+						<li>
+							<a href="./changePassword">Change password</a>
+						</li>
+						<li>
+							<a href="./userList">Users</a>
+						</li>
+						<li>
+							<a href="./groupList">Groups</a>
+						</li>
+						<li>
+							<a href="./accessList">Access management</a>
+						</li>
+						<li>
+							<a href="./admin">System</a>
+						</li>
+						<li>
+							<a href="./systemUpdate">Update system</a>
+						</li>
+						<li>
+							<a href="./systemStatistics">System statistics</a>
+						</li>
+						<li>
+							<a href="./configuration">Configuration</a>
+						</li>
+					</ul>
+				</li>
+				<li>
+					<a href="#"><span>Miscellaneous</span></a>
+					<ul>
+						<li>
+							<a href="./toDoList">To-do</a>
+						</li>
+						<li>
+							<a href="./wicket/bookmarkable/org.projectforge.plugins.memo.MemoListPage">Memo's</a>
+						</li>
+						<li>
+							<a href="./doc">Documentation</a>
+						</li>
+					</ul>
+				</li>
+				<li>
+					<a href="./customizeMenu">Customize menu</a>
+				</li>
+				<li>
+					<a href="#" id="showBookmarkLink19">Show as bookmark</a>
+				</li>
+			</ul>
+		</li>
+	</ul>
+</wicket:panel>
