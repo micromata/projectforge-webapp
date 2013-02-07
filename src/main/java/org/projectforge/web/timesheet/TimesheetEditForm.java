@@ -341,9 +341,6 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
     addCloneButton();
   }
 
-  /**
-   * @param gridBuilder
-   */
   private void renderHookComponents()
   {
     final List<TimesheetPluginComponentHook> hooks = TimesheetEditPage.getPluginHooks();
