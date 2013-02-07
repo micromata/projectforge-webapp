@@ -292,6 +292,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   }
 
   /**
+   * If the event is imported from another system, the uid of the external event is stored here.
    * @return the externalUid
    */
   public String getExternalUid()
