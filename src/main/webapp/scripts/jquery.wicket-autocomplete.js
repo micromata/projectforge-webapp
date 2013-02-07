@@ -18,7 +18,7 @@ jQuery.autocomplete = function(input, options) {
 	if( options.width > 0 ) $results.css("width", options.width);
 
 	// Add to body element
-	$("body").append(results);
+	$input.after($results);
 
 	input.autocompleter = me;
 
@@ -289,15 +289,12 @@ jQuery.autocomplete = function(input, options) {
 	function showResults() {
 		// get the position of the input field right now (in case the DOM is
 		// shifted)
-		var pos = findPos(input);
 		// either use the specified width, or autocalculate based on form
 		// element
 		var iWidth = (options.width > 0) ? options.width : $input.width();
 		// reposition
 		$results.css({
-			width: parseInt(iWidth) + "px",
-			top: (pos.y + input.offsetHeight) + "px",
-			left: pos.x + "px"
+			width: parseInt(iWidth) + "px"
 		}).show();
 		if(options.scroll) {
 			$results.scrollTop(0);
@@ -532,16 +529,6 @@ jQuery.autocomplete = function(input, options) {
 		}
 		cache.data[q] = data;
 	};
-
-	function findPos(obj) {
-		var curleft = obj.offsetLeft || 0;
-		var curtop = obj.offsetTop || 0;
-		while (obj = obj.offsetParent) {
-			curleft += obj.offsetLeft
-			curtop += obj.offsetTop
-		}
-		return {x:curleft,y:curtop};
-	}
 }
 
 jQuery.fn.autocomplete = function(url, options, data) {
