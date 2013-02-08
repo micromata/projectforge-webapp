@@ -78,7 +78,9 @@ public abstract class ModalDialog extends Panel
 
   private boolean lazyBinding;
 
-  private Form< ? > form;
+  protected Form< ? > form;
+
+  protected FeedbackPanel formFeedback;
 
   /**
    * List to create action buttons in the desired order before creating the RepeatingView.
@@ -124,7 +126,6 @@ public abstract class ModalDialog extends Panel
 
   /**
    * Only the div panel of the modal dialog is rendered without buttons and content. Default is false.
-   * @param lazyBinding the lazyBinding to set
    * @return this for chaining.
    */
   public ModalDialog setLazyBinding()
@@ -328,6 +329,7 @@ public abstract class ModalDialog extends Panel
   {
     gridContentContainer.removeAll();
     gridBuilder = new GridBuilder(gridContentContainer, "flowform");
+    initFeedback(gridContentContainer);
     return this;
   }
 
@@ -368,7 +370,21 @@ public abstract class ModalDialog extends Panel
     buttonBarContainer.add(actionButtons.getRepeatingView());
     form.setDefaultButton(closeButtonPanel.getButton());
     gridBuilder = new GridBuilder(gridContentContainer, "flowform");
-    form.add(new FeedbackPanel("formFeedback", new ComponentFeedbackMessageFilter(form)));
+    initFeedback(gridContentContainer);
+  }
+
+  private void initFeedback(WebMarkupContainer container) {
+    if(formFeedback == null) {
+      formFeedback = new FeedbackPanel("formFeedback", new ComponentFeedbackMessageFilter(form));
+      formFeedback.setOutputMarkupId(true);
+      formFeedback.setOutputMarkupPlaceholderTag(true);
+    }
+    container.add(formFeedback);
+  }
+
+  protected void ajaxError(String error, AjaxRequestTarget target) {
+    form.error(error);
+    target.add(formFeedback);
   }
 
   /**

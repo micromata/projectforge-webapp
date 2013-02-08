@@ -9,13 +9,7 @@
 
 package org.projectforge.plugins.teamcal.event.importics;
 
-import java.io.Serializable;
-import java.sql.Timestamp;
-import java.util.LinkedList;
-import java.util.List;
-
 import net.fortuna.ical4j.model.component.VEvent;
-
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.basic.Label;
@@ -35,6 +29,11 @@ import org.projectforge.web.dialog.ModalDialog;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.bootstrap.GridType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
@@ -71,7 +70,7 @@ public class ImportIcsDialog extends ModalDialog
     final String timeFormat = PFUserContext.getUser().getTimeNotation().equals(TimeNotation.H12) ? H12 : H24;
     userDateFormat = PFUserContext.getUser().getDateFormat() + timeFormat;
     if (userDateFormat == null){
-      userDateFormat = "dd.MM.yyyy HH:mm";
+      userDateFormat = "dd.MM.yyyy HH:mm"; // TODO i18n
     }
   }
 
@@ -150,8 +149,7 @@ public class ImportIcsDialog extends ModalDialog
             teamEventDao.saveOrUpdate(teamEvent);
           }
         } else {
-          // TODO ju: dialog feedback panel.
-          error(getString("plugins.teamcal.import.ics.noCalError"));
+          ajaxError(getString("plugins.teamcal.import.ics.noCalError"), target);
           return false;
         }
       }
