@@ -770,4 +770,24 @@ public class AccessChecker
       throw new AccessException("access.exception.demoUserHasNoAccess");
     }
   }
+
+  /**
+   * @return true if logged-in-user is member of {@link ProjectForgeGroup#FINANCE_GROUP}, {@link ProjectForgeGroup#CONTROLLING_GROUP} or
+   *         {@link ProjectForgeGroup#PROJECT_MANAGER}. Returns also true if user is member of {@link ProjectForgeGroup#ORGA_TEAM} and has
+   *         the
+   */
+  public boolean hasLoggedInUserAccessToTimesheetsOfOtherUsers()
+  {
+    final PFUserDO loggedInUser = PFUserContext.getUser();
+    Validate.notNull(loggedInUser);
+    if (isUserMemberOfGroup(loggedInUser, ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP,
+        ProjectForgeGroup.PROJECT_MANAGER) == true) {
+      return true;
+    }
+    if (isUserMemberOfGroup(loggedInUser, ProjectForgeGroup.ORGA_TEAM) == true
+        && hasRight(loggedInUser, UserRightId.PM_HR_PLANNING, UserRightValue.READONLY, UserRightValue.READWRITE)) {
+      return true;
+    }
+    return false;
+  }
 }
