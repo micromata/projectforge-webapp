@@ -166,8 +166,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
       @Override
       protected List<TaskDO> getChoices(final String input)
       {
-        BaseSearchFilter filter = new BaseSearchFilter();
-        filter.setSearchString(input);
+        TaskFilter filter = new TaskFilter();
         final List<TaskDO> result = taskDao.getList(filter);
         return result;
       }
