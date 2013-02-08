@@ -36,7 +36,6 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserRights;
 import org.projectforge.web.calendar.QuickSelectMonthPanel;
 import org.projectforge.web.user.UserSelectPanel;
@@ -71,8 +70,7 @@ public class MonthlyEmployeeReportForm extends AbstractStandardForm<MonthlyEmplo
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.user"));
-      if (UserRights.getAccessChecker().isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP,
-          ProjectForgeGroup.PROJECT_MANAGER) == true) {
+      if (UserRights.getAccessChecker().hasLoggedInUserAccessToTimesheetsOfOtherUsers() == true) {
         final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(filter, "user"),
             parentPage, "user");
         userSelectPanel.setRequired(true);
