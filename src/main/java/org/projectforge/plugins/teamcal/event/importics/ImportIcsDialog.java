@@ -121,7 +121,7 @@ public class ImportIcsDialog extends ModalDialog
   }
 
   @Override
-  protected void onCloseButtonSubmit(final AjaxRequestTarget target)
+  protected boolean onCloseButtonSubmit(final AjaxRequestTarget target)
   {
     TeamEventDO teamEvent;
     if (calendarPairs != null) {
@@ -152,9 +152,11 @@ public class ImportIcsDialog extends ModalDialog
         } else {
           // TODO ju: dialog feedback panel.
           error(getString("plugins.teamcal.import.ics.noCalError"));
+          return false;
         }
       }
     }
+    return true;
   }
 
   /**

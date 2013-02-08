@@ -28,11 +28,13 @@ import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxEventBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
+import org.apache.wicket.feedback.ComponentFeedbackMessageFilter;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.projectforge.web.core.NavTopPanel;
@@ -352,8 +354,9 @@ public abstract class ModalDialog extends Panel
       @Override
       public void callback(final AjaxRequestTarget target)
       {
-        onCloseButtonSubmit(target);
-        close(target);
+        if(onCloseButtonSubmit(target)) {
+          close(target);
+        }
       }
 
       @Override
@@ -365,6 +368,7 @@ public abstract class ModalDialog extends Panel
     buttonBarContainer.add(actionButtons.getRepeatingView());
     form.setDefaultButton(closeButtonPanel.getButton());
     gridBuilder = new GridBuilder(gridContentContainer, "flowform");
+    form.add(new FeedbackPanel("formFeedback", new ComponentFeedbackMessageFilter(form)));
   }
 
   /**
@@ -386,10 +390,14 @@ public abstract class ModalDialog extends Panel
 
   /**
    * Called if user hit the close button.
+   *
    * @param target
+   *
+   * @return true if the dialog can be close, false if errors occured.
    */
-  protected void onCloseButtonSubmit(final AjaxRequestTarget target)
+  protected boolean onCloseButtonSubmit(final AjaxRequestTarget target)
   {
+    return true;
   }
 
   protected void onError(final AjaxRequestTarget target, final Form< ? > form)
