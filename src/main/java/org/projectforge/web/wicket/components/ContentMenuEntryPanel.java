@@ -30,6 +30,7 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.flowlayout.IconPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
@@ -149,7 +150,12 @@ public class ContentMenuEntryPanel extends Panel
    */
   public ContentMenuEntryPanel setTooltip(final String title, final String text)
   {
-    WicketUtils.addTooltip(link, title, text);
+    if (labelComponent instanceof IconPanel) {
+      // Needed because hover doesn't work if a tag contains embedded i tag.
+      ((IconPanel)labelComponent).setTooltip(Model.of(title), Model.of(text));
+    } else {
+      WicketUtils.addTooltip(link, title, text);
+    }
     return this;
   }
 

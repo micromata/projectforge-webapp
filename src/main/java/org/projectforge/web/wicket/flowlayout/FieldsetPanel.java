@@ -34,6 +34,7 @@ import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
+import org.projectforge.web.CSSColor;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridPanel;
 import org.projectforge.web.wicket.components.JiraIssuesPanel;
@@ -313,7 +314,7 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
    */
   public IconPanel addHelpIcon(final IModel<String> title, final IModel<String> tooltip, final FieldSetIconPosition iconPosition)
   {
-    final IconPanel icon = new IconPanel(newIconChildId(), IconType.HELP, title, tooltip);
+    final IconPanel icon = new IconPanel(newIconChildId(), IconType.HELP, title, tooltip).setColor(CSSColor.GRAY);
     add(icon, iconPosition);
     return icon;
   }
@@ -335,7 +336,7 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
    */
   public IconPanel addHelpIcon(final String tooltip, final FieldSetIconPosition iconPosition)
   {
-    final IconPanel icon = new IconPanel(newIconChildId(), IconType.HELP, tooltip);
+    final IconPanel icon = new IconPanel(newIconChildId(), IconType.HELP, tooltip).setColor(CSSColor.GRAY);
     add(icon, iconPosition);
     return icon;
   }
@@ -347,7 +348,7 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
    */
   public IconPanel addHelpIcon(final IModel<String> tooltip)
   {
-    final IconPanel icon = new IconPanel(newIconChildId(), IconType.HELP, tooltip);
+    final IconPanel icon = new IconPanel(newIconChildId(), IconType.HELP, tooltip).setColor(CSSColor.GRAY);
     add(icon, FieldSetIconPosition.TOP_RIGHT);
     return icon;
   }
@@ -359,7 +360,7 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
    */
   public FieldsetPanel addKeyboardHelpIcon(final String tooltip)
   {
-    return add(new IconPanel(newIconChildId(), IconType.KEYBOARD, tooltip), FieldSetIconPosition.BOTTOM_RIGHT);
+    return add(new IconPanel(newIconChildId(), IconType.KEYBOARD, tooltip).setColor(CSSColor.GRAY), FieldSetIconPosition.BOTTOM_RIGHT);
   }
 
   /**
@@ -369,7 +370,7 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
    */
   public FieldsetPanel addKeyboardHelpIcon(final IModel<String> title, final IModel<String> tooltip)
   {
-    return add(new IconPanel(newIconChildId(), IconType.KEYBOARD, title, tooltip), FieldSetIconPosition.BOTTOM_RIGHT);
+    return add(new IconPanel(newIconChildId(), IconType.KEYBOARD, title, tooltip).setColor(CSSColor.GRAY), FieldSetIconPosition.BOTTOM_RIGHT);
   }
 
   /**
@@ -381,7 +382,7 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
   public FieldsetPanel addJIRASupportHelpIcon()
   {
     if (WicketUtils.isJIRAConfigured() == true) {
-      return add(WicketUtils.getJIRASupportTooltipIcon(this), FieldSetIconPosition.TOP_RIGHT);
+      return add(WicketUtils.getJIRASupportTooltipIcon(this).setColor(CSSColor.GRAY), FieldSetIconPosition.TOP_RIGHT);
     } else {
       // No JIRA configured.
       return this;
@@ -397,7 +398,7 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
   {
     if (WicketUtils.isJIRAConfigured() == true) {
       add(new JiraIssuesPanel(newChildId(), model));
-      add(WicketUtils.getJIRASupportTooltipIcon(this), FieldSetIconPosition.TOP_RIGHT);
+      add(WicketUtils.getJIRASupportTooltipIcon(this).setColor(CSSColor.GRAY), FieldSetIconPosition.TOP_RIGHT);
     }
     return this;
   }

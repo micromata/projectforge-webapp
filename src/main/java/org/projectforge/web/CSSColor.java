@@ -31,7 +31,7 @@ import org.projectforge.web.wicket.flowlayout.IconPanel;
  */
 public enum CSSColor
 {
-  BLACK("black"), BLUE("blue"), GREEN("green"), YELLOW("yellow"), RED("red"), WHITE("white");
+  BLACK("black"), BLUE("blue"), GRAY("gray"), GREEN("green"), YELLOW("yellow"), RED("red"), WHITE("white");
 
   private String cssClass;
 

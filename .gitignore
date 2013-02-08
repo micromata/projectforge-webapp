@@ -1,1 +1,6 @@
-/target
+target
+tmp
+work
+.idea
+projectforge-webapp.iml
+src/main/resources/rebel.xml
