@@ -326,10 +326,11 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
        * @see org.projectforge.web.dialog.ModalDialog#onCloseButtonSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
        */
       @Override
-      protected void onCloseButtonSubmit(final AjaxRequestTarget target)
+      protected boolean onCloseButtonSubmit(final AjaxRequestTarget target)
       {
         getData().setStatus(ToDoStatus.CLOSED);
         parentPage.updateAndClose();
+        return true;
       };
     };
     parentPage.add(closeToDoDialog);
