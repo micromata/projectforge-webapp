@@ -223,6 +223,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
           };
         }
     };
+    divContainer.add(autoCompleteTextField);
     WicketUtils.addTooltip(taskLink, getString("task.selectPanel.displayTask.tooltip"));
     taskLink.add(new Label("name", new Model<String>() {
       /**
