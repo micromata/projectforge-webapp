@@ -679,7 +679,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
       }
       return false;
     }
-    if (taskNode.hasChilds() == true) {
+    if (taskNode.hasChilds() == true && operationType.isIn(OperationType.INSERT, OperationType.UPDATE) == true) {
       // 3. Is the task not a leaf node and has this task or ancestor task the booking status ONLY_LEAFS?
       node = taskNode;
       do {
