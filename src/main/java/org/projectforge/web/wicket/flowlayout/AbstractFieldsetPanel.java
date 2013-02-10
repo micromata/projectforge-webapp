@@ -125,7 +125,7 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
    * development warning "No label set for field...'.
    * @return
    */
-  public T setNoLabelFor()
+  public T supressLabelForWarning()
   {
     labelFor = true;
     return getThis();
@@ -464,7 +464,7 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
   protected void onBeforeRender()
   {
     if (labelFor == false && WebConfiguration.isDevelopmentMode() == true) {
-      log.warn("No label set for field '" + labelText + "'. Please call setLabelFor(component) for this fieldset.");
+      log.warn("No label set for field '" + labelText + "'. Please call setLabelFor(component) for this fieldset or supressLabelForWarning().");
     }
     super.onBeforeRender();
   }

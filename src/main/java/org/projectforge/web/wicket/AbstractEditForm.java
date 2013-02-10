@@ -75,10 +75,25 @@ AbstractSecuredForm<O, P>
 
   private O origData;
 
+  /**
+   * If set and supported by the edit page, the user is able to accept or discard changes.
+   */
+  protected O oldData;
+
   public AbstractEditForm(final P parentPage, final O data)
   {
     super(parentPage);
     this.data = data;
+  }
+
+  /**
+   * @param oldData the oldData to set
+   * @return this for chaining.
+   */
+  public AbstractEditForm<O, P> setOldData(final O oldData)
+  {
+    this.oldData = oldData;
+    return this;
   }
 
   @SuppressWarnings("serial")
