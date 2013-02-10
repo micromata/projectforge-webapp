@@ -26,7 +26,6 @@ Mobile Version
 Wicket6-Migration
 -----------------
 - CustomizeMenu geht nicht im IE
-- event row als oberste Zeile anzeigen
 
 Themenspeicher
 --------------
