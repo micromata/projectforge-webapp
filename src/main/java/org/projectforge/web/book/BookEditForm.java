@@ -207,7 +207,7 @@ public class BookEditForm extends AbstractEditForm<BookDO, BookEditPage>
     if (isNew() == false) {
       {
         // Lend out
-        final FieldsetPanel fs = gridBuilder.newFieldset(getString("book.lending")).setNoLabelFor();
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("book.lending")).supressLabelForWarning();
         fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
           /**
            * @see org.apache.wicket.model.Model#getObject()

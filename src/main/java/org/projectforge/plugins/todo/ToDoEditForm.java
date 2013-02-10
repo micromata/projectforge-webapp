@@ -253,7 +253,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
     }
     {
       // Options
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).supressLabelForWarning();
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
       if (ConfigXml.getInstance().isSendMailConfigured() == true) {
         checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(this, "sendNotification"),
