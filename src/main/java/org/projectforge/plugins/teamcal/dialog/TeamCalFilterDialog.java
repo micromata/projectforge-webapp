@@ -172,9 +172,10 @@ public class TeamCalFilterDialog extends ModalDialog
    * @see org.projectforge.web.dialog.ModalDialog#onCloseButtonSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
    */
   @Override
-  protected void onCloseButtonSubmit(final AjaxRequestTarget target)
+  protected boolean onCloseButtonSubmit(final AjaxRequestTarget target)
   {
     myClose(target);
+    return true;
   }
 
   /**

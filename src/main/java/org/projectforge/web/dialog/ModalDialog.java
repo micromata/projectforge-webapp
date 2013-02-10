@@ -28,11 +28,13 @@ import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxEventBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
+import org.apache.wicket.feedback.ComponentFeedbackMessageFilter;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.projectforge.web.core.NavTopPanel;
@@ -76,7 +78,9 @@ public abstract class ModalDialog extends Panel
 
   private boolean lazyBinding;
 
-  private Form< ? > form;
+  protected Form< ? > form;
+
+  protected FeedbackPanel formFeedback;
 
   /**
    * List to create action buttons in the desired order before creating the RepeatingView.
@@ -122,7 +126,6 @@ public abstract class ModalDialog extends Panel
 
   /**
    * Only the div panel of the modal dialog is rendered without buttons and content. Default is false.
-   * @param lazyBinding the lazyBinding to set
    * @return this for chaining.
    */
   public ModalDialog setLazyBinding()
@@ -326,6 +329,7 @@ public abstract class ModalDialog extends Panel
   {
     gridContentContainer.removeAll();
     gridBuilder = new GridBuilder(gridContentContainer, "flowform");
+    initFeedback(gridContentContainer);
     return this;
   }
 
@@ -352,8 +356,9 @@ public abstract class ModalDialog extends Panel
       @Override
       public void callback(final AjaxRequestTarget target)
       {
-        onCloseButtonSubmit(target);
-        close(target);
+        if(onCloseButtonSubmit(target)) {
+          close(target);
+        }
       }
 
       @Override
@@ -365,6 +370,21 @@ public abstract class ModalDialog extends Panel
     buttonBarContainer.add(actionButtons.getRepeatingView());
     form.setDefaultButton(closeButtonPanel.getButton());
     gridBuilder = new GridBuilder(gridContentContainer, "flowform");
+    initFeedback(gridContentContainer);
+  }
+
+  private void initFeedback(WebMarkupContainer container) {
+    if(formFeedback == null) {
+      formFeedback = new FeedbackPanel("formFeedback", new ComponentFeedbackMessageFilter(form));
+      formFeedback.setOutputMarkupId(true);
+      formFeedback.setOutputMarkupPlaceholderTag(true);
+    }
+    container.add(formFeedback);
+  }
+
+  protected void ajaxError(String error, AjaxRequestTarget target) {
+    form.error(error);
+    target.add(formFeedback);
   }
 
   /**
@@ -386,10 +406,14 @@ public abstract class ModalDialog extends Panel
 
   /**
    * Called if user hit the close button.
+   *
    * @param target
+   *
+   * @return true if the dialog can be close, false if errors occured.
    */
-  protected void onCloseButtonSubmit(final AjaxRequestTarget target)
+  protected boolean onCloseButtonSubmit(final AjaxRequestTarget target)
   {
+    return true;
   }
 
   protected void onError(final AjaxRequestTarget target, final Form< ? > form)
