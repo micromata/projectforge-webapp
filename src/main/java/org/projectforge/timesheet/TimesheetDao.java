@@ -509,10 +509,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
     }
     if (operationType == OperationType.DELETE) {
       // UPDATE and INSERT is already checked, SELECT will be ignored.
-      boolean result = checkTimesheetProtection(user, obj, null, operationType, throwException);
-      if (result == true) {
-        result = checkTaskBookable(obj, null, operationType, throwException);
-      }
+      final boolean result = checkTimesheetProtection(user, obj, null, operationType, throwException);
       return result;
     }
     return true;
@@ -679,7 +676,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
       }
       return false;
     }
-    if (taskNode.hasChilds() == true && operationType.isIn(OperationType.INSERT, OperationType.UPDATE) == true) {
+    if (taskNode.hasChilds() == true) {
       // 3. Is the task not a leaf node and has this task or ancestor task the booking status ONLY_LEAFS?
       node = taskNode;
       do {
