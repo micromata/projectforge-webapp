@@ -43,7 +43,6 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.plugins.teamcal.dialog.TeamCalFilterDialog;
 import org.projectforge.plugins.teamcal.event.TeamEventListPage;
 import org.projectforge.plugins.teamcal.event.importics.DropIcsPanel;
-import org.projectforge.plugins.teamcal.event.importics.ImportIcsDialog;
 import org.projectforge.web.calendar.CalendarFeed;
 import org.projectforge.web.calendar.CalendarForm;
 import org.projectforge.web.calendar.CalendarPage;
@@ -62,8 +61,6 @@ public class TeamCalCalendarForm extends CalendarForm
 {
 
   private static final long serialVersionUID = -5838203593605203398L;
-
-  private ImportIcsDialog importIcsDialog;
 
   /**
    * @param parentPage
@@ -91,7 +88,8 @@ public class TeamCalCalendarForm extends CalendarForm
   {
     super.init();
     {
-      final IconButtonPanel searchButtonPanel = new IconButtonPanel(buttonGroupPanel.newChildId(), IconType.SEARCH, new ResourceModel("search")) {
+      final IconButtonPanel searchButtonPanel = new IconButtonPanel(buttonGroupPanel.newChildId(), IconType.SEARCH, new ResourceModel(
+          "search")) {
         /**
          * @see org.projectforge.web.wicket.flowlayout.IconButtonPanel#onSubmit()
          */
@@ -157,25 +155,27 @@ public class TeamCalCalendarForm extends CalendarForm
           @SuppressWarnings("unchecked")
           final List<Component> list = calendar.getComponents("VEVENT");
           // if (calendar.getComponent(name))
+          if (list == null || list.size() == 0) {
+            error(getString("plugins.teamcal.import.noEventsGiven"));
+            throw new IllegalArgumentException("Open Error dialog.");
+          }
 
-          final List<VEvent> newEvents = new ArrayList<VEvent>();
-          final List<VEvent> existingEvents = new ArrayList<VEvent>();
-
+          final List<VEvent> events = new ArrayList<VEvent>();
           for (final Component c : list) {
             final VEvent event = new VEvent(c.getProperties());
 
             if (StringUtils.equals(event.getSummary().getValue(), CalendarFeed.SETUP_EVENT) == true) {
               // skip setup event!
-            } else {
-              if (StringUtils.contains(event.getUid().toString(), '@')) {
-                existingEvents.add(event);
-              } else {
-                newEvents.add(event);
-              }
+              continue;
             }
+            events.add(event);
           }
-
-          importIcsDialog.open(target, newEvents, existingEvents);
+          if (events.size() > 0) {
+            error(getString("plugins.teamcal.import.multipleEventsNotYetSupported"));
+            throw new IllegalArgumentException("Open Error dialog.");
+          }
+          // Check id/external id. If not yet given, create new entry and ask for calendar to add.
+          // If already exists open edit dialog with DiffAcceptDiscardPanels.
         }
       });
     }
@@ -184,19 +184,15 @@ public class TeamCalCalendarForm extends CalendarForm
   /**
    * @see org.apache.wicket.Component#onInitialize()
    */
+  @SuppressWarnings("serial")
   @Override
   protected void onInitialize()
   {
     final TeamCalFilterDialog dialog = new TeamCalFilterDialog(parentPage.newModalDialogId(), (TeamCalCalendarFilter) filter);
     parentPage.add(dialog);
     dialog.init();
-    importIcsDialog = new ImportIcsDialog(parentPage.newModalDialogId(), new ResourceModel("plugins.teamcal.import.ics.title"));
-    parentPage.add(importIcsDialog);
-    importIcsDialog.init();
     final IconButtonPanel calendarButtonPanel = new AjaxIconButtonPanel(buttonGroupPanel.newChildId(), IconType.CALENDAR,
         new ResourceModel("plugins.teamcal.calendar.edit")) {
-      private static final long serialVersionUID = -8572571785540159369L;
-
       /**
        * @see org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
        */
