@@ -122,7 +122,7 @@ public class ScriptExecutePage extends AbstractStandardFormPage implements ISele
         {
           return groovyResult != null;
         }
-      }.setNoLabelFor();
+      }.supressLabelForWarning();
       final DivTextPanel resultPanel = new DivTextPanel(scriptResultFieldsetPanel.newChildId(), new Model<String>() {
         @Override
         public String getObject()

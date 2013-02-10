@@ -117,7 +117,7 @@ public class ScriptingForm extends AbstractStandardForm<ScriptDO, ScriptingPage>
       fs.add(textArea).setAutogrow(50, 500);
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.groovy.result")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.groovy.result")).supressLabelForWarning();
       final DivTextPanel groovyResultPanel = new DivTextPanel(fs.newChildId(), new Model<String>() {
         /**
          * @see org.apache.wicket.model.Model#getObject()

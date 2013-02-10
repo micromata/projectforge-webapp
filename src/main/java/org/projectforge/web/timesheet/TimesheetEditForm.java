@@ -307,7 +307,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
       dependentFormComponentsWithCost2[2] = dependentFormComponentsWithoutCost2[2] = stopMinuteDropDownChoice;
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task.consumption")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task.consumption")).supressLabelForWarning();
       consumptionBarId = fs.newChildId();
       fs.add(getConsumptionBar());
       fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
@@ -334,7 +334,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
     }
     {
       // Save as template checkbox:
-      final FieldsetPanel fs = gridBuilder.newFieldset("").setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset("").supressLabelForWarning();
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
       checkBoxPanel.addCheckBox(new PropertyModel<Boolean>(this, "saveAsTemplate"), getString("userPref.saveAsTemplate"));
     }
@@ -354,7 +354,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
   @SuppressWarnings("serial")
   private void addTemplatesRow()
   {
-    templatesRow = gridBuilder.newFieldset(getString("templates")).setNoLabelFor();
+    templatesRow = gridBuilder.newFieldset(getString("templates")).supressLabelForWarning();
     final String[] templateNames = userPrefDao.getPrefNames(UserPrefArea.TIMESHEET_TEMPLATE);
     if (templateNames != null && templateNames.length > 0) {
       // DropDownChoice templates
