@@ -142,7 +142,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       parentPage.add(icsExportDialog);
       icsExportDialog.init();
       icsExportDialog.redraw(getData());
-      final FieldsetPanel fsSubscribe = gridBuilder.newFieldset(getString("plugins.teamcal.abonnement")).setNoLabelFor();
+      final FieldsetPanel fsSubscribe = gridBuilder.newFieldset(getString("plugins.teamcal.abonnement")).supressLabelForWarning();
       fsSubscribe.add(new AjaxIconLinkPanel(fsSubscribe.newChildId(), IconType.ABONNEMENT, new ResourceModel(
           "plugins.teamcal.abonnement.tooltip")) {
         @Override

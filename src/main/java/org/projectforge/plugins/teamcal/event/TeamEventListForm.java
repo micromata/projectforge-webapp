@@ -119,7 +119,7 @@ public class TeamEventListForm extends AbstractListForm<TeamEventFilter, TeamEve
       }
     });
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("templates")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("templates")).supressLabelForWarning();
       fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("all")) {
         @Override
         public final void onSubmit()
