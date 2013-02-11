@@ -23,17 +23,15 @@
 
 package org.projectforge.plugins.teamcal.integration;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
-import net.fortuna.ical4j.model.component.VEvent;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
+import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
@@ -43,11 +41,11 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.plugins.teamcal.dialog.TeamCalFilterDialog;
 import org.projectforge.plugins.teamcal.event.TeamEventListPage;
 import org.projectforge.plugins.teamcal.event.importics.DropIcsPanel;
-import org.projectforge.web.calendar.CalendarFeed;
 import org.projectforge.web.calendar.CalendarForm;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.calendar.CalendarPageSupport;
 import org.projectforge.web.calendar.ICalendarFilter;
+import org.projectforge.web.dialog.ModalDialog;
 import org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
 import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
@@ -61,6 +59,7 @@ public class TeamCalCalendarForm extends CalendarForm
 {
 
   private static final long serialVersionUID = -5838203593605203398L;
+  private MyErrorDialog errorDialog;
 
   /**
    * @param parentPage
@@ -156,26 +155,29 @@ public class TeamCalCalendarForm extends CalendarForm
           final List<Component> list = calendar.getComponents("VEVENT");
           // if (calendar.getComponent(name))
           if (list == null || list.size() == 0) {
-            error(getString("plugins.teamcal.import.noEventsGiven"));
-            throw new IllegalArgumentException("Open Error dialog.");
+            errorDialog.open(target, getString("plugins.teamcal.import.noEventsGiven"));
+            return;
           }
 
-          final List<VEvent> events = new ArrayList<VEvent>();
-          for (final Component c : list) {
-            final VEvent event = new VEvent(c.getProperties());
+          // Temporary not used, because multiple events are not supported.
+          //          final List<VEvent> events = new ArrayList<VEvent>();
+          //          for (final Component c : list) {
+          //            final VEvent event = new VEvent(c.getProperties());
+          //
+          //            if (StringUtils.equals(event.getSummary().getValue(), CalendarFeed.SETUP_EVENT) == true) {
+          //              // skip setup event!
+          //              continue;
+          //            }
+          //            events.add(event);
+          //          }
 
-            if (StringUtils.equals(event.getSummary().getValue(), CalendarFeed.SETUP_EVENT) == true) {
-              // skip setup event!
-              continue;
-            }
-            events.add(event);
+          // TODO change to events.size() if multiple events are supported.
+          if (list.size() > 1) {
+            errorDialog.open(target, getString("plugins.teamcal.import.multipleEventsNotYetSupported"));
+            return;
           }
-          if (events.size() > 0) {
-            error(getString("plugins.teamcal.import.multipleEventsNotYetSupported"));
-            throw new IllegalArgumentException("Open Error dialog.");
-          }
-          // Check id/external id. If not yet given, create new entry and ask for calendar to add.
-          // If already exists open edit dialog with DiffAcceptDiscardPanels.
+          // 1. Check id/external id. If not yet given, create new entry and ask for calendar to add: Redirect to TeamEventEditPage.
+          // 2. If already exists open edit dialog with DiffAcceptDiscardPanels.
         }
       });
     }
@@ -204,6 +206,9 @@ public class TeamCalCalendarForm extends CalendarForm
         dialog.redraw().addContent(target);
       }
     };
+    errorDialog = new MyErrorDialog(parentPage.newModalDialogId());
+    parentPage.add(errorDialog);
+    errorDialog.init();
     calendarButtonPanel.setDefaultFormProcessing(false);
     buttonGroupPanel.addButton(calendarButtonPanel);
     super.onInitialize();
@@ -227,5 +232,40 @@ public class TeamCalCalendarForm extends CalendarForm
   public Set<Integer> getSelectedCalendars()
   {
     return ((TeamCalCalendarFilter) filter).getActiveVisibleCalendarIds();
+  }
+
+  private class MyErrorDialog extends ModalDialog {
+    private static final long serialVersionUID = -5934755033487813064L;
+
+    /**
+     * @param id
+     */
+    public MyErrorDialog(final String id)
+    {
+      super(id);
+    }
+
+    /**
+     * @see org.projectforge.web.dialog.ModalDialog#onInitialize()
+     */
+    @Override
+    protected void onInitialize()
+    {
+      super.onInitialize();
+      setTitle(getString("plugins.teamcal.import.ics.error"));
+    }
+
+    @Override
+    public void init()
+    {
+      final Form<Void> form = new Form<Void>(getFormId());
+      init(form);
+    }
+
+    public MyErrorDialog open(final AjaxRequestTarget target, final String s) {
+      super.open(target);
+      ajaxError(s, target);
+      return this;
+    }
   }
 }

@@ -459,7 +459,10 @@ function pf_deleteClick(element, content, liElement) {
 		// call initialization file only if API is available
 		if (window.File && window.FileList && window.FileReader) {
 			initDragAndDrop();
-		}
+		} else {
+            // disable dnd
+            $('.pf_dnd').addClass('disabled');
+        }
 	});
 
 	// initialize drag and drop

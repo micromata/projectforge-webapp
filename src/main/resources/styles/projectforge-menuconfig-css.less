@@ -1,22 +1,64 @@
 @media (min-width: 980px) {
-  ul.mm_menueconfig{
+  ul.pf_menueconfig{
     float:left;
   }
-  .container ul.mm_menueconfig > li > a
+  .container ul.pf_menueconfig > li > a
   {
     padding-left:8px;
     padding-right:8px;
   }
   #pf_sortablecontainer{
-    width: 538px;
     display: inline-block;
     height: 40px;
     float:left;
+    margin-right:10px;
   }
   #pf_sortablecontainer > ul{
     position:absolute;
-    z-index:10000;
-    left:35px;
+    z-index:1000;
+    left:70px;
+  }
+  .pf_plus,
+  .pf_trash,
+  #pf_newentry{
+    display:none;
+  }
+  .navbar .nav.pf_menueconfig,
+  .navbar .nav.pf_sitemap{
+    margin:0;
+  }
+  .pf_menueconfig.pf_configuration_active li:first-child > a,
+  .pf_menueconfig.pf_configuration_active li.pf_plus > a{
+    cursor:pointer;
+  }
+  .pf_menueconfig.pf_configuration_active li.pf_trash > a{
+    cursor:default;
+  }
+  .pf_configuration_active a.pf_safenewentry,
+  .pf_configuration_active a.pf_removenewentry{
+    cursor:pointer;
+  }
+  .pf_configuration_active a{
+    cursor:move;
+  }
+  #pf_sortablecontainer > ul > li input[type="text"]{
+    float:left;
+    display: inline-block;
+    height: 12px;
+    padding: 2px 4px;
+    margin-bottom: 0px;
+    font-size: 12px;
+    line-height: 12px;
+    width:100px;
+    margin:10px 0 0 4px;
+  }
+  .pf_warning input[type="text"]{
+    border-color:red;
+  }
+  #pf_sortablecontainer > ul > li .pf_safenewentry,
+  #pf_sortablecontainer > ul > li .pf_removenewentry{
+    overflow:hidden;
+    float:left;
   }
   .container ul.nav > li > a{
     padding-bottom:9px;
@@ -45,26 +87,39 @@
     color:#777;
     line-height:20px;
   }
-  ul.nav.mm_menueconfig li:hover ul.dropdown-menu{
+  ul.nav.pf_menueconfig li.open:hover ul.dropdown-menu,
+  ul.nav.pf_menueconfig li:hover ul.dropdown-menu{
     display:none;
   }
-  ul.nav.mm_menueconfig li.open:hover ul.dropdown-menu{
+  ul.nav.pf_menueconfig.pf_configuration_active li ul.dropdown-menu,
+  ul.nav.pf_menueconfig.pf_configuration_active li.open:hover ul.dropdown-menu{
     display:block;
   }
-  .container ul.nav > li.mm_menueconfig > a {
+  .navbar ul.nav.pf_menueconfig.pf_configuration_active li.open a.dropdown-toggle,
+  .navbar ul.nav.pf_menueconfig.pf_configuration_active a.dropdown-toggle{
+    background-color: #e5e5e5;
+    color: #555555;
+  }
+  .navbar ul.nav.pf_menueconfig li.open > a.dropdown-toggle{
+    background-color:transparent;
+  }
+  .pf_menueconfig .open > .dropdown-menu{
+    display:none;
+  }
+  .container ul.nav > li.pf_menueconfig > a {
     padding-bottom:10px;
   }
-  .mm_menueconfig .dropdown-menu ul li a{
+  .pf_menueconfig .dropdown-menu ul li a{
     cursor:move;
   }
-  .mm_menueconfig .dropdown-menu{
+  .pf_menueconfig .dropdown-menu{
     width:770px;
     top: 100%;
     left: 0px;
     float: left;
     padding-left:5px;
   }
-  .navbar .nav > li.mm_menueconfig > .dropdown-menu::before {
+  .navbar .nav > li.pf_menueconfig > .dropdown-menu::before {
     content: '';
     display: inline-block;
     border-left: 7px solid transparent;
@@ -75,7 +130,7 @@
     top: -7px;
     left:49px;
   }
-  .navbar .nav > li.mm_menueconfig > .dropdown-menu::after {
+  .navbar .nav > li.pf_menueconfig > .dropdown-menu::after {
     content: '';
     display: inline-block;
     border-left: 6px solid transparent;
@@ -85,11 +140,11 @@
     top: -6px;
     left:50px;
   }
-  .mm_menueconfig .dropdown-menu ul{
+  .pf_menueconfig .dropdown-menu ul{
     overflow:hidden;
     margin:0;
   }
-  .mm_menueconfig .dropdown-menu li{
+  .pf_menueconfig .dropdown-menu li{
     float:left;
     width:140px;
     padding-left:4px;
@@ -99,12 +154,12 @@
     margin-bottom:6px;
     background:#f0f0f0;
   }
-  .mm_menueconfig .dropdown-menu > li > a:hover{
+  .pf_menueconfig .dropdown-menu > li > a:hover{
     background-image:none;
     color:#333;
     background:#f0f0f0;
   }
-  .mm_menueconfig .dropdown-menu li li{
+  .pf_menueconfig .dropdown-menu li li{
     clear:left;
     list-style-type:none;
     margin:0;
@@ -112,7 +167,7 @@
     background:#f8f8f8;
     border-bottom:1px solid #f0f0f0;
   }
-  .mm_menueconfig .dropdown-menu li li a{
+  .pf_menueconfig .dropdown-menu li li a{
     white-space:normal;
   }
   .mm_clear{
