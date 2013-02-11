@@ -58,11 +58,11 @@ public class FeedbackForm extends AbstractStandardForm<SendFeedbackData, Feedbac
     super.init();
     gridBuilder.newGridPanel();
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("feedback.receiver")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("feedback.receiver")).supressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), data.getReceiver()));
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("feedback.sender")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("feedback.sender")).supressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), data.getSender()));
     }
     {

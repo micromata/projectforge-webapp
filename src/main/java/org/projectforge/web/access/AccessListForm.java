@@ -57,7 +57,7 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
     gridBuilder.newSplitPanel(GridSize.COL66);
     {
       // Group
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("group")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("group")).supressLabelForWarning();
       final GroupSelectPanel groupSelectPanel = new GroupSelectPanel(fs.newChildId(), new Model<GroupDO>() {
         @Override
         public GroupDO getObject()
@@ -82,7 +82,7 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
     gridBuilder.newSplitPanel(GridSize.COL33);
     {
       // User
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("user")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("user")).supressLabelForWarning();
       final UserSelectPanel assigneeSelectPanel = new UserSelectPanel(fs.newChildId(), new Model<PFUserDO>() {
         @Override
         public PFUserDO getObject()
@@ -107,7 +107,7 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
     }
     gridBuilder.newGridPanel();
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task")).supressLabelForWarning();
       final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new Model<TaskDO>() {
         @Override
         public TaskDO getObject()

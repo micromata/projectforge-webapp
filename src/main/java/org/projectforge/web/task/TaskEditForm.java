@@ -255,7 +255,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
     }
     {
       // Gantt: duration
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.duration")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.duration")).supressLabelForWarning();
       final MinMaxNumberField<BigDecimal> durationField = new MinMaxNumberField<BigDecimal>(InputPanel.WICKET_ID,
           new PropertyModel<BigDecimal>(data, "duration"), BigDecimal.ZERO, TaskEditForm.MAX_DURATION_DAYS);
       WicketUtils.setSize(durationField, 6);

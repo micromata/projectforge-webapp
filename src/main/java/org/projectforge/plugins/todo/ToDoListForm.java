@@ -104,7 +104,7 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
     }
     {
       gridBuilder.newSplitPanel(GridSize.COL100);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task")).supressLabelForWarning();
       final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new Model<TaskDO>() {
         @Override
         public TaskDO getObject()

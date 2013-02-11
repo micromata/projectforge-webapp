@@ -109,7 +109,7 @@ public class TimesheetListForm extends AbstractListForm<TimesheetListFilter, Tim
     final TimesheetFilter filter = getSearchFilter();
     {
       gridBuilder.newSplitPanel(GridSize.COL66);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task")).supressLabelForWarning();
       final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new Model<TaskDO>() {
         @Override
         public TaskDO getObject()
@@ -202,7 +202,7 @@ public class TimesheetListForm extends AbstractListForm<TimesheetListFilter, Tim
     {
       // Duration
       gridBuilder.newSplitPanel(GridSize.COL33);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.totalDuration")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.totalDuration")).supressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
         @Override
         public String getObject()

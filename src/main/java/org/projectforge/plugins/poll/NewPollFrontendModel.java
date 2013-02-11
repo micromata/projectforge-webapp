@@ -59,8 +59,6 @@ public class NewPollFrontendModel implements Serializable
 
   private final List<GroupDO> pollGroupList;
 
-  //  private final List<PollAttendeeDO> calculatedUserList;
-
   @SpringBean(name = "pollAttendeeDao")
   private PollAttendeeDao pollAttendeeDao;
 
@@ -80,7 +78,6 @@ public class NewPollFrontendModel implements Serializable
     this.allEvents = new LinkedList<PollEventDO>();
     this.pollAttendeeList = new LinkedList<PollAttendeeDO>();
     this.pollGroupList = new LinkedList<GroupDO>();
-    //    this.calculatedUserList = new LinkedList<PollAttendeeDO>();
   }
 
   public void initModelByPoll()
@@ -132,14 +129,6 @@ public class NewPollFrontendModel implements Serializable
   {
     return pollGroupList;
   }
-
-  /**
-   * @return the calculatedUserList
-   */
-  //  public List<PollAttendeeDO> getCalculatedAttendeeList()
-  //  {
-  //    return calculatedUserList;
-  //  }
 
   public List<PFUserDO> getUserDoFromAttendees()
   {

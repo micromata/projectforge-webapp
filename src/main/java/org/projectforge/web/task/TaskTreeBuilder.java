@@ -125,8 +125,8 @@ public class TaskTreeBuilder implements Serializable
     this.parentPage = parentPage;
     final List<IColumn<TaskNode, String>> columns = createColumns();
 
-    tree = new TableTree<TaskNode, String>(id, columns, new TaskTreeProvider(taskFilter).setShowRootNode(showRootNode),
-        Integer.MAX_VALUE, TaskTreeExpansion.getExpansionModel()) {
+    tree = new TableTree<TaskNode, String>(id, columns, new TaskTreeProvider(taskFilter).setShowRootNode(showRootNode), Integer.MAX_VALUE,
+        TaskTreeExpansion.getExpansionModel()) {
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -380,6 +380,18 @@ public class TaskTreeBuilder implements Serializable
   public TaskTreeBuilder setHighlightedTaskNodeId(final Integer highlightedTaskNodeId)
   {
     this.highlightedTaskNodeId = highlightedTaskNodeId;
+    final TaskNode node = taskTree.getTaskNodeById(highlightedTaskNodeId);
+    if (node == null) {
+      // Shouldn't occur.
+      return this;
+    }
+    // Open all ancestor nodes of the highlighted node:
+    final Set<TaskNode> set = TaskTreeExpansion.getExpansionModel().getObject();
+    TaskNode parent = node.getParent();
+    while (parent != null) {
+      set.add(parent);
+      parent = parent.getParent();
+    }
     return this;
   }
 }

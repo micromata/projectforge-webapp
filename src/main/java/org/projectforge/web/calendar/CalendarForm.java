@@ -124,7 +124,7 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
       setDefaultButton(refreshButtonPanel.getButton());
     }
     gridBuilder.newSplitPanel(GridSize.SPAN4);
-    final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.duration")).setNoLabelFor();
+    final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.duration")).supressLabelForWarning();
     final DivTextPanel durationPanel = new DivTextPanel(fs.newChildId(), new Label(DivTextPanel.WICKET_ID, new Model<String>() {
       @Override
       public String getObject()

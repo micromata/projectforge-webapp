@@ -85,7 +85,7 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
     }
     {
       gridBuilder.newSplitPanel(GridSize.COL50);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).supressLabelForWarning();
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
       checkBoxPanel.add(new MyCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "notOpened"),
           getString("task.status.notOpened")));

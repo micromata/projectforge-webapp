@@ -51,7 +51,7 @@ public class LayoutSettingsForm extends AbstractStandardForm<LayoutSettingsData,
   {
     super.init();
     data.setBrowserScreenWidthType(getMySession().getBrowserScreenWidthType());
-    final FieldsetPanel fs = gridBuilder.newFieldset(getString("layout.settings.browserScreenWidth")).setLabelSide(false).setNoLabelFor();
+    final FieldsetPanel fs = gridBuilder.newFieldset(getString("layout.settings.browserScreenWidth")).setLabelSide(false).supressLabelForWarning();
     final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
     final RadioGroupPanel<BrowserScreenWidthType> radioGroup = new RadioGroupPanel<BrowserScreenWidthType>(radioGroupPanel.newChildId(),
         "screenWidthType", new PropertyModel<BrowserScreenWidthType>(data, "browserScreenWidthType")) {

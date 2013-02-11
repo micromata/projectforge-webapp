@@ -202,7 +202,7 @@ AbstractSecuredForm<F, P>
     }
     if (showOptionsPanel() == true) {
       gridBuilder.newSplitPanel(GridSize.COL66);
-      optionsFieldsetPanel = gridBuilder.newFieldset(getOptionsLabel()).setNoLabelFor();
+      optionsFieldsetPanel = gridBuilder.newFieldset(getOptionsLabel()).supressLabelForWarning();
       final DivPanel optionsCheckBoxesPanel = new DivPanel(optionsFieldsetPanel.newChildId(), DivType.CHECKBOX);
       onOptionsPanelCreate(optionsFieldsetPanel, optionsCheckBoxesPanel);
       if (showHistorySearchAndDeleteCheckbox() == true) {
