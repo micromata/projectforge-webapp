@@ -139,6 +139,9 @@ public class TaskFilter extends BaseSearchFilter
   {
     Validate.notNull(node);
     Validate.notNull(node.getTask());
+    if (taskVisibility == null) {
+      resetMatch();
+    }
     final TaskDO task = node.getTask();
     if (StringUtils.isBlank(this.searchString) == true) {
       return isVisibleByStatus(node, task) || node.isRootNode() == true;
