@@ -1,5 +1,5 @@
 <wicket:panel xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
-<ul class="nav mm_menueconfig">
+<ul class="nav pf_menueconfig">
   <li class="dropdown">
     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
       <i class="icon-cogs"></i>
@@ -186,9 +186,22 @@
       </li>
     </ul>
   </li>
+  <li class="pf_plus">
+    <a>
+      <i class="icon-plus"></i>
+    </a>
+  </li>
+  <li class="pf_trash">
+    <a>
+      <i class="icon-trash"></i>
+    </a>
+  </li>
 </ul>
 <script>
 $(window).load(function(){
+
+
+  $('#pf_sortablecontainer').width($('#pf_sortablecontainer ul').width());
 
   $.each($('#draggable ul li'), function(){
     $(this).draggable( {
@@ -208,20 +221,17 @@ $(window).load(function(){
         $('body').mousemove(function(e){
           $('.pf_draghelper').css({'top': e.pageY+20, 'left': e.pageX+20})
         });
+
+        //highlight trash
+        $('.pf_trash a i').css('color','red');
       },
       start: function( event, ui ) {
-
-        //highlight target container
-        $('#pf_sortablecontainer ul.nav').addClass('pf_redborder');
 
         //draghelper in den dom attachen wegen z-index Problem bei den dropdownmenues
         $('body').after('<div class="pf_draghelper">' + ui.helper.prevObject.context.innerText + '</div>');
 
       },
       stop: function( event, ui ) {
-
-        //remove highlight target container
-        $('#pf_sortablecontainer ul.nav').removeClass('pf_redborder');
 
         //close all dropdowns
         $.each($('#pf_sortablecontainer .dropdown'), function(){
@@ -231,16 +241,29 @@ $(window).load(function(){
         //remove draghelper
         $('.pf_draghelper').remove();
 
+        //stop highlight trash
+        $('.pf_trash a i').css('color','');
+
       }
     });
   });
 
-  //simulate drag event
-  var is_dragging = false;
-
-  $('.mm_menueconfig').click(function(){
-
-    //set sortable to all lists
+  //add mouseover event on drag
+  var addMouseMoveOnDrag = function() {
+    $.each($('#pf_sortablecontainer .dropdown, #pf_sortablecontainer .dropdown-submenu'), function(){
+      $(this).mouseenter(function() {
+        if($(window).width() > 979){
+          $(this).addClass('open');
+        }
+      });
+      $(this).mouseleave(function() {
+        $(this).removeClass('open');
+      });
+    });
+  }
+  //set sortable to all lists
+  var makesortable = function() {
+    console.log('sortable called');
     $.each($('#pf_sortablecontainer ul'), function(){
       if(!$(this).hasClass('pf_disable')){
         $(this).addClass('sortable'); //@todo:bei save wieder löschen
@@ -260,27 +283,24 @@ $(window).load(function(){
 
       receive: function( event, ui )
       {
-          $(ui.draggable).appendTo( this );
-          if(ui.item.hasClass('dropdown')||ui.item.hasClass('dropdown-submenu'))
-          {
-            if(ui.item.parent().hasClass('dropdown-menu')){
-              ui.item.removeClass('dropdown');
-              ui.item.addClass('dropdown-submenu');
-              ui.item.remove('b');
-            } else if(ui.item.parent().hasClass('nav')){
-              ui.item.removeClass('dropdown-submenu');
-              ui.item.addClass('dropdown');
-            }
+        $(ui.draggable).appendTo( this );
+        if(ui.item.hasClass('dropdown') || ui.item.hasClass('dropdown-submenu'))
+        {
+          if(ui.item.parent().hasClass('dropdown-menu')){
+            ui.item.removeClass('dropdown');
+            ui.item.addClass('dropdown-submenu');
+            ui.item.remove('b');
+          } else if(ui.item.parent().hasClass('nav')){
+            ui.item.removeClass('dropdown-submenu');
+            ui.item.addClass('dropdown');
           }
+        }
       },
 
       start: function(event, ui) {
 
         //simulate drag event - start
         is_dragging = true;
-
-        //highlight target container
-        $('#pf_sortablecontainer ul.nav').addClass('pf_redborder');
 
       },
 
@@ -292,12 +312,56 @@ $(window).load(function(){
         //change width of target container dynamically
         $('#pf_sortablecontainer').width($('#pf_sortablecontainer ul.nav').width());
 
-        //remove highlight target container
-        $('#pf_sortablecontainer ul.nav').removeClass('pf_redborder');
+        //stop highlight trash
+        $('.pf_trash a i').css('color','');
 
+
+        updateBackend();
       }
 
     }).disableSelection();
+  }
+
+  //simulate drag event
+  var is_dragging = false;
+
+  //configuration active indicator
+  var is_configuration_active = false;
+
+  $('.pf_menueconfig li:first-child a').click(function(){
+    $('.pf_menueconfig').addClass('pf_configuration_active');
+    //deactivate click
+    //$('a').click(function(event) {
+    //  event.preventDefault();
+    //});
+
+    if(is_configuration_active == false) {
+      is_configuration_active = true;
+
+      //highlight target container
+      $('#pf_sortablecontainer ul.nav').addClass('pf_redborder');
+
+      $('.pf_trash, .pf_plus').show('fast');
+      $('#pf_sortablecontainer').addClass('pf_configuration_active');
+      $('#pf_sortablecontainer > ul').stop().animate({
+        left: '135'
+      }, 200);
+    } else if (is_configuration_active == true){ //&& !$('.pf_menueconfig').hasClass('pf_configuration_active')){
+      is_configuration_active = false;
+
+      //remove highlight target container
+      $('#pf_sortablecontainer ul.nav').removeClass('pf_redborder');
+
+      $('.pf_trash, .pf_plus').hide('fast');
+      $('#pf_sortablecontainer, .pf_menueconfig').removeClass('pf_configuration_active');
+      $('.pf_menueconfig > li').removeClass('open');
+      $('#pf_sortablecontainer > ul').stop().animate({
+        left: '70'
+      }, 200);
+    }
+
+    makesortable();
+
 
   });
 
@@ -307,21 +371,57 @@ $(window).load(function(){
       //change width of target container dynamically on simulated drag event
       $('#pf_sortablecontainer').width($('#pf_sortablecontainer ul.nav').width());
 
+      //highlight trash
+      $('.pf_trash a i').css('color','red');
+
     }
   });
 
-  //add mouseover event on drag
-  $.each($('#pf_sortablecontainer .dropdown, #pf_sortablecontainer .dropdown-submenu'), function(){
-    $(this).mouseenter(function() {
-      if($(window).width() > 979){
-        $(this).addClass('open');
-      }
-    });
-    $(this).mouseleave(function() {
-      $(this).removeClass('open');
-    });
+  addMouseMoveOnDrag();
+
+  $('.pf_menueconfig > li > ul').mouseenter(function() {
+    $('.pf_menueconfig > li > ul').addClass('pf_active_over');
+  });
+  $('.pf_menueconfig > li > ul').mouseleave(function() {
+    $('.pf_menueconfig > li > ul').removeClass('pf_active_over');
   });
 
+  //new entry is active
+  var is_active_newentry = false;
+
+  $('.pf_plus').click(function(){
+  if(is_active_newentry == false){
+    $('#pf_newentry').css('display', 'block');
+    $('#pf_sortablecontainer').width($('#pf_sortablecontainer ul.nav').width());
+    is_active_newentry = true;
+    }
+  });
+  $('#pf_newentry a').click(function(){
+    is_active_newentry = false;
+    if( !$('#pf_newentry input').val() ) {
+      $('#pf_newentry').addClass('pf_warning');
+    } else {
+
+      console.log($('#pf_newentry input').val());
+      $('#pf_newentry').attr('class', '');
+      $('#pf_newentry').css('display', 'none');
+      $('#pf_newentry').after('<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">' + $('#pf_newentry input').val() + '<b class="caret"></b></a><ul class="dropdown-menu"></ul></li>');
+      $('#pf_newentry input').val('');
+
+      makesortable();
+      addMouseMoveOnDrag();
+      updateBackend();
+    }
+  });
+  $('.pf_removenewentry').click(function(){
+    $('#pf_newentry').css('display', 'none');
+    $('#pf_newentry input').val('');
+    $('#pf_sortablecontainer').width($('#pf_sortablecontainer ul.nav').width());
+    $('#pf_newentry').attr('class', '');
+  });
+  var updateBackend = function() {
+    console.log('speichern');
+  }
 });
 
 </script>
