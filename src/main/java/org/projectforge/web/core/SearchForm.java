@@ -127,7 +127,7 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
       div.add(modifiedSearchExpressionLabel);
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).supressLabelForWarning();
       final DivPanel checkBoxesPanel = fs.addNewCheckBoxDiv();
       checkBoxesPanel.add(new CheckBoxPanel(checkBoxesPanel.newChildId(), new PropertyModel<Boolean>(filter, "searchHistory"),
           getString("search.searchHistory")).setTooltip(getString("search.searchHistory.additional.tooltip")));

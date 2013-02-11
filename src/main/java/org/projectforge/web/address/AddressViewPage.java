@@ -238,7 +238,7 @@ public class AddressViewPage extends AbstractSecuredPage
     if (StringUtils.isBlank(value) == true) {
       return false;
     }
-    final FieldsetPanel fs = gridBuilder.newFieldset(getString(label)).setNoLabelFor();
+    final FieldsetPanel fs = gridBuilder.newFieldset(getString(label)).supressLabelForWarning();
     fs.add(new DivTextPanel(fs.newChildId(), value));
     return true;
   }
@@ -248,7 +248,7 @@ public class AddressViewPage extends AbstractSecuredPage
     if (StringUtils.isBlank(value) == true) {
       return false;
     }
-    final FieldsetPanel fs = gridBuilder.newFieldset(getString(label)).setNoLabelFor();
+    final FieldsetPanel fs = gridBuilder.newFieldset(getString(label)).supressLabelForWarning();
     fs.add(new ExternalLinkPanel(fs.newChildId(), "mailto:" + value, value));
     return true;
   }

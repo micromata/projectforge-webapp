@@ -33,7 +33,6 @@ import org.apache.wicket.model.PropertyModel;
 import org.projectforge.core.Configuration;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserRights;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.user.UserSelectPanel;
@@ -114,8 +113,7 @@ public class CalendarPageSupport implements Serializable
    */
   public boolean isOtherTimesheetsUsersAllowed()
   {
-    return UserRights.getAccessChecker().isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP,
-        ProjectForgeGroup.PROJECT_MANAGER);
+    return UserRights.getAccessChecker().hasLoggedInUserAccessToTimesheetsOfOtherUsers();
   }
 
   /**

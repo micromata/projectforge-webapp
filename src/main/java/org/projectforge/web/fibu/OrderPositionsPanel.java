@@ -36,7 +36,6 @@ import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.core.NumberFormatter;
 import org.projectforge.fibu.AuftragsPositionVO;
-import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.WicketUtils;
@@ -108,7 +107,7 @@ public class OrderPositionsPanel extends Panel
         } else {
           buf.append("??");
         }
-        final String title = StringUtils.defaultString(HtmlHelper.escapeXml(orderPosition.getTitel()));
+        final String title = StringUtils.defaultString(orderPosition.getTitel());
         buf.append(" ").append(getString("projectmanagement.personDays.short")).append("): ").append(title);
         if (orderPosition.getStatus() != null) {
           if (StringUtils.isNotBlank(title) == true) {
@@ -127,7 +126,7 @@ public class OrderPositionsPanel extends Panel
       final StringBuffer buf)
   {
     final StringBuffer tooltip = new StringBuffer();
-    tooltip.append(StringUtils.defaultString(HtmlHelper.escapeXml(pos.getAuftragTitle()))).append(" (").append(
+    tooltip.append(StringUtils.defaultString(pos.getAuftragTitle())).append(" (").append(
         NumberFormatter.format(totalPersonDays)).append(" ").append(getString("projectmanagement.personDays.short")).append(")");
     if (pos.getAuftragsStatus() != null) {
       tooltip.append(", ").append(getString(pos.getAuftragsStatus().getI18nKey()));

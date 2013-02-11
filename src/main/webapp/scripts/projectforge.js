@@ -110,6 +110,14 @@ function initializeComponents() {
 	if ($("textarea.autogrow").length) {
 		$("textarea.autogrow").autoGrow();
 	}
+	
+	/* Scroll to the highlighted table row if exist: */
+	var w = $(window);
+	var row = $('td.highlighted:first').parent('tr');
+	if (row.length){
+	    $('html,body').animate({scrollTop: row.offset().top - (w.height()/2)}, 500 );
+	}
+	
 	$('[rel=\'mypopup\']').hover(function(event) {
 		mouseX = event.pageX;
 		mouseY = event.pageY;

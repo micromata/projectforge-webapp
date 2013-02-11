@@ -509,10 +509,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
     }
     if (operationType == OperationType.DELETE) {
       // UPDATE and INSERT is already checked, SELECT will be ignored.
-      boolean result = checkTimesheetProtection(user, obj, null, operationType, throwException);
-      if (result == true) {
-        result = checkTaskBookable(obj, null, operationType, throwException);
-      }
+      final boolean result = checkTimesheetProtection(user, obj, null, operationType, throwException);
       return result;
     }
     return true;

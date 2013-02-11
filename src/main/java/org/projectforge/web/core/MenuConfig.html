@@ -1,276 +1,432 @@
 <wicket:panel xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
-  <script>
-  $(window).load(function(){
-		$.each($('#draggable ul li'), function(){
-			$(this).draggable( {
-			        stack: $(this),
-			        cursor: 'move',
-			        revert: false,
-			        helper: "clone",
-			        zIndex: 2000,
-			        connectToSortable: '#sortable',
-			        drag: function( event, ui ) 
-			        {
-			        	$('#pf_sortablecontainer').width($('#pf_sortablecontainer ul.nav').width())
-			        },
-			        start: function( event, ui ) {
-			        	$('#pf_sortablecontainer ul.nav').addClass('pf_redborder');
-			        },
-			        stop: function( event, ui ) {
-			        	$('#pf_sortablecontainer ul.nav').removeClass('pf_redborder');
-			        	$.each($('#pf_sortablecontainer .dropdown'), function(){
-			        		$(this).removeClass('open');
-						});
-			        }
-			    } );
-		});
-		$.each($('#pf_sortablecontainer .dropdown'), function(){
-			$(this).mouseenter(function() {
-					$(this).addClass('open');
-				});
-			$(this).mouseleave(function() {
-				$(this).removeClass('open');
-			});
-		});
-	    // $( '.mm_menueconfig' ).draggable( {
-	    //    containment: '#draggable',
-	    //    stack: '#draggable ul li',
-	    //    cursor: 'move',
-	    //    revert: false,
-	    //    connectToSortable: '#sortable'
-	    //} );
-	    $('.mm_menueconfig').click(function(){
-	    	$('.navbar-inner ul.nav:first-child').attr('id', 'sortable');
-	    	$( '#sortable' ).sortable( {
-		    	connectWith: '#sortable',
-		        tolerance: 'pointer',
-		        items: 'li',
-		        placeholder: "pf_sortable-placeholder",
-		        forcePlaceholderSize: true,
-		        receive: function( event, ui )
-		        {
-		            $(ui.draggable).appendTo( this );
-		        }
-		    } ).disableSelection();
-	    	
-	    	//$( '#sortable' ).droppable({
-	    	//    accept: 'li',
-	    	//    activeClass: 'ok',
-	    	//    drop: function(event, ui) {
-	    	//        // add dragged li to list
-	    	//        $(this).find('ul:first').append(ui.draggable);
-	    	//        // close open submenu
-	    	//        $('ul:not(".dropdown")').css({'display': 'none'});
-	    	//    },
-	    	//    over: function(event, ui) {
-	    	//        $(this).find('ul').css({'visibility': 'visible', 'display': 'block'});
-	    	//    }
-	    	//});
-	    });
-	    
-	    
-	    //$( '#sortable' ).sortable({
-	    //    revert: true
-	    //  });
-	    //  $( '#draggable ul li' ).draggable({
-	    //    connectToSortable: '#sortable',
-	    //    helper: "clone",
-	    //    revert: "invalid"
-	    //  });
-	    //  $( "ul, li" ).disableSelection();
-	    //  $('.navbar-inner ul.nav:first-child').attr('id', '#sortable');
-	    //  $('.navbar-inner ul.nav:first-child').before('<div style="width: 546px;display: inline-block;height: 40px;float: left;">');
-	    //  $('.navbar-inner ul.nav:first-child').after('</div>');
-  });
-  
+<ul class="nav pf_menueconfig">
+  <li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+      <i class="icon-cogs"></i>
+      <!-- <b class="caret"></b> -->
+    </a>
+    <ul class="dropdown-menu" id="draggable">
+      <li>
+        <a href="#"><span>Common</span></a>
+        <ul>
+          <li>
+            <a href="./teamCalendar">Calendar</a>
+          </li>
+          <li>
+            <a href="./teamCalList">List of calendars</a>
+          </li>
+          <li>
+            <a href="./bookList">Books</a>
+          </li>
+          <li>
+            <a href="./addressList">Addresses</a>
+          </li>
+          <li>
+            <a href="./sendSms">Send SMS</a>
+          </li>
+          <li>
+            <a href="./search">Search</a>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <a href="#"><span>Project management</span></a>
+        <ul>
+          <li>
+            <a href="./taskTree">Tasks</a>
+          </li>
+          <li>
+            <a href="./timesheetList">Time sheets</a>
+          </li>
+          <li>
+            <a href="./monthlyEmployeeReport">Monthly employee report</a>
+          </li>
+          <li>
+            <a href="./personalStatistics">My statistics</a>
+          </li>
+          <li>
+            <a href="./hrList">HR planning</a>
+          </li>
+          <li>
+            <a href="./hrPlanningList">HR planning list</a>
+          </li>
+          <li>
+            <a href="./ganttList">Gantt</a>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <a href="#"><span>Finance</span></a>
+        <ul>
+          <li>
+            <a href="./outgoingInvoiceList">Invoices</a>
+          </li>
+          <li>
+            <a href="./incomingInvoiceList">Incoming invoices</a>
+          </li>
+          <li>
+            <a href="./customerList">Customers</a>
+          </li>
+          <li>
+            <a href="./projectList">Projects</a>
+          </li>
+          <li>
+            <a href="./employeeList">Employees</a>
+          </li>
+          <li>
+            <a href="./employeeSalaryList">Salaries</a>
+          </li>
+          <li>
+            <a href="./orderBookList">Order book</a>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <a href="#"><span>Cost</span></a>
+        <ul>
+          <li>
+            <a href="./accountList">Accounts</a>
+          </li>
+          <li>
+            <a href="./cost1List">Cost 1 ids</a>
+          </li>
+          <li>
+            <a href="./cost2List">Cost 2 ids</a>
+          </li>
+          <li>
+            <a href="./cost2TypeList">Cost 2 types</a>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <a href="#"><span>Reporting</span></a>
+        <ul>
+          <li>
+            <a href="./accountingRecordList">Accounting records</a>
+          </li>
+          <li>
+            <a href="./reportObjectives">Report Objectives</a>
+          </li>
+          <li>
+            <a href="./scripting">Scripting</a>
+          </li>
+          <li>
+            <a href="./scriptList">List of scripts</a>
+          </li>
+          <li>
+            <a href="./datevImport">Datev import</a>
+          </li>
+        </ul>
+      </li>
+      <li class="mm_clear">
+        <a href="#"><span>Organization</span></a>
+        <ul>
+          <li>
+            <a href="./outgoingMailList">Outbox</a>
+          </li>
+          <li>
+            <a href="./incomingMailList">Inbox</a>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <a href="#"><span>Administration</span></a>
+        <ul>
+          <li>
+            <a href="./myAccount">My account</a>
+          </li>
+          <li>
+            <a href="./userPrefList">My preferences</a>
+          </li>
+          <li>
+            <a href="./changePassword">Change password</a>
+          </li>
+          <li>
+            <a href="./userList">Users</a>
+          </li>
+          <li>
+            <a href="./groupList">Groups</a>
+          </li>
+          <li>
+            <a href="./accessList">Access management</a>
+          </li>
+          <li>
+            <a href="./admin">System</a>
+          </li>
+          <li>
+            <a href="./systemUpdate">Update system</a>
+          </li>
+          <li>
+            <a href="./systemStatistics">System statistics</a>
+          </li>
+          <li>
+            <a href="./configuration">Configuration</a>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <a href="#"><span>Miscellaneous</span></a>
+        <ul>
+          <li>
+            <a href="./toDoList">To-do</a>
+          </li>
+          <li>
+            <a href="./wicket/bookmarkable/org.projectforge.plugins.memo.MemoListPage">Memo's</a>
+          </li>
+          <li>
+            <a href="./doc">Documentation</a>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <a href="./customizeMenu">Customize menu</a>
+      </li>
+      <li>
+        <a href="#" id="showBookmarkLink19">Show as bookmark</a>
+      </li>
+    </ul>
+  </li>
+  <li class="pf_plus">
+    <a>
+      <i class="icon-plus"></i>
+    </a>
+  </li>
+  <li class="pf_trash">
+    <a>
+      <i class="icon-trash"></i>
+    </a>
+  </li>
+</ul>
+<script>
+$(window).load(function(){
 
-  </script>
-	<ul class="nav" role="menu">
-		<li class="dropdown mm_menueconfig">
-			<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-				<i class="icon-sitemap"></i>
-				<!-- <b class="caret"></b> -->
-			</a>
-			<ul class="dropdown-menu" id="draggable">
-				<li>
-					<a href="#"><span>Common</span></a>
-					<ul>
-						<li>
-							<a href="./teamCalendar">Calendar</a>
-						</li>
-						<li>
-							<a href="./teamCalList">List of calendars</a>
-						</li>
-						<li>
-							<a href="./bookList">Books</a>
-						</li>
-						<li>
-							<a href="./addressList">Addresses</a>
-						</li>
-						<li>
-							<a href="./sendSms">Send SMS</a>
-						</li>
-						<li>
-							<a href="./search">Search</a>
-						</li>
-					</ul>
-				</li>
-				<li>
-					<a href="#"><span>Project management</span></a>
-					<ul>
-						<li>
-							<a href="./taskTree">Tasks</a>
-						</li>
-						<li>
-							<a href="./timesheetList">Time sheets</a>
-						</li>
-						<li>
-							<a href="./monthlyEmployeeReport">Monthly employee report</a>
-						</li>
-						<li>
-							<a href="./personalStatistics">My statistics</a>
-						</li>
-						<li>
-							<a href="./hrList">HR planning</a>
-						</li>
-						<li>
-							<a href="./hrPlanningList">HR planning list</a>
-						</li>
-						<li>
-							<a href="./ganttList">Gantt</a>
-						</li>
-					</ul>
-				</li>
-				<li>
-					<a href="#"><span>Finance</span></a>
-					<ul>
-						<li>
-							<a href="./outgoingInvoiceList">Invoices</a>
-						</li>
-						<li>
-							<a href="./incomingInvoiceList">Incoming invoices</a>
-						</li>
-						<li>
-							<a href="./customerList">Customers</a>
-						</li>
-						<li>
-							<a href="./projectList">Projects</a>
-						</li>
-						<li>
-							<a href="./employeeList">Employees</a>
-						</li>
-						<li>
-							<a href="./employeeSalaryList">Salaries</a>
-						</li>
-						<li>
-							<a href="./orderBookList">Order book</a>
-						</li>
-					</ul>
-				</li>
-				<li>
-					<a href="#"><span>Cost</span></a>
-					<ul>
-						<li>
-							<a href="./accountList">Accounts</a>
-						</li>
-						<li>
-							<a href="./cost1List">Cost 1 ids</a>
-						</li>
-						<li>
-							<a href="./cost2List">Cost 2 ids</a>
-						</li>
-						<li>
-							<a href="./cost2TypeList">Cost 2 types</a>
-						</li>
-					</ul>
-				</li>
-				<li>
-					<a href="#"><span>Reporting</span></a>
-					<ul>
-						<li>
-							<a href="./accountingRecordList">Accounting records</a>
-						</li>
-						<li>
-							<a href="./reportObjectives">Report Objectives</a>
-						</li>
-						<li>
-							<a href="./scripting">Scripting</a>
-						</li>
-						<li>
-							<a href="./scriptList">List of scripts</a>
-						</li>
-						<li>
-							<a href="./datevImport">Datev import</a>
-						</li>
-					</ul>
-				</li>
-				<li class="mm_clear">
-					<a href="#"><span>Organization</span></a>
-					<ul>
-						<li>
-							<a href="./outgoingMailList">Outbox</a>
-						</li>
-						<li>
-							<a href="./incomingMailList">Inbox</a>
-						</li>
-					</ul>
-				</li>
-				<li>
-					<a href="#"><span>Administration</span></a>
-					<ul>
-						<li>
-							<a href="./myAccount">My account</a>
-						</li>
-						<li>
-							<a href="./userPrefList">My preferences</a>
-						</li>
-						<li>
-							<a href="./changePassword">Change password</a>
-						</li>
-						<li>
-							<a href="./userList">Users</a>
-						</li>
-						<li>
-							<a href="./groupList">Groups</a>
-						</li>
-						<li>
-							<a href="./accessList">Access management</a>
-						</li>
-						<li>
-							<a href="./admin">System</a>
-						</li>
-						<li>
-							<a href="./systemUpdate">Update system</a>
-						</li>
-						<li>
-							<a href="./systemStatistics">System statistics</a>
-						</li>
-						<li>
-							<a href="./configuration">Configuration</a>
-						</li>
-					</ul>
-				</li>
-				<li>
-					<a href="#"><span>Miscellaneous</span></a>
-					<ul>
-						<li>
-							<a href="./toDoList">To-do</a>
-						</li>
-						<li>
-							<a href="./wicket/bookmarkable/org.projectforge.plugins.memo.MemoListPage">Memo's</a>
-						</li>
-						<li>
-							<a href="./doc">Documentation</a>
-						</li>
-					</ul>
-				</li>
-				<li>
-					<a href="./customizeMenu">Customize menu</a>
-				</li>
-				<li>
-					<a href="#" id="showBookmarkLink19">Show as bookmark</a>
-				</li>
-			</ul>
-		</li>
-	</ul>
+
+  $('#pf_sortablecontainer').width($('#pf_sortablecontainer ul').width());
+
+  $.each($('#draggable ul li'), function(){
+    $(this).draggable( {
+      stack: $(this),
+      cursor: 'move',
+      revert: false,
+      helper: 'clone',
+      zIndex: 20000,
+      opacity: 0.01,
+      connectToSortable: '.sortable',
+      drag: function( event, ui )
+      {
+        //change width of target container dynamically
+        $('#pf_sortablecontainer').width($('#pf_sortablecontainer ul.nav').width());
+
+        //position draghelper on mousemove
+        $('body').mousemove(function(e){
+          $('.pf_draghelper').css({'top': e.pageY+20, 'left': e.pageX+20})
+        });
+
+        //highlight trash
+        $('.pf_trash a i').css('color','red');
+      },
+      start: function( event, ui ) {
+
+        //draghelper in den dom attachen wegen z-index Problem bei den dropdownmenues
+        $('body').after('<div class="pf_draghelper">' + ui.helper.prevObject.context.innerText + '</div>');
+
+      },
+      stop: function( event, ui ) {
+
+        //close all dropdowns
+        $.each($('#pf_sortablecontainer .dropdown'), function(){
+          $(this).removeClass('open');
+        });
+
+        //remove draghelper
+        $('.pf_draghelper').remove();
+
+        //stop highlight trash
+        $('.pf_trash a i').css('color','');
+
+      }
+    });
+  });
+
+  //add mouseover event on drag
+  var addMouseMoveOnDrag = function() {
+    $.each($('#pf_sortablecontainer .dropdown, #pf_sortablecontainer .dropdown-submenu'), function(){
+      $(this).mouseenter(function() {
+        if($(window).width() > 979){
+          $(this).addClass('open');
+        }
+      });
+      $(this).mouseleave(function() {
+        $(this).removeClass('open');
+      });
+    });
+  }
+  //set sortable to all lists
+  var makesortable = function() {
+    console.log('sortable called');
+    $.each($('#pf_sortablecontainer ul'), function(){
+      if(!$(this).hasClass('pf_disable')){
+        $(this).addClass('sortable'); //@todo:bei save wieder löschen
+      }
+    });
+
+    $('.sortable').sortable({
+      connectWith: '.sortable',
+      tolerance: 'pointer',
+      items: 'li:not(.pf_disable li, li.pf_disable)',
+      //cancel: 'li.dropdown',  //stupid child behavior... the same as 244...
+      cursor: 'move',
+      delay: 200,
+      cursorAt: { top: -20 },
+      zIndex: 20000,
+      placeholder: "pf_sortable-placeholder",
+
+      receive: function( event, ui )
+      {
+        $(ui.draggable).appendTo( this );
+        if(ui.item.hasClass('dropdown') || ui.item.hasClass('dropdown-submenu'))
+        {
+          if(ui.item.parent().hasClass('dropdown-menu')){
+            ui.item.removeClass('dropdown');
+            ui.item.addClass('dropdown-submenu');
+            ui.item.remove('b');
+          } else if(ui.item.parent().hasClass('nav')){
+            ui.item.removeClass('dropdown-submenu');
+            ui.item.addClass('dropdown');
+          }
+        }
+      },
+
+      start: function(event, ui) {
+
+        //simulate drag event - start
+        is_dragging = true;
+
+      },
+
+      stop: function(event, ui) {
+
+        //simulate drag event - stop
+        is_dragging = false;
+
+        //change width of target container dynamically
+        $('#pf_sortablecontainer').width($('#pf_sortablecontainer ul.nav').width());
+
+        //stop highlight trash
+        $('.pf_trash a i').css('color','');
+
+
+        updateBackend();
+      }
+
+    }).disableSelection();
+  }
+
+  //simulate drag event
+  var is_dragging = false;
+
+  //configuration active indicator
+  var is_configuration_active = false;
+
+  $('.pf_menueconfig li:first-child a').click(function(){
+    $('.pf_menueconfig').addClass('pf_configuration_active');
+    //deactivate click
+    //$('a').click(function(event) {
+    //  event.preventDefault();
+    //});
+
+    if(is_configuration_active == false) {
+      is_configuration_active = true;
+
+      //highlight target container
+      $('#pf_sortablecontainer ul.nav').addClass('pf_redborder');
+
+      $('.pf_trash, .pf_plus').show('fast');
+      $('#pf_sortablecontainer').addClass('pf_configuration_active');
+      $('#pf_sortablecontainer > ul').stop().animate({
+        left: '135'
+      }, 200);
+    } else if (is_configuration_active == true){ //&& !$('.pf_menueconfig').hasClass('pf_configuration_active')){
+      is_configuration_active = false;
+
+      //remove highlight target container
+      $('#pf_sortablecontainer ul.nav').removeClass('pf_redborder');
+      $('#pf_newentry').css('display', 'none');
+      $('#pf_newentry input').val('');
+      is_active_newentry = false;
+
+      $('.pf_trash, .pf_plus').hide('fast');
+      $('#pf_sortablecontainer, .pf_menueconfig').removeClass('pf_configuration_active');
+      $('.pf_menueconfig > li').removeClass('open');
+      $('#pf_sortablecontainer > ul').stop().animate({
+        left: '70'
+      }, 200);
+    }
+
+    makesortable();
+
+
+  });
+
+  $('body').mousemove(function(e){
+    if(is_dragging){
+
+      //change width of target container dynamically on simulated drag event
+      $('#pf_sortablecontainer').width($('#pf_sortablecontainer ul.nav').width());
+
+      //highlight trash
+      $('.pf_trash a i').css('color','red');
+
+    }
+  });
+
+  addMouseMoveOnDrag();
+
+  $('.pf_menueconfig > li > ul').mouseenter(function() {
+    $('.pf_menueconfig > li > ul').addClass('pf_active_over');
+  });
+  $('.pf_menueconfig > li > ul').mouseleave(function() {
+    $('.pf_menueconfig > li > ul').removeClass('pf_active_over');
+  });
+
+  //new entry is active
+  var is_active_newentry = false;
+
+  $('.pf_plus').click(function(){
+  if(is_active_newentry == false){
+    $('#pf_newentry').css('display', 'block');
+    $('#pf_sortablecontainer').width($('#pf_sortablecontainer ul.nav').width());
+    is_active_newentry = true;
+    }
+  });
+  $('#pf_newentry a').click(function(){
+    is_active_newentry = false;
+    if( !$('#pf_newentry input').val() ) {
+      $('#pf_newentry').addClass('pf_warning');
+    } else {
+
+      console.log($('#pf_newentry input').val());
+      $('#pf_newentry').attr('class', '');
+      $('#pf_newentry').css('display', 'none');
+      $('#pf_newentry').after('<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">' + $('#pf_newentry input').val() + '<b class="caret"></b></a><ul class="dropdown-menu"></ul></li>');
+      $('#pf_newentry input').val('');
+
+      makesortable();
+      addMouseMoveOnDrag();
+      updateBackend();
+    }
+  });
+  $('.pf_removenewentry').click(function(){
+    $('#pf_newentry').css('display', 'none');
+    $('#pf_newentry input').val('');
+    $('#pf_sortablecontainer').width($('#pf_sortablecontainer ul.nav').width());
+    $('#pf_newentry').attr('class', '');
+  });
+  var updateBackend = function() {
+    console.log('speichern');
+  }
+});
+
+</script>
+
 </wicket:panel>

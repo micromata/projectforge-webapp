@@ -127,7 +127,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     }
     {
       // Projekt
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt")).supressLabelForWarning();
       final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data, "projekt"),
           parentPage, "projektId");
       fs.add(projektSelectPanel);

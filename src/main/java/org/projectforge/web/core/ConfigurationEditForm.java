@@ -72,7 +72,7 @@ public class ConfigurationEditForm extends AbstractEditForm<ConfigurationDO, Con
     gridBuilder.newGridPanel();
     {
       // Parameter name
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.parameter")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.parameter")).supressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), getString(data.getI18nKey())));
     }
     {
@@ -115,7 +115,7 @@ public class ConfigurationEditForm extends AbstractEditForm<ConfigurationDO, Con
     }
     {
       // Description
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("description")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("description")).supressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), getString("administration.configuration.param." + data.getParameter() + ".description")));
     }
   }

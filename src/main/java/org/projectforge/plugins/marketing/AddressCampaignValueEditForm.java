@@ -69,12 +69,12 @@ public class AddressCampaignValueEditForm extends AbstractEditForm<AddressCampai
     }
     {
       // Name
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("name")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("name")).supressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), data.getAddress().getFullName()));
     }
     {
       // Organization
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("organization")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("organization")).supressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), data.getAddress().getOrganization()));
     }
     {
