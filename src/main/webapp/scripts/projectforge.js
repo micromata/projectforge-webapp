@@ -459,7 +459,7 @@ function pf_deleteClick(element, content, liElement) {
 			initDragAndDrop();
 		} else {
             // disable dnd
-
+            $('.pf_dnd').addClass('disabled');
         }
 	});
 
