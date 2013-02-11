@@ -66,7 +66,7 @@ public class IconPanel extends Panel
     if (type.isIn(IconType.REMOVE_SIGN, IconType.DENY) == true) {
       return CSSColor.RED;
     }
-    if (type.isIn(IconType.ACCEPT) == true) {
+    if (type.isIn(IconType.ACCEPT, IconType.PLUS_SIGN) == true) {
       return CSSColor.GREEN;
     }
     return null;
