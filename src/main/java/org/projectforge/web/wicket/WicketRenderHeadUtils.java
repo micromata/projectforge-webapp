@@ -62,7 +62,7 @@ public class WicketRenderHeadUtils
   private static final String[] CSS_FILES;
 
   private static final String[] SELECT2_JAVASCRIPT_FILES = { //
-  "scripts/select2/custom_select2.js"};
+  "scripts/select2/select2.js"};
 
   private static final String[][] AUTOGROW_JAVASCRIPT_FILES_DEF = { //
     { "scripts/autogrow/jquery.autogrowtextarea", ""}};
