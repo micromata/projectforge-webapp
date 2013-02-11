@@ -351,6 +351,8 @@ $(window).load(function(){
 
       //remove highlight target container
       $('#pf_sortablecontainer ul.nav').removeClass('pf_redborder');
+      $('#pf_newentry').css('display', 'none');
+      $('#pf_newentry input').val('');
 
       $('.pf_trash, .pf_plus').hide('fast');
       $('#pf_sortablecontainer, .pf_menueconfig').removeClass('pf_configuration_active');
