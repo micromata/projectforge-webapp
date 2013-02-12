@@ -40,7 +40,6 @@ import org.projectforge.fibu.KontoDao;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
@@ -121,12 +120,6 @@ public class KontoListPage extends AbstractListPage<KontoListForm, KontoDao, Kon
   protected KontoDao getBaseDao()
   {
     return kontoDao;
-  }
-
-  @Override
-  protected IModel<KontoDO> getModel(final KontoDO object)
-  {
-    return new DetachableDOModel<KontoDO, KontoDao>(object, getBaseDao());
   }
 
   protected KontoDao getKontoDao()

@@ -53,7 +53,6 @@ import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.CurrencyPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
@@ -227,11 +226,5 @@ IListPageColumnsCreator<EingangsrechnungDO>
   protected EingangsrechnungDao getBaseDao()
   {
     return eingangsrechnungDao;
-  }
-
-  @Override
-  protected IModel<EingangsrechnungDO> getModel(final EingangsrechnungDO object)
-  {
-    return new DetachableDOModel<EingangsrechnungDO, EingangsrechnungDao>(object, getBaseDao());
   }
 }

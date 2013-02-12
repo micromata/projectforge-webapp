@@ -53,7 +53,6 @@ import org.projectforge.web.user.UserPrefListPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
@@ -223,12 +222,6 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
   protected ProjektDao getBaseDao()
   {
     return projektDao;
-  }
-
-  @Override
-  protected IModel<ProjektDO> getModel(final ProjektDO object)
-  {
-    return new DetachableDOModel<ProjektDO, ProjektDao>(object, getBaseDao());
   }
 
   protected ProjektDao getProjektDao()
