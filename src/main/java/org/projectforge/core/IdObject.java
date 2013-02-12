@@ -33,7 +33,7 @@ import org.projectforge.web.wicket.tree.TableTreeExpansion;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public interface IdObject<I extends Serializable>
+public interface IdObject<I extends Serializable> extends Serializable
 {
   public I getId();
 }
