@@ -96,7 +96,7 @@ extends AbstractSecuredPage implements ISelectCallerPage
 
   protected DataTable<O, String> dataTable;
 
-  protected Serializable highlightedRowId;
+  private Serializable highlightedRowId;
 
   protected ISelectCallerPage caller;
 
@@ -168,7 +168,7 @@ extends AbstractSecuredPage implements ISelectCallerPage
       }
     }
     if (parameters.get(PARAMETER_HIGHLIGHTED_ROW) != null) {
-      this.highlightedRowId = WicketUtils.getAsInteger(parameters, PARAMETER_HIGHLIGHTED_ROW);
+      setHighlightedRowId(WicketUtils.getAsInteger(parameters, PARAMETER_HIGHLIGHTED_ROW));
     }
     this.i18nPrefix = i18nPrefix;
     this.caller = caller;
@@ -479,7 +479,10 @@ extends AbstractSecuredPage implements ISelectCallerPage
   {
     this.resultList = null; // Force reload of list
     this.refreshResultList = true;
-    dataTable.setItemsPerPage(form.getPageSize());
+    final long itemsPerPage = dataTable.getItemsPerPage();
+    if (form.getPageSize() != null && form.getPageSize().longValue() != itemsPerPage) {
+      dataTable.setItemsPerPage(form.getPageSize());
+    }
     addRecentSearchTerm();
   }
 
