@@ -57,7 +57,6 @@ import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
@@ -293,27 +292,28 @@ IListPageColumnsCreator<AddressDO>
     }
   }
 
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#buildList()
+   */
   @Override
-  public List<AddressDO> getList()
+  protected List<AddressDO> buildList()
   {
-    if (list == null) {
-      super.getList();
-      final String value = form.getSearchFilter().getAddressCampaignValue();
-      if (StringUtils.isEmpty(value) == false) {
-        final List<AddressDO> origList = list;
-        list = new ArrayList<AddressDO>();
-        for (final AddressDO address : origList) {
-          final AddressCampaignValueDO addressCampaignValue = addressCampaignValueMap.get(address.getId());
-          if (addressCampaignValue != null && addressCampaignValue.getValue() != null) {
-            if (value.equals(addressCampaignValue.getValue()) == true) {
-              list.add(address);
-            }
-          } else {
-            // address campaign value of the given address is not set:
-            if (AddressCampaignValueListForm.ADDRESS_CAMPAIGN_VALUE_UNDEFINED.equals(value) == true) {
-              // Filter all address campaign values without defined value:
-              list.add(address);
-            }
+    List<AddressDO> list = super.buildList();
+    final String value = form.getSearchFilter().getAddressCampaignValue();
+    if (StringUtils.isEmpty(value) == false) {
+      final List<AddressDO> origList = list;
+      list = new ArrayList<AddressDO>();
+      for (final AddressDO address : origList) {
+        final AddressCampaignValueDO addressCampaignValue = addressCampaignValueMap.get(address.getId());
+        if (addressCampaignValue != null && addressCampaignValue.getValue() != null) {
+          if (value.equals(addressCampaignValue.getValue()) == true) {
+            list.add(address);
+          }
+        } else {
+          // address campaign value of the given address is not set:
+          if (AddressCampaignValueListForm.ADDRESS_CAMPAIGN_VALUE_UNDEFINED.equals(value) == true) {
+            // Filter all address campaign values without defined value:
+            list.add(address);
           }
         }
       }
@@ -348,12 +348,6 @@ IListPageColumnsCreator<AddressDO>
   protected AddressDao getBaseDao()
   {
     return addressDao;
-  }
-
-  @Override
-  protected IModel<AddressDO> getModel(final AddressDO object)
-  {
-    return new DetachableDOModel<AddressDO, AddressDao>(object, getBaseDao());
   }
 
   protected AddressCampaignValueDao getAddressCampaignValueDao()
