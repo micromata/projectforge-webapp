@@ -75,7 +75,6 @@ import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
-import org.projectforge.web.wicket.flowlayout.DiffAcceptDiscardPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -177,8 +176,6 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       fieldSet.add(subjectField);
       if (access == false) {
         fieldSet.setEnabled(false);
-      } else if (oldData != null) {
-        fieldSet.add(new DiffAcceptDiscardPanel<String>(fieldSet.newChildId(), subjectField, data, oldData, "subject"));
       }
     }
     {
