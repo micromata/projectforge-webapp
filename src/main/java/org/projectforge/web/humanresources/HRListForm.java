@@ -72,6 +72,8 @@ public class HRListForm extends AbstractListForm<HRFilter, HRListPage>
         getString("hr.planning.filter.allProjectsGroupedByCustomer")));
     optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(filter, "otherProjectsGroupedByCustomer"),
         getString("hr.planning.filter.otherProjectsGroupedByCustomer")));
+    pageSizeFieldsetPanel.setVisible(false);
+    setPageSize(Integer.MAX_VALUE);
   }
 
   public HRListForm(final HRListPage parentPage)
