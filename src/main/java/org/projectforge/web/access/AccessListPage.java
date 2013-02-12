@@ -45,7 +45,6 @@ import org.projectforge.web.task.TaskFormatter;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
@@ -221,12 +220,6 @@ IListPageColumnsCreator<GroupTaskAccessDO>
   protected AccessDao getBaseDao()
   {
     return accessDao;
-  }
-
-  @Override
-  protected IModel<GroupTaskAccessDO> getModel(final GroupTaskAccessDO object)
-  {
-    return new DetachableDOModel<GroupTaskAccessDO, AccessDao>(object, getBaseDao());
   }
 
   protected AccessDao getAccessDao()

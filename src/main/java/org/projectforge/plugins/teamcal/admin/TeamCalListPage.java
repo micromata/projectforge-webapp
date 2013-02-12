@@ -43,7 +43,6 @@ import org.projectforge.plugins.teamcal.dialog.TeamCalICSExportDialog;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
@@ -187,16 +186,6 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
   protected TeamCalListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new TeamCalListForm(this);
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.AbstractListPage#getModel(java.lang.Object)
-   */
-  @Override
-  protected IModel<TeamCalDO> getModel(final TeamCalDO object)
-  {
-    final DetachableDOModel<TeamCalDO, TeamCalDao> model = new DetachableDOModel<TeamCalDO, TeamCalDao>(object, getBaseDao());
-    return model;
   }
 
   /**

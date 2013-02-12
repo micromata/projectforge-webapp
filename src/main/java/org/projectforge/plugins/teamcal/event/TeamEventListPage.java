@@ -43,7 +43,6 @@ import org.projectforge.plugins.teamcal.admin.TeamCalsProvider;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
@@ -193,16 +192,6 @@ IListPageColumnsCreator<TeamEventDO>
   protected TeamEventListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new TeamEventListForm(this);
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.AbstractListPage#getModel(java.lang.Object)
-   */
-  @Override
-  protected IModel<TeamEventDO> getModel(final TeamEventDO object)
-  {
-    final DetachableDOModel<TeamEventDO, TeamEventDao> model = new DetachableDOModel<TeamEventDO, TeamEventDao>(object, getBaseDao());
-    return model;
   }
 
   /**

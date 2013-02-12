@@ -37,7 +37,6 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
@@ -124,16 +123,6 @@ public class PollListPage extends AbstractListPage<PollListForm, PollDao, PollDO
   protected PollListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new PollListForm(this);
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.AbstractListPage#getModel(java.lang.Object)
-   */
-  @Override
-  protected IModel<PollDO> getModel(final PollDO object)
-  {
-    final DetachableDOModel<PollDO, PollDao> model = new DetachableDOModel<PollDO, PollDao>(object, getBaseDao());
-    return model;
   }
 
   /**
