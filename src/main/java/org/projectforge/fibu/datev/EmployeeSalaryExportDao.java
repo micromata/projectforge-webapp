@@ -55,9 +55,9 @@ import org.projectforge.fibu.EmployeeDao;
 import org.projectforge.fibu.EmployeeFilter;
 import org.projectforge.fibu.EmployeeSalaryDO;
 import org.projectforge.fibu.MonthlyEmployeeReport;
+import org.projectforge.fibu.MonthlyEmployeeReport.Kost2Row;
 import org.projectforge.fibu.MonthlyEmployeeReportDao;
 import org.projectforge.fibu.MonthlyEmployeeReportEntry;
-import org.projectforge.fibu.MonthlyEmployeeReport.Kost2Row;
 import org.projectforge.fibu.kost.Kost1DO;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.user.PFUserContext;
@@ -81,15 +81,15 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
 
   private class MyContentProvider extends XlsContentProvider
   {
-    public MyContentProvider(ExportWorkbook workbook)
+    public MyContentProvider(final ExportWorkbook workbook)
     {
       super(workbook);
     }
 
     @Override
-    public void updateRowStyle(ExportRow row)
+    public void updateRowStyle(final ExportRow row)
     {
-      for (ExportCell cell : row.getCells()) {
+      for (final ExportCell cell : row.getCells()) {
         final CellFormat format = cell.ensureAndGetCellFormat();
         format.setFillForegroundColor(HSSFColor.WHITE.index);
         switch (row.getRowNum()) {
@@ -126,10 +126,10 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
   {
     KOST1("fibu.kost1", XlsContentProvider.LENGTH_KOSTENTRAEGER), MITARBEITER("fibu.employee", XlsContentProvider.LENGTH_USER), STUNDEN(
         "hours", XlsContentProvider.LENGTH_DURATION), KOST2("fibu.kost2", XlsContentProvider.LENGTH_KOSTENTRAEGER), BRUTTO_MIT_AG(
-        "fibu.employee.salary.bruttoMitAgAnteil", XlsContentProvider.LENGTH_CURRENCY), KORREKTUR("fibu.common.korrekturWert",
-        XlsContentProvider.LENGTH_CURRENCY), SUMME("sum", XlsContentProvider.LENGTH_CURRENCY), BEZEICHNUNG("description",
-        XlsContentProvider.LENGTH_EXTRA_LONG), DATUM("date", XlsContentProvider.LENGTH_DATE), KONTO("fibu.buchungssatz.konto", 14), GEGENKONTO(
-        "fibu.buchungssatz.gegenKonto", 14);
+            "fibu.employee.salary.bruttoMitAgAnteil", XlsContentProvider.LENGTH_CURRENCY), KORREKTUR("fibu.common.korrekturWert",
+                XlsContentProvider.LENGTH_CURRENCY), SUMME("sum", XlsContentProvider.LENGTH_CURRENCY), BEZEICHNUNG("description",
+                    XlsContentProvider.LENGTH_EXTRA_LONG), DATUM("date", XlsContentProvider.LENGTH_DATE), KONTO("fibu.buchungssatz.konto", 14), GEGENKONTO(
+                        "fibu.buchungssatz.gegenKonto", 14);
 
     final String theTitle;
 
@@ -139,7 +139,7 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
 
     final static ExcelColumn END = GEGENKONTO;
 
-    ExcelColumn(String theTitle, int width)
+    ExcelColumn(final String theTitle, final int width)
     {
       this.theTitle = theTitle;
       this.width = (short) width;
@@ -155,12 +155,13 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
     log.info("Exporting employee salary list.");
     Validate.notEmpty(list);
     Collections.sort(list, new Comparator<EmployeeSalaryDO>() {
-      public int compare(EmployeeSalaryDO o1, EmployeeSalaryDO o2)
+      public int compare(final EmployeeSalaryDO o1, final EmployeeSalaryDO o2)
       {
         return (o1.getEmployee().getUser().getFullname()).compareTo(o2.getEmployee().getUser().getFullname());
       }
     });
     final EmployeeFilter filter = new EmployeeFilter();
+    filter.setShowOnlyActiveEntries(true);
     filter.setDeleted(false);
     final List<EmployeeDO> employees = employeeDao.getList(filter);
     final List<EmployeeDO> missedEmployees = new ArrayList<EmployeeDO>();
@@ -178,7 +179,7 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
     }
     if (CollectionUtils.isNotEmpty(missedEmployees) == true) {
       Collections.sort(missedEmployees, new Comparator<EmployeeDO>() {
-        public int compare(EmployeeDO o1, EmployeeDO o2)
+        public int compare(final EmployeeDO o1, final EmployeeDO o2)
         {
           return (o1.getUser().getFullname()).compareTo(o2.getUser().getFullname());
         }
@@ -210,7 +211,7 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
     employeeSheet.setColumnWidth(4, 12 * 256);
     final ContentProvider provider = employeeSheet.getContentProvider();
     provider.putFormat("STUNDEN", "0.00;[Red]-0.00");
-    ExportRow employeeRow = employeeSheet.addRow();
+    final ExportRow employeeRow = employeeSheet.addRow();
     employeeRow.addCell(0, PFUserContext.getLocalizedString("fibu.employee"));
     employeeRow.addCell(1, PFUserContext.getLocalizedString("fibu.employee.wochenstunden"));
     employeeRow.addCell(2, PFUserContext.getLocalizedString("fibu.employee.sollstunden"));
@@ -225,7 +226,7 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
     final int[] colWidths = new int[numCols];
 
     int idx = 0;
-    for (ExcelColumn col : EnumSet.range(ExcelColumn.START, ExcelColumn.END)) {
+    for (final ExcelColumn col : EnumSet.range(ExcelColumn.START, ExcelColumn.END)) {
       colNames[idx] = col.name();
       colTitles[idx] = PFUserContext.getLocalizedString(col.theTitle);
       colWidths[idx] = col.width;
@@ -252,7 +253,7 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
 
     final ExportRow headRow = sheet.addRow();
     int i = 0;
-    for (String title : colTitles) {
+    for (final String title : colTitles) {
       headRow.addCell(i++, title);
     }
 
@@ -265,22 +266,22 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
       mapping.add(ExcelColumn.MITARBEITER, user.getFullname());
       final Kost1DO kost1 = salary.getEmployee().getKost1();
       final BigDecimal bruttoMitAGAnteil = salary.getBruttoMitAgAnteil();
-      final BigDecimal totalDuration = new BigDecimal(report.getTotalDuration());
-      Map<String, Kost2Row> rows = report.getKost2Rows();
+      final BigDecimal netDuration = new BigDecimal(report.getTotalNetDuration());
+      final Map<String, Kost2Row> rows = report.getKost2Rows();
       BigDecimal sum = BigDecimal.ZERO;
       int j = rows.size();
-      for (Kost2Row row : rows.values()) {
+      for (final Kost2Row row : rows.values()) {
         final Kost2DO kost2 = row.getKost2();
-        MonthlyEmployeeReportEntry entry = report.getKost2Durations().get(kost2.getId());
+        final MonthlyEmployeeReportEntry entry = report.getKost2Durations().get(kost2.getId());
         mapping.add(ExcelColumn.KOST1, kost1.getNummer());
         mapping.add(ExcelColumn.MITARBEITER, user.getFullname());
         mapping.add(ExcelColumn.KOST2, kost2.getNummer());
-        BigDecimal duration = new BigDecimal(entry.getMillis() / 1000); // Seconds
+        final BigDecimal duration = new BigDecimal(entry.getMillis() / 1000); // Seconds
         // duration = duration.divide(new BigDecimal(60 * 60 * 24), 8, RoundingMode.HALF_UP); // Fraction of day (24 hours)
         // mapping.add(ExcelColumn.STUNDEN, duration);
         mapping.add(ExcelColumn.STUNDEN, duration.divide(new BigDecimal(3600), 2, RoundingMode.HALF_UP));
         mapping.add(ExcelColumn.BEZEICHNUNG, kost2.getToolTip());
-        final BigDecimal betrag = CurrencyHelper.multiply(bruttoMitAGAnteil, new BigDecimal(entry.getMillis()).divide(totalDuration, 8,
+        final BigDecimal betrag = CurrencyHelper.multiply(bruttoMitAGAnteil, new BigDecimal(entry.getMillis()).divide(netDuration, 8,
             RoundingMode.HALF_UP));
         sum = sum.add(betrag);
         if (--j == 0) {
@@ -302,7 +303,7 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
         mapping.add(ExcelColumn.GEGENKONTO, GEGENKONTO); // constant.
         sheet.addRow(mapping.getMapping(), 0);
       }
-      addEmployeeRow(employeeSheet, salary.getEmployee(), numberOfWorkingDays, totalDuration);
+      addEmployeeRow(employeeSheet, salary.getEmployee(), numberOfWorkingDays, netDuration);
     }
     for (final EmployeeDO employee : missedEmployees) {
       final PFUserDO user = userGroupCache.getUser(employee.getUserId());
@@ -312,15 +313,15 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
       mapping.add(ExcelColumn.BEZEICHNUNG, "*** FEHLT! ***");
       sheet.addRow(mapping.getMapping(), 0);
       final MonthlyEmployeeReport report = monthlyEmployeeReportDao.getReport(year, month, user);
-      final BigDecimal totalDuration = new BigDecimal(report.getTotalDuration());
-      addEmployeeRow(employeeSheet, employee, numberOfWorkingDays, totalDuration);
+      final BigDecimal netDuration = new BigDecimal(report.getTotalNetDuration());
+      addEmployeeRow(employeeSheet, employee, numberOfWorkingDays, netDuration);
     }
     // sheet.setZoom(3, 4); // 75%
 
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     try {
       xls.write(baos);
-    } catch (IOException ex) {
+    } catch (final IOException ex) {
       log.fatal("Exception encountered " + ex, ex);
       throw new RuntimeException(ex);
     }
@@ -350,17 +351,17 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
     row.addCell(4, differenz, "STUNDEN");
   }
 
-  public void setMonthlyEmployeeReportDao(MonthlyEmployeeReportDao monthlyEmployeeReportDao)
+  public void setMonthlyEmployeeReportDao(final MonthlyEmployeeReportDao monthlyEmployeeReportDao)
   {
     this.monthlyEmployeeReportDao = monthlyEmployeeReportDao;
   }
 
-  public void setUserGroupCache(UserGroupCache userGroupCache)
+  public void setUserGroupCache(final UserGroupCache userGroupCache)
   {
     this.userGroupCache = userGroupCache;
   }
 
-  public void setEmployeeDao(EmployeeDao employeeDao)
+  public void setEmployeeDao(final EmployeeDao employeeDao)
   {
     this.employeeDao = employeeDao;
   }
