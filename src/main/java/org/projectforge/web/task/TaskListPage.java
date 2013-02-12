@@ -66,7 +66,6 @@ import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DatePropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
@@ -377,11 +376,5 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
   protected TaskDao getBaseDao()
   {
     return taskDao;
-  }
-
-  @Override
-  protected IModel<TaskDO> getModel(final TaskDO object)
-  {
-    return new DetachableDOModel<TaskDO, TaskDao>(object, getBaseDao());
   }
 }
