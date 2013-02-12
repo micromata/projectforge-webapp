@@ -330,6 +330,19 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     return list;
   }
 
+  @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+  public List<O> internalLoad(final Collection< ? extends Serializable> idList)
+  {
+    if (idList == null) {
+      return null;
+    }
+    final Session session = getSession();
+    final Criteria criteria = session.createCriteria(clazz).add(Restrictions.in("id", idList));
+    @SuppressWarnings("unchecked")
+    final List<O> list = selectUnique(criteria.list());
+    return list;
+  }
+
   /**
    * This method is used by the searchDao and calls {@link #getList(BaseSearchFilter)} by default.
    * @param filter
@@ -1770,8 +1783,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
 
   /**
    * If true then a eh cache region is used for this dao for every criteria search of this class. <br/>
-   * Please note: If you write your own criteria searches in extended classes, don't forget to call {@link #setCacheRegion(Criteria)}.
-   * <br/>
+   * Please note: If you write your own criteria searches in extended classes, don't forget to call {@link #setCacheRegion(Criteria)}. <br/>
    * Don't forget to add your base dao class name in ehcache.xml.
    * @return false at default.
    */
