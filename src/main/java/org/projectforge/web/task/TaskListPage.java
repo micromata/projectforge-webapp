@@ -227,7 +227,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
       public void populateItem(final Item<ICellPopulator<TaskDO>> item, final String componentId, final IModel<TaskDO> rowModel)
       {
         final TaskDO task = rowModel.getObject();
-        appendCssClasses(item, task, (Integer) highlightedRowId);
+        appendCssClasses(item, task, (Integer) getHighlightedRowId());
       }
     };
     final List<IColumn<TaskDO, String>> columns = new ArrayList<IColumn<TaskDO, String>>();
