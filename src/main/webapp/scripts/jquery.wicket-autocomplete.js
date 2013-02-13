@@ -386,12 +386,8 @@ jQuery.autocomplete = function(input, options) {
 				}
 		    } else if (options.labelValue) {
 		        // First col contains label second col the value.
-		        li.innerHTML = defaultFormat(row[0], q) + (options.deletableItem ? "<span class='pf_deleteLink' onClick='pf_deleteClick(\"#"+ $input.attr("id") +"\", \""+row[0]+"\", this); return false;'>X</span>" : "");  // Johannes
-																																																								// Unterstein,
-																																																								// Kai
-																																																								// Dorschner:
-																																																								// Added
-																																																								// deletableItem
+		        // Johannes Unterstein, Kai Dorschner: Added deletableItem
+		        li.innerHTML = defaultFormat(row[0], q) + (options.deletableItem ? "<i class='icon-remove-sign red pf_deleteLink' onClick='pf_deleteClick(\"#"+ $input.attr("id") +"\", \""+row[0]+"\", this); return false;'></i></span>" : ""); 
 		        $(li).data('me', me); // Johannes & Kai
 		        if (options.selectValue) {
 		          li.selectValue = options.selectValue(row);
@@ -399,12 +395,8 @@ jQuery.autocomplete = function(input, options) {
 		          li.selectValue = row[1];
 		        }
 			} else {
-				li.innerHTML = defaultFormat(row[0], q) + (options.deletableItem ? "<span class='pf_deleteLink' onClick='pf_deleteClick(\"#"+ $input.attr("id") +"\", \""+row[0]+"\", this); return false;'>X</span>" : "");  // Johannes
-																																																								// Unterstein,
-																																																								// Kai
-																																																								// Dorschner:
-																																																								// Added
-																																																								// deletableItem
+		        // Johannes Unterstein, Kai Dorschner: Added deletableItem
+				li.innerHTML = defaultFormat(row[0], q) + (options.deletableItem ? "<i class='icon-remove-sign red pf_deleteLink' onClick='pf_deleteClick(\"#"+ $input.attr("id") +"\", \""+row[0]+"\", this); return false;'></i>" : "");
 				$(li).data('me', me); // Johannes & Kai
 				if (options.selectValue) {
 				  li.selectValue = options.selectValue(row);
