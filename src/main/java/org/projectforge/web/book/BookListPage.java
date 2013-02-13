@@ -45,7 +45,6 @@ import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
@@ -152,12 +151,6 @@ public class BookListPage extends AbstractListPage<BookListForm, BookDao, BookDO
   protected BookDao getBaseDao()
   {
     return bookDao;
-  }
-
-  @Override
-  protected IModel<BookDO> getModel(final BookDO object)
-  {
-    return new DetachableDOModel<BookDO, BookDao>(object, getBaseDao());
   }
 
   protected BookDao getBookDao()

@@ -55,7 +55,6 @@ import org.projectforge.web.wicket.AbstractUnsecureBasePage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.CurrencyPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
@@ -161,7 +160,7 @@ IListPageColumnsCreator<RechnungDO>
         "projekt.name", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.betreff"), getSortable("betreff", sortable),
         "betreff", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.datum.short"), getSortable("betreff", sortable),
+    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.datum.short"), getSortable("datum", sortable),
         "datum", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.faelligkeit.short"), getSortable("faelligkeit",
         sortable), "faelligkeit", cellItemListener));
@@ -253,11 +252,5 @@ IListPageColumnsCreator<RechnungDO>
   protected RechnungDao getBaseDao()
   {
     return rechnungDao;
-  }
-
-  @Override
-  protected IModel<RechnungDO> getModel(final RechnungDO object)
-  {
-    return new DetachableDOModel<RechnungDO, RechnungDao>(object, getBaseDao());
   }
 }

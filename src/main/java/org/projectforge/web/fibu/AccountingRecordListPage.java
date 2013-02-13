@@ -51,7 +51,6 @@ import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.CurrencyPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
@@ -123,7 +122,7 @@ IListPageColumnsCreator<BuchungssatzDO>
   @Override
   protected void init()
   {
-    final List<IColumn<BuchungssatzDO,String>> columns = createColumns(this, true);
+    final List<IColumn<BuchungssatzDO, String>> columns = createColumns(this, true);
     dataTable = createDataTable(columns, "formattedSatzNummer", SortOrder.ASCENDING);
     form.add(dataTable);
   }
@@ -234,45 +233,46 @@ IListPageColumnsCreator<BuchungssatzDO>
     return buchungssatzDao;
   }
 
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#buildList()
+   */
   @Override
-  public List<BuchungssatzDO> getList()
+  protected List<BuchungssatzDO> buildList()
   {
-    if (list == null) {
-      if (StringUtils.isNotEmpty(reportId) == true) {
-        final ReportStorage reportStorage = (ReportStorage) getUserPrefEntry(ReportObjectivesPage.KEY_REPORT_STORAGE);
-        if (reportStorage != null) {
-          report = reportStorage.findById(this.reportId);
-          if (report != null) {
-            if (this.businessAssessmentRowId != null) {
-              final BusinessAssessmentRow row = report.getBusinessAssessment().getRow(businessAssessmentRowId);
-              if (row != null) {
-                list = row.getAccountRecords();
-              } else {
-                log.info("Business assessment row "
-                    + businessAssessmentRowId
-                    + " not found for report with id '"
-                    + reportId
-                    + "' in existing ReportStorage.");
-              }
+    List<BuchungssatzDO> list = null;
+    if (StringUtils.isNotEmpty(reportId) == true) {
+      final ReportStorage reportStorage = (ReportStorage) getUserPrefEntry(ReportObjectivesPage.KEY_REPORT_STORAGE);
+      if (reportStorage != null) {
+        report = reportStorage.findById(this.reportId);
+        if (report != null) {
+          if (this.businessAssessmentRowId != null) {
+            final BusinessAssessmentRow row = report.getBusinessAssessment().getRow(businessAssessmentRowId);
+            if (row != null) {
+              list = row.getAccountRecords();
             } else {
-              list = report.getBuchungssaetze();
+              log.info("Business assessment row "
+                  + businessAssessmentRowId
+                  + " not found for report with id '"
+                  + reportId
+                  + "' in existing ReportStorage.");
             }
           } else {
-            log.info("Report with id '" + reportId + "' not found in existing ReportStorage.");
+            list = report.getBuchungssaetze();
           }
         } else {
-          log.info("Report with id '" + reportId + "' not found. ReportStorage does not exist.");
+          log.info("Report with id '" + reportId + "' not found in existing ReportStorage.");
         }
       } else {
-        list = super.getList();
+        log.info("Report with id '" + reportId + "' not found. ReportStorage does not exist.");
       }
-      if (CollectionUtils.isEmpty(list) == true) {
-        this.businessAssessment = null;
-      } else {
-        this.businessAssessment = new BusinessAssessment(AccountingConfig.getInstance().getBusinessAssessmentConfig());
-        this.businessAssessment.setAccountRecords(list);
-      }
-      return list;
+    } else {
+      list = super.buildList();
+    }
+    if (CollectionUtils.isEmpty(list) == true) {
+      this.businessAssessment = null;
+    } else {
+      this.businessAssessment = new BusinessAssessment(AccountingConfig.getInstance().getBusinessAssessmentConfig());
+      this.businessAssessment.setAccountRecords(list);
     }
     return list;
   }
@@ -283,11 +283,5 @@ IListPageColumnsCreator<BuchungssatzDO>
   BusinessAssessment getBusinessAssessment()
   {
     return businessAssessment;
-  }
-
-  @Override
-  protected IModel<BuchungssatzDO> getModel(final BuchungssatzDO object)
-  {
-    return new DetachableDOModel<BuchungssatzDO, BuchungssatzDao>(object, getBaseDao());
   }
 }

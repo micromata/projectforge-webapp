@@ -8,8 +8,6 @@ TeamCal
 -------
 - TeamCalEdit: Ganztags-Knopp versaut DatePicker.
 - TeamCalEdit: Wenn Start-Datum geändert wird, dann EndeDatum mit ändern (falls dies bisher noch nicht geändert wurde)
-- Recurrency
-- Erinnerungen
 - Attendees, Einladungen
 - Droplet, Import
 
@@ -17,19 +15,16 @@ Konkrete Masken
 ---------------
 - GanttChartEditForm: refresh button
 - Layout Monatsbericht.
+- <a rel="tooltip"><i .../></a>
+- z-index wieder klein machen.
 
 Mobile Version
 --------------
 - Button zum Dis- und Enablen des Responsive-Modes
 - ModalWindows: bigWindows gehen nicht.
 
-Wicket6-Migration
------------------
-- CustomizeMenu geht nicht im IE
-
 Themenspeicher
 --------------
-- https://github.com/svenmeier/wicket-dnd (für Gantt und FavoriteMenu)
 - http://haineault.com/media/jquery/ui-timepickr/page/
 - https://blogs.oracle.com/talkingjavadeployment/entry/native_packaging_for_javafx
 

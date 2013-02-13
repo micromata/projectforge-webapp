@@ -43,7 +43,6 @@ import org.projectforge.web.user.UserPropertyColumn;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
@@ -114,11 +113,5 @@ public class GanttChartListPage extends AbstractListPage<GanttChartListForm, Gan
   protected GanttChartDao getBaseDao()
   {
     return ganttChartDao;
-  }
-
-  @Override
-  protected IModel<GanttChartDO> getModel(final GanttChartDO object)
-  {
-    return new DetachableDOModel<GanttChartDO, GanttChartDao>(object, getBaseDao());
   }
 }

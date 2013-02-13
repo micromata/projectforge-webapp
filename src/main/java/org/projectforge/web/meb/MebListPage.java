@@ -44,7 +44,6 @@ import org.projectforge.web.user.UserPropertyColumn;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
@@ -134,12 +133,6 @@ public class MebListPage extends AbstractListPage<MebListForm, MebDao, MebEntryD
   protected MebDao getBaseDao()
   {
     return mebDao;
-  }
-
-  @Override
-  protected IModel<MebEntryDO> getModel(final MebEntryDO object)
-  {
-    return new DetachableDOModel<MebEntryDO, MebDao>(object, getBaseDao());
   }
 
   protected MebDao getMebDao()

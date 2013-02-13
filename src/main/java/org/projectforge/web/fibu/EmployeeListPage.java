@@ -43,7 +43,6 @@ import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
@@ -150,12 +149,6 @@ public class EmployeeListPage extends AbstractListPage<EmployeeListForm, Employe
   protected EmployeeDao getBaseDao()
   {
     return employeeDao;
-  }
-
-  @Override
-  protected IModel<EmployeeDO> getModel(final EmployeeDO object)
-  {
-    return new DetachableDOModel<EmployeeDO, EmployeeDao>(object, getBaseDao());
   }
 
   protected EmployeeDao getEmployeeDao()

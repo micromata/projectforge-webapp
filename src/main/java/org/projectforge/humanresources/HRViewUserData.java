@@ -30,12 +30,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.projectforge.common.NumberHelper;
+import org.projectforge.core.IdObject;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.user.PFUserDO;
 
-public class HRViewUserData implements Comparable<HRViewUserData>, Serializable
+public class HRViewUserData implements Comparable<HRViewUserData>, Serializable, IdObject<Serializable>
 {
   private static final long serialVersionUID = 5576425603050236009L;
 
@@ -123,7 +124,7 @@ public class HRViewUserData implements Comparable<HRViewUserData>, Serializable
     }
     return hrPlanning.getId();
   }
-  
+
   public boolean isDeleted()
   {
     return deleted;
@@ -216,8 +217,17 @@ public class HRViewUserData implements Comparable<HRViewUserData>, Serializable
     return entry;
   }
 
-  public int compareTo(HRViewUserData o)
+  public int compareTo(final HRViewUserData o)
   {
     return this.user.getFullname().compareTo(o.user.getFullname());
+  }
+
+  /**
+   * @see org.projectforge.core.IdObject#getId()
+   */
+  @Override
+  public Serializable getId()
+  {
+    return hrPlanning != null ? hrPlanning.getId() : null;
   }
 }

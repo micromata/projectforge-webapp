@@ -53,7 +53,6 @@ import org.projectforge.user.PFUserContext;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
@@ -223,12 +222,6 @@ public class Kost2ListPage extends AbstractListPage<Kost2ListForm, Kost2Dao, Kos
   protected Kost2Dao getBaseDao()
   {
     return kost2Dao;
-  }
-
-  @Override
-  protected IModel<Kost2DO> getModel(final Kost2DO object)
-  {
-    return new DetachableDOModel<Kost2DO, Kost2Dao>(object, getBaseDao());
   }
 
   protected Kost2Dao getKost2Dao()

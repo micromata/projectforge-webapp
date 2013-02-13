@@ -60,7 +60,6 @@ import org.projectforge.web.wicket.AbstractUnsecureBasePage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.CurrencyPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
@@ -253,20 +252,15 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
     return auftragDao;
   }
 
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#buildList()
+   */
   @Override
-  public List<AuftragDO> getList()
+  protected List<AuftragDO> buildList()
   {
-    if (list == null) {
-      list = super.getList();
-      auftragDao.calculateInvoicedSum(list);
-    }
+    final List<AuftragDO> list = super.buildList();
+    auftragDao.calculateInvoicedSum(list);
     return list;
-  }
-
-  @Override
-  protected IModel<AuftragDO> getModel(final AuftragDO object)
-  {
-    return new DetachableDOModel<AuftragDO, AuftragDao>(object, getBaseDao());
   }
 
   /**

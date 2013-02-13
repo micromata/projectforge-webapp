@@ -230,7 +230,7 @@ public class CalendarPanel extends Panel
               + ", sourceId: "
               + clickedEvent.getSource().getUuid());
         }
-        if (eventId != null) {
+        if (eventId != null && eventClassName != null) {
           if (TimesheetEventsProvider.EVENT_CLASS_NAME.startsWith(eventClassName) == true) {
             // User clicked on a time sheet, show the time sheet:
             final Integer id = NumberHelper.parseInteger(eventId);
@@ -257,8 +257,8 @@ public class CalendarPanel extends Panel
             addressViewPage.setReturnToPage((WebPage) getPage());
             return;
           }
+          onEventClickedHook(clickedEvent, response, event, eventId, eventClassName);
         }
-        onEventClickedHook(clickedEvent, response, event, eventId, eventClassName);
         response.refetchEvents();
       }
 

@@ -43,7 +43,6 @@ import org.projectforge.task.TaskTree;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
@@ -137,11 +136,5 @@ public class ConfigurationListPage extends AbstractListPage<ConfigurationListFor
   protected ConfigurationDao getBaseDao()
   {
     return configurationDao;
-  }
-
-  @Override
-  protected IModel<ConfigurationDO> getModel(final ConfigurationDO object)
-  {
-    return new DetachableDOModel<ConfigurationDO, ConfigurationDao>(object, getBaseDao());
   }
 }
