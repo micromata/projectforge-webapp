@@ -62,7 +62,7 @@ public abstract class MySortableDataProvider<O> extends SortableDataProvider<O, 
   @Override
   public Iterator<? extends O> iterator(final long first, final long count)
   {
-    final SortParam sp = getSort();
+    final SortParam<String> sp = getSort();
     final List<O> list = getList();
     if (list == null) {
       return null;
