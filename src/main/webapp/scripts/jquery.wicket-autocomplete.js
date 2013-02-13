@@ -387,7 +387,7 @@ jQuery.autocomplete = function(input, options) {
 		    } else if (options.labelValue) {
 		        // First col contains label second col the value.
 		        // Johannes Unterstein, Kai Dorschner: Added deletableItem
-		        li.innerHTML = defaultFormat(row[0], q) + (options.deletableItem ? "<i class='icon-remove-sign red pf_deleteLink' onClick='pf_deleteClick(\"#"+ $input.attr("id") +"\", \""+row[0]+"\", this); return false;'></i></span>" : ""); 
+		        li.innerHTML = defaultFormat(row[0], q) + (options.deletableItem ? "<i class='icon-remove-sign red pf_deleteLink' onclick='pf_deleteClick(\"#"+ $input.attr("id") +"\", \""+row[0]+"\", this); return false;'></i>" : ""); 
 		        $(li).data('me', me); // Johannes & Kai
 		        if (options.selectValue) {
 		          li.selectValue = options.selectValue(row);
@@ -396,7 +396,7 @@ jQuery.autocomplete = function(input, options) {
 		        }
 			} else {
 		        // Johannes Unterstein, Kai Dorschner: Added deletableItem
-				li.innerHTML = defaultFormat(row[0], q) + (options.deletableItem ? "<i class='icon-remove-sign red pf_deleteLink' onClick='pf_deleteClick(\"#"+ $input.attr("id") +"\", \""+row[0]+"\", this); return false;'></i>" : "");
+				li.innerHTML = defaultFormat(row[0], q) + (options.deletableItem ? "<i class='icon-remove-sign red pf_deleteLink' onclick='pf_deleteClick(\"#"+ $input.attr("id") +"\", \""+row[0]+"\", this); return false;'></i>" : "");
 				$(li).data('me', me); // Johannes & Kai
 				if (options.selectValue) {
 				  li.selectValue = options.selectValue(row);
