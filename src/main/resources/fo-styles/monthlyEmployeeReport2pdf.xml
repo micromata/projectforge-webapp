@@ -101,10 +101,10 @@
         <td text-align="end">${week.formattedTotalDuration}</td>
         <groovy> } </groovy>
         <td text-align="end">
-          <span color="#FF0000" use-font="bold">${report.formattedNetDuration}</span>
+          <span color="#FF0000" use-font="bold">${report.formattedTotalNetDuration}</span>
         </td>
       </tr>
-      <groovy> if (report.totalDuration != report.netDuration) { </groovy>
+      <groovy> if (report.totalGrossDuration != report.totalNetDuration) { </groovy>
       <!-- Total sum (if differs from net duration) -->
       <tr>
         <td number-columns-spanned="4" text-align="end">
@@ -114,7 +114,7 @@
         <td text-align="end"></td>
         <groovy> } </groovy>
         <td text-align="end">
-          <span use-font="bold">${report.formattedTotalDuration}</span>
+          <span use-font="bold">${report.formattedTotalGrossDuration}</span>
         </td>
       </tr>
       <groovy> } </groovy>
