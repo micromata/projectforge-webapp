@@ -185,17 +185,10 @@ public class MyListPageSortableDataProvider<T extends IdObject< ? >> extends Sor
   /**
    * @see org.apache.wicket.markup.repeater.data.IDataProvider#model(java.lang.Object)
    */
-  @SuppressWarnings("serial")
   @Override
   public IModel<T> model(final T object)
   {
-    return new Model<T>() {
-      @Override
-      public T getObject()
-      {
-        return object;
-      };
-    };
+    return new Model<T>(object);
   }
 
   /**
