@@ -153,9 +153,8 @@ public class ContentMenuEntryPanel extends Panel
     if (labelComponent instanceof IconPanel) {
       // Needed because hover doesn't work if a tag contains embedded i tag.
       ((IconPanel)labelComponent).setTooltip(Model.of(title), Model.of(text));
-    } else {
-      WicketUtils.addTooltip(link, title, text);
     }
+    WicketUtils.addTooltip(link, title, text);
     return this;
   }
 
