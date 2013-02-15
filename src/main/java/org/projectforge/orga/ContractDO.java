@@ -90,7 +90,7 @@ public class ContractDO extends DefaultBaseDO
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String type;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
   private String status;
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
@@ -131,7 +131,7 @@ public class ContractDO extends DefaultBaseDO
     return date;
   }
 
-  public ContractDO setDate(Date date)
+  public ContractDO setDate(final Date date)
   {
     this.date = date;
     return this;
@@ -146,7 +146,7 @@ public class ContractDO extends DefaultBaseDO
     return validFrom;
   }
 
-  public ContractDO setValidFrom(Date validFrom)
+  public ContractDO setValidFrom(final Date validFrom)
   {
     this.validFrom = validFrom;
     return this;
@@ -161,7 +161,7 @@ public class ContractDO extends DefaultBaseDO
     return validUntil;
   }
 
-  public ContractDO setValidUntil(Date validUntil)
+  public ContractDO setValidUntil(final Date validUntil)
   {
     this.validUntil = validUntil;
     return this;
@@ -173,7 +173,7 @@ public class ContractDO extends DefaultBaseDO
     return title;
   }
 
-  public ContractDO setTitle(String title)
+  public ContractDO setTitle(final String title)
   {
     this.title = title;
     return this;
@@ -188,7 +188,7 @@ public class ContractDO extends DefaultBaseDO
     return type;
   }
 
-  public ContractDO setType(String type)
+  public ContractDO setType(final String type)
   {
     this.type = type;
     return this;
@@ -200,7 +200,7 @@ public class ContractDO extends DefaultBaseDO
     return status;
   }
 
-  public ContractDO setStatus(String status)
+  public ContractDO setStatus(final String status)
   {
     this.status = status;
     return this;
@@ -212,7 +212,7 @@ public class ContractDO extends DefaultBaseDO
     return text;
   }
 
-  public ContractDO setText(String text)
+  public ContractDO setText(final String text)
   {
     this.text = text;
     return this;
@@ -224,7 +224,7 @@ public class ContractDO extends DefaultBaseDO
     return reference;
   }
 
-  public ContractDO setReference(String reference)
+  public ContractDO setReference(final String reference)
   {
     this.reference = reference;
     return this;
@@ -236,7 +236,7 @@ public class ContractDO extends DefaultBaseDO
     return resubmissionOnDate;
   }
 
-  public ContractDO setResubmissionOnDate(Date resubmissionOnDate)
+  public ContractDO setResubmissionOnDate(final Date resubmissionOnDate)
   {
     this.resubmissionOnDate = resubmissionOnDate;
     return this;
@@ -248,7 +248,7 @@ public class ContractDO extends DefaultBaseDO
     return dueDate;
   }
 
-  public ContractDO setDueDate(Date dueDate)
+  public ContractDO setDueDate(final Date dueDate)
   {
     this.dueDate = dueDate;
     return this;
@@ -260,7 +260,7 @@ public class ContractDO extends DefaultBaseDO
     return filing;
   }
 
-  public ContractDO setFiling(String filing)
+  public ContractDO setFiling(final String filing)
   {
     this.filing = filing;
     return this;
@@ -272,7 +272,7 @@ public class ContractDO extends DefaultBaseDO
     return coContractorA;
   }
 
-  public ContractDO setCoContractorA(String coContractorA)
+  public ContractDO setCoContractorA(final String coContractorA)
   {
     this.coContractorA = coContractorA;
     return this;
@@ -284,7 +284,7 @@ public class ContractDO extends DefaultBaseDO
     return contractPersonA;
   }
 
-  public ContractDO setContractPersonA(String contractPersonA)
+  public ContractDO setContractPersonA(final String contractPersonA)
   {
     this.contractPersonA = contractPersonA;
     return this;
@@ -296,7 +296,7 @@ public class ContractDO extends DefaultBaseDO
     return signerA;
   }
 
-  public ContractDO setSignerA(String signerA)
+  public ContractDO setSignerA(final String signerA)
   {
     this.signerA = signerA;
     return this;
@@ -308,7 +308,7 @@ public class ContractDO extends DefaultBaseDO
     return coContractorB;
   }
 
-  public ContractDO setCoContractorB(String coContractorB)
+  public ContractDO setCoContractorB(final String coContractorB)
   {
     this.coContractorB = coContractorB;
     return this;
@@ -320,7 +320,7 @@ public class ContractDO extends DefaultBaseDO
     return contractPersonB;
   }
 
-  public ContractDO setContractPersonB(String contractPersonB)
+  public ContractDO setContractPersonB(final String contractPersonB)
   {
     this.contractPersonB = contractPersonB;
     return this;
@@ -332,7 +332,7 @@ public class ContractDO extends DefaultBaseDO
     return signerB;
   }
 
-  public ContractDO setSignerB(String signerB)
+  public ContractDO setSignerB(final String signerB)
   {
     this.signerB = signerB;
     return this;
@@ -344,7 +344,7 @@ public class ContractDO extends DefaultBaseDO
     return signingDate;
   }
 
-  public ContractDO setSigningDate(Date signingDate)
+  public ContractDO setSigningDate(final Date signingDate)
   {
     this.signingDate = signingDate;
     return this;
