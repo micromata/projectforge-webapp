@@ -43,6 +43,8 @@ public class ContractFilter extends BaseSearchFilter implements Serializable
 
   protected ContractStatus status;
 
+  protected ContractType type;
+
   public ContractFilter()
   {
   }
@@ -93,6 +95,24 @@ public class ContractFilter extends BaseSearchFilter implements Serializable
   public ContractFilter setStatus(final ContractStatus status)
   {
     this.status = status;
+    return this;
+  }
+
+  /**
+   * @return the type
+   */
+  public ContractType getType()
+  {
+    return type;
+  }
+
+  /**
+   * @param type the type to set
+   * @return this for chaining.
+   */
+  public ContractFilter setType(final ContractType type)
+  {
+    this.type = type;
     return this;
   }
 }
