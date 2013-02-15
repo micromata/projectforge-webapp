@@ -47,8 +47,6 @@ import org.projectforge.fibu.EingangsrechnungsPositionDO;
 import org.projectforge.fibu.KontoCache;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KontoDao;
-import org.projectforge.fibu.KundeDO;
-import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.ProjektFormatter;
 import org.projectforge.fibu.RechnungDO;
 import org.projectforge.fibu.RechnungsPositionDO;
@@ -193,18 +191,7 @@ public class KostZuweisungExport
       mapping.add(InvoicesCol.BRUTTO, zuweisung.getBrutto());
       Integer kontoNummer = null;
       if (rechnung instanceof RechnungDO) {
-        KontoDO konto = null;
-        final ProjektDO projekt = ((RechnungDO) rechnung).getProjekt();
-        if (projekt != null) {
-          konto = kontoCache.getKonto(projekt.getKontoId());
-        }
-        final KundeDO kunde = ((RechnungDO) rechnung).getKunde();
-        if (konto == null && kunde != null) {
-          konto = kontoCache.getKonto(kunde.getKontoId());
-        }
-        if (konto == null && projekt.getKunde() != null) {
-          konto = kontoCache.getKonto(projekt.getKunde().getKontoId());
-        }
+        final KontoDO konto = kontoCache.getKonto(((RechnungDO) rechnung));
         if (konto != null) {
           kontoNummer = konto.getNummer();
         }
@@ -284,7 +271,7 @@ public class KostZuweisungExport
       String status = "";
       if (konto.isDeleted() == true) {
         status = PFUserContext.getLocalizedString("deleted");
-      } else if (konto.getStatus() != null){
+      } else if (konto.getStatus() != null) {
         status = PFUserContext.getLocalizedString(konto.getStatus().getI18nKey());
       }
       mapping.add(AccountsCol.STATUS, status);
