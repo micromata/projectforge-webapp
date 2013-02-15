@@ -72,6 +72,10 @@ public class ContractDao extends BaseDao<ContractDO>
     if (myFilter.getStatus() != null) {
       queryFilter.add(Restrictions.eq("status", myFilter.getStatus().name()));
     }
+    if (myFilter.getType() != null) {
+      queryFilter.add(Restrictions.eq("type", myFilter.getType().getValue()));
+    }
+    queryFilter.setYearAndMonth("date", myFilter.getYear(), -1);
     if (log.isDebugEnabled() == true) {
       log.debug(myFilter.toString());
     }
