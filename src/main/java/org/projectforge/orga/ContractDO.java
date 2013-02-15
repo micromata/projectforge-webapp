@@ -90,7 +90,7 @@ public class ContractDO extends DefaultBaseDO
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String type;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(index = Index.TOKENIZED, store = Store.NO)
   private String status;
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
