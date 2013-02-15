@@ -142,13 +142,7 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
         public void populateItem(final Item<ICellPopulator<ProjektDO>> item, final String componentId, final IModel<ProjektDO> rowModel)
         {
           final ProjektDO projekt = rowModel.getObject();
-          KontoDO konto = null;
-          if (projekt != null) {
-            konto = kontoCache.getKonto(projekt.getKontoId());
-            if (konto == null && projekt.getKunde() != null) {
-              konto = kontoCache.getKonto(projekt.getKunde().getKontoId());
-            }
-          }
+          final KontoDO konto = kontoCache.getKonto(projekt);
           item.add(new Label(componentId, konto != null ? konto.formatKonto() : ""));
           cellItemListener.populateItem(item, componentId, rowModel);
         }
