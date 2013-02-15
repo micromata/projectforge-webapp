@@ -31,7 +31,7 @@ import org.projectforge.core.I18nEnum;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  *         <ul>
- *         <li>IN_PROGRES - in progress.</li>
+ *         <li>IN_PROGRESS - in progress.</li>
  *         <li>COMPLETED - completed / signed.</li>
  *         <li>SUSPENDED - completed / not signed.</li>
  *         <li>ESCALATED - escalated.</li>
@@ -39,7 +39,7 @@ import org.projectforge.core.I18nEnum;
  */
 public enum ContractStatus implements I18nEnum
 {
-  UNKNOWN("unknown"), IN_PROGRES("inProgress"), IN_COORDINATION("inCoordination"), COMPLETED("completed"), SIGNED("signed"), SUSPENDED(
+  UNKNOWN("unknown"), IN_PROGRESS("inProgress"), IN_COORDINATION("inCoordination"), COMPLETED("completed"), SIGNED("signed"), SUSPENDED(
       "suspended"), ESCALATED("escalated");
 
   private String key;
@@ -49,8 +49,8 @@ public enum ContractStatus implements I18nEnum
     if (StringUtils.isEmpty(s) == true) {
       return null;
     }
-    if ("IN_PROGRES".equals(s) == true) {
-      return IN_PROGRES;
+    if ("IN_PROGRESS".equals(s) == true || "IN_PROGRES".equals(s) == true) {
+      return IN_PROGRESS;
     } else if ("COMPLETED".equals(s) == true) {
       return COMPLETED;
     } else if ("SUSPENDED".equals(s) == true) {
@@ -76,7 +76,7 @@ public enum ContractStatus implements I18nEnum
     return "legalAffaires.contract.status." + key;
   }
 
-  ContractStatus(String key)
+  ContractStatus(final String key)
   {
     this.key = key;
   }
