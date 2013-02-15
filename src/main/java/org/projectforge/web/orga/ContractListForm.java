@@ -27,12 +27,15 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.orga.ContractDao;
+import org.projectforge.orga.ContractFilter;
+import org.projectforge.orga.ContractStatus;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.YearListCoiceRenderer;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
-public class ContractListForm extends AbstractListForm<ContractListFilter, ContractListPage>
+public class ContractListForm extends AbstractListForm<ContractFilter, ContractListPage>
 {
   private static final long serialVersionUID = -2813402079364322428L;
 
@@ -63,6 +66,17 @@ public class ContractListForm extends AbstractListForm<ContractListFilter, Contr
     };
     yearChoice.setNullValid(false);
     optionsFieldsetPanel.add(yearChoice);
+    {
+      // DropDownChoice status
+      final LabelValueChoiceRenderer<ContractStatus> statusRenderer = new LabelValueChoiceRenderer<ContractStatus>();
+      for (final ContractStatus status : ContractStatus.values()) {
+        statusRenderer.addValue(status, getString(status.getI18nKey()));
+      }
+      final DropDownChoice<ContractStatus> statusChoice = new DropDownChoice<ContractStatus>(optionsFieldsetPanel.getDropDownChoiceId(),
+          new PropertyModel<ContractStatus>(getSearchFilter(), "status"), statusRenderer.getValues(), statusRenderer);
+      statusChoice.setNullValid(true);
+      optionsFieldsetPanel.add(statusChoice, true).setTooltip(getString("status"));
+    }
   }
 
   public Integer getYear()
@@ -80,9 +94,9 @@ public class ContractListForm extends AbstractListForm<ContractListFilter, Contr
   }
 
   @Override
-  protected ContractListFilter newSearchFilterInstance()
+  protected ContractFilter newSearchFilterInstance()
   {
-    return new ContractListFilter();
+    return new ContractFilter();
   }
 
   @Override
