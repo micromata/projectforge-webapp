@@ -29,9 +29,9 @@ import java.util.Map;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.log4j.Logger;
+import org.hibernate.LazyInitializationException;
 import org.projectforge.common.AbstractCache;
 import org.springframework.orm.hibernate3.HibernateTemplate;
-
 
 /**
  * Caches the DATEV accounts.
@@ -46,7 +46,8 @@ public class KontoCache extends AbstractCache
   /** The key is the order id. */
   private Map<Integer, KontoDO> accountMapById;
 
-  public boolean isEmpty() {
+  public boolean isEmpty()
+  {
     checkRefresh();
     return MapUtils.isEmpty(accountMapById);
   }
@@ -58,6 +59,73 @@ public class KontoCache extends AbstractCache
     }
     checkRefresh();
     return accountMapById.get(id);
+  }
+
+  /**
+   * Gets account of given project if given, otherwise the account assigned to the customer assigned to this project. If no account is given at all, null is returned.<br/>
+   * Please note: The object of project must be initialized including the assigned customer, if not a {@link LazyInitializationException} could be thrown.
+   * @param project
+   * @return The assigned account if given, otherwise null.
+   */
+  public KontoDO getKonto(final ProjektDO project)
+  {
+    if (project == null) {
+      return null;
+    }
+    checkRefresh();
+    KontoDO konto = getKonto(project.getKontoId());
+    if (konto != null) {
+      return konto;
+    }
+    final KundeDO customer = project.getKunde();
+    if (customer != null) {
+      konto = getKonto(customer.getKontoId());
+    }
+    return konto;
+  }
+
+  /**
+   * Gets account:
+   * <ol>
+   * <li>Returns the account of given invoice if given.</li>
+   * <li>Returns the account of the assigned project if given.</li>
+   * <li>Returns the account assigned to the customer of this invoice if given.</li>
+   * <li>Returns the account of the customer assigned to the project if given.<br/>
+   * Please note: The object of project must be initialized including the assigned customer, if not a {@link LazyInitializationException} could be thrown.
+   * @param invoice
+   * @return The assigned account if given, otherwise null.
+   */
+  public KontoDO getKonto(final RechnungDO invoice)
+  {
+    if (invoice == null) {
+      return null;
+    }
+    checkRefresh();
+    KontoDO konto = getKonto(invoice.getKontoId());
+    if (konto != null) {
+      return konto;
+    }
+    final ProjektDO project = invoice.getProjekt();
+    if (project != null) {
+      konto = getKonto(project.getKontoId());
+      if (konto != null) {
+        return konto;
+      }
+    }
+    KundeDO kunde = invoice.getKunde();
+    if (kunde != null) {
+      konto = getKonto(kunde.getKontoId());
+    }
+    if (konto != null) {
+      return konto;
+    }
+    if (project != null) {
+      kunde = project.getKunde();
+      if (kunde != null) {
+        konto = getKonto(kunde.getKontoId());
+      }
+    }
+    return konto;
   }
 
   /**
