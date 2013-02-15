@@ -23,6 +23,8 @@
 
 package org.projectforge.orga;
 
+import java.io.Serializable;
+
 import org.projectforge.common.ILabelValueBean;
 import org.projectforge.common.ReflectionToString;
 import org.projectforge.xml.stream.XmlField;
@@ -34,8 +36,10 @@ import org.projectforge.xml.stream.XmlObject;
  * 
  */
 @XmlObject(alias = "contractType")
-public class ContractType implements ILabelValueBean<String, String>
+public class ContractType implements ILabelValueBean<String, String>, Serializable
 {
+  private static final long serialVersionUID = 553564992110970022L;
+
   @XmlField(asAttribute = true)
   private String label;
 
