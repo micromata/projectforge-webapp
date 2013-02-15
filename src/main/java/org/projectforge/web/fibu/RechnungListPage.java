@@ -46,10 +46,12 @@ import org.projectforge.common.NumberHelper;
 import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.fibu.AuftragsPositionVO;
 import org.projectforge.fibu.KontoCache;
+import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.RechnungDO;
 import org.projectforge.fibu.RechnungDao;
 import org.projectforge.fibu.RechnungsStatistik;
 import org.projectforge.fibu.kost.KostZuweisungExport;
+import org.projectforge.registry.Registry;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.AbstractUnsecureBasePage;
 import org.projectforge.web.wicket.CellItemListener;
@@ -158,6 +160,23 @@ IListPageColumnsCreator<RechnungDO>
         "kundeAsString", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.projekt"), getSortable("projekt.name", sortable),
         "projekt.name", cellItemListener));
+    if (Registry.instance().getKontoCache().isEmpty() == false) {
+      columns
+      .add(new CellItemListenerPropertyColumn<RechnungDO>(new Model<String>(getString("fibu.konto")), null, "konto", cellItemListener) {
+        /**
+         * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+         *      java.lang.String, org.apache.wicket.model.IModel)
+         */
+        @Override
+        public void populateItem(final Item<ICellPopulator<RechnungDO>> item, final String componentId, final IModel<RechnungDO> rowModel)
+        {
+          final RechnungDO invoice = rowModel.getObject();
+          final KontoDO konto = kontoCache.getKonto(invoice);
+          item.add(new Label(componentId, konto != null ? konto.formatKonto() : ""));
+          cellItemListener.populateItem(item, componentId, rowModel);
+        }
+      });
+    }
     columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.betreff"), getSortable("betreff", sortable),
         "betreff", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.datum.short"), getSortable("datum", sortable),
