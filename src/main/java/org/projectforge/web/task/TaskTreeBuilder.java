@@ -199,7 +199,7 @@ public class TaskTreeBuilder implements Serializable
       public void populateItem(final Item<ICellPopulator<TaskNode>> item, final String componentId, final IModel<TaskNode> rowModel)
       {
         final TaskNode node = rowModel.getObject();
-        item.add(TaskListPage.getConsumptionBarPanel(tree, componentId, taskTree, selectMode, node));
+        item.add(TaskListPage.getConsumptionBarPanel(tree, componentId, getTaskTree(), selectMode, node));
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
@@ -208,7 +208,7 @@ public class TaskTreeBuilder implements Serializable
         @Override
         public void populateItem(final Item<ICellPopulator<TaskNode>> item, final String componentId, final IModel<TaskNode> rowModel)
         {
-          final Label label = TaskListPage.getKostLabel(componentId, taskTree, rowModel.getObject().getTask());
+          final Label label = TaskListPage.getKostLabel(componentId, getTaskTree(), rowModel.getObject().getTask());
           item.add(label);
           cellItemListener.populateItem(item, componentId, rowModel);
         }
