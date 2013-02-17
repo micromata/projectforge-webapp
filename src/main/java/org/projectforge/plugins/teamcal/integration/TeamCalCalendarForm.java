@@ -31,7 +31,6 @@ import net.fortuna.ical4j.model.Component;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
-import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
@@ -45,8 +44,9 @@ import org.projectforge.web.calendar.CalendarForm;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.calendar.CalendarPageSupport;
 import org.projectforge.web.calendar.ICalendarFilter;
-import org.projectforge.web.dialog.ModalDialog;
+import org.projectforge.web.dialog.ModalMessageDialog;
 import org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
 import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
@@ -59,7 +59,8 @@ public class TeamCalCalendarForm extends CalendarForm
 {
 
   private static final long serialVersionUID = -5838203593605203398L;
-  private MyErrorDialog errorDialog;
+
+  private ModalMessageDialog errorDialog;
 
   /**
    * @param parentPage
@@ -149,33 +150,32 @@ public class TeamCalCalendarForm extends CalendarForm
         @Override
         protected void onIcsImport(final AjaxRequestTarget target, final Calendar calendar)
         {
-          // TODO kai: do fancy stuff with the calendar
-
           @SuppressWarnings("unchecked")
           final List<Component> list = calendar.getComponents("VEVENT");
           // if (calendar.getComponent(name))
           if (list == null || list.size() == 0) {
-            errorDialog.open(target, getString("plugins.teamcal.import.noEventsGiven"));
+            errorDialog.setMessage(getString("plugins.teamcal.import.noEventsGiven")).open(target);
             return;
           }
 
           // Temporary not used, because multiple events are not supported.
-          //          final List<VEvent> events = new ArrayList<VEvent>();
-          //          for (final Component c : list) {
-          //            final VEvent event = new VEvent(c.getProperties());
+          // final List<VEvent> events = new ArrayList<VEvent>();
+          // for (final Component c : list) {
+          // final VEvent event = new VEvent(c.getProperties());
           //
-          //            if (StringUtils.equals(event.getSummary().getValue(), CalendarFeed.SETUP_EVENT) == true) {
-          //              // skip setup event!
-          //              continue;
-          //            }
-          //            events.add(event);
-          //          }
+          // if (StringUtils.equals(event.getSummary().getValue(), CalendarFeed.SETUP_EVENT) == true) {
+          // // skip setup event!
+          // continue;
+          // }
+          // events.add(event);
+          // }
 
           // TODO change to events.size() if multiple events are supported.
           if (list.size() > 1) {
-            errorDialog.open(target, getString("plugins.teamcal.import.multipleEventsNotYetSupported"));
+            errorDialog.setMessage(getString("plugins.teamcal.import.multipleEventsNotYetSupported")).open(target);
             return;
           }
+          errorDialog.setMessage("Not yet implemented.").open(target);
           // 1. Check id/external id. If not yet given, create new entry and ask for calendar to add: Redirect to TeamEventEditPage.
           // 2. If already exists open edit dialog with DiffAcceptDiscardPanels.
         }
@@ -206,7 +206,8 @@ public class TeamCalCalendarForm extends CalendarForm
         dialog.redraw().addContent(target);
       }
     };
-    errorDialog = new MyErrorDialog(parentPage.newModalDialogId());
+    errorDialog = new ModalMessageDialog(parentPage.newModalDialogId(), new ResourceModel("plugins.teamcal.import.ics.error"));
+    errorDialog.setType(DivType.ALERT_ERROR);
     parentPage.add(errorDialog);
     errorDialog.init();
     calendarButtonPanel.setDefaultFormProcessing(false);
@@ -234,38 +235,4 @@ public class TeamCalCalendarForm extends CalendarForm
     return ((TeamCalCalendarFilter) filter).getActiveVisibleCalendarIds();
   }
 
-  private class MyErrorDialog extends ModalDialog {
-    private static final long serialVersionUID = -5934755033487813064L;
-
-    /**
-     * @param id
-     */
-    public MyErrorDialog(final String id)
-    {
-      super(id);
-    }
-
-    /**
-     * @see org.projectforge.web.dialog.ModalDialog#onInitialize()
-     */
-    @Override
-    protected void onInitialize()
-    {
-      super.onInitialize();
-      setTitle(getString("plugins.teamcal.import.ics.error"));
-    }
-
-    @Override
-    public void init()
-    {
-      final Form<Void> form = new Form<Void>(getFormId());
-      init(form);
-    }
-
-    public MyErrorDialog open(final AjaxRequestTarget target, final String s) {
-      super.open(target);
-      ajaxError(s, target);
-      return this;
-    }
-  }
 }
