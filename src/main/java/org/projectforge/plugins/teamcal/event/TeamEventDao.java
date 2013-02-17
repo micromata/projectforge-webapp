@@ -146,6 +146,10 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
   @Override
   protected void afterLoad(final TeamEventDO event)
   {
+    if (event.afterLoadCalled == true) {
+      return;
+    }
+    event.afterLoadCalled = true;
     super.afterLoad(event);
     if (event.isAllDay() == false) {
       return;
@@ -175,6 +179,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     final QueryFilter qFilter = buildQueryFilter(teamEventFilter);
     qFilter.add(Restrictions.isNotNull("recurrenceRule"));
     list = getList(qFilter);
+    list = selectUnique(list);
     final TimeZone timeZone = PFUserContext.getTimeZone();
     if (list != null) {
       for (final TeamEventDO eventDO : list) {

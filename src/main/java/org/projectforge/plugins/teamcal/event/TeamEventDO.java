@@ -118,6 +118,8 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
 
   private String externalUid;
 
+  transient boolean afterLoadCalled;
+
   /**
    * Clear fields for viewers with minimal access. If you add new fields don't forget to clear these fields here.
    */

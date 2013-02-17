@@ -98,7 +98,8 @@ public class TeamEventUtils
     // ical4jStartDate.setTimeZone(ICal4JUtils.getTimeZone(timeZone));
     final net.fortuna.ical4j.model.DateTime ical4jEndDate = new net.fortuna.ical4j.model.DateTime(endDate);
     // ical4jEndDate.setTimeZone(ICal4JUtils.getTimeZone(timeZone));
-    final net.fortuna.ical4j.model.DateTime seedDate = ICal4JUtils.getICal4jDateTime(event.getStartDate(), timeZone);
+    net.fortuna.ical4j.model.DateTime seedDate;
+    seedDate = ICal4JUtils.getICal4jDateTime(event.getStartDate(), timeZone);
     if (ical4jStartDate == null || ical4jEndDate == null || seedDate == null) {
       log.error("Can't get recurrence events of event "
           + event.getId()
