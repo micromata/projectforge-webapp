@@ -97,8 +97,8 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
           + newEndDate
           + ", event=["
           + event
-          + "], event=["
-          + event
+          + "], recurrencyChangeType=["
+          + recurrencyChangeType
           + "]");
     }
     this.eventOfCaller = event;
@@ -123,9 +123,13 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
     } else {
       if (newStartDate != null) {
         teamEventDO.setStartDate(newStartDate);
+      } else {
+        teamEventDO.setStartDate(new Timestamp(event.getStartDate().getTime()));
       }
       if (newEndDate != null) {
         teamEventDO.setEndDate(newEndDate);
+      } else {
+        teamEventDO.setEndDate(new Timestamp(event.getEndDate().getTime()));
       }
     }
     if (recurrencyChangeType == RecurrencyChangeType.ONLY_CURRENT) {
