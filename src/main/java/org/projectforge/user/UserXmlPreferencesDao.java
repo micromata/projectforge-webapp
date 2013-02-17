@@ -30,6 +30,7 @@ import java.util.Map;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.Validate;
 import org.projectforge.access.AccessChecker;
+import org.projectforge.common.GZIPHelper;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.task.TaskDO;
@@ -158,6 +159,14 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
     try {
       UserXmlPreferencesMigrationDao.migrate(userPrefs);
       xml = userPrefs.getSerializedSettings();
+      if (xml == null || xml.length() == 0) {
+        return null;
+      }
+      if (xml.startsWith("!") == true) {
+        // Uncompress value:
+        final String uncompressed = GZIPHelper.compress(xml.substring(1));
+        xml = uncompressed;
+      }
       final Object value = xstream.fromXML(xml);
       return value;
     } catch (final Throwable ex) {
@@ -210,7 +219,13 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
       userPrefs.setUserId(userId);
       userPrefs.setKey(key);
     }
-    userPrefs.setSerializedSettings(xml);
+    if (xml.length() > 1000) {
+      // Compress value:
+      final String compressed = GZIPHelper.compress(xml);
+      userPrefs.setSerializedSettings("!" + compressed);
+    } else {
+      userPrefs.setSerializedSettings(xml);
+    }
     userPrefs.setLastUpdate(date);
     userPrefs.setVersion();
     if (isNew == true) {
