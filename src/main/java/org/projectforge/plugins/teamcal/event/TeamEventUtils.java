@@ -33,11 +33,13 @@ import java.util.StringTokenizer;
 
 import net.fortuna.ical4j.model.DateList;
 import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.DtStart;
+import net.fortuna.ical4j.model.property.ExDate;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.projectforge.calendar.CalendarUtils;
@@ -190,6 +192,14 @@ public class TeamEventUtils
     }
     if (event.getOrganizer() != null) {
       teamEvent.setOrganizer(event.getOrganizer().getValue());
+    }
+    final RRule rule = (RRule) event.getProperty(Property.RRULE);
+    if (rule != null) {
+      teamEvent.setRecurrenceRule(rule.getValue());
+    }
+    final ExDate exDate = (ExDate) event.getProperty(Property.EXDATE);
+    if (exDate != null) {
+      teamEvent.setRecurrenceExDate(exDate.getValue());
     }
     return teamEvent;
   }
