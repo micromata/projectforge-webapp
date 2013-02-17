@@ -179,7 +179,7 @@ public class TeamCalCalendarForm extends CalendarForm
           // 1. Check id/external id. If not yet given, create new entry and ask for calendar to add: Redirect to TeamEventEditPage.
           // 2. If already exists open edit dialog with DiffAcceptDiscardPanels.
         }
-      });
+      }.setTooltip(getString("plugins.teamcal.dropIcsPanel.tooltip")));
     }
   }
 
