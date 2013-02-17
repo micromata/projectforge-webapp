@@ -164,7 +164,7 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
       }
       if (xml.startsWith("!") == true) {
         // Uncompress value:
-        final String uncompressed = GZIPHelper.compress(xml.substring(1));
+        final String uncompressed = GZIPHelper.uncompress(xml.substring(1));
         xml = uncompressed;
       }
       final Object value = xstream.fromXML(xml);
