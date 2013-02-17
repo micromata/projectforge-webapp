@@ -49,7 +49,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.thoughtworks.xstream.XStream;
 
 /**
- * Stores all user persistent objects such as filter settings, personal settings and persists them to the database.
+ * Stores all user persistent objects such as filter settings, personal settings and persists them to the database as xml (compressed (gzip
+ * and base64) for larger xml content).
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
