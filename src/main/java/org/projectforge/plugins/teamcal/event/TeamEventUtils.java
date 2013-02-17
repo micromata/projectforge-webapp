@@ -32,7 +32,6 @@ import java.util.LinkedList;
 import java.util.StringTokenizer;
 
 import net.fortuna.ical4j.model.DateList;
-import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.TimeZone;
@@ -95,10 +94,12 @@ public class TeamEventUtils
       // Shouldn't happen:
       return null;
     }
-    final net.fortuna.ical4j.model.Date ical4jStartDate = ICal4JUtils.getICal4jDate(startDate, timeZone);
-    final net.fortuna.ical4j.model.Date ical4jEndDate = ICal4JUtils.getICal4jDate(endDate, timeZone);
-    final net.fortuna.ical4j.model.Date seed = ICal4JUtils.getICal4jDate(event.getStartDate(), timeZone);
-    if (ical4jStartDate == null || ical4jEndDate == null || seed == null) {
+    final net.fortuna.ical4j.model.DateTime ical4jStartDate = new net.fortuna.ical4j.model.DateTime(startDate);
+    // ical4jStartDate.setTimeZone(ICal4JUtils.getTimeZone(timeZone));
+    final net.fortuna.ical4j.model.DateTime ical4jEndDate = new net.fortuna.ical4j.model.DateTime(endDate);
+    // ical4jEndDate.setTimeZone(ICal4JUtils.getTimeZone(timeZone));
+    final net.fortuna.ical4j.model.DateTime seedDate = ICal4JUtils.getICal4jDateTime(event.getStartDate(), timeZone);
+    if (ical4jStartDate == null || ical4jEndDate == null || seedDate == null) {
       log.error("Can't get recurrence events of event "
           + event.getId()
           + ". Not all three dates are given: startDate="
@@ -106,15 +107,15 @@ public class TeamEventUtils
           + ", endDate="
           + ical4jEndDate
           + ", seed="
-          + seed);
+          + seedDate);
       return null;
     }
     final Collection<Calendar> exDates = getExDates(event.getRecurrenceExDate());
-    final DateList dateList = recur.getDates(seed, ical4jStartDate, ical4jEndDate, Value.TIME);
+    final DateList dateList = recur.getDates(seedDate, ical4jStartDate, ical4jEndDate, Value.DATE_TIME);
     final Collection<TeamEvent> col = new ArrayList<TeamEvent>();
     if (dateList != null) {
       OuterLoop: for (final Object obj : dateList) {
-        final DateTime dateTime = (DateTime) obj;
+        final net.fortuna.ical4j.model.DateTime dateTime = (net.fortuna.ical4j.model.DateTime) obj;
         final Calendar startDay = Calendar.getInstance(timeZone);
         startDay.setTime(dateTime);
         final Calendar masterStartDate = Calendar.getInstance(timeZone);
