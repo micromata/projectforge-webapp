@@ -23,12 +23,16 @@
 
 package org.projectforge.plugins.teamcal.integration;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.property.Uid;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
@@ -36,10 +40,16 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.StringHelper;
 import org.projectforge.plugins.teamcal.dialog.TeamCalFilterDialog;
+import org.projectforge.plugins.teamcal.event.TeamEventDO;
+import org.projectforge.plugins.teamcal.event.TeamEventDao;
+import org.projectforge.plugins.teamcal.event.TeamEventEditPage;
 import org.projectforge.plugins.teamcal.event.TeamEventListPage;
+import org.projectforge.plugins.teamcal.event.TeamEventUtils;
 import org.projectforge.plugins.teamcal.event.importics.DropIcsPanel;
+import org.projectforge.web.calendar.CalendarFeed;
 import org.projectforge.web.calendar.CalendarForm;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.calendar.CalendarPageSupport;
@@ -61,6 +71,9 @@ public class TeamCalCalendarForm extends CalendarForm
   private static final long serialVersionUID = -5838203593605203398L;
 
   private ModalMessageDialog errorDialog;
+
+  @SpringBean(name = "teamEventDao")
+  private TeamEventDao teamEventDao;
 
   /**
    * @param parentPage
@@ -154,30 +167,46 @@ public class TeamCalCalendarForm extends CalendarForm
           final List<Component> list = calendar.getComponents("VEVENT");
           // if (calendar.getComponent(name))
           if (list == null || list.size() == 0) {
-            errorDialog.setMessage(getString("plugins.teamcal.import.noEventsGiven")).open(target);
+            errorDialog.setMessage(getString("plugins.teamcal.import.ics.noEventsGiven")).open(target);
             return;
           }
 
           // Temporary not used, because multiple events are not supported.
-          // final List<VEvent> events = new ArrayList<VEvent>();
-          // for (final Component c : list) {
-          // final VEvent event = new VEvent(c.getProperties());
-          //
-          // if (StringUtils.equals(event.getSummary().getValue(), CalendarFeed.SETUP_EVENT) == true) {
-          // // skip setup event!
-          // continue;
-          // }
-          // events.add(event);
-          // }
+          final List<VEvent> events = new ArrayList<VEvent>();
+          for (final Component c : list) {
+            final VEvent event = new VEvent(c.getProperties());
 
-          // TODO change to events.size() if multiple events are supported.
-          if (list.size() > 1) {
-            errorDialog.setMessage(getString("plugins.teamcal.import.multipleEventsNotYetSupported")).open(target);
+            if (StringUtils.equals(event.getSummary().getValue(), CalendarFeed.SETUP_EVENT) == true) {
+              // skip setup event!
+              continue;
+            }
+            events.add(event);
+          }
+          if (events.size() == 0) {
+            errorDialog.setMessage(getString("plugins.teamcal.import.ics.noEventsGiven")).open(target);
             return;
           }
-          errorDialog.setMessage("Not yet implemented.").open(target);
+          if (events.size() > 1) {
+            errorDialog.setMessage(getString("plugins.teamcal.import.ics.multipleEventsNotYetSupported")).open(target);
+            return;
+          }
+          final VEvent event = events.get(0);
+          final Uid uid = event.getUid();
           // 1. Check id/external id. If not yet given, create new entry and ask for calendar to add: Redirect to TeamEventEditPage.
-          // 2. If already exists open edit dialog with DiffAcceptDiscardPanels.
+          final TeamEventDO dbEvent = teamEventDao.getByUid(uid.getValue());
+          if (dbEvent != null) {
+            // 2. If already exists open edit dialog with DiffAcceptDiscardPanels.
+            // TODO: Don't forget to undelete the event (if marked as deleted).
+            errorDialog.setMessage(getString("plugins.teamcal.import.ics.eventAlreadyImported")).open(target);
+            return;
+          }
+          final TeamEventDO teamEvent = TeamEventUtils.createTeamEventDO(event);
+          final TemplateEntry activeTemplateEntry = ((TeamCalCalendarFilter) filter).getActiveTemplateEntry();
+          if (activeTemplateEntry != null) {
+            teamEventDao.setCalendar(teamEvent, activeTemplateEntry.getDefaultCalendarId());
+          }
+          final TeamEventEditPage editPage = new TeamEventEditPage(new PageParameters(), teamEvent);
+          setResponsePage(editPage);
         }
       }.setTooltip(getString("plugins.teamcal.dropIcsPanel.tooltip")));
     }

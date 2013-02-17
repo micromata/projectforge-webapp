@@ -32,6 +32,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHelper;
 import org.projectforge.core.ModificationStatus;
+import org.projectforge.plugins.teamcal.integration.TeamCalCalendarPage;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredBasePage;
@@ -145,6 +146,9 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   @Override
   public void setResponsePage()
   {
+    if (returnToPage == null) {
+      returnToPage = new TeamCalCalendarPage(new PageParameters());
+    }
     super.setResponsePage();
     if (returnToPage instanceof CalendarPage) {
       // Display the date of this time sheet in the CalendarPage (useful if the time sheet was moved).

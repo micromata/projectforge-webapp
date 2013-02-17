@@ -31,6 +31,7 @@ import java.util.List;
 import net.fortuna.ical4j.model.Recur;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
@@ -149,7 +150,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     gridBuilder.newSplitPanel(GridSize.COL50);
     final TeamCalDO teamCal = data.getCalendar();
     // setting access view
-    if (isNew() == true || teamCal.getOwner() == null) {
+    if (isNew() == true || teamCal == null || teamCal.getOwner() == null) {
       access = true;
     } else {
       if (right.hasUpdateAccess(getUser(), data, data) == true) {
@@ -456,8 +457,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       teamCalDrop.setNullValid(false);
       teamCalDrop.setRequired(true);
       fieldSet.add(teamCalDrop);
-      if (isNew() == false) {
-        // Show switch button only for new events.
+      if (isNew() == false  || StringUtils.isNotBlank(data.getSubject()) == true) {
+        // Show switch button only for new events or events with prefilled input.
         return;
       }
       {

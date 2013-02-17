@@ -41,8 +41,10 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
+import org.projectforge.plugins.teamcal.TeamCalConfig;
 import org.projectforge.plugins.teamcal.admin.TeamCalCache;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
+import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalsProvider;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserRightId;
@@ -67,6 +69,8 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "subject", "location", "calendar.id", "calendar.title", "note",
   "attendees"};
 
+  private TeamCalDao teamCalDao;
+
   public TeamEventDao()
   {
     super(TeamEventDO.class);
@@ -77,6 +81,39 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
   protected String[] getAdditionalSearchFields()
   {
     return ADDITIONAL_SEARCH_FIELDS;
+  }
+
+  /**
+   * @param teamEvent
+   * @param teamCalendarId If null, then team calendar will be set to null;
+   * @see BaseDao#getOrLoad(Integer)
+   */
+  public void setCalendar(final TeamEventDO teamEvent, final Integer teamCalendarId)
+  {
+    final TeamCalDO teamCal = teamCalDao.getOrLoad(teamCalendarId);
+    teamEvent.setCalendar(teamCal);
+  }
+
+
+  @SuppressWarnings("unchecked")
+  public TeamEventDO getByUid(final String uid)
+  {
+    if (uid == null) {
+      return null;
+    }
+    List<TeamEventDO> list;
+    final Integer id = TeamCalConfig.get().extractEventId(uid);
+    if (id != null) {
+      // The uid refers an own event, therefore search for the extracted id.
+      list = getHibernateTemplate().find("from TeamEventDO e where e.id = ?", id);
+    } else {
+      // It's an external event:
+      list = getHibernateTemplate().find("from TeamEventDO e where e.externalUid = ?", uid);
+    }
+    if (list != null && list.isEmpty() == false && list.get(0) != null) {
+      return list.get(0);
+    }
+    return null;
   }
 
   /**
@@ -322,5 +359,13 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
   protected boolean useOwnCriteriaCacheRegion()
   {
     return true;
+  }
+
+  /**
+   * @param teamCalDao the teamCalDao to set
+   */
+  public void setTeamCalDao(final TeamCalDao teamCalDao)
+  {
+    this.teamCalDao = teamCalDao;
   }
 }

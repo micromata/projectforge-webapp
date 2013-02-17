@@ -114,6 +114,8 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
 
   private String attendees;
 
+  private String organizer;
+
   private String externalUid;
 
   /**
@@ -122,6 +124,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   public void clearFields()
   {
     subject = location = note = attendees = null;
+    organizer = null;
   }
 
   public TeamEventDO()
@@ -132,7 +135,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   @Transient
   public String getUid()
   {
-    return String.valueOf(getId()) + "@" + TeamCalConfig.get().getDomain();
+    return TeamCalConfig.get().createEventUid(getId());
   }
 
   @Column(length = Constants.LENGTH_SUBJECT)
@@ -288,6 +291,25 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   public TeamEventDO setAttendees(final String attendees)
   {
     this.attendees = attendees;
+    return this;
+  }
+
+  /**
+   * @return the organizer
+   */
+  @Column(length = 1000)
+  public String getOrganizer()
+  {
+    return organizer;
+  }
+
+  /**
+   * @param organizer the organizer to set
+   * @return this for chaining.
+   */
+  public TeamEventDO setOrganizer(final String organizer)
+  {
+    this.organizer = organizer;
     return this;
   }
 
