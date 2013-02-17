@@ -38,6 +38,8 @@ import org.projectforge.task.TaskFilter;
 import org.projectforge.timesheet.TimesheetPrefData;
 import org.projectforge.web.scripting.RecentScriptCalls;
 import org.projectforge.web.scripting.ScriptCallData;
+import org.projectforge.xstream.JodaDateMidnightConverter;
+import org.projectforge.xstream.JodaDateTimeConverter;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -68,6 +70,8 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
     registerConverter(UserDao.class, PFUserDO.class, 20);
     registerConverter(GroupDao.class, GroupDO.class, 19);
     registerConverter(TaskDao.class, TaskDO.class, 18);
+    xstream.registerConverter(new JodaDateTimeConverter());
+    xstream.registerConverter(new JodaDateMidnightConverter());
   }
 
   /**
