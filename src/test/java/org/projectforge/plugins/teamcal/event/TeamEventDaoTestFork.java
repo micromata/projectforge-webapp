@@ -68,7 +68,7 @@ public class TeamEventDaoTestFork extends PluginTestBase
     event.setStartDate(new Timestamp(DateHelperTest.createDate(2012, Calendar.DECEMBER, 8, 8, 0, 0, 0).getTime()));
     event.setEndDate(new Timestamp(DateHelperTest.createDate(2012, Calendar.DECEMBER, 8, 15, 0, 0, 0).getTime()));
     event.setSubject("Testing the event dao.");
-    event.setAttendees("2,3").setLocation("At home").setNote("This is a note.");
+    event.setLocation("At home").setNote("This is a note.");
     try {
       log.info("Next AccessException is expected:");
       teamEventDao.save(event);
@@ -144,7 +144,7 @@ public class TeamEventDaoTestFork extends PluginTestBase
   private TeamCalDao getTeamCalDao()
   {
     if (this.teamCalDao == null) {
-      this.teamCalDao = (TeamCalDao) Registry.instance().getDao(TeamCalDao.class);
+      this.teamCalDao = Registry.instance().getDao(TeamCalDao.class);
     }
     return this.teamCalDao;
   }
