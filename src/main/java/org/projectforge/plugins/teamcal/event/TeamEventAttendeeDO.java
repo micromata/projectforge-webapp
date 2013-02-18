@@ -24,13 +24,11 @@
 package org.projectforge.plugins.teamcal.event;
 
 import java.io.Serializable;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.ObjectUtils;
@@ -52,11 +50,27 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
 
   private Integer userId;
 
+  private String loginToken;
+
   private TeamAttendeeStatus status;
 
   private String comment;
 
-  private Set<TeamEventAttendeeDO> attendees = null;
+  private Integer id;
+
+  @Id
+  @GeneratedValue
+  @Column(name = "pk")
+  public Integer getId()
+  {
+    return id;
+  }
+
+  public void setId(final Integer id)
+  {
+    this.id = id;
+  }
+
 
   /**
    * @return the userId
@@ -73,6 +87,25 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
   public TeamEventAttendeeDO setUserId(final Integer userId)
   {
     this.userId = userId;
+    return this;
+  }
+
+  /**
+   * @return the loginToken
+   */
+  @Column(name = "login_token", length = 255)
+  public String getLoginToken()
+  {
+    return loginToken;
+  }
+
+  /**
+   * @param loginToken the loginToken to set
+   * @return this for chaining.
+   */
+  public TeamEventAttendeeDO setLoginToken(final String loginToken)
+  {
+    this.loginToken = loginToken;
     return this;
   }
 
@@ -127,26 +160,6 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
   public TeamEventAttendeeDO setComment(final String comment)
   {
     this.comment = comment;
-    return this;
-  }
-
-  /**
-   * @return the attendees
-   */
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-  @JoinColumn(name = "team_event_fk", insertable = true, updatable = true)
-  public Set<TeamEventAttendeeDO> getAttendees()
-  {
-    return attendees;
-  }
-
-  /**
-   * @param attendees the attendees to set
-   * @return this for chaining.
-   */
-  public TeamEventAttendeeDO setAttendees(final Set<TeamEventAttendeeDO> attendees)
-  {
-    this.attendees = attendees;
     return this;
   }
 

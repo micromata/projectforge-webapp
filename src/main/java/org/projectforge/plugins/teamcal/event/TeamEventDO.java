@@ -27,12 +27,15 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -112,7 +115,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String note;
 
-  private String attendees;
+  private Set<TeamEventAttendeeDO> attendees;
 
   private String organizer;
 
@@ -125,7 +128,8 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
    */
   public void clearFields()
   {
-    subject = location = note = attendees = null;
+    subject = location = note;
+    attendees = null;
     organizer = null;
   }
 
@@ -280,8 +284,9 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   /**
    * @return the attendees
    */
-  @Column
-  public String getAttendees()
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @JoinColumn(name = "team_event_fk", insertable = true, updatable = true)
+  public Set<TeamEventAttendeeDO> getAttendees()
   {
     return attendees;
   }
@@ -290,7 +295,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
    * @param attendees the attendees to set
    * @return this for chaining.
    */
-  public TeamEventDO setAttendees(final String attendees)
+  public TeamEventDO setAttendees(final Set<TeamEventAttendeeDO> attendees)
   {
     this.attendees = attendees;
     return this;
