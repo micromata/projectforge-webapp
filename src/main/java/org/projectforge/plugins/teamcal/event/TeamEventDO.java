@@ -128,7 +128,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
    */
   public void clearFields()
   {
-    subject = location = note;
+    subject = location = note = null;
     attendees = null;
     organizer = null;
   }
