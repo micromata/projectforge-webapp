@@ -53,6 +53,7 @@ import org.projectforge.common.AbstractCache;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.InternalErrorException;
+import org.projectforge.debug.StackTraceHolder;
 import org.projectforge.fibu.AuftragDao;
 import org.projectforge.fibu.AuftragsPositionVO;
 import org.projectforge.fibu.ProjektDO;
@@ -783,7 +784,10 @@ public class TaskTree extends AbstractCache implements Serializable
   {
     log.info("Initializing task tree ...");
     if (taskDao == null) {
-      log.info("Can't initialize task tree, taskDao isn't set yet.");
+      log.info("Can't initialize task tree, taskDao isn't set yet (shouldn't occur):");
+      // Stack trace for debugging refresh() call without TaskDao (does only occur in productive mode):
+      final StackTraceHolder sth = new StackTraceHolder();
+      log.info(sth);
       return;
     }
     TaskNode newRoot = null;
