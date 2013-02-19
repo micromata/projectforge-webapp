@@ -24,6 +24,8 @@
 package org.projectforge.plugins.teamcal.event;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -40,14 +42,14 @@ import org.projectforge.core.ModificationStatus;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRights;
 
-import de.micromata.hibernate.history.Historizable;
+import de.micromata.hibernate.history.ExtendedHistorizable;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 @Entity
 @Table(name = "T_PLUGIN_CALENDAR_EVENT_ATTENDEE")
-public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAttendeeDO>, BaseDO<Integer>, Historizable
+public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAttendeeDO>, BaseDO<Integer>, ExtendedHistorizable
 {
   private static final long serialVersionUID = -3293247578185393730L;
 
@@ -62,6 +64,13 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
   private String comment;
 
   private Integer id;
+
+  private static final Set<String> NON_HISTORIZABLE_ATTRIBUTES;
+
+  static {
+    NON_HISTORIZABLE_ATTRIBUTES = new HashSet<String>();
+    NON_HISTORIZABLE_ATTRIBUTES.add("loginToken");
+  }
 
   @Override
   @Id
@@ -317,5 +326,26 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
       this.comment = source.comment;
     }
     return modStatus;
+  }
+
+  /**
+   * @see de.micromata.hibernate.history.ExtendedHistorizable#getHistorizableAttributes()
+   */
+  @Transient
+  @Override
+  public Set<String> getHistorizableAttributes()
+  {
+    // All attributes are historizable.
+    return null;
+  }
+
+  /**
+   * @see de.micromata.hibernate.history.ExtendedHistorizable#getNonHistorizableAttributes()
+   */
+  @Transient
+  @Override
+  public Set<String> getNonHistorizableAttributes()
+  {
+    return NON_HISTORIZABLE_ATTRIBUTES;
   }
 }
