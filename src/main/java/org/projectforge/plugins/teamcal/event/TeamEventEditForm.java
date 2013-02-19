@@ -25,8 +25,8 @@ package org.projectforge.plugins.teamcal.event;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import net.fortuna.ical4j.model.Recur;
 
@@ -124,7 +124,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
   final TeamEventRight right = new TeamEventRight();
 
-  private final List<TeamEventAttendeeDO> attendees = new LinkedList<TeamEventAttendeeDO>();
+  private Set<TeamEventAttendeeDO> attendees;
 
   private final FormComponent< ? >[] dependentFormComponents = new FormComponent[6];
 
@@ -328,7 +328,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.attendees")).supressLabelForWarning();
-      attendees.add(new TeamEventAttendeeDO().setUrl("kai@micromata.de"));
+      attendees = getData().ensureAttendees();
       fs.add(attendeesPanel = new TeamAttendeesPanel(fs.newChildId(), attendees));
     }
     // gridBuilder.newSplitPanel(GridSize.COL50);

@@ -27,7 +27,8 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -43,6 +44,8 @@ import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.annotations.Sort;
+import org.hibernate.annotations.SortType;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
@@ -54,6 +57,7 @@ import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.calendar.TimePeriod;
 import org.projectforge.common.DateHelper;
 import org.projectforge.core.DefaultBaseDO;
+import org.projectforge.core.PFPersistancyBehavior;
 import org.projectforge.database.Constants;
 import org.projectforge.plugins.teamcal.TeamCalConfig;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
@@ -115,7 +119,8 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String note;
 
-  private Set<TeamEventAttendeeDO> attendees;
+  @PFPersistancyBehavior(autoUpdateCollectionEntries = true)
+  private SortedSet<TeamEventAttendeeDO> attendees;
 
   private String organizer;
 
@@ -286,7 +291,8 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
    */
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
   @JoinColumn(name = "team_event_fk", insertable = true, updatable = true)
-  public Set<TeamEventAttendeeDO> getAttendees()
+  @Sort(type = SortType.NATURAL)
+  public SortedSet<TeamEventAttendeeDO> getAttendees()
   {
     return attendees;
   }
@@ -295,10 +301,21 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
    * @param attendees the attendees to set
    * @return this for chaining.
    */
-  public TeamEventDO setAttendees(final Set<TeamEventAttendeeDO> attendees)
+  public TeamEventDO setAttendees(final SortedSet<TeamEventAttendeeDO> attendees)
   {
     this.attendees = attendees;
     return this;
+  }
+
+  /**
+   * Creates a {@link TreeSet}.
+   * @return this for chaining.
+   */
+  public SortedSet<TeamEventAttendeeDO> ensureAttendees() {
+    if (this.attendees == null) {
+      this.attendees = new TreeSet<TeamEventAttendeeDO>();
+    }
+    return this.attendees;
   }
 
   /**

@@ -26,8 +26,11 @@ package org.projectforge.plugins.teamcal.event;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -40,6 +43,7 @@ import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.DateHelper;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.core.DisplayHistoryEntry;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.plugins.teamcal.TeamCalConfig;
 import org.projectforge.plugins.teamcal.admin.TeamCalCache;
@@ -65,6 +69,8 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamEventDao.class);
 
   private static final long ONE_DAY = 1000 * 60 * 60 * 24;
+
+  private static final Class< ? >[] ADDITIONAL_HISTORY_SEARCH_DOS = new Class[] { TeamEventAttendeeDO.class};
 
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "subject", "location", "calendar.id", "calendar.title", "note",
   "attendees"};
@@ -342,6 +348,65 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     }
     return queryFilter;
   }
+
+  /**
+   * Gets history entries of super and adds all history entries of the TeamEventAttendeeDO childs.
+   * @see org.projectforge.core.BaseDao#getDisplayHistoryEntries(org.projectforge.core.ExtendedBaseDO)
+   */
+  @Override
+  public List<DisplayHistoryEntry> getDisplayHistoryEntries(final TeamEventDO obj)
+  {
+    final List<DisplayHistoryEntry> list = super.getDisplayHistoryEntries(obj);
+    if (hasLoggedInUserHistoryAccess(obj, false) == false) {
+      return list;
+    }
+    if (CollectionUtils.isNotEmpty(obj.getAttendees()) == true) {
+      for (final TeamEventAttendeeDO attendee : obj.getAttendees()) {
+        final List<DisplayHistoryEntry> entries = internalGetDisplayHistoryEntries(attendee);
+        for (final DisplayHistoryEntry entry : entries) {
+          final String propertyName = entry.getPropertyName();
+          if (propertyName != null) {
+            entry.setPropertyName(attendee.toString() + ":" + entry.getPropertyName()); // Prepend user name or url to identify.
+          } else {
+            entry.setPropertyName(attendee.toString());
+          }
+        }
+        list.addAll(entries);
+      }
+    }
+    Collections.sort(list, new Comparator<DisplayHistoryEntry>() {
+      public int compare(final DisplayHistoryEntry o1, final DisplayHistoryEntry o2)
+      {
+        return (o2.getTimestamp().compareTo(o1.getTimestamp()));
+      }
+    });
+    return list;
+  }
+
+  @Override
+  protected Class< ? >[] getAdditionalHistorySearchDOs()
+  {
+    return ADDITIONAL_HISTORY_SEARCH_DOS;
+  }
+
+  /**
+   * Returns also true, if idSet contains the id of any attendee.
+   * @see org.projectforge.core.BaseDao#contains(java.util.Set, org.projectforge.core.ExtendedBaseDO)
+   */
+  @Override
+  protected boolean contains(final Set<Integer> idSet, final TeamEventDO entry)
+  {
+    if (super.contains(idSet, entry) == true) {
+      return true;
+    }
+    for (final TeamEventAttendeeDO pos : entry.getAttendees()) {
+      if (idSet.contains(pos.getId()) == true) {
+        return true;
+      }
+    }
+    return false;
+  }
+
 
   @Override
   public TeamEventDO newInstance()
