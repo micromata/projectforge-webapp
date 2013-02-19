@@ -289,7 +289,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   /**
    * @return the attendees
    */
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   @JoinColumn(name = "team_event_fk", insertable = true, updatable = true)
   @Sort(type = SortType.NATURAL)
   public SortedSet<TeamEventAttendeeDO> getAttendees()

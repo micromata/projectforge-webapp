@@ -237,6 +237,8 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
       } else {
         return "id=" + this.userId + " (not found)";
       }
+    } else if (StringUtils.isBlank(url) == true) {
+      return String.valueOf(id);
     }
     return StringUtils.defaultString(this.url);
   }

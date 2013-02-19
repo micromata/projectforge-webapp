@@ -23,6 +23,7 @@
 
 package org.projectforge.plugins.teamcal.integration;
 
+import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -165,7 +166,12 @@ public class TeamAttendeesPanel extends Panel
         rebuildAttendees();
         target.add(mainContainer);
       } else if (attendee.getUserId() == null && StringUtils.isBlank(attendee.getUrl()) == true) {
-        attendees.remove(attendeeModel.getObject());
+        final Iterator<TeamEventAttendeeDO> it = attendees.iterator();
+        while (it.hasNext() == true) {
+          if (it.next() == attendeeModel.getObject()) {
+            it.remove();
+          }
+        }
         rebuildAttendees();
         target.add(mainContainer);
       }
