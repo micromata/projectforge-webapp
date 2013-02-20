@@ -32,6 +32,8 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -122,6 +124,10 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   private String externalUid;
 
   transient boolean afterLoadCalled;
+
+  private Integer alarmReminderDur;
+
+  private AlarmReminderType alarmReminderType;
 
   /**
    * Clear fields for viewers with minimal access. If you add new fields don't forget to clear these fields here.
@@ -496,6 +502,44 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   public long getDuration()
   {
     return getTimePeriod().getDuration();
+  }
+
+  /**
+   * Get string of duration.
+   * 
+   * @return
+   */
+  @Column(name = "alarmReminderDur")
+  public Integer getAlarmReminderDur() {
+    return alarmReminderDur;
+  }
+
+  /**
+   * @return the alarmReminderType
+   */
+  @Column(name = "alarmReminderType")
+  @Enumerated(EnumType.STRING)
+  public AlarmReminderType getAlarmReminderType()
+  {
+    return alarmReminderType;
+  }
+
+  /**
+   * @param alarmReminderType the alarmReminderType to set
+   * @return this for chaining.
+   */
+  public void setAlarmReminderType(final AlarmReminderType alarmReminderType)
+  {
+    this.alarmReminderType = alarmReminderType;
+  }
+
+  /**
+   * @param trigger the trigger to set
+   * @return this for chaining.
+   */
+  public void setAlarmReminderDur(final Integer trigger)
+  {
+    this.alarmReminderDur = trigger;
   }
 
   /**

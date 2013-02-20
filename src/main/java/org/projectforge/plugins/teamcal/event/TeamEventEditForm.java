@@ -42,7 +42,10 @@ import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.markup.html.form.IChoiceRenderer;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.form.validation.IFormValidator;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
@@ -78,6 +81,7 @@ import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
+import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.HtmlCommentPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
@@ -128,6 +132,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
   private final FormComponent< ? >[] dependentFormComponents = new FormComponent[6];
 
+  private List<AlarmReminderType> choicesList;
+
   /**
    * @param parentPage
    * @param data
@@ -145,6 +151,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   protected void init()
   {
     super.init();
+
     final Recur recur = data.getRecurrenceObject();
     recurrenceData = new TeamEventRecurrenceData(recur, PFUserContext.getTimeZone());
     gridBuilder.newSplitPanel(GridSize.COL50);
@@ -229,7 +236,41 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       fieldSet.add(divPanel);
       if (access == false)
         fieldSet.setEnabled(false);
+      // ///////////////////////////////
+      // Reminder
+      // ///////////////////////////////
+      final FieldsetPanel reminderPanel = gridBuilder.newFieldset(getString("plugins.teamcal.event.reminder.title"));
+      final TextField<Integer> duration = new TextField<Integer>(reminderPanel.getTextFieldId(), new PropertyModel<Integer>(data, "alarmReminderDur"));
+      reminderPanel.add(duration);
+
+      final IChoiceRenderer<AlarmReminderType> reminderEntriesRenderer = new IChoiceRenderer<AlarmReminderType>(){
+
+        @Override
+        public Object getDisplayValue(final AlarmReminderType object)
+        {
+          return getString(object.getI18n());
+        }
+
+        @Override
+        public String getIdValue(final AlarmReminderType object, final int index)
+        {
+          return object.name();
+        }
+
+      };
+
+      choicesList = new ArrayList<AlarmReminderType>();
+      for (final AlarmReminderType type : AlarmReminderType.values()) {
+        choicesList.add(type);
+      }
+
+      final IModel<List<AlarmReminderType>> choicesModel = new PropertyModel<List<AlarmReminderType>>(this, "choicesList");
+      final IModel<AlarmReminderType> activeModel = new PropertyModel<AlarmReminderType>(data, "alarmReminderType");
+      final DropDownChoicePanel<AlarmReminderType> reminderTypeChoose = new DropDownChoicePanel<AlarmReminderType>(reminderPanel.newChildId(), activeModel,
+          choicesModel, reminderEntriesRenderer, false);
+      reminderPanel.add(reminderTypeChoose);
     }
+
 
     // ///////////////////////////////
     // Recurrence

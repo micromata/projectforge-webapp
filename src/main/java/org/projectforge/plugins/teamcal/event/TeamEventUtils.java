@@ -195,6 +195,12 @@ public class TeamEventUtils
     if (event.getOrganizer() != null) {
       teamEvent.setOrganizer(event.getOrganizer().getValue());
     }
+    if (event.getAlarms() != null) {
+      //      final VAlarm alarm = (VAlarm) event.getAlarms().get(0);
+      //      teamEvent.setAlarmTrigger(alarm.getTrigger().getValue());
+      //      teamEvent.setAlarmAction(alarm.getAction().getValue());
+      //      teamEvent.setAlarmAttach(alarm.getAttachment().getValue());
+    }
     final RRule rule = (RRule) event.getProperty(Property.RRULE);
     if (rule != null) {
       teamEvent.setRecurrenceRule(rule.getValue());
