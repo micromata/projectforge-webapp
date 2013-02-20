@@ -1,7 +1,6 @@
 <wicket:panel xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
-  <ul class="attendees" wicket:id="main">
-    <li wicket:id="li"><span wicket:id="editableLabel">[label]</span>
-      <wicket:container wicket:id="status">[unknown]</wicket:container>
-      <wicket:container wicket:id="action">[x]</wicket:container></li>
-  </ul>
+  <ol class="attendees" wicket:id="main">
+    <li wicket:id="liRepeater"><span wicket:id="editableLabel">[label]</span> <wicket:container wicket:id="status">[unknown]</wicket:container></li>
+    <li wicket:id="liAddNewAttendee"><span wicket:id="editableLabel">[label]</span></li>
+  </ol>
 </wicket:panel>
