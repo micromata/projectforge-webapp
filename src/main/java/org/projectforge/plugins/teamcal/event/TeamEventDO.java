@@ -522,7 +522,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   }
 
   /**
-   * Get string of duration.
+   * Get duration.
    * 
    * @return
    */
@@ -532,6 +532,9 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   }
 
   /**
+   * Get type of duration
+   * minute, hour, day
+   * 
    * @return the alarmReminderType
    */
   @Column(name = "alarmReminderType")
