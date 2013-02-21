@@ -205,12 +205,12 @@ public class TeamEventUtils
     final List<VAlarm> alarms = event.getAlarms();
     if (alarms != null && alarms.size() >= 1) {
       final Dur dur = alarms.get(0).getTrigger().getDuration();
+      // consider weeks
+      int weeksToDays = 0;
+      if (dur.getWeeks() != 0) {
+        weeksToDays = dur.getWeeks() * DURATION_OF_WEEK;
+      }
       if (dur.getDays() != 0) {
-        // consider weeks
-        int weeksToDays = 0;
-        if (dur.getWeeks() != 0) {
-          weeksToDays = dur.getWeeks() * DURATION_OF_WEEK;
-        }
         teamEvent.setAlarmReminderDur(dur.getDays() + weeksToDays);
         teamEvent.setAlarmReminderType(AlarmReminderType.DAYS);
       } else if (dur.getHours() != 0) {

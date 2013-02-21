@@ -111,10 +111,10 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     final Integer id = TeamCalConfig.get().extractEventId(uid);
     if (id != null) {
       // The uid refers an own event, therefore search for the extracted id.
-      list = getHibernateTemplate().find("from TeamEventDO e where e.id = ?", id);
+      list = getHibernateTemplate().find("from TeamEventDO e where e.id = ? and e.deleted = false", id);
     } else {
       // It's an external event:
-      list = getHibernateTemplate().find("from TeamEventDO e where e.externalUid = ?", uid);
+      list = getHibernateTemplate().find("from TeamEventDO e where e.externalUid = ? and e.deleted = false", uid);
     }
     if (list != null && list.isEmpty() == false && list.get(0) != null) {
       return list.get(0);
