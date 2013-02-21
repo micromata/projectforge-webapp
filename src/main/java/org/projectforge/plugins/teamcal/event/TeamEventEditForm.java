@@ -236,6 +236,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       fieldSet.add(divPanel);
       if (access == false)
         fieldSet.setEnabled(false);
+
       // ///////////////////////////////
       // Reminder
       // ///////////////////////////////
@@ -248,7 +249,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
         @Override
         public Object getDisplayValue(final AlarmReminderType object)
         {
-          return getString(object.getI18n());
+          return getString(object.getI18nKey());
         }
 
         @Override
