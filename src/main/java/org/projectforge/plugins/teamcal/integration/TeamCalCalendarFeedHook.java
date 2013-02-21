@@ -116,7 +116,7 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
           if (StringUtils.isNotBlank(teamEvent.getNote()) == true) {
             vEvent.getProperties().add(new Description(teamEvent.getNote()));
           }
-          if (teamEvent.getAlarmReminderDur() != 0) {
+          if (teamEvent.getAlarmReminderDur() != null) {
             final VAlarm alarm = new VAlarm();
             Dur dur = null;
             // (-1) * needed to set alert before
