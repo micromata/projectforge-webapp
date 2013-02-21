@@ -164,7 +164,7 @@ public class TeamCalCalendarForm extends CalendarForm
         protected void onIcsImport(final AjaxRequestTarget target, final Calendar calendar)
         {
           @SuppressWarnings("unchecked")
-          final List<Component> list = calendar.getComponents("VEVENT");
+          final List<Component> list = calendar.getComponents(Component.VEVENT);
           if (list == null || list.size() == 0) {
             errorDialog.setMessage(getString("plugins.teamcal.import.ics.noEventsGiven")).open(target);
             return;

@@ -59,6 +59,9 @@ public class TeamEventUtils
   private static final RecurrenceFrequency[] SUPPORTED_INTERVALS = new RecurrenceFrequency[] { RecurrenceFrequency.NONE,
     RecurrenceFrequency.DAILY, RecurrenceFrequency.WEEKLY, RecurrenceFrequency.MONTHLY, RecurrenceFrequency.YEARLY};
 
+  // needed to convert weeks into days
+  private static final int DURATION_OF_WEEK = 7;
+
   public static VEvent createVEvent(final TeamEventDO eventDO, final TimeZone timezone)
   {
     final VEvent vEvent = ICal4JUtils.createVEvent(eventDO.getStartDate(), eventDO.getEndDate(), eventDO.getUid(), eventDO.getSubject(),
@@ -203,9 +206,10 @@ public class TeamEventUtils
     if (alarms != null && alarms.size() >= 1) {
       final Dur dur = alarms.get(0).getTrigger().getDuration();
       if (dur.getDays() != 0) {
+        // consider weeks
         int weeksToDays = 0;
         if (dur.getWeeks() != 0) {
-          weeksToDays = dur.getWeeks() * 7;
+          weeksToDays = dur.getWeeks() * DURATION_OF_WEEK;
         }
         teamEvent.setAlarmReminderDur(dur.getDays() + weeksToDays);
         teamEvent.setAlarmReminderType(AlarmReminderType.DAYS);

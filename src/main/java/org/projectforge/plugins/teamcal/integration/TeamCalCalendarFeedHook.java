@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.fortuna.ical4j.model.Dur;
+import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VAlarm;
@@ -61,9 +62,6 @@ import org.projectforge.web.calendar.CalendarFeedHook;
  */
 public class TeamCalCalendarFeedHook implements CalendarFeedHook
 {
-  // Type of reminder action. May be variable in future.
-  private static final String ACTION_TYPE = "AUDIO";
-
   public static final String getUrl(final String teamCalIds)
   {
     return CalendarFeed.getUrl("&teamCals=" + teamCalIds);
@@ -132,7 +130,7 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
             }
             if (dur != null) {
               alarm.getProperties().add(new Trigger(dur));
-              alarm.getProperties().add(new Action(ACTION_TYPE));
+              alarm.getProperties().add(new Action(Property.ACTION));
               vEvent.getAlarms().add(alarm);
             }
           }
