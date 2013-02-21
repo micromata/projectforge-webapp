@@ -61,6 +61,7 @@ import org.projectforge.web.calendar.CalendarFeedHook;
  */
 public class TeamCalCalendarFeedHook implements CalendarFeedHook
 {
+  // Type of reminder action. May be variable in future.
   private static final String ACTION_TYPE = "AUDIO";
 
   public static final String getUrl(final String teamCalIds)
@@ -116,6 +117,8 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
           if (StringUtils.isNotBlank(teamEvent.getNote()) == true) {
             vEvent.getProperties().add(new Description(teamEvent.getNote()));
           }
+
+          // add alarm if necessary
           if (teamEvent.getAlarmReminderDur() != null) {
             final VAlarm alarm = new VAlarm();
             Dur dur = null;
@@ -127,10 +130,15 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
             } else if (AlarmReminderType.DAYS.equals(teamEvent.getAlarmReminderType())) {
               dur = new Dur((-1) * teamEvent.getAlarmReminderDur(), 0, 0, 0);
             }
-            alarm.getProperties().add(new Trigger(dur));
-            alarm.getProperties().add(new Action(ACTION_TYPE));
-            vEvent.getAlarms().add(alarm);
+            if (dur != null) {
+              alarm.getProperties().add(new Trigger(dur));
+              alarm.getProperties().add(new Action(ACTION_TYPE));
+              vEvent.getAlarms().add(alarm);
+            }
           }
+
+          // TODO add attendees
+
           if (teamEvent.hasRecurrence() == true) {
             final Recur recur = teamEvent.getRecurrenceObject();
             if (recur.getUntil() != null) {

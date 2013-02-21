@@ -132,7 +132,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
   private final FormComponent< ? >[] dependentFormComponents = new FormComponent[6];
 
-  private List<AlarmReminderType> choicesList;
+  private List<AlarmReminderType> reminderTypeChoiceList;
 
   /**
    * @param parentPage
@@ -260,12 +260,12 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
       };
 
-      choicesList = new ArrayList<AlarmReminderType>();
+      reminderTypeChoiceList = new ArrayList<AlarmReminderType>();
       for (final AlarmReminderType type : AlarmReminderType.values()) {
-        choicesList.add(type);
+        reminderTypeChoiceList.add(type);
       }
 
-      final IModel<List<AlarmReminderType>> choicesModel = new PropertyModel<List<AlarmReminderType>>(this, "choicesList");
+      final IModel<List<AlarmReminderType>> choicesModel = new PropertyModel<List<AlarmReminderType>>(this, "reminderTypeChoiceList");
       final IModel<AlarmReminderType> activeModel = new PropertyModel<AlarmReminderType>(data, "alarmReminderType");
       final DropDownChoicePanel<AlarmReminderType> reminderTypeChoose = new DropDownChoicePanel<AlarmReminderType>(reminderPanel.newChildId(), activeModel,
           choicesModel, reminderEntriesRenderer, false);
