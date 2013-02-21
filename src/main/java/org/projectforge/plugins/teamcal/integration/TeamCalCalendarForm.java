@@ -165,7 +165,6 @@ public class TeamCalCalendarForm extends CalendarForm
         {
           @SuppressWarnings("unchecked")
           final List<Component> list = calendar.getComponents("VEVENT");
-          // if (calendar.getComponent(name))
           if (list == null || list.size() == 0) {
             errorDialog.setMessage(getString("plugins.teamcal.import.ics.noEventsGiven")).open(target);
             return;
@@ -174,7 +173,7 @@ public class TeamCalCalendarForm extends CalendarForm
           // Temporary not used, because multiple events are not supported.
           final List<VEvent> events = new ArrayList<VEvent>();
           for (final Component c : list) {
-            final VEvent event = new VEvent(c.getProperties());
+            final VEvent event = (VEvent) c;
 
             if (StringUtils.equals(event.getSummary().getValue(), CalendarFeed.SETUP_EVENT) == true) {
               // skip setup event!

@@ -29,12 +29,15 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import net.fortuna.ical4j.model.DateList;
+import net.fortuna.ical4j.model.Dur;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.TimeZone;
+import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.DtStart;
@@ -195,11 +198,24 @@ public class TeamEventUtils
     if (event.getOrganizer() != null) {
       teamEvent.setOrganizer(event.getOrganizer().getValue());
     }
-    if (event.getAlarms() != null) {
-      //      final VAlarm alarm = (VAlarm) event.getAlarms().get(0);
-      //      teamEvent.setAlarmTrigger(alarm.getTrigger().getValue());
-      //      teamEvent.setAlarmAction(alarm.getAction().getValue());
-      //      teamEvent.setAlarmAttach(alarm.getAttachment().getValue());
+    @SuppressWarnings("unchecked")
+    final List<VAlarm> alarms = event.getAlarms();
+    if (alarms != null && alarms.size() >= 1) {
+      final Dur dur = alarms.get(0).getTrigger().getDuration();
+      if (dur.getDays() != 0) {
+        int weeksToDays = 0;
+        if (dur.getWeeks() != 0) {
+          weeksToDays = dur.getWeeks() * 7;
+        }
+        teamEvent.setAlarmReminderDur(dur.getDays() + weeksToDays);
+        teamEvent.setAlarmReminderType(AlarmReminderType.DAYS);
+      } else if (dur.getHours() != 0) {
+        teamEvent.setAlarmReminderDur(dur.getHours());
+        teamEvent.setAlarmReminderType(AlarmReminderType.HOURS);
+      } else if (dur.getMinutes() != 0) {
+        teamEvent.setAlarmReminderDur(dur.getMinutes());
+        teamEvent.setAlarmReminderType(AlarmReminderType.MINUTES);
+      }
     }
     final RRule rule = (RRule) event.getProperty(Property.RRULE);
     if (rule != null) {
