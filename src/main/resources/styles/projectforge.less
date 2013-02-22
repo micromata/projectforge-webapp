@@ -12,12 +12,10 @@
 @import "projectforge-colors-css";
 @import "projectforge-menuconfig-css";
 
-tr.withContextMenu{
-	cursor:pointer;
-}
+
 table.dataview tbody tr.even td,
 table.dataview thead tr.even th,
-table tbody tr.even td, 
+table tbody tr.even td,
 table tbody tr.even th {
 	border-top: none;
 	border-bottom: none;
@@ -28,11 +26,14 @@ table.dataview tbody tr.even:hover th{
 	background:#d9dfe1;
 }
 
-table tbody tr.odd td, 
+table tbody tr.odd td,
 table tbody tr.odd th {
 	border-top: none;
 	border-bottom: none;
 	background: #FFFFFF;
+}
+tr.withContextMenu{
+  cursor:pointer;
 }
 div.controls input, div.controls textarea {
 	padding-left: 4px;

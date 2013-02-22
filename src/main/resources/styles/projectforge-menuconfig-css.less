@@ -34,12 +34,11 @@
   .pf_menueconfig.pf_configuration_active li.pf_trash > a{
     cursor:default;
   }
-  .pf_configuration_active a.pf_safenewentry,
-  .pf_configuration_active a.pf_removenewentry{
+  .pf_configuration_active a.pf_safenewentry{
     cursor:pointer;
   }
   .pf_configuration_active a{
-    cursor:move;
+    cursor:pointer;
   }
   #pf_sortablecontainer > ul > li input[type="text"]{
     float:left;
@@ -55,8 +54,7 @@
   .pf_warning input[type="text"]{
     border-color:red;
   }
-  #pf_sortablecontainer > ul > li .pf_safenewentry,
-  #pf_sortablecontainer > ul > li .pf_removenewentry{
+  #pf_sortablecontainer > ul > li .pf_safenewentry{
     overflow:hidden;
     float:left;
   }
@@ -64,15 +62,20 @@
     padding-bottom:9px;
   }
   .pf_sortable-placeholder{
-    border:1px dotted red;
+    border:1px dotted #777;
+    background:#f8f8f8;
     margin-top:10px;
     height:20px;
     display:block;
-    min-width:50px;
+    min-width:20px;
   }
-
-  .pf_redborder{
-    border:1px dotted red;
+  .pf_sortable{
+    background:#fff;
+    border:1px solid #ccc;
+    border-bottom:0;
+    -moz-border-radius: 6px 6px 0 0; /* Firefox */
+    -webkit-border-radius: 6px 6px 0 0; /* Safari, Chrome */
+    border-radius:  6px 6px 0 0; /* CSS3 */
   }
   .pf_draghelper {
     position:absolute;
@@ -86,6 +89,9 @@
     font-size: 12px;
     color:#777;
     line-height:20px;
+  }
+  li.ui-sortable-helper{
+    display:none!important;
   }
   ul.nav.pf_menueconfig li.open:hover ul.dropdown-menu,
   ul.nav.pf_menueconfig li:hover ul.dropdown-menu{
@@ -110,7 +116,7 @@
     padding-bottom:10px;
   }
   .pf_menueconfig .dropdown-menu ul li a{
-    cursor:move;
+    cursor:pointer;
   }
   .pf_menueconfig .dropdown-menu{
     width:770px;
