@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.projectforge.common.AbstractCache;
 import org.projectforge.common.StringHelper;
@@ -117,11 +118,24 @@ public class UserGroupCache extends AbstractCache
 
   public PFUserDO getUser(final String username)
   {
-    if (username == null) {
+    if (StringUtils.isEmpty(username) == true) {
       return null;
     }
     for (final PFUserDO user : getUserMap().values()) {
       if (username.equals(user.getUsername()) == true) {
+        return user;
+      }
+    }
+    return null;
+  }
+
+  public PFUserDO getUserByFullname(final String fullname)
+  {
+    if (StringUtils.isEmpty(fullname) == true) {
+      return null;
+    }
+    for (final PFUserDO user : getUserMap().values()) {
+      if (fullname.equals(user.getFullname()) == true) {
         return user;
       }
     }

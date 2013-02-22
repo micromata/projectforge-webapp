@@ -135,7 +135,7 @@ public class MonthlyEmployeeReport implements Serializable
 
   private EmployeeDO employee;
 
-  private long totalDuration = 0, netDuration = 0;
+  private long totalGrossDuration = 0, totalNetDuration = 0;
 
   private Integer kost1Id;
 
@@ -261,8 +261,8 @@ public class MonthlyEmployeeReport implements Serializable
             kost2Total.addMillis(entry.getWorkFractionMillis());
           }
           // Travelling times etc. (see cost 2 type factor):
-          totalDuration += entry.getMillis();
-          netDuration += entry.getWorkFractionMillis();
+          totalGrossDuration += entry.getMillis();
+          totalNetDuration += entry.getWorkFractionMillis();
         }
       }
       if (MapUtils.isNotEmpty(week.getTaskEntries()) == true) {
@@ -277,8 +277,8 @@ public class MonthlyEmployeeReport implements Serializable
           } else {
             taskTotal.addMillis(entry.getMillis());
           }
-          totalDuration += entry.getMillis();
-          netDuration += entry.getMillis();
+          totalGrossDuration += entry.getMillis();
+          totalNetDuration += entry.getMillis();
         }
       }
     }
@@ -401,28 +401,28 @@ public class MonthlyEmployeeReport implements Serializable
   /**
    * @return Total duration in ms.
    */
-  public long getTotalDuration()
+  public long getTotalGrossDuration()
   {
-    return totalDuration;
+    return totalGrossDuration;
   }
 
   /**
    * The net duration may differ from total duration (e. g. for travelling times if a fraction is defined for used cost 2 types).
    * @return the netDuration in ms.
    */
-  public long getNetDuration()
+  public long getTotalNetDuration()
   {
-    return netDuration;
+    return totalNetDuration;
   }
 
-  public String getFormattedTotalDuration()
+  public String getFormattedTotalGrossDuration()
   {
-    return MonthlyEmployeeReport.getFormattedDuration(totalDuration);
+    return MonthlyEmployeeReport.getFormattedDuration(totalGrossDuration);
   }
 
-  public String getFormattedNetDuration()
+  public String getFormattedTotalNetDuration()
   {
-    return MonthlyEmployeeReport.getFormattedDuration(netDuration);
+    return MonthlyEmployeeReport.getFormattedDuration(totalNetDuration);
   }
 
   public Integer getKost1Id()

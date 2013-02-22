@@ -32,6 +32,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHelper;
 import org.projectforge.core.ModificationStatus;
+import org.projectforge.plugins.teamcal.integration.TeamCalCalendarPage;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredBasePage;
@@ -96,8 +97,8 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
           + newEndDate
           + ", event=["
           + event
-          + "], event=["
-          + event
+          + "], recurrencyChangeType=["
+          + recurrencyChangeType
           + "]");
     }
     this.eventOfCaller = event;
@@ -122,9 +123,13 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
     } else {
       if (newStartDate != null) {
         teamEventDO.setStartDate(newStartDate);
+      } else {
+        teamEventDO.setStartDate(new Timestamp(event.getStartDate().getTime()));
       }
       if (newEndDate != null) {
         teamEventDO.setEndDate(newEndDate);
+      } else {
+        teamEventDO.setEndDate(new Timestamp(event.getEndDate().getTime()));
       }
     }
     if (recurrencyChangeType == RecurrencyChangeType.ONLY_CURRENT) {
@@ -145,6 +150,9 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   @Override
   public void setResponsePage()
   {
+    if (returnToPage == null) {
+      returnToPage = new TeamCalCalendarPage(new PageParameters());
+    }
     super.setResponsePage();
     if (returnToPage instanceof CalendarPage) {
       // Display the date of this time sheet in the CalendarPage (useful if the time sheet was moved).
@@ -165,6 +173,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   public AbstractSecuredBasePage onSaveOrUpdate()
   {
     super.onSaveOrUpdate();
+
     getData().setRecurrence(form.recurrenceData);
     if (recurrencyChangeType == null || recurrencyChangeType == RecurrencyChangeType.ALL) {
       return null;

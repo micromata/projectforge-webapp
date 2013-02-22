@@ -25,12 +25,13 @@ package org.projectforge.plugins.teamcal.event;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import net.fortuna.ical4j.model.Recur;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
@@ -41,7 +42,10 @@ import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.markup.html.form.IChoiceRenderer;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.form.validation.IFormValidator;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
@@ -75,9 +79,9 @@ import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
-import org.projectforge.web.wicket.flowlayout.DiffAcceptDiscardPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
+import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.HtmlCommentPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
@@ -124,9 +128,11 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
   final TeamEventRight right = new TeamEventRight();
 
-  private final List<TeamEventAttendeeDO> attendees = new LinkedList<TeamEventAttendeeDO>();
+  private Set<TeamEventAttendeeDO> attendees;
 
   private final FormComponent< ? >[] dependentFormComponents = new FormComponent[6];
+
+  private List<AlarmReminderType> reminderTypeChoiceList;
 
   /**
    * @param parentPage
@@ -145,12 +151,13 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   protected void init()
   {
     super.init();
+
     final Recur recur = data.getRecurrenceObject();
     recurrenceData = new TeamEventRecurrenceData(recur, PFUserContext.getTimeZone());
     gridBuilder.newSplitPanel(GridSize.COL50);
     final TeamCalDO teamCal = data.getCalendar();
     // setting access view
-    if (isNew() == true || teamCal.getOwner() == null) {
+    if (isNew() == true || teamCal == null || teamCal.getOwner() == null) {
       access = true;
     } else {
       if (right.hasUpdateAccess(getUser(), data, data) == true) {
@@ -177,8 +184,6 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       fieldSet.add(subjectField);
       if (access == false) {
         fieldSet.setEnabled(false);
-      } else if (oldData != null) {
-        fieldSet.add(new DiffAcceptDiscardPanel<String>(fieldSet.newChildId(), subjectField, data, oldData, "subject"));
       }
     }
     {
@@ -231,7 +236,42 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       fieldSet.add(divPanel);
       if (access == false)
         fieldSet.setEnabled(false);
+
+      // ///////////////////////////////
+      // Reminder
+      // ///////////////////////////////
+      final FieldsetPanel reminderPanel = gridBuilder.newFieldset(getString("plugins.teamcal.event.reminder.title"));
+      final TextField<Integer> duration = new TextField<Integer>(reminderPanel.getTextFieldId(), new PropertyModel<Integer>(data, "alarmReminderDur"));
+      reminderPanel.add(duration);
+
+      final IChoiceRenderer<AlarmReminderType> reminderEntriesRenderer = new IChoiceRenderer<AlarmReminderType>(){
+
+        @Override
+        public Object getDisplayValue(final AlarmReminderType object)
+        {
+          return getString(object.getI18nKey());
+        }
+
+        @Override
+        public String getIdValue(final AlarmReminderType object, final int index)
+        {
+          return object.name();
+        }
+
+      };
+
+      reminderTypeChoiceList = new ArrayList<AlarmReminderType>();
+      for (final AlarmReminderType type : AlarmReminderType.values()) {
+        reminderTypeChoiceList.add(type);
+      }
+
+      final IModel<List<AlarmReminderType>> choicesModel = new PropertyModel<List<AlarmReminderType>>(this, "reminderTypeChoiceList");
+      final IModel<AlarmReminderType> activeModel = new PropertyModel<AlarmReminderType>(data, "alarmReminderType");
+      final DropDownChoicePanel<AlarmReminderType> reminderTypeChoose = new DropDownChoicePanel<AlarmReminderType>(reminderPanel.newChildId(), activeModel,
+          choicesModel, reminderEntriesRenderer, false);
+      reminderPanel.add(reminderTypeChoose);
     }
+
 
     // ///////////////////////////////
     // Recurrence
@@ -330,7 +370,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.attendees")).supressLabelForWarning();
-      attendees.add(new TeamEventAttendeeDO().setUrl("kai@micromata.de"));
+      attendees = getData().ensureAttendees();
       fs.add(attendeesPanel = new TeamAttendeesPanel(fs.newChildId(), attendees));
     }
     // gridBuilder.newSplitPanel(GridSize.COL50);
@@ -459,8 +499,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       teamCalDrop.setNullValid(false);
       teamCalDrop.setRequired(true);
       fieldSet.add(teamCalDrop);
-      if (isNew() == false) {
-        // Show switch button only for new events.
+      if (isNew() == false  || StringUtils.isNotBlank(data.getSubject()) == true) {
+        // Show switch button only for new events or events with prefilled input.
         return;
       }
       {

@@ -40,7 +40,6 @@ import org.projectforge.orga.ContractDao;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
@@ -118,11 +117,5 @@ public class ContractListPage extends AbstractListPage<ContractListForm, Contrac
   protected ContractDao getBaseDao()
   {
     return contractDao;
-  }
-
-  @Override
-  protected IModel<ContractDO> getModel(final ContractDO object)
-  {
-    return new DetachableDOModel<ContractDO, ContractDao>(object, getBaseDao());
   }
 }

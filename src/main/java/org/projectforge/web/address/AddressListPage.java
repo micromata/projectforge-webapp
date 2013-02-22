@@ -66,7 +66,6 @@ import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
@@ -414,12 +413,6 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
   protected AddressDao getBaseDao()
   {
     return addressDao;
-  }
-
-  @Override
-  protected IModel<AddressDO> getModel(final AddressDO object)
-  {
-    return new DetachableDOModel<AddressDO, AddressDao>(object, getBaseDao());
   }
 
   protected AddressDao getAddressDao()

@@ -38,7 +38,6 @@ import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
@@ -106,12 +105,6 @@ public class BankAccountListPage extends AbstractListPage<BankAccountListForm, B
   protected BankAccountDao getBaseDao()
   {
     return bankAccountDao;
-  }
-
-  @Override
-  protected IModel<BankAccountDO> getModel(final BankAccountDO object)
-  {
-    return new DetachableDOModel<BankAccountDO, BankAccountDao>(object, getBaseDao());
   }
 
   protected BankAccountDao getBankAccountDao()

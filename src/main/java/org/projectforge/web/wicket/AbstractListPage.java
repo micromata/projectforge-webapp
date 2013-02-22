@@ -41,7 +41,6 @@ import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.EmptyPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.Item;
-import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.common.RecentQueue;
@@ -50,13 +49,14 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.core.IdObject;
 import org.projectforge.core.UserException;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 
-public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D extends org.projectforge.core.IDao< ? >, O> extends
-AbstractSecuredPage implements ISelectCallerPage
+public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D extends org.projectforge.core.IDao< ? >, O extends IdObject< ? >>
+extends AbstractSecuredPage implements ISelectCallerPage
 {
   private static final long serialVersionUID = 622509418161777195L;
 
@@ -71,6 +71,10 @@ AbstractSecuredPage implements ISelectCallerPage
   public static final String PARAMETER_HIGHLIGHTED_ROW = "row";
 
   private boolean calledBySearchPage;
+
+  private List<O> resultList;
+
+  private boolean refreshResultList = true;
 
   protected static final String[] BOOKMARKABLE_INITIAL_PROPERTIES = new String[] { "f.searchString|s", "f.useModificationFilter|mod",
     "f.modifiedByUserId|mUser", "f.startTimeOfLastModification|mStart", "f.stopTimeOfLastModification|mStop", "f.deleted|del", "pageSize"};
@@ -92,9 +96,7 @@ AbstractSecuredPage implements ISelectCallerPage
 
   protected DataTable<O, String> dataTable;
 
-  protected List<O> list;
-
-  protected Serializable highlightedRowId;
+  private Serializable highlightedRowId;
 
   protected ISelectCallerPage caller;
 
@@ -113,6 +115,8 @@ AbstractSecuredPage implements ISelectCallerPage
   protected boolean storeFilter = true;
 
   private boolean massUpdateMode = false;
+
+  protected MyListPageSortableDataProvider<O> listPageSortableDataProvider;
 
   /**
    * Change this value if the recent search terms should be stored. Should be set in setup-method of derived page class.
@@ -164,7 +168,7 @@ AbstractSecuredPage implements ISelectCallerPage
       }
     }
     if (parameters.get(PARAMETER_HIGHLIGHTED_ROW) != null) {
-      this.highlightedRowId = WicketUtils.getAsInteger(parameters, PARAMETER_HIGHLIGHTED_ROW);
+      setHighlightedRowId(WicketUtils.getAsInteger(parameters, PARAMETER_HIGHLIGHTED_ROW));
     }
     this.i18nPrefix = i18nPrefix;
     this.caller = caller;
@@ -405,7 +409,7 @@ AbstractSecuredPage implements ISelectCallerPage
     log.debug("onSearchSubmit");
     refresh();
     if (isSelectMode() == true) {
-      getList();
+      final List<O> list = getList();
       if (list != null && list.size() == 1) {
         // Quick select:
         final O obj = list.get(0);
@@ -473,32 +477,66 @@ AbstractSecuredPage implements ISelectCallerPage
    */
   public void refresh()
   {
-    list = null; // Force reload of list
-    dataTable.setItemsPerPage(form.getPageSize());
+    this.resultList = null; // Force reload of list
+    this.refreshResultList = true;
+    final long itemsPerPage = dataTable.getItemsPerPage();
+    if (form.getPageSize() != null && form.getPageSize().longValue() != itemsPerPage) {
+      dataTable.setItemsPerPage(form.getPageSize());
+    }
     addRecentSearchTerm();
   }
 
-  @SuppressWarnings("unchecked")
-  public List<O> getList()
+  public final List<O> getList()
   {
-    if (list == null) {
-      try {
-        list = (List<O>) getBaseDao().getList(form.getSearchFilter());
-        if (list == null) {
-          // An error occured:
-          form.addError("search.error");
-        }
-      } catch (final Exception ex) {
-        if (ex instanceof UserException) {
-          final UserException userException = (UserException) ex;
-          error(getLocalizedMessage(userException.getI18nKey(), userException.getParams()));
-        } else {
-          log.error(ex.getMessage(), ex);
-        }
-        list = new ArrayList<O>();
+    if (this.refreshResultList == false && this.resultList != null) {
+      return this.resultList;
+    }
+    this.refreshResultList = false;
+    try {
+      this.resultList = buildList();
+      listPageSortableDataProvider.setCompleteList(this.resultList);
+      if (this.resultList == null) {
+        // An error occured:
+        form.addError("search.error");
+      }
+      return this.resultList;
+    } catch (final Exception ex) {
+      if (ex instanceof UserException) {
+        final UserException userException = (UserException) ex;
+        error(getLocalizedMessage(userException.getI18nKey(), userException.getParams()));
+      } else {
+        log.error(ex.getMessage(), ex);
       }
     }
-    return list;
+    return this.resultList = new ArrayList<O>();
+  }
+
+  @SuppressWarnings("unchecked")
+  protected List<O> buildList()
+  {
+    return (List<O>) getBaseDao().getList(form.getSearchFilter());
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractUnsecureBasePage#onBeforeRender()
+   */
+  @Override
+  protected void onBeforeRender()
+  {
+    if (this.refreshResultList == true) {
+      getList();
+    }
+    super.onBeforeRender();
+  }
+
+  /**
+   * @see org.apache.wicket.markup.html.WebPage#onAfterRender()
+   */
+  @Override
+  protected void onAfterRender()
+  {
+    super.onAfterRender();
+    this.resultList = null; // Don't waste memory.
   }
 
   protected abstract F newListForm(AbstractListPage< ? , ? , ? > parentPage);
@@ -601,7 +639,10 @@ AbstractSecuredPage implements ISelectCallerPage
    */
   protected ISortableDataProvider<O, String> createSortableDataProvider(final String sortProperty, final SortOrder sortOrder)
   {
-    return new ListPageSortableDataProvider(sortProperty, sortOrder);
+    if (listPageSortableDataProvider == null) {
+      listPageSortableDataProvider = new MyListPageSortableDataProvider<O>(sortProperty, sortOrder, this);
+    }
+    return listPageSortableDataProvider;
   }
 
   /**
@@ -638,8 +679,6 @@ AbstractSecuredPage implements ISelectCallerPage
       return getString(i18nPrefix + ".title.list");
     }
   }
-
-  protected abstract IModel<O> getModel(O object);
 
   /**
    * If false then the action filter will not be stored (the previous stored filter will be preserved). true is default.
@@ -753,27 +792,5 @@ AbstractSecuredPage implements ISelectCallerPage
   public boolean isCalledBySearchPage()
   {
     return calledBySearchPage;
-  }
-
-  public class ListPageSortableDataProvider extends MySortableDataProvider<O>
-  {
-    private static final long serialVersionUID = 6940805267003006161L;
-
-    public ListPageSortableDataProvider(final String property, final SortOrder sortOrder)
-    {
-      super(property, sortOrder);
-    }
-
-    @Override
-    public List<O> getList()
-    {
-      return AbstractListPage.this.getList();
-    }
-
-    @Override
-    protected IModel<O> getModel(final O object)
-    {
-      return AbstractListPage.this.getModel(object);
-    }
   }
 }

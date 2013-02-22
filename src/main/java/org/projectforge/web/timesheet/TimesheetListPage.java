@@ -83,6 +83,7 @@ import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.MyListPageSortableDataProvider;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
@@ -232,10 +233,10 @@ IListPageColumnsCreator<TimesheetDO>
         };
 
       };
-      //      final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(buttonGroupPanel.newChildId(), IconType.DOWNLOAD,
-      //          getString("timesheet.iCalSubscription"), iCalExportLink);
-      exportMenu.addSubMenuEntry(new ContentMenuEntryPanel(exportMenu.newSubMenuChildId(), icsExportDialogButton, getString("timesheet.icsExport"))
-      .setTooltip(getString("timesheet.iCalSubscription")));
+      // final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(buttonGroupPanel.newChildId(), IconType.DOWNLOAD,
+      // getString("timesheet.iCalSubscription"), iCalExportLink);
+      exportMenu.addSubMenuEntry(new ContentMenuEntryPanel(exportMenu.newSubMenuChildId(), icsExportDialogButton,
+          getString("timesheet.icsExport")).setTooltip(getString("timesheet.iCalSubscription")));
     }
 
   }
@@ -429,19 +430,6 @@ IListPageColumnsCreator<TimesheetDO>
     return timesheetDao;
   }
 
-  @SuppressWarnings("serial")
-  @Override
-  protected IModel<TimesheetDO> getModel(final TimesheetDO object)
-  {
-    return new Model<TimesheetDO>() {
-      @Override
-      public TimesheetDO getObject()
-      {
-        return object;
-      }
-    };
-  }
-
   /**
    * @see org.projectforge.web.wicket.AbstractListPage#select(java.lang.String, java.lang.Object)
    */
@@ -492,14 +480,17 @@ IListPageColumnsCreator<TimesheetDO>
     }
   }
 
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#buildList()
+   */
   @Override
-  public List<TimesheetDO> getList()
+  protected List<TimesheetDO> buildList()
   {
     final TimesheetFilter filter = form.getSearchFilter();
     if (filter.getStartTime() == null && filter.getStopTime() == null && filter.getTaskId() == null) {
       return null;
     }
-    return super.getList();
+    return super.buildList();
   }
 
   void exportPDF()
@@ -568,7 +559,7 @@ IListPageColumnsCreator<TimesheetDO>
   @Override
   protected ISortableDataProvider<TimesheetDO, String> createSortableDataProvider(final String sortProperty, final SortOrder sortOrder)
   {
-    return new ListPageSortableDataProvider(sortProperty, sortOrder) {
+    this.listPageSortableDataProvider = new MyListPageSortableDataProvider<TimesheetDO>(sortProperty, sortOrder, this) {
       @Override
       protected Comparator<TimesheetDO> getComparator(final String sortProperty, final boolean ascending)
       {
@@ -600,6 +591,7 @@ IListPageColumnsCreator<TimesheetDO>
         };
       }
     };
+    return this.listPageSortableDataProvider;
   }
 
   /**

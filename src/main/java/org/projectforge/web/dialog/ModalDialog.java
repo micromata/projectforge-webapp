@@ -37,6 +37,7 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.projectforge.web.core.NavTopPanel;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
@@ -60,7 +61,7 @@ public abstract class ModalDialog extends Panel
 
   protected GridBuilder gridBuilder;
 
-  private final WebMarkupContainer mainContainer, mainSubContainer, gridContentContainer, buttonBarContainer;
+  protected final WebMarkupContainer mainContainer, mainSubContainer, gridContentContainer, buttonBarContainer;
 
   private boolean escapeKeyEnabled = true;
 
@@ -81,6 +82,11 @@ public abstract class ModalDialog extends Panel
   protected Form< ? > form;
 
   protected FeedbackPanel formFeedback;
+
+  /**
+   * If true, a GridBuilder is automatically available.
+   */
+  protected boolean autoGenerateGridBuilder = true;
 
   /**
    * List to create action buttons in the desired order before creating the RepeatingView.
@@ -306,8 +312,7 @@ public abstract class ModalDialog extends Panel
    */
   public ModalDialog setTitle(final String title)
   {
-    mainSubContainer.add(new Label("title", title));
-    return this;
+    return setTitle(Model.of(title));
   }
 
   /**
@@ -328,7 +333,9 @@ public abstract class ModalDialog extends Panel
   public ModalDialog clearContent()
   {
     gridContentContainer.removeAll();
-    gridBuilder = new GridBuilder(gridContentContainer, "flowform");
+    if (autoGenerateGridBuilder == true) {
+      gridBuilder = new GridBuilder(gridContentContainer, "flowform");
+    }
     initFeedback(gridContentContainer);
     return this;
   }
@@ -356,7 +363,7 @@ public abstract class ModalDialog extends Panel
       @Override
       public void callback(final AjaxRequestTarget target)
       {
-        if(onCloseButtonSubmit(target)) {
+        if (onCloseButtonSubmit(target)) {
           close(target);
         }
       }
@@ -369,12 +376,15 @@ public abstract class ModalDialog extends Panel
     }, closeButtonLabel != null ? closeButtonLabel : getString("close"), SingleButtonPanel.GREY);
     buttonBarContainer.add(actionButtons.getRepeatingView());
     form.setDefaultButton(closeButtonPanel.getButton());
-    gridBuilder = new GridBuilder(gridContentContainer, "flowform");
+    if (autoGenerateGridBuilder == true) {
+      gridBuilder = new GridBuilder(gridContentContainer, "flowform");
+    }
     initFeedback(gridContentContainer);
   }
 
-  private void initFeedback(WebMarkupContainer container) {
-    if(formFeedback == null) {
+  private void initFeedback(final WebMarkupContainer container)
+  {
+    if (formFeedback == null) {
       formFeedback = new FeedbackPanel("formFeedback", new ComponentFeedbackMessageFilter(form));
       formFeedback.setOutputMarkupId(true);
       formFeedback.setOutputMarkupPlaceholderTag(true);
@@ -382,7 +392,8 @@ public abstract class ModalDialog extends Panel
     container.add(formFeedback);
   }
 
-  protected void ajaxError(String error, AjaxRequestTarget target) {
+  protected void ajaxError(final String error, final AjaxRequestTarget target)
+  {
     form.error(error);
     target.add(formFeedback);
   }
@@ -406,9 +417,9 @@ public abstract class ModalDialog extends Panel
 
   /**
    * Called if user hit the close button.
-   *
+   * 
    * @param target
-   *
+   * 
    * @return true if the dialog can be close, false if errors occured.
    */
   protected boolean onCloseButtonSubmit(final AjaxRequestTarget target)

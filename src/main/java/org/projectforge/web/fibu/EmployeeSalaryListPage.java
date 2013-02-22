@@ -45,7 +45,6 @@ import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.CurrencyPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
@@ -179,12 +178,6 @@ public class EmployeeSalaryListPage extends AbstractListPage<EmployeeSalaryListF
   protected EmployeeSalaryDao getBaseDao()
   {
     return employeeSalaryDao;
-  }
-
-  @Override
-  protected IModel<EmployeeSalaryDO> getModel(final EmployeeSalaryDO object)
-  {
-    return new DetachableDOModel<EmployeeSalaryDO, EmployeeSalaryDao>(object, getBaseDao());
   }
 
   protected EmployeeSalaryDao getEmployeeSalaryDao()

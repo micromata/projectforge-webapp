@@ -28,19 +28,25 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import net.fortuna.ical4j.model.Dur;
+import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.TimeZone;
+import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.property.Action;
 import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.Name;
 import net.fortuna.ical4j.model.property.RRule;
+import net.fortuna.ical4j.model.property.Trigger;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.projectforge.calendar.CalendarUtils;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.plugins.teamcal.TeamCalConfig;
+import org.projectforge.plugins.teamcal.event.AlarmReminderType;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDao;
 import org.projectforge.plugins.teamcal.event.TeamEventFilter;
@@ -109,6 +115,28 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
           if (StringUtils.isNotBlank(teamEvent.getNote()) == true) {
             vEvent.getProperties().add(new Description(teamEvent.getNote()));
           }
+
+          // add alarm if necessary
+          if (teamEvent.getAlarmReminderDur() != null) {
+            final VAlarm alarm = new VAlarm();
+            Dur dur = null;
+            // (-1) * needed to set alert before
+            if (AlarmReminderType.MINUTES.equals(teamEvent.getAlarmReminderType())) {
+              dur = new Dur(0, 0, (-1) * teamEvent.getAlarmReminderDur(), 0);
+            } else if (AlarmReminderType.HOURS.equals(teamEvent.getAlarmReminderType())) {
+              dur = new Dur(0, (-1) * teamEvent.getAlarmReminderDur(), 0, 0);
+            } else if (AlarmReminderType.DAYS.equals(teamEvent.getAlarmReminderType())) {
+              dur = new Dur((-1) * teamEvent.getAlarmReminderDur(), 0, 0, 0);
+            }
+            if (dur != null) {
+              alarm.getProperties().add(new Trigger(dur));
+              alarm.getProperties().add(new Action(Property.ACTION));
+              vEvent.getAlarms().add(alarm);
+            }
+          }
+
+          // TODO add attendees
+
           if (teamEvent.hasRecurrence() == true) {
             final Recur recur = teamEvent.getRecurrenceObject();
             if (recur.getUntil() != null) {

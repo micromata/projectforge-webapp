@@ -305,10 +305,10 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
       for (final MonthlyEmployeeReportWeek week : report.getWeeks()) {
         colWeekRepeater.add(new Label(colWeekRepeater.newChildId(), week.getFormattedTotalDuration()));
       }
-      row.add(new Label("sum", report.getFormattedNetDuration()).add(AttributeModifier.replace("style",
+      row.add(new Label("sum", report.getFormattedTotalNetDuration()).add(AttributeModifier.replace("style",
           "font-weight: bold; color:red; text-align: right;")));
     }
-    if (report.getTotalDuration() != report.getNetDuration()) {
+    if (report.getTotalGrossDuration() != report.getTotalNetDuration()) {
       // Net sum row.
       final WebMarkupContainer row = new WebMarkupContainer(rowRepeater.newChildId());
       rowRepeater.add(row);
@@ -332,7 +332,7 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
       final MonthlyEmployeeReportWeek week : report.getWeeks()) {
         colWeekRepeater.add(new Label(colWeekRepeater.newChildId(), ""));
       }
-      row.add(new Label("sum", report.getFormattedTotalDuration()).add(AttributeModifier.replace("style",
+      row.add(new Label("sum", report.getFormattedTotalGrossDuration()).add(AttributeModifier.replace("style",
           "font-weight: bold; text-align: right;")));
     }
   }

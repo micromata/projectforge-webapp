@@ -14,7 +14,7 @@ jQuery.autocomplete = function(input, options) {
 	var results = document.createElement("div");
 	// Create jQuery object for results
 	var $results = $(results);
-	$results.hide().addClass(options.resultsClass).css("position", "absolute");
+	$results.hide().addClass(options.resultsClass);
 	if( options.width > 0 ) $results.css("width", options.width);
 
 	// Add to body element
@@ -248,7 +248,8 @@ jQuery.autocomplete = function(input, options) {
 		input.lastSelected = v;
 		prev = v;
 		$results.html("");
-		$input.val(v).change(); // Johannes Unterstein, Kai Dorschner: Added .change();
+		$input.val(v).change(); // Johannes Unterstein, Kai Dorschner: Added
+								// .change();
 		hideResultsNow();
 		if (options.onItemSelect) setTimeout(function() { options.onItemSelect(li) }, 1);
 	};
@@ -287,8 +288,6 @@ jQuery.autocomplete = function(input, options) {
 	};
 
 	function showResults() {
-		// get the position of the input field right now (in case the DOM is
-		// shifted)
 		// either use the specified width, or autocalculate based on form
 		// element
 		var iWidth = (options.width > 0) ? options.width : $input.width();
@@ -296,11 +295,14 @@ jQuery.autocomplete = function(input, options) {
 		$results.css({
 			width: parseInt(iWidth) + "px"
 		}).show();
+		// get the position of the input field right now (in case the DOM is
+		// shifted)
+		var pos = $input.offset();
+		$results.offset({top: pos.top + $input.height() + 5, left: pos.left});
 		if(options.scroll) {
 			$results.scrollTop(0);
 			$results.css({
-				maxHeight: options.scrollHeight,
-				overflow: 'auto'
+				maxHeight: options.scrollHeight
 			});
 				
 			if($.browser.msie && typeof document.body.style.maxHeight == "undefined") {
@@ -384,7 +386,8 @@ jQuery.autocomplete = function(input, options) {
 				}
 		    } else if (options.labelValue) {
 		        // First col contains label second col the value.
-		        li.innerHTML = defaultFormat(row[0], q) + (options.deletableItem ? "<span class='pf_deleteLink' onClick='pf_deleteClick(\"#"+ $input.attr("id") +"\", \""+row[0]+"\", this); return false;'>X</span>" : "");  // Johannes Unterstein, Kai Dorschner: Added deletableItem
+		        // Johannes Unterstein, Kai Dorschner: Added deletableItem
+		        li.innerHTML = defaultFormat(row[0], q) + (options.deletableItem ? "<i class='icon-remove-sign red pf_deleteLink' onclick='pf_deleteClick(\"#"+ $input.attr("id") +"\", \""+row[0]+"\", this); return false;'></i>" : ""); 
 		        $(li).data('me', me); // Johannes & Kai
 		        if (options.selectValue) {
 		          li.selectValue = options.selectValue(row);
@@ -392,7 +395,8 @@ jQuery.autocomplete = function(input, options) {
 		          li.selectValue = row[1];
 		        }
 			} else {
-				li.innerHTML = defaultFormat(row[0], q) + (options.deletableItem ? "<span class='pf_deleteLink' onClick='pf_deleteClick(\"#"+ $input.attr("id") +"\", \""+row[0]+"\", this); return false;'>X</span>" : "");  // Johannes Unterstein, Kai Dorschner: Added deletableItem
+		        // Johannes Unterstein, Kai Dorschner: Added deletableItem
+				li.innerHTML = defaultFormat(row[0], q) + (options.deletableItem ? "<i class='icon-remove-sign red pf_deleteLink' onclick='pf_deleteClick(\"#"+ $input.attr("id") +"\", \""+row[0]+"\", this); return false;'></i>" : "");
 				$(li).data('me', me); // Johannes & Kai
 				if (options.selectValue) {
 				  li.selectValue = options.selectValue(row);
@@ -442,7 +446,7 @@ jQuery.autocomplete = function(input, options) {
 					]
 					};
           var request = Wicket.Ajax.get(attrs);
-          //var call = new Wicket.Ajax.ajax(attrs)
+          // var call = new Wicket.Ajax.ajax(attrs)
 		// if there's been no data found, remove the loading class
 		} else {
 			$input.removeClass(options.loadingClass);

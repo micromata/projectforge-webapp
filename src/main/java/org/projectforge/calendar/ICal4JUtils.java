@@ -210,6 +210,15 @@ public class ICal4JUtils
     return new java.sql.Date(ical4jDate.getTime());
   }
 
+
+  public static java.sql.Timestamp getSqlTimestamp(final net.fortuna.ical4j.model.Date ical4jDate)
+  {
+    if (ical4jDate == null) {
+      return null;
+    }
+    return new java.sql.Timestamp(ical4jDate.getTime());
+  }
+
   public static net.fortuna.ical4j.model.DateTime getICal4jDateTime(final java.util.Date javaDate, final java.util.TimeZone timeZone)
   {
     if (javaDate == null) {

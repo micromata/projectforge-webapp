@@ -23,16 +23,24 @@
 
 package org.projectforge.web.orga;
 
+import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.PropertyModel;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.orga.ContractDao;
+import org.projectforge.orga.ContractFilter;
+import org.projectforge.orga.ContractStatus;
+import org.projectforge.orga.ContractType;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.YearListCoiceRenderer;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
-public class ContractListForm extends AbstractListForm<ContractListFilter, ContractListPage>
+public class ContractListForm extends AbstractListForm<ContractFilter, ContractListPage>
 {
   private static final long serialVersionUID = -2813402079364322428L;
 
@@ -44,25 +52,42 @@ public class ContractListForm extends AbstractListForm<ContractListFilter, Contr
   }
 
   /**
-   * @see org.projectforge.web.wicket.AbstractListForm#onOptionsPanelCreate(org.projectforge.web.wicket.flowlayout.FieldsetPanel, org.projectforge.web.wicket.flowlayout.DivPanel)
+   * @see org.projectforge.web.wicket.AbstractListForm#onOptionsPanelCreate(org.projectforge.web.wicket.flowlayout.FieldsetPanel,
+   *      org.projectforge.web.wicket.flowlayout.DivPanel)
    */
-  @SuppressWarnings("serial")
   @Override
   protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
   {
     // DropDownChoice years
     final ContractDao contractDao = getParentPage().getBaseDao();
     final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(contractDao.getYears(), true);
-    final DropDownChoice<Integer> yearChoice = new DropDownChoice<Integer>(optionsFieldsetPanel.getDropDownChoiceId(), new PropertyModel<Integer>(this,
-        "year"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer) {
-      @Override
-      protected boolean wantOnSelectionChangedNotifications()
-      {
-        return true;
-      }
-    };
+    final DropDownChoice<Integer> yearChoice = new DropDownChoice<Integer>(optionsFieldsetPanel.getDropDownChoiceId(),
+        new PropertyModel<Integer>(this, "year"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer);
     yearChoice.setNullValid(false);
-    optionsFieldsetPanel.add(yearChoice);
+    optionsFieldsetPanel.add(yearChoice, true);
+    {
+      // DropDownChoice status
+      final LabelValueChoiceRenderer<ContractStatus> statusRenderer = new LabelValueChoiceRenderer<ContractStatus>();
+      for (final ContractStatus status : ContractStatus.values()) {
+        statusRenderer.addValue(status, getString(status.getI18nKey()));
+      }
+      final DropDownChoice<ContractStatus> statusChoice = new DropDownChoice<ContractStatus>(optionsFieldsetPanel.getDropDownChoiceId(),
+          new PropertyModel<ContractStatus>(getSearchFilter(), "status"), statusRenderer.getValues(), statusRenderer);
+      statusChoice.setNullValid(true);
+      optionsFieldsetPanel.add(statusChoice, true).setTooltip(getString("status"));
+    }
+    final List<ContractType> contractTypes = ConfigXml.getInstance().getContractTypes();
+    if (CollectionUtils.isNotEmpty(contractTypes) == true) {
+      // DropDownChoice type
+      final LabelValueChoiceRenderer<ContractType> typeRenderer = new LabelValueChoiceRenderer<ContractType>();
+      for (final ContractType type : contractTypes) {
+        typeRenderer.addValue(type, type.getLabel());
+      }
+      final DropDownChoice<ContractType> typeChoice = new DropDownChoice<ContractType>(optionsFieldsetPanel.getDropDownChoiceId(),
+          new PropertyModel<ContractType>(getSearchFilter(), "type"), typeRenderer.getValues(), typeRenderer);
+      typeChoice.setNullValid(true);
+      optionsFieldsetPanel.add(typeChoice, true).setTooltip(getString("legalAffaires.contract.type"));
+    }
   }
 
   public Integer getYear()
@@ -80,9 +105,9 @@ public class ContractListForm extends AbstractListForm<ContractListFilter, Contr
   }
 
   @Override
-  protected ContractListFilter newSearchFilterInstance()
+  protected ContractFilter newSearchFilterInstance()
   {
-    return new ContractListFilter();
+    return new ContractFilter();
   }
 
   @Override

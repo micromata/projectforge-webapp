@@ -59,22 +59,22 @@ public class TimesheetBookingTest extends TestBase
 
   static boolean initialized = false;
 
-  public void setAccessDao(AccessDao accessDao)
+  public void setAccessDao(final AccessDao accessDao)
   {
     this.accessDao = accessDao;
   }
 
-  public void setTaskDao(TaskDao taskDao)
+  public void setTaskDao(final TaskDao taskDao)
   {
     this.taskDao = taskDao;
   }
 
-  public void setTimesheetDao(TimesheetDao timesheetDao)
+  public void setTimesheetDao(final TimesheetDao timesheetDao)
   {
     this.timesheetDao = timesheetDao;
   }
 
-  public void setAuftragDao(AuftragDao auftragDao)
+  public void setAuftragDao(final AuftragDao auftragDao)
   {
     this.auftragDao = auftragDao;
   }
@@ -88,14 +88,14 @@ public class TimesheetBookingTest extends TestBase
     logon(getUser(TEST_ADMIN_USER));
     TaskDO task;
     task = initTestDB.addTask("TimesheetBookingTest", "root");
-    GroupTaskAccessDO access = new GroupTaskAccessDO().setGroup(initTestDB.addGroup("TBT", TEST_USER)).addAccessEntry(
+    final GroupTaskAccessDO access = new GroupTaskAccessDO().setGroup(initTestDB.addGroup("TBT", TEST_USER)).addAccessEntry(
         new AccessEntryDO(AccessType.OWN_TIMESHEETS, true, true, true, true)).setTask(task);
     accessDao.save(access);
     logon(getUser(TEST_FINANCE_USER));
     taskDao.update(initTestDB.addTask("TBT-1", "TimesheetBookingTest"));
     taskDao.update(initTestDB.addTask("TBT-1.1", "TBT-1").setStatus(TaskStatus.C));
     taskDao.markAsDeleted(initTestDB.addTask("TBT-1.2", "TBT-1"));
-    taskDao.update((TaskDO) initTestDB.addTask("TBT-1.2.1", "TBT-1.2"));
+    taskDao.update(initTestDB.addTask("TBT-1.2.1", "TBT-1.2"));
     taskDao.update(initTestDB.addTask("TBT-2", "TimesheetBookingTest").setTimesheetBookingStatus(TimesheetBookingStatus.TREE_CLOSED));
     taskDao.update(initTestDB.addTask("TBT-2.1", "TBT-2").setTimesheetBookingStatus(TimesheetBookingStatus.OPENED));
     taskDao.update(initTestDB.addTask("TBT-3", "TimesheetBookingTest").setTimesheetBookingStatus(TimesheetBookingStatus.ONLY_LEAFS));
@@ -137,6 +137,7 @@ public class TimesheetBookingTest extends TestBase
   @Test
   public void testOrderPositions()
   {
+    initialize();
     logon(getUser(TEST_FINANCE_USER));
     final AuftragDO auftrag = new AuftragDO().addPosition(new AuftragsPositionDO().setTask(getTask("TBT-5.1")).setTitel("Pos 1"))
         .addPosition(new AuftragsPositionDO().setTask(getTask("TBT-5.2.1.1")).setTitel("Pos 2"));

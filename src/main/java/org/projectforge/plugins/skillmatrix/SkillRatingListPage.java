@@ -43,7 +43,6 @@ import org.projectforge.web.user.UserPropertyColumn;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
@@ -166,14 +165,4 @@ IListPageColumnsCreator<SkillRatingDO>
   {
     return new SkillRatingListForm(this);
   }
-
-  /**
-   * @see org.projectforge.web.wicket.AbstractListPage#getModel(java.lang.Object)
-   */
-  @Override
-  protected IModel<SkillRatingDO> getModel(final SkillRatingDO object)
-  {
-    return new DetachableDOModel<SkillRatingDO, SkillRatingDao>(object, getBaseDao());
-  }
-
 }

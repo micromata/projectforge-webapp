@@ -190,7 +190,7 @@ public class TaskTreePage extends AbstractSecuredPage
     form = new TaskTreeForm(this);
     body.add(form);
     form.init();
-    taskTreeBuilder = new TaskTreeBuilder(taskDao.getTaskTree()).setSelectMode(isSelectMode()).setShowRootNode(isShowRootNode())
+    taskTreeBuilder = new TaskTreeBuilder().setSelectMode(isSelectMode()).setShowRootNode(isShowRootNode())
         .setShowCost(kostCache.isKost2EntriesExists());
     if (accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP,
         ProjectForgeGroup.PROJECT_ASSISTANT, ProjectForgeGroup.PROJECT_MANAGER) == true) {

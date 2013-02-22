@@ -41,7 +41,6 @@ import org.projectforge.scripting.ScriptDao;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
@@ -111,11 +110,5 @@ public class ScriptListPage extends AbstractListPage<ScriptListForm, ScriptDao, 
   protected ScriptDao getBaseDao()
   {
     return scriptDao;
-  }
-
-  @Override
-  protected IModel<ScriptDO> getModel(final ScriptDO object)
-  {
-    return new DetachableDOModel<ScriptDO, ScriptDao>(object, getBaseDao());
   }
 }

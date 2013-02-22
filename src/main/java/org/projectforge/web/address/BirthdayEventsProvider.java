@@ -111,7 +111,7 @@ public class BirthdayEventsProvider extends MyFullCalendarEventsProvider
             + end);
         continue;
       } else {
-        if (dataProtection == false) {
+        if (dataProtection == false && date != null) {
           birthdayAddress.setAge(date.toDate());
         }
       }

@@ -50,7 +50,6 @@ import org.projectforge.web.user.UserPropertyColumn;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
@@ -224,12 +223,6 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
   protected ToDoDao getBaseDao()
   {
     return toDoDao;
-  }
-
-  @Override
-  protected IModel<ToDoDO> getModel(final ToDoDO object)
-  {
-    return new DetachableDOModel<ToDoDO, ToDoDao>(object, getBaseDao());
   }
 
   protected ToDoDao getToDoDao()

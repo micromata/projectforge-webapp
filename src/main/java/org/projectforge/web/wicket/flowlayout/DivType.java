@@ -29,7 +29,8 @@ package org.projectforge.web.wicket.flowlayout;
  */
 public enum DivType
 {
-  CHECKBOX("jqui_checkbox"), RADIOBOX("radio-jquery-ui");
+  ALERT_ERROR("alert alert-error"), ALERT_INFO("alert alert-info"), ALERT_SUCCESS("alert alert-success"), ALERT_WARNNING(
+      "alert"), CHECKBOX("jqui_checkbox"), RADIOBOX("radio-jquery-ui");
 
   private String classAttrValue;
 

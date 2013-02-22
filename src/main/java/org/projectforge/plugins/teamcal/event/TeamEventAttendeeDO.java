@@ -24,27 +24,32 @@
 package org.projectforge.plugins.teamcal.event;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.projectforge.core.BaseDO;
+import org.projectforge.core.ModificationStatus;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRights;
+
+import de.micromata.hibernate.history.ExtendedHistorizable;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 @Entity
 @Table(name = "T_PLUGIN_CALENDAR_EVENT_ATTENDEE")
-public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAttendeeDO>
+public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAttendeeDO>, BaseDO<Integer>, ExtendedHistorizable
 {
   private static final long serialVersionUID = -3293247578185393730L;
 
@@ -52,13 +57,39 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
 
   private Integer userId;
 
+  private String loginToken;
+
   private TeamAttendeeStatus status;
 
   private String comment;
 
-  private Set<TeamEventAttendeeDO> attendees = null;
+  private Integer id;
+
+  private static final Set<String> NON_HISTORIZABLE_ATTRIBUTES;
+
+  static {
+    NON_HISTORIZABLE_ATTRIBUTES = new HashSet<String>();
+    NON_HISTORIZABLE_ATTRIBUTES.add("loginToken");
+  }
+
+  @Override
+  @Id
+  @GeneratedValue
+  @Column(name = "pk")
+  public Integer getId()
+  {
+    return id;
+  }
+
+  @Override
+  public void setId(final Integer id)
+  {
+    this.id = id;
+  }
+
 
   /**
+   * Is set if the attendee is a ProjectForge user.
    * @return the userId
    */
   public Integer getUserId()
@@ -77,6 +108,27 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
   }
 
   /**
+   * Is used if the attendee isn't a ProjectForge user for authentication.
+   * @return the loginToken
+   */
+  @Column(name = "login_token", length = 255)
+  public String getLoginToken()
+  {
+    return loginToken;
+  }
+
+  /**
+   * @param loginToken the loginToken to set
+   * @return this for chaining.
+   */
+  public TeamEventAttendeeDO setLoginToken(final String loginToken)
+  {
+    this.loginToken = loginToken;
+    return this;
+  }
+
+  /**
+   * The url (mail) of the attendee. Isn't used if the attendee is a ProjectForge user.
    * @return the url
    */
   public String getUrl()
@@ -131,31 +183,14 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
   }
 
   /**
-   * @return the attendees
-   */
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-  @JoinColumn(name = "team_event_fk", insertable = true, updatable = true)
-  public Set<TeamEventAttendeeDO> getAttendees()
-  {
-    return attendees;
-  }
-
-  /**
-   * @param attendees the attendees to set
-   * @return this for chaining.
-   */
-  public TeamEventAttendeeDO setAttendees(final Set<TeamEventAttendeeDO> attendees)
-  {
-    this.attendees = attendees;
-    return this;
-  }
-
-  /**
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
   @Override
   public int compareTo(final TeamEventAttendeeDO arg0)
   {
+    if (this.id != null && ObjectUtils.equals(this.id, arg0.id) == true) {
+      return 0;
+    }
     return this.toString().toLowerCase().compareTo(arg0.toString().toLowerCase());
   }
 
@@ -166,6 +201,10 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
   public int hashCode()
   {
     final HashCodeBuilder hcb = new HashCodeBuilder();
+    if (this.id != null) {
+      hcb.append(this.id);
+      return hcb.toHashCode();
+    }
     if (this.userId != null) {
       hcb.append(this.userId);
     } else {
@@ -181,6 +220,9 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
   public boolean equals(final Object o)
   {
     if (o instanceof TeamEventAttendeeDO) {
+      if (this.id != null && ObjectUtils.equals(this.id, ((TeamEventAttendeeDO) o).id) == true) {
+        return true;
+      }
       final TeamEventAttendeeDO other = (TeamEventAttendeeDO) o;
       if (ObjectUtils.equals(this.getUserId(), other.getUserId()) == false)
         return false;
@@ -204,7 +246,106 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
       } else {
         return "id=" + this.userId + " (not found)";
       }
+    } else if (StringUtils.isBlank(url) == true) {
+      return String.valueOf(id);
     }
     return StringUtils.defaultString(this.url);
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDO#isMinorChange()
+   */
+  @Transient
+  @Override
+  public boolean isMinorChange()
+  {
+    return false;
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDO#setMinorChange(boolean)
+   */
+  @Override
+  public void setMinorChange(final boolean value)
+  {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDO#getAttribute(java.lang.String)
+   */
+  @Transient
+  @Override
+  public Object getAttribute(final String key)
+  {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDO#setAttribute(java.lang.String, java.lang.Object)
+   */
+  @Override
+  public void setAttribute(final String key, final Object value)
+  {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDO#copyValuesFrom(org.projectforge.core.BaseDO, java.lang.String[])
+   */
+  @Override
+  public ModificationStatus copyValuesFrom(final BaseDO< ? extends Serializable> src, final String... ignoreFields)
+  {
+    if (src instanceof TeamEventAttendeeDO == false) {
+      throw new UnsupportedOperationException();
+    }
+    final TeamEventAttendeeDO source = (TeamEventAttendeeDO)src;
+    ModificationStatus modStatus = ModificationStatus.NONE;
+    if (ObjectUtils.equals(this.id, source.id) == false) {
+      modStatus = ModificationStatus.MAJOR;
+      this.id = source.id;
+    }
+    if (ObjectUtils.equals(this.url, source.url) == false) {
+      modStatus = ModificationStatus.MAJOR;
+      this.url = source.url;
+    }
+    if (ObjectUtils.equals(this.userId, source.userId) == false) {
+      modStatus = ModificationStatus.MAJOR;
+      this.userId = source.userId;
+    }
+    if (ObjectUtils.equals(this.loginToken, source.loginToken) == false) {
+      modStatus = ModificationStatus.MAJOR;
+      this.loginToken = source.loginToken;
+    }
+    if (this.status != source.status) {
+      modStatus = ModificationStatus.MAJOR;
+      this.status = source.status;
+    }
+    if (this.comment != source.comment) {
+      modStatus = ModificationStatus.MAJOR;
+      this.comment = source.comment;
+    }
+    return modStatus;
+  }
+
+  /**
+   * @see de.micromata.hibernate.history.ExtendedHistorizable#getHistorizableAttributes()
+   */
+  @Transient
+  @Override
+  public Set<String> getHistorizableAttributes()
+  {
+    // All attributes are historizable.
+    return null;
+  }
+
+  /**
+   * @see de.micromata.hibernate.history.ExtendedHistorizable#getNonHistorizableAttributes()
+   */
+  @Transient
+  @Override
+  public Set<String> getNonHistorizableAttributes()
+  {
+    return NON_HISTORIZABLE_ATTRIBUTES;
   }
 }

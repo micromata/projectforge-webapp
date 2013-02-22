@@ -47,7 +47,6 @@ import org.projectforge.web.user.UserPrefListPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
@@ -162,12 +161,6 @@ public class CustomerListPage extends AbstractListPage<CustomerListForm, KundeDa
   protected KundeDao getBaseDao()
   {
     return kundeDao;
-  }
-
-  @Override
-  protected IModel<KundeDO> getModel(final KundeDO object)
-  {
-    return new DetachableDOModel<KundeDO, KundeDao>(object, getBaseDao());
   }
 
   protected KundeDao getKundeDao()

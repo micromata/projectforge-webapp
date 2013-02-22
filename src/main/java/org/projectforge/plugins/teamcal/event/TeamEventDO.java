@@ -27,12 +27,18 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -40,6 +46,8 @@ import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.annotations.Sort;
+import org.hibernate.annotations.SortType;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
@@ -51,6 +59,7 @@ import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.calendar.TimePeriod;
 import org.projectforge.common.DateHelper;
 import org.projectforge.core.DefaultBaseDO;
+import org.projectforge.core.PFPersistancyBehavior;
 import org.projectforge.database.Constants;
 import org.projectforge.plugins.teamcal.TeamCalConfig;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
@@ -112,16 +121,27 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String note;
 
-  private String attendees;
+  @PFPersistancyBehavior(autoUpdateCollectionEntries = true)
+  private SortedSet<TeamEventAttendeeDO> attendees;
+
+  private String organizer;
 
   private String externalUid;
+
+  transient boolean afterLoadCalled;
+
+  private Integer alarmReminderDur;
+
+  private AlarmReminderType alarmReminderType;
 
   /**
    * Clear fields for viewers with minimal access. If you add new fields don't forget to clear these fields here.
    */
   public void clearFields()
   {
-    subject = location = note = attendees = null;
+    subject = location = note = null;
+    attendees = null;
+    organizer = null;
   }
 
   public TeamEventDO()
@@ -132,7 +152,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   @Transient
   public String getUid()
   {
-    return String.valueOf(getId()) + "@" + TeamCalConfig.get().getDomain();
+    return TeamCalConfig.get().createEventUid(getId());
   }
 
   @Column(length = Constants.LENGTH_SUBJECT)
@@ -275,8 +295,10 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   /**
    * @return the attendees
    */
-  @Column
-  public String getAttendees()
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @JoinColumn(name = "team_event_fk", insertable = true, updatable = true)
+  @Sort(type = SortType.NATURAL)
+  public SortedSet<TeamEventAttendeeDO> getAttendees()
   {
     return attendees;
   }
@@ -285,9 +307,39 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
    * @param attendees the attendees to set
    * @return this for chaining.
    */
-  public TeamEventDO setAttendees(final String attendees)
+  public TeamEventDO setAttendees(final SortedSet<TeamEventAttendeeDO> attendees)
   {
     this.attendees = attendees;
+    return this;
+  }
+
+  /**
+   * Creates a {@link TreeSet}.
+   * @return this for chaining.
+   */
+  public SortedSet<TeamEventAttendeeDO> ensureAttendees() {
+    if (this.attendees == null) {
+      this.attendees = new TreeSet<TeamEventAttendeeDO>();
+    }
+    return this.attendees;
+  }
+
+  /**
+   * @return the organizer
+   */
+  @Column(length = 1000)
+  public String getOrganizer()
+  {
+    return organizer;
+  }
+
+  /**
+   * @param organizer the organizer to set
+   * @return this for chaining.
+   */
+  public TeamEventDO setOrganizer(final String organizer)
+  {
+    this.organizer = organizer;
     return this;
   }
 
@@ -467,6 +519,47 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   public long getDuration()
   {
     return getTimePeriod().getDuration();
+  }
+
+  /**
+   * Get duration.
+   * 
+   * @return
+   */
+  @Column(name = "alarmReminderDur")
+  public Integer getAlarmReminderDur() {
+    return alarmReminderDur;
+  }
+
+  /**
+   * Get type of duration
+   * minute, hour, day
+   * 
+   * @return the alarmReminderType
+   */
+  @Column(name = "alarmReminderType")
+  @Enumerated(EnumType.STRING)
+  public AlarmReminderType getAlarmReminderType()
+  {
+    return alarmReminderType;
+  }
+
+  /**
+   * @param alarmReminderType the alarmReminderType to set
+   * @return this for chaining.
+   */
+  public void setAlarmReminderType(final AlarmReminderType alarmReminderType)
+  {
+    this.alarmReminderType = alarmReminderType;
+  }
+
+  /**
+   * @param trigger the trigger to set
+   * @return this for chaining.
+   */
+  public void setAlarmReminderDur(final Integer trigger)
+  {
+    this.alarmReminderDur = trigger;
   }
 
   /**

@@ -77,6 +77,8 @@ public class RechnungDO extends AbstractRechnungDO<RechnungsPositionDO> implemen
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private RechnungTyp typ;
 
+  private KontoDO konto;
+
   static {
     AbstractHistorizableBaseDO.putNonHistorizableProperty(RechnungDO.class, "uiStatusAsXml", "uiStatus");
   }
@@ -225,6 +227,28 @@ public class RechnungDO extends AbstractRechnungDO<RechnungsPositionDO> implemen
   public String getKundeAsString()
   {
     return KundeFormatter.formatKundeAsString(this.kunde, this.kundeText);
+  }
+
+  /**
+   * This Datev account number is used for the exports of invoices. If not given then the account number assigned to the ProjektDO if set or KundeDO is used instead (default).
+   * @return
+   */
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "konto_id")
+  public KontoDO getKonto()
+  {
+    return konto;
+  }
+
+  public void setKonto(final KontoDO konto)
+  {
+    this.konto = konto;
+  }
+
+  @Transient
+  public Integer getKontoId()
+  {
+    return konto != null ? konto.getId() : null;
   }
 
   public int compareTo(final RechnungDO o)

@@ -116,6 +116,8 @@ AbstractSecuredForm<F, P>
 
   private SingleButtonPanel nextButtonPanel;
 
+  protected FieldsetPanel pageSizeFieldsetPanel;
+
   public static final int[] PAGE_SIZES = new int[] { 3, 5, 10, 25, 50, 100, 200, 500, 1000};
 
   public static DropDownChoice<Integer> getPageSizeDropDownChoice(final String id, final Locale locale, final IModel<Integer> model,
@@ -220,8 +222,8 @@ AbstractSecuredForm<F, P>
       gridBuilder.newGridPanel();
     }
     // DropDownChoice page size
-    final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.pageSize"));
-    fs.add(getPageSizeDropDownChoice(fs.getDropDownChoiceId(), getLocale(), new PropertyModel<Integer>(this, "pageSize"), 25, 1000));
+    pageSizeFieldsetPanel = gridBuilder.newFieldset(getString("label.pageSize"));
+    pageSizeFieldsetPanel.add(getPageSizeDropDownChoice(pageSizeFieldsetPanel.getDropDownChoiceId(), getLocale(), new PropertyModel<Integer>(this, "pageSize"), 25, 1000));
 
     final WebMarkupContainer buttonCell = new WebMarkupContainer("buttonCell");
     add(buttonCell);

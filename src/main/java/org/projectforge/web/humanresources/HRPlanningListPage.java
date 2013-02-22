@@ -223,13 +223,13 @@ ISelectCallerPage
     return new HRPlanningListForm(this);
   }
 
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#buildList()
+   */
   @Override
-  public List<HRPlanningEntryDO> getList()
+  protected List<HRPlanningEntryDO> buildList()
   {
-    if (list != null) {
-      return list;
-    }
-    list = hrPlanningEntryDao.getList(form.getSearchFilter());
+    final List<HRPlanningEntryDO> list = hrPlanningEntryDao.getList(form.getSearchFilter());
     return list;
   }
 
@@ -237,19 +237,6 @@ ISelectCallerPage
   protected HRPlanningEntryDao getBaseDao()
   {
     return hrPlanningEntryDao;
-  }
-
-  @SuppressWarnings("serial")
-  @Override
-  protected IModel<HRPlanningEntryDO> getModel(final HRPlanningEntryDO object)
-  {
-    return new Model<HRPlanningEntryDO>() {
-      @Override
-      public HRPlanningEntryDO getObject()
-      {
-        return object;
-      }
-    };
   }
 
   @Override
@@ -302,8 +289,8 @@ ISelectCallerPage
   @Override
   public void refresh()
   {
-    //form.getSearchFilter().setStartTime(new DateHolder(form.getSearchFilter().getStartTime()).setBeginOfWeek().getDate());
-    //form.getSearchFilter().setStopTime(new DateHolder(form.getSearchFilter().getStopTime()).setEndOfWeek().getDate());
+    // form.getSearchFilter().setStartTime(new DateHolder(form.getSearchFilter().getStartTime()).setBeginOfWeek().getDate());
+    // form.getSearchFilter().setStopTime(new DateHolder(form.getSearchFilter().getStopTime()).setEndOfWeek().getDate());
     form.startDate.markModelAsChanged();
     form.stopDate.markModelAsChanged();
     super.refresh();
