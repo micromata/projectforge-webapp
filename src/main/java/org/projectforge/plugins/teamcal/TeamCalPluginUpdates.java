@@ -93,6 +93,9 @@ public class TeamCalPluginUpdates
         } else if (dao.doesTableAttributesExist(calendarTable, calendarAttributes) == false) {
           dao.addTableAttributes(calendarTable, calendarTable.getAttributes());
         }
+        if (dao.doesExist(eventTable) == false) {
+          dao.createTable(eventTable);
+        }
         if (dao.doesExist(attendeeTable) == false) {
           dao.createTable(attendeeTable);
         }
@@ -103,9 +106,6 @@ public class TeamCalPluginUpdates
           final TableAttribute attr = new TableAttribute("team_event_fk", TableAttributeType.INT).setForeignTable(TeamEventDO.class)
               .setForeignAttribute("pk");
           dao.addTableAttributes(attendeeTable, attr);
-        }
-        if (dao.doesExist(eventTable) == false) {
-          dao.createTable(eventTable);
         }
         if (dao.doesTableAttributesExist(eventTable, eventAttributes) == false) {
           dao.addTableAttributes(eventTable, eventTable.getAttributes());
