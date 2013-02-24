@@ -14,12 +14,18 @@ jQuery.autocomplete = function(input, options) {
 	var results = document.createElement("div");
 	// Create jQuery object for results
 	var $results = $(results);
-	$results.hide().addClass(options.resultsClass);
-	if( options.width > 0 ) $results.css("width", options.width);
+    $results.hide().addClass(options.resultsClass).css("position", "absolute");
+    if( options.width > 0 ) $results.css("width", options.width);
 
 	// Add to body element
-	$input.after($results);
-
+    //    var parentContainer = $input.parents(".modal");
+    //    if (parentContainer.length == 0) {
+    //    	parentContainer = $("body");
+    //    }
+    var parentContainer = $("body");
+    parentContainer.append(results);
+    var $parentContainer = $(parentContainer);
+    
 	input.autocompleter = me;
 
 	var timeout = null;
@@ -290,19 +296,21 @@ jQuery.autocomplete = function(input, options) {
 	function showResults() {
 		// either use the specified width, or autocalculate based on form
 		// element
-		var iWidth = (options.width > 0) ? options.width : $input.width();
+        var pos = findPos(input);
+        var iWidth = (options.width > 0) ? options.width : $input.width();
 		// reposition
 		$results.css({
-			width: parseInt(iWidth) + "px"
+			width: parseInt(iWidth) + "px",
+			top: (pos.y + input.offsetHeight) + "px",
+			left: pos.x + "px"
 		}).show();
 		// get the position of the input field right now (in case the DOM is
 		// shifted)
-		var pos = $input.offset();
-		$results.offset({top: pos.top + $input.height() + 5, left: pos.left});
 		if(options.scroll) {
 			$results.scrollTop(0);
 			$results.css({
-				maxHeight: options.scrollHeight
+				maxHeight: options.scrollHeight,
+				overflow: 'auto'
 			});
 				
 			if($.browser.msie && typeof document.body.style.maxHeight == "undefined") {
@@ -533,6 +541,18 @@ jQuery.autocomplete = function(input, options) {
 		}
 		cache.data[q] = data;
 	};
+	
+
+	function findPos(obj) {
+		var curleft = obj.offsetLeft || 0;
+		var curtop = obj.offsetTop || 0;
+		while (obj = obj.offsetParent) {
+			//if ($(obj).hasClass("modal")) break;
+			curleft += obj.offsetLeft
+			curtop += obj.offsetTop
+		}
+		return {x:curleft,y:curtop};
+	}
 }
 
 jQuery.fn.autocomplete = function(url, options, data) {
