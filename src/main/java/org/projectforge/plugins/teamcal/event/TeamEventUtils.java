@@ -205,20 +205,22 @@ public class TeamEventUtils
     final List<VAlarm> alarms = event.getAlarms();
     if (alarms != null && alarms.size() >= 1) {
       final Dur dur = alarms.get(0).getTrigger().getDuration();
-      // consider weeks
-      int weeksToDays = 0;
-      if (dur.getWeeks() != 0) {
-        weeksToDays = dur.getWeeks() * DURATION_OF_WEEK;
-      }
-      if (dur.getDays() != 0) {
-        teamEvent.setAlarmReminderDur(dur.getDays() + weeksToDays);
-        teamEvent.setAlarmReminderType(AlarmReminderType.DAYS);
-      } else if (dur.getHours() != 0) {
-        teamEvent.setAlarmReminderDur(dur.getHours());
-        teamEvent.setAlarmReminderType(AlarmReminderType.HOURS);
-      } else if (dur.getMinutes() != 0) {
-        teamEvent.setAlarmReminderDur(dur.getMinutes());
-        teamEvent.setAlarmReminderType(AlarmReminderType.MINUTES);
+      if (dur != null) { // Might be null.
+        // consider weeks
+        int weeksToDays = 0;
+        if (dur.getWeeks() != 0) {
+          weeksToDays = dur.getWeeks() * DURATION_OF_WEEK;
+        }
+        if (dur.getDays() != 0) {
+          teamEvent.setAlarmReminderDur(dur.getDays() + weeksToDays);
+          teamEvent.setAlarmReminderType(AlarmReminderType.DAYS);
+        } else if (dur.getHours() != 0) {
+          teamEvent.setAlarmReminderDur(dur.getHours());
+          teamEvent.setAlarmReminderType(AlarmReminderType.HOURS);
+        } else if (dur.getMinutes() != 0) {
+          teamEvent.setAlarmReminderDur(dur.getMinutes());
+          teamEvent.setAlarmReminderType(AlarmReminderType.MINUTES);
+        }
       }
     }
     final RRule rule = (RRule) event.getProperty(Property.RRULE);
