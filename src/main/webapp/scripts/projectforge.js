@@ -188,6 +188,7 @@ $.fn.mytooltip.defaults = $
 					animation : true,
 					selector : false,
 					trigger : 'manual',
+					container: 'body',
 					template : '<div class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
 				})
 
@@ -204,7 +205,19 @@ function showMyTooltip(obj) {
 			top : 0,
 			left : 0,
 			display : 'block'
-		}).insertAfter(obj.$element);
+		})
+
+		if (obj.options.container) {
+		    var parentContainer = obj.$element.parents(".modal");
+		    if (parentContainer.length == 0) {
+				$tip.appendTo(obj.options.container);
+		    } else {
+		    	$tip.appendTo(parentContainer);
+		    }
+		} else { 
+			$tip.insertAfter(obj.$element)
+		}
+
 		pos = obj.getPosition(inside);
 		boundTop = $(document).scrollTop();
 		boundLeft = $(document).scrollLeft();
@@ -285,6 +298,7 @@ $.fn.mypopover.defaults = $
 				{
 					width : 'normal',
 					trigger : 'manual',
+					container: 'body',
 					template : '<div class="popover"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"></div></div></div>'
 				})
 
