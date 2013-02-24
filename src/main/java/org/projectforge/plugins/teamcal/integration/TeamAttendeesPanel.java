@@ -26,7 +26,7 @@ package org.projectforge.plugins.teamcal.integration;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel;
@@ -183,7 +183,20 @@ public class TeamAttendeesPanel extends Panel
     {
 
       final FormComponent<String> form = super.newEditor(parent, componentId, model);
-      // form.add(new MyAutoCompleteBehavior());
+      // form.add(new AutoCompleteBehavior<String>(new PFAutoCompleteRenderer()) {
+      // private static final long serialVersionUID = 1L;
+      //
+      // @Override
+      // protected Iterator<String> getChoices(final String input)
+      // {
+      // final List<String> list = new LinkedList<String>();
+      // list.add("Kai Reinhard");
+      // list.add("Horst xy");
+      // list.add("k.reinhard@micromata.de");
+      // list.add("h.xy@irgendwas.de");
+      // return list.iterator();
+      // }
+      // });
       return form;
     }
   }

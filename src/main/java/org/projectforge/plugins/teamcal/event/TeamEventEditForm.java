@@ -31,7 +31,7 @@ import java.util.Set;
 import net.fortuna.ical4j.model.Recur;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
