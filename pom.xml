@@ -434,12 +434,17 @@
       <artifactId>backport-util-concurrent</artifactId>
       <version>3.1</version>
     </dependency>
-    <!-- dependency Version check: 17.01.2013 -->
+    <!-- dependency Version check: 24.02.2013 -->
     <!-- Not yet longer supported. less.js (1.3.3 needed). -->
-  <!-- <groupId>org.lesscss</groupId> -->
-  <!-- <artifactId>lesscss</artifactId> -->
-  <!-- <version>1.3.1</version> -->
-  <!-- </dependency> -->
+    <!-- <groupId>org.lesscss</groupId> -->
+    <!-- <artifactId>lesscss</artifactId> -->
+    <!-- <version>1.3.1</version> -->
+    <!-- </dependency> -->
+    <dependency> <!-- Dependency of lesscss. -->
+      <groupId>org.mozilla</groupId>
+      <artifactId>rhino</artifactId>
+      <version>1.7R4</version>
+    </dependency>
 
   </dependencies>
   <build>
@@ -646,6 +651,6 @@
         <artifactId>maven-project-info-reports-plugin</artifactId>
         <version>2.5.1</version>
       </plugin>
-      </plugins>
+    </plugins>
   </reporting>
 </project>
