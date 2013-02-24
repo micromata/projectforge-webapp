@@ -185,7 +185,7 @@ $.fn.mytooltip.defaults = $
 				{},
 				$.fn.tooltip.defaults,
 				{
-					animation : true,
+					animation : false,
 					selector : false,
 					trigger : 'manual',
 					container: 'body',
