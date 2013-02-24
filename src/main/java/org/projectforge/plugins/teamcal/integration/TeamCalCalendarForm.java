@@ -201,7 +201,7 @@ public class TeamCalCalendarForm extends CalendarForm
           }
           final TeamEventDO teamEvent = TeamEventUtils.createTeamEventDO(event);
           final TemplateEntry activeTemplateEntry = ((TeamCalCalendarFilter) filter).getActiveTemplateEntry();
-          if (activeTemplateEntry != null) {
+          if (activeTemplateEntry != null && activeTemplateEntry.getDefaultCalendarId() != null) {
             teamEventDao.setCalendar(teamEvent, activeTemplateEntry.getDefaultCalendarId());
           }
           final TeamEventEditPage editPage = new TeamEventEditPage(new PageParameters(), teamEvent);
