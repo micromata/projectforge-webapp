@@ -538,6 +538,8 @@ public class AddressDao extends BaseDao<AddressDO>
         pw.print("\\:");
       } else if (ch == ',') {
         pw.print("\\,");
+      } else if (ch == ';') {
+        pw.print("\\;");
       } else if (ch == '\r') {
         pw.print("\\n");
         cr = true;
