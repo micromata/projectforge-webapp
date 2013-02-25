@@ -530,12 +530,28 @@ public class AddressDao extends BaseDao<AddressDO>
    */
   private void out(final PrintWriter pw, final String str)
   {
-    String s = StringUtils.defaultString(str);
-    s = s.replaceAll("\r", "");
-    s = s.replaceAll("\n", "\\\\\n");
-    s = s.replaceAll(",", "\\,");
-    s = s.replaceAll(":", "\\:");
-    pw.print(s);
+    final String s = StringUtils.defaultString(str);
+    boolean cr = false;
+    for (int i = 0; i < s.length(); i++) {
+      final char ch = s.charAt(i);
+      if (ch == ':') {
+        pw.print("\\:");
+      } else if (ch == ',') {
+        pw.print("\\,");
+      } else if (ch == '\r') {
+        pw.print("\\n");
+        cr = true;
+        continue;
+      } else if (ch == '\n') {
+        if (cr == false) {
+          // Print only \n if not already done by previous \r.
+          pw.print("\\n");
+        }
+      } else {
+        pw.print(ch);
+      }
+      cr = false;
+    }
   }
 
   /**
