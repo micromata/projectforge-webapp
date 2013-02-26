@@ -72,8 +72,6 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
 
   private boolean minorChange = false;
 
-  private boolean selected = false;
-
   private transient Map<String, Object> attributeMap;
 
   /**
@@ -146,20 +144,6 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
   public void setMinorChange(final boolean value)
   {
     this.minorChange = value;
-  }
-
-  /**
-   * Default is false. Used for display in lists for selection.
-   */
-  @Transient
-  public boolean isSelected()
-  {
-    return selected;
-  }
-
-  public void setSelected(final boolean selected)
-  {
-    this.selected = selected;
   }
 
   public Object getAttribute(final String key)
