@@ -419,7 +419,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
       posGridBuilder.newSplitPanel(GridSize.COL50);
       {
         // Hours
-        final FieldsetPanel fs = posGridBuilder.newFieldset(getString("hours")).setNoLabelFor();
+        final FieldsetPanel fs = posGridBuilder.newFieldset(getString("hours")).supressLabelForWarning();
         final HRPlanningEditTablePanel table = new HRPlanningEditTablePanel(fs.newChildId());
         fs.add(table);
         table.init(entry);

@@ -122,10 +122,24 @@ div.progress-overbooked-min div {
 /* Autocomplete */
 .ac_results {
 	padding: 0px;
+	position: absolute;
 	border: 1px solid WindowFrame;
 	background-color: Window;
-	overflow: hidden;
-	z-index: 10;
+	overflow: auto;
+	/* modal in bootstrap is 1050 */
+	z-index: 1060;
+}
+
+/* Needed for IE: */
+.ac_results iframe {
+	display: block; /*sorry for IE5*/
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: -1;
+	filter: mask();
+	width: 3000px;
+	z-index: -1;
 }
 
 .ac_results ul {
@@ -136,31 +150,21 @@ div.progress-overbooked-min div {
 	margin: 0;
 }
 
-.ac_results iframe {
-	display: block; /*sorry for IE5*/
-	position: absolute;
-	top: 0;
-	left: 0;
-	z-index: -1;
-	filter: mask();
-	width: 3000px;
-	height: 3000px;
-	z-index: -1;
-}
-
 .ac_results li {
 	margin: 0px;
 	padding-left: 2px;
 	padding-top: 5px;
 	cursor: pointer;
 	display: block;
-	font: menu;
-	font-size: 12px;
 	overflow: hidden;
 }
 
+.ac_results ul li i {
+  margin-right: 10px;
+}
+
 .ac_loading {
-	background: Window url('../images/css_img/indicator.gif') right center
+	background: Window url('../../styles/images/ajax-loader.gif') right center
 		no-repeat;
 }
 
@@ -253,6 +257,7 @@ div.contentMenu .toolbarbutton,div.contentRightMenu .toolbarbutton {
 }
 
 #footer {
+  height: 1.3em;
 	background-color: #4c5766;
 	border-color: #313841;
 	color: #fff;
@@ -280,6 +285,7 @@ div.contentMenu .toolbarbutton,div.contentRightMenu .toolbarbutton {
 
 #footer a {
 	color: #aaa;
+	font-size: 0.8em;
 }
 
 #footer a:hover {
@@ -287,14 +293,15 @@ div.contentMenu .toolbarbutton,div.contentRightMenu .toolbarbutton {
 }
 
 #footer span.divider {
-	padding-left: 5px;
-	padding-right: 5px;
+	padding-left: 3px;
+	padding-right: 3px;
 }
 
 #footer ul#pf_copyHint {
 	float: left;
 	list-style: none;
-	margin: 2px 10px;
+	padding-left: 5px;
+	margin: 0;
 }
 
 #footer ul#pf_copyHint li {
@@ -303,7 +310,7 @@ div.contentMenu .toolbarbutton,div.contentRightMenu .toolbarbutton {
 
 #footer #pf_footerNewsLink {
 	float: right;
-	margin: 2px 10px
+	padding-right: 5px;
 }
 
 /* Errorhandling */
@@ -491,6 +498,10 @@ h2.box_head .subtitle {
 	border-radius: 7px;
 	cursor: default;
 	width: auto;
+}
+
+.pf_dnd.disabled {
+  display: none !important;
 }
 
 .pf_filedrag.hover {

@@ -48,7 +48,6 @@ import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
@@ -200,12 +199,6 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
   protected UserDao getBaseDao()
   {
     return userDao;
-  }
-
-  @Override
-  protected IModel<PFUserDO> getModel(final PFUserDO object)
-  {
-    return new DetachableDOModel<PFUserDO, UserDao>(object, getBaseDao());
   }
 
   protected UserDao getUserDao()

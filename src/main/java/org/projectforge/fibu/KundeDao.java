@@ -37,23 +37,10 @@ public class KundeDao extends BaseDao<KundeDO>
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(KundeDao.class);
 
-  private KontoDao kontoDao;
-
   public KundeDao()
   {
     super(KundeDO.class);
     avoidNullIdCheckBeforeSave = true;
-  }
-
-  /**
-   * @param kunde
-   * @param kontoId If null, then konto will be set to null;
-   * @see BaseDao#getOrLoad(Integer)
-   */
-  public void setKonto(final KundeDO kunde, final Integer kontoId)
-  {
-    final KontoDO konto = kontoDao.getOrLoad(kontoId);
-    kunde.setKonto(konto);
   }
 
   @Override
@@ -119,10 +106,5 @@ public class KundeDao extends BaseDao<KundeDO>
   public KundeDO newInstance()
   {
     return new KundeDO();
-  }
-
-  public void setKontoDao(final KontoDao kontoDao)
-  {
-    this.kontoDao = kontoDao;
   }
 }

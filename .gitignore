@@ -3,4 +3,5 @@ tmp
 work
 .idea
 projectforge-webapp.iml
+/testsystem
 src/main/resources/rebel.xml

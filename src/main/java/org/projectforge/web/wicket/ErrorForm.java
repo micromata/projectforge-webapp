@@ -79,15 +79,15 @@ public class ErrorForm extends AbstractForm<ErrorPageData, ErrorPage>
     gridBuilder = newGridBuilder(this, "flowform");
     gridBuilder.newGridPanel();
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("feedback.receiver")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("feedback.receiver")).supressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), data.getReceiver()));
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("feedback.sender")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("feedback.sender")).supressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), data.getSender()));
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("errorpage.feedback.messageNumber")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("errorpage.feedback.messageNumber")).supressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), data.getMessageNumber()));
     }
     {

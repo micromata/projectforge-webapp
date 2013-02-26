@@ -103,6 +103,7 @@ public class HRListPage extends AbstractListPage<HRListForm, HRDao, HRViewUserDa
   protected void init()
   {
     recreateDataTable();
+    recreateBottomPanel();
   }
 
   @SuppressWarnings("serial")
@@ -312,15 +313,16 @@ public class HRListPage extends AbstractListPage<HRListForm, HRDao, HRViewUserDa
     return hrViewData;
   }
 
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#buildList()
+   */
   @Override
-  public List<HRViewUserData> getList()
+  protected List<HRViewUserData> buildList()
   {
-    if (hrViewData != null && list != null) {
-      return list;
+    if (hrViewData == null) {
+      return null;
     }
-    list = getHRViewData().getUserDatas();
-    recreateDataTable();
-    recreateBottomPanel();
+    final List<HRViewUserData> list = getHRViewData().getUserDatas();
     return list;
   }
 
@@ -328,19 +330,6 @@ public class HRListPage extends AbstractListPage<HRListForm, HRDao, HRViewUserDa
   protected HRDao getBaseDao()
   {
     return hrDao;
-  }
-
-  @SuppressWarnings("serial")
-  @Override
-  protected IModel<HRViewUserData> getModel(final HRViewUserData object)
-  {
-    return new Model<HRViewUserData>() {
-      @Override
-      public HRViewUserData getObject()
-      {
-        return object;
-      }
-    };
   }
 
   @Override
@@ -377,6 +366,8 @@ public class HRListPage extends AbstractListPage<HRListForm, HRDao, HRViewUserDa
   {
     super.refresh();
     this.hrViewData = null;
+    recreateDataTable();
+    recreateBottomPanel();
   }
 
   @Override

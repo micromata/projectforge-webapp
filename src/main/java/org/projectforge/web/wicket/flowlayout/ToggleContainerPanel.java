@@ -33,6 +33,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.Model;
+import org.projectforge.web.wicket.bootstrap.GridBuilder;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -256,6 +257,14 @@ public class ToggleContainerPanel extends Panel
   public ToggleStatus getToggleStatus()
   {
     return toggleStatus;
+  }
+
+  public GridBuilder createGridBuilder()
+  {
+    final DivPanel content = new DivPanel(ToggleContainerPanel.CONTENT_ID);
+    this.add(content);
+    final GridBuilder gridBuilder = new GridBuilder(content, content.newChildId(), true);
+    return gridBuilder;
   }
 
   public enum ToggleStatus

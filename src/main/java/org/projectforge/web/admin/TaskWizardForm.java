@@ -156,7 +156,7 @@ public class TaskWizardForm extends AbstractStandardForm<TaskWizardForm, TaskWiz
     section.add(new Heading3Panel(section.newChildId(), String.valueOf(number) + ". " + getString("task.wizard." + key)));
     section.add(new DivTextPanel(section.newChildId(), getString("task.wizard." + key + ".intro")));
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("group")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("group")).supressLabelForWarning();
       final GroupSelectPanel groupSelectPanel = new GroupSelectPanel(fs.newChildId(), new PropertyModel<GroupDO>(this, key), parentPage,
           key + "Id");
       fs.add(groupSelectPanel);

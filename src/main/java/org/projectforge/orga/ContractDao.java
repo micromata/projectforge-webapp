@@ -26,9 +26,13 @@ package org.projectforge.orga;
 import java.util.List;
 
 import org.apache.commons.lang.Validate;
+import org.hibernate.criterion.Restrictions;
+import org.projectforge.access.AccessException;
 import org.projectforge.core.BaseDao;
+import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.MessageParam;
 import org.projectforge.core.MessageParamType;
+import org.projectforge.core.QueryFilter;
 import org.projectforge.core.UserException;
 import org.projectforge.database.SQLHelper;
 import org.projectforge.fibu.RechnungDO;
@@ -54,6 +58,30 @@ public class ContractDao extends BaseDao<ContractDO>
     userRightId = USER_RIGHT_ID;
   }
 
+  @Override
+  @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+  public List<ContractDO> getList(final BaseSearchFilter filter) throws AccessException
+  {
+    final ContractFilter myFilter;
+    if (filter instanceof ContractFilter) {
+      myFilter = (ContractFilter) filter;
+    } else {
+      myFilter = new ContractFilter(filter);
+    }
+    final QueryFilter queryFilter = new QueryFilter(myFilter);
+    if (myFilter.getStatus() != null) {
+      queryFilter.add(Restrictions.eq("status", myFilter.getStatus().name()));
+    }
+    if (myFilter.getType() != null) {
+      queryFilter.add(Restrictions.eq("type", myFilter.getType().getValue()));
+    }
+    queryFilter.setYearAndMonth("date", myFilter.getYear(), -1);
+    if (log.isDebugEnabled() == true) {
+      log.debug(myFilter.toString());
+    }
+    return getList(queryFilter);
+  }
+
   /**
    * List of all years with contracts: select min(date), max(date) from t_contract.
    * @return
@@ -61,7 +89,7 @@ public class ContractDao extends BaseDao<ContractDO>
   @SuppressWarnings("unchecked")
   public int[] getYears()
   {
-    final List<Object[]> list = (List<Object[]>) getSession().createQuery("select min(date), max(date) from ContractDO t").list();
+    final List<Object[]> list = getSession().createQuery("select min(date), max(date) from ContractDO t").list();
     return SQLHelper.getYears(list);
   }
 
@@ -79,12 +107,12 @@ public class ContractDao extends BaseDao<ContractDO>
     }
     if (obj.getId() == null) {
       // New contract
-      Integer next = getNextNumber(obj);
+      final Integer next = getNextNumber(obj);
       if (next.intValue() != obj.getNumber().intValue()) {
         throw new UserException("legalAffaires.contract.error.numberNotConsecutivelyNumbered");
       }
     } else {
-      List<RechnungDO> list = getHibernateTemplate().find("from ContractDO c where c.number = ? and c.id <> ?",
+      final List<RechnungDO> list = getHibernateTemplate().find("from ContractDO c where c.number = ? and c.id <> ?",
           new Object[] { obj.getNumber(), obj.getId()});
       if (list != null && list.size() > 0) {
         throw new UserException("legalAffaires.contract.error.numberAlreadyExists");
@@ -108,7 +136,7 @@ public class ContractDao extends BaseDao<ContractDO>
         return orig.getNumber();
       }
     }
-    final List<Integer> list = (List<Integer>) getSession().createQuery("select max(t.number) from ContractDO t").list();
+    final List<Integer> list = getSession().createQuery("select max(t.number) from ContractDO t").list();
     Validate.notNull(list);
     if (list.size() == 0 || list.get(0) == null) {
       log.info("First entry of ContractDO");

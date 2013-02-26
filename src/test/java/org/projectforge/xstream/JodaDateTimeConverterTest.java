@@ -21,37 +21,36 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.web.orga;
+package org.projectforge.xstream;
 
-import org.projectforge.orga.ContractFilter;
+import java.util.TimeZone;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
+import junit.framework.Assert;
 
-@XStreamAlias("ContractFilter")
-public class ContractListFilter extends ContractFilter
+import org.joda.time.DateTime;
+import org.junit.Test;
+import org.projectforge.common.DateHelper;
+import org.projectforge.user.PFUserContext;
+import org.projectforge.user.PFUserDO;
+
+public class JodaDateTimeConverterTest
 {
-  private static final long serialVersionUID = -7381514878697257874L;
-
-  protected int year;
-
-  @Override
-  public void reset()
+  @Test
+  public void testConverter()
   {
-    super.reset();
-    this.searchString = "";
+    test(DateHelper.EUROPE_BERLIN);
+    test(DateHelper.UTC);
   }
 
-  /**
-   * Year of contracts to filter. "<= 0" means showing all years.
-   * @return
-   */
-  public int getYear()
-  {
-    return year;
-  }
-
-  public void setYear(int year)
-  {
-    this.year = year;
+  private void test(final TimeZone timeZone) {
+    final PFUserDO user = new PFUserDO();
+    user.setTimeZone(timeZone);
+    PFUserContext.setUser(user);
+    final JodaDateTimeConverter converter = new JodaDateTimeConverter();
+    final DateTime dateTime = (DateTime) converter.parse("1970-11-21 16:00:00");
+    Assert.assertEquals(1970, dateTime.getYear());
+    Assert.assertEquals(11, dateTime.getMonthOfYear());
+    Assert.assertEquals(21, dateTime.getDayOfMonth());
+    Assert.assertEquals("1970-11-21 16:00:00", converter.toString(dateTime));
   }
 }

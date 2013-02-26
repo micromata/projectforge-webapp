@@ -39,7 +39,6 @@ import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
@@ -142,14 +141,4 @@ public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, Ski
   {
     return new SkillListForm(this);
   }
-
-  /**
-   * @see org.projectforge.web.wicket.AbstractListPage#getModel(java.lang.Object)
-   */
-  @Override
-  protected IModel<SkillDO> getModel(final SkillDO object)
-  {
-    return new DetachableDOModel<SkillDO, SkillDao>(object, getBaseDao());
-  }
-
 }

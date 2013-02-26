@@ -53,7 +53,6 @@ import org.projectforge.web.user.UserPrefListPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
@@ -143,13 +142,7 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
         public void populateItem(final Item<ICellPopulator<ProjektDO>> item, final String componentId, final IModel<ProjektDO> rowModel)
         {
           final ProjektDO projekt = rowModel.getObject();
-          KontoDO konto = null;
-          if (projekt != null) {
-            konto = kontoCache.getKonto(projekt.getKontoId());
-            if (konto == null && projekt.getKunde() != null) {
-              konto = kontoCache.getKonto(projekt.getKunde().getKontoId());
-            }
-          }
+          final KontoDO konto = kontoCache.getKonto(projekt);
           item.add(new Label(componentId, konto != null ? konto.formatKonto() : ""));
           cellItemListener.populateItem(item, componentId, rowModel);
         }
@@ -223,12 +216,6 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
   protected ProjektDao getBaseDao()
   {
     return projektDao;
-  }
-
-  @Override
-  protected IModel<ProjektDO> getModel(final ProjektDO object)
-  {
-    return new DetachableDOModel<ProjektDO, ProjektDao>(object, getBaseDao());
   }
 
   protected ProjektDao getProjektDao()

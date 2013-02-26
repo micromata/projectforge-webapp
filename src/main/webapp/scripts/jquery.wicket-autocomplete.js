@@ -14,12 +14,18 @@ jQuery.autocomplete = function(input, options) {
 	var results = document.createElement("div");
 	// Create jQuery object for results
 	var $results = $(results);
-	$results.hide().addClass(options.resultsClass).css("position", "absolute");
-	if( options.width > 0 ) $results.css("width", options.width);
+    $results.hide().addClass(options.resultsClass).css("position", "absolute");
+    if( options.width > 0 ) $results.css("width", options.width);
 
 	// Add to body element
-	$input.after($results);
-
+    //    var parentContainer = $input.parents(".modal");
+    //    if (parentContainer.length == 0) {
+    //    	parentContainer = $("body");
+    //    }
+    var parentContainer = $("body");
+    parentContainer.append(results);
+    var $parentContainer = $(parentContainer);
+    
 	input.autocompleter = me;
 
 	var timeout = null;
@@ -248,7 +254,8 @@ jQuery.autocomplete = function(input, options) {
 		input.lastSelected = v;
 		prev = v;
 		$results.html("");
-		$input.val(v).change(); // Johannes Unterstein, Kai Dorschner: Added .change();
+		$input.val(v).change(); // Johannes Unterstein, Kai Dorschner: Added
+								// .change();
 		hideResultsNow();
 		if (options.onItemSelect) setTimeout(function() { options.onItemSelect(li) }, 1);
 	};
@@ -287,15 +294,18 @@ jQuery.autocomplete = function(input, options) {
 	};
 
 	function showResults() {
-		// get the position of the input field right now (in case the DOM is
-		// shifted)
 		// either use the specified width, or autocalculate based on form
 		// element
-		var iWidth = (options.width > 0) ? options.width : $input.width();
+        var pos = findPos(input);
+        var iWidth = (options.width > 0) ? options.width : $input.width();
 		// reposition
 		$results.css({
-			width: parseInt(iWidth) + "px"
+			width: parseInt(iWidth) + "px",
+			top: (pos.y + input.offsetHeight) + "px",
+			left: pos.x + "px"
 		}).show();
+		// get the position of the input field right now (in case the DOM is
+		// shifted)
 		if(options.scroll) {
 			$results.scrollTop(0);
 			$results.css({
@@ -384,7 +394,8 @@ jQuery.autocomplete = function(input, options) {
 				}
 		    } else if (options.labelValue) {
 		        // First col contains label second col the value.
-		        li.innerHTML = defaultFormat(row[0], q) + (options.deletableItem ? "<span class='pf_deleteLink' onClick='pf_deleteClick(\"#"+ $input.attr("id") +"\", \""+row[0]+"\", this); return false;'>X</span>" : "");  // Johannes Unterstein, Kai Dorschner: Added deletableItem
+		        // Johannes Unterstein, Kai Dorschner: Added deletableItem
+		        li.innerHTML = defaultFormat(row[0], q) + (options.deletableItem ? "<i class='icon-remove-sign red pf_deleteLink' onclick='pf_deleteClick(\"#"+ $input.attr("id") +"\", \""+row[0]+"\", this); return false;'></i>" : ""); 
 		        $(li).data('me', me); // Johannes & Kai
 		        if (options.selectValue) {
 		          li.selectValue = options.selectValue(row);
@@ -392,7 +403,8 @@ jQuery.autocomplete = function(input, options) {
 		          li.selectValue = row[1];
 		        }
 			} else {
-				li.innerHTML = defaultFormat(row[0], q) + (options.deletableItem ? "<span class='pf_deleteLink' onClick='pf_deleteClick(\"#"+ $input.attr("id") +"\", \""+row[0]+"\", this); return false;'>X</span>" : "");  // Johannes Unterstein, Kai Dorschner: Added deletableItem
+		        // Johannes Unterstein, Kai Dorschner: Added deletableItem
+				li.innerHTML = defaultFormat(row[0], q) + (options.deletableItem ? "<i class='icon-remove-sign red pf_deleteLink' onclick='pf_deleteClick(\"#"+ $input.attr("id") +"\", \""+row[0]+"\", this); return false;'></i>" : "");
 				$(li).data('me', me); // Johannes & Kai
 				if (options.selectValue) {
 				  li.selectValue = options.selectValue(row);
@@ -442,7 +454,7 @@ jQuery.autocomplete = function(input, options) {
 					]
 					};
           var request = Wicket.Ajax.get(attrs);
-          //var call = new Wicket.Ajax.ajax(attrs)
+          // var call = new Wicket.Ajax.ajax(attrs)
 		// if there's been no data found, remove the loading class
 		} else {
 			$input.removeClass(options.loadingClass);
@@ -529,6 +541,18 @@ jQuery.autocomplete = function(input, options) {
 		}
 		cache.data[q] = data;
 	};
+	
+
+	function findPos(obj) {
+		var curleft = obj.offsetLeft || 0;
+		var curtop = obj.offsetTop || 0;
+		while (obj = obj.offsetParent) {
+			//if ($(obj).hasClass("modal")) break;
+			curleft += obj.offsetLeft
+			curtop += obj.offsetTop
+		}
+		return {x:curleft,y:curtop};
+	}
 }
 
 jQuery.fn.autocomplete = function(url, options, data) {

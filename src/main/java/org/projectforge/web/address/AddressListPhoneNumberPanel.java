@@ -62,7 +62,8 @@ public class AddressListPhoneNumberPanel extends Panel
     }
     linkOrSpan.add(AttributeModifier.replace("onmouseover", "zoom('" + phoneNumber + "'); return false;"));
     final String tooltip = parentPage.getString(phoneType.getI18nKey());
-    add(linkOrSpan.add(AttributeModifier.replace("title", tooltip)));
+    add(linkOrSpan);
+    WicketUtils.addTooltip(linkOrSpan, tooltip);
     final Label numberLabel = new Label("number", phoneNumber);
     if (favoriteNumber == true) {
       numberLabel.add(AttributeModifier.replace("style", "color:red; font-weight:bold;"));

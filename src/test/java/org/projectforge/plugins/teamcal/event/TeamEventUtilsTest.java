@@ -28,6 +28,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.TimeZone;
 
 import junit.framework.Assert;
@@ -55,6 +56,35 @@ public class TeamEventUtilsTest
     testRRule(DateHelper.EUROPE_BERLIN);
     testRRule(DateHelper.UTC);
     testRRule(TimeZone.getTimeZone("America/Los_Angeles"));
+  }
+
+  @Test
+  public void recurrenceEvents()
+  {
+    final TimeZone timeZone = DateHelper.EUROPE_BERLIN;
+    {
+      final TeamEventDO event = createEvent(timeZone, "2011-06-06 11:00", "2011-06-06 12:00", RecurrenceFrequency.WEEKLY, 1, "2013-12-31");
+      final Collection<TeamEvent> col = TeamEventUtils.getRecurrenceEvents(getDate("2013-10-20", timeZone),
+          getDate("2013-10-29", timeZone), event, timeZone);
+      Assert.assertEquals(2, col.size());
+      final Iterator<TeamEvent> it = col.iterator();
+      Assert.assertEquals(DateHelper.formatAsUTC(DateHelper.parseIsoTimestamp("2013-10-21 11:00:00.0", timeZone)),
+          DateHelper.formatAsUTC(it.next().getStartDate()));
+      Assert.assertEquals(DateHelper.formatAsUTC(DateHelper.parseIsoTimestamp("2013-10-28 11:00:00.0", timeZone)),
+          DateHelper.formatAsUTC(it.next().getStartDate()));
+    }
+    {
+      final TeamEventDO event = createEvent(timeZone, "2011-03-03 00:00", "2011-03-03 00:00", RecurrenceFrequency.WEEKLY, 2, "2011-04-30")
+          .setAllDay(true);
+      final Collection<TeamEvent> col = TeamEventUtils.getRecurrenceEvents(getDate("2011-03-01", timeZone),
+          getDate("2011-03-31", timeZone), event, timeZone);
+      Assert.assertEquals(2, col.size());
+      final Iterator<TeamEvent> it = col.iterator();
+      Assert.assertEquals(DateHelper.formatAsUTC(DateHelper.parseIsoTimestamp("2011-03-03 00:00:00.0", timeZone)),
+          DateHelper.formatAsUTC(it.next().getStartDate()));
+      Assert.assertEquals(DateHelper.formatAsUTC(DateHelper.parseIsoTimestamp("2011-03-17 00:00:00.0", timeZone)),
+          DateHelper.formatAsUTC(it.next().getStartDate()));
+    }
   }
 
   private void testRRule(final TimeZone timeZone)

@@ -23,13 +23,14 @@
 
 package org.projectforge.plugins.teamcal;
 
+import org.projectforge.common.NumberHelper;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.ConfigurationData;
 
 public class TeamCalConfig implements ConfigurationData
 {
   // Don't change this, otherwise the synchronization with older entries may fail.
-  private static final String EVENT_UID_PREFIX = "pf-event";
+  static final String EVENT_UID_PREFIX = "pf-event";
 
   // Don't change this, otherwise the synchronization with older entries may fail.
   private static final String TIMESHEET_UID_PREFIX = "pf-ts";
@@ -44,7 +45,7 @@ public class TeamCalConfig implements ConfigurationData
     return config;
   }
 
-  private String domain = "projectforge.acme.priv";
+  String domain = "projectforge.acme.priv";
 
   /**
    * The domain is needed for having world wide unique uids. Please note: If you change this domain after working with this plugin,
@@ -85,6 +86,20 @@ public class TeamCalConfig implements ConfigurationData
   public String createUid(final String prefix, final String id)
   {
     return prefix + "-" + id + "@" + getDomain();
+  }
+
+  public Integer extractEventId(final String uid)
+  {
+    if (uid == null) {
+      return null;
+    }
+    final String prefix = EVENT_UID_PREFIX + "-";
+    final String suffix = "@" + getDomain();
+    if (uid.endsWith(suffix) == false || uid.startsWith(prefix) == false) {
+      return null;
+    }
+    final String idString = uid.substring(prefix.length(), uid.length() - suffix.length());
+    return NumberHelper.parseInteger(idString);
   }
 
   /**

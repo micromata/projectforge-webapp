@@ -23,12 +23,12 @@
 
 package org.projectforge.web.gantt;
 
-import org.projectforge.orga.ContractFilter;
+import org.projectforge.core.BaseSearchFilter;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("ContractFilter")
-public class GanttChartListFilter extends ContractFilter
+public class GanttChartListFilter extends BaseSearchFilter
 {
   private static final long serialVersionUID = -7381514878697257874L;
 
@@ -50,7 +50,7 @@ public class GanttChartListFilter extends ContractFilter
     return year;
   }
 
-  public void setYear(int year)
+  public void setYear(final int year)
   {
     this.year = year;
   }

@@ -41,7 +41,6 @@ import org.projectforge.fibu.kost.Kost2ArtDao;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
@@ -144,12 +143,6 @@ IListPageColumnsCreator<Kost2ArtDO>
   protected Kost2ArtDao getBaseDao()
   {
     return kost2ArtDao;
-  }
-
-  @Override
-  protected IModel<Kost2ArtDO> getModel(final Kost2ArtDO object)
-  {
-    return new DetachableDOModel<Kost2ArtDO, Kost2ArtDao>(object, getBaseDao());
   }
 
   protected Kost2ArtDao getKost2ArtDao()

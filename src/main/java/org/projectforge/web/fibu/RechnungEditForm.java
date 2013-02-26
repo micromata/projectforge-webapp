@@ -35,12 +35,15 @@ import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.RechnungDO;
 import org.projectforge.fibu.RechnungStatus;
 import org.projectforge.fibu.RechnungTyp;
 import org.projectforge.fibu.RechnungsPositionDO;
+import org.projectforge.fibu.kost.AccountingConfig;
+import org.projectforge.registry.Registry;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.PresizedImage;
 import org.projectforge.web.wicket.WebConstants;
@@ -106,7 +109,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     }
     {
       // Type
-      gridBuilder.newSubSplitPanel(GridSize.COL100);
+      gridBuilder.newSubSplitPanel(GridSize.COL50);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.typ"));
       final LabelValueChoiceRenderer<RechnungTyp> typeChoiceRenderer = new LabelValueChoiceRenderer<RechnungTyp>(this, RechnungTyp.values());
       final DropDownChoice<RechnungTyp> typeChoice = new DropDownChoice<RechnungTyp>(fs.getDropDownChoiceId(),
@@ -115,6 +118,17 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
       typeChoice.setRequired(true);
       fs.add(typeChoice);
     }
+    gridBuilder.newSubSplitPanel(GridSize.COL50);
+    if (Registry.instance().getKontoCache().isEmpty() == false) {
+      // Show this field only if DATEV accounts does exist.
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.konto"));
+      final KontoSelectPanel kontoSelectPanel = new KontoSelectPanel(fs.newChildId(), new PropertyModel<KontoDO>(data, "konto"), null,
+          "kontoId");
+      kontoSelectPanel.setKontoNumberRanges(AccountingConfig.getInstance().getDebitorsAccountNumberRanges()).init();
+      fs.addHelpIcon(getString("fibu.rechnung.konto.tooltip"));
+      fs.add(kontoSelectPanel);
+    }
+    gridBuilder.newSubSplitPanel(GridSize.COL100);
     {
       // Customer
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde"));
@@ -127,7 +141,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     }
     {
       // Projekt
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt")).supressLabelForWarning();
       final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data, "projekt"),
           parentPage, "projektId");
       fs.add(projektSelectPanel);

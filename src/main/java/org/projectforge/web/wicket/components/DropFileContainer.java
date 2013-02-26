@@ -27,10 +27,12 @@ import java.io.Serializable;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxSubmitLink;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.CompoundPropertyModel;
+import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * The panel which includes the drop behavior for several files. If the dropped file (string) was sucessfully importet, the hook method
@@ -43,12 +45,16 @@ public abstract class DropFileContainer extends Panel
 {
   private static final long serialVersionUID = 3622467918922963503L;
 
+  private final WebMarkupContainer main;
+
   /**
    * @param id
    */
   public DropFileContainer(final String id)
   {
     super(id);
+    main = new WebMarkupContainer("main");
+    add(main);
   }
 
   /**
@@ -59,7 +65,7 @@ public abstract class DropFileContainer extends Panel
   {
     super.onInitialize();
     final Form<FormBean> hiddenForm = new Form<FormBean>("hiddenForm", new CompoundPropertyModel<FormBean>(new FormBean()));
-    add(hiddenForm);
+    main.add(hiddenForm);
     hiddenForm.add(new TextArea<String>("importString"));
     hiddenForm.add(new AjaxSubmitLink("submitButton") {
       private static final long serialVersionUID = 6140567784494429257L;
@@ -77,6 +83,27 @@ public abstract class DropFileContainer extends Panel
       }
 
     });
+  }
+
+  /**
+   * @param content
+   * @return this for chaining.
+   */
+  public DropFileContainer setTooltip(final String content)
+  {
+    WicketUtils.addTooltip(main, content);
+    return this;
+  }
+
+  /**
+   * @param title
+   * @param content
+   * @return this for chaining.
+   */
+  public DropFileContainer setTooltip(final String title, final String content)
+  {
+    WicketUtils.addTooltip(main, title, content);
+    return this;
   }
 
   protected abstract void onStringImport(final AjaxRequestTarget target, final String string);

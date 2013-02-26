@@ -110,6 +110,7 @@ function initializeComponents() {
 	if ($("textarea.autogrow").length) {
 		$("textarea.autogrow").autoGrow();
 	}
+	
 	$('[rel=\'mypopup\']').hover(function(event) {
 		mouseX = event.pageX;
 		mouseY = event.pageY;
@@ -184,9 +185,10 @@ $.fn.mytooltip.defaults = $
 				{},
 				$.fn.tooltip.defaults,
 				{
-					animation : true,
+					animation : false,
 					selector : false,
 					trigger : 'manual',
+					container: 'body',
 					template : '<div class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
 				})
 
@@ -203,7 +205,19 @@ function showMyTooltip(obj) {
 			top : 0,
 			left : 0,
 			display : 'block'
-		}).insertAfter(obj.$element);
+		})
+
+		if (obj.options.container) {
+		    var parentContainer = obj.$element.parents(".modal");
+		    if (parentContainer.length == 0) {
+				$tip.appendTo(obj.options.container);
+		    } else {
+		    	$tip.appendTo(parentContainer);
+		    }
+		} else { 
+			$tip.insertAfter(obj.$element)
+		}
+
 		pos = obj.getPosition(inside);
 		boundTop = $(document).scrollTop();
 		boundLeft = $(document).scrollLeft();
@@ -284,6 +298,7 @@ $.fn.mypopover.defaults = $
 				{
 					width : 'normal',
 					trigger : 'manual',
+					container: 'body',
 					template : '<div class="popover"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"></div></div></div>'
 				})
 
@@ -391,6 +406,15 @@ $(function() {
 	});
 });
 
+$(function() {
+	/* Scroll to the highlighted table row if exist: */
+	var w = $(window);
+	var row = $('td.highlighted:first').parent('tr');
+	if (row.length){
+	    $('html,body').animate({scrollTop: row.offset().top - (w.height()/2)}, 500 );
+	}
+});
+
 function doAfterAjaxHandling() {
 	var $uploadProxy = $('.pf_uploadField button[name="fileUploadProxy"], .pf_uploadField .label');
 	$uploadProxy.unbind('click').click(function(e) {
@@ -449,7 +473,10 @@ function pf_deleteClick(element, content, liElement) {
 		// call initialization file only if API is available
 		if (window.File && window.FileList && window.FileReader) {
 			initDragAndDrop();
-		}
+		} else {
+            // disable dnd
+            $('.pf_dnd').addClass('disabled');
+        }
 	});
 
 	// initialize drag and drop

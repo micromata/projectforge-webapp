@@ -39,7 +39,6 @@ import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
@@ -120,12 +119,6 @@ IListPageColumnsCreator<AddressCampaignDO>
   protected AddressCampaignDao getBaseDao()
   {
     return addressCampaignDao;
-  }
-
-  @Override
-  protected IModel<AddressCampaignDO> getModel(final AddressCampaignDO object)
-  {
-    return new DetachableDOModel<AddressCampaignDO, AddressCampaignDao>(object, getBaseDao());
   }
 
   protected AddressCampaignDao getCampaignDao()

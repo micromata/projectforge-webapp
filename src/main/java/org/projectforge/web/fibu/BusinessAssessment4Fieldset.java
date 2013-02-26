@@ -56,7 +56,7 @@ public abstract class BusinessAssessment4Fieldset implements Serializable
       public boolean isVisible() {
         return BusinessAssessment4Fieldset.this.isVisible();
       };
-    }.setNoLabelFor();
+    }.supressLabelForWarning();
     fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
       @Override
       public String getObject()
@@ -113,7 +113,7 @@ public abstract class BusinessAssessment4Fieldset implements Serializable
     final DivPanel businessAssessmentPanel = gridBuilder.getPanel();
     businessAssessmentPanel.setMarkupId("businessAssessment");
     businessAssessmentPanel.add(AttributeModifier.append("style", "display: none;"));
-    final FieldsetPanel fieldset = new FieldsetPanel(businessAssessmentPanel, "").setNoLabelFor();
+    final FieldsetPanel fieldset = new FieldsetPanel(businessAssessmentPanel, "").supressLabelForWarning();
     final Label label = new Label(DivTextPanel.WICKET_ID, new Model<String>() {
       /**
        * @see org.apache.wicket.model.Model#getObject()

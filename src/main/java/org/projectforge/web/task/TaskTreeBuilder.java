@@ -56,6 +56,7 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.fibu.AuftragsPositionVO;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskFilter;
 import org.projectforge.task.TaskNode;
@@ -82,8 +83,6 @@ import org.projectforge.web.wicket.ListSelectActionPanel;
 public class TaskTreeBuilder implements Serializable
 {
   private static final long serialVersionUID = -2425308275690643856L;
-
-  private final TaskTree taskTree;
 
   private final Behavior theme = new WindowsTheme();
 
@@ -114,9 +113,8 @@ public class TaskTreeBuilder implements Serializable
   /**
    * @param id
    */
-  public TaskTreeBuilder(final TaskTree taskTree)
+  public TaskTreeBuilder()
   {
-    this.taskTree = taskTree;
   }
 
   @SuppressWarnings("serial")
@@ -125,8 +123,8 @@ public class TaskTreeBuilder implements Serializable
     this.parentPage = parentPage;
     final List<IColumn<TaskNode, String>> columns = createColumns();
 
-    tree = new TableTree<TaskNode, String>(id, columns, new TaskTreeProvider(taskFilter).setShowRootNode(showRootNode),
-        Integer.MAX_VALUE, TaskTreeExpansion.getExpansionModel()) {
+    tree = new TableTree<TaskNode, String>(id, columns, new TaskTreeProvider(taskFilter).setShowRootNode(showRootNode), Integer.MAX_VALUE,
+        TaskTreeExpansion.getExpansionModel()) {
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -166,6 +164,7 @@ public class TaskTreeBuilder implements Serializable
   @SuppressWarnings("serial")
   private List<IColumn<TaskNode, String>> createColumns()
   {
+    final TaskTree taskTree = getTaskTree();
     final CellItemListener<TaskNode> cellItemListener = new CellItemListener<TaskNode>() {
       public void populateItem(final Item<ICellPopulator<TaskNode>> item, final String componentId, final IModel<TaskNode> rowModel)
       {
@@ -200,7 +199,7 @@ public class TaskTreeBuilder implements Serializable
       public void populateItem(final Item<ICellPopulator<TaskNode>> item, final String componentId, final IModel<TaskNode> rowModel)
       {
         final TaskNode node = rowModel.getObject();
-        item.add(TaskListPage.getConsumptionBarPanel(tree, componentId, taskTree, selectMode, node));
+        item.add(TaskListPage.getConsumptionBarPanel(tree, componentId, getTaskTree(), selectMode, node));
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
@@ -209,7 +208,7 @@ public class TaskTreeBuilder implements Serializable
         @Override
         public void populateItem(final Item<ICellPopulator<TaskNode>> item, final String componentId, final IModel<TaskNode> rowModel)
         {
-          final Label label = TaskListPage.getKostLabel(componentId, taskTree, rowModel.getObject().getTask());
+          final Label label = TaskListPage.getKostLabel(componentId, getTaskTree(), rowModel.getObject().getTask());
           item.add(label);
           cellItemListener.populateItem(item, componentId, rowModel);
         }
@@ -380,6 +379,22 @@ public class TaskTreeBuilder implements Serializable
   public TaskTreeBuilder setHighlightedTaskNodeId(final Integer highlightedTaskNodeId)
   {
     this.highlightedTaskNodeId = highlightedTaskNodeId;
+    final TaskNode node = getTaskTree().getTaskNodeById(highlightedTaskNodeId);
+    if (node == null) {
+      // Shouldn't occur.
+      return this;
+    }
+    // Open all ancestor nodes of the highlighted node:
+    final Set<TaskNode> set = TaskTreeExpansion.getExpansionModel().getObject();
+    TaskNode parent = node.getParent();
+    while (parent != null) {
+      set.add(parent);
+      parent = parent.getParent();
+    }
     return this;
+  }
+
+  private TaskTree getTaskTree() {
+    return Registry.instance().getTaskTree();
   }
 }

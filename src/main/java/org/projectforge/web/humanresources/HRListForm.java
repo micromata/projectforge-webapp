@@ -60,7 +60,7 @@ public class HRListForm extends AbstractListForm<HRFilter, HRListPage>
     super.init();
     final HRFilter filter = getSearchFilter();
     gridBuilder.newGridPanel();
-    final FieldsetPanel fs = gridBuilder.newFieldset(super.getOptionsLabel()).setNoLabelFor();
+    final FieldsetPanel fs = gridBuilder.newFieldset(super.getOptionsLabel()).supressLabelForWarning();
     final DivPanel optionsCheckBoxesPanel = fs.addNewCheckBoxDiv();
     optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(filter, "showPlanning"),
         getString("hr.planning.filter.showPlanning")));
@@ -72,6 +72,8 @@ public class HRListForm extends AbstractListForm<HRFilter, HRListPage>
         getString("hr.planning.filter.allProjectsGroupedByCustomer")));
     optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(filter, "otherProjectsGroupedByCustomer"),
         getString("hr.planning.filter.otherProjectsGroupedByCustomer")));
+    pageSizeFieldsetPanel.setVisible(false);
+    setPageSize(Integer.MAX_VALUE);
   }
 
   public HRListForm(final HRListPage parentPage)

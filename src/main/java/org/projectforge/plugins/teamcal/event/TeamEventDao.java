@@ -26,8 +26,11 @@ package org.projectforge.plugins.teamcal.event;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -40,9 +43,12 @@ import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.DateHelper;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.core.DisplayHistoryEntry;
 import org.projectforge.core.QueryFilter;
+import org.projectforge.plugins.teamcal.TeamCalConfig;
 import org.projectforge.plugins.teamcal.admin.TeamCalCache;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
+import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalsProvider;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserRightId;
@@ -64,8 +70,12 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
 
   private static final long ONE_DAY = 1000 * 60 * 60 * 24;
 
+  private static final Class< ? >[] ADDITIONAL_HISTORY_SEARCH_DOS = new Class[] { TeamEventAttendeeDO.class};
+
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "subject", "location", "calendar.id", "calendar.title", "note",
   "attendees"};
+
+  private TeamCalDao teamCalDao;
 
   public TeamEventDao()
   {
@@ -77,6 +87,39 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
   protected String[] getAdditionalSearchFields()
   {
     return ADDITIONAL_SEARCH_FIELDS;
+  }
+
+  /**
+   * @param teamEvent
+   * @param teamCalendarId If null, then team calendar will be set to null;
+   * @see BaseDao#getOrLoad(Integer)
+   */
+  public void setCalendar(final TeamEventDO teamEvent, final Integer teamCalendarId)
+  {
+    final TeamCalDO teamCal = teamCalDao.getOrLoad(teamCalendarId);
+    teamEvent.setCalendar(teamCal);
+  }
+
+
+  @SuppressWarnings("unchecked")
+  public TeamEventDO getByUid(final String uid)
+  {
+    if (uid == null) {
+      return null;
+    }
+    List<TeamEventDO> list;
+    final Integer id = TeamCalConfig.get().extractEventId(uid);
+    if (id != null) {
+      // The uid refers an own event, therefore search for the extracted id.
+      list = getHibernateTemplate().find("from TeamEventDO e where e.id = ? and e.deleted = false", id);
+    } else {
+      // It's an external event:
+      list = getHibernateTemplate().find("from TeamEventDO e where e.externalUid = ? and e.deleted = false", uid);
+    }
+    if (list != null && list.isEmpty() == false && list.get(0) != null) {
+      return list.get(0);
+    }
+    return null;
   }
 
   /**
@@ -109,6 +152,10 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
   @Override
   protected void afterLoad(final TeamEventDO event)
   {
+    if (event.afterLoadCalled == true) {
+      return;
+    }
+    event.afterLoadCalled = true;
     super.afterLoad(event);
     if (event.isAllDay() == false) {
       return;
@@ -138,6 +185,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     final QueryFilter qFilter = buildQueryFilter(teamEventFilter);
     qFilter.add(Restrictions.isNotNull("recurrenceRule"));
     list = getList(qFilter);
+    list = selectUnique(list);
     final TimeZone timeZone = PFUserContext.getTimeZone();
     if (list != null) {
       for (final TeamEventDO eventDO : list) {
@@ -301,6 +349,65 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     return queryFilter;
   }
 
+  /**
+   * Gets history entries of super and adds all history entries of the TeamEventAttendeeDO childs.
+   * @see org.projectforge.core.BaseDao#getDisplayHistoryEntries(org.projectforge.core.ExtendedBaseDO)
+   */
+  @Override
+  public List<DisplayHistoryEntry> getDisplayHistoryEntries(final TeamEventDO obj)
+  {
+    final List<DisplayHistoryEntry> list = super.getDisplayHistoryEntries(obj);
+    if (hasLoggedInUserHistoryAccess(obj, false) == false) {
+      return list;
+    }
+    if (CollectionUtils.isNotEmpty(obj.getAttendees()) == true) {
+      for (final TeamEventAttendeeDO attendee : obj.getAttendees()) {
+        final List<DisplayHistoryEntry> entries = internalGetDisplayHistoryEntries(attendee);
+        for (final DisplayHistoryEntry entry : entries) {
+          final String propertyName = entry.getPropertyName();
+          if (propertyName != null) {
+            entry.setPropertyName(attendee.toString() + ":" + entry.getPropertyName()); // Prepend user name or url to identify.
+          } else {
+            entry.setPropertyName(attendee.toString());
+          }
+        }
+        list.addAll(entries);
+      }
+    }
+    Collections.sort(list, new Comparator<DisplayHistoryEntry>() {
+      public int compare(final DisplayHistoryEntry o1, final DisplayHistoryEntry o2)
+      {
+        return (o2.getTimestamp().compareTo(o1.getTimestamp()));
+      }
+    });
+    return list;
+  }
+
+  @Override
+  protected Class< ? >[] getAdditionalHistorySearchDOs()
+  {
+    return ADDITIONAL_HISTORY_SEARCH_DOS;
+  }
+
+  /**
+   * Returns also true, if idSet contains the id of any attendee.
+   * @see org.projectforge.core.BaseDao#contains(java.util.Set, org.projectforge.core.ExtendedBaseDO)
+   */
+  @Override
+  protected boolean contains(final Set<Integer> idSet, final TeamEventDO entry)
+  {
+    if (super.contains(idSet, entry) == true) {
+      return true;
+    }
+    for (final TeamEventAttendeeDO pos : entry.getAttendees()) {
+      if (idSet.contains(pos.getId()) == true) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+
   @Override
   public TeamEventDO newInstance()
   {
@@ -322,5 +429,13 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
   protected boolean useOwnCriteriaCacheRegion()
   {
     return true;
+  }
+
+  /**
+   * @param teamCalDao the teamCalDao to set
+   */
+  public void setTeamCalDao(final TeamCalDao teamCalDao)
+  {
+    this.teamCalDao = teamCalDao;
   }
 }

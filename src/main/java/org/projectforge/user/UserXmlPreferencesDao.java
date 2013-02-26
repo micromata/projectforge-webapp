@@ -30,6 +30,7 @@ import java.util.Map;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.Validate;
 import org.projectforge.access.AccessChecker;
+import org.projectforge.common.GZIPHelper;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.task.TaskDO;
@@ -38,6 +39,8 @@ import org.projectforge.task.TaskFilter;
 import org.projectforge.timesheet.TimesheetPrefData;
 import org.projectforge.web.scripting.RecentScriptCalls;
 import org.projectforge.web.scripting.ScriptCallData;
+import org.projectforge.xstream.JodaDateMidnightConverter;
+import org.projectforge.xstream.JodaDateTimeConverter;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -46,7 +49,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.thoughtworks.xstream.XStream;
 
 /**
- * Stores all user persistent objects such as filter settings, personal settings and persists them to the database.
+ * Stores all user persistent objects such as filter settings, personal settings and persists them to the database as xml (compressed (gzip
+ * and base64) for larger xml content).
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
@@ -68,6 +72,8 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
     registerConverter(UserDao.class, PFUserDO.class, 20);
     registerConverter(GroupDao.class, GroupDO.class, 19);
     registerConverter(TaskDao.class, TaskDO.class, 18);
+    xstream.registerConverter(new JodaDateTimeConverter());
+    xstream.registerConverter(new JodaDateMidnightConverter());
   }
 
   /**
@@ -154,6 +160,14 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
     try {
       UserXmlPreferencesMigrationDao.migrate(userPrefs);
       xml = userPrefs.getSerializedSettings();
+      if (xml == null || xml.length() == 0) {
+        return null;
+      }
+      if (xml.startsWith("!") == true) {
+        // Uncompress value:
+        final String uncompressed = GZIPHelper.uncompress(xml.substring(1));
+        xml = uncompressed;
+      }
       final Object value = xstream.fromXML(xml);
       return value;
     } catch (final Throwable ex) {
@@ -206,7 +220,13 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
       userPrefs.setUserId(userId);
       userPrefs.setKey(key);
     }
-    userPrefs.setSerializedSettings(xml);
+    if (xml.length() > 1000) {
+      // Compress value:
+      final String compressed = GZIPHelper.compress(xml);
+      userPrefs.setSerializedSettings("!" + compressed);
+    } else {
+      userPrefs.setSerializedSettings(xml);
+    }
     userPrefs.setLastUpdate(date);
     userPrefs.setVersion();
     if (isNew == true) {

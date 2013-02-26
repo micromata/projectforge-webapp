@@ -142,7 +142,7 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
     final GridSize gridSize = costConfigured == true ? GridSize.COL33 : GridSize.COL50;
     gridBuilder.newSplitPanel(gridSize);
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.user")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.user")).supressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
         /**
          * @see org.apache.wicket.model.Model#getObject()
@@ -157,7 +157,7 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
     }
     if (costConfigured == true) {
       gridBuilder.newSplitPanel(gridSize);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost1")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost1")).supressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
         /**
          * @see org.apache.wicket.model.Model#getObject()
@@ -175,7 +175,7 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
     }
     gridBuilder.newSplitPanel(gridSize);
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.workingDays")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.workingDays")).supressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
         @Override
         public String getObject()
@@ -196,7 +196,7 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
         {
           return report != null && StringUtils.isNotBlank(report.getFormattedUnbookedDays());
         }
-      }.setNoLabelFor();
+      }.supressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
         /**
          * @see org.apache.wicket.model.Model#getObject()
@@ -305,10 +305,10 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
       for (final MonthlyEmployeeReportWeek week : report.getWeeks()) {
         colWeekRepeater.add(new Label(colWeekRepeater.newChildId(), week.getFormattedTotalDuration()));
       }
-      row.add(new Label("sum", report.getFormattedNetDuration()).add(AttributeModifier.replace("style",
+      row.add(new Label("sum", report.getFormattedTotalNetDuration()).add(AttributeModifier.replace("style",
           "font-weight: bold; color:red; text-align: right;")));
     }
-    if (report.getTotalDuration() != report.getNetDuration()) {
+    if (report.getTotalGrossDuration() != report.getTotalNetDuration()) {
       // Net sum row.
       final WebMarkupContainer row = new WebMarkupContainer(rowRepeater.newChildId());
       rowRepeater.add(row);
@@ -332,7 +332,7 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
       final MonthlyEmployeeReportWeek week : report.getWeeks()) {
         colWeekRepeater.add(new Label(colWeekRepeater.newChildId(), ""));
       }
-      row.add(new Label("sum", report.getFormattedTotalDuration()).add(AttributeModifier.replace("style",
+      row.add(new Label("sum", report.getFormattedTotalGrossDuration()).add(AttributeModifier.replace("style",
           "font-weight: bold; text-align: right;")));
     }
   }

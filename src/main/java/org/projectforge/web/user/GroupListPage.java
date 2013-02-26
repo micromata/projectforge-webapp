@@ -43,7 +43,6 @@ import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
@@ -127,12 +126,6 @@ public class GroupListPage extends AbstractListPage<GroupListForm, GroupDao, Gro
   protected GroupDao getBaseDao()
   {
     return groupDao;
-  }
-
-  @Override
-  protected IModel<GroupDO> getModel(final GroupDO object)
-  {
-    return new DetachableDOModel<GroupDO, GroupDao>(object, getBaseDao());
   }
 
   protected GroupDao getGroupDao()

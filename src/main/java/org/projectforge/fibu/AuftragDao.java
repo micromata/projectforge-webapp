@@ -73,7 +73,7 @@ public class AuftragDao extends BaseDao<AuftragDO>
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AuftragDao.class);
 
-  private static final Class< ? >[] ADDITIONAL_SEARCH_DOS = new Class[] { AuftragsPositionDO.class};
+  private static final Class< ? >[] ADDITIONAL_HISTORY_SEARCH_DOS = new Class[] { AuftragsPositionDO.class};
 
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "contactPerson.username", "contactPerson.firstname",
     "contactPerson.lastname", "kunde.name", "projekt.name", "projekt.kunde.name", "positionen.position", "positionen.art",
@@ -591,7 +591,7 @@ public class AuftragDao extends BaseDao<AuftragDO>
   @Override
   protected Class< ? >[] getAdditionalHistorySearchDOs()
   {
-    return ADDITIONAL_SEARCH_DOS;
+    return ADDITIONAL_HISTORY_SEARCH_DOS;
   }
 
   /**

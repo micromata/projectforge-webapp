@@ -206,7 +206,7 @@ extends AbstractEditForm<O, P>
         }
       }, TextStyle.FORM_TEXT);
       fs.add(netPanel);
-      fs.setNoLabelFor();
+      fs.supressLabelForWarning();
       ajaxUpdateComponents.add(netPanel.getLabel4Ajax());
     }
     gridBuilder.newSubSplitPanel(GridSize.COL50);
@@ -221,7 +221,7 @@ extends AbstractEditForm<O, P>
         }
       }, TextStyle.FORM_TEXT);
       fs.add(vatPanel);
-      fs.setNoLabelFor();
+      fs.supressLabelForWarning();
       ajaxUpdateComponents.add(vatPanel.getLabel4Ajax());
     }
     gridBuilder.newSubSplitPanel(GridSize.COL50);
@@ -236,7 +236,7 @@ extends AbstractEditForm<O, P>
         }
       }, TextStyle.FORM_TEXT);
       fs.add(grossPanel);
-      fs.setNoLabelFor();
+      fs.supressLabelForWarning();
       ajaxUpdateComponents.add(grossPanel.getLabel4Ajax());
     }
     gridBuilder.newSubSplitPanel(GridSize.COL50);
@@ -408,9 +408,7 @@ extends AbstractEditForm<O, P>
         positionsPanel.setOpen();
       }
       positionsPanel.setHeading(getPositionHeading(position, positionsPanel));
-      final DivPanel content = new DivPanel(ToggleContainerPanel.CONTENT_ID);
-      positionsPanel.add(content);
-      final GridBuilder posGridBuilder = new GridBuilder(content, content.newChildId(), true);
+      final GridBuilder posGridBuilder = positionsPanel.createGridBuilder();
       final GridSize gridSize = (rechnungsPosition != null) ? GridSize.COL25 : GridSize.COL33;
       {
         posGridBuilder.newSplitPanel(GridSize.COL50, true);
@@ -507,7 +505,7 @@ extends AbstractEditForm<O, P>
         posGridBuilder.newSplitPanel(GridSize.COL50, true);
         posGridBuilder.newSubSplitPanel(GridSize.COL33);
         {
-          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.common.netto")).setLabelSide(false).setNoLabelFor();
+          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.common.netto")).setLabelSide(false).supressLabelForWarning();
           final TextPanel netTextPanel = new TextPanel(fieldset.newChildId(), new Model<String>() {
             @Override
             public String getObject()
@@ -522,7 +520,7 @@ extends AbstractEditForm<O, P>
       {
         posGridBuilder.newSubSplitPanel(GridSize.COL33);
         {
-          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.common.vatAmount")).setLabelSide(false).setNoLabelFor();
+          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.common.vatAmount")).setLabelSide(false).supressLabelForWarning();
           final TextPanel vatTextPanel = new TextPanel(fieldset.newChildId(), new Model<String>() {
             @Override
             public String getObject()
@@ -537,7 +535,7 @@ extends AbstractEditForm<O, P>
       {
         posGridBuilder.newSubSplitPanel(GridSize.COL33);
         {
-          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.common.brutto")).setLabelSide(false).setNoLabelFor();
+          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.common.brutto")).setLabelSide(false).supressLabelForWarning();
           final TextPanel grossTextPanel = new TextPanel(fieldset.newChildId(), new Model<String>() {
             @Override
             public String getObject()

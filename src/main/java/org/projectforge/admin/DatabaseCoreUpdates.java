@@ -56,13 +56,41 @@ public class DatabaseCoreUpdates
   {
     final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
     // /////////////////////////////////////////////////////////////////
+    // 4.3.2
+    // /////////////////////////////////////////////////////////////////
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "4.3.2", "2013-02-15",
+        "Adds t_fibu_rechnung.konto, fixes contract.IN_PROGRES -> contract.IN_PROGRESS") {
+      final Table rechnungTable = new Table(RechnungDO.class);
+
+      @Override
+      public UpdatePreCheckStatus runPreCheck()
+      {
+        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
+        final int entriesToMigrate = dao.queryForInt("select count(*) from t_contract where status='IN_PROGRES'");
+        return dao.doesTableAttributesExist(rechnungTable, "konto") == true //
+            && entriesToMigrate == 0 //
+            ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
+      }
+
+      @Override
+      public UpdateRunningStatus runUpdate()
+      {
+        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
+        if (dao.doesTableAttributesExist(rechnungTable, "konto") == false) {
+          dao.addTableAttributes(rechnungTable, new TableAttribute(RechnungDO.class, "konto"));
+        }
+        final int entriesToMigrate = dao.queryForInt("select count(*) from t_contract where status='IN_PROGRES'");
+        if (entriesToMigrate > 0) {
+          dao.execute("update t_contract set status='IN_PROGRESS' where status='IN_PROGRES'", true);
+        }
+        return UpdateRunningStatus.DONE;
+      }
+    });
+
+    // /////////////////////////////////////////////////////////////////
     // 4.3.1
     // /////////////////////////////////////////////////////////////////
-    list.add(new UpdateEntryImpl(
-        CORE_REGION_ID,
-        "4.3.1",
-        "2013-01-29",
-        "Adds t_fibu_projekt.konto") {
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "4.3.1", "2013-01-29", "Adds t_fibu_projekt.konto") {
       final Table projektTable = new Table(ProjektDO.class);
 
       @Override
@@ -70,7 +98,8 @@ public class DatabaseCoreUpdates
       {
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         return dao.doesTableAttributesExist(projektTable, "konto") == true //
-            ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
+            ? UpdatePreCheckStatus.ALREADY_UPDATED
+                : UpdatePreCheckStatus.OK;
       }
 
       @Override
@@ -83,7 +112,6 @@ public class DatabaseCoreUpdates
         return UpdateRunningStatus.DONE;
       }
     });
-
 
     // /////////////////////////////////////////////////////////////////
     // 4.2
@@ -108,7 +136,7 @@ public class DatabaseCoreUpdates
       {
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         return dao.doesTableAttributesExist(userTable, "authenticationToken", "localUser", "restrictedUser", "deactivated", "ldapValues") == true //
-            && dao.doesTableAttributesExist(groupTable, "localGroup") == true //, "nestedGroupsAllowed", "nestedGroupIds") == true //
+            && dao.doesTableAttributesExist(groupTable, "localGroup") == true // , "nestedGroupsAllowed", "nestedGroupIds") == true //
             && dao.doesTableAttributesExist(outgoingInvoiceTable, "uiStatusAsXml") == true //
             && dao.doesTableAttributesExist(incomingInvoiceTable, "uiStatusAsXml") == true //
             && dao.doesTableAttributesExist(orderTable, "uiStatusAsXml") == true //
