@@ -25,7 +25,9 @@ package org.projectforge.web.wicket;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
@@ -75,6 +77,11 @@ extends AbstractSecuredPage implements ISelectCallerPage
   private List<O> resultList;
 
   private boolean refreshResultList = true;
+
+  /**
+   * For selecting items for mass update (only used by some pages).
+   */
+  protected Set<Integer> selectedItems;
 
   protected static final String[] BOOKMARKABLE_INITIAL_PROPERTIES = new String[] { "f.searchString|s", "f.useModificationFilter|mod",
     "f.modifiedByUserId|mUser", "f.startTimeOfLastModification|mStart", "f.stopTimeOfLastModification|mStop", "f.deleted|del", "pageSize"};
@@ -465,6 +472,9 @@ extends AbstractSecuredPage implements ISelectCallerPage
     form.remove(dataTable);
     createDataTable();
     form.setComponentsVisibility();
+    if (mode == true && selectedItems == null) {
+      selectedItems = new HashSet<Integer>();
+    }
   }
 
   protected void onNextSubmit()
@@ -792,5 +802,32 @@ extends AbstractSecuredPage implements ISelectCallerPage
   public boolean isCalledBySearchPage()
   {
     return calledBySearchPage;
+  }
+
+  @SuppressWarnings("serial")
+  public class SelectItemModel extends Model<Boolean>
+  {
+    Integer id;
+
+    public SelectItemModel(final Integer id)
+    {
+      this.id = id;
+    }
+
+    @Override
+    public Boolean getObject()
+    {
+      return selectedItems.contains(id);
+    }
+
+    @Override
+    public void setObject(final Boolean object)
+    {
+      if (Boolean.TRUE.equals(object) == true) {
+        selectedItems.add(id);
+      } else {
+        selectedItems.remove(id);
+      }
+    }
   }
 }
