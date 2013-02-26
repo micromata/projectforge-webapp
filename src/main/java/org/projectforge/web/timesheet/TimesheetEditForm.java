@@ -231,6 +231,18 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
           super.selectTask(task);
           refresh(); // Task was changed. Therefore update the kost2 list.
         }
+
+        /**
+         * @see org.projectforge.web.task.TaskSelectPanel#onModelSelected(org.apache.wicket.ajax.AjaxRequestTarget,
+         *      org.projectforge.task.TaskDO)
+         */
+        @Override
+        protected void onModelSelected(final AjaxRequestTarget target, final TaskDO taskDo)
+        {
+          final TimesheetDO timesheet = getData();
+          timesheet.setTask(taskDo);
+          setResponsePage(new TimesheetEditPage(timesheet));
+        }
       };
       fs.add(taskSelectPanel);
       taskSelectPanel.init();
