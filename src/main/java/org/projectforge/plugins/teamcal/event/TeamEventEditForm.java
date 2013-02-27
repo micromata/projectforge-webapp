@@ -132,7 +132,9 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
   private final FormComponent< ? >[] dependentFormComponents = new FormComponent[6];
 
-  private List<AlarmReminderType> reminderTypeChoiceList;
+  private List<ReminderActionType> reminderActionTypeList;
+
+  private List<AlarmReminderType> reminderDurationTypeList;
 
   /**
    * @param parentPage
@@ -241,11 +243,17 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       // Reminder
       // ///////////////////////////////
       final FieldsetPanel reminderPanel = gridBuilder.newFieldset(getString("plugins.teamcal.event.reminder.title"));
-      final TextField<Integer> duration = new TextField<Integer>(reminderPanel.getTextFieldId(), new PropertyModel<Integer>(data, "alarmReminderDur"));
-      reminderPanel.add(duration);
+      final FieldsetPanel reminderOptionPanel = gridBuilder.newFieldset(""); // getString("plugins.teamcal.event.reminder.options"));
+      final boolean reminderOptionVisibility = data.getReminderActionType() != ReminderActionType.NONE;
 
-      final IChoiceRenderer<AlarmReminderType> reminderEntriesRenderer = new IChoiceRenderer<AlarmReminderType>(){
+      final TextField<Integer> reminderDuration = new TextField<Integer>(reminderOptionPanel.getTextFieldId(), new PropertyModel<Integer>(data, "reminderDuration"));
+      reminderDuration.setVisible(reminderOptionVisibility);
+      reminderDuration.setOutputMarkupId(true);
+      reminderDuration.setOutputMarkupPlaceholderTag(true);
+      reminderOptionPanel.add(reminderDuration);
 
+      // reminder duration dropdown
+      final IChoiceRenderer<AlarmReminderType> reminderDurationTypeRenderer = new IChoiceRenderer<AlarmReminderType>(){
         @Override
         public Object getDisplayValue(final AlarmReminderType object)
         {
@@ -257,19 +265,69 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
         {
           return object.name();
         }
-
       };
 
-      reminderTypeChoiceList = new ArrayList<AlarmReminderType>();
+      reminderDurationTypeList = new ArrayList<AlarmReminderType>();
       for (final AlarmReminderType type : AlarmReminderType.values()) {
-        reminderTypeChoiceList.add(type);
+        reminderDurationTypeList.add(type);
       }
 
-      final IModel<List<AlarmReminderType>> choicesModel = new PropertyModel<List<AlarmReminderType>>(this, "reminderTypeChoiceList");
-      final IModel<AlarmReminderType> activeModel = new PropertyModel<AlarmReminderType>(data, "alarmReminderType");
-      final DropDownChoicePanel<AlarmReminderType> reminderTypeChoose = new DropDownChoicePanel<AlarmReminderType>(reminderPanel.newChildId(), activeModel,
-          choicesModel, reminderEntriesRenderer, false);
-      reminderPanel.add(reminderTypeChoose);
+      final IModel<List<AlarmReminderType>> reminderDurationChoicesModel = new PropertyModel<List<AlarmReminderType>>(this, "reminderDurationTypeList");
+      final IModel<AlarmReminderType> reminderDurationActiveModel = new PropertyModel<AlarmReminderType>(data, "reminderDurationType");
+      final DropDownChoicePanel<AlarmReminderType> reminderDurationTypeChoice = new DropDownChoicePanel<AlarmReminderType>(reminderOptionPanel.newChildId(), reminderDurationActiveModel,
+          reminderDurationChoicesModel, reminderDurationTypeRenderer, false);
+      reminderDurationTypeChoice.setVisible(reminderOptionVisibility);
+      reminderDurationTypeChoice.getDropDownChoice().setOutputMarkupId(true);
+      reminderDurationTypeChoice.getDropDownChoice().setOutputMarkupPlaceholderTag(true);
+      reminderOptionPanel.add(reminderDurationTypeChoice);
+
+      // reminder action drop down
+      final IChoiceRenderer<ReminderActionType> reminderActionTypeRenderer = new IChoiceRenderer<ReminderActionType>(){
+        @Override
+        public Object getDisplayValue(final ReminderActionType object)
+        {
+          return getString(object.getI18nKey());
+        }
+
+        @Override
+        public String getIdValue(final ReminderActionType object, final int index)
+        {
+          return object.name();
+        }
+      };
+
+      reminderActionTypeList = new ArrayList<ReminderActionType>();
+      for (final ReminderActionType type : ReminderActionType.values()) {
+        reminderActionTypeList.add(type);
+      }
+
+      final IModel<List<ReminderActionType>> reminderActionTypeChoiceModel = new PropertyModel<List<ReminderActionType>>(this, "reminderActionTypeList");
+      final IModel<ReminderActionType> reminderActionActiveModel = new PropertyModel<ReminderActionType>(data, "reminderActionType");
+      final DropDownChoicePanel<ReminderActionType> reminderActionTypeChoice = new DropDownChoicePanel<ReminderActionType>(reminderPanel.newChildId(), reminderActionActiveModel,
+          reminderActionTypeChoiceModel, reminderActionTypeRenderer, false);
+      reminderActionTypeChoice.getDropDownChoice().add(new AjaxFormComponentUpdatingBehavior("onChange"){
+
+        @Override
+        protected void onUpdate(final AjaxRequestTarget target)
+        {
+          if (data.getReminderActionType() != null) {
+            if (data.getReminderActionType().equals(ReminderActionType.MESSAGE) || data.getReminderActionType().equals(ReminderActionType.MESSAGE_SOUND)) {
+              reminderDuration.setVisible(true);
+              reminderDurationTypeChoice.getDropDownChoice().setVisible(true);
+              target.add(reminderDurationTypeChoice.getDropDownChoice(), reminderDuration);
+              return;
+            } else if (data.getReminderActionType().equals(ReminderActionType.NONE)) {
+              reminderDuration.setVisible(false);
+              reminderDurationTypeChoice.getDropDownChoice().setVisible(false);
+              target.add(reminderDurationTypeChoice.getDropDownChoice(), reminderDuration);
+              return;
+            }
+          }
+        }
+
+      });
+      reminderPanel.add(reminderActionTypeChoice);
+
     }
 
 
