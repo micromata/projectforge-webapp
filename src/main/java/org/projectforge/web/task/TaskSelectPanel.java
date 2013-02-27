@@ -264,7 +264,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
    */
   private void initAutoCompletePanels()
   {
-    userselectContainer = new WebMarkupContainer("userselectContainer"){
+    userselectContainer = new WebMarkupContainer("userselectContainer") {
       private static final long serialVersionUID = -4871020567729661148L;
 
       /**
@@ -298,6 +298,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
     userselectContainer.add(searchTaskInput);
     // opener link
     final WebMarkupContainer searchTaskInputOpen = new WebMarkupContainer("searchTaskInputOpen");
+    WicketUtils.addTooltip(searchTaskInputOpen, getString("quickselect"));
     divContainer.add(searchTaskInputOpen);
     searchTaskInputOpen.add(new AjaxEventBehavior("click") {
       private static final long serialVersionUID = -938527474172868488L;
@@ -333,7 +334,8 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
    * @param target
    * @param taskDo
    */
-  protected void onModelSelected(final AjaxRequestTarget target, final TaskDO taskDo) {
+  protected void onModelSelected(final AjaxRequestTarget target, final TaskDO taskDo)
+  {
     target.add(divContainer);
     target.add(userselectContainer);
   }
