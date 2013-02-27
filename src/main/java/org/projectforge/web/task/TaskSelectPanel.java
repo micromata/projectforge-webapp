@@ -308,6 +308,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
         ajaxTaskSelectMode = true;
         target.add(divContainer);
         target.add(userselectContainer);
+        target.focusComponent(searchTaskInput);
       }
     });
     // close link
