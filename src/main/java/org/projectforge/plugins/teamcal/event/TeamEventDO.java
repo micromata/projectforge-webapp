@@ -463,7 +463,9 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   public TeamEventDO addRecurrenceExDate(final Date date)
   {
     final DateFormat df = new SimpleDateFormat(RECURRENCE_EXDATE_FORMAT);
+    // Need the user's time-zone for getting midnight of desired date.
     df.setTimeZone(PFUserContext.getTimeZone());
+    // But print it as UTC date:
     final String exDate = df.format(date) + "Z";
     if (recurrenceExDate == null) {
       recurrenceExDate = exDate;
