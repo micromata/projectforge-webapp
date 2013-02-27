@@ -212,14 +212,14 @@ public class TeamEventUtils
           weeksToDays = dur.getWeeks() * DURATION_OF_WEEK;
         }
         if (dur.getDays() != 0) {
-          teamEvent.setAlarmReminderDur(dur.getDays() + weeksToDays);
-          teamEvent.setAlarmReminderType(AlarmReminderType.DAYS);
+          teamEvent.setReminderDuration(dur.getDays() + weeksToDays);
+          teamEvent.setReminderDurationType(AlarmReminderType.DAYS);
         } else if (dur.getHours() != 0) {
-          teamEvent.setAlarmReminderDur(dur.getHours());
-          teamEvent.setAlarmReminderType(AlarmReminderType.HOURS);
+          teamEvent.setReminderDuration(dur.getHours());
+          teamEvent.setReminderDurationType(AlarmReminderType.HOURS);
         } else if (dur.getMinutes() != 0) {
-          teamEvent.setAlarmReminderDur(dur.getMinutes());
-          teamEvent.setAlarmReminderType(AlarmReminderType.MINUTES);
+          teamEvent.setReminderDuration(dur.getMinutes());
+          teamEvent.setReminderDurationType(AlarmReminderType.MINUTES);
         }
       }
     }

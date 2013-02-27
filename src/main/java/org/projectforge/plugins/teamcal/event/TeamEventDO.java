@@ -130,9 +130,11 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
 
   transient boolean afterLoadCalled;
 
-  private Integer alarmReminderDur;
+  private Integer reminderDuration;
 
-  private AlarmReminderType alarmReminderType;
+  private AlarmReminderType reminderDurationType;
+
+  private ReminderActionType reminderActionType;
 
   /**
    * Clear fields for viewers with minimal access. If you add new fields don't forget to clear these fields here.
@@ -524,44 +526,67 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   }
 
   /**
-   * Get duration.
+   * Get reminder duration.
    * 
    * @return
    */
-  @Column(name = "alarmReminderDur")
-  public Integer getAlarmReminderDur() {
-    return alarmReminderDur;
+  @Column(name = "reminderDuration")
+  public Integer getReminderDuration() {
+    return reminderDuration;
   }
 
   /**
-   * Get type of duration
+   * Get type of reminder duration
    * minute, hour, day
    * 
-   * @return the alarmReminderType
+   * @return the reminderDurationType
    */
-  @Column(name = "alarmReminderType")
+  @Column(name = "reminderDurationType")
   @Enumerated(EnumType.STRING)
-  public AlarmReminderType getAlarmReminderType()
+  public AlarmReminderType getReminderDurationType()
   {
-    return alarmReminderType;
+    return reminderDurationType;
   }
 
   /**
-   * @param alarmReminderType the alarmReminderType to set
+   * @param reminderDurationType the alarmReminderType to set
    * @return this for chaining.
    */
-  public void setAlarmReminderType(final AlarmReminderType alarmReminderType)
+  public void setReminderDurationType(final AlarmReminderType reminderDurationType)
   {
-    this.alarmReminderType = alarmReminderType;
+    this.reminderDurationType = reminderDurationType;
   }
 
   /**
    * @param trigger the trigger to set
    * @return this for chaining.
    */
-  public void setAlarmReminderDur(final Integer trigger)
+  public void setReminderDuration(final Integer trigger)
   {
-    this.alarmReminderDur = trigger;
+    this.reminderDuration = trigger;
+  }
+
+  /**
+   * Gets type of event action.
+   * NONE, AUDIO or DISPLAY
+   * 
+   * @return the reminderType
+   */
+  @Enumerated(EnumType.STRING)
+  public ReminderActionType getReminderActionType()
+  {
+    return reminderActionType;
+  }
+
+  /**
+   * Set type of event action.
+   * 
+   * @param reminderActionType the reminderType to set
+   * @return this for chaining.
+   */
+  public void setReminderActionType(final ReminderActionType reminderActionType)
+  {
+    this.reminderActionType = reminderActionType;
   }
 
   /**
