@@ -57,12 +57,12 @@ import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.calendar.TimePeriod;
-import org.projectforge.common.DateHelper;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.PFPersistancyBehavior;
 import org.projectforge.database.Constants;
 import org.projectforge.plugins.teamcal.TeamCalConfig;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
+import org.projectforge.user.PFUserContext;
 
 /**
  * Overview of used (and may-be planned) fields:
@@ -463,7 +463,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   public TeamEventDO addRecurrenceExDate(final Date date)
   {
     final DateFormat df = new SimpleDateFormat(RECURRENCE_EXDATE_FORMAT);
-    df.setTimeZone(DateHelper.UTC);
+    df.setTimeZone(PFUserContext.getTimeZone());
     final String exDate = df.format(date) + "Z";
     if (recurrenceExDate == null) {
       recurrenceExDate = exDate;
