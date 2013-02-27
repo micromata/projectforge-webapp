@@ -244,10 +244,14 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       // ///////////////////////////////
       final FieldsetPanel reminderPanel = gridBuilder.newFieldset(getString("plugins.teamcal.event.reminder.title"));
       final FieldsetPanel reminderOptionPanel = gridBuilder.newFieldset(""); // getString("plugins.teamcal.event.reminder.options"));
+      if (isNew() == true) {
+        data.setReminderActionType(ReminderActionType.NONE);
+      }
       final boolean reminderOptionVisibility = data.getReminderActionType() != ReminderActionType.NONE;
 
       final TextField<Integer> reminderDuration = new TextField<Integer>(reminderOptionPanel.getTextFieldId(), new PropertyModel<Integer>(data, "reminderDuration"));
       reminderDuration.setVisible(reminderOptionVisibility);
+      reminderDuration.setRequired(reminderOptionVisibility);
       reminderDuration.setOutputMarkupId(true);
       reminderDuration.setOutputMarkupPlaceholderTag(true);
       reminderOptionPanel.add(reminderDuration);
@@ -276,7 +280,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       final IModel<AlarmReminderType> reminderDurationActiveModel = new PropertyModel<AlarmReminderType>(data, "reminderDurationType");
       final DropDownChoicePanel<AlarmReminderType> reminderDurationTypeChoice = new DropDownChoicePanel<AlarmReminderType>(reminderOptionPanel.newChildId(), reminderDurationActiveModel,
           reminderDurationChoicesModel, reminderDurationTypeRenderer, false);
-      reminderDurationTypeChoice.setVisible(reminderOptionVisibility);
+      reminderDurationTypeChoice.getDropDownChoice().setVisible(reminderOptionVisibility);
+      reminderDurationTypeChoice.setRequired(reminderOptionVisibility);
       reminderDurationTypeChoice.getDropDownChoice().setOutputMarkupId(true);
       reminderDurationTypeChoice.getDropDownChoice().setOutputMarkupPlaceholderTag(true);
       reminderOptionPanel.add(reminderDurationTypeChoice);
@@ -311,17 +316,17 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
         protected void onUpdate(final AjaxRequestTarget target)
         {
           if (data.getReminderActionType() != null) {
+            boolean isVisibel = false;
             if (data.getReminderActionType().equals(ReminderActionType.MESSAGE) || data.getReminderActionType().equals(ReminderActionType.MESSAGE_SOUND)) {
-              reminderDuration.setVisible(true);
-              reminderDurationTypeChoice.getDropDownChoice().setVisible(true);
-              target.add(reminderDurationTypeChoice.getDropDownChoice(), reminderDuration);
-              return;
+              isVisibel = true;
             } else if (data.getReminderActionType().equals(ReminderActionType.NONE)) {
-              reminderDuration.setVisible(false);
-              reminderDurationTypeChoice.getDropDownChoice().setVisible(false);
-              target.add(reminderDurationTypeChoice.getDropDownChoice(), reminderDuration);
-              return;
+              isVisibel = false;
             }
+            reminderDuration.setVisible(isVisibel);
+            reminderDurationTypeChoice.getDropDownChoice().setVisible(isVisibel);
+            reminderDurationTypeChoice.setRequired(isVisibel);
+            reminderDuration.setRequired(isVisibel);
+            target.add(reminderDurationTypeChoice.getDropDownChoice(), reminderDuration);
           }
         }
 
