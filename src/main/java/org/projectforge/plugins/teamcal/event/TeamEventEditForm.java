@@ -325,7 +325,6 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
             reminderDuration.setVisible(isVisibel);
             reminderDurationTypeChoice.getDropDownChoice().setVisible(isVisibel);
             reminderDurationTypeChoice.setRequired(isVisibel);
-            reminderDuration.setRequired(isVisibel);
             target.add(reminderDurationTypeChoice.getDropDownChoice(), reminderDuration);
           }
         }
@@ -604,6 +603,9 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     startDateTimePanel = new DateTimePanel(startDateField.newChildId(), new PropertyModel<Date>(data, "startDate"),
         (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withTargetType(java.sql.Timestamp.class)
         .withRequired(true), DatePrecision.MINUTE);
+    startDateTimePanel.getDateField().setOutputMarkupId(true);
+    startDateTimePanel.getDatePanel().setOutputMarkupId(true);
+    startDateTimePanel.setOutputMarkupId(true);
     startDateField.add(startDateTimePanel);
     dateFieldToolTip(startDateTimePanel);
     dependentFormComponents[0] = startDateTimePanel;
@@ -615,11 +617,50 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     endDateTimePanel = new DateTimePanel(endDateField.newChildId(), new PropertyModel<Date>(data, "endDate"),
         (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withTargetType(java.sql.Timestamp.class)
         .withRequired(true), DatePrecision.MINUTE);
+    endDateTimePanel.getDateField().setOutputMarkupId(true);
+    endDateTimePanel.setOutputMarkupId(true);
+    endDateTimePanel.setOutputMarkupPlaceholderTag(true);
     endDateField.add(endDateTimePanel);
     dateFieldToolTip(endDateTimePanel);
     dependentFormComponents[3] = endDateTimePanel;
     dependentFormComponents[4] = endDateTimePanel.getHourOfDayDropDownChoice();
     dependentFormComponents[5] = endDateTimePanel.getMinuteDropDownChoice();
+
+    startDateTimePanel.getDateField().add(new AjaxFormComponentUpdatingBehavior("onChange"){
+      private static final long serialVersionUID = 4577664688930645961L;
+
+      @Override
+      protected void onUpdate(final AjaxRequestTarget target)
+      {
+        if (startDateTimePanel.getDateField().getModelObject().getTime() > endDateTimePanel.getDateField().getModelObject().getTime()) {
+          endDateTimePanel.getDateField().setModelObject(startDateTimePanel.getDateField().getModelObject());
+          // TODO notify hour and minute dropdown of changes
+          //          if (startDateTimePanel.getHourOfDayDropDownChoice().getModelObject() > endDateTimePanel.getHourOfDayDropDownChoice().getModelObject()) {
+          //            endDateTimePanel.getHourOfDayDropDownChoice().setModelObject(startDateTimePanel.getHourOfDay());
+          //          }
+          target.add(endDateTimePanel.getDateField());
+        }
+      }
+
+    });
+
+    endDateTimePanel.getDateField().add(new AjaxFormComponentUpdatingBehavior("onChange"){
+      private static final long serialVersionUID = 4577664688930645961L;
+
+      @Override
+      protected void onUpdate(final AjaxRequestTarget target)
+      {
+        if (startDateTimePanel.getDateField().getModelObject().getTime() > endDateTimePanel.getDateField().getModelObject().getTime()) {
+          startDateTimePanel.getDateField().setModelObject(endDateTimePanel.getDateField().getModelObject());
+          // TODO notify hour and minute dropdown of changes
+          //          if (startDateTimePanel.getHourOfDayDropDownChoice().getModelObject() > endDateTimePanel.getHourOfDayDropDownChoice().getModelObject()) {
+          //            endDateTimePanel.getHourOfDayDropDownChoice().setModelObject(startDateTimePanel.getHourOfDay());
+          //          }
+          target.add(startDateTimePanel.getDateField());
+        }
+      }
+
+    });
 
     if (access == false) {
       endDateField.setEnabled(false);
