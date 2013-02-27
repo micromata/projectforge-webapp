@@ -119,6 +119,8 @@ function initializeComponents() {
 		$(this).mypopover('myshow');
 	}, function() {
 		$(this).mypopover('hide');
+	}).keydown(function(event) {
+		$(this).mypopover('hide');
 	});
 	$('[rel=\'mytooltip\']').hover(function(event) {
 		mouseX = event.pageX;
@@ -128,6 +130,8 @@ function initializeComponents() {
 		$(this).mytooltip('myshow');
 	}, function() {
 		$(this).mytooltip('hide');
+	}).keydown(function(event) {
+		$(this).mypopover('hide');
 	});
 }
 

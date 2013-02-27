@@ -96,9 +96,6 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
       checkBoxPanel.add(new MyCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "deleted"),
           getString("deleted")));
     }
-    // add(new CoolCheckBoxPanel("ajaxSupportCheckBox", new PropertyModel<Boolean>(searchFilter, "ajaxSupport"), getString("ajaxSupport"),
-    // true).setTooltip(getString("task.tree.tooltip.ajaxSupport")));
-    // setModel(new CompoundPropertyModel<TaskFilter>(searchFilter));
 
     actionButtons = new MyComponentsRepeater<Component>("actionButtons");
     add(actionButtons.getRepeatingView());

@@ -223,9 +223,20 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   public AbstractSecuredBasePage afterUpdate(final ModificationStatus modificationStatus)
   {
     if (newEvent != null) {
+      newEvent.setExternalUid(null); // Avoid multiple usage of external uids.
       teamEventDao.save(newEvent);
     }
     return null;
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractEditPage#cloneData()
+   */
+  @Override
+  protected void cloneData()
+  {
+    super.cloneData();
+    getData().setExternalUid(null); // Avoid multiple usage of external uid.
   }
 
   /**
