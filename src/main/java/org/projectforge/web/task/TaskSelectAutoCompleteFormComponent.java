@@ -50,7 +50,7 @@ public abstract class TaskSelectAutoCompleteFormComponent extends PFAutoComplete
   {
     super(id, null);
     setModel(new PropertyModel<TaskDO>(this, "taskDo"));
-    getSettings().withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false).withWidth(200);
+    getSettings().withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false);
     add(new AjaxFormComponentUpdatingBehavior("onChange") {
       private static final long serialVersionUID = 3681828654557441560L;
 
