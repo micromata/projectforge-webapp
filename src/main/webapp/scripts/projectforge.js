@@ -131,7 +131,7 @@ function initializeComponents() {
 	}, function() {
 		$(this).mytooltip('hide');
 	}).keydown(function(event) {
-		$(this).mypopover('hide');
+		$(this).mytooltip('hide');
 	});
 }
 
