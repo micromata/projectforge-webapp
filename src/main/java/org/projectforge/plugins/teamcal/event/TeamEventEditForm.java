@@ -229,8 +229,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
           } else {
             setDateDropChoiceVisible(false);
           }
-          target.add(startDateField.getFieldset());
-          target.add(endDateField.getFieldset());
+          target.add(startDateField.getFieldset(), endDateField.getFieldset(), endDateField);
+          //          target.add(endDateField.getFieldset());
         }
       });
       setDateDropChoiceVisible(data.isAllDay() == false);
@@ -518,6 +518,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     startDateTimePanel.getMinuteDropDownChoice().setVisible(visible);
     endDateTimePanel.getHourOfDayDropDownChoice().setVisible(visible);
     endDateTimePanel.getMinuteDropDownChoice().setVisible(visible);
+    endDateField.setVisible(visible);
   }
 
   /**
@@ -632,14 +633,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       @Override
       protected void onUpdate(final AjaxRequestTarget target)
       {
-        if (startDateTimePanel.getDateField().getModelObject().getTime() > endDateTimePanel.getDateField().getModelObject().getTime()) {
-          endDateTimePanel.getDateField().setModelObject(startDateTimePanel.getDateField().getModelObject());
-          // TODO notify hour and minute dropdown of changes
-          //          if (startDateTimePanel.getHourOfDayDropDownChoice().getModelObject() > endDateTimePanel.getHourOfDayDropDownChoice().getModelObject()) {
-          //            endDateTimePanel.getHourOfDayDropDownChoice().setModelObject(startDateTimePanel.getHourOfDay());
-          //          }
-          target.add(endDateTimePanel.getDateField());
-        }
+        final long selectedDate = startDateTimePanel.getDateField().getModelObject().getTime();
+        target.appendJavaScript("$(function() { $('#"+ endDateTimePanel.getDateField().getMarkupId() + "').datepicker('option', 'minDate', new Date(" + selectedDate  + ")); });");
       }
 
     });
@@ -650,14 +645,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       @Override
       protected void onUpdate(final AjaxRequestTarget target)
       {
-        if (startDateTimePanel.getDateField().getModelObject().getTime() > endDateTimePanel.getDateField().getModelObject().getTime()) {
-          startDateTimePanel.getDateField().setModelObject(endDateTimePanel.getDateField().getModelObject());
-          // TODO notify hour and minute dropdown of changes
-          //          if (startDateTimePanel.getHourOfDayDropDownChoice().getModelObject() > endDateTimePanel.getHourOfDayDropDownChoice().getModelObject()) {
-          //            endDateTimePanel.getHourOfDayDropDownChoice().setModelObject(startDateTimePanel.getHourOfDay());
-          //          }
-          target.add(startDateTimePanel.getDateField());
-        }
+        final long selectedDate = endDateTimePanel.getDateField().getModelObject().getTime();
+        target.appendJavaScript("$(function() { $('#"+ startDateTimePanel.getDateField().getMarkupId() + "').datepicker('option', 'maxDate', new Date(" + selectedDate  + ")); });");
       }
 
     });
