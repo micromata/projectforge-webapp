@@ -53,7 +53,7 @@ public class DatePanel extends FormComponentPanel<Date> implements ComponentWrap
 
   protected Date date;
 
-  protected DateTextField dateField;
+  protected final DateTextField dateField;
 
   protected boolean modelMarkedAsChanged;
 
@@ -85,7 +85,18 @@ public class DatePanel extends FormComponentPanel<Date> implements ComponentWrap
     super(id, model);
     setType(settings.targetType);
     final MyDateConverter dateConverter = new MyDateConverter(settings.targetType, "M-");
-    dateField = new DateTextField("dateField", new PropertyModel<Date>(this, "date"), dateConverter);
+    dateField = new DateTextField("dateField", new PropertyModel<Date>(this, "date"), dateConverter) {
+      /**
+       * @see org.apache.wicket.Component#renderHead(org.apache.wicket.markup.head.IHeaderResponse)
+       */
+      @Override
+      public void renderHead(final IHeaderResponse response)
+      {
+        super.renderHead(response);
+        WicketRenderHeadUtils.renderMainJavaScriptIncludes(response);
+        DatePickerUtils.renderHead(response, getLocale(), dateField.getMarkupId(), autosubmit);
+      }
+    };
     dateField.add(AttributeModifier.replace("size", "10"));
     dateField.setOutputMarkupId(true);
     add(dateField);
@@ -143,16 +154,6 @@ public class DatePanel extends FormComponentPanel<Date> implements ComponentWrap
     return this;
   }
 
-  /**
-   * @see org.apache.wicket.Component#renderHead(org.apache.wicket.markup.html.IHeaderResponse)
-   */
-  @Override
-  public void renderHead(final IHeaderResponse response)
-  {
-    super.renderHead(response);
-    WicketRenderHeadUtils.renderMainJavaScriptIncludes(response);
-    DatePickerUtils.renderHead(response, getLocale(), dateField.getMarkupId(), autosubmit);
-  }
 
   /**
    * @see org.apache.wicket.markup.html.form.FormComponent#setLabel(org.apache.wicket.model.IModel)
