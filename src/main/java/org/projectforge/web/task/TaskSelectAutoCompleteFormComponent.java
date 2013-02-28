@@ -146,7 +146,7 @@ public abstract class TaskSelectAutoCompleteFormComponent extends PFAutoComplete
         try {
           final TaskDO task = taskTree.getTaskById(Integer.valueOf(value));
           if (task == null) {
-            error("hurzel"); // TODO
+            error(getString("timesheet.error.invalidTaskId"));
           }
           getModel().setObject(task);
           notifyChildren();
