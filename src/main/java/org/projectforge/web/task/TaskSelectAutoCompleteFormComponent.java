@@ -22,6 +22,7 @@ import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
+import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 
@@ -90,7 +91,25 @@ public abstract class TaskSelectAutoCompleteFormComponent extends PFAutoComplete
     if (value == null) {
       return "";
     }
-    return "" + value.getTitle();
+
+    return createPath(value.getId()) + value.getTitle();
+  }
+
+  /**
+   * create path to root
+   * 
+   * @return
+   */
+  private String createPath(final Integer taskId)
+  {
+    String path = "";
+    final List<TaskNode> nodeList = taskTree.getPathToRoot(taskId);
+    for (final TaskNode node : nodeList) {
+      if (node.getId() != taskId) {
+        path += node.getTask().getTitle() + " | ";
+      }
+    }
+    return path;
   }
 
   protected void notifyChildren()
