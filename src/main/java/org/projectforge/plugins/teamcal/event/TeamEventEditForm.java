@@ -176,6 +176,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
         }
       }
     }
+
     // add teamCal drop down
     initTeamCalPicker(gridBuilder.newFieldset(getString("plugins.teamcal.event.teamCal")));
     {
@@ -229,8 +230,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
           } else {
             setDateDropChoiceVisible(false);
           }
-          target.add(startDateField.getFieldset(), endDateField.getFieldset(), endDateField);
-          //          target.add(endDateField.getFieldset());
+          target.add(startDateField.getFieldset(), endDateField.getFieldset());
         }
       });
       setDateDropChoiceVisible(data.isAllDay() == false);
@@ -516,9 +516,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   {
     startDateTimePanel.getHourOfDayDropDownChoice().setVisible(visible);
     startDateTimePanel.getMinuteDropDownChoice().setVisible(visible);
-    endDateTimePanel.getHourOfDayDropDownChoice().setVisible(visible);
-    endDateTimePanel.getMinuteDropDownChoice().setVisible(visible);
-    endDateField.setVisible(visible);
+    endDateField.getFieldset().setVisible(visible);
   }
 
   /**
@@ -600,13 +598,15 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   private void initDatePanel()
   {
     startDateField = gridBuilder.newFieldset(getString("plugins.teamcal.event.beginDate"));
+    startDateField.getFieldset().setOutputMarkupPlaceholderTag(true);
+    startDateField.getFieldset().setOutputMarkupId(true);
+
     startDateField.getFieldset().setOutputMarkupId(true);
     startDateTimePanel = new DateTimePanel(startDateField.newChildId(), new PropertyModel<Date>(data, "startDate"),
         (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withTargetType(java.sql.Timestamp.class)
         .withRequired(true), DatePrecision.MINUTE);
     startDateTimePanel.getDateField().setOutputMarkupId(true);
-    startDateTimePanel.getDatePanel().setOutputMarkupId(true);
-    startDateTimePanel.setOutputMarkupId(true);
+
     startDateField.add(startDateTimePanel);
     dateFieldToolTip(startDateTimePanel);
     dependentFormComponents[0] = startDateTimePanel;
@@ -614,13 +614,15 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     dependentFormComponents[2] = startDateTimePanel.getMinuteDropDownChoice();
 
     endDateField = gridBuilder.newFieldset(getString("plugins.teamcal.event.endDate"));
+    endDateField.getFieldset().setOutputMarkupPlaceholderTag(true);
+    endDateField.getFieldset().setOutputMarkupId(true);
+
     endDateField.getFieldset().setOutputMarkupId(true);
     endDateTimePanel = new DateTimePanel(endDateField.newChildId(), new PropertyModel<Date>(data, "endDate"),
         (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withTargetType(java.sql.Timestamp.class)
         .withRequired(true), DatePrecision.MINUTE);
     endDateTimePanel.getDateField().setOutputMarkupId(true);
-    endDateTimePanel.setOutputMarkupId(true);
-    endDateTimePanel.setOutputMarkupPlaceholderTag(true);
+
     endDateField.add(endDateTimePanel);
     dateFieldToolTip(endDateTimePanel);
     dependentFormComponents[3] = endDateTimePanel;

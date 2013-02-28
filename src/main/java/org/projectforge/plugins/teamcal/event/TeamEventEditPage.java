@@ -180,6 +180,10 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       getData().setReminderDurationType(null);
     }
 
+    if (getData().isAllDay() == true && getData().getEndDate() != null) {
+      getData().setEndDate(getData().getStartDate());
+    }
+
     getData().setRecurrence(form.recurrenceData);
     if (recurrencyChangeType == null || recurrencyChangeType == RecurrencyChangeType.ALL) {
       return null;
