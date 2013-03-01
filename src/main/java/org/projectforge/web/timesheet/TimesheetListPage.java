@@ -43,7 +43,6 @@ import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -87,6 +86,7 @@ import org.projectforge.web.wicket.MyListPageSortableDataProvider;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.springframework.util.CollectionUtils;
 
 @ListPage(editPage = TimesheetEditPage.class)
 public class TimesheetListPage extends AbstractListPage<TimesheetListForm, TimesheetDao, TimesheetDO> implements
@@ -244,12 +244,10 @@ IListPageColumnsCreator<TimesheetDO>
   @Override
   protected void onNextSubmit()
   {
-    final ArrayList<TimesheetDO> list = new ArrayList<TimesheetDO>();
-    for (final TimesheetDO sheet : getList()) {
-      if (sheet.isSelected() == true) {
-        list.add(sheet);
-      }
+    if (CollectionUtils.isEmpty(this.selectedItems) == true) {
+      return;
     }
+    final List<TimesheetDO> list = timesheetDao.internalLoad(this.selectedItems);
     setResponsePage(new TimesheetMassUpdatePage(this, list));
   }
 
@@ -304,14 +302,15 @@ IListPageColumnsCreator<TimesheetDO>
           cellItemListener).withUserFormatter(userFormatter));
     } else {
       // Show first column not for TimesheetMassUpdatePage!
-      if (isMassUpdateMode == true) {
+      if (isMassUpdateMode == true && page instanceof TimesheetListPage) {
+        final TimesheetListPage timesheetListPage = (TimesheetListPage) page;
         columns.add(new CellItemListenerPropertyColumn<TimesheetDO>("", null, "selected", cellItemListener) {
           @Override
           public void populateItem(final Item<ICellPopulator<TimesheetDO>> item, final String componentId,
               final IModel<TimesheetDO> rowModel)
           {
             final TimesheetDO timesheet = rowModel.getObject();
-            final CheckBoxPanel checkBoxPanel = new CheckBoxPanel(componentId, new PropertyModel<Boolean>(timesheet, "selected"), null);
+            final CheckBoxPanel checkBoxPanel = new CheckBoxPanel(componentId, timesheetListPage.new SelectItemModel(timesheet.getId()), null);
             item.add(checkBoxPanel);
             cellItemListener.populateItem(item, componentId, rowModel);
             addRowClick(item, isMassUpdateMode);

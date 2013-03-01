@@ -173,7 +173,7 @@ public class TaskWizardForm extends AbstractStandardForm<TaskWizardForm, TaskWiz
           }
           if (parentPage.managerGroupCreated == true) {
             if (task != null) {
-              buf.append(", ");
+              buf.append("-");
             }
             buf.append(getString("task.wizard.managerGroup.groupNameSuffix"));
           }

@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
@@ -42,7 +43,6 @@ import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
@@ -144,13 +144,14 @@ IListPageColumnsCreator<AddressDO>
     if (page instanceof AddressCampaignValueMassUpdatePage) {
       columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(page.getString("created")), getSortable("created",
           sortable), "created", cellItemListener));
-    } else if (massUpdateMode == true) {
+    } else if (massUpdateMode == true && page instanceof AddressCampaignValueListPage) {
+      final AddressCampaignValueListPage addressCampaignValueListPage = (AddressCampaignValueListPage) page;
       columns.add(new CellItemListenerPropertyColumn<AddressDO>("", null, "selected", cellItemListener) {
         @Override
         public void populateItem(final Item<ICellPopulator<AddressDO>> item, final String componentId, final IModel<AddressDO> rowModel)
         {
           final AddressDO address = rowModel.getObject();
-          final CheckBoxPanel checkBoxPanel = new CheckBoxPanel(componentId, new PropertyModel<Boolean>(address, "selected"), null);
+          final CheckBoxPanel checkBoxPanel = new CheckBoxPanel(componentId, addressCampaignValueListPage.new SelectItemModel(address.getId()), null);
           item.add(checkBoxPanel);
           cellItemListener.populateItem(item, componentId, rowModel);
           addRowClick(item, massUpdateMode);
@@ -239,12 +240,10 @@ IListPageColumnsCreator<AddressDO>
   @Override
   protected void onNextSubmit()
   {
-    final ArrayList<AddressDO> list = new ArrayList<AddressDO>();
-    for (final AddressDO sheet : getList()) {
-      if (sheet.isSelected() == true) {
-        list.add(sheet);
-      }
+    if (CollectionUtils.isEmpty(this.selectedItems) == true || form.getSearchFilter().getAddressCampaign() == null) {
+      return;
     }
+    final List<AddressDO> list = addressDao.internalLoad(this.selectedItems);
     setResponsePage(new AddressCampaignValueMassUpdatePage(this, list, form.getSearchFilter().getAddressCampaign(), personalAddressMap,
         addressCampaignValueMap));
   }

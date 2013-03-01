@@ -26,8 +26,10 @@ package org.projectforge.web.wicket.components;
 import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.projectforge.common.DateFormatType;
 import org.projectforge.common.DateFormats;
 import org.projectforge.web.I18nCore;
@@ -48,7 +50,7 @@ public class DatePickerUtils
     final String loc = I18nCore.getDatePickerLocale(locale);
     buf.append("$(function() {\n");
     if (loc != null) {
-      buf.append("  $.datepicker.setDefaults($.datepicker.regional['").append(loc).append("']);\n");
+      buf.append(" $.datepicker.setDefaults($.datepicker.regional['").append(loc).append("']);\n");
     }
     buf.append("  $.datepicker.setDefaults({\n");
     buf.append("    showAnim : 'fadeIn',\n");
@@ -57,8 +59,16 @@ public class DatePickerUtils
     // }
     buf.append("  });\n");
     buf.append("});");
-    response.render(JavaScriptHeaderItem.forScript(buf, "datepicker"));
-    response.render(JavaScriptHeaderItem.forScript(getDatePickerInitJavaScript(id, autosubmit), null));
+
+    // if we are in ajax request cycle, we have to use other rendering methods
+    final AjaxRequestTarget target = RequestCycle.get().find(AjaxRequestTarget.class);
+    if (target == null) {
+      response.render(JavaScriptHeaderItem.forScript(buf, "datepicker"));
+      response.render(JavaScriptHeaderItem.forScript(getDatePickerInitJavaScript(id, autosubmit), null));
+    } else {
+      target.appendJavaScript(buf);
+      target.appendJavaScript(getDatePickerInitJavaScript(id, autosubmit));
+    }
   }
 
   public static String getDatePickerInitJavaScript(final String id, final boolean autosubmit)

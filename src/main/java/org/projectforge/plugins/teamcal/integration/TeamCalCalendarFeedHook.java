@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.fortuna.ical4j.model.Dur;
-import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VAlarm;
@@ -117,20 +116,20 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
           }
 
           // add alarm if necessary
-          if (teamEvent.getAlarmReminderDur() != null) {
+          if (teamEvent.getReminderDuration() != null) {
             final VAlarm alarm = new VAlarm();
             Dur dur = null;
             // (-1) * needed to set alert before
-            if (AlarmReminderType.MINUTES.equals(teamEvent.getAlarmReminderType())) {
-              dur = new Dur(0, 0, (-1) * teamEvent.getAlarmReminderDur(), 0);
-            } else if (AlarmReminderType.HOURS.equals(teamEvent.getAlarmReminderType())) {
-              dur = new Dur(0, (-1) * teamEvent.getAlarmReminderDur(), 0, 0);
-            } else if (AlarmReminderType.DAYS.equals(teamEvent.getAlarmReminderType())) {
-              dur = new Dur((-1) * teamEvent.getAlarmReminderDur(), 0, 0, 0);
+            if (AlarmReminderType.MINUTES.equals(teamEvent.getReminderDurationType())) {
+              dur = new Dur(0, 0, (-1) * teamEvent.getReminderDuration(), 0);
+            } else if (AlarmReminderType.HOURS.equals(teamEvent.getReminderDurationType())) {
+              dur = new Dur(0, (-1) * teamEvent.getReminderDuration(), 0, 0);
+            } else if (AlarmReminderType.DAYS.equals(teamEvent.getReminderDurationType())) {
+              dur = new Dur((-1) * teamEvent.getReminderDuration(), 0, 0, 0);
             }
             if (dur != null) {
               alarm.getProperties().add(new Trigger(dur));
-              alarm.getProperties().add(new Action(Property.ACTION));
+              alarm.getProperties().add(new Action(teamEvent.getReminderActionType().getType()));
               vEvent.getAlarms().add(alarm);
             }
           }

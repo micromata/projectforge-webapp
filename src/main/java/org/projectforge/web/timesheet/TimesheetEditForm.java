@@ -231,12 +231,23 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
           super.selectTask(task);
           refresh(); // Task was changed. Therefore update the kost2 list.
         }
+
+        /**
+         * @see org.projectforge.web.task.TaskSelectPanel#onModelSelected(org.apache.wicket.ajax.AjaxRequestTarget,
+         *      org.projectforge.task.TaskDO)
+         */
+        @Override
+        protected void onModelSelected(final AjaxRequestTarget target, final TaskDO taskDo)
+        {
+          final TimesheetDO timesheet = getData();
+          timesheet.setTask(taskDo);
+          // TODO get current values of all fields!
+          setResponsePage(new TimesheetEditPage(timesheet));
+        }
       };
       fs.add(taskSelectPanel);
       taskSelectPanel.init();
       taskSelectPanel.setRequired(true);
-    }
-    {
     }
     if (cost2Exists == true) {
       // Cost 2 entries does exist in the data-base.

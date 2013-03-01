@@ -12,24 +12,21 @@ package org.projectforge.plugins.teamcal.event;
 import org.projectforge.core.I18nEnum;
 
 /**
- * To define if alert duration type is minute, hour or day.
- * 
  * @author M. Lauterbach (m.lauterbach@micromata.de)
  *
  */
-public enum AlarmReminderType implements I18nEnum
+public enum ReminderActionType implements I18nEnum
 {
-  MINUTES("M", "plugins.teamcal.event.reminder.MINUTES_BEFORE"), //
-  HOURS("H", "plugins.teamcal.event.reminder.HOURS_BEFORE"), //
-  DAYS("D", "plugins.teamcal.event.reminder.DAYS_BEFORE");
+  NONE("NONE", "plugins.teamcal.event.reminder.NONE"), //
+  MESSAGE("DISPLAY", "plugins.teamcal.event.reminder.MESSAGE"), //
+  MESSAGE_SOUND("AUDIO", "plugins.teamcal.event.reminder.MESSAGE_SOUND");
 
   private final String type;
   private final String i18n;
 
-  private AlarmReminderType(final String type , final String i18n)
-  {
-    this.type = type;
+  private ReminderActionType(final String type , final String i18n) {
     this.i18n = i18n;
+    this.type = type;
   }
 
   /**
