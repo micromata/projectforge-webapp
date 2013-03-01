@@ -174,6 +174,16 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   {
     super.onSaveOrUpdate();
 
+    // if reminder action was set on NONE, remove reminder settings.
+    if (getData().getReminderActionType().equals(ReminderActionType.NONE) == true) {
+      getData().setReminderDuration(0);
+      getData().setReminderDurationType(null);
+    }
+
+    if (getData().isAllDay() == true && getData().getEndDate() != null) {
+      getData().setEndDate(getData().getStartDate());
+    }
+
     getData().setRecurrence(form.recurrenceData);
     if (recurrencyChangeType == null || recurrencyChangeType == RecurrencyChangeType.ALL) {
       return null;
@@ -217,9 +227,20 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   public AbstractSecuredBasePage afterUpdate(final ModificationStatus modificationStatus)
   {
     if (newEvent != null) {
+      newEvent.setExternalUid(null); // Avoid multiple usage of external uids.
       teamEventDao.save(newEvent);
     }
     return null;
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractEditPage#cloneData()
+   */
+  @Override
+  protected void cloneData()
+  {
+    super.cloneData();
+    getData().setExternalUid(null); // Avoid multiple usage of external uid.
   }
 
   /**

@@ -241,14 +241,13 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
         {
           final TimesheetDO timesheet = getData();
           timesheet.setTask(taskDo);
+          // TODO get current values of all fields!
           setResponsePage(new TimesheetEditPage(timesheet));
         }
       };
       fs.add(taskSelectPanel);
       taskSelectPanel.init();
       taskSelectPanel.setRequired(true);
-    }
-    {
     }
     if (cost2Exists == true) {
       // Cost 2 entries does exist in the data-base.

@@ -132,7 +132,9 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
   private final FormComponent< ? >[] dependentFormComponents = new FormComponent[6];
 
-  private List<AlarmReminderType> reminderTypeChoiceList;
+  private List<ReminderActionType> reminderActionTypeList;
+
+  private List<AlarmReminderType> reminderDurationTypeList;
 
   /**
    * @param parentPage
@@ -174,6 +176,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
         }
       }
     }
+
     // add teamCal drop down
     initTeamCalPicker(gridBuilder.newFieldset(getString("plugins.teamcal.event.teamCal")));
     {
@@ -227,8 +230,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
           } else {
             setDateDropChoiceVisible(false);
           }
-          target.add(startDateField.getFieldset());
-          target.add(endDateField.getFieldset());
+          target.add(startDateField.getFieldset(), endDateField.getFieldset());
         }
       });
       setDateDropChoiceVisible(data.isAllDay() == false);
@@ -241,11 +243,21 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       // Reminder
       // ///////////////////////////////
       final FieldsetPanel reminderPanel = gridBuilder.newFieldset(getString("plugins.teamcal.event.reminder.title"));
-      final TextField<Integer> duration = new TextField<Integer>(reminderPanel.getTextFieldId(), new PropertyModel<Integer>(data, "alarmReminderDur"));
-      reminderPanel.add(duration);
+      final FieldsetPanel reminderOptionPanel = gridBuilder.newFieldset(""); // getString("plugins.teamcal.event.reminder.options"));
+      if (isNew() == true) {
+        data.setReminderActionType(ReminderActionType.NONE);
+      }
+      final boolean reminderOptionVisibility = data.getReminderActionType() != ReminderActionType.NONE;
 
-      final IChoiceRenderer<AlarmReminderType> reminderEntriesRenderer = new IChoiceRenderer<AlarmReminderType>(){
+      final TextField<Integer> reminderDuration = new TextField<Integer>(reminderOptionPanel.getTextFieldId(), new PropertyModel<Integer>(data, "reminderDuration"));
+      reminderDuration.setVisible(reminderOptionVisibility);
+      reminderDuration.setRequired(reminderOptionVisibility);
+      reminderDuration.setOutputMarkupId(true);
+      reminderDuration.setOutputMarkupPlaceholderTag(true);
+      reminderOptionPanel.add(reminderDuration);
 
+      // reminder duration dropdown
+      final IChoiceRenderer<AlarmReminderType> reminderDurationTypeRenderer = new IChoiceRenderer<AlarmReminderType>(){
         @Override
         public Object getDisplayValue(final AlarmReminderType object)
         {
@@ -257,19 +269,69 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
         {
           return object.name();
         }
-
       };
 
-      reminderTypeChoiceList = new ArrayList<AlarmReminderType>();
+      reminderDurationTypeList = new ArrayList<AlarmReminderType>();
       for (final AlarmReminderType type : AlarmReminderType.values()) {
-        reminderTypeChoiceList.add(type);
+        reminderDurationTypeList.add(type);
       }
 
-      final IModel<List<AlarmReminderType>> choicesModel = new PropertyModel<List<AlarmReminderType>>(this, "reminderTypeChoiceList");
-      final IModel<AlarmReminderType> activeModel = new PropertyModel<AlarmReminderType>(data, "alarmReminderType");
-      final DropDownChoicePanel<AlarmReminderType> reminderTypeChoose = new DropDownChoicePanel<AlarmReminderType>(reminderPanel.newChildId(), activeModel,
-          choicesModel, reminderEntriesRenderer, false);
-      reminderPanel.add(reminderTypeChoose);
+      final IModel<List<AlarmReminderType>> reminderDurationChoicesModel = new PropertyModel<List<AlarmReminderType>>(this, "reminderDurationTypeList");
+      final IModel<AlarmReminderType> reminderDurationActiveModel = new PropertyModel<AlarmReminderType>(data, "reminderDurationType");
+      final DropDownChoicePanel<AlarmReminderType> reminderDurationTypeChoice = new DropDownChoicePanel<AlarmReminderType>(reminderOptionPanel.newChildId(), reminderDurationActiveModel,
+          reminderDurationChoicesModel, reminderDurationTypeRenderer, false);
+      reminderDurationTypeChoice.getDropDownChoice().setVisible(reminderOptionVisibility);
+      reminderDurationTypeChoice.setRequired(reminderOptionVisibility);
+      reminderDurationTypeChoice.getDropDownChoice().setOutputMarkupId(true);
+      reminderDurationTypeChoice.getDropDownChoice().setOutputMarkupPlaceholderTag(true);
+      reminderOptionPanel.add(reminderDurationTypeChoice);
+
+      // reminder action drop down
+      final IChoiceRenderer<ReminderActionType> reminderActionTypeRenderer = new IChoiceRenderer<ReminderActionType>(){
+        @Override
+        public Object getDisplayValue(final ReminderActionType object)
+        {
+          return getString(object.getI18nKey());
+        }
+
+        @Override
+        public String getIdValue(final ReminderActionType object, final int index)
+        {
+          return object.name();
+        }
+      };
+
+      reminderActionTypeList = new ArrayList<ReminderActionType>();
+      for (final ReminderActionType type : ReminderActionType.values()) {
+        reminderActionTypeList.add(type);
+      }
+
+      final IModel<List<ReminderActionType>> reminderActionTypeChoiceModel = new PropertyModel<List<ReminderActionType>>(this, "reminderActionTypeList");
+      final IModel<ReminderActionType> reminderActionActiveModel = new PropertyModel<ReminderActionType>(data, "reminderActionType");
+      final DropDownChoicePanel<ReminderActionType> reminderActionTypeChoice = new DropDownChoicePanel<ReminderActionType>(reminderPanel.newChildId(), reminderActionActiveModel,
+          reminderActionTypeChoiceModel, reminderActionTypeRenderer, false);
+      reminderActionTypeChoice.getDropDownChoice().add(new AjaxFormComponentUpdatingBehavior("onChange"){
+
+        @Override
+        protected void onUpdate(final AjaxRequestTarget target)
+        {
+          if (data.getReminderActionType() != null) {
+            boolean isVisibel = false;
+            if (data.getReminderActionType().equals(ReminderActionType.MESSAGE) || data.getReminderActionType().equals(ReminderActionType.MESSAGE_SOUND)) {
+              isVisibel = true;
+            } else if (data.getReminderActionType().equals(ReminderActionType.NONE)) {
+              isVisibel = false;
+            }
+            reminderDuration.setVisible(isVisibel);
+            reminderDurationTypeChoice.getDropDownChoice().setVisible(isVisibel);
+            reminderDurationTypeChoice.setRequired(isVisibel);
+            target.add(reminderDurationTypeChoice.getDropDownChoice(), reminderDuration);
+          }
+        }
+
+      });
+      reminderPanel.add(reminderActionTypeChoice);
+
     }
 
 
@@ -454,8 +516,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   {
     startDateTimePanel.getHourOfDayDropDownChoice().setVisible(visible);
     startDateTimePanel.getMinuteDropDownChoice().setVisible(visible);
-    endDateTimePanel.getHourOfDayDropDownChoice().setVisible(visible);
-    endDateTimePanel.getMinuteDropDownChoice().setVisible(visible);
+    endDateField.getFieldset().setVisible(visible);
   }
 
   /**
@@ -537,10 +598,15 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   private void initDatePanel()
   {
     startDateField = gridBuilder.newFieldset(getString("plugins.teamcal.event.beginDate"));
+    startDateField.getFieldset().setOutputMarkupPlaceholderTag(true);
+    startDateField.getFieldset().setOutputMarkupId(true);
+
     startDateField.getFieldset().setOutputMarkupId(true);
     startDateTimePanel = new DateTimePanel(startDateField.newChildId(), new PropertyModel<Date>(data, "startDate"),
         (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withTargetType(java.sql.Timestamp.class)
         .withRequired(true), DatePrecision.MINUTE);
+    startDateTimePanel.getDateField().setOutputMarkupId(true);
+
     startDateField.add(startDateTimePanel);
     dateFieldToolTip(startDateTimePanel);
     dependentFormComponents[0] = startDateTimePanel;
@@ -548,15 +614,44 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     dependentFormComponents[2] = startDateTimePanel.getMinuteDropDownChoice();
 
     endDateField = gridBuilder.newFieldset(getString("plugins.teamcal.event.endDate"));
+    endDateField.getFieldset().setOutputMarkupPlaceholderTag(true);
+    endDateField.getFieldset().setOutputMarkupId(true);
+
     endDateField.getFieldset().setOutputMarkupId(true);
     endDateTimePanel = new DateTimePanel(endDateField.newChildId(), new PropertyModel<Date>(data, "endDate"),
         (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withTargetType(java.sql.Timestamp.class)
         .withRequired(true), DatePrecision.MINUTE);
+    endDateTimePanel.getDateField().setOutputMarkupId(true);
+
     endDateField.add(endDateTimePanel);
     dateFieldToolTip(endDateTimePanel);
     dependentFormComponents[3] = endDateTimePanel;
     dependentFormComponents[4] = endDateTimePanel.getHourOfDayDropDownChoice();
     dependentFormComponents[5] = endDateTimePanel.getMinuteDropDownChoice();
+
+    startDateTimePanel.getDateField().add(new AjaxFormComponentUpdatingBehavior("onChange"){
+      private static final long serialVersionUID = 4577664688930645961L;
+
+      @Override
+      protected void onUpdate(final AjaxRequestTarget target)
+      {
+        final long selectedDate = startDateTimePanel.getDateField().getModelObject().getTime();
+        target.appendJavaScript("$(function() { $('#"+ endDateTimePanel.getDateField().getMarkupId() + "').datepicker('option', 'minDate', new Date(" + selectedDate  + ")); });");
+      }
+
+    });
+
+    endDateTimePanel.getDateField().add(new AjaxFormComponentUpdatingBehavior("onChange"){
+      private static final long serialVersionUID = 4577664688930645961L;
+
+      @Override
+      protected void onUpdate(final AjaxRequestTarget target)
+      {
+        final long selectedDate = endDateTimePanel.getDateField().getModelObject().getTime();
+        target.appendJavaScript("$(function() { $('#"+ startDateTimePanel.getDateField().getMarkupId() + "').datepicker('option', 'maxDate', new Date(" + selectedDate  + ")); });");
+      }
+
+    });
 
     if (access == false) {
       endDateField.setEnabled(false);

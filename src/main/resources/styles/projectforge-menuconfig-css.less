@@ -18,17 +18,23 @@
     z-index:1000;
     left:70px;
   }
-  .pf_plus,
-  .pf_trash,
+  #pf_editentry .pf_delete,
   #pf_newentry{
     display:none;
+  }
+  #pf_editentry{
+    overflow:hidden;
+  }
+  #pf_editentry a{
+    display:block;
+    float:left;
+    padding: 10px 5px;
   }
   .navbar .nav.pf_menueconfig,
   .navbar .nav.pf_sitemap{
     margin:0;
   }
-  .pf_menueconfig.pf_configuration_active li:first-child > a,
-  .pf_menueconfig.pf_configuration_active li.pf_plus > a{
+  .pf_menueconfig.pf_configuration_active li:first-child > a{
     cursor:pointer;
   }
   .pf_menueconfig.pf_configuration_active li.pf_trash > a{
@@ -71,7 +77,7 @@
   }
   .pf_sortable{
     background:#fff;
-    border:1px solid #ccc;
+    border:1px solid #bfbfbf;
     border-bottom:0;
     -moz-border-radius: 6px 6px 0 0; /* Firefox */
     -webkit-border-radius: 6px 6px 0 0; /* Safari, Chrome */
@@ -106,6 +112,13 @@
     background-color: #e5e5e5;
     color: #555555;
   }
+  #pf_sortablecontainer ul.dropdown-menu{
+    min-height:30px;
+  }
+  #pf_sortablecontainer.pf_configuration_active ul.dropdown-menu,
+  #pf_sortablecontainer.pf_configuration_active ul.dropdown-menu li{
+    min-width:167px;
+  }
   .navbar ul.nav.pf_menueconfig li.open > a.dropdown-toggle{
     background-color:transparent;
   }
@@ -115,33 +128,41 @@
   .container ul.nav > li.pf_menueconfig > a {
     padding-bottom:10px;
   }
-  .pf_menueconfig .dropdown-menu ul li a{
+  .pf_menueconfig .dropdown-menu ul li > a{
     cursor:pointer;
+    color:#777;
+    padding:4px 10px;
+    display:block;
+  }
+  .pf_menueconfig .dropdown-menu ul li a:hover{
+    text-decoration: none;
   }
   .pf_menueconfig .dropdown-menu{
     width:770px;
     top: 100%;
-    left: 0px;
+    left: 33px;
     float: left;
     padding-left:5px;
+    -webkit-border-radius: 0 0 6px 6px;
+    -moz-border-radius: 0 0 6px 6px;
+    border-radius: 0 0 6px 6px;
   }
   .navbar .nav > li.pf_menueconfig > .dropdown-menu::before {
     content: '';
-    display: inline-block;
-    border-left: 7px solid transparent;
-    border-right: 7px solid transparent;
-    border-bottom: 7px solid #ccc;
-    border-bottom-color: rgba(0, 0, 0, 0.2);
+    display: none;
+    border-left: 0px transparent;
+    border-right: 0px transparent;
+    border-bottom: 0px transparent;
     position: absolute;
     top: -7px;
     left:49px;
   }
   .navbar .nav > li.pf_menueconfig > .dropdown-menu::after {
     content: '';
-    display: inline-block;
-    border-left: 6px solid transparent;
-    border-right: 6px solid transparent;
-    border-bottom: 6px solid #ffffff;
+    display: none;
+    border-left: 0px transparent;
+    border-right: 0px transparent;
+    border-bottom: 0px transparent;
     position: absolute;
     top: -6px;
     left:50px;

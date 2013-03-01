@@ -24,8 +24,10 @@
 package org.projectforge.web.task;
 
 import org.apache.wicket.markup.ComponentTag;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
@@ -199,6 +201,9 @@ public class TaskTreePage extends AbstractSecuredPage
     taskTreeBuilder.set(accessChecker, taskDao, taskFormatter, priorityFormatter, userFormatter, dateTimeFormatter, userGroupCache);
     taskTreeBuilder.setCaller(caller).setSelectProperty(selectProperty);
     form.add(taskTreeBuilder.createTree("tree", this, form.getSearchFilter()));
+
+    body.add(new Label("info", new Model<String>(getString("task.tree.info"))));
+
   }
 
   public void refresh()
