@@ -108,7 +108,6 @@ function preventBubble(e) {
 })();
 
 function initializeComponents() {
-    console.log("initializeComponents start")
     if(initializing == true) {
         // the initializing is less then the configured timeout ago
         return;
@@ -116,7 +115,6 @@ function initializeComponents() {
     initializing = true;
     window.setTimeout(function () {
         initializing = false;
-        console.log("initializing timeout gone")
     }, initializingTimeout);
 	$("div.radio-jquery-ui").buttonset();
 	if ($("textarea.autogrow").length) {
@@ -145,7 +143,6 @@ function initializeComponents() {
 	}).keydown(function(event) {
 		$(this).mypopover('hide');
 	});
-    console.log("initializeComponents end")
 }
 
 function hideAllTooltips() {
