@@ -1,4 +1,6 @@
 var mouseX, mouseY;
+var initializing = false;
+var initializingTimeout = 300; // timeout for initializing
 
 function showConfirmDialog(text) {
 	return window.confirm(text);
@@ -106,6 +108,16 @@ function preventBubble(e) {
 })();
 
 function initializeComponents() {
+    console.log("initializeComponents start")
+    if(initializing == true) {
+        // the initializing is less then the configured timeout ago
+        return;
+    }
+    initializing = true;
+    window.setTimeout(function () {
+        initializing = false;
+        console.log("initializing timeout gone")
+    }, initializingTimeout);
 	$("div.radio-jquery-ui").buttonset();
 	if ($("textarea.autogrow").length) {
 		$("textarea.autogrow").autoGrow();
@@ -133,6 +145,7 @@ function initializeComponents() {
 	}).keydown(function(event) {
 		$(this).mypopover('hide');
 	});
+    console.log("initializeComponents end")
 }
 
 function hideAllTooltips() {
@@ -400,7 +413,13 @@ $(function() {
 				attributes, jqXHR, errorThrown, textStatus) {
 			// handle after AJAX actions
 			doAfterAjaxHandling();
+            // hide double click layer after request
+            $("#mm_transparentOverlay").hide();
 		});
+        Wicket.Event.subscribe('/ajax/call/before', function (jqEvent, attributes, jqXHR, errorThrown, textStatus) {
+            // show double click layer before request
+            $("#mm_transparentOverlay").show();
+        });
 	}
 	$('.pf_preventClickBubble').on("contextmenu", function(e) {
 		e.stopImmediatePropagation();
