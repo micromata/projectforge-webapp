@@ -85,7 +85,7 @@
 		createMenu: function(menu,cmenu) {
 			var className = cmenu.className;
 			$.each(cmenu.theme.split(","),function(i,n){className+=' '+cmenu.themePrefix+n});
-			var $container	= $('<ul class="dropdown"/>').mousedown(function(){cmenu.hide(); return false;}); // We wrap a table around it so width can be flexible
+			var $container	= $('<ul class="dropdown-menu"/>').mousedown(function(){cmenu.hide(); return false;}); // We wrap a table around it so width can be flexible
 
 			// Each menu item is specified as either:
 			//     title:function
@@ -101,11 +101,7 @@
 					}
 				}
 			}
-			var $wrapper = $('<ul class="dropdown-menu contextmenu"/>');
-			var $innerWrapper = $('<li class="has_dropdown"></li>');
-			$wrapper.append($innerWrapper);
-			$innerWrapper.append($container);
-			return $wrapper;
+			return $container;
 		},
 		
 		// Create an individual menu item
