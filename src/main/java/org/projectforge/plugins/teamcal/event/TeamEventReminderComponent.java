@@ -15,9 +15,11 @@ import java.util.List;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
+import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
+import org.projectforge.core.I18nEnum;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -35,7 +37,9 @@ public class TeamEventReminderComponent extends Component
   private static final long serialVersionUID = -7384630904654370695L;
   private static final Integer DURATION_MAX = 1000;
   private final TeamEventDO data;
+  @SuppressWarnings("unused") // used by wicked
   private List<ReminderActionType> reminderActionTypeList;
+  @SuppressWarnings("unused") // used by wicked
   private List<AlarmReminderType> reminderDurationTypeList;
   private final FieldsetPanel reminderPanel;
 
@@ -52,85 +56,43 @@ public class TeamEventReminderComponent extends Component
   /**
    * @see org.apache.wicket.Component#onInitialize()
    */
+  @SuppressWarnings("unchecked")
   @Override
   protected void onInitialize()
   {
     super.onInitialize();
+
     if (data.getId() == null) {
       data.setReminderActionType(ReminderActionType.NONE);
     }
     final boolean reminderOptionVisibility = data.getReminderActionType() != ReminderActionType.NONE;
 
+    // ### unchecked
+    reminderDurationTypeList = (List<AlarmReminderType>) getTypeList(AlarmReminderType.class);
+    reminderActionTypeList = (List<ReminderActionType>) getTypeList(ReminderActionType.class);
+    final IChoiceRenderer<AlarmReminderType> reminderDurationTypeRenderer = (IChoiceRenderer<AlarmReminderType>) getChoiceRenderer(AlarmReminderType.class); //
+    final IChoiceRenderer<ReminderActionType> reminderActionTypeRenderer = (IChoiceRenderer<ReminderActionType>) getChoiceRenderer(ReminderActionType.class); //
+    // ###
+
     final MinMaxNumberField<Integer> reminderDuration = new MinMaxNumberField<Integer>(reminderPanel.getTextFieldId(), new PropertyModel<Integer>(data, "reminderDuration"), 0, DURATION_MAX);
     reminderDuration.setMaxLength(300);
-    reminderDuration.setVisible(reminderOptionVisibility);
-    reminderDuration.setRequired(reminderOptionVisibility);
-    reminderDuration.setOutputMarkupId(true);
-    reminderDuration.setOutputMarkupPlaceholderTag(true);
+    setComponentProperties(reminderDuration, reminderOptionVisibility, true);
 
-    // reminder duration dropdown
-    final IChoiceRenderer<AlarmReminderType> reminderDurationTypeRenderer = new IChoiceRenderer<AlarmReminderType>(){
-      /**
-       * 
-       */
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public Object getDisplayValue(final AlarmReminderType object)
-      {
-        return getString(object.getI18nKey());
-      }
-
-      @Override
-      public String getIdValue(final AlarmReminderType object, final int index)
-      {
-        return object.name();
-      }
-    };
-
-    reminderDurationTypeList = new ArrayList<AlarmReminderType>();
-    for (final AlarmReminderType type : AlarmReminderType.values()) {
-      reminderDurationTypeList.add(type);
-    }
-
+    // reminder duration dropDown
     final IModel<List<AlarmReminderType>> reminderDurationChoicesModel = new PropertyModel<List<AlarmReminderType>>(this, "reminderDurationTypeList");
     final IModel<AlarmReminderType> reminderDurationActiveModel = new PropertyModel<AlarmReminderType>(data, "reminderDurationType");
     final DropDownChoicePanel<AlarmReminderType> reminderDurationTypeChoice = new DropDownChoicePanel<AlarmReminderType>(reminderPanel.newChildId(), reminderDurationActiveModel,
         reminderDurationChoicesModel, reminderDurationTypeRenderer, false);
-    reminderDurationTypeChoice.getDropDownChoice().setVisible(reminderOptionVisibility);
-    reminderDurationTypeChoice.setRequired(reminderOptionVisibility);
-    reminderDurationTypeChoice.getDropDownChoice().setOutputMarkupId(true);
-    reminderDurationTypeChoice.getDropDownChoice().setOutputMarkupPlaceholderTag(true);
+    setComponentProperties(reminderDurationTypeChoice.getDropDownChoice(), reminderOptionVisibility, true);
 
-    // reminder action drop down
-    final IChoiceRenderer<ReminderActionType> reminderActionTypeRenderer = new IChoiceRenderer<ReminderActionType>(){
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public Object getDisplayValue(final ReminderActionType object)
-      {
-        return getString(object.getI18nKey());
-      }
-
-      @Override
-      public String getIdValue(final ReminderActionType object, final int index)
-      {
-        return object.name();
-      }
-    };
-
-    reminderActionTypeList = new ArrayList<ReminderActionType>();
-    for (final ReminderActionType type : ReminderActionType.values()) {
-      reminderActionTypeList.add(type);
-    }
-
+    // reminder action dropDown
     final IModel<List<ReminderActionType>> reminderActionTypeChoiceModel = new PropertyModel<List<ReminderActionType>>(this, "reminderActionTypeList");
     final IModel<ReminderActionType> reminderActionActiveModel = new PropertyModel<ReminderActionType>(data, "reminderActionType");
     final DropDownChoicePanel<ReminderActionType> reminderActionTypeChoice = new DropDownChoicePanel<ReminderActionType>(reminderPanel.getDropDownChoiceId(), reminderActionActiveModel,
         reminderActionTypeChoiceModel, reminderActionTypeRenderer, false);
     reminderActionTypeChoice.getDropDownChoice().add(new AjaxFormComponentUpdatingBehavior("onChange"){
 
-      private static final long serialVersionUID = 1L;
+      private static final long serialVersionUID = -6018962442041909705L;
 
       @Override
       protected void onUpdate(final AjaxRequestTarget target)
@@ -153,6 +115,41 @@ public class TeamEventReminderComponent extends Component
     reminderPanel.add(reminderActionTypeChoice);
     reminderPanel.add(reminderDuration);
     reminderPanel.add(reminderDurationTypeChoice);
+  }
+
+  private void setComponentProperties(final FormComponent<?> comp, final boolean visible, final boolean markUp) {
+    comp.setVisible(visible);
+    comp.setRequired(visible);
+    comp.setOutputMarkupId(markUp);
+    comp.setOutputMarkupPlaceholderTag(markUp);
+  }
+
+  private List< ? extends I18nEnum> getTypeList(final Class< ? extends I18nEnum> obj) {
+    final List<I18nEnum> list = new ArrayList<I18nEnum>();
+    for (final I18nEnum type : obj.getEnumConstants()) {
+      list.add(type);
+    }
+    return list;
+  }
+
+  private IChoiceRenderer< ? extends I18nEnum> getChoiceRenderer(final Class< ? extends I18nEnum> c) {
+    final IChoiceRenderer<I18nEnum> reminderActionTypeRenderer = new IChoiceRenderer<I18nEnum>(){
+
+      private static final long serialVersionUID = -4264875398872979820L;
+
+      @Override
+      public Object getDisplayValue(final I18nEnum object)
+      {
+        return getString(object.getI18nKey());
+      }
+
+      @Override
+      public String getIdValue(final I18nEnum object, final int index)
+      {
+        return object.toString();
+      }
+    };
+    return reminderActionTypeRenderer;
   }
 
   /**
