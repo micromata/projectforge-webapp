@@ -241,7 +241,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
         {
           final TimesheetDO timesheet = getData();
           timesheet.setTask(taskDo);
-          // TODO get current values of all fields!
+          // TODO store current values of all fields!
           setResponsePage(new TimesheetEditPage(timesheet));
         }
       };
