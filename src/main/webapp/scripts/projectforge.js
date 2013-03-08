@@ -131,7 +131,9 @@ function initializeComponents() {
 		$(this).mypopover('hide');
 	}).keydown(function(event) {
 		$(this).mypopover('hide');
-	});
+	}).on("hidden", function (e) {
+        e.stopPropagation();
+    });
 	$('[rel=\'mytooltip\']').hover(function(event) {
 		mouseX = event.pageX;
 		mouseY = event.pageY;
@@ -142,7 +144,9 @@ function initializeComponents() {
 		$(this).mytooltip('hide');
 	}).keydown(function(event) {
 		$(this).mypopover('hide');
-	});
+	}).on("hidden", function (e) {
+        e.stopPropagation();
+    });
 }
 
 function hideAllTooltips() {

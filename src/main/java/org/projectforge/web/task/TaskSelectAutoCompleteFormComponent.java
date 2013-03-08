@@ -9,6 +9,7 @@
 
 package org.projectforge.web.task;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -73,7 +74,14 @@ public abstract class TaskSelectAutoCompleteFormComponent extends PFAutoComplete
     filter.setSearchFields("title", "taskpath");
     filter.setSearchString(input);
     final List<TaskDO> list = taskDao.getList(filter);
-    return list;
+    final List<TaskDO> choices = new ArrayList<TaskDO>();
+    // removing nodes without kost2 list.
+    for (final TaskDO t : list) {
+      if (taskTree.getKost2List(t.getId()) != null) {
+        choices.add(t);
+      }
+    }
+    return choices;
   }
 
   @Override
@@ -145,8 +153,11 @@ public abstract class TaskSelectAutoCompleteFormComponent extends PFAutoComplete
         }
         try {
           final TaskDO task = taskTree.getTaskById(Integer.valueOf(value));
-          if (task == null) {
+          if (task == null
+              || taskTree.getKost2List(task.getId()) == null
+              ) {
             error(getString("timesheet.error.invalidTaskId"));
+            return null;
           }
           getModel().setObject(task);
           notifyChildren();
