@@ -227,7 +227,7 @@ $(window).load(function(){
   var addMouseOverOnDrag = function() {
     $.each($('#pf_sortablecontainer .dropdown, #pf_sortablecontainer .dropdown-submenu'), function(){
       $(this).mouseenter(function() {
-        if($(window).width() > 979){
+        if($(window).width() > 879){
           $(this).addClass('open');
         }
       });
@@ -354,7 +354,7 @@ $(window).load(function(){
     $('#pf_newentry input').val('');
     $('#pf_sortablecontainer, .pf_menueconfig').removeClass('pf_configuration_active');
     $('.pf_menueconfig > li').removeClass('open');
-    if($(window).width() < 979){
+    if($(window).width() < 879){
       $('#pf_sortablecontainer > ul').css('left', '0');
     } else {
       $('#pf_sortablecontainer > ul').css('left', '70');
@@ -366,13 +366,13 @@ $(window).load(function(){
   //fix responsive
   var fixresponsive = function(){
     $(window).resize(function(){
-      if($(window).width() < 979){
+      if($(window).width() < 879){
         closeConfiguration();
         $('#pf_sortablecontainer > ul').css('left', '0px');
         $('#pf_sortablecontainer').css('width','');
         $('#pf_sortablecontainer').css('height','');
       }
-      if($(window).width() > 979 && !is_configuration_active){
+      if($(window).width() > 879 && !is_configuration_active){
         $('#pf_sortablecontainer > ul').css('left', '70px');
         $('#pf_sortablecontainer').css('height',$('.pf_sortable').height());
         updatelayout();
