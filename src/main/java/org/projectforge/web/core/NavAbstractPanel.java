@@ -30,6 +30,7 @@ import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.PFUserContext;
@@ -98,8 +99,9 @@ public abstract class NavAbstractPanel extends Panel
   protected Label getSuffixLabel(final MenuEntry menuEntry)
   {
     final Label suffixLabel;
-    if (menuEntry != null && menuEntry.getNewCounterModel() != null) {
-      suffixLabel = new MenuSuffixLabel(menuEntry.getNewCounterModel());
+    final IModel<Integer> newCounterModel = menuEntry != null ? menuEntry.getNewCounterModel() : null;
+    if (newCounterModel != null && newCounterModel.getObject() != null) {
+      suffixLabel = new MenuSuffixLabel(newCounterModel);
       if (menuEntry != null && menuEntry.getNewCounterTooltip() != null) {
         WicketUtils.addTooltip(suffixLabel, getString(menuEntry.getNewCounterTooltip()));
       }
