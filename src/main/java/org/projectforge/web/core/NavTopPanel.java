@@ -98,8 +98,7 @@ public class NavTopPanel extends NavAbstractPanel
     } else {
       add(new WebMarkupContainer("goMobile").setVisible(false));
     }
-    final BookmarkablePageLink<Void> customizeMenuLink = new BookmarkablePageLink<Void>("customizeMenuLink",
-        CustomizeMenuPage.class);
+    final BookmarkablePageLink<Void> customizeMenuLink = new BookmarkablePageLink<Void>("customizeMenuLink", CustomizeMenuPage.class);
     final BookmarkablePageLink<Void> layoutSettingsMenuLink = new BookmarkablePageLink<Void>("layoutSettingsMenuLink",
         LayoutSettingsPage.class);
     if (UserRights.getAccessChecker().isRestrictedUser() == true) {
@@ -130,8 +129,7 @@ public class NavTopPanel extends NavAbstractPanel
       }
     };
     add(searchForm);
-    final TextField<String> searchField = new TextField<String>("searchField", new PropertyModel<String>(searchForm,
-        "searchString"));
+    final TextField<String> searchField = new TextField<String>("searchField", new PropertyModel<String>(searchForm, "searchString"));
     WicketUtils.setPlaceHolderAttribute(searchField, getString("search.search"));
     searchForm.add(searchField);
     add(customizeMenuLink);
@@ -158,8 +156,7 @@ public class NavTopPanel extends NavAbstractPanel
       add(new Label("user", PFUserContext.getUser().getFullname()));
       if (accessChecker.isRestrictedUser() == true) {
         // Show ChangePaswordPage as my account for restricted users.
-        final BookmarkablePageLink<Void> changePasswordLink = new BookmarkablePageLink<Void>("myAccountLink",
-            ChangePasswordPage.class);
+        final BookmarkablePageLink<Void> changePasswordLink = new BookmarkablePageLink<Void>("myAccountLink", ChangePasswordPage.class);
         add(changePasswordLink);
       } else {
         final BookmarkablePageLink<Void> myAccountLink = new BookmarkablePageLink<Void>("myAccountLink", MyAccountEditPage.class);
@@ -170,8 +167,7 @@ public class NavTopPanel extends NavAbstractPanel
         @Override
         public void onClick()
         {
-          LoginPage.logout((MySession) getSession(), (WebRequest) getRequest(), (WebResponse) getResponse(),
-              userXmlPreferencesCache);
+          LoginPage.logout((MySession) getSession(), (WebRequest) getRequest(), (WebResponse) getResponse(), userXmlPreferencesCache);
           setResponsePage(LoginPage.class);
         };
       };
@@ -357,13 +353,16 @@ public class NavTopPanel extends NavAbstractPanel
       final AbstractSecuredPage page = (AbstractSecuredPage) NavTopPanel.this.getPage();
       {
         final FieldsetPanel fs = gridBuilder.newFieldset(getString("bookmark.directPageLink")).setLabelSide(false);
-        fs.add(new TextArea<String>(fs.getTextAreaId(), new Model<String>(page.getPageAsLink())));
+        final TextArea<String> textArea = new TextArea<String>(fs.getTextAreaId(), new Model<String>(page.getPageAsLink()));
+        fs.add(textArea);
+        textArea.add(AttributeModifier.replace("onClick", "$(this).select();"));
       }
       final PageParameters params = page.getBookmarkableInitialParameters();
       if (params.isEmpty() == false) {
-        final FieldsetPanel fs = gridBuilder.newFieldset(getString(page.getTitleKey4BookmarkableInitialParameters()))
-            .setLabelSide(false);
-        fs.add(new TextArea<String>(fs.getTextAreaId(), new Model<String>(page.getPageAsLink(params))));
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString(page.getTitleKey4BookmarkableInitialParameters())).setLabelSide(false);
+        final TextArea<String> textArea = new TextArea<String>(fs.getTextAreaId(), new Model<String>(page.getPageAsLink(params)));
+        fs.add(textArea);
+        textArea.add(AttributeModifier.replace("onClick", "$(this).select();"));
       }
       return this;
     }
