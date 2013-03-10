@@ -543,21 +543,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
         final long selectedDate = startDateTimePanel.getDateField().getModelObject().getTime();
         target.appendJavaScript("$(function() { $('#"+ endDateTimePanel.getDateField().getMarkupId() + "').datepicker('option', 'minDate', new Date(" + selectedDate  + ")); });");
       }
-
     });
-
-    endDateTimePanel.getDateField().add(new AjaxFormComponentUpdatingBehavior("onChange"){
-      private static final long serialVersionUID = 4577664688930645961L;
-
-      @Override
-      protected void onUpdate(final AjaxRequestTarget target)
-      {
-        final long selectedDate = endDateTimePanel.getDateField().getModelObject().getTime();
-        target.appendJavaScript("$(function() { $('#"+ startDateTimePanel.getDateField().getMarkupId() + "').datepicker('option', 'maxDate', new Date(" + selectedDate  + ")); });");
-      }
-
-    });
-
     if (access == false) {
       endDateField.setEnabled(false);
       startDateField.setEnabled(false);
