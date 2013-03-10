@@ -23,6 +23,8 @@
 
 package org.projectforge.web.wicket;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
@@ -127,7 +129,13 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
   public String getPageAsLink(final PageParameters parameters)
   {
     final String relativeUrl = (String) urlFor(this.getClass(), parameters);
-    return WicketUtils.toAbsolutePath(getRequest(), relativeUrl);
+    final HttpServletRequest req = (HttpServletRequest)(this.getRequest()).getContainerRequest();
+    String requestUrl = req.getRequestURL().toString();
+    final int pos = requestUrl != null ? requestUrl.indexOf("/wa/") : -1;
+    if (pos > 0) {
+      requestUrl = requestUrl.substring(0, pos) + "/wa/";
+    }
+    return WicketUtils.toAbsolutePath(requestUrl, relativeUrl);
   }
 
   /**

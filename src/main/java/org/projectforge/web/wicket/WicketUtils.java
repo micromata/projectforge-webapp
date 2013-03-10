@@ -330,10 +330,9 @@ public class WicketUtils
    * @see RequestUtils#toAbsolutePath(String, String)
    * @see URLHelper#removeJSessionId(String)
    */
-  public final static String toAbsolutePath(final Request request, final String relativePagePath)
+  public final static String toAbsolutePath(final String requestUrl, final String relativePagePath)
   {
-    final HttpServletRequest req = (HttpServletRequest) request.getContainerRequest();
-    final String absoluteUrl = RequestUtils.toAbsolutePath(req.getRequestURL().toString(), relativePagePath);
+    final String absoluteUrl = RequestUtils.toAbsolutePath(requestUrl, relativePagePath);
     return URLHelper.removeJSessionId(absoluteUrl);
   }
 
