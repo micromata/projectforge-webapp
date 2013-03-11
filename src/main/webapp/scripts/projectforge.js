@@ -143,15 +143,15 @@ function initializeComponents() {
 	}, function() {
 		$(this).mytooltip('hide');
 	}).keydown(function(event) {
-		$(this).mypopover('hide');
+		$(this).mytooltip('hide');
 	}).on("hidden", function (e) {
         e.stopPropagation();
     });
 }
 
 function hideAllTooltips() {
-	$("div.popover").hide();
-	$("div.tooltip").hide();
+	$("div.popover").remove();
+	$("div.tooltip").remove();
 }
 
 function initMyPopover(element) {
@@ -159,7 +159,7 @@ function initMyPopover(element) {
 		mouseX = event.pageX;
 		mouseY = event.pageY;
 		// Avoid zombies:
-		$("div.tooltip").hide();
+		hideAllTooltips();
 		$(this).mypopover('myshow');
 	}).mouseleave(function(event) {
 		$(this).mypopover('hide');
@@ -415,11 +415,11 @@ $(function() {
 			// handle after AJAX actions
 			doAfterAjaxHandling();
             // hide double click layer after request
-            $("#mm_transparentOverlay").hide();
+            //$("#mm_transparentOverlay").hide();
 		});
         Wicket.Event.subscribe('/ajax/call/before', function (jqEvent, attributes, jqXHR, errorThrown, textStatus) {
             // show double click layer before request
-            $("#mm_transparentOverlay").show();
+            //$("#mm_transparentOverlay").show();
         });
 	}
 	$('.pf_preventClickBubble').on("contextmenu", function(e) {
