@@ -109,7 +109,7 @@ public class NavTopPanel extends NavAbstractPanel
       layoutSettingsMenuLink.setVisible(false);
     }
     if (WebConfiguration.isDevelopmentMode() == true) {
-      add(new MenuConfig("menuconfig"));
+      add(new MenuConfig("menuconfig", getMenu()));
     } else {
       add(new Label("menuconfig", "").setVisible(false));
     }
@@ -231,7 +231,7 @@ public class NavTopPanel extends NavAbstractPanel
           // Now we add the next menu entry to the area:
           final WebMarkupContainer subMenuItem = new WebMarkupContainer(completeSubMenuRepeater.newChildId());
           completeSubMenuRepeater.add(subMenuItem);
-          final AbstractLink link = getMenuEntryLink(subMenuEntry, null);
+          final AbstractLink link = getMenuEntryLink(subMenuEntry, true);
           if (link != null) {
             subMenuItem.add(link);
           } else {
@@ -254,7 +254,7 @@ public class NavTopPanel extends NavAbstractPanel
         // Now we add a new menu area (title with sub menus):
         final WebMarkupContainer menuItem = new WebMarkupContainer(menuRepeater.newChildId());
         menuRepeater.add(menuItem);
-        final AbstractLink link = getMenuEntryLink(menuEntry, menuItem);
+        final AbstractLink link = getMenuEntryLink(menuEntry, true);
         if (link == null) {
           menuItem.setVisible(false);
           continue;
@@ -282,7 +282,7 @@ public class NavTopPanel extends NavAbstractPanel
             subMenuRepeater.add(subMenuItem);
             // Subsubmenu entries aren't yet supported, show only the sub entries without children, otherwise only the children are
             // displayed.
-            final AbstractLink subLink = getMenuEntryLink(subMenuEntry, subMenuItem);
+            final AbstractLink subLink = getMenuEntryLink(subMenuEntry, true);
             if (subLink == null) {
               subMenuItem.setVisible(false);
               continue;
@@ -305,7 +305,7 @@ public class NavTopPanel extends NavAbstractPanel
             subMenuRepeater.add(subMenuItem);
             // Subsubmenu entries aren't yet supported, show only the sub entries without children, otherwise only the children are
             // displayed.
-            final AbstractLink subLink = getMenuEntryLink(subsubMenuEntry, subMenuItem);
+            final AbstractLink subLink = getMenuEntryLink(subsubMenuEntry, true);
             if (subLink == null) {
               subMenuItem.setVisible(false);
               continue;

@@ -24,13 +24,14 @@
 package org.projectforge.web.core;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.ResourceModel;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.PFUserContext;
@@ -64,7 +65,7 @@ public abstract class NavAbstractPanel extends Panel
     super(id);
   }
 
-  protected AbstractLink getMenuEntryLink(final MenuEntry menuEntry, final WebMarkupContainer suffixParent)
+  static protected AbstractLink getMenuEntryLink(final MenuEntry menuEntry, final boolean showSuffix)
   {
     final AbstractLink link;
     if (menuEntry.isWicketPage() == true) {
@@ -81,7 +82,7 @@ public abstract class NavAbstractPanel extends Panel
         return null;
       }
       if (url != null) {
-        link = new ExternalLink("link", WicketUtils.getUrl(getRequestCycle(), url, true));
+        link = new ExternalLink("link", WicketUtils.getUrl(RequestCycle.get(), url, true));
       } else {
         link = new ExternalLink("link", "#");
       }
@@ -90,20 +91,26 @@ public abstract class NavAbstractPanel extends Panel
       link.add(AttributeModifier.replace("target", "_blank"));
     }
     final String i18nKey = menuEntry.getI18nKey();
-    link.add(new Label("label", i18nKey != null ? getString(i18nKey) : menuEntry.getName()).setRenderBodyOnly(true));
-    final Label menuSuffixLabel = getSuffixLabel(menuEntry);
-    link.add(menuSuffixLabel);
+    if (i18nKey != null) {
+      link.add(new Label("label", new ResourceModel(i18nKey)).setRenderBodyOnly(true));
+    } else {
+      link.add(new Label("label", menuEntry.getName()).setRenderBodyOnly(true));
+    }
+    if (showSuffix == true) {
+      final Label menuSuffixLabel = getSuffixLabel(menuEntry);
+      link.add(menuSuffixLabel);
+    }
     return link;
   }
 
-  protected Label getSuffixLabel(final MenuEntry menuEntry)
+  static protected Label getSuffixLabel(final MenuEntry menuEntry)
   {
     final Label suffixLabel;
     final IModel<Integer> newCounterModel = menuEntry != null ? menuEntry.getNewCounterModel() : null;
     if (newCounterModel != null && newCounterModel.getObject() != null) {
       suffixLabel = new MenuSuffixLabel(newCounterModel);
       if (menuEntry != null && menuEntry.getNewCounterTooltip() != null) {
-        WicketUtils.addTooltip(suffixLabel, getString(menuEntry.getNewCounterTooltip()));
+        WicketUtils.addTooltip(suffixLabel, new ResourceModel(menuEntry.getNewCounterTooltip()));
       }
     } else {
       suffixLabel = new Label("suffix");
