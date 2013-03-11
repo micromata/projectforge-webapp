@@ -1,8 +1,16 @@
 Johannes
 --------
-- JavaScript mergen, ähnlich CSS
-- CSS/Javascript minimieren
-- Tooltipps für FullCalendar über Ajax nachladen?
+- TaskSelectPanel: Im Firefox bleibt overlay, wenn man mit "return"-Taste auswählt. Danach kann nix mehr geklickt werden.
+- TaskSelectPanel: Der Taskpath wird nicht immer angepasst.
+- TaskSelectPanel: Was tun, wenn gespeichert wird und noch das Text-Input-Feld steht?
+- TaskSelectPanel: Wenn erneut gesucht wird, steht alter Suchtext noch da, lieber löschen?
+
+Für Release:
+- Neue Tasksuche als JIRA-Issue und in News.xml aufnehmen.
+- Doc: Print-Css
+
+Bugs
+----
 
 TeamCal
 -------
@@ -10,6 +18,7 @@ TeamCal
 - TeamCalEdit: Wenn Start-Datum geändert wird, dann EndeDatum mit ändern (falls dies bisher noch nicht geändert wurde)
 - Attendees, Einladungen
 - Droplet, Import
+- Export: Auswahl, ob Erinnerungen mit exportiert werden sollen.
 
 Konkrete Masken
 ---------------
