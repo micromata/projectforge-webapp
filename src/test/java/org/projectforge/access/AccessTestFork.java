@@ -42,9 +42,9 @@ import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 
-public class AccessTest extends TestBase
+public class AccessTestFork extends TestBase
 {
-  private static final Logger log = Logger.getLogger(AccessTest.class);
+  private static final Logger log = Logger.getLogger(AccessTestFork.class);
 
   private AccessDao accessDao;
 
