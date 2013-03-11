@@ -93,10 +93,12 @@ public class NavTopPanel extends NavAbstractPanel
   {
     getMenu();
     this.favoritesMenu = FavoritesMenu.get(userXmlPreferencesCache, accessChecker);
+    final WebMarkupContainer goMobile = new WebMarkupContainer("goMobile");
+    add(goMobile);
     if (page.getMySession().isMobileUserAgent() == true) {
-      add(new BookmarkablePageLink<Void>("goMobile", MenuMobilePage.class));
+      goMobile.add(new BookmarkablePageLink<Void>("link", MenuMobilePage.class));
     } else {
-      add(new WebMarkupContainer("goMobile").setVisible(false));
+      goMobile.setVisible(false);
     }
     final BookmarkablePageLink<Void> customizeMenuLink = new BookmarkablePageLink<Void>("customizeMenuLink", CustomizeMenuPage.class);
     final BookmarkablePageLink<Void> layoutSettingsMenuLink = new BookmarkablePageLink<Void>("layoutSettingsMenuLink",
