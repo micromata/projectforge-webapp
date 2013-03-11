@@ -66,7 +66,7 @@ public class StorageClient implements ConfigurationListener
       }
       this.config = ConfigXml.getInstance().getStorageConfig();
       if (this.config == null) {
-        log.warn("No storageConfig given in config.xml. Storage not available.");
+        log.info("No storageConfig given in config.xml. Storage not available.");
         return;
       }
       final Client client = Client.create();
