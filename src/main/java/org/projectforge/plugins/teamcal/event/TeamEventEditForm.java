@@ -55,7 +55,6 @@ import org.projectforge.common.RecurrenceFrequency;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalFilter;
-import org.projectforge.plugins.teamcal.integration.TeamAttendeesPanel;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarPage;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.user.PFUserContext;

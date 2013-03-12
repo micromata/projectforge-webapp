@@ -67,6 +67,8 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
 
   private static final Set<String> NON_HISTORIZABLE_ATTRIBUTES;
 
+  public static final int URL_MAX_LENGTH = 255;
+
   static {
     NON_HISTORIZABLE_ATTRIBUTES = new HashSet<String>();
     NON_HISTORIZABLE_ATTRIBUTES.add("loginToken");
@@ -131,6 +133,7 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
    * The url (mail) of the attendee. Isn't used if the attendee is a ProjectForge user.
    * @return the url
    */
+  @Column(length = URL_MAX_LENGTH)
   public String getUrl()
   {
     return url;

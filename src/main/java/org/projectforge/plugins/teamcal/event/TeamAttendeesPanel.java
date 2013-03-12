@@ -21,7 +21,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.plugins.teamcal.integration;
+package org.projectforge.plugins.teamcal.event;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -29,7 +29,6 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.FormComponent;
@@ -38,9 +37,9 @@ import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.plugins.teamcal.event.TeamEventAttendeeDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
+import org.projectforge.web.wicket.components.AjaxMaxLengthEditableLabel;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -77,7 +76,7 @@ public class TeamAttendeesPanel extends Panel
   }
 
   @SuppressWarnings("serial")
-  class AttendeeEditableLabel extends AjaxEditableLabel<String>
+  class AttendeeEditableLabel extends AjaxMaxLengthEditableLabel
   {
     private IModel<TeamEventAttendeeDO> attendeeModel;
 
@@ -124,7 +123,7 @@ public class TeamAttendeesPanel extends Panel
             attendee.setUserId(null);
           }
         }
-      });
+      }, TeamEventAttendeeDO.URL_MAX_LENGTH);
       this.attendeeModel = attendeeModel;
       this.lastEntry = lastEntry;
       setType(String.class);
