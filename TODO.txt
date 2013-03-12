@@ -24,7 +24,6 @@ Konkrete Masken
 ---------------
 - GanttChartEditForm: refresh button
 - Layout Monatsbericht.
-- <a rel="tooltip"><i .../></a>
 - z-index wieder klein machen.
 
 Mobile Version
