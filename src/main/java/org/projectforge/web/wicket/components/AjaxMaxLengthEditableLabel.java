@@ -23,6 +23,8 @@
 
 package org.projectforge.web.wicket.components;
 
+import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.model.IModel;
@@ -95,6 +97,18 @@ public class AjaxMaxLengthEditableLabel extends AjaxEditableLabel<String>
     } else {
       return super.getConverter(type);
     }
+  }
+
+  /**
+   * @see org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel#newEditor(org.apache.wicket.MarkupContainer, java.lang.String,
+   *      org.apache.wicket.model.IModel)
+   */
+  @Override
+  protected FormComponent<String> newEditor(final MarkupContainer parent, final String componentId, final IModel<String> model)
+  {
+    final FormComponent<String> editor = super.newEditor(parent, componentId, model);
+    editor.add(AttributeModifier.append("onkeypress", "if ( event.which == 13 ) { return false; }"));
+    return editor;
   }
 
   /**
