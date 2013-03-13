@@ -46,6 +46,7 @@ public class MenuConfig extends Panel
       protected void respond(AjaxRequestTarget target)
       {
         final StringValue configuration = RequestCycle.get().getRequest().getPostParameters().getParameterValue("configuration");
+        log.info(configuration);
       }
     };
     add(configureBehavior);

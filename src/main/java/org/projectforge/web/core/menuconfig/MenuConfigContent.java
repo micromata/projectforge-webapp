@@ -35,6 +35,8 @@ import org.projectforge.web.MenuEntry;
 import org.projectforge.web.core.NavAbstractPanel;
 
 /**
+ * @author Dennis Hilpmann (d.hilpmann.extern@micromata.de)
+ * @author Kai Reinhard (k.reinhard@micromata.de)
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  */
 public class MenuConfigContent extends Panel
