@@ -45,7 +45,7 @@ public class MenuConfig extends Panel
       @Override
       protected void respond(AjaxRequestTarget target)
       {
-        final StringValue hurzel = RequestCycle.get().getRequest().getPostParameters().getParameterValue("configuration");
+        final StringValue configuration = RequestCycle.get().getRequest().getPostParameters().getParameterValue("configuration");
       }
     };
     add(configureBehavior);
