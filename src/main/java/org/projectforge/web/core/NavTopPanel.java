@@ -54,6 +54,7 @@ import org.projectforge.web.LayoutSettingsPage;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.MenuEntry;
 import org.projectforge.web.WebConfiguration;
+import org.projectforge.web.core.menuconfig.MenuConfig;
 import org.projectforge.web.dialog.ModalDialog;
 import org.projectforge.web.mobile.MenuMobilePage;
 import org.projectforge.web.user.ChangePasswordPage;

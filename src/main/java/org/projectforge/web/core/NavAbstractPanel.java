@@ -65,7 +65,7 @@ public abstract class NavAbstractPanel extends Panel
     super(id);
   }
 
-  static protected AbstractLink getMenuEntryLink(final MenuEntry menuEntry, final boolean showSuffix)
+  static public AbstractLink getMenuEntryLink(final MenuEntry menuEntry, final boolean showSuffix)
   {
     final AbstractLink link;
     if (menuEntry.isWicketPage() == true) {
