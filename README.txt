@@ -1,4 +1,6 @@
-Please visit: https://www.projectforge.org/pf-en/Developersarewelcome
+Full documentation on: http://www.projectforge.org/pf-en/Documentation
+
+Please visit: http://www.projectforge.org/pf-en/Developersarewelcome
 
 Quickstart (since version 4.*)
 
