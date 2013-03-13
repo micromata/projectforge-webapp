@@ -22,8 +22,13 @@ $(window).load(
             //save the menu configuration
             var update = function () {
                 //@todo: save the menu
-                console
-                        .log('@todo: save the configured menu');
+                console.log('@todo: save the configured menu');
+                var callbackUrl = $("#mm_configure").data("callback");
+                $.ajax({
+                    type: "POST",
+                    url: callbackUrl,
+                    data: { "configuration": "123" }
+                });
                 $('.pf_menueconfig .dropdown-menu').css(
                         'top', $('.pf_sortable').height());
                 $('#pf_sortablecontainer').css('height',

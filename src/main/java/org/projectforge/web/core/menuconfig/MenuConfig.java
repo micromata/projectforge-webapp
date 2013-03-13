@@ -9,7 +9,13 @@
 
 package org.projectforge.web.core.menuconfig;
 
+import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.util.string.StringValue;
 import org.projectforge.web.Menu;
 
 /**
@@ -23,12 +29,33 @@ public class MenuConfig extends Panel
 
   private static final long serialVersionUID = 7330216552642637127L;
 
+  private final WebMarkupContainer configureLink;
+
+  private final AbstractDefaultAjaxBehavior configureBehavior;
+
   /**
    * @param id
    */
   public MenuConfig(final String id, final Menu menu)
   {
     super(id);
+    configureLink = new WebMarkupContainer("configureLink");
+    add(configureLink);
+    configureBehavior = new AbstractDefaultAjaxBehavior() {
+      @Override
+      protected void respond(AjaxRequestTarget target)
+      {
+        final StringValue hurzel = RequestCycle.get().getRequest().getPostParameters().getParameterValue("configuration");
+      }
+    };
+    add(configureBehavior);
     add(new MenuConfigContent("content", menu));
+  }
+
+  @Override
+  protected void onBeforeRender()
+  {
+    super.onBeforeRender();
+    configureLink.add(AttributeModifier.replace("data-callback", "" + configureBehavior.getCallbackUrl()));
   }
 }
