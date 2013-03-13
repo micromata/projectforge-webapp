@@ -46,6 +46,7 @@ public class MenuConfig extends Panel
       protected void respond(AjaxRequestTarget target)
       {
         final StringValue configuration = RequestCycle.get().getRequest().getPostParameters().getParameterValue("configuration");
+        // TODO kai: deserialize, e.g. with Gson, and have fun :)
         log.info(configuration);
       }
     };
