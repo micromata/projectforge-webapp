@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.model.PropertyModel;
@@ -46,13 +47,13 @@ public abstract class TaskSelectAutoCompleteFormComponent extends PFAutoComplete
 
   /**
    * @param id
-   * @param model
    */
   public TaskSelectAutoCompleteFormComponent(final String id)
   {
     super(id, null);
     setModel(new PropertyModel<TaskDO>(this, "taskDo"));
     getSettings().withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false);
+    add(AttributeModifier.append("onkeypress", "if ( event.which == 13 ) { return false; }"));
     add(new AjaxFormComponentUpdatingBehavior("onChange") {
       private static final long serialVersionUID = 3681828654557441560L;
 

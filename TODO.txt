@@ -1,6 +1,5 @@
 Johannes
 --------
-- TaskSelectPanel: Im Firefox bleibt overlay, wenn man mit "return"-Taste auswählt. Danach kann nix mehr geklickt werden.
 - TaskSelectPanel: Der Taskpath wird nicht immer angepasst.
 - TaskSelectPanel: Was tun, wenn gespeichert wird und noch das Text-Input-Feld steht?
 - TaskSelectPanel: Wenn erneut gesucht wird, steht alter Suchtext noch da, lieber löschen?
