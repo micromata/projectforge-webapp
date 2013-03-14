@@ -96,7 +96,6 @@ public abstract class NavAbstractPanel extends Panel
     } else {
       link.add(new Label("label", menuEntry.getName()).setRenderBodyOnly(true));
     }
-    System.out.println(menuEntry.getId());
     link.add(AttributeModifier.append("ref", menuEntry.getId()));
     if (showSuffix == true) {
       final Label menuSuffixLabel = getSuffixLabel(menuEntry);

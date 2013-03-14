@@ -52,7 +52,7 @@ public class Md4 {
     {
       final Md4 mdc = new Md4(str[i]);
       mdc.calc();
-      System.out.println("md4(\"" + str[i] + "\") = " + mdc);
+      //System.out.println("md4(\"" + str[i] + "\") = " + mdc);
     }
   }
 
