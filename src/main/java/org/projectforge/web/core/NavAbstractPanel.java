@@ -65,7 +65,7 @@ public abstract class NavAbstractPanel extends Panel
     super(id);
   }
 
-  static protected AbstractLink getMenuEntryLink(final MenuEntry menuEntry, final boolean showSuffix)
+  static public AbstractLink getMenuEntryLink(final MenuEntry menuEntry, final boolean showSuffix)
   {
     final AbstractLink link;
     if (menuEntry.isWicketPage() == true) {
@@ -96,6 +96,7 @@ public abstract class NavAbstractPanel extends Panel
     } else {
       link.add(new Label("label", menuEntry.getName()).setRenderBodyOnly(true));
     }
+    System.out.println(menuEntry.getId());
     link.add(AttributeModifier.append("ref", menuEntry.getId()));
     if (showSuffix == true) {
       final Label menuSuffixLabel = getSuffixLabel(menuEntry);
