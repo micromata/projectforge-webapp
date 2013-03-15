@@ -78,6 +78,7 @@ public class MyAccountEditForm extends AbstractEditForm<PFUserDO, MyAccountEditP
     UserEditForm.createMEBPhoneNumbers(gridBuilder, data);
     gridBuilder.newGridPanel();
     UserEditForm.createDescription(gridBuilder, data);
+    UserEditForm.createSshPublicKey(gridBuilder, data);
   }
 
   @Override

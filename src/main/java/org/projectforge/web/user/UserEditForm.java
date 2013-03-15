@@ -347,6 +347,13 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(user, "description")));
   }
 
+  public static void createSshPublicKey(final GridBuilder gridBuilder, final PFUserDO user)
+  {
+    // SSH public key
+    final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("user.sshPublicKey"));
+    fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(user, "sshPublicKey")));
+  }
+
   @SuppressWarnings("serial")
   @Override
   protected void init()
@@ -414,6 +421,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     createTimeZone(gridBuilder, data);
     createPhoneIds(gridBuilder, data);
     createMEBPhoneNumbers(gridBuilder, data);
+    createSshPublicKey(gridBuilder, data);
 
     gridBuilder.newGridPanel();
     addAssignedGroups(adminAccess);

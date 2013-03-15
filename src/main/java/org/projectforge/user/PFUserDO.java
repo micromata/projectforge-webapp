@@ -148,6 +148,9 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String ldapValues;
 
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String sshPublicKey;
+
   @Transient
   public String getShortDisplayName()
   {
@@ -858,6 +861,25 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   public PFUserDO setLdapValues(final String ldapValues)
   {
     this.ldapValues = ldapValues;
+    return this;
+  }
+
+  /**
+   * @return the sshPublicKey
+   */
+  @Column(name = "ssh_public_key", length = 1000)
+  public String getSshPublicKey()
+  {
+    return sshPublicKey;
+  }
+
+  /**
+   * @param sshPublicKey the sshPublicKey to set
+   * @return this for chaining.
+   */
+  public PFUserDO setSshPublicKey(final String sshPublicKey)
+  {
+    this.sshPublicKey = sshPublicKey;
     return this;
   }
 

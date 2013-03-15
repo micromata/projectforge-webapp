@@ -59,8 +59,9 @@ public class DatabaseCoreUpdates
     // 4.3.2
     // /////////////////////////////////////////////////////////////////
     list.add(new UpdateEntryImpl(CORE_REGION_ID, "4.3.2", "2013-02-15",
-        "Adds t_fibu_rechnung.konto, fixes contract.IN_PROGRES -> contract.IN_PROGRESS") {
+        "Adds t_fibu_rechnung.konto, t_pf_user.ssh_public_key, fixes contract.IN_PROGRES -> contract.IN_PROGRESS") {
       final Table rechnungTable = new Table(RechnungDO.class);
+      final Table userTable = new Table(PFUserDO.class);
 
       @Override
       public UpdatePreCheckStatus runPreCheck()
@@ -68,6 +69,7 @@ public class DatabaseCoreUpdates
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         final int entriesToMigrate = dao.queryForInt("select count(*) from t_contract where status='IN_PROGRES'");
         return dao.doesTableAttributesExist(rechnungTable, "konto") == true //
+            && dao.doesTableAttributesExist(userTable, "sshPublicKey") //
             && entriesToMigrate == 0 //
             ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
       }
@@ -78,6 +80,9 @@ public class DatabaseCoreUpdates
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         if (dao.doesTableAttributesExist(rechnungTable, "konto") == false) {
           dao.addTableAttributes(rechnungTable, new TableAttribute(RechnungDO.class, "konto"));
+        }
+        if (dao.doesTableAttributesExist(userTable, "sshPublicKey") == false) {
+          dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "sshPublicKey"));
         }
         final int entriesToMigrate = dao.queryForInt("select count(*) from t_contract where status='IN_PROGRES'");
         if (entriesToMigrate > 0) {
