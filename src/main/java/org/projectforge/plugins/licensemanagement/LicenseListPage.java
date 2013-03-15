@@ -108,6 +108,19 @@ public class LicenseListPage extends AbstractListPage<LicenseListForm, LicenseDa
     });
     columns.add(new CellItemListenerPropertyColumn<LicenseDO>(new Model<String>(getString("plugins.licensemanagement.device")), getSortable(
         "device", sortable), "device", cellItemListener));
+    if (accessChecker.isLoggedInUserMemberOfAdminGroup() == true) {
+      columns.add(new CellItemListenerPropertyColumn<LicenseDO>(new Model<String>(getString("plugins.licensemanagement.key")), getSortable(
+          "key", sortable), "key", cellItemListener) {
+        @Override
+        public void populateItem(final Item<ICellPopulator<LicenseDO>> item, final String componentId, final IModel<LicenseDO> rowModel)
+        {
+          final LicenseDO license = rowModel.getObject();
+          final Label label = new Label(componentId, new Model<String>(StringUtils.abbreviate(license.getKey(), 40)));
+          cellItemListener.populateItem(item, componentId, rowModel);
+          item.add(label);
+        }
+      });
+    }
     columns.add(new CellItemListenerPropertyColumn<LicenseDO>(new Model<String>(getString("comment")),
         getSortable("comment", sortable), "comment", cellItemListener) {
       @Override
