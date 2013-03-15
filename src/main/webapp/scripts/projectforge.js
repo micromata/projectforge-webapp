@@ -120,7 +120,13 @@ function initializeComponents() {
 	if ($("textarea.autogrow").length) {
 		$("textarea.autogrow").autoGrow();
 	}
-	
+	$('textarea').each(function(){
+	    $(this).keypress(function(e) {
+	        if (e.ctrlKey && e.keyCode == 13 || e.ctrlKey && e.keyCode == 10) {
+	            $(this).closest('form').find('.btn-success').click();
+	        }
+	    });
+	});	
 	$('[rel=\'mypopup\']').hover(function(event) {
 		mouseX = event.pageX;
 		mouseY = event.pageY;
