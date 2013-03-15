@@ -133,8 +133,10 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
     String requestUrl = req.getRequestURL().toString();
     final int pos = requestUrl != null ? requestUrl.indexOf("/wa/") : -1;
     if (pos > 0) {
+      // Ignore any sub pathes such as /wa/wicket/page:
       requestUrl = requestUrl.substring(0, pos) + "/wa/";
       if (relativeUrl.indexOf("../") >= 0) {
+        // Therefore ignore relative pathes ../:
         relativeUrl = relativeUrl.replace("../", "");
       }
     }
