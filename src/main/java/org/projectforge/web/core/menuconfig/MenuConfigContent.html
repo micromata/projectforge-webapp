@@ -110,7 +110,7 @@ $(window).load(function () {
                     $(this).css('display', 'none');
                     updatelayout();
                     innerItemsVal = $(this).html().split('<span');
-                    if (innerItemsVal.length == 2) { //because of badges
+                    if (innerItemsVal.length > 1) { //because of badges
                         $('#pf_editentry input').val(innerItemsVal[0]);
                     } else {
                         $('#pf_editentry input').val($(this).text());
@@ -125,13 +125,14 @@ $(window).load(function () {
                         if ($('#pf_editentry input').val().length == 0) {
                             $('#pf_editentry').addClass('pf_warning');
                         } else {
+                        	  var value = escapeHtml($('#pf_editentry input').val());
                             if ($(this).parent().prev().find('b').length) {
-                                $(this).parent().prev().html($('#pf_editentry input').val() + '<b class="caret"></b>');
+                                $(this).parent().prev().html(value + '<b class="caret"></b>');
                             } else if ($(this).parent().prev().find('span').length) {
                                 innerItems = $(this).parent().prev().html().split('<span');
-                                $(this).parent().prev().html($('#pf_editentry input').val() + '<span' + innerItems[1]);
+                                $(this).parent().prev().html(value + '<span' + innerItems[1]);
                             } else {
-                                $(this).parent().prev().text($('#pf_editentry input').val());
+                                $(this).parent().prev().html(value);
                             }
                             $(this).parent().prev().css('display', 'block');
                             removeeditentry();
@@ -376,6 +377,27 @@ function putXml(xmlDocument, xmlParent, node) {
         });
     }
 }
+
+//List of HTML entities for escaping.
+var htmlEscapes = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#x27;',
+  '/': '&#x2F;'
+};
+
+// Regex containing the keys listed immediately above.
+var htmlEscaper = /[&<>"'\/]/g;
+
+//Escape a string for HTML interpolation.
+function escapeHtml(string) {
+  return ('' + string).replace(htmlEscaper, function(match) {
+    return htmlEscapes[match];
+  });
+};
+
 </script>
 
 </wicket:panel>
