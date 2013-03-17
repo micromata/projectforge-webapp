@@ -151,11 +151,16 @@ public class FavoritesMenu implements Serializable
       menuEntry = new MenuEntry();
     }
     menuEntry.setSorted(false);
-    Element title;
-    title = item;
+    final Element title = item;
     if (title != null) {
-      if (title.getTextTrim() != null) {
-        menuEntry.setName(title.getTextTrim());
+      final String trimmedTitle = title.getTextTrim();
+      if (trimmedTitle != null) {
+        // menuEntry.setName(StringEscapeUtils.escapeXml(trimmedTitle));
+        if (StringUtils.isBlank(trimmedTitle) == true) {
+          menuEntry.setName("???");
+        } else {
+          menuEntry.setName(trimmedTitle);
+        }
       }
     }
     for (final Iterator< ? > it = item.elementIterator("item"); it.hasNext();) {
