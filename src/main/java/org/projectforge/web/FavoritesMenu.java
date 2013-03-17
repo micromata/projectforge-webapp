@@ -64,11 +64,6 @@ public class FavoritesMenu implements Serializable
 
   private final UserXmlPreferencesCache userXmlPreferencesCache;
 
-  public enum ParseMode
-  {
-    JS_TREE, USER_PREF
-  };
-
   public static FavoritesMenu get(final UserXmlPreferencesCache userXmlPreferencesCache, final AccessChecker accessChecker)
   {
     FavoritesMenu favoritesMenu = (FavoritesMenu) userXmlPreferencesCache.getEntry(USER_PREF_FAVORITES_MENU_KEY);
@@ -108,7 +103,7 @@ public class FavoritesMenu implements Serializable
     return this;
   }
 
-  public void readFromXml(final String menuAsXml, final ParseMode mode)
+  public void readFromXml(final String menuAsXml)
   {
     if (menu == null) {
       log.error("User's menu is null, can't get FavoritesMenu!");
@@ -129,12 +124,12 @@ public class FavoritesMenu implements Serializable
     menuEntries = new ArrayList<MenuEntry>();
     for (final Iterator< ? > it = root.elementIterator("item"); it.hasNext();) {
       final Element item = (Element) it.next();
-      final MenuEntry menuEntry = readFromXml(item, context, mode);
+      final MenuEntry menuEntry = readFromXml(item, context);
       menuEntries.add(menuEntry);
     }
   }
 
-  private MenuEntry readFromXml(final Element item, final MenuBuilderContext context, final ParseMode mode)
+  private MenuEntry readFromXml(final Element item, final MenuBuilderContext context)
   {
     if ("item".equals(item.getName()) == false) {
       log.error("Tag 'item' expected instead of '" + item.getName() + "'. Ignoring this tag.");
@@ -157,12 +152,7 @@ public class FavoritesMenu implements Serializable
     }
     menuEntry.setSorted(false);
     Element title;
-    if (mode == ParseMode.JS_TREE) {
-      final Element content = item.element("content");
-      title = content != null ? content.element("name") : null;
-    } else {
-      title = item;
-    }
+    title = item;
     if (title != null) {
       if (title.getTextTrim() != null) {
         menuEntry.setName(title.getTextTrim());
@@ -173,7 +163,7 @@ public class FavoritesMenu implements Serializable
         log.warn("Menu entry shouldn't have children, because it's a leaf node.");
       }
       final Element child = (Element) it.next();
-      final MenuEntry childMenuEntry = readFromXml(child, context, mode);
+      final MenuEntry childMenuEntry = readFromXml(child, context);
       if (childMenuEntry != null) {
         menuEntry.addMenuEntry(childMenuEntry);
       }
@@ -190,7 +180,7 @@ public class FavoritesMenu implements Serializable
         // Old format:
         buildFromOldUserPrefFormat(userPrefString);
       } else {
-        readFromXml(userPrefString, ParseMode.USER_PREF);
+        readFromXml(userPrefString);
       }
     }
     if (this.menuEntries.size() == 0) {
