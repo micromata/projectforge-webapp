@@ -66,7 +66,7 @@ public abstract class NavAbstractPanel extends Panel
     super(id);
   }
 
-  static public AbstractLink getMenuEntryLink(final MenuEntry menuEntry, final boolean showSuffix)
+  static public AbstractLink getMenuEntryLink(final MenuEntry menuEntry, final boolean showModifiedNames)
   {
     final AbstractLink link;
     if (menuEntry.isWicketPage() == true) {
@@ -91,21 +91,20 @@ public abstract class NavAbstractPanel extends Panel
     if (menuEntry.isNewWindow() == true) {
       link.add(AttributeModifier.replace("target", "_blank"));
     }
-    if (StringUtils.isNotBlank(menuEntry.getName()) == true) {
-      link.add(new Label("label", menuEntry.getName()).setRenderBodyOnly(true));
-    } else {
-      final String i18nKey = menuEntry.getI18nKey();
-      if (i18nKey != null) {
-        link.add(new Label("label", new ResourceModel(i18nKey)).setRenderBodyOnly(true));
+    final String i18nKey = menuEntry.getI18nKey();
+    if (showModifiedNames == true && StringUtils.isNotBlank(menuEntry.getName()) == true || i18nKey == null) {
+      if (StringUtils.isNotBlank(menuEntry.getName()) == true) {
+        link.add(new Label("label", menuEntry.getName()).setRenderBodyOnly(true));
       } else {
+        // Neither i18nKey nor name is given:
         link.add(new Label("label", "???").setRenderBodyOnly(true));
       }
+    } else {
+      link.add(new Label("label", new ResourceModel(i18nKey)).setRenderBodyOnly(true));
     }
     link.add(AttributeModifier.append("ref", menuEntry.getId()));
-    if (showSuffix == true) {
-      final Label menuSuffixLabel = getSuffixLabel(menuEntry);
-      link.add(menuSuffixLabel);
-    }
+    final Label menuSuffixLabel = getSuffixLabel(menuEntry);
+    link.add(menuSuffixLabel);
     return link;
   }
 

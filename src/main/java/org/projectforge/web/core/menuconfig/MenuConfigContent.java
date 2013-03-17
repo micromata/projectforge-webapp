@@ -45,7 +45,7 @@ public class MenuConfigContent extends Panel
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MenuConfigContent.class);
 
-  public MenuConfigContent(String id, final Menu menu)
+  public MenuConfigContent(final String id, final Menu menu)
   {
     super(id);
     final RepeatingView mainMenuRepeater = new RepeatingView("mainMenuItem");
