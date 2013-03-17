@@ -23,6 +23,7 @@
 
 package org.projectforge.web.core;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.AbstractLink;
@@ -90,11 +91,15 @@ public abstract class NavAbstractPanel extends Panel
     if (menuEntry.isNewWindow() == true) {
       link.add(AttributeModifier.replace("target", "_blank"));
     }
-    final String i18nKey = menuEntry.getI18nKey();
-    if (i18nKey != null) {
-      link.add(new Label("label", new ResourceModel(i18nKey)).setRenderBodyOnly(true));
-    } else {
+    if (StringUtils.isNotBlank(menuEntry.getName()) == true) {
       link.add(new Label("label", menuEntry.getName()).setRenderBodyOnly(true));
+    } else {
+      final String i18nKey = menuEntry.getI18nKey();
+      if (i18nKey != null) {
+        link.add(new Label("label", new ResourceModel(i18nKey)).setRenderBodyOnly(true));
+      } else {
+        link.add(new Label("label", "???").setRenderBodyOnly(true));
+      }
     }
     link.add(AttributeModifier.append("ref", menuEntry.getId()));
     if (showSuffix == true) {
