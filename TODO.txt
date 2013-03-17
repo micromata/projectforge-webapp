@@ -4,10 +4,6 @@ Johannes
 - TaskSelectPanel: Was tun, wenn gespeichert wird und noch das Text-Input-Feld steht?
 - TaskSelectPanel: Wenn erneut gesucht wird, steht alter Suchtext noch da, lieber löschen?
 
-Für Release:
-- Neue Tasksuche als JIRA-Issue und in News.xml aufnehmen.
-- Doc: Print-Css
-
 Bugs
 ----
 
