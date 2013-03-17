@@ -340,59 +340,41 @@ $(window).load(function () {
 
 function calcConfiguration() {
     var configuration = []; // new array
-    //var xmlDocument = $.parseXML("<root/>");
+    var xmlDocument = $.parseXML("<root/>");
     $("#pf_sortablecontainer > ul > li").each(function() {
         if($(this).attr("id") == "pf_newentry" == false) {
-            configuration.push(getJson($(this)));
-            //putXml(xmlDocument, xmlDocument.documentElement, $(this));
+            putXml(xmlDocument, xmlDocument.documentElement, $(this));
         }
     });
-    return {configuration: JSON.stringify(configuration) };
+		var serialized;
+		try {
+			// XMLSerializer exists in current Mozilla browsers
+			serializer = new XMLSerializer();
+			serialized = serializer.serializeToString(xmlDocument);
+		} 
+		catch (e) {
+			// Internet Explorer has a different approach to serializing XML
+			serialized = xmlDocument.xml;
+		}
+		console.log(serialized);
+		return serialized
 }
 
 function putXml(xmlDocument, xmlParent, node) {
-    if(node.children("ul").length == 0) {
-      var element = $(node).children("a");
-      var ref = element.attr('ref');
-      // Get content text without text of children (such as span's etc.):
-      var content = element.clone().children().remove().end().text().trim();
-    	var xmlNode = xmlDocument.createElement('item');
-      xmlNode.setAttribute("ref", ref);
-      xmlNode.appendChild(document.createTextNode(content));
-    	xmlParent.appendChild(xmlNode);
-    } else {
-        // node
-        var childs = []; // new array
-        $(node).children("ul").children("li").each(function() {
-            childs.push(getJson($(this)));
-        });
-        return {
-            content: $(node).children("a").text().trim(),
-            children: childs
-        };
-    }
-}
-
-function getJson(node) {
     var element = $(node).children("a");
     var ref = element.attr('ref');
+    // Get content text without text of children (such as span's etc.):
     var content = element.clone().children().remove().end().text().trim();
+  	var xmlNode = xmlDocument.createElement('item');
+    xmlNode.appendChild(document.createTextNode(content));
+  	xmlParent.appendChild(xmlNode);
     if(node.children("ul").length == 0) {
-        // leaf
-        return {
-            ref: ref,
-            content: content
-        };
+      xmlNode.setAttribute("id", ref);
     } else {
         // node
-        var childs = []; // new array
         $(node).children("ul").children("li").each(function() {
-            childs.push(getJson($(this)));
+        	putXml(xmlDocument, xmlNode, $(this));
         });
-        return {
-            content: content,
-            children: childs
-        };
     }
 }
 </script>
