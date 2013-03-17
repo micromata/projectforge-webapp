@@ -151,9 +151,8 @@ public class FavoritesMenu implements Serializable
       menuEntry = new MenuEntry();
     }
     menuEntry.setSorted(false);
-    final Element title = item;
-    if (title != null) {
-      final String trimmedTitle = title.getTextTrim();
+    if (item != null) {
+      final String trimmedTitle = item.getTextTrim();
       if (trimmedTitle != null) {
         // menuEntry.setName(StringEscapeUtils.escapeXml(trimmedTitle));
         if (StringUtils.isBlank(trimmedTitle) == true) {
