@@ -16,6 +16,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.util.string.StringValue;
+import org.projectforge.web.FavoritesMenu;
 import org.projectforge.web.Menu;
 
 /**
@@ -36,18 +37,21 @@ public class MenuConfig extends Panel
   /**
    * @param id
    */
-  public MenuConfig(final String id, final Menu menu)
+  @SuppressWarnings("serial")
+  public MenuConfig(final String id, final Menu menu, final FavoritesMenu favoritesMenu)
   {
     super(id);
     configureLink = new WebMarkupContainer("configureLink");
     add(configureLink);
     configureBehavior = new AbstractDefaultAjaxBehavior() {
       @Override
-      protected void respond(AjaxRequestTarget target)
+      protected void respond(final AjaxRequestTarget target)
       {
         final StringValue configuration = RequestCycle.get().getRequest().getPostParameters().getParameterValue("configuration");
-        // TODO kai: deserialize, e.g. with Gson, and have fun :)
-        log.info(configuration);
+        final String json = configuration.toString("");
+        if (log.isDebugEnabled() == true) {
+          log.debug(configuration);
+        }
       }
     };
     add(configureBehavior);
