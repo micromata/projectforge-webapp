@@ -110,11 +110,7 @@ $(window).load(function () {
                     $(this).css('display', 'none');
                     updatelayout();
                     innerItemsVal = $(this).html().split('<span');
-                    if (innerItemsVal.length > 1) { //because of badges
-                        $('#pf_editentry input').val(innerItemsVal[0]);
-                    } else {
-                        $('#pf_editentry input').val($(this).text());
-                    }
+                    $('#pf_editentry input').val(getTopText($(this)));
                     $('#pf_editentry input').focus();
                     $('#pf_editentry input').keyup(function (event) {
                         if (event.keyCode == 13) {
@@ -132,7 +128,7 @@ $(window).load(function () {
                                 innerItems = $(this).parent().prev().html().split('<span');
                                 $(this).parent().prev().html(value + '<span' + innerItems[1]);
                             } else {
-                                $(this).parent().prev().html(value);
+                                $(this).parent().prev().text(value);
                             }
                             $(this).parent().prev().css('display', 'block');
                             removeeditentry();
@@ -364,7 +360,7 @@ function putXml(xmlDocument, xmlParent, node) {
     var element = $(node).children("a");
     var ref = element.attr('ref');
     // Get content text without text of children (such as span's etc.):
-    var content = element.clone().children().remove().end().text().trim();
+    var content = getTopText(element);
   	var xmlNode = xmlDocument.createElement('item');
     xmlNode.appendChild(document.createTextNode(content));
   	xmlParent.appendChild(xmlNode);
@@ -376,6 +372,11 @@ function putXml(xmlDocument, xmlParent, node) {
         	putXml(xmlDocument, xmlNode, $(this));
         });
     }
+}
+
+// Gets the first text without text of descendants.
+function getTopText(element) {
+    return element.clone().children().remove().end().text().trim();
 }
 
 //List of HTML entities for escaping.
