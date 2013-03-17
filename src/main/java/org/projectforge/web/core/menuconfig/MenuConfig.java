@@ -14,6 +14,7 @@ import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.request.Request;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.util.string.StringValue;
 import org.projectforge.web.FavoritesMenu;
@@ -47,11 +48,14 @@ public class MenuConfig extends Panel
       @Override
       protected void respond(final AjaxRequestTarget target)
       {
-        final StringValue configuration = RequestCycle.get().getRequest().getPostParameters().getParameterValue("configuration");
-        final String json = configuration.toString("");
+        final Request request = RequestCycle.get().getRequest();
+        final StringValue configuration = request.getPostParameters().getParameterValue("configuration");
+        final String xml = configuration.toString("");
         if (log.isDebugEnabled() == true) {
-          log.debug(configuration);
+          log.debug(xml);
         }
+        favoritesMenu.readFromXml(xml);
+        favoritesMenu.storeAsUserPref();
       }
     };
     add(configureBehavior);
