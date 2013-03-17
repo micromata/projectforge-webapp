@@ -33,7 +33,6 @@ import org.apache.wicket.markup.html.WebPage;
 import org.projectforge.core.BaseDao;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.registry.Registry;
-import org.projectforge.web.CustomizeMenuPage;
 import org.projectforge.web.LayoutSettingsPage;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.access.AccessEditPage;
@@ -358,7 +357,6 @@ public class WebRegistry
     addMountPage("calendar", CalendarPage.class);
     addMountPage("changePassword", ChangePasswordPage.class);
     addMountPage("configuration", ConfigurationListPage.class);
-    addMountPage("customizeMenu", CustomizeMenuPage.class);
     addMountPage("datevImport", DatevImportPage.class);
     addMountPage("doc", DocumentationPage.class);
     addMountPage("error", ErrorPage.class);
