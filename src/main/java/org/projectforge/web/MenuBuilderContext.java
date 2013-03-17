@@ -38,13 +38,13 @@ public class MenuBuilderContext
 
   final static String VAR_ORDER_BOOK_ENTRY_EXISTS = "orderBookMenuEntryExists";
 
-  private AccessChecker accessChecker;
+  private final AccessChecker accessChecker;
 
-  private PFUserDO loggedInUser;
+  private final PFUserDO loggedInUser;
 
-  private Menu menu;
+  private final Menu menu;
 
-  private boolean mobileMenu;
+  private final boolean mobileMenu;
 
   private Map<String, Object> variables;
 
