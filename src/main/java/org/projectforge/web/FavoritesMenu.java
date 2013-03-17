@@ -24,9 +24,7 @@
 package org.projectforge.web;
 
 import java.io.Serializable;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -44,9 +42,6 @@ import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.user.UserXmlPreferencesDO;
 import org.projectforge.web.core.NavAbstractPanel;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 /**
  * The customizable menu of the user (stored in the data-base and customizable).
@@ -68,6 +63,11 @@ public class FavoritesMenu implements Serializable
   private final AccessChecker accessChecker;
 
   private final UserXmlPreferencesCache userXmlPreferencesCache;
+
+  public enum ParseMode
+  {
+    JS_TREE, USER_PREF
+  };
 
   public static FavoritesMenu get(final UserXmlPreferencesCache userXmlPreferencesCache, final AccessChecker accessChecker)
   {
@@ -98,59 +98,17 @@ public class FavoritesMenu implements Serializable
   }
 
   /**
+   * Only for test cases.
    * @param menu the menu to set
    * @return this for chaining.
    */
-  public FavoritesMenu setMenu(final Menu menu)
+  FavoritesMenu setMenu(final Menu menu)
   {
     this.menu = menu;
     return this;
   }
 
-  public void readFromJson(final String menuAsJson)
-  {
-    if (menu == null) {
-      log.error("User's menu is null, can't get FavoritesMenu!");
-      return;
-    }
-    if (log.isDebugEnabled() == true) {
-      log.debug("readFromJson: " + menuAsJson);
-    }
-
-    final Gson gson = new Gson();
-    final Type collectionType = new TypeToken<Collection<FavoritesMenuItem>>() {
-    }.getType();
-    Collection<FavoritesMenuItem> col = null;
-    try {
-      col = gson.fromJson(menuAsJson, collectionType);
-    } catch (final Exception ex) {
-      log.error("Exception encountered " + ex, ex);
-      log.error("JSon string: " + menuAsJson);
-      return;
-    }
-    menuEntries = new ArrayList<MenuEntry>();
-    if (col == null) {
-      return;
-    }
-    //
-    //    Document document = null;
-    //    try {
-    //      document = DocumentHelper.parseText(menuAsXml);
-    //    } catch (final DocumentException ex) {
-    //      log.error("Exception encountered " + ex, ex);
-    //      return;
-    //    }
-    //    final MenuBuilderContext context = new MenuBuilderContext(menu, accessChecker, PFUserContext.getUser(), false);
-    //    final Element root = document.getRootElement();
-    //    menuEntries = new ArrayList<MenuEntry>();
-    //    for (final Iterator< ? > it = root.elementIterator("item"); it.hasNext();) {
-    //      final Element item = (Element) it.next();
-    //      final MenuEntry menuEntry = readFromXml(item, context, mode);
-    //      menuEntries.add(menuEntry);
-    //    }
-  }
-
-  public void readFromXml(final String menuAsXml)
+  public void readFromXml(final String menuAsXml, final ParseMode mode)
   {
     if (menu == null) {
       log.error("User's menu is null, can't get FavoritesMenu!");
@@ -171,12 +129,12 @@ public class FavoritesMenu implements Serializable
     menuEntries = new ArrayList<MenuEntry>();
     for (final Iterator< ? > it = root.elementIterator("item"); it.hasNext();) {
       final Element item = (Element) it.next();
-      final MenuEntry menuEntry = readFromXml(item, context);
+      final MenuEntry menuEntry = readFromXml(item, context, mode);
       menuEntries.add(menuEntry);
     }
   }
 
-  private MenuEntry readFromXml(final Element item, final MenuBuilderContext context)
+  private MenuEntry readFromXml(final Element item, final MenuBuilderContext context, final ParseMode mode)
   {
     if ("item".equals(item.getName()) == false) {
       log.error("Tag 'item' expected instead of '" + item.getName() + "'. Ignoring this tag.");
@@ -198,7 +156,13 @@ public class FavoritesMenu implements Serializable
       menuEntry = new MenuEntry();
     }
     menuEntry.setSorted(false);
-    final Element title = item;
+    Element title;
+    if (mode == ParseMode.JS_TREE) {
+      final Element content = item.element("content");
+      title = content != null ? content.element("name") : null;
+    } else {
+      title = item;
+    }
     if (title != null) {
       if (title.getTextTrim() != null) {
         menuEntry.setName(title.getTextTrim());
@@ -209,7 +173,7 @@ public class FavoritesMenu implements Serializable
         log.warn("Menu entry shouldn't have children, because it's a leaf node.");
       }
       final Element child = (Element) it.next();
-      final MenuEntry childMenuEntry = readFromXml(child, context);
+      final MenuEntry childMenuEntry = readFromXml(child, context, mode);
       if (childMenuEntry != null) {
         menuEntry.addMenuEntry(childMenuEntry);
       }
@@ -226,7 +190,7 @@ public class FavoritesMenu implements Serializable
         // Old format:
         buildFromOldUserPrefFormat(userPrefString);
       } else {
-        readFromXml(userPrefString);
+        readFromXml(userPrefString, ParseMode.USER_PREF);
       }
     }
     if (this.menuEntries.size() == 0) {
