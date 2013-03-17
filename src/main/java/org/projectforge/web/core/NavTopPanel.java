@@ -52,7 +52,6 @@ import org.projectforge.web.FavoritesMenu;
 import org.projectforge.web.LayoutSettingsPage;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.MenuEntry;
-import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.core.menuconfig.MenuConfig;
 import org.projectforge.web.dialog.ModalDialog;
 import org.projectforge.web.mobile.MenuMobilePage;
@@ -106,11 +105,7 @@ public class NavTopPanel extends NavAbstractPanel
       // Not visibible for restricted users:
       layoutSettingsMenuLink.setVisible(false);
     }
-    if (WebConfiguration.isDevelopmentMode() == true) {
-      add(new MenuConfig("menuconfig", getMenu(), favoritesMenu));
-    } else {
-      add(new Label("menuconfig", "").setVisible(false));
-    }
+    add(new MenuConfig("menuconfig", getMenu(), favoritesMenu));
     @SuppressWarnings("serial")
     final Form<String> searchForm = new Form<String>("searchForm") {
       private String searchString;
