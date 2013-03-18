@@ -141,7 +141,8 @@ public class LessWicketApplicationInstantiator implements Serializable
 
   public String encodePathWithCachingStrategy(String path)
   {
-    return StringUtils.replace(path, ".css", "-ver-" + startTime + ".css");
+    // wicket uses by default -ver-, so we need to use another prefix
+    return StringUtils.replace(path, ".css", "-version-" + startTime + ".css");
   }
 
   /**
