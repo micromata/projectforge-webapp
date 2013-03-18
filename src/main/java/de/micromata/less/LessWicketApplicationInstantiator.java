@@ -34,6 +34,7 @@ import org.apache.wicket.util.watch.IModificationWatcher;
 import org.lesscss.LessCompiler;
 import org.lesscss.LessSource;
 import org.projectforge.core.Configuration;
+import org.springframework.util.StringUtils;
 
 /**
  * Compiler utility class for less resource files
@@ -65,6 +66,8 @@ public class LessWicketApplicationInstantiator implements Serializable
 
   private File cssTargetFile;
 
+  public final Long startTime;
+
   /**
    * 
    * @param application
@@ -72,7 +75,8 @@ public class LessWicketApplicationInstantiator implements Serializable
    * @param lessPath
    * @param cssPath
    */
-  public LessWicketApplicationInstantiator(final WebApplication application, final String folder, final String lessPath, final String cssPath)
+  public LessWicketApplicationInstantiator(final WebApplication application, final String folder, final String lessPath,
+      final String cssPath)
   {
     this.application = application;
     this.folder = folder;
@@ -80,6 +84,7 @@ public class LessWicketApplicationInstantiator implements Serializable
     this.cssPath = cssPath;
     this.relativeCssPath = folder + "/" + cssPath;
     instance = this;
+    startTime = System.currentTimeMillis();
   }
 
   private void instantiateFiles() throws Exception
@@ -131,7 +136,12 @@ public class LessWicketApplicationInstantiator implements Serializable
 
     // mount compiled css file
     reference = new LessResourceReference(relativeCssPath, cssTargetFile);
-    application.mountResource(relativeCssPath, reference);
+    application.mountResource(encodePathWithCachingStrategy(relativeCssPath), reference);
+  }
+
+  public String encodePathWithCachingStrategy(String path)
+  {
+    return StringUtils.replace(path, ".css", "-ver-" + startTime + ".css");
   }
 
   /**
