@@ -34,6 +34,7 @@ import org.apache.wicket.util.watch.IModificationWatcher;
 import org.lesscss.LessCompiler;
 import org.lesscss.LessSource;
 import org.projectforge.core.Configuration;
+import org.projectforge.web.wicket.WicketApplication;
 import org.springframework.util.StringUtils;
 
 /**
@@ -50,7 +51,7 @@ public class LessWicketApplicationInstantiator implements Serializable
 
   private LessResourceReference reference;
 
-  private final WebApplication application;
+  private final WicketApplication application;
 
   private final String folder;
 
@@ -66,8 +67,6 @@ public class LessWicketApplicationInstantiator implements Serializable
 
   private File cssTargetFile;
 
-  public final Long startTime;
-
   /**
    * 
    * @param application
@@ -75,7 +74,7 @@ public class LessWicketApplicationInstantiator implements Serializable
    * @param lessPath
    * @param cssPath
    */
-  public LessWicketApplicationInstantiator(final WebApplication application, final String folder, final String lessPath,
+  public LessWicketApplicationInstantiator(final WicketApplication application, final String folder, final String lessPath,
       final String cssPath)
   {
     this.application = application;
@@ -84,7 +83,6 @@ public class LessWicketApplicationInstantiator implements Serializable
     this.cssPath = cssPath;
     this.relativeCssPath = folder + "/" + cssPath;
     instance = this;
-    startTime = System.currentTimeMillis();
   }
 
   private void instantiateFiles() throws Exception
@@ -142,7 +140,7 @@ public class LessWicketApplicationInstantiator implements Serializable
   public String encodePathWithCachingStrategy(String path)
   {
     // wicket uses by default -ver-, so we need to use another prefix
-    return StringUtils.replace(path, ".css", "-version-" + startTime + ".css");
+    return StringUtils.replace(path, ".css", "-version-" + application.getStartTime() + ".css");
   }
 
   /**

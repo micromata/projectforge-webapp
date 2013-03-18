@@ -138,6 +138,8 @@ public class WicketApplication extends WebApplication implements WicketApplicati
   @SpringBean(name = "systemInfoCache")
   private SystemInfoCache systemInfoCache;
 
+  private long startTime;
+
   /**
    * At application start the flag developmentMode is perhaps not already set. If possible please use {@link #isDevelopmentSystem()}
    * instead.<br/>
@@ -269,6 +271,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
   protected void init()
   {
     super.init();
+    startTime = System.currentTimeMillis();
     // Own error page for deployment mode and UserException and AccessException.
     getRequestCycleListeners().add(new AbstractRequestCycleListener() {
       /**
@@ -511,7 +514,15 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     return converterLocator;
   }
 
-  private static final String[] UTC_RECOMMENDED = { //
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public static WicketApplication get() {
+        return (WicketApplication) Application.get();
+    }
+
+    private static final String[] UTC_RECOMMENDED = { //
     "**********************************************************", //
     "***                                                    ***", //
     "*** It's highly recommended to start ProjectForge      ***", //

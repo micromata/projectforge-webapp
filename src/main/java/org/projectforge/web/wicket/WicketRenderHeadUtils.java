@@ -26,6 +26,7 @@ package org.projectforge.web.wicket;
 import org.apache.wicket.markup.head.CssReferenceHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptReferenceHeaderItem;
+import org.apache.wicket.request.resource.PackageResourceReference;
 import org.projectforge.web.WebConfiguration;
 
 import de.micromata.less.LessWicketApplicationInstantiator;
@@ -35,13 +36,19 @@ public class WicketRenderHeadUtils
   private static final String[][] JAVASCRIPT_FILES_DEF = { //
     // { "scripts/jquery/1.8.2/jquery-1.8.2", ".min"}, // Wicket delivers jQuery version
     { "include/bootstrap/js/bootstrap", ".min"}, //
-    // Needed: core, widget, mouse, position, draggable, dropable, resizable, selectable, sortable, button, datepicker:
-    { "scripts/jqueryui/jquery-ui-1.10.0.custom", ".min"}, //
     { "scripts/contextmenu/jquery.contextmenu", ""}, //
-    { "scripts/projectforge", ""} //
+    // Needed: core, widget, mouse, position, draggable, dropable, resizable, selectable, sortable, button, datepicker:
+    { "scripts/jqueryui/jquery-ui-1.10.0.custom", ".min"} //
   };
 
   private static final String[] JAVASCRIPT_FILES;
+
+  private static final String[][] JAVASCRIPT_FILES_JAVA_DEF = { //
+
+    { "scripts/projectforge", ""} //
+  };
+
+  private static final String[] JAVASCRIPT_FILES_JAVA;
 
   private static final String[][] CSS_FILES_DEF = { //
     { "styles/google-fonts/google-fonts", ""}, //
@@ -71,12 +78,16 @@ public class WicketRenderHeadUtils
 
   static {
     JAVASCRIPT_FILES = new String[JAVASCRIPT_FILES_DEF.length];
+    JAVASCRIPT_FILES_JAVA = new String[JAVASCRIPT_FILES_JAVA_DEF.length];
     CSS_FILES = new String[CSS_FILES_DEF.length];
     AUTOGROW_JAVASCRIPT_FILES = new String[AUTOGROW_JAVASCRIPT_FILES_DEF.length];
     if (WebConfiguration.isDevelopmentMode() == true) {
       for (int i = 0; i < JAVASCRIPT_FILES_DEF.length; i++) {
         JAVASCRIPT_FILES[i] = JAVASCRIPT_FILES_DEF[i][0] + ".js";
       }
+
+      handleWicketResourceHandledJavascript();
+
       for (int i = 0; i < CSS_FILES_DEF.length; i++) {
         CSS_FILES[i] = CSS_FILES_DEF[i][0] + ".css";
       }
@@ -87,6 +98,9 @@ public class WicketRenderHeadUtils
       for (int i = 0; i < JAVASCRIPT_FILES_DEF.length; i++) {
         JAVASCRIPT_FILES[i] = JAVASCRIPT_FILES_DEF[i][0] + JAVASCRIPT_FILES_DEF[i][1] + ".js";
       }
+
+      handleWicketResourceHandledJavascript();
+
       for (int i = 0; i < CSS_FILES_DEF.length; i++) {
         CSS_FILES[i] = CSS_FILES_DEF[i][0] + CSS_FILES_DEF[i][1] + ".css";
       }
@@ -96,12 +110,29 @@ public class WicketRenderHeadUtils
     }
   }
 
-  /**
+    private static void handleWicketResourceHandledJavascript() {
+        // handle wicket resource handled javascript files
+        long startTime = WicketApplication.get().getStartTime();
+        String name = null;
+        String versionName = null;
+        for (int i = 0; i < JAVASCRIPT_FILES_JAVA_DEF.length; i++) {
+          name = JAVASCRIPT_FILES_JAVA_DEF[i][0] + ".js";
+          versionName = JAVASCRIPT_FILES_JAVA_DEF[i][0] + "-version-" + startTime + ".js";
+          WicketApplication.get().mountResource(versionName,
+              new PackageResourceReference(WicketApplication.class, name));
+          JAVASCRIPT_FILES_JAVA[i] = "wa/" + versionName;
+        }
+    }
+
+    /**
    * Bbootstrap, jqueryui and uquery.contextmenu.js.
    */
   public static void renderMainJavaScriptIncludes(final IHeaderResponse response)
   {
     for (final String url : JAVASCRIPT_FILES) {
+      response.render(JavaScriptReferenceHeaderItem.forUrl(url));
+    }
+    for (final String url : JAVASCRIPT_FILES_JAVA) {
       response.render(JavaScriptReferenceHeaderItem.forUrl(url));
     }
   }
