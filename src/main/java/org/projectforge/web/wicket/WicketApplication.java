@@ -30,7 +30,6 @@ import java.util.TimeZone;
 
 import javax.servlet.ServletContext;
 
-import de.micromata.less.LessWicketApplicationInstantiator;
 import net.fortuna.ical4j.util.CompatibilityHints;
 
 import org.apache.commons.lang.StringUtils;
@@ -87,6 +86,8 @@ import org.springframework.web.context.support.XmlWebApplicationContext;
 
 import com.vaynberg.wicket.select2.ApplicationSettings;
 
+import de.micromata.less.LessWicketApplicationInstantiator;
+
 /**
  * Application object for your web application. If you want to run this application without deploying, run the Start class.
  * 
@@ -138,7 +139,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
   @SpringBean(name = "systemInfoCache")
   private SystemInfoCache systemInfoCache;
 
-  private long startTime;
+  private static long startTime = System.currentTimeMillis();
 
   /**
    * At application start the flag developmentMode is perhaps not already set. If possible please use {@link #isDevelopmentSystem()}
@@ -271,7 +272,6 @@ public class WicketApplication extends WebApplication implements WicketApplicati
   protected void init()
   {
     super.init();
-    startTime = System.currentTimeMillis();
     // Own error page for deployment mode and UserException and AccessException.
     getRequestCycleListeners().add(new AbstractRequestCycleListener() {
       /**
@@ -435,7 +435,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     try {
       final LessWicketApplicationInstantiator lessInstantiator = new LessWicketApplicationInstantiator(this, "styles", "projectforge.less", "projectforge.css");
       lessInstantiator.instantiate();
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error("Unable to instantiate wicket less compiler", e);
     }
   }
@@ -514,15 +514,11 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     return converterLocator;
   }
 
-    public long getStartTime() {
-        return startTime;
-    }
+  public static long getStartTime() {
+    return startTime;
+  }
 
-    public static WicketApplication get() {
-        return (WicketApplication) Application.get();
-    }
-
-    private static final String[] UTC_RECOMMENDED = { //
+  private static final String[] UTC_RECOMMENDED = { //
     "**********************************************************", //
     "***                                                    ***", //
     "*** It's highly recommended to start ProjectForge      ***", //
