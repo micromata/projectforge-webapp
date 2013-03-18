@@ -110,21 +110,21 @@ public class WicketRenderHeadUtils
     }
   }
 
-    private static void handleWicketResourceHandledJavascript() {
-        // handle wicket resource handled javascript files
-        long startTime = WicketApplication.get().getStartTime();
-        String name = null;
-        String versionName = null;
-        for (int i = 0; i < JAVASCRIPT_FILES_JAVA_DEF.length; i++) {
-          name = JAVASCRIPT_FILES_JAVA_DEF[i][0] + ".js";
-          versionName = JAVASCRIPT_FILES_JAVA_DEF[i][0] + "-version-" + startTime + ".js";
-          WicketApplication.get().mountResource(versionName,
-              new PackageResourceReference(WicketApplication.class, name));
-          JAVASCRIPT_FILES_JAVA[i] = "wa/" + versionName;
-        }
+  private static void handleWicketResourceHandledJavascript() {
+    // handle wicket resource handled javascript files
+    final long startTime = WicketApplication.getStartTime();
+    String name = null;
+    String versionName = null;
+    for (int i = 0; i < JAVASCRIPT_FILES_JAVA_DEF.length; i++) {
+      name = JAVASCRIPT_FILES_JAVA_DEF[i][0] + ".js";
+      versionName = JAVASCRIPT_FILES_JAVA_DEF[i][0] + "-version-" + startTime + ".js";
+      WicketApplication.get().mountResource(versionName,
+          new PackageResourceReference(WicketApplication.class, name));
+      JAVASCRIPT_FILES_JAVA[i] = "wa/" + versionName;
     }
+  }
 
-    /**
+  /**
    * Bbootstrap, jqueryui and uquery.contextmenu.js.
    */
   public static void renderMainJavaScriptIncludes(final IHeaderResponse response)
