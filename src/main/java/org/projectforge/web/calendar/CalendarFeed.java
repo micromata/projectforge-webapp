@@ -47,6 +47,7 @@ import net.fortuna.ical4j.model.property.Version;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.MDC;
 import org.projectforge.access.AccessException;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.NumberHelper;
@@ -83,7 +84,7 @@ public class CalendarFeed extends HttpServlet
   private static final List<CalendarFeedHook> feedHooks = new LinkedList<CalendarFeedHook>();
 
   /**
-   *  setup event is needed for empty calendars
+   * setup event is needed for empty calendars
    */
   public static final String SETUP_EVENT = "SETUP EVENT";
 
@@ -119,46 +120,59 @@ public class CalendarFeed extends HttpServlet
     return result;
   }
 
-
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException
   {
-    if (StringUtils.isBlank(req.getParameter("user")) || StringUtils.isBlank(req.getParameter("q"))) {
-      resp.sendError(HttpStatus.SC_BAD_REQUEST);
-      log.error("Bad request, parameters user and q not given. Query string is: " + req.getQueryString());
-      return;
-    }
-    final String encryptedParams = req.getParameter("q");
-    final Integer userId = NumberHelper.parseInteger(req.getParameter("user"));
-    if (userId == null) {
-      log.error("Bad request, parameter user is not an integer: " + req.getQueryString());
-      return;
-    }
-    final Registry registry = Registry.instance();
-    final PFUserDO user = registry.getUserGroupCache().getUser(userId);
-    if (user == null) {
-      log.error("Bad request, user not found: " + req.getQueryString());
-      return;
-    }
-    final String decryptedParams = registry.getDao(UserDao.class).decrypt(userId, encryptedParams);
-    if (decryptedParams == null) {
-      log.error("Bad request, can't decrypt parameter q (may-be the user's authentication token was changed): " + req.getQueryString());
-      return;
-    }
-    final Map<String, String> params = StringHelper.getKeyValues(decryptedParams, "&");
-    final Calendar calendar = createCal(params, userId, params.get("token"), params.get(PARAM_NAME_TIMESHEET_USER));
-
-    if (calendar == null) {
-      resp.sendError(HttpStatus.SC_BAD_REQUEST);
-      return;
-    }
-
-    resp.setContentType("text/calendar");
-    final CalendarOutputter output = new CalendarOutputter(false);
+    PFUserDO user = null;
     try {
-      output.output(calendar, resp.getOutputStream());
-    } catch (final ValidationException ex) {
-      ex.printStackTrace();
+      MDC.put("ip", req.getRemoteAddr());
+      MDC.put("session", req.getSession().getId());
+      if (StringUtils.isBlank(req.getParameter("user")) || StringUtils.isBlank(req.getParameter("q"))) {
+        resp.sendError(HttpStatus.SC_BAD_REQUEST);
+        log.error("Bad request, parameters user and q not given. Query string is: " + req.getQueryString());
+        return;
+      }
+      final String encryptedParams = req.getParameter("q");
+      final Integer userId = NumberHelper.parseInteger(req.getParameter("user"));
+      if (userId == null) {
+        log.error("Bad request, parameter user is not an integer: " + req.getQueryString());
+        return;
+      }
+      final Registry registry = Registry.instance();
+      user = registry.getUserGroupCache().getUser(userId);
+      if (user == null) {
+        log.error("Bad request, user not found: " + req.getQueryString());
+        return;
+      }
+      PFUserContext.setUser(user);
+      MDC.put("user", user.getUsername());
+      final String decryptedParams = registry.getDao(UserDao.class).decrypt(userId, encryptedParams);
+      if (decryptedParams == null) {
+        log.error("Bad request, can't decrypt parameter q (may-be the user's authentication token was changed): " + req.getQueryString());
+        return;
+      }
+      final Map<String, String> params = StringHelper.getKeyValues(decryptedParams, "&");
+      final Calendar calendar = createCal(params, userId, params.get("token"), params.get(PARAM_NAME_TIMESHEET_USER));
+
+      if (calendar == null) {
+        resp.sendError(HttpStatus.SC_BAD_REQUEST);
+        return;
+      }
+
+      resp.setContentType("text/calendar");
+      final CalendarOutputter output = new CalendarOutputter(false);
+      try {
+        output.output(calendar, resp.getOutputStream());
+      } catch (final ValidationException ex) {
+        ex.printStackTrace();
+      }
+    } finally {
+      PFUserContext.setUser(null);
+      MDC.remove("ip");
+      MDC.remove("session");
+      if (user != null) {
+        MDC.remove("user");
+      }
     }
   }
 
@@ -170,7 +184,7 @@ public class CalendarFeed extends HttpServlet
    * @param userKey
    * @return a calendar, null if authentication fails
    */
-  public Calendar createCal(final Map<String, String> params, final Integer userId, final String authKey, final String timesheetUserParam)
+  private Calendar createCal(final Map<String, String> params, final Integer userId, final String authKey, final String timesheetUserParam)
   {
     final UserDao userDao = Registry.instance().getDao(UserDao.class);
     final PFUserDO loggedInUser = userDao.getUserByAuthenticationToken(userId, authKey);
@@ -178,42 +192,37 @@ public class CalendarFeed extends HttpServlet
     if (loggedInUser == null) {
       return null;
     }
-    try {
-      PFUserContext.setUser(loggedInUser);
-      PFUserDO timesheetUser = null;
-      if (StringUtils.isNotBlank(timesheetUserParam) == true) {
-        final Integer timesheetUserId = NumberHelper.parseInteger(timesheetUserParam);
-        if (timesheetUserId != null) {
-          if (timesheetUserId.equals(loggedInUser.getId()) == false) {
-            log.error("Not yet allowed: all users are only allowed to download their own time-sheets.");
-            return null;
-          }
-          timesheetUser = userDao.getUserGroupCache().getUser(timesheetUserId);
-          if (timesheetUser == null) {
-            log.error("Time-sheet user with id '" + timesheetUserParam + "' not found.");
-            return null;
-          }
+    PFUserDO timesheetUser = null;
+    if (StringUtils.isNotBlank(timesheetUserParam) == true) {
+      final Integer timesheetUserId = NumberHelper.parseInteger(timesheetUserParam);
+      if (timesheetUserId != null) {
+        if (timesheetUserId.equals(loggedInUser.getId()) == false) {
+          log.error("Not yet allowed: all users are only allowed to download their own time-sheets.");
+          return null;
+        }
+        timesheetUser = userDao.getUserGroupCache().getUser(timesheetUserId);
+        if (timesheetUser == null) {
+          log.error("Time-sheet user with id '" + timesheetUserParam + "' not found.");
+          return null;
         }
       }
-      // creating a new calendar
-      final Calendar calendar = new Calendar();
-      final Locale locale = PFUserContext.getLocale();
-      calendar.getProperties().add(
-          new ProdId("-//" + loggedInUser.getDisplayUsername() + "//ProjectForge//" + locale.toString().toUpperCase()));
-      calendar.getProperties().add(Version.VERSION_2_0);
-      calendar.getProperties().add(CalScale.GREGORIAN);
-
-      // setup event is needed for empty calendars
-      calendar.getComponents().add(new VEvent(new net.fortuna.ical4j.model.Date(0), SETUP_EVENT));
-
-      // adding events
-      for (final VEvent event : getEvents(params, timesheetUser)) {
-        calendar.getComponents().add(event);
-      }
-      return calendar;
-    } finally {
-      PFUserContext.setUser(null);
     }
+    // creating a new calendar
+    final Calendar calendar = new Calendar();
+    final Locale locale = PFUserContext.getLocale();
+    calendar.getProperties().add(
+        new ProdId("-//" + loggedInUser.getDisplayUsername() + "//ProjectForge//" + locale.toString().toUpperCase()));
+    calendar.getProperties().add(Version.VERSION_2_0);
+    calendar.getProperties().add(CalScale.GREGORIAN);
+
+    // setup event is needed for empty calendars
+    calendar.getComponents().add(new VEvent(new net.fortuna.ical4j.model.Date(0), SETUP_EVENT));
+
+    // adding events
+    for (final VEvent event : getEvents(params, timesheetUser)) {
+      calendar.getComponents().add(event);
+    }
+    return calendar;
   }
 
   /**
