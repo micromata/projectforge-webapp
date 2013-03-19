@@ -29,6 +29,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFeedHook;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.web.calendar.AbstractICSExportDialog;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
@@ -68,7 +69,10 @@ public class TeamCalICSExportDialog extends AbstractICSExportDialog
   @Override
   protected void addFormFields()
   {
-    exportReminders = true;
+    if (teamCal.getOwnerId() != null && teamCal.getOwnerId().equals(PFUserContext.getUserId()) == true) {
+      // Export reminders for owners as default.
+      exportReminders = true;
+    }
     final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).supressLabelForWarning();
     final DivPanel checkBoxesPanel = new DivPanel(fs.newChildId(), DivType.CHECKBOX);
     fs.add(checkBoxesPanel);
