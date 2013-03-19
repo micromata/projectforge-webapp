@@ -17,7 +17,7 @@ import org.projectforge.core.I18nEnum;
  * @author M. Lauterbach (m.lauterbach@micromata.de)
  *
  */
-public enum AlarmReminderType implements I18nEnum
+public enum ReminderDurationUnit implements I18nEnum
 {
   MINUTES("M", "plugins.teamcal.event.reminder.MINUTES_BEFORE"), //
   HOURS("H", "plugins.teamcal.event.reminder.HOURS_BEFORE"), //
@@ -26,7 +26,7 @@ public enum AlarmReminderType implements I18nEnum
   private final String type;
   private final String i18n;
 
-  private AlarmReminderType(final String type , final String i18n)
+  private ReminderDurationUnit(final String type , final String i18n)
   {
     this.type = type;
     this.i18n = i18n;

@@ -59,7 +59,7 @@ public class TeamCalPluginUpdates
           "readonlyAccessUserIds", "minimalAccessGroupIds", "minimalAccessUserIds", "description", "title"};
 
       final String[] eventAttributes = { "subject", "location", "allDay", "calendar", "startDate", "endDate", "note", "organizer",
-          "recurrenceRule", "recurrenceExDate", "recurrenceUntil", "externalUid", "reminderDuration", "reminderDurationType", "reminderActionType"};
+          "recurrenceRule", "recurrenceExDate", "recurrenceUntil", "externalUid", "reminderDuration", "reminderDurationUnit", "reminderActionType"};
 
       final String[] attendeeAttributes = { "id", "url", "userId", "loginToken", "status", "comment"};
 
@@ -96,6 +96,9 @@ public class TeamCalPluginUpdates
         if (dao.doesExist(eventTable) == false) {
           dao.createTable(eventTable);
         }
+        if (dao.doesTableAttributesExist(eventTable, eventAttributes) == false) {
+          dao.addTableAttributes(eventTable, eventTable.getAttributes());
+        }
         if (dao.doesExist(attendeeTable) == false) {
           dao.createTable(attendeeTable);
         }
@@ -106,9 +109,6 @@ public class TeamCalPluginUpdates
           final TableAttribute attr = new TableAttribute("team_event_fk", TableAttributeType.INT).setForeignTable(TeamEventDO.class)
               .setForeignAttribute("pk");
           dao.addTableAttributes(attendeeTable, attr);
-        }
-        if (dao.doesTableAttributesExist(eventTable, eventAttributes) == false) {
-          dao.addTableAttributes(eventTable, eventTable.getAttributes());
         }
         dao.createMissingIndices();
         return UpdateRunningStatus.DONE;

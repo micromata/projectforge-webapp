@@ -45,7 +45,7 @@ import org.joda.time.DateTime;
 import org.projectforge.calendar.CalendarUtils;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.plugins.teamcal.TeamCalConfig;
-import org.projectforge.plugins.teamcal.event.AlarmReminderType;
+import org.projectforge.plugins.teamcal.event.ReminderDurationUnit;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDao;
 import org.projectforge.plugins.teamcal.event.TeamEventFilter;
@@ -124,15 +124,15 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
           }
 
           // add alarm if necessary
-          if (exportReminders == true && teamEvent.getReminderDuration() != null) {
+          if (exportReminders == true && teamEvent.getReminderDuration() != null && teamEvent.getReminderActionType() != null) {
             final VAlarm alarm = new VAlarm();
             Dur dur = null;
             // (-1) * needed to set alert before
-            if (AlarmReminderType.MINUTES.equals(teamEvent.getReminderDurationType())) {
+            if (ReminderDurationUnit.MINUTES.equals(teamEvent.getReminderDurationUnit())) {
               dur = new Dur(0, 0, (-1) * teamEvent.getReminderDuration(), 0);
-            } else if (AlarmReminderType.HOURS.equals(teamEvent.getReminderDurationType())) {
+            } else if (ReminderDurationUnit.HOURS.equals(teamEvent.getReminderDurationUnit())) {
               dur = new Dur(0, (-1) * teamEvent.getReminderDuration(), 0, 0);
-            } else if (AlarmReminderType.DAYS.equals(teamEvent.getReminderDurationType())) {
+            } else if (ReminderDurationUnit.DAYS.equals(teamEvent.getReminderDurationUnit())) {
               dur = new Dur((-1) * teamEvent.getReminderDuration(), 0, 0, 0);
             }
             if (dur != null) {

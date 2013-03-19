@@ -338,8 +338,6 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       attendees = getData().ensureAttendees();
       fs.add(attendeesPanel = new TeamAttendeesPanel(fs.newChildId(), attendees));
     }
-    // gridBuilder.newSplitPanel(GridSize.COL50);
-    // gridBuilder.newFormHeading(getString("plugins.teamcal.event.reminder"));
 
     gridBuilder.newGridPanel();
     {

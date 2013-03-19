@@ -13,18 +13,19 @@ import org.projectforge.core.I18nEnum;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
- *
+ * 
  */
 public enum ReminderActionType implements I18nEnum
 {
-  NONE("NONE", "plugins.teamcal.event.reminder.NONE"), //
   MESSAGE("DISPLAY", "plugins.teamcal.event.reminder.MESSAGE"), //
   MESSAGE_SOUND("AUDIO", "plugins.teamcal.event.reminder.MESSAGE_SOUND");
 
   private final String type;
+
   private final String i18n;
 
-  private ReminderActionType(final String type , final String i18n) {
+  private ReminderActionType(final String type, final String i18n)
+  {
     this.i18n = i18n;
     this.type = type;
   }

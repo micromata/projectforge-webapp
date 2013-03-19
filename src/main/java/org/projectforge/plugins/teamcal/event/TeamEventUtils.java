@@ -213,13 +213,13 @@ public class TeamEventUtils
         }
         if (dur.getDays() != 0) {
           teamEvent.setReminderDuration(dur.getDays() + weeksToDays);
-          teamEvent.setReminderDurationType(AlarmReminderType.DAYS);
+          teamEvent.setReminderDurationUnit(ReminderDurationUnit.DAYS);
         } else if (dur.getHours() != 0) {
           teamEvent.setReminderDuration(dur.getHours());
-          teamEvent.setReminderDurationType(AlarmReminderType.HOURS);
+          teamEvent.setReminderDurationUnit(ReminderDurationUnit.HOURS);
         } else if (dur.getMinutes() != 0) {
           teamEvent.setReminderDuration(dur.getMinutes());
-          teamEvent.setReminderDurationType(AlarmReminderType.MINUTES);
+          teamEvent.setReminderDurationUnit(ReminderDurationUnit.MINUTES);
         }
       }
     }

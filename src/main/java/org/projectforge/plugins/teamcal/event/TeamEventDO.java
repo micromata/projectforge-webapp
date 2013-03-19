@@ -132,7 +132,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
 
   private Integer reminderDuration;
 
-  private AlarmReminderType reminderDurationType;
+  private ReminderDurationUnit reminderDurationType;
 
   private ReminderActionType reminderActionType;
 
@@ -349,6 +349,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
    * If the event is imported from another system, the uid of the external event is stored here.
    * @return the externalUid
    */
+  @Column(name = "external_uid")
   public String getExternalUid()
   {
     return externalUid;
@@ -368,6 +369,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
    * RRULE (rfc5545)
    * @return the recurrence
    */
+  @Column(name = "recurrence_rule")
   public String getRecurrenceRule()
   {
     return recurrenceRule;
@@ -530,7 +532,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
    * 
    * @return
    */
-  @Column(name = "reminderDuration")
+  @Column(name = "reminder_duration")
   public Integer getReminderDuration() {
     return reminderDuration;
   }
@@ -541,20 +543,20 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
    * 
    * @return the reminderDurationType
    */
-  @Column(name = "reminderDurationType")
+  @Column(name = "reminder_duration_unit")
   @Enumerated(EnumType.STRING)
-  public AlarmReminderType getReminderDurationType()
+  public ReminderDurationUnit getReminderDurationUnit()
   {
     return reminderDurationType;
   }
 
   /**
-   * @param reminderDurationType the alarmReminderType to set
+   * @param reminderDurationUnit the alarmReminderType to set
    * @return this for chaining.
    */
-  public void setReminderDurationType(final AlarmReminderType reminderDurationType)
+  public void setReminderDurationUnit(final ReminderDurationUnit reminderDurationUnit)
   {
-    this.reminderDurationType = reminderDurationType;
+    this.reminderDurationType = reminderDurationUnit;
   }
 
   /**
@@ -568,11 +570,12 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
 
   /**
    * Gets type of event action.
-   * NONE, AUDIO or DISPLAY
+   * AUDIO or DISPLAY
    * 
    * @return the reminderType
    */
   @Enumerated(EnumType.STRING)
+  @Column(name = "reminder_action_type")
   public ReminderActionType getReminderActionType()
   {
     return reminderActionType;

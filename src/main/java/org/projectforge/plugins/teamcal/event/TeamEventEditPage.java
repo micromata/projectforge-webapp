@@ -174,12 +174,6 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   {
     super.onSaveOrUpdate();
 
-    // if reminder action was set on NONE, remove reminder settings.
-    if (getData().getReminderActionType().equals(ReminderActionType.NONE) == true) {
-      getData().setReminderDuration(0);
-      getData().setReminderDurationType(null);
-    }
-
     if (getData().isAllDay() == true && getData().getEndDate() != null) {
       getData().setEndDate(getData().getStartDate());
     }
