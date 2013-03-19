@@ -23,18 +23,22 @@
 
 package org.projectforge.plugins.teamcal.integration;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import net.fortuna.ical4j.model.Dur;
+import net.fortuna.ical4j.model.ParameterList;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.Action;
 import net.fortuna.ical4j.model.property.Description;
+import net.fortuna.ical4j.model.property.ExDate;
 import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.Name;
 import net.fortuna.ical4j.model.property.RRule;
@@ -44,6 +48,7 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.projectforge.calendar.CalendarUtils;
 import org.projectforge.calendar.ICal4JUtils;
+import org.projectforge.common.StringHelper;
 import org.projectforge.plugins.teamcal.TeamCalConfig;
 import org.projectforge.plugins.teamcal.event.ReminderDurationUnit;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
@@ -61,6 +66,8 @@ import org.projectforge.web.calendar.CalendarFeedHook;
  */
 public class TeamCalCalendarFeedHook implements CalendarFeedHook
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalCalendarFeedHook.class);
+
   public static final String PARAM_EXPORT_REMINDER = "exportReminders";
 
   public static final String getUrl(final String teamCalIds, final String additionalParameterString)
@@ -92,6 +99,16 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
     if (teamCalIds == null) {
       return null;
     }
+    final StringBuffer buf = new StringBuffer();
+    boolean first = true;
+    for (final Map.Entry<String, String> entry : params.entrySet()) {
+      if ("token".equals(entry.getKey()) == true) {
+        continue;
+      }
+      first = StringHelper.append(buf, first, entry.getKey(), ", ");
+      buf.append("=").append(entry.getValue());
+    }
+    log.info("Getting calendar entries for: " + buf.toString());
     final List<VEvent> events = new LinkedList<VEvent>();
     final TeamEventDao teamEventDao = Registry.instance().getDao(TeamEventDao.class);
     final TeamEventFilter eventFilter = new TeamEventFilter();
@@ -143,7 +160,6 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
           }
 
           // TODO add attendees
-
           if (teamEvent.hasRecurrence() == true) {
             final Recur recur = teamEvent.getRecurrenceObject();
             if (recur.getUntil() != null) {
@@ -151,6 +167,17 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
             }
             final RRule rrule = new RRule(recur);
             vEvent.getProperties().add(rrule);
+            if (teamEvent.getRecurrenceExDate() != null) {
+              final ParameterList parameterList = new ParameterList();
+              parameterList.add(Value.DATE);
+              ExDate exDate;
+              try {
+                exDate = new ExDate(parameterList, teamEvent.getRecurrenceExDate());
+                vEvent.getProperties().add(exDate);
+              } catch (final ParseException ex) {
+                log.error("Can't parse ExDate '" + teamEvent.getRecurrenceExDate() + "': " + ex.getMessage(), ex);
+              }
+            }
           }
           events.add(vEvent);
         }
