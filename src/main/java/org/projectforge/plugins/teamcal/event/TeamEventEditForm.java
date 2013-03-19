@@ -181,14 +181,6 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       }
     }
     {
-      // NOTE
-      final FieldsetPanel fieldSet = gridBuilder.newFieldset(getString("plugins.teamcal.event.note"));
-      final MaxLengthTextArea noteField = new MaxLengthTextArea(fieldSet.getTextAreaId(), new PropertyModel<String>(data, "note"));
-      fieldSet.add(noteField);
-      if (access == false)
-        fieldSet.setEnabled(false);
-    }
-    {
       // LOCATION
       final FieldsetPanel fieldSet = gridBuilder.newFieldset(getString("plugins.teamcal.event.location"));
       final PFAutoCompleteMaxLengthTextField locationTextField = new PFAutoCompleteMaxLengthTextField(fieldSet.getTextFieldId(),
@@ -200,6 +192,14 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
         }
       };
       fieldSet.add(locationTextField);
+      if (access == false)
+        fieldSet.setEnabled(false);
+    }
+    {
+      // NOTE
+      final FieldsetPanel fieldSet = gridBuilder.newFieldset(getString("plugins.teamcal.event.note"));
+      final MaxLengthTextArea noteField = new MaxLengthTextArea(fieldSet.getTextAreaId(), new PropertyModel<String>(data, "note"));
+      fieldSet.add(noteField);
       if (access == false)
         fieldSet.setEnabled(false);
     }
@@ -417,7 +417,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   {
     startDateTimePanel.getHourOfDayDropDownChoice().setVisible(visible);
     startDateTimePanel.getMinuteDropDownChoice().setVisible(visible);
-    endDateField.getFieldset().setVisible(visible);
+    endDateTimePanel.getHourOfDayDropDownChoice().setVisible(visible);
+    endDateTimePanel.getMinuteDropDownChoice().setVisible(visible);
   }
 
   /**
