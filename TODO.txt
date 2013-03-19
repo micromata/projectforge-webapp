@@ -9,11 +9,8 @@ Bugs
 
 TeamCal
 -------
-- TeamCalEdit: Ganztags-Knopp versaut DatePicker.
-- TeamCalEdit: Wenn Start-Datum geändert wird, dann EndeDatum mit ändern (falls dies bisher noch nicht geändert wurde)
 - Attendees, Einladungen
 - Droplet, Import
-- Export: Auswahl, ob Erinnerungen mit exportiert werden sollen.
 
 Konkrete Masken
 ---------------
