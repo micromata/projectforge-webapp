@@ -39,6 +39,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
+import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.wicket.components.AjaxMaxLengthEditableLabel;
 
 /**
@@ -71,8 +72,13 @@ public class TeamAttendeesPanel extends Panel
     rebuildAttendees();
     final WebMarkupContainer item = new WebMarkupContainer("liAddNewAttendee");
     mainContainer.add(item);
-    item.add(new AttendeeEditableLabel("editableLabel", Model.of(new TeamEventAttendeeDO()), true));
+    if (WebConfiguration.isDevelopmentMode() == true) {
+      item.add(new AttendeeEditableLabel("editableLabel", Model.of(new TeamEventAttendeeDO()), true));
+    } else {
+      item.add(new Label("editableLabel", getString("message.notYetImplemented")));
+    }
     item.add(new Label("status", "invisible").setVisible(false));
+    attendeesRepeater.setVisible(false);
   }
 
   @SuppressWarnings("serial")
