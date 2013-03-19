@@ -174,10 +174,6 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   {
     super.onSaveOrUpdate();
 
-    if (getData().isAllDay() == true && getData().getEndDate() != null) {
-      getData().setEndDate(getData().getStartDate());
-    }
-
     getData().setRecurrence(form.recurrenceData);
     if (recurrencyChangeType == null || recurrencyChangeType == RecurrencyChangeType.ALL) {
       return null;
