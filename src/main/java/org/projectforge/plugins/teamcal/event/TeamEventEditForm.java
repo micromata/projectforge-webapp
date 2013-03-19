@@ -238,7 +238,6 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
     }
 
-
     // ///////////////////////////////
     // Recurrence
     // ///////////////////////////////
@@ -464,7 +463,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       teamCalDrop.setNullValid(false);
       teamCalDrop.setRequired(true);
       fieldSet.add(teamCalDrop);
-      if (isNew() == false  || StringUtils.isNotBlank(data.getSubject()) == true) {
+      if (isNew() == false || StringUtils.isNotBlank(data.getSubject()) == true) {
         // Show switch button only for new events or events with prefilled input.
         return;
       }
@@ -533,14 +532,18 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     dependentFormComponents[4] = endDateTimePanel.getHourOfDayDropDownChoice();
     dependentFormComponents[5] = endDateTimePanel.getMinuteDropDownChoice();
 
-    startDateTimePanel.getDateField().add(new AjaxFormComponentUpdatingBehavior("onChange"){
+    startDateTimePanel.getDateField().add(new AjaxFormComponentUpdatingBehavior("onChange") {
       private static final long serialVersionUID = 4577664688930645961L;
 
       @Override
       protected void onUpdate(final AjaxRequestTarget target)
       {
         final long selectedDate = startDateTimePanel.getDateField().getModelObject().getTime();
-        target.appendJavaScript("$(function() { $('#"+ endDateTimePanel.getDateField().getMarkupId() + "').datepicker('option', 'minDate', new Date(" + selectedDate  + ")); });");
+        target.appendJavaScript("$(function() { $('#"
+            + endDateTimePanel.getDateField().getMarkupId()
+            + "').datepicker('option', 'minDate', new Date("
+            + selectedDate
+            + ")); });");
       }
     });
     if (access == false) {
