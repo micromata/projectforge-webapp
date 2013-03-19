@@ -39,11 +39,13 @@ import de.micromata.wicket.ajax.AjaxCallback;
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
  * @author Kai Reinhard (k.reinhard@micromata.de)
- *
+ * 
  */
 public abstract class AbstractICSExportDialog extends ModalDialog
 {
   private static final long serialVersionUID = 1579507911025462251L;
+
+  protected TextArea<String> urlTextArea;
 
   /**
    * @param id
@@ -56,21 +58,35 @@ public abstract class AbstractICSExportDialog extends ModalDialog
     setBigWindow();
   }
 
+  @SuppressWarnings("serial")
   public void redraw()
   {
     clearContent();
     {
       gridBuilder.newSecurityAdviceBox(Model.of(getString("calendar.icsExport.securityAdvice")));
+      addFormFields();
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("calendar.abonnement.url")).setLabelSide(false);
-      final String iCalTarget = getUrl();
-      final String url = WicketUtils.getAbsoluteContextPath() + iCalTarget;
-      final TextArea<String> textArea = new TextArea<String>(fs.getTextAreaId(), Model.of(url));
-      fs.add(textArea);
-      textArea.add(AttributeModifier.replace("onClick", "$(this).select();"));
+      urlTextArea = new TextArea<String>(fs.getTextAreaId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return WicketUtils.getAbsoluteContextPath() + getUrl();
+        };
+      });
+      urlTextArea.setOutputMarkupId(true);
+      fs.add(urlTextArea);
+      urlTextArea.add(AttributeModifier.replace("onClick", "$(this).select();"));
     }
   }
 
   protected abstract String getUrl();
+
+  /**
+   * Does nothing at default. Override this method for inserting form fields before url text-area.
+   */
+  protected void addFormFields()
+  {
+  }
 
   @SuppressWarnings("serial")
   @Override

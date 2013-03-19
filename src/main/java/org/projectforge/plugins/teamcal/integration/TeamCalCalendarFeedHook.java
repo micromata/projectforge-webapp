@@ -61,14 +61,21 @@ import org.projectforge.web.calendar.CalendarFeedHook;
  */
 public class TeamCalCalendarFeedHook implements CalendarFeedHook
 {
-  public static final String getUrl(final String teamCalIds)
+  public static final String PARAM_EXPORT_REMINDER = "exportReminders";
+
+  public static final String getUrl(final String teamCalIds, final String additionalParameterString)
   {
-    return CalendarFeed.getUrl("&teamCals=" + teamCalIds);
+    final StringBuffer buf = new StringBuffer();
+    buf.append("&teamCals=" + teamCalIds);
+    if (additionalParameterString != null) {
+      buf.append(additionalParameterString);
+    }
+    return CalendarFeed.getUrl(buf.toString());
   }
 
-  public static final String getUrl(final Integer teamCalId)
+  public static final String getUrl(final Integer teamCalId, final String additionalParameterString)
   {
-    return getUrl(teamCalId != null ? teamCalId.toString() : "");
+    return getUrl(teamCalId != null ? teamCalId.toString() : "", additionalParameterString);
   }
 
   /**
@@ -92,6 +99,7 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
     final DateTime now = DateTime.now();
     final Date eventDateLimit = now.minusYears(1).toDate();
     eventFilter.setStartDate(eventDateLimit);
+    final boolean exportReminders = "true".equals(params.get(PARAM_EXPORT_REMINDER)) == true;
     for (int i = 0; i < teamCalIds.length; i++) {
       final Integer id = Integer.valueOf(teamCalIds[i]);
       eventFilter.setTeamCalId(id);
@@ -116,7 +124,7 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
           }
 
           // add alarm if necessary
-          if (teamEvent.getReminderDuration() != null) {
+          if (exportReminders == true && teamEvent.getReminderDuration() != null) {
             final VAlarm alarm = new VAlarm();
             Dur dur = null;
             // (-1) * needed to set alert before

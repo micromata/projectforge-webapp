@@ -23,10 +23,17 @@
 
 package org.projectforge.plugins.teamcal.dialog;
 
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.PropertyModel;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFeedHook;
 import org.projectforge.web.calendar.AbstractICSExportDialog;
+import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
@@ -37,6 +44,8 @@ public class TeamCalICSExportDialog extends AbstractICSExportDialog
   private static final long serialVersionUID = -3840971062603541903L;
 
   private TeamCalDO teamCal;
+
+  private boolean exportReminders;
 
   /**
    * @param id
@@ -54,12 +63,34 @@ public class TeamCalICSExportDialog extends AbstractICSExportDialog
   }
 
   /**
+   * @see org.projectforge.web.calendar.AbstractICSExportDialog#addFormFields()
+   */
+  @Override
+  protected void addFormFields()
+  {
+    exportReminders = true;
+    final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).supressLabelForWarning();
+    final DivPanel checkBoxesPanel = new DivPanel(fs.newChildId(), DivType.CHECKBOX);
+    fs.add(checkBoxesPanel);
+    @SuppressWarnings("serial")
+    final AjaxCheckBox checkBox = new AjaxCheckBox(CheckBoxPanel.WICKET_ID, new PropertyModel<Boolean>(this, "exportReminders")) {
+      @Override
+      protected void onUpdate(final AjaxRequestTarget target)
+      {
+        target.add(urlTextArea);
+      }
+    };
+    checkBoxesPanel.add(new CheckBoxPanel(checkBoxesPanel.newChildId(), checkBox, getString("plugins.teamcal.export.reminder.checkbox"))
+    .setTooltip(getString("plugins.teamcal.export.reminder.checkbox.tooltip")));
+  }
+
+  /**
    * @see org.projectforge.web.calendar.AbstractICSExportDialog#getUrl()
    */
   @Override
   protected String getUrl()
   {
-    return TeamCalCalendarFeedHook.getUrl(teamCal.getId());
+    return TeamCalCalendarFeedHook.getUrl(teamCal.getId(), "&" + TeamCalCalendarFeedHook.PARAM_EXPORT_REMINDER + "=" + exportReminders);
   }
 
 }
