@@ -85,6 +85,18 @@ public class CheckBoxPanel extends Panel implements ComponentWrapperPanel
     };
     checkBox.setOutputMarkupId(true);
     add(checkBox);
+    init(labelString);
+  }
+
+  public CheckBoxPanel(final String id, final CheckBox checkBox, final String labelString)
+  {
+    super(id);
+    this.checkBox = checkBox;
+    add(checkBox);
+    init(labelString);
+  }
+
+  private void init(final String labelString) {
     if (labelString != null) {
       label = new Label("label", labelString);
       label.add(AttributeModifier.replace("for", checkBox.getMarkupId()));
