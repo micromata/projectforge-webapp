@@ -225,7 +225,9 @@ public class TeamCalFilterDialog extends ModalDialog
   @SuppressWarnings("serial")
   private void redrawTimesheetsUserControls()
   {
-    timesheetUserFieldset.removeAllFields();
+    if (timesheetUserFieldset != null) {
+      timesheetUserFieldset.removeAllFields();
+    }
     final UserSelectPanel timesheetUserSelectPanel = calendarPageSupport.addUserSelectPanel(timesheetUserFieldset,
         new PropertyModel<PFUserDO>(this, "timesheetsUser"), false);
     if (timesheetUserSelectPanel != null) {
@@ -480,17 +482,13 @@ public class TeamCalFilterDialog extends ModalDialog
             }
           }
         }
-        final PFUserDO user = PFUserContext.getUser();
         final List<Integer> filteredList = new ArrayList<Integer>();
-        filteredList.add(0, TIMESHEET_CALENDAR_ID);
+        filteredList.add(TIMESHEET_CALENDAR_ID);
         if (result != null) {
-          // remove teamCals where user has less than full access or is not owner.
           final Iterator<TeamCalDO> it = result.iterator();
           while (it.hasNext()) {
             final TeamCalDO teamCal = it.next();
-            if (teamCalDao.hasUpdateAccess(user, teamCal, null, false) == true) {
-              filteredList.add(teamCal.getId());
-            }
+            filteredList.add(teamCal.getId());
           }
         }
         final SelectOptions<Integer> options = new SelectOptions<Integer>(SelectPanel.OPTIONS_WICKET_ID, filteredList, renderer);
@@ -521,7 +519,10 @@ public class TeamCalFilterDialog extends ModalDialog
     teamCalsChoice.modelChanged();
     templateChoice.getDropDownChoice().modelChanged();
     target.add(templateChoice.getDropDownChoice(), teamCalsChoice, calendarColorPanel.main, templateName, defaultCalendarSelect,
-        timesheetUserControls, optionsControls);
+        optionsControls);
+    if (timesheetUserControls != null) {
+      target.add(timesheetUserControls);
+    }
   }
 
   public PFUserDO getTimesheetsUser()
