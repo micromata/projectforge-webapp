@@ -268,11 +268,6 @@ public class DatabaseUpdateDao
     }
     final StringBuffer buf = new StringBuffer();
     buildCreateTableStatement(buf, table);
-    for (final TableAttribute attr : table.getAttributes()) {
-      if (attr.getForeignTable() != null) {
-        buildForeignKeyConstraint(buf, table.getName(), attr);
-      }
-    }
     execute(buf.toString());
     return true;
   }
@@ -286,6 +281,11 @@ public class DatabaseUpdateDao
       buf.append("ALTER TABLE ").append(table).append(" ADD COLUMN ");
       buildAttribute(buf, attr);
       buf.append(";\n");
+    }
+    for (final TableAttribute attr : attributes) {
+      if (attr.getForeignTable() != null) {
+        buildForeignKeyConstraint(buf, table, attr);
+      }
     }
   }
 
