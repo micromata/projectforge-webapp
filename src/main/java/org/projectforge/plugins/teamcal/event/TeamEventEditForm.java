@@ -506,7 +506,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     startDateField.getFieldset().setOutputMarkupId(true);
     startDateTimePanel = new DateTimePanel(startDateField.newChildId(), new PropertyModel<Date>(data, "startDate"),
         (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withTargetType(java.sql.Timestamp.class)
-        .withRequired(true), DatePrecision.MINUTE);
+        .withRequired(true), DatePrecision.MINUTE_5);
     startDateTimePanel.getDateField().setOutputMarkupId(true);
 
     startDateField.add(startDateTimePanel);
@@ -522,7 +522,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     endDateField.getFieldset().setOutputMarkupId(true);
     endDateTimePanel = new DateTimePanel(endDateField.newChildId(), new PropertyModel<Date>(data, "endDate"),
         (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withTargetType(java.sql.Timestamp.class)
-        .withRequired(true), DatePrecision.MINUTE);
+        .withRequired(true), DatePrecision.MINUTE_5);
     endDateTimePanel.getDateField().setOutputMarkupId(true);
 
     endDateField.add(endDateTimePanel);
