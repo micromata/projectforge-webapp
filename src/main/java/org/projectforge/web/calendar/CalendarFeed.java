@@ -124,6 +124,7 @@ public class CalendarFeed extends HttpServlet
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException
   {
     PFUserDO user = null;
+    String logMessage = null;
     try {
       MDC.put("ip", req.getRemoteAddr());
       MDC.put("session", req.getSession().getId());
@@ -153,9 +154,21 @@ public class CalendarFeed extends HttpServlet
       }
       final Map<String, String> params = StringHelper.getKeyValues(decryptedParams, "&");
       final Calendar calendar = createCal(params, userId, params.get("token"), params.get(PARAM_NAME_TIMESHEET_USER));
+      final StringBuffer buf = new StringBuffer();
+      boolean first = true;
+      for (final Map.Entry<String, String> entry : params.entrySet()) {
+        if ("token".equals(entry.getKey()) == true) {
+          continue;
+        }
+        first = StringHelper.append(buf, first, entry.getKey(), ", ");
+        buf.append("=").append(entry.getValue());
+      }
+      logMessage = buf.toString();
+      log.info("Getting calendar entries for: " + logMessage);
 
       if (calendar == null) {
         resp.sendError(HttpStatus.SC_BAD_REQUEST);
+        log.error("Bad request, can't find calendar.");
         return;
       }
 
@@ -167,6 +180,7 @@ public class CalendarFeed extends HttpServlet
         ex.printStackTrace();
       }
     } finally {
+      log.info("Finished request: " + logMessage);
       PFUserContext.setUser(null);
       MDC.remove("ip");
       MDC.remove("session");
