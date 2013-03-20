@@ -107,7 +107,7 @@ public class TeamEventReminderComponent extends Component
         "reminderActionTypeList");
     final IModel<ReminderActionType> reminderActionActiveModel = new PropertyModel<ReminderActionType>(data, "reminderActionType");
     final DropDownChoicePanel<ReminderActionType> reminderActionTypeChoice = new DropDownChoicePanel<ReminderActionType>(
-        reminderPanel.getDropDownChoiceId(), new DropDownChoice<ReminderActionType>(DropDownChoicePanel.WICKET_ID,
+        reminderPanel.newChildId(), new DropDownChoice<ReminderActionType>(DropDownChoicePanel.WICKET_ID,
             reminderActionActiveModel, reminderActionTypeChoiceModel, reminderActionTypeRenderer) {
           /**
            * @see org.apache.wicket.markup.html.form.AbstractSingleSelectChoice#getNullKey()
