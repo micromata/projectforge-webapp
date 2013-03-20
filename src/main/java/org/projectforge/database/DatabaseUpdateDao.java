@@ -284,6 +284,9 @@ public class DatabaseUpdateDao
     }
     for (final TableAttribute attr : attributes) {
       if (attr.getForeignTable() != null) {
+        if (doesTableAttributeExist(table, attr.getName()) == true) {
+          buf.append("-- Column does already exist: ");
+        }
         buildForeignKeyConstraint(buf, table, attr);
       }
     }
