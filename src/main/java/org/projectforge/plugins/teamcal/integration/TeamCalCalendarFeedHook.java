@@ -48,7 +48,6 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.projectforge.calendar.CalendarUtils;
 import org.projectforge.calendar.ICal4JUtils;
-import org.projectforge.common.StringHelper;
 import org.projectforge.plugins.teamcal.TeamCalConfig;
 import org.projectforge.plugins.teamcal.event.ReminderDurationUnit;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
@@ -99,16 +98,6 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
     if (teamCalIds == null) {
       return null;
     }
-    final StringBuffer buf = new StringBuffer();
-    boolean first = true;
-    for (final Map.Entry<String, String> entry : params.entrySet()) {
-      if ("token".equals(entry.getKey()) == true) {
-        continue;
-      }
-      first = StringHelper.append(buf, first, entry.getKey(), ", ");
-      buf.append("=").append(entry.getValue());
-    }
-    log.info("Getting calendar entries for: " + buf.toString());
     final List<VEvent> events = new LinkedList<VEvent>();
     final TeamEventDao teamEventDao = Registry.instance().getDao(TeamEventDao.class);
     final TeamEventFilter eventFilter = new TeamEventFilter();
