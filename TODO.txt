@@ -6,6 +6,40 @@ Johannes
 
 Bugs
 ----
+- DatabaseUpdateDao: foreign constraints nur fuer neue Attribute anlegen und beim Anlegen von Tabellen (zweiteres prüfen)
+- Ersten Wiederholungstermin verlegen klappt nicht.
+- ctrl-return dokumentieren.
+- T=[2013-03-19 13:48:50,141] L=[ERROR] User=[salheit@192.168.77.15] C=[org.projectforge.common.Crypt] X=[] M=[Exception encountered while trying to encrypt with Algorithm 'AES' and the given password: null]
+java.lang.NullPointerException
+        at org.projectforge.common.Crypt.getPassword(Crypt.java:103)
+        at org.projectforge.common.Crypt.encrypt(Crypt.java:64)
+        at org.projectforge.user.UserDao.encrypt(UserDao.java:497)
+        at org.projectforge.user.UserDao.encrypt(UserDao.java:482)
+        at org.projectforge.user.UserDao$$FastClassByCGLIB$$e693dffa.invoke(<generated>)
+        at net.sf.cglib.proxy.MethodProxy.invoke(MethodProxy.java:204)
+        at org.springframework.aop.framework.Cglib2AopProxy$CglibMethodInvocation.invokeJoinpoint(Cglib2AopProxy.java:689)
+        at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:150)
+        at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:110)
+        at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:172)
+        at org.springframework.aop.interceptor.AbstractTraceInterceptor.invoke(AbstractTraceInterceptor.java:113)
+        at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:172)
+        at org.springframework.aop.framework.Cglib2AopProxy$DynamicAdvisedInterceptor.intercept(Cglib2AopProxy.java:622)
+        at org.projectforge.user.UserDao$$EnhancerByCGLIB$$b680d600.encrypt(<generated>)
+        at org.projectforge.web.calendar.CalendarFeed.getUrl(CalendarFeed.java:117)
+        at org.projectforge.plugins.teamcal.integration.TeamCalCalendarFeedHook.getUrl(TeamCalCalendarFeedHook.java:73)
+        at org.projectforge.plugins.teamcal.integration.TeamCalCalendarFeedHook.getUrl(TeamCalCalendarFeedHook.java:78)
+        at org.projectforge.plugins.teamcal.dialog.TeamCalICSExportDialog.getUrl(TeamCalICSExportDialog.java:97)
+        at org.projectforge.web.calendar.AbstractICSExportDialog$1.getObject(AbstractICSExportDialog.java:73)
+        at org.projectforge.web.calendar.AbstractICSExportDialog$1.getObject(AbstractICSExportDialog.java:69)
+- Caused by: java.lang.NullPointerException
+        at org.projectforge.plugins.teamcal.event.TeamEventDao.afterLoad(TeamEventDao.java:155)
+        at org.projectforge.plugins.teamcal.event.TeamEventDao.afterLoad(TeamEventDao.java:64)
+        at org.projectforge.core.BaseDao.internalGetById(BaseDao.java:652)
+        at org.projectforge.core.BaseDao.getById(BaseDao.java:637)
+        at org.projectforge.core.BaseDao$$FastClassByCGLIB$$ddb64f08.invoke(<generated>)
+- Modify end-date if start-date is changed.
+- Export also recurrence ex dates!
+- Aus Ereignis Zeitbericht anlegen.
 
 TeamCal
 -------
