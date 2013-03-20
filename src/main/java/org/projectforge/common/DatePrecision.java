@@ -26,7 +26,7 @@ package org.projectforge.common;
 /**
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
- *
+ * 
  */
 public enum DatePrecision
 {
@@ -35,8 +35,11 @@ public enum DatePrecision
   SECOND,
   /** Milliseconds and seconds will be set to zero. */
   MINUTE,
-  /** Milliseconds and seconds will be set to zero, minutes to 0, 15, 30
-   *  or 45. */
+  /** Milliseconds and seconds will be set to zero, minutes to 0, 5, 10, 15 etc. */
+  MINUTE_5,
+  /**
+   * Milliseconds and seconds will be set to zero, minutes to 0, 15, 30 or 45.
+   */
   MINUTE_15,
   /** Milliseconds, seconds and minutes will be set to zero. */
   HOUR_OF_DAY,

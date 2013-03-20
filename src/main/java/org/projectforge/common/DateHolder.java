@@ -297,20 +297,39 @@ public class DateHolder implements Serializable, Cloneable, Comparable<DateHolde
       case HOUR_OF_DAY:
         calendar.set(Calendar.MINUTE, 0);
       case MINUTE_15:
-        final int minute = calendar.get(Calendar.MINUTE);
-        if (minute < 15) {
-          calendar.set(Calendar.MINUTE, 0);
-        } else if (minute < 30) {
-          calendar.set(Calendar.MINUTE, 15);
-        } else if (minute < 45) {
-          calendar.set(Calendar.MINUTE, 30);
-        } else {
-          calendar.set(Calendar.MINUTE, 45);
-        }
+      case MINUTE_5:
       case MINUTE:
         calendar.set(Calendar.SECOND, 0);
       case SECOND:
         calendar.set(Calendar.MILLISECOND, 0);
+      default:
+    }
+    if (this.precision == DatePrecision.MINUTE_15) {
+      final int minute = calendar.get(Calendar.MINUTE);
+      if (minute < 8) {
+        calendar.set(Calendar.MINUTE, 0);
+      } else if (minute < 23) {
+        calendar.set(Calendar.MINUTE, 15);
+      } else if (minute < 38) {
+        calendar.set(Calendar.MINUTE, 30);
+      } else if (minute < 53) {
+        calendar.set(Calendar.MINUTE, 45);
+      } else {
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.add(Calendar.HOUR, 1);
+      }
+    } else if (this.precision == DatePrecision.MINUTE_5) {
+      final int minute = calendar.get(Calendar.MINUTE);
+      for (int i = 3; i < 60; i += 5) {
+        if (minute < i) {
+          calendar.set(Calendar.MINUTE, i - 3);
+          break;
+        }
+      }
+      if (minute > 57) {
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.add(Calendar.HOUR, 1);
+      }
     }
     return this;
   }
