@@ -56,6 +56,8 @@ public class DateTimePanel extends FormComponentPanel<Date> implements Component
 
   private static final LabelValueChoiceRenderer<Integer> MINUTES_1_RENDERER;
 
+  private static final LabelValueChoiceRenderer<Integer> MINUTES_5_RENDERER;
+
   private static final LabelValueChoiceRenderer<Integer> MINUTES_15_RENDERER;
 
   static {
@@ -81,6 +83,10 @@ public class DateTimePanel extends FormComponentPanel<Date> implements Component
     MINUTES_15_RENDERER.addValue(15, "15");
     MINUTES_15_RENDERER.addValue(30, "30");
     MINUTES_15_RENDERER.addValue(45, "45");
+    MINUTES_5_RENDERER = new LabelValueChoiceRenderer<Integer>();
+    for (int i = 0; i <= 55; i += 5) {
+      MINUTES_5_RENDERER.addValue(i, StringHelper.format2DigitNumber(i));
+    }
   }
 
   private final DateHolder dateHolder;
@@ -115,6 +121,9 @@ public class DateTimePanel extends FormComponentPanel<Date> implements Component
   {
     if (precision == DatePrecision.MINUTE_15) {
       return MINUTES_15_RENDERER;
+    }
+    if (precision == DatePrecision.MINUTE_5) {
+      return MINUTES_5_RENDERER;
     }
     return MINUTES_1_RENDERER;
   }
