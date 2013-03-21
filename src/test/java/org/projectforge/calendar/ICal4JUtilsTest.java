@@ -48,8 +48,8 @@ public class ICal4JUtilsTest
     recur.setFrequency(ICal4JUtils.getCal4JFrequencyString(RecurrenceFrequency.WEEKLY));
     recur.setUntil(getDate("2013-01-31", timeZone));
     recur.setInterval(2);
-    final DateList dateList = recur.getDates(getDate("2013-01-01", timeZone),
-        getDate("2012-01-02", timeZone), getDate("2013-03-31", timeZone), Value.TIME);
+    final DateList dateList = recur.getDates(getDate("2013-01-01", timeZone), getDate("2012-01-02", timeZone),
+        getDate("2013-03-31", timeZone), Value.TIME);
     Assert.assertEquals(3, dateList.size());
     final DateFormat df = new SimpleDateFormat(DateFormats.ISO_TIMESTAMP_MINUTES);
     df.setTimeZone(timeZone);
@@ -64,6 +64,17 @@ public class ICal4JUtilsTest
     final net.fortuna.ical4j.model.Date date = ICal4JUtils.getICal4jDate(DateHelper.parseIsoDate("2012-12-22", DateHelper.EUROPE_BERLIN),
         DateHelper.EUROPE_BERLIN);
     Assert.assertEquals("20121222", date.toString());
+  }
+
+  @Test
+  public void parseIsoDate()
+  {
+    final java.util.Date date = ICal4JUtils.parseISODateString("2013-03-21 08:47:00");
+    Assert.assertNotNull(date);
+    Assert.assertEquals("2013-03-21 08:47:00", ICal4JUtils.asISODateString(date));
+    Assert.assertNull(ICal4JUtils.parseISODateString(null));
+    Assert.assertNull(ICal4JUtils.parseISODateString(""));
+    Assert.assertNull(ICal4JUtils.asISODateString(null));
   }
 
   private net.fortuna.ical4j.model.Date getDate(final String dateString, final TimeZone timeZone)
