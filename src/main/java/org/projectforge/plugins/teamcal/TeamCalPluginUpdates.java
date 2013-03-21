@@ -59,7 +59,8 @@ public class TeamCalPluginUpdates
           "readonlyAccessUserIds", "minimalAccessGroupIds", "minimalAccessUserIds", "description", "title"};
 
       final String[] eventAttributes = { "subject", "location", "allDay", "calendar", "startDate", "endDate", "note", "organizer",
-          "recurrenceRule", "recurrenceExDate", "recurrenceUntil", "externalUid", "reminderDuration", "reminderDurationUnit", "reminderActionType"};
+          "recurrenceRule", "recurrenceExDate", "recurrenceDate", "recurrenceReferenceId", "recurrenceUntil", "externalUid",
+          "reminderDuration", "reminderDurationUnit", "reminderActionType"};
 
       final String[] attendeeAttributes = { "id", "url", "userId", "loginToken", "status", "comment"};
 

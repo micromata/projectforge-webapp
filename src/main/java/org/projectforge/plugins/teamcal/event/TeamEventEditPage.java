@@ -196,8 +196,10 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       return null;
     } else if (recurrencyChangeType == RecurrencyChangeType.ONLY_CURRENT) { // only current date
       // Add current date to the master date as exclusion date and save this event (without recurrency settings).
-      masterEvent.addRecurrenceExDate(eventOfCaller.getStartDate());
+      // masterEvent.addRecurrenceExDate(eventOfCaller.getStartDate());
       newEvent = oldDataObject;
+      newEvent.setRecurrenceDate(eventOfCaller.getStartDate());
+      newEvent.setRecurrenceReferenceId(masterEvent.getUid());
       if (log.isDebugEnabled() == true) {
         log.debug("Recurrency ex date of master entry is now added: "
             + DateHelper.formatAsUTC(eventOfCaller.getStartDate())

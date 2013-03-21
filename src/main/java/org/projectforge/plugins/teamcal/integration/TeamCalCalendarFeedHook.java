@@ -23,19 +23,17 @@
 
 package org.projectforge.plugins.teamcal.integration;
 
-import java.text.ParseException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import net.fortuna.ical4j.model.DateList;
 import net.fortuna.ical4j.model.Dur;
-import net.fortuna.ical4j.model.ParameterList;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.Action;
 import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.ExDate;
@@ -56,6 +54,7 @@ import org.projectforge.plugins.teamcal.event.TeamEventFilter;
 import org.projectforge.registry.Registry;
 import org.projectforge.web.calendar.CalendarFeed;
 import org.projectforge.web.calendar.CalendarFeedHook;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Hook for TeamCal feeds
@@ -112,7 +111,13 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
       final List<TeamEventDO> teamEvents = teamEventDao.getList(eventFilter);
       if (teamEvents != null && teamEvents.size() > 0) {
         for (final TeamEventDO teamEvent : teamEvents) {
-          final String uid = TeamCalConfig.get().createEventUid(teamEvent.getId());
+          final String uid;
+          if (teamEvent.getRecurrenceReferenceId() != null) {
+            //uid = teamEvent.getRecurrenceReferenceId();
+            uid = TeamCalConfig.get().createEventUid(teamEvent.getId());
+          } else {
+            uid = TeamCalConfig.get().createEventUid(teamEvent.getId());
+          }
           String summary;
           if (teamCalIds.length > 1) {
             summary = teamEvent.getSubject() + " (" + teamEvent.getCalendar().getTitle() + ")";
@@ -157,16 +162,30 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
             final RRule rrule = new RRule(recur);
             vEvent.getProperties().add(rrule);
             if (teamEvent.getRecurrenceExDate() != null) {
-              final ParameterList parameterList = new ParameterList();
-              parameterList.add(Value.DATE);
-              ExDate exDate;
-              try {
-                exDate = new ExDate(parameterList, teamEvent.getRecurrenceExDate());
-                vEvent.getProperties().add(exDate);
-              } catch (final ParseException ex) {
-                log.error("Can't parse ExDate '" + teamEvent.getRecurrenceExDate() + "': " + ex.getMessage(), ex);
+              final List<net.fortuna.ical4j.model.Date> exDates = ICal4JUtils.parseIsoDateStringsAsICal4jDates(teamEvent
+                  .getRecurrenceExDate());
+              if (CollectionUtils.isEmpty(exDates) == false) {
+                for (final net.fortuna.ical4j.model.Date date : exDates) {
+                  final DateList dateList = new DateList();
+                  dateList.add(date);
+                  ExDate exDate;
+                  exDate = new ExDate(dateList);
+                  vEvent.getProperties().add(exDate);
+                }
               }
             }
+          }
+          if (teamEvent.getRecurrenceReferenceId() != null) {
+            // if (StringUtils.isNotBlank(teamEvent.getRecurrenceDate()) == true) {
+            // try {
+            // final RecurrenceId recurrenceId = new RecurrenceId(teamEvent.getRecurrenceDate());
+            // vEvent.getProperties().add(recurrenceId);
+            // } catch (final ParseException ex) {
+            // log.error("Can't parse recurrenceId date '" + teamEvent.getRecurrenceDate() + "': " + ex.getMessage(), ex);
+            // }
+            // } else {
+            // log.error("Oups, recurrenceDate (RECURRENCE_ID) is given but not the recurrence uid.");
+            // }
           }
           events.add(vEvent);
         }

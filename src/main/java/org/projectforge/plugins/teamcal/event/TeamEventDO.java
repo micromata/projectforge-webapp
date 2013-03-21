@@ -57,6 +57,7 @@ import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.calendar.TimePeriod;
+import org.projectforge.common.DateFormats;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.PFPersistancyBehavior;
 import org.projectforge.database.Constants;
@@ -89,8 +90,6 @@ import org.projectforge.user.PFUserContext;
 @Table(name = "T_PLUGIN_CALENDAR_EVENT")
 public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
 {
-  private static final String RECURRENCE_EXDATE_FORMAT = "yyyyMMdd";
-
   private static final long serialVersionUID = -9205582135590380919L;
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
@@ -114,7 +113,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
 
   private transient RRule recurrenceRuleObject;
 
-  private String recurrenceRule, recurrenceExDate;
+  private String recurrenceRule, recurrenceExDate, recurrenceReferenceDate, recurrenceReferenceId;
 
   private java.util.Date recurrenceUntil;
 
@@ -466,11 +465,10 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
 
   public TeamEventDO addRecurrenceExDate(final Date date)
   {
-    final DateFormat df = new SimpleDateFormat(RECURRENCE_EXDATE_FORMAT);
-    // Need the user's time-zone for getting midnight of desired date.
-    df.setTimeZone(PFUserContext.getTimeZone());
-    // But print it as UTC date:
-    final String exDate = df.format(date) + "Z";
+    if (date == null) {
+      return this;
+    }
+    final String exDate = ICal4JUtils.asISODateString(date);
     if (recurrenceExDate == null) {
       recurrenceExDate = exDate;
     } else {
@@ -486,6 +484,60 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   public TeamEventDO setRecurrenceExDate(final String recurrenceExDate)
   {
     this.recurrenceExDate = recurrenceExDate;
+    return this;
+  }
+
+  /**
+   * @param recurrenceExDate the recurrenceExDate to set
+   * @return this for chaining.
+   */
+  @Transient
+  public TeamEventDO setRecurrenceDate(final Date recurrenceDate)
+  {
+    final DateFormat df = new SimpleDateFormat(DateFormats.ISO_TIMESTAMP_MILLIS);
+    // Need the user's time-zone for getting midnight of desired date.
+    df.setTimeZone(PFUserContext.getTimeZone());
+    // But print it as UTC date:
+    final String recurrenceDateString = df.format(recurrenceDate);
+    setRecurrenceDate(recurrenceDateString);
+    return this;
+  }
+
+  /**
+   * This field is RECURRENCE_ID.
+   * @return the recurrenceId
+   */
+  @Column(name = "recurrence_date")
+  public String getRecurrenceDate()
+  {
+    return recurrenceReferenceDate;
+  }
+
+  /**
+   * @param recurrenceDateString the recurrenceId to set
+   * @return this for chaining.
+   */
+  public TeamEventDO setRecurrenceDate(final String recurrenceDateString)
+  {
+    this.recurrenceReferenceDate = recurrenceDateString;
+    return this;
+  }
+
+  /**
+   * @return the recurrenceReferenceId
+   */
+  public String getRecurrenceReferenceId()
+  {
+    return recurrenceReferenceId;
+  }
+
+  /**
+   * @param recurrenceReferenceId the recurrenceReferenceId to set
+   * @return this for chaining.
+   */
+  public TeamEventDO setRecurrenceReferenceId(final String recurrenceReferenceId)
+  {
+    this.recurrenceReferenceId = recurrenceReferenceId;
     return this;
   }
 

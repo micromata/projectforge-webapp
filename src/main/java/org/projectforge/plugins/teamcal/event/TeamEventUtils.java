@@ -30,7 +30,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import net.fortuna.ical4j.model.DateList;
 import net.fortuna.ical4j.model.Dur;
@@ -48,6 +47,7 @@ import org.projectforge.calendar.CalendarUtils;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.RecurrenceFrequency;
+import org.springframework.util.CollectionUtils;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -149,21 +149,22 @@ public class TeamEventUtils
 
   public static Collection<Calendar> getExDates(final String recurrenceExdate)
   {
-    final Collection<Calendar> exDates = new LinkedList<Calendar>();
+    final Collection<Calendar> exCals = new LinkedList<Calendar>();
     if (recurrenceExdate == null) {
-      return exDates;
+      return exCals;
     }
-    final StringTokenizer tokenizer = new StringTokenizer(recurrenceExdate, ",");
-    while (tokenizer.hasMoreTokens() == true) {
-      final String dateString = tokenizer.nextToken().trim();
-      final net.fortuna.ical4j.model.Date date = ICal4JUtils.parseICal4jDate(dateString);
+    final List<net.fortuna.ical4j.model.Date> exDates = ICal4JUtils.parseIsoDateStringsAsICal4jDates(recurrenceExdate);
+    if (CollectionUtils.isEmpty(exDates)==true) {
+      return exCals;
+    }
+    for (final net.fortuna.ical4j.model.Date date : exDates) {
       if (date != null) {
         final Calendar cal = Calendar.getInstance(DateHelper.UTC);
         cal.setTime(date);
-        exDates.add(cal);
+        exCals.add(cal);
       }
     }
-    return exDates;
+    return exCals;
   }
 
   public static TeamEventDO createTeamEventDO(final VEvent event)
