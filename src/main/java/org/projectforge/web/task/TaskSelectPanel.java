@@ -46,6 +46,7 @@ import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.CSSColor;
+import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
@@ -298,35 +299,39 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
     userselectContainer.add(searchTaskInput);
     // opener link
     final WebMarkupContainer searchTaskInputOpen = new WebMarkupContainer("searchTaskInputOpen");
-    WicketUtils.addTooltip(searchTaskInputOpen, getString("quickselect"));
+    if (WebConfiguration.isDevelopmentMode() == true) {
+      WicketUtils.addTooltip(searchTaskInputOpen, getString("quickselect"));
+      searchTaskInputOpen.add(new AjaxEventBehavior("click") {
+        private static final long serialVersionUID = -938527474172868488L;
+
+        @Override
+        protected void onEvent(final AjaxRequestTarget target)
+        {
+          ajaxTaskSelectMode = true;
+          target.add(divContainer);
+          target.add(userselectContainer);
+          target.focusComponent(searchTaskInput);
+        }
+      });
+      // close link
+      final WebMarkupContainer searchTaskInputClose = new WebMarkupContainer("searchTaskInputClose");
+      divContainer.add(searchTaskInputClose);
+      searchTaskInputClose.add(new AjaxEventBehavior("click") {
+        private static final long serialVersionUID = -4334830387094758960L;
+
+        @Override
+        protected void onEvent(final AjaxRequestTarget target)
+        {
+          ajaxTaskSelectMode = false;
+          target.add(divContainer);
+          target.add(userselectContainer);
+        }
+      });
+      userselectContainer.add(searchTaskInputClose);
+    } else {
+      searchTaskInputOpen.setVisible(false);
+    }
     divContainer.add(searchTaskInputOpen);
-    searchTaskInputOpen.add(new AjaxEventBehavior("click") {
-      private static final long serialVersionUID = -938527474172868488L;
-
-      @Override
-      protected void onEvent(final AjaxRequestTarget target)
-      {
-        ajaxTaskSelectMode = true;
-        target.add(divContainer);
-        target.add(userselectContainer);
-        target.focusComponent(searchTaskInput);
-      }
-    });
-    // close link
-    final WebMarkupContainer searchTaskInputClose = new WebMarkupContainer("searchTaskInputClose");
-    divContainer.add(searchTaskInputClose);
-    searchTaskInputClose.add(new AjaxEventBehavior("click") {
-      private static final long serialVersionUID = -4334830387094758960L;
-
-      @Override
-      protected void onEvent(final AjaxRequestTarget target)
-      {
-        ajaxTaskSelectMode = false;
-        target.add(divContainer);
-        target.add(userselectContainer);
-      }
-    });
-    userselectContainer.add(searchTaskInputClose);
   }
 
   /**
