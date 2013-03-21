@@ -157,7 +157,7 @@ public class TimesheetTest extends TestBase
     ts1 = timesheetDao.internalGetById(id);
 
     final TimesheetDO ts2 = new TimesheetDO().setTask(getTask("timesheet")).setUser(getUser("timesheet-user"));
-    setTimeperiod(ts2, 21, 15, 59, 21, 18, 0); // 11/21 from 15:45 to 18:00
+    setTimeperiod(ts2, 21, 15, 52, 21, 18, 0); // 11/21 from 15:45 to 18:00
     try {
       timesheetDao.save(ts2); // Overlap with ts1!
       fail();
