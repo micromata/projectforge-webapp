@@ -23,8 +23,12 @@
 
 package org.projectforge.calendar;
 
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.TimeZone;
@@ -39,6 +43,7 @@ import org.apache.commons.lang.StringUtils;
 import org.projectforge.common.DateFormats;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.RecurrenceFrequency;
+import org.projectforge.common.StringHelper;
 import org.projectforge.user.PFUserContext;
 
 /**
@@ -210,7 +215,6 @@ public class ICal4JUtils
     return new java.sql.Date(ical4jDate.getTime());
   }
 
-
   public static java.sql.Timestamp getSqlTimestamp(final net.fortuna.ical4j.model.Date ical4jDate)
   {
     if (ical4jDate == null) {
@@ -256,6 +260,51 @@ public class ICal4JUtils
       return null;
     }
     return date;
+  }
+
+  public static Date parseISODateString(final String isoDateString)
+  {
+    if (StringUtils.isBlank(isoDateString) == true) {
+      return null;
+    }
+    final DateFormat df = new SimpleDateFormat(DateFormats.ISO_TIMESTAMP_SECONDS);
+    df.setTimeZone(DateHelper.UTC);
+    try {
+      return df.parse(isoDateString);
+    } catch (final ParseException ex) {
+      log.error("Can't parse ISO date ('" + DateFormats.ISO_TIMESTAMP_SECONDS + "': " + ex.getMessage(), ex);
+      return null;
+    }
+  }
+
+  public static String asISODateString(final Date date)
+  {
+    if (date == null) {
+      return null;
+    }
+    final DateFormat df = new SimpleDateFormat(DateFormats.ISO_TIMESTAMP_SECONDS);
+    df.setTimeZone(DateHelper.UTC);
+    return df.format(date);
+  }
+
+  public static List<net.fortuna.ical4j.model.Date> parseIsoDateStringsAsICal4jDates(final String csv)
+  {
+    if (StringUtils.isBlank(csv) == true) {
+      return null;
+    }
+    final String[] sa = StringHelper.splitAndTrim(csv, ",;|");
+    if (sa == null || sa.length == 0) {
+      return null;
+    }
+    final List<net.fortuna.ical4j.model.Date> result = new ArrayList<net.fortuna.ical4j.model.Date>();
+    for (final String str : sa) {
+      final Date date = parseISODateString(str);
+      if (date == null) {
+        continue;
+      }
+      result.add(getICal4jDateTime(date, DateHelper.UTC));
+    }
+    return result;
   }
 
   private static class MyIcal4JDate extends net.fortuna.ical4j.model.Date
