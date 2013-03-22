@@ -207,6 +207,9 @@ public class TeamCalCalendarFilter extends AbstractCalendarFilter
    */
   public TeamCalCalendarFilter copyValuesFrom(final TeamCalCalendarFilter src)
   {
+    if (src == null) {
+      return this;
+    }
     this.templateEntries.clear();
     for (final TemplateEntry srcEntry : src.templateEntries) {
       final TemplateEntry entry = srcEntry.clone();
@@ -224,6 +227,9 @@ public class TeamCalCalendarFilter extends AbstractCalendarFilter
    */
   public boolean isModified(final TeamCalCalendarFilter other)
   {
+    if (other == null) {
+      return false;
+    }
     if (this.activeTemplateEntryIndex != other.activeTemplateEntryIndex) {
       return true;
     }
