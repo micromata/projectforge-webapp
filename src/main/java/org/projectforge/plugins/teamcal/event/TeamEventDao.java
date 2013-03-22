@@ -100,7 +100,6 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     teamEvent.setCalendar(teamCal);
   }
 
-
   @SuppressWarnings("unchecked")
   public TeamEventDO getByUid(final String uid)
   {
@@ -177,9 +176,18 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
    */
   public List<TeamEvent> getEventList(final TeamEventFilter filter)
   {
-    List<TeamEventDO> list = getList(filter);
     final List<TeamEvent> result = new ArrayList<TeamEvent>();
-    result.addAll(list);
+    List<TeamEventDO> list = getList(filter);
+    if (CollectionUtils.isEmpty(list) == true) {
+      return result;
+    }
+    for (final TeamEventDO eventDO : list) {
+      if (eventDO.hasRecurrence() == true) {
+        // Added later.
+        continue;
+      }
+      result.add(eventDO);
+    }
 
     final TeamEventFilter teamEventFilter = filter.clone().setOnlyRecurrence(true);
     final QueryFilter qFilter = buildQueryFilter(teamEventFilter);
@@ -200,10 +208,6 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
           continue;
         }
         for (final TeamEvent event : events) {
-          if (event instanceof TeamEventDO) {
-            // TeamEventDO objects were already added.
-            continue;
-          }
           if (matches(event.getStartDate(), event.getEndDate(), event.isAllDay(), teamEventFilter) == false) {
             continue;
           }
@@ -406,7 +410,6 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     }
     return false;
   }
-
 
   @Override
   public TeamEventDO newInstance()
