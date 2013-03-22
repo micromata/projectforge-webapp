@@ -455,6 +455,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
 
   /**
    * EXDATE (rfc5545)
+   * Ex dates are time stamps of deleted events out of the recurrence events.
    * @return the recurrenceExDate
    */
   @Column(name = "recurrence_ex_date")
@@ -505,6 +506,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
 
   /**
    * This field is RECURRENCE_ID.
+   * Isn't yet used (ex-date is always used instead in master event).
    * @return the recurrenceId
    */
   @Column(name = "recurrence_date")
@@ -524,6 +526,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   }
 
   /**
+   * Isn't yet used (ex-date is always used instead in master event).
    * @return the recurrenceReferenceId
    */
   public String getRecurrenceReferenceId()
@@ -538,6 +541,16 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   public TeamEventDO setRecurrenceReferenceId(final String recurrenceReferenceId)
   {
     this.recurrenceReferenceId = recurrenceReferenceId;
+    return this;
+  }
+
+  /**
+   * @param recurrenceReferenceId the recurrenceReferenceId to set
+   * @return this for chaining.
+   */
+  public TeamEventDO setRecurrenceReferenceId(final Integer recurrenceReferenceId)
+  {
+    this.recurrenceReferenceId = recurrenceReferenceId != null ? String.valueOf(recurrenceReferenceId) : null;
     return this;
   }
 
