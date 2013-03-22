@@ -178,17 +178,15 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
   {
     final List<TeamEvent> result = new ArrayList<TeamEvent>();
     List<TeamEventDO> list = getList(filter);
-    if (CollectionUtils.isEmpty(list) == true) {
-      return result;
-    }
-    for (final TeamEventDO eventDO : list) {
-      if (eventDO.hasRecurrence() == true) {
-        // Added later.
-        continue;
+    if (CollectionUtils.isNotEmpty(list) == true) {
+      for (final TeamEventDO eventDO : list) {
+        if (eventDO.hasRecurrence() == true) {
+          // Added later.
+          continue;
+        }
+        result.add(eventDO);
       }
-      result.add(eventDO);
     }
-
     final TeamEventFilter teamEventFilter = filter.clone().setOnlyRecurrence(true);
     final QueryFilter qFilter = buildQueryFilter(teamEventFilter);
     qFilter.add(Restrictions.isNotNull("recurrenceRule"));
