@@ -491,10 +491,23 @@ public class UserDao extends BaseDao<PFUserDO>
    */
   public String encrypt(final Integer userId, final String data)
   {
-    final PFUserDO user = userGroupCache.getUser(userId); // for faster access (due to permanent usage e. g. by subscription of calendars
-    // (ics).
-    final String authenticationToken = StringUtils.rightPad(user.getAuthenticationToken(), 32, "x");
+    final String authenticationToken = StringUtils.rightPad(getCachedAuthenticationToken(userId), 32, "x");
     return Crypt.encrypt(authenticationToken, data);
+  }
+
+  /**
+   * for faster access (due to permanent usage e. g. by subscription of calendars
+   * @param userId
+   * @return
+   */
+  private String getCachedAuthenticationToken(final Integer userId)
+  {
+    final PFUserDO user = userGroupCache.getUser(userId);
+    final String authenticationToken = user.getAuthenticationToken();
+    if (StringUtils.isBlank(authenticationToken) == false && authenticationToken.trim().length() >= 10) {
+      return authenticationToken;
+    }
+    return getAuthenticationToken(userId);
   }
 
   /**
@@ -507,7 +520,7 @@ public class UserDao extends BaseDao<PFUserDO>
   {
     final PFUserDO user = userGroupCache.getUser(userId); // for faster access (due to permanent usage e. g. by subscription of calendars
     // (ics).
-    final String authenticationToken = StringUtils.rightPad(user.getAuthenticationToken(), 32, "x");
+    final String authenticationToken = StringUtils.rightPad(getCachedAuthenticationToken(userId), 32, "x");
     return Crypt.decrypt(authenticationToken, encryptedString);
   }
 
