@@ -122,11 +122,13 @@ public abstract class ModalDialog extends Panel
   }
 
   /**
+   * Sets also draggable to false.
    * Appends css class big-modal.
    */
   public ModalDialog setBigWindow()
   {
     bigWindow = true;
+    draggable = false;
     return this;
   }
 
