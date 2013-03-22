@@ -64,8 +64,6 @@ import org.springframework.util.CollectionUtils;
  */
 public class TeamCalCalendarFeedHook implements CalendarFeedHook
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalCalendarFeedHook.class);
-
   public static final String PARAM_EXPORT_REMINDER = "exportReminders";
 
   public static final String getUrl(final String teamCalIds, final String additionalParameterString)
@@ -111,13 +109,7 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
       final List<TeamEventDO> teamEvents = teamEventDao.getList(eventFilter);
       if (teamEvents != null && teamEvents.size() > 0) {
         for (final TeamEventDO teamEvent : teamEvents) {
-          final String uid;
-          if (teamEvent.getRecurrenceReferenceId() != null) {
-            //uid = teamEvent.getRecurrenceReferenceId();
-            uid = TeamCalConfig.get().createEventUid(teamEvent.getId());
-          } else {
-            uid = TeamCalConfig.get().createEventUid(teamEvent.getId());
-          }
+          final String uid = TeamCalConfig.get().createEventUid(teamEvent.getId());
           String summary;
           if (teamCalIds.length > 1) {
             summary = teamEvent.getSubject() + " (" + teamEvent.getCalendar().getTitle() + ")";
@@ -152,8 +144,6 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
               vEvent.getAlarms().add(alarm);
             }
           }
-
-          // TODO add attendees
           if (teamEvent.hasRecurrence() == true) {
             final Recur recur = teamEvent.getRecurrenceObject();
             if (recur.getUntil() != null) {
@@ -175,18 +165,7 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
               }
             }
           }
-          if (teamEvent.getRecurrenceReferenceId() != null) {
-            // if (StringUtils.isNotBlank(teamEvent.getRecurrenceDate()) == true) {
-            // try {
-            // final RecurrenceId recurrenceId = new RecurrenceId(teamEvent.getRecurrenceDate());
-            // vEvent.getProperties().add(recurrenceId);
-            // } catch (final ParseException ex) {
-            // log.error("Can't parse recurrenceId date '" + teamEvent.getRecurrenceDate() + "': " + ex.getMessage(), ex);
-            // }
-            // } else {
-            // log.error("Oups, recurrenceDate (RECURRENCE_ID) is given but not the recurrence uid.");
-            // }
-          }
+          // TODO add attendees
           events.add(vEvent);
         }
       }
