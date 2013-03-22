@@ -167,6 +167,30 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   }
 
   /**
+   * @see org.projectforge.web.wicket.AbstractEditPage#onDelete()
+   */
+  @Override
+  public AbstractSecuredBasePage onDelete()
+  {
+    super.onDelete();
+    if (recurrencyChangeType == null || recurrencyChangeType == RecurrencyChangeType.ALL) {
+      return null;
+    }
+    final Integer masterId = getData().getId(); // Store the id of the master entry.
+    final TeamEventDO masterEvent = teamEventDao.getById(masterId);
+    if (recurrencyChangeType == RecurrencyChangeType.ALL_FUTURE) {
+      final Date recurrenceUntil = new Date(eventOfCaller.getStartDate().getTime() - 24 * 3600 * 1000);
+      form.recurrenceData.setUntil(recurrenceUntil); // Minus 24 hour.
+      masterEvent.setRecurrence(form.recurrenceData);
+      getBaseDao().update(masterEvent);
+    } else if (recurrencyChangeType == RecurrencyChangeType.ONLY_CURRENT) { // only current date
+      masterEvent.addRecurrenceExDate(eventOfCaller.getStartDate());
+      getBaseDao().update(masterEvent);
+    }
+    return (AbstractSecuredBasePage) getReturnToPage();
+  }
+
+  /**
    * @see org.projectforge.web.wicket.AbstractEditPage#onSaveOrUpdate()
    */
   @Override
