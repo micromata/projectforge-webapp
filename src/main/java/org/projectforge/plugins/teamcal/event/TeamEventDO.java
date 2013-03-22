@@ -472,7 +472,8 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
     final String exDate = ICal4JUtils.asISODateString(date);
     if (recurrenceExDate == null) {
       recurrenceExDate = exDate;
-    } else {
+    } else if (recurrenceExDate.contains(exDate) == false) {
+      // Add this ex date only if not yet added:
       recurrenceExDate = recurrenceExDate + "," + exDate;
     }
     return this;
