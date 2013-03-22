@@ -41,7 +41,7 @@
   <classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-core/1.15/jersey-core-1.15.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-core/1.15/jersey-core-1.15-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-server/1.15/jersey-server-1.15.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-server/1.15/jersey-server-1.15-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-servlet/1.15/jersey-servlet-1.15.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-servlet/1.15/jersey-servlet-1.15-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/com/vaynberg/wicket/select2/wicket-select2/2.1/wicket-select2-2.1.jar" sourcepath="M2_REPO/com/vaynberg/wicket/select2/wicket-select2/2.1/wicket-select2-2.1-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/vaynberg/wicket/select2/wicket-select2/2.2/wicket-select2-2.2.jar" sourcepath="M2_REPO/com/vaynberg/wicket/select2/wicket-select2/2.2/wicket-select2-2.2-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/json/json/20090211/json-20090211.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/wicket/wicket-core/6.4.0/wicket-core-6.4.0.jar" sourcepath="M2_REPO/org/apache/wicket/wicket-core/6.4.0/wicket-core-6.4.0-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/wicket/wicket-util/6.4.0/wicket-util-6.4.0.jar" sourcepath="M2_REPO/org/apache/wicket/wicket-util/6.4.0/wicket-util-6.4.0-sources.jar"/>

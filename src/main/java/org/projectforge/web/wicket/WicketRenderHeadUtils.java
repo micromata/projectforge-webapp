@@ -53,23 +53,10 @@ public class WicketRenderHeadUtils
   private static final String[][] CSS_FILES_DEF = { //
     { "styles/google-fonts/google-fonts", ""}, //
     // "http://fonts.googleapis.com/css?family=Droid+Sans:regular&amp;subset=latin", //
-    { "styles/jqueryui/1.10.0/smoothness/jquery-ui-1.10.0.custom", ".min"}, //
-    // { "styles/table", ""}, //
-    // { "scripts/contextmenu/css/jquery.contextmenu", ""}, //
-    // { "include/bootstrap/css/bootstrap", ".min"}, //
-    // { "include/bootstrap/css/bootstrap-responsive", ".min"}, //
-    // { "styles/projectforge-main", ""}, //
-    // { "styles/projectforge-bootstrap", ""}, //
-    // { "styles/projectforge-form", ""}, // before projectforge.css!
-    // { "styles/projectforge-jquery-ui", ""}, //
-    // { "styles/projectforge-wicket", ""}, //
-    // { "styles/projectforge", ""} //
+    { "styles/jqueryui/1.10.0/smoothness/jquery-ui-1.10.0.custom", ".min"} //
   };
 
   private static final String[] CSS_FILES;
-
-  private static final String[] SELECT2_JAVASCRIPT_FILES = { //
-  "scripts/select2/select2.js"};
 
   private static final String[][] AUTOGROW_JAVASCRIPT_FILES_DEF = { //
     { "scripts/autogrow/jquery.autogrowtextarea", ""}};
@@ -154,9 +141,9 @@ public class WicketRenderHeadUtils
   public static void renderSelect2JavaScriptIncludes(final IHeaderResponse response)
   {
     renderMainJavaScriptIncludes(response);
-    for (final String url : SELECT2_JAVASCRIPT_FILES) {
-      response.render(JavaScriptReferenceHeaderItem.forUrl(url));
-    }
+    // for (final String url : SELECT2_JAVASCRIPT_FILES) {
+    // response.render(JavaScriptReferenceHeaderItem.forUrl(url));
+    // }
   }
 
   /**
