@@ -6,7 +6,6 @@ Johannes
 
 Bugs
 ----
-- Ersten Wiederholungstermin verlegen klappt nicht.
 - ctrl-return dokumentieren.
 - T=[2013-03-19 13:48:50,141] L=[ERROR] User=[salheit@192.168.77.15] C=[org.projectforge.common.Crypt] X=[] M=[Exception encountered while trying to encrypt with Algorithm 'AES' and the given password: null]
 java.lang.NullPointerException
@@ -37,12 +36,11 @@ java.lang.NullPointerException
         at org.projectforge.core.BaseDao.getById(BaseDao.java:637)
         at org.projectforge.core.BaseDao$$FastClassByCGLIB$$ddb64f08.invoke(<generated>)
 - Modify end-date if start-date is changed.
-- Export also recurrence ex dates!
 - Aus Ereignis Zeitbericht anlegen.
 - Standardkalender klappt nicht immer, manchmal geht er auf Zeitberichte.
 - http://stackoverflow.com/questions/8813454/fullcalendar-current-time-line-on-week-view-and-day-view
 - ProjectForge-Feiertage abonnieren.
-- Einzeltermine aus wiederkehrenden Terminen als gelöscht markieren.
+- Ausnahmetermine von Ganztagsterminen klappen noch nicht.
 
 TeamCal
 -------
