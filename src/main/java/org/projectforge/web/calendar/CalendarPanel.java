@@ -282,7 +282,7 @@ public class CalendarPanel extends Panel
               DatePickerUtils.getDatePickerInitJavaScript(currentDatePanel.getDateField().getMarkupId(), true));
         }
         // Set interval on refresh the timeline.
-        response.getTarget().appendJavaScript("if(first){ first = false; window.setInterval(setTimeline, 60000); try { setTimeline(); } catch(err) { }}");
+        response.getTarget().appendJavaScript("if(first){ first = false; window.setInterval(setTimeline, 60000); } try { setTimeline(); } catch(err) { }");
         response.getTarget().add(((CalendarPage) getPage()).getForm().getDurationLabel());
       }
     };
