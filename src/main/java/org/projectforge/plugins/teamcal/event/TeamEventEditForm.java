@@ -178,6 +178,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       fieldSet.add(subjectField);
       if (access == false) {
         fieldSet.setEnabled(false);
+      } else {
+        WicketUtils.setFocus(subjectField);
       }
     }
     {
