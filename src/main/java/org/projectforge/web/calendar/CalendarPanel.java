@@ -116,8 +116,6 @@ public class CalendarPanel extends Panel
     config.setSelectable(true);
     config.setSelectHelper(true);
     config.setLoading("function(bool) { if (bool) $(\"#loading\").show(); else $(\"#loading\").hide(); }");
-    //config //.setViewDisplay("function(view) { try { setTimeline(); } catch(err) {} }");
-    //.setViewDisplay("function(view) { var first; var timelineInterval; if(first){ first = false; }else { window.clearInterval(timelineInterval); } timelineInterval = window.setInterval(setTimeline, 300000); try { setTimeline(); } catch(err) {} }");
     // config.setMinTime(new LocalTime(6, 30));
     // config.setMaxTime(new LocalTime(17, 30));
     config.setAllDaySlot(true);
@@ -283,8 +281,8 @@ public class CalendarPanel extends Panel
           response.getTarget().appendJavaScript(
               DatePickerUtils.getDatePickerInitJavaScript(currentDatePanel.getDateField().getMarkupId(), true));
         }
-        // response.getTarget().appendJavaScript("setTimeline();");
-        response.getTarget().appendJavaScript("if(first){ first = false; }else { window.clearInterval(timelineInterval); } var timelineInterval = window.setInterval(setTimeline, 60000); try { setTimeline(); } catch(err) {}");
+        // Set interval on refresh the timeline.
+        response.getTarget().appendJavaScript("if(first){ first = false; window.setInterval(setTimeline, 60000); try { setTimeline(); } catch(err) { }}");
         response.getTarget().add(((CalendarPage) getPage()).getForm().getDurationLabel());
       }
     };
