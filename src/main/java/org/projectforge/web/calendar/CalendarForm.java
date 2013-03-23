@@ -85,12 +85,6 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
     currentDatePanel.getDateField().setOutputMarkupId(true);
     fieldset.add(currentDatePanel);
 
-    final DivPanel checkBoxPanel = fieldset.addNewCheckBoxDiv();
-
-    calendarPageSupport.addOptions(checkBoxPanel, true, filter);
-    checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "slot30"),
-        getString("calendar.option.slot30"), true).setTooltip(getString("calendar.option.slot30.tooltip")));
-
     final DropDownChoice<Integer> firstHourDropDownChoice = new DropDownChoice<Integer>(fieldset.getDropDownChoiceId(),
         new PropertyModel<Integer>(filter, "firstHour"), DateTimePanel.getHourOfDayRenderer().getValues(),
         DateTimePanel.getHourOfDayRenderer()) {
@@ -107,6 +101,13 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
     firstHourDropDownChoice.setRequired(true);
     WicketUtils.addTooltip(firstHourDropDownChoice, getString("calendar.option.firstHour.tooltip"));
     fieldset.add(firstHourDropDownChoice);
+
+    final DivPanel checkBoxPanel = fieldset.addNewCheckBoxDiv();
+
+    calendarPageSupport.addOptions(checkBoxPanel, true, filter);
+    checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "slot30"),
+        getString("calendar.option.slot30"), true).setTooltip(getString("calendar.option.slot30.tooltip")));
+
     buttonGroupPanel = new ButtonGroupPanel(fieldset.newChildId());
     fieldset.add(buttonGroupPanel);
     {
