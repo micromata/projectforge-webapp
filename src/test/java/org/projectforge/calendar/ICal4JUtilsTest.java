@@ -71,10 +71,10 @@ public class ICal4JUtilsTest
   {
     final java.util.Date date = ICal4JUtils.parseISODateString("2013-03-21 08:47:00");
     Assert.assertNotNull(date);
-    Assert.assertEquals("2013-03-21 08:47:00", ICal4JUtils.asISODateString(date));
+    Assert.assertEquals("2013-03-21 08:47:00", ICal4JUtils.asISODateTimeString(date));
     Assert.assertNull(ICal4JUtils.parseISODateString(null));
     Assert.assertNull(ICal4JUtils.parseISODateString(""));
-    Assert.assertNull(ICal4JUtils.asISODateString(null));
+    Assert.assertNull(ICal4JUtils.asISODateTimeString(null));
   }
 
   private net.fortuna.ical4j.model.Date getDate(final String dateString, final TimeZone timeZone)
