@@ -123,6 +123,9 @@ public class TeamEventRight extends UserRightAccessCheck<TeamEventDO>
   @Override
   public boolean hasUpdateAccess(final PFUserDO user, final TeamEventDO obj, final TeamEventDO oldObj)
   {
+    if (obj == null) {
+      return false;
+    }
     final TeamCalDO calendar = obj.getCalendar();
     if (calendar == null) {
       return false;
