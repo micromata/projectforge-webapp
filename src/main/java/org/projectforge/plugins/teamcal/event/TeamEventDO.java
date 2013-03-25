@@ -127,8 +127,6 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
 
   private String externalUid;
 
-  transient boolean afterLoadCalled;
-
   private Integer reminderDuration;
 
   private ReminderDurationUnit reminderDurationType;
@@ -318,7 +316,8 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
    * Creates a {@link TreeSet}.
    * @return this for chaining.
    */
-  public SortedSet<TeamEventAttendeeDO> ensureAttendees() {
+  public SortedSet<TeamEventAttendeeDO> ensureAttendees()
+  {
     if (this.attendees == null) {
       this.attendees = new TreeSet<TeamEventAttendeeDO>();
     }
@@ -454,8 +453,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   }
 
   /**
-   * EXDATE (rfc5545)
-   * Ex dates are time stamps of deleted events out of the recurrence events.
+   * EXDATE (rfc5545) Ex dates are time stamps of deleted events out of the recurrence events.
    * @return the recurrenceExDate
    */
   @Column(name = "recurrence_ex_date")
@@ -464,12 +462,22 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
     return recurrenceExDate;
   }
 
+  /**
+   * @param date
+   * @param timeZone Only used for all day events.
+   * @return
+   */
   public TeamEventDO addRecurrenceExDate(final Date date)
   {
     if (date == null) {
       return this;
     }
-    final String exDate = ICal4JUtils.asISODateString(date);
+    final String exDate;
+    if (isAllDay() == true) {
+      exDate = ICal4JUtils.asISODateString(date);
+    } else {
+      exDate = ICal4JUtils.asISODateTimeString(date);
+    }
     if (recurrenceExDate == null) {
       recurrenceExDate = exDate;
     } else if (recurrenceExDate.contains(exDate) == false) {
@@ -506,8 +514,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   }
 
   /**
-   * This field is RECURRENCE_ID.
-   * Isn't yet used (ex-date is always used instead in master event).
+   * This field is RECURRENCE_ID. Isn't yet used (ex-date is always used instead in master event).
    * @return the recurrenceId
    */
   @Column(name = "recurrence_date")
@@ -599,13 +606,13 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
    * @return
    */
   @Column(name = "reminder_duration")
-  public Integer getReminderDuration() {
+  public Integer getReminderDuration()
+  {
     return reminderDuration;
   }
 
   /**
-   * Get type of reminder duration
-   * minute, hour, day
+   * Get type of reminder duration minute, hour, day
    * 
    * @return the reminderDurationType
    */
@@ -635,8 +642,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   }
 
   /**
-   * Gets type of event action.
-   * AUDIO or DISPLAY
+   * Gets type of event action. AUDIO or DISPLAY
    * 
    * @return the reminderType
    */
