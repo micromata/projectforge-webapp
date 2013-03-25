@@ -34,6 +34,7 @@ import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.Action;
 import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.ExDate;
@@ -152,11 +153,16 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
             final RRule rrule = new RRule(recur);
             vEvent.getProperties().add(rrule);
             if (teamEvent.getRecurrenceExDate() != null) {
-              final List<net.fortuna.ical4j.model.Date> exDates = ICal4JUtils.parseIsoDateStringsAsICal4jDates(teamEvent
+              final List<net.fortuna.ical4j.model.Date> exDates = ICal4JUtils.parseISODateStringsAsICal4jDates(teamEvent
                   .getRecurrenceExDate());
               if (CollectionUtils.isEmpty(exDates) == false) {
                 for (final net.fortuna.ical4j.model.Date date : exDates) {
-                  final DateList dateList = new DateList();
+                  final DateList dateList;
+                  if (teamEvent.isAllDay() == true) {
+                    dateList = new DateList(Value.DATE);
+                  } else {
+                    dateList = new DateList();
+                  }
                   dateList.add(date);
                   ExDate exDate;
                   exDate = new ExDate(dateList);
