@@ -27,7 +27,6 @@ import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.projectforge.calendar.CalendarUtils;
 import org.projectforge.common.ReflectionToString;
 
 /**
@@ -47,26 +46,14 @@ public class TeamRecurrenceEvent implements TeamEvent, Serializable
    * @param master
    * @param startDay day of event (startDate and endDate will be calculated based on this day and the master).
    */
-  public TeamRecurrenceEvent(final TeamEventDO master, final Calendar startDay)
+  public TeamRecurrenceEvent(final TeamEventDO master, final Calendar startDate)
   {
     this.master = master;
-    final Calendar masterStartDate = (Calendar) startDay.clone(); // Clone time zone and local.
-    masterStartDate.setTime(master.getStartDate());
-    startDay.set(Calendar.HOUR_OF_DAY, masterStartDate.get(Calendar.HOUR_OF_DAY));
-    startDay.set(Calendar.MINUTE, masterStartDate.get(Calendar.MINUTE));
-    startDay.set(Calendar.SECOND, masterStartDate.get(Calendar.SECOND));
-    this.startDate = startDay.getTime();
-    final Calendar masterEndDate = (Calendar) startDay.clone(); // Clone time zone and local.
-    masterEndDate.setTime(master.getEndDate());
-    startDay.set(Calendar.HOUR_OF_DAY, masterEndDate.get(Calendar.HOUR_OF_DAY));
-    startDay.set(Calendar.MINUTE, masterEndDate.get(Calendar.MINUTE));
-    startDay.set(Calendar.SECOND, masterEndDate.get(Calendar.SECOND));
-    final int daysBetween = CalendarUtils.daysBetween(masterStartDate, masterEndDate);
-    if (daysBetween > 0) {
-      // The event ends at another day:
-      startDay.add(Calendar.DAY_OF_YEAR, daysBetween);
-    }
-    this.endDate = startDay.getTime();
+    final Calendar cal = (Calendar)startDate.clone();
+    this.startDate = cal.getTime();
+    final long duration = master.getEndDate().getTime() - master.getStartDate().getTime();
+    cal.add(Calendar.MINUTE, (int)(duration / 60000));
+    this.endDate = cal.getTime();
   }
 
   /**
