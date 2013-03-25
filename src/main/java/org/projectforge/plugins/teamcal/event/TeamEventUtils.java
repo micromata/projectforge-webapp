@@ -43,7 +43,6 @@ import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.ExDate;
 import net.fortuna.ical4j.model.property.RRule;
 
-import org.projectforge.calendar.CalendarUtils;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.RecurrenceFrequency;
@@ -125,7 +124,7 @@ public class TeamEventUtils
         final net.fortuna.ical4j.model.DateTime dateTime = (net.fortuna.ical4j.model.DateTime) obj;
         final Calendar startDay = Calendar.getInstance(DateHelper.UTC);
         startDay.setTime(dateTime);
-        final Calendar masterStartDate = Calendar.getInstance(timeZone);
+        final Calendar masterStartDate = Calendar.getInstance(DateHelper.UTC);
         masterStartDate.setTime(event.getStartDate());
         if (exDates != null && exDates.size() > 0) {
           for (final Calendar exDate : exDates) {
@@ -135,7 +134,7 @@ public class TeamEventUtils
             }
           }
         }
-        if (CalendarUtils.isSameDay(startDay, masterStartDate) == true) {
+        if (startDay.equals(masterStartDate) == true) {
           // Put event itself to the list.
           col.add(event);
         } else {
