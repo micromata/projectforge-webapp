@@ -267,12 +267,18 @@ public class ICal4JUtils
     if (StringUtils.isBlank(isoDateString) == true) {
       return null;
     }
-    final DateFormat df = new SimpleDateFormat(DateFormats.ISO_TIMESTAMP_SECONDS);
+    String pattern;
+    if (isoDateString.indexOf(':') > 0) {
+      pattern = DateFormats.ISO_TIMESTAMP_SECONDS;
+    } else {
+      pattern = DateFormats.ISO_DATE;
+    }
+    final DateFormat df = new SimpleDateFormat(pattern);
     df.setTimeZone(DateHelper.UTC);
     try {
       return df.parse(isoDateString);
     } catch (final ParseException ex) {
-      log.error("Can't parse ISO date ('" + DateFormats.ISO_TIMESTAMP_SECONDS + "': " + ex.getMessage(), ex);
+      log.error("Can't parse ISO date ('" + pattern + "': " + ex.getMessage(), ex);
       return null;
     }
   }
@@ -282,12 +288,22 @@ public class ICal4JUtils
     if (date == null) {
       return null;
     }
+    final DateFormat df = new SimpleDateFormat(DateFormats.ISO_DATE);
+    df.setTimeZone(DateHelper.UTC);
+    return df.format(date);
+  }
+
+  public static String asISODateTimeString(final Date date)
+  {
+    if (date == null) {
+      return null;
+    }
     final DateFormat df = new SimpleDateFormat(DateFormats.ISO_TIMESTAMP_SECONDS);
     df.setTimeZone(DateHelper.UTC);
     return df.format(date);
   }
 
-  public static List<net.fortuna.ical4j.model.Date> parseIsoDateStringsAsICal4jDates(final String csv)
+  public static List<net.fortuna.ical4j.model.Date> parseISODateStringsAsICal4jDates(final String csv)
   {
     if (StringUtils.isBlank(csv) == true) {
       return null;
@@ -298,6 +314,9 @@ public class ICal4JUtils
     }
     final List<net.fortuna.ical4j.model.Date> result = new ArrayList<net.fortuna.ical4j.model.Date>();
     for (final String str : sa) {
+      if (str == null) {
+        continue;
+      }
       final Date date = parseISODateString(str);
       if (date == null) {
         continue;
