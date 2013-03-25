@@ -105,7 +105,7 @@ public class TeamEventUtils
     final net.fortuna.ical4j.model.DateTime ical4jEndDate = new net.fortuna.ical4j.model.DateTime(endDate);
     // ical4jEndDate.setTimeZone(ICal4JUtils.getTimeZone(timeZone));
     net.fortuna.ical4j.model.DateTime seedDate;
-    seedDate = ICal4JUtils.getICal4jDateTime(event.getStartDate(), timeZone);
+    seedDate = new net.fortuna.ical4j.model.DateTime(event.getStartDate());
     if (ical4jStartDate == null || ical4jEndDate == null || seedDate == null) {
       log.error("Can't get recurrence events of event "
           + event.getId()
@@ -123,13 +123,13 @@ public class TeamEventUtils
     if (dateList != null) {
       OuterLoop: for (final Object obj : dateList) {
         final net.fortuna.ical4j.model.DateTime dateTime = (net.fortuna.ical4j.model.DateTime) obj;
-        final Calendar startDay = Calendar.getInstance(timeZone);
+        final Calendar startDay = Calendar.getInstance(DateHelper.UTC);
         startDay.setTime(dateTime);
         final Calendar masterStartDate = Calendar.getInstance(timeZone);
         masterStartDate.setTime(event.getStartDate());
         if (exDates != null && exDates.size() > 0) {
           for (final Calendar exDate : exDates) {
-            if (CalendarUtils.isSameDay(startDay, exDate) == true) {
+            if (startDay.equals(exDate) == true) {
               // this date is part of ex dates, so don't use it.
               continue OuterLoop;
             }
@@ -139,7 +139,10 @@ public class TeamEventUtils
           // Put event itself to the list.
           col.add(event);
         } else {
-          final TeamRecurrenceEvent recurEvent = new TeamRecurrenceEvent(event, startDay);
+          // Now we need this event as date with the user's time-zone.
+          final Calendar userCal = Calendar.getInstance(timeZone);
+          userCal.setTime(startDay.getTime());
+          final TeamRecurrenceEvent recurEvent = new TeamRecurrenceEvent(event, userCal);
           col.add(recurEvent);
         }
       }
@@ -153,7 +156,7 @@ public class TeamEventUtils
     if (recurrenceExdate == null) {
       return exCals;
     }
-    final List<net.fortuna.ical4j.model.Date> exDates = ICal4JUtils.parseIsoDateStringsAsICal4jDates(recurrenceExdate);
+    final List<net.fortuna.ical4j.model.Date> exDates = ICal4JUtils.parseISODateStringsAsICal4jDates(recurrenceExdate);
     if (CollectionUtils.isEmpty(exDates)==true) {
       return exCals;
     }
