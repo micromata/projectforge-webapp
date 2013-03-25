@@ -1,3 +1,8 @@
+ProjectForge is a web-based solution for project management including time tracking, team calendar, financial administration, issue management,
+controlling and managing work-break-down-structures (e. g. together with JIRA as issue management system).
+
+
+
 Full documentation on: http://www.projectforge.org/pf-en/Documentation
 
 Please visit: http://www.projectforge.org/pf-en/Developersarewelcome
