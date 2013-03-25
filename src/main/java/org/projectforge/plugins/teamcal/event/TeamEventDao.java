@@ -145,32 +145,6 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
   }
 
   /**
-   * Sets midnight (with user's time zone) of all day events.
-   * @see org.projectforge.core.BaseDao#afterLoad(org.projectforge.core.ExtendedBaseDO)
-   */
-  @Override
-  protected void afterLoad(final TeamEventDO event)
-  {
-    if (event.afterLoadCalled == true) {
-      return;
-    }
-    event.afterLoadCalled = true;
-    super.afterLoad(event);
-    if (event.isAllDay() == false) {
-      return;
-    } else {
-      final Date startDate = event.getStartDate();
-      if (startDate != null) {
-        event.setStartDate(CalendarUtils.getMidnightTimestampFromUTC(startDate));
-      }
-      final Date endDate = event.getEndDate();
-      if (endDate != null) {
-        event.setEndDate(CalendarUtils.getMidnightTimestampFromUTC(endDate));
-      }
-    }
-  }
-
-  /**
    * @param filter
    * @return list of team events (same as {@link #getList(BaseSearchFilter)} but with all calculated and matching recurrence events.
    */
