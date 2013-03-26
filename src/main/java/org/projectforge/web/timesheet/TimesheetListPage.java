@@ -69,7 +69,6 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.HtmlHelper;
-import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.task.TaskPropertyColumn;
 import org.projectforge.web.user.UserFormatter;
@@ -217,28 +216,25 @@ IListPageColumnsCreator<TimesheetDO>
       exportMenu.addSubMenuEntry(new ContentMenuEntryPanel(exportMenu.newSubMenuChildId(), exportExcelButton, getString("exportAsXls"))
       .setTooltip(getString("tooltip.export.excel")));
     }
-    if (WebConfiguration.isDevelopmentMode() == true) {
-      icsExportDialog = new TimesheetsICSExportDialog(newModalDialogId(), new ResourceModel("timesheet.iCalSubscription"));
-      add(icsExportDialog);
-      icsExportDialog.init(PFUserContext.getUserId());
-      icsExportDialog.redraw();
-      final AjaxLink<Void> icsExportDialogButton = new AjaxLink<Void>(ContentMenuEntryPanel.LINK_ID) {
-        /**
-         * @see org.apache.wicket.ajax.markup.html.AjaxLink#onClick(org.apache.wicket.ajax.AjaxRequestTarget)
-         */
-        @Override
-        public void onClick(final AjaxRequestTarget target)
-        {
-          icsExportDialog.open(target);
-        };
-
+    icsExportDialog = new TimesheetsICSExportDialog(newModalDialogId(), new ResourceModel("timesheet.iCalSubscription"));
+    add(icsExportDialog);
+    icsExportDialog.init(PFUserContext.getUserId());
+    icsExportDialog.redraw();
+    final AjaxLink<Void> icsExportDialogButton = new AjaxLink<Void>(ContentMenuEntryPanel.LINK_ID) {
+      /**
+       * @see org.apache.wicket.ajax.markup.html.AjaxLink#onClick(org.apache.wicket.ajax.AjaxRequestTarget)
+       */
+      @Override
+      public void onClick(final AjaxRequestTarget target)
+      {
+        icsExportDialog.open(target);
       };
-      // final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(buttonGroupPanel.newChildId(), IconType.DOWNLOAD,
-      // getString("timesheet.iCalSubscription"), iCalExportLink);
-      exportMenu.addSubMenuEntry(new ContentMenuEntryPanel(exportMenu.newSubMenuChildId(), icsExportDialogButton,
-          getString("timesheet.icsExport")).setTooltip(getString("timesheet.iCalSubscription")));
-    }
 
+    };
+    // final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(buttonGroupPanel.newChildId(), IconType.DOWNLOAD,
+    // getString("timesheet.iCalSubscription"), iCalExportLink);
+    exportMenu.addSubMenuEntry(new ContentMenuEntryPanel(exportMenu.newSubMenuChildId(), icsExportDialogButton,
+        getString("timesheet.icsExport")).setTooltip(getString("timesheet.iCalSubscription")));
   }
 
   @Override
@@ -310,7 +306,8 @@ IListPageColumnsCreator<TimesheetDO>
               final IModel<TimesheetDO> rowModel)
           {
             final TimesheetDO timesheet = rowModel.getObject();
-            final CheckBoxPanel checkBoxPanel = new CheckBoxPanel(componentId, timesheetListPage.new SelectItemModel(timesheet.getId()), null);
+            final CheckBoxPanel checkBoxPanel = new CheckBoxPanel(componentId, timesheetListPage.new SelectItemModel(timesheet.getId()),
+                null);
             item.add(checkBoxPanel);
             cellItemListener.populateItem(item, componentId, rowModel);
             addRowClick(item, isMassUpdateMode);
