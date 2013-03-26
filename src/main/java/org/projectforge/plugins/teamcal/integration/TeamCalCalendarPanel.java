@@ -199,7 +199,7 @@ public class TeamCalCalendarPanel extends CalendarPanel
     if (filter instanceof TeamCalCalendarFilter) {
       // Colors are handled event based, this is just the default value
       final EventSource eventSource = new EventSource();
-      eventProvider = new TeamCalEventProvider(this, teamEventDao, userGroupCache, (TeamCalCalendarFilter) filter);
+      eventProvider = new TeamCalEventProvider(teamEventDao, userGroupCache, (TeamCalCalendarFilter) filter);
       eventSource.setEventsProvider(eventProvider);
       eventSource.setBackgroundColor("#1AA118");
       eventSource.setColor("#000000");
