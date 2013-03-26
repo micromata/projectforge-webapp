@@ -180,7 +180,7 @@ public class NumberHelper
     try {
       result = new Integer(value);
     } catch (final NumberFormatException ex) {
-      log.debug(ex.getMessage(), ex);
+      log.warn("Can't parse integer: '" + value + "'.");
     }
     return result;
   }
