@@ -42,6 +42,7 @@ import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.CalScale;
+import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.Version;
@@ -320,6 +321,9 @@ public class CalendarFeed extends HttpServlet
           summary = TimesheetEventsProvider.getTitle(timesheet);
         }
         final VEvent vEvent = ICal4JUtils.createVEvent(timesheet.getStartTime(), timesheet.getStopTime(), uid, summary);
+        if (StringUtils.isNotBlank(timesheet.getDescription()) == true) {
+          vEvent.getProperties().add(new Description(timesheet.getDescription()));
+        }
         if (StringUtils.isNotBlank(timesheet.getLocation()) == true) {
           vEvent.getProperties().add(new Location(timesheet.getLocation()));
         }
