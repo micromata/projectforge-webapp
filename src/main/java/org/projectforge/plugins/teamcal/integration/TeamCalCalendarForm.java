@@ -42,6 +42,7 @@ import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.StringHelper;
+import org.projectforge.plugins.teamcal.admin.TeamCalListPage;
 import org.projectforge.plugins.teamcal.dialog.TeamCalFilterDialog;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDao;
@@ -100,6 +101,21 @@ public class TeamCalCalendarForm extends CalendarForm
   protected void init()
   {
     super.init();
+    {
+      final IconButtonPanel icsExportButtonPanel = new IconButtonPanel(buttonGroupPanel.newChildId(), IconType.DOWNLOAD, new ResourceModel(
+          "calendar.icsExport.tooltip")) {
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.IconButtonPanel#onSubmit()
+         */
+        @Override
+        protected void onSubmit()
+        {
+          setResponsePage(TeamCalListPage.class);
+        }
+      };
+      icsExportButtonPanel.setDefaultFormProcessing(false);
+      buttonGroupPanel.addButton(icsExportButtonPanel);
+    }
     {
       final IconButtonPanel searchButtonPanel = new IconButtonPanel(buttonGroupPanel.newChildId(), IconType.SEARCH, new ResourceModel(
           "search")) {
