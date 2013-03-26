@@ -26,20 +26,28 @@ package org.projectforge.plugins.teamcal.event;
 import java.sql.Timestamp;
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHelper;
 import org.projectforge.core.ModificationStatus;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarPage;
+import org.projectforge.registry.Registry;
+import org.projectforge.timesheet.TimesheetDO;
+import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.calendar.CalendarPage;
+import org.projectforge.web.timesheet.TimesheetEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredBasePage;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
+ * @author K. Reinhard (k.reinhard@micromata.de)
  * 
  */
 public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEditForm, TeamEventDao>
@@ -78,7 +86,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   public TeamEventEditPage(final PageParameters parameters, final TeamEventDO event)
   {
     super(parameters, "plugins.teamcal.event");
-    super.init(event);
+    init(event);
   }
 
   /**
@@ -137,7 +145,43 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       // The user wants to change only the current event, so remove all recurrency fields.
       teamEventDO.clearAllRecurrenceFields();
     }
-    super.init(teamEventDO);
+    init(teamEventDO);
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractEditPage#init(org.projectforge.core.AbstractBaseDO)
+   */
+  @Override
+  protected void init(final TeamEventDO data)
+  {
+    super.init(data);
+    if (isNew() == false) {
+      @SuppressWarnings("serial")
+      final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(),
+          new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+        @Override
+        public void onClick()
+        {
+          final TimesheetDO timesheet = new TimesheetDO();
+          timesheet.setStartDate(getData().getStartDate())//
+          .setStopTime(getData().getEndDate()) //
+          .setLocation(getData().getLocation());
+          final StringBuffer buf = new StringBuffer();
+          buf.append(getData().getSubject());
+          final String note = getData().getNote();
+          if (StringUtils.isNotBlank(note) == true) {
+            buf.append("\n").append(note);
+          }
+          timesheet.setDescription(buf.toString());
+          final TimesheetDao timesheetDao = Registry.instance().getDao(TimesheetDao.class);
+          timesheetDao.setUser(timesheet, getUserId());
+          final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(timesheet);
+          timesheetEditPage.setReturnToPage(getReturnToPage());
+          setResponsePage(timesheetEditPage);
+        };
+      }, getString("plugins.teamcal.event.convert2Timesheet"));
+      addContentMenuEntry(menu);
+    }
   }
 
   /**
