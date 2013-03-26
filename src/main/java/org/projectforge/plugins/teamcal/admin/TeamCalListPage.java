@@ -219,7 +219,7 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
         {
           openExportICSDialog(exportDialog, target, "plugins.teamcal.export.holidays", CalendarFeed.getUrl4Holidays());
         };
-      }, getString("plugins.teamcal.export.holidays"));
+      }, getString("plugins.teamcal.export.holidays")).setTooltip(getString("plugins.teamcal.export.holidays.tooltip"));
       addContentMenuEntry(menuEntry);
     }
     {
@@ -229,7 +229,7 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
         {
           openExportICSDialog(exportDialog, target, "plugins.teamcal.export.weekOfYears", CalendarFeed.getUrl4WeekOfYears());
         };
-      }, getString("plugins.teamcal.export.weekOfYears"));
+      }, getString("plugins.teamcal.export.weekOfYears")).setTooltip(getString("plugins.teamcal.export.weekOfYears.tooltip"));
       addContentMenuEntry(menuEntry);
     }
 
