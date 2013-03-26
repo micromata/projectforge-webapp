@@ -32,7 +32,6 @@ import net.ftlines.wicket.fullcalendar.Event;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.Component;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.projectforge.calendar.TimePeriod;
@@ -94,14 +93,11 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
   public static final String BREAK_EVENT_CLASS_NAME = "ts-break";
 
   /**
-   * @param parent For i18n.
    * @param timesheetDao
    * @param calFilter
-   * @see Component#getString(String)
    */
-  public TimesheetEventsProvider(final Component parent, final TimesheetDao timesheetDao, final ICalendarFilter calFilter)
+  public TimesheetEventsProvider(final TimesheetDao timesheetDao, final ICalendarFilter calFilter)
   {
-    super(parent);
     this.timesheetDao = timesheetDao;
     this.calFilter = calFilter;
   }
@@ -163,7 +159,7 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
             breakEvent.setEditable(false);
             final String breakId = String.valueOf(++breaksCounter);
             breakEvent.setClassName(BREAK_EVENT_CLASS_NAME).setId(breakId).setStart(lastStopTime).setEnd(startTime)
-                .setTitle(getString("timesheet.break"));
+            .setTitle(getString("timesheet.break"));
             breakEvent.setTextColor("#666666").setBackgroundColor("#F9F9F9").setColor("#F9F9F9");
             events.put(breakId, breakEvent);
             final TimesheetDO breakTimesheet = new TimesheetDO().setStartDate(lastStopTime.toDate()).setStopTime(startTime.getMillis());
@@ -199,9 +195,12 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
         addDurationOfDayOfYear(dayOfYear, duration);
         event.setTooltip(
             getString("timesheet"),
-            new String[][] { { title}, { timesheet.getLocation(), getString("timesheet.location")},
-                { KostFormatter.formatLong(timesheet.getKost2()), getString("fibu.kost2")},
-                { TaskFormatter.instance().getTaskPath(timesheet.getTaskId(), true, OutputType.PLAIN), getString("task")},
+            new String[][] {
+              { title},
+              { timesheet.getLocation(), getString("timesheet.location")},
+              { KostFormatter.formatLong(timesheet.getKost2()), getString("fibu.kost2")},
+              { TaskFormatter.instance().getTaskPath(timesheet.getTaskId(), true, OutputType.PLAIN),
+                getString("task")},
                 { timesheet.getDescription(), getString("description")}});
       }
     }
@@ -293,11 +292,12 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
     final int[] fields = TimePeriod.getDurationFields(millis, 8, 200);
     final StringBuffer buf = new StringBuffer();
     if (fields[0] > 0) {
-      buf.append(fields[0]).append(getString("calendar.unit.day")).append(" ");
+      buf.append(fields[0]).append(PFUserContext.getLocalizedString("calendar.unit.day")).append(" ");
     }
-    buf.append(fields[1]).append(":").append(StringHelper.format2DigitNumber(fields[2])).append(getString("calendar.unit.hour"));
+    buf.append(fields[1]).append(":").append(StringHelper.format2DigitNumber(fields[2]))
+    .append(PFUserContext.getLocalizedString("calendar.unit.hour"));
     if (showTimePeriod == true) {
-      buf.append(" (").append(getString("calendar.month")).append(")");
+      buf.append(" (").append(PFUserContext.getLocalizedString("calendar.month")).append(")");
     }
     return buf.toString();
   }

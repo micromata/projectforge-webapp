@@ -190,6 +190,32 @@ ISelectCallerPage
 
     dataTable = createDataTable(columns, "planning.week", SortOrder.DESCENDING);
     form.add(dataTable);
+    // final AbstractICSExportDialog icsExportDialog = new AbstractICSExportDialog(newModalDialogId(), new
+    // ResourceModel("timesheet.iCalSubscription")) {
+    // /**
+    // * @see org.projectforge.web.calendar.AbstractICSExportDialog#getUrl()
+    // */
+    // @Override
+    // protected String getUrl()
+    // {
+    // }
+    // };
+    // add(icsExportDialog);
+    // icsExportDialog.init(PFUserContext.getUserId());
+    // icsExportDialog.redraw();
+    // final AjaxLink<Void> icsExportDialogButton = new AjaxLink<Void>(ContentMenuEntryPanel.LINK_ID) {
+    // /**
+    // * @see org.apache.wicket.ajax.markup.html.AjaxLink#onClick(org.apache.wicket.ajax.AjaxRequestTarget)
+    // */
+    // @Override
+    // public void onClick(final AjaxRequestTarget target)
+    // {
+    // icsExportDialog.open(target);
+    // };
+    //
+    // };
+    // addContentMenuEntry(new ContentMenuEntryPanel(getNewContentMenuChildId(), icsExportDialogButton, getString("timesheet.icsExport"))
+    // .setTooltip(getString("timesheet.iCalSubscription")));
   }
 
   private NumberPropertyColumn<HRPlanningEntryDO> newNumberPropertyColumn(final String i18nKey, final String property,
