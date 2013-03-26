@@ -133,7 +133,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       if (data.getOwner() == null) {
         data.setOwner(getUser());
       }
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.owner"));//.setLabelFor(this);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.owner")).supressLabelForWarning();
       fs.add(new Label(fs.newChildId(), data.getOwner().getUsername() + ""));
     }
 
