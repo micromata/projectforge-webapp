@@ -54,7 +54,9 @@ public abstract class AbstractICSExportDialog extends ModalDialog
   public AbstractICSExportDialog(final String id, final IModel<String> titleModel)
   {
     super(id);
-    setTitle(titleModel);
+    if (titleModel != null) {
+      setTitle(titleModel);
+    }
     setBigWindow();
   }
 
