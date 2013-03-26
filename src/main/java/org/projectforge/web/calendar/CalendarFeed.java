@@ -25,6 +25,7 @@ package org.projectforge.web.calendar;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -44,11 +45,14 @@ import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.Version;
+import net.ftlines.wicket.fullcalendar.Event;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.MDC;
+import org.joda.time.DateTime;
 import org.projectforge.access.AccessException;
+import org.projectforge.calendar.DayHolder;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.common.StringHelper;
@@ -81,6 +85,10 @@ public class CalendarFeed extends HttpServlet
 
   private static final String PARAM_NAME_TIMESHEET_USER = "timesheetUser";
 
+  private static final String PARAM_NAME_HOLIDAYS = "holidays";
+
+  private static final String PARAM_NAME_WEEK_OF_YEARS = "weekOfYears";
+
   private static final List<CalendarFeedHook> feedHooks = new LinkedList<CalendarFeedHook>();
 
   /**
@@ -98,7 +106,23 @@ public class CalendarFeed extends HttpServlet
    */
   public static String getUrl4Timesheets(final Integer timesheetUserId)
   {
-    return getUrl("&timesheetUser=" + timesheetUserId);
+    return getUrl("&" + PARAM_NAME_TIMESHEET_USER + "=" + timesheetUserId);
+  }
+
+  /**
+   * @return The url for downloading timesheets (including context), e. g. /ProjectForge/export/ProjectForge.ics?user=....
+   */
+  public static String getUrl4Holidays()
+  {
+    return getUrl("&" + PARAM_NAME_HOLIDAYS + "=true");
+  }
+
+  /**
+   * @return The url for downloading timesheets (including context), e. g. /ProjectForge/export/ProjectForge.ics?user=....
+   */
+  public static String getUrl4WeekOfYears()
+  {
+    return getUrl("&" + PARAM_NAME_WEEK_OF_YEARS + "=true");
   }
 
   /**
@@ -302,7 +326,57 @@ public class CalendarFeed extends HttpServlet
         events.add(vEvent);
       }
     }
-
+    final String holidays = params.get(PARAM_NAME_HOLIDAYS);
+    if ("true".equals(holidays) == true) {
+      final HolidayEventsProvider holidaysEventsProvider = new HolidayEventsProvider();
+      DateTime holidaysFrom = new DateTime(PFUserContext.getDateTimeZone());
+      holidaysFrom = holidaysFrom.dayOfYear().withMinimumValue().millisOfDay().withMinimumValue().minusYears(2);
+      final DateTime holidayTo = holidaysFrom.plusYears(6);
+      for (final Event event : holidaysEventsProvider.getEvents(holidaysFrom, holidayTo)) {
+        final Date fromDate = event.getStart().toDate();
+        final Date toDate = event.getEnd() != null ? event.getEnd().toDate() : fromDate;
+        final VEvent vEvent = ICal4JUtils.createVEvent(fromDate, toDate, "pf-holiday" + event.hashCode(), event.getTitle(), true);
+        events.add(vEvent);
+      }
+    }
+    final String weeksOfYear = params.get(PARAM_NAME_WEEK_OF_YEARS);
+    if ("true".equals(weeksOfYear) == true) {
+      final DayHolder from = new DayHolder();
+      from.setBeginOfYear().add(java.util.Calendar.YEAR, -2).setBeginOfWeek();
+      final DayHolder to = new DayHolder(from);
+      to.add(java.util.Calendar.YEAR, 6);
+      final DayHolder current = new DayHolder(from);
+      int paranoiaCounter = 0;
+      do {
+        final VEvent vEvent = ICal4JUtils.createVEvent(current.getDate(), current.getDate(), "pf-weekOfYear" + paranoiaCounter,
+            PFUserContext.getLocalizedString("calendar.weekOfYearShortLabel") + current.getWeekOfYear(), true);
+        events.add(vEvent);
+        current.add(java.util.Calendar.WEEK_OF_YEAR, 1);
+        if (++paranoiaCounter > 500) {
+          log.warn("Dear developer, please have a look here, paranoiaCounter exceeded! Aborting calculation of weeks of year.");
+        }
+      } while (current.before(to) == true);
+    }
+    // Integer hrPlanningUserId = NumberHelper.parseInteger(params.get(PARAM_NAME_HR_PLANNING));
+    // if (hrPlanningUserId != null) {
+    // if (loggedInUser.getId().equals(hrPlanningUserId) == false && isOtherUsersAllowed() == false) {
+    // // Only project managers, controllers and administrative staff is allowed to subscribe time-sheets of other users.
+    // log.warn("User tried to get time-sheets of other user: " + timesheetUser);
+    // hrPlanningUserId = loggedInUser.getId();
+    // }
+    // final HRPlanningDao hrPlanningDao = Registry.instance().getDao(HRPlanningDao.class);
+    // final HRPlanningEventsProvider hrPlanningEventsProvider = new HRPlanningEventsProvider(new CalendarFilter().setShowPlanning(true)
+    // .setTimesheetUserId(hrPlanningUserId), hrPlanningDao);
+    // DateTime planningFrom = new DateTime(PFUserContext.getDateTimeZone());
+    // planningFrom = planningFrom.dayOfYear().withMinimumValue().millisOfDay().withMinimumValue().minusYears(1);
+    // final DateTime planningTo = planningFrom.plusYears(4);
+    // for (final Event event : hrPlanningEventsProvider.getEvents(planningFrom, planningTo)) {
+    // final Date fromDate = event.getStart().toDate();
+    // final Date toDate = event.getEnd() != null ? event.getEnd().toDate() : fromDate;
+    // final VEvent vEvent = ICal4JUtils.createVEvent(fromDate, toDate, "pf-hr-planning" + event.getId(), event.getTitle(), true);
+    // events.add(vEvent);
+    // }
+    // }
     return events;
   }
 
