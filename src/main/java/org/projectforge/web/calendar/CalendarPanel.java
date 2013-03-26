@@ -282,7 +282,8 @@ public class CalendarPanel extends Panel
               DatePickerUtils.getDatePickerInitJavaScript(currentDatePanel.getDateField().getMarkupId(), true));
         }
         // Set interval on refresh the timeline.
-        response.getTarget().appendJavaScript("if(first){ first = false; window.setInterval(setTimeline, 60000); } try { setTimeline(); } catch(err) { }");
+        response.getTarget().appendJavaScript(
+            "if(first){ first = false; window.setInterval(setTimeline, 60000); } try { setTimeline(); } catch(err) { }");
         response.getTarget().add(((CalendarPage) getPage()).getForm().getDurationLabel());
       }
     };
@@ -292,19 +293,19 @@ public class CalendarPanel extends Panel
 
     // Time sheets
     EventSource eventSource = new EventSource();
-    timesheetEventsProvider = new TimesheetEventsProvider(this, timesheetDao, filter);
+    timesheetEventsProvider = new TimesheetEventsProvider(timesheetDao, filter);
     eventSource.setEventsProvider(timesheetEventsProvider);
     eventSource.setEditable(true);
     config.add(eventSource);
     // Holidays:
     eventSource = new EventSource();
-    holidayEventsProvider = new HolidayEventsProvider(this);
+    holidayEventsProvider = new HolidayEventsProvider();
     eventSource.setEventsProvider(holidayEventsProvider);
     eventSource.setEditable(false);
     config.add(eventSource);
     // HR planning:
     eventSource = new EventSource();
-    hrPlanningEventsProvider = new HRPlanningEventsProvider(this, filter, hrPlanningDao);
+    hrPlanningEventsProvider = new HRPlanningEventsProvider(filter, hrPlanningDao);
     eventSource.setEventsProvider(hrPlanningEventsProvider);
     eventSource.setEditable(false);
     eventSource.setBackgroundColor("#0080FF");
@@ -312,7 +313,7 @@ public class CalendarPanel extends Panel
     config.add(eventSource);
     // Birthdays:
     eventSource = new EventSource();
-    birthdayEventsProvider = new BirthdayEventsProvider(this, filter, addressDao,
+    birthdayEventsProvider = new BirthdayEventsProvider(filter, addressDao,
         accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == false);
     eventSource.setEventsProvider(birthdayEventsProvider);
     eventSource.setEditable(false);
