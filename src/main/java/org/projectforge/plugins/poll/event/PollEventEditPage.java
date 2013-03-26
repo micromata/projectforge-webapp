@@ -155,7 +155,7 @@ public class PollEventEditPage extends AbstractSecuredPage
     entryContainer.setOutputMarkupId(true);
     form.add(entryContainer);
 
-    eventProvider = new PollEventEventsProvider(this, model.getPollDo());
+    eventProvider = new PollEventEventsProvider(model.getPollDo());
     if (model.getAllEvents().isEmpty() == false) {
       for (final PollEventDO event : model.getAllEvents()) {
         eventProvider.addEvent(new SelectedRange(new DateTime(event.getStartDate()), new DateTime(event.getEndDate()), false), null);

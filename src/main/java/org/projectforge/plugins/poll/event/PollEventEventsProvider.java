@@ -37,7 +37,6 @@ import net.ftlines.wicket.fullcalendar.callback.ResizedEvent;
 import net.ftlines.wicket.fullcalendar.callback.SelectedRange;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.Component;
 import org.joda.time.DateTime;
 import org.projectforge.plugins.poll.PollDO;
 import org.projectforge.web.calendar.MyFullCalendarEventsProvider;
@@ -57,11 +56,9 @@ public class PollEventEventsProvider extends MyFullCalendarEventsProvider
   private final Random randomizer;
 
   /**
-   * @param parent
    */
-  public PollEventEventsProvider(final Component parent, final PollDO poll)
+  public PollEventEventsProvider( final PollDO poll)
   {
-    super(parent);
     this.poll = poll;
     pollEventCache = new HashMap<PollEventDO, Event>();
     randomizer = new Random(System.currentTimeMillis());
