@@ -45,12 +45,12 @@ public class TeamRecurrenceEventTest
     final TeamEventDO master = new TeamEventDO();
     master.setStartDate(getTimestamp("2013-01-01 08:00", timeZone));
     master.setEndDate(getTimestamp("2013-01-01 10:30", timeZone));
-    TeamRecurrenceEvent recurEvent = new TeamRecurrenceEvent(master, getCalendar(2013, Calendar.JANUARY, 5, timeZone));
+    TeamRecurrenceEvent recurEvent = new TeamRecurrenceEvent(master, getCalendar(2013, Calendar.JANUARY, 5, 8, 0, timeZone));
     assertDateTime("2013-01-05 08:00", recurEvent.getStartDate(), timeZone);
     assertDateTime("2013-01-05 10:30", recurEvent.getEndDate(), timeZone);
 
     master.setEndDate(getTimestamp("2013-01-02 10:30", timeZone));
-    recurEvent = new TeamRecurrenceEvent(master, getCalendar(2013, Calendar.JANUARY, 5, timeZone));
+    recurEvent = new TeamRecurrenceEvent(master, getCalendar(2013, Calendar.JANUARY, 5, 8, 0, timeZone));
     assertDateTime("2013-01-05 08:00", recurEvent.getStartDate(), timeZone);
     assertDateTime("2013-01-06 10:30", recurEvent.getEndDate(), timeZone);
   }
@@ -67,14 +67,15 @@ public class TeamRecurrenceEventTest
     }
   }
 
-  private Calendar getCalendar(final int year, final int month, final int dayOfMonth, final TimeZone timeZone)
+  private Calendar getCalendar(final int year, final int month, final int dayOfMonth, final int hourOfDay, final int minutes,
+      final TimeZone timeZone)
   {
     final Calendar cal = Calendar.getInstance(timeZone);
     cal.set(Calendar.YEAR, year);
     cal.set(Calendar.MONTH, month);
     cal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-    cal.clear(Calendar.HOUR_OF_DAY);
-    cal.clear(Calendar.MINUTE);
+    cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
+    cal.set(Calendar.MINUTE, minutes);
     cal.clear(Calendar.SECOND);
     cal.clear(Calendar.MILLISECOND);
     return cal;
