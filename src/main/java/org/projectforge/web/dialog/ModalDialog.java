@@ -79,6 +79,10 @@ public abstract class ModalDialog extends Panel
 
   private boolean lazyBinding;
 
+  private WebMarkupContainer titleContainer;
+
+  private Label titleLabel;
+
   protected Form< ? > form;
 
   protected FeedbackPanel formFeedback;
@@ -122,8 +126,7 @@ public abstract class ModalDialog extends Panel
   }
 
   /**
-   * Sets also draggable to false.
-   * Appends css class big-modal.
+   * Sets also draggable to false. Appends css class big-modal.
    */
   public ModalDialog setBigWindow()
   {
@@ -291,19 +294,33 @@ public abstract class ModalDialog extends Panel
   /**
    * Add the content to the AjaxRequestTarget if the content is changed.
    * @param target
+   * @return this for chaining.
    */
-  public void addContent(final AjaxRequestTarget target)
+  public ModalDialog addContent(final AjaxRequestTarget target)
   {
     target.add(gridContentContainer);
+    return this;
   }
 
   /**
    * Add the button bar to the AjaxRequestTarget if the buttons or their visibility are changed.
    * @param target
+   * @return this for chaining.
    */
-  public void addButtonBar(final AjaxRequestTarget target)
+  public ModalDialog addButtonBar(final AjaxRequestTarget target)
   {
     target.add(buttonBarContainer);
+    return this;
+  }
+
+  /**
+   * @param target
+   * @return this for chaining.
+   */
+  public ModalDialog addTitleLabel(final AjaxRequestTarget target)
+  {
+    target.add(titleLabel);
+    return this;
   }
 
   public abstract void init();
@@ -323,7 +340,10 @@ public abstract class ModalDialog extends Panel
    */
   public ModalDialog setTitle(final IModel<String> title)
   {
-    mainSubContainer.add(new Label("title", title));
+    titleContainer = new WebMarkupContainer("titleContainer");
+    mainSubContainer.add(titleContainer.setOutputMarkupId(true));
+    titleContainer.add(titleLabel = new Label("titleText", title));
+    titleLabel.setOutputMarkupId(true);
     return this;
   }
 
