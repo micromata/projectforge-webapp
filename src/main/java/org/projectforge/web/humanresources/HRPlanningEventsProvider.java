@@ -29,7 +29,6 @@ import java.util.List;
 import net.ftlines.wicket.fullcalendar.Event;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.Component;
 import org.joda.time.DateTime;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.humanresources.HRPlanningDO;
@@ -61,13 +60,11 @@ public class HRPlanningEventsProvider extends MyFullCalendarEventsProvider
   public static final String EVENT_CLASS_NAME = "hrPlanning";
 
   /**
-   * @param parent For i18n.
+   * @param calendarFilter
    * @param hrPlanningDao
-   * @see Component#getString(String)
    */
-  public HRPlanningEventsProvider(final Component parent, final ICalendarFilter calendarFilter, final HRPlanningDao hrPlanningDao)
+  public HRPlanningEventsProvider(final ICalendarFilter calendarFilter, final HRPlanningDao hrPlanningDao)
   {
-    super(parent);
     this.calendarFilter = calendarFilter;
     this.hrPlanningDao = hrPlanningDao;
   }
@@ -131,7 +128,7 @@ public class HRPlanningEventsProvider extends MyFullCalendarEventsProvider
       event.setEnd(start);
     }
     final StringBuffer buf = new StringBuffer();
-    buf.append(NumberHelper.formatFraction2(hours)).append(parent.getString("calendar.unit.hour")).append(" ")
+    buf.append(NumberHelper.formatFraction2(hours)).append(getString("calendar.unit.hour")).append(" ")
     .append(entry.getProjektNameOrStatus());
     if (StringUtils.isNotBlank(entry.getDescription()) == true) {
       buf.append(": ");

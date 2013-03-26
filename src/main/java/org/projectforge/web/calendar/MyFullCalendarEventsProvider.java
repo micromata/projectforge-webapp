@@ -31,9 +31,9 @@ import net.ftlines.wicket.fullcalendar.Event;
 import net.ftlines.wicket.fullcalendar.EventNotFoundException;
 import net.ftlines.wicket.fullcalendar.EventProvider;
 
-import org.apache.wicket.Component;
 import org.joda.time.DateTime;
 import org.projectforge.common.DateHelper;
+import org.projectforge.user.PFUserContext;
 
 /**
  * Creates events for FullCalendar.
@@ -46,19 +46,12 @@ public abstract class MyFullCalendarEventsProvider implements EventProvider
 
   protected final Map<String, Event> events = new HashMap<String, Event>();
 
-  protected final Component parent;
-
   protected DateTime lastStart, lastEnd;
 
   /**
-   * @param parent For i18n.
-   * @param timesheetDao
-   * @param calFilter
-   * @see Component#getString(String)
    */
-  public MyFullCalendarEventsProvider(final Component parent)
+  public MyFullCalendarEventsProvider()
   {
-    this.parent = parent;
   }
 
   protected abstract void buildEvents(DateTime start, DateTime end);
@@ -105,6 +98,6 @@ public abstract class MyFullCalendarEventsProvider implements EventProvider
 
   protected String getString(final String key)
   {
-    return parent.getString(key);
+    return PFUserContext.getLocalizedString(key);
   }
 }

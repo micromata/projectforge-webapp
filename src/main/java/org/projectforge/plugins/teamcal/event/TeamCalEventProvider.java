@@ -35,7 +35,6 @@ import net.ftlines.wicket.fullcalendar.callback.EventDroppedCallbackScriptGenera
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.Component;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Period;
@@ -73,13 +72,8 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
 
   private final TeamEventRight eventRight;
 
-  /**
-   * @param parent component for i18n
-   */
-  public TeamCalEventProvider(final Component parent, final TeamEventDao teamEventDao, final UserGroupCache userGroupCache,
-      final TeamCalCalendarFilter filter)
+  public TeamCalEventProvider(final TeamEventDao teamEventDao, final UserGroupCache userGroupCache, final TeamCalCalendarFilter filter)
   {
-    super(parent);
     this.filter = filter;
     this.teamEventDao = teamEventDao;
     this.eventRight = new TeamEventRight();
@@ -158,8 +152,9 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
         event.setStart(startDate);
         event.setEnd(endDate);
 
-        event.setTooltip(eventDO.getCalendar().getTitle(), new String[][] { { eventDO.getSubject()},
-          { eventDO.getLocation(), getString("timesheet.location")}, { eventDO.getNote(), getString("plugins.teamcal.event.note")}});
+        event.setTooltip(eventDO.getCalendar().getTitle(),
+            new String[][] { { eventDO.getSubject()}, { eventDO.getLocation(), PFUserContext.getLocalizedString("timesheet.location")},
+          { eventDO.getNote(), PFUserContext.getLocalizedString("plugins.teamcal.event.note")}});
         final String title;
         String durationString = "";
         if (longFormat == true) {
@@ -175,12 +170,13 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
           final String minute = minuteInt < 10 ? "0" + minuteInt : "" + minuteInt;
 
           if (event.isAllDay() == false) {
-            durationString = "\n" + getString("plugins.teamcal.event.duration") + ": " + hour + ":" + minute;
+            durationString = "\n" + PFUserContext.getLocalizedString("plugins.teamcal.event.duration") + ": " + hour + ":" + minute;
           }
           final StringBuffer buf = new StringBuffer();
           buf.append(teamEvent.getSubject());
           if (StringUtils.isNotBlank(teamEvent.getNote()) == true) {
-            buf.append("\n").append(getString("plugins.teamcal.event.note")).append(": ").append(teamEvent.getNote());
+            buf.append("\n").append(PFUserContext.getLocalizedString("plugins.teamcal.event.note")).append(": ")
+            .append(teamEvent.getNote());
           }
           buf.append(durationString);
           title = buf.toString();

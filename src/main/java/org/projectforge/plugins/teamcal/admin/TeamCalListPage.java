@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
@@ -40,12 +41,15 @@ import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.plugins.teamcal.dialog.TeamCalICSExportDialog;
+import org.projectforge.web.calendar.AbstractICSExportDialog;
+import org.projectforge.web.calendar.CalendarFeed;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 
@@ -191,13 +195,92 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
   /**
    * @see org.projectforge.web.wicket.AbstractListPage#init()
    */
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
+    final MyICSExportDialog exportDialog = new MyICSExportDialog(newModalDialogId());
+    TeamCalListPage.this.add(exportDialog);
+    exportDialog.init();
+    {
+      final ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new AjaxLink<Void>("link") {
+        @Override
+        public void onClick(final AjaxRequestTarget target)
+        {
+          openExportICSDialog(exportDialog, target, "plugins.teamcal.export.timesheets", CalendarFeed.getUrl4Timesheets(getUserId()));
+        };
+      }, getString("plugins.teamcal.export.timesheets"));
+      addContentMenuEntry(menuEntry);
+    }
+    {
+      final ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new AjaxLink<Void>("link") {
+        @Override
+        public void onClick(final AjaxRequestTarget target)
+        {
+          openExportICSDialog(exportDialog, target, "plugins.teamcal.export.holidays", CalendarFeed.getUrl4Holidays());
+        };
+      }, getString("plugins.teamcal.export.holidays"));
+      addContentMenuEntry(menuEntry);
+    }
+    {
+      final ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new AjaxLink<Void>("link") {
+        @Override
+        public void onClick(final AjaxRequestTarget target)
+        {
+          openExportICSDialog(exportDialog, target, "plugins.teamcal.export.weekOfYears", CalendarFeed.getUrl4WeekOfYears());
+        };
+      }, getString("plugins.teamcal.export.weekOfYears"));
+      addContentMenuEntry(menuEntry);
+    }
+
     dataTable = createDataTable(createColumns(this, true), "lastUpdate", SortOrder.DESCENDING);
     form.add(dataTable);
     icsExportDialog = new TeamCalICSExportDialog(newModalDialogId(), new ResourceModel("plugins.teamcal.download"));
     add(icsExportDialog);
     icsExportDialog.init();
   }
+
+  private void openExportICSDialog(final MyICSExportDialog exportDialog, final AjaxRequestTarget target, final String titleKey,
+      final String url)
+  {
+    exportDialog.title = getString(titleKey);
+    exportDialog.addContent(target).addTitleLabel(target);
+    exportDialog.redraw();
+    exportDialog.url = url;
+    exportDialog.open(target);
+  }
+
+  class MyICSExportDialog extends AbstractICSExportDialog
+  {
+    private static final long serialVersionUID = -1829962601576743330L;
+
+    String url;
+
+    String title;
+
+    @SuppressWarnings("serial")
+    public MyICSExportDialog(final String id)
+    {
+      super(id, null);
+      setTitle(new Model<String>() {
+        /**
+         * @see org.apache.wicket.model.Model#getObject()
+         */
+        @Override
+        public String getObject()
+        {
+          return title;
+        }
+      });
+    }
+
+    /**
+     * @see org.projectforge.web.calendar.AbstractICSExportDialog#getUrl()
+     */
+    @Override
+    protected String getUrl()
+    {
+      return url;
+    }
+  };
 }

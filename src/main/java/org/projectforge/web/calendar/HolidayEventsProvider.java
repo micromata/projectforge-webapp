@@ -25,10 +25,10 @@ package org.projectforge.web.calendar;
 
 import net.ftlines.wicket.fullcalendar.Event;
 
-import org.apache.wicket.Component;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.projectforge.calendar.DayHolder;
+import org.projectforge.user.PFUserContext;
 
 /**
  * Creates holiday events for FullCalendar.
@@ -42,12 +42,10 @@ public class HolidayEventsProvider extends MyFullCalendarEventsProvider
   private static final long serialVersionUID = 6514836533889643685L;
 
   /**
-   * @param parent For i18n.
-   * @see Component#getString(String)
    */
-  public HolidayEventsProvider(final Component parent)
+  public HolidayEventsProvider()
   {
-    super(parent);
+    super();
   }
 
   /**
@@ -60,7 +58,7 @@ public class HolidayEventsProvider extends MyFullCalendarEventsProvider
     int idCounter = 0;
     int paranoiaCounter = 0;
     do {
-      if (++paranoiaCounter > 1000) {
+      if (++paranoiaCounter > 4000) {
         log.error("Paranoia counter exceeded! Dear developer, please have a look at the implementation of buildEvents.");
         break;
       }
@@ -88,7 +86,7 @@ public class HolidayEventsProvider extends MyFullCalendarEventsProvider
       String title;
       final String holidayInfo = dh.getHolidayInfo();
       if (holidayInfo != null && holidayInfo.startsWith("calendar.holiday.") == true) {
-        title = getString(holidayInfo);
+        title = PFUserContext.getLocalizedString(holidayInfo);
       } else {
         title = holidayInfo;
       }

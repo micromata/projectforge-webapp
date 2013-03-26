@@ -35,6 +35,7 @@ import org.projectforge.address.AddressDao;
 import org.projectforge.address.BirthdayAddress;
 import org.projectforge.common.DateFormatType;
 import org.projectforge.common.DateFormats;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.calendar.ICalendarFilter;
@@ -68,9 +69,8 @@ public class BirthdayEventsProvider extends MyFullCalendarEventsProvider
    * @param dataProtection If true (default) then no ages will be shown, only the names.
    * @see Component#getString(String)
    */
-  public BirthdayEventsProvider(final Component parent, final ICalendarFilter filter, final AddressDao addressDao, final boolean dataProtection)
+  public BirthdayEventsProvider(final ICalendarFilter filter, final AddressDao addressDao, final boolean dataProtection)
   {
-    super(parent);
     this.filter = filter;
     this.addressDao = addressDao;
     this.dataProtection = dataProtection;
@@ -130,7 +130,7 @@ public class BirthdayEventsProvider extends MyFullCalendarEventsProvider
       buf.append(address.getFirstName()).append(" ").append(address.getName());
       if (dataProtection == false && birthdayAddress.getAge() > 0) {
         // Birthday is not visible for all users (age == 0).
-        buf.append(" (").append(birthdayAddress.getAge()).append(" ").append(getString("address.age.short")).append(")");
+        buf.append(" (").append(birthdayAddress.getAge()).append(" ").append(PFUserContext.getLocalizedString("address.age.short")).append(")");
       }
       event.setTitle(buf.toString());
       if (birthdayAddress.isFavorite() == true) {
