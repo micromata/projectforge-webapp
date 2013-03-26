@@ -59,6 +59,7 @@ import org.projectforge.plugins.teamcal.integration.TeamCalCalendarPage;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.HtmlHelper;
+import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.timesheet.TimesheetEditPage;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
@@ -334,8 +335,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       // customized yearly: month of year and see day of month.
     }
 
-    gridBuilder.newSplitPanel(GridSize.COL50);
-    {
+    if (WebConfiguration.isDevelopmentMode() == true) {
+      gridBuilder.newSplitPanel(GridSize.COL50);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.attendees")).supressLabelForWarning();
       attendees = getData().ensureAttendees();
       fs.add(attendeesPanel = new TeamAttendeesPanel(fs.newChildId(), attendees));
