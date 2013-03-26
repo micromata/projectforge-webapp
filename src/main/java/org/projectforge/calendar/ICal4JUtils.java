@@ -285,11 +285,16 @@ public class ICal4JUtils
 
   public static String asISODateString(final Date date)
   {
+    return asISODateString(date, DateHelper.UTC);
+  }
+
+  public static String asISODateString(final Date date, final java.util.TimeZone timeZone)
+  {
     if (date == null) {
       return null;
     }
     final DateFormat df = new SimpleDateFormat(DateFormats.ISO_DATE);
-    df.setTimeZone(DateHelper.UTC);
+    df.setTimeZone(timeZone);
     return df.format(date);
   }
 
@@ -303,13 +308,22 @@ public class ICal4JUtils
     return df.format(date);
   }
 
-  public static List<net.fortuna.ical4j.model.Date> parseISODateStringsAsICal4jDates(final String csv)
+  public static String[] splitExDates(final String csv)
   {
     if (StringUtils.isBlank(csv) == true) {
       return null;
     }
     final String[] sa = StringHelper.splitAndTrim(csv, ",;|");
     if (sa == null || sa.length == 0) {
+      return null;
+    }
+    return sa;
+  }
+
+  public static List<net.fortuna.ical4j.model.Date> parseISODateStringsAsICal4jDates(final String csv, final TimeZone timeZone)
+  {
+    final String[] sa = splitExDates(csv);
+    if (sa == null) {
       return null;
     }
     final List<net.fortuna.ical4j.model.Date> result = new ArrayList<net.fortuna.ical4j.model.Date>();
@@ -321,7 +335,7 @@ public class ICal4JUtils
       if (date == null) {
         continue;
       }
-      result.add(getICal4jDateTime(date, DateHelper.UTC));
+      result.add(getICal4jDateTime(date, timeZone));
     }
     return result;
   }

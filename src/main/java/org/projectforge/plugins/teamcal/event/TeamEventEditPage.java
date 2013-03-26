@@ -33,6 +33,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHelper;
 import org.projectforge.core.ModificationStatus;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarPage;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredBasePage;
@@ -184,7 +185,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       masterEvent.setRecurrence(form.recurrenceData);
       getBaseDao().update(masterEvent);
     } else if (recurrencyChangeType == RecurrencyChangeType.ONLY_CURRENT) { // only current date
-      masterEvent.addRecurrenceExDate(eventOfCaller.getStartDate());
+      masterEvent.addRecurrenceExDate(eventOfCaller.getStartDate(), PFUserContext.getTimeZone());
       getBaseDao().update(masterEvent);
     }
     return (AbstractSecuredBasePage) getReturnToPage();
@@ -220,7 +221,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       return null;
     } else if (recurrencyChangeType == RecurrencyChangeType.ONLY_CURRENT) { // only current date
       // Add current date to the master date as exclusion date and save this event (without recurrency settings).
-      masterEvent.addRecurrenceExDate(eventOfCaller.getStartDate());
+      masterEvent.addRecurrenceExDate(eventOfCaller.getStartDate(), PFUserContext.getTimeZone());
       newEvent = oldDataObject;
       newEvent.setRecurrenceDate(eventOfCaller.getStartDate());
       newEvent.setRecurrenceReferenceId(masterEvent.getId());

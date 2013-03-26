@@ -28,24 +28,23 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
+import net.fortuna.ical4j.model.DateList;
 import net.fortuna.ical4j.model.Dur;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.ExDate;
 import net.fortuna.ical4j.model.property.RRule;
 
-import org.apache.commons.lang.Validate;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.RecurrenceFrequency;
-import org.springframework.util.CollectionUtils;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -98,56 +97,82 @@ public class TeamEventUtils
       // Shouldn't happen:
       return null;
     }
-    final Date seedDate = event.getStartDate();
-    if (startDate == null || endDate == null || seedDate == null) {
+    final java.util.TimeZone timeZone4Calc = timeZone;
+    final String eventStartDateString = event.isAllDay() == true ? DateHelper.formatIsoDate(event.getStartDate(), timeZone) : DateHelper
+        .formatIsoTimestamp(event.getStartDate(), DateHelper.UTC);
+    Date eventStartDate = event.getStartDate();
+    if (event.isAllDay() == true) {
+      // eventStartDate should be midnight in user's time zone.
+      eventStartDate = DateHelper.parseIsoDate(eventStartDateString, timeZone);
+    }
+    if (log.isDebugEnabled() == true) {
+      log.debug("---------- startDate=" + DateHelper.formatIsoTimestamp(eventStartDate, timeZone) + ", timeZone=" + timeZone.getID());
+    }
+    final net.fortuna.ical4j.model.DateTime ical4jStartDate = new net.fortuna.ical4j.model.DateTime(startDate);
+    ical4jStartDate.setTimeZone(ICal4JUtils.getTimeZone(timeZone4Calc));
+    final net.fortuna.ical4j.model.DateTime ical4jEndDate = new net.fortuna.ical4j.model.DateTime(endDate);
+    ical4jEndDate.setTimeZone(ICal4JUtils.getTimeZone(timeZone4Calc));
+    final net.fortuna.ical4j.model.DateTime seedDate = new net.fortuna.ical4j.model.DateTime(eventStartDate);
+    seedDate.setTimeZone(ICal4JUtils.getTimeZone(timeZone4Calc));
+    if (ical4jStartDate == null || ical4jEndDate == null || seedDate == null) {
       log.error("Can't get recurrence events of event "
           + event.getId()
           + ". Not all three dates are given: startDate="
-          + startDate
+          + ical4jStartDate
           + ", endDate="
-          + endDate
+          + ical4jEndDate
           + ", seed="
           + seedDate);
       return null;
     }
-    final Collection<Date> dateList = getRecurrenceDates(recur, event.getRecurrenceExDate(), seedDate, startDate, endDate);
+    final String[] exDates = ICal4JUtils.splitExDates(event.getRecurrenceExDate());
+    final DateList dateList = recur.getDates(seedDate, ical4jStartDate, ical4jEndDate, Value.DATE_TIME);
     final Collection<TeamEvent> col = new ArrayList<TeamEvent>();
     if (dateList != null) {
-      for (final Date date : dateList) {
-        if (date.equals(event.getStartDate()) == true) {
+      OuterLoop: for (final Object obj : dateList) {
+        final net.fortuna.ical4j.model.DateTime dateTime = (net.fortuna.ical4j.model.DateTime) obj;
+        final String isoDateString = event.isAllDay() == true ? DateHelper.formatIsoDate(dateTime, timeZone) : DateHelper
+            .formatIsoTimestamp(dateTime, DateHelper.UTC);
+        if (exDates != null && exDates.length > 0) {
+          for (final String exDate : exDates) {
+            if (isoDateString.startsWith(exDate) == true) {
+              if (log.isDebugEnabled() == true) {
+                log.debug("= ex-dates equals: " + isoDateString + " == " + exDate);
+              }
+              // this date is part of ex dates, so don't use it.
+              continue OuterLoop;
+            }
+            if (log.isDebugEnabled() == true) {
+              log.debug("ex-dates not equals: " + isoDateString + " != " + exDate);
+            }
+          }
+        }
+        if (isoDateString.equals(eventStartDateString) == true) {
           // Put event itself to the list.
           col.add(event);
         } else {
           // Now we need this event as date with the user's time-zone.
           final Calendar userCal = Calendar.getInstance(timeZone);
-          userCal.setTime(date);
+          userCal.setTime(dateTime);
           final TeamRecurrenceEvent recurEvent = new TeamRecurrenceEvent(event, userCal);
           col.add(recurEvent);
         }
       }
     }
+    if (log.isDebugEnabled() == true) {
+      for (final TeamEvent ev : col) {
+        log.debug("startDate="
+            + DateHelper.formatIsoTimestamp(ev.getStartDate(), timeZone)
+            + "; "
+            + DateHelper.formatAsUTC(ev.getStartDate())
+            + ", endDate="
+            + DateHelper.formatIsoTimestamp(ev.getStartDate(), timeZone)
+            + "; "
+            + DateHelper.formatAsUTC(ev.getEndDate()));
+      }
+    }
     return col;
       }
-
-  public static Collection<Calendar> getExDates(final String recurrenceExdate)
-  {
-    final Collection<Calendar> exCals = new LinkedList<Calendar>();
-    if (recurrenceExdate == null) {
-      return exCals;
-    }
-    final List<net.fortuna.ical4j.model.Date> exDates = ICal4JUtils.parseISODateStringsAsICal4jDates(recurrenceExdate);
-    if (CollectionUtils.isEmpty(exDates) == true) {
-      return exCals;
-    }
-    for (final net.fortuna.ical4j.model.Date date : exDates) {
-      if (date != null) {
-        final Calendar cal = Calendar.getInstance(DateHelper.UTC);
-        cal.setTime(date);
-        exCals.add(cal);
-      }
-    }
-    return exCals;
-  }
 
   public static TeamEventDO createTeamEventDO(final VEvent event)
   {
@@ -216,63 +241,6 @@ public class TeamEventUtils
     }
     return teamEvent;
   }
-
-  public static Collection<Date> getRecurrenceDates(final Recur recur, final String exDatesString, final Date seed, final Date startDate,
-      final Date endDate)
-      {
-    Validate.notNull(seed);
-    Validate.notNull(startDate);
-    Validate.notNull(endDate);
-    final Collection<Date> result = new LinkedList<Date>();
-    if (seed.after(endDate) == true) {
-      return result;
-    }
-    final Calendar cal = Calendar.getInstance(DateHelper.UTC);
-    cal.setTime(seed);
-    int interval = recur.getInterval();
-    if (interval < 1) {
-      interval = 1;
-    }
-    final String frequency = recur.getFrequency();
-    int field;
-    if (Recur.WEEKLY.equals(frequency) == true) {
-      field = Calendar.WEEK_OF_YEAR;
-    } else if (Recur.MONTHLY.equals(frequency) == true) {
-      field = Calendar.MONTH;
-    } else if (Recur.DAILY.equals(frequency) == true) {
-      field = Calendar.DAY_OF_YEAR;
-    } else if (Recur.YEARLY.equals(frequency) == true) {
-      field = Calendar.YEAR;
-    } else {
-      log.error("Frequency " + frequency + " not supported.");
-      return result;
-    }
-    while (cal.getTime().before(startDate) == true) {
-      cal.add(field, interval);
-    }
-    final Collection<Calendar> exDates = getExDates(exDatesString);
-    Date until = recur.getUntil();
-    if (until == null || until.after(endDate) == true) {
-      until = endDate;
-    }
-    while (cal.getTime().before(until) == true) {
-      boolean ignore = false;
-      if (exDates != null && exDates.size() > 0) {
-        for (final Calendar exDate : exDates) {
-          if (cal.equals(exDate) == true) {
-            // this date is part of ex dates, so don't use it.
-            ignore = true;
-            break;
-          }
-        }
-      }
-      if (ignore == false) {
-        result.add(cal.getTime());
-      }
-      cal.add(field, interval);
-    }
-    return result;
-      }
 
   public static RecurrenceFrequency[] getSupportedRecurrenceIntervals()
   {

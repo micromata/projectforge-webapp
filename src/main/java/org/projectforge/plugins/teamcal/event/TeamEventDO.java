@@ -28,6 +28,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.SortedSet;
+import java.util.TimeZone;
 import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
@@ -467,14 +468,14 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
    * @param timeZone Only used for all day events.
    * @return
    */
-  public TeamEventDO addRecurrenceExDate(final Date date)
+  public TeamEventDO addRecurrenceExDate(final Date date, final TimeZone timeZone)
   {
     if (date == null) {
       return this;
     }
     final String exDate;
     if (isAllDay() == true) {
-      exDate = ICal4JUtils.asISODateString(date);
+      exDate = ICal4JUtils.asISODateString(date, timeZone);
     } else {
       exDate = ICal4JUtils.asISODateTimeString(date);
     }

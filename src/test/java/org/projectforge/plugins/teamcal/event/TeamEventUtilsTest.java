@@ -87,6 +87,45 @@ public class TeamEventUtilsTest
     }
   }
 
+  @Test
+  public void exDates()
+  {
+    testExDates(DateHelper.EUROPE_BERLIN);
+    testExDates(TimeZone.getTimeZone("Europe/London"));
+    testExDates(TimeZone.getTimeZone("America/Los_Angeles"));
+  }
+
+  private void testExDates(final TimeZone timeZone)
+  {
+    {
+      final TeamEventDO event = createEvent(timeZone, "2013-03-21 20:00", "2013-03-21 21:30", RecurrenceFrequency.WEEKLY, 1, null);
+      event.addRecurrenceExDate(parseDateTime("2013-03-28 20:00", timeZone), timeZone);
+      final Collection<TeamEvent> col = TeamEventUtils.getRecurrenceEvents(getDate("2013-03-01", timeZone),
+          getDate("2013-04-05", timeZone), event, timeZone);
+      Assert.assertEquals(2, col.size());
+      final Iterator<TeamEvent> it = col.iterator();
+      Assert.assertEquals(DateHelper.formatAsUTC(DateHelper.parseIsoTimestamp("2013-03-21 20:00:00.0", timeZone)),
+          DateHelper.formatAsUTC(it.next().getStartDate()));
+      Assert.assertEquals(DateHelper.formatAsUTC(DateHelper.parseIsoTimestamp("2013-04-04 20:00:00.0", timeZone)),
+          DateHelper.formatAsUTC(it.next().getStartDate()));
+    }
+    {
+      final TeamEventDO event = createEvent(timeZone, "2013-03-21 00:00", "2013-03-21 00:00", RecurrenceFrequency.WEEKLY, 1, null)
+          .setAllDay(true);
+      event.addRecurrenceExDate(parseDate("2013-03-28", timeZone), timeZone);
+      final Collection<TeamEvent> col = TeamEventUtils.getRecurrenceEvents(getDate("2013-03-01", timeZone),
+          getDate("2013-04-05", timeZone), event, timeZone);
+      Assert.assertEquals(2, col.size());
+      final Iterator<TeamEvent> it = col.iterator();
+      TeamEvent e = it.next();
+      Assert.assertEquals("2013-03-21 00:00:00.000", DateHelper.formatIsoTimestamp(e.getStartDate(), timeZone));
+      Assert.assertTrue(e instanceof TeamEventDO);
+      e = it.next();
+      Assert.assertEquals("2013-04-04 00:00:00.000", DateHelper.formatIsoTimestamp(e.getStartDate(), timeZone));
+      Assert.assertFalse(e instanceof TeamEventDO);
+    }
+  }
+
   private void testRRule(final TimeZone timeZone)
   {
     TeamEventDO event = createEvent(timeZone, "2012-12-21 8:30", "2012-12-21 9:00", null, 1, null);
@@ -158,6 +197,18 @@ public class TeamEventUtilsTest
   private java.util.Date parseDateTime(final String dateString, final TimeZone timeZone)
   {
     final DateFormat df = new SimpleDateFormat(DateFormats.ISO_TIMESTAMP_MINUTES);
+    df.setTimeZone(timeZone);
+    try {
+      return df.parse(dateString);
+    } catch (final ParseException ex) {
+      Assert.fail("Can't parse dateString '" + dateString + "': " + ex.getMessage());
+      return null;
+    }
+  }
+
+  private java.util.Date parseDate(final String dateString, final TimeZone timeZone)
+  {
+    final DateFormat df = new SimpleDateFormat(DateFormats.ISO_DATE);
     df.setTimeZone(timeZone);
     try {
       return df.parse(dateString);

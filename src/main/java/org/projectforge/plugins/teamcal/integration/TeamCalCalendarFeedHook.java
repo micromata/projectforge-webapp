@@ -154,7 +154,7 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
             vEvent.getProperties().add(rrule);
             if (teamEvent.getRecurrenceExDate() != null) {
               final List<net.fortuna.ical4j.model.Date> exDates = ICal4JUtils.parseISODateStringsAsICal4jDates(teamEvent
-                  .getRecurrenceExDate());
+                  .getRecurrenceExDate(), timeZone);
               if (CollectionUtils.isEmpty(exDates) == false) {
                 for (final net.fortuna.ical4j.model.Date date : exDates) {
                   final DateList dateList;
