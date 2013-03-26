@@ -7,17 +7,9 @@ Johannes
 Bugs
 ----
 - ctrl-return dokumentieren.
-- Caused by: java.lang.NullPointerException
-        at org.projectforge.plugins.teamcal.event.TeamEventDao.afterLoad(TeamEventDao.java:155)
-        at org.projectforge.plugins.teamcal.event.TeamEventDao.afterLoad(TeamEventDao.java:64)
-        at org.projectforge.core.BaseDao.internalGetById(BaseDao.java:652)
-        at org.projectforge.core.BaseDao.getById(BaseDao.java:637)
-        at org.projectforge.core.BaseDao$$FastClassByCGLIB$$ddb64f08.invoke(<generated>)
 - Modify end-date if start-date is changed.
-- Aus Ereignis Zeitbericht anlegen.
-- Standardkalender klappt nicht immer, manchmal geht er auf Zeitberichte.
-- ProjectForge-Feiertage und Zeitberichte abonnieren.
 - Bei 15 Minuten Zeitberichtsauswahl (Klick) ganze Pause füllen oder Anschlussbericht.
+- ToDo schließen (ctrl-return) klappt nicht.
 
 TeamCal
 -------
