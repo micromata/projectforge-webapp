@@ -339,7 +339,7 @@ public class CalendarFeed extends HttpServlet
       for (final Event event : holidaysEventsProvider.getEvents(holidaysFrom, holidayTo)) {
         final Date fromDate = event.getStart().toDate();
         final Date toDate = event.getEnd() != null ? event.getEnd().toDate() : fromDate;
-        final VEvent vEvent = ICal4JUtils.createVEvent(fromDate, toDate, "pf-holiday" + event.hashCode(), event.getTitle(), true);
+        final VEvent vEvent = ICal4JUtils.createVEvent(fromDate, toDate, "pf-holiday" + event.getId(), event.getTitle(), true);
         events.add(vEvent);
       }
     }
@@ -352,8 +352,10 @@ public class CalendarFeed extends HttpServlet
       final DayHolder current = new DayHolder(from);
       int paranoiaCounter = 0;
       do {
-        final VEvent vEvent = ICal4JUtils.createVEvent(current.getDate(), current.getDate(), "pf-weekOfYear" + paranoiaCounter,
-            PFUserContext.getLocalizedString("calendar.weekOfYearShortLabel") + " " + current.getWeekOfYear(), true);
+        final VEvent vEvent = ICal4JUtils.createVEvent(current.getDate(), current.getDate(), "pf-weekOfYear"
+            + current.getYear()
+            + "-"
+            + paranoiaCounter, PFUserContext.getLocalizedString("calendar.weekOfYearShortLabel") + " " + current.getWeekOfYear(), true);
         events.add(vEvent);
         current.add(java.util.Calendar.WEEK_OF_YEAR, 1);
         if (++paranoiaCounter > 500) {
