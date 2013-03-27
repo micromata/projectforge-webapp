@@ -353,7 +353,7 @@ public class CalendarFeed extends HttpServlet
       int paranoiaCounter = 0;
       do {
         final VEvent vEvent = ICal4JUtils.createVEvent(current.getDate(), current.getDate(), "pf-weekOfYear" + paranoiaCounter,
-            PFUserContext.getLocalizedString("calendar.weekOfYearShortLabel") + current.getWeekOfYear(), true);
+            PFUserContext.getLocalizedString("calendar.weekOfYearShortLabel") + " " + current.getWeekOfYear(), true);
         events.add(vEvent);
         current.add(java.util.Calendar.WEEK_OF_YEAR, 1);
         if (++paranoiaCounter > 500) {
