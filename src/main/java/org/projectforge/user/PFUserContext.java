@@ -107,7 +107,11 @@ public class PFUserContext
     if (clientLocale != null) {
       return clientLocale;
     }
-    return defaultLocale != null ? defaultLocale : Locale.getDefault();
+    if (defaultLocale != null) {
+      return defaultLocale;
+    }
+    final Locale locale = ConfigXml.getInstance().getDefaultLocale();
+    return locale != null ? locale : Locale.getDefault();
   }
 
   /**
