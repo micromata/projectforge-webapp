@@ -30,9 +30,11 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
+import org.projectforge.test.TestConfiguration;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.xml.stream.converter.DateConverter;
@@ -42,6 +44,12 @@ import org.projectforge.xml.stream.converter.TimeZoneConverter;
 
 public class ConverterTest
 {
+  @BeforeClass
+  public static void setUp() throws Exception
+  {
+    TestConfiguration.initAsTestConfiguration();
+  }
+
   @Test
   public void testIsoDateConverter()
   {

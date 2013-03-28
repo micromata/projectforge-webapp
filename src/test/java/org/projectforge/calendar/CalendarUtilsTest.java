@@ -28,11 +28,19 @@ import java.util.TimeZone;
 
 import junit.framework.Assert;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectforge.common.DateHelper;
+import org.projectforge.test.TestConfiguration;
 
 public class CalendarUtilsTest
 {
+  @BeforeClass
+  public static void setUp() throws Exception
+  {
+    TestConfiguration.initAsTestConfiguration();
+  }
+
   @Test
   public void testMidnightCalendars()
   {
