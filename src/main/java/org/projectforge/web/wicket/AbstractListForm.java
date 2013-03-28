@@ -295,13 +295,13 @@ AbstractSecuredForm<F, P>
       fieldset.add(new HiddenInputPanel(fieldset.newChildId(), new HiddenField<Boolean>(InputPanel.WICKET_ID, new PropertyModel<Boolean>(
           searchFilter, "useModificationFilter"))).setHtmlId("useModificationFilter"));
 
-      startDateTimePanel = new DateTimePanel(fieldset.newChildId(), new PropertyModel<Date>(searchFilter, "startTimeOfLastModification"),
-          (DateTimePanelSettings) DateTimePanelSettings.get().withSelectProperty("startDateOfLastModification").withSelectPeriodMode(true),
+      startDateTimePanel = new DateTimePanel(fieldset.newChildId(), new PropertyModel<Date>(searchFilter, "startTimeOfModification"),
+          (DateTimePanelSettings) DateTimePanelSettings.get().withSelectProperty("startDateOfModification").withSelectPeriodMode(true),
           DatePrecision.MINUTE);
       fieldset.add(startDateTimePanel);
       fieldset.setLabelFor(startDateTimePanel);
-      stopDateTimePanel = new DateTimePanel(fieldset.newChildId(), new PropertyModel<Date>(searchFilter, "stopTimeOfLastModification"),
-          (DateTimePanelSettings) DateTimePanelSettings.get().withSelectProperty("stopDateOfLastModification").withSelectPeriodMode(true),
+      stopDateTimePanel = new DateTimePanel(fieldset.newChildId(), new PropertyModel<Date>(searchFilter, "stopTimeOfModification"),
+          (DateTimePanelSettings) DateTimePanelSettings.get().withSelectProperty("stopDateOfModification").withSelectPeriodMode(true),
           DatePrecision.MINUTE);
       stopDateTimePanel.setRequired(false);
       fieldset.add(stopDateTimePanel);
