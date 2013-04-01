@@ -40,14 +40,16 @@ import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.DateFormats;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.RecurrenceFrequency;
-import org.projectforge.plugins.teamcal.TeamCalConfig;
+import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigurationParam;
 
 public class TeamEventUtilsTest
 {
   @BeforeClass
   public static void setUp()
   {
-    TeamCalConfig.__internalSetConfig(new TeamCalConfig().setDomain("projectforge.priv"));
+    final String domain = "projectforge.org";
+    Configuration.init4TestMode().put(ConfigurationParam.CALENDAR_DOMAIN, domain);
   }
 
   @Test

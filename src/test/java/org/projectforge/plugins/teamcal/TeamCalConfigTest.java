@@ -26,6 +26,8 @@ package org.projectforge.plugins.teamcal;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigurationParam;
 
 public class TeamCalConfigTest
 {
@@ -33,11 +35,12 @@ public class TeamCalConfigTest
   public void extractUid()
   {
     final TeamCalConfig config = new TeamCalConfig();
-    config.domain = "projectforge.org";
+    final String domain = "projectforge.org";
+    Configuration.init4TestMode().put(ConfigurationParam.CALENDAR_DOMAIN, domain);
     Assert.assertNull(config.extractEventId(null));
     Assert.assertNull(config.extractEventId(""));
-    Assert.assertNull(config.extractEventId("unkown-123@" + config.domain));
-    Assert.assertEquals(new Integer("123"), config.extractEventId(TeamCalConfig.EVENT_UID_PREFIX + "-123@" + config.domain));
-    Assert.assertEquals(new Integer("1"), config.extractEventId(TeamCalConfig.EVENT_UID_PREFIX + "-1@" + config.domain));
+    Assert.assertNull(config.extractEventId("unkown-123@" + domain));
+    Assert.assertEquals(new Integer("123"), config.extractEventId(TeamCalConfig.EVENT_UID_PREFIX + "-123@" + domain));
+    Assert.assertEquals(new Integer("1"), config.extractEventId(TeamCalConfig.EVENT_UID_PREFIX + "-1@" + domain));
   }
 }
