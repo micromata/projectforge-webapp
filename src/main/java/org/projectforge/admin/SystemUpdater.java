@@ -104,8 +104,7 @@ public class SystemUpdater
       checkedRegions.add(updateEntry.getRegionId());
       updateEntry.setPreCheckStatus(updateEntry.runPreCheck());
       if (updateEntry.getPreCheckStatus() != UpdatePreCheckStatus.ALREADY_UPDATED) {
-        log
-        .warn("*** Please note: The data-base perhaps has to be updated first before running the ProjectForge web app. Please login as administrator. Status '"
+        log.warn("*** Please note: The data-base perhaps has to be updated first before running the ProjectForge web app. Please login as administrator. Status '"
             + updateEntry.getPreCheckStatus()
             + "' for update entry '"
             + updateEntry.getRegionId()
@@ -167,6 +166,11 @@ public class SystemUpdater
     }
     updateEntry.setPreCheckStatus(updateEntry.runPreCheck());
     runAllPreChecks();
+  }
+
+  public void afterUpdate(final UpdateEntry updateEntry)
+  {
+    updateEntry.afterUpdate();
   }
 
   public void setDatabaseUpdateDao(final DatabaseUpdateDao databaseUpdateDao)

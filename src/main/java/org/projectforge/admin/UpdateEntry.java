@@ -59,7 +59,7 @@ public abstract class UpdateEntry implements Serializable, Comparable<UpdateEntr
     return preCheckStatus;
   }
 
-  public void setPreCheckStatus(UpdatePreCheckStatus preCheckStatus)
+  public void setPreCheckStatus(final UpdatePreCheckStatus preCheckStatus)
   {
     this.preCheckStatus = preCheckStatus;
   }
@@ -69,7 +69,7 @@ public abstract class UpdateEntry implements Serializable, Comparable<UpdateEntr
     return runningStatus;
   }
 
-  public void setRunningStatus(UpdateRunningStatus runningStatus)
+  public void setRunningStatus(final UpdateRunningStatus runningStatus)
   {
     this.runningStatus = runningStatus;
   }
@@ -81,6 +81,12 @@ public abstract class UpdateEntry implements Serializable, Comparable<UpdateEntr
   public abstract UpdatePreCheckStatus runPreCheck();
 
   public abstract UpdateRunningStatus runUpdate();
+
+  /**
+   * Does nothing at default.
+   */
+  public void afterUpdate() {
+  }
 
   public abstract String getPreCheckResult();
 
