@@ -250,7 +250,6 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
           schemaExportLink, getString("system.admin.button.schemaExport"))
       .setTooltip(getString("system.admin.button.schemaExport.tooltip"));
       databaseActionsMenu.addSubMenuEntry(schemaExportLinkMenuItem);
-      schemaExportLink.add(WicketUtils.javaScriptConfirmDialogOnClick(getString("system.admin.button.schemaExport.question")));
     }
   }
 
