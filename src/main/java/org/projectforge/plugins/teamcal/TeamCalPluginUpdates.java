@@ -23,10 +23,16 @@
 
 package org.projectforge.plugins.teamcal;
 
+import org.apache.wicket.RestartResponseException;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.admin.UpdateEntry;
 import org.projectforge.admin.UpdateEntryImpl;
 import org.projectforge.admin.UpdatePreCheckStatus;
 import org.projectforge.admin.UpdateRunningStatus;
+import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigurationDO;
+import org.projectforge.core.ConfigurationDao;
+import org.projectforge.core.ConfigurationParam;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.Table;
 import org.projectforge.database.TableAttribute;
@@ -34,6 +40,10 @@ import org.projectforge.database.TableAttributeType;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.event.TeamEventAttendeeDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
+import org.projectforge.registry.Registry;
+import org.projectforge.web.admin.SystemUpdatePage;
+import org.projectforge.web.core.ConfigurationEditPage;
+import org.projectforge.web.wicket.AbstractEditPage;
 
 /**
  * Contains the initial data-base set-up script and later all update scripts if any data-base schema updates are required by any later
@@ -78,7 +88,8 @@ public class TeamCalPluginUpdates
             && dao.doesTableAttributesExist(calendarTable, calendarAttributes) == true //
             && dao.doesTableAttributesExist(eventTable, eventAttributes) == true //
             && dao.doesTableAttributesExist(attendeeTable, attendeeAttributes) == true //
-            && dao.doesTableAttributeExist(attendeeTable.getName(), "team_event_fk") == true) {
+            && dao.doesTableAttributeExist(attendeeTable.getName(), "team_event_fk") == true //
+            && Configuration.getInstance().isCalendarDomainValid() == true) {
           return UpdatePreCheckStatus.ALREADY_UPDATED;
         } else {
           return UpdatePreCheckStatus.OK;
@@ -112,7 +123,25 @@ public class TeamCalPluginUpdates
           dao.addTableAttributes(attendeeTable, attr);
         }
         dao.createMissingIndices();
+
         return UpdateRunningStatus.DONE;
+      }
+
+      /**
+       * @see org.projectforge.admin.UpdateEntry#afterUpdate()
+       */
+      @Override
+      public void afterUpdate()
+      {
+        if (Configuration.getInstance().isCalendarDomainValid() == false) {
+          // Force to edit configuration value 'calendar domain'.
+          final ConfigurationDao configurationDao = Registry.instance().getDao(ConfigurationDao.class);
+          configurationDao.checkAndUpdateDatabaseEntries();
+          final ConfigurationDO configurationDO = configurationDao.getEntry(ConfigurationParam.CALENDAR_DOMAIN);
+          final ConfigurationEditPage configurationEditPage = new ConfigurationEditPage(new PageParameters().add(AbstractEditPage.PARAMETER_KEY_ID, configurationDO.getId()));
+          configurationEditPage.setReturnToPage(new SystemUpdatePage(new PageParameters()));
+          throw new RestartResponseException(configurationEditPage);
+        }
       }
     };
   }
