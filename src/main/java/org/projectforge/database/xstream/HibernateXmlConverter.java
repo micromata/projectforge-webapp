@@ -31,8 +31,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.cglib.proxy.Enhancer;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.PredicateUtils;
 import org.hibernate.EntityMode;
@@ -40,6 +38,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.metadata.ClassMetadata;
+import org.hibernate.proxy.HibernateProxyHelper;
 import org.springframework.dao.DataAccessException;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -176,10 +175,7 @@ public class HibernateXmlConverter
         continue;
       }
       Hibernate.initialize(obj);
-      Class< ? > targetClass = obj.getClass();
-      while (Enhancer.isEnhanced(targetClass) == true) {
-        targetClass = targetClass.getSuperclass();
-      }
+      final Class< ? > targetClass = HibernateProxyHelper.getClassWithoutInitializingProxy(obj);
       final ClassMetadata classMetadata = session.getSessionFactory().getClassMetadata(targetClass);
       if (classMetadata == null) {
         log.fatal("Can't init " + obj + " of type " + targetClass);
