@@ -25,18 +25,29 @@ package org.projectforge.plugins.teamcal;
 
 import junit.framework.Assert;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
+import org.projectforge.test.AbstractTestBase;
 
-public class TeamCalConfigTest
+public class TeamCalConfigTest extends AbstractTestBase
 {
+  @BeforeClass
+  public static void setUp() throws Exception
+  {
+    preInit();
+    init(true);
+    final String domain = "projectforge.org";
+    Configuration.getInstance().forceReload();
+    Configuration.init4TestMode().put(ConfigurationParam.CALENDAR_DOMAIN, domain);
+  }
+
   @Test
   public void extractUid()
   {
     final TeamCalConfig config = new TeamCalConfig();
-    final String domain = "projectforge.org";
-    Configuration.init4TestMode().put(ConfigurationParam.CALENDAR_DOMAIN, domain);
+    final String domain = Configuration.getInstance().getCalendarDomain();
     Assert.assertNull(config.extractEventId(null));
     Assert.assertNull(config.extractEventId(""));
     Assert.assertNull(config.extractEventId("unkown-123@" + domain));

@@ -42,13 +42,17 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.common.RecurrenceFrequency;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
+import org.projectforge.test.AbstractTestBase;
 
-public class TeamEventUtilsTest
+public class TeamEventUtilsTest extends AbstractTestBase
 {
   @BeforeClass
-  public static void setUp()
+  public static void setUp() throws Exception
   {
+    preInit();
+    init(true);
     final String domain = "projectforge.org";
+    Configuration.getInstance().forceReload();
     Configuration.init4TestMode().put(ConfigurationParam.CALENDAR_DOMAIN, domain);
   }
 
