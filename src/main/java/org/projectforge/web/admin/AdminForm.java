@@ -33,9 +33,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.AppVersion;
 import org.projectforge.common.DateHelper;
-import org.projectforge.core.Configuration;
 import org.projectforge.user.PFUserContext;
-import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.wicket.AbstractStandardForm;
 import org.projectforge.web.wicket.WicketApplication;
 import org.projectforge.web.wicket.WicketUtils;
@@ -77,74 +75,6 @@ public class AdminForm extends AbstractStandardForm<AdminForm, AdminPage>
   {
     super.init();
     gridBuilder.newSplitPanel(GridSize.COL50);
-    gridBuilder.newFormHeading(getString("system.admin.group.title.systemChecksAndFunctionality"));
-    final Configuration cfg = Configuration.getInstance();
-    {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.group.title.systemChecksAndFunctionality.miscChecks"))
-          .supressLabelForWarning();
-      fs.add(new MyButtonPanel(fs.newChildId(), "checkSystemIntegrity") {
-        @Override
-        public void onSubmit()
-        {
-          parentPage.checkSystemIntegrity();
-        }
-      }.getButtonPanel());
-      fs.add(new MyButtonPanel(fs.newChildId(), "checkI18nProperties") {
-        @Override
-        public void onSubmit()
-        {
-          parentPage.checkI18nProperties();
-        }
-      }.getButtonPanel());
-    }
-    {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.group.title.systemChecksAndFunctionality.caches"))
-          .supressLabelForWarning();
-      fs.add(new MyButtonPanel(fs.newChildId(), "refreshCaches") {
-        @Override
-        public void onSubmit()
-        {
-          parentPage.refreshCaches();
-        }
-      }.getButtonPanel());
-    }
-    {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.group.title.systemChecksAndFunctionality.configuration"))
-          .supressLabelForWarning();
-      fs.add(new MyButtonPanel(fs.newChildId(), "rereadConfiguration") {
-        @Override
-        public void onSubmit()
-        {
-          parentPage.rereadConfiguration();
-        }
-      }.getButtonPanel());
-      fs.add(new MyButtonPanel(fs.newChildId(), "exportConfiguration") {
-        @Override
-        public void onSubmit()
-        {
-          parentPage.exportConfiguration();
-        }
-      }.getButtonPanel());
-    }
-    if (cfg.isMebConfigured() == true) {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("meb.title.heading.short"), getString("meb.title.heading"))
-          .supressLabelForWarning();
-      fs.add(new MyButtonPanel(fs.newChildId(), "checkUnseenMebMails") {
-        @Override
-        public void onSubmit()
-        {
-          parentPage.checkUnseenMebMails();
-        }
-      }.getButtonPanel());
-      fs.add(new MyButtonPanel(fs.newChildId(), "importAllMebMails") {
-        @Override
-        public void onSubmit()
-        {
-          parentPage.importAllMebMails();
-        }
-      }.getButtonPanel());
-    }
-
     gridBuilder.newFormHeading(getString("system.admin.group.title.alertMessage"));
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.group.title.alertMessage"));
@@ -185,56 +115,6 @@ public class AdminForm extends AbstractStandardForm<AdminForm, AdminPage>
     }
 
     gridBuilder.newSplitPanel(GridSize.COL50);
-    gridBuilder.newFormHeading(getString("system.admin.group.title.databaseActions"));
-    {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.group.title.databaseActions.userprefs"))
-          .supressLabelForWarning();
-      fs.add(new MyButtonPanel(fs.newChildId(), "updateUserPrefs") {
-        @Override
-        public void onSubmit()
-        {
-          parentPage.updateUserPrefs();
-        }
-      }.getButtonPanel());
-    }
-    {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.group.title.databaseActions.dataBaseIndices"))
-          .supressLabelForWarning();
-      fs.add(new MyButtonPanel(fs.newChildId(), "createMissingDatabaseIndices") {
-        @Override
-        public void onSubmit()
-        {
-          parentPage.createMissingDatabaseIndices();
-        }
-      }.getButtonPanel());
-      fs.add(new MyButtonPanel(fs.newChildId(), "fixDBHistoryEntries") {
-        @Override
-        public void onSubmit()
-        {
-          parentPage.fixDBHistoryEntries();
-        }
-      }.getButtonPanel());
-    }
-    {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.group.title.databaseActions.export")).supressLabelForWarning();
-      final MyButtonPanel buttonPanel = new MyButtonPanel(fs.newChildId(), "dump") {
-        @Override
-        public void onSubmit()
-        {
-          parentPage.dump();
-        }
-      };
-      buttonPanel.button.add(WicketUtils.javaScriptConfirmDialogOnClick(getString("system.admin.button.dump.question")));
-      fs.add(buttonPanel.getButtonPanel());
-      fs.add(new MyButtonPanel(fs.newChildId(), "schemaExport") {
-        @Override
-        public void onSubmit()
-        {
-          parentPage.schemaExport();
-        }
-      }.getButtonPanel());
-    }
-    gridBuilder.newFormHeading(getString("system.admin.group.title.databaseSearchIndices"));
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.reindex.newestEntries"),
           getString("system.admin.reindex.newestEntries.subtitle"));
@@ -261,20 +141,6 @@ public class AdminForm extends AbstractStandardForm<AdminForm, AdminPage>
           parentPage.reindex();
         }
       }.getButtonPanel());
-    }
-    if (WebConfiguration.isDevelopmentMode() == true) {
-      gridBuilder.newFormHeading("Development modus");
-      final FieldsetPanel fs = gridBuilder.newFieldset("Create test objects").supressLabelForWarning();
-      final Button button = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("BookDO")) {
-        @Override
-        public final void onSubmit()
-        {
-          parentPage.createTestBooks();
-        }
-      };
-      button.add(WicketUtils.javaScriptConfirmDialogOnClick(parentPage.getLocalizedMessage(
-          "system.admin.development.testObjectsCreationQuestion", AdminPage.NUMBER_OF_TEST_OBJECTS_TO_CREATE, "BookDO")));
-      fs.add(new SingleButtonPanel(fs.newChildId(), button, "BookDO", SingleButtonPanel.GREY));
     }
 
     gridBuilder.newGridPanel();

@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.request.Response;
 import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -66,6 +67,8 @@ import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.MessagePage;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketApplication;
+import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 public class AdminPage extends AbstractStandardFormPage implements ISelectCallerPage
 {
@@ -113,6 +116,237 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
     form = new AdminForm(this);
     body.add(form);
     form.init();
+
+    addDatabaseActionsMenu();
+    addCachesMenu();
+    addConfigurationMenu();
+    addMEBMenu();
+    addMiscMenu();
+    addDevelopmentMenu();
+  }
+
+  @SuppressWarnings("serial")
+  protected void addConfigurationMenu()
+  {
+    // Configuration
+    final ContentMenuEntryPanel configurationMenu = new ContentMenuEntryPanel(getNewContentMenuChildId(),
+        getString("system.admin.group.title.systemChecksAndFunctionality.configuration"));
+    addContentMenuEntry(configurationMenu);
+    // Check re-read configuration
+    final Link<Void> rereadConfigurationLink = new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+      @Override
+      public void onClick()
+      {
+        rereadConfiguration();
+      }
+    };
+    final ContentMenuEntryPanel rereadConfigurationLinkMenuItem = new ContentMenuEntryPanel(configurationMenu.newSubMenuChildId(),
+        rereadConfigurationLink, getString("system.admin.button.rereadConfiguration"))
+    .setTooltip(getString("system.admin.button.rereadConfiguration.tooltip"));
+    configurationMenu.addSubMenuEntry(rereadConfigurationLinkMenuItem);
+
+    // Export configuration.
+    final Link<Void> exportConfigurationLink = new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+      @Override
+      public void onClick()
+      {
+        exportConfiguration();
+      }
+    };
+    final ContentMenuEntryPanel exportConfigurationLinkMenuItem = new ContentMenuEntryPanel(configurationMenu.newSubMenuChildId(),
+        exportConfigurationLink, getString("system.admin.button.exportConfiguration"))
+    .setTooltip(getString("system.admin.button.exportConfiguration.tooltip"));
+    configurationMenu.addSubMenuEntry(exportConfigurationLinkMenuItem);
+  }
+
+  @SuppressWarnings("serial")
+  protected void addCachesMenu()
+  {
+    // Caches
+    final ContentMenuEntryPanel cachesMenu = new ContentMenuEntryPanel(getNewContentMenuChildId(),
+        getString("system.admin.group.title.systemChecksAndFunctionality.caches"));
+    addContentMenuEntry(cachesMenu);
+    // Refresh caches.
+    final Link<Void> refreshCachesLink = new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+      @Override
+      public void onClick()
+      {
+        refreshCaches();
+      }
+    };
+    final ContentMenuEntryPanel refreshCachesLinkMenuItem = new ContentMenuEntryPanel(cachesMenu.newSubMenuChildId(), refreshCachesLink,
+        getString("system.admin.button.refreshCaches")).setTooltip(getString("system.admin.button.refreshCaches.tooltip"));
+    cachesMenu.addSubMenuEntry(refreshCachesLinkMenuItem);
+  }
+
+  @SuppressWarnings("serial")
+  protected void addDatabaseActionsMenu()
+  {
+    // Data-base actions
+    final ContentMenuEntryPanel databaseActionsMenu = new ContentMenuEntryPanel(getNewContentMenuChildId(),
+        getString("system.admin.group.title.databaseActions"));
+    addContentMenuEntry(databaseActionsMenu);
+    // Update all user preferences
+    final Link<Void> updateUserPrefsLink = new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+      @Override
+      public void onClick()
+      {
+        updateUserPrefs();
+      }
+    };
+    final ContentMenuEntryPanel updateUserPrefsLinkMenuItem = new ContentMenuEntryPanel(databaseActionsMenu.newSubMenuChildId(),
+        updateUserPrefsLink, getString("system.admin.button.updateUserPrefs"))
+    .setTooltip(getString("system.admin.button.updateUserPrefs.tooltip"));
+    databaseActionsMenu.addSubMenuEntry(updateUserPrefsLinkMenuItem);
+
+    // Create missing data-base indices.
+    final Link<Void> createMissingDatabaseIndicesLink = new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+      @Override
+      public void onClick()
+      {
+        createMissingDatabaseIndices();
+      }
+    };
+    final ContentMenuEntryPanel createMissingDatabaseIndicesLinkMenuItem = new ContentMenuEntryPanel(
+        databaseActionsMenu.newSubMenuChildId(), createMissingDatabaseIndicesLink,
+        getString("system.admin.button.createMissingDatabaseIndices"))
+    .setTooltip(getString("system.admin.button.createMissingDatabaseIndices.tooltip"));
+    databaseActionsMenu.addSubMenuEntry(createMissingDatabaseIndicesLinkMenuItem);
+    // Fix data-base history entries.
+    final Link<Void> fixDBHistoryEntriesLink = new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+      @Override
+      public void onClick()
+      {
+        fixDBHistoryEntries();
+      }
+    };
+    final ContentMenuEntryPanel fixDBHistoryEntriesLinkMenuItem = new ContentMenuEntryPanel(databaseActionsMenu.newSubMenuChildId(),
+        fixDBHistoryEntriesLink, getString("system.admin.button.fixDBHistoryEntries"))
+    .setTooltip(getString("system.admin.button.fixDBHistoryEntries.tooltip"));
+    databaseActionsMenu.addSubMenuEntry(fixDBHistoryEntriesLinkMenuItem);
+    {
+      // Dump data-base.
+      final Link<Void> dumpDatabaseLink = new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+        @Override
+        public void onClick()
+        {
+          dump();
+        }
+      };
+      final ContentMenuEntryPanel dumpDatabaseLinkMenuItem = new ContentMenuEntryPanel(databaseActionsMenu.newSubMenuChildId(),
+          dumpDatabaseLink, getString("system.admin.button.dump")).setTooltip(getString("system.admin.button.dump.tooltip"));
+      databaseActionsMenu.addSubMenuEntry(dumpDatabaseLinkMenuItem);
+      dumpDatabaseLink.add(WicketUtils.javaScriptConfirmDialogOnClick(getString("system.admin.button.dump.question")));
+    }
+    {
+      // Schema export.
+      final Link<Void> schemaExportLink = new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+        @Override
+        public void onClick()
+        {
+          schemaExport();
+        }
+      };
+      final ContentMenuEntryPanel schemaExportLinkMenuItem = new ContentMenuEntryPanel(databaseActionsMenu.newSubMenuChildId(),
+          schemaExportLink, getString("system.admin.button.schemaExport")).setTooltip(getString("system.admin.button.schemaExport.tooltip"));
+      databaseActionsMenu.addSubMenuEntry(schemaExportLinkMenuItem);
+      schemaExportLink.add(WicketUtils.javaScriptConfirmDialogOnClick(getString("system.admin.button.schemaExport.question")));
+    }
+  }
+
+  @SuppressWarnings("serial")
+  protected void addMiscMenu()
+  {
+    // Misc checks
+    final ContentMenuEntryPanel miscChecksMenu = new ContentMenuEntryPanel(getNewContentMenuChildId(),
+        getString("system.admin.group.title.systemChecksAndFunctionality.miscChecks"));
+    addContentMenuEntry(miscChecksMenu);
+    // Check system integrity
+    final Link<Void> checkSystemIntegrityLink = new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+      @Override
+      public void onClick()
+      {
+        checkSystemIntegrity();
+      }
+    };
+    final ContentMenuEntryPanel checkSystemIntegrityLinkMenuItem = new ContentMenuEntryPanel(miscChecksMenu.newSubMenuChildId(),
+        checkSystemIntegrityLink, getString("system.admin.button.checkSystemIntegrity"))
+    .setTooltip(getString("system.admin.button.checkSystemIntegrity.tooltip"));
+    miscChecksMenu.addSubMenuEntry(checkSystemIntegrityLinkMenuItem);
+  }
+
+  @SuppressWarnings("serial")
+  protected void addMEBMenu()
+  {
+    if (Configuration.getInstance().isMebConfigured() == false) {
+      // Do nothing.
+      return;
+    }
+    // Mobile enterprise blogging
+    final ContentMenuEntryPanel mebMenu = new ContentMenuEntryPanel(getNewContentMenuChildId(), getString("meb.title.heading"));
+    addContentMenuEntry(mebMenu);
+    // Check unseen meb mails
+    final Link<Void> checkUnseenMebMailsLink = new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+      @Override
+      public void onClick()
+      {
+        checkUnseenMebMails();
+      }
+    };
+    final ContentMenuEntryPanel checkUnseenMebMailsLinkMenuItem = new ContentMenuEntryPanel(mebMenu.newSubMenuChildId(),
+        checkUnseenMebMailsLink, getString("system.admin.button.checkUnseenMebMails"))
+    .setTooltip(getString("system.admin.button.checkUnseenMebMails.tooltip"));
+    mebMenu.addSubMenuEntry(checkUnseenMebMailsLinkMenuItem);
+
+    // Import all meb mails.
+    final Link<Void> importAllMebMailsLink = new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+      @Override
+      public void onClick()
+      {
+        importAllMebMails();
+      }
+    };
+    final ContentMenuEntryPanel importAllMebMailsLinkMenuItem = new ContentMenuEntryPanel(mebMenu.newSubMenuChildId(),
+        importAllMebMailsLink, getString("system.admin.button.importAllMebMails"))
+    .setTooltip(getString("system.admin.button.importAllMebMails.tooltip"));
+    mebMenu.addSubMenuEntry(importAllMebMailsLinkMenuItem);
+  }
+
+  @SuppressWarnings("serial")
+  protected void addDevelopmentMenu()
+  {
+    if (WebConfiguration.isDevelopmentMode() == false) {
+      // Do nothing.
+      return;
+    }
+    // Development actions
+    final ContentMenuEntryPanel developmentMenu = new ContentMenuEntryPanel(getNewContentMenuChildId(), "Development");
+    addContentMenuEntry(developmentMenu);
+    // Check I18n properties.
+    final Link<Void> checkI18nPropertiesLink = new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+      @Override
+      public void onClick()
+      {
+        checkI18nProperties();
+      }
+    };
+    final ContentMenuEntryPanel checkI18nPropertiesLinkMenuItem = new ContentMenuEntryPanel(developmentMenu.newSubMenuChildId(),
+        checkI18nPropertiesLink, getString("system.admin.button.checkI18nProperties"))
+    .setTooltip(getString("system.admin.button.checkI18nProperties.tooltip"));
+    developmentMenu.addSubMenuEntry(checkI18nPropertiesLinkMenuItem);
+    // Create test objects
+    final Link<Void> createTestObjectsLink = new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+      @Override
+      public void onClick()
+      {
+        createTestBooks();
+      }
+    };
+    createTestObjectsLink.add(WicketUtils.javaScriptConfirmDialogOnClick(getLocalizedMessage(
+        "system.admin.development.testObjectsCreationQuestion", AdminPage.NUMBER_OF_TEST_OBJECTS_TO_CREATE, "BookDO")));
+    final ContentMenuEntryPanel createTestObjectsLinkMenuItem = new ContentMenuEntryPanel(developmentMenu.newSubMenuChildId(),
+        createTestObjectsLink, "BookDO").setTooltip("Creates 100 books of type BookDO for testing.");
+    developmentMenu.addSubMenuEntry(createTestObjectsLinkMenuItem);
   }
 
   @Override
@@ -277,6 +511,15 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
     ((WebResponse) response).setAttachmentHeader(filename);
     ((WebResponse) response).setContentType(DownloadUtils.getContentType(filename));
     xmlDump.dumpDatabase(filename, response.getOutputStream());
+    // final ByteArrayResourceStream byteArrayResourceStream;
+    // if (contentType != null) {
+    // byteArrayResourceStream = new ByteArrayResourceStream(content, filename, contentType);
+    // } else {
+    // byteArrayResourceStream = new ByteArrayResourceStream(content, filename);
+    // }
+    // final ResourceStreamRequestHandler handler = new ResourceStreamRequestHandler(byteArrayResourceStream);
+    // handler.setFileName(filename).setContentDisposition(ContentDisposition.ATTACHMENT);
+    // RequestCycle.get().scheduleRequestHandlerAfterCurrent(handler);
   }
 
   protected void reindex()
@@ -420,10 +663,10 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
       number++;
     }
     for (int i = 1; i <= NUMBER_OF_TEST_OBJECTS_TO_CREATE; i++) {
-      list.add(new BookDO().setTitle(get("title", number, i)).setAbstractText(get("abstractText", number, i)).setAuthors(
-          get("authors", number, i)).setComment(get("comment", number, i)).setEditor(get("editor", number, i)).setIsbn(
-              get("isbn", number, i)).setKeywords(get("keywords", number, i)).setPublisher(get("publisher", number, i)).setSignature(
-                  get("signature", number, i)).setStatus(BookStatus.PRESENT).setTask(task).setYearOfPublishing("2001"));
+      list.add(new BookDO().setTitle(get("title", number, i)).setAbstractText(get("abstractText", number, i))
+          .setAuthors(get("authors", number, i)).setComment(get("comment", number, i)).setEditor(get("editor", number, i))
+          .setIsbn(get("isbn", number, i)).setKeywords(get("keywords", number, i)).setPublisher(get("publisher", number, i))
+          .setSignature(get("signature", number, i)).setStatus(BookStatus.PRESENT).setTask(task).setYearOfPublishing("2001"));
     }
     bookDao.save(list);
     setResponsePage(new MessagePage("system.admin.development.testObjectsCreated", String.valueOf(NUMBER_OF_TEST_OBJECTS_TO_CREATE),
