@@ -23,6 +23,7 @@
 
 package org.projectforge.web.admin;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -35,8 +36,6 @@ import java.util.TreeSet;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.wicket.markup.html.link.Link;
-import org.apache.wicket.request.Response;
-import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.book.BookDO;
@@ -248,7 +247,8 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
         }
       };
       final ContentMenuEntryPanel schemaExportLinkMenuItem = new ContentMenuEntryPanel(databaseActionsMenu.newSubMenuChildId(),
-          schemaExportLink, getString("system.admin.button.schemaExport")).setTooltip(getString("system.admin.button.schemaExport.tooltip"));
+          schemaExportLink, getString("system.admin.button.schemaExport"))
+      .setTooltip(getString("system.admin.button.schemaExport.tooltip"));
       databaseActionsMenu.addSubMenuEntry(schemaExportLinkMenuItem);
       schemaExportLink.add(WicketUtils.javaScriptConfirmDialogOnClick(getString("system.admin.button.schemaExport.question")));
     }
@@ -507,19 +507,9 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
     checkAccess();
     final String ts = DateHelper.getTimestampAsFilenameSuffix(new Date());
     final String filename = "projectforgedump_" + ts + ".xml.gz";
-    final Response response = getResponse();
-    ((WebResponse) response).setAttachmentHeader(filename);
-    ((WebResponse) response).setContentType(DownloadUtils.getContentType(filename));
-    xmlDump.dumpDatabase(filename, response.getOutputStream());
-    // final ByteArrayResourceStream byteArrayResourceStream;
-    // if (contentType != null) {
-    // byteArrayResourceStream = new ByteArrayResourceStream(content, filename, contentType);
-    // } else {
-    // byteArrayResourceStream = new ByteArrayResourceStream(content, filename);
-    // }
-    // final ResourceStreamRequestHandler handler = new ResourceStreamRequestHandler(byteArrayResourceStream);
-    // handler.setFileName(filename).setContentDisposition(ContentDisposition.ATTACHMENT);
-    // RequestCycle.get().scheduleRequestHandlerAfterCurrent(handler);
+    final ByteArrayOutputStream out = new ByteArrayOutputStream();
+    xmlDump.dumpDatabase(filename, out);
+    DownloadUtils.setDownloadTarget(out.toByteArray(), filename);
   }
 
   protected void reindex()
