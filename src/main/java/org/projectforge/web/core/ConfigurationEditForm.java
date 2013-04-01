@@ -27,17 +27,23 @@ import java.math.BigDecimal;
 import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
+import org.apache.wicket.validation.IValidatable;
+import org.apache.wicket.validation.IValidator;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationDO;
+import org.projectforge.core.ConfigurationParam;
 import org.projectforge.core.ConfigurationType;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
@@ -75,14 +81,17 @@ public class ConfigurationEditForm extends AbstractEditForm<ConfigurationDO, Con
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.parameter")).supressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), getString(data.getI18nKey())));
     }
+    FormComponent< ? > valueField = null;
     {
       // Parameter value
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.value"));
       if (data.getConfigurationType() == ConfigurationType.INTEGER) {
-        fs.add(new TextField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data, "intValue")));
+        final TextField<Integer> textField = new TextField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data, "intValue"));
+        fs.add(textField);
+        valueField = textField;
       } else if (data.getConfigurationType() == ConfigurationType.PERCENT) {
-        fs.add(new MinMaxNumberField<BigDecimal>(InputPanel.WICKET_ID, new PropertyModel<BigDecimal>(data, "floatValue"), BigDecimal.ZERO,
-            NumberHelper.HUNDRED) {
+        final MinMaxNumberField<BigDecimal> numberField = new MinMaxNumberField<BigDecimal>(InputPanel.WICKET_ID,
+            new PropertyModel<BigDecimal>(data, "floatValue"), BigDecimal.ZERO, NumberHelper.HUNDRED) {
           /**
            * @see org.projectforge.web.wicket.components.MinMaxNumberField#getConverter(java.lang.Class)
            */
@@ -92,15 +101,35 @@ public class ConfigurationEditForm extends AbstractEditForm<ConfigurationDO, Con
           {
             return new BigDecimalPercentConverter(true);
           };
-        });
+        };
+        fs.add(numberField);
+        valueField = numberField;
       } else if (data.getConfigurationType() == ConfigurationType.STRING) {
-        fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "stringValue")));
+        final MaxLengthTextField textField = new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "stringValue"));
+        if (ConfigurationParam.CALENDAR_DOMAIN.getI18nKey().equals(data.getI18nKey()) == true) {
+          textField.setRequired(true);
+          textField.add(new IValidator<String>() {
+            @Override
+            public void validate(final IValidatable<String> validatable)
+            {
+              if (Configuration.isDomainValid(validatable.getValue()) == false) {
+                textField.error(getString("validation.error.generic"));
+              }
+            }
+          });
+        }
+        fs.add(textField);
+        valueField = textField;
       } else if (data.getConfigurationType() == ConfigurationType.TEXT) {
-        fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "stringValue")));
+        final MaxLengthTextArea textArea = new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "stringValue"));
+        fs.add(textArea);
+        valueField = textArea;
       } else if (data.getConfigurationType() == ConfigurationType.BOOLEAN) {
         fs.addCheckBox(new PropertyModel<Boolean>(data, "booleanValue"), null);
       } else if (data.getConfigurationType() == ConfigurationType.TIME_ZONE) {
-        fs.add(new TimeZonePanel(fs.newChildId(), new PropertyModel<TimeZone>(data, "timeZone")));
+        final TimeZonePanel timeZonePanel = new TimeZonePanel(fs.newChildId(), new PropertyModel<TimeZone>(data, "timeZone"));
+        fs.add(timeZonePanel);
+        valueField = timeZonePanel.getTextField();
       } else if (data.getConfigurationType() == ConfigurationType.TASK) {
         if (data.getTaskId() != null) {
           this.task = taskDao.getById(data.getTaskId());
@@ -111,6 +140,9 @@ public class ConfigurationEditForm extends AbstractEditForm<ConfigurationDO, Con
         taskSelectPanel.init();
       } else {
         throw new UnsupportedOperationException("Parameter of type '" + data.getConfigurationType() + "' not supported.");
+      }
+      if (valueField != null) {
+        WicketUtils.setFocus(valueField);
       }
     }
     {
