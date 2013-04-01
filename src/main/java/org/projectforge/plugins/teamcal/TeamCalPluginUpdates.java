@@ -57,7 +57,7 @@ public class TeamCalPluginUpdates
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
-    return new UpdateEntryImpl(TeamCalPlugin.ID, "1.0.0", "2012-05-09", "Adds tables T_PLUGIN_CALENDAR_*.") {
+    return new UpdateEntryImpl(TeamCalPlugin.ID, "1.0.0", "2012-05-09", "Adds tables T_PLUGIN_CALENDAR_* and parameter CALENDAR_DOMAIN.") {
 
       final Table calendarTable = new Table(TeamCalDO.class);
 
