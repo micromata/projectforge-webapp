@@ -49,6 +49,15 @@ public class SystemUpdatePage extends AbstractSecuredPage
     form = new SystemUpdateForm(this);
     body.add(form);
     form.init();
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractUnsecureBasePage#onBeforeRender()
+   */
+  @Override
+  protected void onBeforeRender()
+  {
+    super.onBeforeRender();
     refresh();
   }
 
@@ -57,6 +66,7 @@ public class SystemUpdatePage extends AbstractSecuredPage
     checkAdminUser();
     accessChecker.checkRestrictedOrDemoUser();
     systemUpdater.update(updateEntry);
+    updateEntry.afterUpdate();
     refresh();
   }
 
