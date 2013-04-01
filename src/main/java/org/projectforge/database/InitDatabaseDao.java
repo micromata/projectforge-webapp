@@ -40,6 +40,7 @@ import org.projectforge.task.TaskStatus;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserDao;
@@ -170,6 +171,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
     admin.addRight(new UserRightDO(UserRightId.PM_ORDER_BOOK, UserRightValue.READWRITE));
     admin.addRight(new UserRightDO(UserRightId.PM_HR_PLANNING, UserRightValue.READWRITE));
     userDao.internalSave(admin);
+    PFUserContext.setUser(admin); // Need to login the admin user for avoiding following access exceptions.
 
     final Set<PFUserDO> adminUsers = new HashSet<PFUserDO>();
     adminUsers.add(admin);
