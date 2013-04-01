@@ -28,6 +28,7 @@ import java.util.TimeZone;
 public enum ConfigurationParam
 {
   SYSTEM_ADMIN_E_MAIL("systemAdministratorEMail", ConfigurationType.STRING), //
+  CALENDAR_DOMAIN("calendarDomain", ConfigurationType.STRING), //
   ORGANIZATION("organization", ConfigurationType.TEXT), //
   MESSAGE_OF_THE_DAY("messageOfTheDay", ConfigurationType.TEXT), //
   DEFAULT_TIMEZONE("timezone", ConfigurationType.TIME_ZONE, TimeZone.getDefault().getID()), //

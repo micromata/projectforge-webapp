@@ -72,7 +72,7 @@ public class Configuration extends AbstractCache
     this.configurationDao = configurationDao;
   }
 
-  public static void init4TestMode()
+  public static Map<ConfigurationParam, Object> init4TestMode()
   {
     if (instance == null) {
       new Configuration();
@@ -80,6 +80,7 @@ public class Configuration extends AbstractCache
       instance.developmentMode = true;
       instance.configurationParamMap = new HashMap<ConfigurationParam, Object>();
     }
+    return instance.configurationParamMap;
   }
 
   public static Configuration getInstance()
@@ -129,6 +130,26 @@ public class Configuration extends AbstractCache
   public boolean isMebMailAccountConfigured()
   {
     return ConfigXml.getInstance().isMebMailAccountConfigured();
+  }
+
+  public String getCalendarDomain()
+  {
+    final String calendarDomain = (String) getValue(ConfigurationParam.CALENDAR_DOMAIN);
+    return calendarDomain;
+  }
+
+  public boolean isCalendarDomainValid()
+  {
+    final String calendarDomain = getCalendarDomain();
+    return isDomainValid(calendarDomain);
+  }
+
+  /**
+   * Validates the domain.
+   */
+  public static boolean isDomainValid(final String domain)
+  {
+    return StringUtils.isNotBlank(domain) == true && domain.matches("^[a-zA-Z]+[a-zA-Z0-9\\.\\-]*[a-zA-Z0-9]+$") == true;
   }
 
   /**
