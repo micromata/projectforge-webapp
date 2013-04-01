@@ -33,7 +33,8 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.validation.IValidatable;
-import org.apache.wicket.validation.validator.AbstractValidator;
+import org.apache.wicket.validation.IValidator;
+import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationDO;
 import org.projectforge.database.InitDatabaseDao;
 import org.projectforge.user.UserDao;
@@ -66,6 +67,8 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
   private String sysopEMail;
 
   private String feedbackEMail;
+
+  private String calendarDomain;
 
   private final String adminUsername = InitDatabaseDao.DEFAULT_ADMIN_USER;
 
@@ -120,9 +123,9 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
       // Password
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("password"));
       passwordField.setRequired(true); // No setReset(true), otherwise uploading and re-entering passwords is a real pain.
-      passwordField.add(new AbstractValidator<String>() {
+      passwordField.add(new IValidator<String>() {
         @Override
-        protected void onValidate(final IValidatable<String> validatable)
+        public void validate(final IValidatable<String> validatable)
         {
           final String input = validatable.getValue();
           final String errorMsgKey = userDao.checkPasswordQuality(input);
@@ -142,9 +145,9 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
       final PasswordTextField passwordRepeatField = new PasswordTextField(PasswordPanel.WICKET_ID, new PropertyModel<String>(this,
           "passwordRepeat"));
       passwordRepeatField.setRequired(true); // No setReset(true), otherwise uploading and re-entering passwords is a real pain.
-      passwordRepeatField.add(new AbstractValidator<String>() {
+      passwordRepeatField.add(new IValidator<String>() {
         @Override
-        protected void onValidate(final IValidatable<String> validatable)
+        public void validate(final IValidatable<String> validatable)
         {
           final String input = validatable.getValue();
           final String passwordInput = passwordField.getConvertedInput();
@@ -162,6 +165,22 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
       fs.setLabelFor(timeZone);
       fs.add(timeZone);
       fs.addHelpIcon(getString("administration.configuration.param.timezone.description"));
+    }
+    {
+      // Calendar domain
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.param.calendarDomain"));
+      final RequiredMaxLengthTextField textField = new RequiredMaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(this, "calendarDomain"), ConfigurationDO.PARAM_LENGTH);
+      fs.add(textField);
+      textField.add(new IValidator<String>() {
+        @Override
+        public void validate(final IValidatable<String> validatable)
+        {
+          if (Configuration.isDomainValid(validatable.getValue()) == false) {
+            textField.error(getString("validation.error.generic"));
+          }
+        }
+      });
+      fs.addHelpIcon(getString("administration.configuration.param.calendarDomain.description"));
     }
     {
       // E-Mail sysops
@@ -200,6 +219,14 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
   public TimeZone getTimeZone()
   {
     return timeZone;
+  }
+
+  /**
+   * @return the calendarDomain
+   */
+  public String getCalendarDomain()
+  {
+    return calendarDomain;
   }
 
   public String getSysopEMail()

@@ -128,6 +128,7 @@ public class SetupPage extends AbstractUnsecureBasePage
         configurationDao.update(configurationDO);
       }
     }
+    configure(ConfigurationParam.CALENDAR_DOMAIN, setupForm.getCalendarDomain());
     configure(ConfigurationParam.SYSTEM_ADMIN_E_MAIL, setupForm.getSysopEMail());
     configure(ConfigurationParam.FEEDBACK_E_MAIL, setupForm.getFeedbackEMail());
     setResponsePage(new MessagePage(message, adminUser.getUsername()));
