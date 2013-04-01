@@ -32,6 +32,7 @@ import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.admin.SystemUpdater;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationDO;
 import org.projectforge.core.ConfigurationDao;
@@ -71,6 +72,9 @@ public class SetupPage extends AbstractUnsecureBasePage
 
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
+
+  @SpringBean(name = "systemUpdater")
+  private SystemUpdater systemUpdater;
 
   @SpringBean(name = "xmlDump")
   private XmlDump xmlDump;
@@ -131,6 +135,10 @@ public class SetupPage extends AbstractUnsecureBasePage
     configure(ConfigurationParam.CALENDAR_DOMAIN, setupForm.getCalendarDomain());
     configure(ConfigurationParam.SYSTEM_ADMIN_E_MAIL, setupForm.getSysopEMail());
     configure(ConfigurationParam.FEEDBACK_E_MAIL, setupForm.getFeedbackEMail());
+    if (systemUpdater.isUpdated() == true) {
+      // Update status:
+      UserFilter.setUpdateRequiredFirst(false);
+    }
     setResponsePage(new MessagePage(message, adminUser.getUsername()));
     log.info("Set-up finished.");
   }
