@@ -112,7 +112,7 @@ public class TaskWizardPage extends AbstractStandardFormPage implements ISelectC
    */
   boolean actionRequired()
   {
-    return form.task != null && (form.managerGroup != null || form.team != null);
+    return form.task != null;
   }
 
   @Override
