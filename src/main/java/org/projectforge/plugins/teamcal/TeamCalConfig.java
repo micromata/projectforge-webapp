@@ -25,6 +25,7 @@ package org.projectforge.plugins.teamcal;
 
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.ConfigXml;
+import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationData;
 
 public class TeamCalConfig implements ConfigurationData
@@ -45,26 +46,9 @@ public class TeamCalConfig implements ConfigurationData
     return config;
   }
 
-  String domain = "projectforge.acme.priv";
-
-  /**
-   * The domain is needed for having world wide unique uids. Please note: If you change this domain after working with this plugin,
-   * synchronisation errors between ProjectForge and your iCal clients may occur.
-   * @return the domain
-   */
   public String getDomain()
   {
-    return domain;
-  }
-
-  /**
-   * @param domain the domain to set
-   * @return this for chaining.
-   */
-  public TeamCalConfig setDomain(final String domain)
-  {
-    this.domain = domain;
-    return this;
+    return Configuration.getInstance().getCalendarDomain();
   }
 
   /**
