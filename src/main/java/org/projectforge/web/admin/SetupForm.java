@@ -165,13 +165,13 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
     }
     {
       // E-Mail sysops
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.param.systemAdministratorEMail"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.param.systemAdministratorEMail.label"), getString("email"));
       fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(this, "sysopEMail"), ConfigurationDO.PARAM_LENGTH));
       fs.addHelpIcon(getString("administration.configuration.param.systemAdministratorEMail.description"));
     }
     {
       // E-Mail sysops
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.param.feedbackEMail"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.param.feedbackEMail.label"), getString("email"));
       fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(this, "feedbackEMail"), ConfigurationDO.PARAM_LENGTH));
       fs.addHelpIcon(getString("administration.configuration.param.feedbackEMail.description"));
     }
