@@ -52,6 +52,8 @@ public class TimeZonePanel extends Panel
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
 
+  private PFAutoCompleteTextField<TimeZone> textField;
+
   private static final IConverter converter = new TimeZoneConverter();
 
   public TimeZonePanel(final String id, final IModel<TimeZone> model)
@@ -72,7 +74,7 @@ public class TimeZonePanel extends Panel
     }
     final String[] favoriteIds = favoritesIds.toArray(new String[favoritesIds.size()]);
     final List<TimeZone> favoriteTimeZones = getAsTimeZoneObjects(favoriteIds);
-    final PFAutoCompleteTextField<TimeZone> textField = new PFAutoCompleteTextField<TimeZone>("input", model) {
+    textField = new PFAutoCompleteTextField<TimeZone>("input", model) {
       @Override
       protected List<TimeZone> getChoices(final String input)
       {
@@ -114,6 +116,14 @@ public class TimeZonePanel extends Panel
     add(textField);
     add(new TooltipImage("autocompleteDblClickHelpImage", WebConstants.IMAGE_HELP_KEYBOARD, tooltip));
     setRenderBodyOnly(true);
+  }
+
+  /**
+   * @return the textField
+   */
+  public PFAutoCompleteTextField<TimeZone> getTextField()
+  {
+    return textField;
   }
 
   private List<TimeZone> getAsTimeZoneObjects(final String[] timeZoneIds)
