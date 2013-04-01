@@ -238,7 +238,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       // ///////////////////////////////
       final FieldsetPanel reminderPanel = gridBuilder.newFieldset(getString("plugins.teamcal.event.reminder.title"));
       reminderPanel.add(new TeamEventReminderComponent(reminderPanel.newChildId(), Model.of(data), reminderPanel));
-
+      reminderPanel.addHelpIcon(getString("plugins.teamcal.event.reminder.tooltip"));
     }
 
     // ///////////////////////////////
