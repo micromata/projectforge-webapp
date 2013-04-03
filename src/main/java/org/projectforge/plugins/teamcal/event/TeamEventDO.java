@@ -368,7 +368,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
    * RRULE (rfc5545)
    * @return the recurrence
    */
-  @Column(name = "recurrence_rule")
+  @Column(name = "recurrence_rule", length = 4000)
   public String getRecurrenceRule()
   {
     return recurrenceRule;
@@ -457,7 +457,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
    * EXDATE (rfc5545) Ex dates are time stamps of deleted events out of the recurrence events.
    * @return the recurrenceExDate
    */
-  @Column(name = "recurrence_ex_date")
+  @Column(name = "recurrence_ex_date", length = 4000)
   public String getRecurrenceExDate()
   {
     return recurrenceExDate;
@@ -538,6 +538,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
    * Isn't yet used (ex-date is always used instead in master event).
    * @return the recurrenceReferenceId
    */
+  @Column(name = "recurrence_reference_id", length = 255)
   public String getRecurrenceReferenceId()
   {
     return recurrenceReferenceId;

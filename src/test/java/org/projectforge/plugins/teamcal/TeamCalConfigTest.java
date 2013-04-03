@@ -23,24 +23,23 @@
 
 package org.projectforge.plugins.teamcal;
 
+import java.util.Map;
+
 import junit.framework.Assert;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
-import org.projectforge.test.AbstractTestBase;
 
-public class TeamCalConfigTest extends AbstractTestBase
+public class TeamCalConfigTest
 {
   @BeforeClass
   public static void setUp() throws Exception
   {
-    preInit();
-    init(true);
     final String domain = "projectforge.org";
-    Configuration.getInstance().forceReload();
-    Configuration.init4TestMode().put(ConfigurationParam.CALENDAR_DOMAIN, domain);
+    final Map<ConfigurationParam, Object> map = Configuration.init4TestMode();
+    map.put(ConfigurationParam.CALENDAR_DOMAIN, domain);
   }
 
   @Test

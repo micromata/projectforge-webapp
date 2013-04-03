@@ -79,6 +79,13 @@ public class Configuration extends AbstractCache
       instance.testMode = true;
       instance.developmentMode = true;
       instance.configurationParamMap = new HashMap<ConfigurationParam, Object>();
+    } else {
+      if (instance.configurationParamMap == null) {
+        instance.forceReload();
+        if (instance.configurationParamMap == null) {
+          instance.configurationParamMap = new HashMap<ConfigurationParam, Object>();
+        }
+      }
     }
     return instance.configurationParamMap;
   }
