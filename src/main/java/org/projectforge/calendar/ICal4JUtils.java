@@ -55,6 +55,10 @@ public class ICal4JUtils
 
   private static TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
 
+  private static final String ICAL_DATETIME_FORMAT = "yyyyMMdd'T'HHmmss";
+
+  private static final String ICAL_DATE_FORMAT = "yyyyMMdd";
+
   /**
    * @return The timeZone (ical4j) built of the default java timeZone of the user.
    * @see PFUserContext#getTimeZone()
@@ -262,6 +266,35 @@ public class ICal4JUtils
     return date;
   }
 
+  /**
+   * Format is '20130327T090000'
+   * @param dateString
+   * @param timeZone
+   * @return
+   */
+  public static Date parseICalDateString(final String dateString, final java.util.TimeZone timeZone)
+  {
+    if (StringUtils.isBlank(dateString) == true) {
+      return null;
+    }
+    String pattern;
+    java.util.TimeZone tz = timeZone;
+    if (dateString.indexOf('T') > 0) {
+      pattern = ICAL_DATETIME_FORMAT;
+    } else {
+      pattern = ICAL_DATE_FORMAT;
+      tz = DateHelper.UTC;
+    }
+    final DateFormat df = new SimpleDateFormat(pattern);
+    df.setTimeZone(tz);
+    try {
+      return df.parse(dateString);
+    } catch (final ParseException ex) {
+      log.error("Can't parse ical date ('" + pattern + "': " + ex.getMessage(), ex);
+      return null;
+    }
+  }
+
   public static Date parseISODateString(final String isoDateString)
   {
     if (StringUtils.isBlank(isoDateString) == true) {
@@ -331,7 +364,12 @@ public class ICal4JUtils
       if (str == null) {
         continue;
       }
-      final Date date = parseISODateString(str);
+      Date date = null;
+      if (str.matches("\\d{8}.*") == true) {
+        date = parseICalDateString(str, timeZone);
+      } else {
+        date = parseISODateString(str);
+      }
       if (date == null) {
         continue;
       }
