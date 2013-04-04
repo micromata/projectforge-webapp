@@ -25,6 +25,7 @@ package org.projectforge.calendar;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.TimeZone;
 
 import junit.framework.Assert;
@@ -81,5 +82,26 @@ public class ICal4JUtilsTest
   {
     final java.util.Date date = DateHelper.parseIsoDate(dateString, timeZone);
     return ICal4JUtils.getICal4jDate(date, timeZone);
+  }
+
+  @Test
+  public void parseISODateStringsAsICal4jDates()
+  {
+    parseISODateStringsAsICal4jDates(DateHelper.EUROPE_BERLIN);
+    parseISODateStringsAsICal4jDates(DateHelper.UTC);
+    parseISODateStringsAsICal4jDates(TimeZone.getTimeZone("America/Los_Angeles"));
+  }
+
+  private void parseISODateStringsAsICal4jDates(final TimeZone timeZone)
+  {
+    final List<net.fortuna.ical4j.model.Date> dates = ICal4JUtils.parseISODateStringsAsICal4jDates("2013-03-21 08:47:00,20130327T090000",
+        ICal4JUtils.getTimeZone(timeZone));
+    Assert.assertEquals(2, dates.size());
+    final DateFormat dfLocal = new SimpleDateFormat(DateFormats.ISO_TIMESTAMP_MINUTES);
+    dfLocal.setTimeZone(timeZone);
+    final DateFormat dfUtc = new SimpleDateFormat(DateFormats.ISO_TIMESTAMP_MINUTES);
+    dfUtc.setTimeZone(DateHelper.UTC);
+    Assert.assertEquals("2013-03-21 08:47", dfUtc.format(dates.get(0)));
+    Assert.assertEquals("2013-03-27 09:00", dfLocal.format(dates.get(1)));
   }
 }
