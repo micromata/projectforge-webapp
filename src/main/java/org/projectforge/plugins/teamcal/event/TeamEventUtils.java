@@ -147,7 +147,7 @@ public class TeamEventUtils
               }
             } else {
               // Allday event.
-              final String isoExDateString = DateHelper.formatIsoDate(exDate, timeZone);
+              final String isoExDateString = DateHelper.formatIsoDate(exDate, DateHelper.UTC);
               if (isoDateString.equals(isoExDateString) == true) {
                 if (log.isDebugEnabled() == true) {
                   log.debug("= ex-dates equals: " + isoDateString + " == " + isoExDateString);
