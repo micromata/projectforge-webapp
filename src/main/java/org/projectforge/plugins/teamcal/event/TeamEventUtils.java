@@ -108,8 +108,9 @@ public class TeamEventUtils
     if (log.isDebugEnabled() == true) {
       log.debug("---------- startDate=" + DateHelper.formatIsoTimestamp(eventStartDate, timeZone) + ", timeZone=" + timeZone.getID());
     }
+    final TimeZone ical4jTimeZone = ICal4JUtils.getTimeZone(timeZone4Calc);
     final net.fortuna.ical4j.model.DateTime ical4jStartDate = new net.fortuna.ical4j.model.DateTime(startDate);
-    ical4jStartDate.setTimeZone(ICal4JUtils.getTimeZone(timeZone4Calc));
+    ical4jStartDate.setTimeZone(ical4jTimeZone);
     final net.fortuna.ical4j.model.DateTime ical4jEndDate = new net.fortuna.ical4j.model.DateTime(endDate);
     ical4jEndDate.setTimeZone(ICal4JUtils.getTimeZone(timeZone4Calc));
     final net.fortuna.ical4j.model.DateTime seedDate = new net.fortuna.ical4j.model.DateTime(eventStartDate);
@@ -125,7 +126,8 @@ public class TeamEventUtils
           + seedDate);
       return null;
     }
-    final String[] exDates = ICal4JUtils.splitExDates(event.getRecurrenceExDate());
+    final List<net.fortuna.ical4j.model.Date> exDates = ICal4JUtils.parseISODateStringsAsICal4jDates(event.getRecurrenceExDate(),
+        ical4jTimeZone);
     final DateList dateList = recur.getDates(seedDate, ical4jStartDate, ical4jEndDate, Value.DATE_TIME);
     final Collection<TeamEvent> col = new ArrayList<TeamEvent>();
     if (dateList != null) {
@@ -133,14 +135,26 @@ public class TeamEventUtils
         final net.fortuna.ical4j.model.DateTime dateTime = (net.fortuna.ical4j.model.DateTime) obj;
         final String isoDateString = event.isAllDay() == true ? DateHelper.formatIsoDate(dateTime, timeZone) : DateHelper
             .formatIsoTimestamp(dateTime, DateHelper.UTC);
-        if (exDates != null && exDates.length > 0) {
-          for (final String exDate : exDates) {
-            if (isoDateString.startsWith(exDate) == true) {
-              if (log.isDebugEnabled() == true) {
-                log.debug("= ex-dates equals: " + isoDateString + " == " + exDate);
+        if (exDates != null && exDates.size() > 0) {
+          for (final net.fortuna.ical4j.model.Date exDate : exDates) {
+            if (event.isAllDay() == false) {
+              if (exDate.getTime() == dateTime.getTime()) {
+                if (log.isDebugEnabled() == true) {
+                  log.debug("= ex-dates equals: " + isoDateString + " == " + exDate);
+                }
+                // this date is part of ex dates, so don't use it.
+                continue OuterLoop;
               }
-              // this date is part of ex dates, so don't use it.
-              continue OuterLoop;
+            } else {
+              // Allday event.
+              final String isoExDateString = DateHelper.formatIsoDate(exDate, timeZone);
+              if (isoDateString.equals(isoExDateString) == true) {
+                if (log.isDebugEnabled() == true) {
+                  log.debug("= ex-dates equals: " + isoDateString + " == " + isoExDateString);
+                }
+                // this date is part of ex dates, so don't use it.
+                continue OuterLoop;
+              }
             }
             if (log.isDebugEnabled() == true) {
               log.debug("ex-dates not equals: " + isoDateString + " != " + exDate);
