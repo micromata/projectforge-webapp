@@ -25,12 +25,13 @@ package org.projectforge.plugins.teamcal.dialog;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
-import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFeedHook;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.calendar.AbstractICSExportDialog;
+import org.projectforge.web.wicket.I18nParamMap;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
@@ -48,13 +49,35 @@ public class TeamCalICSExportDialog extends AbstractICSExportDialog
 
   private boolean exportReminders;
 
+  private String calendarTitle = "-";
+
   /**
    * @param id
    * @param titleModel
    */
-  public TeamCalICSExportDialog(final String id, final IModel<String> titleModel)
+  @SuppressWarnings("serial")
+  public TeamCalICSExportDialog(final String id)
   {
-    super(id, titleModel);
+    super(id, null);
+    setTitle(new Model<String>() {
+      @Override
+      public String getObject()
+      {
+        return getLocalizer().getString("plugins.teamcal.download", TeamCalICSExportDialog.this,
+            new I18nParamMap().put("calendar", calendarTitle));
+      };
+    });
+  }
+
+  /**
+   * @param calendarTitle the calendarTitle to set
+   * @return this for chaining.
+   */
+  public TeamCalICSExportDialog setCalendarTitle(final AjaxRequestTarget target, final String calendarTitle)
+  {
+    this.calendarTitle = calendarTitle;
+    addTitleLabel(target);
+    return this;
   }
 
   public void redraw(final TeamCalDO teamCal)
