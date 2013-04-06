@@ -49,6 +49,7 @@ import org.projectforge.calendar.CalendarUtils;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.plugins.teamcal.TeamCalConfig;
 import org.projectforge.plugins.teamcal.event.ReminderDurationUnit;
+import org.projectforge.plugins.teamcal.event.TeamEvent;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDao;
 import org.projectforge.plugins.teamcal.event.TeamEventFilter;
@@ -65,6 +66,8 @@ import org.springframework.util.CollectionUtils;
  */
 public class TeamCalCalendarFeedHook implements CalendarFeedHook
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalCalendarFeedHook.class);
+
   public static final String PARAM_EXPORT_REMINDER = "exportReminders";
 
   public static final String getUrl(final String teamCalIds, final String additionalParameterString)
@@ -107,9 +110,14 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
     for (int i = 0; i < teamCalIds.length; i++) {
       final Integer id = Integer.valueOf(teamCalIds[i]);
       eventFilter.setTeamCalId(id);
-      final List<TeamEventDO> teamEvents = teamEventDao.getList(eventFilter);
+      final List<TeamEvent> teamEvents = teamEventDao.getEventList(eventFilter, false);
       if (teamEvents != null && teamEvents.size() > 0) {
-        for (final TeamEventDO teamEvent : teamEvents) {
+        for (final TeamEvent teamEventObject : teamEvents) {
+          if (teamEventObject instanceof TeamEventDO == false) {
+            log.warn("Oups, shouldn't occur, please contact the developer: teamEvent isn't of type TeamEventDO: " + teamEventObject);
+            continue;
+          }
+          final TeamEventDO teamEvent = (TeamEventDO)teamEventObject;
           final String uid = TeamCalConfig.get().createEventUid(teamEvent.getId());
           String summary;
           if (teamCalIds.length > 1) {
@@ -153,8 +161,8 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
             final RRule rrule = new RRule(recur);
             vEvent.getProperties().add(rrule);
             if (teamEvent.getRecurrenceExDate() != null) {
-              final List<net.fortuna.ical4j.model.Date> exDates = ICal4JUtils.parseISODateStringsAsICal4jDates(teamEvent
-                  .getRecurrenceExDate(), timeZone);
+              final List<net.fortuna.ical4j.model.Date> exDates = ICal4JUtils.parseISODateStringsAsICal4jDates(
+                  teamEvent.getRecurrenceExDate(), timeZone);
               if (CollectionUtils.isEmpty(exDates) == false) {
                 for (final net.fortuna.ical4j.model.Date date : exDates) {
                   final DateList dateList;
