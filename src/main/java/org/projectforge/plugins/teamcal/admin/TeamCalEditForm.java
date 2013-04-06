@@ -138,7 +138,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
     }
 
     if (accessChecker.isRestrictedUser() == false && isNew() == false) {
-      icsExportDialog = new TeamCalICSExportDialog(parentPage.newModalDialogId(), new ResourceModel("plugins.teamcal.download"));
+      icsExportDialog = new TeamCalICSExportDialog(parentPage.newModalDialogId());
       parentPage.add(icsExportDialog);
       icsExportDialog.init();
       icsExportDialog.redraw(getData());
@@ -148,6 +148,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
         @Override
         public void onClick(final AjaxRequestTarget target)
         {
+          icsExportDialog.setCalendarTitle(target, data.getTitle());
           icsExportDialog.open(target);
         };
       });
@@ -158,7 +159,8 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       // set access users
       {
         // Full access users
-        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess"), getString("plugins.teamcal.access.users"));
+        final FieldsetPanel fs = gridBuilder
+            .newFieldset(getString("plugins.teamcal.fullAccess"), getString("plugins.teamcal.access.users"));
         final UsersProvider usersProvider = new UsersProvider();
         final Collection<PFUserDO> fullAccessUsers = new UsersProvider().getSortedUsers(getData().getFullAccessUserIds());
         fullAccessUsersListHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator()).setFullList(
@@ -174,7 +176,8 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       }
       {
         // Read-only access users
-        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.readonlyAccess"), getString("plugins.teamcal.access.users"));
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.readonlyAccess"),
+            getString("plugins.teamcal.access.users"));
         final UsersProvider usersProvider = new UsersProvider();
         final Collection<PFUserDO> readOnlyAccessUsers = new UsersProvider().getSortedUsers(getData().getReadonlyAccessUserIds());
         readonlyAccessUsersListHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator()).setFullList(
@@ -190,7 +193,8 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       }
       {
         // Minimal access users
-        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.minimalAccess"), getString("plugins.teamcal.access.users"));
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.minimalAccess"),
+            getString("plugins.teamcal.access.users"));
         final UsersProvider usersProvider = new UsersProvider();
         final Collection<PFUserDO> minimalAccessUsers = new UsersProvider().getSortedUsers(getData().getMinimalAccessUserIds());
         minimalAccessUsersListHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator()).setFullList(
@@ -210,7 +214,8 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       // set access groups
       {
         // Full access groups
-        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess"), getString("plugins.teamcal.access.groups"));
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess"),
+            getString("plugins.teamcal.access.groups"));
         final GroupsProvider groupsProvider = new GroupsProvider();
         final Collection<GroupDO> fullAccessGroups = new GroupsProvider().getSortedGroups(getData().getFullAccessGroupIds());
         fullAccessGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
@@ -226,7 +231,8 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       }
       {
         // Read-only access groups
-        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.readonlyAccess"), getString("plugins.teamcal.access.groups"));
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.readonlyAccess"),
+            getString("plugins.teamcal.access.groups"));
         final GroupsProvider groupsProvider = new GroupsProvider();
         final Collection<GroupDO> readOnlyAccessGroups = new GroupsProvider().getSortedGroups(getData().getReadonlyAccessGroupIds());
         readonlyAccessGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
@@ -242,7 +248,8 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       }
       {
         // Minimal access groups
-        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.minimalAccess"), getString("plugins.teamcal.access.groups"));
+        final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.minimalAccess"),
+            getString("plugins.teamcal.access.groups"));
         final GroupsProvider groupsProvider = new GroupsProvider();
         final Collection<GroupDO> minimalAccessGroups = new GroupsProvider().getSortedGroups(getData().getMinimalAccessGroupIds());
         minimalAccessGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(

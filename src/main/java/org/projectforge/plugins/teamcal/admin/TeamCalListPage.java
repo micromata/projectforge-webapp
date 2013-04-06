@@ -159,6 +159,7 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
               {
                 icsExportDialog.redraw(teamCal);
                 icsExportDialog.addContent(target);
+                icsExportDialog.setCalendarTitle(target, teamCal.getTitle());
                 icsExportDialog.open(target);
               };
             });
@@ -235,7 +236,7 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
 
     dataTable = createDataTable(createColumns(this, true), "lastUpdate", SortOrder.DESCENDING);
     form.add(dataTable);
-    icsExportDialog = new TeamCalICSExportDialog(newModalDialogId(), new ResourceModel("plugins.teamcal.download"));
+    icsExportDialog = new TeamCalICSExportDialog(newModalDialogId());
     add(icsExportDialog);
     icsExportDialog.init();
   }
