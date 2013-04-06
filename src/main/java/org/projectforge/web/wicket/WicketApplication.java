@@ -313,7 +313,10 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     getSecuritySettings().setUnauthorizedComponentInstantiationListener(authStrategy);
     // Prepend the resource bundle for overwriting some Wicket default localizations (such as StringValidator.*)
     getResourceSettings().getStringResourceLoaders().add(new BundleStringResourceLoader(RESOURCE_BUNDLE_NAME));
-    getResourceSettings().setThrowExceptionOnMissingResource(false); // Don't throw MissingResourceException for missing i18n keys.
+    if (isDevelopmentSystem() == false) {
+      getResourceSettings().setThrowExceptionOnMissingResource(false); // Don't throw MissingResourceException for
+      // missing i18n keys in production mode.
+    }
     getApplicationSettings().setPageExpiredErrorPage(PageExpiredPage.class); // Don't show expired page.
     // getSessionSettings().setMaxPageMaps(20); // Map up to 20 pages per session (default is 5).
     getComponentInstantiationListeners().add(new SpringComponentInjector(this));
@@ -431,7 +434,8 @@ public class WicketApplication extends WebApplication implements WicketApplicati
 
     // initialize styles compiler
     try {
-      final LessWicketApplicationInstantiator lessInstantiator = new LessWicketApplicationInstantiator(this, "styles", "projectforge.less", "projectforge.css");
+      final LessWicketApplicationInstantiator lessInstantiator = new LessWicketApplicationInstantiator(this, "styles", "projectforge.less",
+          "projectforge.css");
       lessInstantiator.instantiate();
     } catch (final Exception e) {
       log.error("Unable to instantiate wicket less compiler", e);
@@ -512,7 +516,8 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     return converterLocator;
   }
 
-  public static long getStartTime() {
+  public static long getStartTime()
+  {
     return startTime;
   }
 
