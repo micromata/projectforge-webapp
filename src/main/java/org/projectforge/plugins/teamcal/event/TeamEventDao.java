@@ -145,10 +145,16 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
   }
 
   /**
+   * This method also returns recurrence events outside the time period of the given filter but affecting the time-period (e. g. older
+   * recurrence events without end date or end date inside or after the given time period). If calculateRecurrenceEvents is true, only the
+   * recurrence events inside the given time-period are returned, if false only the origin recurrence event (may-be outside the given
+   * time-period) is returned.
    * @param filter
-   * @return list of team events (same as {@link #getList(BaseSearchFilter)} but with all calculated and matching recurrence events.
+   * @param calculateRecurrenceEvents If true, recurrence events inside the given time-period are calculated.
+   * @return list of team events (same as {@link #getList(BaseSearchFilter)} but with all calculated and matching recurrence events (if
+   *         calculateRecurrenceEvents is true). Origin events are of type {@link TeamEventDO}, calculated events of type {@link TeamEvent}.
    */
-  public List<TeamEvent> getEventList(final TeamEventFilter filter)
+  public List<TeamEvent> getEventList(final TeamEventFilter filter, final boolean calculateRecurrenceEvents)
   {
     final List<TeamEvent> result = new ArrayList<TeamEvent>();
     List<TeamEventDO> list = getList(filter);
@@ -172,6 +178,10 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
         if (eventDO.hasRecurrence() == false) {
           log.warn("Shouldn't occur! Please contact developer.");
           // This event was handled above.
+          continue;
+        }
+        if (calculateRecurrenceEvents == false) {
+          result.add(eventDO);
           continue;
         }
         final Collection<TeamEvent> events = TeamEventUtils.getRecurrenceEvents(teamEventFilter.getStartDate(),
@@ -309,12 +319,19 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
             (Restrictions.and(Restrictions.le("startDate", startDate), Restrictions.ge("endDate", endDate)))));
       } else {
         queryFilter.add(
-            // "startDate" < endDate && ("recurrenceUntil" == null || "recurrenceUnti" > startDate)
+            // "startDate" < endDate && ("recurrenceUntil" == null || "recurrenceUntil" > startDate)
             (Restrictions.and(Restrictions.lt("startDate", endDate),
                 Restrictions.or(Restrictions.isNull("recurrenceUntil"), Restrictions.gt("recurrenceUntil", startDate)))));
       }
     } else if (startDate != null) {
-      queryFilter.add(Restrictions.ge("startDate", startDate));
+      if (filter.isOnlyRecurrence() == false) {
+        queryFilter.add(Restrictions.ge("startDate", startDate));
+      } else {
+        // This branch is reached for subscriptions and calendar downloads.
+        queryFilter.add(
+            // "recurrenceUntil" == null || "recurrenceUntil" > startDate
+            Restrictions.or(Restrictions.isNull("recurrenceUntil"), Restrictions.gt("recurrenceUntil", startDate)));
+      }
     } else if (endDate != null) {
       queryFilter.add(Restrictions.le("startDate", endDate));
     }

@@ -110,7 +110,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
     eventFilter.setStartDate(start.toDate());
     eventFilter.setEndDate(end.toDate());
     eventFilter.setUser(PFUserContext.getUser());
-    final List<TeamEvent> teamEvents = teamEventDao.getEventList(eventFilter);
+    final List<TeamEvent> teamEvents = teamEventDao.getEventList(eventFilter, true);
 
     boolean longFormat = false;
     days = Days.daysBetween(start, end).getDays();
