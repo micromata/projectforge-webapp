@@ -10,6 +10,9 @@ Bugs
 - Modify end-date if start-date is changed.
 - Bei 15 Minuten Zeitberichtsauswahl (Klick) ganze Pause füllen oder Anschlussbericht.
 - ToDo schließen (ctrl-return) klappt nicht.
+- Bei Übernahme Ereignisse in Zeitberichte POP-UP mit Aufgabe/Kostenstelle/Templates vorblenden.
+- ics aus Mail auf ProjectForge ziehen.
+- Normalize ex-dates (as UTC-ISO-dates/date-times)
 
 TeamCal
 -------
