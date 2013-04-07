@@ -23,6 +23,7 @@
 
 package org.projectforge.plugins.core;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,6 +36,7 @@ import org.projectforge.admin.UpdateEntry;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.database.DatabaseUpdateDao;
+import org.projectforge.database.xstream.XStreamSavingConverter;
 import org.projectforge.plugins.todo.ToDoPlugin;
 import org.projectforge.registry.Registry;
 import org.projectforge.registry.RegistryEntry;
@@ -62,7 +64,7 @@ public abstract class AbstractPlugin
 
   protected DatabaseUpdateDao databaseUpdateDao;
 
-  private UserXmlPreferencesDao userXmlPreferencesDao;
+  protected UserXmlPreferencesDao userXmlPreferencesDao;
 
   private IResourceSettings resourceSettings;
 
@@ -94,9 +96,9 @@ public abstract class AbstractPlugin
 
   /**
    * Override this method if persistent entities should be added (JPA annotated classes which will be registered at Hibernate). <br/>
-   * Your plugin should support the xml dump and restore of the data-base. If your plugin has different data-object classes where at least one is
-   * embedded (as member) of another, the order should be given. Example: class GroupDO has a list of assigned PFUserDO's, then PFUserDO
-   * should be restored before GroupDO. Therefore PFUserDO should be before GroupDO in the returned list.
+   * Your plugin should support the xml dump and restore of the data-base. If your plugin has different data-object classes where at least
+   * one is embedded (as member) of another, the order should be given. Example: class GroupDO has a list of assigned PFUserDO's, then
+   * PFUserDO should be restored before GroupDO. Therefore PFUserDO should be before GroupDO in the returned list.
    */
   public Class< ? >[] getPersistentEntities()
   {
@@ -360,5 +362,13 @@ public abstract class AbstractPlugin
   public List<UpdateEntry> getUpdateEntries()
   {
     return null;
+  }
+
+  public void onBeforeRestore(final XStreamSavingConverter xstreamSavingConverter, final Object obj)
+  {
+  }
+
+  public void onAfterRestore(final XStreamSavingConverter xstreamSavingConverter, final Object obj, final Serializable newId)
+  {
   }
 }
