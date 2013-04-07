@@ -39,7 +39,7 @@ public class TeamCalCalendarPage extends CalendarPage
 
   private TeamCalCalendarForm form;
 
-  private static final String USERPREF_KEY = "TeamCalendarPage.userPrefs";
+  public static final String USERPREF_KEY = "TeamCalendarPage.userPrefs";
 
   /**
    * @param parameters
