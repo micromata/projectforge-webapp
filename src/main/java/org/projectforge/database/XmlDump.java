@@ -81,6 +81,8 @@ import org.projectforge.fibu.kost.Kost1DO;
 import org.projectforge.fibu.kost.Kost2ArtDO;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.fibu.kost.KostZuweisungDO;
+import org.projectforge.plugins.core.AbstractPlugin;
+import org.projectforge.plugins.core.PluginsRegistry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
@@ -202,6 +204,12 @@ public class XmlDump
         RechnungDO.class, EingangsrechnungDO.class, EmployeeSalaryDO.class, KostZuweisungDO.class,//
         UserPrefEntryDO.class, UserPrefDO.class, //
         AccessEntryDO.class, GroupTaskAccessDO.class, ConfigurationDO.class);
+    final List<AbstractPlugin> list = PluginsRegistry.instance().getPlugins();
+    if (list != null) {
+      for (final AbstractPlugin plugin : list) {
+        xstreamSavingConverter.appendOrderedType(plugin.getPersistentEntities());
+      }
+    }
     Session session = null;
     try {
       final SessionFactory sessionFactory = hibernate.getSessionFactory();
