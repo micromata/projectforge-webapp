@@ -82,7 +82,7 @@ public class TemplateEntry implements Serializable, Comparable<TemplateEntry>, C
   @XStreamAsAttribute
   private Boolean showPlanning;
 
-  Set<TemplateCalendarProperties> getCalendarProperties()
+  public Set<TemplateCalendarProperties> getCalendarProperties()
   {
     return calendarProperties;
   }
