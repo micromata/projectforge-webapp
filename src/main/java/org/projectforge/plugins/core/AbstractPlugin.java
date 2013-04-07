@@ -93,7 +93,10 @@ public abstract class AbstractPlugin
   }
 
   /**
-   * Override this method if persistent entities should be added (JPA annotated classes which will be registered at Hibernate).
+   * Override this method if persistent entities should be added (JPA annotated classes which will be registered at Hibernate). <br/>
+   * Your plugin should support the xml dump and restore of the data-base. If your plugin has different data-object classes where at least one is
+   * embedded (as member) of another, the order should be given. Example: class GroupDO has a list of assigned PFUserDO's, then PFUserDO
+   * should be restored before GroupDO. Therefore PFUserDO should be before GroupDO in the returned list.
    */
   public Class< ? >[] getPersistentEntities()
   {
@@ -216,7 +219,6 @@ public abstract class AbstractPlugin
    * @see WebRegistry#register(String, Class)
    * @see WebRegistry#addMountPages(String, Class, Class)
    */
-  @SuppressWarnings("unchecked")
   protected AbstractPlugin registerWeb(final String id, final Class< ? extends WebPage> pageListClass,
       final Class< ? extends WebPage> pageEditClass)
   {
