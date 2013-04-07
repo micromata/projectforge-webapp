@@ -149,6 +149,7 @@ public class XmlDump
    */
   public XStreamSavingConverter restoreDatabase(final Reader reader)
   {
+    final List<AbstractPlugin> plugins = PluginsRegistry.instance().getPlugins();
     final XStreamSavingConverter xstreamSavingConverter = new XStreamSavingConverter() {
 
       @Override
@@ -194,7 +195,25 @@ public class XmlDump
           final AuftragDO auftrag = (AuftragDO) obj;
           return save(auftrag, auftrag.getPositionen());
         }
+        if (plugins != null) {
+          for (final AbstractPlugin plugin : plugins) {
+            plugin.onBeforeRestore(this, obj);
+          }
+        }
         return super.onBeforeSave(session, obj);
+      }
+
+      /**
+       * @see org.projectforge.database.xstream.XStreamSavingConverter#onAfterSave(java.lang.Object, java.io.Serializable)
+       */
+      @Override
+      public void onAfterSave(final Object obj, final Serializable id)
+      {
+        if (plugins != null) {
+          for (final AbstractPlugin plugin : plugins) {
+            plugin.onAfterRestore(this, obj, id);
+          }
+        }
       }
     };
     // UserRightDO is inserted on cascade while inserting PFUserDO.
@@ -204,9 +223,8 @@ public class XmlDump
         RechnungDO.class, EingangsrechnungDO.class, EmployeeSalaryDO.class, KostZuweisungDO.class,//
         UserPrefEntryDO.class, UserPrefDO.class, //
         AccessEntryDO.class, GroupTaskAccessDO.class, ConfigurationDO.class);
-    final List<AbstractPlugin> list = PluginsRegistry.instance().getPlugins();
-    if (list != null) {
-      for (final AbstractPlugin plugin : list) {
+    if (plugins != null) {
+      for (final AbstractPlugin plugin : plugins) {
         xstreamSavingConverter.appendOrderedType(plugin.getPersistentEntities());
       }
     }
