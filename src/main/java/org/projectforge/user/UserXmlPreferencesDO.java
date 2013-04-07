@@ -29,9 +29,13 @@ import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 /**
@@ -55,7 +59,7 @@ public class UserXmlPreferencesDO implements Serializable
 
   private Integer id;
 
-  private Integer userId;
+  private PFUserDO user;
 
   private String serializedSettings;
 
@@ -80,15 +84,32 @@ public class UserXmlPreferencesDO implements Serializable
     this.id = id;
   }
 
-  @Column(name = "user_id", nullable = false)
-  public Integer getUserId()
+  /**
+   * The employee assigned to this timesheet.
+   * @return the user
+   */
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false)
+  public PFUserDO getUser()
   {
-    return userId;
+    return user;
   }
 
-  public void setUserId(final Integer userId)
+  /**
+   * @param user the user to set
+   */
+  public UserXmlPreferencesDO setUser(final PFUserDO user)
   {
-    this.userId = userId;
+    this.user = user;
+    return this;
+  }
+
+  @Transient
+  public Integer getUserId()
+  {
+    if (this.user == null)
+      return null;
+    return user.getId();
   }
 
   /**

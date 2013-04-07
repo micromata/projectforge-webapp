@@ -62,6 +62,8 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
 
   private AccessChecker accessChecker;
 
+  private UserDao userDao;
+
   private final XStream xstream;
 
   public UserXmlPreferencesDao()
@@ -104,6 +106,14 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
   }
 
   /**
+   * @param userDao the userDao to set
+   */
+  public void setUserDao(final UserDao userDao)
+  {
+    this.userDao = userDao;
+  }
+
+  /**
    * Throws AccessException if the context user is not admin user and not owner of the UserXmlPreferences, meaning the given userId must be
    * the id of the context user.
    * @param userId
@@ -114,7 +124,7 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
       checkAccess(userId);
     }
     @SuppressWarnings("unchecked")
-    final List<UserXmlPreferencesDO> list = getHibernateTemplate().find("from UserXmlPreferencesDO u where u.userId = ? and u.key = ?",
+    final List<UserXmlPreferencesDO> list = getHibernateTemplate().find("from UserXmlPreferencesDO u where u.user.id = ? and u.key = ?",
         new Object[] { userId, key});
     Validate.isTrue(list.size() <= 1);
     if (list.size() == 1) {
@@ -132,7 +142,7 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
   {
     checkAccess(userId);
     @SuppressWarnings("unchecked")
-    final List<UserXmlPreferencesDO> list = getHibernateTemplate().find("from UserXmlPreferencesDO u where u.userId = ?", userId);
+    final List<UserXmlPreferencesDO> list = getHibernateTemplate().find("from UserXmlPreferencesDO u where u.user.id = ?", userId);
     return list;
   }
 
@@ -202,6 +212,18 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
     }
   }
 
+  /**
+   * @param sheet
+   * @param userId If null, then task will be set to null;
+   * @see BaseDao#getOrLoad(Integer)
+   */
+  public void setUser(final UserXmlPreferencesDO userPrefs, final Integer userId)
+  {
+    final PFUserDO user = userDao.getOrLoad(userId);
+    userPrefs.setUser(user);
+  }
+
+
   @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
   public void saveOrUpdate(final Integer userId, final String key, final Object entry, final boolean checkAccess)
   {
@@ -217,7 +239,7 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
       isNew = true;
       userPrefs = new UserXmlPreferencesDO();
       userPrefs.setCreated(date);
-      userPrefs.setUserId(userId);
+      setUser(userPrefs, userId);
       userPrefs.setKey(key);
     }
     if (xml.length() > 1000) {
