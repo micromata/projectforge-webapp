@@ -198,6 +198,15 @@ public class XStreamSavingConverter implements Converter
     return null;
   }
 
+  /**
+   * Does nothing at default.
+   * @param obj Please note: the id isn't yet set to this object!
+   * @param id The new id of the data-base.
+   */
+  public void onAfterSave(final Object obj, final Serializable id)
+  {
+  }
+
   protected Serializable save(final BaseDO< ? extends Serializable> obj,
       final Collection< ? extends BaseDO< ? extends Serializable>> children)
   {
@@ -306,6 +315,7 @@ public class XStreamSavingConverter implements Converter
         if (id == null) {
           id = save(obj);
         }
+        onAfterSave(obj, id);
         if (log.isDebugEnabled() == true) {
           log.debug("wrote object " + obj + " under id " + id);
         }
@@ -392,7 +402,7 @@ public class XStreamSavingConverter implements Converter
     }
   }
 
-  protected Serializable getNewId(final Class< ? > entityClass, final Serializable oldId)
+  public Serializable getNewId(final Class< ? > entityClass, final Serializable oldId)
   {
     return getNewId(getClassname4History(entityClass), oldId);
   }
