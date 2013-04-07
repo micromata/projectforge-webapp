@@ -164,7 +164,7 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
    * @param userPrefs
    * @param logError
    */
-  protected Object deserialize(final UserXmlPreferencesDO userPrefs, final boolean logError)
+  public Object deserialize(final UserXmlPreferencesDO userPrefs, final boolean logError)
   {
     String xml = null;
     try {
@@ -195,6 +195,19 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
     }
   }
 
+  public String serialize(final UserXmlPreferencesDO userPrefs, final Object value)
+  {
+    final String xml = xstream.toXML(value);
+    if (xml.length() > 1000) {
+      // Compress value:
+      final String compressed = GZIPHelper.compress(xml);
+      userPrefs.setSerializedSettings("!" + compressed);
+    } else {
+      userPrefs.setSerializedSettings(xml);
+    }
+    return xml;
+  }
+
   // REQUIRES_NEW needed for avoiding a lot of new data base connections from HibernateFilter.
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
   public void saveOrUpdateUserEntries(final Integer userId, final UserXmlPreferencesMap data, final boolean checkAccess)
@@ -223,7 +236,6 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
     userPrefs.setUser(user);
   }
 
-
   @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
   public void saveOrUpdate(final Integer userId, final String key, final Object entry, final boolean checkAccess)
   {
@@ -231,7 +243,6 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
       // Do nothing.
       return;
     }
-    final String xml = xstream.toXML(entry);
     boolean isNew = false;
     UserXmlPreferencesDO userPrefs = getUserPreferencesByUserId(userId, key, checkAccess);
     final Date date = new Date();
@@ -242,13 +253,7 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
       setUser(userPrefs, userId);
       userPrefs.setKey(key);
     }
-    if (xml.length() > 1000) {
-      // Compress value:
-      final String compressed = GZIPHelper.compress(xml);
-      userPrefs.setSerializedSettings("!" + compressed);
-    } else {
-      userPrefs.setSerializedSettings(xml);
-    }
+    final String xml = serialize(userPrefs, entry);
     userPrefs.setLastUpdate(date);
     userPrefs.setVersion();
     if (isNew == true) {
