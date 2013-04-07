@@ -23,7 +23,11 @@
 
 package org.projectforge.plugins.teamcal;
 
+import java.util.List;
+import java.util.Set;
+
 import org.projectforge.admin.UpdateEntry;
+import org.projectforge.database.xstream.XStreamSavingConverter;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
@@ -37,10 +41,15 @@ import org.projectforge.plugins.teamcal.event.TeamEventEditPage;
 import org.projectforge.plugins.teamcal.event.TeamEventListPage;
 import org.projectforge.plugins.teamcal.event.TeamEventRight;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFeedHook;
+import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFilter;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarPage;
 import org.projectforge.plugins.teamcal.integration.TeamcalTimesheetPluginComponentHook;
+import org.projectforge.plugins.teamcal.integration.TemplateCalendarProperties;
+import org.projectforge.plugins.teamcal.integration.TemplateEntry;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.registry.RegistryEntry;
+import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserXmlPreferencesDO;
 import org.projectforge.web.MenuItemDef;
 import org.projectforge.web.MenuItemDefId;
 import org.projectforge.web.MenuItemRegistry;
@@ -54,6 +63,8 @@ import org.projectforge.web.wicket.WicketApplication;
  */
 public class TeamCalPlugin extends AbstractPlugin
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalPlugin.class);
+
   public static final String ID = "teamCal";
 
   public static final String RESOURCE_BUNDLE_NAME = TeamCalPlugin.class.getPackage().getName() + ".TeamCalI18nResources";
@@ -137,5 +148,62 @@ public class TeamCalPlugin extends AbstractPlugin
   public UpdateEntry getInitializationUpdateEntry()
   {
     return TeamCalPluginUpdates.getInitializationUpdateEntry();
+  }
+
+  /**
+   * Migrates the calendar ids of the filter templates.
+   * @see org.projectforge.plugins.core.AbstractPlugin#onBeforeRestore(org.projectforge.database.xstream.XStreamSavingConverter,
+   *      java.lang.Object)
+   */
+  @Override
+  public void onBeforeRestore(final XStreamSavingConverter xstreamSavingConverter, final Object obj)
+  {
+    if (obj instanceof UserXmlPreferencesDO) {
+      final UserXmlPreferencesDO userPrefs = (UserXmlPreferencesDO) obj;
+      if (TeamCalCalendarPage.USERPREF_KEY.equals(userPrefs.getKey()) == false) {
+        return;
+      }
+      final Object userPrefsObj = userXmlPreferencesDao.deserialize(userPrefs, true);
+      if (userPrefsObj == null || userPrefsObj instanceof TeamCalCalendarFilter == false) {
+        return;
+      }
+      final TeamCalCalendarFilter filter = (TeamCalCalendarFilter) userPrefsObj;
+      final List<TemplateEntry> templates = filter.getTemplateEntries();
+      if (templates == null) {
+        // Nothing to do.
+        return;
+      }
+      for (final TemplateEntry template : templates) {
+        final Set<TemplateCalendarProperties> calendarPropertiesSet = template.getCalendarProperties();
+        if (calendarPropertiesSet != null && calendarPropertiesSet.size() > 0) {
+          for (final TemplateCalendarProperties props : calendarPropertiesSet) {
+            final Integer newCalendarId = getNewCalendarId(xstreamSavingConverter, props.getCalId());
+            if (newCalendarId == null) {
+              continue;
+            }
+            props.setCalId(newCalendarId);
+          }
+        }
+        final Integer calendarId = template.getDefaultCalendarId();
+        if (calendarId != null) {
+          template.setDefaultCalendarId(getNewCalendarId(xstreamSavingConverter, calendarId));
+        }
+        final Integer timesheetUserId = template.getTimesheetUserId();
+        if (timesheetUserId != null) {
+          template.setTimesheetUserId((Integer) xstreamSavingConverter.getNewId(PFUserDO.class, timesheetUserId));
+        }
+      }
+      userXmlPreferencesDao.serialize(userPrefs, filter);
+      return;
+    }
+  }
+
+  private Integer getNewCalendarId(final XStreamSavingConverter xstreamSavingConverter, final Integer oldCalendarId)
+  {
+    final Integer id = (Integer) xstreamSavingConverter.getNewId(TeamCalDO.class, oldCalendarId);
+    if (id == null) {
+      log.error("Oups, can't find calendar with id '" + oldCalendarId + "'.");
+    }
+    return id;
   }
 }
