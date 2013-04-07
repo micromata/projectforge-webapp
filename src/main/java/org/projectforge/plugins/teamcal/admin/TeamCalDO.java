@@ -31,6 +31,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Field;
@@ -262,6 +263,7 @@ public class TeamCalDO extends DefaultBaseDO
   public int hashCode()
   {
     final HashCodeBuilder hcb = new HashCodeBuilder().append(this.getId());
+    hcb.append(this.getTitle());
     return hcb.hashCode();
   }
 
@@ -281,6 +283,6 @@ public class TeamCalDO extends DefaultBaseDO
     final TeamCalDO other = (TeamCalDO) obj;
     if (id != other.getId())
       return false;
-    return true;
+    return StringUtils.equals(title, other.title);
   }
 }
