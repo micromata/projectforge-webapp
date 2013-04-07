@@ -504,6 +504,8 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
   {
     log.info("Administration: Database dump.");
     checkAccess();
+    // Fix the data-base history entries first:
+    databaseUpdateDao.fixDBHistoryEntries();
     final String ts = DateHelper.getTimestampAsFilenameSuffix(new Date());
     final String filename = "projectforgedump_" + ts + ".xml.gz";
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
