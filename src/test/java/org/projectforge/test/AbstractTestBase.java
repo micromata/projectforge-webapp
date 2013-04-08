@@ -44,6 +44,8 @@ import org.projectforge.access.AccessType;
 import org.projectforge.access.OperationType;
 import org.projectforge.common.DateHelper;
 import org.projectforge.core.SimpleHistoryEntry;
+import org.projectforge.plugins.core.AbstractPlugin;
+import org.projectforge.plugins.core.PluginsRegistry;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.GroupDO;
@@ -201,7 +203,17 @@ public class AbstractTestBase
             deleteFrom(hibernateTemplate, table);
           }
         }
-        deleteFrom(hibernateTemplate, "ToDoDO");
+        final List<AbstractPlugin> plugins = PluginsRegistry.instance().getPlugins();
+        if (plugins != null) {
+          for (final AbstractPlugin plugin : plugins) {
+            final Class< ? >[] classes = plugin.getPersistentEntities();
+            if (classes != null) {
+              for (int i = classes.length -1 ; i >= 0; i--) {
+                deleteFrom(hibernateTemplate, classes[i].getName());
+              }
+            }
+          }
+        }
         deleteFrom(hibernateTemplate, "TimesheetDO");
         deleteFrom(hibernateTemplate, "HRPlanningEntryDO");
         deleteFrom(hibernateTemplate, "HRPlanningDO");
