@@ -49,7 +49,11 @@ public class HibernateSearchUsersGroupsBridge implements FieldBridge
   public void set(final String name, final Object value, final Document document, final LuceneOptions luceneOptions)
   {
     final TeamCalDO calendar = (TeamCalDO) value;
-    final TeamCalDao teamCalDao = (TeamCalDao) Registry.instance().getDao(TeamCalDao.class);
+    final TeamCalDao teamCalDao = Registry.instance().getDao(TeamCalDao.class);
+    if (teamCalDao == null) {
+      log.warn("TeamCalDao not found in registry, this is OK for test-cases.");
+      return;
+    }
     final StringBuffer buf = new StringBuffer();
     appendGroups(teamCalDao.getSortedFullAccessGroups(calendar), buf);
     appendGroups(teamCalDao.getSortedReadonlyAccessGroups(calendar), buf);
