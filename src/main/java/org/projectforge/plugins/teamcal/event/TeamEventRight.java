@@ -30,6 +30,7 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRightAccessCheck;
 import org.projectforge.user.UserRightCategory;
 import org.projectforge.user.UserRightValue;
+import org.projectforge.user.UserRights;
 
 /**
  * Every user has access to own to-do's or to-do's he's assigned to. All other users have access if the to-do is assigned to a task and the
@@ -139,7 +140,7 @@ public class TeamEventRight extends UserRightAccessCheck<TeamEventDO>
       return true;
     }
     final Integer userId = user.getId();
-    if (teamCalRight.hasFullAccess(calendar, userId) == true) {
+    if (teamCalRight.hasFullAccess(calendar, userId) == true || UserRights.getAccessChecker().isDemoUser() == true) {
       return true;
     }
     return false;
