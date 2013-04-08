@@ -39,7 +39,6 @@ import org.projectforge.web.Menu;
 import org.projectforge.web.MenuBuilder;
 import org.projectforge.web.MenuEntry;
 import org.projectforge.web.UserFilter;
-import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.wicket.MySession;
 import org.projectforge.web.wicket.WicketUtils;
 
@@ -96,7 +95,7 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
       }
     }
     listViewPanel.add(new ListViewItemPanel(listViewPanel.newChildId(), new BookmarkablePageLink<String>(ListViewItemPanel.LINK_ID,
-        CalendarPage.class), getString("menu.mobile.fullWebVersion")).setAsExternalLink());
+        WicketUtils.getDefaultPage()), getString("menu.mobile.fullWebVersion")).setAsExternalLink());
 
     listViewPanel.add(new ListViewItemPanel(listViewPanel.newChildId(), new Link<String>(ListViewItemPanel.LINK_ID) {
       @Override
