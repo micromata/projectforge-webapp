@@ -142,6 +142,9 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
     subject = location = note = null;
     attendees = null;
     organizer = null;
+    reminderDuration = null;
+    reminderDurationType = null;
+    reminderActionType = null;
   }
 
   public TeamEventDO()
