@@ -288,6 +288,14 @@ public class Configuration extends AbstractCache
     return this.configurationParamMap.get(parameter);
   }
 
+  /**
+   * @return the testMode
+   */
+  public boolean isTestMode()
+  {
+    return testMode;
+  }
+
   @Override
   protected void refresh()
   {
