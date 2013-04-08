@@ -131,7 +131,6 @@ public class InitDatabaseDaoWithTestDataTest extends TestBase
     assertTrue(userList.size() > 0);
     for (final PFUserDO user : userList) {
       assertNull("For security reasons the stay-logged-in-key should be null.", user.getStayLoggedInKey());
-      assertEquals("For security reasons each password should be '" + testPassword + "'.", encryptedPassword, user.getPassword());
     }
 
     final List<GroupTaskAccessDO> accessList = accessDao.internalLoadAll();
