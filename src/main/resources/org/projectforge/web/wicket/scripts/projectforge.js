@@ -459,7 +459,13 @@ function doAfterAjaxHandling() {
 	$("fieldset > div > input[type=checkbox]").addClass("checkbox");
 	$(".jqui_checkbox").buttonset();
 	initializeComponents();
-    adaptSize();
+  adaptSize();
+  $(".mm_delayBlur").blur(function(e) {
+    var that = $(this);
+    setTimeout(function() {
+      that.siblings(".icon-remove").click();
+    }, 400);
+  });
 }
 
 function initColorPicker() {
