@@ -1,8 +1,6 @@
 Johannes
 --------
-- TaskSelectPanel: Der Taskpath wird nicht immer angepasst.
-- TaskSelectPanel: Was tun, wenn gespeichert wird und noch das Text-Input-Feld steht?
-- TaskSelectPanel: Wenn erneut gesucht wird, steht alter Suchtext noch da, lieber löschen?
+- Raum für ToDos
 
 Bugs
 ----

@@ -54,6 +54,7 @@ public abstract class TaskSelectAutoCompleteFormComponent extends PFAutoComplete
     setModel(new PropertyModel<TaskDO>(this, "taskDo"));
     getSettings().withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false);
     add(AttributeModifier.append("onkeypress", "if ( event.which == 13 ) { return false; }"));
+    add(AttributeModifier.append("class", "mm_delayBlur"));
     add(new AjaxFormComponentUpdatingBehavior("onChange") {
       private static final long serialVersionUID = 3681828654557441560L;
 
@@ -65,7 +66,15 @@ public abstract class TaskSelectAutoCompleteFormComponent extends PFAutoComplete
     });
   }
 
-  /**
+  @Override
+  protected void onBeforeRender()
+  {
+    super.onBeforeRender();
+    // this panel should always start with an empty input field, therefore delete the current model
+    taskDo = null;
+  }
+
+    /**
    * @see org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField#getChoices(java.lang.String)
    */
   @Override

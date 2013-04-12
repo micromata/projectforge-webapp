@@ -223,6 +223,8 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
     {
       // Task
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task"));
+      fs.getFieldset().setOutputMarkupId(true);
+      fs.getFieldset().setOutputMarkupPlaceholderTag(true);
       final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(data, "task"), parentPage,
           "taskId") {
         @Override
@@ -239,10 +241,9 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
         @Override
         protected void onModelSelected(final AjaxRequestTarget target, final TaskDO taskDo)
         {
-          final TimesheetDO timesheet = getData();
-          timesheet.setTask(taskDo);
-          // TODO store current values of all fields!
-          setResponsePage(new TimesheetEditPage(timesheet));
+          refresh();
+          target.add(fs.getFieldset());
+          target.add(cost2ChoiceFieldset.getFieldset());
         }
       };
       fs.add(taskSelectPanel);
@@ -252,6 +253,8 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
     if (cost2Exists == true) {
       // Cost 2 entries does exist in the data-base.
       cost2ChoiceFieldset = gridBuilder.newFieldset(getString("fibu.kost2"));
+      cost2ChoiceFieldset.getFieldset().setOutputMarkupId(true);
+      cost2ChoiceFieldset.getFieldset().setOutputMarkupPlaceholderTag(true);
       cost2List = taskTree.getKost2List(data.getTaskId());
       final LabelValueChoiceRenderer<Integer> cost2ChoiceRenderer = getCost2LabelValueChoiceRenderer(parentPage.getBaseDao(), cost2List,
           data, null);

@@ -291,6 +291,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
       protected void onModelSelected(final AjaxRequestTarget target, final TaskDO taskDo)
       {
         ajaxTaskSelectMode = false;
+        target.appendJavaScript("hideAllTooltips();");
         TaskSelectPanel.this.setModelObject(taskDo);
         TaskSelectPanel.this.onModelSelected(target, taskDo);
       }
@@ -308,6 +309,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
         protected void onEvent(final AjaxRequestTarget target)
         {
           ajaxTaskSelectMode = true;
+          target.appendJavaScript("hideAllTooltips();");
           target.add(divContainer);
           target.add(userselectContainer);
           target.focusComponent(searchTaskInput);
@@ -323,6 +325,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
         protected void onEvent(final AjaxRequestTarget target)
         {
           ajaxTaskSelectMode = false;
+          target.appendJavaScript("hideAllTooltips();");
           target.add(divContainer);
           target.add(userselectContainer);
         }
