@@ -60,7 +60,7 @@ public class LoginDefaultHandler implements LoginHandler
   public void initialize()
   {
     final Registry registry = Registry.instance();
-    userDao = (UserDao) registry.getDao(UserDao.class);
+    userDao = registry.getDao(UserDao.class);
     dataSource = registry.getDataSource();
     hibernateTemplate = registry.getHibernateTemplate();
   }
@@ -81,7 +81,7 @@ public class LoginDefaultHandler implements LoginHandler
       final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
       try {
         final PFUserDO resUser = new PFUserDO();
-        final String sql = "select pk, firstname, lastname from t_pf_user where username=? and password=? and deleted=false";
+        final String sql = "select pk, firstname, lastname from t_pf_user where username=? and password=? and deleted=false and deactivated=false and restricted_user=false";
         jdbc.query(sql, new Object[] { username, encryptedPassword}, new ResultSetExtractor() {
           @Override
           public Object extractData(final ResultSet rs) throws SQLException, DataAccessException
@@ -103,6 +103,7 @@ public class LoginDefaultHandler implements LoginHandler
         if (isAdminUser(resUser) == false) {
           return loginResult.setLoginResultStatus(LoginResultStatus.ADMIN_LOGIN_REQUIRED);
         }
+        userDao.getUserGroupCache().internalSetAdminUser(resUser); // User is now marked as admin user.
         return loginResult.setLoginResultStatus(LoginResultStatus.SUCCESS).setUser(resUser);
       } catch (final Exception ex) {
         log.error(ex.getMessage(), ex);
