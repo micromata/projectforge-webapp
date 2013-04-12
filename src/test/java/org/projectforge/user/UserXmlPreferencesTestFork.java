@@ -31,7 +31,7 @@ import org.projectforge.access.AccessException;
 import org.projectforge.test.TestBase;
 
 
-public class UserXmlPreferencesTest extends TestBase
+public class UserXmlPreferencesTestFork extends TestBase
 {
   UserXmlPreferencesCache userXmlPreferencesCache;
 
