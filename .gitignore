@@ -5,3 +5,4 @@ work
 projectforge-webapp.iml
 /testsystem
 src/main/resources/rebel.xml
+testsystem-*.tgz
