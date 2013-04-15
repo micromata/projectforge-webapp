@@ -38,6 +38,7 @@ import org.projectforge.common.AbstractCache;
 import org.projectforge.common.StringHelper;
 import org.projectforge.fibu.EmployeeDO;
 import org.projectforge.fibu.ProjektDO;
+import org.projectforge.web.UserFilter;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
 /**
@@ -569,5 +570,15 @@ public class UserGroupCache extends AbstractCache
       ugIdMap.put(userId, set);
     }
     return set;
+  }
+
+  public synchronized void internalSetAdminUser(final PFUserDO adminUser)
+  {
+    if (UserFilter.isUpdateRequiredFirst() == false) {
+      throw new IllegalStateException(
+          "Can't set admin user internally! This method is only available if system is under maintenance (update required first is true)!");
+    }
+    checkRefresh();
+    this.adminUsers.add(adminUser.getId());
   }
 }

@@ -11,6 +11,8 @@ Bugs
 - Bei Übernahme Ereignisse in Zeitberichte POP-UP mit Aufgabe/Kostenstelle/Templates vorblenden.
 - ics aus Mail auf ProjectForge ziehen.
 - Normalize ex-dates (as UTC-ISO-dates/date-times)
+- Demo-Userpreferences nur in Session speichern.
+- Session-Time-out ProjectForge deutlich erhöhen.
 
 TeamCal
 -------

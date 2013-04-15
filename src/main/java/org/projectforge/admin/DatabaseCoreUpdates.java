@@ -56,9 +56,9 @@ public class DatabaseCoreUpdates
   {
     final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
     // /////////////////////////////////////////////////////////////////
-    // 4.3.2
+    // 5.0
     // /////////////////////////////////////////////////////////////////
-    list.add(new UpdateEntryImpl(CORE_REGION_ID, "4.3.2", "2013-02-15",
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "5.0", "2013-02-15",
         "Adds t_fibu_rechnung.konto, t_pf_user.ssh_public_key, fixes contract.IN_PROGRES -> contract.IN_PROGRESS") {
       final Table rechnungTable = new Table(RechnungDO.class);
       final Table userTable = new Table(PFUserDO.class);

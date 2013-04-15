@@ -26,6 +26,7 @@ package org.projectforge.web.admin;
 import java.util.TimeZone;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.repeater.RepeatingView;
@@ -56,6 +57,8 @@ import org.projectforge.web.wicket.flowlayout.RadioGroupPanel;
 public class SetupForm extends AbstractForm<SetupForm, SetupPage>
 {
   private static final long serialVersionUID = -277853572580468505L;
+
+  private static final String MAGIC_PASSWORD = "******";
 
   @SpringBean(name = "userDao")
   private UserDao userDao;
@@ -118,24 +121,22 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("username"));
       fs.add(new RequiredMaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(this, "adminUsername"), 100));
     }
-    final PasswordTextField passwordField = new PasswordTextField(PasswordPanel.WICKET_ID, new PropertyModel<String>(this, "password"));
+    final PasswordTextField passwordField = new PasswordTextField(PasswordPanel.WICKET_ID, new PropertyModel<String>(this, "password")) {
+      @Override
+      protected void onComponentTag(final ComponentTag tag)
+      {
+        super.onComponentTag(tag);
+        if (encryptedPassword == null) {
+          tag.put("value", "");
+        } else if (StringUtils.isEmpty(getConvertedInput()) == false) {
+          tag.put("value", MAGIC_PASSWORD);
+        }
+      }
+    };
     {
       // Password
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("password"));
       passwordField.setRequired(true); // No setReset(true), otherwise uploading and re-entering passwords is a real pain.
-      passwordField.add(new IValidator<String>() {
-        @Override
-        public void validate(final IValidatable<String> validatable)
-        {
-          final String input = validatable.getValue();
-          final String errorMsgKey = userDao.checkPasswordQuality(input);
-          if (errorMsgKey != null) {
-            passwordField.error(getString(errorMsgKey));
-          } else {
-            encryptedPassword = userDao.encryptPassword(input);
-          }
-        }
-      });
       fs.add(passwordField);
       WicketUtils.setFocus(passwordField);
     }
@@ -143,7 +144,18 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
       // Password repeat
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("passwordRepeat"));
       final PasswordTextField passwordRepeatField = new PasswordTextField(PasswordPanel.WICKET_ID, new PropertyModel<String>(this,
-          "passwordRepeat"));
+          "passwordRepeat")) {
+        @Override
+        protected void onComponentTag(final ComponentTag tag)
+        {
+          super.onComponentTag(tag);
+          if (encryptedPassword == null) {
+            tag.put("value", "");
+          } else if (StringUtils.isEmpty(getConvertedInput()) == false) {
+            tag.put("value", MAGIC_PASSWORD);
+          }
+        }
+      };
       passwordRepeatField.setRequired(true); // No setReset(true), otherwise uploading and re-entering passwords is a real pain.
       passwordRepeatField.add(new IValidator<String>() {
         @Override
@@ -153,6 +165,17 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
           final String passwordInput = passwordField.getConvertedInput();
           if (StringUtils.equals(input, passwordInput) == false) {
             passwordRepeatField.error(getString("user.error.passwordAndRepeatDoesNotMatch"));
+            encryptedPassword = null;
+            return;
+          }
+          if (MAGIC_PASSWORD.equals(passwordInput) == false || encryptedPassword == null) {
+            final String errorMsgKey = userDao.checkPasswordQuality(passwordInput);
+            if (errorMsgKey != null) {
+              encryptedPassword = null;
+              passwordField.error(getString(errorMsgKey));
+            } else {
+              encryptedPassword = userDao.encryptPassword(passwordInput);
+            }
           }
         }
       });
@@ -169,7 +192,8 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
     {
       // Calendar domain
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.param.calendarDomain"));
-      final RequiredMaxLengthTextField textField = new RequiredMaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(this, "calendarDomain"), ConfigurationDO.PARAM_LENGTH);
+      final RequiredMaxLengthTextField textField = new RequiredMaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(this,
+          "calendarDomain"), ConfigurationDO.PARAM_LENGTH);
       fs.add(textField);
       textField.add(new IValidator<String>() {
         @Override
@@ -184,13 +208,15 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
     }
     {
       // E-Mail sysops
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.param.systemAdministratorEMail.label"), getString("email"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.param.systemAdministratorEMail.label"),
+          getString("email"));
       fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(this, "sysopEMail"), ConfigurationDO.PARAM_LENGTH));
       fs.addHelpIcon(getString("administration.configuration.param.systemAdministratorEMail.description"));
     }
     {
       // E-Mail sysops
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.param.feedbackEMail.label"), getString("email"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.param.feedbackEMail.label"),
+          getString("email"));
       fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(this, "feedbackEMail"), ConfigurationDO.PARAM_LENGTH));
       fs.addHelpIcon(getString("administration.configuration.param.feedbackEMail.description"));
     }
