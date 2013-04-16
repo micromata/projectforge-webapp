@@ -202,7 +202,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       // NOTE
       final FieldsetPanel fieldSet = gridBuilder.newFieldset(getString("plugins.teamcal.event.note"));
       final MaxLengthTextArea noteField = new MaxLengthTextArea(fieldSet.getTextAreaId(), new PropertyModel<String>(data, "note"));
-      fieldSet.add(noteField);
+      fieldSet.add(noteField).setAutogrow();
       if (access == false)
         fieldSet.setEnabled(false);
     }
