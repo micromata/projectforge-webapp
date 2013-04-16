@@ -300,7 +300,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
     userselectContainer.add(searchTaskInput);
     // opener link
     final WebMarkupContainer searchTaskInputOpen = new WebMarkupContainer("searchTaskInputOpen");
-    if (WebConfiguration.isDevelopmentMode() == true) {
+    if (isQuickSearchEnabled() == true) {
       WicketUtils.addTooltip(searchTaskInputOpen, getString("quickselect"));
       searchTaskInputOpen.add(new AjaxEventBehavior("click") {
         private static final long serialVersionUID = -938527474172868488L;
@@ -398,5 +398,13 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
   public FormComponent< ? > getFormComponent()
   {
     return null;
+  }
+
+  /**
+   * Hook method which indicates if the quick task search should be enabled. false by default
+   * @return
+   */
+  protected boolean isQuickSearchEnabled() {
+      return false;
   }
 }

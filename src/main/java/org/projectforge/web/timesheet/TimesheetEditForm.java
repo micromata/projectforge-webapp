@@ -245,6 +245,11 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
           target.add(fs.getFieldset());
           target.add(cost2ChoiceFieldset.getFieldset());
         }
+
+        @Override
+        protected boolean isQuickSearchEnabled() {
+            return true;
+        }
       };
       fs.add(taskSelectPanel);
       taskSelectPanel.init();
