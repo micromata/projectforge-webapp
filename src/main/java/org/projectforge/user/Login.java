@@ -58,7 +58,16 @@ public class Login
     if (username == null || password == null) {
       return new LoginResult().setLoginResultStatus(LoginResultStatus.FAILED);
     }
-    return loginHandler.checkLogin(username, password);
+    final LoginResult result = loginHandler.checkLogin(username, password);
+    if (result.getLoginResultStatus() == LoginResultStatus.FAILED) {
+      try {
+        // Avoid brute force attack:
+        Thread.sleep(1000);
+      } catch (final InterruptedException ex) {
+        log.fatal("Exception encountered while Thread.sleep(1000): " + ex, ex);
+      }
+    }
+    return result;
   }
 
   /**
