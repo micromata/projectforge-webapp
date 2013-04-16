@@ -41,7 +41,7 @@ import org.projectforge.user.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * 
+ * Does the authentication stuff for restfull requests.
  * @author Daniel Ludwig (d.ludwig@micromata.de)
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
