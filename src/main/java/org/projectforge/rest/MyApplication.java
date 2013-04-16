@@ -48,6 +48,7 @@ public class MyApplication extends Application
   {
     final Set<Class< ? >> classes = new HashSet<Class< ? >>();
     // register root resource
+    classes.add(AuthenticationRest.class);
     classes.add(TaskDaoRest.class);
     return classes;
   }
