@@ -133,9 +133,12 @@ public class TaskFilter extends BaseSearchFilter
   /**
    * Needed by TaskTreeTable to show and hide nodes.<br/>
    * Don't forget to call resetMatch before!
+   * @param node Node to check.
+   * @param taskDao Needed for access checking.
+   * @param user Needed for access checking.
    * @see org.projectforge.web.tree.TreeTableFilter#match(org.projectforge.web.tree.TreeTableNode)
    */
-  public boolean match(final TaskNode node)
+  public boolean match(final TaskNode node, final TaskDao taskDao, final PFUserDO user)
   {
     Validate.notNull(node);
     Validate.notNull(node.getTask());
@@ -146,7 +149,7 @@ public class TaskFilter extends BaseSearchFilter
     if (StringUtils.isBlank(this.searchString) == true) {
       return isVisibleByStatus(node, task) || node.isRootNode() == true;
     } else {
-      if (isVisibleBySearchString(node, task) == true) {
+      if (isVisibleBySearchString(node, task, taskDao, user) == true) {
         return isVisibleByStatus(node, task) || node.isRootNode() == true;
       } else {
         if (node.getParent() != null && node.getParent().isRootNode() == false && isAncestorVisibleBySearchString(node.getParent()) == true) {
@@ -174,7 +177,7 @@ public class TaskFilter extends BaseSearchFilter
    * @param task
    * @return true if the search string matches at least one field of the task of if this methods returns true for any descendant.
    */
-  private boolean isVisibleBySearchString(final TaskNode node, final TaskDO task)
+  private boolean isVisibleBySearchString(final TaskNode node, final TaskDO task, final TaskDao taskDao, final PFUserDO user)
   {
     final Boolean cachedVisibility = taskVisibility.get(task.getId());
     if (cachedVisibility != null) {
@@ -184,8 +187,11 @@ public class TaskFilter extends BaseSearchFilter
       taskVisibility.put(task.getId(), false);
       return false;
     }
-    final PFUserDO user = Registry.instance().getUserGroupCache().getUser(task.getResponsibleUserId());
-    final String username = user != null ? user.getFullname() + " " + user.getUsername() : null;
+    if (taskDao != null && taskDao.hasSelectAccess(user, node.getTask(), false) == false) {
+      return false;
+    }
+    final PFUserDO responsibleUser = Registry.instance().getUserGroupCache().getUser(task.getResponsibleUserId());
+    final String username = responsibleUser != null ? responsibleUser.getFullname() + " " + responsibleUser.getUsername() : null;
     if (StringUtils.containsIgnoreCase(task.getTitle(), this.searchString) == true
         || StringUtils.containsIgnoreCase(task.getReference(), this.searchString) == true
         || StringUtils.containsIgnoreCase(task.getDescription(), this.searchString) == true
@@ -198,7 +204,7 @@ public class TaskFilter extends BaseSearchFilter
     } else if (node.hasChilds() == true && node.isRootNode() == false) {
       for (final TaskNode childNode : node.getChilds()) {
         final TaskDO childTask = childNode.getTask();
-        if (isVisibleBySearchString(childNode, childTask) == true) {
+        if (isVisibleBySearchString(childNode, childTask, taskDao, user) == true) {
           taskVisibility.put(childTask.getId(), true);
           return true;
         }

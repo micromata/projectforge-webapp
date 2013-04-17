@@ -143,7 +143,7 @@ public class TaskTreeProvider implements ITreeProvider<TaskNode>
       }
     });
     if (appendRootNode == true) {
-      if (taskFilter.match(taskTree.getRootTaskNode()) == true) {
+      if (taskFilter.match(taskTree.getRootTaskNode(), null, null) == true) {
         list.add(taskTree.getRootTaskNode());
       }
     }
@@ -152,7 +152,7 @@ public class TaskTreeProvider implements ITreeProvider<TaskNode>
     }
     final PFUserDO user = PFUserContext.getUser();
     for (final TaskNode node : nodes) {
-      if (taskFilter.match(node) == true && taskDao.hasSelectAccess(user, node.getTask(), false) == true) {
+      if (taskFilter.match(node, taskDao, user) == true && taskDao.hasSelectAccess(user, node.getTask(), false) == true) {
         list.add(node);
       }
     }
