@@ -196,6 +196,7 @@ public class TeamCalFilterDialog extends ModalDialog
   {
     clearContent();
     gridBuilder.newSplitPanel(GridSize.COL50);
+    filter.sort();
     addFilterFieldset();
     gridBuilder.newSplitPanel(GridSize.COL50);
     addDefaultCalenderSelection();

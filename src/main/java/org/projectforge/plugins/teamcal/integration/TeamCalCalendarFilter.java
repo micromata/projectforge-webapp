@@ -111,7 +111,7 @@ public class TeamCalCalendarFilter extends AbstractCalendarFilter
   {
     synchronized (templateEntries) {
       templateEntries.add(entry);
-      Collections.sort(templateEntries);
+      sort();
       setActiveTemplateEntry(entry);
     }
   }
@@ -129,6 +129,11 @@ public class TeamCalCalendarFilter extends AbstractCalendarFilter
       }
     }
     activeTemplateEntry = null;
+  }
+
+  public void sort()
+  {
+    Collections.sort(templateEntries);
   }
 
   /**
