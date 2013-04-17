@@ -58,7 +58,7 @@ public class AuthenticationRest
    */
   @GET
   @Path("getToken")
-  @Produces(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_XML)
   public Response getToken()
   {
     final PFUserDO user = PFUserContext.getUser();
@@ -67,13 +67,13 @@ public class AuthenticationRest
       throw new IllegalArgumentException("No user given for the rest call: authenticate/getToken.");
     }
     final UserObject userObject = new UserObject(user);
-    user.setAuthenticationToken(user.getAuthenticationToken());
+    userObject.setAuthenticationToken(user.getAuthenticationToken());
     return Response.ok(userObject).build();
   }
 
   @GET
   @Path("initialContact")
-  @Produces(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_XML)
   public Response initialContact(@QueryParam("clientVersion") final String clientVersionString)
   {
     final PFUserDO user = PFUserContext.getUser();

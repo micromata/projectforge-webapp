@@ -31,21 +31,20 @@ import com.sun.jersey.api.client.WebResource;
 
 public class RestClientMain
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(RestClientMain.class);
+
   private static final String URL = "http://localhost:8080/ProjectForge/rest";
 
   public static void main(final String[] args)
   {
     final Client client = Client.create();
     final WebResource webResource = client.resource(URL + "/authenticate/getToken");
-    webResource.header(RestUserFilter.AUTHENTICATION_USERNAME, "kai").header(RestUserFilter.AUTHENTICATION_PASSWORD, "test123");
-    final ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+    final ClientResponse response = webResource.accept(MediaType.APPLICATION_XML).header(RestUserFilter.AUTHENTICATION_USERNAME, "kai")
+        .header(RestUserFilter.AUTHENTICATION_PASSWORD, "test123").get(ClientResponse.class);
     if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
       throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
     }
     final String output = response.getEntity(String.class);
-    if ("OK".equals(output) == false) {
-      throw new RuntimeException("Initialization of ProjectForge's storage failed: " + output);
-    }
-
+    log.info(output);
   }
 }
