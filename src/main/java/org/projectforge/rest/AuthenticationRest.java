@@ -52,6 +52,7 @@ public class AuthenticationRest
   private UserDao userDao;
 
   /**
+   * Authentication via http header authenticationUsername and authenticationPassword.<br/>
    * For getting the user's authentication token. This token can be stored in the client (e. g. mobile app). The user's password shouldn't
    * be stored in the client for security reasons. The authentication token is renewable through the ProjectForge's web app (my account).
    * @return {@link UserObject}
@@ -71,6 +72,11 @@ public class AuthenticationRest
     return Response.ok(userObject).build();
   }
 
+  /**
+   * Authentication via http header authenticationUserId and authenticationToken.
+   * @param clientVersionString
+   * @return
+   */
   @GET
   @Path("initialContact")
   @Produces(MediaType.APPLICATION_XML)

@@ -37,6 +37,7 @@ public class RestClientMain
 
   public static void main(final String[] args)
   {
+    // http://localhost:8080/ProjectForge/rest/authenticate/getToken // username / password
     final Client client = Client.create();
     final WebResource webResource = client.resource(URL + "/authenticate/getToken");
     final ClientResponse response = webResource.accept(MediaType.APPLICATION_XML).header(RestUserFilter.AUTHENTICATION_USERNAME, "kai")
@@ -46,5 +47,7 @@ public class RestClientMain
     }
     final String output = response.getEntity(String.class);
     log.info(output);
+
+    // http://localhost:8080/ProjectForge/rest/authenticate/initialContact?clientVersion=5.0 // userId / token
   }
 }

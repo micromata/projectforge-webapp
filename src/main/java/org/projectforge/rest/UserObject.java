@@ -39,6 +39,8 @@ public class UserObject
 {
   private String username, firstName, lastName, email;
 
+  private Integer id;
+
   private String authenticationToken;
 
   public UserObject()
@@ -48,6 +50,7 @@ public class UserObject
   public UserObject(final PFUserDO user)
   {
     this.username = user.getUsername();
+    this.id = user.getId();
     this.firstName = user.getFirstname();
     this.lastName = user.getLastname();
     this.email = user.getEmail();
@@ -62,6 +65,17 @@ public class UserObject
   public void setUsername(final String username)
   {
     this.username = username;
+  }
+
+  @XmlAttribute
+  public Integer getId()
+  {
+    return id;
+  }
+
+  public void setId(final Integer id)
+  {
+    this.id = id;
   }
 
   @XmlAttribute
