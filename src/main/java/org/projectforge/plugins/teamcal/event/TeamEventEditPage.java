@@ -29,6 +29,7 @@ import java.util.Date;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -180,6 +181,27 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
           setResponsePage(timesheetEditPage);
         };
       }, getString("plugins.teamcal.event.convert2Timesheet"));
+      addContentMenuEntry(menu);
+    }
+    if (isNew() == true) {
+      @SuppressWarnings("serial")
+      final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(),
+          new SubmitLink(ContentMenuEntryPanel.LINK_ID, form) {
+        @Override
+        public void onSubmit()
+        {
+          final TeamEventDO event = getData();
+          final TimesheetDO timesheet = new TimesheetDO();
+          if (event != null) {
+            timesheet.setStartDate(event.getStartDate());
+            timesheet.setStopTime(event.getEndDate());
+          }
+          if (returnToPage == null) {
+            returnToPage = new TeamCalCalendarPage(new PageParameters());
+          }
+          setResponsePage(new TimesheetEditPage(timesheet).setReturnToPage(returnToPage));
+        };
+      }.setDefaultFormProcessing(false), getString("plugins.teamcal.switchToTimesheetButton"));
       addContentMenuEntry(menu);
     }
   }
