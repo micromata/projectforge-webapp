@@ -27,8 +27,8 @@
   </properties>
   <repositories>
     <repository>
-      <id>org.projectforge</id>
-      <name>ProjectForge</name>
+      <id>org.projectforge.repo</id>
+      <name>ProjectForge-REPO</name>
       <url>http://www.projectforge.org/nexus/content/repositories/ProjectForge-Snapshots</url> <!-- automatically set -->
     </repository>
   </repositories>
