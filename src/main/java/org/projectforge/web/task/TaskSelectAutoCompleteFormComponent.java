@@ -110,7 +110,7 @@ public abstract class TaskSelectAutoCompleteFormComponent extends PFAutoComplete
       return "";
     }
 
-    return createPath(value.getId()) + value.getTitle();
+    return createPath(value.getId());
   }
 
   /**
@@ -120,14 +120,16 @@ public abstract class TaskSelectAutoCompleteFormComponent extends PFAutoComplete
    */
   private String createPath(final Integer taskId)
   {
-    String path = "";
+    StringBuilder builder = new StringBuilder();
     final List<TaskNode> nodeList = taskTree.getPathToRoot(taskId);
+    final String pipeSeparator =  " | ";
+    String separator = "";
     for (final TaskNode node : nodeList) {
-      if (node.getId() != taskId) {
-        path += node.getTask().getTitle() + " | ";
-      }
+      builder.append(separator);
+      builder.append(node.getTask().getTitle());
+      separator = pipeSeparator;
     }
-    return path;
+    return builder.toString();
   }
 
   protected void notifyChildren()
