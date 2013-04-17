@@ -110,13 +110,7 @@ public abstract class TaskSelectAutoCompleteFormComponent extends PFAutoComplete
       return "";
     }
 
-    String result = createPath(value.getId());
-    String title = value.getTitle();
-      
-    if (result != null && result.contains(title) == false) {
-        result += " | " + title;
-    }
-    return result;
+    return createPath(value.getId());
   }
 
   /**
@@ -128,14 +122,12 @@ public abstract class TaskSelectAutoCompleteFormComponent extends PFAutoComplete
   {
     StringBuilder builder = new StringBuilder();
     final List<TaskNode> nodeList = taskTree.getPathToRoot(taskId);
-    final String secondSeparator =  " | ";
+    final String pipeSeparator =  " | ";
     String separator = "";
     for (final TaskNode node : nodeList) {
-      if (node.getId() != taskId) {
-        builder.append(separator);
-        builder.append(node.getTask().getTitle());
-        separator = secondSeparator;
-      }
+      builder.append(separator);
+      builder.append(node.getTask().getTitle());
+      separator = pipeSeparator;
     }
     return builder.toString();
   }
