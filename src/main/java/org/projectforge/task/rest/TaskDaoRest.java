@@ -80,10 +80,6 @@ public class TaskDaoRest {
     return Response.ok(t).build();
   }
 
-  public TaskDao getTaskDao() {
-    return taskDao;
-  }
-
   public void setTaskDao(final TaskDao taskDao) {
     this.taskDao = taskDao;
   }

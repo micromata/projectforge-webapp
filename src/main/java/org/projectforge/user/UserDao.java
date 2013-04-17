@@ -259,8 +259,6 @@ public class UserDao extends BaseDao<PFUserDO>
     Validate.notNull(username);
     Validate.notNull(encryptedPassword);
 
-    List<PFUserDO> list = getHibernateTemplate().find("from PFUserDO u where u.username = ? and u.password = ?",
-        new Object[] { username, encryptedPassword});
     PFUserDO user = getUser(username, encryptedPassword);
     if (user != null) {
       final int loginFailures = user.getLoginFailures();
@@ -280,7 +278,7 @@ public class UserDao extends BaseDao<PFUserDO>
       contextUser.setPassword(null);
       return contextUser;
     }
-    list = getHibernateTemplate().find("from PFUserDO u where u.username = ?", username);
+    final List<PFUserDO> list = getHibernateTemplate().find("from PFUserDO u where u.username = ?", username);
     if (list != null && list.isEmpty() == false && list.get(0) != null) {
       user = list.get(0);
       user.setLoginFailures(user.getLoginFailures() + 1);
@@ -500,7 +498,7 @@ public class UserDao extends BaseDao<PFUserDO>
    * @param userId
    * @return
    */
-  private String getCachedAuthenticationToken(final Integer userId)
+  public String getCachedAuthenticationToken(final Integer userId)
   {
     final PFUserDO user = userGroupCache.getUser(userId);
     final String authenticationToken = user.getAuthenticationToken();
@@ -518,7 +516,7 @@ public class UserDao extends BaseDao<PFUserDO>
    */
   public String decrypt(final Integer userId, final String encryptedString)
   {
-    final PFUserDO user = userGroupCache.getUser(userId); // for faster access (due to permanent usage e. g. by subscription of calendars
+    //final PFUserDO user = userGroupCache.getUser(userId); // for faster access (due to permanent usage e. g. by subscription of calendars
     // (ics).
     final String authenticationToken = StringUtils.rightPad(getCachedAuthenticationToken(userId), 32, "x");
     return Crypt.decrypt(authenticationToken, encryptedString);
