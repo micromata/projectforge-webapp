@@ -23,9 +23,6 @@
 
 package org.projectforge.rest;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.projectforge.user.PFUserDO;
 
 /**
@@ -34,7 +31,6 @@ import org.projectforge.user.PFUserDO;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-@XmlRootElement(name = "user")
 public class UserObject
 {
   private String username, firstName, lastName, email;
@@ -56,7 +52,6 @@ public class UserObject
     this.email = user.getEmail();
   }
 
-  @XmlAttribute
   public String getUsername()
   {
     return username;
@@ -67,7 +62,6 @@ public class UserObject
     this.username = username;
   }
 
-  @XmlAttribute
   public Integer getId()
   {
     return id;
@@ -78,7 +72,6 @@ public class UserObject
     this.id = id;
   }
 
-  @XmlAttribute
   public String getFirstName()
   {
     return firstName;
@@ -89,7 +82,6 @@ public class UserObject
     this.firstName = firstName;
   }
 
-  @XmlAttribute
   public String getLastName()
   {
     return lastName;
@@ -100,7 +92,6 @@ public class UserObject
     this.lastName = lastName;
   }
 
-  @XmlAttribute
   public String getEmail()
   {
     return email;
@@ -111,7 +102,6 @@ public class UserObject
     this.email = email;
   }
 
-  @XmlAttribute
   public String getAuthenticationToken()
   {
     return authenticationToken;

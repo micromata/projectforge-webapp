@@ -37,6 +37,8 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.gson.Gson;
+
 /**
  * REST interface for authentication (tests) and getting the authentication token on initial contact.
  * 
@@ -59,7 +61,7 @@ public class AuthenticationRest
    */
   @GET
   @Path("getToken")
-  @Produces(MediaType.APPLICATION_XML)
+  @Produces(MediaType.APPLICATION_JSON)
   public Response getToken()
   {
     final PFUserDO user = PFUserContext.getUser();
@@ -69,7 +71,8 @@ public class AuthenticationRest
     }
     final UserObject userObject = new UserObject(user);
     userObject.setAuthenticationToken(user.getAuthenticationToken());
-    return Response.ok(userObject).build();
+    final String json = new Gson().toJson(userObject);
+    return Response.ok(json).build();
   }
 
   /**
@@ -79,7 +82,7 @@ public class AuthenticationRest
    */
   @GET
   @Path("initialContact")
-  @Produces(MediaType.APPLICATION_XML)
+  @Produces(MediaType.APPLICATION_JSON)
   public Response initialContact(@QueryParam("clientVersion") final String clientVersionString)
   {
     final PFUserDO user = PFUserContext.getUser();
@@ -101,7 +104,8 @@ public class AuthenticationRest
     } else {
       info.setStatus(ServerInfo.STATUS_OK);
     }
-    return Response.ok(info).build();
+    final String json = new Gson().toJson(info);
+    return Response.ok(json).build();
   }
 
   /**

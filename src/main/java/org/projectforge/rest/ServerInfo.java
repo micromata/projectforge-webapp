@@ -23,10 +23,6 @@
 
 package org.projectforge.rest;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.projectforge.user.PFUserDO;
 
 /**
@@ -34,7 +30,6 @@ import org.projectforge.user.PFUserDO;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-@XmlRootElement(name = "server-info")
 public class ServerInfo
 {
   public static final String STATUS_OK = "OK";
@@ -61,7 +56,6 @@ public class ServerInfo
     this.version = version;
   }
 
-  @XmlAttribute
   public String getVersion()
   {
     return version;
@@ -72,7 +66,6 @@ public class ServerInfo
     this.version = version;
   }
 
-  @XmlElement
   public UserObject getUser()
   {
     return user;
@@ -86,7 +79,6 @@ public class ServerInfo
   /**
    * @return the status of the client server connection.
    */
-  @XmlAttribute
   public String getStatus()
   {
     return status;

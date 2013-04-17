@@ -40,7 +40,7 @@ public class RestClientMain
     // http://localhost:8080/ProjectForge/rest/authenticate/getToken // username / password
     final Client client = Client.create();
     final WebResource webResource = client.resource(URL + "/authenticate/getToken");
-    final ClientResponse response = webResource.accept(MediaType.APPLICATION_XML).header(RestUserFilter.AUTHENTICATION_USERNAME, "kai")
+    final ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).header(RestUserFilter.AUTHENTICATION_USERNAME, "kai")
         .header(RestUserFilter.AUTHENTICATION_PASSWORD, "test123").get(ClientResponse.class);
     if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
       throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
