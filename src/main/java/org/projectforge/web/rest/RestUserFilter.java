@@ -80,12 +80,12 @@ public class RestUserFilter implements Filter
   ServletException
   {
     final HttpServletRequest req = (HttpServletRequest) request;
-    String userString = req.getHeader(AUTHENTICATION_USER_ID);
+    String userString = getAttribute(req, AUTHENTICATION_USER_ID);
     PFUserDO user = null;
     if (userString != null) {
       final Integer userId = NumberHelper.parseInteger(userString);
       if (userId != null) {
-        final String authenticationToken = req.getHeader(AUTHENTICATION_TOKEN);
+        final String authenticationToken = getAttribute(req, AUTHENTICATION_TOKEN);
         if (authenticationToken != null) {
           if (authenticationToken.equals(userDao.getCachedAuthenticationToken(userId)) == true) {
             user = userDao.getUserGroupCache().getUser(userId);
@@ -99,8 +99,8 @@ public class RestUserFilter implements Filter
         log.error(AUTHENTICATION_USER_ID + " is not an integer: '" + userString + "'. Rest call forbidden.");
       }
     } else {
-      userString = req.getHeader(AUTHENTICATION_USERNAME);
-      final String password = req.getHeader(AUTHENTICATION_PASSWORD);
+      userString = getAttribute(req, AUTHENTICATION_USERNAME);
+      final String password = getAttribute(req, AUTHENTICATION_PASSWORD);
       if (userString != null && password != null) {
         final String encryptedPassword = userDao.encryptPassword(password);
         user = userDao.authenticateUser(userString, encryptedPassword);
@@ -138,6 +138,14 @@ public class RestUserFilter implements Filter
     } finally {
       PFUserContext.setUser(null);
     }
+  }
+
+  private String getAttribute(final HttpServletRequest req, final String key) {
+    String value = req.getHeader(key);
+    if (value == null) {
+      value = req.getParameter(key);
+    }
+    return value;
   }
 
   @Override
