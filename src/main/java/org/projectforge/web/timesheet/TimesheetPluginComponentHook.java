@@ -41,5 +41,5 @@ public interface TimesheetPluginComponentHook
    * @param timesheet
    * @return
    */
-  void renderComponentsToTimesheetEditForm(TimesheetEditForm form, TimesheetDO timesheet);
+  void renderComponentsToTimesheetEditForm(TimesheetEditPage page, TimesheetDO timesheet);
 }
