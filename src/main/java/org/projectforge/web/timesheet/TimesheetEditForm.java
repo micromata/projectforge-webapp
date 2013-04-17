@@ -118,7 +118,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
 
   DropDownChoicePanel<Integer> cost2ChoicePanel;
 
-  private FieldsetPanel cost2ChoiceFieldset, templatesRow;
+  private FieldsetPanel cost2ChoiceFieldset;
 
   private ConsumptionBarPanel consumptionBarPanel;
 
@@ -247,8 +247,9 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
         }
 
         @Override
-        protected boolean isQuickSearchEnabled() {
-            return true;
+        protected boolean isQuickSearchEnabled()
+        {
+          return true;
         }
       };
       fs.add(taskSelectPanel);
@@ -365,7 +366,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
     final List<TimesheetPluginComponentHook> hooks = TimesheetEditPage.getPluginHooks();
     if (hooks != null && hooks.isEmpty() == false) {
       for (final TimesheetPluginComponentHook hook : hooks) {
-        hook.renderComponentsToTimesheetEditForm(this, getData());
+        hook.renderComponentsToTimesheetEditForm(this.parentPage, getData());
       }
     }
   }
@@ -373,7 +374,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
   @SuppressWarnings("serial")
   private void addTemplatesRow()
   {
-    templatesRow = gridBuilder.newFieldset(getString("templates")).supressLabelForWarning();
+    final FieldsetPanel templatesRow = gridBuilder.newFieldset(getString("templates")).supressLabelForWarning();
     final String[] templateNames = userPrefDao.getPrefNames(UserPrefArea.TIMESHEET_TEMPLATE);
     if (templateNames != null && templateNames.length > 0) {
       // DropDownChoice templates
@@ -442,11 +443,6 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
         parentPage, TimesheetEditForm.this, cost2Exists, timesheetDao, taskTree, userFormatter);
     parentPage.add(recentSheetsModalDialog);
     recentSheetsModalDialog.init();
-  }
-
-  public FieldsetPanel getTemplatesRow()
-  {
-    return this.templatesRow;
   }
 
   private void updateCost2ChoiceVisibility()
