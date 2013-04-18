@@ -29,6 +29,7 @@ import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.projectforge.task.TaskNode;
 import org.projectforge.user.UserXmlPreferencesCache;
+import org.projectforge.web.user.UserPreferencesHelper;
 import org.projectforge.web.wicket.tree.TableTreeExpansion;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -46,16 +47,15 @@ public class TaskTreeExpansion extends TableTreeExpansion<Integer, TaskNode>
 
   private static TaskTreeExpansion get()
   {
-    final UserXmlPreferencesCache userXmlPreferencesCache = UserXmlPreferencesCache.getDefaultInstance();
     final TaskTreeExpansion expansion = new TaskTreeExpansion();
     try {
       @SuppressWarnings("unchecked")
-      final Set<Integer> ids = (Set<Integer>) userXmlPreferencesCache.getEntry(TaskTreePage.USER_PREFS_KEY_OPEN_TASKS);
+      final Set<Integer> ids = (Set<Integer>) UserPreferencesHelper.getEntry(TaskTreePage.USER_PREFS_KEY_OPEN_TASKS);
       if (ids != null) {
         expansion.setIds(ids);
       } else {
         // Persist the open entries in the data-base.
-        userXmlPreferencesCache.putEntry(TaskTreePage.USER_PREFS_KEY_OPEN_TASKS, expansion.getIds(), true);
+        UserPreferencesHelper.putEntry(TaskTreePage.USER_PREFS_KEY_OPEN_TASKS, expansion.getIds(), true);
       }
     } catch (final Exception ex) {
       log.error(ex.getMessage(), ex);

@@ -28,6 +28,7 @@ import java.util.Map;
 
 import org.projectforge.access.AccessChecker;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserRights;
 
 /**
  * Context while building a menu for a logged-in-user (e. g. after login).
@@ -48,10 +49,10 @@ public class MenuBuilderContext
 
   private Map<String, Object> variables;
 
-  MenuBuilderContext(final Menu menu, final AccessChecker accessChecker, final PFUserDO loggedInUser, final boolean mobileMenu)
+  MenuBuilderContext(final Menu menu, final PFUserDO loggedInUser, final boolean mobileMenu)
   {
     this.menu = menu;
-    this.accessChecker = accessChecker;
+    this.accessChecker = UserRights.getAccessChecker();
     this.loggedInUser = loggedInUser;
     this.mobileMenu = mobileMenu;
   }

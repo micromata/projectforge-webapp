@@ -39,7 +39,7 @@ import org.projectforge.fibu.EmployeeDao;
 import org.projectforge.fibu.KostFormatter;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
-import org.projectforge.user.UserXmlPreferencesCache;
+import org.projectforge.web.user.UserPreferencesHelper;
 import org.projectforge.web.wicket.AbstractSelectPanel;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
@@ -60,9 +60,6 @@ public class EmployeeSelectPanel extends AbstractSelectPanel<EmployeeDO>
 
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
-
-  @SpringBean(name = "userXmlPreferencesCache")
-  protected UserXmlPreferencesCache userXmlPreferencesCache;
 
   private RecentQueue<String> recentEmployees;
 
@@ -249,11 +246,11 @@ public class EmployeeSelectPanel extends AbstractSelectPanel<EmployeeDO>
   private RecentQueue<String> getRecentEmployees()
   {
     if (this.recentEmployees == null) {
-      this.recentEmployees = (RecentQueue<String>) userXmlPreferencesCache.getEntry(USER_PREF_KEY_RECENT_EMPLOYEES);
+      this.recentEmployees = (RecentQueue<String>) UserPreferencesHelper.getEntry(USER_PREF_KEY_RECENT_EMPLOYEES);
     }
     if (this.recentEmployees == null) {
       this.recentEmployees = new RecentQueue<String>();
-      userXmlPreferencesCache.putEntry(USER_PREF_KEY_RECENT_EMPLOYEES, this.recentEmployees, true);
+      UserPreferencesHelper.putEntry(USER_PREF_KEY_RECENT_EMPLOYEES, this.recentEmployees, true);
     }
     return this.recentEmployees;
   }

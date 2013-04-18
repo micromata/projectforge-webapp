@@ -40,7 +40,7 @@ import org.projectforge.fibu.KundeDao;
 import org.projectforge.fibu.KundeFormatter;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserXmlPreferencesCache;
+import org.projectforge.web.user.UserPreferencesHelper;
 import org.projectforge.web.wicket.AbstractSelectPanel;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
@@ -63,9 +63,6 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
 
   @SpringBean(name = "kundeDao")
   private KundeDao kundeDao;
-
-  @SpringBean(name = "userXmlPreferencesCache")
-  protected UserXmlPreferencesCache userXmlPreferencesCache;
 
   private RecentQueue<String> recentCustomers;
 
@@ -253,11 +250,11 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
   private RecentQueue<String> getRecentCustomers()
   {
     if (this.recentCustomers == null) {
-      this.recentCustomers = (RecentQueue<String>) userXmlPreferencesCache.getEntry(USER_PREF_KEY_RECENT_CUSTOMERS);
+      this.recentCustomers = (RecentQueue<String>) UserPreferencesHelper.getEntry(USER_PREF_KEY_RECENT_CUSTOMERS);
     }
     if (this.recentCustomers == null) {
       this.recentCustomers = new RecentQueue<String>();
-      userXmlPreferencesCache.putEntry(USER_PREF_KEY_RECENT_CUSTOMERS, this.recentCustomers, true);
+      UserPreferencesHelper.putEntry(USER_PREF_KEY_RECENT_CUSTOMERS, this.recentCustomers, true);
     }
     return this.recentCustomers;
   }

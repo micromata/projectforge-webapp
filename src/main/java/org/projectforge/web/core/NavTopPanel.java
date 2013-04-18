@@ -91,7 +91,7 @@ public class NavTopPanel extends NavAbstractPanel
   public void init(final AbstractSecuredPage page)
   {
     getMenu();
-    this.favoritesMenu = FavoritesMenu.get(userXmlPreferencesCache, accessChecker);
+    this.favoritesMenu = FavoritesMenu.get();
     final WebMarkupContainer goMobile = new WebMarkupContainer("goMobile");
     add(goMobile);
     if (page.getMySession().isMobileUserAgent() == true) {

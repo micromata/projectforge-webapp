@@ -63,7 +63,7 @@ public class MenuBuilder implements Serializable
     if (user == null) {
       return;
     }
-    final MenuBuilderContext context = new MenuBuilderContext(menu, accessChecker, user, mobileMenu);
+    final MenuBuilderContext context = new MenuBuilderContext(menu, user, mobileMenu);
     final MenuItemRegistry registry = MenuItemRegistry.instance();
     for (final MenuItemDef menuItemDef : registry.getMenuItemList()) {
       if (menuItemDef.isVisible(context) == false) {

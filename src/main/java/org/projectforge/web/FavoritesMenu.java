@@ -35,13 +35,13 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
-import org.projectforge.access.AccessChecker;
 import org.projectforge.core.UserException;
 import org.projectforge.plugins.todo.ToDoPlugin;
 import org.projectforge.user.PFUserContext;
-import org.projectforge.user.UserXmlPreferencesCache;
+import org.projectforge.user.UserRights;
 import org.projectforge.user.UserXmlPreferencesDO;
 import org.projectforge.web.core.NavAbstractPanel;
+import org.projectforge.web.user.UserPreferencesHelper;
 
 /**
  * The customizable menu of the user (stored in the data-base and customizable).
@@ -60,18 +60,14 @@ public class FavoritesMenu implements Serializable
 
   private Menu menu;
 
-  private final AccessChecker accessChecker;
-
-  private final UserXmlPreferencesCache userXmlPreferencesCache;
-
-  public static FavoritesMenu get(final UserXmlPreferencesCache userXmlPreferencesCache, final AccessChecker accessChecker)
+  public static FavoritesMenu get()
   {
-    FavoritesMenu favoritesMenu = (FavoritesMenu) userXmlPreferencesCache.getEntry(USER_PREF_FAVORITES_MENU_KEY);
+    FavoritesMenu favoritesMenu = (FavoritesMenu) UserPreferencesHelper.getEntry(USER_PREF_FAVORITES_MENU_KEY);
     if (favoritesMenu != null) {
       return favoritesMenu;
     }
-    favoritesMenu = new FavoritesMenu(userXmlPreferencesCache, accessChecker);
-    userXmlPreferencesCache.putEntry(USER_PREF_FAVORITES_MENU_KEY, favoritesMenu, false);
+    favoritesMenu = new FavoritesMenu();
+    UserPreferencesHelper.putEntry(USER_PREF_FAVORITES_MENU_KEY, favoritesMenu, false);
     return favoritesMenu;
   }
 
@@ -79,11 +75,9 @@ public class FavoritesMenu implements Serializable
    * @param userXmlPreferencesCache For storing and getting the persisted favorites menu.
    * @param accessChecker For building the menu entries regarding the access rights of the logged-in user.
    */
-  FavoritesMenu(final UserXmlPreferencesCache userXmlPreferencesCache, final AccessChecker accessChecker)
+  FavoritesMenu()
   {
-    this.menu = (Menu) userXmlPreferencesCache.getEntry(NavAbstractPanel.USER_PREF_MENU_KEY);
-    this.userXmlPreferencesCache = userXmlPreferencesCache;
-    this.accessChecker = accessChecker;
+    this.menu = (Menu) UserPreferencesHelper.getEntry(NavAbstractPanel.USER_PREF_MENU_KEY);
     init();
   }
 
@@ -119,7 +113,7 @@ public class FavoritesMenu implements Serializable
       log.error("Exception encountered " + ex, ex);
       return;
     }
-    final MenuBuilderContext context = new MenuBuilderContext(menu, accessChecker, PFUserContext.getUser(), false);
+    final MenuBuilderContext context = new MenuBuilderContext(menu, PFUserContext.getUser(), false);
     final Element root = document.getRootElement();
     menuEntries = new ArrayList<MenuEntry>();
     for (final Iterator< ? > it = root.elementIterator("item"); it.hasNext();) {
@@ -178,7 +172,7 @@ public class FavoritesMenu implements Serializable
   private void init()
   {
     this.menuEntries = new ArrayList<MenuEntry>();
-    final String userPrefString = (String) userXmlPreferencesCache.getEntry(USER_PREF_FAVORITES_MENU_ENTRIES_KEY);
+    final String userPrefString = (String) UserPreferencesHelper.getEntry(USER_PREF_FAVORITES_MENU_ENTRIES_KEY);
     if (StringUtils.isBlank(userPrefString) == false) {
       if (userPrefString.contains("<root>") == false) {
         // Old format:
@@ -189,7 +183,7 @@ public class FavoritesMenu implements Serializable
     }
     if (this.menuEntries.size() == 0) {
       final MenuItemRegistry registry = MenuItemRegistry.instance();
-      if (accessChecker.isLoggedInUserMemberOfAdminGroup() == true) {
+      if (UserRights.getAccessChecker().isLoggedInUserMemberOfAdminGroup() == true) {
         final MenuEntry adminMenu = new MenuEntry().setName(PFUserContext.getLocalizedString(MenuItemDefId.ADMINISTRATION.getI18nKey()));
         menuEntries.add(adminMenu);
         addFavoriteMenuEntry(adminMenu, registry.get(MenuItemDefId.ACCESS_LIST));
@@ -197,7 +191,7 @@ public class FavoritesMenu implements Serializable
         addFavoriteMenuEntry(adminMenu, registry.get(MenuItemDefId.GROUP_LIST));
         addFavoriteMenuEntry(adminMenu, registry.get(MenuItemDefId.SYSTEM));
       }
-      if (accessChecker.isRestrictedUser() == true) {
+      if (UserRights.getAccessChecker().isRestrictedUser() == true) {
         // Restricted users see only the change password menu entry (as favorite).
         addFavoriteMenuEntry(registry.get(MenuItemDefId.CHANGE_PASSWORD));
       } else {
@@ -277,8 +271,8 @@ public class FavoritesMenu implements Serializable
   public void storeAsUserPref()
   {
     if (CollectionUtils.isEmpty(menuEntries) == true) {
-      userXmlPreferencesCache.putEntry(USER_PREF_FAVORITES_MENU_ENTRIES_KEY, "", true);
-      userXmlPreferencesCache.removeEntry(USER_PREF_FAVORITES_MENU_KEY);
+      UserPreferencesHelper.putEntry(USER_PREF_FAVORITES_MENU_ENTRIES_KEY, "", true);
+      UserPreferencesHelper.removeEntry(USER_PREF_FAVORITES_MENU_KEY);
       return;
     }
     final Document document = DocumentHelper.createDocument();
@@ -290,8 +284,8 @@ public class FavoritesMenu implements Serializable
     if (xml.length() > UserXmlPreferencesDO.MAX_SERIALIZED_LENGTH) {
       throw new UserException("menu.favorite.maxSizeExceeded");
     }
-    userXmlPreferencesCache.putEntry(USER_PREF_FAVORITES_MENU_ENTRIES_KEY, xml, true);
-    userXmlPreferencesCache.putEntry(USER_PREF_FAVORITES_MENU_KEY, this, false);
+    UserPreferencesHelper.putEntry(USER_PREF_FAVORITES_MENU_ENTRIES_KEY, xml, true);
+    UserPreferencesHelper.putEntry(USER_PREF_FAVORITES_MENU_KEY, this, false);
     if (log.isDebugEnabled() == true) {
       log.debug("Favorites menu stored: " + xml);
     }

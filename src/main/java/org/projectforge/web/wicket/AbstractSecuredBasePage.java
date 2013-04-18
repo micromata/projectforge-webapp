@@ -32,6 +32,7 @@ import org.projectforge.core.UserException;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.user.ChangePasswordPage;
+import org.projectforge.web.user.UserPreferencesHelper;
 
 /**
  * All pages with required login should be derived from this page.
@@ -40,8 +41,6 @@ import org.projectforge.web.user.ChangePasswordPage;
 public abstract class AbstractSecuredBasePage extends AbstractUnsecureBasePage
 {
   private static final long serialVersionUID = 3225994698301133706L;
-
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AbstractSecuredBasePage.class);
 
   @SpringBean(name = "userXmlPreferencesCache")
   protected UserXmlPreferencesCache userXmlPreferencesCache;
@@ -85,12 +84,7 @@ public abstract class AbstractSecuredBasePage extends AbstractUnsecureBasePage
    */
   public void putUserPrefEntry(final String key, final Object value, final boolean persistent)
   {
-    if (getUser() == null) {
-      // Should only occur, if user is not logged in.
-      return;
-    }
-    final Integer userId = getUser().getId();
-    userXmlPreferencesCache.putEntry(userId, key, value, persistent);
+    UserPreferencesHelper.putEntry(key, value, persistent);
   }
 
   /**
@@ -101,12 +95,7 @@ public abstract class AbstractSecuredBasePage extends AbstractUnsecureBasePage
    */
   public Object getUserPrefEntry(final String key)
   {
-    if (getUser() == null) {
-      // Should only occur, if user is not logged in.
-      return null;
-    }
-    final Integer userId = getUser().getId();
-    return userXmlPreferencesCache.getEntry(userId, key);
+    return UserPreferencesHelper.getEntry(key);
   }
 
   /**
@@ -119,20 +108,7 @@ public abstract class AbstractSecuredBasePage extends AbstractUnsecureBasePage
    */
   public Object getUserPrefEntry(final Class< ? > expectedType, final String key)
   {
-    final Object entry = getUserPrefEntry(key);
-    if (entry == null) {
-      return null;
-    }
-    if (expectedType.isAssignableFrom(entry.getClass()) == true) {
-      return entry;
-    }
-    // Probably a new software release results in an incompability of old and new object format.
-    log.info("Could not get user preference entry: (old) type "
-        + entry.getClass().getName()
-        + " is not assignable to (new) required type "
-        + expectedType.getName()
-        + " (OK, probably new software release).");
-    return null;
+    return UserPreferencesHelper.getEntry(expectedType, key);
   }
 
   /**
@@ -142,12 +118,7 @@ public abstract class AbstractSecuredBasePage extends AbstractUnsecureBasePage
    */
   public Object removeUserPrefEntry(final String key)
   {
-    if (getUser() == null) {
-      // Should only occur, if user is not logged in.
-      return null;
-    }
-    final Integer userId = getUser().getId();
-    return userXmlPreferencesCache.removeEntry(userId, key);
+    return UserPreferencesHelper.removeEntry(key);
   }
 
   /**

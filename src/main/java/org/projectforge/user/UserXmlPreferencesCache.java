@@ -147,7 +147,11 @@ public class UserXmlPreferencesCache extends AbstractCache
       final List<UserXmlPreferencesDO> userPrefs = userXmlPreferencesDao.getUserPreferencesByUserId(userId);
       for (final UserXmlPreferencesDO userPref : userPrefs) {
         final Object value = userXmlPreferencesDao.deserialize(userPref, true);
-        data.putEntry(userPref.getKey(), value, true);
+        if (accessChecker.isDemoUser(userId) == true) {
+          data.putEntry(userPref.getKey(), value, false);
+        } else {
+          data.putEntry(userPref.getKey(), value, true);
+        }
       }
       this.allPreferences.put(userId, data);
     }

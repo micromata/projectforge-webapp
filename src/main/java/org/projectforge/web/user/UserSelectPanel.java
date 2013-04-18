@@ -41,7 +41,6 @@ import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
-import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.CSSColor;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractSelectPanel;
@@ -65,9 +64,6 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO> implements Co
 
   @SpringBean(name = "userDao")
   private UserDao userDao;
-
-  @SpringBean(name = "userXmlPreferencesCache")
-  protected UserXmlPreferencesCache userXmlPreferencesCache;
 
   private RecentQueue<String> recentUsers;
 
@@ -303,11 +299,11 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO> implements Co
   private RecentQueue<String> getRecentUsers()
   {
     if (this.recentUsers == null) {
-      this.recentUsers = (RecentQueue<String>) userXmlPreferencesCache.getEntry(USER_PREF_KEY_RECENT_USERS);
+      this.recentUsers = (RecentQueue<String>) UserPreferencesHelper.getEntry(USER_PREF_KEY_RECENT_USERS);
     }
     if (this.recentUsers == null) {
       this.recentUsers = new RecentQueue<String>();
-      userXmlPreferencesCache.putEntry(USER_PREF_KEY_RECENT_USERS, this.recentUsers, true);
+      UserPreferencesHelper.putEntry(USER_PREF_KEY_RECENT_USERS, this.recentUsers, true);
     }
     return this.recentUsers;
   }

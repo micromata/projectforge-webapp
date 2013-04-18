@@ -36,13 +36,13 @@ import org.projectforge.Version;
 import org.projectforge.core.Configuration;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.BrowserScreenWidthType;
 import org.projectforge.web.LayoutSettingsPage;
 import org.projectforge.web.UserAgentBrowser;
 import org.projectforge.web.UserAgentDetection;
 import org.projectforge.web.UserAgentDevice;
 import org.projectforge.web.UserAgentOS;
+import org.projectforge.web.user.UserPreferencesHelper;
 
 public class MySession extends WebSession
 {
@@ -176,8 +176,8 @@ public class MySession extends WebSession
     if (browserScreenWidthType == null) {
       final Integer userId = getUserId();
       if (userId != null) {
-        browserScreenWidthType = (BrowserScreenWidthType) UserXmlPreferencesCache.getDefaultInstance().getEntry(userId,
-            LayoutSettingsPage.getBrowserScreenWidthUserPrefKey(this));
+        browserScreenWidthType = (BrowserScreenWidthType) UserPreferencesHelper.getEntry(LayoutSettingsPage
+            .getBrowserScreenWidthUserPrefKey(this));
         if (browserScreenWidthType != null) {
           // browser screen width for the device is given.
           return browserScreenWidthType;
