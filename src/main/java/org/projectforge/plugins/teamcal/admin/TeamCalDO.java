@@ -23,13 +23,7 @@
 
 package org.projectforge.plugins.teamcal.admin;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -71,6 +65,15 @@ public class TeamCalDO extends DefaultBaseDO
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String description;
+
+  private boolean abo;
+
+  private String aboHash;
+
+  private String aboUrl;
+
+  @Lob
+  private byte[] aboCalendarBinary;
 
   public TeamCalDO()
   {
@@ -256,7 +259,47 @@ public class TeamCalDO extends DefaultBaseDO
     return this;
   }
 
-  /**
+  public boolean isAbo()
+  {
+    return abo;
+  }
+
+  public void setAbo(boolean abo)
+  {
+    this.abo = abo;
+  }
+
+  public String getAboHash()
+  {
+    return aboHash;
+  }
+
+  public void setAboHash(String aboHash)
+  {
+    this.aboHash = aboHash;
+  }
+
+  public String getAboUrl()
+  {
+    return aboUrl;
+  }
+
+  public void setAboUrl(String aboUrl)
+  {
+    this.aboUrl = aboUrl;
+  }
+
+  public byte[] getAboCalendarBinary()
+  {
+    return aboCalendarBinary;
+  }
+
+  public void setAboCalendarBinary(byte[] aboCalendarBinary)
+  {
+    this.aboCalendarBinary = aboCalendarBinary;
+  }
+
+    /**
    * @see java.lang.Object#hashCode()
    */
   @Override
