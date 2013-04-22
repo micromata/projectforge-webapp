@@ -37,7 +37,7 @@ import org.projectforge.task.rest.TaskDaoRest;
  * 
  */
 @ApplicationPath("/")
-public class MyApplication extends Application
+public class RestApplication extends Application
 {
   /**
    * @return all restful service classes.
