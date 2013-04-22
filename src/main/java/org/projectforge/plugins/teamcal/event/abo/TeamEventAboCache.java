@@ -23,6 +23,9 @@
 
 package org.projectforge.plugins.teamcal.event.abo;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  */
@@ -30,10 +33,11 @@ public class TeamEventAboCache
 {
   private static TeamEventAboCache instance = new TeamEventAboCache();
 
+  private final Map<Long, TeamEventAbo> abos;
 
   private TeamEventAboCache()
   {
-
+    abos = new HashMap<Long, TeamEventAbo>();
   }
 
   public static TeamEventAboCache instance()
