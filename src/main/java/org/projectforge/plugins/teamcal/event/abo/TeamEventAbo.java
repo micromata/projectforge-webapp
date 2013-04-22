@@ -23,56 +23,108 @@
 
 package org.projectforge.plugins.teamcal.event.abo;
 
+import java.io.ByteArrayInputStream;
 import java.io.Serializable;
 import java.net.URL;
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.List;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
+import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.component.VEvent;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
-import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
-import org.projectforge.plugins.teamcal.event.TeamEventDao;
+import org.projectforge.plugins.teamcal.event.TeamEventUtils;
+import org.projectforge.web.calendar.CalendarFeed;
 
+import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
+import com.google.common.collect.TreeRangeMap;
 
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  */
 public class TeamEventAbo implements Serializable
 {
-  private Integer teamCalId;
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamEventAbo.class);
 
-  private List<TeamEventDO> events;
+  private final Integer teamCalId;
 
-  private RangeMap<Long, TeamEventDO> eventDuractionAccess;
+  private final RangeMap<Long, TeamEventDO> eventDuractionAccess;
 
-  private TeamEventDao teamEventDao;
-
-  private TeamCalDao teamCalDao;
-
-  public TeamEventAbo(TeamEventDao teamEventDao, TeamCalDao teamCalDao, TeamCalDO teamCalDo)
+  public TeamEventAbo(TeamCalDO teamCalDo)
   {
     this.teamCalId = teamCalDo.getId();
-    this.teamEventDao = teamEventDao;
-    this.teamCalDao = teamCalDao;
-    if (teamCalDo.isAbo() == true && StringUtils.isNotEmpty(teamCalDo.getAboUrl())) {
+    this.eventDuractionAccess = TreeRangeMap.create();
+    initOrUpdate(teamCalDo);
+  }
 
+  public void initOrUpdate(TeamCalDO teamCalDo)
+  {
+
+    if (teamCalDo.isAbo() == true && StringUtils.isNotEmpty(teamCalDo.getAboUrl())) {
       final CalendarBuilder builder = new CalendarBuilder();
+      byte[] bytes = null;
       try {
-        final byte[] bytes = IOUtils.toByteArray(new URL(teamCalDo.getAboUrl()));
+        bytes = IOUtils.toByteArray(new URL(teamCalDo.getAboUrl()));
         MessageDigest md = MessageDigest.getInstance("MD5");
         String md5 = md.digest(bytes).toString();
-        if(StringUtils.equals(md5, teamCalDo.getAboHash()) == false) {
-            // TODO update do
+        if (StringUtils.equals(md5, teamCalDo.getAboHash()) == false) {
+          teamCalDo.setAboHash(md5);
+          teamCalDo.setAboCalendarBinary(bytes);
         }
       } catch (Exception e) {
-        e.printStackTrace(); // To change body of catch statement use File | Settings | File Templates.
+        bytes = teamCalDo.getAboCalendarBinary();
+        log.error("Unable to gather abo calendar information, using database.", e);
       }
-      // final Calendar calendar = builder.build();
+      try {
+        final Calendar calendar = builder.build(new ByteArrayInputStream(bytes));
+        final List<Component> list = calendar.getComponents(Component.VEVENT);
+        // Temporary not used, because multiple events are not supported.
+        final List<VEvent> vEvents = new ArrayList<VEvent>();
+        for (final Component c : list) {
+          final VEvent event = (VEvent) c;
+          if (StringUtils.equals(event.getSummary().getValue(), CalendarFeed.SETUP_EVENT) == true) {
+            // skip setup event!
+            continue;
+          }
+          vEvents.add(event);
+        }
+        for (VEvent event : vEvents) {
+          final TeamEventDO teamEvent = TeamEventUtils.createTeamEventDO(event);
+          teamEvent.setCalendar(teamCalDo);
+
+          Long endTime = null;
+          if (teamEvent.hasRecurrence() == true && teamEvent.getEndDate() == null) {
+            // special treatment for recurrence events with no end date
+            endTime = Long.MAX_VALUE;
+          } else {
+            endTime = teamEvent.getEndDate().getTime();
+          }
+          eventDuractionAccess.put(Range.closed(teamEvent.getStartDate().getTime(), endTime), teamEvent);
+        }
+      } catch (Exception e) {
+        log.error("Unable to instantiate team event list.", e);
+      }
     }
+
+  }
+
+  public List<TeamEventDO> getEvents(Long startTime, Long endTime)
+  {
+
+    final RangeMap<Long, TeamEventDO> rangeMap = eventDuractionAccess.subRangeMap(Range.atMost(endTime)).subRangeMap(
+        Range.atLeast(startTime));
+    return new ArrayList<TeamEventDO>(rangeMap.asMapOfRanges().values());
+  }
+
+  public Integer getTeamCalId()
+  {
+    return teamCalId;
   }
 }
