@@ -60,6 +60,8 @@ public class RTask implements Comparable<RTask>
 
   private TimesheetBookingStatus timesheetBookingStatus;
 
+  private boolean bookableForTimesheets;
+
   public RTask(final TaskDO task)
   {
     this.id = task.getId();
@@ -142,6 +144,23 @@ public class RTask implements Comparable<RTask>
   public TimesheetBookingStatus getTimesheetBookingStatus()
   {
     return timesheetBookingStatus;
+  }
+
+  /**
+   * @param bookableForTimesheets the bookableForTimesheets to set
+   * @return this for chaining.
+   */
+  public void setBookableForTimesheets(final boolean bookableForTimesheets)
+  {
+    this.bookableForTimesheets = bookableForTimesheets;
+  }
+
+  /**
+   * @return the bookableForTimesheets
+   */
+  public boolean isBookableForTimesheets()
+  {
+    return bookableForTimesheets;
   }
 
   /**

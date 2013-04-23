@@ -35,12 +35,15 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.projectforge.access.OperationType;
 import org.projectforge.registry.Registry;
 import org.projectforge.rest.JsonUtils;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskFilter;
 import org.projectforge.task.TaskTree;
+import org.projectforge.timesheet.TimesheetDO;
+import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.user.PFUserContext;
 
 /**
@@ -55,9 +58,12 @@ public class TaskDaoRest
 {
   private final TaskDao taskDao;
 
+  private final TimesheetDao timesheetDao;
+
   public TaskDaoRest()
   {
     this.taskDao = Registry.instance().getDao(TaskDao.class);
+    this.timesheetDao = Registry.instance().getDao(TimesheetDao.class);
   }
 
   /**
@@ -79,7 +85,7 @@ public class TaskDaoRest
     final List<RTask> result = new ArrayList<RTask>();
     if (list != null) {
       for (final TaskDO task : list) {
-        result.add(new RTask(task));
+        result.add(createRTask(task));
       }
     }
     final String json = JsonUtils.toJson(result);
@@ -142,7 +148,7 @@ public class TaskDaoRest
     final TaskTree taskTree = taskDao.getTaskTree();
     final Map<Integer, RTask> rtaskMap = new HashMap<Integer, RTask>();
     for (final TaskDO task : tasks) {
-      final RTask rtask = new RTask(task);
+      final RTask rtask = createRTask(task);
       rtaskMap.put(task.getId(), rtask);
     }
     for (final TaskDO task : tasks) {
@@ -160,7 +166,7 @@ public class TaskDaoRest
         // User has no access, ignore this part of the task tree.
         return null;
       }
-      rtask = new RTask(task);
+      rtask = createRTask(task);
       rtaskMap.put(task.getId(), rtask);
     }
     final TaskDO parent = taskTree.getTaskById(task.getParentTaskId());
@@ -180,6 +186,14 @@ public class TaskDaoRest
     if (parentRTask != null) {
       parentRTask.add(rtask);
     }
+    return rtask;
+  }
+
+  private RTask createRTask(final TaskDO task)
+  {
+    final RTask rtask = new RTask(task);
+    final TimesheetDO timesheet = new TimesheetDO().setTask(task);
+    rtask.setBookableForTimesheets(timesheetDao.checkTaskBookable(timesheet, null, OperationType.INSERT, false));
     return rtask;
   }
 }
