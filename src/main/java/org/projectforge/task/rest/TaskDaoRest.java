@@ -36,12 +36,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.projectforge.registry.Registry;
+import org.projectforge.rest.JsonUtils;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskFilter;
 import org.projectforge.task.TaskTree;
-
-import com.google.gson.GsonBuilder;
+import org.projectforge.user.PFUserContext;
 
 /**
  * REST-Schnittstelle für {@link TaskDao}
@@ -75,6 +75,41 @@ public class TaskDaoRest
       @QueryParam("closed") final Boolean closed, //
       @QueryParam("deleted") final Boolean deleted)
   {
+    final List<TaskDO> list = queryList(searchTerm, notOpened, opened, closed, deleted);
+    final List<RTask> result = new ArrayList<RTask>();
+    if (list != null) {
+      for (final TaskDO task : list) {
+        result.add(new RTask(task));
+      }
+    }
+    final String json = JsonUtils.toJson(result);
+    return Response.ok(json).build();
+  }
+
+  /**
+   * Rest-Call für: {@link TaskDao#getList(org.projectforge.core.BaseSearchFilter)}
+   * 
+   * @param searchTerm
+   */
+  @GET
+  @Path("tree")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response getTree( //
+      @QueryParam("search") final String searchTerm, //
+      @QueryParam("notopened") final Boolean notOpened, //
+      @QueryParam("opened") final Boolean opened, //
+      @QueryParam("closed") final Boolean closed, //
+      @QueryParam("deleted") final Boolean deleted)
+  {
+    final List<TaskDO> list = queryList(searchTerm, notOpened, opened, closed, deleted);
+    final List<RTask> result = convertTasks(list);
+    final String json = JsonUtils.toJson(result);
+    return Response.ok(json).build();
+  }
+
+  private List<TaskDO> queryList(final String searchTerm, final Boolean notOpened, final Boolean opened, final Boolean closed,
+      final Boolean deleted)
+      {
     final TaskFilter filter = new TaskFilter();
     if (closed != null) {
       filter.setClosed(closed.booleanValue());
@@ -90,11 +125,8 @@ public class TaskDaoRest
     }
     filter.setSearchString(searchTerm);
     final List<TaskDO> list = taskDao.getList(filter);
-    final List<RTask> result = convertTasks(list);
-    // TODO: Time zone!
-    final String json = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create().toJson(result);
-    return Response.ok(json).build();
-  }
+    return list;
+      }
 
   /**
    * Builds task tree.
@@ -110,6 +142,10 @@ public class TaskDaoRest
     final TaskTree taskTree = taskDao.getTaskTree();
     final Map<Integer, RTask> rtaskMap = new HashMap<Integer, RTask>();
     for (final TaskDO task : tasks) {
+      final RTask rtask = new RTask(task);
+      rtaskMap.put(task.getId(), rtask);
+    }
+    for (final TaskDO task : tasks) {
       addTask(taskTree, topLevelTasks, task, rtaskMap);
     }
     return topLevelTasks;
@@ -117,8 +153,16 @@ public class TaskDaoRest
 
   private RTask addTask(final TaskTree taskTree, final List<RTask> topLevelTasks, final TaskDO task, final Map<Integer, RTask> rtaskMap)
   {
-    final RTask rtask = new RTask(task);
-    rtaskMap.put(task.getId(), rtask);
+    RTask rtask = rtaskMap.get(task.getId());
+    if (rtask == null) {
+      // ancestor task not part of the result list, create it:
+      if (taskDao.hasSelectAccess(PFUserContext.getUser(), task, false) == false) {
+        // User has no access, ignore this part of the task tree.
+        return null;
+      }
+      rtask = new RTask(task);
+      rtaskMap.put(task.getId(), rtask);
+    }
     final TaskDO parent = taskTree.getTaskById(task.getParentTaskId());
     if (parent == null) {
       // this is the root node, ignore it:
@@ -133,7 +177,9 @@ public class TaskDaoRest
       // Get and insert parent task first:
       parentRTask = addTask(taskTree, topLevelTasks, parent, rtaskMap);
     }
-    parentRTask.add(rtask);
+    if (parentRTask != null) {
+      parentRTask.add(rtask);
+    }
     return rtask;
   }
 }

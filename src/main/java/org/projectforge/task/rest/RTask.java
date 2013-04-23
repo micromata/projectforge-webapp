@@ -25,8 +25,9 @@ package org.projectforge.task.rest;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.TreeSet;
 
+import org.projectforge.common.ReflectionToString;
 import org.projectforge.core.Priority;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskStatus;
@@ -37,7 +38,7 @@ import org.projectforge.task.TimesheetBookingStatus;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class RTask
+public class RTask implements Comparable<RTask>
 {
   private Collection<RTask> children;
 
@@ -143,10 +144,18 @@ public class RTask
     return timesheetBookingStatus;
   }
 
+  /**
+   * @return the children
+   */
+  public Collection<RTask> getChildren()
+  {
+    return children;
+  }
+
   void add(final RTask child)
   {
     if (this.children == null) {
-      this.children = new HashSet<RTask>();
+      this.children = new TreeSet<RTask>();
     }
     this.children.add(child);
   }
@@ -170,5 +179,25 @@ public class RTask
       return false;
     }
     return this.hashCode() == obj.hashCode();
+  }
+
+  /**
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString()
+  {
+    return new ReflectionToString(this).toString();
+  }
+
+  /**
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
+  @Override
+  public int compareTo(final RTask o)
+  {
+    final String title1 = this.title != null ? this.title : "";
+    final String title2 = o.title != null ? o.title : "";
+    return title1.compareTo(title2);
   }
 }
