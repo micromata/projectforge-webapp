@@ -80,7 +80,7 @@ public class RestClientMain
 
     // http://localhost:8080/ProjectForge/rest/task/tree // userId / token
     webResource = client.resource(URL + "/task/tree");
-    response = webResource.queryParam("search", "projectforge").accept(MediaType.APPLICATION_JSON)
+    response = webResource.queryParam("search", "").accept(MediaType.APPLICATION_JSON)
         .header(RestUserFilter.AUTHENTICATION_USER_ID, userId.toString()).header(RestUserFilter.AUTHENTICATION_TOKEN, authenticationToken)
         .get(ClientResponse.class);
     if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {

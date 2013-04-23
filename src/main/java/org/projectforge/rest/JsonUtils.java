@@ -24,21 +24,14 @@
 package org.projectforge.rest;
 
 import java.lang.reflect.Type;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
+
+import org.projectforge.rest.converter.PFUserDOTypeAdapter;
+import org.projectforge.rest.converter.UTCDateTypeAdapter;
+import org.projectforge.user.PFUserDO;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 import com.google.gson.JsonSyntaxException;
 
 /**
@@ -66,39 +59,7 @@ public class JsonUtils
 
   private static Gson createGson()
   {
-    return new GsonBuilder().registerTypeAdapter(Date.class, new UTCDateTypeAdapter()).create();
-  }
-
-  private static class UTCDateTypeAdapter implements JsonSerializer<Date>, JsonDeserializer<Date>
-  {
-    private final DateFormat dateFormat;
-
-    private UTCDateTypeAdapter()
-    {
-      dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US);
-      dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
-
-    @Override
-    public synchronized JsonElement serialize(final Date date, final Type type, final JsonSerializationContext jsonSerializationContext)
-    {
-      synchronized (dateFormat) {
-        final String dateFormatAsString = dateFormat.format(date);
-        return new JsonPrimitive(dateFormatAsString);
-      }
-    }
-
-    @Override
-    public synchronized Date deserialize(final JsonElement jsonElement, final Type type,
-        final JsonDeserializationContext jsonDeserializationContext)
-    {
-      try {
-        synchronized (dateFormat) {
-          return dateFormat.parse(jsonElement.getAsString());
-        }
-      } catch (final ParseException e) {
-        throw new JsonSyntaxException(jsonElement.getAsString(), e);
-      }
-    }
+    return new GsonBuilder().registerTypeAdapter(Date.class, new UTCDateTypeAdapter())
+        .registerTypeAdapter(PFUserDO.class, new PFUserDOTypeAdapter()).create();
   }
 }

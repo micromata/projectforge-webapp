@@ -215,8 +215,8 @@ public class RTask implements Comparable<RTask>
   @Override
   public int compareTo(final RTask o)
   {
-    final String title1 = this.title != null ? this.title : "";
-    final String title2 = o.title != null ? o.title : "";
+    final String title1 = this.title != null ? this.title.toLowerCase() : "";
+    final String title2 = o.title != null ? o.title.toLowerCase() : "";
     return title1.compareTo(title2);
   }
 }
