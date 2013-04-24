@@ -21,43 +21,52 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.task.rest;
+package org.projectforge.rest;
 
-import javax.xml.bind.annotation.XmlType;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.projectforge.task.TaskDO;
+import org.projectforge.task.rest.TaskDaoRest;
 
-@XmlType
-public class TaskDOElement {
-	private String title;
+/**
+ * Singleton for register rest calls.
+ * @author Kai Reinhard (k.reinhard@micromata.de)
+ * 
+ */
+public class RestCallRegistry
+{
+  private static final RestCallRegistry instance = new RestCallRegistry();
 
-	private String description;
+  public static RestCallRegistry getInstance()
+  {
+    return instance;
+  }
 
-	/**
-	 * Für JAXB relevant.
-	 */
-	public TaskDOElement() {
-		super();
-	}
+  private final Set<Class< ? >> classes = new HashSet<Class< ? >>();
 
-	public TaskDOElement(final TaskDO task) {
-		title = task.getTitle();
-		description = task.getDescription();
-	}
+  private RestCallRegistry()
+  {
+    classes.add(AuthenticationRest.class);
+    classes.add(TaskDaoRest.class);
+  }
 
-	public String getTitle() {
-		return title;
-	}
+  /**
+   * 
+   * @param clazz
+   * @return this for chaining.
+   */
+  public RestCallRegistry register(final Class< ? > clazz)
+  {
+    classes.add(clazz);
+    return this;
+  }
 
-	public void setTitle(final String title) {
-		this.title = title;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(final String description) {
-		this.description = description;
-	}
+  /**
+   * @return all restful service classes.
+   * @see javax.ws.rs.core.Application#getClasses()
+   */
+  Set<Class< ? >> getClasses()
+  {
+    return classes;
+  }
 }

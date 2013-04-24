@@ -32,12 +32,10 @@ import javax.ws.rs.core.Response;
 
 import org.projectforge.AppVersion;
 import org.projectforge.Version;
+import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.google.gson.Gson;
 
 /**
  * REST interface for authentication (tests) and getting the authentication token on initial contact.
@@ -50,8 +48,12 @@ public class AuthenticationRest
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AuthenticationRest.class);
 
-  @Autowired
-  private UserDao userDao;
+  private final UserDao userDao;
+
+  public AuthenticationRest()
+  {
+    this.userDao = Registry.instance().getDao(UserDao.class);
+  }
 
   /**
    * Authentication via http header authenticationUsername and authenticationPassword.<br/>
@@ -70,15 +72,16 @@ public class AuthenticationRest
       throw new IllegalArgumentException("No user given for the rest call: authenticate/getToken.");
     }
     final UserObject userObject = new UserObject(user);
-    userObject.setAuthenticationToken(user.getAuthenticationToken());
-    final String json = new Gson().toJson(userObject);
+    final String authenticationToken = userDao.getAuthenticationToken(user.getId());
+    userObject.setAuthenticationToken(authenticationToken);
+    final String json = JsonUtils.toJson(userObject);
     return Response.ok(json).build();
   }
 
   /**
    * Authentication via http header authenticationUserId and authenticationToken.
    * @param clientVersionString
-   * @return
+   * @return {@link ServerInfo}
    */
   @GET
   @Path("initialContact")
@@ -104,16 +107,7 @@ public class AuthenticationRest
     } else {
       info.setStatus(ServerInfo.STATUS_OK);
     }
-    final String json = new Gson().toJson(info);
+    final String json = JsonUtils.toJson(info);
     return Response.ok(json).build();
-  }
-
-  /**
-   * @param userDao the userDao to set
-   * @return this for chaining.
-   */
-  public void setUserDao(final UserDao userDao)
-  {
-    this.userDao = userDao;
   }
 }

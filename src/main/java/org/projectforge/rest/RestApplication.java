@@ -23,13 +23,10 @@
 
 package org.projectforge.rest;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
-
-import org.projectforge.task.rest.TaskDaoRest;
 
 /**
  * Initial servlet for initiating the restful services.
@@ -37,7 +34,7 @@ import org.projectforge.task.rest.TaskDaoRest;
  * 
  */
 @ApplicationPath("/")
-public class MyApplication extends Application
+public class RestApplication extends Application
 {
   /**
    * @return all restful service classes.
@@ -46,10 +43,6 @@ public class MyApplication extends Application
   @Override
   public Set<Class< ? >> getClasses()
   {
-    final Set<Class< ? >> classes = new HashSet<Class< ? >>();
-    // register root resource
-    classes.add(AuthenticationRest.class);
-    classes.add(TaskDaoRest.class);
-    return classes;
+    return RestCallRegistry.getInstance().getClasses();
   }
 }

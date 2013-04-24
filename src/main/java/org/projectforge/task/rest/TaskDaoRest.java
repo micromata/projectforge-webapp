@@ -23,64 +23,177 @@
 
 package org.projectforge.task.rest;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.projectforge.access.OperationType;
+import org.projectforge.registry.Registry;
+import org.projectforge.rest.JsonUtils;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskFilter;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.projectforge.task.TaskTree;
+import org.projectforge.timesheet.TimesheetDO;
+import org.projectforge.timesheet.TimesheetDao;
+import org.projectforge.user.PFUserContext;
 
 /**
  * REST-Schnittstelle für {@link TaskDao}
  * 
  * @author Daniel Ludwig (d.ludwig@micromata.de)
+ * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
 @Path("task")
-public class TaskDaoRest {
-  @Autowired
-  private TaskDao taskDao;
+public class TaskDaoRest
+{
+  private final TaskDao taskDao;
+
+  private final TimesheetDao timesheetDao;
+
+  public TaskDaoRest()
+  {
+    this.taskDao = Registry.instance().getDao(TaskDao.class);
+    this.timesheetDao = Registry.instance().getDao(TimesheetDao.class);
+  }
 
   /**
-   * Rest-Call für:
-   * {@link TaskDao#getList(org.projectforge.core.BaseSearchFilter)}
-   *
+   * Rest-Call für: {@link TaskDao#getList(org.projectforge.core.BaseSearchFilter)}
+   * 
    * @param searchTerm
    */
   @GET
-  @Path("list/{search}")
-  @Produces(MediaType.APPLICATION_XML)
-  public Response getList(@PathParam("search") final String searchTerm,
-      @QueryParam("notopened") final boolean notOpened,
-      @QueryParam("opened") final boolean opened,
-      @QueryParam("closed") final boolean closed,
-      @QueryParam("deleted") final boolean deleted) {
-    final TaskFilter filter = new TaskFilter();
-    filter.setClosed(closed);
-    filter.setDeleted(deleted);
-    filter.setOpened(opened);
-    filter.setNotOpened(notOpened);
-
-    filter.setSearchString(searchTerm);
-    final List<TaskDO> list = taskDao.getList(filter);
-    if (list == null || list.isEmpty()) {
-      return Response.ok(new TasksElement()).build();
+  @Path("list")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response getList( //
+      @QueryParam("search") final String searchTerm, //
+      @QueryParam("notopened") final Boolean notOpened, //
+      @QueryParam("opened") final Boolean opened, //
+      @QueryParam("closed") final Boolean closed, //
+      @QueryParam("deleted") final Boolean deleted)
+  {
+    final List<TaskDO> list = queryList(searchTerm, notOpened, opened, closed, deleted);
+    final List<RTask> result = new ArrayList<RTask>();
+    if (list != null) {
+      for (final TaskDO task : list) {
+        result.add(createRTask(task));
+      }
     }
-
-    final TasksElement t = new TasksElement();
-    t.convertAll(list);
-    return Response.ok(t).build();
+    final String json = JsonUtils.toJson(result);
+    return Response.ok(json).build();
   }
 
-  public void setTaskDao(final TaskDao taskDao) {
-    this.taskDao = taskDao;
+  /**
+   * Rest-Call für: {@link TaskDao#getList(org.projectforge.core.BaseSearchFilter)}
+   * 
+   * @param searchTerm
+   */
+  @GET
+  @Path("tree")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response getTree( //
+      @QueryParam("search") final String searchTerm, //
+      @QueryParam("notopened") final Boolean notOpened, //
+      @QueryParam("opened") final Boolean opened, //
+      @QueryParam("closed") final Boolean closed, //
+      @QueryParam("deleted") final Boolean deleted)
+  {
+    final List<TaskDO> list = queryList(searchTerm, notOpened, opened, closed, deleted);
+    final List<RTask> result = convertTasks(list);
+    final String json = JsonUtils.toJson(result);
+    return Response.ok(json).build();
+  }
+
+  private List<TaskDO> queryList(final String searchTerm, final Boolean notOpened, final Boolean opened, final Boolean closed,
+      final Boolean deleted)
+      {
+    final TaskFilter filter = new TaskFilter();
+    if (closed != null) {
+      filter.setClosed(closed.booleanValue());
+    }
+    if (deleted != null) {
+      filter.setDeleted(deleted.booleanValue());
+    }
+    if (opened != null) {
+      filter.setOpened(opened.booleanValue());
+    }
+    if (notOpened != null) {
+      filter.setNotOpened(notOpened.booleanValue());
+    }
+    filter.setSearchString(searchTerm);
+    final List<TaskDO> list = taskDao.getList(filter);
+    return list;
+      }
+
+  /**
+   * Builds task tree.
+   * @param tasks
+   * @return
+   */
+  private List<RTask> convertTasks(final List<TaskDO> tasks)
+  {
+    final List<RTask> topLevelTasks = new ArrayList<RTask>();
+    if (tasks == null || tasks.isEmpty() == true) {
+      return topLevelTasks;
+    }
+    final TaskTree taskTree = taskDao.getTaskTree();
+    final Map<Integer, RTask> rtaskMap = new HashMap<Integer, RTask>();
+    for (final TaskDO task : tasks) {
+      final RTask rtask = createRTask(task);
+      rtaskMap.put(task.getId(), rtask);
+    }
+    for (final TaskDO task : tasks) {
+      addTask(taskTree, topLevelTasks, task, rtaskMap);
+    }
+    return topLevelTasks;
+  }
+
+  private RTask addTask(final TaskTree taskTree, final List<RTask> topLevelTasks, final TaskDO task, final Map<Integer, RTask> rtaskMap)
+  {
+    RTask rtask = rtaskMap.get(task.getId());
+    if (rtask == null) {
+      // ancestor task not part of the result list, create it:
+      if (taskDao.hasSelectAccess(PFUserContext.getUser(), task, false) == false) {
+        // User has no access, ignore this part of the task tree.
+        return null;
+      }
+      rtask = createRTask(task);
+      rtaskMap.put(task.getId(), rtask);
+    }
+    final TaskDO parent = taskTree.getTaskById(task.getParentTaskId());
+    if (parent == null) {
+      // this is the root node, ignore it:
+      return null;
+    }
+    if (taskTree.isRootNode(parent) == true) {
+      topLevelTasks.add(rtask);
+      return rtask;
+    }
+    RTask parentRTask = rtaskMap.get(task.getParentTaskId());
+    if (parentRTask == null) {
+      // Get and insert parent task first:
+      parentRTask = addTask(taskTree, topLevelTasks, parent, rtaskMap);
+    }
+    if (parentRTask != null) {
+      parentRTask.add(rtask);
+    }
+    return rtask;
+  }
+
+  private RTask createRTask(final TaskDO task)
+  {
+    final RTask rtask = new RTask(task);
+    final TimesheetDO timesheet = new TimesheetDO().setTask(task);
+    rtask.setBookableForTimesheets(timesheetDao.checkTaskBookable(timesheet, null, OperationType.INSERT, false));
+    return rtask;
   }
 }

@@ -58,6 +58,7 @@ import org.projectforge.web.fibu.Kost2SelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
@@ -70,6 +71,7 @@ import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
+import org.projectforge.web.wicket.flowlayout.ToggleContainerPanel;
 
 public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
 {
@@ -208,176 +210,192 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
     // ///////////////////////////////
     // GANTT
     // ///////////////////////////////
-    gridBuilder.newSplitPanel(GridSize.COL50, true);
-    gridBuilder.newFormHeading(getString("task.gantt.settings"));
-    gridBuilder.newSubSplitPanel(GridSize.COL50);
+    gridBuilder.newGridPanel();
     {
-      // Gantt object type:
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.objectType"));
-      final LabelValueChoiceRenderer<GanttObjectType> objectTypeChoiceRenderer = new LabelValueChoiceRenderer<GanttObjectType>(fs,
-          GanttObjectType.values());
-      final DropDownChoice<GanttObjectType> objectTypeChoice = new DropDownChoice<GanttObjectType>(fs.getDropDownChoiceId(),
-          new PropertyModel<GanttObjectType>(data, "ganttObjectType"), objectTypeChoiceRenderer.getValues(), objectTypeChoiceRenderer);
-      objectTypeChoice.setNullValid(true);
-      fs.add(objectTypeChoice);
-    }
-    {
-      // Gantt: start date
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.startDate"));
-      final DatePanel startDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "startDate"), DatePanelSettings.get()
-          .withTargetType(java.sql.Date.class).withSelectProperty("startDate"));
-      fs.add(startDatePanel);
-    }
-    {
-      // Gantt: end date
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.endDate"));
-      final DatePanel endDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "endDate"), DatePanelSettings.get()
-          .withTargetType(java.sql.Date.class).withSelectProperty("endDate"));
-      fs.add(endDatePanel);
-      dependentFormComponents[1] = endDatePanel;
-    }
+      final ToggleContainerPanel extendedSettingsPanel = new ToggleContainerPanel(gridBuilder.getPanel().newChildId());
+      extendedSettingsPanel.setHeading(getString("task.gantt.settings"));
+      gridBuilder.getPanel().add(extendedSettingsPanel);
+      extendedSettingsPanel.setClosed();
+      final GridBuilder innerGridBuilder = extendedSettingsPanel.createGridBuilder();
+      innerGridBuilder.newSplitPanel(GridSize.COL50);
+      {
+        // Gantt object type:
+        final FieldsetPanel fs = innerGridBuilder.newFieldset(getString("gantt.objectType"));
+        final LabelValueChoiceRenderer<GanttObjectType> objectTypeChoiceRenderer = new LabelValueChoiceRenderer<GanttObjectType>(fs,
+            GanttObjectType.values());
+        final DropDownChoice<GanttObjectType> objectTypeChoice = new DropDownChoice<GanttObjectType>(fs.getDropDownChoiceId(),
+            new PropertyModel<GanttObjectType>(data, "ganttObjectType"), objectTypeChoiceRenderer.getValues(), objectTypeChoiceRenderer);
+        objectTypeChoice.setNullValid(true);
+        fs.add(objectTypeChoice);
+      }
+      {
+        // Gantt: start date
+        final FieldsetPanel fs = innerGridBuilder.newFieldset(getString("gantt.startDate"));
+        final DatePanel startDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "startDate"), DatePanelSettings.get()
+            .withTargetType(java.sql.Date.class).withSelectProperty("startDate"));
+        fs.add(startDatePanel);
+      }
+      {
+        // Gantt: end date
+        final FieldsetPanel fs = innerGridBuilder.newFieldset(getString("gantt.endDate"));
+        final DatePanel endDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "endDate"), DatePanelSettings.get()
+            .withTargetType(java.sql.Date.class).withSelectProperty("endDate"));
+        fs.add(endDatePanel);
+        dependentFormComponents[1] = endDatePanel;
+      }
 
-    gridBuilder.newSubSplitPanel(GridSize.COL50);
-    {
-      // Progress
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task.progress")).setUnit("%");
-      final MinMaxNumberField<Integer> progressField = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(
-          data, "progress"), 0, 100) {
-        @SuppressWarnings({ "unchecked", "rawtypes"})
-        @Override
-        public IConverter getConverter(final Class type)
-        {
-          return new IntegerPercentConverter(0);
-        }
-      };
-      WicketUtils.setSize(progressField, 3);
-      fs.add(progressField);
-    }
-    {
-      // Gantt: duration
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.duration")).supressLabelForWarning();
-      final MinMaxNumberField<BigDecimal> durationField = new MinMaxNumberField<BigDecimal>(InputPanel.WICKET_ID,
-          new PropertyModel<BigDecimal>(data, "duration"), BigDecimal.ZERO, TaskEditForm.MAX_DURATION_DAYS);
-      WicketUtils.setSize(durationField, 6);
-      fs.add(durationField);
-      dependentFormComponents[0] = durationField;
-    }
-    {
-      // Gantt: predecessor offset
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.predecessorOffset")).setUnit(getString("days"));
-      final MinMaxNumberField<Integer> ganttPredecessorField = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID,
-          new PropertyModel<Integer>(data, "ganttPredecessorOffset"), Integer.MIN_VALUE, Integer.MAX_VALUE);
-      WicketUtils.setSize(ganttPredecessorField, 6);
-      fs.add(ganttPredecessorField);
-    }
-    gridBuilder.newSubSplitPanel(GridSize.COL100);
-    {
-      // Gantt relation type:
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.relationType"));
-      final LabelValueChoiceRenderer<GanttRelationType> relationTypeChoiceRenderer = new LabelValueChoiceRenderer<GanttRelationType>(fs,
-          GanttRelationType.values());
-      final DropDownChoice<GanttRelationType> relationTypeChoice = new DropDownChoice<GanttRelationType>(fs.getDropDownChoiceId(),
-          new PropertyModel<GanttRelationType>(data, "ganttRelationType"), relationTypeChoiceRenderer.getValues(),
-          relationTypeChoiceRenderer);
-      relationTypeChoice.setNullValid(true);
-      fs.add(relationTypeChoice);
-    }
-    {
-      // Gantt: predecessor
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.predecessor"));
-      final TaskSelectPanel ganttPredecessorSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(data,
-          "ganttPredecessor"), parentPage, "ganttPredecessorId");
-      fs.add(ganttPredecessorSelectPanel);
-      ganttPredecessorSelectPanel.setShowFavorites(true);
-      ganttPredecessorSelectPanel.init();
+      innerGridBuilder.newSplitPanel(GridSize.COL50);
+      {
+        // Progress
+        final FieldsetPanel fs = innerGridBuilder.newFieldset(getString("task.progress")).setUnit("%");
+        final MinMaxNumberField<Integer> progressField = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(
+            data, "progress"), 0, 100) {
+          @SuppressWarnings({ "unchecked", "rawtypes"})
+          @Override
+          public IConverter getConverter(final Class type)
+          {
+            return new IntegerPercentConverter(0);
+          }
+        };
+        WicketUtils.setSize(progressField, 3);
+        fs.add(progressField);
+      }
+      {
+        // Gantt: duration
+        final FieldsetPanel fs = innerGridBuilder.newFieldset(getString("gantt.duration")).supressLabelForWarning();
+        final MinMaxNumberField<BigDecimal> durationField = new MinMaxNumberField<BigDecimal>(InputPanel.WICKET_ID,
+            new PropertyModel<BigDecimal>(data, "duration"), BigDecimal.ZERO, TaskEditForm.MAX_DURATION_DAYS);
+        WicketUtils.setSize(durationField, 6);
+        fs.add(durationField);
+        dependentFormComponents[0] = durationField;
+      }
+      {
+        // Gantt: predecessor offset
+        final FieldsetPanel fs = innerGridBuilder.newFieldset(getString("gantt.predecessorOffset")).setUnit(getString("days"));
+        final MinMaxNumberField<Integer> ganttPredecessorField = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID,
+            new PropertyModel<Integer>(data, "ganttPredecessorOffset"), Integer.MIN_VALUE, Integer.MAX_VALUE);
+        WicketUtils.setSize(ganttPredecessorField, 6);
+        fs.add(ganttPredecessorField);
+      }
+      innerGridBuilder.newGridPanel();
+      {
+        // Gantt relation type:
+        final FieldsetPanel fs = innerGridBuilder.newFieldset(getString("gantt.relationType"));
+        final LabelValueChoiceRenderer<GanttRelationType> relationTypeChoiceRenderer = new LabelValueChoiceRenderer<GanttRelationType>(fs,
+            GanttRelationType.values());
+        final DropDownChoice<GanttRelationType> relationTypeChoice = new DropDownChoice<GanttRelationType>(fs.getDropDownChoiceId(),
+            new PropertyModel<GanttRelationType>(data, "ganttRelationType"), relationTypeChoiceRenderer.getValues(),
+            relationTypeChoiceRenderer);
+        relationTypeChoice.setNullValid(true);
+        fs.add(relationTypeChoice);
+      }
+      {
+        // Gantt: predecessor
+        final FieldsetPanel fs = innerGridBuilder.newFieldset(getString("gantt.predecessor"));
+        final TaskSelectPanel ganttPredecessorSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(data,
+            "ganttPredecessor"), parentPage, "ganttPredecessorId");
+        fs.add(ganttPredecessorSelectPanel);
+        ganttPredecessorSelectPanel.setShowFavorites(true);
+        ganttPredecessorSelectPanel.init();
+      }
     }
 
     // ///////////////////////////////
     // FINANCE ADMINISTRATION
     // ///////////////////////////////
-    gridBuilder.newSplitPanel(GridSize.COL50);
-    gridBuilder.newFormHeading(getString("financeAdministration"));
+    gridBuilder.newGridPanel();
+    {
+      final ToggleContainerPanel extendedSettingsPanel = new ToggleContainerPanel(gridBuilder.getPanel().newChildId());
+      extendedSettingsPanel.setHeading(getString("financeAdministration"));
+      gridBuilder.getPanel().add(extendedSettingsPanel);
+      extendedSettingsPanel.setClosed();
+      final GridBuilder innerGridBuilder = extendedSettingsPanel.createGridBuilder();
+      innerGridBuilder.newSplitPanel(GridSize.COL50);
 
-    final boolean hasKost2AndTimesheetBookingAccess = ((TaskDao) getBaseDao()).hasAccessForKost2AndTimesheetBookingStatus(
-        PFUserContext.getUser(), data);
-    {
-      // Cost 2 settings
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost2"));
-      final ProjektDO projekt = taskTree.getProjekt(data.getId());
-      if (projekt != null) {
-        final DivTextPanel projektKostLabel = new DivTextPanel(fs.newChildId(), projekt.getKost() + ".*");
-        WicketUtils.addTooltip(projektKostLabel.getLabel(), new Model<String>() {
-          @Override
-          public String getObject()
-          {
-            final List<Kost2DO> kost2DOs = taskTree.getKost2List(projekt, data, data.getKost2BlackWhiteItems(), data.isKost2IsBlackList());
-            final String[] kost2s = TaskListPage.getKost2s(kost2DOs);
-            if (kost2s == null || kost2s.length == 0) {
-              return " - (-)";
-            }
-            return " - " + StringHelper.listToString("<br/>", kost2s);
-          };
-        });
-        fs.add(projektKostLabel);
-      }
-      final PropertyModel<String> model = new PropertyModel<String>(data, "kost2BlackWhiteList");
-      kost2BlackWhiteTextField = new MaxLengthTextField(InputPanel.WICKET_ID, model);
-      WicketUtils.setSize(kost2BlackWhiteTextField, 10);
-      fs.add(kost2BlackWhiteTextField);
-      final LabelValueChoiceRenderer<Boolean> kost2listTypeChoiceRenderer = new LabelValueChoiceRenderer<Boolean>() //
-          .addValue(Boolean.FALSE, getString("task.kost2list.whiteList")) //
-          .addValue(Boolean.TRUE, getString("task.kost2list.blackList"));
-      final DropDownChoice<Boolean> kost2listTypeChoice = new DropDownChoice<Boolean>(fs.getDropDownChoiceId(), new PropertyModel<Boolean>(
-          data, "kost2IsBlackList"), kost2listTypeChoiceRenderer.getValues(), kost2listTypeChoiceRenderer);
-      kost2listTypeChoice.setNullValid(false);
-      fs.add(kost2listTypeChoice);
-      if (hasKost2AndTimesheetBookingAccess == false) {
-        kost2listTypeChoice.setEnabled(false);
-        kost2BlackWhiteTextField.setEnabled(false);
-      }
-      final Kost2SelectPanel kost2SelectPanel = new Kost2SelectPanel(fs.newChildId(), new PropertyModel<Kost2DO>(this, "kost2Id"),
-          parentPage, "kost2Id") {
-        @Override
-        protected void beforeSelectPage(final PageParameters parameters)
-        {
-          super.beforeSelectPage(parameters);
-          if (projekt != null) {
-            parameters.add(Kost2ListPage.PARAMETER_KEY_STORE_FILTER, false);
-            parameters.add(Kost2ListPage.PARAMETER_KEY_SEARCH_STRING, "nummer:" + projekt.getKost() + ".*");
-          }
+      final boolean hasKost2AndTimesheetBookingAccess = ((TaskDao) getBaseDao()).hasAccessForKost2AndTimesheetBookingStatus(
+          PFUserContext.getUser(), data);
+      {
+        // Cost 2 settings
+        final FieldsetPanel fs = innerGridBuilder.newFieldset(getString("fibu.kost2"));
+        final ProjektDO projekt = taskTree.getProjekt(data.getId());
+        if (projekt != null) {
+          final DivTextPanel projektKostLabel = new DivTextPanel(fs.newChildId(), projekt.getKost() + ".*");
+          WicketUtils.addTooltip(projektKostLabel.getLabel(), new Model<String>() {
+            @Override
+            public String getObject()
+            {
+              final List<Kost2DO> kost2DOs = taskTree.getKost2List(projekt, data, data.getKost2BlackWhiteItems(), data.isKost2IsBlackList());
+              final String[] kost2s = TaskListPage.getKost2s(kost2DOs);
+              if (kost2s == null || kost2s.length == 0) {
+                return " - (-)";
+              }
+              return " - " + StringHelper.listToString("<br/>", kost2s);
+            };
+          });
+          fs.add(projektKostLabel);
         }
-      };
-      fs.add(kost2SelectPanel);
-      kost2SelectPanel.init();
-    }
-    {
-      // Protection until
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task.protectTimesheetsUntil"));
-      final DatePanel protectTimesheetsUntilPanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "protectTimesheetsUntil"),
-          DatePanelSettings.get().withTargetType(java.sql.Date.class).withSelectProperty("protectTimesheetsUntil"));
-      fs.add(protectTimesheetsUntilPanel);
-      if (userGroupCache.isUserMemberOfFinanceGroup() == false) {
-        protectTimesheetsUntilPanel.setEnabled(false);
+        final PropertyModel<String> model = new PropertyModel<String>(data, "kost2BlackWhiteList");
+        kost2BlackWhiteTextField = new MaxLengthTextField(InputPanel.WICKET_ID, model);
+        WicketUtils.setSize(kost2BlackWhiteTextField, 10);
+        fs.add(kost2BlackWhiteTextField);
+        final LabelValueChoiceRenderer<Boolean> kost2listTypeChoiceRenderer = new LabelValueChoiceRenderer<Boolean>() //
+            .addValue(Boolean.FALSE, getString("task.kost2list.whiteList")) //
+            .addValue(Boolean.TRUE, getString("task.kost2list.blackList"));
+        final DropDownChoice<Boolean> kost2listTypeChoice = new DropDownChoice<Boolean>(fs.getDropDownChoiceId(),
+            new PropertyModel<Boolean>(data, "kost2IsBlackList"), kost2listTypeChoiceRenderer.getValues(), kost2listTypeChoiceRenderer);
+        kost2listTypeChoice.setNullValid(false);
+        fs.add(kost2listTypeChoice);
+        if (hasKost2AndTimesheetBookingAccess == false) {
+          kost2listTypeChoice.setEnabled(false);
+          kost2BlackWhiteTextField.setEnabled(false);
+        }
+        final Kost2SelectPanel kost2SelectPanel = new Kost2SelectPanel(fs.newChildId(), new PropertyModel<Kost2DO>(this, "kost2Id"),
+            parentPage, "kost2Id") {
+          @Override
+          protected void beforeSelectPage(final PageParameters parameters)
+          {
+            super.beforeSelectPage(parameters);
+            if (projekt != null) {
+              parameters.add(Kost2ListPage.PARAMETER_KEY_STORE_FILTER, false);
+              parameters.add(Kost2ListPage.PARAMETER_KEY_SEARCH_STRING, "nummer:" + projekt.getKost() + ".*");
+            }
+          }
+        };
+        fs.add(kost2SelectPanel);
+        kost2SelectPanel.init();
       }
-    }
-    {
-      // Time sheet booking status drop down box:
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task.timesheetBooking"));
-      final LabelValueChoiceRenderer<TimesheetBookingStatus> timesheetBookingStatusChoiceRenderer = new LabelValueChoiceRenderer<TimesheetBookingStatus>(
-          fs, TimesheetBookingStatus.values());
-      final DropDownChoice<TimesheetBookingStatus> timesheetBookingStatusChoice = new DropDownChoice<TimesheetBookingStatus>(
-          fs.getDropDownChoiceId(), new PropertyModel<TimesheetBookingStatus>(data, "timesheetBookingStatus"),
-          timesheetBookingStatusChoiceRenderer.getValues(), timesheetBookingStatusChoiceRenderer);
-      timesheetBookingStatusChoice.setNullValid(false);
-      fs.add(timesheetBookingStatusChoice);
-      if (hasKost2AndTimesheetBookingAccess == false) {
-        timesheetBookingStatusChoice.setEnabled(false);
+      {
+        // Time sheet booking status drop down box:
+        final FieldsetPanel fs = innerGridBuilder.newFieldset(getString("task.timesheetBooking"));
+        final LabelValueChoiceRenderer<TimesheetBookingStatus> timesheetBookingStatusChoiceRenderer = new LabelValueChoiceRenderer<TimesheetBookingStatus>(
+            fs, TimesheetBookingStatus.values());
+        final DropDownChoice<TimesheetBookingStatus> timesheetBookingStatusChoice = new DropDownChoice<TimesheetBookingStatus>(
+            fs.getDropDownChoiceId(), new PropertyModel<TimesheetBookingStatus>(data, "timesheetBookingStatus"),
+            timesheetBookingStatusChoiceRenderer.getValues(), timesheetBookingStatusChoiceRenderer);
+        timesheetBookingStatusChoice.setNullValid(false);
+        fs.add(timesheetBookingStatusChoice);
+        if (hasKost2AndTimesheetBookingAccess == false) {
+          timesheetBookingStatusChoice.setEnabled(false);
+        }
       }
-    }
-    {
-      // Protection of privacy:
-      gridBuilder.newFieldset(getString("task.protectionOfPrivacy")).addCheckBox(new PropertyModel<Boolean>(data,
-          "protectionOfPrivacy"), null).setTooltip(getString("task.protectionOfPrivacy.tooltip"));
+      innerGridBuilder.newSplitPanel(GridSize.COL50);
+      {
+        // Protection of privacy:
+        innerGridBuilder.newFieldset(getString("task.protectionOfPrivacy"))
+        .addCheckBox(new PropertyModel<Boolean>(data, "protectionOfPrivacy"), null)
+        .setTooltip(getString("task.protectionOfPrivacy.tooltip"));
+      }
+      {
+        // Protection until
+        final FieldsetPanel fs = innerGridBuilder.newFieldset(getString("task.protectTimesheetsUntil"));
+        final DatePanel protectTimesheetsUntilPanel = new DatePanel(fs.newChildId(),
+            new PropertyModel<Date>(data, "protectTimesheetsUntil"), DatePanelSettings.get().withTargetType(java.sql.Date.class)
+            .withSelectProperty("protectTimesheetsUntil"));
+        fs.add(protectTimesheetsUntilPanel);
+        if (userGroupCache.isUserMemberOfFinanceGroup() == false) {
+          protectTimesheetsUntilPanel.setEnabled(false);
+        }
+      }
     }
 
     gridBuilder.newGridPanel();
