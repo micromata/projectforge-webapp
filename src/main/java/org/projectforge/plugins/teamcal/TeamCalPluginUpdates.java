@@ -66,7 +66,7 @@ public class TeamCalPluginUpdates
       final Table attendeeTable = new Table(TeamEventAttendeeDO.class);
 
       final String[] calendarAttributes = { "owner", "fullAccessGroupIds", "fullAccessUserIds", "readonlyAccessGroupIds",
-          "readonlyAccessUserIds", "minimalAccessGroupIds", "minimalAccessUserIds", "description", "title"};
+          "readonlyAccessUserIds", "minimalAccessGroupIds", "minimalAccessUserIds", "description", "title", "aboCalendarBinary", "aboHash", "aboUrl"};
 
       final String[] eventAttributes = { "subject", "location", "allDay", "calendar", "startDate", "endDate", "note", "organizer",
           "recurrenceRule", "recurrenceExDate", "recurrenceDate", "recurrenceReferenceId", "recurrenceUntil", "externalUid",
