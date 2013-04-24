@@ -23,8 +23,16 @@
 
 package org.projectforge.plugins.teamcal.event.abo;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.hibernate.criterion.Restrictions;
+import org.projectforge.core.QueryFilter;
+import org.projectforge.plugins.teamcal.admin.TeamCalDO;
+import org.projectforge.plugins.teamcal.admin.TeamCalDao;
+import org.projectforge.plugins.teamcal.event.TeamEventDO;
 
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
@@ -33,15 +41,54 @@ public class TeamEventAboCache
 {
   private static TeamEventAboCache instance = new TeamEventAboCache();
 
-  private final Map<Long, TeamEventAbo> abos;
+  private final Map<Integer, TeamEventAbo> abos;
+
+  private List<Integer> teamCalWithAbo;
 
   private TeamEventAboCache()
   {
-    abos = new HashMap<Long, TeamEventAbo>();
+    abos = new HashMap<Integer, TeamEventAbo>();
+    this.teamCalWithAbo = new ArrayList<Integer>();
   }
 
   public static TeamEventAboCache instance()
   {
     return instance;
+  }
+
+  public void updateCache(TeamCalDao dao)
+  {
+    QueryFilter filter = new QueryFilter();
+    filter.add(Restrictions.eq("abo", true));
+    final List<TeamCalDO> aboCalendars = dao.getList(filter);
+    teamCalWithAbo.clear();
+
+    for (TeamCalDO calendar : aboCalendars) {
+      teamCalWithAbo.add(calendar.getId());
+      final TeamEventAbo compareAbo = abos.get(calendar.getId());
+      Long now = System.currentTimeMillis();
+      if (compareAbo == null) {
+        // create the calendar
+        final TeamEventAbo teamEventAbo = new TeamEventAbo(dao, calendar);
+        abos.put(calendar.getId(), teamEventAbo);
+      } else if (compareAbo.getLastUpdated() == null || compareAbo.getLastUpdated() + calendar.getAboUpdateTime() <= now) {
+        // update the calendar
+        compareAbo.initOrUpdate(calendar);
+      }
+    }
+  }
+
+  public boolean isAboCalendar(Integer calendarId)
+  {
+    return teamCalWithAbo.contains(calendarId) == true;
+  }
+
+  public List<TeamEventDO> getEvents(Integer calendarId, Long startTime, Long endTime)
+  {
+    TeamEventAbo eventAbo = abos.get(calendarId);
+    if (eventAbo == null) {
+      return null;
+    }
+    return eventAbo.getEvents(startTime, endTime);
   }
 }

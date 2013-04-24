@@ -24,6 +24,7 @@
 package org.projectforge.plugins.teamcal.event.abo;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.Serializable;
 import java.net.URL;
 import java.security.MessageDigest;
@@ -38,6 +39,7 @@ import net.fortuna.ical4j.model.component.VEvent;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
+import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.plugins.teamcal.event.TeamEventUtils;
 import org.projectforge.web.calendar.CalendarFeed;
@@ -53,14 +55,26 @@ public class TeamEventAbo implements Serializable
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamEventAbo.class);
 
+  private MessageDigest md;
+
   private final Integer teamCalId;
 
   private final RangeMap<Long, TeamEventDO> eventDuractionAccess;
 
-  public TeamEventAbo(TeamCalDO teamCalDo)
+  private final TeamCalDao teamCalDao;
+
+  private Long lastUpdated;
+
+  public TeamEventAbo(TeamCalDao teamCalDao, TeamCalDO teamCalDo)
   {
+    this.teamCalDao = teamCalDao;
     this.teamCalId = teamCalDo.getId();
     this.eventDuractionAccess = TreeRangeMap.create();
+    try {
+      md = MessageDigest.getInstance("MD5");
+    } catch (Exception e) {
+      // TODO
+    }
     initOrUpdate(teamCalDo);
   }
 
@@ -71,12 +85,12 @@ public class TeamEventAbo implements Serializable
       final CalendarBuilder builder = new CalendarBuilder();
       byte[] bytes = null;
       try {
-        bytes = IOUtils.toByteArray(new URL(teamCalDo.getAboUrl()));
-        MessageDigest md = MessageDigest.getInstance("MD5");
+        bytes = IOUtils.toByteArray(new FileInputStream("/Users/junterstein/Desktop/abo.ics")); // new URL(teamCalDo.getAboUrl())
         String md5 = md.digest(bytes).toString();
         if (StringUtils.equals(md5, teamCalDo.getAboHash()) == false) {
           teamCalDo.setAboHash(md5);
           teamCalDo.setAboCalendarBinary(bytes);
+          teamCalDao.update(teamCalDo);
         }
       } catch (Exception e) {
         bytes = teamCalDo.getAboCalendarBinary();
@@ -95,8 +109,12 @@ public class TeamEventAbo implements Serializable
           }
           vEvents.add(event);
         }
+        // clear
+        eventDuractionAccess.clear();
+
         for (VEvent event : vEvents) {
           final TeamEventDO teamEvent = TeamEventUtils.createTeamEventDO(event);
+          teamEvent.setId(666);
           teamEvent.setCalendar(teamCalDo);
 
           Long endTime = null;
@@ -108,6 +126,7 @@ public class TeamEventAbo implements Serializable
           }
           eventDuractionAccess.put(Range.closed(teamEvent.getStartDate().getTime(), endTime), teamEvent);
         }
+        lastUpdated = System.currentTimeMillis();
       } catch (Exception e) {
         log.error("Unable to instantiate team event list.", e);
       }
@@ -126,5 +145,10 @@ public class TeamEventAbo implements Serializable
   public Integer getTeamCalId()
   {
     return teamCalId;
+  }
+
+  public Long getLastUpdated()
+  {
+    return lastUpdated;
   }
 }

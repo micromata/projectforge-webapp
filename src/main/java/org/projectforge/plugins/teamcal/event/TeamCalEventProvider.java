@@ -43,7 +43,6 @@ import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFilter;
 import org.projectforge.plugins.teamcal.integration.TemplateEntry;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.calendar.MyEvent;
 import org.projectforge.web.calendar.MyFullCalendarEventsProvider;
 
@@ -72,7 +71,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
 
   private final TeamEventRight eventRight;
 
-  public TeamCalEventProvider(final TeamEventDao teamEventDao, final UserGroupCache userGroupCache, final TeamCalCalendarFilter filter)
+  public TeamCalEventProvider(final TeamEventDao teamEventDao, final TeamCalCalendarFilter filter)
   {
     this.filter = filter;
     this.teamEventDao = teamEventDao;
