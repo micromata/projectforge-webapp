@@ -34,7 +34,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.validation.IValidatable;
-import org.apache.wicket.validation.validator.AbstractValidator;
+import org.apache.wicket.validation.IValidator;
 import org.projectforge.core.I18nEnum;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.ProjektDO;
@@ -121,23 +121,17 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
       // Name
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("userPref.name"));
       final RequiredMaxLengthTextField name = new RequiredMaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "name"));
-      name.add(new AbstractValidator<String>() {
+      name.add(new IValidator<String>() {
         @Override
-        protected void onValidate(final IValidatable<String> validatable)
+        public void validate(final IValidatable<String> validatable)
         {
           if (data.getArea() == null) {
             return;
           }
           final String value = validatable.getValue();
           if (parentPage.userPrefDao.doesParameterNameAlreadyExist(data.getId(), data.getUser(), data.getArea(), value)) {
-            error(validatable);
+            name.error(getString("userPref.error.nameDoesAlreadyExist"));
           }
-        }
-
-        @Override
-        protected String resourceKey()
-        {
-          return "userPref.error.nameDoesAlreadyExist";
         }
       });
       name.add(WicketUtils.setFocus());
@@ -240,8 +234,8 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
           fs.add(userSelectPanel);
           userSelectPanel.init();
         } else if (TaskDO.class.isAssignableFrom(param.getType()) == true) {
-          final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new UserPrefPropertyModel<TaskDO>(userPrefDao,
-              param, "valueAsObject"), parentPage, param.getParameter());
+          final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs, new UserPrefPropertyModel<TaskDO>(userPrefDao, param,
+              "valueAsObject"), parentPage, param.getParameter());
           if (data.getArea() == UserPrefArea.TASK_FAVORITE) {
             taskSelectPanel.setShowFavorites(false);
           }
