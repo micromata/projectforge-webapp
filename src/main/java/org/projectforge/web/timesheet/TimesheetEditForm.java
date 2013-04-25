@@ -43,7 +43,7 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.validation.IValidatable;
-import org.apache.wicket.validation.validator.AbstractValidator;
+import org.apache.wicket.validation.IValidator;
 import org.hibernate.Hibernate;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
@@ -56,6 +56,7 @@ import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefArea;
@@ -117,6 +118,8 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
   TextArea<String> descriptionArea;
 
   DropDownChoicePanel<Integer> cost2ChoicePanel;
+
+  private DropDownChoice<Integer> cost2Choice;
 
   private FieldsetPanel cost2ChoiceFieldset;
 
@@ -191,7 +194,6 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
           stopMinuteDropDownChoice.error(getString("timesheet.error.maximumDurationExceeded"));
         }
         if (cost2Exists == true) {
-          final DropDownChoice<Integer> cost2Choice = (DropDownChoice<Integer>) dependentFormComponentsWithCost2[3];
           if (cost2Choice != null && cost2Choice.getConvertedInput() == null) {
             // cost2Choice is always != null (but may-be invisible) if cost2 entries does exist in the system.
             // Kost2 is not available for current task.
@@ -223,10 +225,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
     {
       // Task
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task"));
-      fs.getFieldset().setOutputMarkupId(true);
-      fs.getFieldset().setOutputMarkupPlaceholderTag(true);
-      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(data, "task"), parentPage,
-          "taskId") {
+      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs, new PropertyModel<TaskDO>(data, "task"), parentPage, "taskId") {
         @Override
         protected void selectTask(final TaskDO task)
         {
@@ -239,19 +238,16 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
          *      org.projectforge.task.TaskDO)
          */
         @Override
-        protected void onModelSelected(final AjaxRequestTarget target, final TaskDO taskDo)
+        protected void onModelSelected(final AjaxRequestTarget target, final TaskDO taskDO)
         {
           refresh();
-          target.add(fs.getFieldset());
-          target.add(cost2ChoiceFieldset.getFieldset());
-        }
-
-        @Override
-        protected boolean isQuickSearchEnabled()
-        {
-          return true;
+          super.onModelSelected(target, taskDO);
+          if (cost2ChoiceFieldset != null) {
+            target.add(cost2ChoiceFieldset.getFieldset());
+          }
         }
       };
+      taskSelectPanel.setAutocompleteOnlyTaskBookableForTimesheets(true);
       fs.add(taskSelectPanel);
       taskSelectPanel.init();
       taskSelectPanel.setRequired(true);
@@ -264,12 +260,11 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
       cost2List = taskTree.getKost2List(data.getTaskId());
       final LabelValueChoiceRenderer<Integer> cost2ChoiceRenderer = getCost2LabelValueChoiceRenderer(parentPage.getBaseDao(), cost2List,
           data, null);
-      final DropDownChoice<Integer> cost2Choice = createCost2ChoiceRenderer(cost2ChoiceFieldset.getDropDownChoiceId(),
-          parentPage.getBaseDao(), taskTree, cost2ChoiceRenderer, data, cost2List);
-      cost2Choice.setRequired(true);
+      cost2Choice = createCost2ChoiceRenderer(cost2ChoiceFieldset.getDropDownChoiceId(), parentPage.getBaseDao(), taskTree,
+          cost2ChoiceRenderer, data, cost2List);
       cost2ChoicePanel = cost2ChoiceFieldset.add(cost2Choice);
       dependentFormComponentsWithCost2[3] = cost2Choice;
-      updateCost2ChoiceVisibility();
+      updateCost2ChoiceValidation();
     }
     {
       // User
@@ -445,10 +440,11 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
     recentSheetsModalDialog.init();
   }
 
-  private void updateCost2ChoiceVisibility()
+  private void updateCost2ChoiceValidation()
   {
     final boolean cost2Visible = CollectionUtils.isNotEmpty(cost2List);
-    cost2ChoiceFieldset.setVisible(cost2Visible);
+    // cost2ChoiceFieldset.setVisible(cost2Visible);
+    cost2Choice.setRequired(cost2Visible);
   }
 
   @SuppressWarnings("serial")
@@ -474,9 +470,9 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
       }
     }, kost2ChoiceRenderer.getValues(), kost2ChoiceRenderer);
     choice.setNullValid(true);
-    choice.add(new AbstractValidator<Integer>() {
+    choice.add(new IValidator<Integer>() {
       @Override
-      protected void onValidate(final IValidatable<Integer> validatable)
+      public void validate(final IValidatable<Integer> validatable)
       {
         final Integer value = validatable.getValue();
         if (value != null && value >= 0) {
@@ -484,14 +480,8 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
         }
         if (CollectionUtils.isNotEmpty(kost2List) == true) {
           // Kost2 available but not selected.
-          error(validatable);
+          choice.error(PFUserContext.getLocalizedString("timesheet.error.kost2Required"));
         }
-      }
-
-      @Override
-      protected String resourceKey()
-      {
-        return "timesheet.error.kost2Required";
       }
     });
     return choice;
@@ -554,7 +544,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
           data, null);
       cost2ChoicePanel.getDropDownChoice().setChoiceRenderer(cost2ChoiceRenderer);
       cost2ChoicePanel.getDropDownChoice().setChoices(cost2ChoiceRenderer.getValues());
-      updateCost2ChoiceVisibility();
+      updateCost2ChoiceValidation();
     }
     consumptionBarPanel.replaceWith(getConsumptionBar());
   }
