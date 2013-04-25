@@ -202,7 +202,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     initDatePanel();
     {
       // ALL DAY CHECKBOX
-      final FieldsetPanel fieldSet = gridBuilder.newFieldset("").supressLabelForWarning();
+      final FieldsetPanel fieldSet = gridBuilder.newFieldset("").suppressLabelForWarning();
       final DivPanel divPanel = fieldSet.addNewCheckBoxDiv();
       final CheckBoxPanel checkBox = new CheckBoxPanel(divPanel.newChildId(), new PropertyModel<Boolean>(data, "allDay"),
           getString("plugins.teamcal.event.allDay"));
@@ -323,7 +323,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
     if (WebConfiguration.isDevelopmentMode() == true) {
       gridBuilder.newSplitPanel(GridSize.COL50);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.attendees")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.attendees")).suppressLabelForWarning();
       attendees = getData().ensureAttendees();
       fs.add(attendeesPanel = new TeamAttendeesPanel(fs.newChildId(), attendees));
     }
@@ -351,7 +351,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
     gridBuilder.newGridPanel();
     if (parentPage.getRecurrencyChangeType() != null) {
-      final FieldsetPanel fs = gridBuilder.newFieldset((String) null).setLabelSide(false).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset((String) null).setLabelSide(false).suppressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), getString("plugins.teamcal.event.recurrence.change.text")
           + " "
           + getString(parentPage.getRecurrencyChangeType().getI18nKey())
