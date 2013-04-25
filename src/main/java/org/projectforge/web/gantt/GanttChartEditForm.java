@@ -108,8 +108,7 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
     gridBuilder.newGridPanel();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task"));
-      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(data, "task"), parentPage,
-          "taskId") {
+      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs, new PropertyModel<TaskDO>(data, "task"), parentPage, "taskId") {
         @Override
         protected void selectTask(final TaskDO task)
         {

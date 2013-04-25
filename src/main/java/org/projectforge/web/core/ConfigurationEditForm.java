@@ -134,8 +134,7 @@ public class ConfigurationEditForm extends AbstractEditForm<ConfigurationDO, Con
         if (data.getTaskId() != null) {
           this.task = taskDao.getById(data.getTaskId());
         }
-        final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(this, "task"), parentPage,
-            "taskId");
+        final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs, new PropertyModel<TaskDO>(this, "task"), parentPage, "taskId");
         fs.add(taskSelectPanel);
         taskSelectPanel.init();
       } else {

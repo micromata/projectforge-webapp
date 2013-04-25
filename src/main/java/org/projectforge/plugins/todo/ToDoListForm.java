@@ -105,23 +105,23 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
     {
       gridBuilder.newSplitPanel(GridSize.COL100);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task")).supressLabelForWarning();
-      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new Model<TaskDO>() {
+      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs, new Model<TaskDO>() {
         @Override
         public TaskDO getObject()
         {
           return taskTree.getTaskById(getSearchFilter().getTaskId());
         }
-      }, parentPage, "taskId") {
+
         @Override
-        protected void selectTask(final TaskDO task)
+        public void setObject(final TaskDO task)
         {
-          super.selectTask(task);
           if (task != null) {
             getSearchFilter().setTaskId(task.getId());
+          } else {
+            getSearchFilter().setTaskId(null);
           }
-          parentPage.refresh();
         }
-      };
+      }, parentPage, "taskId");
       fs.add(taskSelectPanel);
       taskSelectPanel.init();
       taskSelectPanel.setRequired(false);

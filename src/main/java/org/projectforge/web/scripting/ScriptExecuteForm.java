@@ -222,8 +222,8 @@ public class ScriptExecuteForm extends AbstractStandardForm<ScriptDO, ScriptExec
           quickSelectPanel[index].init();
         }
       } else if (parameter.getType() == ScriptParameterType.TASK) {
-        final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(parameter, "task"),
-            parentPage, "taskId:" + index);
+        final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs, new PropertyModel<TaskDO>(parameter, "task"), parentPage, "taskId:"
+            + index);
         fs.add(taskSelectPanel);
         taskSelectPanel.init();
         taskSelectPanel.setRequired(true);

@@ -407,7 +407,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       {
         // Task
         final FieldsetPanel fs = posGridBuilder.newFieldset(getString("task"));
-        final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(position, "task"),
+        final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs, new PropertyModel<TaskDO>(position, "task"),
             parentPage, "taskId:" + position.getNumber()) {
           @Override
           protected void selectTask(final TaskDO task)
