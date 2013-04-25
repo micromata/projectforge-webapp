@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
+import net.fortuna.ical4j.model.Recur;
 import net.ftlines.wicket.fullcalendar.Event;
 import net.ftlines.wicket.fullcalendar.callback.EventDroppedCallbackScriptGenerator;
 
@@ -38,6 +39,7 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Period;
+import org.projectforge.common.RecurrenceFrequency;
 import org.projectforge.plugins.teamcal.admin.TeamCalRight;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFilter;
 import org.projectforge.plugins.teamcal.integration.TemplateEntry;
@@ -152,9 +154,21 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
         event.setStart(startDate);
         event.setEnd(endDate);
 
-        event.setTooltip(eventDO.getCalendar().getTitle(),
-            new String[][] { { eventDO.getSubject()}, { eventDO.getLocation(), PFUserContext.getLocalizedString("timesheet.location")},
-          { eventDO.getNote(), PFUserContext.getLocalizedString("plugins.teamcal.event.note")}});
+        String recurrence = null;
+        if (eventDO.hasRecurrence() == true) {
+          final Recur recur = eventDO.getRecurrenceObject();
+          final TeamEventRecurrenceData recurrenceData = new TeamEventRecurrenceData(recur, PFUserContext.getTimeZone());
+          final RecurrenceFrequency frequency = recurrenceData.getFrequency();
+          if (frequency != null) {
+            final String unitI18nKey = frequency.getUnitI18nKey();
+            if (unitI18nKey != null) {
+              recurrence = recurrenceData.getInterval() + " " + getString(unitI18nKey);
+            }
+          }
+        }
+        event.setTooltip(eventDO.getCalendar().getTitle(), new String[][] { { eventDO.getSubject()},
+          { eventDO.getLocation(), getString("timesheet.location")}, { eventDO.getNote(), getString("plugins.teamcal.event.note")},
+          { recurrence, getString("plugins.teamcal.event.recurrence")}});
         final String title;
         String durationString = "";
         if (longFormat == true) {
