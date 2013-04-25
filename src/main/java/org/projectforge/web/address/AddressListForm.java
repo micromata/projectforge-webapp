@@ -112,7 +112,7 @@ public class AddressListForm extends AbstractListForm<AddressListFilter, Address
           return searchFilter.isFilter();
         }
       });
-      final FieldsetPanel fieldset = gridBuilder.newFieldset(parentPage.getString("address.contactStatus")).supressLabelForWarning();
+      final FieldsetPanel fieldset = gridBuilder.newFieldset(parentPage.getString("address.contactStatus")).suppressLabelForWarning();
       final DivPanel checkBoxPanel = fieldset.addNewCheckBoxDiv();
       checkBoxPanel.add(form.createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(searchFilter, "active"),
           parentPage.getString("address.contactStatus.active")));
@@ -127,7 +127,7 @@ public class AddressListForm extends AbstractListForm<AddressListFilter, Address
     }
     {
       gridBuilder.newSplitPanel(GridSize.COL33);
-      final FieldsetPanel fieldset = gridBuilder.newFieldset(parentPage.getString("address.addressStatus")).supressLabelForWarning();
+      final FieldsetPanel fieldset = gridBuilder.newFieldset(parentPage.getString("address.addressStatus")).suppressLabelForWarning();
       final DivPanel checkBoxPanel = fieldset.addNewCheckBoxDiv();
       checkBoxPanel.add(form.createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
           new PropertyModel<Boolean>(searchFilter, "uptodate"), parentPage.getString("address.addressStatus.uptodate")));

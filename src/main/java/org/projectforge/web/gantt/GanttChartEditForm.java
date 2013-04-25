@@ -181,7 +181,7 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Options
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).suppressLabelForWarning();
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
       checkBoxPanel.addCheckBox(new PropertyModel<Boolean>(data.getStyle(), "relativeTimeValues"),
           getString("gantt.style.relativeTimeValues"));
@@ -203,7 +203,7 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Time period
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timePeriod")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timePeriod")).suppressLabelForWarning();
       final DatePanel fromDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(getSettings(), "fromDate"), DatePanelSettings
           .get().withSelectProperty("fromDate"));
       fs.add(fromDatePanel);

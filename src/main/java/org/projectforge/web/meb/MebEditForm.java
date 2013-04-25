@@ -92,7 +92,7 @@ public class MebEditForm extends AbstractEditForm<MebEntryDO, MebEditPage>
     gridBuilder.newGridPanel();
     {
       // Date
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("date")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("date")).suppressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), DateTimeFormatter.instance().getFormattedDateTime(data.getDate())));
     }
     {
@@ -111,7 +111,7 @@ public class MebEditForm extends AbstractEditForm<MebEntryDO, MebEditPage>
     }
     {
       // Owner
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("meb.sender")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("meb.sender")).suppressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), data.getSender()));
     }
     {
@@ -131,7 +131,7 @@ public class MebEditForm extends AbstractEditForm<MebEntryDO, MebEditPage>
     }
     {
       // Actions
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("meb.actions")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("meb.actions")).suppressLabelForWarning();
       fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("createTimesheet")) {
         @Override
         public final void onSubmit()

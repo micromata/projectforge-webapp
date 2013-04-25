@@ -83,7 +83,7 @@ public class AdminForm extends AbstractStandardForm<AdminForm, AdminPage>
       fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(this, "alertMessage"), 1000));
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset("").supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset("").suppressLabelForWarning();
       fs.add(new MyButtonPanel(fs.newChildId(), "setAlertMessage") {
         @Override
         public void onSubmit()
@@ -109,7 +109,7 @@ public class AdminForm extends AbstractStandardForm<AdminForm, AdminPage>
       }.getButtonPanel());
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.alertMessage.copyAndPaste.title")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.alertMessage.copyAndPaste.title")).suppressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), PFUserContext.getLocalizedMessage("system.admin.alertMessage.copyAndPaste.text",
           AppVersion.NUMBER)));
     }
@@ -153,7 +153,7 @@ public class AdminForm extends AbstractStandardForm<AdminForm, AdminPage>
       fs.addHelpIcon(getString("system.admin.button.formatLogEntries.textarea.tooltip"));
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset("").supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset("").suppressLabelForWarning();
       fs.add(new MyButtonPanel(fs.newChildId(), "formatLogEntries") {
         @Override
         public void onSubmit()

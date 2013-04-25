@@ -141,11 +141,11 @@ public class ScriptExecuteForm extends AbstractStandardForm<ScriptDO, ScriptExec
     prefillParameters();
     gridBuilder.newGridPanel();
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("scripting.script.name")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("scripting.script.name")).suppressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), data.getName()));
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("description")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("description")).suppressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), data.getDescription()));
     }
     {

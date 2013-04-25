@@ -206,7 +206,7 @@ extends AbstractEditForm<O, P>
         }
       }, TextStyle.FORM_TEXT);
       fs.add(netPanel);
-      fs.supressLabelForWarning();
+      fs.suppressLabelForWarning();
       ajaxUpdateComponents.add(netPanel.getLabel4Ajax());
     }
     gridBuilder.newSubSplitPanel(GridSize.COL50);
@@ -221,7 +221,7 @@ extends AbstractEditForm<O, P>
         }
       }, TextStyle.FORM_TEXT);
       fs.add(vatPanel);
-      fs.supressLabelForWarning();
+      fs.suppressLabelForWarning();
       ajaxUpdateComponents.add(vatPanel.getLabel4Ajax());
     }
     gridBuilder.newSubSplitPanel(GridSize.COL50);
@@ -236,7 +236,7 @@ extends AbstractEditForm<O, P>
         }
       }, TextStyle.FORM_TEXT);
       fs.add(grossPanel);
-      fs.supressLabelForWarning();
+      fs.suppressLabelForWarning();
       ajaxUpdateComponents.add(grossPanel.getLabel4Ajax());
     }
     gridBuilder.newSubSplitPanel(GridSize.COL50);
@@ -505,7 +505,7 @@ extends AbstractEditForm<O, P>
         posGridBuilder.newSplitPanel(GridSize.COL50, true);
         posGridBuilder.newSubSplitPanel(GridSize.COL33);
         {
-          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.common.netto")).setLabelSide(false).supressLabelForWarning();
+          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.common.netto")).setLabelSide(false).suppressLabelForWarning();
           final TextPanel netTextPanel = new TextPanel(fieldset.newChildId(), new Model<String>() {
             @Override
             public String getObject()
@@ -520,7 +520,7 @@ extends AbstractEditForm<O, P>
       {
         posGridBuilder.newSubSplitPanel(GridSize.COL33);
         {
-          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.common.vatAmount")).setLabelSide(false).supressLabelForWarning();
+          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.common.vatAmount")).setLabelSide(false).suppressLabelForWarning();
           final TextPanel vatTextPanel = new TextPanel(fieldset.newChildId(), new Model<String>() {
             @Override
             public String getObject()
@@ -535,7 +535,7 @@ extends AbstractEditForm<O, P>
       {
         posGridBuilder.newSubSplitPanel(GridSize.COL33);
         {
-          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.common.brutto")).setLabelSide(false).supressLabelForWarning();
+          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.common.brutto")).setLabelSide(false).suppressLabelForWarning();
           final TextPanel grossTextPanel = new TextPanel(fieldset.newChildId(), new Model<String>() {
             @Override
             public String getObject()

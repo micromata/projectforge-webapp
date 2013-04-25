@@ -141,7 +141,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
     {
       // User
       data.setUser(PFUserContext.getUser());
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("user")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("user")).suppressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), data.getUser().getFullname()));
     }
     gridBuilder.newGridPanel();
@@ -154,7 +154,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
           // Show area only if given, otherwise the drop down choice for area is shown.
           return data.getArea() != null;
         }
-      }.supressLabelForWarning();
+      }.suppressLabelForWarning();
       fieldset.add(new DivTextPanel(fieldset.newChildId(), new Model<String>() {
         @Override
         public String getObject()
@@ -221,7 +221,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
     if (data.getUserPrefEntries() != null) {
       for (final UserPrefEntryDO param : data.getSortedUserPrefEntries()) {
         final FieldsetPanel fs = gridBuilder.newFieldset(param.getI18nKey() != null ? getString(param.getI18nKey()) : param.getParameter())
-            .supressLabelForWarning();
+            .suppressLabelForWarning();
         if (StringUtils.isNotEmpty(param.getTooltipI18nKey()) == true) {
           fs.addHelpIcon(getString(param.getTooltipI18nKey()));
         }

@@ -88,7 +88,7 @@ public class AccessEditForm extends AbstractEditForm<GroupTaskAccessDO, AccessEd
     }
     {
       // Templates
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("access.templates")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("access.templates")).suppressLabelForWarning();
       fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("clear")) {
         @Override
         public final void onSubmit()
