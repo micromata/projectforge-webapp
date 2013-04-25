@@ -76,6 +76,8 @@ public class TaskNode implements IdObject<Integer>, Serializable
   /** The data of this TaskNode. */
   TaskDO task = null;
 
+  boolean bookableForTimesheets;
+
   /**
    * For every group with access to this node the permissions will be stored here.
    */
@@ -198,6 +200,14 @@ public class TaskNode implements IdObject<Integer>, Serializable
       return parent.isFinished();
     }
     return false;
+  }
+
+  /**
+   * @return the bookableForTimesheets
+   */
+  public boolean isBookableForTimesheets()
+  {
+    return bookableForTimesheets;
   }
 
   public List<Integer> getDescendantIds()
@@ -482,7 +492,8 @@ public class TaskNode implements IdObject<Integer>, Serializable
 
   Element addXMLElement(final Element parent)
   {
-    final Element el = parent.addElement("task").addAttribute("id", String.valueOf(this.getId())).addAttribute("name", this.task.getTitle());
+    final Element el = parent.addElement("task").addAttribute("id", String.valueOf(this.getId()))
+        .addAttribute("name", this.task.getTitle());
     if (this.childs != null) {
       for (final TaskNode node : this.childs) {
         node.addXMLElement(el);
