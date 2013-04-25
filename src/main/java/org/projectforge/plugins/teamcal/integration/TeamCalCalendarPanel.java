@@ -160,6 +160,10 @@ public class TeamCalCalendarPanel extends CalendarPanel
   {
     // User clicked on teamEvent
     final TeamCalEventId id = new TeamCalEventId(event.getId(), PFUserContext.getTimeZone());
+    // skip abo events at this place please
+    if(id.getDataBaseId() == null || id.getDataBaseId() <= 0) {
+      return;
+    }
     final TeamEventDO teamEventDO = teamEventDao.getById(id.getDataBaseId());
     final TeamEvent teamEvent = eventProvider.getTeamEvent(id.toString());
     if (new TeamEventRight().hasUpdateAccess(PFUserContext.getUser(), teamEventDO, null)) {
@@ -250,6 +254,10 @@ public class TeamCalCalendarPanel extends CalendarPanel
       final CalendarResponse response)
   {
     final TeamCalEventId id = new TeamCalEventId(event.getId(), PFUserContext.getTimeZone());
+    // skip abo events at this place please
+    if(id.getDataBaseId() == null || id.getDataBaseId() <= 0) {
+      return;
+    }
     final TeamEvent teamEvent = eventProvider.getTeamEvent(id.toString());
     if (teamEvent == null) {
       return;

@@ -131,9 +131,10 @@ public class TeamEventAbo implements Serializable
         // clear
         eventDuractionAccess.clear();
 
+        Integer startId = -1;
         for (VEvent event : vEvents) {
           final TeamEventDO teamEvent = TeamEventUtils.createTeamEventDO(event);
-          teamEvent.setId(666);
+          teamEvent.setId(startId);
           teamEvent.setCalendar(teamCalDo);
 
           Long endTime = null;
@@ -144,6 +145,7 @@ public class TeamEventAbo implements Serializable
             endTime = teamEvent.getEndDate().getTime();
           }
           eventDuractionAccess.put(Range.closed(teamEvent.getStartDate().getTime(), endTime), teamEvent);
+          startId--;
         }
         lastUpdated = System.currentTimeMillis();
       } catch (Exception e) {

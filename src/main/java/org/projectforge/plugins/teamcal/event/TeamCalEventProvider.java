@@ -146,6 +146,11 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
           event.setEditable(false);
         }
 
+        // id <= 0 is hint for abo events -> not editable
+        if(eventDO.getId() <= 0) {
+          event.setEditable(false);
+        }
+
         if (teamEvent.isAllDay() == true) {
           event.setAllDay(true);
         }
