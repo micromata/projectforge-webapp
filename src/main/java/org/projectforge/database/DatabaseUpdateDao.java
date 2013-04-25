@@ -637,6 +637,21 @@ public class DatabaseUpdateDao
     return jdbc.queryForInt(jdbcQuery);
   }
 
+  /**
+   * Will be called on shutdown.
+   * @see DatabaseSupport#getShutdownDatabaseStatement()
+   */
+  public void shutdownDatabase()
+  {
+    final String statement = DatabaseSupport.instance().getShutdownDatabaseStatement();
+    if (statement == null) {
+      return;
+    }
+    log.info("Executing data-base shutdown statement: " + statement);
+    final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+    jdbc.execute(statement);
+  }
+
   public void setAccessChecker(final AccessChecker accessChecker)
   {
     this.accessChecker = accessChecker;
