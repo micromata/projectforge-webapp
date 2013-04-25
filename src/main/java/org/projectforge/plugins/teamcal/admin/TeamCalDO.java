@@ -49,7 +49,7 @@ public class TeamCalDO extends DefaultBaseDO
   private static final long serialVersionUID = 2869432134443084605L;
 
   static {
-    AbstractHistorizableBaseDO.putNonHistorizableProperty(TeamCalDO.class, "aboCalendarBinary");
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(TeamCalDO.class, "aboCalendarBinary", "aboHash");
   }
 
   // @UserPrefParameter(i18nKey = "plugins.teamcal.subject")

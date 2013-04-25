@@ -24,9 +24,7 @@
 package org.projectforge.plugins.teamcal.event.abo;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.Serializable;
-import java.net.URL;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +34,9 @@ import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.component.VEvent;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
@@ -65,6 +65,8 @@ public class TeamEventAbo implements Serializable
 
   private Long lastUpdated;
 
+  private final HttpClient client;
+
   public TeamEventAbo(TeamCalDao teamCalDao, TeamCalDO teamCalDo)
   {
     this.teamCalDao = teamCalDao;
@@ -75,6 +77,7 @@ public class TeamEventAbo implements Serializable
     } catch (Exception e) {
       // TODO
     }
+    client = new HttpClient();
     initOrUpdate(teamCalDo);
   }
 
@@ -85,7 +88,19 @@ public class TeamEventAbo implements Serializable
       final CalendarBuilder builder = new CalendarBuilder();
       byte[] bytes = null;
       try {
-        bytes = IOUtils.toByteArray(new FileInputStream("/Users/junterstein/Desktop/abo.ics")); // new URL(teamCalDo.getAboUrl())
+
+        // Create a method instance.
+        GetMethod method = new GetMethod(teamCalDo.getAboUrl());
+
+        int statusCode = client.executeMethod(method);
+
+        if (statusCode != HttpStatus.SC_OK) {
+          // TODO
+        }
+
+        // Read the response body.
+        bytes = method.getResponseBody();
+
         String md5 = md.digest(bytes).toString();
         if (StringUtils.equals(md5, teamCalDo.getAboHash()) == false) {
           teamCalDo.setAboHash(md5);
@@ -95,6 +110,10 @@ public class TeamEventAbo implements Serializable
       } catch (Exception e) {
         bytes = teamCalDo.getAboCalendarBinary();
         log.error("Unable to gather abo calendar information, using database.", e);
+      }
+      if (bytes == null) {
+        log.error("Unable to use database abo calendar information, quit.");
+        return;
       }
       try {
         final Calendar calendar = builder.build(new ByteArrayInputStream(bytes));
@@ -128,7 +147,7 @@ public class TeamEventAbo implements Serializable
         }
         lastUpdated = System.currentTimeMillis();
       } catch (Exception e) {
-        log.error("Unable to instantiate team event list.", e);
+        log.error("Unable to instantiate team event list for abo.", e);
       }
     }
 
