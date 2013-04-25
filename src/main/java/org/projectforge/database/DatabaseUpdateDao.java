@@ -153,8 +153,6 @@ public class DatabaseUpdateDao
     return true;
   }
 
-
-
   public boolean isTableEmpty(final String table)
   {
     accessCheck(false);
@@ -201,6 +199,20 @@ public class DatabaseUpdateDao
   {
     accessCheck(true);
     execute("ALTER TABLE " + table + " DROP COLUMN " + attribute);
+    return true;
+  }
+
+  /**
+   * @since 5.1
+   * @param table
+   * @param attribute
+   * @param length
+   * @return
+   */
+  public boolean alterTableColumnVarCharLength(final String table, final String attribute, final int length)
+  {
+    accessCheck(true);
+    execute(getDatabaseSupport().alterTableColumnVarCharLength(table, attribute, length), false);
     return true;
   }
 
@@ -254,9 +266,9 @@ public class DatabaseUpdateDao
 
   public void buildForeignKeyConstraint(final StringBuffer buf, final String table, final TableAttribute attr)
   {
-    buf.append("ALTER TABLE ").append(table).append(" ADD CONSTRAINT ").append(table).append("_").append(attr.getName()).append(
-        " FOREIGN KEY (").append(attr.getName()).append(") REFERENCES ").append(attr.getForeignTable()).append("(").append(
-            attr.getForeignAttribute()).append(");\n");
+    buf.append("ALTER TABLE ").append(table).append(" ADD CONSTRAINT ").append(table).append("_").append(attr.getName())
+    .append(" FOREIGN KEY (").append(attr.getName()).append(") REFERENCES ").append(attr.getForeignTable()).append("(")
+    .append(attr.getForeignAttribute()).append(");\n");
   }
 
   public boolean createTable(final Table table)
@@ -396,6 +408,19 @@ public class DatabaseUpdateDao
     final String sql = buf.toString();
     log.info(sql + "; values = " + StringHelper.listToString(", ", values));
     jdbc.update(sql, values);
+  }
+
+  /**
+   * @param regionId
+   * @param version
+   * @return true, if any entry for the given regionId and version is found in the data-base table t_database_update.
+   */
+  public boolean isVersionUpdated(final String regionId, final String version)
+  {
+    accessCheck(false);
+    final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+    final int result = jdbc.queryForInt("select count(*) from t_database_update where region_id=? and version=?", regionId, version);
+    return result > 0;
   }
 
   /**

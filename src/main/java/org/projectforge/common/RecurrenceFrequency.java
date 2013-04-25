@@ -25,7 +25,6 @@ package org.projectforge.common;
 
 import org.projectforge.core.I18nEnum;
 
-
 /**
  * Some objects need the attribute of a recurrence. This will be given as an interval.
  */
@@ -39,6 +38,22 @@ public enum RecurrenceFrequency implements I18nEnum
   public String getI18nKey()
   {
     return "common.recurrence.frequency." + key;
+  }
+
+  public String getUnitI18nKey()
+  {
+    switch (this) {
+      case DAILY:
+        return "plugins.teamcal.event.recurrence.customized.day";
+      case WEEKLY:
+        return "plugins.teamcal.event.recurrence.customized.week";
+      case MONTHLY:
+        return "plugins.teamcal.event.recurrence.customized.month";
+      case YEARLY:
+        return "plugins.teamcal.event.recurrence.customized.year";
+      default:
+        return null;
+    }
   }
 
   /**
@@ -55,7 +70,8 @@ public enum RecurrenceFrequency implements I18nEnum
     this.key = key;
   }
 
-  public boolean isIn(final RecurrenceFrequency... recurrance) {
+  public boolean isIn(final RecurrenceFrequency... recurrance)
+  {
     for (final RecurrenceFrequency rc : recurrance) {
       if (this == rc) {
         return true;

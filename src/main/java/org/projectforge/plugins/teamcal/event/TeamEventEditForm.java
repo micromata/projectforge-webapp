@@ -286,14 +286,9 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
         public String getObject()
         {
           final RecurrenceFrequency interval = recurrenceData.getFrequency();
-          if (interval == RecurrenceFrequency.DAILY) {
-            return "&nbsp;" + HtmlHelper.escapeHtml(getString("plugins.teamcal.event.recurrence.customized.day"), false);
-          } else if (interval == RecurrenceFrequency.WEEKLY) {
-            return "&nbsp;" + HtmlHelper.escapeHtml(getString("plugins.teamcal.event.recurrence.customized.week"), false);
-          } else if (interval == RecurrenceFrequency.MONTHLY) {
-            return "&nbsp;" + HtmlHelper.escapeHtml(getString("plugins.teamcal.event.recurrence.customized.month"), false);
-          } else if (interval == RecurrenceFrequency.YEARLY) {
-            return "&nbsp;" + HtmlHelper.escapeHtml(getString("plugins.teamcal.event.recurrence.customized.year"), false);
+          final String unitI18nKey = getString(interval.getUnitI18nKey());
+          if (unitI18nKey != null) {
+            return "&nbsp;" + HtmlHelper.escapeHtml(unitI18nKey, false);
           }
           return "";
         }

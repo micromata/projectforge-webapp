@@ -155,6 +155,15 @@ public class TeamCalPlugin extends AbstractPlugin
   }
 
   /**
+   * @see org.projectforge.plugins.core.AbstractPlugin#getUpdateEntries()
+   */
+  @Override
+  public List<UpdateEntry> getUpdateEntries()
+  {
+    return TeamCalPluginUpdates.getUpdateEntries();
+  }
+
+  /**
    * Migrates the calendar ids of the filter templates.
    * @see org.projectforge.plugins.core.AbstractPlugin#onBeforeRestore(org.projectforge.database.xstream.XStreamSavingConverter,
    *      java.lang.Object)

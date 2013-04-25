@@ -51,6 +51,8 @@ import org.projectforge.user.UserDao;
  */
 public class DatabaseCoreUpdates
 {
+  private static final String VERSION_5_0 = "5.0";
+
   @SuppressWarnings("serial")
   public static List<UpdateEntry> getUpdateEntries()
   {
@@ -58,16 +60,20 @@ public class DatabaseCoreUpdates
     // /////////////////////////////////////////////////////////////////
     // 5.0
     // /////////////////////////////////////////////////////////////////
-    list.add(new UpdateEntryImpl(CORE_REGION_ID, "5.0", "2013-02-15",
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, VERSION_5_0, "2013-02-15",
         "Adds t_fibu_rechnung.konto, t_pf_user.ssh_public_key, fixes contract.IN_PROGRES -> contract.IN_PROGRESS") {
       final Table rechnungTable = new Table(RechnungDO.class);
+
       final Table userTable = new Table(PFUserDO.class);
 
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
-        final int entriesToMigrate = dao.queryForInt("select count(*) from t_contract where status='IN_PROGRES'");
+        int entriesToMigrate = 0;
+        if (dao.isVersionUpdated(CORE_REGION_ID, VERSION_5_0) == false) {
+          entriesToMigrate = dao.queryForInt("select count(*) from t_contract where status='IN_PROGRES'");
+        }
         return dao.doesTableAttributesExist(rechnungTable, "konto") == true //
             && dao.doesTableAttributesExist(userTable, "sshPublicKey") //
             && entriesToMigrate == 0 //
