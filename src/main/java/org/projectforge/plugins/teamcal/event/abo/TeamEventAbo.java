@@ -118,7 +118,6 @@ public class TeamEventAbo implements Serializable
       try {
         final Calendar calendar = builder.build(new ByteArrayInputStream(bytes));
         final List<Component> list = calendar.getComponents(Component.VEVENT);
-        // Temporary not used, because multiple events are not supported.
         final List<VEvent> vEvents = new ArrayList<VEvent>();
         for (final Component c : list) {
           final VEvent event = (VEvent) c;
