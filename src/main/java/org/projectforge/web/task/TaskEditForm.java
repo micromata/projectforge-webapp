@@ -66,6 +66,7 @@ import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
+import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.converter.IntegerPercentConverter;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -127,9 +128,10 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
     {
       // Parent task
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task.parentTask"));
-      final TaskSelectPanel parentTaskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(data, "parentTask"),
-          parentPage, "parentTaskId");
+      final TaskSelectPanel parentTaskSelectPanel = new TaskSelectPanel(fs, new PropertyModel<TaskDO>(data, "parentTask"), parentPage,
+          "parentTaskId");
       fs.add(parentTaskSelectPanel);
+      fs.getFieldset().setOutputMarkupId(true);
       parentTaskSelectPanel.init();
       if (taskTree.isRootNode(data) == false) {
         parentTaskSelectPanel.setRequired(true);
@@ -141,7 +143,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
     {
       // Title
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task.title"));
-      final MaxLengthTextField title = new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "title"));
+      final MaxLengthTextField title = new RequiredMaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "title"));
       WicketUtils.setStrong(title);
       fs.add(title);
       if (isNew() == true) {
@@ -262,7 +264,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
       }
       {
         // Gantt: duration
-        final FieldsetPanel fs = innerGridBuilder.newFieldset(getString("gantt.duration")).supressLabelForWarning();
+        final FieldsetPanel fs = innerGridBuilder.newFieldset(getString("gantt.duration")).suppressLabelForWarning();
         final MinMaxNumberField<BigDecimal> durationField = new MinMaxNumberField<BigDecimal>(InputPanel.WICKET_ID,
             new PropertyModel<BigDecimal>(data, "duration"), BigDecimal.ZERO, TaskEditForm.MAX_DURATION_DAYS);
         WicketUtils.setSize(durationField, 6);
@@ -292,8 +294,8 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
       {
         // Gantt: predecessor
         final FieldsetPanel fs = innerGridBuilder.newFieldset(getString("gantt.predecessor"));
-        final TaskSelectPanel ganttPredecessorSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(data,
-            "ganttPredecessor"), parentPage, "ganttPredecessorId");
+        final TaskSelectPanel ganttPredecessorSelectPanel = new TaskSelectPanel(fs, new PropertyModel<TaskDO>(data, "ganttPredecessor"),
+            parentPage, "ganttPredecessorId");
         fs.add(ganttPredecessorSelectPanel);
         ganttPredecessorSelectPanel.setShowFavorites(true);
         ganttPredecessorSelectPanel.init();

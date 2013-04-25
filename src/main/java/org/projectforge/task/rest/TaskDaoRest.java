@@ -35,14 +35,13 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.projectforge.access.OperationType;
 import org.projectforge.registry.Registry;
 import org.projectforge.rest.JsonUtils;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskFilter;
+import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
-import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.user.PFUserContext;
 
@@ -56,6 +55,8 @@ import org.projectforge.user.PFUserContext;
 @Path("task")
 public class TaskDaoRest
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TaskDaoRest.class);
+
   private final TaskDao taskDao;
 
   private final TimesheetDao timesheetDao;
@@ -192,8 +193,16 @@ public class TaskDaoRest
   private RTask createRTask(final TaskDO task)
   {
     final RTask rtask = new RTask(task);
-    final TimesheetDO timesheet = new TimesheetDO().setTask(task);
-    rtask.setBookableForTimesheets(timesheetDao.checkTaskBookable(timesheet, null, OperationType.INSERT, false));
+    if (task == null) {
+      log.error("Oups, task is null.");
+      return rtask;
+    }
+    final TaskNode taskNode = taskDao.getTaskTree().getTaskNodeById(task.getId());
+    if (taskNode == null) {
+      log.error("Oups, task node with id '" + task.getId() + "' not found in taskTree.");
+      return rtask;
+    }
+    rtask.setBookableForTimesheets(taskNode.isBookableForTimesheets());
     return rtask;
   }
 }

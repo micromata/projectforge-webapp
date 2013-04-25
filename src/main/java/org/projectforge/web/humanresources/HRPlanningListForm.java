@@ -134,7 +134,7 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
     {
       // Total hours
       gridBuilder.newSplitPanel(GridSize.COL33);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.totalDuration")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.totalDuration")).suppressLabelForWarning();
       fs.add(new TextPanel(fs.newChildId(), new Model<String>() {
         @Override
         public String getObject()

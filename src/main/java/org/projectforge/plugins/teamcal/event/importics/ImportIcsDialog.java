@@ -89,7 +89,7 @@ public class ImportIcsDialog extends ModalDialog
 
     for (final VEvent event : newEvents) {
       gridBuilder.newSplitPanel(GridSize.COL100, GridType.ROW_FLUID);
-      final FieldsetPanel fsDesc = gridBuilder.newFieldset(event.getSummary().getValue()).supressLabelForWarning();
+      final FieldsetPanel fsDesc = gridBuilder.newFieldset(event.getSummary().getValue()).suppressLabelForWarning();
       final EventCalendarPair referencePair = new EventCalendarPair();
       referencePair.event = event;
       calendarPairs.add(referencePair);

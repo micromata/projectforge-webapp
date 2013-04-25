@@ -73,7 +73,7 @@ public class LoginForm extends AbstractForm<LoginForm, LoginPage>
       fs.add(password);
     }
     {
-      final FieldsetPanel fs = new FieldsetPanel("stayLoggedIn", "").supressLabelForWarning();
+      final FieldsetPanel fs = new FieldsetPanel("stayLoggedIn", "").suppressLabelForWarning();
       add(fs);
       final CheckBoxPanel stayLoggedInCheckBox = fs.addCheckBox(new PropertyModel<Boolean>(this, "stayLoggedIn"), null);
       final DivPanel divPanel = new DivPanel(fs.newChildId());

@@ -61,7 +61,7 @@ AbstractListForm<F, P>
     gridBuilder.newGridPanel();
     {
       // Statistics
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("statistics")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("statistics")).suppressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
         @Override
         public String getObject()

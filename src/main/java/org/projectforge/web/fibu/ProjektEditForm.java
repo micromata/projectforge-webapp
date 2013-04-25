@@ -79,8 +79,8 @@ public class ProjektEditForm extends AbstractEditForm<ProjektDO, ProjektEditPage
     {
       // Number
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt.nummer"));
-      final MinMaxNumberField<Integer> field = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data, "nummer"),
-          0, 99) {
+      final MinMaxNumberField<Integer> field = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data,
+          "nummer"), 0, 99) {
         @SuppressWarnings({ "unchecked", "rawtypes"})
         @Override
         public IConverter getConverter(final Class type)
@@ -93,7 +93,7 @@ public class ProjektEditForm extends AbstractEditForm<ProjektDO, ProjektEditPage
     }
     {
       // Customer
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde")).suppressLabelForWarning();
       final CustomerSelectPanel kundeSelectPanel = new CustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"),
           null, parentPage, "kundeId");
       fs.add(kundeSelectPanel);
@@ -141,8 +141,7 @@ public class ProjektEditForm extends AbstractEditForm<ProjektDO, ProjektEditPage
     {
       // task
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task"));
-      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(data, "task"), parentPage,
-          "taskId");
+      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs, new PropertyModel<TaskDO>(data, "task"), parentPage, "taskId");
       fs.add(taskSelectPanel);
       taskSelectPanel.init();
     }
@@ -158,7 +157,7 @@ public class ProjektEditForm extends AbstractEditForm<ProjektDO, ProjektEditPage
     }
     {
       // project manager group
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt.projektManagerGroup")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt.projektManagerGroup")).suppressLabelForWarning();
       final GroupSelectPanel groupSelectPanel = new GroupSelectPanel(fs.newChildId(), new PropertyModel<GroupDO>(data,
           "projektManagerGroup"), parentPage, "projektManagerGroupId");
       fs.add(groupSelectPanel);
@@ -176,7 +175,7 @@ public class ProjektEditForm extends AbstractEditForm<ProjektDO, ProjektEditPage
     }
     {
       // cost 2 types
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost2art.kost2arten")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost2art.kost2arten")).suppressLabelForWarning();
       final ProjectEditCost2TypeTablePanel table = new ProjectEditCost2TypeTablePanel(fs.newChildId());
       fs.add(table);
       table.init(kost2Arts);

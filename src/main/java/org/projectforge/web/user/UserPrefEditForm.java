@@ -34,7 +34,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.validation.IValidatable;
-import org.apache.wicket.validation.validator.AbstractValidator;
+import org.apache.wicket.validation.IValidator;
 import org.projectforge.core.I18nEnum;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.ProjektDO;
@@ -121,23 +121,17 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
       // Name
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("userPref.name"));
       final RequiredMaxLengthTextField name = new RequiredMaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "name"));
-      name.add(new AbstractValidator<String>() {
+      name.add(new IValidator<String>() {
         @Override
-        protected void onValidate(final IValidatable<String> validatable)
+        public void validate(final IValidatable<String> validatable)
         {
           if (data.getArea() == null) {
             return;
           }
           final String value = validatable.getValue();
           if (parentPage.userPrefDao.doesParameterNameAlreadyExist(data.getId(), data.getUser(), data.getArea(), value)) {
-            error(validatable);
+            name.error(getString("userPref.error.nameDoesAlreadyExist"));
           }
-        }
-
-        @Override
-        protected String resourceKey()
-        {
-          return "userPref.error.nameDoesAlreadyExist";
         }
       });
       name.add(WicketUtils.setFocus());
@@ -147,7 +141,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
     {
       // User
       data.setUser(PFUserContext.getUser());
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("user"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("user")).suppressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), data.getUser().getFullname()));
     }
     gridBuilder.newGridPanel();
@@ -160,7 +154,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
           // Show area only if given, otherwise the drop down choice for area is shown.
           return data.getArea() != null;
         }
-      };
+      }.suppressLabelForWarning();
       fieldset.add(new DivTextPanel(fieldset.newChildId(), new Model<String>() {
         @Override
         public String getObject()
@@ -226,7 +220,8 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
     }
     if (data.getUserPrefEntries() != null) {
       for (final UserPrefEntryDO param : data.getSortedUserPrefEntries()) {
-        final FieldsetPanel fs = gridBuilder.newFieldset(param.getI18nKey() != null ? getString(param.getI18nKey()) : param.getParameter());
+        final FieldsetPanel fs = gridBuilder.newFieldset(param.getI18nKey() != null ? getString(param.getI18nKey()) : param.getParameter())
+            .suppressLabelForWarning();
         if (StringUtils.isNotEmpty(param.getTooltipI18nKey()) == true) {
           fs.addHelpIcon(getString(param.getTooltipI18nKey()));
         }
@@ -240,8 +235,8 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
           fs.add(userSelectPanel);
           userSelectPanel.init();
         } else if (TaskDO.class.isAssignableFrom(param.getType()) == true) {
-          final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new UserPrefPropertyModel<TaskDO>(userPrefDao,
-              param, "valueAsObject"), parentPage, param.getParameter());
+          final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs, new UserPrefPropertyModel<TaskDO>(userPrefDao, param,
+              "valueAsObject"), parentPage, param.getParameter());
           if (data.getArea() == UserPrefArea.TASK_FAVORITE) {
             taskSelectPanel.setShowFavorites(false);
           }

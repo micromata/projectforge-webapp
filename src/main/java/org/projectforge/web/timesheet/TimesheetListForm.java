@@ -109,24 +109,24 @@ public class TimesheetListForm extends AbstractListForm<TimesheetListFilter, Tim
     final TimesheetFilter filter = getSearchFilter();
     {
       gridBuilder.newSplitPanel(GridSize.COL66);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task")).supressLabelForWarning();
-      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new Model<TaskDO>() {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task")).suppressLabelForWarning();
+      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs, new Model<TaskDO>() {
         @Override
         public TaskDO getObject()
         {
           return taskTree.getTaskById(getSearchFilter().getTaskId());
         }
-      }, parentPage, "taskId") {
+
         @Override
-        protected void selectTask(final TaskDO task)
+        public void setObject(final TaskDO task)
         {
-          super.selectTask(task);
           if (task != null) {
             getSearchFilter().setTaskId(task.getId());
+          } else {
+            getSearchFilter().setTaskId(null);
           }
-          parentPage.refresh();
         }
-      };
+      }, parentPage, "taskId");
       fs.add(taskSelectPanel);
       taskSelectPanel.init();
       taskSelectPanel.setRequired(false);
@@ -179,7 +179,8 @@ public class TimesheetListForm extends AbstractListForm<TimesheetListFilter, Tim
           };
         };
         unselectPeriodLink.setDefaultFormProcessing(false);
-        fs.add(new IconLinkPanel(fs.newChildId(), IconType.REMOVE_SIGN, new ResourceModel("calendar.tooltip.unselectPeriod"), unselectPeriodLink).setColor(CSSColor.RED));
+        fs.add(new IconLinkPanel(fs.newChildId(), IconType.REMOVE_SIGN, new ResourceModel("calendar.tooltip.unselectPeriod"),
+            unselectPeriodLink).setColor(CSSColor.RED));
       }
       final QuickSelectPanel quickSelectPanel = new QuickSelectPanel(fs.newChildId(), parentPage, "quickSelect", startDate);
       fs.add(quickSelectPanel);
@@ -202,7 +203,7 @@ public class TimesheetListForm extends AbstractListForm<TimesheetListFilter, Tim
     {
       // Duration
       gridBuilder.newSplitPanel(GridSize.COL33);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.totalDuration")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.totalDuration")).suppressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
         @Override
         public String getObject()

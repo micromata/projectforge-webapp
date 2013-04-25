@@ -128,6 +128,9 @@ public class WicketApplication extends WebApplication implements WicketApplicati
   @SpringBean(name = "daoRegistry")
   private DaoRegistry daoRegistry;
 
+  @SpringBean(name = "daoRegistry")
+  private DatabaseUpdateDao databaseUpdateDao;
+
   @SpringBean(name = "systemUpdater")
   private SystemUpdater systemUpdater;
 
@@ -190,6 +193,15 @@ public class WicketApplication extends WebApplication implements WicketApplicati
   public void setConfiguration(final Configuration configuration)
   {
     this.configuration = configuration;
+  }
+
+  /**
+   * @param databaseUpdateDao the databaseUpdateDao to set
+   * @return this for chaining.
+   */
+  public void setDatabaseUpdateDao(final DatabaseUpdateDao databaseUpdateDao)
+  {
+    this.databaseUpdateDao = databaseUpdateDao;
   }
 
   public void setConfigurationDao(final ConfigurationDao configurationDao)
@@ -448,6 +460,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     log.info("Syncing all user preferences to database.");
     userXmlPreferencesCache.forceReload();
     cronSetup.shutdown();
+    databaseUpdateDao.shutdownDatabase();
     log.info("Destroyed");
   }
 

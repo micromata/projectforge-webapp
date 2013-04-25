@@ -155,7 +155,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         }
       }, TextStyle.FORM_TEXT);
       fs.add(netPanel);
-      fs.supressLabelForWarning();
+      fs.suppressLabelForWarning();
       ajaxUpdateComponents.add(netPanel.getLabel4Ajax());
     }
     gridBuilder.newGridPanel();
@@ -186,7 +186,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
     gridBuilder.newGridPanel();
     {
       // project
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt")).suppressLabelForWarning();
       final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data, "projekt"),
           parentPage, "projektId");
       fs.add(projektSelectPanel);
@@ -194,7 +194,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
     }
     {
       // customer
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde")).suppressLabelForWarning();
       kundeSelectPanel = new CustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"), new PropertyModel<String>(
           data, "kundeText"), parentPage, "kundeId");
       fs.add(kundeSelectPanel);
@@ -364,7 +364,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       final boolean showInvoices = CollectionUtils.isNotEmpty(orderPositions);
       {
         // Invoices
-        final FieldsetPanel fs = posGridBuilder.newFieldset(getString("fibu.rechnungen")).supressLabelForWarning();
+        final FieldsetPanel fs = posGridBuilder.newFieldset(getString("fibu.rechnungen")).suppressLabelForWarning();
         if (showInvoices == true) {
           final InvoicePositionsPanel panel = new InvoicePositionsPanel(fs.newChildId());
           fs.add(panel);
@@ -376,7 +376,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       posGridBuilder.newSplitPanel(GridSize.COL33);
       {
         // invoiced
-        final FieldsetPanel fs = posGridBuilder.newFieldset(getString("fibu.fakturiert")).supressLabelForWarning();
+        final FieldsetPanel fs = posGridBuilder.newFieldset(getString("fibu.fakturiert")).suppressLabelForWarning();
         if (showInvoices == true) {
           fs.add(new DivTextPanel(fs.newChildId(), CurrencyFormatter.format(RechnungDao.getNettoSumme(orderPositions))));
         } else {
@@ -407,7 +407,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       {
         // Task
         final FieldsetPanel fs = posGridBuilder.newFieldset(getString("task"));
-        final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(position, "task"),
+        final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs, new PropertyModel<TaskDO>(position, "task"),
             parentPage, "taskId:" + position.getNumber()) {
           @Override
           protected void selectTask(final TaskDO task)

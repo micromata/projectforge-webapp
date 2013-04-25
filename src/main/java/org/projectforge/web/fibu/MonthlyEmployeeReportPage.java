@@ -142,7 +142,7 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
     final GridSize gridSize = costConfigured == true ? GridSize.COL33 : GridSize.COL50;
     gridBuilder.newSplitPanel(gridSize);
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.user")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.user")).suppressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
         /**
          * @see org.apache.wicket.model.Model#getObject()
@@ -157,7 +157,7 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
     }
     if (costConfigured == true) {
       gridBuilder.newSplitPanel(gridSize);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost1")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost1")).suppressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
         /**
          * @see org.apache.wicket.model.Model#getObject()
@@ -175,7 +175,7 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
     }
     gridBuilder.newSplitPanel(gridSize);
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.workingDays")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.workingDays")).suppressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
         @Override
         public String getObject()
@@ -196,7 +196,7 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
         {
           return report != null && StringUtils.isNotBlank(report.getFormattedUnbookedDays());
         }
-      }.supressLabelForWarning();
+      }.suppressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
         /**
          * @see org.apache.wicket.model.Model#getObject()

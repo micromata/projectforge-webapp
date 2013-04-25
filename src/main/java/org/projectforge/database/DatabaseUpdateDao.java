@@ -26,7 +26,11 @@ package org.projectforge.database;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -35,6 +39,7 @@ import org.projectforge.access.AccessChecker;
 import org.projectforge.access.AccessException;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.BaseDO;
+import org.projectforge.registry.Registry;
 import org.projectforge.user.Login;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
@@ -424,6 +429,28 @@ public class DatabaseUpdateDao
   }
 
   /**
+   */
+  public List<DatabaseUpdateDO> getUpdateHistory()
+  {
+    accessCheck(false);
+    final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+    final List<Map<String, Object>> dbResult = jdbc.queryForList("select * from t_database_update order by update_date desc");
+    final List<DatabaseUpdateDO> result = new ArrayList<DatabaseUpdateDO>();
+    for (final Map<String, Object> map : dbResult) {
+      final DatabaseUpdateDO entry = new DatabaseUpdateDO();
+      entry.setUpdateDate((Date)map.get("update_date"));
+      entry.setRegionId((String)map.get("region_id"));
+      entry.setVersionString((String)map.get("version"));
+      entry.setExecutionResult((String)map.get("execution_result"));
+      final PFUserDO executedByUser = Registry.instance().getUserGroupCache().getUser((Integer)map.get("executed_by_user_fk"));
+      entry.setExecutedBy(executedByUser);
+      entry.setDescription((String)map.get("description"));
+      result.add(entry);
+    }
+    return result;
+  }
+
+  /**
    * There is a bug for Hibernate history with Javassist: Sometimes the data base objects are serialized with the default toString() method
    * instead of using the plain id. This method fixes all wrong data base history entries.
    */
@@ -635,6 +662,21 @@ public class DatabaseUpdateDao
     final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
     log.info(jdbcQuery);
     return jdbc.queryForInt(jdbcQuery);
+  }
+
+  /**
+   * Will be called on shutdown.
+   * @see DatabaseSupport#getShutdownDatabaseStatement()
+   */
+  public void shutdownDatabase()
+  {
+    final String statement = DatabaseSupport.instance().getShutdownDatabaseStatement();
+    if (statement == null) {
+      return;
+    }
+    log.info("Executing data-base shutdown statement: " + statement);
+    final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+    jdbc.execute(statement);
   }
 
   public void setAccessChecker(final AccessChecker accessChecker)

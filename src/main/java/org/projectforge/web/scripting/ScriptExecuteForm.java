@@ -141,11 +141,11 @@ public class ScriptExecuteForm extends AbstractStandardForm<ScriptDO, ScriptExec
     prefillParameters();
     gridBuilder.newGridPanel();
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("scripting.script.name")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("scripting.script.name")).suppressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), data.getName()));
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("description")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("description")).suppressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), data.getDescription()));
     }
     {
@@ -222,8 +222,8 @@ public class ScriptExecuteForm extends AbstractStandardForm<ScriptDO, ScriptExec
           quickSelectPanel[index].init();
         }
       } else if (parameter.getType() == ScriptParameterType.TASK) {
-        final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(parameter, "task"),
-            parentPage, "taskId:" + index);
+        final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs, new PropertyModel<TaskDO>(parameter, "task"), parentPage, "taskId:"
+            + index);
         fs.add(taskSelectPanel);
         taskSelectPanel.init();
         taskSelectPanel.setRequired(true);

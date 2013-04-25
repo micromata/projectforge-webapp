@@ -125,7 +125,7 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
    * development warning "No label set for field...'.
    * @return
    */
-  public T supressLabelForWarning()
+  public T suppressLabelForWarning()
   {
     labelFor = true;
     return getThis();

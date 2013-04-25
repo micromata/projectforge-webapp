@@ -133,7 +133,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       if (data.getOwner() == null) {
         data.setOwner(getUser());
       }
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.owner")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.owner")).suppressLabelForWarning();
       fs.add(new Label(fs.newChildId(), data.getOwner().getUsername() + ""));
     }
 
@@ -142,7 +142,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       parentPage.add(icsExportDialog);
       icsExportDialog.init();
       icsExportDialog.redraw(getData());
-      final FieldsetPanel fsSubscribe = gridBuilder.newFieldset(getString("plugins.teamcal.abonnement")).supressLabelForWarning();
+      final FieldsetPanel fsSubscribe = gridBuilder.newFieldset(getString("plugins.teamcal.abonnement")).suppressLabelForWarning();
       fsSubscribe.add(new AjaxIconLinkPanel(fsSubscribe.newChildId(), IconType.ABONNEMENT, new ResourceModel(
           "plugins.teamcal.abonnement.tooltip")) {
         @Override

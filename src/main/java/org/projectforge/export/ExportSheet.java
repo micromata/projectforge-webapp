@@ -42,11 +42,11 @@ public class ExportSheet
   /** Constant for an empty cell */
   public static final String EMPTY = "LEAVE_CELL_EMPTY";
 
-  private Sheet poiSheet;
+  private final Sheet poiSheet;
 
-  private List<ExportRow> rows;
+  private final List<ExportRow> rows;
 
-  private String name;
+  private final String name;
 
   private String[] propertyNames;
 
@@ -77,7 +77,7 @@ public class ExportSheet
    * Convenient method: Adds all column names, titles, width and adds a head row.
    * @param columns
    */
-  public void setColumns(ExportColumn... columns)
+  public void setColumns(final ExportColumn... columns)
   {
     if (columns == null) {
       return;
@@ -157,7 +157,7 @@ public class ExportSheet
     return name;
   }
 
-  public ExportRow getRow(int row)
+  public ExportRow getRow(final int row)
   {
     return this.rows.get(row);
   }
@@ -174,6 +174,14 @@ public class ExportSheet
   public void setPropertyNames(final String[] propertyNames)
   {
     this.propertyNames = propertyNames;
+  }
+
+  /**
+   * @return the propertyNames
+   */
+  public String[] getPropertyNames()
+  {
+    return propertyNames;
   }
 
   /**

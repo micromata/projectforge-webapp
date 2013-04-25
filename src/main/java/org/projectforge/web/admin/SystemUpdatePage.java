@@ -23,16 +23,27 @@
 
 package org.projectforge.web.admin;
 
+import java.util.Date;
+import java.util.List;
+
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.access.AccessException;
 import org.projectforge.admin.SystemUpdater;
 import org.projectforge.admin.UpdateEntry;
+import org.projectforge.common.DateHelper;
+import org.projectforge.database.DatabaseUpdateDO;
+import org.projectforge.database.DatabaseUpdateDao;
+import org.projectforge.export.ExportSheet;
+import org.projectforge.export.ExportWorkbook;
 import org.projectforge.user.Login;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.web.wicket.AbstractSecuredPage;
+import org.projectforge.web.wicket.DownloadUtils;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 public class SystemUpdatePage extends AbstractSecuredPage
 {
@@ -41,14 +52,37 @@ public class SystemUpdatePage extends AbstractSecuredPage
   @SpringBean(name = "systemUpdater")
   protected SystemUpdater systemUpdater;
 
+  @SpringBean(name = "databaseUpdateDao")
+  private DatabaseUpdateDao databaseUpdateDao;
+
   private final SystemUpdateForm form;
 
+  @SuppressWarnings("serial")
   public SystemUpdatePage(final PageParameters parameters)
   {
     super(parameters);
     form = new SystemUpdateForm(this);
     body.add(form);
     form.init();
+    final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+      @Override
+      public void onClick()
+      {
+        checkAdminUser();
+        final List<DatabaseUpdateDO> updateEntries = databaseUpdateDao.getUpdateHistory();
+        final ExportWorkbook workbook = new ExportWorkbook();
+        final ExportSheet sheet = workbook.addSheet("Update history");
+        sheet.getContentProvider().setColWidths(new int[] { 20, 10, 20, 15, 50, 20});
+        sheet.getContentProvider().putFormat(java.sql.Timestamp.class,"YYYY-MM-DD hh:mm:ss");
+        sheet.setPropertyNames(new String[] { "regionId", "versionString", "updateDate", "executedBy.username", "description", "executionResult"});
+        sheet.addRow().setValues("region id", "version", "update date", "executed by", "description", "execution result");
+        sheet.addRows(updateEntries);
+        final String filename = "ProjectForge-UpdateHistory_" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".xls";
+        final byte[] xls = workbook.getAsByteArray();
+        DownloadUtils.setDownloadTarget(xls, filename);
+      };
+    }, getString("system.update.downloadUpdateHistoryAsXls"));
+    addContentMenuEntry(menu);
   }
 
   /**

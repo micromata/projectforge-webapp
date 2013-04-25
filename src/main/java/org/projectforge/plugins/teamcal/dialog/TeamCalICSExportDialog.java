@@ -96,7 +96,7 @@ public class TeamCalICSExportDialog extends AbstractICSExportDialog
       // Export reminders for owners as default.
       exportReminders = true;
     }
-    final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).supressLabelForWarning();
+    final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).suppressLabelForWarning();
     final DivPanel checkBoxesPanel = new DivPanel(fs.newChildId(), DivType.CHECKBOX);
     fs.add(checkBoxesPanel);
     @SuppressWarnings("serial")

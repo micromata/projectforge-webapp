@@ -224,8 +224,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
     {
       // Task
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task"));
-      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(data, "task"), parentPage,
-          "taskId");
+      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs, new PropertyModel<TaskDO>(data, "task"), parentPage, "taskId");
       fs.add(taskSelectPanel);
       taskSelectPanel.init();
       fs.addHelpIcon(new ResourceModel("plugins.todo.task.tooltip.title"), new ResourceModel("plugins.todo.task.tooltip.content"));
@@ -253,7 +252,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
     }
     {
       // Options
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).suppressLabelForWarning();
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
       if (ConfigXml.getInstance().isSendMailConfigured() == true) {
         checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(this, "sendNotification"),

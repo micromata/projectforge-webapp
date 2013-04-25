@@ -227,7 +227,7 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
 
   /**
    * @param sheet
-   * @param userId If null, then task will be set to null;
+   * @param userId If null, then user will be set to null;
    * @see BaseDao#getOrLoad(Integer)
    */
   public void setUser(final UserXmlPreferencesDO userPrefs, final Integer userId)
@@ -250,7 +250,7 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
       isNew = true;
       userPrefs = new UserXmlPreferencesDO();
       userPrefs.setCreated(date);
-      setUser(userPrefs, userId);
+      userPrefs.setUser(userDao.internalGetById(userId));
       userPrefs.setKey(key);
     }
     final String xml = serialize(userPrefs, entry);

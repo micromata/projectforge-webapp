@@ -76,8 +76,7 @@ public class TaskWizardForm extends AbstractStandardForm<TaskWizardForm, TaskWiz
       final DivPanel section = gridBuilder.getPanel();
       section.add(new Heading3Panel(section.newChildId(), String.valueOf(number++) + ". " + getString("task")));
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task"));
-      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(this, "task"), parentPage,
-          "taskId");
+      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs, new PropertyModel<TaskDO>(this, "task"), parentPage, "taskId");
       fs.add(taskSelectPanel);
       taskSelectPanel.setShowFavorites(false).init();
       taskSelectPanel.setRequired(true);
@@ -143,8 +142,8 @@ public class TaskWizardForm extends AbstractStandardForm<TaskWizardForm, TaskWiz
         return parentPage.actionRequired();
       }
     };
-    final SingleButtonPanel finishButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), finishButton, getString("task.wizard.finish"),
-        SingleButtonPanel.DEFAULT_SUBMIT);
+    final SingleButtonPanel finishButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), finishButton,
+        getString("task.wizard.finish"), SingleButtonPanel.DEFAULT_SUBMIT);
     actionButtons.add(finishButtonPanel);
   }
 
@@ -156,7 +155,7 @@ public class TaskWizardForm extends AbstractStandardForm<TaskWizardForm, TaskWiz
     section.add(new Heading3Panel(section.newChildId(), String.valueOf(number) + ". " + getString("task.wizard." + key)));
     section.add(new DivTextPanel(section.newChildId(), getString("task.wizard." + key + ".intro")));
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("group")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("group")).suppressLabelForWarning();
       final GroupSelectPanel groupSelectPanel = new GroupSelectPanel(fs.newChildId(), new PropertyModel<GroupDO>(this, key), parentPage,
           key + "Id");
       fs.add(groupSelectPanel);

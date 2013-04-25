@@ -57,7 +57,7 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
     gridBuilder.newSplitPanel(GridSize.COL66);
     {
       // Group
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("group")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("group")).suppressLabelForWarning();
       final GroupSelectPanel groupSelectPanel = new GroupSelectPanel(fs.newChildId(), new Model<GroupDO>() {
         @Override
         public GroupDO getObject()
@@ -82,7 +82,7 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
     gridBuilder.newSplitPanel(GridSize.COL33);
     {
       // User
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("user")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("user")).suppressLabelForWarning();
       final UserSelectPanel assigneeSelectPanel = new UserSelectPanel(fs.newChildId(), new Model<PFUserDO>() {
         @Override
         public PFUserDO getObject()
@@ -107,24 +107,24 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
     }
     gridBuilder.newGridPanel();
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task")).supressLabelForWarning();
-      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new Model<TaskDO>() {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task")).suppressLabelForWarning();
+      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs, new Model<TaskDO>() {
         @Override
         public TaskDO getObject()
         {
           return taskTree.getTaskById(getSearchFilter().getTaskId());
         }
-      }, parentPage, "taskId") {
+
         @Override
-        protected void selectTask(final TaskDO task)
+        public void setObject(final TaskDO task)
         {
-          super.selectTask(task);
           if (task != null) {
             getSearchFilter().setTaskId(task.getId());
+          } else {
+            getSearchFilter().setTaskId(null);
           }
-          parentPage.refresh();
         }
-      };
+      }, parentPage, "taskId");
       fs.add(taskSelectPanel);
       taskSelectPanel.init();
       taskSelectPanel.setRequired(false);
@@ -137,7 +137,8 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
   }
 
   /**
-   * @see org.projectforge.web.wicket.AbstractListForm#onOptionsPanelCreate(org.projectforge.web.wicket.flowlayout.FieldsetPanel, org.projectforge.web.wicket.flowlayout.DivPanel)
+   * @see org.projectforge.web.wicket.AbstractListForm#onOptionsPanelCreate(org.projectforge.web.wicket.flowlayout.FieldsetPanel,
+   *      org.projectforge.web.wicket.flowlayout.DivPanel)
    */
   @Override
   protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
@@ -149,8 +150,8 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
         new PropertyModel<Boolean>(getSearchFilter(), "includeAncestorTasks"), getString("access.filter.includeAncestorTasks")).setTooltip(
             getString("access.tooltip.filter.includeAncestorTasks")));
     optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(),
-        new PropertyModel<Boolean>(getSearchFilter(), "includeDescendentTasks"), getString("access.filter.includeDescendentTasks")).setTooltip(
-            getString("access.tooltip.filter.includeDescendentTasks")));
+        new PropertyModel<Boolean>(getSearchFilter(), "includeDescendentTasks"), getString("access.filter.includeDescendentTasks"))
+        .setTooltip(getString("access.tooltip.filter.includeDescendentTasks")));
   }
 
   @Override

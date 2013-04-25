@@ -49,6 +49,7 @@ import org.dom4j.io.XMLWriter;
 import org.hibernate.Hibernate;
 import org.projectforge.access.AccessDao;
 import org.projectforge.access.GroupTaskAccessDO;
+import org.projectforge.access.OperationType;
 import org.projectforge.common.AbstractCache;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.NumberHelper;
@@ -60,6 +61,9 @@ import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.ProjektDao;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.fibu.kost.KostCache;
+import org.projectforge.registry.Registry;
+import org.projectforge.timesheet.TimesheetDO;
+import org.projectforge.timesheet.TimesheetDao;
 
 /**
  * Holds the complete task list in a tree. It will be initialized by the values read from the database. Any changes will be written to this
@@ -141,6 +145,10 @@ public class TaskTree extends AbstractCache implements Serializable
       node.setParent(root);
     }
     taskMap.put(node.getId(), node);
+    final TimesheetDao timesheetDao = Registry.instance().getDao(TimesheetDao.class);
+    final TimesheetDO timesheet = new TimesheetDO().setTask(task);
+    final boolean bookable = timesheetDao.checkTaskBookable(timesheet, null, OperationType.INSERT, false);
+    node.bookableForTimesheets = bookable;
     return addTaskNode(node, parent);
   }
 
@@ -876,6 +884,15 @@ public class TaskTree extends AbstractCache implements Serializable
     }
     readTotalDurations();
     refreshOrderPositionReferences();
+    // Now update the status: bookable for time sheets:
+    final TimesheetDao timesheetDao = Registry.instance().getDao(TimesheetDao.class);
+    final TimesheetDO timesheet = new TimesheetDO();
+    for (final TaskDO task : taskList) {
+      node = taskMap.get(task.getId());
+      timesheet.setTask(task);
+      final boolean bookable = timesheetDao.checkTaskBookable(timesheet, null, OperationType.INSERT, false);
+      node.bookableForTimesheets = bookable;
+    }
     log.info("Initializing task tree done.");
   }
 }

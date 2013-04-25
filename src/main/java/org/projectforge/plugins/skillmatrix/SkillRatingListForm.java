@@ -56,7 +56,7 @@ public class SkillRatingListForm extends AbstractListForm<SkillRatingFilter, Ski
     {
       // Required experience
       gridBuilder.newSplitPanel(GridSize.COL100);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.search.reqiuredExperience")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.search.reqiuredExperience")).suppressLabelForWarning();
       fs.getFieldset().setOutputMarkupId(true);
       final LabelValueChoiceRenderer<SkillRating> ratingChoiceRenderer = new LabelValueChoiceRenderer<SkillRating>(this,
           SkillRating.values());

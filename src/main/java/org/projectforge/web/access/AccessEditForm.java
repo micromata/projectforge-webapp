@@ -59,8 +59,7 @@ public class AccessEditForm extends AbstractEditForm<GroupTaskAccessDO, AccessEd
     {
       // Task
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task"));
-      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(data, "task"), parentPage,
-          "taskId");
+      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs, new PropertyModel<TaskDO>(data, "task"), parentPage, "taskId");
       fs.add(taskSelectPanel.setRequired(true));
       taskSelectPanel.init();
     }
@@ -89,7 +88,7 @@ public class AccessEditForm extends AbstractEditForm<GroupTaskAccessDO, AccessEd
     }
     {
       // Templates
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("access.templates")).supressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("access.templates")).suppressLabelForWarning();
       fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("clear")) {
         @Override
         public final void onSubmit()

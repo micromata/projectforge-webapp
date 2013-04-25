@@ -180,7 +180,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       final Form< ? > form)
   {
     // Authentication token
-    final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("user.authenticationToken")).supressLabelForWarning();
+    final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("user.authenticationToken")).suppressLabelForWarning();
     fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
       @Override
       public String getObject()
@@ -219,7 +219,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       final Form< ? > form)
   {
     // Last login and deleteAllStayLoggedInSessions
-    final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("login.lastLogin")).supressLabelForWarning();
+    final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("login.lastLogin")).suppressLabelForWarning();
     fs.add(new DivTextPanel(fs.newChildId(), DateTimeFormatter.instance().getFormattedDateTime(user.getLastLogin())));
     @SuppressWarnings("serial")
     final Button button = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("invalidateStayLoggedInSessions")) {
@@ -533,7 +533,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     }
     if (sambaConfigured == true) {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.sambaNTPassword"), getString("ldap.sambaNTPassword.subtitle"))
-          .supressLabelForWarning();
+          .suppressLabelForWarning();
       final DivTextPanel sambaNTPassword = new DivTextPanel(fs.newChildId(), "*****");
       fs.add(sambaNTPassword);
       fs.addHelpIcon(getString("ldap.sambaNTPassword.tooltip"));
