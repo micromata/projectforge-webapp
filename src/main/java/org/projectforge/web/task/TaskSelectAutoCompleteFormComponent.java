@@ -34,6 +34,7 @@ import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
  */
 public abstract class TaskSelectAutoCompleteFormComponent extends PFAutoCompleteTextField<TaskDO>
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TaskSelectAutoCompleteFormComponent.class);
 
   private static final long serialVersionUID = 2278347191215880396L;
 
@@ -44,6 +45,8 @@ public abstract class TaskSelectAutoCompleteFormComponent extends PFAutoComplete
   private TaskTree taskTree;
 
   private TaskDO taskDo;
+
+  private boolean autocompleteOnlyTaskBookableForTimesheets;
 
   /**
    * @param id
@@ -74,7 +77,7 @@ public abstract class TaskSelectAutoCompleteFormComponent extends PFAutoComplete
     taskDo = null;
   }
 
-    /**
+  /**
    * @see org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField#getChoices(java.lang.String)
    */
   @Override
@@ -85,10 +88,17 @@ public abstract class TaskSelectAutoCompleteFormComponent extends PFAutoComplete
     filter.setSearchString(input);
     final List<TaskDO> list = taskDao.getList(filter);
     final List<TaskDO> choices = new ArrayList<TaskDO>();
-    // removing nodes without kost2 list.
-    for (final TaskDO t : list) {
-      if (taskTree.getKost2List(t.getId()) != null) {
-        choices.add(t);
+    for (final TaskDO task : list) {
+      if (autocompleteOnlyTaskBookableForTimesheets == false) {
+        choices.add(task);
+      } else {
+        final TaskNode taskNode = taskTree.getTaskNodeById(task.getId());
+        if (taskNode == null) {
+          log.error("Oups, task node with id '" + task.getId() + "' not found in taskTree.");
+        } else if (taskNode.isBookableForTimesheets() == true) {
+          // Only add nodes which are bookable:
+          choices.add(task);
+        }
       }
     }
     return choices;
@@ -120,9 +130,9 @@ public abstract class TaskSelectAutoCompleteFormComponent extends PFAutoComplete
    */
   private String createPath(final Integer taskId)
   {
-    StringBuilder builder = new StringBuilder();
+    final StringBuilder builder = new StringBuilder();
     final List<TaskNode> nodeList = taskTree.getPathToRoot(taskId);
-    final String pipeSeparator =  " | ";
+    final String pipeSeparator = " | ";
     String separator = "";
     for (final TaskNode node : nodeList) {
       builder.append(separator);
@@ -165,9 +175,7 @@ public abstract class TaskSelectAutoCompleteFormComponent extends PFAutoComplete
         }
         try {
           final TaskDO task = taskTree.getTaskById(Integer.valueOf(value));
-          if (task == null
-              || taskTree.getKost2List(task.getId()) == null
-              ) {
+          if (task == null) {
             error(getString("timesheet.error.invalidTaskId"));
             return null;
           }
@@ -190,5 +198,14 @@ public abstract class TaskSelectAutoCompleteFormComponent extends PFAutoComplete
         return task.getTitle();
       }
     };
+  }
+
+  /**
+   * @param autocompleteOnlyTaskBookableForTimesheets the autocompleteOnlyTaskBookableForTimesheets to set
+   * @return this for chaining.
+   */
+  void setAutocompleteOnlyTaskBookableForTimesheets(final boolean autocompleteOnlyTaskBookableForTimesheets)
+  {
+    this.autocompleteOnlyTaskBookableForTimesheets = autocompleteOnlyTaskBookableForTimesheets;
   }
 }
