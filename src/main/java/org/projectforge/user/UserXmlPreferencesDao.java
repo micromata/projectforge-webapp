@@ -232,7 +232,7 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
    */
   public void setUser(final UserXmlPreferencesDO userPrefs, final Integer userId)
   {
-    final PFUserDO user = userDao.internalGetById(userId);
+    final PFUserDO user = userDao.getOrLoad(userId);
     userPrefs.setUser(user);
   }
 
@@ -250,7 +250,7 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
       isNew = true;
       userPrefs = new UserXmlPreferencesDO();
       userPrefs.setCreated(date);
-      setUser(userPrefs, userId);
+      userPrefs.setUser(userDao.internalGetById(userId));
       userPrefs.setKey(key);
     }
     final String xml = serialize(userPrefs, entry);
