@@ -227,12 +227,12 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
 
   /**
    * @param sheet
-   * @param userId If null, then task will be set to null;
+   * @param userId If null, then user will be set to null;
    * @see BaseDao#getOrLoad(Integer)
    */
   public void setUser(final UserXmlPreferencesDO userPrefs, final Integer userId)
   {
-    final PFUserDO user = userDao.getOrLoad(userId);
+    final PFUserDO user = userDao.internalGetById(userId);
     userPrefs.setUser(user);
   }
 
