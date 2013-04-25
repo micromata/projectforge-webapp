@@ -46,7 +46,6 @@ import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.CSSColor;
-import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
@@ -54,6 +53,7 @@ import org.projectforge.web.wicket.AbstractSelectPanel;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.FavoritesChoicePanel;
 import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.IconPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 
@@ -84,9 +84,16 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
 
   private WebMarkupContainer userselectContainer;
 
-  public TaskSelectPanel(final String id, final IModel<TaskDO> model, final ISelectCallerPage caller, final String selectProperty)
+  private FieldsetPanel fieldsetPanel;
+
+  private boolean autocompleteOnlyTaskBookableForTimesheets;
+
+  public TaskSelectPanel(final FieldsetPanel fieldsetPanel, final IModel<TaskDO> model, final ISelectCallerPage caller,
+      final String selectProperty)
   {
-    super(id, model, caller, selectProperty);
+    super(fieldsetPanel.newChildId(), model, caller, selectProperty);
+    this.fieldsetPanel = fieldsetPanel;
+    fieldsetPanel.getFieldset().setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true);
     TaskDO task = model.getObject();
     if (Hibernate.isInitialized(task) == false) {
       task = taskTree.getTaskById(task.getId());
@@ -297,43 +304,40 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
       }
 
     };
+    searchTaskInput.setAutocompleteOnlyTaskBookableForTimesheets(autocompleteOnlyTaskBookableForTimesheets);
     userselectContainer.add(searchTaskInput);
     // opener link
     final WebMarkupContainer searchTaskInputOpen = new WebMarkupContainer("searchTaskInputOpen");
-    if (isQuickSearchEnabled() == true) {
-      WicketUtils.addTooltip(searchTaskInputOpen, getString("quickselect"));
-      searchTaskInputOpen.add(new AjaxEventBehavior("click") {
-        private static final long serialVersionUID = -938527474172868488L;
+    WicketUtils.addTooltip(searchTaskInputOpen, getString("quickselect"));
+    searchTaskInputOpen.add(new AjaxEventBehavior("click") {
+      private static final long serialVersionUID = -938527474172868488L;
 
-        @Override
-        protected void onEvent(final AjaxRequestTarget target)
-        {
-          ajaxTaskSelectMode = true;
-          target.appendJavaScript("hideAllTooltips();");
-          target.add(divContainer);
-          target.add(userselectContainer);
-          target.focusComponent(searchTaskInput);
-        }
-      });
-      // close link
-      final WebMarkupContainer searchTaskInputClose = new WebMarkupContainer("searchTaskInputClose");
-      divContainer.add(searchTaskInputClose);
-      searchTaskInputClose.add(new AjaxEventBehavior("click") {
-        private static final long serialVersionUID = -4334830387094758960L;
+      @Override
+      protected void onEvent(final AjaxRequestTarget target)
+      {
+        ajaxTaskSelectMode = true;
+        target.appendJavaScript("hideAllTooltips();");
+        target.add(divContainer);
+        target.add(userselectContainer);
+        target.focusComponent(searchTaskInput);
+      }
+    });
+    // close link
+    final WebMarkupContainer searchTaskInputClose = new WebMarkupContainer("searchTaskInputClose");
+    divContainer.add(searchTaskInputClose);
+    searchTaskInputClose.add(new AjaxEventBehavior("click") {
+      private static final long serialVersionUID = -4334830387094758960L;
 
-        @Override
-        protected void onEvent(final AjaxRequestTarget target)
-        {
-          ajaxTaskSelectMode = false;
-          target.appendJavaScript("hideAllTooltips();");
-          target.add(divContainer);
-          target.add(userselectContainer);
-        }
-      });
-      userselectContainer.add(searchTaskInputClose);
-    } else {
-      searchTaskInputOpen.setVisible(false);
-    }
+      @Override
+      protected void onEvent(final AjaxRequestTarget target)
+      {
+        ajaxTaskSelectMode = false;
+        target.appendJavaScript("hideAllTooltips();");
+        target.add(divContainer);
+        target.add(userselectContainer);
+      }
+    });
+    userselectContainer.add(searchTaskInputClose);
     divContainer.add(searchTaskInputOpen);
   }
 
@@ -345,6 +349,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
    */
   protected void onModelSelected(final AjaxRequestTarget target, final TaskDO taskDo)
   {
+    target.add(fieldsetPanel.getFieldset());
     target.add(divContainer);
     target.add(userselectContainer);
   }
@@ -401,10 +406,21 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
   }
 
   /**
-   * Hook method which indicates if the quick task search should be enabled. false by default
-   * @return
+   * @param autocompleteOnlyTaskBookableForTimesheets the autocompleteOnlyTaskBookableForTimesheets to set
+   * @return this for chaining.
    */
-  protected boolean isQuickSearchEnabled() {
-      return false;
+  public TaskSelectPanel setAutocompleteOnlyTaskBookableForTimesheets(final boolean autocompleteOnlyTaskBookableForTimesheets)
+  {
+    this.autocompleteOnlyTaskBookableForTimesheets = autocompleteOnlyTaskBookableForTimesheets;
+    return this;
+  }
+
+  /**
+   * If true then only task will be displayed in autocompletion list which are allowed to have timesheets.
+   * @return the autocompleteOnlyTaskBookableForTimesheets
+   */
+  public boolean isAutocompleteOnlyTaskBookableForTimesheets()
+  {
+    return autocompleteOnlyTaskBookableForTimesheets;
   }
 }
