@@ -162,4 +162,14 @@ public class DatabaseSupport
     }
     return buf.toString();
   }
+
+  public String alterTableColumnVarCharLength(final String table, final String attribute, final int length)
+  {
+    if (dialect == HibernateDialect.PostgreSQL) {
+      return "ALTER TABLE " + table + " ALTER COLUMN " + attribute + " TYPE varchar(" + length + ")";
+    } else {
+      return "ALTER TABLE " + table + " ALTER COLUMN " + attribute + " varchar(" + length + ")";
+    }
+  }
+
 }
