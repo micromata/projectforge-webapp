@@ -23,6 +23,9 @@
 
 package org.projectforge.plugins.teamcal;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.admin.UpdateEntry;
@@ -52,7 +55,42 @@ import org.projectforge.web.wicket.AbstractEditPage;
  */
 public class TeamCalPluginUpdates
 {
+  private static final String VERSION_5_1 = "5.1";
+
   static DatabaseUpdateDao dao;
+
+  @SuppressWarnings("serial")
+  public static List<UpdateEntry> getUpdateEntries()
+  {
+    final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
+    // /////////////////////////////////////////////////////////////////
+    // 5.1
+    // /////////////////////////////////////////////////////////////////
+    list.add(new UpdateEntryImpl(TeamCalPlugin.ID, VERSION_5_1, "2013-04-25", "Increase length of T_PLUGIN_CALENDAR_EVENT.NOTE (255-4000)") {
+      final Table eventTable = new Table(TeamEventDO.class);
+
+      @Override
+      public UpdatePreCheckStatus runPreCheck()
+      {
+        // Does the data-base table already exist?
+        if (dao.isVersionUpdated(TeamCalPlugin.ID, VERSION_5_1) == true) {
+          return UpdatePreCheckStatus.ALREADY_UPDATED;
+        } else {
+          return UpdatePreCheckStatus.OK;
+        }
+      }
+
+      @Override
+      public UpdateRunningStatus runUpdate()
+      {
+        if (dao.isVersionUpdated(TeamCalPlugin.ID, VERSION_5_1) == false) {
+          dao.alterTableColumnVarCharLength(eventTable.getName(), "note", 4000);
+        }
+        return UpdateRunningStatus.DONE;
+      }
+    });
+    return list;
+  }
 
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
@@ -138,7 +176,8 @@ public class TeamCalPluginUpdates
           final ConfigurationDao configurationDao = Registry.instance().getDao(ConfigurationDao.class);
           configurationDao.checkAndUpdateDatabaseEntries();
           final ConfigurationDO configurationDO = configurationDao.getEntry(ConfigurationParam.CALENDAR_DOMAIN);
-          final ConfigurationEditPage configurationEditPage = new ConfigurationEditPage(new PageParameters().add(AbstractEditPage.PARAMETER_KEY_ID, configurationDO.getId()));
+          final ConfigurationEditPage configurationEditPage = new ConfigurationEditPage(new PageParameters().add(
+              AbstractEditPage.PARAMETER_KEY_ID, configurationDO.getId()));
           configurationEditPage.setReturnToPage(new SystemUpdatePage(new PageParameters()));
           throw new RestartResponseException(configurationEditPage);
         }

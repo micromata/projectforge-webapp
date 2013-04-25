@@ -279,7 +279,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   /**
    * @return the note
    */
-  @Column
+  @Column(length = 4000)
   public String getNote()
   {
     return note;
