@@ -94,6 +94,9 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
   @Override
   public boolean hasInsertAccess(final PFUserDO user, final TeamCalDO obj)
   {
+    if (obj != null && obj.isAbo() == true) {
+      return false;
+    }
     return isOwner(user, obj) == true || UserRights.getAccessChecker().isUserMemberOfAdminGroup(user) == true;
   }
 
@@ -147,6 +150,9 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
 
   public boolean hasFullAccess(final TeamCalDO calendar, final Integer userId)
   {
+    if (calendar != null && calendar.isAbo() == true) {
+      return false;
+    }
     if (isOwner(userId, calendar) == true) {
       return true;
     }

@@ -34,6 +34,7 @@ import net.ftlines.wicket.fullcalendar.callback.SelectedRange;
 import net.ftlines.wicket.fullcalendar.callback.View;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebPage;
@@ -158,12 +159,12 @@ public class TeamCalCalendarPanel extends CalendarPanel
   protected void onEventClickedHook(final ClickedEvent clickedEvent, final CalendarResponse response, final Event event,
       final String eventId, final String eventClassName)
   {
-    // User clicked on teamEvent
-    final TeamCalEventId id = new TeamCalEventId(event.getId(), PFUserContext.getTimeZone());
     // skip abo events at this place please
-    if(id.getDataBaseId() == null || id.getDataBaseId() <= 0) {
+    if (StringUtils.startsWith(eventId, "-")) {
       return;
     }
+    // User clicked on teamEvent
+    final TeamCalEventId id = new TeamCalEventId(event.getId(), PFUserContext.getTimeZone());
     final TeamEventDO teamEventDO = teamEventDao.getById(id.getDataBaseId());
     final TeamEvent teamEvent = eventProvider.getTeamEvent(id.toString());
     if (new TeamEventRight().hasUpdateAccess(PFUserContext.getUser(), teamEventDO, null)) {
@@ -253,11 +254,11 @@ public class TeamCalCalendarPanel extends CalendarPanel
   private void modifyEvent(final Event event, final DateTime newStartDate, final DateTime newEndDate, final CalendarDropMode dropMode,
       final CalendarResponse response)
   {
-    final TeamCalEventId id = new TeamCalEventId(event.getId(), PFUserContext.getTimeZone());
     // skip abo events at this place please
-    if(id.getDataBaseId() == null || id.getDataBaseId() <= 0) {
+    if (StringUtils.startsWith(event.getId(), "-")) {
       return;
     }
+    final TeamCalEventId id = new TeamCalEventId(event.getId(), PFUserContext.getTimeZone());
     final TeamEvent teamEvent = eventProvider.getTeamEvent(id.toString());
     if (teamEvent == null) {
       return;

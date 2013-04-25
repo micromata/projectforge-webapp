@@ -153,7 +153,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     List<TeamEventDO> list = getList(filter);
     if (CollectionUtils.isNotEmpty(list) == true) {
       for (final TeamEventDO eventDO : list) {
-        if (eventDO.hasRecurrence() == true) {
+        if (eventDO.hasRecurrence() == true && eventDO.getCalendar().isAbo() == false) {
           // Added later.
           continue;
         }
