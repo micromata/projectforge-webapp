@@ -192,7 +192,7 @@ public class ConfigurationDO extends DefaultBaseDO
     setIntValue(taskId);
   }
 
-  @Column
+  @Column(scale = 5, precision = 18)
   public BigDecimal getFloatValue()
   {
     if (floatValue != null) {
