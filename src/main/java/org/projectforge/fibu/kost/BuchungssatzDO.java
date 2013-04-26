@@ -137,8 +137,8 @@ public class BuchungssatzDO extends DefaultBaseDO implements Historizable, Compa
       log.warn("Can't calculate Buchungssatz, because konto or kost2 is not given (for import it will be detected, OK): " + this);
       return;
     }
-    int kto = konto.getNummer();
-    SHType sollHaben = sh;
+    final int kto = konto.getNummer();
+    final SHType sollHaben = sh;
     if (kto >= 4400 && kto <= 4499) {
       // Konto 4400 - 4499 werden im Haben gebucht: Umsatz.
     }
@@ -166,7 +166,7 @@ public class BuchungssatzDO extends DefaultBaseDO implements Historizable, Compa
     return text;
   }
 
-  public void setText(String text)
+  public void setText(final String text)
   {
     this.text = text;
   }
@@ -178,18 +178,18 @@ public class BuchungssatzDO extends DefaultBaseDO implements Historizable, Compa
     return beleg;
   }
 
-  public void setBeleg(String beleg)
+  public void setBeleg(final String beleg)
   {
     this.beleg = beleg;
   }
 
-  @Column(nullable = false)
+  @Column(nullable = false, scale = 2, precision = 18)
   public BigDecimal getBetrag()
   {
     return betrag;
   }
 
-  public void setBetrag(BigDecimal betrag)
+  public void setBetrag(final BigDecimal betrag)
   {
     this.betrag = betrag != null ? betrag.setScale(2, RoundingMode.HALF_UP) : null;
   }
@@ -200,7 +200,7 @@ public class BuchungssatzDO extends DefaultBaseDO implements Historizable, Compa
     return datum;
   }
 
-  public void setDatum(Date datum)
+  public void setDatum(final Date datum)
   {
     this.datum = datum;
   }
@@ -212,7 +212,7 @@ public class BuchungssatzDO extends DefaultBaseDO implements Historizable, Compa
     return konto;
   }
 
-  public void setKonto(KontoDO konto)
+  public void setKonto(final KontoDO konto)
   {
     this.konto = konto;
   }
@@ -230,7 +230,7 @@ public class BuchungssatzDO extends DefaultBaseDO implements Historizable, Compa
     return gegenKonto;
   }
 
-  public void setGegenKonto(KontoDO gegenKonto)
+  public void setGegenKonto(final KontoDO gegenKonto)
   {
     this.gegenKonto = gegenKonto;
   }
@@ -248,7 +248,7 @@ public class BuchungssatzDO extends DefaultBaseDO implements Historizable, Compa
     return kost1;
   }
 
-  public void setKost1(Kost1DO kost1)
+  public void setKost1(final Kost1DO kost1)
   {
     this.kost1 = kost1;
   }
@@ -266,7 +266,7 @@ public class BuchungssatzDO extends DefaultBaseDO implements Historizable, Compa
     return kost2;
   }
 
-  public void setKost2(Kost2DO kost2)
+  public void setKost2(final Kost2DO kost2)
   {
     this.kost2 = kost2;
   }
@@ -283,7 +283,7 @@ public class BuchungssatzDO extends DefaultBaseDO implements Historizable, Compa
     return satznr;
   }
 
-  public void setSatznr(Integer satznr)
+  public void setSatznr(final Integer satznr)
   {
     this.satznr = satznr;
   }
@@ -298,7 +298,7 @@ public class BuchungssatzDO extends DefaultBaseDO implements Historizable, Compa
     return month;
   }
 
-  public void setMonth(Integer month)
+  public void setMonth(final Integer month)
   {
     this.month = month;
   }
@@ -313,7 +313,7 @@ public class BuchungssatzDO extends DefaultBaseDO implements Historizable, Compa
     return year;
   }
 
-  public void setYear(Integer year)
+  public void setYear(final Integer year)
   {
     this.year = year;
   }
@@ -331,14 +331,14 @@ public class BuchungssatzDO extends DefaultBaseDO implements Historizable, Compa
     return sh;
   }
 
-  public void setSH(String value)
+  public void setSH(final String value)
   {
     if ("S".equals(value) == true) {
       sh = SHType.SOLL;
     } else if ("H".equals(value) == true) {
       sh = SHType.HABEN;
     } else {
-      String msg = "Haben / Soll-Wert ist undefiniert: " + this.toString();
+      final String msg = "Haben / Soll-Wert ist undefiniert: " + this.toString();
       log.error(msg);
       throw new RuntimeException(msg);
     }
@@ -350,12 +350,12 @@ public class BuchungssatzDO extends DefaultBaseDO implements Historizable, Compa
     return menge;
   }
 
-  public void setMenge(String menge)
+  public void setMenge(final String menge)
   {
     this.menge = menge;
   }
 
-  public void setSh(SHType sh)
+  public void setSh(final SHType sh)
   {
     this.sh = sh;
   }
@@ -366,17 +366,17 @@ public class BuchungssatzDO extends DefaultBaseDO implements Historizable, Compa
     return comment;
   }
 
-  public void setComment(String comment)
+  public void setComment(final String comment)
   {
     this.comment = comment;
   }
 
-  public void setIgnore(boolean ignore)
+  public void setIgnore(final boolean ignore)
   {
     this.ignore = ignore;
   }
 
-  public int compareTo(BuchungssatzDO other)
+  public int compareTo(final BuchungssatzDO other)
   {
     int r = this.year.compareTo(other.year);
     if (r != 0) {

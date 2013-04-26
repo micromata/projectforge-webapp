@@ -134,7 +134,7 @@ public class Kost2ArtDO extends AbstractHistorizableBaseDO<Integer> implements C
     return fakturiert;
   }
 
-  @Column(name = "work_fraction")
+  @Column(name = "work_fraction", scale = 5, precision = 10)
   public BigDecimal getWorkFraction()
   {
     return workFraction;

@@ -103,7 +103,7 @@ public class KostZuweisungDO extends DefaultBaseDO implements ShortDisplayNameCa
     this.index = index;
   }
 
-  @Column
+  @Column(scale = 2, precision = 12)
   public BigDecimal getNetto()
   {
     return netto;
