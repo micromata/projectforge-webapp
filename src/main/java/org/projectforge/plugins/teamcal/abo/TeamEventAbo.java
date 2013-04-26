@@ -27,6 +27,7 @@ import java.io.ByteArrayInputStream;
 import java.io.Serializable;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
@@ -67,6 +68,8 @@ public class TeamEventAbo implements Serializable
   private Long lastUpdated;
 
   private final HttpClient client;
+  
+  private static final Long TIME_IN_THE_PAST = 365L * 24 * 60 * 60 * 1000; // one year in millis
 
   public TeamEventAbo(TeamCalDao teamCalDao, TeamCalDO teamCalDo)
   {
@@ -117,6 +120,7 @@ public class TeamEventAbo implements Serializable
         return;
       }
       try {
+        final Date timeInPast = new Date(System.currentTimeMillis() - TIME_IN_THE_PAST);
         final Calendar calendar = builder.build(new ByteArrayInputStream(bytes));
         final List<Component> list = calendar.getComponents(Component.VEVENT);
         final List<VEvent> vEvents = new ArrayList<VEvent>();
@@ -124,6 +128,9 @@ public class TeamEventAbo implements Serializable
           final VEvent event = (VEvent) c;
           if (event.getSummary() != null && StringUtils.equals(event.getSummary().getValue(), CalendarFeed.SETUP_EVENT) == true) {
             // skip setup event!
+            continue;
+          }
+          if(event.getStartDate().getDate().before(timeInPast)) {
             continue;
           }
           vEvents.add(event);
