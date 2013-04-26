@@ -122,7 +122,7 @@ public class TeamEventAbo implements Serializable
         final List<VEvent> vEvents = new ArrayList<VEvent>();
         for (final Component c : list) {
           final VEvent event = (VEvent) c;
-          if (StringUtils.equals(event.getSummary().getValue(), CalendarFeed.SETUP_EVENT) == true) {
+          if (event.getSummary() != null && StringUtils.equals(event.getSummary().getValue(), CalendarFeed.SETUP_EVENT) == true) {
             // skip setup event!
             continue;
           }
