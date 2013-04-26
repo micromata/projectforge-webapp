@@ -29,11 +29,13 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
+import org.projectforge.plugins.teamcal.abo.AboUpdateInterval;
 import org.projectforge.plugins.teamcal.dialog.TeamCalICSExportDialog;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
@@ -77,7 +79,9 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
 
   private TeamCalICSExportDialog icsExportDialog;
 
-  private FieldsetPanel fsAboDetails;
+  private FieldsetPanel fsAboUrl;
+
+  private FieldsetPanel fsAboInterval;
 
   /**
    * @param parentPage
@@ -166,19 +170,46 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
         @Override
         protected void onUpdate(AjaxRequestTarget target)
         {
-          fsAboDetails.getFieldset().setVisible(data.isAbo() == true);
-          target.add(fsAboDetails.getFieldset());
+          // update visibility
+          fsAboUrl.getFieldset().setVisible(data.isAbo() == true);
+          fsAboInterval.getFieldset().setVisible(data.isAbo() == true);
+          // update components through ajax
+          target.add(fsAboUrl.getFieldset());
+          target.add(fsAboInterval.getFieldset());
         }
       });
       checkboxDiv.add(checkboxPanel);
-      fsAboDetails  = gridBuilder.newFieldset("").suppressLabelForWarning();
-      fsAboDetails.getFieldset().setOutputMarkupId(true);
-      fsAboDetails.getFieldset().setOutputMarkupPlaceholderTag(true);
-      fsAboDetails.getFieldset().setVisible(data.isAbo() == true);
+      fsAboUrl = gridBuilder.newFieldset(getString("plugins.teamcal.aboUrl")).suppressLabelForWarning();
+      fsAboUrl.getFieldset().setOutputMarkupId(true);
+      fsAboUrl.getFieldset().setOutputMarkupPlaceholderTag(true);
+      fsAboUrl.getFieldset().setVisible(data.isAbo() == true);
 
-      TextField<String> urlField = new TextField<String>(fsAboDetails.getTextFieldId(), new PropertyModel<String>(data, "aboUrl"));
+      TextField<String> urlField = new TextField<String>(fsAboUrl.getTextFieldId(), new PropertyModel<String>(data, "aboUrl"));
       urlField.setRequired(true);
-      fsAboDetails.add(urlField);
+      fsAboUrl.add(urlField);
+
+      fsAboInterval = gridBuilder.newFieldset(getString("plugins.teamcal.updateInterval")).suppressLabelForWarning();
+      fsAboInterval.getFieldset().setOutputMarkupId(true);
+      fsAboInterval.getFieldset().setOutputMarkupPlaceholderTag(true);
+      fsAboInterval.getFieldset().setVisible(data.isAbo() == true);
+
+      IChoiceRenderer<Long> intervalRenderer = new IChoiceRenderer<Long>() {
+        @Override
+        public Object getDisplayValue(Long object)
+        {
+          return getString(AboUpdateInterval.getI18nKeyForInterval(object));
+        }
+
+        @Override
+        public String getIdValue(Long object, int index)
+        {
+          return "" + object;
+        }
+      };
+      DropDownChoicePanel<Long> intervalField = new DropDownChoicePanel<Long>(fsAboUrl.getDropDownChoiceId(), new PropertyModel<Long>(data,
+          "aboUpdateTime"), AboUpdateInterval.getIntervals(), intervalRenderer);
+      intervalField.setRequired(true);
+      fsAboInterval.add(intervalField);
     }
     if (access == true) {
       gridBuilder.newSplitPanel(GridSize.COL50);
