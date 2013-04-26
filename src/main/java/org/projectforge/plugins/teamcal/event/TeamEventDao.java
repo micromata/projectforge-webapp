@@ -153,7 +153,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     List<TeamEventDO> list = getList(filter);
     if (CollectionUtils.isNotEmpty(list) == true) {
       for (final TeamEventDO eventDO : list) {
-        if (eventDO.hasRecurrence() == true && eventDO.getCalendar().isAbo() == false) {
+        if (eventDO.hasRecurrence() == true) {
           // Added later.
           continue;
         }
@@ -165,6 +165,8 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     qFilter.add(Restrictions.isNotNull("recurrenceRule"));
     list = getList(qFilter);
     list = selectUnique(list);
+    // add all abo events
+    list.addAll(TeamEventAboCache.instance().getRecurrenceEvents(teamEventFilter));
     final TimeZone timeZone = PFUserContext.getTimeZone();
     if (list != null) {
       for (final TeamEventDO eventDO : list) {

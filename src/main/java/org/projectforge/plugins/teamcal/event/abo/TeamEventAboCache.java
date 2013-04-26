@@ -23,16 +23,14 @@
 
 package org.projectforge.plugins.teamcal.event.abo;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.hibernate.criterion.Restrictions;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
+import org.projectforge.plugins.teamcal.event.TeamEventFilter;
 
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
@@ -90,5 +88,17 @@ public class TeamEventAboCache
       return null;
     }
     return eventAbo.getEvents(startTime, endTime);
+  }
+
+  public Collection< ? extends TeamEventDO> getRecurrenceEvents(TeamEventFilter filter)
+  {
+    List<TeamEventDO> result = new ArrayList<TeamEventDO>();
+    for (Integer calendarId : filter.getTeamCals()) {
+      TeamEventAbo eventAbo = abos.get(calendarId);
+      if (eventAbo != null) {
+        result.addAll(eventAbo.getRecurrenceEvents());
+      }
+    }
+    return result;
   }
 }

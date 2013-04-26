@@ -58,7 +58,9 @@ public class TeamEventAbo implements Serializable
 
   private final Integer teamCalId;
 
-  private final RangeMap<Long, TeamEventDO> eventDuractionAccess;
+  private final RangeMap<Long, TeamEventDO> eventDurationAccess;
+
+  private final List<TeamEventDO> recurrenceEvents;
 
   private final TeamCalDao teamCalDao;
 
@@ -70,7 +72,8 @@ public class TeamEventAbo implements Serializable
   {
     this.teamCalDao = teamCalDao;
     this.teamCalId = teamCalDo.getId();
-    this.eventDuractionAccess = TreeRangeMap.create();
+    eventDurationAccess = TreeRangeMap.create();
+    recurrenceEvents = new ArrayList<TeamEventDO>();
     client = new HttpClient();
     initOrUpdate(teamCalDo);
   }
@@ -124,7 +127,7 @@ public class TeamEventAbo implements Serializable
           vEvents.add(event);
         }
         // clear
-        eventDuractionAccess.clear();
+        eventDurationAccess.clear();
 
         // the event id must (!) be negative and decrementing (different on each event)
         Integer startId = -1;
@@ -133,20 +136,13 @@ public class TeamEventAbo implements Serializable
           teamEvent.setId(startId);
           teamEvent.setCalendar(teamCalDo);
 
-          Long endTime = null;
-          if (teamEvent.hasRecurrence() == true && 1==2) {
+          if (teamEvent.hasRecurrence() == true) {
             // special treatment for recurrence events ..
-            if(teamEvent.getRecurrenceUntil() == null) {
-              // .. with no end date
-              endTime = Long.MAX_VALUE;
-            } else {
-              // .. with end time
-              endTime = teamEvent.getRecurrenceUntil().getTime();
-            }
+            recurrenceEvents.add(teamEvent);
           } else {
-            endTime = teamEvent.getEndDate().getTime();
+            eventDurationAccess.put(Range.closed(teamEvent.getStartDate().getTime(), teamEvent.getEndDate().getTime()), teamEvent);
           }
-          eventDuractionAccess.put(Range.closed(teamEvent.getStartDate().getTime(), endTime), teamEvent);
+
           startId--;
         }
         lastUpdated = System.currentTimeMillis();
@@ -159,8 +155,9 @@ public class TeamEventAbo implements Serializable
 
   public List<TeamEventDO> getEvents(Long startTime, Long endTime)
   {
-
-    final RangeMap<Long, TeamEventDO> rangeMap = eventDuractionAccess.subRangeMap(Range.open(startTime, endTime));
+    // first: gather all "normal" events
+    final RangeMap<Long, TeamEventDO> rangeMap = eventDurationAccess.subRangeMap(Range.closed(startTime, endTime));
+    // then gather
     return new ArrayList<TeamEventDO>(rangeMap.asMapOfRanges().values());
   }
 
@@ -172,5 +169,9 @@ public class TeamEventAbo implements Serializable
   public Long getLastUpdated()
   {
     return lastUpdated;
+  }
+
+  public List<TeamEventDO> getRecurrenceEvents() {
+    return recurrenceEvents;
   }
 }
