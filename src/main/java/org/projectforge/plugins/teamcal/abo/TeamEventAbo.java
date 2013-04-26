@@ -69,7 +69,7 @@ public class TeamEventAbo implements Serializable
 
   private final HttpClient client;
   
-  private static final Long TIME_IN_THE_PAST = 30L * 24 * 60 * 60 * 1000; // 30 days in millis in the past to subscribe
+  private static final Long TIME_IN_THE_PAST = 60L * 24 * 60 * 60 * 1000; // 60 days in millis in the past to subscribe
 
   public TeamEventAbo(TeamCalDao teamCalDao, TeamCalDO teamCalDo)
   {
