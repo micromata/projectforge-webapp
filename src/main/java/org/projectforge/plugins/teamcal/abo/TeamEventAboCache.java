@@ -21,7 +21,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.plugins.teamcal.event.abo;
+package org.projectforge.plugins.teamcal.abo;
 
 import java.util.*;
 
@@ -43,6 +43,8 @@ public class TeamEventAboCache
 
   private List<Integer> teamCalWithAbo;
 
+  private static final Long ABO_UPDATE_TIME = 5L * 60 * 1000; // 5 min
+
   private TeamEventAboCache()
   {
     abos = new HashMap<Integer, TeamEventAbo>();
@@ -60,19 +62,29 @@ public class TeamEventAboCache
     filter.add(Restrictions.eq("abo", true));
     final List<TeamCalDO> aboCalendars = dao.getList(filter);
     teamCalWithAbo.clear();
+    abos.clear();
 
     for (TeamCalDO calendar : aboCalendars) {
+      updateCache(dao, calendar);
+    }
+  }
+
+  public void updateCache(TeamCalDao dao, TeamCalDO calendar)
+  {
+    if (teamCalWithAbo.contains(calendar.getId()) == false) {
       teamCalWithAbo.add(calendar.getId());
-      final TeamEventAbo compareAbo = abos.get(calendar.getId());
-      Long now = System.currentTimeMillis();
-      if (compareAbo == null) {
-        // create the calendar
-        final TeamEventAbo teamEventAbo = new TeamEventAbo(dao, calendar);
-        abos.put(calendar.getId(), teamEventAbo);
-      } else if (compareAbo.getLastUpdated() == null || compareAbo.getLastUpdated() + calendar.getAboUpdateTime() <= now) {
-        // update the calendar
-        compareAbo.initOrUpdate(calendar);
-      }
+    }
+    final TeamEventAbo compareAbo = abos.get(calendar.getId());
+    Long now = System.currentTimeMillis();
+    Long addedTime = calendar.getAboUpdateTime() == null ? ABO_UPDATE_TIME : calendar.getAboUpdateTime();
+    if (compareAbo == null) {
+      // create the calendar
+      final TeamEventAbo teamEventAbo = new TeamEventAbo(dao, calendar);
+      abos.put(calendar.getId(), teamEventAbo);
+
+    } else if (compareAbo.getLastUpdated() == null || compareAbo.getLastUpdated() + addedTime <= now) {
+      // update the calendar
+      compareAbo.initOrUpdate(calendar);
     }
   }
 
@@ -101,4 +113,5 @@ public class TeamEventAboCache
     }
     return result;
   }
+
 }

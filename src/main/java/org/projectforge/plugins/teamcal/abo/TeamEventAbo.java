@@ -21,7 +21,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.plugins.teamcal.event.abo;
+package org.projectforge.plugins.teamcal.abo;
 
 import java.io.ByteArrayInputStream;
 import java.io.Serializable;
@@ -87,7 +87,9 @@ public class TeamEventAbo implements Serializable
       try {
 
         // Create a method instance.
-        GetMethod method = new GetMethod(teamCalDo.getAboUrl());
+        String url = teamCalDo.getAboUrl();
+        url = StringUtils.replace(url, "webcal", "http");
+        GetMethod method = new GetMethod(url);
 
         int statusCode = client.executeMethod(method);
 

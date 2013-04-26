@@ -27,7 +27,9 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -46,9 +48,7 @@ import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.JodaDatePanel;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
-import org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel;
-import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.IconType;
+import org.projectforge.web.wicket.flowlayout.*;
 
 import com.vaynberg.wicket.select2.Select2MultiChoice;
 
@@ -76,6 +76,8 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
   MultiChoiceListHelper<GroupDO> fullAccessGroupsListHelper, readonlyAccessGroupsListHelper, minimalAccessGroupsListHelper;
 
   private TeamCalICSExportDialog icsExportDialog;
+
+  private FieldsetPanel fsAboDetails;
 
   /**
    * @param parentPage
@@ -153,7 +155,31 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
         };
       });
     }
+    {
+      // external subscription
+      final FieldsetPanel fsAbo = gridBuilder.newFieldset(getString("plugins.teamcal.aboLabel")).suppressLabelForWarning();
+      final DivPanel checkboxDiv = fsAbo.addNewCheckBoxDiv();
+      CheckBoxPanel checkboxPanel = new CheckBoxPanel(checkboxDiv.newChildId(), new PropertyModel<Boolean>(data, "abo"),
+          getString("plugins.teamcal.abo"));
+      // ajax stuff
+      checkboxPanel.getCheckBox().add(new AjaxFormComponentUpdatingBehavior("change") {
+        @Override
+        protected void onUpdate(AjaxRequestTarget target)
+        {
+          fsAboDetails.getFieldset().setVisible(data.isAbo() == true);
+          target.add(fsAboDetails.getFieldset());
+        }
+      });
+      checkboxDiv.add(checkboxPanel);
+      fsAboDetails  = gridBuilder.newFieldset("").suppressLabelForWarning();
+      fsAboDetails.getFieldset().setOutputMarkupId(true);
+      fsAboDetails.getFieldset().setOutputMarkupPlaceholderTag(true);
+      fsAboDetails.getFieldset().setVisible(data.isAbo() == true);
 
+      TextField<String> urlField = new TextField<String>(fsAboDetails.getTextFieldId(), new PropertyModel<String>(data, "aboUrl"));
+      urlField.setRequired(true);
+      fsAboDetails.add(urlField);
+    }
     if (access == true) {
       gridBuilder.newSplitPanel(GridSize.COL50);
       // set access users

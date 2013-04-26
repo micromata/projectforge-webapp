@@ -42,7 +42,7 @@ import org.projectforge.plugins.teamcal.admin.TeamCalCache;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalsProvider;
-import org.projectforge.plugins.teamcal.event.abo.TeamEventAboCache;
+import org.projectforge.plugins.teamcal.abo.TeamEventAboCache;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserRightId;
 import org.springframework.transaction.annotation.Propagation;
