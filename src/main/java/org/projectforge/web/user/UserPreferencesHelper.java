@@ -25,6 +25,7 @@ package org.projectforge.web.user;
 
 import java.io.Serializable;
 
+import org.projectforge.common.CloneHelper;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRights;
@@ -81,9 +82,11 @@ public class UserPreferencesHelper
         return value;
       }
       value = userXmlPreferencesCache.getEntry(userId, key);
-      if (value instanceof Serializable) {
-        MySession.get().setAttribute(key, (Serializable) value);
+      if (value == null || value instanceof Serializable == false) {
+        return null;
       }
+      value = CloneHelper.cloneBySerialization(value);
+      MySession.get().setAttribute(key, (Serializable) value);
       return value;
     }
     return userXmlPreferencesCache.getEntry(userId, key);
