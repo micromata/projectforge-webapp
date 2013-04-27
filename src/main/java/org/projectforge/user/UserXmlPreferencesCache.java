@@ -69,38 +69,18 @@ public class UserXmlPreferencesCache extends AbstractCache
   }
 
   /**
-   * Put the entry for the current logged in user.
-   * @see org.projectforge.user.UserXmlPreferencesMap#putEntry(String, Object, boolean)
-   */
-  public void putEntry(final String key, final Object value, final boolean persistent)
-  {
-    putEntry(PFUserContext.getUserId(), key, value, persistent);
-  }
-
-  /**
+   * Please use UserPreferenceHelper instead for correct handling of demo user's preferences!
    * @see org.projectforge.user.UserXmlPreferencesMap#putEntry(String, Object, boolean)
    */
   public void putEntry(final Integer userId, final String key, final Object value, final boolean persistent)
   {
     final UserXmlPreferencesMap data = ensureAndGetUserPreferencesData(userId);
-    if (accessChecker.isDemoUser(userId) == true) {
-      data.putEntry(key, value, false);
-    } else {
-      data.putEntry(key, value, persistent);
-    }
+    data.putEntry(key, value, persistent);
     checkRefresh(); // Should be called at the end of this method for considering changes inside this method.
   }
 
   /**
-   * Gets the entry for the current logged in user.
-   * @see #ensureAndGetUserPreferencesData(Integer)
-   */
-  public Object getEntry(final String key)
-  {
-    return getEntry(PFUserContext.getUserId(), key);
-  }
-
-  /**
+   * Please use UserPreferenceHelper instead for correct handling of demo user's preferences!
    * @see #ensureAndGetUserPreferencesData(Integer)
    */
   public Object getEntry(final Integer userId, final String key)
@@ -111,15 +91,7 @@ public class UserXmlPreferencesCache extends AbstractCache
   }
 
   /**
-   * Remove the entry of the current logged in user.
-   * @see #removeEntry(Integer, String)
-   */
-  public void removeEntry(final String key)
-  {
-    removeEntry(PFUserContext.getUserId(), key);
-  }
-
-  /**
+   * Please use UserPreferenceHelper instead for correct handling of demo user's preferences!
    * @see org.projectforge.user.UserXmlPreferencesMap#removeEntry(String)
    */
   public Object removeEntry(final Integer userId, final String key)
@@ -138,6 +110,11 @@ public class UserXmlPreferencesCache extends AbstractCache
     return data.removeEntry(key);
   }
 
+  /**
+   * Please use UserPreferenceHelper instead for correct handling of demo user's preferences!
+   * @param userId
+   * @return
+   */
   public synchronized UserXmlPreferencesMap ensureAndGetUserPreferencesData(final Integer userId)
   {
     UserXmlPreferencesMap data = getUserPreferencesData(userId);
@@ -147,11 +124,7 @@ public class UserXmlPreferencesCache extends AbstractCache
       final List<UserXmlPreferencesDO> userPrefs = userXmlPreferencesDao.getUserPreferencesByUserId(userId);
       for (final UserXmlPreferencesDO userPref : userPrefs) {
         final Object value = userXmlPreferencesDao.deserialize(userPref, true);
-        if (accessChecker.isDemoUser(userId) == true) {
-          data.putEntry(userPref.getKey(), value, false);
-        } else {
-          data.putEntry(userPref.getKey(), value, true);
-        }
+        data.putEntry(userPref.getKey(), value, true);
       }
       this.allPreferences.put(userId, data);
     }
@@ -179,6 +152,17 @@ public class UserXmlPreferencesCache extends AbstractCache
 
   private synchronized void flushToDB(final Integer userId, final boolean checkAccess)
   {
+    if (checkAccess == true) {
+      if (userId.equals(PFUserContext.getUserId()) == false) {
+        log.error("User '" + PFUserContext.getUserId() + "' has no access to write user preferences of other user '" + userId + "'.");
+        // No access.
+        return;
+      }
+    }
+    if (accessChecker.isDemoUser(userId) == true) {
+      // Do nothing for demo user.
+      return;
+    }
     final UserXmlPreferencesMap data = allPreferences.get(userId);
     if (data == null || data.isModified() == false) {
       return;
