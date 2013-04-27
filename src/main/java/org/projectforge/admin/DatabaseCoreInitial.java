@@ -1,0 +1,161 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+// Project ProjectForge Community Edition
+//         www.projectforge.org
+//
+// Copyright (C) 2001-2013 Kai Reinhard (k.reinhard@micromata.de)
+//
+// ProjectForge is dual-licensed.
+//
+// This community edition is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation; version 3 of the License.
+//
+// This community edition is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+// Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, see http://www.gnu.org/licenses/.
+//
+/////////////////////////////////////////////////////////////////////////////
+
+package org.projectforge.admin;
+
+import org.projectforge.access.AccessEntryDO;
+import org.projectforge.access.GroupTaskAccessDO;
+import org.projectforge.address.AddressDO;
+import org.projectforge.address.PersonalAddressDO;
+import org.projectforge.book.BookDO;
+import org.projectforge.core.ConfigurationDO;
+import org.projectforge.database.DatabaseUpdateDO;
+import org.projectforge.database.DatabaseUpdateDao;
+import org.projectforge.database.SchemaGenerator;
+import org.projectforge.database.Table;
+import org.projectforge.database.TableAttribute;
+import org.projectforge.database.TableAttributeType;
+import org.projectforge.fibu.AuftragDO;
+import org.projectforge.fibu.AuftragsPositionDO;
+import org.projectforge.fibu.EingangsrechnungDO;
+import org.projectforge.fibu.EingangsrechnungsPositionDO;
+import org.projectforge.fibu.EmployeeDO;
+import org.projectforge.fibu.EmployeeSalaryDO;
+import org.projectforge.fibu.KontoDO;
+import org.projectforge.fibu.KundeDO;
+import org.projectforge.fibu.ProjektDO;
+import org.projectforge.fibu.RechnungDO;
+import org.projectforge.fibu.RechnungsPositionDO;
+import org.projectforge.fibu.kost.BuchungssatzDO;
+import org.projectforge.fibu.kost.Kost1DO;
+import org.projectforge.fibu.kost.Kost2ArtDO;
+import org.projectforge.fibu.kost.Kost2DO;
+import org.projectforge.fibu.kost.KostZuweisungDO;
+import org.projectforge.gantt.GanttChartDO;
+import org.projectforge.humanresources.HRPlanningDO;
+import org.projectforge.humanresources.HRPlanningEntryDO;
+import org.projectforge.meb.ImportedMebEntryDO;
+import org.projectforge.meb.MebEntryDO;
+import org.projectforge.orga.ContractDO;
+import org.projectforge.orga.PostausgangDO;
+import org.projectforge.orga.PosteingangDO;
+import org.projectforge.plugins.teamcal.TeamCalPlugin;
+import org.projectforge.scripting.ScriptDO;
+import org.projectforge.task.TaskDO;
+import org.projectforge.timesheet.TimesheetDO;
+import org.projectforge.user.GroupDO;
+import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserPrefDO;
+import org.projectforge.user.UserPrefEntryDO;
+import org.projectforge.user.UserRightDO;
+import org.projectforge.user.UserXmlPreferencesDO;
+
+import de.micromata.hibernate.history.HistoryEntry;
+import de.micromata.hibernate.history.delta.PropertyDelta;
+
+/**
+ * @author Kai Reinhard (k.reinhard@micromata.de)
+ */
+public class DatabaseCoreInitial
+{
+  private static final String VERSION_5_0 = "5.0";
+
+  private static final String CURRENT_VERSION = VERSION_5_0;
+
+  @SuppressWarnings("serial")
+  public static UpdateEntry getInitializationUpdateEntry()
+  {
+    final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
+
+    final Class< ? >[] doClasses = new Class< ? >[] { //
+        // First needed data-base objects:
+        HistoryEntry.class, PropertyDelta.class, //
+        PFUserDO.class, GroupDO.class, TaskDO.class, GroupTaskAccessDO.class, //
+        AccessEntryDO.class, //
+
+        // To create second:
+        KontoDO.class, //
+
+        // To create third:
+        KundeDO.class, ProjektDO.class, //
+        Kost1DO.class, Kost2ArtDO.class, Kost2DO.class, //
+        AuftragDO.class, AuftragsPositionDO.class, //
+        EingangsrechnungDO.class, EingangsrechnungsPositionDO.class, //
+        RechnungDO.class, RechnungsPositionDO.class, //
+        EmployeeDO.class, //
+        EmployeeSalaryDO.class, //
+        KostZuweisungDO.class, //
+
+        // All the rest:
+        AddressDO.class, PersonalAddressDO.class, //
+        BookDO.class, //
+        ConfigurationDO.class, //
+        DatabaseUpdateDO.class, //
+        BuchungssatzDO.class, //
+        ContractDO.class, //
+        GanttChartDO.class, //
+        HRPlanningDO.class, HRPlanningEntryDO.class, //
+        MebEntryDO.class, ImportedMebEntryDO.class, //
+        PostausgangDO.class, //
+        PosteingangDO.class, //
+        ScriptDO.class, //
+        TimesheetDO.class, //
+        UserPrefDO.class, //
+        UserPrefEntryDO.class, //
+        UserRightDO.class, //
+        UserXmlPreferencesDO.class //
+    };
+
+    return new UpdateEntryImpl(TeamCalPlugin.ID, CURRENT_VERSION, "2013-04-25", "Adds all core tables T_*.") {
+
+      @Override
+      public UpdatePreCheckStatus runPreCheck()
+      {
+        // Does the data-base tables already exist?
+        if (dao.doesEntitiesExist(doClasses) == false) {
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
+        return UpdatePreCheckStatus.ALREADY_UPDATED;
+      }
+
+      @Override
+      public UpdateRunningStatus runUpdate()
+      {
+        if (dao.doesExist(new Table(PFUserDO.class)) == false) {
+          // User table doesn't exist, therefore schema should be empty:
+          dao.createSequence("hibernate_sequence", true);
+        }
+        final SchemaGenerator schemaGenerator = new SchemaGenerator(dao).add(doClasses);
+        final Table propertyDeltaTable = schemaGenerator.getTable(PropertyDelta.class);
+        propertyDeltaTable.addAttribute(new TableAttribute("clazz", TableAttributeType.VARCHAR, 31));
+        final Table historyEntryTable = schemaGenerator.getTable(HistoryEntry.class);
+        final TableAttribute typeAttr = historyEntryTable.getAttributeByName("type");
+        typeAttr.setType(TableAttributeType.INT);
+        schemaGenerator.createSchema();
+        dao.createMissingIndices();
+
+        return UpdateRunningStatus.DONE;
+      }
+    };
+  }
+}
