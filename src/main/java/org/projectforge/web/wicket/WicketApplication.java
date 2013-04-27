@@ -54,7 +54,9 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.apache.wicket.util.lang.Bytes;
 import org.projectforge.AppVersion;
+import org.projectforge.admin.DatabaseCoreInitial;
 import org.projectforge.admin.SystemUpdater;
+import org.projectforge.admin.UpdateEntry;
 import org.projectforge.common.BeanHelper;
 import org.projectforge.common.ExceptionHelper;
 import org.projectforge.core.ConfigXml;
@@ -64,6 +66,8 @@ import org.projectforge.core.CronSetup;
 import org.projectforge.core.SystemInfoCache;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.HibernateUtils;
+import org.projectforge.database.InitDatabaseDao;
+import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.plugins.core.PluginsRegistry;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.storage.StorageClient;
@@ -130,6 +134,9 @@ public class WicketApplication extends WebApplication implements WicketApplicati
 
   @SpringBean(name = "daoRegistry")
   private DatabaseUpdateDao databaseUpdateDao;
+
+  @SpringBean(name = "initDatabaseDao")
+  private InitDatabaseDao initDatabaseDao;
 
   @SpringBean(name = "systemUpdater")
   private SystemUpdater systemUpdater;
@@ -217,6 +224,11 @@ public class WicketApplication extends WebApplication implements WicketApplicati
   public void setDaoRegistry(final DaoRegistry daoRegistry)
   {
     this.daoRegistry = daoRegistry;
+  }
+
+  public void setInitDatabaseDao(final InitDatabaseDao initDatabaseDao)
+  {
+    this.initDatabaseDao = initDatabaseDao;
   }
 
   public void setSystemUpdater(final SystemUpdater systemUpdater)
@@ -358,6 +370,14 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     // }
     final org.hibernate.cfg.Configuration hibernateConfiguration = localSessionFactoryBean.getConfiguration();
     HibernateUtils.setConfiguration(hibernateConfiguration);
+
+    final boolean missingDatabaseSchema = initDatabaseDao.isEmpty();
+    if (missingDatabaseSchema == true) {
+      PFUserContext.setUser(DatabaseUpdateDao.__internalGetSystemAdminPseudoUser());
+      final UpdateEntry updateEntry = DatabaseCoreInitial.getInitializationUpdateEntry();
+      updateEntry.runUpdate();
+    }
+
     final ServletContext servletContext = getServletContext();
     final String configContextPath = configXml.getServletContextPath();
     String contextPath;
@@ -371,10 +391,6 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     if (configuration.getBeanFactory() == null) {
       configuration.setBeanFactory(beanFactory);
     }
-    configuration.setConfigurationDao(configurationDao);
-    SystemInfoCache.internalInitialize(systemInfoCache);
-    WicketUtils.setContextPath(contextPath);
-    UserFilter.initialize(userDao, contextPath);
     if (this.wicketApplicationFilter != null) {
       this.wicketApplicationFilter.setApplication(this);
     } else {
@@ -386,6 +402,19 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     pluginsRegistry.set(beanFactory, getResourceSettings());
     pluginsRegistry.set(systemUpdater);
     pluginsRegistry.initialize();
+    if (missingDatabaseSchema == true) {
+      for (final AbstractPlugin plugin : pluginsRegistry.getPlugins()) {
+        final UpdateEntry updateEntry = plugin.getInitializationUpdateEntry();
+        if (updateEntry != null) {
+          updateEntry.runUpdate();
+        }
+      }
+    }
+
+    configuration.setConfigurationDao(configurationDao);
+    SystemInfoCache.internalInitialize(systemInfoCache);
+    WicketUtils.setContextPath(contextPath);
+    UserFilter.initialize(userDao, contextPath);
 
     for (final Map.Entry<String, Class< ? extends WebPage>> mountPage : WebRegistry.instance().getMountPages().entrySet()) {
       final String path = mountPage.getKey();
