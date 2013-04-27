@@ -37,9 +37,8 @@ import org.projectforge.core.ConfigurationDO;
 import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.ConfigurationParam;
 import org.projectforge.database.DatabaseUpdateDao;
+import org.projectforge.database.SchemaGenerator;
 import org.projectforge.database.Table;
-import org.projectforge.database.TableAttribute;
-import org.projectforge.database.TableAttributeType;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.event.TeamEventAttendeeDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
@@ -57,7 +56,12 @@ public class TeamCalPluginUpdates
 {
   private static final String VERSION_5_1 = "5.1";
 
+  private static final String CURRENT_VERSION = VERSION_5_1;
+
   static DatabaseUpdateDao dao;
+
+  final static Class< ? >[] doClasses = new Class< ? >[] { //
+    TeamCalDO.class, TeamEventDO.class, TeamEventAttendeeDO.class};
 
   @SuppressWarnings("serial")
   public static List<UpdateEntry> getUpdateEntries()
@@ -73,17 +77,17 @@ public class TeamCalPluginUpdates
       public UpdatePreCheckStatus runPreCheck()
       {
         // Does the data-base table already exist?
-        if (dao.isVersionUpdated(TeamCalPlugin.ID, VERSION_5_1) == true) {
+        if (dao.isVersionUpdated(TeamCalPlugin.ID, CURRENT_VERSION) == true) {
           return UpdatePreCheckStatus.ALREADY_UPDATED;
         } else {
-          return UpdatePreCheckStatus.OK;
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
         }
       }
 
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        if (dao.isVersionUpdated(TeamCalPlugin.ID, VERSION_5_1) == false) {
+        if (dao.isVersionUpdated(TeamCalPlugin.ID, CURRENT_VERSION) == false) {
           dao.alterTableColumnVarCharLength(eventTable.getName(), "note", 4000);
         }
         return UpdateRunningStatus.DONE;
@@ -95,73 +99,25 @@ public class TeamCalPluginUpdates
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
-    return new UpdateEntryImpl(TeamCalPlugin.ID, "1.0.0", "2013-04-03", "Adds tables T_PLUGIN_CALENDAR_* and parameter CALENDAR_DOMAIN.") {
-
-      final Table calendarTable = new Table(TeamCalDO.class);
-
-      final Table eventTable = new Table(TeamEventDO.class);
-
-      final Table attendeeTable = new Table(TeamEventAttendeeDO.class);
-
-      final String[] calendarAttributes = { "owner", "fullAccessGroupIds", "fullAccessUserIds", "readonlyAccessGroupIds",
-          "readonlyAccessUserIds", "minimalAccessGroupIds", "minimalAccessUserIds", "description", "title"};
-
-      final String[] eventAttributes = { "subject", "location", "allDay", "calendar", "startDate", "endDate", "note", "organizer",
-          "recurrenceRule", "recurrenceExDate", "recurrenceDate", "recurrenceReferenceId", "recurrenceUntil", "externalUid",
-          "reminderDuration", "reminderDurationUnit", "reminderActionType"};
-
-      final String[] attendeeAttributes = { "id", "url", "userId", "loginToken", "status", "comment"};
-
-      {
-        calendarTable.addDefaultBaseDOAttributes().addAttributes(calendarAttributes);
-        eventTable.addDefaultBaseDOAttributes().addAttributes(eventAttributes);
-        attendeeTable.addAttributes(attendeeAttributes);
-      }
+    return new UpdateEntryImpl(TeamCalPlugin.ID, CURRENT_VERSION, "2013-04-25",
+        "Adds tables T_PLUGIN_CALENDAR_* and parameter CALENDAR_DOMAIN.") {
 
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
         // Does the data-base table already exist?
-        if (dao.doesExist(calendarTable, eventTable, attendeeTable) == true //
-            && dao.doesTableAttributesExist(calendarTable, calendarAttributes) == true //
-            && dao.doesTableAttributesExist(eventTable, eventAttributes) == true //
-            && dao.doesTableAttributesExist(attendeeTable, attendeeAttributes) == true //
-            && dao.doesTableAttributeExist(attendeeTable.getName(), "team_event_fk") == true //
-            && Configuration.getInstance().isCalendarDomainValid() == true) {
+        if (dao.doesEntitiesExist(doClasses) == true && Configuration.getInstance().isCalendarDomainValid() == true) {
           return UpdatePreCheckStatus.ALREADY_UPDATED;
         } else {
-          return UpdatePreCheckStatus.OK;
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
         }
       }
 
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        // Create initial data-base table:
-        if (dao.doesExist(calendarTable) == false) {
-          dao.createTable(calendarTable);
-        } else if (dao.doesTableAttributesExist(calendarTable, calendarAttributes) == false) {
-          dao.addTableAttributes(calendarTable, calendarTable.getAttributes());
-        }
-        if (dao.doesExist(eventTable) == false) {
-          dao.createTable(eventTable);
-        }
-        if (dao.doesTableAttributesExist(eventTable, eventAttributes) == false) {
-          dao.addTableAttributes(eventTable, eventTable.getAttributes());
-        }
-        if (dao.doesExist(attendeeTable) == false) {
-          dao.createTable(attendeeTable);
-        }
-        if (dao.doesTableAttributesExist(attendeeTable, attendeeAttributes) == false) {
-          dao.addTableAttributes(attendeeTable, attendeeTable.getAttributes());
-        }
-        if (dao.doesTableAttributeExist(attendeeTable.getName(), "team_event_fk") == false) {
-          final TableAttribute attr = new TableAttribute("team_event_fk", TableAttributeType.INT).setForeignTable(TeamEventDO.class)
-              .setForeignAttribute("pk");
-          dao.addTableAttributes(attendeeTable, attr);
-        }
+        new SchemaGenerator(dao).add(doClasses).createSchema();
         dao.createMissingIndices();
-
         return UpdateRunningStatus.DONE;
       }
 

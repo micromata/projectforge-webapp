@@ -28,7 +28,7 @@ import org.projectforge.admin.UpdateEntryImpl;
 import org.projectforge.admin.UpdatePreCheckStatus;
 import org.projectforge.admin.UpdateRunningStatus;
 import org.projectforge.database.DatabaseUpdateDao;
-import org.projectforge.database.Table;
+import org.projectforge.database.SchemaGenerator;
 
 /**
  * Contains the initial data-base set-up script and later all update scripts if any data-base schema updates are required by any later
@@ -46,19 +46,17 @@ public class LicenseManagementPluginUpdates
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        final Table table = new Table(LicenseDO.class);
         // Does the data-base table already exist?
-        return dao.doesExist(table) == true ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
+        return dao.doesEntitiesExist(LicenseDO.class) == true ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.READY_FOR_UPDATE;
       }
 
       @Override
       public UpdateRunningStatus runUpdate()
       {
         // Create initial data-base table:
-        final Table table = new Table(LicenseDO.class) //
-        .addDefaultBaseDOAttributes().addAttributes("organization", "product", "version", "updateFromVersion", "licenseHolder", "key",
-            "numberOfLicenses", "ownerIds", "device", "comment", "status", "validSince", "validUntil");
-        dao.createTable(table);
+        final SchemaGenerator schemaGenerator = new SchemaGenerator(dao);
+        schemaGenerator.add(LicenseDO.class);
+        schemaGenerator.createSchema();
         dao.createMissingIndices();
         return UpdateRunningStatus.DONE;
       }
