@@ -25,6 +25,7 @@ package org.projectforge.user;
 
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.projectforge.database.XmlDumpHook;
 import org.projectforge.database.xstream.XStreamSavingConverter;
 import org.projectforge.fibu.KundeDO;
@@ -76,6 +77,9 @@ public class UserPrefDOXmlDumpHook implements XmlDumpHook
   private void updateEntryValue(final XStreamSavingConverter xstreamSavingConverter, final UserPrefEntryDO entry,
       final Class< ? > entityClass)
   {
+    if (StringUtils.isEmpty(entry.getValue()) == true || "null".equals(entry.getValue()) == true) {
+      return;
+    }
     final Integer oldId = entry.getValueAsInteger();
     final Integer newId = xstreamSavingConverter.getNewIdAsInteger(entityClass, oldId);
     if (newId != null) {
