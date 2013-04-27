@@ -65,6 +65,12 @@ public class PluginsRegistry
 
   public void register(final AbstractPlugin plugin)
   {
+    for (final AbstractPlugin pl : plugins) {
+      if (pl.getClass().equals(plugin.getClass()) == true) {
+        log.warn("Can't add plugin twice. Plugin '" + plugin.getClass() + "' already added.");
+        return;
+      }
+    }
     plugins.add(plugin);
   }
 
@@ -97,7 +103,7 @@ public class PluginsRegistry
   public void loadPlugins()
   {
     for (final AbstractPlugin plugin : builtinPlugins) {
-      plugins.add(plugin);
+      register(plugin);
     }
     final ConfigXml xmlConfiguration = ConfigXml.getInstance();
     final String[] pluginMainClasses = xmlConfiguration.getPluginMainClasses();
@@ -107,7 +113,7 @@ public class PluginsRegistry
           final Class< ? > pluginMainClass = Class.forName(pluginMainClassName);
           try {
             final AbstractPlugin plugin = (AbstractPlugin) pluginMainClass.newInstance();
-            plugins.add(plugin);
+            register(plugin);
           } catch (final ClassCastException ex) {
             log.error("Couldn't load plugin, class '" + pluginMainClassName + "' isn't of type AbstractPlugin.");
           } catch (final InstantiationException ex) {
