@@ -291,9 +291,9 @@ public class DatabaseUpdateDao
     final Column columnAnnotation = attr.getAnnotation(Column.class);
     if (columnAnnotation != null && StringUtils.isNotEmpty(columnAnnotation.columnDefinition()) == true) {
       buf.append(columnAnnotation.columnDefinition());
-      return;
+    } else {
+      buf.append(getDatabaseSupport().getType(attr));
     }
-    buf.append(getDatabaseSupport().getType(attr));
     boolean primaryKeyDefinition = false; // For avoiding double 'not null' definition.
     if (attr.isPrimaryKey() == true) {
       final String suffix = getDatabaseSupport().getPrimaryKeyAttributeSuffix(attr);
