@@ -44,7 +44,7 @@ public class DatabaseUpdateDaoTest extends TestBase
   public void createTableScript()
   {
     final Table table = new Table("t_test") //
-    .addAttribute(new TableAttribute("pk", TableAttributeType.INT).setPrimaryKey(true))//
+    .addAttribute(new TableAttribute("pk", TableAttributeType.INT).setPrimaryKey(true).setGenerated(true))//
     .addAttribute(new TableAttribute("counter", TableAttributeType.INT)) //
     .addAttribute(new TableAttribute("money", TableAttributeType.DECIMAL, 8, 2).setNullable(false)) //
     .addAttribute(new TableAttribute("address_fk", TableAttributeType.INT).setForeignTable(AddressDO.class));
