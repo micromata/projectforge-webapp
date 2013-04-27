@@ -119,6 +119,8 @@ public class DatabaseSupport
         } else {
           return "INT";
         }
+      case SHORT:
+        return "SMALLINT";
       case TIMESTAMP:
         return "TIMESTAMP";
       case LOCALE:
@@ -180,5 +182,15 @@ public class DatabaseSupport
     } else {
       return null;
     }
+  }
+
+  public String createSequence(final String name)
+  {
+    if (dialect == HibernateDialect.PostgreSQL) {
+      return "CREATE SEQUENCE " + name + " START 1";
+    } else if (dialect == HibernateDialect.HSQL) {
+      return "CREATE SEQUENCE " + name + " START WITH 1";
+    }
+    return null;
   }
 }
