@@ -402,6 +402,18 @@ public class XStreamSavingConverter implements Converter
     }
   }
 
+  public Integer getNewIdAsInteger(final Class<?> entityClass, final Integer oldId) {
+    final Serializable newId = getNewId(entityClass, oldId);
+    if (newId == null) {
+      log.error("Oups, can't find '" + entityClass + "' id '" + oldId + "'.");
+      return null;
+    } else if (newId instanceof Integer == false) {
+      log.error("Oups, can't get '" + entityClass + "' id '" + oldId + "' as integer: " + newId);
+      return null;
+    }
+    return (Integer)newId;
+  }
+
   public Serializable getNewId(final Class< ? > entityClass, final Serializable oldId)
   {
     return getNewId(getClassname4History(entityClass), oldId);
