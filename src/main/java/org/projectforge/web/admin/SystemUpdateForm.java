@@ -142,7 +142,7 @@ public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdat
           return HtmlHelper.escapeHtml(preCheckResult, true);
         }
       }));
-      if (updateEntry.getPreCheckStatus() == UpdatePreCheckStatus.OK) {
+      if (updateEntry.getPreCheckStatus() == UpdatePreCheckStatus.READY_FOR_UPDATE) {
         final Button updateButton = new Button("button", new Model<String>("update")) {
           @Override
           public final void onSubmit()
