@@ -59,17 +59,18 @@ public class SchemaGeneratorTest
     groupUserTable = generator.getTable("t_group_user");
     Assert.assertNotNull(groupUserTable);
     TableAttribute attr = groupUserTable.getAttributeByName("user_id");
-    assertTableAttribute(attr, "USER_ID", "T_PF_USER", "pk", TableAttributeType.INT);
+    assertTableAttribute(attr, "USER_ID", "T_PF_USER", "pk", TableAttributeType.INT, false);
     attr = groupUserTable.getAttributeByName("group_id");
-    assertTableAttribute(attr, "GROUP_ID", "T_GROUP", "pk", TableAttributeType.INT);
+    assertTableAttribute(attr, "GROUP_ID", "T_GROUP", "pk", TableAttributeType.INT, false);
   }
 
-  private void assertTableAttribute(final TableAttribute attr, final String name, final String foreignTable, final String foreignAttribute, final TableAttributeType type)
+  private void assertTableAttribute(final TableAttribute attr, final String name, final String foreignTable, final String foreignAttribute, final TableAttributeType type, final boolean nullable)
   {
     Assert.assertNotNull(attr);
     Assert.assertEquals(name, attr.getName());
     Assert.assertEquals(foreignTable, attr.getForeignTable());
     Assert.assertEquals(foreignAttribute, attr.getForeignAttribute());
     Assert.assertEquals(type, attr.getType());
+    Assert.assertEquals(nullable, attr.isNullable());
   }
 }
