@@ -149,7 +149,7 @@ public class DatabaseCoreInitial
         }
         final SchemaGenerator schemaGenerator = new SchemaGenerator(dao).add(doClasses);
         final Table propertyDeltaTable = schemaGenerator.getTable(PropertyDelta.class);
-        propertyDeltaTable.addAttribute(new TableAttribute("clazz", TableAttributeType.VARCHAR, 31));
+        propertyDeltaTable.addAttribute(new TableAttribute("clazz", TableAttributeType.VARCHAR, 31).setNullable(false));
         final Table historyEntryTable = schemaGenerator.getTable(HistoryEntry.class);
         final TableAttribute typeAttr = historyEntryTable.getAttributeByName("type");
         typeAttr.setType(TableAttributeType.INT);
