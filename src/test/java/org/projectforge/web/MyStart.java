@@ -35,10 +35,7 @@ import org.projectforge.webserver.StartSettings;
  */
 public class MyStart
 {
-  /**
-   * Should be set to true only at first start:
-   */
-  private static final boolean SCHEMA_UPDATE = true;
+  private static final boolean SCHEMA_UPDATE = false;
 
   private static final String BASE_DIR = System.getProperty("user.dir") + "/testsystem/";
 
