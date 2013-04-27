@@ -208,7 +208,7 @@ public class SchemaGenerator
     final JoinColumn joinColumn = joinColumns[0];
     final TableAttribute primaryKey = targetTable.getPrimaryKey();
     final TableAttribute joinAttr = new TableAttribute(joinColumn.name(), primaryKey.getType());
-    joinAttr.setForeignTable(targetTable.getName()).setForeignAttribute(primaryKey.getName());
+    joinAttr.setForeignTable(targetTable.getName()).setForeignAttribute(primaryKey.getName()).setNullable(false);
     joinTable.addAttribute(joinAttr);
 
   }
