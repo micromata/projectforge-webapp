@@ -130,7 +130,8 @@ public class XmlDump
     this.hibernate = hibernate;
   }
 
-  public void registerHook(final XmlDumpHook xmlDumpHook) {
+  public void registerHook(final XmlDumpHook xmlDumpHook)
+  {
     for (final XmlDumpHook hook : xmlDumpHooks) {
       if (hook.getClass().equals(xmlDumpHook.getClass()) == true) {
         log.error("Can't register XmlDumpHook twice: " + xmlDumpHook);
@@ -210,11 +211,19 @@ public class XmlDump
         }
         if (plugins != null) {
           for (final AbstractPlugin plugin : plugins) {
-            plugin.onBeforeRestore(this, obj);
+            try {
+              plugin.onBeforeRestore(this, obj);
+            } catch (final Exception ex) {
+              log.error("Error in Plugin while restoring object: " + ex.getMessage(), ex);
+            }
           }
         }
         for (final XmlDumpHook xmlDumpHook : xmlDumpHooks) {
-          xmlDumpHook.onBeforeRestore(this, obj);
+          try {
+            xmlDumpHook.onBeforeRestore(this, obj);
+          } catch (final Exception ex) {
+            log.error("Error in XmlDumpHook while restoring object: " + ex.getMessage(), ex);
+          }
         }
         return super.onBeforeSave(session, obj);
       }
