@@ -220,7 +220,7 @@ public class DaoRegistry
   public synchronized void init()
   {
     if (instance != null) {
-      log.error("DaoRegistry is already initialized!");
+      log.info("DaoRegistry is already initialized!");
       return;
     }
     register(CONFIGURATION, ConfigurationDao.class, configurationDao, "administration.configuration").setSearchable(false);
