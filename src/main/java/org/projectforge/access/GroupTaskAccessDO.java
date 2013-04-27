@@ -242,6 +242,7 @@ public class GroupTaskAccessDO extends DefaultBaseDO
   /**
    * If true then the group rights are also valid for all sub tasks. If false, then each sub task needs its own definition.
    */
+  @Column
   public boolean isRecursive()
   {
     return recursive;
