@@ -31,6 +31,8 @@ import org.projectforge.book.BookDO;
 import org.projectforge.core.ConfigurationDO;
 import org.projectforge.database.DatabaseUpdateDO;
 import org.projectforge.database.DatabaseUpdateDao;
+import org.projectforge.database.HibernateDialect;
+import org.projectforge.database.HibernateUtils;
 import org.projectforge.database.SchemaGenerator;
 import org.projectforge.database.Table;
 import org.projectforge.database.TableAttribute;
@@ -141,8 +143,8 @@ public class DatabaseCoreInitial
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        if (dao.doesExist(new Table(PFUserDO.class)) == false) {
-          // User table doesn't exist, therefore schema should be empty:
+        if (dao.doesExist(new Table(PFUserDO.class)) == false && HibernateUtils.getDialect() == HibernateDialect.PostgreSQL) {
+          // User table doesn't exist, therefore schema should be empty. PostgreSQL needs sequence for primary keys:
           dao.createSequence("hibernate_sequence", true);
         }
         final SchemaGenerator schemaGenerator = new SchemaGenerator(dao).add(doClasses);
