@@ -96,7 +96,7 @@ public abstract class AbstractSecuredMobilePage extends AbstractMobilePage
    * @param key
    * @param value
    * @param persistent If true, the object will be persisted in the database.
-   * @see UserXmlPreferencesCache#putEntry(Integer, String, Object, boolean)
+   * @see UserPreferencesHelper#putEntry(String, Object, boolean)
    */
   public void putUserPrefEntry(final String key, final Object value, final boolean persistent)
   {
