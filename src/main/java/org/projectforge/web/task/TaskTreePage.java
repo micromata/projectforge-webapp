@@ -62,7 +62,7 @@ public class TaskTreePage extends AbstractSecuredPage
 {
   private static final long serialVersionUID = -8406452960003792763L;
 
-  static final String USER_PREFS_KEY_OPEN_TASKS = "openTasks";
+  public static final String USER_PREFS_KEY_OPEN_TASKS = "openTasks";
 
   private static final String I18N_PREFIX = "task";
 
