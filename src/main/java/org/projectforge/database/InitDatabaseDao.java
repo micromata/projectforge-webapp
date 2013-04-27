@@ -48,6 +48,7 @@ import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserRightDO;
 import org.projectforge.user.UserRightId;
 import org.projectforge.user.UserRightValue;
+import org.projectforge.user.UserXmlPreferencesXmlDumpHook;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -128,6 +129,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
   public void setXmlDump(final XmlDump xmlDump)
   {
     this.xmlDump = xmlDump;
+    xmlDump.registerHook(new UserXmlPreferencesXmlDumpHook());
   }
 
   /**

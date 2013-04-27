@@ -41,6 +41,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
@@ -110,6 +111,8 @@ public class XmlDump
 
   private HibernateTemplate hibernate;
 
+  private final List<XmlDumpHook> xmlDumpHooks = new LinkedList<XmlDumpHook>();
+
   /**
    * These classes are stored automatically because they're dependent.
    */
@@ -125,6 +128,16 @@ public class XmlDump
   public void setHibernate(final HibernateTemplate hibernate)
   {
     this.hibernate = hibernate;
+  }
+
+  public void registerHook(final XmlDumpHook xmlDumpHook) {
+    for (final XmlDumpHook hook : xmlDumpHooks) {
+      if (hook.getClass().equals(xmlDumpHook.getClass()) == true) {
+        log.error("Can't register XmlDumpHook twice: " + xmlDumpHook);
+        return;
+      }
+    }
+    xmlDumpHooks.add(xmlDumpHook);
   }
 
   /**
@@ -199,6 +212,9 @@ public class XmlDump
           for (final AbstractPlugin plugin : plugins) {
             plugin.onBeforeRestore(this, obj);
           }
+        }
+        for (final XmlDumpHook xmlDumpHook : xmlDumpHooks) {
+          xmlDumpHook.onBeforeRestore(this, obj);
         }
         return super.onBeforeSave(session, obj);
       }
