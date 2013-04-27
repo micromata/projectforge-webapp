@@ -24,11 +24,16 @@
 package org.projectforge.database;
 
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 
@@ -50,7 +55,17 @@ public class TableAttribute implements Serializable
 
   private TableAttributeType type;
 
+  // For debug messages.
+  private Class< ? > entityClass;
+
   private String property;
+
+  private Class< ? > propertyType;
+
+  /**
+   * Only set for List and Sets.
+   */
+  private Class<?> genericType;
 
   private String name;
 
@@ -62,8 +77,6 @@ public class TableAttribute implements Serializable
 
   private boolean primaryKey;
 
-  private boolean generated;
-
   private boolean unique;
 
   private String foreignTable;
@@ -71,6 +84,8 @@ public class TableAttribute implements Serializable
   private String foreignAttribute;
 
   private String defaultValue;
+
+  private List<Annotation> annotations;
 
   /**
    * Creates a property and gets the information from the entity class. The JPA annotations Column, JoinColumn, Entity, Table and ID are
@@ -80,45 +95,54 @@ public class TableAttribute implements Serializable
    */
   public TableAttribute(final Class< ? > clazz, final String property)
   {
+    this.entityClass = clazz;
     this.property = property;
     this.name = property;
     final Method getterMethod = BeanHelper.determineGetter(clazz, property);
     if (getterMethod == null) {
       throw new IllegalStateException("Can't determine getter: " + clazz + "." + property);
     }
-    final Class< ? > dType = BeanHelper.determinePropertyType(getterMethod);
-    final boolean primitive = dType.isPrimitive();
-    if (Boolean.class.isAssignableFrom(dType) == true || Boolean.TYPE.isAssignableFrom(dType) == true) {
+    propertyType = BeanHelper.determinePropertyType(getterMethod);
+    final boolean primitive = propertyType.isPrimitive();
+    if (Boolean.class.isAssignableFrom(propertyType) == true || Boolean.TYPE.isAssignableFrom(propertyType) == true) {
       type = TableAttributeType.BOOLEAN;
-    } else if (Integer.class.isAssignableFrom(dType) == true || Integer.TYPE.isAssignableFrom(dType) == true) {
+    } else if (Integer.class.isAssignableFrom(propertyType) == true || Integer.TYPE.isAssignableFrom(propertyType) == true) {
       type = TableAttributeType.INT;
-    } else if (String.class.isAssignableFrom(dType) == true || dType.isEnum() == true) {
+    } else if (Short.class.isAssignableFrom(propertyType) == true || Short.TYPE.isAssignableFrom(propertyType) == true) {
+      type = TableAttributeType.SHORT;
+    } else if (String.class.isAssignableFrom(propertyType) == true || propertyType.isEnum() == true) {
       type = TableAttributeType.VARCHAR;
-    } else if (BigDecimal.class.isAssignableFrom(dType) == true) {
+    } else if (BigDecimal.class.isAssignableFrom(propertyType) == true) {
       type = TableAttributeType.DECIMAL;
-    } else if (java.sql.Date.class.isAssignableFrom(dType) == true) {
+    } else if (java.sql.Date.class.isAssignableFrom(propertyType) == true) {
       type = TableAttributeType.DATE;
-    } else if (java.util.Date.class.isAssignableFrom(dType) == true) {
+    } else if (java.util.Date.class.isAssignableFrom(propertyType) == true) {
       type = TableAttributeType.TIMESTAMP;
-    } else if (java.util.Locale.class.isAssignableFrom(dType) == true) {
+    } else if (java.util.Locale.class.isAssignableFrom(propertyType) == true) {
       type = TableAttributeType.LOCALE;
+    } else if (java.util.List.class.isAssignableFrom(propertyType) == true) {
+      type = TableAttributeType.LIST;
+      setGenericReturnType(getterMethod);
+    } else if (java.util.Set.class.isAssignableFrom(propertyType) == true) {
+      type = TableAttributeType.SET;
+      setGenericReturnType(getterMethod);
     } else {
-      final Entity entity = dType.getAnnotation(Entity.class);
-      final javax.persistence.Table table = dType.getAnnotation(javax.persistence.Table.class);
+      final Entity entity = propertyType.getAnnotation(Entity.class);
+      final javax.persistence.Table table = propertyType.getAnnotation(javax.persistence.Table.class);
       if (entity != null && table != null && StringUtils.isNotEmpty(table.name()) == true) {
         this.foreignTable = table.name();
-        final String idProperty = JPAHelper.getIdProperty(dType);
+        final String idProperty = JPAHelper.getIdProperty(propertyType);
         if (idProperty == null) {
-          log.info("Id property not found for class '" + dType + "'): " + clazz + "." + property);
+          log.info("Id property not found for class '" + propertyType + "'): " + clazz + "." + property);
         }
         this.foreignAttribute = idProperty;
-        final Column column = JPAHelper.getColumnAnnotation(dType, idProperty);
+        final Column column = JPAHelper.getColumnAnnotation(propertyType, idProperty);
         if (column != null && StringUtils.isNotEmpty(column.name()) == true) {
           this.foreignAttribute = column.name();
         }
       } else {
         log.info("Unsupported property (@Entity, @Table and @Table.name expected for the destination class '"
-            + dType
+            + propertyType
             + "'): "
             + clazz
             + "."
@@ -158,6 +182,29 @@ public class TableAttribute implements Serializable
     if (joinColumn != null) {
       if (StringUtils.isNotEmpty(joinColumn.name()) == true) {
         this.name = joinColumn.name();
+      }
+      if (joinColumn.nullable() == false) {
+        this.nullable = false;
+      }
+    }
+  }
+
+  /**
+   * @param method
+   * @return
+   */
+  private void setGenericReturnType(final Method method)
+  {
+    final Type returnType = method.getGenericReturnType();
+    if (returnType instanceof ParameterizedType) {
+      final ParameterizedType type = (ParameterizedType) returnType;
+      final Type[] typeArguments = type.getActualTypeArguments();
+      if (typeArguments.length > 0) {
+        final Class< ? > typeArgClass = (Class< ? >) typeArguments[0];
+        if (log.isDebugEnabled() == true) {
+          log.debug("Generic type found for '" + entityClass + "." + property + "': '" + typeArgClass + "'.");
+        }
+        genericType = typeArgClass;
       }
     }
   }
@@ -244,6 +291,23 @@ public class TableAttribute implements Serializable
   }
 
   /**
+   * The generic type is set if the property class is a list or set.
+   * @return the genericType
+   */
+  public Class<?> getGenericType()
+  {
+    return genericType;
+  }
+
+  /**
+   * @return the propertyType
+   */
+  public Class< ? > getPropertyType()
+  {
+    return propertyType;
+  }
+
+  /**
    * @return The data base identifier of the attribute.
    */
   public String getName()
@@ -306,31 +370,21 @@ public class TableAttribute implements Serializable
   }
 
   /**
-   * Sets also this attribute as generated at default if it's from type INT.
    * @param primaryKey
    * @return
    */
   public TableAttribute setPrimaryKey(final boolean primaryKey)
   {
     this.primaryKey = primaryKey;
-    if (this.type == TableAttributeType.INT) {
-      this.generated = true;
-    }
     return this;
   }
 
   /**
-   * True (default for primary keys of type INT) if the primary key should be generated by the database.
+   * True if the primary key should be generated by the database (if annotation {@link GeneratedValue} is specified).
    */
   public boolean isGenerated()
   {
-    return generated;
-  }
-
-  public TableAttribute setGenerated(final boolean generated)
-  {
-    this.generated = generated;
-    return this;
+    return getAnnotation(GeneratedValue.class) != null;
   }
 
   public String getForeignTable()
@@ -395,5 +449,35 @@ public class TableAttribute implements Serializable
   {
     this.defaultValue = defaultValue;
     return this;
+  }
+
+  /**
+   * @return the annotations
+   */
+  public List<Annotation> getAnnotations()
+  {
+    return annotations;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends Annotation> T getAnnotation(final Class<T> annotationClass)
+  {
+    if (annotations == null) {
+      return null;
+    }
+    for (final Annotation annotation : annotations) {
+      if (annotation.annotationType().isAssignableFrom(annotationClass) == true) {
+        return (T) annotation;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * @param annotations the annotations to set
+   */
+  public void setAnnotations(final List<Annotation> annotations)
+  {
+    this.annotations = annotations;
   }
 }

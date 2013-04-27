@@ -24,12 +24,28 @@
 package org.projectforge.database;
 
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.UniqueConstraint;
 
 import org.apache.commons.lang.StringUtils;
+import org.projectforge.common.BeanHelper;
 
 /**
  * Represents one attribute of a table (e. g. for creation).
@@ -46,6 +62,8 @@ public class Table implements Serializable
 
   private Class< ? > entityClass;
 
+  private UniqueConstraint[] uniqueConstraints;
+
   private final List<TableAttribute> attributes = new ArrayList<TableAttribute>();
 
   public Table(final Class< ? > entityClass)
@@ -55,6 +73,7 @@ public class Table implements Serializable
     final javax.persistence.Table table = entityClass.getAnnotation(javax.persistence.Table.class);
     if (entity != null && table != null && StringUtils.isNotEmpty(table.name()) == true) {
       this.name = table.name();
+      uniqueConstraints = table.uniqueConstraints();
     } else {
       log.info("Unsupported class (@Entity, @Table and @Table.name expected): " + entityClass);
     }
@@ -78,10 +97,24 @@ public class Table implements Serializable
     this.name = name;
   }
 
-  public TableAttribute getAttribute(final String name)
+  public TableAttribute getAttributeByProperty(final String property)
   {
     for (final TableAttribute attr : attributes) {
-      if (name.equals(attr.getProperty()) == true) {
+      if (property.equals(attr.getProperty()) == true) {
+        return attr;
+      }
+    }
+    return null;
+  }
+
+  public TableAttribute getAttributeByName(final String name)
+  {
+    if (name == null) {
+      return null;
+    }
+    final String lowerCase = name.toLowerCase();
+    for (final TableAttribute attr : attributes) {
+      if (lowerCase.equals(attr.getName().toLowerCase()) == true) {
         return attr;
       }
     }
@@ -93,9 +126,20 @@ public class Table implements Serializable
     return entityClass;
   }
 
+  /**
+   * @return SQL name.
+   */
   public String getName()
   {
     return name;
+  }
+
+  /**
+   * @return the uniqueConstraints
+   */
+  public UniqueConstraint[] getUniqueConstraints()
+  {
+    return uniqueConstraints;
   }
 
   /**
@@ -119,6 +163,12 @@ public class Table implements Serializable
 
   public Table addAttribute(final TableAttribute attr)
   {
+    if (getAttributeByProperty(attr.getProperty()) != null) {
+      throw new IllegalArgumentException("Can't add table attribute twice: '" + entityClass + "." + attr.getProperty() + "");
+    }
+    if (getAttributeByName(attr.getName()) != null) {
+      throw new IllegalArgumentException("Can't add table attribute twice: '" + entityClass + "." + attr.getProperty() + "");
+    }
     attributes.add(attr);
     return this;
   }
@@ -150,4 +200,82 @@ public class Table implements Serializable
   {
     return addAttributes("id", "created", "lastUpdate", "deleted");
   }
+
+  /**
+   * Adds all attributes which are annotated with Column (getter, setter or fields).
+   * @return this for chaining.
+   */
+  public Table autoAddAttributes()
+  {
+    if (entityClass == null) {
+      throw new IllegalStateException("Entity class isn't set. Can't add attributes from property names. Please set entity class first.");
+    }
+    final Field[] fields = BeanHelper.getAllDeclaredFields(entityClass);
+    for (final Field field : fields) {
+      final List<Annotation> annotations = handlePersistencyAnnotations(field);
+      if (annotations == null) {
+        continue;
+      }
+      final String fieldName = field.getName();
+      if (log.isDebugEnabled() == true) {
+        log.debug(name + "." + fieldName);
+      }
+      addTableAttribute(fieldName, annotations);
+    }
+    final List<Method> getter = BeanHelper.getAllGetterMethods(entityClass);
+    for (final Method method : getter) {
+      final List<Annotation> annotations = handlePersistencyAnnotations(method);
+      if (annotations == null) {
+        continue;
+      }
+      if (log.isDebugEnabled() == true) {
+        log.debug(name + "." + method.getName());
+      }
+      final String property = BeanHelper.getProperty(method);
+      if (property != null) {
+        addTableAttribute(property, annotations);
+      } else {
+        log.error("Can't determine property of getter method: '" + method.getName());
+      }
+    }
+    return this;
+  }
+
+  private void addTableAttribute(final String property, final List<Annotation> annotations)
+  {
+    final TableAttribute attr = new TableAttribute(entityClass, property);
+    attr.setAnnotations(annotations);
+    addAttribute(attr);
+  }
+
+  private List<Annotation> handlePersistencyAnnotations(final AccessibleObject object)
+  {
+    if (object == null) {
+      return null;
+    }
+    List<Annotation> list = null;
+    list = handlePersistencyAnnotation(list, object, Basic.class);
+    list = handlePersistencyAnnotation(list, object, Column.class);
+    list = handlePersistencyAnnotation(list, object, GeneratedValue.class);
+    list = handlePersistencyAnnotation(list, object, Id.class);
+    list = handlePersistencyAnnotation(list, object, JoinColumn.class);
+    list = handlePersistencyAnnotation(list, object, JoinTable.class);
+    list = handlePersistencyAnnotation(list, object, ManyToMany.class);
+    list = handlePersistencyAnnotation(list, object, ManyToOne.class);
+    list = handlePersistencyAnnotation(list, object, OneToMany.class);
+    return list;
+  }
+
+  private List<Annotation> handlePersistencyAnnotation(List<Annotation> list, final AccessibleObject object,
+      final Class< ? extends Annotation> annotation)
+      {
+    if (object.isAnnotationPresent(annotation) == false) {
+      return list;
+    }
+    if (list == null) {
+      list = new LinkedList<Annotation>();
+    }
+    list.add(object.getAnnotation(annotation));
+    return list;
+      }
 }
