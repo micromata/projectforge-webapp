@@ -182,6 +182,7 @@ public class UserXmlPreferencesDO implements Serializable
   /**
    * For migrating older entries the version for every entry is given.
    */
+  @Column
   public int getVersion()
   {
     return version;
