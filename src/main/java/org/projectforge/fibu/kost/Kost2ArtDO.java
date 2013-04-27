@@ -106,21 +106,14 @@ public class Kost2ArtDO extends AbstractHistorizableBaseDO<Integer> implements C
   }
 
   @Column(length = 5000)
-  public Kost2ArtDO setDescription(final String description)
-  {
-    this.description = description;
-    return this;
-  }
-
   public String getDescription()
   {
     return description;
   }
 
-  @Column(nullable = false)
-  public Kost2ArtDO setFakturiert(final boolean fakturiert)
+  public Kost2ArtDO setDescription(final String description)
   {
-    this.fakturiert = fakturiert;
+    this.description = description;
     return this;
   }
 
@@ -129,9 +122,16 @@ public class Kost2ArtDO extends AbstractHistorizableBaseDO<Integer> implements C
    * Fördermaßnahmen).
    * @return
    */
+  @Column(nullable = false)
   public boolean isFakturiert()
   {
     return fakturiert;
+  }
+
+  public Kost2ArtDO setFakturiert(final boolean fakturiert)
+  {
+    this.fakturiert = fakturiert;
+    return this;
   }
 
   @Column(name = "work_fraction", scale = 5, precision = 10)
