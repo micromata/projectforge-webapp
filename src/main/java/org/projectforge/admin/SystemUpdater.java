@@ -148,7 +148,6 @@ public class SystemUpdater
     synchronized (this) {
       if (updateEntries == null) {
         updateEntries = new TreeSet<UpdateEntry>();
-        updateEntries.add(DatabaseCoreInitial.getInitializationUpdateEntry());
         updateEntries.addAll(DatabaseCoreUpdates.getUpdateEntries());
       }
     }
