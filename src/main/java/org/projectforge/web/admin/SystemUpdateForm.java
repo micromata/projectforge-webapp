@@ -130,18 +130,16 @@ public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdat
       }
       odd = !odd;
       item.add(new Label("regionId", updateEntry.getRegionId()));
-      item.add(new Label("version", version.toString()));
+      if (updateEntry.isInitial() == true) {
+        item.add(new Label("version", "initial"));
+      } else {
+        item.add(new Label("version", version.toString()));
+      }
       final String description = updateEntry.getDescription();
       item.add(new Label("description", StringUtils.isBlank(description) == true ? "" : description));
       item.add(new Label("date", updateEntry.getDate()));
-      item.add(new Label("preCheckResult", new Model<String>() {
-        @Override
-        public String getObject()
-        {
-          final String preCheckResult = updateEntry.getPreCheckResult();
-          return HtmlHelper.escapeHtml(preCheckResult, true);
-        }
-      }));
+      final String preCheckResult = updateEntry.getPreCheckResult();
+      item.add(new Label("preCheckResult", HtmlHelper.escapeHtml(preCheckResult, true)));
       if (updateEntry.getPreCheckStatus() == UpdatePreCheckStatus.READY_FOR_UPDATE) {
         final Button updateButton = new Button("button", new Model<String>("update")) {
           @Override
@@ -152,14 +150,8 @@ public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdat
         };
         item.add(new SingleButtonPanel("update", updateButton, "update"));
       } else {
-        item.add(new Label("update", new Model<String>() {
-          @Override
-          public String getObject()
-          {
-            final String runningResult = updateEntry.getRunningResult();
-            return HtmlHelper.escapeHtml(runningResult, true);
-          }
-        }));
+        final String runningResult = updateEntry.getRunningResult();
+        item.add(new Label("update", HtmlHelper.escapeHtml(runningResult, true)));
       }
     }
   }
