@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.apache.wicket.settings.IResourceSettings;
 import org.projectforge.admin.SystemUpdater;
+import org.projectforge.admin.UpdateEntry;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.plugins.memo.MemoPlugin;
 import org.projectforge.plugins.teamcal.TeamCalPlugin;
@@ -86,8 +87,24 @@ public class PluginsRegistry
   public void set(final SystemUpdater systemUpdater)
   {
     for (final AbstractPlugin plugin : plugins) {
-      systemUpdater.register(plugin.getInitializationUpdateEntry());
-      systemUpdater.register(plugin.getUpdateEntries());
+      final UpdateEntry updateEntry = plugin.getInitializationUpdateEntry();
+      if (updateEntry != null) {
+        if (updateEntry.isInitial() == false) {
+          log.error("The given UpdateEntry returned by plugin.getInitializationUpdateEntry() is not initial! Please use constructor without parameter version: "
+              + plugin.getClass());
+        }
+        systemUpdater.register(updateEntry);
+      }
+      final List<UpdateEntry> updateEntries = plugin.getUpdateEntries();
+      if (updateEntries != null) {
+        for (final UpdateEntry entry : updateEntries) {
+          if (entry.isInitial() == true) {
+            log.error("The given UpdateEntry returned by plugin.getUpdateEntries() is initial! Please use constructor with parameter version: "
+                + plugin.getClass() + ": " + entry.getDescription());
+          }
+        }
+        systemUpdater.register(updateEntries);
+      }
     }
   }
 
