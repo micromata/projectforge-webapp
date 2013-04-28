@@ -45,6 +45,11 @@ public abstract class UpdateEntry implements Serializable, Comparable<UpdateEntr
   public abstract void setVersion(final Version version);
 
   /**
+   * @return true if this update entry is the initial entry for schema creation of a new module.
+   */
+  public abstract boolean isInitial();
+
+  /**
    * Should be of iso format: 2011-02-28 (yyyy-MM-dd).
    */
   public abstract String getDate();

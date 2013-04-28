@@ -36,7 +36,7 @@ import org.projectforge.common.ReflectionToString;
 public abstract class UpdateEntryImpl extends UpdateEntry
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UpdateEntryImpl.class);
-  
+
   private static final long serialVersionUID = -1178486631632477422L;
 
   private String regionId;
@@ -47,8 +47,22 @@ public abstract class UpdateEntryImpl extends UpdateEntry
 
   private String description;
 
+  private boolean initial;
+
   public UpdateEntryImpl()
   {
+  }
+
+  /**
+   * Constructor only for initial schema updates (for new plug-ins). Otherwise the versionString is mandatory.
+   * @param regionId
+   * @param isoDateString Date string must be of iso format: yyyy-MM-dd.
+   * @param description
+   */
+  public UpdateEntryImpl(final String regionId, final String isoDateString, final String description)
+  {
+    this(regionId, "0.0", isoDateString, description);
+    this.initial = true;
   }
 
   /**
@@ -90,6 +104,15 @@ public abstract class UpdateEntryImpl extends UpdateEntry
   public void setVersion(final Version version)
   {
     this.version = version;
+  }
+
+  /**
+   * @return true if this update entry is the initial entry for schema creation of a new module.
+   */
+  @Override
+  public boolean isInitial()
+  {
+    return initial;
   }
 
   @Override
