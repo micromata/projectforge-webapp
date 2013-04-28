@@ -158,6 +158,7 @@ public class SkillRatingDO extends DefaultBaseDO
     return this;
   }
 
+  @Column
   public Integer getSinceYear()
   {
     return sinceYear;
@@ -202,6 +203,8 @@ public class SkillRatingDO extends DefaultBaseDO
     return this;
   }
 
+  @Enumerated(EnumType.STRING)
+  @Column(length = 15, name = "skill_rating")
   public SkillRating getSkillRating()
   {
     return skillRating;
