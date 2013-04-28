@@ -54,10 +54,6 @@ import org.projectforge.web.wicket.AbstractEditPage;
  */
 public class TeamCalPluginUpdates
 {
-  private static final String VERSION_5_1 = "5.1";
-
-  private static final String CURRENT_VERSION = VERSION_5_1;
-
   static DatabaseUpdateDao dao;
 
   final static Class< ? >[] doClasses = new Class< ? >[] { //
@@ -70,14 +66,15 @@ public class TeamCalPluginUpdates
     // /////////////////////////////////////////////////////////////////
     // 5.1
     // /////////////////////////////////////////////////////////////////
-    list.add(new UpdateEntryImpl(TeamCalPlugin.ID, VERSION_5_1, "2013-04-25", "Increase length of T_PLUGIN_CALENDAR_EVENT.NOTE (255-4000)") {
+    list.add(new UpdateEntryImpl(TeamCalPlugin.ID, "5.1", "2013-04-25",
+        "Increase length of T_PLUGIN_CALENDAR_EVENT.NOTE (255-4000), re-create T_PLUGIN_CALENDAR_EVENT_ATTENDEE") {
       final Table eventTable = new Table(TeamEventDO.class);
 
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
         // Does the data-base table already exist?
-        if (dao.isVersionUpdated(TeamCalPlugin.ID, CURRENT_VERSION) == true) {
+        if (dao.doesTableAttributesExist(TeamEventAttendeeDO.class, "commentOfAttendee") == true) {
           return UpdatePreCheckStatus.ALREADY_UPDATED;
         } else {
           return UpdatePreCheckStatus.READY_FOR_UPDATE;
@@ -87,8 +84,11 @@ public class TeamCalPluginUpdates
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        if (dao.isVersionUpdated(TeamCalPlugin.ID, CURRENT_VERSION) == false) {
+        if (dao.doesTableAttributesExist(TeamEventAttendeeDO.class, "commentOfAttendee") == false) {
           dao.alterTableColumnVarCharLength(eventTable.getName(), "note", 4000);
+          dao.dropTable(new Table(TeamEventAttendeeDO.class).getName()); // Table wasn't in use yet.
+          // TeamEventDO is only needed for generating OneToMany relation with attendee table:
+          new SchemaGenerator(dao).add(TeamEventDO.class, TeamEventAttendeeDO.class).createSchema();
         }
         return UpdateRunningStatus.DONE;
       }
@@ -99,16 +99,17 @@ public class TeamCalPluginUpdates
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
-    return new UpdateEntryImpl(TeamCalPlugin.ID, CURRENT_VERSION, "2013-04-25",
-        "Adds tables T_PLUGIN_CALENDAR_* and parameter CALENDAR_DOMAIN.") {
+    return new UpdateEntryImpl(TeamCalPlugin.ID, "2013-04-25", "Adds tables T_PLUGIN_CALENDAR_* and parameter CALENDAR_DOMAIN.") {
 
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
         // Does the data-base table already exist?
-        if (dao.doesEntitiesExist(doClasses) == true && Configuration.getInstance().isCalendarDomainValid() == true) {
+        // Check only the oldest table.
+        if (dao.doesEntitiesExist(TeamCalDO.class) == true) {
           return UpdatePreCheckStatus.ALREADY_UPDATED;
         } else {
+          // The oldest table doesn't exist, therefore the plug-in has to initialized completely.
           return UpdatePreCheckStatus.READY_FOR_UPDATE;
         }
       }
