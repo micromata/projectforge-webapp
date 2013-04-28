@@ -163,6 +163,13 @@ public class DatabaseUpdateDao
     return true;
   }
 
+  public boolean doesTableAttributesExist(final Class<?> entityClass, final String... properties)
+  {
+    accessCheck(false);
+    final Table table = new Table(entityClass);
+    return doesTableAttributesExist(table, properties);
+  }
+
   public boolean doesTableAttributesExist(final Table table, final String... properties)
   {
     accessCheck(false);
