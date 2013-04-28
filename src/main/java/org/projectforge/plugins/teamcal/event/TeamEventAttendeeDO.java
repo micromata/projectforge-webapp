@@ -68,6 +68,8 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
 
   private String comment;
 
+  private String commentOfAttendee;
+
   private Integer id;
 
   private static final Set<String> NON_HISTORIZABLE_ATTRIBUTES;
@@ -199,6 +201,25 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
   public TeamEventAttendeeDO setComment(final String comment)
   {
     this.comment = comment;
+    return this;
+  }
+
+  /**
+   * @return the commentOfAttendee
+   */
+  @Column(length = 4000, name = "comment_of_attendee")
+  public String getCommentOfAttendee()
+  {
+    return commentOfAttendee;
+  }
+
+  /**
+   * @param commentOfAttendee the commentOfAttendee to set
+   * @return this for chaining.
+   */
+  public TeamEventAttendeeDO setCommentOfAttendee(final String commentOfAttendee)
+  {
+    this.commentOfAttendee = commentOfAttendee;
     return this;
   }
 
