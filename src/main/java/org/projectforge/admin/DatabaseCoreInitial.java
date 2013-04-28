@@ -61,7 +61,6 @@ import org.projectforge.meb.MebEntryDO;
 import org.projectforge.orga.ContractDO;
 import org.projectforge.orga.PostausgangDO;
 import org.projectforge.orga.PosteingangDO;
-import org.projectforge.plugins.teamcal.TeamCalPlugin;
 import org.projectforge.scripting.ScriptDO;
 import org.projectforge.task.TaskDO;
 import org.projectforge.timesheet.TimesheetDO;
@@ -80,10 +79,6 @@ import de.micromata.hibernate.history.delta.PropertyDelta;
  */
 public class DatabaseCoreInitial
 {
-  private static final String VERSION_5_0 = "5.0";
-
-  private static final String CURRENT_VERSION = VERSION_5_0;
-
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
@@ -128,7 +123,7 @@ public class DatabaseCoreInitial
         UserXmlPreferencesDO.class //
     };
 
-    return new UpdateEntryImpl(TeamCalPlugin.ID, CURRENT_VERSION, "2013-04-25", "Adds all core tables T_*.") {
+    return new UpdateEntryImpl(SystemUpdater.CORE_REGION_ID, "2013-04-25", "Adds all core tables T_*.") {
 
       @Override
       public UpdatePreCheckStatus runPreCheck()
