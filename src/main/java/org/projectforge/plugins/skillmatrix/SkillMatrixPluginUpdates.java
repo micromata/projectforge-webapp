@@ -45,13 +45,15 @@ public class SkillMatrixPluginUpdates
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
-    return new UpdateEntryImpl(SkillMatrixPlugin.ID_SKILL_RATING, "1.0.0", "2011-05-27",
+    return new UpdateEntryImpl(SkillMatrixPlugin.ID_SKILL_RATING, "2011-05-27",
         "Adds tables T_PLUGIN_SKILL and T_PLUGIN_SKILL_RATING.") {
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
         // Does the data-base tables already exist?
-        if (dao.doesEntitiesExist(doClasses) == false) {
+        // Check only the oldest table.
+        if (dao.doesEntitiesExist(SkillDO.class) == false) {
+          // The oldest table doesn't exist, therefore the plugin has to initialized completely.
           return UpdatePreCheckStatus.READY_FOR_UPDATE;
         }
         return UpdatePreCheckStatus.ALREADY_UPDATED;

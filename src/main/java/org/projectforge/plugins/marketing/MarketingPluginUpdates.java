@@ -47,13 +47,19 @@ public class MarketingPluginUpdates
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
-    return new UpdateEntryImpl(MarketingPlugin.ADDRESS_CAMPAIGN_ID, "1.0.0", "2011-11-24", "Adds tables T_PLUGIN_MARKETING_*.") {
+    return new UpdateEntryImpl(MarketingPlugin.ADDRESS_CAMPAIGN_ID, "2011-11-24", "Adds tables T_PLUGIN_MARKETING_*.") {
 
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
         // Does the data-base table already exist?
-        return dao.doesEntitiesExist(doClasses) == true ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.READY_FOR_UPDATE;
+        // Check only the oldest table.
+        if (dao.doesEntitiesExist(AddressCampaignDO.class) == true) {
+          return UpdatePreCheckStatus.ALREADY_UPDATED;
+        } else {
+          // The oldest table doesn't exist, therefore the plug-in has to initialized completely.
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
       }
 
       @Override

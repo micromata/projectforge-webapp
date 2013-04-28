@@ -47,12 +47,14 @@ public class PollPluginUpdates
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
-    return new UpdateEntryImpl(PollPlugin.ID, "1.0.0", "2013-01-13", "Adds tables T_PLUGIN_POLL_*.") {
+    return new UpdateEntryImpl(PollPlugin.ID, "2013-01-13", "Adds tables T_PLUGIN_POLL_*.") {
 
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        if (dao.doesEntitiesExist(doClasses) == false) {
+        // Check only the oldest table.
+        if (dao.doesEntitiesExist(PollDO.class) == false) {
+          // The oldest table doesn't exist, therefore the plug-in has to initialized completely.
           return UpdatePreCheckStatus.READY_FOR_UPDATE;
         }
         return UpdatePreCheckStatus.ALREADY_UPDATED;

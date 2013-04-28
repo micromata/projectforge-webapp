@@ -47,12 +47,18 @@ public class BankingPluginUpdates
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
-    return new UpdateEntryImpl(BankingPlugin.BANK_ACCOUNT_ID, "1.0.0", "2012-01-21", "Adds tables T_PLUGIN_BANK_ACCOUNT_*.") {
+    return new UpdateEntryImpl(BankingPlugin.BANK_ACCOUNT_ID, "2012-01-21", "Adds tables T_PLUGIN_BANK_ACCOUNT_*.") {
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
         // Does the data-base table already exist?
-        return dao.doesEntitiesExist(doClasses) == true ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.READY_FOR_UPDATE;
+        if (dao.doesEntitiesExist(BankAccountDO.class) == true) {
+          // Check only the oldest table.
+          return UpdatePreCheckStatus.ALREADY_UPDATED;
+        } else {
+          // The oldest table doesn't exist, therefore the plugin has to initialized completely.
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
       }
 
       @Override

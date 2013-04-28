@@ -42,12 +42,18 @@ public class LicenseManagementPluginUpdates
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
-    return new UpdateEntryImpl(LicenseManagementPlugin.ID, "1.0.0", "2012-10-23", "Adds table T_PLUGIN_LM_LICENSE.") {
+    return new UpdateEntryImpl(LicenseManagementPlugin.ID, "2012-10-23", "Adds table T_PLUGIN_LM_LICENSE.") {
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
         // Does the data-base table already exist?
-        return dao.doesEntitiesExist(LicenseDO.class) == true ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.READY_FOR_UPDATE;
+        // Check only the oldest table.
+        if (dao.doesEntitiesExist(LicenseDO.class) == true) {
+          return UpdatePreCheckStatus.ALREADY_UPDATED;
+        } else {
+          // The oldest table doesn't exist, therefore the plugin has to initialized completely.
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
       }
 
       @Override
