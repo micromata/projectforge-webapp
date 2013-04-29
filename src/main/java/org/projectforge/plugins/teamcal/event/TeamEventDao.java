@@ -239,8 +239,6 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     }
     // abos
     TeamEventAboCache aboCache = TeamEventAboCache.instance();
-    // TODO remove and replace through separated thread
-    aboCache.updateCache(teamCalDao);
     for (Integer calendarId : teamEventFilter.getTeamCals()) {
       if (aboCache.isAboCalendar(calendarId) == true) {
         Date startDate = teamEventFilter.getStartDate();

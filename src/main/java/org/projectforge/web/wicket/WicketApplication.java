@@ -411,6 +411,9 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     }
     log.info("user.timezone is: " + System.getProperty("user.timezone"));
     cronSetup.initialize();
+    log.info("system cronJobs are initialized.");
+    pluginsRegistry.registerCronJobs(cronSetup);
+    log.info("plugin cronJobs are initialized.");
     log.info(AppVersion.APP_ID + " " + AppVersion.NUMBER + " (" + AppVersion.RELEASE_TIMESTAMP + ") initialized.");
 
     PFUserContext.setUser(DatabaseUpdateDao.__internalGetSystemAdminPseudoUser()); // Logon admin user.

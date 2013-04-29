@@ -27,8 +27,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.projectforge.admin.UpdateEntry;
+import org.projectforge.core.CronSetup;
 import org.projectforge.database.xstream.XStreamSavingConverter;
 import org.projectforge.plugins.core.AbstractPlugin;
+import org.projectforge.plugins.teamcal.abo.TeamCalAboJob;
+import org.projectforge.plugins.teamcal.abo.TeamEventAboCache;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalEditPage;
@@ -58,6 +61,7 @@ import org.projectforge.web.MenuItemRegistry;
 import org.projectforge.web.calendar.CalendarFeed;
 import org.projectforge.web.timesheet.TimesheetEditPage;
 import org.projectforge.web.wicket.WicketApplication;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -129,6 +133,8 @@ public class TeamCalPlugin extends AbstractPlugin
     TimesheetEditPage.addPluginHook(new TeamcalTimesheetPluginComponentHook());
 
     RestCallRegistry.getInstance().register(TeamCalDaoRest.class);
+
+    TeamCalAboJob.setTeamCalDao(teamCalDao);
   }
 
   /**
@@ -218,5 +224,19 @@ public class TeamCalPlugin extends AbstractPlugin
       log.error("Oups, can't find calendar with id '" + oldCalendarId + "'.");
     }
     return id;
+  }
+
+  @Override
+  public void registerCronJob(CronSetup cronSetup)
+  {
+    cronSetup.registerCronJob("teamCalAboJob", TeamCalAboJob.class, "0 */5 * * * ?");
+    // do initial cache installation
+    Thread t = new Thread() {
+      @Override
+      public void run() {
+        TeamEventAboCache.instance().updateCache(teamCalDao);
+      }
+    };
+    t.start();
   }
 }
