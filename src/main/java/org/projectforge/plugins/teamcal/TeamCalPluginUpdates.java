@@ -93,7 +93,7 @@ public class TeamCalPluginUpdates
         return UpdateRunningStatus.DONE;
       }
     });
-    list.add(new UpdateEntryImpl(TeamCalPlugin.ID, "5.2", "2013-05-xx",
+    list.add(new UpdateEntryImpl(TeamCalPlugin.ID, "5.2", "2013-04-29",
         "Added subscription features") {
 
       @Override
