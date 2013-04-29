@@ -93,6 +93,29 @@ public class TeamCalPluginUpdates
         return UpdateRunningStatus.DONE;
       }
     });
+    list.add(new UpdateEntryImpl(TeamCalPlugin.ID, "5.2", "2013-05-xx",
+        "Added subscription features") {
+
+      @Override
+      public UpdatePreCheckStatus runPreCheck()
+      {
+        // Does the data-base table already exist?
+        if (dao.doesTableAttributesExist(TeamCalDO.class, "abo", "aboCalendarBinary", "aboHash", "aboUrl", "aboUpdateTime") == true) {
+          return UpdatePreCheckStatus.ALREADY_UPDATED;
+        } else {
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
+      }
+
+      @Override
+      public UpdateRunningStatus runUpdate()
+      {
+        if (dao.doesTableAttributesExist(TeamCalDO.class, "abo", "aboCalendarBinary", "aboHash", "aboUrl", "aboUpdateTime") == false) {
+          new SchemaGenerator(dao).add(TeamCalDO.class).createSchema();
+        }
+        return UpdateRunningStatus.DONE;
+      }
+    });
     return list;
   }
 
