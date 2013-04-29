@@ -39,8 +39,6 @@ import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
-import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
-import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
@@ -183,10 +181,8 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
     }
     {
       // Rateable
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.skill.options"));
-      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-      checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(data, "rateable"),
-          getString("plugins.skillmatrix.skill.rateable")));
+      gridBuilder.newFieldset(getString("plugins.skillmatrix.skill.rateable")).addCheckBox(new PropertyModel<Boolean>(data,
+          "rateable"), null);
     }
   }
 

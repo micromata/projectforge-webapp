@@ -24,11 +24,14 @@
 package org.projectforge.database;
 
 import static org.junit.Assert.assertEquals;
+import junit.framework.Assert;
 
 import org.junit.Test;
+import org.projectforge.core.ConfigurationDO;
 import org.projectforge.task.TaskDO;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserRightDO;
 
 public class TableTest
 {
@@ -47,8 +50,31 @@ public class TableTest
     assertAttribute(table.getAttributes().get(3), "start_date");
     assertAttribute(table.getAttributes().get(4), "responsible_user_id");
 
-    assertAttribute(table.getAttribute("responsibleUser"), "responsible_user_id");
-}
+    assertAttribute(table.getAttributeByProperty("responsibleUser"), "responsible_user_id");
+  }
+
+  @Test
+  public void autoAddAttributes()
+  {
+    Table table = new Table(ConfigurationDO.class);
+    table.autoAddAttributes();
+    assertAttribute(table, "stringValue");
+    assertAttribute(table, "created");
+
+    table = new Table(UserRightDO.class);
+    table.autoAddAttributes();
+    assertAttribute(table, "right_id");
+  }
+
+  private void assertAttribute(final Table table, final String name)
+  {
+    for (final TableAttribute attr : table.getAttributes()) {
+      if (attr.getName().equals(name) == true) {
+        return;
+      }
+    }
+    Assert.fail("Attribute '" + name + "' not found.");
+  }
 
   private void assertAttribute(final TableAttribute attribute, final String name)
   {

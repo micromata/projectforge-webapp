@@ -28,7 +28,7 @@ import org.projectforge.admin.UpdateEntryImpl;
 import org.projectforge.admin.UpdatePreCheckStatus;
 import org.projectforge.admin.UpdateRunningStatus;
 import org.projectforge.database.DatabaseUpdateDao;
-import org.projectforge.database.Table;
+import org.projectforge.database.SchemaGenerator;
 
 /**
  * Contains the initial data-base set-up script and later all update scripts if any data-base schema updates are required by any later
@@ -41,46 +41,32 @@ public class BankingPluginUpdates
 {
   static DatabaseUpdateDao dao;
 
+  final static Class< ? >[] doClasses = new Class< ? >[] { //
+    BankAccountDO.class, BankAccountBalanceDO.class, BankAccountRecordDO.class};
+
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
-    return new UpdateEntryImpl(BankingPlugin.BANK_ACCOUNT_ID, "1.0.0", "2012-01-21", "Adds tables T_PLUGIN_BANK_ACCOUNT_*.") {
-      final Table bankAccountTable = new Table(BankAccountDO.class);
-
-      final Table bankAccountBalanceTable = new Table(BankAccountBalanceDO.class);
-
-      final Table bankAccountRecordTable = new Table(BankAccountRecordDO.class);
-
+    return new UpdateEntryImpl(BankingPlugin.BANK_ACCOUNT_ID, "2012-01-21", "Adds tables T_PLUGIN_BANK_ACCOUNT_*.") {
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
         // Does the data-base table already exist?
-        return dao.doesExist(bankAccountTable, bankAccountBalanceTable, bankAccountRecordTable) ? UpdatePreCheckStatus.ALREADY_UPDATED
-            : UpdatePreCheckStatus.OK;
+        if (dao.doesEntitiesExist(BankAccountDO.class) == true) {
+          // Check only the oldest table.
+          return UpdatePreCheckStatus.ALREADY_UPDATED;
+        } else {
+          // The oldest table doesn't exist, therefore the plugin has to initialized completely.
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
       }
 
       @Override
       public UpdateRunningStatus runUpdate()
       {
         // Create initial data-base table:
-        if (dao.doesExist(bankAccountTable) == false) {
-          final Table table = new Table(BankAccountDO.class) //
-          .addDefaultBaseDOAttributes() //
-          .addAttributes("accountNumber", "bank", "bankIdentificationCode", "name", "description");
-          dao.createTable(table);
-        }
-        if (dao.doesExist(bankAccountBalanceTable) == false) {
-          final Table table = new Table(BankAccountBalanceDO.class) //
-          .addDefaultBaseDOAttributes() //
-          .addAttributes("account", "date", "amount", "description"); //
-          dao.createTable(table);
-        }
-        if (dao.doesExist(bankAccountRecordTable) == false) {
-          final Table table = new Table(BankAccountRecordDO.class) //
-          .addDefaultBaseDOAttributes() //
-          .addAttributes("account", "date", "amount", "text"); //
-          dao.createTable(table);
-        }
+        new SchemaGenerator(dao).add(doClasses).createSchema();
+        dao.createMissingIndices();
         return UpdateRunningStatus.DONE;
       }
     };

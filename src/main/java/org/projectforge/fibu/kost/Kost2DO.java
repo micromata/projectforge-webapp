@@ -55,7 +55,7 @@ import de.micromata.hibernate.history.Historizable;
 @Indexed
 @ClassBridge(name = "nummer", index = Index.TOKENIZED, store = Store.NO, impl = HibernateSearchKost2Bridge.class)
 @Table(name = "T_FIBU_KOST2", uniqueConstraints = { @UniqueConstraint(columnNames = { "nummernkreis", "bereich", "teilbereich",
-    "kost2_art_id"})})
+"kost2_art_id"})})
 public class Kost2DO extends DefaultBaseDO implements Historizable, ShortDisplayNameCapable, Comparable<Kost2DO>
 {
   private static final long serialVersionUID = -6534347300453425760L;
@@ -89,7 +89,7 @@ public class Kost2DO extends DefaultBaseDO implements Historizable, ShortDisplay
     return kostentraegerStatus;
   }
 
-  public Kost2DO setKostentraegerStatus(KostentraegerStatus kostentraegerStatus)
+  public Kost2DO setKostentraegerStatus(final KostentraegerStatus kostentraegerStatus)
   {
     this.kostentraegerStatus = kostentraegerStatus;
     return this;
@@ -135,7 +135,7 @@ public class Kost2DO extends DefaultBaseDO implements Historizable, ShortDisplay
   }
 
   @Transient
-  public boolean isEqual(int nummernkreis, int bereich, int teilbereich, int kost2Art)
+  public boolean isEqual(final int nummernkreis, final int bereich, final int teilbereich, final int kost2Art)
   {
     return this.nummernkreis == nummernkreis
         && this.bereich == bereich
@@ -153,7 +153,7 @@ public class Kost2DO extends DefaultBaseDO implements Historizable, ShortDisplay
     return nummernkreis;
   }
 
-  public Kost2DO setNummernkreis(int nummernkreis)
+  public Kost2DO setNummernkreis(final int nummernkreis)
   {
     this.nummernkreis = nummernkreis;
     return this;
@@ -169,7 +169,7 @@ public class Kost2DO extends DefaultBaseDO implements Historizable, ShortDisplay
     return bereich;
   }
 
-  public Kost2DO setBereich(int bereich)
+  public Kost2DO setBereich(final int bereich)
   {
     this.bereich = bereich;
     return this;
@@ -185,7 +185,7 @@ public class Kost2DO extends DefaultBaseDO implements Historizable, ShortDisplay
     return teilbereich;
   }
 
-  public Kost2DO setTeilbereich(int teilbereich)
+  public Kost2DO setTeilbereich(final int teilbereich)
   {
     this.teilbereich = teilbereich;
     return this;
@@ -198,7 +198,7 @@ public class Kost2DO extends DefaultBaseDO implements Historizable, ShortDisplay
     return kost2Art;
   }
 
-  public Kost2DO setKost2Art(Kost2ArtDO kost2Art)
+  public Kost2DO setKost2Art(final Kost2ArtDO kost2Art)
   {
     this.kost2Art = kost2Art;
     return this;
@@ -212,13 +212,13 @@ public class Kost2DO extends DefaultBaseDO implements Historizable, ShortDisplay
     return kost2Art.getId();
   }
 
-  @Column(name = "work_fraction")
+  @Column(name = "work_fraction", scale = 5, precision = 10)
   public BigDecimal getWorkFraction()
   {
     return workFraction;
   }
 
-  public Kost2DO setWorkFraction(BigDecimal workFraction)
+  public Kost2DO setWorkFraction(final BigDecimal workFraction)
   {
     this.workFraction = workFraction;
     return this;
@@ -230,7 +230,7 @@ public class Kost2DO extends DefaultBaseDO implements Historizable, ShortDisplay
     return description;
   }
 
-  public Kost2DO setDescription(String description)
+  public Kost2DO setDescription(final String description)
   {
     this.description = description;
     return this;
@@ -246,7 +246,7 @@ public class Kost2DO extends DefaultBaseDO implements Historizable, ShortDisplay
     return comment;
   }
 
-  public Kost2DO setComment(String comment)
+  public Kost2DO setComment(final String comment)
   {
     this.comment = comment;
     return this;
@@ -264,7 +264,7 @@ public class Kost2DO extends DefaultBaseDO implements Historizable, ShortDisplay
     return projekt;
   }
 
-  public Kost2DO setProjekt(ProjektDO projekt)
+  public Kost2DO setProjekt(final ProjektDO projekt)
   {
     this.projekt = projekt;
     return this;
@@ -283,10 +283,10 @@ public class Kost2DO extends DefaultBaseDO implements Historizable, ShortDisplay
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
-  public boolean equals(Object o)
+  public boolean equals(final Object o)
   {
     if (o instanceof Kost2DO) {
-      Kost2DO other = (Kost2DO) o;
+      final Kost2DO other = (Kost2DO) o;
       if (this.nummernkreis == other.nummernkreis && this.bereich == other.bereich && this.teilbereich == other.teilbereich) {
         return ObjectUtils.equals(this.kost2Art, other.kost2Art);
       }
@@ -303,7 +303,7 @@ public class Kost2DO extends DefaultBaseDO implements Historizable, ShortDisplay
   @Override
   public int hashCode()
   {
-    HashCodeBuilder hcb = new HashCodeBuilder();
+    final HashCodeBuilder hcb = new HashCodeBuilder();
     hcb.append(this.nummernkreis).append(this.bereich).append(this.teilbereich).append(this.kost2Art);
     return hcb.toHashCode();
   }
@@ -313,7 +313,7 @@ public class Kost2DO extends DefaultBaseDO implements Historizable, ShortDisplay
    * @see #getShortDisplayName()
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
-  public int compareTo(Kost2DO o)
+  public int compareTo(final Kost2DO o)
   {
     return this.getShortDisplayName().compareTo(o.getShortDisplayName());
   }

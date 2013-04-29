@@ -67,7 +67,7 @@ public class SkillDO extends DefaultBaseDO
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String comment;
 
-  private boolean rateable;
+  private boolean rateable = true;
 
   @Column(length = 100)
   public String getTitle()
@@ -128,6 +128,7 @@ public class SkillDO extends DefaultBaseDO
    * some categories is it useful to define them as rateable (e. g. for Programming languages -> Java -> J2EE the skill Java should be
    * rateable).
    */
+  @Column
   public boolean isRateable()
   {
     return rateable;
@@ -142,6 +143,7 @@ public class SkillDO extends DefaultBaseDO
     return this;
   }
 
+  @Column(length = Constants.LENGTH_TEXT)
   public String getDescription()
   {
     return description;

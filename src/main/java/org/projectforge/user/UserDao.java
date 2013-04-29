@@ -404,6 +404,11 @@ public class UserDao extends BaseDao<PFUserDO>
   @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
   public void renewStayLoggedInKey(final Integer userId)
   {
+    if (PFUserContext.getUserId().equals(userId) == false) {
+      // Only admin users are able to renew authentication token of other users:
+      accessChecker.checkIsLoggedInUserMemberOfAdminGroup();
+    }
+    accessChecker.checkRestrictedOrDemoUser(); // Demo users are also not allowed to do this.
     final PFUserDO user = internalGetById(userId);
     user.setStayLoggedInKey(createStayLoggedInKey());
     log.info("Stay-logged-key renewed for user: " + userId + " - " + user.getUsername());
@@ -459,6 +464,11 @@ public class UserDao extends BaseDao<PFUserDO>
   @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
   public void renewAuthenticationToken(final Integer userId)
   {
+    if (PFUserContext.getUserId().equals(userId) == false) {
+      // Only admin users are able to renew authentication token of other users:
+      accessChecker.checkIsLoggedInUserMemberOfAdminGroup();
+    }
+    accessChecker.checkRestrictedOrDemoUser(); // Demo users are also not allowed to do this.
     final PFUserDO user = internalGetById(userId);
     user.setAuthenticationToken(createAuthenticationToken());
     log.info("Authentication token renewed for user: " + userId + " - " + user.getUsername());

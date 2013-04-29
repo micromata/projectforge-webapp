@@ -599,6 +599,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
    * Zeitstempel des letzten erfolgreichen Logins.
    * @return Returns the lastLogin.
    */
+  @Column
   public Timestamp getLastLogin()
   {
     return lastLogin;
@@ -637,6 +638,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
    * Die Anzahl der erfolglosen Logins. Dieser Wert wird bei dem nächsten erfolgreichen Login auf 0 zurück gesetzt.
    * @return Returns the loginFailures.
    */
+  @Column
   public int getLoginFailures()
   {
     return loginFailures;

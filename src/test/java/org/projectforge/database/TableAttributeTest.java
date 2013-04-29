@@ -26,12 +26,10 @@ package org.projectforge.database;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.junit.Test;
 import org.projectforge.access.GroupTaskAccessDO;
 import org.projectforge.fibu.kost.Kost1DO;
-import org.projectforge.fibu.kost.Kost2ArtDO;
 import org.projectforge.task.TaskDO;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.user.PFUserDO;
@@ -64,18 +62,12 @@ public class TableAttributeTest
     assertEquals(TaskDO.PRIORITY_LENGTH, attr.getLength());
 
     attr = assertAttribute(TimesheetDO.class, "startTime", "start_time", TableAttributeType.TIMESTAMP, false, false);
-    attr = assertAttribute(TimesheetDO.class, "task", "task_id", TableAttributeType.INT, false, true);
+    attr = assertAttribute(TimesheetDO.class, "task", "task_id", TableAttributeType.INT, false, false);
     assertEquals("T_TASK", attr.getForeignTable());
     assertEquals("pk", attr.getForeignAttribute());
     attr = assertAttribute(PFUserDO.class, "loginFailures", "loginFailures", TableAttributeType.INT, false, false);
     attr = assertAttribute(GroupTaskAccessDO.class, "recursive", "recursive", TableAttributeType.BOOLEAN, false, false);
     attr = assertAttribute(Kost1DO.class, "nummernkreis", "nummernkreis", TableAttributeType.INT, false, false);
-    try {
-      attr = assertAttribute(Kost2ArtDO.class, "workFraction", "work_fraction", TableAttributeType.DECIMAL, false, true);
-      fail("UnsupportedException expected, because whether scale nor precision is given for this property.");
-    } catch (final UnsupportedOperationException ex) {
-      // Expected, because whether scale nor precision is given.
-    }
   }
 
   private TableAttribute assertAttribute(final Class< ? > cls, final String property, final String name, final TableAttributeType type,

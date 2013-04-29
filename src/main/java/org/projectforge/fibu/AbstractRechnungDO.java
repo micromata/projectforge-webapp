@@ -224,7 +224,7 @@ public abstract class AbstractRechnungDO<T extends AbstractRechnungsPositionDO> 
    * Bruttobetrag, den der Kunde bezahlt hat.
    * @return
    */
-  @Column(name = "zahl_betrag")
+  @Column(name = "zahl_betrag", scale = 2, precision = 12)
   public BigDecimal getZahlBetrag()
   {
     return zahlBetrag;

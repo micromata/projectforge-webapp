@@ -36,6 +36,7 @@ import org.projectforge.core.BaseDao;
 import org.projectforge.fibu.KontoCache;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.UserGroupCache;
+import org.projectforge.user.UserXmlPreferencesDao;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
 /**
@@ -60,6 +61,8 @@ public class Registry
   private TaskTree taskTree;
 
   private UserGroupCache userGroupCache;
+
+  private UserXmlPreferencesDao userXmlPreferencesDao;
 
   private KontoCache kontoCache;
 
@@ -146,7 +149,7 @@ public class Registry
   public <T extends BaseDao< ? >> T getDao(final Class<T> daoClass)
   {
     final RegistryEntry entry = getEntry(daoClass);
-    return entry != null ? (T)entry.getDao() : null;
+    return entry != null ? (T) entry.getDao() : null;
   }
 
   void setTaskTree(final TaskTree taskTree)
@@ -167,6 +170,16 @@ public class Registry
   void setUserGroupCache(final UserGroupCache userGroupCache)
   {
     this.userGroupCache = userGroupCache;
+  }
+
+  public UserXmlPreferencesDao getUserXmlPreferencesDao()
+  {
+    return userXmlPreferencesDao;
+  }
+
+  public void setUserXmlPreferencesDao(final UserXmlPreferencesDao userXmlPreferencesDao)
+  {
+    this.userXmlPreferencesDao = userXmlPreferencesDao;
   }
 
   public KontoCache getKontoCache()

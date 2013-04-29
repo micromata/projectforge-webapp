@@ -57,6 +57,7 @@ public class DatabaseCoreUpdates
   public static List<UpdateEntry> getUpdateEntries()
   {
     final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
+    final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
     // /////////////////////////////////////////////////////////////////
     // 5.0
     // /////////////////////////////////////////////////////////////////
@@ -69,7 +70,6 @@ public class DatabaseCoreUpdates
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         int entriesToMigrate = 0;
         if (dao.isVersionUpdated(CORE_REGION_ID, VERSION_5_0) == false) {
           entriesToMigrate = dao.queryForInt("select count(*) from t_contract where status='IN_PROGRES'");
@@ -77,13 +77,12 @@ public class DatabaseCoreUpdates
         return dao.doesTableAttributesExist(rechnungTable, "konto") == true //
             && dao.doesTableAttributesExist(userTable, "sshPublicKey") //
             && entriesToMigrate == 0 //
-            ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
+            ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.READY_FOR_UPDATE;
       }
 
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         if (dao.doesTableAttributesExist(rechnungTable, "konto") == false) {
           dao.addTableAttributes(rechnungTable, new TableAttribute(RechnungDO.class, "konto"));
         }
@@ -107,16 +106,14 @@ public class DatabaseCoreUpdates
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         return dao.doesTableAttributesExist(projektTable, "konto") == true //
             ? UpdatePreCheckStatus.ALREADY_UPDATED
-                : UpdatePreCheckStatus.OK;
+                : UpdatePreCheckStatus.READY_FOR_UPDATE;
       }
 
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         if (dao.doesTableAttributesExist(projektTable, "konto") == false) {
           dao.addTableAttributes(projektTable, new TableAttribute(ProjektDO.class, "konto"));
         }
@@ -145,19 +142,17 @@ public class DatabaseCoreUpdates
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         return dao.doesTableAttributesExist(userTable, "authenticationToken", "localUser", "restrictedUser", "deactivated", "ldapValues") == true //
             && dao.doesTableAttributesExist(groupTable, "localGroup") == true // , "nestedGroupsAllowed", "nestedGroupIds") == true //
             && dao.doesTableAttributesExist(outgoingInvoiceTable, "uiStatusAsXml") == true //
             && dao.doesTableAttributesExist(incomingInvoiceTable, "uiStatusAsXml") == true //
             && dao.doesTableAttributesExist(orderTable, "uiStatusAsXml") == true //
-            ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
+            ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.READY_FOR_UPDATE;
       }
 
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         if (dao.doesTableAttributesExist(userTable, "authenticationToken") == false) {
           dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "authenticationToken"));
         }
@@ -204,16 +199,14 @@ public class DatabaseCoreUpdates
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         return dao.doesTableAttributesExist(userTable, "firstDayOfWeek", "hrPlanning") == true //
             ? UpdatePreCheckStatus.ALREADY_UPDATED
-                : UpdatePreCheckStatus.OK;
+                : UpdatePreCheckStatus.READY_FOR_UPDATE;
       }
 
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         if (dao.doesTableAttributesExist(userTable, "firstDayOfWeek") == false) {
           dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "firstDayOfWeek"));
         }
@@ -236,16 +229,14 @@ public class DatabaseCoreUpdates
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         return dao.doesTableAttributesExist(scriptTable, "parameter6Name", "parameter6Type") == true //
             && dao.doesTableAttributesExist(eingangsrechnungTable, "paymentType") == true //
-            ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
+            ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.READY_FOR_UPDATE;
       }
 
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         if (dao.doesTableAttributesExist(scriptTable, "parameter6Name") == false) {
           dao.addTableAttributes(scriptTable, new TableAttribute(ScriptDO.class, "parameter6Name"));
         }
@@ -270,7 +261,6 @@ public class DatabaseCoreUpdates
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         final Table kundeTable = new Table(KundeDO.class);
         final Table eingangsrechnungTable = new Table(EingangsrechnungDO.class);
         final Table kontoTable = new Table(KontoDO.class);
@@ -281,13 +271,12 @@ public class DatabaseCoreUpdates
             && dao.doesTableAttributesExist(kontoTable, "status") == true //
             && dao.doesTableAttributesExist(addressTable, "communicationLanguage") == true //
             && dao.doesTableAttributesExist(taskTable, "protectionOfPrivacy") //
-            ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
+            ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.READY_FOR_UPDATE;
       }
 
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         final Table kundeTable = new Table(KundeDO.class);
         if (dao.doesTableAttributesExist(kundeTable, "konto") == false) {
           dao.addTableAttributes(kundeTable, new TableAttribute(KundeDO.class, "konto"));
@@ -321,18 +310,16 @@ public class DatabaseCoreUpdates
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         final Table dbUpdateTable = new Table(DatabaseUpdateDO.class);
         final Table userTable = new Table(PFUserDO.class);
         return dao.doesExist(dbUpdateTable) == true
             && dao.doesTableAttributesExist(userTable, "dateFormat", "excelDateFormat", "timeNotation") == true //
-            ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
+            ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.READY_FOR_UPDATE;
       }
 
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         final Table dbUpdateTable = new Table(DatabaseUpdateDO.class);
         final Table userTable = new Table(PFUserDO.class);
         dbUpdateTable.addAttributes("updateDate", "regionId", "versionString", "executionResult", "executedBy", "description");

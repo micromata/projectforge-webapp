@@ -51,6 +51,13 @@ public class SystemUpdater
 
   private static SystemUpdater instance;
 
+  public SystemUpdater()
+  {
+    if (instance == null) {
+      instance = this;
+    }
+  }
+
   static SystemUpdater instance()
   {
     return instance;
@@ -140,7 +147,6 @@ public class SystemUpdater
   {
     synchronized (this) {
       if (updateEntries == null) {
-        instance = this; // Used by update entries.
         updateEntries = new TreeSet<UpdateEntry>();
         updateEntries.addAll(DatabaseCoreUpdates.getUpdateEntries());
       }

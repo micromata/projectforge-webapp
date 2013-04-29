@@ -28,7 +28,7 @@ import org.projectforge.admin.UpdateEntryImpl;
 import org.projectforge.admin.UpdatePreCheckStatus;
 import org.projectforge.admin.UpdateRunningStatus;
 import org.projectforge.database.DatabaseUpdateDao;
-import org.projectforge.database.Table;
+import org.projectforge.database.SchemaGenerator;
 import org.projectforge.plugins.poll.attendee.PollAttendeeDO;
 import org.projectforge.plugins.poll.event.PollEventDO;
 import org.projectforge.plugins.poll.result.PollResultDO;
@@ -41,49 +41,29 @@ public class PollPluginUpdates
 {
   static DatabaseUpdateDao dao;
 
+  final static Class< ? >[] doClasses = new Class< ? >[] { //
+    PollDO.class, PollEventDO.class, PollAttendeeDO.class, PollResultDO.class};
+
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
-    return new UpdateEntryImpl(PollPlugin.ID, "1.0.0", "2013-01-13", "Adds tables T_PLUGIN_POLL_*.") {
+    return new UpdateEntryImpl(PollPlugin.ID, "2013-01-13", "Adds tables T_PLUGIN_POLL_*.") {
 
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        final Table pollTable = new Table(PollDO.class);
-        final Table eventTable = new Table(PollEventDO.class);
-        final Table attendeeTable = new Table(PollAttendeeDO.class);
-        final Table resultTable = new Table(PollResultDO.class);
-        // Does the data-base table already exist?
-        return dao.doesExist(pollTable) == true
-            && dao.doesExist(eventTable) == true
-            && dao.doesExist(attendeeTable) == true
-            && dao.doesExist(resultTable) == true ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
+        // Check only the oldest table.
+        if (dao.doesEntitiesExist(PollDO.class) == false) {
+          // The oldest table doesn't exist, therefore the plug-in has to initialized completely.
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
+        return UpdatePreCheckStatus.ALREADY_UPDATED;
       }
 
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        final Table pollTable = new Table(PollDO.class);
-        final Table eventTable = new Table(PollEventDO.class);
-        final Table attendeeTable = new Table(PollAttendeeDO.class);
-        final Table resultTable = new Table(PollResultDO.class);
-        // Create initial data-base table:
-        if (dao.doesExist(pollTable) == false) {
-          pollTable.addDefaultBaseDOAttributes().addAttributes("owner", "title", "location", "description", "active");
-          dao.createTable(pollTable);
-        }
-        if (dao.doesExist(eventTable) == false) {
-          eventTable.addDefaultBaseDOAttributes().addAttributes("poll", "startDate", "endDate");
-          dao.createTable(eventTable);
-        }
-        if (dao.doesExist(attendeeTable) == false) {
-          attendeeTable.addDefaultBaseDOAttributes().addAttributes("user", "email", "poll", "secureKey");
-          dao.createTable(attendeeTable);
-        }
-        if (dao.doesExist(resultTable) == false) {
-          resultTable.addDefaultBaseDOAttributes().addAttributes("pollEvent", "pollAttendee", "result");
-          dao.createTable(resultTable);
-        }
+        new SchemaGenerator(dao).add(doClasses).createSchema();
         dao.createMissingIndices();
         return UpdateRunningStatus.DONE;
       }

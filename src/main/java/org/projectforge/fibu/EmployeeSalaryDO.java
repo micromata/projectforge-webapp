@@ -83,7 +83,7 @@ public class EmployeeSalaryDO extends DefaultBaseDO
     return employee;
   }
 
-  public void setEmployee(EmployeeDO employee)
+  public void setEmployee(final EmployeeDO employee)
   {
     this.employee = employee;
   }
@@ -105,7 +105,7 @@ public class EmployeeSalaryDO extends DefaultBaseDO
     return year;
   }
 
-  public void setYear(Integer year)
+  public void setYear(final Integer year)
   {
     this.year = year;
   }
@@ -119,7 +119,7 @@ public class EmployeeSalaryDO extends DefaultBaseDO
     return month;
   }
 
-  public void setMonth(Integer month)
+  public void setMonth(final Integer month)
   {
     this.month = month;
   }
@@ -139,13 +139,13 @@ public class EmployeeSalaryDO extends DefaultBaseDO
   /**
    * Die Bruttoauszahlung an den Arbeitnehmer (inklusive AG-Anteil Sozialversicherungen).
    */
-  @Column(name = "brutto_mit_ag_anteil")
+  @Column(name = "brutto_mit_ag_anteil", scale = 2, precision = 12)
   public BigDecimal getBruttoMitAgAnteil()
   {
     return bruttoMitAgAnteil;
   }
 
-  public void setBruttoMitAgAnteil(BigDecimal bruttoMitAgAnteil)
+  public void setBruttoMitAgAnteil(final BigDecimal bruttoMitAgAnteil)
   {
     this.bruttoMitAgAnteil = bruttoMitAgAnteil;
   }
@@ -156,7 +156,7 @@ public class EmployeeSalaryDO extends DefaultBaseDO
     return comment;
   }
 
-  public void setComment(String comment)
+  public void setComment(final String comment)
   {
     this.comment = comment;
   }
@@ -168,7 +168,7 @@ public class EmployeeSalaryDO extends DefaultBaseDO
     return type;
   }
 
-  public void setType(EmployeeSalaryType type)
+  public void setType(final EmployeeSalaryType type)
   {
     this.type = type;
   }

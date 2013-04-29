@@ -21,32 +21,25 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.web;
+package org.projectforge.database;
 
-import org.projectforge.common.DatabaseDialect;
-import org.projectforge.shared.storage.StorageConstants;
-import org.projectforge.webserver.StartSettings;
+import org.projectforge.database.xstream.XStreamSavingConverter;
+import org.projectforge.plugins.core.AbstractPlugin;
+
 
 /**
- * Use this starter for you own configurations.<br/>
- * For larger installations please increase memory by giving the following start VM parameters: -Xmx1024m -XX:MaxPermSize=256m
- * 
+ * Hooks for XmlDump.
  * @author Kai Reinhard (k.reinhard@micromata.de)
+ * 
  */
-public class MyStart
+public interface XmlDumpHook
 {
-  private static final boolean SCHEMA_UPDATE = false;
+  /**
+   * Will be called before restoring an object. This method could be used for updating object id's etc. The registration could be added to {@link InitDatabaseDao#setXmlDump(XmlDump)}.
+   * Plugins must not be registered because the method {@link AbstractPlugin#onBeforeRestore(XStreamSavingConverter, Object)} will be called.
+   * @param xstreamSavingConverter
+   * @param obj
+   */
+  public void onBeforeRestore(final XStreamSavingConverter xstreamSavingConverter, final Object obj);
 
-  private static final String BASE_DIR = System.getProperty("user.dir") + "/testsystem/";
-
-  public static void main(final String[] args) throws Exception
-  {
-    final StartSettings settings = new StartSettings(DatabaseDialect.HSQL, BASE_DIR);
-    settings.setSchemaUpdate(SCHEMA_UPDATE);
-    settings.setLaunchBrowserAfterStartup(true);
-    // Set the url of ProjectForge's storage web server:
-    System.setProperty(StorageConstants.SYSTEM_PROPERTY_URL, "http://localhost:8081/");
-    final StartHelper startHelper = new StartHelper(settings);
-    startHelper.start();
-  }
 }

@@ -28,7 +28,7 @@ import org.projectforge.admin.UpdateEntryImpl;
 import org.projectforge.admin.UpdatePreCheckStatus;
 import org.projectforge.admin.UpdateRunningStatus;
 import org.projectforge.database.DatabaseUpdateDao;
-import org.projectforge.database.Table;
+import org.projectforge.database.SchemaGenerator;
 
 /**
  * Contains the initial data-base set-up script and later all update scripts if any data-base schema updates are required by any later
@@ -42,23 +42,25 @@ public class ToDoPluginUpdates
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
-    return new UpdateEntryImpl(ToDoPlugin.ID, "1.0.0", "2011-03-08", "Adds table T_PLUGIN_TODO.") {
+    return new UpdateEntryImpl(ToDoPlugin.ID, "2011-03-08", "Adds table T_PLUGIN_TODO.") {
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        final Table table = new Table(ToDoDO.class);
         // Does the data-base table already exist?
-        return dao.doesExist(table) == true ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
+        // Check only the oldest table.
+        if (dao.doesEntitiesExist(ToDoDO.class) == true) {
+          return UpdatePreCheckStatus.ALREADY_UPDATED;
+        } else {
+          // The oldest table doesn't exist, therefore the plug-in has to initialized completely.
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
       }
 
       @Override
       public UpdateRunningStatus runUpdate()
       {
         // Create initial data-base table:
-        final Table table = new Table(ToDoDO.class) //
-        .addDefaultBaseDOAttributes().addAttributes("reporter", "assignee", "task", "group", "subject", "comment", "description",
-            "status", "recent", "type", "priority", "dueDate", "resubmission");
-        dao.createTable(table);
+        new SchemaGenerator(dao).add(ToDoDO.class).createSchema();
         dao.createMissingIndices();
         return UpdateRunningStatus.DONE;
       }

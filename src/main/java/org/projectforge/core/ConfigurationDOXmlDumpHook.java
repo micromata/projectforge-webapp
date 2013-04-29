@@ -21,32 +21,34 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.web;
+package org.projectforge.core;
 
-import org.projectforge.common.DatabaseDialect;
-import org.projectforge.shared.storage.StorageConstants;
-import org.projectforge.webserver.StartSettings;
+import org.projectforge.database.XmlDumpHook;
+import org.projectforge.database.xstream.XStreamSavingConverter;
+import org.projectforge.task.TaskDO;
 
 /**
- * Use this starter for you own configurations.<br/>
- * For larger installations please increase memory by giving the following start VM parameters: -Xmx1024m -XX:MaxPermSize=256m
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
+ * 
  */
-public class MyStart
+public class ConfigurationDOXmlDumpHook implements XmlDumpHook
 {
-  private static final boolean SCHEMA_UPDATE = false;
-
-  private static final String BASE_DIR = System.getProperty("user.dir") + "/testsystem/";
-
-  public static void main(final String[] args) throws Exception
+  /**
+   * @see org.projectforge.database.XmlDumpHook#onBeforeRestore(org.projectforge.database.xstream.XStreamSavingConverter, java.lang.Object)
+   */
+  @Override
+  public void onBeforeRestore(final XStreamSavingConverter xstreamSavingConverter, final Object obj)
   {
-    final StartSettings settings = new StartSettings(DatabaseDialect.HSQL, BASE_DIR);
-    settings.setSchemaUpdate(SCHEMA_UPDATE);
-    settings.setLaunchBrowserAfterStartup(true);
-    // Set the url of ProjectForge's storage web server:
-    System.setProperty(StorageConstants.SYSTEM_PROPERTY_URL, "http://localhost:8081/");
-    final StartHelper startHelper = new StartHelper(settings);
-    startHelper.start();
+    if (obj instanceof ConfigurationDO) {
+      final ConfigurationDO configurationDO = (ConfigurationDO) obj;
+      if (configurationDO.getConfigurationType() != ConfigurationType.TASK) {
+        return;
+      }
+      final Integer oldTaskId = configurationDO.getTaskId();
+      final Integer newTaskId = xstreamSavingConverter.getNewIdAsInteger(TaskDO.class, oldTaskId);
+      configurationDO.setTaskId(newTaskId);
+      return;
+    }
   }
 }

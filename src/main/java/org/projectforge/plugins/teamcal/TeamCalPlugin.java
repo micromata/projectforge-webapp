@@ -26,8 +26,10 @@ package org.projectforge.plugins.teamcal;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.projectforge.admin.UpdateEntry;
 import org.projectforge.core.CronSetup;
+import org.projectforge.common.StringHelper;
 import org.projectforge.database.xstream.XStreamSavingConverter;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.plugins.teamcal.abo.TeamCalAboJob;
@@ -53,6 +55,7 @@ import org.projectforge.plugins.teamcal.rest.TeamCalDaoRest;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.rest.RestCallRegistry;
+import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserXmlPreferencesDO;
 import org.projectforge.web.MenuItemDef;
@@ -61,7 +64,6 @@ import org.projectforge.web.MenuItemRegistry;
 import org.projectforge.web.calendar.CalendarFeed;
 import org.projectforge.web.timesheet.TimesheetEditPage;
 import org.projectforge.web.wicket.WicketApplication;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -170,7 +172,7 @@ public class TeamCalPlugin extends AbstractPlugin
   }
 
   /**
-   * Migrates the calendar ids of the filter templates.
+   * Migrates the calendar ids of the filter templates and user/group id's of calendar access strings.
    * @see org.projectforge.plugins.core.AbstractPlugin#onBeforeRestore(org.projectforge.database.xstream.XStreamSavingConverter,
    *      java.lang.Object)
    */
@@ -196,7 +198,7 @@ public class TeamCalPlugin extends AbstractPlugin
         final Set<TemplateCalendarProperties> calendarPropertiesSet = template.getCalendarProperties();
         if (calendarPropertiesSet != null && calendarPropertiesSet.size() > 0) {
           for (final TemplateCalendarProperties props : calendarPropertiesSet) {
-            final Integer newCalendarId = getNewCalendarId(xstreamSavingConverter, props.getCalId());
+            final Integer newCalendarId = xstreamSavingConverter.getNewIdAsInteger(TeamCalDO.class, props.getCalId());
             if (newCalendarId == null) {
               continue;
             }
@@ -205,25 +207,48 @@ public class TeamCalPlugin extends AbstractPlugin
         }
         final Integer calendarId = template.getDefaultCalendarId();
         if (calendarId != null) {
-          template.setDefaultCalendarId(getNewCalendarId(xstreamSavingConverter, calendarId));
+          template.setDefaultCalendarId(xstreamSavingConverter.getNewIdAsInteger(TeamCalDO.class, calendarId));
         }
         final Integer timesheetUserId = template.getTimesheetUserId();
         if (timesheetUserId != null) {
-          template.setTimesheetUserId((Integer) xstreamSavingConverter.getNewId(PFUserDO.class, timesheetUserId));
+          template.setTimesheetUserId(xstreamSavingConverter.getNewIdAsInteger(PFUserDO.class, timesheetUserId));
         }
       }
       userXmlPreferencesDao.serialize(userPrefs, filter);
       return;
+    } else if (obj instanceof TeamCalDO) {
+      log.info("Migrating " + obj);
+      final TeamCalDO cal = (TeamCalDO) obj;
+      cal.setFullAccessUserIds(updateIds(xstreamSavingConverter, PFUserDO.class, cal.getFullAccessUserIds()));
+      cal.setReadonlyAccessUserIds(updateIds(xstreamSavingConverter, PFUserDO.class, cal.getReadonlyAccessUserIds()));
+      cal.setMinimalAccessUserIds(updateIds(xstreamSavingConverter, PFUserDO.class, cal.getMinimalAccessUserIds()));
+      cal.setFullAccessGroupIds(updateIds(xstreamSavingConverter, GroupDO.class, cal.getFullAccessGroupIds()));
+      cal.setReadonlyAccessGroupIds(updateIds(xstreamSavingConverter, GroupDO.class, cal.getReadonlyAccessGroupIds()));
+      cal.setMinimalAccessGroupIds(updateIds(xstreamSavingConverter, GroupDO.class, cal.getMinimalAccessGroupIds()));
     }
   }
 
-  private Integer getNewCalendarId(final XStreamSavingConverter xstreamSavingConverter, final Integer oldCalendarId)
+  private String updateIds(final XStreamSavingConverter xstreamSavingConverter, final Class< ? > entityClass, final String oldIdsString)
   {
-    final Integer id = (Integer) xstreamSavingConverter.getNewId(TeamCalDO.class, oldCalendarId);
-    if (id == null) {
-      log.error("Oups, can't find calendar with id '" + oldCalendarId + "'.");
+    if (StringUtils.isBlank(oldIdsString) == true) {
+      return oldIdsString;
     }
-    return id;
+    final int[] oldIds = StringHelper.splitToInts(oldIdsString, ",", false);
+    if (oldIds == null || oldIds.length == 0) {
+      return "";
+    }
+    final StringBuffer buf = new StringBuffer();
+    String delimiter = "";
+    for (final int oldId : oldIds) {
+      final Integer newId = xstreamSavingConverter.getNewIdAsInteger(entityClass, oldId);
+      if (newId == null) {
+        // Can' be restored :-(
+        continue;
+      }
+      buf.append(delimiter).append(newId);
+      delimiter = ",";
+    }
+    return buf.toString();
   }
 
   @Override

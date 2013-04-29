@@ -32,6 +32,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.Column;
+import javax.persistence.UniqueConstraint;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
@@ -47,6 +49,10 @@ import org.projectforge.user.ProjectForgeGroup;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * For manipulating the database (patching data etc.)
@@ -86,7 +92,7 @@ public class DatabaseUpdateDao
 
   private void accessCheck(final boolean writeaccess)
   {
-    if (writeaccess == false && PFUserContext.getUser() == SYSTEM_ADMIN_PSEUDO_USER) {
+    if (PFUserContext.getUser() == SYSTEM_ADMIN_PSEUDO_USER) {
       // No access check for the system admin pseudo user.
       return;
     }
@@ -100,6 +106,17 @@ public class DatabaseUpdateDao
   {
     accessCheck(false);
     return internalDoesTableExist(table);
+  }
+
+  public boolean doesEntitiesExist(final Class< ? >... entities)
+  {
+    accessCheck(false);
+    for (final Class< ? > entity : entities) {
+      if (internalDoesTableExist(new Table(entity).getName()) == false) {
+        return false;
+      }
+    }
+    return true;
   }
 
   public boolean doesExist(final Table... tables)
@@ -144,6 +161,13 @@ public class DatabaseUpdateDao
       return false;
     }
     return true;
+  }
+
+  public boolean doesTableAttributesExist(final Class<?> entityClass, final String... properties)
+  {
+    accessCheck(false);
+    final Table table = new Table(entityClass);
+    return doesTableAttributesExist(table, properties);
   }
 
   public boolean doesTableAttributesExist(final Table table, final String... properties)
@@ -226,6 +250,10 @@ public class DatabaseUpdateDao
     buf.append("CREATE TABLE " + table.getName() + " (\n");
     boolean first = true;
     for (final TableAttribute attr : table.getAttributes()) {
+      if (attr.getType().isIn(TableAttributeType.LIST, TableAttributeType.SET) == true) {
+        // Nothing to be done here.
+        continue;
+      }
       if (first == true) {
         first = false;
       } else {
@@ -242,13 +270,23 @@ public class DatabaseUpdateDao
     for (final TableAttribute attr : table.getAttributes()) {
       if (StringUtils.isNotEmpty(attr.getForeignTable()) == true) {
         // foreign key (user_fk) references t_pf_user(pk)
-        buf.append(",\n  FOREIGN KEY ("
-            + attr.getName()
-            + ") REFERENCES "
-            + attr.getForeignTable()
-            + "("
-            + attr.getForeignAttribute()
-            + ")");
+        buf.append(",\n  FOREIGN KEY (").append(attr.getName()).append(") REFERENCES ").append(attr.getForeignTable()).append("(")
+        .append(attr.getForeignAttribute()).append(")");
+      }
+    }
+    final UniqueConstraint[] uniqueConstraints = table.getUniqueConstraints();
+    if (uniqueConstraints != null && uniqueConstraints.length > 0) {
+      for (final UniqueConstraint uniqueConstraint : uniqueConstraints) {
+        final String[] columnNames = uniqueConstraint.columnNames();
+        if (columnNames.length > 0) {
+          buf.append(",\n  UNIQUE (");
+          String separator = "";
+          for (final String columnName : columnNames) {
+            buf.append(separator).append(columnName);
+            separator = ",";
+          }
+          buf.append(")");
+        }
       }
     }
     buf.append("\n);\n");
@@ -256,11 +294,24 @@ public class DatabaseUpdateDao
 
   private void buildAttribute(final StringBuffer buf, final TableAttribute attr)
   {
-    buf.append(attr.getName()).append(" ").append(getDatabaseSupport().getType(attr));
-    if (attr.isPrimaryKey() == true) {
-      buf.append(getDatabaseSupport().getPrimaryKeyAttributeSuffix(attr));
+    buf.append(attr.getName()).append(" ");
+    final Column columnAnnotation = attr.getAnnotation(Column.class);
+    if (columnAnnotation != null && StringUtils.isNotEmpty(columnAnnotation.columnDefinition()) == true) {
+      buf.append(columnAnnotation.columnDefinition());
+    } else {
+      buf.append(getDatabaseSupport().getType(attr));
     }
-    databaseSupport.addDefaultAndNotNull(buf, attr);
+    boolean primaryKeyDefinition = false; // For avoiding double 'not null' definition.
+    if (attr.isPrimaryKey() == true) {
+      final String suffix = getDatabaseSupport().getPrimaryKeyAttributeSuffix(attr);
+      if (StringUtils.isNotEmpty(suffix) == true) {
+        buf.append(suffix);
+        primaryKeyDefinition = true;
+      }
+    }
+    if (primaryKeyDefinition == false) {
+      databaseSupport.addDefaultAndNotNull(buf, attr);
+    }
     // if (attr.isNullable() == false) {
     // buf.append(" NOT NULL");
     // }
@@ -286,6 +337,16 @@ public class DatabaseUpdateDao
     final StringBuffer buf = new StringBuffer();
     buildCreateTableStatement(buf, table);
     execute(buf.toString());
+    return true;
+  }
+
+  public boolean createSequence(final String name, final boolean ignoreErrors)
+  {
+    accessCheck(true);
+    final String sql = getDatabaseSupport().createSequence(name);
+    if (sql != null) {
+      execute(sql, ignoreErrors);
+    }
     return true;
   }
 
@@ -438,13 +499,13 @@ public class DatabaseUpdateDao
     final List<DatabaseUpdateDO> result = new ArrayList<DatabaseUpdateDO>();
     for (final Map<String, Object> map : dbResult) {
       final DatabaseUpdateDO entry = new DatabaseUpdateDO();
-      entry.setUpdateDate((Date)map.get("update_date"));
-      entry.setRegionId((String)map.get("region_id"));
-      entry.setVersionString((String)map.get("version"));
-      entry.setExecutionResult((String)map.get("execution_result"));
-      final PFUserDO executedByUser = Registry.instance().getUserGroupCache().getUser((Integer)map.get("executed_by_user_fk"));
+      entry.setUpdateDate((Date) map.get("update_date"));
+      entry.setRegionId((String) map.get("region_id"));
+      entry.setVersionString((String) map.get("version"));
+      entry.setExecutionResult((String) map.get("execution_result"));
+      final PFUserDO executedByUser = Registry.instance().getUserGroupCache().getUser((Integer) map.get("executed_by_user_fk"));
       entry.setExecutedBy(executedByUser);
-      entry.setDescription((String)map.get("description"));
+      entry.setDescription((String) map.get("description"));
       result.add(entry);
     }
     return result;
@@ -638,22 +699,34 @@ public class DatabaseUpdateDao
    * @param ignoreErrors If true (default) then errors will be caught and logged.
    * @return true if no error occurred (no exception was caught), otherwise false.
    */
+  @SuppressWarnings({ "unchecked", "rawtypes"})
   public boolean execute(final String jdbcString, final boolean ignoreErrors)
   {
     accessCheck(true);
-    final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
     log.info(jdbcString);
-    if (ignoreErrors == true) {
-      try {
-        jdbc.execute(jdbcString);
-      } catch (final Throwable ex) {
-        log.info(ex.getMessage(), ex);
-        return false;
+
+    final DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(dataSource);
+    final TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+    transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
+
+    final Object result = transactionTemplate.execute(new TransactionCallback() {
+      public Object doInTransaction(final TransactionStatus status)
+      {
+        final JdbcTemplate jdbcTemplate = new JdbcTemplate(transactionManager.getDataSource());
+        if (ignoreErrors == true) {
+          try {
+            jdbcTemplate.execute(jdbcString);
+          } catch (final Throwable ex) {
+            log.info(ex.getMessage(), ex);
+            return Boolean.FALSE;
+          }
+        } else {
+          jdbcTemplate.execute(jdbcString);
+        }
+        return Boolean.TRUE;
       }
-    } else {
-      jdbc.execute(jdbcString);
-    }
-    return true;
+    });
+    return result != null && Boolean.TRUE.equals(result) == true;
   }
 
   public int queryForInt(final String jdbcQuery)

@@ -34,13 +34,13 @@ public class SystemUpdaterTest
   public void updateTest()
   {
     SystemUpdater updater = new SystemUpdater();
-    updater.testRegister(createEntry("a", "1.0.0", "2011-02-01", UpdatePreCheckStatus.OK));
+    updater.testRegister(createEntry("a", "1.0.0", "2011-02-01", UpdatePreCheckStatus.READY_FOR_UPDATE));
     assertFalse("Version is expected to be ready for update.", updater.isUpdated());
     updater.testRegister(createEntry("a", "1.1.0", "2011-02-05", UpdatePreCheckStatus.ALREADY_UPDATED));
     assertTrue("Older version shouldn't be tested.", updater.isUpdated());
     updater.testRegister(createEntry("b", "1.0.0", "2011-01-01", UpdatePreCheckStatus.ALREADY_UPDATED));
     assertTrue("Older version shouldn't be tested.", updater.isUpdated());
-    updater.testRegister(createEntry("b", "1.1.0", "2011-01-02", UpdatePreCheckStatus.OK));
+    updater.testRegister(createEntry("b", "1.1.0", "2011-01-02", UpdatePreCheckStatus.READY_FOR_UPDATE));
     assertFalse("b 1.1.0 should be detected as ready for update.", updater.isUpdated());
   }
 

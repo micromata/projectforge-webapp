@@ -32,6 +32,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -96,6 +97,49 @@ public class BeanHelper
       }
     }
     return null;
+  }
+
+  /**
+   * Return all methods starting with 'get*' or 'is*' without parameters and non-bridged of given class and all interfaces and super
+   * classes.
+   * @param clazz
+   * @return
+   */
+  public static List<Method> getAllGetterMethods(final Class< ? > clazz)
+  {
+    final Method[] methods = clazz.getMethods();
+    final List<Method> list = new LinkedList<Method>();
+    for (final Method method : methods) {
+      final String name = method.getName();
+      if (name.startsWith("get") == true && name.length() > 3 || //
+          name.startsWith("is") == true
+          && name.length() > 2) {
+        if (method.getParameterTypes().length == 0 && method.isBridge() == false) {
+          // Don't return bridged methods (methods defined in interface or super class with different return type).
+          list.add(method);
+        }
+      }
+    }
+    return list;
+  }
+
+  /**
+   * getProperty -> property, isValid -> valid.
+   * @param method
+   */
+  public static String getProperty(final Method method)
+  {
+    final String name = method.getName();
+    int pos = 0;
+    if (name.startsWith("get") == true && name.length() > 3) {
+      pos = 3;
+    } else if (name.startsWith("is") == true && name.length() > 2) {
+      pos = 2;
+    } else {
+      return null;
+    }
+    final String property = name.substring(pos);
+    return StringUtils.uncapitalize(property);
   }
 
   public static Class< ? > determinePropertyType(final Method method)
@@ -455,7 +499,7 @@ public class BeanHelper
    * @param fieldname
    * @return
    */
-  public static Object getFieldValue(final Object obj, final Class<?> clazz, final String fieldname)
+  public static Object getFieldValue(final Object obj, final Class< ? > clazz, final String fieldname)
   {
     if (obj == null) {
       return null;
@@ -465,19 +509,9 @@ public class BeanHelper
       field.setAccessible(true);
       return getFieldValue(obj, field);
     } catch (final SecurityException ex) {
-      log.error("Exception encountered while getting field '"
-          + fieldname
-          + "' of object from type '"
-          + clazz.getName()
-          + "': "
-          + ex, ex);
+      log.error("Exception encountered while getting field '" + fieldname + "' of object from type '" + clazz.getName() + "': " + ex, ex);
     } catch (final NoSuchFieldException ex) {
-      log.error("Exception encountered while getting field '"
-          + fieldname
-          + "' of object from type '"
-          + clazz.getName()
-          + "': "
-          + ex, ex);
+      log.error("Exception encountered while getting field '" + fieldname + "' of object from type '" + clazz.getName() + "': " + ex, ex);
     }
     return null;
   }

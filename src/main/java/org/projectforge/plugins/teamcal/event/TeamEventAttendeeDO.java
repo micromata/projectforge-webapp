@@ -29,8 +29,13 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -55,13 +60,15 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
 
   private String url;
 
-  private Integer userId;
+  private PFUserDO user;
 
   private String loginToken;
 
   private TeamAttendeeStatus status;
 
   private String comment;
+
+  private String commentOfAttendee;
 
   private Integer id;
 
@@ -89,24 +96,33 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
     this.id = id;
   }
 
-
   /**
    * Is set if the attendee is a ProjectForge user.
    * @return the userId
    */
-  public Integer getUserId()
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  public PFUserDO getUser()
   {
-    return userId;
+    return user;
   }
 
   /**
-   * @param userId the userId to set
+   * @param user the user to set
    * @return this for chaining.
    */
-  public TeamEventAttendeeDO setUserId(final Integer userId)
+  public TeamEventAttendeeDO setUser(final PFUserDO user)
   {
-    this.userId = userId;
+    this.user = user;
     return this;
+  }
+
+  @Transient
+  public Integer getUserId()
+  {
+    if (this.user == null)
+      return null;
+    return user.getId();
   }
 
   /**
@@ -152,6 +168,8 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
   /**
    * @return the status
    */
+  @Enumerated(EnumType.STRING)
+  @Column(length = 100)
   public TeamAttendeeStatus getStatus()
   {
     return status;
@@ -170,6 +188,7 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
   /**
    * @return the comment
    */
+  @Column(length = 4000)
   public String getComment()
   {
     return comment;
@@ -182,6 +201,25 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
   public TeamEventAttendeeDO setComment(final String comment)
   {
     this.comment = comment;
+    return this;
+  }
+
+  /**
+   * @return the commentOfAttendee
+   */
+  @Column(length = 4000, name = "comment_of_attendee")
+  public String getCommentOfAttendee()
+  {
+    return commentOfAttendee;
+  }
+
+  /**
+   * @param commentOfAttendee the commentOfAttendee to set
+   * @return this for chaining.
+   */
+  public TeamEventAttendeeDO setCommentOfAttendee(final String commentOfAttendee)
+  {
+    this.commentOfAttendee = commentOfAttendee;
     return this;
   }
 
@@ -208,8 +246,8 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
       hcb.append(this.id);
       return hcb.toHashCode();
     }
-    if (this.userId != null) {
-      hcb.append(this.userId);
+    if (this.user != null) {
+      hcb.append(this.user.getId());
     } else {
       hcb.append(this.url);
     }
@@ -242,12 +280,12 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
   @Override
   public String toString()
   {
-    if (this.userId != null) {
-      final PFUserDO user = UserRights.getUserGroupCache().getUser(this.userId);
+    if (this.getUserId() != null) {
+      final PFUserDO user = UserRights.getUserGroupCache().getUser(getUserId());
       if (user != null) {
-        return user.getFullname() + " (id=" + this.userId + ")";
+        return user.getFullname() + " (id=" + getUserId() + ")";
       } else {
-        return "id=" + this.userId + " (not found)";
+        return "id=" + getUserId() + " (not found)";
       }
     } else if (StringUtils.isBlank(url) == true) {
       return String.valueOf(id);
@@ -302,7 +340,7 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
     if (src instanceof TeamEventAttendeeDO == false) {
       throw new UnsupportedOperationException();
     }
-    final TeamEventAttendeeDO source = (TeamEventAttendeeDO)src;
+    final TeamEventAttendeeDO source = (TeamEventAttendeeDO) src;
     ModificationStatus modStatus = ModificationStatus.NONE;
     if (ObjectUtils.equals(this.id, source.id) == false) {
       modStatus = ModificationStatus.MAJOR;
@@ -312,9 +350,9 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
       modStatus = ModificationStatus.MAJOR;
       this.url = source.url;
     }
-    if (ObjectUtils.equals(this.userId, source.userId) == false) {
+    if (ObjectUtils.equals(this.getUser(), source.getUser()) == false) {
       modStatus = ModificationStatus.MAJOR;
-      this.userId = source.userId;
+      this.user = source.user;
     }
     if (ObjectUtils.equals(this.loginToken, source.loginToken) == false) {
       modStatus = ModificationStatus.MAJOR;

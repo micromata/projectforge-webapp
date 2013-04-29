@@ -28,7 +28,7 @@ import org.projectforge.admin.UpdateEntryImpl;
 import org.projectforge.admin.UpdatePreCheckStatus;
 import org.projectforge.admin.UpdateRunningStatus;
 import org.projectforge.database.DatabaseUpdateDao;
-import org.projectforge.database.Table;
+import org.projectforge.database.SchemaGenerator;
 
 /**
  * Contains the initial data-base set-up script and later all update scripts if any data-base schema updates are required by any later
@@ -44,23 +44,25 @@ public class MemoPluginUpdates
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
-    return new UpdateEntryImpl(MemoPlugin.ID, "1.0.0", "2011-03-08", "Adds table T_PLUGIN_MEMO.") {
-      final Table table = new Table(MemoDO.class);
-
+    return new UpdateEntryImpl(MemoPlugin.ID, "2011-03-08", "Adds table T_PLUGIN_MEMO.") {
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
         // Does the data-base table already exist?
-        return dao.doesExist(table) == true ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
+        // Check only the oldest table.
+        if (dao.doesEntitiesExist(MemoDO.class) == true) {
+          return UpdatePreCheckStatus.ALREADY_UPDATED;
+        } else {
+          // The oldest table doesn't exist, therefore the plug-in has to initialized completely.
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
       }
 
       @Override
       public UpdateRunningStatus runUpdate()
       {
         // Create initial data-base table:
-        final Table table = new Table(MemoDO.class) //
-            .addAttributes("id", "created", "lastUpdate", "deleted", "owner", "subject", "memo");
-        dao.createTable(table);
+        new SchemaGenerator(dao).add(MemoDO.class).createSchema();
         dao.createMissingIndices();
         return UpdateRunningStatus.DONE;
       }

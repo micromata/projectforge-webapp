@@ -23,15 +23,12 @@
 
 package org.projectforge.plugins.marketing;
 
-import org.projectforge.address.AddressDO;
 import org.projectforge.admin.UpdateEntry;
 import org.projectforge.admin.UpdateEntryImpl;
 import org.projectforge.admin.UpdatePreCheckStatus;
 import org.projectforge.admin.UpdateRunningStatus;
 import org.projectforge.database.DatabaseUpdateDao;
-import org.projectforge.database.Table;
-import org.projectforge.database.TableAttribute;
-import org.projectforge.database.TableAttributeType;
+import org.projectforge.database.SchemaGenerator;
 
 /**
  * Contains the initial data-base set-up script and later all update scripts if any data-base schema updates are required by any later
@@ -44,37 +41,33 @@ public class MarketingPluginUpdates
 {
   static DatabaseUpdateDao dao;
 
+  final static Class< ? >[] doClasses = new Class< ? >[] { //
+    AddressCampaignDO.class, AddressCampaignValueDO.class};
+
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
-    return new UpdateEntryImpl(MarketingPlugin.ADDRESS_CAMPAIGN_ID, "1.0.0", "2011-11-24", "Adds tables T_PLUGIN_MARKETING_*.") {
-      final Table addressCampaignTable = new Table(AddressCampaignDO.class);
-
-      final Table addressCampaignValueTable = new Table(AddressCampaignValueDO.class);
+    return new UpdateEntryImpl(MarketingPlugin.ADDRESS_CAMPAIGN_ID, "2011-11-24", "Adds tables T_PLUGIN_MARKETING_*.") {
 
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
         // Does the data-base table already exist?
-        return dao.doesExist(addressCampaignTable, addressCampaignValueTable) ? UpdatePreCheckStatus.ALREADY_UPDATED
-            : UpdatePreCheckStatus.OK;
+        // Check only the oldest table.
+        if (dao.doesEntitiesExist(AddressCampaignDO.class) == true) {
+          return UpdatePreCheckStatus.ALREADY_UPDATED;
+        } else {
+          // The oldest table doesn't exist, therefore the plug-in has to initialized completely.
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
       }
 
       @Override
       public UpdateRunningStatus runUpdate()
       {
         // Create initial data-base table:
-        Table table = new Table(AddressCampaignDO.class) //
-        .addDefaultBaseDOAttributes() //
-        .addAttributes("title", "values", "comment");
-        dao.createTable(table);
-        table = new Table(AddressCampaignValueDO.class) //
-        .addDefaultBaseDOAttributes() //
-        .addAttributes("value", "comment") //
-        .addAttribute(new TableAttribute("address_fk", TableAttributeType.INT).setForeignTable(AddressDO.class)) //
-        .addAttribute(new TableAttribute("address_campaign_fk", TableAttributeType.INT).setForeignTable(AddressCampaignDO.class));
-        dao.createTable(table);
-        dao.addUniqueConstraint(table, "t_address_campaign_value_unique", "address_fk", "address_campaign_fk");
+        new SchemaGenerator(dao).add(doClasses).createSchema();
+        dao.createMissingIndices();
         return UpdateRunningStatus.DONE;
       }
     };

@@ -30,6 +30,7 @@ import java.util.TimeZone;
 
 import org.projectforge.access.AccessException;
 import org.projectforge.core.ConfigurationDO;
+import org.projectforge.core.ConfigurationDOXmlDumpHook;
 import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.ConfigurationParam;
 import org.projectforge.core.HibernateSearchReindexer;
@@ -45,9 +46,11 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
+import org.projectforge.user.UserPrefDOXmlDumpHook;
 import org.projectforge.user.UserRightDO;
 import org.projectforge.user.UserRightId;
 import org.projectforge.user.UserRightValue;
+import org.projectforge.user.UserXmlPreferencesXmlDumpHook;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -128,6 +131,9 @@ public class InitDatabaseDao extends HibernateDaoSupport
   public void setXmlDump(final XmlDump xmlDump)
   {
     this.xmlDump = xmlDump;
+    xmlDump.registerHook(new UserXmlPreferencesXmlDumpHook());
+    xmlDump.registerHook(new UserPrefDOXmlDumpHook());
+    xmlDump.registerHook(new ConfigurationDOXmlDumpHook());
   }
 
   /**

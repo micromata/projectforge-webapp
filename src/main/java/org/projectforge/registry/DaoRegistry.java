@@ -63,6 +63,7 @@ import org.projectforge.user.GroupDao;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserPrefDao;
 import org.projectforge.user.UserRightDao;
+import org.projectforge.user.UserXmlPreferencesDao;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
 /**
@@ -210,6 +211,8 @@ public class DaoRegistry
 
   private UserRightDao userRightDao;
 
+  private UserXmlPreferencesDao userXmlPreferencesDao;
+
   /**
    * Registers all daos.
    */
@@ -217,7 +220,7 @@ public class DaoRegistry
   public synchronized void init()
   {
     if (instance != null) {
-      log.error("DaoRegistry is already initialized!");
+      log.info("DaoRegistry is already initialized!");
       return;
     }
     register(CONFIGURATION, ConfigurationDao.class, configurationDao, "administration.configuration").setSearchable(false);
@@ -269,6 +272,7 @@ public class DaoRegistry
     register(USER_RIGHT, UserRightDao.class, userRightDao).setSearchable(false);
     Registry.instance().setDataSource(dataSource);
     Registry.instance().setHibernateTemplate(hibernateTemplate);
+    Registry.instance().setUserXmlPreferencesDao(userXmlPreferencesDao);
     instance = this;
   }
 
@@ -461,5 +465,10 @@ public class DaoRegistry
   public void setUserRightDao(final UserRightDao userRightDao)
   {
     this.userRightDao = userRightDao;
+  }
+
+  public void setUserXmlPreferencesDao(final UserXmlPreferencesDao userXmlPreferencesDao)
+  {
+    this.userXmlPreferencesDao = userXmlPreferencesDao;
   }
 }

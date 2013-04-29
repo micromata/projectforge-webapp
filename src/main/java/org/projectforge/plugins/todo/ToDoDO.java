@@ -291,6 +291,7 @@ public class ToDoDO extends DefaultBaseDO
    * showing the total number of recent to-do's. After displaying the to-do by the assignee the recent flag will be set to false.
    * @return true if any modification isn't seen by the assignee.
    */
+  @Column
   public boolean isRecent()
   {
     return recent;

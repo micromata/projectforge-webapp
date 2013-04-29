@@ -32,7 +32,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
-
 /**
  * For storing the user's last script calls. The parameters will be stored per script.
  * 
@@ -43,9 +42,13 @@ public class ScriptCallData
 {
   @XStreamAsAttribute
   private String scriptName;
-  
+
   @XStreamImplicit(itemFieldName = "parameter")
   private List<ScriptParameter> scriptParameters;
+
+  public ScriptCallData()
+  {
+  }
 
   public ScriptCallData(final String name, final List<ScriptParameter> scriptParameters)
   {
@@ -58,7 +61,7 @@ public class ScriptCallData
     return scriptName;
   }
 
-  public void setScriptName(String scriptName)
+  public void setScriptName(final String scriptName)
   {
     this.scriptName = scriptName;
   }
@@ -68,19 +71,19 @@ public class ScriptCallData
     return scriptParameters;
   }
 
-  public void setScriptParameter(List<ScriptParameter> scriptParameter)
+  public void setScriptParameter(final List<ScriptParameter> scriptParameter)
   {
     this.scriptParameters = scriptParameter;
   }
-  
+
   @Override
-  public boolean equals(Object obj)
+  public boolean equals(final Object obj)
   {
     if (this == obj) {
       return true;
     }
     if (obj instanceof ScriptCallData) {
-      return StringUtils.equals(scriptName, ((ScriptCallData)obj).scriptName);
+      return StringUtils.equals(scriptName, ((ScriptCallData) obj).scriptName);
     }
     return false;
   }

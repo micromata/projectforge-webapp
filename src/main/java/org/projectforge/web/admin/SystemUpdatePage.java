@@ -73,8 +73,9 @@ public class SystemUpdatePage extends AbstractSecuredPage
         final ExportWorkbook workbook = new ExportWorkbook();
         final ExportSheet sheet = workbook.addSheet("Update history");
         sheet.getContentProvider().setColWidths(new int[] { 20, 10, 20, 15, 50, 20});
-        sheet.getContentProvider().putFormat(java.sql.Timestamp.class,"YYYY-MM-DD hh:mm:ss");
-        sheet.setPropertyNames(new String[] { "regionId", "versionString", "updateDate", "executedBy.username", "description", "executionResult"});
+        sheet.getContentProvider().putFormat(java.sql.Timestamp.class, "YYYY-MM-DD hh:mm:ss");
+        sheet.setPropertyNames(new String[] { "regionId", "versionString", "updateDate", "executedBy.username", "description",
+        "executionResult"});
         sheet.addRow().setValues("region id", "version", "update date", "executed by", "description", "execution result");
         sheet.addRows(updateEntries);
         final String filename = "ProjectForge-UpdateHistory_" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".xls";

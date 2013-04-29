@@ -33,9 +33,9 @@ import org.projectforge.test.TestBase;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 
-public class XmlDumpTest extends TestBase
+public class XmlDumpTestFork extends TestBase
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(XmlDumpTest.class);
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(XmlDumpTestFork.class);
 
   private InitDatabaseDao initDatabaseDao;
 

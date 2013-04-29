@@ -28,7 +28,6 @@ import java.util.Set;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.projectforge.task.TaskNode;
-import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.user.UserPreferencesHelper;
 import org.projectforge.web.wicket.tree.TableTreeExpansion;
 
@@ -64,7 +63,7 @@ public class TaskTreeExpansion extends TableTreeExpansion<Integer, TaskNode>
   }
 
   /**
-   * @return The expansion model. Any previous persisted state of open rows will be restored from {@link UserXmlPreferencesCache}.
+   * @return The expansion model. Any previous persisted state of open rows will be restored from {@link UserPreferencesHelper}.
    */
   @SuppressWarnings("serial")
   public static IModel<Set<TaskNode>> getExpansionModel()

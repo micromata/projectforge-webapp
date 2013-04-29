@@ -28,7 +28,7 @@ import org.projectforge.admin.UpdateEntryImpl;
 import org.projectforge.admin.UpdatePreCheckStatus;
 import org.projectforge.admin.UpdateRunningStatus;
 import org.projectforge.database.DatabaseUpdateDao;
-import org.projectforge.database.Table;
+import org.projectforge.database.SchemaGenerator;
 
 /**
  * Contains the initial data-base set-up script and later all update scripts if any data-base schema updates are required by any later
@@ -39,30 +39,30 @@ public class SkillMatrixPluginUpdates
 {
   static DatabaseUpdateDao dao;
 
+  final static Class< ? >[] doClasses = new Class< ? >[] { //
+    SkillDO.class, SkillRatingDO.class};
+
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
-    return new UpdateEntryImpl(SkillMatrixPlugin.ID_SKILL_RATING, "1.0.0", "2011-05-27", "Adds tables T_PLUGIN_SKILL and T_PLUGIN_SKILL_RATING.") {
+    return new UpdateEntryImpl(SkillMatrixPlugin.ID_SKILL_RATING, "2011-05-27",
+        "Adds tables T_PLUGIN_SKILL and T_PLUGIN_SKILL_RATING.") {
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        final Table skillTable = new Table(SkillDO.class);
-        final Table skillRatingTable = new Table(SkillRatingDO.class);
-        // Does the data-base table already exist?
-        return dao.doesExist(skillTable) == true && dao.doesExist(skillRatingTable) == true ? UpdatePreCheckStatus.ALREADY_UPDATED
-            : UpdatePreCheckStatus.OK;
+        // Does the data-base tables already exist?
+        // Check only the oldest table.
+        if (dao.doesEntitiesExist(SkillDO.class) == false) {
+          // The oldest table doesn't exist, therefore the plugin has to initialized completely.
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
+        return UpdatePreCheckStatus.ALREADY_UPDATED;
       }
 
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        // Create initial data-base tables:
-        final Table skillTable = new Table(SkillDO.class) //
-        .addAttributes("id", "created", "lastUpdate", "deleted", "comment", "description");
-        dao.createTable(skillTable);
-        final Table skillRatingTable = new Table(SkillRatingDO.class) //
-        .addAttributes("id", "created", "lastUpdate", "deleted", "comment", "description");
-        dao.createTable(skillRatingTable);
+        new SchemaGenerator(dao).add(doClasses).createSchema();
         dao.createMissingIndices();
         return UpdateRunningStatus.DONE;
       }

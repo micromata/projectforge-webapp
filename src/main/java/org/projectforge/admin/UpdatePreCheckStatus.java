@@ -30,7 +30,7 @@ public enum UpdatePreCheckStatus
 {
   UNKNOWN,
   /** Ready for updating. */
-  OK,
+  READY_FOR_UPDATE,
   /** Already updated, nothing to do. */
   ALREADY_UPDATED,
   /** Update failed. Oh no...*/

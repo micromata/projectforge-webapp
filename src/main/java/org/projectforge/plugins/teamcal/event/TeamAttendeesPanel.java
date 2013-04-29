@@ -112,16 +112,16 @@ public class TeamAttendeesPanel extends Panel
           final TeamEventAttendeeDO attendee = attendeeModel.getObject();
           if (StringUtils.isBlank(object) == true) {
             attendee.setUrl(null);
-            attendee.setUserId(null);
+            attendee.setUser(null);
             return;
           }
           final PFUserDO user = userGroupCache.getUserByFullname(object);
           if (user != null) {
-            attendee.setUserId(user.getId());
+            attendee.setUser(user);
             attendee.setUrl(null);
           } else {
             attendee.setUrl(object);
-            attendee.setUserId(null);
+            attendee.setUser(null);
           }
         }
       }, TeamEventAttendeeDO.URL_MAX_LENGTH);
@@ -161,7 +161,7 @@ public class TeamAttendeesPanel extends Panel
           return;
         }
         final TeamEventAttendeeDO clone = new TeamEventAttendeeDO();
-        clone.setUrl(attendee.getUrl()).setUserId(attendee.getUserId());
+        clone.setUrl(attendee.getUrl()).setUser(attendee.getUser());
         attendees.add(clone);
         rebuildAttendees();
         target.add(mainContainer);

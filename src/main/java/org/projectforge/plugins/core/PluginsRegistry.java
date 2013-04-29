@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.apache.wicket.settings.IResourceSettings;
 import org.projectforge.admin.SystemUpdater;
+import org.projectforge.admin.UpdateEntry;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.CronSetup;
 import org.projectforge.plugins.memo.MemoPlugin;
@@ -66,6 +67,12 @@ public class PluginsRegistry
 
   public void register(final AbstractPlugin plugin)
   {
+    for (final AbstractPlugin pl : plugins) {
+      if (pl.getClass().equals(plugin.getClass()) == true) {
+        log.warn("Can't add plugin twice. Plugin '" + plugin.getClass() + "' already added.");
+        return;
+      }
+    }
     plugins.add(plugin);
   }
 
@@ -81,8 +88,24 @@ public class PluginsRegistry
   public void set(final SystemUpdater systemUpdater)
   {
     for (final AbstractPlugin plugin : plugins) {
-      systemUpdater.register(plugin.getInitializationUpdateEntry());
-      systemUpdater.register(plugin.getUpdateEntries());
+      final UpdateEntry updateEntry = plugin.getInitializationUpdateEntry();
+      if (updateEntry != null) {
+        if (updateEntry.isInitial() == false) {
+          log.error("The given UpdateEntry returned by plugin.getInitializationUpdateEntry() is not initial! Please use constructor without parameter version: "
+              + plugin.getClass());
+        }
+        systemUpdater.register(updateEntry);
+      }
+      final List<UpdateEntry> updateEntries = plugin.getUpdateEntries();
+      if (updateEntries != null) {
+        for (final UpdateEntry entry : updateEntries) {
+          if (entry.isInitial() == true) {
+            log.error("The given UpdateEntry returned by plugin.getUpdateEntries() is initial! Please use constructor with parameter version: "
+                + plugin.getClass() + ": " + entry.getDescription());
+          }
+        }
+        systemUpdater.register(updateEntries);
+      }
     }
   }
 
@@ -98,7 +121,7 @@ public class PluginsRegistry
   public void loadPlugins()
   {
     for (final AbstractPlugin plugin : builtinPlugins) {
-      plugins.add(plugin);
+      register(plugin);
     }
     final ConfigXml xmlConfiguration = ConfigXml.getInstance();
     final String[] pluginMainClasses = xmlConfiguration.getPluginMainClasses();
@@ -108,7 +131,7 @@ public class PluginsRegistry
           final Class< ? > pluginMainClass = Class.forName(pluginMainClassName);
           try {
             final AbstractPlugin plugin = (AbstractPlugin) pluginMainClass.newInstance();
-            plugins.add(plugin);
+            register(plugin);
           } catch (final ClassCastException ex) {
             log.error("Couldn't load plugin, class '" + pluginMainClassName + "' isn't of type AbstractPlugin.");
           } catch (final InstantiationException ex) {
