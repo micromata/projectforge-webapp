@@ -255,13 +255,13 @@ public class TeamCalPlugin extends AbstractPlugin
   public void registerCronJob(CronSetup cronSetup)
   {
     cronSetup.registerCronJob("teamCalAboJob", TeamCalAboJob.class, "0 */5 * * * ?");
-    // do initial cache installation
+    // do initial cache installation and wait one minute to let the rest of the application start up properly
     Thread t = new Thread() {
 
       @Override
       public void run() {
         try {
-          Thread.sleep(2000);
+          Thread.sleep(1000);
         } catch (InterruptedException e) {
           log.info("Thread sleep of cache initialization failed. Initializing cache immediately.");
         }
