@@ -114,7 +114,11 @@ public class TeamCalPluginUpdates
       public UpdateRunningStatus runUpdate()
       {
         if (dao.doesTableAttributesExist(TeamCalDO.class, "abo", "aboCalendarBinary", "aboHash", "aboUrl", "aboUpdateTime") == false) {
-          updateAboDataBase("abo", "aboCalendarBinary", "aboHash", "aboUrl", "aboUpdateTime");
+            // special treatment for abo
+            if (dao.doesTableAttributesExist(TeamCalDO.class, "abo") == false) {
+                dao.addTableAttributes(calendarTable, new TableAttribute(TeamCalDO.class, "abo").setDefaultValue("false"));
+            }
+            updateAboDataBase("aboCalendarBinary", "aboHash", "aboUrl", "aboUpdateTime");
         }
         return UpdateRunningStatus.DONE;
       }
