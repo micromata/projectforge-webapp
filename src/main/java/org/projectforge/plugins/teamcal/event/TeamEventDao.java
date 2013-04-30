@@ -23,15 +23,7 @@
 
 package org.projectforge.plugins.teamcal.event;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.TimeZone;
+import java.util.*;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -50,6 +42,7 @@ import org.projectforge.plugins.teamcal.admin.TeamCalCache;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalsProvider;
+import org.projectforge.plugins.teamcal.abo.TeamEventAboCache;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserRightId;
 import org.springframework.transaction.annotation.Propagation;
@@ -73,7 +66,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
   private static final Class< ? >[] ADDITIONAL_HISTORY_SEARCH_DOS = new Class[] { TeamEventAttendeeDO.class};
 
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "subject", "location", "calendar.id", "calendar.title", "note",
-  "attendees"};
+      "attendees"};
 
   private TeamCalDao teamCalDao;
 
@@ -172,6 +165,8 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     qFilter.add(Restrictions.isNotNull("recurrenceRule"));
     list = getList(qFilter);
     list = selectUnique(list);
+    // add all abo events
+    list.addAll(TeamEventAboCache.instance().getRecurrenceEvents(teamEventFilter));
     final TimeZone timeZone = PFUserContext.getTimeZone();
     if (list != null) {
       for (final TeamEventDO eventDO : list) {
@@ -240,6 +235,19 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
         if (matches(event.getStartDate(), event.getEndDate(), event.isAllDay(), teamEventFilter) == true) {
           result.add(event);
         }
+      }
+    }
+    // abos
+    TeamEventAboCache aboCache = TeamEventAboCache.instance();
+    // TODO remove and replace through separated thread
+    aboCache.updateCache(teamCalDao);
+    for (Integer calendarId : teamEventFilter.getTeamCals()) {
+      if (aboCache.isAboCalendar(calendarId) == true) {
+        Date startDate = teamEventFilter.getStartDate();
+        Date endDate = teamEventFilter.getEndDate();
+        Long startTime = startDate == null ? 0 : startDate.getTime();
+        Long endTime = endDate == null ? Long.MAX_VALUE : endDate.getTime();
+        result.addAll(aboCache.getEvents(calendarId, startTime, endTime));
       }
     }
     return result;
@@ -319,7 +327,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
             (Restrictions.and(Restrictions.le("startDate", startDate), Restrictions.ge("endDate", endDate)))));
       } else {
         queryFilter.add(
-            // "startDate" < endDate && ("recurrenceUntil" == null || "recurrenceUntil" > startDate)
+        // "startDate" < endDate && ("recurrenceUntil" == null || "recurrenceUntil" > startDate)
             (Restrictions.and(Restrictions.lt("startDate", endDate),
                 Restrictions.or(Restrictions.isNull("recurrenceUntil"), Restrictions.gt("recurrenceUntil", startDate)))));
       }
@@ -329,7 +337,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
       } else {
         // This branch is reached for subscriptions and calendar downloads.
         queryFilter.add(
-            // "recurrenceUntil" == null || "recurrenceUntil" > startDate
+        // "recurrenceUntil" == null || "recurrenceUntil" > startDate
             Restrictions.or(Restrictions.isNull("recurrenceUntil"), Restrictions.gt("recurrenceUntil", startDate)));
       }
     } else if (endDate != null) {

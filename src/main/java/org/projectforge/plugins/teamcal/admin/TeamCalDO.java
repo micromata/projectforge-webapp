@@ -23,25 +23,17 @@
 
 package org.projectforge.plugins.teamcal.admin;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.hibernate.search.annotations.ClassBridge;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.IndexedEmbedded;
-import org.hibernate.search.annotations.Store;
+import org.hibernate.search.annotations.*;
+import org.projectforge.core.AbstractHistorizableBaseDO;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.database.Constants;
 import org.projectforge.user.PFUserDO;
+
+import java.util.Set;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -55,6 +47,10 @@ import org.projectforge.user.PFUserDO;
 public class TeamCalDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = 2869432134443084605L;
+
+  static {
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(TeamCalDO.class, "aboCalendarBinary", "aboHash");
+  }
 
   // @UserPrefParameter(i18nKey = "plugins.teamcal.subject")
   @Field(index = Index.TOKENIZED, store = Store.NO)
@@ -71,6 +67,17 @@ public class TeamCalDO extends DefaultBaseDO
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String description;
+
+  private boolean abo;
+
+  private String aboHash;
+
+  private String aboUrl;
+
+  private Long aboUpdateTime;
+
+  @Lob
+  private byte[] aboCalendarBinary;
 
   public TeamCalDO()
   {
@@ -254,6 +261,56 @@ public class TeamCalDO extends DefaultBaseDO
   {
     this.description = description;
     return this;
+  }
+
+  public boolean isAbo()
+  {
+    return abo;
+  }
+
+  public void setAbo(boolean abo)
+  {
+    this.abo = abo;
+  }
+
+  public String getAboHash()
+  {
+    return aboHash;
+  }
+
+  public void setAboHash(String aboHash)
+  {
+    this.aboHash = aboHash;
+  }
+
+  public String getAboUrl()
+  {
+    return aboUrl;
+  }
+
+  public void setAboUrl(String aboUrl)
+  {
+    this.aboUrl = aboUrl;
+  }
+
+  public byte[] getAboCalendarBinary()
+  {
+    return aboCalendarBinary;
+  }
+
+  public void setAboCalendarBinary(byte[] aboCalendarBinary)
+  {
+    this.aboCalendarBinary = aboCalendarBinary;
+  }
+
+  public Long getAboUpdateTime()
+  {
+    return aboUpdateTime;
+  }
+
+  public void setAboUpdateTime(Long aboUpdateTime)
+  {
+    this.aboUpdateTime = aboUpdateTime;
   }
 
   /**
