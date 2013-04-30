@@ -39,6 +39,7 @@ import org.projectforge.core.ConfigurationParam;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.SchemaGenerator;
 import org.projectforge.database.Table;
+import org.projectforge.database.TableAttribute;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.event.TeamEventAttendeeDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
@@ -96,6 +97,8 @@ public class TeamCalPluginUpdates
     list.add(new UpdateEntryImpl(TeamCalPlugin.ID, "5.2", "2013-04-29",
         "Added subscription features") {
 
+      final Table calendarTable = new Table(TeamCalDO.class);
+
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
@@ -111,9 +114,18 @@ public class TeamCalPluginUpdates
       public UpdateRunningStatus runUpdate()
       {
         if (dao.doesTableAttributesExist(TeamCalDO.class, "abo", "aboCalendarBinary", "aboHash", "aboUrl", "aboUpdateTime") == false) {
-          new SchemaGenerator(dao).add(TeamCalDO.class).createSchema();
+          updateAboDataBase("abo", "aboCalendarBinary", "aboHash", "aboUrl", "aboUpdateTime");
         }
         return UpdateRunningStatus.DONE;
+      }
+
+      private void updateAboDataBase(String... columns)
+      {
+        for(String column : columns) {
+          if (dao.doesTableAttributesExist(TeamCalDO.class, column) == false) {
+            dao.addTableAttributes(calendarTable, new TableAttribute(TeamCalDO.class, column));
+          }
+        }
       }
     });
     return list;
