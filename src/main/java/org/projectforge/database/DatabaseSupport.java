@@ -129,6 +129,8 @@ public class DatabaseSupport
         return "DATE";
       case DECIMAL:
         return "DECIMAL(" + attr.getPrecision() + ", " + attr.getScale() + ")";
+      case LOB:
+        return "BYTEA";
       default:
         throw new UnsupportedOperationException("Type '" + attr.getType() + "' not supported for the current database dialect: " + dialect);
     }
