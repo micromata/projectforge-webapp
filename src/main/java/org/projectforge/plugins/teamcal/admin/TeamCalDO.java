@@ -340,9 +340,9 @@ public class TeamCalDO extends DefaultBaseDO
     return externalSubscriptionUpdateInterval;
   }
 
-  public void setExternalSubscriptionUpdateInterval(final Integer externalSubscriptionUpdateTime)
+  public void setExternalSubscriptionUpdateInterval(final Integer externalSubscriptionUpdateInterval)
   {
-    this.externalSubscriptionUpdateInterval = externalSubscriptionUpdateTime;
+    this.externalSubscriptionUpdateInterval = externalSubscriptionUpdateInterval;
   }
 
   /**

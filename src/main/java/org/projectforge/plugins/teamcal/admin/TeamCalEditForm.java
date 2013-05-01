@@ -213,7 +213,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
         }
       };
       final DropDownChoicePanel<Integer> intervalField = new DropDownChoicePanel<Integer>(fsExternalSubscriptionUrl.getDropDownChoiceId(),
-          new PropertyModel<Integer>(data, "externalSubscriptionUpdateTime"), SubscriptionUpdateInterval.getIntervals(), intervalRenderer);
+          new PropertyModel<Integer>(data, "externalSubscriptionUpdateInterval"), SubscriptionUpdateInterval.getIntervals(), intervalRenderer);
       intervalField.setRequired(true);
       fsExternalSubscriptionInterval.add(intervalField);
     }
