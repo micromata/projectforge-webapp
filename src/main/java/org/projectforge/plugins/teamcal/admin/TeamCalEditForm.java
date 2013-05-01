@@ -165,9 +165,10 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
     }
     {
       // external subscription
-      final FieldsetPanel fsSubscription = gridBuilder.newFieldset(getString("plugins.teamcal.externalsubscription.label")).suppressLabelForWarning();
-      final CheckBoxPanel checkboxPanel = new CheckBoxPanel(fsSubscription.newChildId(), new PropertyModel<Boolean>(data, "externalSubscription"),
-          getString("plugins.teamcal.externalsubscription.label"));
+      final FieldsetPanel fsSubscription = gridBuilder.newFieldset(getString("plugins.teamcal.externalsubscription.label"))
+          .suppressLabelForWarning();
+      final CheckBoxPanel checkboxPanel = new CheckBoxPanel(fsSubscription.newChildId(), new PropertyModel<Boolean>(data,
+          "externalSubscription"), null);
       // ajax stuff
       checkboxPanel.getCheckBox().add(new AjaxFormComponentUpdatingBehavior("change") {
         @Override
@@ -187,11 +188,13 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       fsExternalSubscriptionUrl.getFieldset().setOutputMarkupPlaceholderTag(true);
       fsExternalSubscriptionUrl.getFieldset().setVisible(data.isExternalSubscription() == true);
 
-      final TextField<String> urlField = new TextField<String>(fsExternalSubscriptionUrl.getTextFieldId(), new PropertyModel<String>(data, "externalSubscriptionUrl"));
+      final TextField<String> urlField = new TextField<String>(fsExternalSubscriptionUrl.getTextFieldId(), new PropertyModel<String>(data,
+          "externalSubscriptionUrl"));
       urlField.setRequired(true);
       fsExternalSubscriptionUrl.add(urlField);
 
-      fsExternalSubscriptionInterval = gridBuilder.newFieldset(getString("plugins.teamcal.externalsubscription.updateInterval")).suppressLabelForWarning();
+      fsExternalSubscriptionInterval = gridBuilder.newFieldset(getString("plugins.teamcal.externalsubscription.updateInterval"))
+          .suppressLabelForWarning();
       fsExternalSubscriptionInterval.getFieldset().setOutputMarkupId(true);
       fsExternalSubscriptionInterval.getFieldset().setOutputMarkupPlaceholderTag(true);
       fsExternalSubscriptionInterval.getFieldset().setVisible(data.isExternalSubscription() == true);
@@ -209,8 +212,8 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
           return "" + object;
         }
       };
-      final DropDownChoicePanel<Long> intervalField = new DropDownChoicePanel<Long>(fsExternalSubscriptionUrl.getDropDownChoiceId(), new PropertyModel<Long>(data,
-          "externalSubscriptionUpdateTime"), SubscriptionUpdateInterval.getIntervals(), intervalRenderer);
+      final DropDownChoicePanel<Long> intervalField = new DropDownChoicePanel<Long>(fsExternalSubscriptionUrl.getDropDownChoiceId(),
+          new PropertyModel<Long>(data, "externalSubscriptionUpdateTime"), SubscriptionUpdateInterval.getIntervals(), intervalRenderer);
       intervalField.setRequired(true);
       fsExternalSubscriptionInterval.add(intervalField);
     }
