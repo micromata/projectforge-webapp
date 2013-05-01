@@ -30,7 +30,6 @@ package org.projectforge.web.wicket.flowlayout;
  */
 public enum IconType
 {
-  ABONNEMENT("globe"), //
   ACCEPT("ok-sign"), //
   ALERT("warning-sign"), //
   BUILDING("building"), //
@@ -58,6 +57,7 @@ public enum IconType
   REMOVE("remove"), //
   REMOVE_SIGN("remove-sign"), //
   SEARCH("search"), //
+  SUBSCRIPTION("globe"), //
   TABLET("tablet"), //
   TASK("tasks"), //
   TRASH("trash"), //
