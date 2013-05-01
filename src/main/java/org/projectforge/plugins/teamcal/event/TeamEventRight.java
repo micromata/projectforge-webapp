@@ -135,7 +135,7 @@ public class TeamEventRight extends UserRightAccessCheck<TeamEventDO>
   }
 
   public boolean hasUpdateAccess(final PFUserDO user, final TeamCalDO calendar) {
-    if (calendar != null && calendar.isAbo() == true) {
+    if (calendar != null && calendar.isExternalSubscription() == true) {
       return false;
     }
     if (ObjectUtils.equals(user.getId(), calendar.getOwnerId()) == true) {
