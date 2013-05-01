@@ -29,19 +29,9 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.UniqueConstraint;
 
 import org.apache.commons.lang.StringUtils;
@@ -250,32 +240,6 @@ public class Table implements Serializable
 
   private List<Annotation> handlePersistencyAnnotations(final AccessibleObject object)
   {
-    if (object == null) {
-      return null;
-    }
-    List<Annotation> list = null;
-    list = handlePersistencyAnnotation(list, object, Basic.class);
-    list = handlePersistencyAnnotation(list, object, Column.class);
-    list = handlePersistencyAnnotation(list, object, GeneratedValue.class);
-    list = handlePersistencyAnnotation(list, object, Id.class);
-    list = handlePersistencyAnnotation(list, object, JoinColumn.class);
-    list = handlePersistencyAnnotation(list, object, JoinTable.class);
-    list = handlePersistencyAnnotation(list, object, ManyToMany.class);
-    list = handlePersistencyAnnotation(list, object, ManyToOne.class);
-    list = handlePersistencyAnnotation(list, object, OneToMany.class);
-    return list;
+    return JPAHelper.getPersistencyAnnotations(object);
   }
-
-  private List<Annotation> handlePersistencyAnnotation(List<Annotation> list, final AccessibleObject object,
-      final Class< ? extends Annotation> annotation)
-      {
-    if (object.isAnnotationPresent(annotation) == false) {
-      return list;
-    }
-    if (list == null) {
-      list = new LinkedList<Annotation>();
-    }
-    list.add(object.getAnnotation(annotation));
-    return list;
-      }
 }
