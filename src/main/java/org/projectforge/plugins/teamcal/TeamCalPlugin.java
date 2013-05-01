@@ -32,8 +32,6 @@ import org.projectforge.core.CronSetup;
 import org.projectforge.common.StringHelper;
 import org.projectforge.database.xstream.XStreamSavingConverter;
 import org.projectforge.plugins.core.AbstractPlugin;
-import org.projectforge.plugins.teamcal.abo.TeamCalAboJob;
-import org.projectforge.plugins.teamcal.abo.TeamEventAboCache;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalEditPage;
@@ -45,6 +43,8 @@ import org.projectforge.plugins.teamcal.event.TeamEventDao;
 import org.projectforge.plugins.teamcal.event.TeamEventEditPage;
 import org.projectforge.plugins.teamcal.event.TeamEventListPage;
 import org.projectforge.plugins.teamcal.event.TeamEventRight;
+import org.projectforge.plugins.teamcal.externalsubscription.TeamCalSubscriptionJob;
+import org.projectforge.plugins.teamcal.externalsubscription.TeamEventExternalSubscpriptionsCache;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFeedHook;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFilter;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarPage;
@@ -136,7 +136,7 @@ public class TeamCalPlugin extends AbstractPlugin
 
     RestCallRegistry.getInstance().register(TeamCalDaoRest.class);
 
-    TeamCalAboJob.setTeamCalDao(teamCalDao);
+    TeamCalSubscriptionJob.setTeamCalDao(teamCalDao);
   }
 
   /**
@@ -254,13 +254,13 @@ public class TeamCalPlugin extends AbstractPlugin
   @Override
   public void registerCronJob(CronSetup cronSetup)
   {
-    cronSetup.registerCronJob("teamCalAboJob", TeamCalAboJob.class, "0 */5 * * * ?");
+    cronSetup.registerCronJob("teamCalAboJob", TeamCalSubscriptionJob.class, "0 */5 * * * ?");
     // do initial cache installation in a separated thread
     Thread t = new Thread() {
 
       @Override
       public void run() {
-        TeamEventAboCache.instance().updateCache(teamCalDao);
+        TeamEventExternalSubscpriptionsCache.instance().updateCache(teamCalDao);
       }
     };
     t.start();
