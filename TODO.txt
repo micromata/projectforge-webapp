@@ -12,7 +12,14 @@ Bugs
 - ics aus Mail auf ProjectForge ziehen.
 - Normalize ex-dates (as UTC-ISO-dates/date-times)
 - Demo-Userpreferences nur in Session speichern.
-- Session-Time-out ProjectForge deutlich erhöhen.
+- Initial version in t_database_update: für neue Systeme klappt's sonst nicht mit Event.NOTE und contract.status.
+- Escape-Taste für TaskSelectPanel zum Verlassen des Editors.
+- Bookable for time sheets klappt noch nicht für My company (sub tasks has cost2).
+- Demo-Benutzer und Admin: Monatsbericht: Mai-2010
+- Rest-Zugriffe, Kalenderdownloads etc. sperren für Maintenance-Mode!
+- Excel-Export
+- Title bei Context-Menü und Context-Menü runter
+
 
 TeamCal
 -------
