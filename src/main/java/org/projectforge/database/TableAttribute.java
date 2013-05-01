@@ -107,6 +107,9 @@ public class TableAttribute implements Serializable
     }
     propertyType = BeanHelper.determinePropertyType(getterMethod);
     final boolean primitive = propertyType.isPrimitive();
+    if (JPAHelper.isPersistencyAnnotationPresent(getterMethod) == false) {
+      log.warn("************** ProjectForge schema updater expect JPA annotations at getter method such as @Column for proper functioning!");
+    }
     if (Boolean.class.isAssignableFrom(propertyType) == true || Boolean.TYPE.isAssignableFrom(propertyType) == true) {
       type = TableAttributeType.BOOLEAN;
     } else if (Integer.class.isAssignableFrom(propertyType) == true || Integer.TYPE.isAssignableFrom(propertyType) == true) {
@@ -129,7 +132,7 @@ public class TableAttribute implements Serializable
     } else if (java.util.Set.class.isAssignableFrom(propertyType) == true) {
       type = TableAttributeType.SET;
       setGenericReturnType(getterMethod);
-    } else if(getterMethod.isAnnotationPresent(Lob.class)) {
+    } else if (getterMethod.isAnnotationPresent(Lob.class)) {
       type = TableAttributeType.LOB;
     } else {
       final Entity entity = propertyType.getAnnotation(Entity.class);
@@ -155,6 +158,7 @@ public class TableAttribute implements Serializable
       }
       type = TableAttributeType.INT;
     }
+    this.annotations = JPAHelper.getPersistencyAnnotations(getterMethod);
     final Id id = JPAHelper.getIdAnnotation(clazz, property);
     if (id != null) {
       this.primaryKey = true;
