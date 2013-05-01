@@ -310,7 +310,7 @@ public class DatabaseUpdateDao
       }
     }
     if (primaryKeyDefinition == false) {
-      databaseSupport.addDefaultAndNotNull(buf, attr);
+      getDatabaseSupport().addDefaultAndNotNull(buf, attr);
     }
     // if (attr.isNullable() == false) {
     // buf.append(" NOT NULL");
@@ -373,6 +373,31 @@ public class DatabaseUpdateDao
   public void buildAddTableAttributesStatement(final StringBuffer buf, final String table, final Collection<TableAttribute> attributes)
   {
     buildAddTableAttributesStatement(buf, table, attributes.toArray(new TableAttribute[0]));
+  }
+
+  /**
+   * @param entityClass
+   * @param attributeNames Property names of the attributes to create.
+   * @return
+   */
+  public boolean addTableAttributes(final Class<?> entityClass, final String... attributeNames)
+  {
+    return addTableAttributes(new Table(entityClass), attributeNames);
+  }
+
+  /**
+   * @param table
+   * @param attributeNames Property names of the attributes to create.
+   * @return
+   */
+  public boolean addTableAttributes(final Table table, final String... attributeNames)
+  {
+
+    final TableAttribute[] attributes = new TableAttribute[attributeNames.length];
+    for (int i = 0 ; i < attributeNames.length; i++) {
+      attributes[i] = new TableAttribute(table.getEntityClass(), attributeNames[i]);
+    }
+    return addTableAttributes(table, attributes);
   }
 
   public boolean addTableAttributes(final String table, final TableAttribute... attributes)
