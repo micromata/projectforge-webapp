@@ -35,8 +35,8 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
-import org.projectforge.plugins.teamcal.abo.AboUpdateInterval;
 import org.projectforge.plugins.teamcal.dialog.TeamCalICSExportDialog;
+import org.projectforge.plugins.teamcal.externalsubscription.SubscriptionUpdateInterval;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.common.MultiChoiceListHelper;
@@ -50,7 +50,11 @@ import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.JodaDatePanel;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
-import org.projectforge.web.wicket.flowlayout.*;
+import org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel;
+import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
 
 import com.vaynberg.wicket.select2.Select2MultiChoice;
 
@@ -79,9 +83,9 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
 
   private TeamCalICSExportDialog icsExportDialog;
 
-  private FieldsetPanel fsAboUrl;
+  private FieldsetPanel fsExternalSubscriptionUrl;
 
-  private FieldsetPanel fsAboInterval;
+  private FieldsetPanel fsExternalSubscriptionInterval;
 
   /**
    * @param parentPage
@@ -148,9 +152,9 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       parentPage.add(icsExportDialog);
       icsExportDialog.init();
       icsExportDialog.redraw(getData());
-      final FieldsetPanel fsSubscribe = gridBuilder.newFieldset(getString("plugins.teamcal.abonnement")).suppressLabelForWarning();
-      fsSubscribe.add(new AjaxIconLinkPanel(fsSubscribe.newChildId(), IconType.ABONNEMENT, new ResourceModel(
-          "plugins.teamcal.abonnement.tooltip")) {
+      final FieldsetPanel fsSubscribe = gridBuilder.newFieldset(getString("plugins.teamcal.subscription")).suppressLabelForWarning();
+      fsSubscribe.add(new AjaxIconLinkPanel(fsSubscribe.newChildId(), IconType.SUBSCRIPTION, new ResourceModel(
+          "plugins.teamcal.subscription.tooltip")) {
         @Override
         public void onClick(final AjaxRequestTarget target)
         {
@@ -161,55 +165,54 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
     }
     {
       // external subscription
-      final FieldsetPanel fsAbo = gridBuilder.newFieldset(getString("plugins.teamcal.aboLabel")).suppressLabelForWarning();
-      final DivPanel checkboxDiv = fsAbo.addNewCheckBoxDiv();
-      CheckBoxPanel checkboxPanel = new CheckBoxPanel(checkboxDiv.newChildId(), new PropertyModel<Boolean>(data, "abo"),
-          getString("plugins.teamcal.abo"));
+      final FieldsetPanel fsSubscription = gridBuilder.newFieldset(getString("plugins.teamcal.externalsubscription.label")).suppressLabelForWarning();
+      final CheckBoxPanel checkboxPanel = new CheckBoxPanel(fsSubscription.newChildId(), new PropertyModel<Boolean>(data, "externalSubscription"),
+          getString("plugins.teamcal.externalsubscription.label"));
       // ajax stuff
       checkboxPanel.getCheckBox().add(new AjaxFormComponentUpdatingBehavior("change") {
         @Override
-        protected void onUpdate(AjaxRequestTarget target)
+        protected void onUpdate(final AjaxRequestTarget target)
         {
           // update visibility
-          fsAboUrl.getFieldset().setVisible(data.isAbo() == true);
-          fsAboInterval.getFieldset().setVisible(data.isAbo() == true);
+          fsExternalSubscriptionUrl.getFieldset().setVisible(data.isExternalSubscription() == true);
+          fsExternalSubscriptionInterval.getFieldset().setVisible(data.isExternalSubscription() == true);
           // update components through ajax
-          target.add(fsAboUrl.getFieldset());
-          target.add(fsAboInterval.getFieldset());
+          target.add(fsExternalSubscriptionUrl.getFieldset());
+          target.add(fsExternalSubscriptionInterval.getFieldset());
         }
       });
-      checkboxDiv.add(checkboxPanel);
-      fsAboUrl = gridBuilder.newFieldset(getString("plugins.teamcal.aboUrl")).suppressLabelForWarning();
-      fsAboUrl.getFieldset().setOutputMarkupId(true);
-      fsAboUrl.getFieldset().setOutputMarkupPlaceholderTag(true);
-      fsAboUrl.getFieldset().setVisible(data.isAbo() == true);
+      fsSubscription.add(checkboxPanel);
+      fsExternalSubscriptionUrl = gridBuilder.newFieldset(getString("plugins.teamcal.externalsubscription.url")).suppressLabelForWarning();
+      fsExternalSubscriptionUrl.getFieldset().setOutputMarkupId(true);
+      fsExternalSubscriptionUrl.getFieldset().setOutputMarkupPlaceholderTag(true);
+      fsExternalSubscriptionUrl.getFieldset().setVisible(data.isExternalSubscription() == true);
 
-      TextField<String> urlField = new TextField<String>(fsAboUrl.getTextFieldId(), new PropertyModel<String>(data, "aboUrl"));
+      final TextField<String> urlField = new TextField<String>(fsExternalSubscriptionUrl.getTextFieldId(), new PropertyModel<String>(data, "externalSubscriptionUrl"));
       urlField.setRequired(true);
-      fsAboUrl.add(urlField);
+      fsExternalSubscriptionUrl.add(urlField);
 
-      fsAboInterval = gridBuilder.newFieldset(getString("plugins.teamcal.updateInterval")).suppressLabelForWarning();
-      fsAboInterval.getFieldset().setOutputMarkupId(true);
-      fsAboInterval.getFieldset().setOutputMarkupPlaceholderTag(true);
-      fsAboInterval.getFieldset().setVisible(data.isAbo() == true);
+      fsExternalSubscriptionInterval = gridBuilder.newFieldset(getString("plugins.teamcal.externalsubscription.updateInterval")).suppressLabelForWarning();
+      fsExternalSubscriptionInterval.getFieldset().setOutputMarkupId(true);
+      fsExternalSubscriptionInterval.getFieldset().setOutputMarkupPlaceholderTag(true);
+      fsExternalSubscriptionInterval.getFieldset().setVisible(data.isExternalSubscription() == true);
 
-      IChoiceRenderer<Long> intervalRenderer = new IChoiceRenderer<Long>() {
+      final IChoiceRenderer<Long> intervalRenderer = new IChoiceRenderer<Long>() {
         @Override
-        public Object getDisplayValue(Long object)
+        public Object getDisplayValue(final Long object)
         {
-          return getString(AboUpdateInterval.getI18nKeyForInterval(object));
+          return getString(SubscriptionUpdateInterval.getI18nKeyForInterval(object));
         }
 
         @Override
-        public String getIdValue(Long object, int index)
+        public String getIdValue(final Long object, final int index)
         {
           return "" + object;
         }
       };
-      DropDownChoicePanel<Long> intervalField = new DropDownChoicePanel<Long>(fsAboUrl.getDropDownChoiceId(), new PropertyModel<Long>(data,
-          "aboUpdateTime"), AboUpdateInterval.getIntervals(), intervalRenderer);
+      final DropDownChoicePanel<Long> intervalField = new DropDownChoicePanel<Long>(fsExternalSubscriptionUrl.getDropDownChoiceId(), new PropertyModel<Long>(data,
+          "externalSubscriptionUpdateTime"), SubscriptionUpdateInterval.getIntervals(), intervalRenderer);
       intervalField.setRequired(true);
-      fsAboInterval.add(intervalField);
+      fsExternalSubscriptionInterval.add(intervalField);
     }
     if (access == true) {
       gridBuilder.newSplitPanel(GridSize.COL50);
