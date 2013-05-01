@@ -81,7 +81,7 @@ public class TeamEventExternalSubscpriptionsCache
     }
     final TeamEventSubscription compareAbo = subscriptions.get(calendar.getId());
     final Long now = System.currentTimeMillis();
-    final Long addedTime = calendar.getExternalSubscriptionUpdateInterval() == null ? SUBSCRIPTION_UPDATE_TIME : calendar.getExternalSubscriptionUpdateInterval();
+    final Long addedTime = calendar.getExternalSubscriptionUpdateInterval() == null ? SUBSCRIPTION_UPDATE_TIME : 1000L * calendar.getExternalSubscriptionUpdateInterval();
     if (compareAbo == null) {
       // create the calendar
       final TeamEventSubscription teamEventAbo = new TeamEventSubscription(dao, calendar);

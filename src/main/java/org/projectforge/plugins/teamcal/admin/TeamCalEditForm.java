@@ -199,21 +199,21 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       fsExternalSubscriptionInterval.getFieldset().setOutputMarkupPlaceholderTag(true);
       fsExternalSubscriptionInterval.getFieldset().setVisible(data.isExternalSubscription() == true);
 
-      final IChoiceRenderer<Long> intervalRenderer = new IChoiceRenderer<Long>() {
+      final IChoiceRenderer<Integer> intervalRenderer = new IChoiceRenderer<Integer>() {
         @Override
-        public Object getDisplayValue(final Long object)
+        public Object getDisplayValue(final Integer object)
         {
           return getString(SubscriptionUpdateInterval.getI18nKeyForInterval(object));
         }
 
         @Override
-        public String getIdValue(final Long object, final int index)
+        public String getIdValue(final Integer object, final int index)
         {
           return "" + object;
         }
       };
-      final DropDownChoicePanel<Long> intervalField = new DropDownChoicePanel<Long>(fsExternalSubscriptionUrl.getDropDownChoiceId(),
-          new PropertyModel<Long>(data, "externalSubscriptionUpdateTime"), SubscriptionUpdateInterval.getIntervals(), intervalRenderer);
+      final DropDownChoicePanel<Integer> intervalField = new DropDownChoicePanel<Integer>(fsExternalSubscriptionUrl.getDropDownChoiceId(),
+          new PropertyModel<Integer>(data, "externalSubscriptionUpdateTime"), SubscriptionUpdateInterval.getIntervals(), intervalRenderer);
       intervalField.setRequired(true);
       fsExternalSubscriptionInterval.add(intervalField);
     }
