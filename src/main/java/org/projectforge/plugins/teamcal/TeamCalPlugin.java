@@ -28,9 +28,12 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.admin.UpdateEntry;
+import org.projectforge.core.CronSetup;
 import org.projectforge.common.StringHelper;
 import org.projectforge.database.xstream.XStreamSavingConverter;
 import org.projectforge.plugins.core.AbstractPlugin;
+import org.projectforge.plugins.teamcal.abo.TeamCalAboJob;
+import org.projectforge.plugins.teamcal.abo.TeamEventAboCache;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalEditPage;
@@ -132,6 +135,8 @@ public class TeamCalPlugin extends AbstractPlugin
     TimesheetEditPage.addPluginHook(new TeamcalTimesheetPluginComponentHook());
 
     RestCallRegistry.getInstance().register(TeamCalDaoRest.class);
+
+    TeamCalAboJob.setTeamCalDao(teamCalDao);
   }
 
   /**
@@ -244,5 +249,20 @@ public class TeamCalPlugin extends AbstractPlugin
       delimiter = ",";
     }
     return buf.toString();
+  }
+
+  @Override
+  public void registerCronJob(CronSetup cronSetup)
+  {
+    cronSetup.registerCronJob("teamCalAboJob", TeamCalAboJob.class, "0 */5 * * * ?");
+    // do initial cache installation in a separated thread
+    Thread t = new Thread() {
+
+      @Override
+      public void run() {
+        TeamEventAboCache.instance().updateCache(teamCalDao);
+      }
+    };
+    t.start();
   }
 }

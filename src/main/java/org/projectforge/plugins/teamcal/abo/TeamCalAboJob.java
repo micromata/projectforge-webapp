@@ -21,24 +21,40 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.database;
+package org.projectforge.plugins.teamcal.abo;
+
+import org.projectforge.core.AbstractCronJob;
+import org.projectforge.plugins.teamcal.admin.TeamCalDao;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 
 /**
- * Represents one attribute type.
- * 
- * @author Kai Reinhard (k.reinhard@micromata.de)
+ * @author Johannes Unterstein (j.unterstein@micromata.de)
  */
-public enum TableAttributeType
+public class TeamCalAboJob extends AbstractCronJob
 {
-  INT, SHORT, VARCHAR, CHAR, LOCALE, TIMESTAMP, DATE, BOOLEAN, DECIMAL, LIST, SET, LOB;
 
-  public boolean isIn(final TableAttributeType... types)
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalAboJob.class);
+
+  private static TeamCalDao teamCalDao;
+
+  public void execute(JobExecutionContext context) throws JobExecutionException
   {
-    for (final TableAttributeType type : types) {
-      if (type == this) {
-        return true;
-      }
+    if (teamCalDao != null) {
+      TeamEventAboCache.instance().updateCache(teamCalDao);
+    } else {
+      log.error("TeamCalAboJob has no TeamCalDao set -> unable to update cache.");
     }
-    return false;
+  }
+
+  @Override
+  protected void wire(JobExecutionContext context)
+  {
+    // nothing to do here
+  }
+
+  public static void setTeamCalDao(TeamCalDao teamCalDao)
+  {
+    TeamCalAboJob.teamCalDao = teamCalDao;
   }
 }

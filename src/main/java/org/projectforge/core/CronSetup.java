@@ -30,12 +30,7 @@ import org.apache.commons.lang.Validate;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.meb.MebJobExecutor;
 import org.projectforge.meb.MebPollingJob;
-import org.quartz.CronTrigger;
-import org.quartz.JobDataMap;
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.Trigger;
+import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 
 /**
@@ -91,6 +86,17 @@ public class CronSetup
     }
   }
 
+  public void registerCronJob(final String givenName, final Class< ? extends Job> jobClass, final String cronExpression, final Object... params) {
+    if (jobClass != null) {
+      String name = givenName;
+      if (StringUtils.isBlank(name) == true) {
+        name = "generatedExternalName " + jobClass.getName() + " " + System.currentTimeMillis();
+      }
+      // default is run every 10 minutes
+      createCron(name, jobClass, "0 */10 * * * ?", cronExpression, params);
+    }
+  }
+
   /**
    * Should be called at the shutdown of the application.
    */
@@ -103,7 +109,7 @@ public class CronSetup
     }
   }
 
-  private void createCron(final String name, final Class< ? > jobClass, final String cronDefaultExpression, final String cronExpression,
+  private void createCron(final String name, final Class< ? extends Job> jobClass, final String cronDefaultExpression, final String cronExpression,
       final Object... params)
   {
     // Define job instance (group = "default")

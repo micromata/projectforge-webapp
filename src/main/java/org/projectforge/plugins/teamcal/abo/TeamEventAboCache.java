@@ -60,7 +60,8 @@ public class TeamEventAboCache
   {
     QueryFilter filter = new QueryFilter();
     filter.add(Restrictions.eq("abo", true));
-    final List<TeamCalDO> aboCalendars = dao.getList(filter);
+    // internalGetList is valid at this point, because we are calling this method in an asyn thread
+    final List<TeamCalDO> aboCalendars = dao.internalGetList(filter);
     teamCalWithAbo.clear();
     abos.clear();
 

@@ -109,7 +109,8 @@ public class TeamEventAbo implements Serializable
         if (StringUtils.equals(md5, teamCalDo.getAboHash()) == false) {
           teamCalDo.setAboHash(md5);
           teamCalDo.setAboCalendarBinary(bytes);
-          teamCalDao.update(teamCalDo);
+          // internalUpdate is valid at this point, because we are calling this method in an asyn thread
+          teamCalDao.internalUpdate(teamCalDo);
         }
       } catch (Exception e) {
         bytes = teamCalDo.getAboCalendarBinary();

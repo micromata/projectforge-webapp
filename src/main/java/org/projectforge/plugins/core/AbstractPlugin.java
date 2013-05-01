@@ -35,6 +35,7 @@ import org.apache.wicket.settings.IResourceSettings;
 import org.projectforge.admin.UpdateEntry;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
+import org.projectforge.core.CronSetup;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.xstream.XStreamSavingConverter;
 import org.projectforge.plugins.todo.ToDoPlugin;
@@ -362,6 +363,14 @@ public abstract class AbstractPlugin
   public List<UpdateEntry> getUpdateEntries()
   {
     return null;
+  }
+
+  /**
+   * This method is called in the lifecycle, when the plugin is able to register cron jobs.<br/>
+   * <b>Do not register cron jobs before this method was called.</b>
+   */
+  public void registerCronJob(CronSetup cronSetup) {
+
   }
 
   public void onBeforeRestore(final XStreamSavingConverter xstreamSavingConverter, final Object obj)

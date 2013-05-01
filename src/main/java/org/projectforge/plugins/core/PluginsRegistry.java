@@ -30,6 +30,7 @@ import org.apache.wicket.settings.IResourceSettings;
 import org.projectforge.admin.SystemUpdater;
 import org.projectforge.admin.UpdateEntry;
 import org.projectforge.core.ConfigXml;
+import org.projectforge.core.CronSetup;
 import org.projectforge.plugins.memo.MemoPlugin;
 import org.projectforge.plugins.teamcal.TeamCalPlugin;
 import org.projectforge.plugins.todo.ToDoPlugin;
@@ -151,6 +152,12 @@ public class PluginsRegistry
       plugin.setResourceSettings(resourceSettings);
       beanFactory.autowireBeanProperties(plugin, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
       plugin.init();
+    }
+  }
+
+  public void registerCronJobs(CronSetup cronSetup) {
+    for (final AbstractPlugin plugin : plugins) {
+      plugin.registerCronJob(cronSetup);
     }
   }
 }

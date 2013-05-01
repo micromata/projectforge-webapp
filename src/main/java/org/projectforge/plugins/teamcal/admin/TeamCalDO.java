@@ -76,7 +76,6 @@ public class TeamCalDO extends DefaultBaseDO
 
   private Long aboUpdateTime;
 
-  @Lob
   private byte[] aboCalendarBinary;
 
   public TeamCalDO()
@@ -293,6 +292,7 @@ public class TeamCalDO extends DefaultBaseDO
     this.aboUrl = aboUrl;
   }
 
+  @Lob
   public byte[] getAboCalendarBinary()
   {
     return aboCalendarBinary;
