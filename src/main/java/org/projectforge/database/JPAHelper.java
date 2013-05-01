@@ -23,16 +23,26 @@
 
 package org.projectforge.database;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.projectforge.common.BeanHelper;
 
 /**
@@ -116,6 +126,43 @@ public class JPAHelper
     }
     return joinColumn;
   }
+
+  public static boolean isPersistencyAnnotationPresent(final AccessibleObject obj)
+  {
+    return CollectionUtils.isNotEmpty(getPersistencyAnnotations(obj)) == true;
+  }
+
+  public static List<Annotation> getPersistencyAnnotations(final AccessibleObject object)
+  {
+    if (object == null) {
+      return null;
+    }
+    List<Annotation> list = null;
+    list = handlePersistencyAnnotation(list, object, Basic.class);
+    list = handlePersistencyAnnotation(list, object, Column.class);
+    list = handlePersistencyAnnotation(list, object, GeneratedValue.class);
+    list = handlePersistencyAnnotation(list, object, Id.class);
+    list = handlePersistencyAnnotation(list, object, JoinColumn.class);
+    list = handlePersistencyAnnotation(list, object, JoinTable.class);
+    list = handlePersistencyAnnotation(list, object, Lob.class);
+    list = handlePersistencyAnnotation(list, object, ManyToMany.class);
+    list = handlePersistencyAnnotation(list, object, ManyToOne.class);
+    list = handlePersistencyAnnotation(list, object, OneToMany.class);
+    return list;
+  }
+
+  private static List<Annotation> handlePersistencyAnnotation(List<Annotation> list, final AccessibleObject object,
+      final Class< ? extends Annotation> annotation)
+      {
+    if (object.isAnnotationPresent(annotation) == false) {
+      return list;
+    }
+    if (list == null) {
+      list = new LinkedList<Annotation>();
+    }
+    list.add(object.getAnnotation(annotation));
+    return list;
+      }
 
   private static Column getColumnAnnotation(final Method method)
   {
