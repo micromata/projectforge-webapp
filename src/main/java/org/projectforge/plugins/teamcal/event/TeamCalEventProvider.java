@@ -39,6 +39,7 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Period;
+import org.projectforge.common.NumberHelper;
 import org.projectforge.common.RecurrenceFrequency;
 import org.projectforge.plugins.teamcal.admin.TeamCalRight;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFilter;
@@ -170,9 +171,19 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
             }
           }
         }
+        String reminder = null;
+        if (eventDO.getReminderActionType() != null
+            && NumberHelper.greaterZero(eventDO.getReminderDuration()) == true
+            && eventDO.getReminderDurationUnit() != null) {
+          reminder = getString(eventDO.getReminderActionType().getI18nKey())
+              + " "
+              + eventDO.getReminderDuration()
+              + " "
+              + getString(eventDO.getReminderDurationUnit().getI18nKey());
+        }
         event.setTooltip(eventDO.getCalendar().getTitle(), new String[][] { { eventDO.getSubject()},
           { eventDO.getLocation(), getString("timesheet.location")}, { eventDO.getNote(), getString("plugins.teamcal.event.note")},
-          { recurrence, getString("plugins.teamcal.event.recurrence")}});
+          { recurrence, getString("plugins.teamcal.event.recurrence")}, { reminder, getString("plugins.teamcal.event.reminder")}});
         final String title;
         String durationString = "";
         if (longFormat == true) {
