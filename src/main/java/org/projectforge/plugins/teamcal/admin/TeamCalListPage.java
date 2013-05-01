@@ -143,7 +143,7 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
     if (isCalledBySearchPage() == false) {
       // Don't call by search page, because there is no form to show the popup-dialog.
       // ics export buttons
-      columns.add(new AbstractColumn<TeamCalDO, String>(new Model<String>(getString("plugins.teamcal.abonnement"))) {
+      columns.add(new AbstractColumn<TeamCalDO, String>(new Model<String>(getString("plugins.teamcal.subscription"))) {
         /**
          * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
          *      java.lang.String, org.apache.wicket.model.IModel)
@@ -153,7 +153,7 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
         {
           if (accessChecker.isRestrictedUser() == false) {
             final TeamCalDO teamCal = rowModel.getObject();
-            item.add(new AjaxIconLinkPanel(componentId, IconType.ABONNEMENT, new ResourceModel("plugins.teamcal.abonnement.tooltip")) {
+            item.add(new AjaxIconLinkPanel(componentId, IconType.SUBSCRIPTION, new ResourceModel("plugins.teamcal.subscription.tooltip")) {
               @Override
               public void onClick(final AjaxRequestTarget target)
               {
