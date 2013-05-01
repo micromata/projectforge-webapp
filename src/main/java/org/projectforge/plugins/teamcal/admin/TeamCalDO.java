@@ -23,17 +23,27 @@
 
 package org.projectforge.plugins.teamcal.admin;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.hibernate.search.annotations.*;
+import org.hibernate.search.annotations.ClassBridge;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.Store;
 import org.projectforge.core.AbstractHistorizableBaseDO;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.database.Constants;
 import org.projectforge.user.PFUserDO;
-
-import java.util.Set;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -49,7 +59,8 @@ public class TeamCalDO extends DefaultBaseDO
   private static final long serialVersionUID = 2869432134443084605L;
 
   static {
-    AbstractHistorizableBaseDO.putNonHistorizableProperty(TeamCalDO.class, "aboCalendarBinary", "aboHash");
+    AbstractHistorizableBaseDO
+    .putNonHistorizableProperty(TeamCalDO.class, "externalSubscriptionCalendarBinary", "externalSubscriptionHash");
   }
 
   // @UserPrefParameter(i18nKey = "plugins.teamcal.subject")
@@ -68,15 +79,15 @@ public class TeamCalDO extends DefaultBaseDO
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String description;
 
-  private boolean abo;
+  private boolean externalSubscription;
 
-  private String aboHash;
+  private String externalSubscriptionHash;
 
-  private String aboUrl;
+  private String externalSubscriptionUrl;
 
-  private Long aboUpdateTime;
+  private Long externalSubscriptionUpdateTime;
 
-  private byte[] aboCalendarBinary;
+  private byte[] externalSubscriptionCalendarBinary;
 
   public TeamCalDO()
   {
@@ -262,55 +273,76 @@ public class TeamCalDO extends DefaultBaseDO
     return this;
   }
 
-  public boolean isAbo()
+  /**
+   * @return the externalSubscription
+   */
+  @Column(name = "ext_subscription", nullable = false, columnDefinition = "BOOLEAN DEFAULT 'false'")
+  public boolean isExternalSubscription()
   {
-    return abo;
+    return externalSubscription;
   }
 
-  public void setAbo(boolean abo)
+  /**
+   * @param externalSubscription the externalSubscription to set
+   * @return this for chaining.
+   */
+  public TeamCalDO setExternalSubscription(final boolean externalSubscription)
   {
-    this.abo = abo;
+    this.externalSubscription = externalSubscription;
+    return this;
   }
 
-  public String getAboHash()
+  @Column(length = 255, name = "ext_subscription_hash")
+  public String getExternalSubscriptionHash()
   {
-    return aboHash;
+    return externalSubscriptionHash;
   }
 
-  public void setAboHash(String aboHash)
+  public void setExternalSubscriptionHash(final String externalSubscriptionHash)
   {
-    this.aboHash = aboHash;
+    this.externalSubscriptionHash = externalSubscriptionHash;
   }
 
-  public String getAboUrl()
+  /**
+   * This calendar is a subscription of an external calendar.
+   * @return The subscription url.
+   */
+  @Column(name = "ext_subscription_url")
+  public String getExternalSubscriptionUrl()
   {
-    return aboUrl;
+    return externalSubscriptionUrl;
   }
 
-  public void setAboUrl(String aboUrl)
+  public void setExternalSubscriptionUrl(final String externalSubscriptionUrl)
   {
-    this.aboUrl = aboUrl;
+    this.externalSubscriptionUrl = externalSubscriptionUrl;
   }
 
+  @Column(name = "ext_subscription_calendar_binary")
   @Lob
-  public byte[] getAboCalendarBinary()
+  public byte[] getExternalSubscriptionCalendarBinary()
   {
-    return aboCalendarBinary;
+    return externalSubscriptionCalendarBinary;
   }
 
-  public void setAboCalendarBinary(byte[] aboCalendarBinary)
+  public void setExternalSubscriptionCalendarBinary(final byte[] externalSubscriptionCalendarBinary)
   {
-    this.aboCalendarBinary = aboCalendarBinary;
+    this.externalSubscriptionCalendarBinary = externalSubscriptionCalendarBinary;
   }
 
-  public Long getAboUpdateTime()
+  /**
+   * This calendar is a subscription of an external calendar.
+   * @return subscriptionUpdateTime
+   */
+  @Column(name = "ext_subscription_update_time")
+  public Long getExternalSubscriptionUpdateTime()
   {
-    return aboUpdateTime;
+    return externalSubscriptionUpdateTime;
   }
 
-  public void setAboUpdateTime(Long aboUpdateTime)
+  public void setExternalSubscriptionUpdateTime(final Long externalSubscriptionUpdateTime)
   {
-    this.aboUpdateTime = aboUpdateTime;
+    this.externalSubscriptionUpdateTime = externalSubscriptionUpdateTime;
   }
 
   /**
