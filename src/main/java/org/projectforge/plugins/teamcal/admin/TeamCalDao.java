@@ -33,8 +33,8 @@ import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.DisplayHistoryEntry;
 import org.projectforge.core.QueryFilter;
-import org.projectforge.plugins.teamcal.abo.TeamEventAboCache;
 import org.projectforge.plugins.teamcal.admin.TeamCalFilter.OwnerType;
+import org.projectforge.plugins.teamcal.externalsubscription.TeamEventExternalSubscpriptionsCache;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
@@ -299,10 +299,10 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
   }
 
   @Override
-  protected void onSaveOrModify(TeamCalDO obj) {
+  protected void onSaveOrModify(final TeamCalDO obj) {
     super.onSaveOrModify(obj);
-    if (obj.isAbo() == true) {
-      TeamEventAboCache.instance().updateCache(this, obj);
+    if (obj.isExternalSubscription() == true) {
+      TeamEventExternalSubscpriptionsCache.instance().updateCache(this, obj);
     }
   }
 }
