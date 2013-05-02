@@ -33,6 +33,7 @@ import java.util.List;
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VEvent;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -132,7 +133,8 @@ public class TeamEventSubscription implements Serializable
             // skip setup event!
             continue;
           }
-          if (event.getStartDate().getDate().before(timeInPast)) {
+          // skip only far gone events, if they have no recurrence
+          if (event.getStartDate().getDate().before(timeInPast) && event.getProperty(Property.RRULE) != null) {
             continue;
           }
           vEvents.add(event);
