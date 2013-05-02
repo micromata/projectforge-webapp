@@ -134,7 +134,7 @@ public class TeamEventSubscription implements Serializable
             continue;
           }
           // skip only far gone events, if they have no recurrence
-          if (event.getStartDate().getDate().before(timeInPast) && event.getProperty(Property.RRULE) != null) {
+          if (event.getStartDate().getDate().before(timeInPast) && event.getProperty(Property.RRULE) == null) {
             continue;
           }
           vEvents.add(event);
