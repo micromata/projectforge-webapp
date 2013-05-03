@@ -85,7 +85,7 @@ public class TeamCalDO extends DefaultBaseDO
 
   private String externalSubscriptionUrl;
 
-  private Long externalSubscriptionUpdateTime;
+  private Integer externalSubscriptionUpdateInterval;
 
   private byte[] externalSubscriptionCalendarBinary;
 
@@ -331,18 +331,18 @@ public class TeamCalDO extends DefaultBaseDO
   }
 
   /**
-   * This calendar is a subscription of an external calendar.
-   * @return subscriptionUpdateTime
+   * This calendar is a subscription of an external calendar. This is the time in seconds after which this calendar should be refreshed.
+   * @return externalSubscriptionUpdateInterval
    */
-  @Column(name = "ext_subscription_update_time")
-  public Long getExternalSubscriptionUpdateTime()
+  @Column(name = "ext_subscription_update_interval")
+  public Integer getExternalSubscriptionUpdateInterval()
   {
-    return externalSubscriptionUpdateTime;
+    return externalSubscriptionUpdateInterval;
   }
 
-  public void setExternalSubscriptionUpdateTime(final Long externalSubscriptionUpdateTime)
+  public void setExternalSubscriptionUpdateInterval(final Integer externalSubscriptionUpdateInterval)
   {
-    this.externalSubscriptionUpdateTime = externalSubscriptionUpdateTime;
+    this.externalSubscriptionUpdateInterval = externalSubscriptionUpdateInterval;
   }
 
   /**

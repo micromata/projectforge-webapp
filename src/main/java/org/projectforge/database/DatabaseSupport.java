@@ -130,7 +130,11 @@ public class DatabaseSupport
       case DECIMAL:
         return "DECIMAL(" + attr.getPrecision() + ", " + attr.getScale() + ")";
       case LOB:
-        return "BYTEA";
+        if (dialect == HibernateDialect.PostgreSQL) {
+          return "BYTEA";
+        } else {
+          return "LONGVARBINARY";
+        }
       default:
         throw new UnsupportedOperationException("Type '" + attr.getType() + "' not supported for the current database dialect: " + dialect);
     }

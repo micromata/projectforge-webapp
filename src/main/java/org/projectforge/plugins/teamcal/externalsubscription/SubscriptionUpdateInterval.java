@@ -28,26 +28,31 @@ import java.util.List;
 import org.projectforge.core.I18nEnum;
 
 /**
+ * Refresh interval in seconds.
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  */
 public enum SubscriptionUpdateInterval implements I18nEnum
 {
-  FIVE_MINUTES(5L * 60 * 1000, "interval5Min"), //
-  ONE_HOUR(60L * 60 * 1000, "interval1h"), //
-  ONE_DAY(24L * 60 * 60 * 1000, "interval1d")//
+  FIVE_MINUTES(5 * 60, "interval5Min"), //
+  ONE_HOUR(60 * 60, "interval1h"), //
+  ONE_DAY(24 * 60 * 60, "interval1d")//
   ;
 
-  private Long interval;
+  private int interval;
 
   private String i18nKey;
 
-  private SubscriptionUpdateInterval(final Long interval, final String i18nKey)
+  private SubscriptionUpdateInterval(final int interval, final String i18nKey)
   {
     this.interval = interval;
     this.i18nKey = i18nKey;
   }
 
-  public Long getInterval()
+  /**
+   * Refresh interval in seconds.
+   * @return
+   */
+  public int getInterval()
   {
     return interval;
   }
@@ -57,16 +62,16 @@ public enum SubscriptionUpdateInterval implements I18nEnum
     return "plugins.teamcal.externalsubscription.updateInterval." + i18nKey;
   }
 
-  public static List<Long> getIntervals()
+  public static List<Integer> getIntervals()
   {
-    final List<Long> result = new ArrayList<Long>();
+    final List<Integer> result = new ArrayList<Integer>();
     for (final SubscriptionUpdateInterval value : values()) {
       result.add(value.getInterval());
     }
     return result;
   }
 
-  public static String getI18nKeyForInterval(final Long interval)
+  public static String getI18nKeyForInterval(final Integer interval)
   {
     for (final SubscriptionUpdateInterval value : values()) {
       if (value.getInterval() == interval) {

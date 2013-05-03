@@ -60,7 +60,7 @@ public class TeamCalPluginUpdates
     TeamCalDO.class, TeamEventDO.class, TeamEventAttendeeDO.class};
 
   final static String[] newAttributes51 = { "externalSubscription", "externalSubscriptionCalendarBinary", "externalSubscriptionHash", "externalSubscriptionUrl",
-  "externalSubscriptionUpdateTime"};
+  "externalSubscriptionUpdateInterval"};
 
   @SuppressWarnings("serial")
   public static List<UpdateEntry> getUpdateEntries()
