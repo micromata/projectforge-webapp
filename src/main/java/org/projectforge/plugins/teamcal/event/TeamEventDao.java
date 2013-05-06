@@ -166,7 +166,10 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     list = getList(qFilter);
     list = selectUnique(list);
     // add all abo events
-    list.addAll(TeamEventExternalSubscpriptionsCache.instance().getRecurrenceEvents(teamEventFilter));
+    List<TeamEventDO> recurrenceEvents = TeamEventExternalSubscpriptionsCache.instance().getRecurrenceEvents(teamEventFilter);
+    if(recurrenceEvents != null && recurrenceEvents.size() > 0) {
+        list.addAll(recurrenceEvents);
+    }
     final TimeZone timeZone = PFUserContext.getTimeZone();
     if (list != null) {
       for (final TeamEventDO eventDO : list) {
@@ -239,14 +242,17 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     }
     // abos
     TeamEventExternalSubscpriptionsCache aboCache = TeamEventExternalSubscpriptionsCache.instance();
-    for (Integer calendarId : teamEventFilter.getTeamCals()) {
-      if (aboCache.isAboCalendar(calendarId) == true) {
-        Date startDate = teamEventFilter.getStartDate();
-        Date endDate = teamEventFilter.getEndDate();
-        Long startTime = startDate == null ? 0 : startDate.getTime();
-        Long endTime = endDate == null ? Long.MAX_VALUE : endDate.getTime();
-        result.addAll(aboCache.getEvents(calendarId, startTime, endTime));
-      }
+    // precondition for abos: existing teamcals in filter
+    if(teamEventFilter.getTeamCals() != null) {
+        for (Integer calendarId : teamEventFilter.getTeamCals()) {
+          if (aboCache.isAboCalendar(calendarId) == true) {
+            Date startDate = teamEventFilter.getStartDate();
+            Date endDate = teamEventFilter.getEndDate();
+            Long startTime = startDate == null ? 0 : startDate.getTime();
+            Long endTime = endDate == null ? Long.MAX_VALUE : endDate.getTime();
+            result.addAll(aboCache.getEvents(calendarId, startTime, endTime));
+          }
+        }
     }
     return result;
   }

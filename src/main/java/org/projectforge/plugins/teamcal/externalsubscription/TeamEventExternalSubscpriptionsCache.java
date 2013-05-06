@@ -107,14 +107,17 @@ public class TeamEventExternalSubscpriptionsCache
     return eventAbo.getEvents(startTime, endTime);
   }
 
-  public Collection< ? extends TeamEventDO> getRecurrenceEvents(final TeamEventFilter filter)
+  public List<TeamEventDO> getRecurrenceEvents(final TeamEventFilter filter)
   {
     final List<TeamEventDO> result = new ArrayList<TeamEventDO>();
-    for (final Integer calendarId : filter.getTeamCals()) {
-      final TeamEventSubscription eventAbo = subscriptions.get(calendarId);
-      if (eventAbo != null) {
-        result.addAll(eventAbo.getRecurrenceEvents());
-      }
+    // precondition: existing teamcals ins filter
+    if (filter.getTeamCals() != null) {
+        for (final Integer calendarId : filter.getTeamCals()) {
+          final TeamEventSubscription eventAbo = subscriptions.get(calendarId);
+          if (eventAbo != null) {
+            result.addAll(eventAbo.getRecurrenceEvents());
+          }
+        }
     }
     return result;
   }
