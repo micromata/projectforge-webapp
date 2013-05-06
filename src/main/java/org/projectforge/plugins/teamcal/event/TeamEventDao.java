@@ -250,7 +250,10 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
             Date endDate = teamEventFilter.getEndDate();
             Long startTime = startDate == null ? 0 : startDate.getTime();
             Long endTime = endDate == null ? Long.MAX_VALUE : endDate.getTime();
-            result.addAll(aboCache.getEvents(calendarId, startTime, endTime));
+            List<TeamEventDO> events = aboCache.getEvents(calendarId, startTime, endTime);
+            if (events != null && events.size() > 0) {
+                result.addAll(events);
+            }
           }
         }
     }
