@@ -214,7 +214,16 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
     // ///////////////////////////////
     gridBuilder.newGridPanel();
     {
-      final ToggleContainerPanel extendedSettingsPanel = new ToggleContainerPanel(gridBuilder.getPanel().newChildId());
+      final ToggleContainerPanel extendedSettingsPanel = new ToggleContainerPanel(gridBuilder.getPanel().newChildId()) {
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.ToggleContainerPanel#wantsOnStatusChangedNotification()
+         */
+        @Override
+        protected boolean wantsOnStatusChangedNotification()
+        {
+          return true;
+        }
+      };
       extendedSettingsPanel.setHeading(getString("task.gantt.settings"));
       gridBuilder.getPanel().add(extendedSettingsPanel);
       extendedSettingsPanel.setClosed();
@@ -307,7 +316,16 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
     // ///////////////////////////////
     gridBuilder.newGridPanel();
     {
-      final ToggleContainerPanel extendedSettingsPanel = new ToggleContainerPanel(gridBuilder.getPanel().newChildId());
+      final ToggleContainerPanel extendedSettingsPanel = new ToggleContainerPanel(gridBuilder.getPanel().newChildId()) {
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.ToggleContainerPanel#wantsOnStatusChangedNotification()
+         */
+        @Override
+        protected boolean wantsOnStatusChangedNotification()
+        {
+          return true;
+        }
+      };
       extendedSettingsPanel.setHeading(getString("financeAdministration"));
       gridBuilder.getPanel().add(extendedSettingsPanel);
       extendedSettingsPanel.setClosed();
