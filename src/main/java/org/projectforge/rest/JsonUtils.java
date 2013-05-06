@@ -52,9 +52,10 @@ public class JsonUtils
 
   }
 
+  @SuppressWarnings("unchecked")
   public static <T> T fromJson(final String json, final Type typeOfT) throws JsonSyntaxException
   {
-    return createGson().fromJson(json, typeOfT);
+    return (T)createGson().fromJson(json, typeOfT); // Cast (T) needed for Java 1.6.
   }
 
   private static Gson createGson()
