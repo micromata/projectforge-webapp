@@ -116,7 +116,7 @@ public class TeamEventExternalSubscpriptionsCache
           final TeamEventSubscription eventAbo = subscriptions.get(calendarId);
           if (eventAbo != null) {
             List<TeamEventDO> recurrenceEvents = eventAbo.getRecurrenceEvents();
-            if (recurrenceEvents != null && recurrenceEvents.size() > 0) {
+            if (recurrenceEvents != null && recurrenceEvents.size() > 0) {
               result.addAll(recurrenceEvents);
             }
           }
