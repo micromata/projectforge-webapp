@@ -207,6 +207,7 @@ public class ToggleContainerPanel extends Panel
    */
   protected void onToggleStatusChanged(final AjaxRequestTarget target, final ToggleStatus toggleStatus)
   {
+    this.toggleStatus = toggleStatus;
   }
 
   /**
@@ -234,8 +235,6 @@ public class ToggleContainerPanel extends Panel
   public ToggleContainerPanel setOpen()
   {
     toggleStatus = ToggleStatus.OPENED;
-    toggleContainer.add(AttributeModifier.replace("class", "in collapse"));
-    setIcon();
     return this;
   }
 
@@ -246,9 +245,22 @@ public class ToggleContainerPanel extends Panel
   public ToggleContainerPanel setClosed()
   {
     toggleStatus = ToggleStatus.CLOSED;
-    toggleContainer.add(AttributeModifier.replace("class", "collapse"));
-    setIcon();
     return this;
+  }
+
+  /**
+   * @see org.apache.wicket.Component#onBeforeRender()
+   */
+  @Override
+  protected void onBeforeRender()
+  {
+    super.onBeforeRender();
+    if (toggleStatus == ToggleStatus.CLOSED) {
+      toggleContainer.add(AttributeModifier.replace("class", "collapse"));
+    } else {
+      toggleContainer.add(AttributeModifier.replace("class", "in collapse"));
+    }
+    setIcon();
   }
 
   /**
