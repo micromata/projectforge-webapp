@@ -115,7 +115,10 @@ public class TeamEventExternalSubscpriptionsCache
         for (final Integer calendarId : filter.getTeamCals()) {
           final TeamEventSubscription eventAbo = subscriptions.get(calendarId);
           if (eventAbo != null) {
-            result.addAll(eventAbo.getRecurrenceEvents());
+            List<TeamEventDO> recurrenceEvents = eventAbo.getRecurrenceEvents();
+            if (recurrenceEvents != null && recurrenceEvents.size() > 0) {
+              result.addAll(recurrenceEvents);
+            }
           }
         }
     }
