@@ -331,7 +331,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
               if (kost2s == null || kost2s.length == 0) {
                 return " - (-)";
               }
-              return " - " + StringHelper.listToString("<br/>", kost2s);
+              return StringHelper.listToString("\n", kost2s);
             };
           });
           fs.add(projektKostLabel);
