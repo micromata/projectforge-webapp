@@ -123,7 +123,7 @@ public class TeamEventSubscription implements Serializable
 
       // Read the response body.
       InputStream stream = method.getResponseBodyAsStream();
-      IOUtils.read(stream, bytes);
+      bytes = IOUtils.toByteArray(stream);
 
       final String md5 = new String(md.digest(bytes));
       if (StringUtils.equals(md5, teamCalDo.getExternalSubscriptionHash()) == false) {
