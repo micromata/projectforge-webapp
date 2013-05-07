@@ -85,109 +85,110 @@ public class TeamEventSubscription implements Serializable
 
   public void initOrUpdate(final TeamCalDO teamCalDo)
   {
+    String url = teamCalDo.getExternalSubscriptionUrl();
+    if (teamCalDo.isExternalSubscription() == false || StringUtils.isNotEmpty(url) == true) {
+      // No external subscription.
+      return;
+    }
+    log.info("Getting subscribed calendar #" + teamCalDo.getId() + " from: " + url);
+    url = StringUtils.replace(url, "webcal", "http");
+    // Shorten the url or avoiding logging of user credentials as part of the url:
+    String displayUrl = url;
+    final int pos = url.indexOf('?');
+    if (pos > 0) {
+      displayUrl = url.substring(0, pos) + "..."; // Remove query parameters for protection of privacy.
+    }
+    final CalendarBuilder builder = new CalendarBuilder();
+    byte[] bytes = null;
+    try {
 
-    if (teamCalDo.isExternalSubscription() == true && StringUtils.isNotEmpty(teamCalDo.getExternalSubscriptionUrl())) {
-      final CalendarBuilder builder = new CalendarBuilder();
-      byte[] bytes = null;
-      try {
+      // Create a method instance.
+      final GetMethod method = new GetMethod(url);
 
-        // Create a method instance.
-        String url = teamCalDo.getExternalSubscriptionUrl();
-        log.info("Getting subscribed calendar #" + teamCalDo.getId() + " from: " + url);
-        url = StringUtils.replace(url, "webcal", "http");
-        final GetMethod method = new GetMethod(url);
+      final int statusCode = client.executeMethod(method);
 
-        final int statusCode = client.executeMethod(method);
-
-        if (statusCode != HttpStatus.SC_OK) {
-          log.error("Unable to gather subscription calendar #"
-              + teamCalDo.getId()
-              + " information, using database from url '"
-              + teamCalDo.getExternalSubscriptionUrl()
-              + "'. Received statusCode: " + statusCode);
-          return;
-        }
-
-        final MessageDigest md = MessageDigest.getInstance("MD5");
-
-        // Read the response body.
-        bytes = method.getResponseBody();
-
-        final String md5 = new String(md.digest(bytes));
-        if (StringUtils.equals(md5, teamCalDo.getExternalSubscriptionHash()) == false) {
-          teamCalDo.setExternalSubscriptionHash(md5);
-          teamCalDo.setExternalSubscriptionCalendarBinary(bytes);
-          // internalUpdate is valid at this point, because we are calling this method in an asyn thread
-          teamCalDao.internalUpdate(teamCalDo);
-        }
-      } catch (final Exception e) {
-        bytes = teamCalDo.getExternalSubscriptionCalendarBinary();
-        log.error(
-            "Unable to gather subscription calendar #"
-                + teamCalDo.getId()
-                + " information, using database from url '"
-                + teamCalDo.getExternalSubscriptionUrl()
-                + "': "
-                + e.getMessage(), e);
-      }
-      if (bytes == null) {
-        log.error("Unable to use database subscription calendar #"
+      if (statusCode != HttpStatus.SC_OK) {
+        log.error("Unable to gather subscription calendar #"
             + teamCalDo.getId()
-            + " information, quit from url '"
-            + teamCalDo.getExternalSubscriptionUrl()
-            + "'.");
+            + " information, using database from url '"
+            + displayUrl
+            + "'. Received statusCode: "
+            + statusCode);
         return;
       }
-      try {
-        final Date timeInPast = new Date(System.currentTimeMillis() - TIME_IN_THE_PAST);
-        final Calendar calendar = builder.build(new ByteArrayInputStream(bytes));
-        @SuppressWarnings("unchecked")
-        final List<Component> list = calendar.getComponents(Component.VEVENT);
-        final List<VEvent> vEvents = new ArrayList<VEvent>();
-        for (final Component c : list) {
-          final VEvent event = (VEvent) c;
-          if (event.getSummary() != null && StringUtils.equals(event.getSummary().getValue(), CalendarFeed.SETUP_EVENT) == true) {
-            // skip setup event!
-            continue;
-          }
-          // skip only far gone events, if they have no recurrence
-          if (event.getStartDate().getDate().before(timeInPast) && event.getProperty(Property.RRULE) == null) {
-            continue;
-          }
-          vEvents.add(event);
-        }
-        // clear
-        eventDurationAccess.clear();
 
-        // the event id must (!) be negative and decrementing (different on each event)
-        Integer startId = -1;
-        for (final VEvent event : vEvents) {
-          final TeamEventDO teamEvent = TeamEventUtils.createTeamEventDO(event);
-          teamEvent.setId(startId);
-          teamEvent.setCalendar(teamCalDo);
+      final MessageDigest md = MessageDigest.getInstance("MD5");
 
-          if (teamEvent.hasRecurrence() == true) {
-            // special treatment for recurrence events ..
-            recurrenceEvents.add(teamEvent);
-          } else {
-            eventDurationAccess.put(Range.closed(teamEvent.getStartDate().getTime(), teamEvent.getEndDate().getTime()), teamEvent);
-          }
+      // Read the response body.
+      bytes = method.getResponseBody();
 
-          startId--;
-        }
-        lastUpdated = System.currentTimeMillis();
-        log.info("Subscribed calendar #" + teamCalDo.getId() + " successfully received from: " + teamCalDo.getExternalSubscriptionUrl());
-      } catch (final Exception e) {
-        log.error(
-            "Unable to instantiate team event list for calendar #"
-                + teamCalDo.getId()
-                + " information, quit from url '"
-                + teamCalDo.getExternalSubscriptionUrl()
-                + "': "
-                + e.getMessage(), e);
+      final String md5 = new String(md.digest(bytes));
+      if (StringUtils.equals(md5, teamCalDo.getExternalSubscriptionHash()) == false) {
+        teamCalDo.setExternalSubscriptionHash(md5);
+        teamCalDo.setExternalSubscriptionCalendarBinary(bytes);
+        // internalUpdate is valid at this point, because we are calling this method in an asyn thread
+        teamCalDao.internalUpdate(teamCalDo);
       }
+    } catch (final Exception e) {
+      bytes = teamCalDo.getExternalSubscriptionCalendarBinary();
+      log.error("Unable to gather subscription calendar #"
+          + teamCalDo.getId()
+          + " information, using database from url '"
+          + displayUrl
+          + "': "
+          + e.getMessage(), e);
     }
+    if (bytes == null) {
+      log.error("Unable to use database subscription calendar #" + teamCalDo.getId() + " information, quit from url '" + displayUrl + "'.");
+      return;
+    }
+    try {
+      final Date timeInPast = new Date(System.currentTimeMillis() - TIME_IN_THE_PAST);
+      final Calendar calendar = builder.build(new ByteArrayInputStream(bytes));
+      @SuppressWarnings("unchecked")
+      final List<Component> list = calendar.getComponents(Component.VEVENT);
+      final List<VEvent> vEvents = new ArrayList<VEvent>();
+      for (final Component c : list) {
+        final VEvent event = (VEvent) c;
+        if (event.getSummary() != null && StringUtils.equals(event.getSummary().getValue(), CalendarFeed.SETUP_EVENT) == true) {
+          // skip setup event!
+          continue;
+        }
+        // skip only far gone events, if they have no recurrence
+        if (event.getStartDate().getDate().before(timeInPast) && event.getProperty(Property.RRULE) == null) {
+          continue;
+        }
+        vEvents.add(event);
+      }
+      // clear
+      eventDurationAccess.clear();
 
+      // the event id must (!) be negative and decrementing (different on each event)
+      Integer startId = -1;
+      for (final VEvent event : vEvents) {
+        final TeamEventDO teamEvent = TeamEventUtils.createTeamEventDO(event);
+        teamEvent.setId(startId);
+        teamEvent.setCalendar(teamCalDo);
+
+        if (teamEvent.hasRecurrence() == true) {
+          // special treatment for recurrence events ..
+          recurrenceEvents.add(teamEvent);
+        } else {
+          eventDurationAccess.put(Range.closed(teamEvent.getStartDate().getTime(), teamEvent.getEndDate().getTime()), teamEvent);
+        }
+
+        startId--;
+      }
+      lastUpdated = System.currentTimeMillis();
+      log.info("Subscribed calendar #" + teamCalDo.getId() + " successfully received from: " + displayUrl);
+    } catch (final Exception e) {
+      log.error("Unable to instantiate team event list for calendar #"
+          + teamCalDo.getId()
+          + " information, quit from url '"
+          + displayUrl
+          + "': "
+          + e.getMessage(), e);
+    }
   }
 
   public List<TeamEventDO> getEvents(final Long startTime, final Long endTime)
