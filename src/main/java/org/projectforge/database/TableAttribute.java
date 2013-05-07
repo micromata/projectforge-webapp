@@ -36,7 +36,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.common.BeanHelper;
@@ -106,6 +105,11 @@ public class TableAttribute implements Serializable
       throw new IllegalStateException("Can't determine getter: " + clazz + "." + property);
     }
     propertyType = BeanHelper.determinePropertyType(getterMethod);
+    String typePropertyValue = null;
+    if (getterMethod.isAnnotationPresent(org.hibernate.annotations.Type.class)) {
+      org.hibernate.annotations.Type annotation = getterMethod.getAnnotation(org.hibernate.annotations.Type.class);
+      typePropertyValue = annotation.type();
+    }
     final boolean primitive = propertyType.isPrimitive();
     if (JPAHelper.isPersistencyAnnotationPresent(getterMethod) == false) {
       log.warn("************** ProjectForge schema updater expect JPA annotations at getter method such as @Column for proper functioning!");
@@ -132,8 +136,8 @@ public class TableAttribute implements Serializable
     } else if (java.util.Set.class.isAssignableFrom(propertyType) == true) {
       type = TableAttributeType.SET;
       setGenericReturnType(getterMethod);
-    } else if (getterMethod.isAnnotationPresent(Lob.class)) {
-      type = TableAttributeType.LOB;
+    } else if (getterMethod.isAnnotationPresent(org.hibernate.annotations.Type.class) == true && "binary".equals(typePropertyValue)) {
+      type = TableAttributeType.BINARY;
     } else {
       final Entity entity = propertyType.getAnnotation(Entity.class);
       final javax.persistence.Table table = propertyType.getAnnotation(javax.persistence.Table.class);
