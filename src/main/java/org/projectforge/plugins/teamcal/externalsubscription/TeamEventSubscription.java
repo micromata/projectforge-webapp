@@ -24,6 +24,7 @@
 package org.projectforge.plugins.teamcal.externalsubscription;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.security.MessageDigest;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ import net.fortuna.ical4j.model.component.VEvent;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
@@ -86,7 +88,7 @@ public class TeamEventSubscription implements Serializable
   public void initOrUpdate(final TeamCalDO teamCalDo)
   {
     String url = teamCalDo.getExternalSubscriptionUrl();
-    if (teamCalDo.isExternalSubscription() == false || StringUtils.isNotEmpty(url) == true) {
+    if (teamCalDo.isExternalSubscription() == false || StringUtils.isEmpty(url) == true) {
       // No external subscription.
       return;
     }
@@ -120,7 +122,8 @@ public class TeamEventSubscription implements Serializable
       final MessageDigest md = MessageDigest.getInstance("MD5");
 
       // Read the response body.
-      bytes = method.getResponseBody();
+      InputStream stream = method.getResponseBodyAsStream();
+      IOUtils.read(stream, bytes);
 
       final String md5 = new String(md.digest(bytes));
       if (StringUtils.equals(md5, teamCalDo.getExternalSubscriptionHash()) == false) {
