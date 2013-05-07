@@ -105,10 +105,12 @@ public class TableAttribute implements Serializable
       throw new IllegalStateException("Can't determine getter: " + clazz + "." + property);
     }
     propertyType = BeanHelper.determinePropertyType(getterMethod);
+    boolean typePropertyPresent = false;
     String typePropertyValue = null;
     if (getterMethod.isAnnotationPresent(org.hibernate.annotations.Type.class)) {
       org.hibernate.annotations.Type annotation = getterMethod.getAnnotation(org.hibernate.annotations.Type.class);
       typePropertyValue = annotation.type();
+      typePropertyPresent = true;
     }
     final boolean primitive = propertyType.isPrimitive();
     if (JPAHelper.isPersistencyAnnotationPresent(getterMethod) == false) {
@@ -136,7 +138,7 @@ public class TableAttribute implements Serializable
     } else if (java.util.Set.class.isAssignableFrom(propertyType) == true) {
       type = TableAttributeType.SET;
       setGenericReturnType(getterMethod);
-    } else if (getterMethod.isAnnotationPresent(org.hibernate.annotations.Type.class) == true && "binary".equals(typePropertyValue)) {
+    } else if (typePropertyPresent == true && "binary".equals(typePropertyValue)) {
       type = TableAttributeType.BINARY;
     } else {
       final Entity entity = propertyType.getAnnotation(Entity.class);
