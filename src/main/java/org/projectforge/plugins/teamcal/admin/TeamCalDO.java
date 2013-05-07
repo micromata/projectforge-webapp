@@ -23,17 +23,11 @@
 
 package org.projectforge.plugins.teamcal.admin;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.annotations.Type;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
@@ -319,7 +313,7 @@ public class TeamCalDO extends DefaultBaseDO
   }
 
   @Column(name = "ext_subscription_calendar_binary")
-  @Lob
+  @Type(type = "binary")
   public byte[] getExternalSubscriptionCalendarBinary()
   {
     return externalSubscriptionCalendarBinary;
