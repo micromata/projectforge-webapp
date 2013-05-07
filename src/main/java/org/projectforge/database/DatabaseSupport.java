@@ -129,7 +129,7 @@ public class DatabaseSupport
         return "DATE";
       case DECIMAL:
         return "DECIMAL(" + attr.getPrecision() + ", " + attr.getScale() + ")";
-      case LOB:
+      case BINARY:
         if (dialect == HibernateDialect.PostgreSQL) {
           return "BYTEA";
         } else {
