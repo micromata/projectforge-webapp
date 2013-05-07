@@ -93,13 +93,19 @@ public class TeamEventSubscription implements Serializable
 
         // Create a method instance.
         String url = teamCalDo.getExternalSubscriptionUrl();
+        log.info("Getting subscribed calendar #" + teamCalDo.getId() + " from: " + url);
         url = StringUtils.replace(url, "webcal", "http");
         final GetMethod method = new GetMethod(url);
 
         final int statusCode = client.executeMethod(method);
 
         if (statusCode != HttpStatus.SC_OK) {
-          // TODO
+          log.error("Unable to gather subscription calendar #"
+              + teamCalDo.getId()
+              + " information, using database from url '"
+              + teamCalDo.getExternalSubscriptionUrl()
+              + "'.");
+          return;
         }
 
         final MessageDigest md = MessageDigest.getInstance("MD5");
@@ -116,15 +122,26 @@ public class TeamEventSubscription implements Serializable
         }
       } catch (final Exception e) {
         bytes = teamCalDo.getExternalSubscriptionCalendarBinary();
-        log.error("Unable to gather abo calendar information, using database.", e);
+        log.error(
+            "Unable to gather subscription calendar #"
+                + teamCalDo.getId()
+                + " information, using database from url '"
+                + teamCalDo.getExternalSubscriptionUrl()
+                + "': "
+                + e.getMessage(), e);
       }
       if (bytes == null) {
-        log.error("Unable to use database abo calendar information, quit.");
+        log.error("Unable to use database subscription calendar #"
+            + teamCalDo.getId()
+            + " information, quit from url '"
+            + teamCalDo.getExternalSubscriptionUrl()
+            + "'.");
         return;
       }
       try {
         final Date timeInPast = new Date(System.currentTimeMillis() - TIME_IN_THE_PAST);
         final Calendar calendar = builder.build(new ByteArrayInputStream(bytes));
+        @SuppressWarnings("unchecked")
         final List<Component> list = calendar.getComponents(Component.VEVENT);
         final List<VEvent> vEvents = new ArrayList<VEvent>();
         for (final Component c : list) {
@@ -159,8 +176,15 @@ public class TeamEventSubscription implements Serializable
           startId--;
         }
         lastUpdated = System.currentTimeMillis();
+        log.info("Subscribed calendar #" + teamCalDo.getId() + " successfully received from: " + teamCalDo.getExternalSubscriptionUrl());
       } catch (final Exception e) {
-        log.error("Unable to instantiate team event list for abo.", e);
+        log.error(
+            "Unable to instantiate team event list for calendar #"
+                + teamCalDo.getId()
+                + " information, quit from url '"
+                + teamCalDo.getExternalSubscriptionUrl()
+                + "': "
+                + e.getMessage(), e);
       }
     }
 
