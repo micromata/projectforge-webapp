@@ -245,7 +245,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     // precondition for abos: existing teamcals in filter
     if(teamEventFilter.getTeamCals() != null) {
         for (Integer calendarId : teamEventFilter.getTeamCals()) {
-          if (aboCache.isAboCalendar(calendarId) == true) {
+          if (aboCache.isExternalSubscribedCalendar(calendarId) == true) {
             Date startDate = teamEventFilter.getStartDate();
             Date endDate = teamEventFilter.getEndDate();
             Long startTime = startDate == null ? 0 : startDate.getTime();
