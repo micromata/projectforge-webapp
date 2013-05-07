@@ -65,11 +65,11 @@ public class TeamEventExternalSubscpriptionsCache
     final QueryFilter filter = new QueryFilter();
     filter.add(Restrictions.eq("externalSubscription", true));
     // internalGetList is valid at this point, because we are calling this method in an asyn thread
-    final List<TeamCalDO> aboCalendars = dao.internalGetList(filter);
+    final List<TeamCalDO> subscribedCalendars = dao.internalGetList(filter);
     subscribedTamCalIds.clear();
     subscriptions.clear();
 
-    for (final TeamCalDO calendar : aboCalendars) {
+    for (final TeamCalDO calendar : subscribedCalendars) {
       updateCache(dao, calendar);
     }
   }
@@ -79,32 +79,32 @@ public class TeamEventExternalSubscpriptionsCache
     if (subscribedTamCalIds.contains(calendar.getId()) == false) {
       subscribedTamCalIds.add(calendar.getId());
     }
-    final TeamEventSubscription compareAbo = subscriptions.get(calendar.getId());
+    final TeamEventSubscription compareSubscription = subscriptions.get(calendar.getId());
     final Long now = System.currentTimeMillis();
     final Long addedTime = calendar.getExternalSubscriptionUpdateInterval() == null ? SUBSCRIPTION_UPDATE_TIME : 1000L * calendar.getExternalSubscriptionUpdateInterval();
-    if (compareAbo == null) {
+    if (compareSubscription == null) {
       // create the calendar
-      final TeamEventSubscription teamEventAbo = new TeamEventSubscription(dao, calendar);
-      subscriptions.put(calendar.getId(), teamEventAbo);
+      final TeamEventSubscription teamEventSubscription = new TeamEventSubscription(dao, calendar);
+      subscriptions.put(calendar.getId(), teamEventSubscription);
 
-    } else if (compareAbo.getLastUpdated() == null || compareAbo.getLastUpdated() + addedTime <= now) {
+    } else if (compareSubscription.getLastUpdated() == null || compareSubscription.getLastUpdated() + addedTime <= now) {
       // update the calendar
-      compareAbo.initOrUpdate(calendar);
+      compareSubscription.initOrUpdate(calendar);
     }
   }
 
-  public boolean isAboCalendar(final Integer calendarId)
+  public boolean isExternalSubscribedCalendar(final Integer calendarId)
   {
     return subscribedTamCalIds.contains(calendarId) == true;
   }
 
   public List<TeamEventDO> getEvents(final Integer calendarId, final Long startTime, final Long endTime)
   {
-    final TeamEventSubscription eventAbo = subscriptions.get(calendarId);
-    if (eventAbo == null) {
+    final TeamEventSubscription eventSubscription = subscriptions.get(calendarId);
+    if (eventSubscription == null) {
       return null;
     }
-    return eventAbo.getEvents(startTime, endTime);
+    return eventSubscription.getEvents(startTime, endTime);
   }
 
   public List<TeamEventDO> getRecurrenceEvents(final TeamEventFilter filter)
@@ -113,9 +113,9 @@ public class TeamEventExternalSubscpriptionsCache
     // precondition: existing teamcals ins filter
     if (filter.getTeamCals() != null) {
         for (final Integer calendarId : filter.getTeamCals()) {
-          final TeamEventSubscription eventAbo = subscriptions.get(calendarId);
-          if (eventAbo != null) {
-            List<TeamEventDO> recurrenceEvents = eventAbo.getRecurrenceEvents();
+          final TeamEventSubscription eventSubscription = subscriptions.get(calendarId);
+          if (eventSubscription != null) {
+            List<TeamEventDO> recurrenceEvents = eventSubscription.getRecurrenceEvents();
             if (recurrenceEvents != null && recurrenceEvents.size() > 0) {
               result.addAll(recurrenceEvents);
             }
