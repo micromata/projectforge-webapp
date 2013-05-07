@@ -299,8 +299,16 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
   }
 
   @Override
-  protected void onSaveOrModify(final TeamCalDO obj) {
-    super.onSaveOrModify(obj);
+  protected void afterSave(TeamCalDO obj) {
+    super.afterSave(obj);
+    if (obj.isExternalSubscription() == true) {
+      TeamEventExternalSubscpriptionsCache.instance().updateCache(this, obj);
+    }
+  }
+
+  @Override
+  protected void afterUpdate(TeamCalDO obj, TeamCalDO dbObj) {
+    super.afterUpdate(obj, dbObj);
     if (obj.isExternalSubscription() == true) {
       TeamEventExternalSubscpriptionsCache.instance().updateCache(this, obj);
     }
