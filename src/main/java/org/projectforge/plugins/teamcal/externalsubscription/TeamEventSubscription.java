@@ -104,7 +104,7 @@ public class TeamEventSubscription implements Serializable
               + teamCalDo.getId()
               + " information, using database from url '"
               + teamCalDo.getExternalSubscriptionUrl()
-              + "'.");
+              + "'. Received statusCode: " + statusCode);
           return;
         }
 
