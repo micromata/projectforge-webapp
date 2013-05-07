@@ -31,9 +31,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.wicket.settings.IResourceSettings;
 import org.mockito.Mockito;
-import org.projectforge.admin.SystemUpdater;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.plugins.core.PluginsRegistry;
+import org.projectforge.updater.SystemUpdater;
 import org.springframework.beans.BeansException;
 
 /**

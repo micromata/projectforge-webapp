@@ -26,7 +26,7 @@ package org.projectforge.core;
 import java.util.Calendar;
 
 import org.projectforge.common.DateHelper;
-import org.projectforge.database.DatabaseUpdateDao;
+import org.projectforge.database.MyDatabaseUpdateDao;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
@@ -41,7 +41,7 @@ public class CronHourlyJob extends AbstractCronJob
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(CronHourlyJob.class);
 
-  private DatabaseUpdateDao databaseUpdateDao;
+  private MyDatabaseUpdateDao databaseUpdateDao;
 
   private HibernateSearchReindexer hibernateSearchReindexer;
 
@@ -78,7 +78,7 @@ public class CronHourlyJob extends AbstractCronJob
   @Override
   protected void wire(final JobExecutionContext context)
   {
-    databaseUpdateDao = (DatabaseUpdateDao) wire(context, "databaseUpdateDao");
+    databaseUpdateDao = (MyDatabaseUpdateDao) wire(context, "databaseUpdateDao");
     hibernateSearchReindexer = (HibernateSearchReindexer) wire(context, "hibernateSearchReindexer");
   }
 }

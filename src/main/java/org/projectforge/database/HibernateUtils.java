@@ -41,6 +41,7 @@ import org.hibernate.mapping.Column;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.projectforge.access.AccessEntryDO;
+import org.projectforge.common.DatabaseDialect;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.fibu.KundeDO;
@@ -225,15 +226,16 @@ public class HibernateUtils
     instance.configuration = configuration;
   }
 
-  public static HibernateDialect getDialect()
+  public static DatabaseDialect getDialect()
   {
     final String dialect = getConfiguration().getProperty("hibernate.dialect");
     if ("org.hibernate.dialect.PostgreSQLDialect".equals(dialect) == true) {
-      return HibernateDialect.PostgreSQL;
+      return DatabaseDialect.PostgreSQL;
     } else if ("org.hibernate.dialect.HSQLDialect".equals(dialect) == true) {
-      return HibernateDialect.HSQL;
+      return DatabaseDialect.HSQL;
     }
-    return HibernateDialect.UNKOWN;
+    log.warn("Unknown or unsupported dialect: " + dialect);
+    return null;
   }
 
   private boolean internalIsEntity(final Class< ? > entity)

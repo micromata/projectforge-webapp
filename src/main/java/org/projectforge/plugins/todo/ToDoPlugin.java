@@ -23,10 +23,10 @@
 
 package org.projectforge.plugins.todo;
 
-import org.projectforge.admin.UpdateEntry;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.registry.RegistryEntry;
+import org.projectforge.updater.UpdateEntry;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.MenuItemDef;
 import org.projectforge.web.MenuItemDefId;

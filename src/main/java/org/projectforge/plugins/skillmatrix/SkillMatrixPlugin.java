@@ -23,8 +23,8 @@
 
 package org.projectforge.plugins.skillmatrix;
 
-import org.projectforge.admin.UpdateEntry;
 import org.projectforge.plugins.core.AbstractPlugin;
+import org.projectforge.updater.UpdateEntry;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.MenuItemDef;
 import org.projectforge.web.MenuItemDefId;
