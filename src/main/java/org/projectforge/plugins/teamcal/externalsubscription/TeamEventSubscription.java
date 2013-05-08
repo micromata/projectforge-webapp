@@ -83,9 +83,10 @@ public class TeamEventSubscription implements Serializable
     this.teamCalId = teamCalDo.getId();
     eventDurationAccess = TreeRangeMap.create();
     recurrenceEvents = new ArrayList<TeamEventDO>();
+    currentInitializedHash = null;
+    lastUpdated = null;
     client = new HttpClient();
     initOrUpdate(teamCalDo);
-    currentInitializedHash = null;
   }
 
   public void initOrUpdate(final TeamCalDO teamCalDo)
