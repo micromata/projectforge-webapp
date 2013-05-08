@@ -34,7 +34,7 @@ import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.DisplayHistoryEntry;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.plugins.teamcal.admin.TeamCalFilter.OwnerType;
-import org.projectforge.plugins.teamcal.externalsubscription.TeamEventExternalSubscpriptionsCache;
+import org.projectforge.plugins.teamcal.externalsubscription.TeamEventExternalSubscriptionCache;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
@@ -302,15 +302,16 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
   protected void afterSave(TeamCalDO obj) {
     super.afterSave(obj);
     if (obj.isExternalSubscription() == true) {
-      TeamEventExternalSubscpriptionsCache.instance().updateCache(this, obj);
+      TeamEventExternalSubscriptionCache.instance().updateCache(this, obj);
     }
   }
 
   @Override
   protected void afterUpdate(TeamCalDO obj, TeamCalDO dbObj) {
     super.afterUpdate(obj, dbObj);
-    if (obj.isExternalSubscription() == true) {
-      TeamEventExternalSubscpriptionsCache.instance().updateCache(this, obj);
+    if (obj != null && dbObj != null && obj.isExternalSubscription() == true && StringUtils.equals(obj.getExternalSubscriptionUrl(), dbObj.getExternalSubscriptionUrl()) == false) {
+      // only update if the url has changed!
+      TeamEventExternalSubscriptionCache.instance().updateCache(this, obj);
     }
   }
 }

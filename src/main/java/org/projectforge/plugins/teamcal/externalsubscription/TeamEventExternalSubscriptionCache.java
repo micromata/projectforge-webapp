@@ -24,7 +24,6 @@
 package org.projectforge.plugins.teamcal.externalsubscription;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,23 +38,20 @@ import org.projectforge.plugins.teamcal.event.TeamEventFilter;
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  */
-public class TeamEventExternalSubscpriptionsCache
+public class TeamEventExternalSubscriptionCache
 {
-  private static TeamEventExternalSubscpriptionsCache instance = new TeamEventExternalSubscpriptionsCache();
+  private static final TeamEventExternalSubscriptionCache instance = new TeamEventExternalSubscriptionCache();
 
   private final Map<Integer, TeamEventSubscription> subscriptions;
 
-  private final List<Integer> subscribedTamCalIds;
-
   private static final Long SUBSCRIPTION_UPDATE_TIME = 5L * 60 * 1000; // 5 min
 
-  private TeamEventExternalSubscpriptionsCache()
+  private TeamEventExternalSubscriptionCache()
   {
     subscriptions = new HashMap<Integer, TeamEventSubscription>();
-    this.subscribedTamCalIds = new ArrayList<Integer>();
   }
 
-  public static TeamEventExternalSubscpriptionsCache instance()
+  public static TeamEventExternalSubscriptionCache instance()
   {
     return instance;
   }
@@ -66,19 +62,40 @@ public class TeamEventExternalSubscpriptionsCache
     filter.add(Restrictions.eq("externalSubscription", true));
     // internalGetList is valid at this point, because we are calling this method in an asyn thread
     final List<TeamCalDO> subscribedCalendars = dao.internalGetList(filter);
-    subscribedTamCalIds.clear();
-    subscriptions.clear();
 
     for (final TeamCalDO calendar : subscribedCalendars) {
       updateCache(dao, calendar);
     }
+
+    List<Integer> idsToRemove = new ArrayList<Integer>();
+    for (Integer calendarId : subscriptions.keySet()) {
+      // if calendar is not subscribed anymore, remove them
+      if(calendarListContainsId(subscribedCalendars, calendarId) == false) {
+        idsToRemove.add(calendarId);
+      }
+    }
+    removeCalendarsFromCache(idsToRemove);
+  }
+
+  private void removeCalendarsFromCache(List<Integer> idsToRemove)
+  {
+    for (Integer calendarId : idsToRemove) {
+      subscriptions.remove(calendarId);
+    }
+  }
+
+  private boolean calendarListContainsId(List<TeamCalDO> subscribedCalendars, Integer calendarId)
+  {
+    for (TeamCalDO teamCal : subscribedCalendars) {
+      if (teamCal.getId().equals(calendarId)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public void updateCache(final TeamCalDao dao, final TeamCalDO calendar)
   {
-    if (subscribedTamCalIds.contains(calendar.getId()) == false) {
-      subscribedTamCalIds.add(calendar.getId());
-    }
     final TeamEventSubscription compareSubscription = subscriptions.get(calendar.getId());
     final Long now = System.currentTimeMillis();
     final Long addedTime = calendar.getExternalSubscriptionUpdateInterval() == null ? SUBSCRIPTION_UPDATE_TIME : 1000L * calendar.getExternalSubscriptionUpdateInterval();
@@ -95,7 +112,7 @@ public class TeamEventExternalSubscpriptionsCache
 
   public boolean isExternalSubscribedCalendar(final Integer calendarId)
   {
-    return subscribedTamCalIds.contains(calendarId) == true;
+    return subscriptions.keySet().contains(calendarId) == true;
   }
 
   public List<TeamEventDO> getEvents(final Integer calendarId, final Long startTime, final Long endTime)
