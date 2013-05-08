@@ -69,6 +69,8 @@ public class TeamEventSubscription implements Serializable
 
   private final TeamCalDao teamCalDao;
 
+  private String currentInitializedHash;
+
   private Long lastUpdated;
 
   private final HttpClient client;
@@ -83,6 +85,7 @@ public class TeamEventSubscription implements Serializable
     recurrenceEvents = new ArrayList<TeamEventDO>();
     client = new HttpClient();
     initOrUpdate(teamCalDo);
+    currentInitializedHash = null;
   }
 
   public void initOrUpdate(final TeamCalDO teamCalDo)
@@ -129,7 +132,7 @@ public class TeamEventSubscription implements Serializable
       if (StringUtils.equals(md5, teamCalDo.getExternalSubscriptionHash()) == false) {
         teamCalDo.setExternalSubscriptionHash(md5);
         teamCalDo.setExternalSubscriptionCalendarBinary(bytes);
-        // internalUpdate is valid at this point, because we are calling this method in an asyn thread
+        // internalUpdate is valid at this point, because we are calling this method in an async thread
         teamCalDao.internalUpdate(teamCalDo);
       }
     } catch (final Exception e) {
@@ -143,6 +146,10 @@ public class TeamEventSubscription implements Serializable
     }
     if (bytes == null) {
       log.error("Unable to use database subscription calendar #" + teamCalDo.getId() + " information, quit from url '" + displayUrl + "'.");
+      return;
+    }
+    if (currentInitializedHash != null && StringUtils.equals(currentInitializedHash, teamCalDo.getExternalSubscriptionHash()) == true) {
+      // nothing to do here if the hashes are equal
       return;
     }
     try {
@@ -183,6 +190,7 @@ public class TeamEventSubscription implements Serializable
         startId--;
       }
       lastUpdated = System.currentTimeMillis();
+      currentInitializedHash = teamCalDo.getExternalSubscriptionHash();
       log.info("Subscribed calendar #" + teamCalDo.getId() + " successfully received from: " + displayUrl);
     } catch (final Exception e) {
       log.error("Unable to instantiate team event list for calendar #"
