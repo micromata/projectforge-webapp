@@ -97,6 +97,9 @@ public class HRPlanningEventsProvider extends MyFullCalendarEventsProvider
       }
       final DateTime week = new DateTime(planning.getWeek(), PFUserContext.getDateTimeZone());
       for (final HRPlanningEntryDO entry : planning.getEntries()) {
+        if (entry.isDeleted() == true) {
+          continue;
+        }
         putEvent(entry, week, "week", 6, entry.getUnassignedHours());
         putEvent(entry, week, "mo", 0, entry.getMondayHours());
         putEvent(entry, week.plusDays(1), "tu", 0, entry.getTuesdayHours());
