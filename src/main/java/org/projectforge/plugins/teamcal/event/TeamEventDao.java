@@ -42,7 +42,7 @@ import org.projectforge.plugins.teamcal.admin.TeamCalCache;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalsProvider;
-import org.projectforge.plugins.teamcal.externalsubscription.TeamEventExternalSubscpriptionsCache;
+import org.projectforge.plugins.teamcal.externalsubscription.TeamEventExternalSubscriptionCache;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserRightId;
 import org.springframework.transaction.annotation.Propagation;
@@ -166,7 +166,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     list = getList(qFilter);
     list = selectUnique(list);
     // add all abo events
-    List<TeamEventDO> recurrenceEvents = TeamEventExternalSubscpriptionsCache.instance().getRecurrenceEvents(teamEventFilter);
+    List<TeamEventDO> recurrenceEvents = TeamEventExternalSubscriptionCache.instance().getRecurrenceEvents(teamEventFilter);
     if(recurrenceEvents != null && recurrenceEvents.size() > 0) {
         list.addAll(recurrenceEvents);
     }
@@ -241,7 +241,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
       }
     }
     // abos
-    TeamEventExternalSubscpriptionsCache aboCache = TeamEventExternalSubscpriptionsCache.instance();
+    TeamEventExternalSubscriptionCache aboCache = TeamEventExternalSubscriptionCache.instance();
     // precondition for abos: existing teamcals in filter
     if(teamEventFilter.getTeamCals() != null) {
         for (Integer calendarId : teamEventFilter.getTeamCals()) {

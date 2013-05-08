@@ -41,7 +41,7 @@ public class TeamCalSubscriptionJob extends AbstractCronJob
   public void execute(final JobExecutionContext context) throws JobExecutionException
   {
     if (teamCalDao != null) {
-      TeamEventExternalSubscpriptionsCache.instance().updateCache(teamCalDao);
+      TeamEventExternalSubscriptionCache.instance().updateCache(teamCalDao);
     } else {
       log.error("TeamCalSubscriptionJob has no TeamCalDao set -> unable to update cache.");
     }

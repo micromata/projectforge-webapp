@@ -44,7 +44,7 @@ import org.projectforge.plugins.teamcal.event.TeamEventEditPage;
 import org.projectforge.plugins.teamcal.event.TeamEventListPage;
 import org.projectforge.plugins.teamcal.event.TeamEventRight;
 import org.projectforge.plugins.teamcal.externalsubscription.TeamCalSubscriptionJob;
-import org.projectforge.plugins.teamcal.externalsubscription.TeamEventExternalSubscpriptionsCache;
+import org.projectforge.plugins.teamcal.externalsubscription.TeamEventExternalSubscriptionCache;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFeedHook;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFilter;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarPage;
@@ -260,7 +260,7 @@ public class TeamCalPlugin extends AbstractPlugin
 
       @Override
       public void run() {
-        TeamEventExternalSubscpriptionsCache.instance().updateCache(teamCalDao);
+        TeamEventExternalSubscriptionCache.instance().updateCache(teamCalDao);
       }
     };
     t.start();

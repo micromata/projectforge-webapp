@@ -24,7 +24,6 @@
 package org.projectforge.plugins.teamcal.externalsubscription;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,9 +38,9 @@ import org.projectforge.plugins.teamcal.event.TeamEventFilter;
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  */
-public class TeamEventExternalSubscpriptionsCache
+public class TeamEventExternalSubscriptionCache
 {
-  private static TeamEventExternalSubscpriptionsCache instance = new TeamEventExternalSubscpriptionsCache();
+  private static TeamEventExternalSubscriptionCache instance = new TeamEventExternalSubscriptionCache();
 
   private final Map<Integer, TeamEventSubscription> subscriptions;
 
@@ -49,13 +48,13 @@ public class TeamEventExternalSubscpriptionsCache
 
   private static final Long SUBSCRIPTION_UPDATE_TIME = 5L * 60 * 1000; // 5 min
 
-  private TeamEventExternalSubscpriptionsCache()
+  private TeamEventExternalSubscriptionCache()
   {
     subscriptions = new HashMap<Integer, TeamEventSubscription>();
     this.subscribedTamCalIds = new ArrayList<Integer>();
   }
 
-  public static TeamEventExternalSubscpriptionsCache instance()
+  public static TeamEventExternalSubscriptionCache instance()
   {
     return instance;
   }
