@@ -23,7 +23,13 @@
 
 package org.projectforge.plugins.teamcal.admin;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -34,6 +40,7 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
+import org.projectforge.common.ReflectionToString;
 import org.projectforge.core.AbstractHistorizableBaseDO;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.database.Constants;
@@ -367,5 +374,22 @@ public class TeamCalDO extends DefaultBaseDO
     if (id != other.getId())
       return false;
     return StringUtils.equals(title, other.title);
+  }
+
+  /**
+   * Returns string containing all fields (except the password) of given user object (via ReflectionToStringBuilder).
+   * @param user
+   * @return
+   */
+  @Override
+  public String toString()
+  {
+    return (new ReflectionToString(this) {
+      @Override
+      protected boolean accept(final java.lang.reflect.Field f)
+      {
+        return super.accept(f) && !"externalSubscriptionCalendarBinary".equals(f.getName());
+      }
+    }).toString();
   }
 }
