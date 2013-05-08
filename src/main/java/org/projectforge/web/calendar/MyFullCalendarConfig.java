@@ -35,6 +35,7 @@ import org.apache.wicket.Component;
 import org.apache.wicket.model.Model;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonRawValue;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.I18nCore;
 
@@ -47,6 +48,8 @@ public class MyFullCalendarConfig extends Config
   private String allDayText, axisFormat;
 
   private String[] dayNames, dayNamesShort, monthNames, monthNamesShort;
+
+  private String height;
 
   private boolean theme = true;
 
@@ -65,10 +68,10 @@ public class MyFullCalendarConfig extends Config
   public MyFullCalendarConfig(final Component parent)
   {
     this.parent = parent;
-    setAspectRatio(1.5f);
     setIgnoreTimezone(true);
     setSlotMinutes(15);
     setFirstHour(8);
+    setHeight("get_calendar_height()");
     getHeader().setLeft("prev,next today");
     getHeader().setCenter("title");
     getHeader().setRight("month,agendaWeek,agendaDay");
@@ -122,6 +125,25 @@ public class MyFullCalendarConfig extends Config
   public MyFullCalendarConfig setWeekMode(final String weekMode)
   {
     this.weekMode = weekMode;
+    return this;
+  }
+
+  /**
+   * @return the height
+   */
+  @JsonRawValue
+  public String getHeight()
+  {
+    return height;
+  }
+
+  /**
+   * @param height the height to set
+   * @return this for chaining.
+   */
+  public MyFullCalendarConfig setHeight(final String height)
+  {
+    this.height = height;
     return this;
   }
 
