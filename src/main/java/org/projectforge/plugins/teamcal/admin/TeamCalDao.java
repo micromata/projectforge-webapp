@@ -309,7 +309,7 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
   @Override
   protected void afterUpdate(TeamCalDO obj, TeamCalDO dbObj) {
     super.afterUpdate(obj, dbObj);
-    if (obj.isExternalSubscription() == true && obj != null && dbObj != null && StringUtils.equals(obj.getExternalSubscriptionUrl(), dbObj.getExternalSubscriptionUrl()) == false) {
+    if (obj != null && dbObj && obj.isExternalSubscription() == true && != null && StringUtils.equals(obj.getExternalSubscriptionUrl(), dbObj.getExternalSubscriptionUrl()) == false) {
       // only update if the url has changed!
       TeamEventExternalSubscriptionCache.instance().updateCache(this, obj);
     }
