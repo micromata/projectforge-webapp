@@ -36,6 +36,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
+import org.apache.wicket.markup.html.form.LabeledWebMarkupContainer;
 import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
@@ -217,9 +218,6 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
   public InputPanel add(final TextField< ? > textField)
   {
     final InputPanel input = new InputPanel(newChildId(), textField);
-    if (textField.getLabel() == null) {
-      textField.setLabel(new Model<String>(labelText));
-    }
     add(input);
     return input;
   }
@@ -252,9 +250,6 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
   public PasswordPanel add(final PasswordTextField passwordField)
   {
     final PasswordPanel passwordInput = new PasswordPanel(newChildId(), passwordField);
-    if (passwordField.getLabel() == null) {
-      passwordField.setLabel(new Model<String>(labelText));
-    }
     add(passwordInput);
     return passwordInput;
   }
@@ -285,9 +280,6 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
   public TextAreaPanel add(final TextArea< ? > textArea, final boolean autogrow)
   {
     final TextAreaPanel panel = new TextAreaPanel(newChildId(), textArea, autogrow);
-    if (textArea.getLabel() == null) {
-      textArea.setLabel(new Model<String>(labelText));
-    }
     add(panel);
     return panel;
   }
@@ -329,7 +321,6 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
       final IChoiceRenderer<C> renderer, final boolean submitOnChange)
       {
     final DropDownChoicePanel<C> dropDownChoicePanel = new DropDownChoicePanel<C>(newChildId(), model, values, renderer, submitOnChange);
-    dropDownChoicePanel.getDropDownChoice().setLabel(new Model<String>(getLabel()));
     add(dropDownChoicePanel);
     return dropDownChoicePanel;
       }
@@ -343,7 +334,6 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
    */
   public <C> DropDownChoicePanel<C> add(final DropDownChoice<C> dropDownChoice)
   {
-    dropDownChoice.setLabel(new Model<String>(getLabel()));
     return add(dropDownChoice, false);
   }
 
@@ -358,7 +348,6 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
   {
 
     final DropDownChoicePanel<C> dropDownChoicePanel = new DropDownChoicePanel<C>(newChildId(), dropDownChoice, submitOnChange);
-    dropDownChoicePanel.getDropDownChoice().setLabel(new Model<String>(getLabel()));
     add(dropDownChoicePanel);
     return dropDownChoicePanel;
   }
@@ -381,7 +370,6 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
   {
 
     final SelectPanel<C> selectPanel = new SelectPanel<C>(newChildId(), select);
-    selectPanel.getSelect().setLabel(new Model<String>(getLabel()));
     add(selectPanel);
     return selectPanel;
   }
@@ -451,8 +439,16 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
       labelFor = true;
     }
     for (final Component comp : components) {
-      if (comp instanceof FormComponent) {
-        ((FormComponent< ? >) comp).setLabel(new Model<String>(getLabel()));
+      if (comp instanceof LabeledWebMarkupContainer) {
+        final LabeledWebMarkupContainer labeledComponent = (LabeledWebMarkupContainer) comp;
+        if (labeledComponent.getLabel() == null) {
+          labeledComponent.setLabel(new Model<String>(labelText));
+        }
+      } else if (component instanceof ComponentWrapperPanel) {
+        final FormComponent<?> formComponent = ((ComponentWrapperPanel)component).getFormComponent();
+        if (formComponent != null && formComponent.getLabel() == null) {
+          formComponent.setLabel(new Model<String>(labelText));
+        }
       }
     }
   }
@@ -464,7 +460,9 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
   protected void onBeforeRender()
   {
     if (labelFor == false && WebConfiguration.isDevelopmentMode() == true) {
-      log.warn("No label set for field '" + labelText + "'. Please call setLabelFor(component) for this fieldset or supressLabelForWarning().");
+      log.warn("No label set for field '"
+          + labelText
+          + "'. Please call setLabelFor(component) for this fieldset or supressLabelForWarning().");
     }
     super.onBeforeRender();
   }
