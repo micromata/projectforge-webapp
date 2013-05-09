@@ -27,7 +27,7 @@ import java.text.ParseException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
-import org.projectforge.database.DatabaseUpdateDao;
+import org.projectforge.database.MyDatabaseUpdateDao;
 import org.projectforge.meb.MebJobExecutor;
 import org.projectforge.meb.MebPollingJob;
 import org.quartz.*;
@@ -43,7 +43,7 @@ public class CronSetup
 
   private Scheduler scheduler;
 
-  private DatabaseUpdateDao databaseUpdateDao;
+  private MyDatabaseUpdateDao databaseUpdateDao;
 
   private HibernateSearchReindexer hibernateSearchReindexer;
 
@@ -145,7 +145,7 @@ public class CronSetup
     log.info("Cron job '" + name + "' successfully configured: " + cronEx);
   }
 
-  public void setDatabaseUpdateDao(final DatabaseUpdateDao databaseUpdateDao)
+  public void setDatabaseUpdateDao(final MyDatabaseUpdateDao databaseUpdateDao)
   {
     this.databaseUpdateDao = databaseUpdateDao;
   }

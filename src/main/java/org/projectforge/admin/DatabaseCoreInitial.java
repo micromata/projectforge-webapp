@@ -28,15 +28,11 @@ import org.projectforge.access.GroupTaskAccessDO;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.PersonalAddressDO;
 import org.projectforge.book.BookDO;
+import org.projectforge.common.DatabaseDialect;
 import org.projectforge.core.ConfigurationDO;
 import org.projectforge.database.DatabaseUpdateDO;
-import org.projectforge.database.DatabaseUpdateDao;
-import org.projectforge.database.HibernateDialect;
 import org.projectforge.database.HibernateUtils;
-import org.projectforge.database.SchemaGenerator;
-import org.projectforge.database.Table;
-import org.projectforge.database.TableAttribute;
-import org.projectforge.database.TableAttributeType;
+import org.projectforge.database.MyDatabaseUpdateDao;
 import org.projectforge.fibu.AuftragDO;
 import org.projectforge.fibu.AuftragsPositionDO;
 import org.projectforge.fibu.EingangsrechnungDO;
@@ -64,6 +60,15 @@ import org.projectforge.orga.PosteingangDO;
 import org.projectforge.scripting.ScriptDO;
 import org.projectforge.task.TaskDO;
 import org.projectforge.timesheet.TimesheetDO;
+import org.projectforge.updater.SchemaGenerator;
+import org.projectforge.updater.SystemUpdater;
+import org.projectforge.updater.Table;
+import org.projectforge.updater.TableAttribute;
+import org.projectforge.updater.TableAttributeType;
+import org.projectforge.updater.UpdateEntry;
+import org.projectforge.updater.UpdateEntryImpl;
+import org.projectforge.updater.UpdatePreCheckStatus;
+import org.projectforge.updater.UpdateRunningStatus;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserPrefDO;
@@ -79,10 +84,12 @@ import de.micromata.hibernate.history.delta.PropertyDelta;
  */
 public class DatabaseCoreInitial
 {
+  public static final String CORE_REGION_ID = "ProjectForge";
+
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
-    final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
+    final MyDatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
 
     final Class< ? >[] doClasses = new Class< ? >[] { //
         // First needed data-base objects:
@@ -123,7 +130,7 @@ public class DatabaseCoreInitial
         UserXmlPreferencesDO.class //
     };
 
-    return new UpdateEntryImpl(SystemUpdater.CORE_REGION_ID, "2013-04-25", "Adds all core tables T_*.") {
+    return new UpdateEntryImpl(CORE_REGION_ID, "2013-04-25", "Adds all core tables T_*.") {
 
       @Override
       public UpdatePreCheckStatus runPreCheck()
@@ -138,7 +145,7 @@ public class DatabaseCoreInitial
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        if (dao.doesExist(new Table(PFUserDO.class)) == false && HibernateUtils.getDialect() == HibernateDialect.PostgreSQL) {
+        if (dao.doesExist(new Table(PFUserDO.class)) == false && HibernateUtils.getDialect() == DatabaseDialect.PostgreSQL) {
           // User table doesn't exist, therefore schema should be empty. PostgreSQL needs sequence for primary keys:
           dao.createSequence("hibernate_sequence", true);
         }

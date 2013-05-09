@@ -23,15 +23,15 @@
 
 package org.projectforge.plugins.poll;
 
-import org.projectforge.admin.UpdateEntry;
-import org.projectforge.admin.UpdateEntryImpl;
-import org.projectforge.admin.UpdatePreCheckStatus;
-import org.projectforge.admin.UpdateRunningStatus;
-import org.projectforge.database.DatabaseUpdateDao;
-import org.projectforge.database.SchemaGenerator;
+import org.projectforge.database.MyDatabaseUpdateDao;
 import org.projectforge.plugins.poll.attendee.PollAttendeeDO;
 import org.projectforge.plugins.poll.event.PollEventDO;
 import org.projectforge.plugins.poll.result.PollResultDO;
+import org.projectforge.updater.SchemaGenerator;
+import org.projectforge.updater.UpdateEntry;
+import org.projectforge.updater.UpdateEntryImpl;
+import org.projectforge.updater.UpdatePreCheckStatus;
+import org.projectforge.updater.UpdateRunningStatus;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
@@ -39,7 +39,7 @@ import org.projectforge.plugins.poll.result.PollResultDO;
  */
 public class PollPluginUpdates
 {
-  static DatabaseUpdateDao dao;
+  static MyDatabaseUpdateDao dao;
 
   final static Class< ? >[] doClasses = new Class< ? >[] { //
     PollDO.class, PollEventDO.class, PollAttendeeDO.class, PollResultDO.class};

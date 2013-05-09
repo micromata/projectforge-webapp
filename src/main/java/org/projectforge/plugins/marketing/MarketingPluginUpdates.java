@@ -23,12 +23,12 @@
 
 package org.projectforge.plugins.marketing;
 
-import org.projectforge.admin.UpdateEntry;
-import org.projectforge.admin.UpdateEntryImpl;
-import org.projectforge.admin.UpdatePreCheckStatus;
-import org.projectforge.admin.UpdateRunningStatus;
-import org.projectforge.database.DatabaseUpdateDao;
-import org.projectforge.database.SchemaGenerator;
+import org.projectforge.database.MyDatabaseUpdateDao;
+import org.projectforge.updater.SchemaGenerator;
+import org.projectforge.updater.UpdateEntry;
+import org.projectforge.updater.UpdateEntryImpl;
+import org.projectforge.updater.UpdatePreCheckStatus;
+import org.projectforge.updater.UpdateRunningStatus;
 
 /**
  * Contains the initial data-base set-up script and later all update scripts if any data-base schema updates are required by any later
@@ -39,7 +39,7 @@ import org.projectforge.database.SchemaGenerator;
  */
 public class MarketingPluginUpdates
 {
-  static DatabaseUpdateDao dao;
+  static MyDatabaseUpdateDao dao;
 
   final static Class< ? >[] doClasses = new Class< ? >[] { //
     AddressCampaignDO.class, AddressCampaignValueDO.class};

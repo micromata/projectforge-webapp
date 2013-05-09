@@ -23,8 +23,8 @@
 
 package org.projectforge.plugins.memo;
 
-import org.projectforge.admin.UpdateEntry;
 import org.projectforge.plugins.core.AbstractPlugin;
+import org.projectforge.updater.UpdateEntry;
 import org.projectforge.web.MenuItemDef;
 import org.projectforge.web.MenuItemDefId;
 

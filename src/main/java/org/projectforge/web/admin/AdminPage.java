@@ -48,7 +48,7 @@ import org.projectforge.core.ConfigurationParam;
 import org.projectforge.core.HibernateSearchReindexer;
 import org.projectforge.core.ReindexSettings;
 import org.projectforge.core.SystemDao;
-import org.projectforge.database.DatabaseUpdateDao;
+import org.projectforge.database.MyDatabaseUpdateDao;
 import org.projectforge.database.XmlDump;
 import org.projectforge.meb.MebMailClient;
 import org.projectforge.plugins.core.AbstractPlugin;
@@ -87,7 +87,7 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
   private SystemDao systemDao;
 
   @SpringBean(name = "databaseUpdateDao")
-  private DatabaseUpdateDao databaseUpdateDao;
+  private MyDatabaseUpdateDao databaseUpdateDao;
 
   @SpringBean(name = "hibernateSearchReindexer")
   private HibernateSearchReindexer hibernateSearchReindexer;

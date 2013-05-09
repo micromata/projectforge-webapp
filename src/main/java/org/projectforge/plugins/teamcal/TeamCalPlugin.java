@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.projectforge.admin.UpdateEntry;
 import org.projectforge.core.CronSetup;
 import org.projectforge.common.StringHelper;
 import org.projectforge.database.xstream.XStreamSavingConverter;
@@ -55,6 +54,7 @@ import org.projectforge.plugins.teamcal.rest.TeamCalDaoRest;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.rest.RestCallRegistry;
+import org.projectforge.updater.UpdateEntry;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserXmlPreferencesDO;

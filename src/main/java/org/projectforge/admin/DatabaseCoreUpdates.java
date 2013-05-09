@@ -23,16 +23,12 @@
 
 package org.projectforge.admin;
 
-import static org.projectforge.admin.SystemUpdater.CORE_REGION_ID;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import org.projectforge.address.AddressDO;
 import org.projectforge.database.DatabaseUpdateDO;
-import org.projectforge.database.DatabaseUpdateDao;
-import org.projectforge.database.Table;
-import org.projectforge.database.TableAttribute;
+import org.projectforge.database.MyDatabaseUpdateDao;
 import org.projectforge.fibu.AuftragDO;
 import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.KontoDO;
@@ -42,6 +38,13 @@ import org.projectforge.fibu.RechnungDO;
 import org.projectforge.registry.Registry;
 import org.projectforge.scripting.ScriptDO;
 import org.projectforge.task.TaskDO;
+import org.projectforge.updater.SystemUpdater;
+import org.projectforge.updater.Table;
+import org.projectforge.updater.TableAttribute;
+import org.projectforge.updater.UpdateEntry;
+import org.projectforge.updater.UpdateEntryImpl;
+import org.projectforge.updater.UpdatePreCheckStatus;
+import org.projectforge.updater.UpdateRunningStatus;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
@@ -51,13 +54,15 @@ import org.projectforge.user.UserDao;
  */
 public class DatabaseCoreUpdates
 {
+  public static final String CORE_REGION_ID = DatabaseCoreInitial.CORE_REGION_ID;
+
   private static final String VERSION_5_0 = "5.0";
 
   @SuppressWarnings("serial")
   public static List<UpdateEntry> getUpdateEntries()
   {
     final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
-    final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
+    final MyDatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
     // /////////////////////////////////////////////////////////////////
     // 5.0
     // /////////////////////////////////////////////////////////////////

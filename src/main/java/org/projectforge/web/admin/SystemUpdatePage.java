@@ -31,13 +31,13 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.access.AccessException;
-import org.projectforge.admin.SystemUpdater;
-import org.projectforge.admin.UpdateEntry;
 import org.projectforge.common.DateHelper;
 import org.projectforge.database.DatabaseUpdateDO;
-import org.projectforge.database.DatabaseUpdateDao;
+import org.projectforge.database.MyDatabaseUpdateDao;
 import org.projectforge.export.ExportSheet;
 import org.projectforge.export.ExportWorkbook;
+import org.projectforge.updater.SystemUpdater;
+import org.projectforge.updater.UpdateEntry;
 import org.projectforge.user.Login;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.ProjectForgeGroup;
@@ -53,7 +53,7 @@ public class SystemUpdatePage extends AbstractSecuredPage
   protected SystemUpdater systemUpdater;
 
   @SpringBean(name = "databaseUpdateDao")
-  private DatabaseUpdateDao databaseUpdateDao;
+  private MyDatabaseUpdateDao databaseUpdateDao;
 
   private final SystemUpdateForm form;
 

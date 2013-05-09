@@ -28,21 +28,21 @@ import java.util.List;
 
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.projectforge.admin.UpdateEntry;
-import org.projectforge.admin.UpdateEntryImpl;
-import org.projectforge.admin.UpdatePreCheckStatus;
-import org.projectforge.admin.UpdateRunningStatus;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationDO;
 import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.ConfigurationParam;
-import org.projectforge.database.DatabaseUpdateDao;
-import org.projectforge.database.SchemaGenerator;
-import org.projectforge.database.Table;
+import org.projectforge.database.MyDatabaseUpdateDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.event.TeamEventAttendeeDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.registry.Registry;
+import org.projectforge.updater.SchemaGenerator;
+import org.projectforge.updater.Table;
+import org.projectforge.updater.UpdateEntry;
+import org.projectforge.updater.UpdateEntryImpl;
+import org.projectforge.updater.UpdatePreCheckStatus;
+import org.projectforge.updater.UpdateRunningStatus;
 import org.projectforge.web.admin.SystemUpdatePage;
 import org.projectforge.web.core.ConfigurationEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
@@ -54,7 +54,7 @@ import org.projectforge.web.wicket.AbstractEditPage;
  */
 public class TeamCalPluginUpdates
 {
-  static DatabaseUpdateDao dao;
+  static MyDatabaseUpdateDao dao;
 
   final static Class< ? >[] doClasses = new Class< ? >[] { //
     TeamCalDO.class, TeamEventDO.class, TeamEventAttendeeDO.class};
@@ -133,7 +133,7 @@ public class TeamCalPluginUpdates
       }
 
       /**
-       * @see org.projectforge.admin.UpdateEntry#afterUpdate()
+       * @see org.projectforge.updater.UpdateEntry#afterUpdate()
        */
       @Override
       public void afterUpdate()

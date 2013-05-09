@@ -37,7 +37,6 @@
   <bean id="configurationDao" class="org.projectforge.core.ConfigurationDao" />
   <bean id="contractDao" class="org.projectforge.orga.ContractDao" />
   <bean id="databaseDao" class="org.projectforge.database.DatabaseDao" />
-  <bean id="databaseUpdateDao" class="org.projectforge.database.DatabaseUpdateDao" />
   <bean id="ganttChartDao" class="org.projectforge.gantt.GanttChartDao" />
   <bean id="groupDao" class="org.projectforge.user.GroupDao" />
   <bean id="hrDao" class="org.projectforge.humanresources.HRDao" />
@@ -45,6 +44,7 @@
   <bean id="hrPlanningEntryDao" class="org.projectforge.humanresources.HRPlanningEntryDao" />
   <bean id="initDatabaseDao" class="org.projectforge.database.InitDatabaseDao" />
   <bean id="mebDao" class="org.projectforge.meb.MebDao" />
+  <bean id="myDatabaseUpdateDao" class="org.projectforge.database.MyDatabaseUpdateDao" />
   <bean id="personalAddressDao" class="org.projectforge.address.PersonalAddressDao" />
   <bean id="postausgangDao" class="org.projectforge.orga.PostausgangDao" />
   <bean id="posteingangDao" class="org.projectforge.orga.PosteingangDao" />

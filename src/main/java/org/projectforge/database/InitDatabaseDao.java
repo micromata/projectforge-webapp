@@ -39,6 +39,7 @@ import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskStatus;
 import org.projectforge.task.TaskTree;
+import org.projectforge.updater.Table;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
 import org.projectforge.user.PFUserContext;
@@ -71,7 +72,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
 
   private ConfigurationDao configurationDao;
 
-  private DatabaseUpdateDao databaseUpdateDao;
+  private MyDatabaseUpdateDao databaseUpdateDao;
 
   private HibernateSearchReindexer hibernateSearchReindexer;
 
@@ -94,7 +95,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
     this.configurationDao = configurationDao;
   }
 
-  public void setDatabaseUpdateDao(final DatabaseUpdateDao databaseUpdateDao)
+  public void setDatabaseUpdateDao(final MyDatabaseUpdateDao databaseUpdateDao)
   {
     this.databaseUpdateDao = databaseUpdateDao;
   }
