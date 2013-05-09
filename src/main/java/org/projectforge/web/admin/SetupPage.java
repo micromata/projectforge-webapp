@@ -32,13 +32,13 @@ import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.continuousdb.SystemUpdater;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationDO;
 import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.ConfigurationParam;
 import org.projectforge.core.HibernateSearchReindexer;
 import org.projectforge.database.InitDatabaseDao;
+import org.projectforge.database.MyDatabaseUpdater;
 import org.projectforge.database.XmlDump;
 import org.projectforge.database.xstream.XStreamSavingConverter;
 import org.projectforge.task.TaskTree;
@@ -73,8 +73,8 @@ public class SetupPage extends AbstractUnsecureBasePage
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
 
-  @SpringBean(name = "systemUpdater")
-  private SystemUpdater systemUpdater;
+  @SpringBean(name = "myDatabaseUpdater")
+  private MyDatabaseUpdater myDatabaseUpdater;
 
   @SpringBean(name = "xmlDump")
   private XmlDump xmlDump;
@@ -135,7 +135,7 @@ public class SetupPage extends AbstractUnsecureBasePage
     configure(ConfigurationParam.CALENDAR_DOMAIN, setupForm.getCalendarDomain());
     configure(ConfigurationParam.SYSTEM_ADMIN_E_MAIL, setupForm.getSysopEMail());
     configure(ConfigurationParam.FEEDBACK_E_MAIL, setupForm.getFeedbackEMail());
-    if (systemUpdater.isUpdated() == true) {
+    if (myDatabaseUpdater.getSystemUpdater().isUpdated() == true) {
       // Update status:
       UserFilter.setUpdateRequiredFirst(false);
     }
