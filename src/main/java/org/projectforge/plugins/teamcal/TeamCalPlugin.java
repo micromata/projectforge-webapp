@@ -27,8 +27,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.projectforge.core.CronSetup;
 import org.projectforge.common.StringHelper;
+import org.projectforge.continuousdb.UpdateEntry;
+import org.projectforge.core.CronSetup;
 import org.projectforge.database.xstream.XStreamSavingConverter;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
@@ -54,7 +55,6 @@ import org.projectforge.plugins.teamcal.rest.TeamCalDaoRest;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.rest.RestCallRegistry;
-import org.projectforge.updater.UpdateEntry;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserXmlPreferencesDO;
@@ -99,7 +99,7 @@ public class TeamCalPlugin extends AbstractPlugin
   protected void initialize()
   {
     // DatabaseUpdateDao is needed by the updater:
-    TeamCalPluginUpdates.dao = databaseUpdateDao;
+    TeamCalPluginUpdates.dao = getDatabaseUpdateDao();
     final RegistryEntry entry = new RegistryEntry(ID, TeamCalDao.class, teamCalDao, "plugins.teamcal");
     final RegistryEntry eventEntry = new RegistryEntry("teamEvent", TeamEventDao.class, teamEventDao, "plugins.teamcal.event");
 
@@ -252,11 +252,11 @@ public class TeamCalPlugin extends AbstractPlugin
   }
 
   @Override
-  public void registerCronJob(CronSetup cronSetup)
+  public void registerCronJob(final CronSetup cronSetup)
   {
     cronSetup.registerCronJob("teamCalAboJob", TeamCalSubscriptionJob.class, "0 */5 * * * ?");
     // do initial cache installation in a separated thread
-    Thread t = new Thread() {
+    final Thread t = new Thread() {
 
       @Override
       public void run() {

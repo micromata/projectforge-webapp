@@ -32,15 +32,16 @@ import org.apache.commons.lang.Validate;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.resource.loader.BundleStringResourceLoader;
 import org.apache.wicket.settings.IResourceSettings;
+import org.projectforge.continuousdb.UpdateEntry;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.CronSetup;
 import org.projectforge.database.MyDatabaseUpdateDao;
+import org.projectforge.database.MyDatabaseUpdater;
 import org.projectforge.database.xstream.XStreamSavingConverter;
 import org.projectforge.plugins.todo.ToDoPlugin;
 import org.projectforge.registry.Registry;
 import org.projectforge.registry.RegistryEntry;
-import org.projectforge.updater.UpdateEntry;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.user.UserPrefAreaRegistry;
 import org.projectforge.user.UserRight;
@@ -63,7 +64,7 @@ public abstract class AbstractPlugin
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AbstractPlugin.class);
 
-  protected MyDatabaseUpdateDao databaseUpdateDao;
+  protected MyDatabaseUpdater myDatabaseUpdater;
 
   protected UserXmlPreferencesDao userXmlPreferencesDao;
 
@@ -75,9 +76,14 @@ public abstract class AbstractPlugin
 
   private static Set<Class< ? >> initializedPlugins = new HashSet<Class< ? >>();
 
-  public void setDatabaseUpdateDao(final MyDatabaseUpdateDao databaseUpdateDao)
+  public void setMyDatabaseUpdater(final MyDatabaseUpdater myDatabaseUpdater)
   {
-    this.databaseUpdateDao = databaseUpdateDao;
+    this.myDatabaseUpdater = myDatabaseUpdater;
+  }
+
+  public MyDatabaseUpdateDao getDatabaseUpdateDao()
+  {
+    return myDatabaseUpdater.getDatabaseUpdateDao();
   }
 
   public void setUserXmlPreferencesDao(final UserXmlPreferencesDao userXmlPreferencesDao)
@@ -369,7 +375,7 @@ public abstract class AbstractPlugin
    * This method is called in the lifecycle, when the plugin is able to register cron jobs.<br/>
    * <b>Do not register cron jobs before this method was called.</b>
    */
-  public void registerCronJob(CronSetup cronSetup) {
+  public void registerCronJob(final CronSetup cronSetup) {
 
   }
 

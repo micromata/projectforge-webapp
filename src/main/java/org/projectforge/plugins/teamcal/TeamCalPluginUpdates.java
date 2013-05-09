@@ -28,6 +28,12 @@ import java.util.List;
 
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.projectforge.continuousdb.SchemaGenerator;
+import org.projectforge.continuousdb.Table;
+import org.projectforge.continuousdb.UpdateEntry;
+import org.projectforge.continuousdb.UpdateEntryImpl;
+import org.projectforge.continuousdb.UpdatePreCheckStatus;
+import org.projectforge.continuousdb.UpdateRunningStatus;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationDO;
 import org.projectforge.core.ConfigurationDao;
@@ -37,12 +43,6 @@ import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.event.TeamEventAttendeeDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.registry.Registry;
-import org.projectforge.updater.SchemaGenerator;
-import org.projectforge.updater.Table;
-import org.projectforge.updater.UpdateEntry;
-import org.projectforge.updater.UpdateEntryImpl;
-import org.projectforge.updater.UpdatePreCheckStatus;
-import org.projectforge.updater.UpdateRunningStatus;
 import org.projectforge.web.admin.SystemUpdatePage;
 import org.projectforge.web.core.ConfigurationEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
@@ -133,7 +133,7 @@ public class TeamCalPluginUpdates
       }
 
       /**
-       * @see org.projectforge.updater.UpdateEntry#afterUpdate()
+       * @see org.projectforge.continuousdb.UpdateEntry#afterUpdate()
        */
       @Override
       public void afterUpdate()

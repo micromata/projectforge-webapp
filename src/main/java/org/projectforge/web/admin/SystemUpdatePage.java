@@ -32,12 +32,12 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.access.AccessException;
 import org.projectforge.common.DateHelper;
+import org.projectforge.continuousdb.UpdateEntry;
 import org.projectforge.database.DatabaseUpdateDO;
 import org.projectforge.database.MyDatabaseUpdateDao;
+import org.projectforge.database.MyDatabaseUpdater;
 import org.projectforge.export.ExportSheet;
 import org.projectforge.export.ExportWorkbook;
-import org.projectforge.updater.SystemUpdater;
-import org.projectforge.updater.UpdateEntry;
 import org.projectforge.user.Login;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.ProjectForgeGroup;
@@ -49,11 +49,8 @@ public class SystemUpdatePage extends AbstractSecuredPage
 {
   private static final long serialVersionUID = -7624191773850329338L;
 
-  @SpringBean(name = "systemUpdater")
-  protected SystemUpdater systemUpdater;
-
-  @SpringBean(name = "databaseUpdateDao")
-  private MyDatabaseUpdateDao databaseUpdateDao;
+  @SpringBean(name = "myDatabaseUpdater")
+  MyDatabaseUpdater myDatabaseUpdater;
 
   private final SystemUpdateForm form;
 
@@ -69,6 +66,7 @@ public class SystemUpdatePage extends AbstractSecuredPage
       public void onClick()
       {
         checkAdminUser();
+        final MyDatabaseUpdateDao databaseUpdateDao = myDatabaseUpdater.getDatabaseUpdateDao();
         final List<DatabaseUpdateDO> updateEntries = databaseUpdateDao.getUpdateHistory();
         final ExportWorkbook workbook = new ExportWorkbook();
         final ExportSheet sheet = workbook.addSheet("Update history");
@@ -100,7 +98,7 @@ public class SystemUpdatePage extends AbstractSecuredPage
   {
     checkAdminUser();
     accessChecker.checkRestrictedOrDemoUser();
-    systemUpdater.update(updateEntry);
+    myDatabaseUpdater.getSystemUpdater().update(updateEntry);
     updateEntry.afterUpdate();
     refresh();
   }
@@ -108,7 +106,7 @@ public class SystemUpdatePage extends AbstractSecuredPage
   protected void refresh()
   {
     checkAdminUser();
-    systemUpdater.runAllPreChecks();
+    myDatabaseUpdater.getSystemUpdater().runAllPreChecks();
     form.updateEntryRows();
   }
 

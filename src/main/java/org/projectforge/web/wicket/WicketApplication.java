@@ -57,20 +57,21 @@ import org.projectforge.AppVersion;
 import org.projectforge.admin.DatabaseCoreInitial;
 import org.projectforge.common.BeanHelper;
 import org.projectforge.common.ExceptionHelper;
+import org.projectforge.continuousdb.DatabaseSupport;
+import org.projectforge.continuousdb.UpdateEntry;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.CronSetup;
 import org.projectforge.core.SystemInfoCache;
-import org.projectforge.database.MyDatabaseUpdateDao;
 import org.projectforge.database.HibernateUtils;
 import org.projectforge.database.InitDatabaseDao;
+import org.projectforge.database.MyDatabaseUpdateDao;
+import org.projectforge.database.MyDatabaseUpdater;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.plugins.core.PluginsRegistry;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.storage.StorageClient;
-import org.projectforge.updater.SystemUpdater;
-import org.projectforge.updater.UpdateEntry;
 import org.projectforge.user.Login;
 import org.projectforge.user.LoginDefaultHandler;
 import org.projectforge.user.LoginHandler;
@@ -132,14 +133,11 @@ public class WicketApplication extends WebApplication implements WicketApplicati
   @SpringBean(name = "daoRegistry")
   private DaoRegistry daoRegistry;
 
-  @SpringBean(name = "daoRegistry")
-  private MyDatabaseUpdateDao databaseUpdateDao;
-
   @SpringBean(name = "initDatabaseDao")
   private InitDatabaseDao initDatabaseDao;
 
-  @SpringBean(name = "systemUpdater")
-  private SystemUpdater systemUpdater;
+  @SpringBean(name = "myDatabaseUpdater")
+  private MyDatabaseUpdater myDatabaseUpdater;
 
   @SpringBean(name = "userDao")
   private UserDao userDao;
@@ -202,15 +200,6 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     this.configuration = configuration;
   }
 
-  /**
-   * @param databaseUpdateDao the databaseUpdateDao to set
-   * @return this for chaining.
-   */
-  public void setDatabaseUpdateDao(final MyDatabaseUpdateDao databaseUpdateDao)
-  {
-    this.databaseUpdateDao = databaseUpdateDao;
-  }
-
   public void setConfigurationDao(final ConfigurationDao configurationDao)
   {
     this.configurationDao = configurationDao;
@@ -231,9 +220,12 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     this.initDatabaseDao = initDatabaseDao;
   }
 
-  public void setSystemUpdater(final SystemUpdater systemUpdater)
+  /**
+   * @param myDatabaseUpdater the myDatabaseUpdater to set
+   */
+  public void setMyDatabaseUpdater(final MyDatabaseUpdater myDatabaseUpdater)
   {
-    this.systemUpdater = systemUpdater;
+    this.myDatabaseUpdater = myDatabaseUpdater;
   }
 
   public void setUserDao(final UserDao userDao)
@@ -371,10 +363,14 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     final org.hibernate.cfg.Configuration hibernateConfiguration = localSessionFactoryBean.getConfiguration();
     HibernateUtils.setConfiguration(hibernateConfiguration);
 
+    if (DatabaseSupport.getInstance() == null) {
+      DatabaseSupport.setInstance(new DatabaseSupport(HibernateUtils.getDialect()));
+    }
+
     final boolean missingDatabaseSchema = initDatabaseDao.isEmpty();
     if (missingDatabaseSchema == true) {
       PFUserContext.setUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser());
-      final UpdateEntry updateEntry = DatabaseCoreInitial.getInitializationUpdateEntry();
+      final UpdateEntry updateEntry = DatabaseCoreInitial.getInitializationUpdateEntry(myDatabaseUpdater);
       updateEntry.runUpdate();
     }
 
@@ -400,7 +396,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
 
     final PluginsRegistry pluginsRegistry = PluginsRegistry.instance();
     pluginsRegistry.set(beanFactory, getResourceSettings());
-    pluginsRegistry.set(systemUpdater);
+    pluginsRegistry.set(myDatabaseUpdater.getSystemUpdater());
     pluginsRegistry.initialize();
     if (missingDatabaseSchema == true) {
       for (final AbstractPlugin plugin : pluginsRegistry.getPlugins()) {
@@ -446,7 +442,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     log.info(AppVersion.APP_ID + " " + AppVersion.NUMBER + " (" + AppVersion.RELEASE_TIMESTAMP + ") initialized.");
 
     PFUserContext.setUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser()); // Logon admin user.
-    if (systemUpdater.isUpdated() == false) {
+    if (myDatabaseUpdater.getSystemUpdater().isUpdated() == false) {
       // Force redirection to update page:
       UserFilter.setUpdateRequiredFirst(true);
     }
@@ -492,7 +488,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     log.info("Syncing all user preferences to database.");
     userXmlPreferencesCache.forceReload();
     cronSetup.shutdown();
-    databaseUpdateDao.shutdownDatabase();
+    myDatabaseUpdater.getDatabaseUpdateDao().shutdownDatabase();
     log.info("Destroyed");
   }
 

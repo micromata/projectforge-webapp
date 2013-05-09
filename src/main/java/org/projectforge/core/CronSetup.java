@@ -28,9 +28,16 @@ import java.text.ParseException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.projectforge.database.MyDatabaseUpdateDao;
+import org.projectforge.database.MyDatabaseUpdater;
 import org.projectforge.meb.MebJobExecutor;
 import org.projectforge.meb.MebPollingJob;
-import org.quartz.*;
+import org.quartz.CronTrigger;
+import org.quartz.Job;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
 
 /**
@@ -43,7 +50,7 @@ public class CronSetup
 
   private Scheduler scheduler;
 
-  private MyDatabaseUpdateDao databaseUpdateDao;
+  private MyDatabaseUpdater myDatabaseUpdater;
 
   private HibernateSearchReindexer hibernateSearchReindexer;
 
@@ -72,6 +79,7 @@ public class CronSetup
       if (cfg.isMebMailAccountConfigured() == false) {
         mebJobExecutor = null; // MEB is not configured.
       }
+      final MyDatabaseUpdateDao databaseUpdateDao = myDatabaseUpdater.getDatabaseUpdateDao();
       // run every hour at *:00: 0 0 * * * ?
       createCron("hourlyJob", CronHourlyJob.class, "0 0 * * * ?", cfg.getCronExpressionHourlyJob(), "databaseUpdateDao", databaseUpdateDao,
           "hibernateSearchReindexer", hibernateSearchReindexer);
@@ -86,7 +94,9 @@ public class CronSetup
     }
   }
 
-  public void registerCronJob(final String givenName, final Class< ? extends Job> jobClass, final String cronExpression, final Object... params) {
+  public void registerCronJob(final String givenName, final Class< ? extends Job> jobClass, final String cronExpression,
+      final Object... params)
+  {
     if (jobClass != null) {
       String name = givenName;
       if (StringUtils.isBlank(name) == true) {
@@ -109,8 +119,8 @@ public class CronSetup
     }
   }
 
-  private void createCron(final String name, final Class< ? extends Job> jobClass, final String cronDefaultExpression, final String cronExpression,
-      final Object... params)
+  private void createCron(final String name, final Class< ? extends Job> jobClass, final String cronDefaultExpression,
+      final String cronExpression, final Object... params)
   {
     // Define job instance (group = "default")
     final JobDetail job = new JobDetail(name, "default", jobClass);
@@ -145,9 +155,9 @@ public class CronSetup
     log.info("Cron job '" + name + "' successfully configured: " + cronEx);
   }
 
-  public void setDatabaseUpdateDao(final MyDatabaseUpdateDao databaseUpdateDao)
+  public void setMyDatabaseUpdater(final MyDatabaseUpdater myDatabaseUpdater)
   {
-    this.databaseUpdateDao = databaseUpdateDao;
+    this.myDatabaseUpdater = myDatabaseUpdater;
   }
 
   public void setHibernateSearchReindexer(final HibernateSearchReindexer hibernateSearchReindexer)

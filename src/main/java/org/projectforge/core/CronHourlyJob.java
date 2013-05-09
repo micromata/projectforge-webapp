@@ -27,6 +27,7 @@ import java.util.Calendar;
 
 import org.projectforge.common.DateHelper;
 import org.projectforge.database.MyDatabaseUpdateDao;
+import org.projectforge.database.MyDatabaseUpdater;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
@@ -78,7 +79,8 @@ public class CronHourlyJob extends AbstractCronJob
   @Override
   protected void wire(final JobExecutionContext context)
   {
-    databaseUpdateDao = (MyDatabaseUpdateDao) wire(context, "databaseUpdateDao");
+    final MyDatabaseUpdater myDatabaseUpdater = (MyDatabaseUpdater) wire(context, "myDatabaseUpdater");
+    databaseUpdateDao = myDatabaseUpdater.getDatabaseUpdateDao();
     hibernateSearchReindexer = (HibernateSearchReindexer) wire(context, "hibernateSearchReindexer");
   }
 }

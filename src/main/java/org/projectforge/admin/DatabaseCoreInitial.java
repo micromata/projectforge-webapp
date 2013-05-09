@@ -29,10 +29,19 @@ import org.projectforge.address.AddressDO;
 import org.projectforge.address.PersonalAddressDO;
 import org.projectforge.book.BookDO;
 import org.projectforge.common.DatabaseDialect;
+import org.projectforge.continuousdb.DatabaseUpdateDao;
+import org.projectforge.continuousdb.SchemaGenerator;
+import org.projectforge.continuousdb.Table;
+import org.projectforge.continuousdb.TableAttribute;
+import org.projectforge.continuousdb.TableAttributeType;
+import org.projectforge.continuousdb.UpdateEntry;
+import org.projectforge.continuousdb.UpdateEntryImpl;
+import org.projectforge.continuousdb.UpdatePreCheckStatus;
+import org.projectforge.continuousdb.UpdateRunningStatus;
 import org.projectforge.core.ConfigurationDO;
 import org.projectforge.database.DatabaseUpdateDO;
 import org.projectforge.database.HibernateUtils;
-import org.projectforge.database.MyDatabaseUpdateDao;
+import org.projectforge.database.MyDatabaseUpdater;
 import org.projectforge.fibu.AuftragDO;
 import org.projectforge.fibu.AuftragsPositionDO;
 import org.projectforge.fibu.EingangsrechnungDO;
@@ -60,15 +69,6 @@ import org.projectforge.orga.PosteingangDO;
 import org.projectforge.scripting.ScriptDO;
 import org.projectforge.task.TaskDO;
 import org.projectforge.timesheet.TimesheetDO;
-import org.projectforge.updater.SchemaGenerator;
-import org.projectforge.updater.SystemUpdater;
-import org.projectforge.updater.Table;
-import org.projectforge.updater.TableAttribute;
-import org.projectforge.updater.TableAttributeType;
-import org.projectforge.updater.UpdateEntry;
-import org.projectforge.updater.UpdateEntryImpl;
-import org.projectforge.updater.UpdatePreCheckStatus;
-import org.projectforge.updater.UpdateRunningStatus;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserPrefDO;
@@ -87,9 +87,9 @@ public class DatabaseCoreInitial
   public static final String CORE_REGION_ID = "ProjectForge";
 
   @SuppressWarnings("serial")
-  public static UpdateEntry getInitializationUpdateEntry()
+  public static UpdateEntry getInitializationUpdateEntry(final MyDatabaseUpdater databaseUpdater)
   {
-    final MyDatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
+    final DatabaseUpdateDao dao = databaseUpdater.getDatabaseUpdateDao();
 
     final Class< ? >[] doClasses = new Class< ? >[] { //
         // First needed data-base objects:

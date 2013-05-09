@@ -23,8 +23,8 @@
 
 package org.projectforge.plugins.marketing;
 
+import org.projectforge.continuousdb.UpdateEntry;
 import org.projectforge.plugins.core.AbstractPlugin;
-import org.projectforge.updater.UpdateEntry;
 import org.projectforge.web.MenuItemDef;
 import org.projectforge.web.MenuItemDefId;
 
@@ -56,7 +56,7 @@ public class MarketingPlugin extends AbstractPlugin
   protected void initialize()
   {
     // DatabaseUpdateDao is needed by the updater:
-    MarketingPluginUpdates.dao = databaseUpdateDao;
+    MarketingPluginUpdates.dao = getDatabaseUpdateDao();
     // Register it:
     register(ADDRESS_CAMPAIGN_ID, AddressCampaignDao.class, addressCampaignDao, "plugins.marketing.addressCampaign");
     register(ADDRESS_CAMPAIGN_VALUE_ID, AddressCampaignValueDao.class, addressCampaignValueDao, "plugins.marketing.addressCampaignValue")

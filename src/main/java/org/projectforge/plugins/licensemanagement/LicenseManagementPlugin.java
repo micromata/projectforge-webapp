@@ -23,9 +23,9 @@
 
 package org.projectforge.plugins.licensemanagement;
 
+import org.projectforge.continuousdb.UpdateEntry;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.registry.RegistryEntry;
-import org.projectforge.updater.UpdateEntry;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.MenuItemDef;
 import org.projectforge.web.MenuItemDefId;
@@ -61,7 +61,7 @@ public class LicenseManagementPlugin extends AbstractPlugin
   protected void initialize()
   {
     // DatabaseUpdateDao is needed by the updater:
-    LicenseManagementPluginUpdates.dao = databaseUpdateDao;
+    LicenseManagementPluginUpdates.dao = getDatabaseUpdateDao();
     final RegistryEntry entry = new RegistryEntry(ID, LicenseDao.class, licenseDao, "plugins.licensemanagement");
     // The LicenseDao is automatically available by the scripting engine!
     register(entry);

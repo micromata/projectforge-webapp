@@ -23,8 +23,8 @@
 
 package org.projectforge.plugins.memo;
 
+import org.projectforge.continuousdb.UpdateEntry;
 import org.projectforge.plugins.core.AbstractPlugin;
-import org.projectforge.updater.UpdateEntry;
 import org.projectforge.web.MenuItemDef;
 import org.projectforge.web.MenuItemDefId;
 
@@ -52,7 +52,7 @@ public class MemoPlugin extends AbstractPlugin
   protected void initialize()
   {
     // DatabaseUpdateDao is needed by the updater:
-    MemoPluginUpdates.dao = databaseUpdateDao;
+    MemoPluginUpdates.dao = getDatabaseUpdateDao();
     // Register it:
     register(ID, MemoDao.class, memoDao, "plugins.memo");
 
@@ -70,7 +70,7 @@ public class MemoPlugin extends AbstractPlugin
     addResourceBundle(RESOURCE_BUNDLE_NAME);
   }
 
-  public void setMemoDao(MemoDao memoDao)
+  public void setMemoDao(final MemoDao memoDao)
   {
     this.memoDao = memoDao;
   }

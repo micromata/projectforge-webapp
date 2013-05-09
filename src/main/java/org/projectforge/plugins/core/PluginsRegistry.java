@@ -27,13 +27,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.wicket.settings.IResourceSettings;
+import org.projectforge.continuousdb.SystemUpdater;
+import org.projectforge.continuousdb.UpdateEntry;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.CronSetup;
 import org.projectforge.plugins.memo.MemoPlugin;
 import org.projectforge.plugins.teamcal.TeamCalPlugin;
 import org.projectforge.plugins.todo.ToDoPlugin;
-import org.projectforge.updater.SystemUpdater;
-import org.projectforge.updater.UpdateEntry;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 

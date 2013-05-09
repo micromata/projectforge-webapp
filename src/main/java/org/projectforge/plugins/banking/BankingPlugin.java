@@ -23,8 +23,8 @@
 
 package org.projectforge.plugins.banking;
 
+import org.projectforge.continuousdb.UpdateEntry;
 import org.projectforge.plugins.core.AbstractPlugin;
-import org.projectforge.updater.UpdateEntry;
 import org.projectforge.web.MenuItemDef;
 import org.projectforge.web.MenuItemDefId;
 
@@ -59,7 +59,7 @@ public class BankingPlugin extends AbstractPlugin
   protected void initialize()
   {
     // DatabaseUpdateDao is needed by the updater:
-    BankingPluginUpdates.dao = databaseUpdateDao;
+    BankingPluginUpdates.dao = getDatabaseUpdateDao();
     // Register it:
     register(BANK_ACCOUNT_ID, BankAccountDao.class, bankAccountDao, "plugins.banking.account").setNestedDOClasses(
         BankAccountRecordDO.class, BankAccountBalanceDO.class).setSearchable(false);

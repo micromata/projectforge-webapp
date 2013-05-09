@@ -33,9 +33,10 @@ import java.util.Map;
 
 import org.projectforge.access.AccessChecker;
 import org.projectforge.access.AccessException;
+import org.projectforge.continuousdb.DatabaseUpdateDao;
+import org.projectforge.continuousdb.UpdaterConfiguration;
 import org.projectforge.core.BaseDO;
 import org.projectforge.registry.Registry;
-import org.projectforge.updater.DatabaseUpdateDao;
 import org.projectforge.user.Login;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
@@ -59,6 +60,11 @@ public class MyDatabaseUpdateDao extends DatabaseUpdateDao
 
   // private static String TABLE_TYPE = "TABLE";
 
+  public MyDatabaseUpdateDao(final UpdaterConfiguration configuration)
+  {
+    super(configuration);
+  }
+
   private AccessChecker accessChecker;
 
   private static PFUserDO SYSTEM_ADMIN_PSEUDO_USER = new PFUserDO().setUsername("System admin user only for internal usage");
@@ -66,10 +72,6 @@ public class MyDatabaseUpdateDao extends DatabaseUpdateDao
   public static PFUserDO __internalGetSystemAdminPseudoUser()
   {
     return SYSTEM_ADMIN_PSEUDO_USER;
-  }
-
-  static {
-    org.projectforge.updater.DatabaseSupport.setDefaultDialect(HibernateUtils.getDialect());
   }
 
   @Override
@@ -90,7 +92,7 @@ public class MyDatabaseUpdateDao extends DatabaseUpdateDao
   public List<DatabaseUpdateDO> getUpdateHistory()
   {
     accessCheck(false);
-    final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+    final JdbcTemplate jdbc = new JdbcTemplate(getDataSource());
     final List<Map<String, Object>> dbResult = jdbc.queryForList("select * from t_database_update order by update_date desc");
     final List<DatabaseUpdateDO> result = new ArrayList<DatabaseUpdateDO>();
     for (final Map<String, Object> map : dbResult) {
@@ -103,6 +105,19 @@ public class MyDatabaseUpdateDao extends DatabaseUpdateDao
       entry.setExecutedBy(executedByUser);
       entry.setDescription((String) map.get("description"));
       result.add(entry);
+    }
+    return result;
+  }
+
+  /**
+   * @see org.projectforge.continuousdb.DatabaseUpdateDao#createMissingIndices()
+   */
+  @Override
+  public int createMissingIndices()
+  {
+    int result = super.createMissingIndices();
+    if (createIndex("idx_timesheet_user_time", "t_timesheet", "user_id, start_time") == true) {
+      ++result;
     }
     return result;
   }
@@ -127,7 +142,7 @@ public class MyDatabaseUpdateDao extends DatabaseUpdateDao
     log.info("Fix all broken history entries (if exist).");
     final int counter[] = new int[1];
     counter[0] = 0;
-    final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+    final JdbcTemplate jdbc = new JdbcTemplate(getDataSource());
     try {
       String sql = " from t_history_property_delta where old_value like 'org.projectforge.%' or new_value like 'org.projectforge.%'";
       jdbc.query("select id, old_value, new_value, property_type" + sql, new ResultSetExtractor() {

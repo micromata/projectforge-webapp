@@ -23,10 +23,10 @@
 
 package org.projectforge.plugins.todo;
 
+import org.projectforge.continuousdb.UpdateEntry;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.registry.RegistryEntry;
-import org.projectforge.updater.UpdateEntry;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.MenuItemDef;
 import org.projectforge.web.MenuItemDefId;
@@ -62,7 +62,7 @@ public class ToDoPlugin extends AbstractPlugin
   protected void initialize()
   {
     // DatabaseUpdateDao is needed by the updater:
-    ToDoPluginUpdates.dao = databaseUpdateDao;
+    ToDoPluginUpdates.dao = getDatabaseUpdateDao();
     final RegistryEntry entry = new RegistryEntry(ID, ToDoDao.class, toDoDao, "plugins.todo");
     // The ToDoDao is automatically available by the scripting engine!
     register(entry); // Insert at second position after Address entry (for SearchPage).

@@ -32,12 +32,17 @@ import javax.sql.DataSource;
 import org.junit.Test;
 import org.projectforge.address.AddressDO;
 import org.projectforge.common.DatabaseDialect;
+import org.projectforge.continuousdb.DatabaseSupport;
+import org.projectforge.continuousdb.Table;
+import org.projectforge.continuousdb.TableAttribute;
+import org.projectforge.continuousdb.TableAttributeType;
+import org.projectforge.continuousdb.UpdaterConfiguration;
 import org.projectforge.test.TestBase;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 public class DatabaseUpdateDaoTest extends TestBase
 {
-  private MyDatabaseUpdateDao databaseUpdateDao;
+  private MyDatabaseUpdater myDatabaseUpdater;
 
   private DataSource dataSource;
 
@@ -45,12 +50,13 @@ public class DatabaseUpdateDaoTest extends TestBase
   public void createTableScript()
   {
     final Table table = new Table("t_test") //
-    .addAttribute(new TableAttributeHookImpl("pk", TableAttributeType.INT).setPrimaryKey(true).setGenerated(true))//
-    .addAttribute(new TableAttributeHookImpl("counter", TableAttributeType.INT)) //
-    .addAttribute(new TableAttributeHookImpl("money", TableAttributeType.DECIMAL, 8, 2).setNullable(false)) //
-    .addAttribute(new TableAttributeHookImpl("address_fk", TableAttributeType.INT).setForeignTable(AddressDO.class));
-    final MyDatabaseUpdateDao dao = new MyDatabaseUpdateDao();
-    dao.databaseSupport = new DatabaseSupport(DatabaseDialect.HSQL);
+    .addAttribute(new TableAttribute("pk", TableAttributeType.INT).setPrimaryKey(true).setGenerated(true))//
+    .addAttribute(new TableAttribute("counter", TableAttributeType.INT)) //
+    .addAttribute(new TableAttribute("money", TableAttributeType.DECIMAL, 8, 2).setNullable(false)) //
+    .addAttribute(new TableAttribute("address_fk", TableAttributeType.INT).setForeignTable(AddressDO.class));
+    final UpdaterConfiguration config = new UpdaterConfiguration();
+    config.setDialect(DatabaseDialect.HSQL);
+    final MyDatabaseUpdateDao dao = new MyDatabaseUpdateDao(config);
     StringBuffer buf = new StringBuffer();
     dao.buildCreateTableStatement(buf, table);
     assertEquals("CREATE TABLE t_test (\n" //
@@ -60,7 +66,7 @@ public class DatabaseUpdateDaoTest extends TestBase
         + "  address_fk INT,\n" //
         + "  FOREIGN KEY (address_fk) REFERENCES T_ADDRESS(pk)\n" //
         + ");\n", buf.toString());
-    dao.databaseSupport = new DatabaseSupport(DatabaseDialect.PostgreSQL);
+    config.setDialect(DatabaseDialect.PostgreSQL);
     buf = new StringBuffer();
     dao.buildCreateTableStatement(buf, table);
     assertEquals("CREATE TABLE t_test (\n" //
@@ -78,11 +84,12 @@ public class DatabaseUpdateDaoTest extends TestBase
   {
     logon(ADMIN);
     final Table table = new Table("t_test") //
-    .addAttribute(new TableAttributeHookImpl("name", TableAttributeType.VARCHAR, 5).setPrimaryKey(true))//
-    .addAttribute(new TableAttributeHookImpl("counter", TableAttributeType.INT)) //
-    .addAttribute(new TableAttributeHookImpl("money", TableAttributeType.DECIMAL, 8, 2).setNullable(false)) //
-    .addAttribute(new TableAttributeHookImpl("address_fk", TableAttributeType.INT).setForeignTable("t_address").setForeignAttribute("pk"));
+    .addAttribute(new TableAttribute("name", TableAttributeType.VARCHAR, 5).setPrimaryKey(true))//
+    .addAttribute(new TableAttribute("counter", TableAttributeType.INT)) //
+    .addAttribute(new TableAttribute("money", TableAttributeType.DECIMAL, 8, 2).setNullable(false)) //
+    .addAttribute(new TableAttribute("address_fk", TableAttributeType.INT).setForeignTable("t_address").setForeignAttribute("pk"));
     final StringBuffer buf = new StringBuffer();
+    final MyDatabaseUpdateDao databaseUpdateDao = myDatabaseUpdater.getDatabaseUpdateDao();
     databaseUpdateDao.buildCreateTableStatement(buf, table);
     assertEquals("CREATE TABLE t_test (\n" //
         + "  name VARCHAR(5),\n" //
@@ -107,6 +114,7 @@ public class DatabaseUpdateDaoTest extends TestBase
   public void buildAddUniqueConstraint()
   {
     final StringBuffer buf = new StringBuffer();
+    final MyDatabaseUpdateDao databaseUpdateDao = myDatabaseUpdater.getDatabaseUpdateDao();
     databaseUpdateDao.buildAddUniqueConstraintStatement(buf, "t_user_right", "t_user_right_user_fk_key", "user_fk", "right_id");
     assertEquals("ALTER TABLE t_user_right ADD CONSTRAINT t_user_right_user_fk_key UNIQUE (user_fk, right_id);\n", buf.toString());
   }
@@ -115,8 +123,9 @@ public class DatabaseUpdateDaoTest extends TestBase
   public void buildAddTableColumn()
   {
     final StringBuffer buf = new StringBuffer();
-    databaseUpdateDao.buildAddTableAttributesStatement(buf, "t_task", new TableAttributeHookImpl("workpackage_code", TableAttributeType.VARCHAR, 100,
-        false), new TableAttributeHookImpl("user_fk", TableAttributeType.INT).setForeignTable("t_user").setForeignAttribute("pk"));
+    final MyDatabaseUpdateDao databaseUpdateDao = myDatabaseUpdater.getDatabaseUpdateDao();
+    databaseUpdateDao.buildAddTableAttributesStatement(buf, "t_task", new TableAttribute("workpackage_code", TableAttributeType.VARCHAR,
+        100, false), new TableAttribute("user_fk", TableAttributeType.INT).setForeignTable("t_user").setForeignAttribute("pk"));
     assertEquals("-- Does already exist: ALTER TABLE t_task ADD COLUMN workpackage_code VARCHAR(100) NOT NULL;\n" //
         + "ALTER TABLE t_task ADD COLUMN user_fk INT;\n"
         + "ALTER TABLE t_task ADD CONSTRAINT t_task_user_fk FOREIGN KEY (user_fk) REFERENCES t_user(pk);\n", buf.toString());
@@ -125,7 +134,8 @@ public class DatabaseUpdateDaoTest extends TestBase
   @Test
   public void createAndDropTableColumn()
   {
-    databaseUpdateDao.addTableAttributes("t_task", new TableAttributeHookImpl("test1", TableAttributeType.DATE), new TableAttributeHookImpl("test2",
+    final MyDatabaseUpdateDao databaseUpdateDao = myDatabaseUpdater.getDatabaseUpdateDao();
+    databaseUpdateDao.addTableAttributes("t_task", new TableAttribute("test1", TableAttributeType.DATE), new TableAttribute("test2",
         TableAttributeType.INT));
     assertTrue(databaseUpdateDao.doesTableAttributeExist("t_task", "test1"));
     assertTrue(databaseUpdateDao.doesTableAttributeExist("t_task", "test2"));
@@ -140,13 +150,13 @@ public class DatabaseUpdateDaoTest extends TestBase
   @Test
   public void renameTableAttribute()
   {
-    assertEquals("ALTER TABLE t_test ALTER COLUMN old_col RENAME TO new_col", DatabaseSupport.instance().renameAttribute("t_test",
-        "old_col", "new_col"));
+    assertEquals("ALTER TABLE t_test ALTER COLUMN old_col RENAME TO new_col",
+        DatabaseSupport.getInstance().renameAttribute("t_test", "old_col", "new_col"));
   }
 
-  public void setDatabaseUpdateDao(final MyDatabaseUpdateDao databaseUpdateDao)
+  public void setMyDatabaseUpdater(final MyDatabaseUpdater myDatabaseUpdater)
   {
-    this.databaseUpdateDao = databaseUpdateDao;
+    this.myDatabaseUpdater = myDatabaseUpdater;
   }
 
   public void setDataSource(final DataSource dataSource)

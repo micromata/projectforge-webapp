@@ -23,8 +23,8 @@
 
 package org.projectforge.plugins.skillmatrix;
 
+import org.projectforge.continuousdb.UpdateEntry;
 import org.projectforge.plugins.core.AbstractPlugin;
-import org.projectforge.updater.UpdateEntry;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.MenuItemDef;
 import org.projectforge.web.MenuItemDefId;
@@ -63,7 +63,7 @@ public class SkillMatrixPlugin extends AbstractPlugin
   protected void initialize()
   {
     // DatabaseUpdateDao is needed by the updater:
-    SkillMatrixPluginUpdates.dao = databaseUpdateDao;
+    SkillMatrixPluginUpdates.dao = getDatabaseUpdateDao();
     register(ID_SKILL_RATING, SkillRatingDao.class, skillRatingDao, "plugins.skillmatrix");
     register(ID_SKILL, SkillDao.class, skillDao, "plugins.skillmatrix");
 

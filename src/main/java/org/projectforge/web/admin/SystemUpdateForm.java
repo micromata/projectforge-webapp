@@ -34,8 +34,8 @@ import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.Version;
-import org.projectforge.updater.UpdateEntry;
-import org.projectforge.updater.UpdatePreCheckStatus;
+import org.projectforge.continuousdb.UpdateEntry;
+import org.projectforge.continuousdb.UpdatePreCheckStatus;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
@@ -111,7 +111,7 @@ public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdat
     scripts.removeAll();
     final RepeatingView scriptRows = new RepeatingView("scriptRows");
     scripts.add(scriptRows);
-    final SortedSet<UpdateEntry> updateEntries = parentPage.systemUpdater.getUpdateEntries();
+    final SortedSet<UpdateEntry> updateEntries = parentPage.myDatabaseUpdater.getSystemUpdater().getUpdateEntries();
     if (updateEntries == null) {
       return;
     }

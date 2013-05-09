@@ -23,15 +23,15 @@
 
 package org.projectforge.plugins.poll;
 
+import org.projectforge.continuousdb.SchemaGenerator;
+import org.projectforge.continuousdb.UpdateEntry;
+import org.projectforge.continuousdb.UpdateEntryImpl;
+import org.projectforge.continuousdb.UpdatePreCheckStatus;
+import org.projectforge.continuousdb.UpdateRunningStatus;
 import org.projectforge.database.MyDatabaseUpdateDao;
 import org.projectforge.plugins.poll.attendee.PollAttendeeDO;
 import org.projectforge.plugins.poll.event.PollEventDO;
 import org.projectforge.plugins.poll.result.PollResultDO;
-import org.projectforge.updater.SchemaGenerator;
-import org.projectforge.updater.UpdateEntry;
-import org.projectforge.updater.UpdateEntryImpl;
-import org.projectforge.updater.UpdatePreCheckStatus;
-import org.projectforge.updater.UpdateRunningStatus;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)

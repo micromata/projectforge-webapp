@@ -23,12 +23,12 @@
 
 package org.projectforge.plugins.skillmatrix;
 
+import org.projectforge.continuousdb.SchemaGenerator;
+import org.projectforge.continuousdb.UpdateEntry;
+import org.projectforge.continuousdb.UpdateEntryImpl;
+import org.projectforge.continuousdb.UpdatePreCheckStatus;
+import org.projectforge.continuousdb.UpdateRunningStatus;
 import org.projectforge.database.MyDatabaseUpdateDao;
-import org.projectforge.updater.SchemaGenerator;
-import org.projectforge.updater.UpdateEntry;
-import org.projectforge.updater.UpdateEntryImpl;
-import org.projectforge.updater.UpdatePreCheckStatus;
-import org.projectforge.updater.UpdateRunningStatus;
 
 /**
  * Contains the initial data-base set-up script and later all update scripts if any data-base schema updates are required by any later

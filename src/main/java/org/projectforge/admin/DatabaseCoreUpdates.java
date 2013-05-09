@@ -27,8 +27,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.projectforge.address.AddressDO;
+import org.projectforge.continuousdb.DatabaseUpdateDao;
+import org.projectforge.continuousdb.Table;
+import org.projectforge.continuousdb.TableAttribute;
+import org.projectforge.continuousdb.UpdateEntry;
+import org.projectforge.continuousdb.UpdateEntryImpl;
+import org.projectforge.continuousdb.UpdatePreCheckStatus;
+import org.projectforge.continuousdb.UpdateRunningStatus;
 import org.projectforge.database.DatabaseUpdateDO;
-import org.projectforge.database.MyDatabaseUpdateDao;
+import org.projectforge.database.MyDatabaseUpdater;
 import org.projectforge.fibu.AuftragDO;
 import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.KontoDO;
@@ -38,13 +45,6 @@ import org.projectforge.fibu.RechnungDO;
 import org.projectforge.registry.Registry;
 import org.projectforge.scripting.ScriptDO;
 import org.projectforge.task.TaskDO;
-import org.projectforge.updater.SystemUpdater;
-import org.projectforge.updater.Table;
-import org.projectforge.updater.TableAttribute;
-import org.projectforge.updater.UpdateEntry;
-import org.projectforge.updater.UpdateEntryImpl;
-import org.projectforge.updater.UpdatePreCheckStatus;
-import org.projectforge.updater.UpdateRunningStatus;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
@@ -59,10 +59,10 @@ public class DatabaseCoreUpdates
   private static final String VERSION_5_0 = "5.0";
 
   @SuppressWarnings("serial")
-  public static List<UpdateEntry> getUpdateEntries()
+  public static List<UpdateEntry> getUpdateEntries(final MyDatabaseUpdater databaseUpdater)
   {
     final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
-    final MyDatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
+    final DatabaseUpdateDao dao = databaseUpdater.getDatabaseUpdateDao();
     // /////////////////////////////////////////////////////////////////
     // 5.0
     // /////////////////////////////////////////////////////////////////

@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import org.projectforge.access.AccessException;
+import org.projectforge.continuousdb.Table;
 import org.projectforge.core.ConfigurationDO;
 import org.projectforge.core.ConfigurationDOXmlDumpHook;
 import org.projectforge.core.ConfigurationDao;
@@ -39,7 +40,6 @@ import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskStatus;
 import org.projectforge.task.TaskTree;
-import org.projectforge.updater.Table;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
 import org.projectforge.user.PFUserContext;
@@ -72,7 +72,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
 
   private ConfigurationDao configurationDao;
 
-  private MyDatabaseUpdateDao databaseUpdateDao;
+  private MyDatabaseUpdater myDatabaseUpdater;
 
   private HibernateSearchReindexer hibernateSearchReindexer;
 
@@ -95,9 +95,9 @@ public class InitDatabaseDao extends HibernateDaoSupport
     this.configurationDao = configurationDao;
   }
 
-  public void setDatabaseUpdateDao(final MyDatabaseUpdateDao databaseUpdateDao)
+  public void setMyDatabaseUpdater(final MyDatabaseUpdater myDatabaseUpdater)
   {
-    this.databaseUpdateDao = databaseUpdateDao;
+    this.myDatabaseUpdater = myDatabaseUpdater;
   }
 
   /**
@@ -262,12 +262,14 @@ public class InitDatabaseDao extends HibernateDaoSupport
     try {
       if (userGroupCache.internalGetNumberOfUsers() == 0) {
         final Table userTable = new Table(PFUserDO.class);
+        final MyDatabaseUpdateDao databaseUpdateDao = myDatabaseUpdater.getDatabaseUpdateDao();
         return databaseUpdateDao.internalDoesTableExist(userTable.getName()) == false
             || databaseUpdateDao.internalIsTableEmpty(userTable.getName()) == true;
       }
     } catch (final Exception ex) {
       // In the case, that user table is not readable.
       final Table userTable = new Table(PFUserDO.class);
+      final MyDatabaseUpdateDao databaseUpdateDao = myDatabaseUpdater.getDatabaseUpdateDao();
       return databaseUpdateDao.internalDoesTableExist(userTable.getName()) == false
           || databaseUpdateDao.internalIsTableEmpty(userTable.getName()) == true;
     }

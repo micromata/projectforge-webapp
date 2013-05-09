@@ -37,13 +37,13 @@ import org.hibernate.criterion.Restrictions;
 import org.projectforge.access.AccessException;
 import org.projectforge.access.AccessType;
 import org.projectforge.access.OperationType;
+import org.projectforge.continuousdb.DatabaseSupport;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.ModificationStatus;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.core.UserException;
 import org.projectforge.fibu.ProjektDO;
-import org.projectforge.updater.DatabaseSupport;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserDao;
@@ -156,7 +156,7 @@ public class TaskDao extends BaseDao<TaskDO>
   public List<Object[]> readTotalDurations()
   {
     log.debug("Calculating duration for all tasks");
-    final String intervalInSeconds = DatabaseSupport.instance().getIntervalInSeconds("startTime", "stopTime");
+    final String intervalInSeconds = DatabaseSupport.getInstance().getIntervalInSeconds("startTime", "stopTime");
     if (intervalInSeconds != null) {
       @SuppressWarnings("unchecked")
       final List<Object[]> list = getHibernateTemplate().find(
@@ -201,12 +201,12 @@ public class TaskDao extends BaseDao<TaskDO>
   public long readTotalDuration(final Integer taskId)
   {
     log.debug("Calculating duration for all tasks");
-    final String intervalInSeconds = DatabaseSupport.instance().getIntervalInSeconds("startTime", "stopTime");
+    final String intervalInSeconds = DatabaseSupport.getInstance().getIntervalInSeconds("startTime", "stopTime");
     if (intervalInSeconds != null) {
       @SuppressWarnings("unchecked")
       final List<Object> list = getHibernateTemplate().find(
           "select "
-              + DatabaseSupport.instance().getIntervalInSeconds("startTime", "stopTime")
+              + DatabaseSupport.getInstance().getIntervalInSeconds("startTime", "stopTime")
               + " from TimesheetDO where task.id = ? and deleted=false", taskId);
       if (list.size() == 0) {
         return new Long(0);

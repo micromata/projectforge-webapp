@@ -43,7 +43,9 @@ import org.projectforge.access.AccessException;
 import org.projectforge.access.AccessType;
 import org.projectforge.access.OperationType;
 import org.projectforge.common.DateHelper;
+import org.projectforge.continuousdb.DatabaseSupport;
 import org.projectforge.core.SimpleHistoryEntry;
+import org.projectforge.database.HibernateUtils;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.plugins.core.PluginsRegistry;
 import org.projectforge.registry.DaoRegistry;
@@ -158,6 +160,9 @@ public class AbstractTestBase
     final File testDir = new File(TEST_DIR);
     if (testDir.exists() == false) {
       testDir.mkdir();
+    }
+    if (DatabaseSupport.getInstance() == null) {
+      DatabaseSupport.setInstance(new DatabaseSupport(HibernateUtils.getDialect()));
     }
   }
 
