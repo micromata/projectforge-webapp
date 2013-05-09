@@ -14,12 +14,13 @@
   <classpathentry kind="var" path="M2_REPO/javax/xml/jsr173/1.0/jsr173-1.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/transaction/jta/1.1/jta-1.1.jar" sourcepath="M2_REPO/javax/transaction/jta/1.1/jta-1.1-sources.jar"/>
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-  <classpathentry kind="var" path="M2_REPO/org/projectforge/projectforge-common/5.0.1-SNAPSHOT/projectforge-common-5.0.1-SNAPSHOT.jar" sourcepath="M2_REPO/org/projectforge/projectforge-common/5.0.1-SNAPSHOT/projectforge-common-5.0.1-SNAPSHOT-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/projectforge/projectforge-common/5.1.1-SNAPSHOT/projectforge-common-5.1.1-SNAPSHOT.jar" sourcepath="M2_REPO/org/projectforge/projectforge-common/5.1.1-SNAPSHOT/projectforge-common-5.1.1-SNAPSHOT-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar" sourcepath="M2_REPO/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-io/commons-io/2.4/commons-io-2.4.jar" sourcepath="M2_REPO/commons-io/commons-io/2.4/commons-io-2.4-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-lang/commons-lang/2.5/commons-lang-2.5.jar" sourcepath="M2_REPO/commons-lang/commons-lang/2.5/commons-lang-2.5-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.16/log4j-1.2.16.jar" sourcepath="M2_REPO/log4j/log4j/1.2.16/log4j-1.2.16-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/projectforge/projectforge-webserver/5.0.1-SNAPSHOT/projectforge-webserver-5.0.1-SNAPSHOT.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/projectforge/projectforge-continuous-db/5.1.1-SNAPSHOT/projectforge-continuous-db-5.1.1-SNAPSHOT.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/projectforge/projectforge-webserver/5.1.1-SNAPSHOT/projectforge-webserver-5.1.1-SNAPSHOT.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-cli/commons-cli/1.2/commons-cli-1.2.jar" sourcepath="M2_REPO/commons-cli/commons-cli/1.2/commons-cli-1.2-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4.jar" sourcepath="M2_REPO/commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-pool/commons-pool/1.5.4/commons-pool-1.5.4.jar" sourcepath="M2_REPO/commons-pool/commons-pool/1.5.4/commons-pool-1.5.4-sources.jar"/>
