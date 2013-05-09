@@ -31,7 +31,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.wicket.settings.IResourceSettings;
 import org.mockito.Mockito;
-import org.projectforge.continuousdb.SystemUpdater;
+import org.projectforge.database.MyDatabaseUpdater;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.plugins.core.PluginsRegistry;
 import org.springframework.beans.BeansException;
@@ -63,7 +63,8 @@ public class PluginTestBase extends AbstractTestBase
       }
     }
     preInit(additionalContextFiles);
-    pluginsRegistry.set(getTestConfiguration().getBean("systemUpdater", SystemUpdater.class));
+    final MyDatabaseUpdater myDatabaseUpdater = getTestConfiguration().getBean("myDatabaseUpdater", MyDatabaseUpdater.class);
+    pluginsRegistry.set(myDatabaseUpdater.getSystemUpdater());
     pluginsRegistry.set(getTestConfiguration().getBeanFactory(), Mockito.mock(IResourceSettings.class));
     pluginsRegistry.initialize();
     if (tablesToDeleteAfterTests == null && CollectionUtils.isNotEmpty(persistentEntries) == true) {
