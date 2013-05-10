@@ -106,7 +106,7 @@ public class AuftragListForm extends AbstractListForm<AuftragListFilter, Auftrag
         public String getObject()
         {
           return WebConstants.HTML_TEXT_DIVIDER
-              + getStatisticsValue("fibu.auftrag.filter.type.vollstaendigFakturiert", getAuftragsStatistik().getFakturiertSum(),
+              + getStatisticsValue("fibu.fakturiert", getAuftragsStatistik().getFakturiertSum(),
                   getAuftragsStatistik().getCounterFakturiert());
         }
       }) {
