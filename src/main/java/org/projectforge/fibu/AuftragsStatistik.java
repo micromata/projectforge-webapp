@@ -27,6 +27,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import org.projectforge.common.NumberHelper;
+
 public class AuftragsStatistik implements Serializable
 {
   private static final long serialVersionUID = -5486964211679100585L;
@@ -57,9 +59,9 @@ public class AuftragsStatistik implements Serializable
     counter = counterBeauftragt = counterZuFakturieren = counterFakturiert = 0;
   }
 
-  public void add(AuftragDO auftrag)
+  public void add(final AuftragDO auftrag)
   {
-    BigDecimal netto = auftrag.getNettoSumme();
+    final BigDecimal netto = auftrag.getNettoSumme();
     if (auftrag.getAuftragsStatus() != null) {
       if (auftrag.getAuftragsStatus().isIn(AuftragsStatus.GROB_KALKULATION, AuftragsStatus.IN_ERSTELLUNG, AuftragsStatus.GELEGT) == true) {
         akquiseSum = add(akquiseSum, netto);
@@ -72,8 +74,11 @@ public class AuftragsStatistik implements Serializable
         counterZuFakturieren++;
       }
     }
-    if (auftrag.isVollstaendigFakturiert() == true) {
-      fakturiertSum = add(fakturiertSum, netto);
+    final BigDecimal invoiced = auftrag.getFakturiertSum();
+    if (NumberHelper.isNotZero(invoiced) == true) {
+      fakturiertSum = add(fakturiertSum, invoiced);
+      counterFakturiert++;
+    } else if (auftrag.isVollstaendigFakturiert() == true) {
       counterFakturiert++;
     }
     counter++;
@@ -130,7 +135,7 @@ public class AuftragsStatistik implements Serializable
     return counterZuFakturieren;
   }
 
-  private BigDecimal add(BigDecimal sum, BigDecimal amount)
+  private BigDecimal add(BigDecimal sum, final BigDecimal amount)
   {
     if (amount == null) {
       return sum;
