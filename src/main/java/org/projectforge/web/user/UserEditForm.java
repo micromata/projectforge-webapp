@@ -359,6 +359,9 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
   protected void init()
   {
     super.init();
+    if (isNew() == true && Login.getInstance().hasExternalUsermanagementSystem() == false) {
+      getData().setLocalUser(true);
+    }
     ldapUserValues = PFUserDOConverter.readLdapUserValues(data.getLdapValues());
     if (ldapUserValues == null) {
       ldapUserValues = new LdapUserValues();
@@ -394,8 +397,8 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     createAuthenticationToken(gridBuilder, data, (UserDao) getBaseDao(), this);
     createJIRAUsername(gridBuilder, data);
     if (adminAccess == true) {
-      gridBuilder.newFieldset(getString("user.hrPlanningEnabled")).addCheckBox(new PropertyModel<Boolean>(data,
-          "hrPlanning"), null).setTooltip(getString("user.hrPlanningEnabled.tooltip"));
+      gridBuilder.newFieldset(getString("user.hrPlanningEnabled")).addCheckBox(new PropertyModel<Boolean>(data, "hrPlanning"), null)
+      .setTooltip(getString("user.hrPlanningEnabled.tooltip"));
       gridBuilder.newFieldset(getString("user.activated")).addCheckBox(new Model<Boolean>() {
         @Override
         public Boolean getObject()
@@ -442,8 +445,8 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     gridBuilder.newGridPanel();
     gridBuilder.newFormHeading(getString("ldap"));
     gridBuilder.newSplitPanel(GridSize.COL50);
-    gridBuilder.newFieldset(getString("user.localUser")).addCheckBox(new PropertyModel<Boolean>(data,
-        "localUser"), null).setTooltip(getString("user.localUser.tooltip"));
+    gridBuilder.newFieldset(getString("user.localUser")).addCheckBox(new PropertyModel<Boolean>(data, "localUser"), null)
+    .setTooltip(getString("user.localUser.tooltip"));
     final boolean posixConfigured = LdapUserDao.isPosixAccountsConfigured();
     final boolean sambaConfigured = LdapUserDao.isSambaAccountsConfigured();
     if (posixConfigured == false && sambaConfigured == false) {
@@ -510,8 +513,8 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       }
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
-    gridBuilder.newFieldset(getString("user.restrictedUser")).addCheckBox(new PropertyModel<Boolean>(data,
-        "restrictedUser"), null).setTooltip(getString("user.restrictedUser.tooltip"));
+    gridBuilder.newFieldset(getString("user.restrictedUser")).addCheckBox(new PropertyModel<Boolean>(data, "restrictedUser"), null)
+    .setTooltip(getString("user.restrictedUser.tooltip"));
     if (posixConfigured == true) {
       {
         final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.homeDirectory"), getString("ldap.posixAccount"));
