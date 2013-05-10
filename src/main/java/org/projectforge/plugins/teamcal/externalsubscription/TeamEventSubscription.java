@@ -163,6 +163,7 @@ public class TeamEventSubscription implements Serializable
     }
     if (currentInitializedHash != null && StringUtils.equals(currentInitializedHash, teamCalDo.getExternalSubscriptionHash()) == true) {
       // nothing to do here if the hashes are equal
+      log.info("No modification of subscribed calendar #" + teamCalDo.getId() + " found from: " + displayUrl + " (OK, nothing to be done).");
       return;
     }
     try {
