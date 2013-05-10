@@ -96,14 +96,25 @@ public class TeamEventSubscription implements Serializable
       // No external subscription.
       return;
     }
-    log.info("Getting subscribed calendar #" + teamCalDo.getId() + " from: " + url);
     url = StringUtils.replace(url, "webcal", "http");
-    // Shorten the url or avoiding logging of user credentials as part of the url:
-    String displayUrl = url;
-    final int pos = url.indexOf('?');
-    if (pos > 0) {
-      displayUrl = url.substring(0, pos) + "..."; // Remove query parameters for protection of privacy.
+    // Shorten the url or avoiding logging of user credentials as part of the url
+    final StringBuffer buf = new StringBuffer();
+    int numberOfSlash = 0;
+    for (int i = 0; i < url.length(); i++) {
+      final char ch = url.charAt(i);
+      if (ch == '/') {
+        if (++numberOfSlash > 2) {
+          buf.append("...");
+          break;
+        }
+      } else if (ch == '?') {
+        buf.append("...");
+        break;
+      }
+      buf.append(ch);
     }
+    final String displayUrl = buf.toString();
+    log.info("Getting subscribed calendar #" + teamCalDo.getId() + " from: " + displayUrl);
     final CalendarBuilder builder = new CalendarBuilder();
     byte[] bytes = null;
     try {
@@ -126,7 +137,7 @@ public class TeamEventSubscription implements Serializable
       final MessageDigest md = MessageDigest.getInstance("MD5");
 
       // Read the response body.
-      InputStream stream = method.getResponseBodyAsStream();
+      final InputStream stream = method.getResponseBodyAsStream();
       bytes = IOUtils.toByteArray(stream);
 
       final String md5 = new String(md.digest(bytes));
