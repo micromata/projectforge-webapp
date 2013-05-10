@@ -99,17 +99,18 @@ public class TeamEventSubscription implements Serializable
     url = StringUtils.replace(url, "webcal", "http");
     // Shorten the url or avoiding logging of user credentials as part of the url
     final StringBuffer buf = new StringBuffer();
-    int numberOfSlash = 0;
+    boolean dotRead = false;
     for (int i = 0; i < url.length(); i++) {
       final char ch = url.charAt(i);
-      if (ch == '/') {
-        if (++numberOfSlash > 2) {
-          buf.append("...");
-          break;
-        }
-      } else if (ch == '?') {
-        buf.append("...");
+      if (dotRead == true && ch == '/') { // Slash after domain found
+        // Shorten http://www.projectforge.org/cal/... -> http://www.projectforge.org
+        buf.append("/...");
         break;
+      } else if (ch == '?') {
+        buf.append("?...");
+        break;
+      } else if (ch == '.') {
+        dotRead = true;
       }
       buf.append(ch);
     }
