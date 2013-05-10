@@ -137,6 +137,7 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
       public void populateItem(final Item<ICellPopulator<AuftragDO>> cellItem, final String componentId, final IModel<AuftragDO> rowModel)
       {
         final AuftragDO auftrag = rowModel.getObject();
+        auftragDao.calculateInvoicedSum(auftrag);
         final List<AuftragsPositionDO> list = auftrag.getPositionen();
         final Label label = new Label(componentId, new Model<String>("#" + list.size()));
         if (list != null) {
@@ -250,17 +251,6 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
   protected AuftragDao getBaseDao()
   {
     return auftragDao;
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.AbstractListPage#buildList()
-   */
-  @Override
-  protected List<AuftragDO> buildList()
-  {
-    final List<AuftragDO> list = super.buildList();
-    auftragDao.calculateInvoicedSum(list);
-    return list;
   }
 
   /**
