@@ -153,8 +153,7 @@ public class AuftragDao extends BaseDao<AuftragDO>
   @SuppressWarnings("unchecked")
   public int[] getYears()
   {
-    final List<Object[]> list = getSession().createQuery("select min(angebotsDatum), max(angebotsDatum) from AuftragDO t")
-        .list();
+    final List<Object[]> list = getSession().createQuery("select min(angebotsDatum), max(angebotsDatum) from AuftragDO t").list();
     return SQLHelper.getYears(list);
   }
 
@@ -165,8 +164,7 @@ public class AuftragDao extends BaseDao<AuftragDO>
   {
     final Map<Integer, Set<AuftragsPositionVO>> result = new HashMap<Integer, Set<AuftragsPositionVO>>();
     @SuppressWarnings("unchecked")
-    final List<AuftragsPositionDO> list = getHibernateTemplate().find(
-        "from AuftragsPositionDO a where a.task.id is not null");
+    final List<AuftragsPositionDO> list = getHibernateTemplate().find("from AuftragsPositionDO a where a.task.id is not null");
     if (list == null) {
       return result;
     }
@@ -193,6 +191,7 @@ public class AuftragDao extends BaseDao<AuftragDO>
       return stats;
     }
     for (final AuftragDO auftrag : list) {
+      calculateInvoicedSum(auftrag);
       stats.add(auftrag);
     }
     return stats;
@@ -209,12 +208,25 @@ public class AuftragDao extends BaseDao<AuftragDO>
       return;
     }
     for (final AuftragDO auftrag : col) {
-      if (auftrag.getPositionen() != null) {
-        for (final AuftragsPositionDO pos : auftrag.getPositionen()) {
-          final Set<RechnungsPositionVO> set = rechnungCache.getRechnungsPositionVOSetByAuftragsPositionId(pos.getId());
-          if (set != null) {
-            pos.setFakturiertSum(RechnungDao.getNettoSumme(set));
-          }
+      calculateInvoicedSum(auftrag);
+    }
+  }
+
+  /**
+   * Get all invoices and set the field fakturiertSum for the given order.
+   * @param order
+   * @see RechnungCache#getRechnungsPositionVOSetByAuftragsPositionId(Integer)
+   */
+  public void calculateInvoicedSum(final AuftragDO order)
+  {
+    if (order == null) {
+      return;
+    }
+    if (order.getPositionen() != null) {
+      for (final AuftragsPositionDO pos : order.getPositionen()) {
+        final Set<RechnungsPositionVO> set = rechnungCache.getRechnungsPositionVOSetByAuftragsPositionId(pos.getId());
+        if (set != null) {
+          pos.setFakturiertSum(RechnungDao.getNettoSumme(set));
         }
       }
     }
@@ -352,8 +364,10 @@ public class AuftragDao extends BaseDao<AuftragDO>
       queryFilter.add(Restrictions.eq("auftragsStatus", AuftragsStatus.ABGELEHNT));
     } else if (myFilter.isShowAbgeschlossenNichtFakturiert() == true) {
       queryFilter.createAlias("positionen", "position").add(
-          Restrictions.or(Restrictions.eq("auftragsStatus", AuftragsStatus.ABGESCHLOSSEN), Restrictions.and(Restrictions.eq(
-              "position.status", AuftragsPositionsStatus.ABGESCHLOSSEN), Restrictions.eq("position.vollstaendigFakturiert", false))));
+          Restrictions.or(
+              Restrictions.eq("auftragsStatus", AuftragsStatus.ABGESCHLOSSEN),
+              Restrictions.and(Restrictions.eq("position.status", AuftragsPositionsStatus.ABGESCHLOSSEN),
+                  Restrictions.eq("position.vollstaendigFakturiert", false))));
       vollstaendigFakturiert = false; // Und noch nicht fakturiert.
     } else if (myFilter.isShowAkquise() == true) {
       queryFilter.add(Restrictions.in("auftragsStatus", new AuftragsStatus[] { AuftragsStatus.GELEGT, AuftragsStatus.IN_ERSTELLUNG,
