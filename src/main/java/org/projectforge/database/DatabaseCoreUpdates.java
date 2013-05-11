@@ -92,7 +92,7 @@ public class DatabaseCoreUpdates
           for (final DatabaseResultRow row : rows) {
             final Integer pk = (Integer)row.getEntry("pk").getValue();
             final String oldScript = (String)row.getEntry("old_script").getValue();
-            final String oldScriptBackup = (String)row.getEntry("old_script").getValue();
+            final String oldScriptBackup = (String)row.getEntry("old_script_backup").getValue();
             final ScriptDO script = new ScriptDO();
             script.setScriptAsString(oldScript);
             script.setScriptBackupAsString(oldScriptBackup);
