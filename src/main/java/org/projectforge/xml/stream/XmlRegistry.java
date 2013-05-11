@@ -35,6 +35,7 @@ import java.util.TimeZone;
 import org.projectforge.Version;
 import org.projectforge.xml.stream.converter.BigDecimalConverter;
 import org.projectforge.xml.stream.converter.BooleanConverter;
+import org.projectforge.xml.stream.converter.ByteArrayConverter;
 import org.projectforge.xml.stream.converter.ClassConverter;
 import org.projectforge.xml.stream.converter.DateConverter;
 import org.projectforge.xml.stream.converter.DoubleConverter;
@@ -135,6 +136,7 @@ public class XmlRegistry
     conv = new ShortConverter();
     internalRegisterConverter(Short.class, conv);
     internalRegisterConverter(short.class, conv);
+    internalRegisterConverter(byte[].class, new ByteArrayConverter());
 
     internalRegisterConverter(BigDecimal.class, new BigDecimalConverter());
     internalRegisterConverter(Class.class, new ClassConverter());
