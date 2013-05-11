@@ -34,7 +34,6 @@ import org.projectforge.continuousdb.TableAttribute;
 import org.projectforge.continuousdb.UpdateEntry;
 import org.projectforge.continuousdb.UpdaterConfiguration;
 import org.projectforge.continuousdb.hibernate.TableAttributeHookImpl;
-import org.projectforge.continuousdb.spring.DatabaseExecutorImpl;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -59,14 +58,12 @@ public class MyDatabaseUpdater
         return;
       }
       configuration = new UpdaterConfiguration();
-      configuration.setDialect(HibernateUtils.getDialect());
-      final DatabaseExecutorImpl databaseExecutor = new DatabaseExecutorImpl();
-      databaseExecutor.setDataSource(dataSource);
-      configuration.setDatabaseExecutor(databaseExecutor);
+      configuration.setDialect(HibernateUtils.getDialect()).setDataSource(dataSource);
       final MyDatabaseUpdateDao myDatabaseUpdateDao = new MyDatabaseUpdateDao(configuration);
       myDatabaseUpdateDao.setAccessChecker(accessChecker);
-      TableAttribute.register(new TableAttributeHookImpl());
       configuration.setDatabaseUpdateDao(myDatabaseUpdateDao);
+      TableAttribute.register(new TableAttributeHookImpl());
+
       final SortedSet<UpdateEntry> updateEntries = new TreeSet<UpdateEntry>();
       DatabaseCoreUpdates.dao = myDatabaseUpdateDao;
       updateEntries.addAll(DatabaseCoreUpdates.getUpdateEntries());
