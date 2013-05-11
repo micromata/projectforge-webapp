@@ -29,7 +29,6 @@ import java.util.TreeSet;
 import javax.sql.DataSource;
 
 import org.projectforge.access.AccessChecker;
-import org.projectforge.admin.DatabaseCoreUpdates;
 import org.projectforge.continuousdb.SystemUpdater;
 import org.projectforge.continuousdb.TableAttribute;
 import org.projectforge.continuousdb.UpdateEntry;
@@ -69,7 +68,8 @@ public class MyDatabaseUpdater
       TableAttribute.register(new TableAttributeHookImpl());
       configuration.setDatabaseUpdateDao(myDatabaseUpdateDao);
       final SortedSet<UpdateEntry> updateEntries = new TreeSet<UpdateEntry>();
-      updateEntries.addAll(DatabaseCoreUpdates.getUpdateEntries(this));
+      DatabaseCoreUpdates.dao = myDatabaseUpdateDao;
+      updateEntries.addAll(DatabaseCoreUpdates.getUpdateEntries());
       getSystemUpdater().setUpdateEntries(updateEntries);
     }
   }
