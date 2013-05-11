@@ -23,6 +23,46 @@ function rowClick(row) {
 	suppressRowClick = 'false';
 }
 
+function initAceEditor(editorId, textAreaId) {
+    $(function () {
+        var editor = ace.edit(editorId);
+        editor.setTheme("ace/theme/merbivore");
+        editor.getSession().setMode("ace/mode/groovy");
+        editor.setShowInvisibles(true);
+        editor.setHighlightActiveLine(true);
+        editor.setShowPrintMargin(false);
+        var $el = $('#' + textAreaId);
+        // keep textArea and ace in sync
+        editor.getSession().setValue($el.val());
+        editor.getSession().on('change', function () {
+            $el.val(editor.getSession().getValue());
+        });
+        // hide text area
+        $el.hide();
+        // auto grow
+        var heightUpdateFunction = function () {
+
+            // http://stackoverflow.com/questions/11584061/
+            var newHeight =
+                editor.getSession().getScreenLength()
+                    * editor.renderer.lineHeight
+                    + editor.renderer.scrollBar.getWidth();
+
+            $('#' + editorId).height(newHeight.toString() + "px");
+            // This call is required for the editor to fix all of
+            // its inner structure for adapting to a change in size
+            editor.resize();
+        };
+        // Set initial size to match initial content
+        heightUpdateFunction();
+        // Whenever a change happens inside the ACE editor, update
+        // the size again
+        editor.getSession().on('change', heightUpdateFunction);
+        // set focus
+        editor.focus();
+    });
+}
+
 function rowCheckboxClick(row, event) {
 	if (!event)
 		event = window.event; // For ie.
