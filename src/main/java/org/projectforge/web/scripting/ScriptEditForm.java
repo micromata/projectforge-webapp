@@ -29,15 +29,14 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.scripting.ScriptDO;
 import org.projectforge.scripting.ScriptParameterType;
-import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.dialog.ModalDialog;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridSize;
+import org.projectforge.web.wicket.components.AceEditorPanel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
-import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class ScriptEditForm extends AbstractEditForm<ScriptDO, ScriptEditPage>
@@ -81,8 +80,7 @@ public class ScriptEditForm extends AbstractEditForm<ScriptDO, ScriptEditPage>
     }
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("scripting.script"));
-      final MaxLengthTextArea script = new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "script"));
-      WicketUtils.setHeight(script, 50);
+      final AceEditorPanel script = new AceEditorPanel(fs.newChildId(), new PropertyModel<String>(data, "script"));
       fs.add(script);
       fs.addHelpIcon(getString("fieldNotHistorizable"));
     }
@@ -119,9 +117,7 @@ public class ScriptEditForm extends AbstractEditForm<ScriptDO, ScriptEditPage>
         init(new Form<String>(getFormId()));
         {
           final FieldsetPanel fs = gridBuilder.newFieldset(getString("scripting.scriptBackup")).setLabelSide(false);
-          final String esc = HtmlHelper.escapeHtml(data.getScriptBackup(), true);
-          final DivTextPanel scriptBackup = new DivTextPanel(fs.newChildId(), esc);
-          scriptBackup.getLabel().setEscapeModelStrings(false);
+          final AceEditorPanel scriptBackup = new AceEditorPanel(fs.newChildId(), new PropertyModel<String>(data, "scriptBackup"));
           fs.add(scriptBackup);
         }
       }
