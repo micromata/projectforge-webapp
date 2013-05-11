@@ -21,21 +21,18 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.admin;
+package org.projectforge.database;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.projectforge.address.AddressDO;
-import org.projectforge.continuousdb.DatabaseUpdateDao;
 import org.projectforge.continuousdb.Table;
 import org.projectforge.continuousdb.TableAttribute;
 import org.projectforge.continuousdb.UpdateEntry;
 import org.projectforge.continuousdb.UpdateEntryImpl;
 import org.projectforge.continuousdb.UpdatePreCheckStatus;
 import org.projectforge.continuousdb.UpdateRunningStatus;
-import org.projectforge.database.DatabaseUpdateDO;
-import org.projectforge.database.MyDatabaseUpdater;
 import org.projectforge.fibu.AuftragDO;
 import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.KontoDO;
@@ -58,11 +55,35 @@ public class DatabaseCoreUpdates
 
   private static final String VERSION_5_0 = "5.0";
 
+  static MyDatabaseUpdateDao dao;
+
   @SuppressWarnings("serial")
-  public static List<UpdateEntry> getUpdateEntries(final MyDatabaseUpdater databaseUpdater)
+  public static List<UpdateEntry> getUpdateEntries()
   {
     final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
-    final DatabaseUpdateDao dao = databaseUpdater.getDatabaseUpdateDao();
+    // /////////////////////////////////////////////////////////////////
+    // 5.1
+    // /////////////////////////////////////////////////////////////////
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "5.2", "2013-05-11", "Adds t_script.file{_name}.") {
+      @Override
+      public UpdatePreCheckStatus runPreCheck()
+      {
+        if (dao.doesTableAttributesExist(ScriptDO.class, "file", "file_name") == false) {
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
+        return UpdatePreCheckStatus.ALREADY_UPDATED;
+      }
+
+      @Override
+      public UpdateRunningStatus runUpdate()
+      {
+        if (dao.doesTableAttributesExist(ScriptDO.class, "file", "file_name") == true) {
+          return UpdateRunningStatus.DONE;
+        }
+        return UpdateRunningStatus.DONE;
+      }
+    });
+
     // /////////////////////////////////////////////////////////////////
     // 5.0
     // /////////////////////////////////////////////////////////////////

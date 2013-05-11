@@ -21,7 +21,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.admin;
+package org.projectforge.database;
 
 import org.projectforge.access.AccessEntryDO;
 import org.projectforge.access.GroupTaskAccessDO;
@@ -39,9 +39,6 @@ import org.projectforge.continuousdb.UpdateEntryImpl;
 import org.projectforge.continuousdb.UpdatePreCheckStatus;
 import org.projectforge.continuousdb.UpdateRunningStatus;
 import org.projectforge.core.ConfigurationDO;
-import org.projectforge.database.DatabaseUpdateDO;
-import org.projectforge.database.HibernateUtils;
-import org.projectforge.database.MyDatabaseUpdater;
 import org.projectforge.fibu.AuftragDO;
 import org.projectforge.fibu.AuftragsPositionDO;
 import org.projectforge.fibu.EingangsrechnungDO;
