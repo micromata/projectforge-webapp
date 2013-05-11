@@ -49,11 +49,6 @@ import org.springframework.util.CollectionUtils;
 
 public class ScriptingForm extends AbstractStandardForm<ScriptDO, ScriptingPage>
 {
-  /**
-   * Maximum length of Groovy script for form validation of text area (100.000 characters should be really enough).
-   */
-  public static final int MAX_GROOVY_LENGTH = 100000;
-
   private static final long serialVersionUID = 1868796548657011785L;
 
   protected FileUploadField fileUploadField;
