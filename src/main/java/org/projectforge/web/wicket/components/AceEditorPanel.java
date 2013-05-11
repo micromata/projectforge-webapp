@@ -26,16 +26,18 @@ package org.projectforge.web.wicket.components;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
+import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
 
 /**
  * Panel for source code editor ACE, see http://ace.ajax.org
  * 
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  */
-public class AceEditorPanel extends Panel
+public class AceEditorPanel extends Panel implements ComponentWrapperPanel
 {
   private static final long serialVersionUID = 2090967145721334026L;
 
@@ -61,5 +63,23 @@ public class AceEditorPanel extends Panel
     // init ace editor
     final String script = "$(function() { initAceEditor('" + editor.getMarkupId() + "', '" + textArea.getMarkupId() + "'); });";
     response.render(JavaScriptHeaderItem.forScript(script, null));
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel#getFormComponent()
+   */
+  @Override
+  public FormComponent< ? > getFormComponent()
+  {
+    return textArea;
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel#getComponentOutputId()
+   */
+  @Override
+  public String getComponentOutputId()
+  {
+    return textArea.getMarkupId();
   }
 }
