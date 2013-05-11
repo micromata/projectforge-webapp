@@ -42,7 +42,12 @@ public class TeamCalTestHelper
 
   public static void setup() throws BeansException, IOException
   {
-    PluginTestBase.init("org/projectforge/plugins/teamcal/pluginContext.xml", new TeamCalPlugin());
+    setup(true);
+  }
+
+  public static void setup(final boolean createTestData) throws BeansException, IOException
+  {
+    PluginTestBase.init("org/projectforge/plugins/teamcal/pluginContext.xml", createTestData, new TeamCalPlugin());
   }
 
   public TeamCalDO prepareUsersAndGroups(final String prefix, final AbstractTestBase testBase, final TeamCalDao teamCalDao)
