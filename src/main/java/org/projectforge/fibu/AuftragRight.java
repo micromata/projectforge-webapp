@@ -23,10 +23,13 @@
 
 package org.projectforge.fibu;
 
+import java.util.Date;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.access.AccessException;
 import org.projectforge.access.OperationType;
+import org.projectforge.common.DateHelper;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserGroupCache;
@@ -52,11 +55,11 @@ public class AuftragRight extends UserRightAccessCheck<AuftragDO>
     super(UserRightId.PM_ORDER_BOOK, UserRightCategory.PM, UserRights.FALSE_READONLY_PARTLYREADWRITE_READWRITE);
     initializeUserGroupsRight(UserRights.FALSE_READONLY_PARTLYREADWRITE_READWRITE, UserRights.FIBU_ORGA_PM_GROUPS)
     // All project managers have read-write access:
-    .setAvailableGroupRightValues(ProjectForgeGroup.PROJECT_MANAGER, UserRightValue.PARTLYREADWRITE)
-    // All project assistants have no, read or read-write access:
-    .setAvailableGroupRightValues(ProjectForgeGroup.PROJECT_ASSISTANT, UserRightValue.FALSE, UserRightValue.PARTLYREADWRITE)
-    // Read only access for controlling users:
-    .setReadOnlyForControlling();
+        .setAvailableGroupRightValues(ProjectForgeGroup.PROJECT_MANAGER, UserRightValue.PARTLYREADWRITE)
+        // All project assistants have no, read or read-write access:
+        .setAvailableGroupRightValues(ProjectForgeGroup.PROJECT_ASSISTANT, UserRightValue.FALSE, UserRightValue.PARTLYREADWRITE)
+        // Read only access for controlling users:
+        .setReadOnlyForControlling();
   }
 
   /**
@@ -72,14 +75,15 @@ public class AuftragRight extends UserRightAccessCheck<AuftragDO>
 
   /**
    * Contact persons sehen Aufträge, die ihnen zugeordnet sind und die nicht vollständig fakturiert sind, sonst wie
-   * hasSelectAccess(boolean). <br/>
+   * hasSelectAccess(boolean). Vollständig fakturierte Aufträge sehen die contact persons nur, wenn das Angebotsdatum nicht älter ca. 1,5
+   * Jahre (ca. 500 Tage) ist. <br/>
    * Ebenso sehen Projektmanager und Projektassistenten einen Auftrag analog zu einer Kontaktperson, sofern sie Mitglied der
    * ProjektManagerGroup des zugordneten Projekts sind. <br/>
    * Nur Mitglieder der FINANCE_GROUP dürfen für Aufträge das Flag "vollständig fakturiert" ändern.
    * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
    */
   @Override
-  public boolean hasAccess(final PFUserDO user, final AuftragDO obj, final AuftragDO oldObj, final OperationType operationType)
+  public boolean hasAccess(final PFUserDO user, final AuftragDO obj, final  AuftragDO oldObj, final OperationType operationType)
   {
     final AccessChecker accessChecker = UserRights.getAccessChecker();
     final UserGroupCache userGroupCache = UserRights.getUserGroupCache();
@@ -124,11 +128,22 @@ public class AuftragRight extends UserRightAccessCheck<AuftragDO>
       // No further access checking (but not for users with right PARTLY_READWRITE.
     } else if (obj != null) {
       // User should be a PROJECT_MANAGER or PROJECT_ASSISTANT or user has PARTLYREADWRITE access:
+      boolean hasAccess = false;
       if (accessChecker.userEquals(user, obj.getContactPerson()) == true) {
-        return true;
+        hasAccess = true;
       }
       if (obj.getProjekt() != null && userGroupCache.isUserMemberOfGroup(user.getId(), obj.getProjekt().getProjektManagerGroupId())) {
-        return true;
+        hasAccess = true;
+      }
+      if (hasAccess == true) {
+        if (obj.isVollstaendigFakturiert() == false) {
+          return true;
+        } else if (obj.getAngebotsDatum() != null) {
+          long millis = (new Date()).getTime() - obj.getAngebotsDatum().getTime();
+          if (millis / DateHelper.MILLIS_DAY <= 500) {
+            return true;
+          }
+        }
       }
       return false;
     }
