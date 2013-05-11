@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.projectforge.address.AddressDO;
+import org.projectforge.common.DatabaseDialect;
 import org.projectforge.continuousdb.Table;
 import org.projectforge.continuousdb.TableAttribute;
 import org.projectforge.continuousdb.UpdateEntry;
@@ -62,9 +63,10 @@ public class DatabaseCoreUpdates
   {
     final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
     // /////////////////////////////////////////////////////////////////
-    // 5.1
+    // 5.2
     // /////////////////////////////////////////////////////////////////
-    list.add(new UpdateEntryImpl(CORE_REGION_ID, "5.2", "2013-05-11", "Adds t_script.file{_name} and changes type of t_script.script{_backup} to byte[].") {
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "5.2", "2013-05-11",
+        "Adds t_script.file{_name} and changes type of t_script.script{_backup} to byte[].") {
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
@@ -85,6 +87,14 @@ public class DatabaseCoreUpdates
         dao.renameTableAttribute(scriptTable.getName(), "script", "old_script");
         dao.renameTableAttribute(scriptTable.getName(), "scriptbackup", "old_script_backup");
         dao.addTableAttributes(ScriptDO.class, "script", "scriptBackup");
+        if (dao.getDialect() == DatabaseDialect.PostgreSQL) {
+          dao.execute("update t_script set script=convert_to(old_script, 'UTF8')");
+          dao.execute("update t_script set script_backup=convert_to(old_script_backup, 'UTF8')");
+        } else {
+          // Must be of type HSQLDB (other data-base dialects were not supported at this time).
+          dao.execute("update t_script set script=rawtohex(old_script)");
+          dao.execute("update t_script set script_backup=rawtohex(old_script_backup)");
+        }
         return UpdateRunningStatus.DONE;
       }
     });
