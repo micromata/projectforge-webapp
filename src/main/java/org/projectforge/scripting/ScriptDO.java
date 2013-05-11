@@ -23,6 +23,8 @@
 
 package org.projectforge.scripting;
 
+import java.io.UnsupportedEncodingException;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -31,13 +33,13 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.annotations.Type;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.core.AbstractHistorizableBaseDO;
 import org.projectforge.core.DefaultBaseDO;
-
 
 /**
  * Scripts can be stored and executed by authorized users.
@@ -49,6 +51,8 @@ import org.projectforge.core.DefaultBaseDO;
 @Table(name = "T_SCRIPT")
 public class ScriptDO extends DefaultBaseDO
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ScriptDO.class);
+
   private static final long serialVersionUID = 7069806875752038860L;
 
   public static final int PARAMETER_NAME_MAX_LENGTH = 100;
@@ -57,47 +61,43 @@ public class ScriptDO extends DefaultBaseDO
     AbstractHistorizableBaseDO.putNonHistorizableProperty(ScriptDO.class, "script", "scriptBackup");
   }
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
   private String name; // 255 not null
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
   private String description; // 4000;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
-  private String script; // 100000;
+  private byte[] script;
 
-  private String scriptBackup; // 100000;
+  private byte[] scriptBackup;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private byte[] file;
+
+  private String filename;
+
   private String parameter1Name;
 
   private ScriptParameterType parameter1Type;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
   private String parameter2Name;
 
   private ScriptParameterType parameter2Type;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
   private String parameter3Name;
 
   private ScriptParameterType parameter3Type;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
   private String parameter4Name;
 
   private ScriptParameterType parameter4Type;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
   private String parameter5Name;
 
   private ScriptParameterType parameter5Type;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
   private String parameter6Name;
 
   private ScriptParameterType parameter6Type;
 
+  @Field(index = Index.TOKENIZED, store = Store.NO)
   @Column(length = 255, nullable = false)
   public String getName()
   {
@@ -113,32 +113,124 @@ public class ScriptDO extends DefaultBaseDO
    * Please note: script is not historizable. Therefore there is now history of scripts.
    * @return
    */
-  @Column(length = 100000)
-  public String getScript()
+  @Column
+  @Type(type = "binary")
+  public byte[] getScript()
   {
     return script;
   }
 
-  public void setScript(final String script)
+  private String convert(final byte[] bytes)
+  {
+    if (bytes == null) {
+      return null;
+    }
+    String str = null;
+    try {
+      str = new String(bytes, "UTF-8");
+    } catch (final UnsupportedEncodingException ex) {
+      log.fatal("Exception encountered while convering byte[] to String: " + ex.getMessage(), ex);
+    }
+    return str;
+  }
+
+  private byte[] convert(final String str)
+  {
+    if (str == null) {
+      return null;
+    }
+    byte[] bytes = null;
+    try {
+      bytes = str.getBytes("UTF-8");
+    } catch (final UnsupportedEncodingException ex) {
+      log.fatal("Exception encountered while convering String to bytes: " + ex.getMessage(), ex);
+    }
+    return bytes;
+  }
+
+  public void setScript(final byte[] script)
   {
     this.script = script;
+  }
+
+  @Transient
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  public String getScriptAsString()
+  {
+    return convert(script);
+  }
+
+  public void setScriptAsString(final String script)
+  {
+    this.script = convert(script);
   }
 
   /**
    * Instead of historizing the script the last version of the script after changing it will stored in this field.
    * @return
    */
-  @Column(length = 100000)
-  public String getScriptBackup()
+  @Column(name = "script_backup")
+  @Type(type = "binary")
+  public byte[] getScriptBackup()
   {
     return scriptBackup;
   }
 
-  public void setScriptBackup(final String scriptBackup)
+  public void setScriptBackup(final byte[] scriptBackup)
   {
     this.scriptBackup = scriptBackup;
   }
 
+  @Transient
+  public String getScriptBackupAsString()
+  {
+    return convert(scriptBackup);
+  }
+
+  public void setScriptBackupAsString(final String scriptBackup)
+  {
+    this.scriptBackup = convert(scriptBackup);
+  }
+
+
+  /**
+   * @return the file
+   */
+  @Column
+  @Type(type = "binary")
+  public byte[] getFile()
+  {
+    return file;
+  }
+
+  /**
+   * @param file the file to set
+   * @return this for chaining.
+   */
+  public void setFile(final byte[] file)
+  {
+    this.file = file;
+  }
+
+  /**
+   * @return the filename
+   */
+  @Column(name = "file_name", length = 255)
+  public String getFilename()
+  {
+    return filename;
+  }
+
+  /**
+   * @param filename the filename to set
+   * @return this for chaining.
+   */
+  public void setFilename(final String filename)
+  {
+    this.filename = filename;
+  }
+
+  @Field(index = Index.TOKENIZED, store = Store.NO)
   @Column(length = 4000)
   public String getDescription()
   {
@@ -150,6 +242,7 @@ public class ScriptDO extends DefaultBaseDO
     this.description = description;
   }
 
+  @Field(index = Index.TOKENIZED, store = Store.NO)
   @Column(length = PARAMETER_NAME_MAX_LENGTH)
   public String getParameter1Name()
   {
@@ -173,6 +266,7 @@ public class ScriptDO extends DefaultBaseDO
     this.parameter1Type = parameter1Type;
   }
 
+  @Field(index = Index.TOKENIZED, store = Store.NO)
   @Column(length = PARAMETER_NAME_MAX_LENGTH)
   public String getParameter2Name()
   {
@@ -196,6 +290,7 @@ public class ScriptDO extends DefaultBaseDO
     this.parameter2Type = parameter2Type;
   }
 
+  @Field(index = Index.TOKENIZED, store = Store.NO)
   @Column(length = PARAMETER_NAME_MAX_LENGTH)
   public String getParameter3Name()
   {
@@ -219,6 +314,7 @@ public class ScriptDO extends DefaultBaseDO
     this.parameter3Type = parameter3Type;
   }
 
+  @Field(index = Index.TOKENIZED, store = Store.NO)
   @Column(length = PARAMETER_NAME_MAX_LENGTH)
   public String getParameter4Name()
   {
@@ -242,6 +338,7 @@ public class ScriptDO extends DefaultBaseDO
     this.parameter4Type = parameter4Type;
   }
 
+  @Field(index = Index.TOKENIZED, store = Store.NO)
   @Column(length = PARAMETER_NAME_MAX_LENGTH)
   public String getParameter5Name()
   {
@@ -265,6 +362,7 @@ public class ScriptDO extends DefaultBaseDO
     this.parameter5Type = parameter5Type;
   }
 
+  @Field(index = Index.TOKENIZED, store = Store.NO)
   @Column(length = PARAMETER_NAME_MAX_LENGTH)
   public String getParameter6Name()
   {

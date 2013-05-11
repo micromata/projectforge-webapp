@@ -80,7 +80,7 @@ public class ScriptEditForm extends AbstractEditForm<ScriptDO, ScriptEditPage>
     }
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("scripting.script"));
-      final AceEditorPanel script = new AceEditorPanel(fs.newChildId(), new PropertyModel<String>(data, "script"));
+      final AceEditorPanel script = new AceEditorPanel(fs.newChildId(), new PropertyModel<String>(data, "scriptAsString"));
       fs.add(script);
       fs.addHelpIcon(getString("fieldNotHistorizable"));
     }
@@ -117,7 +117,7 @@ public class ScriptEditForm extends AbstractEditForm<ScriptDO, ScriptEditPage>
         init(new Form<String>(getFormId()));
         {
           final FieldsetPanel fs = gridBuilder.newFieldset(getString("scripting.scriptBackup")).setLabelSide(false);
-          final AceEditorPanel scriptBackup = new AceEditorPanel(fs.newChildId(), new PropertyModel<String>(data, "scriptBackup"));
+          final AceEditorPanel scriptBackup = new AceEditorPanel(fs.newChildId(), new PropertyModel<String>(data, "scriptBackupAsString"));
           fs.add(scriptBackup);
         }
       }

@@ -51,7 +51,7 @@ public class ScriptEditPage extends AbstractEditPage<ScriptDO, ScriptEditForm, S
   {
     super(parameters, "scripting");
     init();
-    if (StringUtils.isNotEmpty(form.getData().getScriptBackup()) == true) {
+    if (StringUtils.isNotEmpty(form.getData().getScriptBackupAsString()) == true) {
       // Show backup script button:
       final AjaxLink<Void> showBackupScriptButton = new AjaxLink<Void>(ContentMenuEntryPanel.LINK_ID) {
         @Override

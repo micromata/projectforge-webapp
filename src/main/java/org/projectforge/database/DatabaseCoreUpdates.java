@@ -64,11 +64,11 @@ public class DatabaseCoreUpdates
     // /////////////////////////////////////////////////////////////////
     // 5.1
     // /////////////////////////////////////////////////////////////////
-    list.add(new UpdateEntryImpl(CORE_REGION_ID, "5.2", "2013-05-11", "Adds t_script.file{_name}.") {
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "5.2", "2013-05-11", "Adds t_script.file{_name} and changes type of t_script.script{_backup} to byte[].") {
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        if (dao.doesTableAttributesExist(ScriptDO.class, "file", "file_name") == false) {
+        if (dao.doesTableAttributesExist(ScriptDO.class, "file", "filename") == false) {
           return UpdatePreCheckStatus.READY_FOR_UPDATE;
         }
         return UpdatePreCheckStatus.ALREADY_UPDATED;
@@ -77,9 +77,14 @@ public class DatabaseCoreUpdates
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        if (dao.doesTableAttributesExist(ScriptDO.class, "file", "file_name") == true) {
+        if (dao.doesTableAttributesExist(ScriptDO.class, "file", "filename") == true) {
           return UpdateRunningStatus.DONE;
         }
+        dao.addTableAttributes(ScriptDO.class, "file", "filename");
+        final Table scriptTable = new Table(ScriptDO.class);
+        dao.renameTableAttribute(scriptTable.getName(), "script", "old_script");
+        dao.renameTableAttribute(scriptTable.getName(), "scriptbackup", "old_script_backup");
+        dao.addTableAttributes(ScriptDO.class, "script", "scriptBackup");
         return UpdateRunningStatus.DONE;
       }
     });

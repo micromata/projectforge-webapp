@@ -23,6 +23,7 @@
 
 package org.projectforge.scripting;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +67,7 @@ public class ScriptDao extends BaseDao<ScriptDO>
   @Override
   protected void onChange(final ScriptDO obj, final ScriptDO dbObj)
   {
-    if (StringUtils.equals(dbObj.getScript(), obj.getScript()) == false) {
+    if (Arrays.equals(dbObj.getScript(), obj.getScript()) == false) {
       obj.setScriptBackup(dbObj.getScript());
     }
   }
@@ -76,7 +77,8 @@ public class ScriptDao extends BaseDao<ScriptDO>
    * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
    */
   @Override
-  public boolean hasAccess(final PFUserDO user, final ScriptDO obj, final ScriptDO oldObj, final OperationType operationType, final boolean throwException)
+  public boolean hasAccess(final PFUserDO user, final ScriptDO obj, final ScriptDO oldObj, final OperationType operationType,
+      final boolean throwException)
   {
     return accessChecker.isUserMemberOfGroup(user, throwException, ProjectForgeGroup.CONTROLLING_GROUP, ProjectForgeGroup.FINANCE_GROUP);
   }
@@ -101,7 +103,7 @@ public class ScriptDao extends BaseDao<ScriptDO>
         scriptVariables.put(param.getParameterName(), param.getValue());
       }
     }
-    groovyResult = groovyExecutor.execute(new GroovyResult(), script.getScript(), scriptVariables);
+    groovyResult = groovyExecutor.execute(new GroovyResult(), script.getScriptAsString(), scriptVariables);
     return groovyResult;
   }
 
@@ -117,7 +119,7 @@ public class ScriptDao extends BaseDao<ScriptDO>
     scriptVariables.put("reportList", null);
     scriptVariables.put("taskTree", new ScriptingTaskTree(taskTree));
     for (final RegistryEntry entry : Registry.instance().getOrderedList()) {
-      final ScriptingDao<?> scriptingDao = entry.getScriptingDao();
+      final ScriptingDao< ? > scriptingDao = entry.getScriptingDao();
       if (scriptingDao != null) {
         final String varName = StringUtils.uncapitalize(entry.getId());
         scriptVariables.put(varName + "Dao", scriptingDao);

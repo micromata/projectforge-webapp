@@ -138,7 +138,7 @@ public class ScriptExecutePage extends AbstractStandardFormPage implements ISele
 
   protected void refreshSourceCode()
   {
-    sourceCodePanel.setCode(getScript().getScript(), groovyResult);
+    sourceCodePanel.setCode(getScript().getScriptAsString(), groovyResult);
   }
 
   protected ScriptDO loadScript()
