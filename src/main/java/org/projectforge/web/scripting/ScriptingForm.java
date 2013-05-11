@@ -38,8 +38,7 @@ import org.projectforge.scripting.ScriptDO;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.fibu.ReportScriptingStorage;
 import org.projectforge.web.wicket.AbstractStandardForm;
-import org.projectforge.web.wicket.WicketUtils;
-import org.projectforge.web.wicket.components.MaxLengthTextArea;
+import org.projectforge.web.wicket.components.AceEditorPanel;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
@@ -111,10 +110,8 @@ public class ScriptingForm extends AbstractStandardForm<ScriptDO, ScriptingPage>
     }
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.groovyScript"));
-      final MaxLengthTextArea textArea = new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(this, "groovyScript"),
-          MAX_GROOVY_LENGTH);
-      WicketUtils.setFocus(textArea);
-      fs.add(textArea).setAutogrow(50, 500);
+      final AceEditorPanel textArea = new AceEditorPanel(fs.newChildId(), new PropertyModel<String>(this, "groovyScript"));
+      fs.add(textArea);
     }
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.groovy.result")).suppressLabelForWarning();
