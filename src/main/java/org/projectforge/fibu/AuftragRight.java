@@ -55,11 +55,11 @@ public class AuftragRight extends UserRightAccessCheck<AuftragDO>
     super(UserRightId.PM_ORDER_BOOK, UserRightCategory.PM, UserRights.FALSE_READONLY_PARTLYREADWRITE_READWRITE);
     initializeUserGroupsRight(UserRights.FALSE_READONLY_PARTLYREADWRITE_READWRITE, UserRights.FIBU_ORGA_PM_GROUPS)
     // All project managers have read-write access:
-        .setAvailableGroupRightValues(ProjectForgeGroup.PROJECT_MANAGER, UserRightValue.PARTLYREADWRITE)
-        // All project assistants have no, read or read-write access:
-        .setAvailableGroupRightValues(ProjectForgeGroup.PROJECT_ASSISTANT, UserRightValue.FALSE, UserRightValue.PARTLYREADWRITE)
-        // Read only access for controlling users:
-        .setReadOnlyForControlling();
+    .setAvailableGroupRightValues(ProjectForgeGroup.PROJECT_MANAGER, UserRightValue.PARTLYREADWRITE)
+    // All project assistants have no, read or read-write access:
+    .setAvailableGroupRightValues(ProjectForgeGroup.PROJECT_ASSISTANT, UserRightValue.FALSE, UserRightValue.PARTLYREADWRITE)
+    // Read only access for controlling users:
+    .setReadOnlyForControlling();
   }
 
   /**
@@ -75,8 +75,8 @@ public class AuftragRight extends UserRightAccessCheck<AuftragDO>
 
   /**
    * Contact persons sehen Aufträge, die ihnen zugeordnet sind und die nicht vollständig fakturiert sind, sonst wie
-   * hasSelectAccess(boolean). Vollständig fakturierte Aufträge sehen die contact persons nur, wenn das Angebotsdatum nicht älter ca. 1,5
-   * Jahre (ca. 500 Tage) ist. <br/>
+   * hasSelectAccess(boolean). Vollständig fakturierte Aufträge sehen die contact persons nur, wenn das Angebotsdatum nicht älter ca. 5
+   * Jahre (ca. 1800 Tage) ist. <br/>
    * Ebenso sehen Projektmanager und Projektassistenten einen Auftrag analog zu einer Kontaktperson, sofern sie Mitglied der
    * ProjektManagerGroup des zugordneten Projekts sind. <br/>
    * Nur Mitglieder der FINANCE_GROUP dürfen für Aufträge das Flag "vollständig fakturiert" ändern.
@@ -139,8 +139,8 @@ public class AuftragRight extends UserRightAccessCheck<AuftragDO>
         if (obj.isVollstaendigFakturiert() == false) {
           return true;
         } else if (obj.getAngebotsDatum() != null) {
-          long millis = (new Date()).getTime() - obj.getAngebotsDatum().getTime();
-          if (millis / DateHelper.MILLIS_DAY <= 500) {
+          final long millis = (new Date()).getTime() - obj.getAngebotsDatum().getTime();
+          if (millis / DateHelper.MILLIS_DAY <= 1800) {
             return true;
           }
         }
