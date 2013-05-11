@@ -369,9 +369,13 @@ public class WicketApplication extends WebApplication implements WicketApplicati
 
     final boolean missingDatabaseSchema = initDatabaseDao.isEmpty();
     if (missingDatabaseSchema == true) {
-      PFUserContext.setUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser());
-      final UpdateEntry updateEntry = DatabaseCoreInitial.getInitializationUpdateEntry(myDatabaseUpdater);
-      updateEntry.runUpdate();
+      try {
+        PFUserContext.setUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser());
+        final UpdateEntry updateEntry = DatabaseCoreInitial.getInitializationUpdateEntry(myDatabaseUpdater);
+        updateEntry.runUpdate();
+      } finally {
+        PFUserContext.setUser(null);
+      }
     }
 
     final ServletContext servletContext = getServletContext();
@@ -441,12 +445,15 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     log.info("plugin cronJobs are initialized.");
     log.info(AppVersion.APP_ID + " " + AppVersion.NUMBER + " (" + AppVersion.RELEASE_TIMESTAMP + ") initialized.");
 
-    PFUserContext.setUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser()); // Logon admin user.
-    if (myDatabaseUpdater.getSystemUpdater().isUpdated() == false) {
-      // Force redirection to update page:
-      UserFilter.setUpdateRequiredFirst(true);
+    try {
+      PFUserContext.setUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser()); // Logon admin user.
+      if (myDatabaseUpdater.getSystemUpdater().isUpdated() == false) {
+        // Force redirection to update page:
+        UserFilter.setUpdateRequiredFirst(true);
+      }
+    } finally {
+      PFUserContext.setUser(null);
     }
-    PFUserContext.setUser(null);
     UserXmlPreferencesCache.setInternalInstance(userXmlPreferencesCache);
     LoginHandler loginHandler;
     if (StringUtils.isNotBlank(configXml.getLoginHandlerClass()) == true) {
@@ -488,7 +495,12 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     log.info("Syncing all user preferences to database.");
     userXmlPreferencesCache.forceReload();
     cronSetup.shutdown();
-    myDatabaseUpdater.getDatabaseUpdateDao().shutdownDatabase();
+    try {
+      PFUserContext.setUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser());
+      myDatabaseUpdater.getDatabaseUpdateDao().shutdownDatabase();
+    } finally {
+      PFUserContext.setUser(null);
+    }
     log.info("Destroyed");
   }
 
