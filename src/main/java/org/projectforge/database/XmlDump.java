@@ -50,6 +50,7 @@ import java.util.zip.GZIPOutputStream;
 import javax.persistence.Transient;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.Validate;
@@ -515,6 +516,12 @@ public class XmlDump
               log.error("Field '" + field.getName() + "': value 1 '" + fieldValue1 + "' is different from value 2 '" + fieldValue2 + "'.");
             }
             return false;
+          }
+        } else if (fieldValue1.getClass().isArray() == true) {
+          if (ArrayUtils.isEquals( fieldValue1, fieldValue2) == false) {
+            if (logDifference == true) {
+              log.error("Field '" + field.getName() + "': value 1 '" + fieldValue1 + "' is different from value 2 '" + fieldValue2 + "'.");
+            }
           }
         } else if (ObjectUtils.equals(fieldValue2, fieldValue1) == false) {
           if (logDifference == true) {
