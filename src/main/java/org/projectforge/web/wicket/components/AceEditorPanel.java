@@ -26,7 +26,6 @@ package org.projectforge.web.wicket.components;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
@@ -38,27 +37,29 @@ import org.apache.wicket.model.IModel;
  */
 public class AceEditorPanel extends Panel
 {
+  private static final long serialVersionUID = 2090967145721334026L;
 
-  private WebMarkupContainer editor;
-  private TextArea textArea;
+  private final WebMarkupContainer editor;
 
-  public AceEditorPanel(String id, IModel<String> model)
+  private final TextArea<String> textArea;
+
+  public AceEditorPanel(final String id, final IModel<String> model)
   {
     super(id, model);
     editor = new WebMarkupContainer("editor");
     editor.setOutputMarkupId(true);
-    textArea = new TextArea("textArea", model);
+    textArea = new TextArea<String>("textArea", model);
     textArea.setOutputMarkupId(true);
     add(textArea);
     add(editor);
   }
 
   @Override
-  public void renderHead(IHeaderResponse response)
+  public void renderHead(final IHeaderResponse response)
   {
     super.renderHead(response);
     // init ace editor
-    String script = "$(function() { initAceEditor('" + editor.getMarkupId() + "', '" + textArea.getMarkupId() + "'); });";
+    final String script = "$(function() { initAceEditor('" + editor.getMarkupId() + "', '" + textArea.getMarkupId() + "'); });";
     response.render(JavaScriptHeaderItem.forScript(script, null));
   }
 }
