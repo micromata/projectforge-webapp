@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.projectforge.address.AddressDO;
-import org.projectforge.common.DatabaseDialect;
+import org.projectforge.continuousdb.DatabaseResultRow;
 import org.projectforge.continuousdb.Table;
 import org.projectforge.continuousdb.TableAttribute;
 import org.projectforge.continuousdb.UpdateEntry;
@@ -87,13 +87,17 @@ public class DatabaseCoreUpdates
         dao.renameTableAttribute(scriptTable.getName(), "script", "old_script");
         dao.renameTableAttribute(scriptTable.getName(), "scriptbackup", "old_script_backup");
         dao.addTableAttributes(ScriptDO.class, "script", "scriptBackup");
-        if (dao.getDialect() == DatabaseDialect.PostgreSQL) {
-          dao.execute("update t_script set script=convert_to(old_script, 'UTF8')");
-          dao.execute("update t_script set script_backup=convert_to(old_script_backup, 'UTF8')");
-        } else {
-          // Must be of type HSQLDB (other data-base dialects were not supported at this time).
-          dao.execute("update t_script set script=rawtohex(old_script)");
-          dao.execute("update t_script set script_backup=rawtohex(old_script_backup)");
+        final List<DatabaseResultRow> rows = dao.query("select pk, old_script, old_script_backup from t_script");
+        if (rows != null) {
+          for (final DatabaseResultRow row : rows) {
+            final Integer pk = (Integer)row.getEntry("pk").getValue();
+            final String oldScript = (String)row.getEntry("old_script").getValue();
+            final String oldScriptBackup = (String)row.getEntry("old_script").getValue();
+            final ScriptDO script = new ScriptDO();
+            script.setScriptAsString(oldScript);
+            script.setScriptBackupAsString(oldScriptBackup);
+            dao.update("update t_script set script=?,  script_backup=? where pk=?", script.getScript(), script.getScriptBackup(), pk);
+          }
         }
         return UpdateRunningStatus.DONE;
       }
