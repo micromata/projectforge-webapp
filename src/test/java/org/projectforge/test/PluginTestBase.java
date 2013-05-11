@@ -44,15 +44,30 @@ public class PluginTestBase extends AbstractTestBase
 {
   public static void init(final String additionalContextFile, final AbstractPlugin... plugins) throws BeansException, IOException
   {
-    init(new String[] { additionalContextFile}, plugins);
+    init(additionalContextFile, true, plugins);
+  }
+
+  public static void init(final String additionalContextFile, final boolean createTestData, final AbstractPlugin... plugins) throws BeansException, IOException
+  {
+    init(new String[] { additionalContextFile}, createTestData, plugins);
   }
 
   public static void init(final AbstractPlugin... plugins) throws BeansException, IOException
+  {
+    init(true, plugins);
+  }
+
+  public static void init(final boolean createTestData, final AbstractPlugin... plugins) throws BeansException, IOException
   {
     init((String[]) null, plugins);
   }
 
   public static void init(final String[] additionalContextFiles, final AbstractPlugin... plugins) throws BeansException, IOException
+  {
+    init(additionalContextFiles, true, plugins);
+  }
+
+  public static void init(final String[] additionalContextFiles, final boolean createTestData, final AbstractPlugin... plugins) throws BeansException, IOException
   {
     final List<String> persistentEntries = new ArrayList<String>();
     final PluginsRegistry pluginsRegistry = PluginsRegistry.instance();
@@ -73,7 +88,7 @@ public class PluginTestBase extends AbstractTestBase
       ArrayUtils.reverse(entries);
       tablesToDeleteAfterTests = entries;
     }
-    init(true);
+    init(createTestData);
   }
 
 }
