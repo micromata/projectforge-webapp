@@ -29,6 +29,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectforge.database.xstream.XStreamSavingConverter;
+import org.projectforge.plugins.teamcal.TeamCalTestHelper;
 import org.projectforge.test.TestBase;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
@@ -62,7 +63,7 @@ public class XmlDumpTestFork extends TestBase
   public static void setUp() throws Exception
   {
     preInit();
-    init(false);
+    TeamCalTestHelper.setup(false);
   }
 
   @Test
