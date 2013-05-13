@@ -160,6 +160,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
     // Create Admin user
     final PFUserDO admin = new PFUserDO();
     admin.setUsername(adminUsername);
+    admin.setLocalUser(true);
     admin.setLastname("Administrator");
     admin.setPassword(encryptedAdminPassword);
     admin.setDescription("ProjectForge administrator");
@@ -222,6 +223,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
       log.error("Initialization of database failed. Perhaps caused by corrupted init-test-data.xml.gz.");
     } else {
       user.setUsername(adminUsername);
+      user.setLocalUser(true);
       if (encryptedAdminPassword != null) {
         // Should only be null for test cases.
         user.setPassword(encryptedAdminPassword);
