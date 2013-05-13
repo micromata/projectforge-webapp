@@ -403,11 +403,16 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     pluginsRegistry.set(myDatabaseUpdater.getSystemUpdater());
     pluginsRegistry.initialize();
     if (missingDatabaseSchema == true) {
-      for (final AbstractPlugin plugin : pluginsRegistry.getPlugins()) {
-        final UpdateEntry updateEntry = plugin.getInitializationUpdateEntry();
-        if (updateEntry != null) {
-          updateEntry.runUpdate();
+      try {
+        PFUserContext.setUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser()); // Logon admin user.
+        for (final AbstractPlugin plugin : pluginsRegistry.getPlugins()) {
+          final UpdateEntry updateEntry = plugin.getInitializationUpdateEntry();
+          if (updateEntry != null) {
+            updateEntry.runUpdate();
+          }
         }
+      } finally {
+        PFUserContext.setUser(null);
       }
     }
 
