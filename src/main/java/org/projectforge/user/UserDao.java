@@ -180,10 +180,24 @@ public class UserDao extends BaseDao<PFUserDO>
     return null;
   }
 
+  /**
+   * @see org.projectforge.core.BaseDao#afterSave(org.projectforge.core.ExtendedBaseDO)
+   */
   @Override
-  protected void afterSaveOrModify(final PFUserDO user)
+  protected void afterSave(final PFUserDO obj)
   {
     userGroupCache.setExpired();
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDao#afterUpdate(org.projectforge.core.ExtendedBaseDO, org.projectforge.core.ExtendedBaseDO, boolean)
+   */
+  @Override
+  protected void afterUpdate(final PFUserDO obj, final PFUserDO dbObj, final boolean isModified)
+  {
+    if (isModified == true) {
+      userGroupCache.setExpired();
+    }
   }
 
   /**
@@ -191,6 +205,15 @@ public class UserDao extends BaseDao<PFUserDO>
    */
   @Override
   protected void afterDelete(final PFUserDO obj)
+  {
+    userGroupCache.setExpired();
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDao#afterUndelete(org.projectforge.core.ExtendedBaseDO)
+   */
+  @Override
+  protected void afterUndelete(final PFUserDO obj)
   {
     userGroupCache.setExpired();
   }
@@ -526,7 +549,7 @@ public class UserDao extends BaseDao<PFUserDO>
    */
   public String decrypt(final Integer userId, final String encryptedString)
   {
-    //final PFUserDO user = userGroupCache.getUser(userId); // for faster access (due to permanent usage e. g. by subscription of calendars
+    // final PFUserDO user = userGroupCache.getUser(userId); // for faster access (due to permanent usage e. g. by subscription of calendars
     // (ics).
     final String authenticationToken = StringUtils.rightPad(getCachedAuthenticationToken(userId), 32, "x");
     return Crypt.decrypt(authenticationToken, encryptedString);
