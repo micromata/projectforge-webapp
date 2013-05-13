@@ -24,6 +24,7 @@
 package org.projectforge.fibu;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -40,9 +41,11 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.search.annotations.ClassBridge;
+import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.ShortDisplayNameCapable;
@@ -88,6 +91,14 @@ public class AuftragsPositionDO extends DefaultBaseDO implements ShortDisplayNam
   private BigDecimal fakturiertSum = null;
 
   private boolean vollstaendigFakturiert;
+
+  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @DateBridge(resolution = Resolution.DAY)
+  private Date timeOfPerformanceBegin;
+
+  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @DateBridge(resolution = Resolution.DAY)
+  private Date timeOfPerformanceEnd;
 
   @Transient
   public boolean isAbgeschlossenUndNichtVollstaendigFakturiert()
@@ -277,6 +288,44 @@ public class AuftragsPositionDO extends DefaultBaseDO implements ShortDisplayNam
   }
 
   /**
+   * @return the timeOfPerformanceBegin
+   */
+  @Column(name = "time_of_performance_begin")
+  public Date getTimeOfPerformanceBegin()
+  {
+    return timeOfPerformanceBegin;
+  }
+
+  /**
+   * @param timeOfPerformanceBegin the timeOfPerformanceBegin to set
+   * @return this for chaining.
+   */
+  public AuftragsPositionDO setTimeOfPerformanceBegin(final Date timeOfPerformanceBegin)
+  {
+    this.timeOfPerformanceBegin = timeOfPerformanceBegin;
+    return this;
+  }
+
+  /**
+   * @return the timeOfPerformanceEnd
+   */
+  @Column(name = "time_of_performance_end")
+  public Date getTimeOfPerformanceEnd()
+  {
+    return timeOfPerformanceEnd;
+  }
+
+  /**
+   * @param timeOfPerformanceEnd the timeOfPerformanceEnd to set
+   * @return this for chaining.
+   */
+  public AuftragsPositionDO setTimeOfPerformanceEnd(final Date timeOfPerformanceEnd)
+  {
+    this.timeOfPerformanceEnd = timeOfPerformanceEnd;
+    return this;
+  }
+
+  /**
    * Throws UserException if vollstaendigFakturiert is true and status is not ABGESCHLOSSEN.
    */
   public void checkVollstaendigFakturiert()
@@ -287,10 +336,10 @@ public class AuftragsPositionDO extends DefaultBaseDO implements ShortDisplayNam
   }
 
   @Override
-  public boolean equals(Object o)
+  public boolean equals(final Object o)
   {
     if (o instanceof AuftragsPositionDO) {
-      AuftragsPositionDO other = (AuftragsPositionDO) o;
+      final AuftragsPositionDO other = (AuftragsPositionDO) o;
       if (ObjectUtils.equals(this.getNumber(), other.getNumber()) == false) {
         return false;
       }
@@ -305,7 +354,7 @@ public class AuftragsPositionDO extends DefaultBaseDO implements ShortDisplayNam
   @Override
   public int hashCode()
   {
-    HashCodeBuilder hcb = new HashCodeBuilder();
+    final HashCodeBuilder hcb = new HashCodeBuilder();
     hcb.append(getNumber());
     if (getAuftrag() != null) {
       hcb.append(getAuftrag().getId());
