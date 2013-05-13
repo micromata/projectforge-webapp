@@ -58,7 +58,7 @@ public class ScriptDO extends DefaultBaseDO
   public static final int PARAMETER_NAME_MAX_LENGTH = 100;
 
   static {
-    AbstractHistorizableBaseDO.putNonHistorizableProperty(ScriptDO.class, "script", "scriptBackup");
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(ScriptDO.class, "script", "scriptBackup", "file");
   }
 
   private String name; // 255 not null
