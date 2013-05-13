@@ -96,7 +96,7 @@ public class DatabaseCoreUpdates
             final ScriptDO script = new ScriptDO();
             script.setScriptAsString(oldScript);
             script.setScriptBackupAsString(oldScriptBackup);
-            dao.update("update t_script set script=?,  script_backup=? where pk=?", script.getScript(), script.getScriptBackup(), pk);
+            dao.update("update t_script set script=?, script_backup=? where pk=?", script.getScript(), script.getScriptBackup(), pk);
           }
         }
         return UpdateRunningStatus.DONE;
