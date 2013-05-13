@@ -483,7 +483,6 @@ public class LdapUserDao extends LdapDao<String, LdapUser>
     try {
       ldapConnector.createContext(dn, userPassword);
       log.info("User '" + username + "' (" + dn + ") successfully authenticated.");
-      user = (LdapUser) new LdapUser().setUid(username);
       return user;
     } catch (final Exception ex) {
       log.error("User '" + username + "' (" + dn + ") with invalid credentials.");
