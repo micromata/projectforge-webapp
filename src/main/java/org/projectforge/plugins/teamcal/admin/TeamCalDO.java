@@ -23,6 +23,7 @@
 
 package org.projectforge.plugins.teamcal.admin;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -319,6 +320,7 @@ public class TeamCalDO extends DefaultBaseDO
     this.externalSubscriptionUrl = externalSubscriptionUrl;
   }
 
+  @Basic(fetch = FetchType.LAZY)
   @Column(name = "ext_subscription_calendar_binary")
   @Type(type = "binary")
   public byte[] getExternalSubscriptionCalendarBinary()
