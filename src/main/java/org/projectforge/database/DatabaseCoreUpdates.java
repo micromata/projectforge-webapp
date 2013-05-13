@@ -35,6 +35,7 @@ import org.projectforge.continuousdb.UpdateEntryImpl;
 import org.projectforge.continuousdb.UpdatePreCheckStatus;
 import org.projectforge.continuousdb.UpdateRunningStatus;
 import org.projectforge.fibu.AuftragDO;
+import org.projectforge.fibu.AuftragsPositionDO;
 import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KundeDO;
@@ -65,39 +66,45 @@ public class DatabaseCoreUpdates
     // /////////////////////////////////////////////////////////////////
     // 5.2
     // /////////////////////////////////////////////////////////////////
-    list.add(new UpdateEntryImpl(CORE_REGION_ID, "5.2", "2013-05-11",
-        "Adds t_script.file{_name} and changes type of t_script.script{_backup} to byte[].") {
+    list.add(new UpdateEntryImpl(
+        CORE_REGION_ID,
+        "5.2",
+        "2013-05-13",
+        "Adds t_fibu_auftrag_position.time_of_performance_{start|end}, t_script.file{_name} and changes type of t_script.script{_backup} to byte[].") {
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        if (dao.doesTableAttributesExist(ScriptDO.class, "file", "filename") == false) {
-          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        if (dao.doesTableAttributesExist(ScriptDO.class, "file", "filename") == true
+            && dao.doesTableAttributesExist(AuftragsPositionDO.class, "timeOfPerformanceBegin", "timeOfPerformanceEnd") == true) {
+          return UpdatePreCheckStatus.ALREADY_UPDATED;
         }
-        return UpdatePreCheckStatus.ALREADY_UPDATED;
+        return UpdatePreCheckStatus.READY_FOR_UPDATE;
       }
 
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        if (dao.doesTableAttributesExist(ScriptDO.class, "file", "filename") == true) {
-          return UpdateRunningStatus.DONE;
-        }
-        dao.addTableAttributes(ScriptDO.class, "file", "filename");
-        final Table scriptTable = new Table(ScriptDO.class);
-        dao.renameTableAttribute(scriptTable.getName(), "script", "old_script");
-        dao.renameTableAttribute(scriptTable.getName(), "scriptbackup", "old_script_backup");
-        dao.addTableAttributes(ScriptDO.class, "script", "scriptBackup");
-        final List<DatabaseResultRow> rows = dao.query("select pk, old_script, old_script_backup from t_script");
-        if (rows != null) {
-          for (final DatabaseResultRow row : rows) {
-            final Integer pk = (Integer)row.getEntry("pk").getValue();
-            final String oldScript = (String)row.getEntry("old_script").getValue();
-            final String oldScriptBackup = (String)row.getEntry("old_script_backup").getValue();
-            final ScriptDO script = new ScriptDO();
-            script.setScriptAsString(oldScript);
-            script.setScriptBackupAsString(oldScriptBackup);
-            dao.update("update t_script set script=?, script_backup=? where pk=?", script.getScript(), script.getScriptBackup(), pk);
+        if (dao.doesTableAttributesExist(ScriptDO.class, "file", "filename") == false) {
+          dao.addTableAttributes(ScriptDO.class, "file", "filename");
+          final Table scriptTable = new Table(ScriptDO.class);
+          dao.renameTableAttribute(scriptTable.getName(), "script", "old_script");
+          dao.renameTableAttribute(scriptTable.getName(), "scriptbackup", "old_script_backup");
+          dao.addTableAttributes(ScriptDO.class, "script", "scriptBackup");
+          final List<DatabaseResultRow> rows = dao.query("select pk, old_script, old_script_backup from t_script");
+          if (rows != null) {
+            for (final DatabaseResultRow row : rows) {
+              final Integer pk = (Integer) row.getEntry("pk").getValue();
+              final String oldScript = (String) row.getEntry("old_script").getValue();
+              final String oldScriptBackup = (String) row.getEntry("old_script_backup").getValue();
+              final ScriptDO script = new ScriptDO();
+              script.setScriptAsString(oldScript);
+              script.setScriptBackupAsString(oldScriptBackup);
+              dao.update("update t_script set script=?, script_backup=? where pk=?", script.getScript(), script.getScriptBackup(), pk);
+            }
           }
+        }
+        if (dao.doesTableAttributesExist(AuftragsPositionDO.class, "timeOfPerformanceBegin", "timeOfPerformanceEnd") == false) {
+          dao.addTableAttributes(AuftragsPositionDO.class, "timeOfPerformanceBegin", "timeOfPerformanceEnd");
         }
         return UpdateRunningStatus.DONE;
       }
