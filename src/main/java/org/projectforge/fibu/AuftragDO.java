@@ -191,6 +191,28 @@ public class AuftragDO extends DefaultBaseDO
   }
 
   /**
+   * Adds all net sums of the positions (only ordered positions) and return the total sum.
+   */
+  @Transient
+  public BigDecimal getBeauftragtNettoSumme()
+  {
+    if (positionen == null) {
+      return BigDecimal.ZERO;
+    }
+    BigDecimal sum = BigDecimal.ZERO;
+    for (final AuftragsPositionDO position : positionen) {
+      final BigDecimal nettoSumme = position.getNettoSumme();
+      if (nettoSumme != null
+          && position.getStatus() != null
+          && position.getStatus().isIn(AuftragsPositionsStatus.ABGESCHLOSSEN, AuftragsPositionsStatus.BEAUFTRAGT,
+              AuftragsPositionsStatus.BEAUFTRAGTE_OPTION) == true) {
+        sum = sum.add(nettoSumme);
+      }
+    }
+    return sum;
+  }
+
+  /**
    * Auftragsnummer ist eindeutig und wird fortlaufend erzeugt.
    */
   @Column(unique = true, nullable = false)
@@ -545,6 +567,28 @@ public class AuftragDO extends DefaultBaseDO
   {
     this.fakturiertSum = fakturiertSum;
     return this;
+  }
+
+  @Transient
+  public BigDecimal getZuFakturierenSum()
+  {
+    BigDecimal val = BigDecimal.ZERO;
+    if (positionen != null) {
+      for (final AuftragsPositionDO pos : positionen) {
+        if (pos.getStatus().isIn(AuftragsPositionsStatus.ABGESCHLOSSEN) == true) {
+          BigDecimal net = pos.getNettoSumme();
+          if (net == null) {
+            net = BigDecimal.ZERO;
+          }
+          BigDecimal invoiced = pos.getFakturiertSum();
+          if (invoiced == null) {
+            invoiced = BigDecimal.ZERO;
+          }
+          val = val.add(net).subtract(invoiced);
+        }
+      }
+    }
+    return val;
   }
 
   /**
