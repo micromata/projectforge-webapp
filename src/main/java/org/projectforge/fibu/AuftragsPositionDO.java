@@ -94,11 +94,11 @@ public class AuftragsPositionDO extends DefaultBaseDO implements ShortDisplayNam
 
   @Field(index = Index.UN_TOKENIZED, store = Store.NO)
   @DateBridge(resolution = Resolution.DAY)
-  private Date timeOfPerformanceBegin;
+  private Date periodOfPerformanceBegin;
 
   @Field(index = Index.UN_TOKENIZED, store = Store.NO)
   @DateBridge(resolution = Resolution.DAY)
-  private Date timeOfPerformanceEnd;
+  private Date periodOfPerformanceEnd;
 
   @Transient
   public boolean isAbgeschlossenUndNichtVollstaendigFakturiert()
@@ -290,38 +290,38 @@ public class AuftragsPositionDO extends DefaultBaseDO implements ShortDisplayNam
   /**
    * @return the timeOfPerformanceBegin
    */
-  @Column(name = "time_of_performance_begin")
-  public Date getTimeOfPerformanceBegin()
+  @Column(name = "period_of_performance_begin")
+  public Date getPeriodOfPerformanceBegin()
   {
-    return timeOfPerformanceBegin;
+    return periodOfPerformanceBegin;
   }
 
   /**
-   * @param timeOfPerformanceBegin the timeOfPerformanceBegin to set
+   * @param periodOfPerformanceBegin the periodOfPerformanceBegin to set
    * @return this for chaining.
    */
-  public AuftragsPositionDO setTimeOfPerformanceBegin(final Date timeOfPerformanceBegin)
+  public AuftragsPositionDO setPeriodOfPerformanceBegin(final Date periodOfPerformanceBegin)
   {
-    this.timeOfPerformanceBegin = timeOfPerformanceBegin;
+    this.periodOfPerformanceBegin = periodOfPerformanceBegin;
     return this;
   }
 
   /**
    * @return the timeOfPerformanceEnd
    */
-  @Column(name = "time_of_performance_end")
-  public Date getTimeOfPerformanceEnd()
+  @Column(name = "period_of_performance_end")
+  public Date getPeriodOfPerformanceEnd()
   {
-    return timeOfPerformanceEnd;
+    return periodOfPerformanceEnd;
   }
 
   /**
-   * @param timeOfPerformanceEnd the timeOfPerformanceEnd to set
+   * @param periodOfPerformanceEnd the periodOfPerformanceEnd to set
    * @return this for chaining.
    */
-  public AuftragsPositionDO setTimeOfPerformanceEnd(final Date timeOfPerformanceEnd)
+  public AuftragsPositionDO setPeriodOfPerformanceEnd(final Date periodOfPerformanceEnd)
   {
-    this.timeOfPerformanceEnd = timeOfPerformanceEnd;
+    this.periodOfPerformanceEnd = periodOfPerformanceEnd;
     return this;
   }
 

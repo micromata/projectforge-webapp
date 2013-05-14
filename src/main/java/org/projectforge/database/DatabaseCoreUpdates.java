@@ -75,7 +75,7 @@ public class DatabaseCoreUpdates
       public UpdatePreCheckStatus runPreCheck()
       {
         if (dao.doesTableAttributesExist(ScriptDO.class, "file", "filename") == true
-            && dao.doesTableAttributesExist(AuftragsPositionDO.class, "timeOfPerformanceBegin", "timeOfPerformanceEnd") == true) {
+            && dao.doesTableAttributesExist(AuftragsPositionDO.class, "periodOfPerformanceBegin", "periodOfPerformanceEnd") == true) {
           return UpdatePreCheckStatus.ALREADY_UPDATED;
         }
         return UpdatePreCheckStatus.READY_FOR_UPDATE;
@@ -103,8 +103,8 @@ public class DatabaseCoreUpdates
             }
           }
         }
-        if (dao.doesTableAttributesExist(AuftragsPositionDO.class, "timeOfPerformanceBegin", "timeOfPerformanceEnd") == false) {
-          dao.addTableAttributes(AuftragsPositionDO.class, "timeOfPerformanceBegin", "timeOfPerformanceEnd");
+        if (dao.doesTableAttributesExist(AuftragsPositionDO.class, "periodOfPerformanceBegin", "periodOfPerformanceEnd") == false) {
+          dao.addTableAttributes(AuftragsPositionDO.class, "periodOfPerformanceBegin", "periodOfPerformanceEnd");
         }
         return UpdateRunningStatus.DONE;
       }

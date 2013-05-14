@@ -404,6 +404,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         }
       }
       posGridBuilder.newGridPanel();
+      posGridBuilder.newSplitPanel(GridSize.COL66);
       {
         // Task
         final FieldsetPanel fs = posGridBuilder.newFieldset(getString("task"));
@@ -419,6 +420,19 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         fs.add(taskSelectPanel);
         taskSelectPanel.init();
       }
+      posGridBuilder.newSplitPanel(GridSize.COL33);
+      {
+        // Period of performance
+        final FieldsetPanel fs = posGridBuilder.newFieldset(getString("fibu.periodOfPerformance"));
+        final DatePanel fromDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(position, "periodOfPerformanceBegin"), DatePanelSettings
+            .get().withTargetType(java.sql.Date.class));
+        fs.add(fromDatePanel);
+        fs.add(new DivTextPanel(fs.newChildId(), "-"));
+        final DatePanel endDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(position, "periodOfPerformanceEnd"), DatePanelSettings
+            .get().withTargetType(java.sql.Date.class));
+        fs.add(endDatePanel);
+      }
+      posGridBuilder.newGridPanel();
       {
         // Comment
         final FieldsetPanel fs = posGridBuilder.newFieldset(getString("comment"));
