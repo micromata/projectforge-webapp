@@ -23,6 +23,9 @@
 
 package org.projectforge.web.wicket.components;
 
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.AjaxSelfUpdatingTimerBehavior;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -30,6 +33,7 @@ import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.util.time.Duration;
 import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
 
 /**
@@ -52,6 +56,13 @@ public class AceEditorPanel extends Panel implements ComponentWrapperPanel
     editor.setOutputMarkupId(true);
     textArea = new TextArea<String>("textArea", model);
     textArea.setOutputMarkupId(true);
+    textArea.add(new AjaxFormComponentUpdatingBehavior("timerchange") { // event is thrown through JS
+      @Override
+      protected void onUpdate(AjaxRequestTarget target) {
+        // java model is updated now
+        onIdleModelUpdate();
+      }
+    });
     add(textArea);
     add(editor);
   }
@@ -81,5 +92,12 @@ public class AceEditorPanel extends Panel implements ComponentWrapperPanel
   public String getComponentOutputId()
   {
     return textArea.getMarkupId();
+  }
+
+  /**
+   * Hook method which is called, when the editor makes an "auto save" triggered through idle time of the user
+   */
+  protected void onIdleModelUpdate() {
+    // default implementation is empty
   }
 }
