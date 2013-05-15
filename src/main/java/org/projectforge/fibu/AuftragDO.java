@@ -575,17 +575,18 @@ public class AuftragDO extends DefaultBaseDO
     BigDecimal val = BigDecimal.ZERO;
     if (positionen != null) {
       for (final AuftragsPositionDO pos : positionen) {
-        if (pos.getStatus().isIn(AuftragsPositionsStatus.ABGESCHLOSSEN) == true) {
-          BigDecimal net = pos.getNettoSumme();
-          if (net == null) {
-            net = BigDecimal.ZERO;
-          }
-          BigDecimal invoiced = pos.getFakturiertSum();
-          if (invoiced == null) {
-            invoiced = BigDecimal.ZERO;
-          }
-          val = val.add(net).subtract(invoiced);
+        if (pos.getStatus() == null || pos.getStatus().isIn(AuftragsPositionsStatus.ABGESCHLOSSEN) == false) {
+          continue;
         }
+        BigDecimal net = pos.getNettoSumme();
+        if (net == null) {
+          net = BigDecimal.ZERO;
+        }
+        BigDecimal invoiced = pos.getFakturiertSum();
+        if (invoiced == null) {
+          invoiced = BigDecimal.ZERO;
+        }
+        val = val.add(net).subtract(invoiced);
       }
     }
     return val;
