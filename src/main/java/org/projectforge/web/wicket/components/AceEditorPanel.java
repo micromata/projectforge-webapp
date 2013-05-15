@@ -60,6 +60,7 @@ public class AceEditorPanel extends Panel implements ComponentWrapperPanel
       @Override
       protected void onUpdate(AjaxRequestTarget target) {
         // java model is updated now
+        onIdleModelUpdate();
       }
     });
     add(textArea);
@@ -91,5 +92,12 @@ public class AceEditorPanel extends Panel implements ComponentWrapperPanel
   public String getComponentOutputId()
   {
     return textArea.getMarkupId();
+  }
+
+  /**
+   * Hook method which is called, when the editor makes an "auto save" triggered through idle time of the user
+   */
+  protected void onIdleModelUpdate() {
+    // default implementation is empty
   }
 }

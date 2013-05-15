@@ -46,7 +46,7 @@ function initAceEditor(editorId, textAreaId) {
             if(timeout != null) {
               clearTimeout(timeout);
             }
-            timeout = setTimeout(updateBackend, 20000); // 20 seconds timeout
+            timeout = setTimeout(updateBackend, 60000); // 60 seconds timeout
         });
         // hide text area
         $el.hide();
