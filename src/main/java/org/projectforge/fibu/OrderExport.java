@@ -26,6 +26,7 @@ package org.projectforge.fibu;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.projectforge.access.AccessChecker;
@@ -70,15 +71,18 @@ public class OrderExport
 
   private AuftragDao auftragDao;
 
+  private RechnungCache rechnungCache;
+
   private enum Col
   {
-    NUMMER, DATE, ORDER_DATE, STATUS, PROJECT, PROJECT_CUSTOMER, TITLE, NETSUM, INVOICED, TO_BE_INVOICED, COMPLETELY_INVOICED, CONTACT_PERSON, COMMENT;
+    NUMMER, NUMBER_OF_POSITIONS, DATE, ORDER_DATE, STATUS, PROJECT, PROJECT_CUSTOMER, TITLE, NETSUM, INVOICED, TO_BE_INVOICED, COMPLETELY_INVOICED, INVOICES, CONTACT_PERSON, REFERENCE, COMMENT;
   }
 
   protected ExportColumn[] createColumns()
   {
     return new ExportColumn[] { //
         new I18nExportColumn(Col.NUMMER, "fibu.auftrag.nummer.short", XlsContentProvider.LENGTH_ID),
+        new I18nExportColumn(Col.NUMBER_OF_POSITIONS, "fibu.auftrag.positions", XlsContentProvider.LENGTH_ID),
         new I18nExportColumn(Col.DATE, "fibu.auftrag.datum", XlsContentProvider.LENGTH_DATE),
         new I18nExportColumn(Col.ORDER_DATE, "fibu.auftrag.beauftragungsdatum", XlsContentProvider.LENGTH_DATE),
         new I18nExportColumn(Col.STATUS, "status", 10),
@@ -89,13 +93,17 @@ public class OrderExport
         new I18nExportColumn(Col.INVOICED, "fibu.fakturiert", XlsContentProvider.LENGTH_CURRENCY), //
         new I18nExportColumn(Col.TO_BE_INVOICED, "fibu.tobeinvoiced", XlsContentProvider.LENGTH_CURRENCY),
         new I18nExportColumn(Col.COMPLETELY_INVOICED, "fibu.auftrag.vollstaendigFakturiert", XlsContentProvider.LENGTH_BOOLEAN),
-        new I18nExportColumn(Col.CONTACT_PERSON, "contactPerson", XlsContentProvider.LENGTH_COMMENT)};
+        new I18nExportColumn(Col.INVOICES, "fibu.rechnungen", XlsContentProvider.LENGTH_STD),
+        new I18nExportColumn(Col.CONTACT_PERSON, "contactPerson", XlsContentProvider.LENGTH_STD),
+        new I18nExportColumn(Col.REFERENCE, "fibu.common.reference", XlsContentProvider.LENGTH_STD),
+        new I18nExportColumn(Col.COMMENT, "comment", XlsContentProvider.LENGTH_COMMENT)};
   }
 
   protected void addOrderMapping(final PropertyMapping mapping, final AuftragDO order, final Object... params)
   {
     auftragDao.calculateInvoicedSum(order);
     mapping.add(Col.NUMMER, order.getNummer());
+    mapping.add(Col.NUMBER_OF_POSITIONS, "#" + (order.getPositionen() != null ? order.getPositionen().size() : "0"));
     mapping.add(Col.DATE, order.getAngebotsDatum());
     mapping.add(Col.ORDER_DATE, order.getBeauftragungsDatum());
     mapping.add(Col.STATUS, order.getAuftragsStatus() != null ? PFUserContext.getLocalizedString(order.getAuftragsStatus().getI18nKey())
@@ -112,11 +120,24 @@ public class OrderExport
     addCurrency(mapping, Col.INVOICED, invoicedSum);
     addCurrency(mapping, Col.TO_BE_INVOICED, toBeInvoicedSum);
     mapping.add(Col.COMPLETELY_INVOICED, order.isVollstaendigFakturiert() == true ? "x" : "");
+    final Set<RechnungsPositionVO> invoicePositions = rechnungCache.getRechnungsPositionVOSetByAuftragId(order.getId());
+    final StringBuilder sb = new StringBuilder();
+    if (invoicePositions != null) {
+      String delimiter = "";
+      for (final RechnungsPositionVO pos : invoicePositions) {
+        sb.append(delimiter).append(pos.getRechnungNummer());
+        delimiter = ", ";
+      }
+    }
+    mapping.add(Col.INVOICES, sb.toString());
     final PFUserDO contactPerson = Registry.instance().getUserGroupCache().getUser(order.getContactPersonId());
     mapping.add(Col.CONTACT_PERSON, contactPerson != null ? contactPerson.getFullname() : "");
+    mapping.add(Col.REFERENCE, order.getReferenz());
+    mapping.add(Col.COMMENT, order.getBemerkung());
   }
 
-  private void addCurrency(final PropertyMapping mapping, final Col col, final BigDecimal value) {
+  private void addCurrency(final PropertyMapping mapping, final Col col, final BigDecimal value)
+  {
     if (NumberHelper.isNotZero(value) == true) {
       mapping.add(col, value);
     } else {
@@ -172,5 +193,10 @@ public class OrderExport
   public void setAuftragDao(final AuftragDao auftragDao)
   {
     this.auftragDao = auftragDao;
+  }
+
+  public void setRechnungCache(final RechnungCache rechnungCache)
+  {
+    this.rechnungCache = rechnungCache;
   }
 }
