@@ -25,6 +25,7 @@ package org.projectforge.web.fibu;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -38,17 +39,20 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColu
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.common.DateHelper;
 import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.core.NumberFormatter;
 import org.projectforge.fibu.AuftragDO;
 import org.projectforge.fibu.AuftragDao;
 import org.projectforge.fibu.AuftragsPositionDO;
 import org.projectforge.fibu.AuftragsStatus;
+import org.projectforge.fibu.OrderExport;
 import org.projectforge.fibu.RechnungCache;
 import org.projectforge.fibu.RechnungsPositionVO;
 import org.projectforge.web.common.OutputType;
@@ -60,11 +64,13 @@ import org.projectforge.web.wicket.AbstractUnsecureBasePage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.CurrencyPropertyColumn;
+import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 import org.projectforge.web.wicket.RowCssClass;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 @ListPage(editPage = AuftragEditPage.class)
 public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDao, AuftragDO> implements IListPageColumnsCreator<AuftragDO>
@@ -77,11 +83,14 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
   @SpringBean(name = "auftragDao")
   private AuftragDao auftragDao;
 
-  @SpringBean(name = "userFormatter")
-  private UserFormatter userFormatter;
+  @SpringBean(name = "orderExport")
+  private OrderExport orderExport;
 
   @SpringBean(name = "rechnungCache")
   private RechnungCache rechnungCache;
+
+  @SpringBean(name = "userFormatter")
+  private UserFormatter userFormatter;
 
   @SpringBean(name = "taskFormatter")
   private TaskFormatter taskFormatter;
@@ -227,11 +236,28 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
     return columns;
   }
 
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
     dataTable = createDataTable(createColumns(this, true), "nummer", SortOrder.DESCENDING);
     form.add(dataTable);
+    final ContentMenuEntryPanel exportExcelButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
+      @Override
+      public void onClick()
+      {
+        final List<AuftragDO> list = getList();
+        final byte[] xls = orderExport.export(list);
+        if (xls == null || xls.length == 0) {
+          form.addError("datatable.no-records-found");
+          return;
+        }
+        final String filename = "ProjectForge-OrderExport_" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".xls";
+        DownloadUtils.setDownloadTarget(xls, filename);
+      };
+    }, getString("exportAsXls")).setTooltip(getString("tooltip.export.excel"));
+    addContentMenuEntry(exportExcelButton);
+
   }
 
   @Override
