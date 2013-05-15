@@ -51,6 +51,8 @@ public interface ContentProvider
 
   public void putFormat(Enum< ? > col, String dataFormat);
 
+  public void putFormat(String dataFormat, Enum< ? >... cols);
+
   public void putColWidth(int colIdx, int charLength);
 
   public void setColWidths(int... charLengths);

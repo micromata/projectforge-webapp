@@ -47,6 +47,12 @@ public class XlsContentProvider implements ContentProvider
 {
   static final int LENGHT_UNIT = 256;
 
+  public static final String FORMAT_CURRENCY = "#,##0.00;[Red]-#,##0.00";
+
+  public static final int LENGTH_BOOLEAN = 5;
+
+  public static final int LENGTH_COMMENT = 30;
+
   public static final int LENGTH_CURRENCY = 11;
 
   public static final int LENGTH_DATE = 10;
@@ -281,6 +287,13 @@ public class XlsContentProvider implements ContentProvider
   public void putFormat(final Enum< ? > col, final String dataFormat)
   {
     putFormat(col.name(), dataFormat);
+  }
+
+  public void putFormat(final String dataFormat, final Enum< ? >... cols)
+  {
+    for (final Enum< ? > col : cols) {
+      putFormat(col, dataFormat);
+    }
   }
 
   public void putColWidth(final int colIdx, final int charLength)
