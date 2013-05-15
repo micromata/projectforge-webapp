@@ -214,8 +214,8 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
       public void populateItem(final Item<ICellPopulator<AuftragDO>> item, final String componentId, final IModel<AuftragDO> rowModel)
       {
         final AuftragDO auftrag = rowModel.getObject();
-        final Set<RechnungsPositionVO> orderPositions = rechnungCache.getRechnungsPositionVOSetByAuftragId(auftrag.getId());
-        if (CollectionUtils.isEmpty(orderPositions) == true) {
+        final Set<RechnungsPositionVO> invoicePositions = rechnungCache.getRechnungsPositionVOSetByAuftragId(auftrag.getId());
+        if (CollectionUtils.isEmpty(invoicePositions) == true) {
           item.add(AbstractUnsecureBasePage.createInvisibleDummyComponent(componentId));
         } else {
           final InvoicePositionsPanel panel = new InvoicePositionsPanel(componentId) {
@@ -223,7 +223,7 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
             protected void onBeforeRender()
             {
               super.onBeforeRender();
-              init(orderPositions);
+              init(invoicePositions);
             };
           };
           item.add(panel);
