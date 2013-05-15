@@ -80,7 +80,7 @@ public class AdminForm extends AbstractStandardForm<AdminForm, AdminPage>
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.group.title.alertMessage"));
       alertMessage = WicketApplication.getAlertMessage();
 
-      fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(this, "alertMessage"), 1000));
+      fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(this, "alertMessage"), 1000)).setAutogrow();
     }
     {
       final FieldsetPanel fs = gridBuilder.newFieldset("").suppressLabelForWarning();
