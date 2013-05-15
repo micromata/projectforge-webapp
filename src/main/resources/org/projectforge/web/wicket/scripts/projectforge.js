@@ -25,17 +25,28 @@ function rowClick(row) {
 
 function initAceEditor(editorId, textAreaId) {
     $(function () {
+
+        var $el = $('#' + textAreaId);
+
+        var timeout = null;
+        function updateBackend() {
+          $el.trigger("timerchange");
+        }
+
         var editor = ace.edit(editorId);
         editor.setTheme("ace/theme/merbivore");
         editor.getSession().setMode("ace/mode/groovy");
         editor.setShowInvisibles(true);
         editor.setHighlightActiveLine(true);
         editor.setShowPrintMargin(false);
-        var $el = $('#' + textAreaId);
         // keep textArea and ace in sync
         editor.getSession().setValue($el.val());
         editor.getSession().on('change', function () {
             $el.val(editor.getSession().getValue());
+            if(timeout != null) {
+              clearTimeout(timeout);
+            }
+            timeout = setTimeout(updateBackend, 20000); // 20 seconds timeout
         });
         // hide text area
         $el.hide();
