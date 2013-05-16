@@ -142,7 +142,7 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
     columns.add(new CellItemListenerPropertyColumn<AuftragDO>(getString("fibu.kunde"), "kundeAsString", "kundeAsString", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<AuftragDO>(getString("fibu.projekt"), "projekt.name", "projekt.name", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<AuftragDO>(getString("fibu.auftrag.titel"), "titel", "titel", cellItemListener));
-    columns.add(new AbstractColumn<AuftragDO, String>(new Model<String>(getString("fibu.auftrag.positions"))) {
+    columns.add(new AbstractColumn<AuftragDO, String>(new Model<String>(getString("label.position.short"))) {
       public void populateItem(final Item<ICellPopulator<AuftragDO>> cellItem, final String componentId, final IModel<AuftragDO> rowModel)
       {
         final AuftragDO auftrag = rowModel.getObject();
@@ -200,7 +200,7 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
     .add(new CellItemListenerPropertyColumn<AuftragDO>(getString("fibu.common.reference"), "referenz", "referenz", cellItemListener));
     columns.add(new UserPropertyColumn<AuftragDO>(getString("contactPerson"), "contactPerson.fullname", "contactPerson", cellItemListener)
         .withUserFormatter(userFormatter));
-    columns.add(new CellItemListenerPropertyColumn<AuftragDO>(getString("fibu.auftrag.datum"), "angebotsDatum", "angebotsDatum",
+    columns.add(new CellItemListenerPropertyColumn<AuftragDO>(getString("date"), "angebotsDatum", "angebotsDatum",
         cellItemListener));
     // columns
     // .add(new CellItemListenerPropertyColumn<AuftragDO>(new Model<String>(getString("fibu.auftrag.bindungsFrist")), "bindungsFrist",
