@@ -412,7 +412,6 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
           fs.setWarningBackground();
         }
       }
-      posGridBuilder.newGridPanel();
       posGridBuilder.newSplitPanel(GridSize.COL66);
       {
         // Task
