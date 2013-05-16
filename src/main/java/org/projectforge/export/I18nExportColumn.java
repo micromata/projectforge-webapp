@@ -34,7 +34,7 @@ public class I18nExportColumn extends ExportColumn
    */
   public I18nExportColumn(final String name, final String i18nTitle, final int width)
   {
-    super(name, PFUserContext.getLocalizedString(i18nTitle), width);
+    super(name, i18nTitle != null ? PFUserContext.getLocalizedString(i18nTitle) : "", width);
   }
 
   /**
@@ -44,6 +44,6 @@ public class I18nExportColumn extends ExportColumn
    */
   public I18nExportColumn(final Enum< ? > name, final String i18nTitle, final int width)
   {
-    super(name, PFUserContext.getLocalizedString(i18nTitle), width);
+    super(name, i18nTitle != null ? PFUserContext.getLocalizedString(i18nTitle) : "", width);
   }
 }
