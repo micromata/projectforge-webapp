@@ -206,6 +206,7 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
     // .add(new CellItemListenerPropertyColumn<AuftragDO>(new Model<String>(getString("fibu.auftrag.bindungsFrist")), "bindungsFrist",
     // "bindungsFrist", cellItemListener));
     columns.add(new CurrencyPropertyColumn<AuftragDO>(getString("fibu.auftrag.nettoSumme"), "nettoSumme", "nettoSumme", cellItemListener));
+    columns.add(new CurrencyPropertyColumn<AuftragDO>(getString("fibu.auftrag.commissioned"), "beauftragtNettoSumme", "beauftragtNettoSumme", cellItemListener));
     columns.add(new CurrencyPropertyColumn<AuftragDO>(getString("fibu.fakturiert"), "fakturiertSum", "fakturiertSum", cellItemListener)
         .setSuppressZeroValues(true));
     columns
