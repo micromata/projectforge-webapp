@@ -146,7 +146,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Net sum
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.nettoSumme"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.nettoSumme")).suppressLabelForWarning();
       final DivTextPanel netPanel = new DivTextPanel(fs.newChildId(), new Model<String>() {
         @Override
         public String getObject()
@@ -155,8 +155,17 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         }
       }, TextStyle.FORM_TEXT);
       fs.add(netPanel);
-      fs.suppressLabelForWarning();
       ajaxUpdateComponents.add(netPanel.getLabel4Ajax());
+      fs.add(new DivTextPanel(fs.newChildId(), ", " + getString("fibu.auftrag.commissioned") + ": "));
+      final DivTextPanel orderedPanel = new DivTextPanel(fs.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return CurrencyFormatter.format(data.getBeauftragtNettoSumme());
+        }
+      }, TextStyle.FORM_TEXT);
+      fs.add(orderedPanel);
+      ajaxUpdateComponents.add(orderedPanel.getLabel4Ajax());
     }
     gridBuilder.newGridPanel();
     {
@@ -267,8 +276,8 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
     }
     {
       // email
-      gridBuilder.newFieldset(getString("email")).addCheckBox(new PropertyModel<Boolean>(this,
-          "sendEMailNotification"), null).setTooltip(getString("label.sendEMailNotification"));
+      gridBuilder.newFieldset(getString("email")).addCheckBox(new PropertyModel<Boolean>(this, "sendEMailNotification"), null)
+      .setTooltip(getString("label.sendEMailNotification"));
     }
   }
 
@@ -408,8 +417,8 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       {
         // Task
         final FieldsetPanel fs = posGridBuilder.newFieldset(getString("task"));
-        final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs, new PropertyModel<TaskDO>(position, "task"),
-            parentPage, "taskId:" + position.getNumber()) {
+        final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs, new PropertyModel<TaskDO>(position, "task"), parentPage, "taskId:"
+            + position.getNumber()) {
           @Override
           protected void selectTask(final TaskDO task)
           {
@@ -424,12 +433,12 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       {
         // Period of performance
         final FieldsetPanel fs = posGridBuilder.newFieldset(getString("fibu.periodOfPerformance"));
-        final DatePanel fromDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(position, "periodOfPerformanceBegin"), DatePanelSettings
-            .get().withTargetType(java.sql.Date.class));
+        final DatePanel fromDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(position, "periodOfPerformanceBegin"),
+            DatePanelSettings.get().withTargetType(java.sql.Date.class));
         fs.add(fromDatePanel);
         fs.add(new DivTextPanel(fs.newChildId(), "-"));
-        final DatePanel endDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(position, "periodOfPerformanceEnd"), DatePanelSettings
-            .get().withTargetType(java.sql.Date.class));
+        final DatePanel endDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(position, "periodOfPerformanceEnd"),
+            DatePanelSettings.get().withTargetType(java.sql.Date.class));
         fs.add(endDatePanel);
       }
       posGridBuilder.newGridPanel();
