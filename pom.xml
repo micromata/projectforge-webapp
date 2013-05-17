@@ -301,7 +301,6 @@
       <artifactId>jsr173</artifactId>
       <version>1.0</version>
     </dependency>
-    <!-- dependency> <groupId>org.apache.poi</groupId> <artifactId>poi-ooxml</artifactId> <version>3.5-beta4</version> </dependency -->
     <dependency> <!-- Version check: 2010-08-28 -->
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-all</artifactId>
