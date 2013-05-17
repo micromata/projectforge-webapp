@@ -23,8 +23,6 @@
 
 package org.projectforge.export;
 
-import java.util.Date;
-
 import org.apache.commons.lang.BooleanUtils;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.common.DateFormatType;
@@ -32,6 +30,7 @@ import org.projectforge.common.DateFormats;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
 import org.projectforge.excel.CellFormat;
+import org.projectforge.excel.ContentProvider;
 import org.projectforge.excel.ExportWorkbook;
 import org.projectforge.excel.XlsContentProvider;
 
@@ -42,15 +41,21 @@ public class MyXlsContentProvider extends XlsContentProvider
   public static final int LENGTH_USER = 20;
 
   public static final int LENGTH_ZIPCODE = 7;
+  
+  /**
+   * @see org.projectforge.excel.XlsContentProvider#newInstance()
+   */
+  @Override
+  public ContentProvider newInstance()
+  {
+    return new MyXlsContentProvider(this.workbook);
+  }
 
   public MyXlsContentProvider(final ExportWorkbook workbook)
   {
-    super(workbook);
-    putFormat(Date.class, new CellFormat(DateFormats.getExcelFormatString(DateFormatType.TIMESTAMP_MINUTES)));
-    putFormat(java.sql.Date.class, new CellFormat(DateFormats.getExcelFormatString(DateFormatType.DATE)));
-    putFormat(java.sql.Timestamp.class, new CellFormat(DateFormats.getExcelFormatString(DateFormatType.TIMESTAMP_MILLIS)));
-    putFormat(DateHolder.class, new CellFormat("YYYY-MM-DD").setAutoDatePrecision(true)); // format unused.
-    putFormat(DayHolder.class, new CellFormat(DateFormats.getExcelFormatString(DateFormatType.DATE)));
+    super(new MyXlsExportContext(), workbook);
+    defaultFormatMap.put(DateHolder.class, new CellFormat("YYYY-MM-DD").setAutoDatePrecision(true)); // format unused.
+    defaultFormatMap.put(DayHolder.class, new CellFormat(DateFormats.getExcelFormatString(DateFormatType.DATE)));
   }
 
   /**
@@ -72,9 +77,10 @@ public class MyXlsContentProvider extends XlsContentProvider
   @Override
   protected CellFormat getCustomizedCellFormat(final CellFormat format, final Object value)
   {
-    if (value == null
-        || DateHolder.class.isAssignableFrom(value.getClass()) == false
-        || BooleanUtils.isTrue(format.getAutoDatePrecision()) == false) {
+    if (value == null || DateHolder.class.isAssignableFrom(value.getClass()) == false) {
+      return null;
+    }
+    if (format != null && BooleanUtils.isTrue(format.getAutoDatePrecision()) == false) {
       return null;
     }
     // Find a format dependent on the precision:
