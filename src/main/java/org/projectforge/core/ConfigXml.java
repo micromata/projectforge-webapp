@@ -60,6 +60,7 @@ import org.projectforge.common.BeanHelper;
 import org.projectforge.common.FileHelper;
 import org.projectforge.common.StringHelper;
 import org.projectforge.common.TimeNotation;
+import org.projectforge.excel.ExportConfig;
 import org.projectforge.fibu.kost.AccountingConfig;
 import org.projectforge.jira.JiraConfig;
 import org.projectforge.jira.JiraIssueType;
@@ -145,13 +146,9 @@ public class ConfigXml
   @XmlField(asElement = true)
   private int firstDayOfWeek = Calendar.MONDAY;
 
-  private String excelDefaultPaperSize;
-
   private List<ConfigureHoliday> holidays;
 
   private List<ContractType> contractTypes;
-
-  private transient short excelDefaultPaperSizeValue = -42;
 
   private transient File configFile;
 
@@ -237,7 +234,7 @@ public class ConfigXml
     defaultLocale = Locale.ENGLISH;
     defaultTimeNotation = null;
     firstDayOfWeek = Calendar.MONDAY;
-    ExportConfig.getInstance().setExcelDefaultPaperSize("DINA4");
+    ExportConfig.getInstance().setDefaultPaperSize("DINA4");
     holidays = null;
     contractTypes = null;
     databaseDirectory = "database";
@@ -519,11 +516,13 @@ public class ConfigXml
   }
 
   /**
+   * PLEASE NOTE: Don't forget to close the returned InputStream for avoiding leaked resources!!!<br>
    * Tries to get the given filename from the application's resource dir (file system). If not exist, the input stream will be taken as
    * resource input stream.
    * @param filename Filename (can include relative path settings): "test.xsl", "fo-styles/doit.xsl".
    * @return Object[2]: First value is the InputStream and second value is the url in external form.
    */
+  @SuppressWarnings("resource")
   public Object[] getInputStream(final String filename)
   {
     InputStream is = null;
@@ -577,6 +576,8 @@ public class ConfigXml
         result[0] = IOUtils.toString(is, "UTF-8");
       } catch (final IOException ex) {
         log.error(ex.getMessage(), ex);
+      } finally {
+        IOUtils.closeQuietly(is);
       }
     }
     return result;
