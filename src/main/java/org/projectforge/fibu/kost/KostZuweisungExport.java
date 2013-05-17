@@ -39,7 +39,7 @@ import org.projectforge.excel.ExportSheet;
 import org.projectforge.excel.ExportWorkbook;
 import org.projectforge.excel.I18nExportColumn;
 import org.projectforge.excel.PropertyMapping;
-import org.projectforge.excel.XlsContentProvider;
+import org.projectforge.export.MyXlsContentProvider;
 import org.projectforge.fibu.AbstractRechnungDO;
 import org.projectforge.fibu.AbstractRechnungsPositionDO;
 import org.projectforge.fibu.EingangsrechnungDO;
@@ -62,7 +62,7 @@ public class KostZuweisungExport
 {
   public static final KostZuweisungExport instance = new KostZuweisungExport();
 
-  private class MyContentProvider extends XlsContentProvider
+  private class MyContentProvider extends MyXlsContentProvider
   {
     public MyContentProvider(final ExportWorkbook workbook)
     {
@@ -80,15 +80,15 @@ public class KostZuweisungExport
 
   private enum InvoicesCol
   {
-    BRUTTO("fibu.common.brutto", XlsContentProvider.LENGTH_CURRENCY), //
+    BRUTTO("fibu.common.brutto", MyXlsContentProvider.LENGTH_CURRENCY), //
     KONTO("fibu.buchungssatz.konto", 14), //
-    REFERENZ("fibu.common.reference", XlsContentProvider.LENGTH_STD), //
-    DATE("date", XlsContentProvider.LENGTH_DATE), //
+    REFERENZ("fibu.common.reference", MyXlsContentProvider.LENGTH_STD), //
+    DATE("date", MyXlsContentProvider.LENGTH_DATE), //
     GEGENKONTO("fibu.buchungssatz.gegenKonto", 14), //
-    KOST1("fibu.kost1", XlsContentProvider.LENGTH_KOSTENTRAEGER), //
-    KOST2("fibu.kost2", XlsContentProvider.LENGTH_KOSTENTRAEGER), //
-    TEXT("description", XlsContentProvider.LENGTH_EXTRA_LONG), //
-    KORREKTUR("fibu.common.fehlBetrag", XlsContentProvider.LENGTH_CURRENCY);
+    KOST1("fibu.kost1", MyXlsContentProvider.LENGTH_KOSTENTRAEGER), //
+    KOST2("fibu.kost2", MyXlsContentProvider.LENGTH_KOSTENTRAEGER), //
+    TEXT("description", MyXlsContentProvider.LENGTH_EXTRA_LONG), //
+    KORREKTUR("fibu.common.fehlBetrag", MyXlsContentProvider.LENGTH_CURRENCY);
 
     final String theTitle;
 
@@ -221,11 +221,11 @@ public class KostZuweisungExport
   private enum AccountsCol
   {
     NUMBER("fibu.konto.nummer", 16), //
-    NAME("fibu.konto.bezeichnung", XlsContentProvider.LENGTH_STD), //
+    NAME("fibu.konto.bezeichnung", MyXlsContentProvider.LENGTH_STD), //
     STATUS("status", 14), //
-    DATE_OF_LAST_MODIFICATION("lastUpdate", XlsContentProvider.LENGTH_TIMESTAMP), //
-    DATE_OF_CREATION("created", XlsContentProvider.LENGTH_TIMESTAMP), //
-    DESCRIPTION("comment", XlsContentProvider.LENGTH_EXTRA_LONG);
+    DATE_OF_LAST_MODIFICATION("lastUpdate", MyXlsContentProvider.LENGTH_TIMESTAMP), //
+    DATE_OF_CREATION("created", MyXlsContentProvider.LENGTH_TIMESTAMP), //
+    DESCRIPTION("comment", MyXlsContentProvider.LENGTH_EXTRA_LONG);
 
     final String theTitle;
 

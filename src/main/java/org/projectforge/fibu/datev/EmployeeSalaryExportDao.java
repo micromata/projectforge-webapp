@@ -49,7 +49,7 @@ import org.projectforge.excel.ExportRow;
 import org.projectforge.excel.ExportSheet;
 import org.projectforge.excel.ExportWorkbook;
 import org.projectforge.excel.PropertyMapping;
-import org.projectforge.excel.XlsContentProvider;
+import org.projectforge.export.MyXlsContentProvider;
 import org.projectforge.fibu.EmployeeDO;
 import org.projectforge.fibu.EmployeeDao;
 import org.projectforge.fibu.EmployeeFilter;
@@ -79,7 +79,7 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
 
   public static final int GEGENKONTO = 3791;
 
-  private class MyContentProvider extends XlsContentProvider
+  private class MyContentProvider extends MyXlsContentProvider
   {
     public MyContentProvider(final ExportWorkbook workbook)
     {
@@ -124,11 +124,11 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
 
   private enum ExcelColumn
   {
-    KOST1("fibu.kost1", XlsContentProvider.LENGTH_KOSTENTRAEGER), MITARBEITER("fibu.employee", XlsContentProvider.LENGTH_USER), STUNDEN(
-        "hours", XlsContentProvider.LENGTH_DURATION), KOST2("fibu.kost2", XlsContentProvider.LENGTH_KOSTENTRAEGER), BRUTTO_MIT_AG(
-            "fibu.employee.salary.bruttoMitAgAnteil", XlsContentProvider.LENGTH_CURRENCY), KORREKTUR("fibu.common.korrekturWert",
-                XlsContentProvider.LENGTH_CURRENCY), SUMME("sum", XlsContentProvider.LENGTH_CURRENCY), BEZEICHNUNG("description",
-                    XlsContentProvider.LENGTH_EXTRA_LONG), DATUM("date", XlsContentProvider.LENGTH_DATE), KONTO("fibu.buchungssatz.konto", 14), GEGENKONTO(
+    KOST1("fibu.kost1", MyXlsContentProvider.LENGTH_KOSTENTRAEGER), MITARBEITER("fibu.employee", MyXlsContentProvider.LENGTH_USER), STUNDEN(
+        "hours", MyXlsContentProvider.LENGTH_DURATION), KOST2("fibu.kost2", MyXlsContentProvider.LENGTH_KOSTENTRAEGER), BRUTTO_MIT_AG(
+            "fibu.employee.salary.bruttoMitAgAnteil", MyXlsContentProvider.LENGTH_CURRENCY), KORREKTUR("fibu.common.korrekturWert",
+                MyXlsContentProvider.LENGTH_CURRENCY), SUMME("sum", MyXlsContentProvider.LENGTH_CURRENCY), BEZEICHNUNG("description",
+                    MyXlsContentProvider.LENGTH_EXTRA_LONG), DATUM("date", MyXlsContentProvider.LENGTH_DATE), KONTO("fibu.buchungssatz.konto", 14), GEGENKONTO(
                         "fibu.buchungssatz.gegenKonto", 14);
 
     final String theTitle;
@@ -204,7 +204,7 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
     sheet.createFreezePane(0, 1);
 
     final ExportSheet employeeSheet = xls.addSheet(PFUserContext.getLocalizedString("fibu.employee"));
-    employeeSheet.setColumnWidth(0, XlsContentProvider.LENGTH_USER * 256);
+    employeeSheet.setColumnWidth(0, MyXlsContentProvider.LENGTH_USER * 256);
     employeeSheet.setColumnWidth(1, 14 * 256);
     employeeSheet.setColumnWidth(2, 12 * 256);
     employeeSheet.setColumnWidth(3, 12 * 256);

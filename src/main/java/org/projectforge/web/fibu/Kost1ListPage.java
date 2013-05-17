@@ -44,7 +44,7 @@ import org.projectforge.excel.ExportSheet;
 import org.projectforge.excel.ExportWorkbook;
 import org.projectforge.excel.I18nExportColumn;
 import org.projectforge.excel.PropertyMapping;
-import org.projectforge.excel.XlsContentProvider;
+import org.projectforge.export.MyXlsContentProvider;
 import org.projectforge.fibu.kost.Kost1DO;
 import org.projectforge.fibu.kost.Kost1Dao;
 import org.projectforge.user.PFUserContext;
@@ -156,13 +156,13 @@ public class Kost1ListPage extends AbstractListPage<Kost1ListForm, Kost1Dao, Kos
     }
     final String filename = "ProjectForge-Kost1Export_" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".xls";
     final ExportWorkbook xls = new ExportWorkbook();
-    final ContentProvider contentProvider = new XlsContentProvider(xls);
+    final ContentProvider contentProvider = new MyXlsContentProvider(xls);
     xls.setContentProvider(contentProvider);
     final ExportSheet sheet = xls.addSheet(PFUserContext.getLocalizedString("fibu.kost1.kost1s"));
     final ExportColumn[] cols = new ExportColumn[] { //
-        new I18nExportColumn(Col.KOST, "fibu.kost1", XlsContentProvider.LENGTH_KOSTENTRAEGER),
-        new I18nExportColumn(Col.DESCRIPTION, "description", XlsContentProvider.LENGTH_STD),
-        new I18nExportColumn(Col.STATUS, "status", XlsContentProvider.LENGTH_STD)};
+        new I18nExportColumn(Col.KOST, "fibu.kost1", MyXlsContentProvider.LENGTH_KOSTENTRAEGER),
+        new I18nExportColumn(Col.DESCRIPTION, "description", MyXlsContentProvider.LENGTH_STD),
+        new I18nExportColumn(Col.STATUS, "status", MyXlsContentProvider.LENGTH_STD)};
     sheet.setColumns(cols);
     final PropertyMapping mapping = new PropertyMapping();
     for (final Kost1DO kost : kost1List) {

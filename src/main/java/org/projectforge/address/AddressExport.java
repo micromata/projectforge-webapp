@@ -40,7 +40,7 @@ import org.projectforge.excel.ExportSheet;
 import org.projectforge.excel.ExportWorkbook;
 import org.projectforge.excel.I18nExportColumn;
 import org.projectforge.excel.PropertyMapping;
-import org.projectforge.excel.XlsContentProvider;
+import org.projectforge.export.MyXlsContentProvider;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.web.wicket.converter.LanguageConverter;
@@ -52,7 +52,7 @@ import org.projectforge.web.wicket.converter.LanguageConverter;
  */
 public class AddressExport
 {
-  private class MyContentProvider extends XlsContentProvider
+  private class MyContentProvider extends MyXlsContentProvider
   {
     public MyContentProvider(final ExportWorkbook workbook)
     {

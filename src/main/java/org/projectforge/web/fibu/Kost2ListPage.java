@@ -45,7 +45,7 @@ import org.projectforge.excel.ExportSheet;
 import org.projectforge.excel.ExportWorkbook;
 import org.projectforge.excel.I18nExportColumn;
 import org.projectforge.excel.PropertyMapping;
-import org.projectforge.excel.XlsContentProvider;
+import org.projectforge.export.MyXlsContentProvider;
 import org.projectforge.fibu.KostFormatter;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.fibu.kost.Kost2Dao;
@@ -185,17 +185,17 @@ public class Kost2ListPage extends AbstractListPage<Kost2ListForm, Kost2Dao, Kos
     }
     final String filename = "ProjectForge-Kost2Export_" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".xls";
     final ExportWorkbook xls = new ExportWorkbook();
-    final ContentProvider contentProvider = new XlsContentProvider(xls);
+    final ContentProvider contentProvider = new MyXlsContentProvider(xls);
     xls.setContentProvider(contentProvider);
     final ExportSheet sheet = xls.addSheet(PFUserContext.getLocalizedString("fibu.kost2.kost2s"));
     final ExportColumn[] cols = new ExportColumn[] { //
-        new I18nExportColumn(Col.KOST, "fibu.kost2", XlsContentProvider.LENGTH_KOSTENTRAEGER),
-        new I18nExportColumn(Col.ART, "fibu.kost2.art", XlsContentProvider.LENGTH_STD),
+        new I18nExportColumn(Col.KOST, "fibu.kost2", MyXlsContentProvider.LENGTH_KOSTENTRAEGER),
+        new I18nExportColumn(Col.ART, "fibu.kost2.art", MyXlsContentProvider.LENGTH_STD),
         new I18nExportColumn(Col.FAKTURIERT, "fibu.fakturiert", 5),
-        new I18nExportColumn(Col.PROJEKT, "fibu.projekt", XlsContentProvider.LENGTH_STD),
-        new I18nExportColumn(Col.STATUS, "status", XlsContentProvider.LENGTH_STD),
-        new I18nExportColumn(Col.DESCRIPTION, "description", XlsContentProvider.LENGTH_STD),
-        new I18nExportColumn(Col.COMMENT, "comment", XlsContentProvider.LENGTH_STD)};
+        new I18nExportColumn(Col.PROJEKT, "fibu.projekt", MyXlsContentProvider.LENGTH_STD),
+        new I18nExportColumn(Col.STATUS, "status", MyXlsContentProvider.LENGTH_STD),
+        new I18nExportColumn(Col.DESCRIPTION, "description", MyXlsContentProvider.LENGTH_STD),
+        new I18nExportColumn(Col.COMMENT, "comment", MyXlsContentProvider.LENGTH_STD)};
     sheet.setColumns(cols);
     final PropertyMapping mapping = new PropertyMapping();
     for (final Kost2DO kost : kost2List) {

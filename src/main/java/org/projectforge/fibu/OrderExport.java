@@ -39,7 +39,7 @@ import org.projectforge.excel.ExportSheet;
 import org.projectforge.excel.ExportWorkbook;
 import org.projectforge.excel.I18nExportColumn;
 import org.projectforge.excel.PropertyMapping;
-import org.projectforge.excel.XlsContentProvider;
+import org.projectforge.export.MyXlsContentProvider;
 import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
@@ -53,7 +53,7 @@ import org.projectforge.user.PFUserDO;
  */
 public class OrderExport
 {
-  private class MyContentProvider extends XlsContentProvider
+  private class MyContentProvider extends MyXlsContentProvider
   {
     public MyContentProvider(final ExportWorkbook workbook)
     {
@@ -90,22 +90,22 @@ public class OrderExport
   private ExportColumn[] createOrderColumns()
   {
     return new ExportColumn[] { //
-        new I18nExportColumn(OrderCol.NUMMER, "fibu.auftrag.nummer.short", XlsContentProvider.LENGTH_ID),
-        new I18nExportColumn(OrderCol.NUMBER_OF_POSITIONS, "fibu.auftrag.positions", XlsContentProvider.LENGTH_ID),
-        new I18nExportColumn(OrderCol.DATE, "fibu.auftrag.datum", XlsContentProvider.LENGTH_DATE),
-        new I18nExportColumn(OrderCol.ORDER_DATE, "fibu.auftrag.beauftragungsdatum", XlsContentProvider.LENGTH_DATE),
+        new I18nExportColumn(OrderCol.NUMMER, "fibu.auftrag.nummer.short", MyXlsContentProvider.LENGTH_ID),
+        new I18nExportColumn(OrderCol.NUMBER_OF_POSITIONS, "fibu.auftrag.positions", MyXlsContentProvider.LENGTH_ID),
+        new I18nExportColumn(OrderCol.DATE, "fibu.auftrag.datum", MyXlsContentProvider.LENGTH_DATE),
+        new I18nExportColumn(OrderCol.ORDER_DATE, "fibu.auftrag.beauftragungsdatum", MyXlsContentProvider.LENGTH_DATE),
         new I18nExportColumn(OrderCol.STATUS, "status", 10),
-        new I18nExportColumn(OrderCol.PROJECT, "fibu.projekt", XlsContentProvider.LENGTH_STD),
-        new I18nExportColumn(OrderCol.PROJECT_CUSTOMER, "fibu.kunde", XlsContentProvider.LENGTH_STD),
-        new I18nExportColumn(OrderCol.TITLE, "fibu.auftrag.titel", XlsContentProvider.LENGTH_STD),
-        new I18nExportColumn(OrderCol.NETSUM, "fibu.auftrag.nettoSumme", XlsContentProvider.LENGTH_CURRENCY), //
-        new I18nExportColumn(OrderCol.INVOICED, "fibu.fakturiert", XlsContentProvider.LENGTH_CURRENCY), //
-        new I18nExportColumn(OrderCol.TO_BE_INVOICED, "fibu.tobeinvoiced", XlsContentProvider.LENGTH_CURRENCY),
-        new I18nExportColumn(OrderCol.COMPLETELY_INVOICED, "fibu.auftrag.vollstaendigFakturiert", XlsContentProvider.LENGTH_BOOLEAN),
-        new I18nExportColumn(OrderCol.INVOICES, "fibu.rechnungen", XlsContentProvider.LENGTH_STD),
-        new I18nExportColumn(OrderCol.CONTACT_PERSON, "contactPerson", XlsContentProvider.LENGTH_STD),
-        new I18nExportColumn(OrderCol.REFERENCE, "fibu.common.reference", XlsContentProvider.LENGTH_STD),
-        new I18nExportColumn(OrderCol.COMMENT, "comment", XlsContentProvider.LENGTH_COMMENT)};
+        new I18nExportColumn(OrderCol.PROJECT, "fibu.projekt", MyXlsContentProvider.LENGTH_STD),
+        new I18nExportColumn(OrderCol.PROJECT_CUSTOMER, "fibu.kunde", MyXlsContentProvider.LENGTH_STD),
+        new I18nExportColumn(OrderCol.TITLE, "fibu.auftrag.titel", MyXlsContentProvider.LENGTH_STD),
+        new I18nExportColumn(OrderCol.NETSUM, "fibu.auftrag.nettoSumme", MyXlsContentProvider.LENGTH_CURRENCY), //
+        new I18nExportColumn(OrderCol.INVOICED, "fibu.fakturiert", MyXlsContentProvider.LENGTH_CURRENCY), //
+        new I18nExportColumn(OrderCol.TO_BE_INVOICED, "fibu.tobeinvoiced", MyXlsContentProvider.LENGTH_CURRENCY),
+        new I18nExportColumn(OrderCol.COMPLETELY_INVOICED, "fibu.auftrag.vollstaendigFakturiert", MyXlsContentProvider.LENGTH_BOOLEAN),
+        new I18nExportColumn(OrderCol.INVOICES, "fibu.rechnungen", MyXlsContentProvider.LENGTH_STD),
+        new I18nExportColumn(OrderCol.CONTACT_PERSON, "contactPerson", MyXlsContentProvider.LENGTH_STD),
+        new I18nExportColumn(OrderCol.REFERENCE, "fibu.common.reference", MyXlsContentProvider.LENGTH_STD),
+        new I18nExportColumn(OrderCol.COMMENT, "comment", MyXlsContentProvider.LENGTH_COMMENT)};
   }
 
   private void addOrderMapping(final PropertyMapping mapping, final AuftragDO order, final Object... params)
@@ -140,23 +140,23 @@ public class OrderExport
   private ExportColumn[] createPosColumns()
   {
     return new ExportColumn[] { //
-        new I18nExportColumn(PosCol.NUMMER, "fibu.auftrag.nummer.short", XlsContentProvider.LENGTH_ID),
-        new I18nExportColumn(PosCol.DATE, "fibu.auftrag.datum", XlsContentProvider.LENGTH_DATE),
-        new I18nExportColumn(PosCol.PROJECT, "fibu.projekt", XlsContentProvider.LENGTH_STD),
-        new I18nExportColumn(PosCol.ORDER_TITLE, "fibu.auftrag.titel", XlsContentProvider.LENGTH_STD),
-        new I18nExportColumn(PosCol.TITLE, "fibu.auftrag.position", XlsContentProvider.LENGTH_STD),
+        new I18nExportColumn(PosCol.NUMMER, "fibu.auftrag.nummer.short", MyXlsContentProvider.LENGTH_ID),
+        new I18nExportColumn(PosCol.DATE, "fibu.auftrag.datum", MyXlsContentProvider.LENGTH_DATE),
+        new I18nExportColumn(PosCol.PROJECT, "fibu.projekt", MyXlsContentProvider.LENGTH_STD),
+        new I18nExportColumn(PosCol.ORDER_TITLE, "fibu.auftrag.titel", MyXlsContentProvider.LENGTH_STD),
+        new I18nExportColumn(PosCol.TITLE, "fibu.auftrag.position", MyXlsContentProvider.LENGTH_STD),
         new I18nExportColumn(PosCol.TYPE, "fibu.auftrag.position.art", 10),
         new I18nExportColumn(PosCol.STATUS, "status", 10),
         new I18nExportColumn(PosCol.PERSON_DAYS, "projectmanagement.personDays.short", 8),
-        new I18nExportColumn(PosCol.NETSUM, "fibu.auftrag.nettoSumme", XlsContentProvider.LENGTH_CURRENCY), //
-        new I18nExportColumn(PosCol.INVOICED, "fibu.fakturiert", XlsContentProvider.LENGTH_CURRENCY), //
-        new I18nExportColumn(PosCol.TO_BE_INVOICED, "fibu.tobeinvoiced", XlsContentProvider.LENGTH_CURRENCY),
-        new I18nExportColumn(PosCol.COMPLETELY_INVOICED, "fibu.auftrag.vollstaendigFakturiert", XlsContentProvider.LENGTH_BOOLEAN),
-        new I18nExportColumn(PosCol.INVOICES, "fibu.rechnungen", XlsContentProvider.LENGTH_STD),
-        new I18nExportColumn(PosCol.PERIOD_OF_PERFORMANCE_BEGIN, null, XlsContentProvider.LENGTH_DATE),
-        new I18nExportColumn(PosCol.PERIOD_OF_PERFORMANCE_END, null, XlsContentProvider.LENGTH_DATE),
-        new I18nExportColumn(PosCol.TASK, "task", XlsContentProvider.LENGTH_STD),
-        new I18nExportColumn(PosCol.COMMENT, "comment", XlsContentProvider.LENGTH_COMMENT)};
+        new I18nExportColumn(PosCol.NETSUM, "fibu.auftrag.nettoSumme", MyXlsContentProvider.LENGTH_CURRENCY), //
+        new I18nExportColumn(PosCol.INVOICED, "fibu.fakturiert", MyXlsContentProvider.LENGTH_CURRENCY), //
+        new I18nExportColumn(PosCol.TO_BE_INVOICED, "fibu.tobeinvoiced", MyXlsContentProvider.LENGTH_CURRENCY),
+        new I18nExportColumn(PosCol.COMPLETELY_INVOICED, "fibu.auftrag.vollstaendigFakturiert", MyXlsContentProvider.LENGTH_BOOLEAN),
+        new I18nExportColumn(PosCol.INVOICES, "fibu.rechnungen", MyXlsContentProvider.LENGTH_STD),
+        new I18nExportColumn(PosCol.PERIOD_OF_PERFORMANCE_BEGIN, null, MyXlsContentProvider.LENGTH_DATE),
+        new I18nExportColumn(PosCol.PERIOD_OF_PERFORMANCE_END, null, MyXlsContentProvider.LENGTH_DATE),
+        new I18nExportColumn(PosCol.TASK, "task", MyXlsContentProvider.LENGTH_STD),
+        new I18nExportColumn(PosCol.COMMENT, "comment", MyXlsContentProvider.LENGTH_COMMENT)};
   }
 
   private void addPosMapping(final PropertyMapping mapping, final AuftragDO order, final AuftragsPositionDO pos, final Object... params)
@@ -228,7 +228,7 @@ public class OrderExport
     String sheetTitle = PFUserContext.getLocalizedString("fibu.auftrag.auftraege");
     ExportSheet sheet = xls.addSheet(sheetTitle);
     ContentProvider sheetProvider = sheet.getContentProvider();
-    sheetProvider.putFormat(XlsContentProvider.FORMAT_CURRENCY, OrderCol.NETSUM, OrderCol.INVOICED, OrderCol.TO_BE_INVOICED);
+    sheetProvider.putFormat(MyXlsContentProvider.FORMAT_CURRENCY, OrderCol.NETSUM, OrderCol.INVOICED, OrderCol.TO_BE_INVOICED);
     sheetProvider.putFormat(DateFormats.getExcelFormatString(DateFormatType.DATE), OrderCol.DATE, OrderCol.ORDER_DATE);
     sheet.createFreezePane(1, 1);
     sheet.setColumns(columns);
@@ -244,7 +244,7 @@ public class OrderExport
     sheetTitle = PFUserContext.getLocalizedString("fibu.auftrag.positions");
     sheet = xls.addSheet(sheetTitle);
     sheetProvider = sheet.getContentProvider();
-    sheetProvider.putFormat(XlsContentProvider.FORMAT_CURRENCY, PosCol.NETSUM, PosCol.INVOICED, PosCol.TO_BE_INVOICED);
+    sheetProvider.putFormat(MyXlsContentProvider.FORMAT_CURRENCY, PosCol.NETSUM, PosCol.INVOICED, PosCol.TO_BE_INVOICED);
     sheetProvider.putFormat(DateFormats.getExcelFormatString(DateFormatType.DATE), PosCol.DATE, PosCol.PERIOD_OF_PERFORMANCE_BEGIN,
         PosCol.PERIOD_OF_PERFORMANCE_END);
     sheet.createFreezePane(1, 1);
