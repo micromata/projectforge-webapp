@@ -56,6 +56,8 @@ import org.apache.wicket.util.lang.Bytes;
 import org.projectforge.AppVersion;
 import org.projectforge.common.BeanHelper;
 import org.projectforge.common.ExceptionHelper;
+import org.projectforge.common.Logger;
+import org.projectforge.common.LoggerBridgeLog4j;
 import org.projectforge.continuousdb.DatabaseSupport;
 import org.projectforge.continuousdb.UpdateEntry;
 import org.projectforge.core.ConfigXml;
@@ -285,6 +287,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
   @Override
   protected void init()
   {
+    Logger.setLoggerBridge(new LoggerBridgeLog4j());
     super.init();
     // Own error page for deployment mode and UserException and AccessException.
     getRequestCycleListeners().add(new AbstractRequestCycleListener() {
