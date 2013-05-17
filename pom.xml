@@ -44,6 +44,11 @@
     </dependency>
     <dependency>
       <groupId>org.projectforge</groupId>
+      <artifactId>projectforge-excel</artifactId>
+      <version>${projectforge.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.projectforge</groupId>
       <artifactId>projectforge-webserver</artifactId>
       <version>${projectforge.version}</version>
       <scope>test</scope>
@@ -295,13 +300,6 @@
       <groupId>javax.xml</groupId>
       <artifactId>jsr173</artifactId>
       <version>1.0</version>
-    </dependency>
-
-    <dependency> <!-- Version check: 2013-05-16 -->
-      <groupId>org.apache.poi</groupId>
-      <artifactId>poi</artifactId>
-      <version>3.9</version>
-      <type>jar</type>
     </dependency>
     <!-- dependency> <groupId>org.apache.poi</groupId> <artifactId>poi-ooxml</artifactId> <version>3.5-beta4</version> </dependency -->
     <dependency> <!-- Version check: 2010-08-28 -->
