@@ -54,7 +54,6 @@ import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.PropertyConfigurator;
-import org.apache.poi.ss.usermodel.PrintSetup;
 import org.projectforge.AppVersion;
 import org.projectforge.calendar.ConfigureHoliday;
 import org.projectforge.common.BeanHelper;
@@ -238,7 +237,7 @@ public class ConfigXml
     defaultLocale = Locale.ENGLISH;
     defaultTimeNotation = null;
     firstDayOfWeek = Calendar.MONDAY;
-    excelDefaultPaperSize = "DINA4";
+    ExportConfig.getInstance().setExcelDefaultPaperSize("DINA4");
     holidays = null;
     contractTypes = null;
     databaseDirectory = "database";
@@ -792,24 +791,6 @@ public class ConfigXml
   public int getFirstDayOfWeek()
   {
     return firstDayOfWeek;
-  }
-
-  /**
-   * Supported values "LETTER", default is "DINA4".
-   * @return PrintSetup short value. Default is
-   * @see PrintSetup#A4_PAPERSIZE.
-   */
-  public short getDefaultPaperSize()
-  {
-    if (excelDefaultPaperSizeValue != -42) {
-      return excelDefaultPaperSizeValue;
-    }
-    if ("LETTER".equals(excelDefaultPaperSize) == true) {
-      excelDefaultPaperSizeValue = PrintSetup.LETTER_PAPERSIZE;
-    } else {
-      excelDefaultPaperSizeValue = PrintSetup.A4_PAPERSIZE;
-    }
-    return excelDefaultPaperSizeValue;
   }
 
   /** ProjectForges home dir (for resources, images, configuration etc.). */

@@ -33,13 +33,13 @@ import org.projectforge.access.AccessChecker;
 import org.projectforge.common.DateFormatType;
 import org.projectforge.common.DateFormats;
 import org.projectforge.common.NumberHelper;
-import org.projectforge.export.ContentProvider;
-import org.projectforge.export.ExportColumn;
-import org.projectforge.export.ExportSheet;
-import org.projectforge.export.ExportWorkbook;
-import org.projectforge.export.I18nExportColumn;
-import org.projectforge.export.PropertyMapping;
-import org.projectforge.export.XlsContentProvider;
+import org.projectforge.excel.ContentProvider;
+import org.projectforge.excel.ExportColumn;
+import org.projectforge.excel.ExportSheet;
+import org.projectforge.excel.ExportWorkbook;
+import org.projectforge.excel.I18nExportColumn;
+import org.projectforge.excel.PropertyMapping;
+import org.projectforge.excel.XlsContentProvider;
 import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
@@ -61,7 +61,7 @@ public class OrderExport
     }
 
     @Override
-    public org.projectforge.export.ContentProvider newInstance()
+    public org.projectforge.excel.ContentProvider newInstance()
     {
       return new MyContentProvider(this.workbook);
     }
@@ -237,6 +237,8 @@ public class OrderExport
       addOrderMapping(mapping, order, params);
       sheet.addRow(mapping.getMapping(), 0);
     }
+    sheet.getPoiSheet().setAutoFilter(
+        org.apache.poi.ss.util.CellRangeAddress.valueOf("A1:" + (Character.toString((char) (65 + OrderCol.values().length - 1))) + "1"));
 
     columns = createPosColumns();
     sheetTitle = PFUserContext.getLocalizedString("fibu.auftrag.positions");

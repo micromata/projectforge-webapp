@@ -31,16 +31,16 @@ import java.util.Map;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.projectforge.access.AccessChecker;
-import org.projectforge.export.CellFormat;
-import org.projectforge.export.ContentProvider;
-import org.projectforge.export.ExportCell;
-import org.projectforge.export.ExportColumn;
-import org.projectforge.export.ExportRow;
-import org.projectforge.export.ExportSheet;
-import org.projectforge.export.ExportWorkbook;
-import org.projectforge.export.I18nExportColumn;
-import org.projectforge.export.PropertyMapping;
-import org.projectforge.export.XlsContentProvider;
+import org.projectforge.excel.CellFormat;
+import org.projectforge.excel.ContentProvider;
+import org.projectforge.excel.ExportCell;
+import org.projectforge.excel.ExportColumn;
+import org.projectforge.excel.ExportRow;
+import org.projectforge.excel.ExportSheet;
+import org.projectforge.excel.ExportWorkbook;
+import org.projectforge.excel.I18nExportColumn;
+import org.projectforge.excel.PropertyMapping;
+import org.projectforge.excel.XlsContentProvider;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.web.wicket.converter.LanguageConverter;
@@ -84,7 +84,7 @@ public class AddressExport
     }
 
     @Override
-    public org.projectforge.export.ContentProvider newInstance()
+    public org.projectforge.excel.ContentProvider newInstance()
     {
       return new MyContentProvider(this.workbook);
     }
