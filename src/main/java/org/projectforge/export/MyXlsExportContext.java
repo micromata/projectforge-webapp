@@ -25,18 +25,36 @@ package org.projectforge.export;
 
 import java.util.Locale;
 
+import org.projectforge.excel.ContentProvider;
 import org.projectforge.excel.ExcelDateFormats;
+import org.projectforge.excel.ExportConfig;
 import org.projectforge.excel.ExportContext;
+import org.projectforge.excel.ExportWorkbook;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 
 /**
- * This default context does nothing special, you may implement your own context.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
 public class MyXlsExportContext implements ExportContext
 {
+  private static boolean initialized = false;
+
+  public MyXlsExportContext()
+  {
+    if (initialized == false) {
+      initialized = true;
+      ExportConfig.setInstance(new ExportConfig() {
+        @Override
+        protected ContentProvider createNewContentProvider(final ExportWorkbook workbook)
+        {
+          return new MyXlsContentProvider(workbook);
+        }
+      }.setDefaultExportContext(new MyXlsExportContext()));
+    }
+  }
+
   private Locale locale;
 
   /**
