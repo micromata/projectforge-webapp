@@ -68,7 +68,7 @@ public class TimesheetExport
     }
 
     @Override
-    public void updateRowStyle(final ExportRow row)
+    public MyContentProvider updateRowStyle(final ExportRow row)
     {
       for (final ExportCell cell : row.getCells()) {
         final CellFormat format = cell.ensureAndGetCellFormat();
@@ -89,6 +89,7 @@ public class TimesheetExport
             break;
         }
       }
+      return this;
     }
 
     @Override

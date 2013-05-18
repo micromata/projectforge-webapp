@@ -87,7 +87,7 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
     }
 
     @Override
-    public void updateRowStyle(final ExportRow row)
+    public MyContentProvider updateRowStyle(final ExportRow row)
     {
       for (final ExportCell cell : row.getCells()) {
         final CellFormat format = cell.ensureAndGetCellFormat();
@@ -105,6 +105,7 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
             break;
         }
       }
+      return this;
     }
 
     @Override
@@ -281,8 +282,8 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
         // mapping.add(ExcelColumn.STUNDEN, duration);
         mapping.add(ExcelColumn.STUNDEN, duration.divide(new BigDecimal(3600), 2, RoundingMode.HALF_UP));
         mapping.add(ExcelColumn.BEZEICHNUNG, kost2.getToolTip());
-        final BigDecimal betrag = CurrencyHelper.multiply(bruttoMitAGAnteil, new BigDecimal(entry.getMillis()).divide(netDuration, 8,
-            RoundingMode.HALF_UP));
+        final BigDecimal betrag = CurrencyHelper.multiply(bruttoMitAGAnteil,
+            new BigDecimal(entry.getMillis()).divide(netDuration, 8, RoundingMode.HALF_UP));
         sum = sum.add(betrag);
         if (--j == 0) {
           final BigDecimal korrektur = bruttoMitAGAnteil.subtract(sum);
