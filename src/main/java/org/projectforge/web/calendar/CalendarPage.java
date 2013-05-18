@@ -126,6 +126,13 @@ public class CalendarPage extends AbstractStandardFormPage implements ISelectCal
     return form.getFilter();
   }
 
+  /**
+   * Does nothing at default, is called if the user clicks the "refresh" icon.
+   */
+  protected void refresh()
+  {
+  }
+
   public void cancelSelection(final String property)
   {
   }

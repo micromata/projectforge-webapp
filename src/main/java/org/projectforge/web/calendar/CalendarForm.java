@@ -111,13 +111,15 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
     buttonGroupPanel = new ButtonGroupPanel(fieldset.newChildId());
     fieldset.add(buttonGroupPanel);
     {
-      final IconButtonPanel refreshButtonPanel = new IconButtonPanel(buttonGroupPanel.newChildId(), IconType.REFRESH, getString("refresh")) {
+      final IconButtonPanel refreshButtonPanel = new IconButtonPanel(buttonGroupPanel.newChildId(), IconType.REFRESH,
+          getRefreshIconTooltip()) {
         /**
          * @see org.projectforge.web.wicket.flowlayout.IconButtonPanel#onSubmit()
          */
         @Override
         protected void onSubmit()
         {
+          parentPage.refresh();
           setResponsePage(getPage().getClass(), getPage().getPageParameters());
         }
       };
@@ -136,6 +138,11 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
     durationLabel = durationPanel.getLabel4Ajax();
     fs.add(durationPanel);
     onAfterInit(gridBuilder);
+  }
+
+  protected String getRefreshIconTooltip()
+  {
+    return getString("refresh");
   }
 
   /**
