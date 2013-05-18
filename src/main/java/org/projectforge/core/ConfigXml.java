@@ -146,6 +146,9 @@ public class ConfigXml
   @XmlField(asElement = true)
   private int firstDayOfWeek = Calendar.MONDAY;
 
+  @XmlField(asElement = true)
+  private String excelDefaultPaperSize;
+
   private List<ConfigureHoliday> holidays;
 
   private List<ContractType> contractTypes;
@@ -234,7 +237,7 @@ public class ConfigXml
     defaultLocale = Locale.ENGLISH;
     defaultTimeNotation = null;
     firstDayOfWeek = Calendar.MONDAY;
-    ExportConfig.getInstance().setDefaultPaperSize("DINA4");
+    setExcelDefaultPaperSize("DINA4");
     holidays = null;
     contractTypes = null;
     databaseDirectory = "database";
@@ -359,6 +362,9 @@ public class ConfigXml
           final ConfigXml cfg = (ConfigXml) reader.read(xml);
           final String warnings = reader.getWarnings();
           copyDeclaredFields(null, this.getClass(), cfg, this);
+          if (this.excelDefaultPaperSize != null) {
+            setExcelDefaultPaperSize(excelDefaultPaperSize);
+          }
           if (CollectionUtils.isNotEmpty(cfg.plugins) == true) {
             for (final ConfigurationData srcData : cfg.plugins) {
               final ConfigurationData destData = this.getPluginConfig(srcData.getClass());
@@ -792,6 +798,11 @@ public class ConfigXml
   public int getFirstDayOfWeek()
   {
     return firstDayOfWeek;
+  }
+
+  public void setExcelDefaultPaperSize(final String excelDefaultPaperSize) {
+    this.excelDefaultPaperSize = excelDefaultPaperSize;
+    ExportConfig.getInstance().setDefaultPaperSize(excelDefaultPaperSize);
   }
 
   /** ProjectForges home dir (for resources, images, configuration etc.). */
