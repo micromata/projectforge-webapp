@@ -16,8 +16,7 @@
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
   <classpathentry kind="var" path="M2_REPO/org/projectforge/projectforge-common/5.1.1-SNAPSHOT/projectforge-common-5.1.1-SNAPSHOT.jar" sourcepath="M2_REPO/org/projectforge/projectforge-common/5.1.1-SNAPSHOT/projectforge-common-5.1.1-SNAPSHOT-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-lang/commons-lang/2.5/commons-lang-2.5.jar" sourcepath="M2_REPO/commons-lang/commons-lang/2.5/commons-lang-2.5-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.16/log4j-1.2.16.jar" sourcepath="M2_REPO/log4j/log4j/1.2.16/log4j-1.2.16-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/projectforge/projectforge-continuous-db/5.1.1-SNAPSHOT/projectforge-continuous-db-5.1.1-SNAPSHOT.jar" sourcepath="M2_REPO/org/projectforge/projectforge-continuous-db/5.1.1-SNAPSHOT/projectforge-continuous-db-5.1.1-SNAPSHOT-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/projectforge/projectforge-continuous-db/5.1.1-SNAPSHOT/projectforge-continuous-db-5.1.1-SNAPSHOT.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/projectforge/projectforge-excel/5.1.1-SNAPSHOT/projectforge-excel-5.1.1-SNAPSHOT.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-beanutils/commons-beanutils/1.8.3/commons-beanutils-1.8.3.jar" sourcepath="M2_REPO/commons-beanutils/commons-beanutils/1.8.3/commons-beanutils-1.8.3-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar" sourcepath="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1-sources.jar"/>
@@ -48,6 +47,7 @@
   <classpathentry kind="var" path="M2_REPO/org/eclipse/jetty/jetty-jndi/7.5.0.v20110901/jetty-jndi-7.5.0.v20110901.jar" sourcepath="M2_REPO/org/eclipse/jetty/jetty-jndi/7.5.0.v20110901/jetty-jndi-7.5.0.v20110901-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-log4j12/1.6.4/slf4j-log4j12-1.6.4.jar" sourcepath="M2_REPO/org/slf4j/slf4j-log4j12/1.6.4/slf4j-log4j12-1.6.4-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.6.4/slf4j-api-1.6.4.jar" sourcepath="M2_REPO/org/slf4j/slf4j-api/1.6.4/slf4j-api-1.6.4-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.16/log4j-1.2.16.jar" sourcepath="M2_REPO/log4j/log4j/1.2.16/log4j-1.2.16-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/google/code/gson/gson/2.2.2/gson-2.2.2.jar" sourcepath="M2_REPO/com/google/code/gson/gson/2.2.2/gson-2.2.2-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-client/1.15/jersey-client-1.15.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-client/1.15/jersey-client-1.15-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-core/1.15/jersey-core-1.15.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-core/1.15/jersey-core-1.15-sources.jar"/>
