@@ -241,23 +241,36 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
       }
     }
     // abos
-    TeamEventExternalSubscriptionCache aboCache = TeamEventExternalSubscriptionCache.instance();
+    final TeamEventExternalSubscriptionCache aboCache = TeamEventExternalSubscriptionCache.instance();
+    final List<Integer> alreadyAdded = new ArrayList<Integer>();
     // precondition for abos: existing teamcals in filter
     if(teamEventFilter.getTeamCals() != null) {
         for (Integer calendarId : teamEventFilter.getTeamCals()) {
           if (aboCache.isExternalSubscribedCalendar(calendarId) == true) {
-            Date startDate = teamEventFilter.getStartDate();
-            Date endDate = teamEventFilter.getEndDate();
-            Long startTime = startDate == null ? 0 : startDate.getTime();
-            Long endTime = endDate == null ? Long.MAX_VALUE : endDate.getTime();
-            List<TeamEventDO> events = aboCache.getEvents(calendarId, startTime, endTime);
-            if (events != null && events.size() > 0) {
-                result.addAll(events);
-            }
+            addEventsToList(teamEventFilter, result, aboCache, calendarId);
+            alreadyAdded.add(calendarId);
           }
         }
     }
+    // if the getTeamCalId is not null and we do not added this before, do it now
+    Integer teamCalId = teamEventFilter.getTeamCalId();
+    if (teamCalId != null && alreadyAdded.contains(teamCalId) == false) {
+      if (aboCache.isExternalSubscribedCalendar(teamCalId) == true) {
+        addEventsToList(teamEventFilter, result, aboCache, teamCalId);
+      }
+    }
     return result;
+  }
+
+  private void addEventsToList(TeamEventFilter teamEventFilter, List<TeamEventDO> result, TeamEventExternalSubscriptionCache aboCache, Integer calendarId) {
+    Date startDate = teamEventFilter.getStartDate();
+    Date endDate = teamEventFilter.getEndDate();
+    Long startTime = startDate == null ? 0 : startDate.getTime();
+    Long endTime = endDate == null ? Long.MAX_VALUE : endDate.getTime();
+    List<TeamEventDO> events = aboCache.getEvents(calendarId, startTime, endTime);
+    if (events != null && events.size() > 0) {
+        result.addAll(events);
+    }
   }
 
   private boolean matches(final Date eventStartDate, final Date eventEndDate, final boolean allDay, final TeamEventFilter teamEventFilter)
@@ -303,7 +316,6 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
    * The time period of the filter will be extended by one day. This is needed due to all day events which are stored in UTC. The additional
    * events in the result list not matching the time period have to be removed by caller!
    * @param filter
-   * @param allDay
    * @return
    */
   private QueryFilter buildQueryFilter(final TeamEventFilter filter)
