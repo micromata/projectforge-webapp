@@ -30,16 +30,16 @@ import java.util.Locale;
 
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.export.CellFormat;
-import org.projectforge.export.ContentProvider;
-import org.projectforge.export.ExportCell;
-import org.projectforge.export.ExportColumn;
-import org.projectforge.export.ExportRow;
-import org.projectforge.export.ExportSheet;
-import org.projectforge.export.ExportWorkbook;
-import org.projectforge.export.I18nExportColumn;
-import org.projectforge.export.PropertyMapping;
-import org.projectforge.export.XlsContentProvider;
+import org.projectforge.excel.CellFormat;
+import org.projectforge.excel.ContentProvider;
+import org.projectforge.excel.ExportCell;
+import org.projectforge.excel.ExportColumn;
+import org.projectforge.excel.ExportRow;
+import org.projectforge.excel.ExportSheet;
+import org.projectforge.excel.ExportWorkbook;
+import org.projectforge.excel.I18nExportColumn;
+import org.projectforge.excel.PropertyMapping;
+import org.projectforge.export.MyXlsContentProvider;
 import org.projectforge.fibu.ProjektDao;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserGroupCache;
@@ -53,17 +53,17 @@ import org.projectforge.web.calendar.DateTimeFormatter;
  */
 public class HRPlanningExport
 {
-  private class MyContentProvider extends XlsContentProvider
+  private class MyContentProvider extends MyXlsContentProvider
   {
-    public MyContentProvider(ExportWorkbook workbook)
+    public MyContentProvider(final ExportWorkbook workbook)
     {
       super(workbook);
     }
 
     @Override
-    public void updateRowStyle(ExportRow row)
+    public void updateRowStyle(final ExportRow row)
     {
-      for (ExportCell cell : row.getCells()) {
+      for (final ExportCell cell : row.getCells()) {
         final CellFormat format = cell.ensureAndGetCellFormat();
         format.setFillForegroundColor(HSSFColor.WHITE.index);
         switch (row.getRowNum()) {
@@ -110,7 +110,7 @@ public class HRPlanningExport
    * Exports the filtered list as table with almost all fields. sheet 1 all fields sheet 2 Week to Users sheet 3 Week to Projects sheet 4
    * Projects to Users
    */
-  public byte[] export(List<HRPlanningDO> list, Locale locale)
+  public byte[] export(final List<HRPlanningDO> list, final Locale locale)
   {
     log.info("Exporting resourceplanning list.");
     ExportWorkbook xls = new ExportWorkbook();
@@ -122,7 +122,7 @@ public class HRPlanningExport
     return xls.getAsByteArray();
   }
 
-  public ExportWorkbook exportCompleteList(List<HRPlanningDO> list, ExportWorkbook xls, Locale locale)
+  public ExportWorkbook exportCompleteList(final List<HRPlanningDO> list, final ExportWorkbook xls, final Locale locale)
   {
 
     final ContentProvider contentProvider = new MyContentProvider(xls);
@@ -131,23 +131,23 @@ public class HRPlanningExport
     xls.setContentProvider(contentProvider);
 
     final String sheetTitle = PFUserContext.getLocalizedString("hr.plannings");
-    ExportSheet sheet = xls.addSheet(sheetTitle);
+    final ExportSheet sheet = xls.addSheet(sheetTitle);
     sheet.createFreezePane(8, 1);
 
-    ExportColumn[] cols = new ExportColumn[] { //
-    new I18nExportColumn(Col.USER, "timesheet.user", XlsContentProvider.LENGTH_USER),
-        new I18nExportColumn(Col.PROJEKT, "fibu.projekt", XlsContentProvider.LENGTH_STD),
+    final ExportColumn[] cols = new ExportColumn[] { //
+        new I18nExportColumn(Col.USER, "timesheet.user", MyXlsContentProvider.LENGTH_USER),
+        new I18nExportColumn(Col.PROJEKT, "fibu.projekt", MyXlsContentProvider.LENGTH_STD),
         new I18nExportColumn(Col.WEEK_OF_YEAR, "calendar.weekOfYearShortLabel", 4),
         new I18nExportColumn(Col.PRIORITY, "resourceplanning.priority", 8),
         new I18nExportColumn(Col.PROBABILITY, "resourceplanning.probability", 16),
-        new I18nExportColumn(Col.UNASSIGNEDHOURS, "resourceplanning.unassignedHours", XlsContentProvider.LENGTH_STD),
+        new I18nExportColumn(Col.UNASSIGNEDHOURS, "resourceplanning.unassignedHours", MyXlsContentProvider.LENGTH_STD),
         new I18nExportColumn(Col.MONDAYHOURS, "calendar.shortday.monday", 4),
         new I18nExportColumn(Col.TUESDAYHOURS, "calendar.shortday.tuesday", 4),
         new I18nExportColumn(Col.WEDNESDAYHOURS, "calendar.shortday.wednesday", 4),
         new I18nExportColumn(Col.THURSDAYHOURS, "calendar.shortday.thursday", 4),
         new I18nExportColumn(Col.FRIDAYHOURS, "calendar.shortday.friday", 4),
-        new I18nExportColumn(Col.WEEKENDHOURS, "resourceplanning.weekend", XlsContentProvider.LENGTH_STD),
-        new I18nExportColumn(Col.DESCRIPTION, "timesheet.description", XlsContentProvider.LENGTH_EXTRA_LONG)};
+        new I18nExportColumn(Col.WEEKENDHOURS, "resourceplanning.weekend", MyXlsContentProvider.LENGTH_STD),
+        new I18nExportColumn(Col.DESCRIPTION, "timesheet.description", MyXlsContentProvider.LENGTH_EXTRA_LONG)};
 
     // column property names
     sheet.setColumns(cols);
@@ -162,8 +162,8 @@ public class HRPlanningExport
     sheetProvider.putFormat(Col.FRIDAYHOURS, "0.00");
     sheetProvider.putFormat(Col.WEEKENDHOURS, "0.00");
 
-    PropertyMapping mapping = new PropertyMapping();
-    for (HRPlanningDO planningSheet : list) {
+    final PropertyMapping mapping = new PropertyMapping();
+    for (final HRPlanningDO planningSheet : list) {
       // final ProjektDO projekt = projektDao.getById(planningSheet.getProjektId());
       // final PFUserDO user = userGroupCache.getUser(planningSheet.getUserId());
       // mapping.add(Col.USER, user.getFullname());
@@ -193,7 +193,7 @@ public class HRPlanningExport
    * @param list
    * @return
    */
-  public ExportWorkbook exportKWProjects(List<HRPlanningDO> list, ExportWorkbook xls, Locale locale)
+  public ExportWorkbook exportKWProjects(final List<HRPlanningDO> list, final ExportWorkbook xls, final Locale locale)
   {
     log.info("Exporting resourceplanning list to Calendar View.");
     final ContentProvider contentProvider = new MyContentProvider(xls);
@@ -201,13 +201,13 @@ public class HRPlanningExport
     xls.setContentProvider(contentProvider);
 
     final String sheetTitle = PFUserContext.getLocalizedString("exportKWProjects");
-    ExportSheet sheet = xls.addSheet(sheetTitle);
+    final ExportSheet sheet = xls.addSheet(sheetTitle);
     sheet.createFreezePane(8, 1);
 
-    ExportColumn[] cols = new ExportColumn[] { new I18nExportColumn(Col.WEEK_OF_YEAR, "calendar.weekOfYearShortLabel", 12),
-        new I18nExportColumn(Col.PROJEKT, "fibu.projekt", XlsContentProvider.LENGTH_STD),
-        new I18nExportColumn(Col.TOTAL_DURATION, "timesheet.totalDuration", XlsContentProvider.LENGTH_STD),
-        new I18nExportColumn(Col.WORKDAYS, "resourceplanning.workdays", XlsContentProvider.LENGTH_STD)};
+    final ExportColumn[] cols = new ExportColumn[] { new I18nExportColumn(Col.WEEK_OF_YEAR, "calendar.weekOfYearShortLabel", 12),
+        new I18nExportColumn(Col.PROJEKT, "fibu.projekt", MyXlsContentProvider.LENGTH_STD),
+        new I18nExportColumn(Col.TOTAL_DURATION, "timesheet.totalDuration", MyXlsContentProvider.LENGTH_STD),
+        new I18nExportColumn(Col.WORKDAYS, "resourceplanning.workdays", MyXlsContentProvider.LENGTH_STD)};
 
     // column property names
     sheet.setColumns(cols);
@@ -217,11 +217,11 @@ public class HRPlanningExport
     sheetProvider.putFormat(Col.TOTAL_DURATION, "0.00");
     sheetProvider.putFormat(Col.WORKDAYS, "0.00");
 
-    PropertyMapping mapping = new PropertyMapping();
+    final PropertyMapping mapping = new PropertyMapping();
 
     // Ermittele Anzahl unterschiedlicher Projekte
-    List<String> projectNames = new ArrayList<String>();
-    for (HRPlanningDO planningSheet : list) {
+    final List<String> projectNames = new ArrayList<String>();
+    for (final HRPlanningDO planningSheet : list) {
       // final String projectName = planningSheet.getProjekt().getName();
       // boolean exists = false;
       // for (int i = 0; i < projectNames.size(); i++) {
@@ -248,7 +248,7 @@ public class HRPlanningExport
     // }
     // }
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy");
+    final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy");
 
     // int syear = Integer.valueOf(simpleDateFormat.format(startYear));
     // int eyear = Integer.valueOf(simpleDateFormat.format(endYear));
@@ -315,7 +315,7 @@ public class HRPlanningExport
     return xls;
   }
 
-  public ExportWorkbook exportKWUsers(List<HRPlanningDO> list, ExportWorkbook xls, Locale locale)
+  public ExportWorkbook exportKWUsers(final List<HRPlanningDO> list, final ExportWorkbook xls, final Locale locale)
   {
     log.info("Exporting resourceplanning list to Calendar View.");
 
@@ -324,13 +324,13 @@ public class HRPlanningExport
     xls.setContentProvider(contentProvider);
 
     final String sheetTitle = PFUserContext.getLocalizedString("exportKWUsers");
-    ExportSheet sheet = xls.addSheet(sheetTitle);
+    final ExportSheet sheet = xls.addSheet(sheetTitle);
     sheet.createFreezePane(8, 1);
 
-    ExportColumn[] cols = new ExportColumn[] { new I18nExportColumn(Col.WEEK_OF_YEAR, "calendar.weekOfYearShortLabel", 12),
-        new I18nExportColumn(Col.USER, "timesheet.user", XlsContentProvider.LENGTH_USER),
-        new I18nExportColumn(Col.TOTAL_DURATION, "timesheet.totalDuration", XlsContentProvider.LENGTH_STD),
-        new I18nExportColumn(Col.WORKDAYS, "resourceplanning.workdays", XlsContentProvider.LENGTH_STD)};
+    final ExportColumn[] cols = new ExportColumn[] { new I18nExportColumn(Col.WEEK_OF_YEAR, "calendar.weekOfYearShortLabel", 12),
+        new I18nExportColumn(Col.USER, "timesheet.user", MyXlsContentProvider.LENGTH_USER),
+        new I18nExportColumn(Col.TOTAL_DURATION, "timesheet.totalDuration", MyXlsContentProvider.LENGTH_STD),
+        new I18nExportColumn(Col.WORKDAYS, "resourceplanning.workdays", MyXlsContentProvider.LENGTH_STD)};
 
     // column property names
     sheet.setColumns(cols);
@@ -340,12 +340,12 @@ public class HRPlanningExport
     sheetProvider.putFormat(Col.TOTAL_DURATION, "0.00");
     sheetProvider.putFormat(Col.WORKDAYS, "0.00");
 
-    PropertyMapping mapping = new PropertyMapping();
+    final PropertyMapping mapping = new PropertyMapping();
 
     // Ermittele Anzahl unterschiedlicher User
-    List<String> userNames = new ArrayList<String>();
-    for (HRPlanningDO planningSheet : list) {
-      String userName = planningSheet.getUser().getFullname();
+    final List<String> userNames = new ArrayList<String>();
+    for (final HRPlanningDO planningSheet : list) {
+      final String userName = planningSheet.getUser().getFullname();
       boolean exists = false;
       for (int i = 0; i < userNames.size(); i++) {
         if (userName.equals(userNames.get(i))) {
@@ -371,7 +371,7 @@ public class HRPlanningExport
     // }
     // }
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy");
+    final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy");
 
     // int syear = Integer.valueOf(simpleDateFormat.format(startYear));
     // int eyear = Integer.valueOf(simpleDateFormat.format(endYear));
@@ -446,7 +446,7 @@ public class HRPlanningExport
    * @param list
    * @return
    */
-  public ExportWorkbook exportProjectUserView(List<HRPlanningDO> list, ExportWorkbook xls)
+  public ExportWorkbook exportProjectUserView(final List<HRPlanningDO> list, final ExportWorkbook xls)
   {
     log.info("Exporting resourceplanning list to Calendar View.");
     final ContentProvider contentProvider = new MyContentProvider(xls);
@@ -454,11 +454,11 @@ public class HRPlanningExport
     xls.setContentProvider(contentProvider);
 
     final String sheetTitle = PFUserContext.getLocalizedString("exportProjectsUsers");
-    ExportSheet sheet = xls.addSheet(sheetTitle);
+    final ExportSheet sheet = xls.addSheet(sheetTitle);
     sheet.createFreezePane(8, 1);
 
     // Ermittele Anzahl unterschiedlicher Projekte
-    List<String> projectNames = new ArrayList<String>();
+    final List<String> projectNames = new ArrayList<String>();
     // for (HRPlanningDO planningSheet : list) {
     // String projectName = planningSheet.getProjekt().getName();
     // boolean exists = false;
@@ -545,10 +545,10 @@ public class HRPlanningExport
     return xls;
   }
 
-  public int getStartYearfromDO(HRPlanningDO sheet)
+  public int getStartYearfromDO(final HRPlanningDO sheet)
   {
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy");
-    Integer year = Integer.valueOf(simpleDateFormat.format(sheet.getWeek()));
+    final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy");
+    final Integer year = Integer.valueOf(simpleDateFormat.format(sheet.getWeek()));
 
     return year;
   }

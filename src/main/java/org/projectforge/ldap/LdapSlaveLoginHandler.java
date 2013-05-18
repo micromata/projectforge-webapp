@@ -31,6 +31,7 @@ import javax.naming.NameNotFoundException;
 
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.core.ModificationStatus;
+import org.projectforge.registry.Registry;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.LoginDefaultHandler;
 import org.projectforge.user.LoginResult;
@@ -219,7 +220,7 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
   @Override
   public void afterUserGroupCacheRefresh(final Collection<PFUserDO> users, final Collection<GroupDO> groups)
   {
-    if (mode == Mode.SIMPLE) {
+    if (mode == Mode.SIMPLE || refreshInProgress == true) {
       return;
     }
     new Thread() {
@@ -227,9 +228,13 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
       public void run()
       {
         synchronized (LdapSlaveLoginHandler.this) {
+          if (refreshInProgress == true) {
+            return;
+          }
           try {
             refreshInProgress = true;
             updateLdap(users, groups);
+            Registry.instance().getUserGroupCache().internalGetNumberOfUsers(); // Force refresh of UserGroupCache.
           } finally {
             refreshInProgress = false;
           }

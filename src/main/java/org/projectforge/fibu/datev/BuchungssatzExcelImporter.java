@@ -40,6 +40,7 @@ import org.projectforge.common.ImportedElement;
 import org.projectforge.common.ImportedSheet;
 import org.projectforge.core.ActionLog;
 import org.projectforge.core.UserException;
+import org.projectforge.excel.ExcelImport;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KontoDao;
 import org.projectforge.fibu.KostFormatter;
@@ -49,7 +50,6 @@ import org.projectforge.fibu.kost.Kost1Dao;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.fibu.kost.Kost2Dao;
 import org.projectforge.user.PFUserContext;
-import org.projectforge.xls.ExcelImport;
 
 public class BuchungssatzExcelImporter
 {

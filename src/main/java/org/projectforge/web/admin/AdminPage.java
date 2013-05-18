@@ -48,7 +48,6 @@ import org.projectforge.core.ConfigurationParam;
 import org.projectforge.core.HibernateSearchReindexer;
 import org.projectforge.core.ReindexSettings;
 import org.projectforge.core.SystemDao;
-import org.projectforge.database.MyDatabaseUpdateDao;
 import org.projectforge.database.MyDatabaseUpdater;
 import org.projectforge.database.XmlDump;
 import org.projectforge.meb.MebMailClient;
@@ -90,8 +89,6 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
   @SpringBean(name = "myDatabaseUpdater")
   private MyDatabaseUpdater myDatabaseUpdater;
 
-  private final MyDatabaseUpdateDao databaseUpdateDao;
-
   @SpringBean(name = "hibernateSearchReindexer")
   private HibernateSearchReindexer hibernateSearchReindexer;
 
@@ -115,7 +112,6 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
   public AdminPage(final PageParameters parameters)
   {
     super(parameters);
-    this.databaseUpdateDao = myDatabaseUpdater.getDatabaseUpdateDao();
     form = new AdminForm(this);
     body.add(form);
     form.init();
@@ -509,7 +505,7 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
     log.info("Administration: Database dump.");
     checkAccess();
     // Fix the data-base history entries first:
-    databaseUpdateDao.fixDBHistoryEntries();
+    myDatabaseUpdater.getDatabaseUpdateDao().fixDBHistoryEntries();
     final String ts = DateHelper.getTimestampAsFilenameSuffix(new Date());
     final String filename = "projectforgedump_" + ts + ".xml.gz";
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -625,7 +621,7 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
   {
     log.info("Administration: create missing data base indices.");
     accessChecker.checkRestrictedOrDemoUser();
-    final int counter = databaseUpdateDao.createMissingIndices();
+    final int counter = myDatabaseUpdater.getDatabaseUpdateDao().createMissingIndices();
     setResponsePage(new MessagePage("administration.missingDatabaseIndicesCreated", String.valueOf(counter)));
   }
 
@@ -637,7 +633,7 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
   {
     log.info("Administration: fix data base history entries.");
     accessChecker.checkRestrictedOrDemoUser();
-    final int counter = databaseUpdateDao.fixDBHistoryEntries();
+    final int counter = myDatabaseUpdater.getDatabaseUpdateDao().fixDBHistoryEntries();
     setResponsePage(new MessagePage("system.admin.button.fixDBHistoryEntries.result", String.valueOf(counter)));
   }
 
@@ -654,7 +650,7 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
     final TaskDO task = taskTree.getTaskById(Configuration.getInstance().getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_BOOKS));
     final List<BookDO> list = new ArrayList<BookDO>();
     int number = 1;
-    while (databaseUpdateDao.queryForInt("select count(*) from t_book where title like 'title." + number + ".%'") > 0) {
+    while (myDatabaseUpdater.getDatabaseUpdateDao().queryForInt("select count(*) from t_book where title like 'title." + number + ".%'") > 0) {
       number++;
     }
     for (int i = 1; i <= NUMBER_OF_TEST_OBJECTS_TO_CREATE; i++) {

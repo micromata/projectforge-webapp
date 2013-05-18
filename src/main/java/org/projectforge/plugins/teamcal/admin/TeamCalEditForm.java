@@ -163,7 +163,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
         };
       });
     }
-    {
+    if (access == true) {
       // external subscription
       final FieldsetPanel fsSubscription = gridBuilder.newFieldset(getString("plugins.teamcal.externalsubscription.label"));
       final CheckBoxPanel checkboxPanel = new CheckBoxPanel(fsSubscription.newChildId(), new PropertyModel<Boolean>(data,

@@ -40,6 +40,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.FOUserAgent;
@@ -117,7 +118,8 @@ public class PdfRenderer
     data.put("baseDir", configXml.getResourcePath());
     data.put("appId", AppVersion.APP_ID);
     data.put("appVersion", AppVersion.NUMBER);
-    data.put("organization", StringUtils.defaultString(Configuration.getInstance().getStringValue(ConfigurationParam.ORGANIZATION), AppVersion.APP_ID));
+    data.put("organization",
+        StringUtils.defaultString(Configuration.getInstance().getStringValue(ConfigurationParam.ORGANIZATION), AppVersion.APP_ID));
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     log.info("stylesheet="
         + stylesheet
@@ -151,6 +153,7 @@ public class PdfRenderer
     }
     // configure foUserAgent as desired
 
+    InputStream xsltInputStream = null;
     try {
       // Construct fop with desired output format
       final Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, baos);
@@ -158,7 +161,7 @@ public class PdfRenderer
       // Setup XSLT
       final TransformerFactory factory = TransformerFactory.newInstance();
       Object[] result = configXml.getInputStream(stylesheet);
-      final InputStream xsltInputStream = (InputStream) result[0];
+      xsltInputStream = (InputStream) result[0];
       final StreamSource xltStreamSource = new StreamSource(xsltInputStream);
       final String url = (String) result[1];
       if (url == null) {
@@ -205,6 +208,7 @@ public class PdfRenderer
         log.error(ex.getMessage(), ex);
         throw new RuntimeException(ex);
       }
+      IOUtils.closeQuietly(xsltInputStream);
     }
     return baos.toByteArray();
   }

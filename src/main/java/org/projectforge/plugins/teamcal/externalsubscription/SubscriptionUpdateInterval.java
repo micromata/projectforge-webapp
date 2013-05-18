@@ -33,7 +33,7 @@ import org.projectforge.core.I18nEnum;
  */
 public enum SubscriptionUpdateInterval implements I18nEnum
 {
-  FIVE_MINUTES(5 * 60, "interval5Min"), //
+  FIFTEEN_MINUTES(15 * 60, "interval15Min"), //
   ONE_HOUR(60 * 60, "interval1h"), //
   ONE_DAY(24 * 60 * 60, "interval1d")//
   ;

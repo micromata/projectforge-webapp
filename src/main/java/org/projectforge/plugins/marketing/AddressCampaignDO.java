@@ -84,7 +84,7 @@ public class AddressCampaignDO extends DefaultBaseDO
     return getValuesArray(values);
   }
 
-  @Column(length = 1000)
+  @Column(length = 1000, name = "s_values")
   public String getValues()
   {
     return values;

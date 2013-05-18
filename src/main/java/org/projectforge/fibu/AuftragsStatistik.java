@@ -67,10 +67,10 @@ public class AuftragsStatistik implements Serializable
         akquiseSum = add(akquiseSum, netto);
         counterAkquise++;
       } else if (auftrag.getAuftragsStatus().isIn(AuftragsStatus.LOI, AuftragsStatus.BEAUFTRAGT, AuftragsStatus.ESKALATION) == true) {
-        beauftragtSum = add(beauftragtSum, netto);
+        beauftragtSum = add(beauftragtSum, auftrag.getBeauftragtNettoSumme());
         counterBeauftragt++;
       } else if (auftrag.getAuftragsStatus().isIn(AuftragsStatus.ABGESCHLOSSEN) == true && auftrag.isVollstaendigFakturiert() == false) {
-        zuFakturierenSum = add(zuFakturierenSum, netto);
+        zuFakturierenSum = add(zuFakturierenSum, auftrag.getZuFakturierenSum());
         counterZuFakturieren++;
       }
     }

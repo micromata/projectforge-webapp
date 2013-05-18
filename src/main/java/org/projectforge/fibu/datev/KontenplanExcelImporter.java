@@ -33,8 +33,8 @@ import org.projectforge.common.ImportStorage;
 import org.projectforge.common.ImportedElement;
 import org.projectforge.common.ImportedSheet;
 import org.projectforge.core.ActionLog;
+import org.projectforge.excel.ExcelImport;
 import org.projectforge.fibu.KontoDO;
-import org.projectforge.xls.ExcelImport;
 
 public class KontenplanExcelImporter
 {

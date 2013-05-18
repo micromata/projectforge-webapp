@@ -23,7 +23,14 @@
 
 package org.projectforge.plugins.teamcal.integration;
 
+import java.util.Set;
+
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.plugins.teamcal.admin.TeamCalCache;
+import org.projectforge.plugins.teamcal.admin.TeamCalDO;
+import org.projectforge.plugins.teamcal.admin.TeamCalDao;
+import org.projectforge.plugins.teamcal.externalsubscription.TeamEventExternalSubscriptionCache;
 import org.projectforge.web.calendar.CalendarForm;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.calendar.CalendarPanel;
@@ -38,6 +45,9 @@ public class TeamCalCalendarPage extends CalendarPage
   private static final long serialVersionUID = -6413028759027309796L;
 
   private TeamCalCalendarForm form;
+
+  @SpringBean(name = "teamCalDao")
+  private TeamCalDao teamCalDao;
 
   public static final String USERPREF_KEY = "TeamCalendarPage.userPrefs";
 
@@ -79,6 +89,34 @@ public class TeamCalCalendarPage extends CalendarPage
     }
     return filter;
 
+  }
+
+  /**
+   * @see org.projectforge.web.calendar.CalendarPage#refresh()
+   */
+  @Override
+  protected void refresh()
+  {
+    super.refresh();
+    final TeamCalCalendarFilter filter = getFilter();
+    final TemplateEntry templateEntry = filter.getActiveTemplateEntry();
+    if (templateEntry == null) {
+      // Nothing to do.
+      return;
+    }
+    final Set<Integer> visibleCalendarIds = templateEntry.getVisibleCalendarIds();
+    if (visibleCalendarIds == null) {
+      // Nothing to do.
+      return;
+    }
+    for (final Integer calId : visibleCalendarIds) {
+      final TeamCalDO teamCalDO = TeamCalCache.getInstance().getCalendar(calId);
+      if (teamCalDO == null || teamCalDO.isExternalSubscription() == false) {
+        // Nothing to do.
+        continue;
+      }
+      TeamEventExternalSubscriptionCache.instance().updateCache(teamCalDao, teamCalDO, true);
+    }
   }
 
   @Override

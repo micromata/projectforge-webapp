@@ -396,11 +396,11 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
     final PFUserDO user = (PFUserDO) src;
     ModificationStatus modificationStatus = AbstractBaseDO.copyValues(user, this, ignoreFields);
     if (user.getPassword() != null) {
-      setPassword(user.getPassword());
-      checkAndFixPassword();
-      if (getPassword() != null) {
+      if (user.getPassword().equals(getPassword()) == false) {
         modificationStatus = ModificationStatus.MAJOR;
       }
+      setPassword(user.getPassword());
+      checkAndFixPassword();
     }
     return modificationStatus;
   }

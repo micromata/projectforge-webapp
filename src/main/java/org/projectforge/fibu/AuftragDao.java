@@ -316,9 +316,15 @@ public class AuftragDao extends BaseDao<AuftragDO>
     }
     final AuftragFilter filter = new AuftragFilter();
     filter.setListType(AuftragFilter.FILTER_ABGESCHLOSSEN_NF);
-    final List<AuftragDO> list = getList(filter, false);
-    abgeschlossenNichtFakturiert = list != null ? list.size() : 0;
-    return abgeschlossenNichtFakturiert;
+    try {
+      final List<AuftragDO> list = getList(filter, false);
+      abgeschlossenNichtFakturiert = list != null ? list.size() : 0;
+      return abgeschlossenNichtFakturiert;
+    } catch (final Exception ex) {
+      log.error("Exception ocurred while getting number of closed and not invoiced orders: " + ex.getMessage(), ex);
+      // Exception e. g. if data-base update is needed.
+      return 0;
+    }
   }
 
   @Override

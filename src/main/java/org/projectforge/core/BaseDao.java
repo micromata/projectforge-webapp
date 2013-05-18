@@ -890,7 +890,17 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    */
   protected void afterUpdate(final O obj, final O dbObj)
   {
+  }
 
+  /**
+   * This method will be called after updating. Does nothing at default. PLEASE NOTE: If you overload this method don't forget to set
+   * {@link #supportAfterUpdate} to true, otherwise you won't get the origin data base object!
+   * @param obj The modified object
+   * @param dbObj The object from data base before modification.
+   * @param isModified is true if the object was changed, false if the object wasn't modified.
+   */
+  protected void afterUpdate(final O obj, final O dbObj, final boolean isModified)
+  {
   }
 
   /**
@@ -1071,8 +1081,10 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     Search.getFullTextSession(session).flushToIndexes();
     afterSaveOrModify(obj);
     if (supportAfterUpdate == true) {
+      afterUpdate(obj, dbObjBackup, result != ModificationStatus.NONE);
       afterUpdate(obj, dbObjBackup);
     } else {
+      afterUpdate(obj, null, result != ModificationStatus.NONE);
       afterUpdate(obj, null);
     }
     if (wantsReindexAllDependentObjects == true) {

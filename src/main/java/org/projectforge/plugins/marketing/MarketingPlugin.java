@@ -23,6 +23,8 @@
 
 package org.projectforge.plugins.marketing;
 
+import java.util.List;
+
 import org.projectforge.continuousdb.UpdateEntry;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.web.MenuItemDef;
@@ -95,6 +97,15 @@ public class MarketingPlugin extends AbstractPlugin
   public void setAddressCampaignValueDao(final AddressCampaignValueDao addressCampaignValueDao)
   {
     this.addressCampaignValueDao = addressCampaignValueDao;
+  }
+
+  /**
+   * @see org.projectforge.plugins.core.AbstractPlugin#getUpdateEntries()
+   */
+  @Override
+  public List<UpdateEntry> getUpdateEntries()
+  {
+    return MarketingPluginUpdates.getUpdateEntries();
   }
 
   @Override

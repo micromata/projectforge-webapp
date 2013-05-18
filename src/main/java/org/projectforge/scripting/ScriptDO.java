@@ -25,10 +25,12 @@ package org.projectforge.scripting;
 
 import java.io.UnsupportedEncodingException;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -58,7 +60,7 @@ public class ScriptDO extends DefaultBaseDO
   public static final int PARAMETER_NAME_MAX_LENGTH = 100;
 
   static {
-    AbstractHistorizableBaseDO.putNonHistorizableProperty(ScriptDO.class, "script", "scriptBackup");
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(ScriptDO.class, "script", "scriptBackup", "file");
   }
 
   private String name; // 255 not null
@@ -113,7 +115,7 @@ public class ScriptDO extends DefaultBaseDO
    * Please note: script is not historizable. Therefore there is now history of scripts.
    * @return
    */
-  @Column
+  @Basic(fetch = FetchType.LAZY)
   @Type(type = "binary")
   public byte[] getScript()
   {
@@ -169,6 +171,7 @@ public class ScriptDO extends DefaultBaseDO
    * Instead of historizing the script the last version of the script after changing it will stored in this field.
    * @return
    */
+  @Basic(fetch = FetchType.LAZY)
   @Column(name = "script_backup")
   @Type(type = "binary")
   public byte[] getScriptBackup()
@@ -196,6 +199,7 @@ public class ScriptDO extends DefaultBaseDO
   /**
    * @return the file
    */
+  @Basic(fetch = FetchType.LAZY)
   @Column
   @Type(type = "binary")
   public byte[] getFile()

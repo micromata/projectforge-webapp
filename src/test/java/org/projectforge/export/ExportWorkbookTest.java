@@ -38,7 +38,13 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
 import org.projectforge.core.ConfigXmlTest;
+import org.projectforge.excel.ContentProvider;
+import org.projectforge.excel.ExportConfig;
+import org.projectforge.excel.ExportSheet;
+import org.projectforge.excel.ExportWorkbook;
 import org.projectforge.test.TestConfiguration;
+import org.projectforge.user.PFUserContext;
+import org.projectforge.user.PFUserDO;
 
 public class ExportWorkbookTest
 {
@@ -55,37 +61,53 @@ public class ExportWorkbookTest
   @Test
   public void exportGermanExcel() throws IOException
   {
-    writeExcel("TestExcel_de.xls", Locale.GERMAN);
+    writeExcel("TestExcel_de.xls", Locale.GERMAN, "DD.MM.YYYY");
   }
 
   @Test
   public void exportExcel() throws IOException
   {
-    writeExcel("TestExcel_en.xls", Locale.ENGLISH);
+    writeExcel("TestExcel_en.xls", Locale.ENGLISH, "DD/MM/YYYY");
   }
 
-  private void writeExcel(final String filename, final Locale locale) throws IOException
+  private void writeExcel(final String filename, final Locale locale, final String excelDateFormat) throws IOException
   {
-    final ExportWorkbook workbook = new ExportWorkbook().setLocale(locale);
-    final ExportSheet sheet = workbook.addSheet("Test");
-    sheet.getContentProvider().setColWidths(20, 20, 20);
-    sheet.addRow().setValues("Type", "Precision", "result");
-    sheet.addRow().setValues("Java output", ".", "Tue Sep 28 00:27:10 UTC 2010");
-    sheet.addRow().setValues("DateHolder", "DAY", getDateHolder().setPrecision(DatePrecision.DAY));
-    sheet.addRow().setValues("DateHolder", "HOUR_OF_DAY", getDateHolder().setPrecision(DatePrecision.HOUR_OF_DAY));
-    sheet.addRow().setValues("DateHolder", "MINUTE_15", getDateHolder().setPrecision(DatePrecision.MINUTE_15));
-    sheet.addRow().setValues("DateHolder", "MINUTE", getDateHolder().setPrecision(DatePrecision.MINUTE));
-    sheet.addRow().setValues("DateHolder", "SECOND", getDateHolder().setPrecision(DatePrecision.SECOND));
-    sheet.addRow().setValues("DateHolder", "MILLISECOND", getDateHolder().setPrecision(DatePrecision.MILLISECOND));
-    sheet.addRow().setValues("DateHolder", "-", getDateHolder());
-    sheet.addRow().setValues("DayHolder", "-", new DayHolder(getDate()));
-    sheet.addRow().setValues("java.util.Date", "-", getDate());
-    sheet.addRow().setValues("java.sql.Timestamp", "-", new Timestamp(getDate().getTime()));
-    sheet.addRow().setValues("int", "-", 1234);
-    sheet.addRow().setValues("BigDecimal", "-", new BigDecimal("123123123.123123123123"));
-    final File file = TestConfiguration.getWorkFile(filename);
-    log.info("Writing Excel test sheet to work directory: " + file.getAbsolutePath());
-    workbook.write(new FileOutputStream(file));
+    final PFUserDO user = new PFUserDO();
+    user.setLocale(locale);
+    user.setExcelDateFormat(excelDateFormat);
+    try {
+      PFUserContext.setUser(user);
+
+      ExportConfig.setInstance(new ExportConfig() {
+        @Override
+        protected ContentProvider createNewContentProvider(final ExportWorkbook workbook)
+        {
+          return new MyXlsContentProvider(workbook);
+        }
+      }.setDefaultExportContext(new MyXlsExportContext()));
+      final ExportWorkbook workbook = new ExportWorkbook();
+      final ExportSheet sheet = workbook.addSheet("Test");
+      sheet.getContentProvider().setColWidths(20, 20, 20);
+      sheet.addRow().setValues("Type", "Precision", "result");
+      sheet.addRow().setValues("Java output", ".", "Tue Sep 28 00:27:10 UTC 2010");
+      sheet.addRow().setValues("DateHolder", "DAY", getDateHolder().setPrecision(DatePrecision.DAY));
+      sheet.addRow().setValues("DateHolder", "HOUR_OF_DAY", getDateHolder().setPrecision(DatePrecision.HOUR_OF_DAY));
+      sheet.addRow().setValues("DateHolder", "MINUTE_15", getDateHolder().setPrecision(DatePrecision.MINUTE_15));
+      sheet.addRow().setValues("DateHolder", "MINUTE", getDateHolder().setPrecision(DatePrecision.MINUTE));
+      sheet.addRow().setValues("DateHolder", "SECOND", getDateHolder().setPrecision(DatePrecision.SECOND));
+      sheet.addRow().setValues("DateHolder", "MILLISECOND", getDateHolder().setPrecision(DatePrecision.MILLISECOND));
+      sheet.addRow().setValues("DateHolder", "-", getDateHolder());
+      sheet.addRow().setValues("DayHolder", "-", new DayHolder(getDate()));
+      sheet.addRow().setValues("java.util.Date", "-", getDate());
+      sheet.addRow().setValues("java.sql.Timestamp", "-", new Timestamp(getDate().getTime()));
+      sheet.addRow().setValues("int", "-", 1234);
+      sheet.addRow().setValues("BigDecimal", "-", new BigDecimal("123123123.123123123123"));
+      final File file = TestConfiguration.getWorkFile(filename);
+      log.info("Writing Excel test sheet to work directory: " + file.getAbsolutePath());
+      workbook.write(new FileOutputStream(file));
+    } finally {
+      PFUserContext.setUser(null);
+    }
   }
 
   private DateHolder getDateHolder()

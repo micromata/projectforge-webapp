@@ -27,10 +27,10 @@ import java.util.Map;
 
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressExport;
-import org.projectforge.export.ExportColumn;
-import org.projectforge.export.ExportSheet;
-import org.projectforge.export.I18nExportColumn;
-import org.projectforge.export.PropertyMapping;
+import org.projectforge.excel.ExportColumn;
+import org.projectforge.excel.ExportSheet;
+import org.projectforge.excel.I18nExportColumn;
+import org.projectforge.excel.PropertyMapping;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.wicket.converter.LanguageConverter;
 

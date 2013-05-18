@@ -259,6 +259,15 @@ public class TeamCalCalendarForm extends CalendarForm
     super.onInitialize();
   }
 
+  /**
+   * @see org.projectforge.web.calendar.CalendarForm#getRefreshIconTooltip()
+   */
+  @Override
+  protected String getRefreshIconTooltip()
+  {
+    return getString("plugins.teamcal.calendar.refresh.tooltip");
+  }
+
   @Override
   public TeamCalCalendarFilter getFilter()
   {

@@ -23,7 +23,11 @@
 
 package org.projectforge.plugins.marketing;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.projectforge.continuousdb.SchemaGenerator;
+import org.projectforge.continuousdb.Table;
 import org.projectforge.continuousdb.UpdateEntry;
 import org.projectforge.continuousdb.UpdateEntryImpl;
 import org.projectforge.continuousdb.UpdatePreCheckStatus;
@@ -43,6 +47,42 @@ public class MarketingPluginUpdates
 
   final static Class< ? >[] doClasses = new Class< ? >[] { //
     AddressCampaignDO.class, AddressCampaignValueDO.class};
+
+  @SuppressWarnings("serial")
+  public static List<UpdateEntry> getUpdateEntries()
+  {
+    final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
+    // /////////////////////////////////////////////////////////////////
+    // 5.1
+    // /////////////////////////////////////////////////////////////////
+    list.add(new UpdateEntryImpl(
+        MarketingPlugin.ADDRESS_CAMPAIGN_ID,
+        "5.2",
+        "2013-05-13",
+        "Renames T_PLUGIN_MARKETING_ADDRESS_CAMPAIGN_VALUE.values to s_values.") {
+
+      @Override
+      public UpdatePreCheckStatus runPreCheck()
+      {
+        // Does the data-base table already exist?
+        if (dao.doesTableAttributesExist(AddressCampaignDO.class, "values") == true) {
+          return UpdatePreCheckStatus.ALREADY_UPDATED;
+        } else {
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
+      }
+
+      @Override
+      public UpdateRunningStatus runUpdate()
+      {
+        if (dao.doesTableAttributesExist(AddressCampaignDO.class, "values") == false) {
+          dao.renameTableAttribute(new Table(AddressCampaignDO.class).getName(), "values", "s_values");
+        }
+        return UpdateRunningStatus.DONE;
+      }
+    });
+    return list;
+  }
 
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()

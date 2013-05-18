@@ -13,6 +13,7 @@
   <bean id="daoRegistry" class="org.projectforge.registry.DaoRegistry" singleton="true" />
   <bean id="hrPlanningExport" class="org.projectforge.humanresources.HRPlanningExport" />
   <bean id="mebMailClient" class="org.projectforge.meb.MebMailClient" />
+  <bean id="orderExport" class="org.projectforge.fibu.OrderExport" singleton="true" />
   <bean id="sendMail" class="org.projectforge.mail.SendMail" singleton="true" />
   <bean id="statisticsCache" class="org.projectforge.database.StatisticsCache" singleton="true">
     <property name="expireTimeInHours" value="12" />
