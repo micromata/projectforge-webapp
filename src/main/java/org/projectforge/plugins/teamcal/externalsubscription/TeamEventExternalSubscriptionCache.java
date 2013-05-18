@@ -67,8 +67,8 @@ public class TeamEventExternalSubscriptionCache
       updateCache(dao, calendar);
     }
 
-    List<Integer> idsToRemove = new ArrayList<Integer>();
-    for (Integer calendarId : subscriptions.keySet()) {
+    final List<Integer> idsToRemove = new ArrayList<Integer>();
+    for (final Integer calendarId : subscriptions.keySet()) {
       // if calendar is not subscribed anymore, remove them
       if(calendarListContainsId(subscribedCalendars, calendarId) == false) {
         idsToRemove.add(calendarId);
@@ -77,16 +77,16 @@ public class TeamEventExternalSubscriptionCache
     removeCalendarsFromCache(idsToRemove);
   }
 
-  private void removeCalendarsFromCache(List<Integer> idsToRemove)
+  private void removeCalendarsFromCache(final List<Integer> idsToRemove)
   {
-    for (Integer calendarId : idsToRemove) {
+    for (final Integer calendarId : idsToRemove) {
       subscriptions.remove(calendarId);
     }
   }
 
-  private boolean calendarListContainsId(List<TeamCalDO> subscribedCalendars, Integer calendarId)
+  private boolean calendarListContainsId(final List<TeamCalDO> subscribedCalendars, final Integer calendarId)
   {
-    for (TeamCalDO teamCal : subscribedCalendars) {
+    for (final TeamCalDO teamCal : subscribedCalendars) {
       if (teamCal.getId().equals(calendarId)) {
         return true;
       }
@@ -96,6 +96,16 @@ public class TeamEventExternalSubscriptionCache
 
   public void updateCache(final TeamCalDao dao, final TeamCalDO calendar)
   {
+    updateCache(dao, calendar, false);
+  }
+
+  /**
+   * @param dao
+   * @param calendar
+   * @param force If true then update is forced (independent of last update time and refresh interval).
+   */
+  public void updateCache(final TeamCalDao dao, final TeamCalDO calendar, final boolean force)
+  {
     final TeamEventSubscription compareSubscription = subscriptions.get(calendar.getId());
     final Long now = System.currentTimeMillis();
     final Long addedTime = calendar.getExternalSubscriptionUpdateInterval() == null ? SUBSCRIPTION_UPDATE_TIME : 1000L * calendar.getExternalSubscriptionUpdateInterval();
@@ -104,7 +114,7 @@ public class TeamEventExternalSubscriptionCache
       final TeamEventSubscription teamEventSubscription = new TeamEventSubscription(dao, calendar);
       subscriptions.put(calendar.getId(), teamEventSubscription);
 
-    } else if (compareSubscription.getLastUpdated() == null || compareSubscription.getLastUpdated() + addedTime <= now) {
+    } else if (force == true || compareSubscription.getLastUpdated() == null || compareSubscription.getLastUpdated() + addedTime <= now) {
       // update the calendar
       compareSubscription.initOrUpdate(calendar);
     }
@@ -129,15 +139,15 @@ public class TeamEventExternalSubscriptionCache
     final List<TeamEventDO> result = new ArrayList<TeamEventDO>();
     // precondition: existing teamcals ins filter
     if (filter.getTeamCals() != null) {
-        for (final Integer calendarId : filter.getTeamCals()) {
-          final TeamEventSubscription eventSubscription = subscriptions.get(calendarId);
-          if (eventSubscription != null) {
-            List<TeamEventDO> recurrenceEvents = eventSubscription.getRecurrenceEvents();
-            if (recurrenceEvents != null && recurrenceEvents.size() > 0) {
-              result.addAll(recurrenceEvents);
-            }
+      for (final Integer calendarId : filter.getTeamCals()) {
+        final TeamEventSubscription eventSubscription = subscriptions.get(calendarId);
+        if (eventSubscription != null) {
+          final List<TeamEventDO> recurrenceEvents = eventSubscription.getRecurrenceEvents();
+          if (recurrenceEvents != null && recurrenceEvents.size() > 0) {
+            result.addAll(recurrenceEvents);
           }
         }
+      }
     }
     return result;
   }
