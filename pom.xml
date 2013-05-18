@@ -171,6 +171,11 @@
       <artifactId>joda-time</artifactId>
       <version>${joda.version}</version>
     </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.16</version>
+    </dependency>
     <dependency> <!-- Version check: 2010-08-?? -->
       <groupId>net.sourceforge</groupId>
       <artifactId>mpxj</artifactId>
@@ -195,24 +200,7 @@
       <groupId>org.apache.wicket</groupId>
       <artifactId>wicket-spring</artifactId>
       <version>${wicket.version}</version>
-      <!-- exclude spring framework that wicket pulls in -->
-      <!-- <exclusions> -->
-      <!-- <exclusion> -->
-      <!-- <groupId>org.springframework</groupId> -->
-      <!-- <artifactId>spring</artifactId> -->
-      <!-- </exclusion> -->
-      <!-- </exclusions> -->
     </dependency>
-    <!-- <dependency> -->
-    <!-- <groupId>org.odlabs.wiquery</groupId> -->
-    <!-- <artifactId>wiquery-core</artifactId> -->
-    <!-- <version>${wiquery.version}</version> -->
-    <!-- </dependency> -->
-    <!-- <dependency> -->
-    <!-- <groupId>org.odlabs.wiquery</groupId> -->
-    <!-- <artifactId>wiquery-jquery-ui</artifactId> -->
-    <!-- <version>${wiquery.version}</version> -->
-    <!-- </dependency> -->
     <dependency> <!-- Version check: 2010-08-28 -->
       <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>batik-codec</artifactId>
