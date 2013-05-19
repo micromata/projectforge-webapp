@@ -95,7 +95,7 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
         };
       });
       // DELETE BUTTON
-      final IconButtonPanel deleteFileButton = new IconButtonPanel(SingleButtonPanel.WICKET_ID, IconType.TRASH, getString("delete")) {
+      final IconButtonPanel deleteFileButton = new IconButtonPanel(fs.newChildId(), IconType.TRASH, fs.getString("delete")) {
         /**
          * @see org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
          */
