@@ -25,13 +25,16 @@ package org.projectforge.plugins.licensemanagement;
 
 import java.sql.Date;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.Type;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
@@ -39,8 +42,10 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
+import org.projectforge.core.AbstractHistorizableBaseDO;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.database.Constants;
+import org.projectforge.scripting.ScriptDO;
 import org.projectforge.user.HibernateSearchUsersBridge;
 
 /**
@@ -54,6 +59,10 @@ import org.projectforge.user.HibernateSearchUsersBridge;
 public class LicenseDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = 1124854524084990283L;
+
+  static {
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(ScriptDO.class, "file1", "file2");
+  }
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String organization;
@@ -92,6 +101,16 @@ public class LicenseDO extends DefaultBaseDO
 
   @DateBridge(resolution = Resolution.DAY)
   private Date validUntil;
+
+  private byte[] file1;
+
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String filename1;
+
+  private byte[] file2;
+
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String filename2;
 
   @Transient
   public String getOrderString()
@@ -341,5 +360,81 @@ public class LicenseDO extends DefaultBaseDO
   {
     this.validUntil = validUntil;
     return this;
+  }
+
+  /**
+   * @return the file1
+   */
+  @Basic(fetch = FetchType.LAZY)
+  @Column(name = "file1")
+  @Type(type = "binary")
+  public byte[] getFile1()
+  {
+    return file1;
+  }
+
+  /**
+   * @param file1 the file to set
+   * @return this for chaining.
+   */
+  public void setFile1(final byte[] file1)
+  {
+    this.file1 = file1;
+  }
+
+  /**
+   * @return the filename1
+   */
+  @Column(name = "file_name1", length = 255)
+  public String getFilename1()
+  {
+    return filename1;
+  }
+
+  /**
+   * @param filename1 the filename to set
+   * @return this for chaining.
+   */
+  public void setFilename1(final String filename1)
+  {
+    this.filename1 = filename1;
+  }
+
+  /**
+   * @return the file2
+   */
+  @Basic(fetch = FetchType.LAZY)
+  @Column(name = "file2")
+  @Type(type = "binary")
+  public byte[] getFile2()
+  {
+    return file2;
+  }
+
+  /**
+   * @param file2 the file to set
+   * @return this for chaining.
+   */
+  public void setFile2(final byte[] file2)
+  {
+    this.file2 = file2;
+  }
+
+  /**
+   * @return the filename2
+   */
+  @Column(name = "file_name2", length = 255)
+  public String getFilename2()
+  {
+    return filename2;
+  }
+
+  /**
+   * @param filename2 the filename to set
+   * @return this for chaining.
+   */
+  public void setFilename2(final String filename2)
+  {
+    this.filename2 = filename2;
   }
 }
