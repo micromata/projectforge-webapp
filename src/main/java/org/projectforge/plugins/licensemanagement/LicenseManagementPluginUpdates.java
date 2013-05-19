@@ -23,12 +23,16 @@
 
 package org.projectforge.plugins.licensemanagement;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.projectforge.continuousdb.SchemaGenerator;
 import org.projectforge.continuousdb.UpdateEntry;
 import org.projectforge.continuousdb.UpdateEntryImpl;
 import org.projectforge.continuousdb.UpdatePreCheckStatus;
 import org.projectforge.continuousdb.UpdateRunningStatus;
 import org.projectforge.database.MyDatabaseUpdateDao;
+import org.projectforge.plugins.teamcal.TeamCalPlugin;
 
 /**
  * Contains the initial data-base set-up script and later all update scripts if any data-base schema updates are required by any later
@@ -40,6 +44,39 @@ public class LicenseManagementPluginUpdates
   static MyDatabaseUpdateDao dao;
 
   @SuppressWarnings("serial")
+  public static List<UpdateEntry> getUpdateEntries()
+  {
+    final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
+    // /////////////////////////////////////////////////////////////////
+    // 5.1
+    // /////////////////////////////////////////////////////////////////
+    list.add(new UpdateEntryImpl(TeamCalPlugin.ID, "5.2", "2013-05-19", "Adds T_PLUGIN_LM_LICENSE.file{name}{1,2}.") {
+      String[] newAttributes = { "file1", "filename1", "file2", "filename2"};
+
+      @Override
+      public UpdatePreCheckStatus runPreCheck()
+      {
+        // Does the data-base table already exist?
+        if (dao.doTableAttributesExist(LicenseDO.class, newAttributes) == true) {
+          return UpdatePreCheckStatus.ALREADY_UPDATED;
+        } else {
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
+      }
+
+      @Override
+      public UpdateRunningStatus runUpdate()
+      {
+        if (dao.doTableAttributesExist(LicenseDO.class, newAttributes) == false) {
+          dao.addTableAttributes(LicenseDO.class, newAttributes);
+        }
+        return UpdateRunningStatus.DONE;
+      }
+    });
+    return list;
+  }
+
+  @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
     return new UpdateEntryImpl(LicenseManagementPlugin.ID, "2012-10-23", "Adds table T_PLUGIN_LM_LICENSE.") {
@@ -48,7 +85,7 @@ public class LicenseManagementPluginUpdates
       {
         // Does the data-base table already exist?
         // Check only the oldest table.
-        if (dao.doesEntitiesExist(LicenseDO.class) == true) {
+        if (dao.doEntitiesExist(LicenseDO.class) == true) {
           return UpdatePreCheckStatus.ALREADY_UPDATED;
         } else {
           // The oldest table doesn't exist, therefore the plugin has to initialized completely.

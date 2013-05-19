@@ -45,7 +45,6 @@ import org.hibernate.search.annotations.Store;
 import org.projectforge.core.AbstractHistorizableBaseDO;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.database.Constants;
-import org.projectforge.scripting.ScriptDO;
 import org.projectforge.user.HibernateSearchUsersBridge;
 
 /**
@@ -61,7 +60,7 @@ public class LicenseDO extends DefaultBaseDO
   private static final long serialVersionUID = 1124854524084990283L;
 
   static {
-    AbstractHistorizableBaseDO.putNonHistorizableProperty(ScriptDO.class, "file1", "file2");
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(LicenseDO.class, "file1", "file2");
   }
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
