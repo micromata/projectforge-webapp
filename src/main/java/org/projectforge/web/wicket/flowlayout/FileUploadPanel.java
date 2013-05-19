@@ -94,9 +94,13 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
           return file.getObject() != null;
         };
       });
-      final Button deleteFileButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("delete")) {
+      // DELETE BUTTON
+      final IconButtonPanel deleteFileButton = new IconButtonPanel(SingleButtonPanel.WICKET_ID, IconType.TRASH, getString("delete")) {
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
+         */
         @Override
-        public final void onSubmit()
+        protected void onSubmit()
         {
           file.setObject(null);
           filename.setObject(null);
@@ -111,7 +115,7 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
           return file.getObject() != null;
         }
       };
-      fs.add(new SingleButtonPanel(fs.newChildId(), deleteFileButton, fs.getString("delete"), SingleButtonPanel.DELETE));
+      fs.add(deleteFileButton);
     }
     add(this.fileUploadField = new FileUploadField(FileUploadPanel.WICKET_ID));
     fs.add(this);
@@ -138,22 +142,6 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
   {
     super(id);
     add(this.fileUploadField = fileUploadField);
-    // add(new Label("filename", new Model<String>() {
-    // /**
-    // * @see org.apache.wicket.model.Model#getObject()
-    // */
-    // @Override
-    // public String getObject()
-    // {
-    // final FileUpload fileUpload = fileUploadField.getFileUpload();
-    // if (fileUpload == null) {
-    // return getString("file.upload.noFileSelected");
-    // } else {
-    // return fileUpload.getClientFileName();
-    // }
-    // }
-    // }));
-    // add(new Label("action", getString("file.upload.choose")));
   }
 
   /**
