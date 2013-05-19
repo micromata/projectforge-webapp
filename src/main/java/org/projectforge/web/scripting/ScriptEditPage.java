@@ -27,13 +27,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
-import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.common.FileHelper;
 import org.projectforge.scripting.ScriptDO;
 import org.projectforge.scripting.ScriptDao;
-import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
@@ -79,20 +76,6 @@ public class ScriptEditPage extends AbstractEditPage<ScriptDO, ScriptEditForm, S
   protected ScriptEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final ScriptDO data)
   {
     return new ScriptEditForm(this, data);
-  }
-
-  protected void upload()
-  {
-    accessChecker.checkIsLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
-    accessChecker.checkRestrictedOrDemoUser();
-    log.info("upload");
-    final FileUpload fileUpload = form.fileUploadField.getFileUpload();
-    if (fileUpload != null) {
-      final String clientFileName = FileHelper.createSafeFilename(fileUpload.getClientFileName(), 255);
-      final byte[] bytes = fileUpload.getBytes();
-      getData().setFile(bytes);
-      getData().setFilename(clientFileName);
-    }
   }
 
   /**

@@ -24,15 +24,15 @@
 package org.projectforge.web.scripting;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.upload.FileUploadField;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.lang.Bytes;
+import org.projectforge.access.AccessChecker;
 import org.projectforge.scripting.ScriptDO;
 import org.projectforge.scripting.ScriptParameterType;
+import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.web.dialog.ModalDialog;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
@@ -41,8 +41,6 @@ import org.projectforge.web.wicket.components.AceEditorPanel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
-import org.projectforge.web.wicket.components.SingleButtonPanel;
-import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.FileUploadPanel;
 
@@ -52,7 +50,10 @@ public class ScriptEditForm extends AbstractEditForm<ScriptDO, ScriptEditPage>
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ScriptEditForm.class);
 
-  protected FileUploadField fileUploadField;
+  @SpringBean(name = "accessChecker")
+  private AccessChecker accessChecker;
+
+  protected FileUploadPanel fileUploadPanel;
 
   protected ModalDialog showBackupScriptDialog;
 
@@ -67,50 +68,27 @@ public class ScriptEditForm extends AbstractEditForm<ScriptDO, ScriptEditPage>
   protected void init()
   {
     super.init();
-    gridBuilder.newGridPanel();
-    gridBuilder.newSplitPanel(GridSize.COL50);
+    gridBuilder.newSplitPanel(GridSize.COL33);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("scripting.script.name"));
       fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "name")));
     }
-    gridBuilder.newSplitPanel(GridSize.COL50);
+    gridBuilder.newSplitPanel(GridSize.COL66);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("file"));
-      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
-        @Override
-        public String getObject()
-        {
-          return data.getFilename() != null ? data.getFilename() : "";
-        }
-      }));
-      fileUploadField = new FileUploadField(FileUploadPanel.WICKET_ID);
-      fs.add(new FileUploadPanel(fs.newChildId(), fileUploadField));
-      final Button uploadButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("upload")) {
-        @Override
-        public final void onSubmit()
-        {
-          parentPage.upload();
-        }
-      };
-      fs.add(new SingleButtonPanel(fs.newChildId(), uploadButton, getString("upload"), SingleButtonPanel.GREY));
-      final Button deleteFileButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("delete")) {
-        @Override
-        public final void onSubmit()
-        {
-          data.setFile(null);
-          data.setFilename(null);
-        }
-      };
-      fs.add(new SingleButtonPanel(fs.newChildId(), deleteFileButton, getString("delete"), SingleButtonPanel.DELETE) {
+      fileUploadPanel = new FileUploadPanel(fs.newChildId(), fs, true, true, new PropertyModel<String>(data, "filename"),
+          new PropertyModel<byte[]>(data, "file")) {
         /**
-         * @see org.apache.wicket.Component#isVisible()
+         * @see org.projectforge.web.wicket.flowlayout.FileUploadPanel#upload()
          */
         @Override
-        public boolean isVisible()
+        protected void upload()
         {
-          return data.getFile() != null;
+          accessChecker.checkIsLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
+          accessChecker.checkRestrictedOrDemoUser();
+          super.upload();
         }
-      });
+      };
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
     addParameterSettings(1);
