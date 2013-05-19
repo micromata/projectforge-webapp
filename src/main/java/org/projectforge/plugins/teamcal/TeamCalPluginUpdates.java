@@ -80,8 +80,8 @@ public class TeamCalPluginUpdates
       public UpdatePreCheckStatus runPreCheck()
       {
         // Does the data-base table already exist?
-        if (dao.doesTableAttributesExist(TeamEventAttendeeDO.class, "commentOfAttendee") == true
-            && dao.doesTableAttributesExist(TeamCalDO.class, newAttributes51) == true) {
+        if (dao.doTableAttributesExist(TeamEventAttendeeDO.class, "commentOfAttendee") == true
+            && dao.doTableAttributesExist(TeamCalDO.class, newAttributes51) == true) {
           return UpdatePreCheckStatus.ALREADY_UPDATED;
         } else {
           return UpdatePreCheckStatus.READY_FOR_UPDATE;
@@ -91,13 +91,13 @@ public class TeamCalPluginUpdates
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        if (dao.doesTableAttributesExist(TeamEventAttendeeDO.class, "commentOfAttendee") == false) {
+        if (dao.doTableAttributesExist(TeamEventAttendeeDO.class, "commentOfAttendee") == false) {
           dao.alterTableColumnVarCharLength(eventTable.getName(), "note", 4000);
           dao.dropTable(new Table(TeamEventAttendeeDO.class).getName()); // Table wasn't in use yet.
           // TeamEventDO is only needed for generating OneToMany relation with attendee table:
           new SchemaGenerator(dao).add(TeamEventDO.class, TeamEventAttendeeDO.class).createSchema();
         }
-        if (dao.doesTableAttributesExist(TeamCalDO.class, newAttributes51) == false) {
+        if (dao.doTableAttributesExist(TeamCalDO.class, newAttributes51) == false) {
           dao.addTableAttributes(TeamCalDO.class, newAttributes51);
         }
         return UpdateRunningStatus.DONE;
@@ -116,7 +116,7 @@ public class TeamCalPluginUpdates
       {
         // Does the data-base table already exist?
         // Check only the oldest table.
-        if (dao.doesEntitiesExist(TeamCalDO.class) == true) {
+        if (dao.doEntitiesExist(TeamCalDO.class) == true) {
           return UpdatePreCheckStatus.ALREADY_UPDATED;
         } else {
           // The oldest table doesn't exist, therefore the plug-in has to initialized completely.

@@ -133,7 +133,7 @@ public class DatabaseCoreInitial
       public UpdatePreCheckStatus runPreCheck()
       {
         // Does the data-base tables already exist?
-        if (dao.doesEntitiesExist(doClasses) == false) {
+        if (dao.doEntitiesExist(doClasses) == false) {
           return UpdatePreCheckStatus.READY_FOR_UPDATE;
         }
         return UpdatePreCheckStatus.ALREADY_UPDATED;
@@ -142,7 +142,7 @@ public class DatabaseCoreInitial
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        if (dao.doesExist(new Table(PFUserDO.class)) == false && HibernateUtils.getDialect() == DatabaseDialect.PostgreSQL) {
+        if (dao.doExist(new Table(PFUserDO.class)) == false && HibernateUtils.getDialect() == DatabaseDialect.PostgreSQL) {
           // User table doesn't exist, therefore schema should be empty. PostgreSQL needs sequence for primary keys:
           dao.createSequence("hibernate_sequence", true);
         }

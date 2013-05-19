@@ -53,7 +53,7 @@ public class PollPluginUpdates
       public UpdatePreCheckStatus runPreCheck()
       {
         // Check only the oldest table.
-        if (dao.doesEntitiesExist(PollDO.class) == false) {
+        if (dao.doEntitiesExist(PollDO.class) == false) {
           // The oldest table doesn't exist, therefore the plug-in has to initialized completely.
           return UpdatePreCheckStatus.READY_FOR_UPDATE;
         }

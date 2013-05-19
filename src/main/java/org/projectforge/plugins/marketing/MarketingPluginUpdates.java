@@ -65,7 +65,7 @@ public class MarketingPluginUpdates
       public UpdatePreCheckStatus runPreCheck()
       {
         // Does the data-base table already exist?
-        if (dao.doesTableAttributesExist(AddressCampaignDO.class, "values") == true) {
+        if (dao.doTableAttributesExist(AddressCampaignDO.class, "values") == true) {
           return UpdatePreCheckStatus.ALREADY_UPDATED;
         } else {
           return UpdatePreCheckStatus.READY_FOR_UPDATE;
@@ -75,7 +75,7 @@ public class MarketingPluginUpdates
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        if (dao.doesTableAttributesExist(AddressCampaignDO.class, "values") == false) {
+        if (dao.doTableAttributesExist(AddressCampaignDO.class, "values") == false) {
           dao.renameTableAttribute(new Table(AddressCampaignDO.class).getName(), "values", "s_values");
         }
         return UpdateRunningStatus.DONE;
@@ -94,7 +94,7 @@ public class MarketingPluginUpdates
       {
         // Does the data-base table already exist?
         // Check only the oldest table.
-        if (dao.doesEntitiesExist(AddressCampaignDO.class) == true) {
+        if (dao.doEntitiesExist(AddressCampaignDO.class) == true) {
           return UpdatePreCheckStatus.ALREADY_UPDATED;
         } else {
           // The oldest table doesn't exist, therefore the plug-in has to initialized completely.

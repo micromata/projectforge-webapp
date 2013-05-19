@@ -74,8 +74,8 @@ public class DatabaseCoreUpdates
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        if (dao.doesTableAttributesExist(ScriptDO.class, "file", "filename") == true
-            && dao.doesTableAttributesExist(AuftragsPositionDO.class, "periodOfPerformanceBegin", "periodOfPerformanceEnd") == true) {
+        if (dao.doTableAttributesExist(ScriptDO.class, "file", "filename") == true
+            && dao.doTableAttributesExist(AuftragsPositionDO.class, "periodOfPerformanceBegin", "periodOfPerformanceEnd") == true) {
           return UpdatePreCheckStatus.ALREADY_UPDATED;
         }
         return UpdatePreCheckStatus.READY_FOR_UPDATE;
@@ -84,7 +84,7 @@ public class DatabaseCoreUpdates
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        if (dao.doesTableAttributesExist(ScriptDO.class, "file", "filename") == false) {
+        if (dao.doTableAttributesExist(ScriptDO.class, "file", "filename") == false) {
           dao.addTableAttributes(ScriptDO.class, "file", "filename");
           final Table scriptTable = new Table(ScriptDO.class);
           dao.renameTableAttribute(scriptTable.getName(), "script", "old_script");
@@ -103,7 +103,7 @@ public class DatabaseCoreUpdates
             }
           }
         }
-        if (dao.doesTableAttributesExist(AuftragsPositionDO.class, "periodOfPerformanceBegin", "periodOfPerformanceEnd") == false) {
+        if (dao.doTableAttributesExist(AuftragsPositionDO.class, "periodOfPerformanceBegin", "periodOfPerformanceEnd") == false) {
           dao.addTableAttributes(AuftragsPositionDO.class, "periodOfPerformanceBegin", "periodOfPerformanceEnd");
         }
         return UpdateRunningStatus.DONE;
@@ -126,8 +126,8 @@ public class DatabaseCoreUpdates
         if (dao.isVersionUpdated(CORE_REGION_ID, VERSION_5_0) == false) {
           entriesToMigrate = dao.queryForInt("select count(*) from t_contract where status='IN_PROGRES'");
         }
-        return dao.doesTableAttributesExist(rechnungTable, "konto") == true //
-            && dao.doesTableAttributesExist(userTable, "sshPublicKey") //
+        return dao.doTableAttributesExist(rechnungTable, "konto") == true //
+            && dao.doTableAttributesExist(userTable, "sshPublicKey") //
             && entriesToMigrate == 0 //
             ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.READY_FOR_UPDATE;
       }
@@ -135,10 +135,10 @@ public class DatabaseCoreUpdates
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        if (dao.doesTableAttributesExist(rechnungTable, "konto") == false) {
+        if (dao.doTableAttributesExist(rechnungTable, "konto") == false) {
           dao.addTableAttributes(rechnungTable, new TableAttribute(RechnungDO.class, "konto"));
         }
-        if (dao.doesTableAttributesExist(userTable, "sshPublicKey") == false) {
+        if (dao.doTableAttributesExist(userTable, "sshPublicKey") == false) {
           dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "sshPublicKey"));
         }
         final int entriesToMigrate = dao.queryForInt("select count(*) from t_contract where status='IN_PROGRES'");
@@ -158,7 +158,7 @@ public class DatabaseCoreUpdates
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        return dao.doesTableAttributesExist(projektTable, "konto") == true //
+        return dao.doTableAttributesExist(projektTable, "konto") == true //
             ? UpdatePreCheckStatus.ALREADY_UPDATED
                 : UpdatePreCheckStatus.READY_FOR_UPDATE;
       }
@@ -166,7 +166,7 @@ public class DatabaseCoreUpdates
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        if (dao.doesTableAttributesExist(projektTable, "konto") == false) {
+        if (dao.doTableAttributesExist(projektTable, "konto") == false) {
           dao.addTableAttributes(projektTable, new TableAttribute(ProjektDO.class, "konto"));
         }
         return UpdateRunningStatus.DONE;
@@ -194,33 +194,33 @@ public class DatabaseCoreUpdates
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        return dao.doesTableAttributesExist(userTable, "authenticationToken", "localUser", "restrictedUser", "deactivated", "ldapValues") == true //
-            && dao.doesTableAttributesExist(groupTable, "localGroup") == true // , "nestedGroupsAllowed", "nestedGroupIds") == true //
-            && dao.doesTableAttributesExist(outgoingInvoiceTable, "uiStatusAsXml") == true //
-            && dao.doesTableAttributesExist(incomingInvoiceTable, "uiStatusAsXml") == true //
-            && dao.doesTableAttributesExist(orderTable, "uiStatusAsXml") == true //
+        return dao.doTableAttributesExist(userTable, "authenticationToken", "localUser", "restrictedUser", "deactivated", "ldapValues") == true //
+            && dao.doTableAttributesExist(groupTable, "localGroup") == true // , "nestedGroupsAllowed", "nestedGroupIds") == true //
+            && dao.doTableAttributesExist(outgoingInvoiceTable, "uiStatusAsXml") == true //
+            && dao.doTableAttributesExist(incomingInvoiceTable, "uiStatusAsXml") == true //
+            && dao.doTableAttributesExist(orderTable, "uiStatusAsXml") == true //
             ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.READY_FOR_UPDATE;
       }
 
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        if (dao.doesTableAttributesExist(userTable, "authenticationToken") == false) {
+        if (dao.doTableAttributesExist(userTable, "authenticationToken") == false) {
           dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "authenticationToken"));
         }
-        if (dao.doesTableAttributesExist(userTable, "localUser") == false) {
+        if (dao.doTableAttributesExist(userTable, "localUser") == false) {
           dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "localUser").setDefaultValue("false"));
         }
-        if (dao.doesTableAttributesExist(userTable, "restrictedUser") == false) {
+        if (dao.doTableAttributesExist(userTable, "restrictedUser") == false) {
           dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "restrictedUser").setDefaultValue("false"));
         }
-        if (dao.doesTableAttributesExist(userTable, "deactivated") == false) {
+        if (dao.doTableAttributesExist(userTable, "deactivated") == false) {
           dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "deactivated").setDefaultValue("false"));
         }
-        if (dao.doesTableAttributesExist(userTable, "ldapValues") == false) {
+        if (dao.doTableAttributesExist(userTable, "ldapValues") == false) {
           dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "ldapValues"));
         }
-        if (dao.doesTableAttributesExist(groupTable, "localGroup") == false) {
+        if (dao.doTableAttributesExist(groupTable, "localGroup") == false) {
           dao.addTableAttributes(groupTable, new TableAttribute(GroupDO.class, "localGroup").setDefaultValue("false"));
         }
         // if (dao.doesTableAttributesExist(groupTable, "nestedGroupsAllowed") == false) {
@@ -229,13 +229,13 @@ public class DatabaseCoreUpdates
         // if (dao.doesTableAttributesExist(groupTable, "nestedGroupIds") == false) {
         // dao.addTableAttributes(groupTable, new TableAttribute(GroupDO.class, "nestedGroupIds"));
         // }
-        if (dao.doesTableAttributesExist(outgoingInvoiceTable, "uiStatusAsXml") == false) {
+        if (dao.doTableAttributesExist(outgoingInvoiceTable, "uiStatusAsXml") == false) {
           dao.addTableAttributes(outgoingInvoiceTable, new TableAttribute(RechnungDO.class, "uiStatusAsXml"));
         }
-        if (dao.doesTableAttributesExist(incomingInvoiceTable, "uiStatusAsXml") == false) {
+        if (dao.doTableAttributesExist(incomingInvoiceTable, "uiStatusAsXml") == false) {
           dao.addTableAttributes(incomingInvoiceTable, new TableAttribute(EingangsrechnungDO.class, "uiStatusAsXml"));
         }
-        if (dao.doesTableAttributesExist(orderTable, "uiStatusAsXml") == false) {
+        if (dao.doTableAttributesExist(orderTable, "uiStatusAsXml") == false) {
           dao.addTableAttributes(orderTable, new TableAttribute(AuftragDO.class, "uiStatusAsXml"));
         }
         return UpdateRunningStatus.DONE;
@@ -251,7 +251,7 @@ public class DatabaseCoreUpdates
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        return dao.doesTableAttributesExist(userTable, "firstDayOfWeek", "hrPlanning") == true //
+        return dao.doTableAttributesExist(userTable, "firstDayOfWeek", "hrPlanning") == true //
             ? UpdatePreCheckStatus.ALREADY_UPDATED
                 : UpdatePreCheckStatus.READY_FOR_UPDATE;
       }
@@ -259,10 +259,10 @@ public class DatabaseCoreUpdates
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        if (dao.doesTableAttributesExist(userTable, "firstDayOfWeek") == false) {
+        if (dao.doTableAttributesExist(userTable, "firstDayOfWeek") == false) {
           dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "firstDayOfWeek"));
         }
-        if (dao.doesTableAttributesExist(userTable, "hrPlanning") == false) {
+        if (dao.doTableAttributesExist(userTable, "hrPlanning") == false) {
           dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "hrPlanning").setDefaultValue("true"));
         }
         return UpdateRunningStatus.DONE;
@@ -281,21 +281,21 @@ public class DatabaseCoreUpdates
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        return dao.doesTableAttributesExist(scriptTable, "parameter6Name", "parameter6Type") == true //
-            && dao.doesTableAttributesExist(eingangsrechnungTable, "paymentType") == true //
+        return dao.doTableAttributesExist(scriptTable, "parameter6Name", "parameter6Type") == true //
+            && dao.doTableAttributesExist(eingangsrechnungTable, "paymentType") == true //
             ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.READY_FOR_UPDATE;
       }
 
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        if (dao.doesTableAttributesExist(scriptTable, "parameter6Name") == false) {
+        if (dao.doTableAttributesExist(scriptTable, "parameter6Name") == false) {
           dao.addTableAttributes(scriptTable, new TableAttribute(ScriptDO.class, "parameter6Name"));
         }
-        if (dao.doesTableAttributesExist(scriptTable, "parameter6Type") == false) {
+        if (dao.doTableAttributesExist(scriptTable, "parameter6Type") == false) {
           dao.addTableAttributes(scriptTable, new TableAttribute(ScriptDO.class, "parameter6Type"));
         }
-        if (dao.doesTableAttributesExist(eingangsrechnungTable, "paymentType") == false) {
+        if (dao.doTableAttributesExist(eingangsrechnungTable, "paymentType") == false) {
           dao.addTableAttributes(eingangsrechnungTable, new TableAttribute(EingangsrechnungDO.class, "paymentType"));
         }
         return UpdateRunningStatus.DONE;
@@ -318,11 +318,11 @@ public class DatabaseCoreUpdates
         final Table kontoTable = new Table(KontoDO.class);
         final Table taskTable = new Table(TaskDO.class);
         final Table addressTable = new Table(AddressDO.class);
-        return dao.doesTableAttributesExist(kundeTable, "konto") == true //
-            && dao.doesTableAttributesExist(eingangsrechnungTable, "konto") == true //
-            && dao.doesTableAttributesExist(kontoTable, "status") == true //
-            && dao.doesTableAttributesExist(addressTable, "communicationLanguage") == true //
-            && dao.doesTableAttributesExist(taskTable, "protectionOfPrivacy") //
+        return dao.doTableAttributesExist(kundeTable, "konto") == true //
+            && dao.doTableAttributesExist(eingangsrechnungTable, "konto") == true //
+            && dao.doTableAttributesExist(kontoTable, "status") == true //
+            && dao.doTableAttributesExist(addressTable, "communicationLanguage") == true //
+            && dao.doTableAttributesExist(taskTable, "protectionOfPrivacy") //
             ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.READY_FOR_UPDATE;
       }
 
@@ -330,23 +330,23 @@ public class DatabaseCoreUpdates
       public UpdateRunningStatus runUpdate()
       {
         final Table kundeTable = new Table(KundeDO.class);
-        if (dao.doesTableAttributesExist(kundeTable, "konto") == false) {
+        if (dao.doTableAttributesExist(kundeTable, "konto") == false) {
           dao.addTableAttributes(kundeTable, new TableAttribute(KundeDO.class, "konto"));
         }
         final Table eingangsrechnungTable = new Table(EingangsrechnungDO.class);
-        if (dao.doesTableAttributesExist(eingangsrechnungTable, "konto") == false) {
+        if (dao.doTableAttributesExist(eingangsrechnungTable, "konto") == false) {
           dao.addTableAttributes(eingangsrechnungTable, new TableAttribute(EingangsrechnungDO.class, "konto"));
         }
         final Table kontoTable = new Table(KontoDO.class);
-        if (dao.doesTableAttributesExist(kontoTable, "status") == false) {
+        if (dao.doTableAttributesExist(kontoTable, "status") == false) {
           dao.addTableAttributes(kontoTable, new TableAttribute(KontoDO.class, "status"));
         }
         final Table taskTable = new Table(TaskDO.class);
-        if (dao.doesTableAttributesExist(taskTable, "protectionOfPrivacy") == false) {
+        if (dao.doTableAttributesExist(taskTable, "protectionOfPrivacy") == false) {
           dao.addTableAttributes(taskTable, new TableAttribute(TaskDO.class, "protectionOfPrivacy").setDefaultValue("false"));
         }
         final Table addressTable = new Table(AddressDO.class);
-        if (dao.doesTableAttributesExist(addressTable, "communicationLanguage") == false) {
+        if (dao.doTableAttributesExist(addressTable, "communicationLanguage") == false) {
           dao.addTableAttributes(addressTable, new TableAttribute(AddressDO.class, "communicationLanguage"));
         }
         dao.createMissingIndices();
@@ -364,8 +364,8 @@ public class DatabaseCoreUpdates
       {
         final Table dbUpdateTable = new Table(DatabaseUpdateDO.class);
         final Table userTable = new Table(PFUserDO.class);
-        return dao.doesExist(dbUpdateTable) == true
-            && dao.doesTableAttributesExist(userTable, "dateFormat", "excelDateFormat", "timeNotation") == true //
+        return dao.doExist(dbUpdateTable) == true
+            && dao.doTableAttributesExist(userTable, "dateFormat", "excelDateFormat", "timeNotation") == true //
             ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.READY_FOR_UPDATE;
       }
 
