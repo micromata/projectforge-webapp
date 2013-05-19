@@ -63,8 +63,10 @@ public class ScriptDO extends DefaultBaseDO
     AbstractHistorizableBaseDO.putNonHistorizableProperty(ScriptDO.class, "script", "scriptBackup", "file");
   }
 
+  @Field(index = Index.TOKENIZED, store = Store.NO)
   private String name; // 255 not null
 
+  @Field(index = Index.TOKENIZED, store = Store.NO)
   private String description; // 4000;
 
   private byte[] script;
@@ -73,6 +75,7 @@ public class ScriptDO extends DefaultBaseDO
 
   private byte[] file;
 
+  @Field(index = Index.TOKENIZED, store = Store.NO)
   private String filename;
 
   private String parameter1Name;
