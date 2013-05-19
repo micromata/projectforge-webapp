@@ -23,6 +23,8 @@
 
 package org.projectforge.plugins.licensemanagement;
 
+import java.util.List;
+
 import org.projectforge.continuousdb.UpdateEntry;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.registry.RegistryEntry;
@@ -87,6 +89,15 @@ public class LicenseManagementPlugin extends AbstractPlugin
   public void setLicenseDao(final LicenseDao licenseDao)
   {
     this.licenseDao = licenseDao;
+  }
+
+  /**
+   * @see org.projectforge.plugins.core.AbstractPlugin#getUpdateEntries()
+   */
+  @Override
+  public List<UpdateEntry> getUpdateEntries()
+  {
+    return LicenseManagementPluginUpdates.getUpdateEntries();
   }
 
   /**
