@@ -37,6 +37,7 @@ import javax.ws.rs.core.Response;
 
 import org.projectforge.registry.Registry;
 import org.projectforge.rest.JsonUtils;
+import org.projectforge.rest.RestPaths;
 import org.projectforge.rest.objects.TaskObject;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
@@ -47,13 +48,10 @@ import org.projectforge.user.PFUserContext;
 import org.projectforge.web.rest.converter.TaskDOConverter;
 
 /**
- * REST-Schnittstelle für {@link TaskDao}
- * 
- * @author Daniel Ludwig (d.ludwig@micromata.de)
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-@Path("task")
+@Path(RestPaths.TIMESHEET)
 public class TimesheetDaoRest
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TimesheetDaoRest.class);

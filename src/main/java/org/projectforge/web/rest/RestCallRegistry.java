@@ -50,6 +50,8 @@ public class RestCallRegistry
   {
     classes.add(AuthenticationRest.class);
     classes.add(TaskDaoRest.class);
+    classes.add(TimesheetDaoRest.class);
+    classes.add(TimesheetTemplatesRest.class);
     JsonUtils.add(PFUserDO.class, new PFUserDOTypeAdapter());
   }
 
