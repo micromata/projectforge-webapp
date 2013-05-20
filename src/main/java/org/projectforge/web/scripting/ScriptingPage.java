@@ -276,7 +276,11 @@ public class ScriptingPage extends AbstractStandardFormPage
     try {
       final ExportWorkbook workbook = (ExportWorkbook) groovyResult.getResult();
       final StringBuffer buf = new StringBuffer();
-      buf.append("pf_report_");
+      if (workbook.getFilename() != null) {
+        buf.append(workbook.getFilename()).append("_");
+      } else {
+        buf.append("pf_scriptresult_");
+      }
       buf.append(DateHelper.getTimestampAsFilenameSuffix(new Date())).append(".xls");
       final String filename = buf.toString();
       final Response response = getResponse();
