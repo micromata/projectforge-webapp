@@ -63,8 +63,8 @@ public class LicenseEditPage extends AbstractEditPage<LicenseDO, LicenseEditForm
   public AbstractSecuredBasePage onSaveOrUpdate()
   {
     licenseDao.setOwners(getData(), form.assignOwnersListHelper.getAssignedItems());
-    //groupDao.setNestedGroups(getData(), form.nestedGroupsListHelper.getAssignedItems());
-    // TODO Kai: handle final FileUpload fileUpload = form.getFileUpload();
+    form.fileUploadPanel1.upload();
+    form.fileUploadPanel2.upload();
     return super.onSaveOrUpdate();
   }
 

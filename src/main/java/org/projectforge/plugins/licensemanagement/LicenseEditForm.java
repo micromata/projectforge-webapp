@@ -28,12 +28,10 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRights;
 import org.projectforge.web.common.MultiChoiceListHelper;
-import org.projectforge.web.upload.PFUploadField;
 import org.projectforge.web.user.UsersComparator;
 import org.projectforge.web.user.UsersProvider;
 import org.projectforge.web.wicket.AbstractEditForm;
@@ -48,6 +46,7 @@ import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.FileUploadPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 
 import com.vaynberg.wicket.select2.Select2MultiChoice;
@@ -65,7 +64,7 @@ public class LicenseEditForm extends AbstractEditForm<LicenseDO, LicenseEditPage
 
   MultiChoiceListHelper<PFUserDO> assignOwnersListHelper;
 
-  private PFUploadField pfUploadField;
+  protected FileUploadPanel fileUploadPanel1, fileUploadPanel2;
 
   public LicenseEditForm(final LicenseEditPage parentPage, final LicenseDO data)
   {
@@ -174,10 +173,10 @@ public class LicenseEditForm extends AbstractEditForm<LicenseDO, LicenseEditPage
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.licensemanagement.licenseHolder"));
       fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "licenseHolder")));
     }
+    final LicenseManagementRight right = (LicenseManagementRight) UserRights.instance().getRight(LicenseDao.USER_RIGHT_ID);
     {
       // Text key
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.licensemanagement.key"));
-      final LicenseManagementRight right = (LicenseManagementRight) UserRights.instance().getRight(LicenseDao.USER_RIGHT_ID);
       if (right.isLicenseKeyVisible(getUser(), data) == true) {
         fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "key"))).setAutogrow();
       } else {
@@ -185,13 +184,18 @@ public class LicenseEditForm extends AbstractEditForm<LicenseDO, LicenseEditPage
         fs.addHelpIcon(getString("plugins.licensemanagement.key.notvisible.tooltip"));
       }
     }
-    {
-      final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("license.upload.title"));
-      fs.setVisible(false); // TODO Kai: remove this
-      pfUploadField = new PFUploadField(fs.newChildId());
-      // pfUploadField.setFileName(fileName); TODO Kai: set reasonable filename from DO object
-      fs.add(pfUploadField);
-      fs.setLabelFor(pfUploadField.getLabel());
+    if ((isNew() == true && right.hasInsertAccess(getUser())) //
+        || right.hasUpdateAccess(getUser(), data, null) == true) {
+      gridBuilder.newSplitPanel(GridSize.COL50);
+      FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("plugins.licensemanagement.file1"));
+      fileUploadPanel1 = new FileUploadPanel(fs.newChildId(), fs, this, true, new PropertyModel<String>(data, "filename1"),
+          new PropertyModel<byte[]>(data, "file1"));
+      gridBuilder.newSplitPanel(GridSize.COL50);
+      fs = gridBuilder.newFieldset(gridBuilder.getString("plugins.licensemanagement.file2"));
+      fileUploadPanel2 = new FileUploadPanel(fs.newChildId(), fs, this, true, new PropertyModel<String>(data, "filename2"),
+          new PropertyModel<byte[]>(data, "file2"));
+      gridBuilder.newGridPanel();
+    } else if (right.isLicenseKeyVisible(getUser(), data) == true) {
     }
     {
       // Text comment
@@ -199,10 +203,6 @@ public class LicenseEditForm extends AbstractEditForm<LicenseDO, LicenseEditPage
       fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "comment"))).setAutogrow();
     }
     addCloneButton();
-  }
-
-  public FileUpload getFileUpload() {
-    return pfUploadField.getFileUpload();
   }
 
   @Override
