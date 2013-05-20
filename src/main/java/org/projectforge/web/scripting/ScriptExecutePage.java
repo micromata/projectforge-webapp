@@ -57,7 +57,6 @@ import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
-import org.projectforge.web.wicket.components.SourceCodePanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
@@ -81,8 +80,6 @@ public class ScriptExecutePage extends AbstractStandardFormPage implements ISele
   private Integer id;
 
   protected FieldsetPanel scriptResultFieldsetPanel;
-
-  private SourceCodePanel sourceCodePanel;
 
   private GridBuilder resultGridBuilder;
 
@@ -133,12 +130,6 @@ public class ScriptExecutePage extends AbstractStandardFormPage implements ISele
       resultPanel.getLabel().setEscapeModelStrings(false);
       scriptResultFieldsetPanel.add(resultPanel);
     }
-    body.add(sourceCodePanel = new SourceCodePanel("sourceCode"));
-  }
-
-  protected void refreshSourceCode()
-  {
-    sourceCodePanel.setCode(getScript().getScriptAsString(), groovyResult);
   }
 
   protected ScriptDO loadScript()
@@ -182,7 +173,6 @@ public class ScriptExecutePage extends AbstractStandardFormPage implements ISele
     log.info(buf.toString());
     storeRecentScriptCalls();
     groovyResult = scriptDao.execute(getScript(), form.scriptParameters);
-    refreshSourceCode();
     if (groovyResult.hasException() == true) {
       form.error(getLocalizedMessage("exception.groovyError", String.valueOf(groovyResult.getException())));
       return;
@@ -200,7 +190,11 @@ public class ScriptExecutePage extends AbstractStandardFormPage implements ISele
   private void exportExcel(final ExportWorkbook workbook)
   {
     final StringBuffer buf = new StringBuffer();
-    buf.append("pf_report_");
+    if (workbook.getFilename() != null) {
+      buf.append(workbook.getFilename()).append("_");
+    } else {
+      buf.append("pf_scriptresult_");
+    }
     buf.append(DateHelper.getTimestampAsFilenameSuffix(new Date())).append(".xls");
     final String filename = buf.toString();
     final byte[] xls = workbook.getAsByteArray();
