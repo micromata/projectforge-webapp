@@ -164,7 +164,7 @@ public class UserPrefDao extends BaseDao<UserPrefDO>
     @SuppressWarnings("unchecked")
     final List<UserPrefDO> list = getHibernateTemplate().find("from UserPrefDO u where u.user.id = ? and u.areaString = ?",
         new Object[] { user.getId(), area.getId()});
-    return list;
+    return selectUnique(list);
   }
 
   /**
