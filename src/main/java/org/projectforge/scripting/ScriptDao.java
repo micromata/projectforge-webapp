@@ -103,7 +103,19 @@ public class ScriptDao extends BaseDao<ScriptDO>
         scriptVariables.put(param.getParameterName(), param.getValue());
       }
     }
-    groovyResult = groovyExecutor.execute(new GroovyResult(), script.getScriptAsString(), scriptVariables);
+    final Map<String, Object> scriptVars = new HashMap<String, Object>();
+    scriptVariables.put("script", scriptVars);
+    if (script.getFile() != null) {
+      scriptVars.put("file", script.getFile());
+      scriptVars.put("filename", script.getFilename());
+    }
+
+    String scriptContent = script.getScriptAsString();
+    if (scriptContent.contains("import org.projectforge.export") == true) {
+      // Package was renamed in version 5.2:
+      scriptContent = scriptContent.replace("import org.projectforge.export", "import org.projectforge.excel");
+    }
+    groovyResult = groovyExecutor.execute(new GroovyResult(), scriptContent, scriptVariables);
     return groovyResult;
   }
 
