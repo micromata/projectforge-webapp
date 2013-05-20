@@ -73,7 +73,6 @@ import org.projectforge.web.wicket.AbstractStandardFormPage;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.JFreeChartImage;
 import org.projectforge.web.wicket.WicketUtils;
-import org.projectforge.web.wicket.components.SourceCodePanel;
 
 public class ScriptingPage extends AbstractStandardFormPage
 {
@@ -93,8 +92,6 @@ public class ScriptingPage extends AbstractStandardFormPage
 
   private final ScriptingForm form;
 
-  private SourceCodePanel sourceCodePanel;
-
   private Label availableScriptVariablesLabel;
 
   private WebMarkupContainer imageResultContainer;
@@ -111,7 +108,6 @@ public class ScriptingPage extends AbstractStandardFormPage
     form.init();
     initScriptVariables();
     body.add(imageResultContainer = (WebMarkupContainer) new WebMarkupContainer("imageResult").setVisible(false));
-    body.add(sourceCodePanel = new SourceCodePanel("sourceCode"));
   }
 
   private void initScriptVariables()
@@ -151,13 +147,6 @@ public class ScriptingPage extends AbstractStandardFormPage
     // if (businessAssessmentRowsVariablesLabel == null) {
     // body.add(businessAssessmentRowsVariablesLabel = new Label("businessAssessmentRowsVariables", buf.toString()));
     // }
-  }
-
-  @Override
-  protected void onBeforeRender()
-  {
-    sourceCodePanel.setCode(getReportScriptingStorage().getGroovyScript(), groovyResult);
-    super.onBeforeRender();
   }
 
   protected void execute()
