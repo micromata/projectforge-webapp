@@ -42,7 +42,6 @@ import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskFilter;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
-import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.user.PFUserContext;
 
 /**
@@ -59,12 +58,9 @@ public class TaskDaoRest
 
   private final TaskDao taskDao;
 
-  private final TimesheetDao timesheetDao;
-
   public TaskDaoRest()
   {
     this.taskDao = Registry.instance().getDao(TaskDao.class);
-    this.timesheetDao = Registry.instance().getDao(TimesheetDao.class);
   }
 
   /**
