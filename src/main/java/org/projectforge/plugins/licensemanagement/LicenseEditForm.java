@@ -184,8 +184,8 @@ public class LicenseEditForm extends AbstractEditForm<LicenseDO, LicenseEditPage
         fs.addHelpIcon(getString("plugins.licensemanagement.key.notvisible.tooltip"));
       }
     }
-    if ((isNew() == true && right.hasInsertAccess(getUser())) //
-        || right.hasUpdateAccess(getUser(), data, null) == true) {
+    if ((isNew() == true && right.hasInsertAccess(getUser()) == true) //
+        || (right.hasUpdateAccess(getUser(), data, null) == true && right.isLicenseKeyVisible(getUser(), data) == true)) {
       gridBuilder.newSplitPanel(GridSize.COL50);
       FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("plugins.licensemanagement.file1"));
       fileUploadPanel1 = new FileUploadPanel(fs.newChildId(), fs, this, true, new PropertyModel<String>(data, "filename1"),
