@@ -43,6 +43,7 @@ import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.rest.converter.TaskDOConverter;
+import org.projectforge.web.rest.objects.TaskObject;
 
 /**
  * REST-Schnittstelle für {@link TaskDao}

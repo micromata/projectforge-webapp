@@ -37,9 +37,9 @@ import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.rest.JsonUtils;
-import org.projectforge.web.rest.ServerInfo;
-import org.projectforge.web.rest.UserObject;
 import org.projectforge.web.rest.converter.PFUserDOConverter;
+import org.projectforge.web.rest.objects.ServerInfo;
+import org.projectforge.web.rest.objects.UserObject;
 
 /**
  * REST interface for authentication (tests) and getting the authentication token on initial contact.
