@@ -379,7 +379,7 @@ public class TeamCalDO extends DefaultBaseDO
   }
 
   /**
-   * Returns string containing all fields (except the password) of given user object (via ReflectionToStringBuilder).
+   * Returns string containing all fields (except the externalSubscriptionCalendarBinary) of given object (via ReflectionToStringBuilder).
    * @param user
    * @return
    */
