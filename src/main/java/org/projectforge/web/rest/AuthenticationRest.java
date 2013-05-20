@@ -34,6 +34,7 @@ import org.projectforge.AppVersion;
 import org.projectforge.Version;
 import org.projectforge.registry.Registry;
 import org.projectforge.rest.JsonUtils;
+import org.projectforge.rest.RestPaths;
 import org.projectforge.rest.objects.ServerInfo;
 import org.projectforge.rest.objects.UserObject;
 import org.projectforge.user.PFUserContext;
@@ -47,7 +48,7 @@ import org.projectforge.web.rest.converter.PFUserDOConverter;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-@Path("authenticate")
+@Path(RestPaths.AUTHENTICATE)
 public class AuthenticationRest
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AuthenticationRest.class);
@@ -66,7 +67,7 @@ public class AuthenticationRest
    * @return {@link UserObject}
    */
   @GET
-  @Path("getToken")
+  @Path(RestPaths.AUTHENTICATE_GET_TOKEN_METHOD)
   @Produces(MediaType.APPLICATION_JSON)
   public Response getToken()
   {
@@ -88,7 +89,7 @@ public class AuthenticationRest
    * @return {@link ServerInfo}
    */
   @GET
-  @Path("initialContact")
+  @Path(RestPaths.AUTHENTICATE_INITIAL_CONTACT_METHOD)
   @Produces(MediaType.APPLICATION_JSON)
   public Response initialContact(@QueryParam("clientVersion") final String clientVersionString)
   {

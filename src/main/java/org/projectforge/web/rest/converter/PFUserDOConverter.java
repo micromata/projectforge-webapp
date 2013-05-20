@@ -23,6 +23,8 @@
 
 package org.projectforge.web.rest.converter;
 
+import org.hibernate.Hibernate;
+import org.projectforge.registry.Registry;
 import org.projectforge.rest.objects.UserObject;
 import org.projectforge.user.PFUserDO;
 
@@ -33,8 +35,21 @@ import org.projectforge.user.PFUserDO;
  */
 public class PFUserDOConverter
 {
-  public static UserObject getUserObject(final PFUserDO userDO)
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(PFUserDOConverter.class);
+
+  public static UserObject getUserObject(PFUserDO userDO)
   {
+    if (userDO == null) {
+      return null;
+    }
+    if (Hibernate.isInitialized(userDO) == false) {
+      final Integer userId = userDO.getId();
+      userDO = Registry.instance().getUserGroupCache().getUser(userDO.getId());
+      if (userDO == null) {
+        log.error("Oups, user with id '" + userId + "' not found.");
+        return null;
+      }
+    }
     final UserObject user = new UserObject();
     DOConverter.copyFields(user, userDO);
     user.setUsername(userDO.getUsername());

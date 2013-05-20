@@ -23,6 +23,8 @@
 
 package org.projectforge.web.rest.converter;
 
+import org.hibernate.Hibernate;
+import org.projectforge.registry.Registry;
 import org.projectforge.rest.objects.TaskObject;
 import org.projectforge.task.TaskDO;
 
@@ -33,8 +35,21 @@ import org.projectforge.task.TaskDO;
  */
 public class TaskDOConverter
 {
-  public static TaskObject getTaskObject(final TaskDO taskDO)
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TaskDOConverter.class);
+
+  public static TaskObject getTaskObject(TaskDO taskDO)
   {
+    if (taskDO == null) {
+      return null;
+    }
+    if (Hibernate.isInitialized(taskDO) == false) {
+      final Integer taskId = taskDO.getId();
+      taskDO = Registry.instance().getTaskTree().getTaskById(taskId);
+      if (taskDO == null) {
+        log.error("Oups, task with id '" + taskId + "' not found.");
+        return null;
+      }
+    }
     final TaskObject task = new TaskObject();
     DOConverter.copyFields(task, taskDO);
     task.setParentTaskId(taskDO.getParentTaskId());
