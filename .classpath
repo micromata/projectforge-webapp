@@ -22,6 +22,10 @@
   <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar" sourcepath="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/poi/poi/3.9/poi-3.9.jar" sourcepath="M2_REPO/org/apache/poi/poi/3.9/poi-3.9-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-codec/commons-codec/1.4/commons-codec-1.4.jar" sourcepath="M2_REPO/commons-codec/commons-codec/1.4/commons-codec-1.4-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/projectforge/projectforge-jax-rs/5.1.1-SNAPSHOT/projectforge-jax-rs-5.1.1-SNAPSHOT.jar" sourcepath="M2_REPO/org/projectforge/projectforge-jax-rs/5.1.1-SNAPSHOT/projectforge-jax-rs-5.1.1-SNAPSHOT-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/google/code/gson/gson/2.2.2/gson-2.2.2.jar" sourcepath="M2_REPO/com/google/code/gson/gson/2.2.2/gson-2.2.2-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-client/1.15/jersey-client-1.15.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-client/1.15/jersey-client-1.15-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-core/1.15/jersey-core-1.15.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-core/1.15/jersey-core-1.15-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/projectforge/projectforge-webserver/5.1.1-SNAPSHOT/projectforge-webserver-5.1.1-SNAPSHOT.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-cli/commons-cli/1.2/commons-cli-1.2.jar" sourcepath="M2_REPO/commons-cli/commons-cli/1.2/commons-cli-1.2-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4.jar" sourcepath="M2_REPO/commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4-sources.jar"/>
@@ -48,9 +52,6 @@
   <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-log4j12/1.6.4/slf4j-log4j12-1.6.4.jar" sourcepath="M2_REPO/org/slf4j/slf4j-log4j12/1.6.4/slf4j-log4j12-1.6.4-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.6.4/slf4j-api-1.6.4.jar" sourcepath="M2_REPO/org/slf4j/slf4j-api/1.6.4/slf4j-api-1.6.4-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.16/log4j-1.2.16.jar" sourcepath="M2_REPO/log4j/log4j/1.2.16/log4j-1.2.16-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/com/google/code/gson/gson/2.2.2/gson-2.2.2.jar" sourcepath="M2_REPO/com/google/code/gson/gson/2.2.2/gson-2.2.2-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-client/1.15/jersey-client-1.15.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-client/1.15/jersey-client-1.15-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-core/1.15/jersey-core-1.15.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-core/1.15/jersey-core-1.15-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-server/1.15/jersey-server-1.15.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-server/1.15/jersey-server-1.15-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-servlet/1.15/jersey-servlet-1.15.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-servlet/1.15/jersey-servlet-1.15-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/vaynberg/wicket/select2/wicket-select2/2.2/wicket-select2-2.2.jar" sourcepath="M2_REPO/com/vaynberg/wicket/select2/wicket-select2/2.2/wicket-select2-2.2-sources.jar"/>
