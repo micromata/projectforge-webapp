@@ -57,6 +57,7 @@ public class ModalMessageDialog extends ModalDialog
   {
     super(id);
     this.autoGenerateGridBuilder = false;
+    setTitle(title);
   }
 
   /**
