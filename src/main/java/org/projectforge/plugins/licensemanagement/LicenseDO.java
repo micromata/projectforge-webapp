@@ -42,6 +42,7 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
+import org.projectforge.common.ReflectionToString;
 import org.projectforge.core.AbstractHistorizableBaseDO;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.database.Constants;
@@ -435,5 +436,22 @@ public class LicenseDO extends DefaultBaseDO
   public void setFilename2(final String filename2)
   {
     this.filename2 = filename2;
+  }
+
+  /**
+   * Returns string containing all fields (except the file1/file2) of given object (via ReflectionToStringBuilder).
+   * @param user
+   * @return
+   */
+  @Override
+  public String toString()
+  {
+    return (new ReflectionToString(this) {
+      @Override
+      protected boolean accept(final java.lang.reflect.Field f)
+      {
+        return super.accept(f) && !"file1".equals(f.getName()) && !"file2".equals(f.getName());
+      }
+    }).toString();
   }
 }

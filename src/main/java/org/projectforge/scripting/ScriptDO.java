@@ -40,6 +40,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
+import org.projectforge.common.ReflectionToString;
 import org.projectforge.core.AbstractHistorizableBaseDO;
 import org.projectforge.core.DefaultBaseDO;
 
@@ -421,5 +422,22 @@ public class ScriptDO extends DefaultBaseDO
       }
     }
     return first;
+  }
+
+  /**
+   * Returns string containing all fields (except the file) of given object (via ReflectionToStringBuilder).
+   * @param user
+   * @return
+   */
+  @Override
+  public String toString()
+  {
+    return (new ReflectionToString(this) {
+      @Override
+      protected boolean accept(final java.lang.reflect.Field f)
+      {
+        return super.accept(f) && !"file".equals(f.getName());
+      }
+    }).toString();
   }
 }
