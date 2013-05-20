@@ -76,6 +76,7 @@ public class ScriptEditForm extends AbstractEditForm<ScriptDO, ScriptEditPage>
     gridBuilder.newSplitPanel(GridSize.COL66);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("file"));
+      fs.addHelpIcon(getString("scripting.script.editForm.file.tooltip"));
       fileUploadPanel = new FileUploadPanel(fs.newChildId(), fs, this, true, new PropertyModel<String>(data, "filename"),
           new PropertyModel<byte[]>(data, "file")) {
         /**
