@@ -35,7 +35,7 @@ import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalFilter;
 import org.projectforge.registry.Registry;
-import org.projectforge.web.rest.JsonUtils;
+import org.projectforge.rest.JsonUtils;
 
 /**
  * REST-Schnittstelle für {@link TeamCalDao}

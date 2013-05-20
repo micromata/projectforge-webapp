@@ -33,13 +33,13 @@ import javax.ws.rs.core.Response;
 import org.projectforge.AppVersion;
 import org.projectforge.Version;
 import org.projectforge.registry.Registry;
+import org.projectforge.rest.JsonUtils;
+import org.projectforge.rest.objects.ServerInfo;
+import org.projectforge.rest.objects.UserObject;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
-import org.projectforge.web.rest.JsonUtils;
 import org.projectforge.web.rest.converter.PFUserDOConverter;
-import org.projectforge.web.rest.objects.ServerInfo;
-import org.projectforge.web.rest.objects.UserObject;
 
 /**
  * REST interface for authentication (tests) and getting the authentication token on initial contact.

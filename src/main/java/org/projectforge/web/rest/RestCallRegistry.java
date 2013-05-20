@@ -26,8 +26,8 @@ package org.projectforge.web.rest;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.projectforge.rest.JsonUtils;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.web.rest.JsonUtils;
 import org.projectforge.web.rest.converter.PFUserDOTypeAdapter;
 
 /**

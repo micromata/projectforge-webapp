@@ -36,6 +36,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.projectforge.registry.Registry;
+import org.projectforge.rest.JsonUtils;
+import org.projectforge.rest.objects.TaskObject;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskFilter;
@@ -43,7 +45,6 @@ import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.rest.converter.TaskDOConverter;
-import org.projectforge.web.rest.objects.TaskObject;
 
 /**
  * REST-Schnittstelle für {@link TaskDao}

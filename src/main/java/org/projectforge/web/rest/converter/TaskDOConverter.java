@@ -23,8 +23,8 @@
 
 package org.projectforge.web.rest.converter;
 
+import org.projectforge.rest.objects.TaskObject;
 import org.projectforge.task.TaskDO;
-import org.projectforge.web.rest.objects.TaskObject;
 
 /**
  * For conversion of TaskDO to task object.

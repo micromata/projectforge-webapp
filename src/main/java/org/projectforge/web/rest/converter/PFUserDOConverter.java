@@ -23,8 +23,8 @@
 
 package org.projectforge.web.rest.converter;
 
+import org.projectforge.rest.objects.UserObject;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.web.rest.objects.UserObject;
 
 /**
  * For conversion of PFUserDO to user object.

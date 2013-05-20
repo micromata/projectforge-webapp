@@ -24,7 +24,7 @@
 package org.projectforge.web.rest.converter;
 
 import org.projectforge.core.DefaultBaseDO;
-import org.projectforge.web.rest.AbstractBaseObject;
+import org.projectforge.rest.AbstractBaseObject;
 
 /**
  * For conversion of DefaultBaseDO to base object.

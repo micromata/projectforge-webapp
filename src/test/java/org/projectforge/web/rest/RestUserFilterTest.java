@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.projectforge.rest.Authentication;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
