@@ -42,6 +42,8 @@ public class TextLinkPanel extends Panel
 
   private final Label label;
 
+  private final AbstractLink link;
+
   /**
    * @param id
    * @param link Must have component id {@link #LINK_ID}
@@ -61,6 +63,7 @@ public class TextLinkPanel extends Panel
   public TextLinkPanel(final String id, final AbstractLink link, final String label, final String tooltip)
   {
     super(id);
+    this.link = link;
     init(id, link, tooltip);
     this.label = new Label("text", label);
     link.add(this.label);
@@ -84,6 +87,7 @@ public class TextLinkPanel extends Panel
   public TextLinkPanel(final String id, final AbstractLink link, final IModel<String> label, final String tooltip)
   {
     super(id);
+    this.link = link;
     init(id, link, tooltip);
     this.label = new Label("text", label);
     link.add(this.label);
@@ -95,6 +99,14 @@ public class TextLinkPanel extends Panel
     if (tooltip != null) {
       WicketUtils.addTooltip(link, tooltip);
     }
+  }
+
+  /**
+   * @return the link
+   */
+  public AbstractLink getLink()
+  {
+    return link;
   }
 
   /**
