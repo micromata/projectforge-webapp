@@ -53,9 +53,9 @@ public class ScriptEditForm extends AbstractEditForm<ScriptDO, ScriptEditPage>
   @SpringBean(name = "accessChecker")
   private AccessChecker accessChecker;
 
-  protected FileUploadPanel fileUploadPanel;
-
   protected ModalDialog showBackupScriptDialog;
+
+  protected FileUploadPanel fileUploadPanel;
 
   public ScriptEditForm(final ScriptEditPage parentPage, final ScriptDO data)
   {
@@ -76,13 +76,13 @@ public class ScriptEditForm extends AbstractEditForm<ScriptDO, ScriptEditPage>
     gridBuilder.newSplitPanel(GridSize.COL66);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("file"));
-      fileUploadPanel = new FileUploadPanel(fs.newChildId(), fs, true, true, new PropertyModel<String>(data, "filename"),
+      fileUploadPanel = new FileUploadPanel(fs.newChildId(), fs, this, true, new PropertyModel<String>(data, "filename"),
           new PropertyModel<byte[]>(data, "file")) {
         /**
          * @see org.projectforge.web.wicket.flowlayout.FileUploadPanel#upload()
          */
         @Override
-        protected void upload()
+        public void upload()
         {
           accessChecker.checkIsLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
           accessChecker.checkRestrictedOrDemoUser();
