@@ -86,16 +86,16 @@ public class RestUserFilterTest
   {
     final HttpServletRequest request = mock(HttpServletRequest.class);
     if (username != null) {
-      when(request.getHeader(Mockito.eq(RestUserFilter.AUTHENTICATION_USERNAME))).thenReturn(username);
+      when(request.getHeader(Mockito.eq(Authentication.AUTHENTICATION_USERNAME))).thenReturn(username);
     }
     if (password != null) {
-      when(request.getHeader(Mockito.eq(RestUserFilter.AUTHENTICATION_PASSWORD))).thenReturn(password);
+      when(request.getHeader(Mockito.eq(Authentication.AUTHENTICATION_PASSWORD))).thenReturn(password);
     }
     if (userId != null) {
-      when(request.getHeader(Mockito.eq(RestUserFilter.AUTHENTICATION_USER_ID))).thenReturn(userId.toString());
+      when(request.getHeader(Mockito.eq(Authentication.AUTHENTICATION_USER_ID))).thenReturn(userId.toString());
     }
     if (authenticationToken != null) {
-      when(request.getHeader(Mockito.eq(RestUserFilter.AUTHENTICATION_TOKEN))).thenReturn(authenticationToken);
+      when(request.getHeader(Mockito.eq(Authentication.AUTHENTICATION_TOKEN))).thenReturn(authenticationToken);
     }
     return request;
   }

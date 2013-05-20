@@ -54,7 +54,6 @@ import org.projectforge.plugins.teamcal.integration.TemplateEntry;
 import org.projectforge.plugins.teamcal.rest.TeamCalDaoRest;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.registry.RegistryEntry;
-import org.projectforge.rest.RestCallRegistry;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserXmlPreferencesDO;
@@ -62,6 +61,7 @@ import org.projectforge.web.MenuItemDef;
 import org.projectforge.web.MenuItemDefId;
 import org.projectforge.web.MenuItemRegistry;
 import org.projectforge.web.calendar.CalendarFeed;
+import org.projectforge.web.rest.RestCallRegistry;
 import org.projectforge.web.timesheet.TimesheetEditPage;
 import org.projectforge.web.wicket.WicketApplication;
 

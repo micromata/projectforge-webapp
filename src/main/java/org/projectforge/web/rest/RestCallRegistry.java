@@ -21,12 +21,14 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.rest;
+package org.projectforge.web.rest;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import org.projectforge.task.rest.TaskDaoRest;
+import org.projectforge.user.PFUserDO;
+import org.projectforge.web.rest.JsonUtils;
+import org.projectforge.web.rest.converter.PFUserDOTypeAdapter;
 
 /**
  * Singleton for register rest calls.
@@ -48,6 +50,7 @@ public class RestCallRegistry
   {
     classes.add(AuthenticationRest.class);
     classes.add(TaskDaoRest.class);
+    JsonUtils.add(PFUserDO.class, new PFUserDOTypeAdapter());
   }
 
   /**

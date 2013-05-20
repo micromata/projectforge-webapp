@@ -21,7 +21,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.rest;
+package org.projectforge.web.rest;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -36,6 +36,10 @@ import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
+import org.projectforge.web.rest.JsonUtils;
+import org.projectforge.web.rest.ServerInfo;
+import org.projectforge.web.rest.UserObject;
+import org.projectforge.web.rest.converter.PFUserDOConverter;
 
 /**
  * REST interface for authentication (tests) and getting the authentication token on initial contact.
@@ -71,7 +75,7 @@ public class AuthenticationRest
       log.error("No user given for rest call.");
       throw new IllegalArgumentException("No user given for the rest call: authenticate/getToken.");
     }
-    final UserObject userObject = new UserObject(user);
+    final UserObject userObject = PFUserDOConverter.getUserObject(user);
     final String authenticationToken = userDao.getAuthenticationToken(user.getId());
     userObject.setAuthenticationToken(authenticationToken);
     final String json = JsonUtils.toJson(userObject);
@@ -93,7 +97,9 @@ public class AuthenticationRest
       log.error("No user given for rest call.");
       throw new IllegalArgumentException("No user given for the rest call: authenticate/getToken.");
     }
-    final ServerInfo info = new ServerInfo(user, AppVersion.VERSION.toString());
+    final UserObject userObject = PFUserDOConverter.getUserObject(user);
+    final ServerInfo info = new ServerInfo(AppVersion.VERSION.toString());
+    info.setUser(userObject);
     Version clientVersion = null;
     if (clientVersionString != null) {
       clientVersion = new Version(clientVersionString);

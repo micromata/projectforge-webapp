@@ -21,7 +21,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.task.rest;
+package org.projectforge.web.rest;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,13 +36,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.projectforge.registry.Registry;
-import org.projectforge.rest.JsonUtils;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskFilter;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.PFUserContext;
+import org.projectforge.web.rest.converter.TaskDOConverter;
 
 /**
  * REST-Schnittstelle für {@link TaskDao}
@@ -79,7 +79,7 @@ public class TaskDaoRest
       @QueryParam("deleted") final Boolean deleted)
   {
     final List<TaskDO> list = queryList(searchTerm, notOpened, opened, closed, deleted);
-    final List<RTask> result = new ArrayList<RTask>();
+    final List<TaskObject> result = new ArrayList<TaskObject>();
     if (list != null) {
       for (final TaskDO task : list) {
         result.add(createRTask(task));
@@ -105,7 +105,7 @@ public class TaskDaoRest
       @QueryParam("deleted") final Boolean deleted)
   {
     final List<TaskDO> list = queryList(searchTerm, notOpened, opened, closed, deleted);
-    final List<RTask> result = convertTasks(list);
+    final List<TaskObject> result = convertTasks(list);
     final String json = JsonUtils.toJson(result);
     return Response.ok(json).build();
   }
@@ -136,16 +136,16 @@ public class TaskDaoRest
    * @param tasks
    * @return
    */
-  private List<RTask> convertTasks(final List<TaskDO> tasks)
+  private List<TaskObject> convertTasks(final List<TaskDO> tasks)
   {
-    final List<RTask> topLevelTasks = new ArrayList<RTask>();
+    final List<TaskObject> topLevelTasks = new ArrayList<TaskObject>();
     if (tasks == null || tasks.isEmpty() == true) {
       return topLevelTasks;
     }
     final TaskTree taskTree = taskDao.getTaskTree();
-    final Map<Integer, RTask> rtaskMap = new HashMap<Integer, RTask>();
+    final Map<Integer, TaskObject> rtaskMap = new HashMap<Integer, TaskObject>();
     for (final TaskDO task : tasks) {
-      final RTask rtask = createRTask(task);
+      final TaskObject rtask = createRTask(task);
       rtaskMap.put(task.getId(), rtask);
     }
     for (final TaskDO task : tasks) {
@@ -154,9 +154,9 @@ public class TaskDaoRest
     return topLevelTasks;
   }
 
-  private RTask addTask(final TaskTree taskTree, final List<RTask> topLevelTasks, final TaskDO task, final Map<Integer, RTask> rtaskMap)
+  private TaskObject addTask(final TaskTree taskTree, final List<TaskObject> topLevelTasks, final TaskDO task, final Map<Integer, TaskObject> rtaskMap)
   {
-    RTask rtask = rtaskMap.get(task.getId());
+    TaskObject rtask = rtaskMap.get(task.getId());
     if (rtask == null) {
       // ancestor task not part of the result list, create it:
       if (taskDao.hasSelectAccess(PFUserContext.getUser(), task, false) == false) {
@@ -175,7 +175,7 @@ public class TaskDaoRest
       topLevelTasks.add(rtask);
       return rtask;
     }
-    RTask parentRTask = rtaskMap.get(task.getParentTaskId());
+    TaskObject parentRTask = rtaskMap.get(task.getParentTaskId());
     if (parentRTask == null) {
       // Get and insert parent task first:
       parentRTask = addTask(taskTree, topLevelTasks, parent, rtaskMap);
@@ -186,19 +186,19 @@ public class TaskDaoRest
     return rtask;
   }
 
-  private RTask createRTask(final TaskDO task)
+  private TaskObject createRTask(final TaskDO taskDO)
   {
-    final RTask rtask = new RTask(task);
-    if (task == null) {
+    final TaskObject task = TaskDOConverter.getTaskObject(taskDO);
+    if (taskDO == null) {
       log.error("Oups, task is null.");
-      return rtask;
+      return task;
     }
-    final TaskNode taskNode = taskDao.getTaskTree().getTaskNodeById(task.getId());
+    final TaskNode taskNode = taskDao.getTaskTree().getTaskNodeById(taskDO.getId());
     if (taskNode == null) {
-      log.error("Oups, task node with id '" + task.getId() + "' not found in taskTree.");
-      return rtask;
+      log.error("Oups, task node with id '" + taskDO.getId() + "' not found in taskTree.");
+      return task;
     }
-    rtask.setBookableForTimesheets(taskNode.isBookableForTimesheets());
-    return rtask;
+    task.setBookableForTimesheets(taskNode.isBookableForTimesheets());
+    return task;
   }
 }

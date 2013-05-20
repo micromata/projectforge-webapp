@@ -50,14 +50,6 @@ public class RestUserFilter implements Filter
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(RestUserFilter.class);
 
-  static final String AUTHENTICATION_USER_ID = "authenticationUserId";
-
-  static final String AUTHENTICATION_TOKEN = "authenticationToken";
-
-  static final String AUTHENTICATION_USERNAME = "authenticationUsername";
-
-  static final String AUTHENTICATION_PASSWORD = "authenticationPassword";
-
   @Autowired
   UserDao userDao;
 
@@ -80,44 +72,49 @@ public class RestUserFilter implements Filter
   ServletException
   {
     final HttpServletRequest req = (HttpServletRequest) request;
-    String userString = getAttribute(req, AUTHENTICATION_USER_ID);
+    String userString = getAttribute(req, Authentication.AUTHENTICATION_USER_ID);
     PFUserDO user = null;
     if (userString != null) {
       final Integer userId = NumberHelper.parseInteger(userString);
       if (userId != null) {
-        final String authenticationToken = getAttribute(req, AUTHENTICATION_TOKEN);
+        final String authenticationToken = getAttribute(req, Authentication.AUTHENTICATION_TOKEN);
         if (authenticationToken != null) {
           if (authenticationToken.equals(userDao.getCachedAuthenticationToken(userId)) == true) {
             user = userDao.getUserGroupCache().getUser(userId);
           } else {
-            log.error(AUTHENTICATION_TOKEN + " doesn't match for " + AUTHENTICATION_USER_ID + " '" + userId + "'. Rest call forbidden.");
+            log.error(Authentication.AUTHENTICATION_TOKEN
+                + " doesn't match for "
+                + Authentication.AUTHENTICATION_USER_ID
+                + " '"
+                + userId
+                + "'. Rest call forbidden.");
           }
         } else {
-          log.error(AUTHENTICATION_TOKEN + " not given for userId '" + userId + "'. Rest call forbidden.");
+          log.error(Authentication.AUTHENTICATION_TOKEN + " not given for userId '" + userId + "'. Rest call forbidden.");
         }
       } else {
-        log.error(AUTHENTICATION_USER_ID + " is not an integer: '" + userString + "'. Rest call forbidden.");
+        log.error(Authentication.AUTHENTICATION_USER_ID + " is not an integer: '" + userString + "'. Rest call forbidden.");
       }
     } else {
-      userString = getAttribute(req, AUTHENTICATION_USERNAME);
-      final String password = getAttribute(req, AUTHENTICATION_PASSWORD);
+      userString = getAttribute(req, Authentication.AUTHENTICATION_USERNAME);
+      final String password = getAttribute(req, Authentication.AUTHENTICATION_PASSWORD);
       if (userString != null && password != null) {
         final String encryptedPassword = userDao.encryptPassword(password);
         user = userDao.authenticateUser(userString, encryptedPassword);
         if (user == null) {
           log.error("Authentication failed for "
-              + AUTHENTICATION_USERNAME
+              + Authentication.AUTHENTICATION_USERNAME
               + "='"
               + userString
               + "' with given password. Rest call forbidden.");
         }
       } else {
         log.error("Neither "
-            + AUTHENTICATION_USER_ID
+            + Authentication.AUTHENTICATION_USER_ID
             + " nor "
-            + AUTHENTICATION_USERNAME
+            + Authentication.AUTHENTICATION_USERNAME
             + "/"
-            + AUTHENTICATION_PASSWORD
+            + Authentication.AUTHENTICATION_PASSWORD
             + " is given. Rest call forbidden.");
       }
     }
@@ -140,7 +137,8 @@ public class RestUserFilter implements Filter
     }
   }
 
-  private String getAttribute(final HttpServletRequest req, final String key) {
+  private String getAttribute(final HttpServletRequest req, final String key)
+  {
     String value = req.getHeader(key);
     if (value == null) {
       value = req.getParameter(key);

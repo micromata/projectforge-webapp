@@ -21,7 +21,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.rest;
+package org.projectforge.web.rest;
 
 import java.util.Set;
 

@@ -21,7 +21,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.rest.converter;
+package org.projectforge.web.rest.converter;
 
 import java.lang.reflect.Type;
 
@@ -37,7 +37,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 /**
- * Serialization and deserialization for dates in ISO format and UTC time-zone.
+ * Serialization and deserialization for PFUserDO.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
