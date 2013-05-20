@@ -23,7 +23,8 @@
 
 package org.projectforge.web.wicket.flowlayout;
 
-import org.apache.wicket.markup.html.form.Button;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.html.form.upload.FileUploadField;
@@ -31,9 +32,11 @@ import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.ResourceModel;
 import org.projectforge.common.FileHelper;
+import org.projectforge.web.dialog.ModalQuestionDialog;
+import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.DownloadUtils;
-import org.projectforge.web.wicket.components.SingleButtonPanel;
 
 /**
  * Represents an upload field of a form. If configured it also provides a delete button and the file name with download link.
@@ -56,15 +59,18 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
 
   private TextLinkPanel textLinkPanel;
 
+  private ModalQuestionDialog deleteExistingFileDialog;
+
+  private AjaxIconButtonPanel deleteFileButton;
+
   /**
    * @param id Component id
    * @param fs Optional FieldsetPanel for creation of filename with download link and upload button.
    * @param createFilenameLink If true (and fs is given) the filename is displayed with link for download.
-   * @param createUploadButton If true (and fs is given) the upload button is displayed.
    * @param
    */
   @SuppressWarnings("serial")
-  public FileUploadPanel(final String id, final FieldsetPanel fs, final boolean createFilenameLink, final boolean createUploadButton,
+  public FileUploadPanel(final String id, final FieldsetPanel fs, final Form< ? > form, final boolean createFilenameLink,
       final IModel<String> filename, final IModel<byte[]> file)
   {
     super(id);
@@ -94,16 +100,18 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
           return file.getObject() != null;
         };
       });
+      textLinkPanel.getLink().setOutputMarkupPlaceholderTag(true);
       // DELETE BUTTON
-      final IconButtonPanel deleteFileButton = new IconButtonPanel(fs.newChildId(), IconType.TRASH, fs.getString("delete")) {
+      deleteFileButton = new AjaxIconButtonPanel(fs.newChildId(), IconType.TRASH, fs.getString("delete")) {
         /**
          * @see org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
          */
         @Override
-        protected void onSubmit()
+        protected void onSubmit(final AjaxRequestTarget target)
         {
-          file.setObject(null);
-          filename.setObject(null);
+          deleteExistingFileDialog.open(target);
+          // file.setObject(null);
+          // filename.setObject(null);
         }
 
         /**
@@ -115,21 +123,38 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
           return file.getObject() != null;
         }
       };
+      deleteFileButton.getButton().setOutputMarkupPlaceholderTag(true);
       fs.add(deleteFileButton);
     }
     add(this.fileUploadField = new FileUploadField(FileUploadPanel.WICKET_ID));
-    fs.add(this);
     if (fs != null) {
-      if (createUploadButton == true) {
-        final Button uploadButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("upload")) {
-          @Override
-          public final void onSubmit()
-          {
-            upload();
+      fs.add(this);
+      final AbstractSecuredPage parentPage = (AbstractSecuredPage) getPage();
+      deleteExistingFileDialog = new ModalQuestionDialog(parentPage.newModalDialogId(), new ResourceModel(
+          "file.panel.deleteExistingFile.heading"), new ResourceModel("file.panel.deleteExistingFile.question")) {
+        /**
+         * @see org.projectforge.web.dialog.ModalQuestionDialog#onCloseButtonSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
+         */
+        @Override
+        protected boolean onCloseButtonSubmit(final AjaxRequestTarget target)
+        {
+          super.onCloseButtonSubmit(target);
+          if (isConfirmed() == true) {
+            file.setObject(null);
+            filename.setObject(null);
+            if (textLinkPanel != null) {
+              textLinkPanel.getLabel().modelChanged();
+              textLinkPanel.getLink().setVisible(false);
+              deleteFileButton.getButton().setVisible(false);
+              target.add(textLinkPanel.getLink(), deleteFileButton.getButton());
+            }
           }
-        };
-        fs.add(new SingleButtonPanel(fs.newChildId(), uploadButton, getString("upload"), SingleButtonPanel.GREY));
-      }
+          return true;
+        }
+      };
+      parentPage.add(deleteExistingFileDialog);
+      deleteExistingFileDialog.init();
+      // fs.add(new UploadProgressBar("progress", form, this.fileUploadField));
     }
   }
 
@@ -145,9 +170,9 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
   }
 
   /**
-   * Is called, if FileUploadPanel is created with createUploadButton = true and the upload button was pressed by the user.
+   * Call this to upload the exisiting files.
    */
-  protected void upload()
+  public void upload()
   {
     final FileUpload fileUpload = getFileUpload();
     if (fileUpload != null) {
@@ -155,9 +180,6 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
       log.info("Upload file '" + clientFileName + "'.");
       final byte[] bytes = fileUpload.getBytes();
       filename.setObject(clientFileName);
-      if (textLinkPanel != null) {
-        textLinkPanel.modelChanged();
-      }
       file.setObject(bytes);
     }
   }

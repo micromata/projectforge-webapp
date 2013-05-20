@@ -6,7 +6,9 @@
 <body>
   <h1>Represents a file upload field.</h1>
   <wicket:panel>
-    <input type="file" class="uniform" wicket:id="input" />
+    <div>
+      <input type="file" class="uniform" wicket:id="input" /> <span style="cursor: pointer; color: red;" onclick="$(this).prev().replaceWith( $(this).prev().clone( true ) );">X</span>
+    </div>
   </wicket:panel>
 </body>
 </html>
