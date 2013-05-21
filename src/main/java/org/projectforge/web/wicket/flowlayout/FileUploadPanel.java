@@ -89,6 +89,12 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
           final byte[] data = file.getObject();
           DownloadUtils.setDownloadTarget(data, getFilename());
         }
+
+        @Override
+        public boolean isVisible()
+        {
+          return file.getObject() != null;
+        };
       }, new Model<String>() {
         /**
          * @see org.apache.wicket.model.Model#getObject()
@@ -98,13 +104,7 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
         {
           return getFilename();
         }
-      }) {
-        @Override
-        public boolean isVisible()
-        {
-          return file.getObject() != null;
-        };
-      });
+      }));
       textLinkPanel.getLink().setOutputMarkupPlaceholderTag(true);
       // DELETE BUTTON
       deleteFileButton = new AjaxIconButtonPanel(fs.newChildId(), IconType.TRASH, fs.getString("delete")) {
@@ -123,7 +123,7 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
          * @see org.apache.wicket.Component#isVisible()
          */
         @Override
-        public boolean isVisible()
+        public boolean isButtonVisible()
         {
           return file.getObject() != null;
         }
@@ -170,12 +170,9 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
             filename.setObject(null);
             if (textLinkPanel != null) {
               textLinkPanel.getLabel().modelChanged();
-              textLinkPanel.getLink().setVisible(false);
-              deleteFileButton.getButton().setVisible(false);
-              fileUploadField.setVisible(true);
-              removeFileSelection.setVisible(true);
-              target.add(textLinkPanel.getLink(), deleteFileButton.getButton(), fileUploadField, removeFileSelection);
+              target.add(textLinkPanel.getLink());
             }
+            target.add(deleteFileButton.getButton(), fileUploadField, removeFileSelection);
           }
           return true;
         }
@@ -210,6 +207,19 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
       final byte[] bytes = fileUpload.getBytes();
       filename.setObject(clientFileName);
       file.setObject(bytes);
+    }
+  }
+
+  /**
+   * Calls {@link Form#setMultiPart(boolean)} with value true.
+   * @see org.apache.wicket.Component#onBeforeRender()
+   */
+  @Override
+  protected void onBeforeRender()
+  {
+    super.onBeforeRender();
+    if (this.fileUploadField.getForm() != null) {
+      this.fileUploadField.getForm().setMultiPart(true);
     }
   }
 

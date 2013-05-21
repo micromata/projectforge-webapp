@@ -154,7 +154,21 @@ public class IconButtonPanel extends Panel
       {
         IconButtonPanel.this.onSubmit();
       }
+
+      /**
+       * @see org.apache.wicket.Component#isVisible()
+       */
+      @Override
+      public boolean isVisible()
+      {
+        return IconButtonPanel.this.isButtonVisible();
+      }
     };
+  }
+
+  protected boolean isButtonVisible()
+  {
+    return super.isVisible();
   }
 
 }

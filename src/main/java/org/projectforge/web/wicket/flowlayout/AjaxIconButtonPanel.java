@@ -117,6 +117,15 @@ public class AjaxIconButtonPanel extends IconButtonPanel
       {
         AjaxIconButtonPanel.this.onError(target);
       }
+
+      /**
+       * @see org.apache.wicket.Component#isVisible()
+       */
+      @Override
+      public boolean isVisible()
+      {
+        return isButtonVisible();
+      }
     };
   }
 
