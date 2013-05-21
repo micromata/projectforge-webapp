@@ -69,6 +69,7 @@ public class LicenseEditForm extends AbstractEditForm<LicenseDO, LicenseEditPage
   public LicenseEditForm(final LicenseEditPage parentPage, final LicenseDO data)
   {
     super(parentPage, data);
+    setMultiPart(true);
   }
 
   @SuppressWarnings("serial")
