@@ -190,16 +190,16 @@
     <servlet-class>org.projectforge.web.address.PhoneLookUpServlet</servlet-class>
   </servlet>
   <servlet>
-    <servlet-name>org.projectforge.rest.RestApplication</servlet-name>
+    <servlet-name>org.projectforge.web.rest.RestApplication</servlet-name>
     <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
     <init-param>
       <param-name>javax.ws.rs.Application</param-name>
-      <param-value>org.projectforge.rest.RestApplication</param-value>
+      <param-value>org.projectforge.web.rest.RestApplication</param-value>
     </init-param>
     <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
-    <servlet-name>org.projectforge.rest.RestApplication</servlet-name>
+    <servlet-name>org.projectforge.web.rest.RestApplication</servlet-name>
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
 
