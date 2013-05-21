@@ -23,6 +23,8 @@
 
 package org.projectforge.web.wicket.flowlayout;
 
+import java.util.List;
+
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
@@ -34,6 +36,8 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
+import org.apache.wicket.validation.IValidatable;
+import org.apache.wicket.validation.IValidator;
 import org.projectforge.common.FileHelper;
 import org.projectforge.web.dialog.ModalQuestionDialog;
 import org.projectforge.web.wicket.AbstractSecuredPage;
@@ -142,6 +146,31 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
       }
     });
     this.fileUploadField.setOutputMarkupPlaceholderTag(true);
+    this.fileUploadField.add(new IValidator<List<FileUpload>>() {
+      @Override
+      public void validate(final IValidatable<List<FileUpload>> validatable)
+      {
+        if (validatable == null) {
+          return;
+        }
+        final List<FileUpload> list = validatable.getValue();
+        if (list == null || list.size() == 0) {
+          return;
+        }
+        if (list.size() > 1) {
+          log.error("Multiple file uploads not yet supported. Uploading only first file.");
+        }
+        upload(list.get(0));
+        // final Integer value = validatable.getValue();
+        // if (value != null && value >= 0) {
+        // return;
+        // }
+        // if (CollectionUtils.isNotEmpty(kost2List) == true) {
+        // // Kost2 available but not selected.
+        // choice.error(PFUserContext.getLocalizedString("timesheet.error.kost2Required"));
+        // }
+      }
+    });
     add(this.removeFileSelection = new Label("removeFileSelection", REMOVE_FILE_SELECTION_LABEL) {
       /**
        * @see org.apache.wicket.Component#isVisible()
@@ -196,11 +225,10 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
   }
 
   /**
-   * Call this to upload the exisiting files.
+   * Called by validator.
    */
-  public void upload()
+  protected void upload(final FileUpload fileUpload)
   {
-    final FileUpload fileUpload = getFileUpload();
     if (fileUpload != null) {
       final String clientFileName = FileHelper.createSafeFilename(fileUpload.getClientFileName(), 255);
       log.info("Upload file '" + clientFileName + "'.");

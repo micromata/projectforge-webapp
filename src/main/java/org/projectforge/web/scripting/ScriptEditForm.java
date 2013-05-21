@@ -26,6 +26,7 @@ package org.projectforge.web.scripting;
 import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.lang.Bytes;
@@ -83,11 +84,11 @@ public class ScriptEditForm extends AbstractEditForm<ScriptDO, ScriptEditPage>
          * @see org.projectforge.web.wicket.flowlayout.FileUploadPanel#upload()
          */
         @Override
-        public void upload()
+        protected void upload(final FileUpload fileUpload)
         {
           accessChecker.checkIsLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
           accessChecker.checkRestrictedOrDemoUser();
-          super.upload();
+          super.upload(fileUpload);
         }
       };
     }

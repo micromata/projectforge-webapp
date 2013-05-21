@@ -33,7 +33,6 @@ import org.projectforge.scripting.ScriptDO;
 import org.projectforge.scripting.ScriptDao;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
-import org.projectforge.web.wicket.AbstractSecuredBasePage;
 import org.projectforge.web.wicket.EditPage;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
@@ -65,13 +64,6 @@ public class ScriptEditPage extends AbstractEditPage<ScriptDO, ScriptEditForm, S
           getString("scripting.scriptBackup.show"));
       addContentMenuEntry(menu);
     }
-  }
-
-  @Override
-  public AbstractSecuredBasePage onSaveOrUpdate()
-  {
-    form.fileUploadPanel.upload();
-    return super.onSaveOrUpdate();
   }
 
   @Override
