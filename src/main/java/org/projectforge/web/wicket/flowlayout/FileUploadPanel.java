@@ -24,6 +24,7 @@
 package org.projectforge.web.wicket.flowlayout;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
@@ -62,6 +63,10 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
   private ModalQuestionDialog deleteExistingFileDialog;
 
   private AjaxIconButtonPanel deleteFileButton;
+
+  private Label removeFileSelection;
+
+  private static final String REMOVE_FILE_SELECTION_LABEL = "X";
 
   /**
    * @param id Component id
@@ -126,7 +131,28 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
       deleteFileButton.getButton().setOutputMarkupPlaceholderTag(true);
       fs.add(deleteFileButton);
     }
-    add(this.fileUploadField = new FileUploadField(FileUploadPanel.WICKET_ID));
+    add(this.fileUploadField = new FileUploadField(FileUploadPanel.WICKET_ID) {
+      /**
+       * @see org.apache.wicket.Component#isVisible()
+       */
+      @Override
+      public boolean isVisible()
+      {
+        return file.getObject() == null;
+      }
+    });
+    this.fileUploadField.setOutputMarkupPlaceholderTag(true);
+    add(this.removeFileSelection = new Label("removeFileSelection", REMOVE_FILE_SELECTION_LABEL) {
+      /**
+       * @see org.apache.wicket.Component#isVisible()
+       */
+      @Override
+      public boolean isVisible()
+      {
+        return file.getObject() == null;
+      }
+    });
+    this.removeFileSelection.setOutputMarkupPlaceholderTag(true);
     if (fs != null) {
       fs.add(this);
       final AbstractSecuredPage parentPage = (AbstractSecuredPage) getPage();
@@ -146,7 +172,9 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
               textLinkPanel.getLabel().modelChanged();
               textLinkPanel.getLink().setVisible(false);
               deleteFileButton.getButton().setVisible(false);
-              target.add(textLinkPanel.getLink(), deleteFileButton.getButton());
+              fileUploadField.setVisible(true);
+              removeFileSelection.setVisible(true);
+              target.add(textLinkPanel.getLink(), deleteFileButton.getButton(), fileUploadField, removeFileSelection);
             }
           }
           return true;
@@ -167,6 +195,7 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
   {
     super(id);
     add(this.fileUploadField = fileUploadField);
+    add(this.removeFileSelection = new Label("removeFileSelection", REMOVE_FILE_SELECTION_LABEL));
   }
 
   /**
