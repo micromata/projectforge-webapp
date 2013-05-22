@@ -194,6 +194,7 @@ public class TaskFilter extends BaseSearchFilter
     final String username = responsibleUser != null ? responsibleUser.getFullname() + " " + responsibleUser.getUsername() : null;
     if (StringUtils.containsIgnoreCase(task.getTitle(), this.searchString) == true
         || StringUtils.containsIgnoreCase(task.getReference(), this.searchString) == true
+        || StringUtils.containsIgnoreCase(task.getShortDescription(), this.searchString) == true
         || StringUtils.containsIgnoreCase(task.getDescription(), this.searchString) == true
         || StringUtils.containsIgnoreCase(task.getShortDisplayName(), this.searchString) == true
         || StringUtils.containsIgnoreCase(username, this.searchString) == true
