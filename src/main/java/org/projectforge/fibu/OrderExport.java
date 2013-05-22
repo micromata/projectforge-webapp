@@ -84,7 +84,7 @@ public class OrderExport
 
   private enum PosCol
   {
-    NUMMER, DATE, PROJECT, ORDER_TITLE, TITLE, TYPE, STATUS, PERSON_DAYS, NETSUM, INVOICED, TO_BE_INVOICED, COMPLETELY_INVOICED, INVOICES, PERIOD_OF_PERFORMANCE_BEGIN, PERIOD_OF_PERFORMANCE_END, TASK, COMMENT;
+    NUMBER, POS_NUMBER, DATE, PROJECT, ORDER_TITLE, TITLE, TYPE, STATUS, PERSON_DAYS, NETSUM, INVOICED, TO_BE_INVOICED, COMPLETELY_INVOICED, INVOICES, PERIOD_OF_PERFORMANCE_BEGIN, PERIOD_OF_PERFORMANCE_END, TASK, COMMENT;
   }
 
   private ExportColumn[] createOrderColumns()
@@ -140,11 +140,12 @@ public class OrderExport
   private ExportColumn[] createPosColumns()
   {
     return new ExportColumn[] { //
-        new I18nExportColumn(PosCol.NUMMER, "fibu.auftrag.nummer.short", MyXlsContentProvider.LENGTH_ID),
+        new I18nExportColumn(PosCol.NUMBER, "fibu.auftrag.nummer.short", MyXlsContentProvider.LENGTH_ID),
+        new I18nExportColumn(PosCol.POS_NUMBER, "fibu.auftrag.position", 5),
         new I18nExportColumn(PosCol.DATE, "fibu.auftrag.datum", MyXlsContentProvider.LENGTH_DATE),
         new I18nExportColumn(PosCol.PROJECT, "fibu.projekt", MyXlsContentProvider.LENGTH_STD),
         new I18nExportColumn(PosCol.ORDER_TITLE, "fibu.auftrag.titel", MyXlsContentProvider.LENGTH_STD),
-        new I18nExportColumn(PosCol.TITLE, "fibu.auftrag.position", MyXlsContentProvider.LENGTH_STD),
+        new I18nExportColumn(PosCol.TITLE, "fibu.auftrag.titel", MyXlsContentProvider.LENGTH_STD),
         new I18nExportColumn(PosCol.TYPE, "fibu.auftrag.position.art", 10),
         new I18nExportColumn(PosCol.STATUS, "status", 10),
         new I18nExportColumn(PosCol.PERSON_DAYS, "projectmanagement.personDays.short", 8),
@@ -161,7 +162,8 @@ public class OrderExport
 
   private void addPosMapping(final PropertyMapping mapping, final AuftragDO order, final AuftragsPositionDO pos, final Object... params)
   {
-    mapping.add(PosCol.NUMMER, order.getNummer());
+    mapping.add(PosCol.NUMBER, order.getNummer());
+    mapping.add(PosCol.POS_NUMBER, "#" + pos.getNumber());
     mapping.add(PosCol.DATE, order.getAngebotsDatum());
     mapping.add(PosCol.PROJECT, order.getProjektAsString());
     mapping.add(PosCol.ORDER_TITLE, order.getTitel());
