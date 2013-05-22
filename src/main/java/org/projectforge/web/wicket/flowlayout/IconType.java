@@ -61,6 +61,7 @@ public enum IconType
   TABLET("tablet"), //
   TASK("tasks"), //
   TRASH("trash"), //
+  UPLOAD("upload"), //
   USER("user"), //
   WRENCH("wrench"), //
   ZOOM_IN("zoom-in"), //
