@@ -101,7 +101,7 @@ public class DownloadUtils
     if (mimeType != null) {
       return mimeType.getMimeTypeString();
     }
-    log.error("Unknown file type: " + filename);
+    log.info("Unknown file type: " + filename);
     return "";
   }
 }
