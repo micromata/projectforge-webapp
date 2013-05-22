@@ -31,7 +31,6 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
-import org.projectforge.common.StringHelper;
 import org.projectforge.fibu.kost.KostCache;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskFilter;
@@ -226,16 +225,6 @@ public class TaskTreePage extends AbstractSecuredPage
   boolean isShowRootNode()
   {
     return (accessChecker.isLoggedInUserMemberOfAdminGroup()) || accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP);
-  }
-
-  protected String getSearchToolTip()
-  {
-    return getLocalizedMessage("search.string.info", getSearchFields());
-  }
-
-  public String getSearchFields()
-  {
-    return StringHelper.listToString(", ", taskDao.getSearchFields());
   }
 
   /**
