@@ -138,7 +138,7 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
     }
     if (file.getObject() == null) {
       // Add BUTTON
-      final AjaxIconButtonPanel addFileButton = new AjaxIconButtonPanel(fs.newChildId(), IconType.PLUS, fs.getString("file.upload.choose")) {
+      final AjaxIconButtonPanel addFileButton = new AjaxIconButtonPanel(fs.newChildId(), IconType.UPLOAD, fs.getString("file.upload.choose")) {
         /**
          * @see org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
          */
