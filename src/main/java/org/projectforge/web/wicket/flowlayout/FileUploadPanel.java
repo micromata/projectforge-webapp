@@ -26,6 +26,7 @@ package org.projectforge.web.wicket.flowlayout;
 import java.util.List;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
@@ -69,6 +70,8 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
   private AjaxIconButtonPanel deleteFileButton;
 
   private Label removeFileSelection;
+
+  private WebMarkupContainer main;
 
   private static final String REMOVE_FILE_SELECTION_LABEL = "X";
 
@@ -119,8 +122,6 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
         protected void onSubmit(final AjaxRequestTarget target)
         {
           deleteExistingFileDialog.open(target);
-          // file.setObject(null);
-          // filename.setObject(null);
         }
 
         /**
@@ -135,17 +136,26 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
       deleteFileButton.getButton().setOutputMarkupPlaceholderTag(true);
       fs.add(deleteFileButton);
     }
-    add(this.fileUploadField = new FileUploadField(FileUploadPanel.WICKET_ID) {
-      /**
-       * @see org.apache.wicket.Component#isVisible()
-       */
-      @Override
-      public boolean isVisible()
-      {
-        return file.getObject() == null;
-      }
-    });
-    this.fileUploadField.setOutputMarkupPlaceholderTag(true);
+    if (file.getObject() == null) {
+      // Add BUTTON
+      final AjaxIconButtonPanel addFileButton = new AjaxIconButtonPanel(fs.newChildId(), IconType.PLUS, fs.getString("file.upload.choose")) {
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
+         */
+        @Override
+        protected void onSubmit(final AjaxRequestTarget target)
+        {
+          setVisible(false);
+          main.setVisible(true);
+          target.add(getButton(), main);
+        }
+      };
+      addFileButton.getButton().setOutputMarkupPlaceholderTag(true);
+      fs.add(addFileButton);
+    }
+    add(main = new WebMarkupContainer("main"));
+    main.setVisible(false).setOutputMarkupPlaceholderTag(true);
+    main.add(this.fileUploadField = new FileUploadField(FileUploadPanel.WICKET_ID));
     this.fileUploadField.add(new IValidator<List<FileUpload>>() {
       @Override
       public void validate(final IValidatable<List<FileUpload>> validatable)
@@ -161,17 +171,9 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
           log.error("Multiple file uploads not yet supported. Uploading only first file.");
         }
         upload(list.get(0));
-        // final Integer value = validatable.getValue();
-        // if (value != null && value >= 0) {
-        // return;
-        // }
-        // if (CollectionUtils.isNotEmpty(kost2List) == true) {
-        // // Kost2 available but not selected.
-        // choice.error(PFUserContext.getLocalizedString("timesheet.error.kost2Required"));
-        // }
       }
     });
-    add(this.removeFileSelection = new Label("removeFileSelection", REMOVE_FILE_SELECTION_LABEL) {
+    main.add(this.removeFileSelection = new Label("removeFileSelection", REMOVE_FILE_SELECTION_LABEL) {
       /**
        * @see org.apache.wicket.Component#isVisible()
        */
@@ -197,11 +199,12 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
           if (isConfirmed() == true) {
             file.setObject(null);
             filename.setObject(null);
+            main.setVisible(true);
             if (textLinkPanel != null) {
               textLinkPanel.getLabel().modelChanged();
               target.add(textLinkPanel.getLink());
             }
-            target.add(deleteFileButton.getButton(), fileUploadField, removeFileSelection);
+            target.add(deleteFileButton.getButton(), main, removeFileSelection);
           }
           return true;
         }
@@ -220,8 +223,9 @@ public class FileUploadPanel extends Panel implements ComponentWrapperPanel
   public FileUploadPanel(final String id, final FileUploadField fileUploadField)
   {
     super(id);
-    add(this.fileUploadField = fileUploadField);
-    add(this.removeFileSelection = new Label("removeFileSelection", REMOVE_FILE_SELECTION_LABEL));
+    add(main = new WebMarkupContainer("main"));
+    main.add(this.fileUploadField = fileUploadField);
+    main.add(this.removeFileSelection = new Label("removeFileSelection", REMOVE_FILE_SELECTION_LABEL));
   }
 
   /**
