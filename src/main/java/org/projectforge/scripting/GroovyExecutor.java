@@ -125,10 +125,9 @@ public class GroovyExecutor
   public Script compileGroovy(final GroovyResult result, final String script, final boolean bindScriptResult)
   {
     securityChecks(script);
+    final GroovyClassLoader gcl = new GroovyClassLoader();
     Class< ? > groovyClass = null;
-    GroovyClassLoader gcl = null;
     try {
-      gcl = new GroovyClassLoader();
       groovyClass = gcl.parseClass(script);
     } catch (final CompilationFailedException ex) {
       log.info("Groovy-CompilationFailedException: " + ex.getMessage());
@@ -136,14 +135,6 @@ public class GroovyExecutor
         result.setException(ex);
       }
       return null;
-    } finally {
-      if (gcl != null) {
-        try {
-          gcl.close();
-        } catch (final IOException ex) {
-          log.error("Error while trying to close GroovyClassLoader: " + ex.getMessage(), ex);
-        }
-      }
     }
     Script groovyObject = null;
     try {
