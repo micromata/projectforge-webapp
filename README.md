@@ -8,6 +8,9 @@ Please visit: http://www.projectforge.org/pf-en/Developersarewelcome
 
 ## Quickstart from command line
 
+> Please note: You only need this package for developing ProjectForge.
+> The other modules projectforge-* are automatically available by maven.
+
 1. Checkout:  
    https://github.com/micromata/projectforge-webapp.git
 
