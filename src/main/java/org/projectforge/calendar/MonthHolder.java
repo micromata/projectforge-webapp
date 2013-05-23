@@ -35,7 +35,6 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
 
-
 /**
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -45,7 +44,7 @@ public class MonthHolder
 {
   /** Keys of the month names (e. g. needed for I18n). */
   public static final String MONTH_KEYS[] = new String[] { "january", "february", "march", "april", "may", "june", "july", "august",
-      "september", "october", "november", "december"};
+    "september", "october", "november", "december"};
 
   private List<WeekHolder> weeks;
 
@@ -70,10 +69,10 @@ public class MonthHolder
    * @param dayOfMonth
    * @return null, if the demanded day is not member of the weeks of the MonthHolder.
    */
-  public DayHolder getDay(int month, int dayOfMonth)
+  public DayHolder getDay(final int month, final int dayOfMonth)
   {
-    for (WeekHolder week : weeks) {
-      for (DayHolder day : week.getDays()) {
+    for (final WeekHolder week : weeks) {
+      for (final DayHolder day : week.getDays()) {
         if (day.getMonth() == month && day.getDayOfMonth() == dayOfMonth) {
           return day;
         }
@@ -83,7 +82,7 @@ public class MonthHolder
   }
 
   /** Initializes month containing all days of actual month. */
-  public MonthHolder(TimeZone timeZone, Locale locale)
+  public MonthHolder(final TimeZone timeZone, final Locale locale)
   {
     cal = Calendar.getInstance(timeZone, locale);
     calculate();
@@ -96,7 +95,7 @@ public class MonthHolder
     calculate();
   }
 
-  public MonthHolder(Date date)
+  public MonthHolder(final Date date)
   {
     cal = DateHelper.getCalendar(Locale.GERMAN);
     cal.setTime(date);
@@ -105,7 +104,7 @@ public class MonthHolder
 
   private void calculate()
   {
-    DateHolder dateHolder = new DateHolder(cal, DatePrecision.DAY);
+    final DateHolder dateHolder = new DateHolder(cal, DatePrecision.DAY);
     year = dateHolder.getYear();
     month = dateHolder.getMonth();
     dateHolder.setBeginOfMonth();
@@ -118,7 +117,7 @@ public class MonthHolder
 
     weeks = new ArrayList<WeekHolder>();
     do {
-      WeekHolder week = new WeekHolder(dateHolder.getCalendar(), month);
+      final WeekHolder week = new WeekHolder(dateHolder.getCalendar(), month);
       weeks.add(week);
       dateHolder.add(Calendar.WEEK_OF_YEAR, 1);
     } while (dateHolder.getMonth() == month);
@@ -140,6 +139,14 @@ public class MonthHolder
       return "unknown";
     }
     return MONTH_KEYS[month];
+  }
+
+  /**
+   * @return i18n key of the month name.
+   */
+  public String getI18nKey()
+  {
+    return "calendar.month." + getMonthKey();
   }
 
   public WeekHolder getFirstWeek()
@@ -172,7 +179,7 @@ public class MonthHolder
    * @param day
    * @return
    */
-  public boolean containsDay(DayHolder day)
+  public boolean containsDay(final DayHolder day)
   {
     return (day.getDate().before(begin) == false && day.getDate().after(end) == false);
   }
