@@ -103,12 +103,14 @@ public class ScriptDao extends BaseDao<ScriptDO>
         scriptVariables.put(param.getParameterName(), param.getValue());
       }
     }
-    final Map<String, Object> scriptVars = new HashMap<String, Object>();
-    scriptVariables.put("script", scriptVars);
     if (script.getFile() != null) {
+      final Map<String, Object> scriptVars = new HashMap<String, Object>();
+      scriptVariables.put("script", scriptVars);
       scriptVars.put("file", script.getFile());
       scriptVars.put("filename", script.getFilename());
     }
+
+    scriptVariables.put("i18n", new I18n());
 
     String scriptContent = script.getScriptAsString();
     if (scriptContent.contains("import org.projectforge.export") == true) {
