@@ -103,7 +103,7 @@ public class AddressListForm extends AbstractListForm<AddressListFilter, Address
       final GridBuilder gridBuilder, final AddressFilter searchFilter)
   {
     {
-      gridBuilder.newSplitPanel(GridSize.COL66);
+      gridBuilder.newSplitPanel(GridSize.COL50);
       gridBuilder.getRowPanel().setVisibility(new DivPanelVisibility() {
 
         @Override
@@ -126,7 +126,7 @@ public class AddressListForm extends AbstractListForm<AddressListFilter, Address
           new PropertyModel<Boolean>(searchFilter, "departed"), parentPage.getString("address.contactStatus.departed")));
     }
     {
-      gridBuilder.newSplitPanel(GridSize.COL33);
+      gridBuilder.newSplitPanel(GridSize.COL50);
       final FieldsetPanel fieldset = gridBuilder.newFieldset(parentPage.getString("address.addressStatus")).suppressLabelForWarning();
       final DivPanel checkBoxPanel = fieldset.addNewCheckBoxDiv();
       checkBoxPanel.add(form.createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
