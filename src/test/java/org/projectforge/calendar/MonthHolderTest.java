@@ -28,15 +28,20 @@ import static org.junit.Assert.assertEquals;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+
+import junit.framework.Assert;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
 import org.projectforge.core.ConfigXmlTest;
 import org.projectforge.core.Configuration;
-
+import org.projectforge.user.PFUserContext;
+import org.projectforge.user.PFUserDO;
 
 public class MonthHolderTest
 {
@@ -50,6 +55,7 @@ public class MonthHolderTest
   @Test
   public void testMonthHolder()
   {
+    PFUserContext.setUser(new PFUserDO().setLocale(Locale.GERMAN).setTimeZone(DateHelper.EUROPE_BERLIN));
     final DateHolder date = new DateHolder(new Date(), DatePrecision.DAY, Locale.GERMAN);
     date.setDate(1970, Calendar.NOVEMBER, 21, 0, 0, 0);
     final MonthHolder month = new MonthHolder(date.getDate());
@@ -84,6 +90,19 @@ public class MonthHolderTest
     date.setDate(2009, Calendar.DECEMBER, 16, 0, 0, 0);
     month = new MonthHolder(date.getDate());
     assertBigDecimal(21, month.getNumberOfWorkingDays());
+  }
+
+  @Test
+  public void testDays()
+  {
+    final MonthHolder mh = new MonthHolder(2013, Calendar.MAY);
+    final List<DayHolder> list = mh.getDays();
+    Assert.assertEquals(31, list.size());
+    for (final DayHolder dh : list) {
+      Assert.assertEquals(Calendar.MAY, dh.getMonth());
+    }
+    Assert.assertEquals(1, list.get(0).getDayOfMonth());
+    Assert.assertEquals(31, list.get(30).getDayOfMonth());
   }
 
   private void assertBigDecimal(final double expected, final BigDecimal value)
