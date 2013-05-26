@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -90,15 +91,23 @@ public class MonthHolder
 
   public MonthHolder(final Date date, final TimeZone timeZone)
   {
-    cal = DateHelper.getCalendar(timeZone, Locale.GERMAN);
+    cal = DateHelper.getCalendar(timeZone, null);
     cal.setTime(date);
     calculate();
   }
 
   public MonthHolder(final Date date)
   {
-    cal = DateHelper.getCalendar(Locale.GERMAN);
+    cal = DateHelper.getCalendar();
     cal.setTime(date);
+    calculate();
+  }
+
+  public MonthHolder(final int year, final int month)
+  {
+    cal = DateHelper.getCalendar();
+    cal.clear();
+    cal.set(year, month, 1);
     calculate();
   }
 
@@ -131,6 +140,19 @@ public class MonthHolder
   public int getMonth()
   {
     return month;
+  }
+
+  public List<DayHolder> getDays()
+  {
+    final List<DayHolder> list = new LinkedList<DayHolder>();
+    DayHolder dh = new DayHolder(begin);
+    int paranoiaCounter = 40;
+    while (dh.after(end) == false && --paranoiaCounter > 0) {
+      list.add(dh);
+      dh = dh.clone();
+      dh.add(Calendar.DAY_OF_MONTH, 1);
+    }
+    return list;
   }
 
   public String getMonthKey()
