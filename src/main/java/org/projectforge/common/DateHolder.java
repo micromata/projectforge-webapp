@@ -738,7 +738,7 @@ public class DateHolder implements Serializable, Cloneable, Comparable<DateHolde
   }
 
   @Override
-  public Object clone()
+  public DateHolder clone()
   {
     final DateHolder res = new DateHolder();
     res.calendar = (Calendar) this.calendar.clone();
