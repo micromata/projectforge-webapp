@@ -200,9 +200,14 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
     }
   }
 
-  public void setTimeZone(final TimeZone timeZone)
+  /**
+   * @param timeZone
+   * @return this for chaining.
+   */
+  public PFUserDO setTimeZone(final TimeZone timeZone)
   {
     this.timeZone = timeZone;
+    return this;
   }
 
   @Transient
@@ -233,9 +238,14 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
     return locale;
   }
 
-  public void setLocale(final Locale locale)
+  /**
+   * @param locale
+   * @return this for chaining.
+   */
+  public PFUserDO setLocale(final Locale locale)
   {
     this.locale = locale;
+    return this;
   }
 
   /**
