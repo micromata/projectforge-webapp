@@ -79,7 +79,7 @@ public class DayHolder extends DateHolder
     if (to.before(from) == true) {
       return BigDecimal.ZERO;
     }
-    DayHolder day = new DayHolder(from);
+    final DayHolder day = new DayHolder(from);
     BigDecimal numberOfWorkingDays = BigDecimal.ZERO;
     int numberOfFullWorkingDays = 0;
     int dayCounter = 1;
@@ -125,7 +125,7 @@ public class DayHolder extends DateHolder
   {
     super(date, DatePrecision.DAY);
   }
-  
+
   public DayHolder(final Date date, final TimeZone timeZone, final Locale locale) {
     super(date, DatePrecision.DAY, timeZone, locale);
   }
@@ -168,7 +168,7 @@ public class DayHolder extends DateHolder
 
   public boolean isWeekend()
   {
-    int dayOfWeek = getDayOfWeek();
+    final int dayOfWeek = getDayOfWeek();
     return Calendar.SUNDAY == dayOfWeek || Calendar.SATURDAY == dayOfWeek;
   }
 
@@ -223,7 +223,7 @@ public class DayHolder extends DateHolder
   @Override
   public DayHolder setEndOfMonth()
   {
-    int day = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+    final int day = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
     calendar.set(Calendar.DAY_OF_MONTH, day);
     return this;
   }
@@ -234,13 +234,14 @@ public class DayHolder extends DateHolder
    */
   public long getMillisForCurrentTimeOfDay()
   {
-    Calendar cal = (Calendar) calendar.clone();
+    final Calendar cal = (Calendar) calendar.clone();
     cal.set(Calendar.YEAR, this.getYear());
     cal.set(Calendar.MONTH, this.getMonth());
     cal.set(Calendar.DAY_OF_MONTH, this.getDayOfMonth());
     return cal.getTimeInMillis();
   }
 
+  @Override
   public String toString()
   {
     return isoFormat();
@@ -279,5 +280,13 @@ public class DayHolder extends DateHolder
   public Map<String, Object> getObjects()
   {
     return this.objects;
+  }
+
+  @Override
+  public DayHolder clone()
+  {
+    final DayHolder res = new DayHolder();
+    res.calendar = (Calendar) this.calendar.clone();
+    return res;
   }
 }
