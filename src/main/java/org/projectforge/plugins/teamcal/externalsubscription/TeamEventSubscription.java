@@ -186,6 +186,7 @@ public class TeamEventSubscription implements Serializable
       }
       // clear
       eventDurationAccess.clear();
+      recurrenceEvents.clear();
 
       // the event id must (!) be negative and decrementing (different on each event)
       Integer startId = -1;
