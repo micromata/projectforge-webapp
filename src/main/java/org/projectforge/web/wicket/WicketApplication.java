@@ -56,14 +56,13 @@ import org.apache.wicket.util.lang.Bytes;
 import org.projectforge.AppVersion;
 import org.projectforge.common.BeanHelper;
 import org.projectforge.common.ExceptionHelper;
-import org.projectforge.common.Logger;
-import org.projectforge.common.LoggerBridgeLog4j;
 import org.projectforge.continuousdb.DatabaseSupport;
 import org.projectforge.continuousdb.UpdateEntry;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.CronSetup;
+import org.projectforge.core.ProjectForgeApp;
 import org.projectforge.core.SystemInfoCache;
 import org.projectforge.database.DatabaseCoreInitial;
 import org.projectforge.database.HibernateUtils;
@@ -308,7 +307,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
   @Override
   protected void init()
   {
-    Logger.setLoggerBridge(new LoggerBridgeLog4j());
+    ProjectForgeApp.init();
     super.init();
     // Own error page for deployment mode and UserException and AccessException.
     getRequestCycleListeners().add(new AbstractRequestCycleListener() {
@@ -528,6 +527,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
   protected void onDestroy()
   {
     upAndRunning = false;
+    ProjectForgeApp.shutdown();
     log.info("Syncing all user preferences to database.");
     userXmlPreferencesCache.forceReload();
     cronSetup.shutdown();
