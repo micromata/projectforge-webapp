@@ -113,6 +113,8 @@ public class WicketApplication extends WebApplication implements WicketApplicati
 
   private static Boolean stripWicketTags;
 
+  private static boolean upAndRunning;
+
   private static String alertMessage;
 
   private static Map<Class< ? extends Page>, String> mountedPages = new HashMap<Class< ? extends Page>, String>();
@@ -157,6 +159,15 @@ public class WicketApplication extends WebApplication implements WicketApplicati
   public static Boolean internalIsDevelopmentMode()
   {
     return developmentMode;
+  }
+
+  /**
+   * @return true if the application is running and is full available, false e. g. if ProjectForge runs in maintenance mode or is in
+   *         start-up phase.
+   */
+  public static boolean isUpAndRunning()
+  {
+    return upAndRunning;
   }
 
   /**
@@ -447,12 +458,6 @@ public class WicketApplication extends WebApplication implements WicketApplicati
       }
     }
     log.info("user.timezone is: " + System.getProperty("user.timezone"));
-    cronSetup.initialize();
-    log.info("system cronJobs are initialized.");
-    pluginsRegistry.registerCronJobs(cronSetup);
-    log.info("plugin cronJobs are initialized.");
-    log.info(AppVersion.APP_ID + " " + AppVersion.NUMBER + " (" + AppVersion.RELEASE_TIMESTAMP + ") initialized.");
-
     try {
       PFUserContext.setUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser()); // Logon admin user.
       if (myDatabaseUpdater.getSystemUpdater().isUpdated() == false) {
@@ -474,7 +479,19 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     } else {
       loginHandler.initialize();
       Login.getInstance().setLoginHandler(loginHandler);
+      if (UserFilter.isUpdateRequiredFirst() == false) {
+        upAndRunning = true;
+      }
     }
+    if (upAndRunning == true) {
+      cronSetup.initialize();
+      log.info("system cronJobs are initialized.");
+      pluginsRegistry.registerCronJobs(cronSetup);
+      log.info("plugin cronJobs are initialized.");
+    } else {
+      log.warn("Start-up of ProjectForge isn't completed normally, therefore REST services and cronJobs of plugins aren't available.");
+    }
+    log.info(AppVersion.APP_ID + " " + AppVersion.NUMBER + " (" + AppVersion.RELEASE_TIMESTAMP + ") initialized.");
     try {
       StorageClient.getInstance(); // Initialize storage
     } catch (final Exception ex) {
@@ -500,6 +517,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
   @Override
   protected void onDestroy()
   {
+    upAndRunning = false;
     log.info("Syncing all user preferences to database.");
     userXmlPreferencesCache.forceReload();
     cronSetup.shutdown();
