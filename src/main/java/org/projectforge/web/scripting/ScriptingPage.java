@@ -72,7 +72,6 @@ import org.projectforge.web.fibu.ReportScriptingStorage;
 import org.projectforge.web.wicket.AbstractStandardFormPage;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.JFreeChartImage;
-import org.projectforge.web.wicket.WicketUtils;
 
 public class ScriptingPage extends AbstractStandardFormPage
 {
@@ -260,11 +259,7 @@ public class ScriptingPage extends AbstractStandardFormPage
       buf.append("pf_report_");
       buf.append(DateHelper.getTimestampAsFilenameSuffix(new Date())).append(".pdf");
       final String filename = buf.toString();
-      final Response response = getResponse();
-      ((WebResponse) response).setAttachmentHeader(filename);
-      WicketUtils.getHttpServletResponse(response).setContentType(DownloadUtils.getContentType(filename));
-      JasperExportManager.exportReportToPdfStream(jasperPrint, response.getOutputStream());
-      response.getOutputStream().flush();
+      DownloadUtils.setDownloadTarget(JasperExportManager.exportReportToPdf(jasperPrint), filename);
     } catch (final Exception ex) {
       error(getLocalizedMessage("error", ex.getMessage()));
       log.error(ex.getMessage(), ex);
@@ -283,11 +278,7 @@ public class ScriptingPage extends AbstractStandardFormPage
       }
       buf.append(DateHelper.getTimestampAsFilenameSuffix(new Date())).append(".xls");
       final String filename = buf.toString();
-      final Response response = getResponse();
-      ((WebResponse) response).setAttachmentHeader(filename);
-      WicketUtils.getHttpServletResponse(response).setContentType(DownloadUtils.getContentType(filename));
-      workbook.write(response.getOutputStream());
-      response.getOutputStream().flush();
+      DownloadUtils.setDownloadTarget(workbook.getAsByteArray(), filename);
     } catch (final Exception ex) {
       error(getLocalizedMessage("error", ex.getMessage()));
       log.error(ex.getMessage(), ex);
