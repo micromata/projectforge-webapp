@@ -112,6 +112,10 @@ public class CronSetup
    */
   public void shutdown()
   {
+    if (scheduler == null) {
+      // Scheduler is null e. g. in maintenance mode.
+      return;
+    }
     try {
       scheduler.shutdown();
     } catch (final SchedulerException ex) {
