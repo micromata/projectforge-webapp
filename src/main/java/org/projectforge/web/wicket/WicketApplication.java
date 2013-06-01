@@ -171,6 +171,16 @@ public class WicketApplication extends WebApplication implements WicketApplicati
   }
 
   /**
+   * This method should only be called in test cases!
+   * @param upAndRunning the upAndRunning to set
+   */
+  public static void internalSetUpAndRunning(final boolean upAndRunning)
+  {
+    log.warn("This method should only be called in test cases!");
+    WicketApplication.upAndRunning = upAndRunning;
+  }
+
+  /**
    * Please don't use this method, use {@link WicketUtils#getDefaultPage()} instead.
    * @return
    */
