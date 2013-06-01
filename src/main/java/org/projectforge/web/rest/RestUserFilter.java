@@ -39,6 +39,7 @@ import org.projectforge.rest.Authentication;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
+import org.projectforge.web.WebConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -72,6 +73,12 @@ public class RestUserFilter implements Filter
   public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException,
   ServletException
   {
+    if (WebConfiguration.isUpAndRunning() == false) {
+      log.error("System isn't up and running, rest call denied. The system is may-be in start-up phase or in maintenance mode.");
+      final HttpServletResponse resp = (HttpServletResponse) response;
+      resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+      return;
+    }
     final HttpServletRequest req = (HttpServletRequest) request;
     String userString = getAttribute(req, Authentication.AUTHENTICATION_USER_ID);
     PFUserDO user = null;
