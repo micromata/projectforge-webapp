@@ -28,7 +28,6 @@ import java.io.Serializable;
 
 import org.apache.wicket.markup.head.CssReferenceHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.util.listener.IChangeListener;
 import org.apache.wicket.util.watch.IModificationWatcher;
 import org.lesscss.LessCompiler;
@@ -45,6 +44,8 @@ import org.springframework.util.StringUtils;
  */
 public class LessWicketApplicationInstantiator implements Serializable
 {
+  private static final long serialVersionUID = 243362344112860106L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LessWicketApplicationInstantiator.class);
 
   private static LessWicketApplicationInstantiator instance;
@@ -137,10 +138,10 @@ public class LessWicketApplicationInstantiator implements Serializable
     application.mountResource(encodePathWithCachingStrategy(relativeCssPath), reference);
   }
 
-  public String encodePathWithCachingStrategy(String path)
+  public String encodePathWithCachingStrategy(final String path)
   {
     // wicket uses by default -ver-, so we need to use another prefix
-    return StringUtils.replace(path, ".css", "-version-" + application.getStartTime() + ".css");
+    return StringUtils.replace(path, ".css", "-version-" + WicketApplication.getStartTime() + ".css");
   }
 
   /**
