@@ -29,6 +29,15 @@ import org.projectforge.web.wicket.WicketApplication;
 public class WebConfiguration
 {
   /**
+   * @return true if the application is running and is full available, false e. g. if ProjectForge runs in maintenance mode or is in
+   *         start-up phase.
+   */
+  public static boolean isUpAndRunning()
+  {
+    return WicketApplication.isUpAndRunning();
+  }
+
+  /**
    * At application start the flag developmentModus is perhaps not already set.
    * @return true if the system is configured as development system e. g. in the context.xml, otherwise false.
    */
