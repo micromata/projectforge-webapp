@@ -18,7 +18,7 @@
   </licenses>
   <properties>
     <!-- wtpversion>1.5</wtpversion -->
-    <wicket.version>6.4.0</wicket.version> <!-- Version check: 2012-12-29 -->
+    <wicket.version>6.8.0</wicket.version> <!-- Version check: 2013-06-01 -->
     <!-- <wiquery.version>1.5.5</wiquery.version> -->
     <joda.version>2.0</joda.version>
     <jackson.version>1.7.5</jackson.version>
