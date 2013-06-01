@@ -390,7 +390,9 @@ public class TeamCalDO extends DefaultBaseDO
       @Override
       protected boolean accept(final java.lang.reflect.Field f)
       {
-        return super.accept(f) && !"externalSubscriptionCalendarBinary".equals(f.getName());
+        return super.accept(f)
+            && !"externalSubscriptionCalendarBinary".equals(f.getName())
+            && !"externalSubscriptionHash".equals(f.getName());
       }
     }).toString();
   }
