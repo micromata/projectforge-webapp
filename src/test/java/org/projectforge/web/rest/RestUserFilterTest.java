@@ -41,12 +41,14 @@ import org.projectforge.rest.Authentication;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
+import org.projectforge.web.wicket.WicketApplication;
 
 public class RestUserFilterTest
 {
   @Test
   public void testAuthentication() throws IOException, ServletException
   {
+    WicketApplication.internalSetUpAndRunning(true);
     final HttpServletResponse response = mock(HttpServletResponse.class);
     final UserDao userDao = mock(UserDao.class);
     when(userDao.authenticateUser(Mockito.eq("successUser"), Mockito.eq("successPassword"))).thenReturn(
