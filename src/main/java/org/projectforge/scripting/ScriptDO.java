@@ -199,7 +199,6 @@ public class ScriptDO extends DefaultBaseDO
     this.scriptBackup = convert(scriptBackup);
   }
 
-
   /**
    * @return the file
    */
@@ -436,7 +435,7 @@ public class ScriptDO extends DefaultBaseDO
       @Override
       protected boolean accept(final java.lang.reflect.Field f)
       {
-        return super.accept(f) && !"file".equals(f.getName());
+        return super.accept(f) && !"file".equals(f.getName()) && !"script".equals(f.getName()) && !"scriptBackup".equals(f.getName());
       }
     }).toString();
   }
