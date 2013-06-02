@@ -107,7 +107,7 @@ public class ScriptEditForm extends AbstractEditForm<ScriptDO, ScriptEditPage>
     gridBuilder.newGridPanel();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"));
-      fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "description")));
+      fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "description"))).setAutogrow();
     }
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("scripting.script"));
