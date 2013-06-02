@@ -172,4 +172,13 @@ public class CalendarPage extends AbstractStandardFormPage implements ISelectCal
   {
     return form;
   }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractSecuredPage#isBreadCrumbVisible()
+   */
+  @Override
+  protected boolean isBreadCrumbVisible()
+  {
+    return false;
+  }
 }
