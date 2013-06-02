@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
@@ -64,16 +65,19 @@ public class MyListPageSortableDataProvider<T extends IdObject< ? >> extends Sor
 
   private SortParam<String> sortParam;
 
+  private SortParam<String> secondSortParam;
+
   private final AbstractListPage< ? , ? , T> listPage;
 
-  public MyListPageSortableDataProvider(final String property, final SortOrder sortOrder, final AbstractListPage< ? , ? , T> listPage)
+  public MyListPageSortableDataProvider(final SortParam<String> sortParam, final SortParam<String> secondSortParam,
+      final AbstractListPage< ? , ? , T> listPage)
   {
     this.listPage = listPage;
     // set default sort
-    if (property != null) {
-      setSort(property, sortOrder);
+    if (sortParam != null) {
+      setSort(sortParam);
     } else {
-      setSort("NOSORT", sortOrder);
+      setSort("NOSORT", SortOrder.ASCENDING);
     }
   }
 
@@ -149,9 +153,13 @@ public class MyListPageSortableDataProvider<T extends IdObject< ? >> extends Sor
     }
   }
 
-  protected Comparator<T> getComparator(final String sortProperty, final boolean ascending)
+  protected Comparator<T> getComparator(final SortParam<String> sortParam, final SortParam<String> secondSortParam)
   {
-    return new MyBeanComparator<T>(sortProperty, ascending);
+    final String sortProperty = sortParam != null ? sortParam.getProperty() : null;
+    final boolean ascending = sortParam != null ? sortParam.isAscending() : true;
+    final String secondSortProperty = secondSortParam != null ? secondSortParam.getProperty() : null;
+    final boolean secondAscending = secondSortParam != null ? secondSortParam.isAscending() : true;
+    return new MyBeanComparator<T>(sortProperty, ascending, secondSortProperty, secondAscending);
   }
 
   /**
@@ -176,7 +184,10 @@ public class MyListPageSortableDataProvider<T extends IdObject< ? >> extends Sor
   {
     final SortParam<String> sp = getSort();
     if (sp != null && "NOSORT".equals(sp.getProperty()) == false) {
-      final Comparator<T> comp = getComparator(sp.getProperty().toString(), sp.isAscending());
+      if (this.sortParam != null && StringUtils.equals(this.sortParam.getProperty(), sp.getProperty()) == false) {
+        this.secondSortParam = this.sortParam;
+      }
+      final Comparator<T> comp = getComparator(sp, secondSortParam);
       Collections.sort(list, comp);
     }
     this.sortParam = sp;

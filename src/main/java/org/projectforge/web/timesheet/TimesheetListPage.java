@@ -36,6 +36,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulato
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
+import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.SubmitLink;
@@ -553,13 +554,17 @@ IListPageColumnsCreator<TimesheetDO>
    */
   @SuppressWarnings("serial")
   @Override
-  protected ISortableDataProvider<TimesheetDO, String> createSortableDataProvider(final String sortProperty, final SortOrder sortOrder)
+  protected ISortableDataProvider<TimesheetDO, String> createSortableDataProvider(final SortParam<String> sortParam)
   {
-    this.listPageSortableDataProvider = new MyListPageSortableDataProvider<TimesheetDO>(sortProperty, sortOrder, this) {
+    this.listPageSortableDataProvider = new MyListPageSortableDataProvider<TimesheetDO>(sortParam, null, this) {
       @Override
-      protected Comparator<TimesheetDO> getComparator(final String sortProperty, final boolean ascending)
+      protected Comparator<TimesheetDO> getComparator(final SortParam<String> sortParam, final SortParam<String> secondSortParam)
       {
-        return new MyBeanComparator<TimesheetDO>(sortProperty, ascending) {
+        final String sortProperty = sortParam != null ? sortParam.getProperty() : null;
+        final boolean ascending = sortParam != null ? sortParam.isAscending() : true;
+        final String secondSortProperty = secondSortParam != null ? secondSortParam.getProperty() : null;
+        final boolean secondAscending = secondSortParam != null ? secondSortParam.isAscending() : true;
+        return new MyBeanComparator<TimesheetDO>(sortProperty, ascending, secondSortProperty, secondAscending) {
           @Override
           public int compare(final TimesheetDO t1, final TimesheetDO t2)
           {

@@ -31,9 +31,9 @@ public class MyBeanComparator<T> implements Comparator<T>
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MyBeanComparator.class);
 
-  private String property;
+  private String property, secondProperty;
 
-  private boolean asc;
+  private boolean ascending, secondAscending;
 
   public MyBeanComparator(final String property)
   {
@@ -44,15 +44,36 @@ public class MyBeanComparator<T> implements Comparator<T>
   public MyBeanComparator(final String property, final boolean asc)
   {
     this.property = property;
-    this.asc = asc;
+    this.ascending = asc;
+  }
+
+  public MyBeanComparator(final String property, final boolean ascending, final String secondProperty, final boolean secondAscending)
+  {
+    this.property = property;
+    this.ascending = ascending;
+    this.secondProperty = secondProperty;
+    this.secondAscending = secondAscending;
+  }
+
+  public int compare(final T o1, final T o2)
+  {
+    final int result = compare(o1, o2, property, ascending);
+    if (result != 0) {
+      return result;
+    }
+    return compare(o1, o2, secondProperty, secondAscending);
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes"})
-  public int compare(final T o1, final T o2)
+  private int compare(final T o1, final T o2, final String prop, final boolean asc)
   {
+    if (prop == null) {
+      // Not comparable.
+      return 0;
+    }
     try {
-      final Object value1 = BeanHelper.getNestedProperty(o1, property);
-      final Object value2 = BeanHelper.getNestedProperty(o2, property);
+      final Object value1 = BeanHelper.getNestedProperty(o1, prop);
+      final Object value2 = BeanHelper.getNestedProperty(o2, prop);
       if (value1 == null) {
         if (value2 == null)
           return 0;
@@ -77,7 +98,7 @@ public class MyBeanComparator<T> implements Comparator<T>
         }
       }
     } catch (final Exception ex) {
-      log.error("Exception while comparing values of property '" + property + "': " + ex.getMessage());
+      log.error("Exception while comparing values of property '" + prop + "': " + ex.getMessage());
       return 0;
     }
   }

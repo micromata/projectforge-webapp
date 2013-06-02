@@ -37,6 +37,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DefaultDataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
+import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.ExternalLink;
@@ -639,7 +640,8 @@ extends AbstractSecuredPage implements ISelectCallerPage
       final SortOrder sortOrder)
       {
     final int pageSize = form.getPageSize();
-    return new DefaultDataTable<O, String>("table", columns, createSortableDataProvider(sortProperty, sortOrder), pageSize);
+    return new DefaultDataTable<O, String>("table", columns, createSortableDataProvider(new SortParam<String>(sortProperty,
+        sortOrder == SortOrder.ASCENDING)), pageSize);
     // return new AjaxFallbackDefaultDataTable<O>("table", columns, createSortableDataProvider(sortProperty, ascending), pageSize);
       }
 
@@ -648,13 +650,24 @@ extends AbstractSecuredPage implements ISelectCallerPage
    * @param sortProperty
    * @param ascending
    */
-  protected ISortableDataProvider<O, String> createSortableDataProvider(final String sortProperty, final SortOrder sortOrder)
+  protected ISortableDataProvider<O, String> createSortableDataProvider(final SortParam<String> sortParam)
   {
+    return createSortableDataProvider(sortParam, null);
+  }
+
+  /**
+   * At default a new SortableDOProvider is returned. Overload this method e. g. for avoiding LazyInitializationExceptions due to sorting.
+   * @param sortProperty
+   * @param ascending
+   */
+  protected ISortableDataProvider<O, String> createSortableDataProvider(final SortParam<String> sortParam,
+      final SortParam<String> secondSortParam)
+      {
     if (listPageSortableDataProvider == null) {
-      listPageSortableDataProvider = new MyListPageSortableDataProvider<O>(sortProperty, sortOrder, this);
+      listPageSortableDataProvider = new MyListPageSortableDataProvider<O>(sortParam, secondSortParam, this);
     }
     return listPageSortableDataProvider;
-  }
+      }
 
   /**
    * For displaying the hibernate search fields. Returns list as csv. These fields the user can directly address in his search string, e. g.
@@ -841,7 +854,7 @@ extends AbstractSecuredPage implements ISelectCallerPage
     if (this.returnToPage != null) {
       return this.returnToPage;
     } else if (caller != null && caller instanceof WebPage) {
-      return (WebPage)caller;
+      return (WebPage) caller;
     }
     return null;
   }
