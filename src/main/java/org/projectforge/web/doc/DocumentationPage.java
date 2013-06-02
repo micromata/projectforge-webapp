@@ -87,4 +87,12 @@ public class DocumentationPage extends AbstractSecuredPage
     return getString("doc.title");
   }
 
+  /**
+   * @see org.projectforge.web.wicket.AbstractSecuredPage#isBreadCrumbVisible()
+   */
+  @Override
+  protected boolean isBreadCrumbVisible()
+  {
+    return false;
+  }
 }
