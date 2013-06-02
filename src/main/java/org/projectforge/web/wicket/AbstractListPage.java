@@ -37,6 +37,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DefaultDataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.link.Link;
@@ -829,5 +830,19 @@ extends AbstractSecuredPage implements ISelectCallerPage
         selectedItems.remove(id);
       }
     }
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractSecuredPage#getReturnToPage()
+   */
+  @Override
+  public WebPage getReturnToPage()
+  {
+    if (this.returnToPage != null) {
+      return this.returnToPage;
+    } else if (caller != null && caller instanceof WebPage) {
+      return (WebPage)caller;
+    }
+    return null;
   }
 }

@@ -24,6 +24,7 @@
 package org.projectforge.web.task;
 
 import org.apache.wicket.markup.ComponentTag;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
@@ -277,5 +278,19 @@ public class TaskTreePage extends AbstractSecuredPage
   TaskFilter getTaskFilter()
   {
     return form.getSearchFilter();
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractSecuredPage#getReturnToPage()
+   */
+  @Override
+  public WebPage getReturnToPage()
+  {
+    if (this.returnToPage != null) {
+      return this.returnToPage;
+    } else if (caller != null && caller instanceof WebPage) {
+      return (WebPage)caller;
+    }
+    return null;
   }
 }
