@@ -640,8 +640,8 @@ extends AbstractSecuredPage implements ISelectCallerPage
       final SortOrder sortOrder)
       {
     final int pageSize = form.getPageSize();
-    return new DefaultDataTable<O, String>("table", columns, createSortableDataProvider(new SortParam<String>(sortProperty,
-        sortOrder == SortOrder.ASCENDING)), pageSize);
+    final SortParam<String> sortParam = sortProperty != null ? new SortParam<String>(sortProperty, sortOrder == SortOrder.ASCENDING) : null;
+    return new DefaultDataTable<O, String>("table", columns, createSortableDataProvider(sortParam), pageSize);
     // return new AjaxFallbackDefaultDataTable<O>("table", columns, createSortableDataProvider(sortProperty, ascending), pageSize);
       }
 
