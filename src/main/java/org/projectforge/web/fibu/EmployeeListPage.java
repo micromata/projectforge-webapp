@@ -24,6 +24,7 @@
 package org.projectforge.web.fibu;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
@@ -31,29 +32,39 @@ import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.common.DateHelper;
 import org.projectforge.fibu.EmployeeDO;
 import org.projectforge.fibu.EmployeeDao;
+import org.projectforge.fibu.EmployeeExport;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
+import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 @ListPage(editPage = EmployeeEditPage.class)
-public class EmployeeListPage extends AbstractListPage<EmployeeListForm, EmployeeDao, EmployeeDO> implements IListPageColumnsCreator<EmployeeDO>
+public class EmployeeListPage extends AbstractListPage<EmployeeListForm, EmployeeDao, EmployeeDO> implements
+IListPageColumnsCreator<EmployeeDO>
 {
   private static final long serialVersionUID = -8406452960003792763L;
 
   @SpringBean(name = "employeeDao")
   private EmployeeDao employeeDao;
+
+  @SpringBean(name = "employeeExport")
+  private EmployeeExport employeeExport;
 
   public EmployeeListPage(final PageParameters parameters)
   {
@@ -131,12 +142,31 @@ public class EmployeeListPage extends AbstractListPage<EmployeeListForm, Employe
     return columns;
   }
 
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
     final List<IColumn<EmployeeDO, String>> columns = createColumns(this, true);
     dataTable = createDataTable(columns, "user.lastname", SortOrder.ASCENDING);
     form.add(dataTable);
+    if (WebConfiguration.isDevelopmentMode() == true) {
+      // Not yet finished.
+      final ContentMenuEntryPanel exportExcelButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
+        @Override
+        public void onClick()
+        {
+          final List<EmployeeDO> list = getList();
+          final byte[] xls = employeeExport.export(list);
+          if (xls == null || xls.length == 0) {
+            form.addError("datatable.no-records-found");
+            return;
+          }
+          final String filename = "ProjectForge-Employees_" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".xls";
+          DownloadUtils.setDownloadTarget(xls, filename);
+        };
+      }, getString("exportAsXls")).setTooltip(getString("tooltip.export.excel"));
+      addContentMenuEntry(exportExcelButton);
+    }
   }
 
   @Override
