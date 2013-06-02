@@ -28,9 +28,11 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.core.MenuBarPanel;
 import org.projectforge.web.core.NavTopPanel;
 import org.projectforge.web.dialog.ModalDialog;
@@ -85,6 +87,51 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
   }
 
   /**
+   * @see org.apache.wicket.Component#onInitialize()
+   */
+  @Override
+  protected void onInitialize()
+  {
+    super.onInitialize();
+    final WebMarkupContainer breadcrumbContainer = new WebMarkupContainer("breadcrumb");
+    body.add(breadcrumbContainer);
+    if (WebConfiguration.isDevelopmentMode() == true && isBreadCrumbVisible() == true) {
+      final RepeatingView breadcrumbItems = new RepeatingView("li");
+      breadcrumbContainer.add(breadcrumbItems);
+      final WebPage returnTo = this.getReturnToPage();
+      if (returnTo != null && returnTo instanceof AbstractSecuredPage) {
+        addBreadCrumbs(breadcrumbItems, (AbstractSecuredPage) returnTo);
+      } else {
+        breadcrumbItems.setVisible(false);
+      }
+      breadcrumbContainer.add(new Label("active", getTitle()));
+    } else {
+      breadcrumbContainer.setVisible(false);
+    }
+  }
+
+  @SuppressWarnings("serial")
+  private void addBreadCrumbs(final RepeatingView breadcrumbItems, final AbstractSecuredPage page)
+  {
+    final WebPage returnTo = page.getReturnToPage();
+    if (returnTo != null && returnTo instanceof AbstractSecuredPage) {
+      addBreadCrumbs(breadcrumbItems, (AbstractSecuredPage) returnTo);
+    }
+    final WebMarkupContainer li = new WebMarkupContainer(breadcrumbItems.newChildId());
+    breadcrumbItems.add(li);
+    final Link<Void> pageLink = new Link<Void>("link") {
+
+      @Override
+      public void onClick()
+      {
+        setResponsePage(page);
+      }
+    };
+    li.add(pageLink);
+    pageLink.add(new Label("label", page.getTitle()));
+  }
+
+  /**
    * If set then return after save, update or cancel to this page. If not given then return to given list page. As an alternative you can
    * set the returnToPage as a page parameter (if supported by the derived page).
    * @param returnToPage
@@ -113,7 +160,6 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
     return this.contentMenuBarPanel.newChildId();
   }
 
-
   /**
    * @return This page as link with the page parameters of this page.
    */
@@ -129,7 +175,7 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
   public String getPageAsLink(final PageParameters parameters)
   {
     String relativeUrl = (String) urlFor(this.getClass(), parameters);
-    final HttpServletRequest req = (HttpServletRequest)(this.getRequest()).getContainerRequest();
+    final HttpServletRequest req = (HttpServletRequest) (this.getRequest()).getContainerRequest();
     String requestUrl = req.getRequestURL().toString();
     final int pos = requestUrl != null ? requestUrl.indexOf("/wa/") : -1;
     if (pos > 0) {
@@ -225,5 +271,10 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
   public void add(final ModalDialog modalDialog)
   {
     modalDialogs.add(modalDialog);
+  }
+
+  protected boolean isBreadCrumbVisible()
+  {
+    return true;
   }
 }
