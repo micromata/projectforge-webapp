@@ -63,7 +63,7 @@ public class TeamEventSubscription implements Serializable
 
   private final Integer teamCalId;
 
-  private final RangeMap<Long, TeamEventDO> eventDurationAccess;
+  private final MultipleEntryRangeMapHolder<Long, TeamEventDO> eventDurationAccess;
 
   private final List<TeamEventDO> recurrenceEvents;
 
@@ -81,7 +81,7 @@ public class TeamEventSubscription implements Serializable
   {
     this.teamCalDao = teamCalDao;
     this.teamCalId = teamCalDo.getId();
-    eventDurationAccess = TreeRangeMap.create();
+    eventDurationAccess = new MultipleEntryRangeMapHolder<Long, TeamEventDO>();
     recurrenceEvents = new ArrayList<TeamEventDO>();
     currentInitializedHash = null;
     lastUpdated = null;
@@ -219,10 +219,7 @@ public class TeamEventSubscription implements Serializable
 
   public List<TeamEventDO> getEvents(final Long startTime, final Long endTime)
   {
-    // first: gather all "normal" events
-    final RangeMap<Long, TeamEventDO> rangeMap = eventDurationAccess.subRangeMap(Range.closed(startTime, endTime));
-    // then gather
-    return new ArrayList<TeamEventDO>(rangeMap.asMapOfRanges().values());
+    return eventDurationAccess.getClosedResultList(startTime, endTime);
   }
 
   public Integer getTeamCalId()
