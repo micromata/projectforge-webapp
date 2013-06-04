@@ -86,10 +86,10 @@ public class TeamEventSubscription implements Serializable
     currentInitializedHash = null;
     lastUpdated = null;
     client = new HttpClient();
-    initOrUpdate(teamCalDo);
+    init(teamCalDo);
   }
 
-  public void initOrUpdate(final TeamCalDO teamCalDo)
+  private void init(final TeamCalDO teamCalDo)
   {
     String url = teamCalDo.getExternalSubscriptionUrl();
     if (teamCalDo.isExternalSubscription() == false || StringUtils.isEmpty(url) == true) {

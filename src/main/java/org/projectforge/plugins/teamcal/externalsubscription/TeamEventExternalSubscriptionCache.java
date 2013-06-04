@@ -113,10 +113,12 @@ public class TeamEventExternalSubscriptionCache
       // create the calendar
       final TeamEventSubscription teamEventSubscription = new TeamEventSubscription(dao, calendar);
       subscriptions.put(calendar.getId(), teamEventSubscription);
-
     } else if (force == true || compareSubscription.getLastUpdated() == null || compareSubscription.getLastUpdated() + addedTime <= now) {
       // update the calendar
-      compareSubscription.initOrUpdate(calendar);
+      // we update the cache softly, therefore we create a new instance and replace the old instance in the cached map then
+      // creation and update is therefore the same two lines of code, but semantically different things
+      final TeamEventSubscription teamEventSubscription = new TeamEventSubscription(dao, calendar);
+      subscriptions.put(calendar.getId(), teamEventSubscription);
     }
   }
 
