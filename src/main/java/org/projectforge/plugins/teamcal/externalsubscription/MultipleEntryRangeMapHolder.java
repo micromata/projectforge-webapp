@@ -34,6 +34,7 @@ public class MultipleEntryRangeMapHolder<K extends Comparable, V> implements Ser
     if (range == null) {
       return;
     }
+    // convert the RangeMap to a normal Map
     final Map<Range<K>, List<V>> rangeListMap = rangeMap.asMapOfRanges();
     final List<V> savedList = rangeListMap.get(range);
     if (savedList == null) {
@@ -42,6 +43,7 @@ public class MultipleEntryRangeMapHolder<K extends Comparable, V> implements Ser
       listToAdd.add(value);
       rangeMap.put(range, listToAdd);
     } else {
+      // otherwise just add the new value to the existing list
       savedList.add(value);
     }
   }
@@ -53,11 +55,11 @@ public class MultipleEntryRangeMapHolder<K extends Comparable, V> implements Ser
 
   public List<V> getResultList(Range<K> range)
   {
-    // pick sublists
+    // pick subLists
     final RangeMap<K, List<V>> listRangeMap = rangeMap.subRangeMap(range);
-    // then gather
+    // then build the complete result list
     List<V> result = new ArrayList<V>();
-    for (List<V> subResult : rangeMap.asMapOfRanges().values()) {
+    for (List<V> subResult : listRangeMap.asMapOfRanges().values()) {
       result.addAll(subResult);
     }
     // and return
