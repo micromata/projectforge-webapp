@@ -76,11 +76,11 @@ public class SubscriptionHolder implements Serializable
     for (TeamEventDO teamEventDo : eventList) {
       if (matches(teamEventDo, startTime, endTime) == true) {
         result.add(teamEventDo);
-        // all our events are sorted, if we find a event which starts
-        // after the end date, we can break this iteration
-        if (teamEventDo.getStartDate().getTime() > endTime) {
-          break;
-        }
+      }
+      // all our events are sorted, if we find a event which starts
+      // after the end date, we can break this iteration
+      if (teamEventDo.getStartDate().getTime() > endTime) {
+        break;
       }
     }
     // and return
