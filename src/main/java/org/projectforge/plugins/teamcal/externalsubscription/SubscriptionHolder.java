@@ -9,31 +9,34 @@ import java.util.List;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 
 /**
- * Own abstraction of a RangeMap
+ * Own abstraction of a RangeMap. You can add TeamEvents and access them through their start and end date.
  * 
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  */
-public class MultipleEntryRangeMapHolder implements Serializable
+public class SubscriptionHolder implements Serializable
 {
-  private List<TeamEventDO> rangeMap;
+  // one day in milliseconds
+  private static final int ONE_DAY = 86400000; // 60*60*24*1000
+
+  private List<TeamEventDO> eventList;
 
   private boolean sorted;
 
-  public MultipleEntryRangeMapHolder()
+  public SubscriptionHolder()
   {
-    rangeMap = new ArrayList<TeamEventDO>();
+    eventList = new ArrayList<TeamEventDO>();
     sorted = false;
   }
 
   public void clear()
   {
-    rangeMap.clear();
+    eventList.clear();
     sorted = false;
   }
 
-  public void put(TeamEventDO value)
+  public void add(TeamEventDO value)
   {
-    rangeMap.add(value);
+    eventList.add(value);
     sorted = false;
   }
 
@@ -55,7 +58,7 @@ public class MultipleEntryRangeMapHolder implements Serializable
         return o1.getStartDate().compareTo(o2.getStartDate());
       }
     };
-    Collections.sort(rangeMap, comparator);
+    Collections.sort(eventList, comparator);
     sorted = true;
   }
 
@@ -65,7 +68,7 @@ public class MultipleEntryRangeMapHolder implements Serializable
       sort();
     }
     List<TeamEventDO> result = new ArrayList<TeamEventDO>();
-    for (TeamEventDO teamEventDo : rangeMap) {
+    for (TeamEventDO teamEventDo : eventList) {
       if (matches(teamEventDo, startTime, endTime) == true) {
         result.add(teamEventDo);
         // all our events are sorted, if we find a event which starts
@@ -78,8 +81,6 @@ public class MultipleEntryRangeMapHolder implements Serializable
     // and return
     return result;
   }
-
-  private static final int ONE_DAY = 86400000; // 60*60*24*1000
 
   private boolean matches(TeamEventDO teamEventDo, Long startTime, Long endTime)
   {
