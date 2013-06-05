@@ -42,19 +42,21 @@ public class SubscriptionHolder implements Serializable
 
   public void sort()
   {
+    // the following comparator compares by startDate
     Comparator<TeamEventDO> comparator = new Comparator<TeamEventDO>() {
       @Override
       public int compare(TeamEventDO o1, TeamEventDO o2)
       {
-        if (o1 == null && o2 == null) {
+        if ((o1 == null || o1.getStartDate() == null) && (o2 == null || o2.getStartDate() == null)) {
           return 0;
         }
-        if (o1 == null) {
+        if (o1 == null || o1.getStartDate() == null) {
           return -1;
         }
-        if (o2 == null) {
+        if (o2 == null || o2.getStartDate() == null) {
           return 1;
         }
+        // at this point, no NPE could occur
         return o1.getStartDate().compareTo(o2.getStartDate());
       }
     };
@@ -64,8 +66,11 @@ public class SubscriptionHolder implements Serializable
 
   public List<TeamEventDO> getResultList(Long startTime, Long endTime)
   {
-    if (sorted == false) {
-      sort();
+    // sorting should by synchronized
+    synchronized (this) {
+      if (sorted == false) {
+        sort();
+      }
     }
     List<TeamEventDO> result = new ArrayList<TeamEventDO>();
     for (TeamEventDO teamEventDo : eventList) {
@@ -82,6 +87,11 @@ public class SubscriptionHolder implements Serializable
     return result;
   }
 
+
+  public int size() {
+    return eventList.size();
+  }
+
   private boolean matches(TeamEventDO teamEventDo, Long startTime, Long endTime)
   {
     // Following period extension is needed due to all day events which are stored in UTC. The additional events in the result list not
@@ -96,8 +106,8 @@ public class SubscriptionHolder implements Serializable
     // // get events whose duration overlap with chosen duration.
     // (Restrictions.and(Restrictions.le("startDate", startDate), Restrictions.ge("endDate", endDate)))));
 
-    Long eventStartTime = teamEventDo.getStartDate().getTime();
-    Long eventEndTime = teamEventDo.getEndDate().getTime();
+    final Long eventStartTime = teamEventDo.getStartDate() != null ? teamEventDo.getStartDate().getTime() : Long.MIN_VALUE;
+    final Long eventEndTime = teamEventDo.getEndDate() != null ? teamEventDo.getEndDate().getTime() : Long.MAX_VALUE;
     if (between(eventStartTime, startTime, endTime) || between(eventEndTime, startTime, endTime)) {
       return true;
     }

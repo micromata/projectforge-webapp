@@ -218,7 +218,7 @@ public class TeamEventSubscription implements Serializable
     Long perfStart = System.currentTimeMillis();
     List<TeamEventDO> result = eventDurationAccess.getResultList(startTime, endTime);
     Long perfDuration = System.currentTimeMillis() - perfStart;
-    log.info("calculation of team events took " + perfDuration + " ms for " + result.size() + " events");
+    log.info("calculation of team events took " + perfDuration + " ms for " + result.size() + " events of " +eventDurationAccess.size() + " in total from calendar #"+teamCalId+".");
     return result;
   }
 
