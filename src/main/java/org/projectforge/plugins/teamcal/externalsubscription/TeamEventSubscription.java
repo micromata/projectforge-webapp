@@ -48,10 +48,6 @@ import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.plugins.teamcal.event.TeamEventUtils;
 import org.projectforge.web.calendar.CalendarFeed;
 
-import com.google.common.collect.Range;
-import com.google.common.collect.RangeMap;
-import com.google.common.collect.TreeRangeMap;
-
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  */
@@ -63,7 +59,7 @@ public class TeamEventSubscription implements Serializable
 
   private final Integer teamCalId;
 
-  private final MultipleEntryRangeMapHolder<Long, TeamEventDO> eventDurationAccess;
+  private final MultipleEntryRangeMapHolder eventDurationAccess;
 
   private final List<TeamEventDO> recurrenceEvents;
 
@@ -81,7 +77,7 @@ public class TeamEventSubscription implements Serializable
   {
     this.teamCalDao = teamCalDao;
     this.teamCalId = teamCalDo.getId();
-    eventDurationAccess = new MultipleEntryRangeMapHolder<Long, TeamEventDO>();
+    eventDurationAccess = new MultipleEntryRangeMapHolder();
     recurrenceEvents = new ArrayList<TeamEventDO>();
     currentInitializedHash = null;
     lastUpdated = null;
@@ -199,7 +195,7 @@ public class TeamEventSubscription implements Serializable
           // special treatment for recurrence events ..
           recurrenceEvents.add(teamEvent);
         } else {
-          eventDurationAccess.put(Range.closed(teamEvent.getStartDate().getTime(), teamEvent.getEndDate().getTime()), teamEvent);
+          eventDurationAccess.put(teamEvent);
         }
 
         startId--;
@@ -219,7 +215,7 @@ public class TeamEventSubscription implements Serializable
 
   public List<TeamEventDO> getEvents(final Long startTime, final Long endTime)
   {
-    return eventDurationAccess.getClosedResultList(startTime, endTime);
+    return eventDurationAccess.getResultList(startTime, endTime);
   }
 
   public Integer getTeamCalId()

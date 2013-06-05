@@ -445,12 +445,6 @@
       <artifactId>rhino</artifactId>
       <version>1.7R4</version>
     </dependency>
-
-    <dependency> <!-- version check 19.04.2013 -->
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>14.0.1</version>
-    </dependency>
   </dependencies>
   <build>
     <finalName>ProjectForge</finalName>

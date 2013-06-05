@@ -2,68 +2,112 @@ package org.projectforge.plugins.teamcal.externalsubscription;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
-import com.google.common.collect.Range;
-import com.google.common.collect.RangeMap;
-import com.google.common.collect.TreeRangeMap;
+import org.projectforge.plugins.teamcal.event.TeamEventDO;
 
 /**
- * Holder for generic usage of the RangeMap, but with the feature of multiple elements per key.
+ * Own abstraction of a RangeMap
  * 
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  */
-public class MultipleEntryRangeMapHolder<K extends Comparable, V> implements Serializable
+public class MultipleEntryRangeMapHolder implements Serializable
 {
-  private RangeMap<K, List<V>> rangeMap;
+  private List<TeamEventDO> rangeMap;
+
+  private boolean sorted;
 
   public MultipleEntryRangeMapHolder()
   {
-    rangeMap = TreeRangeMap.create();
+    rangeMap = new ArrayList<TeamEventDO>();
+    sorted = false;
   }
 
   public void clear()
   {
     rangeMap.clear();
+    sorted = false;
   }
 
-  public void put(Range<K> range, V value)
+  public void put(TeamEventDO value)
   {
-    // check precondition, no null keys!
-    if (range == null) {
-      return;
+    rangeMap.add(value);
+    sorted = false;
+  }
+
+  public void sort()
+  {
+    Comparator<TeamEventDO> comparator = new Comparator<TeamEventDO>() {
+      @Override
+      public int compare(TeamEventDO o1, TeamEventDO o2)
+      {
+        if (o1 == null && o2 == null) {
+          return 0;
+        }
+        if (o1 == null) {
+          return -1;
+        }
+        if (o2 == null) {
+          return 1;
+        }
+        return o1.getStartDate().compareTo(o2.getStartDate());
+      }
+    };
+    Collections.sort(rangeMap, comparator);
+    sorted = true;
+  }
+
+  public List<TeamEventDO> getResultList(Long startTime, Long endTime)
+  {
+    if (sorted == false) {
+      sort();
     }
-    // convert the RangeMap to a normal Map
-    final Map<Range<K>, List<V>> rangeListMap = rangeMap.asMapOfRanges();
-    final List<V> savedList = rangeListMap.get(range);
-    if (savedList == null) {
-      // range was not stored in RangeMap yet, so store it now
-      List<V> listToAdd = new ArrayList<V>();
-      listToAdd.add(value);
-      rangeMap.put(range, listToAdd);
-    } else {
-      // otherwise just add the new value to the existing list
-      savedList.add(value);
-    }
-  }
-
-  public List<V> getClosedResultList(K start, K end)
-  {
-    return getResultList(Range.closed(start, end));
-  }
-
-  public List<V> getResultList(Range<K> range)
-  {
-    // pick subLists
-    final RangeMap<K, List<V>> listRangeMap = rangeMap.subRangeMap(range);
-    // then build the complete result list
-    List<V> result = new ArrayList<V>();
-    for (List<V> subResult : listRangeMap.asMapOfRanges().values()) {
-      result.addAll(subResult);
+    List<TeamEventDO> result = new ArrayList<TeamEventDO>();
+    for (TeamEventDO teamEventDo : rangeMap) {
+      if (matches(teamEventDo, startTime, endTime) == true) {
+        result.add(teamEventDo);
+        // all our events are sorted, if we find a event which starts
+        // after the end date, we can break this iteration
+        if (teamEventDo.getEndDate().getTime() > endTime) {
+          break;
+        }
+      }
     }
     // and return
     return result;
   }
 
+  private static final int ONE_DAY = 86400000; // 60*60*24*1000
+
+  private boolean matches(TeamEventDO teamEventDo, Long startTime, Long endTime)
+  {
+    // Following period extension is needed due to all day events which are stored in UTC. The additional events in the result list not
+    // matching the time period have to be removed by caller!
+    startTime = startTime - ONE_DAY;
+    endTime = endTime + ONE_DAY;
+
+    // the following implementation is inspired by TeamEventDao with the following lines:
+
+    // queryFilter.add(Restrictions.or(
+    // (Restrictions.or(Restrictions.between("startDate", startDate, endDate), Restrictions.between("endDate", startDate, endDate))),
+    // // get events whose duration overlap with chosen duration.
+    // (Restrictions.and(Restrictions.le("startDate", startDate), Restrictions.ge("endDate", endDate)))));
+
+    Long eventStartTime = teamEventDo.getStartDate().getTime();
+    Long eventEndTime = teamEventDo.getEndDate().getTime();
+    if (between(eventStartTime, startTime, endTime) || between(eventEndTime, startTime, endTime)) {
+      return true;
+    }
+    if (eventStartTime <= startTime && eventEndTime >= endTime) {
+      return true;
+    }
+    return false;
+  }
+
+  private boolean between(Long searchTime, Long startTime, Long endTime)
+  {
+    return searchTime >= startTime && searchTime <= endTime;
+  }
 }
