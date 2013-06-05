@@ -78,7 +78,7 @@ public class SubscriptionHolder implements Serializable
         result.add(teamEventDo);
         // all our events are sorted, if we find a event which starts
         // after the end date, we can break this iteration
-        if (teamEventDo.getEndDate().getTime() > endTime) {
+        if (teamEventDo.getStartDate().getTime() > endTime) {
           break;
         }
       }
