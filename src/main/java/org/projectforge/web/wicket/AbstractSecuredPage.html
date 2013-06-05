@@ -9,11 +9,13 @@
         [main menu]
         </wicket:panel>
     </div>
-    <ul class="breadcrumb" wicket:id="breadcrumb">
-      <li wicket:id="li"><a href="#" wicket:id="link"><span wicket:id="label">Return to page</span></a><span class="divider">/</span></li>
-      <li class="active" wicket:id="active"></li>
-    </ul>
-    <wicket:container wicket:id="menuBar">[Context dependent menu]</wicket:container>
+    <div class="navActionBar">
+      <ul class="breadcrumb" wicket:id="breadcrumb">
+        <li wicket:id="li"><a href="#" wicket:id="link"><span wicket:id="label">Return to page</span></a><span class="divider">/</span></li>
+        <li class="active" wicket:id="active"></li>
+        <li><wicket:container wicket:id="menuBar">[Context dependent menu]</wicket:container></li>
+      </ul>
+    </div>
     <div wicket:id="alertMessageContainer" class="global-alert-message">
       <i class="icon-bell icon-white"></i> <span wicket:id="alertMessage">This is an Alert!</span>
     </div>

@@ -63,7 +63,6 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
     body.add(topMenuPanel);
     topMenuPanel.init(this);
     contentMenuBarPanel = new MenuBarPanel("menuBar");
-    body.add(contentMenuBarPanel);
     final Model<String> alertMessageModel = new Model<String>() {
       @Override
       public String getObject()
@@ -95,6 +94,7 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
     super.onInitialize();
     final WebMarkupContainer breadcrumbContainer = new WebMarkupContainer("breadcrumb");
     body.add(breadcrumbContainer);
+    breadcrumbContainer.add(contentMenuBarPanel);
     if (WebConfiguration.isDevelopmentMode() == true && isBreadCrumbVisible() == true) {
       final RepeatingView breadcrumbItems = new RepeatingView("li");
       breadcrumbContainer.add(breadcrumbItems);
