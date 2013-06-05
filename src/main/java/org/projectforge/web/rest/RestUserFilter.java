@@ -34,6 +34,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.MDC;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.rest.Authentication;
 import org.projectforge.user.PFUserContext;
@@ -139,9 +140,13 @@ public class RestUserFilter implements Filter
     }
     try {
       PFUserContext.setUser(user);
+      MDC.put("ip", request.getRemoteAddr());
+      MDC.put("user", user.getUsername());
       chain.doFilter(request, response);
     } finally {
       PFUserContext.setUser(null);
+      MDC.remove("ip");
+      MDC.remove("user");
     }
   }
 
