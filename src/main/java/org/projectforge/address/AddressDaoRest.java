@@ -49,6 +49,8 @@ import org.projectforge.web.rest.converter.AddressDOConverter;
 @Path(RestPaths.ADDRESS)
 public class AddressDaoRest
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressDaoRest.class);
+
   private final AddressDao addressDao;
 
   public AddressDaoRest()
@@ -66,6 +68,7 @@ public class AddressDaoRest
   @Produces(MediaType.APPLICATION_JSON)
   public Response getList(@QueryParam("search") final String searchTerm)
   {
+    log.info("Rest call started...");
     final AddressFilter filter = new AddressFilter();
     filter.setSearchString(searchTerm);
     final List<AddressDO> list = addressDao.getList(filter);
@@ -82,6 +85,7 @@ public class AddressDaoRest
       }
     }
     final String json = JsonUtils.toJson(result);
+    log.info("Rest call finished (" + result.size() + " addresses)...");
     return Response.ok(json).build();
   }
 
