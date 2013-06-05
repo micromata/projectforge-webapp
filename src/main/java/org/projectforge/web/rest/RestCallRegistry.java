@@ -26,6 +26,7 @@ package org.projectforge.web.rest;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.projectforge.address.AddressDaoRest;
 import org.projectforge.rest.JsonUtils;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.rest.converter.PFUserDOTypeAdapter;
@@ -49,6 +50,8 @@ public class RestCallRegistry
   private RestCallRegistry()
   {
     classes.add(AuthenticationRest.class);
+
+    classes.add(AddressDaoRest.class);
     classes.add(TaskDaoRest.class);
     classes.add(TimesheetDaoRest.class);
     classes.add(TimesheetTemplatesRest.class);
