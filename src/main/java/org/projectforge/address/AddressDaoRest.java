@@ -68,7 +68,6 @@ public class AddressDaoRest
   @Produces(MediaType.APPLICATION_JSON)
   public Response getList(@QueryParam("search") final String searchTerm)
   {
-    log.info("Rest call started...");
     final AddressFilter filter = new AddressFilter();
     filter.setSearchString(searchTerm);
     final List<AddressDO> list = addressDao.getList(filter);
