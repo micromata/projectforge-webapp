@@ -148,6 +148,7 @@ public class RestUserFilter implements Filter
         MDC.put("ip", "unknown");
       }
       MDC.put("user", user.getUsername());
+      log.info("Rest-call: " + ((HttpServletRequest)request).getRequestURI());
       chain.doFilter(request, response);
     } finally {
       PFUserContext.setUser(null);
