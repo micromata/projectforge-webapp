@@ -72,6 +72,10 @@ class GeneralAggregation {
 		resultTable.each{finalize(it)}
 	}
 	
+	public static Closure createEquiv(List<String> fields) {
+    def getter = HashMap.class.getMethod("get",Object)
+		return {x,y ->  fields.inject(true) {cumPropValue, field -> cumPropValue && getter.invoke(x,field) == getter.invoke(y,field)}}
+	}
 	
 	/*
 	 * lom ist Liste von Maps
