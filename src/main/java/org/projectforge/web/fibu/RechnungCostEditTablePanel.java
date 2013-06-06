@@ -82,6 +82,10 @@ public class RechnungCostEditTablePanel extends Panel
 
   private AbstractRechnungsPositionDO position;
 
+  private final BigDecimal NET_MIN_VALUE = new BigDecimal("-10000000000");
+
+  private final BigDecimal NET_MAX_VALUE = new BigDecimal("10000000000");
+
   MyAjaxComponentHolder ajaxComponents = new MyAjaxComponentHolder();
 
   /**
@@ -198,7 +202,7 @@ public class RechnungCostEditTablePanel extends Panel
     ajaxComponents.register(kost2);
 
     final MinMaxNumberField<BigDecimal> netto = new MinMaxNumberField<BigDecimal>("netto",
-        new PropertyModel<BigDecimal>(zuweisung, "netto"), BigDecimal.ZERO, position.getNetSum()) {
+        new PropertyModel<BigDecimal>(zuweisung, "netto"), NET_MIN_VALUE, NET_MAX_VALUE) {
       @SuppressWarnings({ "rawtypes", "unchecked"})
       @Override
       public IConverter getConverter(final Class type)
