@@ -140,7 +140,13 @@ public class RestUserFilter implements Filter
     }
     try {
       PFUserContext.setUser(user);
-      MDC.put("ip", request.getRemoteAddr());
+      final String ip = request.getRemoteAddr();
+      if (ip != null) {
+        MDC.put("ip", ip);
+      } else {
+        // Only null in test case:
+        MDC.put("ip", "unknown");
+      }
       MDC.put("user", user.getUsername());
       chain.doFilter(request, response);
     } finally {
