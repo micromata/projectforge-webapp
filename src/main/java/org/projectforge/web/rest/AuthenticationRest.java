@@ -45,6 +45,21 @@ import org.projectforge.web.rest.converter.PFUserDOConverter;
 /**
  * REST interface for authentication (tests) and getting the authentication token on initial contact.
  * 
+ * <h2>Concept</h2> It's recommended to avoid storing the user's username and password on the client (e. g. on the mobile phone) due to
+ * security reasons. Please store the user's id and authentication-token instead:
+ * <ol>
+ * <li>On first start of your client (user-token isn't known yet), please call {@link #getToken()} for getting the user data (id,
+ * authentication-token and optional information) by sending the username and password the user typed in.</li>
+ * <li>
+ * You may now store the user's id and authentication-token for the user's convenience on your client (e. g. mobile app).</li>
+ * <li>
+ * Every time the user starts the client / app you should call {@link #initialContact(String)} for checking the server version. May-be the
+ * server version is to old or your client version is to old. This call is optional but good practice.</li>
+ * <li>
+ * Every further rest call is done by authentication via user-id and authentication-token. The user-id is required for logging purposes e. g. for failed logins or brute-force attacks.
+ * </li>
+ * </ol>
+ * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */

@@ -72,6 +72,9 @@ class GeneralAggregation {
 		resultTable.each{finalize(it)}
 	}
 	
+  /*
+   * Closure for generating equivalence relation for aggregation
+   */
 	public static Closure createEquiv(List<String> fields) {
     def getter = HashMap.class.getMethod("get",Object)
 		return {x,y ->  fields.inject(true) {cumPropValue, field -> cumPropValue && getter.invoke(x,field) == getter.invoke(y,field)}}
