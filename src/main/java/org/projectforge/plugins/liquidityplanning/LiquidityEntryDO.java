@@ -28,8 +28,6 @@ import java.sql.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
 import org.hibernate.search.annotations.DateBridge;
@@ -38,7 +36,6 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
-import org.projectforge.common.RecurrenceFrequency;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.database.Constants;
 
@@ -66,12 +63,10 @@ public class LiquidityEntryDO extends DefaultBaseDO
 
   @Field(index = Index.UN_TOKENIZED)
   @DateBridge(resolution = Resolution.DAY)
-  private Date dueDate;
+  private Date dateOfPayment;
 
   @Field(index = Index.UN_TOKENIZED)
   private BigDecimal ammount;
-
-  private RecurrenceFrequency recurranceInterval;
 
   @Column(length = Constants.LENGTH_TITLE)
   public String getSubject()
@@ -89,34 +84,25 @@ public class LiquidityEntryDO extends DefaultBaseDO
     return this;
   }
 
-  @Enumerated(EnumType.STRING)
-  @Column(length = 20)
-  public RecurrenceFrequency getRecurranceInterval()
+  @Column(name = "date_of_payment")
+  /**
+   * @return the dateOfPayment
+   */
+  public Date getDateOfPayment()
   {
-    return recurranceInterval;
+    return dateOfPayment;
   }
 
   /**
    * @return this for chaining.
    */
-  public LiquidityEntryDO setRecurranceInterval(final RecurrenceFrequency recurranceInterval)
-  {
-    this.recurranceInterval = recurranceInterval;
-    return this;
-  }
-
-  @Column(name = "due_date")
-  public Date getDueDate()
-  {
-    return dueDate;
-  }
-
   /**
+   * @param dateOfPayment the dateOfPayment to set
    * @return this for chaining.
    */
-  public LiquidityEntryDO setDueDate(final Date dueDate)
+  public LiquidityEntryDO setDateOfPayment(final Date dateOfPayment)
   {
-    this.dueDate = dueDate;
+    this.dateOfPayment = dateOfPayment;
     return this;
   }
 
