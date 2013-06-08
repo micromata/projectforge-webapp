@@ -23,8 +23,14 @@
 
 package org.projectforge.core;
 
+import java.math.BigDecimal;
+
 public class Constants
 {
   /** The default length of comment strings in the data base. Used by data base definition and front-end validation. */
   public static final int COMMENT_LENGTH = 4000;
+
+  public static final BigDecimal TEN_BILLION = new BigDecimal("10000000000");
+
+  public static final BigDecimal TEN_BILLION_NEGATIVE = new BigDecimal("-10000000000");
 }
