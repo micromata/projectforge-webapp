@@ -58,6 +58,7 @@ public enum IconType
   REMOVE_SIGN("remove-sign"), //
   SEARCH("search"), //
   SUBSCRIPTION("globe"), //
+  SWAP("retweet"), //
   TABLET("tablet"), //
   TASK("tasks"), //
   TRASH("trash"), //
