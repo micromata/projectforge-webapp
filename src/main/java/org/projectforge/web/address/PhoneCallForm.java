@@ -173,7 +173,7 @@ public class PhoneCallForm extends AbstractStandardForm<Object, PhoneCallPage>
   {
     super.init();
     gridBuilder.newSplitPanel(GridSize.COL50);
-    FieldsetPanel fs = gridBuilder.newFieldset(getString("address.phoneCall.number"));
+    FieldsetPanel fs = gridBuilder.newFieldset(getString("address.phoneCall.number.label"), getString("address.phoneCall.number.labeldescription"));
     numberTextField = new PFAutoCompleteTextField<AddressDO>(InputPanel.WICKET_ID, new Model() {
       @Override
       public Serializable getObject()
