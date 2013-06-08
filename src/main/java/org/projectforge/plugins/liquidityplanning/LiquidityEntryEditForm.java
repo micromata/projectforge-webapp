@@ -23,12 +23,19 @@
 
 package org.projectforge.plugins.liquidityplanning;
 
+import java.math.BigDecimal;
+import java.util.Date;
+
 import org.apache.log4j.Logger;
 import org.apache.wicket.model.PropertyModel;
+import org.projectforge.core.Constants;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.components.DatePanel;
+import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
+import org.projectforge.web.wicket.components.RequiredMinMaxNumberField;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
@@ -52,10 +59,23 @@ public class LiquidityEntryEditForm extends AbstractEditForm<LiquidityEntryDO, L
   {
     super.init();
     {
+      // Date of payment
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.liquidityplanning.entry.dateOfPayment"));
+      final DatePanel dateOfPayment = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "dateOfPayment"), DatePanelSettings
+          .get().withTargetType(java.sql.Date.class));
+      fs.add(dateOfPayment);
+      dateOfPayment.add(WicketUtils.setFocus());
+    }
+    {
+      // Amount
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.betrag"));
+      fs.add(new RequiredMinMaxNumberField<BigDecimal>(fs.getTextFieldId(), new PropertyModel<BigDecimal>(data, "amount"), Constants.TEN_BILLION_NEGATIVE, Constants.TEN_BILLION));
+    }
+    {
       // Subject
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.LiquidityEntry.subject"));
-      final RequiredMaxLengthTextField subject = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "subject"));
-      subject.add(WicketUtils.setFocus());
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.betreff"));
+      final RequiredMaxLengthTextField subject = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
+          "subject"));
       fs.add(subject);
     }
     {

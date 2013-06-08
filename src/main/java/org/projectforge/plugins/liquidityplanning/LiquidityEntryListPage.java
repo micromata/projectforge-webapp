@@ -75,8 +75,8 @@ IListPageColumnsCreator<LiquidityEntryDO>
       }
     };
 
-    columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(new Model<String>(getString("created")), getSortable("created",
-        sortable), "created", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(new Model<String>(getString("dateOfPayment")), getSortable("dateOfPayment",
+        sortable), "dateOfPayment", cellItemListener) {
       /**
        * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
        *      java.lang.String, org.apache.wicket.model.IModel)
@@ -92,10 +92,12 @@ IListPageColumnsCreator<LiquidityEntryDO>
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(getString("modified"), getSortable("lastUpdate", sortable),
-        "lastUpdate", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(getString("fibu.common.betrag"), getSortable("amount", sortable),
+        "amount", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(new Model<String>(getString("plugins.liquidityplanning.entry.subject")),
         getSortable("subject", sortable), "subject", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(getString("description"), getSortable("description", sortable),
+        "description", cellItemListener));
 
     return columns;
   }
