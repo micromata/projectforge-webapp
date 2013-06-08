@@ -89,7 +89,7 @@ IListPageColumnsCreator<LiquidityEntryDO>
       {
         final LiquidityEntryDO liquidityEntry = rowModel.getObject();
         item.add(new ListSelectActionPanel(componentId, rowModel, LiquidityEntryEditPage.class, liquidityEntry.getId(), returnToPage,
-            DateTimeFormatter.instance().getFormattedDateTime(liquidityEntry.getCreated())));
+            DateTimeFormatter.instance().getFormattedDate(liquidityEntry.getDateOfPayment())));
         addRowClick(item);
         cellItemListener.populateItem(item, componentId, rowModel);
       }
