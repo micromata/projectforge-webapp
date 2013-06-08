@@ -40,12 +40,12 @@ public class LiquidityEntryEditPage extends AbstractEditPage<LiquidityEntryDO, L
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LiquidityEntryEditPage.class);
 
-  @SpringBean(name = "LiquidityEntryDao")
+  @SpringBean(name = "liquidityEntryDao")
   private LiquidityEntryDao LiquidityEntryDao;
 
   public LiquidityEntryEditPage(final PageParameters parameters)
   {
-    super(parameters, "plugins.LiquidityEntry");
+    super(parameters, "plugins.liquidityplanning.entry");
     init();
   }
 

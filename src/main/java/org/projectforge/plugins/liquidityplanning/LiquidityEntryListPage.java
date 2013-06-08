@@ -39,6 +39,7 @@ import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
+import org.projectforge.web.wicket.CurrencyPropertyColumn;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
@@ -54,12 +55,12 @@ IListPageColumnsCreator<LiquidityEntryDO>
 {
   private static final long serialVersionUID = 9158903150132480532L;
 
-  @SpringBean(name = "LiquidityEntryDao")
+  @SpringBean(name = "liquidityEntryDao")
   private LiquidityEntryDao liquidityEntryDao;
 
   public LiquidityEntryListPage(final PageParameters parameters)
   {
-    super(parameters, "plugins.liquidityplanning");
+    super(parameters, "plugins.liquidityplanning.entry");
   }
 
   @SuppressWarnings("serial")
@@ -75,8 +76,9 @@ IListPageColumnsCreator<LiquidityEntryDO>
       }
     };
 
-    columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(new Model<String>(getString("dateOfPayment")), getSortable("dateOfPayment",
-        sortable), "dateOfPayment", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(new Model<String>(
+        getString("plugins.liquidityplanning.entry.dateOfPayment")), getSortable("dateOfPayment", sortable), "dateOfPayment",
+        cellItemListener) {
       /**
        * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
        *      java.lang.String, org.apache.wicket.model.IModel)
@@ -92,12 +94,13 @@ IListPageColumnsCreator<LiquidityEntryDO>
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(getString("fibu.common.betrag"), getSortable("amount", sortable),
-        "amount", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(new Model<String>(getString("plugins.liquidityplanning.entry.subject")),
-        getSortable("subject", sortable), "subject", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(getString("description"), getSortable("description", sortable),
-        "description", cellItemListener));
+    columns.add(new CurrencyPropertyColumn<LiquidityEntryDO>(getString("fibu.common.betrag"), getSortable("amount", sortable), "amount",
+        cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(
+        new Model<String>(getString("plugins.liquidityplanning.entry.subject")), getSortable("subject", sortable), "subject",
+        cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(getString("comment"), getSortable("comment", sortable), "comment",
+        cellItemListener));
 
     return columns;
   }

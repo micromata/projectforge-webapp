@@ -28,6 +28,7 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.core.Constants;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
@@ -36,6 +37,7 @@ import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.components.RequiredMinMaxNumberField;
+import org.projectforge.web.wicket.converter.CurrencyConverter;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
@@ -54,6 +56,7 @@ public class LiquidityEntryEditForm extends AbstractEditForm<LiquidityEntryDO, L
     super(parentPage, data);
   }
 
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
@@ -64,12 +67,26 @@ public class LiquidityEntryEditForm extends AbstractEditForm<LiquidityEntryDO, L
       final DatePanel dateOfPayment = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "dateOfPayment"), DatePanelSettings
           .get().withTargetType(java.sql.Date.class));
       fs.add(dateOfPayment);
-      dateOfPayment.add(WicketUtils.setFocus());
+      if (isNew() == true) {
+        dateOfPayment.setFocus();
+      }
     }
     {
       // Amount
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.betrag"));
-      fs.add(new RequiredMinMaxNumberField<BigDecimal>(fs.getTextFieldId(), new PropertyModel<BigDecimal>(data, "amount"), Constants.TEN_BILLION_NEGATIVE, Constants.TEN_BILLION));
+      final RequiredMinMaxNumberField<BigDecimal> amount = new RequiredMinMaxNumberField<BigDecimal>(fs.getTextFieldId(),
+          new PropertyModel<BigDecimal>(data, "amount"), Constants.TEN_BILLION_NEGATIVE, Constants.TEN_BILLION) {
+        @SuppressWarnings({ "rawtypes", "unchecked"})
+        @Override
+        public IConverter getConverter(final Class type)
+        {
+          return new CurrencyConverter();
+        }
+      };
+      fs.add(amount);
+      if (isNew() == false) {
+        amount.add(WicketUtils.setFocus());
+      }
     }
     {
       // Subject
@@ -79,10 +96,11 @@ public class LiquidityEntryEditForm extends AbstractEditForm<LiquidityEntryDO, L
       fs.add(subject);
     }
     {
-      // Text description
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.LiquidityEntry.LiquidityEntry"));
-      fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "LiquidityEntry"))).setAutogrow();
+      // Text comment
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));
+      fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "comment"))).setAutogrow();
     }
+    addCloneButton();
   }
 
   @Override

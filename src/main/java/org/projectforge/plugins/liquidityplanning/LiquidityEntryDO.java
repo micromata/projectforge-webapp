@@ -56,9 +56,6 @@ public class LiquidityEntryDO extends DefaultBaseDO
   private String subject;
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
-  private String description;
-
-  @Field(index = Index.TOKENIZED, store = Store.NO)
   private String comment;
 
   @Field(index = Index.UN_TOKENIZED)
@@ -66,7 +63,7 @@ public class LiquidityEntryDO extends DefaultBaseDO
   private Date dateOfPayment;
 
   @Field(index = Index.UN_TOKENIZED)
-  private BigDecimal ammount;
+  private BigDecimal amount;
 
   @Column(length = Constants.LENGTH_TITLE)
   public String getSubject()
@@ -84,10 +81,10 @@ public class LiquidityEntryDO extends DefaultBaseDO
     return this;
   }
 
-  @Column(name = "date_of_payment")
   /**
    * @return the dateOfPayment
    */
+  @Column(name = "date_of_payment")
   public Date getDateOfPayment()
   {
     return dateOfPayment;
@@ -106,38 +103,27 @@ public class LiquidityEntryDO extends DefaultBaseDO
     return this;
   }
 
-  public BigDecimal getAmmount()
+  @Column(scale = 2, precision = 12)
+  public BigDecimal getAmount()
   {
-    return ammount;
+    return amount;
   }
 
-  public LiquidityEntryDO setAmmount(final BigDecimal ammount)
+  public LiquidityEntryDO setAmount(final BigDecimal amount)
   {
-    this.ammount = ammount;
+    this.amount = amount;
     return this;
   }
 
+  @Column(length = Constants.LENGTH_TEXT)
   public String getComment()
   {
     return comment;
   }
 
-  @Column(length = Constants.LENGTH_TEXT)
   public LiquidityEntryDO setComment(final String comment)
   {
     this.comment = comment;
-    return this;
-  }
-
-  public String getDescription()
-  {
-    return description;
-  }
-
-  @Column(length = Constants.LENGTH_TEXT)
-  public LiquidityEntryDO setDescription(final String description)
-  {
-    this.description = description;
     return this;
   }
 }
