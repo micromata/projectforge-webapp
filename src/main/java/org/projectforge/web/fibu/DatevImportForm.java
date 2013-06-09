@@ -61,14 +61,14 @@ public class DatevImportForm extends AbstractImportForm<ImportFilter, DatevImpor
         {
           parentPage.importAccountList();
         }
-      }, getString("finance.datev.importAccountList"), SingleButtonPanel.GREY));
+      }, getString("finance.datev.importAccountList"), SingleButtonPanel.NORMAL));
       fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("importRecords")) {
         @Override
         public final void onSubmit()
         {
           parentPage.importAccountRecords();
         }
-      }, getString("finance.datev.importAccountingRecords"), SingleButtonPanel.GREY));
+      }, getString("finance.datev.importAccountingRecords"), SingleButtonPanel.NORMAL));
       addClearButton(fs);
     }
     {

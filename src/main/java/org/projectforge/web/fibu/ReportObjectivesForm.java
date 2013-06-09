@@ -105,7 +105,7 @@ public class ReportObjectivesForm extends AbstractStandardForm<ReportObjectivesF
         {
           parentPage.importReportObjectivs();
         }
-      }, getString("import"), SingleButtonPanel.GREY));
+      }, getString("import"), SingleButtonPanel.NORMAL));
     }
     {
       final FieldsetPanel fs = new FieldsetPanel(gridBuilder.getPanel(), getString("timePeriod")) {

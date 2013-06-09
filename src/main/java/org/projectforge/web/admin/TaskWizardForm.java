@@ -93,7 +93,7 @@ public class TaskWizardForm extends AbstractStandardForm<TaskWizardForm, TaskWiz
       };
       createTaskButton.setDefaultFormProcessing(false);
       WicketUtils.addTooltip(createTaskButton, getString("task.wizard.button.createTask.tooltip"));
-      fs.add(new SingleButtonPanel(fs.newChildId(), createTaskButton, getString("task.wizard.button.createTask"), SingleButtonPanel.GREY));
+      fs.add(new SingleButtonPanel(fs.newChildId(), createTaskButton, getString("task.wizard.button.createTask"), SingleButtonPanel.NORMAL));
     }
     // Team
     createGroupComponents(number++, "team");
@@ -190,7 +190,7 @@ public class TaskWizardForm extends AbstractStandardForm<TaskWizardForm, TaskWiz
       };
       createGroupButton.setDefaultFormProcessing(false);
       final SingleButtonPanel createGroupButtonPanel = new SingleButtonPanel(fs.newChildId(), createGroupButton,
-          getString("task.wizard.button.createGroup"), SingleButtonPanel.GREY);
+          getString("task.wizard.button.createGroup"), SingleButtonPanel.NORMAL);
       WicketUtils.addTooltip(createGroupButton, getString("task.wizard.button.createGroup.tooltip"));
       fs.add(createGroupButtonPanel);
     }

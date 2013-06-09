@@ -203,7 +203,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       }
     };
     button.add(WicketUtils.javaScriptConfirmDialogOnClick(form.getString("user.authenticationToken.renew.securityQuestion")));
-    fs.add(new SingleButtonPanel(fs.newChildId(), button, gridBuilder.getString("user.authenticationToken.renew"), SingleButtonPanel.RED));
+    fs.add(new SingleButtonPanel(fs.newChildId(), button, gridBuilder.getString("user.authenticationToken.renew"), SingleButtonPanel.DANGER));
     WicketUtils.addTooltip(button, gridBuilder.getString("user.authenticationToken.renew.tooltip"));
   }
 
@@ -231,7 +231,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       }
     };
     fs.add(new SingleButtonPanel(fs.newChildId(), button, gridBuilder.getString("login.stayLoggedIn.invalidateAllStayLoggedInSessions"),
-        SingleButtonPanel.RED));
+        SingleButtonPanel.DANGER));
     WicketUtils.addTooltip(button, gridBuilder.getString("login.stayLoggedIn.invalidateAllStayLoggedInSessions.tooltip"));
   }
 
@@ -466,7 +466,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
         if (ldapUserValues.isPosixValuesEmpty() == true) {
           final Button createButton = newCreateButton(dependentLdapPosixFormComponentsList, dependentLdapSambaFormComponentsList, true,
               sambaConfigured);
-          fs.add(new SingleButtonPanel(fs.newChildId(), createButton, gridBuilder.getString("create"), SingleButtonPanel.GREY));
+          fs.add(new SingleButtonPanel(fs.newChildId(), createButton, gridBuilder.getString("create"), SingleButtonPanel.NORMAL));
           WicketUtils.addTooltip(createButton, gridBuilder.getString("ldap.uidNumber.createDefault.tooltip"));
         }
       }
@@ -495,7 +495,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
         if (ldapUserValues.getSambaSIDNumber() == null) {
           final Button createButton = newCreateButton(dependentLdapPosixFormComponentsList, dependentLdapSambaFormComponentsList, false,
               true);
-          fs.add(new SingleButtonPanel(fs.newChildId(), createButton, gridBuilder.getString("create"), SingleButtonPanel.GREY));
+          fs.add(new SingleButtonPanel(fs.newChildId(), createButton, gridBuilder.getString("create"), SingleButtonPanel.NORMAL));
           WicketUtils.addTooltip(createButton, gridBuilder.getString("ldap.sambaSID.createDefault.tooltip"));
         }
       }

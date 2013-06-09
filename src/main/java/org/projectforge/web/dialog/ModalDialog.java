@@ -395,7 +395,7 @@ public abstract class ModalDialog extends Panel
       {
         ModalDialog.this.onError(target, form);
       }
-    }, closeButtonLabel != null ? closeButtonLabel : getString("close"), SingleButtonPanel.GREY);
+    }, closeButtonLabel != null ? closeButtonLabel : getString("close"), SingleButtonPanel.NORMAL);
     buttonBarContainer.add(actionButtons.getRepeatingView());
     form.setDefaultButton(closeButtonPanel.getButton());
     if (autoGenerateGridBuilder == true) {

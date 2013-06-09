@@ -51,16 +51,16 @@ public class TeamCalImportForm extends AbstractImportForm<ImportFilter, TeamCalI
     super.init();
     gridBuilder.newGridPanel();
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("file"), "*.xls");
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("file"), "*.ics");
       fileUploadField = new FileUploadField(FileUploadPanel.WICKET_ID);
       fs.add(new FileUploadPanel(fs.newChildId(), fileUploadField));
-      fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("importAccounts")) {
+      fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("importEvents")) {
         @Override
         public final void onSubmit()
         {
           parentPage.importEvents();
         }
-      }, getString("finance.datev.importAccountList"), SingleButtonPanel.GREY));
+      }, getString("plugins.teamcal.import.ics.title"), SingleButtonPanel.NORMAL));
       addClearButton(fs);
     }
     {

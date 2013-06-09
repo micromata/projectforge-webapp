@@ -233,7 +233,7 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
         {
           parentPage.export(exportFormat);
         }
-      }, getString("export"), SingleButtonPanel.GREY));
+      }, getString("export"), SingleButtonPanel.NORMAL));
     }
     gridBuilder.newGridPanel();
     {
@@ -272,7 +272,7 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
       };
       cloneButton.setDefaultFormProcessing(false);
       final SingleButtonPanel cloneButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), cloneButton, getString("clone"),
-          SingleButtonPanel.GREY);
+          SingleButtonPanel.NORMAL);
       actionButtons.add(3, cloneButtonPanel);
     }
 

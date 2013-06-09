@@ -95,35 +95,35 @@ public class AccessEditForm extends AbstractEditForm<GroupTaskAccessDO, AccessEd
         {
           data.clear();
         }
-      }, getString("access.templates.clear"), SingleButtonPanel.GREY));
+      }, getString("access.templates.clear"), SingleButtonPanel.NORMAL));
       fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("guest")) {
         @Override
         public final void onSubmit()
         {
           data.guest();
         }
-      }, getString("access.templates.guest"), SingleButtonPanel.GREY));
+      }, getString("access.templates.guest"), SingleButtonPanel.NORMAL));
       fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("employee")) {
         @Override
         public final void onSubmit()
         {
           data.employee();
         }
-      }, getString("access.templates.employee"), SingleButtonPanel.GREY));
+      }, getString("access.templates.employee"), SingleButtonPanel.NORMAL));
       fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("leader")) {
         @Override
         public final void onSubmit()
         {
           data.leader();
         }
-      }, getString("access.templates.leader"), SingleButtonPanel.GREY));
+      }, getString("access.templates.leader"), SingleButtonPanel.NORMAL));
       fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("administrator")) {
         @Override
         public final void onSubmit()
         {
           data.administrator();
         }
-      }, getString("access.templates.administrator"), SingleButtonPanel.RED));
+      }, getString("access.templates.administrator"), SingleButtonPanel.DANGER));
     }
     {
       // Description
