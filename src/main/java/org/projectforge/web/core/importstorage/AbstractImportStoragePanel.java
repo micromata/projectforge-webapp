@@ -44,6 +44,7 @@ import org.projectforge.common.ImportStorage;
 import org.projectforge.common.ImportedElement;
 import org.projectforge.common.ImportedSheet;
 import org.projectforge.common.StringHelper;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.PlainLabel;
 import org.projectforge.web.wicket.flowlayout.DiffTextPanel;
 import org.projectforge.web.wicket.flowlayout.IconPanel;
@@ -56,7 +57,7 @@ import de.micromata.hibernate.history.delta.PropertyDelta;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public abstract class AbstractImportStoragePanel<P extends AbstractImportPage<?>> extends Panel
+public abstract class AbstractImportStoragePanel<P extends AbstractImportPage< ? >> extends Panel
 {
   private static final long serialVersionUID = 6755444819211298966L;
 
@@ -192,7 +193,7 @@ public abstract class AbstractImportStoragePanel<P extends AbstractImportPage<?>
         {
           parentPage.reconcile(sheet.getName());
         }
-      }, "reconcile");
+      }, getString("common.import.action.reconcile"), getString("common.import.action.reconcile.tooltip"));
     } else if (sheet.isReconciled() == true) {
       addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
         @Override
@@ -200,35 +201,35 @@ public abstract class AbstractImportStoragePanel<P extends AbstractImportPage<?>
         {
           parentPage.commit(sheet.getName());
         }
-      }, "commit");
+      }, getString("common.import.action.commit"), getString("common.import.action.commit.tooltip"));
       addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
         @Override
         public void onSubmit()
         {
           parentPage.selectAll(sheet.getName());
         }
-      }, "select all");
+      }, getString("common.import.action.selectAll"));
       addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
         @Override
         public void onSubmit()
         {
           parentPage.select(sheet.getName(), 100);
         }
-      }, "select 100");
+      }, getString("common.import.action.select100"));
       addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
         @Override
         public void onSubmit()
         {
           parentPage.select(sheet.getName(), 500);
         }
-      }, "select 500");
+      }, getString("common.import.action.select500"));
       addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
         @Override
         public void onSubmit()
         {
           parentPage.deselectAll(sheet.getName());
         }
-      }, "deselect all");
+      }, getString("common.import.action.deselectAll"));
     }
     if (sheet.isFaulty() == true) {
       addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
@@ -237,7 +238,7 @@ public abstract class AbstractImportStoragePanel<P extends AbstractImportPage<?>
         {
           parentPage.showErrorSummary(sheet.getName());
         }
-      }, "show error summary");
+      }, getString("common.import.action.showErrorSummary"));
     }
     appendSheetActionLinks(sheet, actionLinkRepeater);
     addSheetTable(sheet, cont);
@@ -253,9 +254,18 @@ public abstract class AbstractImportStoragePanel<P extends AbstractImportPage<?>
 
   protected void addActionLink(final RepeatingView actionLinkRepeater, final SubmitLink link, final String label)
   {
+    addActionLink(actionLinkRepeater, link, label, null);
+  }
+
+  protected void addActionLink(final RepeatingView actionLinkRepeater, final SubmitLink link, final String labelText, final String tooltip)
+  {
     final WebMarkupContainer actionLinkContainer = new WebMarkupContainer(actionLinkRepeater.newChildId());
     actionLinkRepeater.add(actionLinkContainer);
-    actionLinkContainer.add(link.add(new PlainLabel("label", label)));
+    final Label label = new Label("label", labelText);
+    if (tooltip != null) {
+      WicketUtils.addTooltip(label, tooltip);
+    }
+    actionLinkContainer.add(link.add(label));
   }
 
   protected abstract void addHeadColumns(final RepeatingView headColRepeater);

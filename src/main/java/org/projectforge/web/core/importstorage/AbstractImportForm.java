@@ -67,7 +67,7 @@ public abstract class AbstractImportForm<F, P extends AbstractImportPage<?>, S e
       {
         parentPage.clear();
       }
-    }, getString("import.clearStorage"), SingleButtonPanel.RESET) {
+    }, getString("common.import.clearStorage"), SingleButtonPanel.RESET) {
       /**
        * @see org.apache.wicket.Component#isVisible()
        */
