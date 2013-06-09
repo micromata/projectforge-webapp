@@ -47,6 +47,7 @@ import org.projectforge.plugins.teamcal.event.TeamEventEditPage;
 import org.projectforge.plugins.teamcal.event.TeamEventListPage;
 import org.projectforge.plugins.teamcal.event.TeamEventUtils;
 import org.projectforge.plugins.teamcal.event.importics.DropIcsPanel;
+import org.projectforge.plugins.teamcal.event.importics.TeamCalImportPage;
 import org.projectforge.web.calendar.CalendarForm;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.calendar.CalendarPageSupport;
@@ -181,7 +182,8 @@ public class TeamCalCalendarForm extends CalendarForm
             return;
           }
           if (events.size() > 1) {
-            errorDialog.setMessage(getString("plugins.teamcal.import.ics.multipleEventsNotYetSupported")).open(target);
+            // Can't import multiple entries, redirect to import page:
+            redirectToImportPage(events, activeModel.getObject());
             return;
           }
           final VEvent event = events.get(0);
@@ -189,9 +191,8 @@ public class TeamCalCalendarForm extends CalendarForm
           // 1. Check id/external id. If not yet given, create new entry and ask for calendar to add: Redirect to TeamEventEditPage.
           final TeamEventDO dbEvent = teamEventDao.getByUid(uid.getValue());
           if (dbEvent != null) {
-            // 2. If already exists open edit dialog with DiffAcceptDiscardPanels.
-            // TODO: Don't forget to undelete the event (if marked as deleted).
-            errorDialog.setMessage(getString("plugins.teamcal.import.ics.eventAlreadyImported")).open(target);
+            // Can't modify existing entry, redirect to import page:
+            redirectToImportPage(events, activeModel.getObject());
             return;
           }
           final TeamEventDO teamEvent = TeamEventUtils.createTeamEventDO(event);
@@ -204,6 +205,18 @@ public class TeamCalCalendarForm extends CalendarForm
         }
       }.setTooltip(getString("plugins.teamcal.dropIcsPanel.tooltip")));
     }
+  }
+
+  private void redirectToImportPage(final List<VEvent> events, final TemplateEntry activeTemplate)
+  {
+    final PageParameters parameters = new PageParameters();
+    if (activeTemplate != null) {
+      parameters.add(TeamCalImportPage.PARAM_KEY_TEAM_CAL_ID, activeTemplate.getDefaultCalendarId());
+    }
+    final TeamCalImportPage importPage = new TeamCalImportPage(parameters);
+    importPage.setReturnToPage(parentPage);
+    importPage.setEventsToImport(events);
+    setResponsePage(importPage);
   }
 
   /**

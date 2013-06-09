@@ -24,9 +24,11 @@
 package org.projectforge.plugins.teamcal.event.importics;
 
 import java.io.InputStream;
+import java.util.List;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.component.VEvent;
 
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -62,6 +64,12 @@ public class TeamCalImportPage extends AbstractImportPage<TeamCalImportForm>
       form.calendar = teamCalDao.getById(calId);
     }
     form.init();
+  }
+
+  public void setEventsToImport(final List<VEvent> events) {
+    checkAccess();
+    final ImportStorage<TeamEventDO> storage = teamCalImportDao.importEvents(events, actionLog);
+    setStorage(storage);
   }
 
   protected void importEvents()

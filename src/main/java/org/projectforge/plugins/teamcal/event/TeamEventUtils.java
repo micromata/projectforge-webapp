@@ -289,8 +289,14 @@ public class TeamEventUtils
 
   public static List<TeamEventDO> getTeamEvents(final net.fortuna.ical4j.model.Calendar calendar)
   {
-    final List<TeamEventDO> events = new ArrayList<TeamEventDO>();
     final List<VEvent> list = getVEvents(calendar);
+    final List<TeamEventDO> events = convert(list);
+    return events;
+  }
+
+  public static List<TeamEventDO> convert(final List<VEvent> list)
+  {
+    final List<TeamEventDO> events = new ArrayList<TeamEventDO>();
     if (list == null || list.size() == 0) {
       return events;
     }

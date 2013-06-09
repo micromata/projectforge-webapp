@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.List;
 
 import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.component.VEvent;
 
 import org.apache.commons.lang.Validate;
 import org.projectforge.common.ImportStatus;
@@ -67,10 +68,21 @@ public class TeamCalImportDao extends HibernateDaoSupport
 
   public ImportStorage<TeamEventDO> importEvents(final Calendar calendar, final String filename, final ActionLog actionLog)
   {
+    final List<TeamEventDO> events = TeamEventUtils.getTeamEvents(calendar);
+    return importEvents(events, filename, actionLog);
+  }
+
+  public ImportStorage<TeamEventDO> importEvents(final List<VEvent> vEvents, final ActionLog actionLog)
+  {
+    final List<TeamEventDO> events = TeamEventUtils.convert(vEvents);
+    return importEvents(events, "none", actionLog);
+  }
+
+  private ImportStorage<TeamEventDO> importEvents(final List<TeamEventDO> events, final String filename, final ActionLog actionLog)
+  {
     log.info("Uploading ics file: '" + filename + "'...");
     final ImportStorage<TeamEventDO> storage = new ImportStorage<TeamEventDO>();
     storage.setFilename(filename);
-    final List<TeamEventDO> events = TeamEventUtils.getTeamEvents(calendar);
 
     final ImportedSheet<TeamEventDO> importedSheet = new ImportedSheet<TeamEventDO>();
     importedSheet.setName(getSheetName());
