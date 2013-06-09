@@ -23,7 +23,15 @@
 
 package org.projectforge.plugins.teamcal.event;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.TimeZone;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -66,7 +74,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
   private static final Class< ? >[] ADDITIONAL_HISTORY_SEARCH_DOS = new Class[] { TeamEventAttendeeDO.class};
 
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "subject", "location", "calendar.id", "calendar.title", "note",
-      "attendees"};
+  "attendees"};
 
   private TeamCalDao teamCalDao;
 
@@ -93,20 +101,35 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     teamEvent.setCalendar(teamCal);
   }
 
-  @SuppressWarnings("unchecked")
   public TeamEventDO getByUid(final String uid)
+  {
+    return getByUid(uid, null);
+  }
+
+  @SuppressWarnings("unchecked")
+  public TeamEventDO getByUid(final String uid, final Integer teamCalId)
   {
     if (uid == null) {
       return null;
     }
     List<TeamEventDO> list;
     final Integer id = TeamCalConfig.get().extractEventId(uid);
-    if (id != null) {
-      // The uid refers an own event, therefore search for the extracted id.
-      list = getHibernateTemplate().find("from TeamEventDO e where e.id = ? and e.deleted = false", id);
+    if (teamCalId != null) {
+      if (id != null) {
+        // The uid refers an own event, therefore search for the extracted id.
+        list = getHibernateTemplate().find("from TeamEventDO e where e.id=? and e.calendar.id=? and e.deleted=false", id, teamCalId);
+      } else {
+        // It's an external event:
+        list = getHibernateTemplate().find("from TeamEventDO e where e.externalUid=? and e.calendar=? and e.deleted=false", uid, teamCalId);
+      }
     } else {
-      // It's an external event:
-      list = getHibernateTemplate().find("from TeamEventDO e where e.externalUid = ? and e.deleted = false", uid);
+      if (id != null) {
+        // The uid refers an own event, therefore search for the extracted id.
+        list = getHibernateTemplate().find("from TeamEventDO e where e.id=? and e.deleted=false", id);
+      } else {
+        // It's an external event:
+        list = getHibernateTemplate().find("from TeamEventDO e where e.externalUid=? and e.deleted=false", uid);
+      }
     }
     if (list != null && list.isEmpty() == false && list.get(0) != null) {
       return list.get(0);
@@ -166,9 +189,9 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     list = getList(qFilter);
     list = selectUnique(list);
     // add all abo events
-    List<TeamEventDO> recurrenceEvents = TeamEventExternalSubscriptionCache.instance().getRecurrenceEvents(teamEventFilter);
-    if(recurrenceEvents != null && recurrenceEvents.size() > 0) {
-        list.addAll(recurrenceEvents);
+    final List<TeamEventDO> recurrenceEvents = TeamEventExternalSubscriptionCache.instance().getRecurrenceEvents(teamEventFilter);
+    if (recurrenceEvents != null && recurrenceEvents.size() > 0) {
+      list.addAll(recurrenceEvents);
     }
     final TimeZone timeZone = PFUserContext.getTimeZone();
     if (list != null) {
@@ -244,16 +267,16 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     final TeamEventExternalSubscriptionCache aboCache = TeamEventExternalSubscriptionCache.instance();
     final List<Integer> alreadyAdded = new ArrayList<Integer>();
     // precondition for abos: existing teamcals in filter
-    if(teamEventFilter.getTeamCals() != null) {
-        for (Integer calendarId : teamEventFilter.getTeamCals()) {
-          if (aboCache.isExternalSubscribedCalendar(calendarId) == true) {
-            addEventsToList(teamEventFilter, result, aboCache, calendarId);
-            alreadyAdded.add(calendarId);
-          }
+    if (teamEventFilter.getTeamCals() != null) {
+      for (final Integer calendarId : teamEventFilter.getTeamCals()) {
+        if (aboCache.isExternalSubscribedCalendar(calendarId) == true) {
+          addEventsToList(teamEventFilter, result, aboCache, calendarId);
+          alreadyAdded.add(calendarId);
         }
+      }
     }
     // if the getTeamCalId is not null and we do not added this before, do it now
-    Integer teamCalId = teamEventFilter.getTeamCalId();
+    final Integer teamCalId = teamEventFilter.getTeamCalId();
     if (teamCalId != null && alreadyAdded.contains(teamCalId) == false) {
       if (aboCache.isExternalSubscribedCalendar(teamCalId) == true) {
         addEventsToList(teamEventFilter, result, aboCache, teamCalId);
@@ -262,14 +285,16 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     return result;
   }
 
-  private void addEventsToList(TeamEventFilter teamEventFilter, List<TeamEventDO> result, TeamEventExternalSubscriptionCache aboCache, Integer calendarId) {
-    Date startDate = teamEventFilter.getStartDate();
-    Date endDate = teamEventFilter.getEndDate();
-    Long startTime = startDate == null ? 0 : startDate.getTime();
-    Long endTime = endDate == null ? Long.MAX_VALUE : endDate.getTime();
-    List<TeamEventDO> events = aboCache.getEvents(calendarId, startTime, endTime);
+  private void addEventsToList(final TeamEventFilter teamEventFilter, final List<TeamEventDO> result,
+      final TeamEventExternalSubscriptionCache aboCache, final Integer calendarId)
+  {
+    final Date startDate = teamEventFilter.getStartDate();
+    final Date endDate = teamEventFilter.getEndDate();
+    final Long startTime = startDate == null ? 0 : startDate.getTime();
+    final Long endTime = endDate == null ? Long.MAX_VALUE : endDate.getTime();
+    final List<TeamEventDO> events = aboCache.getEvents(calendarId, startTime, endTime);
     if (events != null && events.size() > 0) {
-        result.addAll(events);
+      result.addAll(events);
     }
   }
 
@@ -346,7 +371,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
             (Restrictions.and(Restrictions.le("startDate", startDate), Restrictions.ge("endDate", endDate)))));
       } else {
         queryFilter.add(
-        // "startDate" < endDate && ("recurrenceUntil" == null || "recurrenceUntil" > startDate)
+            // "startDate" < endDate && ("recurrenceUntil" == null || "recurrenceUntil" > startDate)
             (Restrictions.and(Restrictions.lt("startDate", endDate),
                 Restrictions.or(Restrictions.isNull("recurrenceUntil"), Restrictions.gt("recurrenceUntil", startDate)))));
       }
@@ -356,7 +381,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
       } else {
         // This branch is reached for subscriptions and calendar downloads.
         queryFilter.add(
-        // "recurrenceUntil" == null || "recurrenceUntil" > startDate
+            // "recurrenceUntil" == null || "recurrenceUntil" > startDate
             Restrictions.or(Restrictions.isNull("recurrenceUntil"), Restrictions.gt("recurrenceUntil", startDate)));
       }
     } else if (endDate != null) {
