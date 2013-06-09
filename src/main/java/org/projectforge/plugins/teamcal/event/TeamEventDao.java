@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 import org.hibernate.criterion.Order;
@@ -145,6 +146,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
   protected void onSaveOrModify(final TeamEventDO event)
   {
     super.onSaveOrModify(event);
+    Validate.notNull(event.getCalendar());
     if (event.isAllDay() == true) {
       final Date startDate = event.getStartDate();
       if (startDate != null) {
