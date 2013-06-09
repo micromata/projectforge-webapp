@@ -53,7 +53,8 @@ public class TeamCalImportDao extends HibernateDaoSupport
    */
   private static final int INSERT_BLOCK_SIZE = 50;
 
-  static final String[] DIFF_PROPERTIES = { "nummer", "bezeichnung"};
+  static final String[] DIFF_PROPERTIES = { "subject", "location", "allDay", "startDate", "endDate", "note", "recurrenceRule",
+  "recurrenceUntil"};
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalImportDao.class);
 
@@ -117,10 +118,9 @@ public class TeamCalImportDao extends HibernateDaoSupport
   {
     for (final ImportedElement<TeamEventDO> el : sheet.getElements()) {
       final TeamEventDO event = el.getValue();
+      teamEventDao.setCalendar(event, teamCalId);
       final TeamEventDO dbEvent = teamEventDao.getByUid(event.getExternalUid(), teamCalId);
-      if (dbEvent != null) {
-        el.setOldValue(dbEvent);
-      }
+      el.setOldValue(dbEvent);
     }
     sheet.setStatus(ImportStatus.RECONCILED);
     sheet.calculateStatistics();

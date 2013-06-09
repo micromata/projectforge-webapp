@@ -27,6 +27,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -264,7 +266,8 @@ public class TeamEventUtils
     return SUPPORTED_INTERVALS;
   }
 
-  public static List<VEvent> getVEvents(final net.fortuna.ical4j.model.Calendar calendar) {
+  public static List<VEvent> getVEvents(final net.fortuna.ical4j.model.Calendar calendar)
+  {
     final List<VEvent> events = new ArrayList<VEvent>();
     @SuppressWarnings("unchecked")
     final List<Component> list = calendar.getComponents(Component.VEVENT);
@@ -284,7 +287,8 @@ public class TeamEventUtils
     return events;
   }
 
-  public static List<TeamEventDO> getTeamEvents(final net.fortuna.ical4j.model.Calendar calendar) {
+  public static List<TeamEventDO> getTeamEvents(final net.fortuna.ical4j.model.Calendar calendar)
+  {
     final List<TeamEventDO> events = new ArrayList<TeamEventDO>();
     final List<VEvent> list = getVEvents(calendar);
     if (list == null || list.size() == 0) {
@@ -293,6 +297,20 @@ public class TeamEventUtils
     for (final VEvent vEvent : list) {
       events.add(createTeamEventDO(vEvent));
     }
+    Collections.sort(events, new Comparator<TeamEventDO>() {
+      public int compare(final TeamEventDO o1, final TeamEventDO o2)
+      {
+        final Date startDate1 = o1.getStartDate();
+        final Date startDate2 = o2.getStartDate();
+        if (startDate1 == null) {
+          if (startDate2 == null) {
+            return 0;
+          }
+          return -1;
+        }
+        return startDate1.compareTo(startDate2);
+      };
+    });
     return events;
   }
 }

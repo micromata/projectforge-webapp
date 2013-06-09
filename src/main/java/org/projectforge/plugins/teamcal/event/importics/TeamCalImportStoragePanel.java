@@ -23,8 +23,11 @@
 
 package org.projectforge.plugins.teamcal.event.importics;
 
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.projectforge.common.ImportedElement;
+import org.projectforge.plugins.teamcal.event.TeamEventDO;
+import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.core.importstorage.AbstractImportStoragePanel;
 import org.projectforge.web.core.importstorage.ImportFilter;
 
@@ -50,8 +53,14 @@ public class TeamCalImportStoragePanel extends AbstractImportStoragePanel<TeamCa
   @Override
   protected void addHeadColumns(final RepeatingView headColRepeater)
   {
-    // headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.konto.nummer")));
-    // headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.konto.bezeichnung")));
+    headColRepeater.add(new Label(headColRepeater.newChildId(), getString("plugins.teamcal.event.subject")));
+    headColRepeater.add(new Label(headColRepeater.newChildId(), getString("plugins.teamcal.event.location")));
+    headColRepeater.add(new Label(headColRepeater.newChildId(), getString("plugins.teamcal.event.allDay")));
+    headColRepeater.add(new Label(headColRepeater.newChildId(), getString("plugins.teamcal.event.beginDate")));
+    headColRepeater.add(new Label(headColRepeater.newChildId(), getString("plugins.teamcal.event.endDate")));
+    headColRepeater.add(new Label(headColRepeater.newChildId(), getString("plugins.teamcal.event.note")));
+    headColRepeater.add(new Label(headColRepeater.newChildId(), getString("plugins.teamcal.event.recurrence")));
+    headColRepeater.add(new Label(headColRepeater.newChildId(), getString("plugins.teamcal.event.recurrence.until")));
   }
 
   /**
@@ -61,8 +70,14 @@ public class TeamCalImportStoragePanel extends AbstractImportStoragePanel<TeamCa
   @Override
   protected void addColumns(final RepeatingView cellRepeater, final ImportedElement< ? > element, final String style)
   {
-    //    final KontoDO konto = (KontoDO) element.getValue();
-    //    addCell(cellRepeater, konto.getNummer(), style + " white-space: nowrap; text-align: right;");
-    //    addCell(cellRepeater, konto.getBezeichnung(), style);
+    final TeamEventDO event = (TeamEventDO)element.getValue();
+    addCell(cellRepeater, event.getSubject(), style);
+    addCell(cellRepeater, event.getLocation(), style);
+    addCell(cellRepeater, String.valueOf(event.isAllDay()), style);
+    addCell(cellRepeater, DateTimeFormatter.instance().getFormattedDateTime(event.getStartDate()), style);
+    addCell(cellRepeater, DateTimeFormatter.instance().getFormattedDateTime(event.getEndDate()), style);
+    addCell(cellRepeater, event.getNote(), style);
+    addCell(cellRepeater, event.getRecurrenceRule(), style);
+    addCell(cellRepeater, DateTimeFormatter.instance().getFormattedDate(event.getRecurrenceUntil()), style);
   }
 }
