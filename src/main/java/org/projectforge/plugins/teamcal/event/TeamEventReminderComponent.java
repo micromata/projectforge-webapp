@@ -83,15 +83,6 @@ public class TeamEventReminderComponent extends Component
     final MinMaxNumberField<Integer> reminderDuration = new MinMaxNumberField<Integer>(reminderPanel.getTextFieldId(),
         new PropertyModel<Integer>(data, "reminderDuration"), 0, DURATION_MAX);
     WicketUtils.setSize(reminderDuration, 3);
-    if (data.getReminderActionType() == null) {
-      // Pre-set default values if the user selects a reminder action:
-      if (NumberHelper.greaterZero(data.getReminderDuration()) == false) {
-        data.setReminderDuration(15);
-      }
-      if (data.getReminderDurationUnit() == null) {
-        data.setReminderDurationUnit(ReminderDurationUnit.MINUTES);
-      }
-    }
     setComponentProperties(reminderDuration, reminderOptionVisibility, true);
 
     // reminder duration dropDown
@@ -107,8 +98,8 @@ public class TeamEventReminderComponent extends Component
         "reminderActionTypeList");
     final IModel<ReminderActionType> reminderActionActiveModel = new PropertyModel<ReminderActionType>(data, "reminderActionType");
     final DropDownChoicePanel<ReminderActionType> reminderActionTypeChoice = new DropDownChoicePanel<ReminderActionType>(
-        reminderPanel.newChildId(), new DropDownChoice<ReminderActionType>(DropDownChoicePanel.WICKET_ID,
-            reminderActionActiveModel, reminderActionTypeChoiceModel, reminderActionTypeRenderer) {
+        reminderPanel.newChildId(), new DropDownChoice<ReminderActionType>(DropDownChoicePanel.WICKET_ID, reminderActionActiveModel,
+            reminderActionTypeChoiceModel, reminderActionTypeRenderer) {
           /**
            * @see org.apache.wicket.markup.html.form.AbstractSingleSelectChoice#getNullKey()
            */
@@ -126,6 +117,13 @@ public class TeamEventReminderComponent extends Component
       {
         final boolean isVisible = data.getReminderActionType() != null;
         if (isVisible == true) {
+          // Pre-set default values if the user selects a reminder action:
+          if (NumberHelper.greaterZero(data.getReminderDuration()) == false) {
+            data.setReminderDuration(15);
+          }
+          if (data.getReminderDurationUnit() == null) {
+            data.setReminderDurationUnit(ReminderDurationUnit.MINUTES);
+          }
         }
         reminderDuration.setVisible(isVisible);
         reminderDurationTypeChoice.getDropDownChoice().setVisible(isVisible);
