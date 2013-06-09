@@ -26,6 +26,9 @@ package org.projectforge.plugins.teamcal.event.importics;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.PropertyModel;
+import org.projectforge.plugins.teamcal.admin.TeamCalDO;
+import org.projectforge.plugins.teamcal.event.TeamEventEditForm;
 import org.projectforge.web.core.importstorage.AbstractImportForm;
 import org.projectforge.web.core.importstorage.ImportFilter;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
@@ -39,6 +42,8 @@ public class TeamCalImportForm extends AbstractImportForm<ImportFilter, TeamCalI
 
   protected FileUploadField fileUploadField;
 
+  protected TeamCalDO calendar;
+
   public TeamCalImportForm(final TeamCalImportPage parentPage)
   {
     super(parentPage);
@@ -50,6 +55,10 @@ public class TeamCalImportForm extends AbstractImportForm<ImportFilter, TeamCalI
   {
     super.init();
     gridBuilder.newGridPanel();
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.event.teamCal"));
+      TeamEventEditForm.addTeamCalChoice(fs, new PropertyModel<TeamCalDO>(this, "calendar"));
+    }
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("file"), "*.ics");
       fileUploadField = new FileUploadField(FileUploadPanel.WICKET_ID);
@@ -71,5 +80,10 @@ public class TeamCalImportForm extends AbstractImportForm<ImportFilter, TeamCalI
     final DivPanel panel = gridBuilder.getPanel();
     storagePanel = new TeamCalImportStoragePanel(panel.newChildId(), parentPage, importFilter);
     panel.add(storagePanel);
+  }
+
+  protected Integer getCalendarId()
+  {
+    return calendar != null ? calendar.getId() : null;
   }
 }

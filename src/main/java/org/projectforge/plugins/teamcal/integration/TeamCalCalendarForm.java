@@ -23,16 +23,13 @@
 
 package org.projectforge.plugins.teamcal.integration;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.Uid;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
@@ -50,7 +47,6 @@ import org.projectforge.plugins.teamcal.event.TeamEventEditPage;
 import org.projectforge.plugins.teamcal.event.TeamEventListPage;
 import org.projectforge.plugins.teamcal.event.TeamEventUtils;
 import org.projectforge.plugins.teamcal.event.importics.DropIcsPanel;
-import org.projectforge.web.calendar.CalendarFeed;
 import org.projectforge.web.calendar.CalendarForm;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.calendar.CalendarPageSupport;
@@ -179,25 +175,8 @@ public class TeamCalCalendarForm extends CalendarForm
         @Override
         protected void onIcsImport(final AjaxRequestTarget target, final Calendar calendar)
         {
-          @SuppressWarnings("unchecked")
-          final List<Component> list = calendar.getComponents(Component.VEVENT);
-          if (list == null || list.size() == 0) {
-            errorDialog.setMessage(getString("plugins.teamcal.import.ics.noEventsGiven")).open(target);
-            return;
-          }
-
-          // Temporary not used, because multiple events are not supported.
-          final List<VEvent> events = new ArrayList<VEvent>();
-          for (final Component c : list) {
-            final VEvent event = (VEvent) c;
-
-            if (StringUtils.equals(event.getSummary().getValue(), CalendarFeed.SETUP_EVENT) == true) {
-              // skip setup event!
-              continue;
-            }
-            events.add(event);
-          }
-          if (events.size() == 0) {
+          final List<VEvent> events = TeamEventUtils.getVEvents(calendar);
+          if (events == null || events.size() == 0) {
             errorDialog.setMessage(getString("plugins.teamcal.import.ics.noEventsGiven")).open(target);
             return;
           }

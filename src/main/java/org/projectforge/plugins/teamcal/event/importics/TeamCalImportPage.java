@@ -25,10 +25,18 @@ package org.projectforge.plugins.teamcal.event.importics;
 
 import java.io.InputStream;
 
+import net.fortuna.ical4j.data.CalendarBuilder;
+import net.fortuna.ical4j.model.Calendar;
+
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessException;
+import org.projectforge.common.ImportStorage;
+import org.projectforge.plugins.teamcal.admin.TeamCalDao;
+import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.web.core.importstorage.AbstractImportPage;
+import org.projectforge.web.wicket.WicketUtils;
 
 public class TeamCalImportPage extends AbstractImportPage<TeamCalImportForm>
 {
@@ -38,11 +46,21 @@ public class TeamCalImportPage extends AbstractImportPage<TeamCalImportForm>
 
   public static String PARAM_KEY_TEAM_CAL_ID = "teamCalId";
 
+  @SpringBean(name = "teamCalDao")
+  private TeamCalDao teamCalDao;
+
+  @SpringBean(name = "teamCalImportDao")
+  private TeamCalImportDao teamCalImportDao;
+
   public TeamCalImportPage(final PageParameters parameters)
   {
     super(parameters);
     form = new TeamCalImportForm(this);
     body.add(form);
+    final Integer calId = WicketUtils.getAsInteger(parameters, PARAM_KEY_TEAM_CAL_ID);
+    if (calId != null) {
+      form.calendar = teamCalDao.getById(calId);
+    }
     form.init();
   }
 
@@ -54,12 +72,17 @@ public class TeamCalImportPage extends AbstractImportPage<TeamCalImportForm>
       try {
         final InputStream is = fileUpload.getInputStream();
         actionLog.reset();
-        final String clientFileName = fileUpload.getClientFileName();
-        // setStorage(datevImportDao.importKontenplan(is, clientFileName, actionLog));
+        final String clientFilename = fileUpload.getClientFileName();
+        final CalendarBuilder builder = new CalendarBuilder();
+        final Calendar calendar = builder.build(is);
+        final ImportStorage<TeamEventDO> storage = teamCalImportDao.importEvents(calendar, clientFilename, actionLog);
+        setStorage(storage);
       } catch (final Exception ex) {
         log.error(ex.getMessage(), ex);
         error("An error occurred (see log files for details): " + ex.getMessage());
         clear();
+      } finally {
+        fileUpload.closeStreams();
       }
     }
   }
@@ -69,7 +92,7 @@ public class TeamCalImportPage extends AbstractImportPage<TeamCalImportForm>
   {
     checkAccess();
     super.reconcile(sheetName);
-    // datevImportDao.reconcile(getStorage(), sheetName);
+    teamCalImportDao.reconcile(getStorage(), sheetName, form.getCalendarId());
   }
 
   @Override
@@ -77,7 +100,7 @@ public class TeamCalImportPage extends AbstractImportPage<TeamCalImportForm>
   {
     checkAccess();
     super.commit(sheetName);
-    // datevImportDao.commit(getStorage(), sheetName);
+    teamCalImportDao.commit(getStorage(), sheetName, form.getCalendarId());
   }
 
   private void checkAccess()
@@ -94,6 +117,6 @@ public class TeamCalImportPage extends AbstractImportPage<TeamCalImportForm>
   @Override
   protected String getTitle()
   {
-    return getString("fibu.datev.import");
+    return getString("plugins.teamcal.import.ics.title");
   }
 }
