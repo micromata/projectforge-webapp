@@ -72,8 +72,7 @@ public class DatevImportForm extends AbstractImportForm<ImportFilter, DatevImpor
       addClearButton(fs);
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("filter"));
-      addImportFilterRadio(fs);
+      addImportFilterRadio(gridBuilder);
     }
     {
       // Statistics

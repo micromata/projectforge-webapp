@@ -33,6 +33,7 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.util.lang.Bytes;
 import org.projectforge.common.ImportStorage;
 import org.projectforge.web.wicket.AbstractStandardForm;
+import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -84,8 +85,18 @@ public abstract class AbstractImportForm<F, P extends AbstractImportPage<?>, S e
    * @return this for chaining.
    */
   @SuppressWarnings("serial")
-  protected AbstractImportForm<F, P, S> addImportFilterRadio(final FieldsetPanel fs)
+  protected AbstractImportForm<F, P, S> addImportFilterRadio(final GridBuilder gridBuilder)
   {
+    final FieldsetPanel fs = new FieldsetPanel(gridBuilder.getPanel(), getString("filter")) {
+      /**
+       * @see org.apache.wicket.Component#isVisible()
+       */
+      @Override
+      public boolean isVisible()
+      {
+        return storagePanel.isVisible();
+      }
+    };
     final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
     final RadioGroupPanel<String> radioGroup = new RadioGroupPanel<String>(radioGroupPanel.newChildId(), "filterType",
         new PropertyModel<String>(importFilter, "listType")) {
