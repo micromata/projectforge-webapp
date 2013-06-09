@@ -120,7 +120,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
         list = getHibernateTemplate().find("from TeamEventDO e where e.id=? and e.calendar.id=? and e.deleted=false", id, teamCalId);
       } else {
         // It's an external event:
-        list = getHibernateTemplate().find("from TeamEventDO e where e.externalUid=? and e.calendar=? and e.deleted=false", uid, teamCalId);
+        list = getHibernateTemplate().find("from TeamEventDO e where e.externalUid=? and e.calendar.id=? and e.deleted=false", uid, teamCalId);
       }
     } else {
       if (id != null) {

@@ -38,6 +38,7 @@ import org.projectforge.core.ActionLog;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDao;
 import org.projectforge.plugins.teamcal.event.TeamEventUtils;
+import org.projectforge.user.PFUserContext;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -70,6 +71,7 @@ public class TeamCalImportDao extends HibernateDaoSupport
     final List<TeamEventDO> events = TeamEventUtils.getTeamEvents(calendar);
 
     final ImportedSheet<TeamEventDO> importedSheet = new ImportedSheet<TeamEventDO>();
+    importedSheet.setName(PFUserContext.getLocalizedString("plugins.teamcal.events"));
     storage.addSheet(importedSheet);
 
     for (final TeamEventDO event : events) {
