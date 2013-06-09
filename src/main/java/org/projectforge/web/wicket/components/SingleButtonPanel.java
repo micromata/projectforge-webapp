@@ -30,6 +30,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.projectforge.common.StringHelper;
+import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * Panel for using as single button (needed for css decoration).
@@ -112,7 +113,7 @@ public class SingleButtonPanel extends Panel
   public SingleButtonPanel setTooltip(final String tooltip)
   {
     if (tooltip != null) {
-      button.add(AttributeModifier.replace("title", tooltip));
+      WicketUtils.addTooltip(button, tooltip);
     }
     return this;
   }
