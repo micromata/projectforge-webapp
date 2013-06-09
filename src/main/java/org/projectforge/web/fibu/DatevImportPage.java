@@ -51,7 +51,7 @@ public class DatevImportPage extends AbstractStandardFormPage
   @SpringBean(name = "datevImportDao")
   private DatevImportDao datevImportDao;
 
-  static final String KEY_IMPORT_STORAGE = "ImportStorage";
+  static final String KEY_IMPORT_STORAGE = "DatevImportStorage";
 
   private final DatevImportForm form;
 
