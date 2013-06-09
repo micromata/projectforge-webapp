@@ -23,14 +23,12 @@
 
 package org.projectforge.plugins.teamcal.event;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 import net.fortuna.ical4j.model.Recur;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
@@ -49,7 +47,6 @@ import org.projectforge.common.DatePrecision;
 import org.projectforge.common.RecurrenceFrequency;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
-import org.projectforge.plugins.teamcal.admin.TeamCalFilter;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.WebConfiguration;
@@ -415,7 +412,6 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
    * 
    * @param fieldSet
    */
-  @SuppressWarnings("serial")
   private void initTeamCalPicker(final FieldsetPanel fieldSet)
   {
 
@@ -423,34 +419,16 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       final Label teamCalTitle = new Label(fieldSet.newChildId(), new PropertyModel<String>(data, "calendar.getTitle()"));
       fieldSet.add(teamCalTitle);
     } else {
-      final List<TeamCalDO> result = teamCalDao.getList(new TeamCalFilter());
-      final List<TeamCalDO> list = new ArrayList<TeamCalDO>();
-      for (final TeamCalDO cal : result) {
-        if (right.hasUpdateAccess(getUser(), cal) == true) {
-          list.add(cal);
-        }
+      final List<TeamCalDO> list = teamCalDao.getAllCalendarsWithFullAccess();
+      final LabelValueChoiceRenderer<TeamCalDO> calChoiceRenderer = new LabelValueChoiceRenderer<TeamCalDO>();
+      for (final TeamCalDO cal : list) {
+        calChoiceRenderer.addValue(cal, cal.getTitle());
       }
-      final PropertyModel<TeamCalDO> selectModel = new PropertyModel<TeamCalDO>(data, "calendar");
-      final DropDownChoice<TeamCalDO> teamCalDrop = new DropDownChoice<TeamCalDO>(fieldSet.getDropDownChoiceId(), selectModel, list,
-          getLabeledList(list)) {
-        /**
-         * @see org.apache.wicket.markup.html.form.AbstractSingleSelectChoice#isSelected(java.lang.Object, int, java.lang.String)
-         */
-        @Override
-        protected boolean isSelected(final TeamCalDO object, final int index, final String selected)
-        {
-          final boolean check = super.isSelected(object, index, selected);
-          final TeamCalDO team = data.getCalendar();
-          if (team != null && ObjectUtils.equals(object.getId(), team.getId())) {
-            return true;
-          } else {
-            return check;
-          }
-        }
-      };
-      teamCalDrop.setNullValid(false);
-      teamCalDrop.setRequired(true);
-      fieldSet.add(teamCalDrop);
+      final DropDownChoice<TeamCalDO> calDropDownChoice = new DropDownChoice<TeamCalDO>(fieldSet.getDropDownChoiceId(), new PropertyModel<TeamCalDO>(data,
+          "calendar"), calChoiceRenderer.getValues(), calChoiceRenderer);
+      calDropDownChoice.setNullValid(false);
+      calDropDownChoice.setRequired(true);
+      fieldSet.add(calDropDownChoice);
     }
   }
 
@@ -537,15 +515,6 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
         return buf.toString();
       }
     });
-  }
-
-  private LabelValueChoiceRenderer<TeamCalDO> getLabeledList(final List<TeamCalDO> list)
-  {
-    final LabelValueChoiceRenderer<TeamCalDO> templateNamesChoiceRenderer = new LabelValueChoiceRenderer<TeamCalDO>();
-    for (final TeamCalDO t : list) {
-      templateNamesChoiceRenderer.addValue(t, t.getTitle());
-    }
-    return templateNamesChoiceRenderer;
   }
 
   @Override
