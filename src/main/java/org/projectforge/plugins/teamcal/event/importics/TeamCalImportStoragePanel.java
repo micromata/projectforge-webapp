@@ -21,7 +21,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.plugins.teamcal.admin;
+package org.projectforge.plugins.teamcal.event.importics;
 
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.projectforge.common.ImportedElement;

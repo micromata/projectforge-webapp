@@ -21,7 +21,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.plugins.teamcal.admin;
+package org.projectforge.plugins.teamcal.event.importics;
 
 import java.io.InputStream;
 
@@ -36,7 +36,7 @@ public class TeamCalImportPage extends AbstractImportPage<TeamCalImportForm>
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalImportPage.class);
 
-  protected static String PARAM_KEY_TEAM_CAL_ID = "teamCalId";
+  public static String PARAM_KEY_TEAM_CAL_ID = "teamCalId";
 
   public TeamCalImportPage(final PageParameters parameters)
   {
