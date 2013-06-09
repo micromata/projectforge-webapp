@@ -63,15 +63,27 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
   {
     if (isNew() == false) {
       final Integer id = form.getData().getId();
-      final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+      ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
         @Override
         public void onClick()
         {
-          final TeamEventListPage teamEventListPage = new TeamEventListPage(new PageParameters().add(TeamEventListPage.PARAM_CALENDARS, String.valueOf(id)));
+          final TeamEventListPage teamEventListPage = new TeamEventListPage(new PageParameters().add(TeamEventListPage.PARAM_CALENDARS,
+              String.valueOf(id)));
           setResponsePage(teamEventListPage);
         };
       }, getString("plugins.teamcal.events"));
       addContentMenuEntry(menu);
+      if (form.isAccess() == true && getData().isExternalSubscription() == false) {
+        menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+          @Override
+          public void onClick()
+          {
+            final PageParameters parameters = new PageParameters().add(TeamCalImportPage.PARAM_KEY_TEAM_CAL_ID, getData().getId());
+            final TeamCalImportPage importPage = new TeamCalImportPage(parameters);
+            setResponsePage(importPage);
+          };
+        }, getString("import")).setTooltip("plugins.teamcal.import.ics.tooltip");
+      }
     }
   }
 
