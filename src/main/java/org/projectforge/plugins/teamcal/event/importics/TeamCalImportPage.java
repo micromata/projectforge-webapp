@@ -32,6 +32,7 @@ import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.ImportStorage;
+import org.projectforge.common.ImportedSheet;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.web.core.importstorage.AbstractImportPage;
@@ -84,6 +85,20 @@ public class TeamCalImportPage extends AbstractImportPage<TeamCalImportForm>
         fileUpload.closeStreams();
       }
     }
+  }
+
+  void reconcile()
+  {
+    final String name = teamCalImportDao.getSheetName();
+    if (getStorage() == null) {
+      return;
+    }
+    @SuppressWarnings("unchecked")
+    final ImportedSheet<TeamEventDO> sheet = (ImportedSheet<TeamEventDO>)getStorage().getNamedSheet(name);
+    if (sheet == null || sheet.isReconciled() == false) {
+      return;
+    }
+    reconcile(teamCalImportDao.getSheetName());
   }
 
   @Override

@@ -66,12 +66,13 @@ public class TeamCalImportDao extends HibernateDaoSupport
 
   public ImportStorage<TeamEventDO> importEvents(final Calendar calendar, final String filename, final ActionLog actionLog)
   {
+    log.info("Uploading ics file: '" + filename + "'...");
     final ImportStorage<TeamEventDO> storage = new ImportStorage<TeamEventDO>();
     storage.setFilename(filename);
     final List<TeamEventDO> events = TeamEventUtils.getTeamEvents(calendar);
 
     final ImportedSheet<TeamEventDO> importedSheet = new ImportedSheet<TeamEventDO>();
-    importedSheet.setName(PFUserContext.getLocalizedString("plugins.teamcal.events"));
+    importedSheet.setName(getSheetName());
     storage.addSheet(importedSheet);
 
     for (final TeamEventDO event : events) {
@@ -80,6 +81,7 @@ public class TeamCalImportDao extends HibernateDaoSupport
       element.setValue(event);
       importedSheet.addElement(element);
     }
+    log.info("Uploading of ics file '" + filename + "' done. " + actionLog.getCounterSuccess() + " events read.");
     return storage;
   }
 
@@ -104,6 +106,11 @@ public class TeamCalImportDao extends HibernateDaoSupport
     final int no = commit((ImportedSheet<TeamEventDO>) sheet, teamCalId);
     sheet.setNumberOfCommittedElements(no);
     sheet.setStatus(ImportStatus.IMPORTED);
+  }
+
+  String getSheetName()
+  {
+    return PFUserContext.getLocalizedString("plugins.teamcal.events");
   }
 
   private void reconcile(final ImportedSheet<TeamEventDO> sheet, final Integer teamCalId)

@@ -23,14 +23,19 @@
 
 package org.projectforge.plugins.teamcal.event.importics;
 
+import java.util.List;
+
 import org.apache.wicket.markup.html.form.Button;
+import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
-import org.projectforge.plugins.teamcal.event.TeamEventEditForm;
+import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.web.core.importstorage.AbstractImportForm;
 import org.projectforge.web.core.importstorage.ImportFilter;
+import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -43,6 +48,9 @@ public class TeamCalImportForm extends AbstractImportForm<ImportFilter, TeamCalI
   protected FileUploadField fileUploadField;
 
   protected TeamCalDO calendar;
+
+  @SpringBean(name = "teamCalDao")
+  private TeamCalDao teamCalDao;
 
   public TeamCalImportForm(final TeamCalImportPage parentPage)
   {
@@ -57,7 +65,34 @@ public class TeamCalImportForm extends AbstractImportForm<ImportFilter, TeamCalI
     gridBuilder.newGridPanel();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.event.teamCal"));
-      TeamEventEditForm.addTeamCalChoice(fs, new PropertyModel<TeamCalDO>(this, "calendar"));
+      final List<TeamCalDO> list = teamCalDao.getAllCalendarsWithFullAccess();
+      final LabelValueChoiceRenderer<TeamCalDO> calChoiceRenderer = new LabelValueChoiceRenderer<TeamCalDO>();
+      for (final TeamCalDO cal : list) {
+        calChoiceRenderer.addValue(cal, cal.getTitle());
+      }
+      final DropDownChoice<TeamCalDO> calDropDownChoice = new DropDownChoice<TeamCalDO>(fs.getDropDownChoiceId(),
+          new PropertyModel<TeamCalDO>(this, "calendar"), calChoiceRenderer.getValues(), calChoiceRenderer) {
+        /**
+         * @see org.apache.wicket.markup.html.form.DropDownChoice#wantOnSelectionChangedNotifications()
+         */
+        @Override
+        protected boolean wantOnSelectionChangedNotifications()
+        {
+          return true;
+        }
+
+        /**
+         * @see org.apache.wicket.markup.html.form.DropDownChoice#onSelectionChanged(java.lang.Object)
+         */
+        @Override
+        protected void onSelectionChanged(final TeamCalDO newSelection)
+        {
+          parentPage.reconcile();
+        }
+      };
+      calDropDownChoice.setNullValid(false);
+      calDropDownChoice.setRequired(true);
+      fs.add(calDropDownChoice);
     }
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("file"), "*.ics");
@@ -73,8 +108,7 @@ public class TeamCalImportForm extends AbstractImportForm<ImportFilter, TeamCalI
       addClearButton(fs);
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("filter"));
-      addImportFilterRadio(fs);
+      addImportFilterRadio(gridBuilder);
     }
     gridBuilder.newGridPanel();
     final DivPanel panel = gridBuilder.getPanel();
