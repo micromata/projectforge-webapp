@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateList;
 import net.fortuna.ical4j.model.Dur;
 import net.fortuna.ical4j.model.Property;
@@ -42,9 +43,11 @@ import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.ExDate;
 import net.fortuna.ical4j.model.property.RRule;
 
+import org.apache.commons.lang.StringUtils;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.RecurrenceFrequency;
+import org.projectforge.web.calendar.CalendarFeed;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -259,5 +262,37 @@ public class TeamEventUtils
   public static RecurrenceFrequency[] getSupportedRecurrenceIntervals()
   {
     return SUPPORTED_INTERVALS;
+  }
+
+  public static List<VEvent> getVEvents(final net.fortuna.ical4j.model.Calendar calendar) {
+    final List<VEvent> events = new ArrayList<VEvent>();
+    @SuppressWarnings("unchecked")
+    final List<Component> list = calendar.getComponents(Component.VEVENT);
+    if (list == null || list.size() == 0) {
+      return events;
+    }
+    // Temporary not used, because multiple events are not supported.
+    for (final Component c : list) {
+      final VEvent event = (VEvent) c;
+
+      if (StringUtils.equals(event.getSummary().getValue(), CalendarFeed.SETUP_EVENT) == true) {
+        // skip setup event!
+        continue;
+      }
+      events.add(event);
+    }
+    return events;
+  }
+
+  public static List<TeamEventDO> getTeamEvents(final net.fortuna.ical4j.model.Calendar calendar) {
+    final List<TeamEventDO> events = new ArrayList<TeamEventDO>();
+    final List<VEvent> list = getVEvents(calendar);
+    if (list == null || list.size() == 0) {
+      return events;
+    }
+    for (final VEvent vEvent : list) {
+      events.add(createTeamEventDO(vEvent));
+    }
+    return events;
   }
 }
