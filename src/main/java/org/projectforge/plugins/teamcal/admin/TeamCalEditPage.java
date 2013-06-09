@@ -74,16 +74,19 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
         };
       }, getString("plugins.teamcal.events"));
       addContentMenuEntry(menu);
-      if (form.isAccess() == true && getData().isExternalSubscription() == false) {
+      final TeamCalRight right = new TeamCalRight();
+      if (isNew() == true || right.hasFullAccess(getData(), getUserId()) == true && getData().isExternalSubscription() == false) {
         menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
           @Override
           public void onClick()
           {
             final PageParameters parameters = new PageParameters().add(TeamCalImportPage.PARAM_KEY_TEAM_CAL_ID, getData().getId());
             final TeamCalImportPage importPage = new TeamCalImportPage(parameters);
+            importPage.setReturnToPage(TeamCalEditPage.this);
             setResponsePage(importPage);
           };
-        }, getString("import")).setTooltip("plugins.teamcal.import.ics.tooltip");
+        }, getString("import")).setTooltip(getString("plugins.teamcal.import.ics.tooltip"));
+        addContentMenuEntry(menu);
       }
     }
   }

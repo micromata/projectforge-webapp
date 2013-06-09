@@ -358,12 +358,4 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
   {
     this.datePanel = datePanel;
   }
-
-  /**
-   * @return the access
-   */
-  protected boolean isAccess()
-  {
-    return access;
-  }
 }
