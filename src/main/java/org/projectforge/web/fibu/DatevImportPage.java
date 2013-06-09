@@ -107,10 +107,6 @@ public class DatevImportPage extends AbstractImportPage<DatevImportForm>
   {
     checkAccess();
     super.commit(sheetName);
-    if (getStorage() == null) {
-      log.error("Commit called without storage.");
-      return;
-    }
     datevImportDao.commit(getStorage(), sheetName);
   }
 
