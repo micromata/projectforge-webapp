@@ -142,7 +142,7 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
   {
     final TeamCalFilter filter = new TeamCalFilter();
     filter.setOwnerType(OwnerType.ALL);
-    filter.setFullAccess(true);
+    filter.setFullAccess(true).setReadonlyAccess(false).setMinimalAccess(false);
     return getList(filter);
   }
 
@@ -299,7 +299,7 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
   }
 
   @Override
-  protected void afterSave(TeamCalDO obj) {
+  protected void afterSave(final TeamCalDO obj) {
     super.afterSave(obj);
     if (obj.isExternalSubscription() == true) {
       TeamEventExternalSubscriptionCache.instance().updateCache(this, obj);
@@ -307,7 +307,7 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
   }
 
   @Override
-  protected void afterUpdate(TeamCalDO obj, TeamCalDO dbObj) {
+  protected void afterUpdate(final TeamCalDO obj, final TeamCalDO dbObj) {
     super.afterUpdate(obj, dbObj);
     if (obj != null && dbObj != null && obj.isExternalSubscription() == true && StringUtils.equals(obj.getExternalSubscriptionUrl(), dbObj.getExternalSubscriptionUrl()) == false) {
       // only update if the url has changed!
