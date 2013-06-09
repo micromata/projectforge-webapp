@@ -55,20 +55,20 @@ public class DatevImportForm extends AbstractImportForm<ImportFilter, DatevImpor
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("file"), "*.xls");
       fileUploadField = new FileUploadField(FileUploadPanel.WICKET_ID);
       fs.add(new FileUploadPanel(fs.newChildId(), fileUploadField));
-      fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("importAccounts")) {
+      fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("uploadAccounts")) {
         @Override
         public final void onSubmit()
         {
           parentPage.importAccountList();
         }
-      }, getString("finance.datev.importAccountList"), SingleButtonPanel.NORMAL));
-      fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("importRecords")) {
+      }, getString("finance.datev.uploadAccountList"), SingleButtonPanel.NORMAL).setTooltip(getString("common.import.upload.tooltip")));
+      fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("uloadRecords")) {
         @Override
         public final void onSubmit()
         {
           parentPage.importAccountRecords();
         }
-      }, getString("finance.datev.importAccountingRecords"), SingleButtonPanel.NORMAL));
+      }, getString("finance.datev.uploadAccountingRecords"), SingleButtonPanel.NORMAL).setTooltip(getString("common.import.upload.tooltip")));
       addClearButton(fs);
     }
     {
