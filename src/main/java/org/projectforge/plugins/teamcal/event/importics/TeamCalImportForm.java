@@ -69,7 +69,7 @@ public class TeamCalImportForm extends AbstractImportForm<ImportFilter, TeamCalI
         {
           parentPage.importEvents();
         }
-      }, getString("plugins.teamcal.import.ics.title"), SingleButtonPanel.NORMAL));
+      }, getString("upload"), SingleButtonPanel.NORMAL).setTooltip(getString("common.import.upload.tooltip")));
       addClearButton(fs);
     }
     {

@@ -31,7 +31,6 @@ import net.fortuna.ical4j.model.Calendar;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.access.AccessException;
 import org.projectforge.common.ImportStorage;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
@@ -106,12 +105,6 @@ public class TeamCalImportPage extends AbstractImportPage<TeamCalImportForm>
   private void checkAccess()
   {
     accessChecker.checkRestrictedOrDemoUser();
-    throw new AccessException("Todo");
-    // final TeamCalRight right = new TeamCalRight();
-    // if (isNew() == true || right.hasUpdateAccess(getUser(), data, data) == true) {
-    // throw new AccessException("access.exception.userHasNotRight", rightId, StringHelper.listToString(", ", (Object[]) values));
-    // }
-    // if (form.isAccess() == true && getData().isExternalSubscription() == false) {
   }
 
   @Override

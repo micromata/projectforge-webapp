@@ -63,7 +63,7 @@ public class TeamCalImportDao extends HibernateDaoSupport
     this.teamEventDao = teamEventDao;
   }
 
-  protected ImportStorage<TeamEventDO> importEvents(final Calendar calendar, final String filename, final ActionLog actionLog)
+  public ImportStorage<TeamEventDO> importEvents(final Calendar calendar, final String filename, final ActionLog actionLog)
   {
     final ImportStorage<TeamEventDO> storage = new ImportStorage<TeamEventDO>();
     storage.setFilename(filename);
