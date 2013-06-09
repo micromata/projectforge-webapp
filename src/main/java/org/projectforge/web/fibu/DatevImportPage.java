@@ -33,16 +33,15 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.ImportedElement;
 import org.projectforge.common.ImportedSheet;
-import org.projectforge.core.ActionLog;
 import org.projectforge.fibu.datev.DatevImportDao;
 import org.projectforge.fibu.kost.AccountingConfig;
 import org.projectforge.fibu.kost.BuchungssatzDO;
 import org.projectforge.fibu.kost.BusinessAssessment;
 import org.projectforge.user.UserRightId;
 import org.projectforge.user.UserRightValue;
-import org.projectforge.web.wicket.AbstractStandardFormPage;
+import org.projectforge.web.core.importstorage.AbstractImportPage;
 
-public class DatevImportPage extends AbstractStandardFormPage
+public class DatevImportPage extends AbstractImportPage<DatevImportForm>
 {
   private static final long serialVersionUID = 3158445617725488919L;
 
@@ -51,30 +50,12 @@ public class DatevImportPage extends AbstractStandardFormPage
   @SpringBean(name = "datevImportDao")
   private DatevImportDao datevImportDao;
 
-  static final String KEY_IMPORT_STORAGE = "DatevImportStorage";
-
-  private final DatevImportForm form;
-
-  private final ActionLog actionLog = new ActionLog();
-
   public DatevImportPage(final PageParameters parameters)
   {
     super(parameters);
     form = new DatevImportForm(this);
     body.add(form);
     form.init();
-  }
-
-  /**
-   * Clears imported storages if exists.
-   * @return
-   */
-  protected void clear()
-  {
-    checkAccess();
-    log.info("clear called");
-    form.setStorage(null);
-    removeUserPrefEntry(KEY_IMPORT_STORAGE);
   }
 
   protected void importAccountList()
@@ -86,8 +67,7 @@ public class DatevImportPage extends AbstractStandardFormPage
         final InputStream is = fileUpload.getInputStream();
         actionLog.reset();
         final String clientFileName = fileUpload.getClientFileName();
-        form.setStorage(datevImportDao.importKontenplan(is, clientFileName, actionLog));
-        putUserPrefEntry(KEY_IMPORT_STORAGE, form.getStorage(), false);
+        setStorage(datevImportDao.importKontenplan(is, clientFileName, actionLog));
       } catch (final Exception ex) {
         log.error(ex.getMessage(), ex);
         error("An error occurred (see log files for details): " + ex.getMessage());
@@ -105,8 +85,7 @@ public class DatevImportPage extends AbstractStandardFormPage
         final InputStream is = fileUpload.getInputStream();
         actionLog.reset();
         final String clientFileName = fileUpload.getClientFileName();
-        form.setStorage(datevImportDao.importBuchungsdaten(is, clientFileName, actionLog));
-        putUserPrefEntry(KEY_IMPORT_STORAGE, form.getStorage(), false);
+        setStorage(datevImportDao.importBuchungsdaten(is, clientFileName, actionLog));
       } catch (final Exception ex) {
         log.error(ex.getMessage(), ex);
         error("An error occurred (see log files for details): " + ex.getMessage());
@@ -115,63 +94,50 @@ public class DatevImportPage extends AbstractStandardFormPage
     }
   }
 
+  @Override
   protected void reconcile(final String sheetName)
   {
     checkAccess();
-    if (form.getStorage() == null) {
-      log.error("Reconcile called without storage.");
-      return;
-    }
-    datevImportDao.reconcile(form.getStorage(), sheetName);
+    super.reconcile(sheetName);
+    datevImportDao.reconcile(getStorage(), sheetName);
   }
 
+  @Override
   protected void commit(final String sheetName)
   {
     checkAccess();
-    if (form.getStorage() == null) {
+    super.commit(sheetName);
+    if (getStorage() == null) {
       log.error("Commit called without storage.");
       return;
     }
-    datevImportDao.commit(form.getStorage(), sheetName);
+    datevImportDao.commit(getStorage(), sheetName);
   }
 
+  @Override
   protected void selectAll(final String sheetName)
   {
     checkAccess();
-    final ImportedSheet< ? > sheet = form.getStorage().getNamedSheet(sheetName);
-    Validate.notNull(sheet);
-    sheet.selectAll(true, "modified".equals(form.filter.getListType()));
-    // updateSelectedItems();
+    super.selectAll(sheetName);
   }
 
+  @Override
   protected void select(final String sheetName, final int number)
   {
     checkAccess();
-    final ImportedSheet< ? > sheet = form.getStorage().getNamedSheet(sheetName);
-    Validate.notNull(sheet);
-    sheet.select(true, "modified".equals(form.filter.getListType()), number);
-    // updateSelectedItems();
+    super.select(sheetName, number);
   }
 
+  @Override
   protected void deselectAll(final String sheetName)
   {
     checkAccess();
-    final ImportedSheet< ? > sheet = form.getStorage().getNamedSheet(sheetName);
-    Validate.notNull(sheet);
-    sheet.selectAll(false, false);
-    // updateSelectedItems();
-  }
-
-  protected void showErrorSummary(final String sheetName)
-  {
-    final ImportedSheet< ? > sheet = form.getStorage().getNamedSheet(sheetName);
-    Validate.notNull(sheet);
-    form.setErrorProperties(sheet.getErrorProperties());
+    super.deselectAll(sheetName);
   }
 
   protected void showBusinessAssessment(final String sheetName)
   {
-    final ImportedSheet< ? > sheet = form.getStorage().getNamedSheet(sheetName);
+    final ImportedSheet< ? > sheet = getStorage().getNamedSheet(sheetName);
     Validate.notNull(sheet);
     final List<BuchungssatzDO> list = new ArrayList<BuchungssatzDO>();
     for (final ImportedElement< ? > element : sheet.getElements()) {
