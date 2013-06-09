@@ -38,7 +38,6 @@ import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.validation.IFormValidator;
-import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -48,7 +47,6 @@ import org.projectforge.common.DatePrecision;
 import org.projectforge.common.RecurrenceFrequency;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
-import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.WebConfiguration;
@@ -420,29 +418,17 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       final Label teamCalTitle = new Label(fieldSet.newChildId(), new PropertyModel<String>(data, "calendar.getTitle()"));
       fieldSet.add(teamCalTitle);
     } else {
-      addTeamCalChoice(fieldSet, new PropertyModel<TeamCalDO>(data, "calendar"));
+      final List<TeamCalDO> list = teamCalDao.getAllCalendarsWithFullAccess();
+      final LabelValueChoiceRenderer<TeamCalDO> calChoiceRenderer = new LabelValueChoiceRenderer<TeamCalDO>();
+      for (final TeamCalDO cal : list) {
+        calChoiceRenderer.addValue(cal, cal.getTitle());
+      }
+      final DropDownChoice<TeamCalDO> calDropDownChoice = new DropDownChoice<TeamCalDO>(fieldSet.getDropDownChoiceId(), new PropertyModel<TeamCalDO>(data, "calendar"),
+          calChoiceRenderer.getValues(), calChoiceRenderer);
+      calDropDownChoice.setNullValid(false);
+      calDropDownChoice.setRequired(true);
+      fieldSet.add(calDropDownChoice);
     }
-  }
-
-  /**
-   * Creates a drop down choice with all calenders the user has full access to.
-   * @param teamCalDao
-   * @param fieldSet
-   */
-  public static DropDownChoice<TeamCalDO> addTeamCalChoice(final FieldsetPanel fieldSet, final IModel<TeamCalDO> model)
-  {
-    final TeamCalDao teamCalDao = Registry.instance().getDao(TeamCalDao.class);
-    final List<TeamCalDO> list = teamCalDao.getAllCalendarsWithFullAccess();
-    final LabelValueChoiceRenderer<TeamCalDO> calChoiceRenderer = new LabelValueChoiceRenderer<TeamCalDO>();
-    for (final TeamCalDO cal : list) {
-      calChoiceRenderer.addValue(cal, cal.getTitle());
-    }
-    final DropDownChoice<TeamCalDO> calDropDownChoice = new DropDownChoice<TeamCalDO>(fieldSet.getDropDownChoiceId(), model,
-        calChoiceRenderer.getValues(), calChoiceRenderer);
-    calDropDownChoice.setNullValid(false);
-    calDropDownChoice.setRequired(true);
-    fieldSet.add(calDropDownChoice);
-    return calDropDownChoice;
   }
 
   /**
