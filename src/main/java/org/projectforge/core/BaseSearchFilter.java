@@ -60,6 +60,8 @@ public class BaseSearchFilter implements Serializable
 
   protected Date stopTimeOfModification;
 
+  protected Date modifiedSince;
+
   private boolean searchHistory;
 
   private String errorMessage;
@@ -141,6 +143,26 @@ public class BaseSearchFilter implements Serializable
   public String[] getSearchFields()
   {
     return searchFields;
+  }
+
+  /**
+   * If given {@link BaseDao#getList(BaseSearchFilter)} will only search for entries which last date of modification
+   * {@link AbstractBaseDO#getLastUpdate()} isn't before given date.
+   * @return the modifiedSince
+   */
+  public Date getModifiedSince()
+  {
+    return modifiedSince;
+  }
+
+  /**
+   * @param modifiedSince the modifiedSince to set
+   * @return this for chaining.
+   */
+  public BaseSearchFilter setModifiedSince(final Date modifiedSince)
+  {
+    this.modifiedSince = modifiedSince;
+    return this;
   }
 
   /**

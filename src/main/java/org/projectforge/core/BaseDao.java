@@ -401,6 +401,9 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     if (searchFilter.isIgnoreDeleted() == false) {
       filter.add(Restrictions.eq("deleted", searchFilter.isDeleted()));
     }
+    if (searchFilter.getModifiedSince() != null) {
+      filter.add(Restrictions.ge("lastUpdate", searchFilter.getModifiedSince()));
+    }
 
     List<O> list = null;
     {
