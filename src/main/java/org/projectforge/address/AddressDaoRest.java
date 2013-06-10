@@ -23,6 +23,7 @@
 
 package org.projectforge.address;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -34,6 +35,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.registry.Registry;
 import org.projectforge.rest.JsonUtils;
 import org.projectforge.rest.RestPaths;
@@ -62,13 +64,18 @@ public class AddressDaoRest
    * Rest-Call for {@link AddressDao#getFavoriteVCards()}
    * 
    * @param searchTerm
+   * @param modifiedSince millis since 1970 (UTC)
    */
   @GET
   @Path(RestPaths.LIST)
   @Produces(MediaType.APPLICATION_JSON)
-  public Response getList(@QueryParam("search") final String searchTerm)
+  public Response getList(@QueryParam("search") final String searchTerm, @QueryParam("modifiedSince") final Long modifiedSince)
   {
-    final AddressFilter filter = new AddressFilter();
+    final AddressFilter filter = new AddressFilter(new BaseSearchFilter());
+    if (modifiedSince != null) {
+      final Date date = new Date(modifiedSince);
+      filter.setModifiedSince(date);
+    }
     filter.setSearchString(searchTerm);
     final List<AddressDO> list = addressDao.getList(filter);
     final Set<Integer> favorites = addressDao.getFavorites();
