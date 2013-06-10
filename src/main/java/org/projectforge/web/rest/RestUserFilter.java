@@ -135,7 +135,7 @@ public class RestUserFilter implements Filter
         log.fatal("Exception encountered while Thread.sleep(1000): " + ex, ex);
       }
       final HttpServletResponse resp = (HttpServletResponse) response;
-      resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+      resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
       return;
     }
     try {

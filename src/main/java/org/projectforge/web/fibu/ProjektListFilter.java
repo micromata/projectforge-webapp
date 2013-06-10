@@ -36,10 +36,11 @@ public class ProjektListFilter extends ProjektFilter
   private static final long serialVersionUID = 4576278400076797415L;
 
   @Override
-  public void reset()
+  public ProjektListFilter reset()
   {
     super.reset();
     setListType(ProjektFilter.FILTER_NOT_ENDED);
     this.searchString = "";
+    return this;
   }
 }

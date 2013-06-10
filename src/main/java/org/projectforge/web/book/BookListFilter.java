@@ -32,11 +32,12 @@ public class BookListFilter extends BookFilter
   private static final long serialVersionUID = 4935564783349882469L;
 
   @Override
-  public void reset()
+  public BookListFilter reset()
   {
     super.reset();
     setPresent(true);
     setMissed(false);
     setDisposed(false);
+    return this;
   }
 }

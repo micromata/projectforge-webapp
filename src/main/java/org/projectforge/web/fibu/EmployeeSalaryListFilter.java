@@ -33,11 +33,13 @@ public class EmployeeSalaryListFilter extends EmployeeSalaryFilter
 {
   private static final long serialVersionUID = -4336362582633343256L;
 
-  public void reset()
+  @Override
+  public EmployeeSalaryListFilter reset()
   {
     super.reset();
     year = -1;
     month = -1;
     searchString = "";
+    return this;
   }
 }

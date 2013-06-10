@@ -50,27 +50,29 @@ public class SearchFilter extends BaseSearchFilter
 
 
   @Override
-  public void setStartTimeOfModification(final Date startTimeOfLastModification)
+  public SearchFilter setStartTimeOfModification(final Date startTimeOfLastModification)
   {
     if (startTimeOfLastModification == null) {
       super.setStartTimeOfModification(null);
-      return;
+      return this;
     }
     final DateHolder dh = new DateHolder(startTimeOfLastModification, DatePrecision.MILLISECOND);
     dh.setBeginOfDay();
     super.setStartTimeOfModification(dh.getDate());
+    return this;
   }
 
   @Override
-  public void setStopTimeOfModification(final Date stopTimeOfLastModification)
+  public SearchFilter setStopTimeOfModification(final Date stopTimeOfLastModification)
   {
     if (stopTimeOfLastModification == null) {
       super.setStopTimeOfModification(null);
-      return;
+      return this;
     }
     final DateHolder dh = new DateHolder(stopTimeOfLastModification, DatePrecision.MILLISECOND);
     dh.setEndOfDay();
     super.setStopTimeOfModification(dh.getDate());
+    return this;
   }
 
   public PFUserDO getModifiedByUser()
@@ -111,7 +113,7 @@ public class SearchFilter extends BaseSearchFilter
   }
 
   @Override
-  public void reset()
+  public SearchFilter reset()
   {
     super.reset();
     this.searchString = "";
@@ -120,5 +122,6 @@ public class SearchFilter extends BaseSearchFilter
     this.startTimeOfModification = null;
     this.stopTimeOfModification = null;
     this.task = null;
+    return this;
   }
 }

@@ -36,11 +36,12 @@ public class AuftragListFilter extends AuftragFilter
   private static final long serialVersionUID = -6983625672785815596L;
 
   @Override
-  public void reset()
+  public AuftragListFilter reset()
   {
     year = -1;
     searchString = "";
     setAuftragsPositionsArt(null);
     setListType(AuftragFilter.FILTER_ALL);
+    return this;
   }
 }

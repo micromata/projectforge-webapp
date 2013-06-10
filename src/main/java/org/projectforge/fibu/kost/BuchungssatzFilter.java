@@ -54,18 +54,19 @@ public class BuchungssatzFilter extends BaseSearchFilter implements Serializable
   }
 
   @Override
-  public void reset()
+  public BuchungssatzFilter reset()
   {
     super.reset();
     toMonth = fromMonth;
     toYear = fromYear;
+    return this;
   }
 
   /**
    * @param year
    * @param month 0-11
    */
-  public void setFrom(int year, int month)
+  public void setFrom(final int year, final int month)
   {
     this.fromYear = year;
     this.fromMonth = month;
@@ -75,7 +76,7 @@ public class BuchungssatzFilter extends BaseSearchFilter implements Serializable
    * @param year
    * @param month 0-11
    */
-  public void setTo(int year, int month)
+  public void setTo(final int year, final int month)
   {
     this.toYear = year;
     this.toMonth = month;
@@ -86,7 +87,7 @@ public class BuchungssatzFilter extends BaseSearchFilter implements Serializable
     return fromYear;
   }
 
-  public void setFromYear(int fromYear)
+  public void setFromYear(final int fromYear)
   {
     this.fromYear = fromYear;
   }
@@ -99,7 +100,7 @@ public class BuchungssatzFilter extends BaseSearchFilter implements Serializable
     return fromMonth;
   }
 
-  public void setFromMonth(int fromMonth)
+  public void setFromMonth(final int fromMonth)
   {
     this.fromMonth = fromMonth;
   }
@@ -109,7 +110,7 @@ public class BuchungssatzFilter extends BaseSearchFilter implements Serializable
     return toYear;
   }
 
-  public void setToYear(int toYear)
+  public void setToYear(final int toYear)
   {
     this.toYear = toYear;
   }
@@ -122,7 +123,7 @@ public class BuchungssatzFilter extends BaseSearchFilter implements Serializable
     return toMonth;
   }
 
-  public void setToMonth(int toMonth)
+  public void setToMonth(final int toMonth)
   {
     this.toMonth = toMonth;
   }

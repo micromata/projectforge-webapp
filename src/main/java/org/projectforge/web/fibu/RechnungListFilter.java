@@ -36,12 +36,13 @@ public class RechnungListFilter extends RechnungFilter
   private static final long serialVersionUID = -874619598640299510L;
 
   @Override
-  public void reset()
+  public RechnungListFilter reset()
   {
     super.reset();
     year = -1;
     month = -1;
     setShowAll();
     searchString = "";
+    return this;
   }
 }
