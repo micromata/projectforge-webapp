@@ -99,24 +99,22 @@ public class TeamCalImportDao extends HibernateDaoSupport
   }
 
   @SuppressWarnings("unchecked")
-  public void reconcile(final ImportStorage< ? > storage, final String sheetName, final Integer teamCalId)
+  public void reconcile(final ImportStorage< ? > storage, final ImportedSheet<?> sheet, final Integer teamCalId)
   {
     Validate.notNull(storage.getSheets());
-    final ImportedSheet< ? > sheet = storage.getNamedSheet(sheetName);
     Validate.notNull(sheet);
-    reconcile((ImportedSheet<TeamEventDO>) sheet, teamCalId);
+    reconcile((ImportedSheet<TeamEventDO>)sheet, teamCalId);
     sheet.setNumberOfCommittedElements(-1);
   }
 
   @SuppressWarnings("unchecked")
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ)
-  public void commit(final ImportStorage< ? > storage, final String sheetName, final Integer teamCalId)
+  public void commit(final ImportStorage< ? > storage, final ImportedSheet<?> sheet, final Integer teamCalId)
   {
     Validate.notNull(storage.getSheets());
-    final ImportedSheet< ? > sheet = storage.getNamedSheet(sheetName);
     Validate.notNull(sheet);
     Validate.isTrue(sheet.getStatus() == ImportStatus.RECONCILED);
-    final int no = commit((ImportedSheet<TeamEventDO>) sheet, teamCalId);
+    final int no = commit((ImportedSheet<TeamEventDO>)sheet, teamCalId);
     sheet.setNumberOfCommittedElements(no);
     sheet.setStatus(ImportStatus.IMPORTED);
   }

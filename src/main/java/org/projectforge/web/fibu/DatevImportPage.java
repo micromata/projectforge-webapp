@@ -95,19 +95,21 @@ public class DatevImportPage extends AbstractImportPage<DatevImportForm>
   }
 
   @Override
-  protected void reconcile(final String sheetName)
+  protected ImportedSheet< ? > reconcile(final String sheetName)
   {
     checkAccess();
-    super.reconcile(sheetName);
+    final ImportedSheet< ? > sheet = super.reconcile(sheetName);
     datevImportDao.reconcile(getStorage(), sheetName);
+    return sheet;
   }
 
   @Override
-  protected void commit(final String sheetName)
+  protected ImportedSheet< ? > commit(final String sheetName)
   {
     checkAccess();
-    super.commit(sheetName);
+    final ImportedSheet< ? > sheet =  super.commit(sheetName);
     datevImportDao.commit(getStorage(), sheetName);
+    return sheet;
   }
 
   @Override

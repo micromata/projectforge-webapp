@@ -31,19 +31,25 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.form.AjaxSubmitLink;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
+import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.SubmitLink;
+import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.ResourceModel;
 import org.projectforge.common.ImportStatus;
 import org.projectforge.common.ImportStorage;
 import org.projectforge.common.ImportedElement;
 import org.projectforge.common.ImportedSheet;
 import org.projectforge.common.StringHelper;
+import org.projectforge.web.dialog.ModalQuestionDialog;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.PlainLabel;
 import org.projectforge.web.wicket.flowlayout.DiffTextPanel;
@@ -75,6 +81,8 @@ public abstract class AbstractImportStoragePanel<P extends AbstractImportPage< ?
 
   protected ImportFilter filter;
 
+  private final MyModalQuestionDialog commitDialog;
+
   /**
    * @param id
    */
@@ -85,6 +93,9 @@ public abstract class AbstractImportStoragePanel<P extends AbstractImportPage< ?
     this.filter = filter;
     sheetRepeatingView = new RepeatingView("sheetRepeater");
     add(sheetRepeatingView);
+    commitDialog = new MyModalQuestionDialog();
+    parentPage.add(commitDialog);
+    commitDialog.init();
   }
 
   public void refresh()
@@ -195,11 +206,15 @@ public abstract class AbstractImportStoragePanel<P extends AbstractImportPage< ?
         }
       }, getString("common.import.action.reconcile"), getString("common.import.action.reconcile.tooltip"));
     } else if (sheet.isReconciled() == true) {
-      addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
+      addActionLink(actionLinkRepeater, new AjaxSubmitLink("actionLink", parentPage.form) {
+        /**
+         * @see org.apache.wicket.ajax.markup.html.form.AjaxSubmitLink#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget, org.apache.wicket.markup.html.form.Form)
+         */
         @Override
-        public void onSubmit()
+        protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
         {
-          parentPage.commit(sheet.getName());
+          commitDialog.sheetName = sheet.getName();
+          commitDialog.open(target);
         }
       }, getString("common.import.action.commit"), getString("common.import.action.commit.tooltip"));
       addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
@@ -252,12 +267,12 @@ public abstract class AbstractImportStoragePanel<P extends AbstractImportPage< ?
   {
   }
 
-  protected void addActionLink(final RepeatingView actionLinkRepeater, final SubmitLink link, final String label)
+  protected void addActionLink(final RepeatingView actionLinkRepeater, final AbstractLink link, final String label)
   {
     addActionLink(actionLinkRepeater, link, label, null);
   }
 
-  protected void addActionLink(final RepeatingView actionLinkRepeater, final SubmitLink link, final String labelText, final String tooltip)
+  protected void addActionLink(final RepeatingView actionLinkRepeater, final AbstractLink link, final String labelText, final String tooltip)
   {
     final WebMarkupContainer actionLinkContainer = new WebMarkupContainer(actionLinkRepeater.newChildId());
     actionLinkRepeater.add(actionLinkContainer);
@@ -393,4 +408,30 @@ public abstract class AbstractImportStoragePanel<P extends AbstractImportPage< ?
       return addCell(cellRepeater, String.valueOf(value), style);
     }
   }
+
+  @SuppressWarnings("serial")
+  private class MyModalQuestionDialog extends ModalQuestionDialog
+  {
+    String sheetName;
+
+    MyModalQuestionDialog()
+    {
+      super(parentPage.newModalDialogId(), new ResourceModel("common.import.commitQuestionDialog.heading"), new ResourceModel(
+          "common.import.commitQuestionDialog.question"));
+    }
+
+    /**
+     * @see org.projectforge.web.dialog.ModalQuestionDialog#onCloseButtonSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
+     */
+    @Override
+    protected boolean onCloseButtonSubmit(final AjaxRequestTarget target)
+    {
+      super.onCloseButtonSubmit(target);
+      if (isConfirmed() == true) {
+        parentPage.commit(sheetName);
+        setResponsePage(parentPage);
+      }
+      return true;
+    }
+  };
 }

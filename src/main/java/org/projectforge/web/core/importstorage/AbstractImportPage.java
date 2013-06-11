@@ -30,7 +30,7 @@ import org.projectforge.common.ImportedSheet;
 import org.projectforge.core.ActionLog;
 import org.projectforge.web.wicket.AbstractStandardFormPage;
 
-public abstract class AbstractImportPage<F extends AbstractImportForm< ? , ?, ? >> extends AbstractStandardFormPage
+public abstract class AbstractImportPage<F extends AbstractImportForm< ? , ? , ? >> extends AbstractStandardFormPage
 {
   private static final long serialVersionUID = -7206460665473795739L;
 
@@ -56,20 +56,32 @@ public abstract class AbstractImportPage<F extends AbstractImportForm< ? , ?, ? 
     removeUserPrefEntry(getStorageKey());
   }
 
-  protected void reconcile(final String sheetName)
+  protected ImportedSheet<?> reconcile(final String sheetName)
   {
     if (form.getStorage() == null) {
       log.error("Reconcile called without storage.");
-      return;
+      return null;
     }
+    final ImportedSheet<?>sheet = form.getStorage().getNamedSheet(sheetName);
+    if (sheet == null) {
+      log.error("Reconcile called without finding sheet: '"
+          + sheetName + "'.");
+    }
+    return sheet;
   }
 
-  protected void commit(final String sheetName)
+  protected ImportedSheet<?>  commit(final String sheetName)
   {
     if (form.getStorage() == null) {
       log.error("Commit called without storage.");
-      return;
+      return null;
     }
+    final ImportedSheet<?>sheet = form.getStorage().getNamedSheet(sheetName);
+    if (sheet == null) {
+      log.error("Commit called without finding sheet: '"
+          + sheetName + "'.");
+    }
+    return sheet;
   }
 
   protected void selectAll(final String sheetName)
