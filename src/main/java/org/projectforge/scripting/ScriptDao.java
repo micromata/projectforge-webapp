@@ -115,7 +115,7 @@ public class ScriptDao extends BaseDao<ScriptDO>
     String scriptContent = script.getScriptAsString();
     if (scriptContent.contains("import org.projectforge.export") == true) {
       // Package was renamed in version 5.2:
-      scriptContent = scriptContent.replace("import org.projectforge.export", "import org.projectforge.excel");
+      scriptContent = scriptContent.replace("import org.projectforge.export", "import org.projectforge.export.*\nimport org.projectforge.excel");
     }
     groovyResult = groovyExecutor.execute(new GroovyResult(), scriptContent, scriptVariables);
     return groovyResult;
