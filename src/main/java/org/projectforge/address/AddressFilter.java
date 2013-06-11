@@ -34,6 +34,14 @@ import org.projectforge.core.BaseSearchFilter;
  */
 public class AddressFilter extends BaseSearchFilter implements Serializable
 {
+  public static final String FILTER_DOUBLETS = "doublets";
+
+  public static final String FILTER_FILTER = "filter";
+
+  public static final String FILTER_MY_FAVORITES = "myFavorites";
+
+  public static final String FILTER_NEWEST = "newest";
+
   private static final long serialVersionUID = -4397408137924906520L;
 
   private boolean uptodate = true;
@@ -52,15 +60,7 @@ public class AddressFilter extends BaseSearchFilter implements Serializable
 
   private boolean departed = false;
 
-  // Needs to migrate the user preferences before removing.
-  @Deprecated
-  private boolean myFavorites;
-
-  // Needs to migrate the user preferences before removing.
-  @Deprecated
-  private boolean newest;
-
-  private String listType = "filter";
+  private String listType = FILTER_FILTER;
 
   public AddressFilter()
   {
@@ -164,12 +164,12 @@ public class AddressFilter extends BaseSearchFilter implements Serializable
    */
   public boolean isFilter()
   {
-    return "filter".equals(listType);
+    return FILTER_FILTER.equals(listType);
   }
 
   public void setFilter()
   {
-    listType = "filter";
+    listType = FILTER_FILTER;
   }
 
   /**
@@ -179,12 +179,26 @@ public class AddressFilter extends BaseSearchFilter implements Serializable
    */
   public boolean isMyFavorites()
   {
-    return "myFavorites".equals(listType);
+    return FILTER_MY_FAVORITES.equals(listType);
   }
 
   public void setMyFavorites()
   {
-    listType = "myFavorites";
+    listType = FILTER_MY_FAVORITES;
+  }
+
+  /**
+   * If set, only addresses are filtered which are doublets (name and first-name are equal).
+   * @return
+   */
+  public boolean isDoublets()
+  {
+    return FILTER_DOUBLETS.equals(listType);
+  }
+
+  public void setDoublets()
+  {
+    listType = FILTER_DOUBLETS;
   }
 
   /**
@@ -193,12 +207,12 @@ public class AddressFilter extends BaseSearchFilter implements Serializable
    */
   public boolean isNewest()
   {
-    return "newest".equals(listType);
+    return FILTER_NEWEST.equals(listType);
   }
 
   public void setNewest()
   {
-    listType = "newest";
+    listType = FILTER_NEWEST;
   }
 
   public String getListType()
