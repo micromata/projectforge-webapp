@@ -65,6 +65,9 @@ public class LiquidityEntryDO extends DefaultBaseDO
   @Field(index = Index.UN_TOKENIZED)
   private BigDecimal amount;
 
+  @Field(index = Index.UN_TOKENIZED)
+  private boolean payed;
+
   @Column(length = Constants.LENGTH_TITLE)
   public String getSubject()
   {
@@ -112,6 +115,25 @@ public class LiquidityEntryDO extends DefaultBaseDO
   public LiquidityEntryDO setAmount(final BigDecimal amount)
   {
     this.amount = amount;
+    return this;
+  }
+
+  /**
+   * @return the payed
+   */
+  @Column
+  public boolean isPayed()
+  {
+    return payed;
+  }
+
+  /**
+   * @param payed the payed to set
+   * @return this for chaining.
+   */
+  public LiquidityEntryDO setPayed(final boolean payed)
+  {
+    this.payed = payed;
     return this;
   }
 

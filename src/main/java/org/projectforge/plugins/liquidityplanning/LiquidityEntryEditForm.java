@@ -83,10 +83,15 @@ public class LiquidityEntryEditForm extends AbstractEditForm<LiquidityEntryDO, L
           return new CurrencyConverter();
         }
       };
+      WicketUtils.setSize(amount, 8);
       fs.add(amount);
       if (isNew() == false) {
         amount.add(WicketUtils.setFocus());
       }
+    }
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.status.bezahlt"));
+      fs.addCheckBox(new PropertyModel<Boolean>(data, "payed"), null);
     }
     {
       // Subject
