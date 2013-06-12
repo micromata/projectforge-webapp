@@ -77,7 +77,7 @@ public class RestUserFilter implements Filter
     if (WebConfiguration.isUpAndRunning() == false) {
       log.error("System isn't up and running, rest call denied. The system is may-be in start-up phase or in maintenance mode.");
       final HttpServletResponse resp = (HttpServletResponse) response;
-      resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+      resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
       return;
     }
     final HttpServletRequest req = (HttpServletRequest) request;
