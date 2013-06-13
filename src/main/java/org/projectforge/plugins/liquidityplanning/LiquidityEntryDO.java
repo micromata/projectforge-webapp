@@ -28,8 +28,6 @@ import java.sql.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
 import org.hibernate.search.annotations.DateBridge;
@@ -38,7 +36,6 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
-import org.projectforge.common.RecurrenceFrequency;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.database.Constants;
 
@@ -59,19 +56,17 @@ public class LiquidityEntryDO extends DefaultBaseDO
   private String subject;
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
-  private String description;
-
-  @Field(index = Index.TOKENIZED, store = Store.NO)
   private String comment;
 
   @Field(index = Index.UN_TOKENIZED)
   @DateBridge(resolution = Resolution.DAY)
-  private Date dueDate;
+  private Date dateOfPayment;
 
   @Field(index = Index.UN_TOKENIZED)
-  private BigDecimal ammount;
+  private BigDecimal amount;
 
-  private RecurrenceFrequency recurranceInterval;
+  @Field(index = Index.UN_TOKENIZED)
+  private boolean payed;
 
   @Column(length = Constants.LENGTH_TITLE)
   public String getSubject()
@@ -89,69 +84,68 @@ public class LiquidityEntryDO extends DefaultBaseDO
     return this;
   }
 
-  @Enumerated(EnumType.STRING)
-  @Column(length = 20)
-  public RecurrenceFrequency getRecurranceInterval()
+  /**
+   * @return the dateOfPayment
+   */
+  @Column(name = "date_of_payment")
+  public Date getDateOfPayment()
   {
-    return recurranceInterval;
+    return dateOfPayment;
   }
 
   /**
    * @return this for chaining.
    */
-  public LiquidityEntryDO setRecurranceInterval(final RecurrenceFrequency recurranceInterval)
+  /**
+   * @param dateOfPayment the dateOfPayment to set
+   * @return this for chaining.
+   */
+  public LiquidityEntryDO setDateOfPayment(final Date dateOfPayment)
   {
-    this.recurranceInterval = recurranceInterval;
+    this.dateOfPayment = dateOfPayment;
     return this;
   }
 
-  @Column(name = "due_date")
-  public Date getDueDate()
+  @Column(scale = 2, precision = 12)
+  public BigDecimal getAmount()
   {
-    return dueDate;
+    return amount;
+  }
+
+  public LiquidityEntryDO setAmount(final BigDecimal amount)
+  {
+    this.amount = amount;
+    return this;
   }
 
   /**
+   * @return the payed
+   */
+  @Column
+  public boolean isPayed()
+  {
+    return payed;
+  }
+
+  /**
+   * @param payed the payed to set
    * @return this for chaining.
    */
-  public LiquidityEntryDO setDueDate(final Date dueDate)
+  public LiquidityEntryDO setPayed(final boolean payed)
   {
-    this.dueDate = dueDate;
+    this.payed = payed;
     return this;
   }
 
-  public BigDecimal getAmmount()
-  {
-    return ammount;
-  }
-
-  public LiquidityEntryDO setAmmount(final BigDecimal ammount)
-  {
-    this.ammount = ammount;
-    return this;
-  }
-
+  @Column(length = Constants.LENGTH_TEXT)
   public String getComment()
   {
     return comment;
   }
 
-  @Column(length = Constants.LENGTH_TEXT)
   public LiquidityEntryDO setComment(final String comment)
   {
     this.comment = comment;
-    return this;
-  }
-
-  public String getDescription()
-  {
-    return description;
-  }
-
-  @Column(length = Constants.LENGTH_TEXT)
-  public LiquidityEntryDO setDescription(final String description)
-  {
-    this.description = description;
     return this;
   }
 }

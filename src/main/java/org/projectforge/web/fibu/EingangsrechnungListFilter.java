@@ -38,23 +38,26 @@ public class EingangsrechnungListFilter extends RechnungFilter
   /**
    * Zeige Fehlbeträge in der Liste.
    */
+  @Override
   public boolean isShowKostZuweisungStatus()
   {
     return showKostZuweisungStatus;
   }
 
-  public void setShowKostZuweisungStatus(boolean showKostZuweisungStatus)
+  @Override
+  public void setShowKostZuweisungStatus(final boolean showKostZuweisungStatus)
   {
     this.showKostZuweisungStatus = showKostZuweisungStatus;
   }
 
   @Override
-  public void reset()
+  public EingangsrechnungListFilter reset()
   {
     super.reset();
     year = -1;
     month = -1;
     setShowAll();
     searchString = "";
+    return this;
   }
 }

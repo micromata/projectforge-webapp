@@ -34,6 +34,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.MDC;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.rest.Authentication;
 import org.projectforge.user.PFUserContext;
@@ -76,7 +77,7 @@ public class RestUserFilter implements Filter
     if (WebConfiguration.isUpAndRunning() == false) {
       log.error("System isn't up and running, rest call denied. The system is may-be in start-up phase or in maintenance mode.");
       final HttpServletResponse resp = (HttpServletResponse) response;
-      resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+      resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
       return;
     }
     final HttpServletRequest req = (HttpServletRequest) request;
@@ -134,14 +135,25 @@ public class RestUserFilter implements Filter
         log.fatal("Exception encountered while Thread.sleep(1000): " + ex, ex);
       }
       final HttpServletResponse resp = (HttpServletResponse) response;
-      resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+      resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
       return;
     }
     try {
       PFUserContext.setUser(user);
+      final String ip = request.getRemoteAddr();
+      if (ip != null) {
+        MDC.put("ip", ip);
+      } else {
+        // Only null in test case:
+        MDC.put("ip", "unknown");
+      }
+      MDC.put("user", user.getUsername());
+      log.info("Rest-call: " + ((HttpServletRequest)request).getRequestURI());
       chain.doFilter(request, response);
     } finally {
       PFUserContext.setUser(null);
+      MDC.remove("ip");
+      MDC.remove("user");
     }
   }
 

@@ -112,7 +112,7 @@ public class CreateI18nKeys
 
   private void parseHtml(final Map<String, Set<String>> i18nKeyUsage) throws IOException
   {
-    final Collection<File> files = listFiles(PATH + "resources/wa", "html");
+    final Collection<File> files = listFiles(PATH + "java", "html");
     for (final File file : files) {
       final String content = getContent(file);
       find(file, i18nKeyUsage, content, "<wicket:message\\s+key=\"([a-zA-Z0-9\\.]+)\"\\s/>");

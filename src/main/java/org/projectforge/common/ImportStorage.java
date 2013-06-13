@@ -54,7 +54,7 @@ public class ImportStorage<T> implements Serializable
   {
   }
 
-  public ImportStorage(Object id)
+  public ImportStorage(final Object id)
   {
     this.id = id;
   }
@@ -68,7 +68,7 @@ public class ImportStorage<T> implements Serializable
     return sheets;
   }
 
-  public void addSheet(ImportedSheet<T> sheet)
+  public void addSheet(final ImportedSheet<T> sheet)
   {
     Validate.notNull(sheet);
     if (sheets == null) {
@@ -77,12 +77,12 @@ public class ImportStorage<T> implements Serializable
     sheets.add(sheet);
   }
 
-  public ImportedSheet<T> getNamedSheet(String name)
+  public ImportedSheet<T> getNamedSheet(final String name)
   {
     if (CollectionUtils.isEmpty(sheets) == true) {
       return null;
     }
-    for (ImportedSheet<T> sheet : sheets) {
+    for (final ImportedSheet<T> sheet : sheets) {
       if (name.equals(sheet.getName()) == true) {
         return sheet;
       }
@@ -90,9 +90,9 @@ public class ImportStorage<T> implements Serializable
     return null;
   }
 
-  public void setSheetOpen(String name, boolean open)
+  public void setSheetOpen(final String name, final boolean open)
   {
-    ImportedSheet<T> sheet = getNamedSheet(name);
+    final ImportedSheet<T> sheet = getNamedSheet(name);
     if (sheet != null) {
       sheet.setOpen(open);
     } else {
@@ -109,7 +109,7 @@ public class ImportStorage<T> implements Serializable
     return filename;
   }
 
-  public void setFilename(String filename)
+  public void setFilename(final String filename)
   {
     this.filename = filename;
   }
@@ -123,14 +123,14 @@ public class ImportStorage<T> implements Serializable
   }
 
   /**
-   * Each entry in the sheets (ImportedElements) of the storage should have an unique identifier. Use-age: new ImportedElement<Xxx>(storage.nextVal(),
-   * Xxx.class, ...); Returns the next integer.
+   * Each entry in the sheets (ImportedElements) of the storage should have an unique identifier. Use-age: new
+   * ImportedElement<Xxx>(storage.nextVal(), Xxx.class, ...); Returns the next integer.
    */
   public synchronized int nextVal()
   {
     return sequence++;
   }
-  
+
   /**
    * @return the last int given by nextVal without incrementing the underlaying sequencer.
    */

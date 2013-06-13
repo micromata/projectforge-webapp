@@ -38,14 +38,15 @@ public class HRPlanningListFilter extends HRPlanningFilter
   private static final long serialVersionUID = 7278847635662477100L;
 
   @Override
-  public void reset()
+  public HRPlanningListFilter reset()
   {
     super.reset();
     setUserId(PFUserContext.getUserId());
-    DateHolder date = new DateHolder(DatePrecision.DAY);
+    final DateHolder date = new DateHolder(DatePrecision.DAY);
     date.setBeginOfWeek();
     setStartTime(date.getTimestamp());
     date.setEndOfWeek();
     setStopTime(date.getTimestamp());
+    return this;
   }
 }

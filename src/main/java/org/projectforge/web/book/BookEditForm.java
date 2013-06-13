@@ -244,14 +244,14 @@ public class BookEditForm extends AbstractEditForm<BookDO, BookEditPage>
           {
             parentPage.lendOut();
           }
-        }, getString("book.lendOut"), SingleButtonPanel.GREY));
+        }, getString("book.lendOut"), SingleButtonPanel.NORMAL));
         fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("returnBook")) {
           @Override
           public final void onSubmit()
           {
             parentPage.returnBook();
           }
-        }, getString("book.returnBook"), SingleButtonPanel.RED) {
+        }, getString("book.returnBook"), SingleButtonPanel.DANGER) {
           /**
            * @see org.apache.wicket.Component#isVisible()
            */

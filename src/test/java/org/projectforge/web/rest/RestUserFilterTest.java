@@ -57,7 +57,7 @@ public class RestUserFilterTest
     when(userDao.getCachedAuthenticationToken(Mockito.eq(2))).thenReturn("token");
     final UserGroupCache userGroupCache = mock(UserGroupCache.class);
     when(userDao.getUserGroupCache()).thenReturn(userGroupCache);
-    when(userGroupCache.getUser(Mockito.eq(2))).thenReturn(new PFUserDO());
+    when(userGroupCache.getUser(Mockito.eq(2))).thenReturn(new PFUserDO().setUsername("testuser"));
     final RestUserFilter filter = new RestUserFilter();
     filter.userDao = userDao;
 

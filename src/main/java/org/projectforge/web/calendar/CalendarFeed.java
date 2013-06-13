@@ -67,6 +67,7 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRights;
+import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.timesheet.TimesheetEventsProvider;
 
 /**
@@ -148,6 +149,11 @@ public class CalendarFeed extends HttpServlet
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException
   {
+    if (WebConfiguration.isUpAndRunning() == false) {
+      log.error("System isn't up and running, CalendarFeed call denied. The system is may-be in start-up phase or in maintenance mode.");
+      resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+      return;
+    }
     PFUserDO user = null;
     String logMessage = null;
     try {

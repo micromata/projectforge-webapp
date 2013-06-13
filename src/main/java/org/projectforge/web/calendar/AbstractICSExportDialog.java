@@ -102,7 +102,7 @@ public abstract class AbstractICSExportDialog extends ModalDialog
         target.appendJavaScript("setTimeout(\"window.location.href='" + WicketUtils.getAbsoluteContextPath() + getUrl() + "'\", 100);");
         close(target);
       }
-    }, getString("download"), SingleButtonPanel.GREY);
+    }, getString("download"), SingleButtonPanel.NORMAL);
     init(new Form<String>(getFormId()));
   }
 }

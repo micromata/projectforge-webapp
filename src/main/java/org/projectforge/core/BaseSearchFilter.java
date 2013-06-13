@@ -60,6 +60,8 @@ public class BaseSearchFilter implements Serializable
 
   protected Date stopTimeOfModification;
 
+  protected Date modifiedSince;
+
   private boolean searchHistory;
 
   private String errorMessage;
@@ -91,12 +93,16 @@ public class BaseSearchFilter implements Serializable
     this.searchHistory = filter.searchHistory;
   }
 
-  public void reset()
+  /**
+   * @return this for chaining.
+   */
+  public BaseSearchFilter reset()
   {
     deleted = false;
     ignoreDeleted = false;
     searchString = "";
     searchHistory = false;
+    return this;
   }
 
   public boolean isSearchNotEmpty()
@@ -109,14 +115,24 @@ public class BaseSearchFilter implements Serializable
     return searchString;
   }
 
-  public void setSearchString(final String searchString)
+  /**
+   * @param searchString
+   * @return this for chaining.
+   */
+  public BaseSearchFilter setSearchString(final String searchString)
   {
     this.searchString = searchString;
+    return this;
   }
 
-  public void setSearchFields(final String... searchFields)
+  /**
+   * @param searchFields
+   * @return this for chaining.
+   */
+  public BaseSearchFilter setSearchFields(final String... searchFields)
   {
     this.searchFields = searchFields;
+    return this;
   }
 
   /**
@@ -130,6 +146,26 @@ public class BaseSearchFilter implements Serializable
   }
 
   /**
+   * If given {@link BaseDao#getList(BaseSearchFilter)} will only search for entries which last date of modification
+   * {@link AbstractBaseDO#getLastUpdate()} isn't before given date.
+   * @return the modifiedSince
+   */
+  public Date getModifiedSince()
+  {
+    return modifiedSince;
+  }
+
+  /**
+   * @param modifiedSince the modifiedSince to set
+   * @return this for chaining.
+   */
+  public BaseSearchFilter setModifiedSince(final Date modifiedSince)
+  {
+    this.modifiedSince = modifiedSince;
+    return this;
+  }
+
+  /**
    * If true then modifiedByUser and time of last modification is used for filtering.
    * @return
    */
@@ -138,9 +174,14 @@ public class BaseSearchFilter implements Serializable
     return useModificationFilter;
   }
 
-  public void setUseModificationFilter(final boolean useModificationFilter)
+  /**
+   * @param useModificationFilter
+   * @return this for chaining.
+   */
+  public BaseSearchFilter setUseModificationFilter(final boolean useModificationFilter)
   {
     this.useModificationFilter = useModificationFilter;
+    return this;
   }
 
   public Integer getModifiedByUserId()
@@ -148,9 +189,14 @@ public class BaseSearchFilter implements Serializable
     return modifiedByUserId;
   }
 
-  public void setModifiedByUserId(final Integer modifiedByUserId)
+  /**
+   * @param modifiedByUserId
+   * @return this for chaining.
+   */
+  public BaseSearchFilter setModifiedByUserId(final Integer modifiedByUserId)
   {
     this.modifiedByUserId = modifiedByUserId;
+    return this;
   }
 
   public Date getStartTimeOfModification()
@@ -158,9 +204,14 @@ public class BaseSearchFilter implements Serializable
     return startTimeOfModification;
   }
 
-  public void setStartTimeOfModification(final Date startTimeOfModification)
+  /**
+   * @param startTimeOfModification
+   * @return this for chaining.
+   */
+  public BaseSearchFilter setStartTimeOfModification(final Date startTimeOfModification)
   {
     this.startTimeOfModification = startTimeOfModification;
+    return this;
   }
 
   public Date getStopTimeOfModification()
@@ -168,9 +219,14 @@ public class BaseSearchFilter implements Serializable
     return stopTimeOfModification;
   }
 
-  public void setStopTimeOfModification(final Date stopTimeOfModification)
+  /**
+   * @param stopTimeOfModification
+   * @return this for chaining.
+   */
+  public BaseSearchFilter setStopTimeOfModification(final Date stopTimeOfModification)
   {
     this.stopTimeOfModification = stopTimeOfModification;
+    return this;
   }
 
   /**
@@ -186,9 +242,10 @@ public class BaseSearchFilter implements Serializable
    * @param searchHistory the searchHistory to set
    * @return this for chaining.
    */
-  public void setSearchHistory(final boolean searchHistory)
+  public BaseSearchFilter setSearchHistory(final boolean searchHistory)
   {
     this.searchHistory = searchHistory;
+    return this;
   }
 
   /**
@@ -199,9 +256,14 @@ public class BaseSearchFilter implements Serializable
     return ignoreDeleted;
   }
 
-  public void setIgnoreDeleted(final boolean ignoreDeleted)
+  /**
+   * @param ignoreDeleted
+   * @return this for chaining.
+   */
+  public BaseSearchFilter setIgnoreDeleted(final boolean ignoreDeleted)
   {
     this.ignoreDeleted = ignoreDeleted;
+    return this;
   }
 
   /**
@@ -212,9 +274,14 @@ public class BaseSearchFilter implements Serializable
     return deleted;
   }
 
-  public void setDeleted(final boolean deleted)
+  /**
+   * @param deleted
+   * @return this for chaining.
+   */
+  public BaseSearchFilter setDeleted(final boolean deleted)
   {
     this.deleted = deleted;
+    return this;
   }
 
   /**
@@ -226,9 +293,14 @@ public class BaseSearchFilter implements Serializable
     return maxRows;
   }
 
-  public void setMaxRows(final int maxRows)
+  /**
+   * @param maxRows
+   * @return this for chaining.
+   */
+  public BaseSearchFilter setMaxRows(final int maxRows)
   {
     this.maxRows = maxRows;
+    return this;
   }
 
   /**
@@ -240,9 +312,14 @@ public class BaseSearchFilter implements Serializable
     return errorMessage;
   }
 
-  public void setErrorMessage(final String errorMessage)
+  /**
+   * @param errorMessage
+   * @return this for chaining.
+   */
+  public BaseSearchFilter setErrorMessage(final String errorMessage)
   {
     this.errorMessage = errorMessage;
+    return this;
   }
 
   public boolean hasErrorMessage()
@@ -250,8 +327,12 @@ public class BaseSearchFilter implements Serializable
     return StringUtils.isNotEmpty(errorMessage);
   }
 
-  public void clearErrorMessage()
+  /**
+   * @return this for chaining.
+   */
+  public BaseSearchFilter clearErrorMessage()
   {
     this.errorMessage = null;
+    return this;
   }
 }

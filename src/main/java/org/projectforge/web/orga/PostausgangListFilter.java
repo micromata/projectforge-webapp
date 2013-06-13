@@ -36,9 +36,10 @@ public class PostausgangListFilter extends PostFilter
   private static final long serialVersionUID = -2474293005503636313L;
 
   @Override
-  public void reset()
+  public PostausgangListFilter reset()
   {
     super.reset();
     this.searchString = "";
+    return this;
   }
 }

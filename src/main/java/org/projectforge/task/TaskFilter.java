@@ -90,9 +90,10 @@ public class TaskFilter extends BaseSearchFilter
   }
 
   @Override
-  public void setDeleted(final boolean deleted)
+  public TaskFilter setDeleted(final boolean deleted)
   {
     this.deleted = deleted;
+    return this;
   }
 
   public boolean isNotOpened()
@@ -116,12 +117,13 @@ public class TaskFilter extends BaseSearchFilter
   }
 
   @Override
-  public void reset()
+  public TaskFilter reset()
   {
     super.reset();
     notOpened = opened = true;
     closed = deleted = false;
     searchString = "";
+    return this;
   }
 
   public void resetMatch()

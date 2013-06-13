@@ -461,6 +461,12 @@
         </includes>
       </resource>
       <resource>
+        <directory>src/main/groovy</directory>
+        <includes>
+          <include>**/*.groovy</include>
+        </includes>
+      </resource>
+      <resource>
         <directory>src/main/resources</directory>
         <includes>
           <include>keystore</include>

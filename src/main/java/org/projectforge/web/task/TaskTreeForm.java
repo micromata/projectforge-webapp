@@ -131,7 +131,7 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
         }
       };
 
-      listViewButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), listViewButton, getString("listView"), SingleButtonPanel.GREY);
+      listViewButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), listViewButton, getString("listView"), SingleButtonPanel.NORMAL);
       actionButtons.add(listViewButtonPanel);
     }
     {

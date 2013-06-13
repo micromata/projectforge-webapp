@@ -32,7 +32,7 @@ public class AddressListFilter extends AddressFilter
   private static final long serialVersionUID = -2433725695846528675L;
 
   @Override
-  public void reset()
+  public AddressListFilter reset()
   {
     super.reset();
     setUptodate(true);
@@ -45,5 +45,6 @@ public class AddressListFilter extends AddressFilter
     setUninteresting(false);
     setPersonaIngrata(false);
     setDeparted(false);
+    return this;
   }
 }

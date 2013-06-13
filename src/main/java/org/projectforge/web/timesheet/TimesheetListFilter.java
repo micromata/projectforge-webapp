@@ -35,14 +35,15 @@ public class TimesheetListFilter extends TimesheetFilter
   private static final long serialVersionUID = -7685135320311389741L;
 
   @Override
-  public void reset()
+  public TimesheetListFilter reset()
   {
     super.reset();
     setUserId(PFUserContext.getUserId());
-    DateHolder date = new DateHolder(DatePrecision.DAY);
+    final DateHolder date = new DateHolder(DatePrecision.DAY);
     date.setBeginOfWeek();
     setStartTime(date.getTimestamp());
     date.setEndOfWeek();
     setStopTime(date.getTimestamp());
+    return this;
   }
 }

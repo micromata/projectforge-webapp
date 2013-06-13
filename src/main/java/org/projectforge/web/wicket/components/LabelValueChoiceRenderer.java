@@ -33,6 +33,7 @@ import java.util.Map;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.projectforge.common.ILabelValueBean;
+import org.projectforge.core.BaseDO;
 import org.projectforge.core.I18nEnum;
 
 /**
@@ -165,7 +166,13 @@ public class LabelValueChoiceRenderer<T> implements IChoiceRenderer<T>
 
   public String getIdValue(final T object, final int index)
   {
-    return object != null ? object.toString() : "";
+    if (object == null) {
+      return "";
+    }
+    if (object instanceof BaseDO) {
+      return String.valueOf(((BaseDO<?>)object).getId());
+    }
+    return object.toString();
   }
 
 }

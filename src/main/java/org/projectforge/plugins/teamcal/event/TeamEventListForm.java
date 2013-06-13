@@ -127,7 +127,7 @@ public class TeamEventListForm extends AbstractListForm<TeamEventFilter, TeamEve
           final Collection<TeamCalDO> assignedItems = TeamCalCache.getInstance().getAllAccessibleCalendars();
           calendarsListHelper.setAssignedItems(assignedItems);
         }
-      }, getString("selectAll"), SingleButtonPanel.GREY));
+      }, getString("selectAll"), SingleButtonPanel.NORMAL));
       fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("own")) {
         @Override
         public final void onSubmit()
@@ -135,7 +135,7 @@ public class TeamEventListForm extends AbstractListForm<TeamEventFilter, TeamEve
           final Collection<TeamCalDO> assignedItems = TeamCalCache.getInstance().getAllOwnCalendars();
           calendarsListHelper.setAssignedItems(assignedItems);
         }
-      }, getString("plugins.teamcal.own"), SingleButtonPanel.GREY));
+      }, getString("plugins.teamcal.own"), SingleButtonPanel.NORMAL));
     }
   }
 

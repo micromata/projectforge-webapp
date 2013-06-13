@@ -42,7 +42,7 @@ public abstract class ListAndEditPagesTestBase extends WicketPageTestBase
 
   protected final String KEY_LISTPAGE_SEARCH_INPUT_FIELD = "searchFilter";
 
-  protected final String PATH_CONTENT_MENU_REPEATER = "body:menuBar:repeater";
+  protected final String PATH_CONTENT_MENU_REPEATER = "body:breadcrumb:menuBar:repeater";
 
   protected final String PATH_EDITPAGE_FORM = "body:form";
 

@@ -88,9 +88,10 @@ public class AddressListForm extends AbstractListForm<AddressListFilter, Address
         }
       };
       radioGroupPanel.add(radioGroup);
-      radioGroup.add(new Model<String>("filter"), parentPage.getString("filter"));
-      radioGroup.add(new Model<String>("newest"), parentPage.getString("filter.newest"));
-      radioGroup.add(new Model<String>("myFavorites"), parentPage.getString("address.filter.myFavorites"));
+      radioGroup.add(new Model<String>(AddressFilter.FILTER_FILTER), parentPage.getString("filter"));
+      radioGroup.add(new Model<String>(AddressFilter.FILTER_NEWEST), parentPage.getString("filter.newest"));
+      radioGroup.add(new Model<String>(AddressFilter.FILTER_MY_FAVORITES), parentPage.getString("address.filter.myFavorites"));
+      radioGroup.add(new Model<String>(AddressFilter.FILTER_DOUBLETS), parentPage.getString("address.filter.doublets"));
     }
 
   }

@@ -28,6 +28,7 @@ import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.plugins.teamcal.event.TeamEventListPage;
+import org.projectforge.plugins.teamcal.event.importics.TeamCalImportPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredBasePage;
 import org.projectforge.web.wicket.EditPage;
@@ -63,15 +64,30 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
   {
     if (isNew() == false) {
       final Integer id = form.getData().getId();
-      final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+      ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
         @Override
         public void onClick()
         {
-          final TeamEventListPage teamEventListPage = new TeamEventListPage(new PageParameters().add(TeamEventListPage.PARAM_CALENDARS, String.valueOf(id)));
+          final TeamEventListPage teamEventListPage = new TeamEventListPage(new PageParameters().add(TeamEventListPage.PARAM_CALENDARS,
+              String.valueOf(id)));
           setResponsePage(teamEventListPage);
         };
       }, getString("plugins.teamcal.events"));
       addContentMenuEntry(menu);
+      final TeamCalRight right = new TeamCalRight();
+      if (isNew() == true || right.hasFullAccess(getData(), getUserId()) == true && getData().isExternalSubscription() == false) {
+        menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+          @Override
+          public void onClick()
+          {
+            final PageParameters parameters = new PageParameters().add(TeamCalImportPage.PARAM_KEY_TEAM_CAL_ID, getData().getId());
+            final TeamCalImportPage importPage = new TeamCalImportPage(parameters);
+            importPage.setReturnToPage(TeamCalEditPage.this);
+            setResponsePage(importPage);
+          };
+        }, getString("import")).setTooltip(getString("plugins.teamcal.import.ics.tooltip"));
+        addContentMenuEntry(menu);
+      }
     }
   }
 

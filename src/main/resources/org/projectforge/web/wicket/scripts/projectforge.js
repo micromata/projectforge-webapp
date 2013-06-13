@@ -606,14 +606,28 @@ function pf_deleteClick(element, content, liElement) {
 		// fetch file object
 		var files = e.originalEvent.target.files
 				|| e.originalEvent.dataTransfer.files;
-		if (files == null || files.length != 1) {
+		if (files == null) {
+			console.log("*** Files are null!");
+			return;
+		}
+		if (files.length != 1) {
+			console.log("*** Number of files is " + files.length + ", but 1 is expected!");
 			// TODO ju: error handling
 			return;
 		}
 		var file = files[0];
-		if (file == null || file.size > 204800 || file.type != "text/calendar") {
-			/* 200 kbyte max */
+		if (file == null) {
+			console.log("*** File is null!");
+			return;
+		}
+		if (file.size > 1048576) {
+			/* 1 mbyte max */
+			console.log("*** File is to big: " + file.size + " > 1MB.");
+			return;
+		}
+		if (file.type != "text/calendar") {
 			// TODO ju: error handling
+			console.log("*** File of type '" + file.type + "' not supported. 'text/calendar' expected instead.");
 			return;
 		}
 		try {

@@ -100,7 +100,7 @@ public class ScriptingForm extends AbstractStandardForm<ScriptDO, ScriptingPage>
           parentPage.upload();
         }
       };
-      fs.add(new SingleButtonPanel(fs.newChildId(), uploadButton, getString("upload"), SingleButtonPanel.GREY));
+      fs.add(new SingleButtonPanel(fs.newChildId(), uploadButton, getString("upload"), SingleButtonPanel.NORMAL));
     }
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.groovyScript"));

@@ -23,16 +23,13 @@
 
 package org.projectforge.plugins.teamcal.integration;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.Uid;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
@@ -50,7 +47,7 @@ import org.projectforge.plugins.teamcal.event.TeamEventEditPage;
 import org.projectforge.plugins.teamcal.event.TeamEventListPage;
 import org.projectforge.plugins.teamcal.event.TeamEventUtils;
 import org.projectforge.plugins.teamcal.event.importics.DropIcsPanel;
-import org.projectforge.web.calendar.CalendarFeed;
+import org.projectforge.plugins.teamcal.event.importics.TeamCalImportPage;
 import org.projectforge.web.calendar.CalendarForm;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.calendar.CalendarPageSupport;
@@ -179,30 +176,14 @@ public class TeamCalCalendarForm extends CalendarForm
         @Override
         protected void onIcsImport(final AjaxRequestTarget target, final Calendar calendar)
         {
-          @SuppressWarnings("unchecked")
-          final List<Component> list = calendar.getComponents(Component.VEVENT);
-          if (list == null || list.size() == 0) {
-            errorDialog.setMessage(getString("plugins.teamcal.import.ics.noEventsGiven")).open(target);
-            return;
-          }
-
-          // Temporary not used, because multiple events are not supported.
-          final List<VEvent> events = new ArrayList<VEvent>();
-          for (final Component c : list) {
-            final VEvent event = (VEvent) c;
-
-            if (StringUtils.equals(event.getSummary().getValue(), CalendarFeed.SETUP_EVENT) == true) {
-              // skip setup event!
-              continue;
-            }
-            events.add(event);
-          }
-          if (events.size() == 0) {
+          final List<VEvent> events = TeamEventUtils.getVEvents(calendar);
+          if (events == null || events.size() == 0) {
             errorDialog.setMessage(getString("plugins.teamcal.import.ics.noEventsGiven")).open(target);
             return;
           }
           if (events.size() > 1) {
-            errorDialog.setMessage(getString("plugins.teamcal.import.ics.multipleEventsNotYetSupported")).open(target);
+            // Can't import multiple entries, redirect to import page:
+            redirectToImportPage(events, activeModel.getObject());
             return;
           }
           final VEvent event = events.get(0);
@@ -210,9 +191,8 @@ public class TeamCalCalendarForm extends CalendarForm
           // 1. Check id/external id. If not yet given, create new entry and ask for calendar to add: Redirect to TeamEventEditPage.
           final TeamEventDO dbEvent = teamEventDao.getByUid(uid.getValue());
           if (dbEvent != null) {
-            // 2. If already exists open edit dialog with DiffAcceptDiscardPanels.
-            // TODO: Don't forget to undelete the event (if marked as deleted).
-            errorDialog.setMessage(getString("plugins.teamcal.import.ics.eventAlreadyImported")).open(target);
+            // Can't modify existing entry, redirect to import page:
+            redirectToImportPage(events, activeModel.getObject());
             return;
           }
           final TeamEventDO teamEvent = TeamEventUtils.createTeamEventDO(event);
@@ -225,6 +205,18 @@ public class TeamCalCalendarForm extends CalendarForm
         }
       }.setTooltip(getString("plugins.teamcal.dropIcsPanel.tooltip")));
     }
+  }
+
+  private void redirectToImportPage(final List<VEvent> events, final TemplateEntry activeTemplate)
+  {
+    final PageParameters parameters = new PageParameters();
+    if (activeTemplate != null) {
+      parameters.add(TeamCalImportPage.PARAM_KEY_TEAM_CAL_ID, activeTemplate.getDefaultCalendarId());
+    }
+    final TeamCalImportPage importPage = new TeamCalImportPage(parameters);
+    importPage.setReturnToPage(parentPage);
+    importPage.setEventsToImport(events);
+    setResponsePage(importPage);
   }
 
   /**

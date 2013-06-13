@@ -221,7 +221,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
           }
         }
 
-      }, SingleButtonPanel.GREY).setTooltip(getString("recalculate")));
+      }, SingleButtonPanel.NORMAL).setTooltip(getString("recalculate")));
       final DivPanel checkBoxDiv = new DivPanel(fs.newChildId(), DivType.CHECKBOX) {
         /**
          * @see org.apache.wicket.Component#isVisible()
@@ -378,7 +378,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
         final String buttonLabel, classNames;
         if (entry.isDeleted() == true) {
           buttonLabel = getString("undelete");
-          classNames = SingleButtonPanel.GREY;
+          classNames = SingleButtonPanel.NORMAL;
         } else {
           buttonLabel = getString("delete");
           classNames = SingleButtonPanel.DELETE;

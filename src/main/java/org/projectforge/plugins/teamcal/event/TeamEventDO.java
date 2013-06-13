@@ -194,7 +194,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   }
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "calendar_fk")
+  @JoinColumn(name = "calendar_fk", nullable = false)
   /**
    * @return the calendar
    */

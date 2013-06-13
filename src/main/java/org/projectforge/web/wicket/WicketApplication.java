@@ -483,6 +483,16 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     } else {
       loginHandler = new LoginDefaultHandler();
     }
+
+    // initialize styles compiler
+    try {
+      final LessWicketApplicationInstantiator lessInstantiator = new LessWicketApplicationInstantiator(this, "styles", "projectforge.less",
+          "projectforge.css");
+      lessInstantiator.instantiate();
+    } catch (final Exception e) {
+      log.error("Unable to instantiate wicket less compiler", e);
+    }
+
     if (loginHandler == null) {
       log.error("Can't load login handler '" + configXml.getLoginHandlerClass() + "'. No login will be possible!");
     } else {
@@ -490,6 +500,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
       Login.getInstance().setLoginHandler(loginHandler);
       if (UserFilter.isUpdateRequiredFirst() == false) {
         upAndRunning = true;
+        log.info("ProjectForge is now available (up and running)");
       }
     }
     if (upAndRunning == true) {
@@ -512,15 +523,6 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_PARSING, true);
     CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_UNFOLDING, true);
     CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_VALIDATION, true);
-
-    // initialize styles compiler
-    try {
-      final LessWicketApplicationInstantiator lessInstantiator = new LessWicketApplicationInstantiator(this, "styles", "projectforge.less",
-          "projectforge.css");
-      lessInstantiator.instantiate();
-    } catch (final Exception e) {
-      log.error("Unable to instantiate wicket less compiler", e);
-    }
   }
 
   @Override

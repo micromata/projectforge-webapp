@@ -132,6 +132,10 @@ public class LicenseListPage extends AbstractListPage<LicenseListForm, LicenseDa
         item.add(label);
       }
     });
+    columns.add(new CellItemListenerPropertyColumn<LicenseDO>(getString("created"), getSortable("created", sortable), "created",
+        cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<LicenseDO>(getString("modified"), getSortable("lastUpdate", sortable), "lastUpdate",
+        cellItemListener));
     return columns;
   }
 

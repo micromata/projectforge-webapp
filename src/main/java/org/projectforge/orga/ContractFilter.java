@@ -58,11 +58,12 @@ public class ContractFilter extends BaseSearchFilter implements Serializable
    * @see org.projectforge.core.BaseSearchFilter#reset()
    */
   @Override
-  public void reset()
+  public ContractFilter reset()
   {
     super.reset();
     year = -1;
     status = null;
+    return this;
   }
 
   /**

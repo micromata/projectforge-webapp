@@ -138,7 +138,7 @@ public class MebEditForm extends AbstractEditForm<MebEntryDO, MebEditPage>
         {
           parentPage.createTimesheet();
         }
-      }, getString("timesheet.title.add"), SingleButtonPanel.GREY));
+      }, getString("timesheet.title.add"), SingleButtonPanel.NORMAL));
 
       // DropDownChoice favorites
       jiraProjectChoice = new FavoritesChoicePanel<JiraProject, JiraProject>(fs.newChildId(), UserPrefArea.JIRA_PROJECT) {
@@ -217,7 +217,7 @@ public class MebEditForm extends AbstractEditForm<MebEntryDO, MebEditPage>
         }
       };
       WicketUtils.addTooltip(createJiraIssueButton, getString("tooltip.popups.mustBeAllowed"));
-      fs.add(new SingleButtonPanel(fs.newChildId(), createJiraIssueButton, getString("meb.actions.createJIRAIssue"), SingleButtonPanel.GREY));
+      fs.add(new SingleButtonPanel(fs.newChildId(), createJiraIssueButton, getString("meb.actions.createJIRAIssue"), SingleButtonPanel.NORMAL));
       if (jiraConfig == null || StringUtils.isEmpty(jiraConfig.getCreateIssueUrl()) == true) {
         jiraProjectChoice.setVisible(false);
         typeChoice.setVisible(false);

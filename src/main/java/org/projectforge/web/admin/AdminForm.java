@@ -202,7 +202,7 @@ public class AdminForm extends AbstractStandardForm<AdminForm, AdminPage>
           return MyButtonPanel.this.isVisible();
         }
       };
-      buttonPanel = new SingleButtonPanel(id, button, getString("system.admin.button." + i18nKey), SingleButtonPanel.GREY);
+      buttonPanel = new SingleButtonPanel(id, button, getString("system.admin.button." + i18nKey), SingleButtonPanel.NORMAL);
       WicketUtils.addTooltip(button, getString("system.admin.button." + i18nKey + ".tooltip"));
     }
 

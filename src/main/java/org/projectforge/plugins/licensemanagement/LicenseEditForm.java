@@ -47,6 +47,8 @@ import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.FileUploadPanel;
+import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 
 import com.vaynberg.wicket.select2.Select2MultiChoice;
@@ -191,6 +193,24 @@ public class LicenseEditForm extends AbstractEditForm<LicenseDO, LicenseEditPage
       FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("plugins.licensemanagement.file1"));
       fileUploadPanel1 = new FileUploadPanel(fs.newChildId(), fs, this, true, new PropertyModel<String>(data, "filename1"),
           new PropertyModel<byte[]>(data, "file1"));
+      if (isNew() == false && (data.getFile1() != null || data.getFile2() != null)) {
+        // Swap files:
+        fs.add(new IconButtonPanel(fs.newChildId(), IconType.SWAP, getString("plugins.licensemanagement.swapFiles")) {
+          /**
+           * @see org.projectforge.web.wicket.flowlayout.IconButtonPanel#onSubmit()
+           */
+          @Override
+          protected void onSubmit()
+          {
+            final byte[] swap = data.getFile1();
+            final String swapFilename = data.getFilename1();
+            data.setFile1(data.getFile2());
+            data.setFilename1(data.getFilename2());
+            data.setFile2(swap);
+            data.setFilename2(swapFilename);
+          }
+        });
+      }
       gridBuilder.newSplitPanel(GridSize.COL50);
       fs = gridBuilder.newFieldset(gridBuilder.getString("plugins.licensemanagement.file2"));
       fileUploadPanel2 = new FileUploadPanel(fs.newChildId(), fs, this, true, new PropertyModel<String>(data, "filename2"),

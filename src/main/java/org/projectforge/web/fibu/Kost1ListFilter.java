@@ -36,10 +36,11 @@ public class Kost1ListFilter extends KostFilter
   private static final long serialVersionUID = 4887724462816700155L;
 
   @Override
-  public void reset()
+  public Kost1ListFilter reset()
   {
     super.reset();
     setListType(KostFilter.FILTER_NOT_ENDED);
     this.searchString = "";
+    return this;
   }
 }

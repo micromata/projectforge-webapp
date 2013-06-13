@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -149,7 +150,7 @@ public class AddressDao extends BaseDao<AddressDO>
         myFilter.setSearchString("*" + myFilter.getSearchString() + "*");
       }
     }
-    if ("filter".equals(myFilter.getListType()) == true) {
+    if (myFilter.isFilter() == true) {
       // Proceed contact status:
       // Use filter only for non deleted entries:
       if (myFilter.isActive() == true
@@ -193,7 +194,38 @@ public class AddressDao extends BaseDao<AddressDO>
       }
     }
     queryFilter.addOrder(Order.asc("name"));
-    return getList(queryFilter);
+    final List<AddressDO> result = getList(queryFilter);
+    if (myFilter.isDoublets() == true) {
+      final HashSet<String> fullnames = new HashSet<String>();
+      final HashSet<String> doubletFullnames = new HashSet<String>();
+      for (final AddressDO address : result) {
+        final String fullname = getNormalizedFullname(address);
+        if (fullnames.contains(fullname) == true) {
+          doubletFullnames.add(fullname);
+        }
+        fullnames.add(fullname);
+      }
+      final List<AddressDO> doublets = new LinkedList<AddressDO>();
+      for (final AddressDO address : result) {
+        if (doubletFullnames.contains(getNormalizedFullname(address)) == true) {
+          doublets.add(address);
+        }
+      }
+      return doublets;
+    }
+    return result;
+  }
+
+  private String getNormalizedFullname(final AddressDO address)
+  {
+    final StringBuilder builder = new StringBuilder();
+    if (address.getFirstName() != null) {
+      builder.append(address.getFirstName().toLowerCase().trim());
+    }
+    if (address.getName() != null) {
+      builder.append(address.getName().toLowerCase().trim());
+    }
+    return builder.toString();
   }
 
   /**

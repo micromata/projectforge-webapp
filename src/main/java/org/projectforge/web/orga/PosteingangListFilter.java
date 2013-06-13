@@ -36,9 +36,10 @@ public class PosteingangListFilter extends PostFilter
   private static final long serialVersionUID = 6776180804031874393L;
 
   @Override
-  public void reset()
+  public PosteingangListFilter reset()
   {
     super.reset();
     this.searchString = "";
+    return this;
   }
 }

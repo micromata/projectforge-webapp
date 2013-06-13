@@ -35,10 +35,11 @@ public class GanttChartListFilter extends BaseSearchFilter
   protected int year;
 
   @Override
-  public void reset()
+  public GanttChartListFilter reset()
   {
     super.reset();
     this.searchString = "";
+    return this;
   }
 
   /**

@@ -21,11 +21,11 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.web.fibu;
+package org.projectforge.web.core.importstorage;
 
 import java.io.Serializable;
 
-public class DatevImportFilter implements Serializable
+public class ImportFilter implements Serializable
 {
   private static final long serialVersionUID = -4085721004150211567L;
 

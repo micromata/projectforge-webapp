@@ -30,6 +30,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.projectforge.common.StringHelper;
+import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * Panel for using as single button (needed for css decoration).
@@ -47,17 +48,25 @@ public class SingleButtonPanel extends Panel
    */
   public static final String WICKET_ID = "button";
 
-  public static final String CANCEL = "btn-danger";
+  public static final String PRIMARY = "btn-primary";
 
-  public static final String DEFAULT_SUBMIT = "btn-success";
+  public static final String INFO = "btn-info";
 
-  public static final String DELETE = "btn-warning";
+  public static final String SUCCESS = "btn-success";
 
-  public static final String GREY = "btn-info";
+  public static final String WARNING = "btn-warning";
 
-  public static final String RED = "btn-danger";
+  public static final String DANGER = "btn-danger";
 
-  public static final String RESET = "btn-danger";
+  public static final String CANCEL = DANGER;
+
+  public static final String DEFAULT_SUBMIT = SUCCESS;
+
+  public static final String DELETE = WARNING;
+
+  public static final String NORMAL = "";
+
+  public static final String RESET = WARNING;
 
   /**
    * 
@@ -104,7 +113,7 @@ public class SingleButtonPanel extends Panel
   public SingleButtonPanel setTooltip(final String tooltip)
   {
     if (tooltip != null) {
-      button.add(AttributeModifier.replace("title", tooltip));
+      WicketUtils.addTooltip(button, tooltip);
     }
     return this;
   }

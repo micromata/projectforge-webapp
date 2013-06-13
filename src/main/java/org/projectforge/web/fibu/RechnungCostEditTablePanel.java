@@ -41,6 +41,7 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.core.Constants;
 import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.core.NumberFormatter;
 import org.projectforge.fibu.AbstractRechnungsPositionDO;
@@ -198,7 +199,7 @@ public class RechnungCostEditTablePanel extends Panel
     ajaxComponents.register(kost2);
 
     final MinMaxNumberField<BigDecimal> netto = new MinMaxNumberField<BigDecimal>("netto",
-        new PropertyModel<BigDecimal>(zuweisung, "netto"), BigDecimal.ZERO, position.getNetSum()) {
+        new PropertyModel<BigDecimal>(zuweisung, "netto"), Constants.TEN_BILLION_NEGATIVE, Constants.TEN_BILLION) {
       @SuppressWarnings({ "rawtypes", "unchecked"})
       @Override
       public IConverter getConverter(final Class type)

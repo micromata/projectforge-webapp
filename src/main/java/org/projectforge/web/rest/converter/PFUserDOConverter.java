@@ -23,7 +23,12 @@
 
 package org.projectforge.web.rest.converter;
 
+import java.util.Locale;
+import java.util.TimeZone;
+
 import org.hibernate.Hibernate;
+import org.projectforge.core.ConfigXml;
+import org.projectforge.core.Configuration;
 import org.projectforge.registry.Registry;
 import org.projectforge.rest.objects.UserObject;
 import org.projectforge.user.PFUserDO;
@@ -56,6 +61,23 @@ public class PFUserDOConverter
     user.setFirstName(userDO.getFirstname());
     user.setLastName(userDO.getLastname());
     user.setEmail(userDO.getEmail());
+    TimeZone timeZone = userDO.getTimeZoneObject();
+    if (timeZone == null) {
+      timeZone = Configuration.getInstance().getDefaultTimeZone();
+    }
+    if (timeZone != null) {
+      user.setTimeZone(timeZone.getID());
+    }
+    Locale locale = userDO.getLocale();
+    if (locale == null) {
+      locale = ConfigXml.getInstance().getDefaultLocale();
+    }
+    if (locale == null) {
+      locale = Locale.getDefault();
+    }
+    if (locale != null) {
+      user.setLocale(locale.toString());
+    }
     return user;
   }
 }

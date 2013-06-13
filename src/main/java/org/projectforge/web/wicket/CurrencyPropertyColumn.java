@@ -41,6 +41,8 @@ public class CurrencyPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
 
   private boolean suppressZeroValues;
 
+  private boolean displayRedNegativeValues = true;
+
   public CurrencyPropertyColumn(final String label, final String sortProperty, final String property, final CellItemListener<T> cellItemListener)
   {
     super(new Model<String>(label), sortProperty, property, cellItemListener);
@@ -65,9 +67,9 @@ public class CurrencyPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
     if (cellItemListener != null) {
       cellItemListener.populateItem(item, componentId, rowModel);
     }
-    if (value != null && value.compareTo(BigDecimal.ZERO) < 0) {
+    if (value != null && value.compareTo(BigDecimal.ZERO) < 0 && displayRedNegativeValues == true) {
       // Negative value.
-      item.add(AttributeModifier.append("style", new Model<String>("white-space: nowrap; text-align: right; color: red;")));
+      item.add(AttributeModifier.append("style", new Model<String>("white-space: nowrap; text-align: right; color: red !important;")));
     } else {
       item.add(AttributeModifier.append("style", new Model<String>("white-space: nowrap; text-align: right;")));
     }
@@ -76,6 +78,16 @@ public class CurrencyPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
   public CurrencyPropertyColumn<T> setSuppressZeroValues(final boolean supressZeroValues)
   {
     this.suppressZeroValues = supressZeroValues;
+    return this;
+  }
+
+  /**
+   * @param displayRedNegativeValues the displayRedNegativeValues to set
+   * @return this for chaining.
+   */
+  public CurrencyPropertyColumn<T> setDisplayRedNegativeValues(final boolean displayRedNegativeValues)
+  {
+    this.displayRedNegativeValues = displayRedNegativeValues;
     return this;
   }
 }

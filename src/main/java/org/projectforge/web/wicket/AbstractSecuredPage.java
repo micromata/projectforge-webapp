@@ -32,7 +32,6 @@ import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.core.MenuBarPanel;
 import org.projectforge.web.core.NavTopPanel;
 import org.projectforge.web.dialog.ModalDialog;
@@ -63,7 +62,6 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
     body.add(topMenuPanel);
     topMenuPanel.init(this);
     contentMenuBarPanel = new MenuBarPanel("menuBar");
-    body.add(contentMenuBarPanel);
     final Model<String> alertMessageModel = new Model<String>() {
       @Override
       public String getObject()
@@ -95,7 +93,8 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
     super.onInitialize();
     final WebMarkupContainer breadcrumbContainer = new WebMarkupContainer("breadcrumb");
     body.add(breadcrumbContainer);
-    if (WebConfiguration.isDevelopmentMode() == true && isBreadCrumbVisible() == true) {
+    breadcrumbContainer.add(contentMenuBarPanel);
+    if (isBreadCrumbVisible() == true) {
       final RepeatingView breadcrumbItems = new RepeatingView("li");
       breadcrumbContainer.add(breadcrumbItems);
       final WebPage returnTo = this.getReturnToPage();

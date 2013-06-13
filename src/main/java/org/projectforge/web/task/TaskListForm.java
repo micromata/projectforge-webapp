@@ -53,7 +53,7 @@ public class TaskListForm extends AbstractListForm<TaskFilter, TaskListPage>
       }
     };
     actionButtons.add(2, new SingleButtonPanel(actionButtons.newChildId(), taskTreeButton, getString("task.tree.perspective"),
-        SingleButtonPanel.GREY));
+        SingleButtonPanel.NORMAL));
   }
 
   public TaskListForm(final TaskListPage parentPage)
