@@ -500,7 +500,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
       Login.getInstance().setLoginHandler(loginHandler);
       if (UserFilter.isUpdateRequiredFirst() == false) {
         upAndRunning = true;
-        log.info("ProjectForge is now available (up and running)");
+        log.info("ProjectForge is now available (up and running).");
       }
     }
     if (upAndRunning == true) {
