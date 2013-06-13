@@ -28,6 +28,7 @@ import java.io.Serializable;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.projectforge.core.PropertyInfo;
 import org.projectforge.web.BrowserScreenWidthType;
 import org.projectforge.web.wicket.MySession;
 
@@ -90,6 +91,12 @@ public abstract class AbstractGridBuilder<T extends AbstractFieldsetPanel< ? >> 
       return parentDivPanel;
     }
   }
+
+  /**
+   * @param clazz Class which declares the field (named property).
+   * @param property Field with {@link PropertyInfo#i18nKey()}
+   */
+  public abstract T newFieldset(final Class<?> clazz, String property);
 
   public abstract T newFieldset(final String label);
 

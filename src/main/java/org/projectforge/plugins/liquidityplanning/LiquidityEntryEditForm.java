@@ -63,7 +63,7 @@ public class LiquidityEntryEditForm extends AbstractEditForm<LiquidityEntryDO, L
     super.init();
     {
       // Date of payment
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.liquidityplanning.entry.dateOfPayment"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(LiquidityEntryDO.class, "dateOfPayment");
       final DatePanel dateOfPayment = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "dateOfPayment"), DatePanelSettings
           .get().withTargetType(java.sql.Date.class));
       fs.add(dateOfPayment);
@@ -73,7 +73,7 @@ public class LiquidityEntryEditForm extends AbstractEditForm<LiquidityEntryDO, L
     }
     {
       // Amount
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.betrag"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(LiquidityEntryDO.class, "amount");
       final RequiredMinMaxNumberField<BigDecimal> amount = new RequiredMinMaxNumberField<BigDecimal>(fs.getTextFieldId(),
           new PropertyModel<BigDecimal>(data, "amount"), Constants.TEN_BILLION_NEGATIVE, Constants.TEN_BILLION) {
         @SuppressWarnings({ "rawtypes", "unchecked"})
@@ -90,7 +90,7 @@ public class LiquidityEntryEditForm extends AbstractEditForm<LiquidityEntryDO, L
       }
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.status.bezahlt"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(LiquidityEntryDO.class, "payed");
       fs.addCheckBox(new PropertyModel<Boolean>(data, "payed"), null);
     }
     {
@@ -102,7 +102,7 @@ public class LiquidityEntryEditForm extends AbstractEditForm<LiquidityEntryDO, L
     }
     {
       // Text comment
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(LiquidityEntryDO.class, "comment");
       fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "comment"))).setAutogrow();
     }
     addCloneButton();

@@ -31,7 +31,9 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.ResourceModel;
 import org.projectforge.core.I18nEnum;
+import org.projectforge.core.PropUtils;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.calendar.DateTimeFormatter;
 
@@ -76,6 +78,13 @@ public class CellItemListenerPropertyColumn<T> extends PropertyColumn<T, String>
     this.cellItemListener = cellItemListener;
   }
 
+  public CellItemListenerPropertyColumn(final Class< ? > clazz, final String sortProperty, final String propertyExpression,
+      final CellItemListener<T> cellItemListener)
+  {
+    super(new ResourceModel(PropUtils.getI18nKey(clazz, propertyExpression)), sortProperty, propertyExpression);
+    this.cellItemListener = cellItemListener;
+  }
+
   public CellItemListenerPropertyColumn(final IModel<String> displayModel, final String sortProperty, final String propertyExpression)
   {
     this(displayModel, sortProperty, propertyExpression, null);
@@ -108,7 +117,7 @@ public class CellItemListenerPropertyColumn<T> extends PropertyColumn<T, String>
     } else if (object instanceof java.sql.Date) {
       item.add(new Label(componentId, DateTimeFormatter.instance().getFormattedDate(object)).setRenderBodyOnly(true));
     } else if (object instanceof Date) {
-      item.add(new Label(componentId, DateTimeFormatter.instance().getFormattedDateTime((Date)object)).setRenderBodyOnly(true));
+      item.add(new Label(componentId, DateTimeFormatter.instance().getFormattedDateTime((Date) object)).setRenderBodyOnly(true));
     } else {
       item.add(new Label(componentId, propertyModel).setRenderBodyOnly(true));
     }

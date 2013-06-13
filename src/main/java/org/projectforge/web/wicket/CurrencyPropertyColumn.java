@@ -43,6 +43,13 @@ public class CurrencyPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
 
   private boolean displayRedNegativeValues = true;
 
+  public CurrencyPropertyColumn(final Class< ? > clazz, final String sortProperty, final String propertyExpression,
+      final CellItemListener<T> cellItemListener)
+  {
+    super(clazz, sortProperty, propertyExpression, cellItemListener);
+  }
+
+
   public CurrencyPropertyColumn(final String label, final String sortProperty, final String property, final CellItemListener<T> cellItemListener)
   {
     super(new Model<String>(label), sortProperty, property, cellItemListener);

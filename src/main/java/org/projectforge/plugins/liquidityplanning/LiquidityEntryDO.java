@@ -37,6 +37,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.core.DefaultBaseDO;
+import org.projectforge.core.PropertyInfo;
 import org.projectforge.database.Constants;
 
 /**
@@ -52,21 +53,26 @@ public class LiquidityEntryDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = 6006883617791360816L;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
-  private String subject;
-
-  @Field(index = Index.TOKENIZED, store = Store.NO)
-  private String comment;
-
+  @PropertyInfo(i18nKey = "plugins.liquidityplanning.entry.dateOfPayment")
   @Field(index = Index.UN_TOKENIZED)
   @DateBridge(resolution = Resolution.DAY)
   private Date dateOfPayment;
 
+  @PropertyInfo(i18nKey = "fibu.common.betrag")
   @Field(index = Index.UN_TOKENIZED)
   private BigDecimal amount;
 
+  @PropertyInfo(i18nKey = "fibu.rechnung.status.bezahlt")
   @Field(index = Index.UN_TOKENIZED)
   private boolean payed;
+
+  @PropertyInfo(i18nKey = "fibu.rechnung.betreff")
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String subject;
+
+  @PropertyInfo(i18nKey = "comment")
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String comment;
 
   @Column(length = Constants.LENGTH_TITLE)
   public String getSubject()

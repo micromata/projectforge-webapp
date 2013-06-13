@@ -31,9 +31,9 @@ import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulato
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.calendar.DayHolder;
@@ -46,6 +46,7 @@ import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 import org.projectforge.web.wicket.RowCssClass;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.projectforge.web.wicket.flowlayout.IconPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 
@@ -58,6 +59,8 @@ import org.projectforge.web.wicket.flowlayout.IconType;
 public class LiquidityEntryListPage extends AbstractListPage<LiquidityEntryListForm, LiquidityEntryDao, LiquidityEntryDO> implements
 IListPageColumnsCreator<LiquidityEntryDO>
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LiquidityEntryListPage.class);
+
   private static final long serialVersionUID = 9158903150132480532L;
 
   @SpringBean(name = "liquidityEntryDao")
@@ -103,9 +106,8 @@ IListPageColumnsCreator<LiquidityEntryDO>
       }
     };
 
-    columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(new Model<String>(
-        getString("plugins.liquidityplanning.entry.dateOfPayment")), getSortable("dateOfPayment", sortable), "dateOfPayment",
-        cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(LiquidityEntryDO.class, getSortable("dateOfPayment", sortable),
+        "dateOfPayment", cellItemListener) {
       /**
        * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
        *      java.lang.String, org.apache.wicket.model.IModel)
@@ -121,9 +123,9 @@ IListPageColumnsCreator<LiquidityEntryDO>
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CurrencyPropertyColumn<LiquidityEntryDO>(getString("fibu.common.betrag"), getSortable("amount", sortable), "amount",
+    columns.add(new CurrencyPropertyColumn<LiquidityEntryDO>(LiquidityEntryDO.class, getSortable("amount", sortable), "amount",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(new Model<String>(getString("fibu.rechnung.status.bezahlt")),
+    columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(LiquidityEntryDO.class,
         getSortable("payed", sortable), "payed", cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<LiquidityEntryDO>> item, final String componentId,
@@ -138,21 +140,130 @@ IListPageColumnsCreator<LiquidityEntryDO>
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(
-        new Model<String>(getString("plugins.liquidityplanning.entry.subject")), getSortable("subject", sortable), "subject",
+    columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(LiquidityEntryDO.class, getSortable("subject", sortable), "subject",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(getString("comment"), getSortable("comment", sortable), "comment",
+    columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(LiquidityEntryDO.class, getSortable("comment", sortable), "comment",
         cellItemListener));
 
     return columns;
   }
 
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
     dataTable = createDataTable(createColumns(this, true), "dateOfPayment", SortOrder.DESCENDING);
     form.add(dataTable);
+    final ContentMenuEntryPanel exportExcelButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
+      @Override
+      public void onClick()
+      {
+        // exportExcel();
+      };
+    }, getString("exportAsXls")).setTooltip(getString("tooltip.export.excel"));
+    addContentMenuEntry(exportExcelButton);
   }
+
+  // void exportExcel()
+  // {
+  // refresh();
+  // final List<LiquidityEntryDO> entries = getList();
+  // if (entries == null || entries.size() == 0) {
+  // // Nothing to export.
+  // form.addError("validation.error.nothingToExport");
+  // return;
+  // }
+  // final String filename = "ProjectForge-liquidity_" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".xls";
+  //
+  // final ExportWorkbook xls = new ExportWorkbook();
+  // final ContentProvider contentProvider = new MyXlsContentProvider(xls);
+  // // create a default Date format and currency column
+  // xls.setContentProvider(contentProvider);
+  //
+  // final ExportSheet sheet = xls.addSheet("plugins.liquidityplanning.entry.title.heading");
+  // sheet.createFreezePane(0, 1);
+  //
+  // final ExportColumn[] cols = new ExportColumn[5];
+  // int i = 0;
+  // for (final ExcelCol col : ExcelCol.values()) {
+  // cols[i++] = new I18nExportColumn(col, col.theTitle, col.width);
+  // }
+  //
+  //
+  // // column property names
+  // sheet.setColumns(cols);
+  //
+  // final ContentProvider sheetProvider = sheet.getContentProvider();
+  // sheetProvider.putFormat(InvoicesCol.BRUTTO, "#,##0.00;[Red]-#,##0.00");
+  // sheetProvider.putFormat(InvoicesCol.KORREKTUR, "#,##0.00;[Red]-#,##0.00");
+  // sheetProvider.putFormat(InvoicesCol.KOST1, "#");
+  // sheetProvider.putFormat(InvoicesCol.KOST2, "#");
+  // sheetProvider.putFormat(InvoicesCol.DATE, "dd.MM.yyyy");
+  //
+  // final PropertyMapping mapping = new PropertyMapping();
+  // for (final KostZuweisungDO zuweisung : list) {
+  // final AbstractRechnungsPositionDO position;
+  // final AbstractRechnungDO< ? > rechnung;
+  // final String referenz;
+  // final String text;
+  // if (zuweisung.getRechnungsPosition() != null) {
+  // position = zuweisung.getRechnungsPosition();
+  // rechnung = ((RechnungsPositionDO) position).getRechnung();
+  // final RechnungDO r = (RechnungDO) rechnung;
+  // referenz = String.valueOf(r.getNummer());
+  // text = ProjektFormatter.formatProjektKundeAsString(r.getProjekt(), r.getKunde(), r.getKundeText());
+  // } else {
+  // position = zuweisung.getEingangsrechnungsPosition();
+  // rechnung = ((EingangsrechnungsPositionDO) position).getEingangsrechnung();
+  // final EingangsrechnungDO r = (EingangsrechnungDO) rechnung;
+  // referenz = r.getReferenz();
+  // text = r.getKreditor();
+  // }
+  // final BigDecimal grossSum = position.getBruttoSum();
+  //
+  // BigDecimal korrektur = null;
+  // if (grossSum.compareTo(position.getKostZuweisungGrossSum()) != 0) {
+  // korrektur = CurrencyHelper.getGrossAmount(position.getKostZuweisungNetFehlbetrag(), position.getVat());
+  // if (NumberHelper.isZeroOrNull(korrektur) == true) {
+  // korrektur = null;
+  // }
+  // }
+  // mapping.add(InvoicesCol.BRUTTO, zuweisung.getBrutto());
+  // Integer kontoNummer = null;
+  // if (rechnung instanceof RechnungDO) {
+  // final KontoDO konto = kontoCache.getKonto(((RechnungDO) rechnung));
+  // if (konto != null) {
+  // kontoNummer = konto.getNummer();
+  // }
+  // } else if (rechnung instanceof EingangsrechnungDO) {
+  // final Integer kontoId = ((EingangsrechnungDO) rechnung).getKontoId();
+  // if (kontoId != null) {
+  // final KontoDO konto = kontoCache.getKonto(kontoId);
+  // if (konto != null) {
+  // kontoNummer = konto.getNummer();
+  // }
+  // }
+  // }
+  // mapping.add(InvoicesCol.KONTO, kontoNummer != null ? kontoNummer : "");
+  // mapping.add(InvoicesCol.REFERENZ, StringHelper.removeNonDigitsAndNonASCIILetters(referenz));
+  // mapping.add(InvoicesCol.DATE, rechnung.getDatum());
+  // mapping.add(InvoicesCol.GEGENKONTO, "");
+  // mapping.add(InvoicesCol.KOST1, zuweisung.getKost1() != null ? zuweisung.getKost1().getNummer() : "");
+  // mapping.add(InvoicesCol.KOST2, zuweisung.getKost2() != null ? zuweisung.getKost2().getNummer() : "");
+  // mapping.add(InvoicesCol.TEXT, text);
+  // mapping.add(InvoicesCol.KORREKTUR, korrektur);
+  // sheet.addRow(mapping.getMapping(), 0);
+  // }
+  // addAccounts(xls, contentProvider);
+  // return xls.getAsByteArray();
+  //
+  // final byte[] xls = KostZuweisungExport.instance.exportRechnungen(rechnungen, getString("fibu.common.debitor"), kontoCache);
+  // if (xls == null || xls.length == 0) {
+  // log.error("Oups, xls has zero size. Filename: " + filename);
+  // return;
+  // }
+  // DownloadUtils.setDownloadTarget(xls, filename);
+  // }
 
   /**
    * Forces the statistics to be reloaded.

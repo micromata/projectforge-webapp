@@ -31,6 +31,7 @@ import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.projectforge.core.PropUtils;
 import org.projectforge.web.BrowserScreenWidthType;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.flowlayout.AbstractGridBuilder;
@@ -346,6 +347,15 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
   public FieldsetPanel newFieldset(final FieldProperties< ? > fieldProperties)
   {
     return new FieldsetPanel(getPanel(), fieldProperties);
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#newFieldset(java.lang.String)
+   */
+  @Override
+  public FieldsetPanel newFieldset(final Class< ? > clazz, final String property)
+  {
+    return new FieldsetPanel(getPanel(), getString(PropUtils.getI18nKey(clazz, property)));
   }
 
   /**
