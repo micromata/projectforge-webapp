@@ -24,8 +24,14 @@
 package org.projectforge.plugins.liquidityplanning;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.model.Model;
 import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.WebConstants;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.TextStyle;
 
 /**
  * The list formular for the list view (this example has no filter settings). See ToDoListPage for seeing how to use filter settings.
@@ -41,6 +47,57 @@ public class LiquidityEntryListForm extends AbstractListForm<BaseSearchFilter, L
   public LiquidityEntryListForm(final LiquidityEntryListPage parentPage)
   {
     super(parentPage);
+  }
+
+  private LiquidityEntriesStatistics getStats()
+  {
+    return parentPage.getStatistics();
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListForm#init()
+   */
+  @SuppressWarnings("serial")
+  @Override
+  protected void init()
+  {
+    super.init();
+    gridBuilder.newGridPanel();
+    {
+      // Statistics
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("statistics")).suppressLabelForWarning();
+      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return getString("fibu.rechnung.status.bezahlt")
+              + ": "
+              + CurrencyFormatter.format(getStats().getPayed())
+              + WebConstants.HTML_TEXT_DIVIDER;
+        }
+      }));
+      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return getString("totalSum") + ": " + CurrencyFormatter.format(getStats().getTotal()) + WebConstants.HTML_TEXT_DIVIDER;
+        }
+      }));
+      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return getString("fibu.rechnung.offen") + ": " + CurrencyFormatter.format(getStats().getOpen()) + WebConstants.HTML_TEXT_DIVIDER;
+        }
+      }, TextStyle.BLUE));
+      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return getString("fibu.rechnung.filter.ueberfaellig") + ": " + CurrencyFormatter.format(getStats().getOverdue());
+        }
+      }, TextStyle.RED));
+    }
   }
 
   @Override

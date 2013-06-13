@@ -24,6 +24,7 @@
 package org.projectforge.plugins.liquidityplanning;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
@@ -35,6 +36,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.calendar.DayHolder;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
@@ -43,6 +45,9 @@ import org.projectforge.web.wicket.CurrencyPropertyColumn;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.RowCssClass;
+import org.projectforge.web.wicket.flowlayout.IconPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
 
 /**
  * The controller of the list page. Most functionality such as search etc. is done by the super class.
@@ -58,21 +63,43 @@ IListPageColumnsCreator<LiquidityEntryDO>
   @SpringBean(name = "liquidityEntryDao")
   private LiquidityEntryDao liquidityEntryDao;
 
+  private LiquidityEntriesStatistics statistics;
+
   public LiquidityEntryListPage(final PageParameters parameters)
   {
     super(parameters, "plugins.liquidityplanning.entry");
+  }
+
+  LiquidityEntriesStatistics getStatistics()
+  {
+    if (statistics == null) {
+      statistics = liquidityEntryDao.buildStatistics(getList());
+    }
+    return statistics;
   }
 
   @SuppressWarnings("serial")
   public List<IColumn<LiquidityEntryDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final List<IColumn<LiquidityEntryDO, String>> columns = new ArrayList<IColumn<LiquidityEntryDO, String>>();
+    final Date today = new DayHolder().getDate();
     final CellItemListener<LiquidityEntryDO> cellItemListener = new CellItemListener<LiquidityEntryDO>() {
       public void populateItem(final Item<ICellPopulator<LiquidityEntryDO>> item, final String componentId,
           final IModel<LiquidityEntryDO> rowModel)
       {
         final LiquidityEntryDO liquidityEntry = rowModel.getObject();
         appendCssClasses(item, liquidityEntry.getId(), liquidityEntry.isDeleted());
+        if (liquidityEntry.isDeleted() == true) {
+          // Do nothing further
+        } else {
+          if (liquidityEntry.isPayed() == false) {
+            if (liquidityEntry.getDateOfPayment() == null || liquidityEntry.getDateOfPayment().before(today) == true) {
+              appendCssClasses(item, RowCssClass.IMPORTANT_ROW);
+            } else {
+              appendCssClasses(item, RowCssClass.BLUE);
+            }
+          }
+        }
       }
     };
 
@@ -96,6 +123,21 @@ IListPageColumnsCreator<LiquidityEntryDO>
     });
     columns.add(new CurrencyPropertyColumn<LiquidityEntryDO>(getString("fibu.common.betrag"), getSortable("amount", sortable), "amount",
         cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(new Model<String>(getString("fibu.rechnung.status.bezahlt")),
+        getSortable("payed", sortable), "payed", cellItemListener) {
+      @Override
+      public void populateItem(final Item<ICellPopulator<LiquidityEntryDO>> item, final String componentId,
+          final IModel<LiquidityEntryDO> rowModel)
+      {
+        final LiquidityEntryDO entry = rowModel.getObject();
+        if (entry.isPayed() == true) {
+          item.add(new IconPanel(componentId, IconType.ACCEPT));
+        } else {
+          item.add(createInvisibleDummyComponent(componentId));
+        }
+        cellItemListener.populateItem(item, componentId, rowModel);
+      }
+    });
     columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(
         new Model<String>(getString("plugins.liquidityplanning.entry.subject")), getSortable("subject", sortable), "subject",
         cellItemListener));
@@ -110,6 +152,17 @@ IListPageColumnsCreator<LiquidityEntryDO>
   {
     dataTable = createDataTable(createColumns(this, true), "dateOfPayment", SortOrder.DESCENDING);
     form.add(dataTable);
+  }
+
+  /**
+   * Forces the statistics to be reloaded.
+   * @see org.projectforge.web.wicket.AbstractListPage#refresh()
+   */
+  @Override
+  public void refresh()
+  {
+    super.refresh();
+    this.statistics = null;
   }
 
   @Override

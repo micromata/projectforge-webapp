@@ -23,6 +23,8 @@
 
 package org.projectforge.plugins.liquidityplanning;
 
+import java.util.List;
+
 import org.projectforge.core.BaseDao;
 import org.projectforge.user.UserRightId;
 
@@ -40,6 +42,19 @@ public class LiquidityEntryDao extends BaseDao<LiquidityEntryDO>
     super(LiquidityEntryDO.class);
     userRightId = USER_RIGHT_ID;
   }
+
+  public LiquidityEntriesStatistics buildStatistics(final List<LiquidityEntryDO> list)
+  {
+    final LiquidityEntriesStatistics stats = new LiquidityEntriesStatistics();
+    if (list == null) {
+      return stats;
+    }
+    for (final LiquidityEntryDO entry : list) {
+      stats.add(entry);
+    }
+    return stats;
+  }
+
 
   @Override
   public LiquidityEntryDO newInstance()
