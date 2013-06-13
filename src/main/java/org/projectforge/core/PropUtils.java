@@ -24,23 +24,37 @@
 package org.projectforge.core;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import org.projectforge.common.BeanHelper;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 public class PropUtils
 {
+  private static Field[] EMPTY_FIELDS = new Field[0];
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(PropUtils.class);
+
+  private static final Map<Class< ? >, Field[]> fieldsMap = new HashMap<Class< ? >, Field[]>();
 
   public static PropertyInfo get(final Class< ? > clazz, final String property)
   {
-    try {
-      final Field field = clazz.getDeclaredField(property);
-      return field.getAnnotation(PropertyInfo.class);
-    } catch (final NoSuchFieldException ex) {
-      log.error("Field '" + clazz.getName() + "." + property + "' not found: " + ex.getMessage());
+    final Field[] fields = getPropertyInfoFields(clazz);
+    if (fields == null) {
+      log.error("No fields found for '" + clazz.getName() + "'!");
       return null;
     }
+    for (final Field field : fields) {
+      if (field.getName().equals(property) == true) {
+        return field.getAnnotation(PropertyInfo.class);
+      }
+    }
+    return null;
   }
 
   public static String getI18nKey(final Class< ? > clazz, final String property)
@@ -51,5 +65,24 @@ public class PropUtils
       return null;
     }
     return info.i18nKey();
+  }
+
+  public static Field[] getPropertyInfoFields(final Class< ? > clazz)
+  {
+    Field[] fields = fieldsMap.get(clazz);
+    if (fields != null) {
+      return fields;
+    }
+    final Field[] declaredFields = BeanHelper.getAllDeclaredFields(clazz);
+    final List<Field> result = new LinkedList<Field>();
+    for (final Field field : declaredFields) {
+      final PropertyInfo propertyInfo = field.getAnnotation(PropertyInfo.class);
+      if (propertyInfo != null) {
+        result.add(field);
+      }
+    }
+    fields = result.toArray(EMPTY_FIELDS);
+    fieldsMap.put(clazz, fields);
+    return fields;
   }
 }
