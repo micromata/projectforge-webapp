@@ -88,12 +88,12 @@ public class MyXlsContentProvider extends XlsContentProvider
     if (precision == DatePrecision.DAY) {
       return new CellFormat(DateFormats.getExcelFormatString(DateFormatType.DATE));
     } else if (precision == DatePrecision.SECOND) {
-      return new CellFormat(DateFormats.getExcelFormatString(DateFormatType.TIMESTAMP_SECONDS));
+      return new CellFormat(DateFormats.getExcelFormatString(DateFormatType.DATE_TIME_SECONDS));
     } else if (precision == DatePrecision.MILLISECOND) {
-      return new CellFormat(DateFormats.getExcelFormatString(DateFormatType.TIMESTAMP_MILLIS));
+      return new CellFormat(DateFormats.getExcelFormatString(DateFormatType.DATE_TIME_MILLIS));
     } else {
       // HOUR_OF_DAY, MINUTE, MINUTE_15 or null
-      return new CellFormat(DateFormats.getExcelFormatString(DateFormatType.TIMESTAMP_MINUTES));
+      return new CellFormat(DateFormats.getExcelFormatString(DateFormatType.DATE_TIME_MINUTES));
     }
   }
 }
