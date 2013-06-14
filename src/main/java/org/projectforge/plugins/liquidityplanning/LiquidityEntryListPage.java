@@ -23,6 +23,7 @@
 
 package org.projectforge.plugins.liquidityplanning;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -37,11 +38,23 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.calendar.DayHolder;
+import org.projectforge.common.BeanHelper;
+import org.projectforge.common.DateHelper;
+import org.projectforge.core.PropUtils;
+import org.projectforge.core.PropertyInfo;
+import org.projectforge.excel.ContentProvider;
+import org.projectforge.excel.ExportColumn;
+import org.projectforge.excel.ExportSheet;
+import org.projectforge.excel.ExportWorkbook;
+import org.projectforge.excel.I18nExportColumn;
+import org.projectforge.excel.PropertyMapping;
+import org.projectforge.export.MyXlsContentProvider;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.CurrencyPropertyColumn;
+import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
@@ -125,8 +138,8 @@ IListPageColumnsCreator<LiquidityEntryDO>
     });
     columns.add(new CurrencyPropertyColumn<LiquidityEntryDO>(LiquidityEntryDO.class, getSortable("amount", sortable), "amount",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(LiquidityEntryDO.class,
-        getSortable("payed", sortable), "payed", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(LiquidityEntryDO.class, getSortable("payed", sortable), "payed",
+        cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<LiquidityEntryDO>> item, final String componentId,
           final IModel<LiquidityEntryDO> rowModel)
@@ -158,112 +171,60 @@ IListPageColumnsCreator<LiquidityEntryDO>
       @Override
       public void onClick()
       {
-        // exportExcel();
+        exportExcel();
       };
     }, getString("exportAsXls")).setTooltip(getString("tooltip.export.excel"));
     addContentMenuEntry(exportExcelButton);
   }
 
-  // void exportExcel()
-  // {
-  // refresh();
-  // final List<LiquidityEntryDO> entries = getList();
-  // if (entries == null || entries.size() == 0) {
-  // // Nothing to export.
-  // form.addError("validation.error.nothingToExport");
-  // return;
-  // }
-  // final String filename = "ProjectForge-liquidity_" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".xls";
-  //
-  // final ExportWorkbook xls = new ExportWorkbook();
-  // final ContentProvider contentProvider = new MyXlsContentProvider(xls);
-  // // create a default Date format and currency column
-  // xls.setContentProvider(contentProvider);
-  //
-  // final ExportSheet sheet = xls.addSheet("plugins.liquidityplanning.entry.title.heading");
-  // sheet.createFreezePane(0, 1);
-  //
-  // final ExportColumn[] cols = new ExportColumn[5];
-  // int i = 0;
-  // for (final ExcelCol col : ExcelCol.values()) {
-  // cols[i++] = new I18nExportColumn(col, col.theTitle, col.width);
-  // }
-  //
-  //
-  // // column property names
-  // sheet.setColumns(cols);
-  //
-  // final ContentProvider sheetProvider = sheet.getContentProvider();
-  // sheetProvider.putFormat(InvoicesCol.BRUTTO, "#,##0.00;[Red]-#,##0.00");
-  // sheetProvider.putFormat(InvoicesCol.KORREKTUR, "#,##0.00;[Red]-#,##0.00");
-  // sheetProvider.putFormat(InvoicesCol.KOST1, "#");
-  // sheetProvider.putFormat(InvoicesCol.KOST2, "#");
-  // sheetProvider.putFormat(InvoicesCol.DATE, "dd.MM.yyyy");
-  //
-  // final PropertyMapping mapping = new PropertyMapping();
-  // for (final KostZuweisungDO zuweisung : list) {
-  // final AbstractRechnungsPositionDO position;
-  // final AbstractRechnungDO< ? > rechnung;
-  // final String referenz;
-  // final String text;
-  // if (zuweisung.getRechnungsPosition() != null) {
-  // position = zuweisung.getRechnungsPosition();
-  // rechnung = ((RechnungsPositionDO) position).getRechnung();
-  // final RechnungDO r = (RechnungDO) rechnung;
-  // referenz = String.valueOf(r.getNummer());
-  // text = ProjektFormatter.formatProjektKundeAsString(r.getProjekt(), r.getKunde(), r.getKundeText());
-  // } else {
-  // position = zuweisung.getEingangsrechnungsPosition();
-  // rechnung = ((EingangsrechnungsPositionDO) position).getEingangsrechnung();
-  // final EingangsrechnungDO r = (EingangsrechnungDO) rechnung;
-  // referenz = r.getReferenz();
-  // text = r.getKreditor();
-  // }
-  // final BigDecimal grossSum = position.getBruttoSum();
-  //
-  // BigDecimal korrektur = null;
-  // if (grossSum.compareTo(position.getKostZuweisungGrossSum()) != 0) {
-  // korrektur = CurrencyHelper.getGrossAmount(position.getKostZuweisungNetFehlbetrag(), position.getVat());
-  // if (NumberHelper.isZeroOrNull(korrektur) == true) {
-  // korrektur = null;
-  // }
-  // }
-  // mapping.add(InvoicesCol.BRUTTO, zuweisung.getBrutto());
-  // Integer kontoNummer = null;
-  // if (rechnung instanceof RechnungDO) {
-  // final KontoDO konto = kontoCache.getKonto(((RechnungDO) rechnung));
-  // if (konto != null) {
-  // kontoNummer = konto.getNummer();
-  // }
-  // } else if (rechnung instanceof EingangsrechnungDO) {
-  // final Integer kontoId = ((EingangsrechnungDO) rechnung).getKontoId();
-  // if (kontoId != null) {
-  // final KontoDO konto = kontoCache.getKonto(kontoId);
-  // if (konto != null) {
-  // kontoNummer = konto.getNummer();
-  // }
-  // }
-  // }
-  // mapping.add(InvoicesCol.KONTO, kontoNummer != null ? kontoNummer : "");
-  // mapping.add(InvoicesCol.REFERENZ, StringHelper.removeNonDigitsAndNonASCIILetters(referenz));
-  // mapping.add(InvoicesCol.DATE, rechnung.getDatum());
-  // mapping.add(InvoicesCol.GEGENKONTO, "");
-  // mapping.add(InvoicesCol.KOST1, zuweisung.getKost1() != null ? zuweisung.getKost1().getNummer() : "");
-  // mapping.add(InvoicesCol.KOST2, zuweisung.getKost2() != null ? zuweisung.getKost2().getNummer() : "");
-  // mapping.add(InvoicesCol.TEXT, text);
-  // mapping.add(InvoicesCol.KORREKTUR, korrektur);
-  // sheet.addRow(mapping.getMapping(), 0);
-  // }
-  // addAccounts(xls, contentProvider);
-  // return xls.getAsByteArray();
-  //
-  // final byte[] xls = KostZuweisungExport.instance.exportRechnungen(rechnungen, getString("fibu.common.debitor"), kontoCache);
-  // if (xls == null || xls.length == 0) {
-  // log.error("Oups, xls has zero size. Filename: " + filename);
-  // return;
-  // }
-  // DownloadUtils.setDownloadTarget(xls, filename);
-  // }
+  void exportExcel()
+  {
+    refresh();
+    final List<LiquidityEntryDO> list = getList();
+    if (list == null || list.size() == 0) {
+      // Nothing to export.
+      form.addError("validation.error.nothingToExport");
+      return;
+    }
+    final String filename = "ProjectForge-liquidity_" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".xls";
+
+    final ExportWorkbook xls = new ExportWorkbook();
+    final ContentProvider contentProvider = new MyXlsContentProvider(xls);
+    // create a default Date format and currency column
+    xls.setContentProvider(contentProvider);
+
+    final ExportSheet sheet = xls.addSheet("plugins.liquidityplanning.entry.title.heading");
+    sheet.createFreezePane(0, 1);
+
+    final ExportColumn[] cols = new ExportColumn[5];
+    int i = 0;
+    final Field[] fields = PropUtils.getPropertyInfoFields(LiquidityEntryDO.class);
+    for (final Field field : fields) {
+      final PropertyInfo propInfo = field.getAnnotation(PropertyInfo.class);
+      if (propInfo == null) {
+        // Shouldn't occur.
+        continue;
+      }
+      cols[i++] = new I18nExportColumn(field.getName(), propInfo.i18nKey(), propInfo.lenght());
+    }
+
+    // column property names
+    sheet.setColumns(cols);
+    final PropertyMapping mapping = new PropertyMapping();
+    for (final LiquidityEntryDO entry : list) {
+      for (final Field field : fields) {
+        final PropertyInfo propInfo = field.getAnnotation(PropertyInfo.class);
+        if (propInfo == null) {
+          // Shouldn't occur.
+          continue;
+        }
+        field.setAccessible(true);
+        mapping.add(field.getName(), BeanHelper.getFieldValue(entry, field));
+      }
+      sheet.addRow(mapping.getMapping(), 0);
+    }
+    DownloadUtils.setDownloadTarget(xls.getAsByteArray(), filename);
+  }
 
   /**
    * Forces the statistics to be reloaded.
