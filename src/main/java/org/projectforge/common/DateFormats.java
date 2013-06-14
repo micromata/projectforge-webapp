@@ -218,12 +218,12 @@ public class DateFormats
     switch (format) {
       case DATE:
         return defaultExcelDateFormat;
-      case TIMESTAMP_MINUTES:
+      case DATE_TIME_MINUTES:
         return defaultExcelDateFormat + " hh:mm";
-      case TIMESTAMP_SECONDS:
+      case DATE_TIME_SECONDS:
         return defaultExcelDateFormat + " hh:mm:ss";
-      case TIMESTAMP_MILLIS:
-        return defaultExcelDateFormat + " hh:mm:ss.000";
+      case DATE_TIME_MILLIS:
+        return defaultExcelDateFormat + " hh:mm:ss.fff";
       default:
         return defaultExcelDateFormat + " hh:mm:ss";
     }
@@ -265,10 +265,10 @@ public class DateFormats
         return "yyyy-MM-dd HH:mm:ss.SSS";
       case DAY_OF_WEEK_SHORT:
         return "EE";
-      case TIMESTAMP_MINUTES:
+      case DATE_TIME_MINUTES:
         return getFormatString(defaultDateFormat, timeNotation, DateFormatType.DATE)
             + (timeNotation == TimeNotation.H24 ? " HH:mm" : " hh:mm aa");
-      case TIMESTAMP_SECONDS:
+      case DATE_TIME_SECONDS:
         return getFormatString(defaultDateFormat, timeNotation, DateFormatType.DATE)
             + (timeNotation == TimeNotation.H24 ? " HH:mm:ss" : " hh:mm:ss aa");
       case TIMESTAMP_SHORT_MINUTES:

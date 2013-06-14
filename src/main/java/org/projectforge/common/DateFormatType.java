@@ -59,15 +59,15 @@ public enum DateFormatType
   /**
    * DATE + "HH:mm:ss.SSS"
    */
-  TIMESTAMP_MILLIS,
+  DATE_TIME_MILLIS,
   /**
    * DATE + "HH:mm:ss"
    */
-  TIMESTAMP_SECONDS,
+  DATE_TIME_SECONDS,
   /**
    * DATE + "HH:mm"
    */
-  TIMESTAMP_MINUTES,
+  DATE_TIME_MINUTES,
   /**
    * "HH:mm:ss"
    */

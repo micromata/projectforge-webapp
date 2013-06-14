@@ -52,7 +52,7 @@ public abstract class PollEventEntryPanel extends Panel
     final DateTime start = new DateTime(poll.getStartDate());
     final DateTime end = new DateTime(poll.getEndDate());
 
-    final String pattern = DateFormats.getFormatString(DateFormatType.TIMESTAMP_MINUTES);
+    final String pattern = DateFormats.getFormatString(DateFormatType.DATE_TIME_MINUTES);
     add(new Label("startDate", "Start: " + DateFormatUtils.format(start.getMillis(), pattern)));
     add(new Label("endDate", "Ende: " + DateFormatUtils.format(end.getMillis(), pattern)));
 

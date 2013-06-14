@@ -135,7 +135,7 @@ public class PollEventDO extends DefaultBaseDO
   @Override
   public String toString()
   {
-    final String pattern = DateFormats.getFormatString(DateFormatType.TIMESTAMP_MINUTES);
+    final String pattern = DateFormats.getFormatString(DateFormatType.DATE_TIME_MINUTES);
     return DateFormatUtils.format(startDate.getTime(), pattern) + " - " + DateFormatUtils.format(endDate.getTime(), pattern);
   }
 
