@@ -23,7 +23,6 @@
 
 package org.projectforge.plugins.liquidityplanning;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -38,16 +37,9 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.calendar.DayHolder;
-import org.projectforge.common.BeanHelper;
 import org.projectforge.common.DateHelper;
-import org.projectforge.core.PropUtils;
-import org.projectforge.core.PropertyInfo;
 import org.projectforge.excel.ContentProvider;
-import org.projectforge.excel.ExportColumn;
-import org.projectforge.excel.ExportSheet;
-import org.projectforge.excel.ExportWorkbook;
-import org.projectforge.excel.I18nExportColumn;
-import org.projectforge.excel.PropertyMapping;
+import org.projectforge.excel.ExcelExporter;
 import org.projectforge.export.MyXlsContentProvider;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractListPage;
@@ -72,8 +64,6 @@ import org.projectforge.web.wicket.flowlayout.IconType;
 public class LiquidityEntryListPage extends AbstractListPage<LiquidityEntryListForm, LiquidityEntryDao, LiquidityEntryDO> implements
 IListPageColumnsCreator<LiquidityEntryDO>
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LiquidityEntryListPage.class);
-
   private static final long serialVersionUID = 9158903150132480532L;
 
   @SpringBean(name = "liquidityEntryDao")
@@ -165,7 +155,7 @@ IListPageColumnsCreator<LiquidityEntryDO>
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this, true), "dateOfPayment", SortOrder.DESCENDING);
+    dataTable = createDataTable(createColumns(this, true), "dateOfPayment", SortOrder.ASCENDING);
     form.add(dataTable);
     final ContentMenuEntryPanel exportExcelButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
       @Override
@@ -187,43 +177,11 @@ IListPageColumnsCreator<LiquidityEntryDO>
       return;
     }
     final String filename = "ProjectForge-liquidity_" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".xls";
+    final ExcelExporter exporter = new ExcelExporter(filename);
+    final ContentProvider contentProvider = new MyXlsContentProvider(exporter.getWorkbook());
+    exporter.addSheet(contentProvider, getString("plugins.liquidityplanning.entry.title.heading"), list);
 
-    final ExportWorkbook xls = new ExportWorkbook();
-    final ContentProvider contentProvider = new MyXlsContentProvider(xls);
-    // create a default Date format and currency column
-    xls.setContentProvider(contentProvider);
-
-    final ExportSheet sheet = xls.addSheet("plugins.liquidityplanning.entry.title.heading");
-    sheet.createFreezePane(0, 1);
-
-    final ExportColumn[] cols = new ExportColumn[5];
-    int i = 0;
-    final Field[] fields = PropUtils.getPropertyInfoFields(LiquidityEntryDO.class);
-    for (final Field field : fields) {
-      final PropertyInfo propInfo = field.getAnnotation(PropertyInfo.class);
-      if (propInfo == null) {
-        // Shouldn't occur.
-        continue;
-      }
-      cols[i++] = new I18nExportColumn(field.getName(), propInfo.i18nKey(), propInfo.lenght());
-    }
-
-    // column property names
-    sheet.setColumns(cols);
-    final PropertyMapping mapping = new PropertyMapping();
-    for (final LiquidityEntryDO entry : list) {
-      for (final Field field : fields) {
-        final PropertyInfo propInfo = field.getAnnotation(PropertyInfo.class);
-        if (propInfo == null) {
-          // Shouldn't occur.
-          continue;
-        }
-        field.setAccessible(true);
-        mapping.add(field.getName(), BeanHelper.getFieldValue(entry, field));
-      }
-      sheet.addRow(mapping.getMapping(), 0);
-    }
-    DownloadUtils.setDownloadTarget(xls.getAsByteArray(), filename);
+    DownloadUtils.setDownloadTarget(exporter.getWorkbook().getAsByteArray(), filename);
   }
 
   /**

@@ -38,6 +38,7 @@ import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.PropertyInfo;
+import org.projectforge.core.PropertyType;
 import org.projectforge.database.Constants;
 
 /**
@@ -58,7 +59,7 @@ public class LiquidityEntryDO extends DefaultBaseDO
   @DateBridge(resolution = Resolution.DAY)
   private Date dateOfPayment;
 
-  @PropertyInfo(i18nKey = "fibu.common.betrag")
+  @PropertyInfo(i18nKey = "fibu.common.betrag", type = PropertyType.CURRENCY)
   @Field(index = Index.UN_TOKENIZED)
   private BigDecimal amount;
 
