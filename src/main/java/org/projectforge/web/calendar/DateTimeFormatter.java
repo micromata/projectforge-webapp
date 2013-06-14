@@ -125,7 +125,7 @@ public class DateTimeFormatter extends AbstractFormatter
    */
   public String getFormattedDateTime(final Date dateTime)
   {
-    return getFormattedDateTime(dateTime, DateFormats.getFormatString(org.projectforge.common.DateFormatType.TIMESTAMP_SHORT_MINUTES));
+    return getFormattedDateTime(dateTime, DateFormats.getFormatString(org.projectforge.common.DateFormatType.DATE_TIME_SHORT_MINUTES));
   }
 
   /**
@@ -135,7 +135,7 @@ public class DateTimeFormatter extends AbstractFormatter
    */
   public String getFormattedDateTime(final Date dateTime, final Locale locale, final TimeZone timeZone)
   {
-    return getFormattedDateTime(dateTime, DateFormats.getFormatString(org.projectforge.common.DateFormatType.TIMESTAMP_SHORT_MINUTES),
+    return getFormattedDateTime(dateTime, DateFormats.getFormatString(org.projectforge.common.DateFormatType.DATE_TIME_SHORT_MINUTES),
         PFUserContext.getLocale(), PFUserContext.getTimeZone());
   }
 

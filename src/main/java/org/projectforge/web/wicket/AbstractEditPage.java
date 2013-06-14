@@ -148,7 +148,7 @@ AbstractSecuredPage implements IEditPage<O, D>
     };
     final DatePropertyColumn<DisplayHistoryEntry> timestampColumn = new DatePropertyColumn<DisplayHistoryEntry>(dateTimeFormatter,
         getString("timestamp"), null, "timestamp", cellItemListener);
-    timestampColumn.setDatePattern(DateFormats.getFormatString(DateFormatType.TIMESTAMP_SHORT_MINUTES));
+    timestampColumn.setDatePattern(DateFormats.getFormatString(DateFormatType.DATE_TIME_SHORT_MINUTES));
     columns.add(timestampColumn);
     columns.add(new UserPropertyColumn<DisplayHistoryEntry>(getString("user"), null, "user", cellItemListener)
         .withUserFormatter(userFormatter));
