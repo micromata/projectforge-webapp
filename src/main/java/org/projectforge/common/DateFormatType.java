@@ -51,11 +51,11 @@ public enum DateFormatType
   /**
    * DATE_SHORT + HH:mm:ss
    */
-  TIMESTAMP_SHORT_SECONDS,
+  DATE_TIME_SHORT_SECONDS,
   /**
    * DATE_SHORT + HH:mm
    */
-  TIMESTAMP_SHORT_MINUTES,
+  DATE_TIME_SHORT_MINUTES,
   /**
    * DATE + "HH:mm:ss.SSS"
    */
