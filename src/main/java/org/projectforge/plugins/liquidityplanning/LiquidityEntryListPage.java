@@ -39,7 +39,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.common.DateHelper;
 import org.projectforge.excel.ContentProvider;
-import org.projectforge.excel.ExcelExporter;
+import org.projectforge.export.MyExcelExporter;
 import org.projectforge.export.MyXlsContentProvider;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractListPage;
@@ -177,7 +177,7 @@ IListPageColumnsCreator<LiquidityEntryDO>
       return;
     }
     final String filename = "ProjectForge-liquidity_" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".xls";
-    final ExcelExporter exporter = new ExcelExporter(filename);
+    final MyExcelExporter exporter = new MyExcelExporter(filename);
     final ContentProvider contentProvider = new MyXlsContentProvider(exporter.getWorkbook());
     exporter.addSheet(contentProvider, getString("plugins.liquidityplanning.entry.title.heading"), list);
 
