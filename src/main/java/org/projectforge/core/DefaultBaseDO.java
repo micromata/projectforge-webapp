@@ -44,6 +44,7 @@ public class DefaultBaseDO extends AbstractHistorizableBaseDO<Integer>
 {
   private static final long serialVersionUID = 659687830219996653L;
 
+  @PropertyInfo(i18nKey = "id")
   @Field(index = Index.UN_TOKENIZED, store = Store.NO)
   private Integer id;
 

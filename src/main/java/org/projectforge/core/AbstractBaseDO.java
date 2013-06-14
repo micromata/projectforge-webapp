@@ -64,10 +64,13 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AbstractBaseDO.class);
 
+  @PropertyInfo(i18nKey = "created")
   private Date created;
 
+  @PropertyInfo(i18nKey = "modified")
   private Date lastUpdate;
 
+  @PropertyInfo(i18nKey = "deleted")
   private boolean deleted;
 
   private boolean minorChange = false;
