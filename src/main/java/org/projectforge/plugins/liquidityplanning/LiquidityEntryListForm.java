@@ -24,13 +24,18 @@
 package org.projectforge.plugins.liquidityplanning;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.Model;
-import org.projectforge.core.BaseSearchFilter;
+import org.apache.wicket.model.PropertyModel;
 import org.projectforge.core.CurrencyFormatter;
+import org.projectforge.fibu.PaymentStatus;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.WebConstants;
+import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.RadioGroupPanel;
 import org.projectforge.web.wicket.flowlayout.TextStyle;
 
 /**
@@ -38,7 +43,7 @@ import org.projectforge.web.wicket.flowlayout.TextStyle;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class LiquidityEntryListForm extends AbstractListForm<BaseSearchFilter, LiquidityEntryListPage>
+public class LiquidityEntryListForm extends AbstractListForm<LiquidityFilter, LiquidityEntryListPage>
 {
   private static final long serialVersionUID = 2040255193023406307L;
 
@@ -100,10 +105,59 @@ public class LiquidityEntryListForm extends AbstractListForm<BaseSearchFilter, L
     }
   }
 
+  /**
+   * @see org.projectforge.web.wicket.AbstractListForm#onOptionsPanelCreate(org.projectforge.web.wicket.flowlayout.FieldsetPanel,
+   *      org.projectforge.web.wicket.flowlayout.DivPanel)
+   */
+  @SuppressWarnings("serial")
   @Override
-  protected BaseSearchFilter newSearchFilterInstance()
+  protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
   {
-    return new BaseSearchFilter();
+    // DropDownChoice next days
+    final LabelValueChoiceRenderer<Integer> nextDaysRenderer = new LabelValueChoiceRenderer<Integer>();
+    nextDaysRenderer.addValue(0, "filter.all");
+    nextDaysRenderer.addValue(7, getLocalizedMessage("search.nextDays", 7));
+    nextDaysRenderer.addValue(10, getLocalizedMessage("search.nextDays", 10));
+    nextDaysRenderer.addValue(14, getLocalizedMessage("search.nextDays", 14));
+    nextDaysRenderer.addValue(30, getLocalizedMessage("search.nextDays", 30));
+    nextDaysRenderer.addValue(60, getLocalizedMessage("search.nextDays", 60));
+    nextDaysRenderer.addValue(90, getLocalizedMessage("search.nextDays", 90));
+    final DropDownChoice<Integer> nextDaysChoice = new DropDownChoice<Integer>(optionsFieldsetPanel.getDropDownChoiceId(),
+        new PropertyModel<Integer>(getSearchFilter(), "nextDays"), nextDaysRenderer.getValues(), nextDaysRenderer);
+    nextDaysChoice.setNullValid(false);
+    optionsFieldsetPanel.add(nextDaysChoice, true);
+
+    final DivPanel radioGroupPanel = optionsFieldsetPanel.addNewRadioBoxDiv();
+    final RadioGroupPanel<PaymentStatus> radioGroup = new RadioGroupPanel<PaymentStatus>(radioGroupPanel.newChildId(), "paymentStatus",
+        new PropertyModel<PaymentStatus>(getSearchFilter(), "paymentStatus")) {
+      /**
+       * @see org.projectforge.web.wicket.flowlayout.RadioGroupPanel#wantOnSelectionChangedNotifications()
+       */
+      @Override
+      protected boolean wantOnSelectionChangedNotifications()
+      {
+        return true;
+      }
+
+      /**
+       * @see org.projectforge.web.wicket.flowlayout.RadioGroupPanel#onSelectionChanged(java.lang.Object)
+       */
+      @Override
+      protected void onSelectionChanged(final Object newSelection)
+      {
+        parentPage.refresh();
+      }
+    };
+    radioGroupPanel.add(radioGroup);
+    radioGroup.add(new Model<PaymentStatus>(PaymentStatus.ALL), getString(PaymentStatus.ALL.getI18nKey()));
+    radioGroup.add(new Model<PaymentStatus>(PaymentStatus.UNPAYED), getString(PaymentStatus.UNPAYED.getI18nKey()));
+    radioGroup.add(new Model<PaymentStatus>(PaymentStatus.PAYED), getString(PaymentStatus.PAYED.getI18nKey()));
+  }
+
+  @Override
+  protected LiquidityFilter newSearchFilterInstance()
+  {
+    return new LiquidityFilter();
   }
 
   @Override
