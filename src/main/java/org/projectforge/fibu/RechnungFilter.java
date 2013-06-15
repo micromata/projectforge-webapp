@@ -112,9 +112,14 @@ public class RechnungFilter extends BaseSearchFilter implements Serializable
     return this.listType;
   }
 
-  public void setListType(final String listType)
+  /**
+   * @param listType
+   * @return this for chaining.
+   */
+  public RechnungFilter setListType(final String listType)
   {
     this.listType = listType;
+    return this;
   }
 
   /**
