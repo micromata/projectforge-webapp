@@ -24,7 +24,6 @@
 package org.projectforge.export;
 
 import java.lang.reflect.Field;
-import java.util.List;
 
 import org.projectforge.common.DateFormatType;
 import org.projectforge.common.DateFormats;
@@ -50,7 +49,7 @@ public class MyExcelExporter extends ExcelExporter
     super(filename);
   }
 
-  public <T> ExportSheet addSheet(final String sheetTitle, final List<T> list)
+  public ExportSheet addSheet(final String sheetTitle)
   {
     final ContentProvider contentProvider = new MyXlsContentProvider(getWorkbook()) {
       /**
@@ -62,7 +61,7 @@ public class MyExcelExporter extends ExcelExporter
         return null;
       }
     };
-    return addSheet(contentProvider, sheetTitle, list);
+    return addSheet(contentProvider, sheetTitle);
   }
 
   /**
@@ -73,7 +72,7 @@ public class MyExcelExporter extends ExcelExporter
    * @return true, if format is handled by this method, otherwise false.
    */
   @Override
-  protected void putFieldFormat(final ContentProvider sheetProvider, final Field field, final PropertyInfo propInfo,
+  public void putFieldFormat(final ContentProvider sheetProvider, final Field field, final PropertyInfo propInfo,
       final ExportColumn exportColumn)
   {
     final PropertyType type = propInfo.type();

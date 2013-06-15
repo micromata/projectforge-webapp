@@ -39,6 +39,13 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.core.PropertyInfo;
 import org.projectforge.excel.ExportColumn;
+import org.projectforge.export.MyExcelExporter;
+import org.projectforge.fibu.EingangsrechnungDO;
+import org.projectforge.fibu.EingangsrechnungDao;
+import org.projectforge.fibu.InvoicesExcelExport;
+import org.projectforge.fibu.RechnungDO;
+import org.projectforge.fibu.RechnungDao;
+import org.projectforge.fibu.RechnungFilter;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
@@ -64,6 +71,12 @@ IListPageColumnsCreator<LiquidityEntryDO>
 
   @SpringBean(name = "liquidityEntryDao")
   private LiquidityEntryDao liquidityEntryDao;
+
+  @SpringBean(name = "rechnungDao")
+  private RechnungDao rechnungDao;
+
+  @SpringBean(name = "eingangsrechnungDao")
+  private EingangsrechnungDao eingangsrechnungDao;
 
   private LiquidityEntriesStatistics statistics;
 
@@ -171,6 +184,19 @@ IListPageColumnsCreator<LiquidityEntryDO>
   protected String getExcelSheetname()
   {
     return getString("plugins.liquidityplanning.entry.title.heading");
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#onBeforeExcelDownload(org.projectforge.export.MyExcelExporter)
+   */
+  @Override
+  protected void onBeforeExcelDownload(final MyExcelExporter exporter)
+  {
+    final InvoicesExcelExport invoicesExport = new InvoicesExcelExport();
+    final List<RechnungDO> invoices = rechnungDao.getList(new RechnungFilter().setListType(RechnungFilter.FILTER_UNBEZAHLT));
+    invoicesExport.addDebitorInvoicesSheet(exporter, getString("fibu.rechnungen"), invoices);
+    final List<EingangsrechnungDO> creditorInvoices = eingangsrechnungDao.getList(new RechnungFilter().setListType(RechnungFilter.FILTER_UNBEZAHLT));
+    invoicesExport.addCreditorInvoicesSheet(exporter, getString("fibu.eingangsrechnungen"), creditorInvoices);
   }
 
   /**

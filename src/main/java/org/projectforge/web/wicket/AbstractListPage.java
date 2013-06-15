@@ -61,6 +61,7 @@ import org.projectforge.core.PropertyInfo;
 import org.projectforge.core.UserException;
 import org.projectforge.excel.ContentProvider;
 import org.projectforge.excel.ExportColumn;
+import org.projectforge.excel.ExportSheet;
 import org.projectforge.export.MyExcelExporter;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
@@ -752,7 +753,7 @@ extends AbstractSecuredPage implements ISelectCallerPage
        *      org.projectforge.core.PropertyInfo, org.projectforge.excel.ExportColumn)
        */
       @Override
-      protected void putFieldFormat(final ContentProvider sheetProvider, final Field field, final PropertyInfo propInfo,
+      public void putFieldFormat(final ContentProvider sheetProvider, final Field field, final PropertyInfo propInfo,
           final ExportColumn exportColumn)
       {
         super.putFieldFormat(sheetProvider, field, propInfo, exportColumn);
@@ -762,7 +763,8 @@ extends AbstractSecuredPage implements ISelectCallerPage
         AbstractListPage.this.putExcelFieldFormat(field, propInfo, exportColumn);
       }
     };
-    exporter.addSheet(getExcelSheetname(), list);
+    final ExportSheet sheet = exporter.addSheet(getExcelSheetname());
+    exporter.addList(sheet, list);
     onBeforeExcelDownload(exporter);
     DownloadUtils.setDownloadTarget(exporter.getWorkbook().getAsByteArray(), filename);
   }
