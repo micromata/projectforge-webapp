@@ -43,6 +43,7 @@ import org.projectforge.calendar.DayHolder;
 import org.projectforge.common.DateHolder;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.PFPersistancyBehavior;
+import org.projectforge.core.PropertyInfo;
 import org.projectforge.fibu.kost.KostZuweisungDO;
 
 @MappedSuperclass
@@ -50,19 +51,24 @@ public abstract class AbstractRechnungDO<T extends AbstractRechnungsPositionDO> 
 {
   private static final long serialVersionUID = -8936320220788212987L;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
-  protected String betreff;
-
-  @Field(index = Index.TOKENIZED, store = Store.NO)
-  protected String bemerkung;
-
-  @Field(index = Index.TOKENIZED, store = Store.NO)
-  protected String besonderheiten;
-
+  @PropertyInfo(i18nKey = "fibu.rechnung.datum")
   @Field(index = Index.UN_TOKENIZED)
   @DateBridge(resolution = Resolution.DAY)
   protected Date datum;
 
+  @PropertyInfo(i18nKey = "fibu.rechnung.betreff")
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  protected String betreff;
+
+  @PropertyInfo(i18nKey = "comment")
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  protected String bemerkung;
+
+  @PropertyInfo(i18nKey = "fibu.rechnung.besonderheiten")
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  protected String besonderheiten;
+
+  @PropertyInfo(i18nKey = "fibu.rechnung.faelligkeit")
   @Field(index = Index.UN_TOKENIZED)
   @DateBridge(resolution = Resolution.DAY)
   protected Date faelligkeit;
@@ -70,10 +76,12 @@ public abstract class AbstractRechnungDO<T extends AbstractRechnungsPositionDO> 
   @Field(index = Index.UN_TOKENIZED)
   protected transient Integer zahlungsZielInTagen;
 
+  @PropertyInfo(i18nKey = "fibu.rechnung.bezahlDatum")
   @Field(index = Index.UN_TOKENIZED)
   @DateBridge(resolution = Resolution.DAY)
   protected Date bezahlDatum;
 
+  @PropertyInfo(i18nKey = "fibu.rechnung.zahlBetrag")
   @Field(index = Index.UN_TOKENIZED)
   protected BigDecimal zahlBetrag;
 

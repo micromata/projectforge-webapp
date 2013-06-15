@@ -47,6 +47,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.core.AbstractHistorizableBaseDO;
+import org.projectforge.core.PropertyInfo;
 
 /**
  * Geplante und gestellte Rechnungen.
@@ -59,24 +60,31 @@ public class RechnungDO extends AbstractRechnungDO<RechnungsPositionDO> implemen
 {
   private static final long serialVersionUID = 8143023040624332677L;
 
+  @PropertyInfo(i18nKey = "fibu.rechnung.nummer")
   @Field(index = Index.UN_TOKENIZED, store = Store.NO)
   private Integer nummer;
 
+  @PropertyInfo(i18nKey = "fibu.kunde")
   @IndexedEmbedded(depth = 1)
   private KundeDO kunde;
 
+  @PropertyInfo(i18nKey = "fibu.kunde")
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String kundeText;
 
+  @PropertyInfo(i18nKey = "fibu.projekt")
   @IndexedEmbedded(depth = 2)
   private ProjektDO projekt;
 
+  @PropertyInfo(i18nKey = "fibu.rechnung.status")
   @Field(index = Index.UN_TOKENIZED, store = Store.NO)
   private RechnungStatus status;
 
+  @PropertyInfo(i18nKey = "fibu.rechnung.typ")
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private RechnungTyp typ;
 
+  @PropertyInfo(i18nKey = "fibu.konto")
   private KontoDO konto;
 
   static {

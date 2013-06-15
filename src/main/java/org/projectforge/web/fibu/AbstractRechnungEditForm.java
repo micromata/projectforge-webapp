@@ -187,7 +187,7 @@ extends AbstractEditForm<O, P>
     gridBuilder.newSubSplitPanel(GridSize.COL50);
     {
       // Date
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.datum"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(AbstractRechnungDO.class, "datum");
       datumPanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "datum"), DatePanelSettings.get().withTargetType(
           java.sql.Date.class));
       dependentFormComponents[0] = datumPanel.getDateField();
@@ -242,7 +242,7 @@ extends AbstractEditForm<O, P>
     gridBuilder.newSubSplitPanel(GridSize.COL50);
     {
       // Bezahldatum
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.bezahlDatum"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(AbstractRechnungDO.class, "bezahlDatum");
       final DatePanel bezahlDatumPanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "bezahlDatum"), DatePanelSettings
           .get().withTargetType(java.sql.Date.class));
       dependentFormComponents[1] = bezahlDatumPanel.getDateField();
@@ -251,7 +251,7 @@ extends AbstractEditForm<O, P>
     gridBuilder.newSubSplitPanel(GridSize.COL50);
     {
       // Zahlbetrag
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.zahlBetrag"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(AbstractRechnungDO.class, "zahlBetrag");
       final TextField<BigDecimal> zahlBetragField = new TextField<BigDecimal>(InputPanel.WICKET_ID, new PropertyModel<BigDecimal>(data,
           "zahlBetrag")) {
         @SuppressWarnings({ "rawtypes", "unchecked"})
@@ -267,7 +267,7 @@ extends AbstractEditForm<O, P>
     {
       gridBuilder.newSubSplitPanel(GridSize.COL50);
       // Fälligkeit und Zahlungsziel
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.faelligkeit"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(AbstractRechnungDO.class, "faelligkeit");
       faelligkeitPanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "faelligkeit"), DatePanelSettings.get()
           .withTargetType(java.sql.Date.class));
       dependentFormComponents[2] = faelligkeitPanel.getDateField();
@@ -312,13 +312,13 @@ extends AbstractEditForm<O, P>
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Bemerkung
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(AbstractRechnungDO.class, "bemerkung");
       fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "bemerkung")), true);
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Besonderheiten
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.besonderheiten"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(AbstractRechnungDO.class, "besonderheiten");
       fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "besonderheiten")), true);
     }
     gridBuilder.newGridPanel();
@@ -505,7 +505,8 @@ extends AbstractEditForm<O, P>
         posGridBuilder.newSplitPanel(GridSize.COL50, true);
         posGridBuilder.newSubSplitPanel(GridSize.COL33);
         {
-          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.common.netto")).setLabelSide(false).suppressLabelForWarning();
+          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.common.netto")).setLabelSide(false)
+              .suppressLabelForWarning();
           final TextPanel netTextPanel = new TextPanel(fieldset.newChildId(), new Model<String>() {
             @Override
             public String getObject()
@@ -520,7 +521,8 @@ extends AbstractEditForm<O, P>
       {
         posGridBuilder.newSubSplitPanel(GridSize.COL33);
         {
-          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.common.vatAmount")).setLabelSide(false).suppressLabelForWarning();
+          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.common.vatAmount")).setLabelSide(false)
+              .suppressLabelForWarning();
           final TextPanel vatTextPanel = new TextPanel(fieldset.newChildId(), new Model<String>() {
             @Override
             public String getObject()
@@ -535,7 +537,8 @@ extends AbstractEditForm<O, P>
       {
         posGridBuilder.newSubSplitPanel(GridSize.COL33);
         {
-          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.common.brutto")).setLabelSide(false).suppressLabelForWarning();
+          final FieldsetPanel fieldset = posGridBuilder.newFieldset(getString("fibu.common.brutto")).setLabelSide(false)
+              .suppressLabelForWarning();
           final TextPanel grossTextPanel = new TextPanel(fieldset.newChildId(), new Model<String>() {
             @Override
             public String getObject()

@@ -77,7 +77,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     gridBuilder.newGridPanel();
     {
       // Subject
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.betreff"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(RechnungDO.class, "betreff");
       final MaxLengthTextField subject = new RequiredMaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "betreff"));
       subject.add(WicketUtils.setFocus());
       fs.add(subject);
@@ -86,7 +86,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     gridBuilder.newSplitPanel(GridSize.COL50, true).newSubSplitPanel(GridSize.COL50);
     {
       // Number
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.nummer"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(RechnungDO.class, "nummer");
       final MinMaxNumberField<Integer> number = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data,
           "nummer"), 0, 99999999);
       number.setMaxLength(8).add(AttributeModifier.append("style", "width: 6em !important;"));
@@ -98,7 +98,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     gridBuilder.newSubSplitPanel(GridSize.COL50);
     {
       // Status
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.status"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(RechnungDO.class, "status");
       final LabelValueChoiceRenderer<RechnungStatus> statusChoiceRenderer = new LabelValueChoiceRenderer<RechnungStatus>(this,
           RechnungStatus.values());
       statusChoice = new DropDownChoice<RechnungStatus>(fs.getDropDownChoiceId(), new PropertyModel<RechnungStatus>(data, "status"),
@@ -110,7 +110,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     {
       // Type
       gridBuilder.newSubSplitPanel(GridSize.COL50);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.typ"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(RechnungDO.class, "typ");
       final LabelValueChoiceRenderer<RechnungTyp> typeChoiceRenderer = new LabelValueChoiceRenderer<RechnungTyp>(this, RechnungTyp.values());
       final DropDownChoice<RechnungTyp> typeChoice = new DropDownChoice<RechnungTyp>(fs.getDropDownChoiceId(),
           new PropertyModel<RechnungTyp>(data, "typ"), typeChoiceRenderer.getValues(), typeChoiceRenderer);
@@ -121,7 +121,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     gridBuilder.newSubSplitPanel(GridSize.COL50);
     if (Registry.instance().getKontoCache().isEmpty() == false) {
       // Show this field only if DATEV accounts does exist.
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.konto"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(RechnungDO.class, "konto");
       final KontoSelectPanel kontoSelectPanel = new KontoSelectPanel(fs.newChildId(), new PropertyModel<KontoDO>(data, "konto"), null,
           "kontoId");
       kontoSelectPanel.setKontoNumberRanges(AccountingConfig.getInstance().getDebitorsAccountNumberRanges()).init();
@@ -131,7 +131,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     gridBuilder.newSubSplitPanel(GridSize.COL100);
     {
       // Customer
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(RechnungDO.class, "kunde");
       customerSelectPanel = new CustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"), new PropertyModel<String>(
           data, "kundeText"), parentPage, "kundeId");
       fs.add(customerSelectPanel);
@@ -141,7 +141,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     }
     {
       // Projekt
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt")).suppressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(RechnungDO.class, "projekt").suppressLabelForWarning();
       final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data, "projekt"),
           parentPage, "projektId");
       fs.add(projektSelectPanel);

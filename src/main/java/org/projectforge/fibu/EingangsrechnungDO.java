@@ -46,6 +46,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.core.AbstractHistorizableBaseDO;
+import org.projectforge.core.PropertyInfo;
 
 /**
  * Eingehende Rechnungen.
@@ -59,15 +60,19 @@ public class EingangsrechnungDO extends AbstractRechnungDO<EingangsrechnungsPosi
 {
   private static final long serialVersionUID = -9085180505664149496L;
 
+  @PropertyInfo(i18nKey = "fibu.common.reference")
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String referenz;
 
+  @PropertyInfo(i18nKey = "fibu.common.creditor")
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String kreditor;
 
+  @PropertyInfo(i18nKey = "fibu.konto")
   @IndexedEmbedded(depth = 1)
   private KontoDO konto;
 
+  @PropertyInfo(i18nKey = "fibu.payment.type")
   private PaymentType paymentType;
 
   static {

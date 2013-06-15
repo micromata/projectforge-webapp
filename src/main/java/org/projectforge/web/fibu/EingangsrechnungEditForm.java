@@ -28,6 +28,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.PropertyModel;
+import org.projectforge.fibu.AbstractRechnungDO;
 import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.EingangsrechnungsPositionDO;
 import org.projectforge.fibu.KontoDO;
@@ -60,14 +61,14 @@ AbstractRechnungEditForm<EingangsrechnungDO, EingangsrechnungsPositionDO, Eingan
   {
     {
       // Subject
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.betreff"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(AbstractRechnungDO.class, "betreff");
       fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "betreff")));
     }
     /* GRID50 - BLOCK */
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Creditor
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.creditor"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(EingangsrechnungDO.class, "kreditor");
       final PFAutoCompleteTextField<String> kreditorField = new PFAutoCompleteTextField<String>(InputPanel.WICKET_ID,
           new PropertyModel<String>(data, "kreditor")) {
         @Override
@@ -81,12 +82,12 @@ AbstractRechnungEditForm<EingangsrechnungDO, EingangsrechnungsPositionDO, Eingan
     }
     {
       // Reference
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.reference"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(EingangsrechnungDO.class, "referenz");
       fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "referenz")));
     }
     if (Registry.instance().getKontoCache().isEmpty() == false) {
       // Account
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.konto"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(EingangsrechnungDO.class, "konto");
       final KontoSelectPanel kontoSelectPanel = new KontoSelectPanel(fs.newChildId(), new PropertyModel<KontoDO>(data, "konto"),
           parentPage, "kontoId");
       kontoSelectPanel.setKontoNumberRanges(AccountingConfig.getInstance().getCreditorsAccountNumberRanges()).init();
@@ -100,7 +101,7 @@ AbstractRechnungEditForm<EingangsrechnungDO, EingangsrechnungsPositionDO, Eingan
   {
     gridBuilder.newSplitPanel(GridSize.COL50);
     // DropDownChoice payment type
-    final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.payment.type"));
+    final FieldsetPanel fs = gridBuilder.newFieldset(EingangsrechnungDO.class, "paymentType");
     final LabelValueChoiceRenderer<PaymentType> paymentTypeChoiceRenderer = new LabelValueChoiceRenderer<PaymentType>(this,
         PaymentType.values());
     final DropDownChoice<PaymentType> paymentTypeChoice = new DropDownChoice<PaymentType>(fs.getDropDownChoiceId(),
