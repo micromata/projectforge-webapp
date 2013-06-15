@@ -763,7 +763,16 @@ extends AbstractSecuredPage implements ISelectCallerPage
       }
     };
     exporter.addSheet(getExcelSheetname(), list);
+    onBeforeExcelDownload(exporter);
     DownloadUtils.setDownloadTarget(exporter.getWorkbook().getAsByteArray(), filename);
+  }
+
+  /**
+   * You may add here data or sheets to the Excel file before the download starts. Does nothing at default.
+   * @param exporter
+   */
+  protected void onBeforeExcelDownload(final MyExcelExporter exporter)
+  {
   }
 
   /**
