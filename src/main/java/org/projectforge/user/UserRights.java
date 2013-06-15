@@ -121,7 +121,7 @@ public class UserRights
   {
     final UserRightId rightId =  rightIds.get(userRightId);
     if (rightId == null) {
-      log.warn("UserRightId with id '" + userRightId + "' not found.");
+      log.warn("UserRightId with id '" + userRightId + "' not found (may-be not yet initialized).");
     }
     return rightId;
   }
