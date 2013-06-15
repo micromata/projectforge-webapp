@@ -90,10 +90,10 @@ public class LiquidityEntryDao extends BaseDao<LiquidityEntryDO>
         continue;
       }
       if (entry.getAmount() != null) {
-        if (myFilter.getAmountType() == AmountType.CREDIT && BigDecimal.ZERO.compareTo(entry.getAmount()) >= 0) {
+        if (myFilter.getAmountType() == AmountType.CREDIT && entry.getAmount().compareTo(BigDecimal.ZERO) >= 0) {
           continue;
         }
-        if (myFilter.getAmountType() == AmountType.DEBIT && BigDecimal.ZERO.compareTo(entry.getAmount()) <= 0) {
+        if (myFilter.getAmountType() == AmountType.DEBIT && entry.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
           continue;
         }
       }
@@ -105,7 +105,8 @@ public class LiquidityEntryDao extends BaseDao<LiquidityEntryDO>
         if (dateOfPayment.before(today.getDate()) == true) {
           // Entry is before today:
           if (myFilter.getPaymentStatus() == PaymentStatus.PAID || entry.isPaid() == true) {
-            // Ignore entries of the past if they were paid. Also ignore unpaid entries of the past if the user wants to filter only paid entries.
+            // Ignore entries of the past if they were paid. Also ignore unpaid entries of the past if the user wants to filter only paid
+            // entries.
             continue;
           }
         } else {
