@@ -23,6 +23,7 @@
 
 package org.projectforge.plugins.liquidityplanning;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -31,27 +32,22 @@ import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulato
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
-import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.calendar.DayHolder;
-import org.projectforge.common.DateHelper;
-import org.projectforge.excel.ContentProvider;
-import org.projectforge.export.MyExcelExporter;
-import org.projectforge.export.MyXlsContentProvider;
+import org.projectforge.core.PropertyInfo;
+import org.projectforge.excel.ExportColumn;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.CurrencyPropertyColumn;
-import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 import org.projectforge.web.wicket.RowCssClass;
-import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.projectforge.web.wicket.flowlayout.IconPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 
@@ -151,37 +147,46 @@ IListPageColumnsCreator<LiquidityEntryDO>
     return columns;
   }
 
-  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
     dataTable = createDataTable(createColumns(this, true), "dateOfPayment", SortOrder.ASCENDING);
     form.add(dataTable);
-    final ContentMenuEntryPanel exportExcelButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
-      @Override
-      public void onClick()
-      {
-        exportExcel();
-      };
-    }, getString("exportAsXls")).setTooltip(getString("tooltip.export.excel"));
-    addContentMenuEntry(exportExcelButton);
+    addExcelExport();
   }
 
-  void exportExcel()
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#getExcelFilenameIdentifier()
+   */
+  @Override
+  protected String getExcelFilenameIdentifier()
   {
-    refresh();
-    final List<LiquidityEntryDO> list = getList();
-    if (list == null || list.size() == 0) {
-      // Nothing to export.
-      form.addError("validation.error.nothingToExport");
-      return;
-    }
-    final String filename = "ProjectForge-liquidity_" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".xls";
-    final MyExcelExporter exporter = new MyExcelExporter(filename);
-    final ContentProvider contentProvider = new MyXlsContentProvider(exporter.getWorkbook());
-    exporter.addSheet(contentProvider, getString("plugins.liquidityplanning.entry.title.heading"), list);
+    return "liquidity";
+  }
 
-    DownloadUtils.setDownloadTarget(exporter.getWorkbook().getAsByteArray(), filename);
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#getExcelSheetname()
+   */
+  @Override
+  protected String getExcelSheetname()
+  {
+    return getString("plugins.liquidityplanning.entry.title.heading");
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#putExcelFieldFormat(java.lang.reflect.Field, org.projectforge.core.PropertyInfo,
+   *      org.projectforge.excel.ExportColumn)
+   */
+  @Override
+  protected void putExcelFieldFormat(final Field field, final PropertyInfo propInfo, final ExportColumn exportColumn)
+  {
+    if ("dateOfPayment".equals(field.getName()) == true) {
+      exportColumn.setWidth(12);
+    } else if ("payed".equals(field.getName()) == true) {
+      exportColumn.setWidth(8);
+    } else if ("subject".equals(field.getName()) == true || "comment".equals(field.getName()) == true) {
+      exportColumn.setWidth(40);
+    }
   }
 
   /**

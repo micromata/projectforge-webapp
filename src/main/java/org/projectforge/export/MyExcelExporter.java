@@ -24,14 +24,17 @@
 package org.projectforge.export;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 import org.projectforge.common.DateFormatType;
 import org.projectforge.common.DateFormats;
 import org.projectforge.core.PropertyInfo;
 import org.projectforge.core.PropertyType;
+import org.projectforge.excel.CellFormat;
 import org.projectforge.excel.ContentProvider;
 import org.projectforge.excel.ExcelExporter;
 import org.projectforge.excel.ExportColumn;
+import org.projectforge.excel.ExportSheet;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -45,6 +48,21 @@ public class MyExcelExporter extends ExcelExporter
   public MyExcelExporter(final String filename)
   {
     super(filename);
+  }
+
+  public <T> ExportSheet addSheet(final String sheetTitle, final List<T> list)
+  {
+    final ContentProvider contentProvider = new MyXlsContentProvider(getWorkbook()) {
+      /**
+       * @see org.projectforge.export.MyXlsContentProvider#getCustomizedCellFormat(org.projectforge.excel.CellFormat, java.lang.Object)
+       */
+      @Override
+      protected CellFormat getCustomizedCellFormat(final CellFormat format, final Object value)
+      {
+        return null;
+      }
+    };
+    return addSheet(contentProvider, sheetTitle, list);
   }
 
   /**
@@ -61,20 +79,28 @@ public class MyExcelExporter extends ExcelExporter
     final PropertyType type = propInfo.type();
     if (type == PropertyType.DATE) {
       sheetProvider.putFormat(exportColumn, DateFormats.getExcelFormatString(DateFormatType.DATE));
-      return;
+      exportColumn.setWidth(10);
     } else if (type == PropertyType.DATE_TIME) {
       sheetProvider.putFormat(exportColumn, DateFormats.getExcelFormatString(DateFormatType.DATE_TIME_MINUTES));
+      exportColumn.setWidth(10);
     } else if (type == PropertyType.DATE_TIME_SECONDS) {
       sheetProvider.putFormat(exportColumn, DateFormats.getExcelFormatString(DateFormatType.DATE_TIME_SECONDS));
+      exportColumn.setWidth(16);
     } else if (type == PropertyType.DATE_TIME_MILLIS) {
       sheetProvider.putFormat(exportColumn, DateFormats.getExcelFormatString(DateFormatType.DATE_TIME_MILLIS));
+      exportColumn.setWidth(18);
     } else if (type == PropertyType.UNSPECIFIED) {
       if (java.sql.Date.class.isAssignableFrom(field.getType()) == true) {
         sheetProvider.putFormat(exportColumn, DateFormats.getExcelFormatString(DateFormatType.DATE));
+        exportColumn.setWidth(10);
       } else if (java.util.Date.class.isAssignableFrom(field.getType()) == true) {
         sheetProvider.putFormat(exportColumn, DateFormats.getExcelFormatString(DateFormatType.DATE_TIME_MINUTES));
+        exportColumn.setWidth(16);
+      } else {
+        super.putFieldFormat(sheetProvider, field, propInfo, exportColumn);
       }
+    } else {
+      super.putFieldFormat(sheetProvider, field, propInfo, exportColumn);
     }
-    super.putFieldFormat(sheetProvider, field, propInfo, exportColumn);
   }
 }

@@ -24,7 +24,9 @@
 package org.projectforge.web.wicket;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,6 +49,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.projectforge.common.DateHelper;
 import org.projectforge.common.RecentQueue;
 import org.projectforge.common.ReflectionHelper;
 import org.projectforge.common.StringHelper;
@@ -54,7 +57,11 @@ import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.IdObject;
+import org.projectforge.core.PropertyInfo;
 import org.projectforge.core.UserException;
+import org.projectforge.excel.ContentProvider;
+import org.projectforge.excel.ExportColumn;
+import org.projectforge.export.MyExcelExporter;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
@@ -710,6 +717,86 @@ extends AbstractSecuredPage implements ISelectCallerPage
   public boolean isStoreFilter()
   {
     return storeFilter;
+  }
+
+  /**
+   * Adds a excel export content menu entry. ProjectForge exports all data fields (annotated with {@link PropertyInfo} of the current
+   * displayed result list.
+   */
+  public void addExcelExport()
+  {
+    @SuppressWarnings("serial")
+    final ContentMenuEntryPanel exportExcelButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
+      @Override
+      public void onClick()
+      {
+        exportExcel();
+      };
+    }, getString("exportAsXls")).setTooltip(getString("tooltip.export.excel"));
+    addContentMenuEntry(exportExcelButton);
+  }
+
+  protected void exportExcel()
+  {
+    refresh();
+    final List< ? > list = getList();
+    if (list == null || list.size() == 0) {
+      // Nothing to export.
+      form.addError("validation.error.nothingToExport");
+      return;
+    }
+    final String filename = "ProjectForge-" + getExcelFilenameIdentifier() + "_" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".xls";
+    final MyExcelExporter exporter = new MyExcelExporter(filename) {
+      /**
+       * @see org.projectforge.export.MyExcelExporter#putFieldFormat(org.projectforge.excel.ContentProvider, java.lang.reflect.Field,
+       *      org.projectforge.core.PropertyInfo, org.projectforge.excel.ExportColumn)
+       */
+      @Override
+      protected void putFieldFormat(final ContentProvider sheetProvider, final Field field, final PropertyInfo propInfo,
+          final ExportColumn exportColumn)
+      {
+        super.putFieldFormat(sheetProvider, field, propInfo, exportColumn);
+        if ("deleted".equals(field.getName()) == true) {
+          exportColumn.setWidth(8);
+        }
+        AbstractListPage.this.putExcelFieldFormat(field, propInfo, exportColumn);
+      }
+    };
+    exporter.addSheet(getExcelSheetname(), list);
+    DownloadUtils.setDownloadTarget(exporter.getWorkbook().getAsByteArray(), filename);
+  }
+
+  /**
+   * You may set column width and special formats here. Does nothing at default.
+   * @param field
+   * @param propInfo
+   * @param exportColumn
+   */
+  protected void putExcelFieldFormat(final Field field, final PropertyInfo propInfo, final ExportColumn exportColumn)
+  {
+    // if ("dateOfPayment".equals(field.getName()) == true) {
+    // exportColumn.setWidth(12);
+    // }
+  }
+
+  /**
+   * The Excel filename of exported data is "ProjectForge-&lt;identifier&gt;_&lt;date&gt;.xls".
+   * @return "export" at default.
+   * @see #addExcelExport()
+   */
+  protected String getExcelFilenameIdentifier()
+  {
+    return "export";
+  }
+
+  /**
+   * The sheet name of the exported Excel data.
+   * @return "data" at default.
+   * @see #addExcelExport()
+   */
+  protected String getExcelSheetname()
+  {
+    return "data";
   }
 
   /**
