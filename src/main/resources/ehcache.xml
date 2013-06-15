@@ -13,6 +13,7 @@
   <cache name="org.projectforge.task.TaskDao" maxElementsInMemory="1000" />
   <cache name="org.projectforge.timesheet.TimesheetDao" maxElementsInMemory="10000" />
 
+  <cache name="org.projectforge.plugins.liquidityplanning.LiquidityEntryDao" maxElementsInMemory="1000" />
   <cache name="org.projectforge.plugins.teamcal.admin.TeamCalDao" maxElementsInMemory="1000" />
   <cache name="org.projectforge.plugins.teamcal.event.TeamEventDao" maxElementsInMemory="1000" />
   <cache name="org.projectforge.plugins.todo.ToDoDao" maxElementsInMemory="1000" />
