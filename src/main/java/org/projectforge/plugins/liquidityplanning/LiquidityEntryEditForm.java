@@ -90,8 +90,8 @@ public class LiquidityEntryEditForm extends AbstractEditForm<LiquidityEntryDO, L
       }
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(LiquidityEntryDO.class, "payed");
-      fs.addCheckBox(new PropertyModel<Boolean>(data, "payed"), null);
+      final FieldsetPanel fs = gridBuilder.newFieldset(LiquidityEntryDO.class, "paid");
+      fs.addCheckBox(new PropertyModel<Boolean>(data, "paid"), null);
     }
     {
       // Subject

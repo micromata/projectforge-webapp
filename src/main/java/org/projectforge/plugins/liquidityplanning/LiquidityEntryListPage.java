@@ -94,7 +94,7 @@ IListPageColumnsCreator<LiquidityEntryDO>
         if (liquidityEntry.isDeleted() == true) {
           // Do nothing further
         } else {
-          if (liquidityEntry.isPayed() == false) {
+          if (liquidityEntry.isPaid() == false) {
             if (liquidityEntry.getDateOfPayment() == null || liquidityEntry.getDateOfPayment().before(today) == true) {
               appendCssClasses(item, RowCssClass.IMPORTANT_ROW);
             } else {
@@ -124,14 +124,14 @@ IListPageColumnsCreator<LiquidityEntryDO>
     });
     columns.add(new CurrencyPropertyColumn<LiquidityEntryDO>(LiquidityEntryDO.class, getSortable("amount", sortable), "amount",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(LiquidityEntryDO.class, getSortable("payed", sortable), "payed",
+    columns.add(new CellItemListenerPropertyColumn<LiquidityEntryDO>(LiquidityEntryDO.class, getSortable("paid", sortable), "paid",
         cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<LiquidityEntryDO>> item, final String componentId,
           final IModel<LiquidityEntryDO> rowModel)
       {
         final LiquidityEntryDO entry = rowModel.getObject();
-        if (entry.isPayed() == true) {
+        if (entry.isPaid() == true) {
           item.add(new IconPanel(componentId, IconType.ACCEPT));
         } else {
           item.add(createInvisibleDummyComponent(componentId));
@@ -182,7 +182,7 @@ IListPageColumnsCreator<LiquidityEntryDO>
   {
     if ("dateOfPayment".equals(field.getName()) == true) {
       exportColumn.setWidth(12);
-    } else if ("payed".equals(field.getName()) == true) {
+    } else if ("paid".equals(field.getName()) == true) {
       exportColumn.setWidth(8);
     } else if ("subject".equals(field.getName()) == true || "comment".equals(field.getName()) == true) {
       exportColumn.setWidth(40);

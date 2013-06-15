@@ -32,7 +32,7 @@ import org.projectforge.core.I18nEnum;
  */
 public enum PaymentStatus implements I18nEnum
 {
-  ALL("all"), PAYED("payed"), UNPAYED("unpayed");
+  ALL("all"), PAID("paid"), UNPAID("unpaid");
 
   private String key;
 

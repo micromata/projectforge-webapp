@@ -23,9 +23,17 @@
 
 package org.projectforge.plugins.liquidityplanning;
 
+import java.math.BigDecimal;
+import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.projectforge.calendar.DayHolder;
 import org.projectforge.core.BaseDao;
+import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.core.QueryFilter;
+import org.projectforge.fibu.AmountType;
+import org.projectforge.fibu.PaymentStatus;
 import org.projectforge.user.UserRightId;
 
 /**
@@ -55,6 +63,61 @@ public class LiquidityEntryDao extends BaseDao<LiquidityEntryDO>
     return stats;
   }
 
+  @Override
+  public List<LiquidityEntryDO> getList(final BaseSearchFilter filter)
+  {
+    final LiquidityFilter myFilter;
+    if (filter instanceof LiquidityFilter) {
+      myFilter = (LiquidityFilter) filter;
+    } else {
+      myFilter = new LiquidityFilter(filter);
+    }
+    final QueryFilter queryFilter = new QueryFilter(myFilter);
+    final List<LiquidityEntryDO> list = getList(queryFilter);
+    if (myFilter.getPaymentStatus() == PaymentStatus.ALL
+        && myFilter.getAmountType() == AmountType.ALL
+        && myFilter.getNextDays() <= 0
+        || myFilter.isDeleted() == true) {
+      return list;
+    }
+    final List<LiquidityEntryDO> result = new ArrayList<LiquidityEntryDO>();
+    final DayHolder today = new DayHolder();
+    for (final LiquidityEntryDO entry : list) {
+      if (myFilter.getPaymentStatus() == PaymentStatus.PAID && entry.isPaid() == false) {
+        continue;
+      }
+      if (myFilter.getPaymentStatus() == PaymentStatus.UNPAID && entry.isPaid() == true) {
+        continue;
+      }
+      if (entry.getAmount() != null) {
+        if (myFilter.getAmountType() == AmountType.CREDIT && BigDecimal.ZERO.compareTo(entry.getAmount()) >= 0) {
+          continue;
+        }
+        if (myFilter.getAmountType() == AmountType.DEBIT && BigDecimal.ZERO.compareTo(entry.getAmount()) <= 0) {
+          continue;
+        }
+      }
+      if (myFilter.getNextDays() > 0) {
+        Date dateOfPayment = entry.getDateOfPayment();
+        if (dateOfPayment == null) {
+          dateOfPayment = today.getSQLDate();
+        }
+        if (dateOfPayment.before(today.getDate()) == true) {
+          // Entry is before today:
+          if (myFilter.getPaymentStatus() == PaymentStatus.PAID || entry.isPaid() == true) {
+            // Ignore entries of the past if they were paid. Also ignore unpaid entries of the past if the user wants to filter only paid entries.
+            continue;
+          }
+        } else {
+          if (today.daysBetween(entry.getDateOfPayment()) > myFilter.getNextDays()) {
+            continue;
+          }
+        }
+      }
+      result.add(entry);
+    }
+    return result;
+  }
 
   @Override
   public LiquidityEntryDO newInstance()

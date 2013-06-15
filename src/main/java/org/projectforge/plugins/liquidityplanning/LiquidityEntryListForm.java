@@ -28,6 +28,7 @@ import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.core.CurrencyFormatter;
+import org.projectforge.fibu.AmountType;
 import org.projectforge.fibu.PaymentStatus;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.WebConstants;
@@ -77,7 +78,7 @@ public class LiquidityEntryListForm extends AbstractListForm<LiquidityFilter, Li
         {
           return getString("fibu.rechnung.status.bezahlt")
               + ": "
-              + CurrencyFormatter.format(getStats().getPayed())
+              + CurrencyFormatter.format(getStats().getPaid())
               + WebConstants.HTML_TEXT_DIVIDER;
         }
       }));
@@ -115,7 +116,7 @@ public class LiquidityEntryListForm extends AbstractListForm<LiquidityFilter, Li
   {
     // DropDownChoice next days
     final LabelValueChoiceRenderer<Integer> nextDaysRenderer = new LabelValueChoiceRenderer<Integer>();
-    nextDaysRenderer.addValue(0, "filter.all");
+    nextDaysRenderer.addValue(0, getString("filter.all"));
     nextDaysRenderer.addValue(7, getLocalizedMessage("search.nextDays", 7));
     nextDaysRenderer.addValue(10, getLocalizedMessage("search.nextDays", 10));
     nextDaysRenderer.addValue(14, getLocalizedMessage("search.nextDays", 14));
@@ -126,32 +127,60 @@ public class LiquidityEntryListForm extends AbstractListForm<LiquidityFilter, Li
         new PropertyModel<Integer>(getSearchFilter(), "nextDays"), nextDaysRenderer.getValues(), nextDaysRenderer);
     nextDaysChoice.setNullValid(false);
     optionsFieldsetPanel.add(nextDaysChoice, true);
+    {
+      final DivPanel radioGroupPanel = optionsFieldsetPanel.addNewRadioBoxDiv();
+      final RadioGroupPanel<PaymentStatus> radioGroup = new RadioGroupPanel<PaymentStatus>(radioGroupPanel.newChildId(), "paymentStatus",
+          new PropertyModel<PaymentStatus>(getSearchFilter(), "paymentStatus")) {
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.RadioGroupPanel#wantOnSelectionChangedNotifications()
+         */
+        @Override
+        protected boolean wantOnSelectionChangedNotifications()
+        {
+          return true;
+        }
 
-    final DivPanel radioGroupPanel = optionsFieldsetPanel.addNewRadioBoxDiv();
-    final RadioGroupPanel<PaymentStatus> radioGroup = new RadioGroupPanel<PaymentStatus>(radioGroupPanel.newChildId(), "paymentStatus",
-        new PropertyModel<PaymentStatus>(getSearchFilter(), "paymentStatus")) {
-      /**
-       * @see org.projectforge.web.wicket.flowlayout.RadioGroupPanel#wantOnSelectionChangedNotifications()
-       */
-      @Override
-      protected boolean wantOnSelectionChangedNotifications()
-      {
-        return true;
-      }
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.RadioGroupPanel#onSelectionChanged(java.lang.Object)
+         */
+        @Override
+        protected void onSelectionChanged(final Object newSelection)
+        {
+          parentPage.refresh();
+        }
+      };
+      radioGroupPanel.add(radioGroup);
+      radioGroup.add(new Model<PaymentStatus>(PaymentStatus.ALL), getString(PaymentStatus.ALL.getI18nKey()));
+      radioGroup.add(new Model<PaymentStatus>(PaymentStatus.UNPAID), getString(PaymentStatus.UNPAID.getI18nKey()));
+      radioGroup.add(new Model<PaymentStatus>(PaymentStatus.PAID), getString(PaymentStatus.PAID.getI18nKey()));
+    }
+    {
+      final DivPanel radioGroupPanel = optionsFieldsetPanel.addNewRadioBoxDiv();
+      final RadioGroupPanel<AmountType> radioGroup = new RadioGroupPanel<AmountType>(radioGroupPanel.newChildId(), "amountType",
+          new PropertyModel<AmountType>(getSearchFilter(), "amountType")) {
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.RadioGroupPanel#wantOnSelectionChangedNotifications()
+         */
+        @Override
+        protected boolean wantOnSelectionChangedNotifications()
+        {
+          return true;
+        }
 
-      /**
-       * @see org.projectforge.web.wicket.flowlayout.RadioGroupPanel#onSelectionChanged(java.lang.Object)
-       */
-      @Override
-      protected void onSelectionChanged(final Object newSelection)
-      {
-        parentPage.refresh();
-      }
-    };
-    radioGroupPanel.add(radioGroup);
-    radioGroup.add(new Model<PaymentStatus>(PaymentStatus.ALL), getString(PaymentStatus.ALL.getI18nKey()));
-    radioGroup.add(new Model<PaymentStatus>(PaymentStatus.UNPAYED), getString(PaymentStatus.UNPAYED.getI18nKey()));
-    radioGroup.add(new Model<PaymentStatus>(PaymentStatus.PAYED), getString(PaymentStatus.PAYED.getI18nKey()));
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.RadioGroupPanel#onSelectionChanged(java.lang.Object)
+         */
+        @Override
+        protected void onSelectionChanged(final Object newSelection)
+        {
+          parentPage.refresh();
+        }
+      };
+      radioGroupPanel.add(radioGroup);
+      radioGroup.add(new Model<AmountType>(AmountType.ALL), getString(AmountType.ALL.getI18nKey()));
+      radioGroup.add(new Model<AmountType>(AmountType.CREDIT), getString(AmountType.CREDIT.getI18nKey()));
+      radioGroup.add(new Model<AmountType>(AmountType.DEBIT), getString(AmountType.DEBIT.getI18nKey()));
+    }
   }
 
   @Override

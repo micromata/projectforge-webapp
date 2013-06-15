@@ -34,9 +34,9 @@ public class LiquidityEntriesStatistics implements Serializable
 {
   private static final long serialVersionUID = 4818281174624971825L;
 
-  private BigDecimal payed, open, total, overdue;
+  private BigDecimal paid, open, total, overdue;
 
-  private int counterPayed;
+  private int counterPaid;
 
   private int counter;
 
@@ -44,8 +44,8 @@ public class LiquidityEntriesStatistics implements Serializable
 
   public LiquidityEntriesStatistics()
   {
-    payed = open = total = BigDecimal.ZERO;
-    counter = counterPayed = 0;
+    paid = open = total = BigDecimal.ZERO;
+    counter = counterPaid = 0;
     today = new DayHolder().getDate();
   }
 
@@ -53,9 +53,9 @@ public class LiquidityEntriesStatistics implements Serializable
   {
     final BigDecimal amount = entry.getAmount();
     this.total = add(total, amount);
-    if (entry.isPayed() == true) {
-      this.payed = add(payed, amount);
-      counterPayed++;
+    if (entry.isPaid() == true) {
+      this.paid = add(paid, amount);
+      counterPaid++;
     } else {
       this.open = add(open, amount);
       if (entry.getDateOfPayment() != null && entry.getDateOfPayment().before(today) == true) {
@@ -66,11 +66,11 @@ public class LiquidityEntriesStatistics implements Serializable
   }
 
   /**
-   * @return the payed
+   * @return the paid
    */
-  public BigDecimal getPayed()
+  public BigDecimal getPaid()
   {
-    return payed;
+    return paid;
   }
 
   /**
@@ -102,9 +102,9 @@ public class LiquidityEntriesStatistics implements Serializable
     return counter;
   }
 
-  public int getCounterPayed()
+  public int getCounterPaid()
   {
-    return counterPayed;
+    return counterPaid;
   }
 
   private BigDecimal add(BigDecimal sum, final BigDecimal amount)

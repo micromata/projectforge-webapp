@@ -65,7 +65,7 @@ public class LiquidityEntryDO extends DefaultBaseDO
 
   @PropertyInfo(i18nKey = "fibu.rechnung.status.bezahlt")
   @Field(index = Index.UN_TOKENIZED)
-  private boolean payed;
+  private boolean paid;
 
   @PropertyInfo(i18nKey = "fibu.rechnung.betreff")
   @Field(index = Index.TOKENIZED, store = Store.NO)
@@ -126,21 +126,21 @@ public class LiquidityEntryDO extends DefaultBaseDO
   }
 
   /**
-   * @return the payed
+   * @return the paid
    */
   @Column
-  public boolean isPayed()
+  public boolean isPaid()
   {
-    return payed;
+    return paid;
   }
 
   /**
-   * @param payed the payed to set
+   * @param paid the paid to set
    * @return this for chaining.
    */
-  public LiquidityEntryDO setPayed(final boolean payed)
+  public LiquidityEntryDO setPaid(final boolean paid)
   {
-    this.payed = payed;
+    this.paid = paid;
     return this;
   }
 
