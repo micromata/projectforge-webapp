@@ -144,7 +144,8 @@ public class Kost1ListPage extends AbstractListPage<Kost1ListForm, Kost1Dao, Kos
     STATUS, KOST, DESCRIPTION;
   }
 
-  void exportExcel()
+  @Override
+  protected void exportExcel()
   {
     log.info("Exporting kost1 list.");
     refresh();

@@ -161,8 +161,8 @@ IListPageColumnsCreator<RechnungDO>
     columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.projekt"), getSortable("projekt.name", sortable),
         "projekt.name", cellItemListener));
     if (Registry.instance().getKontoCache().isEmpty() == false) {
-      columns
-      .add(new CellItemListenerPropertyColumn<RechnungDO>(new Model<String>(getString("fibu.konto")), null, "konto", cellItemListener) {
+      columns.add(new CellItemListenerPropertyColumn<RechnungDO>(new Model<String>(getString("fibu.konto")), null, "konto",
+          cellItemListener) {
         /**
          * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
          *      java.lang.String, org.apache.wicket.model.IModel)
@@ -239,7 +239,8 @@ IListPageColumnsCreator<RechnungDO>
     addContentMenuEntry(exportExcelButton);
   }
 
-  void exportExcel()
+  @Override
+  protected void exportExcel()
   {
     refresh();
     final List<RechnungDO> rechnungen = getList();

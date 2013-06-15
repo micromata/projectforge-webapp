@@ -121,7 +121,8 @@ public class EmployeeSalaryListPage extends AbstractListPage<EmployeeSalaryListF
     return columns;
   }
 
-  void exportExcel()
+  @Override
+  protected void exportExcel()
   {
     refresh();
 
