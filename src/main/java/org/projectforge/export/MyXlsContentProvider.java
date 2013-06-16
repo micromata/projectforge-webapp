@@ -29,10 +29,16 @@ import org.projectforge.common.DateFormatType;
 import org.projectforge.common.DateFormats;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
+import org.projectforge.core.I18nEnum;
 import org.projectforge.excel.CellFormat;
 import org.projectforge.excel.ContentProvider;
 import org.projectforge.excel.ExportWorkbook;
 import org.projectforge.excel.XlsContentProvider;
+import org.projectforge.fibu.KostFormatter;
+import org.projectforge.fibu.kost.Kost1DO;
+import org.projectforge.fibu.kost.Kost2DO;
+import org.projectforge.user.PFUserContext;
+import org.projectforge.user.PFUserDO;
 
 public class MyXlsContentProvider extends XlsContentProvider
 {
@@ -41,7 +47,7 @@ public class MyXlsContentProvider extends XlsContentProvider
   public static final int LENGTH_USER = 20;
 
   public static final int LENGTH_ZIPCODE = 7;
-  
+
   /**
    * @see org.projectforge.excel.XlsContentProvider#newInstance()
    */
@@ -66,6 +72,14 @@ public class MyXlsContentProvider extends XlsContentProvider
   {
     if (value instanceof DateHolder) {
       return ((DateHolder) value).getCalendar();
+    } else if (value instanceof PFUserDO) {
+      return ((PFUserDO)value).getFullname();
+    } else if (value instanceof Kost1DO) {
+      return KostFormatter.format((Kost1DO)value);
+    } else if (value instanceof Kost2DO) {
+      return KostFormatter.format((Kost2DO)value);
+    } else if (value instanceof I18nEnum) {
+      return PFUserContext.getLocalizedString(((I18nEnum)value).getI18nKey());
     }
     return null;
   }
