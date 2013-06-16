@@ -765,6 +765,9 @@ extends AbstractSecuredPage implements ISelectCallerPage
     };
     final ExportSheet sheet = exporter.addSheet(getExcelSheetname());
     exporter.addList(sheet, list);
+    if (isExcelAutoFilter() == true) {
+      sheet.setAutoFilter();
+    }
     onBeforeExcelDownload(exporter);
     DownloadUtils.setDownloadTarget(exporter.getWorkbook().getAsByteArray(), filename);
   }
@@ -808,6 +811,14 @@ extends AbstractSecuredPage implements ISelectCallerPage
   protected String getExcelSheetname()
   {
     return "data";
+  }
+
+  /**
+   * If true then the whole first row will be declared with Excel auto-filter.
+   * @return true at default.
+   */
+  protected boolean isExcelAutoFilter() {
+    return true;
   }
 
   /**

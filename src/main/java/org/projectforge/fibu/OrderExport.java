@@ -239,9 +239,7 @@ public class OrderExport
       addOrderMapping(mapping, order, params);
       sheet.addRow(mapping.getMapping(), 0);
     }
-    sheet.getPoiSheet().setAutoFilter(
-        org.apache.poi.ss.util.CellRangeAddress.valueOf("A1:" + (Character.toString((char) (65 + OrderCol.values().length - 1))) + "1"));
-
+    sheet.setAutoFilter();
     columns = createPosColumns();
     sheetTitle = PFUserContext.getLocalizedString("fibu.auftrag.positions");
     sheet = xls.addSheet(sheetTitle);
@@ -263,8 +261,7 @@ public class OrderExport
         sheet.addRow(mapping.getMapping(), 0);
       }
     }
-    sheet.getPoiSheet().setAutoFilter(
-        org.apache.poi.ss.util.CellRangeAddress.valueOf("A1:" + (Character.toString((char) (65 + PosCol.values().length - 1))) + "1"));
+    sheet.setAutoFilter();
     return xls.getAsByteArray();
   }
 
