@@ -48,12 +48,12 @@ public class InvoicesExcelExport
     sheet.createFreezePane(0, 1);
     final ContentProvider sheetProvider = sheet.getContentProvider();
 
-    final ExportColumn[] cols = new ExportColumn[4];
+    final ExportColumn[] cols = new ExportColumn[5];
     int i = 0;
     cols[i++] = createColumn(exporter, sheet, RechnungDO.class, "datum");
     cols[i] = new I18nExportColumn("gross", "fibu.rechnung.bruttoBetrag", 10);
     exporter.putCurrencyFormat(sheetProvider, cols[i++]);
-
+    cols[i++] = new I18nExportColumn("number", "fibu.rechnung.nummer", 6);
     cols[i++] = new I18nExportColumn("debitor", "fibu.common.debitor", 60);
     cols[i++] = new I18nExportColumn("subject", PropUtils.getI18nKey(RechnungDO.class, "betreff"), 100);
     // column property names
@@ -63,6 +63,7 @@ public class InvoicesExcelExport
       entry.recalculate();
       mapping.add("datum", entry.getDatum());
       mapping.add("gross", entry.getGrossSum());
+      mapping.add("number", entry.getNummer());
       mapping.add("debitor", entry.getKundeAsString());
       mapping.add("subject", entry.getBetreff());
       sheet.addRow(mapping.getMapping(), 0);
