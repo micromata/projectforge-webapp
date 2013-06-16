@@ -39,6 +39,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.core.AbstractBaseDO;
+import org.projectforge.core.PropertyInfo;
 import org.projectforge.database.Constants;
 import org.projectforge.user.PFUserDO;
 
@@ -59,15 +60,18 @@ public class MemoDO extends AbstractBaseDO<Integer>
 {
   private static final long serialVersionUID = -1755234078022019415L;
 
+  @PropertyInfo(i18nKey = "id")
   @Field(index = Index.UN_TOKENIZED, store = Store.NO)
   private Integer id;
 
+  @PropertyInfo(i18nKey = "plugins.memo.subject")
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String subject;
 
   @IndexedEmbedded
   private PFUserDO owner;
 
+  @PropertyInfo(i18nKey = "plugins.memo.memo")
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String memo;
 
@@ -81,9 +85,9 @@ public class MemoDO extends AbstractBaseDO<Integer>
   }
 
   @Override
-  public void setId(Integer id)
+  public void setId(final Integer id)
   {
-    this.id = (Integer) id;
+    this.id = id;
   }
 
   @Column(length = Constants.LENGTH_TITLE)
@@ -96,7 +100,7 @@ public class MemoDO extends AbstractBaseDO<Integer>
    * @param subject
    * @return this for chaining.
    */
-  public MemoDO setSubject(String subject)
+  public MemoDO setSubject(final String subject)
   {
     this.subject = subject;
     return this;

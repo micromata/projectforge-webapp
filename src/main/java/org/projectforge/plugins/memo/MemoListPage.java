@@ -75,8 +75,7 @@ public class MemoListPage extends AbstractListPage<MemoListForm, MemoDao, MemoDO
       }
     };
 
-    columns.add(new CellItemListenerPropertyColumn<MemoDO>(new Model<String>(getString("created")), getSortable("created", sortable),
-        "created", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<MemoDO>(MemoDO.class, getSortable("created", sortable), "created", cellItemListener) {
       /**
        * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
        *      java.lang.String, org.apache.wicket.model.IModel)
@@ -91,12 +90,10 @@ public class MemoListPage extends AbstractListPage<MemoListForm, MemoDao, MemoDO
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<MemoDO>(getString("modified"), getSortable("lastUpdate", sortable), "lastUpdate",
+    columns.add(new CellItemListenerPropertyColumn<MemoDO>(MemoDO.class, getSortable("lastUpdate", sortable), "lastUpdate",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<MemoDO>(new Model<String>(getString("plugins.memo.subject")), getSortable("subject",
-        sortable), "subject", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<MemoDO>(new Model<String>(getString("plugins.memo.memo")),
-        getSortable("memo", sortable), "memo", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<MemoDO>(MemoDO.class, getSortable("subject", sortable), "subject", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<MemoDO>(MemoDO.class, getSortable("memo", sortable), "memo", cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<MemoDO>> item, final String componentId, final IModel<MemoDO> rowModel)
       {

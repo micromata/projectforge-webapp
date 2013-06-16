@@ -55,14 +55,14 @@ public class MemoEditForm extends AbstractEditForm<MemoDO, MemoEditPage>
     super.init();
     {
       // Subject
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.memo.subject"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(MemoDO.class, "subject");
       final RequiredMaxLengthTextField subject = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "subject"));
       subject.add(WicketUtils.setFocus());
       fs.add(subject);
     }
     {
       // Text description
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.memo.memo"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(MemoDO.class, "memo");
       fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "memo"))).setAutogrow();
     }
   }
