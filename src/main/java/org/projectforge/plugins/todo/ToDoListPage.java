@@ -98,7 +98,7 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
       }
     };
 
-    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("created")), getSortable("created", sortable),
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("created", sortable),
         "created", cellItemListener) {
       @SuppressWarnings({ "unchecked", "rawtypes"})
       @Override
@@ -111,19 +111,19 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(getString("modified"), getSortable("lastUpdate", sortable), "lastUpdate",
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("lastUpdate", sortable), "lastUpdate",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("plugins.todo.subject")), getSortable("subject",
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("subject",
         sortable), "subject", cellItemListener));
-    columns.add(new UserPropertyColumn<ToDoDO>(getString("plugins.todo.assignee"), getSortable("assigneeId", sortable), "assignee",
+    columns.add(new UserPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("assigneeId", sortable), "assignee",
         cellItemListener).withUserFormatter(userFormatter));
-    columns.add(new UserPropertyColumn<ToDoDO>(getString("plugins.todo.reporter"), getSortable("reporterId", sortable), "reporter",
+    columns.add(new UserPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("reporterId", sortable), "reporter",
         cellItemListener).withUserFormatter(userFormatter));
-    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(getString("dueDate"), getSortable("dueDate", sortable), "dueDate",
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("dueDate", sortable), "dueDate",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("plugins.todo.status")), getSortable("status",
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("status",
         sortable), "status", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("priority")), getSortable("priority", sortable),
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("priority", sortable),
         "priority", cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<ToDoDO>> item, final String componentId, final IModel<ToDoDO> rowModel)
@@ -136,11 +136,11 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("plugins.todo.type")),
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(ToDoDO.class,
         getSortable("type", sortable), "type", cellItemListener));
-    columns.add(new TaskPropertyColumn<ToDoDO>(getString("task"), getSortable("task.title", sortable), "task", cellItemListener)
+    columns.add(new TaskPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("task.title", sortable), "task", cellItemListener)
         .withTaskTree(taskTree));
-    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("group")), null, "group", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(ToDoDO.class, null, "group", cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<ToDoDO>> item, final String componentId, final IModel<ToDoDO> rowModel)
       {
@@ -157,7 +157,7 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("description")),
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(ToDoDO.class,
         getSortable("description", sortable), "description", cellItemListener));
     return columns;
   }

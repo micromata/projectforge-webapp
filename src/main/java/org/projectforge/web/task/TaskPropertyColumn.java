@@ -48,6 +48,18 @@ public class TaskPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
   private transient TaskFormatter taskFormatter;
 
   /**
+   * @param clazz
+   * @param sortProperty
+   * @param propertyExpression
+   * @param cellItemListener
+   */
+  public TaskPropertyColumn(final Class< ? > clazz, final String sortProperty, final String propertyExpression,
+      final CellItemListener<T> cellItemListener)
+  {
+    super(clazz, sortProperty, propertyExpression, cellItemListener);
+  }
+
+  /**
    * @param taskFormatter
    * @param label
    * @param sortProperty

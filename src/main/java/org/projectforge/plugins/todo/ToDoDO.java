@@ -45,6 +45,7 @@ import org.hibernate.search.annotations.Store;
 import org.projectforge.core.AbstractHistorizableBaseDO;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.Priority;
+import org.projectforge.core.PropertyInfo;
 import org.projectforge.core.UserPrefParameter;
 import org.projectforge.database.Constants;
 import org.projectforge.task.TaskDO;
@@ -62,52 +63,64 @@ public class ToDoDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = 4864250842083720210L;
 
+  @PropertyInfo(i18nKey = "plugins.todo.subject")
   @UserPrefParameter(i18nKey = "plugins.todo.subject")
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String subject;
 
+  @PropertyInfo(i18nKey = "plugins.todo.reporter")
   @UserPrefParameter(i18nKey = "plugins.todo.reporter")
   @IndexedEmbedded
   private PFUserDO reporter;
 
+  @PropertyInfo(i18nKey = "plugins.todo.assignee")
   @UserPrefParameter(i18nKey = "plugins.todo.assignee")
   @IndexedEmbedded
   private PFUserDO assignee;
 
+  @PropertyInfo(i18nKey = "task")
   @UserPrefParameter(i18nKey = "task")
   @IndexedEmbedded(depth = 1)
   private TaskDO task;
 
+  @PropertyInfo(i18nKey = "group")
   @UserPrefParameter(i18nKey = "group")
   @IndexedEmbedded(depth = 1)
   private GroupDO group;
 
+  @PropertyInfo(i18nKey = "description")
   @UserPrefParameter(i18nKey = "description", multiline = true)
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String description;
 
+  @PropertyInfo(i18nKey = "comment")
   @UserPrefParameter(i18nKey = "comment", multiline = true)
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String comment;
 
+  @PropertyInfo(i18nKey = "plugins.todo.type")
   @UserPrefParameter(i18nKey = "plugins.todo.type")
   @Field(index = Index.UN_TOKENIZED, store = Store.NO)
   private ToDoType type;
 
+  @PropertyInfo(i18nKey = "plugins.todo.status")
   @UserPrefParameter(i18nKey = "plugins.todo.status")
   @Field(index = Index.UN_TOKENIZED, store = Store.NO)
   private ToDoStatus status;
 
   private boolean recent;
 
+  @PropertyInfo(i18nKey = "priority")
   @UserPrefParameter(i18nKey = "priority")
   @Field(index = Index.UN_TOKENIZED, store = Store.NO)
   private Priority priority;
 
+  @PropertyInfo(i18nKey = "dueDate")
   @Field(index = Index.UN_TOKENIZED)
   @DateBridge(resolution = Resolution.DAY)
   private Date dueDate;
 
+  @PropertyInfo(i18nKey = "resubmissionOnDate")
   @Field(index = Index.UN_TOKENIZED)
   @DateBridge(resolution = Resolution.DAY)
   private Date resubmission;

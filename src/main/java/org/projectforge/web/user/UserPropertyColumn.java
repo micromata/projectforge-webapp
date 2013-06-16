@@ -35,14 +35,25 @@ import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 
-
 public class UserPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
 {
   private static final long serialVersionUID = -26352961662061891L;
 
   private UserFormatter userFormatter;
-  
+
   private UserGroupCache userGroupCache;
+
+  /**
+   * @param clazz
+   * @param sortProperty
+   * @param propertyExpression
+   * @param cellItemListener
+   */
+  public UserPropertyColumn(final Class< ? > clazz, final String sortProperty, final String propertyExpression,
+      final CellItemListener<T> cellItemListener)
+  {
+    super(clazz, sortProperty, propertyExpression, cellItemListener);
+  }
 
   /**
    * @param userFormatter
@@ -51,8 +62,7 @@ public class UserPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
    * @param property Should be from type PFUserDO or Integer for user id.
    * @param cellItemListener
    */
-  public UserPropertyColumn(final String label, final String sortProperty, final String property,
-      final CellItemListener<T> cellItemListener)
+  public UserPropertyColumn(final String label, final String sortProperty, final String property, final CellItemListener<T> cellItemListener)
   {
     super(new Model<String>(label), sortProperty, property, cellItemListener);
   }
@@ -76,16 +86,17 @@ public class UserPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
     if (cellItemListener != null)
       cellItemListener.populateItem(item, componentId, rowModel);
   }
-  
-  protected String getLabelString(final IModel<T> rowModel) {
-    Object obj = BeanHelper.getNestedProperty(rowModel.getObject(), getPropertyExpression());
+
+  protected String getLabelString(final IModel<T> rowModel)
+  {
+    final Object obj = BeanHelper.getNestedProperty(rowModel.getObject(), getPropertyExpression());
     PFUserDO user = null;
     if (obj != null) {
       if (obj instanceof PFUserDO) {
         user = (PFUserDO) obj;
       } else if (obj instanceof Integer) {
         Validate.notNull(userGroupCache);
-        Integer userId = (Integer) obj;
+        final Integer userId = (Integer) obj;
         user = userGroupCache.getUser(userId);
       } else {
         throw new IllegalStateException("Unsupported column type: " + obj);
@@ -100,12 +111,12 @@ public class UserPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
     }
     return result;
   }
-  
+
   /**
    * Fluent pattern
    * @param userFormatter
    */
-  public UserPropertyColumn<T> withUserFormatter(UserFormatter userFormatter)
+  public UserPropertyColumn<T> withUserFormatter(final UserFormatter userFormatter)
   {
     this.userFormatter = userFormatter;
     return this;
@@ -115,7 +126,7 @@ public class UserPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
    * Fluent pattern
    * @param userFormatter
    */
-  public UserPropertyColumn<T> setUserGroupCache(UserGroupCache userGroupCache)
+  public UserPropertyColumn<T> setUserGroupCache(final UserGroupCache userGroupCache)
   {
     this.userGroupCache = userGroupCache;
     return this;
