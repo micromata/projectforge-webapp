@@ -23,6 +23,7 @@
 
 package org.projectforge.plugins.teamcal.rest;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.ws.rs.GET;
@@ -36,14 +37,16 @@ import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalFilter;
 import org.projectforge.registry.Registry;
 import org.projectforge.rest.JsonUtils;
+import org.projectforge.rest.RestPaths;
+import org.projectforge.rest.objects.CalendarObject;
 
 /**
- * REST-Schnittstelle für {@link TeamCalDao}
+ * REST interface for {@link TeamCalDao}.
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-@Path("teamcal")
+@Path(RestPaths.TEAMCAL)
 public class TeamCalDaoRest
 {
   private final TeamCalDao teamCalDao;
@@ -54,18 +57,22 @@ public class TeamCalDaoRest
   }
 
   /**
-   * Rest-Call für: {@link TeamCalDao#getList(org.projectforge.core.BaseSearchFilter)}
-   * 
-   * @param searchTerm
+   * Rest-Call for {@link TeamCalDao#getList(org.projectforge.core.BaseSearchFilter)}
    */
   @GET
-  @Path("callist")
+  @Path(RestPaths.LIST)
   @Produces(MediaType.APPLICATION_JSON)
   public Response getList()
   {
     final TeamCalFilter filter = new TeamCalFilter();
     final List<TeamCalDO> list = teamCalDao.getList(filter);
-    final String json = JsonUtils.toJson(list);
+    final List<CalendarObject> result = new LinkedList<CalendarObject>();
+    if (list != null && list.size() > 0) {
+      for (final TeamCalDO cal : list) {
+        result.add(TeamCalDOConverter.getCalendarObject(cal));
+      }
+    }
+    final String json = JsonUtils.toJson(result);
     return Response.ok(json).build();
   }
 }

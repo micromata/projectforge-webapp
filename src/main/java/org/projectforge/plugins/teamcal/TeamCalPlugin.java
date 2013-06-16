@@ -52,6 +52,7 @@ import org.projectforge.plugins.teamcal.integration.TeamcalTimesheetPluginCompon
 import org.projectforge.plugins.teamcal.integration.TemplateCalendarProperties;
 import org.projectforge.plugins.teamcal.integration.TemplateEntry;
 import org.projectforge.plugins.teamcal.rest.TeamCalDaoRest;
+import org.projectforge.plugins.teamcal.rest.TeamEventDaoRest;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.user.GroupDO;
@@ -134,7 +135,7 @@ public class TeamCalPlugin extends AbstractPlugin
 
     TimesheetEditPage.addPluginHook(new TeamcalTimesheetPluginComponentHook());
 
-    RestCallRegistry.getInstance().register(TeamCalDaoRest.class);
+    RestCallRegistry.getInstance().register(TeamCalDaoRest.class).register(TeamEventDaoRest.class);
 
     TeamCalSubscriptionJob.setTeamCalDao(teamCalDao);
   }
