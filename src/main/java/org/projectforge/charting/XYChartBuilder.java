@@ -42,6 +42,7 @@ import org.jfree.data.xy.XYDataset;
 import org.projectforge.user.PFUserContext;
 
 /**
+ * Builder class for building JFree charts.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */

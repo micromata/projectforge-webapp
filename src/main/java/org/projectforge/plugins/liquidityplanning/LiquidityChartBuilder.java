@@ -121,9 +121,6 @@ public class LiquidityChartBuilder
     cb.setRenderer(counter, lineRenderer).setDataset(counter++, worstCaseSet);
 
     cb.setDateXAxis(true).setYAxis(true, null);
-    // getRenderer().setSeriesPaint(1, getGreenMarker());
-    // dataset.addSeries(creditSeries);
-    // dataset.addSeries(debitSeries);
     return cb.getChart();
   }
 }
