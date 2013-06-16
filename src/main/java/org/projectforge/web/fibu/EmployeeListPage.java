@@ -24,7 +24,6 @@
 package org.projectforge.web.fibu;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
@@ -32,27 +31,23 @@ import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
+import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.common.DateHelper;
+import org.projectforge.export.MyExcelExporter;
 import org.projectforge.fibu.EmployeeDO;
 import org.projectforge.fibu.EmployeeDao;
 import org.projectforge.fibu.EmployeeExport;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
-import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 @ListPage(editPage = EmployeeEditPage.class)
 public class EmployeeListPage extends AbstractListPage<EmployeeListForm, EmployeeDao, EmployeeDO> implements
@@ -88,8 +83,8 @@ IListPageColumnsCreator<EmployeeDO>
         appendCssClasses(item, employee.getId(), employee.isDeleted());
       }
     };
-    columns.add(new CellItemListenerPropertyColumn<EmployeeDO>(new Model<String>(getString("name")),
-        getSortable("user.lastname", sortable), "user.lastname", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<EmployeeDO>(new ResourceModel("name"), getSortable("user.lastname", sortable),
+        "user.lastname", cellItemListener) {
       /**
        * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
        *      java.lang.String, org.apache.wicket.model.IModel)
@@ -109,18 +104,18 @@ IListPageColumnsCreator<EmployeeDO>
         addRowClick(item);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<EmployeeDO>(new Model<String>(getString("firstName")), getSortable("user.firstname",
-        sortable), "user.firstname", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<EmployeeDO>(new Model<String>(getString("status")), getSortable("status", sortable),
-        "status", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<EmployeeDO>(new Model<String>(getString("fibu.kost1")), getSortable(
-        "kost1.shortDisplayName", sortable), "kost1.shortDisplayName", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<EmployeeDO>(new Model<String>(getString("address.positionText")), getSortable(
-        "position", sortable), "position", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<EmployeeDO>(new Model<String>(getString("address.division")), getSortable("abteilung",
-        sortable), "abteilung", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<EmployeeDO>(new Model<String>(getString("fibu.employee.eintrittsdatum")), getSortable(
-        "eintrittsDatum", sortable), "eintrittsDatum", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<EmployeeDO>(new ResourceModel("firstName"), getSortable("user.firstname", sortable),
+        "user.firstname", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<EmployeeDO>(EmployeeDO.class, getSortable("status", sortable), "status",
+        cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<EmployeeDO>(new ResourceModel("fibu.kost1"), getSortable("kost1.shortDisplayName",
+        sortable), "kost1.shortDisplayName", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<EmployeeDO>(EmployeeDO.class, getSortable("position", sortable), "position",
+        cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<EmployeeDO>(EmployeeDO.class, getSortable("abteilung", sortable), "abteilung",
+        cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<EmployeeDO>(EmployeeDO.class, getSortable("eintrittsDatum", sortable), "eintrittsDatum",
+        cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<EmployeeDO>> item, final String componentId, final IModel<EmployeeDO> rowModel)
       {
@@ -128,8 +123,8 @@ IListPageColumnsCreator<EmployeeDO>
         item.add(new Label(componentId, DateTimeFormatter.instance().getFormattedDate(employee.getEintrittsDatum())));
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<EmployeeDO>(new Model<String>(getString("fibu.employee.austrittsdatum")), getSortable(
-        "austrittsDatum", sortable), "austrittsDatum", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<EmployeeDO>(EmployeeDO.class, getSortable("austrittsDatum", sortable), "austrittsDatum",
+        cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<EmployeeDO>> item, final String componentId, final IModel<EmployeeDO> rowModel)
       {
@@ -137,36 +132,45 @@ IListPageColumnsCreator<EmployeeDO>
         item.add(new Label(componentId, DateTimeFormatter.instance().getFormattedDate(employee.getAustrittsDatum())));
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<EmployeeDO>(new Model<String>(getString("comment")), getSortable("comment", sortable),
-        "comment", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<EmployeeDO>(EmployeeDO.class, getSortable("comment", sortable), "comment",
+        cellItemListener));
     return columns;
   }
 
-  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
     final List<IColumn<EmployeeDO, String>> columns = createColumns(this, true);
     dataTable = createDataTable(columns, "user.lastname", SortOrder.ASCENDING);
     form.add(dataTable);
-    if (WebConfiguration.isDevelopmentMode() == true) {
-      // Not yet finished.
-      final ContentMenuEntryPanel exportExcelButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
-        @Override
-        public void onClick()
-        {
-          final List<EmployeeDO> list = getList();
-          final byte[] xls = employeeExport.export(list);
-          if (xls == null || xls.length == 0) {
-            form.addError("datatable.no-records-found");
-            return;
-          }
-          final String filename = "ProjectForge-Employees_" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".xls";
-          DownloadUtils.setDownloadTarget(xls, filename);
-        };
-      }, getString("exportAsXls")).setTooltip(getString("tooltip.export.excel"));
-      addContentMenuEntry(exportExcelButton);
-    }
+    addExcelExport();
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#getExcelFilenameIdentifier()
+   */
+  @Override
+  protected String getExcelFilenameIdentifier()
+  {
+    return "employees";
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#getExcelSheetname()
+   */
+  @Override
+  protected String getExcelSheetname()
+  {
+    return getString("fibu.employee.title.heading");
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#onBeforeExcelDownload(org.projectforge.export.MyExcelExporter)
+   */
+  @Override
+  protected void onBeforeExcelDownload(final MyExcelExporter exporter)
+  {
+    exporter.getWorkbook().getSheet(0).getPoiSheet().setAutoFilter(org.apache.poi.ss.util.CellRangeAddress.valueOf("A1:N1"));
   }
 
   @Override

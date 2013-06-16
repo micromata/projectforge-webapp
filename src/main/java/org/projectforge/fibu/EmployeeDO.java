@@ -44,6 +44,7 @@ import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.core.Constants;
 import org.projectforge.core.DefaultBaseDO;
+import org.projectforge.core.PropertyInfo;
 import org.projectforge.fibu.kost.Kost1DO;
 import org.projectforge.user.PFUserDO;
 
@@ -58,37 +59,47 @@ public class EmployeeDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = -1208597049289694757L;
 
-  @IndexedEmbedded(depth = 1)
-  private Kost1DO kost1;
-
+  @PropertyInfo(i18nKey = "fibu.employee.user")
   @IndexedEmbedded(depth = 1)
   private PFUserDO user;
 
+  @PropertyInfo(i18nKey = "fibu.kost1")
+  @IndexedEmbedded(depth = 1)
+  private Kost1DO kost1;
+
+  @PropertyInfo(i18nKey = "status")
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private EmployeeStatus status;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
-  private Integer urlaubstage;
-
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
-  private Integer wochenstunden;
-
+  @PropertyInfo(i18nKey = "address.positionText")
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String position;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
-  private String abteilung;
-
-  @Field(index = Index.TOKENIZED, store = Store.NO)
-  private String comment;
-
+  @PropertyInfo(i18nKey = "fibu.employee.eintrittsdatum")
   @Field(index = Index.UN_TOKENIZED)
   @DateBridge(resolution = Resolution.DAY)
   private Date eintrittsDatum;
 
+  @PropertyInfo(i18nKey = "fibu.employee.austrittsdatum")
   @Field(index = Index.UN_TOKENIZED)
   @DateBridge(resolution = Resolution.DAY)
   private Date austrittsDatum;
+
+  @PropertyInfo(i18nKey = "address.division")
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String abteilung;
+
+  @PropertyInfo(i18nKey = "fibu.employee.urlaubstage")
+  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  private Integer urlaubstage;
+
+  @PropertyInfo(i18nKey = "fibu.employee.wochenstunden")
+  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  private Integer wochenstunden;
+
+  @PropertyInfo(i18nKey = "comment")
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String comment;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "employee_status", length = 30)
@@ -97,7 +108,7 @@ public class EmployeeDO extends DefaultBaseDO
     return status;
   }
 
-  public void setStatus(EmployeeStatus status)
+  public void setStatus(final EmployeeStatus status)
   {
     this.status = status;
   }
@@ -112,7 +123,7 @@ public class EmployeeDO extends DefaultBaseDO
     return kost1;
   }
 
-  public void setKost1(Kost1DO kost1)
+  public void setKost1(final Kost1DO kost1)
   {
     this.kost1 = kost1;
   }
@@ -139,7 +150,7 @@ public class EmployeeDO extends DefaultBaseDO
   /**
    * @param user the user to set
    */
-  public void setUser(PFUserDO user)
+  public void setUser(final PFUserDO user)
   {
     this.user = user;
   }
@@ -158,7 +169,7 @@ public class EmployeeDO extends DefaultBaseDO
     return urlaubstage;
   }
 
-  public void setUrlaubstage(Integer urlaubstage)
+  public void setUrlaubstage(final Integer urlaubstage)
   {
     this.urlaubstage = urlaubstage;
   }
@@ -169,7 +180,7 @@ public class EmployeeDO extends DefaultBaseDO
     return wochenstunden;
   }
 
-  public void setWochenstunden(Integer wochenstunden)
+  public void setWochenstunden(final Integer wochenstunden)
   {
     this.wochenstunden = wochenstunden;
   }
@@ -180,7 +191,7 @@ public class EmployeeDO extends DefaultBaseDO
     return eintrittsDatum;
   }
 
-  public void setEintrittsDatum(Date eintrittsDatum)
+  public void setEintrittsDatum(final Date eintrittsDatum)
   {
     this.eintrittsDatum = eintrittsDatum;
   }
@@ -191,7 +202,7 @@ public class EmployeeDO extends DefaultBaseDO
     return austrittsDatum;
   }
 
-  public void setAustrittsDatum(Date austrittsDatum)
+  public void setAustrittsDatum(final Date austrittsDatum)
   {
     this.austrittsDatum = austrittsDatum;
   }
@@ -202,7 +213,7 @@ public class EmployeeDO extends DefaultBaseDO
     return position;
   }
 
-  public void setPosition(String position)
+  public void setPosition(final String position)
   {
     this.position = position;
   }
@@ -219,12 +230,12 @@ public class EmployeeDO extends DefaultBaseDO
     return abteilung;
   }
 
-  public void setAbteilung(String abteilung)
+  public void setAbteilung(final String abteilung)
   {
     this.abteilung = abteilung;
   }
 
-  public void setComment(String comment)
+  public void setComment(final String comment)
   {
     this.comment = comment;
   }

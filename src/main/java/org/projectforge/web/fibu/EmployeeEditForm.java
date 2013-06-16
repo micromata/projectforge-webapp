@@ -63,7 +63,7 @@ public class EmployeeEditForm extends AbstractEditForm<EmployeeDO, EmployeeEditP
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // User
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.employee.user"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(EmployeeDO.class, "user");
       final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(data, "user"), parentPage,
           "userId");
       userSelectPanel.setShowSelectMeButton(false).setRequired(true);
@@ -72,12 +72,12 @@ public class EmployeeEditForm extends AbstractEditForm<EmployeeDO, EmployeeEditP
     }
     {
       // cost 1
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost1"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(EmployeeDO.class, "kost1");
       fs.add(new Kost1FormComponent(InputPanel.WICKET_ID, new PropertyModel<Kost1DO>(data, "kost1"), true));
     }
     {
       // DropDownChoice status
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("status"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(EmployeeDO.class, "status");
       final LabelValueChoiceRenderer<EmployeeStatus> statusChoiceRenderer = new LabelValueChoiceRenderer<EmployeeStatus>(this,
           EmployeeStatus.values());
       final DropDownChoice<EmployeeStatus> statusChoice = new DropDownChoice<EmployeeStatus>(fs.getDropDownChoiceId(),
@@ -87,39 +87,39 @@ public class EmployeeEditForm extends AbstractEditForm<EmployeeDO, EmployeeEditP
     }
     {
       // Division
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("address.division"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(EmployeeDO.class, "abteilung");
       fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "abteilung")));
     }
     {
       // Position
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("address.positionText"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(EmployeeDO.class, "position");
       fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "position")));
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Weekly hours
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.employee.wochenstunden"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(EmployeeDO.class, "wochenstunden");
       fs.add(new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data, "wochenstunden"), 0, 168));
     }
     {
       // Holidays
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.employee.urlaubstage"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(EmployeeDO.class, "urlaubstage");
       fs.add(new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data, "urlaubstage"), 0, 366));
     }
     {
       // Start date
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.employee.eintrittsdatum"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(EmployeeDO.class, "eintrittsDatum");
       fs.add(new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "eintrittsDatum"), new DatePanelSettings()));
     }
     {
       // End date
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.employee.austrittsdatum"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(EmployeeDO.class, "austrittsDatum");
       fs.add(new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "austrittsDatum"), new DatePanelSettings()));
     }
     gridBuilder.newGridPanel();
     {
       // Comment
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(EmployeeDO.class, "comment");
       fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "comment")), true);
     }
   }
