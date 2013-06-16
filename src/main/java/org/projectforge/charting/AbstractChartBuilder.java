@@ -36,7 +36,6 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYDifferenceRenderer;
-import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.projectforge.user.PFUserContext;
 
@@ -55,12 +54,9 @@ public abstract class AbstractChartBuilder
    * @param valueAxisUnitKey
    * @return
    */
-  protected JFreeChart create(final TimeSeries series1, final TimeSeries series2, final Shape shape, final Stroke stroke,
+  protected JFreeChart create(final TimeSeriesCollection dataset, final Shape shape, final Stroke stroke,
       final boolean showAxisValues, final String valueAxisUnitKey)
   {
-    final TimeSeriesCollection dataset = new TimeSeriesCollection();
-    dataset.addSeries(series1);
-    dataset.addSeries(series2);
     final JFreeChart chart = ChartFactory.createXYLineChart(null, null, null, dataset, PlotOrientation.VERTICAL, true, true, false);
 
     final XYDifferenceRenderer renderer = new XYDifferenceRenderer(new Color(238, 176, 176), new Color(135, 206, 112), true);

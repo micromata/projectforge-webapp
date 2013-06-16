@@ -34,13 +34,13 @@ import java.util.List;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.charting.AbstractChartBuilder;
 import org.projectforge.core.OrderDirection;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.timesheet.TimesheetFilter;
-
 
 /**
  * Erzeugt wahlweise eins von zwei Diagrammen:<br/>
@@ -150,7 +150,10 @@ public class TimesheetDisciplineChartBuilder extends AbstractChartBuilder
       istSeries.add(day, actualWorkingHours);
       dh.add(Calendar.DATE, 1);
     }
-    return create(sollSeries, istSeries, shape, stroke, showAxisValues, "hours");
+    final TimeSeriesCollection dataset = new TimeSeriesCollection();
+    dataset.addSeries(sollSeries);
+    dataset.addSeries(istSeries);
+    return create(dataset, shape, stroke, showAxisValues, "hours");
   }
 
   /**
@@ -212,6 +215,9 @@ public class TimesheetDisciplineChartBuilder extends AbstractChartBuilder
     }
     averageDifferenceBetweenTimesheetAndBooking = numberOfBookedDays > 0 ? new BigDecimal(totalDifference).divide(new BigDecimal(
         numberOfBookedDays), 1, RoundingMode.HALF_UP) : BigDecimal.ZERO;
-    return create(actualSeries, planSeries, shape, stroke, showAxisValues, "days");
+    final TimeSeriesCollection dataset = new TimeSeriesCollection();
+    dataset.addSeries(actualSeries);
+    dataset.addSeries(planSeries);
+    return create(dataset, shape, stroke, showAxisValues, "days");
   }
 }
