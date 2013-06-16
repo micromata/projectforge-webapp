@@ -93,7 +93,7 @@ public class LiquidityChartBuilder
 
     // final XYChartBuilder cb = new XYChartBuilder(ChartFactory.createXYBarChart(null, null, false, null, null, PlotOrientation.VERTICAL,
     // false, false, false));
-    final XYChartBuilder cb = new XYChartBuilder(null, null, null, null, false);
+    final XYChartBuilder cb = new XYChartBuilder(null, null, null, null, true);
 
     int counter = 0;
 
