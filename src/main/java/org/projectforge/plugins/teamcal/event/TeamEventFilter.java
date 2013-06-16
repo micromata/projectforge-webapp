@@ -72,10 +72,12 @@ public class TeamEventFilter extends BaseSearchFilter implements Serializable, C
 
   /**
    * @param user the user to set
+   * @return this for chaining.
    */
-  public void setUser(final PFUserDO user)
+  public TeamEventFilter setUser(final PFUserDO user)
   {
     this.user = user;
+    return this;
   }
 
   /**
@@ -90,9 +92,10 @@ public class TeamEventFilter extends BaseSearchFilter implements Serializable, C
    * @param startDate the startDate to set
    * @return this for chaining.
    */
-  public void setStartDate(final Date startDate)
+  public TeamEventFilter setStartDate(final Date startDate)
   {
     this.startDate = startDate;
+    return this;
   }
 
   /**
@@ -107,9 +110,10 @@ public class TeamEventFilter extends BaseSearchFilter implements Serializable, C
    * @param date the endDate to set
    * @return this for chaining.
    */
-  public void setEndDate(final Date date)
+  public TeamEventFilter setEndDate(final Date date)
   {
     this.endDate = date;
+    return this;
   }
 
   /**
@@ -124,9 +128,10 @@ public class TeamEventFilter extends BaseSearchFilter implements Serializable, C
    * @param teamCalId the teamCalId to set
    * @return this for chaining.
    */
-  public void setTeamCalId(final Integer teamCalId)
+  public TeamEventFilter setTeamCalId(final Integer teamCalId)
   {
     this.teamCalId = teamCalId;
+    return this;
   }
 
   /**
@@ -139,10 +144,12 @@ public class TeamEventFilter extends BaseSearchFilter implements Serializable, C
 
   /**
    * @param teamCals the teamCals to set
+   * @return this for chaining.
    */
-  public void setTeamCals(final Collection<Integer> teamCals)
+  public TeamEventFilter setTeamCals(final Collection<Integer> teamCals)
   {
     this.teamCals = teamCals;
+    return this;
   }
 
   /**
