@@ -36,10 +36,8 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.export.MyExcelExporter;
 import org.projectforge.fibu.EmployeeDO;
 import org.projectforge.fibu.EmployeeDao;
-import org.projectforge.fibu.EmployeeExport;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractListPage;
@@ -57,9 +55,6 @@ IListPageColumnsCreator<EmployeeDO>
 
   @SpringBean(name = "employeeDao")
   private EmployeeDao employeeDao;
-
-  @SpringBean(name = "employeeExport")
-  private EmployeeExport employeeExport;
 
   public EmployeeListPage(final PageParameters parameters)
   {
@@ -162,15 +157,6 @@ IListPageColumnsCreator<EmployeeDO>
   protected String getExcelSheetname()
   {
     return getString("fibu.employee.title.heading");
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.AbstractListPage#onBeforeExcelDownload(org.projectforge.export.MyExcelExporter)
-   */
-  @Override
-  protected void onBeforeExcelDownload(final MyExcelExporter exporter)
-  {
-    exporter.getWorkbook().getSheet(0).getPoiSheet().setAutoFilter(org.apache.poi.ss.util.CellRangeAddress.valueOf("A1:N1"));
   }
 
   @Override
