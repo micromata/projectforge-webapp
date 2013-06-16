@@ -38,15 +38,15 @@ import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.converter.CurrencyConverter;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
-public class LiquidityAnalysisForm extends AbstractStandardForm<Object, LiquidityAnalysisPage>
+public class LiquidityForecastForm extends AbstractStandardForm<Object, LiquidityForecastPage>
 {
   private static final long serialVersionUID = -4518924991100703065L;
 
-  private static final String USER_PREF_KEY_SETTINGS = LiquidityAnalysisSettings.class.getName();
+  private static final String USER_PREF_KEY_SETTINGS = LiquidityForecastSettings.class.getName();
 
-  LiquidityAnalysisSettings settings;
+  LiquidityForecastSettings settings;
 
-  public LiquidityAnalysisForm(final LiquidityAnalysisPage parentPage)
+  public LiquidityForecastForm(final LiquidityForecastPage parentPage)
   {
     super(parentPage);
   }
@@ -58,7 +58,7 @@ public class LiquidityAnalysisForm extends AbstractStandardForm<Object, Liquidit
     super.init();
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.liquidityplanning.analysis.startAmount"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.liquidityplanning.forecast.startAmount"));
       final RequiredMinMaxNumberField<BigDecimal> amount = new RequiredMinMaxNumberField<BigDecimal>(fs.getTextFieldId(),
           new PropertyModel<BigDecimal>(getSettings(), "startAmount"), Constants.TEN_BILLION_NEGATIVE, Constants.TEN_BILLION) {
         @SuppressWarnings({ "rawtypes", "unchecked"})
@@ -73,7 +73,7 @@ public class LiquidityAnalysisForm extends AbstractStandardForm<Object, Liquidit
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.liquidityplanning.analysis.forecast")).setUnit(getString("days"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.liquidityplanning.forecast")).setUnit(getString("days"));
       final RequiredMinMaxNumberField<Integer> nextDays = new RequiredMinMaxNumberField<Integer>(fs.getTextFieldId(),
           new PropertyModel<Integer>(getSettings(), "nextDays"), 3, 365);
       WicketUtils.setSize(nextDays, 4);
@@ -94,13 +94,13 @@ public class LiquidityAnalysisForm extends AbstractStandardForm<Object, Liquidit
     }
   }
 
-  protected LiquidityAnalysisSettings getSettings()
+  protected LiquidityForecastSettings getSettings()
   {
     if (settings == null) {
-      settings = (LiquidityAnalysisSettings) parentPage.getUserPrefEntry(USER_PREF_KEY_SETTINGS);
+      settings = (LiquidityForecastSettings) parentPage.getUserPrefEntry(USER_PREF_KEY_SETTINGS);
     }
     if (settings == null) {
-      settings = new LiquidityAnalysisSettings();
+      settings = new LiquidityForecastSettings();
       parentPage.putUserPrefEntry(USER_PREF_KEY_SETTINGS, settings, true);
     }
     return settings;

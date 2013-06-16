@@ -32,7 +32,7 @@ import org.projectforge.web.wicket.JFreeChartImage;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.flowlayout.ImagePanel;
 
-public class LiquidityAnalysisPage extends AbstractStandardFormPage
+public class LiquidityForecastPage extends AbstractStandardFormPage
 {
   private static final long serialVersionUID = 6510134821712582764L;
 
@@ -43,18 +43,18 @@ public class LiquidityAnalysisPage extends AbstractStandardFormPage
   @SpringBean(name = "liquidityEntryDao")
   private LiquidityEntryDao liquidityEntryDao;
 
-  private LiquidityAnalysis analysis;
+  private LiquidityForecast forecast;
 
   private final GridBuilder gridBuilder;
 
   private ImagePanel chartImage;
 
-  private final LiquidityAnalysisForm form;
+  private final LiquidityForecastForm form;
 
-  public LiquidityAnalysisPage(final PageParameters parameters)
+  public LiquidityForecastPage(final PageParameters parameters)
   {
     super(parameters);
-    form = new LiquidityAnalysisForm(this);
+    form = new LiquidityForecastForm(this);
     body.add(form);
     form.init();
     gridBuilder = new GridBuilder(body, "flowgrid");
@@ -79,7 +79,7 @@ public class LiquidityAnalysisPage extends AbstractStandardFormPage
   {
     super.onBeforeRender();
     final LiquidityChartBuilder chartBuilder = new LiquidityChartBuilder();
-    final JFreeChart chart = chartBuilder.create(analysis, form.getSettings());
+    final JFreeChart chart = chartBuilder.create(forecast, form.getSettings());
     final JFreeChartImage image = new JFreeChartImage(ImagePanel.IMAGE_ID, chart, IMAGE_WIDTH, IMAGE_HEIGHT);
     image.add(AttributeModifier.replace("width", String.valueOf(IMAGE_WIDTH)));
     image.add(AttributeModifier.replace("height", String.valueOf(IMAGE_HEIGHT)));
@@ -87,18 +87,18 @@ public class LiquidityAnalysisPage extends AbstractStandardFormPage
   }
 
   /**
-   * @param analysis the analysis to set
+   * @param forecast the forecast to set
    * @return this for chaining.
    */
-  public LiquidityAnalysisPage setAnalysis(final LiquidityAnalysis analysis)
+  public LiquidityForecastPage setForecast(final LiquidityForecast forecast)
   {
-    this.analysis = analysis;
+    this.forecast = forecast;
     return this;
   }
 
   @Override
   protected String getTitle()
   {
-    return getString("plugins.liquidityplanning.analysis");
+    return getString("plugins.liquidityplanning.forecast");
   }
 }

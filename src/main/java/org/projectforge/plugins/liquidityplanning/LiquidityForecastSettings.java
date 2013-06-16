@@ -26,7 +26,7 @@ package org.projectforge.plugins.liquidityplanning;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class LiquidityAnalysisSettings implements Serializable
+public class LiquidityForecastSettings implements Serializable
 {
   private static final long serialVersionUID = -6429410479048275707L;
 
@@ -49,7 +49,7 @@ public class LiquidityAnalysisSettings implements Serializable
    * @param startAmount the startAmount to set
    * @return this for chaining.
    */
-  public LiquidityAnalysisSettings setStartAmount(final BigDecimal startAmount)
+  public LiquidityForecastSettings setStartAmount(final BigDecimal startAmount)
   {
     this.startAmount = startAmount;
     return this;
@@ -70,7 +70,7 @@ public class LiquidityAnalysisSettings implements Serializable
    * @param nextDays the nextDays to set
    * @return this for chaining.
    */
-  public LiquidityAnalysisSettings setNextDays(final int nextDays)
+  public LiquidityForecastSettings setNextDays(final int nextDays)
   {
     this.nextDays = nextDays;
     return this;

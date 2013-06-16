@@ -45,20 +45,20 @@ import org.projectforge.user.PFUserContext;
 public class LiquidityChartBuilder
 {
   /**
-   * @param analysis
+   * @param forecast
    * @param nextDays
    * @return
    */
-  public JFreeChart create(final LiquidityAnalysis analysis, final LiquidityAnalysisSettings settings)
+  public JFreeChart create(final LiquidityForecast forecast, final LiquidityForecastSettings settings)
   {
     Validate.isTrue(settings.getNextDays() > 0 && settings.getNextDays() < 500);
     final DayHolder dh = new DayHolder();
 
     final TimeSeries accumulatedSeries = new TimeSeries("accumulated");
-    final TimeSeries worstCaseSeries = new TimeSeries(PFUserContext.getLocalizedString("plugins.liquidityplanning.analysis.worstCase"));
+    final TimeSeries worstCaseSeries = new TimeSeries(PFUserContext.getLocalizedString("plugins.liquidityplanning.forecast.worstCase"));
     final TimeSeries creditSeries = new TimeSeries("credits");
     final TimeSeries debitSeries = new TimeSeries("debits");
-    final Iterator<LiquidityEntry> it = analysis.getEntries().iterator();
+    final Iterator<LiquidityEntry> it = forecast.getEntries().iterator();
     LiquidityEntry current = it.hasNext() == true ? it.next() : null;
     double accumulated = settings.getStartAmount().doubleValue();
     double worstCase = accumulated;

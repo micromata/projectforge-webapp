@@ -37,7 +37,7 @@ import org.projectforge.fibu.RechnungDO;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class LiquidityAnalysis implements Serializable
+public class LiquidityForecast implements Serializable
 {
   private static final long serialVersionUID = 5385319337895942452L;
 
@@ -50,11 +50,11 @@ public class LiquidityAnalysis implements Serializable
   private Collection<LiquidityEntry> creditorInvoices;
 
   /**
-   * Refresh analysis from stored liqui-entries, invoices and creditor invoices and sort the entries.
+   * Refresh forecast from stored liqui-entries, invoices and creditor invoices and sort the entries.
    * @return this for chaining.
    * @see #sort()
    */
-  public LiquidityAnalysis build()
+  public LiquidityForecast build()
   {
     entries.clear();
     entries.addAll(this.liquiEntries);
@@ -67,7 +67,7 @@ public class LiquidityAnalysis implements Serializable
   /**
    * @return this for chaining.
    */
-  private LiquidityAnalysis sort()
+  private LiquidityForecast sort()
   {
     Collections.sort(entries, new Comparator<LiquidityEntry>() {
       @Override
@@ -101,7 +101,7 @@ public class LiquidityAnalysis implements Serializable
     return entries;
   }
 
-  public LiquidityAnalysis set(final Collection<LiquidityEntryDO> list)
+  public LiquidityForecast set(final Collection<LiquidityEntryDO> list)
   {
     this.liquiEntries = new LinkedList<LiquidityEntry>();
     if (list == null) {
@@ -119,7 +119,7 @@ public class LiquidityAnalysis implements Serializable
     return this;
   }
 
-  public LiquidityAnalysis setInvoices(final Collection<RechnungDO> list)
+  public LiquidityForecast setInvoices(final Collection<RechnungDO> list)
   {
     this.invoices = new LinkedList<LiquidityEntry>();
     if (list == null) {
@@ -141,7 +141,7 @@ public class LiquidityAnalysis implements Serializable
     return this;
   }
 
-  public LiquidityAnalysis setCreditorInvoices(final Collection<EingangsrechnungDO> list)
+  public LiquidityForecast setCreditorInvoices(final Collection<EingangsrechnungDO> list)
   {
     this.creditorInvoices = new LinkedList<LiquidityEntry>();
     if (list == null) {

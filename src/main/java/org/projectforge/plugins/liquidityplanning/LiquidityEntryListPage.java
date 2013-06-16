@@ -84,7 +84,7 @@ IListPageColumnsCreator<LiquidityEntryDO>
 
   private LiquidityEntriesStatistics statistics;
 
-  private LiquidityAnalysis analysis;
+  private LiquidityForecast forecast;
 
   private List<RechnungDO> invoices;
 
@@ -176,16 +176,16 @@ IListPageColumnsCreator<LiquidityEntryDO>
     dataTable = createDataTable(createColumns(this, true), "dateOfPayment", SortOrder.ASCENDING);
     form.add(dataTable);
     @SuppressWarnings("serial")
-    final ContentMenuEntryPanel liquidityAnalysisButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
+    final ContentMenuEntryPanel liquidityForecastButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
       @Override
       public void onClick()
       {
-        final LiquidityAnalysisPage page = new LiquidityAnalysisPage(new PageParameters()).setAnalysis(getAnalysis());
+        final LiquidityForecastPage page = new LiquidityForecastPage(new PageParameters()).setForecast(getForecast());
         page.setReturnToPage(LiquidityEntryListPage.this);
         setResponsePage(page);
       };
-    }, getString("plugins.liquidityplanning.analysis"));
-    addContentMenuEntry(liquidityAnalysisButton);
+    }, getString("plugins.liquidityplanning.forecast"));
+    addContentMenuEntry(liquidityForecastButton);
     addExcelExport();
   }
 
@@ -214,28 +214,28 @@ IListPageColumnsCreator<LiquidityEntryDO>
   protected void onBeforeExcelDownload(final MyExcelExporter exporter)
   {
     final InvoicesExcelExport invoicesExport = new InvoicesExcelExport();
-    analysis = getAnalysis();
+    forecast = getForecast();
     invoicesExport.addDebitorInvoicesSheet(exporter, getString("fibu.rechnungen"), invoices);
     invoicesExport.addCreditorInvoicesSheet(exporter, getString("fibu.eingangsrechnungen"), creditorInvoices);
     final ExportSheet sheet = exporter.addSheet(getString("filter.all"));
-    exporter.addList(sheet, analysis.getEntries());
+    exporter.addList(sheet, forecast.getEntries());
     sheet.getPoiSheet().setAutoFilter(org.apache.poi.ss.util.CellRangeAddress.valueOf("E1:E1"));
     sheet.getPoiSheet().setAutoFilter(org.apache.poi.ss.util.CellRangeAddress.valueOf("A1:A1"));
   }
 
-  private LiquidityAnalysis getAnalysis()
+  private LiquidityForecast getForecast()
   {
-    if (analysis == null) {
-      analysis = new LiquidityAnalysis();
+    if (forecast == null) {
+      forecast = new LiquidityForecast();
       invoices = rechnungDao.getList(new RechnungFilter().setListType(RechnungFilter.FILTER_UNBEZAHLT));
-      analysis.setInvoices(invoices);
+      forecast.setInvoices(invoices);
       creditorInvoices = eingangsrechnungDao.getList(new RechnungFilter().setListType(RechnungFilter.FILTER_UNBEZAHLT));
-      analysis.setCreditorInvoices(creditorInvoices);
+      forecast.setCreditorInvoices(creditorInvoices);
     }
     final List<LiquidityEntryDO> list = liquidityEntryDao.getList(new LiquidityFilter().setPaymentStatus(PaymentStatus.UNPAID));
-    analysis.set(list);
-    analysis.build();
-    return analysis;
+    forecast.set(list);
+    forecast.build();
+    return forecast;
   }
 
   /**
