@@ -32,6 +32,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulato
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -56,6 +57,7 @@ import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 import org.projectforge.web.wicket.RowCssClass;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.projectforge.web.wicket.flowlayout.IconPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 
@@ -166,6 +168,17 @@ IListPageColumnsCreator<LiquidityEntryDO>
   {
     dataTable = createDataTable(createColumns(this, true), "dateOfPayment", SortOrder.ASCENDING);
     form.add(dataTable);
+    @SuppressWarnings("serial")
+    final ContentMenuEntryPanel liquidityAnalysisButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
+      @Override
+      public void onClick()
+      {
+        final LiquidityAnalysisPage page = new LiquidityAnalysisPage(new PageParameters());
+        page.setReturnToPage(LiquidityEntryListPage.this);
+        setResponsePage(page);
+      };
+    }, getString("plugins.liquidityplanning.analysis"));
+    addContentMenuEntry(liquidityAnalysisButton);
     addExcelExport();
   }
 

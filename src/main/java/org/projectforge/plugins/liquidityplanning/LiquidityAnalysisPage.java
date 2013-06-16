@@ -36,12 +36,15 @@ public class LiquidityAnalysisPage extends AbstractStandardFormPage
 
   private static final int IMAGE_HEIGHT = 400;
 
-  @SpringBean(name = "LiquidityEntryDao")
+  @SpringBean(name = "liquidityEntryDao")
   private LiquidityEntryDao liquidityEntryDao;
 
   public LiquidityAnalysisPage(final PageParameters parameters)
   {
     super(parameters);
+    final LiquidityAnalysisForm form = new LiquidityAnalysisForm(this);
+    body.add(form);
+    form.init();
     final GridBuilder gridBuilder = new GridBuilder(body, "flowgrid");
     // final Shape shape = new Ellipse2D.Float(-3, -3, 6, 6);
     // // final Shape shape = null;
@@ -66,5 +69,4 @@ public class LiquidityAnalysisPage extends AbstractStandardFormPage
   {
     return getString("plugins.liquidityplanning.analysis");
   }
-
 }

@@ -25,12 +25,15 @@ package org.projectforge.plugins.liquidityplanning;
 
 import java.math.BigDecimal;
 
+import org.apache.wicket.markup.html.form.Button;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.core.Constants;
 import org.projectforge.web.wicket.AbstractStandardForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.RequiredMinMaxNumberField;
+import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.converter.CurrencyConverter;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
@@ -52,18 +55,33 @@ public class LiquidityAnalysisForm extends AbstractStandardForm<Object, Liquidit
   protected void init()
   {
     super.init();
-    final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.liquidityplanning.analysis.startAmount"));
-    final RequiredMinMaxNumberField<BigDecimal> amount = new RequiredMinMaxNumberField<BigDecimal>(fs.getTextFieldId(),
-        new PropertyModel<BigDecimal>(getSettings(), "startAmount"), Constants.TEN_BILLION_NEGATIVE, Constants.TEN_BILLION) {
-      @SuppressWarnings({ "rawtypes", "unchecked"})
-      @Override
-      public IConverter getConverter(final Class type)
-      {
-        return new CurrencyConverter();
-      }
-    };
-    WicketUtils.setSize(amount, 8);
-    fs.add(amount);
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.liquidityplanning.analysis.startAmount"));
+      final RequiredMinMaxNumberField<BigDecimal> amount = new RequiredMinMaxNumberField<BigDecimal>(fs.getTextFieldId(),
+          new PropertyModel<BigDecimal>(getSettings(), "startAmount"), Constants.TEN_BILLION_NEGATIVE, Constants.TEN_BILLION) {
+        @SuppressWarnings({ "rawtypes", "unchecked"})
+        @Override
+        public IConverter getConverter(final Class type)
+        {
+          return new CurrencyConverter();
+        }
+      };
+      WicketUtils.setSize(amount, 8);
+      fs.add(amount);
+    }
+    {
+      final Button callButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("execute")) {
+        @Override
+        public final void onSubmit()
+        {
+          //parentPage.call();
+        }
+      };
+      final SingleButtonPanel callButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), callButton,
+          getString("execute"), SingleButtonPanel.DEFAULT_SUBMIT);
+      actionButtons.add(callButtonPanel);
+      setDefaultButton(callButton);
+    }
   }
 
   protected LiquidityAnalysisSettings getSettings()
