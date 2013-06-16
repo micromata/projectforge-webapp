@@ -28,6 +28,7 @@ import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.user.UserPrefArea;
+import org.projectforge.user.UserRightValue;
 import org.projectforge.web.MenuItemDef;
 import org.projectforge.web.MenuItemDefId;
 
@@ -38,7 +39,8 @@ public class LiquidityPlanningPlugin extends AbstractPlugin
 {
   public static final String ID = "liquididityplanning";
 
-  public static final String RESOURCE_BUNDLE_NAME = LiquidityPlanningPlugin.class.getPackage().getName() + ".LiquidityPlanningI18nResources";
+  public static final String RESOURCE_BUNDLE_NAME = LiquidityPlanningPlugin.class.getPackage().getName()
+      + ".LiquidityPlanningI18nResources";
 
   static UserPrefArea USER_PREF_AREA;
 
@@ -72,7 +74,8 @@ public class LiquidityPlanningPlugin extends AbstractPlugin
 
     // Register the menu entry as sub menu entry of the reporting menu:
     final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.REPORTING);
-    registerMenuItem(new MenuItemDef(parentMenu, ID, 10, "plugins.liquidityplanning.menu", LiquidityEntryListPage.class));
+    registerMenuItem(new MenuItemDef(parentMenu, ID, 10, "plugins.liquidityplanning.menu", LiquidityEntryListPage.class,
+        LiquidityEntryDao.USER_RIGHT_ID, UserRightValue.READONLY, UserRightValue.READWRITE));
 
     // Define the access management:
     registerRight(new LiquidityPlanningRight());
