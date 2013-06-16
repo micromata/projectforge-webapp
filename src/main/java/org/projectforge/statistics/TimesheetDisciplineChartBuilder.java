@@ -23,8 +23,6 @@
 
 package org.projectforge.statistics;
 
-import java.awt.Color;
-import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.math.BigDecimal;
@@ -33,23 +31,15 @@ import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
 
-import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.DateTickMarkPosition;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYDifferenceRenderer;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
-import org.jfree.data.time.TimeSeriesCollection;
 import org.projectforge.calendar.DayHolder;
+import org.projectforge.charting.AbstractChartBuilder;
 import org.projectforge.core.OrderDirection;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.timesheet.TimesheetFilter;
-import org.projectforge.user.PFUserContext;
 
 
 /**
@@ -65,7 +55,7 @@ import org.projectforge.user.PFUserContext;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class TimesheetDisciplineChartBuilder
+public class TimesheetDisciplineChartBuilder extends AbstractChartBuilder
 {
   private static final double PLANNED_AVERAGE_DIFFERENCE_BETWEEN_TIMESHEET_AND_BOOKING = 2.0; // days.
 
@@ -198,7 +188,7 @@ public class TimesheetDisciplineChartBuilder
       long difference = 0;
       long totalDuration = 0; // Weight for average.
       while (current != null && (dh.isSameDay(current.getStartTime()) == true || current.getStartTime().before(dh.getDate()) == true)) {
-        long duration = current.getWorkFractionDuration();
+        final long duration = current.getWorkFractionDuration();
         difference += (current.getCreated().getTime() - current.getStartTime().getTime()) * duration;
         totalDuration += duration;
         if (it.hasNext() == true) {
@@ -208,7 +198,7 @@ public class TimesheetDisciplineChartBuilder
           break;
         }
       }
-      double averageDifference = difference > 0 ? ((double) difference) / totalDuration / 86400000 : 0; // In days.
+      final double averageDifference = difference > 0 ? ((double) difference) / totalDuration / 86400000 : 0; // In days.
       final Day day = new Day(dh.getDayOfMonth(), dh.getMonth() + 1, dh.getYear());
       if (averageDifference > 0) {
         planSeries.add(day, PLANNED_AVERAGE_DIFFERENCE_BETWEEN_TIMESHEET_AND_BOOKING); // plan average
@@ -223,51 +213,5 @@ public class TimesheetDisciplineChartBuilder
     averageDifferenceBetweenTimesheetAndBooking = numberOfBookedDays > 0 ? new BigDecimal(totalDifference).divide(new BigDecimal(
         numberOfBookedDays), 1, RoundingMode.HALF_UP) : BigDecimal.ZERO;
     return create(actualSeries, planSeries, shape, stroke, showAxisValues, "days");
-  }
-
-  private JFreeChart create(final TimeSeries series1, final TimeSeries series2, final Shape shape, final Stroke stroke,
-      final boolean showAxisValues, final String valueAxisUnitKey)
-  {
-    final TimeSeriesCollection dataset = new TimeSeriesCollection();
-    dataset.addSeries(series1);
-    dataset.addSeries(series2);
-    final JFreeChart chart = ChartFactory.createXYLineChart(null, null, null, dataset, PlotOrientation.VERTICAL, true, true, false);
-
-    final XYDifferenceRenderer renderer = new XYDifferenceRenderer(new Color(238, 176, 176), new Color(135, 206, 112), true);
-    renderer.setSeriesPaint(0, new Color(222, 23, 33));
-    renderer.setSeriesPaint(1, new Color(64, 169, 59));
-    if (shape != null) {
-      renderer.setSeriesShape(0, shape);
-      renderer.setSeriesShape(1, shape);
-    } else {
-      final Shape none = new Rectangle();
-      renderer.setSeriesShape(0, none);
-      renderer.setSeriesShape(1, none);
-    }
-    renderer.setSeriesStroke(0, stroke);
-    renderer.setSeriesStroke(1, stroke);
-    renderer.setSeriesVisibleInLegend(0, false);
-    renderer.setSeriesVisibleInLegend(1, false);
-    final XYPlot plot = chart.getXYPlot();
-    plot.setRenderer(renderer);
-    plot.setBackgroundPaint(Color.white);
-    plot.setDomainGridlinePaint(Color.lightGray);
-    plot.setRangeGridlinePaint(Color.lightGray);
-    final DateAxis xAxis = new DateAxis();
-    xAxis.setTickMarkPosition(DateTickMarkPosition.MIDDLE);
-    xAxis.setLowerMargin(0.0);
-    xAxis.setUpperMargin(0.0);
-    xAxis.setVisible(showAxisValues);
-    plot.setDomainAxis(xAxis);
-    final NumberAxis yAxis;
-    if (showAxisValues == true) {
-      yAxis = new NumberAxis(PFUserContext.getLocalizedString(valueAxisUnitKey));
-    } else {
-      yAxis = new NumberAxis();
-    }
-    yAxis.setVisible(showAxisValues);
-    plot.setRangeAxis(yAxis);
-    plot.setOutlineVisible(false);
-    return chart;
   }
 }
