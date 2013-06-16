@@ -1,0 +1,111 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+// Project ProjectForge Community Edition
+//         www.projectforge.org
+//
+// Copyright (C) 2001-2013 Kai Reinhard (k.reinhard@micromata.de)
+//
+// ProjectForge is dual-licensed.
+//
+// task community edition is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation; version 3 of the License.
+//
+// task community edition is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+// Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with task program; if not, see http://www.gnu.org/licenses/.
+//
+/////////////////////////////////////////////////////////////////////////////
+
+package org.projectforge.plugins.teamcal.rest;
+
+import java.util.Calendar;
+
+import org.projectforge.common.DateHolder;
+import org.projectforge.plugins.teamcal.event.ReminderDurationUnit;
+import org.projectforge.plugins.teamcal.event.TeamEvent;
+import org.projectforge.plugins.teamcal.event.TeamEventDO;
+import org.projectforge.plugins.teamcal.event.TeamRecurrenceEvent;
+import org.projectforge.rest.objects.CalendarEventObject;
+import org.projectforge.web.rest.converter.DOConverter;
+
+/**
+ * For conversion of TeamEvent to CalendarEventObject.
+ * @author Kai Reinhard (k.reinhard@micromata.de)
+ * 
+ */
+public class TeamEventDOConverter
+{
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamEventDOConverter.class);
+
+  public static CalendarEventObject getEventObject(final TeamEvent src)
+  {
+    if (src == null) {
+      return null;
+    }
+    final CalendarEventObject event = new CalendarEventObject();
+    event.setUid(src.getUid());
+    event.setStartDate(src.getStartDate());
+    event.setEndDate(src.getEndDate());
+    event.setLocation(src.getLocation());
+    event.setNote(src.getNote());
+    event.setSubject(src.getSubject());
+    if (src instanceof TeamEventDO) {
+      event.setCalendarId(((TeamEventDO) src).getCalendarId());
+      setReminderSettings(event, (TeamEventDO) src);
+    } else if (src instanceof TeamRecurrenceEvent) {
+      final TeamEventDO master = ((TeamRecurrenceEvent) src).getMaster();
+      if (master != null) {
+        event.setCalendarId(master.getCalendarId());
+        setReminderSettings(event, master);
+      }
+    }
+    return event;
+  }
+
+  public static CalendarEventObject getEventObject(final TeamEventDO src)
+  {
+    if (src == null) {
+      return null;
+    }
+    final CalendarEventObject event = new CalendarEventObject();
+    DOConverter.copyFields(event, src);
+    event.setUid(src.getUid());
+    event.setStartDate(src.getStartDate());
+    event.setEndDate(src.getEndDate());
+    event.setLocation(src.getLocation());
+    event.setNote(src.getNote());
+    event.setSubject(src.getSubject());
+    event.setCalendarId(src.getCalendarId());
+    setReminderSettings(event, src);
+    return event;
+  }
+
+  private static void setReminderSettings(final CalendarEventObject event, final TeamEventDO src)
+  {
+    if (src.getReminderActionType() == null || src.getReminderDuration() == null || src.getReminderDurationUnit() == null) {
+      return;
+    }
+    event.setReminderType(src.getReminderActionType().toString());
+    event.setReminderDuration(src.getReminderDuration());
+    final ReminderDurationUnit unit = src.getReminderDurationUnit();
+    event.setReminderUnit(unit.toString());
+    final DateHolder date = new DateHolder(src.getStartDate());
+    if (unit == ReminderDurationUnit.MINUTES) {
+      date.add(Calendar.MINUTE, -src.getReminderDuration());
+      event.setReminder(date.getDate());
+    } else if (unit == ReminderDurationUnit.HOURS) {
+      date.add(Calendar.HOUR, -src.getReminderDuration());
+      event.setReminder(date.getDate());
+    } else if (unit == ReminderDurationUnit.DAYS) {
+      date.add(Calendar.DAY_OF_YEAR, -src.getReminderDuration());
+      event.setReminder(date.getDate());
+    } else {
+      log.warn("ReminderDurationUnit '" + src.getReminderDurationUnit() + "' not yet implemented.");
+    }
+  }
+}
