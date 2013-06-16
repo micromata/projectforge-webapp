@@ -45,6 +45,7 @@ import org.projectforge.export.MyExcelExporter;
 import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.EingangsrechnungDao;
 import org.projectforge.fibu.InvoicesExcelExport;
+import org.projectforge.fibu.PaymentStatus;
 import org.projectforge.fibu.RechnungDO;
 import org.projectforge.fibu.RechnungDao;
 import org.projectforge.fibu.RechnungFilter;
@@ -179,7 +180,7 @@ IListPageColumnsCreator<LiquidityEntryDO>
       @Override
       public void onClick()
       {
-        final LiquidityAnalysisPage page = new LiquidityAnalysisPage(new PageParameters()).setAnalysis(getAnalysis().build());
+        final LiquidityAnalysisPage page = new LiquidityAnalysisPage(new PageParameters()).setAnalysis(getAnalysis());
         page.setReturnToPage(LiquidityEntryListPage.this);
         setResponsePage(page);
       };
@@ -216,7 +217,6 @@ IListPageColumnsCreator<LiquidityEntryDO>
     analysis = getAnalysis();
     invoicesExport.addDebitorInvoicesSheet(exporter, getString("fibu.rechnungen"), invoices);
     invoicesExport.addCreditorInvoicesSheet(exporter, getString("fibu.eingangsrechnungen"), creditorInvoices);
-    analysis.set(getList()).build();
     final ExportSheet sheet = exporter.addSheet(getString("filter.all"));
     exporter.addList(sheet, analysis.getEntries());
     sheet.getPoiSheet().setAutoFilter(org.apache.poi.ss.util.CellRangeAddress.valueOf("E1:E1"));
@@ -227,13 +227,14 @@ IListPageColumnsCreator<LiquidityEntryDO>
   {
     if (analysis == null) {
       analysis = new LiquidityAnalysis();
-      analysis.set(getList());
       invoices = rechnungDao.getList(new RechnungFilter().setListType(RechnungFilter.FILTER_UNBEZAHLT));
       analysis.setInvoices(invoices);
       creditorInvoices = eingangsrechnungDao.getList(new RechnungFilter().setListType(RechnungFilter.FILTER_UNBEZAHLT));
       analysis.setCreditorInvoices(creditorInvoices);
-      analysis.sort();
     }
+    final List<LiquidityEntryDO> list = liquidityEntryDao.getList(new LiquidityFilter().setPaymentStatus(PaymentStatus.UNPAID));
+    analysis.set(list);
+    analysis.build();
     return analysis;
   }
 

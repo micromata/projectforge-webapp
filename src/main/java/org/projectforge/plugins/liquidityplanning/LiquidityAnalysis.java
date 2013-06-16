@@ -67,7 +67,7 @@ public class LiquidityAnalysis implements Serializable
   /**
    * @return this for chaining.
    */
-  public LiquidityAnalysis sort()
+  private LiquidityAnalysis sort()
   {
     Collections.sort(entries, new Comparator<LiquidityEntry>() {
       @Override
