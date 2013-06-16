@@ -23,10 +23,6 @@
 
 package org.projectforge.web.statistics;
 
-import java.awt.BasicStroke;
-import java.awt.Shape;
-import java.awt.Stroke;
-import java.awt.geom.Ellipse2D;
 import java.text.NumberFormat;
 
 import org.apache.wicket.AttributeModifier;
@@ -43,9 +39,10 @@ import org.projectforge.user.PFUserContext;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.JFreeChartImage;
 
-
 public class PersonalStatisticsPage extends AbstractSecuredPage
 {
+  private static final long serialVersionUID = 5957430109012640203L;
+
   private static final short LAST_N_DAYS = 45;
 
   private static final int IMAGE_WIDTH = 500;
@@ -64,17 +61,13 @@ public class PersonalStatisticsPage extends AbstractSecuredPage
     final Label timesheetDisciplineChartTitle = new Label("timesheetDisciplineChartTitle",
         getString("personal.statistics.timesheetDisciplineChart.title"));
     body.add(timesheetDisciplineChartTitle);
-    final Shape shape = new Ellipse2D.Float(-3, -3, 6, 6);
-    // final Shape shape = null;
-    final Stroke stroke = new BasicStroke(3.0f);
-    // final Stroke stroke = new BasicStroke(1.0f);
     final EmployeeDO employee = employeeDao.getByUserId(PFUserContext.getUserId());
     double workingHoursPerDay = 8;
     if (employee != null && NumberHelper.greaterZero(employee.getWochenstunden()) == true) {
       workingHoursPerDay = employee.getWochenstunden() / 5;
     }
     final TimesheetDisciplineChartBuilder chartBuilder = new TimesheetDisciplineChartBuilder();
-    final JFreeChart chart1 = chartBuilder.create(timesheetDao, getUser().getId(), workingHoursPerDay, LAST_N_DAYS, shape, stroke, true);
+    final JFreeChart chart1 = chartBuilder.create(timesheetDao, getUser().getId(), workingHoursPerDay, LAST_N_DAYS, true);
     JFreeChartImage image = new JFreeChartImage("timesheetStatisticsImage1", chart1, IMAGE_WIDTH, IMAGE_HEIGHT);
     image.add(AttributeModifier.replace("width", String.valueOf(IMAGE_WIDTH)));
     image.add(AttributeModifier.replace("height", String.valueOf(IMAGE_HEIGHT)));
@@ -92,7 +85,7 @@ public class PersonalStatisticsPage extends AbstractSecuredPage
     timesheetDisciplineChart1Legend.setEscapeModelStrings(false);
     body.add(timesheetDisciplineChart1Legend);
 
-    final JFreeChart chart2 = chartBuilder.create(timesheetDao, getUser().getId(), LAST_N_DAYS, shape, stroke, true);
+    final JFreeChart chart2 = chartBuilder.create(timesheetDao, getUser().getId(), LAST_N_DAYS, true);
     image = new JFreeChartImage("timesheetStatisticsImage2", chart2, IMAGE_WIDTH, IMAGE_HEIGHT);
     image.add(AttributeModifier.replace("width", String.valueOf(IMAGE_WIDTH)));
     image.add(AttributeModifier.replace("height", String.valueOf(IMAGE_HEIGHT)));

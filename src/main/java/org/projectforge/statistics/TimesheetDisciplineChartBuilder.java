@@ -23,8 +23,6 @@
 
 package org.projectforge.statistics;
 
-import java.awt.Shape;
-import java.awt.Stroke;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Calendar;
@@ -108,7 +106,7 @@ public class TimesheetDisciplineChartBuilder extends AbstractChartBuilder
    * @return
    */
   public JFreeChart create(final TimesheetDao timesheetDao, final Integer userId, final double workingHoursPerDay,
-      final short forLastNDays, final Shape shape, final Stroke stroke, final boolean showAxisValues)
+      final short forLastNDays, final boolean showAxisValues)
   {
     final DayHolder dh = new DayHolder();
     final TimesheetFilter filter = new TimesheetFilter();
@@ -153,7 +151,7 @@ public class TimesheetDisciplineChartBuilder extends AbstractChartBuilder
     final TimeSeriesCollection dataset = new TimeSeriesCollection();
     dataset.addSeries(sollSeries);
     dataset.addSeries(istSeries);
-    return create(dataset, shape, stroke, showAxisValues, "hours");
+    return create(dataset, showAxisValues, "hours");
   }
 
   /**
@@ -167,8 +165,7 @@ public class TimesheetDisciplineChartBuilder extends AbstractChartBuilder
    * @param showAxisValues
    * @return
    */
-  public JFreeChart create(final TimesheetDao timesheetDao, final Integer userId, final short forLastNDays, final Shape shape,
-      final Stroke stroke, final boolean showAxisValues)
+  public JFreeChart create(final TimesheetDao timesheetDao, final Integer userId, final short forLastNDays, final boolean showAxisValues)
   {
     final DayHolder dh = new DayHolder();
     final TimesheetFilter filter = new TimesheetFilter();
@@ -218,6 +215,6 @@ public class TimesheetDisciplineChartBuilder extends AbstractChartBuilder
     final TimeSeriesCollection dataset = new TimeSeriesCollection();
     dataset.addSeries(actualSeries);
     dataset.addSeries(planSeries);
-    return create(dataset, shape, stroke, showAxisValues, "days");
+    return create(dataset, showAxisValues, "days");
   }
 }

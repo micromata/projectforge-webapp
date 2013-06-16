@@ -23,10 +23,12 @@
 
 package org.projectforge.charting;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.geom.Ellipse2D;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -45,33 +47,37 @@ import org.projectforge.user.PFUserContext;
  */
 public abstract class AbstractChartBuilder
 {
+
+  private Shape timeseriesShape = new Ellipse2D.Float(-3, -3, 6, 6);
+
+  private Stroke timeseriesStroke = new BasicStroke(3.0f);
+
   /**
    * @param series1
    * @param series2
-   * @param shape e. g. new Ellipse2D.Float(-3, -3, 6, 6) or null, if no marker should be printed.
-   * @param stroke e. g. new BasicStroke(3.0f).
+   * @param timeseriesShape e. g. new Ellipse2D.Float(-3, -3, 6, 6) or null, if no marker should be printed.
+   * @param timeseriesStroke e. g. new BasicStroke(3.0f).
    * @param showAxisValues
    * @param valueAxisUnitKey
    * @return
    */
-  protected JFreeChart create(final TimeSeriesCollection dataset, final Shape shape, final Stroke stroke,
-      final boolean showAxisValues, final String valueAxisUnitKey)
+  protected JFreeChart create(final TimeSeriesCollection dataset, final boolean showAxisValues, final String valueAxisUnitKey)
   {
     final JFreeChart chart = ChartFactory.createXYLineChart(null, null, null, dataset, PlotOrientation.VERTICAL, true, true, false);
 
     final XYDifferenceRenderer renderer = new XYDifferenceRenderer(new Color(238, 176, 176), new Color(135, 206, 112), true);
     renderer.setSeriesPaint(0, new Color(222, 23, 33));
     renderer.setSeriesPaint(1, new Color(64, 169, 59));
-    if (shape != null) {
-      renderer.setSeriesShape(0, shape);
-      renderer.setSeriesShape(1, shape);
+    if (timeseriesShape != null) {
+      renderer.setSeriesShape(0, timeseriesShape);
+      renderer.setSeriesShape(1, timeseriesShape);
     } else {
       final Shape none = new Rectangle();
       renderer.setSeriesShape(0, none);
       renderer.setSeriesShape(1, none);
     }
-    renderer.setSeriesStroke(0, stroke);
-    renderer.setSeriesStroke(1, stroke);
+    renderer.setSeriesStroke(0, timeseriesStroke);
+    renderer.setSeriesStroke(1, timeseriesStroke);
     renderer.setSeriesVisibleInLegend(0, false);
     renderer.setSeriesVisibleInLegend(1, false);
     final XYPlot plot = chart.getXYPlot();
@@ -95,5 +101,25 @@ public abstract class AbstractChartBuilder
     plot.setRangeAxis(yAxis);
     plot.setOutlineVisible(false);
     return chart;
+  }
+
+  /**
+   * @param timeseriesShape the timeseriesShape to set
+   * @return this for chaining.
+   */
+  public AbstractChartBuilder setTimeseriesShape(final Shape timeseriesShape)
+  {
+    this.timeseriesShape = timeseriesShape;
+    return this;
+  }
+
+  /**
+   * @param timeseriesStroke the timeseriesStroke to set
+   * @return this for chaining.
+   */
+  public AbstractChartBuilder setTimeseriesStroke(final Stroke timeseriesStroke)
+  {
+    this.timeseriesStroke = timeseriesStroke;
+    return this;
   }
 }
