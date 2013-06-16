@@ -39,6 +39,8 @@ public class LiquidityAnalysisPage extends AbstractStandardFormPage
   @SpringBean(name = "liquidityEntryDao")
   private LiquidityEntryDao liquidityEntryDao;
 
+  private LiquidityAnalysis analysis;
+
   public LiquidityAnalysisPage(final PageParameters parameters)
   {
     super(parameters);
@@ -62,6 +64,16 @@ public class LiquidityAnalysisPage extends AbstractStandardFormPage
     // image.add(AttributeModifier.replace("height", String.valueOf(IMAGE_HEIGHT)));
     // body.add(image);
     // body.add(timesheetDisciplineChart1Legend);
+  }
+
+  /**
+   * @param analysis the analysis to set
+   * @return this for chaining.
+   */
+  public LiquidityAnalysisPage setAnalysis(final LiquidityAnalysis analysis)
+  {
+    this.analysis = analysis;
+    return this;
   }
 
   @Override

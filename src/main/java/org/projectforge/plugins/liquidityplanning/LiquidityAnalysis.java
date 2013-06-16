@@ -23,6 +23,7 @@
 
 package org.projectforge.plugins.liquidityplanning;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -36,16 +37,30 @@ import org.projectforge.fibu.RechnungDO;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class LiquidityAnalysis
+public class LiquidityAnalysis implements Serializable
 {
+  private static final long serialVersionUID = 5385319337895942452L;
+
   private final List<LiquidityEntry> entries = new LinkedList<LiquidityEntry>();
 
+  private Collection<LiquidityEntry> liquiEntries;
+
+  private Collection<LiquidityEntry> invoices;
+
+  private Collection<LiquidityEntry> creditorInvoices;
+
   /**
+   * Refresh analysis from stored liqui-entries, invoices and creditor invoices and sort the entries.
    * @return this for chaining.
+   * @see #sort()
    */
-  public LiquidityAnalysis clear()
+  public LiquidityAnalysis build()
   {
     entries.clear();
+    entries.addAll(this.liquiEntries);
+    entries.addAll(this.invoices);
+    entries.addAll(this.creditorInvoices);
+    sort();
     return this;
   }
 
@@ -86,8 +101,9 @@ public class LiquidityAnalysis
     return entries;
   }
 
-  public LiquidityAnalysis add(final Collection<LiquidityEntryDO> list)
+  public LiquidityAnalysis set(final Collection<LiquidityEntryDO> list)
   {
+    this.liquiEntries = new LinkedList<LiquidityEntry>();
     if (list == null) {
       return this;
     }
@@ -98,13 +114,14 @@ public class LiquidityAnalysis
       entry.setPaid(liquiEntry.isPaid());
       entry.setSubject(liquiEntry.getSubject());
       entry.setType(LiquidityEntryType.LIQUIDITY);
-      entries.add(entry);
+      this.liquiEntries.add(entry);
     }
     return this;
   }
 
-  public LiquidityAnalysis addInvoices(final Collection<RechnungDO> list)
+  public LiquidityAnalysis setInvoices(final Collection<RechnungDO> list)
   {
+    this.invoices = new LinkedList<LiquidityEntry>();
     if (list == null) {
       return this;
     }
@@ -117,15 +134,16 @@ public class LiquidityAnalysis
       }
       entry.setAmount(invoice.getGrossSum());
       entry.setPaid(invoice.isBezahlt());
-      entry.setSubject(invoice.getKundeAsString() + ": " + invoice.getBetreff());
+      entry.setSubject("#" + invoice.getNummer() + ": " + invoice.getKundeAsString() + ": " + invoice.getBetreff());
       entry.setType(LiquidityEntryType.DEBITOR);
-      entries.add(entry);
+      this.invoices.add(entry);
     }
     return this;
   }
 
-  public LiquidityAnalysis addCreditorInvoices(final Collection<EingangsrechnungDO> list)
+  public LiquidityAnalysis setCreditorInvoices(final Collection<EingangsrechnungDO> list)
   {
+    this.creditorInvoices = new LinkedList<LiquidityEntry>();
     if (list == null) {
       return this;
     }
@@ -140,8 +158,24 @@ public class LiquidityAnalysis
       entry.setPaid(invoice.isBezahlt());
       entry.setSubject(invoice.getKreditor() + ": " + invoice.getBetreff());
       entry.setType(LiquidityEntryType.CREDITOR);
-      entries.add(entry);
+      this.creditorInvoices.add(entry);
     }
     return this;
+  }
+
+  /**
+   * @return the invoices
+   */
+  public Collection<LiquidityEntry> getInvoices()
+  {
+    return invoices;
+  }
+
+  /**
+   * @return the creditorInvoices
+   */
+  public Collection<LiquidityEntry> getCreditorInvoices()
+  {
+    return creditorInvoices;
   }
 }
