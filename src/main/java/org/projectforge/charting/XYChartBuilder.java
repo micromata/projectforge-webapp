@@ -64,7 +64,12 @@ public class XYChartBuilder
 
   public XYChartBuilder(final String title, final String xAxisLabel, final String yAxisLabel, final XYDataset dataset, final boolean legend)
   {
-    chart = ChartFactory.createXYLineChart(title, xAxisLabel, yAxisLabel, dataset, PlotOrientation.VERTICAL, legend, true, false);
+    this(ChartFactory.createXYLineChart(title, xAxisLabel, yAxisLabel, dataset, PlotOrientation.VERTICAL, legend, true, false));
+  }
+
+  public XYChartBuilder(final JFreeChart chart)
+  {
+    this.chart = chart;
     plot = chart.getXYPlot();
     plot.setBackgroundPaint(Color.white);
     plot.setDomainGridlinePaint(Color.lightGray);
@@ -166,6 +171,14 @@ public class XYChartBuilder
   public Stroke getDashedStroke()
   {
     return dashedStroke;
+  }
+
+  /**
+   * @return the stroke
+   */
+  public Stroke getStroke()
+  {
+    return stroke;
   }
 
   public Color getRedFill()

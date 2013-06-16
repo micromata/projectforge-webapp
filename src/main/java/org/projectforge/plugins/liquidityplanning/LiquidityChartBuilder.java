@@ -90,21 +90,35 @@ public class LiquidityChartBuilder
       debitSeries.add(day, debits);
       dh.add(Calendar.DATE, 1);
     }
+
+    // final XYChartBuilder cb = new XYChartBuilder(ChartFactory.createXYBarChart(null, null, false, null, null, PlotOrientation.VERTICAL,
+    // false, false, false));
+    final XYChartBuilder cb = new XYChartBuilder(null, null, null, null, false);
+
+    int counter = 0;
+
+    // final TimeSeriesCollection cashflowSet = new TimeSeriesCollection();
+    // cashflowSet.addSeries(debitSeries);
+    // cashflowSet.addSeries(creditSeries);
+    // final XYBarRenderer barRenderer = new XYBarRenderer(.5);
+    // barRenderer.setSeriesPaint(0, cb.getGreenFill());
+    // barRenderer.setSeriesPaint(1, cb.getRedFill());
+    // barRenderer.setShadowVisible(false);
+    // cb.setRenderer(counter, barRenderer).setDataset(counter++, cashflowSet);
+
     final TimeSeriesCollection accumulatedSet = new TimeSeriesCollection();
     accumulatedSet.addSeries(accumulatedSeries);
-    final TimeSeriesCollection worstCaseSet = new TimeSeriesCollection();
-    worstCaseSet.addSeries(worstCaseSeries);
-    final XYChartBuilder cb = new XYChartBuilder(null, null, null, null, true);
-
     final XYDifferenceRenderer diffRenderer = new XYDifferenceRenderer(cb.getGreenFill(), cb.getRedFill(), true);
     diffRenderer.setSeriesPaint(0, cb.getRedMarker());
-    cb.setRenderer(0, diffRenderer).setDataset(0, accumulatedSet).setStrongStyle(diffRenderer, false, accumulatedSeries);
+    cb.setRenderer(counter, diffRenderer).setDataset(counter++, accumulatedSet).setStrongStyle(diffRenderer, false, accumulatedSeries);
 
+    final TimeSeriesCollection worstCaseSet = new TimeSeriesCollection();
+    worstCaseSet.addSeries(worstCaseSeries);
     final XYLineAndShapeRenderer lineRenderer = new XYLineAndShapeRenderer(true, false);
     lineRenderer.setSeriesPaint(0, cb.getGrayMarker());
     lineRenderer.setSeriesStroke(0, cb.getDashedStroke());
     lineRenderer.setSeriesVisibleInLegend(0, true);
-    cb.setRenderer(1, lineRenderer).setDataset(1, worstCaseSet);
+    cb.setRenderer(counter, lineRenderer).setDataset(counter++, worstCaseSet);
 
     cb.setDateXAxis(true).setYAxis(true, null);
     // getRenderer().setSeriesPaint(1, getGreenMarker());
