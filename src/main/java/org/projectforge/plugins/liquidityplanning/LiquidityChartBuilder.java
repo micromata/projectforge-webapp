@@ -65,22 +65,20 @@ public class LiquidityChartBuilder
     for (int i = 0; i < settings.getNextDays(); i++) {
       double debits = 0;
       double credits = 0;
-      if (current != null) {
-        while (current.getDateOfPayment() == null
-            || dh.before(current.getDateOfPayment()) == false
-            || dh.isSameDay(current.getDateOfPayment()) == true) {
-          final BigDecimal amount = current.getAmount();
-          if (amount != null) {
-            final double val = amount.doubleValue();
-            if (val < 0) {
-              credits += val;
-              worstCase += val;
-            } else {
-              debits += val;
-            }
+      while (current != null
+          && (current.getDateOfPayment() == null || dh.before(current.getDateOfPayment()) == false || dh.isSameDay(current
+              .getDateOfPayment()) == true)) {
+        final BigDecimal amount = current.getAmount();
+        if (amount != null) {
+          final double val = amount.doubleValue();
+          if (val < 0) {
+            credits += val;
+            worstCase += val;
+          } else {
+            debits += val;
           }
-          current = it.hasNext() == true ? it.next() : null;
         }
+        current = it.hasNext() == true ? it.next() : null;
       }
       final Day day = new Day(dh.getDayOfMonth(), dh.getMonth() + 1, dh.getYear());
       accumulated += debits + credits;
