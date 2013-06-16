@@ -32,6 +32,7 @@ import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.core.Constants;
 import org.projectforge.web.wicket.AbstractStandardForm;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.RequiredMinMaxNumberField;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.converter.CurrencyConverter;
@@ -43,7 +44,7 @@ public class LiquidityAnalysisForm extends AbstractStandardForm<Object, Liquidit
 
   private static final String USER_PREF_KEY_SETTINGS = LiquidityAnalysisSettings.class.getName();
 
-  private LiquidityAnalysisSettings settings;
+  LiquidityAnalysisSettings settings;
 
   public LiquidityAnalysisForm(final LiquidityAnalysisPage parentPage)
   {
@@ -55,6 +56,7 @@ public class LiquidityAnalysisForm extends AbstractStandardForm<Object, Liquidit
   protected void init()
   {
     super.init();
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.liquidityplanning.analysis.startAmount"));
       final RequiredMinMaxNumberField<BigDecimal> amount = new RequiredMinMaxNumberField<BigDecimal>(fs.getTextFieldId(),
@@ -69,16 +71,24 @@ public class LiquidityAnalysisForm extends AbstractStandardForm<Object, Liquidit
       WicketUtils.setSize(amount, 8);
       fs.add(amount);
     }
+    gridBuilder.newSplitPanel(GridSize.COL50);
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.liquidityplanning.analysis.forecast")).setUnit(getString("days"));
+      final RequiredMinMaxNumberField<Integer> nextDays = new RequiredMinMaxNumberField<Integer>(fs.getTextFieldId(),
+          new PropertyModel<Integer>(getSettings(), "nextDays"), 3, 365);
+      WicketUtils.setSize(nextDays, 4);
+      fs.add(nextDays);
+    }
     {
       final Button callButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("execute")) {
         @Override
         public final void onSubmit()
         {
-          //parentPage.call();
+          // parentPage.call();
         }
       };
-      final SingleButtonPanel callButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), callButton,
-          getString("execute"), SingleButtonPanel.DEFAULT_SUBMIT);
+      final SingleButtonPanel callButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), callButton, getString("execute"),
+          SingleButtonPanel.DEFAULT_SUBMIT);
       actionButtons.add(callButtonPanel);
       setDefaultButton(callButton);
     }

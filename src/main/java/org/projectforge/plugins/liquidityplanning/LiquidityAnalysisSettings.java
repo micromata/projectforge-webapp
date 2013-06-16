@@ -32,6 +32,8 @@ public class LiquidityAnalysisSettings implements Serializable
 
   private BigDecimal startAmount = BigDecimal.ZERO;
 
+  private int nextDays = 30;
+
   /**
    * @return the startAmount if given or {@link BigDecimal#ZERO}.
    */
@@ -50,6 +52,27 @@ public class LiquidityAnalysisSettings implements Serializable
   public LiquidityAnalysisSettings setStartAmount(final BigDecimal startAmount)
   {
     this.startAmount = startAmount;
+    return this;
+  }
+
+  /**
+   * @return the nextDays (1-365)
+   */
+  public int getNextDays()
+  {
+    if (nextDays < 1 || nextDays > 365) {
+      return 30;
+    }
+    return nextDays;
+  }
+
+  /**
+   * @param nextDays the nextDays to set
+   * @return this for chaining.
+   */
+  public LiquidityAnalysisSettings setNextDays(final int nextDays)
+  {
+    this.nextDays = nextDays;
     return this;
   }
 }

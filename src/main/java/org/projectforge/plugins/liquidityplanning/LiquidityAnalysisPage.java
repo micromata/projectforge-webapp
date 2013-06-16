@@ -49,10 +49,12 @@ public class LiquidityAnalysisPage extends AbstractStandardFormPage
 
   private ImagePanel chartImage;
 
+  private final LiquidityAnalysisForm form;
+
   public LiquidityAnalysisPage(final PageParameters parameters)
   {
     super(parameters);
-    final LiquidityAnalysisForm form = new LiquidityAnalysisForm(this);
+    form = new LiquidityAnalysisForm(this);
     body.add(form);
     form.init();
     gridBuilder = new GridBuilder(body, "flowgrid");
@@ -77,7 +79,7 @@ public class LiquidityAnalysisPage extends AbstractStandardFormPage
   {
     super.onBeforeRender();
     final LiquidityChartBuilder chartBuilder = new LiquidityChartBuilder();
-    final JFreeChart chart = chartBuilder.create(analysis, 100);
+    final JFreeChart chart = chartBuilder.create(analysis, form.getSettings());
     final JFreeChartImage image = new JFreeChartImage(ImagePanel.IMAGE_ID, chart, IMAGE_WIDTH, IMAGE_HEIGHT);
     image.add(AttributeModifier.replace("width", String.valueOf(IMAGE_WIDTH)));
     image.add(AttributeModifier.replace("height", String.valueOf(IMAGE_HEIGHT)));

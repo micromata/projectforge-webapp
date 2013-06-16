@@ -49,9 +49,9 @@ public class LiquidityChartBuilder
    * @param nextDays
    * @return
    */
-  public JFreeChart create(final LiquidityAnalysis analysis, final int nextDays)
+  public JFreeChart create(final LiquidityAnalysis analysis, final LiquidityAnalysisSettings settings)
   {
-    Validate.isTrue(nextDays > 0 && nextDays < 500);
+    Validate.isTrue(settings.getNextDays() > 0 && settings.getNextDays() < 500);
     final DayHolder dh = new DayHolder();
 
     final TimeSeries accumulatedSeries = new TimeSeries("accumulated");
@@ -60,9 +60,9 @@ public class LiquidityChartBuilder
     final TimeSeries debitSeries = new TimeSeries("debits");
     final Iterator<LiquidityEntry> it = analysis.getEntries().iterator();
     LiquidityEntry current = it.hasNext() == true ? it.next() : null;
-    double accumulated = 0;
-    double worstCase = 0;
-    for (int i = 0; i < nextDays; i++) {
+    double accumulated = settings.getStartAmount().doubleValue();
+    double worstCase = accumulated;
+    for (int i = 0; i < settings.getNextDays(); i++) {
       double debits = 0;
       double credits = 0;
       if (current != null) {
