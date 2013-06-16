@@ -29,17 +29,18 @@ import java.util.Iterator;
 
 import org.apache.commons.lang.Validate;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.renderer.xy.XYDifferenceRenderer;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.projectforge.calendar.DayHolder;
-import org.projectforge.charting.AbstractChartBuilder;
+import org.projectforge.charting.XYChartBuilder;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class LiquidityChartBuilder extends AbstractChartBuilder
+public class LiquidityChartBuilder
 {
   /**
    * @param analysis
@@ -52,11 +53,13 @@ public class LiquidityChartBuilder extends AbstractChartBuilder
     final DayHolder dh = new DayHolder();
 
     final TimeSeries accumulatedSeries = new TimeSeries("accumulated");
+    final TimeSeries worstCaseSeries = new TimeSeries("worstCase");
     final TimeSeries creditSeries = new TimeSeries("credits");
     final TimeSeries debitSeries = new TimeSeries("debits");
     final Iterator<LiquidityEntry> it = analysis.getEntries().iterator();
     LiquidityEntry current = it.hasNext() == true ? it.next() : null;
     double accumulated = 0;
+    double worstCase = 0;
     for (int i = 0; i < nextDays; i++) {
       double debits = 0;
       double credits = 0;
@@ -69,6 +72,7 @@ public class LiquidityChartBuilder extends AbstractChartBuilder
             final double val = amount.doubleValue();
             if (val < 0) {
               credits += val;
+              worstCase += val;
             } else {
               debits += val;
             }
@@ -79,14 +83,22 @@ public class LiquidityChartBuilder extends AbstractChartBuilder
       final Day day = new Day(dh.getDayOfMonth(), dh.getMonth() + 1, dh.getYear());
       accumulated += debits + credits;
       accumulatedSeries.add(day, accumulated);
+      worstCaseSeries.add(day, worstCase);
       creditSeries.add(day, -credits);
       debitSeries.add(day, debits);
       dh.add(Calendar.DATE, 1);
     }
     final TimeSeriesCollection dataset = new TimeSeriesCollection();
     dataset.addSeries(accumulatedSeries);
+    //dataset.addSeries(worstCaseSeries);
+    final XYChartBuilder cb = new XYChartBuilder(null, null, null, dataset, true);
+    final XYDifferenceRenderer diffRenderer = new XYDifferenceRenderer(cb.getGreenFill(), cb.getRedFill(), true);
+    diffRenderer.setSeriesPaint(0, cb.getRedMarker());
+    cb.setRenderer(0, diffRenderer).setStyle(diffRenderer, false, accumulatedSeries);
+    cb.setDateXAxis(true).setYAxis(true, null);
+    // getRenderer().setSeriesPaint(1, getGreenMarker());
     // dataset.addSeries(creditSeries);
     // dataset.addSeries(debitSeries);
-    return prepare(dataset).create(true, null);
+    return cb.getChart();
   }
 }

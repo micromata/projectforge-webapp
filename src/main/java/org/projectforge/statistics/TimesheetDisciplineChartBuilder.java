@@ -30,11 +30,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.renderer.xy.XYDifferenceRenderer;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.projectforge.calendar.DayHolder;
-import org.projectforge.charting.AbstractChartBuilder;
+import org.projectforge.charting.XYChartBuilder;
 import org.projectforge.core.OrderDirection;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
@@ -53,7 +54,7 @@ import org.projectforge.timesheet.TimesheetFilter;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class TimesheetDisciplineChartBuilder extends AbstractChartBuilder
+public class TimesheetDisciplineChartBuilder
 {
   private static final double PLANNED_AVERAGE_DIFFERENCE_BETWEEN_TIMESHEET_AND_BOOKING = 2.0; // days.
 
@@ -148,13 +149,16 @@ public class TimesheetDisciplineChartBuilder extends AbstractChartBuilder
       istSeries.add(day, actualWorkingHours);
       dh.add(Calendar.DATE, 1);
     }
-    setXyDifferenceRenderer(getRedFill(), getGreenFill(), true);
-    getRenderer().setSeriesPaint(0, getRedMarker());
-    getRenderer().setSeriesPaint(1, getGreenMarker());
     final TimeSeriesCollection dataset = new TimeSeriesCollection();
     dataset.addSeries(sollSeries);
     dataset.addSeries(istSeries);
-    return prepare(dataset).create(showAxisValues, "hours");
+    final XYChartBuilder cb = new XYChartBuilder(null,  null,  null,  dataset, false);
+    final XYDifferenceRenderer diffRenderer = new XYDifferenceRenderer(cb.getRedFill(), cb.getGreenFill(), true);
+    diffRenderer.setSeriesPaint(0, cb.getRedMarker());
+    diffRenderer.setSeriesPaint(1, cb.getGreenMarker());
+    cb.setRenderer(0, diffRenderer).setStyle(diffRenderer, false, sollSeries, istSeries);
+    cb.setDateXAxis(true).setYAxis(true, "hours");
+    return cb.getChart();
   }
 
   /**
@@ -215,12 +219,16 @@ public class TimesheetDisciplineChartBuilder extends AbstractChartBuilder
     }
     averageDifferenceBetweenTimesheetAndBooking = numberOfBookedDays > 0 ? new BigDecimal(totalDifference).divide(new BigDecimal(
         numberOfBookedDays), 1, RoundingMode.HALF_UP) : BigDecimal.ZERO;
-    setXyDifferenceRenderer(getRedFill(), getGreenFill(), true);
-    getRenderer().setSeriesPaint(0, getRedMarker());
-    getRenderer().setSeriesPaint(1, getGreenMarker());
+
     final TimeSeriesCollection dataset = new TimeSeriesCollection();
     dataset.addSeries(actualSeries);
     dataset.addSeries(planSeries);
-    return prepare(dataset).create(showAxisValues, "days");
+    final XYChartBuilder cb = new XYChartBuilder(null,  null,  null,  dataset, false);
+    final XYDifferenceRenderer diffRenderer = new XYDifferenceRenderer(cb.getRedFill(), cb.getGreenFill(), true);
+    diffRenderer.setSeriesPaint(0, cb.getRedMarker());
+    diffRenderer.setSeriesPaint(1, cb.getGreenMarker());
+    cb.setRenderer(0, diffRenderer).setStyle(diffRenderer, false, actualSeries, planSeries);
+    cb.setDateXAxis(true).setYAxis(true, "days");
+    return cb.getChart();
   }
 }
