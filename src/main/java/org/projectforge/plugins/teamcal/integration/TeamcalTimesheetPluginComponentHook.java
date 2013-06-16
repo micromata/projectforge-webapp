@@ -72,7 +72,7 @@ public class TeamcalTimesheetPluginComponentHook implements TimesheetPluginCompo
           event.setLocation(timesheet.getLocation());
           event.setNote(timesheet.getDescription());
         }
-        setResponsePage(new TeamEventEditPage(new PageParameters(), event));
+        setResponsePage(new TeamEventEditPage(new PageParameters(), event).setReturnToPage(page.getReturnToPage()));
       };
     }.setDefaultFormProcessing(false), page.getString("plugins.teamcal.switchToTeamEventButton"));
     page.addContentMenuEntry(menu);
