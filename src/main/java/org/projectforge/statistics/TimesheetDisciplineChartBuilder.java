@@ -156,7 +156,7 @@ public class TimesheetDisciplineChartBuilder
     final XYDifferenceRenderer diffRenderer = new XYDifferenceRenderer(cb.getRedFill(), cb.getGreenFill(), true);
     diffRenderer.setSeriesPaint(0, cb.getRedMarker());
     diffRenderer.setSeriesPaint(1, cb.getGreenMarker());
-    cb.setRenderer(0, diffRenderer).setStyle(diffRenderer, false, sollSeries, istSeries);
+    cb.setRenderer(0, diffRenderer).setStrongStyle(diffRenderer, false, sollSeries, istSeries);
     cb.setDateXAxis(true).setYAxis(true, "hours");
     return cb.getChart();
   }
@@ -227,7 +227,7 @@ public class TimesheetDisciplineChartBuilder
     final XYDifferenceRenderer diffRenderer = new XYDifferenceRenderer(cb.getRedFill(), cb.getGreenFill(), true);
     diffRenderer.setSeriesPaint(0, cb.getRedMarker());
     diffRenderer.setSeriesPaint(1, cb.getGreenMarker());
-    cb.setRenderer(0, diffRenderer).setStyle(diffRenderer, false, actualSeries, planSeries);
+    cb.setRenderer(0, diffRenderer).setStrongStyle(diffRenderer, false, actualSeries, planSeries);
     cb.setDateXAxis(true).setYAxis(true, "days");
     return cb.getChart();
   }

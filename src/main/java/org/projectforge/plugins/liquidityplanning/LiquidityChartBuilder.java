@@ -30,11 +30,13 @@ import java.util.Iterator;
 import org.apache.commons.lang.Validate;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.renderer.xy.XYDifferenceRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.charting.XYChartBuilder;
+import org.projectforge.user.PFUserContext;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -53,7 +55,7 @@ public class LiquidityChartBuilder
     final DayHolder dh = new DayHolder();
 
     final TimeSeries accumulatedSeries = new TimeSeries("accumulated");
-    final TimeSeries worstCaseSeries = new TimeSeries("worstCase");
+    final TimeSeries worstCaseSeries = new TimeSeries(PFUserContext.getLocalizedString("plugins.liquidityplanning.analysis.worstCase"));
     final TimeSeries creditSeries = new TimeSeries("credits");
     final TimeSeries debitSeries = new TimeSeries("debits");
     final Iterator<LiquidityEntry> it = analysis.getEntries().iterator();
@@ -88,13 +90,22 @@ public class LiquidityChartBuilder
       debitSeries.add(day, debits);
       dh.add(Calendar.DATE, 1);
     }
-    final TimeSeriesCollection dataset = new TimeSeriesCollection();
-    dataset.addSeries(accumulatedSeries);
-    //dataset.addSeries(worstCaseSeries);
-    final XYChartBuilder cb = new XYChartBuilder(null, null, null, dataset, true);
+    final TimeSeriesCollection accumulatedSet = new TimeSeriesCollection();
+    accumulatedSet.addSeries(accumulatedSeries);
+    final TimeSeriesCollection worstCaseSet = new TimeSeriesCollection();
+    worstCaseSet.addSeries(worstCaseSeries);
+    final XYChartBuilder cb = new XYChartBuilder(null, null, null, null, true);
+
     final XYDifferenceRenderer diffRenderer = new XYDifferenceRenderer(cb.getGreenFill(), cb.getRedFill(), true);
     diffRenderer.setSeriesPaint(0, cb.getRedMarker());
-    cb.setRenderer(0, diffRenderer).setStyle(diffRenderer, false, accumulatedSeries);
+    cb.setRenderer(0, diffRenderer).setDataset(0, accumulatedSet).setStrongStyle(diffRenderer, false, accumulatedSeries);
+
+    final XYLineAndShapeRenderer lineRenderer = new XYLineAndShapeRenderer(true, false);
+    lineRenderer.setSeriesPaint(0, cb.getGrayMarker());
+    lineRenderer.setSeriesStroke(0, cb.getDashedStroke());
+    lineRenderer.setSeriesVisibleInLegend(0, true);
+    cb.setRenderer(1, lineRenderer).setDataset(1, worstCaseSet);
+
     cb.setDateXAxis(true).setYAxis(true, null);
     // getRenderer().setSeriesPaint(1, getGreenMarker());
     // dataset.addSeries(creditSeries);

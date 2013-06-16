@@ -37,7 +37,7 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.data.time.TimeSeries;
+import org.jfree.data.general.Series;
 import org.jfree.data.xy.XYDataset;
 import org.projectforge.user.PFUserContext;
 
@@ -51,9 +51,16 @@ public class XYChartBuilder
 
   private final JFreeChart chart;
 
-  private Shape timeseriesShape = new Ellipse2D.Float(-3, -3, 6, 6);
+  private final Shape circleShape = new Ellipse2D.Float(-2, -2, 4, 4);
 
-  private Stroke timeseriesStroke = new BasicStroke(3.0f);
+  private final Shape strongCircleShape = new Ellipse2D.Float(-3, -3, 6, 6);
+
+  private final Stroke strongStroke = new BasicStroke(3.0f);
+
+  private final Stroke stroke = new BasicStroke(1.0f);
+
+  private final Stroke dashedStroke = new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 3.0f, new float[] { 3.0f, 3.0f},
+      1.0f);
 
   public XYChartBuilder(final String title, final String xAxisLabel, final String yAxisLabel, final XYDataset dataset, final boolean legend)
   {
@@ -89,25 +96,51 @@ public class XYChartBuilder
     return this;
   }
 
+  public XYChartBuilder setDataset(final int index, final XYDataset dataset)
+  {
+    plot.setDataset(index, dataset);
+    return this;
+  }
+
   /**
-   * Applies {@link #timeseriesShape} and {@link #timeseriesStroke} if set to all series entries.
+   * Applies {@link #strongCircleShape} and {@link #strongStroke} if set to all series entries.
    * @param renderer
    * @param visibleInLegend
    * @param series
    * @return
    */
-  public XYChartBuilder setStyle(final XYItemRenderer renderer, final boolean visibleInLegend, final TimeSeries... series)
+  public XYChartBuilder setStrongStyle(final XYItemRenderer renderer, final boolean visibleInLegend, final Series... series)
   {
     if (series == null || series.length == 0) {
       return this;
     }
-    if (timeseriesShape != null) {
-      for (int i = 0; i < series.length; i++) {
-        renderer.setSeriesShape(i, timeseriesShape);
-      }
+    for (int i = 0; i < series.length; i++) {
+      renderer.setSeriesShape(i, strongCircleShape);
     }
     for (int i = 0; i < series.length; i++) {
-      renderer.setSeriesStroke(i, timeseriesStroke);
+      renderer.setSeriesStroke(i, strongStroke);
+      renderer.setSeriesVisibleInLegend(i, visibleInLegend);
+    }
+    return this;
+  }
+
+  /**
+   * Applies {@link #strongCircleShape} and {@link #strongStroke} if set to all series entries.
+   * @param renderer
+   * @param visibleInLegend
+   * @param series
+   * @return
+   */
+  public XYChartBuilder setNormalStyle(final XYItemRenderer renderer, final boolean visibleInLegend, final Series... series)
+  {
+    if (series == null || series.length == 0) {
+      return this;
+    }
+    for (int i = 0; i < series.length; i++) {
+      renderer.setSeriesShape(i, circleShape);
+    }
+    for (int i = 0; i < series.length; i++) {
+      renderer.setSeriesStroke(i, stroke);
       renderer.setSeriesVisibleInLegend(i, visibleInLegend);
     }
     return this;
@@ -128,23 +161,11 @@ public class XYChartBuilder
   }
 
   /**
-   * @param timeseriesShape the timeseriesShape to set
-   * @return this for chaining.
+   * @return the dashedStroke
    */
-  public XYChartBuilder setTimeseriesShape(final Shape timeseriesShape)
+  public Stroke getDashedStroke()
   {
-    this.timeseriesShape = timeseriesShape;
-    return this;
-  }
-
-  /**
-   * @param timeseriesStroke the timeseriesStroke to set
-   * @return this for chaining.
-   */
-  public XYChartBuilder setTimeseriesStroke(final Stroke timeseriesStroke)
-  {
-    this.timeseriesStroke = timeseriesStroke;
-    return this;
+    return dashedStroke;
   }
 
   public Color getRedFill()
@@ -165,5 +186,10 @@ public class XYChartBuilder
   public Color getGreenMarker()
   {
     return new Color(64, 169, 59);
+  }
+
+  public Color getGrayMarker()
+  {
+    return new Color(55, 55, 55);
   }
 }
