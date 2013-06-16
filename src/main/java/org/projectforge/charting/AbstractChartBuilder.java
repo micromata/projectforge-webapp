@@ -37,7 +37,9 @@ import org.jfree.chart.axis.DateTickMarkPosition;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.AbstractXYItemRenderer;
 import org.jfree.chart.renderer.xy.XYDifferenceRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.projectforge.user.PFUserContext;
 
@@ -47,39 +49,45 @@ import org.projectforge.user.PFUserContext;
  */
 public abstract class AbstractChartBuilder
 {
-
   private Shape timeseriesShape = new Ellipse2D.Float(-3, -3, 6, 6);
 
   private Stroke timeseriesStroke = new BasicStroke(3.0f);
 
+  private AbstractXYItemRenderer renderer;
+
+  private JFreeChart chart;
+
   /**
-   * @param series1
-   * @param series2
-   * @param timeseriesShape e. g. new Ellipse2D.Float(-3, -3, 6, 6) or null, if no marker should be printed.
-   * @param timeseriesStroke e. g. new BasicStroke(3.0f).
+   * @param dataset
    * @param showAxisValues
    * @param valueAxisUnitKey
    * @return
    */
-  protected JFreeChart create(final TimeSeriesCollection dataset, final boolean showAxisValues, final String valueAxisUnitKey)
+  public AbstractChartBuilder prepare(final TimeSeriesCollection dataset)
   {
-    final JFreeChart chart = ChartFactory.createXYLineChart(null, null, null, dataset, PlotOrientation.VERTICAL, true, true, false);
-
-    final XYDifferenceRenderer renderer = new XYDifferenceRenderer(new Color(238, 176, 176), new Color(135, 206, 112), true);
-    renderer.setSeriesPaint(0, new Color(222, 23, 33));
-    renderer.setSeriesPaint(1, new Color(64, 169, 59));
+    chart = ChartFactory.createXYLineChart(null, null, null, dataset, PlotOrientation.VERTICAL, true, true, false);
+    if (renderer == null) {
+      renderer = new XYLineAndShapeRenderer(true, true);
+    }
     if (timeseriesShape != null) {
-      renderer.setSeriesShape(0, timeseriesShape);
-      renderer.setSeriesShape(1, timeseriesShape);
+      for (int i = 0; i < dataset.getSeries().size(); i++) {
+        renderer.setSeriesShape(i, timeseriesShape);
+      }
     } else {
       final Shape none = new Rectangle();
-      renderer.setSeriesShape(0, none);
-      renderer.setSeriesShape(1, none);
+      for (int i = 0; i < dataset.getSeries().size(); i++) {
+        renderer.setSeriesShape(i, none);
+      }
     }
-    renderer.setSeriesStroke(0, timeseriesStroke);
-    renderer.setSeriesStroke(1, timeseriesStroke);
-    renderer.setSeriesVisibleInLegend(0, false);
-    renderer.setSeriesVisibleInLegend(1, false);
+    for (int i = 0; i < dataset.getSeries().size(); i++) {
+      renderer.setSeriesStroke(i, timeseriesStroke);
+      renderer.setSeriesVisibleInLegend(i, false);
+    }
+    return this;
+  }
+
+  public JFreeChart create(final boolean showAxisValues, final String valueAxisUnitKey)
+  {
     final XYPlot plot = chart.getXYPlot();
     plot.setRenderer(renderer);
     plot.setBackgroundPaint(Color.white);
@@ -92,7 +100,7 @@ public abstract class AbstractChartBuilder
     xAxis.setVisible(showAxisValues);
     plot.setDomainAxis(xAxis);
     final NumberAxis yAxis;
-    if (showAxisValues == true) {
+    if (showAxisValues == true && valueAxisUnitKey != null) {
       yAxis = new NumberAxis(PFUserContext.getLocalizedString(valueAxisUnitKey));
     } else {
       yAxis = new NumberAxis();
@@ -101,6 +109,26 @@ public abstract class AbstractChartBuilder
     plot.setRangeAxis(yAxis);
     plot.setOutlineVisible(false);
     return chart;
+  }
+
+  public Color getRedFill()
+  {
+    return new Color(238, 176, 176);
+  }
+
+  public Color getGreenFill()
+  {
+    return new Color(135, 206, 112);
+  }
+
+  public Color getRedMarker()
+  {
+    return new Color(222, 23, 33);
+  }
+
+  public Color getGreenMarker()
+  {
+    return new Color(64, 169, 59);
   }
 
   /**
@@ -121,5 +149,33 @@ public abstract class AbstractChartBuilder
   {
     this.timeseriesStroke = timeseriesStroke;
     return this;
+  }
+
+  /**
+   * @param xyDifferenceRenderer the xyDifferenceRenderer to set
+   * @return this for chaining.
+   */
+  public AbstractChartBuilder setXyDifferenceRenderer(final Color positivePaint, final Color negativePaint, final boolean shapes)
+  {
+    this.renderer = new XYDifferenceRenderer(positivePaint, negativePaint, shapes);
+    return this;
+  }
+
+  /**
+   * @param xyDifferenceRenderer the xyDifferenceRenderer to set
+   * @return this for chaining.
+   */
+  public AbstractChartBuilder setXYLineAndShapeRenderer(final boolean lines, final boolean shapes)
+  {
+    this.renderer = new XYLineAndShapeRenderer(lines, shapes);
+    return this;
+  }
+
+  /**
+   * @return the renderer
+   */
+  public AbstractXYItemRenderer getRenderer()
+  {
+    return renderer;
   }
 }

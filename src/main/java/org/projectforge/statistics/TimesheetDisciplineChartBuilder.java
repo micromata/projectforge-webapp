@@ -148,10 +148,13 @@ public class TimesheetDisciplineChartBuilder extends AbstractChartBuilder
       istSeries.add(day, actualWorkingHours);
       dh.add(Calendar.DATE, 1);
     }
+    setXyDifferenceRenderer(getRedFill(), getGreenFill(), true);
+    getRenderer().setSeriesPaint(0, getRedMarker());
+    getRenderer().setSeriesPaint(1, getGreenMarker());
     final TimeSeriesCollection dataset = new TimeSeriesCollection();
     dataset.addSeries(sollSeries);
     dataset.addSeries(istSeries);
-    return create(dataset, showAxisValues, "hours");
+    return prepare(dataset).create(showAxisValues, "hours");
   }
 
   /**
@@ -212,9 +215,12 @@ public class TimesheetDisciplineChartBuilder extends AbstractChartBuilder
     }
     averageDifferenceBetweenTimesheetAndBooking = numberOfBookedDays > 0 ? new BigDecimal(totalDifference).divide(new BigDecimal(
         numberOfBookedDays), 1, RoundingMode.HALF_UP) : BigDecimal.ZERO;
+    setXyDifferenceRenderer(getRedFill(), getGreenFill(), true);
+    getRenderer().setSeriesPaint(0, getRedMarker());
+    getRenderer().setSeriesPaint(1, getGreenMarker());
     final TimeSeriesCollection dataset = new TimeSeriesCollection();
     dataset.addSeries(actualSeries);
     dataset.addSeries(planSeries);
-    return create(dataset, showAxisValues, "days");
+    return prepare(dataset).create(showAxisValues, "days");
   }
 }

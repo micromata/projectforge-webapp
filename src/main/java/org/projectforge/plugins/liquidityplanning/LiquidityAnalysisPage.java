@@ -23,16 +23,20 @@
 
 package org.projectforge.plugins.liquidityplanning;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.jfree.chart.JFreeChart;
 import org.projectforge.web.wicket.AbstractStandardFormPage;
+import org.projectforge.web.wicket.JFreeChartImage;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
+import org.projectforge.web.wicket.flowlayout.ImagePanel;
 
 public class LiquidityAnalysisPage extends AbstractStandardFormPage
 {
   private static final long serialVersionUID = 6510134821712582764L;
 
-  private static final int IMAGE_WIDTH = 500;
+  private static final int IMAGE_WIDTH = 800;
 
   private static final int IMAGE_HEIGHT = 400;
 
@@ -41,29 +45,43 @@ public class LiquidityAnalysisPage extends AbstractStandardFormPage
 
   private LiquidityAnalysis analysis;
 
+  private final GridBuilder gridBuilder;
+
+  private ImagePanel chartImage;
+
   public LiquidityAnalysisPage(final PageParameters parameters)
   {
     super(parameters);
     final LiquidityAnalysisForm form = new LiquidityAnalysisForm(this);
     body.add(form);
     form.init();
-    final GridBuilder gridBuilder = new GridBuilder(body, "flowgrid");
-    // final Shape shape = new Ellipse2D.Float(-3, -3, 6, 6);
-    // // final Shape shape = null;
-    // final Stroke stroke = new BasicStroke(3.0f);
-    // // final Stroke stroke = new BasicStroke(1.0f);
-    // final EmployeeDO employee = employeeDao.getByUserId(PFUserContext.getUserId());
-    // double workingHoursPerDay = 8;
-    // if (employee != null && NumberHelper.greaterZero(employee.getWochenstunden()) == true) {
-    // workingHoursPerDay = employee.getWochenstunden() / 5;
-    // }
-    // final TimesheetDisciplineChartBuilder chartBuilder = new TimesheetDisciplineChartBuilder();
-    // final JFreeChart chart1 = chartBuilder.create(timesheetDao, getUser().getId(), workingHoursPerDay, LAST_N_DAYS, shape, stroke, true);
-    // final JFreeChartImage image = new JFreeChartImage("timesheetStatisticsImage1", chart1, IMAGE_WIDTH, IMAGE_HEIGHT);
-    // image.add(AttributeModifier.replace("width", String.valueOf(IMAGE_WIDTH)));
-    // image.add(AttributeModifier.replace("height", String.valueOf(IMAGE_HEIGHT)));
-    // body.add(image);
-    // body.add(timesheetDisciplineChart1Legend);
+    gridBuilder = new GridBuilder(body, "flowgrid");
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractSecuredPage#onInitialize()
+   */
+  @Override
+  protected void onInitialize()
+  {
+    super.onInitialize();
+    chartImage = new ImagePanel(gridBuilder.getPanel().newChildId());
+    gridBuilder.getPanel().add(chartImage);
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractUnsecureBasePage#onBeforeRender()
+   */
+  @Override
+  protected void onBeforeRender()
+  {
+    super.onBeforeRender();
+    final LiquidityChartBuilder chartBuilder = new LiquidityChartBuilder();
+    final JFreeChart chart = chartBuilder.create(analysis, 100);
+    final JFreeChartImage image = new JFreeChartImage(ImagePanel.IMAGE_ID, chart, IMAGE_WIDTH, IMAGE_HEIGHT);
+    image.add(AttributeModifier.replace("width", String.valueOf(IMAGE_WIDTH)));
+    image.add(AttributeModifier.replace("height", String.valueOf(IMAGE_HEIGHT)));
+    chartImage.replaceImage(image);
   }
 
   /**
