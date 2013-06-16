@@ -39,6 +39,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.core.PropertyInfo;
 import org.projectforge.excel.ExportColumn;
+import org.projectforge.excel.ExportSheet;
 import org.projectforge.export.MyExcelExporter;
 import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.EingangsrechnungDao;
@@ -195,8 +196,18 @@ IListPageColumnsCreator<LiquidityEntryDO>
     final InvoicesExcelExport invoicesExport = new InvoicesExcelExport();
     final List<RechnungDO> invoices = rechnungDao.getList(new RechnungFilter().setListType(RechnungFilter.FILTER_UNBEZAHLT));
     invoicesExport.addDebitorInvoicesSheet(exporter, getString("fibu.rechnungen"), invoices);
-    final List<EingangsrechnungDO> creditorInvoices = eingangsrechnungDao.getList(new RechnungFilter().setListType(RechnungFilter.FILTER_UNBEZAHLT));
+    final List<EingangsrechnungDO> creditorInvoices = eingangsrechnungDao.getList(new RechnungFilter()
+    .setListType(RechnungFilter.FILTER_UNBEZAHLT));
     invoicesExport.addCreditorInvoicesSheet(exporter, getString("fibu.eingangsrechnungen"), creditorInvoices);
+    final LiquidityAnalysis analysis = new LiquidityAnalysis();
+    analysis.add(getList());
+    analysis.addInvoices(invoices);
+    analysis.addCreditorInvoices(creditorInvoices);
+    analysis.sort();
+    final ExportSheet sheet = exporter.addSheet(getString("filter.all"));
+    exporter.addList(sheet, analysis.getEntries());
+    sheet.getPoiSheet().setAutoFilter(org.apache.poi.ss.util.CellRangeAddress.valueOf("E1:E1"));
+    sheet.getPoiSheet().setAutoFilter(org.apache.poi.ss.util.CellRangeAddress.valueOf("A1:A1"));
   }
 
   /**
