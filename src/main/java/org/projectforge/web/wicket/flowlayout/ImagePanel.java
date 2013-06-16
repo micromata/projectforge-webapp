@@ -23,6 +23,7 @@
 
 package org.projectforge.web.wicket.flowlayout;
 
+import org.apache.wicket.markup.html.WebComponent;
 import org.apache.wicket.markup.html.image.ContextImage;
 import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -38,6 +39,8 @@ import org.projectforge.web.wicket.components.TooltipImage;
 public class ImagePanel extends Panel
 {
   private static final long serialVersionUID = -2323278625643532689L;
+
+  private WebComponent image;
 
   /**
    * Wicket id.
@@ -59,22 +62,51 @@ public class ImagePanel extends Panel
   public ImagePanel(final String id, final ContextImage image)
   {
     super(id, null);
-    add(image);
+    addImage(image);
   }
 
   public ImagePanel(final String id, final Image image)
   {
     super(id, null);
-    add(image);
+    addImage(image);
+  }
+
+  public ImagePanel(final String id)
+  {
+    super(id, null);
   }
 
   /**
    * @param image
    * @return this for chaining.
    */
-  public ImagePanel addImage(final PresizedImage image)
+  public ImagePanel addImage(final WebComponent image)
   {
-    add(image);
+    add(this.image = image);
+    return this;
+  }
+
+  /**
+   * @param image
+   * @return this for chaining.
+   */
+  public ImagePanel removeImage()
+  {
+    if (image != null) {
+      remove(image);
+      this.image = null;
+    }
+    return this;
+  }
+
+  /**
+   * @param image
+   * @return this for chaining.
+   */
+  public ImagePanel replaceImage(final WebComponent image)
+  {
+    removeImage();
+    add(this.image = image);
     return this;
   }
 }
