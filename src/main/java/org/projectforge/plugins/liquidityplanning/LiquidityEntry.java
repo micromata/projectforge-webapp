@@ -23,6 +23,7 @@
 
 package org.projectforge.plugins.liquidityplanning;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Date;
 
@@ -36,8 +37,10 @@ import org.projectforge.fibu.RechnungDO;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class LiquidityEntry
+public class LiquidityEntry implements Serializable
 {
+  private static final long serialVersionUID = 8878006067746874578L;
+
   @PropertyInfo(i18nKey = "plugins.liquidityplanning.entry.dateOfPayment")
   private Date dateOfPayment;
 
