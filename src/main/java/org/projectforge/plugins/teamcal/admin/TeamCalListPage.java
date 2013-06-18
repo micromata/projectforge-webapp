@@ -234,7 +234,7 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
       addContentMenuEntry(menuEntry);
     }
 
-    dataTable = createDataTable(createColumns(this, true), "lastUpdate", SortOrder.DESCENDING);
+    dataTable = createDataTable(createColumns(this, true), "title", SortOrder.ASCENDING);
     form.add(dataTable);
     icsExportDialog = new TeamCalICSExportDialog(newModalDialogId());
     add(icsExportDialog);
