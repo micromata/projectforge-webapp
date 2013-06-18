@@ -67,13 +67,15 @@ public abstract class DropFileContainer extends Panel
     final Form<FormBean> hiddenForm = new Form<FormBean>("hiddenForm", new CompoundPropertyModel<FormBean>(new FormBean()));
     main.add(hiddenForm);
     hiddenForm.add(new TextArea<String>("importString"));
+    hiddenForm.add(new TextArea<String>("importFileName"));
     hiddenForm.add(new AjaxSubmitLink("submitButton") {
       private static final long serialVersionUID = 6140567784494429257L;
 
       @Override
       protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
       {
-        onStringImport(target, hiddenForm.getModel().getObject().importString);
+        final FormBean modelObject = hiddenForm.getModel().getObject();
+        onStringImport(target, modelObject.importFileName, modelObject.importString);
       }
 
       @Override
@@ -106,7 +108,7 @@ public abstract class DropFileContainer extends Panel
     return this;
   }
 
-  protected abstract void onStringImport(final AjaxRequestTarget target, final String string);
+  protected abstract void onStringImport(final AjaxRequestTarget target, final String filename, final String content);
 
   /**
    * Just the form model
@@ -117,5 +119,7 @@ public abstract class DropFileContainer extends Panel
     private static final long serialVersionUID = 4250094235574838882L;
 
     private String importString;
+
+    private String importFileName;
   }
 }

@@ -52,15 +52,15 @@ public abstract class DropIcsPanel extends DropFileContainer
 
   /**
    * @see org.projectforge.web.wicket.components.DropFileContainer#onStringImport(org.apache.wicket.ajax.AjaxRequestTarget,
-   *      java.lang.String)
+   *      java.lang.String, java.lang.String)
    */
   @Override
-  protected void onStringImport(final AjaxRequestTarget target, final String string)
+  protected void onStringImport(final AjaxRequestTarget target, final String fileName, final String content)
   {
 
     try {
       final CalendarBuilder builder = new CalendarBuilder();
-      final Calendar calendar = builder.build(new StringReader(string));
+      final Calendar calendar = builder.build(new StringReader(content));
       onIcsImport(target, calendar);
     } catch (final Exception ex) {
       // TODO ju: handle exception
