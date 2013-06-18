@@ -85,18 +85,17 @@ public class SkillDao extends BaseDao<SkillDO>
   @SuppressWarnings("unchecked")
   public void checkConstraintViolation(final SkillDO skill) throws UserException
   {
+    // TODO: Check for valid Tree structure (root) -> example TaskDao.checkConstraintVilation
     List<SkillDO> list;
-    // TODO: Check if Skill already exists. -> example TaskDao.checkConstraintViolation
     if(skill.getId() != null) {
       list = getHibernateTemplate().find("from SkillDO s where s.parent.id = ? and s.title = ? and s.id != ?",
           new Object[]{skill.getParentId(), skill.getTitle(), skill.getId()});
     } else {
       list = getHibernateTemplate().find("from SkillDO s where s.parent.id = ? and s.title = ?", new Object[]{skill.getParentId(), skill.getTitle()});
     }
-    if(CollectionUtils.isNotEmpty(list)) {
+    if(CollectionUtils.isNotEmpty(list) == true) {
       throw new UserException(I18N_KEY_ERROR_DUPLICATE_CHILD_SKILL);
     }
-    // TODO: Check for valid Tree structure (root) -> example TaskDao.checkConstraintVilation
   }
 
   /**

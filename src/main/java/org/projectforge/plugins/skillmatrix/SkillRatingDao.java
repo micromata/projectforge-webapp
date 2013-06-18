@@ -25,10 +25,12 @@ package org.projectforge.plugins.skillmatrix;
 
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.criterion.Restrictions;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
+import org.projectforge.core.UserException;
 import org.projectforge.user.UserRightId;
 
 /**
@@ -37,12 +39,15 @@ import org.projectforge.user.UserRightId;
  */
 public class SkillRatingDao extends BaseDao<SkillRatingDO>
 {
-  public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_SKILL_MATRIX_SKILL_RATING", "plugin20",
+  public static final UserRightId USER_RIGHT_ID = new UserRightId(
+      "PLUGIN_SKILL_MATRIX_SKILL_RATING", "plugin20",
       "plugins.skillmatrix.skillrating");
 
   static final String I18N_KEY_ERROR_CYCLIC_REFERENCE = "plugins.skillmatrix.error.cyclicReference";
 
-  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "skill.title"};
+  public static final String I18N_KEY_ERROR_DUPLICATE_RATING = "plugins.skillmatrix.error.duplicateRating";
+
+  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "skill.title" };
 
   public SkillRatingDao()
   {
@@ -54,6 +59,34 @@ public class SkillRatingDao extends BaseDao<SkillRatingDO>
   public SkillRatingDO newInstance()
   {
     return new SkillRatingDO();
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDao#onSaveOrModify(org.projectforge.core.ExtendedBaseDO)
+   */
+  @Override
+  protected void onSaveOrModify(final SkillRatingDO obj)
+  {
+    synchronized (this) {
+      checkConstraintViolation(obj);
+    }
+  }
+
+  /**
+   * @param obj
+   */
+  @SuppressWarnings("unchecked")
+  private void checkConstraintViolation(final SkillRatingDO skillRating) throws UserException
+  {
+    List<SkillRatingDO> list;
+    if(skillRating.getId() != null) {
+      list = getHibernateTemplate().find("from SkillRatingDO s where s.user.id = ? and s.skill.id = ? and s.id != ?", new Object[] { skillRating.getUserId(), skillRating.getSkillId(), skillRating.getId()});
+    } else {
+      list = getHibernateTemplate().find("from SkillRatingDO s where s.user.id = ? and s.skill.id = ?", new Object[] { skillRating.getUserId(), skillRating.getSkillId()});
+    }
+    if(CollectionUtils.isNotEmpty(list) == true) {
+      throw new UserException(I18N_KEY_ERROR_DUPLICATE_RATING);
+    }
   }
 
   /**
@@ -80,7 +113,8 @@ public class SkillRatingDao extends BaseDao<SkillRatingDO>
     final QueryFilter queryFilter = new QueryFilter(myFilter);
 
     if (myFilter.getSkillRating() != null) {
-      final Object[] values = SkillRating.getRequiredExperienceValues(myFilter.getSkillRating());
+      final Object[] values = SkillRating.getRequiredExperienceValues(myFilter
+          .getSkillRating());
       queryFilter.add(Restrictions.in("skillRating", values));
     }
     return getList(queryFilter);

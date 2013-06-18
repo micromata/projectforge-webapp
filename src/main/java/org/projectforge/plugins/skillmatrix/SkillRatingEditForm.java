@@ -106,21 +106,6 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
         } else if (skillTextField.getConvertedInput().isRateable() == false && skillRatingDropDown.getConvertedInput() != null) {
           error(getString("plugins.skillmatrix.error.unrateableSkillWithRating"));
         }
-
-        // TODO: Is this validation necessary?
-        final SkillRatingFilter filter = new SkillRatingFilter();
-        filter.setSearchFields("user.username");
-        filter.setSearchString(data.getUser().getUsername());
-        final List<SkillRatingDO> list = skillRatingDao.getList(filter);
-        for (final SkillRatingDO skillRatingDO : list) {
-          final boolean isDeleted = skillRatingDO.getSkill().isDeleted();
-          final boolean sameSkill = skillRatingDO.getSkill().getTitle() == skillTextField.getConvertedInput().getTitle();
-          final boolean sameSkillRating = skillRatingDO.getCreated().equals(data.getCreated());
-          if (isDeleted == false && sameSkill && sameSkillRating == false) {
-            error(getString("plugins.skillmatrix.error.skillRatingExistsAlready"));
-            break;
-          }
-        }
       }
 
     });

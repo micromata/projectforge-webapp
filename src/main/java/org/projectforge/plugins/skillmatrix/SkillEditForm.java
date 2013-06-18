@@ -66,32 +66,6 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage> {
   public void init() {
     super.init();
 
-    //		add(new IFormValidator() {
-    //
-    //			@Override
-    //			public FormComponent<?>[] getDependentFormComponents() {
-    //				return dependentFormComponents;
-    //			}
-    //
-    //			// TODO: Is this validation still needed?
-    //			// Checked if skill exists -> should be placed in SkillDao.checkConstraintViolation
-    //
-    //			@Override
-    //			public void validate(final Form<?> form) {
-    //				final RequiredMaxLengthTextField skillTextField = (RequiredMaxLengthTextField) dependentFormComponents[0];
-    //				// final SkillTree skillTree = skillDao.getSkillTree();
-    //				// if (skillTree.getSkill(SkillTextField.getConvertedInput()) !=
-    //				// null && skillTextField.getConvertedInput() != null) {
-    //				// error(getString(""));
-    //				// }
-    //
-    //				// if(skillTree.getSkill(skillTextField.getConvertedInput()) !=
-    //				// null) {
-    //				// error(getString("plugins.skillmatrix.error.duplicateChildSkill"));
-    //				// }
-    //			}
-    //		});
-
     gridBuilder.newGridPanel();
 
     {
