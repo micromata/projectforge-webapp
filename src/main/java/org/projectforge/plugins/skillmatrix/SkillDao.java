@@ -23,7 +23,11 @@
 
 package org.projectforge.plugins.skillmatrix;
 
+import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.projectforge.core.BaseDao;
+import org.projectforge.core.UserException;
 import org.projectforge.user.UserRightId;
 
 /**
@@ -36,6 +40,8 @@ public class SkillDao extends BaseDao<SkillDO>
   public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_SKILL_MATRIX_SKILL", "plugin20", "plugins.skillmatrix.skill");
 
   static final String I18N_KEY_ERROR_CYCLIC_REFERENCE = "plugins.skillmatrix.error.cyclicReference";
+
+  public static final String I18N_KEY_ERROR_DUPLICATE_CHILD_SKILL = "plugins.skillmatrix.error.duplicateChildSkill";
 
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "parent.title" };
 
@@ -55,6 +61,17 @@ public class SkillDao extends BaseDao<SkillDO>
     return new SkillDO();
   }
 
+  /**
+   * @see org.projectforge.core.BaseDao#onSaveOrModify(org.projectforge.core.ExtendedBaseDO)
+   */
+  @Override
+  protected void onSaveOrModify(final SkillDO obj)
+  {
+    synchronized (this) {
+      checkConstraintViolation(obj);
+    }
+  }
+
   @Override
   protected void afterSaveOrModify(final SkillDO obj)
   {
@@ -63,6 +80,23 @@ public class SkillDao extends BaseDao<SkillDO>
 
   public SkillTree getSkillTree() {
     return skillTree;
+  }
+
+  @SuppressWarnings("unchecked")
+  public void checkConstraintViolation(final SkillDO skill) throws UserException
+  {
+    List<SkillDO> list;
+    // TODO: Check if Skill already exists. -> example TaskDao.checkConstraintViolation
+    if(skill.getId() != null) {
+      list = getHibernateTemplate().find("from SkillDO s where s.parent.id = ? and s.title = ? and s.id != ?",
+          new Object[]{skill.getParentId(), skill.getTitle(), skill.getId()});
+    } else {
+      list = getHibernateTemplate().find("from SkillDO s where s.parent.id = ? and s.title = ?", new Object[]{skill.getParentId(), skill.getTitle()});
+    }
+    if(CollectionUtils.isNotEmpty(list)) {
+      throw new UserException(I18N_KEY_ERROR_DUPLICATE_CHILD_SKILL);
+    }
+    // TODO: Check for valid Tree structure (root) -> example TaskDao.checkConstraintVilation
   }
 
   /**
