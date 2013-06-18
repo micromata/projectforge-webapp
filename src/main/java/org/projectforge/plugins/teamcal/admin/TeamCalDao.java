@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.criterion.Order;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
@@ -101,6 +102,7 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
       myFilter = new TeamCalFilter(filter);
     }
     final QueryFilter queryFilter = new QueryFilter(myFilter);
+    queryFilter.addOrder(Order.asc("title"));
     final List<TeamCalDO> list = getList(queryFilter);
     if (myFilter.isDeleted() == true) {
       // No further filtering, show all deleted calendars.
