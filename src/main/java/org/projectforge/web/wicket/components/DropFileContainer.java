@@ -25,6 +25,7 @@ package org.projectforge.web.wicket.components;
 
 import java.io.Serializable;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxSubmitLink;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -36,7 +37,7 @@ import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * The panel which includes the drop behavior for several files. If the dropped file (string) was sucessfully importet, the hook method
- * {@link #onStringImport(AjaxRequestTarget, String)} is called.
+ * {@link #onStringImport(AjaxRequestTarget, String, String)} is called.
  * 
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  * 
@@ -46,13 +47,19 @@ public abstract class DropFileContainer extends Panel
   private static final long serialVersionUID = 3622467918922963503L;
 
   private final WebMarkupContainer main;
+  private final String mimeType;
 
   /**
    * @param id
    */
   public DropFileContainer(final String id)
   {
+    this(id, null);
+  }
+
+  public DropFileContainer(final String id, final String mimeType) {
     super(id);
+    this.mimeType = mimeType;
     main = new WebMarkupContainer("main");
     add(main);
   }
@@ -65,6 +72,7 @@ public abstract class DropFileContainer extends Panel
   {
     super.onInitialize();
     final Form<FormBean> hiddenForm = new Form<FormBean>("hiddenForm", new CompoundPropertyModel<FormBean>(new FormBean()));
+    hiddenForm.add(AttributeModifier.replace("data-mimetype", mimeType));
     main.add(hiddenForm);
     hiddenForm.add(new TextArea<String>("importString"));
     hiddenForm.add(new TextArea<String>("importFileName"));

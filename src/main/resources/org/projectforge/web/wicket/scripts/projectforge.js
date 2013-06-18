@@ -625,13 +625,12 @@ function pf_deleteClick(element, content, liElement) {
 			console.log("*** File is to big: " + file.size + " > 1MB.");
 			return;
 		}
-		/*
-		TODO JU: make this configurable
-		if (file.type != "text/calendar") {
-			console.log("*** File of type '" + file.type + "' not supported. 'text/calendar' expected instead.");
-			return;
-		}*/
     var hiddenForm = $(e.originalEvent.target).closest(".pf_dnd").children(".pf_hiddenForm");
+    var mimeType = hiddenForm.data("mimetype");
+    if (mimeType != undefined && file.type != mimeType) {
+      console.log("*** File of type '" + file.type + "' not supported. '" + mimeType + "' expected instead.");
+      return;
+    }
     hiddenForm.children(".pf_name").val(file.name);
 		try {
 			var reader = new FileReader();

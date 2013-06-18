@@ -47,7 +47,7 @@ public abstract class DropIcsPanel extends DropFileContainer
    */
   public DropIcsPanel(final String id)
   {
-    super(id);
+    super(id, "text/calendar");
   }
 
   /**
