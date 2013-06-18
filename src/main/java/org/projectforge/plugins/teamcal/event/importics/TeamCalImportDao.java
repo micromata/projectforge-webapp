@@ -36,6 +36,7 @@ import org.projectforge.common.ImportStorage;
 import org.projectforge.common.ImportedElement;
 import org.projectforge.common.ImportedSheet;
 import org.projectforge.core.ActionLog;
+import org.projectforge.database.HibernateUtils;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDao;
 import org.projectforge.plugins.teamcal.event.TeamEventUtils;
@@ -142,6 +143,9 @@ public class TeamCalImportDao extends HibernateDaoSupport
     final Collection<TeamEventDO> col = new ArrayList<TeamEventDO>();
     for (final ImportedElement<TeamEventDO> el : sheet.getElements()) {
       final TeamEventDO event = el.getValue();
+      if (HibernateUtils.shortenProperties(TeamEventDO.class, event, "note", "location", "subject", "externalUid", "organizer") == true) {
+        log.info("Properties of the event were shortened: " + event);
+      }
       final TeamEventDO dbEvent = teamEventDao.getByUid(event.getExternalUid(), teamCalId);
       if (dbEvent != null) {
         event.setId(dbEvent.getId());
