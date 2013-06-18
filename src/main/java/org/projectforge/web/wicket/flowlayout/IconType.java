@@ -46,6 +46,7 @@ public enum IconType
   HOME("home"), //
   JIRA_SUPPORT("star"), //
   KEYBOARD("th"), //
+  LIST("list"), //
   MINUS_SIGN("minus-sign"), //
   MODIFIED("icon-exclamation-sign"), //
   PHONE("phone"), //
