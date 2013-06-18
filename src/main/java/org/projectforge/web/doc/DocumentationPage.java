@@ -57,7 +57,11 @@ public class DocumentationPage extends AbstractSecuredPage
     final boolean isGerman = locale != null && locale.toString().startsWith("de") == true;
     addDocLink(body, "newsLink", "doc/News.html");
     addDocLink(body, "tutorialLink", "doc/ProjectForge.html");
-    addDocLink(body, "handbookLink", "doc/Handbuch.html");
+    if (isGerman == true) {
+      addDocLink(body, "handbookLink", "doc/Handbuch.html");
+    } else {
+      addDocLink(body, "handbookLink", "doc/UserGuide.html");
+    }
     if (isGerman == true) {
       addDocLink(body, "faqLink", "doc/FAQ_de.html");
     } else {
