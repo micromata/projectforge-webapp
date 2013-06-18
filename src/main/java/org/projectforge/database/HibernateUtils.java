@@ -41,6 +41,7 @@ import org.hibernate.mapping.Column;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.projectforge.access.AccessEntryDO;
+import org.projectforge.common.BeanHelper;
 import org.projectforge.common.DatabaseDialect;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.DefaultBaseDO;
@@ -218,6 +219,47 @@ public class HibernateUtils
   public static Integer getPropertyLength(final String entityName, final String propertyName)
   {
     return instance.internalGetPropertyMaxLength(entityName, propertyName);
+  }
+
+  /**
+   * Shorten the length of the property if to long for the data-base. No log message is produced. The field must be declared with JPA
+   * annotations in the given class (clazz). For getting and setting the property the getter and setter method is used.
+   * @param clazz The class where the field is declared.
+   * @param object
+   * @param propertyName
+   * @return true If at least one property was shortened.
+   */
+  public static boolean shortenProperties(final Class< ? > clazz, final Object object, final String... propertyNames)
+  {
+    boolean result = false;
+    for (final String propertyName : propertyNames) {
+      if (shortenProperty(clazz, object, propertyName) == true) {
+        result = true;
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Shorten the length of the property if to long for the data-base. No log message is produced. The field must be declared with JPA
+   * annotations in the given class (clazz). For getting and setting the property the getter and setter method is used.
+   * @param clazz The class where the field is declared.
+   * @param object
+   * @param propertyName
+   * @return true If the property was shortened.
+   */
+  public static boolean shortenProperty(final Class< ? > clazz, final Object object, final String propertyName)
+  {
+    final Integer length = getPropertyLength(clazz, propertyName);
+    if (length == null) {
+      return false;
+    }
+    final String value = (String) BeanHelper.getProperty(object, propertyName);
+    if (value != null && value.length() > length) {
+      BeanHelper.setProperty(object, propertyName, value.substring(0, length - 1));
+      return true;
+    }
+    return false;
   }
 
   /** Should be set at initialization of ProjectForge after initialization of hibernate. */
