@@ -28,9 +28,7 @@ import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
-import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
@@ -45,8 +43,7 @@ import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
  * @author Billy Duong (duong.billy@yahoo.de)
  * 
  */
-public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
-{
+public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage> {
   private static final long serialVersionUID = 7795854215943696332L;
 
   private static final Logger log = Logger.getLogger(SkillEditForm.class);
@@ -54,59 +51,68 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
   @SpringBean(name = "skillDao")
   private SkillDao skillDao;
 
-  private final FormComponent< ? >[] dependentFormComponents = new FormComponent[1];
+  private final FormComponent<?>[] dependentFormComponents = new FormComponent[1];
 
   /**
    * @param parentPage
    * @param data
    */
-  public SkillEditForm(final SkillEditPage parentPage, final SkillDO data)
-  {
+  public SkillEditForm(final SkillEditPage parentPage, final SkillDO data) {
     super(parentPage, data);
   }
 
   @Override
   @SuppressWarnings("serial")
-  public void init()
-  {
+  public void init() {
     super.init();
 
-    add(new IFormValidator() {
-
-      @Override
-      public FormComponent< ? >[] getDependentFormComponents()
-      {
-        return dependentFormComponents;
-      }
-
-      @Override
-      public void validate(final Form< ? > form)
-      {
-        final RequiredMaxLengthTextField skillTextField = (RequiredMaxLengthTextField) dependentFormComponents[0];
-        final SkillTree skillTree = skillDao.getSkillTree();
-        if(skillTree.getSkill(skillTextField.getConvertedInput()) != null) {
-          error(getString("plugins.skillmatrix.error.skillExistsAlready"));
-        }
-      }
-    });
+    //		add(new IFormValidator() {
+    //
+    //			@Override
+    //			public FormComponent<?>[] getDependentFormComponents() {
+    //				return dependentFormComponents;
+    //			}
+    //
+    //			// TODO: Is this validation still needed?
+    //			// Checked if skill exists -> should be placed in SkillDao.checkConstraintViolation
+    //
+    //			@Override
+    //			public void validate(final Form<?> form) {
+    //				final RequiredMaxLengthTextField skillTextField = (RequiredMaxLengthTextField) dependentFormComponents[0];
+    //				// final SkillTree skillTree = skillDao.getSkillTree();
+    //				// if (skillTree.getSkill(SkillTextField.getConvertedInput()) !=
+    //				// null && skillTextField.getConvertedInput() != null) {
+    //				// error(getString(""));
+    //				// }
+    //
+    //				// if(skillTree.getSkill(skillTextField.getConvertedInput()) !=
+    //				// null) {
+    //				// error(getString("plugins.skillmatrix.error.duplicateChildSkill"));
+    //				// }
+    //			}
+    //		});
 
     gridBuilder.newGridPanel();
 
     {
       // Title of skill
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.skill.title"));
-      final RequiredMaxLengthTextField skillTextField = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "title"));
+      final FieldsetPanel fs = gridBuilder
+          .newFieldset(getString("plugins.skillmatrix.skill.title"));
+      final RequiredMaxLengthTextField skillTextField = new RequiredMaxLengthTextField(
+          fs.getTextFieldId(), new PropertyModel<String>(data,
+              "title"));
       fs.add(skillTextField);
       dependentFormComponents[0] = skillTextField;
     }
     {
       // Parent, look at UserSelectPanel for fine tuning
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.skill.parent"));
-      final PFAutoCompleteTextField<SkillDO> autoCompleteTextField = new PFAutoCompleteTextField<SkillDO>(fs.getTextFieldId(),
-          new PropertyModel<SkillDO>(data, "parent")) {
+      final FieldsetPanel fs = gridBuilder
+          .newFieldset(getString("plugins.skillmatrix.skill.parent"));
+      final PFAutoCompleteTextField<SkillDO> autoCompleteTextField = new PFAutoCompleteTextField<SkillDO>(
+          fs.getTextFieldId(), new PropertyModel<SkillDO>(data,
+              "parent")) {
         @Override
-        protected List<SkillDO> getChoices(final String input)
-        {
+        protected List<SkillDO> getChoices(final String input) {
           final BaseSearchFilter filter = new BaseSearchFilter();
           filter.setSearchFields("title");
           filter.setSearchString(input);
@@ -115,8 +121,7 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
         }
 
         @Override
-        protected String formatLabel(final SkillDO skill)
-        {
+        protected String formatLabel(final SkillDO skill) {
           if (skill == null) {
             return "";
           }
@@ -124,27 +129,26 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
         }
 
         @Override
-        protected String formatValue(final SkillDO skill)
-        {
+        protected String formatValue(final SkillDO skill) {
           if (skill == null) {
             return "";
           }
           return skill.getTitle();
         }
 
-        @SuppressWarnings({ "unchecked", "rawtypes"})
+        @SuppressWarnings({ "unchecked", "rawtypes" })
         @Override
-        public <C> IConverter<C> getConverter(final Class<C> type)
-        {
+        public <C> IConverter<C> getConverter(final Class<C> type) {
           return new IConverter() {
             @Override
-            public Object convertToObject(final String value, final Locale locale)
-            {
+            public Object convertToObject(final String value,
+                final Locale locale) {
               if (StringUtils.isEmpty(value) == true) {
                 getModel().setObject(null);
                 return null;
               }
-              final SkillDO skill = skillDao.getSkillTree().getSkill(value);
+              final SkillDO skill = skillDao.getSkillTree()
+                  .getSkill(value);
               if (skill == null) {
                 error(getString("plugins.skillmatrix.error.skillNotFound"));
               }
@@ -153,8 +157,8 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
             }
 
             @Override
-            public String convertToString(final Object value, final Locale locale)
-            {
+            public String convertToString(final Object value,
+                final Locale locale) {
               if (value == null) {
                 return "";
               }
@@ -165,24 +169,32 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
         }
 
       };
-      autoCompleteTextField.withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false).withWidth(400);
+      autoCompleteTextField.withLabelValue(true).withMatchContains(true)
+      .withMinChars(2).withAutoSubmit(false).withWidth(400);
       fs.add(autoCompleteTextField);
     }
 
     {
       // Descritption
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.skill.description"));
-      fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "description"))).setAutogrow();
+      final FieldsetPanel fs = gridBuilder
+          .newFieldset(getString("plugins.skillmatrix.skill.description"));
+      fs.add(new MaxLengthTextArea(fs.getTextAreaId(),
+          new PropertyModel<String>(data, "description")))
+          .setAutogrow();
     }
     {
       // Comment
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.skill.comment"));
-      fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "comment"))).setAutogrow();
+      final FieldsetPanel fs = gridBuilder
+          .newFieldset(getString("plugins.skillmatrix.skill.comment"));
+      fs.add(new MaxLengthTextArea(fs.getTextAreaId(),
+          new PropertyModel<String>(data, "comment"))).setAutogrow();
     }
     {
       // Rateable
-      gridBuilder.newFieldset(getString("plugins.skillmatrix.skill.rateable")).addCheckBox(new PropertyModel<Boolean>(data,
-          "rateable"), null);
+      gridBuilder.newFieldset(
+          getString("plugins.skillmatrix.skill.rateable"))
+          .addCheckBox(new PropertyModel<Boolean>(data, "rateable"),
+              null);
     }
   }
 
@@ -190,8 +202,7 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
    * @see org.projectforge.web.wicket.AbstractEditForm#getLogger()
    */
   @Override
-  protected Logger getLogger()
-  {
+  protected Logger getLogger() {
     return log;
   }
 

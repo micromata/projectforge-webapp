@@ -107,6 +107,7 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
           error(getString("plugins.skillmatrix.error.unrateableSkillWithRating"));
         }
 
+        // TODO: Is this validation necessary?
         final SkillRatingFilter filter = new SkillRatingFilter();
         filter.setSearchFields("user.username");
         filter.setSearchString(data.getUser().getUsername());
