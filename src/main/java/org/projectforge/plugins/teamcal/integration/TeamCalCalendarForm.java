@@ -99,8 +99,8 @@ public class TeamCalCalendarForm extends CalendarForm
   {
     super.init();
     {
-      final IconButtonPanel icsExportButtonPanel = new IconButtonPanel(buttonGroupPanel.newChildId(), IconType.DOWNLOAD, new ResourceModel(
-          "calendar.icsExport.tooltip")) {
+      final IconButtonPanel icsExportButtonPanel = new IconButtonPanel(buttonGroupPanel.newChildId(), IconType.LIST, new ResourceModel(
+          "plugins.teamcal.calendar.listAndIcsExport.tooltip")) {
         /**
          * @see org.projectforge.web.wicket.flowlayout.IconButtonPanel#onSubmit()
          */
