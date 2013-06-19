@@ -34,6 +34,7 @@ import org.projectforge.excel.CellFormat;
 import org.projectforge.excel.ContentProvider;
 import org.projectforge.excel.ExportWorkbook;
 import org.projectforge.excel.XlsContentProvider;
+import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KostFormatter;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.KundeFormatter;
@@ -78,6 +79,9 @@ public class MyXlsContentProvider extends XlsContentProvider
       return ((DateHolder) value).getCalendar();
     } else if (value instanceof PFUserDO) {
       return ((PFUserDO)value).getFullname();
+    } else if (value instanceof KontoDO) {
+      final KontoDO konto = (KontoDO) value;
+      return konto.getNummer();
     } else if (value instanceof Kost1DO) {
       return KostFormatter.format((Kost1DO)value);
     } else if (value instanceof Kost2DO) {
