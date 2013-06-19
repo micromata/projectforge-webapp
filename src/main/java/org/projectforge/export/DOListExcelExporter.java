@@ -31,6 +31,11 @@ import org.projectforge.core.PropertyInfo;
 import org.projectforge.excel.ContentProvider;
 import org.projectforge.excel.ExportColumn;
 
+/**
+ * MyExcelExporter with minor optimizations e. g. for AbstractListPage.
+ * @author Kai Reinhard (k.reinhard@micromata.de)
+ *
+ */
 public class DOListExcelExporter extends MyExcelExporter
 {
   /**
