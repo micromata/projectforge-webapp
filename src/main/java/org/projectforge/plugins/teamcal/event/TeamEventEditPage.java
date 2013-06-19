@@ -185,8 +185,8 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
     }
     if (isNew() == true) {
       @SuppressWarnings("serial")
-      final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(),
-          new SubmitLink(ContentMenuEntryPanel.LINK_ID, form) {
+      final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new SubmitLink(
+          ContentMenuEntryPanel.LINK_ID, form) {
         @Override
         public void onSubmit()
         {
@@ -273,6 +273,14 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
     getData().setId(null); // Clone object.
     final TeamEventDO oldDataObject = getData();
     final TeamEventDO masterEvent = teamEventDao.getById(masterId);
+    if (masterEvent == null) {
+      log.error("masterEvent is null?! Do nothing more after saving team event.");
+      return null;
+    }
+    if (eventOfCaller == null) {
+      log.error("eventOfCaller is null?! Do nothing more after saving team event.");
+      return null;
+    }
     form.setData(masterEvent);
     if (recurrencyChangeType == RecurrencyChangeType.ALL_FUTURE) {
       // Set the end date of the master date one day before current date and save this event.
@@ -286,7 +294,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       getData().setRecurrence(form.recurrenceData);
       return null;
     } else if (recurrencyChangeType == RecurrencyChangeType.ONLY_CURRENT) { // only current date
-      // Add current date to the master date as exclusion date and save this event (without recurrency settings).
+      // Add current date to the master date as exclusion date and save this event (without recurrence settings).
       masterEvent.addRecurrenceExDate(eventOfCaller.getStartDate(), PFUserContext.getTimeZone());
       newEvent = oldDataObject;
       newEvent.setRecurrenceDate(eventOfCaller.getStartDate());
