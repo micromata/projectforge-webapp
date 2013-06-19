@@ -30,7 +30,7 @@ import org.projectforge.webserver.StartSettings;
  * Starts ProjectForge for development purposes as an alternative to WTP. Debug mode is supported.<br/>
  * For own parameter sets (other database etc.), use MyStart (see StartPostgreSQL as a PostgreSQL example).<br/>
  * For larger installations please increase memory by giving the following start VM parameters: -Xmx1024m -XX:MaxPermSize=256m
- * 
+ *
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 public class Start
@@ -38,7 +38,7 @@ public class Start
   /**
    * Should be set to true only at first start:
    */
-  private static final boolean SCHEMA_UPDATE = true;
+  private static final boolean SCHEMA_UPDATE = false;
 
   private static final String BASE_DIR = System.getProperty("user.dir") + "/testsystem/";
 
