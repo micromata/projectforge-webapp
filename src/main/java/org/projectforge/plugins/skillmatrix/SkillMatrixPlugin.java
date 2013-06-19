@@ -43,6 +43,12 @@ public class SkillMatrixPlugin extends AbstractPlugin
 
   private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { SkillDO.class, SkillRatingDO.class };
 
+  public static final String I18N_KEY_SKILLMATRIX_PREFIX = "plugins.skillmatrix";
+
+  public static final String I18N_KEY_SKILLRATING_MENU_ENTRY = "plugins.skillmatrix.skillrating.menu";
+
+  public static final String I18N_KEY_SKILL_MENU_ENTRY = "plugins.skillmatrix.skill.menu";
+
   /**
    * This dao should be defined in pluginContext.xml (as resources) for proper initialization.
    */
@@ -64,8 +70,8 @@ public class SkillMatrixPlugin extends AbstractPlugin
   {
     // DatabaseUpdateDao is needed by the updater:
     SkillMatrixPluginUpdates.dao = getDatabaseUpdateDao();
-    register(ID_SKILL_RATING, SkillRatingDao.class, skillRatingDao, "plugins.skillmatrix");
-    register(ID_SKILL, SkillDao.class, skillDao, "plugins.skillmatrix");
+    register(ID_SKILL_RATING, SkillRatingDao.class, skillRatingDao, I18N_KEY_SKILLMATRIX_PREFIX);
+    register(ID_SKILL, SkillDao.class, skillDao, I18N_KEY_SKILLMATRIX_PREFIX);
 
     // Register the web part:
     registerWeb(ID_SKILL_RATING, SkillRatingListPage.class, SkillRatingEditPage.class);
@@ -74,8 +80,8 @@ public class SkillMatrixPlugin extends AbstractPlugin
     // Register the menu entry as sub menu entry of the misc menu:
     final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
 
-    registerMenuItem(new MenuItemDef(parentMenu, ID_SKILL_RATING, 5, "plugins.skillmatrix.skillrating.menu", SkillRatingListPage.class));
-    registerMenuItem(new MenuItemDef(parentMenu, ID_SKILL, 5, "plugins.skillmatrix.skill.menu", SkillListPage.class));
+    registerMenuItem(new MenuItemDef(parentMenu, ID_SKILL_RATING, 5, I18N_KEY_SKILLRATING_MENU_ENTRY, SkillRatingListPage.class));
+    registerMenuItem(new MenuItemDef(parentMenu, ID_SKILL, 5, I18N_KEY_SKILL_MENU_ENTRY, SkillListPage.class));
 
     // .setMobileMenu(SkillRatingMobileListPage.class, 10));
 

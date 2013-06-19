@@ -55,9 +55,21 @@ public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, Ski
   @SpringBean(name = "skillDao")
   private SkillDao skillDao;
 
+  public static final String I18N_KEY_PREFIX = "plugins.skillmatrix";
+
+  public static final String I18N_KEY_SKILL_TITLE = "plugins.skillmatrix.skill.title";
+
+  public static final String I18N_KEY_SKILL_PARENT = "plugins.skillmatrix.skill.parent";
+
+  public static final String I18N_KEY_SKILL_DESCRIPTION = "plugins.skillmatrix.skill.description";
+
+  public static final String I18N_KEY_SKILL_COMMENT = "plugins.skillmatrix.skill.comment";
+
+  public static final String I18N_KEY_SKILL_RATEABLE = "plugins.skillmatrix.skill.rateable";
+
   public SkillListPage(final PageParameters parameters)
   {
-    super(parameters, "plugins.skillmatrix");
+    super(parameters, I18N_KEY_PREFIX);
   }
 
   /**
@@ -96,19 +108,19 @@ public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, Ski
     columns.add(new CellItemListenerPropertyColumn<SkillDO>(getString("modified"), getSortable("lastUpdate", sortable), "lastUpdate",
         cellItemListener));
     // Title
-    columns.add(new CellItemListenerPropertyColumn<SkillDO>(new Model<String>(getString("plugins.skillmatrix.skill.title")), getSortable(
+    columns.add(new CellItemListenerPropertyColumn<SkillDO>(new Model<String>(getString(I18N_KEY_SKILL_TITLE)), getSortable(
         "title", sortable), "title", cellItemListener));
     // Parent -> Title
-    columns.add(new CellItemListenerPropertyColumn<SkillDO>(new Model<String>(getString("plugins.skillmatrix.skill.parent")), getSortable(
+    columns.add(new CellItemListenerPropertyColumn<SkillDO>(new Model<String>(getString(I18N_KEY_SKILL_PARENT)), getSortable(
         "parent.title", sortable), "parent.title", cellItemListener));
     // Description
-    columns.add(new CellItemListenerPropertyColumn<SkillDO>(new Model<String>(getString("plugins.skillmatrix.skill.description")),
+    columns.add(new CellItemListenerPropertyColumn<SkillDO>(new Model<String>(getString(I18N_KEY_SKILL_DESCRIPTION)),
         getSortable("description", sortable), "description", cellItemListener));
     // Comment
-    columns.add(new CellItemListenerPropertyColumn<SkillDO>(new Model<String>(getString("plugins.skillmatrix.skill.comment")), getSortable(
+    columns.add(new CellItemListenerPropertyColumn<SkillDO>(new Model<String>(getString(I18N_KEY_SKILL_COMMENT)), getSortable(
         "comment", sortable), "comment", cellItemListener));
     // Rateable
-    columns.add(new CellItemListenerPropertyColumn<SkillDO>(new Model<String>(getString("plugins.skillmatrix.skill.rateable")),
+    columns.add(new CellItemListenerPropertyColumn<SkillDO>(new Model<String>(getString(I18N_KEY_SKILL_RATEABLE)),
         getSortable("rateable", sortable), "rateable", cellItemListener));
 
     return columns;

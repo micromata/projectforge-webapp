@@ -48,6 +48,18 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage> {
 
   private static final Logger log = Logger.getLogger(SkillEditForm.class);
 
+  public static final String I18N_KEY_SKILL_TITLE = "plugins.skillmatrix.skill.title";
+
+  public static final String I18N_KEY_SKILL_PARENT = "plugins.skillmatrix.skill.parent";
+
+  public static final String I18N_KEY_ERROR_SKILL_NOT_FOUND = "plugins.skillmatrix.error.skillNotFound";
+
+  public static final String I18N_KEY_SKILL_DESCRIPTION = "plugins.skillmatrix.skill.description";
+
+  public static final String I18N_KEY_SKILL_COMMENT = "plugins.skillmatrix.skill.comment";
+
+  public static final String I18N_KEY_SKILL_RATEABLE = "plugins.skillmatrix.skill.rateable";
+
   @SpringBean(name = "skillDao")
   private SkillDao skillDao;
 
@@ -71,7 +83,7 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage> {
     {
       // Title of skill
       final FieldsetPanel fs = gridBuilder
-          .newFieldset(getString("plugins.skillmatrix.skill.title"));
+          .newFieldset(getString(I18N_KEY_SKILL_TITLE));
       final RequiredMaxLengthTextField skillTextField = new RequiredMaxLengthTextField(
           fs.getTextFieldId(), new PropertyModel<String>(data,
               "title"));
@@ -81,7 +93,7 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage> {
     {
       // Parent, look at UserSelectPanel for fine tuning
       final FieldsetPanel fs = gridBuilder
-          .newFieldset(getString("plugins.skillmatrix.skill.parent"));
+          .newFieldset(getString(I18N_KEY_SKILL_PARENT));
       final PFAutoCompleteTextField<SkillDO> autoCompleteTextField = new PFAutoCompleteTextField<SkillDO>(
           fs.getTextFieldId(), new PropertyModel<SkillDO>(data,
               "parent")) {
@@ -124,7 +136,7 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage> {
               final SkillDO skill = skillDao.getSkillTree()
                   .getSkill(value);
               if (skill == null) {
-                error(getString("plugins.skillmatrix.error.skillNotFound"));
+                error(getString(I18N_KEY_ERROR_SKILL_NOT_FOUND));
               }
               getModel().setObject(skill);
               return skill;
@@ -151,7 +163,7 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage> {
     {
       // Descritption
       final FieldsetPanel fs = gridBuilder
-          .newFieldset(getString("plugins.skillmatrix.skill.description"));
+          .newFieldset(getString(I18N_KEY_SKILL_DESCRIPTION));
       fs.add(new MaxLengthTextArea(fs.getTextAreaId(),
           new PropertyModel<String>(data, "description")))
           .setAutogrow();
@@ -159,14 +171,14 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage> {
     {
       // Comment
       final FieldsetPanel fs = gridBuilder
-          .newFieldset(getString("plugins.skillmatrix.skill.comment"));
+          .newFieldset(getString(I18N_KEY_SKILL_COMMENT));
       fs.add(new MaxLengthTextArea(fs.getTextAreaId(),
           new PropertyModel<String>(data, "comment"))).setAutogrow();
     }
     {
       // Rateable
       gridBuilder.newFieldset(
-          getString("plugins.skillmatrix.skill.rateable"))
+          getString(I18N_KEY_SKILL_RATEABLE))
           .addCheckBox(new PropertyModel<Boolean>(data, "rateable"),
               null);
     }

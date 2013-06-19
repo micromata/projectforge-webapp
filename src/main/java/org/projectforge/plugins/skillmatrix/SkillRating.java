@@ -41,12 +41,14 @@ public enum SkillRating implements I18nEnum
 
   private int ordering;
 
+  public static final String I18N_KEY_SKILLRATING_PREFIX = "plugins.skillmatrix.skillrating.rating.";
+
   /**
-   * @return The full i18n key including the i18n prefix "plugins.skillmatrix.skillrating.rating.".
+   * @return The full i18n key including I18N_KEY_SKILLRATING_PREFIX.
    */
   public String getI18nKey()
   {
-    return "plugins.skillmatrix.skillrating.rating." + key;
+    return I18N_KEY_SKILLRATING_PREFIX + key;
   }
 
   /**
@@ -74,18 +76,18 @@ public enum SkillRating implements I18nEnum
     final Collection<SkillRating> values = new ArrayList<SkillRating>(5);
     // The missing breaks are intentionally: this way the key of the case itself and all the cases higher are added.
     switch (rating) {
-      case UNKNOWN:
-        values.add(UNKNOWN);
-      case ZERO:
-        values.add(ZERO);
-      case LOW:
-        values.add(LOW);
-      case MIDDLE:
-        values.add(MIDDLE);
-      case HIGH:
-        values.add(HIGH);
-      case EXPERT:
-        values.add(EXPERT);
+    case UNKNOWN:
+      values.add(UNKNOWN);
+    case ZERO:
+      values.add(ZERO);
+    case LOW:
+      values.add(LOW);
+    case MIDDLE:
+      values.add(MIDDLE);
+    case HIGH:
+      values.add(HIGH);
+    case EXPERT:
+      values.add(EXPERT);
     }
     return values.toArray();
   }

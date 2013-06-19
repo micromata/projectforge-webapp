@@ -41,6 +41,8 @@ public class SkillRatingListForm extends AbstractListForm<SkillRatingFilter, Ski
 
   private static final Logger log = Logger.getLogger(SkillRatingListForm.class);
 
+  public static final String I18N_KEY_REQUIRED_EXPERIENCE = "plugins.skillmatrix.search.reqiuredExperience";
+
   /**
    * @param parentPage
    */
@@ -56,7 +58,7 @@ public class SkillRatingListForm extends AbstractListForm<SkillRatingFilter, Ski
     {
       // Required experience
       gridBuilder.newSplitPanel(GridSize.COL100);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.search.reqiuredExperience")).suppressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString(I18N_KEY_REQUIRED_EXPERIENCE)).suppressLabelForWarning();
       fs.getFieldset().setOutputMarkupId(true);
       final LabelValueChoiceRenderer<SkillRating> ratingChoiceRenderer = new LabelValueChoiceRenderer<SkillRating>(this,
           SkillRating.values());

@@ -37,9 +37,13 @@ import org.projectforge.user.UserRightId;
  */
 public class SkillDao extends BaseDao<SkillDO>
 {
-  public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_SKILL_MATRIX_SKILL", "plugin20", "plugins.skillmatrix.skill");
+  public static final String UNIQUE_PLUGIN_ID = "PLUGIN_SKILL_MATRIX_SKILL";
 
-  static final String I18N_KEY_ERROR_CYCLIC_REFERENCE = "plugins.skillmatrix.error.cyclicReference";
+  public static final String I18N_KEY_SKILL_PREFIX = "plugins.skillmatrix.skill";
+
+  public static final UserRightId USER_RIGHT_ID = new UserRightId(UNIQUE_PLUGIN_ID, "plugin20", I18N_KEY_SKILL_PREFIX);
+
+  public static final String I18N_KEY_ERROR_CYCLIC_REFERENCE = "plugins.skillmatrix.error.cyclicReference";
 
   public static final String I18N_KEY_ERROR_DUPLICATE_CHILD_SKILL = "plugins.skillmatrix.error.duplicateChildSkill";
 

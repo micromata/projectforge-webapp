@@ -64,6 +64,22 @@ IListPageColumnsCreator<SkillRatingDO>
   @SpringBean(name = "userFormatter")
   private UserFormatter userFormatter;
 
+  public static final String I18N_KEY_USER = "plugins.skillmatrix.skillrating.user";
+
+  public static final String I18N_KEY_SKILL = "plugins.skillmatrix.skillrating.skill";
+
+  public static final String I18N_KEY_RATING = "plugins.skillmatrix.skillrating.rating";
+
+  public static final String I18N_KEY_SINCE_YEAR = "plugins.skillmatrix.skillrating.sinceyear";
+
+  public static final String I18N_KEY_CERTIFICATES = "plugins.skillmatrix.skillrating.certificates";
+
+  public static final String I18N_KEY_TRAINING_COURSES = "plugins.skillmatrix.skillrating.trainingcourses";
+
+  public static final String I18N_KEY_DESCRIPTION = "plugins.skillmatrix.skillrating.description";
+
+  public static final String I18N_KEY_COMMENT = "plugins.skillmatrix.skillrating.comment";
+
   public SkillRatingListPage(final PageParameters parameters)
   {
     super(parameters, "plugins.skillmatrix");
@@ -107,32 +123,32 @@ IListPageColumnsCreator<SkillRatingDO>
     columns.add(new CellItemListenerPropertyColumn<SkillRatingDO>(getString("modified"), getSortable("lastUpdate", sortable), "lastUpdate",
         cellItemListener));
     // User
-    columns.add(new UserPropertyColumn<SkillRatingDO>(getString("plugins.skillmatrix.skillrating.user"), getSortable("userId", sortable),
+    columns.add(new UserPropertyColumn<SkillRatingDO>(getString(I18N_KEY_USER), getSortable("userId", sortable),
         "user", cellItemListener).withUserFormatter(userFormatter));
     // Skill -> Title
-    columns.add(new CellItemListenerPropertyColumn<SkillRatingDO>(getString("plugins.skillmatrix.skillrating.skill"), getSortable(
+    columns.add(new CellItemListenerPropertyColumn<SkillRatingDO>(getString(I18N_KEY_SKILL), getSortable(
         "skill.title", sortable), "skill.title", cellItemListener));
     // Experience
     columns.add(new CellItemListenerPropertyColumn<SkillRatingDO>(
-        new Model<String>(getString("plugins.skillmatrix.skillrating.rating")), getSortable("skillRating", sortable), "skillRating",
+        new Model<String>(getString(I18N_KEY_RATING)), getSortable("skillRating", sortable), "skillRating",
         cellItemListener));
     // Since year
     columns.add(new CellItemListenerPropertyColumn<SkillRatingDO>(
-        new Model<String>(getString("plugins.skillmatrix.skillrating.sinceyear")), getSortable("sinceYear", sortable), "sinceYear",
+        new Model<String>(getString(I18N_KEY_SINCE_YEAR)), getSortable("sinceYear", sortable), "sinceYear",
         cellItemListener));
     // Certificates
     columns.add(new CellItemListenerPropertyColumn<SkillRatingDO>(
-        new Model<String>(getString("plugins.skillmatrix.skillrating.certificates")), getSortable("certificates", sortable),
+        new Model<String>(getString(I18N_KEY_CERTIFICATES)), getSortable("certificates", sortable),
         "certificates", cellItemListener));
     // Training courses
     columns.add(new CellItemListenerPropertyColumn<SkillRatingDO>(new Model<String>(
-        getString("plugins.skillmatrix.skillrating.trainingcourses")), getSortable("trainingCourses", sortable), "trainingCourses",
+        getString(I18N_KEY_TRAINING_COURSES)), getSortable("trainingCourses", sortable), "trainingCourses",
         cellItemListener));
     // Description
     columns.add(new CellItemListenerPropertyColumn<SkillRatingDO>(new Model<String>(
-        getString("plugins.skillmatrix.skillrating.description")), getSortable("description", sortable), "description", cellItemListener));
+        getString(I18N_KEY_DESCRIPTION)), getSortable("description", sortable), "description", cellItemListener));
     // Comment
-    columns.add(new CellItemListenerPropertyColumn<SkillRatingDO>(new Model<String>(getString("plugins.skillmatrix.skillrating.comment")),
+    columns.add(new CellItemListenerPropertyColumn<SkillRatingDO>(new Model<String>(getString(I18N_KEY_COMMENT)),
         getSortable("comment", sortable), "comment", cellItemListener));
 
     return columns;

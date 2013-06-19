@@ -39,9 +39,13 @@ import org.projectforge.user.UserRightId;
  */
 public class SkillRatingDao extends BaseDao<SkillRatingDO>
 {
+  public static final String UNIQUE_PLUGIN_ID = "PLUGIN_SKILL_MATRIX_SKILL_RATING";
+
+  public static final String I18N_KEY_SKILLRATING_PREFIX = "plugins.skillmatrix.skillrating";
+
   public static final UserRightId USER_RIGHT_ID = new UserRightId(
-      "PLUGIN_SKILL_MATRIX_SKILL_RATING", "plugin20",
-      "plugins.skillmatrix.skillrating");
+      UNIQUE_PLUGIN_ID, "plugin20",
+      I18N_KEY_SKILLRATING_PREFIX);
 
   static final String I18N_KEY_ERROR_CYCLIC_REFERENCE = "plugins.skillmatrix.error.cyclicReference";
 
