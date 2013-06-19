@@ -44,6 +44,7 @@ import org.projectforge.common.DateHolder;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.PFPersistancyBehavior;
 import org.projectforge.core.PropertyInfo;
+import org.projectforge.core.PropertyType;
 import org.projectforge.fibu.kost.KostZuweisungDO;
 
 @MappedSuperclass
@@ -81,7 +82,7 @@ public abstract class AbstractRechnungDO<T extends AbstractRechnungsPositionDO> 
   @DateBridge(resolution = Resolution.DAY)
   protected Date bezahlDatum;
 
-  @PropertyInfo(i18nKey = "fibu.rechnung.zahlBetrag")
+  @PropertyInfo(i18nKey = "fibu.rechnung.zahlBetrag", type = PropertyType.CURRENCY)
   @Field(index = Index.UN_TOKENIZED)
   protected BigDecimal zahlBetrag;
 
