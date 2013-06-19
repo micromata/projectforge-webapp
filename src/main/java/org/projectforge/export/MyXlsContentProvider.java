@@ -35,6 +35,10 @@ import org.projectforge.excel.ContentProvider;
 import org.projectforge.excel.ExportWorkbook;
 import org.projectforge.excel.XlsContentProvider;
 import org.projectforge.fibu.KostFormatter;
+import org.projectforge.fibu.KundeDO;
+import org.projectforge.fibu.KundeFormatter;
+import org.projectforge.fibu.ProjektDO;
+import org.projectforge.fibu.ProjektFormatter;
 import org.projectforge.fibu.kost.Kost1DO;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.user.PFUserContext;
@@ -78,6 +82,10 @@ public class MyXlsContentProvider extends XlsContentProvider
       return KostFormatter.format((Kost1DO)value);
     } else if (value instanceof Kost2DO) {
       return KostFormatter.format((Kost2DO)value);
+    } else if (value instanceof KundeDO) {
+      return KundeFormatter.formatKundeAsString((KundeDO)value, null);
+    } else if (value instanceof ProjektDO) {
+      return ProjektFormatter.formatProjektKundeAsString((ProjektDO)value, null, null);
     } else if (value instanceof I18nEnum) {
       return PFUserContext.getLocalizedString(((I18nEnum)value).getI18nKey());
     }
