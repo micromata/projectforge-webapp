@@ -42,12 +42,19 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.core.Configuration;
 import org.projectforge.core.CurrencyFormatter;
+import org.projectforge.excel.ContentProvider;
+import org.projectforge.excel.ExportColumn;
+import org.projectforge.excel.I18nExportColumn;
+import org.projectforge.excel.PropertyMapping;
+import org.projectforge.export.DOListExcelExporter;
 import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.EingangsrechnungDao;
 import org.projectforge.fibu.EingangsrechnungsStatistik;
 import org.projectforge.fibu.KontoCache;
 import org.projectforge.fibu.KontoDO;
+import org.projectforge.fibu.RechnungFilter;
 import org.projectforge.fibu.kost.KostZuweisungExport;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
@@ -184,20 +191,62 @@ IListPageColumnsCreator<EingangsrechnungDO>
   {
     dataTable = createDataTable(createColumns(this, true), "datum", SortOrder.DESCENDING);
     form.add(dataTable);
-    final ContentMenuEntryPanel exportExcelButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
-      @Override
-      public void onClick()
-      {
-        exportExcel();
-      };
-    }, getString("exportAsXls")).setTooltip(getString("tooltip.export.excel"));
-    addContentMenuEntry(exportExcelButton);
+    addExcelExport(getString("fibu.common.creditor"), getString("fibu.eingangsrechnungen"));
+    if (Configuration.getInstance().isCostConfigured() == true) {
+      final ContentMenuEntryPanel exportExcelButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
+        @Override
+        public void onClick()
+        {
+          exportExcelWithCostAssignments();
+        };
+      }, getString("fibu.rechnung.kostExcelExport")).setTooltip(getString("fibu.rechnung.kostExcelExport.tootlip"));
+      addContentMenuEntry(exportExcelButton);
+    }
   }
 
-  protected void exportExcel()
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#createExcelExporter(java.lang.String)
+   */
+  @Override
+  protected DOListExcelExporter createExcelExporter(final String filenameIdentifier)
+  {
+    return new DOListExcelExporter(filenameIdentifier) {
+      /**
+       * @see org.projectforge.excel.ExcelExporter#onBeforeSettingColumns(java.util.List)
+       */
+      @Override
+      protected List<ExportColumn> onBeforeSettingColumns(final ContentProvider sheetProvider, final List<ExportColumn> columns)
+      {
+        I18nExportColumn col = new I18nExportColumn("netSum", "fibu.common.netto");
+        putCurrencyFormat(sheetProvider, col);
+        columns.add(7, col);
+        col = new I18nExportColumn("grossSum", "fibu.common.brutto");
+        putCurrencyFormat(sheetProvider, col);
+        columns.add(8, col);
+        return columns;
+      }
+
+      /**
+       * @see org.projectforge.excel.ExcelExporter#addMappings(org.projectforge.excel.PropertyMapping, java.lang.Object)
+       */
+      @Override
+      protected void addMappings(final PropertyMapping mapping, final Object entry)
+      {
+        final EingangsrechnungDO invoice = (EingangsrechnungDO) entry;
+        mapping.add("grossSum", invoice.getGrossSum());
+        mapping.add("netSum", invoice.getNetSum());
+      }
+    };
+  }
+
+  protected void exportExcelWithCostAssignments()
   {
     refresh();
-    final List<EingangsrechnungDO> rechnungen = getList();
+    final RechnungFilter filter = new RechnungFilter();
+    final RechnungFilter src = form.getSearchFilter();
+    filter.setYear(src.getYear());
+    filter.setMonth(src.getMonth());
+    final List<EingangsrechnungDO> rechnungen = eingangsrechnungDao.getList(filter);
     if (rechnungen == null || rechnungen.size() == 0) {
       // Nothing to export.
       form.addError("validation.error.nothingToExport");
