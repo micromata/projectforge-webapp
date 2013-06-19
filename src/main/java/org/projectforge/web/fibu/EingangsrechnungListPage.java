@@ -194,7 +194,6 @@ IListPageColumnsCreator<EingangsrechnungDO>
     addContentMenuEntry(exportExcelButton);
   }
 
-  @Override
   protected void exportExcel()
   {
     refresh();

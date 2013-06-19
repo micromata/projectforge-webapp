@@ -39,9 +39,10 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.core.PropertyInfo;
+import org.projectforge.excel.ContentProvider;
 import org.projectforge.excel.ExportColumn;
 import org.projectforge.excel.ExportSheet;
-import org.projectforge.export.MyExcelExporter;
+import org.projectforge.export.DOListExcelExporter;
 import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.EingangsrechnungDao;
 import org.projectforge.fibu.InvoicesExcelExport;
@@ -186,41 +187,50 @@ IListPageColumnsCreator<LiquidityEntryDO>
       };
     }, getString("plugins.liquidityplanning.forecast"));
     addContentMenuEntry(liquidityForecastButton);
-    addExcelExport();
+    addExcelExport("liquidity", getString("plugins.liquidityplanning.entry.title.heading"));
   }
 
   /**
-   * @see org.projectforge.web.wicket.AbstractListPage#getExcelFilenameIdentifier()
+   * @see org.projectforge.web.wicket.AbstractListPage#createExcelExporter(java.lang.String)
    */
   @Override
-  protected String getExcelFilenameIdentifier()
+  protected DOListExcelExporter createExcelExporter(final String filenameIdentifier)
   {
-    return "liquidity";
-  }
+    return new DOListExcelExporter("liquidity") {
+      /**
+       * @see org.projectforge.export.DOListExcelExporter#putFieldFormat(org.projectforge.excel.ContentProvider, java.lang.reflect.Field,
+       *      org.projectforge.core.PropertyInfo, org.projectforge.excel.ExportColumn)
+       */
+      @Override
+      public void putFieldFormat(final ContentProvider sheetProvider, final Field field, final PropertyInfo propInfo,
+          final ExportColumn exportColumn)
+      {
+        super.putFieldFormat(sheetProvider, field, propInfo, exportColumn);
+        if ("dateOfPayment".equals(field.getName()) == true) {
+          exportColumn.setWidth(12);
+        } else if ("paid".equals(field.getName()) == true) {
+          exportColumn.setWidth(8);
+        } else if ("subject".equals(field.getName()) == true || "comment".equals(field.getName()) == true) {
+          exportColumn.setWidth(40);
+        }
+      }
 
-  /**
-   * @see org.projectforge.web.wicket.AbstractListPage#getExcelSheetname()
-   */
-  @Override
-  protected String getExcelSheetname()
-  {
-    return getString("plugins.liquidityplanning.entry.title.heading");
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.AbstractListPage#onBeforeExcelDownload(org.projectforge.export.MyExcelExporter)
-   */
-  @Override
-  protected void onBeforeExcelDownload(final MyExcelExporter exporter)
-  {
-    final InvoicesExcelExport invoicesExport = new InvoicesExcelExport();
-    forecast = getForecast();
-    invoicesExport.addDebitorInvoicesSheet(exporter, getString("fibu.rechnungen"), invoices);
-    invoicesExport.addCreditorInvoicesSheet(exporter, getString("fibu.eingangsrechnungen"), creditorInvoices);
-    final ExportSheet sheet = exporter.addSheet(getString("filter.all"));
-    exporter.addList(sheet, forecast.getEntries());
-    sheet.getPoiSheet().setAutoFilter(org.apache.poi.ss.util.CellRangeAddress.valueOf("E1:E1"));
-    sheet.getPoiSheet().setAutoFilter(org.apache.poi.ss.util.CellRangeAddress.valueOf("A1:A1"));
+      /**
+       * @see org.projectforge.export.DOListExcelExporter#onBeforeExcelDownload(org.projectforge.export.MyExcelExporter)
+       */
+      @Override
+      public void onBeforeDownload()
+      {
+        final InvoicesExcelExport invoicesExport = new InvoicesExcelExport();
+        forecast = getForecast();
+        invoicesExport.addDebitorInvoicesSheet(this, getString("fibu.rechnungen"), invoices);
+        invoicesExport.addCreditorInvoicesSheet(this, getString("fibu.eingangsrechnungen"), creditorInvoices);
+        final ExportSheet sheet = addSheet(getString("filter.all"));
+        addList(sheet, forecast.getEntries());
+        sheet.getPoiSheet().setAutoFilter(org.apache.poi.ss.util.CellRangeAddress.valueOf("E1:E1"));
+        sheet.getPoiSheet().setAutoFilter(org.apache.poi.ss.util.CellRangeAddress.valueOf("A1:A1"));
+      }
+    };
   }
 
   private LiquidityForecast getForecast()
@@ -236,22 +246,6 @@ IListPageColumnsCreator<LiquidityEntryDO>
     forecast.set(list);
     forecast.build();
     return forecast;
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.AbstractListPage#putExcelFieldFormat(java.lang.reflect.Field, org.projectforge.core.PropertyInfo,
-   *      org.projectforge.excel.ExportColumn)
-   */
-  @Override
-  protected void putExcelFieldFormat(final Field field, final PropertyInfo propInfo, final ExportColumn exportColumn)
-  {
-    if ("dateOfPayment".equals(field.getName()) == true) {
-      exportColumn.setWidth(12);
-    } else if ("paid".equals(field.getName()) == true) {
-      exportColumn.setWidth(8);
-    } else if ("subject".equals(field.getName()) == true || "comment".equals(field.getName()) == true) {
-      exportColumn.setWidth(40);
-    }
   }
 
   /**

@@ -174,7 +174,6 @@ public class Kost2ListPage extends AbstractListPage<Kost2ListForm, Kost2Dao, Kos
     STATUS, KOST, ART, FAKTURIERT, PROJEKT, DESCRIPTION, COMMENT;
   }
 
-  @Override
   protected void exportExcel()
   {
     log.info("Exporting kost2 list.");

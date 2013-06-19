@@ -530,7 +530,6 @@ IListPageColumnsCreator<TimesheetDO>
     DownloadUtils.setDownloadTarget(content, filename);
   }
 
-  @Override
   protected void exportExcel()
   {
     refresh();

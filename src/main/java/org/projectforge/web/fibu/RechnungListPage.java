@@ -49,6 +49,7 @@ import org.projectforge.fibu.KontoCache;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.RechnungDO;
 import org.projectforge.fibu.RechnungDao;
+import org.projectforge.fibu.RechnungFilter;
 import org.projectforge.fibu.RechnungsStatistik;
 import org.projectforge.fibu.kost.KostZuweisungExport;
 import org.projectforge.registry.Registry;
@@ -229,21 +230,25 @@ IListPageColumnsCreator<RechnungDO>
   {
     dataTable = createDataTable(createColumns(this, true), "nummer", SortOrder.DESCENDING);
     form.add(dataTable);
+    addExcelExport(getString("fibu.common.debitor"), getString("fibu.rechnungen"));
     final ContentMenuEntryPanel exportExcelButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
       @Override
       public void onClick()
       {
-        exportExcel();
+        exportExcelWithCostAssignments();
       };
-    }, getString("exportAsXls")).setTooltip(getString("tooltip.export.excel"));
+    }, getString("fibu.rechnung.kostExcelExport")).setTooltip(getString("fibu.rechnung.kostExcelExport.tootlip"));
     addContentMenuEntry(exportExcelButton);
   }
 
-  @Override
-  protected void exportExcel()
+  protected void exportExcelWithCostAssignments()
   {
     refresh();
-    final List<RechnungDO> rechnungen = getList();
+    final RechnungFilter filter = new RechnungFilter();
+    final RechnungFilter src = form.getSearchFilter();
+    filter.setYear(src.getYear());
+    filter.setMonth(src.getMonth());
+    final List<RechnungDO> rechnungen = rechnungDao.getList(filter);
     if (rechnungen == null || rechnungen.size() == 0) {
       // Nothing to export.
       form.addError("validation.error.nothingToExport");

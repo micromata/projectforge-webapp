@@ -24,9 +24,7 @@
 package org.projectforge.web.wicket;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -49,7 +47,6 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.projectforge.common.DateHelper;
 import org.projectforge.common.RecentQueue;
 import org.projectforge.common.ReflectionHelper;
 import org.projectforge.common.StringHelper;
@@ -59,10 +56,8 @@ import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.IdObject;
 import org.projectforge.core.PropertyInfo;
 import org.projectforge.core.UserException;
-import org.projectforge.excel.ContentProvider;
-import org.projectforge.excel.ExportColumn;
 import org.projectforge.excel.ExportSheet;
-import org.projectforge.export.MyExcelExporter;
+import org.projectforge.export.DOListExcelExporter;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
@@ -723,21 +718,28 @@ extends AbstractSecuredPage implements ISelectCallerPage
   /**
    * Adds a excel export content menu entry. ProjectForge exports all data fields (annotated with {@link PropertyInfo} of the current
    * displayed result list.
+   * @param filenameIdentifier If given then the id will be part of the exported filename, may be null.
+   * @param sheetTitle may be null.
    */
-  public void addExcelExport()
+  public void addExcelExport(final String filenameIdentifier, final String sheetTitle)
   {
     @SuppressWarnings("serial")
     final ContentMenuEntryPanel exportExcelButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
       @Override
       public void onClick()
       {
-        exportExcel();
+        exportExcel(filenameIdentifier, sheetTitle);
       };
     }, getString("exportAsXls")).setTooltip(getString("tooltip.export.excel"));
     addContentMenuEntry(exportExcelButton);
   }
 
-  protected void exportExcel()
+  protected DOListExcelExporter createExcelExporter(final String filenameIdentifier)
+  {
+    return new DOListExcelExporter(filenameIdentifier);
+  }
+
+  protected void exportExcel(final String filenameIdentifier, final String sheetTitle)
   {
     refresh();
     final List< ? > list = getList();
@@ -746,79 +748,14 @@ extends AbstractSecuredPage implements ISelectCallerPage
       form.addError("validation.error.nothingToExport");
       return;
     }
-    final String filename = "ProjectForge-" + getExcelFilenameIdentifier() + "_" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".xls";
-    final MyExcelExporter exporter = new MyExcelExporter(filename) {
-      /**
-       * @see org.projectforge.export.MyExcelExporter#putFieldFormat(org.projectforge.excel.ContentProvider, java.lang.reflect.Field,
-       *      org.projectforge.core.PropertyInfo, org.projectforge.excel.ExportColumn)
-       */
-      @Override
-      public void putFieldFormat(final ContentProvider sheetProvider, final Field field, final PropertyInfo propInfo,
-          final ExportColumn exportColumn)
-      {
-        super.putFieldFormat(sheetProvider, field, propInfo, exportColumn);
-        if ("deleted".equals(field.getName()) == true) {
-          exportColumn.setWidth(8);
-        }
-        AbstractListPage.this.putExcelFieldFormat(field, propInfo, exportColumn);
-      }
-    };
-    final ExportSheet sheet = exporter.addSheet(getExcelSheetname());
+    final DOListExcelExporter exporter = createExcelExporter(filenameIdentifier);
+    final ExportSheet sheet = exporter.addSheet(sheetTitle != null ? sheetTitle : "data");
     exporter.addList(sheet, list);
-    if (isExcelAutoFilter() == true) {
+    if (exporter.isExcelAutoFilter() == true) {
       sheet.setAutoFilter();
     }
-    onBeforeExcelDownload(exporter);
-    DownloadUtils.setDownloadTarget(exporter.getWorkbook().getAsByteArray(), filename);
-  }
-
-  /**
-   * You may add here data or sheets to the Excel file before the download starts. Does nothing at default.
-   * @param exporter
-   */
-  protected void onBeforeExcelDownload(final MyExcelExporter exporter)
-  {
-  }
-
-  /**
-   * You may set column width and special formats here. Does nothing at default.
-   * @param field
-   * @param propInfo
-   * @param exportColumn
-   */
-  protected void putExcelFieldFormat(final Field field, final PropertyInfo propInfo, final ExportColumn exportColumn)
-  {
-    // if ("dateOfPayment".equals(field.getName()) == true) {
-    // exportColumn.setWidth(12);
-    // }
-  }
-
-  /**
-   * The Excel filename of exported data is "ProjectForge-&lt;identifier&gt;_&lt;date&gt;.xls".
-   * @return "export" at default.
-   * @see #addExcelExport()
-   */
-  protected String getExcelFilenameIdentifier()
-  {
-    return "export";
-  }
-
-  /**
-   * The sheet name of the exported Excel data.
-   * @return "data" at default.
-   * @see #addExcelExport()
-   */
-  protected String getExcelSheetname()
-  {
-    return "data";
-  }
-
-  /**
-   * If true then the whole first row will be declared with Excel auto-filter.
-   * @return true at default.
-   */
-  protected boolean isExcelAutoFilter() {
-    return true;
+    exporter.onBeforeDownload();
+    DownloadUtils.setDownloadTarget(exporter.getWorkbook().getAsByteArray(), exporter.getFilename());
   }
 
   /**

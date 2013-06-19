@@ -138,25 +138,7 @@ IListPageColumnsCreator<EmployeeDO>
     final List<IColumn<EmployeeDO, String>> columns = createColumns(this, true);
     dataTable = createDataTable(columns, "user.lastname", SortOrder.ASCENDING);
     form.add(dataTable);
-    addExcelExport();
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.AbstractListPage#getExcelFilenameIdentifier()
-   */
-  @Override
-  protected String getExcelFilenameIdentifier()
-  {
-    return "employees";
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.AbstractListPage#getExcelSheetname()
-   */
-  @Override
-  protected String getExcelSheetname()
-  {
-    return getString("fibu.employee.title.heading");
+    addExcelExport(getString("fibu.employee.title.heading"), "employees");
   }
 
   @Override
