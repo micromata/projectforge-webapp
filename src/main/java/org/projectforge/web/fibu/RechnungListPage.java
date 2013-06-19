@@ -44,6 +44,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.core.Configuration;
 import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.excel.ContentProvider;
 import org.projectforge.excel.ExportColumn;
@@ -238,14 +239,16 @@ IListPageColumnsCreator<RechnungDO>
     dataTable = createDataTable(createColumns(this, true), "nummer", SortOrder.DESCENDING);
     form.add(dataTable);
     addExcelExport(getString("fibu.common.debitor"), getString("fibu.rechnungen"));
-    final ContentMenuEntryPanel exportExcelButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
-      @Override
-      public void onClick()
-      {
-        exportExcelWithCostAssignments();
-      };
-    }, getString("fibu.rechnung.kostExcelExport")).setTooltip(getString("fibu.rechnung.kostExcelExport.tootlip"));
-    addContentMenuEntry(exportExcelButton);
+    if (Configuration.getInstance().isCostConfigured() == true) {
+      final ContentMenuEntryPanel exportExcelButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
+        @Override
+        public void onClick()
+        {
+          exportExcelWithCostAssignments();
+        };
+      }, getString("fibu.rechnung.kostExcelExport")).setTooltip(getString("fibu.rechnung.kostExcelExport.tootlip"));
+      addContentMenuEntry(exportExcelButton);
+    }
   }
 
   /**
