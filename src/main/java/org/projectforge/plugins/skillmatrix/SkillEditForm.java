@@ -43,62 +43,52 @@ import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
  * @author Billy Duong (duong.billy@yahoo.de)
  * 
  */
-public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage> {
+public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
+{
   private static final long serialVersionUID = 7795854215943696332L;
 
   private static final Logger log = Logger.getLogger(SkillEditForm.class);
 
-  public static final String I18N_KEY_SKILL_TITLE = "plugins.skillmatrix.skill.title";
-
-  public static final String I18N_KEY_SKILL_PARENT = "plugins.skillmatrix.skill.parent";
-
   public static final String I18N_KEY_ERROR_SKILL_NOT_FOUND = "plugins.skillmatrix.error.skillNotFound";
-
-  public static final String I18N_KEY_SKILL_DESCRIPTION = "plugins.skillmatrix.skill.description";
-
-  public static final String I18N_KEY_SKILL_COMMENT = "plugins.skillmatrix.skill.comment";
-
-  public static final String I18N_KEY_SKILL_RATEABLE = "plugins.skillmatrix.skill.rateable";
 
   @SpringBean(name = "skillDao")
   private SkillDao skillDao;
 
-  private final FormComponent<?>[] dependentFormComponents = new FormComponent[1];
+  private final FormComponent< ? >[] dependentFormComponents = new FormComponent[1];
 
   /**
    * @param parentPage
    * @param data
    */
-  public SkillEditForm(final SkillEditPage parentPage, final SkillDO data) {
+  public SkillEditForm(final SkillEditPage parentPage, final SkillDO data)
+  {
     super(parentPage, data);
   }
 
   @Override
   @SuppressWarnings("serial")
-  public void init() {
+  public void init()
+  {
     super.init();
 
     gridBuilder.newGridPanel();
 
     {
       // Title of skill
-      final FieldsetPanel fs = gridBuilder
-          .newFieldset(getString(I18N_KEY_SKILL_TITLE));
-      final RequiredMaxLengthTextField skillTextField = new RequiredMaxLengthTextField(
-          fs.getTextFieldId(), new PropertyModel<String>(data,
-              "title"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(SkillDO.class, "title");
+      final RequiredMaxLengthTextField skillTextField = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
+          "title"));
       fs.add(skillTextField);
       dependentFormComponents[0] = skillTextField;
     }
     {
       // Parent, look at UserSelectPanel for fine tuning
-      final FieldsetPanel fs = gridBuilder
-          .newFieldset(getString(I18N_KEY_SKILL_PARENT));
-      final PFAutoCompleteTextField<SkillDO> autoCompleteTextField = new PFAutoCompleteTextField<SkillDO>(
-          fs.getTextFieldId(), new PropertyModel<SkillDO>(data,
-              "parent")) {
+      final FieldsetPanel fs = gridBuilder.newFieldset(SkillDO.class, "parent");
+      final PFAutoCompleteTextField<SkillDO> autoCompleteTextField = new PFAutoCompleteTextField<SkillDO>(fs.getTextFieldId(),
+          new PropertyModel<SkillDO>(data, "parent")) {
         @Override
-        protected List<SkillDO> getChoices(final String input) {
+        protected List<SkillDO> getChoices(final String input)
+        {
           final BaseSearchFilter filter = new BaseSearchFilter();
           filter.setSearchFields("title");
           filter.setSearchString(input);
@@ -107,7 +97,8 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage> {
         }
 
         @Override
-        protected String formatLabel(final SkillDO skill) {
+        protected String formatLabel(final SkillDO skill)
+        {
           if (skill == null) {
             return "";
           }
@@ -115,26 +106,27 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage> {
         }
 
         @Override
-        protected String formatValue(final SkillDO skill) {
+        protected String formatValue(final SkillDO skill)
+        {
           if (skill == null) {
             return "";
           }
           return skill.getTitle();
         }
 
-        @SuppressWarnings({ "unchecked", "rawtypes" })
+        @SuppressWarnings({ "unchecked", "rawtypes"})
         @Override
-        public <C> IConverter<C> getConverter(final Class<C> type) {
+        public <C> IConverter<C> getConverter(final Class<C> type)
+        {
           return new IConverter() {
             @Override
-            public Object convertToObject(final String value,
-                final Locale locale) {
+            public Object convertToObject(final String value, final Locale locale)
+            {
               if (StringUtils.isEmpty(value) == true) {
                 getModel().setObject(null);
                 return null;
               }
-              final SkillDO skill = skillDao.getSkillTree()
-                  .getSkill(value);
+              final SkillDO skill = skillDao.getSkillTree().getSkill(value);
               if (skill == null) {
                 error(getString(I18N_KEY_ERROR_SKILL_NOT_FOUND));
               }
@@ -143,8 +135,8 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage> {
             }
 
             @Override
-            public String convertToString(final Object value,
-                final Locale locale) {
+            public String convertToString(final Object value, final Locale locale)
+            {
               if (value == null) {
                 return "";
               }
@@ -155,32 +147,23 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage> {
         }
 
       };
-      autoCompleteTextField.withLabelValue(true).withMatchContains(true)
-      .withMinChars(2).withAutoSubmit(false).withWidth(400);
+      autoCompleteTextField.withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false).withWidth(400);
       fs.add(autoCompleteTextField);
     }
 
     {
       // Descritption
-      final FieldsetPanel fs = gridBuilder
-          .newFieldset(getString(I18N_KEY_SKILL_DESCRIPTION));
-      fs.add(new MaxLengthTextArea(fs.getTextAreaId(),
-          new PropertyModel<String>(data, "description")))
-          .setAutogrow();
+      final FieldsetPanel fs = gridBuilder.newFieldset(SkillDO.class, "description");
+      fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "description"))).setAutogrow();
     }
     {
       // Comment
-      final FieldsetPanel fs = gridBuilder
-          .newFieldset(getString(I18N_KEY_SKILL_COMMENT));
-      fs.add(new MaxLengthTextArea(fs.getTextAreaId(),
-          new PropertyModel<String>(data, "comment"))).setAutogrow();
+      final FieldsetPanel fs = gridBuilder.newFieldset(SkillDO.class, "comment");
+      fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "comment"))).setAutogrow();
     }
     {
       // Rateable
-      gridBuilder.newFieldset(
-          getString(I18N_KEY_SKILL_RATEABLE))
-          .addCheckBox(new PropertyModel<Boolean>(data, "rateable"),
-              null);
+      gridBuilder.newFieldset(SkillDO.class, "rateable").addCheckBox(new PropertyModel<Boolean>(data, "rateable"), null);
     }
   }
 
@@ -188,7 +171,8 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage> {
    * @see org.projectforge.web.wicket.AbstractEditForm#getLogger()
    */
   @Override
-  protected Logger getLogger() {
+  protected Logger getLogger()
+  {
     return log;
   }
 

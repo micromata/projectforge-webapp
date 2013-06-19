@@ -37,6 +37,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.core.DefaultBaseDO;
+import org.projectforge.core.PropertyInfo;
 import org.projectforge.core.UserPrefParameter;
 import org.projectforge.database.Constants;
 
@@ -52,21 +53,26 @@ public class SkillDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = 6102127905651011282L;
 
+  @PropertyInfo(i18nKey = "plugins.skillmatrix.skill.title")
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String title;
 
   // Null if this skill is a top level skill.
+  @PropertyInfo(i18nKey = "plugins.skillmatrix.skill.parent")
   @IndexedEmbedded(depth = 1)
   private SkillDO parent;
 
+  @PropertyInfo(i18nKey = "plugins.skillmatrix.skill.description")
   @UserPrefParameter(i18nKey = "description", multiline = true)
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String description;
 
+  @PropertyInfo(i18nKey = "plugins.skillmatrix.skill.comment")
   @UserPrefParameter(i18nKey = "comment", multiline = true)
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String comment;
 
+  @PropertyInfo(i18nKey = "plugins.skillmatrix.skill.rateable")
   private boolean rateable = true;
 
   @Column(length = 100)

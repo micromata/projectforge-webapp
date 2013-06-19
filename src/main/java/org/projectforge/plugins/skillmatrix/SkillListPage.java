@@ -45,12 +45,10 @@ import org.projectforge.web.wicket.ListSelectActionPanel;
 
 /**
  * @author Billy Duong (duong.billy@yahoo.de)
- *
+ * 
  */
 @ListPage(editPage = SkillEditPage.class)
-public class SkillListPage extends
-    AbstractListPage<SkillListForm, SkillDao, SkillDO> implements
-    IListPageColumnsCreator<SkillDO>
+public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, SkillDO> implements IListPageColumnsCreator<SkillDO>
 {
   private static final long serialVersionUID = 3262800972072452074L;
 
@@ -59,84 +57,60 @@ public class SkillListPage extends
 
   public static final String I18N_KEY_PREFIX = "plugins.skillmatrix";
 
-  public static final String I18N_KEY_SKILL_TITLE = "plugins.skillmatrix.skill.title";
-
-  public static final String I18N_KEY_SKILL_PARENT = "plugins.skillmatrix.skill.parent";
-
-  public static final String I18N_KEY_SKILL_DESCRIPTION = "plugins.skillmatrix.skill.description";
-
-  public static final String I18N_KEY_SKILL_COMMENT = "plugins.skillmatrix.skill.comment";
-
-  public static final String I18N_KEY_SKILL_RATEABLE = "plugins.skillmatrix.skill.rateable";
-
   public SkillListPage(final PageParameters parameters)
   {
     super(parameters, I18N_KEY_PREFIX);
   }
 
   /**
-   * @see org.projectforge.web.wicket.IListPageColumnsCreator#createColumns(org.apache.wicket.markup.html.WebPage,
-   *      boolean)
+   * @see org.projectforge.web.wicket.IListPageColumnsCreator#createColumns(org.apache.wicket.markup.html.WebPage, boolean)
    */
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<SkillDO, String>> createColumns(
-      final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<SkillDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final List<IColumn<SkillDO, String>> columns = new ArrayList<IColumn<SkillDO, String>>();
-    final CellItemListener<SkillDO> cellItemListener = new CellItemListener<SkillDO>()
-    {
+    final CellItemListener<SkillDO> cellItemListener = new CellItemListener<SkillDO>() {
       private static final long serialVersionUID = 3628573642359696336L;
 
-      public void populateItem(final Item<ICellPopulator<SkillDO>> item,
-          final String componentId, final IModel<SkillDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<SkillDO>> item, final String componentId, final IModel<SkillDO> rowModel)
       {
         final SkillDO skill = rowModel.getObject();
         appendCssClasses(item, skill.getId(), skill.isDeleted());
       }
     };
 
-    final CellItemListenerPropertyColumn<SkillDO> created = new CellItemListenerPropertyColumn<SkillDO>(
-        new Model<String>(getString("created")), getSortable("created",
-            sortable), "created", cellItemListener)
-    {
-      @SuppressWarnings({ "unchecked", "rawtypes" })
+    final CellItemListenerPropertyColumn<SkillDO> created = new CellItemListenerPropertyColumn<SkillDO>(new Model<String>(
+        getString("created")), getSortable("created", sortable), "created", cellItemListener) {
+      @SuppressWarnings({ "unchecked", "rawtypes"})
       @Override
-      public void populateItem(final Item item, final String componentId,
-          final IModel rowModel)
+      public void populateItem(final Item item, final String componentId, final IModel rowModel)
       {
         final SkillDO skill = (SkillDO) rowModel.getObject();
-        item.add(new ListSelectActionPanel(componentId, rowModel,
-            SkillEditPage.class, skill.getId(), returnToPage, DateTimeFormatter
-                .instance().getFormattedDateTime(skill.getCreated())));
+        item.add(new ListSelectActionPanel(componentId, rowModel, SkillEditPage.class, skill.getId(), returnToPage, DateTimeFormatter
+            .instance().getFormattedDateTime(skill.getCreated())));
         addRowClick(item);
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     };
 
-    final CellItemListenerPropertyColumn<SkillDO> modified = new CellItemListenerPropertyColumn<SkillDO>(
-        getString("modified"), getSortable("lastUpdate", sortable),
-        "lastUpdate", cellItemListener);
+    final CellItemListenerPropertyColumn<SkillDO> modified = new CellItemListenerPropertyColumn<SkillDO>(getString("modified"),
+        getSortable("lastUpdate", sortable), "lastUpdate", cellItemListener);
 
-    final CellItemListenerPropertyColumn<SkillDO> title = new CellItemListenerPropertyColumn<SkillDO>(
-        new Model<String>(getString(I18N_KEY_SKILL_TITLE)), getSortable(
-            "title", sortable), "title", cellItemListener);
+    final CellItemListenerPropertyColumn<SkillDO> title = new CellItemListenerPropertyColumn<SkillDO>(SkillDO.class, getSortable("title",
+        sortable), "title", cellItemListener);
 
-    final CellItemListenerPropertyColumn<SkillDO> parentTitle = new CellItemListenerPropertyColumn<SkillDO>(
-        new Model<String>(getString(I18N_KEY_SKILL_PARENT)), getSortable(
-            "parent.title", sortable), "parent.title", cellItemListener);
+    final CellItemListenerPropertyColumn<SkillDO> parentTitle = new CellItemListenerPropertyColumn<SkillDO>(SkillDO.class, getSortable(
+        "parent.title", sortable), "parent.title", cellItemListener);
 
-    final CellItemListenerPropertyColumn<SkillDO> description = new CellItemListenerPropertyColumn<SkillDO>(
-        new Model<String>(getString(I18N_KEY_SKILL_DESCRIPTION)), getSortable(
-            "description", sortable), "description", cellItemListener);
+    final CellItemListenerPropertyColumn<SkillDO> description = new CellItemListenerPropertyColumn<SkillDO>(SkillDO.class, getSortable(
+        "description", sortable), "description", cellItemListener);
 
-    final CellItemListenerPropertyColumn<SkillDO> comment = new CellItemListenerPropertyColumn<SkillDO>(
-        new Model<String>(getString(I18N_KEY_SKILL_COMMENT)), getSortable(
-            "comment", sortable), "comment", cellItemListener);
+    final CellItemListenerPropertyColumn<SkillDO> comment = new CellItemListenerPropertyColumn<SkillDO>(SkillDO.class, getSortable(
+        "comment", sortable), "comment", cellItemListener);
 
-    final CellItemListenerPropertyColumn<SkillDO> rateable = new CellItemListenerPropertyColumn<SkillDO>(
-        new Model<String>(getString(I18N_KEY_SKILL_RATEABLE)), getSortable(
-            "rateable", sortable), "rateable", cellItemListener);
+    final CellItemListenerPropertyColumn<SkillDO> rateable = new CellItemListenerPropertyColumn<SkillDO>(SkillDO.class, getSortable(
+        "rateable", sortable), "rateable", cellItemListener);
 
     columns.add(created);
     columns.add(modified);
@@ -155,8 +129,7 @@ public class SkillListPage extends
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this, true), "lastUpdate",
-        SortOrder.DESCENDING);
+    dataTable = createDataTable(createColumns(this, true), "lastUpdate", SortOrder.DESCENDING);
     form.add(dataTable);
   }
 
@@ -173,7 +146,7 @@ public class SkillListPage extends
    * @see org.projectforge.web.wicket.AbstractListPage#newListForm(org.projectforge.web.wicket.AbstractListPage)
    */
   @Override
-  protected SkillListForm newListForm(final AbstractListPage<?, ?, ?> parentPage)
+  protected SkillListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new SkillListForm(this);
   }
