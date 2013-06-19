@@ -81,7 +81,7 @@ public class MyXlsContentProvider extends XlsContentProvider
       return ((PFUserDO)value).getFullname();
     } else if (value instanceof KontoDO) {
       final KontoDO konto = (KontoDO) value;
-      return konto.getNummer();
+      return konto.formatKonto();
     } else if (value instanceof Kost1DO) {
       return KostFormatter.format((Kost1DO)value);
     } else if (value instanceof Kost2DO) {
