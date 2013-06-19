@@ -23,6 +23,7 @@
 
 package org.projectforge.web.fibu;
 
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -44,9 +45,15 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.CurrencyFormatter;
+import org.projectforge.excel.ContentProvider;
+import org.projectforge.excel.ExportColumn;
+import org.projectforge.excel.I18nExportColumn;
+import org.projectforge.excel.PropertyMapping;
+import org.projectforge.export.DOListExcelExporter;
 import org.projectforge.fibu.AuftragsPositionVO;
 import org.projectforge.fibu.KontoCache;
 import org.projectforge.fibu.KontoDO;
+import org.projectforge.fibu.KundeFormatter;
 import org.projectforge.fibu.RechnungDO;
 import org.projectforge.fibu.RechnungDao;
 import org.projectforge.fibu.RechnungFilter;
@@ -239,6 +246,58 @@ IListPageColumnsCreator<RechnungDO>
       };
     }, getString("fibu.rechnung.kostExcelExport")).setTooltip(getString("fibu.rechnung.kostExcelExport.tootlip"));
     addContentMenuEntry(exportExcelButton);
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#createExcelExporter(java.lang.String)
+   */
+  @Override
+  protected DOListExcelExporter createExcelExporter(final String filenameIdentifier)
+  {
+    return new DOListExcelExporter(filenameIdentifier) {
+      /**
+       * @see org.projectforge.excel.ExcelExporter#onBeforeSettingColumns(java.util.List)
+       */
+      @Override
+      protected List<ExportColumn> onBeforeSettingColumns(final ContentProvider sheetProvider, final List<ExportColumn> columns)
+      {
+        final List<ExportColumn> sortedColumns = reorderColumns(columns, "nummer", "kunde", "projekt", "konto", "betreff", "datum",
+            "faelligkeit", "bezahlDatum");
+        I18nExportColumn col = new I18nExportColumn("netSum", "fibu.common.netto");
+        putCurrencyFormat(sheetProvider, col);
+        sortedColumns.add(8, col);
+        col = new I18nExportColumn("grossSum", "fibu.common.brutto");
+        putCurrencyFormat(sheetProvider, col);
+        sortedColumns.add(9, col);
+        return removeColumns(sortedColumns, "kundeText");
+      }
+
+      /**
+       * @see org.projectforge.excel.ExcelExporter#addMapping(org.projectforge.excel.PropertyMapping, java.lang.Object,
+       *      java.lang.reflect.Field)
+       */
+      @Override
+      public void addMapping(final PropertyMapping mapping, final Object entry, final Field field)
+      {
+        if ("kunde".equals(field.getName()) == true) {
+          final RechnungDO rechnung = (RechnungDO)entry;
+          mapping.add(field.getName(), KundeFormatter.formatKundeAsString(rechnung.getKunde(), rechnung.getKundeText()));
+        } else {
+          super.addMapping(mapping, entry, field);
+        }
+      }
+
+      /**
+       * @see org.projectforge.excel.ExcelExporter#addMappings(org.projectforge.excel.PropertyMapping, java.lang.Object)
+       */
+      @Override
+      protected void addMappings(final PropertyMapping mapping, final Object entry)
+      {
+        final RechnungDO invoice = (RechnungDO) entry;
+        mapping.add("grossSum", invoice.getGrossSum());
+        mapping.add("netSum", invoice.getNetSum());
+      }
+    };
   }
 
   protected void exportExcelWithCostAssignments()
