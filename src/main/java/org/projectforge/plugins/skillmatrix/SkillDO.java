@@ -43,7 +43,7 @@ import org.projectforge.database.Constants;
 
 /**
  * A skill usable for a skill-matrix.
- * @author Kai Reinhard (k.reinhard@micromata.de)
+ * @author Billy Duong (b.duong@micromata.de)
  * 
  */
 @Entity

@@ -48,12 +48,12 @@ import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
 /**
- * @author Billy Duong (duong.billy@yahoo.de)
+ * @author Billy Duong (b.duong@micromata.de)
  *
  */
 @ListPage(editPage = SkillRatingEditPage.class)
 public class SkillRatingListPage extends AbstractListPage<SkillRatingListForm, SkillRatingDao, SkillRatingDO> implements
-    IListPageColumnsCreator<SkillRatingDO>
+IListPageColumnsCreator<SkillRatingDO>
 {
 
   private static final long serialVersionUID = 3262800972072452074L;

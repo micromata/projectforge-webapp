@@ -37,7 +37,7 @@ import org.projectforge.task.TaskNode;
 /**
  * Holds the complete skill list as a tree. It will be initialized by the values read from the database. Any changes will be written to this
  * tree and to the database.
- * @author Kai Reinhard (k.reinhard@micromata.de)
+ * @author Billy Duong (b.duong@micromata.de)
  */
 public class SkillTree extends AbstractCache implements Serializable
 {

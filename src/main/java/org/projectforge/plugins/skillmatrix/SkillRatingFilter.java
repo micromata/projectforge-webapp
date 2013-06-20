@@ -29,7 +29,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
- * @author Billy Duong (duong.billy@yahoo.de)
+ * @author Billy Duong (b.duong@micromata.de)
  * 
  */
 @XStreamAlias("SkillRatingFilter")

@@ -30,7 +30,7 @@ import org.projectforge.core.I18nEnum;
 
 /**
  * 
- * @author Kai Reinhard (k.reinhard@micromata.de)
+ * @author Billy Duong (b.duong@micromata.de)
  * 
  */
 public enum SkillRating implements I18nEnum
@@ -76,18 +76,18 @@ public enum SkillRating implements I18nEnum
     final Collection<SkillRating> values = new ArrayList<SkillRating>(5);
     // The missing breaks are intentionally: this way the key of the case itself and all the cases higher are added.
     switch (rating) {
-    case UNKNOWN:
-      values.add(UNKNOWN);
-    case ZERO:
-      values.add(ZERO);
-    case LOW:
-      values.add(LOW);
-    case MIDDLE:
-      values.add(MIDDLE);
-    case HIGH:
-      values.add(HIGH);
-    case EXPERT:
-      values.add(EXPERT);
+      case UNKNOWN:
+        values.add(UNKNOWN);
+      case ZERO:
+        values.add(ZERO);
+      case LOW:
+        values.add(LOW);
+      case MIDDLE:
+        values.add(MIDDLE);
+      case HIGH:
+        values.add(HIGH);
+      case EXPERT:
+        values.add(EXPERT);
     }
     return values.toArray();
   }

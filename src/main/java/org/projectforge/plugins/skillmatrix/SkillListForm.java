@@ -28,7 +28,7 @@ import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.web.wicket.AbstractListForm;
 
 /**
- * @author Billy Duong (duong.billy@yahoo.de)
+ * @author Billy Duong (b.duong@micromata.de)
  *
  */
 public class SkillListForm extends AbstractListForm<BaseSearchFilter, SkillListPage>

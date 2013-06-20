@@ -32,7 +32,7 @@ import org.projectforge.user.UserRightId;
 
 /**
  * 
- * @author Kai Reinhard (k.reinhard@micromata.de)
+ * @author Billy Duong (b.duong@micromata.de)
  * 
  */
 public class SkillDao extends BaseDao<SkillDO>
