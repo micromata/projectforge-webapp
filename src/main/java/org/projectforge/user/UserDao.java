@@ -52,9 +52,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 
+ *
  * @author Kai Reinhard (k.reinhard@micromata.de)
- * 
+ *
  */
 public class UserDao extends BaseDao<PFUserDO>
 {
@@ -181,39 +181,10 @@ public class UserDao extends BaseDao<PFUserDO>
   }
 
   /**
-   * @see org.projectforge.core.BaseDao#afterSave(org.projectforge.core.ExtendedBaseDO)
+   * @see org.projectforge.core.BaseDao#afterSaveOrModify(org.projectforge.core.ExtendedBaseDO)
    */
   @Override
-  protected void afterSave(final PFUserDO obj)
-  {
-    userGroupCache.setExpired();
-  }
-
-  /**
-   * @see org.projectforge.core.BaseDao#afterUpdate(org.projectforge.core.ExtendedBaseDO, org.projectforge.core.ExtendedBaseDO, boolean)
-   */
-  @Override
-  protected void afterUpdate(final PFUserDO obj, final PFUserDO dbObj, final boolean isModified)
-  {
-    if (isModified == true) {
-      userGroupCache.setExpired();
-    }
-  }
-
-  /**
-   * @see org.projectforge.core.BaseDao#afterDelete(org.projectforge.core.ExtendedBaseDO)
-   */
-  @Override
-  protected void afterDelete(final PFUserDO obj)
-  {
-    userGroupCache.setExpired();
-  }
-
-  /**
-   * @see org.projectforge.core.BaseDao#afterUndelete(org.projectforge.core.ExtendedBaseDO)
-   */
-  @Override
-  protected void afterUndelete(final PFUserDO obj)
+  protected void afterSaveOrModify(final PFUserDO obj)
   {
     userGroupCache.setExpired();
   }
@@ -444,7 +415,7 @@ public class UserDao extends BaseDao<PFUserDO>
 
   /**
    * Get authentication key by user. ; )
-   * 
+   *
    * @param userName
    * @param authKey
    * @return
