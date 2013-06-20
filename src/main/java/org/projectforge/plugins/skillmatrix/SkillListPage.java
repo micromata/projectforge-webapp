@@ -100,8 +100,8 @@ public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, Ski
     final CellItemListenerPropertyColumn<SkillDO> title = new CellItemListenerPropertyColumn<SkillDO>(SkillDO.class, getSortable("title",
         sortable), "title", cellItemListener);
 
-    final CellItemListenerPropertyColumn<SkillDO> parentTitle = new CellItemListenerPropertyColumn<SkillDO>(SkillDO.class, getSortable(
-        "parent.title", sortable), "parent.title", cellItemListener);
+    final CellItemListenerPropertyColumn<SkillDO> parentTitle = new CellItemListenerPropertyColumn<SkillDO>(
+        getString("plugins.skillmatrix.skill.parent"), getSortable("parent.title", sortable), "parent.title", cellItemListener);
 
     final CellItemListenerPropertyColumn<SkillDO> description = new CellItemListenerPropertyColumn<SkillDO>(SkillDO.class, getSortable(
         "description", sortable), "description", cellItemListener);
