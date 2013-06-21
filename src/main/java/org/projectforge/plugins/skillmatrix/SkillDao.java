@@ -23,6 +23,7 @@
 
 package org.projectforge.plugins.skillmatrix;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -47,7 +48,7 @@ public class SkillDao extends BaseDao<SkillDO>
 
   public static final String I18N_KEY_ERROR_DUPLICATE_CHILD_SKILL = "plugins.skillmatrix.error.duplicateChildSkill";
 
-  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "parent.title" };
+  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "parent.title"};
 
   private final SkillTree skillTree = new SkillTree(this);
 
@@ -82,7 +83,8 @@ public class SkillDao extends BaseDao<SkillDO>
     skillTree.setExpired();
   }
 
-  public SkillTree getSkillTree() {
+  public SkillTree getSkillTree()
+  {
     return skillTree;
   }
 
@@ -91,13 +93,22 @@ public class SkillDao extends BaseDao<SkillDO>
   {
     // TODO: Check for valid Tree structure (root) -> example TaskDao.checkConstraintVilation
     List<SkillDO> list;
-    if(skill.getId() != null) {
-      list = getHibernateTemplate().find("from SkillDO s where s.parent.id = ? and s.title = ? and s.id != ?",
-          new Object[]{skill.getParentId(), skill.getTitle(), skill.getId()});
+    final StringBuilder sb = new StringBuilder();
+    sb.append("from SkillDO s where s.title=? and deleted=false and s.parent.id");
+    final List<Object> params= new LinkedList<Object>();
+    params.add(skill.getTitle());
+    if (skill.getParentId() != null) {
+      sb.append("=?");
+      params.add(skill.getParentId());
     } else {
-      list = getHibernateTemplate().find("from SkillDO s where s.parent.id = ? and s.title = ?", new Object[]{skill.getParentId(), skill.getTitle()});
+      sb.append(" is null ");
     }
-    if(CollectionUtils.isNotEmpty(list) == true) {
+    if (skill.getId() != null) {
+      sb.append(" and s.id != ?");
+      params.add(skill.getId());
+    }
+    list = getHibernateTemplate().find(sb.toString(), params.toArray());
+    if (CollectionUtils.isNotEmpty(list) == true) {
       throw new UserException(I18N_KEY_ERROR_DUPLICATE_CHILD_SKILL);
     }
   }
