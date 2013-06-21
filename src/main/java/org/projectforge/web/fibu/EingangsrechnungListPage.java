@@ -217,13 +217,15 @@ IListPageColumnsCreator<EingangsrechnungDO>
       @Override
       protected List<ExportColumn> onBeforeSettingColumns(final ContentProvider sheetProvider, final List<ExportColumn> columns)
       {
+        final List<ExportColumn> sortedColumns = reorderColumns(columns, "kreditor", "konto", "betreff", "datum",
+            "faelligkeit", "bezahlDatum", "zahlBetrag");
         I18nExportColumn col = new I18nExportColumn("netSum", "fibu.common.netto");
         putCurrencyFormat(sheetProvider, col);
-        columns.add(7, col);
+        sortedColumns.add(6, col);
         col = new I18nExportColumn("grossSum", "fibu.common.brutto");
         putCurrencyFormat(sheetProvider, col);
-        columns.add(8, col);
-        return columns;
+        sortedColumns.add(7, col);
+        return sortedColumns;
       }
 
       /**
@@ -254,6 +256,8 @@ IListPageColumnsCreator<EingangsrechnungDO>
     }
     final String filename = "ProjectForge-"
         + getString("fibu.common.creditor")
+        + "-"
+        + getString("menu.fibu.kost")
         + "_"
         + DateHelper.getDateAsFilenameSuffix(new Date())
         + ".xls";

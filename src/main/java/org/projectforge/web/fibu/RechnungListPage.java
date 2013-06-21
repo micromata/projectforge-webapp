@@ -170,8 +170,7 @@ IListPageColumnsCreator<RechnungDO>
     columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.projekt"), getSortable("projekt.name", sortable),
         "projekt.name", cellItemListener));
     if (Registry.instance().getKontoCache().isEmpty() == false) {
-      columns.add(new CellItemListenerPropertyColumn<RechnungDO>(new Model<String>(getString("fibu.konto")), null, "konto",
-          cellItemListener) {
+      columns.add(new CellItemListenerPropertyColumn<RechnungDO>(RechnungDO.class, null, "konto", cellItemListener) {
         /**
          * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
          *      java.lang.String, org.apache.wicket.model.IModel)
@@ -186,8 +185,8 @@ IListPageColumnsCreator<RechnungDO>
         }
       });
     }
-    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.betreff"), getSortable("betreff", sortable),
-        "betreff", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(RechnungDO.class, getSortable("betreff", sortable), "betreff",
+        cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.datum.short"), getSortable("datum", sortable),
         "datum", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.faelligkeit.short"), getSortable("faelligkeit",
@@ -201,8 +200,7 @@ IListPageColumnsCreator<RechnungDO>
     // columns.add(new CurrencyPropertyColumn<RechnungDO>(getString("fibu.rechnung.zahlBetrag.short"), getSortable("zahlBetrag", sortable),
     // "zahlBetrag",
     // cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(new Model<String>(getString("fibu.auftrag.auftraege")), null, null,
-        cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.auftrag.auftraege"), null, null, cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<RechnungDO>> item, final String componentId, final IModel<RechnungDO> rowModel)
       {
@@ -225,10 +223,10 @@ IListPageColumnsCreator<RechnungDO>
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(new Model<String>(getString("comment")), getSortable("bemerkung", sortable),
-        "bemerkung", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(new Model<String>(getString("status")), getSortable("status", sortable),
-        "status", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(RechnungDO.class, getSortable("bemerkung", sortable), "bemerkung",
+        cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(RechnungDO.class, getSortable("status", sortable), "status",
+        cellItemListener));
     return columns;
   }
 
@@ -265,7 +263,7 @@ IListPageColumnsCreator<RechnungDO>
       protected List<ExportColumn> onBeforeSettingColumns(final ContentProvider sheetProvider, final List<ExportColumn> columns)
       {
         final List<ExportColumn> sortedColumns = reorderColumns(columns, "nummer", "kunde", "projekt", "konto", "betreff", "datum",
-            "faelligkeit", "bezahlDatum");
+            "faelligkeit", "bezahlDatum", "zahlBetrag");
         I18nExportColumn col = new I18nExportColumn("netSum", "fibu.common.netto");
         putCurrencyFormat(sheetProvider, col);
         sortedColumns.add(8, col);
@@ -283,7 +281,7 @@ IListPageColumnsCreator<RechnungDO>
       public void addMapping(final PropertyMapping mapping, final Object entry, final Field field)
       {
         if ("kunde".equals(field.getName()) == true) {
-          final RechnungDO rechnung = (RechnungDO)entry;
+          final RechnungDO rechnung = (RechnungDO) entry;
           mapping.add(field.getName(), KundeFormatter.formatKundeAsString(rechnung.getKunde(), rechnung.getKundeText()));
         } else {
           super.addMapping(mapping, entry, field);
@@ -318,6 +316,8 @@ IListPageColumnsCreator<RechnungDO>
     }
     final String filename = "ProjectForge-"
         + getString("fibu.common.debitor")
+        + "-"
+        + getString("menu.fibu.kost")
         + "_"
         + DateHelper.getDateAsFilenameSuffix(new Date())
         + ".xls";
