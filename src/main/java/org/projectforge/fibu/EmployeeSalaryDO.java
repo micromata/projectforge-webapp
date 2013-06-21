@@ -44,6 +44,7 @@ import org.hibernate.search.annotations.Store;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.Constants;
 import org.projectforge.core.DefaultBaseDO;
+import org.projectforge.core.PropertyInfo;
 
 /**
  * Das monatliche Gehalt eines festangestellten Mitarbeiters.
@@ -56,21 +57,27 @@ public class EmployeeSalaryDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = -6854150096887750382L;
 
+  @PropertyInfo(i18nKey = "fibu.employee")
   @IndexedEmbedded(depth = 2)
   private EmployeeDO employee;
 
+  @PropertyInfo(i18nKey = "calendar.year")
   @Field(index = Index.UN_TOKENIZED, store = Store.NO)
   private Integer year;
 
+  @PropertyInfo(i18nKey = "calendar.month")
   @Field(index = Index.UN_TOKENIZED, store = Store.NO)
   private Integer month;
 
+  @PropertyInfo(i18nKey = "fibu.employee.salary.bruttoMitAgAnteil")
   @Field(index = Index.UN_TOKENIZED, store = Store.NO)
   private BigDecimal bruttoMitAgAnteil;
 
+  @PropertyInfo(i18nKey = "comment")
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String comment;
 
+  @PropertyInfo(i18nKey = "fibu.employee.salary.type")
   private EmployeeSalaryType type;
 
   /**

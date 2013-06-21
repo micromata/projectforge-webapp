@@ -64,7 +64,7 @@ public class EmployeeSalaryEditForm extends AbstractEditForm<EmployeeSalaryDO, E
     gridBuilder.newGridPanel();
     {
       // Employee
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.employee"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(EmployeeSalaryDO.class, "employee");
       final EmployeeSelectPanel employeeSelectPanel = new EmployeeSelectPanel(fs.newChildId(), new PropertyModel<EmployeeDO>(data,
           "employee"), parentPage, "employee");
       fs.add(employeeSelectPanel);
@@ -73,8 +73,8 @@ public class EmployeeSalaryEditForm extends AbstractEditForm<EmployeeSalaryDO, E
     }
     {
       // DropDownChoice months
-      final FieldsetPanel fs = gridBuilder.newFieldset(
-          WicketUtils.createMultipleFieldsetLabel(getString("calendar.month"), getString("calendar.year")));
+      final FieldsetPanel fs = gridBuilder.newFieldset(WicketUtils.createMultipleFieldsetLabel(getString("calendar.month"),
+          getString("calendar.year")));
       final LabelValueChoiceRenderer<Integer> monthChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
       for (int i = 0; i <= 11; i++) {
         monthChoiceRenderer.addValue(i, StringHelper.format2DigitNumber(i + 1));
@@ -91,7 +91,7 @@ public class EmployeeSalaryEditForm extends AbstractEditForm<EmployeeSalaryDO, E
     }
     {
       // DropDownChoice salary type
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.employee.salary.type"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(EmployeeSalaryDO.class, "type");
       final LabelValueChoiceRenderer<EmployeeSalaryType> typeStatusChoiceRenderer = new LabelValueChoiceRenderer<EmployeeSalaryType>(fs,
           EmployeeSalaryType.values());
       final DropDownChoice<EmployeeSalaryType> typeChoice = new DropDownChoice<EmployeeSalaryType>(fs.getDropDownChoiceId(),
@@ -101,7 +101,7 @@ public class EmployeeSalaryEditForm extends AbstractEditForm<EmployeeSalaryDO, E
     }
     {
       // DropDownChoice salary gross sum with employee part
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.employee.salary.bruttoMitAgAnteil"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(EmployeeSalaryDO.class, "bruttoMitAgAnteil");
       fs.add(new TextField<BigDecimal>(InputPanel.WICKET_ID, new PropertyModel<BigDecimal>(data, "bruttoMitAgAnteil")) {
         @SuppressWarnings({ "unchecked", "rawtypes"})
         @Override
@@ -113,7 +113,7 @@ public class EmployeeSalaryEditForm extends AbstractEditForm<EmployeeSalaryDO, E
     }
     {
       // Comment
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(EmployeeSalaryDO.class, "comment");
       fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "comment")), true);
     }
   }

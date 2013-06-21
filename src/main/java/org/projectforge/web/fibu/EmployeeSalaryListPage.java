@@ -23,6 +23,7 @@
 
 package org.projectforge.web.fibu;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -34,10 +35,14 @@ import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHelper;
+import org.projectforge.core.PropertyInfo;
+import org.projectforge.excel.ContentProvider;
+import org.projectforge.excel.ExportColumn;
+import org.projectforge.excel.PropertyMapping;
+import org.projectforge.export.DOListExcelExporter;
 import org.projectforge.fibu.EmployeeSalaryDO;
 import org.projectforge.fibu.EmployeeSalaryDao;
 import org.projectforge.fibu.datev.EmployeeSalaryExportDao;
@@ -86,8 +91,8 @@ public class EmployeeSalaryListPage extends AbstractListPage<EmployeeSalaryListF
         appendCssClasses(item, employeeSalary.getId(), employeeSalary.isDeleted());
       }
     };
-    columns.add(new CellItemListenerPropertyColumn<EmployeeSalaryDO>(new Model<String>(getString("calendar.month")), getSortable(
-        "formattedYearAndMonth", sortable), "formattedYearAndMonth", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<EmployeeSalaryDO>(getString("calendar.month"), getSortable("formattedYearAndMonth",
+        sortable), "formattedYearAndMonth", cellItemListener) {
       /**
        * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
        *      java.lang.String, org.apache.wicket.model.IModel)
@@ -108,16 +113,16 @@ public class EmployeeSalaryListPage extends AbstractListPage<EmployeeSalaryListF
         addRowClick(item);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<EmployeeSalaryDO>(new Model<String>(getString("name")), getSortable(
-        "employee.user.lastname", sortable), "employee.user.lastname", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<EmployeeSalaryDO>(new Model<String>(getString("firstName")), getSortable(
-        "employee.user.firstname", sortable), "employee.user.firstname", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<EmployeeSalaryDO>(new Model<String>(getString("fibu.employee.salary.type")),
-        getSortable("type", sortable), "type", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<EmployeeSalaryDO>(getString("name"), getSortable("employee.user.lastname", sortable),
+        "employee.user.lastname", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<EmployeeSalaryDO>(getString("firstName"), getSortable("employee.user.firstname",
+        sortable), "employee.user.firstname", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<EmployeeSalaryDO>(EmployeeSalaryDO.class, getSortable("type", sortable), "type",
+        cellItemListener));
     columns.add(new CurrencyPropertyColumn<EmployeeSalaryDO>(getString("fibu.employee.salary.bruttoMitAgAnteil"), getSortable(
         "bruttoMitAgAnteil", sortable), "bruttoMitAgAnteil", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<EmployeeSalaryDO>(new Model<String>(getString("comment")), getSortable("comment",
-        sortable), "comment", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<EmployeeSalaryDO>(EmployeeSalaryDO.class, getSortable("comment", sortable), "comment",
+        cellItemListener));
     return columns;
   }
 
@@ -148,6 +153,7 @@ public class EmployeeSalaryListPage extends AbstractListPage<EmployeeSalaryListF
     final List<IColumn<EmployeeSalaryDO, String>> columns = createColumns(this, true);
     dataTable = createDataTable(columns, "employee.user.lastname", SortOrder.ASCENDING);
     form.add(dataTable);
+    addExcelExport(getString("fibu.employee.salaries"), getString("fibu.employee.salaries"));
     {
       // Excel export
       @SuppressWarnings("serial")
@@ -163,9 +169,53 @@ public class EmployeeSalaryListPage extends AbstractListPage<EmployeeSalaryListF
         }
       };
       final ContentMenuEntryPanel excelExportButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), excelExportLink,
-          getString("exportAsXls")).setTooltip(getString("fibu.employee.salary.exportXls.tooltip"));
+          getString("fibu.rechnung.kostExcelExport")).setTooltip(getString("fibu.employee.salary.exportXls.tooltip"));
       addContentMenuEntry(excelExportButton);
     }
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#createExcelExporter(java.lang.String)
+   */
+  @Override
+  protected DOListExcelExporter createExcelExporter(final String filenameIdentifier)
+  {
+    return new DOListExcelExporter(filenameIdentifier) {
+      /**
+       * @see org.projectforge.export.MyExcelExporter#putFieldFormat(org.projectforge.excel.ContentProvider, java.lang.reflect.Field,
+       *      org.projectforge.core.PropertyInfo, org.projectforge.excel.ExportColumn)
+       */
+      @Override
+      public void putFieldFormat(final ContentProvider sheetProvider, final Field field, final PropertyInfo propInfo,
+          final ExportColumn exportColumn)
+      {
+        if ("month".equals(field.getName()) == true) {
+          sheetProvider.putFormat(exportColumn, "mmm");
+          exportColumn.setWidth(6);
+        } else if ("year".equals(field.getName()) == true) {
+          sheetProvider.putFormat(exportColumn, "#");
+          exportColumn.setWidth(6);
+        } else {
+          super.putFieldFormat(sheetProvider, field, propInfo, exportColumn);
+        }
+      }
+
+      /**
+       * @see org.projectforge.excel.ExcelExporter#addMapping(org.projectforge.excel.PropertyMapping, java.lang.Object,
+       *      java.lang.reflect.Field)
+       */
+      @Override
+      public void addMapping(final PropertyMapping mapping, final Object entry, final Field field)
+      {
+        if ("month".equals(field.getName()) == true) {
+          final EmployeeSalaryDO salary = (EmployeeSalaryDO) entry;
+          // Excel month starts with 1 instead of 0:
+          mapping.add(field.getName(), salary.getMonth() + 1);
+        } else {
+          super.addMapping(mapping, entry, field);
+        }
+      }
+    };
   }
 
   @Override
