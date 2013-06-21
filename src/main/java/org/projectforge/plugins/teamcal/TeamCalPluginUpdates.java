@@ -59,8 +59,8 @@ public class TeamCalPluginUpdates
   final static Class< ? >[] doClasses = new Class< ? >[] { //
     TeamCalDO.class, TeamEventDO.class, TeamEventAttendeeDO.class};
 
-  final static String[] newAttributes51 = { "externalSubscription", "externalSubscriptionCalendarBinary", "externalSubscriptionHash", "externalSubscriptionUrl",
-  "externalSubscriptionUpdateInterval"};
+  final static String[] newAttributes51 = { "externalSubscription", "externalSubscriptionCalendarBinary", "externalSubscriptionHash",
+    "externalSubscriptionUrl", "externalSubscriptionUpdateInterval"};
 
   @SuppressWarnings("serial")
   public static List<UpdateEntry> getUpdateEntries()
@@ -148,6 +148,25 @@ public class TeamCalPluginUpdates
           configurationEditPage.setReturnToPage(new SystemUpdatePage(new PageParameters()));
           throw new RestartResponseException(configurationEditPage);
         }
+      }
+
+      /**
+       * @see org.projectforge.continuousdb.UpdateEntry#createMissingIndices()
+       */
+      @Override
+      public int createMissingIndices()
+      {
+        int result = 0;
+        if (dao.createIndex("idx_plugin_team_cal_time", "t_plugin_calendar_event", "calendar_fk, start_date, end_date") == true) {
+          ++result;
+        }
+        if (dao.createIndex("idx_plugin_team_cal_start_date", "t_plugin_calendar_event", "calendar_fk, start_date") == true) {
+          ++result;
+        }
+        if (dao.createIndex("idx_plugin_team_cal_end_date", "t_plugin_calendar_event", "calendar_fk, end_date") == true) {
+          ++result;
+        }
+        return result;
       }
     };
   }
