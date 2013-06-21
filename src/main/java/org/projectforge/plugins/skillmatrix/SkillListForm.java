@@ -24,14 +24,16 @@
 package org.projectforge.plugins.skillmatrix;
 
 import org.apache.log4j.Logger;
-import org.projectforge.core.BaseSearchFilter;
+import org.apache.wicket.markup.html.form.Button;
+import org.apache.wicket.model.Model;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.components.SingleButtonPanel;
 
 /**
  * @author Billy Duong (b.duong@micromata.de)
- *
+ * 
  */
-public class SkillListForm extends AbstractListForm<BaseSearchFilter, SkillListPage>
+public class SkillListForm extends AbstractListForm<SkillFilter, SkillListPage>
 {
   private static final long serialVersionUID = 5333752125044497290L;
 
@@ -46,12 +48,29 @@ public class SkillListForm extends AbstractListForm<BaseSearchFilter, SkillListP
   }
 
   /**
+   * @see org.projectforge.web.wicket.AbstractListForm#init()
+   */
+  @Override
+  protected void init()
+  {
+    super.init();
+    final Button skillTreeButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("treeView")) {
+      @Override
+      public void onSubmit() {
+        parentPage.onTreeViewSubmit();
+      }
+    };
+    actionButtons.add(2, new SingleButtonPanel(actionButtons.newChildId(), skillTreeButton, "Tree View",
+        SingleButtonPanel.NORMAL));
+  }
+
+  /**
    * @see org.projectforge.web.wicket.AbstractListForm#newSearchFilterInstance()
    */
   @Override
-  protected BaseSearchFilter newSearchFilterInstance()
+  protected SkillFilter newSearchFilterInstance()
   {
-    return new BaseSearchFilter();
+    return new SkillFilter();
   }
 
   /**

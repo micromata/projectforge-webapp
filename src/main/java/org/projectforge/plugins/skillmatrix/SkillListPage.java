@@ -57,6 +57,10 @@ public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, Ski
 
   public static final String I18N_KEY_PREFIX = "plugins.skillmatrix";
 
+  private SkillTree skillTree;
+
+  private SkillTreePage skillTreePage;
+
   public SkillListPage(final PageParameters parameters)
   {
     super(parameters, I18N_KEY_PREFIX);
@@ -132,6 +136,15 @@ public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, Ski
   {
     dataTable = createDataTable(createColumns(this, true), "lastUpdate", SortOrder.DESCENDING);
     form.add(dataTable);
+  }
+
+  void onTreeViewSubmit()
+  {
+    if (skillTreePage != null) {
+      setResponsePage(skillTreePage);
+    } else {
+      setResponsePage(new SkillTreePage(this, getPageParameters()));
+    }
   }
 
   /**
