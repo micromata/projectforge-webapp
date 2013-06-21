@@ -34,6 +34,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.web.wicket.AbstractEditForm;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
@@ -76,10 +77,11 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
     {
       // Title of skill
       final FieldsetPanel fs = gridBuilder.newFieldset(SkillDO.class, "title");
-      final RequiredMaxLengthTextField skillTextField = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
+      final RequiredMaxLengthTextField titleField = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
           "title"));
-      fs.add(skillTextField);
-      dependentFormComponents[0] = skillTextField;
+      WicketUtils.setFocus(titleField);
+      fs.add(titleField);
+      dependentFormComponents[0] = titleField;
     }
     {
       // Parent, look at UserSelectPanel for fine tuning
