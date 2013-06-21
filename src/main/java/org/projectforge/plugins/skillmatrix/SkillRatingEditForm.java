@@ -51,30 +51,14 @@ import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
- * @author Billy Duong (duong.billy@yahoo.de)
- * 
+ * @author Billy Duong (b.duong@micromata.de)
+ *
  */
 public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRatingEditPage>
 {
   private static final long serialVersionUID = -4997909992117525036L;
 
   private static final Logger log = Logger.getLogger(SkillRatingEditForm.class);
-
-  public static final String I18N_KEY_USER = "plugins.skillmatrix.skillrating.user";
-
-  public static final String I18N_KEY_SKILL = "plugins.skillmatrix.skillrating.skill";
-
-  public static final String I18N_KEY_RATING = "plugins.skillmatrix.skillrating.rating";
-
-  public static final String I18N_KEY_SINCE_YEAR = "plugins.skillmatrix.skillrating.sinceyear";
-
-  public static final String I18N_KEY_CERTIFICATES = "plugins.skillmatrix.skillrating.certificates";
-
-  public static final String I18N_KEY_TRAINING_COURSES = "plugins.skillmatrix.skillrating.trainingcourses";
-
-  public static final String I18N_KEY_DESCRIPTION = "plugins.skillmatrix.skillrating.description";
-
-  public static final String I18N_KEY_COMMENT = "plugins.skillmatrix.skillrating.comment";
 
   public static final String I18N_KEY_ERROR_RATEABLE_SKILL_WITH_NULL_RATING = "plugins.skillmatrix.error.rateableSkillWithNullRating";
 
@@ -135,14 +119,14 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
     gridBuilder.newGridPanel();
     {
       // User
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString(I18N_KEY_USER)).suppressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(SkillRatingDO.class, "user").suppressLabelForWarning();
       final DivTextPanel username = new DivTextPanel(fs.newChildId(), data.getUser().getUsername());
       username.setStrong();
       fs.add(username);
     }
     {
       // Skill, look at UserSelectPanel for fine tuning ( getConverter() )
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString(I18N_KEY_SKILL));
+      final FieldsetPanel fs = gridBuilder.newFieldset(SkillRatingDO.class, "skill");
       final PFAutoCompleteTextField<SkillDO> autoCompleteTextField = new PFAutoCompleteTextField<SkillDO>(fs.getTextFieldId(),
           new PropertyModel<SkillDO>(data, "skill")) {
         @Override
@@ -225,7 +209,7 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
     }
     {
       // Skill rating
-      fs = gridBuilder.newFieldset(getString(I18N_KEY_RATING));
+      fs = gridBuilder.newFieldset(SkillRatingDO.class, "skillRating");
       fs.getFieldset().setOutputMarkupId(true);
       final LabelValueChoiceRenderer<SkillRating> ratingChoiceRenderer = new LabelValueChoiceRenderer<SkillRating>(this,
           SkillRating.values());
@@ -246,27 +230,27 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
     }
     {
       // Since year
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString(I18N_KEY_SINCE_YEAR));
+      final FieldsetPanel fs = gridBuilder.newFieldset(SkillRatingDO.class, "sinceYear");
       fs.add(new MinMaxNumberField<Integer>(fs.getTextFieldId(), new PropertyModel<Integer>(data, "sinceYear"), 0, 9000));
     }
     {
       // Certificates
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString(I18N_KEY_CERTIFICATES));
+      final FieldsetPanel fs = gridBuilder.newFieldset(SkillRatingDO.class, "certificates");
       fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "certificates")));
     }
     {
       // Training courses
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString(I18N_KEY_TRAINING_COURSES));
+      final FieldsetPanel fs = gridBuilder.newFieldset(SkillRatingDO.class, "trainingCourses");
       fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "trainingCourses")));
     }
     {
       // Description
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString(I18N_KEY_DESCRIPTION));
+      final FieldsetPanel fs = gridBuilder.newFieldset(SkillRatingDO.class, "description");
       fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "description"))).setAutogrow();
     }
     {
       // Comment
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString(I18N_KEY_COMMENT));
+      final FieldsetPanel fs = gridBuilder.newFieldset(SkillRatingDO.class, "comment");
       fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "comment"))).setAutogrow();
     }
   }

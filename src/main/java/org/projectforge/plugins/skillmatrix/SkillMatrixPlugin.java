@@ -30,12 +30,13 @@ import org.projectforge.web.MenuItemDef;
 import org.projectforge.web.MenuItemDefId;
 
 /**
- * @author Kai Reinhard (k.reinhard@micromata.de)
+ * @author Billy Duong (b.duong@micromata.de)
  */
 public class SkillMatrixPlugin extends AbstractPlugin
 {
   public static final String ID_SKILL_RATING = "skillRating";
   public static final String ID_SKILL = "skill";
+  public static final String ID_SKILL_TREE = "skillTree";
 
   public static final String RESOURCE_BUNDLE_NAME = SkillMatrixPlugin.class.getPackage().getName() + ".SkillMatrixI18nResources";
 
@@ -48,6 +49,8 @@ public class SkillMatrixPlugin extends AbstractPlugin
   public static final String I18N_KEY_SKILLRATING_MENU_ENTRY = "plugins.skillmatrix.skillrating.menu";
 
   public static final String I18N_KEY_SKILL_MENU_ENTRY = "plugins.skillmatrix.skill.menu";
+
+  public static final String I18N_KEY_SKILLTREE_MENU_ENTRY = "plugins.skillmatrix.skilltree.menu";
 
   /**
    * This dao should be defined in pluginContext.xml (as resources) for proper initialization.
@@ -80,6 +83,7 @@ public class SkillMatrixPlugin extends AbstractPlugin
     // Register the menu entry as sub menu entry of the misc menu:
     final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
 
+    registerMenuItem(new MenuItemDef(parentMenu, ID_SKILL_TREE, 5, I18N_KEY_SKILLTREE_MENU_ENTRY, SkillTreePage.class));
     registerMenuItem(new MenuItemDef(parentMenu, ID_SKILL_RATING, 5, I18N_KEY_SKILLRATING_MENU_ENTRY, SkillRatingListPage.class));
     registerMenuItem(new MenuItemDef(parentMenu, ID_SKILL, 5, I18N_KEY_SKILL_MENU_ENTRY, SkillListPage.class));
 

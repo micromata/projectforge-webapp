@@ -44,7 +44,7 @@ import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
 /**
- * @author Billy Duong (duong.billy@yahoo.de)
+ * @author Billy Duong (b.duong@micromata.de)
  * 
  */
 @ListPage(editPage = SkillEditPage.class)
@@ -100,6 +100,7 @@ public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, Ski
     final CellItemListenerPropertyColumn<SkillDO> title = new CellItemListenerPropertyColumn<SkillDO>(SkillDO.class, getSortable("title",
         sortable), "title", cellItemListener);
 
+    // TODO: Workaround with get (hardcoded I18N), needs a better solution.
     final CellItemListenerPropertyColumn<SkillDO> parentTitle = new CellItemListenerPropertyColumn<SkillDO>(
         getString("plugins.skillmatrix.skill.parent"), getSortable("parent.title", sortable), "parent.title", cellItemListener);
 

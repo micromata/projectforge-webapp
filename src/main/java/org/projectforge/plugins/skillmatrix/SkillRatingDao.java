@@ -34,7 +34,7 @@ import org.projectforge.core.UserException;
 import org.projectforge.user.UserRightId;
 
 /**
- * @author Billy Duong (duong.billy@yahoo.de)
+ * @author Billy Duong (b.duong@micromata.de)
  * 
  */
 public class SkillRatingDao extends BaseDao<SkillRatingDO>

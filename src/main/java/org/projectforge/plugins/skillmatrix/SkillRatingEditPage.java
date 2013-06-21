@@ -29,7 +29,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.wicket.AbstractEditPage;
 
 /**
- * @author Billy Duong (duong.billy@yahoo.de)
+ * @author Billy Duong (b.duong@micromata.de)
  *
  */
 public class SkillRatingEditPage extends AbstractEditPage<SkillRatingDO, SkillRatingEditForm, SkillRatingDao>

@@ -30,7 +30,7 @@ import org.projectforge.user.UserRightCategory;
 import org.projectforge.user.UserRightValue;
 
 /**
- * @author Billy Duong (duong.billy@yahoo.de)
+ * @author Billy Duong (b.duong@micromata.de)
  *
  */
 public class SkillRight extends UserRightAccessCheck<SkillDO>
