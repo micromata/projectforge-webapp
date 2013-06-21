@@ -67,6 +67,15 @@ public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, Ski
   }
 
   /**
+   * @param skillTreePage2
+   * @param pageParameters
+   */
+  public SkillListPage(final SkillTreePage skillTreePage, final PageParameters pageParameters) {
+    super(pageParameters, I18N_KEY_PREFIX);
+    this.skillTreePage = skillTreePage;
+  }
+
+  /**
    * @see org.projectforge.web.wicket.IListPageColumnsCreator#createColumns(org.apache.wicket.markup.html.WebPage, boolean)
    */
   @SuppressWarnings("serial")

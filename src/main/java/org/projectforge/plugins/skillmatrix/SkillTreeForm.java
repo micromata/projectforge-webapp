@@ -10,7 +10,20 @@
 package org.projectforge.plugins.skillmatrix;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.markup.html.form.Button;
+import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
+import org.apache.wicket.model.PropertyModel;
+import org.projectforge.web.task.TaskListForm;
 import org.projectforge.web.wicket.AbstractForm;
+import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.bootstrap.GridBuilder;
+import org.projectforge.web.wicket.bootstrap.GridSize;
+import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.InputPanel;
 import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
 
 /**
@@ -26,13 +39,16 @@ public class SkillTreeForm extends AbstractForm<SkillFilter, SkillTreePage>
 
   private MyComponentsRepeater<Component> actionButtons;
 
+  protected GridBuilder gridBuilder;
+
+  private SkillFilter searchFilter;
+
   /**
    * @param parentPage
    */
   public SkillTreeForm(final SkillTreePage parentPage)
   {
     super(parentPage);
-    init();
   }
 
   /**
@@ -43,22 +59,56 @@ public class SkillTreeForm extends AbstractForm<SkillFilter, SkillTreePage>
   {
     super.init();
 
-    // actionButtons = new MyComponentsRepeater<Component>("actionButtons");
-    // add(actionButtons.getRepeatingView());
-    // {
-    // @SuppressWarnings("serial")
-    // final Button skillListButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("listView")) {
-    // @Override
-    // public void onSubmit()
-    // {
-    // getParentPage().onListViewSubmit();
-    // }
-    // };
-    // final SingleButtonPanel skillListButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), skillListButton, "List View",
-    // SingleButtonPanel.NORMAL);
-    // actionButtons.add(skillListButtonPanel);
-    // }
+    gridBuilder = newGridBuilder(this, "flowform");
+    {
+      gridBuilder.newSplitPanel(GridSize.COL100);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("searchFilter"));
+      final TextField<String> searchField = new TextField<String>(InputPanel.WICKET_ID, new PropertyModel<String>(getSearchFilter(),
+          "searchString"));
+      searchField.add(WicketUtils.setFocus());
+      fs.add(new InputPanel(fs.newChildId(), searchField));
+      // fs.add(new IconPanel(fs.newIconChildId(), IconType.HELP, getString("tooltip.lucene.link")).setOnClickLocation(getRequestCycle(),
+      // WebConstants.DOC_LINK_HANDBUCH_LUCENE, true), FieldSetIconPosition.TOP_RIGHT);
+    }
 
+    actionButtons = new MyComponentsRepeater<Component>("actionButtons");
+    add(actionButtons.getRepeatingView());
+    {
+      @SuppressWarnings("serial")
+      final Button skillListButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("listView")) {
+        @Override
+        public void onSubmit()
+        {
+          getParentPage().onListViewSubmit();
+        }
+      };
+      final SingleButtonPanel skillListButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), skillListButton, "List View",
+          SingleButtonPanel.NORMAL);
+      actionButtons.add(skillListButtonPanel);
+    }
+
+  }
+
+  public SkillFilter getSearchFilter()
+  {
+    if (this.searchFilter == null) {
+      final Object filter = getParentPage().getUserPrefEntry(SkillListForm.class.getName() + ":Filter");
+      if (filter != null) {
+        try {
+          this.searchFilter = (SkillFilter) filter;
+        } catch (final ClassCastException ex) {
+          // Probably a new software release results in an incompability of old and new filter format.
+          log.info("Could not restore filter from user prefs: (old) filter type "
+              + filter.getClass().getName()
+              + " is not assignable to (new) filter type TaskFilter (OK, probably new software release).");
+        }
+      }
+    }
+    if (this.searchFilter == null) {
+      this.searchFilter = new SkillFilter();
+      getParentPage().putUserPrefEntry(TaskListForm.class.getName() + ":Filter", this.searchFilter, true);
+    }
+    return this.searchFilter;
   }
 
   @Override
@@ -66,6 +116,27 @@ public class SkillTreeForm extends AbstractForm<SkillFilter, SkillTreePage>
   {
     super.onBeforeRender();
     actionButtons.render();
+  }
+
+  @SuppressWarnings("serial")
+  private class MyCheckBoxPanel extends CheckBoxPanel
+  {
+    public MyCheckBoxPanel(final String id, final IModel<Boolean> model, final String labelString)
+    {
+      super(id, model, labelString);
+    }
+
+    @Override
+    protected boolean wantOnSelectionChangedNotifications()
+    {
+      return true;
+    }
+
+    @Override
+    protected void onSelectionChanged(final Boolean newSelection)
+    {
+      // parentPage.refresh();
+    }
   }
 
 }

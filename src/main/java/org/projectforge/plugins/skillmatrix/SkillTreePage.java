@@ -46,8 +46,7 @@ public class SkillTreePage extends AbstractSecuredPage
    */
   public SkillTreePage(final SkillListPage skillListPage, final PageParameters parameters)
   {
-    //TODO rewrite
-    super(new PageParameters());
+    super(parameters);
     this.skillListPage = skillListPage;
     init();
   }
@@ -61,12 +60,17 @@ public class SkillTreePage extends AbstractSecuredPage
 
   private void init()
   {
-    // form = new SkillTreeForm(this);
-    // body.add(form);
+    form = new SkillTreeForm(this);
+    body.add(form);
+    form.init();
   }
 
   public void onListViewSubmit() {
-    setResponsePage(skillListPage);
+    if (skillListPage != null) {
+      setResponsePage(skillListPage);
+    } else {
+      setResponsePage(new SkillListPage(this, getPageParameters()));
+    }
   }
 
   /**
