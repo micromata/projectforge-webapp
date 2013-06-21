@@ -34,8 +34,11 @@ import java.util.Map;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.access.AccessException;
 import org.projectforge.continuousdb.DatabaseUpdateDao;
+import org.projectforge.continuousdb.UpdateEntry;
 import org.projectforge.continuousdb.UpdaterConfiguration;
 import org.projectforge.core.BaseDO;
+import org.projectforge.plugins.core.AbstractPlugin;
+import org.projectforge.plugins.core.PluginsRegistry;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.Login;
 import org.projectforge.user.PFUserContext;
@@ -118,6 +121,12 @@ public class MyDatabaseUpdateDao extends DatabaseUpdateDao
     int result = super.createMissingIndices();
     if (createIndex("idx_timesheet_user_time", "t_timesheet", "user_id, start_time") == true) {
       ++result;
+    }
+    for (final AbstractPlugin plugin : PluginsRegistry.instance().getPlugins()) {
+      final UpdateEntry updateEntry = plugin.getInitializationUpdateEntry();
+      if (updateEntry != null) {
+        result += updateEntry.createMissingIndices();
+      }
     }
     return result;
   }
