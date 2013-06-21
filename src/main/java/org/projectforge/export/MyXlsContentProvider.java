@@ -34,6 +34,7 @@ import org.projectforge.excel.CellFormat;
 import org.projectforge.excel.ContentProvider;
 import org.projectforge.excel.ExportWorkbook;
 import org.projectforge.excel.XlsContentProvider;
+import org.projectforge.fibu.EmployeeDO;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KostFormatter;
 import org.projectforge.fibu.KundeDO;
@@ -78,20 +79,23 @@ public class MyXlsContentProvider extends XlsContentProvider
     if (value instanceof DateHolder) {
       return ((DateHolder) value).getCalendar();
     } else if (value instanceof PFUserDO) {
-      return ((PFUserDO)value).getFullname();
+      return ((PFUserDO) value).getFullname();
+    } else if (value instanceof I18nEnum) {
+      return PFUserContext.getLocalizedString(((I18nEnum) value).getI18nKey());
     } else if (value instanceof KontoDO) {
       final KontoDO konto = (KontoDO) value;
       return konto.formatKonto();
     } else if (value instanceof Kost1DO) {
-      return KostFormatter.format((Kost1DO)value);
+      return KostFormatter.format((Kost1DO) value);
     } else if (value instanceof Kost2DO) {
-      return KostFormatter.format((Kost2DO)value);
+      return KostFormatter.format((Kost2DO) value);
     } else if (value instanceof KundeDO) {
-      return KundeFormatter.formatKundeAsString((KundeDO)value, null);
+      return KundeFormatter.formatKundeAsString((KundeDO) value, null);
     } else if (value instanceof ProjektDO) {
-      return ProjektFormatter.formatProjektKundeAsString((ProjektDO)value, null, null);
-    } else if (value instanceof I18nEnum) {
-      return PFUserContext.getLocalizedString(((I18nEnum)value).getI18nKey());
+      return ProjektFormatter.formatProjektKundeAsString((ProjektDO) value, null, null);
+    } else if (value instanceof EmployeeDO) {
+      final EmployeeDO employee = (EmployeeDO) value;
+      return employee.getUser() != null ? employee.getUser().getFullname() : "???";
     }
     return null;
   }
