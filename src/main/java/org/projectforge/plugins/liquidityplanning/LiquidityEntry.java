@@ -44,6 +44,9 @@ public class LiquidityEntry implements Serializable
   @PropertyInfo(i18nKey = "plugins.liquidityplanning.entry.dateOfPayment")
   private Date dateOfPayment;
 
+  @PropertyInfo(i18nKey = "plugins.liquidityplanning.entry.expectedDateOfPayment")
+  private Date expectedDateOfPayment;
+
   @PropertyInfo(i18nKey = "fibu.common.betrag", type = PropertyType.CURRENCY)
   private BigDecimal amount;
 
@@ -56,6 +59,9 @@ public class LiquidityEntry implements Serializable
   @PropertyInfo(i18nKey = "plugins.liquidityplanning.entry.type")
   private LiquidityEntryType type;
 
+  @PropertyInfo(i18nKey = "comment")
+  private String comment;
+
   public Date getDateOfPayment()
   {
     return dateOfPayment;
@@ -64,6 +70,26 @@ public class LiquidityEntry implements Serializable
   public LiquidityEntry setDateOfPayment(final Date date)
   {
     this.dateOfPayment = date;
+    return this;
+  }
+
+  /**
+   * For invoices (debitor) the expected date of payment is calculated from previous time of payments of former paid invoices from the same
+   * debitor.
+   * @return the expectedDateOfPayment
+   */
+  public Date getExpectedDateOfPayment()
+  {
+    return expectedDateOfPayment;
+  }
+
+  /**
+   * @param expectedDateOfPayment the expectedDateOfPayment to set
+   * @return this for chaining.
+   */
+  public LiquidityEntry setExpectedDateOfPayment(final Date expectedDateOfPayment)
+  {
+    this.expectedDateOfPayment = expectedDateOfPayment;
     return this;
   }
 
@@ -109,5 +135,23 @@ public class LiquidityEntry implements Serializable
   public LiquidityEntryType getType()
   {
     return type;
+  }
+
+  /**
+   * @return the comment
+   */
+  public String getComment()
+  {
+    return comment;
+  }
+
+  /**
+   * @param comment the comment to set
+   * @return this for chaining.
+   */
+  public LiquidityEntry setComment(final String comment)
+  {
+    this.comment = comment;
+    return this;
   }
 }

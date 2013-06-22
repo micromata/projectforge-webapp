@@ -34,6 +34,8 @@ public class LiquidityForecastSettings implements Serializable
 
   private int nextDays = 30;
 
+  private int expectencyForRecentMonths = 12;
+
   /**
    * @return the startAmount if given or {@link BigDecimal#ZERO}.
    */
@@ -73,6 +75,25 @@ public class LiquidityForecastSettings implements Serializable
   public LiquidityForecastSettings setNextDays(final int nextDays)
   {
     this.nextDays = nextDays;
+    return this;
+  }
+
+  /**
+   * For calculating the expected date of payment all paid invoices of an debitor of the last n month are analyzed.
+   * @return the expectencyForRecentMonths
+   */
+  public int getExpectencyForRecentMonths()
+  {
+    return expectencyForRecentMonths;
+  }
+
+  /**
+   * @param expectencyForRecentMonths the expectencyForRecentMonths to set
+   * @return this for chaining.
+   */
+  public LiquidityForecastSettings setExpectencyForRecentMonths(final int expectencyForRecentMonths)
+  {
+    this.expectencyForRecentMonths = expectencyForRecentMonths;
     return this;
   }
 }

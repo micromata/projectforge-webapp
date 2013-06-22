@@ -25,6 +25,7 @@ package org.projectforge.plugins.liquidityplanning;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -210,8 +211,10 @@ IListPageColumnsCreator<LiquidityEntryDO>
           exportColumn.setWidth(12);
         } else if ("paid".equals(field.getName()) == true) {
           exportColumn.setWidth(8);
-        } else if ("subject".equals(field.getName()) == true || "comment".equals(field.getName()) == true) {
+        } else if ("subject".equals(field.getName()) == true) {
           exportColumn.setWidth(40);
+        } else if ("comment".equals(field.getName()) == true) {
+          exportColumn.setWidth(80);
         }
       }
 
@@ -227,8 +230,8 @@ IListPageColumnsCreator<LiquidityEntryDO>
         invoicesExport.addCreditorInvoicesSheet(this, getString("fibu.eingangsrechnungen"), creditorInvoices);
         final ExportSheet sheet = addSheet(getString("filter.all"));
         addList(sheet, forecast.getEntries());
-        sheet.getPoiSheet().setAutoFilter(org.apache.poi.ss.util.CellRangeAddress.valueOf("E1:E1"));
         sheet.getPoiSheet().setAutoFilter(org.apache.poi.ss.util.CellRangeAddress.valueOf("A1:A1"));
+        sheet.getPoiSheet().setAutoFilter(org.apache.poi.ss.util.CellRangeAddress.valueOf("F1:F1"));
       }
     };
   }
@@ -237,7 +240,11 @@ IListPageColumnsCreator<LiquidityEntryDO>
   {
     if (forecast == null) {
       forecast = new LiquidityForecast();
-      invoices = rechnungDao.getList(new RechnungFilter().setListType(RechnungFilter.FILTER_UNBEZAHLT));
+      // Consider only invoices of the last year:
+      final java.sql.Date fromDate = new DayHolder().add(Calendar.DAY_OF_YEAR, -365).getSQLDate();
+      final List<RechnungDO> paidInvoices = rechnungDao.getList(new RechnungFilter().setShowBezahlt().setFromDate(fromDate));
+      forecast.calculateExpectedTimeOfPayments(paidInvoices);
+      invoices = rechnungDao.getList(new RechnungFilter().setShowUnbezahlt());
       forecast.setInvoices(invoices);
       creditorInvoices = eingangsrechnungDao.getList(new RechnungFilter().setListType(RechnungFilter.FILTER_UNBEZAHLT));
       forecast.setCreditorInvoices(creditorInvoices);
