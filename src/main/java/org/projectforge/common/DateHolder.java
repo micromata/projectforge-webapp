@@ -662,6 +662,10 @@ public class DateHolder implements Serializable, Cloneable, Comparable<DateHolde
     return daysBetween(o);
   }
 
+  /**
+   * @param other
+   * @return days between this and given date (other - this).
+   */
   public int daysBetween(final DateHolder other)
   {
     final DateHolder from, to;
