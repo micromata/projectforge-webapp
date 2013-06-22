@@ -28,9 +28,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 import org.projectforge.calendar.DayHolder;
+import org.projectforge.statistics.IntAggregatedValues;
 
-
-public class AbstractRechnungsStatistik<T extends AbstractRechnungDO<?>> implements Serializable
+public class AbstractRechnungsStatistik<T extends AbstractRechnungDO< ? >> implements Serializable
 {
   private static final long serialVersionUID = 3695426728243488756L;
 
@@ -48,7 +48,7 @@ public class AbstractRechnungsStatistik<T extends AbstractRechnungDO<?>> impleme
 
   protected long zahlungsZielSum;
 
-  protected long tatsaechlichesZahlungsZielSum;
+  protected IntAggregatedValues tatsaechlichesZahlungsZiel = new IntAggregatedValues();
 
   protected int counterBezahlt;
 
@@ -82,8 +82,8 @@ public class AbstractRechnungsStatistik<T extends AbstractRechnungDO<?>> impleme
     final DayHolder faelligDatum = new DayHolder(rechnung.getFaelligkeit());
     zahlungsZielSum += datum.daysBetween(faelligDatum);
     if (rechnung.getBezahlDatum() != null) {
-      DayHolder bezahlDatum = new DayHolder(rechnung.getBezahlDatum());
-      tatsaechlichesZahlungsZielSum += datum.daysBetween(bezahlDatum);
+      final DayHolder bezahlDatum = new DayHolder(rechnung.getBezahlDatum());
+      tatsaechlichesZahlungsZiel.add(datum.daysBetween(bezahlDatum), brutto.intValue());
       counterBezahlt++;
     }
     counter++;
@@ -99,10 +99,7 @@ public class AbstractRechnungsStatistik<T extends AbstractRechnungDO<?>> impleme
 
   public int getTatsaechlichesZahlungzielAverage()
   {
-    if (counterBezahlt == 0) {
-      return 0;
-    }
-    return (int) (tatsaechlichesZahlungsZielSum / counterBezahlt);
+    return tatsaechlichesZahlungsZiel.getWeightedAverage();
   }
 
   public BigDecimal getBrutto()
@@ -148,7 +145,7 @@ public class AbstractRechnungsStatistik<T extends AbstractRechnungDO<?>> impleme
     return skontoSum;
   }
 
-  private BigDecimal add(BigDecimal sum, BigDecimal amount)
+  private BigDecimal add(BigDecimal sum, final BigDecimal amount)
   {
     if (amount == null) {
       return sum;
