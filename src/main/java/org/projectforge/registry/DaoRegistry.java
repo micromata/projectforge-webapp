@@ -249,6 +249,7 @@ public class DaoRegistry
     .setNestedDOClasses(AuftragsPositionDO.class);
     register(OUTGOING_INVOICE, RechnungDao.class, rechnungDao, "fibu.rechnung") // Needs customer, project
     .setNestedDOClasses(RechnungsPositionDO.class);
+    Registry.instance().setInvoiceCache(rechnungDao.getRechnungCache());
     register(INCOMING_INVOICE, EingangsrechnungDao.class, eingangsrechnungDao, "fibu.eingangsrechnung") //
     .setNestedDOClasses(EingangsrechnungsPositionDO.class);
     register(ACCOUNTING_RECORD, BuchungssatzDao.class, buchungssatzDao, "fibu.buchungssatz").setSearchable(false); // Need account, cost1

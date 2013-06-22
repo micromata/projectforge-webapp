@@ -34,6 +34,7 @@ import org.apache.commons.lang.Validate;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.fibu.KontoCache;
+import org.projectforge.fibu.RechnungCache;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserXmlPreferencesDao;
@@ -65,6 +66,8 @@ public class Registry
   private UserXmlPreferencesDao userXmlPreferencesDao;
 
   private KontoCache kontoCache;
+
+  private RechnungCache invoiceCache;
 
   private DataSource dataSource;
 
@@ -190,6 +193,22 @@ public class Registry
   void setKontoCache(final KontoCache kontoCache)
   {
     this.kontoCache = kontoCache;
+  }
+
+  /**
+   * @return the invoiceCache
+   */
+  public RechnungCache getInvoiceCache()
+  {
+    return invoiceCache;
+  }
+
+  /**
+   * @param invoiceCache the invoiceCache to set
+   */
+  void setInvoiceCache(final RechnungCache invoiceCache)
+  {
+    this.invoiceCache = invoiceCache;
   }
 
   public DataSource getDataSource()
