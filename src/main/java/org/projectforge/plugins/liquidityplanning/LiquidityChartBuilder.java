@@ -23,9 +23,9 @@
 
 package org.projectforge.plugins.liquidityplanning;
 
-import java.math.BigDecimal;
+import java.awt.Color;
+import java.sql.Date;
 import java.util.Calendar;
-import java.util.Iterator;
 
 import org.apache.commons.lang.Validate;
 import org.jfree.chart.JFreeChart;
@@ -44,6 +44,8 @@ import org.projectforge.user.PFUserContext;
  */
 public class LiquidityChartBuilder
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LiquidityChartBuilder.class);
+
   /**
    * @param forecast
    * @param nextDays
@@ -52,43 +54,77 @@ public class LiquidityChartBuilder
   public JFreeChart create(final LiquidityForecast forecast, final LiquidityForecastSettings settings)
   {
     Validate.isTrue(settings.getNextDays() > 0 && settings.getNextDays() < 500);
-    final DayHolder dh = new DayHolder();
 
-    final TimeSeries accumulatedSeries = new TimeSeries("accumulated");
-    final TimeSeries worstCaseSeries = new TimeSeries(PFUserContext.getLocalizedString("plugins.liquidityplanning.forecast.worstCase"));
-    final TimeSeries creditSeries = new TimeSeries("credits");
-    final TimeSeries debitSeries = new TimeSeries("debits");
-    final Iterator<LiquidityEntry> it = forecast.getEntries().iterator();
-    LiquidityEntry current = it.hasNext() == true ? it.next() : null;
-    double accumulated = settings.getStartAmount().doubleValue();
-    double worstCase = accumulated;
-    for (int i = 0; i < settings.getNextDays(); i++) {
-      double debits = 0;
-      double credits = 0;
-      while (current != null
-          && (current.getDateOfPayment() == null || dh.before(current.getDateOfPayment()) == false || dh.isSameDay(current
-              .getDateOfPayment()) == true)) {
-        final BigDecimal amount = current.getAmount();
-        if (amount != null) {
-          final double val = amount.doubleValue();
-          if (val < 0) {
-            credits += val;
-            worstCase += val;
-          } else {
-            debits += val;
-          }
-        }
-        current = it.hasNext() == true ? it.next() : null;
+    final DayHolder today = new DayHolder();
+    final DayHolder lastDay = new DayHolder();
+    lastDay.add(Calendar.DAY_OF_YEAR, settings.getNextDays());
+    final double[] credits = new double[settings.getNextDays()];
+    final double[] debits = new double[settings.getNextDays()];
+    final double[] creditsExpected = new double[settings.getNextDays()];
+    final double[] debitsExpected = new double[settings.getNextDays()];
+    for (final LiquidityEntry entry : forecast.getEntries()) {
+      if (entry.getAmount() == null) {
+        continue;
       }
-      final Day day = new Day(dh.getDayOfMonth(), dh.getMonth() + 1, dh.getYear());
-      accumulated += debits + credits;
-      accumulatedSeries.add(day, accumulated);
-      worstCaseSeries.add(day, worstCase);
-      creditSeries.add(day, -credits);
-      debitSeries.add(day, debits);
-      dh.add(Calendar.DATE, 1);
+      final Date dateOfPayment = entry.getDateOfPayment();
+      Date expectedDateOfPayment = entry.getExpectedDateOfPayment();
+      if (expectedDateOfPayment == null) {
+        expectedDateOfPayment = dateOfPayment;
+      }
+      final double amount = entry.getAmount().doubleValue();
+      int numberOfDay = 0;
+      if (dateOfPayment != null) {
+        if (today.before(dateOfPayment) == true && today.isSameDay(dateOfPayment) == false) {
+          numberOfDay = today.daysBetween(dateOfPayment);
+        }
+      }
+      if (numberOfDay >= 0 && numberOfDay < settings.getNextDays() == true) {
+        if (amount > 0) {
+          debits[numberOfDay] += amount;
+        } else {
+          credits[numberOfDay] += amount;
+        }
+      }
+      int numberOfDayExpected = 0;
+      if (expectedDateOfPayment != null) {
+        if (today.before(expectedDateOfPayment) == true || today.isSameDay(expectedDateOfPayment) == false) {
+          numberOfDayExpected = today.daysBetween(expectedDateOfPayment);
+        }
+      }
+      if (numberOfDayExpected >= 0 && numberOfDayExpected < settings.getNextDays() == true) {
+        if (amount > 0) {
+          debitsExpected[numberOfDayExpected] += amount;
+        } else {
+          creditsExpected[numberOfDayExpected] += amount;
+        }
+      }
     }
 
+    final TimeSeries accumulatedSeries = new TimeSeries(PFUserContext.getLocalizedString("plugins.liquidityplanning.forecast.dueDate"));
+    final TimeSeries accumulatedSeriesExpected = new TimeSeries(PFUserContext.getLocalizedString("plugins.liquidityplanning.forecast.expected"));
+    final TimeSeries worstCaseSeries = new TimeSeries(PFUserContext.getLocalizedString("plugins.liquidityplanning.forecast.worstCase"));
+    // final TimeSeries creditSeries = new TimeSeries("credits");
+    // final TimeSeries debitSeries = new TimeSeries("debits");
+    double accumulated = settings.getStartAmount().doubleValue();
+    double accumulatedExpected = accumulated;
+    double worstCase = accumulated;
+
+    final DayHolder dh = new DayHolder();
+    for (int i = 0; i < settings.getNextDays(); i++) {
+      if (log.isDebugEnabled() == true) {
+        log.debug("day: " + i + ", credits=" + credits[i] + ", debits=" + debits[i]);
+      }
+      final Day day = new Day(dh.getDayOfMonth(), dh.getMonth() + 1, dh.getYear());
+      accumulated += debits[i] + credits[i];
+      accumulatedSeries.add(day, accumulated);
+      accumulatedExpected += debitsExpected[i] + creditsExpected[i];
+      accumulatedSeriesExpected.add(day, accumulatedExpected);
+      worstCase += credits[i];
+      worstCaseSeries.add(day, worstCase);
+      // creditSeries.add(day, -credits);
+      // debitSeries.add(day, debits);
+      dh.add(Calendar.DATE, 1);
+    }
     // final XYChartBuilder cb = new XYChartBuilder(ChartFactory.createXYBarChart(null, null, false, null, null, PlotOrientation.VERTICAL,
     // false, false, false));
     final XYChartBuilder cb = new XYChartBuilder(null, null, null, null, true);
@@ -104,19 +140,25 @@ public class LiquidityChartBuilder
     // barRenderer.setShadowVisible(false);
     // cb.setRenderer(counter, barRenderer).setDataset(counter++, cashflowSet);
 
+    final TimeSeriesCollection xyDataSeries = new TimeSeriesCollection();
+    xyDataSeries.addSeries(accumulatedSeries);
+    xyDataSeries.addSeries(worstCaseSeries);
+    final XYLineAndShapeRenderer lineRenderer = new XYLineAndShapeRenderer(true, false);
+    lineRenderer.setSeriesPaint(0, Color.BLACK);
+    // lineRenderer.setSeriesStroke(0, cb.getDashedStroke());
+    lineRenderer.setSeriesVisibleInLegend(0, true);
+    lineRenderer.setSeriesPaint(1, cb.getGrayMarker());
+    lineRenderer.setSeriesStroke(1, cb.getDashedStroke());
+    lineRenderer.setSeriesVisibleInLegend(1, true);
+    cb.setRenderer(counter, lineRenderer).setDataset(counter++, xyDataSeries);
+
     final TimeSeriesCollection accumulatedSet = new TimeSeriesCollection();
-    accumulatedSet.addSeries(accumulatedSeries);
+    accumulatedSet.addSeries(accumulatedSeriesExpected);
     final XYDifferenceRenderer diffRenderer = new XYDifferenceRenderer(cb.getGreenFill(), cb.getRedFill(), true);
     diffRenderer.setSeriesPaint(0, cb.getRedMarker());
-    cb.setRenderer(counter, diffRenderer).setDataset(counter++, accumulatedSet).setStrongStyle(diffRenderer, false, accumulatedSeries);
-
-    final TimeSeriesCollection worstCaseSet = new TimeSeriesCollection();
-    worstCaseSet.addSeries(worstCaseSeries);
-    final XYLineAndShapeRenderer lineRenderer = new XYLineAndShapeRenderer(true, false);
-    lineRenderer.setSeriesPaint(0, cb.getGrayMarker());
-    lineRenderer.setSeriesStroke(0, cb.getDashedStroke());
-    lineRenderer.setSeriesVisibleInLegend(0, true);
-    cb.setRenderer(counter, lineRenderer).setDataset(counter++, worstCaseSet);
+    cb.setRenderer(counter, diffRenderer).setDataset(counter++, accumulatedSet)
+    .setStrongStyle(diffRenderer, false, accumulatedSeriesExpected);
+    diffRenderer.setSeriesVisibleInLegend(0, true);
 
     cb.setDateXAxis(true).setYAxis(true, null);
     return cb.getChart();
