@@ -32,6 +32,7 @@ import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.DisplayHistoryEntry;
@@ -147,7 +148,17 @@ public class EingangsrechnungDao extends BaseDao<EingangsrechnungDO>
       myFilter = new RechnungFilter(filter);
     }
     final QueryFilter queryFilter = new QueryFilter(myFilter);
-    queryFilter.setYearAndMonth("datum", myFilter.getYear(), myFilter.getMonth());
+    if (myFilter.getFromDate() != null || myFilter.getToDate() != null) {
+      if (myFilter.getFromDate() != null && myFilter.getToDate() != null) {
+        queryFilter.add(Restrictions.between("datum", myFilter.getFromDate(), myFilter.getToDate()));
+      } else if (myFilter.getFromDate() != null) {
+        queryFilter.add(Restrictions.ge("datum", myFilter.getFromDate()));
+      } else if (myFilter.getToDate() != null) {
+        queryFilter.add(Restrictions.le("datum", myFilter.getToDate()));
+      }
+    } else {
+      queryFilter.setYearAndMonth("datum", myFilter.getYear(), myFilter.getMonth());
+    }
     queryFilter.addOrder(Order.desc("datum"));
     queryFilter.addOrder(Order.desc("kreditor"));
     final List<EingangsrechnungDO> list = getList(queryFilter);
@@ -158,6 +169,10 @@ public class EingangsrechnungDao extends BaseDao<EingangsrechnungDO>
     for (final EingangsrechnungDO rechnung : list) {
       if (myFilter.isShowUnbezahlt() == true) {
         if (rechnung.isBezahlt() == false) {
+          result.add(rechnung);
+        }
+      } else if (myFilter.isShowBezahlt() == true) {
+        if (rechnung.isBezahlt() == true) {
           result.add(rechnung);
         }
       } else if (myFilter.isShowUeberFaellig() == true) {

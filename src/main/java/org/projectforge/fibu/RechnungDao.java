@@ -40,6 +40,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.hibernate.FetchMode;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.projectforge.access.AccessException;
 import org.projectforge.access.OperationType;
 import org.projectforge.common.DateHelper;
@@ -125,6 +126,14 @@ public class RechnungDao extends BaseDao<RechnungDO>
   public void setRechnungCache(final RechnungCache rechnungCache)
   {
     this.rechnungCache = rechnungCache;
+  }
+
+  /**
+   * @return the rechnungCache
+   */
+  public RechnungCache getRechnungCache()
+  {
+    return rechnungCache;
   }
 
   public RechnungDao()
@@ -301,7 +310,17 @@ public class RechnungDao extends BaseDao<RechnungDO>
       myFilter = new RechnungFilter(filter);
     }
     final QueryFilter queryFilter = new QueryFilter(myFilter);
-    queryFilter.setYearAndMonth("datum", myFilter.getYear(), myFilter.getMonth());
+    if (myFilter.getFromDate() != null || myFilter.getToDate() != null) {
+      if (myFilter.getFromDate() != null && myFilter.getToDate() != null) {
+        queryFilter.add(Restrictions.between("datum", myFilter.getFromDate(), myFilter.getToDate()));
+      } else if (myFilter.getFromDate() != null) {
+        queryFilter.add(Restrictions.ge("datum", myFilter.getFromDate()));
+      } else if (myFilter.getToDate() != null) {
+        queryFilter.add(Restrictions.le("datum", myFilter.getToDate()));
+      }
+    } else {
+      queryFilter.setYearAndMonth("datum", myFilter.getYear(), myFilter.getMonth());
+    }
     queryFilter.addOrder(Order.desc("datum"));
     queryFilter.addOrder(Order.desc("nummer"));
     if (myFilter.isShowKostZuweisungStatus() == true) {
@@ -315,6 +334,10 @@ public class RechnungDao extends BaseDao<RechnungDO>
     for (final RechnungDO rechnung : list) {
       if (myFilter.isShowUnbezahlt() == true) {
         if (rechnung.isBezahlt() == false) {
+          result.add(rechnung);
+        }
+      } else if (myFilter.isShowBezahlt() == true) {
+        if (rechnung.isBezahlt() == true) {
           result.add(rechnung);
         }
       } else if (myFilter.isShowUeberFaellig() == true) {
@@ -458,7 +481,6 @@ public class RechnungDao extends BaseDao<RechnungDO>
   {
     return new RechnungDO();
   }
-
 
   /**
    * @see org.projectforge.core.BaseDao#useOwnCriteriaCacheRegion()

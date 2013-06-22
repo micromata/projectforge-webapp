@@ -24,9 +24,9 @@
 package org.projectforge.fibu;
 
 import java.io.Serializable;
+import java.sql.Date;
 
 import org.projectforge.core.BaseSearchFilter;
-
 
 /**
  * 
@@ -37,6 +37,8 @@ public class RechnungFilter extends BaseSearchFilter implements Serializable
 {
   public static final String FILTER_ALL = "all";
 
+  public static final String FILTER_BEZAHLT = "bezahlt";
+
   public static final String FILTER_UEBERFAELLIG = "ueberfaellig";
 
   public static final String FILTER_UNBEZAHLT = "unbezahlt";
@@ -46,6 +48,8 @@ public class RechnungFilter extends BaseSearchFilter implements Serializable
   protected int year;
 
   protected int month;
+
+  protected Date fromDate, toDate;
 
   protected String listType = FILTER_ALL;
 
@@ -82,14 +86,16 @@ public class RechnungFilter extends BaseSearchFilter implements Serializable
     return FILTER_ALL.equals(listType);
   }
 
-  public void setShowAll()
+  public RechnungFilter setShowAll()
   {
     listType = FILTER_ALL;
+    return this;
   }
 
-  public void setShowUnbezahlt()
+  public RechnungFilter setShowUnbezahlt()
   {
     listType = FILTER_UNBEZAHLT;
+    return this;
   }
 
   public boolean isShowUnbezahlt()
@@ -97,9 +103,22 @@ public class RechnungFilter extends BaseSearchFilter implements Serializable
     return FILTER_UNBEZAHLT.equals(listType);
   }
 
-  public void setShowUeberFaellig()
+  public RechnungFilter setShowBezahlt()
+  {
+    listType = FILTER_BEZAHLT;
+    return this;
+  }
+
+  public boolean isShowBezahlt()
+  {
+    return FILTER_BEZAHLT.equals(listType);
+  }
+
+
+  public RechnungFilter setShowUeberFaellig()
   {
     listType = FILTER_UEBERFAELLIG;
+    return this;
   }
 
   public boolean isShowUeberFaellig()
@@ -148,5 +167,43 @@ public class RechnungFilter extends BaseSearchFilter implements Serializable
   public void setMonth(final int month)
   {
     this.month = month;
+  }
+
+  /**
+   * If given then the year and month setting is ignored by {@link RechnungDao#getList(BaseSearchFilter)}.
+   * @return the fromDate
+   */
+  public Date getFromDate()
+  {
+    return fromDate;
+  }
+
+  /**
+   * @param fromDate the fromDate to set
+   * @return this for chaining.
+   */
+  public RechnungFilter setFromDate(final Date fromDate)
+  {
+    this.fromDate = fromDate;
+    return this;
+  }
+
+  /**
+   * If given then the year and month setting is ignored by {@link RechnungDao#getList(BaseSearchFilter)}.
+   * @return the toDate
+   */
+  public Date getToDate()
+  {
+    return toDate;
+  }
+
+  /**
+   * @param toDate the toDate to set
+   * @return this for chaining.
+   */
+  public RechnungFilter setToDate(final Date toDate)
+  {
+    this.toDate = toDate;
+    return this;
   }
 }
