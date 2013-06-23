@@ -81,7 +81,6 @@ public class TeamEventDaoRest
       @QueryParam("modifiedSince") final Integer daysInFuture)
   {
     final DayHolder day = new DayHolder();
-    final Date startDate = day.getDate();
     int days = daysInFuture != null ? daysInFuture : 30;
     if (days <= 0 || days > 90) {
       days = 90;
@@ -107,11 +106,16 @@ public class TeamEventDaoRest
     }
     final List<CalendarEventObject> result = new LinkedList<CalendarEventObject>();
     if (cals.size() > 0) {
-      final TeamEventFilter filter = new TeamEventFilter().setStartDate(startDate).setEndDate(day.getDate()).setTeamCals(cals);
+      final Date now = new Date();
+      final TeamEventFilter filter = new TeamEventFilter().setStartDate(now).setEndDate(day.getDate()).setTeamCals(cals);
       final List<TeamEvent> list = teamEventDao.getEventList(filter, true);
       if (list != null && list.size() > 0) {
         for (final TeamEvent event : list) {
-          result.add(TeamEventDOConverter.getEventObject(event));
+          if (event.getStartDate().after(now) == true) {
+            result.add(TeamEventDOConverter.getEventObject(event));
+          } else {
+            log.info("Start date not in future:" + event.getStartDate() + ", " + event.getSubject());
+          }
         }
       }
     } else {
