@@ -164,30 +164,32 @@ public class LiquidityForecastCashFlow implements Serializable
     // column property names
     sheet.setColumns(cols);
 
+    final int firstDataRowNumber = sheet.getRowCounter() + 1;
     final DayHolder current = today.clone();
     PropertyMapping mapping = new PropertyMapping();
     mapping.add("balanceExpected", BigDecimal.ZERO);
-    mapping.add("balance", new Formula("D" + (sheet.getRowCounter() + 1)));
+    mapping.add("balance", new Formula("D" + firstDataRowNumber));
     sheet.addRow(mapping.getMapping(), 0);
 
-    final int firstDataRowNumber = sheet.getRowCounter() + 1;
     for (int i = 0; i < credits.length; i++) {
-      final int rowNumber = sheet.getRowCounter() + 1;
+      final int rowNumber = sheet.getRowCounter();
       mapping.add("date", current);
       mapping.add("creditsExpected", NumberHelper.isZeroOrNull(creditsExpected[i]) == true ? "" : creditsExpected[i]);
       mapping.add("debitsExpected", NumberHelper.isZeroOrNull(debitsExpected[i]) == true ? "" : debitsExpected[i]);
-      mapping.add("balanceExpected", new Formula("D" + (rowNumber - 1) + "+SUM(B" + rowNumber + ":C" + rowNumber + ")"));
-      mapping.add("balance", new Formula("G" + (rowNumber - 1) + "+SUM(E" + rowNumber + ":F" + rowNumber + ")"));
+      mapping.add("balanceExpected", new Formula("D" + rowNumber + "+SUM(B" + rowNumber + ":C" + rowNumber + ")"));
       mapping.add("credits", NumberHelper.isZeroOrNull(credits[i]) == true ? "" : credits[i]);
       mapping.add("debits", NumberHelper.isZeroOrNull(debits[i]) == true ? "" : debits[i]);
+      mapping.add("balance", new Formula("G" + rowNumber + "+SUM(E" + rowNumber + ":F" + rowNumber + ")"));
       sheet.addRow(mapping.getMapping(), 0);
       current.add(Calendar.DAY_OF_YEAR, 1);
     }
     mapping = new PropertyMapping();
     mapping.add("creditsExpected", new Formula("SUM(B" + firstDataRowNumber + ":B" + sheet.getRowCounter() + ")"));
     mapping.add("debitsExpected", new Formula("SUM(C" + firstDataRowNumber + ":C" + sheet.getRowCounter() + ")"));
+    mapping.add("balanceExpected", new Formula("D" + firstDataRowNumber + "+SUM(B" + firstDataRowNumber + ":C" + sheet.getRowCounter() + ")"));
     mapping.add("credits", new Formula("SUM(E" + firstDataRowNumber + ":E" + sheet.getRowCounter() + ")"));
     mapping.add("debits", new Formula("SUM(F" + firstDataRowNumber + ":F" + sheet.getRowCounter() + ")"));
+    mapping.add("balance", new Formula("G" + firstDataRowNumber + "+SUM(E" + firstDataRowNumber + ":F" + sheet.getRowCounter() + ")"));
     sheet.addRow(mapping.getMapping(), 0);
   }
 

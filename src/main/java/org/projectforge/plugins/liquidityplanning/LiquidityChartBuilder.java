@@ -74,14 +74,14 @@ public class LiquidityChartBuilder
         log.debug("day: " + i + ", credits=" + cashFlow.getCredits()[i] + ", debits=" + cashFlow.getDebits()[i]);
       }
       final Day day = new Day(dh.getDayOfMonth(), dh.getMonth() + 1, dh.getYear());
-      accumulated += cashFlow.getDebits()[i].doubleValue() + cashFlow.getCredits()[i].doubleValue();
+      if (i > 0) {
+        accumulated += cashFlow.getDebits()[i - 1].doubleValue() + cashFlow.getCredits()[i - 1].doubleValue();
+        accumulatedExpected += cashFlow.getDebitsExpected()[i - 1].doubleValue() + cashFlow.getCreditsExpected()[i - 1].doubleValue();
+        worstCase += cashFlow.getCredits()[i - 1].doubleValue();
+      }
       accumulatedSeries.add(day, accumulated);
-      accumulatedExpected += cashFlow.getDebitsExpected()[i].doubleValue() + cashFlow.getCreditsExpected()[i].doubleValue();
       accumulatedSeriesExpected.add(day, accumulatedExpected);
-      worstCase += cashFlow.getCredits()[i].doubleValue();
       worstCaseSeries.add(day, worstCase);
-      // creditSeries.add(day, -credits);
-      // debitSeries.add(day, debits);
       dh.add(Calendar.DATE, 1);
     }
     final XYChartBuilder cb = new XYChartBuilder(null, null, null, null, true);
@@ -128,7 +128,9 @@ public class LiquidityChartBuilder
     final DayHolder dh = new DayHolder();
     for (int i = 0; i < settings.getNextDays(); i++) {
       final Day day = new Day(dh.getDayOfMonth(), dh.getMonth() + 1, dh.getYear());
-      accumulatedExpected += cashFlow.getDebitsExpected()[i].doubleValue() + cashFlow.getCreditsExpected()[i].doubleValue();
+      if (i > 0) {
+        accumulatedExpected += cashFlow.getDebitsExpected()[i - 1].doubleValue() + cashFlow.getCreditsExpected()[i - 1].doubleValue();
+      }
       accumulatedSeriesExpected.add(day, accumulatedExpected);
       creditSeries.add(day, cashFlow.getCreditsExpected()[i].doubleValue());
       debitSeries.add(day, cashFlow.getDebitsExpected()[i].doubleValue());
