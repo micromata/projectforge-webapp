@@ -167,7 +167,7 @@ public class LiquidityForecastCashFlow implements Serializable
     final DayHolder current = today.clone();
     PropertyMapping mapping = new PropertyMapping();
     mapping.add("balanceExpected", BigDecimal.ZERO);
-    mapping.add("balance", BigDecimal.ZERO);
+    mapping.add("balance", new Formula("D" + (sheet.getRowCounter() + 1)));
     sheet.addRow(mapping.getMapping(), 0);
 
     final int firstDataRowNumber = sheet.getRowCounter() + 1;
@@ -184,10 +184,10 @@ public class LiquidityForecastCashFlow implements Serializable
       current.add(Calendar.DAY_OF_YEAR, 1);
     }
     mapping = new PropertyMapping();
-    mapping.add("creditsExpected", new Formula("SUM(B" + firstDataRowNumber +":B"+ sheet.getRowCounter() +")"));
-    mapping.add("debitsExpected", new Formula("SUM(C" + firstDataRowNumber +":C"+ sheet.getRowCounter() +")"));
-    mapping.add("credits", new Formula("SUM(E" + firstDataRowNumber +":E"+ sheet.getRowCounter() +")"));
-    mapping.add("debits", new Formula("SUM(F" + firstDataRowNumber +":F"+ sheet.getRowCounter() +")"));
+    mapping.add("creditsExpected", new Formula("SUM(B" + firstDataRowNumber + ":B" + sheet.getRowCounter() + ")"));
+    mapping.add("debitsExpected", new Formula("SUM(C" + firstDataRowNumber + ":C" + sheet.getRowCounter() + ")"));
+    mapping.add("credits", new Formula("SUM(E" + firstDataRowNumber + ":E" + sheet.getRowCounter() + ")"));
+    mapping.add("debits", new Formula("SUM(F" + firstDataRowNumber + ":F" + sheet.getRowCounter() + ")"));
     sheet.addRow(mapping.getMapping(), 0);
   }
 
