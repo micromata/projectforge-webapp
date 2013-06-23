@@ -742,19 +742,21 @@ extends AbstractSecuredPage implements ISelectCallerPage
   protected void exportExcel(final String filenameIdentifier, final String sheetTitle)
   {
     refresh();
+    final DOListExcelExporter exporter = createExcelExporter(filenameIdentifier);
     final List< ? > list = getList();
-    if (list == null || list.size() == 0) {
+    if (list != null && list.size() > 0) {
+      final ExportSheet sheet = exporter.addSheet(sheetTitle != null ? sheetTitle : "data");
+      exporter.addList(sheet, list);
+      if (exporter.isExcelAutoFilter() == true) {
+        sheet.setAutoFilter();
+      }
+    }
+    exporter.onBeforeDownload();
+    if (exporter.getWorkbook().getNumberOfSheets() == 0) {
       // Nothing to export.
       form.addError("validation.error.nothingToExport");
       return;
     }
-    final DOListExcelExporter exporter = createExcelExporter(filenameIdentifier);
-    final ExportSheet sheet = exporter.addSheet(sheetTitle != null ? sheetTitle : "data");
-    exporter.addList(sheet, list);
-    if (exporter.isExcelAutoFilter() == true) {
-      sheet.setAutoFilter();
-    }
-    exporter.onBeforeDownload();
     DownloadUtils.setDownloadTarget(exporter.getWorkbook().getAsByteArray(), exporter.getFilename());
   }
 
