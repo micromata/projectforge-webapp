@@ -47,7 +47,7 @@ public class LiquidityForecastPage extends AbstractStandardFormPage
 
   private final GridBuilder gridBuilder;
 
-  private ImagePanel chartImage;
+  private ImagePanel xyPlotImage, barChartImage;
 
   private final LiquidityForecastForm form;
 
@@ -67,8 +67,11 @@ public class LiquidityForecastPage extends AbstractStandardFormPage
   protected void onInitialize()
   {
     super.onInitialize();
-    chartImage = new ImagePanel(gridBuilder.getPanel().newChildId());
-    gridBuilder.getPanel().add(chartImage);
+    xyPlotImage = new ImagePanel(gridBuilder.getPanel().newChildId());
+    gridBuilder.getPanel().add(xyPlotImage);
+    gridBuilder.newGridPanel();
+    barChartImage = new ImagePanel(gridBuilder.getPanel().newChildId());
+    gridBuilder.getPanel().add(barChartImage);
   }
 
   /**
@@ -79,11 +82,20 @@ public class LiquidityForecastPage extends AbstractStandardFormPage
   {
     super.onBeforeRender();
     final LiquidityChartBuilder chartBuilder = new LiquidityChartBuilder();
-    final JFreeChart chart = chartBuilder.create(forecast, form.getSettings());
-    final JFreeChartImage image = new JFreeChartImage(ImagePanel.IMAGE_ID, chart, IMAGE_WIDTH, IMAGE_HEIGHT);
-    image.add(AttributeModifier.replace("width", String.valueOf(IMAGE_WIDTH)));
-    image.add(AttributeModifier.replace("height", String.valueOf(IMAGE_HEIGHT)));
-    chartImage.replaceImage(image);
+    {
+      final JFreeChart chart = chartBuilder.createXYPlot(forecast, form.getSettings());
+      final JFreeChartImage image = new JFreeChartImage(ImagePanel.IMAGE_ID, chart, IMAGE_WIDTH, IMAGE_HEIGHT);
+      image.add(AttributeModifier.replace("width", String.valueOf(IMAGE_WIDTH)));
+      image.add(AttributeModifier.replace("height", String.valueOf(IMAGE_HEIGHT)));
+      xyPlotImage.replaceImage(image);
+    }
+    {
+      final JFreeChart chart = chartBuilder.createBarChart(forecast, form.getSettings());
+      final JFreeChartImage image = new JFreeChartImage(ImagePanel.IMAGE_ID, chart, IMAGE_WIDTH, IMAGE_HEIGHT);
+      image.add(AttributeModifier.replace("width", String.valueOf(IMAGE_WIDTH)));
+      image.add(AttributeModifier.replace("height", String.valueOf(IMAGE_HEIGHT)));
+      barChartImage.replaceImage(image);
+    }
   }
 
   /**
