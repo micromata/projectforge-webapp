@@ -230,8 +230,7 @@ IListPageColumnsCreator<LiquidityEntryDO>
         cashFlow.addAsExcelSheet(this, getString("plugins.liquidityplanning.forecast.cashflow"));
         final ExportSheet sheet = addSheet(getString("filter.all"));
         addList(sheet, forecast.getEntries());
-        sheet.getPoiSheet().setAutoFilter(org.apache.poi.ss.util.CellRangeAddress.valueOf("A1:A1"));
-        sheet.getPoiSheet().setAutoFilter(org.apache.poi.ss.util.CellRangeAddress.valueOf("F1:F1"));
+        sheet.getPoiSheet().setAutoFilter(org.apache.poi.ss.util.CellRangeAddress.valueOf("A1:F1"));
         invoicesExport.addDebitorInvoicesSheet(this, getString("fibu.rechnungen"), invoices);
         invoicesExport.addCreditorInvoicesSheet(this, getString("fibu.eingangsrechnungen"), creditorInvoices);
       }
