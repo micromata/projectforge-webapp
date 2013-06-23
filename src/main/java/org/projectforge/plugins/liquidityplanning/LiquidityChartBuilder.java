@@ -25,6 +25,7 @@ package org.projectforge.plugins.liquidityplanning;
 
 import java.awt.Color;
 import java.util.Calendar;
+import java.util.Date;
 
 import org.apache.commons.lang.Validate;
 import org.jfree.chart.ChartFactory;
@@ -69,6 +70,7 @@ public class LiquidityChartBuilder
     double worstCase = accumulated;
 
     final DayHolder dh = new DayHolder();
+    final Date lower = dh.getDate();
     for (int i = 0; i < settings.getNextDays(); i++) {
       if (log.isDebugEnabled() == true) {
         log.debug("day: " + i + ", credits=" + cashFlow.getCredits()[i] + ", debits=" + cashFlow.getDebits()[i]);
@@ -84,6 +86,7 @@ public class LiquidityChartBuilder
       worstCaseSeries.add(day, worstCase);
       dh.add(Calendar.DATE, 1);
     }
+    dh.add(Calendar.DATE, -1);
     final XYChartBuilder cb = new XYChartBuilder(null, null, null, null, true);
 
     int counter = 0;
@@ -107,7 +110,7 @@ public class LiquidityChartBuilder
     .setStrongStyle(diffRenderer, false, accumulatedSeriesExpected);
     diffRenderer.setSeriesVisibleInLegend(0, true);
 
-    cb.setDateXAxis(true).setYAxis(true, null);
+    cb.setDateXAxis(true).setDateXAxisRange(lower, dh.getDate()).setYAxis(true, null);
     return cb.getChart();
   }
 
@@ -126,6 +129,7 @@ public class LiquidityChartBuilder
     double accumulatedExpected = settings.getStartAmount().doubleValue();
 
     final DayHolder dh = new DayHolder();
+    final Date lower = dh.getDate();
     for (int i = 0; i < settings.getNextDays(); i++) {
       final Day day = new Day(dh.getDayOfMonth(), dh.getMonth() + 1, dh.getYear());
       if (i > 0) {
@@ -136,6 +140,7 @@ public class LiquidityChartBuilder
       debitSeries.add(day, cashFlow.getDebitsExpected()[i].doubleValue());
       dh.add(Calendar.DATE, 1);
     }
+    dh.add(Calendar.DATE, -1);
     final XYChartBuilder cb = new XYChartBuilder(ChartFactory.createXYBarChart(null, null, false, null, null, PlotOrientation.VERTICAL,
         false, false, false));
     int counter = 0;
@@ -157,7 +162,7 @@ public class LiquidityChartBuilder
     barRenderer.setShadowVisible(false);
     cb.setRenderer(counter, barRenderer).setDataset(counter++, cashflowSet);
 
-    cb.setDateXAxis(true).setYAxis(true, null);
+    cb.setDateXAxis(true).setDateXAxisRange(lower, dh.getDate()).setYAxis(true, null);
     return cb.getChart();
   }
 }
