@@ -32,9 +32,14 @@ import org.projectforge.user.PFUserContext;
  */
 public class I18n
 {
-  public String get(final String key)
+  public static String getString(final String key)
   {
     return PFUserContext.getLocalizedString(key);
+  }
+
+  public String get(final String key)
+  {
+    return getString(key);
   }
 
   public String get(final String messageKey, final Object... params)
