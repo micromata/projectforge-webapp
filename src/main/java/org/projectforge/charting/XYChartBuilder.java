@@ -28,16 +28,19 @@ import java.awt.Color;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.Ellipse2D;
+import java.util.Date;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.DateTickMarkPosition;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.general.Series;
+import org.jfree.data.time.DateRange;
 import org.jfree.data.xy.XYDataset;
 import org.projectforge.user.PFUserContext;
 
@@ -60,6 +63,8 @@ public class XYChartBuilder
 
   private final Stroke stroke = new BasicStroke(1.0f);
 
+  private ValueAxis xAxis;
+
   private final Stroke dashedStroke = new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 3.0f, new float[] { 3.0f, 3.0f},
       1.0f);
 
@@ -80,12 +85,21 @@ public class XYChartBuilder
 
   public XYChartBuilder setDateXAxis(final boolean showAxisValues)
   {
-    final DateAxis xAxis = new DateAxis();
-    xAxis.setTickMarkPosition(DateTickMarkPosition.MIDDLE);
+    xAxis = new DateAxis();
+    ((DateAxis) xAxis).setTickMarkPosition(DateTickMarkPosition.MIDDLE);
     xAxis.setLowerMargin(0.0);
     xAxis.setUpperMargin(0.0);
     xAxis.setVisible(showAxisValues);
     plot.setDomainAxis(xAxis);
+    return this;
+  }
+
+  public XYChartBuilder setDateXAxisRange(final Date lower, final Date upper)
+  {
+    if (xAxis == null) {
+      throw new IllegalArgumentException("Call set*XAxis first. No xAxis given yet.");
+    }
+    xAxis.setRange(new DateRange(lower, upper));
     return this;
   }
 
