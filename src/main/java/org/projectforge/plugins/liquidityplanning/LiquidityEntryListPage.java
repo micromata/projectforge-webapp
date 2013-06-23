@@ -232,6 +232,8 @@ IListPageColumnsCreator<LiquidityEntryDO>
         addList(sheet, forecast.getEntries());
         sheet.getPoiSheet().setAutoFilter(org.apache.poi.ss.util.CellRangeAddress.valueOf("A1:A1"));
         sheet.getPoiSheet().setAutoFilter(org.apache.poi.ss.util.CellRangeAddress.valueOf("F1:F1"));
+        final LiquidityForecastCashFlow cashFlow = new LiquidityForecastCashFlow(forecast);
+        cashFlow.addAsExcelSheet(this, getString("plugins.liquidityplanning.forecast.cashflow"));
       }
     };
   }
