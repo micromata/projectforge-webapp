@@ -24,7 +24,6 @@
 package org.projectforge.plugins.liquidityplanning;
 
 import java.awt.Color;
-import java.sql.Date;
 import java.util.Calendar;
 
 import org.apache.commons.lang.Validate;
@@ -55,50 +54,7 @@ public class LiquidityChartBuilder
   {
     Validate.isTrue(settings.getNextDays() > 0 && settings.getNextDays() < 500);
 
-    final DayHolder today = new DayHolder();
-    final DayHolder lastDay = new DayHolder();
-    lastDay.add(Calendar.DAY_OF_YEAR, settings.getNextDays());
-    final double[] credits = new double[settings.getNextDays()];
-    final double[] debits = new double[settings.getNextDays()];
-    final double[] creditsExpected = new double[settings.getNextDays()];
-    final double[] debitsExpected = new double[settings.getNextDays()];
-    for (final LiquidityEntry entry : forecast.getEntries()) {
-      if (entry.getAmount() == null) {
-        continue;
-      }
-      final Date dateOfPayment = entry.getDateOfPayment();
-      Date expectedDateOfPayment = entry.getExpectedDateOfPayment();
-      if (expectedDateOfPayment == null) {
-        expectedDateOfPayment = dateOfPayment;
-      }
-      final double amount = entry.getAmount().doubleValue();
-      int numberOfDay = 0;
-      if (dateOfPayment != null) {
-        if (today.before(dateOfPayment) == true && today.isSameDay(dateOfPayment) == false) {
-          numberOfDay = today.daysBetween(dateOfPayment);
-        }
-      }
-      if (numberOfDay >= 0 && numberOfDay < settings.getNextDays() == true) {
-        if (amount > 0) {
-          debits[numberOfDay] += amount;
-        } else {
-          credits[numberOfDay] += amount;
-        }
-      }
-      int numberOfDayExpected = 0;
-      if (expectedDateOfPayment != null) {
-        if (today.before(expectedDateOfPayment) == true || today.isSameDay(expectedDateOfPayment) == false) {
-          numberOfDayExpected = today.daysBetween(expectedDateOfPayment);
-        }
-      }
-      if (numberOfDayExpected >= 0 && numberOfDayExpected < settings.getNextDays() == true) {
-        if (amount > 0) {
-          debitsExpected[numberOfDayExpected] += amount;
-        } else {
-          creditsExpected[numberOfDayExpected] += amount;
-        }
-      }
-    }
+    final LiquidityForecastCashFlow cashFlow = new LiquidityForecastCashFlow(forecast, settings.getNextDays());
 
     final TimeSeries accumulatedSeries = new TimeSeries(PFUserContext.getLocalizedString("plugins.liquidityplanning.forecast.dueDate"));
     final TimeSeries accumulatedSeriesExpected = new TimeSeries(PFUserContext.getLocalizedString("plugins.liquidityplanning.forecast.expected"));
@@ -112,14 +68,14 @@ public class LiquidityChartBuilder
     final DayHolder dh = new DayHolder();
     for (int i = 0; i < settings.getNextDays(); i++) {
       if (log.isDebugEnabled() == true) {
-        log.debug("day: " + i + ", credits=" + credits[i] + ", debits=" + debits[i]);
+        log.debug("day: " + i + ", credits=" + cashFlow.getCredits()[i] + ", debits=" + cashFlow.getDebits()[i]);
       }
       final Day day = new Day(dh.getDayOfMonth(), dh.getMonth() + 1, dh.getYear());
-      accumulated += debits[i] + credits[i];
+      accumulated += cashFlow.getDebits()[i].doubleValue() + cashFlow.getCredits()[i].doubleValue();
       accumulatedSeries.add(day, accumulated);
-      accumulatedExpected += debitsExpected[i] + creditsExpected[i];
+      accumulatedExpected += cashFlow.getDebitsExpected()[i].doubleValue() + cashFlow.getCreditsExpected()[i].doubleValue();
       accumulatedSeriesExpected.add(day, accumulatedExpected);
-      worstCase += credits[i];
+      worstCase += cashFlow.getCredits()[i].doubleValue();
       worstCaseSeries.add(day, worstCase);
       // creditSeries.add(day, -credits);
       // debitSeries.add(day, debits);
