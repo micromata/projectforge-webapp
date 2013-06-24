@@ -65,7 +65,7 @@ public class SkillTreePage extends AbstractSecuredPage
     form.init();
   }
 
-  public void onListViewSubmit() {
+  protected void onListViewSubmit() {
     if (skillListPage != null) {
       setResponsePage(skillListPage);
     } else {
