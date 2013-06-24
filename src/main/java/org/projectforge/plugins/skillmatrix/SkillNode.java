@@ -29,13 +29,14 @@ import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
+import org.projectforge.core.IdObject;
 import org.projectforge.core.UserException;
 
 /**
  * Represents a single skill as part of the SkillTree. The data of a skill node is stored in the database.
  * @author Billy Duong (b.duong@micromata.de)
  */
-public class SkillNode implements Serializable
+public class SkillNode implements IdObject<Integer>, Serializable
 {
   private static final Logger log = Logger.getLogger(SkillNode.class);
 
