@@ -32,7 +32,7 @@ import org.projectforge.core.UserException;
 import org.projectforge.user.UserRightId;
 
 /**
- * 
+ * DAO for SkillDO. Handles constraint validation and database access.
  * @author Billy Duong (b.duong@micromata.de)
  * 
  */
@@ -77,6 +77,10 @@ public class SkillDao extends BaseDao<SkillDO>
     }
   }
 
+  /**
+   * Sets the tree as expired to force a refresh (rebuild of tree).
+   * @see org.projectforge.core.BaseDao#afterSaveOrModify(org.projectforge.core.ExtendedBaseDO)
+   */
   @Override
   protected void afterSaveOrModify(final SkillDO obj)
   {
@@ -88,6 +92,11 @@ public class SkillDao extends BaseDao<SkillDO>
     return skillTree;
   }
 
+  /**
+   * 
+   * @param skill that needs to be validated.
+   * @throws UserException is thrown when the user wants to create a duplicate.
+   */
   @SuppressWarnings("unchecked")
   public void checkConstraintViolation(final SkillDO skill) throws UserException
   {
