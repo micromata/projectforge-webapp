@@ -55,6 +55,8 @@ public class SkillListForm extends AbstractListForm<SkillFilter, SkillListPage>
   {
     super.init();
     final Button skillTreeButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("treeView")) {
+      private static final long serialVersionUID = -8763718088111525575L;
+
       @Override
       public void onSubmit() {
         parentPage.onTreeViewSubmit();
