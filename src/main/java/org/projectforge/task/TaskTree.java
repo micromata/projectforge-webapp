@@ -121,7 +121,7 @@ public class TaskTree extends AbstractCache implements Serializable
       node.setParent(parent);
       parent.addChild(node);
     }
-    this.timeOfLastModification = new Date().getTime();
+    updateTimeOfLastModification();
     return node;
   }
 
@@ -380,7 +380,7 @@ public class TaskTree extends AbstractCache implements Serializable
       node.setParent(newParent);
       newParent.addChild(node);
     }
-    this.timeOfLastModification = new Date().getTime();
+    updateTimeOfLastModification();
     return node;
   }
 
@@ -845,7 +845,7 @@ public class TaskTree extends AbstractCache implements Serializable
       if (parentNode != null) {
         node.setParent(parentNode);
         parentNode.addChild(node);
-        this.timeOfLastModification = new Date().getTime();
+        updateTimeOfLastModification();
       } else {
         log.debug("Processing root node:" + node);
       }
@@ -894,5 +894,10 @@ public class TaskTree extends AbstractCache implements Serializable
       node.bookableForTimesheets = bookable;
     }
     log.info("Initializing task tree done.");
+  }
+
+  private void updateTimeOfLastModification()
+  {
+    this.timeOfLastModification = new Date().getTime();
   }
 }
