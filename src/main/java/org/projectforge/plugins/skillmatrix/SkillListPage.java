@@ -173,4 +173,9 @@ public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, Ski
   {
     return new SkillListForm(this);
   }
+
+  static void appendCssClasses(final Item<?> item, final SkillDO skill, final Integer preselectedSkillNode)
+  {
+    appendCssClasses(item, skill.getId(), preselectedSkillNode, skill.isDeleted());
+  }
 }
