@@ -34,6 +34,7 @@ import org.projectforge.core.UserException;
 import org.projectforge.user.UserRightId;
 
 /**
+ * DAO for SkillRatingDO. Handles constraint validation and database access.
  * @author Billy Duong (b.duong@micromata.de)
  * 
  */
@@ -77,7 +78,9 @@ public class SkillRatingDao extends BaseDao<SkillRatingDO>
   }
 
   /**
-   * @param obj
+   * 
+   * @param skillRating that needs to be validated.
+   * @throws UserException is thrown when the user wants to create a duplicate.
    */
   @SuppressWarnings("unchecked")
   private void checkConstraintViolation(final SkillRatingDO skillRating) throws UserException

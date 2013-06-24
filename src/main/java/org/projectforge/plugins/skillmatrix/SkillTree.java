@@ -33,7 +33,6 @@ import java.util.Map;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 import org.projectforge.common.AbstractCache;
-import org.projectforge.task.TaskNode;
 
 /**
  * Holds the complete skill list as a tree. It will be initialized by the values read from the database. Any changes will be written to this
@@ -66,7 +65,7 @@ public class SkillTree extends AbstractCache implements Serializable
   }
 
   /** Adds the given node as child of the given parent. */
-  private synchronized SkillNode addTaskNode(final SkillNode node, final SkillNode parent)
+  private synchronized SkillNode addSkillNode(final SkillNode node, final SkillNode parent)
   {
     checkRefresh();
     if (parent != null) {
@@ -94,14 +93,14 @@ public class SkillTree extends AbstractCache implements Serializable
       node.setParent(root);
     }
     skillMap.put(node.getId(), node);
-    return addTaskNode(node, parent);
+    return addSkillNode(node, parent);
   }
 
   /**
    * @param skillId
-   * @param ancestorTaskId
+   * @param ancestorSkillId
    * @return
-   * @see TaskNode#getPathToAncestor(Integer)
+   * @see SkillNode#getPathToAncestor(Integer)
    */
   public List<SkillNode> getPath(final Integer skillId, final Integer ancestorSkillId)
   {
