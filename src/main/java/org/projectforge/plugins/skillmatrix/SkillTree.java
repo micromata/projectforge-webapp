@@ -25,6 +25,7 @@ package org.projectforge.plugins.skillmatrix;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +56,10 @@ public class SkillTree extends AbstractCache implements Serializable
   /** The root node of all skills. The only node with parent null. */
   private SkillNode root = null;
 
-  public SkillNode getRootTaskNode()
+  /** Time of last modification in milliseconds from 1970-01-01. */
+  private long timeOfLastModification = 0;
+
+  public SkillNode getRootSkillNode()
   {
     checkRefresh();
     return this.root;
@@ -69,12 +73,13 @@ public class SkillTree extends AbstractCache implements Serializable
       node.setParent(parent);
       parent.addChild(node);
     }
+    updateTimeOfLastModification();
     return node;
   }
 
   /**
-   * Adds a new node with the given data. The given skill holds all data and the information (id) of the parent node of the node to add. Will
-   * be called by SkillDao after inserting a new skill.
+   * Adds a new node with the given data. The given skill holds all data and the information (id) of the parent node of the node to add.
+   * Will be called by SkillDao after inserting a new skill.
    */
   SkillNode addSkillNode(final SkillDO skill)
   {
@@ -130,13 +135,14 @@ public class SkillTree extends AbstractCache implements Serializable
     return skillMap.get(id);
   }
 
-  public SkillDO getSkill(final String title) {
-    if(title == null) {
+  public SkillDO getSkill(final String title)
+  {
+    if (title == null) {
       return null;
     }
     checkRefresh();
-    for(final SkillNode skill : skillMap.values()) {
-      if(title.equals(skill.getSkill().getTitle())) {
+    for (final SkillNode skill : skillMap.values()) {
+      if (title.equals(skill.getSkill().getTitle())) {
         return skill.getSkill();
       }
     }
@@ -151,6 +157,16 @@ public class SkillTree extends AbstractCache implements Serializable
       return node.getSkill();
     }
     return null;
+  }
+
+  /**
+   * Has the current logged in user select access to the given skill?
+   * @param node
+   * @return
+   */
+  public boolean hasSelectAccess(final SkillNode node)
+  {
+    return skillDao.hasLoggedInUserSelectAccess(node.getSkill(), false);
   }
 
   /**
@@ -224,8 +240,8 @@ public class SkillTree extends AbstractCache implements Serializable
   }
 
   /**
-   * All skills from database will be read and cached into this SkillTree. Also all explicit group skill access' will be read from database and
-   * will be cached in this tree (implicit access' will be created too).<br/>
+   * All skills from database will be read and cached into this SkillTree. Also all explicit group skill access' will be read from database
+   * and will be cached in this tree (implicit access' will be created too).<br/>
    * The generation of the skill tree will be done manually, not by Hibernate because the skill hierarchy is very sensible. Manipulations of
    * the skill tree should be done carefully for single skill nodes.
    * 
@@ -281,6 +297,7 @@ public class SkillTree extends AbstractCache implements Serializable
       if (parentNode != null) {
         node.setParent(parentNode);
         parentNode.addChild(node);
+        updateTimeOfLastModification();
       } else {
         log.debug("Processing root node:" + node);
       }
@@ -293,5 +310,26 @@ public class SkillTree extends AbstractCache implements Serializable
       log.debug(this.toString());
     }
     log.info("Initializing skill tree done.");
+  }
+
+  /**
+   * @return the timeOfLastModification
+   */
+  public long getTimeOfLastModification()
+  {
+    return timeOfLastModification;
+  }
+
+  /**
+   * @param timeOfLastModification the timeOfLastModification to set
+   */
+  public void setTimeOfLastModification(final long timeOfLastModification)
+  {
+    this.timeOfLastModification = timeOfLastModification;
+  }
+
+  private void updateTimeOfLastModification()
+  {
+    this.timeOfLastModification = new Date().getTime();
   }
 }
