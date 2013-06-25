@@ -22,6 +22,8 @@ public class SkillTreePage extends AbstractSecuredPage
 
   private static final long serialVersionUID = -3902220283833390881L;
 
+  public static final String USER_PREFS_KEY_OPEN_SKILLS = "openSkills";
+
   private SkillTreeForm form;
 
   private ISelectCallerPage caller;
@@ -29,6 +31,8 @@ public class SkillTreePage extends AbstractSecuredPage
   private String selectProperty;
 
   private SkillListPage skillListPage;
+
+  private SkillTreeBuilder skillTreeBuilder;
 
   /**
    * @param parameters
@@ -63,6 +67,9 @@ public class SkillTreePage extends AbstractSecuredPage
     form = new SkillTreeForm(this);
     body.add(form);
     form.init();
+    skillTreeBuilder = new SkillTreeBuilder().setCaller(caller).setSelectProperty(selectProperty);
+    form.add(skillTreeBuilder.createTree("tree", this, form.getSearchFilter()));
+
   }
 
   protected void onListViewSubmit() {
