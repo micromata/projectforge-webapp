@@ -57,8 +57,6 @@ public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, Ski
 
   public static final String I18N_KEY_PREFIX = "plugins.skillmatrix";
 
-  private SkillTree skillTree;
-
   private SkillTreePage skillTreePage;
 
   public SkillListPage(final PageParameters parameters)

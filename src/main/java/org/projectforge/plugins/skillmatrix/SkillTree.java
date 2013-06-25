@@ -47,7 +47,7 @@ public class SkillTree extends AbstractCache implements Serializable
 
   private static final List<SkillNode> EMPTY_LIST = new ArrayList<SkillNode>();
 
-  private final SkillDao skillDao;
+  private SkillDao skillDao;
 
   /** For faster searching of entries. */
   private Map<Integer, SkillNode> skillMap;
@@ -196,9 +196,8 @@ public class SkillTree extends AbstractCache implements Serializable
     return node;
   }
 
-  public SkillTree(final SkillDao skillDao)
+  public SkillTree()
   {
-    this.skillDao = skillDao;
   }
 
   /**
@@ -330,5 +329,15 @@ public class SkillTree extends AbstractCache implements Serializable
   private void updateTimeOfLastModification()
   {
     this.timeOfLastModification = new Date().getTime();
+  }
+
+  /**
+   * @param skillDao the skillDao to set
+   * @return this for chaining.
+   */
+  SkillTree setSkillDao(final SkillDao skillDao)
+  {
+    this.skillDao = skillDao;
+    return this;
   }
 }
