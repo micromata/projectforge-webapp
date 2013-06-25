@@ -50,7 +50,7 @@ public class SkillDao extends BaseDao<SkillDO>
 
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "parent.title"};
 
-  private final SkillTree skillTree = new SkillTree(this);
+  private final SkillTree skillTree;
 
   // private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SkillDao.class);
 
@@ -58,6 +58,7 @@ public class SkillDao extends BaseDao<SkillDO>
   {
     super(SkillDO.class);
     userRightId = USER_RIGHT_ID;
+    skillTree = new SkillTree().setSkillDao(this);
   }
 
   @Override
@@ -84,7 +85,7 @@ public class SkillDao extends BaseDao<SkillDO>
   @Override
   protected void afterSaveOrModify(final SkillDO obj)
   {
-    skillTree.setExpired();
+    getSkillTree().setExpired();
   }
 
   public SkillTree getSkillTree()
@@ -104,7 +105,7 @@ public class SkillDao extends BaseDao<SkillDO>
     List<SkillDO> list;
     final StringBuilder sb = new StringBuilder();
     sb.append("from SkillDO s where s.title=? and deleted=false and s.parent.id");
-    final List<Object> params= new LinkedList<Object>();
+    final List<Object> params = new LinkedList<Object>();
     params.add(skill.getTitle());
     if (skill.getParentId() != null) {
       sb.append("=?");

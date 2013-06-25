@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.tree.TreeTable;
 import org.projectforge.web.tree.TreeTableFilter;
 import org.projectforge.web.tree.TreeTableNode;
@@ -20,7 +21,7 @@ import org.projectforge.web.tree.TreeTableNode;
 /**
  * The implementation of TreeTable for skills. Used for browsing the skills (tree view).
  * @author Billy Duong (b.duong@micromata.de)
- *
+ * 
  */
 public class SkillTreeTable extends TreeTable<SkillTreeTableNode>
 {
@@ -29,19 +30,16 @@ public class SkillTreeTable extends TreeTable<SkillTreeTableNode>
 
   private static final Logger log = Logger.getLogger(SkillTreeTable.class);
 
-  private final SkillTree skillTree;
+  @SpringBean(name = "skillDao")
+  private SkillDao skillDao;
 
-  private SkillNode rootNode;
+  private final SkillNode rootNode;
 
   /** Time of last modification in milliseconds from 1970-01-01. */
   private long timeOfLastModification = 0;
 
-  public SkillTreeTable(final SkillTree skillTree) {
-    this.skillTree = skillTree;
-  }
-
-  public SkillTreeTable(final SkillTree skillTree, final SkillNode root) {
-    this(skillTree);
+  public SkillTreeTable(final SkillNode root)
+  {
     this.rootNode = root;
   }
 
@@ -53,7 +51,7 @@ public class SkillTreeTable extends TreeTable<SkillTreeTableNode>
   @Override
   public List<SkillTreeTableNode> getNodeList(final TreeTableFilter<TreeTableNode> filter)
   {
-    if (getTimeOfLastModification() < skillTree.getTimeOfLastModification()) {
+    if (getTimeOfLastModification() < getSkillTree().getTimeOfLastModification()) {
       reload();
     }
     return super.getNodeList(filter);
@@ -64,7 +62,7 @@ public class SkillTreeTable extends TreeTable<SkillTreeTableNode>
     final SkillNode skill = parent.getSkillNode();
     if (skill.getChilds() != null) {
       for (final SkillNode node : skill.getChilds()) {
-        if (skillTree.hasSelectAccess(node) == true) {
+        if (getSkillTree().hasSelectAccess(node) == true) {
           // The logged in user has select access, so add this skill node
           // to this tree table:
           final SkillTreeTableNode child = new SkillTreeTableNode(parent, node);
@@ -82,7 +80,7 @@ public class SkillTreeTable extends TreeTable<SkillTreeTableNode>
     if (rootNode != null) {
       root = new SkillTreeTableNode(null, rootNode);
     } else {
-      root = new SkillTreeTableNode(null, skillTree.getRootSkillNode());
+      root = new SkillTreeTableNode(null, getSkillTree().getRootSkillNode());
     }
     addDescendantNodes(root);
     updateOpenStatus();
@@ -96,7 +94,7 @@ public class SkillTreeTable extends TreeTable<SkillTreeTableNode>
    */
   boolean hasSelectAccess(final SkillNode node)
   {
-    return skillTree.hasSelectAccess(node);
+    return getSkillTree().hasSelectAccess(node);
   }
 
   /**
@@ -107,7 +105,13 @@ public class SkillTreeTable extends TreeTable<SkillTreeTableNode>
     return timeOfLastModification;
   }
 
-  private void updateTimeOfLastModification() {
+  private void updateTimeOfLastModification()
+  {
     this.timeOfLastModification = new Date().getTime();
+  }
+
+  private SkillTree getSkillTree()
+  {
+    return skillDao.getSkillTree();
   }
 }
