@@ -22,6 +22,8 @@ public class SkillTreePage extends AbstractSecuredPage
 
   private static final long serialVersionUID = -3902220283833390881L;
 
+  public static final String USER_PREFS_KEY_OPEN_SKILLS = "openSkills";
+
   private SkillTreeForm form;
 
   private ISelectCallerPage caller;
