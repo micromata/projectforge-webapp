@@ -24,8 +24,6 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.NoRecordsToo
 import org.apache.wicket.extensions.markup.html.repeater.tree.AbstractTree;
 import org.apache.wicket.extensions.markup.html.repeater.tree.TableTree;
 import org.apache.wicket.extensions.markup.html.repeater.tree.content.Folder;
-import org.apache.wicket.extensions.markup.html.repeater.tree.table.NodeBorder;
-import org.apache.wicket.extensions.markup.html.repeater.tree.table.NodeModel;
 import org.apache.wicket.extensions.markup.html.repeater.tree.table.TreeColumn;
 import org.apache.wicket.extensions.markup.html.repeater.tree.theme.WindowsTheme;
 import org.apache.wicket.markup.ComponentTag;
@@ -33,16 +31,12 @@ import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.OddEvenItem;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.model.ResourceModel;
 import org.projectforge.web.fibu.ISelectCallerPage;
-import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.CellItemListener;
-import org.projectforge.web.wicket.ListSelectActionPanel;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -137,26 +131,35 @@ public class SkillTreeBuilder implements Serializable
     };
     final List<IColumn<SkillNode, String>> columns = new ArrayList<IColumn<SkillNode, String>>();
 
-    columns.add(new TreeColumn<SkillNode, String>(new ResourceModel("skill")) {
+    // Dummy
+    columns.add(new TreeColumn<SkillNode, String>(new Model<String>("dummy")) {
       @Override
       public void populateItem(final Item<ICellPopulator<SkillNode>> cellItem, final String componentId, final IModel<SkillNode> rowModel)
       {
-        final RepeatingView view = new RepeatingView(componentId);
-        cellItem.add(view);
-        final SkillNode skillNode = rowModel.getObject();
-        if (selectMode == false) {
-          view.add(new ListSelectActionPanel(view.newChildId(), rowModel, SkillEditPage.class, skillNode.getId(), parentPage, ""));
-        } else {
-          view.add(new ListSelectActionPanel(view.newChildId(), rowModel, caller, selectProperty, skillNode.getId(), ""));
-        }
-        AbstractListPage.addRowClick(cellItem);
-        final NodeModel<SkillNode> nodeModel = (NodeModel<SkillNode>) rowModel;
-        final Component nodeComponent = getTree().newNodeComponent(view.newChildId(), nodeModel.getWrappedModel());
-        nodeComponent.add(new NodeBorder(nodeModel.getBranches()));
-        view.add(nodeComponent);
-        cellItemListener.populateItem(cellItem, componentId, rowModel);
+        super.populateItem(cellItem, componentId, rowModel);
       }
     });
+
+    // columns.add(new TreeColumn<SkillNode, String>(new ResourceModel("skill")) {
+    // @Override
+    // public void populateItem(final Item<ICellPopulator<SkillNode>> cellItem, final String componentId, final IModel<SkillNode> rowModel)
+    // {
+    // final RepeatingView view = new RepeatingView(componentId);
+    // cellItem.add(view);
+    // final SkillNode skillNode = rowModel.getObject();
+    // if (selectMode == false) {
+    // view.add(new ListSelectActionPanel(view.newChildId(), rowModel, SkillEditPage.class, skillNode.getId(), parentPage, ""));
+    // } else {
+    // view.add(new ListSelectActionPanel(view.newChildId(), rowModel, caller, selectProperty, skillNode.getId(), ""));
+    // }
+    // AbstractListPage.addRowClick(cellItem);
+    // final NodeModel<SkillNode> nodeModel = (NodeModel<SkillNode>) rowModel;
+    // final Component nodeComponent = getTree().newNodeComponent(view.newChildId(), nodeModel.getWrappedModel());
+    // nodeComponent.add(new NodeBorder(nodeModel.getBranches()));
+    // view.add(nodeComponent);
+    // cellItemListener.populateItem(cellItem, componentId, rowModel);
+    // }
+    // });
     return columns;
   }
 
@@ -229,26 +232,26 @@ public class SkillTreeBuilder implements Serializable
   // this.dateTimeFormatter = dateTimeFormatter;
   // return this;
   // }
-  //
-  // /**
-  // * @param caller the caller to set
-  // * @return this for chaining.
-  // */
-  // public SkillTreeBuilder setCaller(final ISelectCallerPage caller)
-  // {
-  // this.caller = caller;
-  // return this;
-  // }
-  //
-  // /**
-  // * @param selectProperty the selectProperty to set
-  // * @return this for chaining.
-  // */
-  // public SkillTreeBuilder setSelectProperty(final String selectProperty)
-  // {
-  // this.selectProperty = selectProperty;
-  // return this;
-  // }
+
+  /**
+   * @param caller the caller to set
+   * @return this for chaining.
+   */
+  public SkillTreeBuilder setCaller(final ISelectCallerPage caller)
+  {
+    this.caller = caller;
+    return this;
+  }
+
+  /**
+   * @param selectProperty the selectProperty to set
+   * @return this for chaining.
+   */
+  public SkillTreeBuilder setSelectProperty(final String selectProperty)
+  {
+    this.selectProperty = selectProperty;
+    return this;
+  }
 
   /**
    * @param highlightedSkillNodeId the highlightedSkillNodeId to set
@@ -283,7 +286,6 @@ public class SkillTreeBuilder implements Serializable
 
   private SkillTree getSkillTree()
   {
-    // return Registry.instance().getSkillTree();
     return skillDao.getSkillTree();
   }
 
