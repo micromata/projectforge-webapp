@@ -12,6 +12,7 @@ package org.projectforge.plugins.skillmatrix;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
+import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * @author Billy Duong (b.duong@micromata.de)
@@ -65,6 +66,34 @@ public class SkillTreePage extends AbstractSecuredPage
     form = new SkillTreeForm(this);
     body.add(form);
     form.init();
+    final SkillTreeBuilder skillTreeBuilder = new SkillTreeBuilder().setCaller(caller).setSelectProperty(selectProperty);
+    form.add(skillTreeBuilder.createTree("tree", this, form.getSearchFilter()));
+  }
+
+  public void refresh()
+  {
+    form.getSearchFilter().resetMatch();
+  }
+
+  /**
+   * @return true, if this page is called for selection by a caller otherwise false.
+   */
+  public boolean isSelectMode()
+  {
+    return this.caller != null;
+  }
+
+  protected void onSearchSubmit()
+  {
+    refresh();
+  }
+
+
+  protected void onResetSubmit()
+  {
+    form.getSearchFilter().reset();
+    refresh();
+    form.clearInput();
   }
 
   protected void onListViewSubmit() {
@@ -72,6 +101,14 @@ public class SkillTreePage extends AbstractSecuredPage
       setResponsePage(skillListPage);
     } else {
       setResponsePage(new SkillListPage(this, getPageParameters()));
+    }
+  }
+
+  protected void onCancelSubmit()
+  {
+    if (isSelectMode() == true) {
+      WicketUtils.setResponsePage(this, caller);
+      caller.cancelSelection(selectProperty);
     }
   }
 
