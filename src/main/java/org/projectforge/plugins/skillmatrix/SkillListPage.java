@@ -105,7 +105,7 @@ public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, Ski
       }
     };
 
-    final CellItemListenerPropertyColumn<SkillDO> modified = new CellItemListenerPropertyColumn<SkillDO>(getString("modified"),
+    final CellItemListenerPropertyColumn<SkillDO> lastUpdate = new CellItemListenerPropertyColumn<SkillDO>(getString("lastUpdate"),
         getSortable("lastUpdate", sortable), "lastUpdate", cellItemListener);
 
     final CellItemListenerPropertyColumn<SkillDO> title = new CellItemListenerPropertyColumn<SkillDO>(SkillDO.class, getSortable("title",
@@ -130,7 +130,7 @@ public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, Ski
     columns.add(comment);
     columns.add(rateable);
     columns.add(created);
-    columns.add(modified);
+    columns.add(lastUpdate);
 
     return columns;
   }
