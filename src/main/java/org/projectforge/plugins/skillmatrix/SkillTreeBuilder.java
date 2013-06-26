@@ -160,6 +160,12 @@ public class SkillTreeBuilder implements Serializable
       }
     };
 
+    final CellItemListenerPropertyColumn<SkillNode> created = new CellItemListenerPropertyColumn<SkillNode>(new ResourceModel(
+        "created"), null, "skill.created", cellItemListener);
+
+    final CellItemListenerPropertyColumn<SkillNode> lastUpdate = new CellItemListenerPropertyColumn<SkillNode>(new ResourceModel(
+        "lastUpdate"), null, "skill.lastUpdate", cellItemListener);
+
     final CellItemListenerPropertyColumn<SkillNode> description = new CellItemListenerPropertyColumn<SkillNode>(new ResourceModel(
         "plugins.skillmatrix.skill.description"), null, "skill.description", cellItemListener);
 
@@ -173,8 +179,8 @@ public class SkillTreeBuilder implements Serializable
     columns.add(description);
     columns.add(comment);
     columns.add(rateable);
-    // columns.add(created);
-    // columns.add(modified);
+    columns.add(created);
+    columns.add(lastUpdate);
 
     return columns;
   }
