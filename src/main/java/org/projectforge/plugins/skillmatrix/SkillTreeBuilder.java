@@ -63,19 +63,7 @@ public class SkillTreeBuilder implements Serializable
 
   private Integer highlightedSkillNodeId;
 
-  private boolean selectMode, showRootNode, showOrders;
-
-  // private AccessChecker accessChecker;
-  //
-  // private TaskFormatter taskFormatter;
-  //
-  // private PriorityFormatter priorityFormatter;
-  //
-  // private UserFormatter userFormatter;
-  //
-  // private DateTimeFormatter dateTimeFormatter;
-  //
-  // private UserGroupCache userGroupCache;
+  private boolean selectMode, showRootNode;
 
   private ISelectCallerPage caller;
 
@@ -128,7 +116,6 @@ public class SkillTreeBuilder implements Serializable
   @SuppressWarnings("serial")
   private List<IColumn<SkillNode, String>> createColumns()
   {
-    // final SkillTree skillTree = getSkillTree();
     final CellItemListener<SkillNode> cellItemListener = new CellItemListener<SkillNode>() {
       public void populateItem(final Item<ICellPopulator<SkillNode>> item, final String componentId, final IModel<SkillNode> rowModel)
       {
@@ -230,30 +217,6 @@ public class SkillTreeBuilder implements Serializable
     this.showRootNode = showRootNode;
     return this;
   }
-
-  // /**
-  // * @param showOrders the showOrders to set
-  // * @return this for chaining.
-  // */
-  // public SkillTreeBuilder setShowOrders(final boolean showOrders)
-  // {
-  // this.showOrders = showOrders;
-  // return this;
-  // }
-  //
-  // public SkillTreeBuilder set(final AccessChecker accessChecker, final SkillDao skillDao, final SkillFormatter skillFormatter,
-  // final PriorityFormatter priorityFormatter, final UserFormatter userFormatter, final DateTimeFormatter dateTimeFormatter,
-  // final UserGroupCache userGroupCache)
-  // {
-  // this.accessChecker = accessChecker;
-  // this.skillFormatter = skillFormatter;
-  // this.priorityFormatter = priorityFormatter;
-  // this.userFormatter = userFormatter;
-  // this.dateTimeFormatter = dateTimeFormatter;
-  // this.userGroupCache = userGroupCache;
-  // this.dateTimeFormatter = dateTimeFormatter;
-  // return this;
-  // }
 
   /**
    * @param caller the caller to set
