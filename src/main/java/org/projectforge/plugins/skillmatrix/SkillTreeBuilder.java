@@ -138,13 +138,13 @@ public class SkillTreeBuilder implements Serializable
     final List<IColumn<SkillNode, String>> columns = new ArrayList<IColumn<SkillNode, String>>();
 
     // Dummy
-    columns.add(new TreeColumn<SkillNode, String>(new Model<String>("dummy")) {
-      @Override
-      public void populateItem(final Item<ICellPopulator<SkillNode>> cellItem, final String componentId, final IModel<SkillNode> rowModel)
-      {
-        super.populateItem(cellItem, componentId, rowModel);
-      }
-    });
+    //    columns.add(new TreeColumn<SkillNode, String>(new Model<String>("dummy")) {
+    //      @Override
+    //      public void populateItem(final Item<ICellPopulator<SkillNode>> cellItem, final String componentId, final IModel<SkillNode> rowModel)
+    //      {
+    //        super.populateItem(cellItem, componentId, rowModel);
+    //      }
+    //    });
 
     columns.add(new TreeColumn<SkillNode, String>(new ResourceModel("plugins.skillmatrix.skillrating.skill")) {
       @Override
