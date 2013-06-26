@@ -63,7 +63,7 @@ public class AddressDOConverter
     address.setPostalCity(addressDO.getPostalCity());
     address.setPostalCountry(addressDO.getPostalCountry());
     address.setPostalState(addressDO.getPostalState());
-    address.setPostalZipCode(addressDO.getPostalState());
+    address.setPostalZipCode(addressDO.getPostalZipCode());
     address.setPrivateAddressText(addressDO.getPrivateAddressText());
     address.setPrivateCity(addressDO.getPrivateCity());
     address.setPrivateCountry(addressDO.getPrivateCountry());
