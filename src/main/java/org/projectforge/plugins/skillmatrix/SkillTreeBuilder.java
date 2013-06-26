@@ -42,6 +42,7 @@ import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.CellItemListener;
+import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
 /**
@@ -137,16 +138,8 @@ public class SkillTreeBuilder implements Serializable
     };
     final List<IColumn<SkillNode, String>> columns = new ArrayList<IColumn<SkillNode, String>>();
 
-    // Dummy
-    //    columns.add(new TreeColumn<SkillNode, String>(new Model<String>("dummy")) {
-    //      @Override
-    //      public void populateItem(final Item<ICellPopulator<SkillNode>> cellItem, final String componentId, final IModel<SkillNode> rowModel)
-    //      {
-    //        super.populateItem(cellItem, componentId, rowModel);
-    //      }
-    //    });
-
-    columns.add(new TreeColumn<SkillNode, String>(new ResourceModel("plugins.skillmatrix.skillrating.skill")) {
+    // Contains file browser like unfold/fold features
+    final TreeColumn<SkillNode, String> title = new TreeColumn<SkillNode, String>(new ResourceModel("plugins.skillmatrix.skill.title")) {
       @Override
       public void populateItem(final Item<ICellPopulator<SkillNode>> cellItem, final String componentId, final IModel<SkillNode> rowModel)
       {
@@ -165,7 +158,24 @@ public class SkillTreeBuilder implements Serializable
         view.add(nodeComponent);
         cellItemListener.populateItem(cellItem, componentId, rowModel);
       }
-    });
+    };
+
+    final CellItemListenerPropertyColumn<SkillNode> description = new CellItemListenerPropertyColumn<SkillNode>(new ResourceModel(
+        "plugins.skillmatrix.skill.description"), null, "skill.description", cellItemListener);
+
+    final CellItemListenerPropertyColumn<SkillNode> comment = new CellItemListenerPropertyColumn<SkillNode>(new ResourceModel(
+        "plugins.skillmatrix.skill.comment"), null, "skill.comment", cellItemListener);
+
+    final CellItemListenerPropertyColumn<SkillNode> rateable = new CellItemListenerPropertyColumn<SkillNode>(new ResourceModel(
+        "plugins.skillmatrix.skill.rateable"), null, "skill.rateable", cellItemListener);
+
+    columns.add(title);
+    columns.add(description);
+    columns.add(comment);
+    columns.add(rateable);
+    // columns.add(created);
+    // columns.add(modified);
+
     return columns;
   }
 
