@@ -40,6 +40,12 @@ public class SkillTreeForm extends AbstractForm<SkillFilter, SkillTreePage>
 
   private SkillFilter searchFilter;
 
+  private SingleButtonPanel cancelButtonPanel;
+
+  private SingleButtonPanel searchButtonPanel;
+
+  private SingleButtonPanel resetButtonPanel;
+
   /**
    * @param parentPage
    */
@@ -71,20 +77,20 @@ public class SkillTreeForm extends AbstractForm<SkillFilter, SkillTreePage>
     actionButtons = new MyComponentsRepeater<Component>("actionButtons");
 
     add(actionButtons.getRepeatingView());
-    // {
-    // @SuppressWarnings("serial")
-    // final Button cancelButton = new Button("button", new Model<String>("cancel")) {
-    // @Override
-    // public final void onSubmit()
-    // {
-    // getParentPage().onCancelSubmit();
-    // }
-    // };
-    // cancelButton.setDefaultFormProcessing(false);
-    // final SingleButtonPanel cancelButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), cancelButton, getString("cancel"),
-    // SingleButtonPanel.CANCEL);
-    // actionButtons.add(cancelButtonPanel);
-    // }
+    {
+      @SuppressWarnings("serial")
+      final Button cancelButton = new Button("button", new Model<String>("cancel")) {
+        @Override
+        public final void onSubmit()
+        {
+          getParentPage().onCancelSubmit();
+        }
+      };
+      cancelButton.setDefaultFormProcessing(false);
+      cancelButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), cancelButton, getString("cancel"),
+          SingleButtonPanel.CANCEL);
+      actionButtons.add(cancelButtonPanel);
+    }
     {
       @SuppressWarnings("serial")
       final Button resetButton = new Button("button", new Model<String>("reset")) {
@@ -96,7 +102,7 @@ public class SkillTreeForm extends AbstractForm<SkillFilter, SkillTreePage>
         }
       };
       resetButton.setDefaultFormProcessing(false);
-      final SingleButtonPanel resetButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), resetButton, getString("reset"),
+      resetButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), resetButton, getString("reset"),
           SingleButtonPanel.RESET);
       actionButtons.add(resetButtonPanel);
     }
@@ -124,12 +130,23 @@ public class SkillTreeForm extends AbstractForm<SkillFilter, SkillTreePage>
           getParentPage().onSearchSubmit();
         }
       };
-      final SingleButtonPanel searchButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), searchButton, getString("search"),
+      searchButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), searchButton, getString("search"),
           SingleButtonPanel.DEFAULT_SUBMIT);
       actionButtons.add(searchButtonPanel);
       setDefaultButton(searchButton);
     }
 
+    setComponentsVisibility();
+  }
+
+  protected void setComponentsVisibility()
+  {
+    if (parentPage.isSelectMode() == false) {
+      // Show cancel button only in select mode.
+      cancelButtonPanel.setVisible(false);
+    }
+    searchButtonPanel.setVisible(true);
+    resetButtonPanel.setVisible(true);
   }
 
   public SkillFilter getSearchFilter()
@@ -152,6 +169,13 @@ public class SkillTreeForm extends AbstractForm<SkillFilter, SkillTreePage>
       getParentPage().putUserPrefEntry(SkillListForm.class.getName() + ":Filter", this.searchFilter, true);
     }
     return this.searchFilter;
+  }
+
+  @Override
+  protected void onSubmit()
+  {
+    super.onSubmit();
+    parentPage.refresh();
   }
 
   @Override
