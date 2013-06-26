@@ -140,15 +140,12 @@ public class SkillTreeProvider implements ITreeProvider<SkillNode>
     final PFUserDO user = PFUserContext.getUser();
     for (final SkillNode node : nodes) {
 
-      // TODO rewrite matching, no nodes are added
-
       final boolean isMatch = skillFilter.match(node, getSkillDao(), user);
       final boolean hasAccess = getSkillDao().hasSelectAccess(user, node.getSkill(), false);
 
-      //      if (isMatch == true && hasAccess == true) {
-      //        list.add(node);
-      //      }
-      list.add(node);
+      if (isMatch == true && hasAccess == true) {
+        list.add(node);
+      }
     }
     return list.iterator();
   }

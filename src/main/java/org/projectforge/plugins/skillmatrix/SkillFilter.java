@@ -67,10 +67,10 @@ public class SkillFilter extends BaseSearchFilter
     }
     final SkillDO skill = node.getSkill();
     if (StringUtils.isBlank(this.searchString) == true) {
-      return node.isRootNode() == true;
+      return true;
     } else {
       if (isVisibleBySearchString(node, skill, skillDao, user) == true) {
-        return node.isRootNode() == true;
+        return true;
       } else {
         if (node.getParent() != null && node.getParent().isRootNode() == false && isAncestorVisibleBySearchString(node.getParent()) == true) {
           // Otherwise the node is only visible by his status if the parent node is visible:
@@ -104,17 +104,18 @@ public class SkillFilter extends BaseSearchFilter
     if (cachedVisibility != null) {
       return cachedVisibility;
     }
-    if (node.isRootNode() == false) {
-      skillVisibility.put(skill.getId(), false);
-      return false;
-    }
-    if (skillDao != null && skillDao.hasSelectAccess(user, node.getSkill(), false) == false) {
-      return false;
-    }
+    //    if (node.isRootNode() == false) {
+    //      skillVisibility.put(skill.getId(), false);
+    //      return false;
+    //    }
+    //    if (skillDao != null && skillDao.hasSelectAccess(user, node.getSkill(), false) == false) {
+    //      return false;
+    //    }
     //    final PFUserDO responsibleUser = Registry.instance().getUserGroupCache().getUser(skill.getResponsibleUserId());
     //    final String username = responsibleUser != null ? responsibleUser.getFullname() + " " + responsibleUser.getUsername() : null;
     if (StringUtils.containsIgnoreCase(skill.getTitle(), this.searchString) == true
-        || StringUtils.containsIgnoreCase(skill.getDescription(), this.searchString) == true) {
+        || StringUtils.containsIgnoreCase(skill.getDescription(), this.searchString) == true
+        || StringUtils.containsIgnoreCase(skill.getComment(), this.searchString) == true ) {
       skillVisibility.put(skill.getId(), true);
       skillsMatched.add(skill.getId());
       return true;

@@ -123,6 +123,7 @@ public class SkillTreeBuilder implements Serializable
         SkillListPage.appendCssClasses(item, skillNode.getSkill(), highlightedSkillNodeId);
       }
     };
+
     final List<IColumn<SkillNode, String>> columns = new ArrayList<IColumn<SkillNode, String>>();
 
     final TreeColumn<SkillNode, String> title = new TreeColumn<SkillNode, String>(new ResourceModel("plugins.skillmatrix.skill.title")) {
