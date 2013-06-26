@@ -46,7 +46,7 @@ import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
 /**
- * @author Kai Reinhard (k.reinhard@micromata.de)
+ * @author Billy Duong (b.duong@micromata.de)
  * 
  */
 public class SkillTreeBuilder implements Serializable
@@ -125,7 +125,6 @@ public class SkillTreeBuilder implements Serializable
     };
     final List<IColumn<SkillNode, String>> columns = new ArrayList<IColumn<SkillNode, String>>();
 
-    // Contains file browser like unfold/fold features
     final TreeColumn<SkillNode, String> title = new TreeColumn<SkillNode, String>(new ResourceModel("plugins.skillmatrix.skill.title")) {
       @Override
       public void populateItem(final Item<ICellPopulator<SkillNode>> cellItem, final String componentId, final IModel<SkillNode> rowModel)

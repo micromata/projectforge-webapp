@@ -26,7 +26,7 @@ import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 
 /**
- * @author Kai Reinhard (k.reinhard@micromata.de)
+ * @author Billy Duong (b.duong@micromata.de)
  * 
  */
 public class SkillTreeProvider implements ITreeProvider<SkillNode>
