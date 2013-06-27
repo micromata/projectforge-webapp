@@ -212,7 +212,7 @@ public class SkillTreeForm extends AbstractForm<SkillFilter, SkillTreePage>
     @Override
     protected void onSelectionChanged(final Boolean newSelection)
     {
-      // parentPage.refresh();
+      parentPage.refresh();
     }
   }
 
