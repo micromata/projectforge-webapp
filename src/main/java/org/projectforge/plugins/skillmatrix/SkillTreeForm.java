@@ -12,6 +12,7 @@ package org.projectforge.plugins.skillmatrix;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.AbstractForm;
@@ -19,6 +20,8 @@ import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
@@ -64,7 +67,7 @@ public class SkillTreeForm extends AbstractForm<SkillFilter, SkillTreePage>
 
     gridBuilder = newGridBuilder(this, "flowform");
     {
-      gridBuilder.newSplitPanel(GridSize.COL100);
+      gridBuilder.newSplitPanel(GridSize.COL50);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("searchFilter"));
       final TextField<String> searchField = new TextField<String>(InputPanel.WICKET_ID, new PropertyModel<String>(getSearchFilter(),
           "searchString"));
@@ -72,6 +75,13 @@ public class SkillTreeForm extends AbstractForm<SkillFilter, SkillTreePage>
       fs.add(new InputPanel(fs.newChildId(), searchField));
       // fs.add(new IconPanel(fs.newIconChildId(), IconType.HELP, getString("tooltip.lucene.link")).setOnClickLocation(getRequestCycle(),
       // WebConstants.DOC_LINK_HANDBUCH_LUCENE, true), FieldSetIconPosition.TOP_RIGHT);
+    }
+    {
+      gridBuilder.newSplitPanel(GridSize.COL50);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).suppressLabelForWarning();
+      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+      checkBoxPanel.add(new MyCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "deleted"),
+          getString("deleted")));
     }
 
     actionButtons = new MyComponentsRepeater<Component>("actionButtons");
@@ -185,25 +195,25 @@ public class SkillTreeForm extends AbstractForm<SkillFilter, SkillTreePage>
     actionButtons.render();
   }
 
-  // @SuppressWarnings("serial")
-  // private class MyCheckBoxPanel extends CheckBoxPanel
-  // {
-  // public MyCheckBoxPanel(final String id, final IModel<Boolean> model, final String labelString)
-  // {
-  // super(id, model, labelString);
-  // }
-  //
-  // @Override
-  // protected boolean wantOnSelectionChangedNotifications()
-  // {
-  // return true;
-  // }
-  //
-  // @Override
-  // protected void onSelectionChanged(final Boolean newSelection)
-  // {
-  // // parentPage.refresh();
-  // }
-  // }
+  @SuppressWarnings("serial")
+  private class MyCheckBoxPanel extends CheckBoxPanel
+  {
+    public MyCheckBoxPanel(final String id, final IModel<Boolean> model, final String labelString)
+    {
+      super(id, model, labelString);
+    }
+
+    @Override
+    protected boolean wantOnSelectionChangedNotifications()
+    {
+      return true;
+    }
+
+    @Override
+    protected void onSelectionChanged(final Boolean newSelection)
+    {
+      // parentPage.refresh();
+    }
+  }
 
 }
