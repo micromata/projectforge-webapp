@@ -66,21 +66,23 @@ public class SkillFilter extends BaseSearchFilter
       resetMatch();
     }
     final SkillDO skill = node.getSkill();
-    if (StringUtils.isBlank(this.searchString) == true && isVisibleByDelete(skill)) {
-      return true;
+    if (StringUtils.isBlank(this.searchString) == true) {
+      return isVisibleByDelete(skill);
     } else {
       if (isVisibleBySearchString(node, skill, skillDao, user) == true) {
-        return true;
+        return isVisibleByDelete(skill);
       } else {
-        if (node.getParent() != null && node.getParent().isRootNode() == false && isAncestorVisibleBySearchString(node.getParent()) == true) {
-          // Otherwise the node is only visible by his status if the parent node is visible:
-          //return isVisibleByStatus(node, skill);
-          return false;
+        if (isAncestorVisible(node)) {
+          return isVisibleByDelete(skill);
         } else {
           return false;
         }
       }
     }
+  }
+
+  private boolean isAncestorVisible(final SkillNode node) {
+    return (node.getParent() != null && node.getParent().isRootNode() == false && isAncestorVisibleBySearchString(node.getParent()) == true);
   }
 
   private boolean isAncestorVisibleBySearchString(final SkillNode node)
