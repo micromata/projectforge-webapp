@@ -67,20 +67,22 @@ public class SkillFilter extends BaseSearchFilter
     }
     final SkillDO skill = node.getSkill();
     if (StringUtils.isBlank(this.searchString) == true) {
-      return node.isRootNode() == true;
+      return isVisibleByDelete(skill);
     } else {
       if (isVisibleBySearchString(node, skill, skillDao, user) == true) {
-        return node.isRootNode() == true;
+        return isVisibleByDelete(skill);
       } else {
-        if (node.getParent() != null && node.getParent().isRootNode() == false && isAncestorVisibleBySearchString(node.getParent()) == true) {
-          // Otherwise the node is only visible by his status if the parent node is visible:
-          //return isVisibleByStatus(node, skill);
-          return false;
+        if (isAncestorVisible(node)) {
+          return isVisibleByDelete(skill);
         } else {
           return false;
         }
       }
     }
+  }
+
+  private boolean isAncestorVisible(final SkillNode node) {
+    return (node.getParent() != null && node.getParent().isRootNode() == false && isAncestorVisibleBySearchString(node.getParent()) == true);
   }
 
   private boolean isAncestorVisibleBySearchString(final SkillNode node)
@@ -104,17 +106,9 @@ public class SkillFilter extends BaseSearchFilter
     if (cachedVisibility != null) {
       return cachedVisibility;
     }
-    if (node.isRootNode() == false) {
-      skillVisibility.put(skill.getId(), false);
-      return false;
-    }
-    if (skillDao != null && skillDao.hasSelectAccess(user, node.getSkill(), false) == false) {
-      return false;
-    }
-    //    final PFUserDO responsibleUser = Registry.instance().getUserGroupCache().getUser(skill.getResponsibleUserId());
-    //    final String username = responsibleUser != null ? responsibleUser.getFullname() + " " + responsibleUser.getUsername() : null;
     if (StringUtils.containsIgnoreCase(skill.getTitle(), this.searchString) == true
-        || StringUtils.containsIgnoreCase(skill.getDescription(), this.searchString) == true) {
+        || StringUtils.containsIgnoreCase(skill.getDescription(), this.searchString) == true
+        || StringUtils.containsIgnoreCase(skill.getComment(), this.searchString) == true ) {
       skillVisibility.put(skill.getId(), true);
       skillsMatched.add(skill.getId());
       return true;
@@ -129,6 +123,18 @@ public class SkillFilter extends BaseSearchFilter
     }
     skillVisibility.put(skill.getId(), false);
     return false;
+  }
+
+  /**
+   * 
+   * @param skill
+   * @return true if skill is not deleted or deleted skills are visible
+   */
+  private boolean isVisibleByDelete(final SkillDO skill) {
+    if(isDeleted() == false && skill.isDeleted() == true) {
+      return false;
+    }
+    return true;
   }
 
 }

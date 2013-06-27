@@ -33,7 +33,7 @@ import org.projectforge.database.MyDatabaseUpdateDao;
 /**
  * Contains the initial data-base set-up script and later all update scripts if any data-base schema updates are required by any later
  * release of this skillmatrix plugin.
- * @author Kai Reinhard (k.reinhard@micromata.de)
+ * @author Billy Duong (b.duong@micromata.de)
  */
 public class SkillMatrixPluginUpdates
 {

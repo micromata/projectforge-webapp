@@ -9,10 +9,16 @@
 
 package org.projectforge.plugins.skillmatrix;
 
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.Link;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.web.fibu.ISelectCallerPage;
+import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
 
 /**
  * @author Billy Duong (b.duong@micromata.de)
@@ -24,6 +30,10 @@ public class SkillTreePage extends AbstractSecuredPage
   private static final long serialVersionUID = -3902220283833390881L;
 
   public static final String USER_PREFS_KEY_OPEN_SKILLS = "openSkills";
+
+  public static final String I18N_KEY_SKILLTREE_TITLE = "plugins.skillmatrix.title.list";
+
+  public static final String I18N_KEY_SKILLTREE_INFO = "plugins.skillmatrix.skilltree.info";
 
   private SkillTreeForm form;
 
@@ -54,7 +64,8 @@ public class SkillTreePage extends AbstractSecuredPage
     init();
   }
 
-  public SkillTreePage(final ISelectCallerPage caller, final String selectProperty) {
+  public SkillTreePage(final ISelectCallerPage caller, final String selectProperty)
+  {
     super(new PageParameters());
     this.caller = caller;
     this.selectProperty = selectProperty;
@@ -63,11 +74,26 @@ public class SkillTreePage extends AbstractSecuredPage
 
   private void init()
   {
+    if (isSelectMode() == false) {
+      final ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
+        @Override
+        public void onClick()
+        {
+          final PageParameters params = new PageParameters();
+          final AbstractEditPage< ? , ? , ? > editPage = new SkillEditPage(params);
+          editPage.setReturnToPage(SkillTreePage.this);
+          setResponsePage(editPage);
+        };
+      }, IconType.PLUS);
+      addContentMenuEntry(menuEntry);
+    }
     form = new SkillTreeForm(this);
     body.add(form);
     form.init();
     final SkillTreeBuilder skillTreeBuilder = new SkillTreeBuilder().setCaller(caller).setSelectProperty(selectProperty);
     form.add(skillTreeBuilder.createTree("tree", this, form.getSearchFilter()));
+
+    body.add(new Label("info", new Model<String>(getString(I18N_KEY_SKILLTREE_INFO))));
   }
 
   public void refresh()
@@ -88,7 +114,6 @@ public class SkillTreePage extends AbstractSecuredPage
     refresh();
   }
 
-
   protected void onResetSubmit()
   {
     form.getSearchFilter().reset();
@@ -96,7 +121,8 @@ public class SkillTreePage extends AbstractSecuredPage
     form.clearInput();
   }
 
-  protected void onListViewSubmit() {
+  protected void onListViewSubmit()
+  {
     if (skillListPage != null) {
       setResponsePage(skillListPage);
     } else {
@@ -118,8 +144,7 @@ public class SkillTreePage extends AbstractSecuredPage
   @Override
   protected String getTitle()
   {
-    // TODO I18N KEY
-    return "Test";
+    return getString(I18N_KEY_SKILLTREE_TITLE);
   }
 
 }

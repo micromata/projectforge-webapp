@@ -21,13 +21,12 @@ import org.apache.wicket.extensions.markup.html.repeater.tree.ITreeProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 
 /**
- * @author Kai Reinhard (k.reinhard@micromata.de)
+ * @author Billy Duong (b.duong@micromata.de)
  * 
  */
 public class SkillTreeProvider implements ITreeProvider<SkillNode>
@@ -140,7 +139,11 @@ public class SkillTreeProvider implements ITreeProvider<SkillNode>
     }
     final PFUserDO user = PFUserContext.getUser();
     for (final SkillNode node : nodes) {
-      if (skillFilter.match(node, getSkillDao(), user) == true && getSkillDao().hasSelectAccess(user, node.getSkill(), false) == true) {
+
+      final boolean isMatch = skillFilter.match(node, getSkillDao(), user);
+      final boolean hasAccess = getSkillDao().hasSelectAccess(user, node.getSkill(), false);
+
+      if (isMatch == true && hasAccess == true) {
         list.add(node);
       }
     }
@@ -179,7 +182,6 @@ public class SkillTreeProvider implements ITreeProvider<SkillNode>
 
     private final Integer id;
 
-    @SpringBean(name = "skillTree")
     private transient SkillTree skillTree;
 
     public SkillNodeModel(final SkillNode skillNode)
@@ -191,9 +193,9 @@ public class SkillTreeProvider implements ITreeProvider<SkillNode>
     @Override
     protected SkillNode load()
     {
-      // if (skillTree == null) {
-      // skillTree = Registry.instance().getSkillTree();
-      // }
+      if (skillTree == null) {
+        skillTree = Registry.instance().getDao(SkillDao.class).getSkillTree();
+      }
       return skillTree.getSkillNodeById(id);
     }
 
