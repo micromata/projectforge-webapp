@@ -66,7 +66,7 @@ public class SkillFilter extends BaseSearchFilter
       resetMatch();
     }
     final SkillDO skill = node.getSkill();
-    if (StringUtils.isBlank(this.searchString) == true) {
+    if (StringUtils.isBlank(this.searchString) == true && isVisibleByDelete(skill)) {
       return true;
     } else {
       if (isVisibleBySearchString(node, skill, skillDao, user) == true) {
@@ -104,15 +104,6 @@ public class SkillFilter extends BaseSearchFilter
     if (cachedVisibility != null) {
       return cachedVisibility;
     }
-    //    if (node.isRootNode() == false) {
-    //      skillVisibility.put(skill.getId(), false);
-    //      return false;
-    //    }
-    //    if (skillDao != null && skillDao.hasSelectAccess(user, node.getSkill(), false) == false) {
-    //      return false;
-    //    }
-    //    final PFUserDO responsibleUser = Registry.instance().getUserGroupCache().getUser(skill.getResponsibleUserId());
-    //    final String username = responsibleUser != null ? responsibleUser.getFullname() + " " + responsibleUser.getUsername() : null;
     if (StringUtils.containsIgnoreCase(skill.getTitle(), this.searchString) == true
         || StringUtils.containsIgnoreCase(skill.getDescription(), this.searchString) == true
         || StringUtils.containsIgnoreCase(skill.getComment(), this.searchString) == true ) {
@@ -130,6 +121,18 @@ public class SkillFilter extends BaseSearchFilter
     }
     skillVisibility.put(skill.getId(), false);
     return false;
+  }
+
+  /**
+   * 
+   * @param skill
+   * @return true if skill is not deleted or deleted skills are visible
+   */
+  private boolean isVisibleByDelete(final SkillDO skill) {
+    if(isDeleted() == false && skill.isDeleted() == true) {
+      return false;
+    }
+    return true;
   }
 
 }
