@@ -194,7 +194,9 @@ public class DatevImportDao extends HibernateDaoSupport
     Validate.notNull(storage.getSheets());
     final ImportedSheet< ? > sheet = storage.getNamedSheet(sheetName);
     Validate.notNull(sheet);
-    Validate.isTrue(sheet.getStatus() == ImportStatus.RECONCILED);
+    if (sheet.getStatus() != ImportStatus.RECONCILED) {
+      throw new UserException("common.import.action.commit.error.notReconciled");
+    }
     int no = -1;
     if (storage.getId() == Type.KONTENPLAN) {
       no = commitKontenplan((ImportedSheet<KontoDO>) sheet);
