@@ -27,6 +27,8 @@ public class SkillTreePage extends AbstractSecuredPage
 
   public static final String USER_PREFS_KEY_OPEN_SKILLS = "openSkills";
 
+  public static final String I18N_KEY_SKILLTREE_INFO = "plugins.skillmatrix.skilltree.info";
+
   private SkillTreeForm form;
 
   private ISelectCallerPage caller;
@@ -71,7 +73,7 @@ public class SkillTreePage extends AbstractSecuredPage
     final SkillTreeBuilder skillTreeBuilder = new SkillTreeBuilder().setCaller(caller).setSelectProperty(selectProperty);
     form.add(skillTreeBuilder.createTree("tree", this, form.getSearchFilter()));
 
-    body.add(new Label("info", new Model<String>(getString("plugins.skillmatrix.skilltree.info"))));
+    body.add(new Label("info", new Model<String>(getString(I18N_KEY_SKILLTREE_INFO))));
   }
 
   public void refresh()
