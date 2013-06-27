@@ -27,6 +27,8 @@ public class SkillTreePage extends AbstractSecuredPage
 
   public static final String USER_PREFS_KEY_OPEN_SKILLS = "openSkills";
 
+  public static final String I18N_KEY_SKILLTREE_TITLE = "plugins.skillmatrix.title.list";
+
   public static final String I18N_KEY_SKILLTREE_INFO = "plugins.skillmatrix.skilltree.info";
 
   private SkillTreeForm form;
@@ -124,8 +126,7 @@ public class SkillTreePage extends AbstractSecuredPage
   @Override
   protected String getTitle()
   {
-    // TODO I18N KEY
-    return "Test";
+    return getString(I18N_KEY_SKILLTREE_TITLE);
   }
 
 }
