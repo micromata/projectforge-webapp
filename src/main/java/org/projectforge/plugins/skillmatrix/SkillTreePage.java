@@ -9,6 +9,8 @@
 
 package org.projectforge.plugins.skillmatrix;
 
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
@@ -68,6 +70,8 @@ public class SkillTreePage extends AbstractSecuredPage
     form.init();
     final SkillTreeBuilder skillTreeBuilder = new SkillTreeBuilder().setCaller(caller).setSelectProperty(selectProperty);
     form.add(skillTreeBuilder.createTree("tree", this, form.getSearchFilter()));
+
+    body.add(new Label("info", new Model<String>(getString("plugins.skillmatrix.skilltree.info"))));
   }
 
   public void refresh()
