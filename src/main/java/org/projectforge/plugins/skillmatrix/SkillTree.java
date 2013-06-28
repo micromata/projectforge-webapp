@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 import org.projectforge.common.AbstractCache;
@@ -136,7 +137,7 @@ public class SkillTree extends AbstractCache implements Serializable
 
   public SkillDO getSkill(final String title)
   {
-    if (title == null) {
+    if (StringUtils.isEmpty(title)) {
       return null;
     }
     checkRefresh();
