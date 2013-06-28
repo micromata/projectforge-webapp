@@ -13,8 +13,10 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.AbstractReindexTopRightMenu;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
@@ -38,6 +40,9 @@ public class SkillTreePage extends AbstractSecuredPage
   private SkillTreeForm form;
 
   private ISelectCallerPage caller;
+
+  @SpringBean(name = "skillDao")
+  private SkillDao skillDao;
 
   private String selectProperty;
 
@@ -72,6 +77,7 @@ public class SkillTreePage extends AbstractSecuredPage
     init();
   }
 
+  @SuppressWarnings("serial")
   private void init()
   {
     if (isSelectMode() == false) {
@@ -86,6 +92,24 @@ public class SkillTreePage extends AbstractSecuredPage
         };
       }, IconType.PLUS);
       addContentMenuEntry(menuEntry);
+
+      new AbstractReindexTopRightMenu(contentMenuBarPanel, accessChecker.isLoggedInUserMemberOfAdminGroup()) {
+        @Override
+        protected void rebuildDatabaseIndex(final boolean onlyNewest)
+        {
+          if (onlyNewest == true) {
+            skillDao.rebuildDatabaseIndex4NewestEntries();
+          } else {
+            skillDao.rebuildDatabaseIndex();
+          }
+        }
+
+        @Override
+        protected String getString(final String i18nKey)
+        {
+          return SkillTreePage.this.getString(i18nKey);
+        }
+      };
     }
     form = new SkillTreeForm(this);
     body.add(form);
