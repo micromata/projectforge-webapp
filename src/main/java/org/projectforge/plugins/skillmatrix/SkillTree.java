@@ -276,6 +276,7 @@ public class SkillTree extends AbstractCache implements Serializable
       log.fatal("OUPS, no skill found (ProjectForge database not initialized?) OK, initialize it ...");
       final SkillDO rootSkill = new SkillDO();
       rootSkill.setTitle("root");
+      rootSkill.setDescription("ProjectForge root task");
       skillDao.internalSave(rootSkill);
       newRoot = new SkillNode();
       newRoot.setSkill(rootSkill);
