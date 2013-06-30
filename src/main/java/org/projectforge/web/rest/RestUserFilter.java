@@ -37,6 +37,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.MDC;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.rest.Authentication;
+import org.projectforge.rest.ConnectionSettings;
+import org.projectforge.rest.converter.DateTimeFormat;
+import org.projectforge.rest.objects.ConnectionSettingsObject;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
@@ -140,6 +143,8 @@ public class RestUserFilter implements Filter
     }
     try {
       PFUserContext.setUser(user);
+      final ConnectionSettingsObject settings = getConnectionSettings(req);
+      ConnectionSettings.set(settings);
       final String ip = request.getRemoteAddr();
       if (ip != null) {
         MDC.put("ip", ip);
@@ -148,13 +153,27 @@ public class RestUserFilter implements Filter
         MDC.put("ip", "unknown");
       }
       MDC.put("user", user.getUsername());
-      log.info("Rest-call: " + ((HttpServletRequest)request).getRequestURI());
+      log.info("Rest-call: " + ((HttpServletRequest) request).getRequestURI());
       chain.doFilter(request, response);
     } finally {
       PFUserContext.setUser(null);
+      ConnectionSettings.set(null);
       MDC.remove("ip");
       MDC.remove("user");
     }
+  }
+
+  private ConnectionSettingsObject getConnectionSettings(final HttpServletRequest req)
+  {
+    final ConnectionSettingsObject settings = new ConnectionSettingsObject();
+    final String dateTimeFormatString = getAttribute(req, ConnectionSettings.DATE_TIME_FORMAT);
+    if (dateTimeFormatString != null) {
+      final DateTimeFormat dateTimeFormat = DateTimeFormat.valueOf(dateTimeFormatString.toUpperCase());
+      if (dateTimeFormat != null) {
+        settings.setDateTimeFormat(dateTimeFormat);
+      }
+    }
+    return settings;
   }
 
   private String getAttribute(final HttpServletRequest req, final String key)
