@@ -120,7 +120,8 @@ public class AddressDaoRest
           // Already exported:
         }
         if (personalAddress.getLastUpdate() != null && personalAddress.getLastUpdate().before(modifiedSinceDate) == false) {
-          final AddressObject address = AddressDOConverter.getAddressObject(personalAddress.getAddress());
+          final AddressDO addressDO = addressDao.getById(personalAddress.getAddressId());
+          final AddressObject address = AddressDOConverter.getAddressObject(addressDO);
           if (personalAddress.isFavorite() == false) {
             // This address was may-be removed by the user from the personal address book, so add this address as deleted to the result
             // list.
