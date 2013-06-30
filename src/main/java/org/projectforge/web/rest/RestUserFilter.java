@@ -39,7 +39,6 @@ import org.projectforge.common.NumberHelper;
 import org.projectforge.rest.Authentication;
 import org.projectforge.rest.ConnectionSettings;
 import org.projectforge.rest.converter.DateTimeFormat;
-import org.projectforge.rest.objects.ConnectionSettingsObject;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
@@ -143,7 +142,7 @@ public class RestUserFilter implements Filter
     }
     try {
       PFUserContext.setUser(user);
-      final ConnectionSettingsObject settings = getConnectionSettings(req);
+      final ConnectionSettings settings = getConnectionSettings(req);
       ConnectionSettings.set(settings);
       final String ip = request.getRemoteAddr();
       if (ip != null) {
@@ -163,9 +162,9 @@ public class RestUserFilter implements Filter
     }
   }
 
-  private ConnectionSettingsObject getConnectionSettings(final HttpServletRequest req)
+  private ConnectionSettings getConnectionSettings(final HttpServletRequest req)
   {
-    final ConnectionSettingsObject settings = new ConnectionSettingsObject();
+    final ConnectionSettings settings = new ConnectionSettings();
     final String dateTimeFormatString = getAttribute(req, ConnectionSettings.DATE_TIME_FORMAT);
     if (dateTimeFormatString != null) {
       final DateTimeFormat dateTimeFormat = DateTimeFormat.valueOf(dateTimeFormatString.toUpperCase());
