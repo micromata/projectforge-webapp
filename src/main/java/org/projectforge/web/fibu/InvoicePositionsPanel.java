@@ -97,15 +97,16 @@ public class InvoicePositionsPanel extends Panel
           };
           item.add(link);
           final String invoiceNumber = String.valueOf(invoicePosition.getRechnungNummer());
-          final Component label = new Label("label", invoiceNumber).setRenderBodyOnly(true);
+          final Component label = new Label("label", invoiceNumber);
           item.add(label);
           if (rechnungDao.hasLoggedInUserSelectAccess(false) == true) {
             link.add(new Label("label", invoiceNumber));
+            WicketUtils.addTooltip(link, CurrencyFormatter.format(netSum));
             label.setVisible(false);
           } else {
             link.setVisible(false);
+            WicketUtils.addTooltip(label, CurrencyFormatter.format(netSum));
           }
-          WicketUtils.addTooltip(link, CurrencyFormatter.format(netSum));
           netSum = BigDecimal.ZERO;
         }
       }
