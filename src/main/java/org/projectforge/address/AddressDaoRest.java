@@ -24,6 +24,7 @@
 package org.projectforge.address;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -37,6 +38,7 @@ import javax.ws.rs.core.Response;
 
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.registry.Registry;
+import org.projectforge.rest.AddressDaoClientMain;
 import org.projectforge.rest.JsonUtils;
 import org.projectforge.rest.RestPaths;
 import org.projectforge.rest.objects.AddressObject;
@@ -55,16 +57,25 @@ public class AddressDaoRest
 
   private final AddressDao addressDao;
 
+  private final PersonalAddressDao personalAddressDao;
+
   public AddressDaoRest()
   {
     this.addressDao = Registry.instance().getDao(AddressDao.class);
+    this.personalAddressDao = this.addressDao.getPersonalAddressDao();
   }
 
   /**
-   * Rest-Call for {@link AddressDao#getFavoriteVCards()}
-   * 
+   * Rest-Call for {@link AddressDao#getFavoriteVCards()}. <br/>
+   * If modifiedSince is given then only those addresses will be returned:
+   * <ol>
+   * <li>The address was changed after the given modifiedSince date, or</li>
+   * <li>the address was added to the user's personal address book after the given modifiedSince date, or</li>
+   * <li>the address was removed from the user's personal address book after the given modifiedSince date.</li>
+   * </ol>
    * @param searchTerm
-   * @param modifiedSince millis since 1970 (UTC)
+   * @param modifiedSince milliseconds since 1970 (UTC)
+   * @see AddressDaoClientMain
    */
   @GET
   @Path(RestPaths.LIST)
@@ -72,27 +83,55 @@ public class AddressDaoRest
   public Response getList(@QueryParam("search") final String searchTerm, @QueryParam("modifiedSince") final Long modifiedSince)
   {
     final AddressFilter filter = new AddressFilter(new BaseSearchFilter());
+    Date modifiedSinceDate = null;
     if (modifiedSince != null) {
-      final Date date = new Date(modifiedSince);
-      filter.setModifiedSince(date);
+      modifiedSinceDate = new Date(modifiedSince);
+      filter.setModifiedSince(modifiedSinceDate);
     }
     filter.setSearchString(searchTerm);
     final List<AddressDO> list = addressDao.getList(filter);
-    final Set<Integer> favorites = addressDao.getFavorites();
+
+    final List<PersonalAddressDO> favorites = personalAddressDao.getList();
+    final Set<Integer> favoritesSet = new HashSet<Integer>();
+    if (favorites != null) {
+      for (final PersonalAddressDO personalAddress : favorites) {
+        if (personalAddress.isFavoriteCard() == true && personalAddress.isDeleted() == false) {
+          favoritesSet.add(personalAddress.getAddressId());
+        }
+      }
+    }
     final List<AddressObject> result = new LinkedList<AddressObject>();
+    final Set<Integer> alreadyExported = new HashSet<Integer>();
     if (list != null) {
       for (final AddressDO addressDO : list) {
-        if (favorites.contains(addressDO.getId()) == false) {
+        if (favoritesSet.contains(addressDO.getId()) == false) {
           // Export only personal favorites due to data-protection.
           continue;
         }
         final AddressObject address = AddressDOConverter.getAddressObject(addressDO);
         result.add(address);
+        alreadyExported.add(address.getId());
+      }
+    }
+    if (modifiedSinceDate != null) {
+      // Add now personal address entries which were modified since the given date (deleted or added):
+      for (final PersonalAddressDO personalAddress : favorites) {
+        if (alreadyExported.contains(personalAddress.getAddressId()) == true) {
+          // Already exported:
+        }
+        if (personalAddress.getLastUpdate() != null && personalAddress.getLastUpdate().before(modifiedSinceDate) == false) {
+          final AddressObject address = AddressDOConverter.getAddressObject(personalAddress.getAddress());
+          if (personalAddress.isFavorite() == false) {
+            // This address was may-be removed by the user from the personal address book, so add this address as deleted to the result
+            // list.
+            address.setDeleted(true);
+          }
+          result.add(address);
+        }
       }
     }
     final String json = JsonUtils.toJson(result);
     log.info("Rest call finished (" + result.size() + " addresses)...");
     return Response.ok(json).build();
   }
-
 }
