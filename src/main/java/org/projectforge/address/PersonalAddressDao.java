@@ -146,12 +146,6 @@ public class PersonalAddressDao extends HibernateDaoSupport
     checkAccess(dbObj);
     Validate.isTrue(ObjectUtils.equals(dbObj.getAddressId(), obj.getAddressId()));
     obj.setId(dbObj.getId());
-    if (isEmpty(obj) == true) {
-      // Is empty, so delete this entry:
-      getHibernateTemplate().delete(dbObj);
-      log.info("Empty object deleted: " + obj.toString());
-      return true;
-    }
     // Copy all values of modified user to database object.
     final ModificationStatus modified = dbObj.copyValuesFrom(obj, "owner", "address", "id");
     if (modified == ModificationStatus.MAJOR) {
@@ -193,17 +187,18 @@ public class PersonalAddressDao extends HibernateDaoSupport
   /**
    * @return the list of all PersonalAddressDO entries for the context user.
    */
-  @SuppressWarnings("unchecked")
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public List<PersonalAddressDO> getList()
   {
     final PFUserDO owner = PFUserContext.getUser();
     Validate.notNull(owner);
     Validate.notNull(owner.getId());
+    @SuppressWarnings("unchecked")
     final List<PersonalAddressDO> list = getHibernateTemplate().find(
         "from "
             + PersonalAddressDO.class.getSimpleName()
-            + " t join fetch t.address where t.owner.id = ? and t.address.deleted = false order by t.address.name, t.address.firstName", owner.getId());
+            + " t join fetch t.address where t.owner.id=? and t.address.deleted=false order by t.address.name, t.address.firstName",
+            owner.getId());
     return list;
   }
 
@@ -243,7 +238,8 @@ public class PersonalAddressDao extends HibernateDaoSupport
     final List<PersonalAddressDO> list = getHibernateTemplate().find(
         "from "
             + PersonalAddressDO.class.getSimpleName()
-            + " t join fetch t.address where t.owner.id = ? and t.address.deleted = false order by t.address.name, t.address.firstName", owner.getId());
+            + " t join fetch t.address where t.owner.id = ? and t.address.deleted = false order by t.address.name, t.address.firstName",
+            owner.getId());
     final List<AddressDO> result = new ArrayList<AddressDO>();
     for (final PersonalAddressDO entry : list) {
       if (entry.isFavorite() == true) {
