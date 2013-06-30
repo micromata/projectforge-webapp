@@ -88,6 +88,11 @@ public class AddressDao extends BaseDao<AddressDO>
     this.personalAddressDao = personalAddressDao;
   }
 
+  public PersonalAddressDao getPersonalAddressDao()
+  {
+    return personalAddressDao;
+  }
+
   public AddressDao()
   {
     super(AddressDO.class);
