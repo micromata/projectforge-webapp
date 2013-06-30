@@ -38,7 +38,6 @@ import javax.ws.rs.core.Response;
 
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.registry.Registry;
-import org.projectforge.rest.AddressDaoClientMain;
 import org.projectforge.rest.JsonUtils;
 import org.projectforge.rest.RestPaths;
 import org.projectforge.rest.objects.AddressObject;
