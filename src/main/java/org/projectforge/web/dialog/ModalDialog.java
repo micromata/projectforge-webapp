@@ -479,8 +479,21 @@ public abstract class ModalDialog extends Panel
 
   public SingleButtonPanel prependNewAjaxActionButton(final AjaxCallback ajaxCallback, final String label, final String... classnames)
   {
+    return insertNewAjaxActionButton(ajaxCallback, 0, label, classnames);
+  }
+
+  /**
+   * @param ajaxCallback
+   * @param position 0 is the first position.
+   * @param label
+   * @param classnames
+   * @return
+   */
+  public SingleButtonPanel insertNewAjaxActionButton(final AjaxCallback ajaxCallback, final int position, final String label,
+      final String... classnames)
+  {
     final SingleButtonPanel result = addNewAjaxActionButton(ajaxCallback, label, classnames);
-    this.actionButtons.add(0, result);
+    this.actionButtons.add(position, result);
     return result;
   }
 

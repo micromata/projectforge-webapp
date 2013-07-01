@@ -32,7 +32,6 @@ import net.fortuna.ical4j.model.property.Uid;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
-import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
@@ -53,6 +52,7 @@ import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.calendar.CalendarPageSupport;
 import org.projectforge.web.calendar.ICalendarFilter;
 import org.projectforge.web.dialog.ModalMessageDialog;
+import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
@@ -65,13 +65,19 @@ import org.projectforge.web.wicket.flowlayout.IconType;
  */
 public class TeamCalCalendarForm extends CalendarForm
 {
-
   private static final long serialVersionUID = -5838203593605203398L;
+
+  private static final String MAGIC_FILTER_ENTRY = "__MAGIC-FILTER-ENTRY__";
 
   private ModalMessageDialog errorDialog;
 
   @SpringBean(name = "teamEventDao")
   private TeamEventDao teamEventDao;
+
+  @SuppressWarnings("unused")
+  private TemplateEntry activeTemplate;
+
+  private DropDownChoicePanel<TemplateEntry> templateChoice;
 
   /**
    * @param parentPage
@@ -133,78 +139,113 @@ public class TeamCalCalendarForm extends CalendarForm
       buttonGroupPanel.addButton(searchButtonPanel);
     }
 
-    if (((TeamCalCalendarFilter) filter).getActiveTemplateEntry() != null) {
-      final IChoiceRenderer<TemplateEntry> templateEntriesRenderer = new IChoiceRenderer<TemplateEntry>() {
-        private static final long serialVersionUID = 4804134958242438331L;
-
-        @Override
-        public String getIdValue(final TemplateEntry object, final int index)
-        {
-          return object.getName();
-        }
-
-        @Override
-        public Object getDisplayValue(final TemplateEntry object)
-        {
-          return object.getName();
-        }
-      };
-
-      final IModel<List<TemplateEntry>> choicesModel = new PropertyModel<List<TemplateEntry>>(filter, "templateEntries");
-      final IModel<TemplateEntry> activeModel = new PropertyModel<TemplateEntry>(filter, "activeTemplateEntry");
-      final DropDownChoicePanel<TemplateEntry> templateChoice = new DropDownChoicePanel<TemplateEntry>(fieldset.newChildId(), activeModel,
-          choicesModel, templateEntriesRenderer, false);
-      fieldset.add(templateChoice);
-      templateChoice.getDropDownChoice().setOutputMarkupId(true);
-
-      templateChoice.getDropDownChoice().add(new AjaxFormComponentUpdatingBehavior("onChange") {
-        private static final long serialVersionUID = 8999698636114154230L;
-
-        /**
-         * @see org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior#onUpdate(org.apache.wicket.ajax.AjaxRequestTarget)
-         */
-        @Override
-        protected void onUpdate(final AjaxRequestTarget target)
-        {
-          filter.setSelectedCalendar(TemplateEntry.calcCalendarStringForCalendar(activeModel.getObject().getDefaultCalendarId()));
-          setResponsePage(getParentPage().getClass());
-        }
-      });
-
-      fieldset.add(new DropIcsPanel(fieldset.newChildId()) {
-
-        @Override
-        protected void onIcsImport(final AjaxRequestTarget target, final Calendar calendar)
-        {
-          final List<VEvent> events = TeamEventUtils.getVEvents(calendar);
-          if (events == null || events.size() == 0) {
-            errorDialog.setMessage(getString("plugins.teamcal.import.ics.noEventsGiven")).open(target);
-            return;
-          }
-          if (events.size() > 1) {
-            // Can't import multiple entries, redirect to import page:
-            redirectToImportPage(events, activeModel.getObject());
-            return;
-          }
-          final VEvent event = events.get(0);
-          final Uid uid = event.getUid();
-          // 1. Check id/external id. If not yet given, create new entry and ask for calendar to add: Redirect to TeamEventEditPage.
-          final TeamEventDO dbEvent = teamEventDao.getByUid(uid.getValue());
-          if (dbEvent != null) {
-            // Can't modify existing entry, redirect to import page:
-            redirectToImportPage(events, activeModel.getObject());
-            return;
-          }
-          final TeamEventDO teamEvent = TeamEventUtils.createTeamEventDO(event);
-          final TemplateEntry activeTemplateEntry = ((TeamCalCalendarFilter) filter).getActiveTemplateEntry();
-          if (activeTemplateEntry != null && activeTemplateEntry.getDefaultCalendarId() != null) {
-            teamEventDao.setCalendar(teamEvent, activeTemplateEntry.getDefaultCalendarId());
-          }
-          final TeamEventEditPage editPage = new TeamEventEditPage(new PageParameters(), teamEvent);
-          setResponsePage(editPage);
-        }
-      }.setTooltip(getString("plugins.teamcal.dropIcsPanel.tooltip")));
+    final TeamCalFilterDialog dialog = new TeamCalFilterDialog(parentPage.newModalDialogId(), (TeamCalCalendarFilter) filter) {
+      /**
+       * @see org.projectforge.plugins.teamcal.dialog.TeamCalFilterDialog#onClose(org.apache.wicket.ajax.AjaxRequestTarget)
+       */
+      @Override
+      protected void onClose(final AjaxRequestTarget target)
+      {
+        activeTemplate = ((TeamCalCalendarFilter) filter).getActiveTemplateEntry();
+        target.add(templateChoice.getDropDownChoice());
+      }
+    };
+    parentPage.add(dialog);
+    dialog.init();
+    final List<TemplateEntry> values = ((TeamCalCalendarFilter) filter).getTemplateEntries();
+    final LabelValueChoiceRenderer<TemplateEntry> templateNamesChoiceRenderer = new LabelValueChoiceRenderer<TemplateEntry>();
+    for (final TemplateEntry entry : values) {
+      templateNamesChoiceRenderer.addValue(entry, entry.getName());
     }
+    templateNamesChoiceRenderer.addValue(new TemplateEntry().setName(MAGIC_FILTER_ENTRY),
+        getString("plugins.teamcal.calendar.filter.newEntry"));
+    final IModel<TemplateEntry> activeModel = new PropertyModel<TemplateEntry>(this, "activeTemplate");
+    this.activeTemplate = ((TeamCalCalendarFilter) filter).getActiveTemplateEntry();
+    templateChoice = new DropDownChoicePanel<TemplateEntry>(fieldset.newChildId(), activeModel, templateNamesChoiceRenderer.getValues(),
+        templateNamesChoiceRenderer, false);
+    fieldset.add(templateChoice);
+    templateChoice.setTooltip(getString("plugins.teamcal.calendar.filter.choose"));
+    templateChoice.getDropDownChoice().setOutputMarkupId(true);
+
+    templateChoice.getDropDownChoice().add(new AjaxFormComponentUpdatingBehavior("onChange") {
+      private static final long serialVersionUID = 8999698636114154230L;
+
+      /**
+       * @see org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior#onUpdate(org.apache.wicket.ajax.AjaxRequestTarget)
+       */
+      @Override
+      protected void onUpdate(final AjaxRequestTarget target)
+      {
+        final TemplateEntry selectedEntry = activeModel.getObject();
+        if (MAGIC_FILTER_ENTRY.equals(selectedEntry.getName()) == false) {
+          ((TeamCalCalendarFilter) filter).setActiveTemplateEntry(selectedEntry);
+          filter.setSelectedCalendar(TemplateEntry.calcCalendarStringForCalendar(selectedEntry.getDefaultCalendarId()));
+          setResponsePage(getParentPage().getClass());
+        } else {
+          final String newTemplateName = ((TeamCalCalendarFilter) filter)
+              .getNewTemplateName(getString("plugins.teamcal.calendar.filterDialog.newTemplateName"));
+          if (newTemplateName == null) {
+            // New filter 9 is already reached.
+            activeTemplate = ((TeamCalCalendarFilter) filter).getActiveTemplateEntry();
+            target.add(templateChoice.getDropDownChoice());
+            return;
+          }
+          dialog.openNew(target, newTemplateName);
+          // Redraw the content:
+          dialog.redraw().addContent(target);
+        }
+      }
+    });
+
+    final IconButtonPanel calendarButtonPanel = new AjaxIconButtonPanel(buttonGroupPanel.newChildId(), IconType.EDIT, new ResourceModel(
+        "plugins.teamcal.calendar.filter.edit")) {
+      /**
+       * @see org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
+       */
+      @Override
+      protected void onSubmit(final AjaxRequestTarget target)
+      {
+        dialog.open(target);
+        // Redraw the content:
+        dialog.redraw().addContent(target);
+      }
+    };
+    calendarButtonPanel.setDefaultFormProcessing(false);
+    buttonGroupPanel.addButton(calendarButtonPanel);
+
+    fieldset.add(new DropIcsPanel(fieldset.newChildId()) {
+
+      @Override
+      protected void onIcsImport(final AjaxRequestTarget target, final Calendar calendar)
+      {
+        final List<VEvent> events = TeamEventUtils.getVEvents(calendar);
+        if (events == null || events.size() == 0) {
+          errorDialog.setMessage(getString("plugins.teamcal.import.ics.noEventsGiven")).open(target);
+          return;
+        }
+        if (events.size() > 1) {
+          // Can't import multiple entries, redirect to import page:
+          redirectToImportPage(events, activeModel.getObject());
+          return;
+        }
+        final VEvent event = events.get(0);
+        final Uid uid = event.getUid();
+        // 1. Check id/external id. If not yet given, create new entry and ask for calendar to add: Redirect to TeamEventEditPage.
+        final TeamEventDO dbEvent = teamEventDao.getByUid(uid.getValue());
+        if (dbEvent != null) {
+          // Can't modify existing entry, redirect to import page:
+          redirectToImportPage(events, activeModel.getObject());
+          return;
+        }
+        final TeamEventDO teamEvent = TeamEventUtils.createTeamEventDO(event);
+        final TemplateEntry activeTemplateEntry = ((TeamCalCalendarFilter) filter).getActiveTemplateEntry();
+        if (activeTemplateEntry != null && activeTemplateEntry.getDefaultCalendarId() != null) {
+          teamEventDao.setCalendar(teamEvent, activeTemplateEntry.getDefaultCalendarId());
+        }
+        final TeamEventEditPage editPage = new TeamEventEditPage(new PageParameters(), teamEvent);
+        setResponsePage(editPage);
+      }
+    }.setTooltip(getString("plugins.teamcal.dropIcsPanel.tooltip")));
   }
 
   private void redirectToImportPage(final List<VEvent> events, final TemplateEntry activeTemplate)
@@ -222,32 +263,13 @@ public class TeamCalCalendarForm extends CalendarForm
   /**
    * @see org.apache.wicket.Component#onInitialize()
    */
-  @SuppressWarnings("serial")
   @Override
   protected void onInitialize()
   {
-    final TeamCalFilterDialog dialog = new TeamCalFilterDialog(parentPage.newModalDialogId(), (TeamCalCalendarFilter) filter);
-    parentPage.add(dialog);
-    dialog.init();
-    final IconButtonPanel calendarButtonPanel = new AjaxIconButtonPanel(buttonGroupPanel.newChildId(), IconType.CALENDAR,
-        new ResourceModel("plugins.teamcal.calendar.edit")) {
-      /**
-       * @see org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
-       */
-      @Override
-      protected void onSubmit(final AjaxRequestTarget target)
-      {
-        dialog.open(target);
-        // Redraw the content:
-        dialog.redraw().addContent(target);
-      }
-    };
     errorDialog = new ModalMessageDialog(parentPage.newModalDialogId(), new ResourceModel("plugins.teamcal.import.ics.error"));
     errorDialog.setType(DivType.ALERT_ERROR);
     parentPage.add(errorDialog);
     errorDialog.init();
-    calendarButtonPanel.setDefaultFormProcessing(false);
-    buttonGroupPanel.addButton(calendarButtonPanel);
     super.onInitialize();
   }
 
