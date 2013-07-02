@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 import org.projectforge.common.AbstractCache;
@@ -136,7 +137,7 @@ public class SkillTree extends AbstractCache implements Serializable
 
   public SkillDO getSkill(final String title)
   {
-    if (title == null) {
+    if (StringUtils.isEmpty(title)) {
       return null;
     }
     checkRefresh();
@@ -275,6 +276,7 @@ public class SkillTree extends AbstractCache implements Serializable
       log.fatal("OUPS, no skill found (ProjectForge database not initialized?) OK, initialize it ...");
       final SkillDO rootSkill = new SkillDO();
       rootSkill.setTitle("root");
+      rootSkill.setDescription("ProjectForge root task");
       skillDao.internalSave(rootSkill);
       newRoot = new SkillNode();
       newRoot.setSkill(rootSkill);

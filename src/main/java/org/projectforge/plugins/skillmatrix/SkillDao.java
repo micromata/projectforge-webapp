@@ -76,6 +76,9 @@ public class SkillDao extends BaseDao<SkillDO>
     synchronized (this) {
       checkConstraintViolation(obj);
     }
+    if(obj.getParent() == null) {
+      obj.setParent(skillTree.getRootSkillNode().getSkill());
+    }
   }
 
   /**
