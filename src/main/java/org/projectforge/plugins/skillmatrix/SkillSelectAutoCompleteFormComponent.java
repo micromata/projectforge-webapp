@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
@@ -41,6 +43,15 @@ public class SkillSelectAutoCompleteFormComponent extends PFAutoCompleteTextFiel
   {
     super(id, model);
     getSettings().withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false).withWidth(400);
+    add(new AjaxFormComponentUpdatingBehavior("onChange") {
+      private static final long serialVersionUID = 5394951486514219126L;
+
+      @Override
+      protected void onUpdate(final AjaxRequestTarget target)
+      {
+        // AjaxRequestTarget needs this.
+      }
+    });
   }
 
   @Override
