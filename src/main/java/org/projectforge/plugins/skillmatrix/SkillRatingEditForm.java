@@ -24,6 +24,7 @@
 package org.projectforge.plugins.skillmatrix;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
@@ -119,9 +120,20 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
     {
       // Skill, look at UserSelectPanel for fine tuning ( getConverter() )
       final FieldsetPanel fs = gridBuilder.newFieldset(SkillRatingDO.class, "skill");
-      final PFAutoCompleteTextField<SkillDO> autoCompleteTextField = new SkillSelectAutoCompleteFormComponent(fs.getTextFieldId(),
-          new PropertyModel<SkillDO>(data, "skill"));
+      final SkillSelectAutoCompleteFormComponent autoCompleteTextField = new SkillSelectAutoCompleteFormComponent(fs.getTextFieldId(),
+          new PropertyModel<SkillDO>(data, "skill")) {
+
+        @Override
+        protected void onModelSelected(AjaxRequestTarget target, SkillDO skill)
+        {
+          if (target != null) {
+            target.add(SkillRatingEditForm.this.fs.getFieldset());
+          }
+        }
+
+      };
       autoCompleteTextField.setRequired(true);
+      autoCompleteTextField.setFieldsetPanel(SkillRatingEditForm.this.fs);
       fs.add(autoCompleteTextField);
       dependentFormComponents[0] = autoCompleteTextField;
     }

@@ -24,12 +24,12 @@
 package org.projectforge.plugins.skillmatrix;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
-import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -59,7 +59,6 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
   }
 
   @Override
-  @SuppressWarnings("serial")
   public void init()
   {
     super.init();
@@ -78,10 +77,24 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
     {
       // Parent
       final FieldsetPanel fs = gridBuilder.newFieldset(SkillDO.class, "parent");
-      final PFAutoCompleteTextField<SkillDO> autoCompleteTextField = new SkillSelectAutoCompleteFormComponent(fs.getTextFieldId(),
-          new PropertyModel<SkillDO>(data, "parent"));
+      final SkillSelectAutoCompleteFormComponent autoCompleteTextField = new SkillSelectAutoCompleteFormComponent(fs.getTextFieldId(),
+          new PropertyModel<SkillDO>(data, "parent")) {
+
+        private static final long serialVersionUID = 5028475946200551528L;
+
+        @Override
+        protected void onModelSelected(AjaxRequestTarget target, SkillDO skill)
+        {
+          // Do nothing.
+        }
+
+      };
       fs.add(autoCompleteTextField);
     }
+
+    // TODO exchange Autocomplete with SelectPanel (currently not working)
+
+    gridBuilder.newGridPanel();
     {
       // Descritption
       final FieldsetPanel fs = gridBuilder.newFieldset(SkillDO.class, "description");
@@ -105,6 +118,11 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
   protected Logger getLogger()
   {
     return log;
+  }
+
+  public SkillTree getSkillTree()
+  {
+    return skillDao.getSkillTree();
   }
 
 }

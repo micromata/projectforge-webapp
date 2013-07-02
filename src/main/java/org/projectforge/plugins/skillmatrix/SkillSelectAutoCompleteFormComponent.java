@@ -16,16 +16,19 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.task.TaskDO;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
  * @author Billy Duong (b.duong@micromata.de)
  *
  */
-public class SkillSelectAutoCompleteFormComponent extends PFAutoCompleteTextField<SkillDO>
+public abstract class SkillSelectAutoCompleteFormComponent extends PFAutoCompleteTextField<SkillDO>
 {
 
   private static final long serialVersionUID = -3142796647323340935L;
@@ -34,6 +37,10 @@ public class SkillSelectAutoCompleteFormComponent extends PFAutoCompleteTextFiel
 
   @SpringBean(name = "skillDao")
   private SkillDao skillDao;
+
+  private FieldsetPanel fieldsetPanel;
+
+  private SkillDO skill;
 
   /**
    * @param id
@@ -82,6 +89,30 @@ public class SkillSelectAutoCompleteFormComponent extends PFAutoCompleteTextFiel
     return skill.getTitle();
   }
 
+  @Override
+  protected void onBeforeRender()
+  {
+    super.onBeforeRender();
+    // this panel should always start with an empty input field, therefore delete the current model
+    skill = null;
+  }
+
+  protected void notifyChildren()
+  {
+    final AjaxRequestTarget target = RequestCycle.get().find(AjaxRequestTarget.class);
+    if (target != null) {
+      onModelSelected(target, skill);
+    }
+  }
+
+  /**
+   * Hook method which is called when the model is changed with a valid durin an ajax call
+   * 
+   * @param target
+   * @param taskDo
+   */
+  protected abstract void onModelSelected(final AjaxRequestTarget target, SkillDO skill);
+
   @SuppressWarnings({ "unchecked", "rawtypes"})
   @Override
   public <C> IConverter<C> getConverter(final Class<C> type)
@@ -101,6 +132,9 @@ public class SkillSelectAutoCompleteFormComponent extends PFAutoCompleteTextFiel
           error(getString(I18N_KEY_ERROR_SKILL_NOT_FOUND));
         }
         getModel().setObject(skill);
+
+        notifyChildren();
+
         return skill;
       }
 
@@ -114,6 +148,16 @@ public class SkillSelectAutoCompleteFormComponent extends PFAutoCompleteTextFiel
         return skill.getTitle();
       }
     };
+  }
+
+  /**
+   * Optional. The parameter is used for ajax updates.
+   * @param fieldsetPanel
+   * @return
+   */
+  public SkillSelectAutoCompleteFormComponent setFieldsetPanel(FieldsetPanel fieldsetPanel) {
+    this.fieldsetPanel = fieldsetPanel;
+    return this;
   }
 
 }
