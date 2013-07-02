@@ -134,4 +134,16 @@ public class SkillDao extends BaseDao<SkillDO>
   {
     return ADDITIONAL_SEARCH_FIELDS;
   }
+
+  /**
+   * @param skill
+   * @param parentId If null, then skill will be set to null;
+   * @see BaseDao#getOrLoad(Integer)
+   */
+  public SkillDO setParentSkill(final SkillDO skill, final Integer parentId)
+  {
+    final SkillDO parentSkill = getOrLoad(parentId);
+    skill.setParent(parentSkill);
+    return skill;
+  }
 }
