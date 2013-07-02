@@ -115,6 +115,7 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
       username.setStrong();
       fs.add(username);
     }
+    gridBuilder.newGridPanel();
     {
       // Skill, look at UserSelectPanel for fine tuning ( getConverter() )
       final FieldsetPanel fs = gridBuilder.newFieldset(SkillRatingDO.class, "skill");
@@ -145,6 +146,7 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
       fs.add(skillChoice);
       dependentFormComponents[1] = skillChoice.getDropDownChoice();
     }
+    gridBuilder.newGridPanel();
     {
       // Since year
       final FieldsetPanel fs = gridBuilder.newFieldset(SkillRatingDO.class, "sinceYear");
