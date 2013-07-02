@@ -26,13 +26,14 @@ package org.projectforge.plugins.skillmatrix;
 import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 
 /**
  * @author Billy Duong (b.duong@micromata.de)
  *
  */
-public class SkillEditPage extends AbstractEditPage<SkillDO, SkillEditForm, SkillDao>
+public class SkillEditPage extends AbstractEditPage<SkillDO, SkillEditForm, SkillDao> implements ISelectCallerPage
 {
   private static final long serialVersionUID = 4317454400876214258L;
 
@@ -80,5 +81,38 @@ public class SkillEditPage extends AbstractEditPage<SkillDO, SkillEditForm, Skil
     return new SkillEditForm(this, data);
   }
 
+  /**
+   * @see org.projectforge.web.fibu.ISelectCallerPage#select(java.lang.String, java.lang.Object)
+   */
+  @Override
+  public void select(final String property, final Object selectedValue)
+  {
+    if ("parentId".equals(property) == true) {
+      skillDao.setParentSkill(getData(), (Integer) selectedValue);
+    } else {
+      log.error("Property '" + property + "' not supported for selection.");
+    }
+  }
 
+  /**
+   * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
+   */
+  @Override
+  public void unselect(final String property)
+  {
+    if ("parentId".equals(property) == true) {
+      getData().setParent(null);
+    } else {
+      log.error("Property '" + property + "' not supported for selection.");
+    }
+  }
+
+  /**
+   * @see org.projectforge.web.fibu.ISelectCallerPage#cancelSelection(java.lang.String)
+   */
+  @Override
+  public void cancelSelection(final String property)
+  {
+    // Do nothing
+  }
 }
