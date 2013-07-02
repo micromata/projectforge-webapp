@@ -30,6 +30,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
+import org.projectforge.plugins.teamcal.event.TeamEventDao;
 
 /**
  * Own abstraction of a RangeMap. You can add TeamEvents and access them through their start and end date.
@@ -41,7 +42,9 @@ public class SubscriptionHolder implements Serializable
   // one day in milliseconds
   private static final int ONE_DAY = 86400000; // 60*60*24*1000
 
-  private List<TeamEventDO> eventList;
+  // private static final long MIN_DATE_1800 = lendar
+
+  private final List<TeamEventDO> eventList;
 
   private boolean sorted;
 
@@ -57,7 +60,7 @@ public class SubscriptionHolder implements Serializable
     sorted = false;
   }
 
-  public void add(TeamEventDO value)
+  public void add(final TeamEventDO value)
   {
     eventList.add(value);
     sorted = false;
@@ -66,9 +69,9 @@ public class SubscriptionHolder implements Serializable
   public void sort()
   {
     // the following comparator compares by startDate
-    Comparator<TeamEventDO> comparator = new Comparator<TeamEventDO>() {
+    final Comparator<TeamEventDO> comparator = new Comparator<TeamEventDO>() {
       @Override
-      public int compare(TeamEventDO o1, TeamEventDO o2)
+      public int compare(final TeamEventDO o1, final TeamEventDO o2)
       {
         if ((o1 == null || o1.getStartDate() == null) && (o2 == null || o2.getStartDate() == null)) {
           return 0;
@@ -87,7 +90,7 @@ public class SubscriptionHolder implements Serializable
     sorted = true;
   }
 
-  public List<TeamEventDO> getResultList(Long startTime, Long endTime)
+  public List<TeamEventDO> getResultList(final Long startTime, final Long endTime)
   {
     // sorting should by synchronized
     synchronized (this) {
@@ -95,8 +98,8 @@ public class SubscriptionHolder implements Serializable
         sort();
       }
     }
-    List<TeamEventDO> result = new ArrayList<TeamEventDO>();
-    for (TeamEventDO teamEventDo : eventList) {
+    final List<TeamEventDO> result = new ArrayList<TeamEventDO>();
+    for (final TeamEventDO teamEventDo : eventList) {
       // all our events are sorted, if we find a event which starts
       // after the end date, we can break this iteration
       if (teamEventDo.getStartDate().getTime() > endTime) {
@@ -110,12 +113,12 @@ public class SubscriptionHolder implements Serializable
     return result;
   }
 
-
-  public int size() {
+  public int size()
+  {
     return eventList.size();
   }
 
-  private boolean matches(TeamEventDO teamEventDo, Long startTime, Long endTime)
+  private boolean matches(final TeamEventDO teamEventDo, Long startTime, Long endTime)
   {
     // Following period extension is needed due to all day events which are stored in UTC. The additional events in the result list not
     // matching the time period have to be removed by caller!
@@ -129,8 +132,8 @@ public class SubscriptionHolder implements Serializable
     // // get events whose duration overlap with chosen duration.
     // (Restrictions.and(Restrictions.le("startDate", startDate), Restrictions.ge("endDate", endDate)))));
 
-    final Long eventStartTime = teamEventDo.getStartDate() != null ? teamEventDo.getStartDate().getTime() : Long.MIN_VALUE;
-    final Long eventEndTime = teamEventDo.getEndDate() != null ? teamEventDo.getEndDate().getTime() : Long.MAX_VALUE;
+    final Long eventStartTime = teamEventDo.getStartDate() != null ? teamEventDo.getStartDate().getTime() : TeamEventDao.MIN_DATE_1800;
+    final Long eventEndTime = teamEventDo.getEndDate() != null ? teamEventDo.getEndDate().getTime() : TeamEventDao.MAX_DATE_3000;
     if (between(eventStartTime, startTime, endTime) || between(eventEndTime, startTime, endTime)) {
       return true;
     }
@@ -140,7 +143,7 @@ public class SubscriptionHolder implements Serializable
     return false;
   }
 
-  private boolean between(Long searchTime, Long startTime, Long endTime)
+  private boolean between(final Long searchTime, final Long startTime, final Long endTime)
   {
     return searchTime >= startTime && searchTime <= endTime;
   }

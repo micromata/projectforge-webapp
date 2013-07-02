@@ -68,6 +68,10 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
 {
   public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_CALENDAR_EVENT", "plugin15", "plugins.teamcalendar.event");
 
+  public static final long MIN_DATE_1800 = -5364662400000L;
+
+  public static final long MAX_DATE_3000 = 32535216000000L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamEventDao.class);
 
   private static final long ONE_DAY = 1000 * 60 * 60 * 24;
@@ -121,7 +125,8 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
         list = getHibernateTemplate().find("from TeamEventDO e where e.id=? and e.calendar.id=? and e.deleted=false", id, teamCalId);
       } else {
         // It's an external event:
-        list = getHibernateTemplate().find("from TeamEventDO e where e.externalUid=? and e.calendar.id=? and e.deleted=false", uid, teamCalId);
+        list = getHibernateTemplate().find("from TeamEventDO e where e.externalUid=? and e.calendar.id=? and e.deleted=false", uid,
+            teamCalId);
       }
     } else {
       if (id != null) {
@@ -293,7 +298,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     final Date startDate = teamEventFilter.getStartDate();
     final Date endDate = teamEventFilter.getEndDate();
     final Long startTime = startDate == null ? 0 : startDate.getTime();
-    final Long endTime = endDate == null ? Long.MAX_VALUE : endDate.getTime();
+    final Long endTime = endDate == null ? MAX_DATE_3000 : endDate.getTime();
     final List<TeamEventDO> events = aboCache.getEvents(calendarId, startTime, endTime);
     if (events != null && events.size() > 0) {
       result.addAll(events);
