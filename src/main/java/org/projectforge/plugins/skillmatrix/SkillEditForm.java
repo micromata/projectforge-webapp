@@ -23,16 +23,10 @@
 
 package org.projectforge.plugins.skillmatrix;
 
-import java.util.List;
-import java.util.Locale;
-
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.apache.wicket.util.convert.IConverter;
-import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
@@ -84,75 +78,12 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
       dependentFormComponents[0] = titleField;
     }
     {
-      // Parent, look at UserSelectPanel for fine tuning
+      // Parent
       final FieldsetPanel fs = gridBuilder.newFieldset(SkillDO.class, "parent");
-      final PFAutoCompleteTextField<SkillDO> autoCompleteTextField = new PFAutoCompleteTextField<SkillDO>(fs.getTextFieldId(),
-          new PropertyModel<SkillDO>(data, "parent")) {
-        @Override
-        protected List<SkillDO> getChoices(final String input)
-        {
-          final BaseSearchFilter filter = new BaseSearchFilter();
-          filter.setSearchFields("title");
-          filter.setSearchString(input);
-          final List<SkillDO> list = skillDao.getList(filter);
-          return list;
-        }
-
-        @Override
-        protected String formatLabel(final SkillDO skill)
-        {
-          if (skill == null) {
-            return "";
-          }
-          return skill.getTitle();
-        }
-
-        @Override
-        protected String formatValue(final SkillDO skill)
-        {
-          if (skill == null) {
-            return "";
-          }
-          return skill.getTitle();
-        }
-
-        @SuppressWarnings({ "unchecked", "rawtypes"})
-        @Override
-        public <C> IConverter<C> getConverter(final Class<C> type)
-        {
-          return new IConverter() {
-            @Override
-            public Object convertToObject(final String value, final Locale locale)
-            {
-              if (StringUtils.isEmpty(value) == true) {
-                getModel().setObject(null);
-                return null;
-              }
-              final SkillDO skill = skillDao.getSkillTree().getSkill(value);
-              if (skill == null) {
-                error(getString(I18N_KEY_ERROR_SKILL_NOT_FOUND));
-              }
-              getModel().setObject(skill);
-              return skill;
-            }
-
-            @Override
-            public String convertToString(final Object value, final Locale locale)
-            {
-              if (value == null) {
-                return "";
-              }
-              final SkillDO skill = (SkillDO) value;
-              return skill.getTitle();
-            }
-          };
-        }
-
-      };
-      autoCompleteTextField.withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false).withWidth(400);
+      final PFAutoCompleteTextField<SkillDO> autoCompleteTextField = new SkillSelectAutoCompleteFormComponent(fs.getTextFieldId(),
+          new PropertyModel<SkillDO>(data, "parent"));
       fs.add(autoCompleteTextField);
     }
-
     {
       // Descritption
       final FieldsetPanel fs = gridBuilder.newFieldset(SkillDO.class, "description");
