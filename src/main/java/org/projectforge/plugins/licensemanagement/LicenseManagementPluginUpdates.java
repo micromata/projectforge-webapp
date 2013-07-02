@@ -32,7 +32,6 @@ import org.projectforge.continuousdb.UpdateEntryImpl;
 import org.projectforge.continuousdb.UpdatePreCheckStatus;
 import org.projectforge.continuousdb.UpdateRunningStatus;
 import org.projectforge.database.MyDatabaseUpdateDao;
-import org.projectforge.plugins.teamcal.TeamCalPlugin;
 
 /**
  * Contains the initial data-base set-up script and later all update scripts if any data-base schema updates are required by any later
@@ -50,7 +49,7 @@ public class LicenseManagementPluginUpdates
     // /////////////////////////////////////////////////////////////////
     // 5.1
     // /////////////////////////////////////////////////////////////////
-    list.add(new UpdateEntryImpl(TeamCalPlugin.ID, "5.2", "2013-05-19", "Adds T_PLUGIN_LM_LICENSE.file{name}{1,2}.") {
+    list.add(new UpdateEntryImpl(LicenseManagementPlugin.ID, "5.2", "2013-05-19", "Adds T_PLUGIN_LM_LICENSE.file{name}{1,2}.") {
       String[] newAttributes = { "file1", "filename1", "file2", "filename2"};
 
       @Override
