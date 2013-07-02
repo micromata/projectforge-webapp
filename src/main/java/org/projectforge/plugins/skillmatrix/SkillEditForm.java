@@ -44,8 +44,6 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
 
   private static final Logger log = Logger.getLogger(SkillEditForm.class);
 
-  public static final String I18N_KEY_ERROR_SKILL_NOT_FOUND = "plugins.skillmatrix.error.skillNotFound";
-
   @SpringBean(name = "skillDao")
   private SkillDao skillDao;
 
