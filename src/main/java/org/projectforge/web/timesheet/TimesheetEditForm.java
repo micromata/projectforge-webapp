@@ -111,6 +111,8 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
   @SpringBean(name = "userPrefDao")
   private UserPrefDao userPrefDao;
 
+  private UserPrefDO recentUserPref;
+
   UserSelectPanel userSelectPanel;
 
   PFAutoCompleteMaxLengthTextField locationTextField;
@@ -403,14 +405,30 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
             // Fill fields with selected template values:
             final UserPrefDO userPref = userPrefDao.getUserPref(UserPrefArea.TIMESHEET_TEMPLATE, newSelection);
             if (userPref != null) {
-              userPrefDao.fillFromUserPrefParameters(userPref, data);
+              data.setKost2(null).setTask(null);
+              locationTextField.processInput(); // Update model.
+              descriptionArea.processInput(); // Update model.
+              if (recentUserPref != null) {
+                final String recentLocation = recentUserPref.getUserPrefEntryAsString("location");
+                if (StringUtils.equals(recentLocation, data.getLocation()) == true) {
+                  // Previous value was filled by recent user pref so overwrite it:
+                  data.setLocation(null);
+                }
+                final String recentDescription = recentUserPref.getUserPrefEntryAsString("description");
+                if (StringUtils.equals(recentDescription, data.getDescription()) == true) {
+                  // Previous value was filled by recent user pref so overwrite it:
+                  data.setDescription(null);
+                }
+              }
+              userPrefDao.fillFromUserPrefParameters(userPref, data, true);
+              recentUserPref = userPref;
+              locationTextField.modelChanged();
+              descriptionArea.modelChanged();
+              if (cost2ChoicePanel != null) {
+                cost2ChoicePanel.getDropDownChoice().modelChanged();
+              }
             }
             templateName = "";
-            if (cost2ChoicePanel != null) {
-              cost2ChoicePanel.getDropDownChoice().modelChanged();
-            }
-            locationTextField.modelChanged();
-            descriptionArea.modelChanged();
             refresh();
           }
         }
