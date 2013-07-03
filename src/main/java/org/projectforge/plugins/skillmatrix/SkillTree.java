@@ -346,8 +346,10 @@ public class SkillTree extends AbstractCache implements Serializable
     final SkillNode newRoot = new SkillNode();
     final SkillDO rootSkill = new SkillDO();
     rootSkill.setTitle("root");
-    rootSkill.setDescription("ProjectForge root task");
+    rootSkill.setDescription("ProjectForge root skill");
     skillDao.internalSave(rootSkill);
+    // TODO internalSave gives a no hibernate session bound to thread, test this alternative
+    // skillDao.getHibernateTemplate().save(rootSkill);
     newRoot.setSkill(rootSkill);
     return newRoot;
   }
