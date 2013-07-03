@@ -26,6 +26,7 @@ package org.projectforge.plugins.teamcal.externalsubscription;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Date;
@@ -137,7 +138,7 @@ public class TeamEventSubscription implements Serializable
       final InputStream stream = method.getResponseBodyAsStream();
       bytes = IOUtils.toByteArray(stream);
 
-      final String md5 = new String(md.digest(bytes));
+      final String md5 = calcHexHash(md.digest(bytes));
       if (StringUtils.equals(md5, teamCalDo.getExternalSubscriptionHash()) == false) {
         teamCalDo.setExternalSubscriptionHash(md5);
         teamCalDo.setExternalSubscriptionCalendarBinary(bytes);
@@ -211,6 +212,19 @@ public class TeamEventSubscription implements Serializable
           + "': "
           + e.getMessage(), e);
     }
+  }
+
+  /**
+   * calculates hexadecimal representation of
+   * @param md5
+   * @return
+   */
+  private String calcHexHash(byte[] md5) {
+    String result = null;
+    if (md5 != null) {
+      result = new BigInteger(1, md5).toString(16);
+    }
+    return result;
   }
 
   public List<TeamEventDO> getEvents(final Long startTime, final Long endTime)
