@@ -94,6 +94,15 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
 
     // TODO exchange Autocomplete with SelectPanel (currently not working)
 
+    {
+      // Parent task
+      final FieldsetPanel fs = gridBuilder.newFieldset(SkillDO.class, "parent");
+      final SkillSelectPanel parentSelectPanel = new SkillSelectPanel(fs, new PropertyModel<SkillDO>(data, "parent"), parentPage,
+          "parentId");
+      fs.add(parentSelectPanel);
+      fs.getFieldset().setOutputMarkupId(true);
+      parentSelectPanel.init();
+    }
     gridBuilder.newGridPanel();
     {
       // Descritption
