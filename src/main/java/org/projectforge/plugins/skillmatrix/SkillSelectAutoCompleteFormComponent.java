@@ -26,7 +26,7 @@ import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
  * @author Billy Duong (b.duong@micromata.de)
- *
+ * 
  */
 public abstract class SkillSelectAutoCompleteFormComponent extends PFAutoCompleteTextField<SkillDO>
 {
@@ -42,7 +42,8 @@ public abstract class SkillSelectAutoCompleteFormComponent extends PFAutoComplet
 
   private SkillDO skill;
 
-  public SkillSelectAutoCompleteFormComponent(final String id) {
+  public SkillSelectAutoCompleteFormComponent(final String id)
+  {
     this(id, null);
     setModel(new PropertyModel<SkillDO>(this, "skill"));
   }
@@ -82,7 +83,7 @@ public abstract class SkillSelectAutoCompleteFormComponent extends PFAutoComplet
     if (skill == null) {
       return "";
     }
-    return skill.getTitle();
+    return createPath(skill.getId());
   }
 
   @Override
@@ -91,7 +92,26 @@ public abstract class SkillSelectAutoCompleteFormComponent extends PFAutoComplet
     if (skill == null) {
       return "";
     }
-    return skill.getTitle();
+    return "" + skill.getId();
+  }
+
+  /**
+   * create path to root
+   * 
+   * @return
+   */
+  private String createPath(final Integer skillId)
+  {
+    final StringBuilder builder = new StringBuilder();
+    final List<SkillNode> nodeList = getSkillTree().getPathToRoot(skillId);
+    final String pipeSeparator = " | ";
+    String separator = "";
+    for (final SkillNode node : nodeList) {
+      builder.append(separator);
+      builder.append(node.getSkill().getTitle());
+      separator = pipeSeparator;
+    }
+    return builder.toString();
   }
 
   @Override
@@ -132,15 +152,20 @@ public abstract class SkillSelectAutoCompleteFormComponent extends PFAutoComplet
           getModel().setObject(null);
           return null;
         }
-        final SkillDO skill = skillDao.getSkillTree().getSkill(value);
-        if (skill == null) {
-          error(getString(I18N_KEY_ERROR_SKILL_NOT_FOUND));
+        try {
+          final SkillDO skill = getSkillTree().getSkillById(Integer.valueOf(value));
+          if (skill == null) {
+            error(getString(I18N_KEY_ERROR_SKILL_NOT_FOUND));
+          }
+          getModel().setObject(skill);
+
+          notifyChildren();
+
+          return skill;
+        } catch (final NumberFormatException e) {
+          // just ignore the NumberFormatException, because this could happen during wrong inputs
+          return null;
         }
-        getModel().setObject(skill);
-
-        notifyChildren();
-
-        return skill;
       }
 
       @Override
@@ -160,9 +185,15 @@ public abstract class SkillSelectAutoCompleteFormComponent extends PFAutoComplet
    * @param fieldsetPanel
    * @return
    */
-  public SkillSelectAutoCompleteFormComponent setFieldsetPanel(FieldsetPanel fieldsetPanel) {
+  public SkillSelectAutoCompleteFormComponent setFieldsetPanel(FieldsetPanel fieldsetPanel)
+  {
     this.fieldsetPanel = fieldsetPanel;
     return this;
+  }
+
+  public SkillTree getSkillTree()
+  {
+    return skillDao.getSkillTree();
   }
 
 }
