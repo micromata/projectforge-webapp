@@ -30,6 +30,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.UserException;
 import org.projectforge.task.TaskDao;
+import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRightId;
 
 /**
@@ -78,7 +79,6 @@ public class SkillDao extends BaseDao<SkillDO>
   {
     synchronized (this) {
       checkConstraintViolation(obj);
-      checkCyclicReference(obj);
     }
     if(obj.getParent() == null && skillTree.isRootNode(obj) == false) {
       obj.setParent(skillTree.getRootSkillNode().getSkill());
@@ -146,6 +146,16 @@ public class SkillDao extends BaseDao<SkillDO>
       // Cyclic reference because task is ancestor of itself.
       throw new UserException(TaskDao.I18N_KEY_ERROR_CYCLIC_REFERENCE);
     }
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDao#hasUpdateAccess(org.projectforge.user.PFUserDO, org.projectforge.core.ExtendedBaseDO, org.projectforge.core.ExtendedBaseDO, boolean)
+   */
+  @Override
+  public boolean hasUpdateAccess(PFUserDO user, SkillDO obj, SkillDO dbObj, boolean throwException)
+  {
+    checkCyclicReference(obj);
+    return true;
   }
 
   /**
