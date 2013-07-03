@@ -23,7 +23,6 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
-import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
  * @author Billy Duong (b.duong@micromata.de)
@@ -38,8 +37,6 @@ public abstract class SkillSelectAutoCompleteFormComponent extends PFAutoComplet
 
   @SpringBean(name = "skillDao")
   private SkillDao skillDao;
-
-  private FieldsetPanel fieldsetPanel;
 
   private SkillDO skill;
 
@@ -185,17 +182,6 @@ public abstract class SkillSelectAutoCompleteFormComponent extends PFAutoComplet
         return skill.getTitle();
       }
     };
-  }
-
-  /**
-   * Optional. The parameter is used for ajax updates.
-   * @param fieldsetPanel
-   * @return
-   */
-  public SkillSelectAutoCompleteFormComponent setFieldsetPanel(FieldsetPanel fieldsetPanel)
-  {
-    this.fieldsetPanel = fieldsetPanel;
-    return this;
   }
 
   public SkillTree getSkillTree()

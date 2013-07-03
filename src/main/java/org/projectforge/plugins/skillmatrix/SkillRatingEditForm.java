@@ -133,7 +133,6 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
 
       };
       autoCompleteTextField.setRequired(true);
-      autoCompleteTextField.setFieldsetPanel(SkillRatingEditForm.this.fs);
       fs.add(autoCompleteTextField);
       dependentFormComponents[0] = autoCompleteTextField;
     }
