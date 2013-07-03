@@ -217,11 +217,11 @@ public class SkillTree extends AbstractCache implements Serializable
   public boolean isRootNode(final SkillDO skill)
   {
     Validate.notNull(skill);
+    checkRefresh();
     if (root == null && skill.getParentId() == null) {
       // First skill, so it should be the root node.
       return true;
     }
-    checkRefresh();
     if (skill.getId() == null) {
       // Node has no id, so it can't be the root node.
       return false;
@@ -274,12 +274,7 @@ public class SkillTree extends AbstractCache implements Serializable
 
     if (newRoot == null) {
       log.fatal("OUPS, no skill found (ProjectForge database not initialized?) OK, initialize it ...");
-      final SkillDO rootSkill = new SkillDO();
-      rootSkill.setTitle("root");
-      rootSkill.setDescription("ProjectForge root task");
-      skillDao.internalSave(rootSkill);
-      newRoot = new SkillNode();
-      newRoot.setSkill(rootSkill);
+      newRoot = createRootNode();
       skillMap.put(newRoot.getId(), newRoot);
     }
     this.root = newRoot;
@@ -341,5 +336,21 @@ public class SkillTree extends AbstractCache implements Serializable
   {
     this.skillDao = skillDao;
     return this;
+  }
+
+  /**
+   * Creates a root node for the skill tree and saves it in the database.
+   * @return a "dummy" skill node.
+   */
+  private SkillNode createRootNode() {
+    final SkillNode newRoot = new SkillNode();
+    final SkillDO rootSkill = new SkillDO();
+    rootSkill.setTitle("root");
+    rootSkill.setDescription("ProjectForge root skill");
+    skillDao.internalSave(rootSkill);
+    // TODO internalSave gives a no hibernate session bound to thread, test this alternative
+    // skillDao.getHibernateTemplate().save(rootSkill);
+    newRoot.setSkill(rootSkill);
+    return newRoot;
   }
 }

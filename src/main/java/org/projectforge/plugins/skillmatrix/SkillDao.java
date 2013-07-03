@@ -29,6 +29,8 @@ import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.UserException;
+import org.projectforge.task.TaskDao;
+import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRightId;
 
 /**
@@ -47,6 +49,8 @@ public class SkillDao extends BaseDao<SkillDO>
   public static final String I18N_KEY_ERROR_CYCLIC_REFERENCE = "plugins.skillmatrix.error.cyclicReference";
 
   public static final String I18N_KEY_ERROR_DUPLICATE_CHILD_SKILL = "plugins.skillmatrix.error.duplicateChildSkill";
+
+  public static final String I18N_KEY_ERROR_PARENT_SKILL_NOT_FOUND = "plugins.skillmatrix.error.parentNotFound";
 
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "parent.title"};
 
@@ -76,7 +80,7 @@ public class SkillDao extends BaseDao<SkillDO>
     synchronized (this) {
       checkConstraintViolation(obj);
     }
-    if(obj.getParent() == null) {
+    if(obj.getParent() == null && skillTree.isRootNode(obj) == false) {
       obj.setParent(skillTree.getRootSkillNode().getSkill());
     }
   }
@@ -126,6 +130,34 @@ public class SkillDao extends BaseDao<SkillDO>
     }
   }
 
+  private void checkCyclicReference(final SkillDO obj)
+  {
+    if (obj.getId().equals(obj.getParentId()) == true) {
+      // Self reference
+      throw new UserException(I18N_KEY_ERROR_CYCLIC_REFERENCE);
+    }
+    final SkillNode parent = skillTree.getSkillNodeById(obj.getParentId());
+    if (parent == null) {
+      // Task is orphan because it has no parent task.
+      throw new UserException(I18N_KEY_ERROR_PARENT_SKILL_NOT_FOUND);
+    }
+    final SkillNode node = skillTree.getSkillNodeById(obj.getId());
+    if (node.isParentOf(parent) == true) {
+      // Cyclic reference because task is ancestor of itself.
+      throw new UserException(TaskDao.I18N_KEY_ERROR_CYCLIC_REFERENCE);
+    }
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDao#hasUpdateAccess(org.projectforge.user.PFUserDO, org.projectforge.core.ExtendedBaseDO, org.projectforge.core.ExtendedBaseDO, boolean)
+   */
+  @Override
+  public boolean hasUpdateAccess(PFUserDO user, SkillDO obj, SkillDO dbObj, boolean throwException)
+  {
+    checkCyclicReference(obj);
+    return true;
+  }
+
   /**
    * @see org.projectforge.core.BaseDao#getAdditionalSearchFields()
    */
@@ -133,5 +165,17 @@ public class SkillDao extends BaseDao<SkillDO>
   protected String[] getAdditionalSearchFields()
   {
     return ADDITIONAL_SEARCH_FIELDS;
+  }
+
+  /**
+   * @param skill
+   * @param parentId If null, then skill will be set to null;
+   * @see BaseDao#getOrLoad(Integer)
+   */
+  public SkillDO setParentSkill(final SkillDO skill, final Integer parentId)
+  {
+    final SkillDO parentSkill = getOrLoad(parentId);
+    skill.setParent(parentSkill);
+    return skill;
   }
 }

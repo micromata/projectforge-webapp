@@ -92,4 +92,20 @@ public enum SkillRating implements I18nEnum
     return values.toArray();
   }
 
+  /**
+   * @return the ordering
+   */
+  public int getOrdering()
+  {
+    return ordering;
+  }
+
+  /**
+   * @param ordering the ordering to set
+   */
+  public void setOrdering(final int ordering)
+  {
+    this.ordering = ordering;
+  }
+
 }

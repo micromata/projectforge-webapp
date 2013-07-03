@@ -41,6 +41,8 @@ public class SkillTreePage extends AbstractSecuredPage
 
   private ISelectCallerPage caller;
 
+  private SkillTreeBuilder skillTreeBuilder;
+
   @SpringBean(name = "skillDao")
   private SkillDao skillDao;
 
@@ -114,7 +116,7 @@ public class SkillTreePage extends AbstractSecuredPage
     form = new SkillTreeForm(this);
     body.add(form);
     form.init();
-    final SkillTreeBuilder skillTreeBuilder = new SkillTreeBuilder().setCaller(caller).setSelectProperty(selectProperty);
+    skillTreeBuilder = new SkillTreeBuilder().setCaller(caller).setSelectProperty(selectProperty);
     form.add(skillTreeBuilder.createTree("tree", this, form.getSearchFilter()));
 
     body.add(new Label("info", new Model<String>(getString(I18N_KEY_SKILLTREE_INFO))));
@@ -170,5 +172,11 @@ public class SkillTreePage extends AbstractSecuredPage
   {
     return getString(I18N_KEY_SKILLTREE_TITLE);
   }
+
+  public void setHighlightedRowId(final Integer highlightedRowId)
+  {
+    skillTreeBuilder.setHighlightedSkillNodeId(highlightedRowId);
+  }
+
 
 }

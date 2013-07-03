@@ -38,6 +38,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
+import org.projectforge.registry.Registry;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
@@ -264,14 +265,15 @@ public class SkillTreeBuilder implements Serializable
    * @param skillDao the skillDao to set
    * @return this for chaining.
    */
-  public void setSkillDao(final SkillDao skillDao)
+  public SkillTreeBuilder setSkillDao(final SkillDao skillDao)
   {
     this.skillDao = skillDao;
+    return this;
   }
 
   private SkillTree getSkillTree()
   {
-    return skillDao.getSkillTree();
+    return Registry.instance().getDao(SkillDao.class).getSkillTree();
   }
 
 }
