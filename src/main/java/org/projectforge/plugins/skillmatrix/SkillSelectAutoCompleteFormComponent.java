@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.model.IModel;
@@ -56,6 +57,12 @@ public abstract class SkillSelectAutoCompleteFormComponent extends PFAutoComplet
   {
     super(id, model);
     getSettings().withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false).withWidth(400);
+
+    // Prevents a submit with an empty autocomplete textfield by pressing enter
+    add(AttributeModifier.append("onkeypress", "if ( event.which == 13 ) { return false; }"));
+
+    add(AttributeModifier.append("class", "mm_delayBlur"));
+
     add(new AjaxFormComponentUpdatingBehavior("onChange") {
       private static final long serialVersionUID = 5394951486514219126L;
 
