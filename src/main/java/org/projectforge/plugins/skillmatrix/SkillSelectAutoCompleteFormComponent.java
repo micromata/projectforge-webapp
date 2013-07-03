@@ -16,11 +16,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.core.BaseSearchFilter;
-import org.projectforge.task.TaskDO;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
@@ -42,11 +42,16 @@ public abstract class SkillSelectAutoCompleteFormComponent extends PFAutoComplet
 
   private SkillDO skill;
 
+  public SkillSelectAutoCompleteFormComponent(final String id) {
+    this(id, null);
+    setModel(new PropertyModel<SkillDO>(this, "skill"));
+  }
+
   /**
    * @param id
    * @param model
    */
-  protected SkillSelectAutoCompleteFormComponent(final String id, final IModel<SkillDO> model)
+  public SkillSelectAutoCompleteFormComponent(final String id, final IModel<SkillDO> model)
   {
     super(id, model);
     getSettings().withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false).withWidth(400);
