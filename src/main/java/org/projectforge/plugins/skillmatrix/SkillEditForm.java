@@ -102,6 +102,10 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
       fs.add(parentSelectPanel);
       fs.getFieldset().setOutputMarkupId(true);
       parentSelectPanel.init();
+      if (getSkillTree().isRootNode(data)) {
+        fs.setVisible(false);
+      }
+      parentSelectPanel.setRequired(true);
     }
     gridBuilder.newGridPanel();
     {
