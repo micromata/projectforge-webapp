@@ -256,7 +256,6 @@ public class SkillSelectPanel extends AbstractSelectPanel<SkillDO> implements Co
       }
 
     };
-    //searchSkillInput.setAutocompleteOnlySkillBookableForTimesheets(autocompleteOnlySkillBookableForTimesheets);
     userselectContainer.add(searchSkillInput);
     // opener link
     final WebMarkupContainer searchSkillInputOpen = new WebMarkupContainer("searchSkillInputOpen");
