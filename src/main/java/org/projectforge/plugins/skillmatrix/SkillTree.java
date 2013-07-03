@@ -217,11 +217,11 @@ public class SkillTree extends AbstractCache implements Serializable
   public boolean isRootNode(final SkillDO skill)
   {
     Validate.notNull(skill);
+    checkRefresh();
     if (root == null && skill.getParentId() == null) {
       // First skill, so it should be the root node.
       return true;
     }
-    checkRefresh();
     if (skill.getId() == null) {
       // Node has no id, so it can't be the root node.
       return false;
