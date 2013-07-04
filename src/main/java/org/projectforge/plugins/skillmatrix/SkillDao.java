@@ -137,7 +137,7 @@ public class SkillDao extends BaseDao<SkillDO>
       throw new UserException(I18N_KEY_ERROR_CYCLIC_REFERENCE);
     }
     final SkillNode parent = skillTree.getSkillNodeById(obj.getParentId());
-    if (parent == null) {
+    if (parent == null && skillTree.isRootNode(obj) == false) {
       // Task is orphan because it has no parent task.
       throw new UserException(I18N_KEY_ERROR_PARENT_SKILL_NOT_FOUND);
     }
