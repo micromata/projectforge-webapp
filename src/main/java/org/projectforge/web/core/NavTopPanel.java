@@ -54,6 +54,7 @@ import org.projectforge.web.LoginPage;
 import org.projectforge.web.MenuEntry;
 import org.projectforge.web.core.menuconfig.MenuConfig;
 import org.projectforge.web.dialog.ModalDialog;
+import org.projectforge.web.doc.DocumentationPage;
 import org.projectforge.web.mobile.MenuMobilePage;
 import org.projectforge.web.user.ChangePasswordPage;
 import org.projectforge.web.user.MyAccountEditPage;
@@ -156,6 +157,9 @@ public class NavTopPanel extends NavAbstractPanel
         final BookmarkablePageLink<Void> myAccountLink = new BookmarkablePageLink<Void>("myAccountLink", MyAccountEditPage.class);
         add(myAccountLink);
       }
+      final BookmarkablePageLink<Void> documentationLink = new BookmarkablePageLink<Void>("documentationLink", DocumentationPage.class);
+      add(documentationLink);
+
       @SuppressWarnings("serial")
       final Link<String> logoutLink = new Link<String>("logoutLink") {
         @Override

@@ -67,7 +67,6 @@ import org.projectforge.web.book.BookListPage;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.core.ConfigurationListPage;
 import org.projectforge.web.core.SearchPage;
-import org.projectforge.web.doc.DocumentationPage;
 import org.projectforge.web.fibu.AccountingRecordListPage;
 import org.projectforge.web.fibu.AuftragListPage;
 import org.projectforge.web.fibu.CustomerListPage;
@@ -371,7 +370,6 @@ public class MenuItemRegistry
     // invisible at default (because it's only functioning with valid ssl certificate).
     reg.register(misc, MenuItemDefId.IMAGE_CROPPER, 100, ImageCropperPage.class, new String[] { ImageCropperPage.PARAM_SHOW_UPLOAD_BUTTON,
       "false", ImageCropperPage.PARAM_ENABLE_WHITEBOARD_FILTER, "true"}, false);
-    reg.register(misc, MenuItemDefId.DOCUMENTATION, 200, DocumentationPage.class);
     reg.refresh();
   }
 }
