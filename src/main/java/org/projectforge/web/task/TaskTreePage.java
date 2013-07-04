@@ -63,8 +63,6 @@ public class TaskTreePage extends AbstractSecuredPage
 
   public static final String USER_PREFS_KEY_OPEN_TASKS = "openTasks";
 
-  private static final String I18N_PREFIX = "task";
-
   @SpringBean(name = "accessChecker")
   private AccessChecker accessChecker;
 
@@ -239,9 +237,9 @@ public class TaskTreePage extends AbstractSecuredPage
   protected String getTitle()
   {
     if (isSelectMode() == true) {
-      return getString(I18N_PREFIX + ".title.list.select");
+      return getString("task.tree.title.select");
     } else {
-      return getString(I18N_PREFIX + ".title.list");
+      return getString("task.tree.title");
     }
   }
 
