@@ -28,7 +28,6 @@ import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
@@ -202,7 +201,7 @@ public class TaskTreePage extends AbstractSecuredPage
     taskTreeBuilder.setCaller(caller).setSelectProperty(selectProperty);
     form.add(taskTreeBuilder.createTree("tree", this, form.getSearchFilter()));
 
-    body.add(new Label("info", new Model<String>(getString("task.tree.info"))));
+    body.add(new Label("info", getString("task.tree.info")));
 
   }
 

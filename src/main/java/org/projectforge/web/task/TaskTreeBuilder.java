@@ -257,7 +257,7 @@ public class TaskTreeBuilder implements Serializable
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<TaskNode>(new ResourceModel("task.status"), null, "status", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<TaskNode>(new ResourceModel("status"), null, "status", cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<TaskNode>> item, final String componentId, final IModel<TaskNode> rowModel)
       {
