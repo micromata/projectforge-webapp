@@ -119,6 +119,8 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
 
     gridBuilder.newGridPanel();
     addressEditSupport.addComment();
+
+    addCloneButton();
   }
 
   private void addPhoneNumber(final String property, final String labelKey, final String labelDescriptionKey,
