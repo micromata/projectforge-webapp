@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.projectforge</groupId>
     <artifactId>projectforge-parent</artifactId>
-    <version>5.1.1-SNAPSHOT</version> <!-- automatically set -->
+    <version>5.2</version> <!-- automatically set -->
   </parent>
   <licenses>
     <license>
@@ -28,7 +28,7 @@
     <repository>
       <id>org.projectforge.repo</id>
       <name>ProjectForge-REPO</name>
-      <url>http://www.projectforge.org/nexus/content/repositories/ProjectForge-Snapshots</url> <!-- automatically set -->
+      <url>http://www.projectforge.org/nexus/content/repositories/ProjectForge</url> <!-- automatically set -->
     </repository>
   </repositories>
   <dependencies>
