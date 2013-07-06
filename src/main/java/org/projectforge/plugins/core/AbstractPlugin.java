@@ -131,6 +131,14 @@ public abstract class AbstractPlugin
    */
   protected abstract void initialize();
 
+  /**
+   * @return the initialized
+   */
+  public boolean isInitialized()
+  {
+    return initialized;
+  }
+
   protected MenuItemDef getMenuItemDef(final MenuItemDefId menuItemDefId)
   {
     return MenuItemRegistry.instance().get(menuItemDefId);
