@@ -24,7 +24,6 @@
 package org.projectforge.plugins.skillmatrix;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -77,26 +76,6 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
     {
       // Parent
       final FieldsetPanel fs = gridBuilder.newFieldset(SkillDO.class, "parent");
-      final SkillSelectAutoCompleteFormComponent autoCompleteTextField = new SkillSelectAutoCompleteFormComponent(fs.getTextFieldId(),
-          new PropertyModel<SkillDO>(data, "parent")) {
-
-        private static final long serialVersionUID = 5028475946200551528L;
-
-        @Override
-        protected void onModelSelected(AjaxRequestTarget target, SkillDO skill)
-        {
-          // Do nothing.
-        }
-
-      };
-      fs.add(autoCompleteTextField);
-    }
-
-    // TODO exchange Autocomplete with SelectPanel (currently not working)
-
-    {
-      // Parent task
-      final FieldsetPanel fs = gridBuilder.newFieldset(SkillDO.class, "parent");
       final SkillSelectPanel parentSelectPanel = new SkillSelectPanel(fs, new PropertyModel<SkillDO>(data, "parent"), parentPage,
           "parentId");
       fs.add(parentSelectPanel);
@@ -105,7 +84,7 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
       if (getSkillTree().isRootNode(data)) {
         fs.setVisible(false);
       }
-      parentSelectPanel.setRequired(true);
+      //parentSelectPanel.setRequired(true);
     }
     gridBuilder.newGridPanel();
     {

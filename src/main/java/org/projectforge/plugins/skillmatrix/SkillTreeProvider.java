@@ -61,6 +61,10 @@ public class SkillTreeProvider implements ITreeProvider<SkillNode>
   @Override
   public Iterator<SkillNode> getRoots()
   {
+    if(getSkillTree().getRootSkillNode() == null) {
+      // Force a refresh to load the root skill node
+      getSkillTree().refresh();
+    }
     return iterator(getSkillTree().getRootSkillNode().getChilds(), showRootNode);
   }
 
