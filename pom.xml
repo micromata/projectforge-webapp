@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.projectforge</groupId>
     <artifactId>projectforge-parent</artifactId>
-    <version>5.2</version> <!-- automatically set -->
+    <version>5.2.1-SNAPSHOT</version> <!-- automatically set -->
   </parent>
   <licenses>
     <license>
@@ -28,7 +28,7 @@
     <repository>
       <id>org.projectforge.repo</id>
       <name>ProjectForge-REPO</name>
-      <url>http://www.projectforge.org/nexus/content/repositories/ProjectForge</url> <!-- automatically set -->
+      <url>http://www.projectforge.org/nexus/content/repositories/ProjectForge-Snapshots</url> <!-- automatically set -->
     </repository>
   </repositories>
   <dependencies>
@@ -531,12 +531,12 @@
           </connectors>
         </configuration>
       </plugin>
-      <plugin>  <!-- Version check: 13/06/2013. -->
+      <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.1</version>
+        <version>${maven-compile-plugin-version}</version>
         <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
+          <source>${maven-compile-java-version}</source>
+          <target>${maven-compile-java-version}</target>
           <encoding>utf-8</encoding>
         </configuration>
       </plugin>
