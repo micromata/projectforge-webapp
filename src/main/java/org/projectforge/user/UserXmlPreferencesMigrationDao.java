@@ -50,22 +50,22 @@ public class UserXmlPreferencesMigrationDao extends HibernateDaoSupport
 
   private UserXmlPreferencesCache userXmlPreferencesCache;
 
-  public void setAccessChecker(AccessChecker accessChecker)
+  public void setAccessChecker(final AccessChecker accessChecker)
   {
     this.accessChecker = accessChecker;
   }
 
-  public void setUserGroupCache(UserGroupCache userGroupCache)
+  public void setUserGroupCache(final UserGroupCache userGroupCache)
   {
     this.userGroupCache = userGroupCache;
   }
 
-  public void setUserXmlPreferencesCache(UserXmlPreferencesCache userXmlPreferencesCache)
+  public void setUserXmlPreferencesCache(final UserXmlPreferencesCache userXmlPreferencesCache)
   {
     this.userXmlPreferencesCache = userXmlPreferencesCache;
   }
 
-  public void setUserXmlPreferencesDao(UserXmlPreferencesDao userXmlPreferencesDao)
+  public void setUserXmlPreferencesDao(final UserXmlPreferencesDao userXmlPreferencesDao)
   {
     this.userXmlPreferencesDao = userXmlPreferencesDao;
   }
@@ -77,7 +77,7 @@ public class UserXmlPreferencesMigrationDao extends HibernateDaoSupport
     accessChecker.checkIsLoggedInUserMemberOfAdminGroup();
     final StringBuffer buf = new StringBuffer();
     final List<UserXmlPreferencesDO> list = getHibernateTemplate().find(
-        "from " + UserXmlPreferencesDO.class.getSimpleName() + " t order by userId, key");
+        "from " + UserXmlPreferencesDO.class.getSimpleName() + " t order by user.id, key");
     int versionNumber = Integer.MAX_VALUE;
     for (final UserXmlPreferencesDO userPrefs : list) {
       buf.append(migrateUserPrefs(userPrefs));
