@@ -63,16 +63,6 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
     super.init();
 
     gridBuilder.newGridPanel();
-
-    {
-      // Title of skill
-      final FieldsetPanel fs = gridBuilder.newFieldset(SkillDO.class, "title");
-      final RequiredMaxLengthTextField titleField = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
-          "title"));
-      WicketUtils.setFocus(titleField);
-      fs.add(titleField);
-      dependentFormComponents[0] = titleField;
-    }
     {
       // Parent
       final FieldsetPanel fs = gridBuilder.newFieldset(SkillDO.class, "parent");
@@ -84,7 +74,15 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
       if (getSkillTree().isRootNode(data)) {
         fs.setVisible(false);
       }
-      //parentSelectPanel.setRequired(true);
+    }
+    {
+      // Title of skill
+      final FieldsetPanel fs = gridBuilder.newFieldset(SkillDO.class, "title");
+      final RequiredMaxLengthTextField titleField = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
+          "title"));
+      WicketUtils.setFocus(titleField);
+      fs.add(titleField);
+      dependentFormComponents[0] = titleField;
     }
     gridBuilder.newGridPanel();
     {
