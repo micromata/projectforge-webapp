@@ -123,6 +123,10 @@ public class MyDatabaseUpdateDao extends DatabaseUpdateDao
       ++result;
     }
     for (final AbstractPlugin plugin : PluginsRegistry.instance().getPlugins()) {
+      if (plugin.isInitialized() == false) {
+        // Plug-in not (yet) initialized, skip. this is normal on first start-up phase.
+        continue;
+      }
       final UpdateEntry updateEntry = plugin.getInitializationUpdateEntry();
       if (updateEntry != null) {
         result += updateEntry.createMissingIndices();

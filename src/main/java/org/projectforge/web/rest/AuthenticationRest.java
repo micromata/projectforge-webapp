@@ -54,7 +54,7 @@ import org.projectforge.web.rest.converter.PFUserDOConverter;
  * You may now store the user's id and authentication-token for the user's convenience on your client (e. g. mobile app).</li>
  * <li>
  * Every time the user starts the client / app you should call {@link #initialContact(String)} for checking the server version. May-be the
- * server version is to old or your client version is too old. This call is optional but good practice.</li>
+ * server version is too old or your client version is too old. This call is optional but good practice.</li>
  * <li>
  * Every further rest call is done by authentication via user-id and authentication-token. The user-id is required for logging purposes e. g. for failed logins or brute-force attacks.
  * </li>

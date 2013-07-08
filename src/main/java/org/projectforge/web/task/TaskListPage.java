@@ -38,7 +38,6 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHelper;
@@ -180,7 +179,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
         buf.append(HtmlHelper.escapeXml(StringHelper.getWildcardString(kost2s))).append("*");
       }
     }
-    final Label label = new Label(componentId, new Model<String>(buf.toString()));
+    final Label label = new Label(componentId, buf.toString());
     if (kost2s != null) {
       WicketUtils.addTooltip(label, StringHelper.listToString("\n", kost2s));
     }
@@ -191,7 +190,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
   static Label getPriorityLabel(final String componentId, final PriorityFormatter priorityFormatter, final TaskDO task)
   {
     final String formattedPriority = priorityFormatter.getFormattedPriority(task.getPriority());
-    final Label label = new Label(componentId, new Model<String>(formattedPriority));
+    final Label label = new Label(componentId, formattedPriority);
     label.setEscapeModelStrings(false);
     return label;
   }
@@ -199,7 +198,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
   static Label getStatusLabel(final String componentId, final TaskFormatter taskFormatter, final TaskDO task)
   {
     final String formattedStatus = taskFormatter.getFormattedTaskStatus(task.getStatus());
-    final Label label = new Label(componentId, new Model<String>(formattedStatus));
+    final Label label = new Label(componentId, formattedStatus);
     label.setEscapeModelStrings(false);
     return label;
   }
@@ -231,7 +230,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
       }
     };
     final List<IColumn<TaskDO, String>> columns = new ArrayList<IColumn<TaskDO, String>>();
-    columns.add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("task")), getSortable("title", sortable), "title",
+    columns.add(new CellItemListenerPropertyColumn<TaskDO>(getString("task"), getSortable("title", sortable), "title",
         cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<TaskDO>> item, final String componentId, final IModel<TaskDO> rowModel)
@@ -251,7 +250,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
       }
     });
     columns
-    .add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("task.consumption")), null, "task", cellItemListener) {
+    .add(new CellItemListenerPropertyColumn<TaskDO>(getString("task.consumption"), null, "task", cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<TaskDO>> item, final String componentId, final IModel<TaskDO> rowModel)
       {
@@ -302,15 +301,15 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
       });
 
     }
-    columns.add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("shortDescription")), getSortable(
+    columns.add(new CellItemListenerPropertyColumn<TaskDO>(getString("shortDescription"), getSortable(
         "shortDescription", sortable), "shortDescription", cellItemListener));
     if (accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == true) {
       columns.add(new DatePropertyColumn<TaskDO>(dateTimeFormatter, getString("task.protectTimesheetsUntil.short"), getSortable(
           "protectTimesheetsUntil", sortable), "protectTimesheetsUntil", cellItemListener));
     }
-    columns.add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("task.reference")), getSortable("reference",
+    columns.add(new CellItemListenerPropertyColumn<TaskDO>(getString("task.reference"), getSortable("reference",
         sortable), "reference", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("priority")), getSortable("priority", sortable),
+    columns.add(new CellItemListenerPropertyColumn<TaskDO>(getString("priority"), getSortable("priority", sortable),
         "priority", cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<TaskDO>> item, final String componentId, final IModel<TaskDO> rowModel)
@@ -320,7 +319,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("task.status")), getSortable("status", sortable),
+    columns.add(new CellItemListenerPropertyColumn<TaskDO>(getString("status"), getSortable("status", sortable),
         "status", cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<TaskDO>> item, final String componentId, final IModel<TaskDO> rowModel)

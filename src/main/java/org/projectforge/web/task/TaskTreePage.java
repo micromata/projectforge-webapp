@@ -28,7 +28,6 @@ import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
@@ -63,8 +62,6 @@ public class TaskTreePage extends AbstractSecuredPage
   private static final long serialVersionUID = -8406452960003792763L;
 
   public static final String USER_PREFS_KEY_OPEN_TASKS = "openTasks";
-
-  private static final String I18N_PREFIX = "task";
 
   @SpringBean(name = "accessChecker")
   private AccessChecker accessChecker;
@@ -202,7 +199,7 @@ public class TaskTreePage extends AbstractSecuredPage
     taskTreeBuilder.setCaller(caller).setSelectProperty(selectProperty);
     form.add(taskTreeBuilder.createTree("tree", this, form.getSearchFilter()));
 
-    body.add(new Label("info", new Model<String>(getString("task.tree.info"))));
+    body.add(new Label("info", getString("task.tree.info")));
 
   }
 
@@ -240,9 +237,9 @@ public class TaskTreePage extends AbstractSecuredPage
   protected String getTitle()
   {
     if (isSelectMode() == true) {
-      return getString(I18N_PREFIX + ".title.list.select");
+      return getString("task.tree.title.select");
     } else {
-      return getString(I18N_PREFIX + ".title.list");
+      return getString("task.tree.title");
     }
   }
 

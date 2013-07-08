@@ -39,6 +39,8 @@ import org.projectforge.plugins.teamcal.event.TeamEventDao;
  */
 public class SubscriptionHolder implements Serializable
 {
+  private static final long serialVersionUID = 1188093201413097949L;
+
   // one day in milliseconds
   private static final int ONE_DAY = 86400000; // 60*60*24*1000
 

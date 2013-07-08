@@ -231,6 +231,17 @@ public class UserPrefDO extends AbstractBaseDO<Integer>
     return null;
   }
 
+  @Transient
+  public String getUserPrefEntryAsString(final String parameter)
+  {
+    final UserPrefEntryDO entry = getUserPrefEntry(parameter);
+    if (entry == null) {
+      return null;
+    }
+    return entry.getValue();
+  }
+
+
   /**
    * @param parameter
    * @return A list of all parameters which depends on the given parameter or null if no dependent parameter exists for this parameter.

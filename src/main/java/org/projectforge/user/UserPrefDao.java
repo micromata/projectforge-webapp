@@ -274,6 +274,18 @@ public class UserPrefDao extends BaseDao<UserPrefDO>
    */
   public void fillFromUserPrefParameters(final UserPrefDO userPref, final Object obj)
   {
+    fillFromUserPrefParameters(userPref, obj, false);
+  }
+
+  /**
+   * Fill object fields from the parameters of the given userPref.
+   * @param userPref
+   * @param obj
+   * @param preserveExistingValues If true then existing value will not be overwritten by the user pref object. Default is false.
+   * @see #addUserPrefParameters(UserPrefDO, Object)
+   */
+  public void fillFromUserPrefParameters(final UserPrefDO userPref, final Object obj, final boolean preserveExistingValues)
+  {
     Validate.notNull(userPref);
     Validate.notNull(obj);
     final Field[] fields = obj.getClass().getDeclaredFields();
@@ -292,6 +304,20 @@ public class UserPrefDao extends BaseDao<UserPrefDO>
         } else {
           final Object value = getParameterValue(field.getType(), entry.getValue());
           try {
+            if (preserveExistingValues == true) {
+              final Object oldValue = field.get(obj);
+              if (oldValue != null) {
+                if (oldValue instanceof String) {
+                  if (((String) oldValue).length() > 0) {
+                    // Preserve existing value:
+                    continue;
+                  }
+                } else {
+                  // Preserve existing value:
+                  continue;
+                }
+              }
+            }
             field.set(obj, value);
           } catch (final IllegalArgumentException ex) {
             log.error(ex.getMessage()
