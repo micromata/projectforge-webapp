@@ -147,7 +147,9 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
         @Override
         public boolean isVisible()
         {
-          if (data == null || data.getSkill() == null || !data.getSkill().isRateable()) {
+          if (data == null || data.getSkill() == null || data.getSkill().isRateable() == false) {
+            // If a skill is selected that is unrateable, reset the rating of the previous (probably rateable) skill.
+            data.setSkillRating(null);
             return false;
           } else {
             return true;
