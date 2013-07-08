@@ -46,7 +46,6 @@ public class SkillEditPage extends AbstractEditPage<SkillDO, SkillEditForm, Skil
 
   /**
    * @param parameters
-   * @param i18nPrefix
    */
   public SkillEditPage(final PageParameters parameters)
   {
