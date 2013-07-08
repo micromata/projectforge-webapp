@@ -31,6 +31,7 @@ import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.core.UserException;
+import org.projectforge.registry.Registry;
 import org.projectforge.user.UserRightId;
 
 /**
@@ -125,6 +126,13 @@ public class SkillRatingDao extends BaseDao<SkillRatingDO>
       queryFilter.add(Restrictions.in("skillRating", values));
     }
     return getList(queryFilter);
+  }
+
+  public SkillRatingDO setSkill(final SkillRatingDO rating, final Integer id)
+  {
+    final SkillDO skill = Registry.instance().getDao(SkillDao.class).getOrLoad(id);
+    rating.setSkill(skill);
+    return rating;
   }
 
 }
