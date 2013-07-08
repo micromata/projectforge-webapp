@@ -24,7 +24,9 @@
 package org.projectforge.plugins.teamcal.externalsubscription;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -70,7 +72,7 @@ public class TeamEventExternalSubscriptionCache
     final List<Integer> idsToRemove = new ArrayList<Integer>();
     for (final Integer calendarId : subscriptions.keySet()) {
       // if calendar is not subscribed anymore, remove them
-      if(calendarListContainsId(subscribedCalendars, calendarId) == false) {
+      if (calendarListContainsId(subscribedCalendars, calendarId) == false) {
         idsToRemove.add(calendarId);
       }
     }
@@ -108,7 +110,8 @@ public class TeamEventExternalSubscriptionCache
   {
     final TeamEventSubscription compareSubscription = subscriptions.get(calendar.getId());
     final Long now = System.currentTimeMillis();
-    final Long addedTime = calendar.getExternalSubscriptionUpdateInterval() == null ? SUBSCRIPTION_UPDATE_TIME : 1000L * calendar.getExternalSubscriptionUpdateInterval();
+    final Long addedTime = calendar.getExternalSubscriptionUpdateInterval() == null ? SUBSCRIPTION_UPDATE_TIME : 1000L * calendar
+        .getExternalSubscriptionUpdateInterval();
     if (compareSubscription == null) {
       // create the calendar
       final TeamEventSubscription teamEventSubscription = new TeamEventSubscription(dao, calendar);
@@ -140,8 +143,15 @@ public class TeamEventExternalSubscriptionCache
   {
     final List<TeamEventDO> result = new ArrayList<TeamEventDO>();
     // precondition: existing teamcals ins filter
-    if (filter.getTeamCals() != null) {
-      for (final Integer calendarId : filter.getTeamCals()) {
+    final Collection<Integer> teamCals = new LinkedList<Integer>();
+    if (filter.getTeamCals() != null && filter.getTeamCals().size() > 0) {
+      teamCals.addAll(filter.getTeamCals());
+    }
+    if (filter.getTeamCalId() != null) {
+      teamCals.add(filter.getTeamCalId());
+    }
+    if (teamCals != null) {
+      for (final Integer calendarId : teamCals) {
         final TeamEventSubscription eventSubscription = subscriptions.get(calendarId);
         if (eventSubscription != null) {
           final List<TeamEventDO> recurrenceEvents = eventSubscription.getRecurrenceEvents();
