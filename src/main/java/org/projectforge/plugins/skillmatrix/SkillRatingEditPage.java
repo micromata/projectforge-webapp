@@ -39,7 +39,7 @@ public class SkillRatingEditPage extends AbstractEditPage<SkillRatingDO, SkillRa
 
   private static final Logger log = Logger.getLogger(SkillRatingEditPage.class);
 
-  public static final String I18N_KEY_PREFIX = "plugins.skillmatrix";
+  public static final String I18N_KEY_PREFIX = "plugins.skillmatrix.rating";
 
   @SpringBean(name = "skillRatingDao")
   private SkillRatingDao skillRatingDao;

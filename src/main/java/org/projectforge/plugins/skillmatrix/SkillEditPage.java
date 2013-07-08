@@ -39,7 +39,7 @@ public class SkillEditPage extends AbstractEditPage<SkillDO, SkillEditForm, Skil
 
   private static final Logger log = Logger.getLogger(SkillEditPage.class);
 
-  public static final String I18N_KEY_PREFIX = "plugins.skillmatrix";
+  public static final String I18N_KEY_PREFIX = "plugins.skillmatrix.skill";
 
   @SpringBean(name = "skillDao")
   private SkillDao skillDao;
