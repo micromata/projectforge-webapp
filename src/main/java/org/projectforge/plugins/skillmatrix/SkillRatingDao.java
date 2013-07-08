@@ -130,7 +130,7 @@ public class SkillRatingDao extends BaseDao<SkillRatingDO>
 
   public SkillRatingDO setSkill(final SkillRatingDO rating, final Integer id)
   {
-    final SkillDO skill = Registry.instance().getDao(SkillDao.class).getOrLoad(id);
+    final SkillDO skill = Registry.instance().getDao(SkillDao.class).getSkillTree().getSkillById(id);
     rating.setSkill(skill);
     return rating;
   }
