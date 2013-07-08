@@ -270,7 +270,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
         }
       }
     }
-    // abos
+    // subscriptions
     final TeamEventExternalSubscriptionCache aboCache = TeamEventExternalSubscriptionCache.instance();
     final List<Integer> alreadyAdded = new ArrayList<Integer>();
     // precondition for abos: existing teamcals in filter
