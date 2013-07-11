@@ -1,0 +1,36 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<title>Project Tree View</title>
+</head>
+<body>
+<wicket:panel>
+
+   	<h2 wicket:id="titlehead">Project Tree View</h2>
+
+   	<div wicket:id="feedback">[Some error message]</div>
+  
+   	<div>
+		<a wicket:id="collapseAll">[collapse all]</a> &nbsp; <a wicket:id="expandAll">[expand all]</a>
+   	</div>
+
+   	<table wicket:id="projectTree" id="theProjectTree" class="dataview gapless">
+   		<tr>
+   			<td>[project tree appears here]</td>
+		</tr>
+   	</table>
+
+   	<wicket:fragment wicket:id="containerFragment">
+     	<div class="actionLinkPane" wicket:id="container"></div>
+   	</wicket:fragment>
+   	<wicket:fragment wicket:id="moreActionsFragment">
+     	<div class="imageLink showhidden" style="position:absolute; width:24px" href="#">
+       		<img wicket:id="icon" />
+       		<div class="hideme" wicket:id="hiddenContainer" style="position:absolute;right:-8px;">
+         		<div class="actionLink" wicket:id="action"></div>
+         		<div class="clearfix"></div>
+       		</div>
+     	</div>
+   	</wicket:fragment>   
+</wicket:panel>
+</body>
+</html>

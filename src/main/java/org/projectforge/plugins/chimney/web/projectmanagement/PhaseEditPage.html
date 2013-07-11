@@ -1,0 +1,45 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+ <wicket:extend>
+ 
+ 	<h2 wicket:id="heading">Create a new project</h2>
+    
+    <div wicket:id="feedback"></div>
+    
+    <form class="clearfix" wicket:id="form">
+    	<div class="grid_16 box no_titlebar">
+        	<div class="toggle_container">
+        
+			    <fieldset class="label_side">
+		        	<label for="p_title">
+		          		<wicket:message key="plugins.chimney.editwbsnode.title" />
+		        	</label>
+			        <div>
+			          	<input type="text" class="text" id="p_title" wicket:id="title" />
+			        </div>
+			    </fieldset>
+			    
+			 	
+			    <fieldset class="label_side">
+		        	<label for="p_desc">
+		          		<wicket:message key="plugins.chimney.editwbsnode.desc" />
+			        </label>
+			        <div>
+				        <div class="field_div">
+				          <textarea class="textarea" id="p_desc" wicket:id="description"></textarea>
+				        </div>
+			        </div>
+			    </fieldset>
+
+    		</div>
+   		</div>
+	    
+	    <div wicket:id="submit"></div>
+    </form>
+    
+</wicket:extend>
+</body>
+</html>

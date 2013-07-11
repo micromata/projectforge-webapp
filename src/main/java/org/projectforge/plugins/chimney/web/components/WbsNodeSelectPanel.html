@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+  <wicket:panel>
+    <div wicket:id="modal"></div>
+    <fieldset class="label_side">
+        <label wicket:id="selectionLabel">
+          <wicket:container wicket:id="field_label">[Field label]</wicket:container>
+        </label>
+        <div style="padding-top:13px;">
+          <span wicket:id="selected_node">Project->Sub->Sub</span>
+          <a href="#" wicket:id="open_modal" id="change_parent_link"><wicket:message key="plugins.chimney.wbsnodeselect.changelink" /></a>
+        </div>
+    </fieldset>
+  </wicket:panel>
+</body>
+</html>

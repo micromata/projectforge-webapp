@@ -1,0 +1,48 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+<wicket:extend>
+   <h2 wicket:id="titlehead">List of Projects</h2>
+
+   <div wicket:id="feedback"></div>
+   
+   <table class="dataview">
+    <thead>
+     <tr class="headers">
+      <th wicket:id="orderByName"><span wicket:id="headname">Project name</span></th>
+      <th wicket:id="orderByProgress"><span wicket:id="headprogress">Progress</span></th>
+      <th><span wicket:id="headdesc">Short description</span></th>
+      <th wicket:id="orderByPriority"><span wicket:id="headpriority">Priority</span></th>
+      <th wicket:id="orderByStatus"><span wicket:id="headstatus">Status</span></th>
+      <th wicket:id="orderByResponsible"><span wicket:id="headresponsible">Responsible</span></th>
+      <th><span wicket:id="headactions">Actions</span></th>
+     </tr>
+    </thead>
+    <tbody>
+     <tr wicket:id="row">
+      <td><span wicket:id="name">[Name]</span></td>
+      <td>
+       <div class="progress_bar">
+         <strong><wicket:container wicket:id="progresspercent">[Progress]</wicket:container>%</strong>
+         <span wicket:id="progressstyle">&nbsp;</span>
+       </div>
+      </td>
+      <td class="showhidden"><span wicket:id="desc">[Short description]</span><div class="hideme" wicket:id="fulldesc"></div></td>
+      <td><span wicket:id="priority">[Priority]</span></td>
+      <td><span wicket:id="status">[Status]</span></td>
+      <td><span wicket:id="responsible">[Responsible User]</span></td>
+      <td>
+      <a class="edit_link" wicket:id="edit_link"><img wicket:id="edit_icon" wicket:message="alt:plugins.chimney.projectlist.edit,title:plugins.chimney.projectlist.edit" /></a>
+      <a class="delete_link" wicket:id="delete_link" id="delete_link"><img wicket:id="delete_icon" wicket:message="alt:plugins.chimney.projectlist.delete,title:plugins.chimney.projectlist.delete" /></a>
+      </td>
+     </tr>
+    </tbody>
+   </table>
+   <span wicket:id="navigator">[dataview navigator]</span>
+   <div name="createProjectLink" wicket:id="createProjectLink">
+   </div>
+</wicket:extend>
+</body>
+</html>

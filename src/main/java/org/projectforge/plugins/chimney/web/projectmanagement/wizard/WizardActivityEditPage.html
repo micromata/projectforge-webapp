@@ -1,0 +1,125 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+	
+	<wicket:extend>
+		
+		<!-- heading -->
+		<h2 wicket:id="heading">[Create a new activity]</h2>
+
+		<!-- feedback panel -->
+		<div wicket:id="feedback"></div>	
+
+        <div class="grid_16 box no_titlebar">
+        <div class="toggle_container">
+
+        <div wicket:id="wbsSelect"></div>
+
+		<!-- form with activity fields -->
+        <form class="clearfix" wicket:id="activityForm">
+		
+            <div class="columns clearfix mm_clear">
+			  <div class="col_50">
+			
+				<!-- time properties -->
+	    		<fieldset class="label_side">
+	        		<label for="p_fixedBeginDate">
+	          			<wicket:message key="plugins.chimney.editactivity.fixedBeginDate"/>
+	        		</label>
+	        		<div id="p_fixedBeginDate" wicket:id="fixedBeginDate"></div>		        		
+	    		</fieldset>
+			  </div>
+    			
+			  <div class="col_50">
+	    		<fieldset class="label_side">
+	        		<label for="p_fixedEndDate">
+	          			<wicket:message key="plugins.chimney.editactivity.fixedEndDate"/>
+	        		</label>
+	        		<div id="p_fixedEndDate" wicket:id="fixedEndDate"></div>
+	    		</fieldset>
+			  </div>
+			</div>
+
+            <div class="columns clearfix mm_clear">
+			  <div class="col_50">
+	    		<fieldset class="label_side">
+	        		<label for="p_effortEstimation">
+	          			<wicket:message key="plugins.chimney.editactivity.effortEstimation"/>
+	        		</label>
+	        		<div>
+	          			<input type="text" id="p_effortEstimation" wicket:id="effortEstimation" /> <span class="small"><wicket:message key="plugins.chimney.editactivity.effortFormat"/></span>
+	        		</div>
+	    		</fieldset>
+			  </div>
+			</div>
+			
+			
+			<div class="columns clearfix mm_clear">
+			  <div class="col_50">
+	    		<fieldset class="label_side">
+	        		<label for="p_predecessorRelations">
+	          			<wicket:message key="plugins.chimney.editactivity.predecessorRelations"/>
+	        		</label>    
+	        		<div>
+	          			<table class="dataview" id="p_predecessorRelations" >
+	          				<tr>
+	          					<th><wicket:message key="plugins.chimney.editactivity.predecessorRelations"/> </th>
+	          					<th><wicket:message key="plugins.chimney.editactivity.delete"/></th>
+	          				</tr>
+	          				<tr wicket:id="predecessorRelations">
+	          					<td><span wicket:id="label">[label]</span> </td>
+	          					<td><input type="checkbox" wicket:id="deleted"/> </td>
+	          				</tr>
+	          			</table>
+	        		</div>
+	        		
+	    		</fieldset>
+			  </div>
+			
+			  <div class="col_50">
+	    		<fieldset class="label_side">
+	        		<label for="p_successorRelations">
+	          			<wicket:message key="plugins.chimney.editactivity.successorRelations"/>
+	        		</label>
+	        		
+	        		<div>
+	          			<table class="dataview" id="p_successorRelations" >
+	          				<tr>
+	          					<th><wicket:message key="plugins.chimney.editactivity.successorRelations"/> </th>
+	          					<th><wicket:message key="plugins.chimney.editactivity.delete"/></th>
+	          				</tr>
+	          				<tr wicket:id="successorRelations">
+	          					<td><span wicket:id="label">[label]</span> </td>
+	          					<td><input type="checkbox" wicket:id="deleted"/> </td>
+	          				</tr>
+	          			</table>
+	        		</div>
+	        		
+	        		
+	    		</fieldset>
+			  </div>
+			</div>
+			
+			<!-- submit -->
+			<fieldset class="label_side">
+			  <div>
+	    		<div wicket:id="submit"></div>	    			
+				<div wicket:id="submitAndReturn"></div>
+			  </div>
+	    	</fieldset>
+    	</form>
+     	</div>
+	    </div>
+	    
+	    <!-- wizard navigation -->    
+	    <div id="wizard_prev_next" style="position:relative; top: 2em;">
+	      <div id="prev_link" style="float:left" wicket:id="prevLink"></div>
+	      <div id="next_link" style="float:right" wicket:id="nextLink"></div>
+	      <div class="clearfix"></div>
+	    </div>
+    
+	</wicket:extend>
+</body>
+</html>

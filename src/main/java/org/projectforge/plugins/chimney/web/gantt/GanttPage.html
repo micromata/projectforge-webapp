@@ -1,0 +1,134 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<title>Gantt View</title>
+<wicket:head>
+ <style type="text/css">
+ 	 #ganttChartDIV table { margin-bottom: 0 !important; border-collapse:separate !important; }
+     #ganttChartDIV td { vertical-align: top !important; }
+ </style>
+</wicket:head>
+</head>
+<body>
+<wicket:extend>
+
+  <h2 wicket:id="heading" >Gantt View</h2>
+
+  <div wicket:id="feedback">[Some error message]</div>
+  <div wicket:id="tabs"></div>
+  
+  <div class="grid_16 box no_titlebar" style="margin-top: 10px;">
+  <!-- 	<div class="toggle_container">  -->
+  <!--  	<div class="block"> -->
+          
+			  <div id="ganttChartDIV" class="gantt" style="position:relative; float:left; clear:left;"></div>
+			  
+			  <div style="padding-left:8px; position:relative; float:left; clear:left;">					
+			  	<form name="chartConfigForm">
+			    	<span wicket:id="chartScrollWidthLabel"> [ Scroll Panel Width: ] </span> 	  
+					  
+					<select id="chartScrollWidth" name="ChartScrollWidth" size="1"
+				        onchange="changeChartScrollPanelWidth(this.form.ChartScrollWidth.options[this.form.ChartScrollWidth.selectedIndex].value)">
+				      <!-- Options will be initialized by the javascript below  -->
+				    </select>
+			       
+			  	</form>
+			  </div>
+			  
+  	<!--	</div> -->
+	<!-- </div> -->
+  </div> 
+  
+  	 <script type="text/javascript">
+  	 	// Empty gantt config
+  	 	var taskXmlUrl = false;
+  	  	var i18nRessources = false;
+  	  	var displayDateFormat = "yyyy/mm/dd";
+  	 	// more vars will be added later
+  	 </script>
+  	 <script type="text/javascript" wicket:id="jsGanttConfigScript">
+  	 	/* dynamic xml resource url and settings will be rendered here*/
+  	 </script>
+	 <script type="text/javascript">
+	 /*<![CDATA[*/
+	  if (!JSGantt) { 
+		  alert("missing JSGantt resource 'jsgantt.js'!");
+	  } else {
+		  
+		  if (i18nRessources) {
+			// init 118n
+			var i18nOption = { resStore: i18nRessources, lng: "dev" };
+		  	$.i18n.init(i18nOption);
+		  	
+		  	if ($ && $.i18n) {
+		  		displayDateFormat = $.i18n.t("jsgantt.displaydateformat", { defaultValue: displayDateFormat });
+			
+		  		JSGantt.setTranslator(
+				  	function(pI18nKey, pDefaultString) {					  
+						return $.i18n.t("jsgantt."+pI18nKey, { defaultValue: pDefaultString });					  	
+				  	}
+				);
+		  	}
+		  }
+		  
+		  // init jsgantt
+		  var g = new JSGantt.GanttChart('g',document.getElementById('ganttChartDIV'), 'day');
+		 
+		  if(!g) {
+			  alert("failed to initialize JSGantt!");
+		  } else {
+			  // visual jsgantt config: 
+			  g.setShowRes(0); // Show/Hide Responsible (0/1)
+			  g.setShowDur(1); // Show/Hide Duration (0/1)
+			  g.setShowComp(1); // Show/Hide % Complete(0/1)
+			  g.setCaptionType('Caption');  // Set to Show Caption (None,Caption,Resource,Duration,Complete)
+			  g.setShowStartDate(1); // Show/Hide Start Date(0/1)
+			  g.setShowEndDate(1); // Show/Hide End Date(0/1)
+			  g.setDateInputFormat('dd/mm/yyyy')  // Set format of input dates ('mm/dd/yyyy', 'dd/mm/yyyy', 'yyyy-mm-dd')
+			  g.setDateDisplayFormat(displayDateFormat) // Set format to display dates ('mm/dd/yyyy', 'dd/mm/yyyy', 'yyyy-mm-dd')
+			  g.setFormatArr("day","week","month","quarter") // Set format options (up to 4 : "minute","hour","day","week","month","quarter")
+			  
+			  
+			  
+			  if (!taskXmlUrl) {
+				  alert("no task xml task resource url was defined!");
+			  } else {
+				  // load taks and dependencies from xml resource 
+				  JSGantt.parseXML(taskXmlUrl,g);
+			  }
+			  
+			  // prepare scroll pane resize options
+			  var scrollPaneWidthSelect = document.chartConfigForm.ChartScrollWidth;
+			  var defaultSize = screen.availWidth ? screen.availWidth/2 : 500;
+			  scrollPaneWidthSelect.options[0] = new Option("10%", Math.round(0.10 * defaultSize), false, false);
+			  scrollPaneWidthSelect.options[1] = new Option("25%", Math.round(0.25 * defaultSize), false, false);
+			  scrollPaneWidthSelect.options[2] = new Option("50%", Math.round(0.50 * defaultSize), false, false);
+			  scrollPaneWidthSelect.options[3] = new Option("75%", Math.round(0.75 * defaultSize), false, false);
+			  scrollPaneWidthSelect.options[4] = new Option("100%", Math.round(1.00 * defaultSize), true, true);
+			  scrollPaneWidthSelect.options[5] = new Option("150%", Math.round(1.50 * defaultSize), false, false);
+			  scrollPaneWidthSelect.options[6] = new Option("200%", Math.round(2.00 * defaultSize), false, false);
+				 
+			  // visualize the chart:
+			//  g.setChartScrollPanelWidth(scrollPaneWidthSelect.options[scrollPaneWidthSelect.selectedIndex].value);
+			  g.Draw();	
+			  g.DrawDependencies();
+		  }
+	  }
+	 function changeChartScrollPanelWidth(pScrollWidth) {
+		if (!g) return;
+		 g.setChartScrollPanelWidth(pScrollWidth);
+		// visualize the chart: 
+		 g.Draw();	
+		 g.DrawDependencies();	 
+		
+	 }
+	 
+	 
+	
+	/*]]>*/
+	</script> 
+	<noscript>	
+		You need to enable javascript to view the gantt chart!
+	</noscript>      
+</wicket:extend>
+</body>
+</html>

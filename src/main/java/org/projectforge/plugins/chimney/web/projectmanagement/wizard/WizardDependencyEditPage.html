@@ -1,0 +1,68 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+	
+	<wicket:extend>
+		
+		<!-- heading -->
+		<h2 wicket:id="heading">[Create a new dependency]</h2>
+		
+		<!-- feedback panel -->
+		<div wicket:id="feedback"></div>	
+		
+        <div class="grid_16 box no_titlebar">
+        <div class="toggle_container">
+
+		<!-- form with activity fields -->
+        <form class="clearfix" wicket:id="dependencyForm">
+		
+            <div id="predecessor" wicket:id="predecessor"></div>
+
+            <div id="successor" wicket:id="successor"></div>
+        
+            <div class="columns clearfix mm_clear">
+			  <div class="col_50">
+	    		<fieldset class="label_side">
+	        		<label for="depoffset">
+	          			<wicket:message key="plugins.chimney.editdependency.offset"/>
+	        		</label>
+	        		<div>
+	          			<input id="depoffset" wicket:id="offset" /> <span class="small"><wicket:message key="plugins.chimney.editdependency.offsetFormat"/></span>
+	        		</div>
+	    		</fieldset>
+			  </div>
+			  
+			  <div class="col_50">
+                <fieldset class="label_side">
+                    <label for="deptype">
+                        <wicket:message key="plugins.chimney.editdependency.type" />
+                     </label>
+                     <div>
+                        <select id="deptype" wicket:id="type"></select>
+                     </div>
+                </fieldset>
+              </div>
+			</div>
+			
+			<!-- submit -->
+			<fieldset class="label_side">
+			  <div>
+	    		<div wicket:id="submit"></div>
+	    	  </div>	    			
+	    	</fieldset>
+
+    	</form>
+     	</div>
+	    </div>
+
+	    <!-- wizard navigation -->
+	    <div id="wizard_prev_next" style="position:relative; top: 2em;">
+	      <div id="prev_link" style="float:left" wicket:id="prevLink"></div>
+	      <div class="clearfix"></div>
+	    </div>
+    
+	</wicket:extend>
+</body>
+</html>
