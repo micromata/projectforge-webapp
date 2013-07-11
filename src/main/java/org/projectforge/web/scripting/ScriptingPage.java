@@ -25,21 +25,12 @@ package org.projectforge.web.scripting;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import net.sf.jasperreports.engine.JasperCompileManager;
-import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -57,9 +48,6 @@ import org.projectforge.core.ConfigXml;
 import org.projectforge.excel.ExportWorkbook;
 import org.projectforge.export.ExportJFreeChart;
 import org.projectforge.export.JFreeChartImageType;
-import org.projectforge.fibu.kost.BusinessAssessment;
-import org.projectforge.fibu.kost.reporting.Report;
-import org.projectforge.fibu.kost.reporting.ReportGenerator;
 import org.projectforge.fibu.kost.reporting.ReportGeneratorList;
 import org.projectforge.fibu.kost.reporting.ReportStorage;
 import org.projectforge.scripting.GroovyExecutor;
@@ -170,13 +158,13 @@ public class ScriptingPage extends AbstractStandardFormPage
           excelExport();
         } else if (groovyResult.getResult() instanceof ReportGeneratorList == true) {
           reportGeneratorList = (ReportGeneratorList) groovyResult.getResult();
-          jasperReport(reportGeneratorList);
+          //jasperReport(reportGeneratorList);
         } else if (result instanceof ExportJFreeChart) {
           jFreeChartExport();
         }
       }
-    } else if (getReportScriptingStorage().getJasperReport() != null) {
-      jasperReport();
+      // } else if (getReportScriptingStorage().getJasperReport() != null) {
+      // jasperReport();
     }
   }
 
@@ -187,16 +175,17 @@ public class ScriptingPage extends AbstractStandardFormPage
     log.info("upload");
     final FileUpload fileUpload = form.fileUploadField.getFileUpload();
     if (fileUpload != null) {
-      boolean delete = false;
+      final boolean delete = false;
       try {
         final InputStream is = fileUpload.getInputStream();
         final String clientFileName = fileUpload.getClientFileName();
         if (clientFileName.endsWith(".jrxml") == true) {
-          delete = true;
-          final JasperReport report = JasperCompileManager.compileReport(is);
-          if (report != null) {
-            getReportScriptingStorage().setJasperReport(report, clientFileName);
-          }
+          log.error("Jasper reports not supported.");
+          // delete = true;
+          // final JasperReport report = JasperCompileManager.compileReport(is);
+          // if (report != null) {
+          // getReportScriptingStorage().setJasperReport(report, clientFileName);
+          // }
         } else if (clientFileName.endsWith(".xls") == true) {
           final StringBuffer buf = new StringBuffer();
           buf.append("report_").append(FileHelper.createSafeFilename(PFUserContext.getUser().getUsername(), 20)).append(".xls");
@@ -221,50 +210,50 @@ public class ScriptingPage extends AbstractStandardFormPage
    * Creates the reports for the entries.
    * @param reportGeneratorList
    */
-  private void jasperReport(final ReportGeneratorList reportGeneratorList)
-  {
-    if (CollectionUtils.isEmpty(reportGeneratorList.getReports()) == true) {
-      error(getString("fibu.reporting.jasper.error.reportListIsEmpty"));
-      return;
-    }
-    final ReportGenerator report = reportGeneratorList.getReports().get(0);
-    final Collection< ? > beanCollection = report.getBeanCollection();
-    final Map<String, Object> parameters = report.getParameters();
-    jasperReport(parameters, beanCollection);
-  }
+  // private void jasperReport(final ReportGeneratorList reportGeneratorList)
+  // {
+  // if (CollectionUtils.isEmpty(reportGeneratorList.getReports()) == true) {
+  // error(getString("fibu.reporting.jasper.error.reportListIsEmpty"));
+  // return;
+  // }
+  // final ReportGenerator report = reportGeneratorList.getReports().get(0);
+  // final Collection< ? > beanCollection = report.getBeanCollection();
+  // final Map<String, Object> parameters = report.getParameters();
+  // jasperReport(parameters, beanCollection);
+  // }
 
   /**
    * Default report from reportStorage. Uses the current report and puts the business assessment values in parameter map.
    */
-  private void jasperReport()
-  {
-    if (getReportStorage() == null || getReportStorage().getRoot() == null || getReportStorage().getRoot().isLoad() == false) {
-      error(getString("fibu.reporting.jasper.error.reportDataDoesNotExist"));
-      return;
-    }
-    final Map<String, Object> parameters = new HashMap<String, Object>();
-    final Report report = getReportStorage().getCurrentReport();
-    final Collection< ? > beanCollection = report.getBuchungssaetze();
-    BusinessAssessment.putBusinessAssessmentRows(parameters, report.getBusinessAssessment());
-    jasperReport(parameters, beanCollection);
-  }
-
-  private void jasperReport(final Map<String, Object> parameters, final Collection< ? > beanCollection)
-  {
-    try {
-      final JasperReport jasperReport = getReportScriptingStorage().getJasperReport();
-      final JasperPrint jp = JasperFillManager.fillReport(jasperReport, parameters, new JRBeanCollectionDataSource(beanCollection));
-      final JasperPrint jasperPrint = jp;
-      final StringBuffer buf = new StringBuffer();
-      buf.append("pf_report_");
-      buf.append(DateHelper.getTimestampAsFilenameSuffix(new Date())).append(".pdf");
-      final String filename = buf.toString();
-      DownloadUtils.setDownloadTarget(JasperExportManager.exportReportToPdf(jasperPrint), filename);
-    } catch (final Exception ex) {
-      error(getLocalizedMessage("error", ex.getMessage()));
-      log.error(ex.getMessage(), ex);
-    }
-  }
+  // private void jasperReport()
+  // {
+  // if (getReportStorage() == null || getReportStorage().getRoot() == null || getReportStorage().getRoot().isLoad() == false) {
+  // error(getString("fibu.reporting.jasper.error.reportDataDoesNotExist"));
+  // return;
+  // }
+  // final Map<String, Object> parameters = new HashMap<String, Object>();
+  // final Report report = getReportStorage().getCurrentReport();
+  // final Collection< ? > beanCollection = report.getBuchungssaetze();
+  // BusinessAssessment.putBusinessAssessmentRows(parameters, report.getBusinessAssessment());
+  // jasperReport(parameters, beanCollection);
+  // }
+  //
+  // private void jasperReport(final Map<String, Object> parameters, final Collection< ? > beanCollection)
+  // {
+  // try {
+  // final JasperReport jasperReport = getReportScriptingStorage().getJasperReport();
+  // final JasperPrint jp = JasperFillManager.fillReport(jasperReport, parameters, new JRBeanCollectionDataSource(beanCollection));
+  // final JasperPrint jasperPrint = jp;
+  // final StringBuffer buf = new StringBuffer();
+  // buf.append("pf_report_");
+  // buf.append(DateHelper.getTimestampAsFilenameSuffix(new Date())).append(".pdf");
+  // final String filename = buf.toString();
+  // DownloadUtils.setDownloadTarget(JasperExportManager.exportReportToPdf(jasperPrint), filename);
+  // } catch (final Exception ex) {
+  // error(getLocalizedMessage("error", ex.getMessage()));
+  // log.error(ex.getMessage(), ex);
+  // }
+  // }
 
   private void excelExport()
   {

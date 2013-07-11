@@ -27,8 +27,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.jasperreports.engine.JasperReport;
-
 /**
  * Used for persisting the values of ReportScriptingAction.
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -36,59 +34,59 @@ import net.sf.jasperreports.engine.JasperReport;
  */
 public class ReportScriptingStorage
 {
-  private JasperReport jasperReport;
-  
+  //private JasperReport jasperReport;
+
   private Map<String, String> fileMap;
 
   private String groovyScript;
-  
+
   private String lastAddedFile;
-  
+
   /**
    * Compiled JasperReport design, if given.
    */
-  public JasperReport getJasperReport()
-  {
-    return jasperReport;
-  }
-  
-  public void setJasperReport(JasperReport jasperReport, String filename)
-  {
-    this.jasperReport = jasperReport;
-    setFilename(filename, filename);
-  }
-  
-  public void setFilename(String key, String filename) {
+  //  public JasperReport getJasperReport()
+  //  {
+  //    return jasperReport;
+  //  }
+
+  // public void setJasperReport(JasperReport jasperReport, String filename)
+  // {
+  // this.jasperReport = jasperReport;
+  // setFilename(filename, filename);
+  // }
+
+  public void setFilename(final String key, final String filename) {
     getFileMap().put(key, filename);
     lastAddedFile = key;
   }
-  
-  public File getFile(String key) {
-    String filename = getFilename(key);
+
+  public File getFile(final String key) {
+    final String filename = getFilename(key);
     if (filename == null) {
       return null;
     }
     return new File(filename);
   }
-  
-  public String getFilename(String key) {
+
+  public String getFilename(final String key) {
     return getFileMap().get(key);
   }
-  
+
   public String getLastAddedFilename() {
     return lastAddedFile;
   }
- 
+
   public String getGroovyScript()
   {
     return groovyScript;
   }
-  
-  public void setGroovyScript(String groovyScript)
+
+  public void setGroovyScript(final String groovyScript)
   {
     this.groovyScript = groovyScript;
   }
-  
+
   private Map<String, String> getFileMap()
   {
     if (fileMap == null) {
