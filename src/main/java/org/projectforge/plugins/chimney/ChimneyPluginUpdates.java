@@ -24,7 +24,7 @@
 package org.projectforge.plugins.chimney;
 
 import org.projectforge.continuousdb.DatabaseUpdateDao;
-import org.projectforge.continuousdb.Table;
+import org.projectforge.continuousdb.SchemaGenerator;
 import org.projectforge.continuousdb.UpdateEntry;
 import org.projectforge.continuousdb.UpdateEntryImpl;
 import org.projectforge.continuousdb.UpdatePreCheckStatus;
@@ -32,7 +32,11 @@ import org.projectforge.continuousdb.UpdateRunningStatus;
 import org.projectforge.plugins.chimney.activities.DependencyRelationDO;
 import org.projectforge.plugins.chimney.activities.WbsActivityDO;
 import org.projectforge.plugins.chimney.resourceplanning.ResourceAssignmentDO;
-import org.projectforge.plugins.chimney.wbs.AbstractWbsNodeDO;
+import org.projectforge.plugins.chimney.wbs.MilestoneDO;
+import org.projectforge.plugins.chimney.wbs.PhaseDO;
+import org.projectforge.plugins.chimney.wbs.ProjectDO;
+import org.projectforge.plugins.chimney.wbs.SubtaskDO;
+import org.projectforge.plugins.chimney.wbs.WorkpackageDO;
 
 /**
  * Responsible for checking update status of the chimney plugin.
@@ -44,35 +48,34 @@ public class ChimneyPluginUpdates
 {
   static DatabaseUpdateDao dao;
 
-  /**
-   * The UpdateEntry return by this method can not perform any update. Instead it just gives the hint, that schemaUpdate must be set to
-   * true, so hibernate can update the used tables, indexes, ... accordingly.
-   */
+  final static Class< ? >[] doClasses = new Class< ? >[] { //
+    DependencyRelationDO.class, WbsActivityDO.class, ResourceAssignmentDO.class, MilestoneDO.class, PhaseDO.class, ProjectDO.class,
+    SubtaskDO.class, WorkpackageDO.class};
+
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
-    return new UpdateEntryImpl(ChimneyPlugin.ID, "1.0.0", "2012-09-24",
-        "Please set schemaUpdate to true or implement ChimneyPluginUpdates.getInitializationUpdateEntry() accordingly.") {
-
-      @Override
-      public UpdateRunningStatus runUpdate()
-      {
-        return UpdateRunningStatus.FAILED;
-      }
+    return new UpdateEntryImpl(ChimneyPlugin.ID, "5.3.0", "2013-07-11", "Adds tables T_CHIMNEY_*.") {
 
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        final Class< ? >[] persistentEntities = { AbstractWbsNodeDO.class, WbsActivityDO.class, DependencyRelationDO.class,
-            ResourceAssignmentDO.class};
-        boolean ok = true;
-        for (final Class< ? > clazz : persistentEntities) {
-          final Table table = new Table(clazz);
-          if (dao.doExist(table) == false) {
-            ok = false;
-          }
+        // Does the data-base table already exist?
+        // Check only the oldest table.
+        if (dao.doEntitiesExist(ProjectDO.class) == true) {
+          return UpdatePreCheckStatus.ALREADY_UPDATED;
+        } else {
+          // The oldest table doesn't exist, therefore the plug-in has to initialized completely.
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
         }
-        return ok ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.FAILED;
+      }
+
+      @Override
+      public UpdateRunningStatus runUpdate()
+      {
+        new SchemaGenerator(dao).add(doClasses).createSchema();
+        dao.createMissingIndices();
+        return UpdateRunningStatus.DONE;
       }
     };
   }

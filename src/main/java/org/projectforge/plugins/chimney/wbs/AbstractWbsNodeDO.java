@@ -49,7 +49,7 @@ import org.projectforge.user.PFUserDO;
 @org.hibernate.annotations.Entity(dynamicUpdate = true)
 // enables dirty checking on UPDATE
 @Indexed
-@Table(name = "T_WBS_NODE")
+@Table(name = "T_CHIMNEY_WBS_NODE")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "nodetype", discriminatorType = DiscriminatorType.STRING)
 public abstract class AbstractWbsNodeDO extends AbstractVisitableBaseDO<IWbsNodeVisitor> implements IWbsNodeReadOnly

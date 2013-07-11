@@ -35,7 +35,7 @@ import org.projectforge.user.PFUserDO;
 
 @Entity
 @Indexed
-@Table(name = "T_RESOURCE_ASSIGNMENT")
+@Table(name = "T_CHIMNEY_RESOURCE_ASSIGNMENT")
 public class ResourceAssignmentDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = -8536706247102061808L;

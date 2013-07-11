@@ -37,7 +37,7 @@ import org.projectforge.plugins.chimney.web.components.ChimneyJodaPeriodConverte
 
 @Entity
 @Indexed
-@Table(name = "T_WBS_ACTIVITY")
+@Table(name = "T_CHIMNEY_WBS_ACTIVITY")
 public class WbsActivityDO extends DefaultBaseDO implements IActivityReadOnly<DependencyRelationDO>
 {
   private static final long serialVersionUID = -8536706247102061808L;

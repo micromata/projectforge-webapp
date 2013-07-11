@@ -28,7 +28,7 @@ import org.projectforge.plugins.chimney.utils.date.StandardWorkdayNormalizer;
 
 @Entity
 @Indexed
-@Table(name = "T_DEPENDENCY_RELATION", uniqueConstraints = { @UniqueConstraint(columnNames = { "predecessor_id", "successor_id",
+@Table(name = "T_CHIMNEY_DEPENDENCY_RELATION", uniqueConstraints = { @UniqueConstraint(columnNames = { "predecessor_id", "successor_id",
 "deletedDateTime"}, name = "pred_succ_unique")})
 public class DependencyRelationDO extends DefaultBaseDO implements IDependencyRelationReadOnly
 {
