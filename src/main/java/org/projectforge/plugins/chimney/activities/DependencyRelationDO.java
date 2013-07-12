@@ -29,7 +29,7 @@ import org.projectforge.plugins.chimney.utils.date.StandardWorkdayNormalizer;
 @Entity
 @Indexed
 @Table(name = "T_CHIMNEY_DEPENDENCY_RELATION", uniqueConstraints = { @UniqueConstraint(columnNames = { "predecessor_id", "successor_id",
-"deletedDateTime"}, name = "pred_succ_unique")})
+"deleted_date_time"}, name = "pred_succ_unique")})
 public class DependencyRelationDO extends DefaultBaseDO implements IDependencyRelationReadOnly
 {
   private static final long serialVersionUID = 3502200437838799123L;
@@ -99,7 +99,7 @@ public class DependencyRelationDO extends DefaultBaseDO implements IDependencyRe
       successor.getPredecessorRelations().add(this);
   }
 
-  @Column
+  @Column(name = "c_offset")
   @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentPeriodAsString")
   public Period getOffset()
   {
@@ -111,6 +111,7 @@ public class DependencyRelationDO extends DefaultBaseDO implements IDependencyRe
     this.offset = offset;
   }
 
+  @Column
   @Override
   public DependencyRelationType getType()
   {
@@ -252,7 +253,7 @@ public class DependencyRelationDO extends DefaultBaseDO implements IDependencyRe
     successor = newSuccessor;
   }
 
-  @Column(name = "deletedDateTime", nullable = true)
+  @Column(name = "deleted_date_time", nullable = true)
   @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
   DateTime getDeletedDateTime()
   {

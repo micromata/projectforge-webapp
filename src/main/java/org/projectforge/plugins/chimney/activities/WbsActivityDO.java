@@ -19,6 +19,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.Validate;
 import org.hibernate.annotations.Type;
@@ -70,7 +71,7 @@ public class WbsActivityDO extends DefaultBaseDO implements IActivityReadOnly<De
   }
 
   @Override
-  @Column(name = "fixedBeginDate")
+  @Column(name = "fixed_begin_date")
   @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
   public DateTime getFixedBeginDate()
   {
@@ -87,7 +88,7 @@ public class WbsActivityDO extends DefaultBaseDO implements IActivityReadOnly<De
   }
 
   @Override
-  @Column(name = "fixedEndDate")
+  @Column(name = "fixed_end_date")
   @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
   public DateTime getFixedEndDate()
   {
@@ -102,13 +103,14 @@ public class WbsActivityDO extends DefaultBaseDO implements IActivityReadOnly<De
     fixedEndDate = endDate;
   }
 
+  @Transient
   public boolean isEndDateGreaterOrEqualBeginDate(final DateTime beginDate, final DateTime endDate)
   {
     return beginDate == null || endDate == null || endDate.compareTo(beginDate) >= 0;
   }
 
   @Override
-  @Column(name = "effortEstimation")
+  @Column(name = "effort_estimation")
   @Type(type="org.jadira.usertype.dateandtime.joda.PersistentPeriodAsString")
   public Period getEffortEstimation()
   {

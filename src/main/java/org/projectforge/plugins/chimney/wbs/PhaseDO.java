@@ -9,6 +9,7 @@
 
 package org.projectforge.plugins.chimney.wbs;
 
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Transient;
@@ -57,6 +58,7 @@ public class PhaseDO extends AbstractWbsNodeDO
     setPhaseName(title);
   }
 
+  @Column(name = "phase_name", length = 1000)
   public String getPhaseName()
   {
     return phaseName;
@@ -98,6 +100,7 @@ public class PhaseDO extends AbstractWbsNodeDO
     return this.phaseDescription;
   }
 
+  @Column(name = "phase_description", length = 4000)
   public String getPhaseDescription()
   {
     return phaseDescription;
@@ -155,5 +158,4 @@ public class PhaseDO extends AbstractWbsNodeDO
   public void setResponsibleUser(final PFUserDO newUser)
   {
   }
-
 }

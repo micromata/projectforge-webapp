@@ -41,21 +41,27 @@ public class ResourceAssignmentDO extends DefaultBaseDO
   private static final long serialVersionUID = -8536706247102061808L;
 
   private AbstractWbsNodeDO wbsNode;
+
   private PFUserDO user;
+
   private DateTime beginDate;
+
   private DateTime endDate;
+
   private Period plannedEffort;
 
-  public ResourceAssignmentDO() {
+  public ResourceAssignmentDO()
+  {
   }
 
-  public ResourceAssignmentDO(final AbstractWbsNodeDO wbsNode) {
+  public ResourceAssignmentDO(final AbstractWbsNodeDO wbsNode)
+  {
     Validate.notNull(wbsNode);
     this.wbsNode = wbsNode;
   }
 
   @OneToOne(fetch = FetchType.LAZY)
-  @JoinColumn(nullable = false, name = "wbsNode", unique = false)
+  @JoinColumn(nullable = false, name = "wbs_node", unique = false)
   public AbstractWbsNodeDO getWbsNode()
   {
     return wbsNode;
@@ -79,8 +85,8 @@ public class ResourceAssignmentDO extends DefaultBaseDO
   }
 
   @Deprecated
-  @Column(name = "beginDate")
-  @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+  @Column(name = "begin_date")
+  @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
   public DateTime getBeginDate()
   {
     return beginDate;
@@ -96,8 +102,8 @@ public class ResourceAssignmentDO extends DefaultBaseDO
   }
 
   @Deprecated
-  @Column(name = "fixedEndDate")
-  @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+  @Column(name = "fixed_end_date")
+  @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
   public DateTime getEndDate()
   {
     return endDate;
@@ -117,8 +123,8 @@ public class ResourceAssignmentDO extends DefaultBaseDO
     return beginDate == null || endDate == null || endDate.compareTo(beginDate) >= 0;
   }
 
-  @Column(name = "effortEstimation")
-  @Type(type="org.jadira.usertype.dateandtime.joda.PersistentPeriodAsString")
+  @Column(name = "effort_estimation")
+  @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentPeriodAsString")
   public Period getPlannedEffort()
   {
     return StandardWorkdayNormalizer.toNormalizedPeriod(plannedEffort);
@@ -148,7 +154,8 @@ public class ResourceAssignmentDO extends DefaultBaseDO
   }
 
   @Override
-  public boolean equals(final Object o) {
+  public boolean equals(final Object o)
+  {
     if (this == o) {
       return true;
     }
@@ -168,7 +175,8 @@ public class ResourceAssignmentDO extends DefaultBaseDO
   }
 
   @Override
-  public int hashCode() {
+  public int hashCode()
+  {
     if (getId() != null) {
       return getId();
     }

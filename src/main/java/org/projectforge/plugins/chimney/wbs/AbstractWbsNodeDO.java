@@ -51,12 +51,12 @@ import org.projectforge.user.PFUserDO;
 @Indexed
 @Table(name = "T_CHIMNEY_WBS_NODE")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "nodetype", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorColumn(name = "node_type", discriminatorType = DiscriminatorType.STRING)
 public abstract class AbstractWbsNodeDO extends AbstractVisitableBaseDO<IWbsNodeVisitor> implements IWbsNodeReadOnly
 {
   private static final long serialVersionUID = -3762621542515259774L;
 
-  protected TaskDO taskDo = new TaskDO();
+  protected TaskDO structureElementDO = new TaskDO();
 
   protected String wbsCode;
 
@@ -196,12 +196,13 @@ public abstract class AbstractWbsNodeDO extends AbstractVisitableBaseDO<IWbsNode
   }
 
   @OneToOne
-  @JoinColumn(name = "task_fk")
+  @JoinColumn(name = "struct_el_fk")
   public TaskDO getTaskDo()
   {
-    return taskDo;
+    return structureElementDO;
   }
 
+  @Column(name = "wbs_code", length = 1000)
   @Override
   public String getWbsCode()
   {
@@ -218,12 +219,12 @@ public abstract class AbstractWbsNodeDO extends AbstractVisitableBaseDO<IWbsNode
   public String getTitle()
   {
     checkTaskDoPresence();
-    return taskDo.getTitle();
+    return structureElementDO.getTitle();
   }
 
   protected void checkTaskDoPresence()
   {
-    if (taskDo == null) {
+    if (structureElementDO == null) {
       throw new IllegalStateException("taskDo must be set at this state");
     }
   }
@@ -231,59 +232,59 @@ public abstract class AbstractWbsNodeDO extends AbstractVisitableBaseDO<IWbsNode
   public void setTitle(final String title)
   {
     checkTaskDoPresence();
-    taskDo.setTitle(title);
+    structureElementDO.setTitle(title);
   }
 
   public void setShortDescription(final String shortDescription)
   {
     checkTaskDoPresence();
-    taskDo.setShortDescription(shortDescription);
+    structureElementDO.setShortDescription(shortDescription);
   }
 
   @Transient
   public String getShortDescription()
   {
     checkTaskDoPresence();
-    return taskDo.getShortDescription();
+    return structureElementDO.getShortDescription();
   }
 
   public void setDescription(final String description)
   {
     checkTaskDoPresence();
-    taskDo.setDescription(description);
+    structureElementDO.setDescription(description);
   }
 
   @Transient
   public String getDescription()
   {
     checkTaskDoPresence();
-    return taskDo.getDescription();
+    return structureElementDO.getDescription();
   }
 
   @Transient
   public TaskStatus getStatus()
   {
     checkTaskDoPresence();
-    return taskDo.getStatus();
+    return structureElementDO.getStatus();
   }
 
   public void setStatus(final TaskStatus status)
   {
     checkTaskDoPresence();
-    taskDo.setStatus(status);
+    structureElementDO.setStatus(status);
   }
 
   @Transient
   public Priority getPriority()
   {
     checkTaskDoPresence();
-    return taskDo.getPriority();
+    return structureElementDO.getPriority();
   }
 
   public void setPriority(final Priority priority)
   {
     checkTaskDoPresence();
-    taskDo.setPriority(priority);
+    structureElementDO.setPriority(priority);
   }
 
   @SuppressWarnings("deprecation")
@@ -292,7 +293,7 @@ public abstract class AbstractWbsNodeDO extends AbstractVisitableBaseDO<IWbsNode
   public int getProgress()
   {
     checkTaskDoPresence();
-    final Integer progress = taskDo.getProgress();
+    final Integer progress = structureElementDO.getProgress();
     if (progress == null)
       return 0;
     return progress;
@@ -302,7 +303,7 @@ public abstract class AbstractWbsNodeDO extends AbstractVisitableBaseDO<IWbsNode
   public void setProgress(final int progress)
   {
     checkTaskDoPresence();
-    taskDo.setProgress(progress);
+    structureElementDO.setProgress(progress);
   }
 
   @Override
@@ -310,8 +311,8 @@ public abstract class AbstractWbsNodeDO extends AbstractVisitableBaseDO<IWbsNode
   public boolean isDeleted()
   {
     // update the deleted status of this WBSNodeDO automagically if it changed in TaskDO (i.e. user deleted it through task view)
-    if (taskDo != null && taskDo.isDeleted() != super.isDeleted())
-      super.setDeleted(taskDo.isDeleted());
+    if (structureElementDO != null && structureElementDO.isDeleted() != super.isDeleted())
+      super.setDeleted(structureElementDO.isDeleted());
     return super.isDeleted();
   }
 
@@ -319,8 +320,8 @@ public abstract class AbstractWbsNodeDO extends AbstractVisitableBaseDO<IWbsNode
   public void setDeleted(final boolean deleted)
   {
     super.setDeleted(deleted);
-    if (taskDo != null) // must not throw exception here, otherwise, Hibernate cannot create objects
-      taskDo.setDeleted(deleted);
+    if (structureElementDO != null) // must not throw exception here, otherwise, Hibernate cannot create objects
+      structureElementDO.setDeleted(deleted);
   }
 
   /**
@@ -420,7 +421,7 @@ public abstract class AbstractWbsNodeDO extends AbstractVisitableBaseDO<IWbsNode
 
   void setTaskDo(final TaskDO taskDO)
   {
-    this.taskDo = taskDO;
+    this.structureElementDO = taskDO;
   }
 
   void setParent(final AbstractWbsNodeDO parent)
@@ -428,7 +429,6 @@ public abstract class AbstractWbsNodeDO extends AbstractVisitableBaseDO<IWbsNode
     this.parent = parent;
   }
 
-  @SuppressWarnings("unused")
   @OneToMany
   @JoinColumn(name = "parent_id", nullable = true)
   @OrderColumn(name = "parent_index")
@@ -443,7 +443,7 @@ public abstract class AbstractWbsNodeDO extends AbstractVisitableBaseDO<IWbsNode
     this.children = children;
   }
 
-  @Column(name = "autoIncrementChildren", nullable = false)
+  @Column(name = "auto_increment_children", nullable = false)
   public int getAutoIncrementChildren()
   {
     return autoIncrementChildren;
@@ -459,7 +459,7 @@ public abstract class AbstractWbsNodeDO extends AbstractVisitableBaseDO<IWbsNode
     this.planningStatus = planningStatus;
   }
 
-  @Column(nullable = false, columnDefinition = "varchar(255) default 'PLANNING'")
+  @Column(name = "planning_status", nullable = false, columnDefinition = "varchar(255) default 'PLANNING'")
   @Enumerated(EnumType.STRING)
   public PlanningStatus getPlanningStatus()
   {

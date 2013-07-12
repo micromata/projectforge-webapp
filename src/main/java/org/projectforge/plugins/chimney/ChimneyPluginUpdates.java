@@ -49,8 +49,8 @@ public class ChimneyPluginUpdates
   static DatabaseUpdateDao dao;
 
   final static Class< ? >[] doClasses = new Class< ? >[] { //
-    DependencyRelationDO.class, WbsActivityDO.class, ResourceAssignmentDO.class, MilestoneDO.class, PhaseDO.class, ProjectDO.class,
-    SubtaskDO.class, WorkpackageDO.class};
+    PhaseDO.class, MilestoneDO.class, ProjectDO.class, SubtaskDO.class, WorkpackageDO.class, WbsActivityDO.class, ResourceAssignmentDO.class,
+    DependencyRelationDO.class};
 
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
