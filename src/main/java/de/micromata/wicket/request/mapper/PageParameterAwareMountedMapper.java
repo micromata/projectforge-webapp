@@ -47,7 +47,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
  * </pre>
  * 
  * @author <a href="mailto:j.unterstein@micromata.de">Johannes Unterstein</a>
- *
+ * 
  */
 public class PageParameterAwareMountedMapper extends MountedMapper
 {
@@ -70,13 +70,23 @@ public class PageParameterAwareMountedMapper extends MountedMapper
         PageProvider provider = (PageProvider) renderPageHandler.getPageProvider();
         // This check is necessary to prevent a RestartResponseAtInterceptPageException at the wrong time in request cycle
         if (provider.hasPageInstance()) {
+          // get page classes
+          Class< ? extends IRequestablePage> oldPageClass = renderPageHandler.getPageClass();
+          Class< ? extends IRequestablePage> newPageClass = renderPageHandler.getPageProvider().getPageClass();
+
+          // get page parameters
           PageParameters newPageParameters = renderPageHandler.getPageParameters();
           PageParameters oldPageParameters = renderPageHandler.getPageProvider().getPageInstance().getPageParameters();
+
+          if (oldPageClass != null && oldPageClass.equals(newPageClass) == false) {
+            return processBookmarkable(newPageClass, newPageParameters);
+          }
+
           // if we recognize a change between the page parameter of the loaded
           // page and the page parameter of the current request, we redirect
           // to a fresh bookmarkable instance of that page.
           if (!PageParameters.equals(oldPageParameters, newPageParameters)) {
-            handler = processBookmarkable(pageClass, newPageParameters);
+            return processBookmarkable(newPageClass, newPageParameters);
           }
         }
       }
