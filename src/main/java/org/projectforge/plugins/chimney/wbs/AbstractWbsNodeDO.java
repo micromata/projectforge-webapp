@@ -307,25 +307,6 @@ public abstract class AbstractWbsNodeDO extends AbstractVisitableBaseDO<IWbsNode
     structureElementDO.setProgress(progress);
   }
 
-  @Override
-  @Transient
-  public boolean isDeleted()
-  {
-    // update the deleted status of this WBSNodeDO automagically if it changed in TaskDO (i.e. user deleted it through task view)
-    if (structureElementDO != null && structureElementDO.isDeleted() != super.isDeleted()) {
-      super.setDeleted(structureElementDO.isDeleted());
-    }
-    return super.isDeleted();
-  }
-
-  @Override
-  public void setDeleted(final boolean deleted)
-  {
-    super.setDeleted(deleted);
-    if (structureElementDO != null) // must not throw exception here, otherwise, Hibernate cannot create objects
-      structureElementDO.setDeleted(deleted);
-  }
-
   /**
    * @return true, if any node on the path to the root is marked as deleted
    */
@@ -425,6 +406,9 @@ public abstract class AbstractWbsNodeDO extends AbstractVisitableBaseDO<IWbsNode
   void setTaskDo(final TaskDO taskDO)
   {
     this.structureElementDO = taskDO;
+    if (structureElementDO != null && structureElementDO.isDeleted() != isDeleted()) {
+      setDeleted(structureElementDO.isDeleted());
+    }
   }
 
   void setParent(final AbstractWbsNodeDO parent)
