@@ -19,6 +19,7 @@ import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
@@ -311,8 +312,9 @@ public abstract class AbstractWbsNodeDO extends AbstractVisitableBaseDO<IWbsNode
   public boolean isDeleted()
   {
     // update the deleted status of this WBSNodeDO automagically if it changed in TaskDO (i.e. user deleted it through task view)
-    if (structureElementDO != null && structureElementDO.isDeleted() != super.isDeleted())
+    if (structureElementDO != null && structureElementDO.isDeleted() != super.isDeleted()) {
       super.setDeleted(structureElementDO.isDeleted());
+    }
     return super.isDeleted();
   }
 
@@ -399,6 +401,7 @@ public abstract class AbstractWbsNodeDO extends AbstractVisitableBaseDO<IWbsNode
     return autoIncrementChildren;
   }
 
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "phase_fk", nullable = true)
   public PhaseDO getPhase()
   {

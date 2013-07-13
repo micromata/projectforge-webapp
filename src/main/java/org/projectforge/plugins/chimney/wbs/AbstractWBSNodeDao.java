@@ -48,7 +48,7 @@ public abstract class AbstractWBSNodeDao<O extends AbstractWbsNodeDO> extends Ba
         final O item = it.next();
         // this check transitively also checks TaskDO
         if (item.isDeleted()) {
-          // Deleted status has been automagically copied from TaskDO to WBSNodeDO.
+          // Deleted status has been automatically copied from TaskDO to WBSNodeDO.
           // Persist to DB so that it does not need to be filtered again, next time.
           update(item);
           // Remove item from list
