@@ -44,22 +44,29 @@ public class WbsActivityDO extends DefaultBaseDO implements IActivityReadOnly<De
   private static final long serialVersionUID = -8536706247102061808L;
 
   private AbstractWbsNodeDO wbsNode;
+
   private DateTime fixedBeginDate;
+
   private DateTime fixedEndDate;
+
   private Period effortEstimation;
+
   private Set<DependencyRelationDO> predecessorRelations = new HashSet<DependencyRelationDO>();
+
   private Set<DependencyRelationDO> successorRelations = new HashSet<DependencyRelationDO>();
 
-  public WbsActivityDO() {
+  public WbsActivityDO()
+  {
   }
 
-  public WbsActivityDO(final AbstractWbsNodeDO wbsNode) {
+  public WbsActivityDO(final AbstractWbsNodeDO wbsNode)
+  {
     Validate.notNull(wbsNode);
     this.wbsNode = wbsNode;
   }
 
   @OneToOne
-  @JoinColumn(nullable = false, name = "wbsNode", unique = true)
+  @JoinColumn(nullable = false, name = "wbs_node", unique = true)
   public AbstractWbsNodeDO getWbsNode()
   {
     return wbsNode;
@@ -72,12 +79,11 @@ public class WbsActivityDO extends DefaultBaseDO implements IActivityReadOnly<De
 
   @Override
   @Column(name = "fixed_begin_date")
-  @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+  @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
   public DateTime getFixedBeginDate()
   {
     return fixedBeginDate;
   }
-
 
   public void setFixedBeginDate(final DateTime beginDate) throws InconsistentFixedDatesException
   {
@@ -89,7 +95,7 @@ public class WbsActivityDO extends DefaultBaseDO implements IActivityReadOnly<De
 
   @Override
   @Column(name = "fixed_end_date")
-  @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+  @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
   public DateTime getFixedEndDate()
   {
     return fixedEndDate;
@@ -111,7 +117,7 @@ public class WbsActivityDO extends DefaultBaseDO implements IActivityReadOnly<De
 
   @Override
   @Column(name = "effort_estimation")
-  @Type(type="org.jadira.usertype.dateandtime.joda.PersistentPeriodAsString")
+  @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentPeriodAsString")
   public Period getEffortEstimation()
   {
     final AbstractWbsNodeDO maybeWbsNode = getWbsNode();
@@ -127,11 +133,14 @@ public class WbsActivityDO extends DefaultBaseDO implements IActivityReadOnly<De
   }
 
   @Override
-  public Iterator<DependencyRelationDO> predecessorRelationsIterator() {
+  public Iterator<DependencyRelationDO> predecessorRelationsIterator()
+  {
     return getPredecessorRelations().iterator();
   }
+
   @Override
-  public Iterator<DependencyRelationDO> successorRelationsIterator() {
+  public Iterator<DependencyRelationDO> successorRelationsIterator()
+  {
     return getSuccessorRelations().iterator();
   }
 
@@ -139,19 +148,18 @@ public class WbsActivityDO extends DefaultBaseDO implements IActivityReadOnly<De
   public Set<DependencyRelationDO> getPredecessorRelations()
   {
     Iterator<DependencyRelationDO> dependencyIt;
-    for (dependencyIt=predecessorRelations.iterator(); dependencyIt.hasNext();  ) {
+    for (dependencyIt = predecessorRelations.iterator(); dependencyIt.hasNext();) {
       if (dependencyIt.next().isDeleted())
         dependencyIt.remove();
     }
     return predecessorRelations;
   }
 
-
   @OneToMany(mappedBy = "predecessor")
   public Set<DependencyRelationDO> getSuccessorRelations()
   {
     Iterator<DependencyRelationDO> dependencyIt;
-    for (dependencyIt=successorRelations.iterator(); dependencyIt.hasNext();  ) {
+    for (dependencyIt = successorRelations.iterator(); dependencyIt.hasNext();) {
       if (dependencyIt.next().isDeleted())
         dependencyIt.remove();
     }
@@ -161,15 +169,18 @@ public class WbsActivityDO extends DefaultBaseDO implements IActivityReadOnly<De
   /**
    * Called by DependencyRelationDO to update the predecessor list. Do not call directly.
    */
-  protected void addPredecessorRelation(final DependencyRelationDO predecessorRelation) {
+  protected void addPredecessorRelation(final DependencyRelationDO predecessorRelation)
+  {
     if (!predecessorRelations.add(predecessorRelation))
-      throw new IllegalStateException("Tried to add a predecessor dependency relation that has been added before. Looks like you hit a bug.");
+      throw new IllegalStateException(
+          "Tried to add a predecessor dependency relation that has been added before. Looks like you hit a bug.");
   }
 
   /**
    * Called by DependencyRelationDao to update the predecessor list. Do not call directly.
    */
-  protected void removePredecessorRelation(final DependencyRelationDO predecessorRelation) {
+  protected void removePredecessorRelation(final DependencyRelationDO predecessorRelation)
+  {
     if (!predecessorRelations.remove(predecessorRelation))
       throw new IllegalStateException("Tried to remove a predecessor dependency relation that does not exist. Looks like you hit a bug.");
   }
@@ -177,7 +188,8 @@ public class WbsActivityDO extends DefaultBaseDO implements IActivityReadOnly<De
   /**
    * Called by DependencyRelationDO to update the successor list. Do not call directly.
    */
-  protected void addSuccessorRelation(final DependencyRelationDO successorRelation) {
+  protected void addSuccessorRelation(final DependencyRelationDO successorRelation)
+  {
     if (!successorRelations.add(successorRelation))
       throw new IllegalStateException("Tried to add a successor dependency relation that has been added before. Looks like you hit a bug.");
   }
@@ -185,7 +197,8 @@ public class WbsActivityDO extends DefaultBaseDO implements IActivityReadOnly<De
   /**
    * Called by DependencyRelationDao to update the predecessor list. Do not call directly.
    */
-  protected void removeSuccessorRelation(final DependencyRelationDO successorRelation) {
+  protected void removeSuccessorRelation(final DependencyRelationDO successorRelation)
+  {
     if (!successorRelations.remove(successorRelation))
       throw new IllegalStateException("Tried to remove a successor dependency relation that does not exist. Looks like you hit a bug.");
   }
@@ -206,7 +219,8 @@ public class WbsActivityDO extends DefaultBaseDO implements IActivityReadOnly<De
   }
 
   @Override
-  public boolean equals(final Object o) {
+  public boolean equals(final Object o)
+  {
     if (this == o) {
       return true;
     }
@@ -226,13 +240,13 @@ public class WbsActivityDO extends DefaultBaseDO implements IActivityReadOnly<De
   }
 
   @Override
-  public int hashCode() {
+  public int hashCode()
+  {
     if (getId() != null) {
       return getId();
     }
     return super.hashCode();
   }
-
 
   // ---- Hibernate setters -----
 
@@ -255,7 +269,7 @@ public class WbsActivityDO extends DefaultBaseDO implements IActivityReadOnly<De
     }
 
     final Set<DependencyRelationDO> successorRelations = getSuccessorRelations();
-    for (final DependencyRelationDO dependencyRelation: successorRelations) {
+    for (final DependencyRelationDO dependencyRelation : successorRelations) {
       if (dependencyRelation.getSuccessor().hasTransitiveSuccessor(activity)) {
         return true;
       }
@@ -267,7 +281,7 @@ public class WbsActivityDO extends DefaultBaseDO implements IActivityReadOnly<De
   public boolean hasDirectSuccessor(final WbsActivityDO activity)
   {
     final Set<DependencyRelationDO> successorRelations = getSuccessorRelations();
-    for (final DependencyRelationDO dependencyRelation: successorRelations) {
+    for (final DependencyRelationDO dependencyRelation : successorRelations) {
       if (dependencyRelation.getSuccessor().equals(activity)) {
         return true;
       }
@@ -278,7 +292,7 @@ public class WbsActivityDO extends DefaultBaseDO implements IActivityReadOnly<De
   public boolean hasDirectPredecessor(final WbsActivityDO activity)
   {
     final Set<DependencyRelationDO> predecessorRelations = getPredecessorRelations();
-    for (final DependencyRelationDO dependencyRelation: predecessorRelations) {
+    for (final DependencyRelationDO dependencyRelation : predecessorRelations) {
       if (dependencyRelation.getPredecessor().equals(activity)) {
         return true;
       }
@@ -293,7 +307,7 @@ public class WbsActivityDO extends DefaultBaseDO implements IActivityReadOnly<De
     }
 
     final Set<DependencyRelationDO> predecessorRelations = getPredecessorRelations();
-    for (final DependencyRelationDO dependencyRelation: predecessorRelations) {
+    for (final DependencyRelationDO dependencyRelation : predecessorRelations) {
       if (dependencyRelation.getPredecessor().hasTransitivePredecessor(activity)) {
         return true;
       }

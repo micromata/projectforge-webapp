@@ -55,7 +55,7 @@ public class ChimneyPluginUpdates
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
-    return new UpdateEntryImpl(ChimneyPlugin.ID, "5.3.0", "2013-07-11", "Adds tables T_CHIMNEY_*.") {
+    return new UpdateEntryImpl(ChimneyPlugin.ID, "2013-07-11", "Adds tables T_CHIMNEY_*.") {
 
       @Override
       public UpdatePreCheckStatus runPreCheck()
