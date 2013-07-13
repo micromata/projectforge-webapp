@@ -33,7 +33,6 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
@@ -97,11 +96,11 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
       @Override
       public void validate(final Form< ? > form)
       {
-        final PFAutoCompleteTextField<SkillDO> skillTextField = (PFAutoCompleteTextField<SkillDO>) dependentFormComponents[0];
+        final SkillSelectPanel skillSelectPanel = (SkillSelectPanel) dependentFormComponents[0];
         final DropDownChoice<SkillRating> skillRatingDropDown = (DropDownChoice<SkillRating>) dependentFormComponents[1];
-        if (skillTextField.getConvertedInput().isRateable() == true && skillRatingDropDown.getConvertedInput() == null) {
+        if (skillSelectPanel.getConvertedInput().isRateable() == true && skillRatingDropDown.getConvertedInput() == null) {
           error(getString(I18N_KEY_ERROR_RATEABLE_SKILL_WITH_NULL_RATING));
-        } else if (skillTextField.getConvertedInput().isRateable() == false && skillRatingDropDown.getConvertedInput() != null) {
+        } else if (skillSelectPanel.getConvertedInput().isRateable() == false && skillRatingDropDown.getConvertedInput() != null) {
           error(getString(I18N_KEY_ERROR_UNRATEABLE_SKILL_WITH_RATING));
         }
       }
@@ -118,23 +117,24 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
     }
     gridBuilder.newGridPanel();
     {
-      // Skill, look at UserSelectPanel for fine tuning ( getConverter() )
+      // Skill
       final FieldsetPanel fs = gridBuilder.newFieldset(SkillRatingDO.class, "skill");
-      final SkillSelectAutoCompleteFormComponent autoCompleteTextField = new SkillSelectAutoCompleteFormComponent(fs.getTextFieldId(),
-          new PropertyModel<SkillDO>(data, "skill")) {
-
+      final SkillSelectPanel skillSelectPanel = new SkillSelectPanel(fs, new PropertyModel<SkillDO>(data, "skill"), parentPage,
+          "skillId") {
         @Override
         protected void onModelSelected(AjaxRequestTarget target, SkillDO skill)
         {
+          super.onModelSelected(target, skill);
           if (target != null) {
             target.add(SkillRatingEditForm.this.fs.getFieldset());
           }
         }
-
       };
-      autoCompleteTextField.setRequired(true);
-      fs.add(autoCompleteTextField);
-      dependentFormComponents[0] = autoCompleteTextField;
+      fs.add(skillSelectPanel);
+      fs.getFieldset().setOutputMarkupId(true);
+      skillSelectPanel.init();
+      skillSelectPanel.setRequired(true);
+      dependentFormComponents[0] = skillSelectPanel;
     }
     {
       // Skill rating
@@ -147,7 +147,9 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
         @Override
         public boolean isVisible()
         {
-          if (data == null || data.getSkill() == null || !data.getSkill().isRateable()) {
+          if (data == null || data.getSkill() == null || data.getSkill().isRateable() == false) {
+            // If a skill is selected that is unrateable, reset the rating of the previous (probably rateable) skill.
+            data.setSkillRating(null);
             return false;
           } else {
             return true;
@@ -192,6 +194,10 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
   protected Logger getLogger()
   {
     return log;
+  }
+
+  public SkillTree getSkillTree() {
+    return skillDao.getSkillTree();
   }
 
 }
