@@ -30,6 +30,7 @@ import java.util.TimeZone;
 
 import javax.servlet.ServletContext;
 
+import de.micromata.wicket.request.mapper.PageParameterAwareMountedMapper;
 import net.fortuna.ical4j.util.CompatibilityHints;
 
 import org.apache.commons.lang.StringUtils;
@@ -447,7 +448,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     for (final Map.Entry<String, Class< ? extends WebPage>> mountPage : WebRegistry.instance().getMountPages().entrySet()) {
       final String path = mountPage.getKey();
       final Class< ? extends WebPage> pageClass = mountPage.getValue();
-      mountPage(path, pageClass);
+      mountPageWithPageParameterAwareness(path, pageClass);
       mountedPages.put(pageClass, path);
     }
     if (isDevelopmentSystem() == true) {
@@ -523,6 +524,10 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_PARSING, true);
     CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_UNFOLDING, true);
     CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_VALIDATION, true);
+  }
+
+  private void mountPageWithPageParameterAwareness(String path, Class<? extends WebPage> pageClass) {
+    mount(new PageParameterAwareMountedMapper(path, pageClass));
   }
 
   @Override
