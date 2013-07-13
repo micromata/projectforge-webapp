@@ -38,10 +38,10 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.fibu.RechnungDao;
 import org.projectforge.fibu.RechnungsPositionVO;
+import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.WicketUtils;
-
 
 /**
  * This panel shows invoice positions including links to the corresponding order pages.
@@ -99,13 +99,16 @@ public class InvoicePositionsPanel extends Panel
           final String invoiceNumber = String.valueOf(invoicePosition.getRechnungNummer());
           final Component label = new Label("label", invoiceNumber);
           item.add(label);
+          final String tooltip = DateTimeFormatter.instance().getFormattedDate(invoicePosition.getDate())
+              + ": "
+              + CurrencyFormatter.format(netSum);
           if (rechnungDao.hasLoggedInUserSelectAccess(false) == true) {
             link.add(new Label("label", invoiceNumber));
-            WicketUtils.addTooltip(link, CurrencyFormatter.format(netSum));
+            WicketUtils.addTooltip(link, tooltip);
             label.setVisible(false);
           } else {
             link.setVisible(false);
-            WicketUtils.addTooltip(label, CurrencyFormatter.format(netSum));
+            WicketUtils.addTooltip(label, tooltip);
           }
           netSum = BigDecimal.ZERO;
         }

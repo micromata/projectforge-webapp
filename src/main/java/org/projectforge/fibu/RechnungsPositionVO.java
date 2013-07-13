@@ -25,6 +25,7 @@ package org.projectforge.fibu;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Date;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -37,25 +38,28 @@ public class RechnungsPositionVO implements Comparable<RechnungsPositionVO>, Ser
 {
   private static final long serialVersionUID = -4377826234871813253L;
 
-  private short number;
+  private final short number;
 
-  private Integer rechnungId;
+  private final Integer rechnungId;
 
-  private Integer rechnungNummer;
+  private final Date date;
 
-  private String rechnungBetreff;
+  private final Integer rechnungNummer;
 
-  private String text;
+  private final String rechnungBetreff;
+
+  private final String text;
 
   private Integer auftragsId;
 
   private short auftragsPositionNummer;
 
-  private BigDecimal netSum;
+  private final BigDecimal netSum;
 
   public RechnungsPositionVO(final RechnungsPositionDO rechnungsPosition)
   {
     final RechnungDO rechnung = rechnungsPosition.getRechnung();
+    this.date = rechnung.getDatum();
     this.number = rechnungsPosition.getNumber();
     this.rechnungId = rechnung.getId();
     this.rechnungNummer = rechnung.getNummer();
@@ -75,6 +79,14 @@ public class RechnungsPositionVO implements Comparable<RechnungsPositionVO>, Ser
   public short getNumber()
   {
     return number;
+  }
+
+  /**
+   * @return the date
+   */
+  public Date getDate()
+  {
+    return date;
   }
 
   public BigDecimal getNettoSumme()
@@ -109,17 +121,17 @@ public class RechnungsPositionVO implements Comparable<RechnungsPositionVO>, Ser
   {
     return auftragsId;
   }
-  
+
   public short getAuftragsPositionNummer()
   {
     return auftragsPositionNummer;
   }
-  
+
   @Override
-  public boolean equals(Object o)
+  public boolean equals(final Object o)
   {
     if (o instanceof RechnungsPositionVO) {
-      RechnungsPositionVO other = (RechnungsPositionVO) o;
+      final RechnungsPositionVO other = (RechnungsPositionVO) o;
       if (ObjectUtils.equals(this.getNumber(), other.getNumber()) == false)
         return false;
       if (ObjectUtils.equals(this.getRechnungId(), other.getRechnungId()) == false)
@@ -132,7 +144,7 @@ public class RechnungsPositionVO implements Comparable<RechnungsPositionVO>, Ser
   @Override
   public int hashCode()
   {
-    HashCodeBuilder hcb = new HashCodeBuilder();
+    final HashCodeBuilder hcb = new HashCodeBuilder();
     hcb.append(getNumber());
     hcb.append(getRechnungId());
     return hcb.toHashCode();
