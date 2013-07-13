@@ -130,7 +130,7 @@ public abstract class AbstractSecuredChimneyPage extends AbstractSecuredPage
     final ArrayList<NavigationItem> navItems = new ArrayList<NavigationItem>();
     insertNavigationItems(navItems);
 
-    final RepeatingView rv = new RepeatingView("breadcrumb");
+    final RepeatingView rv = new RepeatingView("chimneyBreadcrumb");
     boolean first = true;
     for (final Iterator<NavigationItem> it = navItems.iterator(); it.hasNext();) {
       final NavigationItem navItem = it.next();
