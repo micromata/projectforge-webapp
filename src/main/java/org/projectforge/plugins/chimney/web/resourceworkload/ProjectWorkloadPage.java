@@ -528,7 +528,7 @@ public class ProjectWorkloadPage extends AbstractSecuredChimneyPage
     filter = new QueryFilter();
     Junction taskDisjunction = Restrictions.disjunction();
     for (final AbstractWbsNodeDO node : allProjectNodesList) {
-      taskDisjunction = taskDisjunction.add(Restrictions.eq("task", node.getTaskDo()));
+      taskDisjunction = taskDisjunction.add(Restrictions.eq("task", node.getTask()));
     }
     filter.add(taskDisjunction);
     filter.add(Restrictions.between("startTime", beginStamp, endStamp));

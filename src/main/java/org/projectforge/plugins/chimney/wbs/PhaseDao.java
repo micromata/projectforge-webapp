@@ -33,7 +33,7 @@ public class PhaseDao extends AbstractWBSNodeDao<PhaseDO>
   protected void onSaveOrModify(final PhaseDO obj)
   {
     // prevent a TaskDO from being saved to the task table
-    obj.setTaskDo(null);
+    obj.setTask(null);
     log.info("onSaveOrModify: taskDO auf null gesetzt");
   }
 
@@ -41,7 +41,7 @@ public class PhaseDao extends AbstractWBSNodeDao<PhaseDO>
   protected void onDelete(final PhaseDO obj)
   {
     // prevent the TaskDO to be deleted from the task table (it does not even exist there)
-    obj.setTaskDo(null);
+    obj.setTask(null);
     log.info("onDelete");
   }
 

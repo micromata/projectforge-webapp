@@ -16,7 +16,7 @@ import org.projectforge.plugins.chimney.wbs.visitors.IWbsNodeVisitor;
 import org.projectforge.plugins.chimney.wbs.visitors.WbsNodeChildValidationVisitor;
 
 @Entity
-@DiscriminatorValue("Workpackage")
+@DiscriminatorValue("workpackage")
 public class WorkpackageDO extends AbstractWbsNodeDO
 {
   private static final long serialVersionUID = -8883710265963990727L;

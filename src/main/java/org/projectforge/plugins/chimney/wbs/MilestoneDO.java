@@ -16,7 +16,7 @@ import org.projectforge.plugins.chimney.wbs.visitors.IWbsNodeVisitor;
 import org.projectforge.plugins.chimney.wbs.visitors.WbsNodeChildValidationVisitor;
 
 @Entity
-@DiscriminatorValue("Milestone")
+@DiscriminatorValue("milestone")
 public class MilestoneDO extends AbstractWbsNodeDO
 {
   private static final long serialVersionUID = -948071470598592248L;

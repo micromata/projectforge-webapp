@@ -18,16 +18,34 @@ import org.projectforge.access.AccessException;
 import org.projectforge.core.BaseDao;
 import org.projectforge.plugins.chimney.wbs.AbstractWbsNodeDO;
 import org.projectforge.plugins.chimney.wbs.IWbsNodeReadOnly;
+import org.projectforge.plugins.chimney.wbs.WbsNodeDao;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
 public class WbsActivityDao extends BaseDao<WbsActivityDO>
 {
+  private WbsNodeDao wbsNodeDao;
+
   public WbsActivityDao()
   {
     super(WbsActivityDO.class);
     userRightId = WbsActivityRight.USER_RIGHT_ID;
+  }
+
+  /**
+   * @param activity
+   * @param wbsNodeId If null, then wbsNodeId will be set to null;
+   * @see BaseDao#getOrLoad(Integer)
+   */
+  public void setWbsNode(final WbsActivityDO activity, final Integer wbsNodeId)
+  {
+    if (wbsNodeId == null) {
+      activity.setWbsNode(null);
+      return;
+    }
+    final AbstractWbsNodeDO wbsNode = wbsNodeDao.getOrLoad(wbsNodeId);
+    activity.setWbsNode(wbsNode);
   }
 
   @Override
@@ -66,8 +84,12 @@ public class WbsActivityDao extends BaseDao<WbsActivityDO>
   }
 
   /**
-   * <p>Retrieves an activity by a wbs node.</p>
-   * <p>If the activity does not already exist, it will be created (and persisted) on the fly.</p>
+   * <p>
+   * Retrieves an activity by a wbs node.
+   * </p>
+   * <p>
+   * If the activity does not already exist, it will be created (and persisted) on the fly.
+   * </p>
    * @param wbsNode must be non-transient
    * @throws IllegalArgumentException if the argument is transient or null
    * @return
@@ -77,7 +99,8 @@ public class WbsActivityDao extends BaseDao<WbsActivityDO>
     Validate.notNull(wbsNode);
 
     if (wbsNode.getId() == null) {
-      throw new IllegalArgumentException(String.format("Wbs node '%s' must not be transient to get or create activity for it.", wbsNode.toString()));
+      throw new IllegalArgumentException(String.format("Wbs node '%s' must not be transient to get or create activity for it.",
+          wbsNode.toString()));
     }
 
     final WbsActivityDO possibleActivity = getByWbsNode(wbsNode);
@@ -93,5 +116,10 @@ public class WbsActivityDao extends BaseDao<WbsActivityDO>
     final WbsActivityDO activity = new WbsActivityDO(abstractWbsNodeDO);
     this.save(activity);
     return activity;
+  }
+
+  public void setWbsNodeDao(final WbsNodeDao wbsNodeDao)
+  {
+    this.wbsNodeDao = wbsNodeDao;
   }
 }

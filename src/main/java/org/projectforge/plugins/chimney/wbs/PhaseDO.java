@@ -21,7 +21,7 @@ import org.projectforge.task.TaskStatus;
 import org.projectforge.user.PFUserDO;
 
 @Entity
-@DiscriminatorValue("Phase")
+@DiscriminatorValue("phase")
 public class PhaseDO extends AbstractWbsNodeDO
 {
 

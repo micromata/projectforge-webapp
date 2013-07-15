@@ -57,7 +57,7 @@ public abstract class AbstractWbsNodeDO extends AbstractVisitableBaseDO<IWbsNode
 {
   private static final long serialVersionUID = -3762621542515259774L;
 
-  protected TaskDO structureElementDO = new TaskDO();
+  protected TaskDO task = new TaskDO();
 
   protected String wbsCode;
 
@@ -96,7 +96,7 @@ public abstract class AbstractWbsNodeDO extends AbstractVisitableBaseDO<IWbsNode
   protected void setNewParent(final AbstractWbsNodeDO newParent)
   {
     parent = newParent;
-    getTaskDo().setParentTask(newParent.getTaskDo());
+    getTask().setParentTask(newParent.getTask());
   }
 
   /**
@@ -197,10 +197,10 @@ public abstract class AbstractWbsNodeDO extends AbstractVisitableBaseDO<IWbsNode
   }
 
   @OneToOne
-  @JoinColumn(name = "struct_el_fk")
-  public TaskDO getTaskDo()
+  @JoinColumn(name = "task_fk")
+  public TaskDO getTask()
   {
-    return structureElementDO;
+    return task;
   }
 
   @Column(name = "wbs_code", length = 1000)
@@ -219,73 +219,73 @@ public abstract class AbstractWbsNodeDO extends AbstractVisitableBaseDO<IWbsNode
   @Transient
   public String getTitle()
   {
-    checkTaskDoPresence();
-    return structureElementDO.getTitle();
+    checkTaskDOPresence();
+    return task.getTitle();
   }
 
-  protected void checkTaskDoPresence()
+  protected void checkTaskDOPresence()
   {
-    if (structureElementDO == null) {
-      throw new IllegalStateException("taskDo must be set at this state");
+    if (task == null) {
+      throw new IllegalStateException("taskDO must be set at this state!");
     }
   }
 
   public void setTitle(final String title)
   {
-    checkTaskDoPresence();
-    structureElementDO.setTitle(title);
+    checkTaskDOPresence();
+    task.setTitle(title);
   }
 
   public void setShortDescription(final String shortDescription)
   {
-    checkTaskDoPresence();
-    structureElementDO.setShortDescription(shortDescription);
+    checkTaskDOPresence();
+    task.setShortDescription(shortDescription);
   }
 
   @Transient
   public String getShortDescription()
   {
-    checkTaskDoPresence();
-    return structureElementDO.getShortDescription();
+    checkTaskDOPresence();
+    return task.getShortDescription();
   }
 
   public void setDescription(final String description)
   {
-    checkTaskDoPresence();
-    structureElementDO.setDescription(description);
+    checkTaskDOPresence();
+    task.setDescription(description);
   }
 
   @Transient
   public String getDescription()
   {
-    checkTaskDoPresence();
-    return structureElementDO.getDescription();
+    checkTaskDOPresence();
+    return task.getDescription();
   }
 
   @Transient
   public TaskStatus getStatus()
   {
-    checkTaskDoPresence();
-    return structureElementDO.getStatus();
+    checkTaskDOPresence();
+    return task.getStatus();
   }
 
   public void setStatus(final TaskStatus status)
   {
-    checkTaskDoPresence();
-    structureElementDO.setStatus(status);
+    checkTaskDOPresence();
+    task.setStatus(status);
   }
 
   @Transient
   public Priority getPriority()
   {
-    checkTaskDoPresence();
-    return structureElementDO.getPriority();
+    checkTaskDOPresence();
+    return task.getPriority();
   }
 
   public void setPriority(final Priority priority)
   {
-    checkTaskDoPresence();
-    structureElementDO.setPriority(priority);
+    checkTaskDOPresence();
+    task.setPriority(priority);
   }
 
   @SuppressWarnings("deprecation")
@@ -293,8 +293,8 @@ public abstract class AbstractWbsNodeDO extends AbstractVisitableBaseDO<IWbsNode
   @Transient
   public int getProgress()
   {
-    checkTaskDoPresence();
-    final Integer progress = structureElementDO.getProgress();
+    checkTaskDOPresence();
+    final Integer progress = task.getProgress();
     if (progress == null)
       return 0;
     return progress;
@@ -303,8 +303,8 @@ public abstract class AbstractWbsNodeDO extends AbstractVisitableBaseDO<IWbsNode
   @SuppressWarnings("deprecation")
   public void setProgress(final int progress)
   {
-    checkTaskDoPresence();
-    structureElementDO.setProgress(progress);
+    checkTaskDOPresence();
+    task.setProgress(progress);
   }
 
   /**
@@ -337,8 +337,8 @@ public abstract class AbstractWbsNodeDO extends AbstractVisitableBaseDO<IWbsNode
   @Transient
   public PFUserDO getResponsibleUser()
   {
-    checkTaskDoPresence();
-    return this.getTaskDo().getResponsibleUser();
+    checkTaskDOPresence();
+    return this.getTask().getResponsibleUser();
   }
 
   /**
@@ -348,9 +348,16 @@ public abstract class AbstractWbsNodeDO extends AbstractVisitableBaseDO<IWbsNode
    */
   public void setResponsibleUser(final PFUserDO newUser)
   {
-    checkTaskDoPresence();
-    getTaskDo().setResponsibleUser(newUser);
+    checkTaskDOPresence();
+    getTask().setResponsibleUser(newUser);
   }
+
+  @Transient
+  public Integer getResponsibleUserId()
+  {
+    return getTask().getResponsibleUserId();
+  }
+
 
   @Override
   public String toString()
@@ -403,11 +410,11 @@ public abstract class AbstractWbsNodeDO extends AbstractVisitableBaseDO<IWbsNode
   // below are some private setters/getters needed by Hibernate
   // -----------------------------------------------------------
 
-  void setTaskDo(final TaskDO taskDO)
+  void setTask(final TaskDO task)
   {
-    this.structureElementDO = taskDO;
-    if (structureElementDO != null && structureElementDO.isDeleted() != isDeleted()) {
-      setDeleted(structureElementDO.isDeleted());
+    this.task = task;
+    if (task != null && task.isDeleted() != isDeleted()) {
+      setDeleted(task.isDeleted());
     }
   }
 

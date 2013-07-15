@@ -9,29 +9,32 @@
 
 package org.projectforge.plugins.chimney.web.projectmanagement.powerworkpackage;
 
-import java.util.List;
-
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.Form;
+import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.plugins.chimney.activities.WbsActivityDO;
+import org.projectforge.plugins.chimney.activities.WbsActivityDao;
 import org.projectforge.plugins.chimney.wbs.ProjectDO;
 import org.projectforge.plugins.chimney.wbs.ProjectDao;
-import org.projectforge.plugins.chimney.web.AbstractSecuredChimneyPage;
-import org.projectforge.plugins.chimney.web.components.ChimneyFeedbackPanel;
-import org.projectforge.plugins.chimney.web.navigation.BreadcrumbConstants;
-import org.projectforge.plugins.chimney.web.navigation.NavigationConstants;
+import org.projectforge.plugins.chimney.web.WicketWbsUtils;
+import org.projectforge.plugins.chimney.web.projecttree.ProjectTreePage;
+import org.projectforge.web.fibu.ISelectCallerPage;
+import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.AbstractSecuredBasePage;
 
-public class PowerProjectEditPage extends AbstractSecuredChimneyPage
+public class PowerProjectEditPage extends AbstractEditPage<ProjectDO, PowerProjectEditForm, ProjectDao> implements ISelectCallerPage
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(PowerProjectEditPage.class);
+
   private static final long serialVersionUID = -7665037550701489286L;
 
   public static final String PAGE_ID = "powerProjectEdit";
 
-  private final boolean isNew;
+  @SpringBean
+  private ProjectDao projectDao;
 
   @SpringBean
-  ProjectDao projectDao;
+  private WbsActivityDao wbsActivityDao;
 
   /**
    * Constructor for creating a new project
@@ -39,63 +42,77 @@ public class PowerProjectEditPage extends AbstractSecuredChimneyPage
    */
   public PowerProjectEditPage(final PageParameters parameters)
   {
-    super(parameters, true);
-    isNew = true;
-    init(new ProjectDO());
+    super(parameters, "plugins.chimney.project");
+    init();
   }
 
   /**
-   * Constructor for editing a project
-   * @param parameters
-   * @param projectId Id of the project to edit. Make sure a project with this id exists or this page will break ungracefully
+   * @see org.projectforge.web.wicket.AbstractEditPage#afterSaveOrUpdate()
    */
-  public PowerProjectEditPage(final PageParameters parameters, final Integer projectId) {
-    super(parameters, true);
-    isNew = false;
-    init(projectDao.getOrLoad(projectId));
-  }
-
-  private void init(final ProjectDO project) {
-    final Form<ProjectDO> form = new PowerProjectForm("powerProjectEditForm", project);
-    body.add(form);
-    body.add(new ChimneyFeedbackPanel("feedback"));
-    body.add(new Label("heading", getString(getHeadingI18n())));
-    createNavigation();
-  }
-
   @Override
-  protected String getTitle()
+  public AbstractSecuredBasePage afterSaveOrUpdate()
   {
-    if (isNew)
-      return getString("plugins.chimney.createproject.title");
-    return getString("plugins.chimney.editproject.title");
+    final WbsActivityDO activity = form.getActivity();
+    // Currently there is no possibility (at least I have not found any) to fully validate the project before trying to save it. The
+    // case of sister tasks with the same title can only be observed by trying to save can catch the exception on error.
+    wbsActivityDao.setWbsNode(activity, getData().getId());
+    wbsActivityDao.saveOrUpdate(activity);
+    return new ProjectTreePage(WicketWbsUtils.getProject(getData()).getId());
   }
 
-  @Override
-  protected String getNavigationBarName()
+  /**
+   * @see org.projectforge.web.fibu.ISelectCallerPage#select(java.lang.String, java.lang.Integer)
+   */
+  public void select(final String property, final Object selectedValue)
   {
-    //if (isNew)
-    //  return NavigationConstants.WIZARD;
-    return NavigationConstants.MAIN;
-  }
-
-  @Override
-  protected void insertBreadcrumbItems(final List<String> items)
-  {
-    items.add(BreadcrumbConstants.PROJECT_PLANNING);
-    if (isNew) {
-      //items.add(BreadcrumbConstants.WIZARD);
-      items.add(BreadcrumbConstants.CREATE_PROJECT);
+    if ("responsibleUserId".equals(property) == true) {
+      projectDao.setResponsibleUser(getData(), (Integer) selectedValue);
     } else {
-      items.add(BreadcrumbConstants.EDIT_PROJECT);
+      log.error("Property '" + property + "' not supported for selection.");
     }
   }
 
-  protected String getHeadingI18n()
+  /**
+   * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
+   */
+  public void unselect(final String property)
   {
-    if (isNew)
-      return "plugins.chimney.createproject.heading";
-    return "plugins.chimney.editproject.heading";
+    if ("responsibleUserId".equals(property) == true) {
+      getData().setResponsibleUser(null);
+    } else {
+      log.error("Property '" + property + "' not supported for selection.");
+    }
   }
 
+  /**
+   * @see org.projectforge.web.fibu.ISelectCallerPage#cancelSelection(java.lang.String)
+   */
+  public void cancelSelection(final String property)
+  {
+    // Do nothing.
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractEditPage#getBaseDao()
+   */
+  @Override
+  protected ProjectDao getBaseDao()
+  {
+    return projectDao;
+  }
+
+  @Override
+  protected PowerProjectEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final ProjectDO data)
+  {
+    return new PowerProjectEditForm(this, data);
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractEditPage#getLogger()
+   */
+  @Override
+  protected Logger getLogger()
+  {
+    return log;
+  }
 }

@@ -32,9 +32,9 @@ public abstract class AbstractWBSNodeDao<O extends AbstractWbsNodeDO> extends Ba
   @Override
   protected void onSaveOrModify(final O obj)
   {
-    Validate.notNull(obj.getTaskDo(), "TaskDO is not set.");
+    Validate.notNull(obj.getTask(), "TaskDO is not set.");
     // must explicitly save the task via TaskDao, otherwise TaskTree will not be updated
-    taskDao.saveOrUpdate(obj.getTaskDo());
+    taskDao.saveOrUpdate(obj.getTask());
   }
 
   @Override
@@ -61,9 +61,9 @@ public abstract class AbstractWBSNodeDao<O extends AbstractWbsNodeDO> extends Ba
   @Override
   protected void onDelete(final O obj)
   {
-    Validate.notNull(obj.getTaskDo(), "TaskDO is not set");
+    Validate.notNull(obj.getTask(), "TaskDO is not set");
     Validate.isTrue(obj.getParent() == null, "Node must be removed from its parent's child list before deleting it.");
-    taskDao.markAsDeleted(obj.getTaskDo());
+    taskDao.markAsDeleted(obj.getTask());
   }
 
   public void setTaskDao(final TaskDao taskDao)

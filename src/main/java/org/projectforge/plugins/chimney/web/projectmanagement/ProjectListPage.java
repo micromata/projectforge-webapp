@@ -42,6 +42,7 @@ import org.projectforge.plugins.chimney.web.projectmanagement.powerworkpackage.P
 import org.projectforge.plugins.chimney.web.projecttree.ProjectTreePage;
 import org.projectforge.task.TaskStatus;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.WicketUtils;
 
 /**
@@ -51,6 +52,7 @@ import org.projectforge.web.wicket.WicketUtils;
 public class ProjectListPage extends AbstractSecuredChimneyPage
 {
   private static final long serialVersionUID = -1119854557054917947L;
+
   public static final String PAGE_ID = "projectList";
 
   private final int projectsPerPage = 20;
@@ -59,6 +61,7 @@ public class ProjectListPage extends AbstractSecuredChimneyPage
   private ProjectDao projectDao;
 
   private DataView<ProjectDO> dataView;
+
   private SortableProjectDataProvider dataProvider;
 
   public ProjectListPage(final PageParameters parameters)
@@ -89,10 +92,10 @@ public class ProjectListPage extends AbstractSecuredChimneyPage
     body.add(feedbackPanel);
   }
 
-
   private void addNewLink()
   {
-    body.add(new ImageLinkPanel("createProjectLink", ImageResources.NEWPROJECT, PowerProjectEditPage.class, getString("plugins.chimney.projectlist.createproject"), getString("plugins.chimney.projectlist.createproject")));
+    body.add(new ImageLinkPanel("createProjectLink", ImageResources.NEWPROJECT, PowerProjectEditPage.class,
+        getString("plugins.chimney.projectlist.createproject"), getString("plugins.chimney.projectlist.createproject")));
   }
 
   private void addPagination()
@@ -165,11 +168,11 @@ public class ProjectListPage extends AbstractSecuredChimneyPage
   }
 
   /**
-   * DataView component for displaying project data with odd/even row styling
-   * and edit/delete buttons.
+   * DataView component for displaying project data with odd/even row styling and edit/delete buttons.
    * @author Sweeps <pf@byte-storm.com>
    */
-  class ProjectDataView extends DataView<ProjectDO> {
+  class ProjectDataView extends DataView<ProjectDO>
+  {
 
     protected ProjectDataView(final String id, final IDataProvider<ProjectDO> dataProvider)
     {
@@ -177,7 +180,8 @@ public class ProjectListPage extends AbstractSecuredChimneyPage
     }
 
     private static final long serialVersionUID = 1L;
-    //private ProjectDO project;
+
+    // private ProjectDO project;
 
     @Override
     protected void populateItem(final Item<ProjectDO> item)
@@ -191,8 +195,7 @@ public class ProjectListPage extends AbstractSecuredChimneyPage
     private void addRowFormattingTo(final Item<ProjectDO> item)
     {
       // add formatting for odd/even rows
-      item.add(AttributeModifier.replace("class", new AbstractReadOnlyModel<String>()
-          {
+      item.add(AttributeModifier.replace("class", new AbstractReadOnlyModel<String>() {
         private static final long serialVersionUID = 1L;
 
         @Override
@@ -200,7 +203,7 @@ public class ProjectListPage extends AbstractSecuredChimneyPage
         {
           return (item.getIndex() % 2 == 1) ? "even" : "odd";
         }
-          }));
+      }));
     }
 
     private void addDeleteLinkTo(final Item<ProjectDO> item)
@@ -209,6 +212,7 @@ public class ProjectListPage extends AbstractSecuredChimneyPage
       // add delete link and icon
       final Link<Void> deleteLink = new Link<Void>("delete_link") {
         private static final long serialVersionUID = 1L;
+
         @Override
         public void onClick()
         {
@@ -216,8 +220,8 @@ public class ProjectListPage extends AbstractSecuredChimneyPage
           setResponsePage(ProjectListPage.this);
         }
       };
-      deleteLink.add(WicketUtils.javaScriptConfirmDialogOnClick(getLocalizedMessage(
-          "plugins.chimney.projectlist.projectconfirmdelete", project.getTitle())));
+      deleteLink.add(WicketUtils.javaScriptConfirmDialogOnClick(getLocalizedMessage("plugins.chimney.projectlist.projectconfirmdelete",
+          project.getTitle())));
       deleteLink.add(new Image("delete_icon", ImageResources.DELETE_SMALL_IMAGE));
       item.add(deleteLink);
     }
@@ -228,10 +232,13 @@ public class ProjectListPage extends AbstractSecuredChimneyPage
       // add edit link and icon
       final Link<Void> editLink = new Link<Void>("edit_link") {
         private static final long serialVersionUID = 1L;
+
         @Override
         public void onClick()
         {
-          setResponsePage(new PowerProjectEditPage(new PageParameters(), project.getId()));
+          final PageParameters params = new PageParameters();
+          params.add(AbstractEditPage.PARAMETER_KEY_ID, String.valueOf(project.getId()));
+          setResponsePage(new PowerProjectEditPage(params).setReturnToPage(ProjectListPage.this));
         }
       };
       editLink.add(new Image("edit_icon", ImageResources.EDIT_SMALL_IMAGE));
@@ -243,22 +250,23 @@ public class ProjectListPage extends AbstractSecuredChimneyPage
       // put ProjectDO's data into the right columns
       final ProjectDO project = item.getModelObject();
 
-      item.add(new TextLinkPanel("name",project.getTitle()) {
+      item.add(new TextLinkPanel("name", project.getTitle()) {
         private static final long serialVersionUID = 7943147663723750177L;
+
         @Override
         public void onClick()
         {
-          setResponsePage(new ProjectTreePage( item.getModelObject().getId()));
+          setResponsePage(new ProjectTreePage(item.getModelObject().getId()));
         }
-      }
-      );
+      });
       final int progress = project.getProgress();
       item.add(new Label("progresspercent", String.format("%d", progress)));
-      item.add(new WebMarkupContainer("progressstyle").add(AttributeModifier.prepend("style", "width:"+progress+"%;")));
+      item.add(new WebMarkupContainer("progressstyle").add(AttributeModifier.prepend("style", "width:" + progress + "%;")));
       final Label descLabel = new Label("desc", new PropertyModel<String>(project, "shortDescription"));
       item.add(descLabel);
       item.add(new MultiLineLabel("fulldesc", new PropertyModel<String>(project, "description")) {
         private static final long serialVersionUID = 1L;
+
         @Override
         public boolean isVisible()
         { // display hovered full description only if there is one

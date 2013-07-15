@@ -27,6 +27,7 @@ import org.projectforge.plugins.chimney.web.projectmanagement.powerworkpackage.P
 import org.projectforge.plugins.chimney.web.projectmanagement.powerworkpackage.PowerProjectEditPage;
 import org.projectforge.plugins.chimney.web.projectmanagement.powerworkpackage.PowerSubtaskEditPage;
 import org.projectforge.plugins.chimney.web.projectmanagement.powerworkpackage.PowerWorkpackageEditPage;
+import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 
 public class WbsNodeEditPageVisitor implements IWbsNodeVisitor, Serializable
@@ -59,7 +60,9 @@ public class WbsNodeEditPageVisitor implements IWbsNodeVisitor, Serializable
   @Override
   public void visit(final ProjectDO node)
   {
-    editPage = new PowerProjectEditPage(new PageParameters(), node.getId());
+    final PageParameters params = new PageParameters();
+    params.add(AbstractEditPage.PARAMETER_KEY_ID, String.valueOf( node.getId()));
+    editPage = new PowerProjectEditPage(params);
   }
 
   @Override

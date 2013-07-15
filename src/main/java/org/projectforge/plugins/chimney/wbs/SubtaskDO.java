@@ -20,7 +20,7 @@ import org.projectforge.plugins.chimney.wbs.visitors.WbsNodeChildValidationVisit
 import org.projectforge.task.TaskStatus;
 
 @Entity
-@DiscriminatorValue("Subtask")
+@DiscriminatorValue("subtask")
 public class SubtaskDO extends AbstractWbsNodeDO
 {
   private static final long serialVersionUID = 2012789637926693915L;
