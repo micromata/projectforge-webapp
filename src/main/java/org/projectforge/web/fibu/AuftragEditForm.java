@@ -25,6 +25,7 @@ package org.projectforge.web.fibu;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -35,10 +36,14 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.datetime.markup.html.form.DateTextField;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -109,6 +114,8 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
 
   @SpringBean(name = "rechnungCache")
   private RechnungCache rechnungCache;
+
+  private FormComponent< ? >[] positionsDependentFormComponents = new FormComponent[0];
 
   public AuftragEditForm(final AuftragEditPage parentPage, final AuftragDO data)
   {
@@ -279,12 +286,36 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       gridBuilder.newFieldset(getString("email")).addCheckBox(new PropertyModel<Boolean>(this, "sendEMailNotification"), null)
       .setTooltip(getString("label.sendEMailNotification"));
     }
+    add(new IFormValidator() {
+      @Override
+      public FormComponent< ? >[] getDependentFormComponents()
+      {
+        return positionsDependentFormComponents;
+      }
+
+      @Override
+      public void validate(final Form< ? > form)
+      {
+        for (int i = 0; i < positionsDependentFormComponents.length - 1; i += 2) {
+          final Date performanceFromDate = ((DateTextField) positionsDependentFormComponents[i]).getConvertedInput();
+          final Date performanceEndDate = ((DateTextField) positionsDependentFormComponents[i + 1]).getConvertedInput();
+          if (performanceFromDate == null || performanceEndDate == null) {
+            continue;
+          }
+          if (performanceEndDate.before(performanceFromDate) == true) {
+            positionsDependentFormComponents[i + 1].error(getString("error.endDateBeforeBeginDate"));
+          }
+        }
+      }
+    });
+
   }
 
   @SuppressWarnings("serial")
   void refresh()
   {
     positionsRepeater.removeAll();
+    final Collection<FormComponent< ? >> dependentComponents = new ArrayList<FormComponent< ? >>();
     if (CollectionUtils.isEmpty(data.getPositionen()) == true) {
       // Ensure that at least one position is available:
       data.addPosition(new AuftragsPositionDO());
@@ -435,10 +466,12 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         final DatePanel fromDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(position, "periodOfPerformanceBegin"),
             DatePanelSettings.get().withTargetType(java.sql.Date.class));
         fs.add(fromDatePanel);
+        dependentComponents.add(fromDatePanel.getDateField());
         fs.add(new DivTextPanel(fs.newChildId(), "-"));
         final DatePanel endDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(position, "periodOfPerformanceEnd"),
             DatePanelSettings.get().withTargetType(java.sql.Date.class));
         fs.add(endDatePanel);
+        dependentComponents.add(endDatePanel.getDateField());
       }
       posGridBuilder.newGridPanel();
       {
@@ -447,6 +480,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(position, "bemerkung")));
       }
     }
+    positionsDependentFormComponents = dependentComponents.toArray(new FormComponent[0]);
   }
 
   protected String getPositionHeading(final AuftragsPositionDO position, final ToggleContainerPanel positionsPanel)
