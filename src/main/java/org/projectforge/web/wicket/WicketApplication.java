@@ -322,7 +322,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
       {
         // in case of expired session, please redirect to home page
         if (ex instanceof PageExpiredException) {
-          return new RenderPageRequestHandler(new PageProvider(getHomePage()));
+          return super.onException(cycle, ex);
         }
         final Throwable rootCause = ExceptionHelper.getRootCause(ex);
         // log.error(rootCause.getMessage(), ex);
