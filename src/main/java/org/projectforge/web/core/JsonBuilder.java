@@ -26,11 +26,10 @@ package org.projectforge.web.core;
 import java.util.Collection;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
 
 public class JsonBuilder
 {
-  final private StringBuffer buf = new StringBuffer();
+  final private StringBuilder sb = new StringBuilder();
 
   /**
    * Creates Json result string from the given list.<br/>
@@ -38,59 +37,92 @@ public class JsonBuilder
    * [["Klein", "Horst"],["Schmidt", "Klaus"], ...] // For two Properties (e. g. name, first name) [["id:37", "Klein", "Horst"],["id:42",
    * "Schmidt", "Klaus"], ...] // For two Properties (e. g. name, first name) with id. <br/>
    * Uses ObjectUtils.toString(Object) for formatting each value.
-   * @param prependId If true, the first column will be returned as "id:<value>".
    * @param col The array representation: List<Object> or List<Object[]>. If null then "[]" is returned.
    * @return
    */
-  public static String buildToStringRows(final Collection< ? > col, final boolean prependId)
+  public static String buildToStringRows(final Collection< ? > col)
   {
     if (col == null) {
       return "[]";
     }
     final JsonBuilder builder = new JsonBuilder();
-    return builder.append(col, prependId).getAsString();
-  }
-
-  public static String buildToStringRows(final Collection< ? > col)
-  {
-    return buildToStringRows(col, false);
+    return builder.append(col).getAsString();
   }
 
   public String getAsString()
   {
-    return buf.toString();
+    return sb.toString();
   }
 
   /**
    * Appends objects to buffer, e. g.: ["Horst"], ["Klaus"], ... Uses formatValue(Object) to render the values.
    * @param oArray
-   * @param prependId If true then id will be prepended at the first column, e. g.: ["id:37", "Klein", "Horst"].
    * @return This (fluent)
    */
-  public JsonBuilder append(final Object[] oArray, final boolean prependId)
+  public JsonBuilder append(final Object[] oArray)
   {
-    buf.append(" ["); // begin array
-    boolean firstCell = true;
-    for (Object obj : oArray) {
-      if (firstCell == true) {
-        firstCell = false;
-        buf.append("\"");
-        if (prependId == true) {
-          buf.append("id:");
-        }
-      } else {
-        buf.append(",\"");
-      }
-      // " must be quoted as \":
-      buf.append(StringUtils.replace(formatValue(obj), "\"", "\\\"")).append("\"");
+    sb.append(" ["); // begin array
+    String separator = "";
+    for (final Object obj : oArray) {
+      sb.append(separator);
+      separator = ",";
+      sb.append(escapeString(formatValue(obj)));
     }
-    buf.append("]"); // end array
+    sb.append("]"); // end array
     return this;
   }
 
-  public JsonBuilder append(final Object[] oArray)
+  private String escapeString(final String string)
   {
-    return append(oArray, false);
+    if (string == null || string.length() == 0) {
+      return "\"\"";
+    }
+    char c = 0;
+    int i;
+    final int len = string.length();
+    final StringBuilder sb = new StringBuilder(len + 4);
+    String t;
+    sb.append('"');
+    for (i = 0; i < len; i += 1) {
+      c = string.charAt(i);
+      switch (c) {
+        case '\\':
+        case '"':
+          sb.append('\\');
+          sb.append(c);
+          break;
+        case '/':
+          // if (b == '<') {
+          sb.append('\\');
+          // }
+          sb.append(c);
+          break;
+        case '\b':
+          sb.append("\\b");
+          break;
+        case '\t':
+          sb.append("\\t");
+          break;
+        case '\n':
+          sb.append("\\n");
+          break;
+        case '\f':
+          sb.append("\\f");
+          break;
+        case '\r':
+          sb.append("\\r");
+          break;
+        default:
+          if (c < ' ') {
+            t = "000" + Integer.toHexString(c);
+            sb.append("\\u" + t.substring(t.length() - 4));
+          } else {
+            sb.append(c);
+          }
+      }
+    }
+    sb.append('"');
+    return sb.toString();
   }
 
   /**
@@ -99,36 +131,29 @@ public class JsonBuilder
    * [["Klein", "Horst"],["Schmidt", "Klaus"], ...] // For two Properties (e. g. name, first name) [["id:37", "Klein", "Horst"],["id:42",
    * "Schmidt", "Klaus"], ...] // For two Properties (e. g. name, first name) with id. <br/>
    * Uses formatValue(Object) for formatting each value.
-   * @param prependId If true, the first column will be returned as "id:<value>".
    * @param col The array representation: List<Object> or List<Object[]>. If null then "[]" is returned.
    * @return
    */
-  public JsonBuilder append(final Collection< ? > col, final boolean prependId)
+  public JsonBuilder append(final Collection< ? > col)
   {
     if (col == null) {
-      buf.append("[]");
+      sb.append("[]");
       return this;
     }
     // Format: [["1.1", "1.2", ...],["2.1", "2.2", ...]]
-    buf.append("[\n");
-    boolean firstRow = true;
+    sb.append("[\n");
+    String separator = "\n";
     for (final Object os : col) {
-      if (firstRow == true)
-        firstRow = false;
-      else buf.append(",\n");
+      sb.append(separator);
+      separator = ",\n";
       if (os instanceof Object[]) { // Multiple properties
-        append((Object[]) os, prependId);
+        append((Object[]) os);
       } else { // Only one property
         append(transform(os));
       }
     }
-    buf.append("]"); // end data
+    sb.append("]"); // end data
     return this;
-  }
-
-  public JsonBuilder append(final Collection< ? > col)
-  {
-    return append(col, false);
   }
 
   /**
@@ -136,7 +161,7 @@ public class JsonBuilder
    * @return
    * @see ObjectUtils#toString(Object)
    */
-  protected String formatValue(Object obj)
+  protected String formatValue(final Object obj)
   {
     return ObjectUtils.toString(obj);
   }
@@ -144,12 +169,12 @@ public class JsonBuilder
   protected JsonBuilder append(final Object obj)
   {
     if (obj instanceof Object[]) {
-      return append((Object[])obj);
+      return append((Object[]) obj);
     }
-    buf.append(" ["); // begin row
+    sb.append(" ["); // begin row
     // " must be quoted as \":
-    buf.append("\"").append(StringUtils.replace(formatValue(obj), "\"", "\\\"")).append("\"");
-    buf.append("]"); // end row
+    sb.append(escapeString(formatValue(obj)));
+    sb.append("]"); // end row
     return this;
   }
 

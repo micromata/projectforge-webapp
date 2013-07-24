@@ -41,7 +41,6 @@ import org.projectforge.web.wicket.WicketRenderHeadUtils;
 
 public abstract class PFAutoCompleteBehavior<T> extends AbstractDefaultAjaxBehavior
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(PFAutoCompleteBehavior.class);
   private static final long serialVersionUID = -6532710378025987377L;
 
   protected PFAutoCompleteSettings settings;
@@ -86,7 +85,7 @@ public abstract class PFAutoCompleteBehavior<T> extends AbstractDefaultAjaxBehav
     final List<T> favorites = getFavorites();
     final MyJsonBuilder builder = new MyJsonBuilder();
     if (favorites != null) {
-      buf.append(builder.append(favorites, false).getAsString());
+      buf.append(builder.append(favorites).getAsString());
     } else {
       buf.append(builder.append(getRecentUserInputs()).getAsString());
     }
