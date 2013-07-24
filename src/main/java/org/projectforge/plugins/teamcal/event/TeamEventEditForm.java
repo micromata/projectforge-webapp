@@ -116,6 +116,9 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
   private final FormComponent< ? >[] dependentFormComponents = new FormComponent[6];
 
+  // Needed by autocompletion for location fields.
+  private TeamCalDO[] calendarsWithFullAccess;
+
   /**
    * @param parentPage
    * @param data
@@ -179,9 +182,10 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
         @Override
         protected List<String> getChoices(final String input)
         {
-          return teamEventDao.getAutocompletion("location", input);
+          return teamEventDao.getLocationAutocompletion(input, calendarsWithFullAccess);
         }
       };
+      locationTextField.withMatchContains(true).withMinChars(3);
       fieldSet.add(locationTextField);
       if (access == false)
         fieldSet.setEnabled(false);
@@ -415,16 +419,19 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   private void initTeamCalPicker(final FieldsetPanel fieldSet)
   {
     if (access == false) {
-      final Label teamCalTitle = new Label(fieldSet.newChildId(), new PropertyModel<String>(data, "calendar.getTitle()"));
+      final TeamCalDO calendar = data.getCalendar();
+      final Label teamCalTitle = new Label(fieldSet.newChildId(), calendar != null ? new PropertyModel<String>(data.getCalendar(), "title")
+          : "");
       fieldSet.add(teamCalTitle);
     } else {
       final List<TeamCalDO> list = teamCalDao.getAllCalendarsWithFullAccess();
+      calendarsWithFullAccess = list.toArray(new TeamCalDO[0]);
       final LabelValueChoiceRenderer<TeamCalDO> calChoiceRenderer = new LabelValueChoiceRenderer<TeamCalDO>();
       for (final TeamCalDO cal : list) {
         calChoiceRenderer.addValue(cal, cal.getTitle());
       }
-      final DropDownChoice<TeamCalDO> calDropDownChoice = new DropDownChoice<TeamCalDO>(fieldSet.getDropDownChoiceId(), new PropertyModel<TeamCalDO>(data, "calendar"),
-          calChoiceRenderer.getValues(), calChoiceRenderer);
+      final DropDownChoice<TeamCalDO> calDropDownChoice = new DropDownChoice<TeamCalDO>(fieldSet.getDropDownChoiceId(),
+          new PropertyModel<TeamCalDO>(data, "calendar"), calChoiceRenderer.getValues(), calChoiceRenderer);
       calDropDownChoice.setNullValid(false);
       calDropDownChoice.setRequired(true);
       fieldSet.add(calDropDownChoice);
