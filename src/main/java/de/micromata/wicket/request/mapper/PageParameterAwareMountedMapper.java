@@ -4,6 +4,7 @@ import org.apache.wicket.Application;
 import org.apache.wicket.core.request.handler.PageProvider;
 import org.apache.wicket.core.request.handler.RenderPageRequestHandler;
 import org.apache.wicket.core.request.mapper.MountedMapper;
+import org.apache.wicket.protocol.http.PageExpiredException;
 import org.apache.wicket.request.IRequestHandler;
 import org.apache.wicket.request.component.IRequestablePage;
 import org.apache.wicket.request.mapper.info.PageInfo;
@@ -61,8 +62,14 @@ public class PageParameterAwareMountedMapper extends MountedMapper
   protected IRequestHandler processHybrid(PageInfo pageInfo, Class< ? extends IRequestablePage> pageClass, PageParameters pageParameters,
       Integer renderCount)
   {
-    IRequestHandler handler = super.processHybrid(pageInfo, pageClass, pageParameters, renderCount);
-    if (handler instanceof RenderPageRequestHandler) {
+    IRequestHandler handler = null;
+    try {
+      handler = super.processHybrid(pageInfo, pageClass, pageParameters, renderCount);
+    } catch (PageExpiredException e) {
+      // in case of pageExpiredException at this point, we just redirect to previous bookmarkable resource
+      return processBookmarkable(pageClass, pageParameters);
+    }
+    if (handler != null && handler instanceof RenderPageRequestHandler) {
       // in the current implementation (wicket 1.5.6) super.processHybrid
       // returns a RenderPageRequestHandler
       RenderPageRequestHandler renderPageHandler = (RenderPageRequestHandler) handler;
