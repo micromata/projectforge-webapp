@@ -193,7 +193,7 @@ public class ScriptExecuteForm extends AbstractStandardForm<ScriptDO, ScriptExec
         }
       }
     }
-    parameterFieldsets = new FieldsetPanel[5];
+    parameterFieldsets = new FieldsetPanel[scriptParameters.size()];
     int index = 0;
     boolean focusSet = false;
     fieldSetsPanel = gridBuilder.getPanel();
