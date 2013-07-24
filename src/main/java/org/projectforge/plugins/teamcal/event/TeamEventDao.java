@@ -34,14 +34,17 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.Query;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.projectforge.calendar.CalendarUtils;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.DateHelper;
+import org.projectforge.common.DateHolder;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.DisplayHistoryEntry;
@@ -290,6 +293,33 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
       }
     }
     return result;
+  }
+
+  /**
+   * Get all locations of the user's calendar events (not deleted ones) with modification date within last year.
+   * @param searchString
+   */
+  @SuppressWarnings("unchecked")
+  public List<String> getLocationAutocompletion(final String searchString, final TeamCalDO[] calendars)
+  {
+    if (calendars == null || calendars.length == 0) {
+      return null;
+    }
+    if (StringUtils.isBlank(searchString) == true) {
+      return null;
+    }
+    checkLoggedInUserSelectAccess();
+    final String s = "select distinct location from "
+        + clazz.getSimpleName()
+        + " t where deleted=false and t.calendar in :cals and lastUpdate > :lastUpdate and lower(t.location) like :location) order by t.location";
+    final Query query = getSession().createQuery(s);
+    query.setParameterList("cals", calendars);
+    final DateHolder dh = new DateHolder();
+    dh.add(Calendar.YEAR, -1);
+    query.setDate("lastUpdate", dh.getDate());
+    query.setString("location", "%" + StringUtils.lowerCase(searchString) + "%");
+    final List<String> list = query.list();
+    return list;
   }
 
   private void addEventsToList(final TeamEventFilter teamEventFilter, final List<TeamEventDO> result,
