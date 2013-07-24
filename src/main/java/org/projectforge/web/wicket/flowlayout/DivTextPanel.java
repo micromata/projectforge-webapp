@@ -28,6 +28,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.WicketUtils;
 
 /**
@@ -45,11 +46,15 @@ public class DivTextPanel extends Panel
 
   private final WebMarkupContainer div;
 
+  @SuppressWarnings("unused")
+  private String text;
+
   public DivTextPanel(final String id, final String text, final Behavior... behaviors)
   {
     super(id);
     add(div = new WebMarkupContainer("div"));
-    label = new Label(WICKET_ID, text);
+    this.text = text;
+    label = new Label(WICKET_ID, new PropertyModel<String>(this, "text"));
     init(behaviors);
   }
 
@@ -93,6 +98,17 @@ public class DivTextPanel extends Panel
   public WebMarkupContainer getDiv()
   {
     return div;
+  }
+
+  /**
+   * Sets the label text. Has only an effect if this DivTextPanel was instantiated via {@link #DivTextPanel(String, String, Behavior...)}
+   * @param text the text to set
+   * @return this for chaining.
+   */
+  public DivTextPanel setText(final String text)
+  {
+    this.text = text;
+    return this;
   }
 
   /**
