@@ -382,12 +382,6 @@
       <version>2.1.0</version>
       <scope>compile</scope>
     </dependency>
-    <dependency>
-      <!-- Needed to persist joda time objects via Hibernate, must be upgraded if hibernate is upgraded (Chimney-Plugin). -->
-      <groupId>org.jadira.usertype</groupId>
-      <artifactId>usertype.jodatime</artifactId>
-      <version>1.9</version>
-    </dependency>
     <dependency> <!-- Version check: 16.06.2013 -->
       <groupId>org.jfree</groupId>
       <artifactId>jfreechart</artifactId>
