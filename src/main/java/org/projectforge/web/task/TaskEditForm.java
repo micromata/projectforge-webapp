@@ -40,6 +40,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
 import org.hibernate.Hibernate;
 import org.projectforge.common.StringHelper;
+import org.projectforge.core.Configuration;
 import org.projectforge.core.Priority;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.kost.Kost2DO;
@@ -90,8 +91,16 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
 
   protected MaxLengthTextField kost2BlackWhiteTextField;
 
+  private DropDownChoice<Boolean> kost2listTypeChoice;
+
+  private DropDownChoice<TimesheetBookingStatus> timesheetBookingStatusChoice;
+
   @SuppressWarnings("unused")
   private Integer kost2Id;
+
+  private ProjektDO projekt;
+
+  private DivTextPanel projektKostLabel;
 
   // Components for form validation.
   private final FormComponent< ? >[] dependentFormComponents = new FormComponent[2];
@@ -332,28 +341,23 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
       final GridBuilder innerGridBuilder = extendedSettingsPanel.createGridBuilder();
       innerGridBuilder.newSplitPanel(GridSize.COL50);
 
-      final boolean hasKost2AndTimesheetBookingAccess = ((TaskDao) getBaseDao()).hasAccessForKost2AndTimesheetBookingStatus(
-          PFUserContext.getUser(), data);
-      {
+      if (Configuration.getInstance().isCostConfigured() == true) {
         // Cost 2 settings
         final FieldsetPanel fs = innerGridBuilder.newFieldset(getString("fibu.kost2"));
-        final ProjektDO projekt = taskTree.getProjekt(data.getId());
-        if (projekt != null) {
-          final DivTextPanel projektKostLabel = new DivTextPanel(fs.newChildId(), projekt.getKost() + ".*");
-          WicketUtils.addTooltip(projektKostLabel.getLabel(), new Model<String>() {
-            @Override
-            public String getObject()
-            {
-              final List<Kost2DO> kost2DOs = taskTree.getKost2List(projekt, data, data.getKost2BlackWhiteItems(), data.isKost2IsBlackList());
-              final String[] kost2s = TaskListPage.getKost2s(kost2DOs);
-              if (kost2s == null || kost2s.length == 0) {
-                return " - (-)";
-              }
-              return StringHelper.listToString("\n", kost2s);
-            };
-          });
-          fs.add(projektKostLabel);
-        }
+        this.projektKostLabel = new DivTextPanel(fs.newChildId(), "");
+        WicketUtils.addTooltip(projektKostLabel.getLabel(), new Model<String>() {
+          @Override
+          public String getObject()
+          {
+            final List<Kost2DO> kost2DOs = taskTree.getKost2List(projekt, data, data.getKost2BlackWhiteItems(), data.isKost2IsBlackList());
+            final String[] kost2s = TaskListPage.getKost2s(kost2DOs);
+            if (kost2s == null || kost2s.length == 0) {
+              return " - (-)";
+            }
+            return StringHelper.listToString("\n", kost2s);
+          };
+        });
+        fs.add(projektKostLabel);
         final PropertyModel<String> model = new PropertyModel<String>(data, "kost2BlackWhiteList");
         kost2BlackWhiteTextField = new MaxLengthTextField(InputPanel.WICKET_ID, model);
         WicketUtils.setSize(kost2BlackWhiteTextField, 10);
@@ -361,14 +365,10 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
         final LabelValueChoiceRenderer<Boolean> kost2listTypeChoiceRenderer = new LabelValueChoiceRenderer<Boolean>() //
             .addValue(Boolean.FALSE, getString("task.kost2list.whiteList")) //
             .addValue(Boolean.TRUE, getString("task.kost2list.blackList"));
-        final DropDownChoice<Boolean> kost2listTypeChoice = new DropDownChoice<Boolean>(fs.getDropDownChoiceId(),
-            new PropertyModel<Boolean>(data, "kost2IsBlackList"), kost2listTypeChoiceRenderer.getValues(), kost2listTypeChoiceRenderer);
+        kost2listTypeChoice = new DropDownChoice<Boolean>(fs.getDropDownChoiceId(), new PropertyModel<Boolean>(data, "kost2IsBlackList"),
+            kost2listTypeChoiceRenderer.getValues(), kost2listTypeChoiceRenderer);
         kost2listTypeChoice.setNullValid(false);
         fs.add(kost2listTypeChoice);
-        if (hasKost2AndTimesheetBookingAccess == false) {
-          kost2listTypeChoice.setEnabled(false);
-          kost2BlackWhiteTextField.setEnabled(false);
-        }
         final Kost2SelectPanel kost2SelectPanel = new Kost2SelectPanel(fs.newChildId(), new PropertyModel<Kost2DO>(this, "kost2Id"),
             parentPage, "kost2Id") {
           @Override
@@ -389,14 +389,11 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
         final FieldsetPanel fs = innerGridBuilder.newFieldset(getString("task.timesheetBooking"));
         final LabelValueChoiceRenderer<TimesheetBookingStatus> timesheetBookingStatusChoiceRenderer = new LabelValueChoiceRenderer<TimesheetBookingStatus>(
             fs, TimesheetBookingStatus.values());
-        final DropDownChoice<TimesheetBookingStatus> timesheetBookingStatusChoice = new DropDownChoice<TimesheetBookingStatus>(
-            fs.getDropDownChoiceId(), new PropertyModel<TimesheetBookingStatus>(data, "timesheetBookingStatus"),
-            timesheetBookingStatusChoiceRenderer.getValues(), timesheetBookingStatusChoiceRenderer);
+        timesheetBookingStatusChoice = new DropDownChoice<TimesheetBookingStatus>(fs.getDropDownChoiceId(),
+            new PropertyModel<TimesheetBookingStatus>(data, "timesheetBookingStatus"), timesheetBookingStatusChoiceRenderer.getValues(),
+            timesheetBookingStatusChoiceRenderer);
         timesheetBookingStatusChoice.setNullValid(false);
         fs.add(timesheetBookingStatusChoice);
-        if (hasKost2AndTimesheetBookingAccess == false) {
-          timesheetBookingStatusChoice.setEnabled(false);
-        }
       }
       innerGridBuilder.newSplitPanel(GridSize.COL50);
       {
@@ -426,6 +423,34 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
       fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, model), true);
       fs.addJIRAField(model);
     }
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractEditForm#onBeforeRender()
+   */
+  @Override
+  public void onBeforeRender()
+  {
+    super.onBeforeRender();
+    final TaskDO task = isNew() == true ? data.getParentTask() : data;
+    final boolean hasKost2AndTimesheetBookingAccess = ((TaskDao) getBaseDao()).hasAccessForKost2AndTimesheetBookingStatus(
+        PFUserContext.getUser(), task);
+    if (Configuration.getInstance().isCostConfigured() == true) {
+      // Cost 2 settings
+      final ProjektDO projekt = taskTree.getProjekt(task.getId());
+      if (this.projekt == projekt) {
+        return;
+      }
+      this.projekt = projekt;
+      if (projekt != null) {
+        this.projektKostLabel.setText(projekt.getKost() + ".*");
+      } else {
+        this.projektKostLabel.setText("");
+      }
+      kost2listTypeChoice.setEnabled(hasKost2AndTimesheetBookingAccess);
+      kost2BlackWhiteTextField.setEnabled(hasKost2AndTimesheetBookingAccess);
+    }
+    timesheetBookingStatusChoice.setEnabled(hasKost2AndTimesheetBookingAccess);
   }
 
   @Override
