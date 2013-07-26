@@ -435,7 +435,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
     final TaskDO task = isNew() == true ? data.getParentTask() : data;
     final boolean hasKost2AndTimesheetBookingAccess = ((TaskDao) getBaseDao()).hasAccessForKost2AndTimesheetBookingStatus(
         PFUserContext.getUser(), task);
-    if (Configuration.getInstance().isCostConfigured() == true) {
+    if (Configuration.getInstance().isCostConfigured() == true && task != null) {
       // Cost 2 settings
       final ProjektDO projekt = taskTree.getProjekt(task.getId());
       if (this.projekt == projekt) {
