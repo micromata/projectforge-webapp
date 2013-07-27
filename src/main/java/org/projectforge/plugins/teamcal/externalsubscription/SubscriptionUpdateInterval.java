@@ -20,6 +20,7 @@
 // with this program; if not, see http://www.gnu.org/licenses/.
 //
 /////////////////////////////////////////////////////////////////////////////
+
 package org.projectforge.plugins.teamcal.externalsubscription;
 
 import java.util.ArrayList;
