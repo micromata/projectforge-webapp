@@ -271,14 +271,25 @@ public class TimesheetDO extends DefaultBaseDO implements Comparable<TimesheetDO
   }
 
   /**
+   * @param stopTime
+   * @return this for chaining.
+   * @see #setStopDate(Date)
+   */
+  public TimesheetDO setStopTime(final Timestamp stopTime) {
+    return setStopDate(stopTime);
+  }
+
+  /**
    * Rounds the timestamp to DatePrecision.MINUTE_15 before.
-   * @param stopTime the stopTime to set
+   * @param stopDate the stopTime to set
+   * @return this for chaining.
    * @see DateHolder#DateHolder(java.util.Calendar, DatePrecision)
    */
-  public TimesheetDO setStopTime(final Timestamp stopTime)
+  @Transient
+  public TimesheetDO setStopDate(final Date stopDate)
   {
-    if (stopTime != null) {
-      final DateHolder date = new DateHolder(stopTime, DatePrecision.MINUTE_15);
+    if (stopDate != null) {
+      final DateHolder date = new DateHolder(stopDate, DatePrecision.MINUTE_15);
       this.stopTime = date.getTimestamp();
     } else {
       this.stopTime = null;
