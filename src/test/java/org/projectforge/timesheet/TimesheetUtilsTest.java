@@ -65,17 +65,14 @@ public class TimesheetUtilsTest
     add(list, user1, "2013-07-24 23:00", "2013-07-25 06:00");
     add(list, user1, "2013-07-25 23:00", "2013-07-26 06:00");
 
-    assertTimestamp("2013-07-20 12:15", TimesheetUtils.getBegin(list, parseDate("2013-07-20"), user1.getId()));
-    assertTimestamp("2013-07-20 13:00", TimesheetUtils.getEnd(list, parseDate("2013-07-20"), user1.getId()));
-    assertTimestamp("2013-07-20 08:00", TimesheetUtils.getBegin(list, parseDate("2013-07-20"), user2.getId()));
-    assertTimestamp("2013-07-20 19:00", TimesheetUtils.getEnd(list, parseDate("2013-07-20"), user2.getId()));
+    assertStats("2013-07-20 12:15", "2013-07-20 13:00", 45, 0, TimesheetUtils.getStats(list, parseDate("2013-07-20"), user1.getId()));
+    assertStats("2013-07-20 08:00", "2013-07-20 19:00", 9*60, 120, TimesheetUtils.getStats(list, parseDate("2013-07-20"), user2.getId()));
 
-    assertTimestamp("2013-07-22 00:00", TimesheetUtils.getBegin(list, parseDate("2013-07-22"), user1.getId()));
-    assertTimestamp("2013-07-22 13:00", TimesheetUtils.getEnd(list, parseDate("2013-07-22"), user1.getId()));
+    assertStats("2013-07-22 00:00", "2013-07-22 13:00", 7*60, 6*60, TimesheetUtils.getStats(list, parseDate("2013-07-22"), user1.getId()));
 
-    assertTimestamp("2013-07-25 00:00", TimesheetUtils.getBegin(list, parseDate("2013-07-25"), user1.getId()));
-    assertEndTimestamp("2013-07-25 23:59", TimesheetUtils.getEnd(list, parseDate("2013-07-25"), user1.getId()));
-    Assert.assertNull(TimesheetUtils.getBegin(list, parseDate("2013-07-19"), user1.getId()));
+    assertStats("2013-07-25 00:00", "2013-07-26 00:00", 8*60, 16*60, TimesheetUtils.getStats(list, parseDate("2013-07-25"), user1.getId()));
+
+    Assert.assertNull(TimesheetUtils.getStats(list, parseDate("2013-07-19"), user1.getId()).getEarliestStartDate());
   }
 
   private void add(final List<TimesheetDO> list, final PFUserDO user, final String start, final String stop)
@@ -86,16 +83,20 @@ public class TimesheetUtilsTest
     list.add(ts);
   }
 
-  private void assertTimestamp(final String expected, final Date date)
+  private void assertStats(final String expectedEarliestStartDate, final String expectedEarliestStopDate, final long expectedTotalMinutes,
+      final long expectedBreakMinutes, final TimesheetStats stats)
   {
-    Assert.assertNotNull(date);
-    Assert.assertEquals(expected + ":00.000", DateHelper.formatIsoTimestamp(date, timeZone));
+    assertTimestamp("earliest start date", expectedEarliestStartDate, stats.getEarliestStartDate());
+    assertTimestamp("latest stop date", expectedEarliestStopDate, stats.getLatestStopDate());
+    Assert.assertEquals("total millis", expectedTotalMinutes, stats.getTotalMillis() / 60000);
+    Assert.assertEquals("total break millis", expectedBreakMinutes, stats.getTotalBreakMillis() / 60000);
   }
 
-  private void assertEndTimestamp(final String expected, final Date date)
+  private void assertTimestamp(final String title, final String expected, final Date date)
   {
     Assert.assertNotNull(date);
-    Assert.assertEquals(expected + ":59.999", DateHelper.formatIsoTimestamp(date, timeZone));
+    final String suffix = ":00.000"; //expected.endsWith(":59") == true ? ":59.999" : ":00.000";
+    Assert.assertEquals(title, expected + suffix, DateHelper.formatIsoTimestamp(date, timeZone));
   }
 
   private Date parseTimestamp(final String dateString)

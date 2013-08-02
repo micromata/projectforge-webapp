@@ -23,7 +23,7 @@
 
 package org.projectforge.timesheet;
 
-import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 
@@ -43,7 +43,7 @@ public class TimesheetUtils
    * @return The start time of the earliest time-sheet for the given user for the given date of the given list of time sheets. Returns null
    *         if no such time sheet is given.
    */
-  public static Timestamp getBegin(final Collection<TimesheetDO> timesheets, final Date date, final Integer userId)
+  public static Date getBegin(final Collection<TimesheetDO> timesheets, final Date date, final Integer userId)
   {
     return getBeginEnd(timesheets, date, userId, true);
   }
@@ -55,7 +55,7 @@ public class TimesheetUtils
    * @return The stop time of the latest time-sheet for the given user for the given date of the given list of time sheets. Returns null if
    *         no such time sheet is given.
    */
-  public static Timestamp getEnd(final Collection<TimesheetDO> timesheets, final Date date, final Integer userId)
+  public static Date getEnd(final Collection<TimesheetDO> timesheets, final Date date, final Integer userId)
   {
     return getBeginEnd(timesheets, date, userId, false);
   }
@@ -68,37 +68,39 @@ public class TimesheetUtils
    * @see #getBegin(Collection, Date, Integer)
    * @see #getEnd(Collection, Date, Integer)
    */
-  public static Timestamp getBeginEnd(final Collection<TimesheetDO> timesheets, final Date date, final Integer userId, final boolean begin)
+  public static Date getBeginEnd(final Collection<TimesheetDO> timesheets, final Date date, final Integer userId, final boolean begin)
+  {
+    final TimesheetStats stats = getStats(timesheets, date, userId);
+    if (stats == null) {
+      return null;
+    }
+    if (begin == true) {
+      return stats.getEarliestStartDate();
+    } else {
+      return stats.getLatestStopDate();
+    }
+  }
+
+  public static TimesheetStats getStats(final Collection<TimesheetDO> timesheets, final Date day, final Integer userId)
+  {
+    final DateHolder dh = new DateHolder(day).setBeginOfDay();
+    final Date startDate = dh.getDate();
+    final Date stopDate = dh.add(Calendar.DAY_OF_MONTH, 1).getDate();
+    return calculateStats(timesheets, startDate, stopDate, userId);
+  }
+
+  public static TimesheetStats calculateStats(final Collection<TimesheetDO> timesheets, final Date from, final Date to, final Integer userId)
   {
     if (timesheets == null || timesheets.size() == 0) {
       return null;
     }
-    Timestamp result = null;
-    final DateHolder dh = new DateHolder(date);
+    final TimesheetStats stats = new TimesheetStats(from, to);
     for (final TimesheetDO timesheet : timesheets) {
-      final Timestamp startDate = timesheet.getStartTime();
-      final Timestamp stopDate = timesheet.getStopTime();
-      if (timesheet.getStartTime() == null || stopDate == null || userId != timesheet.getUserId()) {
+      if (userId != timesheet.getUserId()) {
         continue;
       }
-      if (begin == true) {
-        if (dh.isSameDay(startDate) == true) {
-          if (result == null || result.after(startDate) == true) {
-            result = startDate;
-          }
-        } else if (dh.isSameDay(stopDate) == true) {
-          return dh.setBeginOfDay().getTimestamp();
-        }
-      } else {
-        if (dh.isSameDay(stopDate) == true) {
-          if (result == null || result.before(stopDate) == true) {
-            result = stopDate;
-          }
-        } else if (dh.isSameDay(startDate) == true) {
-          return dh.setEndOfDay().getTimestamp();
-        }
-      }
+      stats.add(timesheet);
     }
-    return result;
+    return stats;
   }
 }
