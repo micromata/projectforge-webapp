@@ -57,11 +57,11 @@ public class GroovyEngine
 
   private TimeZone timeZone;
 
-  private boolean htmlFormat = true;
+  private final boolean htmlFormat = true;
 
-  private GroovyExecutor groovyExecutor;
+  private final GroovyExecutor groovyExecutor;
 
-  private Map<String, Object> variables;
+  private final Map<String, Object> variables;
 
   public GroovyEngine(final Locale locale, final TimeZone timeZone)
   {
@@ -126,7 +126,7 @@ public class GroovyEngine
    */
   public String executeTemplate(final String template)
   {
-    final String content = replaceIncludes(template).replaceAll("#HURZ#", "\\$");
+    final String content = replaceIncludes(template).replaceAll("#HURZ1#", "\\\\").replaceAll("#HURZ2#", "\\$"); // see replaceIncludes
     return groovyExecutor.executeTemplate(content, variables);
   }
 
@@ -135,7 +135,7 @@ public class GroovyEngine
     if (template == null) {
       return null;
     }
-    final Pattern p = Pattern.compile("#INCLUDE\\{([0-9\\.a-zA-Z/]*)\\}", Pattern.MULTILINE);
+    final Pattern p = Pattern.compile("#INCLUDE\\{([0-9\\-\\.a-zA-Z/]*)\\}", Pattern.MULTILINE);
     final StringBuffer buf = new StringBuffer();
     final Matcher m = p.matcher(template);
     while (m.find()) {
@@ -144,8 +144,8 @@ public class GroovyEngine
         final Object[] res = ConfigXml.getInstance().getContent(filename);
         String content = (String) res[0];
         if (content != null) {
-          content = replaceIncludes(content).replaceAll("\\$", "#HURZ#");
-          m.appendReplacement(buf, content); // Doesn't work with $ in content
+          content = replaceIncludes(content).replaceAll("\\\\", "#HURZ1#").replaceAll("\\$", "#HURZ2#");
+          m.appendReplacement(buf, content); // Doesn't work with '$' or '\' in content
         } else {
           m.appendReplacement(buf, "*** " + filename + " not found! ***");
         }
@@ -178,7 +178,7 @@ public class GroovyEngine
    * @param params
    * @see I18nHelper#getLocalizedMessage(Locale, String, Object...)
    */
-  public String getMessage(String messageKey, Object... params)
+  public String getMessage(final String messageKey, final Object... params)
   {
     return I18nHelper.getLocalizedMessage(locale, messageKey, params);
   }
