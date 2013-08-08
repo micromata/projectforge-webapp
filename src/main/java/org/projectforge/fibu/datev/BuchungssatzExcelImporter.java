@@ -170,7 +170,7 @@ public class BuchungssatzExcelImporter
       if (year == 0) {
         year = date.getYear();
       } else if (year != date.getYear()) {
-        final String msg = "Not supported: Buchungssätze innerhalb eines Excel-Sheets liegen in verschiedenen Jahren.";
+        final String msg = "Not supported: Buchungssätze innerhalb eines Excel-Sheets liegen in verschiedenen Jahren: Im Blatt '" + sheet.getSheetName() + "', in Zeile " + (i + 2);
         actionLog.logError(msg);
         throw new UserException(msg);
       }
