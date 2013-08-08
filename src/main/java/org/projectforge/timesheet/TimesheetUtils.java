@@ -37,59 +37,30 @@ import org.projectforge.common.DateHolder;
 public class TimesheetUtils
 {
   /**
+   * Analyzes the given time-sheets. The time-sheets will be filtered (by given day and given user).
    * @param timesheets
-   * @param date
+   * @param day
    * @param userId
-   * @return The start time of the earliest time-sheet for the given user for the given date of the given list of time sheets. Returns null
-   *         if no such time sheet is given.
+   * @return
    */
-  public static Date getBegin(final Collection<TimesheetDO> timesheets, final Date date, final Integer userId)
-  {
-    return getBeginEnd(timesheets, date, userId, true);
-  }
-
-  /**
-   * @param timesheets
-   * @param date
-   * @param userId
-   * @return The stop time of the latest time-sheet for the given user for the given date of the given list of time sheets. Returns null if
-   *         no such time sheet is given.
-   */
-  public static Date getEnd(final Collection<TimesheetDO> timesheets, final Date date, final Integer userId)
-  {
-    return getBeginEnd(timesheets, date, userId, false);
-  }
-
-  /**
-   * @param timesheets
-   * @param date
-   * @param userId
-   * @param begin If true then the start time of the earliest time-sheet is returned otherwise the latest stop-time.
-   * @see #getBegin(Collection, Date, Integer)
-   * @see #getEnd(Collection, Date, Integer)
-   */
-  public static Date getBeginEnd(final Collection<TimesheetDO> timesheets, final Date date, final Integer userId, final boolean begin)
-  {
-    final TimesheetStats stats = getStats(timesheets, date, userId);
-    if (stats == null) {
-      return null;
-    }
-    if (begin == true) {
-      return stats.getEarliestStartDate();
-    } else {
-      return stats.getLatestStopDate();
-    }
-  }
-
   public static TimesheetStats getStats(final Collection<TimesheetDO> timesheets, final Date day, final Integer userId)
   {
     final DateHolder dh = new DateHolder(day).setBeginOfDay();
     final Date startDate = dh.getDate();
     final Date stopDate = dh.add(Calendar.DAY_OF_MONTH, 1).getDate();
-    return calculateStats(timesheets, startDate, stopDate, userId);
+    return getStats(timesheets, startDate, stopDate, userId);
   }
 
-  public static TimesheetStats calculateStats(final Collection<TimesheetDO> timesheets, final Date from, final Date to, final Integer userId)
+
+  /**
+   * Analyzes the given time-sheets. The time-sheets will be filtered (by given time period and given user).
+   * @param timesheets
+   * @param from
+   * @param to
+   * @param userId
+   * @return
+   */
+  public static TimesheetStats getStats(final Collection<TimesheetDO> timesheets, final Date from, final Date to, final Integer userId)
   {
     if (timesheets == null || timesheets.size() == 0) {
       return null;
