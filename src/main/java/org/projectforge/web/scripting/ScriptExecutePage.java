@@ -24,15 +24,12 @@
 package org.projectforge.web.scripting;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.Date;
 
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.jfree.chart.ChartUtilities;
-import org.jfree.chart.JFreeChart;
 import org.projectforge.calendar.TimePeriod;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
@@ -40,7 +37,7 @@ import org.projectforge.common.NumberHelper;
 import org.projectforge.core.UserException;
 import org.projectforge.excel.ExportWorkbook;
 import org.projectforge.export.ExportJFreeChart;
-import org.projectforge.export.JFreeChartImageType;
+import org.projectforge.export.ExportZipArchive;
 import org.projectforge.scripting.GroovyResult;
 import org.projectforge.scripting.ScriptDO;
 import org.projectforge.scripting.ScriptDao;
@@ -183,6 +180,8 @@ public class ScriptExecutePage extends AbstractStandardFormPage implements ISele
         exportExcel((ExportWorkbook) obj);
       } else if (obj instanceof ExportJFreeChart == true) {
         exportJFreeChart((ExportJFreeChart) obj);
+      } else if (obj instanceof ExportZipArchive == true) {
+        exportZipArchive((ExportZipArchive) obj);
       }
     }
   }
@@ -207,26 +206,30 @@ public class ScriptExecutePage extends AbstractStandardFormPage implements ISele
 
   private void exportJFreeChart(final ExportJFreeChart exportJFreeChart)
   {
-    final JFreeChart chart = exportJFreeChart.getJFreeChart();
-    final int width = exportJFreeChart.getWidth();
-    final int height = exportJFreeChart.getHeight();
-    final StringBuffer buf = new StringBuffer();
-    buf.append("pf_chart_");
-    buf.append(DateHelper.getTimestampAsFilenameSuffix(new Date()));
+    final StringBuilder sb = new StringBuilder();
+    sb.append("pf_chart_");
+    sb.append(DateHelper.getTimestampAsFilenameSuffix(new Date()));
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
-    try {
-      if (exportJFreeChart.getImageType() == JFreeChartImageType.PNG) {
-        ChartUtilities.writeChartAsPNG(out, chart, width, height);
-        buf.append(".png");
-      } else {
-        ChartUtilities.writeChartAsJPEG(out, chart, width, height);
-        buf.append(".jpg");
-      }
-    } catch (final IOException ex) {
-      log.fatal("Exception encountered " + ex, ex);
-    }
-    DownloadUtils.setDownloadTarget(out.toByteArray(), buf.toString());
+    final String extension = exportJFreeChart.write(out);
+    sb.append('.').append(extension);
+    DownloadUtils.setDownloadTarget(out.toByteArray(), sb.toString());
   }
+
+  private void exportZipArchive(final ExportZipArchive exportZipArchive)
+  {
+    try {
+      final StringBuilder sb = new StringBuilder();
+      sb.append(exportZipArchive.getFilename()).append("_");
+      sb.append(DateHelper.getTimestampAsFilenameSuffix(new Date())).append(".zip");
+      final String filename = sb.toString();
+      DownloadUtils.setDownloadTarget(filename, exportZipArchive.createResourceStreamWriter());
+    } catch (final Exception ex) {
+      error(getLocalizedMessage("error", ex.getMessage()));
+      log.error(ex.getMessage(), ex);
+    }
+  }
+
+
 
   protected void storeRecentScriptCalls()
   {

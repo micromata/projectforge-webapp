@@ -29,6 +29,7 @@ import org.apache.wicket.request.Response;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.handler.resource.ResourceStreamRequestHandler;
 import org.apache.wicket.request.resource.ContentDisposition;
+import org.apache.wicket.util.resource.IResourceStream;
 import org.projectforge.common.MimeType;
 
 public class DownloadUtils
@@ -67,7 +68,7 @@ public class DownloadUtils
    */
   public static void setDownloadTarget(final byte[] content, final String filename, final MimeType mimeType)
   {
-    setDownloadTarget(content, filename, mimeType != null ? mimeType.getMimeTypeString() : (String)null);
+    setDownloadTarget(content, filename, mimeType != null ? mimeType.getMimeTypeString() : (String) null);
   }
 
   /**
@@ -87,6 +88,14 @@ public class DownloadUtils
     handler.setFileName(filename).setContentDisposition(ContentDisposition.ATTACHMENT);
     RequestCycle.get().scheduleRequestHandlerAfterCurrent(handler);
     log.info("Starting download for file. filename:" + filename + ", content-type:" + byteArrayResourceStream.getContentType());
+  }
+
+  public static void setDownloadTarget(final String filename, final IResourceStream resourceStream)
+  {
+    final ResourceStreamRequestHandler handler = new ResourceStreamRequestHandler(resourceStream);
+    handler.setFileName(filename).setContentDisposition(ContentDisposition.ATTACHMENT);
+    RequestCycle.get().scheduleRequestHandlerAfterCurrent(handler);
+    log.info("Starting download for file. filename:" + filename + ", content-type:" + resourceStream.getContentType());
   }
 
   /**

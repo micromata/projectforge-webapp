@@ -23,16 +23,22 @@
 
 package org.projectforge.export;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
+import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 
 public class ExportJFreeChart
 {
-  private JFreeChart jFreeChart;
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ExportJFreeChart.class);
 
-  private int width;
+  private final JFreeChart jFreeChart;
 
-  private int height;
-  
+  private final int width;
+
+  private final int height;
+
   private JFreeChartImageType imageType = JFreeChartImageType.JPEG;
 
   public ExportJFreeChart(final JFreeChart jFreeChart, final int width, final int height)
@@ -41,28 +47,52 @@ public class ExportJFreeChart
     this.width = width;
     this.height = height;
   }
-  
+
+  /**
+   * @param out
+   * @return extension png or jpg for usage as file name extension.
+   */
+  public String write(final OutputStream out)
+  {
+    final JFreeChart chart = getJFreeChart();
+    final int width = getWidth();
+    final int height = getHeight();
+    String extension = null;
+    try {
+      if (getImageType() == JFreeChartImageType.PNG) {
+        extension = "png";
+        ChartUtilities.writeChartAsPNG(out, chart, width, height);
+      } else {
+        extension = "jpg";
+        ChartUtilities.writeChartAsJPEG(out, chart, width, height);
+      }
+    } catch (final IOException ex) {
+      log.error("Exception encountered " + ex, ex);
+    }
+    return extension;
+  }
+
   public JFreeChart getJFreeChart()
   {
     return jFreeChart;
   }
-  
+
   public int getWidth()
   {
     return width;
   }
-  
+
   public int getHeight()
   {
     return height;
   }
-  
+
   public JFreeChartImageType getImageType()
   {
     return imageType;
   }
-  
-  public ExportJFreeChart setImageType(JFreeChartImageType imageType)
+
+  public ExportJFreeChart setImageType(final JFreeChartImageType imageType)
   {
     this.imageType = imageType;
     return this;

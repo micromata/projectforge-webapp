@@ -40,14 +40,12 @@ import org.apache.wicket.request.Response;
 import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.jfree.chart.ChartUtilities;
-import org.jfree.chart.JFreeChart;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.FileHelper;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.excel.ExportWorkbook;
 import org.projectforge.export.ExportJFreeChart;
-import org.projectforge.export.JFreeChartImageType;
+import org.projectforge.export.ExportZipArchive;
 import org.projectforge.fibu.kost.reporting.ReportGeneratorList;
 import org.projectforge.fibu.kost.reporting.ReportStorage;
 import org.projectforge.scripting.GroovyExecutor;
@@ -158,7 +156,9 @@ public class ScriptingPage extends AbstractStandardFormPage
           excelExport();
         } else if (groovyResult.getResult() instanceof ReportGeneratorList == true) {
           reportGeneratorList = (ReportGeneratorList) groovyResult.getResult();
-          //jasperReport(reportGeneratorList);
+          // jasperReport(reportGeneratorList);
+        } else if (result instanceof ExportZipArchive) {
+          zipExport();
         } else if (result instanceof ExportJFreeChart) {
           jFreeChartExport();
         }
@@ -278,29 +278,40 @@ public class ScriptingPage extends AbstractStandardFormPage
   {
     try {
       final ExportJFreeChart exportJFreeChart = (ExportJFreeChart) groovyResult.getResult();
-      final JFreeChart chart = exportJFreeChart.getJFreeChart();
+      final StringBuilder sb = new StringBuilder();
+      sb.append("pf_chart_");
+      sb.append(DateHelper.getTimestampAsFilenameSuffix(new Date()));
+      final Response response = getResponse();
+      final String extension = exportJFreeChart.write(response.getOutputStream());
+      sb.append('.').append(extension);
+      final String filename = sb.toString();
       final int width = exportJFreeChart.getWidth();
       final int height = exportJFreeChart.getHeight();
-      final StringBuffer buf = new StringBuffer();
-      buf.append("pf_chart_");
-      buf.append(DateHelper.getTimestampAsFilenameSuffix(new Date()));
-      final Response response = getResponse();
-      if (exportJFreeChart.getImageType() == JFreeChartImageType.PNG) {
-        ChartUtilities.writeChartAsPNG(response.getOutputStream(), chart, width, height);
-        buf.append(".png");
-      } else {
-        ChartUtilities.writeChartAsJPEG(response.getOutputStream(), chart, width, height);
-        buf.append(".jpg");
-      }
-      final String filename = buf.toString();
-      final JFreeChartImage image = new JFreeChartImage("image", chart, exportJFreeChart.getImageType(), width, height);
+      final JFreeChartImage image = new JFreeChartImage("image", exportJFreeChart.getJFreeChart(), exportJFreeChart.getImageType(), width,
+          height);
       image.add(AttributeModifier.replace("width", String.valueOf(width)));
       image.add(AttributeModifier.replace("height", String.valueOf(height)));
       imageResultContainer.removeAll();
       imageResultContainer.add(image).setVisible(true);
       ((WebResponse) response).setAttachmentHeader(filename);
       ((WebResponse) response).setContentType(DownloadUtils.getContentType(filename));
+      log.info("Starting download for file. filename:" + filename + ", content-type:" + DownloadUtils.getContentType(filename));
       response.getOutputStream().flush();
+    } catch (final Exception ex) {
+      error(getLocalizedMessage("error", ex.getMessage()));
+      log.error(ex.getMessage(), ex);
+    }
+  }
+
+  private void zipExport()
+  {
+    try {
+      final ExportZipArchive exportZipArchive = (ExportZipArchive) groovyResult.getResult();
+      final StringBuilder sb = new StringBuilder();
+      sb.append(exportZipArchive.getFilename()).append("_");
+      sb.append(DateHelper.getTimestampAsFilenameSuffix(new Date())).append(".zip");
+      final String filename = sb.toString();
+      DownloadUtils.setDownloadTarget(filename, exportZipArchive.createResourceStreamWriter());
     } catch (final Exception ex) {
       error(getLocalizedMessage("error", ex.getMessage()));
       log.error(ex.getMessage(), ex);
