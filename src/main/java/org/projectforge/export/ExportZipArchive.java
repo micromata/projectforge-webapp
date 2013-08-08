@@ -117,6 +117,12 @@ public class ExportZipArchive
     return this;
   }
 
+  public ExportZipArchive add(final ExportWorkbook exportWorkbook)
+  {
+    zipFiles.add(new ExportZipFile(exportWorkbook.getFilename(), exportWorkbook));
+    return this;
+  }
+
   public ExportZipArchive add(final String filename, final ExportJFreeChart exportJFreeChart)
   {
     zipFiles.add(new ExportZipFile(filename, exportJFreeChart));
