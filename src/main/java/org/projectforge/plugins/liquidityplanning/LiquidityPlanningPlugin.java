@@ -72,6 +72,8 @@ public class LiquidityPlanningPlugin extends AbstractPlugin
     // Insert at first position before accounting-record entry (for SearchPage).
     registerWeb(ID, LiquidityEntryListPage.class, LiquidityEntryEditPage.class, DaoRegistry.ACCOUNTING_RECORD, true);
 
+    addMountPage("liquidityForecast", LiquidityForecastPage.class);
+
     // Register the menu entry as sub menu entry of the reporting menu:
     final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.REPORTING);
     registerMenuItem(new MenuItemDef(parentMenu, ID, 10, "plugins.liquidityplanning.menu", LiquidityEntryListPage.class,
