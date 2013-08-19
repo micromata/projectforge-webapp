@@ -389,6 +389,9 @@ public class TaskDao extends BaseDao<TaskDO>
     if (accessChecker.isUserMemberOfGroup(user, ProjectForgeGroup.FINANCE_GROUP) == true) {
       return true;
     }
+    if (obj == null) {
+      return false;
+    }
     final Integer taskId = obj.getId() != null ? obj.getId() : obj.getParentTaskId();
     final ProjektDO projekt = taskTree.getProjekt(taskId);
     // Parent task because id of current task is null and project can't be found.
