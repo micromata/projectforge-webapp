@@ -63,7 +63,12 @@ public class LiquidityForecast implements Serializable
   /**
    * Used for calculating the expected date of payment for future invoices.
    */
-  private final Map<String, IntAggregatedValues> aggregatedValuesMap = new HashMap<String, IntAggregatedValues>();
+  private final Map<String, IntAggregatedValues> aggregatedDebitorInvoicesValuesMap = new HashMap<String, IntAggregatedValues>();
+
+  /**
+   * Used for calculating the expected date of payment for future invoices.
+   */
+  private final Map<String, IntAggregatedValues> aggregatedCreditorInvoicesValuesMap = new HashMap<String, IntAggregatedValues>();
 
   private Collection<LiquidityEntry> creditorInvoices;
 
@@ -159,25 +164,25 @@ public class LiquidityForecast implements Serializable
       // Store values for different groups:
       final Integer projectId = invoice.getProjektId();
       if (projectId != null) {
-        ensureAndAddPaymentValue("project#" + projectId, timeForPayment, amount);
+        ensureAndAddDebitorPaymentValue("project#" + projectId, timeForPayment, amount);
       }
       final Integer customerId = invoice.getKundeId();
       if (customerId != null) {
-        ensureAndAddPaymentValue("customer#" + customerId, timeForPayment, amount);
+        ensureAndAddDebitorPaymentValue("customer#" + customerId, timeForPayment, amount);
       }
       final KontoDO account = accountCache.getKonto(invoice);
       final Integer accountId = account != null ? account.getId() : null;
       if (accountId != null) {
-        ensureAndAddPaymentValue("account#" + accountId, timeForPayment, amount);
+        ensureAndAddDebitorPaymentValue("account#" + accountId, timeForPayment, amount);
       }
       String customerText = invoice.getKundeText();
       if (customerText != null) {
         customerText = customerText.toLowerCase();
-        ensureAndAddPaymentValue("customer:" + customerText, timeForPayment, amount);
+        ensureAndAddDebitorPaymentValue("customer:" + customerText, timeForPayment, amount);
         if (customerText.length() > 5) {
           customerText = customerText.substring(0, 5);
         }
-        ensureAndAddPaymentValue("shortCustomer:" + customerText, timeForPayment, amount);
+        ensureAndAddDebitorPaymentValue("shortCustomer:" + customerText, timeForPayment, amount);
       }
     }
     return this;
@@ -225,7 +230,7 @@ public class LiquidityForecast implements Serializable
 
   private boolean setExpectedDateOfPayment(final LiquidityEntry entry, final Date dateOfInvoice, final String mapKey, final String area)
   {
-    final IntAggregatedValues values = aggregatedValuesMap.get(mapKey);
+    final IntAggregatedValues values = aggregatedDebitorInvoicesValuesMap.get(mapKey);
     if (values != null && values.getNumberOfValues() >= 1) {
       entry.setExpectedDateOfPayment(getDate(dateOfInvoice, values.getWeightedAverage()));
       entry.setComment(mapKey + ": " + area + ": " + values.getWeightedAverage() + " days (" + values.getNumberOfValues() + " paid invoices)");
@@ -235,21 +240,106 @@ public class LiquidityForecast implements Serializable
     }
   }
 
+  private void ensureAndAddDebitorPaymentValue(final String mapId, final int timeForPayment, final int amount)
+  {
+    IntAggregatedValues values = aggregatedDebitorInvoicesValuesMap.get(mapId);
+    if (values == null) {
+      values = new IntAggregatedValues();
+      aggregatedDebitorInvoicesValuesMap.put(mapId, values);
+    }
+    values.add(timeForPayment, amount);
+  }
+
+  /**
+   * For calculating the expected date of payment of future invoices. <br/>
+   * Should be called before {@link #setInvoices(Collection)}!
+   * @param list
+   */
+  public LiquidityForecast calculateExpectedTimeOfCreditorPayments(final Collection<EingangsrechnungDO> list)
+  {
+    if (list == null) {
+      return this;
+    }
+    for (final EingangsrechnungDO invoice : list) {
+      final DayHolder date = new DayHolder(invoice.getDatum());
+      final DayHolder dateOfPayment = new DayHolder(invoice.getBezahlDatum());
+      if (date == null || dateOfPayment == null) {
+        continue;
+      }
+      final int timeForPayment = date.daysBetween(dateOfPayment);
+      final int amount = invoice.getGrossSum().intValue();
+      final KontoDO account = invoice.getKonto();
+      final Integer accountId = account != null ? account.getId() : null;
+      if (accountId != null) {
+        ensureAndAddCreditorPaymentValue("account#" + accountId, timeForPayment, amount);
+      }
+      String creditorText = invoice.getKreditor();
+      if (creditorText != null) {
+        creditorText = creditorText.toLowerCase();
+        ensureAndAddCreditorPaymentValue("creditor:" + creditorText, timeForPayment, amount);
+        if (creditorText.length() > 5) {
+          creditorText = creditorText.substring(0, 5);
+        }
+        ensureAndAddCreditorPaymentValue("shortCreditor:" + creditorText, timeForPayment, amount);
+      }
+    }
+    return this;
+  }
+
+  private void setExpectedTimeOfPayment(final LiquidityEntry entry, final EingangsrechnungDO invoice)
+  {
+    Date dateOfInvoice = invoice.getDatum();
+    if (dateOfInvoice == null) {
+      dateOfInvoice = new DayHolder().getSQLDate();
+    }
+    final KontoDO account = invoice.getKonto();
+    if (account != null
+        && setExpectedDateOfCreditorPayment(entry, dateOfInvoice, "account#" + account.getId(),
+            "" + account.getNummer() + " - " + account.getBezeichnung()) == true) {
+      return;
+    }
+    String creditorText = invoice.getKreditor();
+    if (creditorText != null) {
+      creditorText = creditorText.toLowerCase();
+      if (setExpectedDateOfCreditorPayment(entry, dateOfInvoice, "creditor:" + creditorText, creditorText) == true) {
+        return;
+      }
+      if (creditorText.length() > 5) {
+        creditorText = creditorText.substring(0, 5);
+      }
+      if (setExpectedDateOfCreditorPayment(entry, dateOfInvoice, "shortCreditor:" + creditorText, creditorText) == true) {
+        return;
+      }
+    }
+  }
+
+  private boolean setExpectedDateOfCreditorPayment(final LiquidityEntry entry, final Date dateOfInvoice, final String mapKey, final String area)
+  {
+    final IntAggregatedValues values = aggregatedCreditorInvoicesValuesMap.get(mapKey);
+    if (values != null && values.getNumberOfValues() >= 1) {
+      entry.setExpectedDateOfPayment(getDate(dateOfInvoice, values.getWeightedAverage()));
+      entry.setComment(mapKey + ": " + area + ": " + values.getWeightedAverage() + " days (" + values.getNumberOfValues() + " paid invoices)");
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private void ensureAndAddCreditorPaymentValue(final String mapId, final int timeForPayment, final int amount)
+  {
+    IntAggregatedValues values = aggregatedCreditorInvoicesValuesMap.get(mapId);
+    if (values == null) {
+      values = new IntAggregatedValues();
+      aggregatedCreditorInvoicesValuesMap.put(mapId, values);
+    }
+    values.add(timeForPayment, amount);
+  }
+
   private Date getDate(final Date date, final int timeOfPayment)
   {
     final DayHolder day = new DayHolder(date);
     day.add(Calendar.DAY_OF_YEAR, timeOfPayment);
     return day.getSQLDate();
-  }
-
-  private void ensureAndAddPaymentValue(final String mapId, final int timeForPayment, final int amount)
-  {
-    IntAggregatedValues values = aggregatedValuesMap.get(mapId);
-    if (values == null) {
-      values = new IntAggregatedValues();
-      aggregatedValuesMap.put(mapId, values);
-    }
-    values.add(timeForPayment, amount);
   }
 
   /**
@@ -297,6 +387,7 @@ public class LiquidityForecast implements Serializable
       entry.setPaid(invoice.isBezahlt());
       entry.setSubject(invoice.getKreditor() + ": " + invoice.getBetreff());
       entry.setType(LiquidityEntryType.CREDITOR);
+      setExpectedTimeOfPayment(entry, invoice);
       this.creditorInvoices.add(entry);
     }
     return this;
