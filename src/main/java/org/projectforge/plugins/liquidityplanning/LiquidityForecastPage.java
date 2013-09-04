@@ -27,6 +27,8 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.jfree.chart.JFreeChart;
+import org.projectforge.fibu.EingangsrechnungDao;
+import org.projectforge.fibu.RechnungDao;
 import org.projectforge.web.wicket.AbstractStandardFormPage;
 import org.projectforge.web.wicket.JFreeChartImage;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
@@ -42,6 +44,12 @@ public class LiquidityForecastPage extends AbstractStandardFormPage
 
   @SpringBean(name = "liquidityEntryDao")
   private LiquidityEntryDao liquidityEntryDao;
+
+  @SpringBean(name = "rechnungDao")
+  private RechnungDao rechnungDao;
+
+  @SpringBean(name = "eingangsrechnungDao")
+  private EingangsrechnungDao eingangsrechnungDao;
 
   private LiquidityForecast forecast;
 
@@ -80,6 +88,9 @@ public class LiquidityForecastPage extends AbstractStandardFormPage
   @Override
   protected void onBeforeRender()
   {
+    if (forecast == null) {
+      forecast = LiquidityEntryListPage.getForecast(rechnungDao, eingangsrechnungDao, liquidityEntryDao);
+    }
     super.onBeforeRender();
     final LiquidityChartBuilder chartBuilder = new LiquidityChartBuilder();
     {

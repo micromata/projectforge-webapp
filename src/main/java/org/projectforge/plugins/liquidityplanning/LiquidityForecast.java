@@ -58,7 +58,9 @@ public class LiquidityForecast implements Serializable
 
   private Collection<LiquidityEntry> liquiEntries;
 
-  private Collection<LiquidityEntry> invoices;
+  private Collection<RechnungDO> invoices;
+
+  private Collection<LiquidityEntry> invoicesLiquidityEntries;
 
   /**
    * Used for calculating the expected date of payment for future invoices.
@@ -70,7 +72,9 @@ public class LiquidityForecast implements Serializable
    */
   private final Map<String, IntAggregatedValues> aggregatedCreditorInvoicesValuesMap = new HashMap<String, IntAggregatedValues>();
 
-  private Collection<LiquidityEntry> creditorInvoices;
+  private Collection<EingangsrechnungDO> creditorInvoices;
+
+  private Collection<LiquidityEntry> creditorInvoicesLiquidityEntries;
 
   /**
    * Refresh forecast from stored liqui-entries, invoices and creditor invoices and sort the entries.
@@ -81,8 +85,8 @@ public class LiquidityForecast implements Serializable
   {
     entries.clear();
     entries.addAll(this.liquiEntries);
-    entries.addAll(this.invoices);
-    entries.addAll(this.creditorInvoices);
+    entries.addAll(this.invoicesLiquidityEntries);
+    entries.addAll(this.creditorInvoicesLiquidityEntries);
     sort();
     return this;
   }
@@ -233,7 +237,14 @@ public class LiquidityForecast implements Serializable
     final IntAggregatedValues values = aggregatedDebitorInvoicesValuesMap.get(mapKey);
     if (values != null && values.getNumberOfValues() >= 1) {
       entry.setExpectedDateOfPayment(getDate(dateOfInvoice, values.getWeightedAverage()));
-      entry.setComment(mapKey + ": " + area + ": " + values.getWeightedAverage() + " days (" + values.getNumberOfValues() + " paid invoices)");
+      entry.setComment(mapKey
+          + ": "
+          + area
+          + ": "
+          + values.getWeightedAverage()
+          + " days ("
+          + values.getNumberOfValues()
+          + " paid invoices)");
       return true;
     } else {
       return false;
@@ -313,12 +324,20 @@ public class LiquidityForecast implements Serializable
     }
   }
 
-  private boolean setExpectedDateOfCreditorPayment(final LiquidityEntry entry, final Date dateOfInvoice, final String mapKey, final String area)
+  private boolean setExpectedDateOfCreditorPayment(final LiquidityEntry entry, final Date dateOfInvoice, final String mapKey,
+      final String area)
   {
     final IntAggregatedValues values = aggregatedCreditorInvoicesValuesMap.get(mapKey);
     if (values != null && values.getNumberOfValues() >= 1) {
       entry.setExpectedDateOfPayment(getDate(dateOfInvoice, values.getWeightedAverage()));
-      entry.setComment(mapKey + ": " + area + ": " + values.getWeightedAverage() + " days (" + values.getNumberOfValues() + " paid invoices)");
+      entry.setComment(mapKey
+          + ": "
+          + area
+          + ": "
+          + values.getWeightedAverage()
+          + " days ("
+          + values.getNumberOfValues()
+          + " paid invoices)");
       return true;
     } else {
       return false;
@@ -349,7 +368,8 @@ public class LiquidityForecast implements Serializable
    */
   public LiquidityForecast setInvoices(final Collection<RechnungDO> list)
   {
-    this.invoices = new LinkedList<LiquidityEntry>();
+    this.invoices = list;
+    this.invoicesLiquidityEntries = new LinkedList<LiquidityEntry>();
     if (list == null) {
       return this;
     }
@@ -365,14 +385,15 @@ public class LiquidityForecast implements Serializable
       entry.setSubject("#" + invoice.getNummer() + ": " + invoice.getKundeAsString() + ": " + invoice.getBetreff());
       entry.setType(LiquidityEntryType.DEBITOR);
       setExpectedTimeOfPayment(entry, invoice);
-      this.invoices.add(entry);
+      this.invoicesLiquidityEntries.add(entry);
     }
     return this;
   }
 
   public LiquidityForecast setCreditorInvoices(final Collection<EingangsrechnungDO> list)
   {
-    this.creditorInvoices = new LinkedList<LiquidityEntry>();
+    this.creditorInvoices = list;
+    this.creditorInvoicesLiquidityEntries = new LinkedList<LiquidityEntry>();
     if (list == null) {
       return this;
     }
@@ -388,7 +409,7 @@ public class LiquidityForecast implements Serializable
       entry.setSubject(invoice.getKreditor() + ": " + invoice.getBetreff());
       entry.setType(LiquidityEntryType.CREDITOR);
       setExpectedTimeOfPayment(entry, invoice);
-      this.creditorInvoices.add(entry);
+      this.creditorInvoicesLiquidityEntries.add(entry);
     }
     return this;
   }
@@ -396,7 +417,15 @@ public class LiquidityForecast implements Serializable
   /**
    * @return the invoices
    */
-  public Collection<LiquidityEntry> getInvoices()
+  public Collection<LiquidityEntry> getInvoicesLiquidityEntries()
+  {
+    return invoicesLiquidityEntries;
+  }
+
+  /**
+   * @return the invoices
+   */
+  public Collection<RechnungDO> getInvoices()
   {
     return invoices;
   }
@@ -404,7 +433,15 @@ public class LiquidityForecast implements Serializable
   /**
    * @return the creditorInvoices
    */
-  public Collection<LiquidityEntry> getCreditorInvoices()
+  public Collection<LiquidityEntry> getCreditorInvoicesLiquidityEntries()
+  {
+    return creditorInvoicesLiquidityEntries;
+  }
+
+  /**
+   * @return the creditorInvoices
+   */
+  public Collection<EingangsrechnungDO> getCreditorInvoices()
   {
     return creditorInvoices;
   }

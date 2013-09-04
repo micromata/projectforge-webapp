@@ -88,10 +88,6 @@ IListPageColumnsCreator<LiquidityEntryDO>
 
   private LiquidityForecast forecast;
 
-  private List<RechnungDO> invoices;
-
-  private List<EingangsrechnungDO> creditorInvoices;
-
   public LiquidityEntryListPage(final PageParameters parameters)
   {
     super(parameters, "plugins.liquidityplanning.entry");
@@ -231,30 +227,43 @@ IListPageColumnsCreator<LiquidityEntryDO>
         final ExportSheet sheet = addSheet(getString("filter.all"));
         addList(sheet, forecast.getEntries());
         sheet.getPoiSheet().setAutoFilter(org.apache.poi.ss.util.CellRangeAddress.valueOf("A1:F1"));
-        invoicesExport.addDebitorInvoicesSheet(this, getString("fibu.rechnungen"), invoices);
-        invoicesExport.addCreditorInvoicesSheet(this, getString("fibu.eingangsrechnungen"), creditorInvoices);
+        invoicesExport.addDebitorInvoicesSheet(this, getString("fibu.rechnungen"), forecast.getInvoices());
+        invoicesExport.addCreditorInvoicesSheet(this, getString("fibu.eingangsrechnungen"), forecast.getCreditorInvoices());
       }
     };
+  }
+
+  static LiquidityForecast getForecast(final RechnungDao rechnungDao, final EingangsrechnungDao eingangsrechnungDao,
+      final LiquidityEntryDao liquidityEntryDao)
+  {
+    final LiquidityForecast forecast = new LiquidityForecast();
+    // Consider only invoices of the last year:
+    final java.sql.Date fromDate = new DayHolder().add(Calendar.DAY_OF_YEAR, -365).getSQLDate();
+    {
+      final List<RechnungDO> paidInvoices = rechnungDao.getList(new RechnungFilter().setShowBezahlt().setFromDate(fromDate));
+      forecast.calculateExpectedTimeOfPayments(paidInvoices);
+      final List<RechnungDO> invoices = rechnungDao.getList(new RechnungFilter().setShowUnbezahlt());
+      forecast.setInvoices(invoices);
+    }
+    {
+      final List<EingangsrechnungDO> paidInvoices = eingangsrechnungDao
+          .getList(new RechnungFilter().setShowBezahlt().setFromDate(fromDate));
+      forecast.calculateExpectedTimeOfCreditorPayments(paidInvoices);
+      final List<EingangsrechnungDO> creditorInvoices = eingangsrechnungDao.getList(new RechnungFilter()
+      .setListType(RechnungFilter.FILTER_UNBEZAHLT));
+      forecast.setCreditorInvoices(creditorInvoices);
+    }
+    final List<LiquidityEntryDO> list = liquidityEntryDao.getList(new LiquidityFilter().setPaymentStatus(PaymentStatus.UNPAID));
+    forecast.set(list);
+    forecast.build();
+    return forecast;
+
   }
 
   private LiquidityForecast getForecast()
   {
     if (forecast == null) {
-      forecast = new LiquidityForecast();
-      // Consider only invoices of the last year:
-      final java.sql.Date fromDate = new DayHolder().add(Calendar.DAY_OF_YEAR, -365).getSQLDate();
-      {
-        final List<RechnungDO> paidInvoices = rechnungDao.getList(new RechnungFilter().setShowBezahlt().setFromDate(fromDate));
-        forecast.calculateExpectedTimeOfPayments(paidInvoices);
-        invoices = rechnungDao.getList(new RechnungFilter().setShowUnbezahlt());
-        forecast.setInvoices(invoices);
-      }
-      {
-        final List<EingangsrechnungDO> paidInvoices = eingangsrechnungDao.getList(new RechnungFilter().setShowBezahlt().setFromDate(fromDate));
-        forecast.calculateExpectedTimeOfCreditorPayments(paidInvoices);
-        creditorInvoices = eingangsrechnungDao.getList(new RechnungFilter().setListType(RechnungFilter.FILTER_UNBEZAHLT));
-        forecast.setCreditorInvoices(creditorInvoices);
-      }
+      forecast = getForecast(rechnungDao, eingangsrechnungDao, liquidityEntryDao);
     }
     final List<LiquidityEntryDO> list = liquidityEntryDao.getList(new LiquidityFilter().setPaymentStatus(PaymentStatus.UNPAID));
     forecast.set(list);
