@@ -24,7 +24,7 @@
 package org.projectforge.fibu;
 
 import java.lang.reflect.Field;
-import java.util.List;
+import java.util.Collection;
 
 import org.projectforge.core.PropUtils;
 import org.projectforge.core.PropertyInfo;
@@ -42,7 +42,7 @@ public class InvoicesExcelExport
   {
   }
 
-  public void addDebitorInvoicesSheet(final MyExcelExporter exporter, final String title, final List<RechnungDO> list)
+  public void addDebitorInvoicesSheet(final MyExcelExporter exporter, final String title, final Collection<RechnungDO> list)
   {
     final ExportSheet sheet = exporter.addSheet(title);
     sheet.createFreezePane(0, 1);
@@ -72,7 +72,7 @@ public class InvoicesExcelExport
     }
   }
 
-  public void addCreditorInvoicesSheet(final MyExcelExporter exporter, final String title, final List<EingangsrechnungDO> list)
+  public void addCreditorInvoicesSheet(final MyExcelExporter exporter, final String title, final Collection<EingangsrechnungDO> list)
   {
     final ExportSheet sheet = exporter.addSheet(title);
     sheet.createFreezePane(0, 1);
