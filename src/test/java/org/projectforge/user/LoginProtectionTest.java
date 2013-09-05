@@ -44,28 +44,28 @@ public class LoginProtectionTest
     lp.incrementFailedLoginTimeOffset("kai");
     lp.incrementFailedLoginTimeOffset("kai");
     lp.incrementFailedLoginTimeOffset("kai");
-    Assert.assertTrue(lp.getFailedLoginTimeOffsetIfExist("kai") > 0);
-    Assert.assertTrue(lp.getFailedLoginTimeOffsetIfExist("kai") < 3001);
-    Assert.assertEquals(0, (int) lp.getFailedLoginTimeOffsetIfExist("horst"));
+    Assert.assertTrue(lp.getFailedLoginTimeOffsetIfExists("kai") > 0);
+    Assert.assertTrue(lp.getFailedLoginTimeOffsetIfExists("kai") < 3001);
+    Assert.assertEquals(0, (int) lp.getFailedLoginTimeOffsetIfExists("horst"));
     lp.setEntry("horst", 10, current - DURATION_48_HOURS); // Expired.
     lp.incrementFailedLoginTimeOffset("kai"); // 10 failed login attempts should be deleted now:
     Assert.assertEquals(1, lp.getSizeOfLastFailedLoginMap());
     Assert.assertEquals(1, lp.getSizeOfLoginFailedAttemptsMap());
     Assert.assertNull(lp.getNumberOfFailedLoginAttempts("horst"));
-    Assert.assertEquals(0, (int) lp.getFailedLoginTimeOffsetIfExist("horst"));
+    Assert.assertEquals(0, (int) lp.getFailedLoginTimeOffsetIfExists("horst"));
     lp.setEntry("horst", 10, current - DURATION_4_HOURS); // Not expired.
     lp.incrementFailedLoginTimeOffset("kai");
-    Assert.assertEquals(0, (int) lp.getFailedLoginTimeOffsetIfExist("horst"));
+    Assert.assertEquals(0, (int) lp.getFailedLoginTimeOffsetIfExists("horst"));
     lp.incrementFailedLoginTimeOffset("horst");
     Assert.assertEquals(11, (int) lp.getNumberOfFailedLoginAttempts("horst"));
-    Assert.assertTrue(lp.getFailedLoginTimeOffsetIfExist("horst") > 0);
-    Assert.assertTrue(lp.getFailedLoginTimeOffsetIfExist("horst") < 11001);
+    Assert.assertTrue(lp.getFailedLoginTimeOffsetIfExists("horst") > 0);
+    Assert.assertTrue(lp.getFailedLoginTimeOffsetIfExists("horst") < 11001);
     lp.clearLoginTimeOffset("horst");
-    Assert.assertEquals(0, (int) lp.getFailedLoginTimeOffsetIfExist("horst"));
+    Assert.assertEquals(0, (int) lp.getFailedLoginTimeOffsetIfExists("horst"));
     lp.incrementFailedLoginTimeOffset("horst");
-    final long offset = lp.getFailedLoginTimeOffsetIfExist("horst");
+    final long offset = lp.getFailedLoginTimeOffsetIfExists("horst");
     Assert.assertTrue(offset > 0 && offset < 1001);
     Thread.sleep(offset + 1);
-    Assert.assertEquals(0, (int) lp.getFailedLoginTimeOffsetIfExist("horst"));
+    Assert.assertEquals(0, (int) lp.getFailedLoginTimeOffsetIfExists("horst"));
   }
 }

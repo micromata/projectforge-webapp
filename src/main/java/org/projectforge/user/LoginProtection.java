@@ -33,7 +33,7 @@ import java.util.Map;
  * <pre>
  * public boolean login(String clientIp, String username, String password)
  * {
- *   long offset = LoginProtection.instance().getFailedLoginTimeOffsetIfExist(clientIp);
+ *   long offset = LoginProtection.instance().getFailedLoginTimeOffsetIfExists(clientIp);
  *   if (offset &gt; 0) {
  *     // setResponsePage(MessagePage.class, &quot;Your account is locked for &quot; + offset / 1000 +
  *     // &quot; seconds due to failed login attempts. Please try again later.&quot;);
@@ -88,7 +88,7 @@ public class LoginProtection
    * @param userId This could be the client's ip address, the login name etc.
    * @return 0 if no active time offset was found, otherwise the time offset left until the account is opened for login again.
    */
-  public long getFailedLoginTimeOffsetIfExist(final String userId)
+  public long getFailedLoginTimeOffsetIfExists(final String userId)
   {
     final Long lastFailedLoginInMs = this.lastFailedLoginMap.get(userId);
     if (lastFailedLoginInMs == null) {

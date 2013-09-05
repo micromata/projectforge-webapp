@@ -58,7 +58,7 @@ public class Login
     if (username == null || password == null) {
       return new LoginResult().setLoginResultStatus(LoginResultStatus.FAILED);
     }
-    final long offset = LoginProtection.instance().getFailedLoginTimeOffsetIfExist(username);
+    final long offset = LoginProtection.instance().getFailedLoginTimeOffsetIfExists(username);
     if (offset > 0) {
       final String seconds = String.valueOf(offset / 1000);
       log.warn("The account for '"
