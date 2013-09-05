@@ -58,14 +58,21 @@ public class Login
     if (username == null || password == null) {
       return new LoginResult().setLoginResultStatus(LoginResultStatus.FAILED);
     }
+    final long offset = LoginProtection.instance().getFailedLoginTimeOffsetIfExist(username);
+    if (offset > 0) {
+      final String seconds = String.valueOf(offset / 1000);
+      log.warn("The account for '"
+          + username
+          + "' is locked for "
+          + seconds
+          + " seconds due to failed login attempts. Please try again later.");
+      return new LoginResult().setLoginResultStatus(LoginResultStatus.LOGIN_TIME_OFFSET).setMsgParam(seconds);
+    }
     final LoginResult result = loginHandler.checkLogin(username, password);
-    if (result.getLoginResultStatus() == LoginResultStatus.FAILED) {
-      try {
-        // Avoid brute force attack:
-        Thread.sleep(1000);
-      } catch (final InterruptedException ex) {
-        log.fatal("Exception encountered while Thread.sleep(1000): " + ex, ex);
-      }
+    if (result.getLoginResultStatus() == LoginResultStatus.SUCCESS) {
+      LoginProtection.instance().clearLoginTimeOffset(username);
+    } else if (result.getLoginResultStatus() == LoginResultStatus.FAILED) {
+      LoginProtection.instance().incrementFailedLoginTimeOffset(username);
     }
     return result;
   }

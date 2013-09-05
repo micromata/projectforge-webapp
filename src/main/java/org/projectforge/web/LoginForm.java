@@ -29,6 +29,7 @@ import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.projectforge.user.LoginResultStatus;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
@@ -88,9 +89,9 @@ public class LoginForm extends AbstractForm<LoginForm, LoginPage>
       @Override
       public final void onSubmit()
       {
-        final String result = parentPage.checkLogin();
-        if (result != null) {
-          parentPage.addError(getString(result));
+        final LoginResultStatus status = parentPage.checkLogin();
+        if (status != null) {
+          parentPage.addError(status.getLocalizedMessage());
         }
       }
     };
