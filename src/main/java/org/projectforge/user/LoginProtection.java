@@ -28,14 +28,15 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Usage:<br/>
+ * Class for avoiding brute force attacks by time offsets during login after failed login attempts. Usage:<br/>
  * 
  * <pre>
  * public boolean login(String clientIp, String username, String password)
  * {
  *   long offset = LoginProtection.instance().getFailedLoginTimeOffsetIfExist(clientIp);
  *   if (offset &gt; 0) {
- *     // setResponsePage(MessagePage.class, &quot;Intruder detection, please wait &quot; + offset * 1000 + &quot; seconds after next try.&quot;);
+ *     // setResponsePage(MessagePage.class, &quot;Your account is locked for &quot; + offset / 1000 +
+ *     // &quot; seconds due to failed login attempts. Please try again later.&quot;);
  *     return false;
  *   }
  *   boolean success = checkLogin(username, password); // Check the login however you want.
@@ -54,7 +55,7 @@ import java.util.Map;
 public class LoginProtection
 {
   /**
-   * Login fail offset times expire after 24h.
+   * Login offset time after failed login attempts expires after 24h.
    */
   private static final long LOGIN_OFFSET_EXPIRES_AFTER_MS = 24 * 60 * 60 * 1000;
 
@@ -73,7 +74,7 @@ public class LoginProtection
   /**
    * Number of failed logins per IP address.
    */
-  private final Map<String, Integer> loginFailsMap = new HashMap<String, Integer>();
+  private final Map<String, Integer> loginFailedAttemptsMap = new HashMap<String, Integer>();
 
   /**
    * Time stamp of last failed login per IP address in ms since 01/01/1970.
@@ -120,7 +121,7 @@ public class LoginProtection
   {
     clearExpiredEntries();
     final long currentTimeInMillis = System.currentTimeMillis();
-    Integer numberOfFailedLogins = this.loginFailsMap.get(userId);
+    Integer numberOfFailedLogins = this.loginFailedAttemptsMap.get(userId);
     if (numberOfFailedLogins == null) {
       if (increment == false) {
         return 0;
@@ -131,12 +132,15 @@ public class LoginProtection
       if (lastFailedLoginInMs != null && currentTimeInMillis - lastFailedLoginInMs > LOGIN_OFFSET_EXPIRES_AFTER_MS) {
         // Last failed login entry is to old, so we'll ignore and clear it:
         clearLoginTimeOffset(userId);
-        return 0;
+        if (increment == false) {
+          return 0;
+        }
+        numberOfFailedLogins = 0;
       }
     }
     if (increment == true) {
       synchronized (this) {
-        this.loginFailsMap.put(userId, ++numberOfFailedLogins);
+        this.loginFailedAttemptsMap.put(userId, ++numberOfFailedLogins);
         this.lastFailedLoginMap.put(userId, currentTimeInMillis);
       }
     }
@@ -150,7 +154,7 @@ public class LoginProtection
   public void clearLoginTimeOffset(final String userId)
   {
     synchronized (this) {
-      this.loginFailsMap.remove(userId);
+      this.loginFailedAttemptsMap.remove(userId);
       this.lastFailedLoginMap.remove(userId);
     }
   }
@@ -165,8 +169,8 @@ public class LoginProtection
         final Long lastFailedLoginInMs = this.lastFailedLoginMap.get(key);
         if (lastFailedLoginInMs != null && currentTimeInMillis - lastFailedLoginInMs > LOGIN_OFFSET_EXPIRES_AFTER_MS) {
           // Last failed login entry is to old, so we'll ignore and clear it:
-          this.loginFailsMap.remove(key);
-          this.lastFailedLoginMap.remove(key);
+          this.loginFailedAttemptsMap.remove(key);
+          it.remove();
         }
       }
     }
@@ -178,8 +182,43 @@ public class LoginProtection
   public void clearAll()
   {
     synchronized (this) {
-      this.loginFailsMap.clear();
+      this.loginFailedAttemptsMap.clear();
       this.lastFailedLoginMap.clear();
     }
+  }
+
+  /**
+   * For internal use by test cases.
+   */
+  int getSizeOfLastFailedLoginMap()
+  {
+    return this.lastFailedLoginMap.size();
+  }
+
+  /**
+   * For internal use by test cases.
+   */
+  int getSizeOfLoginFailedAttemptsMap()
+  {
+    return this.loginFailedAttemptsMap.size();
+  }
+
+  /**
+   * For internal use by test cases.
+   */
+  void setEntry(final String userId, final int numberOfFailedLoginAttempts, final long lastFailedAttemptTimestamp)
+  {
+    synchronized (this) {
+      this.loginFailedAttemptsMap.put(userId, numberOfFailedLoginAttempts);
+      this.lastFailedLoginMap.put(userId, lastFailedAttemptTimestamp);
+    }
+  }
+
+  /**
+   * For internal use by test cases.
+   */
+  Integer getNumberOfFailedLoginAttempts(final String userId)
+  {
+    return this.loginFailedAttemptsMap.get(userId);
   }
 }
