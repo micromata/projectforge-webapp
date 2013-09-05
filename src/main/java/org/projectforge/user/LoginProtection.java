@@ -77,16 +77,16 @@ public class LoginProtection
   private final Map<String, Integer> loginFailedAttemptsMap = new HashMap<String, Integer>();
 
   /**
-   * Time stamp of last failed login per IP address in ms since 01/01/1970.
+   * Time stamp of last failed login per userId in ms since 01/01/1970.
    * @see System#currentTimeMillis()
    */
   private final Map<String, Long> lastFailedLoginMap = new HashMap<String, Long>();
 
   /**
-   * Call this before checking the login credentials. If true is returned please don't proceed the login-procedure. Please display a user
-   * message that the login was denied due to an intruder detection for x seconds. The user should try it later (after x seconds) again.
+   * Call this before checking the login credentials. If a long > 0 is returned please don't proceed the login-procedure. Please display a user
+   * message that the login was denied due previous failed login attempts. The user should try it later again (after x seconds).
    * @param userId This could be the client's ip address, the login name etc.
-   * @return 0 if no active time offset was found, otherwise the time offset left until the account is opened for login again.
+   * @return 0 if no active time offset was found, otherwise the time offset left until the account is opened again for login.
    */
   public long getFailedLoginTimeOffsetIfExists(final String userId)
   {
@@ -159,6 +159,9 @@ public class LoginProtection
     }
   }
 
+  /**
+   * Clears (removes) all entries for userId's older than {@link #LOGIN_OFFSET_EXPIRES_AFTER_MS}.
+   */
   public void clearExpiredEntries()
   {
     final long currentTimeInMillis = System.currentTimeMillis();
