@@ -69,4 +69,15 @@ public class LoginResult
     this.loginResultStatus = loginResultStatus;
     return this;
   }
+
+  /**
+   * @param msgParam
+   * @return this for chaining.
+   * @see LoginResultStatus#setMsgParam(String)
+   */
+  public LoginResult setMsgParam(final String msgParam)
+  {
+    this.loginResultStatus.setMsgParam(msgParam);
+    return this;
+  }
 }

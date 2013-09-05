@@ -32,9 +32,12 @@ import org.projectforge.core.I18nEnum;
  */
 public enum LoginResultStatus implements I18nEnum
 {
-  ADMIN_LOGIN_REQUIRED("adminLoginRequired"), FAILED("error.loginFailed"), LOGIN_EXPIRED("error.loginExpired"), SUCCESS("success");
+  ADMIN_LOGIN_REQUIRED("adminLoginRequired"), /** This account is locked for x seconds due to failed login attempts. */
+  LOGIN_TIME_OFFSET("timeOffset"), FAILED("error.loginFailed"), LOGIN_EXPIRED("error.loginExpired"), SUCCESS("success");
 
   private String key;
+
+  private String msgParam;
 
   /**
    * The key will be used e. g. for i18n.
@@ -52,8 +55,8 @@ public enum LoginResultStatus implements I18nEnum
 
   public boolean isIn(final LoginResultStatus... loginResult)
   {
-    for (final LoginResultStatus art : loginResult) {
-      if (this == art) {
+    for (final LoginResultStatus status : loginResult) {
+      if (this == status) {
         return true;
       }
     }
@@ -63,5 +66,33 @@ public enum LoginResultStatus implements I18nEnum
   public String getI18nKey()
   {
     return "login." + key;
+  }
+
+  public String getLocalizedMessage()
+  {
+    if (this == LOGIN_TIME_OFFSET) {
+      // msgParam is seconds.
+      return PFUserContext.getLocalizedMessage(getI18nKey(), msgParam);
+    }
+    return PFUserContext.getLocalizedString(getI18nKey());
+  }
+
+  /**
+   * Used for {@link #LOGIN_TIME_OFFSET} as parameter for seconds.
+   * @param msgParam the msgParam to set
+   * @return this for chaining.
+   */
+  public LoginResultStatus setMsgParam(final String msgParam)
+  {
+    this.msgParam = msgParam;
+    return this;
+  }
+
+  /**
+   * @return the msgParam
+   */
+  public String getMsgParam()
+  {
+    return msgParam;
   }
 }
