@@ -39,33 +39,37 @@ public class LoginProtectionTest
     final long current = System.currentTimeMillis();
     final LoginProtection lp = LoginProtection.instance();
     lp.clearAll();
-    Assert.assertEquals(0, lp.getSizeOfLastFailedLoginMap());
-    Assert.assertEquals(0, lp.getSizeOfLoginFailedAttemptsMap());
+    Assert.assertEquals("Maps should be empty.", 0, lp.getSizeOfLastFailedLoginMap());
+    Assert.assertEquals("Maps should be empty.", 0, lp.getSizeOfLoginFailedAttemptsMap());
     lp.incrementFailedLoginTimeOffset("kai");
     lp.incrementFailedLoginTimeOffset("kai");
     lp.incrementFailedLoginTimeOffset("kai");
-    Assert.assertTrue(lp.getFailedLoginTimeOffsetIfExists("kai") > 0);
-    Assert.assertTrue(lp.getFailedLoginTimeOffsetIfExists("kai") < 3001);
-    Assert.assertEquals(0, (int) lp.getFailedLoginTimeOffsetIfExists("horst"));
+    Assert.assertTrue("Time offset due to 3 failed logins expected.", lp.getFailedLoginTimeOffsetIfExists("kai") > 0);
+    Assert.assertTrue("Time offset due to 3 failed logins not more than 3 seconds expected.",
+        lp.getFailedLoginTimeOffsetIfExists("kai") < 3001);
+    Assert.assertEquals("No offset for new user 'horst' expected.", 0, (int) lp.getFailedLoginTimeOffsetIfExists("horst"));
     lp.setEntry("horst", 10, current - DURATION_48_HOURS); // Expired.
     lp.incrementFailedLoginTimeOffset("kai"); // 10 failed login attempts should be deleted now:
-    Assert.assertEquals(1, lp.getSizeOfLastFailedLoginMap());
-    Assert.assertEquals(1, lp.getSizeOfLoginFailedAttemptsMap());
-    Assert.assertNull(lp.getNumberOfFailedLoginAttempts("horst"));
-    Assert.assertEquals(0, (int) lp.getFailedLoginTimeOffsetIfExists("horst"));
+    Assert.assertEquals("Penalty for 'horst' should be deleted, because it's expired.", 1, lp.getSizeOfLastFailedLoginMap());
+    Assert.assertEquals("Penalty for 'horst' should be deleted, because it's expired.", 1, lp.getSizeOfLoginFailedAttemptsMap());
+    Assert.assertEquals("Penalty for 'horst' should be deleted, because it's expired.", 0, lp.getNumberOfFailedLoginAttempts("horst"));
+    Assert.assertEquals("Penalty for 'horst' should be deleted, because it's expired.", 0,
+        (int) lp.getFailedLoginTimeOffsetIfExists("horst"));
     lp.setEntry("horst", 10, current - DURATION_4_HOURS); // Not expired.
     lp.incrementFailedLoginTimeOffset("kai");
-    Assert.assertEquals(0, (int) lp.getFailedLoginTimeOffsetIfExists("horst"));
+    Assert.assertEquals("No time offset for 'horst' expected because last login was 4 hours ago.", 0,
+        (int) lp.getFailedLoginTimeOffsetIfExists("horst"));
     lp.incrementFailedLoginTimeOffset("horst");
-    Assert.assertEquals(11, (int) lp.getNumberOfFailedLoginAttempts("horst"));
-    Assert.assertTrue(lp.getFailedLoginTimeOffsetIfExists("horst") > 0);
-    Assert.assertTrue(lp.getFailedLoginTimeOffsetIfExists("horst") < 11001);
+    Assert.assertEquals("11 failed login attempts expected.", 11, lp.getNumberOfFailedLoginAttempts("horst"));
+    Assert.assertTrue("Time offset due to 11 failed logins expected.", lp.getFailedLoginTimeOffsetIfExists("horst") > 0);
+    Assert.assertTrue("Time offset due to 11 failed logins not more than 11 seconds expected.",
+        lp.getFailedLoginTimeOffsetIfExists("horst") < 11001);
     lp.clearLoginTimeOffset("horst");
-    Assert.assertEquals(0, (int) lp.getFailedLoginTimeOffsetIfExists("horst"));
+    Assert.assertEquals("Penalty for 'horst' should be deleted.", 0, (int) lp.getFailedLoginTimeOffsetIfExists("horst"));
     lp.incrementFailedLoginTimeOffset("horst");
     final long offset = lp.getFailedLoginTimeOffsetIfExists("horst");
-    Assert.assertTrue(offset > 0 && offset < 1001);
+    Assert.assertTrue("Time offset between 0 and 1 second expected due to 1 failed login attempt.", offset > 0 && offset < 1001);
     Thread.sleep(offset + 1);
-    Assert.assertEquals(0, (int) lp.getFailedLoginTimeOffsetIfExists("horst"));
+    Assert.assertEquals("No time offset for 'horst' expected, because time offest was run down.", 0, (int) lp.getFailedLoginTimeOffsetIfExists("horst"));
   }
 }
