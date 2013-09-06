@@ -225,6 +225,7 @@ public class LoginProtection
   }
 
   /**
+   * @param userId This could be the client's ip address, the login name etc.
    * @return The number of failed login attempts (not expired ones) if exist, otherwise 0.
    */
   public int getNumberOfFailedLoginAttempts(final String userId)
