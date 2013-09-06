@@ -225,10 +225,11 @@ public class LoginProtection
   }
 
   /**
-   * For internal use by test cases.
+   * @return The number of failed login attempts (not expired ones) if exist, otherwise 0.
    */
-  Integer getNumberOfFailedLoginAttempts(final String userId)
+  public int getNumberOfFailedLoginAttempts(final String userId)
   {
-    return this.loginFailedAttemptsMap.get(userId);
+    final Integer result = this.loginFailedAttemptsMap.get(userId);
+    return result != null ? result : 0;
   }
 }

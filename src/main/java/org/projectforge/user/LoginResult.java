@@ -71,13 +71,13 @@ public class LoginResult
   }
 
   /**
-   * @param msgParam
+   * @param msgParams
    * @return this for chaining.
-   * @see LoginResultStatus#setMsgParam(String)
+   * @see LoginResultStatus#setMsgParams(Object...)
    */
-  public LoginResult setMsgParam(final String msgParam)
+  public LoginResult setMsgParams(final Object... msgParams)
   {
-    this.loginResultStatus.setMsgParam(msgParam);
+    this.loginResultStatus.setMsgParams(msgParams);
     return this;
   }
 }

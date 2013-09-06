@@ -37,7 +37,7 @@ public enum LoginResultStatus implements I18nEnum
 
   private String key;
 
-  private String msgParam;
+  private Object[] msgParams;
 
   /**
    * The key will be used e. g. for i18n.
@@ -72,27 +72,27 @@ public enum LoginResultStatus implements I18nEnum
   {
     if (this == LOGIN_TIME_OFFSET) {
       // msgParam is seconds.
-      return PFUserContext.getLocalizedMessage(getI18nKey(), msgParam);
+      return PFUserContext.getLocalizedMessage(getI18nKey(), msgParams);
     }
     return PFUserContext.getLocalizedString(getI18nKey());
   }
 
   /**
    * Used for {@link #LOGIN_TIME_OFFSET} as parameter for seconds.
-   * @param msgParam the msgParam to set
+   * @param msgParams the msgParam to set
    * @return this for chaining.
    */
-  public LoginResultStatus setMsgParam(final String msgParam)
+  public LoginResultStatus setMsgParams(final Object... msgParams)
   {
-    this.msgParam = msgParam;
+    this.msgParams = msgParams;
     return this;
   }
 
   /**
    * @return the msgParam
    */
-  public String getMsgParam()
+  public Object[] getMsgParams()
   {
-    return msgParam;
+    return msgParams;
   }
 }

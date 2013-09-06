@@ -58,7 +58,8 @@ public class Login
     if (username == null || password == null) {
       return new LoginResult().setLoginResultStatus(LoginResultStatus.FAILED);
     }
-    final long offset = LoginProtection.instance().getFailedLoginTimeOffsetIfExists(username);
+    final LoginProtection loginProtection = LoginProtection.instance();
+    final long offset = loginProtection.getFailedLoginTimeOffsetIfExists(username);
     if (offset > 0) {
       final String seconds = String.valueOf(offset / 1000);
       log.warn("The account for '"
@@ -66,13 +67,14 @@ public class Login
           + "' is locked for "
           + seconds
           + " seconds due to failed login attempts. Please try again later.");
-      return new LoginResult().setLoginResultStatus(LoginResultStatus.LOGIN_TIME_OFFSET).setMsgParam(seconds);
+      final int numberOfFailedAttempts = loginProtection.getNumberOfFailedLoginAttempts(username);
+      return new LoginResult().setLoginResultStatus(LoginResultStatus.LOGIN_TIME_OFFSET).setMsgParams(seconds, String.valueOf(numberOfFailedAttempts));
     }
     final LoginResult result = loginHandler.checkLogin(username, password);
     if (result.getLoginResultStatus() == LoginResultStatus.SUCCESS) {
-      LoginProtection.instance().clearLoginTimeOffset(username);
+      loginProtection.clearLoginTimeOffset(username);
     } else if (result.getLoginResultStatus() == LoginResultStatus.FAILED) {
-      LoginProtection.instance().incrementFailedLoginTimeOffset(username);
+      loginProtection.incrementFailedLoginTimeOffset(username);
     }
     return result;
   }
