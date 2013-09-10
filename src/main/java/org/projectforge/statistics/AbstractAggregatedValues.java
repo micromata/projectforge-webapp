@@ -116,7 +116,11 @@ public abstract class AbstractAggregatedValues<T>
           sum = sum(sum, multiply(value, weight));
           weightSum = sum(weightSum, weight);
         }
-        weightedAverage = divide(sum, weightSum);
+        if (isZero(weightSum) == true) {
+          weightedAverage = getZero();
+        } else {
+          weightedAverage = divide(sum, weightSum);
+        }
       }
       weightedAverageDirty = false;
     }
@@ -137,4 +141,6 @@ public abstract class AbstractAggregatedValues<T>
   protected abstract T divide(T value, T divisor);
 
   protected abstract T multiply(T value1, T value2);
+
+  protected abstract boolean isZero(T value);
 }
