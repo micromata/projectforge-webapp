@@ -44,6 +44,16 @@ public  class BigDecimalAggregatedValues extends AbstractAggregatedValues<BigDec
     return BigDecimal.ZERO;
   }
 
+
+  /**
+   * @see org.projectforge.statistics.AbstractAggregatedValues#isZero(java.lang.Object)
+   */
+  @Override
+  protected boolean isZero(final BigDecimal value)
+  {
+    return value == null || value.compareTo(BigDecimal.ZERO) == 0;
+  }
+
   /**
    * @see org.projectforge.statistics.AbstractAggregatedValues#sum(java.lang.Object, java.lang.Object)
    */

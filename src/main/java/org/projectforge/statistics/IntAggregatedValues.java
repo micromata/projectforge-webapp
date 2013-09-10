@@ -43,6 +43,14 @@ public class IntAggregatedValues extends AbstractAggregatedValues<Integer> imple
   }
 
   /**
+   * @see org.projectforge.statistics.AbstractAggregatedValues#isZero(java.lang.Object)
+   */
+  @Override
+  protected boolean isZero(final Integer value)
+  {
+    return value == null || value == 0;
+  }
+  /**
    * @see org.projectforge.statistics.AbstractAggregatedValues#sum(java.lang.Object, java.lang.Object)
    */
   @Override
