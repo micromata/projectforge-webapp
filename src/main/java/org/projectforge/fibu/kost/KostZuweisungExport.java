@@ -81,6 +81,7 @@ public class KostZuweisungExport
   private enum InvoicesCol
   {
     BRUTTO("fibu.common.brutto", MyXlsContentProvider.LENGTH_CURRENCY), //
+    VAT("fibu.common.vat", MyXlsContentProvider.LENGTH_BOOLEAN), //
     KONTO("fibu.buchungssatz.konto", 14), //
     REFERENZ("fibu.common.reference", MyXlsContentProvider.LENGTH_STD), //
     DATE("date", MyXlsContentProvider.LENGTH_DATE), //
@@ -114,7 +115,13 @@ public class KostZuweisungExport
       if (rechnung.getPositionen() != null) {
         for (final AbstractRechnungsPositionDO position : rechnung.getPositionen()) {
           if (CollectionUtils.isNotEmpty(position.getKostZuweisungen()) == true) {
-            zuweisungen.addAll(position.getKostZuweisungen());
+            for (final KostZuweisungDO zuweisung : position.getKostZuweisungen()) {
+              if (NumberHelper.isZeroOrNull(zuweisung.getBrutto()) == true) {
+                // Skip entries with zero amounts.
+                continue;
+              }
+              zuweisungen.add(zuweisung);
+            }
           } else {
             final KostZuweisungDO zuweisung = new KostZuweisungDO();
             if (position instanceof RechnungsPositionDO) {
@@ -189,6 +196,7 @@ public class KostZuweisungExport
         }
       }
       mapping.add(InvoicesCol.BRUTTO, zuweisung.getBrutto());
+      mapping.add(InvoicesCol.VAT, NumberHelper.isNotZero(position.getVat()));
       Integer kontoNummer = null;
       if (rechnung instanceof RechnungDO) {
         final KontoDO konto = kontoCache.getKonto(((RechnungDO) rechnung));
