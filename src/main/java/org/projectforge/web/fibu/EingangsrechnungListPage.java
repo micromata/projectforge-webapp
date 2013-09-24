@@ -23,6 +23,7 @@
 
 package org.projectforge.web.fibu;
 
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -49,6 +50,7 @@ import org.projectforge.excel.ExportColumn;
 import org.projectforge.excel.I18nExportColumn;
 import org.projectforge.excel.PropertyMapping;
 import org.projectforge.export.DOListExcelExporter;
+import org.projectforge.export.MyXlsContentProvider;
 import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.EingangsrechnungDao;
 import org.projectforge.fibu.EingangsrechnungsStatistik;
@@ -217,15 +219,39 @@ IListPageColumnsCreator<EingangsrechnungDO>
       @Override
       protected List<ExportColumn> onBeforeSettingColumns(final ContentProvider sheetProvider, final List<ExportColumn> columns)
       {
-        final List<ExportColumn> sortedColumns = reorderColumns(columns, "kreditor", "konto", "betreff", "datum",
+        final List<ExportColumn> sortedColumns = reorderColumns(columns, "kreditor", "konto", "kontoBezeichnung", "betreff", "datum",
             "faelligkeit", "bezahlDatum", "zahlBetrag");
-        I18nExportColumn col = new I18nExportColumn("netSum", "fibu.common.netto");
-        putCurrencyFormat(sheetProvider, col);
-        sortedColumns.add(6, col);
-        col = new I18nExportColumn("grossSum", "fibu.common.brutto");
+        I18nExportColumn col = new I18nExportColumn("kontoBezeichnung", "fibu.konto.bezeichnung", MyXlsContentProvider.LENGTH_STD);
+        sortedColumns.add(2, col);
+        col = new I18nExportColumn("netSum", "fibu.common.netto");
         putCurrencyFormat(sheetProvider, col);
         sortedColumns.add(7, col);
+        col = new I18nExportColumn("grossSum", "fibu.common.brutto");
+        putCurrencyFormat(sheetProvider, col);
+        sortedColumns.add(8, col);
         return sortedColumns;
+      }
+
+      /**
+       * @see org.projectforge.excel.ExcelExporter#addMapping(org.projectforge.excel.PropertyMapping, java.lang.Object,
+       *      java.lang.reflect.Field)
+       */
+      @Override
+      public void addMapping(final PropertyMapping mapping, final Object entry, final Field field)
+      {
+        if ("konto".equals(field.getName()) == true) {
+          Integer kontoNummer = null;
+          final Integer kontoId = ((EingangsrechnungDO) entry).getKontoId();
+          if (kontoId != null) {
+            final KontoDO konto = kontoCache.getKonto(kontoId);
+            if (konto != null) {
+              kontoNummer = konto.getNummer();
+            }
+          }
+          mapping.add(field.getName(), kontoNummer != null ? kontoNummer : "");
+        } else {
+          super.addMapping(mapping, entry, field);
+        }
       }
 
       /**
@@ -235,6 +261,15 @@ IListPageColumnsCreator<EingangsrechnungDO>
       protected void addMappings(final PropertyMapping mapping, final Object entry)
       {
         final EingangsrechnungDO invoice = (EingangsrechnungDO) entry;
+        String kontoBezeichnung = null;
+        final Integer kontoId = ((EingangsrechnungDO) entry).getKontoId();
+        if (kontoId != null) {
+          final KontoDO konto = kontoCache.getKonto(kontoId);
+          if (konto != null) {
+            kontoBezeichnung = konto.getBezeichnung();
+          }
+        }
+        mapping.add("kontoBezeichnung", kontoBezeichnung != null ? kontoBezeichnung : "");
         mapping.add("grossSum", invoice.getGrossSum());
         mapping.add("netSum", invoice.getNetSum());
       }
