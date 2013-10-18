@@ -23,7 +23,8 @@
 
 package org.projectforge.user;
 
-// TODO: Logging von Versuchen, z. B. stündlich.
+// TODO: Logging von Fehlversuchen, z. B. Anzahl pro IP/User stündlich (nicht pro Fehlversuch).
+
 /**
  * Class for avoiding brute force attacks by time offsets during login after failed login attempts. Usage:<br/>
  * 
@@ -40,10 +41,10 @@ package org.projectforge.user;
  *   }
  *   boolean success = checkLogin(username, password); // Check the login however you want.
  *   if (success == true) {
- *     LoginProtection.instance().clearLoginTimeOffset(clientIp);
+ *     LoginProtection.instance().clearLoginTimeOffset(userId, clientIp);
  *     return true;
  *   } else {
- *     LoginProtection.instance().incrementFailedLoginTimeOffset(clientIp);
+ *     LoginProtection.instance().incrementFailedLoginTimeOffset(userId, clientIp);
  *     return false;
  *   }
  * }
