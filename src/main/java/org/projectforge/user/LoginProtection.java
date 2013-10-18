@@ -23,20 +23,19 @@
 
 package org.projectforge.user;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
+TODO: Logging von Versuchen, z. B. stündlich.
 /**
  * Class for avoiding brute force attacks by time offsets during login after failed login attempts. Usage:<br/>
  * 
  * <pre>
  * public boolean login(String clientIp, String username, String password)
  * {
- *   long offset = LoginProtection.instance().getFailedLoginTimeOffsetIfExists(clientIp);
+ *   long offset = LoginProtection.instance().getFailedLoginTimeOffsetIfExists(username, clientIp);
  *   if (offset &gt; 0) {
- *     // setResponsePage(MessagePage.class, &quot;Your account is locked for &quot; + offset / 1000 +
- *     // &quot; seconds due to failed login attempts. Please try again later.&quot;);
+ *     final String seconds = String.valueOf(offset / 1000);
+ *     final int numberOfFailedAttempts = loginProtection.getNumberOfFailedLoginAttempts(username, clientIpAddress);
+ *     // setResponsePage(MessagePage.class, &quot;Your account is locked for &quot; + seconds +
+ *     // &quot; seconds due to " + numberOfFailedAttempts + " failed login attempts. Please try again later.&quot;);
  *     return false;
  *   }
  *   boolean success = checkLogin(username, password); // Check the login however you want.
@@ -49,20 +48,23 @@ import java.util.Map;
  *   }
  * }
  * </pre>
+ * 
+ * Time offsets for ip addresses should be much smaller (for avoiding penalties for normal usage by a lot of users behind the same NAT
+ * system).
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
 public class LoginProtection
 {
   /**
-   * Login offset time after failed login attempts expires after 24h.
+   * After this given number of failed logins (for one specific user id) the account penalty counter will be incremented.
    */
-  private static final long LOGIN_OFFSET_EXPIRES_AFTER_MS = 24 * 60 * 60 * 1000;
+  private static final int DEFAULT_NUMBER_OF_FAILED_LOGINS_BEFORE_INCREMENTING_FOR_USER_ID = 1;
 
   /**
-   * Login time offset will be number of failed logins multiplied by this value (in ms).
+   * After this given number of failed logins (for one specific ip address) the account penalty counter will be incremented.
    */
-  private static final long LOGIN_TIME_OFFSET_SCALE = 1000;
+  private static final int DEFAULT_NUMBER_OF_FAILED_LOGINS_BEFORE_INCREMENTING_FOR_IP = 1000;
 
   private static final LoginProtection instance = new LoginProtection();
 
@@ -76,113 +78,69 @@ public class LoginProtection
    */
   private LoginProtection()
   {
+    mapByUserId = new LoginProtectionMap();
+    mapByUserId.setNumberOfFailedLoginsBeforeIncrementing(DEFAULT_NUMBER_OF_FAILED_LOGINS_BEFORE_INCREMENTING_FOR_USER_ID);
+    mapByIpAddress = new LoginProtectionMap();
+    mapByIpAddress.setNumberOfFailedLoginsBeforeIncrementing(DEFAULT_NUMBER_OF_FAILED_LOGINS_BEFORE_INCREMENTING_FOR_IP);
   }
 
-  /**
-   * Number of failed logins per IP address.
-   */
-  private final Map<String, Integer> loginFailedAttemptsMap = new HashMap<String, Integer>();
+  private final LoginProtectionMap mapByUserId;
 
-  /**
-   * Time stamp of last failed login per userId in ms since 01/01/1970.
-   * @see System#currentTimeMillis()
-   */
-  private final Map<String, Long> lastFailedLoginMap = new HashMap<String, Long>();
+  private final LoginProtectionMap mapByIpAddress;
 
   /**
    * Call this before checking the login credentials. If a long > 0 is returned please don't proceed the login-procedure. Please display a
-   * user message that the login was denied due previous failed login attempts. The user should try it later again (after x seconds).
-   * @param userId This could be the client's ip address, the login name etc.
-   * @return 0 if no active time offset was found, otherwise the time offset left until the account is opened again for login.
+   * user message that the login was denied due previous failed login attempts. The user should try it later again (after x seconds). <br/>
+   * If a login offset exists for both (for user id and client's ip address) the larger value will be returned.
+   * @param userId May-be null.
+   * @param clientIpAddress May-be null.
+   * @return the time offset for login if exist, otherwise 0.
    */
-  public long getFailedLoginTimeOffsetIfExists(final String userId)
+  public long getFailedLoginTimeOffsetIfExists(final String userId, final String clientIpAddress)
   {
-    final Long lastFailedLoginInMs = this.lastFailedLoginMap.get(userId);
-    if (lastFailedLoginInMs == null) {
-      return 0;
+    long userIdOffset = 0;
+    long ipAddressOffset = 0;
+    if (userId != null) {
+      userIdOffset = mapByUserId.getFailedLoginTimeOffsetIfExists(userId);
     }
-    final long offset = getFailedLoginTimeOffset(userId, false);
-    final long currentTimeInMs = System.currentTimeMillis();
-    if (lastFailedLoginInMs + offset < currentTimeInMs) {
-      return 0;
+    if (clientIpAddress != null) {
+      ipAddressOffset = mapByIpAddress.getFailedLoginTimeOffsetIfExists(clientIpAddress);
     }
-    return lastFailedLoginInMs + offset - currentTimeInMs;
+    return (userIdOffset > ipAddressOffset) ? userIdOffset : ipAddressOffset;
   }
 
   /**
-   * Increments the number of login failures.
-   * @param userId This could be the client's ip address, the login name etc.
-   * @return Login time offset in ms.
+   * Returns the number of failed login attempts. If failed login attempts exist for both (user id and ip) the larger value will be
+   * returned.
+   * @param userId May-be null.
+   * @param clientIpAddress May-be null.
+   * @return The number of failed login attempts (not expired ones) if exist, otherwise 0.
    */
-  public long incrementFailedLoginTimeOffset(final String userId)
+  public int getNumberOfFailedLoginAttempts(final String userId, final String clientIpAddress)
   {
-    return getFailedLoginTimeOffset(userId, true);
-  }
-
-  /**
-   * @param userId This could be the client's ip address, the login name etc.
-   * @param increment If true the login fail counter will be incremented.
-   * @return
-   */
-  private long getFailedLoginTimeOffset(final String userId, final boolean increment)
-  {
-    clearExpiredEntries();
-    final long currentTimeInMillis = System.currentTimeMillis();
-    Integer numberOfFailedLogins = this.loginFailedAttemptsMap.get(userId);
-    if (numberOfFailedLogins == null) {
-      if (increment == false) {
-        return 0;
-      }
-      numberOfFailedLogins = 0;
-    } else {
-      final Long lastFailedLoginInMs = this.lastFailedLoginMap.get(userId);
-      if (lastFailedLoginInMs != null && currentTimeInMillis - lastFailedLoginInMs > LOGIN_OFFSET_EXPIRES_AFTER_MS) {
-        // Last failed login entry is to old, so we'll ignore and clear it:
-        clearLoginTimeOffset(userId);
-        if (increment == false) {
-          return 0;
-        }
-        numberOfFailedLogins = 0;
-      }
+    int failedLoginsForUserId = 0;
+    int failedLoginsForIpAddress = 0;
+    if (userId != null) {
+      failedLoginsForUserId = mapByUserId.getNumberOfFailedLoginAttempts(userId);
     }
-    if (increment == true) {
-      synchronized (this) {
-        this.loginFailedAttemptsMap.put(userId, ++numberOfFailedLogins);
-        this.lastFailedLoginMap.put(userId, currentTimeInMillis);
-      }
+    if (clientIpAddress != null) {
+      failedLoginsForIpAddress = mapByIpAddress.getNumberOfFailedLoginAttempts(clientIpAddress);
     }
-    return numberOfFailedLogins * LOGIN_TIME_OFFSET_SCALE;
+    return (failedLoginsForUserId > failedLoginsForIpAddress) ? failedLoginsForUserId : failedLoginsForIpAddress;
   }
 
   /**
    * Call this method after successful authentication. The counter of failed logins will be cleared.
-   * @param userId This could be the client's ip address, the login name etc.
+   * @param userId May-be null.
+   * @param clientIpAddress May-be null.
    */
-  public void clearLoginTimeOffset(final String userId)
+  public void clearLoginTimeOffset(final String userId, final String clientIpAddress)
   {
-    synchronized (this) {
-      this.loginFailedAttemptsMap.remove(userId);
-      this.lastFailedLoginMap.remove(userId);
+    if (userId != null) {
+      mapByUserId.clearLoginTimeOffset(userId);
     }
-  }
-
-  /**
-   * Clears (removes) all entries for userId's older than {@link #LOGIN_OFFSET_EXPIRES_AFTER_MS}.
-   */
-  public void clearExpiredEntries()
-  {
-    final long currentTimeInMillis = System.currentTimeMillis();
-    synchronized (this) {
-      final Iterator<String> it = this.lastFailedLoginMap.keySet().iterator();
-      while (it.hasNext() == true) {
-        final String key = it.next();
-        final Long lastFailedLoginInMs = this.lastFailedLoginMap.get(key);
-        if (lastFailedLoginInMs != null && currentTimeInMillis - lastFailedLoginInMs > LOGIN_OFFSET_EXPIRES_AFTER_MS) {
-          // Last failed login entry is to old, so we'll ignore and clear it:
-          this.loginFailedAttemptsMap.remove(key);
-          it.remove();
-        }
-      }
+    if (clientIpAddress != null) {
+      mapByIpAddress.clearLoginTimeOffset(clientIpAddress);
     }
   }
 
@@ -191,46 +149,43 @@ public class LoginProtection
    */
   public void clearAll()
   {
-    synchronized (this) {
-      this.loginFailedAttemptsMap.clear();
-      this.lastFailedLoginMap.clear();
+    mapByUserId.clearAll();
+    mapByIpAddress.clearAll();
+  }
+
+
+  /**
+   * Increments the number of login failures.
+   * @param userId May-be null.
+   * @param clientIpAddress May-be null.
+   * @return Login time offset in ms. If time offsets are given for both, the user id and the ip address, the larger one will be returned.
+   */
+  public long incrementFailedLoginTimeOffset(final String userId, final String clientIpAddress)
+  {
+    long timeOffsetForUserId = 0;
+    long timeOffsetForIpAddress = 0;
+    if (userId != null) {
+      timeOffsetForUserId = mapByUserId.incrementFailedLoginTimeOffset(userId);
     }
-  }
-
-  /**
-   * For internal use by test cases.
-   */
-  int getSizeOfLastFailedLoginMap()
-  {
-    return this.lastFailedLoginMap.size();
-  }
-
-  /**
-   * For internal use by test cases.
-   */
-  int getSizeOfLoginFailedAttemptsMap()
-  {
-    return this.loginFailedAttemptsMap.size();
-  }
-
-  /**
-   * For internal use by test cases.
-   */
-  void setEntry(final String userId, final int numberOfFailedLoginAttempts, final long lastFailedAttemptTimestamp)
-  {
-    synchronized (this) {
-      this.loginFailedAttemptsMap.put(userId, numberOfFailedLoginAttempts);
-      this.lastFailedLoginMap.put(userId, lastFailedAttemptTimestamp);
+    if (clientIpAddress != null) {
+      timeOffsetForIpAddress = mapByIpAddress.incrementFailedLoginTimeOffset(clientIpAddress);
     }
+    return (timeOffsetForUserId > timeOffsetForIpAddress) ? timeOffsetForUserId : timeOffsetForIpAddress;
   }
 
   /**
-   * @param userId This could be the client's ip address, the login name etc.
-   * @return The number of failed login attempts (not expired ones) if exist, otherwise 0.
+   * @return the mapByIpAddress
    */
-  public int getNumberOfFailedLoginAttempts(final String userId)
+  public LoginProtectionMap getMapByIpAddress()
   {
-    final Integer result = this.loginFailedAttemptsMap.get(userId);
-    return result != null ? result : 0;
+    return mapByIpAddress;
+  }
+
+  /**
+   * @return the mapByUserId
+   */
+  public LoginProtectionMap getMapByUserId()
+  {
+    return mapByUserId;
   }
 }

@@ -37,7 +37,7 @@ public class LoginProtectionTest
   public void testLoginProtection() throws InterruptedException
   {
     final long current = System.currentTimeMillis();
-    final LoginProtection lp = LoginProtection.instance();
+    final LoginProtectionMap lp = LoginProtection.instance().getMapByUserId();
     lp.clearAll();
     Assert.assertEquals("Maps should be empty.", 0, lp.getSizeOfLastFailedLoginMap());
     Assert.assertEquals("Maps should be empty.", 0, lp.getSizeOfLoginFailedAttemptsMap());
@@ -70,6 +70,24 @@ public class LoginProtectionTest
     final long offset = lp.getFailedLoginTimeOffsetIfExists("horst");
     Assert.assertTrue("Time offset between 0 and 1 second expected due to 1 failed login attempt.", offset > 0 && offset < 1001);
     Thread.sleep(offset + 1);
-    Assert.assertEquals("No time offset for 'horst' expected, because time offest was run down.", 0, (int) lp.getFailedLoginTimeOffsetIfExists("horst"));
+    Assert.assertEquals("No time offset for 'horst' expected, because time offest was run down.", 0,
+        (int) lp.getFailedLoginTimeOffsetIfExists("horst"));
+  }
+
+  @Test
+  public void testLoginProtectionByIp() throws InterruptedException
+  {
+    final LoginProtection lp = LoginProtection.instance();
+    lp.clearAll();
+    Assert.assertEquals("Maps should be empty.", 0, lp.getMapByIpAddress().getSizeOfLastFailedLoginMap());
+    Assert.assertEquals("Maps should be empty.", 0, lp.getMapByIpAddress().getSizeOfLoginFailedAttemptsMap());
+    final String ip = "192.168.76.1";
+    for (int i = 0; i < 3001; i++) {
+      lp.incrementFailedLoginTimeOffset(String.valueOf(i), ip);
+    }
+    Assert.assertTrue("Time offset due to 3 failed logins expected.", lp.getFailedLoginTimeOffsetIfExists("kai", ip) > 0);
+    Assert.assertTrue("Time offset due to 3 failed logins not more than 3 seconds expected.",
+        lp.getFailedLoginTimeOffsetIfExists("kai", ip) < 3001);
+    Assert.assertEquals("No offset for new ip address expected.", 0, (int) lp.getFailedLoginTimeOffsetIfExists("horst", "192.168.76.2"));
   }
 }

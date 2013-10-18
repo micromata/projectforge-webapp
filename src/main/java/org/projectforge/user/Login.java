@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.projectforge.web.UserFilter;
+import org.projectforge.web.wicket.ClientIpResolver;
 
 /**
  * 
@@ -59,7 +60,8 @@ public class Login
       return new LoginResult().setLoginResultStatus(LoginResultStatus.FAILED);
     }
     final LoginProtection loginProtection = LoginProtection.instance();
-    final long offset = loginProtection.getFailedLoginTimeOffsetIfExists(username);
+    final String clientIpAddress = ClientIpResolver.getClientIp();
+    final long offset = loginProtection.getFailedLoginTimeOffsetIfExists(username, clientIpAddress);
     if (offset > 0) {
       final String seconds = String.valueOf(offset / 1000);
       log.warn("The account for '"
@@ -67,14 +69,14 @@ public class Login
           + "' is locked for "
           + seconds
           + " seconds due to failed login attempts. Please try again later.");
-      final int numberOfFailedAttempts = loginProtection.getNumberOfFailedLoginAttempts(username);
+      final int numberOfFailedAttempts = loginProtection.getNumberOfFailedLoginAttempts(username, clientIpAddress);
       return new LoginResult().setLoginResultStatus(LoginResultStatus.LOGIN_TIME_OFFSET).setMsgParams(seconds, String.valueOf(numberOfFailedAttempts));
     }
     final LoginResult result = loginHandler.checkLogin(username, password);
     if (result.getLoginResultStatus() == LoginResultStatus.SUCCESS) {
-      loginProtection.clearLoginTimeOffset(username);
+      loginProtection.clearLoginTimeOffset(username, clientIpAddress);
     } else if (result.getLoginResultStatus() == LoginResultStatus.FAILED) {
-      loginProtection.incrementFailedLoginTimeOffset(username);
+      loginProtection.incrementFailedLoginTimeOffset(username, clientIpAddress);
     }
     return result;
   }
