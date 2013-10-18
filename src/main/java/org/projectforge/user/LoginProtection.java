@@ -23,7 +23,7 @@
 
 package org.projectforge.user;
 
-TODO: Logging von Versuchen, z. B. stündlich.
+// TODO: Logging von Versuchen, z. B. stündlich.
 /**
  * Class for avoiding brute force attacks by time offsets during login after failed login attempts. Usage:<br/>
  * 
