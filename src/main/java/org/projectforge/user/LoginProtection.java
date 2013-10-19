@@ -23,8 +23,6 @@
 
 package org.projectforge.user;
 
-// TODO: Logging von Fehlversuchen, z. B. Anzahl pro IP/User stündlich (nicht pro Fehlversuch).
-
 /**
  * Class for avoiding brute force attacks by time offsets during login after failed login attempts. Usage:<br/>
  * 
@@ -36,7 +34,7 @@ package org.projectforge.user;
  *     final String seconds = String.valueOf(offset / 1000);
  *     final int numberOfFailedAttempts = loginProtection.getNumberOfFailedLoginAttempts(username, clientIpAddress);
  *     // setResponsePage(MessagePage.class, &quot;Your account is locked for &quot; + seconds +
- *     // &quot; seconds due to " + numberOfFailedAttempts + " failed login attempts. Please try again later.&quot;);
+ *     // &quot; seconds due to &quot; + numberOfFailedAttempts + &quot; failed login attempts. Please try again later.&quot;);
  *     return false;
  *   }
  *   boolean success = checkLogin(username, password); // Check the login however you want.
@@ -57,6 +55,8 @@ package org.projectforge.user;
  */
 public class LoginProtection
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LoginProtection.class);
+
   /**
    * After this given number of failed logins (for one specific user id) the account penalty counter will be incremented.
    */
@@ -154,7 +154,6 @@ public class LoginProtection
     mapByIpAddress.clearAll();
   }
 
-
   /**
    * Increments the number of login failures.
    * @param userId May-be null.
@@ -167,9 +166,19 @@ public class LoginProtection
     long timeOffsetForIpAddress = 0;
     if (userId != null) {
       timeOffsetForUserId = mapByUserId.incrementFailedLoginTimeOffset(userId);
+      if (timeOffsetForUserId > 0) {
+        log.warn("Time-offset (penalty) for user '" + userId + "' increased: " + (timeOffsetForUserId / 1000) + " seconds.");
+      }
     }
     if (clientIpAddress != null) {
       timeOffsetForIpAddress = mapByIpAddress.incrementFailedLoginTimeOffset(clientIpAddress);
+      if (timeOffsetForIpAddress > 0) {
+        log.warn("Time-offset (penalty) for ip address '"
+            + clientIpAddress
+            + "' increased: "
+            + (timeOffsetForIpAddress / 1000)
+            + " seconds.");
+      }
     }
     return (timeOffsetForUserId > timeOffsetForIpAddress) ? timeOffsetForUserId : timeOffsetForIpAddress;
   }
