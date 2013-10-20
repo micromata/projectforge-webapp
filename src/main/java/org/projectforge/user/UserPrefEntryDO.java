@@ -44,7 +44,7 @@ import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.ModificationStatus;
 import org.projectforge.core.UserPrefParameter;
-import org.projectforge.multitenancy.TentantDO;
+import org.projectforge.multitenancy.TenantDO;
 
 /**
  * Represents a single generic user preference entry.
@@ -59,7 +59,7 @@ public class UserPrefEntryDO implements BaseDO<Integer>, Serializable
 
   public static final int MAX_STRING_VALUE_LENGTH = 10000;
 
-  private TentantDO tenant;
+  private TenantDO tenant;
 
   private String parameter; // 255 not null
 
@@ -104,16 +104,16 @@ public class UserPrefEntryDO implements BaseDO<Integer>, Serializable
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "tenant_id")
   @Override
-  public TentantDO getTenant()
+  public TenantDO getTenant()
   {
     return this.tenant;
   }
 
   /**
-   * @see org.projectforge.core.BaseDO#setTenant(TentantDO)
+   * @see org.projectforge.core.BaseDO#setTenant(TenantDO)
    */
   @Override
-  public UserPrefEntryDO setTenant(final TentantDO tenant)
+  public UserPrefEntryDO setTenant(final TenantDO tenant)
   {
     this.tenant = tenant;
     return this;

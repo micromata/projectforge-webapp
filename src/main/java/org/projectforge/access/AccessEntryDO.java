@@ -44,7 +44,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.ModificationStatus;
-import org.projectforge.multitenancy.TentantDO;
+import org.projectforge.multitenancy.TenantDO;
 
 /**
  * Represents a single generic access entry for the four main SQL functionalities.
@@ -59,7 +59,7 @@ public class AccessEntryDO implements Comparable<AccessEntryDO>, Serializable, B
 
   // private static final Logger log = Logger.getLogger(AccessEntryDO.class);
 
-  private TentantDO tenant;
+  private TenantDO tenant;
 
   private AccessType accessType = null;
 
@@ -90,18 +90,18 @@ public class AccessEntryDO implements Comparable<AccessEntryDO>, Serializable, B
    * @see org.projectforge.core.BaseDO#getTenant()
    */
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "tentant_id")
+  @JoinColumn(name = "tenant_id")
   @Override
-  public TentantDO getTenant()
+  public TenantDO getTenant()
   {
     return this.tenant;
   }
 
   /**
-   * @see org.projectforge.core.BaseDO#setTenant(TentantDO)
+   * @see org.projectforge.core.BaseDO#setTenant(TenantDO)
    */
   @Override
-  public AccessEntryDO setTenant(final TentantDO tenant)
+  public AccessEntryDO setTenant(final TenantDO tenant)
   {
     this.tenant = tenant;
     return this;

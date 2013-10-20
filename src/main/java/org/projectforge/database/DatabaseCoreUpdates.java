@@ -42,7 +42,7 @@ import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.RechnungDO;
-import org.projectforge.multitenancy.TentantDO;
+import org.projectforge.multitenancy.TenantDO;
 import org.projectforge.registry.Registry;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.scripting.ScriptDO;
@@ -73,7 +73,7 @@ public class DatabaseCoreUpdates
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        if (dao.doEntitiesExist(TentantDO.class) == false) {
+        if (dao.doEntitiesExist(TenantDO.class) == false) {
           return UpdatePreCheckStatus.READY_FOR_UPDATE;
         }
         final List<RegistryEntry> list = Registry.instance().getOrderedList();
@@ -95,8 +95,8 @@ public class DatabaseCoreUpdates
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        if (dao.doEntitiesExist(TentantDO.class) == false) {
-          final SchemaGenerator schemaGenerator = new SchemaGenerator(dao).add(TentantDO.class);
+        if (dao.doEntitiesExist(TenantDO.class) == false) {
+          final SchemaGenerator schemaGenerator = new SchemaGenerator(dao).add(TenantDO.class);
           schemaGenerator.createSchema();
         }
         final List<RegistryEntry> list = Registry.instance().getOrderedList();

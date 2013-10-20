@@ -43,7 +43,7 @@ import org.projectforge.core.ModificationStatus;
  */
 @Entity
 @Table(name = "T_TENANT")
-public class TentantDO implements BaseDO<Integer>, Serializable
+public class TenantDO implements BaseDO<Integer>, Serializable
 {
   private static final long serialVersionUID = -2242576370698028282L;
 
@@ -79,7 +79,7 @@ public class TentantDO implements BaseDO<Integer>, Serializable
    * @param name the name to set
    * @return this for chaining.
    */
-  public TentantDO setName(final String name)
+  public TenantDO setName(final String name)
   {
     this.name = name;
     return this;
@@ -98,7 +98,7 @@ public class TentantDO implements BaseDO<Integer>, Serializable
    * @param description the description to set
    * @return this for chaining.
    */
-  public TentantDO setDescription(final String description)
+  public TenantDO setDescription(final String description)
   {
     this.description = description;
     return this;
@@ -110,17 +110,17 @@ public class TentantDO implements BaseDO<Integer>, Serializable
    */
   @Transient
   @Override
-  public TentantDO getTenant()
+  public TenantDO getTenant()
   {
     return this;
   }
 
   /**
    * Throws {@link UnsupportedOperationException}.
-   * @see org.projectforge.core.BaseDO#setTenant(TentantDO)
+   * @see org.projectforge.core.BaseDO#setTenant(TenantDO)
    */
   @Override
-  public BaseDO<Integer> setTenant(final TentantDO tenant)
+  public BaseDO<Integer> setTenant(final TenantDO tenant)
   {
     throw new UnsupportedOperationException();
   }

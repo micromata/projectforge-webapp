@@ -55,7 +55,7 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.common.ReflectionToString;
 import org.projectforge.database.HibernateUtils;
-import org.projectforge.multitenancy.TentantDO;
+import org.projectforge.multitenancy.TenantDO;
 
 /**
  * 
@@ -70,7 +70,7 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AbstractBaseDO.class);
 
   @IndexedEmbedded(depth = 1)
-  private TentantDO tenant;
+  private TenantDO tenant;
 
   @PropertyInfo(i18nKey = "created")
   private Date created;
@@ -99,16 +99,16 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "tenant_id")
   @Override
-  public TentantDO getTenant()
+  public TenantDO getTenant()
   {
     return this.tenant;
   }
 
   /**
-   * @see org.projectforge.core.BaseDO#setTenant(TentantDO)
+   * @see org.projectforge.core.BaseDO#setTenant(TenantDO)
    */
   @Override
-  public AbstractBaseDO<I> setTenant(final TentantDO tenant)
+  public AbstractBaseDO<I> setTenant(final TenantDO tenant)
   {
     this.tenant = tenant;
     return this;

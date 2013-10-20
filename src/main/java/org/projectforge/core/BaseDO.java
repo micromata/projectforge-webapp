@@ -25,7 +25,7 @@ package org.projectforge.core;
 
 import java.io.Serializable;
 
-import org.projectforge.multitenancy.TentantDO;
+import org.projectforge.multitenancy.TenantDO;
 
 /**
  * 
@@ -37,13 +37,13 @@ public interface BaseDO<I extends Serializable> extends IdObject<I>
   /**
    * @return The tenant for multi-tenancy.
    */
-  public TentantDO getTenant();
+  public TenantDO getTenant();
 
   /**
    * Sets the tenant for multi-tenancy.
    * @return this for chaining.
    */
-  public BaseDO<I> setTenant(TentantDO client);
+  public BaseDO<I> setTenant(TenantDO client);
 
   public I getId();
 

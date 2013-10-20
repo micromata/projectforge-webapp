@@ -37,7 +37,7 @@ class HibernateCoreEntities
     de.micromata.hibernate.history.delta.CollectionPropertyDelta.class, //
     de.micromata.hibernate.history.delta.AssociationPropertyDelta.class, //
     de.micromata.hibernate.history.HistoryEntry.class, //
-    org.projectforge.multitenancy.TentantDO.class, //
+    org.projectforge.multitenancy.TenantDO.class, //
     org.projectforge.fibu.AuftragDO.class, //
     org.projectforge.fibu.AuftragsPositionDO.class, //
     org.projectforge.fibu.EmployeeDO.class, //
