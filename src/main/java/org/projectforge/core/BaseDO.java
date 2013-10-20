@@ -25,6 +25,8 @@ package org.projectforge.core;
 
 import java.io.Serializable;
 
+import org.projectforge.multitenancy.ClientDO;
+
 /**
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -32,6 +34,17 @@ import java.io.Serializable;
  */
 public interface BaseDO<I extends Serializable> extends IdObject<I>
 {
+  /**
+   * @return The client for multi-tenancy.
+   */
+  public ClientDO getClient();
+
+  /**
+   * Sets the client for multi-tenancy.
+   * @return this for chaining.
+   */
+  public BaseDO<I> setClient(ClientDO client);
+
   public I getId();
 
   public void setId(I id);

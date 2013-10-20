@@ -60,6 +60,7 @@ import org.projectforge.humanresources.HRPlanningDO;
 import org.projectforge.humanresources.HRPlanningEntryDO;
 import org.projectforge.meb.ImportedMebEntryDO;
 import org.projectforge.meb.MebEntryDO;
+import org.projectforge.multitenancy.ClientDO;
 import org.projectforge.orga.ContractDO;
 import org.projectforge.orga.PostausgangDO;
 import org.projectforge.orga.PosteingangDO;
@@ -91,6 +92,7 @@ public class DatabaseCoreInitial
     final Class< ? >[] doClasses = new Class< ? >[] { //
         // First needed data-base objects:
         HistoryEntry.class, PropertyDelta.class, //
+        ClientDO.class, //
         PFUserDO.class, GroupDO.class, TaskDO.class, GroupTaskAccessDO.class, //
         AccessEntryDO.class, //
 

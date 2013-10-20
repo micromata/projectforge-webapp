@@ -39,6 +39,9 @@ import java.util.TreeSet;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 
@@ -48,9 +51,11 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.hibernate.collection.PersistentSet;
+import org.hibernate.search.annotations.IndexedEmbedded;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.common.ReflectionToString;
 import org.projectforge.database.HibernateUtils;
+import org.projectforge.multitenancy.ClientDO;
 
 /**
  * 
@@ -63,6 +68,9 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
   private static final long serialVersionUID = -2225460450662176301L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AbstractBaseDO.class);
+
+  @IndexedEmbedded(depth = 1)
+  private ClientDO client;
 
   @PropertyInfo(i18nKey = "created")
   private Date created;
@@ -83,6 +91,27 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
    */
   public void recalculate()
   {
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDO#getClientId()
+   */
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "client_id")
+  @Override
+  public ClientDO getClient()
+  {
+    return this.client;
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDO#setClient(ClientDO)
+   */
+  @Override
+  public AbstractBaseDO<I> setClient(final ClientDO client)
+  {
+    this.client = client;
+    return this;
   }
 
   @Basic

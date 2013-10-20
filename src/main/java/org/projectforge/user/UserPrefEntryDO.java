@@ -27,8 +27,11 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
@@ -41,6 +44,7 @@ import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.ModificationStatus;
 import org.projectforge.core.UserPrefParameter;
+import org.projectforge.multitenancy.ClientDO;
 
 /**
  * Represents a single generic user preference entry.
@@ -54,6 +58,8 @@ public class UserPrefEntryDO implements BaseDO<Integer>, Serializable
   private static final long serialVersionUID = 7163902159871289059L;
 
   public static final int MAX_STRING_VALUE_LENGTH = 10000;
+
+  private ClientDO client;
 
   private String parameter; // 255 not null
 
@@ -90,6 +96,27 @@ public class UserPrefEntryDO implements BaseDO<Integer>, Serializable
   public void setId(final Integer id)
   {
     this.id = id;
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDO#getClient()
+   */
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "client_id")
+  @Override
+  public ClientDO getClient()
+  {
+    return this.client;
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDO#setClient(ClientDO)
+   */
+  @Override
+  public UserPrefEntryDO setClient(final ClientDO client)
+  {
+    this.client = client;
+    return this;
   }
 
   @Column(length = 255)

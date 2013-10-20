@@ -44,6 +44,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.ModificationStatus;
+import org.projectforge.multitenancy.ClientDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRights;
 
@@ -57,6 +58,8 @@ import de.micromata.hibernate.history.ExtendedHistorizable;
 public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAttendeeDO>, BaseDO<Integer>, ExtendedHistorizable
 {
   private static final long serialVersionUID = -3293247578185393730L;
+
+  private ClientDO client;
 
   private String url;
 
@@ -94,6 +97,27 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
   public void setId(final Integer id)
   {
     this.id = id;
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDO#getClient()
+   */
+  @Override
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "client_id")
+  public ClientDO getClient()
+  {
+    return this.client;
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDO#setClient(ClientDO)
+   */
+  @Override
+  public TeamEventAttendeeDO setClient(final ClientDO client)
+  {
+    this.client = client;
+    return this;
   }
 
   /**

@@ -29,8 +29,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
@@ -41,7 +44,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.ModificationStatus;
-
+import org.projectforge.multitenancy.ClientDO;
 
 /**
  * Represents a single generic access entry for the four main SQL functionalities.
@@ -55,6 +58,8 @@ public class AccessEntryDO implements Comparable<AccessEntryDO>, Serializable, B
   private static final long serialVersionUID = 5973002212430487361L;
 
   // private static final Logger log = Logger.getLogger(AccessEntryDO.class);
+
+  private ClientDO client;
 
   private AccessType accessType = null;
 
@@ -79,6 +84,27 @@ public class AccessEntryDO implements Comparable<AccessEntryDO>, Serializable, B
   public void setId(final Integer id)
   {
     this.id = id;
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDO#getClient()
+   */
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "client_id")
+  @Override
+  public ClientDO getClient()
+  {
+    return this.client;
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDO#setClient(ClientDO)
+   */
+  @Override
+  public AccessEntryDO setClient(final ClientDO client)
+  {
+    this.client = client;
+    return this;
   }
 
   /**
@@ -109,7 +135,8 @@ public class AccessEntryDO implements Comparable<AccessEntryDO>, Serializable, B
     this.accessType = accessType;
   }
 
-  public AccessEntryDO(final AccessType type, final boolean accessSelect, final boolean accessInsert, final boolean accessUpdate, final boolean accessDelete)
+  public AccessEntryDO(final AccessType type, final boolean accessSelect, final boolean accessInsert, final boolean accessUpdate,
+      final boolean accessDelete)
   {
     this.accessType = type;
     setAccess(accessSelect, accessInsert, accessUpdate, accessDelete);
@@ -246,7 +273,7 @@ public class AccessEntryDO implements Comparable<AccessEntryDO>, Serializable, B
    * modified. Null values will be excluded.
    * @param src
    */
-  public ModificationStatus copyValuesFrom(final BaseDO<? extends Serializable> src, final String... ignoreFields)
+  public ModificationStatus copyValuesFrom(final BaseDO< ? extends Serializable> src, final String... ignoreFields)
   {
     return AbstractBaseDO.copyValues(src, this, ignoreFields);
   }

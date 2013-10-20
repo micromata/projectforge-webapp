@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.projectforge.address.AddressDO;
 import org.projectforge.continuousdb.DatabaseResultRow;
+import org.projectforge.continuousdb.SchemaGenerator;
 import org.projectforge.continuousdb.Table;
 import org.projectforge.continuousdb.TableAttribute;
 import org.projectforge.continuousdb.UpdateEntry;
@@ -41,7 +42,9 @@ import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.RechnungDO;
+import org.projectforge.multitenancy.ClientDO;
 import org.projectforge.registry.Registry;
+import org.projectforge.registry.RegistryEntry;
 import org.projectforge.scripting.ScriptDO;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.GroupDO;
@@ -63,6 +66,57 @@ public class DatabaseCoreUpdates
   public static List<UpdateEntry> getUpdateEntries()
   {
     final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
+    // /////////////////////////////////////////////////////////////////
+    // 5.3
+    // /////////////////////////////////////////////////////////////////
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "5.3", "2013-10-20", "Adds client_id to all entities for multi-tenancy.") {
+      @Override
+      public UpdatePreCheckStatus runPreCheck()
+      {
+        if (dao.doEntitiesExist(ClientDO.class) == false) {
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
+        final List<RegistryEntry> list = Registry.instance().getOrderedList();
+        for (final RegistryEntry entry : list) {
+          if (entry.getDOClass() != null && dao.doTableAttributesExist(entry.getDOClass(), "client") == false) {
+            return UpdatePreCheckStatus.READY_FOR_UPDATE;
+          }
+          if (entry.getNestedDOClasses() != null) {
+            for (final Class<?> doClass : entry.getNestedDOClasses()) {
+              if (doClass != null && dao.doTableAttributesExist(doClass, "client") == false) {
+                return UpdatePreCheckStatus.READY_FOR_UPDATE;
+              }
+            }
+          }
+        }
+        return UpdatePreCheckStatus.ALREADY_UPDATED;
+      }
+
+      @Override
+      public UpdateRunningStatus runUpdate()
+      {
+        if (dao.doEntitiesExist(ClientDO.class) == false) {
+          final SchemaGenerator schemaGenerator = new SchemaGenerator(dao).add(ClientDO.class);
+          schemaGenerator.createSchema();
+        }
+        final List<RegistryEntry> list = Registry.instance().getOrderedList();
+        for (final RegistryEntry entry : list) {
+          if (entry.getDOClass() != null && dao.doTableAttributesExist(entry.getDOClass(), "client") == false) {
+            dao.addTableAttributes(entry.getDOClass(), "client");
+          }
+          if (entry.getNestedDOClasses() != null) {
+            for (final Class<?> doClass : entry.getNestedDOClasses()) {
+              if (doClass != null && dao.doTableAttributesExist(doClass, "client") == false) {
+                dao.addTableAttributes(doClass, "client");
+              }
+            }
+          }
+        }
+        dao.createMissingIndices();
+        return UpdateRunningStatus.DONE;
+      }
+    });
+
     // /////////////////////////////////////////////////////////////////
     // 5.2
     // /////////////////////////////////////////////////////////////////
