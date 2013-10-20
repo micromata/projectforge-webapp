@@ -42,7 +42,7 @@ import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.RechnungDO;
-import org.projectforge.multitenancy.ClientDO;
+import org.projectforge.multitenancy.TentantDO;
 import org.projectforge.registry.Registry;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.scripting.ScriptDO;
@@ -69,21 +69,21 @@ public class DatabaseCoreUpdates
     // /////////////////////////////////////////////////////////////////
     // 5.3
     // /////////////////////////////////////////////////////////////////
-    list.add(new UpdateEntryImpl(CORE_REGION_ID, "5.3", "2013-10-20", "Adds client_id to all entities for multi-tenancy.") {
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "5.3", "2013-10-20", "Adds t_tenant, tenant_id to all entities for multi-tenancy.") {
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        if (dao.doEntitiesExist(ClientDO.class) == false) {
+        if (dao.doEntitiesExist(TentantDO.class) == false) {
           return UpdatePreCheckStatus.READY_FOR_UPDATE;
         }
         final List<RegistryEntry> list = Registry.instance().getOrderedList();
         for (final RegistryEntry entry : list) {
-          if (entry.getDOClass() != null && dao.doTableAttributesExist(entry.getDOClass(), "client") == false) {
+          if (entry.getDOClass() != null && dao.doTableAttributesExist(entry.getDOClass(), "tenant") == false) {
             return UpdatePreCheckStatus.READY_FOR_UPDATE;
           }
           if (entry.getNestedDOClasses() != null) {
             for (final Class<?> doClass : entry.getNestedDOClasses()) {
-              if (doClass != null && dao.doTableAttributesExist(doClass, "client") == false) {
+              if (doClass != null && dao.doTableAttributesExist(doClass, "tenant") == false) {
                 return UpdatePreCheckStatus.READY_FOR_UPDATE;
               }
             }
@@ -95,19 +95,19 @@ public class DatabaseCoreUpdates
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        if (dao.doEntitiesExist(ClientDO.class) == false) {
-          final SchemaGenerator schemaGenerator = new SchemaGenerator(dao).add(ClientDO.class);
+        if (dao.doEntitiesExist(TentantDO.class) == false) {
+          final SchemaGenerator schemaGenerator = new SchemaGenerator(dao).add(TentantDO.class);
           schemaGenerator.createSchema();
         }
         final List<RegistryEntry> list = Registry.instance().getOrderedList();
         for (final RegistryEntry entry : list) {
-          if (entry.getDOClass() != null && dao.doTableAttributesExist(entry.getDOClass(), "client") == false) {
-            dao.addTableAttributes(entry.getDOClass(), "client");
+          if (entry.getDOClass() != null && dao.doTableAttributesExist(entry.getDOClass(), "tenant") == false) {
+            dao.addTableAttributes(entry.getDOClass(), "tenant");
           }
           if (entry.getNestedDOClasses() != null) {
             for (final Class<?> doClass : entry.getNestedDOClasses()) {
-              if (doClass != null && dao.doTableAttributesExist(doClass, "client") == false) {
-                dao.addTableAttributes(doClass, "client");
+              if (doClass != null && dao.doTableAttributesExist(doClass, "tenant") == false) {
+                dao.addTableAttributes(doClass, "tenant");
               }
             }
           }

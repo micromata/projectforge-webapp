@@ -44,7 +44,7 @@ import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.ModificationStatus;
 import org.projectforge.core.UserPrefParameter;
-import org.projectforge.multitenancy.ClientDO;
+import org.projectforge.multitenancy.TentantDO;
 
 /**
  * Represents a single generic user preference entry.
@@ -59,7 +59,7 @@ public class UserPrefEntryDO implements BaseDO<Integer>, Serializable
 
   public static final int MAX_STRING_VALUE_LENGTH = 10000;
 
-  private ClientDO client;
+  private TentantDO tenant;
 
   private String parameter; // 255 not null
 
@@ -99,23 +99,23 @@ public class UserPrefEntryDO implements BaseDO<Integer>, Serializable
   }
 
   /**
-   * @see org.projectforge.core.BaseDO#getClient()
+   * @see org.projectforge.core.BaseDO#getTenant()
    */
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "client_id")
+  @JoinColumn(name = "tenant_id")
   @Override
-  public ClientDO getClient()
+  public TentantDO getTenant()
   {
-    return this.client;
+    return this.tenant;
   }
 
   /**
-   * @see org.projectforge.core.BaseDO#setClient(ClientDO)
+   * @see org.projectforge.core.BaseDO#setTenant(TentantDO)
    */
   @Override
-  public UserPrefEntryDO setClient(final ClientDO client)
+  public UserPrefEntryDO setTenant(final TentantDO tenant)
   {
-    this.client = client;
+    this.tenant = tenant;
     return this;
   }
 

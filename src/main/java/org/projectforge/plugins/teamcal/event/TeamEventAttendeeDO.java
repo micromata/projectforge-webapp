@@ -44,7 +44,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.ModificationStatus;
-import org.projectforge.multitenancy.ClientDO;
+import org.projectforge.multitenancy.TentantDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRights;
 
@@ -59,7 +59,7 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
 {
   private static final long serialVersionUID = -3293247578185393730L;
 
-  private ClientDO client;
+  private TentantDO tenant;
 
   private String url;
 
@@ -100,23 +100,23 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
   }
 
   /**
-   * @see org.projectforge.core.BaseDO#getClient()
+   * @see org.projectforge.core.BaseDO#getTenant()
    */
   @Override
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "client_id")
-  public ClientDO getClient()
+  @JoinColumn(name = "tenant_id")
+  public TentantDO getTenant()
   {
-    return this.client;
+    return this.tenant;
   }
 
   /**
-   * @see org.projectforge.core.BaseDO#setClient(ClientDO)
+   * @see org.projectforge.core.BaseDO#setTenant(TentantDO)
    */
   @Override
-  public TeamEventAttendeeDO setClient(final ClientDO client)
+  public TeamEventAttendeeDO setTenant(final TentantDO tenant)
   {
-    this.client = client;
+    this.tenant = tenant;
     return this;
   }
 

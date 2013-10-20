@@ -55,7 +55,7 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.common.ReflectionToString;
 import org.projectforge.database.HibernateUtils;
-import org.projectforge.multitenancy.ClientDO;
+import org.projectforge.multitenancy.TentantDO;
 
 /**
  * 
@@ -70,7 +70,7 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AbstractBaseDO.class);
 
   @IndexedEmbedded(depth = 1)
-  private ClientDO client;
+  private TentantDO tenant;
 
   @PropertyInfo(i18nKey = "created")
   private Date created;
@@ -94,23 +94,23 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
   }
 
   /**
-   * @see org.projectforge.core.BaseDO#getClientId()
+   * @see org.projectforge.core.BaseDO#getTenant()
    */
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "client_id")
+  @JoinColumn(name = "tenant_id")
   @Override
-  public ClientDO getClient()
+  public TentantDO getTenant()
   {
-    return this.client;
+    return this.tenant;
   }
 
   /**
-   * @see org.projectforge.core.BaseDO#setClient(ClientDO)
+   * @see org.projectforge.core.BaseDO#setTenant(TentantDO)
    */
   @Override
-  public AbstractBaseDO<I> setClient(final ClientDO client)
+  public AbstractBaseDO<I> setTenant(final TentantDO tenant)
   {
-    this.client = client;
+    this.tenant = tenant;
     return this;
   }
 

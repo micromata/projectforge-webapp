@@ -37,13 +37,13 @@ import org.projectforge.core.BaseDO;
 import org.projectforge.core.ModificationStatus;
 
 /**
- * Represents a single generic user preference entry.
+ * Represents a single tenant (client) for multi-tenancy.
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 @Entity
-@Table(name = "T_CLIENT")
-public class ClientDO implements BaseDO<Integer>, Serializable
+@Table(name = "T_TENANT")
+public class TentantDO implements BaseDO<Integer>, Serializable
 {
   private static final long serialVersionUID = -2242576370698028282L;
 
@@ -79,7 +79,7 @@ public class ClientDO implements BaseDO<Integer>, Serializable
    * @param name the name to set
    * @return this for chaining.
    */
-  public ClientDO setName(final String name)
+  public TentantDO setName(final String name)
   {
     this.name = name;
     return this;
@@ -98,7 +98,7 @@ public class ClientDO implements BaseDO<Integer>, Serializable
    * @param description the description to set
    * @return this for chaining.
    */
-  public ClientDO setDescription(final String description)
+  public TentantDO setDescription(final String description)
   {
     this.description = description;
     return this;
@@ -106,21 +106,21 @@ public class ClientDO implements BaseDO<Integer>, Serializable
 
   /**
    * Returns this.
-   * @see org.projectforge.core.BaseDO#getClientId()
+   * @see org.projectforge.core.BaseDO#getTenant()
    */
   @Transient
   @Override
-  public ClientDO getClient()
+  public TentantDO getTenant()
   {
     return this;
   }
 
   /**
    * Throws {@link UnsupportedOperationException}.
-   * @see org.projectforge.core.BaseDO#setClient(ClientDO)
+   * @see org.projectforge.core.BaseDO#setTenant(TentantDO)
    */
   @Override
-  public BaseDO<Integer> setClient(final ClientDO client)
+  public BaseDO<Integer> setTenant(final TentantDO tenant)
   {
     throw new UnsupportedOperationException();
   }
