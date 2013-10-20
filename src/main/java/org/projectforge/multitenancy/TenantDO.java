@@ -23,18 +23,12 @@
 
 package org.projectforge.multitenancy;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.projectforge.core.AbstractBaseDO;
-import org.projectforge.core.BaseDO;
-import org.projectforge.core.ModificationStatus;
+import org.projectforge.core.DefaultBaseDO;
 
 /**
  * Represents a single tenant (client) for multi-tenancy.
@@ -43,28 +37,13 @@ import org.projectforge.core.ModificationStatus;
  */
 @Entity
 @Table(name = "T_TENANT")
-public class TenantDO implements BaseDO<Integer>, Serializable
+public class TenantDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = -2242576370698028282L;
-
-  private Integer id;
 
   private String name;
 
   private String description;
-
-  @Id
-  @GeneratedValue
-  @Column(name = "pk")
-  public Integer getId()
-  {
-    return id;
-  }
-
-  public void setId(final Integer id)
-  {
-    this.id = id;
-  }
 
   /**
    * @return the name
@@ -105,8 +84,8 @@ public class TenantDO implements BaseDO<Integer>, Serializable
   }
 
   /**
-   * Returns this.
    * @see org.projectforge.core.BaseDO#getTenant()
+   * @return this.
    */
   @Transient
   @Override
@@ -120,57 +99,8 @@ public class TenantDO implements BaseDO<Integer>, Serializable
    * @see org.projectforge.core.BaseDO#setTenant(TenantDO)
    */
   @Override
-  public BaseDO<Integer> setTenant(final TenantDO tenant)
+  public TenantDO setTenant(final TenantDO tenant)
   {
     throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Throws {@link UnsupportedOperationException}.
-   * @see org.projectforge.core.BaseDO#isMinorChange()
-   */
-  @Override
-  public boolean isMinorChange()
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Throws {@link UnsupportedOperationException}.
-   * @see org.projectforge.core.BaseDO#setMinorChange(boolean)
-   */
-  @Override
-  public void setMinorChange(final boolean value)
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Throws {@link UnsupportedOperationException}.
-   * @see org.projectforge.core.BaseDO#getAttribute(java.lang.String)
-   */
-  @Override
-  public Object getAttribute(final String key)
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Throws {@link UnsupportedOperationException}.
-   * @see org.projectforge.core.BaseDO#setAttribute(java.lang.String, java.lang.Object)
-   */
-  @Override
-  public void setAttribute(final String key, final Object value)
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * @see org.projectforge.core.BaseDO#copyValuesFrom(org.projectforge.core.BaseDO, java.lang.String[])
-   */
-  @Override
-  public ModificationStatus copyValuesFrom(final BaseDO< ? extends Serializable> src, final String... ignoreFields)
-  {
-    return AbstractBaseDO.copyValues(src, this, ignoreFields);
   }
 }
