@@ -78,11 +78,13 @@ public class DatabaseCoreUpdates
         }
         final List<RegistryEntry> list = Registry.instance().getOrderedList();
         for (final RegistryEntry entry : list) {
-          if (entry.getDOClass() != null && dao.doTableAttributesExist(entry.getDOClass(), "tenant") == false) {
+          if (entry.getDOClass() != null
+              && entry.getDOClass() != TenantDO.class
+              && dao.doTableAttributesExist(entry.getDOClass(), "tenant") == false) {
             return UpdatePreCheckStatus.READY_FOR_UPDATE;
           }
           if (entry.getNestedDOClasses() != null) {
-            for (final Class<?> doClass : entry.getNestedDOClasses()) {
+            for (final Class< ? > doClass : entry.getNestedDOClasses()) {
               if (doClass != null && dao.doTableAttributesExist(doClass, "tenant") == false) {
                 return UpdatePreCheckStatus.READY_FOR_UPDATE;
               }
@@ -105,7 +107,7 @@ public class DatabaseCoreUpdates
             dao.addTableAttributes(entry.getDOClass(), "tenant");
           }
           if (entry.getNestedDOClasses() != null) {
-            for (final Class<?> doClass : entry.getNestedDOClasses()) {
+            for (final Class< ? > doClass : entry.getNestedDOClasses()) {
               if (doClass != null && dao.doTableAttributesExist(doClass, "tenant") == false) {
                 dao.addTableAttributes(doClass, "tenant");
               }

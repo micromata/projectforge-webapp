@@ -92,6 +92,8 @@ import org.projectforge.web.meb.MebEditPage;
 import org.projectforge.web.meb.MebListPage;
 import org.projectforge.web.mobile.LoginMobilePage;
 import org.projectforge.web.mobile.MenuMobilePage;
+import org.projectforge.web.multitenancy.TenantEditPage;
+import org.projectforge.web.multitenancy.TenantListPage;
 import org.projectforge.web.orga.ContractEditPage;
 import org.projectforge.web.orga.ContractListPage;
 import org.projectforge.web.orga.PostausgangEditPage;
@@ -299,6 +301,9 @@ public class WebRegistry
 
     register(DaoRegistry.TIMESHEET, TimesheetListPage.class);
     addMountPages(DaoRegistry.TIMESHEET, TimesheetListPage.class, TimesheetEditPage.class);
+
+    register(DaoRegistry.TENANT, TenantListPage.class);
+    addMountPages(DaoRegistry.TENANT, TenantListPage.class, TenantEditPage.class);
 
     register(DaoRegistry.USER, UserListPage.class);
     addMountPages(DaoRegistry.USER, UserListPage.class, UserEditPage.class);

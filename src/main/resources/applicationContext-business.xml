@@ -53,6 +53,7 @@
   <bean id="searchDao" class="org.projectforge.core.SearchDao" />
   <bean id="systemDao" class="org.projectforge.core.SystemDao" />
   <bean id="taskDao" class="org.projectforge.task.TaskDao" />
+  <bean id="tenantDao" class="org.projectforge.multitenancy.TenantDao" />
   <bean id="timesheetDao" class="org.projectforge.timesheet.TimesheetDao" />
   <bean id="timesheetExport" class="org.projectforge.timesheet.TimesheetExport" />
   <bean id="userDao" class="org.projectforge.user.UserDao" />
