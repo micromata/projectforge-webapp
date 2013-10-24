@@ -26,7 +26,9 @@ package org.projectforge.registry;
 import javax.sql.DataSource;
 
 import org.projectforge.access.AccessDao;
+import org.projectforge.access.AccessEntryDO;
 import org.projectforge.address.AddressDao;
+import org.projectforge.address.PersonalAddressDO;
 import org.projectforge.book.BookDao;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.ConfigurationDao;
@@ -52,6 +54,7 @@ import org.projectforge.gantt.GanttChartDao;
 import org.projectforge.humanresources.HRPlanningDao;
 import org.projectforge.humanresources.HRPlanningEntryDO;
 import org.projectforge.meb.MebDao;
+import org.projectforge.multitenancy.TenantDao;
 import org.projectforge.orga.ContractDao;
 import org.projectforge.orga.PostausgangDao;
 import org.projectforge.orga.PosteingangDao;
@@ -139,6 +142,8 @@ public class DaoRegistry
 
   public static final String TASK = "task";
 
+  public static final String TENANT = "tenant";
+
   public static final String TIMESHEET = "timesheet";
 
   public static final String USER = "user";
@@ -203,6 +208,8 @@ public class DaoRegistry
 
   private TaskDao taskDao;
 
+  private TenantDao tenantDao;
+
   private TimesheetDao timesheetDao;
 
   private UserDao userDao;
@@ -224,14 +231,15 @@ public class DaoRegistry
       return;
     }
     register(CONFIGURATION, ConfigurationDao.class, configurationDao, "administration.configuration").setSearchable(false);
+    register(TENANT, TenantDao.class, tenantDao, "tenant");
     register(USER, UserDao.class, userDao, "user");
     Registry.instance().setUserGroupCache(userDao.getUserGroupCache());
     register(GROUP, GroupDao.class, groupDao, "group");
     register(TASK, TaskDao.class, taskDao, "task"); // needs PFUserDO
     Registry.instance().setTaskTree(taskDao.getTaskTree());
-    register(ACCESS, AccessDao.class, accessDao, "access");
+    register(ACCESS, AccessDao.class, accessDao, "access").setNestedDOClasses(AccessEntryDO.class);
 
-    register(ADDRESS, AddressDao.class, addressDao, "address");
+    register(ADDRESS, AddressDao.class, addressDao, "address").setNestedDOClasses(PersonalAddressDO.class);
     register(TIMESHEET, TimesheetDao.class, timesheetDao, "timesheet") //
     .setSearchFilterClass(TimesheetFilter.class);
     register(BOOK, BookDao.class, bookDao, "book");
@@ -446,6 +454,11 @@ public class DaoRegistry
   public void setTaskDao(final TaskDao taskDao)
   {
     this.taskDao = taskDao;
+  }
+
+  public void setTenantDao(final TenantDao tenantDao)
+  {
+    this.tenantDao = tenantDao;
   }
 
   public void setTimesheetDao(final TimesheetDao timesheetDao)
