@@ -63,6 +63,7 @@ public enum MenuItemDefId
   INCOMING_INVOICE_LIST("fibu.eingangsrechnungen"), //
   MEB("meb"), //
   MONTHLY_EMPLOYEE_REPORT("monthlyEmployeeReport"), //
+  TENANT_LIST("multiTenancy"), //
   MY_ACCOUNT("myAccount"), //
   MY_PREFERENCES("myPreferences"), //
   REPORT_OBJECTIVES("fibu.reporting.reportObjectives"), //

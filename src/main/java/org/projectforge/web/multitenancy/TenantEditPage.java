@@ -43,7 +43,7 @@ public class TenantEditPage extends AbstractEditPage<TenantDO, TenantEditForm, T
 
   public TenantEditPage(final PageParameters parameters)
   {
-    super(parameters, "tenant");
+    super(parameters, "multitenancy");
     init();
   }
 

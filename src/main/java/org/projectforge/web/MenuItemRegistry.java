@@ -87,6 +87,7 @@ import org.projectforge.web.humanresources.HRListPage;
 import org.projectforge.web.humanresources.HRPlanningListPage;
 import org.projectforge.web.imagecropper.ImageCropperPage;
 import org.projectforge.web.meb.MebListPage;
+import org.projectforge.web.multitenancy.TenantListPage;
 import org.projectforge.web.orga.ContractListPage;
 import org.projectforge.web.orga.PostausgangListPage;
 import org.projectforge.web.orga.PosteingangListPage;
@@ -358,6 +359,7 @@ public class MenuItemRegistry
       }
     });
 
+    reg.register(admin, MenuItemDefId.TENANT_LIST, 35, TenantListPage.class);
     reg.register(admin, MenuItemDefId.USER_LIST, 40, UserListPage.class);
     reg.register(admin, MenuItemDefId.GROUP_LIST, 50, GroupListPage.class); // Visible for all.
     reg.register(admin, MenuItemDefId.ACCESS_LIST, 60, AccessListPage.class); // Visible for all.

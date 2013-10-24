@@ -55,7 +55,7 @@ public class TenantListPage extends AbstractListPage<TenantListForm, TenantDao, 
 
   public TenantListPage(final PageParameters parameters)
   {
-    super(parameters, "tenant");
+    super(parameters, "multitenancy");
   }
 
   @SuppressWarnings("serial")
