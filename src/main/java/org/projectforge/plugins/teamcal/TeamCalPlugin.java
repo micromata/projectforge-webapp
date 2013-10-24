@@ -96,6 +96,7 @@ public class TeamCalPlugin extends AbstractPlugin
   /**
    * @see org.projectforge.plugins.core.AbstractPlugin#initialize()
    */
+  @SuppressWarnings("unchecked")
   @Override
   protected void initialize()
   {
@@ -103,10 +104,12 @@ public class TeamCalPlugin extends AbstractPlugin
     TeamCalPluginUpdates.dao = getDatabaseUpdateDao();
     final RegistryEntry entry = new RegistryEntry(ID, TeamCalDao.class, teamCalDao, "plugins.teamcal");
     final RegistryEntry eventEntry = new RegistryEntry("teamEvent", TeamEventDao.class, teamEventDao, "plugins.teamcal.event");
+    eventEntry.setNestedDOClasses(TeamEventAttendeeDO.class);
 
     // The CalendarDao is automatically available by the scripting engine!
     register(entry);
     register(eventEntry);
+
 
     // Register the web part:
     registerWeb(ID, TeamCalListPage.class, TeamCalEditPage.class);
