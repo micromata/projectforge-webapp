@@ -165,7 +165,7 @@ public class RegistryEntry implements Serializable
 
   /**
    * The nested do classes are used e. g. by the full text search engine for re-indexing.
-   * @return Nested (dependant do classes with no own registry entry) if given, otherwise null.
+   * @return Nested (dependent do classes with no own registry entry) if given, otherwise null.
    */
   public Class< ? extends BaseDO< ? >>[] getNestedDOClasses()
       {
