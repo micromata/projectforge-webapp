@@ -101,7 +101,9 @@ public class PluginsRegistry
         for (final UpdateEntry entry : updateEntries) {
           if (entry.isInitial() == true) {
             log.error("The given UpdateEntry returned by plugin.getUpdateEntries() is initial! Please use constructor with parameter version: "
-                + plugin.getClass() + ": " + entry.getDescription());
+                + plugin.getClass()
+                + ": "
+                + entry.getDescription());
           }
         }
         systemUpdater.register(updateEntries);
@@ -109,9 +111,13 @@ public class PluginsRegistry
     }
   }
 
-  public void set(final ConfigurableListableBeanFactory beanFactory, final IResourceSettings resourceSettings)
+  public void set(final ConfigurableListableBeanFactory beanFactory)
   {
     this.beanFactory = beanFactory;
+  }
+
+  public void set(final IResourceSettings resourceSettings)
+  {
     this.resourceSettings = resourceSettings;
   }
 
@@ -155,7 +161,8 @@ public class PluginsRegistry
     }
   }
 
-  public void registerCronJobs(final CronSetup cronSetup) {
+  public void registerCronJobs(final CronSetup cronSetup)
+  {
     for (final AbstractPlugin plugin : plugins) {
       plugin.registerCronJob(cronSetup);
     }
