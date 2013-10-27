@@ -26,12 +26,8 @@ package org.projectforge.web.wicket;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TimeZone;
 
 import javax.servlet.ServletContext;
-
-import de.micromata.wicket.request.mapper.PageParameterAwareMountedMapper;
-import net.fortuna.ical4j.util.CompatibilityHints;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Application;
@@ -54,32 +50,18 @@ import org.apache.wicket.resource.loader.BundleStringResourceLoader;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.apache.wicket.util.lang.Bytes;
-import org.projectforge.AppVersion;
 import org.projectforge.common.BeanHelper;
 import org.projectforge.common.ExceptionHelper;
-import org.projectforge.continuousdb.DatabaseSupport;
-import org.projectforge.continuousdb.UpdateEntry;
-import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
-import org.projectforge.core.ConfigurationDao;
-import org.projectforge.core.CronSetup;
 import org.projectforge.core.ProjectForgeApp;
-import org.projectforge.core.SystemInfoCache;
-import org.projectforge.database.DatabaseCoreInitial;
-import org.projectforge.database.HibernateUtils;
-import org.projectforge.database.InitDatabaseDao;
 import org.projectforge.database.MyDatabaseUpdateDao;
-import org.projectforge.database.MyDatabaseUpdater;
-import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.plugins.core.PluginsRegistry;
-import org.projectforge.registry.DaoRegistry;
-import org.projectforge.storage.StorageClient;
+import org.projectforge.registry.Registry;
 import org.projectforge.user.Login;
 import org.projectforge.user.LoginDefaultHandler;
 import org.projectforge.user.LoginHandler;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserDao;
-import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.UserFilter;
 import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.calendar.CalendarPage;
@@ -92,6 +74,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
 import de.micromata.less.LessWicketApplicationInstantiator;
+import de.micromata.wicket.request.mapper.PageParameterAwareMountedMapper;
 
 /**
  * Application object for your web application. If you want to run this application without deploying, run the Start class.
@@ -113,8 +96,6 @@ public class WicketApplication extends WebApplication implements WicketApplicati
 
   private static Boolean stripWicketTags;
 
-  private static boolean upAndRunning;
-
   private static String alertMessage;
 
   private static Map<Class< ? extends Page>, String> mountedPages = new HashMap<Class< ? extends Page>, String>();
@@ -122,34 +103,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
   @SpringBean(name = "wicketApplicationFilter")
   private WicketApplicationFilter wicketApplicationFilter;
 
-  private UserXmlPreferencesCache userXmlPreferencesCache;
-
-  @SpringBean(name = "configurationDao")
-  private ConfigurationDao configurationDao;
-
-  private ConfigXml configXml;
-
-  private Configuration configuration;
-
-  @SpringBean(name = "cronSetup")
-  private CronSetup cronSetup;
-
-  @SpringBean(name = "daoRegistry")
-  private DaoRegistry daoRegistry;
-
-  @SpringBean(name = "initDatabaseDao")
-  private InitDatabaseDao initDatabaseDao;
-
-  @SpringBean(name = "myDatabaseUpdater")
-  private MyDatabaseUpdater myDatabaseUpdater;
-
-  @SpringBean(name = "userDao")
-  private UserDao userDao;
-
-  @SpringBean(name = "systemInfoCache")
-  private SystemInfoCache systemInfoCache;
-
-  private static long startTime = System.currentTimeMillis();
+  private ProjectForgeApp projectForgeApp;
 
   /**
    * At application start the flag developmentMode is perhaps not already set. If possible please use {@link #isDevelopmentSystem()}
@@ -167,7 +121,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
    */
   public static boolean isUpAndRunning()
   {
-    return upAndRunning;
+    return ProjectForgeApp.getInstance().isUpAndRunning();
   }
 
   /**
@@ -176,8 +130,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
    */
   public static void internalSetUpAndRunning(final boolean upAndRunning)
   {
-    log.warn("This method should only be called in test cases!");
-    WicketApplication.upAndRunning = upAndRunning;
+    ProjectForgeApp.getInstance().internalSetUpAndRunning(upAndRunning);
   }
 
   /**
@@ -206,59 +159,6 @@ public class WicketApplication extends WebApplication implements WicketApplicati
   public void setWicketApplicationFilter(final WicketApplicationFilter wicketApplicationFilter)
   {
     this.wicketApplicationFilter = wicketApplicationFilter;
-  }
-
-  public void setUserXmlPreferencesCache(final UserXmlPreferencesCache userXmlPreferencesCache)
-  {
-    this.userXmlPreferencesCache = userXmlPreferencesCache;
-  }
-
-  public void setConfigXml(final ConfigXml configXml)
-  {
-    this.configXml = configXml;
-  }
-
-  public void setConfiguration(final Configuration configuration)
-  {
-    this.configuration = configuration;
-  }
-
-  public void setConfigurationDao(final ConfigurationDao configurationDao)
-  {
-    this.configurationDao = configurationDao;
-  }
-
-  public void setCronSetup(final CronSetup cronSetup)
-  {
-    this.cronSetup = cronSetup;
-  }
-
-  public void setDaoRegistry(final DaoRegistry daoRegistry)
-  {
-    this.daoRegistry = daoRegistry;
-  }
-
-  public void setInitDatabaseDao(final InitDatabaseDao initDatabaseDao)
-  {
-    this.initDatabaseDao = initDatabaseDao;
-  }
-
-  /**
-   * @param myDatabaseUpdater the myDatabaseUpdater to set
-   */
-  public void setMyDatabaseUpdater(final MyDatabaseUpdater myDatabaseUpdater)
-  {
-    this.myDatabaseUpdater = myDatabaseUpdater;
-  }
-
-  public void setUserDao(final UserDao userDao)
-  {
-    this.userDao = userDao;
-  }
-
-  public void setSystemInfoCache(final SystemInfoCache systemInfoCache)
-  {
-    this.systemInfoCache = systemInfoCache;
   }
 
   /**
@@ -308,8 +208,16 @@ public class WicketApplication extends WebApplication implements WicketApplicati
   @Override
   protected void init()
   {
-    ProjectForgeApp.init();
     super.init();
+    final XmlWebApplicationContext webApplicationContext = (XmlWebApplicationContext) WebApplicationContextUtils
+        .getWebApplicationContext(getServletContext());
+    final ConfigurableListableBeanFactory beanFactory = webApplicationContext.getBeanFactory();
+    beanFactory.autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
+    final LocalSessionFactoryBean localSessionFactoryBean = (LocalSessionFactoryBean) beanFactory.getBean("&sessionFactory");
+    final org.hibernate.cfg.Configuration hibernateConfiguration = localSessionFactoryBean.getConfiguration();
+    final PluginsRegistry pluginsRegistry = PluginsRegistry.instance();
+    pluginsRegistry.set(getResourceSettings());
+    projectForgeApp = ProjectForgeApp.init(beanFactory, hibernateConfiguration);
     // Own error page for deployment mode and UserException and AccessException.
     getRequestCycleListeners().add(new AbstractRequestCycleListener() {
       /**
@@ -367,12 +275,6 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     // final ApplicationSettings select2Settings = ApplicationSettings.get();
     // select2Settings.setIncludeJavascript(false);
 
-    final XmlWebApplicationContext webApplicationContext = (XmlWebApplicationContext) WebApplicationContextUtils
-        .getWebApplicationContext(getServletContext());
-    final ConfigurableListableBeanFactory beanFactory = webApplicationContext.getBeanFactory();
-    beanFactory.autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
-    final LocalSessionFactoryBean localSessionFactoryBean = (LocalSessionFactoryBean) beanFactory.getBean("&sessionFactory");
-
     // if ("true".equals(System.getProperty(SYSTEM_PROPERTY_HSQLDB_18_UPDATE)) == true) {
     // try {
     // log.info("Send SHUTDOWN COMPACT to upgrade data-base version:");
@@ -384,66 +286,24 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     // log.fatal("Data-base SHUTDOWN COMPACT failed: " + ex.getMessage());
     // }
     // }
-    final org.hibernate.cfg.Configuration hibernateConfiguration = localSessionFactoryBean.getConfiguration();
-    HibernateUtils.setConfiguration(hibernateConfiguration);
-
-    if (DatabaseSupport.getInstance() == null) {
-      DatabaseSupport.setInstance(new DatabaseSupport(HibernateUtils.getDialect()));
-    }
-
-    final boolean missingDatabaseSchema = initDatabaseDao.isEmpty();
-    if (missingDatabaseSchema == true) {
-      try {
-        PFUserContext.setUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser());
-        final UpdateEntry updateEntry = DatabaseCoreInitial.getInitializationUpdateEntry(myDatabaseUpdater);
-        updateEntry.runUpdate();
-      } finally {
-        PFUserContext.setUser(null);
-      }
-    }
 
     final ServletContext servletContext = getServletContext();
-    final String configContextPath = configXml.getServletContextPath();
+    final String configContextPath = projectForgeApp.getConfigXml().getServletContextPath();
     String contextPath;
     if (StringUtils.isBlank(configContextPath) == true) {
       contextPath = servletContext.getContextPath();
-      configXml.setServletContextPath(contextPath);
+      projectForgeApp.getConfigXml().setServletContextPath(contextPath);
     } else {
       contextPath = configContextPath;
     }
     log.info("Using servlet context path: " + contextPath);
-    if (configuration.getBeanFactory() == null) {
-      configuration.setBeanFactory(beanFactory);
-    }
     if (this.wicketApplicationFilter != null) {
       this.wicketApplicationFilter.setApplication(this);
     } else {
       throw new RuntimeException("this.wicketApplicationFilter is null");
     }
-    daoRegistry.init();
-
-    final PluginsRegistry pluginsRegistry = PluginsRegistry.instance();
-    pluginsRegistry.set(beanFactory, getResourceSettings());
-    pluginsRegistry.set(myDatabaseUpdater.getSystemUpdater());
-    pluginsRegistry.initialize();
-    if (missingDatabaseSchema == true) {
-      try {
-        PFUserContext.setUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser()); // Logon admin user.
-        for (final AbstractPlugin plugin : pluginsRegistry.getPlugins()) {
-          final UpdateEntry updateEntry = plugin.getInitializationUpdateEntry();
-          if (updateEntry != null) {
-            updateEntry.runUpdate();
-          }
-        }
-      } finally {
-        PFUserContext.setUser(null);
-      }
-    }
-
-    configuration.setConfigurationDao(configurationDao);
-    SystemInfoCache.internalInitialize(systemInfoCache);
     WicketUtils.setContextPath(contextPath);
-    UserFilter.initialize(userDao, contextPath);
+    UserFilter.initialize(Registry.instance().getDao(UserDao.class), contextPath);
 
     for (final Map.Entry<String, Class< ? extends WebPage>> mountPage : WebRegistry.instance().getMountPages().entrySet()) {
       final String path = mountPage.getKey();
@@ -458,29 +318,18 @@ public class WicketApplication extends WebApplication implements WicketApplicati
       }
       getDebugSettings().setOutputMarkupContainerClassName(true);
     }
-    log.info("Default TimeZone is: " + TimeZone.getDefault());
-    if ("UTC".equals(TimeZone.getDefault().getID()) == false) {
-      for (final String str : UTC_RECOMMENDED) {
-        log.fatal(str);
-      }
-      for (final String str : UTC_RECOMMENDED) {
-        System.err.println(str);
-      }
-    }
-    log.info("user.timezone is: " + System.getProperty("user.timezone"));
     try {
       PFUserContext.setUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser()); // Logon admin user.
-      if (myDatabaseUpdater.getSystemUpdater().isUpdated() == false) {
+      if (projectForgeApp.getMyDatabaseUpdater().getSystemUpdater().isUpdated() == false) {
         // Force redirection to update page:
         UserFilter.setUpdateRequiredFirst(true);
       }
     } finally {
       PFUserContext.setUser(null);
     }
-    UserXmlPreferencesCache.setInternalInstance(userXmlPreferencesCache);
     LoginHandler loginHandler;
-    if (StringUtils.isNotBlank(configXml.getLoginHandlerClass()) == true) {
-      loginHandler = (LoginHandler) BeanHelper.newInstance(configXml.getLoginHandlerClass());
+    if (StringUtils.isNotBlank(projectForgeApp.getConfigXml().getLoginHandlerClass()) == true) {
+      loginHandler = (LoginHandler) BeanHelper.newInstance(projectForgeApp.getConfigXml().getLoginHandlerClass());
     } else {
       loginHandler = new LoginDefaultHandler();
     }
@@ -495,56 +344,26 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     }
 
     if (loginHandler == null) {
-      log.error("Can't load login handler '" + configXml.getLoginHandlerClass() + "'. No login will be possible!");
+      log.error("Can't load login handler '" + projectForgeApp.getConfigXml().getLoginHandlerClass() + "'. No login will be possible!");
     } else {
       loginHandler.initialize();
       Login.getInstance().setLoginHandler(loginHandler);
       if (UserFilter.isUpdateRequiredFirst() == false) {
-        upAndRunning = true;
-        log.info("ProjectForge is now available (up and running).");
+        projectForgeApp.finalizeInitialization();
       }
     }
-    if (upAndRunning == true) {
-      cronSetup.initialize();
-      log.info("system cronJobs are initialized.");
-      pluginsRegistry.registerCronJobs(cronSetup);
-      log.info("plugin cronJobs are initialized.");
-    } else {
-      log.warn("Start-up of ProjectForge isn't completed normally, therefore REST services and cronJobs of plugins aren't available.");
-    }
-    log.info(AppVersion.APP_ID + " " + AppVersion.NUMBER + " (" + AppVersion.RELEASE_TIMESTAMP + ") initialized.");
-    try {
-      StorageClient.getInstance(); // Initialize storage
-    } catch (final Exception ex) {
-      log.error(ex.getMessage(), ex);
-    }
     getPageSettings().setRecreateMountedPagesAfterExpiry(false);
-
-    // initialize ical4j to be more "relaxed"
-    CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_PARSING, true);
-    CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_UNFOLDING, true);
-    CompatibilityHints.setHintEnabled(CompatibilityHints.KEY_RELAXED_VALIDATION, true);
   }
 
-  private void mountPageWithPageParameterAwareness(String path, Class<? extends WebPage> pageClass) {
+  private void mountPageWithPageParameterAwareness(final String path, final Class< ? extends WebPage> pageClass)
+  {
     mount(new PageParameterAwareMountedMapper(path, pageClass));
   }
 
   @Override
   protected void onDestroy()
   {
-    upAndRunning = false;
     ProjectForgeApp.shutdown();
-    log.info("Syncing all user preferences to database.");
-    userXmlPreferencesCache.forceReload();
-    cronSetup.shutdown();
-    try {
-      PFUserContext.setUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser());
-      myDatabaseUpdater.getDatabaseUpdateDao().shutdownDatabase();
-    } finally {
-      PFUserContext.setUser(null);
-    }
-    log.info("Destroyed");
   }
 
   /**
@@ -614,16 +433,6 @@ public class WicketApplication extends WebApplication implements WicketApplicati
 
   public static long getStartTime()
   {
-    return startTime;
+    return ProjectForgeApp.getInstance().getStartTime();
   }
-
-  private static final String[] UTC_RECOMMENDED = { //
-    "**********************************************************", //
-    "***                                                    ***", //
-    "*** It's highly recommended to start ProjectForge      ***", //
-    "*** with TimeZone UTC. This default TimeZone has to be ***", //
-    "*** set before any initialization of Hibernate!!!!     ***", //
-    "*** You can do this e. g. in JAVA_OPTS etc.            ***", //
-    "***                                                    ***", //
-  "**********************************************************"};
 }
