@@ -23,11 +23,13 @@
 
 package org.projectforge.multitenancy;
 
+import org.projectforge.access.AccessChecker;
 import org.projectforge.access.OperationType;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserRightAccessCheck;
 import org.projectforge.user.UserRightCategory;
+import org.projectforge.user.UserRightValue;
 import org.projectforge.user.UserRights;
 
 /**
@@ -37,9 +39,11 @@ import org.projectforge.user.UserRights;
  */
 public class TenantRight extends UserRightAccessCheck<TenantDO>
 {
+  private static final long serialVersionUID = -558887908748357573L;
+
   public TenantRight()
   {
-    super(TenantDao.USER_RIGHT_ID, UserRightCategory.FIBU);
+    super(TenantDao.USER_RIGHT_ID, UserRightCategory.ADMIN, UserRightValue.READONLY, UserRightValue.READWRITE);
   }
 
   /**
@@ -49,7 +53,11 @@ public class TenantRight extends UserRightAccessCheck<TenantDO>
   @Override
   public boolean hasSelectAccess(final PFUserDO user)
   {
-    return UserRights.getAccessChecker().isUserMemberOfGroup(user, ProjectForgeGroup.ADMIN_GROUP);
+    final AccessChecker ac = UserRights.getAccessChecker();
+    if (ac.isUserMemberOfAdminGroup(user) == false) { // Should be checked automatically by this right, paranoia setting.
+      return false;
+    }
+    return ac.hasRight(user, getId(), UserRightValue.READONLY, UserRightValue.READWRITE);
   }
 
   /**

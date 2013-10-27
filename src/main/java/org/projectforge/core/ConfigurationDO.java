@@ -52,6 +52,8 @@ public class ConfigurationDO extends DefaultBaseDO
 
   private static final long serialVersionUID = -1369978022611555731L;
 
+  private boolean global;
+
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String parameter;
 
@@ -327,6 +329,27 @@ public class ConfigurationDO extends DefaultBaseDO
           + type
           + "'!");
     }
+    return this;
+  }
+
+  /**
+   * If true this parameter is valid for all tenants (in multi-tenancy environments), otherwise this parameter is valid only for the tenant
+   * this parameter is assigned to.
+   * @return the global
+   */
+  @Column(name = "is_global")
+  public boolean isGlobal()
+  {
+    return global;
+  }
+
+  /**
+   * @param global the global to set
+   * @return this for chaining.
+   */
+  ConfigurationDO setGlobal(final boolean global)
+  {
+    this.global = global;
     return this;
   }
 }

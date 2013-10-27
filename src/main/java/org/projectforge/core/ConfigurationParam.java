@@ -27,26 +27,32 @@ import java.util.TimeZone;
 
 public enum ConfigurationParam
 {
-  SYSTEM_ADMIN_E_MAIL("systemAdministratorEMail", ConfigurationType.STRING), //
-  CALENDAR_DOMAIN("calendarDomain", ConfigurationType.STRING), //
-  ORGANIZATION("organization", ConfigurationType.TEXT), //
-  MESSAGE_OF_THE_DAY("messageOfTheDay", ConfigurationType.TEXT), //
-  DEFAULT_TIMEZONE("timezone", ConfigurationType.TIME_ZONE, TimeZone.getDefault().getID()), //
-  DATE_FORMATS("dateFormats", ConfigurationType.STRING, "MM/dd/yyyy;dd/MM/yyyy;dd.MM.yyyy;yyyy-MM-dd"), //
-  EXCEL_DATE_FORMATS("excelDateFormats", ConfigurationType.STRING, "MM/DD/YYYY;DD/MM/YYYY;DD.MM.YYYY"), //
-  FEEDBACK_E_MAIL("feedbackEMail", ConfigurationType.STRING), //
-  FIBU_DEFAULT_VAT("fibu.defaultVAT", ConfigurationType.PERCENT), //
-  COST_CONFIGURED("fibu.costConfigured", ConfigurationType.BOOLEAN), //
-  DEFAULT_TASK_ID_4_ADDRESSES("defaultTask4Addresses", ConfigurationType.TASK), //
-  DEFAULT_TASK_ID_4_BOOKS("defaultTask4Books", ConfigurationType.TASK), //
-  DEFAULT_COUNTRY_PHONE_PREFIX("countryPhonePrefix", ConfigurationType.STRING, "+49"), //
-  MEB_SMS_RECEIVING_PHONE_NUMBER("mebSMSReceivingPhoneNumber", ConfigurationType.STRING);
+  // Global parameters:
+  SYSTEM_ADMIN_E_MAIL("systemAdministratorEMail", ConfigurationType.STRING, true), //
+  MESSAGE_OF_THE_DAY("messageOfTheDay", ConfigurationType.TEXT, true), //
+  MULTI_TENANCY_ENABLED("admin.multiTenancyEnabled",  ConfigurationType.BOOLEAN, true), //
+
+  // Tenant specific parameters:
+  CALENDAR_DOMAIN("calendarDomain", ConfigurationType.STRING, false), //
+  ORGANIZATION("organization", ConfigurationType.TEXT, false), //
+  DEFAULT_TIMEZONE("timezone", ConfigurationType.TIME_ZONE, false, TimeZone.getDefault().getID()), //
+  DATE_FORMATS("dateFormats", ConfigurationType.STRING, false, "MM/dd/yyyy;dd/MM/yyyy;dd.MM.yyyy;yyyy-MM-dd"), //
+  EXCEL_DATE_FORMATS("excelDateFormats", ConfigurationType.STRING, false, "MM/DD/YYYY;DD/MM/YYYY;DD.MM.YYYY"), //
+  FEEDBACK_E_MAIL("feedbackEMail", ConfigurationType.STRING, false), //
+  FIBU_DEFAULT_VAT("fibu.defaultVAT", ConfigurationType.PERCENT, false), //
+  COST_CONFIGURED("fibu.costConfigured", ConfigurationType.BOOLEAN, false), //
+  DEFAULT_TASK_ID_4_ADDRESSES("defaultTask4Addresses", ConfigurationType.TASK, false), //
+  DEFAULT_TASK_ID_4_BOOKS("defaultTask4Books", ConfigurationType.TASK, false), //
+  DEFAULT_COUNTRY_PHONE_PREFIX("countryPhonePrefix", ConfigurationType.STRING, false, "+49"), //
+  MEB_SMS_RECEIVING_PHONE_NUMBER("mebSMSReceivingPhoneNumber", ConfigurationType.STRING, false); //
 
   private String key;
 
   private ConfigurationType type;
 
   private String defaultStringValue;
+
+  private boolean global;
 
   /**
    * The key will be used e. g. for i18n.
@@ -83,15 +89,25 @@ public enum ConfigurationParam
     return "administration.configuration.param." + key + ".description";
   }
 
-  ConfigurationParam(final String key, final ConfigurationType type)
+  /**
+   * @return the global
+   * @see ConfigurationDO#isGlobal()
+   */
+  public boolean isGlobal()
   {
-    this(key, type, null);
+    return global;
   }
 
-  ConfigurationParam(final String key, final ConfigurationType type, final String defaultStringValue)
+  ConfigurationParam(final String key, final ConfigurationType type, final boolean global)
+  {
+    this(key, type, global, null);
+  }
+
+  ConfigurationParam(final String key, final ConfigurationType type, final boolean global, final String defaultStringValue)
   {
     this.key = key;
     this.type = type;
+    this.global = global;
     this.defaultStringValue = defaultStringValue;
   }
 }

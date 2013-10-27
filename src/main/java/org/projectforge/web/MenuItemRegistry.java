@@ -48,6 +48,7 @@ import org.projectforge.fibu.RechnungDao;
 import org.projectforge.fibu.datev.DatevImportDao;
 import org.projectforge.fibu.kost.Kost2Dao;
 import org.projectforge.humanresources.HRPlanningDao;
+import org.projectforge.multitenancy.TenantDao;
 import org.projectforge.orga.ContractDao;
 import org.projectforge.orga.PostausgangDao;
 import org.projectforge.orga.PosteingangDao;
@@ -359,7 +360,7 @@ public class MenuItemRegistry
       }
     });
 
-    reg.register(admin, MenuItemDefId.TENANT_LIST, 35, TenantListPage.class);
+    reg.register(admin, MenuItemDefId.TENANT_LIST, 35, TenantListPage.class, TenantDao.USER_RIGHT_ID);
     reg.register(admin, MenuItemDefId.USER_LIST, 40, UserListPage.class);
     reg.register(admin, MenuItemDefId.GROUP_LIST, 50, GroupListPage.class); // Visible for all.
     reg.register(admin, MenuItemDefId.ACCESS_LIST, 60, AccessListPage.class); // Visible for all.

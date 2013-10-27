@@ -32,7 +32,7 @@ import org.projectforge.core.I18nEnum;
  */
 public enum UserRightCategory implements I18nEnum
 {
-  FIBU("fibu"), MISC("misc"), ORGA("orga"),
+  ADMIN("admin"), FIBU("fibu"), MISC("misc"), ORGA("orga"),
   /** Project management */
   PM("pm"), PLUGINS("plugins");
 
@@ -52,7 +52,7 @@ public enum UserRightCategory implements I18nEnum
     return "access.right.category" + key;
   }
 
-  UserRightCategory(String key)
+  UserRightCategory(final String key)
   {
     this.key = key;
   }

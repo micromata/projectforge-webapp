@@ -35,6 +35,7 @@ import org.projectforge.fibu.ProjektRight;
 import org.projectforge.gantt.GanttChartRight;
 import org.projectforge.humanresources.HRPlanningRight;
 import org.projectforge.meb.MebRight;
+import org.projectforge.multitenancy.TenantRight;
 
 public class UserRights
 {
@@ -136,8 +137,6 @@ public class UserRights
   {
     this.accessChecker = accessChecker;
 
-
-
     addRight(UserRightCategory.FIBU, UserRightId.FIBU_EMPLOYEE, FALSE_READONLY_READWRITE, FIBU_ORGA_GROUPS).setReadOnlyForControlling();
     addRight(UserRightCategory.FIBU, UserRightId.FIBU_EMPLOYEE_SALARY, FALSE_READONLY_READWRITE, FIBU_GROUPS).setAvailableGroupRightValues(
         ProjectForgeGroup.CONTROLLING_GROUP, UserRightValue.FALSE, UserRightValue.READONLY);
@@ -153,6 +152,7 @@ public class UserRights
     .setReadOnlyForControlling();
     addRight(UserRightCategory.ORGA, UserRightId.ORGA_OUTGOING_MAIL, FALSE_READONLY_READWRITE, FIBU_ORGA_GROUPS)
     .setReadOnlyForControlling();
+    addRight(new TenantRight());
     addRight(new ProjektRight());
     addRight(new AuftragRight());
     addRight(new MebRight());

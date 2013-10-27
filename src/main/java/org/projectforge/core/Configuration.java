@@ -139,6 +139,12 @@ public class Configuration extends AbstractCache
     return ConfigXml.getInstance().isMebMailAccountConfigured();
   }
 
+  public boolean isMultiTenancyConfigured()
+  {
+    return getBooleanValue(ConfigurationParam.COST_CONFIGURED);
+  }
+
+
   public String getCalendarDomain()
   {
     final String calendarDomain = (String) getValue(ConfigurationParam.CALENDAR_DOMAIN);

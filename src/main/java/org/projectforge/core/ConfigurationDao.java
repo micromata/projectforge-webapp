@@ -54,7 +54,7 @@ public class ConfigurationDao extends BaseDao<ConfigurationDO>
    * @see Configuration#setExpired()
    */
   @Override
-  protected void afterSaveOrModify(ConfigurationDO obj)
+  protected void afterSaveOrModify(final ConfigurationDO obj)
   {
     Configuration.getInstance().setExpired();
   }
@@ -90,7 +90,7 @@ public class ConfigurationDao extends BaseDao<ConfigurationDO>
     return list.get(0);
   }
 
-  public Object getValue(final ConfigurationParam parameter, ConfigurationDO configurationDO)
+  public Object getValue(final ConfigurationParam parameter, final ConfigurationDO configurationDO)
   {
     if (parameter.getType().isIn(ConfigurationType.STRING, ConfigurationType.TEXT) == true) {
       if (configurationDO == null) {
@@ -169,6 +169,11 @@ public class ConfigurationDao extends BaseDao<ConfigurationDO>
           configuration.internalSetConfigurationType(param.getType());
           modified = true;
         }
+        if (configuration.isGlobal() != param.isGlobal()) {
+          log.info("Updating configuration flag 'global' of configuration entry: " + param);
+          configuration.setGlobal(param.isGlobal());
+          modified = true;
+        }
         if (configuration.isDeleted() == true) {
           log.info("Restore deleted configuration entry: " + param);
           configuration.setDeleted(false);
@@ -185,13 +190,14 @@ public class ConfigurationDao extends BaseDao<ConfigurationDO>
     final ConfigurationDO configuration = new ConfigurationDO();
     configuration.setParameter(param.getKey());
     configuration.setConfigurationType(param.getType());
+    configuration.setGlobal(param.isGlobal());
     if (param.getType().isIn(ConfigurationType.STRING, ConfigurationType.TEXT) == true) {
       configuration.setValue(param.getDefaultStringValue());
     }
     internalSave(configuration);
   }
 
-  public void setTaskTree(TaskTree taskTree)
+  public void setTaskTree(final TaskTree taskTree)
   {
     this.taskTree = taskTree;
   }

@@ -35,6 +35,7 @@ import org.projectforge.continuousdb.UpdateEntry;
 import org.projectforge.continuousdb.UpdateEntryImpl;
 import org.projectforge.continuousdb.UpdatePreCheckStatus;
 import org.projectforge.continuousdb.UpdateRunningStatus;
+import org.projectforge.core.ConfigurationDO;
 import org.projectforge.fibu.AuftragDO;
 import org.projectforge.fibu.AuftragsPositionDO;
 import org.projectforge.fibu.EingangsrechnungDO;
@@ -69,11 +70,14 @@ public class DatabaseCoreUpdates
     // /////////////////////////////////////////////////////////////////
     // 5.3
     // /////////////////////////////////////////////////////////////////
-    list.add(new UpdateEntryImpl(CORE_REGION_ID, "5.3", "2013-10-20", "Adds t_tenant, tenant_id to all entities for multi-tenancy.") {
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "5.3", "2013-10-20",
+        "Adds t_tenant, tenant_id to all entities for multi-tenancy. Adds t_configuration.is_global.") {
+      final Table configurationTable = new Table(ConfigurationDO.class);
+
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        if (dao.doEntitiesExist(TenantDO.class) == false) {
+        if (dao.doEntitiesExist(TenantDO.class) == false || dao.doTableAttributesExist(configurationTable, "global") == false) {
           return UpdatePreCheckStatus.READY_FOR_UPDATE;
         }
         final List<RegistryEntry> list = Registry.instance().getOrderedList();
@@ -97,6 +101,10 @@ public class DatabaseCoreUpdates
       @Override
       public UpdateRunningStatus runUpdate()
       {
+        if (dao.doTableAttributesExist(configurationTable, "global") == false) {
+          dao.addTableAttributes(configurationTable, new TableAttribute(ConfigurationDO.class, "global").setDefaultValue("false"));
+        }
+
         if (dao.doEntitiesExist(TenantDO.class) == false) {
           final SchemaGenerator schemaGenerator = new SchemaGenerator(dao).add(TenantDO.class);
           schemaGenerator.createSchema();

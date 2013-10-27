@@ -42,37 +42,39 @@ public class UserRightId implements I18nEnum, Comparable<UserRightId>, Serializa
 {
   private static final long serialVersionUID = 2328022474754212904L;
 
-  public static UserRightId FIBU_EINGANGSRECHNUNGEN = new UserRightId("FIBU_EINGANGSRECHNUNGEN", "fibu1",
+  public static final UserRightId ADMIN_TENANT = new UserRightId("ADMIN_TENANT", "admin", "access.right.admin.tenant");;
+
+  public static final UserRightId FIBU_EINGANGSRECHNUNGEN = new UserRightId("FIBU_EINGANGSRECHNUNGEN", "fibu1",
       "access.right.fibu.eingangsrechnungen");
 
-  public static UserRightId FIBU_AUSGANGSRECHNUNGEN = new UserRightId("FIBU_AUSGANGSRECHNUNGEN", "fibu2",
+  public static final UserRightId FIBU_AUSGANGSRECHNUNGEN = new UserRightId("FIBU_AUSGANGSRECHNUNGEN", "fibu2",
       "access.right.fibu.ausgangsrechnungen");
 
-  public static UserRightId FIBU_EMPLOYEE = new UserRightId("FIBU_EMPLOYEE", "fibu3", "access.right.fibu.employee");
+  public static final UserRightId FIBU_EMPLOYEE = new UserRightId("FIBU_EMPLOYEE", "fibu3", "access.right.fibu.employee");
 
-  public static UserRightId FIBU_EMPLOYEE_SALARY = new UserRightId("FIBU_EMPLOYEE_SALARY", "fibu4", "access.right.fibu.employeeSalaries");
+  public static final UserRightId FIBU_EMPLOYEE_SALARY = new UserRightId("FIBU_EMPLOYEE_SALARY", "fibu4", "access.right.fibu.employeeSalaries");
 
-  public static UserRightId FIBU_DATEV_IMPORT = new UserRightId("FIBU_DATEV_IMPORT", "fibu5", "access.right.fibu.datevImport");
+  public static final UserRightId FIBU_DATEV_IMPORT = new UserRightId("FIBU_DATEV_IMPORT", "fibu5", "access.right.fibu.datevImport");
 
-  public static UserRightId FIBU_COST_UNIT = new UserRightId("FIBU_COST_UNIT", "fibu6", "access.right.fibu.costUnit");
+  public static final UserRightId FIBU_COST_UNIT = new UserRightId("FIBU_COST_UNIT", "fibu6", "access.right.fibu.costUnit");
 
-  public static UserRightId FIBU_ACCOUNTS = new UserRightId("FIBU_ACCOUNTS", "fibu7", "access.right.fibu.accounts");
+  public static final UserRightId FIBU_ACCOUNTS = new UserRightId("FIBU_ACCOUNTS", "fibu7", "access.right.fibu.accounts");
 
-  public static UserRightId MISC_MEB = new UserRightId("MISC_MEB", "misc1", "access.right.misc.meb");
+  public static final UserRightId MISC_MEB = new UserRightId("MISC_MEB", "misc1", "access.right.misc.meb");
 
-  public static UserRightId PM_GANTT = new UserRightId("PM_GANTT", "pm1", "access.right.pm.gantt");
+  public static final UserRightId PM_GANTT = new UserRightId("PM_GANTT", "pm1", "access.right.pm.gantt");
 
-  public static UserRightId PM_ORDER_BOOK = new UserRightId("PM_ORDER_BOOK", "pm2", "access.right.pm.orderbook");
+  public static final UserRightId PM_ORDER_BOOK = new UserRightId("PM_ORDER_BOOK", "pm2", "access.right.pm.orderbook");
 
-  public static UserRightId PM_HR_PLANNING = new UserRightId("PM_HR_PLANNING", "pm3", "access.right.pm.hrPlanning");
+  public static final UserRightId PM_HR_PLANNING = new UserRightId("PM_HR_PLANNING", "pm3", "access.right.pm.hrPlanning");
 
-  public static UserRightId PM_PROJECT = new UserRightId("PM_PROJECT", "pm4", "access.right.pm.project");
+  public static final UserRightId PM_PROJECT = new UserRightId("PM_PROJECT", "pm4", "access.right.pm.project");
 
-  public static UserRightId ORGA_CONTRACTS = new UserRightId("ORGA_CONTRACTS", "orga1", "access.right.orga.contracts");
+  public static final UserRightId ORGA_CONTRACTS = new UserRightId("ORGA_CONTRACTS", "orga1", "access.right.orga.contracts");
 
-  public static UserRightId ORGA_INCOMING_MAIL = new UserRightId("ORGA_INCOMING_MAIL", "orga2", "access.right.orga.incomingmail");
+  public static final UserRightId ORGA_INCOMING_MAIL = new UserRightId("ORGA_INCOMING_MAIL", "orga2", "access.right.orga.incomingmail");
 
-  public static UserRightId ORGA_OUTGOING_MAIL = new UserRightId("ORGA_OUTGOING_MAIL", "orga3", "access.right.orga.outgoingmail");
+  public static final UserRightId ORGA_OUTGOING_MAIL = new UserRightId("ORGA_OUTGOING_MAIL", "orga3", "access.right.orga.outgoingmail");
 
   private final String id;
 

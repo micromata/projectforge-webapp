@@ -93,6 +93,12 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
   {
   }
 
+  @Transient
+  public Integer getTenantId()
+  {
+    return this.tenant != null ? this.tenant.getId() : null;
+  }
+
   /**
    * @see org.projectforge.core.BaseDO#getTenant()
    */

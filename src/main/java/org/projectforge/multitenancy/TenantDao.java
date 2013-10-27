@@ -33,7 +33,7 @@ import org.projectforge.user.UserRightId;
  */
 public class TenantDao extends BaseDao<TenantDO>
 {
-  public static final UserRightId USER_RIGHT_ID = new UserRightId("TENANT", "admin", "access.right.admin.tenant");;
+  public static final UserRightId USER_RIGHT_ID = UserRightId.ADMIN_TENANT;
 
   public TenantDao()
   {
