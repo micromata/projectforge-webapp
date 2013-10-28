@@ -80,7 +80,8 @@ public class PluginTestBase extends AbstractTestBase
     preInit(additionalContextFiles);
     final MyDatabaseUpdater myDatabaseUpdater = getTestConfiguration().getBean("myDatabaseUpdater", MyDatabaseUpdater.class);
     pluginsRegistry.set(myDatabaseUpdater.getSystemUpdater());
-    pluginsRegistry.set(getTestConfiguration().getBeanFactory(), Mockito.mock(IResourceSettings.class));
+    pluginsRegistry.set(getTestConfiguration().getBeanFactory());
+    pluginsRegistry.set(Mockito.mock(IResourceSettings.class));
     pluginsRegistry.initialize();
     if (tablesToDeleteAfterTests == null && CollectionUtils.isNotEmpty(persistentEntries) == true) {
       // Put the persistent entries in reverse order to delete:
