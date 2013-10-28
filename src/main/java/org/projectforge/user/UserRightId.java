@@ -42,7 +42,7 @@ public class UserRightId implements I18nEnum, Comparable<UserRightId>, Serializa
 {
   private static final long serialVersionUID = 2328022474754212904L;
 
-  public static final UserRightId ADMIN_TENANT = new UserRightId("ADMIN_TENANT", "admin", "access.right.admin.tenant");;
+  public static final UserRightId ADMIN_TENANT = new UserRightId("ADMIN_TENANT", "admin", "access.right.admin.multitenancy");
 
   public static final UserRightId FIBU_EINGANGSRECHNUNGEN = new UserRightId("FIBU_EINGANGSRECHNUNGEN", "fibu1",
       "access.right.fibu.eingangsrechnungen");

@@ -78,6 +78,4 @@ public class TenantRight extends UserRightAccessCheck<TenantDO>
   {
     return UserRights.getAccessChecker().isUserMemberOfGroup(user, ProjectForgeGroup.ADMIN_GROUP);
   }
-
-
 }

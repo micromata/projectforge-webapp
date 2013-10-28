@@ -41,14 +41,36 @@ public class TenantDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = -2242576370698028282L;
 
+  private String shortName;
+
   private String name;
 
   private String description;
 
   /**
-   * @return the name
+   * The short name is the display name.
+   * @return the shortName
    */
   @Column(length = 100)
+  public String getShortName()
+  {
+    return shortName;
+  }
+
+  /**
+   * @param shortName the shortName to set
+   * @return this for chaining.
+   */
+  public TenantDO setShortName(final String shortName)
+  {
+    this.shortName = shortName;
+    return this;
+  }
+
+  /**
+   * @return the name
+   */
+  @Column(length = 255)
   public String getName()
   {
     return name;
