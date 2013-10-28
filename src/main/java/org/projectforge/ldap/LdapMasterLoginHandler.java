@@ -102,28 +102,32 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
     if (loginResult.getLoginResultStatus() != LoginResultStatus.SUCCESS) {
       return loginResult;
     }
-    // User is now logged-in successfully.
-    final LdapUser authLdapUser = ldapUserDao.authenticate(username, password, userBase);
-    final PFUserDO user = loginResult.getUser();
-    final LdapUser ldapUser = PFUserDOConverter.convert(user);
-    ldapUser.setOrganizationalUnit(userBase);
-    if (authLdapUser == null) {
-      log.info("User's credentials in LDAP not up-to-date: " + username + ". Updating LDAP entry...");
-      ldapUserDao.createOrUpdate(userBase, ldapUser);
-      ldapUserDao.changePassword(ldapUser, null, password);
-    } else {
-      final String sambaNTPassword = sambaNTPasswords.get(loginResult.getUser().getId());
-      if (sambaNTPassword != null) {
-        if ("".equals(sambaNTPassword) == true) {
-          // sambaNTPassword needed to be set (isn't yet set):
-          ldapUserDao.changePassword(ldapUser, null, password);
-        } else {
-          if (sambaNTPassword.equals(SmbEncrypt.NTUNICODEHash(password)) == false) {
-            // sambaNTPassword needed to be updated:
+    try {
+      // User is now logged-in successfully.
+      final LdapUser authLdapUser = ldapUserDao.authenticate(username, password, userBase);
+      final PFUserDO user = loginResult.getUser();
+      final LdapUser ldapUser = PFUserDOConverter.convert(user);
+      ldapUser.setOrganizationalUnit(userBase);
+      if (authLdapUser == null) {
+        log.info("User's credentials in LDAP not up-to-date: " + username + ". Updating LDAP entry...");
+        ldapUserDao.createOrUpdate(userBase, ldapUser);
+        ldapUserDao.changePassword(ldapUser, null, password);
+      } else {
+        final String sambaNTPassword = sambaNTPasswords.get(loginResult.getUser().getId());
+        if (sambaNTPassword != null) {
+          if ("".equals(sambaNTPassword) == true) {
+            // sambaNTPassword needed to be set (isn't yet set):
             ldapUserDao.changePassword(ldapUser, null, password);
+          } else {
+            if (sambaNTPassword.equals(SmbEncrypt.NTUNICODEHash(password)) == false) {
+              // sambaNTPassword needed to be updated:
+              ldapUserDao.changePassword(ldapUser, null, password);
+            }
           }
         }
       }
+    } catch (final Exception ex) {
+      log.error("An exception occured while checking login against LDAP system (ignoring this error): " + ex.getMessage(), ex);
     }
     return loginResult;
   }
@@ -236,7 +240,9 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
                 boolean passwordsGiven = false;
                 if (ldapUser.isPasswordGiven() == true) {
                   // If the user has a Samba SID then the Samba NT password mustn't be blank:
-                  if (sambaConfigured == false || ldapUser.getSambaSIDNumber() == null || StringUtils.isNotBlank(ldapUser.getSambaNTPassword()) == true) {
+                  if (sambaConfigured == false
+                      || ldapUser.getSambaSIDNumber() == null
+                      || StringUtils.isNotBlank(ldapUser.getSambaNTPassword()) == true) {
                     passwordsGiven = true;
                   }
                 }
