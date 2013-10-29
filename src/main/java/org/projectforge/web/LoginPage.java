@@ -93,50 +93,41 @@ public class LoginPage extends AbstractUnsecureBasePage
   }
 
   public static void logout(final MySession mySession, final WebRequest request, final WebResponse response,
-      final UserXmlPreferencesCache userXmlPreferencesCache, final MenuBuilder menuBuilder)
-  {
-    final PFUserDO user = mySession.getUser();
-    if (user != null) {
-      userXmlPreferencesCache.flushToDB(user.getId());
-      userXmlPreferencesCache.clear(user.getId());
-      if (menuBuilder != null) {
-        menuBuilder.expireMenu(user.getId());
-      }
-    }
-    mySession.logout();
-    final Cookie stayLoggedInCookie = UserFilter.getStayLoggedInCookie(WicketUtils.getHttpServletRequest(request));
-    if (stayLoggedInCookie != null) {
-      stayLoggedInCookie.setMaxAge(0);
-      stayLoggedInCookie.setValue(null);
-      stayLoggedInCookie.setPath("/");
-      response.addCookie(stayLoggedInCookie);
-    }
-  }
-
-  public static void logout(final MySession mySession, final WebRequest request, final WebResponse response,
       final UserXmlPreferencesCache userXmlPreferencesCache)
   {
-    logout(mySession, request, response, userXmlPreferencesCache, null);
+    final Cookie stayLoggedInCookie = UserFilter.getStayLoggedInCookie(WicketUtils.getHttpServletRequest(request));
+    logout(mySession, stayLoggedInCookie,  userXmlPreferencesCache);
+    if (stayLoggedInCookie != null) {
+      response.addCookie(stayLoggedInCookie);
+    }
   }
 
   public static void logout(final MySession mySession, final HttpServletRequest request, final HttpServletResponse response,
-      final UserXmlPreferencesCache userXmlPreferencesCache, final MenuBuilder menuBuilder)
+      final UserXmlPreferencesCache userXmlPreferencesCache)
+  {
+    final Cookie stayLoggedInCookie = UserFilter.getStayLoggedInCookie(request);
+    logout(mySession, stayLoggedInCookie,  userXmlPreferencesCache);
+    if (stayLoggedInCookie != null) {
+      response.addCookie(stayLoggedInCookie);
+    }
+  }
+
+  private static void logout(final MySession mySession, final Cookie stayLoggedInCookie, final UserXmlPreferencesCache userXmlPreferencesCache)
   {
     final PFUserDO user = mySession.getUser();
     if (user != null) {
       userXmlPreferencesCache.flushToDB(user.getId());
       userXmlPreferencesCache.clear(user.getId());
+      final MenuBuilder menuBuilder = MenuBuilder.getInstance();
       if (menuBuilder != null) {
         menuBuilder.expireMenu(user.getId());
       }
     }
     mySession.logout();
-    final Cookie stayLoggedInCookie = UserFilter.getStayLoggedInCookie(request);
     if (stayLoggedInCookie != null) {
       stayLoggedInCookie.setMaxAge(0);
       stayLoggedInCookie.setValue(null);
       stayLoggedInCookie.setPath("/");
-      response.addCookie(stayLoggedInCookie);
     }
   }
 
@@ -215,8 +206,8 @@ public class LoginPage extends AbstractUnsecureBasePage
    * @param targetUrlAfterLogin
    * @return i18n key of the validation error message if not successfully logged in, otherwise null.
    */
-  public static LoginResultStatus internalCheckLogin(final WebPage page, final UserDao userDao, final String username, final String password,
-      final boolean userWantsToStayLoggedIn, final Class< ? extends WebPage> defaultPage)
+  public static LoginResultStatus internalCheckLogin(final WebPage page, final UserDao userDao, final String username,
+      final String password, final boolean userWantsToStayLoggedIn, final Class< ? extends WebPage> defaultPage)
   {
     final LoginResult loginResult = Login.getInstance().checkLogin(username, password);
     final PFUserDO user = loginResult.getUser();

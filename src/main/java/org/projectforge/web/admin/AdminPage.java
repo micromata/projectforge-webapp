@@ -95,9 +95,6 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
   @SpringBean(name = "mebMailClient")
   private MebMailClient mebMailClient;
 
-  @SpringBean(name = "menuBuilder")
-  private MenuBuilder menuBuilder;
-
   @SpringBean(name = "taskTree")
   private TaskTree taskTree;
 
@@ -386,7 +383,7 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
     String refreshedCaches = systemDao.refreshCaches();
     userXmlPreferencesCache.forceReload();
     refreshedCaches += ", UserXmlPreferencesCache";
-    menuBuilder.refreshAllMenus();
+    MenuBuilder.getInstance().refreshAllMenus();
     refreshedCaches += ", MenuCache";
     setResponsePage(new MessagePage("administration.refreshCachesDone", refreshedCaches));
   }

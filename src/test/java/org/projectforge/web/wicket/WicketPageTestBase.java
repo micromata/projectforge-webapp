@@ -48,7 +48,6 @@ import org.junit.Before;
 import org.projectforge.test.TestBase;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.LoginPage;
-import org.projectforge.web.MenuBuilder;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -65,8 +64,6 @@ public class WicketPageTestBase extends TestBase
   protected static final String KEY_LOGINPAGE_BUTTON_LOGIN = "loginButton:button";
 
   protected WicketTester tester;
-
-  protected MenuBuilder menuBuilder;
 
   private UserXmlPreferencesCache userXmlPreferencesCache;
 
@@ -293,7 +290,7 @@ public class WicketPageTestBase extends TestBase
    */
   protected void logout()
   {
-    LoginPage.logout((MySession) tester.getSession(), tester.getRequest(), tester.getResponse(), userXmlPreferencesCache, menuBuilder);
+    LoginPage.logout((MySession) tester.getSession(), tester.getRequest(), tester.getResponse(), userXmlPreferencesCache);
     tester.startPage(LoginPage.class);
     tester.assertRenderedPage(LoginPage.class);
   }
@@ -301,10 +298,5 @@ public class WicketPageTestBase extends TestBase
   public void setUserXmlPreferencesCache(final UserXmlPreferencesCache userXmlPreferencesCache)
   {
     this.userXmlPreferencesCache = userXmlPreferencesCache;
-  }
-
-  public void setMenuBuilder(final MenuBuilder menuBuilder)
-  {
-    this.menuBuilder = menuBuilder;
   }
 }

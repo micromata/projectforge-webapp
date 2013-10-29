@@ -32,7 +32,6 @@ import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.request.http.WebRequest;
 import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.Menu;
@@ -49,9 +48,6 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
 
   // Indicates that the menu mobile page should be shown directly instead of restoring last page after stay-logged-in.
   private static final String PARAM_HOME_KEY = "home";
-
-  @SpringBean(name = "menuBuilder")
-  private MenuBuilder menuBuilder;
 
   /**
    * Returns a link to this the menu mobile page. It should be shown directly instead of restoring last page after stay-logged-in .
@@ -86,7 +82,7 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
     final ListViewPanel listViewPanel = new ListViewPanel("menu");
     pageContainer.add(listViewPanel);
     listViewPanel.add(new ListViewItemPanel(listViewPanel.newChildId(), getString("menu.main.title")).setListDivider());
-    final Menu menu = menuBuilder.getMobileMenu(PFUserContext.getUser());
+    final Menu menu = MenuBuilder.getInstance().getMobileMenu(PFUserContext.getUser());
     if (menu.getMenuEntries() != null) {
       for (final MenuEntry menuEntry : menu.getMenuEntries()) {
         if (menuEntry.isVisible() == true) {
@@ -102,8 +98,7 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
       @Override
       public void onClick()
       {
-        LoginPage.logout((MySession) getSession(), (WebRequest) getRequest(), (WebResponse) getResponse(), userXmlPreferencesCache,
-            menuBuilder);
+        LoginPage.logout((MySession) getSession(), (WebRequest) getRequest(), (WebResponse) getResponse(), userXmlPreferencesCache);
         setResponsePage(LoginMobilePage.class);
       }
 

@@ -20,7 +20,6 @@
   </bean>
   <bean id="htmlHelper" class="org.projectforge.web.HtmlHelper" singleton="true" />
   <bean id="kundeFormatter" class="org.projectforge.fibu.KundeFormatter" singleton="true" />
-  <bean id="menuBuilder" class="org.projectforge.web.MenuBuilder" singleton="true" />
   <bean id="priorityFormatter" class="org.projectforge.web.core.PriorityFormatter" singleton="true" />
   <bean id="projektFormatter" class="org.projectforge.fibu.ProjektFormatter" singleton="true" />
   <bean id="sessionStorage" class="org.projectforge.web.core.SessionStorage" singleton="true" />

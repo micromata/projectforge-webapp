@@ -34,7 +34,6 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.FavoritesMenu;
 import org.projectforge.web.Menu;
@@ -53,9 +52,6 @@ public abstract class NavAbstractPanel extends Panel
   public static final String USER_PREF_MENU_KEY = "usersMenu";
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(NavAbstractPanel.class);
-
-  @SpringBean(name = "menuBuilder")
-  private MenuBuilder menuBuilder;
 
   protected Menu menu;
 
@@ -140,7 +136,7 @@ public abstract class NavAbstractPanel extends Panel
     if (log.isDebugEnabled() == true) {
       log.debug("Build new menu.");
     }
-    menu = menuBuilder.getMenu(PFUserContext.getUser());
+    menu = MenuBuilder.getInstance().getMenu(PFUserContext.getUser());
     if (securedPage != null) {
       securedPage.putUserPrefEntry(USER_PREF_MENU_KEY, menu, false);
     }
