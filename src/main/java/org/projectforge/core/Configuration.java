@@ -141,7 +141,7 @@ public class Configuration extends AbstractCache
 
   public boolean isMultiTenancyConfigured()
   {
-    return getBooleanValue(ConfigurationParam.COST_CONFIGURED);
+    return getBooleanValue(ConfigurationParam.MULTI_TENANCY_ENABLED);
   }
 
 
