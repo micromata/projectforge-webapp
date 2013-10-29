@@ -925,7 +925,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   }
 
   /**
-   * This method will be called after deleting. Does nothing at default.
+   * This method will be called after deleting as well as after object is marked as deleted. Does nothing at default.
    * @param obj The deleted object.
    */
   protected void afterDelete(final O obj)
