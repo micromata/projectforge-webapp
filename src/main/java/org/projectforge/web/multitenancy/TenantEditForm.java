@@ -56,11 +56,18 @@ public class TenantEditForm extends AbstractEditForm<TenantDO, TenantEditPage>
     super.init();
     gridBuilder.newGridPanel();
     {
-      // Title
+      // Short name
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("multitenancy.tenant.shortName"));
+      final RequiredMaxLengthTextField title = new RequiredMaxLengthTextField(InputPanel.WICKET_ID,
+          new PropertyModel<String>(data, "shortName"));
+      title.add(WicketUtils.setFocus());
+      fs.add(title);
+    }
+    {
+      // Name
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("name"));
       final RequiredMaxLengthTextField title = new RequiredMaxLengthTextField(InputPanel.WICKET_ID,
           new PropertyModel<String>(data, "name"));
-      title.add(WicketUtils.setFocus());
       fs.add(title);
     }
     {

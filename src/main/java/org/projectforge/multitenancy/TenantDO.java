@@ -26,7 +26,6 @@ package org.projectforge.multitenancy;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.projectforge.core.DefaultBaseDO;
 
@@ -106,23 +105,13 @@ public class TenantDO extends DefaultBaseDO
   }
 
   /**
-   * @see org.projectforge.core.BaseDO#getTenant()
-   * @return this.
-   */
-  @Transient
-  @Override
-  public TenantDO getTenant()
-  {
-    return this;
-  }
-
-  /**
-   * Throws {@link UnsupportedOperationException}.
+   * @param tenant Parameter will be ignored, this is used as tenant to set instead.
    * @see org.projectforge.core.BaseDO#setTenant(TenantDO)
    */
   @Override
   public TenantDO setTenant(final TenantDO tenant)
   {
-    throw new UnsupportedOperationException();
+    super.setTenant(this);
+    return this;
   }
 }

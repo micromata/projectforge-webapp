@@ -27,6 +27,8 @@ import org.projectforge.access.AccessChecker;
 import org.projectforge.access.OperationType;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
+import org.projectforge.user.UserGroupCache;
+import org.projectforge.user.UserGroupsRight;
 import org.projectforge.user.UserRightAccessCheck;
 import org.projectforge.user.UserRightCategory;
 import org.projectforge.user.UserRightValue;
@@ -41,9 +43,24 @@ public class TenantRight extends UserRightAccessCheck<TenantDO>
 {
   private static final long serialVersionUID = -558887908748357573L;
 
+  @SuppressWarnings("serial")
   public TenantRight()
   {
     super(TenantDao.USER_RIGHT_ID, UserRightCategory.ADMIN, UserRightValue.READONLY, UserRightValue.READWRITE);
+    setUserGroupsRight(new UserGroupsRight(null, null, UserRights.FALSE_READONLY_PARTLYREADWRITE_READWRITE, ProjectForgeGroup.ADMIN_GROUP) {
+      /**
+       * @see org.projectforge.user.UserGroupsRight#isAvailable(org.projectforge.user.UserGroupCache, org.projectforge.user.PFUserDO)
+       */
+      @Override
+      public boolean isAvailable(final UserGroupCache userGroupCache, final PFUserDO user)
+      {
+        if (TenantChecker.getInstance().isMultiTenancyAvailable() == false) {
+          // Right should only be available if multi tenancy is configured.
+          return false;
+        }
+        return super.isAvailable(userGroupCache, user);
+      }
+    });
   }
 
   /**
@@ -53,6 +70,9 @@ public class TenantRight extends UserRightAccessCheck<TenantDO>
   @Override
   public boolean hasSelectAccess(final PFUserDO user)
   {
+    if (TenantChecker.getInstance().isMultiTenancyAvailable() == false) {
+      return false;
+    }
     final AccessChecker ac = UserRights.getAccessChecker();
     if (ac.isUserMemberOfAdminGroup(user) == false) { // Should be checked automatically by this right, paranoia setting.
       return false;
@@ -66,6 +86,9 @@ public class TenantRight extends UserRightAccessCheck<TenantDO>
   @Override
   public boolean hasSelectAccess(final PFUserDO user, final TenantDO obj)
   {
+    if (TenantChecker.getInstance().isMultiTenancyAvailable() == false) {
+      return false;
+    }
     return hasSelectAccess(user);
   }
 
@@ -76,6 +99,9 @@ public class TenantRight extends UserRightAccessCheck<TenantDO>
   @Override
   public boolean hasAccess(final PFUserDO user, final TenantDO obj, final TenantDO oldObj, final OperationType operationType)
   {
+    if (TenantChecker.getInstance().isMultiTenancyAvailable() == false) {
+      return false;
+    }
     return UserRights.getAccessChecker().isUserMemberOfGroup(user, ProjectForgeGroup.ADMIN_GROUP);
   }
 }

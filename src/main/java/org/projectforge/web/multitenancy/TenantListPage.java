@@ -87,6 +87,8 @@ public class TenantListPage extends AbstractListPage<TenantListForm, TenantDao, 
     });
     columns.add(new CellItemListenerPropertyColumn<TenantDO>(getString("id"), getSortable("id", sortable), "id",
         cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<TenantDO>(getString("multitenancy.tenant.shortName"), getSortable("shortName", sortable), "shortName",
+        cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<TenantDO>(getString("name"), getSortable("name", sortable), "name",
         cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<TenantDO>(getString("description"), getSortable("description", sortable), "description",
