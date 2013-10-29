@@ -43,12 +43,17 @@ public class UserRightAccessCheck<O> extends UserRight
     super(id, category, rightValues);
   }
 
+  protected void setUserGroupsRight(final UserGroupsRight right)
+  {
+    this.userGroupsRight = right;
+  }
+
   /**
    * Optional for enabling user specific values stored in the data base. See {@link HRPlanningRight} as an example.
    * @param values
    * @param dependsOnGroups
    */
-  protected UserGroupsRight initializeUserGroupsRight(final UserRightValue[] values, ProjectForgeGroup... dependsOnGroups)
+  protected UserGroupsRight initializeUserGroupsRight(final UserRightValue[] values, final ProjectForgeGroup... dependsOnGroups)
   {
     userGroupsRight = new UserGroupsRight(null, null, values, dependsOnGroups);
     return userGroupsRight;
@@ -118,6 +123,7 @@ public class UserRightAccessCheck<O> extends UserRight
    * @return matches of UserGroupsRight if exist, otherwise false.
    * @see UserGroupsRight#matches(UserGroupCache, PFUserDO, UserRightValue)
    */
+  @Override
   public boolean matches(final UserGroupCache userGroupCache, final PFUserDO user, final UserRightValue value)
   {
     if (userGroupsRight != null) {
