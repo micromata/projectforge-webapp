@@ -25,25 +25,39 @@ package org.projectforge.web;
 
 import java.io.Serializable;
 
-import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.access.AccessChecker;
+import org.projectforge.access.OperationType;
+import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserChangedListener;
+import org.projectforge.user.UserDao;
+import org.projectforge.user.UserXmlPreferencesCache;
+import org.projectforge.web.core.NavAbstractPanel;
 
 /**
  * Build of the user's personal menu (depending on the access rights of the user).
  * @author Kai Reinhard (k.reinhard@micromata.de)
- *
+ * 
  */
-public class MenuBuilder implements Serializable
+public class MenuBuilder implements Serializable, UserChangedListener
 {
   private static final long serialVersionUID = -924049082728488113L;
 
-  @SpringBean(name = "accessChecker")
-  private AccessChecker accessChecker;
+  private static MenuBuilder instance;
 
-  public void setAccessChecker(final AccessChecker accessChecker)
+  public static MenuBuilder getInstance()
   {
-    this.accessChecker = accessChecker;
+    synchronized (MenuBuilder.class) {
+      if (instance == null) {
+        instance = new MenuBuilder();
+        Registry.instance().getDao(UserDao.class).register(instance);
+      }
+    }
+    return instance;
+  }
+
+  private MenuBuilder()
+  {
+    instance = this;
   }
 
   private final MenuCache menuCache = new MenuCache();
@@ -111,5 +125,18 @@ public class MenuBuilder implements Serializable
       }
     }
     return menu;
+  }
+
+  /**
+   * @see org.projectforge.user.UserChangedListener#afterUserChanged(org.projectforge.user.PFUserDO, org.projectforge.access.OperationType)
+   */
+  @Override
+  public void afterUserChanged(final PFUserDO user, final OperationType operationType)
+  {
+    if (user != null) {
+      expireMenu(user.getId());
+      // Force reloading the users menu from cache:
+      UserXmlPreferencesCache.getDefaultInstance().removeEntry(user.getId(), NavAbstractPanel.USER_PREF_MENU_KEY);
+    }
   }
 }
