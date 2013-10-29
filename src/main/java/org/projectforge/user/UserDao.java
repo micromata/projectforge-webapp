@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -52,9 +53,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- *
+ * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
- *
+ * 
  */
 public class UserDao extends BaseDao<PFUserDO>
 {
@@ -68,9 +69,20 @@ public class UserDao extends BaseDao<PFUserDO>
 
   public static final String MESSAGE_KEY_PASSWORD_QUALITY_CHECK = "user.changePassword.error.passwordQualityCheck";
 
+  private final List<UserChangedListener> userChangedListeners = new LinkedList<UserChangedListener>();
+
   public UserDao()
   {
     super(PFUserDO.class);
+  }
+
+  /**
+   * Register given listener. The listener is called every time a user was inserted, updated or deleted.
+   * @param userChangedListener
+   */
+  public void register(final UserChangedListener userChangedListener)
+  {
+    userChangedListeners.add(userChangedListener);
   }
 
   public UserGroupCache getUserGroupCache()
@@ -178,6 +190,54 @@ public class UserDao extends BaseDao<PFUserDO>
       }
     }
     return null;
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDao#afterSave(org.projectforge.core.ExtendedBaseDO)
+   */
+  @Override
+  protected void afterSave(final PFUserDO obj)
+  {
+    super.afterSave(obj);
+    for (final UserChangedListener userChangedListener : userChangedListeners) {
+      userChangedListener.afterUserChanged(obj, OperationType.INSERT);
+    }
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDao#afterUpdate(org.projectforge.core.ExtendedBaseDO, org.projectforge.core.ExtendedBaseDO)
+   */
+  @Override
+  protected void afterUpdate(final PFUserDO obj, final PFUserDO dbObj)
+  {
+    super.afterUpdate(obj, dbObj);
+    for (final UserChangedListener userChangedListener : userChangedListeners) {
+      userChangedListener.afterUserChanged(obj, OperationType.UPDATE);
+    }
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDao#afterUndelete(org.projectforge.core.ExtendedBaseDO)
+   */
+  @Override
+  protected void afterUndelete(final PFUserDO obj)
+  {
+    super.afterUndelete(obj);
+    for (final UserChangedListener userChangedListener : userChangedListeners) {
+      userChangedListener.afterUserChanged(obj, OperationType.UPDATE);
+    }
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDao#afterDelete(org.projectforge.core.ExtendedBaseDO)
+   */
+  @Override
+  protected void afterDelete(final PFUserDO obj)
+  {
+    super.afterDelete(obj);
+    for (final UserChangedListener userChangedListener : userChangedListeners) {
+      userChangedListener.afterUserChanged(obj, OperationType.DELETE);
+    }
   }
 
   /**
@@ -415,7 +475,7 @@ public class UserDao extends BaseDao<PFUserDO>
 
   /**
    * Get authentication key by user. ; )
-   *
+   * 
    * @param userName
    * @param authKey
    * @return
