@@ -80,6 +80,9 @@ public class DatabaseCoreUpdates
         if (dao.doEntitiesExist(TenantDO.class) == false || dao.doTableAttributesExist(configurationTable, "global") == false) {
           return UpdatePreCheckStatus.READY_FOR_UPDATE;
         }
+        if (dao.doEntitiesExist(PFUserDO.class) == false || dao.doTableAttributesExist(PFUserDO.class, "tenants") == false) {
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
         final List<RegistryEntry> list = Registry.instance().getOrderedList();
         for (final RegistryEntry entry : list) {
           if (entry.getDOClass() != null
@@ -103,6 +106,9 @@ public class DatabaseCoreUpdates
       {
         if (dao.doTableAttributesExist(configurationTable, "global") == false) {
           dao.addTableAttributes(configurationTable, new TableAttribute(ConfigurationDO.class, "global").setDefaultValue("false"));
+        }
+        if (dao.doTableAttributesExist(PFUserDO.class, "tenants") == false) {
+          dao.addTableAttributes(PFUserDO.class, "tenants");
         }
 
         if (dao.doEntitiesExist(TenantDO.class) == false) {
