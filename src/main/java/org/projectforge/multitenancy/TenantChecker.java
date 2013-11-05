@@ -23,8 +23,12 @@
 
 package org.projectforge.multitenancy;
 
+import org.hibernate.search.util.HibernateHelper;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.Configuration;
+import org.projectforge.registry.Registry;
+import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserGroupCache;
 
 /**
  * 
@@ -39,6 +43,10 @@ public class TenantChecker
   {
     return instance;
   }
+
+  private TenantDao tenantDao;
+
+  private UserGroupCache userGroupCache;
 
   public boolean isMultiTenancyAvailable()
   {
@@ -67,5 +75,51 @@ public class TenantChecker
       return false;
     }
     return tenantId.equals(obj.getTenantId());
+  }
+
+  public boolean isPartOfTenant(final TenantDO tenant, final PFUserDO user)
+  {
+    if (tenant == null) {
+      return false;
+    }
+    return isPartOfTenant(tenant.getId(), user);
+  }
+
+  public boolean isPartOfTenant(final Integer tenantId, final PFUserDO user)
+  {
+    if (isPartOfTenant(tenantId, (AbstractBaseDO< ? >) user) == true) {
+      return true;
+    }
+    PFUserDO u = user;
+    if (HibernateHelper.isInitialized(user) == false) {
+      u = getUserGroupCache().getUser(user.getId());
+    }
+    return false;
+  }
+
+  /**
+   * @param user
+   * @return true in multi-tenancy environments if the given user (may be initialized by Hibernate or not) has the read-write right of
+   *         {@link TenantDao#USER_RIGHT_ID}.
+   */
+  public boolean isSuperAdmin(final PFUserDO user)
+  {
+    return isMultiTenancyAvailable() == true && getDao().hasInsertAccess(user) == true;
+  }
+
+  private TenantDao getDao()
+  {
+    if (tenantDao == null) {
+      tenantDao = Registry.instance().getDao(TenantDao.class);
+    }
+    return tenantDao;
+  }
+
+  private UserGroupCache getUserGroupCache()
+  {
+    if (userGroupCache == null) {
+      userGroupCache = Registry.instance().getUserGroupCache();
+    }
+    return userGroupCache;
   }
 }
