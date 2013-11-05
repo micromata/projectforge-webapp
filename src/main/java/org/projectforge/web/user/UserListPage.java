@@ -37,8 +37,10 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.access.AccessChecker;
 import org.projectforge.access.OperationType;
 import org.projectforge.ldap.LdapUserDao;
+import org.projectforge.multitenancy.TenantChecker;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRightDO;
@@ -51,6 +53,7 @@ import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.RowCssClass;
 import org.projectforge.web.wicket.flowlayout.IconPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 
@@ -58,6 +61,9 @@ import org.projectforge.web.wicket.flowlayout.IconType;
 public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUserDO> implements IListPageColumnsCreator<PFUserDO>
 {
   private static final long serialVersionUID = 4408701323868106520L;
+
+  @SpringBean(name = "accessChecker")
+  private AccessChecker accessChecker;
 
   @SpringBean(name = "userDao")
   private UserDao userDao;
@@ -83,6 +89,9 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
       {
         final PFUserDO user = rowModel.getObject();
         appendCssClasses(item, user.getId(), user.hasSystemAccess() == false);
+        if (TenantChecker.getInstance().isSuperAdmin(user) == true) {
+          appendCssClasses(item, RowCssClass.IMPORTANT_ROW);
+        }
       }
     };
     columns.add(new CellItemListenerPropertyColumn<PFUserDO>(getString("user.username"), getSortable("username", sortable), "username",
