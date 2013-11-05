@@ -124,7 +124,17 @@ public class UserDao extends BaseDao<PFUserDO>
       queryFilter.add(Restrictions.eq("hrPlanning", myFilter.getHrPlanning()));
     }
     queryFilter.addOrder(Order.asc("username"));
-    return getList(queryFilter);
+    List<PFUserDO> list = getList(queryFilter);
+    if (myFilter.getIsAdminUser() != null) {
+      final List<PFUserDO> origList = list;
+      list = new LinkedList<PFUserDO>();
+      for (final PFUserDO user : origList) {
+        if (myFilter.getIsAdminUser() == accessChecker.isUserMemberOfAdminGroup(user, false)) {
+          list.add(user);
+        }
+      }
+    }
+    return list;
   }
 
   public String getGroupnames(final PFUserDO user)
