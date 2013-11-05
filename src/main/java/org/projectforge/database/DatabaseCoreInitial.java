@@ -150,7 +150,8 @@ public class DatabaseCoreInitial
         }
         final SchemaGenerator schemaGenerator = new SchemaGenerator(dao).add(doClasses);
         final Table propertyDeltaTable = schemaGenerator.getTable(PropertyDelta.class);
-        propertyDeltaTable.addAttribute(new TableAttribute("clazz", TableAttributeType.VARCHAR, 31).setNullable(false));
+        final TableAttribute attr = propertyDeltaTable.getAttributeByName("clazz");
+        attr.setNullable(false).setType(TableAttributeType.VARCHAR).setLength(31); // Discriminator value is may-be not handled correctly by continuous-db.
         final Table historyEntryTable = schemaGenerator.getTable(HistoryEntry.class);
         final TableAttribute typeAttr = historyEntryTable.getAttributeByName("type");
         typeAttr.setType(TableAttributeType.INT);

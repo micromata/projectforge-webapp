@@ -339,7 +339,9 @@ public class UserGroupCache extends AbstractCache
    */
   public boolean isUserMemberOfGroup(final PFUserDO user, final ProjectForgeGroup... groups)
   {
-    Validate.notNull(user);
+    if (user == null) {
+      return false;
+    }
     Validate.notNull(groups);
     for (final ProjectForgeGroup group : groups) {
       boolean result = false;

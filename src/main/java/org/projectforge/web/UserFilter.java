@@ -231,7 +231,11 @@ public class UserFilter implements Filter
         // final boolean sessionTimeout = request.isRequestedSessionIdValid() == false;
         user = (PFUserDO) request.getSession().getAttribute(SESSION_KEY_USER);
         if (user != null) {
-          user = Registry.instance().getUserGroupCache().getUser(user.getId());
+          if (updateRequiredFirst == false) {
+            // Get the fresh user from the user cache (not in maintenance mode because user group cache is perhaps not initialized correctly
+            // if updates of e. g. the user table are necessary.
+            user = Registry.instance().getUserGroupCache().getUser(user.getId());
+          }
           if (log.isDebugEnabled() == true) {
             log.debug("User found in session: " + request.getRequestURI());
           }

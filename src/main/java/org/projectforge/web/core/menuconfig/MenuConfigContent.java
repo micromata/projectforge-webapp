@@ -56,6 +56,10 @@ public class MenuConfigContent extends Panel
       return;
     }
     int counter = 0;
+    if (menu.getMenuEntries() == null) {
+      // Should only occur in maintenance mode!
+      return;
+    }
     for (final MenuEntry mainMenuEntry : menu.getMenuEntries()) {
       if (mainMenuEntry.hasSubMenuEntries() == false) {
         continue;
