@@ -58,7 +58,17 @@ public class UserListForm extends AbstractListForm<PFUserFilter, UserListPage>
       final DropDownChoice<Boolean> deactivatedChoice = new DropDownChoice<Boolean>(optionsFieldsetPanel.getDropDownChoiceId(), new PropertyModel<Boolean>(
           getSearchFilter(), "deactivatedUser"), deactivatedRenderer.getValues(), deactivatedRenderer);
       deactivatedChoice.setNullValid(true);
-      optionsFieldsetPanel.add(deactivatedChoice, true).setTooltip(getString("user.deactivated"));
+      optionsFieldsetPanel.add(deactivatedChoice, true).setTooltip(getString("user.activated"));
+    }
+    {
+      // DropDownChoice admin-user
+      final LabelValueChoiceRenderer<Boolean> isAdminRenderer = new LabelValueChoiceRenderer<Boolean>();
+      isAdminRenderer.addValue(true, getString("user.adminUsers"));
+      isAdminRenderer.addValue(false, getString("user.adminUsers.none"));
+      final DropDownChoice<Boolean> isAdminChoice = new DropDownChoice<Boolean>(optionsFieldsetPanel.getDropDownChoiceId(), new PropertyModel<Boolean>(
+          getSearchFilter(), "isAdminUser"), isAdminRenderer.getValues(), isAdminRenderer);
+      isAdminChoice.setNullValid(true);
+      optionsFieldsetPanel.add(isAdminChoice, true).setTooltip(getString("user.adminUsers"));
     }
     if (Login.getInstance().hasExternalUsermanagementSystem() == true) {
       {

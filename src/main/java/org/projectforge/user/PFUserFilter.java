@@ -36,7 +36,7 @@ public class PFUserFilter extends BaseSearchFilter implements Serializable
 {
   private static final long serialVersionUID = 5603571926905349386L;
 
-  private Boolean deactivatedUser, restrictedUser, localUser, hrPlanning;
+  private Boolean isAdminUser, deactivatedUser, restrictedUser, localUser, hrPlanning;
 
   public PFUserFilter()
   {
@@ -45,7 +45,25 @@ public class PFUserFilter extends BaseSearchFilter implements Serializable
   public PFUserFilter(final BaseSearchFilter filter)
   {
     super(filter);
-    deactivatedUser = restrictedUser = localUser = null;
+    isAdminUser = deactivatedUser = restrictedUser = localUser = null;
+  }
+
+  /**
+   * @return the isAdminUser
+   */
+  public Boolean getIsAdminUser()
+  {
+    return isAdminUser;
+  }
+
+  /**
+   * @param isAdminUser the isAdminUser to set
+   * @return this for chaining.
+   */
+  public PFUserFilter setIsAdminUser(final Boolean isAdminUser)
+  {
+    this.isAdminUser = isAdminUser;
+    return this;
   }
 
   /**
