@@ -23,7 +23,6 @@
 
 package org.projectforge.multitenancy;
 
-import org.projectforge.access.AccessChecker;
 import org.projectforge.access.OperationType;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
@@ -64,35 +63,6 @@ public class TenantRight extends UserRightAccessCheck<TenantDO>
   }
 
   /**
-   * @return true if the user is member of group FINANCE or CONTROLLING.
-   * @see org.projectforge.user.UserRightAccessCheck#hasSelectAccess(org.projectforge.access.AccessChecker, org.projectforge.user.PFUserDO)
-   */
-  @Override
-  public boolean hasSelectAccess(final PFUserDO user)
-  {
-    if (TenantChecker.getInstance().isMultiTenancyAvailable() == false) {
-      return false;
-    }
-    final AccessChecker ac = UserRights.getAccessChecker();
-    if (ac.isUserMemberOfAdminGroup(user) == false) { // Should be checked automatically by this right, paranoia setting.
-      return false;
-    }
-    return ac.hasRight(user, getId(), UserRightValue.READONLY, UserRightValue.READWRITE);
-  }
-
-  /**
-   * @see org.projectforge.user.UserRightAccessCheck#hasSelectAccess(java.lang.Object)
-   */
-  @Override
-  public boolean hasSelectAccess(final PFUserDO user, final TenantDO obj)
-  {
-    if (TenantChecker.getInstance().isMultiTenancyAvailable() == false) {
-      return false;
-    }
-    return hasSelectAccess(user);
-  }
-
-  /**
    * @return true if user is member of group FINANCE.
    * @see org.projectforge.user.UserRightAccessCheck#hasSelectAccess(java.lang.Object)
    */
@@ -102,6 +72,12 @@ public class TenantRight extends UserRightAccessCheck<TenantDO>
     if (TenantChecker.getInstance().isMultiTenancyAvailable() == false) {
       return false;
     }
-    return UserRights.getAccessChecker().isUserMemberOfGroup(user, ProjectForgeGroup.ADMIN_GROUP);
+    if (UserRights.getAccessChecker().isUserMemberOfGroup(user, ProjectForgeGroup.ADMIN_GROUP) == false) {
+      return false;
+    }
+    if (operationType == OperationType.SELECT) {
+      return UserRights.getAccessChecker().hasRight(user, getId(), UserRightValue.READONLY, UserRightValue.READWRITE);
+    }
+    return UserRights.getAccessChecker().hasRight(user, getId(), UserRightValue.READWRITE);
   }
 }

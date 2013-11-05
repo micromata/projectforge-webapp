@@ -49,14 +49,12 @@ import org.projectforge.fibu.datev.DatevImportDao;
 import org.projectforge.fibu.kost.Kost2Dao;
 import org.projectforge.humanresources.HRPlanningDao;
 import org.projectforge.multitenancy.TenantChecker;
-import org.projectforge.multitenancy.TenantDao;
 import org.projectforge.orga.ContractDao;
 import org.projectforge.orga.PostausgangDao;
 import org.projectforge.orga.PosteingangDao;
 import org.projectforge.user.Login;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
-import org.projectforge.user.UserRightDO;
 import org.projectforge.user.UserRightId;
 import org.projectforge.user.UserRightValue;
 import org.projectforge.web.access.AccessListPage;
@@ -369,15 +367,8 @@ public class MenuItemRegistry
       @Override
       protected boolean isVisible(final MenuBuilderContext context)
       {
-        if (TenantChecker.getInstance().isMultiTenancyAvailable() == false) {
-          return false;
-        }
         final PFUserDO user = context.getLoggedInUser();
-        final UserRightDO right = user.getRight(TenantDao.USER_RIGHT_ID);
-        if (right == null || right.getValue() == null) {
-          return false;
-        }
-        return right.getValue().isIn(UserRightValue.READONLY, UserRightValue.READWRITE);
+        return TenantChecker.getInstance().isSuperAdmin(user);
       }
     });
     // reg.register(admin, MenuItemDefId.TENANT_LIST, 35, TenantListPage.class, TenantDao.USER_RIGHT_ID, READONLY_READWRITE);
