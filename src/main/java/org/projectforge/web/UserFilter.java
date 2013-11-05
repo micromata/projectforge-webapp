@@ -44,6 +44,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.MDC;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.common.StringHelper;
+import org.projectforge.registry.Registry;
 import org.projectforge.user.Login;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
@@ -230,6 +231,11 @@ public class UserFilter implements Filter
         // final boolean sessionTimeout = request.isRequestedSessionIdValid() == false;
         user = (PFUserDO) request.getSession().getAttribute(SESSION_KEY_USER);
         if (user != null) {
+          if (updateRequiredFirst == false) {
+            // Get the fresh user from the user cache (not in maintenance mode because user group cache is perhaps not initialized correctly
+            // if updates of e. g. the user table are necessary.
+            user = Registry.instance().getUserGroupCache().getUser(user.getId());
+          }
           if (log.isDebugEnabled() == true) {
             log.debug("User found in session: " + request.getRequestURI());
           }
