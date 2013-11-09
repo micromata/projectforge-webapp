@@ -35,8 +35,6 @@ import org.projectforge.web.user.GroupSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
-import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
-import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class AccessEditForm extends AbstractEditForm<GroupTaskAccessDO, AccessEditPage>
@@ -72,12 +70,9 @@ public class AccessEditForm extends AbstractEditForm<GroupTaskAccessDO, AccessEd
       groupSelectPanel.init();
     }
     {
-      // Option
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"));
-      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-      checkBoxPanel
-      .add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(data, "recursive"), getString("recursive"))
-      .setTooltip(getString("access.recursive.help")));
+      // Option recursive
+      gridBuilder.newFieldset(getString("recursive")).addCheckBox(new PropertyModel<Boolean>(data, "recursive"), null)
+      .setTooltip(getString("access.recursive.help"));
     }
     {
       // Access entries table
