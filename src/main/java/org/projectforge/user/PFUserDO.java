@@ -92,8 +92,6 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   private String password;
 
-  private String tenants;
-
   private boolean localUser;
 
   private boolean restrictedUser;
@@ -709,26 +707,6 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   public PFUserDO setNoPassword()
   {
     this.password = NOPASSWORD;
-    return this;
-  }
-
-  /**
-   * A user is may-be assigned to multiple tenants. The main tenant is assigned as {@link #getTenant()}, further tenants are listed here.
-   * @return the tenants (csv of tenant id's).
-   */
-  @Column(length = 4000)
-  public String getTenants()
-  {
-    return tenants;
-  }
-
-  /**
-   * @param tenants the tenants to set (csv of tenant id's).
-   * @return this for chaining.
-   */
-  public PFUserDO setTenants(final String tenants)
-  {
-    this.tenants = tenants;
     return this;
   }
 
