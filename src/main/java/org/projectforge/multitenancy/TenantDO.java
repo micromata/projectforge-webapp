@@ -54,6 +54,7 @@ public class TenantDO extends DefaultBaseDO
    * installation.
    * @return the defaultTenant
    */
+  @Column(name = "default_tenant")
   public Boolean getDefaultTenant()
   {
     return defaultTenant;
