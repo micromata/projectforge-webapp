@@ -49,7 +49,7 @@ public class TenantDao extends BaseDao<TenantDO>
   public TenantDO getDefaultTenant()
   {
     @SuppressWarnings("unchecked")
-    final List<TenantDO> list = getHibernateTemplate().find("from TenantDO t where t.default_tenant = true");
+    final List<TenantDO> list = getHibernateTemplate().find("from TenantDO t where t.defaultTenant = true");
     if (list != null && list.isEmpty() == true) {
       return null;
     }
@@ -73,7 +73,7 @@ public class TenantDao extends BaseDao<TenantDO>
       return;
     }
     if (obj.getId() == null || defaultTenant.getId() != obj.getId()) {
-      throw new UserException("");
+      throw new UserException("multitenancy.error.maxOnlyOneTenantShouldBeDefault");
     }
   }
 

@@ -26,6 +26,7 @@ package org.projectforge.multitenancy;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.projectforge.core.DefaultBaseDO;
 
@@ -63,6 +64,7 @@ public class TenantDO extends DefaultBaseDO
   /**
    * @return the defaultTenant
    */
+  @Transient
   public boolean isDefaultTenant()
   {
     return defaultTenant != null && defaultTenant == true;

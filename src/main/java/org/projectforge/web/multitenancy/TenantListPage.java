@@ -44,6 +44,7 @@ import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.RowCssClass;
 
 @ListPage(editPage = TenantEditPage.class)
 public class TenantListPage extends AbstractListPage<TenantListForm, TenantDao, TenantDO> implements IListPageColumnsCreator<TenantDO>
@@ -65,8 +66,11 @@ public class TenantListPage extends AbstractListPage<TenantListForm, TenantDao, 
     final CellItemListener<TenantDO> cellItemListener = new CellItemListener<TenantDO>() {
       public void populateItem(final Item<ICellPopulator<TenantDO>> item, final String componentId, final IModel<TenantDO> rowModel)
       {
-        final TenantDO Tenant = rowModel.getObject();
-        appendCssClasses(item, Tenant.getId(), Tenant.isDeleted());
+        final TenantDO tenant = rowModel.getObject();
+        appendCssClasses(item, tenant.getId(), tenant.isDeleted());
+        if (tenant.isDefaultTenant() == true) {
+          appendCssClasses(item, RowCssClass.IMPORTANT_ROW);
+        }
       }
     };
     columns.add(new CellItemListenerPropertyColumn<TenantDO>(new Model<String>(getString("created")), getSortable("created", sortable),
