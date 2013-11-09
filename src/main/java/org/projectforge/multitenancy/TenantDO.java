@@ -46,6 +46,37 @@ public class TenantDO extends DefaultBaseDO
 
   private String description;
 
+  private Boolean defaultTenant;
+
+  /**
+   * No or only one default tenant should be exist. All entities in the database without a given tenant_id are automatically assigned to
+   * this tenant. This feature should only be used for ProjectForge installations migrated from single tenant into a multi tenancy
+   * installation.
+   * @return the defaultTenant
+   */
+  public Boolean getDefaultTenant()
+  {
+    return defaultTenant;
+  }
+
+  /**
+   * @return the defaultTenant
+   */
+  public boolean isDefaultTenant()
+  {
+    return defaultTenant != null && defaultTenant == true;
+  }
+
+  /**
+   * @param defaultTenant the defaultTenant to set
+   * @return this for chaining.
+   */
+  public TenantDO setDefaultTenant(final Boolean defaultTenant)
+  {
+    this.defaultTenant = defaultTenant;
+    return this;
+  }
+
   /**
    * The short name is the display name.
    * @return the shortName

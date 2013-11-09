@@ -71,6 +71,11 @@ public class TenantEditForm extends AbstractEditForm<TenantDO, TenantEditPage>
       fs.add(title);
     }
     {
+      // Option recursive
+      gridBuilder.newFieldset(getString("multitenancy.defaultTenant")).addCheckBox(new PropertyModel<Boolean>(data, "defaultTenant"), null)
+      .setTooltip(getString("multitenancy.defaultTenant.tooltip"));
+    }
+    {
       // Description
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"));
       fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "description")));

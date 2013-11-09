@@ -23,7 +23,10 @@
 
 package org.projectforge.multitenancy;
 
+import java.util.List;
+
 import org.projectforge.core.BaseDao;
+import org.projectforge.core.UserException;
 import org.projectforge.user.UserRightId;
 
 /**
@@ -33,12 +36,45 @@ import org.projectforge.user.UserRightId;
  */
 public class TenantDao extends BaseDao<TenantDO>
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TenantDao.class);
+
   public static final UserRightId USER_RIGHT_ID = UserRightId.ADMIN_TENANT;
 
   public TenantDao()
   {
     super(TenantDO.class);
     userRightId = USER_RIGHT_ID;
+  }
+
+  public TenantDO getDefaultTenant()
+  {
+    @SuppressWarnings("unchecked")
+    final List<TenantDO> list = getHibernateTemplate().find("from TenantDO t where t.default_tenant = true");
+    if (list != null && list.isEmpty() == true) {
+      return null;
+    }
+    if (list.size() > 1) {
+      log.warn("There are more than one tenent object declared as default! No or only one tenant should be defined as default!");
+    }
+    return list.get(0);
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDao#onSaveOrModify(org.projectforge.core.ExtendedBaseDO)
+   */
+  @Override
+  protected void onSaveOrModify(final TenantDO obj)
+  {
+    if (obj.isDefaultTenant() == false) {
+      return;
+    }
+    final TenantDO defaultTenant = getDefaultTenant();
+    if (defaultTenant == null) {
+      return;
+    }
+    if (obj.getId() == null || defaultTenant.getId() != obj.getId()) {
+      throw new UserException("");
+    }
   }
 
   @Override
