@@ -76,7 +76,7 @@ public class AccessEditForm extends AbstractEditForm<GroupTaskAccessDO, AccessEd
     }
     {
       // Access entries table
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("access.accessTable"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("access.accessTable")).suppressLabelForWarning();
       final AccessEditTablePanel accessEditTablePanel = new AccessEditTablePanel(fs.newChildId(), data);
       fs.add(accessEditTablePanel);
       accessEditTablePanel.init();
