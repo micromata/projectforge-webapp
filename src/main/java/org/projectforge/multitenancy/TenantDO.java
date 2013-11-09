@@ -23,12 +23,22 @@
 
 package org.projectforge.multitenancy;
 
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.search.annotations.ContainedIn;
+import org.hibernate.search.annotations.IndexedEmbedded;
 import org.projectforge.core.DefaultBaseDO;
+import org.projectforge.user.PFUserDO;
 
 /**
  * Represents a single tenant (client) for multi-tenancy.
@@ -48,6 +58,30 @@ public class TenantDO extends DefaultBaseDO
   private String description;
 
   private Boolean defaultTenant;
+
+  @ContainedIn
+  @IndexedEmbedded(depth = 1)
+  private Set<PFUserDO> assignedUsers;
+
+  @ManyToMany(targetEntity = org.projectforge.user.PFUserDO.class, cascade = { CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+  @JoinTable(name = "T_TENANT_USER", joinColumns = @JoinColumn(name = "TENANT_ID"), inverseJoinColumns = @JoinColumn(name = "USER_ID"))
+  public Set<PFUserDO> getAssignedUsers()
+  {
+    return assignedUsers;
+  }
+
+  public void setAssignedUsers(final Set<PFUserDO> assignedUsers)
+  {
+    this.assignedUsers = assignedUsers;
+  }
+
+  // public void addUser(final PFUserDO user)
+  // {
+  // if (this.assignedUsers == null) {
+  // this.assignedUsers = new HashSet<PFUserDO>();
+  // }
+  // this.assignedUsers.add(user);
+  // }
 
   /**
    * No or only one default tenant should be exist. All entities in the database without a given tenant_id are automatically assigned to

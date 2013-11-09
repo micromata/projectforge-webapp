@@ -106,7 +106,7 @@ public class DatabaseCoreUpdates
         }
 
         if (dao.doEntitiesExist(TenantDO.class) == false) {
-          final SchemaGenerator schemaGenerator = new SchemaGenerator(dao).add(TenantDO.class);
+          final SchemaGenerator schemaGenerator = new SchemaGenerator(dao).add(PFUserDO.class, TenantDO.class);
           schemaGenerator.createSchema();
         }
         final List<RegistryEntry> list = Registry.instance().getOrderedList();
