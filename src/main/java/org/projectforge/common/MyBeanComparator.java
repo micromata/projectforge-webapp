@@ -26,6 +26,7 @@ package org.projectforge.common;
 import java.util.Comparator;
 
 import org.apache.commons.lang.ClassUtils;
+import org.projectforge.core.StringComparator;
 
 public class MyBeanComparator<T> implements Comparator<T>
 {
@@ -81,6 +82,9 @@ public class MyBeanComparator<T> implements Comparator<T>
       }
       if (value2 == null) {
         return (asc == true) ? 1 : -1;
+      }
+      if (value1 instanceof String && value2 instanceof String) {
+        return StringComparator.getInstance().compare((String)value1, (String)value2, asc);
       }
       if (ClassUtils.isAssignable(value2.getClass(), value1.getClass()) == true) {
         if (asc == true) {
