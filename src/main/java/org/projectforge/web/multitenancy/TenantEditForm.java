@@ -23,11 +23,18 @@
 
 package org.projectforge.web.multitenancy;
 
+import java.util.Collection;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.multitenancy.TenantDO;
 import org.projectforge.multitenancy.TenantDao;
+import org.projectforge.user.PFUserDO;
+import org.projectforge.web.common.MultiChoiceListHelper;
+import org.projectforge.web.user.UsersComparator;
+import org.projectforge.web.user.UsersProvider;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
@@ -35,6 +42,8 @@ import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
+
+import com.vaynberg.wicket.select2.Select2MultiChoice;
 
 public class TenantEditForm extends AbstractEditForm<TenantDO, TenantEditPage>
 {
@@ -44,6 +53,8 @@ public class TenantEditForm extends AbstractEditForm<TenantDO, TenantEditPage>
 
   @SpringBean(name = "tenantDao")
   private TenantDao tenantDao;
+
+  MultiChoiceListHelper<PFUserDO> assignUsersListHelper;
 
   public TenantEditForm(final TenantEditPage parentPage, final TenantDO data)
   {
@@ -71,9 +82,25 @@ public class TenantEditForm extends AbstractEditForm<TenantDO, TenantEditPage>
       fs.add(title);
     }
     {
-      // Option recursive
+      // Option default
       gridBuilder.newFieldset(getString("multitenancy.defaultTenant")).addCheckBox(new PropertyModel<Boolean>(data, "defaultTenant"), null)
       .setTooltip(getString("multitenancy.defaultTenant.tooltip"));
+    }
+    {
+      // Assigned users
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("multitenancy.assignedUsers")).setLabelSide(false);
+      final Set<PFUserDO> assignedUsers = getData().getAssignedUsers();
+      final UsersProvider usersProvider = new UsersProvider();
+      assignUsersListHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator()).setFullList(
+          usersProvider.getSortedUsers());
+      if (assignedUsers != null) {
+        for (final PFUserDO user : assignedUsers) {
+          assignUsersListHelper.addOriginalAssignedItem(user).assignItem(user);
+        }
+      }
+      final Select2MultiChoice<PFUserDO> users = new Select2MultiChoice<PFUserDO>(fs.getSelect2MultiChoiceId(),
+          new PropertyModel<Collection<PFUserDO>>(this.assignUsersListHelper, "assignedItems"), usersProvider);
+      fs.add(users);
     }
     {
       // Description

@@ -61,6 +61,8 @@ import org.projectforge.ldap.LdapSambaAccountsUtils;
 import org.projectforge.ldap.LdapUserDao;
 import org.projectforge.ldap.LdapUserValues;
 import org.projectforge.ldap.PFUserDOConverter;
+import org.projectforge.multitenancy.TenantChecker;
+import org.projectforge.multitenancy.TenantDO;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.Login;
 import org.projectforge.user.PFUserContext;
@@ -119,7 +121,9 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
 
   boolean invalidateAllStayLoggedInSessions;
 
-  MultiChoiceListHelper<GroupDO> assignListHelper;
+  MultiChoiceListHelper<GroupDO> assignGroupsListHelper;
+
+  MultiChoiceListHelper<TenantDO> assignTenantsListHelper;
 
   LdapUserValues ldapUserValues;
 
@@ -428,6 +432,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
 
     gridBuilder.newGridPanel();
     addAssignedGroups(adminAccess);
+    addAssignedTenants();
     if (adminAccess == true && Login.getInstance().hasExternalUsermanagementSystem() == true) {
       addLdapStuff();
     }
@@ -816,18 +821,43 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     final FieldsetPanel fs = gridBuilder.newFieldset(getString("user.assignedGroups")).setLabelSide(false);
     final Collection<Integer> set = ((UserDao) getBaseDao()).getAssignedGroups(data);
     final GroupsProvider groupsProvider = new GroupsProvider();
-    assignListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
+    assignGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
         groupsProvider.getSortedGroups());
     if (set != null) {
       for (final Integer groupId : set) {
         final GroupDO group = userGroupCache.getGroup(groupId);
         if (group != null) {
-          assignListHelper.addOriginalAssignedItem(group).assignItem(group);
+          assignGroupsListHelper.addOriginalAssignedItem(group).assignItem(group);
         }
       }
     }
     final Select2MultiChoice<GroupDO> groups = new Select2MultiChoice<GroupDO>(fs.getSelect2MultiChoiceId(),
-        new PropertyModel<Collection<GroupDO>>(this.assignListHelper, "assignedItems"), groupsProvider);
+        new PropertyModel<Collection<GroupDO>>(this.assignGroupsListHelper, "assignedItems"), groupsProvider);
+    fs.add(groups);
+  }
+
+  private void addAssignedTenants()
+  {
+    if (TenantChecker.getInstance().isSuperAdmin(getUser()) == false) {
+      // Do nothing, user has no multi-tenancy admin right.
+      // TODO: Admin user should add or delete users from the tenant he is administrator for.
+      return;
+    }
+    final FieldsetPanel fs = gridBuilder.newFieldset(getString("multitenancy.assignedUsers")).setLabelSide(false);
+    final Collection<Integer> set = ((UserDao) getBaseDao()).getAssignedTenants(data);
+    final GroupsProvider groupsProvider = new GroupsProvider();
+    assignGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
+        groupsProvider.getSortedGroups());
+    if (set != null) {
+      for (final Integer groupId : set) {
+        final GroupDO group = userGroupCache.getGroup(groupId);
+        if (group != null) {
+          assignGroupsListHelper.addOriginalAssignedItem(group).assignItem(group);
+        }
+      }
+    }
+    final Select2MultiChoice<GroupDO> groups = new Select2MultiChoice<GroupDO>(fs.getSelect2MultiChoiceId(),
+        new PropertyModel<Collection<GroupDO>>(this.assignGroupsListHelper, "assignedItems"), groupsProvider);
     fs.add(groups);
   }
 

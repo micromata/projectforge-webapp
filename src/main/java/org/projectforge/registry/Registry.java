@@ -35,6 +35,7 @@ import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.fibu.KontoCache;
 import org.projectforge.fibu.RechnungCache;
+import org.projectforge.multitenancy.TenantsCache;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserXmlPreferencesDao;
@@ -68,6 +69,8 @@ public class Registry
   private KontoCache kontoCache;
 
   private RechnungCache invoiceCache;
+
+  private TenantsCache tenantsCache;
 
   private DataSource dataSource;
 
@@ -173,6 +176,16 @@ public class Registry
   void setUserGroupCache(final UserGroupCache userGroupCache)
   {
     this.userGroupCache = userGroupCache;
+  }
+
+  public TenantsCache getTenantsCache()
+  {
+    return tenantsCache;
+  }
+
+  public void setTenantsCache(final TenantsCache tenantsCache)
+  {
+    this.tenantsCache = tenantsCache;
   }
 
   public UserXmlPreferencesDao getUserXmlPreferencesDao()

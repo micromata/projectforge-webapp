@@ -23,6 +23,7 @@
 
 package org.projectforge.multitenancy;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -75,13 +76,13 @@ public class TenantDO extends DefaultBaseDO
     this.assignedUsers = assignedUsers;
   }
 
-  // public void addUser(final PFUserDO user)
-  // {
-  // if (this.assignedUsers == null) {
-  // this.assignedUsers = new HashSet<PFUserDO>();
-  // }
-  // this.assignedUsers.add(user);
-  // }
+  public void addUser(final PFUserDO user)
+  {
+    if (this.assignedUsers == null) {
+      this.assignedUsers = new HashSet<PFUserDO>();
+    }
+    this.assignedUsers.add(user);
+  }
 
   /**
    * No or only one default tenant should be exist. All entities in the database without a given tenant_id are automatically assigned to

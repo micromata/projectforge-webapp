@@ -28,8 +28,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -48,6 +50,7 @@ import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.DisplayHistoryEntry;
 import org.projectforge.core.ModificationStatus;
 import org.projectforge.core.QueryFilter;
+import org.projectforge.multitenancy.TenantDO;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -148,6 +151,19 @@ public class UserDao extends BaseDao<PFUserDO>
   public Collection<Integer> getAssignedGroups(final PFUserDO user)
   {
     return userGroupCache.getUserGroups(user);
+  }
+
+  public Collection<Integer> getAssignedTenants(final PFUserDO user)
+  {
+    @SuppressWarnings("unchecked")
+    final List<TenantDO> list = getHibernateTemplate().find("from TenantDO t where ? member of t.assignedUsers", user);
+    final Set<Integer> result = new HashSet<Integer>();
+    if (list != null) {
+      for (final TenantDO tenant : list) {
+        result.add(tenant.getId());
+      }
+    }
+    return result;
   }
 
   public List<UserRightDO> getUserRights(final Integer userId)

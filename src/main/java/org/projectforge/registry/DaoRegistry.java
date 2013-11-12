@@ -55,6 +55,7 @@ import org.projectforge.humanresources.HRPlanningDao;
 import org.projectforge.humanresources.HRPlanningEntryDO;
 import org.projectforge.meb.MebDao;
 import org.projectforge.multitenancy.TenantDao;
+import org.projectforge.multitenancy.TenantsCache;
 import org.projectforge.orga.ContractDao;
 import org.projectforge.orga.PostausgangDao;
 import org.projectforge.orga.PosteingangDao;
@@ -210,6 +211,8 @@ public class DaoRegistry
 
   private TenantDao tenantDao;
 
+  private TenantsCache tenantsCache;
+
   private TimesheetDao timesheetDao;
 
   private UserDao userDao;
@@ -232,6 +235,7 @@ public class DaoRegistry
     }
     register(CONFIGURATION, ConfigurationDao.class, configurationDao, "administration.configuration").setSearchable(false);
     register(TENANT, TenantDao.class, tenantDao, "tenant");
+    Registry.instance().setTenantsCache(tenantsCache);
     register(USER, UserDao.class, userDao, "user");
     Registry.instance().setUserGroupCache(userDao.getUserGroupCache());
     register(GROUP, GroupDao.class, groupDao, "group");
@@ -459,6 +463,16 @@ public class DaoRegistry
   public void setTenantDao(final TenantDao tenantDao)
   {
     this.tenantDao = tenantDao;
+  }
+
+  public TenantsCache getTenantsCache()
+  {
+    return tenantsCache;
+  }
+
+  public void setTenantsCache(final TenantsCache tenantsCache)
+  {
+    this.tenantsCache = tenantsCache;
   }
 
   public void setTimesheetDao(final TimesheetDao timesheetDao)

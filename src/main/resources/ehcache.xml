@@ -11,6 +11,7 @@
   <cache name="org.projectforge.address.AddressDao" maxElementsInMemory="1000" />
   <cache name="org.projectforge.book.BookDao" maxElementsInMemory="1000" />
   <cache name="org.projectforge.task.TaskDao" maxElementsInMemory="1000" />
+  <cache name="org.projectforge.multitenancy.TenantDao" maxElementsInMemory="100" />
   <cache name="org.projectforge.timesheet.TimesheetDao" maxElementsInMemory="10000" />
 
   <cache name="org.projectforge.plugins.liquidityplanning.LiquidityEntryDao" maxElementsInMemory="1000" />

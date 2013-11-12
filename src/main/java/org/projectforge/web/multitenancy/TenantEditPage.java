@@ -29,6 +29,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.multitenancy.TenantDO;
 import org.projectforge.multitenancy.TenantDao;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.AbstractSecuredBasePage;
 import org.projectforge.web.wicket.EditPage;
 
 @EditPage(defaultReturnPage = TenantListPage.class)
@@ -45,6 +46,14 @@ public class TenantEditPage extends AbstractEditPage<TenantDO, TenantEditForm, T
   {
     super(parameters, "multitenancy");
     init();
+  }
+
+  @Override
+  public AbstractSecuredBasePage onSaveOrUpdate()
+  {
+    tenantDao.setAssignedUsers(getData(), form.assignUsersListHelper.getAssignedItems());
+    //groupDao.setNestedGroups(getData(), form.nestedGroupsListHelper.getAssignedItems());
+    return super.onSaveOrUpdate();
   }
 
   @Override

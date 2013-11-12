@@ -106,7 +106,7 @@ public class UserEditPage extends AbstractEditPage<PFUserDO, UserEditForm, UserD
   @Override
   public AbstractSecuredBasePage afterSaveOrUpdate()
   {
-    groupDao.assignGroups(getData(), form.assignListHelper.getItemsToAssign(), form.assignListHelper.getItemsToUnassign());
+    groupDao.assignGroups(getData(), form.assignGroupsListHelper.getItemsToAssign(), form.assignGroupsListHelper.getItemsToUnassign());
 
     if (form.rightsData != null) {
       final List<UserRightVO> list = form.rightsData.getRights();
