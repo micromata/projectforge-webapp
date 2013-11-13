@@ -121,9 +121,11 @@ public class TenantsProvider extends TextChoiceProvider<TenantDO>
       final Collection<TenantDO> allTenants = getTenantsCache().getTenants();
       sortedTenants = new TreeSet<TenantDO>(tenantsComparator);
       final PFUserDO loggedInUser = PFUserContext.getUser();
-      for (final TenantDO tenant : allTenants) {
-        if (tenant.isDeleted() == false && getTenantDao().hasSelectAccess(loggedInUser, tenant, false) == true) {
-          sortedTenants.add(tenant);
+      if (allTenants != null) {
+        for (final TenantDO tenant : allTenants) {
+          if (tenant.isDeleted() == false && getTenantDao().hasSelectAccess(loggedInUser, tenant, false) == true) {
+            sortedTenants.add(tenant);
+          }
         }
       }
     }
@@ -217,7 +219,7 @@ public class TenantsProvider extends TextChoiceProvider<TenantDO>
   private TenantsCache getTenantsCache()
   {
     if (tenantsCache == null) {
-      tenantsCache = Registry.instance().getTenantsCache();
+      tenantsCache = getTenantDao().getTenantsCache();
     }
     return tenantsCache;
   }

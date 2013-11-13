@@ -24,6 +24,7 @@
 package org.projectforge.web.user;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
@@ -41,6 +42,8 @@ import org.projectforge.access.AccessChecker;
 import org.projectforge.access.OperationType;
 import org.projectforge.ldap.LdapUserDao;
 import org.projectforge.multitenancy.TenantChecker;
+import org.projectforge.multitenancy.TenantDO;
+import org.projectforge.multitenancy.TenantsCache;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRightDO;
@@ -64,6 +67,9 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
 
   @SpringBean(name = "accessChecker")
   private AccessChecker accessChecker;
+
+  @SpringBean(name = "tenantsCache")
+  private TenantsCache tenantsCache;
 
   @SpringBean(name = "userDao")
   private UserDao userDao;
@@ -182,7 +188,19 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
           cellItemListener.populateItem(cellItem, componentId, rowModel);
         }
       });
-
+      if (TenantChecker.getInstance().isSuperAdmin(getUser()) == true) {
+        columns.add(new AbstractColumn<PFUserDO, String>(new Model<String>(getString("multitenancy.assignedTenants"))) {
+          public void populateItem(final Item<ICellPopulator<PFUserDO>> cellItem, final String componentId, final IModel<PFUserDO> rowModel)
+          {
+            final PFUserDO user = rowModel.getObject();
+            final Collection<TenantDO> tenants = tenantsCache.getTenantsOfUser(user.getId());
+            final String tenantNames = tenantsCache.getTenantShortNames(tenants);
+            final Label label = new Label(componentId, new Model<String>(tenantNames));
+            cellItem.add(label);
+            cellItemListener.populateItem(cellItem, componentId, rowModel);
+          }
+        });
+      }
       if (LdapUserDao.isPosixAccountsConfigured() == true) {
         columns
         .add(new CellItemListenerPropertyColumn<PFUserDO>(getString("user.ldapValues"), "ldapValues", "ldapValues", cellItemListener));

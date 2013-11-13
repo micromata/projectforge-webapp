@@ -23,7 +23,9 @@
 
 package org.projectforge.multitenancy;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -36,9 +38,12 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.Hibernate;
 import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.projectforge.common.StringHelper;
 import org.projectforge.core.DefaultBaseDO;
+import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
 
 /**
@@ -59,6 +64,8 @@ public class TenantDO extends DefaultBaseDO
   private String description;
 
   private Boolean defaultTenant;
+
+  private String usernames;
 
   @ContainedIn
   @IndexedEmbedded(depth = 1)
@@ -82,6 +89,39 @@ public class TenantDO extends DefaultBaseDO
       this.assignedUsers = new HashSet<PFUserDO>();
     }
     this.assignedUsers.add(user);
+  }
+
+  /**
+   * Returns the collection of assigned users only if initialized. Avoids a LazyInitializationException.
+   * @return
+   */
+  @Transient
+  public Set<PFUserDO> getSafeAssignedUsers()
+  {
+    if (this.assignedUsers == null || Hibernate.isInitialized(this.assignedUsers) == false) {
+      return null;
+    }
+    return this.assignedUsers;
+  }
+
+  @Transient
+  public String getUsernames()
+  {
+    if (usernames != null) {
+      return usernames;
+    }
+    final TenantDO tenant = Registry.instance().getTenantsCache().getTenant(getId()); // If not initialized.
+    if (tenant.getAssignedUsers() == null) {
+      return "";
+    }
+    final List<String> list = new ArrayList<String>();
+    for (final PFUserDO user : tenant.getAssignedUsers()) {
+      if (user != null) {
+        list.add(user.getUsername());
+      }
+    }
+    usernames = StringHelper.listToString(list, ", ", true);
+    return usernames;
   }
 
   /**

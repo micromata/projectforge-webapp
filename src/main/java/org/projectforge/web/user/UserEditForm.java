@@ -63,6 +63,8 @@ import org.projectforge.ldap.LdapUserValues;
 import org.projectforge.ldap.PFUserDOConverter;
 import org.projectforge.multitenancy.TenantChecker;
 import org.projectforge.multitenancy.TenantDO;
+import org.projectforge.multitenancy.TenantsCache;
+import org.projectforge.multitenancy.TenantsComparator;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.Login;
 import org.projectforge.user.PFUserContext;
@@ -76,6 +78,7 @@ import org.projectforge.user.UserRightValue;
 import org.projectforge.web.I18nCore;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.common.MultiChoiceListHelper;
+import org.projectforge.web.multitenancy.TenantsProvider;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
@@ -103,6 +106,9 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
 
   @SpringBean(name = "accessChecker")
   private AccessChecker accessChecker;
+
+  @SpringBean(name = "tenantsCache")
+  private TenantsCache tenantsCache;
 
   @SpringBean(name = "userRightDao")
   private UserRightDao userRightDao;
@@ -843,22 +849,22 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       // TODO: Admin user should add or delete users from the tenant he is administrator for.
       return;
     }
-    final FieldsetPanel fs = gridBuilder.newFieldset(getString("multitenancy.assignedUsers")).setLabelSide(false);
+    final FieldsetPanel fs = gridBuilder.newFieldset(getString("multitenancy.assignedTenants")).setLabelSide(false);
     final Collection<Integer> set = ((UserDao) getBaseDao()).getAssignedTenants(data);
-    final GroupsProvider groupsProvider = new GroupsProvider();
-    assignGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
-        groupsProvider.getSortedGroups());
+    final TenantsProvider tenantsProvider = new TenantsProvider();
+    assignTenantsListHelper = new MultiChoiceListHelper<TenantDO>().setComparator(new TenantsComparator()).setFullList(
+        tenantsProvider.getSortedTenants());
     if (set != null) {
-      for (final Integer groupId : set) {
-        final GroupDO group = userGroupCache.getGroup(groupId);
-        if (group != null) {
-          assignGroupsListHelper.addOriginalAssignedItem(group).assignItem(group);
+      for (final Integer tenantId : set) {
+        final TenantDO tenant = tenantsCache.getTenant(tenantId);
+        if (tenant != null) {
+          assignTenantsListHelper.addOriginalAssignedItem(tenant).assignItem(tenant);
         }
       }
     }
-    final Select2MultiChoice<GroupDO> groups = new Select2MultiChoice<GroupDO>(fs.getSelect2MultiChoiceId(),
-        new PropertyModel<Collection<GroupDO>>(this.assignGroupsListHelper, "assignedItems"), groupsProvider);
-    fs.add(groups);
+    final Select2MultiChoice<TenantDO> tenants = new Select2MultiChoice<TenantDO>(fs.getSelect2MultiChoiceId(),
+        new PropertyModel<Collection<TenantDO>>(this.assignTenantsListHelper, "assignedItems"), tenantsProvider);
+    fs.add(tenants);
   }
 
   String getEncryptedPassword()

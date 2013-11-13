@@ -35,6 +35,7 @@ import org.hibernate.LockMode;
 import org.projectforge.access.AccessException;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.UserException;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRightId;
@@ -56,9 +57,24 @@ public class TenantDao extends BaseDao<TenantDO>
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "assignedUsers.username", "assignedUsers.firstname",
   "assignedUsers.lastname"};
 
+  private TenantsCache tenantsCache;
+
   private UserDao userDao;
 
   // private final TenantsProvider groupsProvider = new TenantsProvider();
+
+  /**
+   * @return the tenantsCache
+   */
+  public TenantsCache getTenantsCache()
+  {
+    return tenantsCache;
+  }
+
+  public void setTenantsCache(final TenantsCache tenantsCache)
+  {
+    this.tenantsCache = tenantsCache;
+  }
 
   public void setUserDao(final UserDao userDao)
   {
@@ -68,6 +84,7 @@ public class TenantDao extends BaseDao<TenantDO>
   public TenantDao()
   {
     super(TenantDO.class);
+    this.supportAfterUpdate = true;
     userRightId = USER_RIGHT_ID;
   }
 
@@ -150,6 +167,7 @@ public class TenantDao extends BaseDao<TenantDO>
         createHistoryEntry(user, null, tenantList);
       }
     }
+    tenantsCache.setExpired();
   }
 
   /**
@@ -185,6 +203,7 @@ public class TenantDao extends BaseDao<TenantDO>
     for (final PFUserDO user : unassignedList) {
       createHistoryEntry(user, tenantList, null);
     }
+    tenantsCache.setExpired();
   }
 
   /**
@@ -199,6 +218,10 @@ public class TenantDao extends BaseDao<TenantDO>
       throws AccessException
       {
     getHibernateTemplate().refresh(user, LockMode.READ);
+    if (TenantChecker.getInstance().isSuperAdmin(PFUserContext.getUser()) == false) {
+      log.warn("User has now access right to change assigned users of a tenant! Skipping assignment.");
+      return;
+    }
     final List<TenantDO> assignedTenants = new ArrayList<TenantDO>();
     if (tenantsToAssign != null) {
       for (final TenantDO tenant : tenantsToAssign) {

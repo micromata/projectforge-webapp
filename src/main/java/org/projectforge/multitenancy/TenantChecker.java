@@ -23,12 +23,10 @@
 
 package org.projectforge.multitenancy;
 
-import org.hibernate.search.util.HibernateHelper;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.Configuration;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserGroupCache;
 
 /**
  * 
@@ -45,8 +43,6 @@ public class TenantChecker
   }
 
   private TenantDao tenantDao;
-
-  private UserGroupCache userGroupCache;
 
   public boolean isMultiTenancyAvailable()
   {
@@ -87,12 +83,12 @@ public class TenantChecker
 
   public boolean isPartOfTenant(final Integer tenantId, final PFUserDO user)
   {
-    if (isPartOfTenant(tenantId, (AbstractBaseDO< ? >) user) == true) {
+    // if (isPartOfTenant(tenantId, (AbstractBaseDO< ? >) user) == true) {
+    // Ignore this setting (because it's weather displayed nor modifiable!
+    // return true;
+    // }
+    if (getTenantsCache().isUserAssignedToTenant(tenantId, user.getId()) == true) {
       return true;
-    }
-    PFUserDO u = user;
-    if (HibernateHelper.isInitialized(user) == false) {
-      u = getUserGroupCache().getUser(user.getId());
     }
     return false;
   }
@@ -115,11 +111,8 @@ public class TenantChecker
     return tenantDao;
   }
 
-  private UserGroupCache getUserGroupCache()
+  private TenantsCache getTenantsCache()
   {
-    if (userGroupCache == null) {
-      userGroupCache = Registry.instance().getUserGroupCache();
-    }
-    return userGroupCache;
+    return getDao().getTenantsCache();
   }
 }

@@ -31,6 +31,8 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.core.Configuration;
 import org.projectforge.ldap.PFUserDOConverter;
+import org.projectforge.multitenancy.TenantChecker;
+import org.projectforge.multitenancy.TenantDao;
 import org.projectforge.user.GroupDao;
 import org.projectforge.user.Login;
 import org.projectforge.user.PFUserDO;
@@ -50,6 +52,9 @@ public class UserEditPage extends AbstractEditPage<PFUserDO, UserEditForm, UserD
 
   @SpringBean(name = "groupDao")
   private GroupDao groupDao;
+
+  @SpringBean(name = "tenantDao")
+  private TenantDao tenantDao;
 
   @SpringBean(name = "userDao")
   private UserDao userDao;
@@ -107,7 +112,9 @@ public class UserEditPage extends AbstractEditPage<PFUserDO, UserEditForm, UserD
   public AbstractSecuredBasePage afterSaveOrUpdate()
   {
     groupDao.assignGroups(getData(), form.assignGroupsListHelper.getItemsToAssign(), form.assignGroupsListHelper.getItemsToUnassign());
-
+    if (TenantChecker.getInstance().isSuperAdmin(getUser()) == true) {
+      tenantDao.assignTenants(getData(), form.assignTenantsListHelper.getItemsToAssign(), form.assignTenantsListHelper.getItemsToUnassign());
+    }
     if (form.rightsData != null) {
       final List<UserRightVO> list = form.rightsData.getRights();
       userRightDao.updateUserRights(getData(), list);
