@@ -79,7 +79,8 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   private static final String NOPASSWORD = "--- none ---";
 
   static {
-    AbstractHistorizableBaseDO.putNonHistorizableProperty(PFUserDO.class, "loginFailures", "lastLogin", "stayLoggedInKey");
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(PFUserDO.class, "loginFailures", "lastLogin", "lastPasswordChange",
+        "stayLoggedInKey");
   }
 
   private transient Map<String, Object> attributeMap;
@@ -91,6 +92,8 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   private String jiraUsername;
 
   private String password;
+
+  private Long lastPasswordChange;
 
   private boolean localUser;
 
@@ -708,6 +711,28 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   public PFUserDO setNoPassword()
   {
     this.password = NOPASSWORD;
+    return this;
+  }
+
+  /**
+   * Unix time of last change of password (in millis since 1970).
+   * @return the lastPasswordChange. If not given the creation time of this user object is used instead.
+   */
+  public Long getLastPasswordChange()
+  {
+    if (lastPasswordChange == null) {
+      return this.getCreated() != null ? this.getCreated().getTime() : null;
+    }
+    return lastPasswordChange;
+  }
+
+  /**
+   * @param lastPasswordChange the lastPasswordChange to set
+   * @return this for chaining.
+   */
+  public PFUserDO setLastPasswordChange(final Long lastPasswordChange)
+  {
+    this.lastPasswordChange = lastPasswordChange;
     return this;
   }
 
