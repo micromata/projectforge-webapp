@@ -25,6 +25,7 @@ package org.projectforge.user;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
@@ -93,7 +94,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   private String password;
 
-  private Long lastPasswordChange;
+  private Date lastPasswordChange;
 
   private boolean localUser;
 
@@ -714,14 +715,13 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   }
 
   /**
-   * Unix time of last change of password (in millis since 1970).
    * @return the lastPasswordChange. If not given the creation time of this user object is used instead.
    */
   @Column(name = "last_password_change")
-  public Long getLastPasswordChange()
+  public Date getLastPasswordChange()
   {
     if (lastPasswordChange == null) {
-      return this.getCreated() != null ? this.getCreated().getTime() : null;
+      return this.getCreated() != null ? this.getCreated() : null;
     }
     return lastPasswordChange;
   }
@@ -730,7 +730,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
    * @param lastPasswordChange the lastPasswordChange to set
    * @return this for chaining.
    */
-  public PFUserDO setLastPasswordChange(final Long lastPasswordChange)
+  public PFUserDO setLastPasswordChange(final Date lastPasswordChange)
   {
     this.lastPasswordChange = lastPasswordChange;
     return this;
