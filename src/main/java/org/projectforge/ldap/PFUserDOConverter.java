@@ -61,6 +61,7 @@ public class PFUserDOConverter
     user.setId(getId(ldapUser));
     user.setOrganization(ldapUser.getOrganization());
     user.setDescription(ldapUser.getDescription());
+    user.setLastPasswordChange(ldapUser.getSambaPwdLastSet());
     final String[] mails = ldapUser.getMail();
     if (mails != null) {
       for (final String mail : mails) {
@@ -104,6 +105,7 @@ public class PFUserDOConverter
     }
     ldapUser.setRestrictedUser(user.isRestrictedUser());
     setLdapValues(ldapUser, user.getLdapValues());
+    ldapUser.setSambaPwdLastSet(user.getLastPasswordChange());
     return ldapUser;
   }
 
@@ -266,9 +268,16 @@ public class PFUserDOConverter
       ListHelper.addAll(properties, "uidNumber", "gidNumber", "homeDirectory", "loginShell");
     }
     if (LdapUserDao.isSambaAccountsConfigured() == true && isSambaAccountValuesEmpty(src) == false) {
-      ListHelper.addAll(properties, "sambaSIDNumber", "sambaPrimaryGroupSIDNumber",  "sambaNTPassword");
+      ListHelper.addAll(properties, "sambaSIDNumber", "sambaPrimaryGroupSIDNumber", "sambaNTPassword");
     }
     modified = BeanHelper.copyProperties(src, dest, true, properties.toArray(new String[0]));
+    if (LdapUserDao.isSambaAccountsConfigured() == true && isSambaAccountValuesEmpty(src) == false) {
+      final long diffSambaPwdLastSet = dest.getSambaPwdLastSetAsUnixEpochSeconds() - src.getSambaPwdLastSetAsUnixEpochSeconds();
+      if (diffSambaPwdLastSet > 10 || diffSambaPwdLastSet < -10) {
+        // Difference is more then 10 seconds:
+        modified = true;
+      }
+    }
     return modified;
   }
 

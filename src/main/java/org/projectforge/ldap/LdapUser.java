@@ -23,6 +23,8 @@
 
 package org.projectforge.ldap;
 
+import java.util.Date;
+
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
@@ -31,6 +33,8 @@ public class LdapUser extends LdapPerson
   private Integer uidNumber, gidNumber, sambaSIDNumber, sambaPrimaryGroupSIDNumber;
 
   private String loginShell, homeDirectory, sambaNTPassword;
+
+  private Date sambaPwdLastSet;
 
   /**
    * @return The uid number of object class posixAccount.
@@ -139,6 +143,35 @@ public class LdapUser extends LdapPerson
   public LdapUser setSambaNTPassword(final String sambaNTPassword)
   {
     this.sambaNTPassword = sambaNTPassword;
+    return this;
+  }
+
+  /**
+   * @return the sambaPwdLastSet
+   */
+  public Date getSambaPwdLastSet()
+  {
+    return sambaPwdLastSet;
+  }
+
+  /**
+   * @return the sambaPwdLastSet as seconds since 1970 (Unix)
+   */
+  public long getSambaPwdLastSetAsUnixEpochSeconds()
+  {
+    if (sambaPwdLastSet != null) {
+      return sambaPwdLastSet.getTime() / 1000;
+    }
+    return 0L;
+  }
+
+  /**
+   * @param sambaPwdLastSet the sambaPwdLastSet to set
+   * @return this for chaining.
+   */
+  public LdapUser setSambaPwdLastSet(final Date sambaPwdLastSet)
+  {
+    this.sambaPwdLastSet = sambaPwdLastSet;
     return this;
   }
 }

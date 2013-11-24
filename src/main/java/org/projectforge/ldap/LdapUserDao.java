@@ -24,6 +24,7 @@
 package org.projectforge.ldap;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -230,6 +231,11 @@ public class LdapUserDao extends LdapDao<String, LdapUser>
       final Integer sambaPrimaryGroupSIDNumber = ldapConfig.getSambaAccountsConfig().getSambaSIDNumber(sambaPrimaryGroupSID);
       user.setSambaPrimaryGroupSIDNumber(sambaPrimaryGroupSIDNumber);
       user.setSambaNTPassword(LdapUtils.getAttributeStringValue(attributes, "sambaNTPassword"));
+      final String sambaPwdLastSet = LdapUtils.getAttributeStringValue(attributes, "sambaPwdLastSet");
+      if (sambaPwdLastSet != null) {
+        final long value = NumberHelper.parseLong(sambaPwdLastSet) * 1000; // ms since 1970
+        user.setSambaPwdLastSet(new Date(value));
+      }
     }
     if (dn != null) {
       if (dn.contains(DEACTIVATED_SUB_CONTEXT2) == true) {
@@ -522,7 +528,8 @@ public class LdapUserDao extends LdapDao<String, LdapUser>
             list.add(createModificationItem(DirContext.ADD_ATTRIBUTE, "objectClass", missedObjectClass));
           }
         }
-      }}
+      }
+    }
     if (modifyPosixAccount == true) {
       createAndAddModificationItems(list, "uidNumber", String.valueOf(user.getUidNumber()));
       createAndAddModificationItems(list, "gidNumber", String.valueOf(user.getGidNumber()));
@@ -531,7 +538,11 @@ public class LdapUserDao extends LdapDao<String, LdapUser>
     }
     if (modifySambaAccount == true) {
       createAndAddModificationItems(list, "sambaSID", ldapConfig.getSambaAccountsConfig().getSambaSID(user.getSambaSIDNumber()));
-      createAndAddModificationItems(list, "sambaPrimaryGroupSID", ldapConfig.getSambaAccountsConfig().getSambaPrimaryGroupSID(user.getSambaPrimaryGroupSIDNumber()));
+      createAndAddModificationItems(list, "sambaPrimaryGroupSID",
+          ldapConfig.getSambaAccountsConfig().getSambaPrimaryGroupSID(user.getSambaPrimaryGroupSIDNumber()));
+      createAndAddModificationItems(list, "sambaAcctFlags", "U          ");
+      createAndAddModificationItems(list, "sambaPasswordHistory", "0000000000000000000000000000000000000000000000000000000000000000");
+      createAndAddModificationItems(list, "sambaPwdLastSet", String.valueOf(user.getSambaPwdLastSetAsUnixEpochSeconds()));
     }
     return list;
   }
