@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.projectforge.core.ProjectForgeApp;
 import org.projectforge.rest.Authentication;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
@@ -48,6 +49,7 @@ public class RestUserFilterTest
   @Test
   public void testAuthentication() throws IOException, ServletException
   {
+    ProjectForgeApp.init(null, null);
     WicketApplication.internalSetUpAndRunning(true);
     final HttpServletResponse response = mock(HttpServletResponse.class);
     final UserDao userDao = mock(UserDao.class);

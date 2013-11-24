@@ -28,11 +28,17 @@ import org.apache.wicket.request.cycle.RequestCycle;
 
 public class ClientIpResolver extends WebClientInfo
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ClientIpResolver.class);
+
   private static final long serialVersionUID = -1001665111323720357L;
 
   public static String getClientIp()
   {
     final RequestCycle requestCycle = RequestCycle.get();
+    if (requestCycle == null) {
+      log.warn("Oups, requestCycle of Wicket is null (should only occur for test cases).");
+      return "";
+    }
     return new ClientIpResolver(requestCycle).getRemoteAddr(requestCycle);
   }
 

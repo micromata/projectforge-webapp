@@ -90,7 +90,9 @@ public class ProjectForgeApp
       return instance;
     }
     instance = new ProjectForgeApp();
-    instance.internalInit(beanFactory, hibernateConfiguration);
+    if (beanFactory != null) {
+      instance.internalInit(beanFactory, hibernateConfiguration);
+    }
     return instance;
   }
 
