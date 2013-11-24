@@ -433,6 +433,10 @@ public class WicketApplication extends WebApplication implements WicketApplicati
 
   public static long getStartTime()
   {
+    if (ProjectForgeApp.getInstance() == null) {
+      // Should only occur in test cases.
+      return 0;
+    }
     return ProjectForgeApp.getInstance().getStartTime();
   }
 }
