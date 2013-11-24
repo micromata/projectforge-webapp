@@ -64,6 +64,30 @@ public class DatabaseCoreUpdates
   {
     final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
     // /////////////////////////////////////////////////////////////////
+    // 5.3
+    // /////////////////////////////////////////////////////////////////
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "5.3", "2013-11-24", "Adds t_pf_user.last_password_change.") {
+
+      @Override
+      public UpdatePreCheckStatus runPreCheck()
+      {
+        if (dao.doTableAttributesExist(PFUserDO.class, "lastPasswordChange") == false) {
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
+        return UpdatePreCheckStatus.ALREADY_UPDATED;
+      }
+
+      @Override
+      public UpdateRunningStatus runUpdate()
+      {
+        if (dao.doTableAttributesExist(PFUserDO.class, "lastPasswordChange") == false) {
+          dao.addTableAttributes(PFUserDO.class, "lastPasswordChange");
+        }
+        return UpdateRunningStatus.DONE;
+      }
+    });
+
+    // /////////////////////////////////////////////////////////////////
     // 5.2
     // /////////////////////////////////////////////////////////////////
     list.add(new UpdateEntryImpl(
