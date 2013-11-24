@@ -93,7 +93,7 @@ public class UserEditPage extends AbstractEditPage<PFUserDO, UserEditForm, UserD
   public AbstractSecuredBasePage onSaveOrUpdate()
   {
     if (StringUtils.isNotEmpty(form.getEncryptedPassword()) == true) {
-      getData().setPassword(form.getEncryptedPassword());
+      userDao.onPasswordChange(getData(), form.getEncryptedPassword());
     }
     getData().setPersonalPhoneIdentifiers(userDao.getNormalizedPersonalPhoneIdentifiers(getData()));
     if (form.ldapUserValues.isValuesEmpty() == false) {

@@ -53,9 +53,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- *
+ * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
- *
+ * 
  */
 public class UserDao extends BaseDao<PFUserDO>
 {
@@ -379,11 +379,22 @@ public class UserDao extends BaseDao<PFUserDO>
     if (user == null) {
       return MESSAGE_KEY_OLD_PASSWORD_WRONG;
     }
-    user.setPassword(encryptedNewPassword);
-    user.setStayLoggedInKey(createStayLoggedInKey());
+    onPasswordChange(user, encryptedNewPassword);
     Login.getInstance().passwordChanged(user, newPassword);
     log.info("Password changed and stay-logged-key renewed for user: " + user.getId() + " - " + user.getUsername());
     return null;
+  }
+
+  public void onPasswordChange(final PFUserDO user, final String encryptedNewPassword)
+  {
+    user.setPassword(encryptedNewPassword);
+    user.checkAndFixPassword();
+    if (user.getPassword() != null) {
+      user.setStayLoggedInKey(createStayLoggedInKey());
+      user.setLastPasswordChange(new Date());
+    } else {
+      throw new IllegalArgumentException("Given password seems to be not encrypted! Aborting due to security reasons (for avoiding storage of clear password in the database).");
+    }
   }
 
   /**
@@ -426,7 +437,7 @@ public class UserDao extends BaseDao<PFUserDO>
 
   /**
    * Get authentication key by user. ; )
-   *
+   * 
    * @param userName
    * @param authKey
    * @return
