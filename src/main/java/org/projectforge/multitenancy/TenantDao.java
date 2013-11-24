@@ -258,6 +258,7 @@ public class TenantDao extends BaseDao<TenantDO>
     }
     getSession().flush();
     createHistoryEntry(user, unassignedTenants, assignedTenants);
+    tenantsCache.setExpired();
       }
 
   private void createHistoryEntry(final PFUserDO user, Collection<TenantDO> unassignedList, Collection<TenantDO> assignedList)
