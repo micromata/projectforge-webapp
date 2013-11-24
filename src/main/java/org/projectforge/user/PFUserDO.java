@@ -718,6 +718,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
    * Unix time of last change of password (in millis since 1970).
    * @return the lastPasswordChange. If not given the creation time of this user object is used instead.
    */
+  @Column(name = "last_password_change")
   public Long getLastPasswordChange()
   {
     if (lastPasswordChange == null) {
