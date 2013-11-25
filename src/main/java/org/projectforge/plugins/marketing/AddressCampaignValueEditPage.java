@@ -71,7 +71,7 @@ AbstractEditPage<AddressCampaignValueDO, AddressCampaignValueEditForm, AddressCa
       sval = parameters.get(PARAMETER_ADDRESS_ID);
       final Integer addressId = sval.isEmpty() ? null : sval.toInteger();
       sval = parameters.get(PARAMETER_ADDRESS_CAMPAIGN_ID);
-      final Integer addressCampaignId = sval.isEmpty() ? null : sval.toInteger();
+      final Integer addressCampaignId = sval.isEmpty() || "null".equals(sval.toString()) ? null : sval.toInteger();
       if (addressId == null || addressCampaignId == null) {
         throw new UserException("plugins.marketing.addressCampaignValue.error.addressOrCampaignNotGiven");
       }
