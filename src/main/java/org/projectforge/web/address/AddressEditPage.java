@@ -117,6 +117,18 @@ public class AddressEditPage extends AbstractEditPage<AddressDO, AddressEditForm
     return null;
   }
 
+  /**
+   * @see org.projectforge.web.wicket.AbstractEditPage#cloneData()
+   */
+  @Override
+  protected void cloneData()
+  {
+    super.cloneData();
+    final PersonalAddressDO personalAddress = form.addressEditSupport.personalAddress;
+    personalAddress.setId(null);
+    personalAddress.setDeleted(false);
+  }
+
   @Override
   protected AddressDao getBaseDao()
   {
