@@ -38,7 +38,6 @@ import org.apache.wicket.RuntimeConfigurationType;
 import org.apache.wicket.Session;
 import org.apache.wicket.core.request.handler.PageProvider;
 import org.apache.wicket.core.request.handler.RenderPageRequestHandler;
-import org.apache.wicket.core.request.mapper.CryptoMapper;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.protocol.http.PageExpiredException;
 import org.apache.wicket.protocol.http.WebApplication;
@@ -210,7 +209,8 @@ public class WicketApplication extends WebApplication implements WicketApplicati
   protected void init()
   {
     super.init();
-    setRootRequestMapper(new CryptoMapper(getRootRequestMapper(), this));
+    // CryptoMapper doesn't work with FullCalendar.
+    // setRootRequestMapper(new CryptoMapper(getRootRequestMapper(), this));
     final XmlWebApplicationContext webApplicationContext = (XmlWebApplicationContext) WebApplicationContextUtils
         .getWebApplicationContext(getServletContext());
     final ConfigurableListableBeanFactory beanFactory = webApplicationContext.getBeanFactory();
