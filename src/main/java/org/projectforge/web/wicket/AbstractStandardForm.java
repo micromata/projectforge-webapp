@@ -45,9 +45,15 @@ public class AbstractStandardForm<F, P extends AbstractStandardFormPage> extends
 
   protected Component messagesComponent;
 
+  /**
+   * Cross site request forgery token.
+   */
+  private final CsrfTokenHandler csrfTokenHandler;
+
   public AbstractStandardForm(final P parentPage)
   {
     super(parentPage);
+    csrfTokenHandler = new CsrfTokenHandler(this);
   }
 
   @SuppressWarnings("serial")
@@ -119,5 +125,15 @@ public class AbstractStandardForm<F, P extends AbstractStandardFormPage> extends
   {
     super.onBeforeRender();
     actionButtons.render();
+  }
+
+  /**
+   * @see org.apache.wicket.markup.html.form.Form#onSubmit()
+   */
+  @Override
+  protected void onSubmit()
+  {
+    super.onSubmit();
+    csrfTokenHandler.onSubmit();
   }
 }

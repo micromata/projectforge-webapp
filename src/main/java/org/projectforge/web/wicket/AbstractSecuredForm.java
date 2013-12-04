@@ -29,9 +29,27 @@ public abstract class AbstractSecuredForm<F, P extends AbstractSecuredBasePage> 
 {
   private static final long serialVersionUID = 5034574268522349613L;
 
+  /**
+   * Cross site request forgery token.
+   */
+  private final CsrfTokenHandler csrfTokenHandler;
+
+
   public AbstractSecuredForm(final P parentPage)
   {
     super(parentPage);
+    csrfTokenHandler = new CsrfTokenHandler(this);
+  }
+
+
+  /**
+   * @see org.apache.wicket.markup.html.form.Form#onSubmit()
+   */
+  @Override
+  protected void onSubmit()
+  {
+    super.onSubmit();
+    csrfTokenHandler.onSubmit();
   }
 
   /**
@@ -66,6 +84,6 @@ public abstract class AbstractSecuredForm<F, P extends AbstractSecuredBasePage> 
 
   public WebPage getReturnToPage()
   {
-    return ((AbstractSecuredPage)this.parentPage).getReturnToPage();
+    return ((AbstractSecuredPage) this.parentPage).getReturnToPage();
   }
 }
