@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_1.xsd">
   <context-param>
     <param-name>contextConfigLocation</param-name>
     <param-value>
@@ -244,14 +244,20 @@
     <servlet-name>CalendarFeed</servlet-name>
     <url-pattern>/export/ProjectForge.ics</url-pattern>
   </servlet-mapping>
-  
+
   <servlet-mapping>
     <servlet-name>PhoneLookUpServlet</servlet-name>
     <url-pattern>/phoneLookup</url-pattern>
   </servlet-mapping>
 
   <session-config>
+    <!-- Session timeout after X MINUTES after no user interaction. -->
     <session-timeout>600</session-timeout>
+    <cookie-config>
+      <!-- XSS attack: make sure that cookie cannot be accessed via client side scripts -->
+      <http-only>true</http-only>
+      <!-- CSRF attack, session hijack attack: require cookie can only be used for SSL communication. <secure>true</secure> -->
+    </cookie-config>
   </session-config>
   <!--This section defines what file to open first if none is specified -->
   <welcome-file-list>
