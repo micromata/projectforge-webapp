@@ -87,7 +87,7 @@ public class RestUserFilter implements Filter
     final HttpServletRequest req = (HttpServletRequest) request;
     String userString = getAttribute(req, Authentication.AUTHENTICATION_USER_ID);
     final LoginProtection loginProtection = LoginProtection.instance();
-    final String clientIpAddress = ClientIpResolver.getClientIp();
+    final String clientIpAddress = ClientIpResolver.getClientIp(request);
     PFUserDO user = null;
     if (userString != null) {
       final Integer userId = NumberHelper.parseInteger(userString);
@@ -99,7 +99,7 @@ public class RestUserFilter implements Filter
               + userString
               + "' is locked for "
               + seconds
-              + " seconds due to failed login attempts. Please try again later.");
+              + " seconds due to failed login attempts (ip=" + clientIpAddress + ").");
           final HttpServletResponse resp = (HttpServletResponse) response;
           resp.sendError(HttpServletResponse.SC_FORBIDDEN);
           return;
@@ -132,7 +132,7 @@ public class RestUserFilter implements Filter
             + userString
             + "' is locked for "
             + seconds
-            + " seconds due to failed login attempts. Please try again later.");
+            + " seconds due to failed login attempts (ip=" + clientIpAddress + ").");
         final HttpServletResponse resp = (HttpServletResponse) response;
         resp.sendError(HttpServletResponse.SC_FORBIDDEN);
         return;
