@@ -47,7 +47,7 @@ import org.projectforge.web.wicket.WicketApplication;
 public class RestUserFilterTest
 {
   @Test
-  public void testAuthentication() throws IOException, ServletException
+  public void testAuthentication() throws IOException, ServletException, InterruptedException
   {
     ProjectForgeApp.init(null, null);
     WicketApplication.internalSetUpAndRunning(true);
@@ -68,6 +68,7 @@ public class RestUserFilterTest
     FilterChain chain = mock(FilterChain.class);
     filter.doFilter(request, response, chain);
     verify(chain, never()).doFilter(Mockito.any(HttpServletRequest.class), Mockito.any(HttpServletResponse.class));
+    Thread.sleep(1100); // Login penalty.
     // Correct user name and password
     request = mockRequest("successUser", "successPassword", null, null);
     chain = mock(FilterChain.class);
@@ -79,6 +80,7 @@ public class RestUserFilterTest
     chain = mock(FilterChain.class);
     filter.doFilter(request, response, chain);
     verify(chain, never()).doFilter(Mockito.any(HttpServletRequest.class), Mockito.any(HttpServletResponse.class));
+    Thread.sleep(1100); // Login penalty.
     // Correct user name and password
     request = mockRequest(null, null, 2, "token");
     chain = mock(FilterChain.class);
