@@ -31,6 +31,8 @@ public class JsonBuilder
 {
   final private StringBuilder sb = new StringBuilder();
 
+  private boolean escapeHtml;
+
   /**
    * Creates Json result string from the given list.<br/>
    * [["Horst"], ["Klaus"], ...]] // For single property<br/>
@@ -47,6 +49,16 @@ public class JsonBuilder
     }
     final JsonBuilder builder = new JsonBuilder();
     return builder.append(col).getAsString();
+  }
+
+  /**
+   * @param escapeHtml the escapeHtml to set (default is false).
+   * @return this for chaining.
+   */
+  public JsonBuilder setEscapeHtml(final boolean escapeHtml)
+  {
+    this.escapeHtml = escapeHtml;
+    return this;
   }
 
   public String getAsString()
@@ -117,7 +129,32 @@ public class JsonBuilder
             t = "000" + Integer.toHexString(c);
             sb.append("\\u" + t.substring(t.length() - 4));
           } else {
-            sb.append(c);
+            if (escapeHtml == true) {
+              switch (c) {
+                case '<':
+                  sb.append("&lt;");
+                  break;
+                case '>':
+                  sb.append("&gt;");
+                  break;
+                case '&':
+                  sb.append("&amp;");
+                  break;
+                case '"':
+                  sb.append("&quot;");
+                  break;
+                case '\'':
+                  sb.append("&#x27;");
+                  break;
+                case '/':
+                  sb.append("&#x2F;");
+                  break;
+                default:
+                  sb.append(c);
+              }
+            } else {
+              sb.append(c);
+            }
           }
       }
     }
