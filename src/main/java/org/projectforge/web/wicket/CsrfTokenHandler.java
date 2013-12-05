@@ -77,7 +77,7 @@ public class CsrfTokenHandler implements Serializable
           + sessionCsrfToken
           + ", posted csrf token="
           + postedCsrfToken);
-      throw new InternalErrorException();
+      throw new InternalErrorException("errorpage.csrfError");
     }
   }
 }
