@@ -6,12 +6,15 @@
 </head>
 
 <body>
-<wicket:extend>
-  <form wicket:id="form" autocomplete="off">
-  <div data-role="fieldcontain" id="searchfield"><input type="text" data-type="search" wicket:id="searchField" id="search" placeholder="Suche" /></div>
-  </form>
-  <wicket:container wicket:id="listViewPage">
-  </wicket:container>
-</wicket:extend>
+  <wicket:extend>
+    <form wicket:id="form" autocomplete="off">
+      <div data-role="fieldcontain" id="searchfield">
+        <input type="text" data-type="search" wicket:id="searchField" id="search" placeholder="Suche" />
+      </div>
+      <input type="hidden" wicket:id="csrfToken" />
+    </form>
+    <wicket:container wicket:id="listViewPage">
+    </wicket:container>
+  </wicket:extend>
 </body>
 </html>

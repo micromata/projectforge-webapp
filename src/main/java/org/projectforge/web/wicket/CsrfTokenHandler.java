@@ -29,7 +29,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Session;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.HiddenField;
-import org.apache.wicket.model.Model;
+import org.apache.wicket.model.PropertyModel;
 import org.projectforge.core.InternalErrorException;
 
 /**
@@ -43,7 +43,7 @@ public class CsrfTokenHandler implements Serializable
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(CsrfTokenHandler.class);
 
-  private HiddenField<String> csrfTokenField;
+  private final String csrfToken;
 
   /**
    * The given form should contain a hidden field named 'csrfToken'.
@@ -51,7 +51,8 @@ public class CsrfTokenHandler implements Serializable
    */
   public CsrfTokenHandler(final Form< ? > form)
   {
-    form.add(csrfTokenField = new HiddenField<String>("csrfToken", Model.of(getCsrfSessionToken())));
+    csrfToken = getCsrfSessionToken();
+    form.add(new HiddenField<String>("csrfToken", new PropertyModel<String>(this, "csrfToken")));
   }
 
   /**
@@ -71,12 +72,11 @@ public class CsrfTokenHandler implements Serializable
   public void onSubmit()
   {
     final String sessionCsrfToken = getCsrfSessionToken();
-    final String postedCsrfToken = this.csrfTokenField.getInput();
-    if (StringUtils.equals(sessionCsrfToken, postedCsrfToken) == false) {
+    if (StringUtils.equals(sessionCsrfToken, csrfToken) == false) {
       log.error("Cross site request forgery alert. csrf token doesn't match! session csrf token="
           + sessionCsrfToken
           + ", posted csrf token="
-          + postedCsrfToken);
+          + csrfToken);
       throw new InternalErrorException("errorpage.csrfError");
     }
   }

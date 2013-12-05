@@ -40,6 +40,7 @@ import org.projectforge.core.ConfigurationDO;
 import org.projectforge.database.InitDatabaseDao;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.wicket.AbstractForm;
+import org.projectforge.web.wicket.CsrfTokenHandler;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
@@ -86,9 +87,15 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
 
   private String encryptedPassword;
 
+  /**
+   * Cross site request forgery token.
+   */
+  private final CsrfTokenHandler csrfTokenHandler;
+
   public SetupForm(final SetupPage parentPage)
   {
     super(parentPage, "setupform");
+    csrfTokenHandler = new CsrfTokenHandler(this);
   }
 
   @Override
@@ -227,6 +234,7 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
         @Override
         public final void onSubmit()
         {
+          csrfTokenHandler.onSubmit();
           parentPage.finishSetup();
         }
       };
@@ -235,6 +243,13 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
       actionButtons.add(finishButtonPanel);
       setDefaultButton(finishButton);
     }
+  }
+
+  @Override
+  protected void onSubmit()
+  {
+    super.onSubmit();
+    csrfTokenHandler.onSubmit();
   }
 
   public SetupTarget getSetupMode()

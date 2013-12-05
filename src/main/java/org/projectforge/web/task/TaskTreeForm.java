@@ -31,6 +31,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.task.TaskFilter;
 import org.projectforge.web.wicket.AbstractForm;
+import org.projectforge.web.wicket.CsrfTokenHandler;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
@@ -64,6 +65,11 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
   private SingleButtonPanel searchButtonPanel;
 
   protected GridBuilder gridBuilder;
+
+  /**
+   * Cross site request forgery token.
+   */
+  private final CsrfTokenHandler csrfTokenHandler;
 
   @Override
   @SuppressWarnings("serial")
@@ -131,7 +137,8 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
         }
       };
 
-      listViewButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), listViewButton, getString("listView"), SingleButtonPanel.NORMAL);
+      listViewButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), listViewButton, getString("listView"),
+          SingleButtonPanel.NORMAL);
       actionButtons.add(listViewButtonPanel);
     }
     {
@@ -153,6 +160,7 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
   public TaskTreeForm(final TaskTreePage parentPage)
   {
     super(parentPage);
+    csrfTokenHandler = new CsrfTokenHandler(this);
   }
 
   @Override
@@ -198,6 +206,7 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
   protected void onSubmit()
   {
     super.onSubmit();
+    csrfTokenHandler.onSubmit();
     parentPage.refresh();
   }
 

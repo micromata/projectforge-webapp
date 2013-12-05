@@ -39,6 +39,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.projectforge.web.core.NavTopPanel;
+import org.projectforge.web.wicket.CsrfTokenHandler;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
@@ -96,6 +97,11 @@ public abstract class ModalDialog extends Panel
    * List to create action buttons in the desired order before creating the RepeatingView.
    */
   protected MyComponentsRepeater<Component> actionButtons;
+
+  /**
+   * Cross site request forgery token.
+   */
+  protected CsrfTokenHandler csrfTokenHandler;
 
   /**
    * @param id
@@ -231,6 +237,7 @@ public abstract class ModalDialog extends Panel
       @Override
       protected void onEvent(final AjaxRequestTarget target)
       {
+        csrfTokenHandler.onSubmit();
         handleCloseEvent(target);
       }
     });
@@ -288,6 +295,7 @@ public abstract class ModalDialog extends Panel
 
   public void close(final AjaxRequestTarget target)
   {
+    csrfTokenHandler.onSubmit();
     target.appendJavaScript("$('#" + getMainContainerMarkupId() + "').modal('hide');");
   }
 
@@ -366,6 +374,7 @@ public abstract class ModalDialog extends Panel
   protected void init(final Form< ? > form)
   {
     this.form = form;
+    csrfTokenHandler = new CsrfTokenHandler(form);
     mainSubContainer.add(form);
     form.add(gridContentContainer);
     form.add(buttonBarContainer);
@@ -374,6 +383,7 @@ public abstract class ModalDialog extends Panel
         @Override
         public void callback(final AjaxRequestTarget target)
         {
+          csrfTokenHandler.onSubmit();
           onCancelButtonSubmit(target);
           close(target);
         }
@@ -385,6 +395,7 @@ public abstract class ModalDialog extends Panel
       @Override
       public void callback(final AjaxRequestTarget target)
       {
+        csrfTokenHandler.onSubmit();
         if (onCloseButtonSubmit(target)) {
           close(target);
         }
@@ -393,6 +404,7 @@ public abstract class ModalDialog extends Panel
       @Override
       public void onError(final AjaxRequestTarget target, final Form< ? > form)
       {
+        csrfTokenHandler.onSubmit();
         ModalDialog.this.onError(target, form);
       }
     }, closeButtonLabel != null ? closeButtonLabel : getString("close"), SingleButtonPanel.NORMAL);
@@ -416,6 +428,7 @@ public abstract class ModalDialog extends Panel
 
   protected void ajaxError(final String error, final AjaxRequestTarget target)
   {
+    csrfTokenHandler.onSubmit();
     form.error(error);
     target.add(formFeedback);
   }
@@ -427,6 +440,7 @@ public abstract class ModalDialog extends Panel
    */
   protected void handleCloseEvent(final AjaxRequestTarget target)
   {
+    csrfTokenHandler.onSubmit();
   }
 
   /**
@@ -505,6 +519,7 @@ public abstract class ModalDialog extends Panel
       @Override
       protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
       {
+        csrfTokenHandler.onSubmit();
         ajaxCallback.callback(target);
       }
 
