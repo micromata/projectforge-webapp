@@ -80,7 +80,7 @@ public class RestUserFilterTest
     chain = mock(FilterChain.class);
     filter.doFilter(request, response, chain);
     verify(chain, never()).doFilter(Mockito.any(HttpServletRequest.class), Mockito.any(HttpServletResponse.class));
-    Thread.sleep(1100); // Login penalty.
+    Thread.sleep(2100); // Login penalty.
     // Correct user name and password
     request = mockRequest(null, null, 2, "token");
     chain = mock(FilterChain.class);
