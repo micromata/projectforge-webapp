@@ -179,10 +179,15 @@ public class NumberHelperTest
   }
 
   @Test
-  public void randomLong()
+  public void randomTest()
   {
     for (int i = 0; i < 10; i++) {
-      log.info(String.valueOf(NumberHelper.getSecureRandomUrlSaveString(20)));
+      final String randomString = NumberHelper.getSecureRandomUrlSaveString(20);
+      log.info(randomString);
+    }
+    for (int i = 1; i < 20; i++) {
+      final String randomString = NumberHelper.getSecureRandomBase64String(i);
+      log.info(randomString);
     }
   }
 
