@@ -96,4 +96,13 @@ public class AccountingConfig implements Serializable
   {
     return businessAssessment;
   }
+
+  /**
+   * @see ConfigXml#toString(Object)
+   */
+  @Override
+  public String toString()
+  {
+    return ConfigXml.toString(this);
+  }
 }

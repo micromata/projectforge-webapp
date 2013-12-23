@@ -53,7 +53,9 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.log4j.PropertyConfigurator;
+import org.dom4j.Element;
 import org.projectforge.AppVersion;
 import org.projectforge.calendar.ConfigureHoliday;
 import org.projectforge.common.BeanHelper;
@@ -90,6 +92,8 @@ import org.projectforge.xml.stream.XmlOmitField;
 @XmlObject(alias = "config")
 public class ConfigXml
 {
+  private static final String SECRET_PROPERTY_STRING = "******";
+
   // If change this, please change it also in EmbeddedJetty. If true then no log4j is initialized.
   private static final String SYSTEM_PROPERTY_STANDALONE = "ProjectForge.standalone";
 
@@ -131,8 +135,10 @@ public class ConfigXml
 
   private String smsUrl;
 
+  @ConfigXmlSecretField
   private String receiveSmsKey;
 
+  @ConfigXmlSecretField
   private String phoneLookupKey;
 
   private MailAccountConfig mebMailAccount = new MailAccountConfig();
@@ -175,6 +181,7 @@ public class ConfigXml
 
   private String keystoreFile;
 
+  @ConfigXmlSecretField
   private String keystorePassphrase;
 
   private String cronExpressionHourlyJob;
@@ -402,6 +409,23 @@ public class ConfigXml
         }
         return super.ignoreField(obj, field);
       }
+
+      /**
+       * @see org.projectforge.xml.stream.XmlObjectWriter#writeField(java.lang.reflect.Field, java.lang.Object, java.lang.Object,
+       *      org.projectforge.xml.stream.XmlField, org.dom4j.Element)
+       */
+      @Override
+      protected void writeField(final Field field, final Object obj, final Object fieldValue, final XmlField annotation,
+          final Element element)
+      {
+        if (field != null) {
+          if (field.isAnnotationPresent(ConfigXmlSecretField.class) == true) {
+            super.writeField(field, obj, SECRET_PROPERTY_STRING, annotation, element);
+            return;
+          }
+        }
+        super.writeField(field, obj, fieldValue, annotation, element);
+      }
     };
     final String xml = writer.writeToXml(this, true);
     return XmlHelper.XML_HEADER + xml;
@@ -506,8 +530,8 @@ public class ConfigXml
             // Do nothing.
           } else {
             field.set(dest, srcFieldValue);
-            if (StringHelper.isIn(field.getName(), "receiveSmsKey", "phoneLookupKey") == true) {
-              log.info(StringUtils.defaultString(prefix) + field.getName() + " = ****");
+            if (field.isAnnotationPresent(ConfigXmlSecretField.class) == true) {
+              log.info(StringUtils.defaultString(prefix) + field.getName() + " = " + SECRET_PROPERTY_STRING);
             } else {
               log.info(StringUtils.defaultString(prefix) + field.getName() + " = " + srcFieldValue);
             }
@@ -815,7 +839,8 @@ public class ConfigXml
     return firstDayOfWeek;
   }
 
-  public void setExcelDefaultPaperSize(final String excelDefaultPaperSize) {
+  public void setExcelDefaultPaperSize(final String excelDefaultPaperSize)
+  {
     this.excelDefaultPaperSize = excelDefaultPaperSize;
     ExportConfig.getInstance().setDefaultPaperSize(excelDefaultPaperSize);
   }
@@ -1152,5 +1177,25 @@ public class ConfigXml
   public void setLdapConfig(final LdapConfig ldapConfig)
   {
     this.ldapConfig = ldapConfig;
+  }
+
+  /**
+   * Replaces field values with annotation {@link ConfigXmlSecretField} by "******".
+   * @param configObject
+   * @return String representation of the given object.
+   * @see ReflectionToStringBuilder#ReflectionToStringBuilder(Object)
+   */
+  public static String toString(final Object configObject)
+  {
+    return new ReflectionToStringBuilder(configObject) {
+      @Override
+      protected Object getValue(final Field field) throws IllegalArgumentException, IllegalAccessException
+      {
+        if (field.isAnnotationPresent(ConfigXmlSecretField.class) == true) {
+          return SECRET_PROPERTY_STRING;
+        }
+        return super.getValue(field);
+      };
+    }.toString();
   }
 }

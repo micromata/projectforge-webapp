@@ -23,8 +23,8 @@
 
 package org.projectforge.web;
 
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.wicket.markup.html.WebPage;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.wicket.WicketApplication;
 import org.projectforge.xml.stream.XmlField;
@@ -77,12 +77,11 @@ public class WebConfig
   }
 
   /**
-   * @see ReflectionToStringBuilder
+   * @see ConfigXml#toString(Object)
    */
   @Override
   public String toString()
   {
-    final ReflectionToStringBuilder tos = new ReflectionToStringBuilder(this);
-    return tos.toString();
+    return ConfigXml.toString(this);
   }
 }

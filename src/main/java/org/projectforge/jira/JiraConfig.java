@@ -23,8 +23,10 @@
 
 package org.projectforge.jira;
 
-  import java.io.Serializable;
+import java.io.Serializable;
 import java.util.List;
+
+import org.projectforge.core.ConfigXml;
 
 /**
  * Basic configuration of the JIRA ProjectForge is connected to.
@@ -34,8 +36,8 @@ public class JiraConfig implements Serializable
 {
   private static final long serialVersionUID = -427784191871257457L;
 
-  private String createIssueUrl = null;
-  
+  private final String createIssueUrl = null;
+
   private List<JiraIssueType> issueTypes;
 
   /**
@@ -48,9 +50,18 @@ public class JiraConfig implements Serializable
   {
     return createIssueUrl;
   }
-  
+
   public List<JiraIssueType> getIssueTypes()
   {
     return issueTypes;
+  }
+
+  /**
+   * @see ConfigXml#toString(Object)
+   */
+  @Override
+  public String toString()
+  {
+    return ConfigXml.toString(this);
   }
 }

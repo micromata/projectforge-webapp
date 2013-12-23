@@ -23,7 +23,8 @@
 
 package org.projectforge.mail;
 
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.projectforge.core.ConfigXml;
+import org.projectforge.core.ConfigXmlSecretField;
 import org.projectforge.xml.stream.XmlField;
 
 /**
@@ -41,8 +42,9 @@ public class MailAccountConfig
   @XmlField(defaultIntValue = -1)
   private int port = -1;
 
+  @ConfigXmlSecretField
   private String password = null;
-  
+
   private boolean readonly;
 
   /**
@@ -54,7 +56,7 @@ public class MailAccountConfig
     return hostname;
   }
 
-  public MailAccountConfig setHostname(String hostname)
+  public MailAccountConfig setHostname(final String hostname)
   {
     this.hostname = hostname;
     return this;
@@ -68,7 +70,7 @@ public class MailAccountConfig
     return protocol;
   }
 
-  public MailAccountConfig setProtocol(String protocol)
+  public MailAccountConfig setProtocol(final String protocol)
   {
     this.protocol = protocol;
     return this;
@@ -83,7 +85,7 @@ public class MailAccountConfig
     return port;
   }
 
-  public MailAccountConfig setPort(int port)
+  public MailAccountConfig setPort(final int port)
   {
     this.port = port;
     return this;
@@ -94,7 +96,7 @@ public class MailAccountConfig
     return username;
   }
 
-  public MailAccountConfig setUsername(String username)
+  public MailAccountConfig setUsername(final String username)
   {
     this.username = username;
     return this;
@@ -105,12 +107,12 @@ public class MailAccountConfig
     return password;
   }
 
-  public MailAccountConfig setPassword(String password)
+  public MailAccountConfig setPassword(final String password)
   {
     this.password = password;
     return this;
   }
-  
+
   /**
    * If read-only then no modifications were done on the mail server.
    */
@@ -118,16 +120,18 @@ public class MailAccountConfig
   {
     return readonly;
   }
-  
-  public void setReadonly(boolean readonly)
+
+  public void setReadonly(final boolean readonly)
   {
     this.readonly = readonly;
   }
-  
+
+  /**
+   * @see ConfigXml#toString(Object)
+   */
   @Override
   public String toString()
   {
-    final ReflectionToStringBuilder builder = new ReflectionToStringBuilder(this);
-    return builder.toString();
+    return ConfigXml.toString(this);
   }
 }

@@ -32,6 +32,7 @@ import org.projectforge.user.PFUserDO;
  */
 public class SecurityConfig
 {
+  @ConfigXmlSecretField
   private String passwordPepper;
 
   /**
@@ -52,5 +53,14 @@ public class SecurityConfig
   {
     this.passwordPepper = passwordPepper;
     return this;
+  }
+
+  /**
+   * @see ConfigXml#toString(Object)
+   */
+  @Override
+  public String toString()
+  {
+    return ConfigXml.toString(this);
   }
 }
