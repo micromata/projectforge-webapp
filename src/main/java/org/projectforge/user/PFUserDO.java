@@ -118,6 +118,8 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   private String authenticationToken;
 
+  private String saltString;
+
   private Timestamp lastLogin;
 
   private int loginFailures;
@@ -370,6 +372,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
         return super.accept(f)
             && !"password".equals(f.getName())
             && !"stayLoggedInKey".equals(f.getName())
+            && !"saltString".equals(f.getName())
             && !"authenticationToken".equals(f.getName());
       }
     }).toString();
@@ -546,6 +549,25 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   public void setStayLoggedInKey(final String stayLoggedInKey)
   {
     this.stayLoggedInKey = stayLoggedInKey;
+  }
+
+  /**
+   * @return the saltString for giving salt to hashed password.
+   */
+  @Column(name = "salt_string", length = 40)
+  public String getSaltString()
+  {
+    return saltString;
+  }
+
+  /**
+   * @param saltString the saltString to set
+   * @return this for chaining.
+   */
+  public PFUserDO setSaltString(final String saltString)
+  {
+    this.saltString = saltString;
+    return this;
   }
 
   /**
