@@ -30,10 +30,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation for properties which should be (de-)serialized from and to xml attributes.
+ * Annotation for marking fields of the ConfigXml as secret fields. Such fields will not be hidden in the export functionality of the
+ * config.xml as well as in toString() methods. The value is displayed as "******" instead.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-@Target( { FIELD})
+@Target({ FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ConfigXmlSecretField {
 }
