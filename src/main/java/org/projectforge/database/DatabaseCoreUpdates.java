@@ -66,12 +66,12 @@ public class DatabaseCoreUpdates
     // /////////////////////////////////////////////////////////////////
     // 5.3
     // /////////////////////////////////////////////////////////////////
-    list.add(new UpdateEntryImpl(CORE_REGION_ID, "5.3", "2013-11-24", "Adds t_pf_user.last_password_change.") {
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "5.3", "2013-11-24", "Adds t_pf_user.last_password_change, t_pf_user.salt_string.") {
 
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        if (dao.doTableAttributesExist(PFUserDO.class, "lastPasswordChange") == false) {
+        if (dao.doTableAttributesExist(PFUserDO.class, "lastPasswordChange", "saltString") == false) {
           return UpdatePreCheckStatus.READY_FOR_UPDATE;
         }
         return UpdatePreCheckStatus.ALREADY_UPDATED;
@@ -80,8 +80,8 @@ public class DatabaseCoreUpdates
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        if (dao.doTableAttributesExist(PFUserDO.class, "lastPasswordChange") == false) {
-          dao.addTableAttributes(PFUserDO.class, "lastPasswordChange");
+        if (dao.doTableAttributesExist(PFUserDO.class, "lastPasswordChange", "saltString") == false) {
+          dao.addTableAttributes(PFUserDO.class, "lastPasswordChange", "saltString");
         }
         return UpdateRunningStatus.DONE;
       }
