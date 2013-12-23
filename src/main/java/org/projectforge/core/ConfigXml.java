@@ -119,6 +119,8 @@ public class ConfigXml
 
   private String jiraBrowseBaseUrl;
 
+  private SecurityConfig securityConfig;
+
   private StorageConfig storageConfig;
 
   private String telephoneSystemUrl;
@@ -671,6 +673,19 @@ public class ConfigXml
   public final boolean isJIRAConfigured()
   {
     return StringUtils.isNotBlank(getJiraBrowseBaseUrl());
+  }
+
+  /**
+   * @return the securityConfig
+   */
+  public SecurityConfig getSecurityConfig()
+  {
+    return securityConfig;
+  }
+
+  public boolean isSecurityConfigured()
+  {
+    return securityConfig != null && StringUtils.isNotBlank(securityConfig.getPepperString());
   }
 
   /**
