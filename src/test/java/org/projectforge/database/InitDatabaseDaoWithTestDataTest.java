@@ -115,11 +115,13 @@ public class InitDatabaseDaoWithTestDataTest extends TestBase
   public void initializeEmptyDatabase()
   {
     final String testPassword = "demo123";
-    final String encryptedPassword = userDao.encryptPassword(testPassword);
     userGroupCache.setExpired(); // Force reload (because it's may be expired due to previous tests).
     assertTrue(initDatabaseDao.isEmpty());
-    initDatabaseDao.initializeEmptyDatabaseWithTestData("myadmin", encryptedPassword, null);
-    final PFUserDO initialAdminUser = userDao.authenticateUser("myadmin", encryptedPassword);
+    final PFUserDO admin = new PFUserDO();
+    admin.setUsername("myadmin");
+    userDao.createEncryptedPassword(admin, testPassword);
+    initDatabaseDao.initializeEmptyDatabaseWithTestData(admin, null);
+    final PFUserDO initialAdminUser = userDao.authenticateUser("myadmin", testPassword);
     assertNotNull(initialAdminUser);
     assertEquals("myadmin", initialAdminUser.getUsername());
     final Collection<Integer> col = userGroupCache.getUserGroups(initialAdminUser);
@@ -165,8 +167,9 @@ public class InitDatabaseDaoWithTestDataTest extends TestBase
 
     log.error("****> Next exception and error message are OK (part of the test).");
     boolean exception = false;
+    admin.setUsername(InitDatabaseDao.DEFAULT_ADMIN_USER);
     try {
-      initDatabaseDao.initializeEmptyDatabase(InitDatabaseDao.DEFAULT_ADMIN_USER, encryptedPassword, null);
+      initDatabaseDao.initializeEmptyDatabase(admin, null);
       fail("AccessException expected.");
     } catch (final AccessException ex) {
       exception = true;
@@ -178,7 +181,7 @@ public class InitDatabaseDaoWithTestDataTest extends TestBase
     log.error("****> Next exception and error message are OK (part of the test).");
     exception = false;
     try {
-      initDatabaseDao.initializeEmptyDatabaseWithTestData(InitDatabaseDao.DEFAULT_ADMIN_USER, encryptedPassword, null);
+      initDatabaseDao.initializeEmptyDatabaseWithTestData(admin, null);
       fail("AccessException expected.");
     } catch (final AccessException ex) {
       exception = true;

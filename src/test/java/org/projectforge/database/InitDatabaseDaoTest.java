@@ -66,14 +66,15 @@ public class InitDatabaseDaoTest extends TestBase
   @Test
   public void initializeEmptyDatabase()
   {
-    final String encryptedPassword = userDao.encryptPassword(DEFAULT_ADMIN_PASSWORD);
     userGroupCache.setExpired(); // Force reload (because it's may be expired due to previous tests).
     assertTrue(initDatabaseDao.isEmpty());
     final PFUserDO admin = new PFUserDO();
+    admin.setUsername(InitDatabaseDao.DEFAULT_ADMIN_USER);
     admin.setId(1);
+    userDao.createEncryptedPassword(admin, DEFAULT_ADMIN_PASSWORD);
     PFUserContext.setUser(admin);
-    initDatabaseDao.initializeEmptyDatabase(InitDatabaseDao.DEFAULT_ADMIN_USER, encryptedPassword, null);
-    final PFUserDO user = userDao.authenticateUser(InitDatabaseDao.DEFAULT_ADMIN_USER, encryptedPassword);
+    initDatabaseDao.initializeEmptyDatabase(admin, null);
+    final PFUserDO user = userDao.authenticateUser(InitDatabaseDao.DEFAULT_ADMIN_USER, DEFAULT_ADMIN_PASSWORD);
     assertNotNull(user);
     assertEquals(InitDatabaseDao.DEFAULT_ADMIN_USER, user.getUsername());
     final Collection<Integer> col = userGroupCache.getUserGroups(user);
@@ -83,7 +84,7 @@ public class InitDatabaseDaoTest extends TestBase
 
     boolean exception = false;
     try {
-      initDatabaseDao.initializeEmptyDatabase(InitDatabaseDao.DEFAULT_ADMIN_USER, encryptedPassword, null);
+      initDatabaseDao.initializeEmptyDatabase(admin, null);
       fail("AccessException expected.");
     } catch (final AccessException ex) {
       exception = true;
@@ -93,7 +94,7 @@ public class InitDatabaseDaoTest extends TestBase
 
     exception = false;
     try {
-      initDatabaseDao.initializeEmptyDatabaseWithTestData(InitDatabaseDao.DEFAULT_ADMIN_USER, encryptedPassword, null);
+      initDatabaseDao.initializeEmptyDatabaseWithTestData(admin, null);
       fail("AccessException expected.");
     } catch (final AccessException ex) {
       exception = true;

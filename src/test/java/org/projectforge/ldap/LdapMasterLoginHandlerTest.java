@@ -104,8 +104,9 @@ public class LdapMasterLoginHandlerTest extends TestBase
     loginHandler.initialize();
     Login.getInstance().setLoginHandler(loginHandler);
     logon(TEST_ADMIN_USER);
-    userDao.internalSave(new PFUserDO().setUsername("kai").setPassword(userDao.encryptPassword("successful")).setFirstname("Kai")
-        .setLastname("Reinhard"));
+    final PFUserDO user = new PFUserDO().setUsername("kai").setFirstname("Kai").setLastname("Reinhard");
+    userDao.createEncryptedPassword(user, "successful");
+    userDao.internalSave(user);
     Assert.assertEquals(LoginResultStatus.SUCCESS, loginHandler.checkLogin("kai", "successful").getLoginResultStatus());
 
     final ArgumentCaptor<LdapUser> argumentCaptor = ArgumentCaptor.forClass(LdapUser.class);
@@ -170,7 +171,7 @@ public class LdapMasterLoginHandlerTest extends TestBase
     synchronizeLdapUsers(loginHandler);
     ldapUser = ldapUserDao.findById(userId3, getPath());
     Assert.assertEquals("ldapMaster3", ldapUser.getUid());
-    Assert.assertTrue( ldapUser.getOrganizationalUnit().contains("ou=restricted"));
+    Assert.assertTrue(ldapUser.getOrganizationalUnit().contains("ou=restricted"));
     ldapGroup = ldapGroupDao.findById(groupId1);
     assertMembers(ldapGroup, "ldapMaster1", "ldapMaster3,ou=restricted", "ldapMaster4");
 
@@ -237,8 +238,8 @@ public class LdapMasterLoginHandlerTest extends TestBase
 
   private Integer createUser(final String username, final String password, final String firstname, final String lastname)
   {
-    final PFUserDO user = new PFUserDO().setUsername(username).setPassword(userDao.encryptPassword(password)).setFirstname(firstname)
-        .setLastname(lastname);
+    final PFUserDO user = new PFUserDO().setUsername(username).setFirstname(firstname).setLastname(lastname);
+    userDao.createEncryptedPassword(user, password);
     return (Integer) userDao.internalSave(user);
   }
 

@@ -155,7 +155,7 @@ public class InitTestDB
     final PFUserDO user = new PFUserDO();
     user.setUsername(username);
     if (password != null) {
-      user.setPassword(userDao.encryptPassword(password));
+      userDao.createEncryptedPassword(user, password);
     }
     return addUser(user);
   }
@@ -320,7 +320,7 @@ public class InitTestDB
     .addRight(new UserRightDO(UserRightId.PM_ORDER_BOOK, UserRightValue.READWRITE)) //
     .addRight(new UserRightDO(UserRightId.PM_PROJECT, UserRightValue.READWRITE)) //
     .addRight(new UserRightDO(UserRightId.PM_HR_PLANNING, UserRightValue.READWRITE)); //
-    user.setPassword(userDao.encryptPassword(TestBase.TEST_FULL_ACCESS_USER_PASSWORD));
+    userDao.createEncryptedPassword(user, TestBase.TEST_FULL_ACCESS_USER_PASSWORD);
     addUser(user);
     addUser(TestBase.TEST_USER, TestBase.TEST_USER_PASSWORD);
     addUser(TestBase.TEST_USER2);
