@@ -685,7 +685,7 @@ public class ConfigXml
 
   public boolean isSecurityConfigured()
   {
-    return securityConfig != null && StringUtils.isNotBlank(securityConfig.getPepperString());
+    return securityConfig != null && StringUtils.isNotBlank(securityConfig.getPasswordPepper());
   }
 
   /**

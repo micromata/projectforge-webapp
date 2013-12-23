@@ -32,25 +32,25 @@ import org.projectforge.user.PFUserDO;
  */
 public class SecurityConfig
 {
-  private String pepperString;
+  private String passwordPepper;
 
   /**
    * If configured passwords will be hashed by using this salt.
-   * @return the pepperString which should be used for hashing passwords (with salt and pepper).
+   * @return the passwordPepper which should be used for hashing passwords (with salt and pepper).
    * @see PFUserDO#getPasswordSalt()
    */
-  public String getPepperString()
+  public String getPasswordPepper()
   {
-    return pepperString;
+    return passwordPepper;
   }
 
   /**
-   * @param pepperString the pepperString to set
+   * @param passwordPepper the passwordPepper to set
    * @return this for chaining.
    */
-  public SecurityConfig setPepperString(final String pepperString)
+  public SecurityConfig setPasswordPepper(final String passwordPepper)
   {
-    this.pepperString = pepperString;
+    this.passwordPepper = passwordPepper;
     return this;
   }
 }

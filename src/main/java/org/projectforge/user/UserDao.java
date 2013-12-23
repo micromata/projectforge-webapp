@@ -427,7 +427,7 @@ public class UserDao extends BaseDao<PFUserDO>
   {
     final SecurityConfig securityConfig = ConfigXml.getInstance().getSecurityConfig();
     if (securityConfig != null) {
-      return securityConfig.getPepperString();
+      return securityConfig.getPasswordPepper();
     }
     return "";
   }
