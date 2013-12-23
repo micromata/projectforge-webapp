@@ -37,7 +37,7 @@ public class SecurityConfig
   /**
    * If configured passwords will be hashed by using this salt.
    * @return the pepperString which should be used for hashing passwords (with salt and pepper).
-   * @see PFUserDO#getSaltString()
+   * @see PFUserDO#getPasswordSalt()
    */
   public String getPepperString()
   {
