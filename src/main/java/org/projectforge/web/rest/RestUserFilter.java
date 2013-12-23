@@ -138,8 +138,7 @@ public class RestUserFilter implements Filter
         return;
       }
       if (userString != null && password != null) {
-        final String encryptedPassword = userDao.encryptPassword(password);
-        user = userDao.authenticateUser(userString, encryptedPassword);
+        user = userDao.authenticateUser(userString, password);
         if (user == null) {
           log.error("Authentication failed for "
               + Authentication.AUTHENTICATION_USERNAME
