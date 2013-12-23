@@ -519,6 +519,20 @@ public class NumberHelper
     return Base64.encodeBase64URLSafeString(bytes);
   }
 
+  /**
+   * Generates secure random bytes of the given length and return base 64 encoded bytes as url safe String. This is not the length of the
+   * resulting string!
+   * @param numberOfBytes
+   * @return
+   */
+  public static String getSecureRandomBase64String(final int numberOfBytes)
+  {
+    final SecureRandom random = new SecureRandom();
+    final byte[] bytes = new byte[numberOfBytes];
+    random.nextBytes(bytes);
+    return org.apache.commons.codec.binary.StringUtils.newStringUtf8(Base64.encodeBase64(bytes, false));
+  }
+
   public static boolean isIn(final int value, final int... numbers)
   {
     if (numbers == null) {
