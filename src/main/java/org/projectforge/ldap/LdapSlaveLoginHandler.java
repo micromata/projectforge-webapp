@@ -145,13 +145,13 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
       if (mode == Mode.SIMPLE || ldapConfig.isStorePasswords() == false) {
         user.setNoPassword();
       } else {
-        user.setPassword(userDao.encryptPassword(password));
+        userDao.createEncryptedPassword(user, password);
       }
       userDao.internalSave(user);
     } else if (mode != Mode.SIMPLE) {
       PFUserDOConverter.copyUserFields(PFUserDOConverter.convert(ldapUser), user);
       if (ldapConfig.isStorePasswords() == true) {
-        user.setPassword(userDao.encryptPassword(password));
+        userDao.createEncryptedPassword(user, password);
       }
       userDao.internalUpdate(user);
       if (user.hasSystemAccess() == false) {

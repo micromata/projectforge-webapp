@@ -139,9 +139,10 @@ public class InitDatabaseDao extends HibernateDaoSupport
 
   /**
    * If the database is empty (user list is empty) then a admin user and ProjectForge root task will be created.
-   * @return
+   * @param adminUser The admin user with the desired username and the salted password (salt string included). All other attributes and
+   *          groups of the user are set by this method.
    */
-  public PFUserDO initializeEmptyDatabase(final String adminUsername, final String encryptedAdminPassword, final TimeZone adminUserTimezone)
+  public PFUserDO initializeEmptyDatabase(final PFUserDO user, final TimeZone adminUserTimezone)
   {
     log.fatal("User wants to initialize database.");
     if (isEmpty() == false) {
@@ -158,31 +159,32 @@ public class InitDatabaseDao extends HibernateDaoSupport
     // Use of taskDao does not work with maven test case: Could not synchronize database state with session?
 
     // Create Admin user
-    final PFUserDO admin = new PFUserDO();
-    admin.setUsername(adminUsername);
-    admin.setLocalUser(true);
-    admin.setLastname("Administrator");
-    admin.setPassword(encryptedAdminPassword);
-    admin.setDescription("ProjectForge administrator");
-    admin.setTimeZone(adminUserTimezone);
-    admin.addRight(new UserRightDO(UserRightId.FIBU_AUSGANGSRECHNUNGEN, UserRightValue.READWRITE));
-    admin.addRight(new UserRightDO(UserRightId.FIBU_COST_UNIT, UserRightValue.READWRITE));
-    admin.addRight(new UserRightDO(UserRightId.FIBU_EINGANGSRECHNUNGEN, UserRightValue.READWRITE));
-    admin.addRight(new UserRightDO(UserRightId.FIBU_DATEV_IMPORT, UserRightValue.TRUE));
-    admin.addRight(new UserRightDO(UserRightId.FIBU_EMPLOYEE, UserRightValue.READWRITE));
-    admin.addRight(new UserRightDO(UserRightId.FIBU_EMPLOYEE_SALARY, UserRightValue.READWRITE));
-    admin.addRight(new UserRightDO(UserRightId.FIBU_ACCOUNTS, UserRightValue.READWRITE));
-    admin.addRight(new UserRightDO(UserRightId.ORGA_CONTRACTS, UserRightValue.READWRITE));
-    admin.addRight(new UserRightDO(UserRightId.ORGA_INCOMING_MAIL, UserRightValue.READWRITE));
-    admin.addRight(new UserRightDO(UserRightId.ORGA_OUTGOING_MAIL, UserRightValue.READWRITE));
-    admin.addRight(new UserRightDO(UserRightId.PM_PROJECT, UserRightValue.READWRITE));
-    admin.addRight(new UserRightDO(UserRightId.PM_ORDER_BOOK, UserRightValue.READWRITE));
-    admin.addRight(new UserRightDO(UserRightId.PM_HR_PLANNING, UserRightValue.READWRITE));
-    userDao.internalSave(admin);
-    PFUserContext.setUser(admin); // Need to login the admin user for avoiding following access exceptions.
+    final PFUserDO adminUser = new PFUserDO();
+    adminUser.setUsername(user.getUsername());
+    adminUser.setPassword(user.getPassword());
+    adminUser.setPasswordSalt(user.getPasswordSalt());
+    adminUser.setLocalUser(true);
+    adminUser.setLastname("Administrator");
+    adminUser.setDescription("ProjectForge administrator");
+    adminUser.setTimeZone(adminUserTimezone);
+    adminUser.addRight(new UserRightDO(UserRightId.FIBU_AUSGANGSRECHNUNGEN, UserRightValue.READWRITE));
+    adminUser.addRight(new UserRightDO(UserRightId.FIBU_COST_UNIT, UserRightValue.READWRITE));
+    adminUser.addRight(new UserRightDO(UserRightId.FIBU_EINGANGSRECHNUNGEN, UserRightValue.READWRITE));
+    adminUser.addRight(new UserRightDO(UserRightId.FIBU_DATEV_IMPORT, UserRightValue.TRUE));
+    adminUser.addRight(new UserRightDO(UserRightId.FIBU_EMPLOYEE, UserRightValue.READWRITE));
+    adminUser.addRight(new UserRightDO(UserRightId.FIBU_EMPLOYEE_SALARY, UserRightValue.READWRITE));
+    adminUser.addRight(new UserRightDO(UserRightId.FIBU_ACCOUNTS, UserRightValue.READWRITE));
+    adminUser.addRight(new UserRightDO(UserRightId.ORGA_CONTRACTS, UserRightValue.READWRITE));
+    adminUser.addRight(new UserRightDO(UserRightId.ORGA_INCOMING_MAIL, UserRightValue.READWRITE));
+    adminUser.addRight(new UserRightDO(UserRightId.ORGA_OUTGOING_MAIL, UserRightValue.READWRITE));
+    adminUser.addRight(new UserRightDO(UserRightId.PM_PROJECT, UserRightValue.READWRITE));
+    adminUser.addRight(new UserRightDO(UserRightId.PM_ORDER_BOOK, UserRightValue.READWRITE));
+    adminUser.addRight(new UserRightDO(UserRightId.PM_HR_PLANNING, UserRightValue.READWRITE));
+    userDao.internalSave(adminUser);
+    PFUserContext.setUser(adminUser); // Need to login the admin user for avoiding following access exceptions.
 
     final Set<PFUserDO> adminUsers = new HashSet<PFUserDO>();
-    adminUsers.add(admin);
+    adminUsers.add(adminUser);
     addGroup(ProjectForgeGroup.ADMIN_GROUP, "Administrators of ProjectForge", adminUsers);
     addGroup(ProjectForgeGroup.CONTROLLING_GROUP, "Users for having read access to the company's finances.", adminUsers);
     addGroup(ProjectForgeGroup.FINANCE_GROUP, "Finance and Accounting", adminUsers);
@@ -195,7 +197,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
     userGroupCache.setExpired();
 
     log.fatal("Empty database successfully initialized.");
-    return admin;
+    return adminUser;
   }
 
   private void addGroup(final ProjectForgeGroup projectForgeGroup, final String description, final Set<PFUserDO> users)
@@ -204,13 +206,18 @@ public class InitDatabaseDao extends HibernateDaoSupport
     group.setName(projectForgeGroup.toString());
     group.setDescription(description);
     group.setAssignedUsers(users);
-    //group.setNestedGroupsAllowed(false);
+    // group.setNestedGroupsAllowed(false);
     group.setLocalGroup(true); // Do not synchronize group with external user management system by default.
     groupDao.internalSave(group);
   }
 
-  public PFUserDO initializeEmptyDatabaseWithTestData(final String adminUsername, final String encryptedAdminPassword,
-      final TimeZone adminUserTimezone)
+  /**
+   * @param adminUser The admin user with the desired username and the salted password (salt string included). All other attributes and
+   *          groups of the user are set by this method.
+   * @param adminUserTimezone
+   * @return
+   */
+  public PFUserDO initializeEmptyDatabaseWithTestData(final PFUserDO adminUser, final TimeZone adminUserTimezone)
   {
     log.fatal("User wants to initialize database with test data.");
     if (isEmpty() == false) {
@@ -222,12 +229,10 @@ public class InitDatabaseDao extends HibernateDaoSupport
     if (user == null) {
       log.error("Initialization of database failed. Perhaps caused by corrupted init-test-data.xml.gz.");
     } else {
-      user.setUsername(adminUsername);
+      user.setUsername(adminUser.getUsername());
+      user.setPassword(adminUser.getPassword());
+      user.setPasswordSalt(adminUser.getPasswordSalt());
       user.setLocalUser(true);
-      if (encryptedAdminPassword != null) {
-        // Should only be null for test cases.
-        user.setPassword(encryptedAdminPassword);
-      }
       user.setTimeZone(adminUserTimezone);
       userDao.internalUpdate(user);
       Integer taskId = null;
