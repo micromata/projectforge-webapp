@@ -846,20 +846,32 @@ public class WicketUtils
    * @param title
    * @param text If the string contains "\n" characters then html=true and &lt;br/&gt; are used.
    */
-  public static Component addTooltip(final Component component, final IModel<String> title, IModel<String> text)
+  public static Component addTooltip(final Component component, final IModel<String> title, final IModel<String> text)
   {
-    if (text != null && text.getObject() != null && text.getObject().indexOf("\n") > 0) {
-      final String newText = HtmlHelper.escapeHtml(text.getObject(), true);
-      text = Model.of(newText);
-      component.add(AttributeModifier.replace("data-html", true));
-    }
+    @SuppressWarnings("serial")
+    final
+    IModel<String> myModel = new Model<String>() {
+      /**
+       * @see org.apache.wicket.model.Model#getObject()
+       */
+      @Override
+      public String getObject()
+      {
+        if (text != null && text.getObject() != null && text.getObject().indexOf("\n") > 0) {
+          final String newText = HtmlHelper.escapeHtml(text.getObject(), true);
+          return newText;
+        }
+        return text.getObject();
+      }
+    };
+    component.add(AttributeModifier.replace("data-html", true));
     if (title != null && title.getObject() != null) {
       component.add(AttributeModifier.replace("rel", "mypopup"));
       component.add(AttributeModifier.replace("data-original-title", title));
-      component.add(AttributeModifier.replace("data-content", text));
+      component.add(AttributeModifier.replace("data-content", myModel));
     } else {
       component.add(AttributeModifier.replace("rel", "mytooltip"));
-      component.add(AttributeModifier.replace("title", text));
+      component.add(AttributeModifier.replace("title", myModel));
     }
     return component;
   }
