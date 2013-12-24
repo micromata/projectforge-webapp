@@ -51,7 +51,7 @@ public class WebConstants
 
   private static final String DIR = "images/";
 
-  public static final String DOC_LINK_HANDBUCH_LUCENE = "secure/doc/Handbuch.html#label_volltextsuche";
+  public static final String DOC_LINK_HANDBUCH_LUCENE = "secure/doc/UserGuide.html#label_fullindexsearch";
 
   public static final String I18N_KEY_FIELD_REQUIRED = "validation.error.fieldRequired";
 
