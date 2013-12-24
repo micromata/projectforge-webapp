@@ -409,7 +409,7 @@ public class UserDao extends BaseDao<PFUserDO>
               + user.getId()
               + " with username '"
               + user.getUsername()
-              + "' has is not yet salted and has no pepper!");
+              + "' is not yet salted and has no pepper!");
           return PasswordCheckResult.OK_WITHOUT_SALT_AND_PEPPER;
         }
         log.info("Password of user "
