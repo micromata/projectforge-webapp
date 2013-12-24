@@ -80,8 +80,8 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   private static final String NOPASSWORD = "--- none ---";
 
   static {
-    AbstractHistorizableBaseDO.putNonHistorizableProperty(PFUserDO.class, "loginFailures", "lastLogin", "lastPasswordChange",
-        "stayLoggedInKey");
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(PFUserDO.class, "loginFailures", "lastLogin", "stayLoggedInKey", "passwordSalt",
+        "password");
   }
 
   private transient Map<String, Object> attributeMap;
