@@ -173,7 +173,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
     String[] kost2s = null;
     if (list != null) {
       if (list.size() == 1) {
-        buf.append(list.get(0).getShortDisplayName());
+        buf.append(HtmlHelper.escapeXml(list.get(0).getShortDisplayName()));
       } else {
         kost2s = getKost2s(list);
         buf.append(HtmlHelper.escapeXml(StringHelper.getWildcardString(kost2s))).append("*");
