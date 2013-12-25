@@ -73,7 +73,7 @@ public class LoginPageTest extends WicketPageTestBase
   }
 
   @Test
-  public void testInternalCheckLogin()
+  public void testInternalCheckLogin() throws InterruptedException
   {
     login(TestBase.TEST_USER, TestBase.TEST_USER_PASSWORD);
     logout();
@@ -88,6 +88,7 @@ public class LoginPageTest extends WicketPageTestBase
     tester.assertRenderedPage(LoginPage.class);
     login(TestBase.TEST_ADMIN_USER, "wrongPassword", false);
     tester.assertRenderedPage(LoginPage.class);
+    Thread.sleep(2000);
     login(TestBase.TEST_ADMIN_USER, TestBase.TEST_ADMIN_USER_PASSWORD, false);
     tester.assertRenderedPage(SystemUpdatePage.class);
     logout();
