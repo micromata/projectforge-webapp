@@ -88,7 +88,7 @@ public class LoginPageTest extends WicketPageTestBase
     tester.assertRenderedPage(LoginPage.class);
     login(TestBase.TEST_ADMIN_USER, "wrongPassword", false);
     tester.assertRenderedPage(LoginPage.class);
-    Thread.sleep(2000);
+    Thread.sleep(1000);
     login(TestBase.TEST_ADMIN_USER, TestBase.TEST_ADMIN_USER_PASSWORD, false);
     tester.assertRenderedPage(SystemUpdatePage.class);
     logout();
