@@ -118,12 +118,12 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
 
   protected UserRightsEditData rightsData;
 
-  String password;
+  private String password;
 
   @SuppressWarnings("unused")
   private String passwordRepeat;
 
-  private String encryptedPassword;
+  private PFUserDO passwordUser;
 
   boolean invalidateAllStayLoggedInSessions;
 
@@ -697,7 +697,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       protected void onComponentTag(final ComponentTag tag)
       {
         super.onComponentTag(tag);
-        if (encryptedPassword == null) {
+        if (passwordUser == null) {
           tag.put("value", "");
         } else if (StringUtils.isEmpty(getConvertedInput()) == false) {
           tag.put("value", MAGIC_PASSWORD);
@@ -711,7 +711,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       protected void onComponentTag(final ComponentTag tag)
       {
         super.onComponentTag(tag);
-        if (encryptedPassword == null) {
+        if (passwordUser == null) {
           tag.put("value", "");
         } else if (StringUtils.isEmpty(getConvertedInput()) == false) {
           tag.put("value", MAGIC_PASSWORD);
@@ -730,17 +730,18 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
           return;
         }
         if (StringUtils.equals(passwordInput, passwordRepeatInput) == false) {
-          encryptedPassword = null;
+          passwordUser = null;
           validatable.error(new ValidationError().addMessageKey("user.error.passwordAndRepeatDoesNotMatch"));
           return;
         }
-        if (MAGIC_PASSWORD.equals(passwordInput) == false || encryptedPassword == null) {
+        if (MAGIC_PASSWORD.equals(passwordInput) == false || passwordUser == null) {
           final String errorMsgKey = ((UserDao) getBaseDao()).checkPasswordQuality(passwordInput);
           if (errorMsgKey != null) {
-            encryptedPassword = null;
+            passwordUser = null;
             validatable.error(new ValidationError().addMessageKey(errorMsgKey));
           } else {
-            encryptedPassword = ((UserDao) getBaseDao()).encryptPassword(passwordInput);
+            passwordUser = new PFUserDO();
+            ((UserDao) getBaseDao()).createEncryptedPassword(passwordUser, passwordInput);
           }
         }
       }
@@ -867,9 +868,20 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     fs.add(tenants);
   }
 
-  String getEncryptedPassword()
+  /**
+   * @return the passwordUser
+   */
+  PFUserDO getPasswordUser()
   {
-    return encryptedPassword;
+    return passwordUser;
+  }
+
+  /**
+   * @return The clear text password (if given). Please check {@link #getPasswordUser()} first.
+   */
+  String getPassword()
+  {
+    return password;
   }
 
   @Override

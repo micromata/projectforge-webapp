@@ -23,6 +23,7 @@
 
 package org.projectforge.storage;
 
+import org.projectforge.core.ConfigXml;
 
 /**
  * Bean used by ConfigXML (config.xml) for configuring the storage (JackRabit repository). The storage runs on a separate web server or as
@@ -69,5 +70,14 @@ public class StorageConfig
   {
     this.authenticationToken = authenticationToken;
     return this;
+  }
+
+  /**
+   * @see ConfigXml#toString(Object)
+   */
+  @Override
+  public String toString()
+  {
+    return ConfigXml.toString(this);
   }
 }

@@ -38,6 +38,7 @@ import org.projectforge.continuousdb.UpdateEntry;
 import org.projectforge.continuousdb.UpdatePreCheckStatus;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.AbstractForm;
+import org.projectforge.web.wicket.CsrfTokenHandler;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
@@ -55,6 +56,11 @@ public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdat
   private GridBuilder gridBuilder;
 
   /**
+   * Cross site request forgery token.
+   */
+  private final CsrfTokenHandler csrfTokenHandler;
+
+  /**
    * List to create content menu in the desired order before creating the RepeatingView.
    */
   protected MyComponentsRepeater<SingleButtonPanel> actionButtons;
@@ -62,6 +68,7 @@ public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdat
   public SystemUpdateForm(final SystemUpdatePage parentPage)
   {
     super(parentPage);
+    csrfTokenHandler = new CsrfTokenHandler(this);
   }
 
   @Override
@@ -164,5 +171,12 @@ public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdat
   {
     super.onBeforeRender();
     actionButtons.render();
+  }
+
+  @Override
+  protected void onSubmit()
+  {
+    super.onSubmit();
+    csrfTokenHandler.onSubmit();
   }
 }

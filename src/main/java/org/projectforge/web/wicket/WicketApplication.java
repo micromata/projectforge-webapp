@@ -209,6 +209,8 @@ public class WicketApplication extends WebApplication implements WicketApplicati
   protected void init()
   {
     super.init();
+    // CryptoMapper doesn't work with FullCalendar.
+    // setRootRequestMapper(new CryptoMapper(getRootRequestMapper(), this));
     final XmlWebApplicationContext webApplicationContext = (XmlWebApplicationContext) WebApplicationContextUtils
         .getWebApplicationContext(getServletContext());
     final ConfigurableListableBeanFactory beanFactory = webApplicationContext.getBeanFactory();

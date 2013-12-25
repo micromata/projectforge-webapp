@@ -25,7 +25,6 @@ package org.projectforge.web.user;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -97,8 +96,11 @@ public class UserEditPage extends AbstractEditPage<PFUserDO, UserEditForm, UserD
   @Override
   public AbstractSecuredBasePage onSaveOrUpdate()
   {
-    if (StringUtils.isNotEmpty(form.getEncryptedPassword()) == true) {
-      userDao.onPasswordChange(getData(), form.getEncryptedPassword());
+    final PFUserDO passwordUser = form.getPasswordUser();
+    if (passwordUser != null) {
+      getData().setPassword(passwordUser.getPassword());
+      getData().setPasswordSalt(passwordUser.getPasswordSalt());
+      userDao.onPasswordChange(getData());
     }
     getData().setPersonalPhoneIdentifiers(userDao.getNormalizedPersonalPhoneIdentifiers(getData()));
     if (form.ldapUserValues.isValuesEmpty() == false) {
@@ -119,8 +121,8 @@ public class UserEditPage extends AbstractEditPage<PFUserDO, UserEditForm, UserD
       final List<UserRightVO> list = form.rightsData.getRights();
       userRightDao.updateUserRights(getData(), list);
     }
-    if (StringUtils.isNotEmpty(form.getEncryptedPassword()) == true) {
-      Login.getInstance().passwordChanged(getData(), form.password);
+    if (form.getPasswordUser() != null) {
+      Login.getInstance().passwordChanged(getData(), form.getPassword());
     }
     return super.afterSaveOrUpdate();
   }

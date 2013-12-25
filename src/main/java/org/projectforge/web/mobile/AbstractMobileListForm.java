@@ -27,6 +27,7 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.web.wicket.CsrfTokenHandler;
 
 public abstract class AbstractMobileListForm<F extends BaseSearchFilter, P extends AbstractMobileListPage< ? , ? , ? >> extends
 AbstractMobileForm<AbstractMobileListForm< ? , ? >, AbstractMobileListPage< ? , ? , ? >>
@@ -36,6 +37,11 @@ AbstractMobileForm<AbstractMobileListForm< ? , ? >, AbstractMobileListPage< ? , 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AbstractMobileListForm.class);
 
   protected F filter;
+
+  /**
+   * Cross site request forgery token.
+   */
+  private final CsrfTokenHandler csrfTokenHandler;
 
   @SuppressWarnings("unchecked")
   public AbstractMobileListForm(final AbstractMobileListPage< ? , ? , ? > parentPage)
@@ -51,6 +57,14 @@ AbstractMobileForm<AbstractMobileListForm< ? , ? >, AbstractMobileListPage< ? , 
       filter = newFilter();
       parentPage.putUserPrefEntry(userPrefFilterKey, filter, true);
     }
+    csrfTokenHandler = new CsrfTokenHandler(this);
+  }
+
+  @Override
+  protected void onSubmit()
+  {
+    super.onSubmit();
+    csrfTokenHandler.onSubmit();
   }
 
   protected void init()

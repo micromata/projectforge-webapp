@@ -245,6 +245,11 @@ public abstract class PFAutoCompleteBehavior<T> extends AbstractDefaultAjaxBehav
 
   private class MyJsonBuilder extends JsonBuilder
   {
+    private MyJsonBuilder()
+    {
+      setEscapeHtml(true);
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     protected String formatValue(final Object obj)

@@ -47,9 +47,11 @@ import org.projectforge.common.Crypt;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.core.DisplayHistoryEntry;
 import org.projectforge.core.ModificationStatus;
 import org.projectforge.core.QueryFilter;
+import org.projectforge.core.SecurityConfig;
 import org.projectforge.multitenancy.TenantDO;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -334,12 +336,12 @@ public class UserDao extends BaseDao<PFUserDO>
    */
   @SuppressWarnings("unchecked")
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-  public PFUserDO authenticateUser(final String username, final String encryptedPassword)
+  public PFUserDO authenticateUser(final String username, final String password)
   {
     Validate.notNull(username);
-    Validate.notNull(encryptedPassword);
+    Validate.notNull(password);
 
-    PFUserDO user = getUser(username, encryptedPassword);
+    PFUserDO user = getUser(username, password, true);
     if (user != null) {
       final int loginFailures = user.getLoginFailures();
       final Timestamp lastLogin = user.getLastLogin();
@@ -368,14 +370,22 @@ public class UserDao extends BaseDao<PFUserDO>
   }
 
   @SuppressWarnings("unchecked")
-  private PFUserDO getUser(final String username, final String encryptedPassword)
+  private PFUserDO getUser(final String username, final String password, final boolean updateSaltAndPepperIfNeeded)
   {
-    final List<PFUserDO> list = getHibernateTemplate().find("from PFUserDO u where u.username = ? and u.password = ?",
-        new Object[] { username, encryptedPassword});
-    if (list != null && list.isEmpty() == false && list.get(0) != null) {
-      return list.get(0);
+    final List<PFUserDO> list = getHibernateTemplate().find("from PFUserDO u where u.username = ?", username);
+    if (list == null || list.isEmpty() == true || list.get(0) == null) {
+      return null;
     }
-    return null;
+    final PFUserDO user = list.get(0);
+    final PasswordCheckResult passwordCheckResult = checkPassword(user, password);
+    if (passwordCheckResult.isOK() == false) {
+      return null;
+    }
+    if (updateSaltAndPepperIfNeeded == true && passwordCheckResult.isPasswordUpdateNeeded() == true) {
+      log.info("Giving salt and/or pepper to the password of the user " + user.getId() + ".");
+      createEncryptedPassword(user, password);
+    }
+    return user;
   }
 
   @SuppressWarnings("unchecked")
@@ -419,14 +429,87 @@ public class UserDao extends BaseDao<PFUserDO>
   }
 
   /**
-   * Encrypts the password.
-   * @param password
-   * @return
+   * Encrypts the password with a new generated salt string and the pepper string if configured any.
+   * @param user The user to user.
+   * @param password as clear text.
    * @see Crypt#digest(String)
    */
-  public String encryptPassword(final String password)
+  public void createEncryptedPassword(final PFUserDO user, final String password)
   {
-    return Crypt.digest(password);
+    final String saltString = createSaltString();
+    user.setPasswordSalt(saltString);
+    final String encryptedPassword = Crypt.digest(getPepperString() + saltString + password);
+    user.setPassword(encryptedPassword);
+  }
+
+  /**
+   * Checks the given password by comparing it with the stored user password. For backward compatibility the password is encrypted with and
+   * without pepper (if configured). The salt string of the given user is used.
+   * @param user
+   * @param password as clear text.
+   * @return true if the password matches the user's password.
+   */
+  public PasswordCheckResult checkPassword(final PFUserDO user, final String password)
+  {
+    if (user == null) {
+      log.warn("User not given in checkPassword(PFUserDO, String) method.");
+      return PasswordCheckResult.FAILED;
+    }
+    final String userPassword = user.getPassword();
+    if (StringUtils.isBlank(userPassword) == true) {
+      log.warn("User's password is blank, can't checkPassword(PFUserDO, String) for user with id " + user.getId());
+      return PasswordCheckResult.FAILED;
+    }
+    String saltString = user.getPasswordSalt();
+    if (saltString == null) {
+      saltString = "";
+    }
+    final String pepperString = getPepperString();
+    String encryptedPassword = Crypt.digest(pepperString + saltString + password);
+    if (userPassword.equals(encryptedPassword) == true) {
+      // Passwords match!
+      if (StringUtils.isEmpty(saltString) == true) {
+        log.info("Password of user " + user.getId() + " with username '" + user.getUsername() + "' is not yet salted!");
+        return PasswordCheckResult.OK_WITHOUT_SALT;
+      }
+      return PasswordCheckResult.OK;
+    }
+    if (StringUtils.isNotBlank(pepperString) == true) {
+      // Check password without pepper:
+      encryptedPassword = Crypt.digest(saltString + password);
+      if (userPassword.equals(encryptedPassword) == true) {
+        // Passwords match!
+        if (StringUtils.isEmpty(saltString) == true) {
+          log.info("Password of user "
+              + user.getId()
+              + " with username '"
+              + user.getUsername()
+              + "' is not yet salted and has no pepper!");
+          return PasswordCheckResult.OK_WITHOUT_SALT_AND_PEPPER;
+        }
+        log.info("Password of user "
+            + user.getId()
+            + " with username '"
+            + user.getUsername()
+            + "' has no pepper!");
+        return PasswordCheckResult.OK_WITHOUT_PEPPER;
+      }
+    }
+    return PasswordCheckResult.FAILED;
+  }
+
+  private String createSaltString()
+  {
+    return NumberHelper.getSecureRandomBase64String(10);
+  }
+
+  private String getPepperString()
+  {
+    final SecurityConfig securityConfig = ConfigXml.getInstance().getSecurityConfig();
+    if (securityConfig != null) {
+      return securityConfig.getPasswordPepper();
+    }
+    return "";
   }
 
   /**
@@ -448,27 +531,26 @@ public class UserDao extends BaseDao<PFUserDO>
       return errorMsgKey;
     }
     accessChecker.checkRestrictedOrDemoUser();
-    final String encryptedOldPassword = encryptPassword(oldPassword);
-    final String encryptedNewPassword = encryptPassword(newPassword);
-    user = getUser(user.getUsername(), encryptedOldPassword);
+    user = getUser(user.getUsername(), oldPassword, false);
     if (user == null) {
       return MESSAGE_KEY_OLD_PASSWORD_WRONG;
     }
-    onPasswordChange(user, encryptedNewPassword);
+    createEncryptedPassword(user, newPassword);
+    onPasswordChange(user);
     Login.getInstance().passwordChanged(user, newPassword);
     log.info("Password changed and stay-logged-key renewed for user: " + user.getId() + " - " + user.getUsername());
     return null;
   }
 
-  public void onPasswordChange(final PFUserDO user, final String encryptedNewPassword)
+  public void onPasswordChange(final PFUserDO user)
   {
-    user.setPassword(encryptedNewPassword);
     user.checkAndFixPassword();
     if (user.getPassword() != null) {
       user.setStayLoggedInKey(createStayLoggedInKey());
       user.setLastPasswordChange(new Date());
     } else {
-      throw new IllegalArgumentException("Given password seems to be not encrypted! Aborting due to security reasons (for avoiding storage of clear password in the database).");
+      throw new IllegalArgumentException(
+          "Given password seems to be not encrypted! Aborting due to security reasons (for avoiding storage of clear password in the database).");
     }
   }
 

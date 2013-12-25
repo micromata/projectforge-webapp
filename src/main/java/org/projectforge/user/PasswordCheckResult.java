@@ -21,47 +21,36 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.jira;
-
-import java.io.Serializable;
-import java.util.List;
-
-import org.projectforge.core.ConfigXml;
+package org.projectforge.user;
 
 /**
- * Basic configuration of the JIRA ProjectForge is connected to.
  * @author Kai Reinhard (k.reinhard@micromata.de)
+ * 
  */
-public class JiraConfig implements Serializable
+public enum PasswordCheckResult
 {
-  private static final long serialVersionUID = -427784191871257457L;
-
-  private final String createIssueUrl = null;
-
-  private List<JiraIssueType> issueTypes;
-
-  /**
-   * Base url for creating JIRA issues:
-   * https://jira.acme.com/jira/secure/CreateIssueDetails!init.jspa?pid=10310&issuetype=3&priority=4&description=say+hello+world...<br/>
-   * Example: https://jira.acme.com/jira/secure/CreateIssueDetails!init.jspa. <br/>
-   * If null then no creation of JIRA issues is supported (e. g. for MEB).
-   */
-  public String getCreateIssueUrl()
-  {
-    return createIssueUrl;
-  }
-
-  public List<JiraIssueType> getIssueTypes()
-  {
-    return issueTypes;
-  }
+  /** Password check failed. */
+  FAILED,
+  /** Password checked successfully (without salt, password has to be salted!). */
+  OK_WITHOUT_SALT,
+  /** Password checked successfully (without pepper but pepper is given). */
+  OK_WITHOUT_PEPPER,
+  /** Password checked successfully (without salt and pepper, please give pepper and salt to the password). */
+  OK_WITHOUT_SALT_AND_PEPPER,
+  /** Password checked successfully and password is salted (and pepper is given if configured). Nothing to be done. */
+  OK;
 
   /**
-   * @see ConfigXml#toString(Object)
+   * @return True if the password check was successfully. A password update is may-be needed, please call {@link #isPasswordUpdateNeeded()} to
+   *         check this.
    */
-  @Override
-  public String toString()
+  public boolean isOK()
   {
-    return ConfigXml.toString(this);
+    return this != FAILED;
+  }
+
+  public boolean isPasswordUpdateNeeded()
+  {
+    return this == OK_WITHOUT_SALT || this == OK_WITHOUT_PEPPER || this == OK_WITHOUT_SALT_AND_PEPPER;
   }
 }

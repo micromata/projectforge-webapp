@@ -47,7 +47,7 @@ import org.projectforge.web.wicket.WicketApplication;
 public class RestUserFilterTest
 {
   @Test
-  public void testAuthentication() throws IOException, ServletException
+  public void testAuthentication() throws IOException, ServletException, InterruptedException
   {
     ProjectForgeApp.init(null, null);
     WicketApplication.internalSetUpAndRunning(true);
@@ -55,7 +55,6 @@ public class RestUserFilterTest
     final UserDao userDao = mock(UserDao.class);
     when(userDao.authenticateUser(Mockito.eq("successUser"), Mockito.eq("successPassword"))).thenReturn(
         new PFUserDO().setUsername("successUser"));
-    when(userDao.encryptPassword(Mockito.eq("successPassword"))).thenReturn("successPassword");
     when(userDao.getCachedAuthenticationToken(Mockito.eq(2))).thenReturn("token");
     final UserGroupCache userGroupCache = mock(UserGroupCache.class);
     when(userDao.getUserGroupCache()).thenReturn(userGroupCache);
@@ -68,6 +67,7 @@ public class RestUserFilterTest
     FilterChain chain = mock(FilterChain.class);
     filter.doFilter(request, response, chain);
     verify(chain, never()).doFilter(Mockito.any(HttpServletRequest.class), Mockito.any(HttpServletResponse.class));
+    Thread.sleep(1100); // Login penalty.
     // Correct user name and password
     request = mockRequest("successUser", "successPassword", null, null);
     chain = mock(FilterChain.class);
@@ -79,6 +79,7 @@ public class RestUserFilterTest
     chain = mock(FilterChain.class);
     filter.doFilter(request, response, chain);
     verify(chain, never()).doFilter(Mockito.any(HttpServletRequest.class), Mockito.any(HttpServletResponse.class));
+    Thread.sleep(2100); // Login penalty.
     // Correct user name and password
     request = mockRequest(null, null, 2, "token");
     chain = mock(FilterChain.class);

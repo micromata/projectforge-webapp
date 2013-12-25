@@ -80,8 +80,8 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   private static final String NOPASSWORD = "--- none ---";
 
   static {
-    AbstractHistorizableBaseDO.putNonHistorizableProperty(PFUserDO.class, "loginFailures", "lastLogin", "lastPasswordChange",
-        "stayLoggedInKey");
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(PFUserDO.class, "loginFailures", "lastLogin", "stayLoggedInKey", "passwordSalt",
+        "password");
   }
 
   private transient Map<String, Object> attributeMap;
@@ -117,6 +117,8 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   private String stayLoggedInKey;
 
   private String authenticationToken;
+
+  private String passwordSalt;
 
   private Timestamp lastLogin;
 
@@ -370,6 +372,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
         return super.accept(f)
             && !"password".equals(f.getName())
             && !"stayLoggedInKey".equals(f.getName())
+            && !"passwordSalt".equals(f.getName())
             && !"authenticationToken".equals(f.getName());
       }
     }).toString();
@@ -546,6 +549,25 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   public void setStayLoggedInKey(final String stayLoggedInKey)
   {
     this.stayLoggedInKey = stayLoggedInKey;
+  }
+
+  /**
+   * @return the saltString for giving salt to hashed password.
+   */
+  @Column(name = "password_salt", length = 40)
+  public String getPasswordSalt()
+  {
+    return passwordSalt;
+  }
+
+  /**
+   * @param passwordSalt the saltString to set
+   * @return this for chaining.
+   */
+  public PFUserDO setPasswordSalt(final String passwordSalt)
+  {
+    this.passwordSalt = passwordSalt;
+    return this;
   }
 
   /**

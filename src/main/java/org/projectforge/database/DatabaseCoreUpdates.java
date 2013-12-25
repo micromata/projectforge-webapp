@@ -70,8 +70,11 @@ public class DatabaseCoreUpdates
     // /////////////////////////////////////////////////////////////////
     // 5.3
     // /////////////////////////////////////////////////////////////////
-    list.add(new UpdateEntryImpl(CORE_REGION_ID, "5.3", "2013-10-20",
-        "Adds t_tenant, tenant_id to all entities for multi-tenancy. Adds t_configuration.is_global and t_pf_user.last_password_change.") {
+    list.add(new UpdateEntryImpl(
+        CORE_REGION_ID,
+        "5.3",
+        "2013-10-20",
+        "Adds t_tenant, tenant_id to all entities for multi-tenancy. Adds t_configuration.is_global, t_pf_user.last_password_change and t_pf_user.password_salt.") {
       final Table configurationTable = new Table(ConfigurationDO.class);
 
       @Override
@@ -79,7 +82,7 @@ public class DatabaseCoreUpdates
       {
         if (dao.doEntitiesExist(TenantDO.class) == false
             || dao.doTableAttributesExist(configurationTable, "global") == false
-            || dao.doTableAttributesExist(PFUserDO.class, "lastPasswordChange") == false) {
+            || dao.doTableAttributesExist(PFUserDO.class, "lastPasswordChange", "passwordSalt") == false) {
           return UpdatePreCheckStatus.READY_FOR_UPDATE;
         }
         final List<RegistryEntry> list = Registry.instance().getOrderedList();
@@ -106,8 +109,8 @@ public class DatabaseCoreUpdates
         if (dao.doTableAttributesExist(configurationTable, "global") == false) {
           dao.addTableAttributes(configurationTable, new TableAttribute(ConfigurationDO.class, "global").setDefaultValue("false"));
         }
-        if (dao.doTableAttributesExist(PFUserDO.class, "lastPasswordChange") == false) {
-          dao.addTableAttributes(PFUserDO.class, "lastPasswordChange");
+        if (dao.doTableAttributesExist(PFUserDO.class, "lastPasswordChange", "passwordSalt") == false) {
+          dao.addTableAttributes(PFUserDO.class, "lastPasswordChange", "passwordSalt");
         }
 
         if (dao.doEntitiesExist(TenantDO.class) == false) {

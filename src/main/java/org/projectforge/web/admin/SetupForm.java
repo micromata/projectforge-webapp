@@ -38,8 +38,10 @@ import org.apache.wicket.validation.IValidator;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationDO;
 import org.projectforge.database.InitDatabaseDao;
+import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.wicket.AbstractForm;
+import org.projectforge.web.wicket.CsrfTokenHandler;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
@@ -73,8 +75,6 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
 
   private String calendarDomain;
 
-  private final String adminUsername = InitDatabaseDao.DEFAULT_ADMIN_USER;
-
   // @SuppressWarnings("unused")
   // private String organization;
 
@@ -84,11 +84,20 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
   @SuppressWarnings("unused")
   private String passwordRepeat;
 
-  private String encryptedPassword;
+  /** User for storing adminUsername and password with salt. */
+  private final PFUserDO adminUser;
+
+  /**
+   * Cross site request forgery token.
+   */
+  private final CsrfTokenHandler csrfTokenHandler;
 
   public SetupForm(final SetupPage parentPage)
   {
     super(parentPage, "setupform");
+    csrfTokenHandler = new CsrfTokenHandler(this);
+    adminUser = new PFUserDO();
+    adminUser.setUsername(InitDatabaseDao.DEFAULT_ADMIN_USER);
   }
 
   @Override
@@ -119,14 +128,14 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
     {
       // User name
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("username"));
-      fs.add(new RequiredMaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(this, "adminUsername"), 100));
+      fs.add(new RequiredMaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(adminUser, "username"), 100));
     }
     final PasswordTextField passwordField = new PasswordTextField(PasswordPanel.WICKET_ID, new PropertyModel<String>(this, "password")) {
       @Override
       protected void onComponentTag(final ComponentTag tag)
       {
         super.onComponentTag(tag);
-        if (encryptedPassword == null) {
+        if (adminUser.getPassword() == null) {
           tag.put("value", "");
         } else if (StringUtils.isEmpty(getConvertedInput()) == false) {
           tag.put("value", MAGIC_PASSWORD);
@@ -149,7 +158,7 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
         protected void onComponentTag(final ComponentTag tag)
         {
           super.onComponentTag(tag);
-          if (encryptedPassword == null) {
+          if (adminUser.getPassword()  == null) {
             tag.put("value", "");
           } else if (StringUtils.isEmpty(getConvertedInput()) == false) {
             tag.put("value", MAGIC_PASSWORD);
@@ -165,16 +174,16 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
           final String passwordInput = passwordField.getConvertedInput();
           if (StringUtils.equals(input, passwordInput) == false) {
             passwordRepeatField.error(getString("user.error.passwordAndRepeatDoesNotMatch"));
-            encryptedPassword = null;
+            adminUser.setPassword(null);
             return;
           }
-          if (MAGIC_PASSWORD.equals(passwordInput) == false || encryptedPassword == null) {
+          if (MAGIC_PASSWORD.equals(passwordInput) == false || adminUser.getPassword() == null) {
             final String errorMsgKey = userDao.checkPasswordQuality(passwordInput);
             if (errorMsgKey != null) {
-              encryptedPassword = null;
+              adminUser.setPassword(null);
               passwordField.error(getString(errorMsgKey));
             } else {
-              encryptedPassword = userDao.encryptPassword(passwordInput);
+              userDao.createEncryptedPassword(adminUser, passwordInput);
             }
           }
         }
@@ -227,6 +236,7 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
         @Override
         public final void onSubmit()
         {
+          csrfTokenHandler.onSubmit();
           parentPage.finishSetup();
         }
       };
@@ -235,6 +245,13 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
       actionButtons.add(finishButtonPanel);
       setDefaultButton(finishButton);
     }
+  }
+
+  @Override
+  protected void onSubmit()
+  {
+    super.onSubmit();
+    csrfTokenHandler.onSubmit();
   }
 
   public SetupTarget getSetupMode()
@@ -265,13 +282,11 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
     return feedbackEMail;
   }
 
-  public String getEncryptedPassword()
+  /**
+   * @return the adminUser containing the desired username and password with the used salt-string.
+   */
+  public PFUserDO getAdminUser()
   {
-    return encryptedPassword;
-  }
-
-  public String getAdminUsername()
-  {
-    return adminUsername;
+    return adminUser;
   }
 }

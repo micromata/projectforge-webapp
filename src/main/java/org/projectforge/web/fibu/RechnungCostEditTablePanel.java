@@ -54,6 +54,7 @@ import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.fibu.kost.Kost2Dao;
 import org.projectforge.fibu.kost.KostZuweisungDO;
 import org.projectforge.fibu.kost.KostZuweisungenCopyHelper;
+import org.projectforge.web.wicket.CsrfTokenHandler;
 import org.projectforge.web.wicket.WicketAjaxUtils;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
@@ -86,16 +87,30 @@ public class RechnungCostEditTablePanel extends Panel
   MyAjaxComponentHolder ajaxComponents = new MyAjaxComponentHolder();
 
   /**
+   * Cross site request forgery token.
+   */
+  private final CsrfTokenHandler csrfTokenHandler;
+
+  /**
    * @param id
    */
+  @SuppressWarnings("serial")
   public RechnungCostEditTablePanel(final String id)
   {
     super(id);
     feedbackPanel = new FeedbackPanel("feedback");
     ajaxComponents.register(feedbackPanel);
     add(feedbackPanel);
-    this.form = new Form<AbstractRechnungsPositionDO>("form");
+    this.form = new Form<AbstractRechnungsPositionDO>("form") {
+      @Override
+      protected void onSubmit()
+      {
+        super.onSubmit();
+        csrfTokenHandler.onSubmit();
+      }
+    };
     add(form);
+    csrfTokenHandler = new CsrfTokenHandler(form);
     rows = new RepeatingView("rows");
     form.add(rows);
   }

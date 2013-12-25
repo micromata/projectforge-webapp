@@ -111,12 +111,10 @@ public class SetupPage extends AbstractUnsecureBasePage
     PFUserDO adminUser = null;
     final String message;
     if (setupForm.getSetupMode() == SetupTarget.EMPTY_DATABASE) {
-      adminUser = initDatabaseDao.initializeEmptyDatabase(setupForm.getAdminUsername(), setupForm.getEncryptedPassword(),
-          setupForm.getTimeZone());
+      adminUser = initDatabaseDao.initializeEmptyDatabase(setupForm.getAdminUser(), setupForm.getTimeZone());
       message = "administration.setup.message.emptyDatabase";
     } else {
-      adminUser = initDatabaseDao.initializeEmptyDatabaseWithTestData(setupForm.getAdminUsername(), setupForm.getEncryptedPassword(),
-          setupForm.getTimeZone());
+      adminUser = initDatabaseDao.initializeEmptyDatabaseWithTestData(setupForm.getAdminUser(), setupForm.getTimeZone());
       message = "administration.setup.message.testdata";
       // refreshes the visibility of the costConfigured dependent menu items:
       Configuration.getInstance().setExpired(); // Force reload.

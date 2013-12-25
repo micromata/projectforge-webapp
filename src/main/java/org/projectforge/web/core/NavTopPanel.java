@@ -59,6 +59,7 @@ import org.projectforge.web.mobile.MenuMobilePage;
 import org.projectforge.web.user.ChangePasswordPage;
 import org.projectforge.web.user.MyAccountEditPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
+import org.projectforge.web.wicket.CsrfTokenHandler;
 import org.projectforge.web.wicket.FeedbackPage;
 import org.projectforge.web.wicket.MySession;
 import org.projectforge.web.wicket.WicketUtils;
@@ -81,6 +82,11 @@ public class NavTopPanel extends NavAbstractPanel
   private final UserXmlPreferencesCache userXmlPreferencesCache;
 
   private BookmarkDialog bookmarkDialog;
+
+  /**
+   * Cross site request forgery token.
+   */
+  private CsrfTokenHandler csrfTokenHandler;
 
   public NavTopPanel(final String id, final UserXmlPreferencesCache userXmlPreferencesCache, final AccessChecker accessChecker)
   {
@@ -117,6 +123,7 @@ public class NavTopPanel extends NavAbstractPanel
       @Override
       protected void onSubmit()
       {
+        csrfTokenHandler.onSubmit();
         if (StringUtils.isNotBlank(searchString) == true) {
           final SearchPage searchPage = new SearchPage(new PageParameters(), searchString);
           setResponsePage(searchPage);
@@ -124,6 +131,7 @@ public class NavTopPanel extends NavAbstractPanel
         super.onSubmit();
       }
     };
+    csrfTokenHandler = new CsrfTokenHandler(searchForm);
     add(searchForm);
     final TextField<String> searchField = new TextField<String>("searchField", new PropertyModel<String>(searchForm, "searchString"));
     WicketUtils.setPlaceHolderAttribute(searchField, getString("search.search"));

@@ -77,7 +77,7 @@ public class PostausgangDO extends DefaultBaseDO
     return datum;
   }
 
-  public void setDatum(Date datum)
+  public void setDatum(final Date datum)
   {
     this.datum = datum;
   }
@@ -88,7 +88,7 @@ public class PostausgangDO extends DefaultBaseDO
     return person;
   }
 
-  public void setPerson(String person)
+  public void setPerson(final String person)
   {
     this.person = person;
   }
@@ -99,7 +99,7 @@ public class PostausgangDO extends DefaultBaseDO
     return empfaenger;
   }
 
-  public void setEmpfaenger(String empfaenger)
+  public void setEmpfaenger(final String empfaenger)
   {
     this.empfaenger = empfaenger;
   }
@@ -110,7 +110,7 @@ public class PostausgangDO extends DefaultBaseDO
     return inhalt;
   }
 
-  public void setInhalt(String inhalt)
+  public void setInhalt(final String inhalt)
   {
     this.inhalt = inhalt;
   }
@@ -121,19 +121,19 @@ public class PostausgangDO extends DefaultBaseDO
     return bemerkung;
   }
 
-  public void setBemerkung(String bemerkung)
+  public void setBemerkung(final String bemerkung)
   {
     this.bemerkung = bemerkung;
   }
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "post_type", length = 20, nullable = false)
+  @Column(name = "post_type", length = 100, nullable = false)
   public PostType getType()
   {
     return type;
   }
 
-  public void setType(PostType type)
+  public void setType(final PostType type)
   {
     this.type = type;
   }

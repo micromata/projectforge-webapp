@@ -117,14 +117,10 @@ public class ProjectForgeApp
    */
   public void finalizeInitialization()
   {
-    if (upAndRunning == true) {
-      cronSetup.initialize();
-      log.info("system cronJobs are initialized.");
-      pluginsRegistry.registerCronJobs(cronSetup);
-      log.info("plugin cronJobs are initialized.");
-    } else {
-      log.warn("Start-up of ProjectForge isn't completed normally, therefore REST services and cronJobs of plugins aren't available.");
-    }
+    cronSetup.initialize();
+    log.info("system cronJobs are initialized.");
+    pluginsRegistry.registerCronJobs(cronSetup);
+    log.info("plugin cronJobs are initialized.");
     log.info(AppVersion.APP_ID + " " + AppVersion.NUMBER + " (" + AppVersion.RELEASE_TIMESTAMP + ") initialized.");
     try {
       StorageClient.getInstance(); // Initialize storage

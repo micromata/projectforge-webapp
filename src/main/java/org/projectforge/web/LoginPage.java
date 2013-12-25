@@ -38,7 +38,6 @@ import org.apache.wicket.request.http.WebRequest;
 import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.ProjectForgeVersion;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
 import org.projectforge.database.InitDatabaseDao;
@@ -159,7 +158,6 @@ public class LoginPage extends AbstractUnsecureBasePage
     body.add(AttributeModifier.replace("class", "loginpage"));
     body.add(form);
     form.init();
-    body.add(new Label("welcome", getLocalizedMessage("login.welcome", ProjectForgeVersion.YEAR)));
     final WebMarkupContainer administratorLoginNeeded = new WebMarkupContainer("administratorLoginNeeded");
     body.add(administratorLoginNeeded);
     if (UserFilter.isUpdateRequiredFirst() == false) {

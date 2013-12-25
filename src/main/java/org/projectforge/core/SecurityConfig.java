@@ -21,39 +21,38 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.jira;
+package org.projectforge.core;
 
-import java.io.Serializable;
-import java.util.List;
+import org.projectforge.user.PFUserDO;
 
-import org.projectforge.core.ConfigXml;
 
 /**
- * Basic configuration of the JIRA ProjectForge is connected to.
+ * Bean used by ConfigXML (config.xml) for configuring security stuff.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class JiraConfig implements Serializable
+public class SecurityConfig
 {
-  private static final long serialVersionUID = -427784191871257457L;
-
-  private final String createIssueUrl = null;
-
-  private List<JiraIssueType> issueTypes;
+  @ConfigXmlSecretField
+  private String passwordPepper;
 
   /**
-   * Base url for creating JIRA issues:
-   * https://jira.acme.com/jira/secure/CreateIssueDetails!init.jspa?pid=10310&issuetype=3&priority=4&description=say+hello+world...<br/>
-   * Example: https://jira.acme.com/jira/secure/CreateIssueDetails!init.jspa. <br/>
-   * If null then no creation of JIRA issues is supported (e. g. for MEB).
+   * If configured passwords will be hashed by using this salt.
+   * @return the passwordPepper which should be used for hashing passwords (with salt and pepper).
+   * @see PFUserDO#getPasswordSalt()
    */
-  public String getCreateIssueUrl()
+  public String getPasswordPepper()
   {
-    return createIssueUrl;
+    return passwordPepper;
   }
 
-  public List<JiraIssueType> getIssueTypes()
+  /**
+   * @param passwordPepper the passwordPepper to set
+   * @return this for chaining.
+   */
+  public SecurityConfig setPasswordPepper(final String passwordPepper)
   {
-    return issueTypes;
+    this.passwordPepper = passwordPepper;
+    return this;
   }
 
   /**

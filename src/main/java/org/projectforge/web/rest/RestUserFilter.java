@@ -39,10 +39,12 @@ import org.projectforge.common.NumberHelper;
 import org.projectforge.rest.Authentication;
 import org.projectforge.rest.ConnectionSettings;
 import org.projectforge.rest.converter.DateTimeFormat;
+import org.projectforge.user.LoginProtection;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.WebConfiguration;
+import org.projectforge.web.wicket.ClientIpResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -84,10 +86,24 @@ public class RestUserFilter implements Filter
     }
     final HttpServletRequest req = (HttpServletRequest) request;
     String userString = getAttribute(req, Authentication.AUTHENTICATION_USER_ID);
+    final LoginProtection loginProtection = LoginProtection.instance();
+    final String clientIpAddress = ClientIpResolver.getClientIp(request);
     PFUserDO user = null;
     if (userString != null) {
       final Integer userId = NumberHelper.parseInteger(userString);
       if (userId != null) {
+        final long offset = loginProtection.getFailedLoginTimeOffsetIfExists(userString, clientIpAddress);
+        if (offset > 0) {
+          final String seconds = String.valueOf(offset / 1000);
+          log.warn("The account for '"
+              + userString
+              + "' is locked for "
+              + seconds
+              + " seconds due to failed login attempts (ip=" + clientIpAddress + ").");
+          final HttpServletResponse resp = (HttpServletResponse) response;
+          resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+          return;
+        }
         final String authenticationToken = getAttribute(req, Authentication.AUTHENTICATION_TOKEN);
         if (authenticationToken != null) {
           if (authenticationToken.equals(userDao.getCachedAuthenticationToken(userId)) == true) {
@@ -109,9 +125,20 @@ public class RestUserFilter implements Filter
     } else {
       userString = getAttribute(req, Authentication.AUTHENTICATION_USERNAME);
       final String password = getAttribute(req, Authentication.AUTHENTICATION_PASSWORD);
+      final long offset = loginProtection.getFailedLoginTimeOffsetIfExists(userString, clientIpAddress);
+      if (offset > 0) {
+        final String seconds = String.valueOf(offset / 1000);
+        log.warn("The account for '"
+            + userString
+            + "' is locked for "
+            + seconds
+            + " seconds due to failed login attempts (ip=" + clientIpAddress + ").");
+        final HttpServletResponse resp = (HttpServletResponse) response;
+        resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+        return;
+      }
       if (userString != null && password != null) {
-        final String encryptedPassword = userDao.encryptPassword(password);
-        user = userDao.authenticateUser(userString, encryptedPassword);
+        user = userDao.authenticateUser(userString, password);
         if (user == null) {
           log.error("Authentication failed for "
               + Authentication.AUTHENTICATION_USERNAME
@@ -130,17 +157,13 @@ public class RestUserFilter implements Filter
       }
     }
     if (user == null) {
-      try {
-        // Avoid brute force attack:
-        Thread.sleep(1000);
-      } catch (final InterruptedException ex) {
-        log.fatal("Exception encountered while Thread.sleep(1000): " + ex, ex);
-      }
+      loginProtection.incrementFailedLoginTimeOffset(userString, clientIpAddress);
       final HttpServletResponse resp = (HttpServletResponse) response;
       resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
       return;
     }
     try {
+      loginProtection.clearLoginTimeOffset(userString, clientIpAddress);
       PFUserContext.setUser(user);
       final ConnectionSettings settings = getConnectionSettings(req);
       ConnectionSettings.set(settings);

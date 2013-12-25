@@ -33,6 +33,7 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.CompoundPropertyModel;
+import org.projectforge.web.wicket.CsrfTokenHandler;
 import org.projectforge.web.wicket.WicketUtils;
 
 /**
@@ -47,7 +48,13 @@ public abstract class DropFileContainer extends Panel
   private static final long serialVersionUID = 3622467918922963503L;
 
   private final WebMarkupContainer main;
+
   private final String mimeType;
+
+  /**
+   * Cross site request forgery token.
+   */
+  private  CsrfTokenHandler csrfTokenHandler;
 
   /**
    * @param id
@@ -57,7 +64,8 @@ public abstract class DropFileContainer extends Panel
     this(id, null);
   }
 
-  public DropFileContainer(final String id, final String mimeType) {
+  public DropFileContainer(final String id, final String mimeType)
+  {
     super(id);
     this.mimeType = mimeType;
     main = new WebMarkupContainer("main");
@@ -82,6 +90,7 @@ public abstract class DropFileContainer extends Panel
       @Override
       protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
       {
+        csrfTokenHandler.onSubmit();
         final FormBean modelObject = hiddenForm.getModel().getObject();
         onStringImport(target, modelObject.importFileName, modelObject.importString);
       }
@@ -93,6 +102,7 @@ public abstract class DropFileContainer extends Panel
       }
 
     });
+    csrfTokenHandler = new CsrfTokenHandler(hiddenForm);
   }
 
   /**

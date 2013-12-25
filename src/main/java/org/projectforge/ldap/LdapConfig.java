@@ -24,7 +24,8 @@
 package org.projectforge.ldap;
 
 import org.apache.commons.lang.StringUtils;
-import org.projectforge.common.ReflectionToString;
+import org.projectforge.core.ConfigXml;
+import org.projectforge.core.ConfigXmlSecretField;
 import org.projectforge.xml.stream.XmlField;
 
 /**
@@ -43,6 +44,7 @@ public class LdapConfig
 
   private String managerUser;
 
+  @ConfigXmlSecretField
   private String managerPassword;
 
   private String authentication = "simple";
@@ -300,11 +302,11 @@ public class LdapConfig
   }
 
   /**
-   * @see ReflectionToString#asString(Object)
+   * @see ConfigXml#toString(Object)
    */
   @Override
   public String toString()
   {
-    return ReflectionToString.toStringExclude(this, "managerPassword");
+    return ConfigXml.toString(this);
   }
 }

@@ -37,6 +37,7 @@ import org.projectforge.user.LoginHandler;
 import org.projectforge.user.LoginResult;
 import org.projectforge.user.LoginResultStatus;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.PasswordCheckResult;
 
 public class LdapSlaveLoginHandlerTest extends TestBase
 {
@@ -65,8 +66,8 @@ public class LdapSlaveLoginHandlerTest extends TestBase
     final String userBase = "ou=pf-mock-test-users";
     final String testUsername = "mockedLdapSlaveTestuser";
     ldapUserDao = mock(LdapUserDao.class);
-    when(ldapUserDao.authenticate(Mockito.eq(testUsername), Mockito.eq("successful"), Mockito.eq(userBase))).thenReturn((LdapUser)
-        new LdapUser().setUid(testUsername));
+    when(ldapUserDao.authenticate(Mockito.eq(testUsername), Mockito.eq("successful"), Mockito.eq(userBase))).thenReturn(
+        (LdapUser) new LdapUser().setUid(testUsername));
     when(ldapUserDao.authenticate(Mockito.anyString(), Mockito.eq("fail"), Mockito.eq(userBase))).thenReturn(null);
     final LdapSlaveLoginHandler loginHandler = new LdapSlaveLoginHandler();
     loginHandler.ldapConfig = new LdapConfig().setUserBase(userBase);
@@ -88,7 +89,8 @@ public class LdapSlaveLoginHandlerTest extends TestBase
     final LdapSlaveLoginHandler loginHandler = createLoginHandler();
     loginHandler.setMode(LdapSlaveLoginHandler.Mode.SIMPLE);
     final String testUsername = "ldapSlaveTestuser";
-    final LdapUser ldapUser = (LdapUser)new LdapUser().setUid(testUsername).setGivenName("Kai").setSurname("Reinhard").setEmployeeNumber("42");
+    final LdapUser ldapUser = (LdapUser) new LdapUser().setUid(testUsername).setGivenName("Kai").setSurname("Reinhard")
+        .setEmployeeNumber("42");
     createLdapUser(ldapUser, "successful");
     testSimpleMode(loginHandler, testUsername);
     ldapUserDao.delete(ldapUser);
@@ -148,8 +150,7 @@ public class LdapSlaveLoginHandlerTest extends TestBase
     result = loginHandler.checkLogin(testUsername, "successful");
     Assert.assertEquals("User is a local user, thus the LDAP authentication should be ignored.", LoginResultStatus.FAILED,
         result.getLoginResultStatus());
-
-    user.setPassword(userDao.encryptPassword("test"));
+    userDao.createEncryptedPassword(user, "test");
     userDao.internalUpdate(user);
     result = loginHandler.checkLogin(testUsername, "test");
     Assert.assertEquals("User is a local user, thus authentication should be done by the login default handler.",
@@ -164,8 +165,8 @@ public class LdapSlaveLoginHandlerTest extends TestBase
     final String userBase = "ou=pf-mock-test-users";
     final LdapUserDao ldapUserDao = mock(LdapUserDao.class);
     LoginResult loginResult;
-    final LdapUser kai = (LdapUser)new LdapUser().setUid("kai").setDescription("Developer").setGivenName("Kai").setMail("k.reinhard@acme.com")
-        .setOrganization("Micromata").setSurname("Reinhard");
+    final LdapUser kai = (LdapUser) new LdapUser().setUid("kai").setDescription("Developer").setGivenName("Kai")
+        .setMail("k.reinhard@acme.com").setOrganization("Micromata").setSurname("Reinhard");
     when(ldapUserDao.authenticate("kai", "successful", userBase)).thenReturn(kai);
     when(ldapUserDao.authenticate("kai", "fail", userBase)).thenReturn(null);
     when(ldapUserDao.findByUsername("kai", userBase)).thenReturn(kai);
@@ -184,7 +185,7 @@ public class LdapSlaveLoginHandlerTest extends TestBase
         userDao.doesUsernameAlreadyExist(new PFUserDO().setUsername("kai")));
     final PFUserDO user = userDao.getInternalByName("kai");
     LdapTestUtils.assertUser(user, "kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
-    Assert.assertEquals(userDao.encryptPassword("successful"), user.getPassword());
+    Assert.assertEquals(userDao.checkPassword(user, "successful"), PasswordCheckResult.OK);
 
     userDao.internalMarkAsDeleted(user);
     Assert.assertEquals("User is deleted in data-base. Login not possible.", LoginResultStatus.LOGIN_EXPIRED,
@@ -202,9 +203,11 @@ public class LdapSlaveLoginHandlerTest extends TestBase
     loginHandler.setMode(LdapSlaveLoginHandler.Mode.USERS);
     final String testUsername1 = "ldapSlaveTestuserUserMode1";
     final String testUsername2 = "ldapSlaveTestuserUserMode2";
-    final LdapUser ldapUser1 = (LdapUser)new LdapUser().setUid(testUsername1).setGivenName("Kai").setSurname("Reinhard").setEmployeeNumber("100");
+    final LdapUser ldapUser1 = (LdapUser) new LdapUser().setUid(testUsername1).setGivenName("Kai").setSurname("Reinhard")
+        .setEmployeeNumber("100");
     createLdapUser(ldapUser1, "successful");
-    final LdapUser ldapUser2 = (LdapUser)new LdapUser().setUid(testUsername2).setGivenName("Kai").setSurname("Reinhard").setEmployeeNumber("101");
+    final LdapUser ldapUser2 = (LdapUser) new LdapUser().setUid(testUsername2).setGivenName("Kai").setSurname("Reinhard")
+        .setEmployeeNumber("101");
     createLdapUser(ldapUser2, "successful");
 
     logon(TEST_ADMIN_USER);
@@ -221,7 +224,7 @@ public class LdapSlaveLoginHandlerTest extends TestBase
     Assert.assertEquals(LoginResultStatus.SUCCESS, result.getLoginResultStatus());
     Assert.assertNotNull("User should be returned.", result.getUser());
     synchronizeLdapUsers(loginHandler);
-    PFUserDO user = userDao.authenticateUser(testUsername1, userDao.encryptPassword("successful"));
+    PFUserDO user = userDao.authenticateUser(testUsername1, "successful");
     Assert.assertNotNull("User should be created by login handler.", user);
     Assert.assertEquals(testUsername1, user.getUsername());
     result = loginHandler.checkLogin(testUsername1, "successful");
@@ -243,7 +246,8 @@ public class LdapSlaveLoginHandlerTest extends TestBase
     Assert.assertFalse("User isn't available in LDAP, therefore should be deleted.", user.isDeleted());
 
     // Check that LDAP is ignored for local users:
-    user.setLocalUser(true).setPassword(userDao.encryptPassword("test"));
+    user.setLocalUser(true);
+    userDao.createEncryptedPassword(user, "test");
     userDao.internalUpdate(user);
     result = loginHandler.checkLogin(testUsername2, "successful");
     Assert.assertEquals("User is a local user, thus the LDAP authentication should be ignored.", LoginResultStatus.FAILED,

@@ -29,6 +29,7 @@ import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.util.lang.Bytes;
 import org.projectforge.web.wicket.AbstractForm;
+import org.projectforge.web.wicket.CsrfTokenHandler;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -42,10 +43,23 @@ public class SetupImportForm extends AbstractForm<SetupImportForm, SetupPage>
 
   protected String filename;
 
+  /**
+   * Cross site request forgery token.
+   */
+  private final CsrfTokenHandler csrfTokenHandler;
+
   public SetupImportForm(final SetupPage parentPage)
   {
     super(parentPage, "importform");
     initUpload(Bytes.megabytes(100));
+    csrfTokenHandler = new CsrfTokenHandler(this);
+  }
+
+  @Override
+  protected void onSubmit()
+  {
+    super.onSubmit();
+    csrfTokenHandler.onSubmit();
   }
 
   @Override

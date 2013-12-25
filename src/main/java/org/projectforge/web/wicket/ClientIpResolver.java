@@ -23,8 +23,15 @@
 
 package org.projectforge.web.wicket;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.wicket.protocol.http.request.WebClientInfo;
 import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.util.string.Strings;
 
 public class ClientIpResolver extends WebClientInfo
 {
@@ -40,6 +47,30 @@ public class ClientIpResolver extends WebClientInfo
       return "";
     }
     return new ClientIpResolver(requestCycle).getRemoteAddr(requestCycle);
+  }
+
+  public static String getClientIp(final ServletRequest request)
+  {
+    String remoteAddr = null;
+    if (request instanceof HttpServletRequest) {
+      remoteAddr = ((HttpServletRequest) request).getHeader("X-Forwarded-For");
+    }
+    if (remoteAddr != null) {
+      if (remoteAddr.contains(",")) {
+        // sometimes the header is of form client ip,proxy 1 ip,proxy 2 ip,...,proxy n ip,
+        // we just want the client
+        remoteAddr = Strings.split(remoteAddr, ',')[0].trim();
+      }
+      try {
+        // If ip4/6 address string handed over, simply does pattern validation.
+        InetAddress.getByName(remoteAddr);
+      } catch (final UnknownHostException e) {
+        remoteAddr = request.getRemoteAddr();
+      }
+    } else {
+      remoteAddr = request.getRemoteAddr();
+    }
+    return remoteAddr;
   }
 
   /**

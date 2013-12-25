@@ -68,35 +68,17 @@ public class LoginDefaultHandler implements LoginHandler
   /**
    * @see org.projectforge.user.LoginHandler#checkLogin(java.lang.String, java.lang.String, boolean)
    */
-  @SuppressWarnings({ "unchecked", "rawtypes"})
   @Override
   public LoginResult checkLogin(final String username, final String password)
   {
     final LoginResult loginResult = new LoginResult();
-    final String encryptedPassword = userDao.encryptPassword(password);
     PFUserDO user = null;
     if (UserFilter.isUpdateRequiredFirst() == true) {
       // Only administrator login is allowed. The login is checked without Hibernate because the data-base schema may be out-dated thus
       // Hibernate isn't functioning.
-      final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
       try {
-        final PFUserDO resUser = new PFUserDO();
-        final String sql = "select pk, firstname, lastname from t_pf_user where username=? and password=? and deleted=false and deactivated=false and restricted_user=false";
-        jdbc.query(sql, new Object[] { username, encryptedPassword}, new ResultSetExtractor() {
-          @Override
-          public Object extractData(final ResultSet rs) throws SQLException, DataAccessException
-          {
-            if (rs.next() == true) {
-              final int pk = rs.getInt("pk");
-              final String firstname = rs.getString("firstname");
-              final String lastname = rs.getString("lastname");
-              resUser.setId(pk);
-              resUser.setUsername(username).setFirstname(firstname).setLastname(lastname);
-            }
-            return null;
-          }
-        });
-        if (resUser.getUsername() == null) {
+        final PFUserDO resUser = getUserWithJdbc(username, password);
+        if (resUser == null || resUser.getUsername() == null) {
           log.info("Admin login for maintenance (data-base update) failed for user '" + username + "' (user/password not found).");
           return loginResult.setLoginResultStatus(LoginResultStatus.FAILED);
         }
@@ -109,10 +91,10 @@ public class LoginDefaultHandler implements LoginHandler
         log.error(ex.getMessage(), ex);
       }
     } else {
-      user = userDao.authenticateUser(username, encryptedPassword);
+      user = userDao.authenticateUser(username, password);
     }
     if (user != null) {
-      log.info("User with valid username/password: " + username + "/" + encryptedPassword);
+      log.info("User with valid username/password: " + username + "/****");
       if (user.hasSystemAccess() == false) {
         log.info("User has no system access (is deleted/deactivated): " + user.getDisplayUsername());
         return loginResult.setLoginResultStatus(LoginResultStatus.LOGIN_EXPIRED);
@@ -120,10 +102,72 @@ public class LoginDefaultHandler implements LoginHandler
         return loginResult.setLoginResultStatus(LoginResultStatus.SUCCESS).setUser(user);
       }
     } else {
-      log.info("User login failed: " + username + "/" + encryptedPassword);
+      log.info("User login failed: " + username + "/****");
       return loginResult.setLoginResultStatus(LoginResultStatus.FAILED);
     }
   }
+
+  /**
+   * Only administrator login is allowed. The login is checked without Hibernate because the data-base schema may be out-dated thus
+   * Hibernate isn't functioning.
+   * @param jdbc
+   * @param username
+   * @param password
+   * @return
+   * @throws SQLException
+   */
+  private PFUserDO getUserWithJdbc(final String username, final String password) throws SQLException
+  {
+    final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+    String sql = "select pk, firstname, lastname, password, salt_string from t_pf_user where username=? and deleted=false and deactivated=false and restricted_user=false";
+    PFUserDO user = null;
+    try {
+      user = loadUser(jdbc, sql, username, true);
+    } catch (final Exception ex) {
+      log.warn("This SQLException is only OK if you've a ProjectForge installation 5.2 or minor!");
+      sql = "select pk, firstname, lastname, password from t_pf_user where username=? and deleted=false and deactivated=false and restricted_user=false";
+      user = loadUser(jdbc, sql, username, false);
+    }
+    if (user == null) {
+      return null;
+    }
+    userDao.checkPassword(user, password);
+    return user;
+  }
+
+  /**
+   * @param user
+   * @param rs
+   * @param username
+   * @param withSaltString false before ProjectForge version 5.3.
+   * @throws SQLException
+   */
+  @SuppressWarnings({ "unchecked", "rawtypes"})
+  private PFUserDO loadUser(final JdbcTemplate jdbc, final String sql, final String username, final boolean withSaltString)
+      throws SQLException
+      {
+    final PFUserDO user = new PFUserDO();
+    jdbc.query(sql, new Object[] { username}, new ResultSetExtractor() {
+      @Override
+      public Object extractData(final ResultSet rs) throws SQLException, DataAccessException
+      {
+        if (rs.next() == true) {
+          final String password = rs.getString("password");
+          final int pk = rs.getInt("pk");
+          final String firstname = rs.getString("firstname");
+          final String lastname = rs.getString("lastname");
+          if (withSaltString == true) {
+            final String saltString = rs.getString("salt_string");
+            user.setPasswordSalt(saltString);
+          }
+          user.setId(pk);
+          user.setUsername(username).setFirstname(firstname).setLastname(lastname).setPassword(password);
+        }
+        return null;
+      }
+    });
+    return user;
+      }
 
   public boolean isAdminUser(final PFUserDO user)
   {

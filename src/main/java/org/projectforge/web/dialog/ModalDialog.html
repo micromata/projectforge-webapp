@@ -3,7 +3,9 @@
     <wicket:container wicket:id="mainSubContainer">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="myModalLabel" wicket:id="titleContainer"><span wicket:id="titleText">[title]</span></h3>
+        <h3 id="myModalLabel" wicket:id="titleContainer">
+          <span wicket:id="titleText">[title]</span>
+        </h3>
       </div>
       <form wicket:id="form" autocomplete="off">
         <div class="modal-body" wicket:id="gridContent">
@@ -13,6 +15,7 @@
         <div class="modal-footer" wicket:id="buttonBar">
           <wicket:container wicket:id="actionButtons" />
         </div>
+        <input type="hidden" wicket:id="csrfToken" />
       </form>
     </wicket:container>
   </div>

@@ -28,6 +28,7 @@ import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.projectforge.core.AbstractBaseDO;
+import org.projectforge.web.wicket.CsrfTokenHandler;
 import org.projectforge.web.wicket.mobileflowlayout.MobileGridBuilder;
 
 public abstract class AbstractMobileEditForm<O extends AbstractBaseDO< ? >, P extends AbstractMobileEditPage< ? , ? , ? >> extends
@@ -39,10 +40,23 @@ AbstractMobileForm<O, P>
 
   protected MobileGridBuilder gridBuilder;
 
+  /**
+   * Cross site request forgery token.
+   */
+  private final CsrfTokenHandler csrfTokenHandler;
+
   public AbstractMobileEditForm(final P parentPage, final O data)
   {
     super(parentPage);
     this.data = data;
+    csrfTokenHandler = new CsrfTokenHandler(this);
+  }
+
+  @Override
+  protected void onSubmit()
+  {
+    super.onSubmit();
+    csrfTokenHandler.onSubmit();
   }
 
   public O getData()

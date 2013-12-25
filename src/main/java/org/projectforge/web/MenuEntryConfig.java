@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Translation;
 import org.projectforge.xml.stream.XmlField;
 import org.projectforge.xml.stream.XmlObject;
@@ -229,12 +229,11 @@ public class MenuEntryConfig
   }
 
   /**
-   * @see ReflectionToStringBuilder
+   * @see ConfigXml#toString(Object)
    */
   @Override
   public String toString()
   {
-    final ReflectionToStringBuilder tos = new ReflectionToStringBuilder(this);
-    return tos.toString();
+    return ConfigXml.toString(this);
   }
 }

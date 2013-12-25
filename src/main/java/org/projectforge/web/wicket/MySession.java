@@ -33,6 +33,7 @@ import org.apache.wicket.protocol.http.WebSession;
 import org.apache.wicket.protocol.http.request.WebClientInfo;
 import org.apache.wicket.request.Request;
 import org.projectforge.Version;
+import org.projectforge.common.NumberHelper;
 import org.projectforge.core.Configuration;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
@@ -72,6 +73,11 @@ public class MySession extends WebSession
 
   private BrowserScreenWidthType browserScreenWidthType;
 
+  /**
+   * Random cross site request forgery token.
+   */
+  private final String csrfToken;
+
   public MySession(final Request request)
   {
     super(request);
@@ -91,6 +97,7 @@ public class MySession extends WebSession
       log.error("Oups, ClientInfo is not from type WebClientInfo: " + info);
     }
     setUser(PFUserContext.getUser());
+    this.csrfToken = NumberHelper.getSecureRandomUrlSaveString(20);
   }
 
   public static MySession get()
@@ -104,6 +111,14 @@ public class MySession extends WebSession
   public synchronized PFUserDO getUser()
   {
     return user;
+  }
+
+  /**
+   * @return the randomized cross site request forgery token
+   */
+  public String getCsrfToken()
+  {
+    return csrfToken;
   }
 
   /**
