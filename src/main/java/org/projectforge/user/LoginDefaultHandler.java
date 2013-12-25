@@ -119,7 +119,7 @@ public class LoginDefaultHandler implements LoginHandler
   private PFUserDO getUserWithJdbc(final String username, final String password) throws SQLException
   {
     final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
-    String sql = "select pk, firstname, lastname, password, salt_string from t_pf_user where username=? and deleted=false and deactivated=false and restricted_user=false";
+    String sql = "select pk, firstname, lastname, password, password_salt from t_pf_user where username=? and deleted=false and deactivated=false and restricted_user=false";
     PFUserDO user = null;
     try {
       user = loadUser(jdbc, sql, username, true);
@@ -150,22 +150,24 @@ public class LoginDefaultHandler implements LoginHandler
   private PFUserDO loadUser(final JdbcTemplate jdbc, final String sql, final String username, final boolean withSaltString)
       throws SQLException
       {
-    final PFUserDO user = new PFUserDO();
-    jdbc.query(sql, new Object[] { username}, new ResultSetExtractor() {
+    final PFUserDO user = (PFUserDO)jdbc.query(sql, new Object[] { username}, new ResultSetExtractor() {
       @Override
       public Object extractData(final ResultSet rs) throws SQLException, DataAccessException
       {
         if (rs.next() == true) {
+          final PFUserDO user = new PFUserDO();
+          user.setUsername(username);
           final String password = rs.getString("password");
           final int pk = rs.getInt("pk");
           final String firstname = rs.getString("firstname");
           final String lastname = rs.getString("lastname");
           if (withSaltString == true) {
-            final String saltString = rs.getString("salt_string");
+            final String saltString = rs.getString("password_salt");
             user.setPasswordSalt(saltString);
           }
           user.setId(pk);
           user.setUsername(username).setFirstname(firstname).setLastname(lastname).setPassword(password);
+          return user;
         }
         return null;
       }
