@@ -131,7 +131,11 @@ public class LoginDefaultHandler implements LoginHandler
     if (user == null) {
       return null;
     }
-    userDao.checkPassword(user, password);
+    final PasswordCheckResult passwordCheckResult = userDao.checkPassword(user, password);
+    if (passwordCheckResult.isOK() == false) {
+      log.warn("Login for admin user '" + username + "' in maintenance mode failed, wrong password.");
+      return null;
+    }
     return user;
   }
 
