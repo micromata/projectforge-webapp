@@ -150,7 +150,7 @@ public class LoginDefaultHandler implements LoginHandler
   private PFUserDO loadUser(final JdbcTemplate jdbc, final String sql, final String username, final boolean withSaltString)
       throws SQLException
       {
-    final PFUserDO user = jdbc.query(sql, new Object[] { username}, new ResultSetExtractor() {
+    final PFUserDO user = (PFUserDO)jdbc.query(sql, new Object[] { username}, new ResultSetExtractor() {
       @Override
       public Object extractData(final ResultSet rs) throws SQLException, DataAccessException
       {
