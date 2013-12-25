@@ -31,7 +31,6 @@ import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.AppVersion;
-import org.projectforge.ProjectForgeVersion;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
 import org.projectforge.user.PFUserDO;
@@ -80,7 +79,6 @@ public class LoginMobilePage extends AbstractMobilePage
       }
     }
     setNoBackButton();
-    pageContainer.add(new Label("welcome", getLocalizedMessage("login.welcome", ProjectForgeVersion.YEAR)));
     form = new LoginMobileForm(this);
     pageContainer.add(form);
     form.init();
