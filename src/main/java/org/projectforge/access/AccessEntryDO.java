@@ -98,6 +98,16 @@ public class AccessEntryDO implements Comparable<AccessEntryDO>, Serializable, B
   }
 
   /**
+   * @see org.projectforge.core.BaseDO#getTenantId()
+   */
+  @Override
+  @Transient
+  public Integer getTenantId()
+  {
+    return tenant != null ? tenant.getId() : null;
+  }
+
+  /**
    * @see org.projectforge.core.BaseDO#setTenant(TenantDO)
    */
   @Override

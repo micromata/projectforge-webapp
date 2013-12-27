@@ -39,6 +39,8 @@ public interface BaseDO<I extends Serializable> extends IdObject<I>
    */
   public TenantDO getTenant();
 
+  public Integer getTenantId();
+
   /**
    * Sets the tenant for multi-tenancy.
    * @return this for chaining.
