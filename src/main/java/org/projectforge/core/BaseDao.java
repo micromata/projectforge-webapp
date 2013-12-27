@@ -68,8 +68,9 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.database.DatabaseDao;
 import org.projectforge.lucene.ClassicAnalyzer;
-import org.projectforge.user.ThreadLocalUserContext;
+import org.projectforge.multitenancy.TenantChecker;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserRight;
 import org.projectforge.user.UserRightId;
@@ -313,7 +314,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       if (obj == null) {
         throw new RuntimeException("Object with id " + id + " not found for class " + clazz);
       }
-      if (hasLoggedInUserSelectAccess(obj, false) == true) {
+      if (TenantChecker.getInstance().isPartOfCurrentTenant(obj) == true && hasLoggedInUserSelectAccess(obj, false) == true) {
         return obj;
       }
     }
@@ -526,7 +527,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   {
     final List<O> result = new ArrayList<O>();
     for (final O obj : origList) {
-      if (hasLoggedInUserSelectAccess(obj, false) == true) {
+      if (TenantChecker.getInstance().isPartOfCurrentTenant(obj) == true && hasLoggedInUserSelectAccess(obj, false) == true) {
         result.add(obj);
         afterLoad(obj);
       }
@@ -641,6 +642,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     if (obj == null) {
       return null;
     }
+    checkPartOfCurrentTenant(obj, OperationType.SELECT);
     checkLoggedInUserSelectAccess(obj);
     return obj;
   }
@@ -665,6 +667,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   public HistoryEntry[] getHistoryEntries(final O obj)
   {
     accessChecker.checkRestrictedUser();
+    checkPartOfCurrentTenant(obj, OperationType.SELECT);
     checkLoggedInUserHistoryAccess(obj);
     return internalGetHistoryEntries(obj);
   }
@@ -841,6 +844,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     if (avoidNullIdCheckBeforeSave == false) {
       Validate.isTrue(obj.getId() == null);
     }
+    checkPartOfCurrentTenant(obj, OperationType.INSERT);
     checkLoggedInUserInsertAccess(obj);
     accessChecker.checkRestrictedOrDemoUser();
     return internalSave(obj);
@@ -1060,6 +1064,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     }
     final O dbObj = getHibernateTemplate().load(clazz, obj.getId(), LockMode.PESSIMISTIC_WRITE);
     if (checkAccess == true) {
+      checkPartOfCurrentTenant(obj, OperationType.UPDATE);
       checkLoggedInUserUpdateAccess(obj, dbObj);
     }
     onChange(obj, dbObj);
@@ -1141,6 +1146,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       throw new RuntimeException(msg);
     }
     final O dbObj = getHibernateTemplate().load(clazz, obj.getId(), LockMode.PESSIMISTIC_WRITE);
+    checkPartOfCurrentTenant(obj, OperationType.DELETE);
     checkLoggedInUserDeleteAccess(obj, dbObj);
     accessChecker.checkRestrictedOrDemoUser();
     internalMarkAsDeleted(obj);
@@ -1189,6 +1195,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     accessChecker.checkRestrictedOrDemoUser();
     onDelete(obj);
     final O dbObj = getHibernateTemplate().load(clazz, obj.getId(), LockMode.PESSIMISTIC_WRITE);
+    checkPartOfCurrentTenant(obj, OperationType.DELETE);
     checkLoggedInUserDeleteAccess(obj, dbObj);
     getHibernateTemplate().delete(dbObj);
     log.info("Object deleted: " + obj.toString());
@@ -1209,6 +1216,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       log.error(msg);
       throw new RuntimeException(msg);
     }
+    checkPartOfCurrentTenant(obj, OperationType.INSERT);
     checkLoggedInUserInsertAccess(obj);
     accessChecker.checkRestrictedOrDemoUser();
     internalUndelete(obj);
@@ -1230,6 +1238,11 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     Search.getFullTextSession(session).flushToIndexes();
     afterSaveOrModify(obj);
     afterUndelete(obj);
+  }
+
+  protected void checkPartOfCurrentTenant(final O obj, final OperationType operationType)
+  {
+    TenantChecker.getInstance().checkPartOfCurrentTenant(obj);
   }
 
   /**
