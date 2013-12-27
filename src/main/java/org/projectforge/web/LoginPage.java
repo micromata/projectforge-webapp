@@ -192,7 +192,7 @@ public class LoginPage extends AbstractUnsecureBasePage
   {
     final UserContext userContext = new UserContext(user);
     ((MySession) page.getSession()).login(userContext, page.getRequest());
-    UserFilter.login(WicketUtils.getHttpServletRequest(page.getRequest()), user);
+    UserFilter.login(WicketUtils.getHttpServletRequest(page.getRequest()), userContext);
   }
 
   /**

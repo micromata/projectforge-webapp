@@ -146,13 +146,10 @@ public class UserFilter implements Filter
     response.addCookie(stayLoggedInCookie); // Refresh cookie.
   }
 
-  public static UserContext login(final HttpServletRequest request, final PFUserDO user)
-  {
-    final UserContext userContext = new UserContext(user);
-    login(request, userContext);
-    return userContext;
-  }
-
+  /**
+   * @param request
+   * @param userContext
+   */
   public static void login(final HttpServletRequest request, final UserContext userContext)
   {
     final HttpSession session = request.getSession();

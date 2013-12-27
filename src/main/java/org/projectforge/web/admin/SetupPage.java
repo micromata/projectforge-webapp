@@ -121,7 +121,8 @@ public class SetupPage extends AbstractUnsecureBasePage
       Configuration.getInstance().setExpired(); // Force reload.
       MenuItemRegistry.instance().refresh();
     }
-    final UserContext userContext =  UserFilter.login(WicketUtils.getHttpServletRequest(getRequest()), adminUser);
+    final UserContext userContext = new UserContext(adminUser);
+    UserFilter.login(WicketUtils.getHttpServletRequest(getRequest()), userContext);
     ((MySession) getSession()).login(userContext, getRequest());
     configurationDao.checkAndUpdateDatabaseEntries();
     if (setupForm.getTimeZone() != null) {
