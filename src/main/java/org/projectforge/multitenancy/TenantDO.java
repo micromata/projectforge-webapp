@@ -43,6 +43,7 @@ import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.DefaultBaseDO;
+import org.projectforge.core.ShortDisplayNameCapable;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
 
@@ -53,7 +54,7 @@ import org.projectforge.user.PFUserDO;
  */
 @Entity
 @Table(name = "T_TENANT")
-public class TenantDO extends DefaultBaseDO
+public class TenantDO extends DefaultBaseDO implements ShortDisplayNameCapable
 {
   private static final long serialVersionUID = -2242576370698028282L;
 
@@ -222,5 +223,15 @@ public class TenantDO extends DefaultBaseDO
   {
     super.setTenant(this);
     return this;
+  }
+
+  /**
+   * @see org.projectforge.core.ShortDisplayNameCapable#getShortDisplayName()
+   */
+  @Override
+  @Transient
+  public String getShortDisplayName()
+  {
+    return name;
   }
 }
