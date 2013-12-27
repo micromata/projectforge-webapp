@@ -23,10 +23,13 @@
 
 package org.projectforge.multitenancy;
 
-import org.projectforge.core.AbstractBaseDO;
+import org.projectforge.access.AccessException;
+import org.projectforge.core.BaseDO;
 import org.projectforge.core.Configuration;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
+import org.projectforge.user.UserContext;
 
 /**
  * 
@@ -54,7 +57,7 @@ public class TenantChecker
    * @param obj
    * @return true if id of tenant is equals to tenant id of the given object, otherwise false.
    */
-  public boolean isPartOfTenant(final TenantDO tenant, final AbstractBaseDO< ? > obj)
+  public boolean isPartOfTenant(final TenantDO tenant, final BaseDO< ? > obj)
   {
     if (tenant == null) {
       return false;
@@ -62,7 +65,7 @@ public class TenantChecker
     return isPartOfTenant(tenant.getId(), obj);
   }
 
-  public boolean isPartOfTenant(final Integer tenantId, final AbstractBaseDO< ? > obj)
+  public boolean isPartOfTenant(final Integer tenantId, final BaseDO< ? > obj)
   {
     if (obj == null) {
       return false;
@@ -71,6 +74,49 @@ public class TenantChecker
       return false;
     }
     return tenantId.equals(obj.getTenantId());
+  }
+
+  /**
+   * Checks only if the current chosen tenant of the logged-in-user fit the tenant of the given object. This means the user's current tenant
+   * is the same tenant the given object is assigned to, or the current tenant is the default tenant and the given object is not assigned to
+   * a tenant.<br/>
+   * If no multi-tenancy is configured, always true is returned.
+   * @param obj
+   * @return
+   */
+  public boolean isPartOfCurrentTenant(final BaseDO< ? > obj)
+  {
+    if (isMultiTenancyAvailable() == false) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    final UserContext userContext = ThreadLocalUserContext.getUserContext();
+    if (userContext == null) {
+      return false;
+    }
+    final TenantDO currentTenant = userContext.getCurrentTenant();
+    if (currentTenant == null) {
+      return false;
+    }
+    if (obj.getTenantId() == null) {
+      // The given object isn't assigned to a tenant, so assuming the default tenant.
+      return currentTenant.isDefaultTenant();
+    }
+    return obj.getTenantId().equals(currentTenant.getId());
+  }
+
+  public void checkPartOfCurrentTenant(final BaseDO< ? > obj)
+  {
+    if (isPartOfCurrentTenant(obj) == false) {
+      final UserContext userContext = ThreadLocalUserContext.getUserContext();
+      final TenantDO currentTenant = userContext.getCurrentTenant();
+      final String currentTenantString = currentTenant != null ? currentTenant.getShortName() : ThreadLocalUserContext.getLocalizedString("multitenancy.defaultTenant");
+      final TenantDO objectTenant = obj.getTenant();
+      final String objectTenantString = objectTenant != null ? objectTenant.getShortName() : ThreadLocalUserContext.getLocalizedString("multitenancy.defaultTenant");
+      throw new AccessException(ThreadLocalUserContext.getUser(), "access.exception.usersCurrentTenantDoesNotMatch", currentTenantString, objectTenantString);
+    }
   }
 
   public boolean isPartOfTenant(final TenantDO tenant, final PFUserDO user)
