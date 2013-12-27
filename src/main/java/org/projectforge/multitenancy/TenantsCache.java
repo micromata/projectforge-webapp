@@ -32,6 +32,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.projectforge.common.AbstractCache;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
 /**
@@ -46,6 +47,10 @@ public class TenantsCache extends AbstractCache
 
   /** The key is the order id. */
   private Collection<TenantDO> tenants;
+
+  public boolean isMultiTenancyAvailable() {
+    return TenantChecker.getInstance().isMultiTenancyAvailable();
+  }
 
   public boolean isEmpty()
   {
@@ -77,6 +82,14 @@ public class TenantsCache extends AbstractCache
   {
     checkRefresh();
     return tenants;
+  }
+
+  /**
+   * @return the tenants
+   */
+  public Collection<TenantDO> getTenantsOfLoggedInUser()
+  {
+    return getTenantsOfUser(ThreadLocalUserContext.getUserId());
   }
 
   /**
@@ -122,9 +135,6 @@ public class TenantsCache extends AbstractCache
     }
     final Collection<PFUserDO> assignedUsers = tenant.getAssignedUsers();
     if (assignedUsers == null) {
-      return false;
-    }
-    if (userId == null) {
       return false;
     }
     for (final PFUserDO assignedUser : assignedUsers) {

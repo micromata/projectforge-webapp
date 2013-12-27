@@ -119,12 +119,22 @@ public class UserContext implements Serializable
   }
 
   /**
-   * @param currentTenant the currentTenant to set
+   * @param tenant the currentTenant to set
    * @return this for chaining.
    */
-  public UserContext setCurrentTenant(final TenantDO currentTenant)
+  public UserContext setCurrentTenant(final TenantDO tenant)
   {
-    this.currentTenant = currentTenant;
+    if (tenant == null) {
+      log.warn("Can't switch to current tenant=null!");
+      return this;
+    }
+    if (tenant.getId() == null) {
+      log.warn("Can't switch to current tenant with id=null!");
+    }
+    if (this.currentTenant != null && tenant.getId().equals(this.currentTenant.getId()) == false) {
+      log.info("User switched the tenant: [" + tenant.getName() + "] (was [" + this.currentTenant.getName() + "]).");
+    }
+    this.currentTenant = tenant;
     return this;
   }
 
