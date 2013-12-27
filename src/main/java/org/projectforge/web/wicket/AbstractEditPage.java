@@ -51,6 +51,7 @@ import org.projectforge.core.BaseDao;
 import org.projectforge.core.DisplayHistoryEntry;
 import org.projectforge.core.ExtendedBaseDO;
 import org.projectforge.core.ModificationStatus;
+import org.projectforge.multitenancy.TenantChecker;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.admin.WizardPage;
 import org.projectforge.web.calendar.DateTimeFormatter;
@@ -126,6 +127,7 @@ AbstractSecuredPage implements IEditPage<O, D>
         if (data == null) {
           data = getBaseDao().newInstance();
         }
+        TenantChecker.getInstance().setCurrentTenant(data);
       }
     }
     form = newEditForm(this, data);
