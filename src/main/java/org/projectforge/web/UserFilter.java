@@ -251,7 +251,7 @@ public class UserFilter implements Filter
         final PFUserDO user = userContext != null ? userContext.getUser() : null;
         if (user != null) {
           MDC.put("user", user.getUsername());
-          ThreadLocalUserContext.setUser(user);
+          ThreadLocalUserContext.setUserContext(userContext);
           request = decorateWithLocale(request);
           chain.doFilter(request, response);
         } else {
@@ -265,7 +265,7 @@ public class UserFilter implements Filter
         }
       }
     } finally {
-      ThreadLocalUserContext.setUser(null);
+      ThreadLocalUserContext.clear();
       MDC.remove("ip");
       MDC.remove("session");
       final PFUserDO user = userContext != null ? userContext.getUser() : null;
