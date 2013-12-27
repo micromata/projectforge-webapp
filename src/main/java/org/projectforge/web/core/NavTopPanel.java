@@ -27,6 +27,7 @@ import java.util.Collection;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.RestartResponseAtInterceptPageException;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -189,6 +190,7 @@ public class NavTopPanel extends NavAbstractPanel
             public void onClick()
             {
               userContext.setCurrentTenant(tenant);
+              throw new RestartResponseAtInterceptPageException(getPage().getPageClass());
             };
           };
           li.add(changeTenantLink);
