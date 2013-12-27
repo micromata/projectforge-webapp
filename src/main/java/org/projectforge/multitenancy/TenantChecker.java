@@ -107,15 +107,37 @@ public class TenantChecker
     return obj.getTenantId().equals(currentTenant.getId());
   }
 
+  /**
+   * Sets the current tenant (of the logged-in user) for the given object. If no current tenant found, the default tenant of the system is
+   * used (if exist). If no such tenant exist, null is set as the object's tenant. <br/>
+   * If no multi-tenancy is configured, nothing is done.
+   * @param obj
+   */
+  public void setCurrentTenant(final BaseDO< ? > obj)
+  {
+    if (isMultiTenancyAvailable() == false) {
+      return;
+    }
+    final UserContext userContext = ThreadLocalUserContext.getUserContext();
+    TenantDO currentTenant = userContext != null ? userContext.getCurrentTenant() : null;
+    if (currentTenant == null) {
+      currentTenant = getTenantsCache().getDefaultTenant();
+    }
+    obj.setTenant(currentTenant);
+  }
+
   public void checkPartOfCurrentTenant(final BaseDO< ? > obj)
   {
     if (isPartOfCurrentTenant(obj) == false) {
       final UserContext userContext = ThreadLocalUserContext.getUserContext();
       final TenantDO currentTenant = userContext.getCurrentTenant();
-      final String currentTenantString = currentTenant != null ? currentTenant.getShortName() : ThreadLocalUserContext.getLocalizedString("multitenancy.defaultTenant");
+      final String currentTenantString = currentTenant != null ? currentTenant.getName() : ThreadLocalUserContext
+          .getLocalizedString("multitenancy.defaultTenant");
       final TenantDO objectTenant = obj.getTenant();
-      final String objectTenantString = objectTenant != null ? objectTenant.getShortName() : ThreadLocalUserContext.getLocalizedString("multitenancy.defaultTenant");
-      throw new AccessException(ThreadLocalUserContext.getUser(), "access.exception.usersCurrentTenantDoesNotMatch", currentTenantString, objectTenantString);
+      final String objectTenantString = objectTenant != null ? objectTenant.getName() : ThreadLocalUserContext
+          .getLocalizedString("multitenancy.defaultTenant");
+      throw new AccessException(ThreadLocalUserContext.getUser(), "access.exception.usersCurrentTenantDoesNotMatch", currentTenantString,
+          objectTenantString);
     }
   }
 

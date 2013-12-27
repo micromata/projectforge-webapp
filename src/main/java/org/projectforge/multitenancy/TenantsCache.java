@@ -53,6 +53,8 @@ public class TenantsCache extends AbstractCache
    */
   private Collection<TenantDO> tenants;
 
+  private TenantDO defaultTenant;
+
   /**
    * Key is the user id and the value is a set of the assigned tenants.
    */
@@ -67,6 +69,15 @@ public class TenantsCache extends AbstractCache
   {
     checkRefresh();
     return CollectionUtils.isEmpty(tenants);
+  }
+
+  /**
+   * @return the defaultTenant
+   */
+  public TenantDO getDefaultTenant()
+  {
+    checkRefresh();
+    return defaultTenant;
   }
 
   public TenantDO getTenant(final Integer id)
@@ -173,7 +184,8 @@ public class TenantsCache extends AbstractCache
   {
     log.info("Initializing TenantsCache ...");
     // This method must not be synchronized because it works with a new copy of maps.
-    final List<TenantDO> list = hibernateTemplate.find("from TenantDO as tenant left join fetch tenant.assignedUsers where tenant.deleted=false");
+    final List<TenantDO> list = hibernateTemplate
+        .find("from TenantDO as tenant left join fetch tenant.assignedUsers where tenant.deleted=false");
     final Map<Integer, Set<TenantDO>> map = new HashMap<Integer, Set<TenantDO>>();
     final Collection<PFUserDO> users = Registry.instance().getUserGroupCache().getAllUsers();
     for (final PFUserDO user : users) {
@@ -197,6 +209,13 @@ public class TenantsCache extends AbstractCache
         }
         if (set.isEmpty() == false) {
           map.put(user.getId(), set);
+        }
+      }
+    }
+    if (list != null) {
+      for (final TenantDO tenant : list) {
+        if (tenant.isDefaultTenant() == true) {
+          this.defaultTenant = tenant;
         }
       }
     }
