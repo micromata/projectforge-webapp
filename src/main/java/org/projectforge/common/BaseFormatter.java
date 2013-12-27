@@ -23,7 +23,7 @@
 
 package org.projectforge.common;
 
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 public class BaseFormatter
 {
@@ -47,11 +47,11 @@ public class BaseFormatter
    * Proxy.
    * @param key
    * @return
-   * @see PFUserContext#getLocalizedString(String)
+   * @see ThreadLocalUserContext#getLocalizedString(String)
    */
   public String getLocalizedString(String key)
   {
-    return PFUserContext.getLocalizedString(key);
+    return ThreadLocalUserContext.getLocalizedString(key);
   }
 
 }

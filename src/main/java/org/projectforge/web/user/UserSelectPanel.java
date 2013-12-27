@@ -38,7 +38,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.common.RecentQueue;
 import org.projectforge.core.BaseSearchFilter;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.CSSColor;
@@ -227,7 +227,7 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO> implements Co
         @Override
         public void onSubmit()
         {
-          caller.select(selectProperty, PFUserContext.getUserId());
+          caller.select(selectProperty, ThreadLocalUserContext.getUserId());
           markTextFieldModelAsChanged();
         }
 
@@ -236,7 +236,7 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO> implements Co
         {
           // Is visible if no user is given or the given user is not the current logged in user.
           final PFUserDO user = UserSelectPanel.this.getModelObject();
-          return showSelectMeButton == true && (user == null || user.getId().equals(PFUserContext.getUser().getId()) == false);
+          return showSelectMeButton == true && (user == null || user.getId().equals(ThreadLocalUserContext.getUser().getId()) == false);
         }
       };
       ((SubmitLink) selectMeLink).setDefaultFormProcessing(defaultFormProcessing);
@@ -245,7 +245,7 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO> implements Co
         @Override
         public void onClick(final AjaxRequestTarget target)
         {
-          UserSelectPanel.this.setModelObject(PFUserContext.getUser());
+          UserSelectPanel.this.setModelObject(ThreadLocalUserContext.getUser());
           markTextFieldModelAsChanged();
           target.add(this, userTextField); // For hiding entry.
         }
@@ -258,7 +258,7 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO> implements Co
         {
           // Is visible if no user is given or the given user is not the current logged in user.
           final PFUserDO user = UserSelectPanel.this.getModelObject();
-          return showSelectMeButton == true && (user == null || user.getId().equals(PFUserContext.getUser().getId()) == false);
+          return showSelectMeButton == true && (user == null || user.getId().equals(ThreadLocalUserContext.getUser().getId()) == false);
         }
       };
       selectMeLink.setOutputMarkupId(true);

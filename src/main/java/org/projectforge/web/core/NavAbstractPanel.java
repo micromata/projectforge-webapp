@@ -34,7 +34,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.FavoritesMenu;
 import org.projectforge.web.Menu;
 import org.projectforge.web.MenuBuilder;
@@ -136,7 +136,7 @@ public abstract class NavAbstractPanel extends Panel
     if (log.isDebugEnabled() == true) {
       log.debug("Build new menu.");
     }
-    menu = MenuBuilder.getInstance().getMenu(PFUserContext.getUser());
+    menu = MenuBuilder.getInstance().getMenu(ThreadLocalUserContext.getUser());
     if (securedPage != null) {
       securedPage.putUserPrefEntry(USER_PREF_MENU_KEY, menu, false);
     }

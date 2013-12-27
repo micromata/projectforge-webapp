@@ -42,7 +42,7 @@ import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.plugins.core.PluginsRegistry;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.storage.StorageClient;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -170,11 +170,11 @@ public class ProjectForgeApp
     final boolean missingDatabaseSchema = initDatabaseDao.isEmpty();
     if (missingDatabaseSchema == true) {
       try {
-        PFUserContext.setUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser());
+        ThreadLocalUserContext.setUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser());
         final UpdateEntry updateEntry = DatabaseCoreInitial.getInitializationUpdateEntry(myDatabaseUpdater);
         updateEntry.runUpdate();
       } finally {
-        PFUserContext.setUser(null);
+        ThreadLocalUserContext.setUser(null);
       }
     }
 
@@ -186,7 +186,7 @@ public class ProjectForgeApp
     pluginsRegistry.initialize();
     if (missingDatabaseSchema == true) {
       try {
-        PFUserContext.setUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser()); // Logon admin user.
+        ThreadLocalUserContext.setUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser()); // Logon admin user.
         for (final AbstractPlugin plugin : pluginsRegistry.getPlugins()) {
           final UpdateEntry updateEntry = plugin.getInitializationUpdateEntry();
           if (updateEntry != null) {
@@ -194,7 +194,7 @@ public class ProjectForgeApp
           }
         }
       } finally {
-        PFUserContext.setUser(null);
+        ThreadLocalUserContext.setUser(null);
       }
     }
     UserXmlPreferencesCache.setInternalInstance(userXmlPreferencesCache);
@@ -212,10 +212,10 @@ public class ProjectForgeApp
     userXmlPreferencesCache.forceReload();
     cronSetup.shutdown();
     try {
-      PFUserContext.setUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser());
+      ThreadLocalUserContext.setUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser());
       myDatabaseUpdater.getDatabaseUpdateDao().shutdownDatabase();
     } finally {
-      PFUserContext.setUser(null);
+      ThreadLocalUserContext.setUser(null);
     }
     log.info("Shutdown completed.");
   }

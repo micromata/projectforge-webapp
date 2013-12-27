@@ -34,7 +34,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.projectforge.core.I18nEnum;
 import org.projectforge.core.PropUtils;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.calendar.DateTimeFormatter;
 
 /**
@@ -113,7 +113,7 @@ public class CellItemListenerPropertyColumn<T> extends PropertyColumn<T, String>
     if (object == null) {
       item.add(new Label(componentId, propertyModel).setRenderBodyOnly(true));
     } else if (object instanceof I18nEnum) {
-      item.add(new Label(componentId, PFUserContext.getLocalizedString(((I18nEnum) object).getI18nKey())).setRenderBodyOnly(true));
+      item.add(new Label(componentId, ThreadLocalUserContext.getLocalizedString(((I18nEnum) object).getI18nKey())).setRenderBodyOnly(true));
     } else if (object instanceof java.sql.Date) {
       item.add(new Label(componentId, DateTimeFormatter.instance().getFormattedDate(object)).setRenderBodyOnly(true));
     } else if (object instanceof Date) {

@@ -40,7 +40,7 @@ import org.jfree.data.time.TimeSeriesCollection;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.charting.XYChartBuilder;
 import org.projectforge.scripting.I18n;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -63,7 +63,7 @@ public class LiquidityChartBuilder
 
     final TimeSeries accumulatedSeries = new TimeSeries(I18n.getString("plugins.liquidityplanning.forecast.dueDate"));
     final TimeSeries accumulatedSeriesExpected = new TimeSeries(
-        PFUserContext.getLocalizedString("plugins.liquidityplanning.forecast.expected"));
+        ThreadLocalUserContext.getLocalizedString("plugins.liquidityplanning.forecast.expected"));
     final TimeSeries worstCaseSeries = new TimeSeries(I18n.getString("plugins.liquidityplanning.forecast.worstCase"));
     double accumulatedExpected = settings.getStartAmount().doubleValue();
     double accumulated = accumulatedExpected;

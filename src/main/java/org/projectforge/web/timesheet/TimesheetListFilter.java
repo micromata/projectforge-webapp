@@ -26,7 +26,7 @@ package org.projectforge.web.timesheet;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
 import org.projectforge.timesheet.TimesheetFilter;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 /**
  */
@@ -38,7 +38,7 @@ public class TimesheetListFilter extends TimesheetFilter
   public TimesheetListFilter reset()
   {
     super.reset();
-    setUserId(PFUserContext.getUserId());
+    setUserId(ThreadLocalUserContext.getUserId());
     final DateHolder date = new DateHolder(DatePrecision.DAY);
     date.setBeginOfWeek();
     setStartTime(date.getTimestamp());

@@ -62,7 +62,7 @@ import org.projectforge.registry.Registry;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.timesheet.TimesheetFilter;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserDao;
@@ -133,7 +133,7 @@ public class CalendarFeed extends HttpServlet
    */
   public static String getUrl(final String additionalParams)
   {
-    final PFUserDO user = PFUserContext.getUser();
+    final PFUserDO user = ThreadLocalUserContext.getUser();
     final UserDao userDao = Registry.instance().getDao(UserDao.class);
     final String authenticationKey = userDao.getAuthenticationToken(user.getId());
     final StringBuffer buf = new StringBuffer();
@@ -176,7 +176,7 @@ public class CalendarFeed extends HttpServlet
         log.error("Bad request, user not found: " + req.getQueryString());
         return;
       }
-      PFUserContext.setUser(user);
+      ThreadLocalUserContext.setUser(user);
       MDC.put("user", user.getUsername());
       final String decryptedParams = registry.getDao(UserDao.class).decrypt(userId, encryptedParams);
       if (decryptedParams == null) {
@@ -212,7 +212,7 @@ public class CalendarFeed extends HttpServlet
       }
     } finally {
       log.info("Finished request: " + logMessage);
-      PFUserContext.setUser(null);
+      ThreadLocalUserContext.setUser(null);
       MDC.remove("ip");
       MDC.remove("session");
       if (user != null) {
@@ -254,7 +254,7 @@ public class CalendarFeed extends HttpServlet
     }
     // creating a new calendar
     final Calendar calendar = new Calendar();
-    final Locale locale = PFUserContext.getLocale();
+    final Locale locale = ThreadLocalUserContext.getLocale();
     calendar.getProperties().add(
         new ProdId("-//" + loggedInUser.getDisplayUsername() + "//ProjectForge//" + locale.toString().toUpperCase()));
     calendar.getProperties().add(Version.VERSION_2_0);
@@ -277,13 +277,13 @@ public class CalendarFeed extends HttpServlet
    */
   private List<VEvent> getEvents(final Map<String, String> params, PFUserDO timesheetUser)
   {
-    final PFUserDO loggedInUser = PFUserContext.getUser();
+    final PFUserDO loggedInUser = ThreadLocalUserContext.getUser();
     if (loggedInUser == null) {
       throw new AccessException("No logged-in-user found!");
     }
     final List<VEvent> events = new ArrayList<VEvent>();
     final TimeZone timezone = ICal4JUtils.getUserTimeZone();
-    final java.util.Calendar cal = java.util.Calendar.getInstance(PFUserContext.getTimeZone());
+    final java.util.Calendar cal = java.util.Calendar.getInstance(ThreadLocalUserContext.getTimeZone());
 
     boolean eventsExist = false;
     for (final CalendarFeedHook hook : feedHooks) {
@@ -339,7 +339,7 @@ public class CalendarFeed extends HttpServlet
     final String holidays = params.get(PARAM_NAME_HOLIDAYS);
     if ("true".equals(holidays) == true) {
       final HolidayEventsProvider holidaysEventsProvider = new HolidayEventsProvider();
-      DateTime holidaysFrom = new DateTime(PFUserContext.getDateTimeZone());
+      DateTime holidaysFrom = new DateTime(ThreadLocalUserContext.getDateTimeZone());
       holidaysFrom = holidaysFrom.dayOfYear().withMinimumValue().millisOfDay().withMinimumValue().minusYears(2);
       final DateTime holidayTo = holidaysFrom.plusYears(6);
       for (final Event event : holidaysEventsProvider.getEvents(holidaysFrom, holidayTo)) {
@@ -361,7 +361,7 @@ public class CalendarFeed extends HttpServlet
         final VEvent vEvent = ICal4JUtils.createVEvent(current.getDate(), current.getDate(), "pf-weekOfYear"
             + current.getYear()
             + "-"
-            + paranoiaCounter, PFUserContext.getLocalizedString("calendar.weekOfYearShortLabel") + " " + current.getWeekOfYear(), true);
+            + paranoiaCounter, ThreadLocalUserContext.getLocalizedString("calendar.weekOfYearShortLabel") + " " + current.getWeekOfYear(), true);
         events.add(vEvent);
         current.add(java.util.Calendar.WEEK_OF_YEAR, 1);
         if (++paranoiaCounter > 500) {

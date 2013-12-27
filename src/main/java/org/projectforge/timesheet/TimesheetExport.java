@@ -46,7 +46,7 @@ import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.calendar.DateTimeFormatter;
@@ -125,7 +125,7 @@ public class TimesheetExport
     // create a default Date format and currency column
     xls.setContentProvider(contentProvider);
 
-    final String sheetTitle = PFUserContext.getLocalizedString("timesheet.timesheets");
+    final String sheetTitle = ThreadLocalUserContext.getLocalizedString("timesheet.timesheets");
     final ExportSheet sheet = xls.addSheet(sheetTitle);
     sheet.createFreezePane(8, 1);
 

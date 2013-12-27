@@ -43,7 +43,7 @@ import org.projectforge.excel.ExportConfig;
 import org.projectforge.excel.ExportSheet;
 import org.projectforge.excel.ExportWorkbook;
 import org.projectforge.test.TestConfiguration;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 
 public class ExportWorkbookTest
@@ -76,7 +76,7 @@ public class ExportWorkbookTest
     user.setLocale(locale);
     user.setExcelDateFormat(excelDateFormat);
     try {
-      PFUserContext.setUser(user);
+      ThreadLocalUserContext.setUser(user);
 
       ExportConfig.setInstance(new ExportConfig() {
         @Override
@@ -106,7 +106,7 @@ public class ExportWorkbookTest
       log.info("Writing Excel test sheet to work directory: " + file.getAbsolutePath());
       workbook.write(new FileOutputStream(file));
     } finally {
-      PFUserContext.setUser(null);
+      ThreadLocalUserContext.setUser(null);
     }
   }
 

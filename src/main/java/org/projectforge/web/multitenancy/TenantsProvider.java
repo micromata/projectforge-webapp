@@ -36,7 +36,7 @@ import org.projectforge.multitenancy.TenantDao;
 import org.projectforge.multitenancy.TenantsCache;
 import org.projectforge.multitenancy.TenantsComparator;
 import org.projectforge.registry.Registry;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 
 import com.vaynberg.wicket.select2.Response;
@@ -120,7 +120,7 @@ public class TenantsProvider extends TextChoiceProvider<TenantDO>
     if (sortedTenants == null) {
       final Collection<TenantDO> allTenants = getTenantsCache().getTenants();
       sortedTenants = new TreeSet<TenantDO>(tenantsComparator);
-      final PFUserDO loggedInUser = PFUserContext.getUser();
+      final PFUserDO loggedInUser = ThreadLocalUserContext.getUser();
       if (allTenants != null) {
         for (final TenantDO tenant : allTenants) {
           if (tenant.isDeleted() == false && getTenantDao().hasSelectAccess(loggedInUser, tenant, false) == true) {

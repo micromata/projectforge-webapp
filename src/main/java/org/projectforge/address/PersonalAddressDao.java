@@ -36,7 +36,7 @@ import org.projectforge.access.AccessChecker;
 import org.projectforge.access.AccessException;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.ModificationStatus;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -96,7 +96,7 @@ public class PersonalAddressDao extends HibernateDaoSupport
     Validate.notNull(obj);
     Validate.notNull(obj.getOwnerId());
     Validate.notNull(obj.getAddressId());
-    final PFUserDO owner = PFUserContext.getUser();
+    final PFUserDO owner = ThreadLocalUserContext.getUser();
     if (owner == null || owner.getId().equals(obj.getOwnerId()) == false) {
       throw new AccessException("address.accessException.userIsNotOwnerOfPersonalAddress");
     }
@@ -162,7 +162,7 @@ public class PersonalAddressDao extends HibernateDaoSupport
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public PersonalAddressDO getByAddressId(final Integer addressId)
   {
-    final PFUserDO owner = PFUserContext.getUser();
+    final PFUserDO owner = ThreadLocalUserContext.getUser();
     Validate.notNull(owner);
     Validate.notNull(owner.getId());
     final List<PersonalAddressDO> list = getHibernateTemplate().find(
@@ -190,7 +190,7 @@ public class PersonalAddressDao extends HibernateDaoSupport
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public List<PersonalAddressDO> getList()
   {
-    final PFUserDO owner = PFUserContext.getUser();
+    final PFUserDO owner = ThreadLocalUserContext.getUser();
     Validate.notNull(owner);
     Validate.notNull(owner.getId());
     @SuppressWarnings("unchecked")
@@ -210,7 +210,7 @@ public class PersonalAddressDao extends HibernateDaoSupport
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public Map<Integer, PersonalAddressDO> getPersonalAddressByAddressId()
   {
-    final PFUserDO owner = PFUserContext.getUser();
+    final PFUserDO owner = ThreadLocalUserContext.getUser();
     Validate.notNull(owner);
     Validate.notNull(owner.getId());
     final List<PersonalAddressDO> list = getHibernateTemplate().find(
@@ -232,7 +232,7 @@ public class PersonalAddressDao extends HibernateDaoSupport
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public List<AddressDO> getMyAddresses()
   {
-    final PFUserDO owner = PFUserContext.getUser();
+    final PFUserDO owner = ThreadLocalUserContext.getUser();
     Validate.notNull(owner);
     Validate.notNull(owner.getId());
     final List<PersonalAddressDO> list = getHibernateTemplate().find(

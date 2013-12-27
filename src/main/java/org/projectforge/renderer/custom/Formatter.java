@@ -33,7 +33,7 @@ import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetFilter;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 /**
  * @author Sebastian Hardt (s.hardt@micromata.de) This Interface is for the different output Formatters for the PDF exporter.
@@ -58,6 +58,6 @@ public abstract class Formatter
 
   public String getLocalizedString(final String key)
   {
-    return PFUserContext.getLocalizedString(key);
+    return ThreadLocalUserContext.getLocalizedString(key);
   }
 }

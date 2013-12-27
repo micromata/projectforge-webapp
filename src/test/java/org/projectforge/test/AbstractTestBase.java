@@ -53,7 +53,7 @@ import org.projectforge.task.TaskDO;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.Login;
 import org.projectforge.user.LoginDefaultHandler;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserDao;
@@ -197,7 +197,7 @@ public class AbstractTestBase
   @SuppressWarnings({ "unchecked", "rawtypes"})
   protected static void clearDatabase()
   {
-    PFUserContext.setUser(ADMIN_USER); // Logon admin user.
+    ThreadLocalUserContext.setUser(ADMIN_USER); // Logon admin user.
     final TransactionTemplate transactionTemplate = testConfiguration.getBean("txTemplate", TransactionTemplate.class);
     final HibernateTemplate hibernateTemplate = testConfiguration.getBean("hibernate", HibernateTemplate.class);
     transactionTemplate.execute(new TransactionCallback() {
@@ -291,18 +291,18 @@ public class AbstractTestBase
     if (user == null) {
       fail("User not found: " + username);
     }
-    PFUserContext.setUser(user);
+    ThreadLocalUserContext.setUser(user);
     return user;
   }
 
   public void logon(final PFUserDO user)
   {
-    PFUserContext.setUser(user);
+    ThreadLocalUserContext.setUser(user);
   }
 
   protected void logoff()
   {
-    PFUserContext.setUser(null);
+    ThreadLocalUserContext.setUser(null);
   }
 
   /**

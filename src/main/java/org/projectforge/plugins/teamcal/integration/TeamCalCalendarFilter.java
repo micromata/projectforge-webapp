@@ -30,7 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.calendar.AbstractCalendarFilter;
 
 /**
@@ -277,8 +277,8 @@ public class TeamCalCalendarFilter extends AbstractCalendarFilter
   private void createDefaultEntry()
   {
     final TemplateEntry newTemplate = new TemplateEntry();
-    newTemplate.setName(PFUserContext.getLocalizedString("default"));
-    newTemplate.setTimesheetUserId(PFUserContext.getUserId()).setShowBirthdays(true).setShowBreaks(true).setShowPlanning(true)
+    newTemplate.setName(ThreadLocalUserContext.getLocalizedString("default"));
+    newTemplate.setTimesheetUserId(ThreadLocalUserContext.getUserId()).setShowBirthdays(true).setShowBreaks(true).setShowPlanning(true)
     .setShowStatistics(true);
     add(newTemplate);
   }

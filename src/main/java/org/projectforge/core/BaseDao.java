@@ -68,7 +68,7 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.database.DatabaseDao;
 import org.projectforge.lucene.ClassicAnalyzer;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserRight;
@@ -1238,7 +1238,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    */
   protected final void checkLoggedInUserSelectAccess() throws AccessException
   {
-    if (hasSelectAccess(PFUserContext.getUser(), true) == false) {
+    if (hasSelectAccess(ThreadLocalUserContext.getUser(), true) == false) {
       // Should not occur!
       log.error("Development error: Subclass should throw an exception instead of returning false.");
       throw new UserException(UserException.I18N_KEY_PLEASE_CONTACT_DEVELOPER_TEAM);
@@ -1247,7 +1247,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
 
   protected final void checkLoggedInUserSelectAccess(final O obj) throws AccessException
   {
-    if (hasSelectAccess(PFUserContext.getUser(), obj, true) == false) {
+    if (hasSelectAccess(ThreadLocalUserContext.getUser(), obj, true) == false) {
       // Should not occur!
       log.error("Development error: Subclass should throw an exception instead of returning false.");
       throw new UserException(UserException.I18N_KEY_PLEASE_CONTACT_DEVELOPER_TEAM);
@@ -1256,7 +1256,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
 
   protected final void checkLoggedInUserHistoryAccess(final O obj) throws AccessException
   {
-    if (hasHistoryAccess(PFUserContext.getUser(), true) == false || hasLoggedInUserHistoryAccess(obj, true) == false) {
+    if (hasHistoryAccess(ThreadLocalUserContext.getUser(), true) == false || hasLoggedInUserHistoryAccess(obj, true) == false) {
       // Should not occur!
       log.error("Development error: Subclass should throw an exception instead of returning false.");
       throw new UserException(UserException.I18N_KEY_PLEASE_CONTACT_DEVELOPER_TEAM);
@@ -1265,7 +1265,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
 
   protected final void checkLoggedInUserInsertAccess(final O obj) throws AccessException
   {
-    checkInsertAccess(PFUserContext.getUser(), obj);
+    checkInsertAccess(ThreadLocalUserContext.getUser(), obj);
   }
 
   protected void checkInsertAccess(final PFUserDO user, final O obj) throws AccessException
@@ -1284,7 +1284,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    */
   protected final void checkLoggedInUserUpdateAccess(final O obj, final O dbObj) throws AccessException
   {
-    checkUpdateAccess(PFUserContext.getUser(), obj, dbObj);
+    checkUpdateAccess(ThreadLocalUserContext.getUser(), obj, dbObj);
   }
 
   /**
@@ -1317,7 +1317,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    */
   public final boolean hasLoggedInUserSelectAccess(final boolean throwException)
   {
-    return hasSelectAccess(PFUserContext.getUser(), throwException);
+    return hasSelectAccess(ThreadLocalUserContext.getUser(), throwException);
   }
 
   /**
@@ -1340,7 +1340,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    */
   public final boolean hasLoggedInUserAccess(final O obj, final O oldObj, final OperationType operationType, final boolean throwException)
   {
-    return hasAccess(PFUserContext.getUser(), obj, oldObj, operationType, throwException);
+    return hasAccess(ThreadLocalUserContext.getUser(), obj, oldObj, operationType, throwException);
   }
 
   /**
@@ -1368,7 +1368,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    */
   public final boolean hasLoggedInUserSelectAccess(final O obj, final boolean throwException)
   {
-    return hasSelectAccess(PFUserContext.getUser(), obj, throwException);
+    return hasSelectAccess(ThreadLocalUserContext.getUser(), obj, throwException);
   }
 
   /**
@@ -1390,7 +1390,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    */
   public final boolean hasLoggedInUserHistoryAccess(final O obj, final boolean throwException)
   {
-    return hasHistoryAccess(PFUserContext.getUser(), obj, throwException);
+    return hasHistoryAccess(ThreadLocalUserContext.getUser(), obj, throwException);
   }
 
   /**
@@ -1415,7 +1415,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    */
   public final boolean hasLoggedInUserHistoryAccess(final boolean throwException)
   {
-    return hasHistoryAccess(PFUserContext.getUser(), throwException);
+    return hasHistoryAccess(ThreadLocalUserContext.getUser(), throwException);
   }
 
   /**
@@ -1438,7 +1438,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    */
   public final boolean hasLoggedInUserInsertAccess(final O obj, final boolean throwException)
   {
-    return hasInsertAccess(PFUserContext.getUser(), obj, throwException);
+    return hasInsertAccess(ThreadLocalUserContext.getUser(), obj, throwException);
   }
 
   /**
@@ -1460,7 +1460,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    */
   public final boolean hasLoggedInUserInsertAccess()
   {
-    return hasInsertAccess(PFUserContext.getUser());
+    return hasInsertAccess(ThreadLocalUserContext.getUser());
   }
 
   /**
@@ -1486,7 +1486,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    */
   public final boolean hasLoggedInUserUpdateAccess(final O obj, final O dbObj, final boolean throwException)
   {
-    return hasUpdateAccess(PFUserContext.getUser(), obj, dbObj, throwException);
+    return hasUpdateAccess(ThreadLocalUserContext.getUser(), obj, dbObj, throwException);
   }
 
   /**
@@ -1510,7 +1510,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    */
   public final boolean hasLoggedInUserDeleteAccess(final O obj, final O dbObj, final boolean throwException)
   {
-    return hasDeleteAccess(PFUserContext.getUser(), obj, dbObj, throwException);
+    return hasDeleteAccess(ThreadLocalUserContext.getUser(), obj, dbObj, throwException);
   }
 
   /**
@@ -1551,7 +1551,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       final Object oldValue, final Object newValue)
   {
     accessChecker.checkRestrictedOrDemoUser();
-    final PFUserDO contextUser = PFUserContext.getUser();
+    final PFUserDO contextUser = ThreadLocalUserContext.getUser();
     final String userPk = contextUser != null ? contextUser.getId().toString() : null;
     if (userPk == null) {
       log.warn("No user found for creating history entry.");

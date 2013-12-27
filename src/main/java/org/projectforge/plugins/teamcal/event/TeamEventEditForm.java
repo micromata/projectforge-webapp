@@ -47,7 +47,7 @@ import org.projectforge.common.DatePrecision;
 import org.projectforge.common.RecurrenceFrequency;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.wicket.AbstractEditForm;
@@ -138,7 +138,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     super.init();
 
     final Recur recur = data.getRecurrenceObject();
-    recurrenceData = new TeamEventRecurrenceData(recur, PFUserContext.getTimeZone());
+    recurrenceData = new TeamEventRecurrenceData(recur, ThreadLocalUserContext.getTimeZone());
     gridBuilder.newSplitPanel(GridSize.COL50);
     final TeamCalDO teamCal = data.getCalendar();
     // setting access view

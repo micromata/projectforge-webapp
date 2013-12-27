@@ -39,7 +39,7 @@ import org.projectforge.core.InternalErrorException;
 import org.projectforge.core.ProjectForgeException;
 import org.projectforge.core.SendFeedback;
 import org.projectforge.core.UserException;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 /**
  * Standard error page should be shown in production mode.
@@ -143,7 +143,7 @@ public class ErrorPage extends AbstractSecuredPage
     form.data.setMessageNumber(messageNumber);
     form.data.setMessage(throwable != null ? throwable.getMessage() : "");
     form.data.setStackTrace(throwable != null ? ExceptionHelper.printStackTrace(throwable) : "");
-    form.data.setSender(PFUserContext.getUser().getFullname());
+    form.data.setSender(ThreadLocalUserContext.getUser().getFullname());
     final String subject = "ProjectForge-Error #" + form.data.getMessageNumber() + " from " + form.data.getSender();
     form.data.setSubject(subject);
     if (rootCause != null) {

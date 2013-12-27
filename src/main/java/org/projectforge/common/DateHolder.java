@@ -33,7 +33,7 @@ import java.util.TimeZone;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.projectforge.calendar.DayHolder;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 /**
  * Parse and formats dates.
@@ -434,7 +434,7 @@ public class DateHolder implements Serializable, Cloneable, Comparable<DateHolde
 
   private static int getFirstDayOfWeek()
   {
-    return PFUserContext.getCalendarFirstDayOfWeek();
+    return ThreadLocalUserContext.getCalendarFirstDayOfWeek();
   }
 
   /**

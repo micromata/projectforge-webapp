@@ -32,7 +32,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.wicket.WebConstants;
@@ -111,7 +111,7 @@ public class TimeZonePanel extends Panel
     };
     textField.withMatchContains(true).withMinChars(2);
     // Cant't use getString(i18nKey) because we're in the constructor and this would result in a Wicket warning.
-    final String tooltip = PFUserContext.getLocalizedString("tooltip.autocomplete.timeZone");
+    final String tooltip = ThreadLocalUserContext.getLocalizedString("tooltip.autocomplete.timeZone");
     WicketUtils.addTooltip(textField, tooltip);
     add(textField);
     add(new TooltipImage("autocompleteDblClickHelpImage", WebConstants.IMAGE_HELP_KEYBOARD, tooltip));

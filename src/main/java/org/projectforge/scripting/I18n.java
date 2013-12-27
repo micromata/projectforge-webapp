@@ -23,7 +23,7 @@
 
 package org.projectforge.scripting;
 
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 /**
  * Helper for i18n.
@@ -34,7 +34,7 @@ public class I18n
 {
   public static String getString(final String key)
   {
-    return PFUserContext.getLocalizedString(key);
+    return ThreadLocalUserContext.getLocalizedString(key);
   }
 
   public String get(final String key)
@@ -44,6 +44,6 @@ public class I18n
 
   public String get(final String messageKey, final Object... params)
   {
-    return PFUserContext.getLocalizedMessage(messageKey, params);
+    return ThreadLocalUserContext.getLocalizedMessage(messageKey, params);
   }
 }

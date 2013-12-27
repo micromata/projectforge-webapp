@@ -37,7 +37,7 @@ import org.apache.commons.lang.Validate;
 import org.projectforge.plugins.teamcal.admin.TeamCalCache;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.dialog.TeamCalFilterDialog;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.timesheet.TimesheetEventsProvider;
 
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -441,7 +441,7 @@ public class TemplateEntry implements Serializable, Comparable<TemplateEntry>, C
    */
   public TemplateEntry setShowTimesheets(final boolean showTimesheets)
   {
-    this.timesheetUserId = PFUserContext.getUserId();
+    this.timesheetUserId = ThreadLocalUserContext.getUserId();
     return this;
   }
 

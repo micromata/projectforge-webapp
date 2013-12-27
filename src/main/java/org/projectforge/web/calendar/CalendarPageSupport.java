@@ -31,7 +31,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.core.Configuration;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRights;
 import org.projectforge.web.fibu.ISelectCallerPage;
@@ -55,7 +55,7 @@ public class CalendarPageSupport implements Serializable
   public CalendarPageSupport(final ISelectCallerPage parentPage)
   {
     this.parentPage = parentPage;
-    this.user = PFUserContext.getUser();
+    this.user = ThreadLocalUserContext.getUser();
   }
 
   public UserSelectPanel addUserSelectPanel(final FieldsetPanel fieldset, final IModel<PFUserDO> model, final boolean autosubmit)

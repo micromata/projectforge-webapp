@@ -51,7 +51,7 @@ import org.projectforge.fibu.ProjektFormatter;
 import org.projectforge.fibu.RechnungDO;
 import org.projectforge.fibu.RechnungsPositionDO;
 import org.projectforge.registry.Registry;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 /**
  * For excel export.
@@ -248,7 +248,7 @@ public class KostZuweisungExport
 
   private void addAccounts(final ExportWorkbook xls, final ContentProvider contentProvider)
   {
-    final ExportSheet sheet = xls.addSheet(PFUserContext.getLocalizedString("fibu.konto.konten"));
+    final ExportSheet sheet = xls.addSheet(ThreadLocalUserContext.getLocalizedString("fibu.konto.konten"));
     sheet.createFreezePane(0, 1);
 
     final ExportColumn[] cols = new ExportColumn[AccountsCol.values().length];
@@ -278,9 +278,9 @@ public class KostZuweisungExport
       mapping.add(AccountsCol.DATE_OF_CREATION, konto.getCreated());
       String status = "";
       if (konto.isDeleted() == true) {
-        status = PFUserContext.getLocalizedString("deleted");
+        status = ThreadLocalUserContext.getLocalizedString("deleted");
       } else if (konto.getStatus() != null) {
-        status = PFUserContext.getLocalizedString(konto.getStatus().getI18nKey());
+        status = ThreadLocalUserContext.getLocalizedString(konto.getStatus().getI18nKey());
       }
       mapping.add(AccountsCol.STATUS, status);
       mapping.add(AccountsCol.DESCRIPTION, konto.getDescription());

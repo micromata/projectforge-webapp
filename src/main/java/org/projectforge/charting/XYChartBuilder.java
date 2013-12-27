@@ -42,7 +42,7 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.general.Series;
 import org.jfree.data.time.DateRange;
 import org.jfree.data.xy.XYDataset;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 /**
  * Builder class for building JFree charts.
@@ -107,7 +107,7 @@ public class XYChartBuilder
   {
     final NumberAxis yAxis;
     if (showAxisValues == true && valueAxisUnitKey != null) {
-      yAxis = new NumberAxis(PFUserContext.getLocalizedString(valueAxisUnitKey));
+      yAxis = new NumberAxis(ThreadLocalUserContext.getLocalizedString(valueAxisUnitKey));
     } else {
       yAxis = new NumberAxis();
     }

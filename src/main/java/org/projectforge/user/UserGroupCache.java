@@ -191,7 +191,7 @@ public class UserGroupCache extends AbstractCache
    */
   public boolean isLoggedInUserMemberOfGroup(final Integer groupId)
   {
-    return isUserMemberOfGroup(PFUserContext.getUserId(), groupId);
+    return isUserMemberOfGroup(ThreadLocalUserContext.getUserId(), groupId);
   }
 
   /**
@@ -239,7 +239,7 @@ public class UserGroupCache extends AbstractCache
 
   public boolean isUserMemberOfAdminGroup()
   {
-    return isUserMemberOfAdminGroup(PFUserContext.getUserId());
+    return isUserMemberOfAdminGroup(ThreadLocalUserContext.getUserId());
   }
 
   public boolean isUserMemberOfAdminGroup(final Integer userId)
@@ -251,7 +251,7 @@ public class UserGroupCache extends AbstractCache
 
   public boolean isUserMemberOfFinanceGroup()
   {
-    return isUserMemberOfFinanceGroup(PFUserContext.getUserId());
+    return isUserMemberOfFinanceGroup(ThreadLocalUserContext.getUserId());
   }
 
   public boolean isUserMemberOfFinanceGroup(final Integer userId)
@@ -263,7 +263,7 @@ public class UserGroupCache extends AbstractCache
 
   public boolean isUserMemberOfProjectManagers()
   {
-    return isUserMemberOfProjectManagers(PFUserContext.getUserId());
+    return isUserMemberOfProjectManagers(ThreadLocalUserContext.getUserId());
   }
 
   public boolean isUserMemberOfProjectManagers(final Integer userId)
@@ -275,7 +275,7 @@ public class UserGroupCache extends AbstractCache
 
   public boolean isUserMemberOfProjectAssistant()
   {
-    return isUserMemberOfProjectAssistant(PFUserContext.getUserId());
+    return isUserMemberOfProjectAssistant(ThreadLocalUserContext.getUserId());
   }
 
   public boolean isUserMemberOfProjectAssistant(final Integer userId)
@@ -290,7 +290,7 @@ public class UserGroupCache extends AbstractCache
     if (projekt == null || projekt.getProjektManagerGroupId() == null) {
       return false;
     }
-    final Integer userId = PFUserContext.getUserId();
+    final Integer userId = ThreadLocalUserContext.getUserId();
     if (isUserMemberOfProjectAssistant(userId) == false && isUserMemberOfProjectManagers(userId) == false) {
       return false;
     }
@@ -299,7 +299,7 @@ public class UserGroupCache extends AbstractCache
 
   public boolean isUserMemberOfControllingGroup()
   {
-    return isUserMemberOfControllingGroup(PFUserContext.getUserId());
+    return isUserMemberOfControllingGroup(ThreadLocalUserContext.getUserId());
   }
 
   public boolean isUserMemberOfControllingGroup(final Integer userId)
@@ -311,7 +311,7 @@ public class UserGroupCache extends AbstractCache
 
   public boolean isUserMemberOfMarketingGroup()
   {
-    return isUserMemberOfMarketingGroup(PFUserContext.getUserId());
+    return isUserMemberOfMarketingGroup(ThreadLocalUserContext.getUserId());
   }
 
   public boolean isUserMemberOfMarketingGroup(final Integer userId)
@@ -322,7 +322,7 @@ public class UserGroupCache extends AbstractCache
 
   public boolean isUserMemberOfOrgaGroup()
   {
-    return isUserMemberOfOrgaGroup(PFUserContext.getUserId());
+    return isUserMemberOfOrgaGroup(ThreadLocalUserContext.getUserId());
   }
 
   public boolean isUserMemberOfOrgaGroup(final Integer userId)

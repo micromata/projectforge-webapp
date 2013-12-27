@@ -44,7 +44,7 @@ import org.projectforge.common.RecurrenceFrequency;
 import org.projectforge.plugins.teamcal.admin.TeamCalRight;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFilter;
 import org.projectforge.plugins.teamcal.integration.TemplateEntry;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.calendar.MyEvent;
 import org.projectforge.web.calendar.MyFullCalendarEventsProvider;
@@ -111,7 +111,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
     eventFilter.setTeamCals(visibleCalendars);
     eventFilter.setStartDate(start.toDate());
     eventFilter.setEndDate(end.toDate());
-    eventFilter.setUser(PFUserContext.getUser());
+    eventFilter.setUser(ThreadLocalUserContext.getUser());
     final List<TeamEvent> teamEvents = teamEventDao.getEventList(eventFilter, true);
 
     boolean longFormat = false;
@@ -122,12 +122,12 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
     }
 
     final TeamCalRight right = new TeamCalRight();
-    final PFUserDO user = PFUserContext.getUser();
-    final TimeZone timeZone = PFUserContext.getTimeZone();
+    final PFUserDO user = ThreadLocalUserContext.getUser();
+    final TimeZone timeZone = ThreadLocalUserContext.getTimeZone();
     if (CollectionUtils.isNotEmpty(teamEvents) == true) {
       for (final TeamEvent teamEvent : teamEvents) {
-        final DateTime startDate = new DateTime(teamEvent.getStartDate(), PFUserContext.getDateTimeZone());
-        final DateTime endDate = new DateTime(teamEvent.getEndDate(), PFUserContext.getDateTimeZone());
+        final DateTime startDate = new DateTime(teamEvent.getStartDate(), ThreadLocalUserContext.getDateTimeZone());
+        final DateTime endDate = new DateTime(teamEvent.getEndDate(), ThreadLocalUserContext.getDateTimeZone());
         final TeamEventDO eventDO;
         final TeamCalEventId id = new TeamCalEventId(teamEvent, timeZone);
         if (teamEvent instanceof TeamEventDO) {
@@ -141,7 +141,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
         event.setId("" + id);
         event.setColor(activeTemplateEntry.getColorCode(eventDO.getCalendarId()));
 
-        if (eventRight.hasUpdateAccess(PFUserContext.getUser(), eventDO, null)) {
+        if (eventRight.hasUpdateAccess(ThreadLocalUserContext.getUser(), eventDO, null)) {
           event.setEditable(true);
         } else {
           event.setEditable(false);
@@ -162,7 +162,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
         String recurrence = null;
         if (eventDO.hasRecurrence() == true) {
           final Recur recur = eventDO.getRecurrenceObject();
-          final TeamEventRecurrenceData recurrenceData = new TeamEventRecurrenceData(recur, PFUserContext.getTimeZone());
+          final TeamEventRecurrenceData recurrenceData = new TeamEventRecurrenceData(recur, ThreadLocalUserContext.getTimeZone());
           final RecurrenceFrequency frequency = recurrenceData.getFrequency();
           if (frequency != null) {
             final String unitI18nKey = frequency.getUnitI18nKey();
@@ -199,12 +199,12 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
           final String minute = minuteInt < 10 ? "0" + minuteInt : "" + minuteInt;
 
           if (event.isAllDay() == false) {
-            durationString = "\n" + PFUserContext.getLocalizedString("plugins.teamcal.event.duration") + ": " + hour + ":" + minute;
+            durationString = "\n" + ThreadLocalUserContext.getLocalizedString("plugins.teamcal.event.duration") + ": " + hour + ":" + minute;
           }
           final StringBuffer buf = new StringBuffer();
           buf.append(teamEvent.getSubject());
           if (StringUtils.isNotBlank(teamEvent.getNote()) == true) {
-            buf.append("\n").append(PFUserContext.getLocalizedString("plugins.teamcal.event.note")).append(": ")
+            buf.append("\n").append(ThreadLocalUserContext.getLocalizedString("plugins.teamcal.event.note")).append(": ")
             .append(teamEvent.getNote());
           }
           buf.append(durationString);

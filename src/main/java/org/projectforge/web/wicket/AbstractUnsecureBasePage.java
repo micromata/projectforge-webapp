@@ -44,7 +44,7 @@ import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.template.PackageTextTemplate;
 import org.projectforge.AppVersion;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.core.LogoServlet;
@@ -117,7 +117,7 @@ public abstract class AbstractUnsecureBasePage extends WebPage
     if (WebConfiguration.isDevelopmentMode() == false) {
       developmentSystem.setVisible(false);
     }
-    final PFUserDO user = PFUserContext.getUser();
+    final PFUserDO user = ThreadLocalUserContext.getUser();
     AbstractLink link;
     if (user == null) {
       link = new ExternalLink("footerNewsLink", "http://www.projectforge.org/pf-en/News");

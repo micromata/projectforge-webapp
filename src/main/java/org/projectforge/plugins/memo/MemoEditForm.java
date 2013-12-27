@@ -25,7 +25,7 @@ package org.projectforge.plugins.memo;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.model.PropertyModel;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
@@ -46,7 +46,7 @@ public class MemoEditForm extends AbstractEditForm<MemoDO, MemoEditPage>
   public MemoEditForm(final MemoEditPage parentPage, final MemoDO data)
   {
     super(parentPage, data);
-    data.setOwner(PFUserContext.getUser());
+    data.setOwner(ThreadLocalUserContext.getUser());
   }
 
   @Override

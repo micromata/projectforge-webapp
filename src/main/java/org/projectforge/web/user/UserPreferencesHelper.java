@@ -26,7 +26,7 @@ package org.projectforge.web.user;
 import java.io.Serializable;
 
 import org.projectforge.common.CloneHelper;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRights;
 import org.projectforge.user.UserXmlPreferencesCache;
@@ -45,7 +45,7 @@ public class UserPreferencesHelper
    */
   public static void putEntry(final String key, final Object value, final boolean persistent)
   {
-    final PFUserDO user = PFUserContext.getUser();
+    final PFUserDO user = ThreadLocalUserContext.getUser();
     if (user == null || value == null) {
       // Should only occur, if user is not logged in.
       return;
@@ -68,7 +68,7 @@ public class UserPreferencesHelper
    */
   public static Object getEntry(final String key)
   {
-    final PFUserDO user = PFUserContext.getUser();
+    final PFUserDO user = ThreadLocalUserContext.getUser();
     if (user == null) {
       // Should only occur, if user is not logged in.
       return null;
@@ -125,7 +125,7 @@ public class UserPreferencesHelper
    */
   public static Object removeEntry(final String key)
   {
-    final PFUserDO user = PFUserContext.getUser();
+    final PFUserDO user = ThreadLocalUserContext.getUser();
     if (user == null) {
       // Should only occur, if user is not logged in.
       return null;

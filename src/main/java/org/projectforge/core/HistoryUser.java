@@ -26,7 +26,7 @@ package org.projectforge.core;
 import java.util.Locale;
 
 import org.hibernate.Session;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 
 import de.micromata.hibernate.history.HistoryEntry;
@@ -73,7 +73,7 @@ public class HistoryUser implements HistoryUserRetriever
    */
   public String getPrincipal()
   {
-    final PFUserDO user = PFUserContext.getUser();
+    final PFUserDO user = ThreadLocalUserContext.getUser();
     if (user == null) {
       return null;
     }

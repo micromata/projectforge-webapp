@@ -37,7 +37,7 @@ import org.projectforge.core.QueryFilter;
 import org.projectforge.plugins.teamcal.admin.TeamCalFilter.OwnerType;
 import org.projectforge.plugins.teamcal.externalsubscription.TeamEventExternalSubscriptionCache;
 import org.projectforge.user.GroupDO;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRightId;
@@ -110,7 +110,7 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
     }
     final List<TeamCalDO> result = new ArrayList<TeamCalDO>();
     final TeamCalRight right = (TeamCalRight) getUserRight();
-    final PFUserDO user = PFUserContext.getUser();
+    final PFUserDO user = ThreadLocalUserContext.getUser();
     final Integer userId = user.getId();
     for (final TeamCalDO cal : list) {
       final boolean isOwn = right.isOwner(user, cal);

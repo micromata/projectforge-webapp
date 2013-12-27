@@ -28,7 +28,7 @@ import net.ftlines.wicket.fullcalendar.Event;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.projectforge.calendar.DayHolder;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 /**
  * Creates holiday events for FullCalendar.
@@ -86,7 +86,7 @@ public class HolidayEventsProvider extends MyFullCalendarEventsProvider
       String title;
       final String holidayInfo = dh.getHolidayInfo();
       if (holidayInfo != null && holidayInfo.startsWith("calendar.holiday.") == true) {
-        title = PFUserContext.getLocalizedString(holidayInfo);
+        title = ThreadLocalUserContext.getLocalizedString(holidayInfo);
       } else {
         title = holidayInfo;
       }

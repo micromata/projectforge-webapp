@@ -37,7 +37,7 @@ import org.joda.time.DateTimeZone;
 import org.junit.Test;
 import org.projectforge.common.DateHelper;
 import org.projectforge.test.TestBase;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 
 public class JodaDateConverterTest extends TestBase
@@ -96,7 +96,7 @@ public class JodaDateConverterTest extends TestBase
     user.setTimeZone(DateHelper.EUROPE_BERLIN);
     user.setLocale(Locale.GERMAN);
     user.setDateFormat("dd.MM.yyyy");
-    PFUserContext.setUser(user);
+    ThreadLocalUserContext.setUser(user);
     JodaDateConverter conv = new JodaDateConverter();
     DateMidnight testDate = createDate(1970, DateTimeConstants.NOVEMBER, 21, EUROPE_BERLIN);
     assertEquals("21.11.1970", conv.convertToString(testDate, Locale.GERMAN));
@@ -121,7 +121,7 @@ public class JodaDateConverterTest extends TestBase
     final PFUserDO user = new PFUserDO();
     user.setTimeZone(timeZone.getID());
     user.setDateFormat("dd.MM.yyyy");
-    PFUserContext.setUser(user);
+    ThreadLocalUserContext.setUser(user);
     final JodaDateConverter conv = new JodaDateConverter();
     assertNull(conv.convertToObject("", Locale.GERMAN));
     DateMidnight testDate = createDate(1970, DateTimeConstants.OCTOBER, 21, timeZone);
@@ -171,7 +171,7 @@ public class JodaDateConverterTest extends TestBase
   {
     final PFUserDO user = new PFUserDO();
     user.setTimeZone(timeZone.getID());
-    PFUserContext.setUser(user);
+    ThreadLocalUserContext.setUser(user);
     final JodaDateConverter conv = new JodaDateConverter();
     DateMidnight testDate = createDate(1970, DateTimeConstants.OCTOBER, 21, timeZone);
     DateMidnight date = conv.convertToObject("10/21/1970", Locale.ENGLISH);

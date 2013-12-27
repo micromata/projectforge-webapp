@@ -72,9 +72,9 @@ public enum LoginResultStatus implements I18nEnum
   {
     if (this == LOGIN_TIME_OFFSET) {
       // msgParam is seconds.
-      return PFUserContext.getLocalizedMessage(getI18nKey(), msgParams);
+      return ThreadLocalUserContext.getLocalizedMessage(getI18nKey(), msgParams);
     }
-    return PFUserContext.getLocalizedString(getI18nKey());
+    return ThreadLocalUserContext.getLocalizedString(getI18nKey());
   }
 
   /**

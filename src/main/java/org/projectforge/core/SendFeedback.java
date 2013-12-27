@@ -28,7 +28,7 @@ import java.util.Map;
 
 import org.projectforge.mail.Mail;
 import org.projectforge.mail.SendMail;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 
 public class SendFeedback
@@ -44,14 +44,14 @@ public class SendFeedback
   public boolean send(final SendFeedbackData data)
   {
     if (data.getSender() == null) {
-      data.setSender(PFUserContext.getUser().getFullname());
+      data.setSender(ThreadLocalUserContext.getUser().getFullname());
     }
     params.put("data", data);
     final Mail msg = new Mail();
     msg.setTo(data.getReceiver());
     msg.setProjectForgeSubject(data.getSubject());
     params.put("subject", data.getSubject());
-    String content = sendMail.renderGroovyTemplate(msg, "mail/feedback.txt", params, PFUserContext.getUser());
+    String content = sendMail.renderGroovyTemplate(msg, "mail/feedback.txt", params, ThreadLocalUserContext.getUser());
     msg.setContent(content);
     msg.setContentType(Mail.CONTENTTYPE_TEXT);
     return sendMail.send(msg);

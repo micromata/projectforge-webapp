@@ -30,7 +30,7 @@ import junit.framework.Assert;
 import org.joda.time.DateMidnight;
 import org.junit.Test;
 import org.projectforge.common.DateHelper;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 
 public class JodaDateMidnightConverterTest
@@ -45,7 +45,7 @@ public class JodaDateMidnightConverterTest
   private void test(final TimeZone timeZone) {
     final PFUserDO user = new PFUserDO();
     user.setTimeZone(timeZone);
-    PFUserContext.setUser(user);
+    ThreadLocalUserContext.setUser(user);
     final JodaDateMidnightConverter converter = new JodaDateMidnightConverter();
     final DateMidnight dateMidnight = (DateMidnight) converter.parse("1970-11-21");
     Assert.assertEquals(1970, dateMidnight.getYear());

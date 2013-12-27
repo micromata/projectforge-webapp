@@ -64,7 +64,7 @@ import org.projectforge.core.PFPersistancyBehavior;
 import org.projectforge.database.Constants;
 import org.projectforge.plugins.teamcal.TeamCalConfig;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 /**
  * Overview of used (and may-be planned) fields:
@@ -510,7 +510,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   {
     final DateFormat df = new SimpleDateFormat(DateFormats.ISO_TIMESTAMP_MILLIS);
     // Need the user's time-zone for getting midnight of desired date.
-    df.setTimeZone(PFUserContext.getTimeZone());
+    df.setTimeZone(ThreadLocalUserContext.getTimeZone());
     // But print it as UTC date:
     final String recurrenceDateString = df.format(recurrenceDate);
     setRecurrenceDate(recurrenceDateString);

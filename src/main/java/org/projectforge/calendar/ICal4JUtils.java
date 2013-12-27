@@ -44,7 +44,7 @@ import org.projectforge.common.DateFormats;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.RecurrenceFrequency;
 import org.projectforge.common.StringHelper;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -61,16 +61,16 @@ public class ICal4JUtils
 
   /**
    * @return The timeZone (ical4j) built of the default java timeZone of the user.
-   * @see PFUserContext#getTimeZone()
+   * @see ThreadLocalUserContext#getTimeZone()
    */
   public static TimeZone getUserTimeZone()
   {
-    return registry.getTimeZone(PFUserContext.getTimeZone().getID());
+    return registry.getTimeZone(ThreadLocalUserContext.getTimeZone().getID());
   }
 
   /**
    * @return The timeZone (ical4j) built of the default java timeZone of the user.
-   * @see PFUserContext#getTimeZone()
+   * @see ThreadLocalUserContext#getTimeZone()
    */
   public static TimeZone getTimeZone(final java.util.TimeZone timeZone)
   {

@@ -34,7 +34,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.StringHelper;
 import org.projectforge.timesheet.TimesheetDao;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRights;
 import org.projectforge.web.calendar.QuickSelectMonthPanel;
@@ -77,7 +77,7 @@ public class MonthlyEmployeeReportForm extends AbstractStandardForm<MonthlyEmplo
         fs.add(userSelectPanel);
         userSelectPanel.init();
       } else {
-        filter.setUser(PFUserContext.getUser());
+        filter.setUser(ThreadLocalUserContext.getUser());
         fs.add(new DivTextPanel(fs.newChildId(), filter.getUser().getFullname()));
       }
     }

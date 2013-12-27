@@ -55,7 +55,7 @@ import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalsProvider;
 import org.projectforge.plugins.teamcal.externalsubscription.TeamEventExternalSubscriptionCache;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserRightId;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -203,7 +203,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     if (recurrenceEvents != null && recurrenceEvents.size() > 0) {
       list.addAll(recurrenceEvents);
     }
-    final TimeZone timeZone = PFUserContext.getTimeZone();
+    final TimeZone timeZone = ThreadLocalUserContext.getTimeZone();
     if (list != null) {
       for (final TeamEventDO eventDO : list) {
         if (eventDO.hasRecurrence() == false) {
@@ -345,7 +345,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
       utcCal.setTime(eventStartDate);
       if (startDate != null && eventEndDate.before(startDate) == true) {
         // Check same day (eventStartDate in UTC and startDate of filter in user's time zone):
-        final Calendar userCal = Calendar.getInstance(PFUserContext.getTimeZone());
+        final Calendar userCal = Calendar.getInstance(ThreadLocalUserContext.getTimeZone());
         userCal.setTime(startDate);
         if (CalendarUtils.isSameDay(utcCal, utcCal) == true) {
           return true;
@@ -354,7 +354,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
       }
       if (endDate != null && eventStartDate.after(endDate) == true) {
         // Check same day (eventEndDate in UTC and endDate of filter in user's time zone):
-        final Calendar userCal = Calendar.getInstance(PFUserContext.getTimeZone());
+        final Calendar userCal = Calendar.getInstance(ThreadLocalUserContext.getTimeZone());
         userCal.setTime(endDate);
         if (CalendarUtils.isSameDay(utcCal, utcCal) == true) {
           return true;

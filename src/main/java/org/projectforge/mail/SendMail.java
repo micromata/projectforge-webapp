@@ -40,7 +40,7 @@ import org.projectforge.core.ConfigXml;
 import org.projectforge.core.InternalErrorException;
 import org.projectforge.core.UserException;
 import org.projectforge.scripting.GroovyEngine;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.HtmlHelper;
 
@@ -168,8 +168,8 @@ public class SendMail
   public String renderGroovyTemplate(final Mail composedMessage, final String groovyTemplate, final Map<String, Object> data,
       final PFUserDO recipient)
   {
-    final PFUserDO user = PFUserContext.getUser();
-    data.put("createdLabel", PFUserContext.getLocalizedString("created"));
+    final PFUserDO user = ThreadLocalUserContext.getUser();
+    data.put("createdLabel", ThreadLocalUserContext.getLocalizedString("created"));
     data.put("loggedInUser", user);
     data.put("recipient", recipient);
     data.put("msg", composedMessage);

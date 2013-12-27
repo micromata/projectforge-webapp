@@ -49,7 +49,7 @@ import org.projectforge.fibu.kost.Kost1DO;
 import org.projectforge.fibu.kost.Kost1Dao;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.fibu.kost.Kost2Dao;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 public class BuchungssatzExcelImporter
 {
@@ -226,7 +226,7 @@ public class BuchungssatzExcelImporter
       }
     } catch (final Exception ex) {
       log.error(ex.getMessage(), ex);
-      throw new UserException(PFUserContext.getLocalizedString("finance.datev.import.error.titleRowMissed"));
+      throw new UserException(ThreadLocalUserContext.getLocalizedString("finance.datev.import.error.titleRowMissed"));
     }
   }
 

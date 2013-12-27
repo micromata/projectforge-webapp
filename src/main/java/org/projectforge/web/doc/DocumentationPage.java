@@ -30,7 +30,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.WicketUtils;
 
@@ -53,7 +53,7 @@ public class DocumentationPage extends AbstractSecuredPage
   public DocumentationPage(final PageParameters parameters)
   {
     super(parameters);
-    final Locale locale = PFUserContext.getLocale();
+    final Locale locale = ThreadLocalUserContext.getLocale();
     final boolean isGerman = locale != null && locale.toString().startsWith("de") == true;
     addDocLink(body, "newsLink", "doc/News.html");
     addDocLink(body, "tutorialLink", "doc/ProjectForge.html");

@@ -50,7 +50,7 @@ import org.projectforge.task.TaskTree;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
 import org.projectforge.user.I18nHelper;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRightId;
@@ -110,7 +110,7 @@ public class ToDoDao extends BaseDao<ToDoDO>
     final String searchString = myFilter.getSearchString();
     if (myFilter.isOnlyRecent() == true) {
       final PFUserDO assignee = new PFUserDO();
-      assignee.setId(PFUserContext.getUserId());
+      assignee.setId(ThreadLocalUserContext.getUserId());
       queryFilter.add(Restrictions.eq("assignee", assignee));
       myFilter.setSearchString(""); // Delete search string for ignoring it.
       queryFilter.add(Restrictions.eq("recent", true));
@@ -181,7 +181,7 @@ public class ToDoDao extends BaseDao<ToDoDO>
       }
     }
     data.put("history", list);
-    final PFUserDO user = PFUserContext.getUser();
+    final PFUserDO user = ThreadLocalUserContext.getUser();
     final Integer userId = user.getId();
     final Integer assigneeId = todo.getAssigneeId();
     final Integer reporterId = todo.getReporterId();
@@ -193,7 +193,7 @@ public class ToDoDao extends BaseDao<ToDoDO>
     }
     if (userId != assigneeId && userId != reporterId && hasSelectAccess(user, todo, false) == false) {
       // User is whether reporter nor assignee, so send e-mail (in the case the user hasn't read access anymore).
-      sendNotification(PFUserContext.getUser(), todo, data, false);
+      sendNotification(ThreadLocalUserContext.getUser(), todo, data, false);
     }
   }
 
@@ -229,7 +229,7 @@ public class ToDoDao extends BaseDao<ToDoDO>
   @Override
   protected void onSave(final ToDoDO obj)
   {
-    if (ObjectUtils.equals(PFUserContext.getUserId(), obj.getAssigneeId()) == false) {
+    if (ObjectUtils.equals(ThreadLocalUserContext.getUserId(), obj.getAssigneeId()) == false) {
       // To-do is changed by other user than assignee, so set recent flag for this to-do for the assignee.
       obj.setRecent(true);
     }
@@ -238,7 +238,7 @@ public class ToDoDao extends BaseDao<ToDoDO>
   @Override
   protected void onChange(final ToDoDO obj, final ToDoDO dbObj)
   {
-    if (ObjectUtils.equals(PFUserContext.getUserId(), obj.getAssigneeId()) == false) {
+    if (ObjectUtils.equals(ThreadLocalUserContext.getUserId(), obj.getAssigneeId()) == false) {
       // To-do is changed by other user than assignee, so set recent flag for this to-do for the assignee.
       final ToDoDO copyOfDBObj = new ToDoDO();
       copyOfDBObj.copyValuesFrom(dbObj, "deleted");
@@ -293,7 +293,7 @@ public class ToDoDao extends BaseDao<ToDoDO>
   public int getOpenToDoEntries(Integer userId)
   {
     if (userId == null) {
-      userId = PFUserContext.getUserId();
+      userId = ThreadLocalUserContext.getUserId();
     }
     return toDoCache.getOpenToDoEntries(userId);
   }

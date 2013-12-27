@@ -32,7 +32,7 @@ import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.request.http.WebRequest;
 import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.Menu;
 import org.projectforge.web.MenuBuilder;
@@ -82,7 +82,7 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
     final ListViewPanel listViewPanel = new ListViewPanel("menu");
     pageContainer.add(listViewPanel);
     listViewPanel.add(new ListViewItemPanel(listViewPanel.newChildId(), getString("menu.main.title")).setListDivider());
-    final Menu menu = MenuBuilder.getInstance().getMobileMenu(PFUserContext.getUser());
+    final Menu menu = MenuBuilder.getInstance().getMobileMenu(ThreadLocalUserContext.getUser());
     if (menu.getMenuEntries() != null) {
       for (final MenuEntry menuEntry : menu.getMenuEntries()) {
         if (menuEntry.isVisible() == true) {

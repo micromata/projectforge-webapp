@@ -35,7 +35,7 @@ import org.projectforge.core.UserException;
 import org.projectforge.fibu.EmployeeDO;
 import org.projectforge.fibu.KostFormatter;
 import org.projectforge.fibu.ProjektStatus;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserRightId;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,7 +79,7 @@ public class Kost1Dao extends BaseDao<Kost1DO>
     if (hasLoggedInUserSelectAccess(kost1, false) == true) {
       return KostFormatter.format(kost1);
     } else {
-      final EmployeeDO employee = userGroupCache.getEmployee(PFUserContext.getUserId());
+      final EmployeeDO employee = userGroupCache.getEmployee(ThreadLocalUserContext.getUserId());
       if (employee != null && employee.getKost1Id() != null && employee.getKost1Id().compareTo(id) == 0) {
         kost1.setDescription(""); // Paranoia (if KostFormatter shows description in future times and Kost1DO is not visible for the user).
         return KostFormatter.format(kost1);

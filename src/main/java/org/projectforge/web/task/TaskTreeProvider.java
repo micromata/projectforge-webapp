@@ -40,7 +40,7 @@ import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskFilter;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 
 /**
@@ -150,7 +150,7 @@ public class TaskTreeProvider implements ITreeProvider<TaskNode>
     if (nodes == null || nodes.isEmpty() == true) {
       return list.iterator();
     }
-    final PFUserDO user = PFUserContext.getUser();
+    final PFUserDO user = ThreadLocalUserContext.getUser();
     for (final TaskNode node : nodes) {
       if (taskFilter.match(node, taskDao, user) == true && taskDao.hasSelectAccess(user, node.getTask(), false) == true) {
         list.add(node);

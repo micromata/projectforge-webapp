@@ -44,7 +44,7 @@ import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskFilter;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.rest.converter.TaskDOConverter;
 
 /**
@@ -163,7 +163,7 @@ public class TaskDaoRest
     TaskObject rtask = rtaskMap.get(task.getId());
     if (rtask == null) {
       // ancestor task not part of the result list, create it:
-      if (taskDao.hasSelectAccess(PFUserContext.getUser(), task, false) == false) {
+      if (taskDao.hasSelectAccess(ThreadLocalUserContext.getUser(), task, false) == false) {
         // User has no access, ignore this part of the task tree.
         return null;
       }

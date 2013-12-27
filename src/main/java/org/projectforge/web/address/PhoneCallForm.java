@@ -49,7 +49,7 @@ import org.projectforge.common.NumberHelper;
 import org.projectforge.common.RecentQueue;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.ConfigXml;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.AbstractEditPage;
@@ -264,7 +264,7 @@ public class PhoneCallForm extends AbstractStandardForm<Object, PhoneCallPage>
       // DropDownChoice myCurrentPhoneId
       fs = gridBuilder.newFieldset(getString("address.myCurrentPhoneId"));
       final LabelValueChoiceRenderer<String> myCurrentPhoneIdChoiceRenderer = new LabelValueChoiceRenderer<String>();
-      final String[] ids = userDao.getPersonalPhoneIdentifiers(PFUserContext.getUser());
+      final String[] ids = userDao.getPersonalPhoneIdentifiers(ThreadLocalUserContext.getUser());
       if (ids == null) {
         myCurrentPhoneIdChoiceRenderer.addValue("--", getString("user.personalPhoneIdentifiers.pleaseDefine"));
       } else {

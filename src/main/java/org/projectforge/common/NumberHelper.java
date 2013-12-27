@@ -35,7 +35,7 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 /**
  * Some helper methods ...
@@ -109,20 +109,20 @@ public class NumberHelper
       if (no.longValue() >= 100) {
         no = no.setScale(0, BigDecimal.ROUND_HALF_UP);
       }
-      return NumberFormat.getInstance(PFUserContext.getLocale()).format(no) + " kb";
+      return NumberFormat.getInstance(ThreadLocalUserContext.getLocale()).format(no) + " kb";
     }
     if (bytes < GIGA_BYTES) {
       BigDecimal no = new BigDecimal(bytes).divide(MB_BD, 1, BigDecimal.ROUND_HALF_UP);
       if (no.longValue() >= 100) {
         no = no.setScale(0, BigDecimal.ROUND_HALF_UP);
       }
-      return NumberFormat.getInstance(PFUserContext.getLocale()).format(no) + " Mb";
+      return NumberFormat.getInstance(ThreadLocalUserContext.getLocale()).format(no) + " Mb";
     }
     BigDecimal no = new BigDecimal(bytes).divide(GB_BD, 1, BigDecimal.ROUND_HALF_UP);
     if (no.longValue() >= 100) {
       no = no.setScale(0, BigDecimal.ROUND_HALF_UP);
     }
-    return NumberFormat.getInstance(PFUserContext.getLocale()).format(no) + " Gb";
+    return NumberFormat.getInstance(ThreadLocalUserContext.getLocale()).format(no) + " Gb";
   }
 
   /**
@@ -330,11 +330,11 @@ public class NumberHelper
   }
 
   /**
-   * @see PFUserContext#getLocale()
+   * @see ThreadLocalUserContext#getLocale()
    */
   public static String formatFraction2(final Number value)
   {
-    final Locale locale = PFUserContext.getLocale();
+    final Locale locale = ThreadLocalUserContext.getLocale();
     final NumberFormat format = getNumberFraction2Format(locale);
     return format.format(value);
   }

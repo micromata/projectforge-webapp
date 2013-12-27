@@ -27,7 +27,7 @@ import java.util.Date;
 
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.joda.time.DateMidnight;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractStandardFormPage;
 
@@ -161,7 +161,7 @@ public class CalendarPage extends AbstractStandardFormPage implements ISelectCal
    */
   public CalendarPage setStartDate(final Date startDate)
   {
-    form.getFilter().setStartDate(new DateMidnight(startDate, PFUserContext.getDateTimeZone()));
+    form.getFilter().setStartDate(new DateMidnight(startDate, ThreadLocalUserContext.getDateTimeZone()));
     return this;
   }
 

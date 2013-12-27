@@ -27,7 +27,7 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.util.Locale;
 
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 
 public class TestHelper
@@ -36,7 +36,7 @@ public class TestHelper
   {
     final PFUserDO user = new PFUserDO();
     user.setLocale(locale);
-    PFUserContext.setUser(user);
+    ThreadLocalUserContext.setUser(user);
   }
 
   public static void setDeclaredField(final Object obj, final String fieldName, final Object value)

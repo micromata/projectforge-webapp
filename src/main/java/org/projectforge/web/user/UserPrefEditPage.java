@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.fibu.kost.Kost2DO;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.user.UserPrefAreaRegistry;
 import org.projectforge.user.UserPrefDO;
@@ -86,7 +86,7 @@ public class UserPrefEditPage extends AbstractEditPage<UserPrefDO, UserPrefEditF
   private UserPrefDO initUserPref(final UserPrefDO userPref, final UserPrefArea area, final Object object)
   {
     userPref.setArea(area);
-    userPref.setUser(PFUserContext.getUser());
+    userPref.setUser(ThreadLocalUserContext.getUser());
     if (object != null) {
       userPrefDao.addUserPrefParameters(userPref, object);
     } else {

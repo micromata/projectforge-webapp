@@ -34,7 +34,7 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 
@@ -119,7 +119,7 @@ public class GroupsProvider extends TextChoiceProvider<GroupDO>
     if (sortedGroups == null) {
       final Collection<GroupDO> allGroups = getUserGroupCache().getAllGroups();
       sortedGroups = new TreeSet<GroupDO>(groupsComparator);
-      final PFUserDO loggedInUser = PFUserContext.getUser();
+      final PFUserDO loggedInUser = ThreadLocalUserContext.getUser();
       for (final GroupDO group : allGroups) {
         if (group.isDeleted() == false && getGroupDao().hasSelectAccess(loggedInUser, group, false) == true) {
           sortedGroups.add(group);

@@ -35,7 +35,7 @@ import org.apache.wicket.request.Request;
 import org.projectforge.Version;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.Configuration;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.BrowserScreenWidthType;
 import org.projectforge.web.LayoutSettingsPage;
@@ -85,7 +85,7 @@ public class MySession extends WebSession
     final ClientInfo info = getClientInfo();
     if (info instanceof WebClientInfo) {
       clientProperties = ((WebClientInfo) clientInfo).getProperties();
-      clientProperties.setTimeZone(PFUserContext.getTimeZone());
+      clientProperties.setTimeZone(ThreadLocalUserContext.getTimeZone());
       userAgent = ((WebClientInfo) info).getUserAgent();
       userAgentDevice = UserAgentDevice.getUserAgentDevice(userAgent);
       userAgentOS = UserAgentOS.getUserAgentOS(userAgent);
@@ -96,7 +96,7 @@ public class MySession extends WebSession
     } else {
       log.error("Oups, ClientInfo is not from type WebClientInfo: " + info);
     }
-    setUser(PFUserContext.getUser());
+    setUser(ThreadLocalUserContext.getUser());
     this.csrfToken = NumberHelper.getSecureRandomUrlSaveString(20);
   }
 
@@ -267,7 +267,7 @@ public class MySession extends WebSession
     }
     this.user = user;
     log.debug("User logged in: " + user.getShortDisplayName());
-    PFUserContext.setUser(user);
+    ThreadLocalUserContext.setUser(user);
     setLocale(request);
   }
 
@@ -277,7 +277,7 @@ public class MySession extends WebSession
    */
   public void setLocale(final Request request)
   {
-    setLocale(PFUserContext.getLocale(request.getLocale()));
+    setLocale(ThreadLocalUserContext.getLocale(request.getLocale()));
   }
 
   public void logout()
@@ -286,7 +286,7 @@ public class MySession extends WebSession
       log.info("User logged out: " + user.getShortDisplayName());
       user = null;
     }
-    PFUserContext.setUser(null);
+    ThreadLocalUserContext.setUser(null);
     super.clear();
     super.invalidate();
   }

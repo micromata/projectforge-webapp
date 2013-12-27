@@ -22,7 +22,7 @@ import org.apache.wicket.request.Request;
 import org.joda.time.DateMidnight;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 /**
  * A base callback that passes back calendar's starting date
@@ -60,7 +60,7 @@ public abstract class ViewDisplayCallback extends AbstractAjaxCallback implement
   protected void respond(final AjaxRequestTarget target) {
     final Request r = target.getPage().getRequest();
     final ViewType type = ViewType.forCode(r.getRequestParameters().getParameterValue("view").toString());
-    final DateTimeFormatter fmt = ISODateTimeFormat.dateTimeParser().withZone(PFUserContext.getDateTimeZone());
+    final DateTimeFormatter fmt = ISODateTimeFormat.dateTimeParser().withZone(ThreadLocalUserContext.getDateTimeZone());
     final DateMidnight start = fmt.parseDateTime(r.getRequestParameters().getParameterValue("start").toString())
         .toDateMidnight();
     final DateMidnight end = fmt.parseDateTime(r.getRequestParameters().getParameterValue("end").toString())

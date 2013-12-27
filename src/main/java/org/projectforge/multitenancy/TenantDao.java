@@ -35,7 +35,7 @@ import org.hibernate.LockMode;
 import org.projectforge.access.AccessException;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.UserException;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRightId;
@@ -218,7 +218,7 @@ public class TenantDao extends BaseDao<TenantDO>
       throws AccessException
       {
     getHibernateTemplate().refresh(user, LockMode.READ);
-    if (TenantChecker.getInstance().isSuperAdmin(PFUserContext.getUser()) == false) {
+    if (TenantChecker.getInstance().isSuperAdmin(ThreadLocalUserContext.getUser()) == false) {
       log.warn("User has now access right to change assigned users of a tenant! Skipping assignment.");
       return;
     }

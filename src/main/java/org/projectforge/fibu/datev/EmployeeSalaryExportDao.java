@@ -60,7 +60,7 @@ import org.projectforge.fibu.MonthlyEmployeeReportDao;
 import org.projectforge.fibu.MonthlyEmployeeReportEntry;
 import org.projectforge.fibu.kost.Kost1DO;
 import org.projectforge.fibu.kost.Kost2DO;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -204,7 +204,7 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
     final ExportSheet sheet = xls.addSheet(sheetTitle);
     sheet.createFreezePane(0, 1);
 
-    final ExportSheet employeeSheet = xls.addSheet(PFUserContext.getLocalizedString("fibu.employee"));
+    final ExportSheet employeeSheet = xls.addSheet(ThreadLocalUserContext.getLocalizedString("fibu.employee"));
     employeeSheet.setColumnWidth(0, MyXlsContentProvider.LENGTH_USER * 256);
     employeeSheet.setColumnWidth(1, 14 * 256);
     employeeSheet.setColumnWidth(2, 12 * 256);
@@ -213,11 +213,11 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
     final ContentProvider provider = employeeSheet.getContentProvider();
     provider.putFormat("STUNDEN", "0.00;[Red]-0.00");
     final ExportRow employeeRow = employeeSheet.addRow();
-    employeeRow.addCell(0, PFUserContext.getLocalizedString("fibu.employee"));
-    employeeRow.addCell(1, PFUserContext.getLocalizedString("fibu.employee.wochenstunden"));
-    employeeRow.addCell(2, PFUserContext.getLocalizedString("fibu.employee.sollstunden"));
-    employeeRow.addCell(3, PFUserContext.getLocalizedString("fibu.employee.iststunden"));
-    employeeRow.addCell(4, PFUserContext.getLocalizedString("fibu.common.difference"));
+    employeeRow.addCell(0, ThreadLocalUserContext.getLocalizedString("fibu.employee"));
+    employeeRow.addCell(1, ThreadLocalUserContext.getLocalizedString("fibu.employee.wochenstunden"));
+    employeeRow.addCell(2, ThreadLocalUserContext.getLocalizedString("fibu.employee.sollstunden"));
+    employeeRow.addCell(3, ThreadLocalUserContext.getLocalizedString("fibu.employee.iststunden"));
+    employeeRow.addCell(4, ThreadLocalUserContext.getLocalizedString("fibu.common.difference"));
 
     // build all column names, title, widths from fixed and variable columns
     final int numCols = ExcelColumn.values().length;
@@ -229,7 +229,7 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
     int idx = 0;
     for (final ExcelColumn col : EnumSet.range(ExcelColumn.START, ExcelColumn.END)) {
       colNames[idx] = col.name();
-      colTitles[idx] = PFUserContext.getLocalizedString(col.theTitle);
+      colTitles[idx] = ThreadLocalUserContext.getLocalizedString(col.theTitle);
       colWidths[idx] = col.width;
       ++idx;
     }

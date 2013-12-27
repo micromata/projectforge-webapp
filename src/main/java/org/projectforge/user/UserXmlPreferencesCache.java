@@ -153,8 +153,8 @@ public class UserXmlPreferencesCache extends AbstractCache
   private synchronized void flushToDB(final Integer userId, final boolean checkAccess)
   {
     if (checkAccess == true) {
-      if (userId.equals(PFUserContext.getUserId()) == false) {
-        log.error("User '" + PFUserContext.getUserId() + "' has no access to write user preferences of other user '" + userId + "'.");
+      if (userId.equals(ThreadLocalUserContext.getUserId()) == false) {
+        log.error("User '" + ThreadLocalUserContext.getUserId() + "' has no access to write user preferences of other user '" + userId + "'.");
         // No access.
         return;
       }

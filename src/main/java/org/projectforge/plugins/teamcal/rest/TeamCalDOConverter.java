@@ -28,7 +28,7 @@ import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalRight;
 import org.projectforge.rest.objects.CalendarObject;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserRights;
 import org.projectforge.web.rest.converter.DOConverter;
 
@@ -44,7 +44,7 @@ public class TeamCalDOConverter
     if (src == null) {
       return null;
     }
-    final Integer userId = PFUserContext.getUserId();
+    final Integer userId = ThreadLocalUserContext.getUserId();
     final CalendarObject cal = new CalendarObject();
     DOConverter.copyFields(cal, src);
     cal.setTitle(src.getTitle());

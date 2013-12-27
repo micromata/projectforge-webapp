@@ -65,7 +65,7 @@ import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.timesheet.TimesheetExport;
 import org.projectforge.timesheet.TimesheetFilter;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefArea;
@@ -219,7 +219,7 @@ IListPageColumnsCreator<TimesheetDO>
     }
     icsExportDialog = new TimesheetsICSExportDialog(newModalDialogId(), new ResourceModel("timesheet.iCalSubscription"));
     add(icsExportDialog);
-    icsExportDialog.init(PFUserContext.getUserId());
+    icsExportDialog.init(ThreadLocalUserContext.getUserId());
     icsExportDialog.redraw();
     final AjaxLink<Void> icsExportDialogButton = new AjaxLink<Void>(ContentMenuEntryPanel.LINK_ID) {
       /**

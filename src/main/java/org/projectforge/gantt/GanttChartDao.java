@@ -44,7 +44,7 @@ import org.projectforge.core.BaseDao;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskTree;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRightId;
@@ -132,7 +132,7 @@ public class GanttChartDao extends BaseDao<GanttChartDO>
     writer.setXmlRegistry(xmlRegistry);
     final MyRootElement root = new MyRootElement();
     root.ganttChart = ganttChart;
-    root.setCreated().setTimeZone(PFUserContext.getTimeZone()).setVersion("1.0");
+    root.setCreated().setTimeZone(ThreadLocalUserContext.getTimeZone()).setVersion("1.0");
     final Element element = writer.write(document, root);
     // Now, remove all elements with no information from the DOM:
     final String xml;

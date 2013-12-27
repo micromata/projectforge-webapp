@@ -35,7 +35,7 @@ import org.junit.Test;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.test.TestConfiguration;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.xml.stream.converter.DateConverter;
 import org.projectforge.xml.stream.converter.ISODateConverter;
@@ -57,7 +57,7 @@ public class ConverterTest
     final ISODateConverter isoDateConverter = new ISODateConverter();
     final PFUserDO cetUser = new PFUserDO();
     cetUser.setTimeZone(DateHelper.EUROPE_BERLIN);
-    PFUserContext.setUser(cetUser); // login CET user.
+    ThreadLocalUserContext.setUser(cetUser); // login CET user.
     DateHolder dh = new DateHolder();
     dh.setDate(2010, Calendar.AUGUST, 29, 23, 8, 17, 123);
     assertEquals("1283116097123", dateConverter.toString(dh.getDate()));
@@ -68,7 +68,7 @@ public class ConverterTest
     assertEquals("2010-08-29", isoDateConverter.toString(dh.setHourOfDay(0).getDate()));
     final PFUserDO utcUser = new PFUserDO();
     utcUser.setTimeZone(DateHelper.UTC);
-    PFUserContext.setUser(utcUser); // login UTC user.
+    ThreadLocalUserContext.setUser(utcUser); // login UTC user.
     dh = new DateHolder(DateHelper.UTC);
     dh.setDate(2010, Calendar.AUGUST, 29, 23, 8, 17, 123);
     assertEquals("2010-08-29 23:08:17.123", isoDateConverter.toString(dh.getDate()));

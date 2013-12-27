@@ -36,7 +36,7 @@ import javax.sql.DataSource;
 import org.apache.commons.lang.Validate;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.BaseDao;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRightId;
@@ -136,7 +136,7 @@ public class MebDao extends BaseDao<MebEntryDO>
   public int getRecentMEBEntries(Integer userId)
   {
     if (userId == null) {
-      userId = PFUserContext.getUserId();
+      userId = ThreadLocalUserContext.getUserId();
     }
     return mebCache.getRecentMEBEntries(userId);
   }

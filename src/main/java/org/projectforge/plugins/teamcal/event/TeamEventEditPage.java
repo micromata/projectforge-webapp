@@ -39,7 +39,7 @@ import org.projectforge.plugins.teamcal.integration.TeamCalCalendarPage;
 import org.projectforge.registry.Registry;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.timesheet.TimesheetEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
@@ -251,7 +251,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       masterEvent.setRecurrence(form.recurrenceData);
       getBaseDao().update(masterEvent);
     } else if (recurrencyChangeType == RecurrencyChangeType.ONLY_CURRENT) { // only current date
-      masterEvent.addRecurrenceExDate(eventOfCaller.getStartDate(), PFUserContext.getTimeZone());
+      masterEvent.addRecurrenceExDate(eventOfCaller.getStartDate(), ThreadLocalUserContext.getTimeZone());
       getBaseDao().update(masterEvent);
     }
     return (AbstractSecuredBasePage) getReturnToPage();
@@ -295,7 +295,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       return null;
     } else if (recurrencyChangeType == RecurrencyChangeType.ONLY_CURRENT) { // only current date
       // Add current date to the master date as exclusion date and save this event (without recurrence settings).
-      masterEvent.addRecurrenceExDate(eventOfCaller.getStartDate(), PFUserContext.getTimeZone());
+      masterEvent.addRecurrenceExDate(eventOfCaller.getStartDate(), ThreadLocalUserContext.getTimeZone());
       newEvent = oldDataObject;
       newEvent.setRecurrenceDate(eventOfCaller.getStartDate());
       newEvent.setRecurrenceReferenceId(masterEvent.getId());

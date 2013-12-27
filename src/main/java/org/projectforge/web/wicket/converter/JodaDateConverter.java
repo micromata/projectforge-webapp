@@ -34,7 +34,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.projectforge.common.DateFormatType;
 import org.projectforge.common.DateFormats;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 /**
  * 
@@ -58,7 +58,7 @@ public class JodaDateConverter implements IConverter<DateMidnight>
   public JodaDateConverter()
   {
     this.userDateFormat = getPattern();
-    this.timeZone = PFUserContext.getDateTimeZone();
+    this.timeZone = ThreadLocalUserContext.getDateTimeZone();
     this.currentYear = new DateMidnight(timeZone).getYear();
   }
 

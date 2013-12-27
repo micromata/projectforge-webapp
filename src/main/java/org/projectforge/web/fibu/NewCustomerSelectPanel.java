@@ -38,7 +38,7 @@ import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.KundeDao;
 import org.projectforge.fibu.KundeFormatter;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.user.UserPreferencesHelper;
 import org.projectforge.web.wicket.AbstractSelectPanel;
@@ -201,7 +201,7 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
       @Override
       public void onSubmit()
       {
-        caller.select(selectProperty, PFUserContext.getUserId());
+        caller.select(selectProperty, ThreadLocalUserContext.getUserId());
         markTextFieldModelAsChanged();
       }
 
@@ -210,7 +210,7 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
       {
         // Is visible if no user is given or the given user is not the current logged in user.
         final KundeDO user = getModelObject();
-        return user == null || user.getId().equals(PFUserContext.getUser().getId()) == false;
+        return user == null || user.getId().equals(ThreadLocalUserContext.getUser().getId()) == false;
       }
     };
     add(selectMeButton);

@@ -32,7 +32,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.util.convert.converter.BigDecimalConverter;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.ConfigXml;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 
 /**
@@ -90,7 +90,7 @@ public class CurrencyConverter extends BigDecimalConverter
     if (locale != null) {
       nf = NumberHelper.getCurrencyFormat(locale);
     } else {
-      nf = NumberHelper.getCurrencyFormat(PFUserContext.getLocale());
+      nf = NumberHelper.getCurrencyFormat(ThreadLocalUserContext.getLocale());
     }
     return nf.format(value) + " " + currency;
   }

@@ -49,7 +49,7 @@ import org.projectforge.export.MyXlsContentProvider;
 import org.projectforge.fibu.KostFormatter;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.fibu.kost.Kost2Dao;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
@@ -188,7 +188,7 @@ public class Kost2ListPage extends AbstractListPage<Kost2ListForm, Kost2Dao, Kos
     final ExportWorkbook xls = new ExportWorkbook();
     final ContentProvider contentProvider = new MyXlsContentProvider(xls);
     xls.setContentProvider(contentProvider);
-    final ExportSheet sheet = xls.addSheet(PFUserContext.getLocalizedString("fibu.kost2.kost2s"));
+    final ExportSheet sheet = xls.addSheet(ThreadLocalUserContext.getLocalizedString("fibu.kost2.kost2s"));
     final ExportColumn[] cols = new ExportColumn[] { //
         new I18nExportColumn(Col.KOST, "fibu.kost2", MyXlsContentProvider.LENGTH_KOSTENTRAEGER),
         new I18nExportColumn(Col.ART, "fibu.kost2.art", MyXlsContentProvider.LENGTH_STD),

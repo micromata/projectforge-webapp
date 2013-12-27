@@ -28,7 +28,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
@@ -74,7 +74,7 @@ public class JodaDateTimeConverter implements Converter
     try {
       final DateTimeFormatter parseFormat = DateTimeFormat.forPattern(ISO_FORMAT);
       final DateTime date = parseFormat.withZone(DateTimeZone.UTC).parseDateTime(data);
-      final DateTimeZone dateTimeZone = PFUserContext.getDateTimeZone();
+      final DateTimeZone dateTimeZone = ThreadLocalUserContext.getDateTimeZone();
       return new DateTime(date, dateTimeZone);
     } catch (final Exception ex) {
       log.error("Can't parse DateMidnight: " + data);

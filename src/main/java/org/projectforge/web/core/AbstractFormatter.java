@@ -23,13 +23,13 @@
 
 package org.projectforge.web.core;
 
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 
 public abstract class AbstractFormatter
 {
   public String getI18nMessage(String i18nKey)
   {
-    return PFUserContext.getLocalizedString(i18nKey);
+    return ThreadLocalUserContext.getLocalizedString(i18nKey);
   }
 }

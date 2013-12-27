@@ -32,7 +32,7 @@ import org.projectforge.core.UserException;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 
 /**
@@ -65,7 +65,7 @@ public class AccessException extends UserException
 
   public AccessException(final String i18nKey, final Object... params)
   {
-    this(PFUserContext.getUser(), i18nKey, params);
+    this(ThreadLocalUserContext.getUser(), i18nKey, params);
   }
 
   public AccessException(final PFUserDO user, final String i18nKey, final Object... params)
@@ -78,7 +78,7 @@ public class AccessException extends UserException
 
   public AccessException(final AccessType accessType, final OperationType operationType)
   {
-    this(PFUserContext.getUser(), accessType, operationType);
+    this(ThreadLocalUserContext.getUser(), accessType, operationType);
   }
 
   public AccessException(final PFUserDO user, final AccessType accessType, final OperationType operationType)
@@ -93,7 +93,7 @@ public class AccessException extends UserException
 
   public AccessException(final Integer taskId, final AccessType accessType, final OperationType operationType)
   {
-    this(PFUserContext.getUser(), taskId, accessType, operationType);
+    this(ThreadLocalUserContext.getUser(), taskId, accessType, operationType);
   }
 
   public AccessException(final PFUserDO user, final Integer taskId, final AccessType accessType, final OperationType operationType)

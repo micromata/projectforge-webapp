@@ -26,7 +26,7 @@ package org.projectforge.web.humanresources;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
 import org.projectforge.humanresources.HRPlanningFilter;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 /**
  * 
@@ -41,7 +41,7 @@ public class HRPlanningListFilter extends HRPlanningFilter
   public HRPlanningListFilter reset()
   {
     super.reset();
-    setUserId(PFUserContext.getUserId());
+    setUserId(ThreadLocalUserContext.getUserId());
     final DateHolder date = new DateHolder(DatePrecision.DAY);
     date.setBeginOfWeek();
     setStartTime(date.getTimestamp());

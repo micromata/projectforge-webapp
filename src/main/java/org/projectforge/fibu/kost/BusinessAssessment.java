@@ -38,7 +38,7 @@ import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KostFormatter;
 import org.projectforge.fibu.kost.reporting.Report;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.HtmlHelper;
 
 /**
@@ -302,7 +302,7 @@ public class BusinessAssessment implements Serializable
       if ("€".equals(unit) == true) {
         value = CurrencyFormatter.format(amount);
       } else {
-        final NumberFormat format = NumberHelper.getNumberFractionFormat(PFUserContext.getLocale(), scale);
+        final NumberFormat format = NumberHelper.getNumberFractionFormat(ThreadLocalUserContext.getLocale(), scale);
         value = format.format(amount) + " " + unit;
       }
       buf.append(StringUtils.leftPad(value, 18));

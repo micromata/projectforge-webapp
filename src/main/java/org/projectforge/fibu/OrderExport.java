@@ -43,7 +43,7 @@ import org.projectforge.export.MyXlsContentProvider;
 import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 
 /**
@@ -116,7 +116,7 @@ public class OrderExport
     mapping.add(OrderCol.DATE, order.getAngebotsDatum());
     mapping.add(OrderCol.ORDER_DATE, order.getBeauftragungsDatum());
     mapping.add(OrderCol.STATUS,
-        order.getAuftragsStatus() != null ? PFUserContext.getLocalizedString(order.getAuftragsStatus().getI18nKey()) : "");
+        order.getAuftragsStatus() != null ? ThreadLocalUserContext.getLocalizedString(order.getAuftragsStatus().getI18nKey()) : "");
     mapping.add(OrderCol.PROJECT, order.getProjektAsString());
     final ProjektDO project = order.getProjekt();
     final String projectCustomer = KundeFormatter.formatKundeAsString(project != null ? project.getKunde() : null, order.getKundeText());
@@ -168,8 +168,8 @@ public class OrderExport
     mapping.add(PosCol.PROJECT, order.getProjektAsString());
     mapping.add(PosCol.ORDER_TITLE, order.getTitel());
     mapping.add(PosCol.TITLE, pos.getTitel());
-    mapping.add(PosCol.TYPE, pos.getArt() != null ? PFUserContext.getLocalizedString(pos.getArt().getI18nKey()) : "");
-    mapping.add(PosCol.STATUS, pos.getStatus() != null ? PFUserContext.getLocalizedString(pos.getStatus().getI18nKey()) : "");
+    mapping.add(PosCol.TYPE, pos.getArt() != null ? ThreadLocalUserContext.getLocalizedString(pos.getArt().getI18nKey()) : "");
+    mapping.add(PosCol.STATUS, pos.getStatus() != null ? ThreadLocalUserContext.getLocalizedString(pos.getStatus().getI18nKey()) : "");
     mapping.add(PosCol.PERSON_DAYS, pos.getPersonDays());
     final BigDecimal netSum = pos.getNettoSumme() != null ? pos.getNettoSumme() : BigDecimal.ZERO;
     final BigDecimal invoicedSum = pos.getFakturiertSum() != null ? pos.getFakturiertSum() : BigDecimal.ZERO;
@@ -227,7 +227,7 @@ public class OrderExport
     xls.setContentProvider(contentProvider);
 
     ExportColumn[] columns = createOrderColumns();
-    String sheetTitle = PFUserContext.getLocalizedString("fibu.auftrag.auftraege");
+    String sheetTitle = ThreadLocalUserContext.getLocalizedString("fibu.auftrag.auftraege");
     ExportSheet sheet = xls.addSheet(sheetTitle);
     ContentProvider sheetProvider = sheet.getContentProvider();
     sheetProvider.putFormat(MyXlsContentProvider.FORMAT_CURRENCY, OrderCol.NETSUM, OrderCol.INVOICED, OrderCol.TO_BE_INVOICED);
@@ -241,7 +241,7 @@ public class OrderExport
     }
     sheet.setAutoFilter();
     columns = createPosColumns();
-    sheetTitle = PFUserContext.getLocalizedString("fibu.auftrag.positions");
+    sheetTitle = ThreadLocalUserContext.getLocalizedString("fibu.auftrag.positions");
     sheet = xls.addSheet(sheetTitle);
     sheetProvider = sheet.getContentProvider();
     sheetProvider.putFormat(MyXlsContentProvider.FORMAT_CURRENCY, PosCol.NETSUM, PosCol.INVOICED, PosCol.TO_BE_INVOICED);
@@ -250,7 +250,7 @@ public class OrderExport
     sheet.createFreezePane(1, 1);
     sheet.setColumns(columns);
     sheet.setMergedRegion(0, 0, PosCol.PERIOD_OF_PERFORMANCE_BEGIN.ordinal(), PosCol.PERIOD_OF_PERFORMANCE_END.ordinal(),
-        PFUserContext.getLocalizedString("fibu.periodOfPerformance"));
+        ThreadLocalUserContext.getLocalizedString("fibu.periodOfPerformance"));
     for (final AuftragDO order : list) {
       if (order.getPositionen() == null) {
         continue;

@@ -35,7 +35,7 @@ import org.projectforge.fibu.EmployeeDO;
 import org.projectforge.fibu.EmployeeDao;
 import org.projectforge.statistics.TimesheetDisciplineChartBuilder;
 import org.projectforge.timesheet.TimesheetDao;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.JFreeChartImage;
 
@@ -61,7 +61,7 @@ public class PersonalStatisticsPage extends AbstractSecuredPage
     final Label timesheetDisciplineChartTitle = new Label("timesheetDisciplineChartTitle",
         getString("personal.statistics.timesheetDisciplineChart.title"));
     body.add(timesheetDisciplineChartTitle);
-    final EmployeeDO employee = employeeDao.getByUserId(PFUserContext.getUserId());
+    final EmployeeDO employee = employeeDao.getByUserId(ThreadLocalUserContext.getUserId());
     double workingHoursPerDay = 8;
     if (employee != null && NumberHelper.greaterZero(employee.getWochenstunden()) == true) {
       workingHoursPerDay = employee.getWochenstunden() / 5;
@@ -72,7 +72,7 @@ public class PersonalStatisticsPage extends AbstractSecuredPage
     image.add(AttributeModifier.replace("width", String.valueOf(IMAGE_WIDTH)));
     image.add(AttributeModifier.replace("height", String.valueOf(IMAGE_HEIGHT)));
     body.add(image);
-    final NumberFormat format = NumberFormat.getNumberInstance(PFUserContext.getLocale());
+    final NumberFormat format = NumberFormat.getNumberInstance(ThreadLocalUserContext.getLocale());
     final String planHours = "<span style=\"color: #DE1821; font-weight: bold;\">"
         + format.format(chartBuilder.getPlanWorkingHours())
         + "</span>";

@@ -35,7 +35,7 @@ import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.ConfigXml;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.WicketUtils;
 
@@ -213,7 +213,7 @@ public class ImageCropperPage extends AbstractSecuredPage
     if (defaultLanguage != null) {
       return defaultLanguage;
     }
-    return PFUserContext.getLocale().getCountry();
+    return ThreadLocalUserContext.getLocale().getCountry();
   }
 
   public void setDefaultLanguage(final String defaultLanguage)

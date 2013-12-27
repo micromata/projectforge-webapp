@@ -32,7 +32,7 @@ import org.apache.commons.lang.StringUtils;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.common.StringHelper;
 import org.projectforge.registry.Registry;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
@@ -83,7 +83,7 @@ public class UsersProvider extends TextChoiceProvider<PFUserDO>
     if (sortedUsers == null) {
       sortedUsers = new TreeSet<PFUserDO>(usersComparator);
       final Collection<PFUserDO> allusers = getUserGroupCache().getAllUsers();
-      final PFUserDO loggedInUser = PFUserContext.getUser();
+      final PFUserDO loggedInUser = ThreadLocalUserContext.getUser();
       for (final PFUserDO user : allusers) {
         if (user.isDeleted() == false && user.isDeactivated() == false && getUserDao().hasSelectAccess(loggedInUser, user, false) == true) {
           sortedUsers.add(user);

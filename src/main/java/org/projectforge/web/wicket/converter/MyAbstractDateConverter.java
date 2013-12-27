@@ -37,7 +37,7 @@ import org.apache.wicket.util.convert.ConversionException;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.common.DateFormatType;
 import org.projectforge.common.DateFormats;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.calendar.DateTimeFormatter;
 
 /**
@@ -112,7 +112,7 @@ public abstract class MyAbstractDateConverter extends DateConverter
       if (ClassUtils.isAssignable(targetType, java.sql.Date.class) == false) {
         // Set time zone not for java.sql.Date, because e. g. for Europe/Berlin the date 1970-11-21 will
         // result in 1970-11-20 23:00:00 UTC and therefore 1970-11-20!
-        dateFormats[i].setTimeZone(PFUserContext.getTimeZone());
+        dateFormats[i].setTimeZone(ThreadLocalUserContext.getTimeZone());
       }
     }
 

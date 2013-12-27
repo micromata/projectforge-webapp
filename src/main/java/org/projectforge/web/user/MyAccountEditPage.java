@@ -30,7 +30,7 @@ import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.Login;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.UserFilter;
@@ -59,7 +59,7 @@ public class MyAccountEditPage extends AbstractEditPage<PFUserDO, MyAccountEditF
           getString("menu.changePassword"));
       addContentMenuEntry(menu);
     }
-    final PFUserDO loggedInUser = userDao.internalGetById(PFUserContext.getUserId());
+    final PFUserDO loggedInUser = userDao.internalGetById(ThreadLocalUserContext.getUserId());
     super.init(loggedInUser);
     this.showHistory = false;
   }
@@ -88,7 +88,7 @@ public class MyAccountEditPage extends AbstractEditPage<PFUserDO, MyAccountEditF
   @Override
   protected void update()
   {
-    if (PFUserContext.getUserId().equals(getData().getId()) == false) {
+    if (ThreadLocalUserContext.getUserId().equals(getData().getId()) == false) {
       throw new IllegalStateException("Oups, MyAccountEditPage is called with another than the logged in user!");
     }
     getData().setPersonalPhoneIdentifiers(userDao.getNormalizedPersonalPhoneIdentifiers(getData()));

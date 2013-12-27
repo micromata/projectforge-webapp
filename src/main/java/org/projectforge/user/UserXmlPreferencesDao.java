@@ -153,7 +153,7 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
   public void checkAccess(final Integer userId)
   {
     Validate.notNull(userId);
-    final PFUserDO user = PFUserContext.getUser();
+    final PFUserDO user = ThreadLocalUserContext.getUser();
     if (ObjectUtils.equals(userId, user.getId()) == false) {
       accessChecker.checkIsLoggedInUserMemberOfAdminGroup();
     }

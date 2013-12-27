@@ -41,7 +41,7 @@ import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.GroupDO;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.user.UserPrefAreaRegistry;
@@ -98,7 +98,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
   {
     // DropDownChoice area
     final LabelValueChoiceRenderer<UserPrefArea> areaChoiceRenderer = new LabelValueChoiceRenderer<UserPrefArea>();
-    for (final UserPrefArea area : UserPrefAreaRegistry.instance().getOrderedEntries(PFUserContext.getLocale())) {
+    for (final UserPrefArea area : UserPrefAreaRegistry.instance().getOrderedEntries(ThreadLocalUserContext.getLocale())) {
       areaChoiceRenderer.addValue(area, parent.getString("userPref.area." + area.getKey()));
     }
     return areaChoiceRenderer;
@@ -140,7 +140,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // User
-      data.setUser(PFUserContext.getUser());
+      data.setUser(ThreadLocalUserContext.getUser());
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("user")).suppressLabelForWarning();
       fs.add(new DivTextPanel(fs.newChildId(), data.getUser().getFullname()));
     }

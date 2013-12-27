@@ -29,7 +29,7 @@ import org.apache.commons.lang.Validate;
 import org.projectforge.common.StringHelper;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserGroupCache;
@@ -63,7 +63,7 @@ public class AccessChecker
   public boolean hasLoggedInUserPermission(final Integer taskId, final AccessType accessType, final OperationType operationType,
       final boolean throwException)
   {
-    return hasPermission(PFUserContext.getUser(), taskId, accessType, operationType, throwException);
+    return hasPermission(ThreadLocalUserContext.getUser(), taskId, accessType, operationType, throwException);
   }
 
   /**
@@ -141,7 +141,7 @@ public class AccessChecker
    */
   public boolean isLoggedInUserMemberOfAdminGroup()
   {
-    return isUserMemberOfAdminGroup(PFUserContext.getUser());
+    return isUserMemberOfAdminGroup(ThreadLocalUserContext.getUser());
   }
 
   /**
@@ -180,7 +180,7 @@ public class AccessChecker
    */
   public void checkIsLoggedInUserMemberOfGroup(final ProjectForgeGroup... groups)
   {
-    checkIsUserMemberOfGroup(PFUserContext.getUser(), groups);
+    checkIsUserMemberOfGroup(ThreadLocalUserContext.getUser(), groups);
   }
 
   /**
@@ -214,7 +214,7 @@ public class AccessChecker
    */
   public boolean isLoggedInUserMemberOfGroup(final boolean throwException, final ProjectForgeGroup... groups)
   {
-    return isUserMemberOfGroup(PFUserContext.getUser(), throwException, groups);
+    return isUserMemberOfGroup(ThreadLocalUserContext.getUser(), throwException, groups);
   }
 
   /**
@@ -289,7 +289,7 @@ public class AccessChecker
    */
   public boolean userEqualsToContextUser(final PFUserDO user)
   {
-    return userEquals(PFUserContext.getUser(), user);
+    return userEquals(ThreadLocalUserContext.getUser(), user);
   }
 
   /**
@@ -299,7 +299,7 @@ public class AccessChecker
    */
   public boolean isLoggedInUserInSameGroup(final PFUserDO user)
   {
-    return areUsersInSameGroup(PFUserContext.getUser(), user);
+    return areUsersInSameGroup(ThreadLocalUserContext.getUser(), user);
   }
 
   /**
@@ -392,7 +392,7 @@ public class AccessChecker
   public boolean hasLoggedInUserAccess(final UserRightId rightId, final Object obj, final Object oldObj, final OperationType operationType,
       final boolean throwException)
   {
-    return hasAccess(PFUserContext.getUser(), rightId, obj, oldObj, operationType, throwException);
+    return hasAccess(ThreadLocalUserContext.getUser(), rightId, obj, oldObj, operationType, throwException);
   }
 
   /**
@@ -404,7 +404,7 @@ public class AccessChecker
    */
   public boolean hasLoggedInUserSelectAccess(final UserRightId rightId, final boolean throwException)
   {
-    return hasSelectAccess(PFUserContext.getUser(), rightId, throwException);
+    return hasSelectAccess(ThreadLocalUserContext.getUser(), rightId, throwException);
   }
 
   /**
@@ -502,7 +502,7 @@ public class AccessChecker
    */
   public boolean hasLoggedInUserRight(final UserRightId rightId, final UserRightValue... values)
   {
-    return hasRight(PFUserContext.getUser(), rightId, false, values);
+    return hasRight(ThreadLocalUserContext.getUser(), rightId, false, values);
   }
 
   /**
@@ -523,7 +523,7 @@ public class AccessChecker
    */
   public boolean hasLoggedInUserRight(final UserRightId rightId, final boolean throwException, final UserRightValue... values)
   {
-    return hasRight(PFUserContext.getUser(), rightId, throwException, values);
+    return hasRight(ThreadLocalUserContext.getUser(), rightId, throwException, values);
   }
 
   /**
@@ -564,7 +564,7 @@ public class AccessChecker
    */
   public boolean hasLoggedInUserReadAccess(final UserRightId rightId, final boolean throwException)
   {
-    return hasReadAccess(PFUserContext.getUser(), rightId, throwException);
+    return hasReadAccess(ThreadLocalUserContext.getUser(), rightId, throwException);
   }
 
   /**
@@ -611,7 +611,7 @@ public class AccessChecker
 
   public boolean hasLoggedInUserHistoryAccess(final UserRightId rightId, final Object obj, final boolean throwException)
   {
-    return hasHistoryAccess(PFUserContext.getUser(), rightId, obj, throwException);
+    return hasHistoryAccess(ThreadLocalUserContext.getUser(), rightId, obj, throwException);
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes"})
@@ -662,7 +662,7 @@ public class AccessChecker
    */
   public boolean isAvailable(final UserRightId rightId)
   {
-    return isAvailable(PFUserContext.getUser(), rightId);
+    return isAvailable(ThreadLocalUserContext.getUser(), rightId);
   }
 
   /**
@@ -678,7 +678,7 @@ public class AccessChecker
 
   public boolean isDemoUser()
   {
-    final PFUserDO user = PFUserContext.getUser();
+    final PFUserDO user = ThreadLocalUserContext.getUser();
     if (user == null) {
       return false;
     }
@@ -704,7 +704,7 @@ public class AccessChecker
 
   public boolean isRestrictedUser()
   {
-    final PFUserDO user = PFUserContext.getUser();
+    final PFUserDO user = ThreadLocalUserContext.getUser();
     if (user == null) {
       return true;
     }
@@ -737,7 +737,7 @@ public class AccessChecker
 
   public boolean isRestrictedOrDemoUser()
   {
-    final PFUserDO user = PFUserContext.getUser();
+    final PFUserDO user = ThreadLocalUserContext.getUser();
     if (user == null) {
       return false;
     }
@@ -778,7 +778,7 @@ public class AccessChecker
    */
   public boolean hasLoggedInUserAccessToTimesheetsOfOtherUsers()
   {
-    final PFUserDO loggedInUser = PFUserContext.getUser();
+    final PFUserDO loggedInUser = ThreadLocalUserContext.getUser();
     Validate.notNull(loggedInUser);
     if (isUserMemberOfGroup(loggedInUser, ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP,
         ProjectForgeGroup.PROJECT_MANAGER) == true) {

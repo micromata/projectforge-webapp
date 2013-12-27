@@ -29,7 +29,7 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import org.projectforge.common.DateHelper;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -65,7 +65,7 @@ public class CalendarUtils
    */
   public static Calendar getUTCMidnightCalendar(final Date date)
   {
-    return getUTCMidnightCalendar(date, PFUserContext.getTimeZone());
+    return getUTCMidnightCalendar(date, ThreadLocalUserContext.getTimeZone());
   }
 
   /**
@@ -113,7 +113,7 @@ public class CalendarUtils
    */
   public static Calendar getMidnightCalendarFromUTC(final Date date)
   {
-    return getMidnightCalendarFromUTC(date, PFUserContext.getTimeZone());
+    return getMidnightCalendarFromUTC(date, ThreadLocalUserContext.getTimeZone());
   }
 
   /**

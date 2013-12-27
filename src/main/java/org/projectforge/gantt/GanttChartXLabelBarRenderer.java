@@ -30,7 +30,7 @@ import org.projectforge.calendar.DayHolder;
 import org.projectforge.common.DateHolder;
 import org.projectforge.export.SVGColor;
 import org.projectforge.export.SVGHelper;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -169,7 +169,7 @@ public class GanttChartXLabelBarRenderer
     if (style.getXLabel() != null) {
       label = style.getXLabel();
     } else if (style.isRelativeTimeValues() == true) {
-      label = PFUserContext.getLocalizedString(labelUnit.getI18nKey());
+      label = ThreadLocalUserContext.getLocalizedString(labelUnit.getI18nKey());
     }
     this.showNonWorkingDays = style.isShowNonWorkingDays();
     if (this.showNonWorkingDays == true) {

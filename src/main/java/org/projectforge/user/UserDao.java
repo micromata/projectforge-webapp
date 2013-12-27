@@ -577,7 +577,7 @@ public class UserDao extends BaseDao<PFUserDO>
   @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
   public void renewStayLoggedInKey(final Integer userId)
   {
-    if (PFUserContext.getUserId().equals(userId) == false) {
+    if (ThreadLocalUserContext.getUserId().equals(userId) == false) {
       // Only admin users are able to renew authentication token of other users:
       accessChecker.checkIsLoggedInUserMemberOfAdminGroup();
     }
@@ -637,7 +637,7 @@ public class UserDao extends BaseDao<PFUserDO>
   @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
   public void renewAuthenticationToken(final Integer userId)
   {
-    if (PFUserContext.getUserId().equals(userId) == false) {
+    if (ThreadLocalUserContext.getUserId().equals(userId) == false) {
       // Only admin users are able to renew authentication token of other users:
       accessChecker.checkIsLoggedInUserMemberOfAdminGroup();
     }
@@ -660,7 +660,7 @@ public class UserDao extends BaseDao<PFUserDO>
    */
   public String encrypt(final String data)
   {
-    return encrypt(PFUserContext.getUserId(), data);
+    return encrypt(ThreadLocalUserContext.getUserId(), data);
   }
 
   /**
@@ -751,7 +751,7 @@ public class UserDao extends BaseDao<PFUserDO>
   public void updateMyAccount(final PFUserDO user)
   {
     accessChecker.checkRestrictedOrDemoUser();
-    final PFUserDO contextUser = PFUserContext.getUser();
+    final PFUserDO contextUser = ThreadLocalUserContext.getUser();
     Validate.isTrue(user.getId().equals(contextUser.getId()) == true);
     final PFUserDO dbUser = getHibernateTemplate().load(clazz, user.getId(), LockMode.PESSIMISTIC_WRITE);
     if (copyValues(user, dbUser, "deleted", "password", "lastLogin", "loginFailures", "username", "stayLoggedInKey", "authenticationToken",

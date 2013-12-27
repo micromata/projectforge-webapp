@@ -49,7 +49,7 @@ import org.projectforge.common.DatePrecision;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.user.UserSelectPanel;
@@ -322,18 +322,18 @@ AbstractSecuredForm<F, P>
       // DropDownChoice for convenient selection of time periods.
       final LabelValueChoiceRenderer<String> timePeriodChoiceRenderer = new LabelValueChoiceRenderer<String>();
       timePeriodChoiceRenderer.addValue("lastMinute", getString("search.lastMinute"));
-      timePeriodChoiceRenderer.addValue("lastMinutes:10", PFUserContext.getLocalizedMessage("search.lastMinutes", 10));
-      timePeriodChoiceRenderer.addValue("lastMinutes:30", PFUserContext.getLocalizedMessage("search.lastMinutes", 30));
+      timePeriodChoiceRenderer.addValue("lastMinutes:10", ThreadLocalUserContext.getLocalizedMessage("search.lastMinutes", 10));
+      timePeriodChoiceRenderer.addValue("lastMinutes:30", ThreadLocalUserContext.getLocalizedMessage("search.lastMinutes", 30));
       timePeriodChoiceRenderer.addValue("lastHour", getString("search.lastHour"));
-      timePeriodChoiceRenderer.addValue("lastHours:4", PFUserContext.getLocalizedMessage("search.lastHours", 4));
+      timePeriodChoiceRenderer.addValue("lastHours:4", ThreadLocalUserContext.getLocalizedMessage("search.lastHours", 4));
       timePeriodChoiceRenderer.addValue("today", getString("search.today"));
       timePeriodChoiceRenderer.addValue("sinceYesterday", getString("search.sinceYesterday"));
-      timePeriodChoiceRenderer.addValue("lastDays:3", PFUserContext.getLocalizedMessage("search.lastDays", 3));
-      timePeriodChoiceRenderer.addValue("lastDays:7", PFUserContext.getLocalizedMessage("search.lastDays", 7));
-      timePeriodChoiceRenderer.addValue("lastDays:14", PFUserContext.getLocalizedMessage("search.lastDays", 14));
-      timePeriodChoiceRenderer.addValue("lastDays:30", PFUserContext.getLocalizedMessage("search.lastDays", 30));
-      timePeriodChoiceRenderer.addValue("lastDays:60", PFUserContext.getLocalizedMessage("search.lastDays", 60));
-      timePeriodChoiceRenderer.addValue("lastDays:90", PFUserContext.getLocalizedMessage("search.lastDays", 90));
+      timePeriodChoiceRenderer.addValue("lastDays:3", ThreadLocalUserContext.getLocalizedMessage("search.lastDays", 3));
+      timePeriodChoiceRenderer.addValue("lastDays:7", ThreadLocalUserContext.getLocalizedMessage("search.lastDays", 7));
+      timePeriodChoiceRenderer.addValue("lastDays:14", ThreadLocalUserContext.getLocalizedMessage("search.lastDays", 14));
+      timePeriodChoiceRenderer.addValue("lastDays:30", ThreadLocalUserContext.getLocalizedMessage("search.lastDays", 30));
+      timePeriodChoiceRenderer.addValue("lastDays:60", ThreadLocalUserContext.getLocalizedMessage("search.lastDays", 60));
+      timePeriodChoiceRenderer.addValue("lastDays:90", ThreadLocalUserContext.getLocalizedMessage("search.lastDays", 90));
       final DropDownChoice<String> modificationSinceChoice = new DropDownChoice<String>(fieldset.getDropDownChoiceId(),
           new PropertyModel<String>(this, "modificationSince"), timePeriodChoiceRenderer.getValues(), timePeriodChoiceRenderer);
       modificationSinceChoice.setNullValid(true);

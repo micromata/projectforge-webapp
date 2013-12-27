@@ -41,7 +41,7 @@ import org.projectforge.excel.ExportWorkbook;
 import org.projectforge.excel.I18nExportColumn;
 import org.projectforge.excel.PropertyMapping;
 import org.projectforge.export.MyXlsContentProvider;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.web.wicket.converter.LanguageConverter;
 
@@ -168,13 +168,13 @@ public class AddressExport
   {
     mapping.add(Col.NAME, address.getName());
     mapping.add(Col.FIRST_NAME, address.getFirstName());
-    mapping.add(Col.FORM, address.getForm() != null ? PFUserContext.getLocalizedString(address.getForm().getI18nKey()) : "");
+    mapping.add(Col.FORM, address.getForm() != null ? ThreadLocalUserContext.getLocalizedString(address.getForm().getI18nKey()) : "");
     mapping.add(Col.TITLE, address.getTitle());
     mapping.add(Col.CONTACT_STATUS, address.getContactStatus());
     mapping.add(Col.ORGANIZATION, address.getOrganization());
     mapping.add(Col.DIVISION, address.getDivision());
     mapping.add(Col.POSITION, address.getPositionText());
-    mapping.add(Col.COMMUNICATION_LANG, LanguageConverter.getLanguageAsString(address.getCommunicationLanguage(), PFUserContext.getLocale()));
+    mapping.add(Col.COMMUNICATION_LANG, LanguageConverter.getLanguageAsString(address.getCommunicationLanguage(), ThreadLocalUserContext.getLocale()));
     mapping.add(Col.EMAIL, address.getEmail());
     mapping.add(Col.WEBSITE, address.getWebsite());
     mapping.add(Col.MAILING_ADDRESS, address.getMailingAddressText());
@@ -215,7 +215,7 @@ public class AddressExport
 
   protected String getSheetTitle()
   {
-    return PFUserContext.getLocalizedString("address.addresses");
+    return ThreadLocalUserContext.getLocalizedString("address.addresses");
   }
 
   protected void initSheet(final ExportSheet sheet, final Object... params)
@@ -254,10 +254,10 @@ public class AddressExport
     final ExportSheet sheet = xls.addSheet(sheetTitle);
     sheet.addRow(); // Column headers
     sheet.setMergedRegion(0, 0, Col.MAILING_ADDRESS.ordinal(), Col.MAILING_STATE.ordinal(), "Mailing");
-    sheet.setMergedRegion(0, 0, Col.ADDRESS.ordinal(), Col.STATE.ordinal(), PFUserContext.getLocalizedString("address.addressText"));
-    sheet.setMergedRegion(0, 0, Col.POSTAL_ADDRESS.ordinal(), Col.POSTAL_STATE.ordinal(), PFUserContext
+    sheet.setMergedRegion(0, 0, Col.ADDRESS.ordinal(), Col.STATE.ordinal(), ThreadLocalUserContext.getLocalizedString("address.addressText"));
+    sheet.setMergedRegion(0, 0, Col.POSTAL_ADDRESS.ordinal(), Col.POSTAL_STATE.ordinal(), ThreadLocalUserContext
         .getLocalizedString("address.postalAddressText"));
-    sheet.setMergedRegion(0, 0, Col.PRIVATE_ADDRESS.ordinal(), Col.PRIVATE_STATE.ordinal(), PFUserContext
+    sheet.setMergedRegion(0, 0, Col.PRIVATE_ADDRESS.ordinal(), Col.PRIVATE_STATE.ordinal(), ThreadLocalUserContext
         .getLocalizedString("address.privateAddressText"));
     initSheet(sheet, params);
 

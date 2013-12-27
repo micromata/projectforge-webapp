@@ -40,7 +40,7 @@ import org.projectforge.rest.Authentication;
 import org.projectforge.rest.ConnectionSettings;
 import org.projectforge.rest.converter.DateTimeFormat;
 import org.projectforge.user.LoginProtection;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.WebConfiguration;
@@ -164,7 +164,7 @@ public class RestUserFilter implements Filter
     }
     try {
       loginProtection.clearLoginTimeOffset(userString, clientIpAddress);
-      PFUserContext.setUser(user);
+      ThreadLocalUserContext.setUser(user);
       final ConnectionSettings settings = getConnectionSettings(req);
       ConnectionSettings.set(settings);
       final String ip = request.getRemoteAddr();
@@ -178,7 +178,7 @@ public class RestUserFilter implements Filter
       log.info("Rest-call: " + ((HttpServletRequest) request).getRequestURI());
       chain.doFilter(request, response);
     } finally {
-      PFUserContext.setUser(null);
+      ThreadLocalUserContext.setUser(null);
       ConnectionSettings.set(null);
       MDC.remove("ip");
       MDC.remove("user");

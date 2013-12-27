@@ -52,7 +52,7 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.HibernateSearchPhoneNumberBridge;
 import org.projectforge.task.TaskDO;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -451,7 +451,7 @@ public class AddressDO extends DefaultBaseDO
   public String getFullNameWithTitleAndForm() {
     final StringBuffer buf = new StringBuffer();
     if (getForm() != null) {
-      buf.append(PFUserContext.getLocalizedString(getForm().getI18nKey())).append(" ");
+      buf.append(ThreadLocalUserContext.getLocalizedString(getForm().getI18nKey())).append(" ");
     }
     if (getTitle() != null) {
       buf.append(getTitle()).append(" ");

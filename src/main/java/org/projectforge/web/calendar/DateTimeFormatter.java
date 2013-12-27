@@ -34,7 +34,7 @@ import org.projectforge.calendar.TimePeriod;
 import org.projectforge.common.DateFormats;
 import org.projectforge.common.DateHelper;
 import org.projectforge.renderer.RenderType;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.core.AbstractFormatter;
 
@@ -78,7 +78,7 @@ public class DateTimeFormatter extends AbstractFormatter
    */
   public String getFormattedDate(final Object date)
   {
-    return getFormattedDate(date, PFUserContext.getLocale(), PFUserContext.getTimeZone());
+    return getFormattedDate(date, ThreadLocalUserContext.getLocale(), ThreadLocalUserContext.getTimeZone());
   }
 
   /**
@@ -98,7 +98,7 @@ public class DateTimeFormatter extends AbstractFormatter
    */
   public String getFormattedDate(final Object date, final String pattern)
   {
-    return getFormattedDate(date, pattern, PFUserContext.getLocale(), PFUserContext.getTimeZone());
+    return getFormattedDate(date, pattern, ThreadLocalUserContext.getLocale(), ThreadLocalUserContext.getTimeZone());
   }
 
   /**
@@ -136,7 +136,7 @@ public class DateTimeFormatter extends AbstractFormatter
   public String getFormattedDateTime(final Date dateTime, final Locale locale, final TimeZone timeZone)
   {
     return getFormattedDateTime(dateTime, DateFormats.getFormatString(org.projectforge.common.DateFormatType.DATE_TIME_SHORT_MINUTES),
-        PFUserContext.getLocale(), PFUserContext.getTimeZone());
+        ThreadLocalUserContext.getLocale(), ThreadLocalUserContext.getTimeZone());
   }
 
   /**
@@ -146,7 +146,7 @@ public class DateTimeFormatter extends AbstractFormatter
    */
   public String getFormattedDateTime(final Date dateTime, final String pattern)
   {
-    return getFormattedDateTime(dateTime, pattern, PFUserContext.getLocale(), PFUserContext.getTimeZone());
+    return getFormattedDateTime(dateTime, pattern, ThreadLocalUserContext.getLocale(), ThreadLocalUserContext.getTimeZone());
   }
 
   /**
@@ -161,7 +161,7 @@ public class DateTimeFormatter extends AbstractFormatter
     }
     final DateFormat format = locale != null ? new SimpleDateFormat(pattern, locale) : new SimpleDateFormat(pattern);
     if (timeZone != null) {
-      format.setTimeZone(PFUserContext.getTimeZone());
+      format.setTimeZone(ThreadLocalUserContext.getTimeZone());
     }
     return format.format(dateTime);
   }
@@ -186,8 +186,8 @@ public class DateTimeFormatter extends AbstractFormatter
     if (time == null) {
       return "";
     }
-    final DateFormat format = new SimpleDateFormat(pattern, PFUserContext.getLocale());
-    format.setTimeZone(PFUserContext.getTimeZone());
+    final DateFormat format = new SimpleDateFormat(pattern, ThreadLocalUserContext.getLocale());
+    format.setTimeZone(ThreadLocalUserContext.getTimeZone());
     return format.format(time);
   }
 

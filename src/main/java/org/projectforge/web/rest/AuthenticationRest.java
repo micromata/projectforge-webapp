@@ -37,7 +37,7 @@ import org.projectforge.rest.JsonUtils;
 import org.projectforge.rest.RestPaths;
 import org.projectforge.rest.objects.ServerInfo;
 import org.projectforge.rest.objects.UserObject;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.rest.converter.PFUserDOConverter;
@@ -86,7 +86,7 @@ public class AuthenticationRest
   @Produces(MediaType.APPLICATION_JSON)
   public Response getToken()
   {
-    final PFUserDO user = PFUserContext.getUser();
+    final PFUserDO user = ThreadLocalUserContext.getUser();
     if (user == null) {
       log.error("No user given for rest call.");
       throw new IllegalArgumentException("No user given for the rest call: authenticate/getToken.");
@@ -108,7 +108,7 @@ public class AuthenticationRest
   @Produces(MediaType.APPLICATION_JSON)
   public Response initialContact(@QueryParam("clientVersion") final String clientVersionString)
   {
-    final PFUserDO user = PFUserContext.getUser();
+    final PFUserDO user = ThreadLocalUserContext.getUser();
     if (user == null) {
       log.error("No user given for rest call.");
       throw new IllegalArgumentException("No user given for the rest call: authenticate/getToken.");

@@ -24,7 +24,7 @@
 package org.projectforge.fibu;
 
 import org.projectforge.access.OperationType;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserRightAccessCheck;
@@ -75,7 +75,7 @@ public class ProjektRight extends UserRightAccessCheck<ProjektDO>
     }
     if (UserRights.getAccessChecker().isUserMemberOfGroup(user, ProjectForgeGroup.PROJECT_MANAGER, ProjectForgeGroup.PROJECT_ASSISTANT) == true) {
       if (obj.getProjektManagerGroup() != null
-          && UserRights.getUserGroupCache().isUserMemberOfGroup(PFUserContext.getUserId(), obj.getProjektManagerGroupId()) == true) {
+          && UserRights.getUserGroupCache().isUserMemberOfGroup(ThreadLocalUserContext.getUserId(), obj.getProjektManagerGroupId()) == true) {
         if ((obj.getStatus() == null || obj.getStatus().isIn(ProjektStatus.ENDED) == false) && obj.isDeleted() == false) {
           // Ein Projektleiter sieht keine nicht aktiven oder gelöschten Projekte.
           return true;

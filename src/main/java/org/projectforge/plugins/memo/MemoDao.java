@@ -25,7 +25,7 @@ package org.projectforge.plugins.memo;
 
 import org.projectforge.core.BaseDao;
 import org.projectforge.plugins.todo.ToDoDO;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRightId;
@@ -51,7 +51,7 @@ public class MemoDao extends BaseDao<MemoDO>
   protected void onSaveOrModify(MemoDO obj)
   {
     super.onSaveOrModify(obj);
-    obj.setOwner(PFUserContext.getUser()); // Set always the logged-in user as owner.
+    obj.setOwner(ThreadLocalUserContext.getUser()); // Set always the logged-in user as owner.
   }
 
   public void setAssignee(final ToDoDO todo, final Integer userId)

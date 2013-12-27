@@ -27,7 +27,7 @@ import java.util.Locale;
 
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 
 /**
@@ -147,7 +147,7 @@ public class DateFormats
    */
   private static String ensureAndGetDefaultDateFormat()
   {
-    final PFUserDO user = PFUserContext.getUser();
+    final PFUserDO user = ThreadLocalUserContext.getUser();
     String defaultDateFormat = user != null ? user.getDateFormat() : null;
     if (defaultDateFormat == null) {
       defaultDateFormat = Configuration.getInstance().getDefaultDateFormat();
@@ -164,13 +164,13 @@ public class DateFormats
    */
   public static TimeNotation ensureAndGetDefaultTimeNotation()
   {
-    final PFUserDO user = PFUserContext.getUser();
+    final PFUserDO user = ThreadLocalUserContext.getUser();
     TimeNotation defaultTimeNotation = user != null ? user.getTimeNotation() : null;
     if (defaultTimeNotation == null) {
       if (ConfigXml.getInstance().getDefaultTimeNotation() != null) {
         defaultTimeNotation = ConfigXml.getInstance().getDefaultTimeNotation();
       } else {
-        final Locale locale = PFUserContext.getLocale();
+        final Locale locale = ThreadLocalUserContext.getLocale();
         if (locale != null && locale.toString().toLowerCase().startsWith("de") == true) {
           defaultTimeNotation = TimeNotation.H24;
         } else {
@@ -190,7 +190,7 @@ public class DateFormats
    */
   private static String ensureAndGetDefaultExcelDateFormat()
   {
-    final PFUserDO user = PFUserContext.getUser();
+    final PFUserDO user = ThreadLocalUserContext.getUser();
     String defaultExcelDateFormat = user != null ? user.getExcelDateFormat() : null;
     if (defaultExcelDateFormat == null) {
       defaultExcelDateFormat = Configuration.getInstance().getDefaultExcelDateFormat();

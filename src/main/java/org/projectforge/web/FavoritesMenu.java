@@ -37,7 +37,7 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.projectforge.core.UserException;
 import org.projectforge.plugins.todo.ToDoPlugin;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserRights;
 import org.projectforge.user.UserXmlPreferencesDO;
 import org.projectforge.web.core.NavAbstractPanel;
@@ -113,7 +113,7 @@ public class FavoritesMenu implements Serializable
       log.error("Exception encountered " + ex, ex);
       return;
     }
-    final MenuBuilderContext context = new MenuBuilderContext(menu, PFUserContext.getUser(), false);
+    final MenuBuilderContext context = new MenuBuilderContext(menu, ThreadLocalUserContext.getUser(), false);
     final Element root = document.getRootElement();
     menuEntries = new ArrayList<MenuEntry>();
     for (final Iterator< ? > it = root.elementIterator("item"); it.hasNext();) {
@@ -184,7 +184,7 @@ public class FavoritesMenu implements Serializable
     if (this.menuEntries.size() == 0) {
       final MenuItemRegistry registry = MenuItemRegistry.instance();
       if (UserRights.getAccessChecker().isLoggedInUserMemberOfAdminGroup() == true) {
-        final MenuEntry adminMenu = new MenuEntry().setName(PFUserContext.getLocalizedString(MenuItemDefId.ADMINISTRATION.getI18nKey()));
+        final MenuEntry adminMenu = new MenuEntry().setName(ThreadLocalUserContext.getLocalizedString(MenuItemDefId.ADMINISTRATION.getI18nKey()));
         menuEntries.add(adminMenu);
         addFavoriteMenuEntry(adminMenu, registry.get(MenuItemDefId.ACCESS_LIST));
         addFavoriteMenuEntry(adminMenu, registry.get(MenuItemDefId.USER_LIST));
@@ -195,7 +195,7 @@ public class FavoritesMenu implements Serializable
         // Restricted users see only the change password menu entry (as favorite).
         addFavoriteMenuEntry(registry.get(MenuItemDefId.CHANGE_PASSWORD));
       } else {
-        final MenuEntry projectManagementMenu = new MenuEntry().setName(PFUserContext.getLocalizedString(MenuItemDefId.PROJECT_MANAGEMENT
+        final MenuEntry projectManagementMenu = new MenuEntry().setName(ThreadLocalUserContext.getLocalizedString(MenuItemDefId.PROJECT_MANAGEMENT
             .getI18nKey()));
         menuEntries.add(projectManagementMenu);
         addFavoriteMenuEntry(projectManagementMenu, registry.get(MenuItemDefId.MONTHLY_EMPLOYEE_REPORT));

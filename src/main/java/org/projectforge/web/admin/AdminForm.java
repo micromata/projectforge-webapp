@@ -33,7 +33,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.AppVersion;
 import org.projectforge.common.DateHelper;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.wicket.AbstractStandardForm;
 import org.projectforge.web.wicket.WicketApplication;
 import org.projectforge.web.wicket.WicketUtils;
@@ -110,7 +110,7 @@ public class AdminForm extends AbstractStandardForm<AdminForm, AdminPage>
     }
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("system.admin.alertMessage.copyAndPaste.title")).suppressLabelForWarning();
-      fs.add(new DivTextPanel(fs.newChildId(), PFUserContext.getLocalizedMessage("system.admin.alertMessage.copyAndPaste.text",
+      fs.add(new DivTextPanel(fs.newChildId(), ThreadLocalUserContext.getLocalizedMessage("system.admin.alertMessage.copyAndPaste.text",
           AppVersion.NUMBER)));
     }
 

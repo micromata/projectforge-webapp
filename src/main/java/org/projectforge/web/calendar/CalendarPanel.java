@@ -51,7 +51,7 @@ import org.projectforge.common.NumberHelper;
 import org.projectforge.humanresources.HRPlanningDao;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.web.address.AddressViewPage;
@@ -422,7 +422,7 @@ public class CalendarPanel extends Panel
       if (newEndTimeMillis != null) {
         timesheet.setStopTime(new Timestamp(newEndTimeMillis));
       }
-      final PFUserDO loggedInUser = PFUserContext.getUser();
+      final PFUserDO loggedInUser = ThreadLocalUserContext.getUser();
       if (CalendarDropMode.MOVE_SAVE.equals(dropMode) == true || CalendarDropMode.MOVE_EDIT.equals(dropMode) == true) {
         if (timesheetDao.hasUpdateAccess(loggedInUser, timesheet, dbTimesheet, false) == false) {
           // User has no update access, therefore ignore this request...

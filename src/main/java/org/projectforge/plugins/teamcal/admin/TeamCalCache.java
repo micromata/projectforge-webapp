@@ -33,7 +33,7 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.projectforge.common.AbstractCache;
 import org.projectforge.registry.Registry;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRights;
 
@@ -72,7 +72,7 @@ public class TeamCalCache extends AbstractCache
   {
     checkRefresh();
     final Set<TeamCalDO> set = new TreeSet<TeamCalDO>(new TeamCalsComparator());
-    final PFUserDO loggedInUser = PFUserContext.getUser();
+    final PFUserDO loggedInUser = ThreadLocalUserContext.getUser();
     for (final TeamCalDO cal : calendarMap.values()) {
       if (teamCalRight.hasSelectAccess(loggedInUser, cal) == true && cal.isDeleted() == false) {
         set.add(cal);
@@ -89,7 +89,7 @@ public class TeamCalCache extends AbstractCache
   {
     checkRefresh();
     final Set<TeamCalDO> set = new TreeSet<TeamCalDO>(new TeamCalsComparator());
-    final Integer loggedInUserId = PFUserContext.getUserId();
+    final Integer loggedInUserId = ThreadLocalUserContext.getUserId();
     for (final TeamCalDO cal : calendarMap.values()) {
       if (teamCalRight.isOwner(loggedInUserId, cal) == true) {
         set.add(cal);
@@ -108,7 +108,7 @@ public class TeamCalCache extends AbstractCache
           log.warn("Calendar with id " + calId + " not found in cache.");
           continue;
         }
-        if (teamCalRight.hasSelectAccess(PFUserContext.getUser()) == true) {
+        if (teamCalRight.hasSelectAccess(ThreadLocalUserContext.getUser()) == true) {
           set.add(cal);
         }
       }

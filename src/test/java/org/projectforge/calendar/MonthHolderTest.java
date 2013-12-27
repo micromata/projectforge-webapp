@@ -40,7 +40,7 @@ import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
 import org.projectforge.core.ConfigXmlTest;
 import org.projectforge.core.Configuration;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 
 public class MonthHolderTest
@@ -55,7 +55,7 @@ public class MonthHolderTest
   @Test
   public void testMonthHolder()
   {
-    PFUserContext.setUser(new PFUserDO().setLocale(Locale.GERMAN).setTimeZone(DateHelper.EUROPE_BERLIN));
+    ThreadLocalUserContext.setUser(new PFUserDO().setLocale(Locale.GERMAN).setTimeZone(DateHelper.EUROPE_BERLIN));
     final DateHolder date = new DateHolder(new Date(), DatePrecision.DAY, Locale.GERMAN);
     date.setDate(1970, Calendar.NOVEMBER, 21, 0, 0, 0);
     final MonthHolder month = new MonthHolder(date.getDate());

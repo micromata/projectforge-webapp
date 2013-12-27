@@ -25,7 +25,7 @@ package org.projectforge.common;
 
 import java.util.ArrayList;
 
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 /**
  * Stores messages in an array. Used by methods as return value.
@@ -79,7 +79,7 @@ public class ResultHolder
     @Override
     public String getMessage()
     {
-      return PFUserContext.getLocalizedMessage(messageKey, params);
+      return ThreadLocalUserContext.getLocalizedMessage(messageKey, params);
     }
   }
 

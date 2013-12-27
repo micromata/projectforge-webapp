@@ -45,7 +45,7 @@ import org.projectforge.task.TaskDO;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.timesheet.TimesheetFilter;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.calendar.ICalendarFilter;
 import org.projectforge.web.calendar.MyEvent;
@@ -136,7 +136,7 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
       firstDayOfMonth = null;
     } else {
       // Month view:
-      final DateTime currentMonth = new DateTime(start.plusDays(10), PFUserContext.getDateTimeZone()); // Now we're definitely in the right
+      final DateTime currentMonth = new DateTime(start.plusDays(10), ThreadLocalUserContext.getDateTimeZone()); // Now we're definitely in the right
       // month.
       month = currentMonth.getMonthOfYear();
       firstDayOfMonth = currentMonth.withDayOfMonth(1);
@@ -144,8 +144,8 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
     if (CollectionUtils.isEmpty(timesheets) == false) {
       DateTime lastStopTime = null;
       for (final TimesheetDO timesheet : timesheets) {
-        final DateTime startTime = new DateTime(timesheet.getStartTime(), PFUserContext.getDateTimeZone());
-        final DateTime stopTime = new DateTime(timesheet.getStopTime(), PFUserContext.getDateTimeZone());
+        final DateTime startTime = new DateTime(timesheet.getStartTime(), ThreadLocalUserContext.getDateTimeZone());
+        final DateTime stopTime = new DateTime(timesheet.getStopTime(), ThreadLocalUserContext.getDateTimeZone());
         if (stopTime.isBefore(start) == true || startTime.isAfter(end) == true) {
           // Time sheet doesn't match time period start - end.
           continue;
@@ -218,7 +218,7 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
         }
         final int dayOfYear = day.getDayOfYear();
         final long duration = durationsPerDayOfYear[dayOfYear];
-        final boolean firstDayOfWeek = day.getDayOfWeek() == PFUserContext.getJodaFirstDayOfWeek();
+        final boolean firstDayOfWeek = day.getDayOfWeek() == ThreadLocalUserContext.getJodaFirstDayOfWeek();
         if (firstDayOfWeek == false && duration == 0) {
           day = day.plusDays(1);
           continue;
@@ -292,12 +292,12 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
     final int[] fields = TimePeriod.getDurationFields(millis, 8, 200);
     final StringBuffer buf = new StringBuffer();
     if (fields[0] > 0) {
-      buf.append(fields[0]).append(PFUserContext.getLocalizedString("calendar.unit.day")).append(" ");
+      buf.append(fields[0]).append(ThreadLocalUserContext.getLocalizedString("calendar.unit.day")).append(" ");
     }
     buf.append(fields[1]).append(":").append(StringHelper.format2DigitNumber(fields[2]))
-    .append(PFUserContext.getLocalizedString("calendar.unit.hour"));
+    .append(ThreadLocalUserContext.getLocalizedString("calendar.unit.hour"));
     if (showTimePeriod == true) {
-      buf.append(" (").append(PFUserContext.getLocalizedString("calendar.month")).append(")");
+      buf.append(" (").append(ThreadLocalUserContext.getLocalizedString("calendar.month")).append(")");
     }
     return buf.toString();
   }

@@ -26,7 +26,7 @@ package org.projectforge.web.core;
 import javax.servlet.jsp.PageContext;
 
 import org.projectforge.core.Priority;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.HtmlHelper;
 
 
@@ -48,7 +48,7 @@ public class PriorityFormatter
     buf.append("<span");
     htmlHelper.attribute(buf, "class", "priority_" + priority.getKey());
     buf.append(">");
-    buf.append(PFUserContext.getLocalizedString("priority." + priority.getKey()));
+    buf.append(ThreadLocalUserContext.getLocalizedString("priority." + priority.getKey()));
     buf.append("</span>");
     return buf.toString();
   }

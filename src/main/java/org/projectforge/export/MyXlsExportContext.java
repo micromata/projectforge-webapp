@@ -30,7 +30,7 @@ import org.projectforge.excel.ExcelDateFormats;
 import org.projectforge.excel.ExportConfig;
 import org.projectforge.excel.ExportContext;
 import org.projectforge.excel.ExportWorkbook;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 
 /**
@@ -64,7 +64,7 @@ public class MyXlsExportContext implements ExportContext
   public Locale getLocale()
   {
     if (this.locale != null) {
-      locale = PFUserContext.getLocale();
+      locale = ThreadLocalUserContext.getLocale();
     }
     return locale;
   }
@@ -81,7 +81,7 @@ public class MyXlsExportContext implements ExportContext
    */
   public String getLocalizedString(final String i18nKey)
   {
-    return PFUserContext.getLocalizedString(i18nKey);
+    return ThreadLocalUserContext.getLocalizedString(i18nKey);
   }
 
   /**
@@ -91,7 +91,7 @@ public class MyXlsExportContext implements ExportContext
   @Override
   public String getExcelDateFormat()
   {
-    final PFUserDO user = PFUserContext.getUser();
+    final PFUserDO user = ThreadLocalUserContext.getUser();
     return user != null ? user.getExcelDateFormat() : ExcelDateFormats.EXCEL_DEFAULT_DATE;
   }
 }

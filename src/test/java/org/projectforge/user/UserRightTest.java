@@ -145,10 +145,10 @@ public class UserRightTest extends TestBase
     final UserRight right = UserRights.instance().getRight(UserRightId.PM_HR_PLANNING);
     logon(TEST_PROJECT_MANAGER_USER);
     assertFalse("Right is not configurable, because all available right values are automatically assigned to the current user", right
-        .isConfigurable(userDao.getUserGroupCache(), PFUserContext.getUser()));
+        .isConfigurable(userDao.getUserGroupCache(), ThreadLocalUserContext.getUser()));
     logon(TEST_ADMIN_USER);
     assertFalse("Right is not configurable, because no right values are available.", right.isConfigurable(userDao.getUserGroupCache(),
-        PFUserContext.getUser()));
+        ThreadLocalUserContext.getUser()));
     PFUserDO user = new PFUserDO();
     user.setUsername("testConfigurableRight");
     user = userDao.getById(userDao.save(user));
@@ -157,14 +157,14 @@ public class UserRightTest extends TestBase
     groupDao.update(group);
     logon(user.getUsername());
     assertTrue("Right is configurable, because serveral right values are available.", right.isConfigurable(userDao.getUserGroupCache(),
-        PFUserContext.getUser()));
+        ThreadLocalUserContext.getUser()));
     logon(TEST_ADMIN_USER);
     group = getGroup(ProjectForgeGroup.PROJECT_MANAGER.toString());
     group.getAssignedUsers().add(user);
     groupDao.update(group);
     logon(user.getUsername());
     assertFalse("Right is not configurable, because all available right values are automatically assigned to the current user", right
-        .isConfigurable(userDao.getUserGroupCache(), PFUserContext.getUser()));
+        .isConfigurable(userDao.getUserGroupCache(), ThreadLocalUserContext.getUser()));
   }
 
   @Test
@@ -176,7 +176,7 @@ public class UserRightTest extends TestBase
     logon(TEST_ADMIN_USER);
     assertFalse("Right invalid.", accessChecker.hasLoggedInUserRight(UserRightId.PM_HR_PLANNING, false, UserRightValue.READWRITE));
     assertFalse("Right is not configurable, because no right values are available.", right.isConfigurable(userDao.getUserGroupCache(),
-        PFUserContext.getUser()));
+        ThreadLocalUserContext.getUser()));
     PFUserDO user = new PFUserDO();
     user.setUsername("testHRPlanningRight");
     user = userDao.getById(userDao.save(user));
@@ -189,7 +189,7 @@ public class UserRightTest extends TestBase
     logon(user.getUsername());
     assertFalse("Right invalid.", accessChecker.hasLoggedInUserRight(UserRightId.PM_HR_PLANNING, false, UserRightValue.READWRITE));
     assertTrue("Right is configurable, because serveral right values are available.", right.isConfigurable(userDao.getUserGroupCache(),
-        PFUserContext.getUser()));
+        ThreadLocalUserContext.getUser()));
     logon(TEST_ADMIN_USER);
     group = getGroup(ProjectForgeGroup.PROJECT_MANAGER.toString());
     group.getAssignedUsers().add(user);
@@ -198,6 +198,6 @@ public class UserRightTest extends TestBase
     assertTrue("Right now valid because project managers have always READWRITE access.", accessChecker.hasLoggedInUserRight(
         UserRightId.PM_HR_PLANNING, false, UserRightValue.READWRITE));
     assertFalse("Right is not configurable, because all available right values are automatically assigned to the current user", right
-        .isConfigurable(userDao.getUserGroupCache(), PFUserContext.getUser()));
+        .isConfigurable(userDao.getUserGroupCache(), ThreadLocalUserContext.getUser()));
   }
 }

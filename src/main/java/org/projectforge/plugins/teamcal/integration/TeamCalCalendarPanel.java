@@ -54,7 +54,7 @@ import org.projectforge.plugins.teamcal.event.TeamEventDao;
 import org.projectforge.plugins.teamcal.event.TeamEventEditPage;
 import org.projectforge.plugins.teamcal.event.TeamEventRight;
 import org.projectforge.plugins.teamcal.event.TeamRecurrenceEvent;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.calendar.CalendarFilter;
@@ -164,10 +164,10 @@ public class TeamCalCalendarPanel extends CalendarPanel
       return;
     }
     // User clicked on teamEvent
-    final TeamCalEventId id = new TeamCalEventId(event.getId(), PFUserContext.getTimeZone());
+    final TeamCalEventId id = new TeamCalEventId(event.getId(), ThreadLocalUserContext.getTimeZone());
     final TeamEventDO teamEventDO = teamEventDao.getById(id.getDataBaseId());
     final TeamEvent teamEvent = eventProvider.getTeamEvent(id.toString());
-    if (new TeamEventRight().hasUpdateAccess(PFUserContext.getUser(), teamEventDO, null)) {
+    if (new TeamEventRight().hasUpdateAccess(ThreadLocalUserContext.getUser(), teamEventDO, null)) {
       if (teamEventDO.hasRecurrence() == true) {
         // at this point the dbTeamEvent is already updated in time
         recurrenceChangeDialog.open(response.getTarget(), teamEvent, null, null);
@@ -258,7 +258,7 @@ public class TeamCalCalendarPanel extends CalendarPanel
     if (StringUtils.startsWith(event.getId(), "-")) {
       return;
     }
-    final TeamCalEventId id = new TeamCalEventId(event.getId(), PFUserContext.getTimeZone());
+    final TeamCalEventId id = new TeamCalEventId(event.getId(), ThreadLocalUserContext.getTimeZone());
     final TeamEvent teamEvent = eventProvider.getTeamEvent(id.toString());
     if (teamEvent == null) {
       return;

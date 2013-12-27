@@ -92,7 +92,7 @@ public class UserPrefDao extends BaseDao<UserPrefDO>
    */
   public String[] getPrefNames(final UserPrefArea area)
   {
-    final PFUserDO user = PFUserContext.getUser();
+    final PFUserDO user = ThreadLocalUserContext.getUser();
     @SuppressWarnings("unchecked")
     final List<Object> list = getSession().createQuery("select name from UserPrefDO t where user_fk=? and areaString = ? order by name")
     .setInteger(0, user.getId()).setParameter(1, area.getId()).list();
@@ -148,7 +148,7 @@ public class UserPrefDao extends BaseDao<UserPrefDO>
 
   public UserPrefDO getUserPref(final UserPrefArea area, final String name)
   {
-    final PFUserDO user = PFUserContext.getUser();
+    final PFUserDO user = ThreadLocalUserContext.getUser();
     @SuppressWarnings("unchecked")
     final List<UserPrefDO> list = getHibernateTemplate().find("from UserPrefDO u where u.user.id = ? and u.areaString = ? and u.name = ?",
         new Object[] { user.getId(), area.getId(), name});
@@ -160,7 +160,7 @@ public class UserPrefDao extends BaseDao<UserPrefDO>
 
   public List<UserPrefDO> getUserPrefs(final UserPrefArea area)
   {
-    final PFUserDO user = PFUserContext.getUser();
+    final PFUserDO user = ThreadLocalUserContext.getUser();
     @SuppressWarnings("unchecked")
     final List<UserPrefDO> list = getHibernateTemplate().find("from UserPrefDO u where u.user.id = ? and u.areaString = ?",
         new Object[] { user.getId(), area.getId()});

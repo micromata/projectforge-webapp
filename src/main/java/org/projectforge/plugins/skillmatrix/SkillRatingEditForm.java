@@ -31,7 +31,7 @@ import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
@@ -75,7 +75,7 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
   public SkillRatingEditForm(final SkillRatingEditPage parentPage, final SkillRatingDO data)
   {
     super(parentPage, data);
-    data.setUser(PFUserContext.getUser());
+    data.setUser(ThreadLocalUserContext.getUser());
   }
 
   @SuppressWarnings("serial")

@@ -33,7 +33,7 @@ import net.ftlines.wicket.fullcalendar.EventProvider;
 
 import org.joda.time.DateTime;
 import org.projectforge.common.DateHelper;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 /**
  * Creates events for FullCalendar.
@@ -98,6 +98,6 @@ public abstract class MyFullCalendarEventsProvider implements EventProvider
 
   protected String getString(final String key)
   {
-    return PFUserContext.getLocalizedString(key);
+    return ThreadLocalUserContext.getLocalizedString(key);
   }
 }

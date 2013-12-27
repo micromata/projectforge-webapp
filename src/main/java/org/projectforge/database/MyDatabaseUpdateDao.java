@@ -41,7 +41,7 @@ import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.plugins.core.PluginsRegistry;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.Login;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.springframework.dao.DataAccessException;
@@ -80,11 +80,11 @@ public class MyDatabaseUpdateDao extends DatabaseUpdateDao
   @Override
   protected void accessCheck(final boolean writeaccess)
   {
-    if (PFUserContext.getUser() == SYSTEM_ADMIN_PSEUDO_USER) {
+    if (ThreadLocalUserContext.getUser() == SYSTEM_ADMIN_PSEUDO_USER) {
       // No access check for the system admin pseudo user.
       return;
     }
-    if (Login.getInstance().isAdminUser(PFUserContext.getUser()) == false) {
+    if (Login.getInstance().isAdminUser(ThreadLocalUserContext.getUser()) == false) {
       throw new AccessException(AccessChecker.I18N_KEY_VIOLATION_USER_NOT_MEMBER_OF, ProjectForgeGroup.ADMIN_GROUP.getKey());
     }
     accessChecker.checkRestrictedOrDemoUser();

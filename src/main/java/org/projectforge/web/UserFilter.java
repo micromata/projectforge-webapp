@@ -46,7 +46,7 @@ import org.projectforge.common.NumberHelper;
 import org.projectforge.common.StringHelper;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.Login;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.core.LogoServlet;
@@ -252,7 +252,7 @@ public class UserFilter implements Filter
         }
         if (user != null) {
           MDC.put("user", user.getUsername());
-          PFUserContext.setUser(user);
+          ThreadLocalUserContext.setUser(user);
           request = decorateWithLocale(request, user);
           chain.doFilter(request, response);
         } else {
@@ -266,7 +266,7 @@ public class UserFilter implements Filter
         }
       }
     } finally {
-      PFUserContext.setUser(null);
+      ThreadLocalUserContext.setUser(null);
       MDC.remove("ip");
       MDC.remove("session");
       if (user != null) {
@@ -338,7 +338,7 @@ public class UserFilter implements Filter
    */
   protected HttpServletRequest decorateWithLocale(HttpServletRequest request, final PFUserDO user)
   {
-    final Locale locale = PFUserContext.getLocale(request.getLocale());
+    final Locale locale = ThreadLocalUserContext.getLocale(request.getLocale());
     request = new HttpServletRequestWrapper(request) {
       @Override
       public Locale getLocale()

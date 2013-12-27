@@ -28,7 +28,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import org.projectforge.common.NumberHelper;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 /**
  * Converts BigDecimal values to formatted currency strings.
@@ -45,7 +45,7 @@ public class CurrencyFormatter
    */
   public static String format(final BigDecimal value)
   {
-    return format(value, PFUserContext.getLocale());
+    return format(value, ThreadLocalUserContext.getLocale());
   }
 
   /**

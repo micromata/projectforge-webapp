@@ -31,7 +31,7 @@ import org.projectforge.excel.ExportColumn;
 import org.projectforge.excel.ExportSheet;
 import org.projectforge.excel.I18nExportColumn;
 import org.projectforge.excel.PropertyMapping;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.wicket.converter.LanguageConverter;
 
 /**
@@ -103,13 +103,13 @@ public class AddressCampaignValueExport extends AddressExport
     final AddressCampaignValueDO addressCampaignValue = addressCampaignValueMap.get(address.getId());
     mapping.add(Col.NAME, address.getName());
     mapping.add(Col.FIRST_NAME, address.getFirstName());
-    mapping.add(Col.FORM, address.getForm() != null ? PFUserContext.getLocalizedString(address.getForm().getI18nKey()) : "");
+    mapping.add(Col.FORM, address.getForm() != null ? ThreadLocalUserContext.getLocalizedString(address.getForm().getI18nKey()) : "");
     mapping.add(Col.TITLE, address.getTitle());
     mapping.add(Col.CONTACT_STATUS, address.getContactStatus());
     mapping.add(Col.ORGANIZATION, address.getOrganization());
     mapping.add(Col.DIVISION, address.getDivision());
     mapping.add(Col.POSITION, address.getPositionText());
-    mapping.add(Col.COMMUNICATION_LANG, LanguageConverter.getLanguageAsString(address.getCommunicationLanguage(), PFUserContext.getLocale()));
+    mapping.add(Col.COMMUNICATION_LANG, LanguageConverter.getLanguageAsString(address.getCommunicationLanguage(), ThreadLocalUserContext.getLocale()));
     mapping.add(Col.ADDRESS_CAMPAIGN_VALUE, addressCampaignValue != null ? addressCampaignValue.getValue() : "");
     mapping.add(Col.ADDRESS_CAMPAIGN_COMMENT, addressCampaignValue != null ? addressCampaignValue.getComment() : "");
     mapping.add(Col.EMAIL, address.getEmail());
@@ -150,7 +150,7 @@ public class AddressCampaignValueExport extends AddressExport
   @Override
   protected String getSheetTitle()
   {
-    return PFUserContext.getLocalizedString("plugins.marketing.addressCampaign");
+    return ThreadLocalUserContext.getLocalizedString("plugins.marketing.addressCampaign");
   }
 
   @Override

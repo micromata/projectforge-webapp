@@ -31,7 +31,7 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.projectforge.access.AccessEntryDO;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.wicket.flowlayout.IconPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 
@@ -106,6 +106,6 @@ public class AccessTablePanel extends Panel
    */
   private String getLocalizedString(final String key) {
     //return super.getString(key);
-    return PFUserContext.getLocalizedString(key);
+    return ThreadLocalUserContext.getLocalizedString(key);
   }
 }

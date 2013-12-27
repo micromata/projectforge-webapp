@@ -43,7 +43,7 @@ import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.ProjektFormatter;
 import org.projectforge.fibu.kost.Kost1DO;
 import org.projectforge.fibu.kost.Kost2DO;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 
 public class MyXlsContentProvider extends XlsContentProvider
@@ -81,7 +81,7 @@ public class MyXlsContentProvider extends XlsContentProvider
     } else if (value instanceof PFUserDO) {
       return ((PFUserDO) value).getFullname();
     } else if (value instanceof I18nEnum) {
-      return PFUserContext.getLocalizedString(((I18nEnum) value).getI18nKey());
+      return ThreadLocalUserContext.getLocalizedString(((I18nEnum) value).getI18nKey());
     } else if (value instanceof KontoDO) {
       final KontoDO konto = (KontoDO) value;
       return konto.formatKonto();

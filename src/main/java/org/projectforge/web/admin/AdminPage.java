@@ -55,7 +55,7 @@ import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.plugins.core.PluginsRegistry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.user.UserXmlPreferencesMigrationDao;
 import org.projectforge.web.MenuBuilder;
@@ -429,7 +429,7 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
       log.error("Could not load i18n properties: " + ex.getMessage(), ex);
       throw new RuntimeException(ex);
     }
-    buf.append("Checking the differences between the " + PFUserContext.BUNDLE_NAME + " properties (default and _de)\n\n");
+    buf.append("Checking the differences between the " + ThreadLocalUserContext.BUNDLE_NAME + " properties (default and _de)\n\n");
     buf.append("Found " + props.size() + " entries in default property file (en).\n\n");
     buf.append("Missing in _de:\n");
     buf.append("---------------\n");
@@ -669,7 +669,7 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
   private void load(final Properties properties, final String locale) throws IOException
   {
     final ClassLoader cLoader = this.getClass().getClassLoader();
-    InputStream is = cLoader.getResourceAsStream(PFUserContext.BUNDLE_NAME + locale + ".properties");
+    InputStream is = cLoader.getResourceAsStream(ThreadLocalUserContext.BUNDLE_NAME + locale + ".properties");
     properties.load(is);
     for (final AbstractPlugin plugin : PluginsRegistry.instance().getPlugins()) {
       if (plugin.getResourceBundleName() == null) {

@@ -54,7 +54,7 @@ import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
 import org.projectforge.core.InternalErrorException;
 import org.projectforge.scripting.GroovyEngine;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 
 /**
@@ -112,8 +112,8 @@ public class PdfRenderer
   public byte[] render(final String stylesheet, final String groovyXml, final Map<String, Object> data)
   {
     // initialize();
-    final PFUserDO user = PFUserContext.getUser();
-    data.put("createdLabel", PFUserContext.getLocalizedString("created"));
+    final PFUserDO user = ThreadLocalUserContext.getUser();
+    data.put("createdLabel", ThreadLocalUserContext.getLocalizedString("created"));
     data.put("loggedInUser", user);
     data.put("baseDir", configXml.getResourcePath());
     data.put("appId", AppVersion.APP_ID);
@@ -179,7 +179,7 @@ public class PdfRenderer
 
       // First run jelly through xmlData:
       result = configXml.getContent(groovyXml);
-      final GroovyEngine groovyEngine = new GroovyEngine(data, PFUserContext.getLocale(), PFUserContext.getTimeZone());
+      final GroovyEngine groovyEngine = new GroovyEngine(data, ThreadLocalUserContext.getLocale(), ThreadLocalUserContext.getTimeZone());
       final String groovyXmlInput = groovyEngine.preprocessGroovyXml((String) result[0]);
       final String xmlData = groovyEngine.executeTemplate(groovyXmlInput);
 

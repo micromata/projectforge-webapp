@@ -28,7 +28,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import org.projectforge.common.NumberHelper;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 public class NumberFormatter
 {
@@ -38,7 +38,7 @@ public class NumberFormatter
    */
   public static String format(final int value)
   {
-    final NumberFormat format = NumberFormat.getNumberInstance(PFUserContext.getLocale());
+    final NumberFormat format = NumberFormat.getNumberInstance(ThreadLocalUserContext.getLocale());
     return format.format(value);
   }
 
@@ -48,7 +48,7 @@ public class NumberFormatter
    */
   public static String format(final long value)
   {
-    final NumberFormat format = NumberFormat.getNumberInstance(PFUserContext.getLocale());
+    final NumberFormat format = NumberFormat.getNumberInstance(ThreadLocalUserContext.getLocale());
     return format.format(value);
   }
 
@@ -83,7 +83,7 @@ public class NumberFormatter
    */
   public static String format(final BigDecimal value, final int scale)
   {
-    return format(value, scale, PFUserContext.getLocale());
+    return format(value, scale, ThreadLocalUserContext.getLocale());
   }
 
   /**

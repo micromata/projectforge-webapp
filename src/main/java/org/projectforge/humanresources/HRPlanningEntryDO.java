@@ -50,7 +50,7 @@ import org.projectforge.core.ShortDisplayNameCapable;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.ProjektFormatter;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 
 /**
@@ -282,7 +282,7 @@ public class HRPlanningEntryDO extends DefaultBaseDO implements ShortDisplayName
   public String getProjektNameOrStatus()
   {
     if (this.status != null) {
-      return PFUserContext.getLocalizedString(status.getI18nKey());
+      return ThreadLocalUserContext.getLocalizedString(status.getI18nKey());
     } else {
       return getProjektName();
     }

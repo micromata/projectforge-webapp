@@ -52,7 +52,7 @@ import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
@@ -270,17 +270,17 @@ public class InitTestDB
 
   void initDatabase()
   {
-    final PFUserDO origUser = PFUserContext.getUser();
+    final PFUserDO origUser = ThreadLocalUserContext.getUser();
     final PFUserDO initUser = new PFUserDO().setUsername("Init-database-pseudo-user");
     initUser.setId(-1);
-    PFUserContext.setUser(initUser);
+    ThreadLocalUserContext.setUser(initUser);
     initConfiguration();
     initUsers();
     initGroups();
     initTaskTree();
     initAccess();
     initKost2Arts();
-    PFUserContext.setUser(origUser);
+    ThreadLocalUserContext.setUser(origUser);
   }
 
   private void initConfiguration()

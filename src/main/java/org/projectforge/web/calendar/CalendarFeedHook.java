@@ -29,7 +29,7 @@ import java.util.Map;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VEvent;
 
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 /**
  * @author Johannes Unterstein(j.unterstein@micromata.de)
@@ -40,7 +40,7 @@ public interface CalendarFeedHook
 
   /**
    * @param params
-   * @param timezone The time zone of the ics framework (build from {@link PFUserContext#getTimeZone()}.
+   * @param timezone The time zone of the ics framework (build from {@link ThreadLocalUserContext#getTimeZone()}.
    * @param cal
    */
   public List<VEvent> getEvents(final Map<String, String> params, TimeZone timeZone);

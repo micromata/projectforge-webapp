@@ -40,7 +40,7 @@ import org.projectforge.database.HibernateUtils;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDao;
 import org.projectforge.plugins.teamcal.event.TeamEventUtils;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -122,7 +122,7 @@ public class TeamCalImportDao extends HibernateDaoSupport
 
   String getSheetName()
   {
-    return PFUserContext.getLocalizedString("plugins.teamcal.events");
+    return ThreadLocalUserContext.getLocalizedString("plugins.teamcal.events");
   }
 
   private void reconcile(final ImportedSheet<TeamEventDO> sheet, final Integer teamCalId)

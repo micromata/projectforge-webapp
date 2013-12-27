@@ -36,7 +36,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
 import org.projectforge.registry.Registry;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 
 /**
@@ -155,7 +155,7 @@ public class SkillTreeProvider implements ITreeProvider<SkillNode>
     if (nodes == null || nodes.isEmpty() == true) {
       return list.iterator();
     }
-    final PFUserDO user = PFUserContext.getUser();
+    final PFUserDO user = ThreadLocalUserContext.getUser();
     for (final SkillNode node : nodes) {
 
       final boolean isMatch = skillFilter.match(node, getSkillDao(), user);

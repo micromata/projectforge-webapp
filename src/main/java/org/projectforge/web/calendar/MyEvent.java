@@ -27,7 +27,7 @@ import net.ftlines.wicket.fullcalendar.Event;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.Period;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.WebConfiguration;
 
@@ -116,7 +116,7 @@ public class MyEvent extends Event
     if (first == false) {
       buf.append("\n");
     }
-    buf.append(PFUserContext.getLocalizedString("timesheet.duration")).append(": ").append(getDuration());
+    buf.append(ThreadLocalUserContext.getLocalizedString("timesheet.duration")).append(": ").append(getDuration());
     this.tooltipContent = HtmlHelper.escapeHtml(buf.toString(), true);
     return this;
   }
@@ -135,7 +135,7 @@ public class MyEvent extends Event
     final int minutes = period.getMinutes();
     final StringBuffer buf = new StringBuffer();
     if (days > 0) { // days
-      buf.append(days).append(PFUserContext.getLocalizedString("calendar.unit.day")).append(" ");
+      buf.append(days).append(ThreadLocalUserContext.getLocalizedString("calendar.unit.day")).append(" ");
     }
     if (isAllDay() == false) {
       buf.append(hours).append(":"); // hours

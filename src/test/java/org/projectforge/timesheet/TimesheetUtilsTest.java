@@ -33,7 +33,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.projectforge.common.DateHelper;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 
 public class TimesheetUtilsTest
@@ -47,7 +47,7 @@ public class TimesheetUtilsTest
   {
     timeZone = DateHelper.EUROPE_BERLIN;
     locale = new Locale("DE_de");
-    PFUserContext.setUser(new PFUserDO().setTimeZone(timeZone).setLocale(locale));
+    ThreadLocalUserContext.setUser(new PFUserDO().setTimeZone(timeZone).setLocale(locale));
     final PFUserDO user1 = new PFUserDO();
     user1.setId(1);
     final PFUserDO user2 = new PFUserDO();

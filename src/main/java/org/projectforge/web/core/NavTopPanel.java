@@ -45,7 +45,7 @@ import org.apache.wicket.request.http.WebRequest;
 import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.access.AccessChecker;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserRights;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.FavoritesMenu;
@@ -156,7 +156,7 @@ public class NavTopPanel extends NavAbstractPanel
       addBookmarkDialog();
     }
     {
-      add(new Label("user", PFUserContext.getUser().getFullname()));
+      add(new Label("user", ThreadLocalUserContext.getUser().getFullname()));
       if (accessChecker.isRestrictedUser() == true) {
         // Show ChangePaswordPage as my account for restricted users.
         final BookmarkablePageLink<Void> changePasswordLink = new BookmarkablePageLink<Void>("myAccountLink", ChangePasswordPage.class);

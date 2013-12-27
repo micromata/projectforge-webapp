@@ -67,7 +67,7 @@ import org.projectforge.multitenancy.TenantsCache;
 import org.projectforge.multitenancy.TenantsComparator;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.Login;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
@@ -195,7 +195,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       @Override
       public String getObject()
       {
-        if (PFUserContext.getUserId().equals(user.getId()) == true) {
+        if (ThreadLocalUserContext.getUserId().equals(user.getId()) == true) {
           return userDao.getAuthenticationToken(user.getId());
         } else {
           // Administrators shouldn't see the token.

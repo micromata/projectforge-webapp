@@ -60,7 +60,7 @@ import org.projectforge.registry.Registry;
 import org.projectforge.user.Login;
 import org.projectforge.user.LoginDefaultHandler;
 import org.projectforge.user.LoginHandler;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.UserFilter;
 import org.projectforge.web.WebConfiguration;
@@ -321,13 +321,13 @@ public class WicketApplication extends WebApplication implements WicketApplicati
       getDebugSettings().setOutputMarkupContainerClassName(true);
     }
     try {
-      PFUserContext.setUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser()); // Logon admin user.
+      ThreadLocalUserContext.setUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser()); // Logon admin user.
       if (projectForgeApp.getMyDatabaseUpdater().getSystemUpdater().isUpdated() == false) {
         // Force redirection to update page:
         UserFilter.setUpdateRequiredFirst(true);
       }
     } finally {
-      PFUserContext.setUser(null);
+      ThreadLocalUserContext.setUser(null);
     }
     LoginHandler loginHandler;
     if (StringUtils.isNotBlank(projectForgeApp.getConfigXml().getLoginHandlerClass()) == true) {

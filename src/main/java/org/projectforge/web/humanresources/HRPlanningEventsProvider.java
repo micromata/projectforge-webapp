@@ -35,7 +35,7 @@ import org.projectforge.humanresources.HRPlanningDO;
 import org.projectforge.humanresources.HRPlanningDao;
 import org.projectforge.humanresources.HRPlanningEntryDO;
 import org.projectforge.humanresources.HRPlanningFilter;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.calendar.ICalendarFilter;
 import org.projectforge.web.calendar.MyFullCalendarEventsProvider;
 
@@ -82,7 +82,7 @@ public class HRPlanningEventsProvider extends MyFullCalendarEventsProvider
     final HRPlanningFilter filter = new HRPlanningFilter();
     Integer timesheetUserId = calendarFilter.getTimesheetUserId() ;
     if (timesheetUserId == null) {
-      timesheetUserId = PFUserContext.getUserId();
+      timesheetUserId = ThreadLocalUserContext.getUserId();
     }
     filter.setUserId(timesheetUserId);
     filter.setStartTime(start.toDate());
@@ -95,7 +95,7 @@ public class HRPlanningEventsProvider extends MyFullCalendarEventsProvider
       if (planning.getEntries() == null) {
         continue;
       }
-      final DateTime week = new DateTime(planning.getWeek(), PFUserContext.getDateTimeZone());
+      final DateTime week = new DateTime(planning.getWeek(), ThreadLocalUserContext.getDateTimeZone());
       for (final HRPlanningEntryDO entry : planning.getEntries()) {
         if (entry.isDeleted() == true) {
           continue;

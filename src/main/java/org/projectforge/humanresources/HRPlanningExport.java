@@ -41,7 +41,7 @@ import org.projectforge.excel.I18nExportColumn;
 import org.projectforge.excel.PropertyMapping;
 import org.projectforge.export.MyXlsContentProvider;
 import org.projectforge.fibu.ProjektDao;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.calendar.DateTimeFormatter;
 
@@ -131,7 +131,7 @@ public class HRPlanningExport
     // create a default Date format and currency column
     xls.setContentProvider(contentProvider);
 
-    final String sheetTitle = PFUserContext.getLocalizedString("hr.plannings");
+    final String sheetTitle = ThreadLocalUserContext.getLocalizedString("hr.plannings");
     final ExportSheet sheet = xls.addSheet(sheetTitle);
     sheet.createFreezePane(8, 1);
 
@@ -201,7 +201,7 @@ public class HRPlanningExport
     // create a default Date format and currency column
     xls.setContentProvider(contentProvider);
 
-    final String sheetTitle = PFUserContext.getLocalizedString("exportKWProjects");
+    final String sheetTitle = ThreadLocalUserContext.getLocalizedString("exportKWProjects");
     final ExportSheet sheet = xls.addSheet(sheetTitle);
     sheet.createFreezePane(8, 1);
 
@@ -324,7 +324,7 @@ public class HRPlanningExport
     // create a default Date format and currency column
     xls.setContentProvider(contentProvider);
 
-    final String sheetTitle = PFUserContext.getLocalizedString("exportKWUsers");
+    final String sheetTitle = ThreadLocalUserContext.getLocalizedString("exportKWUsers");
     final ExportSheet sheet = xls.addSheet(sheetTitle);
     sheet.createFreezePane(8, 1);
 
@@ -454,7 +454,7 @@ public class HRPlanningExport
     // create a default Date format and currency column
     xls.setContentProvider(contentProvider);
 
-    final String sheetTitle = PFUserContext.getLocalizedString("exportProjectsUsers");
+    final String sheetTitle = ThreadLocalUserContext.getLocalizedString("exportProjectsUsers");
     final ExportSheet sheet = xls.addSheet(sheetTitle);
     sheet.createFreezePane(8, 1);
 

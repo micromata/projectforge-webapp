@@ -25,7 +25,7 @@ package org.projectforge.web.calendar;
 
 import java.util.Date;
 
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.timesheet.TimesheetEventsProvider;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -70,7 +70,7 @@ public class CalendarFilter extends AbstractCalendarFilter
   public CalendarFilter()
   {
     super();
-    timesheetUserId = PFUserContext.getUserId();
+    timesheetUserId = ThreadLocalUserContext.getUserId();
     selectedCalendar = TimesheetEventsProvider.EVENT_CLASS_NAME;
   }
 
@@ -148,7 +148,7 @@ public class CalendarFilter extends AbstractCalendarFilter
   public CalendarFilter setShowTimesheets(final boolean showTimesheets)
   {
     if (showTimesheets == true) {
-      this.timesheetUserId = PFUserContext.getUserId();
+      this.timesheetUserId = ThreadLocalUserContext.getUserId();
     } else {
       this.timesheetUserId = null;
     }

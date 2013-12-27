@@ -34,7 +34,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectforge.access.AccessException;
 import org.projectforge.test.TestBase;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 
@@ -72,7 +72,7 @@ public class InitDatabaseDaoTest extends TestBase
     admin.setUsername(InitDatabaseDao.DEFAULT_ADMIN_USER);
     admin.setId(1);
     userDao.createEncryptedPassword(admin, DEFAULT_ADMIN_PASSWORD);
-    PFUserContext.setUser(admin);
+    ThreadLocalUserContext.setUser(admin);
     initDatabaseDao.initializeEmptyDatabase(admin, null);
     final PFUserDO user = userDao.authenticateUser(InitDatabaseDao.DEFAULT_ADMIN_USER, DEFAULT_ADMIN_PASSWORD);
     assertNotNull(user);

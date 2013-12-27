@@ -40,7 +40,7 @@ import org.joda.time.DateTimeConstants;
 import org.projectforge.calendar.TimePeriod;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.calendar.DateTimeFormatter;
 
 /**
@@ -196,8 +196,8 @@ public class DateHelper implements Serializable
    */
   public static final String formatShortNameOfDay(final Date date)
   {
-    final DateFormat df = new SimpleDateFormat("EE", PFUserContext.getLocale());
-    df.setTimeZone(PFUserContext.getTimeZone());
+    final DateFormat df = new SimpleDateFormat("EE", ThreadLocalUserContext.getLocale());
+    df.setTimeZone(ThreadLocalUserContext.getTimeZone());
     return df.format(date);
   }
 
@@ -233,7 +233,7 @@ public class DateHelper implements Serializable
    */
   public static String formatIsoDate(final Date date)
   {
-    return getIsoDateFormat(PFUserContext.getTimeZone()).format(date);
+    return getIsoDateFormat(ThreadLocalUserContext.getTimeZone()).format(date);
   }
 
   /**
@@ -277,7 +277,7 @@ public class DateHelper implements Serializable
 
   public static String formatIsoTimestamp(final Date date)
   {
-    return formatIsoTimestamp(date, PFUserContext.getTimeZone());
+    return formatIsoTimestamp(date, ThreadLocalUserContext.getTimeZone());
   }
 
   public static String formatIsoTimestamp(final Date date, final TimeZone timeZone)
@@ -372,7 +372,7 @@ public class DateHelper implements Serializable
     if (date == null) {
       return "--";
     }
-    return getFilenameFormatTimestamp(PFUserContext.getTimeZone()).format(date);
+    return getFilenameFormatTimestamp(ThreadLocalUserContext.getTimeZone()).format(date);
   }
 
   public static final String getDateAsFilenameSuffix(final Date date)
@@ -380,7 +380,7 @@ public class DateHelper implements Serializable
     if (date == null) {
       return "--";
     }
-    return getFilenameFormatDate(PFUserContext.getTimeZone()).format(date);
+    return getFilenameFormatDate(ThreadLocalUserContext.getTimeZone()).format(date);
   }
 
   /**
@@ -403,10 +403,10 @@ public class DateHelper implements Serializable
   public static Calendar getCalendar(TimeZone timeZone, Locale locale)
   {
     if (locale == null) {
-      locale = PFUserContext.getLocale();
+      locale = ThreadLocalUserContext.getLocale();
     }
     if (timeZone == null) {
-      timeZone = PFUserContext.getTimeZone();
+      timeZone = ThreadLocalUserContext.getTimeZone();
     }
     return Calendar.getInstance(timeZone, locale);
   }
@@ -496,7 +496,7 @@ public class DateHelper implements Serializable
     if (date == null) {
       return -1;
     }
-    final Calendar cal = Calendar.getInstance(PFUserContext.getTimeZone(), ConfigXml.getInstance().getDefaultLocale());
+    final Calendar cal = Calendar.getInstance(ThreadLocalUserContext.getTimeZone(), ConfigXml.getInstance().getDefaultLocale());
     cal.setTime(date);
     return cal.get(Calendar.WEEK_OF_YEAR);
   }
@@ -624,7 +624,7 @@ public class DateHelper implements Serializable
   public static long getDateTimeAsMillis(final DateTime dateTime)
   {
     final String isDateString = dateTime.toString(DateFormats.ISO_TIMESTAMP_MILLIS);
-    final Date date = DateHelper.parseIsoTimestamp(isDateString, PFUserContext.getTimeZone());
+    final Date date = DateHelper.parseIsoTimestamp(isDateString, ThreadLocalUserContext.getTimeZone());
     return date.getTime();
   }
 

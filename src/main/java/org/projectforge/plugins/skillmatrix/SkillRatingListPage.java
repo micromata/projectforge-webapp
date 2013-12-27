@@ -36,7 +36,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.user.UserPropertyColumn;
@@ -96,7 +96,7 @@ IListPageColumnsCreator<SkillRatingDO>
         item.add(new ListSelectActionPanel(componentId, rowModel, SkillRatingEditPage.class, skillRating.getId(), returnToPage,
             DateTimeFormatter.instance().getFormattedDateTime(skillRating.getCreated())));
         // Only the owner can click / edit his entries
-        if (ObjectUtils.equals(PFUserContext.getUserId(), skillRating.getUserId())) {
+        if (ObjectUtils.equals(ThreadLocalUserContext.getUserId(), skillRating.getUserId())) {
           addRowClick(item);
         }
         cellItemListener.populateItem(item, componentId, rowModel);

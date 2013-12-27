@@ -73,7 +73,7 @@ import org.projectforge.gantt.Task2GanttTaskConverter;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskTree;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.CSSColor;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.fibu.ISelectCallerPage;
@@ -144,10 +144,10 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
     clickRows = false;
     final StringBuffer buf = new StringBuffer();
     buf.append("function showSaveAsTaskQuestionDialog() {\n").append("  return window.confirm('");
-    buf.append(PFUserContext.getLocalizedString("gantt.question.saveGanttObjectAsTask"));
+    buf.append(ThreadLocalUserContext.getLocalizedString("gantt.question.saveGanttObjectAsTask"));
     buf.append("');\n}\n");
     buf.append("function showMoveTaskQuestionDialog() {\n").append("  return window.confirm('");
-    buf.append(PFUserContext.getLocalizedString("gantt.question.moveTask"));
+    buf.append(ThreadLocalUserContext.getLocalizedString("gantt.question.moveTask"));
     buf.append("');\n}\n");
     add(new Label("questionDialogsMethods", buf.toString()).setEscapeModelStrings(false));
   }
@@ -496,9 +496,9 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
             public String getObject()
             {
               if (clipboard == ganttObject) {
-                return PFUserContext.getLocalizedString("gantt.action.moveToTop");
+                return ThreadLocalUserContext.getLocalizedString("gantt.action.moveToTop");
               } else {
-                return PFUserContext.getLocalizedString("gantt.action.move");
+                return ThreadLocalUserContext.getLocalizedString("gantt.action.move");
               }
             };
           }) {
@@ -707,7 +707,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
     public ContextMenuEntry(final String id, final String labelKey)
     {
       this(id);
-      link.add(new Label("label", PFUserContext.getLocalizedString(labelKey)).setRenderBodyOnly(true));
+      link.add(new Label("label", ThreadLocalUserContext.getLocalizedString(labelKey)).setRenderBodyOnly(true));
     }
 
     public ContextMenuEntry(final String id, final Model<String> label)
@@ -1173,7 +1173,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
           }
         }
       }.setDefaultFormProcessing(false)).setColor(CSSColor.RED);
-      rejectSubmitLink.setTooltip(Model.of(PFUserContext.getLocalizedMessage("gantt.tooltip.rejectValue", taskValueAsString)));
+      rejectSubmitLink.setTooltip(Model.of(ThreadLocalUserContext.getLocalizedMessage("gantt.tooltip.rejectValue", taskValueAsString)));
       add(rejectSubmitLink);
       saveSubmitLink = new IconLinkPanel("save", IconType.ACCEPT, new SubmitLink(IconLinkPanel.LINK_ID, form) {
         @Override

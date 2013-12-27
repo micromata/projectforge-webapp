@@ -28,7 +28,7 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.user.UserPrefEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
@@ -57,7 +57,7 @@ public class ToDoEditPage extends AbstractEditPage<ToDoDO, ToDoEditForm, ToDoDao
       if (pref != null) {
         copyPrefValues(pref, getData());
       }
-      getData().setReporter(PFUserContext.getUser());
+      getData().setReporter(ThreadLocalUserContext.getUser());
       getData().setStatus(ToDoStatus.OPENED);
     } else {
       // Store old to-do for sending e-mail notification after major changes.
@@ -74,7 +74,7 @@ public class ToDoEditPage extends AbstractEditPage<ToDoDO, ToDoEditForm, ToDoDao
       // Do nothing.
       return;
     }
-    if (ObjectUtils.equals(PFUserContext.getUserId(), getData().getAssigneeId()) == true) {
+    if (ObjectUtils.equals(ThreadLocalUserContext.getUserId(), getData().getAssigneeId()) == true) {
       // OK, user has now seen this to-do: delete recent flag:
       if (isNew() == false && getData().isRecent() == true) {
         getData().setRecent(false);

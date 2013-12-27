@@ -30,7 +30,7 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import org.apache.commons.lang.StringUtils;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.xml.stream.XmlConstants;
 
 public class DateConverter extends AbstractValueConverter<Date>
@@ -109,13 +109,13 @@ public class DateConverter extends AbstractValueConverter<Date>
   
   /**
    * The time zone of this object (if given) or the time zone of the user if found in the PFUserContext, otherwise {@link TimeZone#getDefault()}.
-   * @see PFUserContext#getUser()
-   * @see PFUserContext#getTimeZone()
+   * @see ThreadLocalUserContext#getUser()
+   * @see ThreadLocalUserContext#getTimeZone()
    */
   protected TimeZone getTimeZone() {
     if (timeZone != null) {
       return timeZone;
     }
-    return PFUserContext.getTimeZone();
+    return ThreadLocalUserContext.getTimeZone();
   }
 }

@@ -54,7 +54,7 @@ import org.projectforge.plugins.teamcal.event.TeamEventRight;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFilter;
 import org.projectforge.plugins.teamcal.integration.TemplateEntry;
 import org.projectforge.registry.Registry;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRights;
 import org.projectforge.web.calendar.CalendarPageSupport;
@@ -413,7 +413,7 @@ public class TeamCalFilterDialog extends ModalDialog
         final List<TeamCalDO> result = new ArrayList<TeamCalDO>();
         if (activeTemplateEntry != null) {
           for (final TeamCalDO cal : activeTemplateEntry.getCalendars()) {
-            if (teamEventRight.hasUpdateAccess(PFUserContext.getUser(), cal) == true) {
+            if (teamEventRight.hasUpdateAccess(ThreadLocalUserContext.getUser(), cal) == true) {
               // User is allowed to insert events to this calendar:
               result.add(cal);
             }

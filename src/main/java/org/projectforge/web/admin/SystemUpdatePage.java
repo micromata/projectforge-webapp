@@ -39,7 +39,7 @@ import org.projectforge.database.MyDatabaseUpdater;
 import org.projectforge.excel.ExportSheet;
 import org.projectforge.excel.ExportWorkbook;
 import org.projectforge.user.Login;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.DownloadUtils;
@@ -112,7 +112,7 @@ public class SystemUpdatePage extends AbstractSecuredPage
 
   private void checkAdminUser()
   {
-    if (Login.getInstance().isAdminUser(PFUserContext.getUser()) == false) {
+    if (Login.getInstance().isAdminUser(ThreadLocalUserContext.getUser()) == false) {
       throw new AccessException(AccessChecker.I18N_KEY_VIOLATION_USER_NOT_MEMBER_OF, ProjectForgeGroup.ADMIN_GROUP.getKey());
     }
   }

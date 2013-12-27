@@ -35,7 +35,7 @@ import org.projectforge.gantt.GanttAccess;
 import org.projectforge.gantt.GanttChartDO;
 import org.projectforge.gantt.GanttChartSettings;
 import org.projectforge.task.TaskDO;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
@@ -86,7 +86,7 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
     super(parentPage, data);
     if (isNew() == true) {
       if (data.getOwner() == null) {
-        data.setOwner(PFUserContext.getUser());
+        data.setOwner(ThreadLocalUserContext.getUser());
       }
       if (StringUtils.isEmpty(data.getName()) == true) {
         data.setName("MyChart");

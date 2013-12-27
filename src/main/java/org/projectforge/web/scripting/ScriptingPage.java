@@ -51,7 +51,7 @@ import org.projectforge.fibu.kost.reporting.ReportStorage;
 import org.projectforge.scripting.GroovyExecutor;
 import org.projectforge.scripting.GroovyResult;
 import org.projectforge.scripting.ScriptDao;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.web.fibu.ReportObjectivesPage;
 import org.projectforge.web.fibu.ReportScriptingStorage;
@@ -188,7 +188,7 @@ public class ScriptingPage extends AbstractStandardFormPage
           // }
         } else if (clientFileName.endsWith(".xls") == true) {
           final StringBuffer buf = new StringBuffer();
-          buf.append("report_").append(FileHelper.createSafeFilename(PFUserContext.getUser().getUsername(), 20)).append(".xls");
+          buf.append("report_").append(FileHelper.createSafeFilename(ThreadLocalUserContext.getUser().getUsername(), 20)).append(".xls");
           final File file = new File(ConfigXml.getInstance().getWorkingDirectory(), buf.toString());
           fileUpload.writeTo(file);
           getReportScriptingStorage().setFilename(clientFileName, file.getAbsolutePath());

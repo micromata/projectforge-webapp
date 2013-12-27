@@ -36,7 +36,7 @@ import org.apache.wicket.model.Model;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.annotate.JsonRawValue;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.I18nCore;
 
 public class MyFullCalendarConfig extends Config
@@ -81,7 +81,7 @@ public class MyFullCalendarConfig extends Config
     getButtonText().setMonth(getString("calendar.month"));
     getButtonText().setDay(getString("calendar.day"));
     setAllDayText(getString("calendar.allday"));
-    I18nCore.setFullCalendarDateFormats(PFUserContext.getUser(), this);
+    I18nCore.setFullCalendarDateFormats(ThreadLocalUserContext.getUser(), this);
     final DateFormatSymbols dateFormatSymbols = new DateFormatSymbols(parent.getLocale());
     setDayNames(convert(dateFormatSymbols.getWeekdays()));
     setDayNamesShort(convert(dateFormatSymbols.getShortWeekdays()));
@@ -107,7 +107,7 @@ public class MyFullCalendarConfig extends Config
    */
   public int getFirstDay()
   {
-    return PFUserContext.getJodaFirstDayOfWeek();
+    return ThreadLocalUserContext.getJodaFirstDayOfWeek();
   }
 
   /**

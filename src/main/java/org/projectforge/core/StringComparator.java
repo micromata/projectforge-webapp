@@ -26,7 +26,7 @@ package org.projectforge.core;
 import java.text.Collator;
 import java.util.Locale;
 
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 /**
  * Uses {@link Collator} and the user's locale to compare string.
@@ -49,7 +49,7 @@ public class StringComparator
   private final Locale german = new Locale("de");
 
   /**
-   * Uses {@link PFUserContext#getLocale()} as locale in ascending order.
+   * Uses {@link ThreadLocalUserContext#getLocale()} as locale in ascending order.
    * @param s1
    * @param s2
    * @return The result of {@link Collator#compare(String, String)}.
@@ -61,7 +61,7 @@ public class StringComparator
   }
 
   /**
-   * Uses {@link PFUserContext#getLocale()} as locale.
+   * Uses {@link ThreadLocalUserContext#getLocale()} as locale.
    * @param s1
    * @param s2
    * @param asc
@@ -70,7 +70,7 @@ public class StringComparator
    */
   public int compare(final String s1, final String s2, final boolean asc)
   {
-    return compare(s1, s2, asc, PFUserContext.getLocale());
+    return compare(s1, s2, asc, ThreadLocalUserContext.getLocale());
   }
 
   /**

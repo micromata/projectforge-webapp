@@ -56,7 +56,7 @@ import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefArea;
@@ -498,7 +498,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
         }
         if (CollectionUtils.isNotEmpty(kost2List) == true) {
           // Kost2 available but not selected.
-          choice.error(PFUserContext.getLocalizedString("timesheet.error.kost2Required"));
+          choice.error(ThreadLocalUserContext.getLocalizedString("timesheet.error.kost2Required"));
         }
       }
     });

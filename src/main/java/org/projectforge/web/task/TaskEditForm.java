@@ -51,7 +51,7 @@ import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskStatus;
 import org.projectforge.task.TaskTree;
 import org.projectforge.task.TimesheetBookingStatus;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.fibu.Kost2ListPage;
@@ -434,7 +434,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
     super.onBeforeRender();
     final TaskDO task = isNew() == true ? data.getParentTask() : data;
     final boolean hasKost2AndTimesheetBookingAccess = ((TaskDao) getBaseDao()).hasAccessForKost2AndTimesheetBookingStatus(
-        PFUserContext.getUser(), task);
+        ThreadLocalUserContext.getUser(), task);
     if (Configuration.getInstance().isCostConfigured() == true && task != null) {
       // Cost 2 settings
       final ProjektDO projekt = taskTree.getProjekt(task.getId());

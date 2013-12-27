@@ -47,7 +47,7 @@ import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.common.OutputType;
 import org.projectforge.web.dialog.ModalDialog;
 import org.projectforge.web.task.TaskFormatter;
@@ -143,7 +143,7 @@ public class TimesheetEditSelectRecentDialogPanel extends ModalDialog
               if (timesheet.getKost2() != null) {
                 buf.append(timesheet.getKost2().getShortDisplayName());
               }
-              if (timesheet.getUserId() != null && timesheet.getUserId().equals(PFUserContext.getUserId()) == false) {
+              if (timesheet.getUserId() != null && timesheet.getUserId().equals(ThreadLocalUserContext.getUserId()) == false) {
                 if (timesheet.getKost2() != null) {
                   buf.append(", ");
                 }

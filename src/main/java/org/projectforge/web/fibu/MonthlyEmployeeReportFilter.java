@@ -27,7 +27,7 @@ import java.io.Serializable;
 
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.StringHelper;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 
 public class MonthlyEmployeeReportFilter implements Serializable
@@ -48,7 +48,7 @@ public class MonthlyEmployeeReportFilter implements Serializable
       month = date.getMonth();
     }
     if (user == null) {
-      user = PFUserContext.getUser();
+      user = ThreadLocalUserContext.getUser();
     }
   }
 

@@ -26,7 +26,7 @@ package org.projectforge.web.meb;
 import org.apache.log4j.Logger;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.TextPanel;
@@ -43,7 +43,7 @@ public class MebListForm extends AbstractListForm<MebListFilter, MebListPage>
     super.init();
     gridBuilder.newGridPanel();
     final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.hint")).suppressLabelForWarning();
-    fs.add(new TextPanel(fs.newChildId(), PFUserContext.getLocalizedMessage("meb.intro",
+    fs.add(new TextPanel(fs.newChildId(), ThreadLocalUserContext.getLocalizedMessage("meb.intro",
         Configuration.getInstance().getStringValue(ConfigurationParam.MEB_SMS_RECEIVING_PHONE_NUMBER))));
   }
 

@@ -38,7 +38,7 @@ import org.projectforge.fibu.kost.AccountingConfig;
 import org.projectforge.fibu.kost.BuchungssatzDO;
 import org.projectforge.fibu.kost.BusinessAssessment;
 import org.projectforge.fibu.kost.BusinessAssessmentTable;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 
 /**
  * Ein Report enthält unterliegende Buchungssätze, die gemäß Zeitraum und zugehörigem ReportObjective selektiert werden.
@@ -300,7 +300,7 @@ public class Report implements Serializable
       }
       if (reportObjective.isSuppressOther() == false && this.other != null) {
         final ReportObjective objective = new ReportObjective();
-        final String other = PFUserContext.getLocalizedString("fibu.reporting.other");
+        final String other = ThreadLocalUserContext.getLocalizedString("fibu.reporting.other");
         objective.setId(this.getId() + " - " + other);
         objective.setTitle(this.getTitle() + " - " + other);
         final Report report = new Report(objective, this);
@@ -309,7 +309,7 @@ public class Report implements Serializable
       }
       if (reportObjective.isSuppressDuplicates() == false && this.duplicates != null) {
         final ReportObjective objective = new ReportObjective();
-        final String duplicates = PFUserContext.getLocalizedString("fibu.reporting.duplicates");
+        final String duplicates = ThreadLocalUserContext.getLocalizedString("fibu.reporting.duplicates");
         objective.setId(this.getId() + " - " + duplicates);
         objective.setTitle(this.getTitle() + " - " + duplicates);
         final Report report = new Report(objective, this);

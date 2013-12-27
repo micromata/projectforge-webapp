@@ -64,7 +64,7 @@ import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskStatus;
 import org.projectforge.task.TaskTree;
 import org.projectforge.task.TimesheetBookingStatus;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserDao;
@@ -238,7 +238,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
   {
     final TimesheetFilter timesheetFilter = new TimesheetFilter(filter);
     if (filter.getModifiedByUserId() == null) {
-      timesheetFilter.setUserId(PFUserContext.getUserId());
+      timesheetFilter.setUserId(ThreadLocalUserContext.getUserId());
     }
     return getList(timesheetFilter);
   }
@@ -773,7 +773,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
         + clazz.getSimpleName()
         + " t where deleted=false and t.user.id = ? and lastUpdate > ? and lower(t.location) like ?) order by t.location";
     final Query query = getSession().createQuery(s);
-    query.setInteger(0, PFUserContext.getUser().getId());
+    query.setInteger(0, ThreadLocalUserContext.getUser().getId());
     final DateHolder dh = new DateHolder();
     dh.add(Calendar.YEAR, -1);
     query.setDate(1, dh.getDate());
@@ -795,7 +795,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
     final String s = "select location from "
         + (clazz.getSimpleName() + " t where deleted=false and t.user.id = ? and lastUpdate > ? and t.location != null and t.location != '' order by t.lastUpdate desc");
     final Query query = getSession().createQuery(s);
-    query.setInteger(0, PFUserContext.getUser().getId());
+    query.setInteger(0, ThreadLocalUserContext.getUser().getId());
     final DateHolder dh = new DateHolder();
     dh.add(Calendar.YEAR, -1);
     query.setDate(1, dh.getDate());
