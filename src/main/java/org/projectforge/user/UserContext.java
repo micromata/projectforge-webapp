@@ -24,9 +24,15 @@
 package org.projectforge.user;
 
 import java.io.Serializable;
+import java.util.Collection;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.Validate;
+import org.projectforge.multitenancy.TenantChecker;
 import org.projectforge.multitenancy.TenantDO;
+import org.projectforge.multitenancy.TenantsCache;
 import org.projectforge.registry.Registry;
+import org.projectforge.web.user.UserPreferencesHelper;
 
 /**
  * User context for logged-in users. Contains the user and the current tenant (if any) etc.
@@ -38,11 +44,15 @@ public class UserContext implements Serializable
 
   private static final long serialVersionUID = 4934701869144478233L;
 
+  private static final String USER_PREF_KEY_CURRENT_TENANT = UserContext.class.getName() + ":currentTenantId";
+
   private PFUserDO user;
 
   private TenantDO currentTenant;
 
   private boolean stayLoggedIn;
+
+  private boolean initialized;
 
   private UserContext()
   {
@@ -66,6 +76,7 @@ public class UserContext implements Serializable
    */
   public UserContext(final PFUserDO user)
   {
+    Validate.notNull(user);
     this.user = new PFUserDO();
     copyUser(user, this.user);
   }
@@ -115,6 +126,9 @@ public class UserContext implements Serializable
    */
   public TenantDO getCurrentTenant()
   {
+    if (initialized == false) {
+      initialize();
+    }
     return currentTenant;
   }
 
@@ -130,9 +144,11 @@ public class UserContext implements Serializable
     }
     if (tenant.getId() == null) {
       log.warn("Can't switch to current tenant with id=null!");
+      return this;
     }
     if (this.currentTenant != null && tenant.getId().equals(this.currentTenant.getId()) == false) {
       log.info("User switched the tenant: [" + tenant.getName() + "] (was [" + this.currentTenant.getName() + "]).");
+      UserPreferencesHelper.putEntry(USER_PREF_KEY_CURRENT_TENANT, tenant.getId(), true);
     }
     this.currentTenant = tenant;
     return this;
@@ -154,5 +170,28 @@ public class UserContext implements Serializable
   {
     this.stayLoggedIn = stayLoggedIn;
     return this;
+  }
+
+  private void initialize()
+  {
+    synchronized (this) {
+      if (initialized == true || ThreadLocalUserContext.getUserContext() == null) {
+        return;
+      }
+      if (user.getId() != null && TenantChecker.getInstance().isMultiTenancyAvailable() == true) {
+        // Try to find the last used tenant of the user:
+        final Integer currentTenantId = (Integer) UserPreferencesHelper.getEntry(USER_PREF_KEY_CURRENT_TENANT);
+        final TenantsCache tenantsCache = Registry.instance().getTenantsCache();
+        if (currentTenantId != null) {
+          this.currentTenant = tenantsCache.getTenant(currentTenantId);
+        } else {
+          final Collection<TenantDO> tenants = tenantsCache.getTenantsOfUser(user.getId());
+          if (CollectionUtils.isNotEmpty(tenants) == true) {
+            setCurrentTenant(tenants.iterator().next());
+          }
+        }
+      }
+      initialized = true;
+    }
   }
 }
