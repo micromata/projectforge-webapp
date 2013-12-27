@@ -35,8 +35,9 @@ import org.apache.wicket.request.Request;
 import org.projectforge.Version;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.Configuration;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
+import org.projectforge.user.UserContext;
 import org.projectforge.web.BrowserScreenWidthType;
 import org.projectforge.web.LayoutSettingsPage;
 import org.projectforge.web.UserAgentBrowser;
@@ -51,7 +52,7 @@ public class MySession extends WebSession
 
   private static final long serialVersionUID = -1783696379234637066L;
 
-  private PFUserDO user;
+  private UserContext userContext;
 
   private String userAgent;
 
@@ -96,7 +97,7 @@ public class MySession extends WebSession
     } else {
       log.error("Oups, ClientInfo is not from type WebClientInfo: " + info);
     }
-    setUser(ThreadLocalUserContext.getUser());
+    setUserContext(ThreadLocalUserContext.getUserContext());
     this.csrfToken = NumberHelper.getSecureRandomUrlSaveString(20);
   }
 
@@ -110,7 +111,12 @@ public class MySession extends WebSession
    */
   public synchronized PFUserDO getUser()
   {
-    return user;
+    return userContext != null ? userContext.getUser() : null;
+  }
+
+  public synchronized UserContext getUserContext()
+  {
+    return userContext;
   }
 
   /**
@@ -126,22 +132,25 @@ public class MySession extends WebSession
    */
   public synchronized Integer getUserId()
   {
+    final PFUserDO user = getUser();
     return user != null ? user.getId() : null;
   }
 
-  public synchronized void setUser(final PFUserDO user)
+  public synchronized void setUserContext(final UserContext userContext)
   {
-    this.user = user;
+    this.userContext = userContext;
     dirty();
   }
 
   public synchronized boolean isAuthenticated()
   {
+    final PFUserDO user = getUser();
     return (user != null);
   }
 
   public synchronized TimeZone getTimeZone()
   {
+    final PFUserDO user = getUser();
     return user != null ? user.getTimeZoneObject() : Configuration.getInstance().getDefaultTimeZone();
   }
 
@@ -259,15 +268,16 @@ public class MySession extends WebSession
     this.ignoreMobileUserAgent = ignoreMobileUserAgent;
   }
 
-  public void login(final PFUserDO user, final Request request)
+  public void login(final UserContext userContext, final Request request)
   {
+    this.userContext = userContext;
+    final PFUserDO user = userContext != null ? userContext.getUser() : null;
     if (user == null) {
       log.warn("Oups, no user given to log in.");
       return;
     }
-    this.user = user;
     log.debug("User logged in: " + user.getShortDisplayName());
-    ThreadLocalUserContext.setUser(user);
+    ThreadLocalUserContext.setUserContext(userContext);
     setLocale(request);
   }
 
@@ -282,11 +292,12 @@ public class MySession extends WebSession
 
   public void logout()
   {
+    PFUserDO user = userContext != null ? userContext.getUser() : null;
     if (user != null) {
       log.info("User logged out: " + user.getShortDisplayName());
       user = null;
     }
-    ThreadLocalUserContext.setUser(null);
+    ThreadLocalUserContext.clear();
     super.clear();
     super.invalidate();
   }

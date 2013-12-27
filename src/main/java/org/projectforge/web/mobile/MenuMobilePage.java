@@ -33,11 +33,11 @@ import org.apache.wicket.request.http.WebRequest;
 import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.user.ThreadLocalUserContext;
+import org.projectforge.user.UserContext;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.Menu;
 import org.projectforge.web.MenuBuilder;
 import org.projectforge.web.MenuEntry;
-import org.projectforge.web.UserFilter;
 import org.projectforge.web.user.UserPreferencesHelper;
 import org.projectforge.web.wicket.MySession;
 import org.projectforge.web.wicket.WicketUtils;
@@ -68,8 +68,9 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
   public MenuMobilePage(final PageParameters parameters)
   {
     super(parameters);
-    if (getUser().getAttribute(UserFilter.USER_ATTR_STAY_LOGGED_IN) != null) {
-      getUser().removeAttribute(UserFilter.USER_ATTR_STAY_LOGGED_IN);
+    final UserContext userContext = getUserContext();
+    if (userContext.isStayLoggedIn() == true) {
+      userContext.setStayLoggedIn(false);
       if (WicketUtils.contains(parameters, PARAM_HOME_KEY) == false) {
         final RecentMobilePageInfo pageInfo = (RecentMobilePageInfo) UserPreferencesHelper
             .getEntry(AbstractSecuredMobilePage.USER_PREF_RECENT_PAGE);

@@ -44,10 +44,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.MDC;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.common.StringHelper;
-import org.projectforge.registry.Registry;
 import org.projectforge.user.Login;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
+import org.projectforge.user.UserContext;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.core.LogoServlet;
 import org.projectforge.web.meb.SMSReceiverServlet;
@@ -60,11 +60,6 @@ import org.projectforge.web.wicket.WicketUtils;
  */
 public class UserFilter implements Filter
 {
-  /**
-   * Set after stay-logged-in functionality (used by MenuMobilePage).
-   */
-  public static final String USER_ATTR_STAY_LOGGED_IN = "stayLoggedIn";
-
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UserFilter.class);
 
   private final static String SESSION_KEY_USER = "UserFilter.user";
@@ -73,11 +68,11 @@ public class UserFilter implements Filter
 
   private static final int COOKIE_MAX_AGE = 30 * 24 * 3600; // 30 days.
 
-  private static String IGNORE_PREFIX_WICKET;
+  // private static String IGNORE_PREFIX_WICKET;
 
-  private static String IGNORE_PREFIX_DOC;
+  // private static String IGNORE_PREFIX_DOC;
 
-  private static String IGNORE_PREFIX_SITE_DOC;
+  // private static String IGNORE_PREFIX_SITE_DOC;
 
   private static String IGNORE_PREFIX_LOGO;
 
@@ -96,9 +91,9 @@ public class UserFilter implements Filter
     UserFilter.userDao = userDao;
     CONTEXT_PATH = contextPath;
     WICKET_PAGES_PREFIX = CONTEXT_PATH + "/" + WicketUtils.WICKET_APPLICATION_PATH;
-    IGNORE_PREFIX_WICKET = WICKET_PAGES_PREFIX + "resources";
-    IGNORE_PREFIX_DOC = contextPath + "/secure/doc";
-    IGNORE_PREFIX_SITE_DOC = contextPath + "/secure/site";
+    // IGNORE_PREFIX_WICKET = WICKET_PAGES_PREFIX + "resources";
+    // IGNORE_PREFIX_DOC = contextPath + "/secure/doc";
+    // IGNORE_PREFIX_SITE_DOC = contextPath + "/secure/site";
     IGNORE_PREFIX_LOGO = contextPath + "/" + LogoServlet.BASE_URL;
     IGNORE_PREFIX_SMS_REVEIVE_SERVLET = contextPath + "/" + SMSReceiverServlet.URL;
   }
@@ -151,36 +146,39 @@ public class UserFilter implements Filter
     response.addCookie(stayLoggedInCookie); // Refresh cookie.
   }
 
-  public static void login(final HttpServletRequest request, final PFUserDO user)
+  public static UserContext login(final HttpServletRequest request, final PFUserDO user)
+  {
+    final UserContext userContext = new UserContext(user);
+    login(request, userContext);
+    return userContext;
+  }
+
+  public static void login(final HttpServletRequest request, final UserContext userContext)
   {
     final HttpSession session = request.getSession();
-    final PFUserDO storedUser = new PFUserDO();
-    copyUser(user, storedUser);
-    session.setAttribute(SESSION_KEY_USER, storedUser);
+    session.setAttribute(SESSION_KEY_USER, userContext);
   }
 
-  public static void updateUser(final HttpServletRequest request, final PFUserDO user)
+  public static void refreshUser(final HttpServletRequest request)
   {
-    final PFUserDO origUser = getUser(request);
-    if (origUser.getId().equals(user.getId()) == false) {
-      log.error("**** Intruser? User id of the session user is different to the id of the given user!");
-      return;
-    }
-    copyUser(user, origUser);
-  }
-
-  private static void copyUser(final PFUserDO srcUser, final PFUserDO destUser)
-  {
-    destUser.copyValuesFrom(srcUser, "password", "stayLoggedInKey");
+    final UserContext userContext = getUserContext(request);
+    userContext.refreshUser();
   }
 
   public static PFUserDO getUser(final HttpServletRequest request)
+  {
+    final UserContext userContext = getUserContext(request);
+    return userContext != null ? userContext.getUser() : null;
+  }
+
+  public static UserContext getUserContext(final HttpServletRequest request)
   {
     final HttpSession session = request.getSession();
     if (session == null) {
       return null;
     }
-    return (PFUserDO) session.getAttribute(SESSION_KEY_USER);
+    final UserContext userContext = (UserContext) session.getAttribute(SESSION_KEY_USER);
+    return userContext;
   }
 
   public void destroy()
@@ -217,7 +215,7 @@ public class UserFilter implements Filter
       }
     }
     final HttpServletResponse response = (HttpServletResponse) resp;
-    PFUserDO user = null;
+    UserContext userContext = null;
     try {
       MDC.put("ip", request.getRemoteAddr());
       MDC.put("session", request.getSession().getId());
@@ -229,36 +227,37 @@ public class UserFilter implements Filter
         chain.doFilter(request, response);
       } else {
         // final boolean sessionTimeout = request.isRequestedSessionIdValid() == false;
-        user = (PFUserDO) request.getSession().getAttribute(SESSION_KEY_USER);
-        if (user != null) {
+        userContext = (UserContext) request.getSession().getAttribute(SESSION_KEY_USER);
+        if (userContext != null) {
           if (updateRequiredFirst == false) {
             // Get the fresh user from the user cache (not in maintenance mode because user group cache is perhaps not initialized correctly
             // if updates of e. g. the user table are necessary.
-            user = Registry.instance().getUserGroupCache().getUser(user.getId());
+            userContext.refreshUser();
           }
           if (log.isDebugEnabled() == true) {
             log.debug("User found in session: " + request.getRequestURI());
           }
         } else if (updateRequiredFirst == false) {
           // Ignore stay-logged-in if redirect to update page is required.
-          user = checkStayLoggedIn(request, response);
-          if (user != null) {
+          userContext = checkStayLoggedIn(request, response);
+          if (userContext != null) {
             if (log.isDebugEnabled() == true) {
               log.debug("User's stay logged-in cookie found: " + request.getRequestURI());
             }
-            user.setAttribute(USER_ATTR_STAY_LOGGED_IN, true); // Used by MenuMobilePage.
-            UserFilter.login(request, user);
+            userContext.setStayLoggedIn(true); // Used by MenuMobilePage.
+            UserFilter.login(request, userContext);
           }
         }
+        final PFUserDO user = userContext != null ? userContext.getUser() : null;
         if (user != null) {
           MDC.put("user", user.getUsername());
           ThreadLocalUserContext.setUser(user);
-          request = decorateWithLocale(request, user);
+          request = decorateWithLocale(request);
           chain.doFilter(request, response);
         } else {
           if (((HttpServletRequest) req).getRequestURI().startsWith(WICKET_PAGES_PREFIX) == true) {
             // Access-checking is done by Wicket, not by this filter:
-            request = decorateWithLocale(request, user);
+            request = decorateWithLocale(request);
             chain.doFilter(request, response);
           } else {
             response.getWriter().append("No access.");
@@ -269,6 +268,7 @@ public class UserFilter implements Filter
       ThreadLocalUserContext.setUser(null);
       MDC.remove("ip");
       MDC.remove("session");
+      final PFUserDO user = userContext != null ? userContext.getUser() : null;
       if (user != null) {
         MDC.remove("user");
       }
@@ -282,7 +282,7 @@ public class UserFilter implements Filter
    * User is not logged. Checks a stay-logged-in-cookie.
    * @return user if valid cookie found, otherwise null.
    */
-  private PFUserDO checkStayLoggedIn(final HttpServletRequest request, final HttpServletResponse response)
+  private UserContext checkStayLoggedIn(final HttpServletRequest request, final HttpServletResponse response)
   {
     final Cookie sessionIdCookie = getCookie(request, "JSESSIONID");
     if (sessionIdCookie != null && sessionIdCookie.getSecure() == false && request.isSecure() == true) {
@@ -326,7 +326,7 @@ public class UserFilter implements Filter
       }
       addStayLoggedInCookie(request, response, stayLoggedInCookie);
       log.info("User successfully logged in using stay-logged-in method: " + user.getUserDisplayname());
-      return user;
+      return new UserContext(user);
     }
     return null;
   }
@@ -336,7 +336,7 @@ public class UserFilter implements Filter
    * @param user
    * @return
    */
-  protected HttpServletRequest decorateWithLocale(HttpServletRequest request, final PFUserDO user)
+  protected HttpServletRequest decorateWithLocale(HttpServletRequest request)
   {
     final Locale locale = ThreadLocalUserContext.getLocale(request.getLocale());
     request = new HttpServletRequestWrapper(request) {

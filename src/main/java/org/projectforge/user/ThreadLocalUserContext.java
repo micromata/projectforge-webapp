@@ -42,25 +42,55 @@ public class ThreadLocalUserContext
 
   public static final String BUNDLE_NAME = "I18nResources";
 
-  private static ThreadLocal<PFUserDO> context = new ThreadLocal<PFUserDO>();
+  private static ThreadLocal<UserContext> threadLocalUserContext = new ThreadLocal<UserContext>();
 
   /**
    * @return The user of ThreadLocal if exists.
    */
   public final static PFUserDO getUser()
   {
-    return context.get();
+    final UserContext userContext = getUserContext();
+    if (userContext == null) {
+      return null;
+    }
+    return userContext.getUser();
   }
 
+  public final static UserContext getUserContext()
+  {
+    return threadLocalUserContext.get();
+  }
+
+  public final static void clear() {
+    threadLocalUserContext.set(null);
+  }
+
+  /**
+   * If given user is null, {@link #clear()} is called.
+   * @param user
+   */
   public final static void setUser(final PFUserDO user)
   {
+    if (user == null) {
+      clear();
+      return;
+    }
+    final UserContext userContext = new UserContext(user);
+    setUserContext(userContext);
+  }
+
+  public final static void setUserContext(final UserContext userContext)
+  {
+    final PFUserDO oldUser = getUser();
+    PFUserDO newUser = userContext != null ? userContext.getUser() : null;
     if (log.isDebugEnabled() == true) {
-      log.debug("setUserInfo: " + user != null ? user.getDisplayUsername() : "null" + ", was: " + context.get() != null ? context.get()
+      log.debug("setUserInfo: " + newUser != null ? newUser.getDisplayUsername() : "null" + ", was: " + oldUser != null ? oldUser
           .getDisplayUsername() : "null");
     }
-    context.set(user);
+    threadLocalUserContext.set(userContext);
     if (log.isDebugEnabled() == true) {
-      log.debug("user is now: " + context.get() != null ? context.get().getDisplayUsername() : "null");
+      newUser = getUser();
+      log.debug("user is now: " + newUser != null ? newUser.getDisplayUsername() : "null");
     }
   }
 

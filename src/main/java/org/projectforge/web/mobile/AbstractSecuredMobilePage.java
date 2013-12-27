@@ -29,8 +29,8 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.core.MessageParam;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserContext;
 import org.projectforge.user.UserXmlPreferencesCache;
-import org.projectforge.web.UserFilter;
 import org.projectforge.web.user.UserPreferencesHelper;
 import org.projectforge.web.wicket.MySession;
 
@@ -60,7 +60,8 @@ public abstract class AbstractSecuredMobilePage extends AbstractMobilePage
   public AbstractSecuredMobilePage(final PageParameters parameters)
   {
     super(parameters);
-    if (getUser().getAttribute(UserFilter.USER_ATTR_STAY_LOGGED_IN) == null) {
+    final UserContext userContext = getUserContext();
+    if (userContext.isStayLoggedIn() == false) {
       putUserPrefEntry(USER_PREF_RECENT_PAGE, new RecentMobilePageInfo(this), true);
     }
   }
@@ -83,6 +84,14 @@ public abstract class AbstractSecuredMobilePage extends AbstractMobilePage
   protected PFUserDO getUser()
   {
     return getMySession().getUser();
+  }
+
+  /**
+   * @see MySession#getUser()
+   */
+  protected UserContext getUserContext()
+  {
+    return getMySession().getUserContext();
   }
 
   protected Integer getUserId()

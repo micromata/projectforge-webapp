@@ -45,6 +45,7 @@ import org.projectforge.user.Login;
 import org.projectforge.user.LoginResult;
 import org.projectforge.user.LoginResultStatus;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserContext;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.admin.SetupPage;
@@ -187,9 +188,10 @@ public class LoginPage extends AbstractUnsecureBasePage
     errorsContainer.setVisible(true);
   }
 
-  public static void internalLogin(final WebPage page, final PFUserDO user)
+  private static void internalLogin(final WebPage page, final PFUserDO user)
   {
-    ((MySession) page.getSession()).login(user, page.getRequest());
+    final UserContext userContext = new UserContext(user);
+    ((MySession) page.getSession()).login(userContext, page.getRequest());
     UserFilter.login(WicketUtils.getHttpServletRequest(page.getRequest()), user);
   }
 

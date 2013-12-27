@@ -30,8 +30,8 @@ import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.Login;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.UserFilter;
 import org.projectforge.web.wicket.AbstractEditPage;
@@ -78,7 +78,7 @@ public class MyAccountEditPage extends AbstractEditPage<PFUserDO, MyAccountEditF
   {
     final HttpServletRequest request = WicketUtils.getHttpServletRequest(getRequest());
     // Don't trust the form data, use logged in user from the data base instead.
-    UserFilter.updateUser(request, userDao.internalGetById(getUserId()));
+    UserFilter.refreshUser(request);
     return super.afterSaveOrUpdate();
   }
 

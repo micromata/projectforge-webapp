@@ -43,6 +43,7 @@ import org.projectforge.plugins.core.PluginsRegistry;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.storage.StorageClient;
 import org.projectforge.user.ThreadLocalUserContext;
+import org.projectforge.user.UserContext;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -167,14 +168,15 @@ public class ProjectForgeApp
       configuration.setBeanFactory(beanFactory);
     }
 
+    final UserContext internalSystemAdminUserContext = UserContext.__internalCreateWithSpecialUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser());
     final boolean missingDatabaseSchema = initDatabaseDao.isEmpty();
     if (missingDatabaseSchema == true) {
       try {
-        ThreadLocalUserContext.setUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser());
+        ThreadLocalUserContext.setUserContext(internalSystemAdminUserContext); // Logon admin user.
         final UpdateEntry updateEntry = DatabaseCoreInitial.getInitializationUpdateEntry(myDatabaseUpdater);
         updateEntry.runUpdate();
       } finally {
-        ThreadLocalUserContext.setUser(null);
+        ThreadLocalUserContext.clear();
       }
     }
 
@@ -186,7 +188,7 @@ public class ProjectForgeApp
     pluginsRegistry.initialize();
     if (missingDatabaseSchema == true) {
       try {
-        ThreadLocalUserContext.setUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser()); // Logon admin user.
+        ThreadLocalUserContext.setUserContext(internalSystemAdminUserContext); // Logon admin user.
         for (final AbstractPlugin plugin : pluginsRegistry.getPlugins()) {
           final UpdateEntry updateEntry = plugin.getInitializationUpdateEntry();
           if (updateEntry != null) {
@@ -194,7 +196,7 @@ public class ProjectForgeApp
           }
         }
       } finally {
-        ThreadLocalUserContext.setUser(null);
+        ThreadLocalUserContext.clear();
       }
     }
     UserXmlPreferencesCache.setInternalInstance(userXmlPreferencesCache);
@@ -212,10 +214,11 @@ public class ProjectForgeApp
     userXmlPreferencesCache.forceReload();
     cronSetup.shutdown();
     try {
-      ThreadLocalUserContext.setUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser());
+      final UserContext internalSystemAdminUserContext = UserContext.__internalCreateWithSpecialUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser());
+      ThreadLocalUserContext.setUserContext(internalSystemAdminUserContext); // Logon admin user.
       myDatabaseUpdater.getDatabaseUpdateDao().shutdownDatabase();
     } finally {
-      ThreadLocalUserContext.setUser(null);
+      ThreadLocalUserContext.clear();
     }
     log.info("Shutdown completed.");
   }

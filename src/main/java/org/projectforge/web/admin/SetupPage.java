@@ -43,6 +43,7 @@ import org.projectforge.database.XmlDump;
 import org.projectforge.database.xstream.XStreamSavingConverter;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserContext;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.MenuItemRegistry;
@@ -120,8 +121,8 @@ public class SetupPage extends AbstractUnsecureBasePage
       Configuration.getInstance().setExpired(); // Force reload.
       MenuItemRegistry.instance().refresh();
     }
-    ((MySession) getSession()).login(adminUser, getRequest());
-    UserFilter.login(WicketUtils.getHttpServletRequest(getRequest()), adminUser);
+    final UserContext userContext =  UserFilter.login(WicketUtils.getHttpServletRequest(getRequest()), adminUser);
+    ((MySession) getSession()).login(userContext, getRequest());
     configurationDao.checkAndUpdateDatabaseEntries();
     if (setupForm.getTimeZone() != null) {
       final ConfigurationDO configurationDO = getConfigurationDO(ConfigurationParam.DEFAULT_TIMEZONE);
