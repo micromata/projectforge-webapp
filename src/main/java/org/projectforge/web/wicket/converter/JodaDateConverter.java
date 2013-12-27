@@ -71,7 +71,7 @@ public class JodaDateConverter implements IConverter<DateMidnight>
   }
 
   /**
-   * @param locale ignored, locale of PFUserContext is used instead.
+   * @param locale ignored, locale of ThreadLocalUserContext is used instead.
    * @see org.apache.wicket.datetime.DateConverter#convertToString(java.lang.Object, java.util.Locale)
    * @see DateTimeFormatter#getFormattedDate(Object)
    */

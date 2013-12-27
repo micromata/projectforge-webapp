@@ -33,7 +33,7 @@ import org.projectforge.user.ThreadLocalUserContext;
 public class NumberFormatter
 {
   /**
-   * Uses the scale of the BigDecimal. Uses the PFUserContext locale.
+   * Uses the scale of the BigDecimal. Uses the ThreadLocalUserContext locale.
    * @param value
    */
   public static String format(final int value)
@@ -43,7 +43,7 @@ public class NumberFormatter
   }
 
   /**
-   * Uses the scale of the BigDecimal. Uses the PFUserContext locale.
+   * Uses the scale of the BigDecimal. Uses the ThreadLocalUserContext locale.
    * @param value
    */
   public static String format(final long value)
@@ -53,7 +53,7 @@ public class NumberFormatter
   }
 
   /**
-   * Uses the scale of the BigDecimal. Uses the PFUserContext locale.
+   * Uses the scale of the BigDecimal. Uses the ThreadLocalUserContext locale.
    * @param value
    */
   public static String format(final BigDecimal value)
@@ -78,7 +78,7 @@ public class NumberFormatter
   }
 
   /**
-   * Uses the scale of the BigDecimal. Uses the PFUserContext locale.
+   * Uses the scale of the BigDecimal. Uses the ThreadLocalUserContext locale.
    * @param value
    */
   public static String format(final BigDecimal value, final int scale)

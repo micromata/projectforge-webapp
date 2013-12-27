@@ -195,7 +195,7 @@ public class AccessChecker
   }
 
   /**
-   * Checks if the user of the PFUserContext (logged in user) is member at least of one of the given groups.
+   * Checks if the user of the ThreadLocalUserContext (logged in user) is member at least of one of the given groups.
    * 
    * @param groups
    * @see #isUserMemberOfGroup(boolean, ProjectForgeGroup...)
@@ -206,7 +206,7 @@ public class AccessChecker
   }
 
   /**
-   * Checks if the user of the PFUserContext (logged in user) is member at least of one of the given groups.
+   * Checks if the user of the ThreadLocalUserContext (logged in user) is member at least of one of the given groups.
    * 
    * @param throwException default false.
    * @param groups
@@ -218,7 +218,7 @@ public class AccessChecker
   }
 
   /**
-   * Checks if the user of the PFUserContext (logged in user) is member at least of one of the given groups.
+   * Checks if the user of the ThreadLocalUserContext (logged in user) is member at least of one of the given groups.
    * 
    * @param throwException default false.
    * @param groups
@@ -282,7 +282,7 @@ public class AccessChecker
   }
 
   /**
-   * Gets the user from the PFUserContext and compares the both user.
+   * Gets the user from the ThreadLocalUserContext and compares the both user.
    * @param user
    * @return
    * @see AccessChecker#userEquals(PFUserDO, PFUserDO)

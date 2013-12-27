@@ -201,7 +201,7 @@ ISelectCallerPage
     // }
     // };
     // add(icsExportDialog);
-    // icsExportDialog.init(PFUserContext.getUserId());
+    // icsExportDialog.init(ThreadLocalUserContext.getUserId());
     // icsExportDialog.redraw();
     // final AjaxLink<Void> icsExportDialogButton = new AjaxLink<Void>(ContentMenuEntryPanel.LINK_ID) {
     // /**

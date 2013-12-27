@@ -108,7 +108,7 @@ public class DateConverter extends AbstractValueConverter<Date>
   }
   
   /**
-   * The time zone of this object (if given) or the time zone of the user if found in the PFUserContext, otherwise {@link TimeZone#getDefault()}.
+   * The time zone of this object (if given) or the time zone of the user if found in the ThreadLocalUserContext, otherwise {@link TimeZone#getDefault()}.
    * @see ThreadLocalUserContext#getUser()
    * @see ThreadLocalUserContext#getTimeZone()
    */

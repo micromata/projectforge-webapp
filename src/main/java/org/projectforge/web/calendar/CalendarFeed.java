@@ -379,7 +379,7 @@ public class CalendarFeed extends HttpServlet
     // final HRPlanningDao hrPlanningDao = Registry.instance().getDao(HRPlanningDao.class);
     // final HRPlanningEventsProvider hrPlanningEventsProvider = new HRPlanningEventsProvider(new CalendarFilter().setShowPlanning(true)
     // .setTimesheetUserId(hrPlanningUserId), hrPlanningDao);
-    // DateTime planningFrom = new DateTime(PFUserContext.getDateTimeZone());
+    // DateTime planningFrom = new DateTime(ThreadLocalUserContext.getDateTimeZone());
     // planningFrom = planningFrom.dayOfYear().withMinimumValue().millisOfDay().withMinimumValue().minusYears(1);
     // final DateTime planningTo = planningFrom.plusYears(4);
     // for (final Event event : hrPlanningEventsProvider.getEvents(planningFrom, planningTo)) {

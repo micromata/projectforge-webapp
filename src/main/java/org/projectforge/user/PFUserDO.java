@@ -444,7 +444,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   }
 
   /**
-   * The locale given from the client (e. g. from the browser by the http request). This locale is needed by PFUserContext for getting the
+   * The locale given from the client (e. g. from the browser by the http request). This locale is needed by ThreadLocalUserContext for getting the
    * browser locale if the user's locale is null and the request's locale is not available.
    * @return
    */
