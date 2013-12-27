@@ -57,6 +57,8 @@ public class Configuration extends AbstractCache
 
   private boolean testMode, developmentMode;
 
+  private Boolean multitenancyMode;
+
   public void setBeanFactory(final ConfigurableListableBeanFactory beanFactory)
   {
     this.beanFactory = beanFactory;
@@ -141,7 +143,10 @@ public class Configuration extends AbstractCache
 
   public boolean isMultiTenancyConfigured()
   {
-    return getBooleanValue(ConfigurationParam.MULTI_TENANCY_ENABLED);
+    if (multitenancyMode == null) {
+      multitenancyMode = getBooleanValue(ConfigurationParam.MULTI_TENANCY_ENABLED);
+    }
+    return multitenancyMode;
   }
 
 
@@ -330,6 +335,7 @@ public class Configuration extends AbstractCache
       }
       newMap.put(param, configurationDao.getValue(param, configuration));
     }
+    multitenancyMode = null;
     this.configurationParamMap = newMap;
   }
 }
