@@ -24,13 +24,16 @@
 package org.projectforge.multitenancy;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.projectforge.common.AbstractCache;
+import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ThreadLocalUserContext;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -45,10 +48,18 @@ public class TenantsCache extends AbstractCache
 
   private HibernateTemplate hibernateTemplate;
 
-  /** The key is the order id. */
+  /**
+   * Collection of all tenants (without deleted ones).
+   */
   private Collection<TenantDO> tenants;
 
-  public boolean isMultiTenancyAvailable() {
+  /**
+   * Key is the user id and the value is a set of the assigned tenants.
+   */
+  private Map<Integer, Set<TenantDO>> userTenantMap;
+
+  public boolean isMultiTenancyAvailable()
+  {
     return TenantChecker.getInstance().isMultiTenancyAvailable();
   }
 
@@ -98,19 +109,8 @@ public class TenantsCache extends AbstractCache
    */
   public Collection<TenantDO> getTenantsOfUser(final Integer userId)
   {
-    final Collection<TenantDO> list = getTenants();
-    final Set<TenantDO> result = new TreeSet<TenantDO>(new TenantsComparator());
-    if (list != null) {
-      for (final TenantDO tenant : list) {
-        if (tenant.isDeleted() == true) {
-          continue;
-        }
-        if (isUserAssignedToTenant(tenant, userId) == true) {
-          result.add(tenant);
-        }
-      }
-    }
-    return result;
+    checkRefresh();
+    return userTenantMap.get(userId);
   }
 
   public boolean isUserAssignedToTenant(final Integer tenantId, final Integer userId)
@@ -130,16 +130,16 @@ public class TenantsCache extends AbstractCache
    */
   public boolean isUserAssignedToTenant(final TenantDO tenant, final Integer userId)
   {
-    if (tenant == null || userId == null || tenant.isDeleted() == true) {
+    if (tenant == null || tenant.getId() == null) {
       return false;
     }
-    final Collection<PFUserDO> assignedUsers = tenant.getAssignedUsers();
-    if (assignedUsers == null) {
+    checkRefresh();
+    final Set<TenantDO> assignedTenants = userTenantMap.get(userId);
+    if (assignedTenants == null) {
       return false;
     }
-    for (final PFUserDO assignedUser : assignedUsers) {
-      if (userId.equals(assignedUser.getId()) == true) {
-        // User is assigned to the given tenant.
+    for (final TenantDO assignedTenant : assignedTenants) {
+      if (tenant.getId().equals(assignedTenant.getId()) == true) {
         return true;
       }
     }
@@ -173,8 +173,35 @@ public class TenantsCache extends AbstractCache
   {
     log.info("Initializing TenantsCache ...");
     // This method must not be synchronized because it works with a new copy of maps.
-    final List<TenantDO> list = hibernateTemplate.find("from TenantDO t where deleted=false");
+    final List<TenantDO> list = hibernateTemplate.find("from TenantDO as tenant left join fetch tenant.assignedUsers where tenant.deleted=false");
+    final Map<Integer, Set<TenantDO>> map = new HashMap<Integer, Set<TenantDO>>();
+    final Collection<PFUserDO> users = Registry.instance().getUserGroupCache().getAllUsers();
+    for (final PFUserDO user : users) {
+      if (user.isDeleted() == true) {
+        continue;
+      }
+      if (list != null) {
+        final Set<TenantDO> set = new TreeSet<TenantDO>(new TenantsComparator());
+        for (final TenantDO tenant : list) {
+          final Collection<PFUserDO> assignedUsers = tenant.getAssignedUsers();
+          if (assignedUsers == null) {
+            continue;
+          }
+          for (final PFUserDO assignedUser : assignedUsers) {
+            if (user.getId().equals(assignedUser.getId()) == true) {
+              // User is assigned to the given tenant.
+              set.add(tenant);
+              continue;
+            }
+          }
+        }
+        if (set.isEmpty() == false) {
+          map.put(user.getId(), set);
+        }
+      }
+    }
     this.tenants = list;
+    this.userTenantMap = map;
     log.info("Initializing of TenantsCache done.");
   }
 
