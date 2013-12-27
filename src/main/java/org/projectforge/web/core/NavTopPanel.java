@@ -44,8 +44,12 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.http.WebRequest;
 import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
+import org.projectforge.multitenancy.TenantDO;
+import org.projectforge.multitenancy.TenantsCache;
 import org.projectforge.user.ThreadLocalUserContext;
+import org.projectforge.user.UserContext;
 import org.projectforge.user.UserRights;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.FavoritesMenu;
@@ -83,6 +87,9 @@ public class NavTopPanel extends NavAbstractPanel
 
   private BookmarkDialog bookmarkDialog;
 
+  @SpringBean
+  private TenantsCache tenantsCache;
+
   /**
    * Cross site request forgery token.
    */
@@ -95,6 +102,7 @@ public class NavTopPanel extends NavAbstractPanel
     this.accessChecker = accessChecker;
   }
 
+  @SuppressWarnings("serial")
   public void init(final AbstractSecuredPage page)
   {
     getMenu();
@@ -113,7 +121,6 @@ public class NavTopPanel extends NavAbstractPanel
       layoutSettingsMenuLink.setVisible(false);
     }
     add(new MenuConfig("menuconfig", getMenu(), favoritesMenu));
-    @SuppressWarnings("serial")
     final Form<String> searchForm = new Form<String>("searchForm") {
       private String searchString;
 
@@ -139,7 +146,6 @@ public class NavTopPanel extends NavAbstractPanel
     add(layoutSettingsMenuLink);
     add(new BookmarkablePageLink<Void>("feedbackLink", FeedbackPage.class));
     {
-      @SuppressWarnings("serial")
       final AjaxLink<Void> showBookmarkLink = new AjaxLink<Void>("showBookmarkLink") {
         /**
          * @see org.apache.wicket.ajax.markup.html.AjaxLink#onClick(org.apache.wicket.ajax.AjaxRequestTarget)
@@ -156,6 +162,42 @@ public class NavTopPanel extends NavAbstractPanel
       addBookmarkDialog();
     }
     {
+      // Tenants
+      final Collection<TenantDO> tenants = tenantsCache.isMultiTenancyAvailable() == true ? tenantsCache.getTenantsOfLoggedInUser() : null;
+      if (tenants == null || tenants.size() <= 1) {
+        // Tenants not available or user is only assigned to one or less tenants.
+        add(new WebMarkupContainer("currentTenant").setVisible(false));
+      } else {
+        final UserContext userContext = MySession.get().getUserContext();
+        final WebMarkupContainer tenantMenu = new WebMarkupContainer("currentTenant");
+        add(tenantMenu);
+        tenantMenu.add(new Label("label", new Model<String>() {
+          @Override
+          public String getObject()
+          {
+            final TenantDO currentTenant = userContext.getCurrentTenant();
+            return currentTenant != null ? currentTenant.getShortName() : "???";
+          };
+        }).setRenderBodyOnly(true));
+        final RepeatingView tenantsRepeater = new RepeatingView("tenantsRepeater");
+        tenantMenu.add(tenantsRepeater);
+        for (final TenantDO tenant : tenants) {
+          final WebMarkupContainer li = new WebMarkupContainer(tenantsRepeater.newChildId());
+          tenantsRepeater.add(li);
+          final Link<Void> changeTenantLink = new Link<Void>("changeTenantLink") {
+            @Override
+            public void onClick()
+            {
+              userContext.setCurrentTenant(tenant);
+            };
+          };
+          li.add(changeTenantLink);
+          changeTenantLink.add(new Label("label", tenant.getName()));
+        }
+
+      }
+    }
+    {
       add(new Label("user", ThreadLocalUserContext.getUser().getFullname()));
       if (accessChecker.isRestrictedUser() == true) {
         // Show ChangePaswordPage as my account for restricted users.
@@ -167,9 +209,7 @@ public class NavTopPanel extends NavAbstractPanel
       }
       final BookmarkablePageLink<Void> documentationLink = new BookmarkablePageLink<Void>("documentationLink", DocumentationPage.class);
       add(documentationLink);
-
-      @SuppressWarnings("serial")
-      final Link<String> logoutLink = new Link<String>("logoutLink") {
+      final Link<Void> logoutLink = new Link<Void>("logoutLink") {
         @Override
         public void onClick()
         {
