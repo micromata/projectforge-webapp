@@ -42,6 +42,7 @@ import javax.persistence.Transient;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.search.annotations.Indexed;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.ModificationStatus;
 import org.projectforge.multitenancy.TenantDO;
@@ -54,6 +55,7 @@ import de.micromata.hibernate.history.ExtendedHistorizable;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 @Entity
+@Indexed
 @Table(name = "T_PLUGIN_CALENDAR_EVENT_ATTENDEE")
 public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAttendeeDO>, BaseDO<Integer>, ExtendedHistorizable
 {
