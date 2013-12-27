@@ -40,6 +40,7 @@ import javax.persistence.Transient;
 
 import org.hibernate.Hibernate;
 import org.hibernate.search.annotations.ContainedIn;
+import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.DefaultBaseDO;
@@ -53,6 +54,7 @@ import org.projectforge.user.PFUserDO;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 @Entity
+@Indexed
 @Table(name = "T_TENANT")
 public class TenantDO extends DefaultBaseDO implements ShortDisplayNameCapable
 {

@@ -41,6 +41,7 @@ import javax.persistence.UniqueConstraint;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.search.annotations.Indexed;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.ModificationStatus;
@@ -52,6 +53,7 @@ import org.projectforge.multitenancy.TenantDO;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 @Entity
+@Indexed
 @Table(name = "T_GROUP_TASK_ACCESS_ENTRY", uniqueConstraints = { @UniqueConstraint(columnNames = { "group_task_access_fk", "access_type"})})
 public class AccessEntryDO implements Comparable<AccessEntryDO>, Serializable, BaseDO<Integer>
 {
