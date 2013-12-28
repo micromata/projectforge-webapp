@@ -78,6 +78,7 @@ public enum MenuItemDefId
   SCRIPTING("scripting"), //
   SEARCH("search"), //
   SPACE_LIST("spaceList"), //
+  SQL_CONSOLE("sqlConsole"), //
   SYSTEM("system"), //
   SYSTEM_STATISTICS("systemStatistics"), //
   SYSTEM_UPDATE("systemUpdate"), //

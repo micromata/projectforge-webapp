@@ -63,6 +63,7 @@ import org.projectforge.web.address.AddressMobileListPage;
 import org.projectforge.web.address.PhoneCallPage;
 import org.projectforge.web.address.SendSmsPage;
 import org.projectforge.web.admin.AdminPage;
+import org.projectforge.web.admin.SqlConsolePage;
 import org.projectforge.web.admin.SystemUpdatePage;
 import org.projectforge.web.book.BookListPage;
 import org.projectforge.web.calendar.CalendarPage;
@@ -376,6 +377,9 @@ public class MenuItemRegistry
     reg.register(admin, MenuItemDefId.GROUP_LIST, 50, GroupListPage.class); // Visible for all.
     reg.register(admin, MenuItemDefId.ACCESS_LIST, 60, AccessListPage.class); // Visible for all.
     reg.register(admin, MenuItemDefId.SYSTEM, 70, AdminPage.class, ADMIN_GROUP);
+    if (WebConfiguration.isDevelopmentMode() == true) {
+      reg.register(admin, MenuItemDefId.SQL_CONSOLE, 71, SqlConsolePage.class, ADMIN_GROUP);
+    }
     reg.register(admin, MenuItemDefId.SYSTEM_UPDATE, 80, SystemUpdatePage.class, ADMIN_GROUP);
     reg.register(admin, MenuItemDefId.SYSTEM_STATISTICS, 90, SystemStatisticsPage.class);
     reg.register(admin, MenuItemDefId.CONFIGURATION, 100, ConfigurationListPage.class, ADMIN_GROUP);
