@@ -26,8 +26,8 @@ package org.projectforge.web.user;
 import java.io.Serializable;
 
 import org.projectforge.common.CloneHelper;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserRights;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.wicket.MySession;
@@ -57,7 +57,11 @@ public class UserPreferencesHelper
       return;
     }
     final UserXmlPreferencesCache userXmlPreferencesCache = UserXmlPreferencesCache.getDefaultInstance();
-    userXmlPreferencesCache.putEntry(userId, key, value, persistent);
+    try {
+      userXmlPreferencesCache.putEntry(userId, key, value, persistent);
+    } catch (final Exception ex) {
+      log.error("Should only occur in maintenance mode: " + ex.getMessage(), ex);
+    }
   }
 
   /**
@@ -89,7 +93,12 @@ public class UserPreferencesHelper
       MySession.get().setAttribute(key, (Serializable) value);
       return value;
     }
-    return userXmlPreferencesCache.getEntry(userId, key);
+    try {
+      return userXmlPreferencesCache.getEntry(userId, key);
+    } catch (final Exception ex) {
+      log.error("Should only occur in maintenance mode: " + ex.getMessage(), ex);
+      return null;
+    }
   }
 
   /**
