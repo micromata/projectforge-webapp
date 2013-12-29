@@ -27,9 +27,11 @@ import java.util.List;
 
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.common.ExceptionHelper;
 import org.projectforge.continuousdb.DatabaseResultRow;
 import org.projectforge.continuousdb.DatabaseResultRowEntry;
 import org.projectforge.database.MyDatabaseUpdater;
+import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.AbstractStandardFormPage;
 
 public class SqlConsolePage extends AbstractStandardFormPage
@@ -55,29 +57,39 @@ public class SqlConsolePage extends AbstractStandardFormPage
   {
     checkAccess();
     log.info("Executing sql: " + sql);
-    final List<DatabaseResultRow> result = myDatabaseUpdater.getDatabaseUpdateDao().query(sql);
-    final StringBuilder sb = new StringBuilder();
-    if (result != null && result.size() > 0) {
-      final DatabaseResultRow firstRow = result.get(0);
-      final List<DatabaseResultRowEntry> entries = firstRow.getEntries();
-      if (entries != null && entries.size() > 0) {
-        sb.append("<table>");
-        sb.append("<tr>");
-        for (final DatabaseResultRowEntry entry : entries) {
-          sb.append("<th>").append(entry.getName()).append("</th>");
-        }
-        sb.append("</tr>");
-        for (final DatabaseResultRow row : result) {
-          sb.append("<tr>");
-          for (final DatabaseResultRowEntry entry : row.getEntries()) {
-            sb.append("<td>").append(entry.getValue()).append("</td>");
+    try {
+      final StringBuilder sb = new StringBuilder();
+      if (sql.trim().toLowerCase().startsWith("select") == true) {
+        final List<DatabaseResultRow> result = myDatabaseUpdater.getDatabaseUpdateDao().query(sql);
+        if (result != null && result.size() > 0) {
+          final DatabaseResultRow firstRow = result.get(0);
+          final List<DatabaseResultRowEntry> entries = firstRow.getEntries();
+          if (entries != null && entries.size() > 0) {
+            sb.append("<table>");
+            sb.append("<tr>");
+            for (final DatabaseResultRowEntry entry : entries) {
+              sb.append("<th>").append(HtmlHelper.escapeHtml(entry.getName(), false)).append("</th>");
+            }
+            sb.append("</tr>");
+            for (final DatabaseResultRow row : result) {
+              sb.append("<tr>");
+              for (final DatabaseResultRowEntry entry : row.getEntries()) {
+                sb.append("<td>").append(HtmlHelper.escapeHtml(String.valueOf(entry.getValue()), true)).append("</td>");
+              }
+              sb.append("</tr>");
+            }
+            sb.append("</table>");
           }
-          sb.append("</tr>");
         }
-        sb.append("</table>");
+        form.setResultString(sb.toString());
+      } else {
+        myDatabaseUpdater.getDatabaseUpdateDao().execute(sql);
+        form.setResultString("Statement executed. See log files for further information.");
       }
+    } catch (final Exception ex) {
+      log.info("SQL statement produced an error: " + ex.getMessage());
+      form.setResultString(HtmlHelper.escapeHtml(ExceptionHelper.printStackTrace(ex), true));
     }
-    form.setResultString(sb.toString());
   }
 
   @Override
