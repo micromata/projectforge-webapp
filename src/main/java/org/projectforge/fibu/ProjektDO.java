@@ -56,8 +56,8 @@ import de.micromata.hibernate.history.Historizable;
 @Entity
 @Indexed
 @ClassBridge(name = "kost2", index = Index.TOKENIZED, store = Store.NO, impl = HibernateSearchProjectKostBridge.class)
-@Table(name = "T_FIBU_PROJEKT", uniqueConstraints = { @UniqueConstraint(columnNames = { "nummer", "kunde_id"}),
-    @UniqueConstraint(columnNames = { "nummer", "intern_kost2_4"})})
+@Table(name = "T_FIBU_PROJEKT", uniqueConstraints = { @UniqueConstraint(columnNames = { "nummer", "kunde_id", "tenant_id"}),
+    @UniqueConstraint(columnNames = { "nummer", "intern_kost2_4", "tenant_id"})})
 public class ProjektDO extends DefaultBaseDO implements Historizable, ShortDisplayNameCapable
 {
   private static final long serialVersionUID = 7842680360705785761L;

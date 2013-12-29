@@ -55,7 +55,7 @@ import de.micromata.hibernate.history.Historizable;
 @Indexed
 @ClassBridge(name = "nummer", index = Index.TOKENIZED, store = Store.NO, impl = HibernateSearchKost2Bridge.class)
 @Table(name = "T_FIBU_KOST2", uniqueConstraints = { @UniqueConstraint(columnNames = { "nummernkreis", "bereich", "teilbereich",
-"kost2_art_id"})})
+    "kost2_art_id", "tenant_id"})})
 public class Kost2DO extends DefaultBaseDO implements Historizable, ShortDisplayNameCapable, Comparable<Kost2DO>
 {
   private static final long serialVersionUID = -6534347300453425760L;

@@ -24,9 +24,12 @@
 package org.projectforge.database;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.projectforge.address.AddressDO;
+import org.projectforge.book.BookDO;
 import org.projectforge.continuousdb.DatabaseResultRow;
 import org.projectforge.continuousdb.SchemaGenerator;
 import org.projectforge.continuousdb.Table;
@@ -39,11 +42,17 @@ import org.projectforge.core.ConfigurationDO;
 import org.projectforge.fibu.AuftragDO;
 import org.projectforge.fibu.AuftragsPositionDO;
 import org.projectforge.fibu.EingangsrechnungDO;
+import org.projectforge.fibu.EmployeeDO;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.RechnungDO;
+import org.projectforge.fibu.kost.BuchungssatzDO;
+import org.projectforge.fibu.kost.Kost1DO;
+import org.projectforge.fibu.kost.Kost2DO;
+import org.projectforge.humanresources.HRPlanningDO;
 import org.projectforge.multitenancy.TenantDO;
+import org.projectforge.orga.ContractDO;
 import org.projectforge.registry.Registry;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.scripting.ScriptDO;
@@ -51,6 +60,10 @@ import org.projectforge.task.TaskDO;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
+import org.projectforge.user.UserPrefDO;
+import org.projectforge.user.UserPrefEntryDO;
+import org.projectforge.user.UserRightDO;
+import org.projectforge.user.UserXmlPreferencesDO;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -100,6 +113,9 @@ public class DatabaseCoreUpdates
             }
           }
         }
+        if (dao.doTableAttributesExist(UserXmlPreferencesDO.class, "tenant") == false) {
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
         return UpdatePreCheckStatus.ALREADY_UPDATED;
       }
 
@@ -118,20 +134,39 @@ public class DatabaseCoreUpdates
           schemaGenerator.createSchema();
         }
         final List<RegistryEntry> list = Registry.instance().getOrderedList();
+        final Set<Class< ? >> updatedEntities = new HashSet<Class< ? >>();
         for (final RegistryEntry entry : list) {
           if (entry.getDOClass() != null && dao.doTableAttributesExist(entry.getDOClass(), "tenant") == false) {
             dao.addTableAttributes(entry.getDOClass(), "tenant");
+            updatedEntities.add(entry.getDOClass());
           }
           if (entry.getNestedDOClasses() != null) {
             for (final Class< ? > doClass : entry.getNestedDOClasses()) {
               if (doClass != null && dao.doTableAttributesExist(doClass, "tenant") == false) {
                 dao.addTableAttributes(doClass, "tenant");
+                updatedEntities.add(doClass);
               }
             }
           }
         }
+        if (dao.doTableAttributesExist(UserXmlPreferencesDO.class, "tenant") == false) {
+          dao.addTableAttributes(UserXmlPreferencesDO.class, "tenant");
+        }
+        dropAndRecreateAllUniqueConstraints(updatedEntities, AuftragDO.class, BookDO.class, BuchungssatzDO.class, ConfigurationDO.class,
+            ContractDO.class, EmployeeDO.class, GroupDO.class, HRPlanningDO.class, KontoDO.class, Kost1DO.class, Kost2DO.class,
+            PFUserDO.class, ProjektDO.class, RechnungDO.class, UserPrefDO.class, UserPrefEntryDO.class, UserRightDO.class,
+            UserXmlPreferencesDO.class);
         dao.createMissingIndices();
         return UpdateRunningStatus.DONE;
+      }
+
+      private void dropAndRecreateAllUniqueConstraints(final Set<Class< ? >> updatedEntities, final Class< ? >... entities)
+      {
+        for (final Class< ? > entity : entities) {
+          if (updatedEntities.contains(entity) == true) {
+            dao.dropAndRecreateAllUniqueConstraints(entity);
+          }
+        }
       }
     });
 

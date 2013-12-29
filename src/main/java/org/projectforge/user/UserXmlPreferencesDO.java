@@ -38,13 +38,15 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
+import org.projectforge.multitenancy.TenantDO;
+
 /**
  * For persistency of UserPreferencesData (stores them serialized).
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
 @Entity
-@Table(name = "T_USER_XML_PREFS", uniqueConstraints = { @UniqueConstraint(columnNames = { "user_id", "key"})})
+@Table(name = "T_USER_XML_PREFS", uniqueConstraints = { @UniqueConstraint(columnNames = { "user_id", "key", "tenant_id"})})
 public class UserXmlPreferencesDO implements Serializable
 {
   public static final int MAX_SERIALIZED_LENGTH = 10000;
@@ -58,6 +60,8 @@ public class UserXmlPreferencesDO implements Serializable
   public static final int CURRENT_VERSION = 4;
 
   private Integer id;
+
+  private TenantDO tenant;
 
   private PFUserDO user;
 
@@ -82,6 +86,31 @@ public class UserXmlPreferencesDO implements Serializable
   public void setId(final Integer id)
   {
     this.id = id;
+  }
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "tenant_id")
+  public TenantDO getTenant()
+  {
+    return this.tenant;
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDO#getTenantId()
+   */
+  @Transient
+  public Integer getTenantId()
+  {
+    return tenant != null ? tenant.getId() : null;
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDO#setTenant(TenantDO)
+   */
+  public UserXmlPreferencesDO setTenant(final TenantDO tenant)
+  {
+    this.tenant = tenant;
+    return this;
   }
 
   /**

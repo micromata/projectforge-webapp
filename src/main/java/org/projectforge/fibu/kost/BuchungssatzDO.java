@@ -58,7 +58,7 @@ import de.micromata.hibernate.history.Historizable;
  */
 @Entity
 @Indexed
-@Table(name = "t_fibu_buchungssatz", uniqueConstraints = { @UniqueConstraint(columnNames = { "year", "month", "satznr"})})
+@Table(name = "t_fibu_buchungssatz", uniqueConstraints = { @UniqueConstraint(columnNames = { "year", "month", "satznr", "tenant_id"})})
 public class BuchungssatzDO extends DefaultBaseDO implements Historizable, Comparable<BuchungssatzDO>
 {
   private static final long serialVersionUID = 8634592782531883482L;

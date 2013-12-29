@@ -28,6 +28,7 @@ import java.sql.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
@@ -42,7 +43,7 @@ import org.projectforge.core.DefaultBaseDO;
  */
 @Entity
 @Indexed
-@Table(name = "T_CONTRACT")
+@Table(name = "T_CONTRACT", uniqueConstraints = { @UniqueConstraint(columnNames = { "number", "tenant_id"})})
 public class ContractDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = -1399338188515793833L;
@@ -113,7 +114,7 @@ public class ContractDO extends DefaultBaseDO
   /**
    * consecutively numbered.
    */
-  @Column(unique = true, nullable = true)
+  @Column(nullable = true)
   public Integer getNumber()
   {
     return number;

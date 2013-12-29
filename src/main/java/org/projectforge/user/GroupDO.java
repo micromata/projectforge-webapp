@@ -60,7 +60,7 @@ import org.projectforge.core.ShortDisplayNameCapable;
  */
 @Entity
 @Indexed
-@Table(name = "T_GROUP", uniqueConstraints = { @UniqueConstraint(columnNames = { "name"})})
+@Table(name = "T_GROUP", uniqueConstraints = { @UniqueConstraint(columnNames = { "name", "tenant_id"})})
 public class GroupDO extends DefaultBaseDO implements ShortDisplayNameCapable
 {
   // private static final Logger log = Logger.getLogger(GroupDO.class);

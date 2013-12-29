@@ -39,6 +39,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.IndexColumn;
 import org.hibernate.search.annotations.Field;
@@ -55,7 +56,7 @@ import org.projectforge.core.PropertyInfo;
  */
 @Entity
 @Indexed
-@Table(name = "t_fibu_rechnung")
+@Table(name = "t_fibu_rechnung", uniqueConstraints = { @UniqueConstraint(columnNames = { "nummer", "tenant_id"})})
 public class RechnungDO extends AbstractRechnungDO<RechnungsPositionDO> implements Comparable<RechnungDO>
 {
   private static final long serialVersionUID = 8143023040624332677L;
@@ -151,7 +152,7 @@ public class RechnungDO extends AbstractRechnungDO<RechnungsPositionDO> implemen
     return projekt.getId();
   }
 
-  @Column(unique = true, nullable = true)
+  @Column(nullable = true)
   public Integer getNummer()
   {
     return nummer;

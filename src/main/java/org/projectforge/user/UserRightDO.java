@@ -47,7 +47,7 @@ import org.projectforge.core.DefaultBaseDO;
 
 @Entity
 @Indexed
-@Table(name = "T_USER_RIGHT", uniqueConstraints = { @UniqueConstraint(columnNames = { "user_fk", "right_id"})})
+@Table(name = "T_USER_RIGHT", uniqueConstraints = { @UniqueConstraint(columnNames = { "user_fk", "right_id", "tenant_id"})})
 public class UserRightDO extends DefaultBaseDO implements Comparable<UserRightDO>, Serializable
 {
   private static final long serialVersionUID = 6703048743393453733L;
@@ -145,7 +145,7 @@ public class UserRightDO extends DefaultBaseDO implements Comparable<UserRightDO
     return user.getId();
   }
 
-  public UserRightDO setUser(PFUserDO user)
+  public UserRightDO setUser(final PFUserDO user)
   {
     this.user = user;
     return this;
@@ -176,16 +176,17 @@ public class UserRightDO extends DefaultBaseDO implements Comparable<UserRightDO
   @Override
   public int hashCode()
   {
-    HashCodeBuilder hcb = new HashCodeBuilder();
+    final HashCodeBuilder hcb = new HashCodeBuilder();
     if (getRightId() != null)
       hcb.append(getRightId().hashCode());
     hcb.append(getId());
     return hcb.toHashCode();
   }
 
+  @Override
   public String toString()
   {
-    ToStringBuilder sb = new ToStringBuilder(this);
+    final ToStringBuilder sb = new ToStringBuilder(this);
     sb.append("id", getId());
     sb.append("userId", this.getUserId());
     sb.append("rightId", this.rightId);

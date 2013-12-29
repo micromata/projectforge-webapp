@@ -34,6 +34,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
@@ -54,7 +55,7 @@ import org.projectforge.user.PFUserDO;
  */
 @Entity
 @Indexed
-@Table(name = "t_fibu_employee")
+@Table(name = "t_fibu_employee", uniqueConstraints = { @UniqueConstraint(columnNames = { "user_id", "tenant_id"})})
 public class EmployeeDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = -1208597049289694757L;
@@ -141,7 +142,7 @@ public class EmployeeDO extends DefaultBaseDO
    * @return the user
    */
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "user_id", nullable = false, unique = true)
+  @JoinColumn(name = "user_id", nullable = false)
   public PFUserDO getUser()
   {
     return user;

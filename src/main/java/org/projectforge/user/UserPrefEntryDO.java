@@ -52,7 +52,7 @@ import org.projectforge.multitenancy.TenantDO;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 @Entity
-@Table(name = "T_USER_PREF_ENTRY", uniqueConstraints = { @UniqueConstraint(columnNames = { "user_pref_fk", "parameter"})})
+@Table(name = "T_USER_PREF_ENTRY", uniqueConstraints = { @UniqueConstraint(columnNames = { "user_pref_fk", "parameter", "tenant_id"})})
 public class UserPrefEntryDO implements BaseDO<Integer>, Serializable
 {
   private static final long serialVersionUID = 7163902159871289059L;

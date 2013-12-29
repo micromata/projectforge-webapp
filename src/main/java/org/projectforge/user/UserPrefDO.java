@@ -63,7 +63,7 @@ import org.projectforge.core.ModificationStatus;
  */
 @Entity
 @Indexed
-@Table(name = "T_USER_PREF", uniqueConstraints = { @UniqueConstraint(columnNames = { "user_fk", "area", "name"})})
+@Table(name = "T_USER_PREF", uniqueConstraints = { @UniqueConstraint(columnNames = { "user_fk", "area", "name", "tenant_id"})})
 public class UserPrefDO extends AbstractBaseDO<Integer>
 {
   private static final long serialVersionUID = -7752620237173115542L;

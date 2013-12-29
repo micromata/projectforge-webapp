@@ -39,6 +39,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.IndexColumn;
@@ -64,7 +65,7 @@ import org.projectforge.user.PFUserDO;
  */
 @Entity
 @Indexed
-@Table(name = "t_fibu_auftrag")
+@Table(name = "t_fibu_auftrag", uniqueConstraints = { @UniqueConstraint(columnNames = { "nummer", "tenant_id"})})
 public class AuftragDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = -3114903689890703366L;
@@ -215,7 +216,7 @@ public class AuftragDO extends DefaultBaseDO
   /**
    * Auftragsnummer ist eindeutig und wird fortlaufend erzeugt.
    */
-  @Column(unique = true, nullable = false)
+  @Column(nullable = false)
   public Integer getNummer()
   {
     return nummer;

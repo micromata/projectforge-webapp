@@ -29,6 +29,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -43,7 +44,7 @@ import de.micromata.hibernate.history.Historizable;
 
 @Entity
 @Indexed
-@Table(name = "T_FIBU_KONTO")
+@Table(name = "T_FIBU_KONTO", uniqueConstraints = { @UniqueConstraint(columnNames = { "nummer", "tenant_id"})})
 public class KontoDO extends DefaultBaseDO implements Historizable, ShortDisplayNameCapable
 {
   private static final long serialVersionUID = -7468158838560608225L;
@@ -78,7 +79,7 @@ public class KontoDO extends DefaultBaseDO implements Historizable, ShortDisplay
     return formatKonto(this);
   }
 
-  @Column(name = "nummer", nullable = false, unique = true)
+  @Column(name = "nummer", nullable = false)
   public Integer getNummer()
   {
     return nummer;

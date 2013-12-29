@@ -34,6 +34,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.search.annotations.DateBridge;
@@ -53,7 +54,7 @@ import org.projectforge.user.PFUserDO;
  */
 @Entity
 @Indexed
-@Table(name = "T_BOOK")
+@Table(name = "T_BOOK", uniqueConstraints = { @UniqueConstraint(columnNames = { "signature", "tenant_id"})})
 public class BookDO extends DefaultBaseDO
 {
   // private static final Logger log = Logger.getLogger(TaskDO.class);
@@ -168,7 +169,7 @@ public class BookDO extends DefaultBaseDO
     return this;
   }
 
-  @Column(length = 255, unique = true)
+  @Column(length = 255)
   public String getSignature()
   {
     return signature;

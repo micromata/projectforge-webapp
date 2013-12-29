@@ -27,6 +27,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
@@ -39,7 +40,7 @@ import de.micromata.hibernate.history.Historizable;
 
 @Entity
 @Indexed
-@Table(name = "T_PLUGIN_BANK_ACCOUNT")
+@Table(name = "T_PLUGIN_BANK_ACCOUNT", uniqueConstraints = { @UniqueConstraint(columnNames = { "account_number", "tenant_id"})})
 public class BankAccountDO extends DefaultBaseDO implements Historizable, ShortDisplayNameCapable
 {
   private static final long serialVersionUID = -6492718816678384637L;
@@ -59,7 +60,7 @@ public class BankAccountDO extends DefaultBaseDO implements Historizable, ShortD
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String description;
 
-  @Column(name = "account_number", length = 255, nullable = false, unique = true)
+  @Column(name = "account_number", length = 255, nullable = false)
   public String getAccountNumber()
   {
     return accountNumber;

@@ -32,6 +32,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
@@ -45,7 +46,7 @@ import org.hibernate.search.annotations.Store;
  */
 @Entity
 @Indexed
-@Table(name = "T_CONFIGURATION")
+@Table(name = "T_CONFIGURATION", uniqueConstraints = { @UniqueConstraint(columnNames = { "parameter", "tenant_id"})})
 public class ConfigurationDO extends DefaultBaseDO
 {
   public static final int PARAM_LENGTH = 4000;
@@ -67,7 +68,7 @@ public class ConfigurationDO extends DefaultBaseDO
   private ConfigurationType configurationType;
 
   /** Key under which the configuration value is stored in the database. */
-  @Column(length = 255, unique = true, nullable = false)
+  @Column(length = 255, nullable = false)
   public String getParameter()
   {
     return parameter;

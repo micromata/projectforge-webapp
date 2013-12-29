@@ -63,7 +63,7 @@ import org.projectforge.web.calendar.DateTimeFormatter;
  */
 @Entity
 @Indexed
-@Table(name = "T_HR_PLANNING", uniqueConstraints = { @UniqueConstraint(columnNames = { "user_fk", "week"})})
+@Table(name = "T_HR_PLANNING", uniqueConstraints = { @UniqueConstraint(columnNames = { "user_fk", "week", "tenant_id"})})
 public class HRPlanningDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = 6413788186422319573L;
