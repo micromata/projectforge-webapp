@@ -500,7 +500,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   /**
    * @return Returns the username.
    */
-  @Column(length = 255, unique = true, nullable = false)
+  @Column(length = 255, nullable = false)
   public String getUsername()
   {
     return username;
