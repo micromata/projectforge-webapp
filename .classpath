@@ -15,19 +15,19 @@
   <classpathentry kind="var" path="M2_REPO/javax/xml/jsr173/1.0/jsr173-1.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/transaction/jta/1.1/jta-1.1.jar" sourcepath="M2_REPO/javax/transaction/jta/1.1/jta-1.1-sources.jar"/>
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-  <classpathentry kind="var" path="M2_REPO/org/projectforge/projectforge-common/5.2.1-SNAPSHOT/projectforge-common-5.2.1-SNAPSHOT.jar" sourcepath="M2_REPO/org/projectforge/projectforge-common/5.2.1-SNAPSHOT/projectforge-common-5.2.1-SNAPSHOT-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/projectforge/projectforge-common/5.3.1-SNAPSHOT/projectforge-common-5.3.1-SNAPSHOT.jar" sourcepath="M2_REPO/org/projectforge/projectforge-common/5.3.1-SNAPSHOT/projectforge-common-5.3.1-SNAPSHOT-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-lang/commons-lang/2.5/commons-lang-2.5.jar" sourcepath="M2_REPO/commons-lang/commons-lang/2.5/commons-lang-2.5-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/projectforge/projectforge-continuous-db/5.2.1-SNAPSHOT/projectforge-continuous-db-5.2.1-SNAPSHOT.jar" sourcepath="M2_REPO/org/projectforge/projectforge-continuous-db/5.2.1-SNAPSHOT/projectforge-continuous-db-5.2.1-SNAPSHOT-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/projectforge/projectforge-excel/5.2.1-SNAPSHOT/projectforge-excel-5.2.1-SNAPSHOT.jar" sourcepath="M2_REPO/org/projectforge/projectforge-excel/5.2.1-SNAPSHOT/projectforge-excel-5.2.1-SNAPSHOT-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/projectforge/projectforge-continuous-db/5.3.1-SNAPSHOT/projectforge-continuous-db-5.3.1-SNAPSHOT.jar" sourcepath="M2_REPO/org/projectforge/projectforge-continuous-db/5.3.1-SNAPSHOT/projectforge-continuous-db-5.3.1-SNAPSHOT-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/projectforge/projectforge-excel/5.3.1-SNAPSHOT/projectforge-excel-5.3.1-SNAPSHOT.jar" sourcepath="M2_REPO/org/projectforge/projectforge-excel/5.3.1-SNAPSHOT/projectforge-excel-5.3.1-SNAPSHOT-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-beanutils/commons-beanutils/1.8.3/commons-beanutils-1.8.3.jar" sourcepath="M2_REPO/commons-beanutils/commons-beanutils/1.8.3/commons-beanutils-1.8.3-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar" sourcepath="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/poi/poi/3.9/poi-3.9.jar" sourcepath="M2_REPO/org/apache/poi/poi/3.9/poi-3.9-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-codec/commons-codec/1.4/commons-codec-1.4.jar" sourcepath="M2_REPO/commons-codec/commons-codec/1.4/commons-codec-1.4-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/projectforge/projectforge-jax-rs/5.2.1-SNAPSHOT/projectforge-jax-rs-5.2.1-SNAPSHOT.jar" sourcepath="M2_REPO/org/projectforge/projectforge-jax-rs/5.2.1-SNAPSHOT/projectforge-jax-rs-5.2.1-SNAPSHOT-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/projectforge/projectforge-jax-rs/5.3.1-SNAPSHOT/projectforge-jax-rs-5.3.1-SNAPSHOT.jar" sourcepath="M2_REPO/org/projectforge/projectforge-jax-rs/5.3.1-SNAPSHOT/projectforge-jax-rs-5.3.1-SNAPSHOT-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/google/code/gson/gson/2.2.2/gson-2.2.2.jar" sourcepath="M2_REPO/com/google/code/gson/gson/2.2.2/gson-2.2.2-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-client/1.15/jersey-client-1.15.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-client/1.15/jersey-client-1.15-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/sun/jersey/jersey-core/1.15/jersey-core-1.15.jar" sourcepath="M2_REPO/com/sun/jersey/jersey-core/1.15/jersey-core-1.15-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/projectforge/projectforge-webserver/5.2.1-SNAPSHOT/projectforge-webserver-5.2.1-SNAPSHOT.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/projectforge/projectforge-webserver/5.3.1-SNAPSHOT/projectforge-webserver-5.3.1-SNAPSHOT.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-cli/commons-cli/1.2/commons-cli-1.2.jar" sourcepath="M2_REPO/commons-cli/commons-cli/1.2/commons-cli-1.2-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4.jar" sourcepath="M2_REPO/commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-pool/commons-pool/1.5.4/commons-pool-1.5.4.jar" sourcepath="M2_REPO/commons-pool/commons-pool/1.5.4/commons-pool-1.5.4-sources.jar"/>
@@ -141,8 +141,6 @@
   <classpathentry kind="var" path="M2_REPO/com/lowagie/itext/2.1.0/itext-2.1.0.jar" sourcepath="M2_REPO/com/lowagie/itext/2.1.0/itext-2.1.0-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/bouncycastle/bcmail-jdk14/136/bcmail-jdk14-136.jar"/>
   <classpathentry kind="var" path="M2_REPO/bouncycastle/bcprov-jdk14/136/bcprov-jdk14-136.jar" sourcepath="M2_REPO/bouncycastle/bcprov-jdk14/136/bcprov-jdk14-136-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/jadira/usertype/usertype.jodatime/1.9/usertype.jodatime-1.9.jar" sourcepath="M2_REPO/org/jadira/usertype/usertype.jodatime/1.9/usertype.jodatime-1.9-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/jadira/usertype/usertype.spi/1.9/usertype.spi-1.9.jar" sourcepath="M2_REPO/org/jadira/usertype/usertype.spi/1.9/usertype.spi-1.9-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jfree/jfreechart/1.0.14/jfreechart-1.0.14.jar" sourcepath="M2_REPO/org/jfree/jfreechart/1.0.14/jfreechart-1.0.14-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jfree/jcommon/1.0.17/jcommon-1.0.17.jar" sourcepath="M2_REPO/org/jfree/jcommon/1.0.17/jcommon-1.0.17-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/xerces/xercesImpl/2.8.1/xercesImpl-2.8.1.jar" sourcepath="M2_REPO/xerces/xercesImpl/2.8.1/xercesImpl-2.8.1-sources.jar"/>

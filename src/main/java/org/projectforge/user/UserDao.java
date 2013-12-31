@@ -274,7 +274,9 @@ public class UserDao extends BaseDao<PFUserDO>
   @Override
   protected void afterSaveOrModify(final PFUserDO obj)
   {
-    userGroupCache.setExpired();
+    if (obj.isMinorChange() == false) {
+      userGroupCache.setExpired();
+    }
   }
 
   /**
@@ -480,18 +482,10 @@ public class UserDao extends BaseDao<PFUserDO>
       if (userPassword.equals(encryptedPassword) == true) {
         // Passwords match!
         if (StringUtils.isEmpty(saltString) == true) {
-          log.info("Password of user "
-              + user.getId()
-              + " with username '"
-              + user.getUsername()
-              + "' is not yet salted and has no pepper!");
+          log.info("Password of user " + user.getId() + " with username '" + user.getUsername() + "' is not yet salted and has no pepper!");
           return PasswordCheckResult.OK_WITHOUT_SALT_AND_PEPPER;
         }
-        log.info("Password of user "
-            + user.getId()
-            + " with username '"
-            + user.getUsername()
-            + "' has no pepper!");
+        log.info("Password of user " + user.getId() + " with username '" + user.getUsername() + "' has no pepper!");
         return PasswordCheckResult.OK_WITHOUT_PEPPER;
       }
     }
