@@ -121,7 +121,11 @@ public class Configuration extends AbstractCache
   public Configuration()
   {
     super(TICKS_PER_HOUR);
-    instance = this;
+    if (instance == null) {
+      instance = this;
+    } else {
+      log.warn("Configuration is already instantiated.");
+    }
   }
 
   public boolean isMebConfigured()
@@ -148,7 +152,6 @@ public class Configuration extends AbstractCache
     }
     return multitenancyMode;
   }
-
 
   public String getCalendarDomain()
   {
