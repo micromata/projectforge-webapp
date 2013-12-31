@@ -96,7 +96,7 @@ public class LoginPage extends AbstractUnsecureBasePage
       final UserXmlPreferencesCache userXmlPreferencesCache)
   {
     final Cookie stayLoggedInCookie = UserFilter.getStayLoggedInCookie(WicketUtils.getHttpServletRequest(request));
-    logout(mySession, stayLoggedInCookie,  userXmlPreferencesCache);
+    logout(mySession, stayLoggedInCookie, userXmlPreferencesCache);
     if (stayLoggedInCookie != null) {
       response.addCookie(stayLoggedInCookie);
     }
@@ -106,13 +106,14 @@ public class LoginPage extends AbstractUnsecureBasePage
       final UserXmlPreferencesCache userXmlPreferencesCache)
   {
     final Cookie stayLoggedInCookie = UserFilter.getStayLoggedInCookie(request);
-    logout(mySession, stayLoggedInCookie,  userXmlPreferencesCache);
+    logout(mySession, stayLoggedInCookie, userXmlPreferencesCache);
     if (stayLoggedInCookie != null) {
       response.addCookie(stayLoggedInCookie);
     }
   }
 
-  private static void logout(final MySession mySession, final Cookie stayLoggedInCookie, final UserXmlPreferencesCache userXmlPreferencesCache)
+  private static void logout(final MySession mySession, final Cookie stayLoggedInCookie,
+      final UserXmlPreferencesCache userXmlPreferencesCache)
   {
     final PFUserDO user = mySession.getUser();
     if (user != null) {
@@ -159,6 +160,11 @@ public class LoginPage extends AbstractUnsecureBasePage
     body.add(AttributeModifier.replace("class", "loginpage"));
     body.add(form);
     form.init();
+    // Use the following message to check a ProjectForge installation with your monitoring tool (such as Nagios):
+    final String message = WebConfiguration.isUpAndRunning() ? "ProjectForge is alive."
+        : "ProjectForge is not full available (perhaps in maintenance mode or in start-up phase).";
+    body.add(new Label("statusComment", "<!-- " + HtmlHelper.escapeHtml(message, false) + " -->").setEscapeModelStrings(false)
+        .setRenderBodyOnly(true));
     final WebMarkupContainer administratorLoginNeeded = new WebMarkupContainer("administratorLoginNeeded");
     body.add(administratorLoginNeeded);
     if (UserFilter.isUpdateRequiredFirst() == false) {
