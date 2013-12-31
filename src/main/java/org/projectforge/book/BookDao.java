@@ -59,14 +59,7 @@ public class BookDao extends BaseDao<BookDO>
 
   private UserDao userDao;
 
-  private Configuration configuration;
-
   private TaskDao taskDao;
-
-  public void setConfiguration(final Configuration configuration)
-  {
-    this.configuration = configuration;
-  }
 
   public void setUserDao(final UserDao userDao)
   {
@@ -88,7 +81,7 @@ public class BookDao extends BaseDao<BookDO>
    */
   public Integer getDefaultTaskId()
   {
-    return configuration.getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_BOOKS);
+    return Configuration.getInstance().getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_BOOKS);
   }
 
   @Override

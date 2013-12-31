@@ -67,14 +67,7 @@ public class AddressDao extends BaseDao<AddressDO>
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressDao.class);
 
-  private Configuration configuration;
-
   private TaskDao taskDao;
-
-  public void setConfiguration(final Configuration configuration)
-  {
-    this.configuration = configuration;
-  }
 
   public void setTaskDao(final TaskDao taskDao)
   {
@@ -103,7 +96,7 @@ public class AddressDao extends BaseDao<AddressDO>
    */
   public Integer getDefaultTaskId()
   {
-    return configuration.getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_ADDRESSES);
+    return Configuration.getInstance().getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_ADDRESSES);
   }
 
   public List<Locale> getUsedCommunicationLanguages()
@@ -611,7 +604,7 @@ public class AddressDao extends BaseDao<AddressDO>
       return;
     }
     final String no = NumberHelper
-        .extractPhonenumber(number, configuration.getStringValue(ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX));
+        .extractPhonenumber(number, Configuration.getInstance().getStringValue(ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX));
     final String name = address.getName();
     pw.print("\"");
     if (StringUtils.isNotEmpty(name)) {
