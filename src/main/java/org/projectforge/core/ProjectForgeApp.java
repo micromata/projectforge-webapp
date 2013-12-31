@@ -223,7 +223,7 @@ public class ProjectForgeApp
     log.info("Shutdown completed.");
   }
 
-  public void setConfiguration(final Configuration configuration)
+  public void setInternalUseConfiguration(final Configuration configuration)
   {
     this.configuration = configuration;
   }
