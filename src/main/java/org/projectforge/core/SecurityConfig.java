@@ -25,7 +25,6 @@ package org.projectforge.core;
 
 import org.projectforge.user.PFUserDO;
 
-
 /**
  * Bean used by ConfigXML (config.xml) for configuring security stuff.
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -34,6 +33,8 @@ public class SecurityConfig
 {
   @ConfigXmlSecretField
   private String passwordPepper;
+
+  private boolean sqlConsoleAvailable;
 
   /**
    * If configured passwords will be hashed by using this salt.
@@ -53,6 +54,18 @@ public class SecurityConfig
   {
     this.passwordPepper = passwordPepper;
     return this;
+  }
+
+  /**
+   * Attention: You shouldn't activate this feature in productive environments. The SQL console is available for admin users (not for
+   * restricted or demo users). This feature is useful if you use e. g. HSQLDB for having access to the database. <br/>
+   * Please note: if available there is a full access (select, update, insert, delete, drop etc.) enabled! <br/>
+   * This feature is enabled automatically if ProjectForge is started in development mode.
+   * @return the sqlConsoleAvailable
+   */
+  public boolean isSqlConsoleAvailable()
+  {
+    return sqlConsoleAvailable;
   }
 
   /**
