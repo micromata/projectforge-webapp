@@ -80,8 +80,8 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   private static final String NOPASSWORD = "--- none ---";
 
   static {
-    AbstractHistorizableBaseDO.putNonHistorizableProperty(PFUserDO.class, "loginFailures", "lastLogin", "stayLoggedInKey", "passwordSalt",
-        "password");
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(PFUserDO.class, "authenticationToken", "loginFailures", "lastLogin",
+        "stayLoggedInKey", "passwordSalt", "password");
   }
 
   private transient Map<String, Object> attributeMap;
@@ -444,8 +444,8 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   }
 
   /**
-   * The locale given from the client (e. g. from the browser by the http request). This locale is needed by ThreadLocalUserContext for getting the
-   * browser locale if the user's locale is null and the request's locale is not available.
+   * The locale given from the client (e. g. from the browser by the http request). This locale is needed by ThreadLocalUserContext for
+   * getting the browser locale if the user's locale is null and the request's locale is not available.
    * @return
    */
   @Transient
