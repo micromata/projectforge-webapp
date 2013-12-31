@@ -34,6 +34,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.search.annotations.Indexed;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.user.PFUserDO;
 
@@ -44,6 +45,7 @@ import org.projectforge.user.PFUserDO;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 @Entity
+@Indexed
 @Table(name = "T_PERSONAL_ADDRESS", uniqueConstraints = { @UniqueConstraint(columnNames = { "owner_id", "address_id"})})
 public class PersonalAddressDO extends AbstractBaseDO<Integer>
 {
@@ -85,9 +87,9 @@ public class PersonalAddressDO extends AbstractBaseDO<Integer>
     return id;
   }
 
-  public void setId(Integer id)
+  public void setId(final Integer id)
   {
-    this.id = (Integer) id;
+    this.id = id;
   }
 
   /**
@@ -101,7 +103,7 @@ public class PersonalAddressDO extends AbstractBaseDO<Integer>
     return owner;
   }
 
-  public void setOwner(PFUserDO owner)
+  public void setOwner(final PFUserDO owner)
   {
     this.owner = owner;
   }
@@ -125,7 +127,7 @@ public class PersonalAddressDO extends AbstractBaseDO<Integer>
     return address;
   }
 
-  public void setAddress(AddressDO address)
+  public void setAddress(final AddressDO address)
   {
     this.address = address;
   }
@@ -148,7 +150,7 @@ public class PersonalAddressDO extends AbstractBaseDO<Integer>
     return favoriteCard;
   }
 
-  public void setFavoriteCard(boolean favoriteCard)
+  public void setFavoriteCard(final boolean favoriteCard)
   {
     this.favoriteCard = favoriteCard;
   }
@@ -159,7 +161,7 @@ public class PersonalAddressDO extends AbstractBaseDO<Integer>
     return favoriteBusinessPhone;
   }
 
-  public void setFavoriteBusinessPhone(boolean favoriteBusinessPhone)
+  public void setFavoriteBusinessPhone(final boolean favoriteBusinessPhone)
   {
     this.favoriteBusinessPhone = favoriteBusinessPhone;
   }
@@ -170,7 +172,7 @@ public class PersonalAddressDO extends AbstractBaseDO<Integer>
     return favoritePrivatePhone;
   }
 
-  public void setFavoritePrivatePhone(boolean favoritePrivatePhone)
+  public void setFavoritePrivatePhone(final boolean favoritePrivatePhone)
   {
     this.favoritePrivatePhone = favoritePrivatePhone;
   }
@@ -181,7 +183,7 @@ public class PersonalAddressDO extends AbstractBaseDO<Integer>
     return favoriteMobilePhone;
   }
 
-  public void setFavoriteMobilePhone(boolean favoriteMobilePhone)
+  public void setFavoriteMobilePhone(final boolean favoriteMobilePhone)
   {
     this.favoriteMobilePhone = favoriteMobilePhone;
   }
@@ -192,7 +194,7 @@ public class PersonalAddressDO extends AbstractBaseDO<Integer>
     return favoritePrivateMobilePhone;
   }
 
-  public void setFavoritePrivateMobilePhone(boolean favoritePrivateMobilePhone)
+  public void setFavoritePrivateMobilePhone(final boolean favoritePrivateMobilePhone)
   {
     this.favoritePrivateMobilePhone = favoritePrivateMobilePhone;
   }
@@ -203,7 +205,7 @@ public class PersonalAddressDO extends AbstractBaseDO<Integer>
     return favoriteFax;
   }
 
-  public void setFavoriteFax(boolean favoriteFax)
+  public void setFavoriteFax(final boolean favoriteFax)
   {
     this.favoriteFax = favoriteFax;
   }
