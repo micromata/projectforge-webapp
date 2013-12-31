@@ -45,9 +45,6 @@ public class LoginMobilePage extends AbstractMobilePage
 {
   private static final long serialVersionUID = 313568971144109236L;
 
-  @SpringBean(name = "configuration")
-  private Configuration configuration;
-
   @SpringBean(name = "userDao")
   private UserDao userDao;
 
@@ -83,7 +80,7 @@ public class LoginMobilePage extends AbstractMobilePage
     pageContainer.add(form);
     form.init();
     pageContainer.add(new FeedbackPanel("feedback").setOutputMarkupId(true));
-    final String messageOfTheDay = configuration.getStringValue(ConfigurationParam.MESSAGE_OF_THE_DAY);
+    final String messageOfTheDay = Configuration.getInstance().getStringValue(ConfigurationParam.MESSAGE_OF_THE_DAY);
     if (StringUtils.isBlank(messageOfTheDay) == true) {
       pageContainer.add(new Label("messageOfTheDay", "[invisible]").setVisible(false));
     } else {

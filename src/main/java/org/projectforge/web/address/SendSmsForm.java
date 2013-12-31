@@ -63,9 +63,6 @@ public class SendSmsForm extends AbstractStandardForm<SendSmsData, SendSmsPage>
   @SpringBean(name = "addressDao")
   private AddressDao addressDao;
 
-  @SpringBean(name = "configuration")
-  private Configuration configuration;
-
   protected SendSmsData data;
 
   private RecentQueue<String> recentSearchTermsQueue;
@@ -87,7 +84,7 @@ public class SendSmsForm extends AbstractStandardForm<SendSmsData, SendSmsPage>
     if (StringUtils.isBlank(number) == true) {
       return;
     }
-    list.add(getPhoneNumberAndPerson(address, number, configuration.getStringValue(ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX)));
+    list.add(getPhoneNumberAndPerson(address, number, Configuration.getInstance().getStringValue(ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX)));
   }
 
   @Override

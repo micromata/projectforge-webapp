@@ -66,9 +66,6 @@ public class LoginPage extends AbstractUnsecureBasePage
   // Used by LoginMobilePage
   private static final String PARAMETER_KEY_FORCE_NON_MOBILE = "forceNonMobile";
 
-  @SpringBean(name = "configuration")
-  private Configuration configuration;
-
   @SpringBean(name = "initDatabaseDao")
   private InitDatabaseDao initDatabaseDao;
 
@@ -171,7 +168,7 @@ public class LoginPage extends AbstractUnsecureBasePage
       administratorLoginNeeded.setVisible(false);
     }
     {
-      final String messageOfTheDay = configuration.getStringValue(ConfigurationParam.MESSAGE_OF_THE_DAY);
+      final String messageOfTheDay = Configuration.getInstance().getStringValue(ConfigurationParam.MESSAGE_OF_THE_DAY);
       final WebMarkupContainer container = new WebMarkupContainer("messageOfTheDay");
       body.add(container.setVisible(StringUtils.isNotBlank(messageOfTheDay)));
       final Label messageOfTheDayLabel = new Label("msg", messageOfTheDay);
