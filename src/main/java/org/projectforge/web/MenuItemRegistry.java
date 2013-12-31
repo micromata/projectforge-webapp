@@ -38,6 +38,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Page;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
+import org.projectforge.core.SecurityConfig;
 import org.projectforge.fibu.AuftragDao;
 import org.projectforge.fibu.EingangsrechnungDao;
 import org.projectforge.fibu.EmployeeDao;
@@ -196,6 +197,11 @@ public class MenuItemRegistry
 
     get(MenuItemDefId.PHONE_CALL).setVisible(StringUtils.isNotEmpty(xmlConfiguration.getTelephoneSystemUrl()));
     get(MenuItemDefId.CONTRACTS).setVisible(CollectionUtils.isNotEmpty(xmlConfiguration.getContractTypes()));
+
+    final SecurityConfig securityConfig = xmlConfiguration.getSecurityConfig();
+    final boolean sqlConsoleAvailable = Configuration.isDevelopmentMode() == true
+        || (securityConfig != null && securityConfig.isSqlConsoleAvailable() == true);
+    get(MenuItemDefId.SQL_CONSOLE).setVisible(sqlConsoleAvailable);
   }
 
   private MenuItemDef register(final MenuItemDef parent, final MenuItemDefId defId, final int orderNumber,
@@ -377,9 +383,8 @@ public class MenuItemRegistry
     reg.register(admin, MenuItemDefId.GROUP_LIST, 50, GroupListPage.class); // Visible for all.
     reg.register(admin, MenuItemDefId.ACCESS_LIST, 60, AccessListPage.class); // Visible for all.
     reg.register(admin, MenuItemDefId.SYSTEM, 70, AdminPage.class, ADMIN_GROUP);
-    if (WebConfiguration.isDevelopmentMode() == true) {
-      reg.register(admin, MenuItemDefId.SQL_CONSOLE, 71, SqlConsolePage.class, ADMIN_GROUP);
-    }
+    // Only available in development mode or if SQL console is configured in SecurityConfig.
+    reg.register(admin, MenuItemDefId.SQL_CONSOLE, 71, SqlConsolePage.class, ADMIN_GROUP);
     reg.register(admin, MenuItemDefId.SYSTEM_UPDATE, 80, SystemUpdatePage.class, ADMIN_GROUP);
     reg.register(admin, MenuItemDefId.SYSTEM_STATISTICS, 90, SystemStatisticsPage.class);
     reg.register(admin, MenuItemDefId.CONFIGURATION, 100, ConfigurationListPage.class, ADMIN_GROUP);
