@@ -27,9 +27,13 @@ import java.util.List;
 
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.access.AccessException;
 import org.projectforge.common.ExceptionHelper;
 import org.projectforge.continuousdb.DatabaseResultRow;
 import org.projectforge.continuousdb.DatabaseResultRowEntry;
+import org.projectforge.core.ConfigXml;
+import org.projectforge.core.Configuration;
+import org.projectforge.core.SecurityConfig;
 import org.projectforge.database.MyDatabaseUpdater;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.AbstractStandardFormPage;
@@ -48,6 +52,14 @@ public class SqlConsolePage extends AbstractStandardFormPage
   public SqlConsolePage(final PageParameters parameters)
   {
     super(parameters);
+    log.warn("SQL console is called by the user!");
+    final SecurityConfig securityConfig = ConfigXml.getInstance().getSecurityConfig();
+    final boolean sqlConsoleAvailable = Configuration.isDevelopmentMode() == true
+        || (securityConfig != null && securityConfig.isSqlConsoleAvailable() == true);
+    if (sqlConsoleAvailable == false) {
+      throw new AccessException("access.exception.violation",
+          "The SQL console isn't available (isn't configured). May-be this is an attack!");
+    }
     form = new SqlConsoleForm(this);
     body.add(form);
     form.init();

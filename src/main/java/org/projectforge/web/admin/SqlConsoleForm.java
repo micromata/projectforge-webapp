@@ -69,7 +69,7 @@ public class SqlConsoleForm extends AbstractStandardForm<SqlConsoleForm, SqlCons
           parentPage.excecute(sql);
         }
       };
-      final SingleButtonPanel buttonPanel = new SingleButtonPanel(fs.newChildId(), button, "execute", SingleButtonPanel.NORMAL);
+      final SingleButtonPanel buttonPanel = new SingleButtonPanel(fs.newChildId(), button, "execute", SingleButtonPanel.DANGER);
       fs.add(buttonPanel);
     }
     gridBuilder.newGridPanel();
