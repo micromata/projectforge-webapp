@@ -59,6 +59,7 @@ import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.user.UserXmlPreferencesMigrationDao;
 import org.projectforge.web.MenuBuilder;
+import org.projectforge.web.MenuItemRegistry;
 import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractStandardFormPage;
@@ -396,6 +397,7 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
     if (result != null) {
       result = result.replaceAll("\n", "<br/>\n");
     }
+    MenuItemRegistry.instance().refresh();
     setResponsePage(new MessagePage("administration.rereadConfiguration", result));
   }
 
