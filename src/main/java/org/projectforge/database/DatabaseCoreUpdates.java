@@ -166,6 +166,30 @@ public class DatabaseCoreUpdates
     });
 
     // /////////////////////////////////////////////////////////////////
+    // 5.3
+    // /////////////////////////////////////////////////////////////////
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "5.3", "2013-11-24", "Adds t_pf_user.last_password_change, t_pf_user.password_salt.") {
+
+      @Override
+      public UpdatePreCheckStatus runPreCheck()
+      {
+        if (dao.doTableAttributesExist(PFUserDO.class, "lastPasswordChange", "passwordSalt") == false) {
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
+        return UpdatePreCheckStatus.ALREADY_UPDATED;
+      }
+
+      @Override
+      public UpdateRunningStatus runUpdate()
+      {
+        if (dao.doTableAttributesExist(PFUserDO.class, "lastPasswordChange", "passwordSalt") == false) {
+          dao.addTableAttributes(PFUserDO.class, "lastPasswordChange", "passwordSalt");
+        }
+        return UpdateRunningStatus.DONE;
+      }
+    });
+
+    // /////////////////////////////////////////////////////////////////
     // 5.2
     // /////////////////////////////////////////////////////////////////
     list.add(new UpdateEntryImpl(
