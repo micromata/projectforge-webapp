@@ -3,7 +3,7 @@
 // Project ProjectForge Community Edition
 //         www.projectforge.org
 //
-// Copyright (C) 2001-2013 Kai Reinhard (k.reinhard@micromata.de)
+// Copyright (C) 2001-2014 Kai Reinhard (k.reinhard@micromata.de)
 //
 // ProjectForge is dual-licensed.
 //
@@ -22,11 +22,11 @@
 /////////////////////////////////////////////////////////////////////////////
 package net.ftlines.wicket.fullcalendar.callback;
 
-import org.apache.wicket.Component;
-import org.apache.wicket.util.template.PackageTextTemplate;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.wicket.Component;
+import org.apache.wicket.util.template.PackageTextTemplate;
 
 /**
  * Just the Javascript generator helper class to provide the event dropped javascript
@@ -61,7 +61,7 @@ public class EventDroppedCallbackScriptGenerator
    */
   private static Map<String, String> buildMap(final Component component, final String script)
   {
-    Map<String, String> result = new HashMap<String, String>();
+    final Map<String, String> result = new HashMap<String, String>();
     result.put("NO_CONTEXTMENU_INDICATOR", NO_CONTEXTMENU_INDICATOR);
     result.put("ORIGINAL_CALLBACK", script);
     result.put("MOVE_SAVE", component.getString(MOVE_SAVE));
@@ -84,7 +84,7 @@ public class EventDroppedCallbackScriptGenerator
    * @param urlTail
    * @return
    */
-  public static String getEventDroppedJavascript(Component component, String url, String script, String urlTail)
+  public static String getEventDroppedJavascript(final Component component, final String url, final String script, final String urlTail)
   {
     return JS_TEMPLATE.asString(buildMap(component, script.replace(urlTail, url + "&which=\"+which+\""))).replace(LINE_SEPARATOR, "")
         .replace("  ", " ");
