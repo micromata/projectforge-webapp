@@ -53,7 +53,8 @@ public class TestConfiguration
 
   private static final String[] TEST_CONTEXT_FILES = new String[] { "test-applicationContext-main.xml", "applicationContext-hibernate.xml",
     "applicationContext-business.xml", "applicationContext-web.xml", "applicationContext-ldap.xml",
-    "org/projectforge/plugins/memo/pluginContext.xml", "org/projectforge/plugins/todo/pluginContext.xml"};
+    "org/projectforge/plugins/memo/pluginContext.xml", "org/projectforge/plugins/todo/pluginContext.xml",
+  "org/projectforge/plugins/teamcal/pluginContext.xml"};
 
   private static final String[] CMD_CONTEXT_FILES = new String[] { "cmd-applicationContext-main.xml", "applicationContext-hibernate.xml",
     "applicationContext-business.xml", "applicationContext-ldap.xml"};
