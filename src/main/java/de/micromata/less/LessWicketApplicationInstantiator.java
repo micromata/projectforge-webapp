@@ -32,7 +32,7 @@ import org.apache.wicket.util.listener.IChangeListener;
 import org.apache.wicket.util.watch.IModificationWatcher;
 import org.lesscss.LessCompiler;
 import org.lesscss.LessSource;
-import org.projectforge.core.Configuration;
+import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.wicket.WicketApplication;
 import org.springframework.util.StringUtils;
 
@@ -122,7 +122,7 @@ public class LessWicketApplicationInstantiator implements Serializable
     instantiateFiles();
     final LessSource mainLessSource = compile();
 
-    if (Configuration.isDevelopmentMode() == true) {
+    if (WebConfiguration.isDevelopmentMode() == true) {
       // only add this fancy resource watcher in dev mode
       final IModificationWatcher resourceWatcher = application.getResourceSettings().getResourceWatcher(true);
       // add watchers
