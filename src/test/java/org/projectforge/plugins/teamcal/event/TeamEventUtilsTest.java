@@ -52,8 +52,9 @@ public class TeamEventUtilsTest extends AbstractTestBase
     preInit();
     init(true);
     final String domain = "projectforge.org";
-    Configuration.getInstance().forceReload();
-    Configuration.init4TestMode().put(ConfigurationParam.CALENDAR_DOMAIN, domain);
+    final Configuration config = Configuration.getInstance();
+    config.forceReload();
+    config.putParameter4TestcasesOnly(ConfigurationParam.CALENDAR_DOMAIN, domain);
   }
 
   @Test

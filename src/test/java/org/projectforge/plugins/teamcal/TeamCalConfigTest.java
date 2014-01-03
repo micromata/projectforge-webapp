@@ -23,12 +23,11 @@
 
 package org.projectforge.plugins.teamcal;
 
-import java.util.Map;
-
 import junit.framework.Assert;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.projectforge.core.AbstractConfiguration;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
 
@@ -37,9 +36,10 @@ public class TeamCalConfigTest
   @BeforeClass
   public static void setUp() throws Exception
   {
+    AbstractConfiguration.init4TestMode();
     final String domain = "projectforge.org";
-    final Map<ConfigurationParam, Object> map = Configuration.init4TestMode();
-    map.put(ConfigurationParam.CALENDAR_DOMAIN, domain);
+    final Configuration config = Configuration.getInstance();
+    config.putParameter4TestcasesOnly(ConfigurationParam.CALENDAR_DOMAIN, domain);
   }
 
   @Test
