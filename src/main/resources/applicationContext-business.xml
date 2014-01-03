@@ -3,7 +3,6 @@
 <beans default-lazy-init="false" default-autowire="byType">
   <bean id="accessChecker" class="org.projectforge.access.AccessChecker" singleton="true" />
   <bean id="addressExport" class="org.projectforge.address.AddressExport" singleton="true" />
-  <bean id="internalUseConfiguration" class="org.projectforge.core.Configuration" singleton="true" />
   <bean id="groovyExecutor" class="org.projectforge.scripting.GroovyExecutor" />
   <bean id="myDatabaseUpdater" class="org.projectforge.database.MyDatabaseUpdater" singleton="true" />
   <bean id="historyAdapter" class="de.micromata.hibernate.history.HistoryAdapter" />
@@ -17,11 +16,6 @@
   <bean id="sendMail" class="org.projectforge.mail.SendMail" singleton="true" />
   <bean id="statisticsCache" class="org.projectforge.database.StatisticsCache" singleton="true">
     <property name="expireTimeInHours" value="12" />
-  </bean>
-  <bean id="taskTree" class="org.projectforge.task.TaskTree" singleton="true">
-    <property name="expireTimeInHours">
-      <value>1</value>
-    </property>
   </bean>
   <bean id="userGroupCache" class="org.projectforge.user.UserGroupCache" singleton="true">
     <property name="expireTimeInHours" value="1" />
