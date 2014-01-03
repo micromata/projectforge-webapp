@@ -75,6 +75,14 @@ public class Kost2Dao extends BaseDao<Kost2DO>
     this.kostCache = kostCache;
   }
 
+  /**
+   * @return the kostCache
+   */
+  public KostCache getKostCache()
+  {
+    return kostCache;
+  }
+
   @Override
   protected String[] getAdditionalSearchFields()
   {
@@ -138,9 +146,9 @@ public class Kost2Dao extends BaseDao<Kost2DO>
   public List<Kost2DO> getActiveKost2(final int nummernkreis, final int bereich, final int teilbereich)
   {
     final List<Kost2DO> list = getHibernateTemplate()
-    .find(
-        "from Kost2DO k where k.nummernkreis=? and k.bereich=? and k.teilbereich=? and (k.kostentraegerStatus='ACTIVE' or k.kostentraegerStatus is null) order by k.kost2Art.id",
-        new Object[] { nummernkreis, bereich, teilbereich});
+        .find(
+            "from Kost2DO k where k.nummernkreis=? and k.bereich=? and k.teilbereich=? and (k.kostentraegerStatus='ACTIVE' or k.kostentraegerStatus is null) order by k.kost2Art.id",
+            new Object[] { nummernkreis, bereich, teilbereich});
     if (CollectionUtils.isEmpty(list) == true) {
       return null;
     }
