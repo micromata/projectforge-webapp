@@ -32,6 +32,8 @@ import java.util.TimeZone;
 import org.apache.commons.lang.Validate;
 import org.projectforge.access.OperationType;
 import org.projectforge.multitenancy.TenantDO;
+import org.projectforge.multitenancy.TenantRegistry;
+import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.user.PFUserDO;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -58,7 +60,8 @@ public class ConfigurationDao extends BaseDao<ConfigurationDO>
       GlobalConfiguration.getInstance().setExpired();
     } else {
       final TenantDO tenant = obj.getTenant();
-
+      final TenantRegistry tenantRegistry = TenantRegistryMap.getInstance().getTenantRegistry(tenant);
+      tenantRegistry.getConfiguration().setExpired();
     }
   }
 
