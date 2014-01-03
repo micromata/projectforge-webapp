@@ -30,6 +30,7 @@ import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.fibu.kost.Kost2DO;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
 import org.projectforge.timesheet.TimesheetDO;
@@ -55,9 +56,6 @@ public class TimesheetMassUpdateForm extends AbstractMassEditForm<TimesheetDO, T
   @SpringBean(name = "timesheetDao")
   private TimesheetDao timesheetDao;
 
-  @SpringBean(name = "taskTree")
-  private TaskTree taskTree;
-
   protected boolean updateTask;
 
   private TimesheetPageSupport timesheetPageSupport;
@@ -73,6 +71,7 @@ public class TimesheetMassUpdateForm extends AbstractMassEditForm<TimesheetDO, T
   protected void init()
   {
     super.init();
+    final TaskTree taskTree = Registry.instance().getTaskTree();
     timesheetPageSupport = new TimesheetPageSupport(parentPage, gridBuilder, timesheetDao, data);
     gridBuilder.newGridPanel();
     {

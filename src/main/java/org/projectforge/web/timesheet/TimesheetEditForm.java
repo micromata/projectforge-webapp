@@ -51,13 +51,14 @@ import org.projectforge.common.DatePrecision;
 import org.projectforge.core.SystemInfoCache;
 import org.projectforge.fibu.KostFormatter;
 import org.projectforge.fibu.kost.Kost2DO;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.user.UserPrefDO;
@@ -96,8 +97,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
 
   ModalDialog recentSheetsModalDialog;
 
-  @SpringBean(name = "taskTree")
-  private TaskTree taskTree;
+  private transient TaskTree taskTree;
 
   @SpringBean(name = "timesheetDao")
   private TimesheetDao timesheetDao;
@@ -199,11 +199,11 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
           if (cost2Choice != null && cost2Choice.getConvertedInput() == null) {
             // cost2Choice is always != null (but may-be invisible) if cost2 entries does exist in the system.
             // Kost2 is not available for current task.
-            final TaskNode taskNode = taskTree.getTaskNodeById(data.getTaskId());
+            final TaskNode taskNode = getTaskTree().getTaskNodeById(data.getTaskId());
             if (taskNode != null) {
               final List<Integer> descendents = taskNode.getDescendantIds();
               for (final Integer taskId : descendents) {
-                if (CollectionUtils.isNotEmpty(taskTree.getKost2List(taskId)) == true) {
+                if (CollectionUtils.isNotEmpty(getTaskTree().getKost2List(taskId)) == true) {
                   // But Kost2 is available for sub task, so user should book his time sheet
                   // on a sub task with kost2s.
                   if (cost2Choice.isVisible()) {
@@ -259,10 +259,10 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
       cost2ChoiceFieldset = gridBuilder.newFieldset(getString("fibu.kost2"));
       cost2ChoiceFieldset.getFieldset().setOutputMarkupId(true);
       cost2ChoiceFieldset.getFieldset().setOutputMarkupPlaceholderTag(true);
-      cost2List = taskTree.getKost2List(data.getTaskId());
+      cost2List = getTaskTree().getKost2List(data.getTaskId());
       final LabelValueChoiceRenderer<Integer> cost2ChoiceRenderer = getCost2LabelValueChoiceRenderer(parentPage.getBaseDao(), cost2List,
           data, null);
-      cost2Choice = createCost2ChoiceRenderer(cost2ChoiceFieldset.getDropDownChoiceId(), parentPage.getBaseDao(), taskTree,
+      cost2Choice = createCost2ChoiceRenderer(cost2ChoiceFieldset.getDropDownChoiceId(), parentPage.getBaseDao(), getTaskTree(),
           cost2ChoiceRenderer, data, cost2List);
       cost2ChoicePanel = cost2ChoiceFieldset.add(cost2Choice);
       dependentFormComponentsWithCost2[3] = cost2Choice;
@@ -453,7 +453,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
     templatesRow
     .add(new IconLinkPanel(templatesRow.newChildId(), IconType.FOLDER_OPEN, new ResourceModel("timesheet.recent.select"), link));
     recentSheetsModalDialog = new TimesheetEditSelectRecentDialogPanel(parentPage.newModalDialogId(), getString("timesheet.recent.select"),
-        parentPage, TimesheetEditForm.this, cost2Exists, timesheetDao, taskTree, userFormatter);
+        parentPage, TimesheetEditForm.this, cost2Exists, timesheetDao, getTaskTree(), userFormatter);
     parentPage.add(recentSheetsModalDialog);
     recentSheetsModalDialog.init();
   }
@@ -557,7 +557,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
   protected void refresh()
   {
     if (cost2ChoicePanel != null) {
-      cost2List = taskTree.getKost2List(data.getTaskId());
+      cost2List = getTaskTree().getKost2List(data.getTaskId());
       final LabelValueChoiceRenderer<Integer> cost2ChoiceRenderer = getCost2LabelValueChoiceRenderer(parentPage.getBaseDao(), cost2List,
           data, null);
       cost2ChoicePanel.getDropDownChoice().setChoiceRenderer(cost2ChoiceRenderer);
@@ -570,9 +570,9 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
   protected ConsumptionBarPanel getConsumptionBar()
   {
     final Integer taskId = data.getTaskId();
-    TaskNode node = taskId != null ? taskTree.getTaskNodeById(taskId) : null;
+    TaskNode node = taskId != null ? getTaskTree().getTaskNodeById(taskId) : null;
     if (node != null) {
-      final TaskNode personDaysNode = taskTree.getPersonDaysNode(node);
+      final TaskNode personDaysNode = getTaskTree().getPersonDaysNode(node);
       if (personDaysNode != null) {
         node = personDaysNode;
       }
@@ -620,5 +620,13 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
   public TimesheetEditFilter getFilter()
   {
     return filter;
+  }
+
+  private TaskTree getTaskTree()
+  {
+    if (taskTree == null) {
+      taskTree = Registry.instance().getTaskTree();
+    }
+    return taskTree;
   }
 }

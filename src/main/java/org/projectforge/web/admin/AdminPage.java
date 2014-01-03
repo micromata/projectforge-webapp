@@ -53,6 +53,7 @@ import org.projectforge.database.XmlDump;
 import org.projectforge.meb.MebMailClient;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.plugins.core.PluginsRegistry;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.ThreadLocalUserContext;
@@ -95,9 +96,6 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
 
   @SpringBean(name = "mebMailClient")
   private MebMailClient mebMailClient;
-
-  @SpringBean(name = "taskTree")
-  private TaskTree taskTree;
 
   @SpringBean(name = "userXmlPreferencesCache")
   private UserXmlPreferencesCache userXmlPreferencesCache;
@@ -646,6 +644,7 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
   {
     accessChecker.checkIsLoggedInUserMemberOfAdminGroup();
     accessChecker.checkRestrictedOrDemoUser();
+    final TaskTree taskTree = Registry.instance().getTaskTree();
     final TaskDO task = taskTree.getTaskById(Configuration.getInstance().getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_BOOKS));
     final List<BookDO> list = new ArrayList<BookDO>();
     int number = 1;

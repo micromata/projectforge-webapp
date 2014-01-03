@@ -46,13 +46,14 @@ import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.gantt.GanttObjectType;
 import org.projectforge.gantt.GanttRelationType;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskStatus;
 import org.projectforge.task.TaskTree;
 import org.projectforge.task.TimesheetBookingStatus;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.fibu.Kost2ListPage;
 import org.projectforge.web.fibu.Kost2SelectPanel;
@@ -83,9 +84,6 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
 
   public static final BigDecimal MAX_DURATION_DAYS = new BigDecimal(10000);
 
-  @SpringBean(name = "taskTree")
-  private TaskTree taskTree;
-
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
 
@@ -101,6 +99,8 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
   private ProjektDO projekt;
 
   private DivTextPanel projektKostLabel;
+
+  private transient TaskTree taskTree;
 
   // Components for form validation.
   private final FormComponent< ? >[] dependentFormComponents = new FormComponent[2];
@@ -142,7 +142,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
       fs.add(parentTaskSelectPanel);
       fs.getFieldset().setOutputMarkupId(true);
       parentTaskSelectPanel.init();
-      if (taskTree.isRootNode(data) == false) {
+      if (getTaskTree().isRootNode(data) == false) {
         parentTaskSelectPanel.setRequired(true);
       } else {
         fs.setVisible(false);
@@ -199,7 +199,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
           data, "maxHours"), 0, 9999);
       WicketUtils.setSize(maxNumberField, 6);
       fs.add(maxNumberField);
-      if (isNew() == false && taskTree.hasOrderPositions(data.getId(), true) == true) {
+      if (isNew() == false && getTaskTree().hasOrderPositions(data.getId(), true) == true) {
         WicketUtils.setWarningTooltip(maxNumberField);
         WicketUtils.addTooltip(maxNumberField, getString("task.edit.maxHoursIngoredDueToAssignedOrders"));
       }
@@ -349,7 +349,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
           @Override
           public String getObject()
           {
-            final List<Kost2DO> kost2DOs = taskTree.getKost2List(projekt, data, data.getKost2BlackWhiteItems(), data.isKost2IsBlackList());
+            final List<Kost2DO> kost2DOs = getTaskTree().getKost2List(projekt, data, data.getKost2BlackWhiteItems(), data.isKost2IsBlackList());
             final String[] kost2s = TaskListPage.getKost2s(kost2DOs);
             if (kost2s == null || kost2s.length == 0) {
               return " - (-)";
@@ -437,7 +437,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
         ThreadLocalUserContext.getUser(), task);
     if (Configuration.getInstance().isCostConfigured() == true && task != null) {
       // Cost 2 settings
-      final ProjektDO projekt = taskTree.getProjekt(task.getId());
+      final ProjektDO projekt = getTaskTree().getProjekt(task.getId());
       if (this.projekt == projekt) {
         return;
       }
@@ -451,6 +451,14 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
       kost2BlackWhiteTextField.setEnabled(hasKost2AndTimesheetBookingAccess);
     }
     timesheetBookingStatusChoice.setEnabled(hasKost2AndTimesheetBookingAccess);
+  }
+
+  private TaskTree getTaskTree()
+  {
+    if (taskTree == null) {
+      taskTree = Registry.instance().getTaskTree();
+    }
+    return taskTree;
   }
 
   @Override

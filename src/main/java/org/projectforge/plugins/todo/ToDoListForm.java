@@ -26,7 +26,7 @@ package org.projectforge.plugins.todo;
 import org.apache.log4j.Logger;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.PFUserDO;
@@ -43,8 +43,7 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ToDoListForm.class);
 
-  @SpringBean(name = "taskTree")
-  private TaskTree taskTree;
+  private transient TaskTree taskTree;
 
   @SuppressWarnings("serial")
   @Override
@@ -109,7 +108,7 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
         @Override
         public TaskDO getObject()
         {
-          return taskTree.getTaskById(getSearchFilter().getTaskId());
+          return getTaskTree().getTaskById(getSearchFilter().getTaskId());
         }
 
         @Override
@@ -160,6 +159,14 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
   protected ToDoFilter newSearchFilterInstance()
   {
     return new ToDoFilter();
+  }
+
+  private TaskTree getTaskTree()
+  {
+    if (taskTree == null) {
+      taskTree = Registry.instance().getTaskTree();
+    }
+    return taskTree;
   }
 
   @Override

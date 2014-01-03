@@ -56,6 +56,7 @@ import org.projectforge.common.FileHelper;
 import org.projectforge.common.MyBeanComparator;
 import org.projectforge.core.SystemInfoCache;
 import org.projectforge.jira.JiraUtils;
+import org.projectforge.registry.Registry;
 import org.projectforge.renderer.PdfRenderer;
 import org.projectforge.renderer.custom.Formatter;
 import org.projectforge.renderer.custom.FormatterFactory;
@@ -65,8 +66,8 @@ import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.timesheet.TimesheetExport;
 import org.projectforge.timesheet.TimesheetFilter;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.HtmlHelper;
@@ -129,8 +130,7 @@ IListPageColumnsCreator<TimesheetDO>
   @SpringBean(name = "timesheetExport")
   private TimesheetExport timesheetExport;
 
-  @SpringBean(name = "taskTree")
-  private TaskTree taskTree;
+  private transient TaskTree taskTree;
 
   @SpringBean(name = "userFormatter")
   private UserFormatter userFormatter;
@@ -258,14 +258,14 @@ IListPageColumnsCreator<TimesheetDO>
   protected void createDataTable()
   {
     final List<IColumn<TimesheetDO, String>> columns = createColumns(this, !isMassUpdateMode(), isMassUpdateMode(), form.getSearchFilter(),
-        taskTree, userFormatter, dateTimeFormatter);
+        getTaskTree(), userFormatter, dateTimeFormatter);
     dataTable = createDataTable(columns, "startTime", SortOrder.DESCENDING);
     form.add(dataTable);
   }
 
   public List<IColumn<TimesheetDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    return createColumns(returnToPage, sortable, false, form.getSearchFilter(), taskTree, userFormatter, dateTimeFormatter);
+    return createColumns(returnToPage, sortable, false, form.getSearchFilter(), getTaskTree(), userFormatter, dateTimeFormatter);
   }
 
   /**
@@ -602,5 +602,13 @@ IListPageColumnsCreator<TimesheetDO>
   protected String[] getBookmarkableInitialProperties()
   {
     return MY_BOOKMARKABLE_INITIAL_PROPERTIES;
+  }
+
+  private TaskTree getTaskTree()
+  {
+    if (taskTree == null) {
+      taskTree = Registry.instance().getTaskTree();
+    }
+    return taskTree;
   }
 }

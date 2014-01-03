@@ -34,6 +34,7 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.NumberFormatter;
 import org.projectforge.database.HibernateUtils;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
 import org.projectforge.timesheet.TimesheetDO;
@@ -53,14 +54,12 @@ public class SystemStatisticsPage extends AbstractSecuredPage
   @SpringBean(name = "dataSource")
   private DataSource dataSource;
 
-  @SpringBean(name = "taskTree")
-  private TaskTree taskTree;
-
   public SystemStatisticsPage(final PageParameters parameters)
   {
     super(parameters);
     final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
     body.add(new Label("totalNumberOfTimesheets", NumberFormatter.format(getTableCount(jdbc, TimesheetDO.class))));
+    final TaskTree taskTree = Registry.instance().getTaskTree();
     final long totalDuration = taskTree.getRootTaskNode().getDuration(taskTree, true);
     BigDecimal tatalPersonDays = new BigDecimal(totalDuration).divide(DateHelper.SECONDS_PER_WORKING_DAY, 2, BigDecimal.ROUND_HALF_UP);
     tatalPersonDays = NumberHelper.setDefaultScale(tatalPersonDays);

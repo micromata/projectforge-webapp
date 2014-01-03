@@ -27,7 +27,7 @@ import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.GroupDO;
@@ -48,8 +48,7 @@ public class TaskWizardForm extends AbstractStandardForm<TaskWizardForm, TaskWiz
 {
   private static final long serialVersionUID = -2450673501083584299L;
 
-  @SpringBean(name = "taskTree")
-  private TaskTree taskTree;
+  private transient TaskTree taskTree;
 
   protected TaskDO task;
 
@@ -85,7 +84,7 @@ public class TaskWizardForm extends AbstractStandardForm<TaskWizardForm, TaskWiz
         public final void onSubmit()
         {
           final PageParameters params = new PageParameters();
-          params.add(TaskEditPage.PARAM_PARENT_TASK_ID, taskTree.getRootTaskNode().getId());
+          params.add(TaskEditPage.PARAM_PARENT_TASK_ID, getTaskTree().getRootTaskNode().getId());
           final TaskEditPage editPage = new TaskEditPage(params);
           editPage.setReturnToPage(parentPage);
           setResponsePage(editPage);
@@ -194,5 +193,13 @@ public class TaskWizardForm extends AbstractStandardForm<TaskWizardForm, TaskWiz
       WicketUtils.addTooltip(createGroupButton, getString("task.wizard.button.createGroup.tooltip"));
       fs.add(createGroupButtonPanel);
     }
+  }
+
+  private TaskTree getTaskTree()
+  {
+    if (taskTree == null) {
+      taskTree = Registry.instance().getTaskTree();
+    }
+    return taskTree;
   }
 }

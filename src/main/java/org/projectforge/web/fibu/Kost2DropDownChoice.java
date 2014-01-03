@@ -28,12 +28,12 @@ import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.validator.AbstractValidator;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.fibu.KostFormatter;
 import org.projectforge.fibu.kost.Kost2DO;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskTree;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 
@@ -44,8 +44,7 @@ public abstract class Kost2DropDownChoice extends DropDownChoice<Integer>
 {
   private static final long serialVersionUID = 7812878062066655023L;
 
-  @SpringBean(name = "taskTree")
-  private TaskTree taskTree;
+  private transient TaskTree taskTree;
 
   private Kost2DO kost2;
 
@@ -58,11 +57,13 @@ public abstract class Kost2DropDownChoice extends DropDownChoice<Integer>
   {
     super(componentId);
     setModel(new Model<Integer>() {
+      @Override
       public Integer getObject()
       {
         return getKost2Id();
       }
 
+      @Override
       public void setObject(final Integer kost2Id)
       {
         setKost2Id(kost2Id);
@@ -74,7 +75,7 @@ public abstract class Kost2DropDownChoice extends DropDownChoice<Integer>
     setNullValid(true);
     add(new AbstractValidator<Integer>() {
       @Override
-      protected void onValidate(IValidatable<Integer> validatable)
+      protected void onValidate(final IValidatable<Integer> validatable)
       {
         final Integer value = validatable.getValue();
         if (value != null && value >= 0) {
@@ -127,7 +128,7 @@ public abstract class Kost2DropDownChoice extends DropDownChoice<Integer>
   private void refreshChoiceRenderer()
   {
     final LabelValueChoiceRenderer<Integer> kost2ChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
-    kost2List = taskTree.getKost2List(taskId);
+    kost2List = getTaskTree().getKost2List(taskId);
     if (kost2List != null && kost2List.size() == 1) {
       // Es ist genau ein Eintrag. Deshalb selektieren wir diesen auch:
       final Integer kost2Id = kost2List.get(0).getId();
@@ -137,11 +138,19 @@ public abstract class Kost2DropDownChoice extends DropDownChoice<Integer>
     if (CollectionUtils.isEmpty(kost2List) == true) {
       setKost2Id(null); // No kost2 list given, therefore set also kost2 to null.
     } else {
-      for (Kost2DO kost2 : kost2List) {
+      for (final Kost2DO kost2 : kost2List) {
         kost2ChoiceRenderer.addValue(kost2.getId(), KostFormatter.formatForSelection(kost2));
       }
     }
     setChoiceRenderer(kost2ChoiceRenderer);
     setChoices(kost2ChoiceRenderer.getValues());
+  }
+
+  private TaskTree getTaskTree()
+  {
+    if (taskTree == null) {
+      taskTree = Registry.instance().getTaskTree();
+    }
+    return taskTree;
   }
 }

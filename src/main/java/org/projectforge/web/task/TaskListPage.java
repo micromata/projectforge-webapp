@@ -46,6 +46,7 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.fibu.AuftragsPositionVO;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.fibu.kost.KostCache;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskNode;
@@ -101,9 +102,6 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
 
   @SpringBean(name = "taskFormatter")
   private TaskFormatter taskFormatter;
-
-  @SpringBean(name = "taskTree")
-  private TaskTree taskTree;
 
   /**
    * Sibling page (if the user switches between tree and list view.
@@ -222,6 +220,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
   @SuppressWarnings("serial")
   public List<IColumn<TaskDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
+    final TaskTree taskTree = Registry.instance().getTaskTree();
     final CellItemListener<TaskDO> cellItemListener = new CellItemListener<TaskDO>() {
       public void populateItem(final Item<ICellPopulator<TaskDO>> item, final String componentId, final IModel<TaskDO> rowModel)
       {

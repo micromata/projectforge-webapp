@@ -39,6 +39,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.hibernate.Hibernate;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskFavorite;
@@ -69,8 +70,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
   @SpringBean(name = "taskDao")
   private TaskDao taskDao;
 
-  @SpringBean(name = "taskTree")
-  private TaskTree taskTree;
+  private transient TaskTree taskTree;
 
   private boolean showPath = true;
 
@@ -96,7 +96,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
     fieldsetPanel.getFieldset().setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true);
     TaskDO task = model.getObject();
     if (Hibernate.isInitialized(task) == false) {
-      task = taskTree.getTaskById(task.getId());
+      task = getTaskTree().getTaskById(task.getId());
       model.setObject(task);
     }
     divContainer = new WebMarkupContainer("div") {
@@ -134,12 +134,12 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
     currentTaskId = taskId;
     if (showPath == true && task != null) {
       ancestorRepeater.removeAll();
-      final TaskNode taskNode = taskTree.getTaskNodeById(task.getId());
+      final TaskNode taskNode = getTaskTree().getTaskNodeById(task.getId());
       final List<Integer> ancestorIds = taskNode.getAncestorIds();
       final ListIterator<Integer> it = ancestorIds.listIterator(ancestorIds.size());
       while (it.hasPrevious() == true) {
         final Integer ancestorId = it.previous();
-        final TaskDO ancestorTask = taskTree.getTaskById(ancestorId);
+        final TaskDO ancestorTask = getTaskTree().getTaskById(ancestorId);
         if (ancestorTask.getParentTask() == null) {
           // Don't show root node:
           continue;
@@ -422,5 +422,13 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
   public boolean isAutocompleteOnlyTaskBookableForTimesheets()
   {
     return autocompleteOnlyTaskBookableForTimesheets;
+  }
+
+  private TaskTree getTaskTree()
+  {
+    if (taskTree == null) {
+      taskTree = Registry.instance().getTaskTree();
+    }
+    return taskTree;
   }
 }

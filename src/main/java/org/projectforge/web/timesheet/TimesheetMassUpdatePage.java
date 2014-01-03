@@ -38,6 +38,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.MyBeanComparator;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskTree;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
@@ -59,9 +60,6 @@ public class TimesheetMassUpdatePage extends AbstractMassEditPage implements ISe
   @SpringBean(name = "userFormatter")
   private UserFormatter userFormatter;
 
-  @SpringBean(name = "taskTree")
-  private TaskTree taskTree;
-
   @SpringBean(name = "timesheetDao")
   private TimesheetDao timesheetDao;
 
@@ -72,6 +70,7 @@ public class TimesheetMassUpdatePage extends AbstractMassEditPage implements ISe
   public TimesheetMassUpdatePage(final AbstractSecuredPage callerPage, final List<TimesheetDO> timesheets)
   {
     super(new PageParameters(), callerPage);
+    final TaskTree taskTree = Registry.instance().getTaskTree();
     this.timesheets = timesheets;
     form = new TimesheetMassUpdateForm(this);
     Integer taskId = null;

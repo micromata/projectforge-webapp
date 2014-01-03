@@ -38,6 +38,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.core.ConfigurationDO;
 import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.ConfigurationType;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
 import org.projectforge.web.wicket.AbstractListPage;
@@ -55,8 +56,7 @@ public class ConfigurationListPage extends AbstractListPage<ConfigurationListFor
   @SpringBean(name = "configurationDao")
   private ConfigurationDao configurationDao;
 
-  @SpringBean(name = "taskTree")
-  private TaskTree taskTree;
+  private transient TaskTree taskTree;
 
   public ConfigurationListPage(final PageParameters parameters)
   {
@@ -100,7 +100,7 @@ public class ConfigurationListPage extends AbstractListPage<ConfigurationListFor
         if (configuration.getValue() == null) {
           value = "";
         } else if (configuration.getConfigurationType() == ConfigurationType.TASK) {
-          final TaskDO task = taskTree.getTaskById(configuration.getTaskId());
+          final TaskDO task = getTaskTree().getTaskById(configuration.getTaskId());
           if (task != null) {
             value = task.getId() + ": " + task.getTitle();
           } else {
@@ -124,6 +124,14 @@ public class ConfigurationListPage extends AbstractListPage<ConfigurationListFor
     });
     dataTable = createDataTable(columns, null, SortOrder.ASCENDING);
     form.add(dataTable);
+  }
+
+  private TaskTree getTaskTree()
+  {
+    if (taskTree == null) {
+      taskTree = Registry.instance().getTaskTree();
+    }
+    return taskTree;
   }
 
   @Override

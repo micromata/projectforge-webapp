@@ -41,6 +41,7 @@ import org.projectforge.database.InitDatabaseDao;
 import org.projectforge.database.MyDatabaseUpdater;
 import org.projectforge.database.XmlDump;
 import org.projectforge.database.xstream.XStreamSavingConverter;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserContext;
@@ -67,9 +68,6 @@ public class SetupPage extends AbstractUnsecureBasePage
 
   @SpringBean(name = "hibernateSearchReindexer")
   private HibernateSearchReindexer hibernateSearchReindexer;
-
-  @SpringBean(name = "taskTree")
-  private TaskTree taskTree;
 
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
@@ -188,6 +186,7 @@ public class SetupPage extends AbstractUnsecureBasePage
       final int counter = xmlDump.verifyDump(converter);
       configurationDao.checkAndUpdateDatabaseEntries();
       Configuration.getInstance().setExpired();
+      final TaskTree taskTree = Registry.instance().getTaskTree();
       taskTree.setExpired();
       userGroupCache.setExpired();
       new Thread() {

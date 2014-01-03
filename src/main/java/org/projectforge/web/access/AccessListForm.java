@@ -26,8 +26,8 @@ package org.projectforge.web.access;
 import org.apache.log4j.Logger;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessFilter;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.GroupDO;
@@ -46,8 +46,7 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AccessListForm.class);
 
-  @SpringBean(name = "taskTree")
-  private TaskTree taskTree;
+  private transient TaskTree taskTree;
 
   @SuppressWarnings("serial")
   @Override
@@ -112,7 +111,7 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
         @Override
         public TaskDO getObject()
         {
-          return taskTree.getTaskById(getSearchFilter().getTaskId());
+          return getTaskTree().getTaskById(getSearchFilter().getTaskId());
         }
 
         @Override
@@ -152,6 +151,14 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
     optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(),
         new PropertyModel<Boolean>(getSearchFilter(), "includeDescendentTasks"), getString("access.filter.includeDescendentTasks"))
         .setTooltip(getString("access.tooltip.filter.includeDescendentTasks")));
+  }
+
+  private TaskTree getTaskTree()
+  {
+    if (taskTree == null) {
+      taskTree = Registry.instance().getTaskTree();
+    }
+    return taskTree;
   }
 
   @Override

@@ -36,6 +36,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.gantt.GanttChartDO;
 import org.projectforge.gantt.GanttChartDao;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskTree;
 import org.projectforge.web.task.TaskPropertyColumn;
 import org.projectforge.web.user.UserFormatter;
@@ -54,9 +55,6 @@ public class GanttChartListPage extends AbstractListPage<GanttChartListForm, Gan
   @SpringBean(name = "ganttChartDao")
   private GanttChartDao ganttChartDao;
 
-  @SpringBean(name = "taskTree")
-  private TaskTree taskTree;
-
   @SpringBean(name = "userFormatter")
   private UserFormatter userFormatter;
 
@@ -70,7 +68,7 @@ public class GanttChartListPage extends AbstractListPage<GanttChartListForm, Gan
   protected void init()
   {
     final List<IColumn<GanttChartDO, String>> columns = new ArrayList<IColumn<GanttChartDO, String>>();
-
+    final TaskTree taskTree = Registry.instance().getTaskTree();
     final CellItemListener<GanttChartDO> cellItemListener = new CellItemListener<GanttChartDO>() {
       public void populateItem(final Item<ICellPopulator<GanttChartDO>> item, final String componentId, final IModel<GanttChartDO> rowModel)
       {

@@ -38,6 +38,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.UserGroupCache;
@@ -67,9 +68,6 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
   @SpringBean(name = "priorityFormatter")
   private PriorityFormatter priorityFormatter;
 
-  @SpringBean(name = "taskTree")
-  private TaskTree taskTree;
-
   @SpringBean(name = "userFormatter")
   private UserFormatter userFormatter;
 
@@ -84,6 +82,7 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
   @SuppressWarnings("serial")
   public List<IColumn<ToDoDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
+    final TaskTree taskTree = Registry.instance().getTaskTree();
     final List<IColumn<ToDoDO, String>> columns = new ArrayList<IColumn<ToDoDO, String>>();
     final CellItemListener<ToDoDO> cellItemListener = new CellItemListener<ToDoDO>() {
       public void populateItem(final Item<ICellPopulator<ToDoDO>> item, final String componentId, final IModel<ToDoDO> rowModel)
@@ -98,8 +97,7 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
       }
     };
 
-    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("created", sortable),
-        "created", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("created", sortable), "created", cellItemListener) {
       @SuppressWarnings({ "unchecked", "rawtypes"})
       @Override
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
@@ -113,18 +111,14 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
     });
     columns.add(new CellItemListenerPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("lastUpdate", sortable), "lastUpdate",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("subject",
-        sortable), "subject", cellItemListener));
-    columns.add(new UserPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("assigneeId", sortable), "assignee",
-        cellItemListener).withUserFormatter(userFormatter));
-    columns.add(new UserPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("reporterId", sortable), "reporter",
-        cellItemListener).withUserFormatter(userFormatter));
-    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("dueDate", sortable), "dueDate",
-        cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("status",
-        sortable), "status", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("priority", sortable),
-        "priority", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("subject", sortable), "subject", cellItemListener));
+    columns.add(new UserPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("assigneeId", sortable), "assignee", cellItemListener)
+        .withUserFormatter(userFormatter));
+    columns.add(new UserPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("reporterId", sortable), "reporter", cellItemListener)
+        .withUserFormatter(userFormatter));
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("dueDate", sortable), "dueDate", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("status", sortable), "status", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("priority", sortable), "priority", cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<ToDoDO>> item, final String componentId, final IModel<ToDoDO> rowModel)
       {
@@ -136,8 +130,7 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(ToDoDO.class,
-        getSortable("type", sortable), "type", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("type", sortable), "type", cellItemListener));
     columns.add(new TaskPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("task.title", sortable), "task", cellItemListener)
         .withTaskTree(taskTree));
     columns.add(new CellItemListenerPropertyColumn<ToDoDO>(ToDoDO.class, null, "group", cellItemListener) {
@@ -157,8 +150,8 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(ToDoDO.class,
-        getSortable("description", sortable), "description", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(ToDoDO.class, getSortable("description", sortable), "description",
+        cellItemListener));
     return columns;
   }
 

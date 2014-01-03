@@ -39,6 +39,7 @@ import org.projectforge.common.NumberHelper;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.fibu.kost.KostCache;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
 import org.projectforge.timesheet.TimesheetDO;
@@ -109,8 +110,7 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
   @SpringBean(name = "kostCache")
   private KostCache kostCache;
 
-  @SpringBean(name = "taskTree")
-  private TaskTree taskTree;
+  private transient TaskTree taskTree;
 
   @SpringBean(name = "timesheetDao")
   private TimesheetDao timesheetDao;
@@ -268,7 +268,7 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
   private TimesheetDO getRecentSheet(final TimesheetPrefEntry entry)
   {
     final TimesheetDO sheet = new TimesheetDO();
-    final TaskDO task = taskTree.getTaskById(entry.getTaskId());
+    final TaskDO task = getTaskTree().getTaskById(entry.getTaskId());
     sheet.setTask(task);
     final Kost2DO kost2 = kostCache.getKost2(entry.getKost2Id());
     sheet.setKost2(kost2);
@@ -364,7 +364,7 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
   public AbstractSecuredBasePage afterSaveOrUpdate()
   {
     // clean ignore location if needed
-    if(form != null && form.getFilter() != null && getData() != null) {
+    if (form != null && form.getFilter() != null && getData() != null) {
       form.getFilter().removeIgnoredLocation(getData().getLocation());
     }
     // Save time sheet as recent time sheet
@@ -401,11 +401,21 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
     return log;
   }
 
-  public static void addPluginHook(final TimesheetPluginComponentHook hook) {
+  public static void addPluginHook(final TimesheetPluginComponentHook hook)
+  {
     PLUGIN_HOOKS.add(hook);
   }
 
-  public static List<TimesheetPluginComponentHook> getPluginHooks() {
+  public static List<TimesheetPluginComponentHook> getPluginHooks()
+  {
     return Collections.unmodifiableList(PLUGIN_HOOKS);
+  }
+
+  private TaskTree getTaskTree()
+  {
+    if (taskTree == null) {
+      taskTree = Registry.instance().getTaskTree();
+    }
+    return taskTree;
   }
 }

@@ -36,6 +36,7 @@ import org.projectforge.access.GroupTaskAccessDO;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.QueryFilter;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskTree;
@@ -106,9 +107,6 @@ public class TutorialPage extends AbstractSecuredPage
 
   @SpringBean(name = "taskDao")
   private TaskDao taskDao;
-
-  @SpringBean(name = "taskTree")
-  private TaskTree taskTree;
 
   public TutorialPage(final PageParameters params)
   {
@@ -193,6 +191,7 @@ public class TutorialPage extends AbstractSecuredPage
     if (doesEntryAlreadyExist(taskDao, tutorialReference) == true) {
       return;
     }
+    final TaskTree taskTree = Registry.instance().getTaskTree();
     final TaskDO task;
     if (REF_TASK_JAVA_GURUS.equals(reference) == true) {
       task = createTask(taskTree.getRootTaskNode().getTask(), "Java Gurus inc.", tutorialReference);
