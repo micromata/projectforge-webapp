@@ -31,8 +31,8 @@ import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.AppVersion;
-import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
+import org.projectforge.core.GlobalConfiguration;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserXmlPreferencesCache;
@@ -80,7 +80,7 @@ public class LoginMobilePage extends AbstractMobilePage
     pageContainer.add(form);
     form.init();
     pageContainer.add(new FeedbackPanel("feedback").setOutputMarkupId(true));
-    final String messageOfTheDay = Configuration.getInstance().getStringValue(ConfigurationParam.MESSAGE_OF_THE_DAY);
+    final String messageOfTheDay = GlobalConfiguration.getInstance().getStringValue(ConfigurationParam.MESSAGE_OF_THE_DAY);
     if (StringUtils.isBlank(messageOfTheDay) == true) {
       pageContainer.add(new Label("messageOfTheDay", "[invisible]").setVisible(false));
     } else {
