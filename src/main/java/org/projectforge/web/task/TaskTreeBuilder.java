@@ -92,6 +92,8 @@ public class TaskTreeBuilder implements Serializable
 
   private AccessChecker accessChecker;
 
+  private transient TaskTree taskTree;
+
   private TaskFormatter taskFormatter;
 
   private PriorityFormatter priorityFormatter;
@@ -164,7 +166,6 @@ public class TaskTreeBuilder implements Serializable
   @SuppressWarnings("serial")
   private List<IColumn<TaskNode, String>> createColumns()
   {
-    final TaskTree taskTree = getTaskTree();
     final CellItemListener<TaskNode> cellItemListener = new CellItemListener<TaskNode>() {
       public void populateItem(final Item<ICellPopulator<TaskNode>> item, final String componentId, final IModel<TaskNode> rowModel)
       {
@@ -214,13 +215,13 @@ public class TaskTreeBuilder implements Serializable
         }
       });
     }
-    if (taskTree.hasOrderPositionsEntries() == true && showOrders == true) {
+    if (getTaskTree().hasOrderPositionsEntries() == true && showOrders == true) {
       columns.add(new CellItemListenerPropertyColumn<TaskNode>(new ResourceModel("fibu.auftrag.auftraege"), null, null, cellItemListener) {
         @Override
         public void populateItem(final Item<ICellPopulator<TaskNode>> item, final String componentId, final IModel<TaskNode> rowModel)
         {
           final TaskNode taskNode = rowModel.getObject();
-          final Set<AuftragsPositionVO> orderPositions = taskTree.getOrderPositionEntries(taskNode.getId());
+          final Set<AuftragsPositionVO> orderPositions = getTaskTree().getOrderPositionEntries(taskNode.getId());
           if (CollectionUtils.isEmpty(orderPositions) == true) {
             final Label label = new Label(componentId, ""); // Empty label.
             item.add(label);
@@ -395,6 +396,9 @@ public class TaskTreeBuilder implements Serializable
   }
 
   private TaskTree getTaskTree() {
-    return Registry.instance().getTaskTree();
+    if (taskTree == null) {
+      taskTree = Registry.instance().getTaskTree();
+    }
+    return taskTree;
   }
 }
