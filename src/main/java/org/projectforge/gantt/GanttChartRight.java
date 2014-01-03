@@ -26,6 +26,7 @@ package org.projectforge.gantt;
 import org.projectforge.access.AccessType;
 import org.projectforge.access.OperationType;
 import org.projectforge.fibu.ProjektDO;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
@@ -120,7 +121,7 @@ public class GanttChartRight extends UserRightAccessCheck<GanttChartDO>
         // User has task access:
         return true;
       }
-      final TaskTree taskTree = UserRights.getAccessChecker().getTaskTree();
+      final TaskTree taskTree = Registry.instance().getTaskTree();
       final ProjektDO project = taskTree.getProjekt(obj.getTaskId());
       if (project == null) {
         // Project manager group not found:
