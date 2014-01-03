@@ -29,8 +29,10 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 import org.projectforge.common.StringHelper;
+import org.projectforge.core.AbstractConfiguration;
 import org.projectforge.core.ConfigXmlTest;
-import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigurationDao;
+import org.projectforge.core.GlobalConfiguration;
 import org.projectforge.database.HibernateUtils;
 import org.projectforge.jdbc.PropertyDataSource;
 import org.springframework.beans.BeansException;
@@ -61,6 +63,8 @@ public class TestConfiguration
   protected String[] contextFiles;
 
   protected String databaseUrl;
+
+  private ConfigurationDao configurationDao;
 
   protected boolean isInitialized = false;
 
@@ -133,6 +137,11 @@ public class TestConfiguration
   public ConfigurableListableBeanFactory getBeanFactory()
   {
     return ctx.getBeanFactory();
+  }
+
+  public void setConfigurationDao(final ConfigurationDao configurationDao)
+  {
+    this.configurationDao = configurationDao;
   }
 
   public boolean isInitialized()
@@ -218,7 +227,7 @@ public class TestConfiguration
       // Get a new HibernateTemplate each time
       ctx.getBeanFactory().autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
     }
-    final Configuration cfg = ctx.getBean("configuration", Configuration.class);
-    cfg.setBeanFactory(ctx.getBeanFactory()); // Bean factory need to be set.
+    AbstractConfiguration.init4TestMode();
+    GlobalConfiguration.getInstance().setConfigurationDao(configurationDao);
   }
 }
