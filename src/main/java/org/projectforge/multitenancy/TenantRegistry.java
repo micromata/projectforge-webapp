@@ -25,6 +25,8 @@ package org.projectforge.multitenancy;
 
 import org.apache.log4j.Logger;
 import org.projectforge.access.AccessDao;
+import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigurationDao;
 import org.projectforge.fibu.AuftragDao;
 import org.projectforge.fibu.ProjektDao;
 import org.projectforge.registry.Registry;
@@ -48,6 +50,8 @@ public class TenantRegistry
 
   private final long timeToLive;
 
+  private Configuration configuration;
+
   private TaskTree taskTree;
 
   private final TenantDO tenant;
@@ -64,6 +68,8 @@ public class TenantRegistry
     taskTree.setKostCache(registry.getKostCache());
     taskTree.setProjektDao(registry.getDao(ProjektDao.class));
     taskTree.setTaskDao(registry.getDao(TaskDao.class));
+    final Configuration configuration = new Configuration(tenant);
+    configuration.setConfigurationDao(registry.getDao(ConfigurationDao.class));
   }
 
   /**
@@ -72,6 +78,14 @@ public class TenantRegistry
   public boolean isOutdated()
   {
     return System.currentTimeMillis() - lastUsage > 0;
+  }
+
+  /**
+   * @return the configuration
+   */
+  public Configuration getConfiguration()
+  {
+    return configuration;
   }
 
   /**

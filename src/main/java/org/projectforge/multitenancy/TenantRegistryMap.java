@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.lang.Validate;
 import org.projectforge.common.AbstractCache;
 
 /**
@@ -53,20 +54,26 @@ public class TenantRegistryMap extends AbstractCache
     super(EXPIRE_TIME);
   }
 
-  public TenantRegistry getTenantRegistry()
+  public TenantRegistry getTenantRegistry(final TenantDO tenant)
   {
+    Validate.notNull(tenant);
     checkRefresh();
-    final TenantDO tenant = TenantChecker.getCurrentTenant();
-    if (tenant == null) {
-      log.warn("Current tenant is null in ThreadLocal.");
-      return null;
-    }
     TenantRegistry registry = tenantRegistryMap.get(tenant.getId());
     if (registry == null) {
       registry = new TenantRegistry(tenant);
       tenantRegistryMap.put(tenant.getId(), registry);
     }
     return registry;
+  }
+
+  public TenantRegistry getTenantRegistry()
+  {
+    final TenantDO tenant = TenantChecker.getCurrentTenant();
+    if (tenant == null) {
+      log.warn("Current tenant is null in ThreadLocal.");
+      return null;
+    }
+    return getTenantRegistry(tenant);
   }
 
   /**
