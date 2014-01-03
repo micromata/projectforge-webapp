@@ -26,7 +26,7 @@ package org.projectforge.core;
 /**
  * Marker for Configuration.
  * @author Kai Reinhard (k.reinhard@micromata.de)
- * @see Configuration
+ * @see AbstractConfiguration
  */
 public interface ConfigurationData
 {
