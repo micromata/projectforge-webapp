@@ -23,6 +23,7 @@
 
 package org.projectforge.core;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -48,6 +49,21 @@ public class Configuration extends AbstractConfiguration
   private final TenantDO tenant;
 
   private static Configuration instance;
+
+  public static void _init4TestMode()
+  {
+    if (instance == null) {
+      instance = new Configuration(null);
+      instance.configurationParamMap = new HashMap<ConfigurationParam, Object>();
+    } else {
+      if (instance.configurationParamMap == null) {
+        instance.forceReload();
+        if (instance.configurationParamMap == null) {
+          instance.configurationParamMap = new HashMap<ConfigurationParam, Object>();
+        }
+      }
+    }
+  }
 
   /**
    * @return The instance of the current tenant or if no tenant does exist the default instance.

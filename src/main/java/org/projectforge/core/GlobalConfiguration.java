@@ -23,6 +23,7 @@
 
 package org.projectforge.core;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,23 +46,21 @@ public class GlobalConfiguration extends AbstractConfiguration
 
   private Boolean multitenancyMode;
 
-  // public static Map<ConfigurationParam, Object> init4TestMode()
-  // {
-  // if (instance == null) {
-  // new AbstractConfiguration();
-  // instance.testMode = true;
-  // instance.developmentMode = true;
-  // instance.configurationParamMap = new HashMap<ConfigurationParam, Object>();
-  // } else {
-  // if (instance.configurationParamMap == null) {
-  // instance.forceReload();
-  // if (instance.configurationParamMap == null) {
-  // instance.configurationParamMap = new HashMap<ConfigurationParam, Object>();
-  // }
-  // }
-  // }
-  // return instance.configurationParamMap;
-  // }
+  public static void _init4TestMode()
+  {
+    if (instance == null) {
+      createConfiguration(true, null);
+      instance.testMode = true;
+      instance.configurationParamMap = new HashMap<ConfigurationParam, Object>();
+    } else {
+      if (instance.configurationParamMap == null) {
+        instance.forceReload();
+        if (instance.configurationParamMap == null) {
+          instance.configurationParamMap = new HashMap<ConfigurationParam, Object>();
+        }
+      }
+    }
+  }
 
   public static GlobalConfiguration getInstance()
   {

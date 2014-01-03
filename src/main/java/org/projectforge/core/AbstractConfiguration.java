@@ -55,23 +55,11 @@ public abstract class AbstractConfiguration extends AbstractCache
     this.configurationDao = configurationDao;
   }
 
-  // public static Map<ConfigurationParam, Object> init4TestMode()
-  // {
-  // if (instance == null) {
-  // new AbstractConfiguration();
-  // instance.testMode = true;
-  // instance.developmentMode = true;
-  // instance.configurationParamMap = new HashMap<ConfigurationParam, Object>();
-  // } else {
-  // if (instance.configurationParamMap == null) {
-  // instance.forceReload();
-  // if (instance.configurationParamMap == null) {
-  // instance.configurationParamMap = new HashMap<ConfigurationParam, Object>();
-  // }
-  // }
-  // }
-  // return instance.configurationParamMap;
-  // }
+  public static void init4TestMode()
+  {
+    GlobalConfiguration._init4TestMode();
+    Configuration._init4TestMode();
+  }
 
   // public static AbstractConfiguration getInstance()
   // {
