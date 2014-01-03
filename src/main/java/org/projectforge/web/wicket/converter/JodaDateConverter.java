@@ -121,7 +121,7 @@ public class JodaDateConverter implements IConverter<DateMidnight>
     if (date != null) {
       return date;
     } else {
-      log.info("Unparseable date string (user's input): " + value);
+      log.info("Unparseable date string (user's input): " + value + " for locale " + locale);
       throw new ConversionException("validation.error.general"); // Message key will not be used (dummy).
     }
   }
