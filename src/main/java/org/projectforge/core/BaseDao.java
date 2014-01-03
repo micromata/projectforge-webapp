@@ -69,6 +69,9 @@ import org.projectforge.common.DateHolder;
 import org.projectforge.database.DatabaseDao;
 import org.projectforge.lucene.ClassicAnalyzer;
 import org.projectforge.multitenancy.TenantChecker;
+import org.projectforge.multitenancy.TenantDO;
+import org.projectforge.multitenancy.TenantDao;
+import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserGroupCache;
@@ -267,6 +270,17 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     this.historyAdapter = historyAdapter;
   }
 
+  /**
+   * @param obj
+   * @param tenant If null, then tenant will be set to null;
+   * @see BaseDao#getOrLoad(Integer)
+   */
+  public void setTenant(final O obj, final Integer tenantId)
+  {
+    final TenantDO tenant = Registry.instance().getDao(TenantDao.class).getOrLoad(tenantId);
+    obj.setTenant(tenant);
+  }
+
   @Override
   protected void initDao()
   {
@@ -329,6 +343,22 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     @SuppressWarnings("unchecked")
     final List<O> list = getHibernateTemplate().find("from " + clazz.getSimpleName() + " t");
     return list;
+  }
+
+  @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+  public List<O> internalLoadAll(final TenantDO tenant)
+  {
+    Validate.notNull(tenant);
+    if (tenant.isDefaultTenant() == true) {
+      @SuppressWarnings("unchecked")
+      final List<O> list = getHibernateTemplate().find("from " + clazz.getSimpleName() + " t where tenant_id = ? or tenant_id is null",
+          tenant.getId());
+      return list;
+    } else {
+      @SuppressWarnings("unchecked")
+      final List<O> list = getHibernateTemplate().find("from " + clazz.getSimpleName() + " t where tenant_id = ?", tenant.getId());
+      return list;
+    }
   }
 
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
