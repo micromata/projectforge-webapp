@@ -31,14 +31,14 @@ import java.util.TimeZone;
 
 import org.apache.commons.lang.Validate;
 import org.projectforge.access.OperationType;
-import org.projectforge.task.TaskTree;
+import org.projectforge.multitenancy.TenantDO;
 import org.projectforge.user.PFUserDO;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Configuration values persistet in the data base. Please access the configuration parameters via {@link Configuration}.
+ * Configuration values persistet in the data base. Please access the configuration parameters via {@link AbstractConfiguration}.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
@@ -46,17 +46,20 @@ public class ConfigurationDao extends BaseDao<ConfigurationDO>
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ConfigurationDao.class);
 
-  private TaskTree taskTree;
-
   /**
    * Force reload of the Configuration cache.
    * @see org.projectforge.core.BaseDao#afterSaveOrModify(org.projectforge.core.ExtendedBaseDO)
-   * @see Configuration#setExpired()
+   * @see AbstractConfiguration#setExpired()
    */
   @Override
   protected void afterSaveOrModify(final ConfigurationDO obj)
   {
-    Configuration.getInstance().setExpired();
+    if (obj.isGlobal() == true) {
+      GlobalConfiguration.getInstance().setExpired();
+    } else {
+      final TenantDO tenant = obj.getTenant();
+
+    }
   }
 
   /**
@@ -122,11 +125,7 @@ public class ConfigurationDao extends BaseDao<ConfigurationDO>
         return null;
       }
       final Integer taskId = configurationDO.getTaskId();
-      if (taskId != null) {
-        return taskTree.getTaskById(taskId);
-      } else {
-        return null;
-      }
+      return taskId;
     } else if (parameter.getType() == ConfigurationType.TIME_ZONE) {
       String timezoneId = configurationDO != null ? configurationDO.getTimeZoneId() : null;
       if (timezoneId == null) {
@@ -195,10 +194,5 @@ public class ConfigurationDao extends BaseDao<ConfigurationDO>
       configuration.setValue(param.getDefaultStringValue());
     }
     internalSave(configuration);
-  }
-
-  public void setTaskTree(final TaskTree taskTree)
-  {
-    this.taskTree = taskTree;
   }
 }
