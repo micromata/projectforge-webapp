@@ -176,6 +176,11 @@ public class Registry
     return tenantRegistry.getTaskTree();
   }
 
+  public TaskTree getTaskTree(final BaseDO<?> obj)
+  {
+    return getTaskTree(obj.getTenant());
+  }
+
   public UserGroupCache getUserGroupCache()
   {
     return userGroupCache;
