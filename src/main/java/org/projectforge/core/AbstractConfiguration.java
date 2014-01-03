@@ -46,7 +46,7 @@ public abstract class AbstractConfiguration extends AbstractCache
 
   protected ConfigurationDao configurationDao;
 
-  private Map<ConfigurationParam, Object> configurationParamMap;
+  protected Map<ConfigurationParam, Object> configurationParamMap;
 
   private final boolean global;
 
