@@ -41,6 +41,7 @@ import org.projectforge.export.MyXlsExportContext;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.plugins.core.PluginsRegistry;
 import org.projectforge.registry.DaoRegistry;
+import org.projectforge.registry.Registry;
 import org.projectforge.storage.StorageClient;
 import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserContext;
@@ -164,8 +165,9 @@ public class ProjectForgeApp
       DatabaseSupport.setInstance(new DatabaseSupport(HibernateUtils.getDialect()));
     }
 
-    if (configuration.getBeanFactory() == null) {
-      configuration.setBeanFactory(beanFactory);
+    final Registry registry = Registry.instance();
+    if (registry.getBeanFactory() == null) {
+      registry.setBeanFactory(beanFactory);
     }
 
     final UserContext internalSystemAdminUserContext = UserContext.__internalCreateWithSpecialUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser());

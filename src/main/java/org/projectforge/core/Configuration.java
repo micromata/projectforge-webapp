@@ -35,7 +35,6 @@ import org.projectforge.common.AbstractCache;
 import org.projectforge.common.DateFormats;
 import org.projectforge.task.TaskDO;
 import org.projectforge.xml.stream.XmlObject;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 /**
  * This class also provides the configuration of the parameters which are stored via ConfigurationDao. Those parameters are cached. <br/>
@@ -51,23 +50,11 @@ public class Configuration extends AbstractCache
 
   private ConfigurationDao configurationDao;
 
-  private ConfigurableListableBeanFactory beanFactory;
-
   private Map<ConfigurationParam, Object> configurationParamMap;
 
   private boolean testMode, developmentMode;
 
   private Boolean multitenancyMode;
-
-  public void setBeanFactory(final ConfigurableListableBeanFactory beanFactory)
-  {
-    this.beanFactory = beanFactory;
-  }
-
-  public ConfigurableListableBeanFactory getBeanFactory()
-  {
-    return this.beanFactory;
-  }
 
   public void setConfigurationDao(final ConfigurationDao configurationDao)
   {
