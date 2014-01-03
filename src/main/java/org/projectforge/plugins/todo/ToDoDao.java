@@ -44,14 +44,15 @@ import org.projectforge.core.ModificationStatus;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.mail.Mail;
 import org.projectforge.mail.SendMail;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
 import org.projectforge.user.I18nHelper;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRightId;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -80,7 +81,7 @@ public class ToDoDao extends BaseDao<ToDoDO>
 
   private SendMail sendMail;
 
-  private TaskTree taskTree;
+  private transient TaskTree taskTree;
 
   private final ToDoCache toDoCache = new ToDoCache(this);
 
@@ -134,7 +135,7 @@ public class ToDoDao extends BaseDao<ToDoDO>
         queryFilter.add(Restrictions.in("status", col));
       }
       if (myFilter.getTaskId() != null) {
-        final TaskNode node = taskTree.getTaskNodeById(myFilter.getTaskId());
+        final TaskNode node = getTaskTree().getTaskNodeById(myFilter.getTaskId());
         final List<Integer> taskIds = node.getDescendantIds();
         taskIds.add(node.getId());
         queryFilter.add(Restrictions.in("task.id", taskIds));
@@ -274,7 +275,7 @@ public class ToDoDao extends BaseDao<ToDoDO>
 
   public void setTask(final ToDoDO todo, final Integer taskId)
   {
-    final TaskDO task = taskTree.getTaskById(taskId);
+    final TaskDO task = getTaskTree().getTaskById(taskId);
     todo.setTask(task);
   }
 
@@ -339,9 +340,12 @@ public class ToDoDao extends BaseDao<ToDoDO>
     this.userDao = userDao;
   }
 
-  public void setTaskTree(final TaskTree taskTree)
+  private TaskTree getTaskTree()
   {
-    this.taskTree = taskTree;
+    if (taskTree == null) {
+      taskTree = Registry.instance().getTaskTree();
+    }
+    return taskTree;
   }
 
   /**

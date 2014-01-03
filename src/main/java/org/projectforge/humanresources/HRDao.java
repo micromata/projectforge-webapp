@@ -36,6 +36,7 @@ import org.projectforge.core.IDao;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.ProjektDO;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskTree;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
@@ -62,8 +63,6 @@ public class HRDao extends HibernateDaoSupport implements IDao<HRViewData>
   private HRPlanningDao hrPlanningDao;
 
   private UserGroupCache userGroupCache;
-
-  private TaskTree taskTree;
 
   private UserDao userDao;
 
@@ -96,6 +95,7 @@ public class HRDao extends HibernateDaoSupport implements IDao<HRViewData>
           log.error("Oups, user of time sheet is null or unknown? Ignoring entry: " + sheet);
           continue;
         }
+        final TaskTree taskTree = Registry.instance().getTaskTree();
         final ProjektDO projekt = taskTree.getProjekt(sheet.getTaskId());
         final Object targetObject = getTargetObject(filter, projekt);
         if (targetObject == null) {
@@ -231,27 +231,22 @@ public class HRDao extends HibernateDaoSupport implements IDao<HRViewData>
         .getProjektManagerGroupId()) == true);
   }
 
-  public void setTimesheetDao(TimesheetDao timesheetDao)
+  public void setTimesheetDao(final TimesheetDao timesheetDao)
   {
     this.timesheetDao = timesheetDao;
   }
 
-  public void setHrPlanningDao(HRPlanningDao hrPlanningDao)
+  public void setHrPlanningDao(final HRPlanningDao hrPlanningDao)
   {
     this.hrPlanningDao = hrPlanningDao;
   }
 
-  public void setUserGroupCache(UserGroupCache userGroupCache)
+  public void setUserGroupCache(final UserGroupCache userGroupCache)
   {
     this.userGroupCache = userGroupCache;
   }
 
-  public void setTaskTree(TaskTree taskTree)
-  {
-    this.taskTree = taskTree;
-  }
-
-  public void setUserDao(UserDao userDao)
+  public void setUserDao(final UserDao userDao)
   {
     this.userDao = userDao;
   }
@@ -260,7 +255,7 @@ public class HRDao extends HibernateDaoSupport implements IDao<HRViewData>
    * Throws UnsupportedOperationException.
    * @see org.projectforge.core.IDao#getList(org.projectforge.core.BaseSearchFilter)
    */
-  public List<HRViewData> getList(BaseSearchFilter filter)
+  public List<HRViewData> getList(final BaseSearchFilter filter)
   {
     throw new UnsupportedOperationException();
   }

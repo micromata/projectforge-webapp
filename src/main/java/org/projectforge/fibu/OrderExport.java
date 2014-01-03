@@ -40,11 +40,12 @@ import org.projectforge.excel.ExportWorkbook;
 import org.projectforge.excel.I18nExportColumn;
 import org.projectforge.excel.PropertyMapping;
 import org.projectforge.export.MyXlsContentProvider;
+import org.projectforge.multitenancy.TenantRegistry;
+import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskNode;
-import org.projectforge.task.TaskTree;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
 
 /**
  * For excel export.
@@ -75,7 +76,7 @@ public class OrderExport
 
   private RechnungCache rechnungCache;
 
-  private TaskTree taskTree;
+  private transient TenantRegistry tenantRegistry;
 
   private enum OrderCol
   {
@@ -182,7 +183,7 @@ public class OrderExport
     mapping.add(PosCol.INVOICES, getInvoices(invoicePositions));
     mapping.add(PosCol.PERIOD_OF_PERFORMANCE_BEGIN, pos.getPeriodOfPerformanceBegin());
     mapping.add(PosCol.PERIOD_OF_PERFORMANCE_END, pos.getPeriodOfPerformanceEnd());
-    final TaskNode node = taskTree.getTaskNodeById(pos.getTaskId());
+    final TaskNode node = getTenantRegistry().getTaskTree().getTaskNodeById(pos.getTaskId());
     mapping.add(PosCol.TASK, node != null ? node.getTask().getTitle() : "");
     mapping.add(PosCol.COMMENT, pos.getBemerkung());
   }
@@ -280,8 +281,14 @@ public class OrderExport
     this.rechnungCache = rechnungCache;
   }
 
-  public void setTaskTree(final TaskTree taskTree)
+  /**
+   * @return the tenantRegistry
+   */
+  public TenantRegistry getTenantRegistry()
   {
-    this.taskTree = taskTree;
+    if (tenantRegistry == null) {
+      tenantRegistry = TenantRegistryMap.getInstance().getTenantRegistry();
+    }
+    return tenantRegistry;
   }
 }

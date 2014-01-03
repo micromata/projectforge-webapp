@@ -30,6 +30,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.hibernate.Hibernate;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskStatus;
@@ -40,8 +41,6 @@ import org.projectforge.web.core.AbstractFormatter;
 
 public class TaskFormatter extends AbstractFormatter
 {
-  private TaskTree taskTree;
-
   private HtmlHelper htmlHelper;
 
   private static TaskFormatter instance;
@@ -59,11 +58,6 @@ public class TaskFormatter extends AbstractFormatter
     if (instance == null) {
       instance = this;
     }
-  }
-
-  public void setTaskTree(final TaskTree taskTree)
-  {
-    this.taskTree = taskTree;
   }
 
   public void setHtmlHelper(final HtmlHelper htmlHelper)
@@ -101,6 +95,7 @@ public class TaskFormatter extends AbstractFormatter
   public String getTaskPath(final RequestCycle requestCycle, final Integer taskId, final Integer ancestorTaskId,
       final boolean lineThroughDeletedTasks)
   {
+    final TaskTree taskTree = Registry.instance().getTaskTree();
     if (taskId == null || taskTree.getTaskNodeById(taskId) == null) {
       return null;
     }
@@ -148,6 +143,7 @@ public class TaskFormatter extends AbstractFormatter
     if (taskId == null) {
       return null;
     }
+    final TaskTree taskTree = Registry.instance().getTaskTree();
     TaskNode n = taskTree.getTaskNodeById(taskId);
     if (n == null) {
       return null;
@@ -204,6 +200,7 @@ public class TaskFormatter extends AbstractFormatter
     // WicketUtils.getBookmarkablePageUrl(TaskEditPage.class, "id", String.valueOf(task.getId())));
     // }
     if (Hibernate.isInitialized(task) == false) {
+      final TaskTree taskTree = Registry.instance().getTaskTree();
       task = taskTree.getTaskById(task.getId());
     }
     if (task.isDeleted() == true) {

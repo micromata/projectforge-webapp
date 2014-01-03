@@ -38,7 +38,6 @@ import org.projectforge.registry.DaoRegistry;
 import org.projectforge.registry.Registry;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.task.ScriptingTaskTree;
-import org.projectforge.task.TaskTree;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 
@@ -49,8 +48,6 @@ import org.projectforge.user.ProjectForgeGroup;
  */
 public class ScriptDao extends BaseDao<ScriptDO>
 {
-  private TaskTree taskTree;
-
   private GroovyExecutor groovyExecutor;
 
   private GroovyResult groovyResult;
@@ -131,7 +128,7 @@ public class ScriptDao extends BaseDao<ScriptDO>
     scriptVariables.put("appVersion", AppVersion.NUMBER);
     scriptVariables.put("appRelease", AppVersion.RELEASE_DATE);
     scriptVariables.put("reportList", null);
-    scriptVariables.put("taskTree", new ScriptingTaskTree(taskTree));
+    scriptVariables.put("taskTree", new ScriptingTaskTree(Registry.instance().getTaskTree()));
     for (final RegistryEntry entry : Registry.instance().getOrderedList()) {
       final ScriptingDao< ? > scriptingDao = entry.getScriptingDao();
       if (scriptingDao != null) {
@@ -157,11 +154,6 @@ public class ScriptDao extends BaseDao<ScriptDO>
     scriptVariables.put("kundeDao", scriptVariables.get(DaoRegistry.CUSTOMER + "Dao"));
     scriptVariables.put("projektDao", scriptVariables.get(DaoRegistry.PROJECT + "Dao"));
     scriptVariables.put("rechnungDao", scriptVariables.get(DaoRegistry.OUTGOING_INVOICE + "Dao"));
-  }
-
-  public void setTaskTree(final TaskTree taskTree)
-  {
-    this.taskTree = taskTree;
   }
 
   public void setGroovyExecutor(final GroovyExecutor groovyExecutor)

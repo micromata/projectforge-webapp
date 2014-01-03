@@ -44,10 +44,11 @@ import org.projectforge.export.MyXlsContentProvider;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.kost.Kost2DO;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.common.OutputType;
@@ -100,8 +101,6 @@ public class TimesheetExport
   };
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TimesheetExport.class);
-
-  private TaskTree taskTree;
 
   private TaskFormatter taskFormatter;
 
@@ -159,6 +158,7 @@ public class TimesheetExport
     sheetProvider.putFormat(Col.ID, "0");
 
     final PropertyMapping mapping = new PropertyMapping();
+    final TaskTree taskTree = Registry.instance().getTaskTree();
     for (final TimesheetDO timesheet : list) {
       final TaskNode node = taskTree.getTaskNodeById(timesheet.getTaskId());
       final PFUserDO user = userGroupCache.getUser(timesheet.getUserId());
@@ -206,11 +206,6 @@ public class TimesheetExport
     sheet.setZoom(3, 4); // 75%
 
     return xls.getAsByteArray();
-  }
-
-  public void setTaskTree(final TaskTree taskTree)
-  {
-    this.taskTree = taskTree;
   }
 
   public void setTaskFormatter(final TaskFormatter taskFormatter)
