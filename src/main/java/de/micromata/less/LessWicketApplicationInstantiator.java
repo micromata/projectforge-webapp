@@ -182,7 +182,12 @@ public class LessWicketApplicationInstantiator implements Serializable
     if (instance != null && instance.reference != null) {
       response.render(CssReferenceHeaderItem.forReference(instance.reference));
     } else {
-      log.error("Unable to find compiled main projectforge.css less file");
+      final String message = "Unable to find compiled main projectforge.css less file";
+      if (GlobalConfiguration.getInstance().isTestMode() == false) {
+        log.error(message);
+      } else {
+        log.info(message + " (OK in test-mode).");
+      }
     }
   }
 }
