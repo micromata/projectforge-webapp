@@ -54,6 +54,7 @@ public class Configuration extends AbstractConfiguration
   {
     if (instance == null) {
       instance = new Configuration(null);
+      instance.testMode = true;
       instance.configurationParamMap = new HashMap<ConfigurationParam, Object>();
     } else {
       if (instance.configurationParamMap == null) {

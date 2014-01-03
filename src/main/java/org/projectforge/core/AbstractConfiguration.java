@@ -44,6 +44,8 @@ public abstract class AbstractConfiguration extends AbstractCache
 {
   private static transient final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AbstractConfiguration.class);
 
+  protected boolean testMode;
+
   protected ConfigurationDao configurationDao;
 
   protected Map<ConfigurationParam, Object> configurationParamMap;
@@ -151,11 +153,11 @@ public abstract class AbstractConfiguration extends AbstractCache
   @Override
   protected void refresh()
   {
-    // if (testMode == true) {
-    // // Do nothing.
-    // log.info("Initializing Configuration (ConfigurationDO parameters): Do nothing (test mode)...");
-    // return;
-    // }
+    if (testMode == true) {
+      // Do nothing.
+      log.info("Initializing Configuration (ConfigurationDO parameters): Do nothing (test mode)...");
+      return;
+    }
     log.info("Initializing " + this.getClass().getName() + " (ConfigurationDO parameters) ...");
     final Map<ConfigurationParam, Object> newMap = new HashMap<ConfigurationParam, Object>();
     List<ConfigurationDO> list;

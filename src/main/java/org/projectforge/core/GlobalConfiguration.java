@@ -42,7 +42,7 @@ public class GlobalConfiguration extends AbstractConfiguration
 
   private static GlobalConfiguration instance;
 
-  private boolean testMode, developmentMode;
+  private boolean developmentMode;
 
   private Boolean multitenancyMode;
 
