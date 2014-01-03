@@ -49,13 +49,14 @@ import org.projectforge.database.HibernateUtils;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.plugins.core.PluginsRegistry;
 import org.projectforge.registry.DaoRegistry;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.Login;
 import org.projectforge.user.LoginDefaultHandler;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserDao;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -155,6 +156,10 @@ public class AbstractTestBase
     testConfiguration = TestConfiguration.getConfiguration();
     final DaoRegistry daoRegistry = TestConfiguration.getConfiguration().getBean("daoRegistry", DaoRegistry.class);
     daoRegistry.init();
+    final Registry registry = Registry.instance();
+    if (registry.getBeanFactory() == null) {
+      registry.setBeanFactory(TestConfiguration.getConfiguration().getBeanFactory());
+    }
     initTestDB = testConfiguration.getBean("initTestDB", InitTestDB.class);
     testConfiguration.autowire(initTestDB, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME);
     final File testDir = new File(TEST_DIR);
@@ -213,7 +218,7 @@ public class AbstractTestBase
           for (final AbstractPlugin plugin : plugins) {
             final Class< ? >[] classes = plugin.getPersistentEntities();
             if (classes != null) {
-              for (int i = classes.length -1 ; i >= 0; i--) {
+              for (int i = classes.length - 1; i >= 0; i--) {
                 deleteFrom(hibernateTemplate, classes[i].getName());
               }
             }
