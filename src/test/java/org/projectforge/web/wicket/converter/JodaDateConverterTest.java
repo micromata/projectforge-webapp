@@ -37,8 +37,8 @@ import org.joda.time.DateTimeZone;
 import org.junit.Test;
 import org.projectforge.common.DateHelper;
 import org.projectforge.test.TestBase;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
 
 public class JodaDateConverterTest extends TestBase
 {
@@ -92,18 +92,19 @@ public class JodaDateConverterTest extends TestBase
   @Test
   public void convertToString()
   {
-    final PFUserDO user = new PFUserDO();
+    PFUserDO user = new PFUserDO();
     user.setTimeZone(DateHelper.EUROPE_BERLIN);
     user.setLocale(Locale.GERMAN);
     user.setDateFormat("dd.MM.yyyy");
     ThreadLocalUserContext.setUser(user);
+    user = ThreadLocalUserContext.getUser();
     JodaDateConverter conv = new JodaDateConverter();
     DateMidnight testDate = createDate(1970, DateTimeConstants.NOVEMBER, 21, EUROPE_BERLIN);
     assertEquals("21.11.1970", conv.convertToString(testDate, Locale.GERMAN));
     user.setLocale(Locale.ENGLISH);
     user.setDateFormat("MM/dd/yyyy");
     conv = new JodaDateConverter();
-    assertEquals("11/21/1970", conv.convertToString(testDate, Locale.GERMAN));
+    assertEquals("11/21/1970", conv.convertToString(testDate, Locale.GERMAN)); // User's locale should be used instead.
 
     user.setLocale(Locale.GERMAN);
     user.setDateFormat("dd.MM.yyyy");
