@@ -45,6 +45,13 @@ public class TenantChecker
     return instance;
   }
 
+  public static TenantDO getCurrentTenant()
+  {
+    final UserContext userContext = ThreadLocalUserContext.getUserContext();
+    final TenantDO currentTenant = userContext != null ? userContext.getCurrentTenant() : null;
+    return currentTenant;
+  }
+
   private TenantDao tenantDao;
 
   public boolean isMultiTenancyAvailable()
@@ -92,11 +99,7 @@ public class TenantChecker
     if (obj == null) {
       return false;
     }
-    final UserContext userContext = ThreadLocalUserContext.getUserContext();
-    if (userContext == null) {
-      return false;
-    }
-    final TenantDO currentTenant = userContext.getCurrentTenant();
+    final TenantDO currentTenant = getCurrentTenant();
     if (currentTenant == null) {
       return false;
     }
@@ -118,8 +121,7 @@ public class TenantChecker
     if (isMultiTenancyAvailable() == false) {
       return;
     }
-    final UserContext userContext = ThreadLocalUserContext.getUserContext();
-    TenantDO currentTenant = userContext != null ? userContext.getCurrentTenant() : null;
+    TenantDO currentTenant = getCurrentTenant();
     if (currentTenant == null) {
       currentTenant = getTenantsCache().getDefaultTenant();
     }
@@ -129,8 +131,7 @@ public class TenantChecker
   public void checkPartOfCurrentTenant(final BaseDO< ? > obj)
   {
     if (isPartOfCurrentTenant(obj) == false) {
-      final UserContext userContext = ThreadLocalUserContext.getUserContext();
-      final TenantDO currentTenant = userContext.getCurrentTenant();
+      final TenantDO currentTenant = getCurrentTenant();
       final String currentTenantString = currentTenant != null ? currentTenant.getName() : ThreadLocalUserContext
           .getLocalizedString("multitenancy.defaultTenant");
       final TenantDO objectTenant = obj.getTenant();
