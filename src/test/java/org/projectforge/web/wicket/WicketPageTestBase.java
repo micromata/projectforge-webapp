@@ -45,6 +45,8 @@ import org.apache.wicket.util.tester.WicketTester;
 import org.apache.wicket.util.visit.IVisit;
 import org.apache.wicket.util.visit.IVisitor;
 import org.junit.Before;
+import org.projectforge.core.ProjectForgeApp;
+import org.projectforge.plugins.core.PluginsRegistry;
 import org.projectforge.test.TestBase;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.LoginPage;
@@ -52,6 +54,7 @@ import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 
 /**
  * Your wicket tester class must extends this or any derived class from TestBase for correct initialization of Spring, data-base, resource
@@ -75,10 +78,22 @@ public class WicketPageTestBase extends TestBase
       super.init();
       final ClassPathXmlApplicationContext context = getTestConfiguration().getApplicationContext();
       getComponentInstantiationListeners().add(new SpringComponentInjector(this, context, true));
-      getResourceSettings().getStringResourceLoaders().add(new BundleStringResourceLoader(WicketApplication.RESOURCE_BUNDLE_NAME));
+      if (ProjectForgeApp.getInstance() == null) { // Only on first initialization.
+        getResourceSettings().getStringResourceLoaders().add(new BundleStringResourceLoader(WicketApplication.RESOURCE_BUNDLE_NAME));
+      } else {
+        // Restore resource settings from last initialization:
+        setResourceSettings(PluginsRegistry.instance().getResourceSettings());
+      }
       final ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
       beanFactory.autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
-      UserXmlPreferencesCache.setInternalInstance(userXmlPreferencesCache);
+      if (ProjectForgeApp.getInstance() == null) { // Only on first initialization.
+        UserXmlPreferencesCache.setInternalInstance(userXmlPreferencesCache);
+        final LocalSessionFactoryBean localSessionFactoryBean = (LocalSessionFactoryBean) beanFactory.getBean("&sessionFactory");
+        final org.hibernate.cfg.Configuration hibernateConfiguration = localSessionFactoryBean.getConfiguration();
+        final PluginsRegistry pluginsRegistry = PluginsRegistry.instance();
+        pluginsRegistry.set(getResourceSettings());
+        ProjectForgeApp.init(beanFactory, hibernateConfiguration, isDevelopmentSystem());
+      }
     }
 
     @Override
