@@ -35,10 +35,15 @@ import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.fibu.KontoCache;
 import org.projectforge.fibu.RechnungCache;
+import org.projectforge.fibu.kost.KostCache;
+import org.projectforge.multitenancy.TenantChecker;
+import org.projectforge.multitenancy.TenantRegistry;
+import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.multitenancy.TenantsCache;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserXmlPreferencesDao;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
 /**
@@ -68,6 +73,8 @@ public class Registry
 
   private KontoCache kontoCache;
 
+  private KostCache kostCache;
+
   private RechnungCache invoiceCache;
 
   private TenantsCache tenantsCache;
@@ -75,6 +82,8 @@ public class Registry
   private DataSource dataSource;
 
   private HibernateTemplate hibernateTemplate;
+
+  private ConfigurableListableBeanFactory beanFactory;
 
   public static Registry instance()
   {
@@ -165,7 +174,11 @@ public class Registry
 
   public TaskTree getTaskTree()
   {
-    return taskTree;
+    if (TenantChecker.getInstance().isMultiTenancyAvailable() == false) {
+      return taskTree;
+    }
+    final TenantRegistry tenantRegistry = TenantRegistryMap.getInstance().getTenantRegistry();
+    return tenantRegistry != null ? tenantRegistry.getTaskTree() : null;
   }
 
   public UserGroupCache getUserGroupCache()
@@ -209,6 +222,22 @@ public class Registry
   }
 
   /**
+   * @return the kostCache
+   */
+  public KostCache getKostCache()
+  {
+    return kostCache;
+  }
+
+  /**
+   * @param kostCache the kostCache to set
+   */
+  void setKostCache(final KostCache kostCache)
+  {
+    this.kostCache = kostCache;
+  }
+
+  /**
    * @return the invoiceCache
    */
   public RechnungCache getInvoiceCache()
@@ -245,6 +274,16 @@ public class Registry
   void setHibernateTemplate(final HibernateTemplate hibernateTemplate)
   {
     this.hibernateTemplate = hibernateTemplate;
+  }
+
+  public void setBeanFactory(final ConfigurableListableBeanFactory beanFactory)
+  {
+    this.beanFactory = beanFactory;
+  }
+
+  public ConfigurableListableBeanFactory getBeanFactory()
+  {
+    return this.beanFactory;
   }
 
   private Registry()
