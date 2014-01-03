@@ -27,11 +27,12 @@ import java.util.Collection;
 
 import org.apache.commons.lang.Validate;
 import org.projectforge.common.StringHelper;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserRight;
 import org.projectforge.user.UserRightAccessCheck;
@@ -49,8 +50,6 @@ public class AccessChecker
   public static final String I18N_KEY_VIOLATION_USER_NOT_MEMBER_OF = "access.violation.userNotMemberOf";
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AccessChecker.class);
-
-  private TaskTree taskTree;
 
   private UserGroupCache userGroupCache;
 
@@ -78,7 +77,7 @@ public class AccessChecker
       // A user group "Admin" has always access.
       return true;
     }
-    final TaskNode node = taskTree.getTaskNodeById(taskId);
+    final TaskNode node = getTaskTree().getTaskNodeById(taskId);
     if (node == null) {
       log.error("Task with " + taskId + " not found.");
       if (throwException == true) {
@@ -105,14 +104,9 @@ public class AccessChecker
     return false;
   }
 
-  public void setTaskTree(final TaskTree taskTree)
+  private TaskTree getTaskTree()
   {
-    this.taskTree = taskTree;
-  }
-
-  public TaskTree getTaskTree()
-  {
-    return taskTree;
+    return Registry.instance().getTaskTree();
   }
 
   public void setUserGroupCache(final UserGroupCache userGroupCache)
