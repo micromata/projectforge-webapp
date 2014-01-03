@@ -36,7 +36,7 @@ import org.projectforge.core.BaseDao;
 import org.projectforge.fibu.KontoCache;
 import org.projectforge.fibu.RechnungCache;
 import org.projectforge.fibu.kost.KostCache;
-import org.projectforge.multitenancy.TenantChecker;
+import org.projectforge.multitenancy.TenantDO;
 import org.projectforge.multitenancy.TenantRegistry;
 import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.multitenancy.TenantsCache;
@@ -64,8 +64,6 @@ public class Registry
   private final Map<Class< ? extends BaseDO< ? >>, RegistryEntry> mapByDO = new HashMap<Class< ? extends BaseDO< ? >>, RegistryEntry>();
 
   private final List<RegistryEntry> orderedList = new ArrayList<RegistryEntry>();
-
-  private TaskTree taskTree;
 
   private UserGroupCache userGroupCache;
 
@@ -167,18 +165,15 @@ public class Registry
     return entry != null ? (T) entry.getDao() : null;
   }
 
-  void setTaskTree(final TaskTree taskTree)
-  {
-    this.taskTree = taskTree;
-  }
-
   public TaskTree getTaskTree()
   {
-    if (TenantChecker.getInstance().isMultiTenancyAvailable() == false) {
-      return taskTree;
-    }
-    final TenantRegistry tenantRegistry = TenantRegistryMap.getInstance().getTenantRegistry();
-    return tenantRegistry != null ? tenantRegistry.getTaskTree() : null;
+    return getTaskTree(null);
+  }
+
+  public TaskTree getTaskTree(final TenantDO tenant)
+  {
+    final TenantRegistry tenantRegistry = TenantRegistryMap.getInstance().getTenantRegistry(tenant);
+    return tenantRegistry.getTaskTree();
   }
 
   public UserGroupCache getUserGroupCache()
