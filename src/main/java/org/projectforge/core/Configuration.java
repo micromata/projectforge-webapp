@@ -23,17 +23,18 @@
 
 package org.projectforge.core;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
 
 import org.apache.commons.lang.StringUtils;
-import org.projectforge.common.AbstractCache;
+import org.apache.commons.lang.Validate;
 import org.projectforge.common.DateFormats;
-import org.projectforge.task.TaskDO;
+import org.projectforge.multitenancy.TenantChecker;
+import org.projectforge.multitenancy.TenantDO;
+import org.projectforge.multitenancy.TenantRegistry;
+import org.projectforge.multitenancy.TenantRegistryMap;
+import org.projectforge.registry.Registry;
+import org.projectforge.task.TaskTree;
 import org.projectforge.xml.stream.XmlObject;
 
 /**
@@ -42,77 +43,35 @@ import org.projectforge.xml.stream.XmlObject;
  * 
  */
 @XmlObject(alias = "config")
-public class Configuration extends AbstractCache
+public class Configuration extends AbstractConfiguration
 {
-  private static transient final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(Configuration.class);
+  private final TenantDO tenant;
 
-  private static transient Configuration instance;
+  private static Configuration instance;
 
-  private ConfigurationDao configurationDao;
-
-  private Map<ConfigurationParam, Object> configurationParamMap;
-
-  private boolean testMode, developmentMode;
-
-  private Boolean multitenancyMode;
-
-  public void setConfigurationDao(final ConfigurationDao configurationDao)
-  {
-    this.configurationDao = configurationDao;
-  }
-
-  public static Map<ConfigurationParam, Object> init4TestMode()
-  {
-    if (instance == null) {
-      new Configuration();
-      instance.testMode = true;
-      instance.developmentMode = true;
-      instance.configurationParamMap = new HashMap<ConfigurationParam, Object>();
-    } else {
-      if (instance.configurationParamMap == null) {
-        instance.forceReload();
-        if (instance.configurationParamMap == null) {
-          instance.configurationParamMap = new HashMap<ConfigurationParam, Object>();
-        }
-      }
-    }
-    return instance.configurationParamMap;
-  }
-
+  /**
+   * @return The instance of the current tenant or if no tenant does exist the default instance.
+   */
   public static Configuration getInstance()
   {
-    if (instance == null) {
-      throw new IllegalStateException("Configuration is not yet configured");
-    }
-    return instance;
-  }
-
-  public static boolean isInitialized()
-  {
-    return instance != null;
-  }
-
-  public static boolean isDevelopmentMode()
-  {
-    if (instance == null) {
-      return false;
-    }
-    return instance.developmentMode;
-  }
-
-  public void internalSetDevelopmentMode(final boolean developmentMode)
-  {
-    this.developmentMode = developmentMode;
-  }
-
-  public Configuration()
-  {
-    super(TICKS_PER_HOUR);
-    if (instance == null) {
-      instance = this;
+    if (TenantChecker.getInstance().isMultiTenancyAvailable() == false) {
+      if (instance == null) {
+        instance = new Configuration(null);
+        instance.setConfigurationDao(Registry.instance().getDao(ConfigurationDao.class));
+      }
+      return instance;
     } else {
-      log.warn("Configuration is already instantiated.");
+      final TenantRegistryMap tennatRegistryMap = TenantRegistryMap.getInstance();
+      final TenantRegistry tenantRegistry = tennatRegistryMap.getTenantRegistry();
+      Validate.notNull(tenantRegistry);
+      return tenantRegistry.getConfiguration();
     }
+  }
+
+  public Configuration(final TenantDO tenant)
+  {
+    super(false);
+    this.tenant = tenant;
   }
 
   public boolean isMebConfigured()
@@ -130,14 +89,6 @@ public class Configuration extends AbstractCache
   public boolean isMebMailAccountConfigured()
   {
     return ConfigXml.getInstance().isMebMailAccountConfigured();
-  }
-
-  public boolean isMultiTenancyConfigured()
-  {
-    if (multitenancyMode == null) {
-      multitenancyMode = getBooleanValue(ConfigurationParam.MULTI_TENANCY_ENABLED);
-    }
-    return multitenancyMode;
   }
 
   public String getCalendarDomain()
@@ -224,108 +175,37 @@ public class Configuration extends AbstractCache
   }
 
   /**
-   * @return The string value of the given parameter stored as ConfigurationDO in the data base.
-   * @throws ClassCastException if configuration parameter is from the wrong type.
+   * @see org.projectforge.core.AbstractConfiguration#getValue(org.projectforge.core.ConfigurationParam)
    */
-  public String getStringValue(final ConfigurationParam parameter)
+  @Override
+  protected Object getValue(final ConfigurationParam parameter)
   {
-    return (String) getValue(parameter);
-  }
-
-  /**
-   * @return The boolean value of the given parameter stored as ConfigurationDO in the data base.
-   * @throws ClassCastException if configuration parameter is from the wrong type.
-   */
-  public boolean getBooleanValue(final ConfigurationParam parameter)
-  {
-    final Object obj = getValue(parameter);
-    if (obj != null && Boolean.TRUE.equals(obj)) {
-      return true;
-    } else {
-      return false;
+    final Object obj = super.getValue(parameter);
+    if (parameter.getType() == ConfigurationType.TASK) {
+      final TaskTree taskTree;
+      if (tenant != null) {
+        final TenantRegistry registry = TenantRegistryMap.getInstance().getTenantRegistry(tenant);
+        Validate.notNull(registry);
+        taskTree = registry.getTaskTree();
+      } else {
+        if (TenantChecker.getInstance().isMultiTenancyAvailable() == true) {
+          throw new IllegalArgumentException("Oups, tenant is null in multi-tenancy environment.");
+        }
+        taskTree = Registry.instance().getTaskTree();
+      }
+      final Integer taskId = (Integer) obj;
+      if (taskId != null) {
+        return taskTree.getTaskById(taskId);
+      } else {
+        return null;
+      }
     }
-  }
-
-  /**
-   * @return The BigDecimal value of the given parameter stored as ConfigurationDO in the data base.
-   * @throws ClassCastException if configuration parameter is from the wrong type.
-   */
-  public BigDecimal getPercentValue(final ConfigurationParam parameter)
-  {
-    return (BigDecimal) getValue(parameter);
-  }
-
-  /**
-   * @return The Integer value of the given parameter stored as ConfigurationDO in the data base.
-   * @throws ClassCastException if configuration parameter is from the wrong type.
-   */
-  public Integer getTaskIdValue(final ConfigurationParam parameter)
-  {
-    final TaskDO task = (TaskDO) getValue(parameter);
-    if (task != null) {
-      return task.getId();
-    }
-    return null;
-  }
-
-  public boolean isAddressManagementConfigured()
-  {
-    return getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_ADDRESSES) != null;
-  }
-
-  public boolean isBookManagementConfigured()
-  {
-    return getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_BOOKS) != null;
-  }
-
-  public boolean isCostConfigured()
-  {
-    return getBooleanValue(ConfigurationParam.COST_CONFIGURED);
-  }
-
-  private Object getValue(final ConfigurationParam parameter)
-  {
-    checkRefresh();
-    return this.configurationParamMap.get(parameter);
-  }
-
-  /**
-   * @return the testMode
-   */
-  public boolean isTestMode()
-  {
-    return testMode;
+    return obj;
   }
 
   @Override
-  protected void refresh()
+  protected List<ConfigurationDO> loadParameters()
   {
-    if (testMode == true) {
-      // Do nothing.
-      log.info("Initializing Configuration (ConfigurationDO parameters): Do nothing (test mode)...");
-      return;
-    }
-    log.info("Initializing Configuration (ConfigurationDO parameters) ...");
-    final Map<ConfigurationParam, Object> newMap = new HashMap<ConfigurationParam, Object>();
-    List<ConfigurationDO> list;
-    try {
-      list = configurationDao.internalLoadAll();
-    } catch (final Exception ex) {
-      log.fatal("******* Exception while getting configuration parameters from data-base (only OK for migration from older versions): "
-          + ex.getMessage());
-      list = new ArrayList<ConfigurationDO>();
-    }
-    for (final ConfigurationParam param : ConfigurationParam.values()) {
-      ConfigurationDO configuration = null;
-      for (final ConfigurationDO entry : list) {
-        if (StringUtils.equals(param.getKey(), entry.getParameter()) == true) {
-          configuration = entry;
-          break;
-        }
-      }
-      newMap.put(param, configurationDao.getValue(param, configuration));
-    }
-    multitenancyMode = null;
-    this.configurationParamMap = newMap;
+    return configurationDao.internalLoadAll(tenant);
   }
 }
