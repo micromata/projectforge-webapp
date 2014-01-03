@@ -39,7 +39,7 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
 import org.projectforge.core.ConfigXmlTest;
-import org.projectforge.core.Configuration;
+import org.projectforge.core.AbstractConfiguration;
 import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 
@@ -49,7 +49,7 @@ public class MonthHolderTest
   public static void setUp()
   {
     ConfigXmlTest.createTestConfiguration();
-    Configuration.init4TestMode();
+    AbstractConfiguration.init4TestMode();
   }
 
   @Test
