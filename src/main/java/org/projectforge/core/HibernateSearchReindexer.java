@@ -54,8 +54,6 @@ public class HibernateSearchReindexer
       + "Try to run re-index manually in the web administration menu and if occured again, "
       + "shutdown ProjectForge, delete lock file(s) in hibernate-search sub directory and restart.";
 
-  private Configuration configuration;
-
   private SendMail sendMail;
 
   private DatabaseDao databaseDao;
@@ -74,7 +72,7 @@ public class HibernateSearchReindexer
     final String result = rebuildDatabaseSearchIndices();
     if (result.contains("*") == true) {
       log.fatal(ERROR_MSG);
-      final String recipients = configuration.getStringValue(ConfigurationParam.SYSTEM_ADMIN_E_MAIL);
+      final String recipients = GlobalConfiguration.getInstance().getStringValue(ConfigurationParam.SYSTEM_ADMIN_E_MAIL);
       if (StringUtils.isNotBlank(recipients) == true) {
         log.info("Try to inform administrator about re-indexing error.");
         final Mail msg = new Mail();
@@ -161,11 +159,6 @@ public class HibernateSearchReindexer
   public String rebuildDatabaseSearchIndices()
   {
     return rebuildDatabaseSearchIndices(new ReindexSettings());
-  }
-
-  public void setConfiguration(final Configuration configuration)
-  {
-    this.configuration = configuration;
   }
 
   public void setSendMail(final SendMail sendMail)
