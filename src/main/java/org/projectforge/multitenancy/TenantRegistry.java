@@ -47,9 +47,9 @@ public class TenantRegistry
 
   private final long timeToLive;
 
-  private final Configuration configuration;
+  private Configuration configuration;
 
-  private final TaskTree taskTree;
+  private TaskTree taskTree;
 
   private final TenantDO tenant;
 
@@ -58,15 +58,6 @@ public class TenantRegistry
     this.tenant = tenant;
     this.lastUsage = System.currentTimeMillis();
     this.timeToLive = TIME_TO_LIVE_MS;
-    taskTree = new TaskTree();
-    final Registry registry = Registry.instance();
-    taskTree.setAccessDao(registry.getDao(AccessDao.class));
-    taskTree.setAuftragDao(registry.getDao(AuftragDao.class));
-    taskTree.setKostCache(registry.getKostCache());
-    taskTree.setProjektDao(registry.getDao(ProjektDao.class));
-    taskTree.setTaskDao(registry.getDao(TaskDao.class));
-    configuration = new Configuration(tenant);
-    configuration.setConfigurationDao(registry.getDao(ConfigurationDao.class));
   }
 
   /**
@@ -82,6 +73,11 @@ public class TenantRegistry
    */
   public Configuration getConfiguration()
   {
+    if (configuration == null) {
+      final Registry registry = Registry.instance();
+      configuration = new Configuration(tenant);
+      configuration.setConfigurationDao(registry.getDao(ConfigurationDao.class));
+    }
     return configuration;
   }
 
@@ -90,6 +86,15 @@ public class TenantRegistry
    */
   public TaskTree getTaskTree()
   {
+    if (taskTree == null) {
+      taskTree = new TaskTree();
+      final Registry registry = Registry.instance();
+      taskTree.setAccessDao(registry.getDao(AccessDao.class));
+      taskTree.setAuftragDao(registry.getDao(AuftragDao.class));
+      taskTree.setKostCache(registry.getKostCache());
+      taskTree.setProjektDao(registry.getDao(ProjektDao.class));
+      taskTree.setTaskDao(registry.getDao(TaskDao.class));
+    }
     updateUsageTime();
     return taskTree;
   }
