@@ -40,7 +40,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -61,6 +60,7 @@ import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.ProjektDao;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.fibu.kost.KostCache;
+import org.projectforge.multitenancy.TenantDO;
 import org.projectforge.registry.Registry;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
@@ -74,20 +74,17 @@ public class TaskTree extends AbstractCache implements Serializable
 {
   private static final long serialVersionUID = 3748005966442878168L;
 
-  @SpringBean(name = "taskDao")
-  private transient TaskDao taskDao;
+  private TaskDao taskDao;
 
-  @SpringBean(name = "accessDao")
-  private transient AccessDao accessDao;
+  private AccessDao accessDao;
 
-  @SpringBean(name = "kost2Dao")
-  private transient ProjektDao projektDao;
+  private ProjektDao projektDao;
 
-  @SpringBean(name = "kostCache")
-  private transient KostCache kostCache;
+  private KostCache kostCache;
 
-  @SpringBean(name = "auftragDao")
-  private transient AuftragDao auftragDao;
+  private AuftragDao auftragDao;
+
+  private TenantDO tenant;
 
   private static final List<TaskNode> EMPTY_LIST = new ArrayList<TaskNode>();
 
@@ -445,6 +442,7 @@ public class TaskTree extends AbstractCache implements Serializable
 
   public TaskTree()
   {
+    super(AbstractCache.TICKS_PER_HOUR);
   }
 
   public void setTaskDao(final TaskDao taskDao)
@@ -457,7 +455,7 @@ public class TaskTree extends AbstractCache implements Serializable
     return taskDao;
   }
 
-  public void setGroupTaskAccessdao(final AccessDao accessDao)
+  public void setAccessDao(final AccessDao accessDao)
   {
     this.accessDao = accessDao;
   }
@@ -476,6 +474,22 @@ public class TaskTree extends AbstractCache implements Serializable
   {
     this.auftragDao = auftragDao;
     auftragDao.registerTaskTree(this);
+  }
+
+  /**
+   * @return the tenant
+   */
+  public TenantDO getTenant()
+  {
+    return tenant;
+  }
+
+  /**
+   * @param tenant the tenant to set
+   */
+  public void setTenant(final TenantDO tenant)
+  {
+    this.tenant = tenant;
   }
 
   /**
@@ -800,7 +814,12 @@ public class TaskTree extends AbstractCache implements Serializable
     }
     TaskNode newRoot = null;
     taskMap = new HashMap<Integer, TaskNode>();
-    final List<TaskDO> taskList = taskDao.internalLoadAll();
+    final List<TaskDO> taskList;
+    if (tenant != null) {
+      taskList = taskDao.internalLoadAll(tenant);
+    } else {
+      taskList = taskDao.internalLoadAll();
+    }
     TaskNode node;
     log.debug("Loading list of tasks ...");
     for (final TaskDO task : taskList) {
@@ -821,10 +840,17 @@ public class TaskTree extends AbstractCache implements Serializable
     }
 
     if (newRoot == null) {
-      log.fatal("OUPS, no task found (ProjectForge database not initialized?) OK, initialize it ...");
       final TaskDO rootTask = new TaskDO();
+      if (tenant == null) {
+        log.fatal("OUPS, no task found (ProjectForge database not initialized?) OK, initialize it ...");
+        rootTask.setShortDescription("ProjectForge root task");
+      } else {
+        log.info("No task yet given for tenant: " + tenant.getId() + ". Creating root task.");
+        taskDao.setTenant(rootTask, tenant.getId());
+        rootTask.setShortDescription("ProjectForge root task of tenant #" + tenant.getId());
+      }
       rootTask.setTitle("root");
-      rootTask.setShortDescription("ProjectForge root task");
+      rootTask.setTenant(tenant);
       taskDao.internalSave(rootTask);
       newRoot = new TaskNode();
       newRoot.setTask(rootTask);
