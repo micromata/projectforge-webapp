@@ -32,6 +32,7 @@ import org.hibernate.criterion.Restrictions;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskNode;
@@ -53,16 +54,9 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
 
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "task.title", "group.name"};
 
-  private TaskTree taskTree;
-
   private TaskDao taskDao;
 
   private GroupDao groupDao;
-
-  public void setTaskTree(final TaskTree taskTree)
-  {
-    this.taskTree = taskTree;
-  }
 
   public void setTaskDao(final TaskDao taskDao)
   {
@@ -151,9 +145,11 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
       myFilter = new AccessFilter(filter);
     }
     final QueryFilter queryFilter = new QueryFilter(myFilter);
+    TaskTree taskTree = null;
     if (myFilter.getTaskId() != null) {
       List<Integer> descendants = null;
       List<Integer> ancestors = null;
+      taskTree = Registry.instance().getTaskTree();
       final TaskNode node = taskTree.getTaskNodeById(myFilter.getTaskId());
       if (myFilter.isIncludeDescendentTasks() == true) {
         descendants = node.getDescendantIds();
@@ -292,7 +288,7 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
     final TaskDO task = obj.getTask();
     if (task != null && Hibernate.isInitialized(task) == false) {
       Hibernate.initialize(obj.getTask());
-      obj.setTask(taskTree.getTaskById(task.getId()));
+      obj.setTask(Registry.instance().getTaskTree(task).getTaskById(task.getId()));
     }
     final GroupDO group = obj.getGroup();
     if (group != null && Hibernate.isInitialized(group) == false) {
@@ -304,7 +300,7 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
   protected void afterSaveOrModify(final GroupTaskAccessDO obj)
   {
     super.afterSaveOrModify(obj);
-    taskTree.setGroupTaskAccess(obj);
+    Registry.instance().getTaskTree(obj).setGroupTaskAccess(obj);
   }
 
   @Override
@@ -365,13 +361,13 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
   @Override
   protected void afterDelete(final GroupTaskAccessDO obj)
   {
-    taskTree.removeGroupTaskAccess(obj);
+    Registry.instance().getTaskTree(obj.getTask()).removeGroupTaskAccess(obj);
   }
 
   @Override
   protected void afterUndelete(final GroupTaskAccessDO obj)
   {
-    taskTree.setGroupTaskAccess(obj);
+    Registry.instance().getTaskTree(obj.getTask()).setGroupTaskAccess(obj);
   }
 
   @Override

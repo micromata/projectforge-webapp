@@ -59,14 +59,15 @@ import org.projectforge.core.UserException;
 import org.projectforge.database.SQLHelper;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.fibu.kost.Kost2Dao;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskStatus;
 import org.projectforge.task.TaskTree;
 import org.projectforge.task.TimesheetBookingStatus;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.timesheet.TimesheetListFilter;
 import org.springframework.transaction.annotation.Propagation;
@@ -99,18 +100,11 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
 
   private static final Logger log = Logger.getLogger(TimesheetDao.class);
 
-  private TaskTree taskTree;
-
   private UserDao userDao;
 
   private Kost2Dao kost2Dao;
 
   private final Map<Integer, Set<Integer>> timesheetsWithOverlapByUser = new HashMap<Integer, Set<Integer>>();
-
-  public void setTaskTree(final TaskTree taskTree)
-  {
-    this.taskTree = taskTree;
-  }
 
   public void setUserDao(final UserDao userDao)
   {
@@ -158,7 +152,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
    */
   public void setTask(final TimesheetDO sheet, final Integer taskId)
   {
-    final TaskDO task = taskTree.getTaskById(taskId);
+    final TaskDO task = Registry.instance().getTaskTree(sheet).getTaskById(taskId);
     sheet.setTask(task);
   }
 
@@ -183,7 +177,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
     if (timesheet == null || timesheet.getTaskId() == null) {
       return null;
     }
-    return taskTree.getKost2List(timesheet.getTaskId());
+    return Registry.instance().getTaskTree(timesheet).getKost2List(timesheet.getTaskId());
   }
 
   public QueryFilter buildQueryFilter(final TimesheetFilter filter)
@@ -203,7 +197,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
     }
     if (filter.getTaskId() != null) {
       if (filter.isRecursive() == true) {
-        final TaskNode node = taskTree.getTaskNodeById(filter.getTaskId());
+        final TaskNode node = Registry.instance().getTaskTree().getTaskNodeById(filter.getTaskId());
         final List<Integer> taskIds = node.getDescendantIds();
         taskIds.add(node.getId());
         queryFilter.add(Restrictions.in("task.id", taskIds));
@@ -325,7 +319,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
       // Force re-analysis of time sheet overlaps after any modification of time sheets.
       recheckTimesheetOverlap(obj.getUserId());
     }
-    taskTree.resetTotalDuration(obj.getTaskId());
+    Registry.instance().getTaskTree(obj).resetTotalDuration(obj.getTaskId());
   }
 
   /**
@@ -340,7 +334,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
     Validate.isTrue(obj.getDuration() >= 60000, "Duration of time sheet must be at minimum 60s!");
     Validate.isTrue(obj.getDuration() <= MAXIMUM_DURATION, MAXIMUM_DURATION_EXCEEDED);
     Validate.isTrue(obj.getStartTime().before(obj.getStopTime()), "Stop time of time sheet is before start time!");
-    final List<Kost2DO> kost2List = taskTree.getKost2List(obj.getTaskId());
+    final List<Kost2DO> kost2List = Registry.instance().getTaskTree(obj).getKost2List(obj.getTaskId());
     final Integer kost2Id = obj.getKost2Id();
     if (CollectionUtils.isNotEmpty(kost2List) == true) {
       Validate.notNull(kost2Id, "Kost2Id must be given for time sheet and given kost2 list!");
@@ -361,7 +355,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
   protected void onChange(final TimesheetDO obj, final TimesheetDO dbObj)
   {
     if (obj.getTaskId().compareTo(dbObj.getTaskId()) != 0) {
-      taskTree.resetTotalDuration(dbObj.getTaskId());
+      Registry.instance().getTaskTree(obj).resetTotalDuration(dbObj.getTaskId());
     }
   }
 
@@ -377,7 +371,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
     }
     final TaskDO task = obj.getTask();
     if (task != null && Hibernate.isInitialized(task) == false) {
-      obj.setTask(taskTree.getTaskById(task.getId()));
+      obj.setTask(Registry.instance().getTaskTree(obj).getTaskById(task.getId()));
     }
   }
 
@@ -528,7 +522,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
           || accessChecker.isUserMemberOfGroup(user, ProjectForgeGroup.PROJECT_MANAGER) == true) {
         if (accessChecker.userEquals(user, obj.getUser()) == false) {
           // Check protection of privacy for foreign time sheets:
-          final List<TaskNode> pathToRoot = taskTree.getPathToRoot(obj.getTaskId());
+          final List<TaskNode> pathToRoot = Registry.instance().getTaskTree(obj).getPathToRoot(obj.getTaskId());
           for (final TaskNode node : pathToRoot) {
             if (node.getTask().isProtectionOfPrivacy() == true) {
               return false;
@@ -639,7 +633,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
         return true;
       }
     }
-    final TaskNode taskNode = taskTree.getTaskNodeById(timesheet.getTaskId());
+    final TaskNode taskNode = Registry.instance().getTaskTree(timesheet).getTaskNodeById(timesheet.getTaskId());
     // 1. Is the task or any of the ancestor tasks closed, deleted or has the booking status TREE_CLOSED?
     TaskNode node = taskNode;
     do {
@@ -694,7 +688,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
       } while (node != null);
       // 4. Does any of the descendant task node has an assigned order position?
       for (final TaskNode child : taskNode.getChilds()) {
-        if (taskTree.hasOrderPositions(child.getId(), true) == true) {
+        if (Registry.instance().getTaskTree(timesheet).hasOrderPositions(child.getId(), true) == true) {
           if (throwException == true) {
             throw new AccessException("timesheet.error.taskNotBookable.orderPositionsFoundInSubTasks", taskNode.getTask().getTitle()
                 + " (#"
@@ -734,6 +728,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
         return true;
       }
     }
+    final TaskTree taskTree = Registry.instance().getTaskTree(timesheet);
     final TaskNode taskNode = taskTree.getTaskNodeById(timesheet.getTaskId());
     Validate.notNull(taskNode);
     final List<TaskNode> list = taskNode.getPathToRoot();
