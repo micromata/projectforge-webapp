@@ -52,7 +52,7 @@ import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.apache.wicket.util.lang.Bytes;
 import org.projectforge.common.BeanHelper;
 import org.projectforge.common.ExceptionHelper;
-import org.projectforge.core.Configuration;
+import org.projectforge.core.GlobalConfiguration;
 import org.projectforge.core.ProjectForgeApp;
 import org.projectforge.database.MyDatabaseUpdateDao;
 import org.projectforge.plugins.core.PluginsRegistry;
@@ -378,7 +378,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     if (developmentMode == null) {
       final String value = getServletContext().getInitParameter("development");
       developmentMode = "true".equals(value);
-      Configuration.getInstance().internalSetDevelopmentMode(developmentMode);
+      GlobalConfiguration.getInstance().internalSetDevelopmentMode(developmentMode);
     }
     return developmentMode;
   }
