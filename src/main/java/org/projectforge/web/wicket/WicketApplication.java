@@ -52,7 +52,6 @@ import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.apache.wicket.util.lang.Bytes;
 import org.projectforge.common.BeanHelper;
 import org.projectforge.common.ExceptionHelper;
-import org.projectforge.core.GlobalConfiguration;
 import org.projectforge.core.ProjectForgeApp;
 import org.projectforge.database.MyDatabaseUpdateDao;
 import org.projectforge.plugins.core.PluginsRegistry;
@@ -220,7 +219,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     final org.hibernate.cfg.Configuration hibernateConfiguration = localSessionFactoryBean.getConfiguration();
     final PluginsRegistry pluginsRegistry = PluginsRegistry.instance();
     pluginsRegistry.set(getResourceSettings());
-    projectForgeApp = ProjectForgeApp.init(beanFactory, hibernateConfiguration);
+    projectForgeApp = ProjectForgeApp.init(beanFactory, hibernateConfiguration,isDevelopmentSystem());
     // Own error page for deployment mode and UserException and AccessException.
     getRequestCycleListeners().add(new AbstractRequestCycleListener() {
       /**
@@ -378,7 +377,6 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     if (developmentMode == null) {
       final String value = getServletContext().getInitParameter("development");
       developmentMode = "true".equals(value);
-      GlobalConfiguration.getInstance().internalSetDevelopmentMode(developmentMode);
     }
     return developmentMode;
   }
