@@ -28,7 +28,7 @@ import java.util.Collection;
 import org.apache.lucene.document.Document;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
-import org.projectforge.core.Configuration;
+import org.projectforge.core.GlobalConfiguration;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
@@ -52,7 +52,7 @@ public class HibernateSearchUsersGroupsBridge implements FieldBridge
     final TeamCalDO calendar = (TeamCalDO) value;
     final TeamCalDao teamCalDao = Registry.instance().getDao(TeamCalDao.class);
     if (teamCalDao == null) {
-      if (Configuration.getInstance().isTestMode() == false) {
+      if (GlobalConfiguration.getInstance().isTestMode() == false) {
         log.error("TeamCalDao not found in registry!");
       }
       return;
