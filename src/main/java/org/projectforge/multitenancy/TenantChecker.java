@@ -25,7 +25,7 @@ package org.projectforge.multitenancy;
 
 import org.projectforge.access.AccessException;
 import org.projectforge.core.BaseDO;
-import org.projectforge.core.Configuration;
+import org.projectforge.core.GlobalConfiguration;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ThreadLocalUserContext;
@@ -56,7 +56,7 @@ public class TenantChecker
 
   public boolean isMultiTenancyAvailable()
   {
-    return Configuration.getInstance().isMultiTenancyConfigured();
+    return GlobalConfiguration.getInstance().isMultiTenancyConfigured();
   }
 
   /**
