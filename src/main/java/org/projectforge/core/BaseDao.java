@@ -348,7 +348,11 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public List<O> internalLoadAll(final TenantDO tenant)
   {
-    Validate.notNull(tenant);
+    if (tenant == null) {
+      @SuppressWarnings("unchecked")
+      final List<O> list = getHibernateTemplate().find("from " + clazz.getSimpleName() + " t where tenant_id is null");
+      return list;
+    }
     if (tenant.isDefaultTenant() == true) {
       @SuppressWarnings("unchecked")
       final List<O> list = getHibernateTemplate().find("from " + clazz.getSimpleName() + " t where tenant_id = ? or tenant_id is null",
