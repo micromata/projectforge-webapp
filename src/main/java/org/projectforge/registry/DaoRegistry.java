@@ -254,6 +254,7 @@ public class DaoRegistry
     register(COST1, Kost1Dao.class, kost1Dao, "fibu.kost1").setScriptingDao(new Kost1ScriptingDao(kost1Dao));
     register(COST2_Type, Kost2ArtDao.class, kost2ArtDao, "fibu.kost2art");
     register(COST2, Kost2Dao.class, kost2Dao, "fibu.kost2"); // Needs kost2Art and project
+    Registry.instance().setKostCache(kost2Dao.getKostCache());
     register(COST_ASSIGNMENT, KostZuweisungDao.class, kostZuweisungDao, "fibu.") // Needs kost, invoices, employee salaries
     .setFullTextSearchSupport(false).setSearchable(false);
 
