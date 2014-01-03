@@ -301,7 +301,7 @@ public class WicketPageTestBase extends TestBase
   }
 
   /**
-   * Logs any current logged-in user out and calls log-in page.
+   * Logs out any current logged-in user and calls log-in page.
    */
   protected void logout()
   {
