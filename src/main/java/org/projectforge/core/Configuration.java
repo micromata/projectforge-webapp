@@ -30,6 +30,7 @@ import java.util.TimeZone;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.projectforge.common.DateFormats;
+import org.projectforge.common.DateHelper;
 import org.projectforge.multitenancy.TenantChecker;
 import org.projectforge.multitenancy.TenantDO;
 import org.projectforge.multitenancy.TenantRegistry;
@@ -64,6 +65,7 @@ public class Configuration extends AbstractConfiguration
         }
       }
     }
+    instance.putParameter4TestcasesOnly(ConfigurationParam.DEFAULT_TIMEZONE, DateHelper.EUROPE_BERLIN);
   }
 
   /**
