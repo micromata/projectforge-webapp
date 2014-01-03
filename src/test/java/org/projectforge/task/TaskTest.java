@@ -47,6 +47,7 @@ import org.projectforge.fibu.kost.Kost2ArtDO;
 import org.projectforge.fibu.kost.Kost2ArtDao;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.fibu.kost.Kost2Dao;
+import org.projectforge.registry.Registry;
 import org.projectforge.test.TestBase;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
@@ -63,8 +64,6 @@ public class TaskTest extends TestBase
   private Kost2Dao kost2Dao;
 
   private Kost2ArtDao kost2ArtDao;
-
-  private TaskTree taskTree;
 
   private TimesheetDao timesheetDao;
 
@@ -86,11 +85,6 @@ public class TaskTest extends TestBase
   public void setKost2ArtDao(final Kost2ArtDao kost2ArtDao)
   {
     this.kost2ArtDao = kost2ArtDao;
-  }
-
-  public void setTaskTree(final TaskTree taskTree)
-  {
-    this.taskTree = taskTree;
   }
 
   public void setTimesheetDao(final TimesheetDao timesheetDao)
@@ -482,21 +476,22 @@ public class TaskTest extends TestBase
     final TaskDO task = initTestDB.addTask("totalDurationTask", "root");
     final TaskDO subTask1 = initTestDB.addTask("totalDurationTask.subtask1", "totalDurationTask");
     final TaskDO subTask2 = initTestDB.addTask("totalDurationTask.subtask2", "totalDurationTask");
+    final TaskTree taskTree = Registry.instance().getTaskTree();
     assertEquals(0, taskDao.readTotalDuration(task.getId()));
     final DateHolder dh = new DateHolder();
     dh.setDate(2010, Calendar.APRIL, 20, 8, 0);
-    TimesheetDO ts = new TimesheetDO().setUser(getUser(TEST_USER)).setStartDate(dh.getDate()).setStopTime(
-        dh.add(Calendar.HOUR_OF_DAY, 4).getTimestamp()).setTask(task);
+    TimesheetDO ts = new TimesheetDO().setUser(getUser(TEST_USER)).setStartDate(dh.getDate())
+        .setStopTime(dh.add(Calendar.HOUR_OF_DAY, 4).getTimestamp()).setTask(task);
     timesheetDao.save(ts);
     assertEquals(4 * 3600, taskDao.readTotalDuration(task.getId()));
-    assertEquals(4 * 3600, getTotalDuration(task.getId()));
-    ts = new TimesheetDO().setUser(getUser(TEST_USER)).setStartDate(dh.add(Calendar.HOUR_OF_DAY, 1).getDate()).setStopTime(
-        dh.add(Calendar.HOUR_OF_DAY, 4).getTimestamp()).setTask(task);
+    assertEquals(4 * 3600, getTotalDuration(taskTree, task.getId()));
+    ts = new TimesheetDO().setUser(getUser(TEST_USER)).setStartDate(dh.add(Calendar.HOUR_OF_DAY, 1).getDate())
+        .setStopTime(dh.add(Calendar.HOUR_OF_DAY, 4).getTimestamp()).setTask(task);
     timesheetDao.save(ts);
     assertEquals(8 * 3600, taskDao.readTotalDuration(task.getId()));
-    assertEquals(8 * 3600, getTotalDuration(task.getId()));
-    ts = new TimesheetDO().setUser(getUser(TEST_USER)).setStartDate(dh.add(Calendar.HOUR_OF_DAY, 1).getDate()).setStopTime(
-        dh.add(Calendar.HOUR_OF_DAY, 4).getTimestamp()).setTask(subTask1);
+    assertEquals(8 * 3600, getTotalDuration(taskTree, task.getId()));
+    ts = new TimesheetDO().setUser(getUser(TEST_USER)).setStartDate(dh.add(Calendar.HOUR_OF_DAY, 1).getDate())
+        .setStopTime(dh.add(Calendar.HOUR_OF_DAY, 4).getTimestamp()).setTask(subTask1);
     timesheetDao.save(ts);
     final List<Object[]> list = taskDao.readTotalDurations();
     boolean taskFound = false;
@@ -517,27 +512,27 @@ public class TaskTest extends TestBase
         fail("Entry not not expected.");
       }
     }
-    assertEquals(12 * 3600, getTotalDuration(task.getId()));
-    assertEquals(8 * 3600, getDuration(task.getId()));
-    assertEquals(4 * 3600, getTotalDuration(subTask1.getId()));
-    assertEquals(4 * 3600, getDuration(subTask1.getId()));
-    assertEquals(0, getTotalDuration(subTask2.getId()));
-    assertEquals(0, getDuration(subTask2.getId()));
-    taskTree.refresh(); // Should be same after refresh (there was an error).
-    assertEquals(12 * 3600, getTotalDuration(task.getId()));
-    assertEquals(8 * 3600, getDuration(task.getId()));
-    assertEquals(4 * 3600, getTotalDuration(subTask1.getId()));
-    assertEquals(4 * 3600, getDuration(subTask1.getId()));
-    assertEquals(0, getTotalDuration(subTask2.getId()));
-    assertEquals(0, getDuration(subTask2.getId()));
+    assertEquals(12 * 3600, getTotalDuration(taskTree, task.getId()));
+    assertEquals(8 * 3600, getDuration(taskTree, task.getId()));
+    assertEquals(4 * 3600, getTotalDuration(taskTree, subTask1.getId()));
+    assertEquals(4 * 3600, getDuration(taskTree, subTask1.getId()));
+    assertEquals(0, getTotalDuration(taskTree, subTask2.getId()));
+    assertEquals(0, getDuration(taskTree, subTask2.getId()));
+    Registry.instance().getTaskTree().refresh(); // Should be same after refresh (there was an error).
+    assertEquals(12 * 3600, getTotalDuration(taskTree, task.getId()));
+    assertEquals(8 * 3600, getDuration(taskTree, task.getId()));
+    assertEquals(4 * 3600, getTotalDuration(taskTree, subTask1.getId()));
+    assertEquals(4 * 3600, getDuration(taskTree, subTask1.getId()));
+    assertEquals(0, getTotalDuration(taskTree, subTask2.getId()));
+    assertEquals(0, getDuration(taskTree, subTask2.getId()));
   }
 
-  private long getTotalDuration(final Integer taskId)
+  private long getTotalDuration(final TaskTree taskTree, final Integer taskId)
   {
     return taskTree.getTaskNodeById(taskId).getDuration(taskTree, true);
   }
 
-  private long getDuration(final Integer taskId)
+  private long getDuration(final TaskTree taskTree, final Integer taskId)
   {
     return taskTree.getTaskNodeById(taskId).getDuration(taskTree, false);
   }
