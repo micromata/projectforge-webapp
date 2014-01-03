@@ -36,15 +36,16 @@ import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.ConfigurationParam;
 import org.projectforge.core.HibernateSearchReindexer;
 import org.projectforge.database.xstream.XStreamSavingConverter;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskStatus;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefDOXmlDumpHook;
@@ -79,8 +80,6 @@ public class InitDatabaseDao extends HibernateDaoSupport
   private UserGroupCache userGroupCache;
 
   private GroupDao groupDao;
-
-  private TaskTree taskTree;
 
   private XmlDump xmlDump;
 
@@ -122,11 +121,6 @@ public class InitDatabaseDao extends HibernateDaoSupport
   public void setGroupDao(final GroupDao groupDao)
   {
     this.groupDao = groupDao;
-  }
-
-  public void setTaskTree(final TaskTree taskTree)
-  {
-    this.taskTree = taskTree;
   }
 
   public void setXmlDump(final XmlDump xmlDump)
@@ -193,7 +187,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
     addGroup(ProjectForgeGroup.PROJECT_MANAGER, "Project managers have access to assigned orders and resource planning.", null);
     addGroup(ProjectForgeGroup.PROJECT_ASSISTANT, "Project assistants have access to assigned orders.", null);
 
-    taskTree.setExpired();
+    Registry.instance().getTaskTree().setExpired();
     userGroupCache.setExpired();
 
     log.fatal("Empty database successfully initialized.");
@@ -223,6 +217,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
     if (isEmpty() == false) {
       databaseNotEmpty();
     }
+    final TaskTree taskTree = Registry.instance().getTaskTree();
     final XStreamSavingConverter xstreamSavingConverter = xmlDump.restoreDatabaseFromClasspathResource(TEST_DATA_BASE_DUMP_FILE, "utf-8");
     xmlDump.verifyDump(xstreamSavingConverter);
     final PFUserDO user = userDao.getInternalByName(DEFAULT_ADMIN_USER);
