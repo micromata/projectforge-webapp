@@ -64,11 +64,9 @@ public class ProjectForgeApp
 
   private final long startTime = System.currentTimeMillis();
 
-  private Configuration configuration;
+  private ConfigXml configXml;
 
   private ConfigurationDao configurationDao;
-
-  private ConfigXml configXml;
 
   private CronSetup cronSetup;
 
@@ -85,7 +83,7 @@ public class ProjectForgeApp
   private PluginsRegistry pluginsRegistry;
 
   public synchronized static ProjectForgeApp init(final ConfigurableListableBeanFactory beanFactory,
-      final org.hibernate.cfg.Configuration hibernateConfiguration)
+      final org.hibernate.cfg.Configuration hibernateConfiguration, final boolean developmentMode)
   {
     if (instance != null) {
       log.warn("ProjectForge is already initialized!");
@@ -93,7 +91,7 @@ public class ProjectForgeApp
     }
     instance = new ProjectForgeApp();
     if (beanFactory != null) {
-      instance.internalInit(beanFactory, hibernateConfiguration);
+      instance.internalInit(beanFactory, hibernateConfiguration, developmentMode);
     }
     return instance;
   }
@@ -119,6 +117,7 @@ public class ProjectForgeApp
    */
   public void finalizeInitialization()
   {
+    GlobalConfiguration.getInstance().setConfigurationDao(Registry.instance().getDao(ConfigurationDao.class));
     cronSetup.initialize();
     log.info("system cronJobs are initialized.");
     pluginsRegistry.registerCronJobs(cronSetup);
@@ -137,12 +136,14 @@ public class ProjectForgeApp
     log.info("ProjectForge is now available (up and running).");
   }
 
-  private void internalInit(final ConfigurableListableBeanFactory beanFactory, final org.hibernate.cfg.Configuration hibernateConfiguration)
+  private void internalInit(final ConfigurableListableBeanFactory beanFactory, final org.hibernate.cfg.Configuration hibernateConfiguration, final boolean developmentMode)
   {
     log.info("Initializing...");
     beanFactory.autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
     // Log4j for ProjectForge modules: common, excel and continuous-db.
     Logger.setLoggerBridge(new LoggerBridgeLog4j());
+
+    GlobalConfiguration.createConfiguration(developmentMode, instance.configurationDao);
 
     // Time zone
     log.info("Default TimeZone is: " + TimeZone.getDefault());
@@ -170,7 +171,8 @@ public class ProjectForgeApp
       registry.setBeanFactory(beanFactory);
     }
 
-    final UserContext internalSystemAdminUserContext = UserContext.__internalCreateWithSpecialUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser());
+    final UserContext internalSystemAdminUserContext = UserContext.__internalCreateWithSpecialUser(MyDatabaseUpdateDao
+        .__internalGetSystemAdminPseudoUser());
     final boolean missingDatabaseSchema = initDatabaseDao.isEmpty();
     if (missingDatabaseSchema == true) {
       try {
@@ -203,7 +205,6 @@ public class ProjectForgeApp
     }
     UserXmlPreferencesCache.setInternalInstance(userXmlPreferencesCache);
 
-    configuration.setConfigurationDao(configurationDao);
     SystemInfoCache.internalInitialize(systemInfoCache);
 
   }
@@ -216,7 +217,8 @@ public class ProjectForgeApp
     userXmlPreferencesCache.forceReload();
     cronSetup.shutdown();
     try {
-      final UserContext internalSystemAdminUserContext = UserContext.__internalCreateWithSpecialUser(MyDatabaseUpdateDao.__internalGetSystemAdminPseudoUser());
+      final UserContext internalSystemAdminUserContext = UserContext.__internalCreateWithSpecialUser(MyDatabaseUpdateDao
+          .__internalGetSystemAdminPseudoUser());
       ThreadLocalUserContext.setUserContext(internalSystemAdminUserContext); // Logon admin user.
       myDatabaseUpdater.getDatabaseUpdateDao().shutdownDatabase();
     } finally {
@@ -225,14 +227,14 @@ public class ProjectForgeApp
     log.info("Shutdown completed.");
   }
 
-  public void setInternalUseConfiguration(final Configuration configuration)
-  {
-    this.configuration = configuration;
-  }
-
   public void setUserXmlPreferencesCache(final UserXmlPreferencesCache userXmlPreferencesCache)
   {
     this.userXmlPreferencesCache = userXmlPreferencesCache;
+  }
+
+  public void setConfigurationDao(final ConfigurationDao configurationDao)
+  {
+    this.configurationDao = configurationDao;
   }
 
   /**
@@ -246,11 +248,6 @@ public class ProjectForgeApp
   public void setConfigXml(final ConfigXml configXml)
   {
     this.configXml = configXml;
-  }
-
-  public void setConfigurationDao(final ConfigurationDao configurationDao)
-  {
-    this.configurationDao = configurationDao;
   }
 
   public void setCronSetup(final CronSetup cronSetup)
