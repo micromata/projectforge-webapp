@@ -299,7 +299,7 @@ public class MySession extends WebSession
     }
     ThreadLocalUserContext.clear();
     super.clear();
-    super.invalidate();
+    super.invalidateNow();
   }
 
   public void put(final String name, final Serializable value)
