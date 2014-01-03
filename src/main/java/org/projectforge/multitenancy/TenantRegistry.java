@@ -50,7 +50,7 @@ public class TenantRegistry
 
   private final long timeToLive;
 
-  private Configuration configuration;
+  private final Configuration configuration;
 
   private final TaskTree taskTree;
 
@@ -68,7 +68,7 @@ public class TenantRegistry
     taskTree.setKostCache(registry.getKostCache());
     taskTree.setProjektDao(registry.getDao(ProjektDao.class));
     taskTree.setTaskDao(registry.getDao(TaskDao.class));
-    final Configuration configuration = new Configuration(tenant);
+    configuration = new Configuration(tenant);
     configuration.setConfigurationDao(registry.getDao(ConfigurationDao.class));
   }
 
