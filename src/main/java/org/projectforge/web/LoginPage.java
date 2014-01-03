@@ -38,8 +38,8 @@ import org.apache.wicket.request.http.WebRequest;
 import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
+import org.projectforge.core.GlobalConfiguration;
 import org.projectforge.database.InitDatabaseDao;
 import org.projectforge.user.Login;
 import org.projectforge.user.LoginResult;
@@ -168,7 +168,7 @@ public class LoginPage extends AbstractUnsecureBasePage
       administratorLoginNeeded.setVisible(false);
     }
     {
-      final String messageOfTheDay = Configuration.getInstance().getStringValue(ConfigurationParam.MESSAGE_OF_THE_DAY);
+      final String messageOfTheDay = GlobalConfiguration.getInstance().getStringValue(ConfigurationParam.MESSAGE_OF_THE_DAY);
       final WebMarkupContainer container = new WebMarkupContainer("messageOfTheDay");
       body.add(container.setVisible(StringUtils.isNotBlank(messageOfTheDay)));
       final Label messageOfTheDayLabel = new Label("msg", messageOfTheDay);
