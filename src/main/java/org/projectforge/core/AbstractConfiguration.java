@@ -66,6 +66,7 @@ public abstract class AbstractConfiguration extends AbstractCache
 
   public void putParameter4TestcasesOnly(final ConfigurationParam param, final Object value)
   {
+    checkRefresh();
     this.configurationParamMap.put(param, value);
   }
 
