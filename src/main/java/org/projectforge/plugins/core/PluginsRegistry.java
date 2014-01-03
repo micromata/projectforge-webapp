@@ -122,6 +122,14 @@ public class PluginsRegistry
   }
 
   /**
+   * @return the resourceSettings
+   */
+  public IResourceSettings getResourceSettings()
+  {
+    return resourceSettings;
+  }
+
+  /**
    * Load built-in plugins and plugins which are configured in config.xml.
    */
   public void loadPlugins()
