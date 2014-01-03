@@ -23,7 +23,6 @@
 
 package org.projectforge.multitenancy;
 
-import org.apache.log4j.Logger;
 import org.projectforge.access.AccessDao;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationDao;
@@ -43,8 +42,6 @@ public class TenantRegistry
    * Default time to live for an holder.
    */
   private static final long TIME_TO_LIVE_MS = 60 * 60 * 1000;
-
-  private static Logger log = Logger.getLogger(TenantRegistry.class);
 
   private long lastUsage;
 
