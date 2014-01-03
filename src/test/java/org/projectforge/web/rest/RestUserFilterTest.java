@@ -49,7 +49,7 @@ public class RestUserFilterTest
   @Test
   public void testAuthentication() throws IOException, ServletException, InterruptedException
   {
-    ProjectForgeApp.init(null, null);
+    ProjectForgeApp.init(null, null, true);
     WicketApplication.internalSetUpAndRunning(true);
     final HttpServletResponse response = mock(HttpServletResponse.class);
     final UserDao userDao = mock(UserDao.class);
