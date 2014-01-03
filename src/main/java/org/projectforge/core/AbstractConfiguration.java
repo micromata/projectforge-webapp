@@ -63,6 +63,11 @@ public abstract class AbstractConfiguration extends AbstractCache
     Configuration._init4TestMode();
   }
 
+  public void putParameter4TestcasesOnly(final ConfigurationParam param, final Object value)
+  {
+    this.configurationParamMap.put(param, value);
+  }
+
   // public static AbstractConfiguration getInstance()
   // {
   // if (instance == null) {
