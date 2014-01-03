@@ -31,6 +31,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.common.AbstractCache;
+import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.task.TaskDO;
 import org.projectforge.xml.stream.XmlObject;
 
@@ -60,6 +61,7 @@ public abstract class AbstractConfiguration extends AbstractCache
   public static void init4TestMode()
   {
     GlobalConfiguration._init4TestMode();
+    TenantRegistryMap.getInstance().getTenantRegistry().getConfiguration().testMode = true;
   }
 
   public void putParameter4TestcasesOnly(final ConfigurationParam param, final Object value)
@@ -147,13 +149,14 @@ public abstract class AbstractConfiguration extends AbstractCache
   protected void refresh()
   {
     final String identifier = getIdentifier4LogMessage();
+    final Map<ConfigurationParam, Object> newMap = new HashMap<ConfigurationParam, Object>();
     if (testMode == true) {
       // Do nothing.
       log.info("Initializing " + identifier + " (ConfigurationDO parameters): Do nothing (test mode)...");
+      this.configurationParamMap = newMap;
       return;
     }
     log.info("Initializing " + identifier + " (ConfigurationDO parameters) ...");
-    final Map<ConfigurationParam, Object> newMap = new HashMap<ConfigurationParam, Object>();
     List<ConfigurationDO> list;
     try {
       list = loadParameters();
