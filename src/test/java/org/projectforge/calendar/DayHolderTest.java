@@ -1,5 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
 //
+
 // Project ProjectForge Community Edition
 //         www.projectforge.org
 //
@@ -32,8 +33,8 @@ import java.util.Calendar;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectforge.common.DateHolder;
+import org.projectforge.core.AbstractConfiguration;
 import org.projectforge.core.ConfigXmlTest;
-import org.projectforge.core.Configuration;
 
 
 public class DayHolderTest
@@ -43,7 +44,7 @@ public class DayHolderTest
   {
     // Needed if this tests runs before the ConfigurationTest.
     ConfigXmlTest.createTestConfiguration();
-    Configuration.init4TestMode();
+    AbstractConfiguration.init4TestMode();
   }
 
   @Test
@@ -51,7 +52,7 @@ public class DayHolderTest
   {
     final DayHolder day = new DayHolder();
     assertFields(day);
-    final DateHolder dh = (DateHolder) day.clone();
+    final DateHolder dh = day.clone();
     assertFields(dh);
   }
 
