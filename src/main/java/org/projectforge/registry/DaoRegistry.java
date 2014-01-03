@@ -240,7 +240,6 @@ public class DaoRegistry
     Registry.instance().setUserGroupCache(userDao.getUserGroupCache());
     register(GROUP, GroupDao.class, groupDao, "group");
     register(TASK, TaskDao.class, taskDao, "task"); // needs PFUserDO
-    Registry.instance().setTaskTree(taskDao.getTaskTree());
     register(ACCESS, AccessDao.class, accessDao, "access").setNestedDOClasses(AccessEntryDO.class);
 
     register(ADDRESS, AddressDao.class, addressDao, "address").setNestedDOClasses(PersonalAddressDO.class);
