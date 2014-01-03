@@ -97,7 +97,7 @@ public class JodaDateConverterTest extends TestBase
     user.setLocale(Locale.GERMAN);
     user.setDateFormat("dd.MM.yyyy");
     ThreadLocalUserContext.setUser(user);
-    user = ThreadLocalUserContext.getUser();
+    user = ThreadLocalUserContext.getUser(); // ThreadLocalUserContext made a copy!
     JodaDateConverter conv = new JodaDateConverter();
     DateMidnight testDate = createDate(1970, DateTimeConstants.NOVEMBER, 21, EUROPE_BERLIN);
     assertEquals("21.11.1970", conv.convertToString(testDate, Locale.GERMAN));
