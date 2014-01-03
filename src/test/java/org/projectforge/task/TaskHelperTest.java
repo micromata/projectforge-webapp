@@ -31,23 +31,17 @@ import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.ProjektDao;
 import org.projectforge.fibu.kost.Kost2ArtDO;
 import org.projectforge.fibu.kost.Kost2DO;
+import org.projectforge.registry.Registry;
 import org.projectforge.test.TestBase;
 
 
 public class TaskHelperTest extends TestBase
 {
   private ProjektDao projektDao;
-  
-  private TaskTree taskTree;
 
-  public void setProjektDao(ProjektDao projektDao)
+  public void setProjektDao(final ProjektDao projektDao)
   {
     this.projektDao = projektDao;
-  }
-  
-  public void setTaskTree(TaskTree taskTree)
-  {
-    this.taskTree = taskTree;
   }
 
   @Test
@@ -66,6 +60,7 @@ public class TaskHelperTest extends TestBase
   public void addKost2()
   {
     logon(TEST_FINANCE_USER);
+    final TaskTree taskTree = Registry.instance().getTaskTree();
     final TaskDO task1 = initTestDB.addTask("addKost2", "root");
     final ProjektDO projekt = new ProjektDO().setName("addKost2").setInternKost2_4(128).setNummer(5).setTask(task1);
     projektDao.save(projekt);
