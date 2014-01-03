@@ -36,8 +36,8 @@ import org.apache.wicket.util.convert.ConversionException;
 import org.junit.Test;
 import org.projectforge.common.DateHelper;
 import org.projectforge.test.TestBase;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
 
 public class MyDateConverterTest extends TestBase
 {
@@ -107,11 +107,12 @@ public class MyDateConverterTest extends TestBase
   public void convertToString()
   {
     final MyDateConverter conv = new MyDateConverter();
-    final PFUserDO user = new PFUserDO();
+    PFUserDO user = new PFUserDO();
     user.setTimeZone(DateHelper.EUROPE_BERLIN);
     user.setLocale(Locale.GERMAN);
     user.setDateFormat("dd.MM.yyyy");
     ThreadLocalUserContext.setUser(user);
+    user = ThreadLocalUserContext.getUser(); // ThreadLocalUserContext made a copy!
     Date testDate = createDate(1970, 10, 21, 0, 0, 0, 0, DateHelper.EUROPE_BERLIN);
     assertEquals("21.11.1970", conv.convertToString(testDate, Locale.GERMAN));
     user.setLocale(Locale.ENGLISH);
@@ -226,7 +227,8 @@ public class MyDateConverterTest extends TestBase
     assertEquals(exptected.getTime(), actual.getTime());
   }
 
-  private Date createDate(final int year, final int month, final int day, final int hour, final int minute, final int second, final int millisecond, final TimeZone timeZone)
+  private Date createDate(final int year, final int month, final int day, final int hour, final int minute, final int second,
+      final int millisecond, final TimeZone timeZone)
   {
     final Calendar cal = Calendar.getInstance(timeZone);
     cal.set(Calendar.YEAR, year);
