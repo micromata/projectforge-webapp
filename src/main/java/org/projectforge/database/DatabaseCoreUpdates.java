@@ -39,6 +39,7 @@ import org.projectforge.continuousdb.UpdateEntryImpl;
 import org.projectforge.continuousdb.UpdatePreCheckStatus;
 import org.projectforge.continuousdb.UpdateRunningStatus;
 import org.projectforge.core.ConfigurationDO;
+import org.projectforge.core.ConfigurationDao;
 import org.projectforge.fibu.AuftragDO;
 import org.projectforge.fibu.AuftragsPositionDO;
 import org.projectforge.fibu.EingangsrechnungDO;
@@ -83,18 +84,14 @@ public class DatabaseCoreUpdates
     // /////////////////////////////////////////////////////////////////
     // 5.4
     // /////////////////////////////////////////////////////////////////
-    list.add(new UpdateEntryImpl(
-        CORE_REGION_ID,
-        "5.4",
-        "2013-12-31",
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "5.4", "2013-12-31",
         "Adds t_tenant, tenant_id to all entities for multi-tenancy. Adds t_configuration.is_global.") {
       final Table configurationTable = new Table(ConfigurationDO.class);
 
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        if (dao.doEntitiesExist(TenantDO.class) == false
-            || dao.doTableAttributesExist(configurationTable, "global") == false) {
+        if (dao.doEntitiesExist(TenantDO.class) == false || dao.doTableAttributesExist(configurationTable, "global") == false) {
           return UpdatePreCheckStatus.READY_FOR_UPDATE;
         }
         final List<RegistryEntry> list = Registry.instance().getOrderedList();
@@ -123,6 +120,8 @@ public class DatabaseCoreUpdates
       {
         if (dao.doTableAttributesExist(configurationTable, "global") == false) {
           dao.addTableAttributes(configurationTable, new TableAttribute(ConfigurationDO.class, "global").setDefaultValue("false"));
+          final ConfigurationDao configurationDao = Registry.instance().getDao(ConfigurationDao.class);
+          configurationDao.checkAndUpdateDatabaseEntries();
         }
         if (dao.doEntitiesExist(TenantDO.class) == false) {
           final SchemaGenerator schemaGenerator = new SchemaGenerator(dao).add(PFUserDO.class, TenantDO.class);
