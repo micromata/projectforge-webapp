@@ -182,17 +182,7 @@ public class Configuration extends AbstractConfiguration
   {
     final Object obj = super.getValue(parameter);
     if (parameter.getType() == ConfigurationType.TASK) {
-      final TaskTree taskTree;
-      if (tenant != null) {
-        final TenantRegistry registry = TenantRegistryMap.getInstance().getTenantRegistry(tenant);
-        Validate.notNull(registry);
-        taskTree = registry.getTaskTree();
-      } else {
-        if (TenantChecker.getInstance().isMultiTenancyAvailable() == true) {
-          throw new IllegalArgumentException("Oups, tenant is null in multi-tenancy environment.");
-        }
-        taskTree = Registry.instance().getTaskTree();
-      }
+      final TaskTree taskTree = Registry.instance().getTaskTree();
       final Integer taskId = (Integer) obj;
       if (taskId != null) {
         return taskTree.getTaskById(taskId);
