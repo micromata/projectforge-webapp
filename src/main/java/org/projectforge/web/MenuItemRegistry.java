@@ -199,7 +199,7 @@ public class MenuItemRegistry
     get(MenuItemDefId.CONTRACTS).setVisible(CollectionUtils.isNotEmpty(xmlConfiguration.getContractTypes()));
 
     final SecurityConfig securityConfig = xmlConfiguration.getSecurityConfig();
-    final boolean sqlConsoleAvailable = Configuration.isDevelopmentMode() == true
+    final boolean sqlConsoleAvailable = WebConfiguration.isDevelopmentMode() == true
         || (securityConfig != null && securityConfig.isSqlConsoleAvailable() == true);
     get(MenuItemDefId.SQL_CONSOLE).setVisible(sqlConsoleAvailable);
   }
