@@ -32,6 +32,7 @@ import org.apache.wicket.util.listener.IChangeListener;
 import org.apache.wicket.util.watch.IModificationWatcher;
 import org.lesscss.LessCompiler;
 import org.lesscss.LessSource;
+import org.projectforge.core.GlobalConfiguration;
 import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.wicket.WicketApplication;
 import org.springframework.util.StringUtils;
@@ -161,7 +162,12 @@ public class LessWicketApplicationInstantiator implements Serializable
         try {
           compile();
         } catch (final Exception e) {
-          log.error("unable to compile less source during watcher for file " + importedSource.getAbsolutePath(), e);
+          final String message = "Unable to compile less source during watcher for file " + importedSource.getAbsolutePath();
+          if (GlobalConfiguration.getInstance().isTestMode() == false) {
+            log.error(message, e);
+          } else {
+            log.info(message + " (OK in test-mode).");
+          }
         }
       }
     });
