@@ -32,10 +32,10 @@ import org.projectforge.common.ExceptionHelper;
 import org.projectforge.continuousdb.DatabaseResultRow;
 import org.projectforge.continuousdb.DatabaseResultRowEntry;
 import org.projectforge.core.ConfigXml;
-import org.projectforge.core.Configuration;
 import org.projectforge.core.SecurityConfig;
 import org.projectforge.database.MyDatabaseUpdater;
 import org.projectforge.web.HtmlHelper;
+import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.wicket.AbstractStandardFormPage;
 
 public class SqlConsolePage extends AbstractStandardFormPage
@@ -54,7 +54,7 @@ public class SqlConsolePage extends AbstractStandardFormPage
     super(parameters);
     log.warn("SQL console is called by the user!");
     final SecurityConfig securityConfig = ConfigXml.getInstance().getSecurityConfig();
-    final boolean sqlConsoleAvailable = Configuration.isDevelopmentMode() == true
+    final boolean sqlConsoleAvailable = WebConfiguration.isDevelopmentMode() == true
         || (securityConfig != null && securityConfig.isSqlConsoleAvailable() == true);
     if (sqlConsoleAvailable == false) {
       throw new AccessException("access.exception.violation",
