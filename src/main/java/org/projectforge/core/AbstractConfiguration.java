@@ -28,11 +28,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.common.AbstractCache;
-import org.projectforge.common.DateFormats;
 import org.projectforge.task.TaskDO;
 import org.projectforge.xml.stream.XmlObject;
 
@@ -42,185 +40,56 @@ import org.projectforge.xml.stream.XmlObject;
  * 
  */
 @XmlObject(alias = "config")
-public class Configuration extends AbstractCache
+public abstract class AbstractConfiguration extends AbstractCache
 {
-  private static transient final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(Configuration.class);
+  private static transient final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AbstractConfiguration.class);
 
-  private static transient Configuration instance;
-
-  private ConfigurationDao configurationDao;
+  protected ConfigurationDao configurationDao;
 
   private Map<ConfigurationParam, Object> configurationParamMap;
 
-  private boolean testMode, developmentMode;
-
-  private Boolean multitenancyMode;
+  private final boolean global;
 
   public void setConfigurationDao(final ConfigurationDao configurationDao)
   {
     this.configurationDao = configurationDao;
   }
 
-  public static Map<ConfigurationParam, Object> init4TestMode()
-  {
-    if (instance == null) {
-      new Configuration();
-      instance.testMode = true;
-      instance.developmentMode = true;
-      instance.configurationParamMap = new HashMap<ConfigurationParam, Object>();
-    } else {
-      if (instance.configurationParamMap == null) {
-        instance.forceReload();
-        if (instance.configurationParamMap == null) {
-          instance.configurationParamMap = new HashMap<ConfigurationParam, Object>();
-        }
-      }
-    }
-    return instance.configurationParamMap;
-  }
+  // public static Map<ConfigurationParam, Object> init4TestMode()
+  // {
+  // if (instance == null) {
+  // new AbstractConfiguration();
+  // instance.testMode = true;
+  // instance.developmentMode = true;
+  // instance.configurationParamMap = new HashMap<ConfigurationParam, Object>();
+  // } else {
+  // if (instance.configurationParamMap == null) {
+  // instance.forceReload();
+  // if (instance.configurationParamMap == null) {
+  // instance.configurationParamMap = new HashMap<ConfigurationParam, Object>();
+  // }
+  // }
+  // }
+  // return instance.configurationParamMap;
+  // }
 
-  public static Configuration getInstance()
-  {
-    if (instance == null) {
-      throw new IllegalStateException("Configuration is not yet configured");
-    }
-    return instance;
-  }
+  // public static AbstractConfiguration getInstance()
+  // {
+  // if (instance == null) {
+  // throw new IllegalStateException("Configuration is not yet configured");
+  // }
+  // return instance;
+  // }
 
-  public static boolean isInitialized()
-  {
-    return instance != null;
-  }
+  // public static boolean isInitialized()
+  // {
+  // return instance != null;
+  // }
 
-  public static boolean isDevelopmentMode()
-  {
-    if (instance == null) {
-      return false;
-    }
-    return instance.developmentMode;
-  }
-
-  public void internalSetDevelopmentMode(final boolean developmentMode)
-  {
-    this.developmentMode = developmentMode;
-  }
-
-  public Configuration()
+  public AbstractConfiguration(final boolean global)
   {
     super(TICKS_PER_HOUR);
-    if (instance == null) {
-      instance = this;
-    } else {
-      log.warn("Configuration is already instantiated.");
-    }
-  }
-
-  public boolean isMebConfigured()
-  {
-    if (StringUtils.isNotEmpty(getStringValue(ConfigurationParam.MEB_SMS_RECEIVING_PHONE_NUMBER)) == true
-        || isMebMailAccountConfigured() == true) {
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * @see ConfigXml#isMebMailAccountConfigured()
-   */
-  public boolean isMebMailAccountConfigured()
-  {
-    return ConfigXml.getInstance().isMebMailAccountConfigured();
-  }
-
-  public boolean isMultiTenancyConfigured()
-  {
-    if (multitenancyMode == null) {
-      multitenancyMode = getBooleanValue(ConfigurationParam.MULTI_TENANCY_ENABLED);
-    }
-    return multitenancyMode;
-  }
-
-  public String getCalendarDomain()
-  {
-    final String calendarDomain = (String) getValue(ConfigurationParam.CALENDAR_DOMAIN);
-    return calendarDomain;
-  }
-
-  public boolean isCalendarDomainValid()
-  {
-    final String calendarDomain = getCalendarDomain();
-    return isDomainValid(calendarDomain);
-  }
-
-  /**
-   * Validates the domain.
-   */
-  public static boolean isDomainValid(final String domain)
-  {
-    return StringUtils.isNotBlank(domain) == true && domain.matches("^[a-zA-Z]+[a-zA-Z0-9\\.\\-]*[a-zA-Z0-9]+$") == true;
-  }
-
-  /**
-   * Return the configured time zone. If not found the default time zone of the system is returned.
-   * @param parameter
-   * @see ConfigurationDao#getTimeZoneValue(ConfigurationParam)
-   */
-  public TimeZone getDefaultTimeZone()
-  {
-    final TimeZone timeZone = (TimeZone) getValue(ConfigurationParam.DEFAULT_TIMEZONE);
-    if (timeZone != null) {
-      return timeZone;
-    } else {
-      return TimeZone.getDefault();
-    }
-  }
-
-  /**
-   * Available date formats (configurable as parameter, see web dialogue with system parameters).
-   * @return
-   */
-  public String[] getDateFormats()
-  {
-    final String str = getStringValue(ConfigurationParam.DATE_FORMATS);
-    final String[] sa = StringUtils.split(str, " \t\r\n,;");
-    return sa;
-  }
-
-  /**
-   * @return The first entry of {@link #getDateFormats()} if exists, otherwise yyyy-MM-dd (ISO date format).
-   */
-  public String getDefaultDateFormat()
-  {
-    final String[] sa = getDateFormats();
-    if (sa != null && sa.length > 0) {
-      return sa[0];
-    } else {
-      return DateFormats.ISO_DATE;
-    }
-  }
-
-  /**
-   * Available excel date formats (configurable as parameter, see web dialogue with system parameters).
-   * @return
-   */
-  public String[] getExcelDateFormats()
-  {
-    final String str = getStringValue(ConfigurationParam.EXCEL_DATE_FORMATS);
-    final String[] sa = StringUtils.split(str, " \t\r\n,;");
-    return sa;
-  }
-
-  /**
-   * @return The first entry of {@link #getExcelDateFormats()} if exists, otherwise YYYY-MM-DD (ISO date format).
-   */
-  public String getDefaultExcelDateFormat()
-  {
-    final String[] sa = getExcelDateFormats();
-    if (sa != null && sa.length > 0) {
-      return sa[0];
-    } else {
-      return DateFormats.EXCEL_ISO_DATE;
-    }
+    this.global = global;
   }
 
   /**
@@ -283,39 +152,36 @@ public class Configuration extends AbstractCache
     return getBooleanValue(ConfigurationParam.COST_CONFIGURED);
   }
 
-  private Object getValue(final ConfigurationParam parameter)
+  protected Object getValue(final ConfigurationParam parameter)
   {
     checkRefresh();
     return this.configurationParamMap.get(parameter);
   }
 
-  /**
-   * @return the testMode
-   */
-  public boolean isTestMode()
-  {
-    return testMode;
-  }
+  protected abstract List<ConfigurationDO> loadParameters();
 
   @Override
   protected void refresh()
   {
-    if (testMode == true) {
-      // Do nothing.
-      log.info("Initializing Configuration (ConfigurationDO parameters): Do nothing (test mode)...");
-      return;
-    }
-    log.info("Initializing Configuration (ConfigurationDO parameters) ...");
+    // if (testMode == true) {
+    // // Do nothing.
+    // log.info("Initializing Configuration (ConfigurationDO parameters): Do nothing (test mode)...");
+    // return;
+    // }
+    log.info("Initializing " + this.getClass().getName() + " (ConfigurationDO parameters) ...");
     final Map<ConfigurationParam, Object> newMap = new HashMap<ConfigurationParam, Object>();
     List<ConfigurationDO> list;
     try {
-      list = configurationDao.internalLoadAll();
+      list = loadParameters();
     } catch (final Exception ex) {
       log.fatal("******* Exception while getting configuration parameters from data-base (only OK for migration from older versions): "
           + ex.getMessage());
       list = new ArrayList<ConfigurationDO>();
     }
     for (final ConfigurationParam param : ConfigurationParam.values()) {
+      if (param.isGlobal() != global) {
+        continue;
+      }
       ConfigurationDO configuration = null;
       for (final ConfigurationDO entry : list) {
         if (StringUtils.equals(param.getKey(), entry.getParameter()) == true) {
@@ -325,7 +191,6 @@ public class Configuration extends AbstractCache
       }
       newMap.put(param, configurationDao.getValue(param, configuration));
     }
-    multitenancyMode = null;
     this.configurationParamMap = newMap;
   }
 }
