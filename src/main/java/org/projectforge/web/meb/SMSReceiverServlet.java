@@ -32,10 +32,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.meb.MebDao;
 import org.projectforge.meb.MebEntryDO;
+import org.projectforge.registry.Registry;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
@@ -99,9 +99,9 @@ public class SMSReceiverServlet extends HttpServlet
       response(resp, "Unsupported date format.");
       return;
     }
-    final ConfigurableListableBeanFactory beanFactory = Configuration.getInstance().getBeanFactory();
+    final ConfigurableListableBeanFactory beanFactory = Registry.instance().getBeanFactory();
     beanFactory.autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
-    MebEntryDO entry = new MebEntryDO();
+    final MebEntryDO entry = new MebEntryDO();
     entry.setDate(date);
     entry.setSender(sender);
     entry.setMessage(msg);
@@ -114,12 +114,12 @@ public class SMSReceiverServlet extends HttpServlet
   {
     try {
       resp.getWriter().print(result);
-    } catch (IOException ex) {
+    } catch (final IOException ex) {
       log.error("Exception encountered while writing servlet response: " + ex, ex);
     }
   }
 
-  public void setMebDao(MebDao mebDao)
+  public void setMebDao(final MebDao mebDao)
   {
     this.mebDao = mebDao;
   }
