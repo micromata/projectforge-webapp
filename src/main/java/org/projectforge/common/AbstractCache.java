@@ -38,6 +38,8 @@ public abstract class AbstractCache
 
   public static final long TICKS_PER_HOUR = TICKS_PER_MINUTE * 60;
 
+  public static final long TICKS_PER_DAY = 24 * TICKS_PER_HOUR;
+
   protected long expireTime = 60 * TICKS_PER_MINUTE;
 
   private transient long timeOfLastRefresh = -1;
