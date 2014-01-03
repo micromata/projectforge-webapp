@@ -25,7 +25,6 @@ package org.projectforge.core;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.projectforge.xml.stream.XmlObject;
 
@@ -115,24 +114,18 @@ public class GlobalConfiguration extends AbstractConfiguration
     return testMode;
   }
 
+  /**
+   * @see org.projectforge.core.AbstractConfiguration#getIdentifier4LogMessage()
+   */
+  @Override
+  protected String getIdentifier4LogMessage()
+  {
+    return "GlobalConfiguration";
+  }
+
   @Override
   protected List<ConfigurationDO> loadParameters()
   {
     return configurationDao.internalLoadAll();
-  }
-
-  /**
-   * @see org.projectforge.core.AbstractConfiguration#refresh()
-   */
-  @Override
-  protected void refresh()
-  {
-    final boolean firstInitialization = configurationParamMap == null;
-    super.refresh();
-    if (firstInitialization == true) {
-      for (final Map.Entry<ConfigurationParam, Object> entry : configurationParamMap.entrySet()) {
-        log.info("GlobalConfiguration: " + entry.getKey().getKey() + "=" + entry.getValue());
-      }
-    }
   }
 }

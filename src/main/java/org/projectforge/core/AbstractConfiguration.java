@@ -60,26 +60,12 @@ public abstract class AbstractConfiguration extends AbstractCache
   public static void init4TestMode()
   {
     GlobalConfiguration._init4TestMode();
-    Configuration._init4TestMode();
   }
 
   public void putParameter4TestcasesOnly(final ConfigurationParam param, final Object value)
   {
     this.configurationParamMap.put(param, value);
   }
-
-  // public static AbstractConfiguration getInstance()
-  // {
-  // if (instance == null) {
-  // throw new IllegalStateException("Configuration is not yet configured");
-  // }
-  // return instance;
-  // }
-
-  // public static boolean isInitialized()
-  // {
-  // return instance != null;
-  // }
 
   public AbstractConfiguration(final boolean global)
   {
@@ -155,15 +141,18 @@ public abstract class AbstractConfiguration extends AbstractCache
 
   protected abstract List<ConfigurationDO> loadParameters();
 
+  protected abstract String getIdentifier4LogMessage();
+
   @Override
   protected void refresh()
   {
+    final String identifier = getIdentifier4LogMessage();
     if (testMode == true) {
       // Do nothing.
-      log.info("Initializing Configuration (ConfigurationDO parameters): Do nothing (test mode)...");
+      log.info("Initializing " + identifier + " (ConfigurationDO parameters): Do nothing (test mode)...");
       return;
     }
-    log.info("Initializing " + this.getClass().getName() + " (ConfigurationDO parameters) ...");
+    log.info("Initializing " + identifier + " (ConfigurationDO parameters) ...");
     final Map<ConfigurationParam, Object> newMap = new HashMap<ConfigurationParam, Object>();
     List<ConfigurationDO> list;
     try {
@@ -185,6 +174,15 @@ public abstract class AbstractConfiguration extends AbstractCache
         }
       }
       newMap.put(param, configurationDao.getValue(param, configuration));
+    }
+    if (this.configurationParamMap == null) {
+      for (final Map.Entry<ConfigurationParam, Object> entry : newMap.entrySet()) {
+        final Object value = entry.getValue();
+        if (value == null) {
+          continue;
+        }
+        log.info(identifier + ": " + entry.getKey().getKey() + "=" + value);
+      }
     }
     this.configurationParamMap = newMap;
   }

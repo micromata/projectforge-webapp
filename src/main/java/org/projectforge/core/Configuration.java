@@ -23,15 +23,12 @@
 
 package org.projectforge.core;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.projectforge.common.DateFormats;
-import org.projectforge.common.DateHelper;
-import org.projectforge.multitenancy.TenantChecker;
 import org.projectforge.multitenancy.TenantDO;
 import org.projectforge.multitenancy.TenantRegistry;
 import org.projectforge.multitenancy.TenantRegistryMap;
@@ -49,42 +46,15 @@ public class Configuration extends AbstractConfiguration
 {
   private final TenantDO tenant;
 
-  private static Configuration instance;
-
-  public static void _init4TestMode()
-  {
-    if (instance == null) {
-      instance = new Configuration(null);
-      instance.testMode = true;
-      instance.configurationParamMap = new HashMap<ConfigurationParam, Object>();
-    } else {
-      if (instance.configurationParamMap == null) {
-        instance.forceReload();
-        if (instance.configurationParamMap == null) {
-          instance.configurationParamMap = new HashMap<ConfigurationParam, Object>();
-        }
-      }
-    }
-    instance.putParameter4TestcasesOnly(ConfigurationParam.DEFAULT_TIMEZONE, DateHelper.EUROPE_BERLIN);
-  }
-
   /**
    * @return The instance of the current tenant or if no tenant does exist the default instance.
    */
   public static Configuration getInstance()
   {
-    if (TenantChecker.getInstance().isMultiTenancyAvailable() == false) {
-      if (instance == null) {
-        instance = new Configuration(null);
-        instance.setConfigurationDao(Registry.instance().getDao(ConfigurationDao.class));
-      }
-      return instance;
-    } else {
-      final TenantRegistryMap tennatRegistryMap = TenantRegistryMap.getInstance();
-      final TenantRegistry tenantRegistry = tennatRegistryMap.getTenantRegistry();
-      Validate.notNull(tenantRegistry);
-      return tenantRegistry.getConfiguration();
-    }
+    final TenantRegistryMap tennatRegistryMap = TenantRegistryMap.getInstance();
+    final TenantRegistry tenantRegistry = tennatRegistryMap.getTenantRegistry();
+    Validate.notNull(tenantRegistry);
+    return tenantRegistry.getConfiguration();
   }
 
   public Configuration(final TenantDO tenant)
@@ -210,6 +180,15 @@ public class Configuration extends AbstractConfiguration
       }
     }
     return obj;
+  }
+
+  /**
+   * @see org.projectforge.core.AbstractConfiguration#getIdentifier4LogMessage()
+   */
+  @Override
+  protected String getIdentifier4LogMessage()
+  {
+    return "Configuration[tenant=" + (tenant != null ? tenant.getId() : null) + "]";
   }
 
   @Override
