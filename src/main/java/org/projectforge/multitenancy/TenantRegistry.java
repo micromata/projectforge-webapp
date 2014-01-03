@@ -52,7 +52,7 @@ public class TenantRegistry
 
   private Configuration configuration;
 
-  private TaskTree taskTree;
+  private final TaskTree taskTree;
 
   private final TenantDO tenant;
 
@@ -61,7 +61,7 @@ public class TenantRegistry
     this.tenant = tenant;
     this.lastUsage = System.currentTimeMillis();
     this.timeToLive = TIME_TO_LIVE_MS;
-    final TaskTree taskTree = new TaskTree();
+    taskTree = new TaskTree();
     final Registry registry = Registry.instance();
     taskTree.setAccessDao(registry.getDao(AccessDao.class));
     taskTree.setAuftragDao(registry.getDao(AuftragDao.class));
