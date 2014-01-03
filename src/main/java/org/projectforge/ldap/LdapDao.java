@@ -43,7 +43,7 @@ import javax.naming.directory.SearchResult;
 
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.common.StringHelper;
-import org.projectforge.core.Configuration;
+import org.projectforge.core.GlobalConfiguration;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -565,7 +565,7 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
     if (StringUtils.isBlank(searchBase) == true) {
       searchBase = getOuBase();
       if (StringUtils.isBlank(searchBase) == true) {
-        if (Configuration.isDevelopmentMode() == true) {
+        if (GlobalConfiguration.isDevelopmentMode() == true) {
           throw new RuntimeException("No ou given!");
         } else {
           log.warn("Oups, no search-base (ou) given. Searching in whole LDAP tree!");
