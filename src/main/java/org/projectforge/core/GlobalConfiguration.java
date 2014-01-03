@@ -24,6 +24,7 @@
 package org.projectforge.core;
 
 import java.util.List;
+import java.util.Map;
 
 import org.projectforge.xml.stream.XmlObject;
 
@@ -83,19 +84,20 @@ public class GlobalConfiguration extends AbstractConfiguration
     return instance.developmentMode;
   }
 
-  public void internalSetDevelopmentMode(final boolean developmentMode)
+  static void createConfiguration(final boolean developmentMode, final ConfigurationDao configurationDao)
   {
-    this.developmentMode = developmentMode;
+    if (instance != null) {
+      log.warn("GlobalConfiguration is already instantiated.");
+      return;
+    }
+    instance = new GlobalConfiguration();
+    instance.developmentMode = developmentMode;
+    instance.configurationDao = configurationDao;
   }
 
-  public GlobalConfiguration()
+  private GlobalConfiguration()
   {
     super(true);
-    if (instance == null) {
-      instance = this;
-    } else {
-      log.warn("GlobalConfiguration is already instantiated.");
-    }
   }
 
   public boolean isMultiTenancyConfigured()
@@ -118,5 +120,20 @@ public class GlobalConfiguration extends AbstractConfiguration
   protected List<ConfigurationDO> loadParameters()
   {
     return configurationDao.internalLoadAll();
+  }
+
+  /**
+   * @see org.projectforge.core.AbstractConfiguration#refresh()
+   */
+  @Override
+  protected void refresh()
+  {
+    final boolean firstInitialization = configurationParamMap == null;
+    super.refresh();
+    if (firstInitialization == true) {
+      for (final Map.Entry<ConfigurationParam, Object> entry : configurationParamMap.entrySet()) {
+        log.info("GlobalConfiguration: " + entry.getKey().getKey() + "=" + entry.getValue());
+      }
+    }
   }
 }
