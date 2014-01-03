@@ -35,6 +35,7 @@ import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.GlobalConfiguration;
 import org.projectforge.database.HibernateUtils;
 import org.projectforge.jdbc.PropertyDataSource;
+import org.projectforge.multitenancy.TenantRegistryMap;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -230,5 +231,6 @@ public class TestConfiguration
     }
     AbstractConfiguration.init4TestMode();
     GlobalConfiguration.getInstance().setConfigurationDao(configurationDao);
+    TenantRegistryMap.getInstance().getTenantRegistry().getConfiguration().setConfigurationDao(configurationDao);
   }
 }

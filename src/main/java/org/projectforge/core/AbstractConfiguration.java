@@ -150,7 +150,7 @@ public abstract class AbstractConfiguration extends AbstractCache
   {
     final String identifier = getIdentifier4LogMessage();
     final Map<ConfigurationParam, Object> newMap = new HashMap<ConfigurationParam, Object>();
-    if (testMode == true) {
+    if (testMode == true && configurationDao == null) {
       // Do nothing.
       log.info("Initializing " + identifier + " (ConfigurationDO parameters): Do nothing (test mode)...");
       this.configurationParamMap = newMap;
