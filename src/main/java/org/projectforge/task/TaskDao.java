@@ -44,6 +44,8 @@ import org.projectforge.core.ModificationStatus;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.core.UserException;
 import org.projectforge.fibu.ProjektDO;
+import org.projectforge.multitenancy.TenantDO;
+import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserDao;
@@ -71,23 +73,11 @@ public class TaskDao extends BaseDao<TaskDO>
 
   public static final String I18N_KEY_ERROR_DUPLICATE_CHILD_TASKS = "task.error.duplicateChildTasks";
 
-  private TaskTree taskTree;
-
   private UserDao userDao;
 
   public TaskDao()
   {
     super(TaskDO.class);
-  }
-
-  public TaskTree getTaskTree()
-  {
-    return taskTree;
-  }
-
-  public void setTaskTree(final TaskTree taskTree)
-  {
-    this.taskTree = taskTree;
   }
 
   public void setUserDao(final UserDao userDao)
@@ -280,6 +270,7 @@ public class TaskDao extends BaseDao<TaskDO>
   {
     if (task.getParentTaskId() == null) {
       // Root task or task without parent task.
+      final TaskTree taskTree =  getTaskTree(task);
       if (taskTree.isRootNode(task) == false) {
         // Task is not root task!
         throw new UserException(I18N_KEY_ERROR_PARENT_TASK_NOT_GIVEN);
@@ -304,6 +295,7 @@ public class TaskDao extends BaseDao<TaskDO>
   {
     // Reread it from the database to get the current version (given obj could be different, for example after markAsDeleted):
     final TaskDO task = internalGetById(obj.getId());
+    final TaskTree taskTree =  getTaskTree(task);
     taskTree.addOrUpdateTaskNode(task);
   }
 
@@ -345,6 +337,7 @@ public class TaskDao extends BaseDao<TaskDO>
   {
     Validate.notNull(dbObj);
     Validate.notNull(obj);
+    final TaskTree taskTree =  getTaskTree(obj);
     if (taskTree.isRootNode(obj) == true) {
       if (obj.getParentTaskId() != null) {
         throw new UserException(TaskDao.I18N_KEY_ERROR_CYCLIC_REFERENCE);
@@ -393,6 +386,7 @@ public class TaskDao extends BaseDao<TaskDO>
       return false;
     }
     final Integer taskId = obj.getId() != null ? obj.getId() : obj.getParentTaskId();
+    final TaskTree taskTree =  getTaskTree(obj);
     final ProjektDO projekt = taskTree.getProjekt(taskId);
     // Parent task because id of current task is null and project can't be found.
     if (projekt != null && userGroupCache.isUserProjectManagerOrAssistantForProject(projekt) == true) {
@@ -460,6 +454,7 @@ public class TaskDao extends BaseDao<TaskDO>
   {
     Validate.notNull(obj);
     // Checks if the task is orphan.
+    final TaskTree taskTree =  getTaskTree(obj);
     final TaskNode parent = taskTree.getTaskNodeById(obj.getParentTaskId());
     if (parent == null) {
       if (taskTree.isRootNode(obj) == true && obj.isDeleted() == true) {
@@ -512,6 +507,7 @@ public class TaskDao extends BaseDao<TaskDO>
       // Self reference
       throw new UserException(I18N_KEY_ERROR_CYCLIC_REFERENCE);
     }
+    final TaskTree taskTree =  getTaskTree(obj);
     final TaskNode parent = taskTree.getTaskNodeById(obj.getParentTaskId());
     if (parent == null) {
       // Task is orphan because it has no parent task.
@@ -531,9 +527,21 @@ public class TaskDao extends BaseDao<TaskDO>
   @Override
   protected void onDelete(final TaskDO obj)
   {
+    final TaskTree taskTree =  getTaskTree(obj);
     if (taskTree.isRootNode(obj) == true) {
       throw new UserException("task.error.couldNotDeleteRootTask");
     }
+  }
+
+  public TaskTree getTaskTree()
+  {
+    return Registry.instance().getTaskTree();
+  }
+
+  public TaskTree getTaskTree(final TaskDO task)
+  {
+    final TenantDO tenant = task.getTenant();
+    return Registry.instance().getTaskTree(tenant);
   }
 
   /**
