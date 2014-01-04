@@ -63,7 +63,7 @@ public class TenantRegistryMap extends AbstractCache
       if (tenant != null) {
         log.warn("Oups, why call getTenantRegistry with tenant " + tenant.getId() + " if ProjectForge is running in single tenant mode?");
       }
-      return getSingeleTenantRegistry();
+      return getSingleTenantRegistry();
     }
     Validate.notNull(tenant);
     synchronized (this) {
@@ -79,17 +79,13 @@ public class TenantRegistryMap extends AbstractCache
   public TenantRegistry getTenantRegistry()
   {
     if (TenantChecker.getInstance().isMultiTenancyAvailable() == false) {
-      return getSingeleTenantRegistry();
+      return getSingleTenantRegistry();
     }
     final TenantDO tenant = TenantChecker.getCurrentTenant();
-    if (tenant == null) {
-      log.warn("Current tenant is null in ThreadLocal.");
-      return null;
-    }
     return getTenantRegistry(tenant);
   }
 
-  private TenantRegistry getSingeleTenantRegistry()
+  private TenantRegistry getSingleTenantRegistry()
   {
     synchronized (this) {
       if (singleTenantRegistry == null) {
