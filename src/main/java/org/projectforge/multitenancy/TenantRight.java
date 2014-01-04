@@ -24,6 +24,7 @@
 package org.projectforge.multitenancy;
 
 import org.projectforge.access.OperationType;
+import org.projectforge.core.GlobalConfiguration;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserGroupCache;
@@ -53,7 +54,7 @@ public class TenantRight extends UserRightAccessCheck<TenantDO>
       @Override
       public boolean isAvailable(final UserGroupCache userGroupCache, final PFUserDO user)
       {
-        if (TenantChecker.getInstance().isMultiTenancyAvailable() == false) {
+        if (GlobalConfiguration.getInstance().isMultiTenancyConfigured() == false) {
           // Right should only be available if multi tenancy is configured.
           return false;
         }
@@ -69,7 +70,7 @@ public class TenantRight extends UserRightAccessCheck<TenantDO>
   @Override
   public boolean hasAccess(final PFUserDO user, final TenantDO obj, final TenantDO oldObj, final OperationType operationType)
   {
-    if (TenantChecker.getInstance().isMultiTenancyAvailable() == false) {
+    if (GlobalConfiguration.getInstance().isMultiTenancyConfigured() == false) {
       return false;
     }
     if (UserRights.getAccessChecker().isUserMemberOfGroup(user, ProjectForgeGroup.ADMIN_GROUP) == false) {
