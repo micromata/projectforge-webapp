@@ -115,7 +115,8 @@ public class UserEditPage extends AbstractEditPage<PFUserDO, UserEditForm, UserD
   {
     groupDao.assignGroups(getData(), form.assignGroupsListHelper.getItemsToAssign(), form.assignGroupsListHelper.getItemsToUnassign());
     if (TenantChecker.getInstance().isSuperAdmin(getUser()) == true) {
-      tenantDao.assignTenants(getData(), form.assignTenantsListHelper.getItemsToAssign(), form.assignTenantsListHelper.getItemsToUnassign());
+      tenantDao
+      .assignTenants(getData(), form.assignTenantsListHelper.getItemsToAssign(), form.assignTenantsListHelper.getItemsToUnassign());
     }
     if (form.rightsData != null) {
       final List<UserRightVO> list = form.rightsData.getRights();
@@ -124,7 +125,8 @@ public class UserEditPage extends AbstractEditPage<PFUserDO, UserEditForm, UserD
     if (form.getPasswordUser() != null) {
       Login.getInstance().passwordChanged(getData(), form.getPassword());
     }
-    return new UserListPage(new PageParameters()); // Force to reload Menu directly, otherwise menu is reloaded after next page call.
+    return new UserListPage(new PageParameters()); // Force to reload Menu directly (if the admin user modified himself), otherwise menu is
+    // reloaded after next page call.
   }
 
   @Override
