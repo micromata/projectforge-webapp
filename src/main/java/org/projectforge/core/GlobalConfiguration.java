@@ -98,6 +98,16 @@ public class GlobalConfiguration extends AbstractConfiguration
     super(true);
   }
 
+  /**
+   * @see org.projectforge.common.AbstractCache#setExpired()
+   */
+  @Override
+  public void setExpired()
+  {
+    super.setExpired();
+    this.multitenancyMode = null;
+  }
+
   public boolean isMultiTenancyConfigured()
   {
     if (multitenancyMode == null) {
