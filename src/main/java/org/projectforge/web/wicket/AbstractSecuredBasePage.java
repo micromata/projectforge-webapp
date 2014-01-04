@@ -31,6 +31,7 @@ import org.projectforge.core.MessageParam;
 import org.projectforge.core.UserException;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserXmlPreferencesCache;
+import org.projectforge.web.LoginPage;
 import org.projectforge.web.user.ChangePasswordPage;
 import org.projectforge.web.user.UserPreferencesHelper;
 
@@ -51,7 +52,10 @@ public abstract class AbstractSecuredBasePage extends AbstractUnsecureBasePage
   public AbstractSecuredBasePage(final PageParameters parameters)
   {
     super(parameters);
-    if (isAccess4restrictedUsersAllowed() == false && (getUser() == null || getUser().isRestrictedUser() == true)) {
+    if (getUser() == null) {
+      throw new RestartResponseException(LoginPage.class);
+    }
+    if (isAccess4restrictedUsersAllowed() == false && getUser().isRestrictedUser() == true) {
       throw new RestartResponseException(ChangePasswordPage.class);
     }
   }
