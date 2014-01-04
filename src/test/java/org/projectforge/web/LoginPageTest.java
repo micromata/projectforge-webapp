@@ -23,10 +23,8 @@
 
 package org.projectforge.web;
 
-import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.tester.FormTester;
-import org.junit.Assert;
 import org.junit.Test;
 import org.projectforge.test.TestBase;
 import org.projectforge.web.address.AddressListPage;
@@ -49,12 +47,12 @@ public class LoginPageTest extends WicketPageTestBase
     tester.assertVisible("body:form:username");
     FormTester form = tester.newFormTester("body:form");
     form.setValue(findComponentByLabel(form, "username"), "demo");
-    form.setValue(findComponentByLabel(form,"password"), "wrong");
+    form.setValue(findComponentByLabel(form, "password"), "wrong");
     form.submit(KEY_LOGINPAGE_BUTTON_LOGIN);
     tester.assertRenderedPage(LoginPage.class);
     form = tester.newFormTester("body:form");
-    form.setValue(findComponentByLabel(form,"username"), TestBase.TEST_ADMIN_USER);
-    form.setValue(findComponentByLabel(form,"password"), TestBase.TEST_ADMIN_USER_PASSWORD);
+    form.setValue(findComponentByLabel(form, "username"), TestBase.TEST_ADMIN_USER);
+    form.setValue(findComponentByLabel(form, "password"), TestBase.TEST_ADMIN_USER_PASSWORD);
     form.submit(KEY_LOGINPAGE_BUTTON_LOGIN);
     tester.assertRenderedPage(CalendarPage.class);
     tester.startPage(AddressListPage.class);
@@ -64,12 +62,8 @@ public class LoginPageTest extends WicketPageTestBase
     tester.assertRenderedPage(WicketUtils.getDefaultPage());
 
     logout();
-    try {
-      tester.startPage(AddressListPage.class);
-      Assert.fail("Page must not be available, user not logged-in.");
-    } catch (final WicketRuntimeException ex) {
-      // Everything fine.
-    }
+    tester.startPage(AddressListPage.class);
+    tester.assertRenderedPage(LoginPage.class);
   }
 
   @Test
