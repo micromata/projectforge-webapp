@@ -322,7 +322,7 @@ public class AccessChecker
   }
 
   /**
-   * @param user Check the access for the given user instead of the logged-in user.
+   * @param origUser Check the access for the given user instead of the logged-in user.
    * @param rightId
    * @param obj
    * @param oldObj
@@ -330,14 +330,15 @@ public class AccessChecker
    * @param throwException
    */
   @SuppressWarnings({ "unchecked", "rawtypes"})
-  public boolean hasAccess(final PFUserDO user, final UserRightId rightId, final Object obj, final Object oldObj,
+  public boolean hasAccess(final PFUserDO origUser, final UserRightId rightId, final Object obj, final Object oldObj,
       final OperationType operationType, final boolean throwException)
   {
     final UserRight right = userRights.getRight(rightId);
     Validate.notNull(right);
     boolean result;
     if (right instanceof UserRightAccessCheck< ? >) {
-      Validate.notNull(user);
+      Validate.notNull(origUser);
+      final PFUserDO user = getUser(origUser);
       switch (operationType) {
         case SELECT:
           if (obj != null) {
@@ -368,9 +369,9 @@ public class AccessChecker
       return result;
     }
     if (operationType == OperationType.SELECT) {
-      return hasRight(user, rightId, throwException, UserRightValue.READONLY, UserRightValue.READWRITE);
+      return hasRight(origUser, rightId, throwException, UserRightValue.READONLY, UserRightValue.READWRITE);
     } else {
-      return hasRight(user, rightId, throwException, UserRightValue.READWRITE);
+      return hasRight(origUser, rightId, throwException, UserRightValue.READWRITE);
     }
   }
 
@@ -529,10 +530,11 @@ public class AccessChecker
    * @param throwException
    * @return
    */
-  public boolean hasRight(final PFUserDO user, final UserRightId rightId, final boolean throwException, final UserRightValue... values)
+  public boolean hasRight(final PFUserDO origUser, final UserRightId rightId, final boolean throwException, final UserRightValue... values)
   {
-    Validate.notNull(user);
+    Validate.notNull(origUser);
     Validate.notNull(values);
+    final PFUserDO user = userGroupCache.getUser(origUser.getId());
     final UserRightDO rightDO = user.getRight(rightId);
     final UserRight right = userRights.getRight(rightId);
     for (final UserRightValue value : values) {
@@ -609,12 +611,13 @@ public class AccessChecker
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes"})
-  public boolean hasHistoryAccess(final PFUserDO user, final UserRightId rightId, final Object obj, final boolean throwException)
+  public boolean hasHistoryAccess(final PFUserDO origUser, final UserRightId rightId, final Object obj, final boolean throwException)
   {
     final UserRight right = userRights.getRight(rightId);
     Validate.notNull(right);
     if (right instanceof UserRightAccessCheck< ? >) {
-      Validate.notNull(user);
+      Validate.notNull(origUser);
+      final PFUserDO user = userGroupCache.getUser(origUser.getId());
       if (((UserRightAccessCheck) right).hasHistoryAccess(user, obj) == true) {
         return true;
       } else if (throwException == true) {
@@ -623,7 +626,7 @@ public class AccessChecker
         return false;
       }
     } else {
-      return hasRight(user, rightId, throwException, UserRightValue.READONLY, UserRightValue.READWRITE);
+      return hasRight(origUser, rightId, throwException, UserRightValue.READONLY, UserRightValue.READWRITE);
     }
   }
 
@@ -676,7 +679,7 @@ public class AccessChecker
     if (user == null) {
       return false;
     }
-    return isDemoUser(user);
+    return isDemoUser(user.getId());
   }
 
   public boolean isDemoUser(final Integer userId)
@@ -702,7 +705,7 @@ public class AccessChecker
     if (user == null) {
       return true;
     }
-    return isRestrictedUser(user);
+    return isRestrictedUser(user.getId());
   }
 
   public boolean isRestrictedUser(final Integer userId)
@@ -735,7 +738,7 @@ public class AccessChecker
     if (user == null) {
       return false;
     }
-    return isRestrictedOrDemoUser(user);
+    return isRestrictedOrDemoUser(user.getId());
   }
 
   public boolean isRestrictedOrDemoUser(final Integer userId)
@@ -783,5 +786,18 @@ public class AccessChecker
       return true;
     }
     return false;
+  }
+
+  /**
+   * @param user
+   * @return The user from the UserGroupCache instead of e. g. Session for getting the newest access right values of the user.
+   */
+  private PFUserDO getUser(final PFUserDO user)
+  {
+    if (user == null) {
+      return null;
+    }
+    final PFUserDO result = userGroupCache.getUser(user.getId());
+    return result;
   }
 }
