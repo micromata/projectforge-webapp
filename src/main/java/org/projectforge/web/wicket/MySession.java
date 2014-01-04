@@ -298,6 +298,7 @@ public class MySession extends WebSession
       user = null;
     }
     ThreadLocalUserContext.clear();
+    userContext = null;
     super.clear();
     super.invalidateNow();
   }
