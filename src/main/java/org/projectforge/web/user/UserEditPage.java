@@ -124,7 +124,7 @@ public class UserEditPage extends AbstractEditPage<PFUserDO, UserEditForm, UserD
     if (form.getPasswordUser() != null) {
       Login.getInstance().passwordChanged(getData(), form.getPassword());
     }
-    return super.afterSaveOrUpdate();
+    return new UserListPage(new PageParameters()); // Force to reload Menu directly, otherwise menu is reloaded after next page call.
   }
 
   @Override
