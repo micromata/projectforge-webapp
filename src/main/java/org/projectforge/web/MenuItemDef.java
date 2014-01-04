@@ -77,18 +77,29 @@ public class MenuItemDef implements Serializable
 
   private boolean visibleForRestrictedUsers;
 
+  private MenuItemDefVisibility visibility;
+
   /**
    * Overwrite this if you need special access checking.
    * @param context
-   * @return true (at default).
+   * @return visibility.
+   * @see #isVisible()
    */
   protected boolean isVisible(final MenuBuilderContext context)
   {
-    return visible;
+    return isVisible();
   }
 
+  /**
+   * Calls {@link MenuItemDefVisibility#isVisible()} if visibility object is given, otherwise flag set by {@link #setVisible(boolean)} (true as default).
+   * @return
+   * @see MenuItemDefVisibility#isVisible()
+   */
   public boolean isVisible()
   {
+    if (this.visibility != null) {
+      return this.visibility.isVisible();
+    }
     return this.visible;
   }
 
@@ -99,6 +110,12 @@ public class MenuItemDef implements Serializable
   public MenuItemDef setVisible(final boolean visible)
   {
     this.visible = visible;
+    return this;
+  }
+
+  public MenuItemDef setVisibility(final MenuItemDefVisibility visibility)
+  {
+    this.visibility = visibility;
     return this;
   }
 

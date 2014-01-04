@@ -30,6 +30,7 @@ import static org.projectforge.user.ProjectForgeGroup.ORGA_TEAM;
 import static org.projectforge.user.UserRights.READONLY_PARTLYREADWRITE_READWRITE;
 import static org.projectforge.user.UserRights.READONLY_READWRITE;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -114,13 +115,13 @@ import org.projectforge.web.user.UserPrefListPage;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class MenuItemRegistry
+public class MenuItemRegistry implements Serializable
 {
+  private static final long serialVersionUID = -6988615451822648295L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MenuItemRegistry.class);
 
   private final List<MenuItemDef> menuItemList = new ArrayList<MenuItemDef>();
-
-  private final ConfigXml xmlConfiguration = ConfigXml.getInstance();
 
   private static final MenuItemRegistry instance = new MenuItemRegistry();
 
@@ -156,7 +157,7 @@ public class MenuItemRegistry
    */
   public MenuItemDef register(final MenuItemDef menuItemDef)
   {
-    final MenuEntryConfig root = xmlConfiguration.getMenuConfig();
+    final MenuEntryConfig root = ConfigXml.getInstance().getMenuConfig();
     if (root != null) {
       final MenuEntryConfig entry = root.findMenuEntry(menuItemDef); //
       if (entry != null) {
@@ -174,27 +175,50 @@ public class MenuItemRegistry
    * Should be called after any modification of configuration parameters such as costConfigured. It refreshes the visibility of some menu
    * entries.
    */
+  @SuppressWarnings("serial")
   public void refresh()
   {
     final ConfigXml xmlConfiguration = ConfigXml.getInstance();
-    final Configuration configuration = Configuration.getInstance();
-    final boolean costConfigured = configuration.isCostConfigured();
-    get(MenuItemDefId.CUSTOMER_LIST).setVisible(costConfigured);
-    get(MenuItemDefId.PROJECT_LIST).setVisible(costConfigured);
-    get(MenuItemDefId.EMPLOYEE_LIST).setVisible(costConfigured);
-    get(MenuItemDefId.EMPLOYEE_SALARY_LIST).setVisible(costConfigured);
-    get(MenuItemDefId.ACCOUNT_LIST).setVisible(costConfigured);
-    get(MenuItemDefId.COST1_LIST).setVisible(costConfigured);
-    get(MenuItemDefId.COST2_LIST).setVisible(costConfigured);
-    get(MenuItemDefId.COST2_TYPE_LIST).setVisible(costConfigured);
-    get(MenuItemDefId.ACCOUNTING_RECORD_LIST).setVisible(costConfigured);
-    get(MenuItemDefId.REPORT_OBJECTIVES).setVisible(costConfigured);
-    get(MenuItemDefId.DATEV_IMPORT).setVisible(costConfigured);
+    final MenuItemDefVisibility costConfiguredVisibility = new MenuItemDefVisibility() {
+      @Override
+      public boolean isVisible()
+      {
+        return Configuration.getInstance().isCostConfigured();
+      }
+    };
+    get(MenuItemDefId.CUSTOMER_LIST).setVisibility(costConfiguredVisibility);
+    get(MenuItemDefId.PROJECT_LIST).setVisibility(costConfiguredVisibility);
+    get(MenuItemDefId.EMPLOYEE_LIST).setVisibility(costConfiguredVisibility);
+    get(MenuItemDefId.EMPLOYEE_SALARY_LIST).setVisibility(costConfiguredVisibility);
+    get(MenuItemDefId.ACCOUNT_LIST).setVisibility(costConfiguredVisibility);
+    get(MenuItemDefId.COST1_LIST).setVisibility(costConfiguredVisibility);
+    get(MenuItemDefId.COST2_LIST).setVisibility(costConfiguredVisibility);
+    get(MenuItemDefId.COST2_TYPE_LIST).setVisibility(costConfiguredVisibility);
+    get(MenuItemDefId.ACCOUNTING_RECORD_LIST).setVisibility(costConfiguredVisibility);
+    get(MenuItemDefId.REPORT_OBJECTIVES).setVisibility(costConfiguredVisibility);
+    get(MenuItemDefId.DATEV_IMPORT).setVisibility(costConfiguredVisibility);
 
-    get(MenuItemDefId.ADDRESS_LIST).setVisible(configuration.isAddressManagementConfigured());
-    get(MenuItemDefId.BOOK_LIST).setVisible(configuration.isBookManagementConfigured());
-    get(MenuItemDefId.MEB).setVisible(configuration.isMebConfigured());
-
+    get(MenuItemDefId.ADDRESS_LIST).setVisibility(new MenuItemDefVisibility() {
+      @Override
+      public boolean isVisible()
+      {
+        return Configuration.getInstance().isAddressManagementConfigured();
+      }
+    });
+    get(MenuItemDefId.BOOK_LIST).setVisibility(new MenuItemDefVisibility() {
+      @Override
+      public boolean isVisible()
+      {
+        return Configuration.getInstance().isBookManagementConfigured();
+      }
+    });
+    get(MenuItemDefId.MEB).setVisibility(new MenuItemDefVisibility() {
+      @Override
+      public boolean isVisible()
+      {
+        return Configuration.getInstance().isMebConfigured();
+      }
+    });
     get(MenuItemDefId.PHONE_CALL).setVisible(StringUtils.isNotEmpty(xmlConfiguration.getTelephoneSystemUrl()));
     get(MenuItemDefId.CONTRACTS).setVisible(CollectionUtils.isNotEmpty(xmlConfiguration.getContractTypes()));
 
