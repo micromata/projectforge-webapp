@@ -118,11 +118,6 @@ public class DatabaseCoreUpdates
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        if (dao.doTableAttributesExist(configurationTable, "global") == false) {
-          dao.addTableAttributes(configurationTable, new TableAttribute(ConfigurationDO.class, "global").setDefaultValue("false"));
-          final ConfigurationDao configurationDao = Registry.instance().getDao(ConfigurationDao.class);
-          configurationDao.checkAndUpdateDatabaseEntries();
-        }
         if (dao.doEntitiesExist(TenantDO.class) == false) {
           final SchemaGenerator schemaGenerator = new SchemaGenerator(dao).add(PFUserDO.class, TenantDO.class);
           schemaGenerator.createSchema();
@@ -150,6 +145,11 @@ public class DatabaseCoreUpdates
             ContractDO.class, EmployeeDO.class, GroupDO.class, HRPlanningDO.class, KontoDO.class, Kost1DO.class, Kost2DO.class,
             PFUserDO.class, ProjektDO.class, RechnungDO.class, UserPrefDO.class, UserPrefEntryDO.class, UserRightDO.class,
             UserXmlPreferencesDO.class);
+        if (dao.doTableAttributesExist(configurationTable, "global") == false) {
+          dao.addTableAttributes(configurationTable, new TableAttribute(ConfigurationDO.class, "global").setDefaultValue("false"));
+          final ConfigurationDao configurationDao = Registry.instance().getDao(ConfigurationDao.class);
+          configurationDao.checkAndUpdateDatabaseEntries();
+        }
         dao.createMissingIndices();
         return UpdateRunningStatus.DONE;
       }
