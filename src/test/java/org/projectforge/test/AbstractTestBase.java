@@ -224,6 +224,9 @@ public class AbstractTestBase
             }
           }
         }
+        deleteFrom(hibernateTemplate, "TeamEventAttendeeDO"); // Plugin stuff needed
+        deleteFrom(hibernateTemplate, "TeamEventDO"); // Because it's part of
+        deleteFrom(hibernateTemplate, "TeamCalDO"); // the dump file.
         deleteFrom(hibernateTemplate, "TimesheetDO");
         deleteFrom(hibernateTemplate, "HRPlanningEntryDO");
         deleteFrom(hibernateTemplate, "HRPlanningDO");
@@ -276,9 +279,13 @@ public class AbstractTestBase
 
   private static void deleteFrom(final HibernateTemplate hibernateTemplate, final String entity)
   {
-    final Query query = hibernateTemplate.getSessionFactory().getCurrentSession().createQuery("delete from " + entity);
-    query.executeUpdate();
-    hibernateTemplate.flush();
+    try {
+      final Query query = hibernateTemplate.getSessionFactory().getCurrentSession().createQuery("delete from " + entity);
+      query.executeUpdate();
+      hibernateTemplate.flush();
+    } catch (final Exception ex) {
+      // Do nothing, it's only a test case and the object is may-be already deleted.
+    }
   }
 
   private static void deleteAllDBObjects(final HibernateTemplate hibernateTemplate, final String entity)
