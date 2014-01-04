@@ -29,6 +29,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -43,15 +44,17 @@ import org.projectforge.book.BookDO;
 import org.projectforge.book.BookDao;
 import org.projectforge.fibu.AuftragDO;
 import org.projectforge.fibu.AuftragDao;
+import org.projectforge.plugins.teamcal.TeamCalTestHelper;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
-import org.projectforge.test.TestBase;
+import org.projectforge.test.PluginTestBase;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
+import org.springframework.beans.BeansException;
 
 import de.micromata.hibernate.history.HistoryEntry;
 
-public class InitDatabaseDaoWithTestDataTest extends TestBase
+public class InitDatabaseDaoWithTestDataTest extends PluginTestBase
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(InitDatabaseDaoWithTestDataTest.class);
 
@@ -68,6 +71,12 @@ public class InitDatabaseDaoWithTestDataTest extends TestBase
   private TaskDao taskDao;
 
   private UserGroupCache userGroupCache;
+
+  @BeforeClass
+  public static void setup() throws BeansException, IOException
+  {
+    TeamCalTestHelper.setup(); // Needed because it's part of dump.
+  }
 
   public void setInitDatabaseDao(final InitDatabaseDao initDatabaseDao)
   {
