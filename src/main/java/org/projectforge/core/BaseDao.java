@@ -353,7 +353,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       final List<O> list = getHibernateTemplate().find("from " + clazz.getSimpleName() + " t where tenant_id is null");
       return list;
     }
-    if (tenant.isDefaultTenant() == true) {
+    if (tenant.isDefault() == true) {
       @SuppressWarnings("unchecked")
       final List<O> list = getHibernateTemplate().find("from " + clazz.getSimpleName() + " t where tenant_id = ? or tenant_id is null",
           tenant.getId());

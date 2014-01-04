@@ -68,7 +68,7 @@ public class TenantListPage extends AbstractListPage<TenantListForm, TenantDao, 
       {
         final TenantDO tenant = rowModel.getObject();
         appendCssClasses(item, tenant.getId(), tenant.isDeleted());
-        if (tenant.isDefaultTenant() == true) {
+        if (tenant.isDefault() == true) {
           appendCssClasses(item, RowCssClass.IMPORTANT_ROW);
         }
       }

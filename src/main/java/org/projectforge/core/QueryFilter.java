@@ -80,7 +80,7 @@ public class QueryFilter
       final UserContext userContext = ThreadLocalUserContext.getUserContext();
       final TenantDO currentTenant = userContext.getCurrentTenant();
       if (currentTenant != null) {
-        if (currentTenant.isDefaultTenant() == true) {
+        if (currentTenant.isDefault() == true) {
           this.add(Restrictions.or(Restrictions.eq("tenant", userContext.getCurrentTenant()), Restrictions.isNull("tenant")));
         } else {
           this.add(Restrictions.eq("tenant", userContext.getCurrentTenant()));

@@ -214,7 +214,7 @@ public class TenantsCache extends AbstractCache
     }
     if (list != null) {
       for (final TenantDO tenant : list) {
-        if (tenant.isDefaultTenant() == true) {
+        if (tenant.isDefault() == true) {
           this.defaultTenant = tenant;
         }
       }

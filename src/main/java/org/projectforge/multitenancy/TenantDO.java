@@ -143,7 +143,7 @@ public class TenantDO extends DefaultBaseDO implements ShortDisplayNameCapable
    * @return the defaultTenant
    */
   @Transient
-  public boolean isDefaultTenant()
+  public boolean isDefault()
   {
     return defaultTenant != null && defaultTenant == true;
   }

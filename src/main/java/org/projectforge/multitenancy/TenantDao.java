@@ -107,7 +107,7 @@ public class TenantDao extends BaseDao<TenantDO>
   @Override
   protected void onSaveOrModify(final TenantDO obj)
   {
-    if (obj.isDefaultTenant() == false) {
+    if (obj.isDefault() == false) {
       return;
     }
     final TenantDO defaultTenant = getDefaultTenant();

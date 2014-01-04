@@ -105,7 +105,7 @@ public class TenantChecker
     }
     if (obj.getTenantId() == null) {
       // The given object isn't assigned to a tenant, so assuming the default tenant.
-      return currentTenant.isDefaultTenant();
+      return currentTenant.isDefault();
     }
     return obj.getTenantId().equals(currentTenant.getId());
   }
