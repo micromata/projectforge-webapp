@@ -106,6 +106,12 @@ public class TenantsCache extends AbstractCache
     return tenants;
   }
 
+  public boolean hasTenants()
+  {
+    checkRefresh();
+    return tenants != null && tenants.size() > 0;
+  }
+
   /**
    * @return the tenants
    */

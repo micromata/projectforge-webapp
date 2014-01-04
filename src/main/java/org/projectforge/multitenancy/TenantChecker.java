@@ -56,7 +56,7 @@ public class TenantChecker
 
   public boolean isMultiTenancyAvailable()
   {
-    return GlobalConfiguration.getInstance().isMultiTenancyConfigured();
+    return GlobalConfiguration.getInstance().isMultiTenancyConfigured() == true && getTenantsCache().hasTenants() == true;
   }
 
   /**
@@ -130,6 +130,9 @@ public class TenantChecker
 
   public void checkPartOfCurrentTenant(final BaseDO< ? > obj)
   {
+    if (isMultiTenancyAvailable() == false) {
+      return;
+    }
     if (isPartOfCurrentTenant(obj) == false) {
       final TenantDO currentTenant = getCurrentTenant();
       final String currentTenantString = currentTenant != null ? currentTenant.getName() : ThreadLocalUserContext
