@@ -28,7 +28,11 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.lang.Validate;
+import org.projectforge.access.AccessException;
 import org.projectforge.common.AbstractCache;
+import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
+import org.projectforge.user.UserRights;
 
 /**
  * Holds TenantCachesHolder element and detaches them if not used for some time to save memory.
@@ -43,6 +47,8 @@ public class TenantRegistryMap extends AbstractCache
   private final Map<Integer, TenantRegistry> tenantRegistryMap = new HashMap<Integer, TenantRegistry>();
 
   private TenantRegistry singleTenantRegistry;
+
+  private TenantRegistry dummyTenantRegistry;
 
   private static TenantRegistryMap instance = new TenantRegistryMap();
 
@@ -64,6 +70,18 @@ public class TenantRegistryMap extends AbstractCache
         log.warn("Oups, why call getTenantRegistry with tenant " + tenant.getId() + " if ProjectForge is running in single tenant mode?");
       }
       return getSingleTenantRegistry();
+    }
+    if (tenant == null) {
+      final PFUserDO user = ThreadLocalUserContext.getUser();
+      if (user == null) {
+        return getDummyTenantRegistry();
+      }
+      if (TenantChecker.getInstance().isSuperAdmin(user) == true) {
+        throw new AccessException("multitenancy.accessException.noTenant.superAdminUser");
+      } else if (UserRights.getAccessChecker().isUserMemberOfAdminGroup(user) == true) {
+        throw new AccessException("multitenancy.accessException.noTenant.adminUser");
+      }
+      throw new AccessException("multitenancy.accessException.noTenant.nonAdminUser");
     }
     Validate.notNull(tenant);
     synchronized (this) {
@@ -92,6 +110,25 @@ public class TenantRegistryMap extends AbstractCache
         singleTenantRegistry = new TenantRegistry(null);
       }
       return singleTenantRegistry;
+    }
+  }
+
+  /**
+   * The dummy tenant registry is implemented only for misconfigured systems, meaning the administrator has configured tenants but no
+   * default tenant and the users try to login in, but no tenant will be found (error messages will occur). The super admin is the onliest
+   * user to fix this issue (because the system is available due to this dummy tenant).
+   * @return
+   */
+  private TenantRegistry getDummyTenantRegistry()
+  {
+    synchronized (this) {
+      if (dummyTenantRegistry == null) {
+        final TenantDO dummyTenant = new TenantDO().setName("Dummy tenant").setShortName("Dummy tenant")
+            .setDescription("This tenant is only a technical tenant, if no default tenant is given.");
+        dummyTenant.setId(-1);
+        dummyTenantRegistry = new TenantRegistry(dummyTenant);
+      }
+      return dummyTenantRegistry;
     }
   }
 
