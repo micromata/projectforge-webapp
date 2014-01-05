@@ -566,7 +566,8 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   {
     final List<O> result = new ArrayList<O>();
     for (final O obj : origList) {
-      if (TenantChecker.getInstance().isPartOfCurrentTenant(obj) == true && hasLoggedInUserSelectAccess(obj, false) == true) {
+      if ((TenantChecker.getInstance().isSuperAdmin(ThreadLocalUserContext.getUser()) == true || TenantChecker.getInstance()
+          .isPartOfCurrentTenant(obj) == true) && hasLoggedInUserSelectAccess(obj, false) == true) {
         result.add(obj);
         afterLoad(obj);
       }
