@@ -44,8 +44,8 @@ import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.template.PackageTextTemplate;
 import org.projectforge.AppVersion;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.core.LogoServlet;
 import org.projectforge.web.doc.DocumentationPage;
@@ -269,7 +269,7 @@ public abstract class AbstractUnsecureBasePage extends WebPage
 
   public String getLocalizedMessage(final String key, final Object... params)
   {
-    if (params == null) {
+    if (params == null || params.length == 0) {
       return getString(key);
     }
     return MessageFormat.format(getString(key), params);
