@@ -27,11 +27,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
+import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -51,12 +54,10 @@ import org.projectforge.core.SystemDao;
 import org.projectforge.database.MyDatabaseUpdater;
 import org.projectforge.database.XmlDump;
 import org.projectforge.meb.MebMailClient;
-import org.projectforge.plugins.core.AbstractPlugin;
-import org.projectforge.plugins.core.PluginsRegistry;
 import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
-import org.projectforge.user.ThreadLocalUserContext;
+import org.projectforge.user.I18nHelper;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.user.UserXmlPreferencesMigrationDao;
 import org.projectforge.web.MenuBuilder;
@@ -413,84 +414,59 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
   {
     log.info("Administration: check i18n properties.");
     checkAccess();
-    final StringBuffer buf = new StringBuffer();
-    final Properties props = new Properties();
-    final Properties props_en = new Properties();
-    final Properties props_de = new Properties();
+    final StringBuilder buf = new StringBuilder();
+    final StringBuilder warnMessages = new StringBuilder();
     final Properties propsFound = new Properties();
-    final ClassLoader cLoader = this.getClass().getClassLoader();
     try {
-      load(props, "");
-      load(props_en, "_en");
-      load(props_de, "_de");
+      final ClassLoader cLoader = this.getClass().getClassLoader();
       final InputStream is = cLoader.getResourceAsStream(WebConstants.FILE_I18N_KEYS);
       propsFound.load(is);
     } catch (final IOException ex) {
       log.error("Could not load i18n properties: " + ex.getMessage(), ex);
       throw new RuntimeException(ex);
     }
-    buf.append("Checking the differences between the " + ThreadLocalUserContext.BUNDLE_NAME + " properties (default and _de)\n\n");
-    buf.append("Found " + props.size() + " entries in default property file (en).\n\n");
+    final SortedMap<String, String> defaultMap = load(warnMessages, new Locale("en"));
+    final SortedMap<String, String> deMap = load(warnMessages, new Locale("de"));
+    buf.append("Checking the differences between the i18n resource properties (default and _de)\n\n");
+    buf.append("Found " + defaultMap.size() + " entries in default property file (en).\n\n");
     buf.append("Missing in _de:\n");
     buf.append("---------------\n");
-    List<String> keys = new ArrayList<String>();
-    for (final Object key : props.keySet()) {
-      if (props_de.containsKey(key) == false) {
-        keys.add(String.valueOf(key));
+    for (final String key : defaultMap.keySet()) {
+      if (deMap.containsKey(key) == false) {
+        buf.append(key).append("=").append(defaultMap.get(key)).append("\n");
       }
-    }
-    Collections.sort(keys);
-    for (final String key : keys) {
-      buf.append(key + "=" + props.getProperty(key) + "\n");
     }
     buf.append("\n\nOnly in _de (not in _en):\n");
     buf.append("-------------------------\n");
-    keys = new ArrayList<String>();
-    for (final Object key : props_de.keySet()) {
-      if (props.containsKey(key) == false) {
-        keys.add(String.valueOf(key));
+    for (final String key : deMap.keySet()) {
+      if (defaultMap.containsKey(key) == false) {
+        buf.append(key).append("=").append(deMap.get(key)).append("\n");
       }
     }
-    Collections.sort(keys);
-    for (final String key : keys) {
-      buf.append(key + "=" + props_de.getProperty(key) + "\n");
+    buf.append("\n\nWarnings and errors:\n");
+    buf.append("--------------------\n");
+    buf.append(warnMessages);
+    buf.append("\n\nMaybe not defined but used (found in java, jsp or Wicket's html code):\n");
+    buf.append("----------------------------------------------------------------------\n");
+    for (final Object key : propsFound.keySet()) {
+      if (defaultMap.containsKey(key) == false && deMap.containsKey(key) == false) {
+        buf.append(key).append("=").append(propsFound.getProperty((String) key)).append("\n");
+      }
     }
-    if (WebConfiguration.isDevelopmentMode() == true) {
-      buf.append("\n\nMaybe not defined but used (found in java, jsp or Wicket's html code):\n");
-      buf.append("----------------------------------------------------------------------\n");
-      keys = new ArrayList<String>();
-      for (final Object key : propsFound.keySet()) {
-        if (props.containsKey(key) == false && props_de.containsKey(key) == false && props.containsKey(key) == false) {
-          keys.add(String.valueOf(key) + "=" + propsFound.getProperty((String) key));
-        }
+    buf.append("\n\nExperimental (in progress): Maybe unused (not found in java, jsp or Wicket's html code):\n");
+    buf.append("----------------------------------------------------------------------------------------\n");
+    final Set<String> all = new TreeSet<String>();
+    CollectionUtils.addAll(all, defaultMap.keySet().iterator());
+    CollectionUtils.addAll(all, deMap.keySet().iterator());
+    for (final String key : all) {
+      if (propsFound.containsKey(key) == true) {
+        continue;
       }
-      Collections.sort(keys);
-      for (final String key : keys) {
-        buf.append(key + "\n");
+      String value = defaultMap.get(key);
+      if (value == null) {
+        value = deMap.get(key);
       }
-      buf.append("\n\nExperimental (in progress): Maybe unused (not found in java, jsp or Wicket's html code):\n");
-      buf.append("----------------------------------------------------------------------------------------\n");
-      final Set<String> all = new TreeSet<String>();
-      CollectionUtils.addAll(all, props.keys());
-      CollectionUtils.addAll(all, props_en.keys());
-      CollectionUtils.addAll(all, props_de.keys());
-      keys = new ArrayList<String>();
-      for (final String key : all) {
-        if (propsFound.containsKey(key) == false) {
-          keys.add(String.valueOf(key));
-        }
-      }
-      Collections.sort(keys);
-      for (final String key : keys) {
-        String value = props_de.getProperty(key);
-        if (value == null) {
-          value = props_en.getProperty(key);
-        }
-        if (value == null) {
-          value = props.getProperty(key);
-        }
-        buf.append(key + "=" + value + "\n");
-      }
+      buf.append(key + "=" + value + "\n");
     }
     final String result = buf.toString();
     final String filename = "projectforge_i18n_check" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".txt";
@@ -667,20 +643,36 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
     return basename + "." + number + "." + counter;
   }
 
-  private void load(final Properties properties, final String locale) throws IOException
+  private SortedMap<String, String> load(final StringBuilder warnMessages, final Locale locale)
   {
-    final ClassLoader cLoader = this.getClass().getClassLoader();
-    InputStream is = cLoader.getResourceAsStream(ThreadLocalUserContext.BUNDLE_NAME + locale + ".properties");
-    properties.load(is);
-    for (final AbstractPlugin plugin : PluginsRegistry.instance().getPlugins()) {
-      if (plugin.getResourceBundleName() == null) {
-        continue;
-      }
-      final String basePath = plugin.getResourceBundleName().replace('.', '/');
-      is = cLoader.getResourceAsStream(basePath + locale + ".properties");
-      if (is != null) {
-        properties.load(is);
+    final SortedMap<String, String> map = new TreeMap<String, String>();
+    final List<ResourceBundle> resourceBundleList = I18nHelper.getResourceBundles(locale);
+    for (final ResourceBundle bundle : resourceBundleList) {
+      for (final String key : bundle.keySet()) {
+        final String value = bundle.getString(key);
+        if (map.containsKey(key) == true) {
+          warnMessages.append("Duplicate entry (locale=").append(locale).append("): ").append(key);
+        }
+        map.put(key, value);
+        if (value != null && (value.contains("{0") == true || value.contains("{1") == true) && value.contains("'") == true) {
+          // Message, check for single quotes:
+          char lastChar = ' ';
+          for (int i = 0; i < value.length(); i++) {
+            final char ch = value.charAt(i);
+            if (lastChar == '\'') {
+              if (ch != '\'') {
+                warnMessages.append("Key '").append(key).append("' (locale=").append(locale)
+                .append(") contains invalid message string (single quotes are not allowed and must be replaced by '').\n");
+                break;
+              }
+              lastChar = ' '; // Quotes were OK.
+            } else {
+              lastChar = ch;
+            }
+          }
+        }
       }
     }
+    return map;
   }
 }
