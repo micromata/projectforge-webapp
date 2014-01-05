@@ -40,8 +40,6 @@ public class ThreadLocalUserContext
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ThreadLocalUserContext.class);
 
-  public static final String BUNDLE_NAME = "I18nResources";
-
   private static ThreadLocal<UserContext> threadLocalUserContext = new ThreadLocal<UserContext>();
 
   /**
