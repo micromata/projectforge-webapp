@@ -84,7 +84,11 @@ public class QueryFilter
    */
   public QueryFilter(final BaseSearchFilter filter, final boolean ignoreTenant)
   {
-    this.filter = filter;
+    if (filter == null) {
+      this.filter = new BaseSearchFilter();
+    } else {
+      this.filter = filter;
+    }
     if (ignoreTenant == false && TenantChecker.getInstance().isMultiTenancyAvailable() == true) {
       final UserContext userContext = ThreadLocalUserContext.getUserContext();
       final TenantDO currentTenant = userContext.getCurrentTenant();
