@@ -172,6 +172,9 @@ public class TenantChecker
    */
   public boolean isSuperAdmin(final PFUserDO user)
   {
+    if (user == null) {
+      return false;
+    }
     return GlobalConfiguration.getInstance().isMultiTenancyConfigured() == true && getDao().hasInsertAccess(user) == true;
   }
 
