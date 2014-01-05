@@ -398,8 +398,13 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public List<O> getList(final BaseSearchFilter filter)
   {
-    final QueryFilter queryFilter = new QueryFilter(filter);
+    final QueryFilter queryFilter = createQueryFilter(filter);
     return getList(queryFilter);
+  }
+
+  protected QueryFilter createQueryFilter(final BaseSearchFilter filter)
+  {
+    return new QueryFilter(filter);
   }
 
   /**
