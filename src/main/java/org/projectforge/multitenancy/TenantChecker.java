@@ -99,6 +99,9 @@ public class TenantChecker
     if (obj == null) {
       return false;
     }
+    if (obj instanceof TenantDO && isSuperAdmin(ThreadLocalUserContext.getUser()) == true) {
+      return true;
+    }
     final TenantDO currentTenant = getCurrentTenant();
     if (currentTenant == null) {
       return false;
@@ -156,7 +159,7 @@ public class TenantChecker
   public boolean isPartOfTenant(final Integer tenantId, final PFUserDO user)
   {
     // if (isPartOfTenant(tenantId, (AbstractBaseDO< ? >) user) == true) {
-    // Ignore this setting (because it's weather displayed nor modifiable!
+    // Ignore this setting (because it's neither displayed nor modifiable!
     // return true;
     // }
     if (user == null) {

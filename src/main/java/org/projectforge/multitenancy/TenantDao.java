@@ -34,9 +34,11 @@ import org.apache.commons.lang.ObjectUtils;
 import org.hibernate.LockMode;
 import org.projectforge.access.AccessException;
 import org.projectforge.core.BaseDao;
+import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.core.QueryFilter;
 import org.projectforge.core.UserException;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRightId;
 import org.springframework.transaction.annotation.Isolation;
@@ -117,6 +119,19 @@ public class TenantDao extends BaseDao<TenantDO>
     if (obj.getId() == null || ObjectUtils.equals(defaultTenant.getId(), obj.getId()) == false) {
       throw new UserException("multitenancy.error.maxOnlyOneTenantShouldBeDefault");
     }
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDao#createQueryFilter(org.projectforge.core.BaseSearchFilter)
+   */
+  @Override
+  protected QueryFilter createQueryFilter(final BaseSearchFilter filter)
+  {
+    final boolean superAdmin = TenantChecker.getInstance().isSuperAdmin(ThreadLocalUserContext.getUser()) == true;
+    if (superAdmin == false) {
+      return super.createQueryFilter(filter);
+    }
+    return new QueryFilter(filter, true);
   }
 
   /**

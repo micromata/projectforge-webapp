@@ -86,9 +86,7 @@ public class TenantRegistryMap extends AbstractCache
       if (user == null) {
         return getDummyTenantRegistry();
       }
-      if (TenantChecker.getInstance().isSuperAdmin(user) == true) {
-        throw new AccessException("multitenancy.accessException.noTenant.superAdminUser");
-      } else if (UserRights.getAccessChecker().isUserMemberOfAdminGroup(user) == true) {
+      if (UserRights.getAccessChecker().isUserMemberOfAdminGroup(user) == true) {
         throw new AccessException("multitenancy.accessException.noTenant.adminUser");
       }
       throw new AccessException("multitenancy.accessException.noTenant.nonAdminUser");

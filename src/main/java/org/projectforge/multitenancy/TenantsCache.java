@@ -198,9 +198,13 @@ public class TenantsCache extends AbstractCache
       if (user.isDeleted() == true) {
         continue;
       }
+      final boolean superAdmin = TenantChecker.getInstance().isSuperAdmin(user);
       if (list != null) {
         final Set<TenantDO> set = new TreeSet<TenantDO>(new TenantsComparator());
         for (final TenantDO tenant : list) {
+          if (superAdmin == true) {
+            set.add(tenant);
+          }
           final Collection<PFUserDO> assignedUsers = tenant.getAssignedUsers();
           if (assignedUsers == null) {
             continue;
