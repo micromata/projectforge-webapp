@@ -24,6 +24,8 @@
 package org.projectforge.user;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -89,9 +91,22 @@ public class I18nHelper
           return translation;
         }
       }
-    } catch (Exception ex) { // MissingResourceException or NullpointerException
+    } catch (final Exception ex) { // MissingResourceException or NullpointerException
       log.warn("Resource key '" + key + "' not found for locale '" + locale + "'");
     }
     return "???" + key + "???";
+  }
+
+  public static List<ResourceBundle> getResourceBundles(final Locale locale)
+  {
+    final List<ResourceBundle> list = new ArrayList<ResourceBundle>();
+    list.add(getResourceBundle(BUNDLE_NAME, locale));
+    for (final AbstractPlugin plugin : PluginsRegistry.instance().getPlugins()) {
+      if (plugin.getResourceBundleName() == null) {
+        continue;
+      }
+      list.add(getResourceBundle(plugin.getResourceBundleName(), locale));
+    }
+    return list;
   }
 }
