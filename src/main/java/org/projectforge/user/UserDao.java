@@ -52,6 +52,7 @@ import org.projectforge.core.DisplayHistoryEntry;
 import org.projectforge.core.ModificationStatus;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.core.SecurityConfig;
+import org.projectforge.multitenancy.TenantChecker;
 import org.projectforge.multitenancy.TenantDO;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -97,9 +98,22 @@ public class UserDao extends BaseDao<PFUserDO>
 
   public QueryFilter getDefaultFilter()
   {
-    final QueryFilter queryFilter = new QueryFilter();
+    final QueryFilter queryFilter = new QueryFilter(null, false);
     queryFilter.add(Restrictions.eq("deleted", false));
     return queryFilter;
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDao#createQueryFilter(org.projectforge.core.BaseSearchFilter)
+   */
+  @Override
+  protected QueryFilter createQueryFilter(final BaseSearchFilter filter)
+  {
+    final boolean superAdmin = TenantChecker.getInstance().isSuperAdmin(ThreadLocalUserContext.getUser()) == true;
+    if (superAdmin == false) {
+      return super.createQueryFilter(filter);
+    }
+    return new QueryFilter(filter, true);
   }
 
   @Override
@@ -111,7 +125,7 @@ public class UserDao extends BaseDao<PFUserDO>
     } else {
       myFilter = new PFUserFilter(filter);
     }
-    final QueryFilter queryFilter = new QueryFilter(myFilter);
+    final QueryFilter queryFilter = createQueryFilter(myFilter);
     if (myFilter.getDeactivatedUser() != null) {
       queryFilter.add(Restrictions.eq("deactivated", myFilter.getDeactivatedUser()));
     }
@@ -135,6 +149,16 @@ public class UserDao extends BaseDao<PFUserDO>
       list = new LinkedList<PFUserDO>();
       for (final PFUserDO user : origList) {
         if (myFilter.getIsAdminUser() == accessChecker.isUserMemberOfAdminGroup(user, false)) {
+          list.add(user);
+        }
+      }
+    }
+    final TenantChecker tenantChecker = TenantChecker.getInstance();
+    if (tenantChecker.isMultiTenancyAvailable() == true && tenantChecker.isSuperAdmin(ThreadLocalUserContext.getUser()) == false) {
+      final List<PFUserDO> origList = list;
+      list = new LinkedList<PFUserDO>();
+      for (final PFUserDO user : origList) {
+        if (tenantChecker.isPartOfTenant(ThreadLocalUserContext.getUserContext().getCurrentTenant(), user) == true) {
           list.add(user);
         }
       }
