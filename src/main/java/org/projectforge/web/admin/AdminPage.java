@@ -29,9 +29,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Properties;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -425,8 +423,8 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
       log.error("Could not load i18n properties: " + ex.getMessage(), ex);
       throw new RuntimeException(ex);
     }
-    final SortedMap<String, String> defaultMap = load(warnMessages, new Locale("en"));
-    final SortedMap<String, String> deMap = load(warnMessages, new Locale("de"));
+    final SortedMap<String, String> defaultMap = load(warnMessages, "");
+    final SortedMap<String, String> deMap = load(warnMessages, "_de");
     buf.append("Checking the differences between the i18n resource properties (default and _de)\n\n");
     buf.append("Found " + defaultMap.size() + " entries in default property file (en).\n\n");
     buf.append("Missing in _de:\n");
@@ -643,17 +641,30 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
     return basename + "." + number + "." + counter;
   }
 
-  private SortedMap<String, String> load(final StringBuilder warnMessages, final Locale locale)
+  private SortedMap<String, String> load(final StringBuilder warnMessages, final String locale)
   {
+    final ClassLoader cLoader = this.getClass().getClassLoader();
     final SortedMap<String, String> map = new TreeMap<String, String>();
-    final List<ResourceBundle> resourceBundleList = I18nHelper.getResourceBundles(locale);
-    for (final ResourceBundle bundle : resourceBundleList) {
-      for (final String key : bundle.keySet()) {
-        final String value = bundle.getString(key);
+    final List<String> resourceBundleList = I18nHelper.getResourceBundleNames();
+    for (final String bundle : resourceBundleList) {
+      final String path = bundle.replace('.', '/') + locale + ".properties";
+      log.info("Loading i18 resource properties: " + path);
+      final InputStream is = cLoader.getResourceAsStream(path);
+      final Properties properties = new Properties();
+      if (is != null) {
+        try {
+          properties.load(is);
+        } catch (final IOException ex) {
+          log.error("Error while loading resource properties '" + path + locale + ".properties: " + ex.getMessage(), ex);
+          continue;
+        }
+      }
+      for (final Object key : properties.keySet()) {
+        final String value = properties.getProperty((String) key);
         if (map.containsKey(key) == true) {
           warnMessages.append("Duplicate entry (locale=").append(locale).append("): ").append(key);
         }
-        map.put(key, value);
+        map.put((String) key, value);
         if (value != null && (value.contains("{0") == true || value.contains("{1") == true) && value.contains("'") == true) {
           // Message, check for single quotes:
           char lastChar = ' ';
@@ -672,6 +683,7 @@ public class AdminPage extends AbstractStandardFormPage implements ISelectCaller
           }
         }
       }
+      log.info("Found " + map.size() + " entries in: " + path);
     }
     return map;
   }
