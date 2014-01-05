@@ -97,15 +97,15 @@ public class I18nHelper
     return "???" + key + "???";
   }
 
-  public static List<ResourceBundle> getResourceBundles(final Locale locale)
+  public static List<String> getResourceBundleNames()
   {
-    final List<ResourceBundle> list = new ArrayList<ResourceBundle>();
-    list.add(getResourceBundle(BUNDLE_NAME, locale));
+    final List<String> list = new ArrayList<String>();
+    list.add(BUNDLE_NAME);
     for (final AbstractPlugin plugin : PluginsRegistry.instance().getPlugins()) {
       if (plugin.getResourceBundleName() == null) {
         continue;
       }
-      list.add(getResourceBundle(plugin.getResourceBundleName(), locale));
+      list.add(plugin.getResourceBundleName());
     }
     return list;
   }
