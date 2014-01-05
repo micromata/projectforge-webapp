@@ -91,14 +91,20 @@ public class MenuItemDef implements Serializable
   }
 
   /**
-   * Calls {@link MenuItemDefVisibility#isVisible()} if visibility object is given, otherwise flag set by {@link #setVisible(boolean)} (true as default).
+   * Calls {@link MenuItemDefVisibility#isVisible()} if visibility object is given, otherwise flag set by {@link #setVisible(boolean)} (true
+   * as default).
    * @return
    * @see MenuItemDefVisibility#isVisible()
    */
   public boolean isVisible()
   {
     if (this.visibility != null) {
-      return this.visibility.isVisible();
+      try {
+        return this.visibility.isVisible();
+      } catch (final Exception ex) {
+        // log.error("Exception occured while trying to evaluate visibility of a menu entry: " + ex.getMessage(), ex);
+        return false;
+      }
     }
     return this.visible;
   }
