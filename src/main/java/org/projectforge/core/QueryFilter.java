@@ -41,7 +41,6 @@ import org.projectforge.multitenancy.TenantDO;
 import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserContext;
 
-
 /**
  * Stores the expressions and settings for creating a hibernate criteria object. This template is useful for avoiding the need of a
  * hibernate session in the stripes action classes.
@@ -75,8 +74,18 @@ public class QueryFilter
 
   public QueryFilter(final BaseSearchFilter filter)
   {
+    this(filter, false);
+  }
+
+  /**
+   * 
+   * @param filter
+   * @param ignoreTenant default is false.
+   */
+  public QueryFilter(final BaseSearchFilter filter, final boolean ignoreTenant)
+  {
     this.filter = filter;
-    if (TenantChecker.getInstance().isMultiTenancyAvailable() == true) {
+    if (ignoreTenant == false && TenantChecker.getInstance().isMultiTenancyAvailable() == true) {
       final UserContext userContext = ThreadLocalUserContext.getUserContext();
       final TenantDO currentTenant = userContext.getCurrentTenant();
       if (currentTenant != null) {
