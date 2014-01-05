@@ -262,6 +262,7 @@ public class AbstractTestBase
         deleteFrom(hibernateTemplate, "UserRightDO");
         deleteFrom(hibernateTemplate, "UserXmlPreferencesDO");
         deleteAllDBObjects(hibernateTemplate, "GroupDO");
+        deleteAllDBObjects(hibernateTemplate, "TenantDO");
         deleteAllDBObjects(hibernateTemplate, "PFUserDO");
         deleteFrom(hibernateTemplate, "de.micromata.hibernate.history.delta.PropertyDelta");
         deleteFrom(hibernateTemplate, "de.micromata.hibernate.history.HistoryEntry");
