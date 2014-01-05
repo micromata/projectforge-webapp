@@ -245,6 +245,16 @@ public class UserDao extends BaseDao<PFUserDO>
   }
 
   /**
+   * @see org.projectforge.core.BaseDao#onChange(org.projectforge.core.ExtendedBaseDO, org.projectforge.core.ExtendedBaseDO)
+   */
+  @Override
+  protected void onChange(final PFUserDO obj, final PFUserDO dbObj)
+  {
+    super.onChange(obj, dbObj);
+    obj.setTenant(null); // Tenant for users isn't supported.
+  }
+
+  /**
    * @see org.projectforge.core.BaseDao#afterSave(org.projectforge.core.ExtendedBaseDO)
    */
   @Override
