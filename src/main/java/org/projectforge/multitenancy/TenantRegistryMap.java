@@ -30,6 +30,7 @@ import java.util.Map;
 import org.apache.commons.lang.Validate;
 import org.projectforge.access.AccessException;
 import org.projectforge.common.AbstractCache;
+import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserRights;
@@ -62,7 +63,7 @@ public class TenantRegistryMap extends AbstractCache
     super(EXPIRE_TIME);
   }
 
-  public TenantRegistry getTenantRegistry(final TenantDO tenant)
+  public TenantRegistry getTenantRegistry(TenantDO tenant)
   {
     checkRefresh();
     if (TenantChecker.getInstance().isMultiTenancyAvailable() == false) {
@@ -70,6 +71,15 @@ public class TenantRegistryMap extends AbstractCache
         log.warn("Oups, why call getTenantRegistry with tenant " + tenant.getId() + " if ProjectForge is running in single tenant mode?");
       }
       return getSingleTenantRegistry();
+    }
+    if (tenant == null) {
+      final TenantDO defaultTenant = Registry.instance().getTenantsCache().getDefaultTenant();
+      if (defaultTenant != null) {
+        final PFUserDO user = ThreadLocalUserContext.getUser();
+        if (TenantChecker.getInstance().isPartOfTenant(defaultTenant, user)) {
+          tenant = defaultTenant;
+        }
+      }
     }
     if (tenant == null) {
       final PFUserDO user = ThreadLocalUserContext.getUser();

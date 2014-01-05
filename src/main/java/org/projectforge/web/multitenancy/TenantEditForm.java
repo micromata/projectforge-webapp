@@ -39,6 +39,7 @@ import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
@@ -65,6 +66,10 @@ public class TenantEditForm extends AbstractEditForm<TenantDO, TenantEditPage>
   protected void init()
   {
     super.init();
+    final boolean hasDefaultTenant = tenantDao.getDefaultTenant() != null;
+    if (isNew() == true && hasDefaultTenant == false) {
+      getData().setDefaultTenant(true);
+    }
     gridBuilder.newGridPanel();
     {
       // Short name
@@ -83,8 +88,12 @@ public class TenantEditForm extends AbstractEditForm<TenantDO, TenantEditPage>
     }
     {
       // Option default
-      gridBuilder.newFieldset(getString("multitenancy.defaultTenant")).addCheckBox(new PropertyModel<Boolean>(data, "defaultTenant"), null)
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("multitenancy.defaultTenant"));
+      fs.addCheckBox(new PropertyModel<Boolean>(data, "defaultTenant"), null)
       .setTooltip(getString("multitenancy.defaultTenant.tooltip"));
+      if (hasDefaultTenant == false) {
+        fs.add(new DivTextPanel(fs.newChildId(), getString("multitenancy.defaultTenant.recommended")));
+      }
     }
     {
       // Assigned users

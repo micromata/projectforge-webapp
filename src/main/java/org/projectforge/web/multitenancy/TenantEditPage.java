@@ -52,7 +52,6 @@ public class TenantEditPage extends AbstractEditPage<TenantDO, TenantEditForm, T
   public AbstractSecuredBasePage onSaveOrUpdate()
   {
     tenantDao.setAssignedUsers(getData(), form.assignUsersListHelper.getAssignedItems());
-    //groupDao.setNestedGroups(getData(), form.nestedGroupsListHelper.getAssignedItems());
     return super.onSaveOrUpdate();
   }
 

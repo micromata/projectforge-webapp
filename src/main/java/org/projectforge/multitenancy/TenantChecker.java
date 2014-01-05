@@ -159,6 +159,9 @@ public class TenantChecker
     // Ignore this setting (because it's weather displayed nor modifiable!
     // return true;
     // }
+    if (user == null) {
+      return false;
+    }
     if (getTenantsCache().isUserAssignedToTenant(tenantId, user.getId()) == true) {
       return true;
     }
