@@ -138,7 +138,12 @@ public class ErrorPage extends AbstractSecuredPage
       }
     }
     form = new ErrorForm(this);
-    final String receiver = Configuration.getInstance().getStringValue(ConfigurationParam.FEEDBACK_E_MAIL);
+    String receiver = null;
+    try {
+      receiver = Configuration.getInstance().getStringValue(ConfigurationParam.FEEDBACK_E_MAIL);
+    } catch (final Exception ex) {
+      log.error("Exception occured while trying to get configured e-mail for feedback: " + ex.getMessage(), ex);
+    }
     form.data.setReceiver(receiver);
     form.data.setMessageNumber(messageNumber);
     form.data.setMessage(throwable != null ? throwable.getMessage() : "");
