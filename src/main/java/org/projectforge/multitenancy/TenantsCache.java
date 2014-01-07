@@ -71,6 +71,12 @@ public class TenantsCache extends AbstractCache
     return CollectionUtils.isEmpty(tenants);
   }
 
+  public String getLogName(final TenantDO tenant) {
+    final TenantDO t = getTenant(tenant.getId());
+    return "#" + t.getId() + " '" + t.getShortName() + "'";
+  }
+
+
   /**
    * @return the defaultTenant
    */

@@ -39,6 +39,7 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.fibu.EmployeeDO;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.multitenancy.TenantDO;
+import org.projectforge.registry.Registry;
 import org.projectforge.web.UserFilter;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
@@ -479,7 +480,11 @@ public class UserGroupCache extends AbstractCache
   @Override
   protected void refresh()
   {
-    log.info("Initializing UserGroupCache ...");
+    String tenantLog = "";
+    if (tenant != null) {
+      tenantLog = " for tenant #" + Registry.instance().getTenantsCache().getLogName(tenant);
+    }
+    log.info("Initializing UserGroupCache " + tenantLog + "...");
     // This method must not be synchronized because it works with a new copy of maps.
     final Map<Integer, PFUserDO> uMap = new HashMap<Integer, PFUserDO>();
     // Could not autowire UserDao because of cyclic reference with AccessChecker.
@@ -498,6 +503,13 @@ public class UserGroupCache extends AbstractCache
     final Set<Integer> nMarketingUsers = new HashSet<Integer>();
     final Set<Integer> nOrgaUsers = new HashSet<Integer>();
     for (final GroupDO group : groups) {
+      if (tenant != null) {
+        if (tenant.getId().equals(group.getTenantId()) == true || (tenant.isDefault() == true && group.getTenant() == null)) {
+          // proceed, group is assigned to current tenant or current tenant is the default tenant and the group is unassigned.
+        } else {
+          continue;
+        }
+      }
       gMap.put(group.getId(), group);
       if (group.getAssignedUsers() != null) {
         for (final PFUserDO user : group.getAssignedUsers()) {
@@ -546,8 +558,8 @@ public class UserGroupCache extends AbstractCache
     try {
       rights = hibernateTemplate.find("from UserRightDO t order by user.id, right_id");
     } catch (final Exception ex) {
-      log.fatal("******* Exception while getting user rights from data-base (only OK for migration from older versions): "
-          + ex.getMessage());
+      log.fatal(
+          "******* Exception while getting user rights from data-base (only OK for migration from older versions): " + ex.getMessage(), ex);
       rights = new ArrayList<UserRightDO>();
     }
     List<UserRightDO> list = null;
@@ -569,7 +581,7 @@ public class UserGroupCache extends AbstractCache
       }
     }
     this.rightMap = rMap;
-    log.info("Initializing of UserGroupCache done.");
+    log.info("Initializing of UserGroupCache done" + tenantLog + ".");
     Login.getInstance().afterUserGroupCacheRefresh(users, groups);
   }
 
