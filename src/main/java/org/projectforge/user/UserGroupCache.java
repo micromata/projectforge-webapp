@@ -38,6 +38,7 @@ import org.projectforge.common.AbstractCache;
 import org.projectforge.common.StringHelper;
 import org.projectforge.fibu.EmployeeDO;
 import org.projectforge.fibu.ProjektDO;
+import org.projectforge.multitenancy.TenantDO;
 import org.projectforge.web.UserFilter;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
@@ -48,6 +49,8 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 public class UserGroupCache extends AbstractCache
 {
   private static Logger log = Logger.getLogger(UserGroupCache.class);
+
+  private final TenantDO tenant;
 
   /** The key is the user id and the value is a list of assigned groups. */
   private Map<Integer, Set<Integer>> userGroupIdMap;
@@ -79,9 +82,10 @@ public class UserGroupCache extends AbstractCache
 
   private HibernateTemplate hibernateTemplate;
 
-  public UserGroupCache()
+  public UserGroupCache(final TenantDO tenant)
   {
     setExpireTimeInHours(1);
+    this.tenant = tenant;
   }
 
   public void setHibernateTemplate(final HibernateTemplate hibernateTemplate)
@@ -587,5 +591,13 @@ public class UserGroupCache extends AbstractCache
     }
     checkRefresh();
     this.adminUsers.add(adminUser.getId());
+  }
+
+  /**
+   * @return the tenant
+   */
+  public TenantDO getTenant()
+  {
+    return tenant;
   }
 }
