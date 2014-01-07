@@ -24,9 +24,11 @@
 package org.projectforge.fibu;
 
 import org.projectforge.access.OperationType;
-import org.projectforge.user.ThreadLocalUserContext;
+import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
+import org.projectforge.user.ThreadLocalUserContext;
+import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserRightAccessCheck;
 import org.projectforge.user.UserRightCategory;
 import org.projectforge.user.UserRightId;
@@ -47,11 +49,11 @@ public class ProjektRight extends UserRightAccessCheck<ProjektDO>
     super(UserRightId.PM_PROJECT, UserRightCategory.PM, UserRights.FALSE_READONLY_READWRITE);
     initializeUserGroupsRight(UserRights.FALSE_READONLY_READWRITE, UserRights.FIBU_ORGA_PM_GROUPS)
     // All project managers have read only access:
-        .setAvailableGroupRightValues(ProjectForgeGroup.PROJECT_MANAGER, UserRightValue.READONLY)
-        // All project assistants have no, read or read-only access:
-        .setAvailableGroupRightValues(ProjectForgeGroup.PROJECT_ASSISTANT, UserRightValue.READONLY)
-        // Read only access for controlling users:
-        .setReadOnlyForControlling();
+    .setAvailableGroupRightValues(ProjectForgeGroup.PROJECT_MANAGER, UserRightValue.READONLY)
+    // All project assistants have no, read or read-only access:
+    .setAvailableGroupRightValues(ProjectForgeGroup.PROJECT_ASSISTANT, UserRightValue.READONLY)
+    // Read only access for controlling users:
+    .setReadOnlyForControlling();
   }
 
   /**
@@ -74,8 +76,9 @@ public class ProjektRight extends UserRightAccessCheck<ProjektDO>
       return true;
     }
     if (UserRights.getAccessChecker().isUserMemberOfGroup(user, ProjectForgeGroup.PROJECT_MANAGER, ProjectForgeGroup.PROJECT_ASSISTANT) == true) {
+      final UserGroupCache userGroupCache = TenantRegistryMap.getInstance().getTenantRegistry().getUserGroupCache();
       if (obj.getProjektManagerGroup() != null
-          && UserRights.getUserGroupCache().isUserMemberOfGroup(ThreadLocalUserContext.getUserId(), obj.getProjektManagerGroupId()) == true) {
+          && userGroupCache.isUserMemberOfGroup(ThreadLocalUserContext.getUserId(), obj.getProjektManagerGroupId()) == true) {
         if ((obj.getStatus() == null || obj.getStatus().isIn(ProjektStatus.ENDED) == false) && obj.isDeleted() == false) {
           // Ein Projektleiter sieht keine nicht aktiven oder gelöschten Projekte.
           return true;

@@ -91,11 +91,6 @@ public class UserDao extends BaseDao<PFUserDO>
     userChangedListeners.add(userChangedListener);
   }
 
-  public UserGroupCache getUserGroupCache()
-  {
-    return userGroupCache;
-  }
-
   public QueryFilter getDefaultFilter()
   {
     final QueryFilter queryFilter = new QueryFilter(null, false);
@@ -171,12 +166,12 @@ public class UserDao extends BaseDao<PFUserDO>
     if (user == null) {
       return "";
     }
-    return userGroupCache.getGroupnames(user.getId());
+    return getUserGroupCache().getGroupnames(user.getId());
   }
 
   public Collection<Integer> getAssignedGroups(final PFUserDO user)
   {
-    return userGroupCache.getUserGroups(user);
+    return getUserGroupCache().getUserGroups(user);
   }
 
   public Collection<Integer> getAssignedTenants(final PFUserDO user)
@@ -194,7 +189,7 @@ public class UserDao extends BaseDao<PFUserDO>
 
   public List<UserRightDO> getUserRights(final Integer userId)
   {
-    return userGroupCache.getUserRights(userId);
+    return getUserGroupCache().getUserRights(userId);
   }
 
   public String[] getPersonalPhoneIdentifiers(final PFUserDO user)
@@ -309,7 +304,7 @@ public class UserDao extends BaseDao<PFUserDO>
   protected void afterSaveOrModify(final PFUserDO obj)
   {
     if (obj.isMinorChange() == false) {
-      userGroupCache.setExpired();
+      getUserGroupCache().setExpired();
     }
   }
 
@@ -711,7 +706,7 @@ public class UserDao extends BaseDao<PFUserDO>
    */
   public String getCachedAuthenticationToken(final Integer userId)
   {
-    final PFUserDO user = userGroupCache.getUser(userId);
+    final PFUserDO user = getUserGroupCache().getUser(userId);
     final String authenticationToken = user.getAuthenticationToken();
     if (StringUtils.isBlank(authenticationToken) == false && authenticationToken.trim().length() >= 10) {
       return authenticationToken;
@@ -791,7 +786,7 @@ public class UserDao extends BaseDao<PFUserDO>
     } else {
       log.info("No modifications detected (no update needed): " + dbUser.toString());
     }
-    userGroupCache.updateUser(user);
+    getUserGroupCache().updateUser(user);
   }
 
   /**

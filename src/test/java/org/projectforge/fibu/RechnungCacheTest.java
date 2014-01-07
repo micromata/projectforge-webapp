@@ -41,8 +41,6 @@ public class RechnungCacheTest extends TestBase
 
   private RechnungDao rechnungDao;
 
-  private RechnungCache rechnungCache;
-
   @Test
   public void baseTest()
   {
@@ -75,7 +73,7 @@ public class RechnungCacheTest extends TestBase
     rechnung2.setNummer(rechnungDao.getNextNumber(rechnung2)).setDatum(today.getSQLDate());
     rechnungDao.save(rechnung2);
 
-    Set<RechnungsPositionVO> set = rechnungCache.getRechnungsPositionVOSetByAuftragId(auftrag.getId());
+    Set<RechnungsPositionVO> set = rechnungDao.getRechnungCache().getRechnungsPositionVOSetByAuftragId(auftrag.getId());
     assertEquals("3 invoice positions expected.", 3, set.size());
     final Iterator<RechnungsPositionVO> it = set.iterator();
     RechnungsPositionVO posVO = it.next(); // Positions are ordered.
@@ -86,18 +84,18 @@ public class RechnungCacheTest extends TestBase
     assertEquals("2.1", posVO.getText());
     assertTrue(new BigDecimal("700").compareTo(RechnungDao.getNettoSumme(set)) == 0);
 
-    set = rechnungCache.getRechnungsPositionVOSetByAuftragsPositionId(auftrag.getPosition((short)1).getId());
+    set = rechnungDao.getRechnungCache().getRechnungsPositionVOSetByAuftragsPositionId(auftrag.getPosition((short)1).getId());
     assertEquals("2 invoice positions expected.", 2, set.size());
     assertTrue(new BigDecimal("500").compareTo(RechnungDao.getNettoSumme(set)) == 0);
 
-    set = rechnungCache.getRechnungsPositionVOSetByAuftragsPositionId(auftrag.getPosition((short)2).getId());
+    set = rechnungDao.getRechnungCache().getRechnungsPositionVOSetByAuftragsPositionId(auftrag.getPosition((short)2).getId());
     assertEquals("1 invoice positions expected.", 1, set.size());
     assertTrue(new BigDecimal("200").compareTo(RechnungDao.getNettoSumme(set)) == 0);
 
     final RechnungDO rechnung = rechnungDao.getById(rechnung2.getId());
     rechnung.getPosition(0).setAuftragsPosition(null);
     rechnungDao.update(rechnung);
-    set = rechnungCache.getRechnungsPositionVOSetByAuftragId(auftrag.getId());
+    set = rechnungDao.getRechnungCache().getRechnungsPositionVOSetByAuftragId(auftrag.getId());
     assertEquals("2 invoice positions expected.", 2, set.size());
     assertTrue(new BigDecimal("300").compareTo(RechnungDao.getNettoSumme(set)) == 0);
   }
@@ -105,11 +103,6 @@ public class RechnungCacheTest extends TestBase
   public void setAuftragDao(final AuftragDao auftragDao)
   {
     this.auftragDao = auftragDao;
-  }
-
-  public void setRechnungCache(final RechnungCache rechnungCache)
-  {
-    this.rechnungCache = rechnungCache;
   }
 
   public void setRechnungDao(final RechnungDao rechnungDao)

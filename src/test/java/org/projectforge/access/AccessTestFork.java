@@ -34,6 +34,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.test.TestBase;
@@ -52,8 +53,6 @@ public class AccessTestFork extends TestBase
 
   private TimesheetDao timesheetDao;
 
-  private UserGroupCache userGroupCache;
-
   public void setAccessDao(final AccessDao accessDao)
   {
     this.accessDao = accessDao;
@@ -67,11 +66,6 @@ public class AccessTestFork extends TestBase
   public void setTimesheetDao(final TimesheetDao timesheetDao)
   {
     this.timesheetDao = timesheetDao;
-  }
-
-  public void setUserGroupCache(final UserGroupCache userGroupCache)
-  {
-    this.userGroupCache = userGroupCache;
   }
 
   @Test
@@ -107,6 +101,7 @@ public class AccessTestFork extends TestBase
   @Test
   public void checkTaskMoves()
   {
+    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
     // First check initialization:
     final PFUserDO user1 = getUser("user1");
     assertTrue("user1 should be member of group1", userGroupCache.isUserMemberOfGroup(user1.getId(), getGroup("group1").getId()));

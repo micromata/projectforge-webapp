@@ -60,7 +60,6 @@ import org.projectforge.scripting.ScriptDO;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserDao;
 import org.projectforge.user.UserPrefDO;
 import org.projectforge.user.UserPrefEntryDO;
 import org.projectforge.user.UserRightDO;
@@ -504,9 +503,8 @@ public class DatabaseCoreUpdates
         dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "dateFormat"));
         dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "excelDateFormat"));
         dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "timeNotation"));
-        final UserDao userDao = Registry.instance().getDao(UserDao.class);
         dao.createMissingIndices();
-        userDao.getUserGroupCache().setExpired();
+        Registry.instance().getUserGroupCache().setExpired();
         return UpdateRunningStatus.DONE;
       }
     });

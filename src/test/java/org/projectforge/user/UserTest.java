@@ -36,6 +36,7 @@ import java.util.Set;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
+import org.projectforge.registry.Registry;
 import org.projectforge.test.TestBase;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -68,7 +69,8 @@ public class UserTest extends TestBase
     logon(TEST_ADMIN_USER);
     final PFUserDO user = userDao.getInternalByName(TEST_ADMIN_USER);
     assertEquals(user.getUsername(), TEST_ADMIN_USER);
-    final UserGroupCache cache = userDao.getUserGroupCache();
+    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
+    final UserGroupCache cache = userGroupCache;
     final PFUserDO user1 = getUser("user1");
     final String groupnames = cache.getGroupnames(user1.getId());
     assertEquals("Groupnames", "group1; group2", groupnames);
@@ -229,6 +231,7 @@ public class UserTest extends TestBase
     });
   }
 
+  @SuppressWarnings({ "unchecked", "rawtypes"})
   @Test
   public void testUniqueUsernameDO()
   {

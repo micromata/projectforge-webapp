@@ -45,6 +45,7 @@ import org.projectforge.book.BookDao;
 import org.projectforge.fibu.AuftragDO;
 import org.projectforge.fibu.AuftragDao;
 import org.projectforge.plugins.teamcal.TeamCalTestHelper;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.test.PluginTestBase;
@@ -69,8 +70,6 @@ public class InitDatabaseDaoWithTestDataTest extends PluginTestBase
   private BookDao bookDao;
 
   private TaskDao taskDao;
-
-  private UserGroupCache userGroupCache;
 
   @BeforeClass
   public static void setup() throws BeansException, IOException
@@ -108,11 +107,6 @@ public class InitDatabaseDaoWithTestDataTest extends PluginTestBase
     this.bookDao = bookDao;
   }
 
-  public void setUserGroupCache(final UserGroupCache userGroupCache)
-  {
-    this.userGroupCache = userGroupCache;
-  }
-
   @BeforeClass
   public static void setUp() throws Exception
   {
@@ -123,6 +117,7 @@ public class InitDatabaseDaoWithTestDataTest extends PluginTestBase
   @Test
   public void initializeEmptyDatabase()
   {
+    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
     final String testPassword = "demo123";
     userGroupCache.setExpired(); // Force reload (because it's may be expired due to previous tests).
     assertTrue(initDatabaseDao.isEmpty());

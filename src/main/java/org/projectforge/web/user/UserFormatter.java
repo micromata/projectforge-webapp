@@ -23,19 +23,13 @@
 
 package org.projectforge.web.user;
 
+import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.HtmlHelper;
 
 public class UserFormatter
 {
-  private UserGroupCache userGroupCache;
-
-  public void setUserGroupCache(UserGroupCache userGroupCache)
-  {
-    this.userGroupCache = userGroupCache;
-  }
-
   /**
    * Does not escape characters.
    * @param user (must not be initialized, the user will be get from the userGroupCache)
@@ -58,14 +52,15 @@ public class UserFormatter
    */
   public String formatUser(final Integer userId)
   {
-    PFUserDO u = userGroupCache.getUser(userId);
+    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
+    final PFUserDO u = userGroupCache.getUser(userId);
     return u != null ? u.getFullname() : "";
   }
 
   /**
    * Escapes xml characters.
    */
-  public String getFormattedUser(PFUserDO user)
+  public String getFormattedUser(final PFUserDO user)
   {
     if (user == null) {
       return "";
@@ -73,22 +68,24 @@ public class UserFormatter
     return HtmlHelper.escapeXml(user.getFullname());
   }
 
-  public String getFormattedUser(Integer userId)
+  public String getFormattedUser(final Integer userId)
   {
     if (userId == null) {
       return "";
     }
-    PFUserDO user = userGroupCache.getUser(userId);
+    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
+    final PFUserDO user = userGroupCache.getUser(userId);
     return getFormattedUser(user);
   }
 
-  public void appendFormattedUser(StringBuffer buf, Integer userId)
+  public void appendFormattedUser(final StringBuffer buf, final Integer userId)
   {
-    PFUserDO user = userGroupCache.getUser(userId);
+    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
+    final PFUserDO user = userGroupCache.getUser(userId);
     appendFormattedUser(buf, user);
   }
 
-  public void appendFormattedUser(StringBuffer buf, PFUserDO user)
+  public void appendFormattedUser(final StringBuffer buf, final PFUserDO user)
   {
     buf.append(getFormattedUser(user));
   }

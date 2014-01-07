@@ -36,6 +36,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.projectforge.registry.Registry;
 import org.projectforge.test.TestBase;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
@@ -43,6 +44,7 @@ import org.projectforge.user.Login;
 import org.projectforge.user.LoginResult;
 import org.projectforge.user.LoginResultStatus;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserGroupCache;
 import org.springframework.util.CollectionUtils;
 
 // Create
@@ -140,9 +142,10 @@ public class LdapMasterLoginHandlerTest extends TestBase
 
     // Assign users to group
     group.setAssignedUsers(new HashSet<PFUserDO>());
-    group.addUser(userDao.getUserGroupCache().getUser(userId1));
-    group.addUser(userDao.getUserGroupCache().getUser(userId2));
-    group.addUser(userDao.getUserGroupCache().getUser(userId3));
+    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
+    group.addUser(userGroupCache.getUser(userId1));
+    group.addUser(userGroupCache.getUser(userId2));
+    group.addUser(userGroupCache.getUser(userId3));
     groupDao.internalUpdate(group);
     synchronizeLdapUsers(loginHandler);
     ldapGroup = ldapGroupDao.findById(groupId1);
@@ -156,7 +159,7 @@ public class LdapMasterLoginHandlerTest extends TestBase
     PFUserDO user3 = userDao.getById(userId3);
     user3.setUsername("ldapMasterRenamed3");
     userDao.internalUpdate(user3);
-    group = userDao.getUserGroupCache().getGroup(groupId1);
+    group = userGroupCache.getGroup(groupId1);
     group.addUser(userDao.getById(userId4));
     groupDao.internalUpdate(group);
     synchronizeLdapUsers(loginHandler);
@@ -193,14 +196,14 @@ public class LdapMasterLoginHandlerTest extends TestBase
     Assert.assertNotNull(ldapUserDao.authenticate(user1.getUsername(), "newpassword"));
 
     // Delete all groups
-    final Collection<GroupDO> groups = userDao.getUserGroupCache().getAllGroups();
+    final Collection<GroupDO> groups = userGroupCache.getAllGroups();
     for (final GroupDO g : groups) {
       groupDao.internalMarkAsDeleted(g);
     }
     synchronizeLdapUsers(loginHandler);
     Assert.assertEquals("LDAP groups must be empty (all groups are deleted in the PF data-base).", 0,
         ldapGroupDao.findAll(ldapRealTestHelper.ldapConfig.getGroupBase()).size());
-    final Collection<PFUserDO> users = userDao.getUserGroupCache().getAllUsers();
+    final Collection<PFUserDO> users = userGroupCache.getAllUsers();
     for (final PFUserDO user : users) {
       userDao.internalMarkAsDeleted(user);
     }
@@ -263,13 +266,14 @@ public class LdapMasterLoginHandlerTest extends TestBase
 
   private void synchronizeLdapUsers(final LdapMasterLoginHandler loginHandler)
   {
-    userDao.getUserGroupCache().forceReload(); // Synchronize ldap users.
+    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
+    userGroupCache.forceReload(); // Synchronize ldap users.
     while (true) {
       try {
         Thread.sleep(200);
       } catch (final InterruptedException ex) {
       }
-      if (userDao.getUserGroupCache().isRefreshInProgress() == false && loginHandler.isRefreshInProgress() == false) {
+      if (userGroupCache.isRefreshInProgress() == false && loginHandler.isRefreshInProgress() == false) {
         break;
       }
     }

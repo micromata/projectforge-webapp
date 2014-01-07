@@ -38,8 +38,9 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.common.RecentQueue;
 import org.projectforge.core.BaseSearchFilter;
-import org.projectforge.user.ThreadLocalUserContext;
+import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.CSSColor;
 import org.projectforge.web.fibu.ISelectCallerPage;
@@ -158,7 +159,7 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO> implements Co
             // ### FORMAT ###
             final int ind = value.indexOf(" (");
             final String username = ind >= 0 ? value.substring(0, ind) : value;
-            final PFUserDO user = userDao.getUserGroupCache().getUser(username);
+            final PFUserDO user = Registry.instance().getUserGroupCache().getUser(username);
             if (user == null) {
               userTextField.error(getString("user.panel.error.usernameNotFound"));
             }

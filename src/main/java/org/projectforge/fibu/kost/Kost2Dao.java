@@ -52,8 +52,6 @@ public class Kost2Dao extends BaseDao<Kost2DO>
 
   private Kost2ArtDao kost2ArtDao;
 
-  private KostCache kostCache;
-
   public Kost2Dao()
   {
     super(Kost2DO.class);
@@ -70,17 +68,12 @@ public class Kost2Dao extends BaseDao<Kost2DO>
     this.kost2ArtDao = kost2ArtDao;
   }
 
-  public void setKostCache(final KostCache kostCache)
-  {
-    this.kostCache = kostCache;
-  }
-
   /**
    * @return the kostCache
    */
   public KostCache getKostCache()
   {
-    return kostCache;
+    return getTenantRegistry().getKostCache();
   }
 
   @Override
@@ -240,7 +233,7 @@ public class Kost2Dao extends BaseDao<Kost2DO>
   protected void afterSaveOrModify(final Kost2DO kost2)
   {
     super.afterSaveOrModify(kost2);
-    kostCache.updateKost2(kost2);
+    getKostCache().updateKost2(kost2);
   }
 
   @Override

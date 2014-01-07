@@ -203,7 +203,7 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
     if (myFilter.getUserId() != null) {
       final List<GroupTaskAccessDO> result = new ArrayList<GroupTaskAccessDO>();
       for (final GroupTaskAccessDO access : list) {
-        if (userGroupCache.isUserMemberOfGroup(myFilter.getUserId(), access.getGroupId())) {
+        if (getUserGroupCache().isUserMemberOfGroup(myFilter.getUserId(), access.getGroupId())) {
           result.add(access);
         }
       }
@@ -233,7 +233,7 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
     boolean result = accessChecker.isUserMemberOfAdminGroup(user);
     if (result == false && obj.isDeleted() == false) {
       Validate.notNull(user);
-      result = userGroupCache.isUserMemberOfGroup(user.getId(), obj.getGroupId());
+      result = getUserGroupCache().isUserMemberOfGroup(user.getId(), obj.getGroupId());
     }
     if (throwException == true && result == false) {
       throw new AccessException(AccessType.GROUP, OperationType.SELECT);
@@ -292,7 +292,7 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
     }
     final GroupDO group = obj.getGroup();
     if (group != null && Hibernate.isInitialized(group) == false) {
-      obj.setGroup(userGroupCache.getGroup(obj.getGroupId()));
+      obj.setGroup(getUserGroupCache().getGroup(obj.getGroupId()));
     }
   }
 

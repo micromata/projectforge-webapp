@@ -367,7 +367,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
   {
     final PFUserDO user = obj.getUser();
     if (user != null && Hibernate.isInitialized(user) == false) {
-      obj.setUser(userDao.getUserGroupCache().getUser(user.getId()));
+      obj.setUser(getUserGroupCache().getUser(user.getId()));
     }
     final TaskDO task = obj.getTask();
     if (task != null && Hibernate.isInitialized(task) == false) {
@@ -397,7 +397,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
   public Set<Integer> getTimesheetsWithTimeoverlap(final Integer userId)
   {
     Validate.notNull(userId);
-    final PFUserDO user = userGroupCache.getUser(userId);
+    final PFUserDO user = getUserGroupCache().getUser(userId);
     Validate.notNull(user);
     synchronized (timesheetsWithOverlapByUser) {
       if (timesheetsWithOverlapByUser.get(userId) != null) {

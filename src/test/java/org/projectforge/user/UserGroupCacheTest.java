@@ -31,26 +31,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
+import org.projectforge.registry.Registry;
 import org.projectforge.test.TestBase;
 
 public class UserGroupCacheTest extends TestBase
 {
   private GroupDao groupDao;
 
-  private UserGroupCache userGroupCache;
-
   public void setGroupDao(final GroupDao groupDao)
   {
     this.groupDao = groupDao;
-  }
-
-  /**
-   * @param userGroupCache the userGroupCache to set
-   * @return this for chaining.
-   */
-  public void setUserGroupCache(final UserGroupCache userGroupCache)
-  {
-    this.userGroupCache = userGroupCache;
   }
 
   @Test
@@ -73,6 +63,7 @@ public class UserGroupCacheTest extends TestBase
     id = groupDao.save(group2);
     group2 = groupDao.getById(id);
 
+    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
     assertFalse(userGroupCache.isUserMemberOfAtLeastOneGroup(getUser(TEST_ADMIN_USER).getId()));
     assertFalse(userGroupCache.isUserMemberOfAtLeastOneGroup(getUser(TEST_ADMIN_USER).getId(), group1.getId()));
     assertTrue(userGroupCache.isUserMemberOfAtLeastOneGroup(getUser(TEST_ADMIN_USER).getId(), group2.getId()));

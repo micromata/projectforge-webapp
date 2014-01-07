@@ -281,7 +281,7 @@ public class GroupDao extends BaseDao<GroupDO>
     }
     getSession().flush();
     createHistoryEntry(user, unassignedGroups, assignedGroups);
-    userGroupCache.setExpired();
+    getUserGroupCache().setExpired();
       }
 
   private void createHistoryEntry(final PFUserDO user, Collection<GroupDO> unassignedList, Collection<GroupDO> assignedList)
@@ -333,7 +333,7 @@ public class GroupDao extends BaseDao<GroupDO>
   @Override
   protected void afterSaveOrModify(final GroupDO group)
   {
-    userGroupCache.setExpired();
+    getUserGroupCache().setExpired();
   }
 
   /**
@@ -342,7 +342,7 @@ public class GroupDao extends BaseDao<GroupDO>
   @Override
   protected void afterDelete(final GroupDO obj)
   {
-    userGroupCache.setExpired();
+    getUserGroupCache().setExpired();
   }
 
   @Override
@@ -373,7 +373,7 @@ public class GroupDao extends BaseDao<GroupDO>
         || accessChecker.isUserMemberOfGroup(user, ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
     if (result == false && obj.isDeleted() == false) {
       Validate.notNull(user);
-      result = userGroupCache.isUserMemberOfGroup(user.getId(), obj.getId());
+      result = getUserGroupCache().isUserMemberOfGroup(user.getId(), obj.getId());
     }
     if (throwException == true && result == false) {
       throw new AccessException(AccessType.GROUP, OperationType.SELECT);

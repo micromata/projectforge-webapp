@@ -36,26 +36,24 @@ public class Kost2ArtDao extends BaseDao<Kost2ArtDO>
 {
   public static final UserRightId USER_RIGHT_ID = UserRightId.FIBU_COST_UNIT;
 
-  private KostCache kostCache;
-
   public Kost2ArtDao()
   {
     super(Kost2ArtDO.class);
     avoidNullIdCheckBeforeSave = true;
     userRightId = USER_RIGHT_ID;
   }
-  
+
   @Override
-  protected void afterSaveOrModify(Kost2ArtDO obj)
+  protected void afterSaveOrModify(final Kost2ArtDO obj)
   {
     super.afterSaveOrModify(obj);
-    kostCache.updateKost2Arts();
+    getTenantRegistry().getKostCache().updateKost2Arts();
   }
 
   @Override
-  public List<Kost2ArtDO> getList(BaseSearchFilter filter)
+  public List<Kost2ArtDO> getList(final BaseSearchFilter filter)
   {
-    QueryFilter queryFilter = new QueryFilter(filter);
+    final QueryFilter queryFilter = new QueryFilter(filter);
     queryFilter.addOrder(Order.asc("id"));
     return getList(queryFilter);
   }
@@ -65,14 +63,9 @@ public class Kost2ArtDao extends BaseDao<Kost2ArtDO>
    * @see org.projectforge.core.BaseDao#isIdValid(java.lang.Integer)
    */
   @Override
-  protected boolean isIdValid(Integer id)
+  protected boolean isIdValid(final Integer id)
   {
     return (id != null && id >= 0);
-  }
-  
-  public void setKostCache(KostCache kostCache)
-  {
-    this.kostCache = kostCache;
   }
 
   @Override

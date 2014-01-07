@@ -46,8 +46,9 @@ import org.hibernate.search.annotations.Indexed;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.ModificationStatus;
 import org.projectforge.multitenancy.TenantDO;
+import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserRights;
+import org.projectforge.user.UserGroupCache;
 
 import de.micromata.hibernate.history.ExtendedHistorizable;
 
@@ -317,7 +318,8 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
   public String toString()
   {
     if (this.getUserId() != null) {
-      final PFUserDO user = UserRights.getUserGroupCache().getUser(getUserId());
+      final UserGroupCache userGroupCache = TenantRegistryMap.getInstance().getTenantRegistry().getUserGroupCache();
+      final PFUserDO user = userGroupCache.getUser(getUserId());
       if (user != null) {
         return user.getFullname() + " (id=" + getUserId() + ")";
       } else {

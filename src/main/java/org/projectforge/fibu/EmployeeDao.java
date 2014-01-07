@@ -161,7 +161,7 @@ public class EmployeeDao extends BaseDao<EmployeeDO>
   protected void afterSaveOrModify(final EmployeeDO employee)
   {
     super.afterSaveOrModify(employee);
-    userGroupCache.refreshEmployee(employee.getUserId());
+    getUserGroupCache().refreshEmployee(employee.getUserId());
   }
 
   public void setUserDao(final UserDao userDao)

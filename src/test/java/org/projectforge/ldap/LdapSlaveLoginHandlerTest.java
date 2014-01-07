@@ -31,6 +31,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.projectforge.registry.Registry;
 import org.projectforge.test.TestBase;
 import org.projectforge.user.Login;
 import org.projectforge.user.LoginHandler;
@@ -38,6 +39,7 @@ import org.projectforge.user.LoginResult;
 import org.projectforge.user.LoginResultStatus;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.PasswordCheckResult;
+import org.projectforge.user.UserGroupCache;
 
 public class LdapSlaveLoginHandlerTest extends TestBase
 {
@@ -119,7 +121,8 @@ public class LdapSlaveLoginHandlerTest extends TestBase
   private void testSimpleMode(final LoginHandler loginHandler, final String testUsername)
   {
     logon(TEST_ADMIN_USER);
-    Assert.assertNull("If failed, a previous test run didn't cleared the data-base.", userDao.getUserGroupCache().getUser(testUsername));
+    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
+    Assert.assertNull("If failed, a previous test run didn't cleared the data-base.", userGroupCache.getUser(testUsername));
 
     // Check failed login:
     LoginResult result = loginHandler.checkLogin(testUsername, "fail");
@@ -200,6 +203,7 @@ public class LdapSlaveLoginHandlerTest extends TestBase
       return;
     }
     final LdapSlaveLoginHandler loginHandler = createLoginHandler();
+    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
     loginHandler.setMode(LdapSlaveLoginHandler.Mode.USERS);
     final String testUsername1 = "ldapSlaveTestuserUserMode1";
     final String testUsername2 = "ldapSlaveTestuserUserMode2";
@@ -211,8 +215,8 @@ public class LdapSlaveLoginHandlerTest extends TestBase
     createLdapUser(ldapUser2, "successful");
 
     logon(TEST_ADMIN_USER);
-    Assert.assertNull("If failed, a previous test run didn't cleared the data-base.", userDao.getUserGroupCache().getUser(testUsername1));
-    Assert.assertNull("If failed, a previous test run didn't cleared the data-base.", userDao.getUserGroupCache().getUser(testUsername2));
+    Assert.assertNull("If failed, a previous test run didn't cleared the data-base.", userGroupCache.getUser(testUsername1));
+    Assert.assertNull("If failed, a previous test run didn't cleared the data-base.", userGroupCache.getUser(testUsername2));
 
     // Check failed login:
     LoginResult result = loginHandler.checkLogin(testUsername1, "fail");
@@ -263,13 +267,14 @@ public class LdapSlaveLoginHandlerTest extends TestBase
 
   private void synchronizeLdapUsers(final LdapSlaveLoginHandler loginHandler)
   {
-    userDao.getUserGroupCache().forceReload(); // Synchronize ldap users.
+    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
+    userGroupCache.forceReload(); // Synchronize ldap users.
     while (true) {
       try {
         Thread.sleep(200);
       } catch (final InterruptedException ex) {
       }
-      if (userDao.getUserGroupCache().isRefreshInProgress() == false && loginHandler.isRefreshInProgress() == false) {
+      if (userGroupCache.isRefreshInProgress() == false && loginHandler.isRefreshInProgress() == false) {
         break;
       }
     }

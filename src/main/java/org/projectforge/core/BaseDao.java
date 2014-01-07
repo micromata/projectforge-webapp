@@ -71,6 +71,8 @@ import org.projectforge.lucene.ClassicAnalyzer;
 import org.projectforge.multitenancy.TenantChecker;
 import org.projectforge.multitenancy.TenantDO;
 import org.projectforge.multitenancy.TenantDao;
+import org.projectforge.multitenancy.TenantRegistry;
+import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ThreadLocalUserContext;
@@ -147,8 +149,6 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   protected AccessChecker accessChecker;
 
   protected DatabaseDao databaseDao;
-
-  protected UserGroupCache userGroupCache;
 
   protected HistoryAdapter historyAdapter;
 
@@ -258,11 +258,6 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   public void setDatabaseDao(final DatabaseDao databaseDao)
   {
     this.databaseDao = databaseDao;
-  }
-
-  public void setUserGroupCache(final UserGroupCache userGroupCache)
-  {
-    this.userGroupCache = userGroupCache;
   }
 
   public void setHistoryAdapter(final HistoryAdapter historyAdapter)
@@ -777,11 +772,11 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     final List<DisplayHistoryEntry> result = new ArrayList<DisplayHistoryEntry>();
     final List<PropertyDelta> delta = entry.getDelta();
     if (delta == null || delta.size() == 0) {
-      final DisplayHistoryEntry se = new DisplayHistoryEntry(userGroupCache, entry);
+      final DisplayHistoryEntry se = new DisplayHistoryEntry(getUserGroupCache(), entry);
       result.add(se);
     } else {
       for (final PropertyDelta prop : delta) {
-        final DisplayHistoryEntry se = new DisplayHistoryEntry(userGroupCache, entry, prop, session);
+        final DisplayHistoryEntry se = new DisplayHistoryEntry(getUserGroupCache(), entry, prop, session);
         result.add(se);
       }
     }
@@ -808,11 +803,11 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
         for (final HistoryEntry entry : entries) {
           final List<PropertyDelta> delta = entry.getDelta();
           if (delta == null || delta.size() == 0) {
-            final SimpleHistoryEntry se = new SimpleHistoryEntry(userGroupCache, entry);
+            final SimpleHistoryEntry se = new SimpleHistoryEntry(getUserGroupCache(), entry);
             list.add(se);
           } else {
             for (final PropertyDelta prop : delta) {
-              final SimpleHistoryEntry se = new SimpleHistoryEntry(userGroupCache, entry, prop);
+              final SimpleHistoryEntry se = new SimpleHistoryEntry(getUserGroupCache(), entry, prop);
               list.add(se);
             }
           }
@@ -1839,6 +1834,16 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   public Class< ? > getDataObjectType()
   {
     return clazz;
+  }
+
+  public TenantRegistry getTenantRegistry()
+  {
+    return TenantRegistryMap.getInstance().getTenantRegistry();
+  }
+
+  public UserGroupCache getUserGroupCache()
+  {
+    return getTenantRegistry().getUserGroupCache();
   }
 
   /**

@@ -43,6 +43,7 @@ import org.projectforge.common.DateHolder;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.KundeDao;
 import org.projectforge.fibu.ProjektDO;
+import org.projectforge.registry.Registry;
 import org.projectforge.test.TestBase;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
@@ -63,28 +64,21 @@ public class HRPlanningTest extends TestBase
 
   private KundeDao kundeDao;
 
-  private UserGroupCache userGroupCache;
-
   private static boolean initialized;
 
-  public void setGroupDao(GroupDao groupDao)
+  public void setGroupDao(final GroupDao groupDao)
   {
     this.groupDao = groupDao;
   }
 
-  public void setHrPlanningDao(HRPlanningDao hrPlanningDao)
+  public void setHrPlanningDao(final HRPlanningDao hrPlanningDao)
   {
     this.hrPlanningDao = hrPlanningDao;
   }
 
-  public void setKundeDao(KundeDao kundeDao)
+  public void setKundeDao(final KundeDao kundeDao)
   {
     this.kundeDao = kundeDao;
-  }
-
-  public void setUserGroupCache(UserGroupCache userGroupCache)
-  {
-    this.userGroupCache = userGroupCache;
   }
 
   @Before
@@ -106,6 +100,7 @@ public class HRPlanningTest extends TestBase
   @Test
   public void testUserRights()
   {
+    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
     PFUserDO user1 = initTestDB.addUser("HRPlanningTestUser1");
     final HRPlanningRight right = (HRPlanningRight) UserRights.instance().getRight(UserRightId.PM_HR_PLANNING);
     assertFalse(right.isAvailable(userGroupCache, user1));
@@ -115,11 +110,11 @@ public class HRPlanningTest extends TestBase
     try {
       hrPlanningDao.hasLoggedInUserAccess(planning, null, OperationType.SELECT, true);
       fail("AccessException excepted.");
-    } catch (AccessException ex) {
+    } catch (final AccessException ex) {
       // OK
     }
     logon(TestBase.TEST_ADMIN_USER);
-    GroupDO group = initTestDB.getGroup(ORGA_GROUP);
+    final GroupDO group = initTestDB.getGroup(ORGA_GROUP);
     group.getAssignedUsers().add(user1);
     groupDao.update(group);
     assertTrue(right.isAvailable(userGroupCache, user1));
@@ -196,7 +191,7 @@ public class HRPlanningTest extends TestBase
     setHours(entry, 6, 5, 4, 3, 2, 1);
     entry.setProjekt(projekt2);
     planning.addEntry(entry);
-    Serializable id = hrPlanningDao.save(planning);
+    final Serializable id = hrPlanningDao.save(planning);
     // Check saved planning
     planning = hrPlanningDao.getById(id);
     assertUTCDate(planning.getWeek(), 2010, Calendar.JANUARY, 11, 0, 0, 0);
@@ -239,9 +234,9 @@ public class HRPlanningTest extends TestBase
     assertBigDecimal(weekend, entry.getWeekendHours());
   }
 
-  private java.sql.Date createDate(int year, int month, int day, int hour, int minute, int second, int millisecond)
+  private java.sql.Date createDate(final int year, final int month, final int day, final int hour, final int minute, final int second, final int millisecond)
   {
-    Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.GERMAN);
+    final Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.GERMAN);
     cal.set(Calendar.YEAR, year);
     cal.set(Calendar.MONTH, month);
     cal.set(Calendar.DAY_OF_MONTH, day);

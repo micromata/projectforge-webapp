@@ -79,8 +79,6 @@ public class InitDatabaseDao extends HibernateDaoSupport
 
   private HibernateSearchReindexer hibernateSearchReindexer;
 
-  private UserGroupCache userGroupCache;
-
   private GroupDao groupDao;
 
   private XmlDump xmlDump;
@@ -113,11 +111,6 @@ public class InitDatabaseDao extends HibernateDaoSupport
   public void setUserDao(final UserDao userDao)
   {
     this.userDao = userDao;
-  }
-
-  public void setUserGroupCache(final UserGroupCache userGroupCache)
-  {
-    this.userGroupCache = userGroupCache;
   }
 
   public void setGroupDao(final GroupDao groupDao)
@@ -182,7 +175,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
     internalCreateProjectForgeGroups(null, adminUser);
 
     Registry.instance().getTaskTree().setExpired();
-    userGroupCache.setExpired();
+    Registry.instance().getUserGroupCache().setExpired();
 
     log.fatal("Empty database successfully initialized.");
     return adminUser;
@@ -282,13 +275,14 @@ public class InitDatabaseDao extends HibernateDaoSupport
       }
     }.start();
     taskTree.setExpired();
-    userGroupCache.setExpired();
+    Registry.instance().getUserGroupCache().setExpired();
     return user;
   }
 
   public boolean isEmpty()
   {
     try {
+      final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
       if (userGroupCache.internalGetNumberOfUsers() == 0) {
         final Table userTable = new Table(PFUserDO.class);
         final MyDatabaseUpdateDao databaseUpdateDao = myDatabaseUpdater.getDatabaseUpdateDao();

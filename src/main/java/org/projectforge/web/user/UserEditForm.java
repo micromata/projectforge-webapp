@@ -69,6 +69,7 @@ import org.projectforge.user.Login;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserDao;
+import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserRight;
 import org.projectforge.user.UserRightDao;
 import org.projectforge.user.UserRightVO;
@@ -787,8 +788,9 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     boolean odd = true;
     for (final UserRightVO rightVO : userRights) {
       final UserRight right = rightVO.getRight();
-      final UserRightValue[] availableValues = right.getAvailableValues(((UserDao) getBaseDao()).getUserGroupCache(), data);
-      if (right.isConfigurable(((UserDao) getBaseDao()).getUserGroupCache(), data) == false) {
+      final UserGroupCache userGroupCache = getTenantRegistry().getUserGroupCache();
+      final UserRightValue[] availableValues = right.getAvailableValues(userGroupCache, data);
+      if (right.isConfigurable(userGroupCache, data) == false) {
         continue;
       }
       if (first == true) {

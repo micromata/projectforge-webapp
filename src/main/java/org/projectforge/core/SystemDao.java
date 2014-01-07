@@ -32,12 +32,10 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.projectforge.database.HibernateUtils;
 import org.projectforge.database.SchemaExport;
-import org.projectforge.fibu.KontoCache;
-import org.projectforge.fibu.RechnungCache;
-import org.projectforge.fibu.kost.KostCache;
+import org.projectforge.multitenancy.TenantRegistry;
+import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
-import org.projectforge.user.UserGroupCache;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,14 +51,6 @@ public class SystemDao extends HibernateDaoSupport
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SystemDao.class);
 
   private TaskDao taskDao;
-
-  private UserGroupCache userGroupCache;
-
-  private KontoCache kontoCache;
-
-  private KostCache kostCache;
-
-  private RechnungCache rechnungCache;
 
   private SystemInfoCache systemInfoCache;
 
@@ -152,11 +142,12 @@ public class SystemDao extends HibernateDaoSupport
    */
   public String refreshCaches()
   {
-    userGroupCache.forceReload();
-    taskDao.getTaskTree().forceReload();
-    kontoCache.forceReload();
-    kostCache.forceReload();
-    rechnungCache.forceReload();
+    final TenantRegistry tenantRegistry = TenantRegistryMap.getInstance().getTenantRegistry();
+    tenantRegistry.getUserGroupCache().forceReload();
+    tenantRegistry.getTaskTree().forceReload();
+    tenantRegistry.getKontoCache().forceReload();
+    tenantRegistry.getKostCache().forceReload();
+    tenantRegistry.getInvoicCache().forceReload();
     systemInfoCache.forceReload();
     return "UserGroupCache, TaskTree, KontoCache, KostCache, RechnungCache, SystemInfoCache";
   }
@@ -164,26 +155,6 @@ public class SystemDao extends HibernateDaoSupport
   public void setTaskDao(final TaskDao taskDao)
   {
     this.taskDao = taskDao;
-  }
-
-  public void setUserGroupCache(final UserGroupCache userGroupCache)
-  {
-    this.userGroupCache = userGroupCache;
-  }
-
-  public void setKontoCache(final KontoCache kontoCache)
-  {
-    this.kontoCache = kontoCache;
-  }
-
-  public void setKostCache(final KostCache kostCache)
-  {
-    this.kostCache = kostCache;
-  }
-
-  public void setRechnungCache(final RechnungCache rechnungCache)
-  {
-    this.rechnungCache = rechnungCache;
   }
 
   public void setSystemInfoCache(final SystemInfoCache systemInfoCache)

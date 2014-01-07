@@ -26,10 +26,12 @@ package org.projectforge.gantt;
 import org.projectforge.access.AccessType;
 import org.projectforge.access.OperationType;
 import org.projectforge.fibu.ProjektDO;
+import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
+import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserRightAccessCheck;
 import org.projectforge.user.UserRightCategory;
 import org.projectforge.user.UserRightId;
@@ -128,7 +130,8 @@ public class GanttChartRight extends UserRightAccessCheck<GanttChartDO>
         return UserRights.getAccessChecker().isUserMemberOfGroup(user, ProjectForgeGroup.PROJECT_MANAGER);
       }
       // Users of the project manager group have access:
-      return UserRights.getAccessChecker().getUserGroupCache().isUserMemberOfGroup(user, project.getProjektManagerGroupId());
+      final UserGroupCache userGroupCache = TenantRegistryMap.getInstance().getTenantRegistry().getUserGroupCache();
+      return userGroupCache.isUserMemberOfGroup(user, project.getProjektManagerGroupId());
     } else {
       log.error("Unsupported GanttAccess type: " + access);
     }

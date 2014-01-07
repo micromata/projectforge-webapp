@@ -80,8 +80,6 @@ public class RechnungDao extends BaseDao<RechnungDO>
 
   private ProjektDao projektDao;
 
-  private RechnungCache rechnungCache;
-
   public static BigDecimal getNettoSumme(final Collection<RechnungsPositionVO> col)
   {
     BigDecimal nettoSumme = BigDecimal.ZERO;
@@ -123,17 +121,12 @@ public class RechnungDao extends BaseDao<RechnungDO>
     this.projektDao = projektDao;
   }
 
-  public void setRechnungCache(final RechnungCache rechnungCache)
-  {
-    this.rechnungCache = rechnungCache;
-  }
-
   /**
    * @return the rechnungCache
    */
   public RechnungCache getRechnungCache()
   {
-    return rechnungCache;
+    return getTenantRegistry().getInvoicCache();
   }
 
   public RechnungDao()
@@ -264,7 +257,7 @@ public class RechnungDao extends BaseDao<RechnungDO>
   @Override
   protected void afterSaveOrModify(final RechnungDO obj)
   {
-    rechnungCache.setExpired(); // Expire the cache because assignments to order position may be changed.
+    getRechnungCache().setExpired(); // Expire the cache because assignments to order position may be changed.
   }
 
   /**

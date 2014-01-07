@@ -53,8 +53,6 @@ public class Kost1Dao extends BaseDao<Kost1DO>
     return ADDITIONAL_SEARCH_FIELDS;
   }
 
-  private KostCache kostCache;
-
   public Kost1Dao()
   {
     super(Kost1DO.class);
@@ -79,7 +77,7 @@ public class Kost1Dao extends BaseDao<Kost1DO>
     if (hasLoggedInUserSelectAccess(kost1, false) == true) {
       return KostFormatter.format(kost1);
     } else {
-      final EmployeeDO employee = userGroupCache.getEmployee(ThreadLocalUserContext.getUserId());
+      final EmployeeDO employee = getUserGroupCache().getEmployee(ThreadLocalUserContext.getUserId());
       if (employee != null && employee.getKost1Id() != null && employee.getKost1Id().compareTo(id) == 0) {
         kost1.setDescription(""); // Paranoia (if KostFormatter shows description in future times and Kost1DO is not visible for the user).
         return KostFormatter.format(kost1);
@@ -164,17 +162,12 @@ public class Kost1Dao extends BaseDao<Kost1DO>
   protected void afterSaveOrModify(final Kost1DO kost1)
   {
     super.afterSaveOrModify(kost1);
-    kostCache.updateKost1(kost1);
+    getTenantRegistry().getKostCache().updateKost1(kost1);
   }
 
   @Override
   public Kost1DO newInstance()
   {
     return new Kost1DO();
-  }
-
-  public void setKostCache(final KostCache kostCache)
-  {
-    this.kostCache = kostCache;
   }
 }

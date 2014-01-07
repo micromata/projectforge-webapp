@@ -35,7 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.fibu.KostFormatter;
 import org.projectforge.fibu.kost.Kost2DO;
-import org.projectforge.fibu.kost.KostCache;
+import org.projectforge.registry.Registry;
 import org.projectforge.renderer.CellHolder;
 import org.projectforge.renderer.RenderType;
 import org.projectforge.renderer.RowHolder;
@@ -61,8 +61,6 @@ public class MicromataFormatter extends Formatter
 
   private DateTimeFormatter dateTimeFormatter;
 
-  private KostCache kostCache;
-
   private HtmlHelper htmlHelper;
 
   @Override
@@ -82,7 +80,7 @@ public class MicromataFormatter extends Formatter
     for (final TimesheetDO timesheet : timeSheets) {
       final RowHolder row = new RowHolder();
       if (actionFilter.getUserId() != null) {
-        final Kost2DO kost2 = kostCache.getKost2(timesheet.getKost2Id());
+        final Kost2DO kost2 = Registry.instance().getKostCache().getKost2(timesheet.getKost2Id());
         if (kost2 != null) {
           row.addCell(new CellHolder(KostFormatter.format(kost2)));
         } else {
@@ -186,10 +184,5 @@ public class MicromataFormatter extends Formatter
   public void setHtmlHelper(final HtmlHelper htmlHelper)
   {
     this.htmlHelper = htmlHelper;
-  }
-
-  public void setKostCache(final KostCache kostCache)
-  {
-    this.kostCache = kostCache;
   }
 }

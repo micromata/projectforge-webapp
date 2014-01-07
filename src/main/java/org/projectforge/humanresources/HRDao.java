@@ -62,8 +62,6 @@ public class HRDao extends HibernateDaoSupport implements IDao<HRViewData>
 
   private HRPlanningDao hrPlanningDao;
 
-  private UserGroupCache userGroupCache;
-
   private UserDao userDao;
 
   /**
@@ -89,6 +87,7 @@ public class HRDao extends HibernateDaoSupport implements IDao<HRViewData>
       tsFilter.setStartTime(filter.getStartTime());
       tsFilter.setStopTime(filter.getStopTime());
       final List<TimesheetDO> sheets = timesheetDao.getList(tsFilter);
+      final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
       for (final TimesheetDO sheet : sheets) {
         final PFUserDO user = userGroupCache.getUser(sheet.getUserId());
         if (user == null) {
@@ -97,7 +96,7 @@ public class HRDao extends HibernateDaoSupport implements IDao<HRViewData>
         }
         final TaskTree taskTree = Registry.instance().getTaskTree();
         final ProjektDO projekt = taskTree.getProjekt(sheet.getTaskId());
-        final Object targetObject = getTargetObject(filter, projekt);
+        final Object targetObject = getTargetObject(userGroupCache, filter, projekt);
         if (targetObject == null) {
           data.addTimesheet(sheet, user);
         } else if (targetObject instanceof ProjektDO) {
@@ -117,6 +116,7 @@ public class HRDao extends HibernateDaoSupport implements IDao<HRViewData>
       date.setDate(filter.getStopTime());
       hrFilter.setStopTime(date.getSQLDate()); // Considers the user's time zone.
       final List<HRPlanningDO> plannings = hrPlanningDao.getList(hrFilter);
+      final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
       for (final HRPlanningDO planning : plannings) {
         if (planning.getEntries() == null) {
           continue;
@@ -127,7 +127,7 @@ public class HRDao extends HibernateDaoSupport implements IDao<HRViewData>
           }
           final PFUserDO user = userGroupCache.getUser(planning.getUserId());
           final ProjektDO projekt = entry.getProjekt();
-          final Object targetObject = getTargetObject(filter, projekt);
+          final Object targetObject = getTargetObject(userGroupCache, filter, projekt);
           if (targetObject == null) {
             data.addHRPlanningEntry(entry, user);
           } else if (targetObject instanceof ProjektDO) {
@@ -195,14 +195,14 @@ public class HRDao extends HibernateDaoSupport implements IDao<HRViewData>
    * @param projekt
    * @return
    */
-  private Object getTargetObject(final HRFilter filter, final ProjektDO projekt)
+  private Object getTargetObject(final UserGroupCache userGroupCache, final HRFilter filter, final ProjektDO projekt)
   {
     if (projekt == null) {
       return null;
     }
     final KundeDO kunde = projekt.getKunde();
     if (filter.isOnlyMyProjects() == true) {
-      if (isMyProject(projekt) == true) {
+      if (isMyProject(userGroupCache, projekt) == true) {
         if (filter.isAllProjectsGroupedByCustomer() == true) {
           return kunde;
         } else {
@@ -214,7 +214,7 @@ public class HRDao extends HibernateDaoSupport implements IDao<HRViewData>
     } else if (filter.isAllProjectsGroupedByCustomer() == true) {
       return kunde;
     } else if (filter.isOtherProjectsGroupedByCustomer() == true) {
-      if (isMyProject(projekt) == true) {
+      if (isMyProject(userGroupCache, projekt) == true) {
         return projekt;
       } else {
         return kunde;
@@ -225,7 +225,7 @@ public class HRDao extends HibernateDaoSupport implements IDao<HRViewData>
     }
   }
 
-  private boolean isMyProject(final ProjektDO projekt)
+  private boolean isMyProject(final UserGroupCache userGroupCache, final ProjektDO projekt)
   {
     return (projekt != null && projekt.getProjektManagerGroup() != null && userGroupCache.isLoggedInUserMemberOfGroup(projekt
         .getProjektManagerGroupId()) == true);
@@ -239,11 +239,6 @@ public class HRDao extends HibernateDaoSupport implements IDao<HRViewData>
   public void setHrPlanningDao(final HRPlanningDao hrPlanningDao)
   {
     this.hrPlanningDao = hrPlanningDao;
-  }
-
-  public void setUserGroupCache(final UserGroupCache userGroupCache)
-  {
-    this.userGroupCache = userGroupCache;
   }
 
   public void setUserDao(final UserDao userDao)

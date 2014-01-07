@@ -237,7 +237,6 @@ public class DaoRegistry
     register(TENANT, TenantDao.class, tenantDao, "tenant");
     Registry.instance().setTenantsCache(tenantsCache);
     register(USER, UserDao.class, userDao, "user");
-    Registry.instance().setUserGroupCache(userDao.getUserGroupCache());
     register(GROUP, GroupDao.class, groupDao, "group");
     register(TASK, TaskDao.class, taskDao, "task"); // needs PFUserDO
     register(ACCESS, AccessDao.class, accessDao, "access").setNestedDOClasses(AccessEntryDO.class);
@@ -253,7 +252,6 @@ public class DaoRegistry
     register(COST1, Kost1Dao.class, kost1Dao, "fibu.kost1").setScriptingDao(new Kost1ScriptingDao(kost1Dao));
     register(COST2_Type, Kost2ArtDao.class, kost2ArtDao, "fibu.kost2art");
     register(COST2, Kost2Dao.class, kost2Dao, "fibu.kost2"); // Needs kost2Art and project
-    Registry.instance().setKostCache(kost2Dao.getKostCache());
     register(COST_ASSIGNMENT, KostZuweisungDao.class, kostZuweisungDao, "fibu.") // Needs kost, invoices, employee salaries
     .setFullTextSearchSupport(false).setSearchable(false);
 
@@ -261,13 +259,11 @@ public class DaoRegistry
     .setNestedDOClasses(AuftragsPositionDO.class);
     register(OUTGOING_INVOICE, RechnungDao.class, rechnungDao, "fibu.rechnung") // Needs customer, project
     .setNestedDOClasses(RechnungsPositionDO.class);
-    Registry.instance().setInvoiceCache(rechnungDao.getRechnungCache());
     register(INCOMING_INVOICE, EingangsrechnungDao.class, eingangsrechnungDao, "fibu.eingangsrechnung") //
     .setNestedDOClasses(EingangsrechnungsPositionDO.class);
     register(ACCOUNTING_RECORD, BuchungssatzDao.class, buchungssatzDao, "fibu.buchungssatz").setSearchable(false); // Need account, cost1
     // and cost2.
     register(ACCOUNT, KontoDao.class, kontoDao, "fibu.konto");
-    Registry.instance().setKontoCache(kontoDao.getKontoCache());
     register(EMPLOYEE, EmployeeDao.class, employeeDao, "fibu.employee").setScriptingDao(new EmployeeScriptingDao(employeeDao));
     register(EMPLOYEE_SALARY, EmployeeDao.class, employeeSalaryDao, "fibu.employee.salary").setSearchable(false);
 

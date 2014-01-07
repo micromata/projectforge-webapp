@@ -36,12 +36,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.MDC;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.registry.Registry;
 import org.projectforge.rest.Authentication;
 import org.projectforge.rest.ConnectionSettings;
 import org.projectforge.rest.converter.DateTimeFormat;
 import org.projectforge.user.LoginProtection;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.wicket.ClientIpResolver;
@@ -107,7 +108,7 @@ public class RestUserFilter implements Filter
         final String authenticationToken = getAttribute(req, Authentication.AUTHENTICATION_TOKEN);
         if (authenticationToken != null) {
           if (authenticationToken.equals(userDao.getCachedAuthenticationToken(userId)) == true) {
-            user = userDao.getUserGroupCache().getUser(userId);
+            user = Registry.instance().getUserGroupCache().getUser(userId);
           } else {
             log.error(Authentication.AUTHENTICATION_TOKEN
                 + " doesn't match for "

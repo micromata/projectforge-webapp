@@ -28,6 +28,7 @@ import java.util.List;
 import org.apache.commons.lang.Validate;
 import org.hibernate.Query;
 import org.projectforge.access.AccessChecker;
+import org.projectforge.registry.Registry;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,8 +45,6 @@ public class UserXmlPreferencesMigrationDao extends HibernateDaoSupport
 
   private AccessChecker accessChecker;
 
-  private UserGroupCache userGroupCache;
-
   private UserXmlPreferencesDao userXmlPreferencesDao;
 
   private UserXmlPreferencesCache userXmlPreferencesCache;
@@ -53,11 +52,6 @@ public class UserXmlPreferencesMigrationDao extends HibernateDaoSupport
   public void setAccessChecker(final AccessChecker accessChecker)
   {
     this.accessChecker = accessChecker;
-  }
-
-  public void setUserGroupCache(final UserGroupCache userGroupCache)
-  {
-    this.userGroupCache = userGroupCache;
   }
 
   public void setUserXmlPreferencesCache(final UserXmlPreferencesCache userXmlPreferencesCache)
@@ -122,6 +116,7 @@ public class UserXmlPreferencesMigrationDao extends HibernateDaoSupport
     Validate.notNull(userId);
     final StringBuffer buf = new StringBuffer();
     buf.append("Checking user preferences for user '");
+    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
     final PFUserDO user = userGroupCache.getUser(userPrefs.getUserId());
     if (user != null) {
       buf.append(user.getUsername());

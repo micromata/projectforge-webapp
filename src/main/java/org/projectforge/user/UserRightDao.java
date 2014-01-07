@@ -56,6 +56,7 @@ public class UserRightDao extends BaseDao<UserRightDO>
   public void updateUserRights(final PFUserDO user, final List<UserRightVO> list)
   {
     final List<UserRightDO> dbList = getList(user);
+    final UserGroupCache userGroupCache = getUserGroupCache();
     for (final UserRightVO rightVO : list) {
       UserRightDO rightDO = null;
       for (final UserRightDO dbItem : dbList) {
@@ -115,6 +116,7 @@ public class UserRightDao extends BaseDao<UserRightDO>
       return list;
     }
     final List<UserRightDO> dbList = getList(user);
+    final UserGroupCache userGroupCache = getUserGroupCache();
     for (final UserRight right : UserRights.instance().getOrderedRights()) {
       if (right.isAvailable(userGroupCache, user) == false) {
         continue;
@@ -131,7 +133,7 @@ public class UserRightDao extends BaseDao<UserRightDO>
   }
 
   @Override
-  public List<UserRightDO> getList(BaseSearchFilter filter)
+  public List<UserRightDO> getList(final BaseSearchFilter filter)
   {
     final QueryFilter queryFilter = new QueryFilter(filter);
     final UserRightFilter myFilter = (UserRightFilter) filter;
@@ -140,7 +142,7 @@ public class UserRightDao extends BaseDao<UserRightDO>
     }
     queryFilter.createAlias("user", "u");
     queryFilter.addOrder(Order.asc("u.username")).addOrder(Order.asc("rightIdString"));
-    List<UserRightDO> list = getList(queryFilter);
+    final List<UserRightDO> list = getList(queryFilter);
     return list;
   }
 

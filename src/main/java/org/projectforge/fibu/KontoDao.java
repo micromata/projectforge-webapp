@@ -33,8 +33,6 @@ public class KontoDao extends BaseDao<KontoDO>
 {
   public static final UserRightId USER_RIGHT_ID = UserRightId.FIBU_ACCOUNTS;
 
-  private KontoCache kontoCache;
-
   public KontoDao()
   {
     super(KontoDO.class);
@@ -47,7 +45,7 @@ public class KontoDao extends BaseDao<KontoDO>
   @Override
   protected void afterSaveOrModify(final KontoDO obj)
   {
-    kontoCache.refresh();
+    getKontoCache().refresh();
   }
 
   @SuppressWarnings("unchecked")
@@ -74,15 +72,6 @@ public class KontoDao extends BaseDao<KontoDO>
    */
   public KontoCache getKontoCache()
   {
-    return kontoCache;
-  }
-
-  /**
-   * @param kontoCache the kontoCache to set
-   * @return this for chaining.
-   */
-  public void setKontoCache(final KontoCache kontoCache)
-  {
-    this.kontoCache = kontoCache;
+    return getTenantRegistry().getKontoCache();
   }
 }

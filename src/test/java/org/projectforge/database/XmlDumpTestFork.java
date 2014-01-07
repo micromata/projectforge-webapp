@@ -40,18 +40,11 @@ public class XmlDumpTestFork extends TestBase
 
   private InitDatabaseDao initDatabaseDao;
 
-  private UserGroupCache userGroupCache;
-
   private XmlDump xmlDump;
 
   public void setInitDatabaseDao(final InitDatabaseDao initDatabaseDao)
   {
     this.initDatabaseDao = initDatabaseDao;
-  }
-
-  public void setUserGroupCache(final UserGroupCache userGroupCache)
-  {
-    this.userGroupCache = userGroupCache;
   }
 
   public void setXmlDump(final XmlDump xmlDump)
@@ -69,6 +62,7 @@ public class XmlDumpTestFork extends TestBase
   @Test
   public void verifyDump()
   {
+    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
     userGroupCache.setExpired(); // Force reload (because it's may be expired due to previous tests).
     assertTrue(initDatabaseDao.isEmpty());
     final XStreamSavingConverter converter = xmlDump

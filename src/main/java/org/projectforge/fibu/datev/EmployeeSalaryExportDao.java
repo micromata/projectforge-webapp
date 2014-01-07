@@ -60,8 +60,9 @@ import org.projectforge.fibu.MonthlyEmployeeReportDao;
 import org.projectforge.fibu.MonthlyEmployeeReportEntry;
 import org.projectforge.fibu.kost.Kost1DO;
 import org.projectforge.fibu.kost.Kost2DO;
-import org.projectforge.user.ThreadLocalUserContext;
+import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserGroupCache;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Propagation;
@@ -118,8 +119,6 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(EmployeeSalaryExportDao.class);
 
   private MonthlyEmployeeReportDao monthlyEmployeeReportDao;
-
-  private UserGroupCache userGroupCache;
 
   private EmployeeDao employeeDao;
 
@@ -258,6 +257,7 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
       headRow.addCell(i++, title);
     }
 
+    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
     for (final EmployeeSalaryDO salary : list) {
       final PropertyMapping mapping = new PropertyMapping();
       final PFUserDO user = userGroupCache.getUser(salary.getEmployee().getUserId());
@@ -332,6 +332,7 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
   private void addEmployeeRow(final ExportSheet sheet, final EmployeeDO employee, final BigDecimal numberOfWorkingDays,
       final BigDecimal totalDuration)
   {
+    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
     final PFUserDO user = userGroupCache.getUser(employee.getUserId());
     final ExportRow row = sheet.addRow();
     row.addCell(0, user.getFullname());
@@ -355,11 +356,6 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
   public void setMonthlyEmployeeReportDao(final MonthlyEmployeeReportDao monthlyEmployeeReportDao)
   {
     this.monthlyEmployeeReportDao = monthlyEmployeeReportDao;
-  }
-
-  public void setUserGroupCache(final UserGroupCache userGroupCache)
-  {
-    this.userGroupCache = userGroupCache;
   }
 
   public void setEmployeeDao(final EmployeeDao employeeDao)

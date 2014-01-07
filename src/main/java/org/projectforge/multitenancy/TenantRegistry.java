@@ -54,7 +54,13 @@ public class TenantRegistry
 
   private Configuration configuration;
 
-  private HibernateTemplate hibernateTemplate;
+  private final HibernateTemplate hibernateTemplate;
+
+  private RechnungCache invoiceCache;
+
+  private KontoCache kontoCache;
+
+  private KostCache kostCache;
 
   private TaskTree taskTree;
 
@@ -65,6 +71,7 @@ public class TenantRegistry
   public TenantRegistry(final TenantDO tenant)
   {
     this.tenant = tenant;
+    this.hibernateTemplate = Registry.instance().getHibernateTemplate();
     this.lastUsage = System.currentTimeMillis();
     this.timeToLive = TIME_TO_LIVE_MS;
   }
@@ -97,10 +104,15 @@ public class TenantRegistry
 
   public KostCache getKostCache()
   {
-    return Registry.instance().getKostCache();
+    if (kostCache == null) {
+      kostCache = new KostCache();
+      kostCache.setHibernateTemplate(hibernateTemplate);
+    }
+    return kostCache;
   }
 
-  public RechnungCache getInvoicCache() {
+  public RechnungCache getInvoicCache()
+  {
     return Registry.instance().getInvoiceCache();
   }
 
@@ -114,7 +126,7 @@ public class TenantRegistry
       final Registry registry = Registry.instance();
       taskTree.setAccessDao(registry.getDao(AccessDao.class));
       taskTree.setAuftragDao(registry.getDao(AuftragDao.class));
-      taskTree.setKostCache(registry.getKostCache());
+      taskTree.setKostCache(getKostCache());
       taskTree.setProjektDao(registry.getDao(ProjektDao.class));
       taskTree.setTaskDao(registry.getDao(TaskDao.class));
     }
@@ -128,9 +140,8 @@ public class TenantRegistry
   public UserGroupCache getUserGroupCache()
   {
     if (userGroupCache == null) {
-      // userGroupCache = new UserGroupCache();
-      // userGroupCache.setHibernateTemplate(hibernateTemplate);
-      userGroupCache = Registry.instance().getUserGroupCache();
+      userGroupCache = new UserGroupCache();
+      userGroupCache.setHibernateTemplate(hibernateTemplate);
     }
     return userGroupCache;
   }

@@ -106,8 +106,6 @@ public class TimesheetExport
 
   private DateTimeFormatter dateTimeFormatter;
 
-  private UserGroupCache userGroupCache;
-
   private enum Col
   {
     USER, KUNDE, PROJEKT, KOST2, WEEK_OF_YEAR, DAY_OF_WEEK, START_TIME, STOP_TIME, DURATION, HOURS, LOCATION, TASK_TITLE, REFERENCE, SHORT_DESCRIPTION, DESCRIPTION, TASK_PATH, ID;
@@ -159,6 +157,7 @@ public class TimesheetExport
 
     final PropertyMapping mapping = new PropertyMapping();
     final TaskTree taskTree = Registry.instance().getTaskTree();
+    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
     for (final TimesheetDO timesheet : list) {
       final TaskNode node = taskTree.getTaskNodeById(timesheet.getTaskId());
       final PFUserDO user = userGroupCache.getUser(timesheet.getUserId());
@@ -216,10 +215,5 @@ public class TimesheetExport
   public void setDateTimeFormatter(final DateTimeFormatter dateTimeFormatter)
   {
     this.dateTimeFormatter = dateTimeFormatter;
-  }
-
-  public void setUserGroupCache(final UserGroupCache userGroupCache)
-  {
-    this.userGroupCache = userGroupCache;
   }
 }

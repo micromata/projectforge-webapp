@@ -89,8 +89,6 @@ public class AuftragDao extends BaseDao<AuftragDO>
 
   private Integer abgeschlossenNichtFakturiert;
 
-  private RechnungCache rechnungCache;
-
   private TaskDao taskDao;
 
   private TaskTree taskTree;
@@ -108,11 +106,6 @@ public class AuftragDao extends BaseDao<AuftragDO>
   public void setProjektDao(final ProjektDao projektDao)
   {
     this.projektDao = projektDao;
-  }
-
-  public void setRechnungCache(final RechnungCache rechnungCache)
-  {
-    this.rechnungCache = rechnungCache;
   }
 
   public void setTaskDao(final TaskDao taskDao)
@@ -224,7 +217,7 @@ public class AuftragDao extends BaseDao<AuftragDO>
     }
     if (order.getPositionen() != null) {
       for (final AuftragsPositionDO pos : order.getPositionen()) {
-        final Set<RechnungsPositionVO> set = rechnungCache.getRechnungsPositionVOSetByAuftragsPositionId(pos.getId());
+        final Set<RechnungsPositionVO> set = getTenantRegistry().getInvoicCache().getRechnungsPositionVOSetByAuftragsPositionId(pos.getId());
         if (set != null) {
           pos.setFakturiertSum(RechnungDao.getNettoSumme(set));
         }

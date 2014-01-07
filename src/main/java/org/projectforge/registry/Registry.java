@@ -65,15 +65,7 @@ public class Registry
 
   private final List<RegistryEntry> orderedList = new ArrayList<RegistryEntry>();
 
-  private UserGroupCache userGroupCache;
-
   private UserXmlPreferencesDao userXmlPreferencesDao;
-
-  private KontoCache kontoCache;
-
-  private KostCache kostCache;
-
-  private RechnungCache invoiceCache;
 
   private TenantsCache tenantsCache;
 
@@ -183,12 +175,7 @@ public class Registry
 
   public UserGroupCache getUserGroupCache()
   {
-    return userGroupCache;
-  }
-
-  void setUserGroupCache(final UserGroupCache userGroupCache)
-  {
-    this.userGroupCache = userGroupCache;
+    return TenantRegistryMap.getInstance().getTenantRegistry().getUserGroupCache();
   }
 
   public TenantsCache getTenantsCache()
@@ -213,12 +200,7 @@ public class Registry
 
   public KontoCache getKontoCache()
   {
-    return kontoCache;
-  }
-
-  void setKontoCache(final KontoCache kontoCache)
-  {
-    this.kontoCache = kontoCache;
+    return TenantRegistryMap.getInstance().getTenantRegistry().getKontoCache();
   }
 
   /**
@@ -226,15 +208,7 @@ public class Registry
    */
   public KostCache getKostCache()
   {
-    return kostCache;
-  }
-
-  /**
-   * @param kostCache the kostCache to set
-   */
-  void setKostCache(final KostCache kostCache)
-  {
-    this.kostCache = kostCache;
+    return TenantRegistryMap.getInstance().getTenantRegistry().getKostCache();
   }
 
   /**
@@ -242,15 +216,7 @@ public class Registry
    */
   public RechnungCache getInvoiceCache()
   {
-    return invoiceCache;
-  }
-
-  /**
-   * @param invoiceCache the invoiceCache to set
-   */
-  void setInvoiceCache(final RechnungCache invoiceCache)
-  {
-    this.invoiceCache = invoiceCache;
+    return TenantRegistryMap.getInstance().getTenantRegistry().getInvoicCache();
   }
 
   public DataSource getDataSource()

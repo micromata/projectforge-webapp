@@ -26,7 +26,9 @@ package org.projectforge.plugins.todo;
 import org.apache.commons.lang.ObjectUtils;
 import org.projectforge.access.AccessType;
 import org.projectforge.access.OperationType;
+import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserRightAccessCheck;
 import org.projectforge.user.UserRightCategory;
 import org.projectforge.user.UserRightValue;
@@ -115,8 +117,11 @@ public class ToDoRight extends UserRightAccessCheck<ToDoDO>
     if (ObjectUtils.equals(user.getId(), toDo.getAssigneeId()) == true || ObjectUtils.equals(user.getId(), toDo.getReporterId()) == true) {
       return true;
     }
-    if (toDo.getGroup() != null && UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), toDo.getGroupId()) == true) {
-      return true;
+    if (toDo.getGroup() != null) {
+      final UserGroupCache userGroupCache = TenantRegistryMap.getInstance().getTenantRegistry().getUserGroupCache();
+      if (userGroupCache.isUserMemberOfGroup(user.getId(), toDo.getGroupId()) == true) {
+        return true;
+      }
     }
     if (toDo.getTaskId() != null) {
       return UserRights.getAccessChecker().hasPermission(user, toDo.getTaskId(), AccessType.TASKS, operationType, false);

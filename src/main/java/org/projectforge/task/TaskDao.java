@@ -389,7 +389,7 @@ public class TaskDao extends BaseDao<TaskDO>
     final TaskTree taskTree =  getTaskTree(obj);
     final ProjektDO projekt = taskTree.getProjekt(taskId);
     // Parent task because id of current task is null and project can't be found.
-    if (projekt != null && userGroupCache.isUserProjectManagerOrAssistantForProject(projekt) == true) {
+    if (projekt != null && getUserGroupCache().isUserProjectManagerOrAssistantForProject(projekt) == true) {
       return true;
     }
     return false;

@@ -62,9 +62,9 @@ import org.projectforge.registry.Registry;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.timesheet.TimesheetFilter;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRights;
 import org.projectforge.web.WebConfiguration;
@@ -245,7 +245,7 @@ public class CalendarFeed extends HttpServlet
           log.error("Not yet allowed: all users are only allowed to download their own time-sheets.");
           return null;
         }
-        timesheetUser = userDao.getUserGroupCache().getUser(timesheetUserId);
+        timesheetUser = Registry.instance().getUserGroupCache().getUser(timesheetUserId);
         if (timesheetUser == null) {
           log.error("Time-sheet user with id '" + timesheetUserParam + "' not found.");
           return null;

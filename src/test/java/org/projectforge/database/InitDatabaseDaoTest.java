@@ -33,9 +33,10 @@ import java.util.Collection;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectforge.access.AccessException;
+import org.projectforge.registry.Registry;
 import org.projectforge.test.TestBase;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserGroupCache;
 
 public class InitDatabaseDaoTest extends TestBase
@@ -44,16 +45,9 @@ public class InitDatabaseDaoTest extends TestBase
 
   private InitDatabaseDao initDatabaseDao;
 
-  private UserGroupCache userGroupCache;
-
   public void setInitDatabaseDao(final InitDatabaseDao initDatabaseDao)
   {
     this.initDatabaseDao = initDatabaseDao;
-  }
-
-  public void setUserGroupCache(final UserGroupCache userGroupCache)
-  {
-    this.userGroupCache = userGroupCache;
   }
 
   @BeforeClass
@@ -66,6 +60,7 @@ public class InitDatabaseDaoTest extends TestBase
   @Test
   public void initializeEmptyDatabase()
   {
+    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
     userGroupCache.setExpired(); // Force reload (because it's may be expired due to previous tests).
     assertTrue(initDatabaseDao.isEmpty());
     final PFUserDO admin = new PFUserDO();

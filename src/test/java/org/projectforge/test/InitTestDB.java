@@ -46,14 +46,15 @@ import org.projectforge.fibu.kost.Kost2ArtDO;
 import org.projectforge.fibu.kost.Kost2ArtDao;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.fibu.kost.Kost2Dao;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserRightDO;
@@ -80,8 +81,6 @@ public class InitTestDB
 
   private GroupDao groupDao;
 
-  private UserGroupCache userGroupCache;
-
   private Kost2ArtDao kost2ArtDao;
 
   private final Map<String, GroupDO> groupMap = new HashMap<String, GroupDO>();
@@ -93,11 +92,6 @@ public class InitTestDB
   public void setUserDao(final UserDao userDao)
   {
     this.userDao = userDao;
-  }
-
-  public void setUserGroupCache(final UserGroupCache userGroupCache)
-  {
-    this.userGroupCache = userGroupCache;
   }
 
   public void setAccessDao(final AccessDao accessDao)
@@ -193,6 +187,7 @@ public class InitTestDB
     }
     groupDao.internalSave(group);
     putGroup(group);
+    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
     userGroupCache.setExpired();
     return group;
   }

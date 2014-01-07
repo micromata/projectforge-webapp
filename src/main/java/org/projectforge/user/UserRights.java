@@ -98,11 +98,6 @@ public class UserRights
     return instance.accessChecker;
   }
 
-  public static UserGroupCache getUserGroupCache()
-  {
-    return getAccessChecker().getUserGroupCache();
-  }
-
   public static UserRights initialize(final AccessChecker accessChecker)
   {
     if (instance != null) {

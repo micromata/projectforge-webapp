@@ -85,7 +85,7 @@ public class LoginDefaultHandler implements LoginHandler
         if (isAdminUser(resUser) == false) {
           return loginResult.setLoginResultStatus(LoginResultStatus.ADMIN_LOGIN_REQUIRED);
         }
-        userDao.getUserGroupCache().internalSetAdminUser(resUser); // User is now marked as admin user.
+        Registry.instance().getUserGroupCache().internalSetAdminUser(resUser); // User is now marked as admin user.
         return loginResult.setLoginResultStatus(LoginResultStatus.SUCCESS).setUser(resUser);
       } catch (final Exception ex) {
         log.error(ex.getMessage(), ex);
@@ -197,7 +197,7 @@ public class LoginDefaultHandler implements LoginHandler
   @Override
   public boolean checkStayLoggedIn(final PFUserDO user)
   {
-    final PFUserDO dbUser = userDao.getUserGroupCache().getUser(user.getId());
+    final PFUserDO dbUser = userDao.getById(user.getId());
     if (dbUser != null && dbUser.hasSystemAccess() == true) {
       return true;
     }

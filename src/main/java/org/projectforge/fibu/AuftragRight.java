@@ -30,6 +30,7 @@ import org.projectforge.access.AccessChecker;
 import org.projectforge.access.AccessException;
 import org.projectforge.access.OperationType;
 import org.projectforge.common.DateHelper;
+import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserGroupCache;
@@ -86,7 +87,7 @@ public class AuftragRight extends UserRightAccessCheck<AuftragDO>
   public boolean hasAccess(final PFUserDO user, final AuftragDO obj, final  AuftragDO oldObj, final OperationType operationType)
   {
     final AccessChecker accessChecker = UserRights.getAccessChecker();
-    final UserGroupCache userGroupCache = UserRights.getUserGroupCache();
+    final UserGroupCache userGroupCache = TenantRegistryMap.getInstance().getTenantRegistry().getUserGroupCache();
     if (operationType == OperationType.SELECT) {
       if (accessChecker.isUserMemberOfGroup(user, ProjectForgeGroup.CONTROLLING_GROUP) == true) {
         return true;
