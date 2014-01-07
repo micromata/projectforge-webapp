@@ -59,7 +59,7 @@ public class GroupDao extends BaseDao<GroupDO>
 
   private UserDao userDao;
 
-  //private final GroupsProvider groupsProvider = new GroupsProvider();
+  // private final GroupsProvider groupsProvider = new GroupsProvider();
 
   public void setUserDao(final UserDao userDao)
   {
@@ -154,31 +154,31 @@ public class GroupDao extends BaseDao<GroupDO>
     }
   }
 
-  //  /**
-  //   * Please note: Only the string group.nestedGroups will be modified (but not be saved)!
-  //   * @param group
-  //   * @param nestedGroups Full list of all nested groups which have to assigned to this group.
-  //   * @return
-  //   */
-  //  public void setNestedGroups(final GroupDO group, final Collection<GroupDO> nestedGroups)
-  //  {
-  //    if (group.isNestedGroupsAllowed() == false && CollectionUtils.isNotEmpty(nestedGroups) == true) {
-  //      log.warn("Couldn't set nested groups because given group doesn't allow nested groups: " + group);
-  //      group.setNestedGroupIds(null);
-  //      return;
-  //    }
-  //    group.setNestedGroupIds(groupsProvider.getGroupIds(nestedGroups));
-  //  }
+  // /**
+  // * Please note: Only the string group.nestedGroups will be modified (but not be saved)!
+  // * @param group
+  // * @param nestedGroups Full list of all nested groups which have to assigned to this group.
+  // * @return
+  // */
+  // public void setNestedGroups(final GroupDO group, final Collection<GroupDO> nestedGroups)
+  // {
+  // if (group.isNestedGroupsAllowed() == false && CollectionUtils.isNotEmpty(nestedGroups) == true) {
+  // log.warn("Couldn't set nested groups because given group doesn't allow nested groups: " + group);
+  // group.setNestedGroupIds(null);
+  // return;
+  // }
+  // group.setNestedGroupIds(groupsProvider.getGroupIds(nestedGroups));
+  // }
   //
-  //  public Collection<GroupDO> getSortedNestedGroups(final GroupDO group)
-  //  {
-  //    if (group.isNestedGroupsAllowed() == false && StringUtils.isNotEmpty(group.getNestedGroupIds()) == true) {
-  //      log.warn("Ignore nested groups because given group doesn't allow nested groups: " + group);
-  //      group.setNestedGroupIds(null);
-  //      return null;
-  //    }
-  //    return groupsProvider.getSortedGroups(group.getNestedGroupIds());
-  //  }
+  // public Collection<GroupDO> getSortedNestedGroups(final GroupDO group)
+  // {
+  // if (group.isNestedGroupsAllowed() == false && StringUtils.isNotEmpty(group.getNestedGroupIds()) == true) {
+  // log.warn("Ignore nested groups because given group doesn't allow nested groups: " + group);
+  // group.setNestedGroupIds(null);
+  // return null;
+  // }
+  // return groupsProvider.getSortedGroups(group.getNestedGroupIds());
+  // }
 
   /**
    * Creates for every user an history entry if the user is part of this new group.
@@ -308,6 +308,26 @@ public class GroupDao extends BaseDao<GroupDO>
   {
     final List<GroupDO> list = getHibernateTemplate().find("from GroupDO t join");
     return list;
+  }
+
+  /**
+   * Prevents changing the group name for ProjectForge groups.
+   * @see org.projectforge.core.BaseDao#onChange(org.projectforge.core.ExtendedBaseDO, org.projectforge.core.ExtendedBaseDO)
+   */
+  @Override
+  protected void onChange(final GroupDO obj, final GroupDO dbObj)
+  {
+    for (final ProjectForgeGroup group : ProjectForgeGroup.values()) {
+      if (group.getName().equals(dbObj.getName()) == true) {
+        // A group of ProjectForge will be changed.
+        if (group.getName().equals(obj) == false) {
+          // The group's name must be unmodified!
+          log.warn("Preventing the change of ProjectForge's group '" + group.getName() + "' in '" + obj.getName() + "'.");
+          obj.setName(group.getName());
+        }
+        break;
+      }
+    }
   }
 
   @Override
