@@ -34,9 +34,6 @@ public class ToDoMobileEditForm extends AbstractMobileEditForm<ToDoDO, ToDoMobil
 {
   private static final long serialVersionUID = 4099598385616228222L;
 
-  // @SpringBean(name = "userGroupCache")
-  // private UserGroupCache userGroupCache;
-  //
   // @SpringBean(name = "userPrefDao")
   // private UserPrefDao userPrefDao;
 
