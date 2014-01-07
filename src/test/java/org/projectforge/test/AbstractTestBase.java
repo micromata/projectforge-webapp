@@ -177,13 +177,12 @@ public class AbstractTestBase
   public static void init(final boolean createTestData) throws BeansException, IOException
   {
     clearDatabase();
-
-    if (createTestData == true) {
-      initTestDB.initDatabase();
-    }
     final LoginDefaultHandler loginHandler = new LoginDefaultHandler();
     loginHandler.initialize();
     Login.getInstance().setLoginHandler(loginHandler);
+    if (createTestData == true) {
+      initTestDB.initDatabase();
+    }
   }
 
   public static InitTestDB getInitTestDB()
