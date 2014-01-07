@@ -279,6 +279,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
     return user;
   }
 
+  @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public boolean isEmpty()
   {
     try {
