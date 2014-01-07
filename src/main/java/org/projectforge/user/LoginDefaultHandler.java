@@ -197,7 +197,7 @@ public class LoginDefaultHandler implements LoginHandler
   @Override
   public boolean checkStayLoggedIn(final PFUserDO user)
   {
-    final PFUserDO dbUser = userDao.getById(user.getId());
+    final PFUserDO dbUser = userDao.internalGetById(user.getId());
     if (dbUser != null && dbUser.hasSystemAccess() == true) {
       return true;
     }
