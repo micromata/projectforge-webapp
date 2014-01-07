@@ -44,7 +44,6 @@ import org.projectforge.plugins.poll.event.PollEventEditPage;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.common.MultiChoiceListHelper;
 import org.projectforge.web.user.GroupsComparator;
 import org.projectforge.web.user.GroupsProvider;
@@ -64,9 +63,6 @@ public class PollAttendeePage extends PollBasePage
   private static final long serialVersionUID = 8780858653279140945L;
 
   private static Integer SECURE_KEY_LENGTH = 50;
-
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
 
   @SpringBean(name = "userDao")
   private UserDao userDao;
