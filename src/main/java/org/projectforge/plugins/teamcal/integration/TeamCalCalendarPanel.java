@@ -54,9 +54,8 @@ import org.projectforge.plugins.teamcal.event.TeamEventDao;
 import org.projectforge.plugins.teamcal.event.TeamEventEditPage;
 import org.projectforge.plugins.teamcal.event.TeamEventRight;
 import org.projectforge.plugins.teamcal.event.TeamRecurrenceEvent;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserGroupCache;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.calendar.CalendarFilter;
 import org.projectforge.web.calendar.CalendarPanel;
 import org.projectforge.web.calendar.ICalendarFilter;
@@ -80,9 +79,6 @@ public class TeamCalCalendarPanel extends CalendarPanel
 
   @SpringBean(name = "teamCalDao")
   private TeamCalDao teamCalDao;
-
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
 
   private TeamCalEventProvider eventProvider;
 
