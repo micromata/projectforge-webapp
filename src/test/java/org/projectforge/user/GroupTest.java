@@ -48,34 +48,35 @@ public class GroupTest extends TestBase
 
   private TransactionTemplate txTemplate;
 
-  public void setGroupDao(GroupDao groupDao)
+  public void setGroupDao(final GroupDao groupDao)
   {
     this.groupDao = groupDao;
   }
 
-  public void setTxTemplate(TransactionTemplate txTemplate)
+  public void setTxTemplate(final TransactionTemplate txTemplate)
   {
     this.txTemplate = txTemplate;
   }
 
+  @SuppressWarnings({ "unchecked", "rawtypes"})
   @Test
   public void testSaveAndUpdate()
   {
     txTemplate.execute(new TransactionCallback() {
-      public Object doInTransaction(TransactionStatus status)
+      public Object doInTransaction(final TransactionStatus status)
       {
         logon(TEST_ADMIN_USER);
         GroupDO group = new GroupDO();
         group.setName("testgroup");
-        Set<PFUserDO> assignedUsers = new HashSet<PFUserDO>();
+        final Set<PFUserDO> assignedUsers = new HashSet<PFUserDO>();
         group.setAssignedUsers(assignedUsers);
         assignedUsers.add(getUser(TEST_USER));
-        Serializable id = groupDao.save(group);
+        final Serializable id = groupDao.save(group);
         group = groupDao.getById(id);
         assertEquals("testgroup", group.getName());
         assertEquals(1, group.getAssignedUsers().size());
         assertTrue(group.getAssignedUsers().contains(getUser(TEST_USER)));
-        PFUserDO user = getUser(TEST_USER2);
+        final PFUserDO user = getUser(TEST_USER2);
         Assert.assertNotNull(user);
         group.getAssignedUsers().add(user);
         groupDao.update(group);
@@ -88,21 +89,22 @@ public class GroupTest extends TestBase
     });
   }
 
+  @SuppressWarnings({ "unchecked", "rawtypes"})
   @Test
   public void testHistory()
   {
     txTemplate.execute(new TransactionCallback() {
-      public Object doInTransaction(TransactionStatus status)
+      public Object doInTransaction(final TransactionStatus status)
       {
-        PFUserDO histUser = logon(TEST_ADMIN_USER);
+        final PFUserDO histUser = logon(TEST_ADMIN_USER);
 
         GroupDO group = new GroupDO();
         group.setName("historyGroup");
-        Set<PFUserDO> assignedUsers = new HashSet<PFUserDO>();
+        final Set<PFUserDO> assignedUsers = new HashSet<PFUserDO>();
         assignedUsers.add(getUser(TEST_USER));
         assignedUsers.add(getUser(TEST_USER2));
         group.setAssignedUsers(assignedUsers);
-        Serializable id = groupDao.save(group);
+        final Serializable id = groupDao.save(group);
 
         group = groupDao.getById(id);
         assertEquals(2, group.getAssignedUsers().size());
@@ -111,7 +113,7 @@ public class GroupTest extends TestBase
 
         group = groupDao.getById(id);
         assertEquals(1, group.getAssignedUsers().size());
-        PFUserDO user = initTestDB.addUser("historyGroupUser");
+        final PFUserDO user = initTestDB.addUser("historyGroupUser");
         group.getAssignedUsers().add(user);
         groupDao.update(group);
 
@@ -126,13 +128,23 @@ public class GroupTest extends TestBase
         assertHistoryEntry(entry, group.getId(), histUser, HistoryEntryType.UPDATE, "assignedUsers", PFUserDO.class, getUser(TEST_USER2)
             .getId().toString(), "");
         entry = historyEntries[0];
-        assertHistoryEntry(entry, group.getId(), histUser, HistoryEntryType.UPDATE, "assignedUsers", PFUserDO.class, "", getUser(
-            "historyGroupUser").getId().toString());
+        assertHistoryEntry(entry, group.getId(), histUser, HistoryEntryType.UPDATE, "assignedUsers", PFUserDO.class, "",
+            getUser("historyGroupUser").getId().toString());
         historyEntries = userDao.getHistoryEntries(getUser("historyGroupUser"));
         log.debug(entry);
         return null;
       }
-
     });
+  }
+
+  @Test
+  public void checkUnmodifiableGroupNames()
+  {
+    GroupDO adminGroup = getGroup(ProjectForgeGroup.ADMIN_GROUP.getName());
+    final Integer id = adminGroup.getId();
+    adminGroup.setName("Changed admin group");
+    groupDao.internalSave(adminGroup);
+    adminGroup = groupDao.internalGetById(id);
+    Assert.assertEquals("Group's name shouldn't be allowed to change.",  ProjectForgeGroup.ADMIN_GROUP.getName(), adminGroup.getName());
   }
 }
