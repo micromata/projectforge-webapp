@@ -52,6 +52,9 @@ public abstract class AbstractCache
   {
   }
 
+  /**
+   * @param expireTime in milliseconds.
+   */
   protected AbstractCache(final long expireTime)
   {
     this.expireTime = expireTime;
