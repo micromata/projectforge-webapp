@@ -28,7 +28,7 @@ import java.util.List;
 import org.apache.lucene.document.Document;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
-import org.projectforge.web.filter.SpringContext;
+import org.projectforge.registry.Registry;
 
 /**
  * TaskPathBridge for hibernate search to search in the parent task titles.
@@ -48,21 +48,19 @@ public class HibernateSearchTaskPathBridge implements FieldBridge
   public void set(final String name, final Object value, final Document document, final LuceneOptions luceneOptions)
   {
     final TaskDO task = (TaskDO) value;
-    if (SpringContext.getWebApplicationContext() != null) { // Is null in test environment.
-      final TaskTree taskTree = SpringContext.getBean(TaskTree.class);
-      final TaskNode taskNode = taskTree.getTaskNodeById(task.getId());
-      if (taskNode == null) {
-        return;
-      }
-      final List<TaskNode> list = taskNode.getPathToRoot();
-      final StringBuffer buf = new StringBuffer();
-      for (final TaskNode node : list) {
-        buf.append(node.getTask().getTitle()).append("|");
-      }
-      if (log.isDebugEnabled() == true) {
-        log.debug(buf.toString());
-      }
-      luceneOptions.addFieldToDocument(name, buf.toString(), document);
+    final TaskTree taskTree = Registry.instance().getTaskTree();
+    final TaskNode taskNode = taskTree.getTaskNodeById(task.getId());
+    if (taskNode == null) {
+      return;
     }
+    final List<TaskNode> list = taskNode.getPathToRoot();
+    final StringBuffer buf = new StringBuffer();
+    for (final TaskNode node : list) {
+      buf.append(node.getTask().getTitle()).append("|");
+    }
+    if (log.isDebugEnabled() == true) {
+      log.debug(buf.toString());
+    }
+    luceneOptions.addFieldToDocument(name, buf.toString(), document);
   }
 }
