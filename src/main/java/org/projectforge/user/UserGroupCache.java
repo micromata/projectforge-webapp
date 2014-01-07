@@ -79,6 +79,11 @@ public class UserGroupCache extends AbstractCache
 
   private HibernateTemplate hibernateTemplate;
 
+  public UserGroupCache()
+  {
+    setExpireTimeInHours(1);
+  }
+
   public void setHibernateTemplate(final HibernateTemplate hibernateTemplate)
   {
     this.hibernateTemplate = hibernateTemplate;
