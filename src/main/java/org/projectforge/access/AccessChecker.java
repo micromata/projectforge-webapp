@@ -528,6 +528,9 @@ public class AccessChecker
     Validate.notNull(values);
     final UserGroupCache userGroupCache = TenantRegistryMap.getInstance().getTenantRegistry().getUserGroupCache();
     final PFUserDO user = userGroupCache.getUser(origUser.getId());
+    if (user == null) {
+      return false;
+    }
     final UserRightDO rightDO = user.getRight(rightId);
     final UserRight right = userRights.getRight(rightId);
     for (final UserRightValue value : values) {
