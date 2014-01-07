@@ -148,7 +148,7 @@ public class TenantRegistry
   public UserGroupCache getUserGroupCache()
   {
     if (userGroupCache == null) {
-      userGroupCache = new UserGroupCache();
+      userGroupCache = new UserGroupCache(tenant);
       userGroupCache.setHibernateTemplate(hibernateTemplate);
     }
     return userGroupCache;
