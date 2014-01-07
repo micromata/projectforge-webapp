@@ -79,7 +79,7 @@ public class UserPreferencesHelper
     }
     final UserXmlPreferencesCache userXmlPreferencesCache = UserXmlPreferencesCache.getDefaultInstance();
     final Integer userId = user.getId();
-    if (UserRights.getAccessChecker().isDemoUser(userId) == true) {
+    if (UserRights.getAccessChecker().isDemoUser(user) == true) {
       // Store user pref for demo user only in user's session.
       Object value = MySession.get().getAttribute(key);
       if (value != null) {
