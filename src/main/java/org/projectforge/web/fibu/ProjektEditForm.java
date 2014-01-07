@@ -28,15 +28,12 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.ProjektStatus;
 import org.projectforge.fibu.kost.AccountingConfig;
-import org.projectforge.fibu.kost.KostCache;
-import org.projectforge.registry.Registry;
 import org.projectforge.reporting.Kost2Art;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.GroupDO;
@@ -59,9 +56,6 @@ public class ProjektEditForm extends AbstractEditForm<ProjektDO, ProjektEditPage
   private static final long serialVersionUID = -6018131069720611834L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ProjektEditForm.class);
-
-  @SpringBean(name = "kostCache")
-  private KostCache kostCache;
 
   List<Kost2Art> kost2Arts;
 
@@ -116,7 +110,7 @@ public class ProjektEditForm extends AbstractEditForm<ProjektDO, ProjektEditPage
       fs.add(field);
       fs.add(new DivTextPanel(fs.newChildId(), ".##.##"));
     }
-    if (Registry.instance().getKontoCache().isEmpty() == false) {
+    if (getTenantRegistry().getKontoCache().isEmpty() == false) {
       // Show this field only if DATEV accounts does exist.
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.konto"));
       final KontoSelectPanel kontoSelectPanel = new KontoSelectPanel(fs.newChildId(), new PropertyModel<KontoDO>(data, "konto"), null,
@@ -169,9 +163,9 @@ public class ProjektEditForm extends AbstractEditForm<ProjektDO, ProjektEditPage
       fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "description")));
     }
     if (isNew() == true) {
-      kost2Arts = kostCache.getAllKostArts();
+      kost2Arts = getTenantRegistry().getKostCache().getAllKostArts();
     } else {
-      kost2Arts = kostCache.getAllKost2Arts(getData().getId());
+      kost2Arts = getTenantRegistry().getKostCache().getAllKost2Arts(getData().getId());
     }
     {
       // cost 2 types

@@ -47,7 +47,6 @@ import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.common.StringHelper;
@@ -59,12 +58,10 @@ import org.projectforge.fibu.AuftragsPositionsStatus;
 import org.projectforge.fibu.AuftragsStatus;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.ProjektDO;
-import org.projectforge.fibu.RechnungCache;
 import org.projectforge.fibu.RechnungDao;
 import org.projectforge.fibu.RechnungsPositionVO;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
@@ -101,9 +98,6 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
 
   private boolean sendEMailNotification = true;
 
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
-
   protected CheckBox sendEMailNotficationCheckBox;
 
   protected RepeatingView positionsRepeater;
@@ -111,9 +105,6 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
   protected CustomerSelectPanel kundeSelectPanel;
 
   private final List<Component> ajaxUpdateComponents = new ArrayList<Component>();
-
-  @SpringBean(name = "rechnungCache")
-  private RechnungCache rechnungCache;
 
   private FormComponent< ? >[] positionsDependentFormComponents = new FormComponent[0];
 
@@ -400,7 +391,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         }
       }
       posGridBuilder.newSplitPanel(GridSize.COL33);
-      final Set<RechnungsPositionVO> orderPositions = rechnungCache.getRechnungsPositionVOSetByAuftragsPositionId(position.getId());
+      final Set<RechnungsPositionVO> orderPositions = getTenantRegistry().getInvoicCache().getRechnungsPositionVOSetByAuftragsPositionId(position.getId());
       final boolean showInvoices = CollectionUtils.isNotEmpty(orderPositions);
       {
         // Invoices
@@ -422,7 +413,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         } else {
           fs.add(AbstractUnsecureBasePage.createInvisibleDummyComponent(fs.newChildId()));
         }
-        if (userGroupCache.isUserMemberOfFinanceGroup() == true) {
+        if (getTenantRegistry().getUserGroupCache().isUserMemberOfFinanceGroup() == true) {
           final DivPanel checkBoxDiv = fs.addNewCheckBoxDiv();
           checkBoxDiv.add(new CheckBoxPanel(checkBoxDiv.newChildId(), new PropertyModel<Boolean>(position, "vollstaendigFakturiert"),
               getString("fibu.auftrag.vollstaendigFakturiert")));

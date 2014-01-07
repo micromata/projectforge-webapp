@@ -45,7 +45,6 @@ import org.projectforge.user.GroupDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserDao;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.access.AccessEditPage;
 import org.projectforge.web.task.TaskEditPage;
 import org.projectforge.web.user.GroupEditPage;
@@ -101,9 +100,6 @@ public class TutorialPage extends AbstractSecuredPage
 
   @SpringBean(name = "userDao")
   private UserDao userDao;
-
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
 
   @SpringBean(name = "taskDao")
   private TaskDao taskDao;
@@ -180,7 +176,7 @@ public class TutorialPage extends AbstractSecuredPage
   private List<Integer> addGroups(final PFUserDO user, final ProjectForgeGroup... groups)
   {
     final List<Integer> groupsToAssign = new ArrayList<Integer>();
-    final GroupDO group = userGroupCache.getGroup(ProjectForgeGroup.PROJECT_MANAGER);
+    final GroupDO group = getTenantRegistry().getUserGroupCache().getGroup(ProjectForgeGroup.PROJECT_MANAGER);
     groupsToAssign.add(group.getId());
     return groupsToAssign;
   }

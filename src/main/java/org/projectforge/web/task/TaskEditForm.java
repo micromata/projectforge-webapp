@@ -36,7 +36,6 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
 import org.hibernate.Hibernate;
 import org.projectforge.common.StringHelper;
@@ -54,7 +53,6 @@ import org.projectforge.task.TaskTree;
 import org.projectforge.task.TimesheetBookingStatus;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ThreadLocalUserContext;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.fibu.Kost2ListPage;
 import org.projectforge.web.fibu.Kost2SelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
@@ -83,9 +81,6 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TaskEditForm.class);
 
   public static final BigDecimal MAX_DURATION_DAYS = new BigDecimal(10000);
-
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
 
   protected MaxLengthTextField kost2BlackWhiteTextField;
 
@@ -174,7 +169,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task.assignedUser"));
       PFUserDO responsibleUser = data.getResponsibleUser();
       if (Hibernate.isInitialized(responsibleUser) == false) {
-        responsibleUser = userGroupCache.getUser(responsibleUser.getId());
+        responsibleUser = getTenantRegistry().getUserGroupCache().getUser(responsibleUser.getId());
         data.setResponsibleUser(responsibleUser);
       }
       final UserSelectPanel responsibleUserSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(data,
@@ -349,7 +344,8 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
           @Override
           public String getObject()
           {
-            final List<Kost2DO> kost2DOs = getTaskTree().getKost2List(projekt, data, data.getKost2BlackWhiteItems(), data.isKost2IsBlackList());
+            final List<Kost2DO> kost2DOs = getTaskTree().getKost2List(projekt, data, data.getKost2BlackWhiteItems(),
+                data.isKost2IsBlackList());
             final String[] kost2s = TaskListPage.getKost2s(kost2DOs);
             if (kost2s == null || kost2s.length == 0) {
               return " - (-)";
@@ -409,7 +405,7 @@ public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
             new PropertyModel<Date>(data, "protectTimesheetsUntil"), DatePanelSettings.get().withTargetType(java.sql.Date.class)
             .withSelectProperty("protectTimesheetsUntil"));
         fs.add(protectTimesheetsUntilPanel);
-        if (userGroupCache.isUserMemberOfFinanceGroup() == false) {
+        if (getTenantRegistry().getUserGroupCache().isUserMemberOfFinanceGroup() == false) {
           protectTimesheetsUntilPanel.setEnabled(false);
         }
       }
