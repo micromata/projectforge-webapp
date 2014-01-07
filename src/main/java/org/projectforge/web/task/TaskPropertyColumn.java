@@ -23,7 +23,6 @@
 
 package org.projectforge.web.task;
 
-import org.apache.commons.lang.Validate;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
@@ -31,7 +30,8 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.hibernate.Hibernate;
 import org.projectforge.common.BeanHelper;
-import org.projectforge.registry.Registry;
+import org.projectforge.multitenancy.TenantDO;
+import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
 import org.projectforge.web.common.OutputType;
@@ -43,9 +43,11 @@ public class TaskPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
 {
   private static final long serialVersionUID = -26352961662061891L;
 
-  private TaskTree taskTree;
+  private transient TaskTree taskTree;
 
   private transient TaskFormatter taskFormatter;
+
+  private TenantDO tenant;
 
   /**
    * @param clazz
@@ -106,12 +108,11 @@ public class TaskPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
       if (obj instanceof TaskDO) {
         task = (TaskDO) obj;
         if (Hibernate.isInitialized(task) == false) {
-          task = Registry.instance().getTaskTree().getTaskById(task.getId());
+          task = getTaskTree().getTaskById(task.getId());
         }
       } else if (obj instanceof Integer) {
-        Validate.notNull(taskTree);
         final Integer taskId = (Integer) obj;
-        task = taskTree.getTaskById(taskId);
+        task = getTaskTree().getTaskById(taskId);
       } else {
         throw new IllegalStateException("Unsupported column type: " + obj);
       }
@@ -137,6 +138,15 @@ public class TaskPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
   public TaskPropertyColumn<T> withTaskTree(final TaskTree taskTree)
   {
     this.taskTree = taskTree;
+    this.tenant = taskTree.getTenant();
     return this;
+  }
+
+  private TaskTree getTaskTree()
+  {
+    if (taskTree == null) {
+      taskTree = TenantRegistryMap.getInstance().getTenantRegistry(tenant).getTaskTree();
+    }
+    return taskTree;
   }
 }
