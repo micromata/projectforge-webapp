@@ -32,6 +32,8 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.util.lang.Bytes;
+import org.projectforge.multitenancy.TenantRegistry;
+import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
 
@@ -42,6 +44,8 @@ public abstract class AbstractForm<F, P extends AbstractUnsecureBasePage> extend
   protected final P parentPage;
 
   private final ShinyFormVisitor shinyVisitor = new ShinyFormVisitor();
+
+  private transient TenantRegistry tenantRegistry;
 
   /**
    * Convenience method for creating a component which is in the mark-up file but should not be visible.
@@ -161,5 +165,18 @@ public abstract class AbstractForm<F, P extends AbstractUnsecureBasePage> extend
   public GridBuilder newGridBuilder(final WebMarkupContainer parent, final String id)
   {
     return new GridBuilder(parent, id);
+  }
+
+
+  /**
+   * For getting caches etc.
+   * @return The current tenantRegistry also for systems without tenants configured.
+   */
+  protected TenantRegistry getTenantRegistry()
+  {
+    if (tenantRegistry == null) {
+      tenantRegistry = TenantRegistryMap.getInstance().getTenantRegistry();
+    }
+    return tenantRegistry;
   }
 }

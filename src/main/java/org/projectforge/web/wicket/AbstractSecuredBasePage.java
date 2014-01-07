@@ -29,6 +29,8 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.core.MessageParam;
 import org.projectforge.core.UserException;
+import org.projectforge.multitenancy.TenantRegistry;
+import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.LoginPage;
@@ -48,6 +50,8 @@ public abstract class AbstractSecuredBasePage extends AbstractUnsecureBasePage
 
   @SpringBean(name = "accessChecker")
   protected AccessChecker accessChecker;
+
+  private transient TenantRegistry tenantRegistry;
 
   public AbstractSecuredBasePage(final PageParameters parameters)
   {
@@ -202,5 +206,17 @@ public abstract class AbstractSecuredBasePage extends AbstractUnsecureBasePage
   public boolean isAccess4restrictedUsersAllowed()
   {
     return false;
+  }
+
+  /**
+   * For getting caches etc.
+   * @return The current tenantRegistry also for systems without tenants configured.
+   */
+  protected TenantRegistry getTenantRegistry()
+  {
+    if (tenantRegistry == null) {
+      tenantRegistry = TenantRegistryMap.getInstance().getTenantRegistry();
+    }
+    return tenantRegistry;
   }
 }
