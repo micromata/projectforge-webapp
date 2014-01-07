@@ -45,7 +45,7 @@ public class MultiTenancyTestFork extends TestBase
 
   private static TenantDO defaultTenant, tenant2, tenant3;
 
-  private static PFUserDO superAdminDefault, superAdmin2, superAdmin3, admin1, admin2;
+  private static PFUserDO superAdminDefault, superAdmin2, superAdmin3, admin1, admin2, user1;
 
   private static boolean initialized;
 
@@ -77,8 +77,9 @@ public class MultiTenancyTestFork extends TestBase
     superAdmin3 = createUser("mt_superAdmin3", true);
     admin1 = createUser("mt_admin1", false);
     admin2 = createUser("mt_admin2", false);
-    defaultTenant = createTenant("Tenant 1", true, superAdminDefault);
-    tenant2 = createTenant("Tenant 2", false, superAdmin2, superAdminDefault);
+    user1 = initTestDB.addUser(new PFUserDO().setUsername("mt_user1"));
+    defaultTenant = createTenant("Tenant 1", true, superAdminDefault, admin1);
+    tenant2 = createTenant("Tenant 2", false, superAdmin2, superAdminDefault, admin1, admin2);
     tenant3 = createTenant("Tenant 3", false);
   }
 
