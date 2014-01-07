@@ -54,7 +54,7 @@ public class TenantRegistry
 
   private Configuration configuration;
 
-  private final HibernateTemplate hibernateTemplate;
+  private HibernateTemplate hibernateTemplate;
 
   private RechnungCache invoiceCache;
 
@@ -71,7 +71,6 @@ public class TenantRegistry
   public TenantRegistry(final TenantDO tenant)
   {
     this.tenant = tenant;
-    this.hibernateTemplate = Registry.instance().getHibernateTemplate();
     this.lastUsage = System.currentTimeMillis();
     this.timeToLive = TIME_TO_LIVE_MS;
   }
@@ -101,7 +100,7 @@ public class TenantRegistry
   {
     if (kontoCache == null) {
       kontoCache = new KontoCache();
-      kontoCache.setHibernateTemplate(hibernateTemplate);
+      kontoCache.setHibernateTemplate(getHibernateTemplate());
     }
     return kontoCache;
   }
@@ -110,7 +109,7 @@ public class TenantRegistry
   {
     if (kostCache == null) {
       kostCache = new KostCache();
-      kostCache.setHibernateTemplate(hibernateTemplate);
+      kostCache.setHibernateTemplate(getHibernateTemplate());
     }
     return kostCache;
   }
@@ -119,7 +118,7 @@ public class TenantRegistry
   {
     if (invoiceCache == null) {
       invoiceCache = new RechnungCache();
-      invoiceCache.setHibernateTemplate(hibernateTemplate);
+      invoiceCache.setHibernateTemplate(getHibernateTemplate());
     }
     return invoiceCache;
   }
@@ -150,7 +149,7 @@ public class TenantRegistry
   {
     if (userGroupCache == null) {
       userGroupCache = new UserGroupCache(tenant);
-      userGroupCache.setHibernateTemplate(hibernateTemplate);
+      userGroupCache.setHibernateTemplate(getHibernateTemplate());
     }
     return userGroupCache;
   }
@@ -182,5 +181,13 @@ public class TenantRegistry
   public long getTimeToLive()
   {
     return timeToLive;
+  }
+
+  private HibernateTemplate getHibernateTemplate()
+  {
+    if (this.hibernateTemplate == null) {
+      this.hibernateTemplate = Registry.instance().getHibernateTemplate();
+    }
+    return hibernateTemplate;
   }
 }
