@@ -52,7 +52,6 @@ import org.projectforge.core.DisplayHistoryEntry;
 import org.projectforge.core.ExtendedBaseDO;
 import org.projectforge.core.ModificationStatus;
 import org.projectforge.multitenancy.TenantChecker;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.admin.WizardPage;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.task.TaskTreePage;
@@ -82,9 +81,6 @@ AbstractSecuredPage implements IEditPage<O, D>
   protected WebMarkupContainer topMenuPanel;
 
   protected WebMarkupContainer bottomPanel;
-
-  @SpringBean(name = "userGroupCache")
-  protected UserGroupCache userGroupCache;
 
   @SpringBean(name = "userFormatter")
   protected UserFormatter userFormatter;

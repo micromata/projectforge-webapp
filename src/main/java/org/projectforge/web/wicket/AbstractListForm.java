@@ -43,15 +43,13 @@ import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserGroupCache;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.bootstrap.GridSize;
@@ -97,9 +95,6 @@ AbstractSecuredForm<F, P>
   protected DateTimePanel startDateTimePanel;
 
   protected DateTimePanel stopDateTimePanel;
-
-  @SpringBean(name = "userGroupCache")
-  protected UserGroupCache userGroupCache;
 
   private FieldsetPanel optionsFieldsetPanel;
 
@@ -349,7 +344,7 @@ AbstractSecuredForm<F, P>
         @Override
         public PFUserDO getObject()
         {
-          return userGroupCache.getUser(searchFilter.getModifiedByUserId());
+          return getTenantRegistry().getUserGroupCache().getUser(searchFilter.getModifiedByUserId());
         }
 
         @Override

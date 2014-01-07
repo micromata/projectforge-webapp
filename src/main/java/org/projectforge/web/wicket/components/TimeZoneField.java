@@ -29,11 +29,10 @@ import java.util.List;
 import java.util.TimeZone;
 
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
-import org.projectforge.user.ThreadLocalUserContext;
+import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserGroupCache;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.converter.TimeZoneConverter;
@@ -57,9 +56,6 @@ public class TimeZoneField extends PFAutoCompleteTextField<TimeZone>
     };
   };
 
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
-
   private final List<TimeZone> favoriteTimeZones;
 
   private final List<TimeZone> timeZones;
@@ -71,7 +67,7 @@ public class TimeZoneField extends PFAutoCompleteTextField<TimeZone>
     Arrays.sort(availableTimeZones);
     timeZones = getAsTimeZoneObjects(availableTimeZones);
     final List<String> favoritesIds = new ArrayList<String>();
-    for (final PFUserDO user : userGroupCache.getAllUsers()) {
+    for (final PFUserDO user : Registry.instance().getUserGroupCache().getAllUsers()) {
       final String timeZone = user.getTimeZone();
       if (timeZone == null) {
         continue;
