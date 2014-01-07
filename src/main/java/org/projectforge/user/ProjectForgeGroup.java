@@ -53,7 +53,15 @@ public enum ProjectForgeGroup
     return key;
   }
 
-  public boolean equals(String groupName)
+  /**
+   * Same as {@link #getKey()}. This is the group name.
+   */
+  public String getName()
+  {
+    return key;
+  }
+
+  public boolean equals(final String groupName)
   {
     return key.equals(groupName);
   }
@@ -68,7 +76,7 @@ public enum ProjectForgeGroup
     return key;
   }
 
-  ProjectForgeGroup(String key)
+  ProjectForgeGroup(final String key)
   {
     this.key = key;
   }
