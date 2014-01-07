@@ -171,6 +171,8 @@ public class ProjectForgeApp
       registry.setBeanFactory(beanFactory);
     }
 
+    daoRegistry.init();
+
     final UserContext internalSystemAdminUserContext = UserContext.__internalCreateWithSpecialUser(MyDatabaseUpdateDao
         .__internalGetSystemAdminPseudoUser());
     final boolean missingDatabaseSchema = initDatabaseDao.isEmpty();
@@ -183,8 +185,6 @@ public class ProjectForgeApp
         ThreadLocalUserContext.clear();
       }
     }
-
-    daoRegistry.init();
 
     pluginsRegistry = PluginsRegistry.instance();
     pluginsRegistry.set(beanFactory);
