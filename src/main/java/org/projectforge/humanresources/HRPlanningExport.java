@@ -42,7 +42,6 @@ import org.projectforge.excel.PropertyMapping;
 import org.projectforge.export.MyXlsContentProvider;
 import org.projectforge.fibu.ProjektDao;
 import org.projectforge.user.ThreadLocalUserContext;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.calendar.DateTimeFormatter;
 
 /**
@@ -95,9 +94,6 @@ public class HRPlanningExport
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(HRPlanningExport.class);
 
   final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.instance();
-
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
 
   @SpringBean(name = "projektDao")
   private ProjektDao projektDao;
