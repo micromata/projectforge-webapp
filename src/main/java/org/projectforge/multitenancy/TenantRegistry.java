@@ -99,7 +99,11 @@ public class TenantRegistry
 
   public KontoCache getKontoCache()
   {
-    return Registry.instance().getKontoCache();
+    if (kontoCache == null) {
+      kontoCache = new KontoCache();
+      kontoCache.setHibernateTemplate(hibernateTemplate);
+    }
+    return kontoCache;
   }
 
   public KostCache getKostCache()
@@ -113,7 +117,11 @@ public class TenantRegistry
 
   public RechnungCache getInvoicCache()
   {
-    return Registry.instance().getInvoiceCache();
+    if (invoiceCache == null) {
+      invoiceCache = new RechnungCache();
+      invoiceCache.setHibernateTemplate(hibernateTemplate);
+    }
+    return invoiceCache;
   }
 
   /**
