@@ -30,6 +30,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectforge.database.xstream.XStreamSavingConverter;
 import org.projectforge.plugins.teamcal.TeamCalTestHelper;
+import org.projectforge.registry.Registry;
 import org.projectforge.test.TestBase;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
