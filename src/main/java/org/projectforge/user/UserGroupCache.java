@@ -91,6 +91,7 @@ public class UserGroupCache extends AbstractCache
 
   public void setHibernateTemplate(final HibernateTemplate hibernateTemplate)
   {
+    Validate.notNull(hibernateTemplate);
     this.hibernateTemplate = hibernateTemplate;
   }
 
