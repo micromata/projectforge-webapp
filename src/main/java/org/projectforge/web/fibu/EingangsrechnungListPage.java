@@ -54,7 +54,6 @@ import org.projectforge.export.MyXlsContentProvider;
 import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.EingangsrechnungDao;
 import org.projectforge.fibu.EingangsrechnungsStatistik;
-import org.projectforge.fibu.KontoCache;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.RechnungFilter;
 import org.projectforge.fibu.kost.KostZuweisungExport;
@@ -79,9 +78,6 @@ IListPageColumnsCreator<EingangsrechnungDO>
 
   @SpringBean(name = "eingangsrechnungDao")
   private EingangsrechnungDao eingangsrechnungDao;
-
-  @SpringBean(name = "kontoCache")
-  private KontoCache kontoCache;
 
   private EingangsrechnungsStatistik eingangsrechnungsStatistik;
 
@@ -163,7 +159,7 @@ IListPageColumnsCreator<EingangsrechnungDO>
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
       {
         final EingangsrechnungDO rechnung = (EingangsrechnungDO) rowModel.getObject();
-        final KontoDO konto = kontoCache.getKonto(rechnung.getKontoId());
+        final KontoDO konto = getTenantRegistry().getKontoCache().getKonto(rechnung.getKontoId());
         item.add(new Label(componentId, konto != null ? konto.formatKonto() : ""));
         cellItemListener.populateItem(item, componentId, rowModel);
       }
@@ -243,7 +239,7 @@ IListPageColumnsCreator<EingangsrechnungDO>
           Integer kontoNummer = null;
           final Integer kontoId = ((EingangsrechnungDO) entry).getKontoId();
           if (kontoId != null) {
-            final KontoDO konto = kontoCache.getKonto(kontoId);
+            final KontoDO konto = getTenantRegistry().getKontoCache().getKonto(kontoId);
             if (konto != null) {
               kontoNummer = konto.getNummer();
             }
@@ -264,7 +260,7 @@ IListPageColumnsCreator<EingangsrechnungDO>
         String kontoBezeichnung = null;
         final Integer kontoId = ((EingangsrechnungDO) entry).getKontoId();
         if (kontoId != null) {
-          final KontoDO konto = kontoCache.getKonto(kontoId);
+          final KontoDO konto = getTenantRegistry().getKontoCache().getKonto(kontoId);
           if (konto != null) {
             kontoBezeichnung = konto.getBezeichnung();
           }
@@ -296,7 +292,7 @@ IListPageColumnsCreator<EingangsrechnungDO>
         + "_"
         + DateHelper.getDateAsFilenameSuffix(new Date())
         + ".xls";
-    final byte[] xls = KostZuweisungExport.instance.exportRechnungen(rechnungen, getString("fibu.common.creditor"), kontoCache);
+    final byte[] xls = KostZuweisungExport.instance.exportRechnungen(rechnungen, getString("fibu.common.creditor"), getTenantRegistry().getKontoCache());
     if (xls == null || xls.length == 0) {
       log.error("Oups, xls has zero size. Filename: " + filename);
       return;

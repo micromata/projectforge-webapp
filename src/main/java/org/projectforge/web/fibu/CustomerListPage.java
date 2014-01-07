@@ -37,7 +37,6 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.fibu.KontoCache;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.KundeDao;
@@ -56,9 +55,6 @@ import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 public class CustomerListPage extends AbstractListPage<CustomerListForm, KundeDao, KundeDO> implements IListPageColumnsCreator<KundeDO>
 {
   private static final long serialVersionUID = -8406452960003792763L;
-
-  @SpringBean(name = "kontoCache")
-  private KontoCache kontoCache;
 
   @SpringBean(name = "kundeDao")
   private KundeDao kundeDao;
@@ -118,7 +114,7 @@ public class CustomerListPage extends AbstractListPage<CustomerListForm, KundeDa
       public void populateItem(final Item<ICellPopulator<KundeDO>> item, final String componentId, final IModel<KundeDO> rowModel)
       {
         final KundeDO kunde = rowModel.getObject();
-        final KontoDO konto = kontoCache.getKonto(kunde.getKontoId());
+        final KontoDO konto = getTenantRegistry().getKontoCache().getKonto(kunde.getKontoId());
         item.add(new Label(componentId, konto != null ? konto.formatKonto() : ""));
         cellItemListener.populateItem(item, componentId, rowModel);
       }

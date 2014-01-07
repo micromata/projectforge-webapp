@@ -53,7 +53,6 @@ import org.projectforge.fibu.AuftragDao;
 import org.projectforge.fibu.AuftragsPositionDO;
 import org.projectforge.fibu.AuftragsStatus;
 import org.projectforge.fibu.OrderExport;
-import org.projectforge.fibu.RechnungCache;
 import org.projectforge.fibu.RechnungsPositionVO;
 import org.projectforge.web.common.OutputType;
 import org.projectforge.web.task.TaskFormatter;
@@ -85,9 +84,6 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
 
   @SpringBean(name = "orderExport")
   private OrderExport orderExport;
-
-  @SpringBean(name = "rechnungCache")
-  private RechnungCache rechnungCache;
 
   @SpringBean(name = "userFormatter")
   private UserFormatter userFormatter;
@@ -215,7 +211,7 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
       public void populateItem(final Item<ICellPopulator<AuftragDO>> item, final String componentId, final IModel<AuftragDO> rowModel)
       {
         final AuftragDO auftrag = rowModel.getObject();
-        final Set<RechnungsPositionVO> invoicePositions = rechnungCache.getRechnungsPositionVOSetByAuftragId(auftrag.getId());
+        final Set<RechnungsPositionVO> invoicePositions = getTenantRegistry().getInvoicCache().getRechnungsPositionVOSetByAuftragId(auftrag.getId());
         if (CollectionUtils.isEmpty(invoicePositions) == true) {
           item.add(AbstractUnsecureBasePage.createInvisibleDummyComponent(componentId));
         } else {

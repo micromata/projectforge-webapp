@@ -61,7 +61,7 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
         @Override
         public GroupDO getObject()
         {
-          return userGroupCache.getGroup(getSearchFilter().getGroupId());
+          return getTenantRegistry().getUserGroupCache().getGroup(getSearchFilter().getGroupId());
         }
 
         @Override
@@ -86,7 +86,7 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
         @Override
         public PFUserDO getObject()
         {
-          return userGroupCache.getUser(getSearchFilter().getUserId());
+          return getTenantRegistry().getUserGroupCache().getUser(getSearchFilter().getUserId());
         }
 
         @Override

@@ -58,7 +58,6 @@ import org.projectforge.renderer.PdfRenderer;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.common.OutputType;
 import org.projectforge.web.task.TaskFormatter;
@@ -104,9 +103,6 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
 
   @SpringBean(name = "taskFormatter")
   private TaskFormatter taskFormatter;
-
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
 
   private final GridBuilder gridBuilder;
 
@@ -471,7 +467,7 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
       } else {
         id = (Integer) selectedValue;
       }
-      form.filter.setUser(userGroupCache.getUser(id));
+      form.filter.setUser(getTenantRegistry().getUserGroupCache().getUser(id));
     } else if ("quickSelect".equals(property) == true) {
       final Date date = (Date) selectedValue;
       form.setDate(date);

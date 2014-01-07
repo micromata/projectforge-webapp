@@ -45,14 +45,12 @@ import org.projectforge.common.NumberHelper;
 import org.projectforge.common.StringHelper;
 import org.projectforge.fibu.AuftragsPositionVO;
 import org.projectforge.fibu.kost.Kost2DO;
-import org.projectforge.fibu.kost.KostCache;
 import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.ProjectForgeGroup;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.calendar.DateTimeFormatter;
@@ -88,14 +86,8 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
   @SpringBean(name = "userFormatter")
   private UserFormatter userFormatter;
 
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
-
   @SpringBean(name = "dateTimeFormatter")
   private DateTimeFormatter dateTimeFormatter;
-
-  @SpringBean(name = "kostCache")
-  private KostCache kostCache;
 
   @SpringBean(name = "priorityFormatter")
   private PriorityFormatter priorityFormatter;
@@ -108,7 +100,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
    */
   private TaskTreePage taskTreePage;
 
-  static void appendCssClasses(final Item<?> item, final TaskDO task, final Integer preselectedTaskNode)
+  static void appendCssClasses(final Item< ? > item, final TaskDO task, final Integer preselectedTaskNode)
   {
     appendCssClasses(item, task.getId(), preselectedTaskNode, task.isDeleted());
   }
@@ -229,8 +221,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
       }
     };
     final List<IColumn<TaskDO, String>> columns = new ArrayList<IColumn<TaskDO, String>>();
-    columns.add(new CellItemListenerPropertyColumn<TaskDO>(getString("task"), getSortable("title", sortable), "title",
-        cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<TaskDO>(getString("task"), getSortable("title", sortable), "title", cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<TaskDO>> item, final String componentId, final IModel<TaskDO> rowModel)
       {
@@ -248,8 +239,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
         addRowClick(item);
       }
     });
-    columns
-    .add(new CellItemListenerPropertyColumn<TaskDO>(getString("task.consumption"), null, "task", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<TaskDO>(getString("task.consumption"), null, "task", cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<TaskDO>> item, final String componentId, final IModel<TaskDO> rowModel)
       {
@@ -258,7 +248,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    if (kostCache.isKost2EntriesExists() == true) {
+    if (getTenantRegistry().getKostCache().isKost2EntriesExists() == true) {
       columns.add(new CellItemListenerPropertyColumn<TaskDO>(getString("fibu.kost2"), getSortable("kost2", sortable), "kost2",
           cellItemListener) {
         @Override
@@ -300,16 +290,16 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
       });
 
     }
-    columns.add(new CellItemListenerPropertyColumn<TaskDO>(getString("shortDescription"), getSortable(
-        "shortDescription", sortable), "shortDescription", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<TaskDO>(getString("shortDescription"), getSortable("shortDescription", sortable),
+        "shortDescription", cellItemListener));
     if (accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == true) {
       columns.add(new DatePropertyColumn<TaskDO>(dateTimeFormatter, getString("task.protectTimesheetsUntil.short"), getSortable(
           "protectTimesheetsUntil", sortable), "protectTimesheetsUntil", cellItemListener));
     }
-    columns.add(new CellItemListenerPropertyColumn<TaskDO>(getString("task.reference"), getSortable("reference",
-        sortable), "reference", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<TaskDO>(getString("priority"), getSortable("priority", sortable),
-        "priority", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<TaskDO>(getString("task.reference"), getSortable("reference", sortable), "reference",
+        cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<TaskDO>(getString("priority"), getSortable("priority", sortable), "priority",
+        cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<TaskDO>> item, final String componentId, final IModel<TaskDO> rowModel)
       {
@@ -318,8 +308,8 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<TaskDO>(getString("status"), getSortable("status", sortable),
-        "status", cellItemListener) {
+    columns
+    .add(new CellItemListenerPropertyColumn<TaskDO>(getString("status"), getSortable("status", sortable), "status", cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<TaskDO>> item, final String componentId, final IModel<TaskDO> rowModel)
       {
@@ -330,7 +320,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
     });
     final UserPropertyColumn<TaskDO> userPropertyColumn = new UserPropertyColumn<TaskDO>(getString("task.assignedUser"), getSortable(
         "responsibleUserId", sortable), "responsibleUserId", cellItemListener).withUserFormatter(userFormatter).setUserGroupCache(
-            userGroupCache);
+            getTenantRegistry().getUserGroupCache());
     columns.add(userPropertyColumn);
     return columns;
   }

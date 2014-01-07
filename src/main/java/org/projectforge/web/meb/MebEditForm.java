@@ -35,7 +35,6 @@ import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.hibernate.Hibernate;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.jira.JiraConfig;
@@ -45,7 +44,6 @@ import org.projectforge.meb.MebEntryDO;
 import org.projectforge.meb.MebEntryStatus;
 import org.projectforge.orga.PostType;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.URLHelper;
 import org.projectforge.web.calendar.DateTimeFormatter;
@@ -69,9 +67,6 @@ public class MebEditForm extends AbstractEditForm<MebEntryDO, MebEditPage>
   private static final String USER_PREF_KEY_JIRA_PROJECT = "meb.edit.recentJiraProject";
 
   private static final String USER_PREF_KEY_JIRA_ISSUE_TYPE = "meb.edit.recentJiraIssueType";
-
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
 
   private Integer jiraIssueType;
 
@@ -100,7 +95,7 @@ public class MebEditForm extends AbstractEditForm<MebEntryDO, MebEditPage>
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("meb.owner"));
       PFUserDO owner = data.getOwner();
       if (Hibernate.isInitialized(owner) == false) {
-        owner = userGroupCache.getUser(owner.getId());
+        owner = getTenantRegistry().getUserGroupCache().getUser(owner.getId());
         data.setOwner(owner);
       }
       final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(data, "owner"), parentPage,

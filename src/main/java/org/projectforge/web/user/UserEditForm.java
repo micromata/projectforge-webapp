@@ -61,16 +61,14 @@ import org.projectforge.ldap.LdapSambaAccountsUtils;
 import org.projectforge.ldap.LdapUserDao;
 import org.projectforge.ldap.LdapUserValues;
 import org.projectforge.ldap.PFUserDOConverter;
-import org.projectforge.multitenancy.TenantChecker;
 import org.projectforge.multitenancy.TenantDO;
 import org.projectforge.multitenancy.TenantsCache;
 import org.projectforge.multitenancy.TenantsComparator;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.Login;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserDao;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserRight;
 import org.projectforge.user.UserRightDao;
 import org.projectforge.user.UserRightVO;
@@ -112,9 +110,6 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
 
   @SpringBean(name = "userRightDao")
   private UserRightDao userRightDao;
-
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
 
   protected UserRightsEditData rightsData;
 
@@ -832,7 +827,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
         groupsProvider.getSortedGroups());
     if (set != null) {
       for (final Integer groupId : set) {
-        final GroupDO group = userGroupCache.getGroup(groupId);
+        final GroupDO group = getTenantRegistry().getUserGroupCache().getGroup(groupId);
         if (group != null) {
           assignGroupsListHelper.addOriginalAssignedItem(group).assignItem(group);
         }
@@ -845,11 +840,6 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
 
   private void addAssignedTenants()
   {
-    if (TenantChecker.getInstance().isSuperAdmin(getUser()) == false) {
-      // Do nothing, user has no multi-tenancy admin right.
-      // TODO: Admin user should add or delete users from the tenant he is administrator for.
-      return;
-    }
     final FieldsetPanel fs = gridBuilder.newFieldset(getString("multitenancy.assignedTenants")).setLabelSide(false);
     final Collection<Integer> set = ((UserDao) getBaseDao()).getAssignedTenants(data);
     final TenantsProvider tenantsProvider = new TenantsProvider();

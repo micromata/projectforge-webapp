@@ -31,11 +31,9 @@ import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
-import org.projectforge.fibu.kost.KostCache;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskFilter;
 import org.projectforge.user.ProjectForgeGroup;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.admin.TaskWizardPage;
 import org.projectforge.web.calendar.DateTimeFormatter;
@@ -72,9 +70,6 @@ public class TaskTreePage extends AbstractSecuredPage
   @SpringBean(name = "dateTimeFormatter")
   private DateTimeFormatter dateTimeFormatter;
 
-  @SpringBean(name = "kostCache")
-  private KostCache kostCache;
-
   @SpringBean(name = "priorityFormatter")
   private PriorityFormatter priorityFormatter;
 
@@ -83,9 +78,6 @@ public class TaskTreePage extends AbstractSecuredPage
 
   @SpringBean(name = "taskDao")
   private TaskDao taskDao;
-
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
 
   protected ISelectCallerPage caller;
 
@@ -190,12 +182,13 @@ public class TaskTreePage extends AbstractSecuredPage
     body.add(form);
     form.init();
     taskTreeBuilder = new TaskTreeBuilder().setSelectMode(isSelectMode()).setShowRootNode(isShowRootNode())
-        .setShowCost(kostCache.isKost2EntriesExists());
+        .setShowCost(getTenantRegistry().getKostCache().isKost2EntriesExists());
     if (accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP,
         ProjectForgeGroup.PROJECT_ASSISTANT, ProjectForgeGroup.PROJECT_MANAGER) == true) {
       taskTreeBuilder.setShowOrders(true);
     }
-    taskTreeBuilder.set(accessChecker, taskDao, taskFormatter, priorityFormatter, userFormatter, dateTimeFormatter, userGroupCache);
+    taskTreeBuilder.set(accessChecker, taskDao, taskFormatter, priorityFormatter, userFormatter, dateTimeFormatter, getTenantRegistry()
+        .getUserGroupCache());
     taskTreeBuilder.setCaller(caller).setSelectProperty(selectProperty);
     form.add(taskTreeBuilder.createTree("tree", this, form.getSearchFilter()));
 
@@ -286,7 +279,7 @@ public class TaskTreePage extends AbstractSecuredPage
     if (this.returnToPage != null) {
       return this.returnToPage;
     } else if (caller != null && caller instanceof WebPage) {
-      return (WebPage)caller;
+      return (WebPage) caller;
     }
     return null;
   }

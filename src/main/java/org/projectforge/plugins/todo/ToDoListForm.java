@@ -58,7 +58,7 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
         @Override
         public PFUserDO getObject()
         {
-          return userGroupCache.getUser(getSearchFilter().getAssigneeId());
+          return getTenantRegistry().getUserGroupCache().getUser(getSearchFilter().getAssigneeId());
         }
 
         @Override
@@ -84,7 +84,7 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
         @Override
         public PFUserDO getObject()
         {
-          return userGroupCache.getUser(getSearchFilter().getReporterId());
+          return getTenantRegistry().getUserGroupCache().getUser(getSearchFilter().getReporterId());
         }
 
         @Override

@@ -24,10 +24,8 @@
 package org.projectforge.web.user;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
@@ -38,9 +36,6 @@ public class MyAccountEditForm extends AbstractEditForm<PFUserDO, MyAccountEditP
   private static final long serialVersionUID = 4137560623244324454L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MyAccountEditForm.class);
-
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
 
   boolean invalidateAllStayLoggedInSessions;
 
@@ -66,7 +61,7 @@ public class MyAccountEditForm extends AbstractEditForm<PFUserDO, MyAccountEditP
     UserEditForm.createAuthenticationToken(gridBuilder, data, (UserDao) getBaseDao(), this);
     UserEditForm.createJIRAUsername(gridBuilder, data);
     final FieldsetPanel fs = gridBuilder.newFieldset(getString("user.assignedGroups")).suppressLabelForWarning();
-    fs.add(new DivTextPanel(fs.newChildId(), userGroupCache.getGroupnames(data.getId())));
+    fs.add(new DivTextPanel(fs.newChildId(), getTenantRegistry().getUserGroupCache().getGroupnames(data.getId())));
     gridBuilder.newSplitPanel(GridSize.COL50);
     UserEditForm.createLastLoginAndDeleteAllStayLogins(gridBuilder, data, (UserDao) getBaseDao(), this);
     UserEditForm.createLocale(gridBuilder, data);

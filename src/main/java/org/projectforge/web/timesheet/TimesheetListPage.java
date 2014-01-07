@@ -68,7 +68,6 @@ import org.projectforge.timesheet.TimesheetExport;
 import org.projectforge.timesheet.TimesheetFilter;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ThreadLocalUserContext;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.calendar.DateTimeFormatter;
@@ -134,9 +133,6 @@ IListPageColumnsCreator<TimesheetDO>
 
   @SpringBean(name = "userFormatter")
   private UserFormatter userFormatter;
-
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
 
   private TimesheetsICSExportDialog icsExportDialog;
 
@@ -503,7 +499,7 @@ IListPageColumnsCreator<TimesheetDO>
     buf.append("timesheets_");
     final TimesheetFilter filter = form.getSearchFilter();
     if (filter.getUserId() != null) {
-      buf.append(FileHelper.createSafeFilename(userGroupCache.getUser(filter.getUserId()).getLastname(), 20)).append("_");
+      buf.append(FileHelper.createSafeFilename(getTenantRegistry().getUserGroupCache().getUser(filter.getUserId()).getLastname(), 20)).append("_");
     }
     if (filter.getTaskId() != null) {
       final String taskTitle = taskTree.getTaskById(filter.getTaskId()).getTitle();
@@ -571,11 +567,11 @@ IListPageColumnsCreator<TimesheetDO>
             if ("user.fullname".equals(sortProperty) == true) {
               PFUserDO user = t1.getUser();
               if (user != null && Hibernate.isInitialized(user) == false) {
-                t1.setUser(userGroupCache.getUser(user.getId()));
+                t1.setUser(getTenantRegistry().getUserGroupCache().getUser(user.getId()));
               }
               user = t2.getUser();
               if (user != null && Hibernate.isInitialized(user) == false) {
-                t2.setUser(userGroupCache.getUser(user.getId()));
+                t2.setUser(getTenantRegistry().getUserGroupCache().getUser(user.getId()));
               }
             } else if ("task.title".equals(sortProperty) == true) {
               TaskDO task = t1.getTask();

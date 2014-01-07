@@ -38,7 +38,6 @@ import org.projectforge.humanresources.HRPlanningEntryDO;
 import org.projectforge.humanresources.HRPlanningEntryDao;
 import org.projectforge.humanresources.HRPlanningFilter;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.CSSColor;
 import org.projectforge.web.calendar.QuickSelectPanel;
 import org.projectforge.web.fibu.ProjektSelectPanel;
@@ -69,9 +68,6 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
 
   @SpringBean(name = "projektDao")
   private ProjektDao projektDao;
-
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
 
   @SpringBean(name = "hrPlanningEntryDao")
   private HRPlanningEntryDao hrPlanningEntryDao;
@@ -181,7 +177,7 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
         @Override
         public PFUserDO getObject()
         {
-          return userGroupCache.getUser(filter.getUserId());
+          return getTenantRegistry().getUserGroupCache().getUser(filter.getUserId());
         }
 
         @Override

@@ -38,7 +38,6 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.kost.Kost2DO;
-import org.projectforge.fibu.kost.KostCache;
 import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
@@ -47,7 +46,6 @@ import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.timesheet.TimesheetPrefData;
 import org.projectforge.timesheet.TimesheetPrefEntry;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.fibu.ISelectCallerPage;
@@ -107,16 +105,10 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
 
   private static final long serialVersionUID = -8192471994161712577L;
 
-  @SpringBean(name = "kostCache")
-  private KostCache kostCache;
-
   private transient TaskTree taskTree;
 
   @SpringBean(name = "timesheetDao")
   private TimesheetDao timesheetDao;
-
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
 
   private static final List<TimesheetPluginComponentHook> PLUGIN_HOOKS = new ArrayList<TimesheetPluginComponentHook>();
 
@@ -270,11 +262,11 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
     final TimesheetDO sheet = new TimesheetDO();
     final TaskDO task = getTaskTree().getTaskById(entry.getTaskId());
     sheet.setTask(task);
-    final Kost2DO kost2 = kostCache.getKost2(entry.getKost2Id());
+    final Kost2DO kost2 = getTenantRegistry().getKostCache().getKost2(entry.getKost2Id());
     sheet.setKost2(kost2);
     sheet.setDescription(entry.getDescription());
     sheet.setLocation(entry.getLocation());
-    final PFUserDO user = userGroupCache.getUser(entry.getUserId());
+    final PFUserDO user = getTenantRegistry().getUserGroupCache().getUser(entry.getUserId());
     sheet.setUser(user);
     return sheet;
   }

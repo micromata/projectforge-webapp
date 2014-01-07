@@ -139,7 +139,7 @@ public class TimesheetListForm extends AbstractListForm<TimesheetListFilter, Tim
         @Override
         public PFUserDO getObject()
         {
-          return userGroupCache.getUser(filter.getUserId());
+          return getTenantRegistry().getUserGroupCache().getUser(filter.getUserId());
         }
 
         @Override

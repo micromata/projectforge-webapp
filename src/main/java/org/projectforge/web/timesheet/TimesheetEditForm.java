@@ -59,7 +59,6 @@ import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ThreadLocalUserContext;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.user.UserPrefDO;
 import org.projectforge.user.UserPrefDao;
@@ -104,9 +103,6 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
 
   @SpringBean(name = "userFormatter")
   private UserFormatter userFormatter;
-
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
 
   @SpringBean(name = "userPrefDao")
   private UserPrefDao userPrefDao;
@@ -273,7 +269,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("user"));
       PFUserDO user = data.getUser();
       if (Hibernate.isInitialized(user) == false) {
-        user = userGroupCache.getUser(user.getId());
+        user = getTenantRegistry().getUserGroupCache().getUser(user.getId());
         data.setUser(user);
       }
       userSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(data, "user"), parentPage, "userId");
