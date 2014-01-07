@@ -37,6 +37,7 @@ import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.core.UserException;
+import org.projectforge.database.InitDatabaseDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserDao;
@@ -59,11 +60,18 @@ public class TenantDao extends BaseDao<TenantDO>
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "assignedUsers.username", "assignedUsers.firstname",
   "assignedUsers.lastname"};
 
+  private InitDatabaseDao initDatabaseDao;
+
   private TenantsCache tenantsCache;
 
   private UserDao userDao;
 
   // private final TenantsProvider groupsProvider = new TenantsProvider();
+
+  public void setInitDatabaseDao(final InitDatabaseDao initDatabaseDao)
+  {
+    this.initDatabaseDao = initDatabaseDao;
+  }
 
   /**
    * @return the tenantsCache
@@ -167,6 +175,7 @@ public class TenantDao extends BaseDao<TenantDO>
   }
 
   /**
+   * Creates ProjectForge's system groups for the new tenant.<br/>
    * Creates for every user an history entry if the user is part of this new tenant.
    * @param tenant
    * @see org.projectforge.core.BaseDao#afterSave(org.projectforge.core.ExtendedBaseDO)
@@ -174,6 +183,8 @@ public class TenantDao extends BaseDao<TenantDO>
   @Override
   public void afterSave(final TenantDO tenant)
   {
+    final PFUserDO adminUser = ThreadLocalUserContext.getUser();
+    initDatabaseDao.internalCreateProjectForgeGroups(tenant, adminUser);
     final Collection<TenantDO> tenantList = new ArrayList<TenantDO>();
     tenantList.add(tenant);
     if (tenant.getAssignedUsers() != null) {

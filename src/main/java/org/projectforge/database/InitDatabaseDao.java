@@ -36,6 +36,8 @@ import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.ConfigurationParam;
 import org.projectforge.core.HibernateSearchReindexer;
 import org.projectforge.database.xstream.XStreamSavingConverter;
+import org.projectforge.multitenancy.TenantDO;
+import org.projectforge.multitenancy.TenantDao;
 import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskNode;
@@ -177,15 +179,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
     userDao.internalSave(adminUser);
     ThreadLocalUserContext.setUser(adminUser); // Need to login the admin user for avoiding following access exceptions.
 
-    final Set<PFUserDO> adminUsers = new HashSet<PFUserDO>();
-    adminUsers.add(adminUser);
-    addGroup(ProjectForgeGroup.ADMIN_GROUP, "Administrators of ProjectForge", adminUsers);
-    addGroup(ProjectForgeGroup.CONTROLLING_GROUP, "Users for having read access to the company's finances.", adminUsers);
-    addGroup(ProjectForgeGroup.FINANCE_GROUP, "Finance and Accounting", adminUsers);
-    addGroup(ProjectForgeGroup.MARKETING_GROUP, "Marketing users can download all addresses in excel format.", null);
-    addGroup(ProjectForgeGroup.ORGA_TEAM, "The organization team has access to post in- and outbound, contracts etc..", adminUsers);
-    addGroup(ProjectForgeGroup.PROJECT_MANAGER, "Project managers have access to assigned orders and resource planning.", null);
-    addGroup(ProjectForgeGroup.PROJECT_ASSISTANT, "Project assistants have access to assigned orders.", null);
+    internalCreateProjectForgeGroups(null, adminUser);
 
     Registry.instance().getTaskTree().setExpired();
     userGroupCache.setExpired();
@@ -194,12 +188,45 @@ public class InitDatabaseDao extends HibernateDaoSupport
     return adminUser;
   }
 
-  private void addGroup(final ProjectForgeGroup projectForgeGroup, final String description, final Set<PFUserDO> users)
+  /**
+   * Only for internal usage by {@link TenantDao} or {@link InitDatabaseDao}!
+   * @param tenant
+   * @param adminUser
+   */
+  public void internalCreateProjectForgeGroups(final TenantDO tenant, final PFUserDO adminUser)
+  {
+    final Set<PFUserDO> adminUsers = new HashSet<PFUserDO>();
+    adminUsers.add(adminUser);
+    Set<PFUserDO> adminUsersForNewTenants = null;
+    if (tenant == null) {
+      // Assign admin user for almost all groups only for initialization of a new ProjectForge installation. For new tenants the admin user
+      // is only assigned to the admin group for the new tenant.
+      adminUsersForNewTenants = adminUsers;
+    }
+
+    addGroup(ProjectForgeGroup.ADMIN_GROUP, "Administrators of ProjectForge", tenant, adminUsers);
+    addGroup(ProjectForgeGroup.CONTROLLING_GROUP, "Users for having read access to the company's finances.", tenant,
+        adminUsersForNewTenants);
+    addGroup(ProjectForgeGroup.FINANCE_GROUP, "Finance and Accounting", tenant, adminUsersForNewTenants);
+    addGroup(ProjectForgeGroup.MARKETING_GROUP, "Marketing users can download all addresses in excel format.", tenant, null);
+    addGroup(ProjectForgeGroup.ORGA_TEAM, "The organization team has access to post in- and outbound, contracts etc..", tenant,
+        adminUsersForNewTenants);
+    addGroup(ProjectForgeGroup.PROJECT_MANAGER, "Project managers have access to assigned orders and resource planning.", tenant, null);
+    addGroup(ProjectForgeGroup.PROJECT_ASSISTANT, "Project assistants have access to assigned orders.", tenant, null);
+  }
+
+  private void addGroup(final ProjectForgeGroup projectForgeGroup, final String description, final TenantDO tenant,
+      final Set<PFUserDO> users)
   {
     final GroupDO group = new GroupDO();
     group.setName(projectForgeGroup.toString());
     group.setDescription(description);
-    group.setAssignedUsers(users);
+    if (users != null) {
+      group.setAssignedUsers(users);
+    }
+    if (tenant != null) {
+      groupDao.setTenant(group, tenant.getId());
+    }
     // group.setNestedGroupsAllowed(false);
     group.setLocalGroup(true); // Do not synchronize group with external user management system by default.
     groupDao.internalSave(group);
