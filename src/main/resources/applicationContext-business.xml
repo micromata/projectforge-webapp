@@ -17,9 +17,6 @@
   <bean id="statisticsCache" class="org.projectforge.database.StatisticsCache" singleton="true">
     <property name="expireTimeInHours" value="12" />
   </bean>
-  <bean id="userGroupCache" class="org.projectforge.user.UserGroupCache" singleton="true">
-    <property name="expireTimeInHours" value="1" />
-  </bean>
   <bean id="systemInfoCache" class="org.projectforge.core.SystemInfoCache" singleton="true">
     <property name="expireTimeInHours" value="1" />
   </bean>
@@ -69,18 +66,15 @@
   <bean id="employeeDao" class="org.projectforge.fibu.EmployeeDao" />
   <bean id="employeeSalaryExportDao" class="org.projectforge.fibu.datev.EmployeeSalaryExportDao" />
   <bean id="employeeSalaryDao" class="org.projectforge.fibu.EmployeeSalaryDao" />
-  <bean id="kontoCache" class="org.projectforge.fibu.KontoCache" singleton="true" />
   <bean id="kontoDao" class="org.projectforge.fibu.KontoDao" />
   <bean id="kost1Dao" class="org.projectforge.fibu.kost.Kost1Dao" />
   <bean id="kost2Dao" class="org.projectforge.fibu.kost.Kost2Dao" />
   <bean id="kost2ArtDao" class="org.projectforge.fibu.kost.Kost2ArtDao" />
-  <bean id="kostCache" class="org.projectforge.fibu.kost.KostCache" singleton="true" />
   <bean id="kostZuweisungDao" class="org.projectforge.fibu.kost.KostZuweisungDao" />
   <bean id="datevImportDao" class="org.projectforge.fibu.datev.DatevImportDao" />
   <bean id="kundeDao" class="org.projectforge.fibu.KundeDao" />
   <bean id="monthlyEmployeeReportDao" class="org.projectforge.fibu.MonthlyEmployeeReportDao" />
   <bean id="projektDao" class="org.projectforge.fibu.ProjektDao" />
-  <bean id="rechnungCache" class="org.projectforge.fibu.RechnungCache" singleton="true" />
   <bean id="rechnungDao" class="org.projectforge.fibu.RechnungDao">
     <property name="defaultSteuersatz">
       <value>0.19</value>
