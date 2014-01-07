@@ -131,6 +131,7 @@ public class TenantRegistry
   {
     if (taskTree == null) {
       taskTree = new TaskTree();
+      taskTree.setTenant(tenant);
       final Registry registry = Registry.instance();
       taskTree.setAccessDao(registry.getDao(AccessDao.class));
       taskTree.setAuftragDao(registry.getDao(AuftragDao.class));
