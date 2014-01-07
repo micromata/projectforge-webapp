@@ -30,6 +30,8 @@ import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.projectforge.common.BeanHelper;
+import org.projectforge.multitenancy.TenantDO;
+import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.wicket.CellItemListener;
@@ -41,7 +43,9 @@ public class UserPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
 
   private UserFormatter userFormatter;
 
-  private UserGroupCache userGroupCache;
+  private transient UserGroupCache userGroupCache;
+
+  private TenantDO tenant;
 
   /**
    * @param clazz
@@ -95,9 +99,8 @@ public class UserPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
       if (obj instanceof PFUserDO) {
         user = (PFUserDO) obj;
       } else if (obj instanceof Integer) {
-        Validate.notNull(userGroupCache);
         final Integer userId = (Integer) obj;
-        user = userGroupCache.getUser(userId);
+        user = getUserGroupCache().getUser(userId);
       } else {
         throw new IllegalStateException("Unsupported column type: " + obj);
       }
@@ -129,6 +132,15 @@ public class UserPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
   public UserPropertyColumn<T> setUserGroupCache(final UserGroupCache userGroupCache)
   {
     this.userGroupCache = userGroupCache;
+    this.tenant = userGroupCache.getTenant();
     return this;
+  }
+
+  private UserGroupCache getUserGroupCache()
+  {
+    if (userGroupCache == null) {
+      userGroupCache = TenantRegistryMap.getInstance().getTenantRegistry(tenant).getUserGroupCache();
+    }
+    return userGroupCache;
   }
 }

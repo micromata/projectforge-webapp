@@ -56,6 +56,8 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.fibu.AuftragsPositionVO;
+import org.projectforge.multitenancy.TenantDO;
+import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskFilter;
@@ -102,7 +104,9 @@ public class TaskTreeBuilder implements Serializable
 
   private DateTimeFormatter dateTimeFormatter;
 
-  private UserGroupCache userGroupCache;
+  private transient UserGroupCache userGroupCache;
+
+  private TenantDO tenant;
 
   private TableTree<TaskNode, String> tree;
 
@@ -268,7 +272,7 @@ public class TaskTreeBuilder implements Serializable
       }
     });
     final UserPropertyColumn<TaskNode> userPropertyColumn = new UserPropertyColumn<TaskNode>(parentPage.getString("task.assignedUser"),
-        null, "task.responsibleUserId", cellItemListener).withUserFormatter(userFormatter).setUserGroupCache(userGroupCache);
+        null, "task.responsibleUserId", cellItemListener).withUserFormatter(userFormatter).setUserGroupCache(getUserGroupCache());
     columns.add(userPropertyColumn);
     return columns;
   }
@@ -349,6 +353,7 @@ public class TaskTreeBuilder implements Serializable
     this.userFormatter = userFormatter;
     this.dateTimeFormatter = dateTimeFormatter;
     this.userGroupCache = userGroupCache;
+    this.tenant = userGroupCache != null ? userGroupCache.getTenant() : null;
     this.dateTimeFormatter = dateTimeFormatter;
     return this;
   }
@@ -400,5 +405,13 @@ public class TaskTreeBuilder implements Serializable
       taskTree = Registry.instance().getTaskTree();
     }
     return taskTree;
+  }
+
+  private UserGroupCache getUserGroupCache()
+  {
+    if (userGroupCache == null) {
+      userGroupCache = TenantRegistryMap.getInstance().getTenantRegistry(tenant).getUserGroupCache();
+    }
+    return userGroupCache;
   }
 }
