@@ -44,7 +44,6 @@ import org.projectforge.core.Priority;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefDO;
 import org.projectforge.user.UserPrefDao;
 import org.projectforge.web.dialog.ModalDialog;
@@ -71,9 +70,6 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
   private static final long serialVersionUID = -6208809585214296635L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ToDoEditForm.class);
-
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
 
   @SpringBean(name = "userPrefDao")
   private UserPrefDao userPrefDao;
@@ -198,7 +194,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
       final FieldsetPanel fs = gridBuilder.newFieldset(ToDoDO.class, "assignee");
       PFUserDO assignee = data.getAssignee();
       if (Hibernate.isInitialized(assignee) == false) {
-        assignee = userGroupCache.getUser(assignee.getId());
+        assignee = getTenantRegistry().getUserGroupCache().getUser(assignee.getId());
         data.setAssignee(assignee);
       }
       final UserSelectPanel assigneeUserSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(data, "assignee"),
@@ -212,7 +208,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
       final FieldsetPanel fs = gridBuilder.newFieldset(ToDoDO.class, "reporter");
       PFUserDO reporter = data.getReporter();
       if (Hibernate.isInitialized(reporter) == false) {
-        reporter = userGroupCache.getUser(reporter.getId());
+        reporter = getTenantRegistry().getUserGroupCache().getUser(reporter.getId());
         data.setReporter(reporter);
       }
       final UserSelectPanel reporterUserSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(data, "reporter"),

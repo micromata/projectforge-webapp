@@ -41,7 +41,6 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.GroupDO;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.core.PriorityFormatter;
 import org.projectforge.web.task.TaskPropertyColumn;
@@ -70,9 +69,6 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
 
   @SpringBean(name = "userFormatter")
   private UserFormatter userFormatter;
-
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
 
   public ToDoListPage(final PageParameters parameters)
   {
@@ -140,7 +136,7 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
         final ToDoDO projektDO = rowModel.getObject();
         String groupName = "";
         if (projektDO.getGroup() != null) {
-          final GroupDO group = userGroupCache.getGroup(projektDO.getGroupId());
+          final GroupDO group = getTenantRegistry().getUserGroupCache().getGroup(projektDO.getGroupId());
           if (group != null) {
             groupName = group.getName();
           }

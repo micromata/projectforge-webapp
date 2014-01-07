@@ -36,7 +36,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.wicket.components.AjaxMaxLengthEditableLabel;
@@ -49,9 +49,6 @@ public class TeamAttendeesPanel extends Panel
   private static final long serialVersionUID = 5951744897882589488L;
 
   private final Set<TeamEventAttendeeDO> attendees;
-
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
 
   private final RepeatingView attendeesRepeater;
 
@@ -97,6 +94,7 @@ public class TeamAttendeesPanel extends Panel
           }
           final TeamEventAttendeeDO attendee = attendeeModel.getObject();
           if (attendee.getUserId() != null) {
+            final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
             final PFUserDO user = userGroupCache.getUser(attendee.getUserId());
             return user != null ? user.getFullname() : attendee.getUrl();
           }
@@ -115,6 +113,7 @@ public class TeamAttendeesPanel extends Panel
             attendee.setUser(null);
             return;
           }
+          final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
           final PFUserDO user = userGroupCache.getUserByFullname(object);
           if (user != null) {
             attendee.setUser(user);

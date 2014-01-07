@@ -69,9 +69,6 @@ public class SetupPage extends AbstractUnsecureBasePage
   @SpringBean(name = "hibernateSearchReindexer")
   private HibernateSearchReindexer hibernateSearchReindexer;
 
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
-
   @SpringBean(name = "myDatabaseUpdater")
   private MyDatabaseUpdater myDatabaseUpdater;
 
@@ -188,6 +185,7 @@ public class SetupPage extends AbstractUnsecureBasePage
       Configuration.getInstance().setExpired();
       final TaskTree taskTree = Registry.instance().getTaskTree();
       taskTree.setExpired();
+      final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
       userGroupCache.setExpired();
       new Thread() {
         @Override

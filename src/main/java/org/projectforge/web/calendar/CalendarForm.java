@@ -31,7 +31,6 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.joda.time.DateMidnight;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.wicket.AbstractStandardForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
@@ -49,9 +48,6 @@ import org.projectforge.web.wicket.flowlayout.IconType;
 public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarPage>
 {
   private static final long serialVersionUID = -145923669780937370L;
-
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
 
   @SpringBean(name = "userDao")
   protected UserDao userDao;
@@ -173,7 +169,7 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
   public PFUserDO getTimesheetsUser()
   {
     final Integer userId = getFilter().getTimesheetUserId();
-    return userId != null ? userGroupCache.getUser(userId) : null;
+    return userId != null ? getTenantRegistry().getUserGroupCache().getUser(userId) : null;
   }
 
   public void setTimesheetsUser(final PFUserDO user)

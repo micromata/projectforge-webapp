@@ -27,10 +27,15 @@ import org.projectforge.access.AccessDao;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationDao;
 import org.projectforge.fibu.AuftragDao;
+import org.projectforge.fibu.KontoCache;
 import org.projectforge.fibu.ProjektDao;
+import org.projectforge.fibu.RechnungCache;
+import org.projectforge.fibu.kost.KostCache;
 import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskTree;
+import org.projectforge.user.UserGroupCache;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 
 /**
  * Holds caches of a single tenant. After the configured time to live (TTL) this registry is detached from {@link TenantRegistryMap}.
@@ -49,7 +54,11 @@ public class TenantRegistry
 
   private Configuration configuration;
 
+  private HibernateTemplate hibernateTemplate;
+
   private TaskTree taskTree;
+
+  private UserGroupCache userGroupCache;
 
   private final TenantDO tenant;
 
@@ -81,6 +90,20 @@ public class TenantRegistry
     return configuration;
   }
 
+  public KontoCache getKontoCache()
+  {
+    return Registry.instance().getKontoCache();
+  }
+
+  public KostCache getKostCache()
+  {
+    return Registry.instance().getKostCache();
+  }
+
+  public RechnungCache getInvoicCache() {
+    return Registry.instance().getInvoiceCache();
+  }
+
   /**
    * @return the taskTree
    */
@@ -97,6 +120,19 @@ public class TenantRegistry
     }
     updateUsageTime();
     return taskTree;
+  }
+
+  /**
+   * @return the userGroupCache
+   */
+  public UserGroupCache getUserGroupCache()
+  {
+    if (userGroupCache == null) {
+      // userGroupCache = new UserGroupCache();
+      // userGroupCache.setHibernateTemplate(hibernateTemplate);
+      userGroupCache = Registry.instance().getUserGroupCache();
+    }
+    return userGroupCache;
   }
 
   /**
