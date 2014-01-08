@@ -36,7 +36,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.MDC;
 import org.projectforge.common.NumberHelper;
-import org.projectforge.registry.Registry;
 import org.projectforge.rest.Authentication;
 import org.projectforge.rest.ConnectionSettings;
 import org.projectforge.rest.converter.DateTimeFormat;
@@ -108,7 +107,7 @@ public class RestUserFilter implements Filter
         final String authenticationToken = getAttribute(req, Authentication.AUTHENTICATION_TOKEN);
         if (authenticationToken != null) {
           if (authenticationToken.equals(userDao.getCachedAuthenticationToken(userId)) == true) {
-            user = Registry.instance().getUserGroupCache().getUser(userId);
+            user = userDao.getUserCache().getUser(userId);
           } else {
             log.error(Authentication.AUTHENTICATION_TOKEN
                 + " doesn't match for "
