@@ -184,7 +184,13 @@ public class TenantDao extends BaseDao<TenantDO>
   public void afterSave(final TenantDO tenant)
   {
     final PFUserDO adminUser = ThreadLocalUserContext.getUser();
-    initDatabaseDao.internalCreateProjectForgeGroups(tenant, adminUser);
+    if (tenant.isDefault() == false) {
+      // The groups do already exist for the default tenant.
+      initDatabaseDao.internalCreateProjectForgeGroups(tenant, adminUser);
+    } else {
+      // Clear the dummy entry:
+      TenantRegistryMap.getInstance().clear();
+    }
     final Collection<TenantDO> tenantList = new ArrayList<TenantDO>();
     tenantList.add(tenant);
     if (tenant.getAssignedUsers() != null) {

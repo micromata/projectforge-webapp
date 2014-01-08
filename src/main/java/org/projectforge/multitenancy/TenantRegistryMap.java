@@ -30,6 +30,7 @@ import java.util.Map;
 import org.apache.commons.lang.Validate;
 import org.projectforge.access.AccessException;
 import org.projectforge.common.AbstractCache;
+import org.projectforge.core.BaseDO;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ThreadLocalUserContext;
@@ -61,6 +62,14 @@ public class TenantRegistryMap extends AbstractCache
   private TenantRegistryMap()
   {
     super(EXPIRE_TIME);
+  }
+
+  public TenantRegistry getTenantRegistry(final BaseDO<?> obj)
+  {
+    if (obj == null) {
+      return getTenantRegistry();
+    }
+    return getTenantRegistry(obj.getTenant());
   }
 
   public TenantRegistry getTenantRegistry(TenantDO tenant)
@@ -137,6 +146,15 @@ public class TenantRegistryMap extends AbstractCache
         dummyTenantRegistry = new TenantRegistry(dummyTenant);
       }
       return dummyTenantRegistry;
+    }
+  }
+
+  void clear()
+  {
+    synchronized (this) {
+      singleTenantRegistry = null;
+      dummyTenantRegistry = null;
+      tenantRegistryMap.clear();
     }
   }
 
