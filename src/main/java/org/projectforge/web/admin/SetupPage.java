@@ -44,8 +44,8 @@ import org.projectforge.database.xstream.XStreamSavingConverter;
 import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserCache;
 import org.projectforge.user.UserContext;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.MenuItemRegistry;
 import org.projectforge.web.UserFilter;
@@ -185,8 +185,8 @@ public class SetupPage extends AbstractUnsecureBasePage
       Configuration.getInstance().setExpired();
       final TaskTree taskTree = Registry.instance().getTaskTree();
       taskTree.setExpired();
-      final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
-      userGroupCache.setExpired();
+      final UserCache userCache = Registry.instance().getUserCache();
+      userCache.setExpired();
       new Thread() {
         @Override
         public void run()

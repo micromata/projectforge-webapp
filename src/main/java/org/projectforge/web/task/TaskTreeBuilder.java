@@ -56,15 +56,12 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.fibu.AuftragsPositionVO;
-import org.projectforge.multitenancy.TenantDO;
-import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskFilter;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.ProjectForgeGroup;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.core.PriorityFormatter;
 import org.projectforge.web.fibu.ISelectCallerPage;
@@ -103,10 +100,6 @@ public class TaskTreeBuilder implements Serializable
   private UserFormatter userFormatter;
 
   private DateTimeFormatter dateTimeFormatter;
-
-  private transient UserGroupCache userGroupCache;
-
-  private TenantDO tenant;
 
   private TableTree<TaskNode, String> tree;
 
@@ -272,7 +265,7 @@ public class TaskTreeBuilder implements Serializable
       }
     });
     final UserPropertyColumn<TaskNode> userPropertyColumn = new UserPropertyColumn<TaskNode>(parentPage.getString("task.assignedUser"),
-        null, "task.responsibleUserId", cellItemListener).withUserFormatter(userFormatter).setUserGroupCache(getUserGroupCache());
+        null, "task.responsibleUserId", cellItemListener).withUserFormatter(userFormatter);
     columns.add(userPropertyColumn);
     return columns;
   }
@@ -344,16 +337,13 @@ public class TaskTreeBuilder implements Serializable
   }
 
   public TaskTreeBuilder set(final AccessChecker accessChecker, final TaskDao taskDao, final TaskFormatter taskFormatter,
-      final PriorityFormatter priorityFormatter, final UserFormatter userFormatter, final DateTimeFormatter dateTimeFormatter,
-      final UserGroupCache userGroupCache)
+      final PriorityFormatter priorityFormatter, final UserFormatter userFormatter, final DateTimeFormatter dateTimeFormatter)
   {
     this.accessChecker = accessChecker;
     this.taskFormatter = taskFormatter;
     this.priorityFormatter = priorityFormatter;
     this.userFormatter = userFormatter;
     this.dateTimeFormatter = dateTimeFormatter;
-    this.userGroupCache = userGroupCache;
-    this.tenant = userGroupCache != null ? userGroupCache.getTenant() : null;
     this.dateTimeFormatter = dateTimeFormatter;
     return this;
   }
@@ -400,18 +390,11 @@ public class TaskTreeBuilder implements Serializable
     return this;
   }
 
-  private TaskTree getTaskTree() {
+  private TaskTree getTaskTree()
+  {
     if (taskTree == null) {
       taskTree = Registry.instance().getTaskTree();
     }
     return taskTree;
-  }
-
-  private UserGroupCache getUserGroupCache()
-  {
-    if (userGroupCache == null) {
-      userGroupCache = TenantRegistryMap.getInstance().getTenantRegistry(tenant).getUserGroupCache();
-    }
-    return userGroupCache;
   }
 }

@@ -39,7 +39,7 @@ import org.projectforge.fibu.EmployeeDao;
 import org.projectforge.fibu.KostFormatter;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserGroupCache;
+import org.projectforge.user.UserCache;
 import org.projectforge.web.user.UserPreferencesHelper;
 import org.projectforge.web.wicket.AbstractSelectPanel;
 import org.projectforge.web.wicket.WicketUtils;
@@ -160,8 +160,8 @@ public class EmployeeSelectPanel extends AbstractSelectPanel<EmployeeDO>
             }
             final int ind = value.indexOf(": ");
             final String username = ind >= 0 ? value.substring(0, ind) : value;
-            final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
-            final PFUserDO user = userGroupCache.getUser(username);
+            final UserCache userCache = Registry.instance().getUserCache();
+            final PFUserDO user = userCache.getUser(username);
             if (user == null) {
               error(getString("fibu.employee.panel.error.employeeNotFound"));
               return null;

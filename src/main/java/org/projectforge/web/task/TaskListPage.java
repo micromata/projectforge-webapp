@@ -319,8 +319,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
       }
     });
     final UserPropertyColumn<TaskDO> userPropertyColumn = new UserPropertyColumn<TaskDO>(getString("task.assignedUser"), getSortable(
-        "responsibleUserId", sortable), "responsibleUserId", cellItemListener).withUserFormatter(userFormatter).setUserGroupCache(
-            getTenantRegistry().getUserGroupCache());
+        "responsibleUserId", sortable), "responsibleUserId", cellItemListener).withUserFormatter(userFormatter);
     columns.add(userPropertyColumn);
     return columns;
   }

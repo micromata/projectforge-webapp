@@ -30,10 +30,9 @@ import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.projectforge.common.BeanHelper;
-import org.projectforge.multitenancy.TenantDO;
-import org.projectforge.multitenancy.TenantRegistryMap;
+import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserGroupCache;
+import org.projectforge.user.UserCache;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 
@@ -43,9 +42,7 @@ public class UserPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
 
   private UserFormatter userFormatter;
 
-  private transient UserGroupCache userGroupCache;
-
-  private TenantDO tenant;
+  private transient UserCache userCache;
 
   /**
    * @param clazz
@@ -100,7 +97,7 @@ public class UserPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
         user = (PFUserDO) obj;
       } else if (obj instanceof Integer) {
         final Integer userId = (Integer) obj;
-        user = getUserGroupCache().getUser(userId);
+        user = getUserCache().getUser(userId);
       } else {
         throw new IllegalStateException("Unsupported column type: " + obj);
       }
@@ -125,22 +122,11 @@ public class UserPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
     return this;
   }
 
-  /**
-   * Fluent pattern
-   * @param userFormatter
-   */
-  public UserPropertyColumn<T> setUserGroupCache(final UserGroupCache userGroupCache)
+  private UserCache getUserCache()
   {
-    this.userGroupCache = userGroupCache;
-    this.tenant = userGroupCache.getTenant();
-    return this;
-  }
-
-  private UserGroupCache getUserGroupCache()
-  {
-    if (userGroupCache == null) {
-      userGroupCache = TenantRegistryMap.getInstance().getTenantRegistry(tenant).getUserGroupCache();
+    if (userCache == null) {
+      userCache = Registry.instance().getUserCache();
     }
-    return userGroupCache;
+    return userCache;
   }
 }

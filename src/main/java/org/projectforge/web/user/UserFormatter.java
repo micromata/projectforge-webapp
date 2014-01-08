@@ -25,14 +25,14 @@ package org.projectforge.web.user;
 
 import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserGroupCache;
+import org.projectforge.user.UserCache;
 import org.projectforge.web.HtmlHelper;
 
 public class UserFormatter
 {
   /**
    * Does not escape characters.
-   * @param user (must not be initialized, the user will be get from the userGroupCache)
+   * @param user (must not be initialized, the user will be get from the {@link UserCache})
    * @return User's full name.
    * @see PFUserDO#getFullname()
    */
@@ -52,8 +52,8 @@ public class UserFormatter
    */
   public String formatUser(final Integer userId)
   {
-    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
-    final PFUserDO u = userGroupCache.getUser(userId);
+    final UserCache userCache = Registry.instance().getUserCache();
+    final PFUserDO u = userCache.getUser(userId);
     return u != null ? u.getFullname() : "";
   }
 
@@ -73,15 +73,15 @@ public class UserFormatter
     if (userId == null) {
       return "";
     }
-    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
-    final PFUserDO user = userGroupCache.getUser(userId);
+    final UserCache userCache = Registry.instance().getUserCache();
+    final PFUserDO user = userCache.getUser(userId);
     return getFormattedUser(user);
   }
 
   public void appendFormattedUser(final StringBuffer buf, final Integer userId)
   {
-    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
-    final PFUserDO user = userGroupCache.getUser(userId);
+    final UserCache userCache = Registry.instance().getUserCache();
+    final PFUserDO user = userCache.getUser(userId);
     appendFormattedUser(buf, user);
   }
 
