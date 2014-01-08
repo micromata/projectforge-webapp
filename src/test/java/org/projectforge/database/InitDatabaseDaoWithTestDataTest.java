@@ -74,7 +74,7 @@ public class InitDatabaseDaoWithTestDataTest extends PluginTestBase
   @BeforeClass
   public static void setup() throws BeansException, IOException
   {
-    TeamCalTestHelper.setup(); // Needed because it's part of dump.
+    TeamCalTestHelper.setup(false); // Needed because it's part of dump.
   }
 
   public void setInitDatabaseDao(final InitDatabaseDao initDatabaseDao)
@@ -120,6 +120,7 @@ public class InitDatabaseDaoWithTestDataTest extends PluginTestBase
     final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
     final String testPassword = "demo123";
     userGroupCache.setExpired(); // Force reload (because it's may be expired due to previous tests).
+    Registry.instance().getUserCache().setExpired(); // Force reload (because it's may be expired due to previous tests).
     assertTrue(initDatabaseDao.isEmpty());
     final PFUserDO admin = new PFUserDO();
     admin.setUsername("myadmin");
