@@ -40,8 +40,8 @@ import org.mockito.Mockito;
 import org.projectforge.core.ProjectForgeApp;
 import org.projectforge.rest.Authentication;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserCache;
 import org.projectforge.user.UserDao;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.wicket.WicketApplication;
 
 public class RestUserFilterTest
@@ -56,9 +56,9 @@ public class RestUserFilterTest
     when(userDao.authenticateUser(Mockito.eq("successUser"), Mockito.eq("successPassword"))).thenReturn(
         new PFUserDO().setUsername("successUser"));
     when(userDao.getCachedAuthenticationToken(Mockito.eq(2))).thenReturn("token");
-    final UserGroupCache userGroupCache = mock(UserGroupCache.class);
-    when(userDao.getUserGroupCache()).thenReturn(userGroupCache);
-    when(userGroupCache.getUser(Mockito.eq(2))).thenReturn(new PFUserDO().setUsername("testuser"));
+    final UserCache userCache = mock(UserCache.class);
+    when(userDao.getUserCache()).thenReturn(userCache);
+    when(userCache.getUser(Mockito.eq(2))).thenReturn(new PFUserDO().setUsername("testuser"));
     final RestUserFilter filter = new RestUserFilter();
     filter.userDao = userDao;
 
