@@ -76,6 +76,7 @@ import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ThreadLocalUserContext;
+import org.projectforge.user.UserCache;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserRight;
 import org.projectforge.user.UserRightId;
@@ -772,11 +773,11 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     final List<DisplayHistoryEntry> result = new ArrayList<DisplayHistoryEntry>();
     final List<PropertyDelta> delta = entry.getDelta();
     if (delta == null || delta.size() == 0) {
-      final DisplayHistoryEntry se = new DisplayHistoryEntry(getUserGroupCache(), entry);
+      final DisplayHistoryEntry se = new DisplayHistoryEntry(getUserCache(), entry);
       result.add(se);
     } else {
       for (final PropertyDelta prop : delta) {
-        final DisplayHistoryEntry se = new DisplayHistoryEntry(getUserGroupCache(), entry, prop, session);
+        final DisplayHistoryEntry se = new DisplayHistoryEntry(getUserCache(), entry, prop, session);
         result.add(se);
       }
     }
@@ -803,11 +804,11 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
         for (final HistoryEntry entry : entries) {
           final List<PropertyDelta> delta = entry.getDelta();
           if (delta == null || delta.size() == 0) {
-            final SimpleHistoryEntry se = new SimpleHistoryEntry(getUserGroupCache(), entry);
+            final SimpleHistoryEntry se = new SimpleHistoryEntry(getUserCache(), entry);
             list.add(se);
           } else {
             for (final PropertyDelta prop : delta) {
-              final SimpleHistoryEntry se = new SimpleHistoryEntry(getUserGroupCache(), entry, prop);
+              final SimpleHistoryEntry se = new SimpleHistoryEntry(getUserCache(), entry, prop);
               list.add(se);
             }
           }
@@ -1841,6 +1842,17 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     return TenantRegistryMap.getInstance().getTenantRegistry();
   }
 
+  /**
+   * @return the cache containing all users (independent of current tenant) without rights and group assignments.
+   */
+  public UserCache getUserCache()
+  {
+    return Registry.instance().getUserCache();
+  }
+
+  /**
+   * @return the UserGroupCache with groups and rights (tenant specific).
+   */
   public UserGroupCache getUserGroupCache()
   {
     return getTenantRegistry().getUserGroupCache();

@@ -34,6 +34,7 @@ import org.projectforge.task.TaskTree;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.ThreadLocalUserContext;
+import org.projectforge.user.UserCache;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserRight;
 import org.projectforge.user.UserRightAccessCheck;
@@ -72,11 +73,6 @@ public class AccessChecker
       final boolean throwException)
   {
     Validate.notNull(user);
-    final UserGroupCache userGroupCache = TenantRegistryMap.getInstance().getTenantRegistry().getUserGroupCache();
-    if (userGroupCache.isUserMemberOfAdminGroup(user.getId()) == true) {
-      // A user group "Admin" has always access.
-      return true;
-    }
     final TaskNode node = getTaskTree().getTaskNodeById(taskId);
     if (node == null) {
       log.error("Task with " + taskId + " not found.");
@@ -84,6 +80,11 @@ public class AccessChecker
         throw new AccessException(taskId, accessType, operationType);
       }
       return false;
+    }
+    final UserGroupCache userGroupCache = TenantRegistryMap.getInstance().getTenantRegistry(node.getTask()).getUserGroupCache();
+    if (userGroupCache.isUserMemberOfAdminGroup(user.getId()) == true) {
+      // A user group "Admin" has always access.
+      return true;
     }
     final Collection<Integer> groupIds = userGroupCache.getUserGroups(user);
     if (groupIds == null) {
@@ -613,8 +614,8 @@ public class AccessChecker
     Validate.notNull(right);
     if (right instanceof UserRightAccessCheck< ? >) {
       Validate.notNull(origUser);
-      final UserGroupCache userGroupCache = TenantRegistryMap.getInstance().getTenantRegistry().getUserGroupCache();
-      final PFUserDO user = userGroupCache.getUser(origUser.getId());
+      final UserCache userCache = Registry.instance().getUserCache();
+      final PFUserDO user = userCache.getUser(origUser.getId());
       if (((UserRightAccessCheck) right).hasHistoryAccess(user, obj) == true) {
         return true;
       } else if (throwException == true) {
@@ -682,8 +683,8 @@ public class AccessChecker
 
   public boolean isDemoUser(final Integer userId)
   {
-    final UserGroupCache userGroupCache = TenantRegistryMap.getInstance().getTenantRegistry().getUserGroupCache();
-    final PFUserDO user = userGroupCache.getUser(userId);
+    final UserCache userCache = Registry.instance().getUserCache();
+    final PFUserDO user = userCache.getUser(userId);
     return isDemoUser(user);
   }
 
@@ -743,8 +744,8 @@ public class AccessChecker
 
   public boolean isRestrictedOrDemoUser(final Integer userId)
   {
-    final UserGroupCache userGroupCache = TenantRegistryMap.getInstance().getTenantRegistry().getUserGroupCache();
-    final PFUserDO user = userGroupCache.getUser(userId);
+    final UserCache userCache = Registry.instance().getUserCache();
+    final PFUserDO user = userCache.getUser(userId);
     return isRestrictedOrDemoUser(user);
   }
 

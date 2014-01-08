@@ -36,7 +36,7 @@ import org.hibernate.Session;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserGroupCache;
+import org.projectforge.user.UserCache;
 
 import de.micromata.hibernate.history.HistoryEntry;
 import de.micromata.hibernate.history.HistoryEntryType;
@@ -66,7 +66,7 @@ public class DisplayHistoryEntry implements Serializable
 
   private final Timestamp timestamp;
 
-  public DisplayHistoryEntry(final UserGroupCache userCache, final HistoryEntry entry)
+  public DisplayHistoryEntry(final UserCache userCache, final HistoryEntry entry)
   {
     this.timestamp = entry.getTimestamp();
     final Integer userId = NumberHelper.parseInteger(entry.getUserName());
@@ -79,7 +79,7 @@ public class DisplayHistoryEntry implements Serializable
     // entry.getEntityId();
   }
 
-  private PFUserDO getUser(final UserGroupCache userCache, final String userId)
+  private PFUserDO getUser(final UserCache userCache, final String userId)
   {
     if (StringUtils.isBlank(userId) == true) {
       return null;
@@ -91,7 +91,7 @@ public class DisplayHistoryEntry implements Serializable
     return userCache.getUser(id);
   }
 
-  public DisplayHistoryEntry(final UserGroupCache userCache, final HistoryEntry entry, final PropertyDelta prop, final Session session)
+  public DisplayHistoryEntry(final UserCache userCache, final HistoryEntry entry, final PropertyDelta prop, final Session session)
   {
     this(userCache, entry);
     this.propertyType = prop.getPropertyType();

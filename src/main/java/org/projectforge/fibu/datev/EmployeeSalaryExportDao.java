@@ -63,7 +63,7 @@ import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ThreadLocalUserContext;
-import org.projectforge.user.UserGroupCache;
+import org.projectforge.user.UserCache;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -257,10 +257,10 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
       headRow.addCell(i++, title);
     }
 
-    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
+    final UserCache userCache = Registry.instance().getUserCache();
     for (final EmployeeSalaryDO salary : list) {
       final PropertyMapping mapping = new PropertyMapping();
-      final PFUserDO user = userGroupCache.getUser(salary.getEmployee().getUserId());
+      final PFUserDO user = userCache.getUser(salary.getEmployee().getUserId());
       Validate.isTrue(year == salary.getYear());
       Validate.isTrue(month == salary.getMonth());
       final MonthlyEmployeeReport report = monthlyEmployeeReportDao.getReport(year, month, user);
@@ -307,7 +307,7 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
       addEmployeeRow(employeeSheet, salary.getEmployee(), numberOfWorkingDays, netDuration);
     }
     for (final EmployeeDO employee : missedEmployees) {
-      final PFUserDO user = userGroupCache.getUser(employee.getUserId());
+      final PFUserDO user = userCache.getUser(employee.getUserId());
       final PropertyMapping mapping = new PropertyMapping();
       mapping.add(ExcelColumn.MITARBEITER, user.getFullname());
       mapping.add(ExcelColumn.SUMME, "***");
@@ -332,8 +332,8 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
   private void addEmployeeRow(final ExportSheet sheet, final EmployeeDO employee, final BigDecimal numberOfWorkingDays,
       final BigDecimal totalDuration)
   {
-    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
-    final PFUserDO user = userGroupCache.getUser(employee.getUserId());
+    final UserCache userCache = Registry.instance().getUserCache();
+    final PFUserDO user = userCache.getUser(employee.getUserId());
     final ExportRow row = sheet.addRow();
     row.addCell(0, user.getFullname());
     // Wochenstunden

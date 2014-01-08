@@ -48,8 +48,8 @@ import org.projectforge.user.GroupDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.ThreadLocalUserContext;
+import org.projectforge.user.UserCache;
 import org.projectforge.user.UserDao;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefDOXmlDumpHook;
 import org.projectforge.user.UserRightDO;
 import org.projectforge.user.UserRightId;
@@ -283,8 +283,8 @@ public class InitDatabaseDao extends HibernateDaoSupport
   public boolean isEmpty()
   {
     try {
-      final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
-      if (userGroupCache.internalGetNumberOfUsers() == 0) {
+      final UserCache userCache = Registry.instance().getUserCache();
+      if (userCache.internalGetNumberOfUsers() == 0) {
         final Table userTable = new Table(PFUserDO.class);
         final MyDatabaseUpdateDao databaseUpdateDao = myDatabaseUpdater.getDatabaseUpdateDao();
         return databaseUpdateDao.internalDoesTableExist(userTable.getName()) == false

@@ -28,7 +28,7 @@ import java.sql.Timestamp;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserGroupCache;
+import org.projectforge.user.UserCache;
 
 import de.micromata.hibernate.history.HistoryEntry;
 import de.micromata.hibernate.history.HistoryEntryType;
@@ -42,23 +42,23 @@ import de.micromata.hibernate.history.delta.PropertyDelta;
 public class SimpleHistoryEntry
 {
   private PFUserDO user;
-  
-  private HistoryEntryType entryType;
-  
+
+  private final HistoryEntryType entryType;
+
   private String propertyName;
-  
+
   private String propertyType;
-  
+
   private String oldValue;
-  
+
   private String newValue;
-  
-  private Timestamp timestamp;
-    
-  public SimpleHistoryEntry(UserGroupCache userCache, HistoryEntry entry)
+
+  private final Timestamp timestamp;
+
+  public SimpleHistoryEntry(final UserCache userCache, final HistoryEntry entry)
   {
     this.timestamp = entry.getTimestamp();
-    Integer userId = NumberHelper.parseInteger(entry.getUserName());
+    final Integer userId = NumberHelper.parseInteger(entry.getUserName());
     if (userId != null) {
       this.user = userCache.getUser(userId);
     }
@@ -68,7 +68,7 @@ public class SimpleHistoryEntry
     // entry.getEntityId();
   }
 
-  public SimpleHistoryEntry(UserGroupCache userCache, HistoryEntry entry, PropertyDelta prop)
+  public SimpleHistoryEntry(final UserCache userCache, final HistoryEntry entry, final PropertyDelta prop)
   {
     this(userCache, entry);
     this.propertyType = prop.getPropertyType();
@@ -116,21 +116,22 @@ public class SimpleHistoryEntry
   {
     return propertyType;
   }
-  
+
   public PFUserDO getUser()
   {
     return user;
   }
-  
+
   public Timestamp getTimestamp()
   {
     return timestamp;
   }
-  
+
   /**
    * Returns string containing all fields (except the password, via ReflectionToStringBuilder).
    * @return
    */
+  @Override
   public String toString()
   {
     return new ReflectionToStringBuilder(this).toString();

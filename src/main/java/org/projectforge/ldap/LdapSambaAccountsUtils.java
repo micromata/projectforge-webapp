@@ -29,7 +29,7 @@ import org.apache.commons.lang.ObjectUtils;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserGroupCache;
+import org.projectforge.user.UserCache;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -44,8 +44,8 @@ public class LdapSambaAccountsUtils
    */
   public static int getNextFreeSambaSIDNumber()
   {
-    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
-    final Collection<PFUserDO> allUsers = userGroupCache.getAllUsers();
+    final UserCache userCache = Registry.instance().getUserCache();
+    final Collection<PFUserDO> allUsers = userCache.getAllUsers();
     int currentMaxNumber = 999;
     for (final PFUserDO user : allUsers) {
       final LdapUserValues ldapUserValues = PFUserDOConverter.readLdapUserValues(user.getLdapValues());
@@ -71,8 +71,8 @@ public class LdapSambaAccountsUtils
       // Nothing to check.
       return true;
     }
-    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
-    final Collection<PFUserDO> allUsers = userGroupCache.getAllUsers();
+    final UserCache userCache = Registry.instance().getUserCache();
+    final Collection<PFUserDO> allUsers = userCache.getAllUsers();
     for (final PFUserDO user : allUsers) {
       final LdapUserValues ldapUserValues = PFUserDOConverter.readLdapUserValues(user.getLdapValues());
       if (ObjectUtils.equals(user.getId(), currentUser.getId()) == true) {
