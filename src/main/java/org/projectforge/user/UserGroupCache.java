@@ -38,6 +38,7 @@ import org.projectforge.common.AbstractCache;
 import org.projectforge.common.StringHelper;
 import org.projectforge.fibu.EmployeeDO;
 import org.projectforge.fibu.ProjektDO;
+import org.projectforge.multitenancy.TenantChecker;
 import org.projectforge.multitenancy.TenantDO;
 import org.projectforge.registry.Registry;
 import org.projectforge.web.UserFilter;
@@ -491,6 +492,12 @@ public class UserGroupCache extends AbstractCache
     // Could not autowire UserDao because of cyclic reference with AccessChecker.
     final List<PFUserDO> users = Login.getInstance().getAllUsers();
     for (final PFUserDO user : users) {
+      if (tenant != null) {
+        if (TenantChecker.getInstance().isPartOfTenant(tenant.getId(), user) == false) {
+          // Ignore users not assigned to current tenant.
+          continue;
+        }
+      }
       uMap.put(user.getId(), user);
     }
     final List<GroupDO> groups = Login.getInstance().getAllGroups();
@@ -505,9 +512,8 @@ public class UserGroupCache extends AbstractCache
     final Set<Integer> nOrgaUsers = new HashSet<Integer>();
     for (final GroupDO group : groups) {
       if (tenant != null) {
-        if (tenant.getId().equals(group.getTenantId()) == true || (tenant.isDefault() == true && group.getTenant() == null)) {
-          // proceed, group is assigned to current tenant or current tenant is the default tenant and the group is unassigned.
-        } else {
+        if (TenantChecker.getInstance().isPartOfTenant(tenant.getId(), group) == false) {
+          // Ignore groups not assigned to current tenant.
           continue;
         }
       }
