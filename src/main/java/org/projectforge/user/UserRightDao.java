@@ -32,6 +32,7 @@ import org.projectforge.access.OperationType;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
+import org.projectforge.multitenancy.TenantRegistryMap;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -94,6 +95,16 @@ public class UserRightDao extends BaseDao<UserRightDO>
       }
     }
     userGroupCache.setExpired();
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDao#afterSaveOrModify(org.projectforge.core.ExtendedBaseDO)
+   */
+  @Override
+  protected void afterSaveOrModify(final UserRightDO obj)
+  {
+    super.afterSaveOrModify(obj);
+    TenantRegistryMap.getInstance().getTenantRegistry(obj).getUserGroupCache().setExpired();
   }
 
   private void copy(final UserRightDO dest, final UserRightVO src)
