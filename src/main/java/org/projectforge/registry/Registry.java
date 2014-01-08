@@ -41,6 +41,7 @@ import org.projectforge.multitenancy.TenantRegistry;
 import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.multitenancy.TenantsCache;
 import org.projectforge.task.TaskTree;
+import org.projectforge.user.UserCache;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserXmlPreferencesDao;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -65,9 +66,11 @@ public class Registry
 
   private final List<RegistryEntry> orderedList = new ArrayList<RegistryEntry>();
 
-  private UserXmlPreferencesDao userXmlPreferencesDao;
-
   private TenantsCache tenantsCache;
+
+  private UserCache userCache;
+
+  private UserXmlPreferencesDao userXmlPreferencesDao;
 
   private DataSource dataSource;
 
@@ -168,9 +171,20 @@ public class Registry
     return tenantRegistry.getTaskTree();
   }
 
-  public TaskTree getTaskTree(final BaseDO<?> obj)
+  public TaskTree getTaskTree(final BaseDO< ? > obj)
   {
     return getTaskTree(obj.getTenant());
+  }
+
+  /**
+   * @return the userCache
+   */
+  public UserCache getUserCache()
+  {
+    if (userCache == null) {
+      userCache = new UserCache();
+    }
+    return userCache;
   }
 
   public UserGroupCache getUserGroupCache()
