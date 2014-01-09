@@ -69,9 +69,10 @@ public class MultiTenancyTestFork extends TestBase
     if (initialized == true) {
       return;
     }
+    logon(TEST_ADMIN_USER);
     final ConfigurationDO configurationDO = configurationDao.getEntry(ConfigurationParam.MULTI_TENANCY_ENABLED);
     configurationDO.setBooleanValue(true);
-    configurationDao.internalSave(configurationDO);
+    configurationDao.internalUpdate(configurationDO);
     superAdminDefault = createUser("mt_superAdminDefault", true);
     superAdmin2 = createUser("mt_superAdmin2", true);
     superAdmin3 = createUser("mt_superAdmin3", true);
@@ -92,6 +93,7 @@ public class MultiTenancyTestFork extends TestBase
   private PFUserDO createUser(final String username, final boolean superAdmin)
   {
     final PFUserDO user = new PFUserDO().setUsername(username);
+    user.setSuperAdmin(superAdmin);
     final Serializable id = userDao.internalSave(user);
     return userDao.getById(id);
   }
