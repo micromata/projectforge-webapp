@@ -34,7 +34,10 @@ import org.projectforge.access.OperationType;
 import org.projectforge.multitenancy.TenantDO;
 import org.projectforge.multitenancy.TenantRegistry;
 import org.projectforge.multitenancy.TenantRegistryMap;
+import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
+import org.projectforge.user.UserDao;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,6 +59,15 @@ public class ConfigurationDao extends BaseDao<ConfigurationDO>
   @Override
   protected void afterSaveOrModify(final ConfigurationDO obj)
   {
+    if (obj.getConfigurationType() == ConfigurationParam.MULTI_TENANCY_ENABLED.getType() && obj.getBooleanValue() == true) {
+      // Enable current logged in user as super admin user.
+      final Integer adminUserId = ThreadLocalUserContext.getUserId();
+      final UserDao userDao = Registry.instance().getDao(UserDao.class);
+      final PFUserDO adminUser = userDao.getById(adminUserId);
+      log.info("Enabling current user as super admin (for administer tenants) because he has enabled multi-tenancy: " + adminUser.getDisplayUsername());
+      adminUser.setSuperAdmin(true);
+      userDao.update(adminUser);
+    }
     if (obj.isGlobal() == true) {
       GlobalConfiguration.getInstance().setExpired();
     } else {
