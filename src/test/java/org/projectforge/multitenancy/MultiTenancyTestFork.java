@@ -79,6 +79,7 @@ public class MultiTenancyTestFork extends TestBase
     admin1 = createUser("mt_admin1", false);
     admin2 = createUser("mt_admin2", false);
     user1 = initTestDB.addUser(new PFUserDO().setUsername("mt_user1"));
+    logon(superAdminDefault);
     defaultTenant = createTenant("Tenant 1", true, superAdminDefault, admin1);
     tenant2 = createTenant("Tenant 2", false, superAdmin2, superAdminDefault, admin1, admin2);
     tenant3 = createTenant("Tenant 3", false);
