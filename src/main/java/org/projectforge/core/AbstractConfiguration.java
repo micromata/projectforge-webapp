@@ -163,7 +163,7 @@ public abstract class AbstractConfiguration extends AbstractCache
       list = loadParameters();
     } catch (final Exception ex) {
       log.fatal("******* Exception while getting configuration parameters from data-base (only OK for migration from older versions): "
-          + ex.getMessage());
+          + ex.getMessage(), ex);
       list = new ArrayList<ConfigurationDO>();
     }
     for (final ConfigurationParam param : ConfigurationParam.values()) {
