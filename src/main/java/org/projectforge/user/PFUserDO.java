@@ -102,6 +102,8 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   private boolean deactivated;
 
+  private boolean superAdmin;
+
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String firstname;
 
@@ -898,6 +900,27 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   public PFUserDO setDeactivated(final boolean deactivated)
   {
     this.deactivated = deactivated;
+    return this;
+  }
+
+  /**
+   * @return the superAdmin
+   */
+  @Column(name = "super_admin", nullable = false)
+  public boolean isSuperAdmin()
+  {
+    return superAdmin;
+  }
+
+  /**
+   * A super admin is able to administer tenants. For tenants the user must be assigned to PF_Admin if he should be an administrator of the
+   * tenant's objects. This flag is therefore independent of the right to administer objects of tenants itself.
+   * @param superAdmin the superAdmin to set
+   * @return this for chaining.
+   */
+  public PFUserDO setSuperAdmin(final boolean superAdmin)
+  {
+    this.superAdmin = superAdmin;
     return this;
   }
 

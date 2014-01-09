@@ -84,13 +84,16 @@ public class DatabaseCoreUpdates
     // 5.4
     // /////////////////////////////////////////////////////////////////
     list.add(new UpdateEntryImpl(CORE_REGION_ID, "5.4", "2013-12-31",
-        "Adds t_tenant, tenant_id to all entities for multi-tenancy. Adds t_configuration.is_global.") {
+        "Adds t_tenant, tenant_id to all entities for multi-tenancy. Adds t_configuration.is_global, t_pf_user.super_admin.") {
       final Table configurationTable = new Table(ConfigurationDO.class);
 
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
         if (dao.doEntitiesExist(TenantDO.class) == false || dao.doTableAttributesExist(configurationTable, "global") == false) {
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
+        if (dao.doTableAttributesExist(PFUserDO.class, "superAdmin") == false) {
           return UpdatePreCheckStatus.READY_FOR_UPDATE;
         }
         final List<RegistryEntry> list = Registry.instance().getOrderedList();
@@ -148,6 +151,9 @@ public class DatabaseCoreUpdates
           dao.addTableAttributes(configurationTable, new TableAttribute(ConfigurationDO.class, "global").setDefaultValue("false"));
           final ConfigurationDao configurationDao = Registry.instance().getDao(ConfigurationDao.class);
           configurationDao.checkAndUpdateDatabaseEntries();
+        }
+        if (dao.doTableAttributesExist(PFUserDO.class, "superAdmin") == false) {
+          dao.addTableAttributes(new Table(PFUserDO.class), new TableAttribute(PFUserDO.class, "super_admin").setDefaultValue("false"));
         }
         dao.createMissingIndices();
         return UpdateRunningStatus.DONE;

@@ -27,8 +27,6 @@ import org.projectforge.access.OperationType;
 import org.projectforge.core.GlobalConfiguration;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
-import org.projectforge.user.UserGroupCache;
-import org.projectforge.user.UserGroupsRight;
 import org.projectforge.user.UserRightAccessCheck;
 import org.projectforge.user.UserRightCategory;
 import org.projectforge.user.UserRightValue;
@@ -43,24 +41,9 @@ public class TenantRight extends UserRightAccessCheck<TenantDO>
 {
   private static final long serialVersionUID = -558887908748357573L;
 
-  @SuppressWarnings("serial")
   public TenantRight()
   {
-    super(TenantDao.USER_RIGHT_ID, UserRightCategory.ADMIN, UserRightValue.READONLY, UserRightValue.READWRITE);
-    setUserGroupsRight(new UserGroupsRight(null, null, UserRights.FALSE_READONLY_PARTLYREADWRITE_READWRITE, ProjectForgeGroup.ADMIN_GROUP) {
-      /**
-       * @see org.projectforge.user.UserGroupsRight#isAvailable(org.projectforge.user.UserGroupCache, org.projectforge.user.PFUserDO)
-       */
-      @Override
-      public boolean isAvailable(final UserGroupCache userGroupCache, final PFUserDO user)
-      {
-        if (GlobalConfiguration.getInstance().isMultiTenancyConfigured() == false) {
-          // Right should only be available if multi tenancy is configured.
-          return false;
-        }
-        return super.isAvailable(userGroupCache, user);
-      }
-    });
+    super(TenantDao.USER_RIGHT_ID, UserRightCategory.ADMIN, UserRightValue.TRUE);
   }
 
   /**
@@ -73,12 +56,16 @@ public class TenantRight extends UserRightAccessCheck<TenantDO>
     if (GlobalConfiguration.getInstance().isMultiTenancyConfigured() == false) {
       return false;
     }
+    if (user.isSuperAdmin() == true) {
+      return true;
+    }
     if (UserRights.getAccessChecker().isUserMemberOfGroup(user, ProjectForgeGroup.ADMIN_GROUP) == false) {
       return false;
     }
     if (operationType == OperationType.SELECT) {
-      return UserRights.getAccessChecker().hasRight(user, getId(), UserRightValue.READONLY, UserRightValue.READWRITE);
+      // Administrators (not super users) has the select access for tenants they're assigned to.
+      return TenantChecker.getInstance().isPartOfTenant(obj, user);
     }
-    return UserRights.getAccessChecker().hasRight(user, getId(), UserRightValue.READWRITE);
+    return false;
   }
 }

@@ -181,7 +181,7 @@ public class TenantChecker
     if (user == null) {
       return false;
     }
-    return GlobalConfiguration.getInstance().isMultiTenancyConfigured() == true && getDao().hasInsertAccess(user) == true;
+    return GlobalConfiguration.getInstance().isMultiTenancyConfigured() == true && user.isSuperAdmin() == true;
   }
 
   private TenantDao getDao()
