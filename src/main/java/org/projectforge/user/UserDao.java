@@ -304,6 +304,7 @@ public class UserDao extends BaseDao<PFUserDO>
   protected void afterSaveOrModify(final PFUserDO obj)
   {
     if (obj.isMinorChange() == false) {
+      getUserCache().setExpired();
       getUserGroupCache().setExpired();
     }
   }
@@ -706,7 +707,7 @@ public class UserDao extends BaseDao<PFUserDO>
    */
   public String getCachedAuthenticationToken(final Integer userId)
   {
-    final PFUserDO user = getUserGroupCache().getUser(userId);
+    final PFUserDO user = getUserCache().getUser(userId);
     final String authenticationToken = user.getAuthenticationToken();
     if (StringUtils.isBlank(authenticationToken) == false && authenticationToken.trim().length() >= 10) {
       return authenticationToken;
@@ -722,7 +723,7 @@ public class UserDao extends BaseDao<PFUserDO>
    */
   public String decrypt(final Integer userId, final String encryptedString)
   {
-    // final PFUserDO user = userGroupCache.getUser(userId); // for faster access (due to permanent usage e. g. by subscription of calendars
+    // final PFUserDO user = userCache.getUser(userId); // for faster access (due to permanent usage e. g. by subscription of calendars
     // (ics).
     final String authenticationToken = StringUtils.rightPad(getCachedAuthenticationToken(userId), 32, "x");
     return Crypt.decrypt(authenticationToken, encryptedString);
@@ -786,6 +787,7 @@ public class UserDao extends BaseDao<PFUserDO>
     } else {
       log.info("No modifications detected (no update needed): " + dbUser.toString());
     }
+    getUserCache().updateUser(user);
     getUserGroupCache().updateUser(user);
   }
 
