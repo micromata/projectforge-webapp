@@ -979,4 +979,22 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   {
     return getShortDisplayName();
   }
+
+  /**
+   * @return If any of the secret fields is given (password, passwordSalt, stayLoggedInKey or authenticationToken).
+   */
+  public boolean hasSecretFieldValues()
+  {
+    return this.password != null || this.passwordSalt != null || this.stayLoggedInKey != null || this.authenticationToken != null;
+  }
+
+  /**
+   * @return A copy of the given user without copying the secret fields (password, passwordSalt, stayLoggedInKey or authenticationToken).
+   */
+  public static PFUserDO createCopyWithoutSecretFields(final PFUserDO srcUser)
+  {
+    final PFUserDO user = new PFUserDO();
+    user.copyValuesFrom(srcUser, "password", "passwordSalt", "stayLoggedInKey", "authenticationToken");
+    return user;
+  }
 }
