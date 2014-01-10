@@ -50,6 +50,7 @@ import org.projectforge.user.GroupDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserRightDO;
+import org.projectforge.user.UserRightDao;
 import org.projectforge.user.UserRightId;
 import org.projectforge.user.UserRightValue;
 import org.projectforge.user.UserRights;
@@ -63,6 +64,8 @@ public class HRPlanningTest extends TestBase
   private HRPlanningDao hrPlanningDao;
 
   private KundeDao kundeDao;
+
+  private UserRightDao userRightDao;
 
   private static boolean initialized;
 
@@ -81,8 +84,13 @@ public class HRPlanningTest extends TestBase
     this.kundeDao = kundeDao;
   }
 
+  public void setUserRightDao(final UserRightDao userRightDao)
+  {
+    this.userRightDao = userRightDao;
+  }
+
   @Before
-  public void createProjekts()
+  public void createProjects()
   {
     if (initialized == true) {
       return;
@@ -134,8 +142,9 @@ public class HRPlanningTest extends TestBase
     assertFalse(accessChecker.hasLoggedInUserInsertAccess(UserRightId.PM_HR_PLANNING, planning, false));
     logon(TestBase.TEST_ADMIN_USER);
     user1 = userDao.getById(user1.getId());
-    user1.getRight(UserRightId.PM_HR_PLANNING).setValue(UserRightValue.READWRITE);
-    userDao.update(user1);
+    final UserRightDO userRight = user1.getRight(UserRightId.PM_HR_PLANNING);
+    userRight.setValue(UserRightValue.READWRITE);
+    userRightDao.update(userRight);
     logon(user1);
     assertTrue(hrPlanningDao.hasLoggedInUserAccess(planning, null, OperationType.SELECT, false));
     assertTrue(accessChecker.hasLoggedInUserSelectAccess(UserRightId.PM_HR_PLANNING, planning, false));
