@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
 import org.projectforge.common.AbstractCache;
 
 /**
- * The users will be cached with this class (without groups and rights).
+ * The users will be cached with this class (without groups).
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 public class UserCache extends AbstractCache
@@ -141,7 +141,8 @@ public class UserCache extends AbstractCache
     // Could not autowire UserDao because of cyclic reference with AccessChecker.
     final List<PFUserDO> users = Login.getInstance().getAllUsers();
     for (final PFUserDO user : users) {
-      uMap.put(user.getId(), user);
+      final PFUserDO copiedUser = PFUserDO.createCopyWithoutSecretFields(user);
+      uMap.put(user.getId(), copiedUser);
     }
     this.userMap = uMap;
     log.info("Initializing of UserCache done.");
