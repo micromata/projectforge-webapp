@@ -405,6 +405,20 @@ public class UserGroupCache extends AbstractCache
     return getUserRightMap().get(userId);
   }
 
+  public UserRightDO getUserRight(final Integer userId, final UserRightId rightId)
+  {
+    final List<UserRightDO> rights = getUserRights(userId);
+    if (rights == null) {
+      return null;
+    }
+    for (final UserRightDO right : rights) {
+      if (right.getRightId().equals(rightId) == true) {
+        return right;
+      }
+    }
+    return null;
+  }
+
   private Map<Integer, List<UserRightDO>> getUserRightMap()
   {
     checkRefresh();
@@ -498,7 +512,8 @@ public class UserGroupCache extends AbstractCache
           continue;
         }
       }
-      uMap.put(user.getId(), user);
+      final PFUserDO copiedUser = PFUserDO.createCopyWithoutSecretFields(user);
+      uMap.put(user.getId(), copiedUser);
     }
     final List<GroupDO> groups = Login.getInstance().getAllGroups();
     final Map<Integer, GroupDO> gMap = new HashMap<Integer, GroupDO>();
