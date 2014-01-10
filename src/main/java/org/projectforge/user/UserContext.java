@@ -71,14 +71,18 @@ public class UserContext implements Serializable
   }
 
   /**
-   * Makes a copy of the given user and stores this user.
+   * Stores the given user in the context. If the user contains secret fields (such as password etc.) a copy without such fields is stored.
    * @param user
    */
   public UserContext(final PFUserDO user)
   {
     Validate.notNull(user);
-    this.user = new PFUserDO();
-    copyUser(user, this.user);
+    if (user.hasSecretFieldValues() == true) {
+      log.warn("Should instantiate UserContext with user containing secret values (makes now a copy of the given user).");
+      this.user = PFUserDO.createCopyWithoutSecretFields(user);
+    } else {
+      this.user = user;
+    }
   }
 
   /**
@@ -99,18 +103,18 @@ public class UserContext implements Serializable
    */
   public UserContext refreshUser()
   {
-    final PFUserDO updatedUser = Registry.instance().getUserGroupCache().getUser(user.getId());
+    final PFUserDO updatedUser = Registry.instance().getUserCache().getUser(user.getId());
     if (updatedUser == null) {
-      log.warn("Couldn't update user from UserGroupCache, should only occur in maintenance mode!");
+      log.warn("Couldn't update user from UserCache, should only occur in maintenance mode!");
       return this;
     }
-    copyUser(updatedUser, user);
+    if (user.hasSecretFieldValues() == true) {
+      log.warn("Oups, userCache contains user (id=" + user.getId() + ") with secret values, please contact developers.");
+      this.user = PFUserDO.createCopyWithoutSecretFields(updatedUser);
+    } else {
+      this.user = updatedUser;
+    }
     return this;
-  }
-
-  private void copyUser(final PFUserDO srcUser, final PFUserDO destUser)
-  {
-    destUser.copyValuesFrom(srcUser, "password", "passwordSalt", "stayLoggedInKey");
   }
 
   /**
