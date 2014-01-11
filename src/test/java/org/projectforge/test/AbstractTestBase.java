@@ -201,6 +201,7 @@ public class AbstractTestBase
   @SuppressWarnings({ "unchecked", "rawtypes"})
   protected static void clearDatabase()
   {
+    log.info("clearDatabase...");
     ThreadLocalUserContext.setUser(ADMIN_USER); // Logon admin user.
     final TransactionTemplate transactionTemplate = testConfiguration.getBean("txTemplate", TransactionTemplate.class);
     final HibernateTemplate hibernateTemplate = testConfiguration.getBean("hibernate", HibernateTemplate.class);
@@ -358,6 +359,7 @@ public class AbstractTestBase
 
   protected static void deleteDB()
   {
+    log.info("deleteDB...");
     final String databaseUrl = testConfiguration.getDatabaseUrl();
     final String baseFilename = databaseUrl.substring(databaseUrl.lastIndexOf(':') + 1);
     final File data = new File(baseFilename + ".data");
