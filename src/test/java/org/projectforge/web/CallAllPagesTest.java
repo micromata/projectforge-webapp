@@ -31,7 +31,6 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.junit.AfterClass;
 import org.junit.Test;
 import org.projectforge.core.SystemInfoCache;
-import org.projectforge.registry.Registry;
 import org.projectforge.test.TestBase;
 import org.projectforge.test.TestConfiguration;
 import org.projectforge.web.address.AddressMobileViewPage;
@@ -68,7 +67,6 @@ public class CallAllPagesTest extends WicketPageTestBase
   @Test
   public void testAllMountedPages()
   {
-    testPage(SetupPage.class);
     testAllMountedPages(BrowserScreenWidthType.NARROW);
     testAllMountedPages(BrowserScreenWidthType.NORMAL);
     testAllMountedPages(BrowserScreenWidthType.WIDE);
@@ -76,8 +74,7 @@ public class CallAllPagesTest extends WicketPageTestBase
     testPage(LoginMobilePage.class);
     clearDatabase();
     deleteDB();
-    Registry.instance().getUserGroupCache().setExpired();
-    Registry.instance().getUserCache().setExpired();
+    testPage(SetupPage.class);
   }
 
   private void testAllMountedPages(final BrowserScreenWidthType browserScreenWidthType)
