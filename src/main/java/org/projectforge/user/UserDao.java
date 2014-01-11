@@ -54,6 +54,7 @@ import org.projectforge.core.QueryFilter;
 import org.projectforge.core.SecurityConfig;
 import org.projectforge.multitenancy.TenantChecker;
 import org.projectforge.multitenancy.TenantDO;
+import org.projectforge.registry.Registry;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -176,8 +177,9 @@ public class UserDao extends BaseDao<PFUserDO>
 
   public Collection<Integer> getAssignedTenants(final PFUserDO user)
   {
+    final PFUserDO u = Registry.instance().getUserCache().getUser(user.getId());
     @SuppressWarnings("unchecked")
-    final List<TenantDO> list = getHibernateTemplate().find("from TenantDO t where ? member of t.assignedUsers", user);
+    final List<TenantDO> list = getHibernateTemplate().find("from TenantDO t where ? member of t.assignedUsers", u);
     final Set<Integer> result = new HashSet<Integer>();
     if (list != null) {
       for (final TenantDO tenant : list) {
