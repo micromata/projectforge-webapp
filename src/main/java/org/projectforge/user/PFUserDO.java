@@ -994,7 +994,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   public static PFUserDO createCopyWithoutSecretFields(final PFUserDO srcUser)
   {
     final PFUserDO user = new PFUserDO();
-    user.copyValuesFrom(srcUser, "password", "passwordSalt", "stayLoggedInKey", "authenticationToken");
+    user.copyValuesFrom(srcUser, "passwordSalt", "stayLoggedInKey", "authenticationToken"); // password is already ignored.
     return user;
   }
 }
