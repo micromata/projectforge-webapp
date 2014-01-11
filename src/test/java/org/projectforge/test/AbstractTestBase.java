@@ -275,6 +275,8 @@ public class AbstractTestBase
         return null;
       }
     });
+    Registry.instance().getUserGroupCache().setExpired();
+    Registry.instance().getUserCache().setExpired();
   }
 
   private static void deleteFrom(final HibernateTemplate hibernateTemplate, final String entity)
@@ -368,6 +370,8 @@ public class AbstractTestBase
       deleteFile(baseFilename + ".properties");
       deleteFile(baseFilename + ".script");
     }
+    Registry.instance().getUserGroupCache().setExpired();
+    Registry.instance().getUserCache().setExpired();
   }
 
   private static void deleteFile(final String filename)
