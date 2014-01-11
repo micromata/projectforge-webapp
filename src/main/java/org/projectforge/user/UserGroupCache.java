@@ -498,7 +498,7 @@ public class UserGroupCache extends AbstractCache
   {
     String tenantLog = "";
     if (tenant != null) {
-      tenantLog = " for tenant #" + Registry.instance().getTenantsCache().getLogName(tenant);
+      tenantLog = " for tenant " + Registry.instance().getTenantsCache().getLogName(tenant);
     }
     log.info("Initializing UserGroupCache " + tenantLog + "...");
     // This method must not be synchronized because it works with a new copy of maps.

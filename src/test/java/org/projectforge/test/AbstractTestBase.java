@@ -46,6 +46,7 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.continuousdb.DatabaseSupport;
 import org.projectforge.core.SimpleHistoryEntry;
 import org.projectforge.database.HibernateUtils;
+import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.plugins.core.PluginsRegistry;
 import org.projectforge.registry.DaoRegistry;
@@ -276,7 +277,7 @@ public class AbstractTestBase
         return null;
       }
     });
-    Registry.instance().getUserGroupCache().setExpired();
+    TenantRegistryMap.getInstance().setAllUserGroupCachesAsExpired();
     Registry.instance().getUserCache().setExpired();
   }
 
@@ -372,7 +373,7 @@ public class AbstractTestBase
       deleteFile(baseFilename + ".properties");
       deleteFile(baseFilename + ".script");
     }
-    Registry.instance().getUserGroupCache().setExpired();
+    TenantRegistryMap.getInstance().setAllUserGroupCachesAsExpired();
     Registry.instance().getUserCache().setExpired();
   }
 

@@ -28,13 +28,11 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.lang.Validate;
-import org.projectforge.access.AccessException;
 import org.projectforge.common.AbstractCache;
 import org.projectforge.core.BaseDO;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ThreadLocalUserContext;
-import org.projectforge.user.UserRights;
 
 /**
  * Holds TenantCachesHolder element and detaches them if not used for some time to save memory.
@@ -64,7 +62,7 @@ public class TenantRegistryMap extends AbstractCache
     super(EXPIRE_TIME);
   }
 
-  public TenantRegistry getTenantRegistry(final BaseDO<?> obj)
+  public TenantRegistry getTenantRegistry(final BaseDO< ? > obj)
   {
     if (obj == null) {
       return getTenantRegistry();
@@ -95,10 +93,11 @@ public class TenantRegistryMap extends AbstractCache
       if (user == null) {
         return getDummyTenantRegistry();
       }
-      if (UserRights.getAccessChecker().isUserMemberOfAdminGroup(user) == true) {
-        throw new AccessException("multitenancy.accessException.noTenant.adminUser");
-      }
-      throw new AccessException("multitenancy.accessException.noTenant.nonAdminUser");
+      throw new IllegalArgumentException("No default tenant found for user: " + user.getUsername());
+      // if (UserRights.getAccessChecker().isUserMemberOfAdminGroup(tenant, user) == true) {
+      // throw new AccessException("multitenancy.accessException.noTenant.adminUser");
+      // }
+      // throw new AccessException("multitenancy.accessException.noTenant.nonAdminUser");
     }
     Validate.notNull(tenant);
     synchronized (this) {
@@ -179,5 +178,12 @@ public class TenantRegistryMap extends AbstractCache
       }
     }
     log.info("Refreshing of " + TenantRegistry.class.getName() + " done.");
+  }
+
+  public void setAllUserGroupCachesAsExpired()
+  {
+    for (final TenantRegistry registry : tenantRegistryMap.values()) {
+      registry.getUserGroupCache().setExpired();
+    }
   }
 }

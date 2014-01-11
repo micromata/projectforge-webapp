@@ -33,6 +33,7 @@ import java.util.Collection;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectforge.access.AccessException;
+import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.registry.Registry;
 import org.projectforge.test.TestBase;
 import org.projectforge.user.PFUserDO;
@@ -61,7 +62,7 @@ public class InitDatabaseDaoTestFork extends TestBase
   public void initializeEmptyDatabase()
   {
     final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
-    userGroupCache.setExpired(); // Force reload (because it's may be expired due to previous tests).
+    TenantRegistryMap.getInstance().setAllUserGroupCachesAsExpired(); // Force reload (because it's may be expired due to previous tests).
     Registry.instance().getUserCache().setExpired();
     assertTrue(initDatabaseDao.isEmpty());
     final PFUserDO admin = new PFUserDO();

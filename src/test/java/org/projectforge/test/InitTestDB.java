@@ -46,6 +46,7 @@ import org.projectforge.fibu.kost.Kost2ArtDO;
 import org.projectforge.fibu.kost.Kost2ArtDao;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.fibu.kost.Kost2Dao;
+import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
@@ -56,7 +57,6 @@ import org.projectforge.user.GroupDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserDao;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserRightDO;
 import org.projectforge.user.UserRightId;
 import org.projectforge.user.UserRightValue;
@@ -187,8 +187,7 @@ public class InitTestDB
     }
     groupDao.internalSave(group);
     putGroup(group);
-    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
-    userGroupCache.setExpired();
+    TenantRegistryMap.getInstance().setAllUserGroupCachesAsExpired();
     Registry.instance().getUserCache().setExpired();
     return group;
   }

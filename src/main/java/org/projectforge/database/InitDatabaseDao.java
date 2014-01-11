@@ -38,6 +38,7 @@ import org.projectforge.core.HibernateSearchReindexer;
 import org.projectforge.database.xstream.XStreamSavingConverter;
 import org.projectforge.multitenancy.TenantDO;
 import org.projectforge.multitenancy.TenantDao;
+import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskNode;
@@ -175,8 +176,8 @@ public class InitDatabaseDao extends HibernateDaoSupport
     internalCreateProjectForgeGroups(null, adminUser);
 
     Registry.instance().getTaskTree().setExpired();
-    Registry.instance().getUserGroupCache().setExpired();
     Registry.instance().getUserCache().setExpired();
+    TenantRegistryMap.getInstance().setAllUserGroupCachesAsExpired();
 
     log.fatal("Empty database successfully initialized.");
     return adminUser;

@@ -53,6 +53,7 @@ import org.projectforge.fibu.kost.Kost1DO;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.humanresources.HRPlanningDO;
 import org.projectforge.multitenancy.TenantDO;
+import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.orga.ContractDO;
 import org.projectforge.registry.Registry;
 import org.projectforge.registry.RegistryEntry;
@@ -510,7 +511,7 @@ public class DatabaseCoreUpdates
         dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "excelDateFormat"));
         dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "timeNotation"));
         dao.createMissingIndices();
-        Registry.instance().getUserGroupCache().setExpired();
+        TenantRegistryMap.getInstance().setAllUserGroupCachesAsExpired();
         Registry.instance().getUserCache().setExpired();
         return UpdateRunningStatus.DONE;
       }

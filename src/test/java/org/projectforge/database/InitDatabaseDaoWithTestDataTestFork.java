@@ -44,6 +44,7 @@ import org.projectforge.book.BookDO;
 import org.projectforge.book.BookDao;
 import org.projectforge.fibu.AuftragDO;
 import org.projectforge.fibu.AuftragDao;
+import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.plugins.teamcal.TeamCalTestHelper;
 import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
@@ -119,7 +120,7 @@ public class InitDatabaseDaoWithTestDataTestFork extends PluginTestBase
   {
     final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
     final String testPassword = "demo123";
-    userGroupCache.setExpired(); // Force reload (because it's may be expired due to previous tests).
+    TenantRegistryMap.getInstance().setAllUserGroupCachesAsExpired(); // Force reload (because it's may be expired due to previous tests).
     Registry.instance().getUserCache().setExpired(); // Force reload (because it's may be expired due to previous tests).
     assertTrue(initDatabaseDao.isEmpty());
     final PFUserDO admin = new PFUserDO();
