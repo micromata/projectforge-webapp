@@ -303,7 +303,7 @@ public class AbstractTestBase
     if (user == null) {
       fail("User not found: " + username);
     }
-    ThreadLocalUserContext.setUser(user);
+    ThreadLocalUserContext.setUser(PFUserDO.createCopyWithoutSecretFields(user));
     return user;
   }
 
