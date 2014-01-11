@@ -193,7 +193,7 @@ public class LoginPage extends AbstractUnsecureBasePage
 
   private static void internalLogin(final WebPage page, final PFUserDO user)
   {
-    final UserContext userContext = new UserContext(user);
+    final UserContext userContext = new UserContext(PFUserDO.createCopyWithoutSecretFields(user));
     ((MySession) page.getSession()).login(userContext, page.getRequest());
     UserFilter.login(WicketUtils.getHttpServletRequest(page.getRequest()), userContext);
   }
