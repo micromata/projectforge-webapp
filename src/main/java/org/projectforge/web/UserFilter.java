@@ -323,7 +323,7 @@ public class UserFilter implements Filter
       }
       addStayLoggedInCookie(request, response, stayLoggedInCookie);
       log.info("User successfully logged in using stay-logged-in method: " + user.getUserDisplayname());
-      return new UserContext(user);
+      return new UserContext(PFUserDO.createCopyWithoutSecretFields(user));
     }
     return null;
   }
