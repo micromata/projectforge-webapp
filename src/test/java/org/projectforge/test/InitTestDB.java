@@ -189,6 +189,7 @@ public class InitTestDB
     putGroup(group);
     final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
     userGroupCache.setExpired();
+    Registry.instance().getUserCache().setExpired();
     return group;
   }
 

@@ -176,6 +176,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
 
     Registry.instance().getTaskTree().setExpired();
     Registry.instance().getUserGroupCache().setExpired();
+    Registry.instance().getUserCache().setExpired();
 
     log.fatal("Empty database successfully initialized.");
     return adminUser;
@@ -276,6 +277,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
     }.start();
     taskTree.setExpired();
     Registry.instance().getUserGroupCache().setExpired();
+    Registry.instance().getUserCache().setExpired();
     return user;
   }
 

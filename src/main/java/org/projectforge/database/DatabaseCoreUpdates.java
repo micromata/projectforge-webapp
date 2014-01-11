@@ -511,6 +511,7 @@ public class DatabaseCoreUpdates
         dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "timeNotation"));
         dao.createMissingIndices();
         Registry.instance().getUserGroupCache().setExpired();
+        Registry.instance().getUserCache().setExpired();
         return UpdateRunningStatus.DONE;
       }
     });

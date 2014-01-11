@@ -62,6 +62,7 @@ public class InitDatabaseDaoTestFork extends TestBase
   {
     final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
     userGroupCache.setExpired(); // Force reload (because it's may be expired due to previous tests).
+    Registry.instance().getUserCache().setExpired();
     assertTrue(initDatabaseDao.isEmpty());
     final PFUserDO admin = new PFUserDO();
     admin.setUsername(InitDatabaseDao.DEFAULT_ADMIN_USER);

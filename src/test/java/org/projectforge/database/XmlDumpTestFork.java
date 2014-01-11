@@ -65,6 +65,7 @@ public class XmlDumpTestFork extends TestBase
   {
     final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
     userGroupCache.setExpired(); // Force reload (because it's may be expired due to previous tests).
+    Registry.instance().getUserCache().setExpired();
     assertTrue(initDatabaseDao.isEmpty());
     final XStreamSavingConverter converter = xmlDump
         .restoreDatabaseFromClasspathResource(InitDatabaseDao.TEST_DATA_BASE_DUMP_FILE, "utf-8");

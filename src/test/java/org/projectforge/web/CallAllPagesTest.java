@@ -68,6 +68,7 @@ public class CallAllPagesTest extends WicketPageTestBase
   @Test
   public void testAllMountedPages()
   {
+    testPage(SetupPage.class);
     testAllMountedPages(BrowserScreenWidthType.NARROW);
     testAllMountedPages(BrowserScreenWidthType.NORMAL);
     testAllMountedPages(BrowserScreenWidthType.WIDE);
@@ -76,7 +77,7 @@ public class CallAllPagesTest extends WicketPageTestBase
     clearDatabase();
     deleteDB();
     Registry.instance().getUserGroupCache().setExpired();
-    testPage(SetupPage.class);
+    Registry.instance().getUserCache().setExpired();
   }
 
   private void testAllMountedPages(final BrowserScreenWidthType browserScreenWidthType)
