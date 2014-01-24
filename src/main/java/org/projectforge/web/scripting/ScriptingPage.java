@@ -60,7 +60,7 @@ import org.projectforge.web.wicket.AbstractStandardFormPage;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.JFreeChartImage;
 
-public class ScriptingPage extends AbstractStandardFormPage
+public class ScriptingPage extends AbstractScriptingPage
 {
   private static final long serialVersionUID = -1910145309628761662L;
 
@@ -73,8 +73,6 @@ public class ScriptingPage extends AbstractStandardFormPage
 
   @SpringBean(name = "groovyExecutor")
   private GroovyExecutor groovyExecutor;
-
-  protected GroovyResult groovyResult;
 
   private final ScriptingForm form;
 
@@ -152,6 +150,7 @@ public class ScriptingPage extends AbstractStandardFormPage
         return;
       }
       if (groovyResult.hasResult() == true) {
+        // TODO maybe a good point to generalize to AbstractScriptingPage?
         final Object result = groovyResult.getResult();
         if (result instanceof ExportWorkbook == true) {
           excelExport();
@@ -315,21 +314,6 @@ public class ScriptingPage extends AbstractStandardFormPage
       sb.append(DateHelper.getTimestampAsFilenameSuffix(new Date())).append(".zip");
       final String filename = sb.toString();
       DownloadUtils.setDownloadTarget(filename, exportZipArchive.createResourceStreamWriter());
-    } catch (final Exception ex) {
-      error(getLocalizedMessage("error", ex.getMessage()));
-      log.error(ex.getMessage(), ex);
-    }
-  }
-
-  private void jsonExport()
-  {
-    try {
-      final ExportJson exportJson = (ExportJson) groovyResult.getResult();
-      final StringBuilder sb = new StringBuilder();
-      sb.append(exportJson.getJsonName()).append("_");
-      sb.append(DateHelper.getTimestampAsFilenameSuffix(new Date())).append(".json");
-      final String filename = sb.toString();
-      DownloadUtils.setDownloadTarget(filename, exportJson.createResourceStreamWriter());
     } catch (final Exception ex) {
       error(getLocalizedMessage("error", ex.getMessage()));
       log.error(ex.getMessage(), ex);

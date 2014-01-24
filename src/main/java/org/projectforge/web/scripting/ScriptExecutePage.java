@@ -37,6 +37,7 @@ import org.projectforge.common.NumberHelper;
 import org.projectforge.core.UserException;
 import org.projectforge.excel.ExportWorkbook;
 import org.projectforge.export.ExportJFreeChart;
+import org.projectforge.export.ExportJson;
 import org.projectforge.export.ExportZipArchive;
 import org.projectforge.scripting.GroovyResult;
 import org.projectforge.scripting.ScriptDO;
@@ -57,7 +58,7 @@ import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
-public class ScriptExecutePage extends AbstractStandardFormPage implements ISelectCallerPage
+public class ScriptExecutePage extends AbstractScriptingPage implements ISelectCallerPage
 {
   private static final long serialVersionUID = -183858142939207911L;
 
@@ -79,8 +80,6 @@ public class ScriptExecutePage extends AbstractStandardFormPage implements ISele
   protected FieldsetPanel scriptResultFieldsetPanel;
 
   private GridBuilder resultGridBuilder;
-
-  protected transient GroovyResult groovyResult;
 
   @SuppressWarnings("serial")
   public ScriptExecutePage(final PageParameters parameters)
@@ -175,6 +174,7 @@ public class ScriptExecutePage extends AbstractStandardFormPage implements ISele
       return;
     }
     if (groovyResult.hasResult() == true) {
+      // TODO maybe a good point to generalize to AbstractScriptingPage?
       final Object obj = groovyResult.getResult();
       if (obj instanceof ExportWorkbook == true) {
         exportExcel((ExportWorkbook) obj);
@@ -182,8 +182,9 @@ public class ScriptExecutePage extends AbstractStandardFormPage implements ISele
         exportJFreeChart((ExportJFreeChart) obj);
       } else if (obj instanceof ExportZipArchive == true) {
         exportZipArchive((ExportZipArchive) obj);
+      } else if (obj instanceof ExportJson) {
+        jsonExport();
       }
-      // TODO JU add json
     }
   }
 
