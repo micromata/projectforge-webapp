@@ -45,6 +45,7 @@ import org.projectforge.common.FileHelper;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.excel.ExportWorkbook;
 import org.projectforge.export.ExportJFreeChart;
+import org.projectforge.export.ExportJson;
 import org.projectforge.export.ExportZipArchive;
 import org.projectforge.fibu.kost.reporting.ReportGeneratorList;
 import org.projectforge.fibu.kost.reporting.ReportStorage;
@@ -161,6 +162,8 @@ public class ScriptingPage extends AbstractStandardFormPage
           zipExport();
         } else if (result instanceof ExportJFreeChart) {
           jFreeChartExport();
+        } else if (result instanceof ExportJson) {
+          jsonExport();
         }
       }
       // } else if (getReportScriptingStorage().getJasperReport() != null) {
@@ -312,6 +315,21 @@ public class ScriptingPage extends AbstractStandardFormPage
       sb.append(DateHelper.getTimestampAsFilenameSuffix(new Date())).append(".zip");
       final String filename = sb.toString();
       DownloadUtils.setDownloadTarget(filename, exportZipArchive.createResourceStreamWriter());
+    } catch (final Exception ex) {
+      error(getLocalizedMessage("error", ex.getMessage()));
+      log.error(ex.getMessage(), ex);
+    }
+  }
+
+  private void jsonExport()
+  {
+    try {
+      final ExportJson exportJson = (ExportJson) groovyResult.getResult();
+      final StringBuilder sb = new StringBuilder();
+      sb.append(exportJson.getJsonName()).append("_");
+      sb.append(DateHelper.getTimestampAsFilenameSuffix(new Date())).append(".json");
+      final String filename = sb.toString();
+      DownloadUtils.setDownloadTarget(filename, exportJson.createResourceStreamWriter());
     } catch (final Exception ex) {
       error(getLocalizedMessage("error", ex.getMessage()));
       log.error(ex.getMessage(), ex);
