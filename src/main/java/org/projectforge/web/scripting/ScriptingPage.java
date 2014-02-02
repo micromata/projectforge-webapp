@@ -56,7 +56,6 @@ import org.projectforge.user.PFUserContext;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.web.fibu.ReportObjectivesPage;
 import org.projectforge.web.fibu.ReportScriptingStorage;
-import org.projectforge.web.wicket.AbstractStandardFormPage;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.JFreeChartImage;
 
