@@ -64,8 +64,6 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
   // Counts the length of grid panels of current row. After reaching full length, a new row will be created automatically.
   private final int lengthCounter[] = new int[MAX_LEVEL + 1];
 
-  private final boolean fluid;
-
   private Set<String> rowsPanelHelperSet;
 
   /**
@@ -73,18 +71,12 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
    * @param id
    * @param fluid Default is true.
    */
-  public GridBuilder(final MarkupContainer parent, final String id, final boolean fluid)
+  public GridBuilder(final MarkupContainer parent, final String id)
   {
     super();
     this.parent = parent;
-    this.fluid = fluid;
-    mainContainer = new DivPanel(id, fluid == true ? GridType.CONTAINER_FLUID : GridType.CONTAINER);
+    mainContainer = new DivPanel(id, GridType.CONTAINER);
     parent.add(mainContainer);
-  }
-
-  public GridBuilder(final MarkupContainer parent, final String id)
-  {
-    this(parent, id, true);
   }
 
   public GridBuilder newGridPanel(final GridType... gridTypes)
@@ -256,7 +248,7 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
   private GridBuilder newRowPanel(final int level, final GridType... gridTypes)
   {
     validateRowPanelLevel(level);
-    final DivPanel rowPanel = new DivPanel(newRowPanelId(level), fluid == true ? GridType.ROW_FLUID : GridType.ROW);
+    final DivPanel rowPanel = new DivPanel(newRowPanelId(level), GridType.ROW);
     rowPanel.addCssClasses(gridTypes);
     return addRowPanel(level, rowPanel);
   }

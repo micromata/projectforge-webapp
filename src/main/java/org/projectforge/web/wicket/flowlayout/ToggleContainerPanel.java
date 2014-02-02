@@ -275,7 +275,7 @@ public class ToggleContainerPanel extends Panel
   {
     final DivPanel content = new DivPanel(ToggleContainerPanel.CONTENT_ID);
     this.add(content);
-    final GridBuilder gridBuilder = new GridBuilder(content, content.newChildId(), true);
+    final GridBuilder gridBuilder = new GridBuilder(content, content.newChildId());
     return gridBuilder;
   }
 
