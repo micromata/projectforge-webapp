@@ -27,6 +27,7 @@ import java.util.Collection;
 
 import org.apache.commons.lang.Validate;
 import org.projectforge.common.StringHelper;
+import org.projectforge.multitenancy.TenantDO;
 import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskNode;
@@ -140,6 +141,17 @@ public class AccessChecker
   }
 
   /**
+   * @param tenant
+   * @param userId
+   * @return
+   * @see org.projectforge.user.UserGroupCache#isUserMemberOfAdminGroup(java.lang.Integer)
+   */
+  public boolean isUserMemberOfAdminGroup(final TenantDO tenant, final PFUserDO user)
+  {
+    return isUserMemberOfGroup(tenant, user, ProjectForgeGroup.ADMIN_GROUP);
+  }
+
+  /**
    * @param userId
    * @return
    * @see org.projectforge.user.UserGroupCache#isUserMemberOfAdminGroup(java.lang.Integer)
@@ -157,6 +169,17 @@ public class AccessChecker
   public boolean isUserMemberOfAdminGroup(final PFUserDO user, final boolean throwException)
   {
     return isUserMemberOfGroup(user, throwException, ProjectForgeGroup.ADMIN_GROUP);
+  }
+
+  /**
+   * @param tenant
+   * @param user
+   * @return
+   * @see org.projectforge.user.UserGroupCache#isUserMemberOfAdminGroup(java.lang.Integer)
+   */
+  public boolean isUserMemberOfAdminGroup(final TenantDO tenant, final PFUserDO user, final boolean throwException)
+  {
+    return isUserMemberOfGroup(tenant, user, throwException, ProjectForgeGroup.ADMIN_GROUP);
   }
 
   /**
@@ -228,6 +251,34 @@ public class AccessChecker
     }
   }
 
+  /**
+   * Checks if the user of the ThreadLocalUserContext (logged in user) is member at least of one of the given groups.
+   * 
+   * @param tenant
+   * @param user
+   * @param throwException default false.
+   * @param groups
+   * @see #isUserMemberOfGroup(PFUserDO, ProjectForgeGroup...)
+   */
+  public boolean isUserMemberOfGroup(final TenantDO tenant, final PFUserDO user, final boolean throwException, final ProjectForgeGroup... groups)
+  {
+    Validate.notNull(groups);
+    if (user == null) {
+      // Before user is logged in.
+      if (throwException == true) {
+        throw getLoggedInUserNotMemberOfException(groups);
+      }
+      return false;
+    }
+    if (throwException == false) {
+      return isUserMemberOfGroup(tenant, user, groups);
+    } else if (isUserMemberOfGroup(tenant, user, groups) == true) {
+      return true;
+    } else {
+      throw getLoggedInUserNotMemberOfException(groups);
+    }
+  }
+
   private AccessException getLoggedInUserNotMemberOfException(final ProjectForgeGroup... groups)
   {
     final StringBuffer buf = new StringBuffer();
@@ -250,6 +301,18 @@ public class AccessChecker
   public boolean isUserMemberOfGroup(final PFUserDO user, final ProjectForgeGroup... groups)
   {
     final UserGroupCache userGroupCache = TenantRegistryMap.getInstance().getTenantRegistry().getUserGroupCache();
+    return userGroupCache.isUserMemberOfGroup(user, groups);
+  }
+
+  /**
+   * Checks if the given user is at least member of one of the given groups.
+   * @param tenant
+   * @param user
+   * @param groups
+   */
+  public boolean isUserMemberOfGroup(final TenantDO tenant, final PFUserDO user, final ProjectForgeGroup... groups)
+  {
+    final UserGroupCache userGroupCache = TenantRegistryMap.getInstance().getTenantRegistry(tenant).getUserGroupCache();
     return userGroupCache.isUserMemberOfGroup(user, groups);
   }
 
