@@ -102,7 +102,7 @@ $(window).load(function () {
                 if (!is_editing) {
                     $('#pf_sortablecontainer ul').sortable('disable');
                     is_editing = true;
-                    $(this).after('<div id="pf_editentry" class="pf_disable"><input type="text" class="text"><a class="pf_save"><i class="icon-ok"></i></a><a class="pf_delete"><i class="icon-trash"></i></a></div>');
+                    $(this).after('<div id="pf_editentry" class="pf_disable"><input type="text" class="text"><a class="pf_save"><i class="glyphicon-ok"></i></a><a class="pf_delete"><i class="glyphicon-trash"></i></a></div>');
                     if ($(this).parent().find('ul').children().length == 0) {
                         $('.pf_delete').css('display', 'block');
                     } else {

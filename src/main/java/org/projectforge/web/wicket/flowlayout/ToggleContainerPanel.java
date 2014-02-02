@@ -47,11 +47,11 @@ public class ToggleContainerPanel extends Panel
 
   public static final String HEADING_TEXT_ID = "text";
 
-  private static final String ICON_STATUS_OPENED = "icon-minus";
+  private static final String ICON_STATUS_OPENED = "glyphicon-minus";
 
-  private static final String ICON_OPENED = "icon-minus icon-white";
+  private static final String ICON_OPENED = "glyphicon-minus glyphicon-white";
 
-  private static final String ICON_CLOSED = "icon-plus icon-white";
+  private static final String ICON_CLOSED = "glyphicon-plus glyphicon-white";
 
   private final WebMarkupContainer panel, toggleContainer, toggleHeading, iconContainer;
 

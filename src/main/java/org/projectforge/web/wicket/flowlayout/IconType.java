@@ -48,7 +48,7 @@ public enum IconType
   KEYBOARD("th"), //
   LIST("list"), //
   MINUS_SIGN("minus-sign"), //
-  MODIFIED("icon-exclamation-sign"), //
+  MODIFIED("exclamation-sign"), //
   PHONE("phone"), //
   PHONE_MOBILE("mobile-phone"), //
   PLUS("plus"), //
@@ -78,7 +78,7 @@ public enum IconType
 
   public String getClassAttrValue()
   {
-    return "icon-" + cssIdentifier;
+    return "glyphicon-" + cssIdentifier;
   }
 
   public boolean isIn(final IconType... type)
