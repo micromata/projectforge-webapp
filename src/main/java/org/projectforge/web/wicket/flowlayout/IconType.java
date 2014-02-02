@@ -78,7 +78,7 @@ public enum IconType
 
   public String getClassAttrValue()
   {
-    return "glyphicon-" + cssIdentifier;
+    return "glyphicon glyphicon-" + cssIdentifier;
   }
 
   public boolean isIn(final IconType... type)
