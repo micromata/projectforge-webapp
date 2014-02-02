@@ -60,7 +60,7 @@ public enum GridSize
   private GridSize(final int length)
   {
     this.length = length;
-    this.classAttrValue = "span" + length;
+    this.classAttrValue = "col-md-" + length;
   }
 
   private GridSize(final GridSize master)
