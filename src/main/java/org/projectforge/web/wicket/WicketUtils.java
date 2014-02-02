@@ -77,7 +77,6 @@ import org.projectforge.web.mobile.AbstractSecuredMobilePage;
 import org.projectforge.web.mobile.MenuMobilePage;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
-import org.projectforge.web.wicket.flowlayout.ComponentSize;
 import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.IconPanel;
@@ -682,14 +681,6 @@ public class WicketUtils
     buf.append("');\n}\n");
     parent.add(new Label("showDeleteEntryQuestionDialog", buf.toString()).setEscapeModelStrings(false).add(
         AttributeModifier.replace("type", "text/javascript")));
-  }
-
-  public static void setSize(Component component, final ComponentSize size)
-  {
-    if (component instanceof ComponentWrapperPanel) {
-      component = ((ComponentWrapperPanel) component).getFormComponent();
-    }
-    component.add(AttributeModifier.append("class", size.getClassAttrValue()));
   }
 
   /**
