@@ -3,7 +3,7 @@
 // e. g. FontAwesome doesn't work.
 
 @import "bootstrap/bootstrap";
-// @import "bootstrap/responsive";
+@import "bootstrap/responsive";
 
 
 @import "table-css";
@@ -51,7 +51,7 @@ label {
 .dropdown-menu li > a {
 	padding: 3px 24px 3px 10px;
 }
-/* Adressen Eingabefelder rutschen bei bei schmalem Bildschirm untereinander. */
+/* Adressen Eingabefelder rutschen bei bei schmalem Bildschirm untereinander. */ 
 label.control-label {
 	position: relative;
 	float: left;
@@ -111,13 +111,13 @@ ul.nav-pills > li > a {
   padding-bottom: 3px;
   margin-top: 2px;
   margin-bottom: 2px;
-  // .border-radius(5px);
+  .border-radius(5px);
   color:@navbarText;
   background:#f0f0f0;
   border: 1px solid @navbarBorder;
-  // .border-radius(@baseBorderRadius);
+  .border-radius(@baseBorderRadius);
   .box-shadow(0 1px 4px rgba(0,0,0,.065));
-
+  
 }
 ul.nav-pills > li > a:hover {
 	color: @grayDark;
@@ -212,7 +212,7 @@ ul.nav-pills > .active > a:hover {
 	}
 	.nav-collapse ul.dropdown-menu > .dropdown-submenu > a {
 		padding: 2px 15px;
-	}
+	} 
 	.nav-collapse ul.dropdown-menu ul.dropdown-menu a {
 		padding: 2px 25px;
 	}
