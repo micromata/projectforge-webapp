@@ -5,13 +5,18 @@
 
 <body>
   <wicket:panel>
-    <div class="container">
-      <a class="btn navbar-btn" data-toggle="collapse" data-target=".navbar-responsive-collapse"> <span class="glyphicon glyphicon-bar"></span> <span
-        class="glyphicon glyphicon-bar"></span> <span class="glyphicon glyphicon-bar"></span>
-      </a>
-      <div class="nav-collapse collapse navbar-responsive-collapse">
+    <div class="container-fluid navbar navbar-default">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+      </div>
+      <div class="collapse navbar-collapse navbar-responsive-collapse">
         <ul class="nav navbar-nav pf_sitemap">
-          <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-sitemap"></i><span
+          <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-list-alt"></span><span
               class="badge badge-important" wicket:id="totalMenuCounter">[8]</span><b class="caret"></b></a>
             <ul class="dropdown-menu">
               <li class="dropdown-submenu" wicket:id="completeMenuCategoryRepeater"><a href="#"><span wicket:id="menuCategoryLabel">[General]</span><span
@@ -24,7 +29,7 @@
         </ul>
         <wicket:container wicket:id="menuconfig"></wicket:container>
         <div id="pf_sortablecontainer">
-          <ul class="nav" role="menu">
+          <ul class="nav navbar-nav" role="menu">
             <li id="pf_newentry" class="pf_disable"><input type="text" class="text"><a class="pf_safenewentry"><i
                 class="glyphicon glyphicon-plus-sign"></i></a></li>
             <li wicket:id="goMobile"><a href="#" wicket:id="link"><wicket:message key="menu.mobileMenu" /></a></li>
