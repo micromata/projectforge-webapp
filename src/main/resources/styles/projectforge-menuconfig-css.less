@@ -51,14 +51,8 @@
   }
   #pf_sortablecontainer > ul > li input[type="text"] {
     float:left;
-    display: inline-block;
-    height: 12px;
-    padding: 2px 4px;
-    margin-bottom: 0px;
-    font-size: 12px;
-    line-height: 12px;
-    width:100px;
     margin:10px 0 0 4px;
+    width:100px;
   }
   .pf_warning input[type="text"] {
     border-color:red;
@@ -170,9 +164,12 @@
     top: -6px;
     left:50px;
   }
+  .pf_menueconfig .dropdown-menu {
+    font-size: 12px;
+  }
   .pf_menueconfig .dropdown-menu ul {
-    overflow:hidden;
     margin:0;
+    padding:0;
   }
   .pf_menueconfig .dropdown-menu li {
     float:left;
@@ -190,6 +187,7 @@
     background:#f0f0f0;
   }
   .pf_menueconfig .dropdown-menu li li {
+    width:132px;
     clear:left;
     list-style-type:none;
     margin:0;
