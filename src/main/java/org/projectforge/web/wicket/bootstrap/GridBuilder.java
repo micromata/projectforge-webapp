@@ -66,16 +66,20 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
 
   private Set<String> rowsPanelHelperSet;
 
+  public GridBuilder(final MarkupContainer parent, final String id) {
+    this(parent, id, true);
+  }
+
   /**
    * @param parent
    * @param id
    * @param fluid Default is true.
    */
-  public GridBuilder(final MarkupContainer parent, final String id)
+  public GridBuilder(final MarkupContainer parent, final String id, boolean fluid)
   {
     super();
     this.parent = parent;
-    mainContainer = new DivPanel(id, GridType.CONTAINER);
+    mainContainer = new DivPanel(id, fluid == true ? GridType.CONTAINER_FLUID : GridType.CONTAINER);
     parent.add(mainContainer);
   }
 
