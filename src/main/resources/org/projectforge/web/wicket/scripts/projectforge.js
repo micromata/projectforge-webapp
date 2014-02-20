@@ -167,8 +167,9 @@ function initializeComponents() {
     window.setTimeout(function () {
         initializing = false;
     }, initializingTimeout);
-	$("div.radio-jquery-ui").buttonset();
-	if ($("textarea.autogrow").length) {
+    $('[checked="checked"]').parent().addClass("active");
+    $('.btn').button();
+    if ($("textarea.autogrow").length) {
 		$("textarea.autogrow").autoGrow();
 	}
 	$('textarea').each(function(){
@@ -508,7 +509,7 @@ function doAfterAjaxHandling() {
 		$(this).siblings('.label').change();
 	});
 	$("fieldset > div > input[type=checkbox]").addClass("checkbox");
-	$(".jqui_checkbox").buttonset();
+	//$(".jqui_checkbox").buttonset();
 	initializeComponents();
   adaptSize();
   $(".mm_delayBlur").blur(function(e) {
