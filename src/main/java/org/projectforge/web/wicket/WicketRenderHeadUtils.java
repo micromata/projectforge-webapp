@@ -35,7 +35,7 @@ public class WicketRenderHeadUtils
 {
   private static final String[][] JAVASCRIPT_FILES_DEF = { //
     // { "scripts/jquery/1.8.2/jquery-1.8.2", ".min"}, // Wicket delivers jQuery version
-    // Needed: core, widget, mouse, position, draggable, droppable, resizable, selectable, sortable, datepicker:
+    // Needed: core, widget, mouse, position, draggable, droppable, resizable, selectable, sortable, datepicker (smoothness):
     { "scripts/jqueryui/jquery-ui-1.10.4.custom", ".min"}, //
     { "include/bootstrap/js/bootstrap", ".min"}, //
     { "scripts/contextmenu/jquery.contextmenu", ""} //
