@@ -30,7 +30,7 @@ package org.projectforge.web.wicket.flowlayout;
 public enum DivType
 {
   ALERT_ERROR("alert alert-error"), ALERT_INFO("alert alert-info"), ALERT_SUCCESS("alert alert-success"), ALERT_WARNNING(
-      "alert"), CHECKBOX("jqui_checkbox"), RADIOBOX("radio-jquery-ui");
+      "alert"), BTN_GROUP("btn-group"), CHECKBOX("jqui_checkbox");
 
   private String classAttrValue;
 

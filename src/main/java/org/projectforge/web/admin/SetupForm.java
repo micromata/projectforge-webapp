@@ -49,7 +49,6 @@ import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.components.TimeZonePanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 import org.projectforge.web.wicket.flowlayout.ParTextPanel;
@@ -112,7 +111,7 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
     {
       // RadioChoice mode
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.setup.target"));
-      final DivPanel radioPanel = new DivPanel(fs.newChildId(), DivType.RADIOBOX);
+      final DivPanel radioPanel = fs.addNewRadioBoxDiv();
       fs.add(radioPanel);
       fs.setLabelFor(radioPanel);
       final RadioGroupPanel<SetupTarget> radioGroup = new RadioGroupPanel<SetupTarget>(radioPanel.newChildId(), "setuptarget",

@@ -370,7 +370,8 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
    */
   public FieldsetPanel addKeyboardHelpIcon(final IModel<String> title, final IModel<String> tooltip)
   {
-    return add(new IconPanel(newIconChildId(), IconType.KEYBOARD, title, tooltip).setColor(CSSColor.GRAY), FieldSetIconPosition.BOTTOM_RIGHT);
+    return add(new IconPanel(newIconChildId(), IconType.KEYBOARD, title, tooltip).setColor(CSSColor.GRAY),
+        FieldSetIconPosition.BOTTOM_RIGHT);
   }
 
   /**
@@ -474,7 +475,8 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
 
   public DivPanel addNewRadioBoxDiv()
   {
-    final DivPanel radioBoxDiv = new DivPanel(newChildId(), DivType.RADIOBOX);
+    final DivPanel radioBoxDiv = new DivPanel(newChildId(), DivType.BTN_GROUP);
+    radioBoxDiv.add(AttributeModifier.append("data-toggle", "buttons"));
     add(radioBoxDiv);
     return radioBoxDiv;
   }
