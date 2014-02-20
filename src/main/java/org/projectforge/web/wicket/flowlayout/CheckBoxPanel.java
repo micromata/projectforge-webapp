@@ -100,6 +100,7 @@ public class CheckBoxPanel extends Panel implements ComponentWrapperPanel
     if (labelString != null) {
       label = new Label("label", labelString);
       label.add(AttributeModifier.replace("for", checkBox.getMarkupId()));
+      label.setRenderBodyOnly(true);
     } else {
       label = new Label("label");
       label.setVisible(false);

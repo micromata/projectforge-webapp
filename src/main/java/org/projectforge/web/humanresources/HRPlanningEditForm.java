@@ -222,7 +222,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
         }
 
       }, SingleButtonPanel.NORMAL).setTooltip(getString("recalculate")));
-      final DivPanel checkBoxDiv = new DivPanel(fs.newChildId(), DivType.CHECKBOX) {
+      final DivPanel checkBoxDiv = new DivPanel(fs.newChildId(), DivType.BTN_GROUP) {
         /**
          * @see org.apache.wicket.Component#isVisible()
          */

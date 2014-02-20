@@ -468,7 +468,7 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
 
   public DivPanel addNewCheckBoxDiv()
   {
-    final DivPanel checkBoxDiv = new DivPanel(newChildId(), DivType.CHECKBOX);
+    final DivPanel checkBoxDiv = new DivPanel(newChildId(), DivType.BTN_GROUP);
     add(checkBoxDiv);
     return checkBoxDiv;
   }
@@ -476,7 +476,6 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
   public DivPanel addNewRadioBoxDiv()
   {
     final DivPanel radioBoxDiv = new DivPanel(newChildId(), DivType.BTN_GROUP);
-    radioBoxDiv.add(AttributeModifier.append("data-toggle", "buttons"));
     add(radioBoxDiv);
     return radioBoxDiv;
   }
