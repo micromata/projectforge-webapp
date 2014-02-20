@@ -31,9 +31,8 @@ import org.apache.wicket.model.PropertyModel;
 import org.projectforge.access.AccessEntryDO;
 import org.projectforge.access.AccessType;
 import org.projectforge.access.GroupTaskAccessDO;
-import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
-import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.ButtonGroupPanel;
+import org.projectforge.web.wicket.flowlayout.CheckBoxButton;
 
 /**
  * Rows of access rights (without header).
@@ -68,11 +67,11 @@ public class AccessEditTablePanel extends Panel
     final WebMarkupContainer row = new WebMarkupContainer(rowRepeater.newChildId());
     rowRepeater.add(row);
     row.add(new Label("area", getString(accessEntry.getAccessType().getI18nKey())));
-    final DivPanel groupPanel = new DivPanel("checkboxes", DivType.CHECKBOX);
+    final ButtonGroupPanel groupPanel = new ButtonGroupPanel("checkboxes").setToggleButtons();
     row.add(groupPanel);
-    groupPanel.add(new CheckBoxPanel(groupPanel.newChildId(), new PropertyModel<Boolean>(accessEntry, "accessSelect"), getString("access.type.select")));
-    groupPanel.add(new CheckBoxPanel(groupPanel.newChildId(), new PropertyModel<Boolean>(accessEntry, "accessInsert"), getString("access.type.insert")));
-    groupPanel.add(new CheckBoxPanel(groupPanel.newChildId(), new PropertyModel<Boolean>(accessEntry, "accessUpdate"), getString("access.type.update")));
-    groupPanel.add(new CheckBoxPanel(groupPanel.newChildId(), new PropertyModel<Boolean>(accessEntry, "accessDelete"), getString("access.type.delete")));
+    groupPanel.addButton(new CheckBoxButton(groupPanel.newChildId(), new PropertyModel<Boolean>(accessEntry, "accessSelect"), getString("access.type.select")));
+    groupPanel.addButton(new CheckBoxButton(groupPanel.newChildId(), new PropertyModel<Boolean>(accessEntry, "accessInsert"), getString("access.type.insert")));
+    groupPanel.addButton(new CheckBoxButton(groupPanel.newChildId(), new PropertyModel<Boolean>(accessEntry, "accessUpdate"), getString("access.type.update")));
+    groupPanel.addButton(new CheckBoxButton(groupPanel.newChildId(), new PropertyModel<Boolean>(accessEntry, "accessDelete"), getString("access.type.delete")));
   }
 }
