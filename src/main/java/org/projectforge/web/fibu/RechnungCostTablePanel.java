@@ -94,10 +94,24 @@ public class RechnungCostTablePanel extends Panel
         }
         final boolean percentageVisible = NumberHelper.isNotZero(percentage);
         item.add(new Label("percentage", NumberFormatter.formatPercent(percentage)).setVisible(percentageVisible));
+        onRenderCostRow(position, zuweisung, kost1, kost2);
       }
     };
     table.add(listView);
     refresh();
+  }
+
+  /**
+   * Does nothing at default.
+   * @param position
+   * @param costAssignment
+   * @param cost1
+   * @param cost2
+   */
+  protected void onRenderCostRow(final AbstractRechnungsPositionDO position, final KostZuweisungDO costAssignment, final Component cost1,
+      final Component cost2)
+  {
+
   }
 
   /**
