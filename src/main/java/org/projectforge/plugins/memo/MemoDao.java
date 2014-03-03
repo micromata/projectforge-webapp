@@ -24,10 +24,7 @@
 package org.projectforge.plugins.memo;
 
 import org.projectforge.core.BaseDao;
-import org.projectforge.plugins.todo.ToDoDO;
 import org.projectforge.user.PFUserContext;
-import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRightId;
 
 /**
@@ -39,41 +36,22 @@ public class MemoDao extends BaseDao<MemoDO>
 {
   public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_MEMO", "plugin20", "plugins.memo.memo");;
 
-  private UserDao userDao;
-
   public MemoDao()
   {
     super(MemoDO.class);
     userRightId = USER_RIGHT_ID;
   }
-  
+
   @Override
-  protected void onSaveOrModify(MemoDO obj)
+  protected void onSaveOrModify(final MemoDO obj)
   {
     super.onSaveOrModify(obj);
     obj.setOwner(PFUserContext.getUser()); // Set always the logged-in user as owner.
-  }
-
-  public void setAssignee(final ToDoDO todo, final Integer userId)
-  {
-    final PFUserDO user = userDao.getOrLoad(userId);
-    todo.setAssignee(user);
-  }
-
-  public void setReporter(final ToDoDO todo, final Integer userId)
-  {
-    final PFUserDO user = userDao.getOrLoad(userId);
-    todo.setReporter(user);
   }
 
   @Override
   public MemoDO newInstance()
   {
     return new MemoDO();
-  }
-
-  public void setUserDao(final UserDao userDao)
-  {
-    this.userDao = userDao;
   }
 }
