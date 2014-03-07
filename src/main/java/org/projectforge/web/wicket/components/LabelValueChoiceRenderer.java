@@ -116,6 +116,20 @@ public class LabelValueChoiceRenderer<T> implements IChoiceRenderer<T>
     return this;
   }
 
+  @SuppressWarnings("unchecked")
+  public LabelValueChoiceRenderer<T> setValueArray(final String[] values)
+  {
+    for (final String value : values) {
+      addValue((T) value, value);
+    }
+    return this;
+  }
+
+  public void clear() {
+    this.values.clear();
+    this.displayValues.clear();
+  }
+
   public LabelValueChoiceRenderer<T> addValue(final T value, final String displayValue)
   {
     this.values.add(value);
