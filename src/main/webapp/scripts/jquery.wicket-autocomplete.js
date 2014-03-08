@@ -254,8 +254,9 @@ jQuery.autocomplete = function(input, options) {
 		input.lastSelected = v;
 		prev = v;
 		$results.html("");
-		$input.val(v).change(); // Johannes Unterstein, Kai Dorschner: Added
-								// .change();
+		newVal = $input.html(v).text(); // Unescape needed for avoiding multiple escaping (Kai R.)
+		$input.val(newVal).change();    // Johannes Unterstein, Kai Dorschner: Added
+                                        // .change();
 		hideResultsNow();
 		if (options.onItemSelect) setTimeout(function() { options.onItemSelect(li) }, 1);
 	};
