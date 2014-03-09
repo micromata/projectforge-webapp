@@ -154,7 +154,7 @@ public class DatabaseCoreUpdates
           configurationDao.checkAndUpdateDatabaseEntries();
         }
         if (dao.doTableAttributesExist(PFUserDO.class, "superAdmin") == false) {
-          dao.addTableAttributes(new Table(PFUserDO.class), new TableAttribute(PFUserDO.class, "super_admin").setDefaultValue("false"));
+          dao.addTableAttributes(new Table(PFUserDO.class), new TableAttribute(PFUserDO.class, "superAdmin").setDefaultValue("false"));
         }
         dao.createMissingIndices();
         return UpdateRunningStatus.DONE;
