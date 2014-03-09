@@ -147,7 +147,7 @@ public class SystemDao extends HibernateDaoSupport
     tenantRegistry.getTaskTree().forceReload();
     tenantRegistry.getKontoCache().forceReload();
     tenantRegistry.getKostCache().forceReload();
-    tenantRegistry.getInvoicCache().forceReload();
+    tenantRegistry.getInvoiceCache().forceReload();
     systemInfoCache.forceReload();
     return "UserGroupCache, TaskTree, KontoCache, KostCache, RechnungCache, SystemInfoCache";
   }

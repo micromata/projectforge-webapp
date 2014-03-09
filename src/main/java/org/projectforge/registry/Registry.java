@@ -230,7 +230,7 @@ public class Registry
    */
   public RechnungCache getInvoiceCache()
   {
-    return TenantRegistryMap.getInstance().getTenantRegistry().getInvoicCache();
+    return TenantRegistryMap.getInstance().getTenantRegistry().getInvoiceCache();
   }
 
   public DataSource getDataSource()

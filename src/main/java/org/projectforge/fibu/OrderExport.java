@@ -128,7 +128,7 @@ public class OrderExport
     addCurrency(mapping, OrderCol.INVOICED, invoicedSum);
     addCurrency(mapping, OrderCol.TO_BE_INVOICED, toBeInvoicedSum);
     mapping.add(OrderCol.COMPLETELY_INVOICED, order.isVollstaendigFakturiert() == true ? "x" : "");
-    final Set<RechnungsPositionVO> invoicePositions = tenantRegistry.getInvoicCache().getRechnungsPositionVOSetByAuftragId(order.getId());
+    final Set<RechnungsPositionVO> invoicePositions = tenantRegistry.getInvoiceCache().getRechnungsPositionVOSetByAuftragId(order.getId());
     mapping.add(OrderCol.INVOICES, getInvoices(invoicePositions));
     final PFUserDO contactPerson = Registry.instance().getUserGroupCache().getUser(order.getContactPersonId());
     mapping.add(OrderCol.CONTACT_PERSON, contactPerson != null ? contactPerson.getFullname() : "");
@@ -177,7 +177,7 @@ public class OrderExport
     addCurrency(mapping, PosCol.INVOICED, invoicedSum);
     addCurrency(mapping, PosCol.TO_BE_INVOICED, toBeInvoicedSum);
     mapping.add(PosCol.COMPLETELY_INVOICED, pos.isVollstaendigFakturiert() == true ? "x" : "");
-    final Set<RechnungsPositionVO> invoicePositions = tenantRegistry.getInvoicCache().getRechnungsPositionVOSetByAuftragsPositionId(pos.getId());
+    final Set<RechnungsPositionVO> invoicePositions = tenantRegistry.getInvoiceCache().getRechnungsPositionVOSetByAuftragsPositionId(pos.getId());
     mapping.add(PosCol.INVOICES, getInvoices(invoicePositions));
     mapping.add(PosCol.PERIOD_OF_PERFORMANCE_BEGIN, pos.getPeriodOfPerformanceBegin());
     mapping.add(PosCol.PERIOD_OF_PERFORMANCE_END, pos.getPeriodOfPerformanceEnd());

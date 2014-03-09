@@ -217,7 +217,7 @@ public class AuftragDao extends BaseDao<AuftragDO>
     }
     if (order.getPositionen() != null) {
       for (final AuftragsPositionDO pos : order.getPositionen()) {
-        final Set<RechnungsPositionVO> set = getTenantRegistry().getInvoicCache().getRechnungsPositionVOSetByAuftragsPositionId(pos.getId());
+        final Set<RechnungsPositionVO> set = getTenantRegistry().getInvoiceCache().getRechnungsPositionVOSetByAuftragsPositionId(pos.getId());
         if (set != null) {
           pos.setFakturiertSum(RechnungDao.getNettoSumme(set));
         }

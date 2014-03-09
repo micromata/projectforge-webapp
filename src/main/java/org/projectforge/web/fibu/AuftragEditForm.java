@@ -391,7 +391,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         }
       }
       posGridBuilder.newSplitPanel(GridSize.COL33);
-      final Set<RechnungsPositionVO> invoicePositionsByOrderPositionId = getTenantRegistry().getInvoicCache()
+      final Set<RechnungsPositionVO> invoicePositionsByOrderPositionId = getTenantRegistry().getInvoiceCache()
           .getRechnungsPositionVOSetByAuftragsPositionId(position.getId());
       final boolean showInvoices = CollectionUtils.isNotEmpty(invoicePositionsByOrderPositionId);
       {

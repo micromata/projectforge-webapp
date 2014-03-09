@@ -126,7 +126,7 @@ public class RechnungDao extends BaseDao<RechnungDO>
    */
   public RechnungCache getRechnungCache()
   {
-    return getTenantRegistry().getInvoicCache();
+    return getTenantRegistry().getInvoiceCache();
   }
 
   public RechnungDao()

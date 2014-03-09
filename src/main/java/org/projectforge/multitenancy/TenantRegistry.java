@@ -114,7 +114,7 @@ public class TenantRegistry
     return kostCache;
   }
 
-  public RechnungCache getInvoicCache()
+  public RechnungCache getInvoiceCache()
   {
     if (invoiceCache == null) {
       invoiceCache = new RechnungCache();
