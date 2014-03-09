@@ -28,6 +28,7 @@ import java.math.BigDecimal;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.TextField;
@@ -35,6 +36,7 @@ import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.fibu.AbstractRechnungsPositionDO;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.ProjektDO;
@@ -43,6 +45,8 @@ import org.projectforge.fibu.RechnungStatus;
 import org.projectforge.fibu.RechnungTyp;
 import org.projectforge.fibu.RechnungsPositionDO;
 import org.projectforge.fibu.kost.AccountingConfig;
+import org.projectforge.fibu.kost.Kost2DO;
+import org.projectforge.fibu.kost.KostZuweisungDO;
 import org.projectforge.registry.Registry;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.PresizedImage;
@@ -174,6 +178,51 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
       orderLink.setVisible(false);
     }
     orderLink.add(new PresizedImage("linkImage", WebConstants.IMAGE_FIND));
+  }
+
+  /**
+   * Highlights the cost2 element if it differs from the cost2 of the given project (if any).
+   * @param position
+   * @param cost1
+   * @param cost2
+   */
+  @Override
+  protected void onRenderCostRow(final AbstractRechnungsPositionDO position, final KostZuweisungDO costAssignment,
+      final Component cost1Component, final Component cost2Component)
+  {
+    final RechnungDO invoice = ((RechnungsPositionDO) position).getRechnung();
+    if (invoice == null) {
+      log.warn("Oups, no invoice given. Shouldn't occur!");
+      return;
+    }
+    final Kost2DO cost2 = costAssignment.getKost2();
+    final ProjektDO projekt = invoice.getProjekt();
+    int numberRange = -1; // First number of cost.
+    int area = -1; // Number 2-4
+    int number = -1; // Number 5-6.
+    if (projekt != null) {
+      numberRange = projekt.getNummernkreis();
+      area = projekt.getBereich();
+      number = projekt.getNummer();
+    } else {
+      final KundeDO customer = invoice.getKunde();
+      if (customer == null) {
+        return;
+      }
+      numberRange = customer.getNummernkreis();
+      number = customer.getBereich();
+    }
+    boolean differs = false;
+    if (numberRange >= 0 && cost2.getNummernkreis() != numberRange) {
+      differs = true;
+    } else if (area >= 0 && cost2.getBereich() != area) {
+      differs = true;
+    } else if (number >= 0&& cost2.getTeilbereich() != number) {
+      differs = true;
+    }
+    if (differs == true) {
+      WicketUtils.setWarningTooltip(cost2Component);
+    }
   }
 
   @SuppressWarnings("unchecked")

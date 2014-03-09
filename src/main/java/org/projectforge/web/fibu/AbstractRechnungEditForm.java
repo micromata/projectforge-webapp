@@ -567,7 +567,17 @@ extends AbstractEditForm<O, P>
           {
             posGridBuilder.newSubSplitPanel(GridSize.COL50);
             DivPanel panel = posGridBuilder.getPanel();
-            final RechnungCostTablePanel costTable = new RechnungCostTablePanel(panel.newChildId(), position);
+            final RechnungCostTablePanel costTable = new RechnungCostTablePanel(panel.newChildId(), position) {
+              /**
+               * @see org.projectforge.web.fibu.RechnungCostTablePanel#onRenderCostRow(org.projectforge.fibu.AbstractRechnungsPositionDO,
+               *      org.apache.wicket.Component, org.apache.wicket.Component)
+               */
+              @Override
+              protected void onRenderCostRow(final AbstractRechnungsPositionDO position, final KostZuweisungDO costAssignment, final Component cost1, final Component cost2)
+              {
+                AbstractRechnungEditForm.this.onRenderCostRow(position, costAssignment, cost1, cost2);
+              }
+            };
             panel.add(costTable);
             ajaxUpdatePositionComponents.add(costTable.refresh().getTable());
 
@@ -610,6 +620,18 @@ extends AbstractEditForm<O, P>
         }
       }
     }
+  }
+
+  /**
+   * Does nothing at default.
+   * @param position
+   * @param costAssignment
+   * @param cost1
+   * @param cost2
+   */
+  protected void onRenderCostRow(final AbstractRechnungsPositionDO position, final KostZuweisungDO costAssignment, final Component cost1,
+      final Component cost2)
+  {
   }
 
   protected String getPositionHeading(final AbstractRechnungsPositionDO position, final ToggleContainerPanel positionsPanel)

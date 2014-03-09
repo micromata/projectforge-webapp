@@ -24,8 +24,10 @@
 package org.projectforge.web.fibu;
 
 import java.math.BigDecimal;
-import java.util.Iterator;
+import java.sql.Date;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -61,58 +63,114 @@ public class InvoicePositionsPanel extends Panel
   }
 
   @SuppressWarnings("serial")
-  public void init(final Set<RechnungsPositionVO> invoicePositions)
+  public void init(final Set<RechnungsPositionVO> invoicePositionsByOrderPositionId)
   {
     final RepeatingView positionsRepeater = new RepeatingView("pos");
     add(positionsRepeater);
-    if (invoicePositions != null) {
-      final Iterator<RechnungsPositionVO> it = invoicePositions.iterator();
-      int orderNumber = -1;
-      Link<String> link = null;
-      RechnungsPositionVO previousOrderPosition = null;
-      BigDecimal netSum = BigDecimal.ZERO;
-      while (it.hasNext() == true) {
-        final RechnungsPositionVO invoicePosition = it.next();
-        netSum = netSum.add(invoicePosition.getNettoSumme());
-        if (orderNumber != invoicePosition.getRechnungNummer().intValue()) {
-          orderNumber = invoicePosition.getRechnungNummer();
-          final WebMarkupContainer item = new WebMarkupContainer(positionsRepeater.newChildId());
-          positionsRepeater.add(item);
-          final Label separatorLabel = new Label("separator", ", ");
-          if (previousOrderPosition == null) {
-            separatorLabel.setVisible(false); // Invisible for first entry.
+    if (invoicePositionsByOrderPositionId != null) {
+      final SortedSet<Integer> invoiceNumbers = new TreeSet<Integer>();
+      for (final RechnungsPositionVO invoicePosition : invoicePositionsByOrderPositionId) {
+        invoiceNumbers.add(invoicePosition.getRechnungNummer());
+      }
+      boolean first = true;
+      Integer invoiceId = null;
+      Date invoiceDate = null;
+      for (final Integer invoiceNumber : invoiceNumbers) {
+        BigDecimal netSum = BigDecimal.ZERO;
+        for (final RechnungsPositionVO invoicePosition : invoicePositionsByOrderPositionId) {
+          if (invoicePosition.getRechnungNummer() != invoiceNumber) {
+            // Invoice position doesn't match current invoice.
+            continue;
           }
-          previousOrderPosition = invoicePosition;
-          item.add(separatorLabel);
-          link = new Link<String>("link") {
-            @Override
-            public void onClick()
-            {
-              final PageParameters params = new PageParameters();
-              params.add(AbstractEditPage.PARAMETER_KEY_ID, String.valueOf(invoicePosition.getRechnungId()));
-              final RechnungEditPage page = new RechnungEditPage(params);
-              page.setReturnToPage((AbstractSecuredPage) getPage());
-              setResponsePage(page);
-            };
+          invoiceId = invoicePosition.getRechnungId();
+          invoiceDate = invoicePosition.getDate();
+          netSum = netSum.add(invoicePosition.getNettoSumme());
+        }
+        final WebMarkupContainer item = new WebMarkupContainer(positionsRepeater.newChildId());
+        positionsRepeater.add(item);
+        final Label separatorLabel = new Label("separator", ", ");
+        if (first == true) {
+          separatorLabel.setVisible(false); // Invisible for first entry.
+          first = false;
+        }
+        item.add(separatorLabel);
+        final String invoiceIdString = String.valueOf(invoiceId);
+        final Link<String> link = new Link<String>("link") {
+          @Override
+          public void onClick()
+          {
+            final PageParameters params = new PageParameters();
+            params.add(AbstractEditPage.PARAMETER_KEY_ID, invoiceIdString);
+            final RechnungEditPage page = new RechnungEditPage(params);
+            page.setReturnToPage((AbstractSecuredPage) getPage());
+            setResponsePage(page);
           };
-          item.add(link);
-          final String invoiceNumber = String.valueOf(invoicePosition.getRechnungNummer());
-          final Component label = new Label("label", invoiceNumber);
-          item.add(label);
-          final String tooltip = DateTimeFormatter.instance().getFormattedDate(invoicePosition.getDate())
-              + ": "
-              + CurrencyFormatter.format(netSum);
-          if (rechnungDao.hasLoggedInUserSelectAccess(false) == true) {
-            link.add(new Label("label", invoiceNumber));
-            WicketUtils.addTooltip(link, tooltip);
-            label.setVisible(false);
-          } else {
-            link.setVisible(false);
-            WicketUtils.addTooltip(label, tooltip);
-          }
-          netSum = BigDecimal.ZERO;
+        };
+        item.add(link);
+        final Component label = new Label("label", invoiceNumber);
+        item.add(label);
+        final String tooltip = DateTimeFormatter.instance().getFormattedDate(invoiceDate) + ": " + CurrencyFormatter.format(netSum);
+        if (rechnungDao.hasLoggedInUserSelectAccess(false) == true) {
+          link.add(new Label("label", invoiceNumber));
+          WicketUtils.addTooltip(link, tooltip);
+          label.setVisible(false);
+        } else {
+          link.setVisible(false);
+          WicketUtils.addTooltip(label, tooltip);
         }
       }
+
+      // final Iterator<RechnungsPositionVO> it = invoicePositionsByOrderPositionId.iterator();
+      // int orderNumber = -1;
+      // Link<String> link = null;
+      // RechnungsPositionVO previousOrderPosition = null;
+      // BigDecimal netSum = BigDecimal.ZERO;
+      // while (it.hasNext() == true) {
+      // final RechnungsPositionVO invoicePosition = it.next();
+      // if (orderNumber == -1) {
+      // orderNumber = invoicePosition.getRechnungNummer();
+      // }
+      // if (orderNumber == invoicePosition.getRechnungNummer().intValue()) {
+      // netSum = netSum.add(invoicePosition.getNettoSumme());
+      // } else {
+      // orderNumber = invoicePosition.getRechnungNummer();
+      // final WebMarkupContainer item = new WebMarkupContainer(positionsRepeater.newChildId());
+      // positionsRepeater.add(item);
+      // final Label separatorLabel = new Label("separator", ", ");
+      // if (previousOrderPosition == null) {
+      // separatorLabel.setVisible(false); // Invisible for first entry.
+      // }
+      // previousOrderPosition = invoicePosition;
+      // item.add(separatorLabel);
+      // link = new Link<String>("link") {
+      // @Override
+      // public void onClick()
+      // {
+      // final PageParameters params = new PageParameters();
+      // params.add(AbstractEditPage.PARAMETER_KEY_ID, String.valueOf(invoicePosition.getRechnungId()));
+      // final RechnungEditPage page = new RechnungEditPage(params);
+      // page.setReturnToPage((AbstractSecuredPage) getPage());
+      // setResponsePage(page);
+      // };
+      // };
+      // item.add(link);
+      // final String invoiceNumber = String.valueOf(invoicePosition.getRechnungNummer());
+      // final Component label = new Label("label", invoiceNumber);
+      // item.add(label);
+      // final String tooltip = DateTimeFormatter.instance().getFormattedDate(invoicePosition.getDate())
+      // + ": "
+      // + CurrencyFormatter.format(netSum);
+      // if (rechnungDao.hasLoggedInUserSelectAccess(false) == true) {
+      // link.add(new Label("label", invoiceNumber));
+      // WicketUtils.addTooltip(link, tooltip);
+      // label.setVisible(false);
+      // } else {
+      // link.setVisible(false);
+      // WicketUtils.addTooltip(label, tooltip);
+      // }
+      // netSum = invoicePosition.getNettoSumme();
+      // }
+      // }
     }
   }
 }

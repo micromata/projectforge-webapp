@@ -391,15 +391,16 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         }
       }
       posGridBuilder.newSplitPanel(GridSize.COL33);
-      final Set<RechnungsPositionVO> orderPositions = getTenantRegistry().getInvoicCache().getRechnungsPositionVOSetByAuftragsPositionId(position.getId());
-      final boolean showInvoices = CollectionUtils.isNotEmpty(orderPositions);
+      final Set<RechnungsPositionVO> invoicePositionsByOrderPositionId = getTenantRegistry().getInvoicCache()
+          .getRechnungsPositionVOSetByAuftragsPositionId(position.getId());
+      final boolean showInvoices = CollectionUtils.isNotEmpty(invoicePositionsByOrderPositionId);
       {
         // Invoices
         final FieldsetPanel fs = posGridBuilder.newFieldset(getString("fibu.rechnungen")).suppressLabelForWarning();
         if (showInvoices == true) {
           final InvoicePositionsPanel panel = new InvoicePositionsPanel(fs.newChildId());
           fs.add(panel);
-          panel.init(orderPositions);
+          panel.init(invoicePositionsByOrderPositionId);
         } else {
           fs.add(AbstractUnsecureBasePage.createInvisibleDummyComponent(fs.newChildId()));
         }
@@ -409,7 +410,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         // invoiced
         final FieldsetPanel fs = posGridBuilder.newFieldset(getString("fibu.fakturiert")).suppressLabelForWarning();
         if (showInvoices == true) {
-          fs.add(new DivTextPanel(fs.newChildId(), CurrencyFormatter.format(RechnungDao.getNettoSumme(orderPositions))));
+          fs.add(new DivTextPanel(fs.newChildId(), CurrencyFormatter.format(RechnungDao.getNettoSumme(invoicePositionsByOrderPositionId))));
         } else {
           fs.add(AbstractUnsecureBasePage.createInvisibleDummyComponent(fs.newChildId()));
         }

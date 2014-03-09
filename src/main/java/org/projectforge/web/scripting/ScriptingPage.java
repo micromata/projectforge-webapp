@@ -45,6 +45,7 @@ import org.projectforge.common.FileHelper;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.excel.ExportWorkbook;
 import org.projectforge.export.ExportJFreeChart;
+import org.projectforge.export.ExportJson;
 import org.projectforge.export.ExportZipArchive;
 import org.projectforge.fibu.kost.reporting.ReportGeneratorList;
 import org.projectforge.fibu.kost.reporting.ReportStorage;
@@ -55,11 +56,10 @@ import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.web.fibu.ReportObjectivesPage;
 import org.projectforge.web.fibu.ReportScriptingStorage;
-import org.projectforge.web.wicket.AbstractStandardFormPage;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.JFreeChartImage;
 
-public class ScriptingPage extends AbstractStandardFormPage
+public class ScriptingPage extends AbstractScriptingPage
 {
   private static final long serialVersionUID = -1910145309628761662L;
 
@@ -72,8 +72,6 @@ public class ScriptingPage extends AbstractStandardFormPage
 
   @SpringBean(name = "groovyExecutor")
   private GroovyExecutor groovyExecutor;
-
-  protected GroovyResult groovyResult;
 
   private final ScriptingForm form;
 
@@ -151,6 +149,7 @@ public class ScriptingPage extends AbstractStandardFormPage
         return;
       }
       if (groovyResult.hasResult() == true) {
+        // TODO maybe a good point to generalize to AbstractScriptingPage?
         final Object result = groovyResult.getResult();
         if (result instanceof ExportWorkbook == true) {
           excelExport();
@@ -161,6 +160,8 @@ public class ScriptingPage extends AbstractStandardFormPage
           zipExport();
         } else if (result instanceof ExportJFreeChart) {
           jFreeChartExport();
+        } else if (result instanceof ExportJson) {
+          jsonExport();
         }
       }
       // } else if (getReportScriptingStorage().getJasperReport() != null) {
