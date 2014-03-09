@@ -32,7 +32,6 @@ import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.projectforge.core.PropUtils;
-import org.projectforge.web.BrowserScreenWidthType;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.flowlayout.AbstractGridBuilder;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
@@ -66,7 +65,8 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
 
   private Set<String> rowsPanelHelperSet;
 
-  public GridBuilder(final MarkupContainer parent, final String id) {
+  public GridBuilder(final MarkupContainer parent, final String id)
+  {
     this(parent, id, true);
   }
 
@@ -75,7 +75,7 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
    * @param id
    * @param fluid Default is true.
    */
-  public GridBuilder(final MarkupContainer parent, final String id, boolean fluid)
+  public GridBuilder(final MarkupContainer parent, final String id, final boolean fluid)
   {
     super();
     this.parent = parent;
@@ -110,35 +110,21 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
     } else {
       splitDepth = 1;
     }
-    if (browserScreenWidthType == BrowserScreenWidthType.NARROW) {
-      if (splitDepth == 1) {
-        return newGridPanel(0, GridSize.COL100, gridTypes);
+    newGridPanel(0, size, gridTypes);
+    if (hasSubSplitPanel == true) {
+      // Set the class attribute "row-has-childs":
+      if (rowsPanelHelperSet == null) {
+        rowsPanelHelperSet = new HashSet<String>();
+        rowPanel[0].addCssClasses(GridType.ROW_HAS_CHILDS);
+        rowsPanelHelperSet.add(rowPanel[0].getMarkupId());
       } else {
-        return this;
-      }
-    } else if (browserScreenWidthType == BrowserScreenWidthType.NORMAL) {
-      if (splitDepth == 1) {
-        return newGridPanel(0, size, gridTypes);
-      } else {
-        return this;
-      }
-    } else {
-      newGridPanel(0, size, gridTypes);
-      if (hasSubSplitPanel == true) {
-        // Set the class attribute "row-has-childs":
-        if (rowsPanelHelperSet == null) {
-          rowsPanelHelperSet = new HashSet<String>();
+        if (rowsPanelHelperSet.contains(rowPanel[0].getMarkupId()) == false) {
           rowPanel[0].addCssClasses(GridType.ROW_HAS_CHILDS);
           rowsPanelHelperSet.add(rowPanel[0].getMarkupId());
-        } else {
-          if (rowsPanelHelperSet.contains(rowPanel[0].getMarkupId()) == false) {
-            rowPanel[0].addCssClasses(GridType.ROW_HAS_CHILDS);
-            rowsPanelHelperSet.add(rowPanel[0].getMarkupId());
-          }
         }
       }
-      return this;
     }
+    return this;
   }
 
   public GridBuilder newSubSplitPanel(final GridSize size, final GridType... gridTypes)
@@ -146,13 +132,7 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
     if (splitDepth < 2) {
       throw new IllegalArgumentException("Dear developer: please call gridBuilder.newSplitPanel(GridSize, true, ...) first!");
     }
-    if (browserScreenWidthType == BrowserScreenWidthType.NARROW) {
-      return newGridPanel(0, GridSize.COL100, gridTypes);
-    } else if (browserScreenWidthType == BrowserScreenWidthType.NORMAL) {
-      return newGridPanel(0, size, gridTypes);
-    } else {
-      return newGridPanel(1, size, gridTypes);
-    }
+    return newGridPanel(1, size, gridTypes);
   }
 
   /**

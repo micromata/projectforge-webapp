@@ -46,10 +46,8 @@ import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.user.PFUserContext;
-import org.projectforge.user.UserRights;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.FavoritesMenu;
-import org.projectforge.web.LayoutSettingsPage;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.MenuEntry;
 import org.projectforge.web.core.menuconfig.MenuConfig;
@@ -106,12 +104,6 @@ public class NavTopPanel extends NavAbstractPanel
     } else {
       goMobile.setVisible(false);
     }
-    final BookmarkablePageLink<Void> layoutSettingsMenuLink = new BookmarkablePageLink<Void>("layoutSettingsMenuLink",
-        LayoutSettingsPage.class);
-    if (UserRights.getAccessChecker().isRestrictedUser() == true) {
-      // Not visibible for restricted users:
-      layoutSettingsMenuLink.setVisible(false);
-    }
     add(new MenuConfig("menuconfig", getMenu(), favoritesMenu));
     @SuppressWarnings("serial")
     final Form<String> searchForm = new Form<String>("searchForm") {
@@ -136,7 +128,6 @@ public class NavTopPanel extends NavAbstractPanel
     final TextField<String> searchField = new TextField<String>("searchField", new PropertyModel<String>(searchForm, "searchString"));
     WicketUtils.setPlaceHolderAttribute(searchField, getString("search.search"));
     searchForm.add(searchField);
-    add(layoutSettingsMenuLink);
     add(new BookmarkablePageLink<Void>("feedbackLink", FeedbackPage.class));
     {
       @SuppressWarnings("serial")
