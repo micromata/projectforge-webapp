@@ -31,7 +31,6 @@ import org.hibernate.Hibernate;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
@@ -89,7 +88,7 @@ public class InviteeEditForm extends AbstractEditForm<InviteeDO, InviteeEditPage
       fs.add(trainingSelectPanel);
       trainingSelectPanel.setRequired(true);
       trainingSelectPanel.init();
-      WicketUtils.setFocus(trainingSelectPanel);
+      trainingSelectPanel.setFocus();
     }
 
     { // Invitee
