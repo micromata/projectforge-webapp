@@ -111,7 +111,7 @@ public class TrainingSelectPanel extends AbstractSelectPanel<TrainingDO> impleme
       protected String getTooltip()
       {
         final TrainingDO training = getModel().getObject();
-        if (training == null) {
+        if (training == null || training.getSkill() == null || training.getSkill().getTitle() == null) {
           return null;
         }
         return training.getSkill().getTitle() + ", " + training.getTitle();
@@ -148,7 +148,7 @@ public class TrainingSelectPanel extends AbstractSelectPanel<TrainingDO> impleme
             final String title = ind >= 0 ? value.substring(0, ind) : value;
             final TrainingDO training = trainingDao.getTraining(title);
             if (training == null) {
-              trainingTextField.error(getString("training.panel.error.trainingNotFound"));
+              trainingTextField.error(getString("plugins.skillmatrix.skilltraining.panel.error.trainingNotFound"));
             }
             getModel().setObject(training);
             return training;
@@ -236,7 +236,11 @@ public class TrainingSelectPanel extends AbstractSelectPanel<TrainingDO> impleme
       return "";
     }
     // PLEASE NOTE: If you change the format don't forget to change the format above (search ### FORMAT ###)
-    return training.getTitle() + " (" + training.getSkill().getTitle() + ")";
+    String s = "";
+    if (training.getSkill() != null && training.getSkill().getTitle() != null) {
+      s = training.getSkill().getTitle();
+    }
+    return training.getTitle() + " (" + s + ")";
   }
 
   /**
