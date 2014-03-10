@@ -37,6 +37,7 @@ import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.user.UserPreferencesHelper;
 import org.projectforge.web.wicket.AbstractSelectPanel;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
 
@@ -262,4 +263,13 @@ public class TrainingSelectPanel extends AbstractSelectPanel<TrainingDO> impleme
     return trainingTextField;
   }
 
+  /**
+   * @see org.projectforge.web.wicket.AbstractSelectPanel#setFocus()
+   */
+  @Override
+  public AbstractSelectPanel<TrainingDO> setFocus()
+  {
+    WicketUtils.setFocus(this.trainingTextField);
+    return this;
+  }
 }
