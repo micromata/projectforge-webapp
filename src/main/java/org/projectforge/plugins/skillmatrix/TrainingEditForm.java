@@ -124,7 +124,7 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
       fs.addHelpIcon(getString("plugins.marketing.addressCampaign.values.format"));
       fs.add(valuesRating);
       fs.addAlertIcon(getString("plugins.skillmatrix.skilltraining.edit.warning.doNotChangeValues"));
-      valuesRating.setRequired(true);
+      valuesRating.setRequired(false);
       valuesRating.add(new AbstractValidator<String>() {
         @Override
         protected void onValidate(final IValidatable<String> validatable)
@@ -142,7 +142,7 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
       fs.addHelpIcon(getString("plugins.marketing.addressCampaign.values.format"));
       fs.add(valuesCertificate);
       fs.addAlertIcon(getString("plugins.skillmatrix.skilltraining.edit.warning.doNotChangeValues"));
-      valuesCertificate.setRequired(true);
+      valuesCertificate.setRequired(false);
       valuesCertificate.add(new AbstractValidator<String>() {
         @Override
         protected void onValidate(final IValidatable<String> validatable)
