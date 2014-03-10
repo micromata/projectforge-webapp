@@ -38,10 +38,9 @@ import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
+ * This is the edit formular page.
  * @author Werner Feder (werner.feder@t-online.de)
- * 
  */
-
 public class InviteeEditForm extends AbstractEditForm<InviteeDO, InviteeEditPage>
 {
 
@@ -49,7 +48,8 @@ public class InviteeEditForm extends AbstractEditForm<InviteeDO, InviteeEditPage
 
   private static final Logger log = Logger.getLogger(InviteeEditForm.class);
 
-  private static String[] defaultArray = {"Wert 1", "Wert 2", "Wert 3"};
+  private static String[] defaultRatingArray            = {"hoch", "mittel", "niedrig"};
+  private static String[] defaultCertificateArray       = {"Note 1", "Note 2", "Note 3", "Note 4"};
 
   private LabelValueChoiceRenderer<String> ratingChoiceRenderer;
   private LabelValueChoiceRenderer<String> certificateChoiceRenderer;
@@ -109,10 +109,10 @@ public class InviteeEditForm extends AbstractEditForm<InviteeDO, InviteeEditPage
     { // Rating
       final FieldsetPanel fs = gridBuilder.newFieldset(InviteeDO.class, "rating");
       final TrainingDO training = data.getTraining();
-      if (training == null) {
-        ratingChoiceRenderer = new LabelValueChoiceRenderer<String>(defaultArray);
-      } else {
+      if (training != null && training.getRatingArray() != null) {
         ratingChoiceRenderer = new LabelValueChoiceRenderer<String>(training.getRatingArray());
+      } else {
+        ratingChoiceRenderer = new LabelValueChoiceRenderer<String>(defaultRatingArray);
       }
       fs.addDropDownChoice(new PropertyModel<String>(data, "rating"), ratingChoiceRenderer.getValues(), ratingChoiceRenderer).setNullValid(
           true);
@@ -121,10 +121,10 @@ public class InviteeEditForm extends AbstractEditForm<InviteeDO, InviteeEditPage
     { // Certificate
       final FieldsetPanel fs = gridBuilder.newFieldset(InviteeDO.class, "certificate");
       final TrainingDO training = data.getTraining();
-      if (training == null) {
-        certificateChoiceRenderer = new LabelValueChoiceRenderer<String>(defaultArray);
-      } else {
+      if (training != null && training.getCertificateArray() != null) {
         certificateChoiceRenderer = new LabelValueChoiceRenderer<String>(training.getCertificateArray());
+      } else {
+        certificateChoiceRenderer = new LabelValueChoiceRenderer<String>(defaultCertificateArray);
       }
       fs.addDropDownChoice(new PropertyModel<String>(data, "certificate"), certificateChoiceRenderer.getValues(), certificateChoiceRenderer).setNullValid(
           true);
@@ -152,12 +152,12 @@ public class InviteeEditForm extends AbstractEditForm<InviteeDO, InviteeEditPage
     final TrainingDO training = data.getTraining();
     certificateChoiceRenderer.clear();
     ratingChoiceRenderer.clear();
-    if (training != null) {
+    if (training != null && training.getCertificateArray() != null && training.getRatingArray() != null) {
       certificateChoiceRenderer.setValueArray(training.getCertificateArray());
       ratingChoiceRenderer.setValueArray(training.getRatingArray());
     } else {
-      certificateChoiceRenderer.setValueArray(defaultArray);
-      ratingChoiceRenderer.setValueArray(defaultArray);
+      certificateChoiceRenderer.setValueArray(defaultCertificateArray);
+      ratingChoiceRenderer.setValueArray(defaultRatingArray);
     }
   }
 
