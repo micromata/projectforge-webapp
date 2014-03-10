@@ -29,8 +29,8 @@ import org.apache.log4j.Logger;
 import org.projectforge.web.wicket.AbstractListForm;
 
 /**
+ * The list formular for the list view.
  * @author Werner Feder (werner.feder@t-online.de)
- * 
  */
 public class InviteeListForm extends AbstractListForm<InviteeFilter, InviteeListPage> implements Serializable
 {
@@ -38,9 +38,6 @@ public class InviteeListForm extends AbstractListForm<InviteeFilter, InviteeList
   private static final long serialVersionUID = 314512845221133499L;
 
   private static final Logger log = Logger.getLogger(InviteeListForm.class);
-
-  // public static final String I18N_KEY_REQUIRED_EXPERIENCE =
-  // "plugins.skillmatrix.search.reqiuredExperience";
 
   /**
    * @param parentPage

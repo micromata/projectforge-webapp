@@ -30,8 +30,8 @@ import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 
 /**
+ * The controller of the edit formular page. Most functionality such as insert, update, delete etc. is done by the super class.
  * @author Werner Feder (werner.feder@t-online.de)
- * 
  */
 public class TrainingEditPage extends AbstractEditPage<TrainingDO, TrainingEditForm, TrainingDao> implements ISelectCallerPage
 {

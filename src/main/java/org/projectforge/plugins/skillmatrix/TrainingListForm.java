@@ -29,17 +29,14 @@ import org.apache.log4j.Logger;
 import org.projectforge.web.wicket.AbstractListForm;
 
 /**
+ * The list formular for the list view.
  * @author Werner Feder (werner.feder@t-online.de)
- * 
  */
 public class TrainingListForm extends AbstractListForm<TrainingFilter, TrainingListPage> implements Serializable
 {
 
   private static final long serialVersionUID = 1284459106693285166L;
   private static final Logger log = Logger.getLogger(TrainingListForm.class);
-
-  // public static final String I18N_KEY_REQUIRED_EXPERIENCE =
-  // "plugins.skillmatrix.search.reqiuredExperience";
 
   /**
    * @param parentPage

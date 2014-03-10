@@ -41,8 +41,8 @@ import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
+ * This is the edit formular page.
  * @author Werner Feder (werner.feder@t-online.de)
- * 
  */
 @SuppressWarnings("deprecation")
 public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditPage>

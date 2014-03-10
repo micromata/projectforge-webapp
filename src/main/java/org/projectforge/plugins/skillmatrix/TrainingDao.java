@@ -16,8 +16,8 @@ import org.projectforge.core.BaseDao;
 import org.projectforge.user.UserRightId;
 
 /**
+ * This is the base data access object class. Most functionality such as access checking, select, insert, update, save, delete etc. is implemented by the super class.
  * @author Werner Feder (werner.feder@t-online.de)
- * 
  */
 public class TrainingDao extends BaseDao<TrainingDO>
 {
@@ -28,9 +28,7 @@ public class TrainingDao extends BaseDao<TrainingDO>
 
   public static final UserRightId USER_RIGHT_ID = new UserRightId(UNIQUE_PLUGIN_ID, "plugin20", I18N_KEY_SKILL_PREFIX);
 
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TrainingDao.class);
-
-  // private final Table table = new Table(TrainingDO.class);
+  //  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TrainingDao.class);
 
   private SkillDao skillDao;
 

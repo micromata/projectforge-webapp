@@ -47,6 +47,7 @@ import org.projectforge.core.UserPrefParameter;
 import org.projectforge.database.Constants;
 
 /**
+ * This data object is the Java representation of a data-base entry of a training.
  * @author Werner Feder (werner.feder@t-online.de)
  * 
  */

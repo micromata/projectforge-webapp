@@ -29,8 +29,8 @@ import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
 /**
+ * The controller of the list page. Most functionality such as search etc. is done by the super class.
  * @author Werner Feder (werner.feder@t-online.de)
- * 
  */
 @ListPage(editPage = InviteeEditPage.class)
 public class InviteeListPage extends AbstractListPage<InviteeListForm, InviteeDao, InviteeDO> implements
@@ -52,7 +52,6 @@ IListPageColumnsCreator<InviteeDO>
   /**
    * @see org.projectforge.web.wicket.IListPageColumnsCreator#createColumns(org.apache.wicket.markup.html.WebPage, boolean)
    */
-
   @SuppressWarnings("serial")
   @Override
   public List<IColumn<InviteeDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
@@ -68,7 +67,7 @@ IListPageColumnsCreator<InviteeDO>
 
     columns.add(new CellItemListenerPropertyColumn<InviteeDO>(getString("plugins.skillmatrix.skillrating.skill"),
         getSortable("training.skill.title", sortable), "training.skill.title", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<InviteeDO>(getString("plugins.skillmatrix.skilltraining.menu"),
+    columns.add(new CellItemListenerPropertyColumn<InviteeDO>(getString("plugins.skillmatrix.skilltraining.training"),
         getSortable("training.title", sortable), "training.title", cellItemListener));
 
     columns.add(new CellItemListenerPropertyColumn<InviteeDO>(getString("plugins.skillmatrix.skilltraining.startDate"),

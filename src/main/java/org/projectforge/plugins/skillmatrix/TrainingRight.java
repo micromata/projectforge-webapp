@@ -30,8 +30,8 @@ import org.projectforge.user.UserRightCategory;
 import org.projectforge.user.UserRightValue;
 
 /**
+ * Define the access rights. In this example every user has access to training functionality.
  * @author Werner Feder (werner.feder@t-online.de)
- * 
  */
 public class TrainingRight extends UserRightAccessCheck<TrainingDO>
 {

@@ -30,8 +30,8 @@ import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 
 /**
+ * The controller of the edit formular page. Most functionality such as insert, update, delete etc. is done by the super class.
  * @author Werner Feder (werner.feder@t-online.de)
- * 
  */
 public class InviteeEditPage extends AbstractEditPage<InviteeDO, InviteeEditForm, InviteeDao> implements ISelectCallerPage
 {
@@ -40,7 +40,7 @@ public class InviteeEditPage extends AbstractEditPage<InviteeDO, InviteeEditForm
 
   private static final Logger log = Logger.getLogger(InviteeEditPage.class);
 
-  public static final String I18N_KEY_PREFIX = "plugins.skillmatrix.skilltraining";
+  public static final String I18N_KEY_PREFIX = "plugins.skillmatrix.skilltraining.invitee";
 
   @SpringBean(name = "inviteeDao")
   private InviteeDao inviteeDao;
@@ -88,11 +88,7 @@ public class InviteeEditPage extends AbstractEditPage<InviteeDO, InviteeEditForm
   @Override
   public void select(final String property, final Object selectedValue)
   {
-    //    if ("skillId".equals(property) == true) {
-    //      trainingDao.setSkill(getData(), (Integer) selectedValue);
-    //    } else {
-    //      log.error("Property '" + property + "' not supported for selection.");
-    //    }
+    // Do nothing
   }
 
   /**
@@ -101,11 +97,7 @@ public class InviteeEditPage extends AbstractEditPage<InviteeDO, InviteeEditForm
   @Override
   public void unselect(final String property)
   {
-    //    if ("skillId".equals(property) == true) {
-    //      trainingDao.setSkill(getData(), null);
-    //    } else {
-    //      log.error("Property '" + property + "' not supported for selection.");
-    //    }
+    // Do nothing
   }
 
   /**

@@ -29,6 +29,7 @@ import org.projectforge.database.Constants;
 import org.projectforge.user.PFUserDO;
 
 /**
+ * This data object is the Java representation of a data-base entry of invitee.
  * @author Werner Feder (werner.feder@t-online.de)
  * 
  */

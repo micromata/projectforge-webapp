@@ -29,8 +29,8 @@ import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
 /**
+ * The controller of the list page. Most functionality such as search etc. is done by the super class.
  * @author Werner Feder (werner.feder@t-online.de)
- * 
  */
 @ListPage(editPage = TrainingEditPage.class)
 public class TrainingListPage extends AbstractListPage<TrainingListForm, TrainingDao, TrainingDO> implements
@@ -49,10 +49,10 @@ IListPageColumnsCreator<TrainingDO>
     super(parameters, I18N_KEY_PREFIX);
   }
 
+
   /**
    * @see org.projectforge.web.wicket.IListPageColumnsCreator#createColumns(org.apache.wicket.markup.html.WebPage, boolean)
    */
-
   @SuppressWarnings("serial")
   @Override
   public List<IColumn<TrainingDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
@@ -68,7 +68,7 @@ IListPageColumnsCreator<TrainingDO>
 
     columns.add(new CellItemListenerPropertyColumn<TrainingDO>(getString("plugins.skillmatrix.skillrating.skill"), getSortable(
         "skill.title", sortable), "skill.title", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<TrainingDO>(getString("plugins.skillmatrix.skilltraining.menu"), getSortable("title",
+    columns.add(new CellItemListenerPropertyColumn<TrainingDO>(getString("plugins.skillmatrix.skilltraining.training"), getSortable("title",
         sortable), "title", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<TrainingDO>(TrainingDO.class, getSortable("description", sortable), "description",
         cellItemListener));
