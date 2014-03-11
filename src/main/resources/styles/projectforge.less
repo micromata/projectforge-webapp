@@ -46,7 +46,7 @@ div.controls input, div.controls textarea {
 	padding-right: 4px;
 }
 label {
-	margin-top: 4px;
+	// margin-top: 4px;
 }
 .dropdown-menu li > a {
 	padding: 3px 24px 3px 10px;
@@ -131,6 +131,17 @@ ul.nav-pills > .active > a:hover {
 
 /* Submenu nach unten ausklappen*/
 @media (max-width: 879px) {
+// @media (max-width: 767px) {
+  #pf_sortablecontainer{
+    width: auto!important;
+  }
+  .navbar-search.pull-left,
+  .navbar-nav.pull-right {
+    float: none!important
+  }
+  .navbar-collapse {
+    max-height: none!important;
+  }
 	// Sub menus
 	// ---------------------------
 	ul.dropdown-menu li.dropdown-submenu ul.dropdown-menu {
@@ -353,4 +364,13 @@ ul.nav-pills > .active > a:hover {
 .breadcrumb > li {
   vertical-align: top;
   line-height: 26px;
+}
+.dropdown-menu {
+  font-size: 12px;
+}
+.dropdown-menu > li > a {
+  color: #777;
+}
+.navbar-collapse .dropdown-menu a {
+  padding: 4px 10px;
 }

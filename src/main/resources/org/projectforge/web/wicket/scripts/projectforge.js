@@ -457,10 +457,10 @@ function openDialog(element, closeScript) {
 }
 
 $(function() {
-	$(".dialog_content").live("dialogopen", function(event, ui) {
+	$(".dialog_content").on("dialogopen", function(event, ui) {
 		disableScroll();
 	});
-	$(".dialog_content").live("dialogclose", function(event, ui) {
+	$(".dialog_content").on("dialogclose", function(event, ui) {
 		enableScroll();
 	});
 
@@ -521,7 +521,7 @@ function doAfterAjaxHandling() {
 }
 
 function initColorPicker() {
-	$('.pf_colorPreview').live('click', function() {
+	$('.pf_colorPreview').on('click', function() {
 		$(this).siblings('.pf_colorForm').find('.pf_colorPickerField').click();
 	});
 }
