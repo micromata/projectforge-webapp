@@ -94,7 +94,8 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
       final FieldsetPanel fs = gridBuilder.newFieldset(TrainingDO.class, "skill");
       final SkillSelectPanel parentSelectPanel = new SkillSelectPanel(fs, new PropertyModel<SkillDO>(data, "skill"), parentPage, "skillId");
       fs.add(parentSelectPanel);
-      fs.getFieldset().setOutputMarkupId(true);
+      parentSelectPanel.setRequired(true);
+      //fs.getFieldset().setOutputMarkupId(true);
       parentSelectPanel.init();
     }
 

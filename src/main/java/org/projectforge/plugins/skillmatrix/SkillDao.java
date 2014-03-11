@@ -23,6 +23,7 @@
 
 package org.projectforge.plugins.skillmatrix;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,8 +31,10 @@ import org.apache.commons.collections.CollectionUtils;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.UserException;
 import org.projectforge.task.TaskDao;
+import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRightId;
+import org.projectforge.web.user.GroupsProvider;
 
 /**
  * DAO for SkillDO. Handles constraint validation and database access.
@@ -152,7 +155,7 @@ public class SkillDao extends BaseDao<SkillDO>
    * @see org.projectforge.core.BaseDao#hasUpdateAccess(org.projectforge.user.PFUserDO, org.projectforge.core.ExtendedBaseDO, org.projectforge.core.ExtendedBaseDO, boolean)
    */
   @Override
-  public boolean hasUpdateAccess(PFUserDO user, SkillDO obj, SkillDO dbObj, boolean throwException)
+  public boolean hasUpdateAccess(final PFUserDO user, final SkillDO obj, final SkillDO dbObj, final boolean throwException)
   {
     checkCyclicReference(obj);
     return true;
@@ -178,4 +181,35 @@ public class SkillDao extends BaseDao<SkillDO>
     skill.setParent(parentSkill);
     return skill;
   }
+
+  /**
+   * Please note: Only the string group.fullAccessGroupIds will be modified (but not be saved)!
+   * @param calendar
+   * @param fullAccessGroups
+   */
+  public void setFullAccessGroups(final SkillDO skill, final Collection<GroupDO> fullAccessGroups)
+  {
+    skill.setFullAccessGroupIds(new GroupsProvider().getGroupIds(fullAccessGroups));
+  }
+
+  public Collection<GroupDO> getSortedFullAccessGroups(final SkillDO skill)
+  {
+    return new GroupsProvider().getSortedGroups(skill.getFullAccessGroupIds());
+  }
+
+  /**
+   * Please note: Only the string group.readonlyAccessGroupIds will be modified (but not be saved)!
+   * @param calendar
+   * @param readonlyAccessGroups
+   */
+  public void setReadonlyAccessGroups(final SkillDO skill, final Collection<GroupDO> readonlyAccessGroups)
+  {
+    skill.setReadonlyAccessGroupIds(new GroupsProvider().getGroupIds(readonlyAccessGroups));
+  }
+
+  public Collection<GroupDO> getSortedReadonlyAccessGroups(final SkillDO skill)
+  {
+    return new GroupsProvider().getSortedGroups(skill.getReadonlyAccessGroupIds());
+  }
+
 }

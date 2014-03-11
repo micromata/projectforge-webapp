@@ -210,11 +210,11 @@ public class TrainingDO extends DefaultBaseDO
     if (StringUtils.isBlank(values) == true) {
       return null;
     }
-    final String[] svals = StringUtils.split(values, ";");
-    for (int i=0; i < svals.length; i++) {
-      svals[i] = StringUtils.trim(svals[i]);
+    final String[] sar = StringUtils.split(values, ";");
+    for (int i=0; i < sar.length; i++) {
+      sar[i] = StringUtils.trim(sar[i]);
     }
-    return svals;
+    return sar;
   }
 
   @Transient

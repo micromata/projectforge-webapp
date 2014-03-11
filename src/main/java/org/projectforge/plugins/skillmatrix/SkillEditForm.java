@@ -23,15 +23,24 @@
 
 package org.projectforge.plugins.skillmatrix;
 
+import java.util.Collection;
+
 import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.user.GroupDO;
+import org.projectforge.web.common.MultiChoiceListHelper;
+import org.projectforge.web.user.GroupsComparator;
+import org.projectforge.web.user.GroupsProvider;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+
+import com.vaynberg.wicket.select2.Select2MultiChoice;
 
 /**
  * @author Billy Duong (b.duong@micromata.de)
@@ -48,6 +57,8 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
 
   private final FormComponent< ? >[] dependentFormComponents = new FormComponent[1];
 
+  MultiChoiceListHelper<GroupDO> fullAccessGroupsListHelper, readonlyAccessGroupsListHelper;
+
   /**
    * @param parentPage
    * @param data
@@ -62,7 +73,7 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
   {
     super.init();
 
-    gridBuilder.newGridPanel();
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Parent
       final FieldsetPanel fs = gridBuilder.newFieldset(SkillDO.class, "parent");
@@ -84,6 +95,44 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
       fs.add(titleField);
       dependentFormComponents[0] = titleField;
     }
+
+    gridBuilder.newSplitPanel(GridSize.COL50);
+    // set access groups
+    {
+      // Full access groups
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess"),
+          getString("plugins.teamcal.access.groups"));
+      final GroupsProvider groupsProvider = new GroupsProvider();
+      final Collection<GroupDO> fullAccessGroups = new GroupsProvider().getSortedGroups(getData().getFullAccessGroupIds());
+      fullAccessGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
+          groupsProvider.getSortedGroups());
+      if (fullAccessGroups != null) {
+        for (final GroupDO group : fullAccessGroups) {
+          fullAccessGroupsListHelper.addOriginalAssignedItem(group).assignItem(group);
+        }
+      }
+      final Select2MultiChoice<GroupDO> groups = new Select2MultiChoice<GroupDO>(fs.getSelect2MultiChoiceId(),
+          new PropertyModel<Collection<GroupDO>>(this.fullAccessGroupsListHelper, "assignedItems"), groupsProvider);
+      fs.add(groups);
+    }
+    {
+      // Read-only access groups
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.readonlyAccess"),
+          getString("plugins.teamcal.access.groups"));
+      final GroupsProvider groupsProvider = new GroupsProvider();
+      final Collection<GroupDO> readOnlyAccessGroups = new GroupsProvider().getSortedGroups(getData().getReadonlyAccessGroupIds());
+      readonlyAccessGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
+          groupsProvider.getSortedGroups());
+      if (readOnlyAccessGroups != null) {
+        for (final GroupDO group : readOnlyAccessGroups) {
+          readonlyAccessGroupsListHelper.addOriginalAssignedItem(group).assignItem(group);
+        }
+      }
+      final Select2MultiChoice<GroupDO> groups = new Select2MultiChoice<GroupDO>(fs.getSelect2MultiChoiceId(),
+          new PropertyModel<Collection<GroupDO>>(this.readonlyAccessGroupsListHelper, "assignedItems"), groupsProvider);
+      fs.add(groups);
+    }
+
     gridBuilder.newGridPanel();
     {
       // Descritption

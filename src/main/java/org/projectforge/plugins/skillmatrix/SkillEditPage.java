@@ -28,6 +28,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.AbstractSecuredBasePage;
 
 /**
  * @author Billy Duong (b.duong@micromata.de)
@@ -113,5 +114,13 @@ public class SkillEditPage extends AbstractEditPage<SkillDO, SkillEditForm, Skil
   public void cancelSelection(final String property)
   {
     // Do nothing
+  }
+
+  @Override
+  public AbstractSecuredBasePage onSaveOrUpdate()
+  {
+    skillDao.setFullAccessGroups(getData(), form.fullAccessGroupsListHelper.getAssignedItems());
+    skillDao.setReadonlyAccessGroups(getData(), form.readonlyAccessGroupsListHelper.getAssignedItems());
+    return super.onSaveOrUpdate();
   }
 }

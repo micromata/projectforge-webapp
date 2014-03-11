@@ -52,6 +52,8 @@ public class TrainingRight extends UserRightAccessCheck<TrainingDO>
   public boolean hasAccess(final PFUserDO user, final TrainingDO obj, final TrainingDO oldObj, final OperationType operationType)
   {
     // TODO rewrite hasAccess method
+    // Zwei neue Felder pro TrainingDO (analog TeamCalDO:  private String fullAccessGroupIds, readonlyAccessGroupIds;
+
     return true;
   }
 }

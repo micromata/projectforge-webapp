@@ -272,4 +272,5 @@ public class TrainingSelectPanel extends AbstractSelectPanel<TrainingDO> impleme
     WicketUtils.setFocus(this.trainingTextField);
     return this;
   }
+  
 }

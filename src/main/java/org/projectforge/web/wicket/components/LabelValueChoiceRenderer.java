@@ -116,6 +116,9 @@ public class LabelValueChoiceRenderer<T> implements IChoiceRenderer<T>
     return this;
   }
 
+  /**
+   * @return This for chaining.
+   */
   @SuppressWarnings("unchecked")
   public LabelValueChoiceRenderer<T> setValueArray(final String[] values)
   {
@@ -125,9 +128,13 @@ public class LabelValueChoiceRenderer<T> implements IChoiceRenderer<T>
     return this;
   }
 
-  public void clear() {
+  /**
+   * @return This for chaining.
+   */
+  public LabelValueChoiceRenderer<T> clear() {
     this.values.clear();
     this.displayValues.clear();
+    return this;
   }
 
   public LabelValueChoiceRenderer<T> addValue(final T value, final String displayValue)
