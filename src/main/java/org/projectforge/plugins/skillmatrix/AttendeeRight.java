@@ -30,10 +30,10 @@ import org.projectforge.user.UserRightCategory;
 import org.projectforge.user.UserRightValue;
 
 /**
- * Define the access rights. In this example every user has access to invitee functionality.
+ * Define the access rights. In this example every user has access to attendee functionality.
  * @author Werner Feder (werner.feder@t-online.de)
  */
-public class InviteeRight extends UserRightAccessCheck<InviteeDO>
+public class AttendeeRight extends UserRightAccessCheck<AttendeeDO>
 {
 
   private static final long serialVersionUID = -3590945654632199595L;
@@ -43,13 +43,13 @@ public class InviteeRight extends UserRightAccessCheck<InviteeDO>
    * @param category
    * @param rightValues
    */
-  public InviteeRight()
+  public AttendeeRight()
   {
-    super(InviteeDao.USER_RIGHT_ID, UserRightCategory.PLUGINS, UserRightValue.TRUE);
+    super(AttendeeDao.USER_RIGHT_ID, UserRightCategory.PLUGINS, UserRightValue.TRUE);
   }
 
   @Override
-  public boolean hasAccess(final PFUserDO user, final InviteeDO obj, final InviteeDO oldObj, final OperationType operationType)
+  public boolean hasAccess(final PFUserDO user, final AttendeeDO obj, final AttendeeDO oldObj, final OperationType operationType)
   {
     // TODO rewrite hasAccess method
     return true;

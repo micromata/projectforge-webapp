@@ -33,22 +33,22 @@ import org.projectforge.web.wicket.AbstractEditPage;
  * The controller of the edit formular page. Most functionality such as insert, update, delete etc. is done by the super class.
  * @author Werner Feder (werner.feder@t-online.de)
  */
-public class InviteeEditPage extends AbstractEditPage<InviteeDO, InviteeEditForm, InviteeDao> implements ISelectCallerPage
+public class AttendeeEditPage extends AbstractEditPage<AttendeeDO, AttendeeEditForm, AttendeeDao> implements ISelectCallerPage
 {
 
   private static final long serialVersionUID = 6051980938679738200L;
 
-  private static final Logger log = Logger.getLogger(InviteeEditPage.class);
+  private static final Logger log = Logger.getLogger(AttendeeEditPage.class);
 
-  public static final String I18N_KEY_PREFIX = "plugins.skillmatrix.skilltraining.invitee";
+  public static final String I18N_KEY_PREFIX = "plugins.skillmatrix.skilltraining.attendee";
 
-  @SpringBean(name = "inviteeDao")
-  private InviteeDao inviteeDao;
+  @SpringBean(name = "attendeeDao")
+  private AttendeeDao attendeeDao;
 
   /**
    * @param parameters
    */
-  public InviteeEditPage(final PageParameters parameters)
+  public AttendeeEditPage(final PageParameters parameters)
   {
     super(parameters, I18N_KEY_PREFIX);
     init();
@@ -58,9 +58,9 @@ public class InviteeEditPage extends AbstractEditPage<InviteeDO, InviteeEditForm
    * @see org.projectforge.web.wicket.AbstractEditPage#getBaseDao()
    */
   @Override
-  protected InviteeDao getBaseDao()
+  protected AttendeeDao getBaseDao()
   {
-    return inviteeDao;
+    return attendeeDao;
   }
 
   /**
@@ -77,9 +77,9 @@ public class InviteeEditPage extends AbstractEditPage<InviteeDO, InviteeEditForm
    *      org.projectforge.core.AbstractBaseDO)
    */
   @Override
-  protected InviteeEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final InviteeDO data)
+  protected AttendeeEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final AttendeeDO data)
   {
-    return new InviteeEditForm(this, data);
+    return new AttendeeEditForm(this, data);
   }
 
   /**

@@ -40,21 +40,18 @@ import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
  * This is the edit formular page.
  * @author Werner Feder (werner.feder@t-online.de)
  */
-public class InviteeEditForm extends AbstractEditForm<InviteeDO, InviteeEditPage>
+public class AttendeeEditForm extends AbstractEditForm<AttendeeDO, AttendeeEditPage>
 {
 
   private static final long serialVersionUID = 6814668114853472909L;
 
-  private static final Logger log = Logger.getLogger(InviteeEditForm.class);
+  private static final Logger log = Logger.getLogger(AttendeeEditForm.class);
 
-  //  private static String[] defaultRatingArray            = {"hoch", "mittel", "niedrig"};
-  //  private static String[] defaultCertificateArray       = {"Note 1", "Note 2", "Note 3", "Note 4"};
+  private FieldsetPanel ratingFs, certificateFs;
+  private LabelValueChoiceRenderer<String> ratingChoiceRenderer, certificateChoiceRenderer;
 
-  private LabelValueChoiceRenderer<String> ratingChoiceRenderer;
-  private LabelValueChoiceRenderer<String> certificateChoiceRenderer;
-
-  @SpringBean(name = "inviteeDao")
-  private InviteeDao inviteeDao;
+  @SpringBean(name = "attendeeDao")
+  private AttendeeDao attendeeDao;
 
   @SpringBean(name = "skillDao")
   private SkillDao skillDao;
@@ -63,7 +60,7 @@ public class InviteeEditForm extends AbstractEditForm<InviteeDO, InviteeEditPage
    * @param parentPage
    * @param data
    */
-  public InviteeEditForm(final InviteeEditPage parentPage, final InviteeDO data)
+  public AttendeeEditForm(final AttendeeEditPage parentPage, final AttendeeDO data)
   {
     super(parentPage, data);
   }
@@ -77,77 +74,45 @@ public class InviteeEditForm extends AbstractEditForm<InviteeDO, InviteeEditPage
     gridBuilder.newSplitPanel(GridSize.COL50);
 
     { // Training
-      final FieldsetPanel fs = gridBuilder.newFieldset(InviteeDO.class, "training");
+      final FieldsetPanel fs = gridBuilder.newFieldset(AttendeeDO.class, "training");
       TrainingDO training = data.getTraining();
       if (Hibernate.isInitialized(training) == false) {
-        training = inviteeDao.getTraingDao().getOrLoad(training.getId());
+        training = attendeeDao.getTraingDao().getOrLoad(training.getId());
         data.setTraining(training);
       }
       final TrainingSelectPanel trainingSelectPanel = new TrainingSelectPanel(fs.newChildId(), new PropertyModel<TrainingDO>(data, "training"),
-          parentPage, "trainingId");
-      fs.add(trainingSelectPanel);
-      trainingSelectPanel.setRequired(true);
-      trainingSelectPanel.init();
-      trainingSelectPanel.setFocus();
+          parentPage, "trainingId").init();
+      fs.add(trainingSelectPanel.setFocus().setRequired(true));
     }
 
-    { // Invitee
-      final FieldsetPanel fs = gridBuilder.newFieldset(InviteeDO.class, "person");
+    { // Attendee
+      final FieldsetPanel fs = gridBuilder.newFieldset(AttendeeDO.class, "person");
       PFUserDO person = data.getPerson();
       if (Hibernate.isInitialized(person) == false) {
-        person = inviteeDao.getUserDao().getOrLoad(person.getId());
+        person = attendeeDao.getUserDao().getOrLoad(person.getId());
         data.setPerson(person);
       }
-      final UserSelectPanel inviteeSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(data, "person"),
-          parentPage, "personId");
-      fs.add(inviteeSelectPanel);
-      inviteeSelectPanel.setRequired(true);
-      inviteeSelectPanel.init();
+      final UserSelectPanel attendeeSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(data, "person"),
+          parentPage, "personId").init();
+      fs.add(attendeeSelectPanel.setRequired(true));
     }
 
     { // Rating
-      final TrainingDO training = data.getTraining();
-      final FieldsetPanel fs;
-      if (training != null && training.getRatingArray() != null) {
-        fs = gridBuilder.newFieldset(InviteeDO.class, "rating");
-        ratingChoiceRenderer = new LabelValueChoiceRenderer<String>(training.getRatingArray());
-        fs.addDropDownChoice(new PropertyModel<String>(data, "rating"), ratingChoiceRenderer.getValues(), ratingChoiceRenderer).setNullValid(
-            true);
-      }
-
-      //      final FieldsetPanel fs = gridBuilder.newFieldset(InviteeDO.class, "rating");
-      //      final TrainingDO training = data.getTraining();
-      //      if (training != null && training.getRatingArray() != null) {
-      //        ratingChoiceRenderer = new LabelValueChoiceRenderer<String>(training.getRatingArray());
-      //      } else {
-      //        ratingChoiceRenderer = new LabelValueChoiceRenderer<String>(defaultRatingArray);
-      //      }
-      //      fs.addDropDownChoice(new PropertyModel<String>(data, "rating"), ratingChoiceRenderer.getValues(), ratingChoiceRenderer).setNullValid(
-      //          true);
+      ratingFs = gridBuilder.newFieldset(AttendeeDO.class, "rating");
+      ratingChoiceRenderer = new LabelValueChoiceRenderer<String>();
+      ratingFs.addDropDownChoice(new PropertyModel<String>(data, "rating"), ratingChoiceRenderer.getValues(), ratingChoiceRenderer)
+      .setNullValid(true);
     }
 
     { // Certificate
-      final TrainingDO training = data.getTraining();
-      final FieldsetPanel fs;
-      if (training != null && training.getCertificateArray() != null) {
-        fs = gridBuilder.newFieldset(InviteeDO.class, "certificate");
-        certificateChoiceRenderer = new LabelValueChoiceRenderer<String>(training.getCertificateArray());
-        fs.addDropDownChoice(new PropertyModel<String>(data, "certificate"), certificateChoiceRenderer.getValues(), certificateChoiceRenderer).setNullValid(
-            true);
-      }
-
-      //      final FieldsetPanel fs = gridBuilder.newFieldset(InviteeDO.class, "certificate");
-      //      if (training != null && training.getCertificateArray() != null) {
-      //        certificateChoiceRenderer = new LabelValueChoiceRenderer<String>(training.getCertificateArray());
-      //      } else {
-      //        certificateChoiceRenderer = new LabelValueChoiceRenderer<String>(defaultCertificateArray);
-      //      }
-      //      fs.addDropDownChoice(new PropertyModel<String>(data, "certificate"), certificateChoiceRenderer.getValues(), certificateChoiceRenderer).setNullValid(
-      //          true);
+      certificateFs = gridBuilder.newFieldset(AttendeeDO.class, "certificate");
+      certificateChoiceRenderer = new LabelValueChoiceRenderer<String>();
+      certificateFs.addDropDownChoice(new PropertyModel<String>(data, "certificate"), certificateChoiceRenderer.getValues(), certificateChoiceRenderer)
+      .setNullValid(true);
     }
 
     { // Description
-      final FieldsetPanel fs = gridBuilder.newFieldset(InviteeDO.class, "description");
+      final FieldsetPanel fs = gridBuilder.newFieldset(AttendeeDO.class, "description");
       fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "description"))).setAutogrow();
     }
 
@@ -162,16 +127,15 @@ public class InviteeEditForm extends AbstractEditForm<InviteeDO, InviteeEditPage
     super.onBeforeRender();
     final TrainingDO training = data.getTraining();
 
-    if (training != null && training.getCertificateArray() != null && training.getRatingArray() != null) {
-      certificateChoiceRenderer.clear();
-      ratingChoiceRenderer.clear();
-      certificateChoiceRenderer.setValueArray(training.getCertificateArray());
-      ratingChoiceRenderer.setValueArray(training.getRatingArray());
+    if (training != null && training.getRatingArray() != null && training.getCertificateArray() != null) {
+      certificateChoiceRenderer.clear().setValueArray(training.getCertificateArray());
+      ratingChoiceRenderer.clear().setValueArray(training.getRatingArray());
+      ratingFs.setVisible(true);
+      certificateFs.setVisible(true);
+    } else {
+      ratingFs.setVisible(false);
+      certificateFs.setVisible(false);
     }
-    //    else {
-    //      certificateChoiceRenderer.setValueArray(defaultCertificateArray);
-    //      ratingChoiceRenderer.setValueArray(defaultRatingArray);
-    //    }
   }
 
   /**

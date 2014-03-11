@@ -32,19 +32,19 @@ import org.projectforge.web.wicket.ListSelectActionPanel;
  * The controller of the list page. Most functionality such as search etc. is done by the super class.
  * @author Werner Feder (werner.feder@t-online.de)
  */
-@ListPage(editPage = InviteeEditPage.class)
-public class InviteeListPage extends AbstractListPage<InviteeListForm, InviteeDao, InviteeDO> implements
-IListPageColumnsCreator<InviteeDO>
+@ListPage(editPage = AttendeeEditPage.class)
+public class AttendeeListPage extends AbstractListPage<AttendeeListForm, AttendeeDao, AttendeeDO> implements
+IListPageColumnsCreator<AttendeeDO>
 {
 
   private static final long serialVersionUID = 685671613717879800L;
 
   public static final String I18N_KEY_PREFIX = "plugins.skillmatrix";
 
-  @SpringBean(name = "inviteeDao")
-  private InviteeDao inviteeDao;
+  @SpringBean(name = "attendeeDao")
+  private AttendeeDao attendeeDao;
 
-  public InviteeListPage(final PageParameters parameters)
+  public AttendeeListPage(final PageParameters parameters)
   {
     super(parameters, I18N_KEY_PREFIX);
   }
@@ -54,55 +54,55 @@ IListPageColumnsCreator<InviteeDO>
    */
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<InviteeDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<AttendeeDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<InviteeDO, String>> columns = new ArrayList<IColumn<InviteeDO, String>>();
-    final CellItemListener<InviteeDO> cellItemListener = new CellItemListener<InviteeDO>() {
-      public void populateItem(final Item<ICellPopulator<InviteeDO>> item, final String componentId, final IModel<InviteeDO> rowModel)
+    final List<IColumn<AttendeeDO, String>> columns = new ArrayList<IColumn<AttendeeDO, String>>();
+    final CellItemListener<AttendeeDO> cellItemListener = new CellItemListener<AttendeeDO>() {
+      public void populateItem(final Item<ICellPopulator<AttendeeDO>> item, final String componentId, final IModel<AttendeeDO> rowModel)
       {
-        final InviteeDO inviteeDO = rowModel.getObject();
-        appendCssClasses(item, inviteeDO.getId(), inviteeDO.isDeleted());
+        final AttendeeDO attendeeDO = rowModel.getObject();
+        appendCssClasses(item, attendeeDO.getId(), attendeeDO.isDeleted());
       }
     };
 
-    columns.add(new CellItemListenerPropertyColumn<InviteeDO>(getString("plugins.skillmatrix.skillrating.skill"),
+    columns.add(new CellItemListenerPropertyColumn<AttendeeDO>(getString("plugins.skillmatrix.skillrating.skill"),
         getSortable("training.skill.title", sortable), "training.skill.title", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<InviteeDO>(getString("plugins.skillmatrix.skilltraining.training"),
+    columns.add(new CellItemListenerPropertyColumn<AttendeeDO>(getString("plugins.skillmatrix.skilltraining.training"),
         getSortable("training.title", sortable), "training.title", cellItemListener));
 
-    columns.add(new CellItemListenerPropertyColumn<InviteeDO>(getString("plugins.skillmatrix.skilltraining.startDate"),
+    columns.add(new CellItemListenerPropertyColumn<AttendeeDO>(getString("plugins.skillmatrix.skilltraining.startDate"),
         getSortable("training.startDate", sortable), "training.startDate",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<InviteeDO>(getString("plugins.skillmatrix.skilltraining.endDate"),
+    columns.add(new CellItemListenerPropertyColumn<AttendeeDO>(getString("plugins.skillmatrix.skilltraining.endDate"),
         getSortable("training.endDate", sortable), "training.endDate",
         cellItemListener));
 
-    columns.add(new CellItemListenerPropertyColumn<InviteeDO>(getString("plugins.skillmatrix.skilltraining.firstname"),
+    columns.add(new CellItemListenerPropertyColumn<AttendeeDO>(getString("plugins.skillmatrix.skilltraining.firstname"),
         getSortable("person.firstname", sortable), "person.firstname", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<InviteeDO>(getString("plugins.skillmatrix.skilltraining.lastname"),
+    columns.add(new CellItemListenerPropertyColumn<AttendeeDO>(getString("plugins.skillmatrix.skilltraining.lastname"),
         getSortable("person.lastname", sortable), "person.lastname", cellItemListener));
 
-    columns.add(new CellItemListenerPropertyColumn<InviteeDO>(InviteeDO.class, getSortable("rating", sortable), "rating",
+    columns.add(new CellItemListenerPropertyColumn<AttendeeDO>(AttendeeDO.class, getSortable("rating", sortable), "rating",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<InviteeDO>(InviteeDO.class, getSortable("certificate", sortable), "certificate",
+    columns.add(new CellItemListenerPropertyColumn<AttendeeDO>(AttendeeDO.class, getSortable("certificate", sortable), "certificate",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<InviteeDO>(InviteeDO.class, getSortable("description", sortable), "description",
+    columns.add(new CellItemListenerPropertyColumn<AttendeeDO>(AttendeeDO.class, getSortable("description", sortable), "description",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<InviteeDO>(InviteeDO.class, getSortable("created", sortable), "created",
+    columns.add(new CellItemListenerPropertyColumn<AttendeeDO>(AttendeeDO.class, getSortable("created", sortable), "created",
         cellItemListener) {
       @SuppressWarnings({ "unchecked", "rawtypes"})
       @Override
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
       {
-        final InviteeDO inviteeDO = (InviteeDO) rowModel.getObject();
-        item.add(new ListSelectActionPanel(componentId, rowModel, InviteeEditPage.class, inviteeDO.getId(), returnToPage,
-            DateTimeFormatter.instance().getFormattedDateTime(inviteeDO.getCreated())));
+        final AttendeeDO attendeeDO = (AttendeeDO) rowModel.getObject();
+        item.add(new ListSelectActionPanel(componentId, rowModel, AttendeeEditPage.class, attendeeDO.getId(), returnToPage,
+            DateTimeFormatter.instance().getFormattedDateTime(attendeeDO.getCreated())));
         addRowClick(item);
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
 
-    columns.add(new CellItemListenerPropertyColumn<InviteeDO>(InviteeDO.class, getSortable("lastUpdate", sortable), "lastUpdate",
+    columns.add(new CellItemListenerPropertyColumn<AttendeeDO>(AttendeeDO.class, getSortable("lastUpdate", sortable), "lastUpdate",
         cellItemListener));
 
     return columns;
@@ -122,18 +122,18 @@ IListPageColumnsCreator<InviteeDO>
    * @see org.projectforge.web.wicket.AbstractListPage#getBaseDao()
    */
   @Override
-  protected InviteeDao getBaseDao()
+  protected AttendeeDao getBaseDao()
   {
-    return inviteeDao;
+    return attendeeDao;
   }
 
   /**
    * @see org.projectforge.web.wicket.AbstractListPage#newListForm(org.projectforge.web.wicket.AbstractListPage)
    */
   @Override
-  protected InviteeListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
+  protected AttendeeListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
-    return new InviteeListForm(this);
+    return new AttendeeListForm(this);
   }
 
 }

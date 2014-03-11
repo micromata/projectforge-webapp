@@ -32,17 +32,17 @@ import org.projectforge.web.wicket.AbstractListForm;
  * The list formular for the list view.
  * @author Werner Feder (werner.feder@t-online.de)
  */
-public class InviteeListForm extends AbstractListForm<InviteeFilter, InviteeListPage> implements Serializable
+public class AttendeeListForm extends AbstractListForm<AttendeeFilter, AttendeeListPage> implements Serializable
 {
 
   private static final long serialVersionUID = 314512845221133499L;
 
-  private static final Logger log = Logger.getLogger(InviteeListForm.class);
+  private static final Logger log = Logger.getLogger(AttendeeListForm.class);
 
   /**
    * @param parentPage
    */
-  public InviteeListForm(final InviteeListPage parentPage)
+  public AttendeeListForm(final AttendeeListPage parentPage)
   {
     super(parentPage);
   }
@@ -60,9 +60,9 @@ public class InviteeListForm extends AbstractListForm<InviteeFilter, InviteeList
    * @see org.projectforge.web.wicket.AbstractListForm#newSearchFilterInstance()
    */
   @Override
-  protected InviteeFilter newSearchFilterInstance()
+  protected AttendeeFilter newSearchFilterInstance()
   {
-    return new InviteeFilter();
+    return new AttendeeFilter();
   }
 
   /**

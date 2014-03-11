@@ -29,24 +29,24 @@ import org.projectforge.database.Constants;
 import org.projectforge.user.PFUserDO;
 
 /**
- * This data object is the Java representation of a data-base entry of invitee.
+ * This data object is the Java representation of a data-base entry of attendee.
  * @author Werner Feder (werner.feder@t-online.de)
  * 
  */
 @Entity
 @Indexed
-@Table(name = "T_PLUGIN_SKILL_INVITEE")
-public class InviteeDO extends DefaultBaseDO
+@Table(name = "T_PLUGIN_SKILL_ATTENDEE")
+public class AttendeeDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = -3676402473986512186L;
 
-  @PropertyInfo(i18nKey = "plugins.skillmatrix.skilltraining.invitee.menu")
-  @UserPrefParameter(i18nKey = "plugins.skillmatrix.skilltraining.invitee.menu")
+  @PropertyInfo(i18nKey = "plugins.skillmatrix.skilltraining.attendee")
+  @UserPrefParameter(i18nKey = "plugins.skillmatrix.skilltraining.attendee")
   @IndexedEmbedded(depth = 1)
   private PFUserDO person;
 
-  @PropertyInfo(i18nKey = "plugins.skillmatrix.skilltraining.menu")
-  @UserPrefParameter(i18nKey = "plugins.skillmatrix.skilltraining.menu")
+  @PropertyInfo(i18nKey = "plugins.skillmatrix.skilltraining.training")
+  @UserPrefParameter(i18nKey = "plugins.skillmatrix.skilltraining.training")
   @IndexedEmbedded
   private TrainingDO training;
 
@@ -80,7 +80,7 @@ public class InviteeDO extends DefaultBaseDO
    * @param skill
    * @return this for chaining.
    */
-  public InviteeDO setPerson(final PFUserDO person)
+  public AttendeeDO setPerson(final PFUserDO person)
   {
     this.person = person;
     return this;
@@ -96,7 +96,7 @@ public class InviteeDO extends DefaultBaseDO
    * @param skill
    * @return this for chaining.
    */
-  public InviteeDO setTraining(final TrainingDO training)
+  public AttendeeDO setTraining(final TrainingDO training)
   {
     this.training = training;
     return this;
@@ -118,7 +118,7 @@ public class InviteeDO extends DefaultBaseDO
   /**
    * @return this for chaining.
    */
-  public InviteeDO setDescription(final String description)
+  public AttendeeDO setDescription(final String description)
   {
     this.description = description;
     return this;
@@ -136,7 +136,7 @@ public class InviteeDO extends DefaultBaseDO
    * @param rating the rating to set
    * @return this for chaining.
    */
-  public InviteeDO setRating(final String rating)
+  public AttendeeDO setRating(final String rating)
   {
     this.rating = rating;
     return this;
@@ -154,7 +154,7 @@ public class InviteeDO extends DefaultBaseDO
    * @param certificate the certificate to set
    * @return this for chaining.
    */
-  public InviteeDO setCertificate(final String certificate)
+  public AttendeeDO setCertificate(final String certificate)
   {
     this.certificate = certificate;
     return this;
