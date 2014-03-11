@@ -88,8 +88,6 @@ IListPageColumnsCreator<InviteeDO>
         cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<InviteeDO>(InviteeDO.class, getSortable("description", sortable), "description",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<InviteeDO>(InviteeDO.class, getSortable("successfully",
-        sortable), "successfully", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<InviteeDO>(InviteeDO.class, getSortable("created", sortable), "created",
         cellItemListener) {
       @SuppressWarnings({ "unchecked", "rawtypes"})

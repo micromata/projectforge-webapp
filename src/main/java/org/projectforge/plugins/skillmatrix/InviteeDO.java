@@ -42,7 +42,7 @@ public class InviteeDO extends DefaultBaseDO
 
   @PropertyInfo(i18nKey = "plugins.skillmatrix.skilltraining.invitee.menu")
   @UserPrefParameter(i18nKey = "plugins.skillmatrix.skilltraining.invitee.menu")
-  @IndexedEmbedded
+  @IndexedEmbedded(depth = 1)
   private PFUserDO person;
 
   @PropertyInfo(i18nKey = "plugins.skillmatrix.skilltraining.menu")
@@ -62,9 +62,6 @@ public class InviteeDO extends DefaultBaseDO
   @PropertyInfo(i18nKey = "plugins.skillmatrix.skilltraining.certificate")
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String certificate;
-
-  @PropertyInfo(i18nKey = "plugins.skillmatrix.skilltraining.successfully")
-  private boolean successfully;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "person_fk")
@@ -163,18 +160,4 @@ public class InviteeDO extends DefaultBaseDO
     return this;
   }
 
-  @Column
-  public boolean isSuccessfully()
-  {
-    return successfully;
-  }
-
-  /**
-   * @return this for chaining.
-   */
-  public InviteeDO setSuccessfully(final boolean successfully)
-  {
-    this.successfully = successfully;
-    return this;
-  }
 }

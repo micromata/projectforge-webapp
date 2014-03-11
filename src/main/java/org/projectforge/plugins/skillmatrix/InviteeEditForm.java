@@ -47,8 +47,8 @@ public class InviteeEditForm extends AbstractEditForm<InviteeDO, InviteeEditPage
 
   private static final Logger log = Logger.getLogger(InviteeEditForm.class);
 
-  private static String[] defaultRatingArray            = {"hoch", "mittel", "niedrig"};
-  private static String[] defaultCertificateArray       = {"Note 1", "Note 2", "Note 3", "Note 4"};
+  //  private static String[] defaultRatingArray            = {"hoch", "mittel", "niedrig"};
+  //  private static String[] defaultCertificateArray       = {"Note 1", "Note 2", "Note 3", "Note 4"};
 
   private LabelValueChoiceRenderer<String> ratingChoiceRenderer;
   private LabelValueChoiceRenderer<String> certificateChoiceRenderer;
@@ -101,42 +101,54 @@ public class InviteeEditForm extends AbstractEditForm<InviteeDO, InviteeEditPage
       final UserSelectPanel inviteeSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(data, "person"),
           parentPage, "personId");
       fs.add(inviteeSelectPanel);
-      inviteeSelectPanel.setRequired(false);
+      inviteeSelectPanel.setRequired(true);
       inviteeSelectPanel.init();
     }
 
     { // Rating
-      final FieldsetPanel fs = gridBuilder.newFieldset(InviteeDO.class, "rating");
       final TrainingDO training = data.getTraining();
+      final FieldsetPanel fs;
       if (training != null && training.getRatingArray() != null) {
+        fs = gridBuilder.newFieldset(InviteeDO.class, "rating");
         ratingChoiceRenderer = new LabelValueChoiceRenderer<String>(training.getRatingArray());
-      } else {
-        ratingChoiceRenderer = new LabelValueChoiceRenderer<String>(defaultRatingArray);
+        fs.addDropDownChoice(new PropertyModel<String>(data, "rating"), ratingChoiceRenderer.getValues(), ratingChoiceRenderer).setNullValid(
+            true);
       }
-      fs.addDropDownChoice(new PropertyModel<String>(data, "rating"), ratingChoiceRenderer.getValues(), ratingChoiceRenderer).setNullValid(
-          true);
+
+      //      final FieldsetPanel fs = gridBuilder.newFieldset(InviteeDO.class, "rating");
+      //      final TrainingDO training = data.getTraining();
+      //      if (training != null && training.getRatingArray() != null) {
+      //        ratingChoiceRenderer = new LabelValueChoiceRenderer<String>(training.getRatingArray());
+      //      } else {
+      //        ratingChoiceRenderer = new LabelValueChoiceRenderer<String>(defaultRatingArray);
+      //      }
+      //      fs.addDropDownChoice(new PropertyModel<String>(data, "rating"), ratingChoiceRenderer.getValues(), ratingChoiceRenderer).setNullValid(
+      //          true);
     }
 
     { // Certificate
-      final FieldsetPanel fs = gridBuilder.newFieldset(InviteeDO.class, "certificate");
       final TrainingDO training = data.getTraining();
+      final FieldsetPanel fs;
       if (training != null && training.getCertificateArray() != null) {
+        fs = gridBuilder.newFieldset(InviteeDO.class, "certificate");
         certificateChoiceRenderer = new LabelValueChoiceRenderer<String>(training.getCertificateArray());
-      } else {
-        certificateChoiceRenderer = new LabelValueChoiceRenderer<String>(defaultCertificateArray);
+        fs.addDropDownChoice(new PropertyModel<String>(data, "certificate"), certificateChoiceRenderer.getValues(), certificateChoiceRenderer).setNullValid(
+            true);
       }
-      fs.addDropDownChoice(new PropertyModel<String>(data, "certificate"), certificateChoiceRenderer.getValues(), certificateChoiceRenderer).setNullValid(
-          true);
+
+      //      final FieldsetPanel fs = gridBuilder.newFieldset(InviteeDO.class, "certificate");
+      //      if (training != null && training.getCertificateArray() != null) {
+      //        certificateChoiceRenderer = new LabelValueChoiceRenderer<String>(training.getCertificateArray());
+      //      } else {
+      //        certificateChoiceRenderer = new LabelValueChoiceRenderer<String>(defaultCertificateArray);
+      //      }
+      //      fs.addDropDownChoice(new PropertyModel<String>(data, "certificate"), certificateChoiceRenderer.getValues(), certificateChoiceRenderer).setNullValid(
+      //          true);
     }
 
     { // Description
       final FieldsetPanel fs = gridBuilder.newFieldset(InviteeDO.class, "description");
       fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "description"))).setAutogrow();
-    }
-
-    { // Successfully
-      final FieldsetPanel fs = gridBuilder.newFieldset(InviteeDO.class, "successfully");
-      fs.addCheckBox(new PropertyModel<Boolean>(data, "successfully"), null);
     }
 
   }
@@ -149,15 +161,17 @@ public class InviteeEditForm extends AbstractEditForm<InviteeDO, InviteeEditPage
   {
     super.onBeforeRender();
     final TrainingDO training = data.getTraining();
-    certificateChoiceRenderer.clear();
-    ratingChoiceRenderer.clear();
+
     if (training != null && training.getCertificateArray() != null && training.getRatingArray() != null) {
+      certificateChoiceRenderer.clear();
+      ratingChoiceRenderer.clear();
       certificateChoiceRenderer.setValueArray(training.getCertificateArray());
       ratingChoiceRenderer.setValueArray(training.getRatingArray());
-    } else {
-      certificateChoiceRenderer.setValueArray(defaultCertificateArray);
-      ratingChoiceRenderer.setValueArray(defaultRatingArray);
     }
+    //    else {
+    //      certificateChoiceRenderer.setValueArray(defaultCertificateArray);
+    //      ratingChoiceRenderer.setValueArray(defaultRatingArray);
+    //    }
   }
 
   /**
