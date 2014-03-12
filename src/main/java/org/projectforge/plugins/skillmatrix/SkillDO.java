@@ -206,4 +206,5 @@ public class SkillDO extends DefaultBaseDO
     this.readonlyAccessGroupIds = readonlyAccessGroupIds;
     return this;
   }
+
 }

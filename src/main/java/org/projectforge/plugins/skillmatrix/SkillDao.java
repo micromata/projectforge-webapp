@@ -158,7 +158,7 @@ public class SkillDao extends BaseDao<SkillDO>
   public boolean hasUpdateAccess(final PFUserDO user, final SkillDO obj, final SkillDO dbObj, final boolean throwException)
   {
     checkCyclicReference(obj);
-    return true;
+    return super.hasUpdateAccess(user, obj, dbObj, throwException);
   }
 
   /**
