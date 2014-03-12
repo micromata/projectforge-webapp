@@ -47,7 +47,7 @@ public class AttendeeDO extends DefaultBaseDO
 
   @PropertyInfo(i18nKey = "plugins.skillmatrix.skilltraining.training")
   @UserPrefParameter(i18nKey = "plugins.skillmatrix.skilltraining.training")
-  @IndexedEmbedded
+  @IndexedEmbedded(depth = 1)
   private TrainingDO training;
 
   @PropertyInfo(i18nKey = "plugins.skillmatrix.skill.description")

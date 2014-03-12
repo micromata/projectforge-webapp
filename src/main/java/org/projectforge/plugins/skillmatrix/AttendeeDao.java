@@ -27,14 +27,12 @@ public class AttendeeDao extends BaseDao<AttendeeDO>
 
   public static final UserRightId USER_RIGHT_ID = new UserRightId(UNIQUE_PLUGIN_ID, "plugin20", I18N_KEY_SKILL_PREFIX);
 
-  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { // "responsibleUser.username", "responsibleUser.firstname",
-    // "responsibleUser.lastname", "taskpath", "projekt.name", "projekt.kunde.name", "kost2.nummer", "kost2.description"
-  };
+  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "person.firstname", "person.lastname","training.title",
+    "training.skill.title", "rating", "certificate" };
 
   // private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AttendeeDao.class);
 
   private TrainingDao trainingDao;
-
   private UserDao userDao;
 
   public AttendeeDao()

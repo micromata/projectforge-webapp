@@ -28,7 +28,7 @@ public class TrainingDao extends BaseDao<TrainingDO>
 
   public static final UserRightId USER_RIGHT_ID = new UserRightId(UNIQUE_PLUGIN_ID, "plugin20", I18N_KEY_SKILL_PREFIX);
 
-  //  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TrainingDao.class);
+  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "skill.title" };
 
   private SkillDao skillDao;
 
@@ -36,6 +36,12 @@ public class TrainingDao extends BaseDao<TrainingDO>
   {
     super(TrainingDO.class);
     userRightId = USER_RIGHT_ID;
+  }
+
+  @Override
+  protected String[] getAdditionalSearchFields()
+  {
+    return ADDITIONAL_SEARCH_FIELDS;
   }
 
   @Override
