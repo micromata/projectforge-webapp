@@ -91,7 +91,7 @@ public class TrainingDao extends BaseDao<TrainingDO>
 
   /**
    * Please note: Only the string group.fullAccessGroupIds will be modified (but not be saved)!
-   * @param calendar
+   * @param training
    * @param fullAccessGroups
    */
   public void setFullAccessGroups(final TrainingDO training, final Collection<GroupDO> fullAccessGroups)
@@ -106,7 +106,7 @@ public class TrainingDao extends BaseDao<TrainingDO>
 
   /**
    * Please note: Only the string group.readonlyAccessGroupIds will be modified (but not be saved)!
-   * @param calendar
+   * @param training
    * @param readonlyAccessGroups
    */
   public void setReadonlyAccessGroups(final TrainingDO training, final Collection<GroupDO> readonlyAccessGroups)
