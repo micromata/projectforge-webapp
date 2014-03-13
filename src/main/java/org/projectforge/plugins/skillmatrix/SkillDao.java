@@ -184,7 +184,7 @@ public class SkillDao extends BaseDao<SkillDO>
 
   /**
    * Please note: Only the string group.fullAccessGroupIds will be modified (but not be saved)!
-   * @param calendar
+   * @param skill
    * @param fullAccessGroups
    */
   public void setFullAccessGroups(final SkillDO skill, final Collection<GroupDO> fullAccessGroups)
@@ -199,7 +199,7 @@ public class SkillDao extends BaseDao<SkillDO>
 
   /**
    * Please note: Only the string group.readonlyAccessGroupIds will be modified (but not be saved)!
-   * @param calendar
+   * @param skill
    * @param readonlyAccessGroups
    */
   public void setReadonlyAccessGroups(final SkillDO skill, final Collection<GroupDO> readonlyAccessGroups)
