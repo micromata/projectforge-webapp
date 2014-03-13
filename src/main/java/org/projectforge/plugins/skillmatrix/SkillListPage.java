@@ -124,14 +124,6 @@ public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, Ski
     final CellItemListenerPropertyColumn<SkillDO> rateable = new CellItemListenerPropertyColumn<SkillDO>(SkillDO.class, getSortable(
         "rateable", sortable), "rateable", cellItemListener);
 
-    // ToDo: Remove
-    final CellItemListenerPropertyColumn<SkillDO> fullAccessGroupIds = new CellItemListenerPropertyColumn<SkillDO>(
-        getString("plugins.teamcal.fullAccess"), getSortable("fullAccessGroupIds", sortable), "fullAccessGroupIds", cellItemListener);
-
-
-    final CellItemListenerPropertyColumn<SkillDO> readonlyAccessGroupIds = new CellItemListenerPropertyColumn<SkillDO>(
-        getString("plugins.teamcal.readonlyAccess"), getSortable("readonlyAccessGroupIds", sortable), "readonlyAccessGroupIds", cellItemListener);
-
     columns.add(title);
     columns.add(parentTitle);
     columns.add(description);
@@ -139,10 +131,6 @@ public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, Ski
     columns.add(rateable);
     columns.add(created);
     columns.add(lastUpdate);
-
-    // ToDo: Remove
-    columns.add(fullAccessGroupIds);
-    columns.add(readonlyAccessGroupIds);
 
     return columns;
   }
