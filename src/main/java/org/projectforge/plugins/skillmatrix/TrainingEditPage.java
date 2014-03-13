@@ -28,6 +28,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.AbstractSecuredBasePage;
 
 /**
  * The controller of the edit formular page. Most functionality such as insert, update, delete etc. is done by the super class.
@@ -115,5 +116,13 @@ public class TrainingEditPage extends AbstractEditPage<TrainingDO, TrainingEditF
   public void cancelSelection(final String property)
   {
     // Do nothing
+  }
+
+  @Override
+  public AbstractSecuredBasePage onSaveOrUpdate()
+  {
+    trainingDao.setFullAccessGroups(getData(), form.fullAccessGroupsListHelper.getAssignedItems());
+    trainingDao.setReadonlyAccessGroups(getData(), form.readonlyAccessGroupsListHelper.getAssignedItems());
+    return super.onSaveOrUpdate();
   }
 }
