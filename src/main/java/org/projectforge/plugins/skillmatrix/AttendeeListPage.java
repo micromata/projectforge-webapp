@@ -78,9 +78,9 @@ IListPageColumnsCreator<AttendeeDO>
         cellItemListener));
 
     columns.add(new CellItemListenerPropertyColumn<AttendeeDO>(getString("plugins.skillmatrix.skilltraining.firstname"),
-        getSortable("person.firstname", sortable), "person.firstname", cellItemListener));
+        getSortable("attendee.firstname", sortable), "attendee.firstname", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<AttendeeDO>(getString("plugins.skillmatrix.skilltraining.lastname"),
-        getSortable("person.lastname", sortable), "person.lastname", cellItemListener));
+        getSortable("attendee.lastname", sortable), "attendee.lastname", cellItemListener));
 
     columns.add(new CellItemListenerPropertyColumn<AttendeeDO>(AttendeeDO.class, getSortable("rating", sortable), "rating",
         cellItemListener));

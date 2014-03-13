@@ -86,14 +86,14 @@ public class AttendeeEditForm extends AbstractEditForm<AttendeeDO, AttendeeEditP
     }
 
     { // Attendee
-      final FieldsetPanel fs = gridBuilder.newFieldset(AttendeeDO.class, "person");
-      PFUserDO person = data.getPerson();
-      if (Hibernate.isInitialized(person) == false) {
-        person = attendeeDao.getUserDao().getOrLoad(person.getId());
-        data.setPerson(person);
+      final FieldsetPanel fs = gridBuilder.newFieldset(AttendeeDO.class, "attendee");
+      PFUserDO attendee = data.getAttendee();
+      if (Hibernate.isInitialized(attendee) == false) {
+        attendee = attendeeDao.getUserDao().getOrLoad(attendee.getId());
+        data.setAttendee(attendee);
       }
-      final UserSelectPanel attendeeSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(data, "person"),
-          parentPage, "personId").init();
+      final UserSelectPanel attendeeSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(data, "attendee"),
+          parentPage, "attendeeId").init();
       fs.add(attendeeSelectPanel.setRequired(true));
     }
 

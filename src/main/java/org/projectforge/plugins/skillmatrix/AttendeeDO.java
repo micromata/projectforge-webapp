@@ -40,10 +40,10 @@ public class AttendeeDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = -3676402473986512186L;
 
-  @PropertyInfo(i18nKey = "plugins.skillmatrix.skilltraining.attendee")
-  @UserPrefParameter(i18nKey = "plugins.skillmatrix.skilltraining.attendee")
+  @PropertyInfo(i18nKey = "plugins.skillmatrix.skilltraining.attendee.menu")
+  @UserPrefParameter(i18nKey = "plugins.skillmatrix.skilltraining.attendee.menu")
   @IndexedEmbedded(depth = 1)
-  private PFUserDO person;
+  private PFUserDO attendee;
 
   @PropertyInfo(i18nKey = "plugins.skillmatrix.skilltraining.training")
   @UserPrefParameter(i18nKey = "plugins.skillmatrix.skilltraining.training")
@@ -64,25 +64,25 @@ public class AttendeeDO extends DefaultBaseDO
   private String certificate;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "person_fk")
-  public PFUserDO getPerson()
+  @JoinColumn(name = "attendee_fk")
+  public PFUserDO getAttendee()
   {
-    return person;
+    return attendee;
   }
 
   @Transient
-  public Integer getPersonId()
+  public Integer getAttendeeId()
   {
-    return person != null ? person.getId() : null;
+    return attendee != null ? attendee.getId() : null;
   }
 
   /**
    * @param skill
    * @return this for chaining.
    */
-  public AttendeeDO setPerson(final PFUserDO person)
+  public AttendeeDO setAttendee(final PFUserDO attendee)
   {
-    this.person = person;
+    this.attendee = attendee;
     return this;
   }
 
