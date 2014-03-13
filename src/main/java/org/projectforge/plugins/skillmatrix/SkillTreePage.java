@@ -130,7 +130,7 @@ public class SkillTreePage extends AbstractSecuredPage
     form = new SkillTreeForm(this);
     body.add(form);
     form.init();
-    skillTreeBuilder = new SkillTreeBuilder().setCaller(caller).setSelectProperty(selectProperty).setSelectMode(isSelectMode());
+    skillTreeBuilder = new SkillTreeBuilder().setCaller(caller).setSelectProperty(selectProperty).setSelectMode(isSelectMode()).setShowRootNode(true);
     form.add(skillTreeBuilder.createTree("tree", this, form.getSearchFilter()));
 
     body.add(new Label("info", new Model<String>(getString(I18N_KEY_SKILLTREE_INFO))));
