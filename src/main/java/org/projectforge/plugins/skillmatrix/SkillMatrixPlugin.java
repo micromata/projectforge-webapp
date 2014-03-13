@@ -23,7 +23,11 @@
 
 package org.projectforge.plugins.skillmatrix;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.projectforge.common.StringHelper;
 import org.projectforge.continuousdb.UpdateEntry;
+import org.projectforge.database.xstream.XStreamSavingConverter;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.MenuItemDef;
@@ -34,6 +38,8 @@ import org.projectforge.web.MenuItemDefId;
  */
 public class SkillMatrixPlugin extends AbstractPlugin
 {
+  private static final Logger log = Logger.getLogger(SkillMatrixPlugin.class);
+
   public static final String ID_SKILL_RATING = "skillRating";
 
   public static final String ID_SKILL = "skill";
@@ -151,4 +157,39 @@ public class SkillMatrixPlugin extends AbstractPlugin
   {
     return SkillMatrixPluginUpdates.getInitializationUpdateEntry();
   }
+
+  @Override
+  public void onBeforeRestore(final XStreamSavingConverter xstreamSavingConverter, final Object obj)
+  {
+    if (obj instanceof TrainingDO) {
+      log.info("Migrating " + obj);
+      final TrainingDO training = (TrainingDO) obj;
+      training.setFullAccessGroupIds(updateIds(xstreamSavingConverter, TrainingDO.class, training.getFullAccessGroupIds()));
+      training.setReadonlyAccessGroupIds(updateIds(xstreamSavingConverter, TrainingDO.class, training.getReadonlyAccessGroupIds()));
+    }
+  }
+
+  private String updateIds(final XStreamSavingConverter xstreamSavingConverter, final Class< ? > entityClass, final String oldIdsString)
+  {
+    if (StringUtils.isBlank(oldIdsString) == true) {
+      return oldIdsString;
+    }
+    final int[] oldIds = StringHelper.splitToInts(oldIdsString, ",", false);
+    if (oldIds == null || oldIds.length == 0) {
+      return "";
+    }
+    final StringBuffer buf = new StringBuffer();
+    String delimiter = "";
+    for (final int oldId : oldIds) {
+      final Integer newId = xstreamSavingConverter.getNewIdAsInteger(entityClass, oldId);
+      if (newId == null) {
+        // Can' be restored :-(
+        continue;
+      }
+      buf.append(delimiter).append(newId);
+      delimiter = ",";
+    }
+    return buf.toString();
+  }
+
 }

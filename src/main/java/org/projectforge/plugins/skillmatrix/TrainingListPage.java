@@ -96,6 +96,15 @@ IListPageColumnsCreator<TrainingDO>
     columns.add(new CellItemListenerPropertyColumn<TrainingDO>(TrainingDO.class, getSortable("lastUpdate", sortable), "lastUpdate",
         cellItemListener));
 
+    // ToDo: Remove
+    final CellItemListenerPropertyColumn<TrainingDO> fullAccessGroupIds = new CellItemListenerPropertyColumn<TrainingDO>(
+        getString("plugins.teamcal.fullAccess"), getSortable("fullAccessGroupIds", sortable), "fullAccessGroupIds", cellItemListener);
+    final CellItemListenerPropertyColumn<TrainingDO> readonlyAccessGroupIds = new CellItemListenerPropertyColumn<TrainingDO>(
+        getString("plugins.teamcal.readonlyAccess"), getSortable("readonlyAccessGroupIds", sortable), "readonlyAccessGroupIds", cellItemListener);
+
+    columns.add(fullAccessGroupIds);
+    columns.add(readonlyAccessGroupIds);
+
     return columns;
   }
 

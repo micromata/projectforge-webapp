@@ -90,6 +90,8 @@ public class TrainingDO extends DefaultBaseDO
   @DateBridge(resolution = Resolution.DAY)
   private Date endDate;
 
+  private String fullAccessGroupIds, readonlyAccessGroupIds;
+
   @Column(length = 100)
   public String getTitle()
   {
@@ -225,6 +227,47 @@ public class TrainingDO extends DefaultBaseDO
   @Transient
   public String[] getCertificateArray() {
     return getValuesArray(getCertificate());
+  }
+
+  /**
+   * Members of these groups have full read/write access to this training.
+   * @return the fullAccessGroupIds
+   */
+  @Column(name = "full_access_group_ids", nullable = true)
+  public String getFullAccessGroupIds()
+  {
+    return fullAccessGroupIds;
+  }
+
+  /**
+   * These users have full read/write access to this training.
+   * @param fullAccessGroupIds the fullAccessGroupIds to set
+   * @return this for chaining.
+   */
+  public TrainingDO setFullAccessGroupIds(final String fullAccessGroupIds)
+  {
+    this.fullAccessGroupIds = fullAccessGroupIds;
+    return this;
+  }
+
+  /**
+   * Members of these groups have full read-only access to this training.
+   * @return the readonlyAccessGroupIds
+   */
+  @Column(name = "readonly_access_group_ids", nullable = true)
+  public String getReadonlyAccessGroupIds()
+  {
+    return readonlyAccessGroupIds;
+  }
+
+  /**
+   * @param readonlyAccessGroupIds the readonlyAccessGroupIds to set
+   * @return this for chaining.
+   */
+  public TrainingDO setReadonlyAccessGroupIds(final String readonlyAccessGroupIds)
+  {
+    this.readonlyAccessGroupIds = readonlyAccessGroupIds;
+    return this;
   }
 
 }

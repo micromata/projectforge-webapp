@@ -9,11 +9,14 @@
 
 package org.projectforge.plugins.skillmatrix;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.projectforge.core.BaseDao;
+import org.projectforge.user.GroupDO;
 import org.projectforge.user.UserRightId;
+import org.projectforge.web.user.GroupsProvider;
 
 /**
  * This is the base data access object class. Most functionality such as access checking, select, insert, update, save, delete etc. is implemented by the super class.
@@ -84,5 +87,35 @@ public class TrainingDao extends BaseDao<TrainingDO>
       return null;
     }
     return list.get(0);
+  }
+
+  /**
+   * Please note: Only the string group.fullAccessGroupIds will be modified (but not be saved)!
+   * @param calendar
+   * @param fullAccessGroups
+   */
+  public void setFullAccessGroups(final TrainingDO training, final Collection<GroupDO> fullAccessGroups)
+  {
+    training.setFullAccessGroupIds(new GroupsProvider().getGroupIds(fullAccessGroups));
+  }
+
+  public Collection<GroupDO> getSortedFullAccessGroups(final TrainingDO training)
+  {
+    return new GroupsProvider().getSortedGroups(training.getFullAccessGroupIds());
+  }
+
+  /**
+   * Please note: Only the string group.readonlyAccessGroupIds will be modified (but not be saved)!
+   * @param calendar
+   * @param readonlyAccessGroups
+   */
+  public void setReadonlyAccessGroups(final TrainingDO training, final Collection<GroupDO> readonlyAccessGroups)
+  {
+    training.setReadonlyAccessGroupIds(new GroupsProvider().getGroupIds(readonlyAccessGroups));
+  }
+
+  public Collection<GroupDO> getSortedReadonlyAccessGroups(final TrainingDO training)
+  {
+    return new GroupsProvider().getSortedGroups(training.getReadonlyAccessGroupIds());
   }
 }
