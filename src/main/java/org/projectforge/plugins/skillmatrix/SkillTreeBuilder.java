@@ -177,6 +177,12 @@ public class SkillTreeBuilder implements Serializable
     final CellItemListenerPropertyColumn<SkillNode> rateable = new CellItemListenerPropertyColumn<SkillNode>(new ResourceModel(
         "plugins.skillmatrix.skill.rateable"), null, "skill.rateable", cellItemListener);
 
+    // ToDo: Remove
+    final CellItemListenerPropertyColumn<SkillNode> fullAccessGroupIds = new CellItemListenerPropertyColumn<SkillNode>(new ResourceModel(
+        "plugins.teamcal.fullAccess"), null, "skill.fullAccessGroupIds", cellItemListener);
+    final CellItemListenerPropertyColumn<SkillNode> readonlyAccessGroupIds = new CellItemListenerPropertyColumn<SkillNode>(new ResourceModel(
+        "plugins.teamcal.readonlyAccess"), null, "skill.readonlyAccessGroupIds", cellItemListener);
+
     columns.add(title);
     columns.add(description);
     columns.add(comment);
@@ -184,6 +190,9 @@ public class SkillTreeBuilder implements Serializable
     columns.add(created);
     columns.add(lastUpdate);
 
+    // ToDo: Remove
+    columns.add(fullAccessGroupIds);
+    columns.add(readonlyAccessGroupIds);
     return columns;
   }
 
