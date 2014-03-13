@@ -119,11 +119,11 @@ function preventBubble(e) {
 			});
 		});
 	}
-	
+
 	$(function() {
 		submenueMakeClass();
 	});
-	
+
 })();
 
 (function() {
@@ -133,14 +133,14 @@ function preventBubble(e) {
 	$(function() {
 		adaptSize();
 	});
-	
+
 	$(window).resize(function() {
 		if(timeout != null) {
 			clearTimeout(timeout);
 		}
 		timeout = setTimeout(adaptSize, timeoutMillis);
 	});
-	
+
 	window.adaptSize = function adaptSize() {
 		$.each($('.controls'), function(){
 			if($(this).parent().width() > 0) {
@@ -178,211 +178,23 @@ function initializeComponents() {
 	            $(this).closest('form').find('.btn-success').click();
 	        }
 	    });
-	});	
-	$('[rel=\'mypopup\']').hover(function(event) {
-		mouseX = event.pageX;
-		mouseY = event.pageY;
-		// Avoid zombies:
-		hideAllTooltips();
-		$(this).mypopover('myshow');
-	}, function() {
-		$(this).mypopover('hide');
-	}).keydown(function(event) {
-		$(this).mypopover('hide');
-	}).on("hidden", function (e) {
-        e.stopPropagation();
+	});
+    hideAllTooltips();
+	$('[rel=mypopup]').popover({
+        container: 'body',
+        placement: 'auto'
     });
-	$('[rel=\'mytooltip\']').hover(function(event) {
-		mouseX = event.pageX;
-		mouseY = event.pageY;
-		// Avoid zombies:
-		hideAllTooltips();
-		$(this).mytooltip('myshow');
-	}, function() {
-		$(this).mytooltip('hide');
-	}).keydown(function(event) {
-		$(this).mytooltip('hide');
-	}).on("hidden", function (e) {
-        e.stopPropagation();
+
+    $('[rel=mytooltip]').tooltip({
+    	container: 'body',
+    	placement: 'auto'
     });
 }
 
 function hideAllTooltips() {
-	$("div.popover").remove();
-	$("div.tooltip").remove();
+    $("div.popover").remove();
+    $("div.tooltip").remove();
 }
-
-function initMyPopover(element) {
-	element.mouseenter(function(event) {
-		mouseX = event.pageX;
-		mouseY = event.pageY;
-		// Avoid zombies:
-		hideAllTooltips();
-		$(this).mypopover('myshow');
-	}).mouseleave(function(event) {
-		$(this).mypopover('hide');
-	});
-	return element;
-}
-
-// ///////////////////////////////////
-//
-// BOOTSTRAP based tooltip
-//
-// ///////////////////////////////////
-var MyTooltip = function(element, options) {
-	this.init('mytooltip', element, options)
-}
-
-MyTooltip.prototype = $.extend($.fn.tooltip.Constructor.prototype, {
-	constructor : MyTooltip,
-	myshow : function() {
-		showMyTooltip(this);
-	}
-})
-
-$.fn.mytooltip = function(option) {
-	return this
-			.each(function() {
-				var $this = $(this), data = $this.data('mytooltip'), options = typeof option == 'object'
-						&& option
-				if (!data)
-					$this.data('mytooltip',
-							(data = new MyTooltip(this, options)))
-				if (typeof option == 'string')
-					data[option]()
-			})
-}
-
-$.fn.mytooltip.Constructor = MyTooltip
-
-$.fn.mytooltip.defaults = $
-		.extend(
-				{},
-				$.fn.tooltip.defaults,
-				{
-					animation : false,
-					selector : false,
-					trigger : 'manual',
-					container: 'body',
-					template : '<div class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
-				})
-
-function showMyTooltip(obj) {
-	var $tip, inside, pos, tipWidth, tipHeight, posX, posY, boundTop, boundBottom, boundLeft, boundRight, tp
-	if (obj.hasContent() && obj.enabled) {
-		$tip = obj.tip();
-		obj.setContent();
-
-		if (obj.options.animation) {
-			$tip.addClass('fade');
-		}
-		$tip.detach().css({
-			top : 0,
-			left : 0,
-			display : 'block'
-		})
-
-		if (obj.options.container) {
-		    var parentContainer = obj.$element.parents(".modal");
-		    if (parentContainer.length == 0) {
-				$tip.appendTo(obj.options.container);
-		    } else {
-		    	$tip.appendTo(parentContainer);
-		    }
-		} else { 
-			$tip.insertAfter(obj.$element)
-		}
-
-		pos = obj.getPosition(inside);
-		boundTop = $(document).scrollTop();
-		boundLeft = $(document).scrollLeft();
-		boundRight = boundLeft + $(window).width();
-		boundBottom = boundTop + $(window).height();
-		tipWidth = $tip[0].offsetWidth
-		tipHeight = $tip[0].offsetHeight
-		if (mouseX + tipWidth + 5 < boundRight
-				|| mouseX - tipWidth - 5 < boundLeft) {
-			// Bottom, if enough space at bottom of mouse
-			// position or not enough space above mouse
-			// position:
-			posX = mouseX + 5;
-		} else {
-			// Position is in top of mouse position:
-			posX = mouseX - tipWidth - 5;
-		}
-		if (mouseY + tipHeight + 5 < boundBottom
-				|| mouseY - tipHeight - 5 < boundTop) {
-			// Right if enough space right of mouse position
-			// or not enough space left of mouse position:
-			posY = mouseY + 5;
-		} else {
-			// Position is left of mouse position:
-			posY = mouseY - tipHeight - 5;
-		}
-		tp = {
-			top : posY,
-			left : posX
-		}
-		$tip.offset(tp).addClass('in')
-	}
-}
-// ///////////////////////////////////
-//
-// END BOOTSTRAP based tooltip
-//
-// ///////////////////////////////////
-
-// ///////////////////////////////////
-//
-// BOOTSTRAP based popover
-//
-// ///////////////////////////////////
-var MyPopover = function(element, options) {
-	this.init('mypopover', element, options)
-}
-
-MyPopover.prototype = $.extend($.fn.popover.Constructor.prototype, {
-
-	constructor : MyPopover
-
-	,
-	myshow : function() {
-		showMyTooltip(this);
-	}
-})
-
-$.fn.mypopover = function(option) {
-	return this
-			.each(function() {
-				var $this = $(this), data = $this.data('mypopover'), options = typeof option == 'object'
-						&& option
-				if (!data)
-					$this.data('mypopover',
-							(data = new MyPopover(this, options)))
-				if (typeof option == 'string')
-					data[option]()
-			})
-}
-
-$.fn.mypopover.Constructor = MyPopover
-
-$.fn.mypopover.defaults = $
-		.extend(
-				{},
-				$.fn.tooltip.defaults,
-				{
-					width : 'normal',
-					trigger : 'manual',
-					container: 'body',
-					template : '<div class="popover"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"></div></div></div>'
-				})
-
-// ///////////////////////////////////
-//
-// END BOOTSTRAP based popover
-//
-// ///////////////////////////////////
 
 /*
  * Only used if the ToggleContainer works without Ajax (wantOnToggleNotification =
