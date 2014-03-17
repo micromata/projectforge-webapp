@@ -42,10 +42,6 @@ public class TrainingRight extends UserRightAccessCheck<TrainingDO>
 
   private static final long serialVersionUID = -61862536307104944L;
 
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TrainingRight.class);
-
-  private static final boolean doLog = false;
-
   private static final String delim =",";
 
   private transient UserGroupCache userGroupCache;
@@ -68,24 +64,16 @@ public class TrainingRight extends UserRightAccessCheck<TrainingDO>
     return userGroupCache;
   }
 
-  @SuppressWarnings("unused")
   @Override
   public boolean hasAccess(final PFUserDO user, final TrainingDO obj, final TrainingDO oldObj, final OperationType operationType)
   {
-    // TODO rewrite hasAccess method
-    // Zwei neue Felder pro TrainingDO (analog TeamCalDO:  private String fullAccessGroupIds, readonlyAccessGroupIds;
-
     if (UserRights.getAccessChecker().isUserMemberOfAdminGroup(user) == true) {
-      if (doLog == true)
-        log.info("Admin allowed to " + operationType.name());
       return true;
     }
 
     final TrainingDO training = (oldObj != null) ? oldObj : obj;
 
     if (training == null) {
-      if (doLog == true)
-        log.info("Training == null " + operationType.name());
       return true;
     }
 
@@ -93,22 +81,14 @@ public class TrainingRight extends UserRightAccessCheck<TrainingDO>
     switch (operationType) {
       case SELECT:
       {
-        if (doLog == true)
-          log.info("Training " + operationType.name() + " " + training.getTitle() + " for user " + user.getId());
         ret = ( (hasFullAccess(training, user.getId()) == true) || (hasReadonlyAccess(training, user.getId()) == true) );
-        if (doLog == true)
-          log.info("return " + ret);
         break;
       }
       case INSERT:
       case UPDATE:
       case DELETE:
       {
-        if (doLog == true)
-          log.info("Training " + operationType.name() + " " + training.getTitle() + " for user " + user.getId());
         ret = (hasFullAccess(training, user.getId()) == true);
-        if (doLog == true)
-          log.info("return " + ret);
         break;
       }
       default:

@@ -42,11 +42,7 @@ public class SkillRight extends UserRightAccessCheck<SkillDO>
 {
   private static final long serialVersionUID = 6346078004388197890L;
 
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SkillRight.class);
-
   private static final String delim =",";
-
-  private static final boolean doLog = false;
 
   private transient UserGroupCache userGroupCache;
 
@@ -68,27 +64,17 @@ public class SkillRight extends UserRightAccessCheck<SkillDO>
     return userGroupCache;
   }
 
-  @SuppressWarnings("unused")
   @Override
   public boolean hasAccess(final PFUserDO user, final SkillDO obj, final SkillDO oldObj, final OperationType operationType)
   {
-    // TODO rewrite hasAccess method
-    // Zwei neue Felder pro SkillDO (analog TeamCalDO:  private String fullAccessGroupIds, readonlyAccessGroupIds;
-    // 1. Administrator darf immer.
-    // 2a Lesen: Hole alle Gruppen vom aktuellen Skill bis zum obersten und schaue ob angemeldeter Benutzer in einer der Gruppen mit Vollzugriff oder Lesezugriff ist.
-    // 2b Schreiben (Anlegen, Ändern, Löschen): ebd. und schauen ob angemeldeter Benutzer in einer der Gruppen mit Vollzugriff ist.
 
     if (UserRights.getAccessChecker().isUserMemberOfAdminGroup(user) == true) {
-      if (doLog == true)
-        log.info("Admin allowed to " + operationType.name());
       return true;
     }
 
     final SkillDO skill = (oldObj != null) ? oldObj : obj;
 
     if (skill == null) {
-      if (doLog == true)
-        log.info("Skill == null " + operationType.name());
       return true;
     }
 
@@ -96,22 +82,14 @@ public class SkillRight extends UserRightAccessCheck<SkillDO>
     switch (operationType) {
       case SELECT:
       {
-        if (doLog == true)
-          log.info("Skill " + operationType.name() + " " + skill.getTitle() + " for user " + user.getId());
         ret = ( (hasFullAccess(skill, user.getId()) == true) || (hasReadonlyAccess(skill, user.getId()) == true) );
-        if (doLog == true)
-          log.info("return " + ret);
         break;
       }
       case INSERT:
       case UPDATE:
       case DELETE:
       {
-        if (doLog == true)
-          log.info("Skill " + operationType.name() + " " + skill.getTitle() + " for user " + user.getId());
         ret = (hasFullAccess(skill, user.getId()) == true);
-        if (doLog == true)
-          log.info("return " + ret);
         break;
       }
       default:
@@ -140,7 +118,6 @@ public class SkillRight extends UserRightAccessCheck<SkillDO>
     return false;
   }
 
-  @SuppressWarnings("unused")
   public String getSkillParentsFullAccessGroupIds(final SkillDO skill)
   {
     String skillGroupIds = "";
@@ -154,12 +131,9 @@ public class SkillRight extends UserRightAccessCheck<SkillDO>
       }
       tmpSkill = tmpSkill.getParent();
     }
-    if (doLog == true)
-      log.info("FullAccessGroupIds : " + skillGroupIds);
     return skillGroupIds;
   }
 
-  @SuppressWarnings("unused")
   public String getSkillParentsReadonlyAccessGroupIds(final SkillDO skill)
   {
     String skillGroupIds = "";
@@ -173,8 +147,6 @@ public class SkillRight extends UserRightAccessCheck<SkillDO>
       }
       tmpSkill = tmpSkill.getParent();
     }
-    if (doLog == true)
-      log.info("ReadonlyAccessGroupIds : " + skillGroupIds);
     return skillGroupIds;
   }
 }
