@@ -24,6 +24,7 @@
 package org.projectforge.web.wicket.flowlayout;
 
 import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.FormComponent;
@@ -45,6 +46,8 @@ public class CheckBoxPanel extends Panel implements ComponentWrapperPanel
   private CheckBox checkBox;
 
   private Label label;
+
+  private WebMarkupContainer parentContainer;
 
   private boolean wantOnSelectionChangedNotifications;
 
@@ -69,6 +72,8 @@ public class CheckBoxPanel extends Panel implements ComponentWrapperPanel
       final boolean wantOnSelectionChangedNotifications)
   {
     super(id);
+    this.parentContainer = new WebMarkupContainer("parent");
+    add(this.parentContainer);
     this.wantOnSelectionChangedNotifications = wantOnSelectionChangedNotifications;
     checkBox = new CheckBox(WICKET_ID, model) {
       @Override
@@ -84,7 +89,7 @@ public class CheckBoxPanel extends Panel implements ComponentWrapperPanel
       }
     };
     checkBox.setOutputMarkupId(true);
-    add(checkBox);
+    this.parentContainer.add(checkBox);
     init(labelString);
   }
 
@@ -96,7 +101,8 @@ public class CheckBoxPanel extends Panel implements ComponentWrapperPanel
     init(labelString);
   }
 
-  private void init(final String labelString) {
+  private void init(final String labelString)
+  {
     if (labelString != null) {
       label = new Label("label", labelString);
       label.add(AttributeModifier.replace("for", checkBox.getMarkupId()));
@@ -105,7 +111,7 @@ public class CheckBoxPanel extends Panel implements ComponentWrapperPanel
       label = new Label("label");
       label.setVisible(false);
     }
-    add(label);
+    this.parentContainer.add(label);
     setRenderBodyOnly(true);
   }
 
@@ -116,11 +122,7 @@ public class CheckBoxPanel extends Panel implements ComponentWrapperPanel
    */
   public CheckBoxPanel setTooltip(final String tooltip)
   {
-    if (label.isVisible() == true) {
-      WicketUtils.addTooltip(label, tooltip);
-    } else {
-      WicketUtils.addTooltip(checkBox, tooltip);
-    }
+    WicketUtils.addTooltip(this.parentContainer, tooltip);
     return this;
   }
 
@@ -131,11 +133,7 @@ public class CheckBoxPanel extends Panel implements ComponentWrapperPanel
    */
   public CheckBoxPanel setTooltip(final String title, final String text)
   {
-    if (label.isVisible() == true) {
-      WicketUtils.addTooltip(label, title, text);
-    } else {
-      WicketUtils.addTooltip(checkBox, title, text);
-    }
+    WicketUtils.addTooltip(this.parentContainer, title, text);
     return this;
   }
 
