@@ -62,15 +62,15 @@ public class HRListForm extends AbstractListForm<HRFilter, HRListPage>
     gridBuilder.newGridPanel();
     final FieldsetPanel fs = gridBuilder.newFieldset(super.getOptionsLabel()).suppressLabelForWarning();
     final DivPanel optionsCheckBoxesPanel = fs.addNewCheckBoxDiv();
-    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(filter, "showPlanning"),
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxButton(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(filter, "showPlanning"),
         getString("hr.planning.filter.showPlanning")));
-    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(filter, "showBookedTimesheets"),
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxButton(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(filter, "showBookedTimesheets"),
         getString("hr.planning.filter.showBookedTimesheets")));
-    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(filter, "onlyMyProjects"),
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxButton(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(filter, "onlyMyProjects"),
         getString("hr.planning.filter.onlyMyProjects")));
-    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(filter, "allProjectsGroupedByCustomer"),
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxButton(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(filter, "allProjectsGroupedByCustomer"),
         getString("hr.planning.filter.allProjectsGroupedByCustomer")));
-    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(filter, "otherProjectsGroupedByCustomer"),
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxButton(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(filter, "otherProjectsGroupedByCustomer"),
         getString("hr.planning.filter.otherProjectsGroupedByCustomer")));
     pageSizeFieldsetPanel.setVisible(false);
     setPageSize(Integer.MAX_VALUE);
