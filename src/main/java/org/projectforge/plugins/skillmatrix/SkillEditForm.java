@@ -26,10 +26,14 @@ package org.projectforge.plugins.skillmatrix;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.registry.Registry;
 import org.projectforge.user.GroupDO;
+import org.projectforge.user.UserGroupCache;
+import org.projectforge.user.UserRights;
 import org.projectforge.web.common.MultiChoiceListHelper;
 import org.projectforge.web.user.GroupsComparator;
 import org.projectforge.web.user.GroupsProvider;
@@ -98,11 +102,11 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
       dependentFormComponents[0] = titleField;
     }
 
+    final SkillRight skillRight = (SkillRight) UserRights.instance().getRight(SkillDao.USER_RIGHT_ID);
     gridBuilder.newSplitPanel(GridSize.COL50);
-    // set access groups
     {
       // Full access groups
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess"), getString("plugins.teamcal.access.groups"));
+      FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess"), getString("plugins.teamcal.access.groups"));
       final GroupsProvider groupsProvider = new GroupsProvider();
       final Collection<GroupDO> fullAccessGroups = new GroupsProvider().getSortedGroups(getData().getFullAccessGroupIds());
       fullAccessGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
@@ -115,10 +119,16 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
       final Select2MultiChoice<GroupDO> groups = new Select2MultiChoice<GroupDO>(fs.getSelect2MultiChoiceId(),
           new PropertyModel<Collection<GroupDO>>(this.fullAccessGroupsListHelper, "assignedItems"), groupsProvider);
       fs.add(groups);
+
+      if (getData().getParent() != null) {
+        fs = gridBuilder.newFieldset("", getString("plugins.skillmatrix.skill.inherited"));
+        final Label label = new Label ( "inheritedFullRights", getGroupnames( skillRight.getFullAccessGroupIds(getData().getParent())));
+        fs.add(label);
+      }
     }
     {
       // Read-only access groups
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.readonlyAccess"),
+      FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.readonlyAccess"),
           getString("plugins.teamcal.access.groups"));
       final GroupsProvider groupsProvider = new GroupsProvider();
       final Collection<GroupDO> readOnlyAccessGroups = new GroupsProvider().getSortedGroups(getData().getReadonlyAccessGroupIds());
@@ -132,11 +142,17 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
       final Select2MultiChoice<GroupDO> groups = new Select2MultiChoice<GroupDO>(fs.getSelect2MultiChoiceId(),
           new PropertyModel<Collection<GroupDO>>(this.readonlyAccessGroupsListHelper, "assignedItems"), groupsProvider);
       fs.add(groups);
+
+      if (getData().getParent() != null) {
+        fs = gridBuilder.newFieldset("", getString("plugins.skillmatrix.skill.inherited"));
+        final Label label = new Label ( "inheritedRoRights", getGroupnames( skillRight.getReadonlyAccessGroupIds(getData().getParent())));
+        fs.add(label);
+      }
     }
 
     gridBuilder.newGridPanel();
     {
-      // Descritption
+      // Description
       final FieldsetPanel fs = gridBuilder.newFieldset(SkillDO.class, "description");
       fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "description"))).setAutogrow();
     }
@@ -165,4 +181,12 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
     return skillDao.getSkillTree();
   }
 
+  private String getGroupnames(final Integer[] ids) {
+    String s ="";
+    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
+    for (final Integer id : ids) {
+      s += userGroupCache.getGroupname(id) + " ";
+    }
+    return s;
+  }
 }
