@@ -74,21 +74,10 @@ public class TrainingRight extends UserRightAccessCheck<TrainingDO>
       return true;
     }
     if (operationType == OperationType.SELECT) {
-      return (hasFullAccess(training, user.getId()) == true) || (hasReadonlyAccess(training, user.getId()) == true);
+      return (hasAccess(StringHelper.splitToIntegers(training.getSkill().getFullAccessGroupIds(), ","), user.getId()) == true)
+          || (hasAccess(StringHelper.splitToIntegers(training.getSkill().getReadonlyAccessGroupIds(), ","), user.getId()) == true);
     }
-    return hasFullAccess(training, user.getId());
-  }
-
-  public boolean hasFullAccess(final TrainingDO training, final Integer userId)
-  {
-    final Integer[] groupIds = StringHelper.splitToIntegers(training.getSkill().getFullAccessGroupIds(), ",");
-    return hasAccess(groupIds, userId);
-  }
-
-  public boolean hasReadonlyAccess(final TrainingDO training, final Integer userId)
-  {
-    final Integer[] groupIds = StringHelper.splitToIntegers(training.getSkill().getReadonlyAccessGroupIds(), ",");
-    return hasAccess(groupIds, userId);
+    return hasAccess(StringHelper.splitToIntegers(training.getSkill().getFullAccessGroupIds(), ","), user.getId());
   }
 
   private boolean hasAccess(final Integer[] groupIds, final Integer userId)

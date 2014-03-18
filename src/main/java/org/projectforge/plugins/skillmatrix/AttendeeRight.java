@@ -61,7 +61,6 @@ public class AttendeeRight extends UserRightAccessCheck<AttendeeDO>
     return userGroupCache;
   }
 
-
   @Override
   public boolean hasAccess(final PFUserDO user, final AttendeeDO obj, final AttendeeDO oldObj, final OperationType operationType)
   {
@@ -74,21 +73,10 @@ public class AttendeeRight extends UserRightAccessCheck<AttendeeDO>
       return true;
     }
     if (operationType == OperationType.SELECT) {
-      return (hasFullAccess(attendee, user.getId()) == true) || (hasReadonlyAccess(attendee, user.getId()) == true);
+      return (hasAccess(StringHelper.splitToIntegers(attendee.getTraining().getFullAccessGroupIds(), ","), user.getId()) == true)
+          || (hasAccess(StringHelper.splitToIntegers(attendee.getTraining().getReadonlyAccessGroupIds(), ","), user.getId()) == true);
     }
-    return hasFullAccess(attendee, user.getId());
-  }
-
-  public boolean hasFullAccess(final AttendeeDO attendee, final Integer userId)
-  {
-    final Integer[] groupIds = StringHelper.splitToIntegers(attendee.getTraining().getFullAccessGroupIds(), ",");
-    return hasAccess(groupIds, userId);
-  }
-
-  public boolean hasReadonlyAccess(final AttendeeDO attendee, final Integer userId)
-  {
-    final Integer[] groupIds = StringHelper.splitToIntegers(attendee.getTraining().getReadonlyAccessGroupIds(), ",");
-    return hasAccess(groupIds, userId);
+    return hasAccess(StringHelper.splitToIntegers(attendee.getTraining().getFullAccessGroupIds(), ","), user.getId());
   }
 
   private boolean hasAccess(final Integer[] groupIds, final Integer userId)
