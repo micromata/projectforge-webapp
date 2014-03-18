@@ -23,7 +23,6 @@
 
 package org.projectforge.plugins.skillmatrix;
 
-import org.apache.log4j.Logger;
 import org.projectforge.continuousdb.UpdateEntry;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.user.UserPrefArea;
@@ -35,7 +34,6 @@ import org.projectforge.web.MenuItemDefId;
  */
 public class SkillMatrixPlugin extends AbstractPlugin
 {
-  private static final Logger log = Logger.getLogger(SkillMatrixPlugin.class);
 
   public static final String ID_SKILL_RATING = "skillRating";
 

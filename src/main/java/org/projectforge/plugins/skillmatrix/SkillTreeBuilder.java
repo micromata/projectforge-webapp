@@ -72,8 +72,6 @@ public class SkillTreeBuilder implements Serializable
 
   private TableTree<SkillNode, String> tree;
 
-  private SkillDao skillDao;
-
   private AbstractSecuredPage parentPage;
 
   private Integer highlightedSkillNodeId;
@@ -272,16 +270,6 @@ public class SkillTreeBuilder implements Serializable
       set.add(parent);
       parent = parent.getParent();
     }
-    return this;
-  }
-
-  /**
-   * @param skillDao the skillDao to set
-   * @return this for chaining.
-   */
-  public SkillTreeBuilder setSkillDao(final SkillDao skillDao)
-  {
-    this.skillDao = skillDao;
     return this;
   }
 
