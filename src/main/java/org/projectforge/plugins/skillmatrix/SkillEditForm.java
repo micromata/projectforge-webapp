@@ -82,8 +82,10 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
       fs.add(parentSelectPanel);
       fs.getFieldset().setOutputMarkupId(true);
       parentSelectPanel.init();
-      if (getSkillTree().isRootNode(data)) {
+      if (getSkillTree().isRootNode(data) == true) {
         fs.setVisible(false);
+      } else {
+        parentSelectPanel.setRequired(true);
       }
     }
     {
@@ -100,8 +102,7 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
     // set access groups
     {
       // Full access groups
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess"),
-          getString("plugins.teamcal.access.groups"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess"), getString("plugins.teamcal.access.groups"));
       final GroupsProvider groupsProvider = new GroupsProvider();
       final Collection<GroupDO> fullAccessGroups = new GroupsProvider().getSortedGroups(getData().getFullAccessGroupIds());
       fullAccessGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
