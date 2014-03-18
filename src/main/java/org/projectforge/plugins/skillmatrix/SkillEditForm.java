@@ -106,7 +106,7 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Full access groups
-      FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess"), getString("plugins.teamcal.access.groups"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess"), getString("plugins.teamcal.access.groups"));
       final GroupsProvider groupsProvider = new GroupsProvider();
       final Collection<GroupDO> fullAccessGroups = new GroupsProvider().getSortedGroups(getData().getFullAccessGroupIds());
       fullAccessGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
@@ -121,14 +121,14 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
       fs.add(groups);
 
       if (getData().getParent() != null) {
-        fs = gridBuilder.newFieldset("", getString("plugins.skillmatrix.skill.inherited"));
-        final Label label = new Label ( "inheritedFullRights", getGroupnames( skillRight.getFullAccessGroupIds(getData().getParent())));
-        fs.add(label);
+        final FieldsetPanel fs2 = gridBuilder.newFieldset("", getString("plugins.skillmatrix.skill.inherited")).setLabelFor(groups);
+        final Label label = new Label ( "1", getGroupnames( skillRight.getFullAccessGroupIds(getData().getParent())));
+        fs2.add(label);
       }
     }
     {
       // Read-only access groups
-      FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.readonlyAccess"),
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.readonlyAccess"),
           getString("plugins.teamcal.access.groups"));
       final GroupsProvider groupsProvider = new GroupsProvider();
       final Collection<GroupDO> readOnlyAccessGroups = new GroupsProvider().getSortedGroups(getData().getReadonlyAccessGroupIds());
@@ -144,9 +144,9 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
       fs.add(groups);
 
       if (getData().getParent() != null) {
-        fs = gridBuilder.newFieldset("", getString("plugins.skillmatrix.skill.inherited"));
-        final Label label = new Label ( "inheritedRoRights", getGroupnames( skillRight.getReadonlyAccessGroupIds(getData().getParent())));
-        fs.add(label);
+        final FieldsetPanel fs2 = gridBuilder.newFieldset("", getString("plugins.skillmatrix.skill.inherited")).setLabelFor(groups);
+        final Label label = new Label ( "1", getGroupnames( skillRight.getReadonlyAccessGroupIds(getData().getParent())));
+        fs2.add(label);
       }
     }
 
