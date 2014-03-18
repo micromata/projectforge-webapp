@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -146,6 +147,9 @@ public abstract class TaskSelectAutoCompleteFormComponent extends PFAutoComplete
   {
     final StringBuilder builder = new StringBuilder();
     final List<TaskNode> nodeList = taskTree.getPathToRoot(taskId);
+    if (CollectionUtils.isEmpty(nodeList) == true) {
+      return getString("task.path.rootTask");
+    }
     final String pipeSeparator = " | ";
     String separator = "";
     for (final TaskNode node : nodeList) {
