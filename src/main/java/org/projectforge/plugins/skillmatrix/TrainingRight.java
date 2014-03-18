@@ -34,15 +34,13 @@ import org.projectforge.user.UserRightValue;
 import org.projectforge.user.UserRights;
 
 /**
- * Define the access rights. In this example every user has access to training functionality.
+ * Define the access rights.
  * @author Werner Feder (werner.feder@t-online.de)
  */
 public class TrainingRight extends UserRightAccessCheck<TrainingDO>
 {
 
   private static final long serialVersionUID = -61862536307104944L;
-
-  private static final String delim =",";
 
   private transient UserGroupCache userGroupCache;
 
@@ -72,40 +70,24 @@ public class TrainingRight extends UserRightAccessCheck<TrainingDO>
     }
 
     final TrainingDO training = (oldObj != null) ? oldObj : obj;
-
     if (training == null) {
       return true;
     }
-
-    boolean ret = false;
-    switch (operationType) {
-      case SELECT:
-      {
-        ret = ( (hasFullAccess(training, user.getId()) == true) || (hasReadonlyAccess(training, user.getId()) == true) );
-        break;
-      }
-      case INSERT:
-      case UPDATE:
-      case DELETE:
-      {
-        ret = (hasFullAccess(training, user.getId()) == true);
-        break;
-      }
-      default:
-        break;
+    if (operationType == OperationType.SELECT) {
+      return (hasFullAccess(training, user.getId()) == true) || (hasReadonlyAccess(training, user.getId()) == true);
     }
-    return ret;
+    return hasFullAccess(training, user.getId());
   }
 
   public boolean hasFullAccess(final TrainingDO training, final Integer userId)
   {
-    final Integer[] groupIds = StringHelper.splitToIntegers(training.getSkill().getFullAccessGroupIds(), delim);
+    final Integer[] groupIds = StringHelper.splitToIntegers(training.getSkill().getFullAccessGroupIds(), ",");
     return hasAccess(groupIds, userId);
   }
 
   public boolean hasReadonlyAccess(final TrainingDO training, final Integer userId)
   {
-    final Integer[] groupIds = StringHelper.splitToIntegers(training.getSkill().getReadonlyAccessGroupIds(), delim);
+    final Integer[] groupIds = StringHelper.splitToIntegers(training.getSkill().getReadonlyAccessGroupIds(), ",");
     return hasAccess(groupIds, userId);
   }
 

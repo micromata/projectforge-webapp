@@ -34,18 +34,12 @@ import org.projectforge.user.UserRightValue;
 import org.projectforge.user.UserRights;
 
 /**
- * Define the access rights. In this example every user has access to attendee functionality.
+ * Define the access rights.
  * @author Werner Feder (werner.feder@t-online.de)
  */
 public class AttendeeRight extends UserRightAccessCheck<AttendeeDO>
 {
   private static final long serialVersionUID = -3590945654632199595L;
-
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TrainingRight.class);
-
-  private static final boolean doLog = false;
-
-  private static final String delim =",";
 
   private transient UserGroupCache userGroupCache;
 
@@ -67,64 +61,33 @@ public class AttendeeRight extends UserRightAccessCheck<AttendeeDO>
     return userGroupCache;
   }
 
-  @SuppressWarnings("unused")
+
   @Override
   public boolean hasAccess(final PFUserDO user, final AttendeeDO obj, final AttendeeDO oldObj, final OperationType operationType)
   {
-    // TODO rewrite hasAccess method
-    // Zwei neue Felder pro TrainingDO (analog TeamCalDO:  private String fullAccessGroupIds, readonlyAccessGroupIds;
-
     if (UserRights.getAccessChecker().isUserMemberOfAdminGroup(user) == true) {
-      if (doLog == true)
-        log.info("Admin allowed to " + operationType.name());
       return true;
     }
 
     final AttendeeDO attendee = (oldObj != null) ? oldObj : obj;
-
     if (attendee == null) {
-      if (doLog == true)
-        log.info("Training == null " + operationType.name());
       return true;
     }
-
-    boolean ret = false;
-    switch (operationType) {
-      case SELECT:
-      {
-        if (doLog == true)
-          log.info("Attendee " + operationType.name() + " " + attendee.getAttendee().getFullname() + " for user " + user.getId());
-        ret = ( (hasFullAccess(attendee, user.getId()) == true) || (hasReadonlyAccess(attendee, user.getId()) == true) );
-        if (doLog == true)
-          log.info("return " + ret);
-        break;
-      }
-      case INSERT:
-      case UPDATE:
-      case DELETE:
-      {
-        if (doLog == true)
-          log.info("Attendee " + operationType.name() + " " + attendee.getAttendee().getFullname() + " for user " + user.getId());
-        ret = (hasFullAccess(attendee, user.getId()) == true);
-        if (doLog == true)
-          log.info("return " + ret);
-        break;
-      }
-      default:
-        break;
+    if (operationType == OperationType.SELECT) {
+      return (hasFullAccess(attendee, user.getId()) == true) || (hasReadonlyAccess(attendee, user.getId()) == true);
     }
-    return ret;
+    return hasFullAccess(attendee, user.getId());
   }
 
   public boolean hasFullAccess(final AttendeeDO attendee, final Integer userId)
   {
-    final Integer[] groupIds = StringHelper.splitToIntegers(attendee.getTraining().getFullAccessGroupIds(), delim);
+    final Integer[] groupIds = StringHelper.splitToIntegers(attendee.getTraining().getFullAccessGroupIds(), ",");
     return hasAccess(groupIds, userId);
   }
 
   public boolean hasReadonlyAccess(final AttendeeDO attendee, final Integer userId)
   {
-    final Integer[] groupIds = StringHelper.splitToIntegers(attendee.getTraining().getReadonlyAccessGroupIds(), delim);
+    final Integer[] groupIds = StringHelper.splitToIntegers(attendee.getTraining().getReadonlyAccessGroupIds(), ",");
     return hasAccess(groupIds, userId);
   }
 

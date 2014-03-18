@@ -23,26 +23,29 @@
 
 package org.projectforge.plugins.skillmatrix;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.access.OperationType;
-import org.projectforge.common.StringHelper;
 import org.projectforge.registry.Registry;
+import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserRightAccessCheck;
 import org.projectforge.user.UserRightCategory;
 import org.projectforge.user.UserRightValue;
 import org.projectforge.user.UserRights;
+import org.projectforge.web.user.GroupsProvider;
 
 /**
  * @author Billy Duong (b.duong@micromata.de)
- *
+ * 
  */
 public class SkillRight extends UserRightAccessCheck<SkillDO>
 {
   private static final long serialVersionUID = 6346078004388197890L;
-
-  private static final String delim =",";
 
   private transient UserGroupCache userGroupCache;
 
@@ -77,36 +80,21 @@ public class SkillRight extends UserRightAccessCheck<SkillDO>
     if (skill == null) {
       return true;
     }
-
-    boolean ret = false;
-    switch (operationType) {
-      case SELECT:
-      {
-        ret = ( (hasFullAccess(skill, user.getId()) == true) || (hasReadonlyAccess(skill, user.getId()) == true) );
-        break;
-      }
-      case INSERT:
-      case UPDATE:
-      case DELETE:
-      {
-        ret = (hasFullAccess(skill, user.getId()) == true);
-        break;
-      }
-      default:
-        break;
+    if (operationType == OperationType.SELECT) {
+      return (hasFullAccess(skill, user.getId()) == true) || (hasReadonlyAccess(skill, user.getId()) == true);
     }
-    return ret;
+    return hasFullAccess(skill, user.getId());
   }
 
   public boolean hasFullAccess(final SkillDO skill, final Integer userId)
   {
-    final Integer[] groupIds = StringHelper.splitToIntegers(getSkillParentsFullAccessGroupIds(skill), delim);
+    final Integer[] groupIds = getFullAccessGroupIds(skill);
     return hasAccess(groupIds, userId);
   }
 
   public boolean hasReadonlyAccess(final SkillDO skill, final Integer userId)
   {
-    final Integer[] groupIds = StringHelper.splitToIntegers(getSkillParentsReadonlyAccessGroupIds(skill), delim);
+    final Integer[] groupIds = getReadonlyAccessGroupIds(skill);
     return hasAccess(groupIds, userId);
   }
 
@@ -118,35 +106,49 @@ public class SkillRight extends UserRightAccessCheck<SkillDO>
     return false;
   }
 
-  public String getSkillParentsFullAccessGroupIds(final SkillDO skill)
+  public Integer[] getFullAccessGroupIds(final SkillDO skill)
   {
-    String skillGroupIds = "";
-    if (StringUtils.isBlank(skill.getFullAccessGroupIds()) == false) {
-      skillGroupIds = skill.getFullAccessGroupIds() + delim;
-    }
-    SkillDO tmpSkill = skill.getParent();
-    while (tmpSkill != null) {
-      if (StringUtils.isBlank(tmpSkill.getFullAccessGroupIds()) == false) {
-        skillGroupIds += tmpSkill.getFullAccessGroupIds() + delim;
-      }
-      tmpSkill = tmpSkill.getParent();
-    }
-    return skillGroupIds;
+    final Set<Integer> result = new HashSet<Integer>();
+    getFullAccessGroupIds(result, skill);
+    return result.toArray(new Integer[0]);
   }
 
-  public String getSkillParentsReadonlyAccessGroupIds(final SkillDO skill)
+  private void getFullAccessGroupIds(final Set<Integer> groupIds, final SkillDO skill)
   {
-    String skillGroupIds = "";
-    if (StringUtils.isBlank(skill.getReadonlyAccessGroupIds()) == false) {
-      skillGroupIds = skill.getReadonlyAccessGroupIds() + delim;
-    }
-    SkillDO tmpSkill = skill.getParent();
-    while (tmpSkill != null) {
-      if (StringUtils.isBlank(tmpSkill.getReadonlyAccessGroupIds()) == false) {
-        skillGroupIds += tmpSkill.getReadonlyAccessGroupIds() + delim;
+    if (StringUtils.isNotBlank(skill.getFullAccessGroupIds()) == true) {
+      final Collection<GroupDO> groups = new GroupsProvider().getSortedGroups(skill.getFullAccessGroupIds());
+      if (groups != null) {
+        for (final GroupDO group : groups) {
+          groupIds.add(group.getId());
+        }
       }
-      tmpSkill = tmpSkill.getParent();
     }
-    return skillGroupIds;
+    if (skill.getParent() == null) {
+      return;
+    }
+    getFullAccessGroupIds(groupIds, skill.getParent());
+  }
+
+  public Integer[] getReadonlyAccessGroupIds(final SkillDO skill)
+  {
+    final Set<Integer> result = new HashSet<Integer>();
+    getReadonlyAccessGroupIds(result, skill);
+    return result.toArray(new Integer[0]);
+  }
+
+  private void getReadonlyAccessGroupIds(final Set<Integer> groupIds, final SkillDO skill)
+  {
+    if (StringUtils.isNotBlank(skill.getReadonlyAccessGroupIds()) == true) {
+      final Collection<GroupDO> groups = new GroupsProvider().getSortedGroups(skill.getReadonlyAccessGroupIds());
+      if (groups != null) {
+        for (final GroupDO group : groups) {
+          groupIds.add(group.getId());
+        }
+      }
+    }
+    if (skill.getParent() == null) {
+      return;
+    }
+    getReadonlyAccessGroupIds(groupIds, skill.getParent());
   }
 }
