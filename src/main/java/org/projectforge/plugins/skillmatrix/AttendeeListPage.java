@@ -21,6 +21,8 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.calendar.DateTimeFormatter;
+import org.projectforge.web.user.UserFormatter;
+import org.projectforge.web.user.UserPropertyColumn;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
@@ -43,6 +45,9 @@ IListPageColumnsCreator<AttendeeDO>
 
   @SpringBean(name = "attendeeDao")
   private AttendeeDao attendeeDao;
+
+  @SpringBean(name = "userFormatter")
+  private UserFormatter userFormatter;
 
   public AttendeeListPage(final PageParameters parameters)
   {
@@ -77,11 +82,8 @@ IListPageColumnsCreator<AttendeeDO>
         getSortable("training.endDate", sortable), "training.endDate",
         cellItemListener));
 
-    columns.add(new CellItemListenerPropertyColumn<AttendeeDO>(getString("plugins.skillmatrix.skilltraining.firstname"),
-        getSortable("attendee.firstname", sortable), "attendee.firstname", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<AttendeeDO>(getString("plugins.skillmatrix.skilltraining.lastname"),
-        getSortable("attendee.lastname", sortable), "attendee.lastname", cellItemListener));
-
+    columns.add(new UserPropertyColumn<AttendeeDO>(AttendeeDO.class, getSortable("attendeeId", sortable), "attendee",
+        cellItemListener).withUserFormatter(userFormatter));
     columns.add(new CellItemListenerPropertyColumn<AttendeeDO>(AttendeeDO.class, getSortable("rating", sortable), "rating",
         cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<AttendeeDO>(AttendeeDO.class, getSortable("certificate", sortable), "certificate",
