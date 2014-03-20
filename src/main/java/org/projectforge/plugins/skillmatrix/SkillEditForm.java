@@ -67,11 +67,9 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
   MultiChoiceListHelper<GroupDO> fullAccessGroupsListHelper, readOnlyAccessGroupsListHelper;
 
   private Model <String> labelFullModel, labelReadOnlyModel;
-  private FieldsetPanel fsRoot, fsFull, fsRo;
-
-  private SkillRight skillRight;
-
   private Label labelFull, labelReadOnly;
+  private FieldsetPanel fsRoot;
+  private SkillRight skillRight;
 
   /**
    * @param parentPage
@@ -106,12 +104,32 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
         @Override
         protected void onModelSelected(final AjaxRequestTarget target, final SkillDO skillDo)
         {
-          // TODO Auto-generated method stub
           super.onModelSelected(target, skillDo);
-          labelFullModel.setObject(getGroupnames(skillRight.getFullAccessGroupIds(skillDo.getParent())));
-          labelReadOnlyModel.setObject(getGroupnames(skillRight.getReadOnlyAccessGroupIds(skillDo.getParent())));
+          if (skillDo.getParent() != null) {
+            labelFullModel.setObject(getGroupnames(skillRight.getFullAccessGroupIds(skillDo.getParent())));
+            labelReadOnlyModel.setObject(getGroupnames(skillRight.getReadOnlyAccessGroupIds(skillDo.getParent())));
+          } else {
+            labelFullModel.setObject("");
+            labelReadOnlyModel.setObject("");
+          }
           target.add(labelFull);
           target.add(labelReadOnly);
+        }
+        /**
+         * @see org.projectforge.plugins.skillmatrix.SkillSelectPanel#onBeforeRender()
+         */
+        @Override
+        protected void onBeforeRender()
+        {
+          super.onBeforeRender();
+          final SkillDO skillDo = skillDao.getOrLoad(this.getCurrentSkillId());
+          if (skillDo.getParent() != null) {
+            labelFullModel.setObject(getGroupnames(skillRight.getFullAccessGroupIds(skillDo.getParent())));
+            labelReadOnlyModel.setObject(getGroupnames(skillRight.getReadOnlyAccessGroupIds(skillDo.getParent())));
+          } else {
+            labelFullModel.setObject("");
+            labelReadOnlyModel.setObject("");
+          }
         }
       };
       fsRoot.add(parentSelectPanel);
@@ -152,17 +170,17 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
       fs.add(groups);
       fsRoot.add(fs);
 
-      fsFull = gridBuilder.newFieldset("", getString("plugins.skillmatrix.skill.inherited")).setLabelFor(groups);
-      fsFull.setOutputMarkupId(true);
+      final FieldsetPanel fs2 = gridBuilder.newFieldset("", getString("plugins.skillmatrix.skill.inherited")).setLabelFor(groups);
+      fs2.setOutputMarkupId(true);
       labelFullModel = new Model<String>("");
-      labelFull = new Label ( "labelFull", labelFullModel);
+      labelFull = new Label (fs2.newChildId(), labelFullModel);
       labelFull.setOutputMarkupId(true);
-      fsFull.add(labelFull);
-      fsFull.getFieldset().setOutputMarkupId(true);
+      fs2.add(labelFull);
+      fs2.getFieldset().setOutputMarkupId(true);
       if (getData().getParent() != null) {
         labelFullModel.setObject(getGroupnames( skillRight.getFullAccessGroupIds(getData().getParent())));
       }
-      fsRoot.add(fsFull);
+      fsRoot.add(fs2);
     }
     {
       // Read-only access groups
@@ -181,17 +199,17 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
       fs.add(groups);
       fsRoot.add(fs);
 
-      fsRo = gridBuilder.newFieldset("", getString("plugins.skillmatrix.skill.inherited")).setLabelFor(groups);
-      fsRo.setOutputMarkupId(true);
+      final FieldsetPanel fs2 = gridBuilder.newFieldset("", getString("plugins.skillmatrix.skill.inherited")).setLabelFor(groups);
+      fs2.setOutputMarkupId(true);
       labelReadOnlyModel = new Model<String>("");
-      labelReadOnly = new Label ("labelReadOnly", labelReadOnlyModel);
+      labelReadOnly = new Label (fs2.newChildId(), labelReadOnlyModel);
       labelReadOnly.setOutputMarkupId(true);
-      fsRo.add(labelReadOnly);
-      fsRo.getFieldset().setOutputMarkupId(true);
+      fs2.add(labelReadOnly);
+      fs2.getFieldset().setOutputMarkupId(true);
       if (getData().getParent() != null) {
         labelReadOnlyModel.setObject(getGroupnames( skillRight.getReadOnlyAccessGroupIds(getData().getParent())));
       }
-      fsRoot.add(fsRo);
+      fsRoot.add(fs2);
     }
 
     gridBuilder.newGridPanel();
