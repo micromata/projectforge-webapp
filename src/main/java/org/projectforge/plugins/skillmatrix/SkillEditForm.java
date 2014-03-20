@@ -91,9 +91,7 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
     gridBuilder.newSplitPanel(GridSize.COL66, GridType.CONTAINER);
     {
       // Parent
-
       fsRoot = gridBuilder.newFieldset(SkillDO.class, "parent");
-      //gridBuilder.setCurrentLevel(0);
       @SuppressWarnings("serial")
       final SkillSelectPanel parentSelectPanel = new SkillSelectPanel(fsRoot, new PropertyModel<SkillDO>(data, "parent"), parentPage,
           "parentId") {
@@ -123,7 +121,7 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
         {
           super.onBeforeRender();
           final SkillDO skillDo = skillDao.getOrLoad(this.getCurrentSkillId());
-          if (skillDo.getParent() != null) {
+          if (skillDo != null && skillDo.getParent() != null) {
             labelFullModel.setObject(getGroupnames(skillRight.getFullAccessGroupIds(skillDo.getParent())));
             labelReadOnlyModel.setObject(getGroupnames(skillRight.getReadOnlyAccessGroupIds(skillDo.getParent())));
           } else {
