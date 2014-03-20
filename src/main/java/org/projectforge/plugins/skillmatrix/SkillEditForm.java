@@ -26,8 +26,10 @@ package org.projectforge.plugins.skillmatrix;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.registry.Registry;
@@ -40,6 +42,7 @@ import org.projectforge.web.user.GroupsProvider;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridSize;
+import org.projectforge.web.wicket.bootstrap.GridType;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -61,7 +64,14 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
 
   private final FormComponent< ? >[] dependentFormComponents = new FormComponent[1];
 
-  MultiChoiceListHelper<GroupDO> fullAccessGroupsListHelper, readonlyAccessGroupsListHelper;
+  MultiChoiceListHelper<GroupDO> fullAccessGroupsListHelper, readOnlyAccessGroupsListHelper;
+
+  private Model <String> labelFullModel, labelReadOnlyModel;
+  private FieldsetPanel fsRoot, fsFull, fsRo;
+
+  private SkillRight skillRight;
+
+  private Label labelFull, labelReadOnly;
 
   /**
    * @param parentPage
@@ -77,21 +87,43 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
   {
     super.init();
 
-    gridBuilder.newSplitPanel(GridSize.COL50);
+    skillRight = (SkillRight) UserRights.instance().getRight(SkillDao.USER_RIGHT_ID);
+
+    gridBuilder.newGridPanel();
+    gridBuilder.newSplitPanel(GridSize.COL66, GridType.CONTAINER);
     {
       // Parent
-      final FieldsetPanel fs = gridBuilder.newFieldset(SkillDO.class, "parent");
-      final SkillSelectPanel parentSelectPanel = new SkillSelectPanel(fs, new PropertyModel<SkillDO>(data, "parent"), parentPage,
-          "parentId");
-      fs.add(parentSelectPanel);
-      fs.getFieldset().setOutputMarkupId(true);
+
+      fsRoot = gridBuilder.newFieldset(SkillDO.class, "parent");
+      //gridBuilder.setCurrentLevel(0);
+      @SuppressWarnings("serial")
+      final SkillSelectPanel parentSelectPanel = new SkillSelectPanel(fsRoot, new PropertyModel<SkillDO>(data, "parent"), parentPage,
+          "parentId") {
+
+        /**
+         * @see org.projectforge.plugins.skillmatrix.SkillSelectPanel#onModelSelected(org.apache.wicket.ajax.AjaxRequestTarget, org.projectforge.plugins.skillmatrix.SkillDO)
+         */
+        @Override
+        protected void onModelSelected(final AjaxRequestTarget target, final SkillDO skillDo)
+        {
+          // TODO Auto-generated method stub
+          super.onModelSelected(target, skillDo);
+          labelFullModel.setObject(getGroupnames(skillRight.getFullAccessGroupIds(skillDo.getParent())));
+          labelReadOnlyModel.setObject(getGroupnames(skillRight.getReadOnlyAccessGroupIds(skillDo.getParent())));
+          target.add(labelFull);
+          target.add(labelReadOnly);
+        }
+      };
+      fsRoot.add(parentSelectPanel);
+      fsRoot.getFieldset().setOutputMarkupId(true);
       parentSelectPanel.init();
       if (getSkillTree().isRootNode(data) == true) {
-        fs.setVisible(false);
+        fsRoot.setVisible(false);
       } else {
         parentSelectPanel.setRequired(true);
       }
     }
+
     {
       // Title of skill
       final FieldsetPanel fs = gridBuilder.newFieldset(SkillDO.class, "title");
@@ -100,10 +132,9 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
       WicketUtils.setFocus(titleField);
       fs.add(titleField);
       dependentFormComponents[0] = titleField;
+      fsRoot.add(fs);
     }
 
-    final SkillRight skillRight = (SkillRight) UserRights.instance().getRight(SkillDao.USER_RIGHT_ID);
-    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Full access groups
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess"), getString("plugins.teamcal.access.groups"));
@@ -119,35 +150,48 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
       final Select2MultiChoice<GroupDO> groups = new Select2MultiChoice<GroupDO>(fs.getSelect2MultiChoiceId(),
           new PropertyModel<Collection<GroupDO>>(this.fullAccessGroupsListHelper, "assignedItems"), groupsProvider);
       fs.add(groups);
+      fsRoot.add(fs);
 
+      fsFull = gridBuilder.newFieldset("", getString("plugins.skillmatrix.skill.inherited")).setLabelFor(groups);
+      fsFull.setOutputMarkupId(true);
+      labelFullModel = new Model<String>("");
+      labelFull = new Label ( "labelFull", labelFullModel);
+      labelFull.setOutputMarkupId(true);
+      fsFull.add(labelFull);
+      fsFull.getFieldset().setOutputMarkupId(true);
       if (getData().getParent() != null) {
-        final FieldsetPanel fs2 = gridBuilder.newFieldset("", getString("plugins.skillmatrix.skill.inherited")).setLabelFor(groups);
-        final Label label = new Label ( "1", getGroupnames( skillRight.getFullAccessGroupIds(getData().getParent())));
-        fs2.add(label);
+        labelFullModel.setObject(getGroupnames( skillRight.getFullAccessGroupIds(getData().getParent())));
       }
+      fsRoot.add(fsFull);
     }
     {
       // Read-only access groups
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.readonlyAccess"),
-          getString("plugins.teamcal.access.groups"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.readonlyAccess"), getString("plugins.teamcal.access.groups"));
       final GroupsProvider groupsProvider = new GroupsProvider();
-      final Collection<GroupDO> readOnlyAccessGroups = new GroupsProvider().getSortedGroups(getData().getReadonlyAccessGroupIds());
-      readonlyAccessGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
+      final Collection<GroupDO> readOnlyAccessGroups = new GroupsProvider().getSortedGroups(getData().getReadOnlyAccessGroupIds());
+      readOnlyAccessGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
           groupsProvider.getSortedGroups());
       if (readOnlyAccessGroups != null) {
         for (final GroupDO group : readOnlyAccessGroups) {
-          readonlyAccessGroupsListHelper.addOriginalAssignedItem(group).assignItem(group);
+          readOnlyAccessGroupsListHelper.addOriginalAssignedItem(group).assignItem(group);
         }
       }
       final Select2MultiChoice<GroupDO> groups = new Select2MultiChoice<GroupDO>(fs.getSelect2MultiChoiceId(),
-          new PropertyModel<Collection<GroupDO>>(this.readonlyAccessGroupsListHelper, "assignedItems"), groupsProvider);
+          new PropertyModel<Collection<GroupDO>>(this.readOnlyAccessGroupsListHelper, "assignedItems"), groupsProvider);
       fs.add(groups);
+      fsRoot.add(fs);
 
+      fsRo = gridBuilder.newFieldset("", getString("plugins.skillmatrix.skill.inherited")).setLabelFor(groups);
+      fsRo.setOutputMarkupId(true);
+      labelReadOnlyModel = new Model<String>("");
+      labelReadOnly = new Label ("labelReadOnly", labelReadOnlyModel);
+      labelReadOnly.setOutputMarkupId(true);
+      fsRo.add(labelReadOnly);
+      fsRo.getFieldset().setOutputMarkupId(true);
       if (getData().getParent() != null) {
-        final FieldsetPanel fs2 = gridBuilder.newFieldset("", getString("plugins.skillmatrix.skill.inherited")).setLabelFor(groups);
-        final Label label = new Label ( "1", getGroupnames( skillRight.getReadonlyAccessGroupIds(getData().getParent())));
-        fs2.add(label);
+        labelReadOnlyModel.setObject(getGroupnames( skillRight.getReadOnlyAccessGroupIds(getData().getParent())));
       }
+      fsRoot.add(fsRo);
     }
 
     gridBuilder.newGridPanel();
