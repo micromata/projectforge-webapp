@@ -373,5 +373,13 @@ public class SkillSelectPanel extends AbstractSelectPanel<SkillDO> implements Co
   public SkillTree getSkillTree() {
     return skillDao.getSkillTree();
   }
+
+  /**
+   * @return the currentSkillId
+   */
+  public Integer getCurrentSkillId()
+  {
+    return currentSkillId;
+  }
 }
 
