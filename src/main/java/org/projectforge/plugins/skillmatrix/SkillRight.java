@@ -81,7 +81,7 @@ public class SkillRight extends UserRightAccessCheck<SkillDO>
       return true;
     }
     if (operationType == OperationType.SELECT) {
-      return (hasFullAccess(skill, user.getId()) == true) || (hasReadonlyAccess(skill, user.getId()) == true);
+      return (hasFullAccess(skill, user.getId()) == true) || (hasReadOnlyAccess(skill, user.getId()) == true);
     }
     return hasFullAccess(skill, user.getId());
   }
@@ -92,9 +92,9 @@ public class SkillRight extends UserRightAccessCheck<SkillDO>
     return hasAccess(groupIds, userId);
   }
 
-  public boolean hasReadonlyAccess(final SkillDO skill, final Integer userId)
+  public boolean hasReadOnlyAccess(final SkillDO skill, final Integer userId)
   {
-    final Integer[] groupIds = getReadonlyAccessGroupIds(skill);
+    final Integer[] groupIds = getReadOnlyAccessGroupIds(skill);
     return hasAccess(groupIds, userId);
   }
 
@@ -129,17 +129,17 @@ public class SkillRight extends UserRightAccessCheck<SkillDO>
     getFullAccessGroupIds(groupIds, skill.getParent());
   }
 
-  public Integer[] getReadonlyAccessGroupIds(final SkillDO skill)
+  public Integer[] getReadOnlyAccessGroupIds(final SkillDO skill)
   {
     final Set<Integer> result = new HashSet<Integer>();
-    getReadonlyAccessGroupIds(result, skill);
+    getReadOnlyAccessGroupIds(result, skill);
     return result.toArray(new Integer[0]);
   }
 
-  private void getReadonlyAccessGroupIds(final Set<Integer> groupIds, final SkillDO skill)
+  private void getReadOnlyAccessGroupIds(final Set<Integer> groupIds, final SkillDO skill)
   {
-    if (StringUtils.isNotBlank(skill.getReadonlyAccessGroupIds()) == true) {
-      final Collection<GroupDO> groups = new GroupsProvider().getSortedGroups(skill.getReadonlyAccessGroupIds());
+    if (StringUtils.isNotBlank(skill.getReadOnlyAccessGroupIds()) == true) {
+      final Collection<GroupDO> groups = new GroupsProvider().getSortedGroups(skill.getReadOnlyAccessGroupIds());
       if (groups != null) {
         for (final GroupDO group : groups) {
           groupIds.add(group.getId());
@@ -149,6 +149,6 @@ public class SkillRight extends UserRightAccessCheck<SkillDO>
     if (skill.getParent() == null) {
       return;
     }
-    getReadonlyAccessGroupIds(groupIds, skill.getParent());
+    getReadOnlyAccessGroupIds(groupIds, skill.getParent());
   }
 }

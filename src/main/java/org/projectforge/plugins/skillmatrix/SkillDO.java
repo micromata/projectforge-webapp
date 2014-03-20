@@ -75,7 +75,7 @@ public class SkillDO extends DefaultBaseDO
   @PropertyInfo(i18nKey = "plugins.skillmatrix.skill.rateable")
   private boolean rateable = true;
 
-  private String fullAccessGroupIds, readonlyAccessGroupIds;
+  private String fullAccessGroupIds, readOnlyAccessGroupIds;
 
   @Column(length = 100)
   public String getTitle()
@@ -189,21 +189,21 @@ public class SkillDO extends DefaultBaseDO
 
   /**
    * Members of these groups have full read-only access to this skill and related trainings.
-   * @return the readonlyAccessGroupIds
+   * @return the readOnlyAccessGroupIds
    */
   @Column(name = "readonly_access_group_ids", nullable = true)
-  public String getReadonlyAccessGroupIds()
+  public String getReadOnlyAccessGroupIds()
   {
-    return readonlyAccessGroupIds;
+    return readOnlyAccessGroupIds;
   }
 
   /**
-   * @param readonlyAccessGroupIds the readonlyAccessGroupIds to set
+   * @param readOnlyAccessGroupIds the readOnlyAccessGroupIds to set
    * @return this for chaining.
    */
-  public SkillDO setReadonlyAccessGroupIds(final String readonlyAccessGroupIds)
+  public SkillDO setReadOnlyAccessGroupIds(final String readonlyAccessGroupIds)
   {
-    this.readonlyAccessGroupIds = readonlyAccessGroupIds;
+    this.readOnlyAccessGroupIds = readonlyAccessGroupIds;
     return this;
   }
 

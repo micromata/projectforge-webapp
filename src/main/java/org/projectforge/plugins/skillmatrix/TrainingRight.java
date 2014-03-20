@@ -75,7 +75,7 @@ public class TrainingRight extends UserRightAccessCheck<TrainingDO>
     }
     if (operationType == OperationType.SELECT) {
       return (hasAccess(StringHelper.splitToIntegers(training.getSkill().getFullAccessGroupIds(), ","), user.getId()) == true)
-          || (hasAccess(StringHelper.splitToIntegers(training.getSkill().getReadonlyAccessGroupIds(), ","), user.getId()) == true);
+          || (hasAccess(StringHelper.splitToIntegers(training.getSkill().getReadOnlyAccessGroupIds(), ","), user.getId()) == true);
     }
     return hasAccess(StringHelper.splitToIntegers(training.getSkill().getFullAccessGroupIds(), ","), user.getId());
   }

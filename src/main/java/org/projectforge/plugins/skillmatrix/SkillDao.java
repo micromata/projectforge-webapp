@@ -204,12 +204,12 @@ public class SkillDao extends BaseDao<SkillDO>
    */
   public void setReadonlyAccessGroups(final SkillDO skill, final Collection<GroupDO> readonlyAccessGroups)
   {
-    skill.setReadonlyAccessGroupIds(new GroupsProvider().getGroupIds(readonlyAccessGroups));
+    skill.setReadOnlyAccessGroupIds(new GroupsProvider().getGroupIds(readonlyAccessGroups));
   }
 
   public Collection<GroupDO> getSortedReadonlyAccessGroups(final SkillDO skill)
   {
-    return new GroupsProvider().getSortedGroups(skill.getReadonlyAccessGroupIds());
+    return new GroupsProvider().getSortedGroups(skill.getReadOnlyAccessGroupIds());
   }
 
 }
