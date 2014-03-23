@@ -53,6 +53,8 @@ public class TrainingSelectPanel extends AbstractSelectPanel<TrainingDO> impleme
 
   private static final String USER_PREF_KEY_RECENT_TRAININGS = "TrainingSelectPanel:recentTrainings";
 
+  private boolean defaultFormProcessing = false;
+
   @SpringBean(name = "trainingDao")
   private TrainingDao trainingDao;
 
@@ -272,5 +274,14 @@ public class TrainingSelectPanel extends AbstractSelectPanel<TrainingDO> impleme
     WicketUtils.setFocus(this.trainingTextField);
     return this;
   }
-  
+
+  /**
+   * Should be called before init() method. If true, then the validation will be done after submitting.
+   * @param defaultFormProcessing
+   */
+  public void setDefaultFormProcessing(final boolean defaultFormProcessing)
+  {
+    this.defaultFormProcessing = defaultFormProcessing;
+  }
+
 }

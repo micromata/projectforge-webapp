@@ -13,7 +13,11 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.projectforge.core.BaseDao;
+import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.core.QueryFilter;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.UserRightId;
 import org.projectforge.web.user.GroupsProvider;
@@ -117,5 +121,31 @@ public class TrainingDao extends BaseDao<TrainingDO>
   public Collection<GroupDO> getSortedReadonlyAccessGroups(final TrainingDO training)
   {
     return new GroupsProvider().getSortedGroups(training.getReadonlyAccessGroupIds());
+  }
+
+  @Override
+  public List<TrainingDO> getList(final BaseSearchFilter filter)
+  {
+    final TrainingFilter myFilter;
+    if (filter instanceof TrainingFilter) {
+      myFilter = (TrainingFilter) filter;
+    } else {
+      myFilter = new TrainingFilter(filter);
+    }
+    final QueryFilter queryFilter = new QueryFilter(myFilter);
+    final String searchString = myFilter.getSearchString();
+
+    if (myFilter.getSkillId() != null) {
+      final SkillDO skill = new SkillDO();
+      skill.setId(myFilter.getSkillId());
+      queryFilter.add(Restrictions.eq("skill", skill));
+    }
+    if (myFilter.getTrainingId() != null) {
+      queryFilter.add(Restrictions.eq("id", myFilter.getTrainingId()));
+    }
+    queryFilter.addOrder(Order.desc("created"));
+    final List<TrainingDO> list = getList(queryFilter);
+    myFilter.setSearchString(searchString); // Restore search string.
+    return list;
   }
 }

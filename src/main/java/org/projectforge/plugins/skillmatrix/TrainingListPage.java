@@ -49,7 +49,6 @@ IListPageColumnsCreator<TrainingDO>
     super(parameters, I18N_KEY_PREFIX);
   }
 
-
   /**
    * @see org.projectforge.web.wicket.IListPageColumnsCreator#createColumns(org.apache.wicket.markup.html.WebPage, boolean)
    */
@@ -125,6 +124,39 @@ IListPageColumnsCreator<TrainingDO>
   protected TrainingListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new TrainingListForm(this);
+  }
+
+  /*
+   * @see org.projectforge.web.wicket.AbstractListPage#select(java.lang.String, java.lang.Object)
+   */
+  @Override
+  public void select(final String property, final Object selectedValue)
+  {
+    if ("skillId".equals(property) == true) {
+      form.getSearchFilter().setSkillId((Integer) selectedValue);
+      refresh();
+    } else if ("trainingId".equals(property) == true) {
+      form.getSearchFilter().setTrainingId((Integer) selectedValue);
+      refresh();
+    } else
+      super.select(property, selectedValue);
+  }
+
+  /**
+   * 
+   * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
+   */
+  @Override
+  public void unselect(final String property)
+  {
+    if ("skillId".equals(property) == true) {
+      form.getSearchFilter().setSkillId(null);
+      refresh();
+    } else if ("trainingId".equals(property) == true) {
+      form.getSearchFilter().setTrainingId(null);
+      refresh();
+    }
+    super.unselect(property);
   }
 
 }

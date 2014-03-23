@@ -26,7 +26,11 @@ package org.projectforge.plugins.skillmatrix;
 import java.io.Serializable;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.model.Model;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.bootstrap.GridSize;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
  * The list formular for the list view.
@@ -38,6 +42,12 @@ public class TrainingListForm extends AbstractListForm<TrainingFilter, TrainingL
   private static final long serialVersionUID = 1284459106693285166L;
   private static final Logger log = Logger.getLogger(TrainingListForm.class);
 
+  @SpringBean(name = "trainingDao")
+  private TrainingDao trainingDao;
+
+  @SpringBean(name = "skillDao")
+  private SkillDao skillDao;
+
   /**
    * @param parentPage
    */
@@ -46,12 +56,61 @@ public class TrainingListForm extends AbstractListForm<TrainingFilter, TrainingL
     super(parentPage);
   }
 
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
     super.init();
+    gridBuilder.newSplitPanel(GridSize.COL33);
     {
-      gridBuilder.newGridPanelId();
+      // Skill
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.skillrating.skill"));
+      final SkillTextSelectPanel skillSelectPanel = new SkillTextSelectPanel(fs.newChildId(), new Model<SkillDO>() {
+        @Override
+        public SkillDO getObject()
+        {
+          return skillDao.getById(getSearchFilter().getSkillId());
+        }
+        @Override
+        public void setObject(final SkillDO object)
+        {
+          if (object == null) {
+            getSearchFilter().setSkillId(null);
+          } else {
+            getSearchFilter().setSkillId(object.getId());
+          }
+        }
+      }, parentPage, "skillId");
+      fs.add(skillSelectPanel);
+      skillSelectPanel.setDefaultFormProcessing(false);
+      skillSelectPanel.init().withAutoSubmit(true);
+    }
+
+    gridBuilder.newSplitPanel(GridSize.COL33);
+    {
+      // Training
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.skilltraining.training"));
+      final TrainingSelectPanel trainingSelectPanel = new TrainingSelectPanel(fs.newChildId(), new Model<TrainingDO>() {
+        @Override
+        public TrainingDO getObject()
+        {
+          return trainingDao.getById(getSearchFilter().getTrainingId());
+        }
+
+        @Override
+        public void setObject(final TrainingDO object)
+        {
+          if (object == null) {
+            getSearchFilter().setTrainingId(null);
+          } else {
+            getSearchFilter().setTrainingId(object.getId());
+          }
+        }
+      }, parentPage, "trainingId");
+
+      fs.add(trainingSelectPanel);
+      trainingSelectPanel.setDefaultFormProcessing(false);
+      trainingSelectPanel.init().withAutoSubmit(true);
     }
   }
 
