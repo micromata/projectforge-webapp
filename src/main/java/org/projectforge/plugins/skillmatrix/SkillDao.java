@@ -212,4 +212,16 @@ public class SkillDao extends BaseDao<SkillDO>
     return new GroupsProvider().getSortedGroups(skill.getReadOnlyAccessGroupIds());
   }
 
+  @SuppressWarnings("unchecked")
+  public SkillDO getSkill(final String title)
+  {
+    if (title == null) {
+      return null;
+    }
+    final List<SkillDO> list = getHibernateTemplate().find("from SkillDO u where u.title = ?", title);
+    if (CollectionUtils.isEmpty(list) == true) {
+      return null;
+    }
+    return list.get(0);
+  }
 }
