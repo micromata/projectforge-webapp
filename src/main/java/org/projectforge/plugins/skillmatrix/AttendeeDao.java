@@ -9,7 +9,14 @@
 
 package org.projectforge.plugins.skillmatrix;
 
+import java.util.List;
+
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.projectforge.core.BaseDao;
+import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.core.QueryFilter;
+import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRightId;
 
@@ -27,10 +34,8 @@ public class AttendeeDao extends BaseDao<AttendeeDO>
 
   public static final UserRightId USER_RIGHT_ID = new UserRightId(UNIQUE_PLUGIN_ID, "plugin20", I18N_KEY_SKILL_PREFIX);
 
-  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "attendee.firstname", "attendee.lastname","training.title",
+  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "attendee.firstname", "attendee.lastname", "attendee.username", "training.title",
     "training.skill.title", "rating", "certificate" };
-
-  // private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AttendeeDao.class);
 
   private TrainingDao trainingDao;
   private UserDao userDao;
@@ -73,5 +78,33 @@ public class AttendeeDao extends BaseDao<AttendeeDO>
   {
     this.userDao = userDao;
     return this;
+  }
+
+  @Override
+  public List<AttendeeDO> getList(final BaseSearchFilter filter)
+  {
+    final AttendeeFilter myFilter;
+    if (filter instanceof AttendeeFilter) {
+      myFilter = (AttendeeFilter) filter;
+    } else {
+      myFilter = new AttendeeFilter(filter);
+    }
+    final QueryFilter queryFilter = new QueryFilter(myFilter);
+    final String searchString = myFilter.getSearchString();
+
+    if (myFilter.getAttendeeId() != null) {
+      final PFUserDO attendee = new PFUserDO();
+      attendee.setId(myFilter.getAttendeeId());
+      queryFilter.add(Restrictions.eq("attendee", attendee));
+    }
+    if (myFilter.getTrainingId() != null) {
+      final TrainingDO training = new TrainingDO();
+      training.setId(myFilter.getTrainingId());
+      queryFilter.add(Restrictions.eq("training", training));
+    }
+    queryFilter.addOrder(Order.desc("created"));
+    final List<AttendeeDO> list = getList(queryFilter);
+    myFilter.setSearchString(searchString); // Restore search string.
+    return list;
   }
 }

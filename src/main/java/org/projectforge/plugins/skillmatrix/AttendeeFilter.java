@@ -19,8 +19,16 @@ public class AttendeeFilter extends BaseSearchFilter
 {
   private static final long serialVersionUID = 1278054558397436842L;
 
-  private Integer attendeeId, skillId, trainingId;
+  private Integer attendeeId, trainingId;
 
+  public AttendeeFilter()
+  {
+  }
+
+  public AttendeeFilter(final BaseSearchFilter filter)
+  {
+    super(filter);
+  }
   /**
    * @return the attendeeId
    */
@@ -36,24 +44,6 @@ public class AttendeeFilter extends BaseSearchFilter
   public AttendeeFilter setAttendeeId(final Integer attendeeId)
   {
     this.attendeeId = attendeeId;
-    return this;
-  }
-
-  /**
-   * @return the skillId
-   */
-  public Integer getSkillId()
-  {
-    return skillId;
-  }
-
-  /**
-   * @param skillId the skillId to set
-   * @return this for chaining.
-   */
-  public AttendeeFilter setSkillId(final Integer skillId)
-  {
-    this.skillId = skillId;
     return this;
   }
 

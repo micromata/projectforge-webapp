@@ -130,6 +130,40 @@ IListPageColumnsCreator<AttendeeDO>
   }
 
   /**
+   * @see org.projectforge.web.wicket.AbstractListPage#select(java.lang.String, java.lang.Object)
+   */
+  @Override
+  public void select(final String property, final Object selectedValue)
+  {
+    if ("attendeeId".equals(property) == true) {
+      form.getSearchFilter().setAttendeeId((Integer) selectedValue);
+      refresh();
+    } else if ("trainingId".equals(property) == true) {
+      form.getSearchFilter().setTrainingId((Integer) selectedValue);
+      refresh();
+    } else {
+      super.select(property, selectedValue);
+    }
+  }
+
+  /**
+   * 
+   * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
+   */
+  @Override
+  public void unselect(final String property)
+  {
+    if ("attendeeId".equals(property) == true) {
+      form.getSearchFilter().setAttendeeId(null);
+      refresh();
+    } else if ("trainingId".equals(property) == true) {
+      form.getSearchFilter().setTrainingId(null);
+      refresh();
+    } else {
+      super.unselect(property);
+    }
+  }
+  /**
    * @see org.projectforge.web.wicket.AbstractListPage#newListForm(org.projectforge.web.wicket.AbstractListPage)
    */
   @Override
