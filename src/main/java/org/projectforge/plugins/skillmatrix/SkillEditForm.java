@@ -26,7 +26,6 @@ package org.projectforge.plugins.skillmatrix;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -39,7 +38,6 @@ import org.projectforge.web.common.MultiChoiceListHelper;
 import org.projectforge.web.user.GroupsComparator;
 import org.projectforge.web.user.GroupsProvider;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.bootstrap.GridType;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
@@ -100,15 +98,6 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
         }
 
         /**
-         * @see org.projectforge.plugins.skillmatrix.SkillSelectPanel#onModelSelected(org.apache.wicket.ajax.AjaxRequestTarget, org.projectforge.plugins.skillmatrix.SkillDO)
-         */
-        @Override
-        protected void onModelSelected(final AjaxRequestTarget target, final SkillDO skillDo)
-        {
-          super.onModelSelected(target, skillDo);
-          setLabels(skillDo);
-        }
-        /**
          * @see org.projectforge.plugins.skillmatrix.SkillSelectPanel#onBeforeRender()
          */
         @Override
@@ -126,15 +115,16 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
         fs.setVisible(false);
       } else {
         parentSelectPanel.setRequired(true);
+        parentSelectPanel.setFocus();
       }
     }
 
     {
       // Title of skill
       final FieldsetPanel fs = gridBuilder.newFieldset(SkillDO.class, "title");
-      final RequiredMaxLengthTextField titleField = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
+      final RequiredMaxLengthTextField titleField =  new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
           "title"));
-      WicketUtils.setFocus(titleField);
+
       fs.add(titleField);
     }
 
@@ -229,8 +219,8 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
     String s ="";
     final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
     for (final Integer id : ids) {
-      s += userGroupCache.getGroupname(id) + " ";
+      s += userGroupCache.getGroupname(id) + ", ";
     }
-    return s;
+    return s.substring(0, s.lastIndexOf(", "));
   }
 }
