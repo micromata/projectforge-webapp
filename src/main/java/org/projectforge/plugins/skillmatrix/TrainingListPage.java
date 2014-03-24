@@ -39,7 +39,7 @@ IListPageColumnsCreator<TrainingDO>
 
   private static final long serialVersionUID = -6016271633747836684L;
 
-  public static final String I18N_KEY_PREFIX = "plugins.skillmatrix";
+  public static final String I18N_KEY_PREFIX = "plugins.skillmatrix.skilltraining";
 
   @SpringBean(name = "trainingDao")
   private TrainingDao trainingDao;
