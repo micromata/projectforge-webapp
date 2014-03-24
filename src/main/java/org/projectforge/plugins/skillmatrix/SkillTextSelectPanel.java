@@ -75,6 +75,7 @@ public class SkillTextSelectPanel extends AbstractSelectPanel<SkillDO> implement
   public SkillTextSelectPanel(final String id, final IModel<SkillDO> model, final ISelectCallerPage caller, final String selectProperty)
   {
     super(id, model, caller, selectProperty);
+
     skillTextField = new PFAutoCompleteTextField<SkillDO>("skillField", getModel()) {
       @Override
       protected List<SkillDO> getChoices(final String input)
@@ -284,6 +285,17 @@ public class SkillTextSelectPanel extends AbstractSelectPanel<SkillDO> implement
   public boolean isDefaultFormProcessing()
   {
     return defaultFormProcessing;
+  }
+
+  /**
+   * @return the currentSkillId
+   */
+  public Integer getCurrentSkillId()
+  {
+    if (currentSkill != null && currentSkill.getId() != null)
+      return currentSkill.getId();
+    else
+      return -1;
   }
 
 }
