@@ -74,10 +74,10 @@ public class TrainingRight extends UserRightAccessCheck<TrainingDO>
       return true;
     }
     if (operationType == OperationType.SELECT) {
-      return (hasAccess(StringHelper.splitToIntegers(training.getSkill().getFullAccessGroupIds(), ","), user.getId()) == true)
-          || (hasAccess(StringHelper.splitToIntegers(training.getSkill().getReadOnlyAccessGroupIds(), ","), user.getId()) == true);
+      return (hasAccess(StringHelper.splitToIntegers(training.getFullAccessGroupIds(), ","), user.getId()) == true)
+          || (hasAccess(StringHelper.splitToIntegers(training.getReadOnlyAccessGroupIds(), ","), user.getId()) == true);
     }
-    return hasAccess(StringHelper.splitToIntegers(training.getSkill().getFullAccessGroupIds(), ","), user.getId());
+    return hasAccess(StringHelper.splitToIntegers(training.getFullAccessGroupIds(), ","), user.getId());
   }
 
   private boolean hasAccess(final Integer[] groupIds, final Integer userId)
