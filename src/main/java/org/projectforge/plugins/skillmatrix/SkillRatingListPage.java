@@ -66,7 +66,7 @@ IListPageColumnsCreator<SkillRatingDO>
 
   public SkillRatingListPage(final PageParameters parameters)
   {
-    super(parameters, "plugins.skillmatrix");
+    super(parameters, "plugins.skillmatrix.rating");
   }
 
   /**
