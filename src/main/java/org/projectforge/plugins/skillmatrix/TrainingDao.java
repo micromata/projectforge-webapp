@@ -113,14 +113,14 @@ public class TrainingDao extends BaseDao<TrainingDO>
    * @param training
    * @param readonlyAccessGroups
    */
-  public void setReadonlyAccessGroups(final TrainingDO training, final Collection<GroupDO> readonlyAccessGroups)
+  public void setReadOnlyAccessGroups(final TrainingDO training, final Collection<GroupDO> readonlyAccessGroups)
   {
-    training.setReadonlyAccessGroupIds(new GroupsProvider().getGroupIds(readonlyAccessGroups));
+    training.setReadOnlyAccessGroupIds(new GroupsProvider().getGroupIds(readonlyAccessGroups));
   }
 
-  public Collection<GroupDO> getSortedReadonlyAccessGroups(final TrainingDO training)
+  public Collection<GroupDO> getSortedReadOnlyAccessGroups(final TrainingDO training)
   {
-    return new GroupsProvider().getSortedGroups(training.getReadonlyAccessGroupIds());
+    return new GroupsProvider().getSortedGroups(training.getReadOnlyAccessGroupIds());
   }
 
   @Override

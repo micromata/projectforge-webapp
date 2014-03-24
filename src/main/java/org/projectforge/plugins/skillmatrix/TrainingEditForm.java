@@ -133,7 +133,7 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.readonlyAccess"),
           getString("plugins.teamcal.access.groups"));
       final GroupsProvider groupsProvider = new GroupsProvider();
-      final Collection<GroupDO> readOnlyAccessGroups = new GroupsProvider().getSortedGroups(getData().getReadonlyAccessGroupIds());
+      final Collection<GroupDO> readOnlyAccessGroups = new GroupsProvider().getSortedGroups(getData().getReadOnlyAccessGroupIds());
       readonlyAccessGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
           groupsProvider.getSortedGroups());
       if (readOnlyAccessGroups != null) {

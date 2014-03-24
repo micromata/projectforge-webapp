@@ -122,7 +122,7 @@ public class TrainingEditPage extends AbstractEditPage<TrainingDO, TrainingEditF
   public AbstractSecuredBasePage onSaveOrUpdate()
   {
     trainingDao.setFullAccessGroups(getData(), form.fullAccessGroupsListHelper.getAssignedItems());
-    trainingDao.setReadonlyAccessGroups(getData(), form.readonlyAccessGroupsListHelper.getAssignedItems());
+    trainingDao.setReadOnlyAccessGroups(getData(), form.readonlyAccessGroupsListHelper.getAssignedItems());
     return super.onSaveOrUpdate();
   }
 }
