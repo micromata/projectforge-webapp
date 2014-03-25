@@ -25,6 +25,7 @@ package org.projectforge.plugins.skillmatrix;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.form.FormComponent;
@@ -33,7 +34,11 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.validator.AbstractValidator;
+import org.projectforge.registry.Registry;
 import org.projectforge.user.GroupDO;
+import org.projectforge.user.PFUserContext;
+import org.projectforge.user.UserDao;
+import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.common.MultiChoiceListHelper;
 import org.projectforge.web.user.GroupsComparator;
 import org.projectforge.web.user.GroupsProvider;
@@ -66,13 +71,20 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
   @SpringBean(name = "skillDao")
   private SkillDao skillDao;
 
+  @SpringBean(name = "userDao")
+  private UserDao userDao;
+
   private final FormComponent< ? >[] dependentFormComponents = new FormComponent[1];
 
   private TextField<String> valuesRating;
 
   private TextField<String> valuesCertificate;
 
+  private Collection<GroupDO> curUserGroups;
+
   MultiChoiceListHelper<GroupDO> fullAccessGroupsListHelper, readonlyAccessGroupsListHelper;
+
+  PropertyModel<Collection<GroupDO>> fullAccessModel;
 
   /**
    * @param parentPage
@@ -89,24 +101,43 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
   {
     super.init();
 
+    curUserGroups = new HashSet<GroupDO>();
+
     gridBuilder.newSplitPanel(GridSize.COL50);
 
-    { // Title of skill
+    { // Skill
+      final FieldsetPanel fs = gridBuilder.newFieldset(TrainingDO.class, "skill");
+      final SkillTextSelectPanel parentSelectPanel = new SkillTextSelectPanel(fs.newChildId(), new PropertyModel<SkillDO>(data, "skill"), parentPage, "skillId") {
+        /**
+         * @see org.projectforge.web.wicket.AbstractSelectPanel#onBeforeRender()
+         */
+        @Override
+        protected void onBeforeRender()
+        {
+          super.onBeforeRender();
+          Collection<Integer> assignedGroups = new HashSet<Integer>();
+          assignedGroups = userDao.getAssignedGroups(PFUserContext.getUser());
+          final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
+          curUserGroups.clear();
+          for (final Integer assignedGroup: assignedGroups) {
+            curUserGroups.add(userGroupCache.getGroup(assignedGroup));
+          }
+          fullAccessModel.setObject(curUserGroups);
+        }
+      };
+      fs.add(parentSelectPanel);
+      parentSelectPanel.setRequired(true);
+      //fs.getFieldset().setOutputMarkupId(true);
+      parentSelectPanel.init();
+    }
+
+    { // Title of training
       final FieldsetPanel fs = gridBuilder.newFieldset(TrainingDO.class, "title");
       final RequiredMaxLengthTextField titleField = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
           "title"));
       WicketUtils.setFocus(titleField);
       fs.add(titleField);
       dependentFormComponents[0] = titleField;
-    }
-
-    { // Skill
-      final FieldsetPanel fs = gridBuilder.newFieldset(TrainingDO.class, "skill");
-      final SkillSelectPanel parentSelectPanel = new SkillSelectPanel(fs, new PropertyModel<SkillDO>(data, "skill"), parentPage, "skillId");
-      fs.add(parentSelectPanel);
-      parentSelectPanel.setRequired(true);
-      //fs.getFieldset().setOutputMarkupId(true);
-      parentSelectPanel.init();
     }
 
     gridBuilder.newSplitPanel(GridSize.COL50);
@@ -124,8 +155,9 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
           fullAccessGroupsListHelper.addOriginalAssignedItem(group).assignItem(group);
         }
       }
+      fullAccessModel = new PropertyModel<Collection<GroupDO>> (this.fullAccessGroupsListHelper, "assignedItems");
       final Select2MultiChoice<GroupDO> groups = new Select2MultiChoice<GroupDO>(fs.getSelect2MultiChoiceId(),
-          new PropertyModel<Collection<GroupDO>>(this.fullAccessGroupsListHelper, "assignedItems"), groupsProvider);
+          fullAccessModel, groupsProvider);
       fs.add(groups);
     }
     {
@@ -147,7 +179,7 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
     }
 
     gridBuilder.newGridPanel();
-    { // Descritption
+    { // Description
       final FieldsetPanel fs = gridBuilder.newFieldset(TrainingDO.class, "description");
       fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "description"))).setAutogrow();
     }
