@@ -73,8 +73,8 @@ public class AttendeeRight extends UserRightAccessCheck<AttendeeDO>
       return true;
     }
     if (operationType == OperationType.SELECT) {
-      return (hasAccess(StringHelper.splitToIntegers(attendee.getTraining().getFullAccessGroupIds(), ","), user.getId()) == true)
-          || (hasAccess(StringHelper.splitToIntegers(attendee.getTraining().getReadOnlyAccessGroupIds(), ","), user.getId()) == true);
+      return (hasAccess(StringHelper.splitToIntegers(attendee.getTraining().getReadOnlyAccessGroupIds(), ","), user.getId()) == true)
+          || ( user.getId() == attendee.getAttendeeId());
     }
     return hasAccess(StringHelper.splitToIntegers(attendee.getTraining().getFullAccessGroupIds(), ","), user.getId());
   }
