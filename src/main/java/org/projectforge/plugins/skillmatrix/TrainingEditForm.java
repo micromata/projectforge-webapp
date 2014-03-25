@@ -42,6 +42,7 @@ import org.projectforge.web.common.MultiChoiceListHelper;
 import org.projectforge.web.user.GroupsComparator;
 import org.projectforge.web.user.GroupsProvider;
 import org.projectforge.web.wicket.AbstractEditForm;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
@@ -95,28 +96,33 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
     super.init();
 
     gridBuilder.newSplitPanel(GridSize.COL50);
-    { // Skill
-      final FieldsetPanel fs = gridBuilder.newFieldset(TrainingDO.class, "skill");
-      final SkillTextSelectPanel parentSelectPanel = new SkillTextSelectPanel(fs.newChildId(), new PropertyModel<SkillDO>(data, "skill"), parentPage, "skillId");
-      fs.add(parentSelectPanel);
-      parentSelectPanel.setRequired(true);
-      parentSelectPanel.setFocus();
-      parentSelectPanel.setDefaultFormProcessing(false);
-      parentSelectPanel.init();
-    }
 
-    { // Title of training
-      final FieldsetPanel fs = gridBuilder.newFieldset(TrainingDO.class, "title");
-      final RequiredMaxLengthTextField titleField = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
-          "title"));
-      fs.add(titleField);
-      dependentFormComponents[0] = titleField;
+    // Skill
+    FieldsetPanel fs = gridBuilder.newFieldset(TrainingDO.class, "skill");
+    final SkillTextSelectPanel parentSelectPanel = new SkillTextSelectPanel(fs.newChildId(), new PropertyModel<SkillDO>(data, "skill"), parentPage, "skillId");
+    fs.add(parentSelectPanel);
+    parentSelectPanel.setRequired(true);
+    parentSelectPanel.setFocus();
+    parentSelectPanel.setDefaultFormProcessing(false);
+    parentSelectPanel.init();
+
+    // Title of training
+    fs = gridBuilder.newFieldset(TrainingDO.class, "title");
+    final RequiredMaxLengthTextField titleField = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
+        "title"));
+    fs.add(titleField);
+    dependentFormComponents[0] = titleField;
+
+    if (isNew() == true) {
+      parentSelectPanel.setFocus();
+    } else {
+      WicketUtils.setFocus(titleField);
     }
 
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Full access groups
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess"),
+      fs = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess"),
           getString("plugins.teamcal.access.groups"));
       final GroupsProvider groupsProvider = new GroupsProvider();
       final Collection<GroupDO> fullAccessGroups = new GroupsProvider().getSortedGroups(getData().getFullAccessGroupIds());
@@ -158,7 +164,7 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
 
     {
       // Read-only access groups
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.readonlyAccess"),
+      fs = gridBuilder.newFieldset(getString("plugins.teamcal.readonlyAccess"),
           getString("plugins.teamcal.access.groups"));
       final GroupsProvider groupsProvider = new GroupsProvider();
       final Collection<GroupDO> readOnlyAccessGroups = new GroupsProvider().getSortedGroups(getData().getReadOnlyAccessGroupIds());
@@ -176,26 +182,29 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
     }
 
     gridBuilder.newGridPanel();
-    { // Description
-      final FieldsetPanel fs = gridBuilder.newFieldset(TrainingDO.class, "description");
+    {
+      // Description
+      fs = gridBuilder.newFieldset(TrainingDO.class, "description");
       fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "description"))).setAutogrow();
     }
 
-    { // startDate
-      final FieldsetPanel fs = gridBuilder.newFieldset(TrainingDO.class, "startDate");
+    {
+      // startDate
+      fs = gridBuilder.newFieldset(TrainingDO.class, "startDate");
       fs.add(new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "startDate"), DatePanelSettings.get().withTargetType(
           java.sql.Date.class)));
     }
 
-    { // EndDate
-      final FieldsetPanel fs = gridBuilder.newFieldset(TrainingDO.class, "endDate");
+    {
+      // EndDate
+      fs = gridBuilder.newFieldset(TrainingDO.class, "endDate");
       fs.add(new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "endDate"), DatePanelSettings.get().withTargetType(
           java.sql.Date.class)));
-
     }
 
-    { // Rating
-      final FieldsetPanel fs = gridBuilder.newFieldset(TrainingDO.class, "rating");
+    {
+      // Rating
+      fs = gridBuilder.newFieldset(TrainingDO.class, "rating");
       valuesRating = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "rating"));
       fs.addHelpIcon(getString("plugins.marketing.addressCampaign.values.format"));
       fs.add(valuesRating);
@@ -212,8 +221,9 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
       });
     }
 
-    { // Certificate
-      final FieldsetPanel fs = gridBuilder.newFieldset(TrainingDO.class, "certificate");
+    {
+      // Certificate
+      fs = gridBuilder.newFieldset(TrainingDO.class, "certificate");
       valuesCertificate = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "certificate"));
       fs.addHelpIcon(getString("plugins.marketing.addressCampaign.values.format"));
       fs.add(valuesCertificate);

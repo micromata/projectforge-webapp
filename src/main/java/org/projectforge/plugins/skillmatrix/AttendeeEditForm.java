@@ -73,28 +73,34 @@ public class AttendeeEditForm extends AbstractEditForm<AttendeeDO, AttendeeEditP
 
     gridBuilder.newSplitPanel(GridSize.COL50);
 
-    { // Training
-      final FieldsetPanel fs = gridBuilder.newFieldset(AttendeeDO.class, "training");
-      TrainingDO training = data.getTraining();
-      if (Hibernate.isInitialized(training) == false) {
-        training = attendeeDao.getTraingDao().getOrLoad(training.getId());
-        data.setTraining(training);
-      }
-      final TrainingSelectPanel trainingSelectPanel = new TrainingSelectPanel(fs.newChildId(), new PropertyModel<TrainingDO>(data, "training"),
-          parentPage, "trainingId").init();
-      fs.add(trainingSelectPanel.setFocus().setRequired(true));
+    // Training
+    FieldsetPanel fs = gridBuilder.newFieldset(AttendeeDO.class, "training");
+    TrainingDO training = data.getTraining();
+    if (Hibernate.isInitialized(training) == false) {
+      training = attendeeDao.getTraingDao().getOrLoad(training.getId());
+      data.setTraining(training);
     }
+    final TrainingSelectPanel trainingSelectPanel = new TrainingSelectPanel(fs.newChildId(), new PropertyModel<TrainingDO>(data, "training"),
+        parentPage, "trainingId").init();
+    trainingSelectPanel.setRequired(true);
+    fs.add(trainingSelectPanel);
 
-    { // Attendee
-      final FieldsetPanel fs = gridBuilder.newFieldset(AttendeeDO.class, "attendee");
-      PFUserDO attendee = data.getAttendee();
-      if (Hibernate.isInitialized(attendee) == false) {
-        attendee = attendeeDao.getUserDao().getOrLoad(attendee.getId());
-        data.setAttendee(attendee);
-      }
-      final UserSelectPanel attendeeSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(data, "attendee"),
-          parentPage, "attendeeId").init();
-      fs.add(attendeeSelectPanel.setRequired(true));
+    // Attendee
+    fs = gridBuilder.newFieldset(AttendeeDO.class, "attendee");
+    PFUserDO attendee = data.getAttendee();
+    if (Hibernate.isInitialized(attendee) == false) {
+      attendee = attendeeDao.getUserDao().getOrLoad(attendee.getId());
+      data.setAttendee(attendee);
+    }
+    final UserSelectPanel attendeeSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(data, "attendee"),
+        parentPage, "attendeeId").init();
+    fs.add(attendeeSelectPanel.setRequired(true));
+
+    if (isNew() == true) {
+      trainingSelectPanel.setFocus();
+    } else {
+      attendeeSelectPanel.setFocus();
+      //WicketUtils.setFocus(attendeeSelectPanel);
     }
 
     { // Rating
@@ -112,7 +118,7 @@ public class AttendeeEditForm extends AbstractEditForm<AttendeeDO, AttendeeEditP
     }
 
     { // Description
-      final FieldsetPanel fs = gridBuilder.newFieldset(AttendeeDO.class, "description");
+      fs = gridBuilder.newFieldset(AttendeeDO.class, "description");
       fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "description"))).setAutogrow();
     }
 
