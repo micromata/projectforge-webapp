@@ -23,29 +23,25 @@
 
 package org.projectforge.plugins.skillmatrix;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.validation.IValidatable;
-import org.apache.wicket.validation.validator.AbstractValidator;
-import org.projectforge.registry.Registry;
+import org.apache.wicket.validation.IValidator;
+import org.apache.wicket.validation.ValidationError;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserDao;
-import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.common.MultiChoiceListHelper;
 import org.projectforge.web.user.GroupsComparator;
 import org.projectforge.web.user.GroupsProvider;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
@@ -59,7 +55,6 @@ import com.vaynberg.wicket.select2.Select2MultiChoice;
  * This is the edit formular page.
  * @author Werner Feder (werner.feder@t-online.de)
  */
-@SuppressWarnings("deprecation")
 public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditPage>
 {
 
@@ -84,12 +79,6 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
 
   MultiChoiceListHelper<GroupDO> fullAccessGroupsListHelper, readonlyAccessGroupsListHelper;
 
-  Collection<GroupDO> curUserGroups;
-
-
-  private Model <String> labelFullModel;
-  private Collection<Integer> curUserGroupIds;
-
   /**
    * @param parentPage
    * @param data
@@ -111,6 +100,8 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
       final SkillTextSelectPanel parentSelectPanel = new SkillTextSelectPanel(fs.newChildId(), new PropertyModel<SkillDO>(data, "skill"), parentPage, "skillId");
       fs.add(parentSelectPanel);
       parentSelectPanel.setRequired(true);
+      parentSelectPanel.setFocus();
+      parentSelectPanel.setDefaultFormProcessing(false);
       parentSelectPanel.init();
     }
 
@@ -118,7 +109,6 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
       final FieldsetPanel fs = gridBuilder.newFieldset(TrainingDO.class, "title");
       final RequiredMaxLengthTextField titleField = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
           "title"));
-      WicketUtils.setFocus(titleField);
       fs.add(titleField);
       dependentFormComponents[0] = titleField;
     }
@@ -126,15 +116,6 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Full access groups
-
-      curUserGroupIds = new HashSet<Integer>();
-      curUserGroupIds = userDao.getAssignedGroups(PFUserContext.getUser());
-      final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
-      curUserGroups = new HashSet<GroupDO>();
-      for (final Integer assignedGroup: curUserGroupIds) {
-        curUserGroups.add(userGroupCache.getGroup(assignedGroup));
-      }
-
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess"),
           getString("plugins.teamcal.access.groups"));
       final GroupsProvider groupsProvider = new GroupsProvider();
@@ -143,24 +124,36 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
           groupsProvider.getSortedGroups());
       if (fullAccessGroups != null) {
         for (final GroupDO group : fullAccessGroups) {
-          if (curUserGroups.contains(group) == false) {
-            fullAccessGroupsListHelper.addOriginalAssignedItem(group).assignItem(group);
-          }
+          fullAccessGroupsListHelper.addOriginalAssignedItem(group).assignItem(group);
         }
       }
       final Select2MultiChoice<GroupDO> groups = new Select2MultiChoice<GroupDO>(fs.getSelect2MultiChoiceId(),
           new PropertyModel<Collection<GroupDO>> (this.fullAccessGroupsListHelper, "assignedItems"), groupsProvider);
-      groups.setRequired(true);
-      fs.add(groups);
+      groups.add(new IValidator<Object>() {
+        @Override
+        public void validate(final IValidatable< Object > validatable)
+        {
+          @SuppressWarnings("unchecked")
+          final ArrayList<GroupDO> groups = (ArrayList<GroupDO>) validatable.getValue();
+          final Collection<Integer> curUserGroupIds = userDao.getAssignedGroups(PFUserContext.getUser());
 
-      final FieldsetPanel fs2 = gridBuilder.newFieldset("", getString("plugins.skillmatrix.skill.inherited")).setLabelFor(groups);
-      fs2.setOutputMarkupId(true);
-      labelFullModel = new Model<String>("");
-      final Label labelFull = new Label (fs2.newChildId(), labelFullModel);
-      labelFull.setOutputMarkupId(true);
-      fs2.add(labelFull);
-      fs2.getFieldset().setOutputMarkupId(true);
-      labelFullModel.setObject(getGroupnames(curUserGroupIds.toArray(new Integer[0])));
+          boolean isInUserGroups = false;
+          for (final GroupDO group: groups) {
+            if (curUserGroupIds.contains(group.getId()) == true) {
+              isInUserGroups = true;
+              break;
+            }
+          }
+          if (isInUserGroups == false) {
+            final ValidationError validationError = new ValidationError().addKey("plugins.skillmatrix.skilltraining.error.nousergroup");
+            validatable.error(validationError);
+          }
+        }
+
+      });
+      groups.setRequired(true);
+      fs.addHelpIcon(getString("plugins.skillmatrix.skilltraining.fullaccess"));
+      fs.add(groups);
     }
 
     {
@@ -178,6 +171,7 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
       }
       final Select2MultiChoice<GroupDO> groups = new Select2MultiChoice<GroupDO>(fs.getSelect2MultiChoiceId(),
           new PropertyModel<Collection<GroupDO>>(this.readonlyAccessGroupsListHelper, "assignedItems"), groupsProvider);
+      fs.addHelpIcon(getString("plugins.skillmatrix.skilltraining.readonlyaccess"));
       fs.add(groups);
     }
 
@@ -207,9 +201,9 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
       fs.add(valuesRating);
       fs.addAlertIcon(getString("plugins.skillmatrix.skilltraining.edit.warning.doNotChangeValues"));
       valuesRating.setRequired(false);
-      valuesRating.add(new AbstractValidator<String>() {
+      valuesRating.add(new IValidator<String>() {
         @Override
-        protected void onValidate(final IValidatable<String> validatable)
+        public void validate(final IValidatable<String> validatable)
         {
           if (TrainingDO.getValuesArray(validatable.getValue()) == null) {
             valuesRating.error(getString("plugins.skillmatrix.skilltraining.values.invalidFormat"));
@@ -225,9 +219,9 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
       fs.add(valuesCertificate);
       fs.addAlertIcon(getString("plugins.skillmatrix.skilltraining.edit.warning.doNotChangeValues"));
       valuesCertificate.setRequired(false);
-      valuesCertificate.add(new AbstractValidator<String>() {
+      valuesCertificate.add(new IValidator<String>() {
         @Override
-        protected void onValidate(final IValidatable<String> validatable)
+        public void validate(final IValidatable<String> validatable)
         {
           if (TrainingDO.getValuesArray(validatable.getValue()) == null) {
             valuesCertificate.error(getString("plugins.skillmatrix.skilltraining.values.invalidFormat"));
@@ -235,10 +229,7 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
         }
       });
     }
-
   }
-
-
 
   /**
    * @see org.projectforge.web.wicket.AbstractEditForm#getLogger()
@@ -249,12 +240,4 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
     return log;
   }
 
-  private String getGroupnames(final Integer[] ids) {
-    String s ="";
-    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
-    for (final Integer id : ids) {
-      s += userGroupCache.getGroupname(id) + ", ";
-    }
-    return s.substring(0, s.lastIndexOf(", "));
-  }
 }
