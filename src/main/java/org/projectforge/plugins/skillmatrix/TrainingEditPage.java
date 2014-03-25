@@ -23,9 +23,13 @@
 
 package org.projectforge.plugins.skillmatrix;
 
+import java.util.Collection;
+import java.util.HashSet;
+
 import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.user.GroupDO;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredBasePage;
@@ -121,7 +125,11 @@ public class TrainingEditPage extends AbstractEditPage<TrainingDO, TrainingEditF
   @Override
   public AbstractSecuredBasePage onSaveOrUpdate()
   {
-    trainingDao.setFullAccessGroups(getData(), form.fullAccessGroupsListHelper.getAssignedItems());
+    final Collection<GroupDO> fullAccessGroups = new HashSet<GroupDO>();
+    fullAccessGroups.addAll(form.fullAccessGroupsListHelper.getAssignedItems());
+    fullAccessGroups.addAll(form.curUserGroups);
+
+    trainingDao.setFullAccessGroups(getData(), fullAccessGroups);
     trainingDao.setReadOnlyAccessGroups(getData(), form.readonlyAccessGroupsListHelper.getAssignedItems());
     return super.onSaveOrUpdate();
   }

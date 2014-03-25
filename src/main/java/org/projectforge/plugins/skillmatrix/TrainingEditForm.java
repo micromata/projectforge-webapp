@@ -28,8 +28,10 @@ import java.util.Date;
 import java.util.HashSet;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.validation.IValidatable;
@@ -80,11 +82,13 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
 
   private TextField<String> valuesCertificate;
 
-  private Collection<GroupDO> curUserGroups;
-
   MultiChoiceListHelper<GroupDO> fullAccessGroupsListHelper, readonlyAccessGroupsListHelper;
 
-  PropertyModel<Collection<GroupDO>> fullAccessModel;
+  Collection<GroupDO> curUserGroups;
+
+
+  private Model <String> labelFullModel;
+  private Collection<Integer> curUserGroupIds;
 
   /**
    * @param parentPage
@@ -101,33 +105,12 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
   {
     super.init();
 
-    curUserGroups = new HashSet<GroupDO>();
-
     gridBuilder.newSplitPanel(GridSize.COL50);
-
     { // Skill
       final FieldsetPanel fs = gridBuilder.newFieldset(TrainingDO.class, "skill");
-      final SkillTextSelectPanel parentSelectPanel = new SkillTextSelectPanel(fs.newChildId(), new PropertyModel<SkillDO>(data, "skill"), parentPage, "skillId") {
-        /**
-         * @see org.projectforge.web.wicket.AbstractSelectPanel#onBeforeRender()
-         */
-        @Override
-        protected void onBeforeRender()
-        {
-          super.onBeforeRender();
-          Collection<Integer> assignedGroups = new HashSet<Integer>();
-          assignedGroups = userDao.getAssignedGroups(PFUserContext.getUser());
-          final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
-          curUserGroups.clear();
-          for (final Integer assignedGroup: assignedGroups) {
-            curUserGroups.add(userGroupCache.getGroup(assignedGroup));
-          }
-          fullAccessModel.setObject(curUserGroups);
-        }
-      };
+      final SkillTextSelectPanel parentSelectPanel = new SkillTextSelectPanel(fs.newChildId(), new PropertyModel<SkillDO>(data, "skill"), parentPage, "skillId");
       fs.add(parentSelectPanel);
       parentSelectPanel.setRequired(true);
-      //fs.getFieldset().setOutputMarkupId(true);
       parentSelectPanel.init();
     }
 
@@ -141,9 +124,17 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
     }
 
     gridBuilder.newSplitPanel(GridSize.COL50);
-    // set access groups
     {
       // Full access groups
+
+      curUserGroupIds = new HashSet<Integer>();
+      curUserGroupIds = userDao.getAssignedGroups(PFUserContext.getUser());
+      final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
+      curUserGroups = new HashSet<GroupDO>();
+      for (final Integer assignedGroup: curUserGroupIds) {
+        curUserGroups.add(userGroupCache.getGroup(assignedGroup));
+      }
+
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess"),
           getString("plugins.teamcal.access.groups"));
       final GroupsProvider groupsProvider = new GroupsProvider();
@@ -152,14 +143,26 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
           groupsProvider.getSortedGroups());
       if (fullAccessGroups != null) {
         for (final GroupDO group : fullAccessGroups) {
-          fullAccessGroupsListHelper.addOriginalAssignedItem(group).assignItem(group);
+          if (curUserGroups.contains(group) == false) {
+            fullAccessGroupsListHelper.addOriginalAssignedItem(group).assignItem(group);
+          }
         }
       }
-      fullAccessModel = new PropertyModel<Collection<GroupDO>> (this.fullAccessGroupsListHelper, "assignedItems");
       final Select2MultiChoice<GroupDO> groups = new Select2MultiChoice<GroupDO>(fs.getSelect2MultiChoiceId(),
-          fullAccessModel, groupsProvider);
+          new PropertyModel<Collection<GroupDO>> (this.fullAccessGroupsListHelper, "assignedItems"), groupsProvider);
+      groups.setRequired(true);
       fs.add(groups);
+
+      final FieldsetPanel fs2 = gridBuilder.newFieldset("", getString("plugins.skillmatrix.skill.inherited")).setLabelFor(groups);
+      fs2.setOutputMarkupId(true);
+      labelFullModel = new Model<String>("");
+      final Label labelFull = new Label (fs2.newChildId(), labelFullModel);
+      labelFull.setOutputMarkupId(true);
+      fs2.add(labelFull);
+      fs2.getFieldset().setOutputMarkupId(true);
+      labelFullModel.setObject(getGroupnames(curUserGroupIds.toArray(new Integer[0])));
     }
+
     {
       // Read-only access groups
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.readonlyAccess"),
@@ -232,7 +235,10 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
         }
       });
     }
+
   }
+
+
 
   /**
    * @see org.projectforge.web.wicket.AbstractEditForm#getLogger()
@@ -243,4 +249,12 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
     return log;
   }
 
+  private String getGroupnames(final Integer[] ids) {
+    String s ="";
+    final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
+    for (final Integer id : ids) {
+      s += userGroupCache.getGroupname(id) + ", ";
+    }
+    return s.substring(0, s.lastIndexOf(", "));
+  }
 }
