@@ -121,6 +121,7 @@ public class SkillEditPage extends AbstractEditPage<SkillDO, SkillEditForm, Skil
   {
     skillDao.setFullAccessGroups(getData(), form.fullAccessGroupsListHelper.getAssignedItems());
     skillDao.setReadonlyAccessGroups(getData(), form.readOnlyAccessGroupsListHelper.getAssignedItems());
+    skillDao.setTrainingAccessGroups(getData(), form.trainingAccessGroupsListHelper.getAssignedItems());
     return super.onSaveOrUpdate();
   }
 }

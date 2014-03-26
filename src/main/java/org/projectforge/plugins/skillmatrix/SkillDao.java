@@ -212,6 +212,21 @@ public class SkillDao extends BaseDao<SkillDO>
     return new GroupsProvider().getSortedGroups(skill.getReadOnlyAccessGroupIds());
   }
 
+  /**
+   * Please note: Only the string group.trainingAccessGroupIds will be modified (but not be saved)!
+   * @param skill
+   * @param trainingAccessGroups
+   */
+  public void setTrainingAccessGroups(final SkillDO skill, final Collection<GroupDO> trainingAccessGroups)
+  {
+    skill.setTrainingAccessGroupIds(new GroupsProvider().getGroupIds(trainingAccessGroups));
+  }
+
+  public Collection<GroupDO> getSortedTrainingAccessGroups(final SkillDO skill)
+  {
+    return new GroupsProvider().getSortedGroups(skill.getTrainingAccessGroupIds());
+  }
+
   @SuppressWarnings("unchecked")
   public SkillDO getSkill(final String title)
   {

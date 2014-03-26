@@ -63,7 +63,7 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
   @SpringBean(name = "skillDao")
   private SkillDao skillDao;
 
-  MultiChoiceListHelper<GroupDO> fullAccessGroupsListHelper, readOnlyAccessGroupsListHelper;
+  MultiChoiceListHelper<GroupDO> fullAccessGroupsListHelper, readOnlyAccessGroupsListHelper, trainingAccessGroupsListHelper;
 
   private SkillRight skillRight;
 
@@ -196,6 +196,44 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
       fs.add(labelReadOnly);
       fs.suppressLabelForWarning();
       ajaxTargets.add(labelReadOnly.getLabel4Ajax());
+    }
+
+    gridBuilder.newSplitPanel(GridSize.COL50, GridType.CONTAINER);
+    {
+      // Training access groups
+      fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.skill.trainingAccess"), getString("plugins.teamcal.access.groups"));
+      final GroupsProvider groupsProvider = new GroupsProvider();
+      final Collection<GroupDO> trainingAccessGroups = new GroupsProvider().getSortedGroups(getData().getTrainingAccessGroupIds());
+      trainingAccessGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
+          groupsProvider.getSortedGroups());
+      if (trainingAccessGroups != null) {
+        for (final GroupDO group : trainingAccessGroups) {
+          trainingAccessGroupsListHelper.addOriginalAssignedItem(group).assignItem(group);
+        }
+      }
+      final Select2MultiChoice<GroupDO> groups = new Select2MultiChoice<GroupDO>(fs.getSelect2MultiChoiceId(),
+          new PropertyModel<Collection<GroupDO>>(this.trainingAccessGroupsListHelper, "assignedItems"), groupsProvider);
+      fs.add(groups);
+
+      // Training access groups inherited rights
+      fs = gridBuilder.newFieldset("", getString("plugins.skillmatrix.skill.inherited"));
+      @SuppressWarnings("serial")
+      final DivTextPanel labelTraining = new DivTextPanel(fs.newChildId(), new Model<String>() {
+        /**
+         * @see org.apache.wicket.model.Model#getObject()
+         */
+        @Override
+        public String getObject()
+        {
+          if (getData().getParent() != null) {
+            return getGroupnames(skillRight.getTrainingAccessGroupIds(getData().getParent()));
+          }
+          return "";
+        }
+      });
+      fs.add(labelTraining);
+      fs.suppressLabelForWarning();
+      ajaxTargets.add(labelTraining.getLabel4Ajax());
     }
 
     gridBuilder.newGridPanel();

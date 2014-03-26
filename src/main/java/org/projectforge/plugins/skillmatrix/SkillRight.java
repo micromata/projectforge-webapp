@@ -98,6 +98,12 @@ public class SkillRight extends UserRightAccessCheck<SkillDO>
     return hasAccess(groupIds, userId);
   }
 
+  public boolean hasTrainingAccess(final SkillDO skill, final Integer userId)
+  {
+    final Integer[] groupIds = getTrainingAccessGroupIds(skill);
+    return hasAccess(groupIds, userId);
+  }
+
   private boolean hasAccess(final Integer[] groupIds, final Integer userId)
   {
     if (getUserGroupCache().isUserMemberOfAtLeastOneGroup(userId, groupIds) == true) {
@@ -150,5 +156,28 @@ public class SkillRight extends UserRightAccessCheck<SkillDO>
       return;
     }
     getReadOnlyAccessGroupIds(groupIds, skill.getParent());
+  }
+
+  public Integer[] getTrainingAccessGroupIds(final SkillDO skill)
+  {
+    final Set<Integer> result = new HashSet<Integer>();
+    getTrainingAccessGroupIds(result, skill);
+    return result.toArray(new Integer[0]);
+  }
+
+  private void getTrainingAccessGroupIds(final Set<Integer> groupIds, final SkillDO skill)
+  {
+    if (StringUtils.isNotBlank(skill.getTrainingAccessGroupIds()) == true) {
+      final Collection<GroupDO> groups = new GroupsProvider().getSortedGroups(skill.getTrainingAccessGroupIds());
+      if (groups != null) {
+        for (final GroupDO group : groups) {
+          groupIds.add(group.getId());
+        }
+      }
+    }
+    if (skill.getParent() == null) {
+      return;
+    }
+    getTrainingAccessGroupIds(groupIds, skill.getParent());
   }
 }
