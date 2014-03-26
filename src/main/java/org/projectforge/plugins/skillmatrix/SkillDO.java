@@ -75,7 +75,7 @@ public class SkillDO extends DefaultBaseDO
   @PropertyInfo(i18nKey = "plugins.skillmatrix.skill.rateable")
   private boolean rateable = true;
 
-  private String fullAccessGroupIds, readOnlyAccessGroupIds;
+  private String fullAccessGroupIds, readOnlyAccessGroupIds, trainingGroupsIds;
 
   @Column(length = 100)
   public String getTitle()
@@ -177,7 +177,7 @@ public class SkillDO extends DefaultBaseDO
   }
 
   /**
-   * These users have full read/write access to this skill and related trainings.
+   * These users have full read/write access to this skill.
    * @param fullAccessGroupIds the fullAccessGroupIds to set
    * @return this for chaining.
    */
@@ -188,7 +188,7 @@ public class SkillDO extends DefaultBaseDO
   }
 
   /**
-   * Members of these groups have full read-only access to this skill and related trainings.
+   * Members of these groups have full read-only access to this skill.
    * @return the readOnlyAccessGroupIds
    */
   @Column(name = "readonly_access_group_ids", nullable = true)
@@ -207,4 +207,24 @@ public class SkillDO extends DefaultBaseDO
     return this;
   }
 
+  /**
+   * Members of these groups have full read/write access to trainings of this skill.
+   * @return the trainingGroupsIds
+   */
+  @Column(name = "training_access_group_ids", nullable = true)
+  public String getTrainingAccessGroupIds()
+  {
+    return trainingGroupsIds;
+  }
+
+  /**
+   * These users have full read/write access to trainings of this skill.
+   * @param trainingGroupsIds the trainingGroupsIds to set
+   * @return this for chaining.
+   */
+  public SkillDO setTrainingAccessGroupIds(final String trainingGroupsIds)
+  {
+    this.trainingGroupsIds = trainingGroupsIds;
+    return this;
+  }
 }
