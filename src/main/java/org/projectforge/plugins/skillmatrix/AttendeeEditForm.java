@@ -81,8 +81,9 @@ public class AttendeeEditForm extends AbstractEditForm<AttendeeDO, AttendeeEditP
       data.setTraining(training);
     }
     final TrainingSelectPanel trainingSelectPanel = new TrainingSelectPanel(fs.newChildId(), new PropertyModel<TrainingDO>(data, "training"),
-        parentPage, "trainingId").init();
-    trainingSelectPanel.setRequired(true);
+        parentPage, "trainingId");
+    trainingSelectPanel.setDefaultFormProcessing(false);
+    trainingSelectPanel.init().withAutoSubmit(true).setRequired(true);
     fs.add(trainingSelectPanel);
 
     // Attendee
@@ -93,14 +94,14 @@ public class AttendeeEditForm extends AbstractEditForm<AttendeeDO, AttendeeEditP
       data.setAttendee(attendee);
     }
     final UserSelectPanel attendeeSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(data, "attendee"),
-        parentPage, "attendeeId").init();
+        parentPage, "attendeeId");
     fs.add(attendeeSelectPanel.setRequired(true));
+    attendeeSelectPanel.init();
 
     if (isNew() == true) {
       trainingSelectPanel.setFocus();
     } else {
       attendeeSelectPanel.setFocus();
-      //WicketUtils.setFocus(attendeeSelectPanel);
     }
 
     { // Rating
