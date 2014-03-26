@@ -24,9 +24,11 @@
 package org.projectforge.plugins.skillmatrix;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.Component;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -65,6 +67,7 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
   private Model<String> labelFullModel, labelReadOnlyModel;
 
   private SkillRight skillRight;
+  private Collection<Component> ajaxTargets;
 
   /**
    * @param parentPage
@@ -81,11 +84,12 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
     super.init();
 
     skillRight = (SkillRight) UserRights.instance().getRight(SkillDao.USER_RIGHT_ID);
+    ajaxTargets = new HashSet<Component>();
 
     gridBuilder.newSplitPanel(GridSize.COL50, GridType.CONTAINER);
     // Parent
     FieldsetPanel fs = gridBuilder.newFieldset(SkillDO.class, "parent");
-    final SkillTextSelectPanel parentSelectPanel = new SkillTextSelectPanel(fs.newChildId(), new PropertyModel<SkillDO>(data, "parent"),
+    final SkillSelectPanel parentSelectPanel = new SkillSelectPanel(fs, new PropertyModel<SkillDO>(data, "parent"),
         parentPage, "parentId") {
       private static final long serialVersionUID = 8355684523726816059L;
 
@@ -110,9 +114,24 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
         final SkillDO skillDo = skillDao.getOrLoad(this.getCurrentSkillId());
         setLabels(skillDo);
       }
+
+      /**
+       * @see org.projectforge.plugins.skillmatrix.SkillSelectPanel#onModelSelected(org.apache.wicket.ajax.AjaxRequestTarget, org.projectforge.plugins.skillmatrix.SkillDO)
+       */
+      @Override
+      protected void onModelSelected(final AjaxRequestTarget target, final SkillDO skillDo)
+      {
+        super.onModelSelected(target, skillDo);
+        setLabels(skillDo);
+        if (ajaxTargets != null) {
+          for (final Component ajaxTarget: ajaxTargets)
+            target.add(ajaxTarget);
+        }
+      }
     };
-    parentSelectPanel.init();
+
     fs.add(parentSelectPanel);
+    parentSelectPanel.init();
     fs.getFieldset().setOutputMarkupId(true);
     if (getSkillTree().isRootNode(data) == true) {
       fs.setVisible(false);
@@ -121,46 +140,41 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
     }
 
     // Title of skill
+    gridBuilder.newSplitPanel(GridSize.COL50, GridType.CONTAINER);
     fs = gridBuilder.newFieldset(SkillDO.class, "title");
     final RequiredMaxLengthTextField titleField = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
         "title"));
-
     fs.add(titleField);
-
-    if (isNew() == true) {
-      parentSelectPanel.setFocus();
-    } else {
-      WicketUtils.setFocus(titleField);
-    }
+    WicketUtils.setFocus(titleField);
 
     gridBuilder.newSplitPanel(GridSize.COL50, GridType.CONTAINER);
-    {
-      // Full access groups
-      fs = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess"), getString("plugins.teamcal.access.groups"));
-      final GroupsProvider groupsProvider = new GroupsProvider();
-      final Collection<GroupDO> fullAccessGroups = new GroupsProvider().getSortedGroups(getData().getFullAccessGroupIds());
-      fullAccessGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
-          groupsProvider.getSortedGroups());
-      if (fullAccessGroups != null) {
-        for (final GroupDO group : fullAccessGroups) {
-          fullAccessGroupsListHelper.addOriginalAssignedItem(group).assignItem(group);
-        }
-      }
-      final Select2MultiChoice<GroupDO> groups = new Select2MultiChoice<GroupDO>(fs.getSelect2MultiChoiceId(),
-          new PropertyModel<Collection<GroupDO>>(this.fullAccessGroupsListHelper, "assignedItems"), groupsProvider);
-      fs.add(groups);
-
-      fs = gridBuilder.newFieldset("", getString("plugins.skillmatrix.skill.inherited")).setLabelFor(groups);
-      fs.setOutputMarkupId(true);
-      labelFullModel = new Model<String>("");
-      final Label labelFull = new Label(fs.newChildId(), labelFullModel);
-      labelFull.setOutputMarkupId(true);
-      fs.add(labelFull);
-      fs.getFieldset().setOutputMarkupId(true);
-      if (getData().getParent() != null) {
-        labelFullModel.setObject(getGroupnames(skillRight.getFullAccessGroupIds(getData().getParent())));
+    // Full access groups
+    fs = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess"), getString("plugins.teamcal.access.groups"));
+    final GroupsProvider groupsFullAccessProvider = new GroupsProvider();
+    final Collection<GroupDO> fullAccessGroups = new GroupsProvider().getSortedGroups(getData().getFullAccessGroupIds());
+    fullAccessGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
+        groupsFullAccessProvider.getSortedGroups());
+    if (fullAccessGroups != null) {
+      for (final GroupDO group : fullAccessGroups) {
+        fullAccessGroupsListHelper.addOriginalAssignedItem(group).assignItem(group);
       }
     }
+    final Select2MultiChoice<GroupDO> groupsFullAccess = new Select2MultiChoice<GroupDO>(fs.getSelect2MultiChoiceId(),
+        new PropertyModel<Collection<GroupDO>>(this.fullAccessGroupsListHelper, "assignedItems"), groupsFullAccessProvider);
+    fs.add(groupsFullAccess);
+
+    // Full access groups inherited rights
+    fs = gridBuilder.newFieldset("", getString("plugins.skillmatrix.skill.inherited"));
+    labelFullModel = new Model<String>("");
+    final MaxLengthTextArea labelFull = new MaxLengthTextArea("textarea", labelFullModel);
+    labelFull.setOutputMarkupId(true).setEnabled(false);
+    fs.add(labelFull).setAutogrow();
+    if (getData().getParent() != null) {
+      labelFullModel.setObject(getGroupnames(skillRight.getFullAccessGroupIds(getData().getParent())));
+    }
+    ajaxTargets.add(labelFull);
+
+    gridBuilder.newSplitPanel(GridSize.COL50, GridType.CONTAINER);
     {
       // Read-only access groups
       fs = gridBuilder.newFieldset(getString("plugins.teamcal.readonlyAccess"), getString("plugins.teamcal.access.groups"));
@@ -177,16 +191,16 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
           new PropertyModel<Collection<GroupDO>>(this.readOnlyAccessGroupsListHelper, "assignedItems"), groupsProvider);
       fs.add(groups);
 
-      fs = gridBuilder.newFieldset("", getString("plugins.skillmatrix.skill.inherited")).setLabelFor(groups);
-      fs.setOutputMarkupId(true);
+      // Read-only access groups inherited rights
+      fs = gridBuilder.newFieldset("", getString("plugins.skillmatrix.skill.inherited"));
       labelReadOnlyModel = new Model<String>("");
-      final Label labelReadOnly = new Label(fs.newChildId(), labelReadOnlyModel);
-      labelReadOnly.setOutputMarkupId(true);
-      fs.add(labelReadOnly);
-      fs.getFieldset().setOutputMarkupId(true);
+      final MaxLengthTextArea labelReadOnly = new MaxLengthTextArea("textarea", labelReadOnlyModel);
+      labelReadOnly.setOutputMarkupId(true).setEnabled(false);
+      fs.add(labelReadOnly).setAutogrow();
       if (getData().getParent() != null) {
         labelReadOnlyModel.setObject(getGroupnames(skillRight.getReadOnlyAccessGroupIds(getData().getParent())));
       }
+      ajaxTargets.add(labelReadOnly);
     }
 
     gridBuilder.newGridPanel();

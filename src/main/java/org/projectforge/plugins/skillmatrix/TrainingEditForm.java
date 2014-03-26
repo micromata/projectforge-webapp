@@ -99,11 +99,9 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
 
     // Skill
     FieldsetPanel fs = gridBuilder.newFieldset(TrainingDO.class, "skill");
-    final SkillTextSelectPanel parentSelectPanel = new SkillTextSelectPanel(fs.newChildId(), new PropertyModel<SkillDO>(data, "skill"), parentPage, "skillId");
+    final SkillSelectPanel parentSelectPanel = new SkillSelectPanel(fs, new PropertyModel<SkillDO>(data, "skill"), parentPage, "skillId");
     fs.add(parentSelectPanel);
     parentSelectPanel.setRequired(true);
-    parentSelectPanel.setFocus();
-    parentSelectPanel.setDefaultFormProcessing(false);
     parentSelectPanel.init();
 
     // Title of training
@@ -112,12 +110,7 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
         "title"));
     fs.add(titleField);
     dependentFormComponents[0] = titleField;
-
-    if (isNew() == true) {
-      parentSelectPanel.setFocus();
-    } else {
-      WicketUtils.setFocus(titleField);
-    }
+    WicketUtils.setFocus(titleField);
 
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
