@@ -45,6 +45,7 @@ import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.bootstrap.GridType;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 import com.vaynberg.wicket.select2.Select2MultiChoice;
@@ -64,9 +65,8 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
 
   MultiChoiceListHelper<GroupDO> fullAccessGroupsListHelper, readOnlyAccessGroupsListHelper;
 
-  private Model<String> labelFullModel, labelReadOnlyModel;
-
   private SkillRight skillRight;
+
   private Collection<Component> ajaxTargets;
 
   /**
@@ -89,42 +89,19 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
     gridBuilder.newSplitPanel(GridSize.COL50, GridType.CONTAINER);
     // Parent
     FieldsetPanel fs = gridBuilder.newFieldset(SkillDO.class, "parent");
-    final SkillSelectPanel parentSelectPanel = new SkillSelectPanel(fs, new PropertyModel<SkillDO>(data, "parent"),
-        parentPage, "parentId") {
+    final SkillSelectPanel parentSelectPanel = new SkillSelectPanel(fs, new PropertyModel<SkillDO>(data, "parent"), parentPage, "parentId") {
       private static final long serialVersionUID = 8355684523726816059L;
 
-      private void setLabels(final SkillDO skill)
-      {
-        if (skill != null && skill.getParent() != null) {
-          labelFullModel.setObject(getGroupnames(skillRight.getFullAccessGroupIds(skill.getParent())));
-          labelReadOnlyModel.setObject(getGroupnames(skillRight.getReadOnlyAccessGroupIds(skill.getParent())));
-        } else {
-          labelFullModel.setObject("");
-          labelReadOnlyModel.setObject("");
-        }
-      }
-
       /**
-       * @see org.projectforge.plugins.skillmatrix.SkillSelectPanel#onBeforeRender()
-       */
-      @Override
-      protected void onBeforeRender()
-      {
-        super.onBeforeRender();
-        final SkillDO skillDo = skillDao.getOrLoad(this.getCurrentSkillId());
-        setLabels(skillDo);
-      }
-
-      /**
-       * @see org.projectforge.plugins.skillmatrix.SkillSelectPanel#onModelSelected(org.apache.wicket.ajax.AjaxRequestTarget, org.projectforge.plugins.skillmatrix.SkillDO)
+       * @see org.projectforge.plugins.skillmatrix.SkillSelectPanel#onModelSelected(org.apache.wicket.ajax.AjaxRequestTarget,
+       *      org.projectforge.plugins.skillmatrix.SkillDO)
        */
       @Override
       protected void onModelSelected(final AjaxRequestTarget target, final SkillDO skillDo)
       {
         super.onModelSelected(target, skillDo);
-        setLabels(skillDo);
         if (ajaxTargets != null) {
-          for (final Component ajaxTarget: ajaxTargets)
+          for (final Component ajaxTarget : ajaxTargets)
             target.add(ajaxTarget);
         }
       }
@@ -165,14 +142,23 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
 
     // Full access groups inherited rights
     fs = gridBuilder.newFieldset("", getString("plugins.skillmatrix.skill.inherited"));
-    labelFullModel = new Model<String>("");
-    final MaxLengthTextArea labelFull = new MaxLengthTextArea("textarea", labelFullModel);
-    labelFull.setOutputMarkupId(true).setEnabled(false);
-    fs.add(labelFull).setAutogrow();
-    if (getData().getParent() != null) {
-      labelFullModel.setObject(getGroupnames(skillRight.getFullAccessGroupIds(getData().getParent())));
-    }
-    ajaxTargets.add(labelFull);
+    @SuppressWarnings("serial")
+    final DivTextPanel labelFull = new DivTextPanel(fs.newChildId(), new Model<String>() {
+      /**
+       * @see org.apache.wicket.model.Model#getObject()
+       */
+      @Override
+      public String getObject()
+      {
+        if (getData().getParent() != null) {
+          return getGroupnames(skillRight.getFullAccessGroupIds(getData().getParent()));
+        }
+        return "";
+      }
+    });
+    fs.suppressLabelForWarning();
+    fs.add(labelFull);
+    ajaxTargets.add(labelFull.getLabel4Ajax());
 
     gridBuilder.newSplitPanel(GridSize.COL50, GridType.CONTAINER);
     {
@@ -193,14 +179,23 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
 
       // Read-only access groups inherited rights
       fs = gridBuilder.newFieldset("", getString("plugins.skillmatrix.skill.inherited"));
-      labelReadOnlyModel = new Model<String>("");
-      final MaxLengthTextArea labelReadOnly = new MaxLengthTextArea("textarea", labelReadOnlyModel);
-      labelReadOnly.setOutputMarkupId(true).setEnabled(false);
-      fs.add(labelReadOnly).setAutogrow();
-      if (getData().getParent() != null) {
-        labelReadOnlyModel.setObject(getGroupnames(skillRight.getReadOnlyAccessGroupIds(getData().getParent())));
-      }
-      ajaxTargets.add(labelReadOnly);
+      @SuppressWarnings("serial")
+      final DivTextPanel labelReadOnly = new DivTextPanel(fs.newChildId(), new Model<String>() {
+        /**
+         * @see org.apache.wicket.model.Model#getObject()
+         */
+        @Override
+        public String getObject()
+        {
+          if (getData().getParent() != null) {
+            return getGroupnames(skillRight.getReadOnlyAccessGroupIds(getData().getParent()));
+          }
+          return "";
+        }
+      });
+      fs.add(labelReadOnly);
+      fs.suppressLabelForWarning();
+      ajaxTargets.add(labelReadOnly.getLabel4Ajax());
     }
 
     gridBuilder.newGridPanel();
