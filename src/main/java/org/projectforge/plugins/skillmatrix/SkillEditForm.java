@@ -87,8 +87,16 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
     ajaxTargets = new HashSet<Component>();
 
     gridBuilder.newSplitPanel(GridSize.COL50, GridType.CONTAINER);
+    // Title of skill
+    FieldsetPanel fs = gridBuilder.newFieldset(SkillDO.class, "title");
+    final RequiredMaxLengthTextField titleField = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
+        "title"));
+    fs.add(titleField);
+    WicketUtils.setFocus(titleField);
+
+    gridBuilder.newSplitPanel(GridSize.COL50, GridType.CONTAINER);
     // Parent
-    FieldsetPanel fs = gridBuilder.newFieldset(SkillDO.class, "parent");
+    fs = gridBuilder.newFieldset(SkillDO.class, "parent");
     final SkillSelectPanel parentSelectPanel = new SkillSelectPanel(fs, new PropertyModel<SkillDO>(data, "parent"), parentPage, "parentId") {
       private static final long serialVersionUID = 8355684523726816059L;
 
@@ -115,14 +123,6 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
     } else {
       parentSelectPanel.setRequired(true);
     }
-
-    // Title of skill
-    gridBuilder.newSplitPanel(GridSize.COL50, GridType.CONTAINER);
-    fs = gridBuilder.newFieldset(SkillDO.class, "title");
-    final RequiredMaxLengthTextField titleField = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
-        "title"));
-    fs.add(titleField);
-    WicketUtils.setFocus(titleField);
 
     gridBuilder.newSplitPanel(GridSize.COL50, GridType.CONTAINER);
     // Full access groups
