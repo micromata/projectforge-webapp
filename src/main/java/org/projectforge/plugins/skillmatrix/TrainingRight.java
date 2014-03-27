@@ -77,7 +77,7 @@ public class TrainingRight extends UserRightAccessCheck<TrainingDO>
       return (hasAccess(StringHelper.splitToIntegers(training.getFullAccessGroupIds(), ","), user.getId()) == true)
           || (hasAccess(StringHelper.splitToIntegers(training.getReadOnlyAccessGroupIds(), ","), user.getId()) == true);
     }
-    return hasAccess(StringHelper.splitToIntegers(training.getFullAccessGroupIds(), ","), user.getId());
+    return hasAccess(StringHelper.splitToIntegers(training.getSkill().getTrainingAccessGroupIds(), ","), user.getId());
   }
 
   private boolean hasAccess(final Integer[] groupIds, final Integer userId)
