@@ -26,9 +26,11 @@ package org.projectforge.plugins.skillmatrix;
 import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.common.NumberHelper;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredBasePage;
+import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * The controller of the edit formular page. Most functionality such as insert, update, delete etc. is done by the super class.
@@ -43,6 +45,8 @@ public class TrainingEditPage extends AbstractEditPage<TrainingDO, TrainingEditF
 
   public static final String I18N_KEY_PREFIX = "plugins.skillmatrix.skilltraining";
 
+  public static final String PARAM_PARENT_SKILL_ID = "parentSkillId";
+
   @SpringBean(name = "trainingDao")
   private TrainingDao trainingDao;
 
@@ -53,6 +57,10 @@ public class TrainingEditPage extends AbstractEditPage<TrainingDO, TrainingEditF
   {
     super(parameters, I18N_KEY_PREFIX);
     init();
+    final Integer parentSkillId = WicketUtils.getAsInteger(parameters, PARAM_PARENT_SKILL_ID);
+    if (NumberHelper.greaterZero(parentSkillId) == true) {
+      trainingDao.setSkill(getData(), parentSkillId);
+    }
   }
 
   /**

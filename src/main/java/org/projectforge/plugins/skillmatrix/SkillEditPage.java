@@ -24,11 +24,15 @@
 package org.projectforge.plugins.skillmatrix;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.common.NumberHelper;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredBasePage;
+import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 /**
  * @author Billy Duong (b.duong@micromata.de)
@@ -42,18 +46,32 @@ public class SkillEditPage extends AbstractEditPage<SkillDO, SkillEditForm, Skil
 
   public static final String I18N_KEY_PREFIX = "plugins.skillmatrix.skill";
 
+  public static final String PARAM_PARENT_SKILL_ID = "parentSkillId";
+
   @SpringBean(name = "skillDao")
   private SkillDao skillDao;
+
 
   /**
    * @param parameters
    */
+  //  public SkillEditPage(final PageParameters parameters)
+  //  {
+  //    super(parameters, I18N_KEY_PREFIX);
+  //    super.init();
+  //    addTopMenuPanel();
+  //  }
+
   public SkillEditPage(final PageParameters parameters)
   {
     super(parameters, I18N_KEY_PREFIX);
     init();
+    addTopMenuPanel();
+    final Integer parentSkillId = WicketUtils.getAsInteger(parameters, PARAM_PARENT_SKILL_ID);
+    if (NumberHelper.greaterZero(parentSkillId) == true) {
+      skillDao.setParentSkill(getData(), parentSkillId);
+    }
   }
-
   /**
    * @see org.projectforge.web.wicket.AbstractEditPage#getBaseDao()
    */
@@ -124,4 +142,64 @@ public class SkillEditPage extends AbstractEditPage<SkillDO, SkillEditForm, Skil
     skillDao.setTrainingAccessGroups(getData(), form.trainingAccessGroupsListHelper.getAssignedItems());
     return super.onSaveOrUpdate();
   }
+
+  @SuppressWarnings("serial")
+  private void addTopMenuPanel()
+  {
+    if (isNew() == false) {
+      final Integer id = form.getData().getId();
+      ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+        @Override
+        public void onClick()
+        {
+          final PageParameters params = new PageParameters();
+          params.set(PARAM_PARENT_SKILL_ID, id);
+          final SkillEditPage skillEditPage = new SkillEditPage(params);
+          skillEditPage.setReturnToPage(SkillEditPage.this);
+          setResponsePage(skillEditPage);
+        };
+      }, getString("plugins.skillmatrix.skill.menu.addSubSkill"));
+      addContentMenuEntry(menu);
+
+      menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+        @Override
+        public void onClick()
+        {
+          final PageParameters params = new PageParameters();
+          params.add(TrainingEditPage.PARAM_PARENT_SKILL_ID, id);
+          final TrainingEditPage trainingEditPage = new TrainingEditPage(params);
+          trainingEditPage.setReturnToPage(SkillEditPage.this);
+          setResponsePage(trainingEditPage);
+        };
+      }, getString("plugins.skillmatrix.skill.menu.addTraining"));
+      addContentMenuEntry(menu);
+
+      //      final BookmarkablePageLink<Void> showTimesheetsLink = new BookmarkablePageLink<Void>("link", TimesheetListPage.class);
+      //      showTimesheetsLink.getPageParameters().set(TimesheetListPage.PARAMETER_KEY_TASK_ID, id);
+      //      menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), showTimesheetsLink, getString("task.menu.showTimesheets"));
+      //      addContentMenuEntry(menu);
+      //
+      //      menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+      //        @Override
+      //        public void onClick()
+      //        {
+      //          final PageParameters params = new PageParameters();
+      //          params.set(GanttChartEditPage.PARAM_KEY_TASK, id);
+      //          final GanttChartEditPage ganttChartEditPage = new GanttChartEditPage(params);
+      //          ganttChartEditPage.setReturnToPage(TaskEditPage.this);
+      //          setResponsePage(ganttChartEditPage);
+      //        };
+      //      }, getString("gantt.title.add"));
+      //      addContentMenuEntry(menu);
+      //
+      //      final BookmarkablePageLink<Void> showAccessRightsLink = new BookmarkablePageLink<Void>("link", AccessListPage.class);
+      //      if (form.getData().getId() != null) {
+      //        showAccessRightsLink.getPageParameters().set(AccessListPage.PARAMETER_KEY_TASK_ID, form.getData().getId());
+      //      }
+      //      final ContentMenuEntryPanel extendedMenu = contentMenuBarPanel.ensureAndAddExtendetMenuEntry();
+      //      menu = new ContentMenuEntryPanel(extendedMenu.newSubMenuChildId(), showAccessRightsLink, getString("task.menu.showAccessRights"));
+      //      extendedMenu.addSubMenuEntry(menu);
+    }
+  }
+
 }
