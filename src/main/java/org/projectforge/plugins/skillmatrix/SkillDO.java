@@ -75,6 +75,8 @@ public class SkillDO extends DefaultBaseDO
   @PropertyInfo(i18nKey = "plugins.skillmatrix.skill.rateable")
   private boolean rateable = true;
 
+  private String fullAccessGroupIds, readOnlyAccessGroupIds, trainingGroupsIds;
+
   @Column(length = 100)
   public String getTitle()
   {
@@ -164,4 +166,65 @@ public class SkillDO extends DefaultBaseDO
     return this;
   }
 
+  /**
+   * Members of these groups have full read/write access to this skill and related trainings.
+   * @return the fullAccessGroupIds
+   */
+  @Column(name = "full_access_group_ids", nullable = true)
+  public String getFullAccessGroupIds()
+  {
+    return fullAccessGroupIds;
+  }
+
+  /**
+   * These users have full read/write access to this skill.
+   * @param fullAccessGroupIds the fullAccessGroupIds to set
+   * @return this for chaining.
+   */
+  public SkillDO setFullAccessGroupIds(final String fullAccessGroupIds)
+  {
+    this.fullAccessGroupIds = fullAccessGroupIds;
+    return this;
+  }
+
+  /**
+   * Members of these groups have full read-only access to this skill.
+   * @return the readOnlyAccessGroupIds
+   */
+  @Column(name = "readonly_access_group_ids", nullable = true)
+  public String getReadOnlyAccessGroupIds()
+  {
+    return readOnlyAccessGroupIds;
+  }
+
+  /**
+   * @param readOnlyAccessGroupIds the readOnlyAccessGroupIds to set
+   * @return this for chaining.
+   */
+  public SkillDO setReadOnlyAccessGroupIds(final String readonlyAccessGroupIds)
+  {
+    this.readOnlyAccessGroupIds = readonlyAccessGroupIds;
+    return this;
+  }
+
+  /**
+   * Members of these groups have full read/write access to trainings of this skill.
+   * @return the trainingGroupsIds
+   */
+  @Column(name = "training_access_group_ids", nullable = true)
+  public String getTrainingAccessGroupIds()
+  {
+    return trainingGroupsIds;
+  }
+
+  /**
+   * These users have full read/write access to trainings of this skill.
+   * @param trainingGroupsIds the trainingGroupsIds to set
+   * @return this for chaining.
+   */
+  public SkillDO setTrainingAccessGroupIds(final String trainingGroupsIds)
+  {
+    this.trainingGroupsIds = trainingGroupsIds;
+    return this;
+  }
 }

@@ -24,10 +24,17 @@
 package org.projectforge.plugins.skillmatrix;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.common.NumberHelper;
+import org.projectforge.user.PFUserContext;
+import org.projectforge.user.UserDao;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.AbstractSecuredBasePage;
+import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 /**
  * @author Billy Duong (b.duong@micromata.de)
@@ -41,18 +48,24 @@ public class SkillEditPage extends AbstractEditPage<SkillDO, SkillEditForm, Skil
 
   public static final String I18N_KEY_PREFIX = "plugins.skillmatrix.skill";
 
+  public static final String PARAM_PARENT_SKILL_ID = "parentSkillId";
+
   @SpringBean(name = "skillDao")
   private SkillDao skillDao;
 
-  /**
-   * @param parameters
-   */
+  @SpringBean(name = "userDao")
+  private UserDao userDao;
+
   public SkillEditPage(final PageParameters parameters)
   {
     super(parameters, I18N_KEY_PREFIX);
     init();
+    addTopMenuPanel();
+    final Integer parentSkillId = WicketUtils.getAsInteger(parameters, PARAM_PARENT_SKILL_ID);
+    if (NumberHelper.greaterZero(parentSkillId) == true) {
+      skillDao.setParentSkill(getData(), parentSkillId);
+    }
   }
-
   /**
    * @see org.projectforge.web.wicket.AbstractEditPage#getBaseDao()
    */
@@ -114,4 +127,76 @@ public class SkillEditPage extends AbstractEditPage<SkillDO, SkillEditForm, Skil
   {
     // Do nothing
   }
+
+  @Override
+  public AbstractSecuredBasePage onSaveOrUpdate()
+  {
+    skillDao.setFullAccessGroups(getData(), form.fullAccessGroupsListHelper.getAssignedItems());
+    skillDao.setReadonlyAccessGroups(getData(), form.readOnlyAccessGroupsListHelper.getAssignedItems());
+    skillDao.setTrainingAccessGroups(getData(), form.trainingAccessGroupsListHelper.getAssignedItems());
+    return super.onSaveOrUpdate();
+  }
+
+  @SuppressWarnings("serial")
+  private void addTopMenuPanel()
+  {
+    if (isNew() == false) {
+
+      final Integer[] curUserGroupIds = userDao.getAssignedGroups(PFUserContext.getUser()).toArray(new Integer[0]);
+      final Integer id = form.getData().getId();
+
+      final Integer[] fullAccessGroupIds = form.skillRight.getFullAccessGroupIds(getData());
+      boolean isUserInFullAccessGroup = false;
+      for (final Integer i: curUserGroupIds) {
+        for (final Integer j : fullAccessGroupIds) {
+          if (i == j) {
+            isUserInFullAccessGroup = true;
+            break;
+          }
+        }
+      }
+
+      if (isUserInFullAccessGroup == true) {
+        final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+          @Override
+          public void onClick()
+          {
+            final PageParameters params = new PageParameters();
+            params.set(PARAM_PARENT_SKILL_ID, id);
+            final SkillEditPage skillEditPage = new SkillEditPage(params);
+            skillEditPage.setReturnToPage(SkillEditPage.this);
+            setResponsePage(skillEditPage);
+          };
+        }, getString("plugins.skillmatrix.skill.menu.addSubSkill"));
+        addContentMenuEntry(menu);
+      }
+
+      final Integer[] trainingGroupIds = form.skillRight.getTrainingAccessGroupIds(getData());
+      boolean isUserInTrainingGroup = false;
+      for (final Integer i: curUserGroupIds) {
+        for (final Integer j : trainingGroupIds) {
+          if (i == j) {
+            isUserInTrainingGroup = true;
+            break;
+          }
+        }
+      }
+
+      if (isUserInTrainingGroup == true) {
+        final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+          @Override
+          public void onClick()
+          {
+            final PageParameters params = new PageParameters();
+            params.add(TrainingEditPage.PARAM_PARENT_SKILL_ID, id);
+            final TrainingEditPage trainingEditPage = new TrainingEditPage(params);
+            trainingEditPage.setReturnToPage(SkillEditPage.this);
+            setResponsePage(trainingEditPage);
+          };
+        }, getString("plugins.skillmatrix.skill.menu.addTraining"));
+        addContentMenuEntry(menu);
+      }
+    }
+  }
+
 }
