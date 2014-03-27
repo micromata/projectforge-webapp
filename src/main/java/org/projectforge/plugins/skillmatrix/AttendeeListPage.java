@@ -9,6 +9,7 @@
 
 package org.projectforge.plugins.skillmatrix;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,8 @@ import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.excel.PropertyMapping;
+import org.projectforge.export.DOListExcelExporter;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.user.UserPropertyColumn;
@@ -118,8 +121,51 @@ IListPageColumnsCreator<AttendeeDO>
   {
     dataTable = createDataTable(createColumns(this, true), "lastUpdate", SortOrder.DESCENDING);
     form.add(dataTable);
+    addExcelExport(getString("plugins.skillmatrix.skilltraining.attendee.menu"), getString("plugins.skillmatrix.skilltraining.attendee.menu"));
   }
 
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#createExcelExporter(java.lang.String)
+   */
+  @Override
+  protected DOListExcelExporter createExcelExporter(final String filenameIdentifier)
+  {
+    return new DOListExcelExporter(filenameIdentifier) {
+      // /**
+      // * @see org.projectforge.excel.ExcelExporter#onBeforeSettingColumns(java.util.List)
+      // */
+      // @Override
+      // protected List<ExportColumn> onBeforeSettingColumns(final ContentProvider sheetProvider, final List<ExportColumn> columns)
+      // {
+      // final List<ExportColumn> sortedColumns = reorderColumns(columns, "kreditor", "konto", "kontoBezeichnung", "betreff", "datum",
+      // "faelligkeit", "bezahlDatum", "zahlBetrag");
+      // I18nExportColumn col = new I18nExportColumn("kontoBezeichnung", "fibu.konto.bezeichnung", MyXlsContentProvider.LENGTH_STD);
+      // sortedColumns.add(2, col);
+      // col = new I18nExportColumn("netSum", "fibu.common.netto");
+      // putCurrencyFormat(sheetProvider, col);
+      // sortedColumns.add(7, col);
+      // col = new I18nExportColumn("grossSum", "fibu.common.brutto");
+      // putCurrencyFormat(sheetProvider, col);
+      // sortedColumns.add(8, col);
+      // return sortedColumns;
+      // }
+
+      /**
+       * @see org.projectforge.excel.ExcelExporter#addMapping(org.projectforge.excel.PropertyMapping, java.lang.Object,
+       *      java.lang.reflect.Field)
+       */
+      @Override
+      public void addMapping(final PropertyMapping mapping, final Object entry, final Field field)
+      {
+        if ("training".equals(field.getName()) == true) {
+          final SkillDO skill = ((AttendeeDO) entry).getTraining().getSkill();
+          mapping.add(field.getName(), skill != null ? skill.getTitle() : "");
+        } else {
+          super.addMapping(mapping, entry, field);
+        }
+      }
+    };
+  }
   /**
    * @see org.projectforge.web.wicket.AbstractListPage#getBaseDao()
    */
