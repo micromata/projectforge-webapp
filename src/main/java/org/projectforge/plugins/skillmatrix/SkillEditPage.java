@@ -52,16 +52,6 @@ public class SkillEditPage extends AbstractEditPage<SkillDO, SkillEditForm, Skil
   private SkillDao skillDao;
 
 
-  /**
-   * @param parameters
-   */
-  //  public SkillEditPage(final PageParameters parameters)
-  //  {
-  //    super(parameters, I18N_KEY_PREFIX);
-  //    super.init();
-  //    addTopMenuPanel();
-  //  }
-
   public SkillEditPage(final PageParameters parameters)
   {
     super(parameters, I18N_KEY_PREFIX);
@@ -173,32 +163,6 @@ public class SkillEditPage extends AbstractEditPage<SkillDO, SkillEditForm, Skil
         };
       }, getString("plugins.skillmatrix.skill.menu.addTraining"));
       addContentMenuEntry(menu);
-
-      //      final BookmarkablePageLink<Void> showTimesheetsLink = new BookmarkablePageLink<Void>("link", TimesheetListPage.class);
-      //      showTimesheetsLink.getPageParameters().set(TimesheetListPage.PARAMETER_KEY_TASK_ID, id);
-      //      menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), showTimesheetsLink, getString("task.menu.showTimesheets"));
-      //      addContentMenuEntry(menu);
-      //
-      //      menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
-      //        @Override
-      //        public void onClick()
-      //        {
-      //          final PageParameters params = new PageParameters();
-      //          params.set(GanttChartEditPage.PARAM_KEY_TASK, id);
-      //          final GanttChartEditPage ganttChartEditPage = new GanttChartEditPage(params);
-      //          ganttChartEditPage.setReturnToPage(TaskEditPage.this);
-      //          setResponsePage(ganttChartEditPage);
-      //        };
-      //      }, getString("gantt.title.add"));
-      //      addContentMenuEntry(menu);
-      //
-      //      final BookmarkablePageLink<Void> showAccessRightsLink = new BookmarkablePageLink<Void>("link", AccessListPage.class);
-      //      if (form.getData().getId() != null) {
-      //        showAccessRightsLink.getPageParameters().set(AccessListPage.PARAMETER_KEY_TASK_ID, form.getData().getId());
-      //      }
-      //      final ContentMenuEntryPanel extendedMenu = contentMenuBarPanel.ensureAndAddExtendetMenuEntry();
-      //      menu = new ContentMenuEntryPanel(extendedMenu.newSubMenuChildId(), showAccessRightsLink, getString("task.menu.showAccessRights"));
-      //      extendedMenu.addSubMenuEntry(menu);
     }
   }
 

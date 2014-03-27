@@ -287,15 +287,4 @@ public class SkillTextSelectPanel extends AbstractSelectPanel<SkillDO> implement
     return defaultFormProcessing;
   }
 
-  /**
-   * @return the currentSkillId
-   */
-  public Integer getCurrentSkillId()
-  {
-    if (currentSkill != null && currentSkill.getId() != null)
-      return currentSkill.getId();
-    else
-      return -1;
-  }
-
 }
