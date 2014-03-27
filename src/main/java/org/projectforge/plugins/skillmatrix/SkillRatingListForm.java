@@ -24,7 +24,11 @@
 package org.projectforge.plugins.skillmatrix;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.user.PFUserDO;
+import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
@@ -43,6 +47,9 @@ public class SkillRatingListForm extends AbstractListForm<SkillRatingFilter, Ski
 
   public static final String I18N_KEY_REQUIRED_EXPERIENCE = "plugins.skillmatrix.search.reqiuredExperience";
 
+  @SpringBean(name = "skillDao")
+  private SkillDao skillDao;
+
   /**
    * @param parentPage
    */
@@ -58,7 +65,7 @@ public class SkillRatingListForm extends AbstractListForm<SkillRatingFilter, Ski
     {
       // Required experience
       gridBuilder.newSplitPanel(GridSize.COL100);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString(I18N_KEY_REQUIRED_EXPERIENCE)).suppressLabelForWarning();
+      FieldsetPanel fs = gridBuilder.newFieldset(getString(I18N_KEY_REQUIRED_EXPERIENCE)).suppressLabelForWarning();
       fs.getFieldset().setOutputMarkupId(true);
       final LabelValueChoiceRenderer<SkillRating> ratingChoiceRenderer = new LabelValueChoiceRenderer<SkillRating>(this,
           SkillRating.values());
@@ -66,6 +73,57 @@ public class SkillRatingListForm extends AbstractListForm<SkillRatingFilter, Ski
           new PropertyModel<SkillRating>(getSearchFilter(), "skillRating"), ratingChoiceRenderer.getValues(), ratingChoiceRenderer);
       skillChoice.setNullValid(true);
       fs.add(skillChoice);
+
+      // User
+      gridBuilder.newSplitPanel(GridSize.COL50);
+      fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.skillrating.user"));
+      @SuppressWarnings("serial")
+      final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new Model<PFUserDO>() {
+        @Override
+        public PFUserDO getObject()
+        {
+          return userGroupCache.getUser(getSearchFilter().getUserId());
+        }
+
+        @Override
+        public void setObject(final PFUserDO object)
+        {
+          if (object == null) {
+            getSearchFilter().setUserId(null);
+          } else {
+            getSearchFilter().setUserId(object.getId());
+          }
+        }
+      }, parentPage, "userId");
+      fs.add(userSelectPanel);
+      userSelectPanel.setDefaultFormProcessing(false);
+      userSelectPanel.init().withAutoSubmit(true);
+
+      // Skill
+      gridBuilder.newSplitPanel(GridSize.COL50);
+      fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.skill.title"));
+      @SuppressWarnings("serial")
+      final SkillTextSelectPanel skillSelectPanel = new SkillTextSelectPanel(fs.newChildId(), new Model<SkillDO>() {
+        @Override
+        public SkillDO getObject()
+        {
+          return skillDao.getById(getSearchFilter().getSkillId());
+        }
+        @Override
+        public void setObject(final SkillDO object)
+        {
+          if (object == null) {
+            getSearchFilter().setSkillId(null);
+          } else {
+            getSearchFilter().setSkillId(object.getId());
+          }
+        }
+      }, parentPage, "skillId");
+      fs.add(skillSelectPanel);
+      skillSelectPanel.setDefaultFormProcessing(false);
+      skillSelectPanel.init().withAutoSubmit(true);
+
+
     }
   }
 

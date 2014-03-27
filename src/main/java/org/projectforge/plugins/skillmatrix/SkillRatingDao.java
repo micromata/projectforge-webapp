@@ -32,6 +32,7 @@ import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.core.UserException;
 import org.projectforge.registry.Registry;
+import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRightId;
 
 /**
@@ -129,12 +130,27 @@ public class SkillRatingDao extends BaseDao<SkillRatingDO>
       myFilter = new SkillRatingFilter(filter);
     }
     final QueryFilter queryFilter = new QueryFilter(myFilter);
+    final String searchString = myFilter.getSearchString();
 
     if (myFilter.getSkillRating() != null) {
       final Object[] values = SkillRating.getRequiredExperienceValues(myFilter
           .getSkillRating());
       queryFilter.add(Restrictions.in("skillRating", values));
     }
+
+    if (myFilter.getSkillId() != null) {
+      final SkillDO skill = new SkillDO();
+      skill.setId(myFilter.getSkillId());
+      queryFilter.add(Restrictions.eq("skill", skill));
+    }
+
+    if (myFilter.getUserId() != null) {
+      final PFUserDO user = new PFUserDO();
+      user.setId(myFilter.getUserId());
+      queryFilter.add(Restrictions.eq("user", user));
+    }
+
+    myFilter.setSearchString(searchString); // Restore search string.
     return getList(queryFilter);
   }
 

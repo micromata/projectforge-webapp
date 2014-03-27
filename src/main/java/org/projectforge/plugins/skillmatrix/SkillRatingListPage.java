@@ -160,7 +160,7 @@ IListPageColumnsCreator<SkillRatingDO>
   {
     dataTable = createDataTable(createColumns(this, true), "lastUpdate", SortOrder.DESCENDING);
     form.add(dataTable);
-    addExcelExport(getString("fibu.employee.title.heading"), "skill ratings"); // TODO: i18n und beschriftung
+    addExcelExport(getString("plugins.skillmatrix.skillrating.menu"), getString("plugins.skillmatrix.skillrating.menu"));
   }
 
   /**
@@ -222,5 +222,38 @@ IListPageColumnsCreator<SkillRatingDO>
   protected SkillRatingListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new SkillRatingListForm(this);
+  }
+
+  /*
+   * @see org.projectforge.web.wicket.AbstractListPage#select(java.lang.String, java.lang.Object)
+   */
+  @Override
+  public void select(final String property, final Object selectedValue)
+  {
+    if ("skillId".equals(property) == true) {
+      form.getSearchFilter().setSkillId((Integer) selectedValue);
+      refresh();
+    } else if ("userId".equals(property) == true) {
+      form.getSearchFilter().setUserId((Integer) selectedValue);
+      refresh();
+    } else
+      super.select(property, selectedValue);
+  }
+
+  /**
+   * 
+   * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
+   */
+  @Override
+  public void unselect(final String property)
+  {
+    if ("skillId".equals(property) == true) {
+      form.getSearchFilter().setSkillId(null);
+      refresh();
+    } else if ("userId".equals(property) == true) {
+      form.getSearchFilter().setUserId(null);
+      refresh();
+    }
+    super.unselect(property);
   }
 }
