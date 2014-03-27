@@ -65,7 +65,7 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
 
   MultiChoiceListHelper<GroupDO> fullAccessGroupsListHelper, readOnlyAccessGroupsListHelper, trainingAccessGroupsListHelper;
 
-  private SkillRight skillRight;
+  SkillRight skillRight;
 
   private Collection<Component> ajaxTargets;
 
