@@ -37,8 +37,6 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.excel.ContentProvider;
-import org.projectforge.excel.ExportColumn;
 import org.projectforge.excel.PropertyMapping;
 import org.projectforge.export.DOListExcelExporter;
 import org.projectforge.user.PFUserContext;
@@ -173,25 +171,6 @@ IListPageColumnsCreator<SkillRatingDO>
   {
     return new DOListExcelExporter(filenameIdentifier) {
       /**
-       * @see org.projectforge.excel.ExcelExporter#onBeforeSettingColumns(java.util.List)
-       */
-      @Override
-      protected List<ExportColumn> onBeforeSettingColumns(final ContentProvider sheetProvider, final List<ExportColumn> columns)
-      {
-        final List<ExportColumn> sortedColumns = reorderColumns(columns, "skill", "user",  "sinceYear", "skillRating", "certificates",
-            "trainingCourses", "description", "comment");
-        //       I18nExportColumn col = new I18nExportColumn("kontoBezeichnung", "fibu.konto.bezeichnung", MyXlsContentProvider.LENGTH_STD);
-        //       sortedColumns.add(2, col);
-        //       col = new I18nExportColumn("netSum", "fibu.common.netto");
-        //       putCurrencyFormat(sheetProvider, col);
-        //       sortedColumns.add(7, col);
-        //       col = new I18nExportColumn("grossSum", "fibu.common.brutto");
-        //       putCurrencyFormat(sheetProvider, col);
-        //       sortedColumns.add(8, col);
-        return sortedColumns;
-      }
-
-      /**
        * @see org.projectforge.excel.ExcelExporter#addMapping(org.projectforge.excel.PropertyMapping, java.lang.Object,
        *      java.lang.reflect.Field)
        */
@@ -201,12 +180,6 @@ IListPageColumnsCreator<SkillRatingDO>
         if ("skill".equals(field.getName()) == true) {
           final SkillDO skill = ((SkillRatingDO) entry).getSkill();
           mapping.add(field.getName(), skill != null ? skill.getTitle() : "");
-        } else if ("sinceYear".equals(field.getName()) == true) {
-          final Integer i = ((SkillRatingDO) entry).getSinceYear();
-          String s = null;
-          if ( i != null)
-            s = i.toString();
-          mapping.add(field.getName(), s != null ? s : "");
         } else {
           super.addMapping(mapping, entry, field);
         }
