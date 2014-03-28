@@ -348,6 +348,11 @@ public class SkillTree extends AbstractCache implements Serializable
     rootSkill.setTitle("root");
     rootSkill.setDescription("ProjectForge root skill");
     rootSkill.setRateable(false);
+
+    rootSkill.setFullAccessGroupIds("4");
+    rootSkill.setReadOnlyAccessGroupIds("4");
+    rootSkill.setTrainingAccessGroupIds("4");
+
     // TODO internalSave gives a no hibernate session bound to thread warning, this workaround should probably exchanged for a better solution
     // skillDao.internalSave(rootSkill);
     skillDao.getHibernateTemplate().save(rootSkill);
