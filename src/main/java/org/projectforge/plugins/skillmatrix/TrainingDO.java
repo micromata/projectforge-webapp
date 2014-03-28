@@ -43,6 +43,7 @@ import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.PropertyInfo;
+import org.projectforge.core.ShortDisplayNameCapable;
 import org.projectforge.core.UserPrefParameter;
 import org.projectforge.database.Constants;
 
@@ -54,7 +55,7 @@ import org.projectforge.database.Constants;
 @Entity
 @Indexed
 @Table(name = "T_PLUGIN_SKILL_TRAINING")
-public class TrainingDO extends DefaultBaseDO
+public class TrainingDO extends DefaultBaseDO implements ShortDisplayNameCapable
 {
 
   private static final long serialVersionUID = -3671964174762366962L;
@@ -91,6 +92,12 @@ public class TrainingDO extends DefaultBaseDO
   private Date endDate;
 
   private String fullAccessGroupIds, readOnlyAccessGroupIds;
+
+  @Transient
+  public String getShortDisplayName()
+  {
+    return this.getTitle() + " (#" + this.getId() + ")";
+  }
 
   @Column(length = 100)
   public String getTitle()
