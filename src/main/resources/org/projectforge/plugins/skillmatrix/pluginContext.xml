@@ -4,4 +4,6 @@
   <!-- Daos (automatically initialized as singletons.) -->
   <bean id="skillDao" class="org.projectforge.plugins.skillmatrix.SkillDao" />
   <bean id="skillRatingDao" class="org.projectforge.plugins.skillmatrix.SkillRatingDao" />
+  <bean id="trainingDao" class="org.projectforge.plugins.skillmatrix.TrainingDao" />
+  <bean id="attendeeDao" class="org.projectforge.plugins.skillmatrix.AttendeeDao" />
 </beans>

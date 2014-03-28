@@ -26,6 +26,7 @@ package org.projectforge.plugins.skillmatrix;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -122,6 +123,9 @@ public abstract class SkillSelectAutoCompleteFormComponent extends PFAutoComplet
   {
     final StringBuilder builder = new StringBuilder();
     final List<SkillNode> nodeList = getSkillTree().getPathToRoot(skillId);
+    if (CollectionUtils.isEmpty(nodeList) == true) {
+      return getString("task.path.rootTask");
+    }
     final String pipeSeparator = " | ";
     String separator = "";
     for (final SkillNode node : nodeList) {

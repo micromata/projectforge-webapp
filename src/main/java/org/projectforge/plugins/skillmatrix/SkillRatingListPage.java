@@ -23,6 +23,7 @@
 
 package org.projectforge.plugins.skillmatrix;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +37,11 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.user.ThreadLocalUserContext;
+import org.projectforge.excel.ContentProvider;
+import org.projectforge.excel.ExportColumn;
+import org.projectforge.excel.PropertyMapping;
+import org.projectforge.export.DOListExcelExporter;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.user.UserPropertyColumn;
@@ -49,7 +54,7 @@ import org.projectforge.web.wicket.ListSelectActionPanel;
 
 /**
  * @author Billy Duong (b.duong@micromata.de)
- *
+ * 
  */
 @ListPage(editPage = SkillRatingEditPage.class)
 public class SkillRatingListPage extends AbstractListPage<SkillRatingListForm, SkillRatingDao, SkillRatingDO> implements
@@ -66,7 +71,7 @@ IListPageColumnsCreator<SkillRatingDO>
 
   public SkillRatingListPage(final PageParameters parameters)
   {
-    super(parameters, "plugins.skillmatrix");
+    super(parameters, "plugins.skillmatrix.rating");
   }
 
   /**
@@ -96,7 +101,7 @@ IListPageColumnsCreator<SkillRatingDO>
         item.add(new ListSelectActionPanel(componentId, rowModel, SkillRatingEditPage.class, skillRating.getId(), returnToPage,
             DateTimeFormatter.instance().getFormattedDateTime(skillRating.getCreated())));
         // Only the owner can click / edit his entries
-        if (ObjectUtils.equals(ThreadLocalUserContext.getUserId(), skillRating.getUserId())) {
+        if (ObjectUtils.equals(PFUserContext.getUserId(), skillRating.getUserId())) {
           addRowClick(item);
         }
         cellItemListener.populateItem(item, componentId, rowModel);
@@ -111,7 +116,8 @@ IListPageColumnsCreator<SkillRatingDO>
 
     // TODO: Workaround with get (hardcoded I18N), needs a better solution.
     // Commented lines don't work!
-    // final CellItemListenerPropertyColumn<SkillRatingDO> skillTitle = new CellItemListenerPropertyColumn<SkillRatingDO>(SkillRatingDO.class,
+    // final CellItemListenerPropertyColumn<SkillRatingDO> skillTitle = new
+    // CellItemListenerPropertyColumn<SkillRatingDO>(SkillRatingDO.class,
     // getSortable("skill.title", sortable), "skill.title", cellItemListener);
     final CellItemListenerPropertyColumn<SkillRatingDO> skillTitle = new CellItemListenerPropertyColumn<SkillRatingDO>(
         getString("plugins.skillmatrix.skill.title"), getSortable("skill.title", sortable), "skill.title", cellItemListener);
@@ -156,6 +162,56 @@ IListPageColumnsCreator<SkillRatingDO>
   {
     dataTable = createDataTable(createColumns(this, true), "lastUpdate", SortOrder.DESCENDING);
     form.add(dataTable);
+    addExcelExport(getString("plugins.skillmatrix.skillrating.menu"), getString("plugins.skillmatrix.skillrating.menu"));
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#createExcelExporter(java.lang.String)
+   */
+  @Override
+  protected DOListExcelExporter createExcelExporter(final String filenameIdentifier)
+  {
+    return new DOListExcelExporter(filenameIdentifier) {
+      /**
+       * @see org.projectforge.excel.ExcelExporter#onBeforeSettingColumns(java.util.List)
+       */
+      @Override
+      protected List<ExportColumn> onBeforeSettingColumns(final ContentProvider sheetProvider, final List<ExportColumn> columns)
+      {
+        final List<ExportColumn> sortedColumns = reorderColumns(columns, "skill", "user",  "sinceYear", "skillRating", "certificates",
+            "trainingCourses", "description", "comment");
+        //       I18nExportColumn col = new I18nExportColumn("kontoBezeichnung", "fibu.konto.bezeichnung", MyXlsContentProvider.LENGTH_STD);
+        //       sortedColumns.add(2, col);
+        //       col = new I18nExportColumn("netSum", "fibu.common.netto");
+        //       putCurrencyFormat(sheetProvider, col);
+        //       sortedColumns.add(7, col);
+        //       col = new I18nExportColumn("grossSum", "fibu.common.brutto");
+        //       putCurrencyFormat(sheetProvider, col);
+        //       sortedColumns.add(8, col);
+        return sortedColumns;
+      }
+
+      /**
+       * @see org.projectforge.excel.ExcelExporter#addMapping(org.projectforge.excel.PropertyMapping, java.lang.Object,
+       *      java.lang.reflect.Field)
+       */
+      @Override
+      public void addMapping(final PropertyMapping mapping, final Object entry, final Field field)
+      {
+        if ("skill".equals(field.getName()) == true) {
+          final SkillDO skill = ((SkillRatingDO) entry).getSkill();
+          mapping.add(field.getName(), skill != null ? skill.getTitle() : "");
+        } else if ("sinceYear".equals(field.getName()) == true) {
+          final Integer i = ((SkillRatingDO) entry).getSinceYear();
+          String s = null;
+          if ( i != null)
+            s = i.toString();
+          mapping.add(field.getName(), s != null ? s : "");
+        } else {
+          super.addMapping(mapping, entry, field);
+        }
+      }
+    };
   }
 
   /**
@@ -174,5 +230,38 @@ IListPageColumnsCreator<SkillRatingDO>
   protected SkillRatingListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new SkillRatingListForm(this);
+  }
+
+  /*
+   * @see org.projectforge.web.wicket.AbstractListPage#select(java.lang.String, java.lang.Object)
+   */
+  @Override
+  public void select(final String property, final Object selectedValue)
+  {
+    if ("skillId".equals(property) == true) {
+      form.getSearchFilter().setSkillId((Integer) selectedValue);
+      refresh();
+    } else if ("userId".equals(property) == true) {
+      form.getSearchFilter().setUserId((Integer) selectedValue);
+      refresh();
+    } else
+      super.select(property, selectedValue);
+  }
+
+  /**
+   * 
+   * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
+   */
+  @Override
+  public void unselect(final String property)
+  {
+    if ("skillId".equals(property) == true) {
+      form.getSearchFilter().setSkillId(null);
+      refresh();
+    } else if ("userId".equals(property) == true) {
+      form.getSearchFilter().setUserId(null);
+      refresh();
+    }
+    super.unselect(property);
   }
 }

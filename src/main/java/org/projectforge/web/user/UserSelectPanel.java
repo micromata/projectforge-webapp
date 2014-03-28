@@ -45,6 +45,7 @@ import org.projectforge.user.UserDao;
 import org.projectforge.web.CSSColor;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractSelectPanel;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
 import org.projectforge.web.wicket.flowlayout.IconPanel;
@@ -340,5 +341,15 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO> implements Co
   public FormComponent< ? > getFormComponent()
   {
     return userTextField;
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractSelectPanel#setFocus()
+   */
+  @Override
+  public AbstractSelectPanel<PFUserDO> setFocus()
+  {
+    WicketUtils.setFocus(this.userTextField);
+    return this;
   }
 }

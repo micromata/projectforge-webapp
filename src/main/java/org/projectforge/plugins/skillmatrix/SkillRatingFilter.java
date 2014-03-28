@@ -40,6 +40,8 @@ public class SkillRatingFilter extends BaseSearchFilter
   @XStreamAsAttribute
   private SkillRating skillRating;
 
+  private Integer skillId, userId;
+
   public SkillRatingFilter()
   {
   }
@@ -57,6 +59,42 @@ public class SkillRatingFilter extends BaseSearchFilter
   public void setSkillRating(final SkillRating skillRating)
   {
     this.skillRating = skillRating;
+  }
+
+  /**
+   * @return the skillId
+   */
+  public Integer getSkillId()
+  {
+    return skillId;
+  }
+
+  /**
+   * @param skillId the skillId to set
+   * @return this for chaining.
+   */
+  public SkillRatingFilter setSkillId(final Integer skillId)
+  {
+    this.skillId = skillId;
+    return this;
+  }
+
+  /**
+   * @return the userId
+   */
+  public Integer getUserId()
+  {
+    return userId;
+  }
+
+  /**
+   * @param userId the userId to set
+   * @return this for chaining.
+   */
+  public SkillRatingFilter setUserId(final Integer userId)
+  {
+    this.userId = userId;
+    return this;
   }
 
 }
