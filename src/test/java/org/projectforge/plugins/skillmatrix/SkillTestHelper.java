@@ -11,6 +11,7 @@ package org.projectforge.plugins.skillmatrix;
 
 import java.io.IOException;
 
+import org.projectforge.plugins.teamcal.TeamCalPlugin;
 import org.projectforge.test.AbstractTestBase;
 import org.projectforge.test.PluginTestBase;
 import org.projectforge.user.GroupDO;
@@ -35,7 +36,8 @@ public class SkillTestHelper
 
   public static void setup(final boolean createTestData) throws BeansException, IOException
   {
-    PluginTestBase.init("org/projectforge/plugins/skillmatrix/pluginContext.xml", createTestData, new SkillMatrixPlugin());
+    final String [] contextFiles = { "org/projectforge/plugins/teamcal/pluginContext.xml", "org/projectforge/plugins/skillmatrix/pluginContext.xml"};
+    PluginTestBase.init(contextFiles, createTestData,  new TeamCalPlugin() ,new SkillMatrixPlugin());
   }
 
   public SkillDO prepareUsersAndGroups(final String prefix, final AbstractTestBase testBase, final SkillDao skillDao)
