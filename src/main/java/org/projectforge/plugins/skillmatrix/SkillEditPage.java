@@ -196,6 +196,21 @@ public class SkillEditPage extends AbstractEditPage<SkillDO, SkillEditForm, Skil
         }, getString("plugins.skillmatrix.skill.menu.addTraining"));
         addContentMenuEntry(menu);
       }
+
+      if (isUserInFullAccessGroup == true) {
+        final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+          @Override
+          public void onClick()
+          {
+            final PageParameters params = new PageParameters();
+            params.add(SkillRatingListPage.PARAM_SKILL_ID, id);
+            final SkillRatingListPage skillRatingListPage = new SkillRatingListPage(params);
+            skillRatingListPage.setReturnToPage(SkillEditPage.this);
+            setResponsePage(skillRatingListPage);
+          };
+        }, getString("plugins.skillmatrix.skill.menu.addRating"));
+        addContentMenuEntry(menu);
+      }
     }
   }
 
