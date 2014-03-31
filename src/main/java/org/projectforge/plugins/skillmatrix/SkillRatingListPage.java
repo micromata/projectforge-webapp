@@ -37,6 +37,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.common.NumberHelper;
 import org.projectforge.excel.PropertyMapping;
 import org.projectforge.export.DOListExcelExporter;
 import org.projectforge.user.PFUserContext;
@@ -49,6 +50,7 @@ import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * @author Billy Duong (b.duong@micromata.de)
@@ -67,9 +69,15 @@ IListPageColumnsCreator<SkillRatingDO>
   @SpringBean(name = "userFormatter")
   private UserFormatter userFormatter;
 
+  public static final String PARAM_SKILL_ID = "skillId";
+
   public SkillRatingListPage(final PageParameters parameters)
   {
     super(parameters, "plugins.skillmatrix.rating");
+    final Integer skillId = WicketUtils.getAsInteger(parameters, PARAM_SKILL_ID);
+    if (NumberHelper.greaterZero(skillId) == true) {
+      form.getSearchFilter().setSkillId(skillId);
+    }
   }
 
   /**
@@ -118,7 +126,7 @@ IListPageColumnsCreator<SkillRatingDO>
     // CellItemListenerPropertyColumn<SkillRatingDO>(SkillRatingDO.class,
     // getSortable("skill.title", sortable), "skill.title", cellItemListener);
     final CellItemListenerPropertyColumn<SkillRatingDO> skillTitle = new CellItemListenerPropertyColumn<SkillRatingDO>(
-        getString("plugins.skillmatrix.skill.title"), getSortable("skill.title", sortable), "skill.title", cellItemListener);
+        getString("plugins.skillmatrix.skillrating.skill"), getSortable("skill.title", sortable), "skill.title", cellItemListener);
 
     final CellItemListenerPropertyColumn<SkillRatingDO> experience = new CellItemListenerPropertyColumn<SkillRatingDO>(SkillRatingDO.class,
         getSortable("skillRating", sortable), "skillRating", cellItemListener);
