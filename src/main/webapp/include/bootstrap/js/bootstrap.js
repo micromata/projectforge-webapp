@@ -1118,6 +1118,7 @@ if (typeof jQuery === 'undefined') { throw new Error('Bootstrap\'s JavaScript re
     }
 
     Tooltip.prototype.enter = function (obj) {
+        window.mousePos = { x: obj.pageX, y: obj.pageY}; // CUSTOMIZED
         var self = obj instanceof this.constructor ?
             obj : $(obj.currentTarget)[this.type](this.getDelegateOptions()).data('bs.' + this.type)
 
@@ -1340,7 +1341,8 @@ if (typeof jQuery === 'undefined') { throw new Error('Bootstrap\'s JavaScript re
         return placement == 'bottom' ? { top: pos.top + pos.height,   left: pos.left + pos.width / 2 - actualWidth / 2  } :
             placement == 'top'    ? { top: pos.top - actualHeight, left: pos.left + pos.width / 2 - actualWidth / 2  } :
                 placement == 'left'   ? { top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left - actualWidth } :
-                    /* placement == 'right' */ { top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left + pos.width   }
+                  placement == 'right' ? { top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left + pos.width   } :
+                    /* placement == 'mouse' */ {top: window.mousePos.y + 10, left: window.mousePos.x + 10}  // CUSTOMIZED
     }
 
     Tooltip.prototype.getTitle = function () {

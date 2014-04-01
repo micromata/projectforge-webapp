@@ -96,7 +96,7 @@ public class MyFullCalendarConfig extends Config
                         "title: event.tooltipTitle, " +
                         "content: event.tooltipContent, " +
                         "html: true, " +
-                        "placement: 'auto bottom'," +
+                        "placement: 'mouse'," +
                         "trigger: 'hover'" +
                     "});" +
                 "}" +

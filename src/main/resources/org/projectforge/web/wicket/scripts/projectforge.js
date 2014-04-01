@@ -172,7 +172,7 @@ function initializeComponents() {
     if ($("textarea.autogrow").length) {
 		$("textarea.autogrow").autoGrow();
 	}
-	$('textarea').each(function(){
+	$('textarea').each(function(my){
 	    $(this).keypress(function(e) {
 	        if (e.ctrlKey && e.keyCode == 13 || e.ctrlKey && e.keyCode == 10) {
 	            $(this).closest('form').find('.btn-success').click();
@@ -182,12 +182,12 @@ function initializeComponents() {
     hideAllTooltips();
 	$('[rel=mypopup]').popover({
         container: 'body',
-        placement: 'auto'
+        placement: 'right auto'
     });
 
     $('[rel=mytooltip]').tooltip({
     	container: 'body',
-    	placement: 'auto'
+    	placement: 'right auto'
     });
 }
 
