@@ -195,7 +195,7 @@ public class SkillEditPage extends AbstractEditPage<SkillDO, SkillEditForm, Skil
             trainingEditPage.setReturnToPage(SkillEditPage.this);
             setResponsePage(trainingEditPage);
           };
-        }, getString("plugins.skillmatrix.skill.menu.addTraining"));
+        }, getString("plugins.skillmatrix.skilltraining.menu"));
         addContentMenuEntry(menu);
       }
 
