@@ -27,7 +27,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -40,10 +39,10 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.excel.PropertyMapping;
 import org.projectforge.export.DOListExcelExporter;
-import org.projectforge.user.PFUserContext;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.user.UserPropertyColumn;
+import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
@@ -106,12 +105,10 @@ IListPageColumnsCreator<SkillRatingDO>
         final SkillRatingDO skillRating = (SkillRatingDO) rowModel.getObject();
         item.add(new ListSelectActionPanel(componentId, rowModel, SkillRatingEditPage.class, skillRating.getId(), returnToPage,
             DateTimeFormatter.instance().getFormattedDateTime(skillRating.getCreated())));
-        // Only the owner can click / edit his entries
-        if (ObjectUtils.equals(PFUserContext.getUserId(), skillRating.getUserId())) {
-          addRowClick(item);
-        }
+        addRowClick(item);
         cellItemListener.populateItem(item, componentId, rowModel);
       }
+
     };
 
     final CellItemListenerPropertyColumn<SkillRatingDO> modified = new CellItemListenerPropertyColumn<SkillRatingDO>(getString("modified"),
@@ -245,4 +242,20 @@ IListPageColumnsCreator<SkillRatingDO>
     }
     super.unselect(property);
   }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#redirectToEditPage(org.apache.wicket.request.mapper.parameter.PageParameters)
+   */
+  @Override
+  protected AbstractEditPage< ? , ? , ? > redirectToEditPage(final PageParameters params)
+  {
+    if (params == null && form.getSearchFilter().getSkillId() != null) {
+      final PageParameters newParams = new PageParameters();
+      newParams.set(SkillRatingEditForm.PARAM_SKILL_ID, form.getSearchFilter().getSkillId());
+      return super.redirectToEditPage(newParams);
+    } else {
+      return super.redirectToEditPage(params);
+    }
+  }
+
 }
