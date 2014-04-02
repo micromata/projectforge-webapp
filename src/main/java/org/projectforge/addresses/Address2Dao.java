@@ -20,18 +20,18 @@ import org.projectforge.task.TaskDao;
 import org.projectforge.user.PFUserDO;
 
 /**
- * @author Kai Reinhard (k.reinhard@micromata.de)
+ * @author Werner Feder (werner.feder@t-online.de)
  *
  */
-public class AddressEntryDao extends BaseDao<AddressEntryDO>
+public class Address2Dao extends BaseDao<Address2DO>
 {
 
   private Configuration configuration;
   private TaskDao taskDao;
 
-  public AddressEntryDao()
+  public Address2Dao()
   {
-    super(AddressEntryDO.class);
+    super(Address2DO.class);
   }
 
   public void setConfiguration(final Configuration configuration)
@@ -44,14 +44,14 @@ public class AddressEntryDao extends BaseDao<AddressEntryDO>
     this.taskDao = taskDao;
   }
 
-  private String getNormalizedFullname(final AddressEntryDO addressEntry)
+  private String getNormalizedFullname(final Address2DO address)
   {
     final StringBuilder builder = new StringBuilder();
-    if (addressEntry.getFirstName() != null) {
-      builder.append(addressEntry.getFirstName().toLowerCase().trim());
+    if (address.getFirstName() != null) {
+      builder.append(address.getFirstName().toLowerCase().trim());
     }
-    if (addressEntry.getName() != null) {
-      builder.append(addressEntry.getName().toLowerCase().trim());
+    if (address.getName() != null) {
+      builder.append(address.getName().toLowerCase().trim());
     }
     return builder.toString();
   }
@@ -61,10 +61,10 @@ public class AddressEntryDao extends BaseDao<AddressEntryDO>
    * @param taskId If null, then task will be set to null;
    * @see BaseDao#getOrLoad(Integer)
    */
-  public void setTask(final AddressEntryDO addressEntry, final Integer taskId)
+  public void setTask(final Address2DO address, final Integer taskId)
   {
     final TaskDO task = taskDao.getOrLoad(taskId);
-    addressEntry.setTask(task);
+    address.setTask(task);
   }
   /**
    * return Always true, no generic select access needed for address objects.
@@ -84,27 +84,18 @@ public class AddressEntryDao extends BaseDao<AddressEntryDO>
     return configuration.getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_ADDRESSES);
   }
 
-  private void beforeUpdateOrSave(final AddressEntryDO addressEntry)
+  private void beforeUpdateOrSave(final Address2DO address)
   {
-    if (addressEntry != null && addressEntry.getTaskId() == null) {
-      setTask(addressEntry, getDefaultTaskId());
+    if (address != null && address.getTaskId() == null) {
+      setTask(address, getDefaultTaskId());
     }
-  }
-
-  /**
-   * @see org.projectforge.core.BaseDao#newInstance()
-   */
-  @Override
-  public AddressEntryDO newInstance()
-  {
-    return new AddressEntryDO();
   }
 
   /**
    * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
    */
   @Override
-  public boolean hasAccess(final PFUserDO user, final AddressEntryDO obj, final AddressEntryDO oldObj, final OperationType operationType,
+  public boolean hasAccess(final PFUserDO user, final Address2DO obj, final Address2DO oldObj, final OperationType operationType,
       final boolean throwException)
   {
     beforeUpdateOrSave(obj);
@@ -115,7 +106,7 @@ public class AddressEntryDao extends BaseDao<AddressEntryDO>
    * @see org.projectforge.core.BaseDao#hasUpdateAccess(Object, Object)
    */
   @Override
-  public boolean hasUpdateAccess(final PFUserDO user, final AddressEntryDO obj, final AddressEntryDO dbObj, final boolean throwException)
+  public boolean hasUpdateAccess(final PFUserDO user, final Address2DO obj, final Address2DO dbObj, final boolean throwException)
   {
     Validate.notNull(dbObj);
     Validate.notNull(obj);
@@ -137,5 +128,14 @@ public class AddressEntryDao extends BaseDao<AddressEntryDO>
       }
     }
     return true;
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDao#newInstance()
+   */
+  @Override
+  public Address2DO newInstance()
+  {
+    return new Address2DO();
   }
 }

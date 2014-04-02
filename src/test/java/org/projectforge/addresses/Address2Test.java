@@ -48,46 +48,42 @@ import de.micromata.hibernate.history.HistoryEntry;
 import de.micromata.hibernate.history.HistoryEntryType;
 import de.micromata.hibernate.history.delta.PropertyDelta;
 
-public class AddressEntryTest extends TestBase
+public class Address2Test extends TestBase
 {
-  private final static Logger log = Logger.getLogger(AddressEntryTest.class);
+  private final static Logger log = Logger.getLogger(Address2Test.class);
 
-  private AddressEntryDao addressEntryDao;
+  private Address2Dao address2Dao;
 
-  public void setAddressEntryDao(final AddressEntryDao addressEntryDao)
+  public void setAddress2Dao(final Address2Dao address2Dao)
   {
-    this.addressEntryDao = addressEntryDao;
+    this.address2Dao = address2Dao;
   }
-
-  //  public AddressEntryTest() {
-  //    addressEntryDao = new AddressEntryDao(AddressEntryDO.class);
-  //  }
 
   @Test
   public void testSaveAndUpdate()
   {
     logon(ADMIN);
 
-    final AddressEntryDO a1 = new AddressEntryDO();
+    final Address2DO a1 = new Address2DO();
     a1.setName("Kai Reinhard");
     a1.setTask(getTask("1.1"));
-    addressEntryDao.save(a1);
+    address2Dao.save(a1);
     log.debug(a1);
 
     a1.setName("Hurzel");
-    addressEntryDao.setTask(a1, getTask("1.2").getId());
-    addressEntryDao.update(a1);
+    address2Dao.setTask(a1, getTask("1.2").getId());
+    address2Dao.update(a1);
     assertEquals("Hurzel", a1.getName());
 
-    final AddressEntryDO a2 = addressEntryDao.getById(a1.getId());
+    final Address2DO a2 = address2Dao.getById(a1.getId());
     assertEquals("Hurzel", a2.getName());
     assertEquals(getTask("1.2").getId(), a2.getTaskId());
     a2.setName("Micromata GmbH");
-    addressEntryDao.setTask(a2, getTask("1").getId());
-    addressEntryDao.update(a2);
+    address2Dao.setTask(a2, getTask("1").getId());
+    address2Dao.update(a2);
     log.debug(a2);
 
-    final AddressEntryDO a3 = addressEntryDao.getById(a1.getId());
+    final Address2DO a3 = address2Dao.getById(a1.getId());
     assertEquals("Micromata GmbH", a3.getName());
     assertEquals(getTask("1").getId(), a3.getTaskId());
     log.debug(a3);
@@ -97,32 +93,32 @@ public class AddressEntryTest extends TestBase
   public void testDeleteAndUndelete()
   {
     logon(ADMIN);
-    AddressEntryDO a1 = new AddressEntryDO();
+    Address2DO a1 = new Address2DO();
     a1.setName("Test");
     a1.setTask(getTask("1.1"));
-    addressEntryDao.save(a1);
+    address2Dao.save(a1);
 
     final Integer id = a1.getId();
-    a1 = addressEntryDao.getById(id);
-    addressEntryDao.markAsDeleted(a1);
-    a1 = addressEntryDao.getById(id);
+    a1 = address2Dao.getById(id);
+    address2Dao.markAsDeleted(a1);
+    a1 = address2Dao.getById(id);
     assertEquals("Should be marked as deleted.", true, a1.isDeleted());
 
-    addressEntryDao.undelete(a1);
-    a1 = addressEntryDao.getById(id);
+    address2Dao.undelete(a1);
+    a1 = address2Dao.getById(id);
     assertEquals("Should be undeleted.", false, a1.isDeleted());
   }
 
   @Test(expected = RuntimeException.class)
   public void testDelete()
   {
-    AddressEntryDO a1 = new AddressEntryDO();
+    Address2DO a1 = new Address2DO();
     a1.setName("Not deletable");
     a1.setTask(getTask("1.1"));
-    addressEntryDao.save(a1);
+    address2Dao.save(a1);
     final Integer id = a1.getId();
-    a1 = addressEntryDao.getById(id);
-    addressEntryDao.delete(a1);
+    a1 = address2Dao.getById(id);
+    address2Dao.delete(a1);
   }
 
   @Test
@@ -130,14 +126,14 @@ public class AddressEntryTest extends TestBase
   {
     final PFUserDO user = getUser(TestBase.ADMIN);
     logon(user.getUsername());
-    AddressEntryDO a1 = new AddressEntryDO();
+    Address2DO a1 = new Address2DO();
     a1.setName("History test");
     a1.setTask(getTask("1.1"));
-    addressEntryDao.save(a1);
+    address2Dao.save(a1);
     final Integer id = a1.getId();
     a1.setName("History 2");
-    addressEntryDao.update(a1);
-    HistoryEntry[] historyEntries = addressEntryDao.getHistoryEntries(a1);
+    address2Dao.update(a1);
+    HistoryEntry[] historyEntries = address2Dao.getHistoryEntries(a1);
     assertEquals(2, historyEntries.length);
     HistoryEntry entry = historyEntries[0];
     log.debug(entry);
@@ -147,8 +143,8 @@ public class AddressEntryTest extends TestBase
     assertHistoryEntry(entry, id, user, HistoryEntryType.INSERT, null, null, null, null);
 
     a1.setTask(getTask("1.2"));
-    addressEntryDao.update(a1);
-    historyEntries = addressEntryDao.getHistoryEntries(a1);
+    address2Dao.update(a1);
+    historyEntries = address2Dao.getHistoryEntries(a1);
     assertEquals(3, historyEntries.length);
     entry = historyEntries[0];
     log.debug(entry);
@@ -156,8 +152,8 @@ public class AddressEntryTest extends TestBase
 
     a1.setTask(getTask("1.1"));
     a1.setName("History test");
-    addressEntryDao.update(a1);
-    historyEntries = addressEntryDao.getHistoryEntries(a1);
+    address2Dao.update(a1);
+    historyEntries = address2Dao.getHistoryEntries(a1);
     assertEquals(4, historyEntries.length);
     entry = historyEntries[0];
     log.debug(entry);
@@ -173,7 +169,7 @@ public class AddressEntryTest extends TestBase
       }
     }
 
-    List<SimpleHistoryEntry> list = addressEntryDao.getSimpleHistoryEntries(a1);
+    List<SimpleHistoryEntry> list = address2Dao.getSimpleHistoryEntries(a1);
     assertEquals(5, list.size());
     for (int i = 0; i < 2; i++) {
       final SimpleHistoryEntry se = list.get(i);
@@ -190,14 +186,14 @@ public class AddressEntryTest extends TestBase
     se = list.get(4);
     assertSimpleHistoryEntry(se, user, HistoryEntryType.INSERT, null, null, null, null);
 
-    a1 = addressEntryDao.getById(a1.getId());
+    a1 = address2Dao.getById(a1.getId());
     final Date date = a1.getLastUpdate();
     final String oldName = a1.getName();
     a1.setName("Micromata GmbH");
     a1.setName(oldName);
-    addressEntryDao.update(a1);
-    a1 = addressEntryDao.getById(a1.getId());
-    list = addressEntryDao.getSimpleHistoryEntries(a1);
+    address2Dao.update(a1);
+    a1 = address2Dao.getById(a1.getId());
+    list = address2Dao.getSimpleHistoryEntries(a1);
     assertEquals(5, list.size());
     assertEquals(date, a1.getLastUpdate()); // Fails: Fix AbstractBaseDO.copyDeclaredFields: ObjectUtils.equals(Boolean, boolean) etc.
   }
@@ -205,32 +201,32 @@ public class AddressEntryTest extends TestBase
   @Test
   public void checkStandardAccess()
   {
-    AddressEntryDO a1 = new AddressEntryDO();
+    Address2DO a1 = new Address2DO();
     a1.setName("testa1");
     a1.setTask(getTask("ta_1_siud"));
-    addressEntryDao.internalSave(a1);
-    AddressEntryDO a2 = new AddressEntryDO();
+    address2Dao.internalSave(a1);
+    Address2DO a2 = new Address2DO();
     a2.setName("testa2");
     a2.setTask(getTask("ta_2_siux"));
-    addressEntryDao.internalSave(a2);
-    final AddressEntryDO a3 = new AddressEntryDO();
+    address2Dao.internalSave(a2);
+    final Address2DO a3 = new Address2DO();
     a3.setName("testa3");
     a3.setTask(getTask("ta_3_sxxx"));
-    addressEntryDao.internalSave(a3);
-    final AddressEntryDO a4 = new AddressEntryDO();
+    address2Dao.internalSave(a3);
+    final Address2DO a4 = new Address2DO();
     a4.setName("testa4");
     a4.setTask(getTask("ta_4_xxxx"));
-    addressEntryDao.internalSave(a4);
+    address2Dao.internalSave(a4);
     logon(TestBase.TEST_USER);
 
     // Select
     try {
-      addressEntryDao.getById(a4.getId());
+      address2Dao.getById(a4.getId());
       fail("User has no access to select");
     } catch (final AccessException ex) {
       assertAccessException(ex, getTask("ta_4_xxxx").getId(), AccessType.TASKS, OperationType.SELECT);
     }
-    AddressEntryDO address = addressEntryDao.getById(a3.getId());
+    Address2DO address = address2Dao.getById(a3.getId());
     assertEquals("testa3", address.getName());
 
     // Select filter
@@ -238,7 +234,7 @@ public class AddressEntryTest extends TestBase
     searchFilter.setSearchString("testa*");
     final QueryFilter filter = new QueryFilter(searchFilter);
     filter.addOrder(Order.asc("name"));
-    final List<AddressEntryDO> result = addressEntryDao.getList(filter);
+    final List<Address2DO> result = address2Dao.getList(filter);
     assertEquals("Should found 3 address'.", 3, result.size());
     final HashSet<String> set = new HashSet<String>();
     set.add("testa1");
@@ -250,66 +246,66 @@ public class AddressEntryTest extends TestBase
     // test_a4 should not be included in result list (no select access)
 
     // Insert
-    address = new AddressEntryDO();
+    address = new Address2DO();
     address.setName("test");
-    addressEntryDao.setTask(address, getTask("ta_4_xxxx").getId());
+    address2Dao.setTask(address, getTask("ta_4_xxxx").getId());
     try {
-      addressEntryDao.save(address);
+      address2Dao.save(address);
       fail("User has no access to insert");
     } catch (final AccessException ex) {
       assertAccessException(ex, getTask("ta_4_xxxx").getId(), AccessType.TASKS, OperationType.INSERT);
     }
-    addressEntryDao.setTask(address, getTask("ta_1_siud").getId());
-    addressEntryDao.save(address);
+    address2Dao.setTask(address, getTask("ta_1_siud").getId());
+    address2Dao.save(address);
     assertEquals("test", address.getName());
 
     // Update
     a3.setName("test_a3test");
     try {
-      addressEntryDao.update(a3);
+      address2Dao.update(a3);
       fail("User has no access to update");
     } catch (final AccessException ex) {
       assertAccessException(ex, getTask("ta_3_sxxx").getId(), AccessType.TASKS, OperationType.UPDATE);
     }
     a2.setName("testa2test");
-    addressEntryDao.update(a2);
-    address = addressEntryDao.getById(a2.getId());
+    address2Dao.update(a2);
+    address = address2Dao.getById(a2.getId());
     assertEquals("testa2test", address.getName());
     a2.setName("testa2");
-    addressEntryDao.update(a2);
-    address = addressEntryDao.getById(a2.getId());
+    address2Dao.update(a2);
+    address = address2Dao.getById(a2.getId());
     assertEquals("testa2", address.getName());
 
     // Update with moving in task hierarchy
     a2.setName("testa2test");
-    addressEntryDao.setTask(a2, getTask("ta_1_siud").getId());
+    address2Dao.setTask(a2, getTask("ta_1_siud").getId());
     try {
-      addressEntryDao.update(a2);
+      address2Dao.update(a2);
       fail("User has no access to update");
     } catch (final AccessException ex) {
       assertAccessException(ex, getTask("ta_2_siux").getId(), AccessType.TASKS, OperationType.DELETE);
     }
-    a2 = addressEntryDao.getById(a2.getId());
+    a2 = address2Dao.getById(a2.getId());
     a1.setName("testa1test");
-    addressEntryDao.setTask(a1, getTask("ta_5_sxux").getId());
+    address2Dao.setTask(a1, getTask("ta_5_sxux").getId());
     try {
-      addressEntryDao.update(a1);
+      address2Dao.update(a1);
       fail("User has no access to update");
     } catch (final AccessException ex) {
       assertAccessException(ex, getTask("ta_5_sxux").getId(), AccessType.TASKS, OperationType.INSERT);
     }
-    a1 = addressEntryDao.getById(a1.getId());
+    a1 = address2Dao.getById(a1.getId());
     assertEquals("testa1", a1.getName());
 
     // Delete
     try {
-      addressEntryDao.delete(a1);
+      address2Dao.delete(a1);
       fail("Address is historizable and should not be allowed to delete.");
     } catch (final RuntimeException ex) {
-      assertEquals(true, ex.getMessage().startsWith(AddressEntryDao.EXCEPTION_HISTORIZABLE_NOTDELETABLE));
+      assertEquals(true, ex.getMessage().startsWith(Address2Dao.EXCEPTION_HISTORIZABLE_NOTDELETABLE));
     }
     try {
-      addressEntryDao.markAsDeleted(a2);
+      address2Dao.markAsDeleted(a2);
       fail("User has no access to delete");
     } catch (final AccessException ex) {
       assertAccessException(ex, getTask("ta_2_siux").getId(), AccessType.TASKS, OperationType.DELETE);
@@ -319,7 +315,7 @@ public class AddressEntryTest extends TestBase
   //  @Test
   //  public void testInstantMessagingField() throws Exception
   //  {
-  //    final AddressEntryDO address = new AddressEntryDO();
+  //    final Address2DO address = new Address2DO();
   //    assertNull(address.getInstantMessaging4DB());
   //    address.setInstantMessaging(InstantMessagingType.SKYPE, "skype-name");
   //    assertEquals("SKYPE=skype-name", address.getInstantMessaging4DB());

@@ -9,8 +9,6 @@
 
 package org.projectforge.addresses;
 
-import java.sql.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -21,176 +19,175 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
-import org.projectforge.address.FormOfAddress;
-import org.projectforge.common.StringHelper;
 import org.projectforge.core.DefaultBaseDO;
-import org.projectforge.task.TaskDO;
-import org.projectforge.user.PFUserContext;
 
 /**
- * @author Kai Reinhard (k.reinhard@micromata.de)
+ * @author Werner Feder (werner.feder@t-online.de)
  *
  */
 @Entity
 @Indexed
-@Table(name = "T_ADDRESSES")
+@Table(name = "T_ADDRESSENTRY")
 public class AddressEntryDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = -1724220844452834692L;
 
   //private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressEntryDO.class);
 
-  private TaskDO task;
+  private Address2DO address;
 
   @Enumerated(EnumType.STRING)
   @Field(index = Index.TOKENIZED, store = Store.NO)
-  private AddressEntryType addressEntryType;
+  private AddressType addressType;
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
-  private String name; // 255 not null
+  private String city; // 255
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
-  private String firstName; // 255
+  private String country; // 255
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
-  private FormOfAddress form;
+  private String state; // 255
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
-  private String title; // 255
+  private String street; // 255
 
-  @Field(index = Index.UN_TOKENIZED)
-  @DateBridge(resolution = Resolution.DAY)
-  private Date birthday;
-
-
-  @Column
-  public Date getBirthday()
-  {
-    return birthday;
-  }
-
-  public AddressEntryDO setBirthday(final Date birthday)
-  {
-    this.birthday = birthday;
-    return this;
-  }
-
-  @Column(name = "first_name", length = 255)
-  public String getFirstName()
-  {
-    return firstName;
-  }
-
-  public AddressEntryDO setFirstName(final String firstName)
-  {
-    this.firstName = firstName;
-    return this;
-  }
-
-  @Transient
-  public String getFullName()
-  {
-    return StringHelper.listToString(", ", name, firstName);
-  }
-
-  @Transient
-  public String getFullNameWithTitleAndForm() {
-    final StringBuffer buf = new StringBuffer();
-    if (getForm() != null) {
-      buf.append(PFUserContext.getLocalizedString(getForm().getI18nKey())).append(" ");
-    }
-    if (getTitle() != null) {
-      buf.append(getTitle()).append(" ");
-    }
-    if (getFirstName() != null) {
-      buf.append(getFirstName()).append(" ");
-    }
-    if (getName() != null) {
-      buf.append(getName());
-    }
-    return buf.toString();
-  }
-
-  @Column(length = 255)
-  public String getName()
-  {
-    return name;
-  }
-
-  public AddressEntryDO setName(final String name)
-  {
-    this.name = name;
-    return this;
-  }
-
-  @Enumerated(EnumType.STRING)
-  @Column(name = "form", length = 10)
-  public FormOfAddress getForm()
-  {
-    return form;
-  }
-
-  public AddressEntryDO setForm(final FormOfAddress form)
-  {
-    this.form = form;
-    return this;
-  }
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String zipCode; // 255
 
   /**
    * Not used as object due to performance reasons.
    * @return
    */
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "task_id", nullable = false)
-  public TaskDO getTask()
+  @JoinColumn(name = "address_id", nullable = false)
+  public Address2DO getAddress()
   {
-    return task;
+    return address;
   }
 
-  public void setTask(final TaskDO task)
+  public void setAddress(final Address2DO address)
   {
-    this.task = task;
+    this.address = address;
   }
 
   @Transient
-  public Integer getTaskId()
+  public Integer getAddressId()
   {
-    if (this.task == null)
+    if (this.address == null)
       return null;
-    return task.getId();
-  }
-
-  @Column(length = 255)
-  public String getTitle()
-  {
-    return title;
-  }
-
-  public AddressEntryDO setTitle(final String title)
-  {
-    this.title = title;
-    return this;
+    return address.getId();
   }
 
   @Enumerated(EnumType.STRING)
   @Column(length = 15, name = "address_type")
-  public AddressEntryType getAddressEntryType()
+  public AddressType getAddressType()
   {
-    return addressEntryType;
+    return addressType;
   }
 
   /**
    * @return this for chaining.
    */
-  public AddressEntryDO setAddressEntryType(final AddressEntryType addressEntryType)
+  public AddressEntryDO setAddressType(final AddressType addressType)
   {
-    this.addressEntryType = addressEntryType;
+    this.addressType = addressType;
     return this;
   }
+
+  /**
+   * @return the city
+   */
+  public String getCity()
+  {
+    return city;
+  }
+
+  /**
+   * @param city the city to set
+   * @return this for chaining.
+   */
+  public AddressEntryDO setCity(final String city)
+  {
+    this.city = city;
+    return this;
+  }
+
+  /**
+   * @return the country
+   */
+  public String getCountry()
+  {
+    return country;
+  }
+
+  /**
+   * @param country the country to set
+   * @return this for chaining.
+   */
+  public AddressEntryDO setCountry(final String country)
+  {
+    this.country = country;
+    return this;
+  }
+
+  /**
+   * @return the state
+   */
+  public String getState()
+  {
+    return state;
+  }
+
+  /**
+   * @param state the state to set
+   * @return this for chaining.
+   */
+  public AddressEntryDO setState(final String state)
+  {
+    this.state = state;
+    return this;
+  }
+
+  /**
+   * @return the street
+   */
+  public String getStreet()
+  {
+    return street;
+  }
+
+  /**
+   * @param street the street to set
+   * @return this for chaining.
+   */
+  public AddressEntryDO setStreet(final String street)
+  {
+    this.street = street;
+    return this;
+  }
+
+  /**
+   * @return the zipCode
+   */
+  public String getZipCode()
+  {
+    return zipCode;
+  }
+
+  /**
+   * @param zipCode the zipCode to set
+   * @return this for chaining.
+   */
+  public AddressEntryDO setZipCode(final String zipCode)
+  {
+    this.zipCode = zipCode;
+    return this;
+  }
+
+
 }
