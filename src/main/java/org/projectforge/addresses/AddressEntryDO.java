@@ -15,6 +15,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -27,6 +30,7 @@ import org.hibernate.search.annotations.Store;
 import org.projectforge.address.FormOfAddress;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.DefaultBaseDO;
+import org.projectforge.task.TaskDO;
 import org.projectforge.user.PFUserContext;
 
 /**
@@ -42,9 +46,11 @@ public class AddressEntryDO extends DefaultBaseDO
 
   //private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressEntryDO.class);
 
+  private TaskDO task;
+
   @Enumerated(EnumType.STRING)
   @Field(index = Index.TOKENIZED, store = Store.NO)
-  private AddressEntryType addressType;
+  private AddressEntryType addressEntryType;
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String name; // 255 not null
@@ -136,6 +142,30 @@ public class AddressEntryDO extends DefaultBaseDO
     return this;
   }
 
+  /**
+   * Not used as object due to performance reasons.
+   * @return
+   */
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "task_id", nullable = false)
+  public TaskDO getTask()
+  {
+    return task;
+  }
+
+  public void setTask(final TaskDO task)
+  {
+    this.task = task;
+  }
+
+  @Transient
+  public Integer getTaskId()
+  {
+    if (this.task == null)
+      return null;
+    return task.getId();
+  }
+
   @Column(length = 255)
   public String getTitle()
   {
@@ -150,17 +180,17 @@ public class AddressEntryDO extends DefaultBaseDO
 
   @Enumerated(EnumType.STRING)
   @Column(length = 15, name = "address_type")
-  public AddressEntryType getAddressTypeg()
+  public AddressEntryType getAddressEntryType()
   {
-    return addressType;
+    return addressEntryType;
   }
 
   /**
    * @return this for chaining.
    */
-  public AddressEntryDO setSkillRating(final AddressEntryType addressType)
+  public AddressEntryDO setAddressEntryType(final AddressEntryType addressEntryType)
   {
-    this.addressType = addressType;
+    this.addressEntryType = addressEntryType;
     return this;
   }
 }
