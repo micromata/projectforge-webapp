@@ -182,12 +182,14 @@ function initializeComponents() {
     hideAllTooltips();
 	$('[rel=mypopup]').popover({
         container: 'body',
-        placement: 'bottom auto'
+        placement: 'bottom auto',
+        trigger: 'hover'
     });
 
     $('[rel=mytooltip]').tooltip({
     	container: 'body',
-    	placement: 'bottom auto'
+    	placement: 'bottom auto',
+        trigger: 'hover'
     });
 }
 
