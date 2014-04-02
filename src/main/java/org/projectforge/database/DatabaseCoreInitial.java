@@ -28,6 +28,7 @@ import org.projectforge.access.GroupTaskAccessDO;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.PersonalAddressDO;
 import org.projectforge.addresses.Address2DO;
+import org.projectforge.addresses.AddressEntryDO;
 import org.projectforge.book.BookDO;
 import org.projectforge.common.DatabaseDialect;
 import org.projectforge.continuousdb.DatabaseUpdateDao;
@@ -110,7 +111,7 @@ public class DatabaseCoreInitial
 
         // All the rest:
         AddressDO.class, PersonalAddressDO.class, //
-        Address2DO.class, //
+        Address2DO.class, AddressEntryDO.class, //
         BookDO.class, //
         ConfigurationDO.class, //
         DatabaseUpdateDO.class, //

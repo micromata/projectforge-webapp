@@ -48,10 +48,6 @@ public class Address2DO extends DefaultBaseDO
 
   private TaskDO task;
 
-  @Enumerated(EnumType.STRING)
-  @Field(index = Index.TOKENIZED, store = Store.NO)
-  private AddressType addressType;
-
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String name; // 255 not null
 
@@ -178,19 +174,4 @@ public class Address2DO extends DefaultBaseDO
     return this;
   }
 
-  @Enumerated(EnumType.STRING)
-  @Column(length = 15, name = "address_type")
-  public AddressType getAddressType()
-  {
-    return addressType;
-  }
-
-  /**
-   * @return this for chaining.
-   */
-  public Address2DO setAddressType(final AddressType addressType)
-  {
-    this.addressType = addressType;
-    return this;
-  }
 }

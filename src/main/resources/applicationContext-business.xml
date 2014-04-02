@@ -35,6 +35,7 @@
   <bean id="accessDao" class="org.projectforge.access.AccessDao" />
   <bean id="addressDao" class="org.projectforge.address.AddressDao" />
   <bean id="address2Dao" class="org.projectforge.addresses.Address2Dao" />
+  <bean id="addressEntryDao" class="org.projectforge.addresses.AddressEntryDao" />
   <bean id="bookDao" class="org.projectforge.book.BookDao" />
   <bean id="configurationDao" class="org.projectforge.core.ConfigurationDao" />
   <bean id="contractDao" class="org.projectforge.orga.ContractDao" />
