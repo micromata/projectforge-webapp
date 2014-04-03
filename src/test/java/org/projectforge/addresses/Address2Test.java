@@ -77,15 +77,15 @@ public class Address2Test extends TestBase
     .setContactType(ContactType.PRIVATE.getI18nKey())
     .setImType(InstantMessagingType.TWITTER.getI18nKey())
     .setUser("Hurzeli");
-    a1.setImValues(Address2Dao.getImValuesAsXml(value1,value2));
+    a1.setImValues(address2Dao.getImValuesAsXml(value1,value2));
 
     final EmailValue email1 = new EmailValue().setContactType(ContactType.BUSINESS.getI18nKey()).setEmail("theo.test@acme.com");
     final EmailValue email2 = new EmailValue().setContactType(ContactType.PRIVATE.getI18nKey()).setEmail("theo.test@t-offline.de");
-    a1.setEmailValues(Address2Dao.getEmailValuesAsXml(email1, email2));
+    a1.setEmailValues(address2Dao.getEmailValuesAsXml(email1, email2));
 
     final PhoneValue phone1 = new PhoneValue().setContactType(ContactType.BUSINESS.getI18nKey()).setNumber("1234567");
     final PhoneValue phone2 = new PhoneValue().setContactType(ContactType.PRIVATE.getI18nKey()).setNumber("7654321");
-    a1.setPhoneValues(Address2Dao.getPhoneValuesAsXml(phone1, phone2));
+    a1.setPhoneValues(address2Dao.getPhoneValuesAsXml(phone1, phone2));
 
     address2Dao.save(a1);
     log.debug(a1);
@@ -93,17 +93,17 @@ public class Address2Test extends TestBase
     final Address2DO a1a = address2Dao.getById(a1.getId());
 
     ArrayList<InstantMessagingValue> list = new ArrayList<InstantMessagingValue>();
-    list = (ArrayList<InstantMessagingValue>) Address2Dao.readImValues(a1a.getImValues());
+    list = (ArrayList<InstantMessagingValue>) address2Dao.readImValues(a1a.getImValues());
     assertEquals(value1.getUser(), list.get(0).getUser());
     assertEquals(value2.getUser(), list.get(1).getUser());
 
     ArrayList<EmailValue> emailList = new ArrayList<EmailValue>();
-    emailList =(ArrayList<EmailValue>) Address2Dao.readEmailValues(a1a.getEmailValues());
+    emailList =(ArrayList<EmailValue>) address2Dao.readEmailValues(a1a.getEmailValues());
     assertEquals(email1.getEmail(), emailList.get(0).getEmail());
     assertEquals(email2.getEmail(), emailList.get(1).getEmail());
 
     ArrayList<PhoneValue> phoneList = new ArrayList<PhoneValue>();
-    phoneList =(ArrayList<PhoneValue>) Address2Dao.readPhoneValues(a1a.getPhoneValues());
+    phoneList =(ArrayList<PhoneValue>) address2Dao.readPhoneValues(a1a.getPhoneValues());
     assertEquals(phone1.getNumber(), phoneList.get(0).getNumber());
     assertEquals(phone2.getNumber(), phoneList.get(1).getNumber());
 

@@ -11,7 +11,6 @@ package org.projectforge.addresses;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 //import org.apache.poi.ss.formula.functions.T;
 import org.projectforge.access.AccessType;
@@ -22,9 +21,6 @@ import org.projectforge.core.ConfigurationParam;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.xml.stream.AliasMap;
-import org.projectforge.xml.stream.XmlObjectReader;
-import org.projectforge.xml.stream.XmlObjectWriter;
 
 /**
  * @author Werner Feder (werner.feder@t-online.de)
@@ -32,14 +28,24 @@ import org.projectforge.xml.stream.XmlObjectWriter;
  */
 public class Address2Dao extends BaseDao<Address2DO>
 {
-  private static final String ENCLOSING_ENTITY ="values";
 
   private Configuration configuration;
+
   private TaskDao taskDao;
+
+  private final XmlConverter<InstantMessagingValue> imConverter;
+  private final XmlConverter<PhoneValue> phoneConverter;
+  private final XmlConverter<EmailValue> emailConverter;
 
   public Address2Dao()
   {
     super(Address2DO.class);
+    final InstantMessagingValue im = new InstantMessagingValue();
+    final PhoneValue phone = new PhoneValue();
+    final EmailValue email = new EmailValue();
+    imConverter = new XmlConverter<InstantMessagingValue>(im);
+    phoneConverter = new XmlConverter<PhoneValue>(phone);
+    emailConverter = new XmlConverter<EmailValue>(email);
   }
 
   public void setConfiguration(final Configuration configuration)
@@ -52,17 +58,17 @@ public class Address2Dao extends BaseDao<Address2DO>
     this.taskDao = taskDao;
   }
 
-  private String getNormalizedFullname(final Address2DO address)
-  {
-    final StringBuilder builder = new StringBuilder();
-    if (address.getFirstName() != null) {
-      builder.append(address.getFirstName().toLowerCase().trim());
-    }
-    if (address.getName() != null) {
-      builder.append(address.getName().toLowerCase().trim());
-    }
-    return builder.toString();
-  }
+  //  private String getNormalizedFullname(final Address2DO address)
+  //  {
+  //    final StringBuilder builder = new StringBuilder();
+  //    if (address.getFirstName() != null) {
+  //      builder.append(address.getFirstName().toLowerCase().trim());
+  //    }
+  //    if (address.getName() != null) {
+  //      builder.append(address.getName().toLowerCase().trim());
+  //    }
+  //    return builder.toString();
+  //  }
 
   /**
    * @param address
@@ -151,102 +157,39 @@ public class Address2Dao extends BaseDao<Address2DO>
    * Exports xml string as List of Instant Messaging values.
    * @param InstantMessagingValue values
    */
-  public static List<InstantMessagingValue> readImValues(final String imValuesAsXml)
+  public List<InstantMessagingValue> readImValues(final String valuesAsXml)
   {
-    if (StringUtils.isBlank(imValuesAsXml) == true) {
-      return null;
-    }
-    final XmlObjectReader reader = new XmlObjectReader();
-    final AliasMap aliasMap = new AliasMap();
-    aliasMap.put(List.class, ENCLOSING_ENTITY);
-    reader.setAliasMap(aliasMap).initialize(InstantMessagingValue.class);;
-    @SuppressWarnings("unchecked")
-    final List<InstantMessagingValue> list = (List<InstantMessagingValue>) reader.read(imValuesAsXml);
-    return list;
+    return imConverter.readValues(valuesAsXml);
   }
 
   /**
    * Exports the Instant Messaging values as xml string.
    * @param InstantMessagingValue values
    */
-  public static String getImValuesAsXml(final InstantMessagingValue... values)
+  public String getImValuesAsXml(final InstantMessagingValue... values)
   {
-    if (values == null)
-      return "";
-    String xml =  "<" + ENCLOSING_ENTITY + ">";
-    for (final InstantMessagingValue value : values) {
-      xml += XmlObjectWriter.writeAsXml(value);
-    }
-    xml += "</" + ENCLOSING_ENTITY + ">";
-    return xml;
+    return imConverter.getValuesAsXml(values);
   }
 
-  /**
-   * Exports xml string as List of Email values.
-   * @param InstantMessagingValue values
-   */
-  public static List<EmailValue> readEmailValues(final String emailValuesAsXml)
+
+  public List<EmailValue> readEmailValues(final String valuesAsXml)
   {
-    if (StringUtils.isBlank(emailValuesAsXml) == true) {
-      return null;
-    }
-    final XmlObjectReader reader = new XmlObjectReader();
-    final AliasMap aliasMap = new AliasMap();
-    aliasMap.put(List.class, ENCLOSING_ENTITY);
-    reader.setAliasMap(aliasMap).initialize(EmailValue.class);;
-    @SuppressWarnings("unchecked")
-    final List<EmailValue> list = (List<EmailValue>) reader.read(emailValuesAsXml);
-    return list;
+    return emailConverter.readValues(valuesAsXml);
   }
 
-  /**
-   * Exports the Email values as xml string.
-   * @param InstantMessagingValue values
-   */
-  public static String getEmailValuesAsXml(final EmailValue... values)
+  public String getEmailValuesAsXml(final EmailValue... values)
   {
-    if (values == null)
-      return "";
-    String xml =  "<" + ENCLOSING_ENTITY + ">";
-    for (final EmailValue value : values) {
-      xml += XmlObjectWriter.writeAsXml(value);
-    }
-    xml += "</" + ENCLOSING_ENTITY + ">";
-    return xml;
+    return emailConverter.getValuesAsXml(values);
   }
 
-  /**
-   * Exports xml string as List of Email values.
-   * @param InstantMessagingValue values
-   */
-  public static List<PhoneValue> readPhoneValues(final String phoneValuesAsXml)
+  public List<PhoneValue> readPhoneValues(final String valuesAsXml)
   {
-    if (StringUtils.isBlank(phoneValuesAsXml) == true) {
-      return null;
-    }
-    final XmlObjectReader reader = new XmlObjectReader();
-    final AliasMap aliasMap = new AliasMap();
-    aliasMap.put(List.class, ENCLOSING_ENTITY);
-    reader.setAliasMap(aliasMap).initialize(PhoneValue.class);;
-    @SuppressWarnings("unchecked")
-    final List<PhoneValue> list = (List<PhoneValue>) reader.read(phoneValuesAsXml);
-    return list;
+    return phoneConverter.readValues(valuesAsXml);
   }
 
-  /**
-   * Exports the Email values as xml string.
-   * @param InstantMessagingValue values
-   */
-  public static String getPhoneValuesAsXml(final PhoneValue... values)
+  public String getPhoneValuesAsXml(final PhoneValue... values)
   {
-    if (values == null)
-      return "";
-    String xml =  "<" + ENCLOSING_ENTITY + ">";
-    for (final PhoneValue value : values) {
-      xml += XmlObjectWriter.writeAsXml(value);
-    }
-    xml += "</" + ENCLOSING_ENTITY + ">";
-    return xml;
+    return phoneConverter.getValuesAsXml(values);
   }
 
 }
