@@ -60,7 +60,7 @@ public class AddressEntryTest extends TestBase
 
     final AddressEntryDO ae1 = new AddressEntryDO();
     ae1.setAddress(a1);
-    ae1.setAddressType(AddressType.BUSINESS);
+    ae1.setContactType(ContactType.BUSINESS);
     ae1.setStreet("Marie-Calm-Straße 1-5");
     addressEntryDao.save(ae1);
     log.debug(ae1);
@@ -68,7 +68,7 @@ public class AddressEntryTest extends TestBase
     final AddressEntryDO ae2 = addressEntryDao.getById(ae1.getId());
     assertEquals("Marie-Calm-Straße 1-5", ae2.getStreet());
 
-    ae2.setAddressType(AddressType.POSTAL);
+    ae2.setContactType(ContactType.POSTAL);
     ae2.setStreet("Teststrasse 42");
 
     addressEntryDao.update(ae2);
@@ -76,7 +76,7 @@ public class AddressEntryTest extends TestBase
 
     final AddressEntryDO ae3 = addressEntryDao.getById(ae2.getId());
     assertEquals("Teststrasse 42", ae3.getStreet());
-    assertEquals(AddressType.POSTAL, ae3.getAddressType());
+    assertEquals(ContactType.POSTAL, ae3.getContactType());
     log.debug(ae3);
   }
 
@@ -91,7 +91,7 @@ public class AddressEntryTest extends TestBase
 
     AddressEntryDO ae1 = new AddressEntryDO();
     ae1.setAddress(a1);
-    ae1.setAddressType(AddressType.BUSINESS);
+    ae1.setContactType(ContactType.BUSINESS);
     ae1.setStreet("Marie-Calm-Straße 1-5");
     addressEntryDao.save(ae1);
     log.debug(ae1);
