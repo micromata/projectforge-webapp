@@ -18,7 +18,7 @@ import org.projectforge.xml.stream.XmlObject;
  * @author Werner Feder (werner.feder@t-online.de)
  */
 @XmlObject(alias = "value")
-public class InstantMessagingValues implements Serializable
+public class InstantMessagingValue implements Serializable
 {
   private static final long serialVersionUID = 5659903071636285902L;
 
@@ -36,7 +36,7 @@ public class InstantMessagingValues implements Serializable
     return contactType;
   }
 
-  public InstantMessagingValues setContactType(final String contactType)
+  public InstantMessagingValue setContactType(final String contactType)
   {
     this.contactType = contactType;
     return this;
@@ -47,7 +47,7 @@ public class InstantMessagingValues implements Serializable
     return imType;
   }
 
-  public InstantMessagingValues setImType(final String imType)
+  public InstantMessagingValue setImType(final String imType)
   {
     this.imType = imType;
     return this;
@@ -58,7 +58,7 @@ public class InstantMessagingValues implements Serializable
     return user;
   }
 
-  public InstantMessagingValues setUser(final String user)
+  public InstantMessagingValue setUser(final String user)
   {
     this.user = user;
     return this;
