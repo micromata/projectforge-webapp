@@ -27,6 +27,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -67,8 +68,28 @@ public class Address2Test extends TestBase
     final Address2DO a1 = new Address2DO();
     a1.setName("Kai Reinhard");
     a1.setTask(getTask("1.1"));
+
+    final InstantMessagingValues value1 = new InstantMessagingValues()
+    .setContactType(ContactType.BUSINESS.getI18nKey())
+    .setImType(InstantMessagingType.JABBER.getI18nKey())
+    .setUser("Hurzel");
+
+    final InstantMessagingValues value2 = new InstantMessagingValues()
+    .setContactType(ContactType.PRIVATE.getI18nKey())
+    .setImType(InstantMessagingType.TWITTER.getI18nKey())
+    .setUser("Hurzeli");
+
+    a1.setImValues(Address2Dao.getImValuesAsXml(value1,value2));
+
     address2Dao.save(a1);
     log.debug(a1);
+
+    final Address2DO a1a = address2Dao.getById(a1.getId());
+
+    ArrayList<InstantMessagingValues> list = new ArrayList<InstantMessagingValues>();
+    list = (ArrayList<InstantMessagingValues>) Address2Dao.readImValues(a1a.getImValues());
+    assertEquals(value1.getUser(), list.get(0).getUser());
+    assertEquals(value2.getUser(), list.get(1).getUser());
 
     a1.setName("Hurzel");
     address2Dao.setTask(a1, getTask("1.2").getId());
