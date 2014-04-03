@@ -146,7 +146,11 @@ public class Address2Dao extends BaseDao<Address2DO>
     return new Address2DO();
   }
 
-  public static List<InstantMessagingValues> readImValues(final String imValuesAsXml)
+  /**
+   * Exports xml string as List of Instant Messaging values.
+   * @param InstantMessagingValue values
+   */
+  public static List<InstantMessagingValue> readImValues(final String imValuesAsXml)
   {
     if (StringUtils.isBlank(imValuesAsXml) == true) {
       return null;
@@ -154,22 +158,56 @@ public class Address2Dao extends BaseDao<Address2DO>
     final XmlObjectReader reader = new XmlObjectReader();
     final AliasMap aliasMap = new AliasMap();
     aliasMap.put(List.class, ENCLOSING_ENTITY);
-    reader.setAliasMap(aliasMap).initialize(InstantMessagingValues.class);;
+    reader.setAliasMap(aliasMap).initialize(InstantMessagingValue.class);;
     @SuppressWarnings("unchecked")
-    final List<InstantMessagingValues> list = (List<InstantMessagingValues>) reader.read(imValuesAsXml);
+    final List<InstantMessagingValue> list = (List<InstantMessagingValue>) reader.read(imValuesAsXml);
     return list;
   }
 
   /**
    * Exports the Instant Messaging values as xml string.
-   * @param InstantMessagingValues values
+   * @param InstantMessagingValue values
    */
-  public static String getImValuesAsXml(final InstantMessagingValues... values)
+  public static String getImValuesAsXml(final InstantMessagingValue... values)
   {
     if (values == null)
       return "";
     String xml =  "<" + ENCLOSING_ENTITY + ">";
-    for (final InstantMessagingValues value : values) {
+    for (final InstantMessagingValue value : values) {
+      xml += XmlObjectWriter.writeAsXml(value);
+    }
+    xml += "</" + ENCLOSING_ENTITY + ">";
+    return xml;
+  }
+
+  /**
+   * Exports xml string as List of Email values.
+   * @param InstantMessagingValue values
+   */
+  public static List<EmailValue> readEmailValues(final String emailValuesAsXml)
+  {
+    if (StringUtils.isBlank(emailValuesAsXml) == true) {
+      return null;
+    }
+    final XmlObjectReader reader = new XmlObjectReader();
+    final AliasMap aliasMap = new AliasMap();
+    aliasMap.put(List.class, ENCLOSING_ENTITY);
+    reader.setAliasMap(aliasMap).initialize(EmailValue.class);;
+    @SuppressWarnings("unchecked")
+    final List<EmailValue> list = (List<EmailValue>) reader.read(emailValuesAsXml);
+    return list;
+  }
+
+  /**
+   * Exports the Email values as xml string.
+   * @param InstantMessagingValue values
+   */
+  public static String getEmailValuesAsXml(final EmailValue... values)
+  {
+    if (values == null)
+      return "";
+    String xml =  "<" + ENCLOSING_ENTITY + ">";
+    for (final EmailValue value : values) {
       xml += XmlObjectWriter.writeAsXml(value);
     }
     xml += "</" + ENCLOSING_ENTITY + ">";
