@@ -70,6 +70,9 @@ public class Address2DO extends DefaultBaseDO
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String emailValues;
 
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String phoneValues;
+
   @Column
   public Date getBirthday()
   {
@@ -198,6 +201,17 @@ public class Address2DO extends DefaultBaseDO
   public Address2DO setEmailValues(final String emailValues)
   {
     this.emailValues = emailValues;
+    return this;
+  }
+
+  public String getPhoneValues()
+  {
+    return phoneValues;
+  }
+
+  public Address2DO setPhoneValues(final String phoneValues)
+  {
+    this.phoneValues = phoneValues;
     return this;
   }
 

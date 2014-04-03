@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
+//import org.apache.poi.ss.formula.functions.T;
 import org.projectforge.access.AccessType;
 import org.projectforge.access.OperationType;
 import org.projectforge.core.BaseDao;
@@ -213,4 +214,39 @@ public class Address2Dao extends BaseDao<Address2DO>
     xml += "</" + ENCLOSING_ENTITY + ">";
     return xml;
   }
+
+  /**
+   * Exports xml string as List of Email values.
+   * @param InstantMessagingValue values
+   */
+  public static List<PhoneValue> readPhoneValues(final String phoneValuesAsXml)
+  {
+    if (StringUtils.isBlank(phoneValuesAsXml) == true) {
+      return null;
+    }
+    final XmlObjectReader reader = new XmlObjectReader();
+    final AliasMap aliasMap = new AliasMap();
+    aliasMap.put(List.class, ENCLOSING_ENTITY);
+    reader.setAliasMap(aliasMap).initialize(PhoneValue.class);;
+    @SuppressWarnings("unchecked")
+    final List<PhoneValue> list = (List<PhoneValue>) reader.read(phoneValuesAsXml);
+    return list;
+  }
+
+  /**
+   * Exports the Email values as xml string.
+   * @param InstantMessagingValue values
+   */
+  public static String getPhoneValuesAsXml(final PhoneValue... values)
+  {
+    if (values == null)
+      return "";
+    String xml =  "<" + ENCLOSING_ENTITY + ">";
+    for (final PhoneValue value : values) {
+      xml += XmlObjectWriter.writeAsXml(value);
+    }
+    xml += "</" + ENCLOSING_ENTITY + ">";
+    return xml;
+  }
+
 }

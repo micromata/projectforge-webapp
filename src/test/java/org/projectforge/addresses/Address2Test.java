@@ -83,6 +83,10 @@ public class Address2Test extends TestBase
     final EmailValue email2 = new EmailValue().setContactType(ContactType.PRIVATE.getI18nKey()).setEmail("theo.test@t-offline.de");
     a1.setEmailValues(Address2Dao.getEmailValuesAsXml(email1, email2));
 
+    final PhoneValue phone1 = new PhoneValue().setContactType(ContactType.BUSINESS.getI18nKey()).setNumber("1234567");
+    final PhoneValue phone2 = new PhoneValue().setContactType(ContactType.PRIVATE.getI18nKey()).setNumber("7654321");
+    a1.setPhoneValues(Address2Dao.getPhoneValuesAsXml(phone1, phone2));
+
     address2Dao.save(a1);
     log.debug(a1);
 
@@ -97,6 +101,11 @@ public class Address2Test extends TestBase
     emailList =(ArrayList<EmailValue>) Address2Dao.readEmailValues(a1a.getEmailValues());
     assertEquals(email1.getEmail(), emailList.get(0).getEmail());
     assertEquals(email2.getEmail(), emailList.get(1).getEmail());
+
+    ArrayList<PhoneValue> phoneList = new ArrayList<PhoneValue>();
+    phoneList =(ArrayList<PhoneValue>) Address2Dao.readPhoneValues(a1a.getPhoneValues());
+    assertEquals(phone1.getNumber(), phoneList.get(0).getNumber());
+    assertEquals(phone2.getNumber(), phoneList.get(1).getNumber());
 
     a1.setName("Hurzel");
     address2Dao.setTask(a1, getTask("1.2").getId());
