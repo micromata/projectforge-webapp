@@ -42,11 +42,11 @@ import org.projectforge.user.PFUserContext;
 @Table(name = "T_ADDRESS2")
 public class Address2DO extends DefaultBaseDO
 {
-  private static final long serialVersionUID = -1724220844452834692L;
+  private static final long serialVersionUID = -1177059694759828682L;
 
   //private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(Address2DO.class);
 
-  private TaskDO task;
+  private TaskDO task; // not null
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String name; // 255 not null
@@ -64,6 +64,8 @@ public class Address2DO extends DefaultBaseDO
   @DateBridge(resolution = Resolution.DAY)
   private Date birthday;
 
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String imValues;
 
   @Column
   public Date getBirthday()
@@ -113,7 +115,7 @@ public class Address2DO extends DefaultBaseDO
     return buf.toString();
   }
 
-  @Column(length = 255)
+  @Column(length = 255, nullable = false)
   public String getName()
   {
     return name;
@@ -171,6 +173,17 @@ public class Address2DO extends DefaultBaseDO
   public Address2DO setTitle(final String title)
   {
     this.title = title;
+    return this;
+  }
+
+  public String getImValues()
+  {
+    return imValues;
+  }
+
+  public Address2DO setImValues(final String imValues)
+  {
+    this.imValues = imValues;
     return this;
   }
 
