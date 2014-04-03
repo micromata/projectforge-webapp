@@ -9,6 +9,9 @@
 
 package org.projectforge.addresses;
 
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.projectforge.access.AccessType;
 import org.projectforge.access.OperationType;
@@ -18,6 +21,9 @@ import org.projectforge.core.ConfigurationParam;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.xml.stream.AliasMap;
+import org.projectforge.xml.stream.XmlObjectReader;
+import org.projectforge.xml.stream.XmlObjectWriter;
 
 /**
  * @author Werner Feder (werner.feder@t-online.de)
@@ -25,6 +31,7 @@ import org.projectforge.user.PFUserDO;
  */
 public class Address2Dao extends BaseDao<Address2DO>
 {
+  private static final String ENCLOSING_ENTITY ="values";
 
   private Configuration configuration;
   private TaskDao taskDao;
@@ -137,5 +144,35 @@ public class Address2Dao extends BaseDao<Address2DO>
   public Address2DO newInstance()
   {
     return new Address2DO();
+  }
+
+  public static List<InstantMessagingValues> readImValues(final String imValuesAsXml)
+  {
+    if (StringUtils.isBlank(imValuesAsXml) == true) {
+      return null;
+    }
+    final XmlObjectReader reader = new XmlObjectReader();
+    final AliasMap aliasMap = new AliasMap();
+    aliasMap.put(List.class, ENCLOSING_ENTITY);
+    reader.setAliasMap(aliasMap).initialize(InstantMessagingValues.class);;
+    @SuppressWarnings("unchecked")
+    final List<InstantMessagingValues> list = (List<InstantMessagingValues>) reader.read(imValuesAsXml);
+    return list;
+  }
+
+  /**
+   * Exports the Instant Messaging values as xml string.
+   * @param InstantMessagingValues values
+   */
+  public static String getImValuesAsXml(final InstantMessagingValues... values)
+  {
+    if (values == null)
+      return "";
+    String xml =  "<" + ENCLOSING_ENTITY + ">";
+    for (final InstantMessagingValues value : values) {
+      xml += XmlObjectWriter.writeAsXml(value);
+    }
+    xml += "</" + ENCLOSING_ENTITY + ">";
+    return xml;
   }
 }
