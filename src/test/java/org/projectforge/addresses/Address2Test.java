@@ -69,27 +69,34 @@ public class Address2Test extends TestBase
     a1.setName("Kai Reinhard");
     a1.setTask(getTask("1.1"));
 
-    final InstantMessagingValues value1 = new InstantMessagingValues()
+    final InstantMessagingValue value1 = new InstantMessagingValue()
     .setContactType(ContactType.BUSINESS.getI18nKey())
     .setImType(InstantMessagingType.JABBER.getI18nKey())
     .setUser("Hurzel");
-
-    final InstantMessagingValues value2 = new InstantMessagingValues()
+    final InstantMessagingValue value2 = new InstantMessagingValue()
     .setContactType(ContactType.PRIVATE.getI18nKey())
     .setImType(InstantMessagingType.TWITTER.getI18nKey())
     .setUser("Hurzeli");
-
     a1.setImValues(Address2Dao.getImValuesAsXml(value1,value2));
+
+    final EmailValue email1 = new EmailValue().setContactType(ContactType.BUSINESS.getI18nKey()).setEmail("theo.test@acme.com");
+    final EmailValue email2 = new EmailValue().setContactType(ContactType.PRIVATE.getI18nKey()).setEmail("theo.test@t-offline.de");
+    a1.setEmailValues(Address2Dao.getEmailValuesAsXml(email1, email2));
 
     address2Dao.save(a1);
     log.debug(a1);
 
     final Address2DO a1a = address2Dao.getById(a1.getId());
 
-    ArrayList<InstantMessagingValues> list = new ArrayList<InstantMessagingValues>();
-    list = (ArrayList<InstantMessagingValues>) Address2Dao.readImValues(a1a.getImValues());
+    ArrayList<InstantMessagingValue> list = new ArrayList<InstantMessagingValue>();
+    list = (ArrayList<InstantMessagingValue>) Address2Dao.readImValues(a1a.getImValues());
     assertEquals(value1.getUser(), list.get(0).getUser());
     assertEquals(value2.getUser(), list.get(1).getUser());
+
+    ArrayList<EmailValue> emailList = new ArrayList<EmailValue>();
+    emailList =(ArrayList<EmailValue>) Address2Dao.readEmailValues(a1a.getEmailValues());
+    assertEquals(email1.getEmail(), emailList.get(0).getEmail());
+    assertEquals(email2.getEmail(), emailList.get(1).getEmail());
 
     a1.setName("Hurzel");
     address2Dao.setTask(a1, getTask("1.2").getId());
