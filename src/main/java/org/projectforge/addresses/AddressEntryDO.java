@@ -27,14 +27,13 @@ import org.projectforge.core.DefaultBaseDO;
 
 /**
  * @author Werner Feder (werner.feder@t-online.de)
- *
  */
 @Entity
 @Indexed
 @Table(name = "T_ADDRESSENTRY")
 public class AddressEntryDO extends DefaultBaseDO
 {
-  private static final long serialVersionUID = -1724220844452834692L;
+  private static final long serialVersionUID = -8141697905834021747L;
 
   //private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressEntryDO.class);
 
@@ -42,7 +41,7 @@ public class AddressEntryDO extends DefaultBaseDO
 
   @Enumerated(EnumType.STRING)
   @Field(index = Index.TOKENIZED, store = Store.NO)
-  private AddressType addressType;
+  private ContactType contactType;
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String city; // 255
@@ -84,18 +83,18 @@ public class AddressEntryDO extends DefaultBaseDO
   }
 
   @Enumerated(EnumType.STRING)
-  @Column(length = 15, name = "address_type")
-  public AddressType getAddressType()
+  @Column(length = 15, name = "contact_type", nullable = false)
+  public ContactType getContactType()
   {
-    return addressType;
+    return contactType;
   }
 
   /**
    * @return this for chaining.
    */
-  public AddressEntryDO setAddressType(final AddressType addressType)
+  public AddressEntryDO setContactType(final ContactType contactType)
   {
-    this.addressType = addressType;
+    this.contactType = contactType;
     return this;
   }
 

@@ -26,20 +26,23 @@ package org.projectforge.addresses;
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.core.I18nEnum;
 
-public enum AddressType implements I18nEnum
+/**
+ * @author Werner Feder (werner.feder@t-online.de)
+ */
+public enum ContactType implements I18nEnum
 {
-  BUSINESS("business"), POSTAL("postal"), PRIVATE("private");
+  BUSINESS("business"), POSTAL("postal"), PRIVATE("private"), OTHER("other"), OWN("own");
 
-  public static final String I18N_KEY_ADDRESSTYPE_PREFIX = "addresstype.";
+  public static final String I18N_KEY_CONTACTTYPE_PREFIX = "contacttype.";
 
   /**
    * List of all available values.
    */
-  public static final AddressType[] LIST = new AddressType[] { BUSINESS, POSTAL, PRIVATE };
+  public static final ContactType[] LIST = new ContactType[] { BUSINESS, POSTAL, PRIVATE, OTHER, OWN };
 
   private String key;
 
-  public static AddressType get(final String s)
+  public static ContactType get(final String s)
   {
     if (StringUtils.isEmpty(s) == true) {
       return null;
@@ -50,8 +53,12 @@ public enum AddressType implements I18nEnum
       return POSTAL;
     } else if ("PRIVATE".equals(s) == true) {
       return PRIVATE;
+    } else if ("OTHER".equals(s) == true) {
+      return OTHER;
+    } else if ("OWN".equals(s) == true) {
+      return OWN;
     }
-    throw new UnsupportedOperationException("Unknown AddressType: '" + s + "'");
+    throw new UnsupportedOperationException("Unknown ContactType: '" + s + "'");
   }
 
   /**
@@ -63,7 +70,7 @@ public enum AddressType implements I18nEnum
     return key;
   }
 
-  AddressType(final String key)
+  ContactType(final String key)
   {
     this.key = key;
   }
@@ -74,6 +81,6 @@ public enum AddressType implements I18nEnum
   @Override
   public String getI18nKey()
   {
-    return I18N_KEY_ADDRESSTYPE_PREFIX + key;
+    return I18N_KEY_CONTACTTYPE_PREFIX + key;
   }
 }
