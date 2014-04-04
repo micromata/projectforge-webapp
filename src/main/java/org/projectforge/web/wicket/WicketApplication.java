@@ -46,6 +46,7 @@ import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
 import org.apache.wicket.request.cycle.AbstractRequestCycleListener;
 import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.resource.loader.BundleStringResourceLoader;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
@@ -288,6 +289,9 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     // log.fatal("Data-base SHUTDOWN COMPACT failed: " + ex.getMessage());
     // }
     // }
+
+    // Javascript Resource settings
+    getJavaScriptLibrarySettings().setJQueryReference(new PackageResourceReference(WicketApplication.class, "scripts/jquery.js"));
 
     final ServletContext servletContext = getServletContext();
     final String configContextPath = projectForgeApp.getConfigXml().getServletContextPath();

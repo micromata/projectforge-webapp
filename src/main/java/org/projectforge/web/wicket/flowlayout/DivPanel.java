@@ -104,6 +104,9 @@ public class DivPanel extends Panel
       for (final DivType cssClass : cssClasses) {
         if (cssClass != null) {
           div.add(AttributeModifier.append("class", cssClass.getClassAttrValue()));
+          if (cssClass == DivType.BTN_GROUP) {
+            add(AttributeModifier.append("data-toggle", "buttons"));
+          }
         }
       }
     }

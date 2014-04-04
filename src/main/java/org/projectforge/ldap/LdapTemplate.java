@@ -83,6 +83,7 @@ public abstract class LdapTemplate
       log.error(e.getMessage(), e);
       return null;
     } catch (final Exception e) {
+      log.error(e.getMessage(), e);
       throw new RuntimeException(e);
     } finally {
       if (results != null) {

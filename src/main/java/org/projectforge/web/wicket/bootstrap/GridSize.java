@@ -23,7 +23,6 @@
 
 package org.projectforge.web.wicket.bootstrap;
 
-
 /**
  * Used for defining class attribute value for elements (bootstrap grid sizes).
  * <ul>
@@ -38,7 +37,8 @@ package org.projectforge.web.wicket.bootstrap;
  */
 public enum GridSize
 {
-  SPAN1(1), SPAN2(2), SPAN3(3), SPAN4(4), SPAN6(6), SPAN8(8), SPAN9(9), SPAN12(12), COL25(SPAN3), COL33(SPAN4), COL50(SPAN6), COL66(SPAN8), COL75(SPAN9), COL100(SPAN12);
+  SPAN1(1), SPAN2(2), SPAN3(3), SPAN4(4), SPAN6(6), SPAN8(8), SPAN9(9), SPAN12(12), COL25(SPAN3), COL33(SPAN4), COL50(SPAN6), COL66(SPAN8), COL75(
+      SPAN9), COL100(SPAN12);
 
   private final String classAttrValue;
 
@@ -60,7 +60,12 @@ public enum GridSize
   private GridSize(final int length)
   {
     this.length = length;
-    this.classAttrValue = "span" + length;
+    // To maintain fluid widths on desktops & tablets, but stack vertically on smartphones:
+    // Replace .col-md-* with .col-sm-*
+    //
+    // To maintain fluid widths on all devices (no stacking):
+    // Replace .col-md-* with .col-xs-*
+    this.classAttrValue = "col-sm-" + length;
   }
 
   private GridSize(final GridSize master)

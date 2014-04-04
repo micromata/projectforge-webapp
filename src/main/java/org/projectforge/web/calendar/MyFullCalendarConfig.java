@@ -89,7 +89,18 @@ public class MyFullCalendarConfig extends Config
     setMonthNamesShort(dateFormatSymbols.getShortMonths());
     setWeekMode("variable");
     setEnableContextMenu(true);
-    setEventRenderModel(Model.of("function(event, element) {if (event.tooltipTitle) {initMyPopover(element); element.mypopover({title: event.tooltipTitle, content: event.tooltipContent, html: true })}}"));
+    setEventRenderModel(Model.of("function(event, element) {" +
+                "if (event.tooltipTitle) {" +
+                    "element.popover({" +
+                        "container: document.body, " +
+                        "title: event.tooltipTitle, " +
+                        "content: event.tooltipContent, " +
+                        "html: true, " +
+                        "placement: 'mouse'," +
+                        "trigger: 'hover'" +
+                    "});" +
+                "}" +
+            "}"));
   }
 
   /**

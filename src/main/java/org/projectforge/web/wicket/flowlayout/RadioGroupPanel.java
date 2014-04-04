@@ -112,6 +112,7 @@ public class RadioGroupPanel<T extends Serializable> extends Panel
     cont.add(radio);
     final Label label = new Label("label", labelString);
     label.add(AttributeModifier.replace("for", radio.setOutputMarkupId(true).getMarkupId()));
+    label.setRenderBodyOnly(true);
     cont.add(label);
     if (tooltip != null) {
       WicketUtils.addTooltip(label, tooltip);
