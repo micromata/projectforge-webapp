@@ -7,7 +7,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.addresses;
+package org.projectforge.contact;
 
 import java.io.Serializable;
 

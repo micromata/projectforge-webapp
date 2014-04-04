@@ -27,10 +27,10 @@ import org.projectforge.access.AccessEntryDO;
 import org.projectforge.access.GroupTaskAccessDO;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.PersonalAddressDO;
-import org.projectforge.addresses.Address2DO;
-import org.projectforge.addresses.AddressEntryDO;
 import org.projectforge.book.BookDO;
 import org.projectforge.common.DatabaseDialect;
+import org.projectforge.contact.ContactDO;
+import org.projectforge.contact.ContactEntryDO;
 import org.projectforge.continuousdb.DatabaseUpdateDao;
 import org.projectforge.continuousdb.SchemaGenerator;
 import org.projectforge.continuousdb.Table;
@@ -111,7 +111,7 @@ public class DatabaseCoreInitial
 
         // All the rest:
         AddressDO.class, PersonalAddressDO.class, //
-        Address2DO.class, AddressEntryDO.class, //
+        ContactDO.class, ContactEntryDO.class, //
         BookDO.class, //
         ConfigurationDO.class, //
         DatabaseUpdateDO.class, //

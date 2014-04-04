@@ -65,6 +65,7 @@ import org.projectforge.web.admin.AdminPage;
 import org.projectforge.web.admin.SystemUpdatePage;
 import org.projectforge.web.book.BookListPage;
 import org.projectforge.web.calendar.CalendarPage;
+import org.projectforge.web.contact.ContactListPage;
 import org.projectforge.web.core.ConfigurationListPage;
 import org.projectforge.web.core.SearchPage;
 import org.projectforge.web.fibu.AccountingRecordListPage;
@@ -263,7 +264,7 @@ public class MenuItemRegistry
       }
     };
     reg.register(meb);
-    reg.register(common, MenuItemDefId.ADDRESS_LIST2, 90, org.projectforge.web.addresses.AddressListPage.class);
+    reg.register(common, MenuItemDefId.CONTACT_LIST, 90, ContactListPage.class);
     reg.register(common, MenuItemDefId.SEARCH, 100, SearchPage.class);
 
     // PROJECT_MANAGEMENT

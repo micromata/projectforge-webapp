@@ -51,6 +51,8 @@ import org.projectforge.web.admin.SystemUpdatePage;
 import org.projectforge.web.book.BookEditPage;
 import org.projectforge.web.book.BookListPage;
 import org.projectforge.web.calendar.CalendarPage;
+import org.projectforge.web.contact.ContactEditPage;
+import org.projectforge.web.contact.ContactListPage;
 import org.projectforge.web.core.ConfigurationListPage;
 import org.projectforge.web.core.SearchPage;
 import org.projectforge.web.doc.DocumentationPage;
@@ -291,8 +293,8 @@ public class WebRegistry
     addMountPages(DaoRegistry.ADDRESS, AddressListPage.class, AddressEditPage.class);
     addMountPage(DaoRegistry.ADDRESS + "View", AddressViewPage.class);
 
-    register(DaoRegistry.ADDRESS2, org.projectforge.web.addresses.AddressListPage.class);
-    addMountPages(DaoRegistry.ADDRESS2, org.projectforge.web.addresses.AddressListPage.class, org.projectforge.web.addresses.AddressEditPage.class);
+    register(DaoRegistry.CONTACT, ContactListPage.class);
+    addMountPages(DaoRegistry.CONTACT, ContactListPage.class, ContactEditPage.class);
 
     register(DaoRegistry.BOOK, BookListPage.class);
     addMountPages(DaoRegistry.BOOK, BookListPage.class, BookEditPage.class);

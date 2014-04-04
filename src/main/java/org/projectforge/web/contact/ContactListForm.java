@@ -21,13 +21,13 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.web.addresses;
+package org.projectforge.web.contact;
 
 import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.addresses.AddressFilter;
+import org.projectforge.contact.ContactFilter;
 import org.projectforge.plugins.skillmatrix.SkillDao;
 import org.projectforge.plugins.skillmatrix.TrainingDao;
 import org.projectforge.web.wicket.AbstractListForm;
@@ -36,12 +36,12 @@ import org.projectforge.web.wicket.AbstractListForm;
  * The list formular for the list view.
  * @author Werner Feder (werner.feder@t-online.de)
  */
-public class AddressListForm extends AbstractListForm<AddressFilter, AddressListPage> implements Serializable
+public class ContactListForm extends AbstractListForm<ContactFilter, ContactListPage> implements Serializable
 {
 
   private static final long serialVersionUID = 2352857862306753080L;
 
-  private static final Logger log = Logger.getLogger(AddressListForm.class);
+  private static final Logger log = Logger.getLogger(ContactListForm.class);
 
   @SpringBean(name = "trainingDao")
   private TrainingDao trainingDao;
@@ -52,7 +52,7 @@ public class AddressListForm extends AbstractListForm<AddressFilter, AddressList
   /**
    * @param parentPage
    */
-  public AddressListForm(final AddressListPage parentPage)
+  public ContactListForm(final ContactListPage parentPage)
   {
     super(parentPage);
   }
@@ -68,9 +68,9 @@ public class AddressListForm extends AbstractListForm<AddressFilter, AddressList
    * @see org.projectforge.web.wicket.AbstractListForm#newSearchFilterInstance()
    */
   @Override
-  protected AddressFilter newSearchFilterInstance()
+  protected ContactFilter newSearchFilterInstance()
   {
-    return new AddressFilter();
+    return new ContactFilter();
   }
 
   /**

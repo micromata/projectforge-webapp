@@ -7,7 +7,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.addresses;
+package org.projectforge.contact;
 
 import java.sql.Date;
 
@@ -41,11 +41,11 @@ import org.projectforge.user.PFUserContext;
 @Entity
 @Indexed
 @Table(name = "T_ADDRESS2")
-public class Address2DO extends DefaultBaseDO
+public class ContactDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = -1177059694759828682L;
 
-  //private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(Address2DO.class);
+  //private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ContactDO.class);
 
   private TaskDO task;
 
@@ -85,7 +85,7 @@ public class Address2DO extends DefaultBaseDO
     return birthday;
   }
 
-  public Address2DO setBirthday(final Date birthday)
+  public ContactDO setBirthday(final Date birthday)
   {
     this.birthday = birthday;
     return this;
@@ -97,7 +97,7 @@ public class Address2DO extends DefaultBaseDO
     return firstname;
   }
 
-  public Address2DO setFirstname(final String firstname)
+  public ContactDO setFirstname(final String firstname)
   {
     this.firstname = firstname;
     return this;
@@ -133,7 +133,7 @@ public class Address2DO extends DefaultBaseDO
     return name;
   }
 
-  public Address2DO setName(final String name)
+  public ContactDO setName(final String name)
   {
     this.name = name;
     return this;
@@ -146,7 +146,7 @@ public class Address2DO extends DefaultBaseDO
     return form;
   }
 
-  public Address2DO setForm(final FormOfAddress form)
+  public ContactDO setForm(final FormOfAddress form)
   {
     this.form = form;
     return this;
@@ -182,7 +182,7 @@ public class Address2DO extends DefaultBaseDO
     return title;
   }
 
-  public Address2DO setTitle(final String title)
+  public ContactDO setTitle(final String title)
   {
     this.title = title;
     return this;
@@ -193,7 +193,7 @@ public class Address2DO extends DefaultBaseDO
     return imValues;
   }
 
-  public Address2DO setImValues(final String imValues)
+  public ContactDO setImValues(final String imValues)
   {
     this.imValues = imValues;
     return this;
@@ -204,7 +204,7 @@ public class Address2DO extends DefaultBaseDO
     return emailValues;
   }
 
-  public Address2DO setEmailValues(final String emailValues)
+  public ContactDO setEmailValues(final String emailValues)
   {
     this.emailValues = emailValues;
     return this;
@@ -215,7 +215,7 @@ public class Address2DO extends DefaultBaseDO
     return phoneValues;
   }
 
-  public Address2DO setPhoneValues(final String phoneValues)
+  public ContactDO setPhoneValues(final String phoneValues)
   {
     this.phoneValues = phoneValues;
     return this;

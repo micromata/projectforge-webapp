@@ -7,7 +7,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.web.addresses;
+package org.projectforge.web.contact;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +21,8 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.addresses.Address2DO;
-import org.projectforge.addresses.Address2Dao;
+import org.projectforge.contact.ContactDO;
+import org.projectforge.contact.ContactDao;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
@@ -33,17 +33,18 @@ import org.projectforge.web.wicket.ListPage;
  * The controller of the list page. Most functionality such as search etc. is done by the super class.
  * @author Werner Feder (werner.feder@t-online.de)
  */
-@ListPage(editPage = AddressEditPage.class)
-public class AddressListPage extends AbstractListPage<AddressListForm, Address2Dao, Address2DO> implements
-IListPageColumnsCreator<Address2DO>
+@ListPage(editPage = ContactEditPage.class)
+public class ContactListPage extends AbstractListPage<ContactListForm, ContactDao, ContactDO> implements
+IListPageColumnsCreator<ContactDO>
 {
+  private static final long serialVersionUID = -7719281395937025724L;
 
-  public static final String I18N_KEY_PREFIX = "address2";
+  public static final String I18N_KEY_PREFIX = "contact";
 
-  @SpringBean(name = "address2Dao")
-  private Address2Dao address2Dao;
+  @SpringBean(name = "contactDao")
+  private ContactDao contactDao;
 
-  public AddressListPage(final PageParameters parameters)
+  public ContactListPage(final PageParameters parameters)
   {
     super(parameters, I18N_KEY_PREFIX);
   }
@@ -53,25 +54,25 @@ IListPageColumnsCreator<Address2DO>
    */
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<Address2DO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<ContactDO, String>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<Address2DO, String>> columns = new ArrayList<IColumn<Address2DO, String>>();
-    final CellItemListener<Address2DO> cellItemListener = new CellItemListener<Address2DO>() {
-      public void populateItem(final Item<ICellPopulator<Address2DO>> item, final String componentId, final IModel<Address2DO> rowModel)
+    final List<IColumn<ContactDO, String>> columns = new ArrayList<IColumn<ContactDO, String>>();
+    final CellItemListener<ContactDO> cellItemListener = new CellItemListener<ContactDO>() {
+      public void populateItem(final Item<ICellPopulator<ContactDO>> item, final String componentId, final IModel<ContactDO> rowModel)
       {
-        final Address2DO address2DO = rowModel.getObject();
-        appendCssClasses(item, address2DO.getId(), address2DO.isDeleted());
+        final ContactDO contactDO = rowModel.getObject();
+        appendCssClasses(item, contactDO.getId(), contactDO.isDeleted());
       }
     };
 
-    columns.add(new CellItemListenerPropertyColumn<Address2DO>(Address2DO.class, getSortable("name", sortable), "name",
+    columns.add(new CellItemListenerPropertyColumn<ContactDO>(ContactDO.class, getSortable("name", sortable), "name",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<Address2DO>(Address2DO.class, getSortable("firstname", sortable), "firstname",
+    columns.add(new CellItemListenerPropertyColumn<ContactDO>(ContactDO.class, getSortable("firstname", sortable), "firstname",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<Address2DO>(Address2DO.class, getSortable("title", sortable), "title", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<Address2DO>(Address2DO.class, getSortable("birthday", sortable), "birthday",
+    columns.add(new CellItemListenerPropertyColumn<ContactDO>(ContactDO.class, getSortable("title", sortable), "title", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<ContactDO>(ContactDO.class, getSortable("birthday", sortable), "birthday",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<Address2DO>(new Model<String>(getString("modified")),
+    columns.add(new CellItemListenerPropertyColumn<ContactDO>(new Model<String>(getString("modified")),
         getSortable("lastUpdate", sortable), "lastUpdate", cellItemListener));
 
     return columns;
@@ -93,18 +94,18 @@ IListPageColumnsCreator<Address2DO>
    * @see org.projectforge.web.wicket.AbstractListPage#getBaseDao()
    */
   @Override
-  protected Address2Dao getBaseDao()
+  protected ContactDao getBaseDao()
   {
-    return address2Dao;
+    return contactDao;
   }
 
   /**
    * @see org.projectforge.web.wicket.AbstractListPage#newListForm(org.projectforge.web.wicket.AbstractListPage)
    */
   @Override
-  protected AddressListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
+  protected ContactListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
-    return new AddressListForm(this);
+    return new ContactListForm(this);
   }
 
 }

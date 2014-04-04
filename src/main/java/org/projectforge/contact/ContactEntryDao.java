@@ -7,7 +7,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.addresses;
+package org.projectforge.contact;
 
 import org.apache.commons.lang.Validate;
 import org.projectforge.access.AccessType;
@@ -19,20 +19,20 @@ import org.projectforge.user.PFUserDO;
  * @author Werner Feder (werner.feder@t-online.de)
  *
  */
-public class AddressEntryDao extends BaseDao<AddressEntryDO>
+public class ContactEntryDao extends BaseDao<ContactEntryDO>
 {
 
-  private Address2Dao address2Dao;
+  private ContactDao contactDao;
 
-  public AddressEntryDao()
+  public ContactEntryDao()
   {
-    super(AddressEntryDO.class);
+    super(ContactEntryDO.class);
   }
 
 
-  public void setAddressDao(final Address2Dao address2Dao)
+  public void setContactDao(final ContactDao contactDao)
   {
-    this.address2Dao = address2Dao;
+    this.contactDao = contactDao;
   }
 
   /**
@@ -40,9 +40,9 @@ public class AddressEntryDao extends BaseDao<AddressEntryDO>
    * @param address2Id If null, then address will be set to null;
    * @see BaseDao#getOrLoad(Integer)
    */
-  public void setAddress(final AddressEntryDO addressEntry, final Integer address2Id)
+  public void setAddress(final ContactEntryDO addressEntry, final Integer address2Id)
   {
-    final Address2DO adress2 = address2Dao.getOrLoad(address2Id);
+    final ContactDO adress2 = contactDao.getOrLoad(address2Id);
     addressEntry.setAddress(adress2);
   }
   /**
@@ -60,7 +60,7 @@ public class AddressEntryDao extends BaseDao<AddressEntryDO>
    * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
    */
   @Override
-  public boolean hasAccess(final PFUserDO user, final AddressEntryDO obj, final AddressEntryDO oldObj, final OperationType operationType,
+  public boolean hasAccess(final PFUserDO user, final ContactEntryDO obj, final ContactEntryDO oldObj, final OperationType operationType,
       final boolean throwException)
   {
     return accessChecker.hasPermission(user, obj.getAddressId(), AccessType.TASKS, operationType, throwException);
@@ -70,7 +70,7 @@ public class AddressEntryDao extends BaseDao<AddressEntryDO>
    * @see org.projectforge.core.BaseDao#hasUpdateAccess(Object, Object)
    */
   @Override
-  public boolean hasUpdateAccess(final PFUserDO user, final AddressEntryDO obj, final AddressEntryDO dbObj, final boolean throwException)
+  public boolean hasUpdateAccess(final PFUserDO user, final ContactEntryDO obj, final ContactEntryDO dbObj, final boolean throwException)
   {
     Validate.notNull(dbObj);
     Validate.notNull(obj);
@@ -97,8 +97,8 @@ public class AddressEntryDao extends BaseDao<AddressEntryDO>
    * @see org.projectforge.core.BaseDao#newInstance()
    */
   @Override
-  public AddressEntryDO newInstance()
+  public ContactEntryDO newInstance()
   {
-    return new AddressEntryDO();
+    return new ContactEntryDO();
   }
 }

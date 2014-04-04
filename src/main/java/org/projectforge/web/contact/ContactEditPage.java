@@ -21,13 +21,13 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.web.addresses;
+package org.projectforge.web.contact;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.addresses.Address2DO;
-import org.projectforge.addresses.Address2Dao;
+import org.projectforge.contact.ContactDO;
+import org.projectforge.contact.ContactDao;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 
@@ -35,22 +35,22 @@ import org.projectforge.web.wicket.AbstractEditPage;
  * The controller of the edit formular page. Most functionality such as insert, update, delete etc. is done by the super class.
  * @author Werner Feder (werner.feder@t-online.de)
  */
-public class AddressEditPage extends AbstractEditPage<Address2DO, AddressEditForm, Address2Dao> implements ISelectCallerPage
+public class ContactEditPage extends AbstractEditPage<ContactDO, ContactEditForm, ContactDao> implements ISelectCallerPage
 {
 
   private static final long serialVersionUID = -4584335798024587418L;
 
-  private static final Logger log = Logger.getLogger(AddressEditPage.class);
+  private static final Logger log = Logger.getLogger(ContactEditPage.class);
 
-  public static final String I18N_KEY_PREFIX = "address2";
+  public static final String I18N_KEY_PREFIX = "contact";
 
-  @SpringBean(name = "address2Dao")
-  private Address2Dao address2Dao;
+  @SpringBean(name = "contactDao")
+  private ContactDao contactDao;
 
   /**
    * @param parameters
    */
-  public AddressEditPage(final PageParameters parameters)
+  public ContactEditPage(final PageParameters parameters)
   {
     super(parameters, I18N_KEY_PREFIX);
     init();
@@ -60,9 +60,9 @@ public class AddressEditPage extends AbstractEditPage<Address2DO, AddressEditFor
    * @see org.projectforge.web.wicket.AbstractEditPage#getBaseDao()
    */
   @Override
-  protected Address2Dao getBaseDao()
+  protected ContactDao getBaseDao()
   {
-    return address2Dao;
+    return contactDao;
   }
 
   /**
@@ -79,9 +79,9 @@ public class AddressEditPage extends AbstractEditPage<Address2DO, AddressEditFor
    *      org.projectforge.core.AbstractBaseDO)
    */
   @Override
-  protected AddressEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final Address2DO data)
+  protected ContactEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final ContactDO data)
   {
-    return new AddressEditForm(this, data);
+    return new ContactEditForm(this, data);
   }
 
   /**

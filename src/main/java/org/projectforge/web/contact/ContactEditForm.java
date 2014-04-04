@@ -21,7 +21,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.web.addresses;
+package org.projectforge.web.contact;
 
 
 import java.util.Date;
@@ -30,8 +30,8 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.FormOfAddress;
-import org.projectforge.addresses.Address2DO;
-import org.projectforge.addresses.Address2Dao;
+import org.projectforge.contact.ContactDO;
+import org.projectforge.contact.ContactDao;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
@@ -46,21 +46,21 @@ import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
  * This is the edit formular page.
  * @author Werner Feder (werner.feder@t-online.de)
  */
-public class AddressEditForm extends AbstractEditForm<Address2DO, AddressEditPage>
+public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage>
 {
 
   private static final long serialVersionUID = 7930242750045989712L;
 
-  private static final Logger log = Logger.getLogger(AddressEditForm.class);
+  private static final Logger log = Logger.getLogger(ContactEditForm.class);
 
-  @SpringBean(name = "address2Dao")
-  private Address2Dao address2Dao;
+  @SpringBean(name = "contactDao")
+  private ContactDao contactDao;
 
   /**
    * @param parentPage
    * @param data
    */
-  public AddressEditForm(final AddressEditPage parentPage, final Address2DO data)
+  public ContactEditForm(final ContactEditPage parentPage, final ContactDO data)
   {
     super(parentPage, data);
   }
@@ -74,13 +74,13 @@ public class AddressEditForm extends AbstractEditForm<Address2DO, AddressEditPag
     gridBuilder.newSplitPanel(GridSize.COL50);
 
     // name
-    FieldsetPanel fs = gridBuilder.newFieldset(Address2DO.class, "name");
+    FieldsetPanel fs = gridBuilder.newFieldset(ContactDO.class, "name");
     final RequiredMaxLengthTextField name = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
         "name"));
     fs.add(name);
 
     // firstname
-    fs = gridBuilder.newFieldset(Address2DO.class, "firstname");
+    fs = gridBuilder.newFieldset(ContactDO.class, "firstname");
     final MaxLengthTextField firstname = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "firstname"));
     fs.add(firstname);
 
@@ -91,12 +91,12 @@ public class AddressEditForm extends AbstractEditForm<Address2DO, AddressEditPag
     fs.addDropDownChoice(props.getModel(), formChoiceRenderer.getValues(), formChoiceRenderer).setRequired(true).setNullValid(false);
 
     // title
-    fs = gridBuilder.newFieldset(Address2DO.class, "title");
+    fs = gridBuilder.newFieldset(ContactDO.class, "title");
     final MaxLengthTextField title = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "title"));
     fs.add(title);
 
     // birthday
-    fs = gridBuilder.newFieldset(Address2DO.class, "birthday");
+    fs = gridBuilder.newFieldset(ContactDO.class, "birthday");
     fs.add(new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "birthday"), DatePanelSettings.get().withTargetType(
         java.sql.Date.class)));
 

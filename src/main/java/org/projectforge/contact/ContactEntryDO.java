@@ -7,7 +7,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.addresses;
+package org.projectforge.contact;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -31,13 +31,13 @@ import org.projectforge.core.DefaultBaseDO;
 @Entity
 @Indexed
 @Table(name = "T_ADDRESSENTRY")
-public class AddressEntryDO extends DefaultBaseDO
+public class ContactEntryDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = -8141697905834021747L;
 
-  //private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressEntryDO.class);
+  //private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ContactEntryDO.class);
 
-  private Address2DO address;
+  private ContactDO address;
 
   @Enumerated(EnumType.STRING)
   @Field(index = Index.TOKENIZED, store = Store.NO)
@@ -64,12 +64,12 @@ public class AddressEntryDO extends DefaultBaseDO
    */
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "address_id", nullable = false)
-  public Address2DO getAddress()
+  public ContactDO getAddress()
   {
     return address;
   }
 
-  public void setAddress(final Address2DO address)
+  public void setAddress(final ContactDO address)
   {
     this.address = address;
   }
@@ -92,7 +92,7 @@ public class AddressEntryDO extends DefaultBaseDO
   /**
    * @return this for chaining.
    */
-  public AddressEntryDO setContactType(final ContactType contactType)
+  public ContactEntryDO setContactType(final ContactType contactType)
   {
     this.contactType = contactType;
     return this;
@@ -110,7 +110,7 @@ public class AddressEntryDO extends DefaultBaseDO
    * @param city the city to set
    * @return this for chaining.
    */
-  public AddressEntryDO setCity(final String city)
+  public ContactEntryDO setCity(final String city)
   {
     this.city = city;
     return this;
@@ -128,7 +128,7 @@ public class AddressEntryDO extends DefaultBaseDO
    * @param country the country to set
    * @return this for chaining.
    */
-  public AddressEntryDO setCountry(final String country)
+  public ContactEntryDO setCountry(final String country)
   {
     this.country = country;
     return this;
@@ -146,7 +146,7 @@ public class AddressEntryDO extends DefaultBaseDO
    * @param state the state to set
    * @return this for chaining.
    */
-  public AddressEntryDO setState(final String state)
+  public ContactEntryDO setState(final String state)
   {
     this.state = state;
     return this;
@@ -164,7 +164,7 @@ public class AddressEntryDO extends DefaultBaseDO
    * @param street the street to set
    * @return this for chaining.
    */
-  public AddressEntryDO setStreet(final String street)
+  public ContactEntryDO setStreet(final String street)
   {
     this.street = street;
     return this;
@@ -182,7 +182,7 @@ public class AddressEntryDO extends DefaultBaseDO
    * @param zipCode the zipCode to set
    * @return this for chaining.
    */
-  public AddressEntryDO setZipCode(final String zipCode)
+  public ContactEntryDO setZipCode(final String zipCode)
   {
     this.zipCode = zipCode;
     return this;

@@ -57,8 +57,8 @@ class HibernateCoreEntities
     org.projectforge.access.GroupTaskAccessDO.class, //
     org.projectforge.address.AddressDO.class, //
     org.projectforge.address.PersonalAddressDO.class, //
-    org.projectforge.addresses.Address2DO.class, //
-    org.projectforge.addresses.AddressEntryDO.class, //
+    org.projectforge.contact.ContactDO.class, //
+    org.projectforge.contact.ContactEntryDO.class, //
     org.projectforge.book.BookDO.class, //
     org.projectforge.core.ConfigurationDO.class, //
     org.projectforge.database.DatabaseUpdateDO.class, //

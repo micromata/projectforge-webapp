@@ -7,7 +7,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.addresses;
+package org.projectforge.contact;
 
 import org.projectforge.core.BaseSearchFilter;
 
@@ -15,16 +15,16 @@ import org.projectforge.core.BaseSearchFilter;
  * @author Werner Feder (werner.feder@t-online.de)
  * 
  */
-public class AddressFilter extends BaseSearchFilter
+public class ContactFilter extends BaseSearchFilter
 {
 
   private static final long serialVersionUID = -2555263898845331080L;
 
-  public AddressFilter()
+  public ContactFilter()
   {
   }
 
-  public AddressFilter(final BaseSearchFilter filter)
+  public ContactFilter(final BaseSearchFilter filter)
   {
     super(filter);
   }

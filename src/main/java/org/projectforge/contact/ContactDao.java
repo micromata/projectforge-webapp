@@ -7,7 +7,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.addresses;
+package org.projectforge.contact;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ import org.projectforge.user.PFUserDO;
  * @author Werner Feder (werner.feder@t-online.de)
  *
  */
-public class Address2Dao extends BaseDao<Address2DO>
+public class ContactDao extends BaseDao<ContactDO>
 {
 
   private Configuration configuration;
@@ -37,9 +37,9 @@ public class Address2Dao extends BaseDao<Address2DO>
   private final XmlConverter<PhoneValue> phoneConverter;
   private final XmlConverter<EmailValue> emailConverter;
 
-  public Address2Dao()
+  public ContactDao()
   {
-    super(Address2DO.class);
+    super(ContactDO.class);
     final InstantMessagingValue im = new InstantMessagingValue();
     final PhoneValue phone = new PhoneValue();
     final EmailValue email = new EmailValue();
@@ -58,7 +58,7 @@ public class Address2Dao extends BaseDao<Address2DO>
     this.taskDao = taskDao;
   }
 
-  //  private String getNormalizedFullname(final Address2DO address)
+  //  private String getNormalizedFullname(final ContactDO address)
   //  {
   //    final StringBuilder builder = new StringBuilder();
   //    if (address.getFirstName() != null) {
@@ -75,7 +75,7 @@ public class Address2Dao extends BaseDao<Address2DO>
    * @param taskId If null, then task will be set to null;
    * @see BaseDao#getOrLoad(Integer)
    */
-  public void setTask(final Address2DO address, final Integer taskId)
+  public void setTask(final ContactDO address, final Integer taskId)
   {
     final TaskDO task = taskDao.getOrLoad(taskId);
     address.setTask(task);
@@ -98,7 +98,7 @@ public class Address2Dao extends BaseDao<Address2DO>
     return configuration.getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_ADDRESSES);
   }
 
-  private void beforeUpdateOrSave(final Address2DO address)
+  private void beforeUpdateOrSave(final ContactDO address)
   {
     if (address != null && address.getTaskId() == null) {
       setTask(address, getDefaultTaskId());
@@ -109,7 +109,7 @@ public class Address2Dao extends BaseDao<Address2DO>
    * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
    */
   @Override
-  public boolean hasAccess(final PFUserDO user, final Address2DO obj, final Address2DO oldObj, final OperationType operationType,
+  public boolean hasAccess(final PFUserDO user, final ContactDO obj, final ContactDO oldObj, final OperationType operationType,
       final boolean throwException)
   {
     beforeUpdateOrSave(obj);
@@ -120,7 +120,7 @@ public class Address2Dao extends BaseDao<Address2DO>
    * @see org.projectforge.core.BaseDao#hasUpdateAccess(Object, Object)
    */
   @Override
-  public boolean hasUpdateAccess(final PFUserDO user, final Address2DO obj, final Address2DO dbObj, final boolean throwException)
+  public boolean hasUpdateAccess(final PFUserDO user, final ContactDO obj, final ContactDO dbObj, final boolean throwException)
   {
     Validate.notNull(dbObj);
     Validate.notNull(obj);
@@ -148,9 +148,9 @@ public class Address2Dao extends BaseDao<Address2DO>
    * @see org.projectforge.core.BaseDao#newInstance()
    */
   @Override
-  public Address2DO newInstance()
+  public ContactDO newInstance()
   {
-    return new Address2DO();
+    return new ContactDO();
   }
 
   /**
