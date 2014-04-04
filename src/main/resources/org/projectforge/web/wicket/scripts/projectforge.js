@@ -336,6 +336,9 @@ function doAfterAjaxHandling() {
   $(document).on("change", "[data-toggle^=button] [type=checkbox]", function() {
     eval($(this).attr("onclick"));
   });
+  $(document).on("change", "[data-toggle^=button] [type=radio]", function() {
+	    eval($(this).attr("onclick"));
+	  });
 }
 
 function initColorPicker() {
