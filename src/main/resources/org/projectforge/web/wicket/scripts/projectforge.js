@@ -332,6 +332,10 @@ function doAfterAjaxHandling() {
       that.siblings(".icon-remove").click();
     }, 400);
   });
+  // quickfix to handle wicket checkboxes to work with bootstrap3
+  $(document).on("change", "[data-toggle^=button] [type=checkbox]", function() {
+    eval($(this).attr("onclick"));
+  });
 }
 
 function initColorPicker() {
