@@ -263,6 +263,7 @@ public class MenuItemRegistry
       }
     };
     reg.register(meb);
+    reg.register(common, MenuItemDefId.ADDRESS_LIST2, 90, org.projectforge.web.addresses.AddressListPage.class);
     reg.register(common, MenuItemDefId.SEARCH, 100, SearchPage.class);
 
     // PROJECT_MANAGEMENT

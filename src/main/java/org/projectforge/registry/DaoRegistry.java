@@ -27,6 +27,7 @@ import javax.sql.DataSource;
 
 import org.projectforge.access.AccessDao;
 import org.projectforge.address.AddressDao;
+import org.projectforge.addresses.Address2Dao;
 import org.projectforge.book.BookDao;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.ConfigurationDao;
@@ -93,6 +94,8 @@ public class DaoRegistry
 
   public static final String ADDRESS = "address";
 
+  public static final String ADDRESS2 = "address2";
+
   public static final String BOOK = "book";
 
   public static final String CONFIGURATION = "configuration";
@@ -150,6 +153,8 @@ public class DaoRegistry
   private AccessDao accessDao;
 
   private AddressDao addressDao;
+
+  private Address2Dao address2Dao;
 
   private AuftragDao auftragDao;
 
@@ -232,6 +237,7 @@ public class DaoRegistry
     register(ACCESS, AccessDao.class, accessDao, "access");
 
     register(ADDRESS, AddressDao.class, addressDao, "address");
+    register(ADDRESS2, Address2Dao.class, address2Dao, "address2");
     register(TIMESHEET, TimesheetDao.class, timesheetDao, "timesheet") //
     .setSearchFilterClass(TimesheetFilter.class);
     register(BOOK, BookDao.class, bookDao, "book");
@@ -316,6 +322,11 @@ public class DaoRegistry
   public void setAddressDao(final AddressDao addressDao)
   {
     this.addressDao = addressDao;
+  }
+
+  public void setAddress2Dao(final Address2Dao address2Dao)
+  {
+    this.address2Dao = address2Dao;
   }
 
   public void setAuftragDao(final AuftragDao auftragDao)

@@ -291,6 +291,9 @@ public class WebRegistry
     addMountPages(DaoRegistry.ADDRESS, AddressListPage.class, AddressEditPage.class);
     addMountPage(DaoRegistry.ADDRESS + "View", AddressViewPage.class);
 
+    register(DaoRegistry.ADDRESS2, org.projectforge.web.addresses.AddressListPage.class);
+    addMountPages(DaoRegistry.ADDRESS2, org.projectforge.web.addresses.AddressListPage.class, org.projectforge.web.addresses.AddressEditPage.class);
+
     register(DaoRegistry.BOOK, BookListPage.class);
     addMountPages(DaoRegistry.BOOK, BookListPage.class, BookEditPage.class);
 

@@ -40,6 +40,7 @@ public enum MenuItemDefId
   ACCOUNT_LIST("fibu.konten"), //
   ACCOUNTING_RECORD_LIST("fibu.buchungssaetze"), //
   ADDRESS_LIST("addressList"), //
+  ADDRESS_LIST2("addressList2"), //
   BANK_ACCOUNT_LIST("finance.bankAccounts"), //
   BOOK_LIST("bookList"), //
   CALENDAR("calendar"), //
