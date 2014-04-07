@@ -21,7 +21,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.addresses;
+package org.projectforge.contact;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -56,13 +56,13 @@ import de.micromata.hibernate.history.HistoryEntry;
 import de.micromata.hibernate.history.HistoryEntryType;
 import de.micromata.hibernate.history.delta.PropertyDelta;
 
-public class Address2Test extends TestBase
+public class ContactTest extends TestBase
 {
-  private final static Logger log = Logger.getLogger(Address2Test.class);
+  private final static Logger log = Logger.getLogger(ContactTest.class);
 
   private ContactDao contactDao;
 
-  public void setAddress2Dao(final ContactDao contactDao)
+  public void setContactDao(final ContactDao contactDao)
   {
     this.contactDao = contactDao;
   }

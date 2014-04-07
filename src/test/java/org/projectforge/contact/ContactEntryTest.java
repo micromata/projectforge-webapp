@@ -21,32 +21,27 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.addresses;
+package org.projectforge.contact;
 
 import static org.junit.Assert.assertEquals;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
-import org.projectforge.contact.ContactDO;
-import org.projectforge.contact.ContactDao;
-import org.projectforge.contact.ContactEntryDO;
-import org.projectforge.contact.ContactEntryDao;
-import org.projectforge.contact.ContactType;
 import org.projectforge.test.TestBase;
 
-public class AddressEntryTest extends TestBase
+public class ContactEntryTest extends TestBase
 {
-  private final static Logger log = Logger.getLogger(AddressEntryTest.class);
+  private final static Logger log = Logger.getLogger(ContactEntryTest.class);
 
   private ContactEntryDao contactEntryDao;
   private ContactDao contactDao;
 
-  public void setAddressEntryDao(final ContactEntryDao contactEntryDao)
+  public void setContactEntryDao(final ContactEntryDao contactEntryDao)
   {
     this.contactEntryDao = contactEntryDao;
   }
 
-  public void setAddress2Dao(final ContactDao contactDao)
+  public void setContactDao(final ContactDao contactDao)
   {
     this.contactDao = contactDao;
   }
