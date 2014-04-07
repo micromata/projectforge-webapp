@@ -24,7 +24,9 @@
 package org.projectforge.web.contact;
 
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.model.PropertyModel;
@@ -32,6 +34,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.FormOfAddress;
 import org.projectforge.contact.ContactDO;
 import org.projectforge.contact.ContactDao;
+import org.projectforge.contact.EmailValue;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
@@ -41,6 +44,7 @@ import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.flowlayout.FieldProperties;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+
 
 /**
  * This is the edit formular page.
@@ -55,6 +59,10 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
 
   @SpringBean(name = "contactDao")
   private ContactDao contactDao;
+
+  private EmailsPanel emailsPanel;
+
+  private List<EmailValue> emails;
 
   /**
    * @param parentPage
@@ -99,6 +107,12 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
     fs = gridBuilder.newFieldset(ContactDO.class, "birthday");
     fs.add(new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "birthday"), DatePanelSettings.get().withTargetType(
         java.sql.Date.class)));
+
+    // Emails
+    emails = contactDao.readEmailValues(getData().getEmailValues());
+    if ( emails == null)
+      emails = new ArrayList<EmailValue>();
+    fs.add(emailsPanel = new EmailsPanel(fs.newChildId(), emails));
 
   }
 
