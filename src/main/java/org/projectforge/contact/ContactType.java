@@ -33,7 +33,7 @@ public enum ContactType implements I18nEnum
 {
   BUSINESS("business"), POSTAL("postal"), PRIVATE("private"), OTHER("other"), OWN("own");
 
-  public static final String I18N_KEY_CONTACTTYPE_PREFIX = "contacttype.";
+  public static final String I18N_KEY_CONTACTTYPE_PREFIX = "contact.type.";
 
   /**
    * List of all available values.

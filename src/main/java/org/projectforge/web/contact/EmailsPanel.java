@@ -30,14 +30,19 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.PropertyModel;
+import org.projectforge.contact.ContactType;
 import org.projectforge.contact.EmailValue;
 import org.projectforge.plugins.teamcal.event.TeamEventAttendeeDO;
 import org.projectforge.web.wicket.components.AjaxMaxLengthEditableLabel;
+import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
+import org.projectforge.web.wicket.flowlayout.FieldProperties;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -53,6 +58,8 @@ public class EmailsPanel extends Panel
 
   private final WebMarkupContainer mainContainer;
 
+  private final LabelValueChoiceRenderer<ContactType> formChoiceRenderer;
+
   /**
    * @param id
    */
@@ -67,9 +74,16 @@ public class EmailsPanel extends Panel
     rebuildEmails();
     final WebMarkupContainer item = new WebMarkupContainer("liAddNewEmail");
     mainContainer.add(item);
+    // final List<ContactType> choices = Arrays.asList(ContactType.LIST);
+    //final PropertyModel<ContactType[]> props = new PropertyModel<ContactType[]>(ContactType.LIST);
+
+    final FieldProperties<ContactType> props = new FieldProperties<ContactType>("contact.type", new PropertyModel<ContactType>(new Model<ContactType>(), "emails"));
+    formChoiceRenderer = new LabelValueChoiceRenderer<ContactType>(this, ContactType.values());
+    item.add(new DropDownChoice<ContactType>("choice", formChoiceRenderer.getValues(), formChoiceRenderer));
     item.add(new EmailEditableLabel("editableLabel", Model.of(new EmailValue()), true));
     emailsRepeater.setVisible(true);
   }
+
 
   @SuppressWarnings("serial")
   class EmailEditableLabel extends AjaxMaxLengthEditableLabel
@@ -89,7 +103,7 @@ public class EmailsPanel extends Panel
         public String getObject()
         {
           if (lastEntry == true) {
-            return EmailsPanel.this.getString("plugins.teamcal.event.addNewAttendee");
+            return EmailsPanel.this.getString("email");
           }
           final EmailValue email = emailModel.getObject();
           return email.getEmail();
@@ -196,6 +210,7 @@ public class EmailsPanel extends Panel
     for (final EmailValue email : emails) {
       final WebMarkupContainer item = new WebMarkupContainer(emailsRepeater.newChildId());
       emailsRepeater.add(item);
+      item.add(new DropDownChoice<ContactType>("choice", formChoiceRenderer.getValues(), formChoiceRenderer));
       if ( count == size)
         item.add(new EmailEditableLabel("editableLabel", Model.of(email), true));
       else

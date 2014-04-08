@@ -73,6 +73,7 @@ public class ContactDO extends DefaultBaseDO
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String imValues;
 
+  @PropertyInfo(i18nKey = "emails")
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String emailValues;
 

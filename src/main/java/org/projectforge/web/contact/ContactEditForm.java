@@ -108,6 +108,7 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
     fs.add(new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "birthday"), DatePanelSettings.get().withTargetType(
         java.sql.Date.class)));
 
+
     // Emails
     emails = contactDao.readEmailValues(getData().getEmailValues());
     if ( emails == null)
