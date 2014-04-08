@@ -11,6 +11,7 @@ package org.projectforge.contact;
 
 import java.io.Serializable;
 
+import org.projectforge.core.PropertyInfo;
 import org.projectforge.xml.stream.XmlField;
 import org.projectforge.xml.stream.XmlObject;
 
@@ -23,9 +24,11 @@ public class EmailValue implements Serializable
   private static final long serialVersionUID = 3930937731653442004L;
 
   @XmlField
+  @PropertyInfo(i18nKey = "contactType")
   private String contactType;
 
   @XmlField
+  @PropertyInfo(i18nKey = "email")
   private String email;
 
   public String getContactType()
