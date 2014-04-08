@@ -7,7 +7,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.contact;
+package org.projectforge.address.contact;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

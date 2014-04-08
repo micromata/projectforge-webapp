@@ -27,8 +27,8 @@ import javax.sql.DataSource;
 
 import org.projectforge.access.AccessDao;
 import org.projectforge.address.AddressDao;
+import org.projectforge.address.contact.ContactDao;
 import org.projectforge.book.BookDao;
-import org.projectforge.contact.ContactDao;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.ConfigurationDao;
 import org.projectforge.fibu.AuftragDao;

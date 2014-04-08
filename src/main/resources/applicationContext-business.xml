@@ -36,8 +36,8 @@
   <bean id="addressDao" class="org.projectforge.address.AddressDao" />
   <bean id="bookDao" class="org.projectforge.book.BookDao" />
   <bean id="configurationDao" class="org.projectforge.core.ConfigurationDao" />
-  <bean id="contactDao" class="org.projectforge.contact.ContactDao" />
-  <bean id="contactEntryDao" class="org.projectforge.contact.ContactEntryDao" />
+  <bean id="contactDao" class="org.projectforge.address.contact.ContactDao" />
+  <bean id="contactEntryDao" class="org.projectforge.address.contact.ContactEntryDao" />
   <bean id="contractDao" class="org.projectforge.orga.ContractDao" />
   <bean id="databaseDao" class="org.projectforge.database.DatabaseDao" />
   <bean id="ganttChartDao" class="org.projectforge.gantt.GanttChartDao" />

@@ -7,7 +7,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.contact;
+package org.projectforge.address.contact;
 
 import org.projectforge.core.BaseSearchFilter;
 

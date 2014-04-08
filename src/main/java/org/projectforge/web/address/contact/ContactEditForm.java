@@ -21,7 +21,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.web.contact;
+package org.projectforge.web.address.contact;
 
 
 import java.util.ArrayList;
@@ -32,10 +32,10 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.FormOfAddress;
-import org.projectforge.contact.ContactDO;
-import org.projectforge.contact.ContactDao;
-import org.projectforge.contact.ContactType;
-import org.projectforge.contact.EmailValue;
+import org.projectforge.address.contact.ContactDO;
+import org.projectforge.address.contact.ContactDao;
+import org.projectforge.address.contact.ContactType;
+import org.projectforge.address.contact.EmailValue;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;

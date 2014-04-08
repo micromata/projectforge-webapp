@@ -21,13 +21,13 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.web.contact;
+package org.projectforge.web.address.contact;
 
 import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.contact.ContactFilter;
+import org.projectforge.address.contact.ContactFilter;
 import org.projectforge.plugins.skillmatrix.SkillDao;
 import org.projectforge.plugins.skillmatrix.TrainingDao;
 import org.projectforge.web.wicket.AbstractListForm;
