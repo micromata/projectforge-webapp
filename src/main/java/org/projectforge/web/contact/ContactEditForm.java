@@ -34,6 +34,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.FormOfAddress;
 import org.projectforge.contact.ContactDO;
 import org.projectforge.contact.ContactDao;
+import org.projectforge.contact.ContactType;
 import org.projectforge.contact.EmailValue;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.bootstrap.GridSize;
@@ -111,8 +112,13 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
 
     // Emails
     emails = contactDao.readEmailValues(getData().getEmailValues());
-    if ( emails == null)
+    if ( emails == null) {
       emails = new ArrayList<EmailValue>();
+      final EmailValue e1 = new EmailValue().setEmail("werner.feder@its-feder.de").setContactType(ContactType.BUSINESS.getI18nKey());
+      emails.add(e1);
+      final EmailValue e2 = new EmailValue().setEmail("werner.feder@t-online.de").setContactType(ContactType.PRIVATE.getI18nKey());
+      emails.add(e2);
+    }
     fs.add(emailsPanel = new EmailsPanel(fs.newChildId(), emails));
 
   }
