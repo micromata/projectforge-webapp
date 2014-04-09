@@ -24,6 +24,7 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.core.DefaultBaseDO;
+import org.projectforge.core.PropertyInfo;
 
 /**
  * @author Werner Feder (werner.feder@t-online.de)
@@ -39,24 +40,30 @@ public class ContactEntryDO extends DefaultBaseDO
 
   private ContactDO address;
 
+  @PropertyInfo(i18nKey = "contactType")
   @Enumerated(EnumType.STRING)
   @Field(index = Index.TOKENIZED, store = Store.NO)
-  private ContactType contactType;
+  private ContactType contactType; // 15
 
+  @PropertyInfo(i18nKey = "city")
   @Field(index = Index.TOKENIZED, store = Store.NO)
-  private String city; // 255
+  private String city;
 
+  @PropertyInfo(i18nKey = "country")
   @Field(index = Index.TOKENIZED, store = Store.NO)
-  private String country; // 255
+  private String country;
 
+  @PropertyInfo(i18nKey = "state")
   @Field(index = Index.TOKENIZED, store = Store.NO)
-  private String state; // 255
+  private String state;
 
+  @PropertyInfo(i18nKey = "street")
   @Field(index = Index.TOKENIZED, store = Store.NO)
-  private String street; // 255
+  private String street;
 
+  @PropertyInfo(i18nKey = "zipCode")
   @Field(index = Index.TOKENIZED, store = Store.NO)
-  private String zipCode; // 255
+  private String zipCode;
 
   /**
    * Not used as object due to performance reasons.

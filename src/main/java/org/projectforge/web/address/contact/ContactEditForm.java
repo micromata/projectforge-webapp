@@ -35,6 +35,7 @@ import org.projectforge.address.FormOfAddress;
 import org.projectforge.address.PhoneType;
 import org.projectforge.address.contact.ContactDO;
 import org.projectforge.address.contact.ContactDao;
+import org.projectforge.address.contact.ContactEntryDO;
 import org.projectforge.address.contact.ContactType;
 import org.projectforge.address.contact.EmailValue;
 import org.projectforge.address.contact.InstantMessagingType;
@@ -73,6 +74,9 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
 
   private ImsPanel imsPanel;
   private List<InstantMessagingValue> ims;
+
+  private ContactEntryPanel entryPanel;
+  private List<ContactEntryDO> entrys;
 
   /**
    * @param parentPage
@@ -150,6 +154,9 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
       ims.add(i2);
     }
     fs.add(imsPanel = new ImsPanel(fs.newChildId(), ims));
+
+    final List<ContactEntryDO> entrys = new ArrayList<ContactEntryDO>();
+    fs.add(entryPanel = new ContactEntryPanel(fs.newChildId(), entrys));
 
   }
 
