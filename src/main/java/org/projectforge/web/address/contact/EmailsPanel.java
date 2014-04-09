@@ -23,6 +23,7 @@
 
 package org.projectforge.web.address.contact;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -36,6 +37,8 @@ import org.projectforge.address.contact.ContactType;
 import org.projectforge.address.contact.EmailValue;
 import org.projectforge.web.wicket.components.AjaxMaxLengthEditableLabel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
+import org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -81,7 +84,6 @@ public class EmailsPanel extends Panel
   @SuppressWarnings("serial")
   void init(final WebMarkupContainer item)
   {
-    // new PropertyModel<ContactType>( emailValue, "contactType")
     final DropDownChoice<ContactType> dropdownChoice = new DropDownChoice<ContactType>("choice", new PropertyModel<ContactType>(
         newEmailValue, "contactType"), formChoiceRenderer.getValues(), formChoiceRenderer);
     item.add(dropdownChoice);
@@ -99,6 +101,25 @@ public class EmailsPanel extends Panel
         super.onSubmit(target);
         emails.add(new EmailValue().setEmail(newEmailValue.getEmail()).setContactType(newEmailValue.getContactType()));
         newEmailValue.setEmail(DEFAULT_EMAIL_VALUE);
+        rebuildEmails();
+        target.add(mainContainer);
+      }
+    });
+
+    item.add(new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(newEmailValue, "email")) {
+      /**
+       * @see org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel#onClick(org.apache.wicket.ajax.AjaxRequestTarget)
+       */
+      @Override
+      protected void onClick(final AjaxRequestTarget target)
+      {
+        super.onClick(target);
+        final Iterator<EmailValue> it = emails.iterator();
+        while (it.hasNext() == true) {
+          if (it.next() == newEmailValue) {
+            it.remove();
+          }
+        }
         rebuildEmails();
         target.add(mainContainer);
       }
@@ -123,6 +144,26 @@ public class EmailsPanel extends Panel
         }
       });
       item.add(new AjaxMaxLengthEditableLabel("editableLabel", new PropertyModel<String>(email, "email")));
+
+      item.add(new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(email, "email")) {
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel#onClick(org.apache.wicket.ajax.AjaxRequestTarget)
+         */
+        @Override
+        protected void onClick(final AjaxRequestTarget target)
+        {
+          super.onClick(target);
+          final Iterator<EmailValue> it = emails.iterator();
+          while (it.hasNext() == true) {
+            if (it.next() == email) {
+              it.remove();
+            }
+          }
+          rebuildEmails();
+          target.add(mainContainer);
+        }
+      });
+
     }
   }
 }
