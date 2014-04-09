@@ -70,7 +70,7 @@ public class ImsPanel extends Panel
   {
     super(id);
     this.ims = ims;
-    newImValue = new InstantMessagingValue().setUser(DEFAULT_IM_VALUE).setContactType(ContactType.BUSINESS);
+    newImValue = new InstantMessagingValue().setUser(DEFAULT_IM_VALUE).setContactType(ContactType.BUSINESS).setImType(InstantMessagingType.AIM);
     contactChoiceRenderer = new LabelValueChoiceRenderer<ContactType>(this, ContactType.values());
     imChoiceRenderer = new LabelValueChoiceRenderer<InstantMessagingType>(this, InstantMessagingType.values());
     mainContainer = new WebMarkupContainer("main");
@@ -116,7 +116,7 @@ public class ImsPanel extends Panel
       protected void onSubmit(final AjaxRequestTarget target)
       {
         super.onSubmit(target);
-        ims.add(new InstantMessagingValue().setUser(newImValue.getUser()).setContactType(newImValue.getContactType()));
+        ims.add(new InstantMessagingValue().setUser(newImValue.getUser()).setContactType(newImValue.getContactType()).setImType(newImValue.getImType()));
         newImValue.setUser(DEFAULT_IM_VALUE);
         rebuildIms();
         target.add(mainContainer);
