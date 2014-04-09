@@ -25,18 +25,18 @@ public class EmailValue implements Serializable
 
   @XmlField
   @PropertyInfo(i18nKey = "contactType")
-  private String contactType;
+  private ContactType contactType;
 
   @XmlField
   @PropertyInfo(i18nKey = "email")
   private String email;
 
-  public String getContactType()
+  public ContactType getContactType()
   {
     return contactType;
   }
 
-  public EmailValue setContactType(final String contactType)
+  public EmailValue setContactType(final ContactType contactType)
   {
     this.contactType = contactType;
     return this;

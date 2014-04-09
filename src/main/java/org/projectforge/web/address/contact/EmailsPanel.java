@@ -55,7 +55,8 @@ public class EmailsPanel extends Panel
 
   private final WebMarkupContainer mainContainer;
 
-  //private final LabelValueChoiceRenderer<ContactType> formChoiceRenderer;
+  private final LabelValueChoiceRenderer<ContactType> formChoiceRenderer;
+
 
   /**
    * @param id
@@ -64,6 +65,7 @@ public class EmailsPanel extends Panel
   {
     super(id);
     this.emails = emails;
+    formChoiceRenderer = new LabelValueChoiceRenderer<ContactType>(this, ContactType.values());
     mainContainer = new WebMarkupContainer("main");
     add(mainContainer.setOutputMarkupId(true));
     emailsRepeater = new RepeatingView("liRepeater");
@@ -78,9 +80,9 @@ public class EmailsPanel extends Panel
   }
 
   void init(final WebMarkupContainer item) {
-    final LabelValueChoiceRenderer<ContactType> formChoiceRenderer = new LabelValueChoiceRenderer<ContactType>(this, ContactType.values());
-    item.add(new DropDownChoice<ContactType>("choice", formChoiceRenderer.getValues(),  formChoiceRenderer));
-    item.add(new EmailEditableLabel("editableLabel", Model.of(new EmailValue()), true));
+    final EmailValue value = new EmailValue().setEmail("E-Mail").setContactType(ContactType.PRIVATE);
+    item.add(new DropDownChoice<ContactType>("choice", new PropertyModel<ContactType>( value, "contactType"), formChoiceRenderer.getValues(),  formChoiceRenderer));
+    item.add(new EmailEditableLabel("editableLabel", Model.of(value), true));
   }
 
   @SuppressWarnings("serial")
@@ -180,7 +182,6 @@ public class EmailsPanel extends Panel
   private void rebuildEmails()
   {
     emailsRepeater.removeAll();
-    final LabelValueChoiceRenderer<ContactType> formChoiceRenderer = new LabelValueChoiceRenderer<ContactType>(this, ContactType.values());
     for (final EmailValue email : emails) {
       final WebMarkupContainer item = new WebMarkupContainer(emailsRepeater.newChildId());
       emailsRepeater.add(item);

@@ -114,9 +114,9 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
     emails = contactDao.readEmailValues(getData().getEmailValues());
     if ( emails == null) {
       emails = new ArrayList<EmailValue>();
-      final EmailValue e1 = new EmailValue().setEmail("werner.feder@its-feder.de").setContactType(ContactType.BUSINESS.getI18nKey());
+      final EmailValue e1 = new EmailValue().setEmail("werner.feder@its-feder.de").setContactType(ContactType.BUSINESS);
       emails.add(e1);
-      final EmailValue e2 = new EmailValue().setEmail("werner.feder@t-online.de").setContactType(ContactType.PRIVATE.getI18nKey());
+      final EmailValue e2 = new EmailValue().setEmail("werner.feder@t-online.de").setContactType(ContactType.PRIVATE);
       emails.add(e2);
     }
     fs.add(emailsPanel = new EmailsPanel(fs.newChildId(), emails));
