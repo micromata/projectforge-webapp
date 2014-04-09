@@ -86,8 +86,8 @@ public class ContactTest extends TestBase
     .setUser("Hurzeli");
     a1.setImValues(contactDao.getImValuesAsXml(value1,value2));
 
-    final EmailValue email1 = new EmailValue().setContactType(ContactType.BUSINESS.getI18nKey()).setEmail("theo.test@acme.com");
-    final EmailValue email2 = new EmailValue().setContactType(ContactType.PRIVATE.getI18nKey()).setEmail("theo.test@t-offline.de");
+    final EmailValue email1 = new EmailValue().setContactType(ContactType.BUSINESS).setEmail("theo.test@acme.com");
+    final EmailValue email2 = new EmailValue().setContactType(ContactType.PRIVATE).setEmail("theo.test@t-offline.de");
     a1.setEmailValues(contactDao.getEmailValuesAsXml(email1, email2));
 
     final PhoneValue phone1 = new PhoneValue().setContactType(ContactType.BUSINESS.getI18nKey()).setNumber("1234567");

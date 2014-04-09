@@ -37,7 +37,6 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.address.contact.ContactType;
 import org.projectforge.address.contact.EmailValue;
-import org.projectforge.plugins.teamcal.event.TeamEventAttendeeDO;
 import org.projectforge.web.wicket.components.AjaxMaxLengthEditableLabel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 
@@ -57,7 +56,7 @@ public class EmailsPanel extends Panel
 
   private final LabelValueChoiceRenderer<ContactType> formChoiceRenderer;
 
-
+  private final EmailValue emailValue;
   /**
    * @param id
    */
@@ -65,6 +64,7 @@ public class EmailsPanel extends Panel
   {
     super(id);
     this.emails = emails;
+    emailValue = new EmailValue().setEmail("E-Mail").setContactType(ContactType.PRIVATE);
     formChoiceRenderer = new LabelValueChoiceRenderer<ContactType>(this, ContactType.values());
     mainContainer = new WebMarkupContainer("main");
     add(mainContainer.setOutputMarkupId(true));
@@ -80,9 +80,8 @@ public class EmailsPanel extends Panel
   }
 
   void init(final WebMarkupContainer item) {
-    final EmailValue value = new EmailValue().setEmail("E-Mail").setContactType(ContactType.PRIVATE);
-    item.add(new DropDownChoice<ContactType>("choice", new PropertyModel<ContactType>( value, "contactType"), formChoiceRenderer.getValues(),  formChoiceRenderer));
-    item.add(new EmailEditableLabel("editableLabel", Model.of(value), true));
+    item.add(new DropDownChoice<ContactType>("choice", new PropertyModel<ContactType>( emailValue, "contactType"), formChoiceRenderer.getValues(),  formChoiceRenderer));
+    item.add(new EmailEditableLabel("editableLabel", Model.of(emailValue), true));
   }
 
   @SuppressWarnings("serial")
@@ -118,12 +117,14 @@ public class EmailsPanel extends Panel
           final EmailValue email = emailModel.getObject();
           if (StringUtils.isBlank(object) == true) {
             email.setEmail(null);
+            //email.setContactType(null);
             return;
           } else {
             email.setEmail(object);
+            //email.setContactType(null);
           }
         }
-      }, TeamEventAttendeeDO.URL_MAX_LENGTH);
+      }, 255);
       this.emailModel = emailModel;
       this.lastEntry = lastEntry;
       setType(String.class);
@@ -161,7 +162,7 @@ public class EmailsPanel extends Panel
           return;
         }
         final EmailValue clone = new EmailValue();
-        clone.setEmail(email.getEmail());
+        clone.setEmail(email.getEmail()).setContactType(email.getContactType());
         emails.add(clone);
         rebuildEmails();
         target.add(mainContainer);
