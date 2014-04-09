@@ -23,18 +23,15 @@
 
 package org.projectforge.web.address.contact;
 
-import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
-import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
-import org.apache.wicket.util.iterator.ComponentHierarchyIterator;
+import org.apache.wicket.model.PropertyModel;
 import org.projectforge.address.contact.ContactType;
 import org.projectforge.address.contact.EmailValue;
 import org.projectforge.web.wicket.components.AjaxMaxLengthEditableLabel;
@@ -45,18 +42,20 @@ import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
  */
 public class EmailsPanel extends Panel
 {
-
   private static final long serialVersionUID = -7950224503861575606L;
 
   private final List<EmailValue> emails;
 
   private final RepeatingView emailsRepeater;
 
-  private final WebMarkupContainer mainContainer;
+  private final WebMarkupContainer mainContainer, addNewEMailContainer;
 
   private final LabelValueChoiceRenderer<ContactType> formChoiceRenderer;
 
-  private final EmailValue emailValue;
+  private final EmailValue newEmailValue;
+
+  private final String DEFAULT_EMAIL_VALUE = "E-Mail";
+
   /**
    * @param id
    */
@@ -64,7 +63,7 @@ public class EmailsPanel extends Panel
   {
     super(id);
     this.emails = emails;
-    emailValue = new EmailValue().setEmail("E-Mail").setContactType(ContactType.PRIVATE);
+    newEmailValue = new EmailValue().setEmail(DEFAULT_EMAIL_VALUE).setContactType(ContactType.PRIVATE);
     formChoiceRenderer = new LabelValueChoiceRenderer<ContactType>(this, ContactType.values());
     mainContainer = new WebMarkupContainer("main");
     add(mainContainer.setOutputMarkupId(true));
@@ -72,132 +71,58 @@ public class EmailsPanel extends Panel
     mainContainer.add(emailsRepeater);
 
     rebuildEmails();
-    final WebMarkupContainer item = new WebMarkupContainer("liAddNewEmail");
-    mainContainer.add(item);
+    addNewEMailContainer = new WebMarkupContainer("liAddNewEmail");
+    mainContainer.add(addNewEMailContainer);
 
-    init(item);
+    init(addNewEMailContainer);
     emailsRepeater.setVisible(true);
   }
 
-  void init(final WebMarkupContainer item) {
+  @SuppressWarnings("serial")
+  void init(final WebMarkupContainer item)
+  {
     // new PropertyModel<ContactType>( emailValue, "contactType")
-    item.add(new DropDownChoice<ContactType>("choice", Model.of(new EmailValue().getContactType()), formChoiceRenderer.getValues(),  formChoiceRenderer));
-    item.add(new EmailEditableLabel("editableLabel", Model.of(new EmailValue()), true));
+    final DropDownChoice<ContactType> dropdownChoice = new DropDownChoice<ContactType>("choice", new PropertyModel<ContactType>(
+        newEmailValue, "contactType"), formChoiceRenderer.getValues(), formChoiceRenderer);
+    item.add(dropdownChoice);
+    dropdownChoice.add(new AjaxFormComponentUpdatingBehavior("onchange") {
+      @Override
+      protected void onUpdate(final AjaxRequestTarget target)
+      {
+        newEmailValue.setContactType(dropdownChoice.getModelObject());
+      }
+    });
+    item.add(new AjaxMaxLengthEditableLabel("editableLabel", new PropertyModel<String>(newEmailValue, "email")) {
+      @Override
+      protected void onSubmit(final AjaxRequestTarget target)
+      {
+        super.onSubmit(target);
+        emails.add(new EmailValue().setEmail(newEmailValue.getEmail()).setContactType(newEmailValue.getContactType()));
+        newEmailValue.setEmail(DEFAULT_EMAIL_VALUE);
+        rebuildEmails();
+        target.add(mainContainer);
+      }
+    });
   }
 
   @SuppressWarnings("serial")
-  class EmailEditableLabel extends AjaxMaxLengthEditableLabel
-  {
-    private IModel<EmailValue> emailModel;
-
-    private boolean lastEntry;
-
-    EmailEditableLabel(final String id, final IModel<EmailValue> emailModel, final boolean lastEntry)
-    {
-      super("editableLabel", new Model<String>() {
-
-        /**
-         * @see org.apache.wicket.model.Model#getObject()
-         */
-        @Override
-        public String getObject()
-        {
-          if (lastEntry == true) {
-            return EmailsPanel.this.getString("email");
-          }
-          final EmailValue email = emailModel.getObject();
-          return email.getEmail();
-        }
-
-        /**
-         * @see org.apache.wicket.model.Model#setObject(java.io.Serializable)
-         */
-        @Override
-        public void setObject(final String object)
-        {
-          final EmailValue email = emailModel.getObject();
-          if (StringUtils.isBlank(object) == true) {
-            email.setEmail(null);
-            //email.setContactType(null);
-            return;
-          } else {
-            email.setEmail(object);
-            //email.setContactType(null);
-          }
-        }
-      }, 255);
-      this.emailModel = emailModel;
-      this.lastEntry = lastEntry;
-      setType(String.class);
-    }
-
-
-    /**
-     * @return the emailModel
-     */
-    EmailValue getEmail()
-    {
-      return emailModel.getObject();
-    }
-
-    /**
-     * @see org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel#onEdit(org.apache.wicket.ajax.AjaxRequestTarget)
-     */
-    @Override
-    public void onEdit(final AjaxRequestTarget target)
-    {
-      super.onEdit(target);
-    }
-
-    /**
-     * @see org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
-     */
-    @Override
-    protected void onSubmit(final AjaxRequestTarget target)
-    {
-      final EmailValue email = emailModel.getObject();
-
-
-      final ComponentHierarchyIterator iter = EmailsPanel.this.visitChildren(DropDownChoice.class);
-      while (iter.hasNext() == true) {
-        final DropDownChoice drop = (DropDownChoice) iter.next();
-        final IModel m = drop.getModel();
-        final IModel<String> s = drop.getLabel();
-      }
-      if (lastEntry == true) {
-        if (StringUtils.isBlank(email.getEmail()) == true) {
-          // Do nothing.
-          super.onSubmit(target);
-          return;
-        }
-        final EmailValue clone = new EmailValue();
-        clone.setEmail(email.getEmail()).setContactType(email.getContactType());
-        emails.add(clone);
-        rebuildEmails();
-        target.add(mainContainer);
-      } else if (StringUtils.isBlank(email.getEmail()) == true) {
-        final Iterator<EmailValue> it = emails.iterator();
-        while (it.hasNext() == true) {
-          if (it.next() == emailModel.getObject()) {
-            it.remove();
-          }
-        }
-        rebuildEmails();
-        target.add(mainContainer);
-      }
-      super.onSubmit(target);
-    }
-  }
-
   private void rebuildEmails()
   {
     emailsRepeater.removeAll();
     for (final EmailValue email : emails) {
       final WebMarkupContainer item = new WebMarkupContainer(emailsRepeater.newChildId());
       emailsRepeater.add(item);
-      // new PropertyModel<ContactType>( email, "contactType")
-      item.add(new DropDownChoice<ContactType>("choice", Model.of(email.getContactType()), formChoiceRenderer.getValues(),  formChoiceRenderer));
-      item.add(new EmailEditableLabel("editableLabel", Model.of(email), false));
+      final DropDownChoice<ContactType> dropdownChoice = new DropDownChoice<ContactType>("choice", new PropertyModel<ContactType>(email,
+          "contactType"), formChoiceRenderer.getValues(), formChoiceRenderer);
+      item.add(dropdownChoice);
+      dropdownChoice.add(new AjaxFormComponentUpdatingBehavior("onchange") {
+        @Override
+        protected void onUpdate(final AjaxRequestTarget target)
+        {
+          email.setContactType(dropdownChoice.getModelObject());
+        }
+      });
+      item.add(new AjaxMaxLengthEditableLabel("editableLabel", new PropertyModel<String>(email, "email")));
     }
   }
 }
