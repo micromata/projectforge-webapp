@@ -74,7 +74,7 @@ public class PhonesPanel extends Panel
     phonesRepeater = new RepeatingView("liRepeater");
     mainContainer.add(phonesRepeater);
 
-    rebuildEmails();
+    rebuildPhones();
     addNewPhoneContainer = new WebMarkupContainer("liAddNewPhone");
     mainContainer.add(addNewPhoneContainer);
 
@@ -102,7 +102,7 @@ public class PhonesPanel extends Panel
         super.onSubmit(target);
         phones.add(new PhoneValue().setNumber(newPhoneValue.getNumber()).setPhoneType(newPhoneValue.getPhoneType()));
         newPhoneValue.setNumber(DEFAULT_PHONE_VALUE);
-        rebuildEmails();
+        rebuildPhones();
         target.add(mainContainer);
       }
     });
@@ -121,14 +121,14 @@ public class PhonesPanel extends Panel
             it.remove();
           }
         }
-        rebuildEmails();
+        rebuildPhones();
         target.add(mainContainer);
       }
     });
   }
 
   @SuppressWarnings("serial")
-  private void rebuildEmails()
+  private void rebuildPhones()
   {
     phonesRepeater.removeAll();
     for (final PhoneValue phone : phones) {
@@ -160,7 +160,7 @@ public class PhonesPanel extends Panel
               it.remove();
             }
           }
-          rebuildEmails();
+          rebuildPhones();
           target.add(mainContainer);
         }
       });

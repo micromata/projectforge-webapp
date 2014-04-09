@@ -37,6 +37,8 @@ import org.projectforge.address.contact.ContactDO;
 import org.projectforge.address.contact.ContactDao;
 import org.projectforge.address.contact.ContactType;
 import org.projectforge.address.contact.EmailValue;
+import org.projectforge.address.contact.InstantMessagingType;
+import org.projectforge.address.contact.InstantMessagingValue;
 import org.projectforge.address.contact.PhoneValue;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.bootstrap.GridSize;
@@ -68,6 +70,9 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
 
   private PhonesPanel phonesPanel;
   private List<PhoneValue> phones;
+
+  private ImsPanel imsPanel;
+  private List<InstantMessagingValue> ims;
 
   /**
    * @param parentPage
@@ -135,6 +140,16 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
     }
     fs.add(phonesPanel = new PhonesPanel(fs.newChildId(), phones));
 
+    // Ims
+    ims = contactDao.readImValues(getData().getImValues());
+    if ( ims == null) {
+      ims = new ArrayList<InstantMessagingValue>();
+      final InstantMessagingValue i1 = new InstantMessagingValue().setUser("Harry Hirsch").setContactType(ContactType.BUSINESS).setImType(InstantMessagingType.JABBER);
+      ims.add(i1);
+      final InstantMessagingValue i2 = new InstantMessagingValue().setUser("Marta Maulig").setContactType(ContactType.PRIVATE).setImType(InstantMessagingType.FACEBOOK);
+      ims.add(i2);
+    }
+    fs.add(imsPanel = new ImsPanel(fs.newChildId(), ims));
 
   }
 

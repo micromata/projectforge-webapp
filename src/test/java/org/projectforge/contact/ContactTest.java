@@ -78,12 +78,12 @@ public class ContactTest extends TestBase
     a1.setTask(getTask("1.1"));
 
     final InstantMessagingValue value1 = new InstantMessagingValue()
-    .setContactType(ContactType.BUSINESS.getI18nKey())
-    .setImType(InstantMessagingType.JABBER.getI18nKey())
+    .setContactType(ContactType.BUSINESS)
+    .setImType(InstantMessagingType.JABBER)
     .setUser("Hurzel");
     final InstantMessagingValue value2 = new InstantMessagingValue()
-    .setContactType(ContactType.PRIVATE.getI18nKey())
-    .setImType(InstantMessagingType.TWITTER.getI18nKey())
+    .setContactType(ContactType.PRIVATE)
+    .setImType(InstantMessagingType.TWITTER)
     .setUser("Hurzeli");
     a1.setImValues(contactDao.getImValuesAsXml(value1,value2));
 

@@ -11,6 +11,7 @@ package org.projectforge.address.contact;
 
 import java.io.Serializable;
 
+import org.projectforge.core.PropertyInfo;
 import org.projectforge.xml.stream.XmlField;
 import org.projectforge.xml.stream.XmlObject;
 
@@ -23,31 +24,34 @@ public class InstantMessagingValue implements Serializable
   private static final long serialVersionUID = 5659903071636285902L;
 
   @XmlField
-  private String contactType;
+  @PropertyInfo(i18nKey = "contactType")
+  private ContactType contactType;
 
   @XmlField
-  private String imType;
+  @PropertyInfo(i18nKey = "imType")
+  private InstantMessagingType imType;
 
   @XmlField
+  @PropertyInfo(i18nKey = "user")
   private String user;
 
-  public String getContactType()
+  public ContactType getContactType()
   {
     return contactType;
   }
 
-  public InstantMessagingValue setContactType(final String contactType)
+  public InstantMessagingValue setContactType(final ContactType contactType)
   {
     this.contactType = contactType;
     return this;
   }
 
-  public String getImType()
+  public InstantMessagingType getImType()
   {
     return imType;
   }
 
-  public InstantMessagingValue setImType(final String imType)
+  public InstantMessagingValue setImType(final InstantMessagingType imType)
   {
     this.imType = imType;
     return this;

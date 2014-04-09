@@ -31,14 +31,14 @@ import org.projectforge.core.I18nEnum;
  */
 public enum InstantMessagingType implements I18nEnum
 {
-  AIM("aim"), FACEBOOK("facebook"), GADO("gado"), GOOGLETALK("googletalk"), ICQ("icq"), JABBER("jabber"), MSN("msn"), QQ("qq"), SKYPE("skype"), TWITTER("twitter"), YAHOO("yahoo"), OTHER("other") ;
+  AIM("aim"), FACEBOOK("facebook"), GADO("gado"), GOOGLE_TALK("googletalk"), ICQ("icq"), JABBER("jabber"), MSN("msn"), QQ("qq"), SKYPE("skype"), TWITTER("twitter"), YAHOO("yahoo"), OTHER("other") ;
 
   public static final String I18N_KEY_INSTANTMESSAGINGTYPE_PREFIX = "instantmessagingtype.";
 
   /**
    * List of all available values.
    */
-  public static final InstantMessagingType[] LIST = new InstantMessagingType[] { AIM, FACEBOOK, GADO, GOOGLETALK, ICQ, JABBER, MSN, QQ, SKYPE, TWITTER, YAHOO, OTHER };
+  public static final InstantMessagingType[] LIST = new InstantMessagingType[] { AIM, FACEBOOK, GADO, GOOGLE_TALK, ICQ, JABBER, MSN, QQ, SKYPE, TWITTER, YAHOO, OTHER };
 
   private String key;
 
@@ -53,12 +53,11 @@ public enum InstantMessagingType implements I18nEnum
       return FACEBOOK;
     } else if ("GADO".equals(s) == true) {
       return GADO;
-    } else if ("GOOGLETALK".equals(s) == true) {
-      return GOOGLETALK;
+    } else if ("GOOGLE_TALK".equals(s) == true) {
+      return GOOGLE_TALK;
     } else if ("ICQ".equals(s) == true) {
       return ICQ;
-    }
-    if ("JABBER".equals(s) == true) {
+    } else if ("JABBER".equals(s) == true) {
       return JABBER;
     } else if ("MSN".equals(s) == true) {
       return MSN;
