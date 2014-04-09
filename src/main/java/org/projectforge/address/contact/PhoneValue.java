@@ -11,6 +11,8 @@ package org.projectforge.address.contact;
 
 import java.io.Serializable;
 
+import org.projectforge.address.PhoneType;
+import org.projectforge.core.PropertyInfo;
 import org.projectforge.xml.stream.XmlField;
 import org.projectforge.xml.stream.XmlObject;
 
@@ -23,19 +25,21 @@ public class PhoneValue implements Serializable
   private static final long serialVersionUID = 8470994791533327287L;
 
   @XmlField
-  private String contactType;
+  @PropertyInfo(i18nKey = "phoneType")
+  private PhoneType phoneType;
 
   @XmlField
+  @PropertyInfo(i18nKey = "number")
   private String number;
 
-  public String getContactType()
+  public PhoneType getPhoneType()
   {
-    return contactType;
+    return phoneType;
   }
 
-  public PhoneValue setContactType(final String contactType)
+  public PhoneValue setPhoneType(final PhoneType phoneType)
   {
-    this.contactType = contactType;
+    this.phoneType = phoneType;
     return this;
   }
 

@@ -32,10 +32,12 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.FormOfAddress;
+import org.projectforge.address.PhoneType;
 import org.projectforge.address.contact.ContactDO;
 import org.projectforge.address.contact.ContactDao;
 import org.projectforge.address.contact.ContactType;
 import org.projectforge.address.contact.EmailValue;
+import org.projectforge.address.contact.PhoneValue;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
@@ -62,8 +64,10 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
   private ContactDao contactDao;
 
   private EmailsPanel emailsPanel;
-
   private List<EmailValue> emails;
+
+  private PhonesPanel phonesPanel;
+  private List<PhoneValue> phones;
 
   /**
    * @param parentPage
@@ -109,7 +113,6 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
     fs.add(new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "birthday"), DatePanelSettings.get().withTargetType(
         java.sql.Date.class)));
 
-
     // Emails
     emails = contactDao.readEmailValues(getData().getEmailValues());
     if ( emails == null) {
@@ -120,6 +123,18 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
       emails.add(e2);
     }
     fs.add(emailsPanel = new EmailsPanel(fs.newChildId(), emails));
+
+    // Phones
+    phones = contactDao.readPhoneValues(getData().getPhoneValues());
+    if ( phones == null) {
+      phones = new ArrayList<PhoneValue>();
+      final PhoneValue p1 = new PhoneValue().setNumber("0173 29 49 531").setPhoneType(PhoneType.BUSINESS);
+      phones.add(p1);
+      final PhoneValue p2 = new PhoneValue().setNumber("0561 87 53 44").setPhoneType(PhoneType.PRIVATE);
+      phones.add(p2);
+    }
+    fs.add(phonesPanel = new PhonesPanel(fs.newChildId(), phones));
+
 
   }
 

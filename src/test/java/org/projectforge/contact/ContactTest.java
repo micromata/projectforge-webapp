@@ -38,6 +38,7 @@ import org.junit.Test;
 import org.projectforge.access.AccessException;
 import org.projectforge.access.AccessType;
 import org.projectforge.access.OperationType;
+import org.projectforge.address.PhoneType;
 import org.projectforge.address.contact.ContactDO;
 import org.projectforge.address.contact.ContactDao;
 import org.projectforge.address.contact.ContactType;
@@ -90,8 +91,8 @@ public class ContactTest extends TestBase
     final EmailValue email2 = new EmailValue().setContactType(ContactType.PRIVATE).setEmail("theo.test@t-offline.de");
     a1.setEmailValues(contactDao.getEmailValuesAsXml(email1, email2));
 
-    final PhoneValue phone1 = new PhoneValue().setContactType(ContactType.BUSINESS.getI18nKey()).setNumber("1234567");
-    final PhoneValue phone2 = new PhoneValue().setContactType(ContactType.PRIVATE.getI18nKey()).setNumber("7654321");
+    final PhoneValue phone1 = new PhoneValue().setPhoneType(PhoneType.BUSINESS).setNumber("1234567");
+    final PhoneValue phone2 = new PhoneValue().setPhoneType(PhoneType.PRIVATE).setNumber("7654321");
     a1.setPhoneValues(contactDao.getPhoneValuesAsXml(phone1, phone2));
 
     contactDao.save(a1);
