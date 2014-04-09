@@ -34,7 +34,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.util.iterator.ComponentHierarchyIterator;
 import org.projectforge.address.contact.ContactType;
 import org.projectforge.address.contact.EmailValue;
 import org.projectforge.web.wicket.components.AjaxMaxLengthEditableLabel;
@@ -80,8 +80,9 @@ public class EmailsPanel extends Panel
   }
 
   void init(final WebMarkupContainer item) {
-    item.add(new DropDownChoice<ContactType>("choice", new PropertyModel<ContactType>( emailValue, "contactType"), formChoiceRenderer.getValues(),  formChoiceRenderer));
-    item.add(new EmailEditableLabel("editableLabel", Model.of(emailValue), true));
+    // new PropertyModel<ContactType>( emailValue, "contactType")
+    item.add(new DropDownChoice<ContactType>("choice", Model.of(new EmailValue().getContactType()), formChoiceRenderer.getValues(),  formChoiceRenderer));
+    item.add(new EmailEditableLabel("editableLabel", Model.of(new EmailValue()), true));
   }
 
   @SuppressWarnings("serial")
@@ -155,6 +156,14 @@ public class EmailsPanel extends Panel
     protected void onSubmit(final AjaxRequestTarget target)
     {
       final EmailValue email = emailModel.getObject();
+
+
+      final ComponentHierarchyIterator iter = EmailsPanel.this.visitChildren(DropDownChoice.class);
+      while (iter.hasNext() == true) {
+        final DropDownChoice drop = (DropDownChoice) iter.next();
+        final IModel m = drop.getModel();
+        final IModel<String> s = drop.getLabel();
+      }
       if (lastEntry == true) {
         if (StringUtils.isBlank(email.getEmail()) == true) {
           // Do nothing.
@@ -186,7 +195,8 @@ public class EmailsPanel extends Panel
     for (final EmailValue email : emails) {
       final WebMarkupContainer item = new WebMarkupContainer(emailsRepeater.newChildId());
       emailsRepeater.add(item);
-      item.add(new DropDownChoice<ContactType>("choice", new PropertyModel<ContactType>( email, "contactType"), formChoiceRenderer.getValues(),  formChoiceRenderer));
+      // new PropertyModel<ContactType>( email, "contactType")
+      item.add(new DropDownChoice<ContactType>("choice", Model.of(email.getContactType()), formChoiceRenderer.getValues(),  formChoiceRenderer));
       item.add(new EmailEditableLabel("editableLabel", Model.of(email), false));
     }
   }
