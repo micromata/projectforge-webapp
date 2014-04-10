@@ -102,7 +102,9 @@ public class ContactEntryPanel extends Panel
       }
     });
 
-    item.add(new AjaxMaxLengthEditableLabel("street", new PropertyModel<String>(newEntryValue, "street")) {
+    final WebMarkupContainer streetCodeDiv = new WebMarkupContainer("streetCodeDiv");
+    streetCodeDiv.setOutputMarkupId(true);
+    streetCodeDiv.add(new AjaxMaxLengthEditableLabel("street", new PropertyModel<String>(newEntryValue, "street")) {
       /**
        * @see org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel#onEdit(org.apache.wicket.ajax.AjaxRequestTarget)
        */
@@ -120,7 +122,7 @@ public class ContactEntryPanel extends Panel
       protected void onSubmit(final AjaxRequestTarget target)
       {
         super.onSubmit(target);
-        final ComponentHierarchyIterator it = this.getParent().visitChildren(AjaxMaxLengthEditableLabel.class);
+        final ComponentHierarchyIterator it = this.getPage().visitChildren(AjaxMaxLengthEditableLabel.class);
         while (it.hasNext() == true) {
           final Component c = it.next();
           if (c.getId().equals("zipCode") == true) {
@@ -129,26 +131,9 @@ public class ContactEntryPanel extends Panel
           }
         }
       }
-    });
+    }).setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true).setVisible(true);;
+    item.add(streetCodeDiv);
 
-    item.add(new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(newEntryValue, "street")) {
-      /**
-       * @see org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel#onClick(org.apache.wicket.ajax.AjaxRequestTarget)
-       */
-      @Override
-      protected void onClick(final AjaxRequestTarget target)
-      {
-        super.onClick(target);
-        final Iterator<ContactEntryDO> it = entrys.iterator();
-        while (it.hasNext() == true) {
-          if (it.next() == newEntryValue) {
-            it.remove();
-          }
-        }
-        rebuildEntrys();
-        target.add(mainContainer);
-      }
-    });
 
     final WebMarkupContainer zipCodeDiv = new WebMarkupContainer("zipCodeDiv");
     zipCodeDiv.setOutputMarkupId(true);
@@ -220,8 +205,30 @@ public class ContactEntryPanel extends Panel
     stateDiv.setOutputMarkupId(true);
     stateDiv.add(new AjaxMaxLengthEditableLabel("state", new PropertyModel<String>(newEntryValue, "state")).setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true).setVisible(false));
     item.add(stateDiv);
+
+    item.add(new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(newEntryValue, "street")) {
+      /**
+       * @see org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel#onClick(org.apache.wicket.ajax.AjaxRequestTarget)
+       */
+      @Override
+      protected void onClick(final AjaxRequestTarget target)
+      {
+        super.onClick(target);
+        final Iterator<ContactEntryDO> it = entrys.iterator();
+        while (it.hasNext() == true) {
+          if (it.next() == newEntryValue) {
+            it.remove();
+          }
+        }
+        rebuildEntrys();
+        target.add(mainContainer);
+      }
+    });
+
   }
 
+
+  /** rebuild ** ********************************* */
   @SuppressWarnings("serial")
   private void rebuildEntrys()
   {
@@ -240,7 +247,9 @@ public class ContactEntryPanel extends Panel
         }
       });
 
-      item.add(new AjaxMaxLengthEditableLabel("street", new PropertyModel<String>(entry, "street")) {
+      final WebMarkupContainer streetCodeDiv = new WebMarkupContainer("streetCodeDiv");
+      streetCodeDiv.setOutputMarkupId(true);
+      streetCodeDiv.add(new AjaxMaxLengthEditableLabel("street", new PropertyModel<String>(entry, "street")) {
         /**
          * @see org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel#onEdit(org.apache.wicket.ajax.AjaxRequestTarget)
          */
@@ -258,7 +267,7 @@ public class ContactEntryPanel extends Panel
         protected void onSubmit(final AjaxRequestTarget target)
         {
           super.onSubmit(target);
-          final ComponentHierarchyIterator it = this.getParent().visitChildren(AjaxMaxLengthEditableLabel.class);
+          final ComponentHierarchyIterator it = this.getPage().visitChildren(AjaxMaxLengthEditableLabel.class);
           while (it.hasNext() == true) {
             final Component c = it.next();
             if (c.getId().equals("zipCode") == true) {
@@ -267,31 +276,13 @@ public class ContactEntryPanel extends Panel
             }
           }
         }
-      });
-
-      item.add(new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(entry, "street")) {
-        /**
-         * @see org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel#onClick(org.apache.wicket.ajax.AjaxRequestTarget)
-         */
-        @Override
-        protected void onClick(final AjaxRequestTarget target)
-        {
-          super.onClick(target);
-          final Iterator<ContactEntryDO> it = entrys.iterator();
-          while (it.hasNext() == true) {
-            if (it.next() == entry) {
-              it.remove();
-            }
-          }
-          rebuildEntrys();
-          target.add(mainContainer);
-        }
-      });
+      }).setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true).setVisible(true);
+      item.add(streetCodeDiv);
 
 
       final WebMarkupContainer zipCodeDiv = new WebMarkupContainer("zipCodeDiv");
       zipCodeDiv.setOutputMarkupId(true);
-      zipCodeDiv.add(new AjaxMaxLengthEditableLabel("zipCode", new PropertyModel<String>(newEntryValue, "zipCode")) {
+      zipCodeDiv.add(new AjaxMaxLengthEditableLabel("zipCode", new PropertyModel<String>(entry, "zipCode")) {
         /**
          * @see org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
          */

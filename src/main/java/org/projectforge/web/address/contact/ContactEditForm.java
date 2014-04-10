@@ -95,7 +95,7 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
   {
     super.init();
 
-    gridBuilder.newSplitPanel(GridSize.COL50);
+    gridBuilder.newSplitPanel(GridSize.COL75);
 
     // name
     FieldsetPanel fs = gridBuilder.newFieldset(ContactDO.class, "name");
