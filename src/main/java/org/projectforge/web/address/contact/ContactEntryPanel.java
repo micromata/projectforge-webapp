@@ -37,6 +37,7 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.util.iterator.ComponentHierarchyIterator;
 import org.projectforge.address.contact.ContactEntryDO;
 import org.projectforge.address.contact.ContactType;
+import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.web.wicket.components.AjaxMaxLengthEditableLabel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel;
@@ -88,6 +89,7 @@ public class ContactEntryPanel extends Panel
     entrysRepeater.setVisible(true);
   }
 
+  /********************************** init ** ********************************* */
   @SuppressWarnings("serial")
   void init(final WebMarkupContainer item)
   {
@@ -203,7 +205,21 @@ public class ContactEntryPanel extends Panel
 
     final WebMarkupContainer stateDiv = new WebMarkupContainer("stateDiv");
     stateDiv.setOutputMarkupId(true);
-    stateDiv.add(new AjaxMaxLengthEditableLabel("state", new PropertyModel<String>(newEntryValue, "state")).setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true).setVisible(false));
+    stateDiv.add(new AjaxMaxLengthEditableLabel("state", new PropertyModel<String>(newEntryValue, "state")) {
+      /**
+       * @see org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
+       */
+      @Override
+      protected void onSubmit(final AjaxRequestTarget target)
+      {
+        super.onSubmit(target);
+        final ContactEntryDO clone = new ContactEntryDO();
+        AbstractBaseDO.copyValues(newEntryValue, clone);
+        entrys.add(clone);
+        rebuildEntrys();
+        target.add(mainContainer);
+      }
+    }.setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true).setVisible(false));
     item.add(stateDiv);
 
     item.add(new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(newEntryValue, "street")) {
@@ -227,8 +243,7 @@ public class ContactEntryPanel extends Panel
 
   }
 
-
-  /** rebuild ** ********************************* */
+  /********************************** rebuild ** ********************************* */
   @SuppressWarnings("serial")
   private void rebuildEntrys()
   {
@@ -348,8 +363,44 @@ public class ContactEntryPanel extends Panel
 
       final WebMarkupContainer stateDiv = new WebMarkupContainer("stateDiv");
       stateDiv.setOutputMarkupId(true);
-      stateDiv.add(new AjaxMaxLengthEditableLabel("state", new PropertyModel<String>(entry, "state")).setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true).setVisible(false));
+      stateDiv.add(new AjaxMaxLengthEditableLabel("state", new PropertyModel<String>(entry, "state")) {
+        /**
+         * @see org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
+         */
+        @Override
+        protected void onSubmit(final AjaxRequestTarget target)
+        {
+          super.onSubmit(target);
+          //final ArrayList<String> ignoreFields = {"id"};
+
+          //ArrayUtils.add(ignoreFields, "id");
+          final ContactEntryDO clone = new ContactEntryDO();
+          AbstractBaseDO.copyValues(newEntryValue, clone);
+          entrys.add(clone);
+          rebuildEntrys();
+          target.add(mainContainer);
+        }
+      }.setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true).setVisible(false));
       item.add(stateDiv);
+
+      item.add(new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(entry, "street")) {
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel#onClick(org.apache.wicket.ajax.AjaxRequestTarget)
+         */
+        @Override
+        protected void onClick(final AjaxRequestTarget target)
+        {
+          super.onClick(target);
+          final Iterator<ContactEntryDO> it = entrys.iterator();
+          while (it.hasNext() == true) {
+            if (it.next() == newEntryValue) {
+              it.remove();
+            }
+          }
+          rebuildEntrys();
+          target.add(mainContainer);
+        }
+      });
 
     }
   }
