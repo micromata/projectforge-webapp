@@ -32,15 +32,9 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.FormOfAddress;
-import org.projectforge.address.PhoneType;
 import org.projectforge.address.contact.ContactDO;
 import org.projectforge.address.contact.ContactDao;
 import org.projectforge.address.contact.ContactEntryDO;
-import org.projectforge.address.contact.ContactType;
-import org.projectforge.address.contact.EmailValue;
-import org.projectforge.address.contact.InstantMessagingType;
-import org.projectforge.address.contact.InstantMessagingValue;
-import org.projectforge.address.contact.PhoneValue;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
@@ -67,13 +61,10 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
   private ContactDao contactDao;
 
   private EmailsPanel emailsPanel;
-  private List<EmailValue> emails;
 
   private PhonesPanel phonesPanel;
-  private List<PhoneValue> phones;
 
   private ImsPanel imsPanel;
-  private List<InstantMessagingValue> ims;
 
   private ContactEntryPanel entryPanel;
   private List<ContactEntryDO> entrys;
@@ -87,6 +78,17 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
     super(parentPage, data);
   }
 
+  /**
+   * @see org.projectforge.web.wicket.AbstractSecuredForm#onSubmit()
+   */
+  @Override
+  protected void onSubmit()
+  {
+    getData().setEmailValues(emailsPanel.getEmailsAsXmlString());
+    getData().setPhoneValues(phonesPanel.getPhonesAsXmlString());
+    getData().setImValues(imsPanel.getImsAsXmlString());
+    super.onSubmit();
+  }
 
   @Override
   public void init()
@@ -103,7 +105,7 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
 
     // firstname
     fs = gridBuilder.newFieldset(ContactDO.class, "firstname");
-    final MaxLengthTextField firstname = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "firstname"));
+    final MaxLengthTextField firstname = new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "firstname"));
     fs.add(firstname);
 
     // form
@@ -114,7 +116,7 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
 
     // title
     fs = gridBuilder.newFieldset(ContactDO.class, "title");
-    final MaxLengthTextField title = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "title"));
+    final MaxLengthTextField title = new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "title"));
     fs.add(title);
 
     // birthday
@@ -123,37 +125,14 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
         java.sql.Date.class)));
 
     // Emails
-    emails = contactDao.readEmailValues(getData().getEmailValues());
-    if ( emails == null) {
-      emails = new ArrayList<EmailValue>();
-      final EmailValue e1 = new EmailValue().setEmail("werner.feder@its-feder.de").setContactType(ContactType.BUSINESS);
-      emails.add(e1);
-      final EmailValue e2 = new EmailValue().setEmail("werner.feder@t-online.de").setContactType(ContactType.PRIVATE);
-      emails.add(e2);
-    }
-    fs.add(emailsPanel = new EmailsPanel(fs.newChildId(), emails));
+    emailsPanel = new EmailsPanel(fs.newChildId(), new PropertyModel<String>(data, "emailValues"));
+    fs.add(emailsPanel);
 
     // Phones
-    phones = contactDao.readPhoneValues(getData().getPhoneValues());
-    if ( phones == null) {
-      phones = new ArrayList<PhoneValue>();
-      final PhoneValue p1 = new PhoneValue().setNumber("0173 29 49 531").setPhoneType(PhoneType.BUSINESS);
-      phones.add(p1);
-      final PhoneValue p2 = new PhoneValue().setNumber("0561 87 53 44").setPhoneType(PhoneType.PRIVATE);
-      phones.add(p2);
-    }
-    fs.add(phonesPanel = new PhonesPanel(fs.newChildId(), phones));
+    fs.add(phonesPanel = new PhonesPanel(fs.newChildId(), getData().getPhoneValues()));
 
-    // Ims
-    ims = contactDao.readImValues(getData().getImValues());
-    if ( ims == null) {
-      ims = new ArrayList<InstantMessagingValue>();
-      final InstantMessagingValue i1 = new InstantMessagingValue().setUser("Harry Hirsch").setContactType(ContactType.BUSINESS).setImType(InstantMessagingType.JABBER);
-      ims.add(i1);
-      final InstantMessagingValue i2 = new InstantMessagingValue().setUser("Marta Maulig").setContactType(ContactType.PRIVATE).setImType(InstantMessagingType.FACEBOOK);
-      ims.add(i2);
-    }
-    fs.add(imsPanel = new ImsPanel(fs.newChildId(), ims));
+    // Instant Messaging Entrys
+    fs.add(imsPanel = new ImsPanel(fs.newChildId(), getData().getImValues()));
 
     final List<ContactEntryDO> entrys = new ArrayList<ContactEntryDO>();
     fs.add(entryPanel = new ContactEntryPanel(fs.newChildId(), entrys));
@@ -168,5 +147,4 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
   {
     return log;
   }
-
 }

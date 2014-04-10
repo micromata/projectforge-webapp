@@ -23,11 +23,13 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.contact.ContactDO;
 import org.projectforge.address.contact.ContactDao;
+import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
+import org.projectforge.web.wicket.ListSelectActionPanel;
 
 /**
  * The controller of the list page. Most functionality such as search etc. is done by the super class.
@@ -67,6 +69,7 @@ IListPageColumnsCreator<ContactDO>
 
     columns.add(new CellItemListenerPropertyColumn<ContactDO>(ContactDO.class, getSortable("name", sortable), "name",
         cellItemListener));
+
     columns.add(new CellItemListenerPropertyColumn<ContactDO>(ContactDO.class, getSortable("firstname", sortable), "firstname",
         cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<ContactDO>(ContactDO.class, getSortable("title", sortable), "title", cellItemListener));
@@ -75,6 +78,19 @@ IListPageColumnsCreator<ContactDO>
     columns.add(new CellItemListenerPropertyColumn<ContactDO>(new Model<String>(getString("modified")),
         getSortable("lastUpdate", sortable), "lastUpdate", cellItemListener));
 
+    columns.add(new CellItemListenerPropertyColumn<ContactDO>(ContactDO.class, getSortable("created", sortable), "created",
+        cellItemListener){
+      @SuppressWarnings({ "unchecked", "rawtypes"})
+      @Override
+      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      {
+        final ContactDO contactDO = (ContactDO) rowModel.getObject();
+        item.add(new ListSelectActionPanel(componentId, rowModel, ContactEditPage.class, contactDO.getId(), returnToPage,
+            DateTimeFormatter.instance().getFormattedDateTime(contactDO.getCreated())));
+        addRowClick(item);
+        cellItemListener.populateItem(item, componentId, rowModel);
+      }
+    });
     return columns;
   }
 

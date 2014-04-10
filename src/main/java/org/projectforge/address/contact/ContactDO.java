@@ -70,13 +70,15 @@ public class ContactDO extends DefaultBaseDO
   @DateBridge(resolution = Resolution.DAY)
   private Date birthday;
 
+  @PropertyInfo(i18nKey = "imValues")
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String imValues;
 
-  @PropertyInfo(i18nKey = "emails")
+  @PropertyInfo(i18nKey = "emailValues")
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String emailValues;
 
+  @PropertyInfo(i18nKey = "phoneValues")
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String phoneValues;
 

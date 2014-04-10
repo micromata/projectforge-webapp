@@ -9,6 +9,7 @@
 
 package org.projectforge.address.contact;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -47,6 +48,20 @@ public class XmlConverter<T>
       return "";
     String xml =  "<" + ENCLOSING_ENTITY + ">";
     for (final T value : values) {
+      xml += XmlObjectWriter.writeAsXml(value);
+    }
+    xml += "</" + ENCLOSING_ENTITY + ">";
+    return xml;
+  }
+
+  public String getValuesAsXml(final List<T> values)
+  {
+    if (values == null)
+      return "";
+    String xml =  "<" + ENCLOSING_ENTITY + ">";
+    final Iterator<T> it = values.iterator();
+    while (it.hasNext() == true) {
+      final T value = it.next();
       xml += XmlObjectWriter.writeAsXml(value);
     }
     xml += "</" + ENCLOSING_ENTITY + ">";

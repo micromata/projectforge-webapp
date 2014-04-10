@@ -23,9 +23,11 @@
 
 package org.projectforge.web.address.contact;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -33,7 +35,9 @@ import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.PhoneType;
+import org.projectforge.address.contact.ContactDao;
 import org.projectforge.address.contact.PhoneValue;
 import org.projectforge.web.wicket.components.AjaxMaxLengthEditableLabel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
@@ -48,7 +52,10 @@ public class PhonesPanel extends Panel
 
   private static final long serialVersionUID = -5390479088481704778L;
 
-  private final List<PhoneValue> phones;
+  @SpringBean(name = "contactDao")
+  private ContactDao contactDao;
+
+  private List<PhoneValue> phones = null;
 
   private final RepeatingView phonesRepeater;
 
@@ -63,10 +70,13 @@ public class PhonesPanel extends Panel
   /**
    * @param id
    */
-  public PhonesPanel(final String id, final List<PhoneValue> phones)
+  public PhonesPanel(final String id, final String phonesXmlString)
   {
     super(id);
-    this.phones = phones;
+    if (StringUtils.isNotBlank(phonesXmlString) == true)
+      phones = contactDao.readPhoneValues(phonesXmlString);
+    if (phones == null)
+      phones = new ArrayList<PhoneValue>();
     newPhoneValue = new PhoneValue().setNumber(DEFAULT_PHONE_VALUE).setPhoneType(PhoneType.PRIVATE);
     formChoiceRenderer = new LabelValueChoiceRenderer<PhoneType>(this, PhoneType.values());
     mainContainer = new WebMarkupContainer("main");
@@ -80,6 +90,10 @@ public class PhonesPanel extends Panel
 
     init(addNewPhoneContainer);
     phonesRepeater.setVisible(true);
+  }
+
+  public String getPhonesAsXmlString() {
+    return contactDao.getPhoneValuesAsXml(phones);
   }
 
   @SuppressWarnings("serial")

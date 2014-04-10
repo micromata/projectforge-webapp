@@ -23,16 +23,21 @@
 
 package org.projectforge.web.address.contact;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.address.contact.ContactDao;
 import org.projectforge.address.contact.ContactType;
 import org.projectforge.address.contact.EmailValue;
 import org.projectforge.web.wicket.components.AjaxMaxLengthEditableLabel;
@@ -47,7 +52,10 @@ public class EmailsPanel extends Panel
 {
   private static final long serialVersionUID = -7950224503861575606L;
 
-  private final List<EmailValue> emails;
+  @SpringBean(name = "contactDao")
+  private ContactDao contactDao;
+
+  private List<EmailValue> emails = null;
 
   private final RepeatingView emailsRepeater;
 
@@ -62,10 +70,14 @@ public class EmailsPanel extends Panel
   /**
    * @param id
    */
-  public EmailsPanel(final String id, final List<EmailValue> emails)
+  public EmailsPanel(final String id, final IModel<String> model)
   {
-    super(id);
-    this.emails = emails;
+    super(id, model);
+    final String emailsXmlString = model.getObject();
+    if (StringUtils.isNotBlank(emailsXmlString) == true)
+      emails = contactDao.readEmailValues(emailsXmlString);
+    if (emails == null)
+      emails = new ArrayList<EmailValue>();
     newEmailValue = new EmailValue().setEmail(DEFAULT_EMAIL_VALUE).setContactType(ContactType.PRIVATE);
     formChoiceRenderer = new LabelValueChoiceRenderer<ContactType>(this, ContactType.values());
     mainContainer = new WebMarkupContainer("main");
@@ -80,6 +92,11 @@ public class EmailsPanel extends Panel
     init(addNewEMailContainer);
     emailsRepeater.setVisible(true);
   }
+
+  public String getEmailsAsXmlString() {
+    return contactDao.getEmailValuesAsXml(emails);
+  }
+
 
   @SuppressWarnings("serial")
   void init(final WebMarkupContainer item)

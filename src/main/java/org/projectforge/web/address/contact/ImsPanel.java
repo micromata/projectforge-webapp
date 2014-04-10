@@ -23,9 +23,11 @@
 
 package org.projectforge.web.address.contact;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -33,6 +35,8 @@ import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.address.contact.ContactDao;
 import org.projectforge.address.contact.ContactType;
 import org.projectforge.address.contact.InstantMessagingType;
 import org.projectforge.address.contact.InstantMessagingValue;
@@ -49,7 +53,10 @@ public class ImsPanel extends Panel
 
   private static final long serialVersionUID = -7631249461414483163L;
 
-  private final List<InstantMessagingValue> ims;
+  @SpringBean(name = "contactDao")
+  private ContactDao contactDao;
+
+  private List<InstantMessagingValue> ims = null;
 
   private final RepeatingView imsRepeater;
 
@@ -66,10 +73,13 @@ public class ImsPanel extends Panel
   /**
    * @param id
    */
-  public ImsPanel(final String id, final List<InstantMessagingValue> ims)
+  public ImsPanel(final String id, final String imsXmlString)
   {
     super(id);
-    this.ims = ims;
+    if (StringUtils.isNotBlank(imsXmlString) == true)
+      ims = contactDao.readImValues(imsXmlString);
+    if (ims == null)
+      ims = new ArrayList<InstantMessagingValue>();
     newImValue = new InstantMessagingValue().setUser(DEFAULT_IM_VALUE).setContactType(ContactType.BUSINESS).setImType(InstantMessagingType.AIM);
     contactChoiceRenderer = new LabelValueChoiceRenderer<ContactType>(this, ContactType.values());
     imChoiceRenderer = new LabelValueChoiceRenderer<InstantMessagingType>(this, InstantMessagingType.values());
@@ -84,6 +94,10 @@ public class ImsPanel extends Panel
 
     init(addNewImContainer);
     imsRepeater.setVisible(true);
+  }
+
+  public String getImsAsXmlString() {
+    return contactDao.getImValuesAsXml(ims);
   }
 
   @SuppressWarnings("serial")

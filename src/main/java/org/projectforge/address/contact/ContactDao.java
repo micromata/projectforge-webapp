@@ -171,6 +171,10 @@ public class ContactDao extends BaseDao<ContactDO>
     return imConverter.getValuesAsXml(values);
   }
 
+  public String getImValuesAsXml(final List<InstantMessagingValue> values)
+  {
+    return imConverter.getValuesAsXml(values);
+  }
 
   public List<EmailValue> readEmailValues(final String valuesAsXml)
   {
@@ -182,12 +186,22 @@ public class ContactDao extends BaseDao<ContactDO>
     return emailConverter.getValuesAsXml(values);
   }
 
+  public String getEmailValuesAsXml(final List<EmailValue> values)
+  {
+    return emailConverter.getValuesAsXml(values);
+  }
+
   public List<PhoneValue> readPhoneValues(final String valuesAsXml)
   {
     return phoneConverter.readValues(valuesAsXml);
   }
 
   public String getPhoneValuesAsXml(final PhoneValue... values)
+  {
+    return phoneConverter.getValuesAsXml(values);
+  }
+
+  public String getPhoneValuesAsXml(final List<PhoneValue> values)
   {
     return phoneConverter.getValuesAsXml(values);
   }
