@@ -26,16 +26,18 @@ package org.projectforge.web.address.contact;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.util.iterator.ComponentHierarchyIterator;
 import org.projectforge.address.contact.ContactEntryDO;
 import org.projectforge.address.contact.ContactType;
+import org.projectforge.web.wicket.components.AjaxMaxLengthEditableLabel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
@@ -57,7 +59,12 @@ public class ContactEntryPanel extends Panel
 
   private final ContactEntryDO newEntryValue;
 
-  private final String DEFAULT_ENTRY_VALUE = "Adresse";
+  private final String DEFAULT_ENTRY_VALUE = "Neue Adresse";
+  private final String DEFAULT_STREET_VALUE = "Strasse";
+  private final String DEFAULT_ZIPCODE_VALUE= "Plz";
+  private final String DEFAULT_CITY_VALUE = "Stadt";
+  private final String DEFAULT_COUNTRY_VALUE = "Land";
+  private final String DEFAULT_STATE_VALUE = "Bundesland";
 
   /**
    * @param id
@@ -66,7 +73,7 @@ public class ContactEntryPanel extends Panel
   {
     super(id);
     this.entrys = entrys;
-    newEntryValue = new ContactEntryDO().setCity(DEFAULT_ENTRY_VALUE).setContactType(ContactType.PRIVATE);
+    newEntryValue = new ContactEntryDO().setStreet(DEFAULT_ENTRY_VALUE).setCity(DEFAULT_CITY_VALUE).setZipCode(DEFAULT_ZIPCODE_VALUE).setCountry(DEFAULT_COUNTRY_VALUE).setState(DEFAULT_STATE_VALUE).setContactType(ContactType.PRIVATE);
     formChoiceRenderer = new LabelValueChoiceRenderer<ContactType>(this, ContactType.values());
     mainContainer = new WebMarkupContainer("main");
     add(mainContainer.setOutputMarkupId(true));
@@ -95,7 +102,36 @@ public class ContactEntryPanel extends Panel
       }
     });
 
-    item.add(new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(newEntryValue, "city")) {
+    item.add(new AjaxMaxLengthEditableLabel("street", new PropertyModel<String>(newEntryValue, "street")) {
+      /**
+       * @see org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel#onEdit(org.apache.wicket.ajax.AjaxRequestTarget)
+       */
+      @Override
+      public void onEdit(final AjaxRequestTarget target)
+      {
+        super.onEdit(target);
+        if (newEntryValue.getStreet().equals(DEFAULT_ENTRY_VALUE) == true)
+          newEntryValue.setStreet(DEFAULT_STREET_VALUE);
+      }
+      /**
+       * @see org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
+       */
+      @Override
+      protected void onSubmit(final AjaxRequestTarget target)
+      {
+        super.onSubmit(target);
+        final ComponentHierarchyIterator it = this.getParent().visitChildren(AjaxMaxLengthEditableLabel.class);
+        while (it.hasNext() == true) {
+          final Component c = it.next();
+          if (c.getId().equals("zipCode") == true) {
+            c.setVisible(true);
+            target.add(mainContainer);
+          }
+        }
+      }
+    });
+
+    item.add(new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(newEntryValue, "street")) {
       /**
        * @see org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel#onClick(org.apache.wicket.ajax.AjaxRequestTarget)
        */
@@ -114,12 +150,76 @@ public class ContactEntryPanel extends Panel
       }
     });
 
-    item.add(new TextField<String>("street", new PropertyModel<String>(newEntryValue, "street")));
-    item.add(new TextField<String>("zipCode", new PropertyModel<String>(newEntryValue, "zipCode")));
-    item.add(new TextField<String>("city", new PropertyModel<String>(newEntryValue, "city")));
-    item.add(new TextField<String>("country", new PropertyModel<String>(newEntryValue, "country")));
-    item.add(new TextField<String>("state", new PropertyModel<String>(newEntryValue, "state")));
+    final WebMarkupContainer zipCodeDiv = new WebMarkupContainer("zipCodeDiv");
+    zipCodeDiv.setOutputMarkupId(true);
+    zipCodeDiv.add(new AjaxMaxLengthEditableLabel("zipCode", new PropertyModel<String>(newEntryValue, "zipCode")) {
+      /**
+       * @see org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
+       */
+      @Override
+      protected void onSubmit(final AjaxRequestTarget target)
+      {
+        super.onSubmit(target);
+        final ComponentHierarchyIterator it = this.getPage().visitChildren(AjaxMaxLengthEditableLabel.class);
+        while (it.hasNext() == true) {
+          final Component c = it.next();
+          if (c.getId().equals("city") == true) {
+            c.setVisible(true);
+            target.add(mainContainer);
+          }
+        }
+      }
+    }.setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true).setVisible(false));
+    item.add(zipCodeDiv);
 
+    final WebMarkupContainer cityDiv = new WebMarkupContainer("cityDiv");
+    cityDiv.setOutputMarkupId(true);
+    cityDiv.add(new AjaxMaxLengthEditableLabel("city", new PropertyModel<String>(newEntryValue, "city")) {
+      /**
+       * @see org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
+       */
+      @Override
+      protected void onSubmit(final AjaxRequestTarget target)
+      {
+        super.onSubmit(target);
+        final ComponentHierarchyIterator it = this.getPage().visitChildren(AjaxMaxLengthEditableLabel.class);
+        while (it.hasNext() == true) {
+          final Component c = it.next();
+          if (c.getId().equals("country") == true) {
+            c.setVisible(true);
+            target.add(mainContainer);
+          }
+        }
+      }
+    }.setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true).setVisible(false));
+    item.add(cityDiv);
+
+    final WebMarkupContainer countryDiv = new WebMarkupContainer("countryDiv");
+    countryDiv.setOutputMarkupId(true);
+    countryDiv.add(new AjaxMaxLengthEditableLabel("country", new PropertyModel<String>(newEntryValue, "country")) {
+      /**
+       * @see org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
+       */
+      @Override
+      protected void onSubmit(final AjaxRequestTarget target)
+      {
+        super.onSubmit(target);
+        final ComponentHierarchyIterator it = this.getPage().visitChildren(AjaxMaxLengthEditableLabel.class);
+        while (it.hasNext() == true) {
+          final Component c = it.next();
+          if (c.getId().equals("state") == true) {
+            c.setVisible(true);
+            target.add(mainContainer);
+          }
+        }
+      }
+    }.setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true).setVisible(false));
+    item.add(countryDiv);
+
+    final WebMarkupContainer stateDiv = new WebMarkupContainer("stateDiv");
+    stateDiv.setOutputMarkupId(true);
+    stateDiv.add(new AjaxMaxLengthEditableLabel("state", new PropertyModel<String>(newEntryValue, "state")).setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true).setVisible(false));
+    item.add(stateDiv);
   }
 
   @SuppressWarnings("serial")
@@ -140,7 +240,36 @@ public class ContactEntryPanel extends Panel
         }
       });
 
-      item.add(new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(entry, "city")) {
+      item.add(new AjaxMaxLengthEditableLabel("street", new PropertyModel<String>(entry, "street")) {
+        /**
+         * @see org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel#onEdit(org.apache.wicket.ajax.AjaxRequestTarget)
+         */
+        @Override
+        public void onEdit(final AjaxRequestTarget target)
+        {
+          super.onEdit(target);
+          if (newEntryValue.getStreet().equals(DEFAULT_ENTRY_VALUE) == true)
+            newEntryValue.setStreet(DEFAULT_STREET_VALUE);
+        }
+        /**
+         * @see org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
+         */
+        @Override
+        protected void onSubmit(final AjaxRequestTarget target)
+        {
+          super.onSubmit(target);
+          final ComponentHierarchyIterator it = this.getParent().visitChildren(AjaxMaxLengthEditableLabel.class);
+          while (it.hasNext() == true) {
+            final Component c = it.next();
+            if (c.getId().equals("zipCode") == true) {
+              c.setVisible(true);
+              target.add(mainContainer);
+            }
+          }
+        }
+      });
+
+      item.add(new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(entry, "street")) {
         /**
          * @see org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel#onClick(org.apache.wicket.ajax.AjaxRequestTarget)
          */
@@ -159,11 +288,77 @@ public class ContactEntryPanel extends Panel
         }
       });
 
-      item.add(new TextField<String>("street", new PropertyModel<String>(entry, "street")));
-      item.add(new TextField<String>("zipCode", new PropertyModel<String>(entry, "zipCode")));
-      item.add(new TextField<String>("city", new PropertyModel<String>(entry, "city")));
-      item.add(new TextField<String>("country", new PropertyModel<String>(entry, "country")));
-      item.add(new TextField<String>("state", new PropertyModel<String>(entry, "state")));
+
+      final WebMarkupContainer zipCodeDiv = new WebMarkupContainer("zipCodeDiv");
+      zipCodeDiv.setOutputMarkupId(true);
+      zipCodeDiv.add(new AjaxMaxLengthEditableLabel("zipCode", new PropertyModel<String>(newEntryValue, "zipCode")) {
+        /**
+         * @see org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
+         */
+        @Override
+        protected void onSubmit(final AjaxRequestTarget target)
+        {
+          super.onSubmit(target);
+          final ComponentHierarchyIterator it = this.getPage().visitChildren(AjaxMaxLengthEditableLabel.class);
+          while (it.hasNext() == true) {
+            final Component c = it.next();
+            if (c.getId().equals("city") == true) {
+              c.setVisible(true);
+              target.add(mainContainer);
+            }
+          }
+        }
+      }.setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true).setVisible(false));
+      item.add(zipCodeDiv);
+
+      final WebMarkupContainer cityDiv = new WebMarkupContainer("cityDiv");
+      cityDiv.setOutputMarkupId(true);
+      cityDiv.add(new AjaxMaxLengthEditableLabel("city", new PropertyModel<String>(entry, "city")) {
+        /**
+         * @see org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
+         */
+        @Override
+        protected void onSubmit(final AjaxRequestTarget target)
+        {
+          super.onSubmit(target);
+          final ComponentHierarchyIterator it = this.getPage().visitChildren(AjaxMaxLengthEditableLabel.class);
+          while (it.hasNext() == true) {
+            final Component c = it.next();
+            if (c.getId().equals("country") == true) {
+              c.setVisible(true);
+              target.add(mainContainer);
+            }
+          }
+        }
+      }.setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true).setVisible(false));
+      item.add(cityDiv);
+
+      final WebMarkupContainer countryDiv = new WebMarkupContainer("countryDiv");
+      countryDiv.setOutputMarkupId(true);
+      countryDiv.add(new AjaxMaxLengthEditableLabel("country", new PropertyModel<String>(entry, "country")) {
+        /**
+         * @see org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel#onSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
+         */
+        @Override
+        protected void onSubmit(final AjaxRequestTarget target)
+        {
+          super.onSubmit(target);
+          final ComponentHierarchyIterator it = this.getPage().visitChildren(AjaxMaxLengthEditableLabel.class);
+          while (it.hasNext() == true) {
+            final Component c = it.next();
+            if (c.getId().equals("state") == true) {
+              c.setVisible(true);
+              target.add(mainContainer);
+            }
+          }
+        }
+      }.setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true).setVisible(false));
+      item.add(countryDiv);
+
+      final WebMarkupContainer stateDiv = new WebMarkupContainer("stateDiv");
+      stateDiv.setOutputMarkupId(true);
+      stateDiv.add(new AjaxMaxLengthEditableLabel("state", new PropertyModel<String>(entry, "state")).setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true).setVisible(false));
+      item.add(stateDiv);
 
     }
   }

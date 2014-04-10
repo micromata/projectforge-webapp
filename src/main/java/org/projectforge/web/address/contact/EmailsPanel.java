@@ -30,6 +30,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
+import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -67,13 +68,15 @@ public class EmailsPanel extends Panel
 
   private final String DEFAULT_EMAIL_VALUE = "E-Mail";
 
+  private final String emailsXmlString;
+
   /**
    * @param id
    */
   public EmailsPanel(final String id, final IModel<String> model)
   {
     super(id, model);
-    final String emailsXmlString = model.getObject();
+    emailsXmlString = model.getObject();
     if (StringUtils.isNotBlank(emailsXmlString) == true)
       emails = contactDao.readEmailValues(emailsXmlString);
     if (emails == null)
@@ -97,6 +100,19 @@ public class EmailsPanel extends Panel
     return contactDao.getEmailValuesAsXml(emails);
   }
 
+  private String getEmailsXmlString() {
+    return emailsXmlString;
+  }
+
+  /**
+   * @see org.apache.wicket.Component#onComponentTag(org.apache.wicket.markup.ComponentTag)
+   */
+  @Override
+  protected void onComponentTag(final ComponentTag tag)
+  {
+    tag.put("value", getEmailsXmlString());
+    super.onComponentTag(tag);
+  }
 
   @SuppressWarnings("serial")
   void init(final WebMarkupContainer item)
