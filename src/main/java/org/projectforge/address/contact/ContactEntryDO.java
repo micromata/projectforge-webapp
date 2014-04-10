@@ -31,7 +31,7 @@ import org.projectforge.core.PropertyInfo;
  */
 @Entity
 @Indexed
-@Table(name = "T_ADDRESSENTRY")
+@Table(name = "T_CONTACTENTRY")
 public class ContactEntryDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = -8141697905834021747L;

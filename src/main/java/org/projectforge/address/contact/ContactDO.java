@@ -40,7 +40,7 @@ import org.projectforge.user.PFUserContext;
  */
 @Entity
 @Indexed
-@Table(name = "T_ADDRESS2")
+@Table(name = "T_CONTACT")
 public class ContactDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = -1177059694759828682L;
