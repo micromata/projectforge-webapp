@@ -33,7 +33,6 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
-import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.address.contact.ContactEntryDO;
 import org.projectforge.address.contact.ContactType;
@@ -66,9 +65,6 @@ public class ContactEntryPanel extends Panel
   private final String DEFAULT_COUNTRY_VALUE = "Land";
   private final String DEFAULT_STATE_VALUE = "Bundesland";
 
-  private final IModel<ContactEntryDO> model;
-
-  private Component street;
   private Component city;
   private Component zipCode;
   private Component country;
@@ -78,11 +74,10 @@ public class ContactEntryPanel extends Panel
   /**
    * @param id
    */
-  public ContactEntryPanel(final String id, final List<ContactEntryDO> entrys, final IModel<ContactEntryDO> model)
+  public ContactEntryPanel(final String id, final List<ContactEntryDO> entrys)
   {
     super(id);
     this.entrys = entrys;
-    this.model = model;
     newEntryValue = new ContactEntryDO().setStreet(DEFAULT_ENTRY_VALUE).setCity(DEFAULT_CITY_VALUE).setZipCode(DEFAULT_ZIPCODE_VALUE).setCountry(DEFAULT_COUNTRY_VALUE).setState(DEFAULT_STATE_VALUE).setContactType(ContactType.PRIVATE);
     formChoiceRenderer = new LabelValueChoiceRenderer<ContactType>(this, ContactType.values());
     mainContainer = new WebMarkupContainer("main");
@@ -116,7 +111,7 @@ public class ContactEntryPanel extends Panel
     final WebMarkupContainer streetCodeDiv = new WebMarkupContainer("streetCodeDiv");
     streetCodeDiv.setOutputMarkupId(true);
 
-    streetCodeDiv.add(street = new AjaxMaxLengthEditableLabel("street", new PropertyModel<String>(newEntryValue, "street")) {
+    streetCodeDiv.add(new AjaxMaxLengthEditableLabel("street", new PropertyModel<String>(newEntryValue, "street")) {
       /**
        * @see org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel#onEdit(org.apache.wicket.ajax.AjaxRequestTarget)
        */
