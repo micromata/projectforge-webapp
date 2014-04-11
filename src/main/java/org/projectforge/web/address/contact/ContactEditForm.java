@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.FormOfAddress;
@@ -135,7 +136,7 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
     fs.add(imsPanel = new ImsPanel(fs.newChildId(), getData().getImValues()));
 
     final List<ContactEntryDO> entrys = new ArrayList<ContactEntryDO>();
-    fs.add(entryPanel = new ContactEntryPanel(fs.newChildId(), entrys));
+    fs.add(entryPanel = new ContactEntryPanel(fs.newChildId(), entrys, Model.of(new ContactEntryDO())));
 
   }
 

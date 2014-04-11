@@ -19,6 +19,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
@@ -195,5 +196,17 @@ public class ContactEntryDO extends DefaultBaseDO
     return this;
   }
 
-
+  @Override
+  public boolean equals(final Object o)
+  {
+    if (o instanceof ContactEntryDO) {
+      final ContactEntryDO other = (ContactEntryDO) o;
+      if (ObjectUtils.equals(this.getContactType(), other.getContactType()) == false)
+        return false;
+      if (ObjectUtils.equals(this.getId(), other.getId()) == false)
+        return false;
+      return true;
+    }
+    return false;
+  }
 }
