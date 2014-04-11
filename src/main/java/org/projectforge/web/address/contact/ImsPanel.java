@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -69,6 +70,8 @@ public class ImsPanel extends Panel
   private final InstantMessagingValue newImValue;
 
   private final String DEFAULT_IM_VALUE = "Instant Messaging";
+
+  private Component delete;
 
   /**
    * @param id
@@ -137,9 +140,9 @@ public class ImsPanel extends Panel
       }
     });
 
-
-
-    item.add(new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(newImValue, "user")) {
+    final WebMarkupContainer deleteDiv = new WebMarkupContainer("deleteDiv");
+    deleteDiv.setOutputMarkupId(true);
+    deleteDiv.add( delete = new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(newImValue, "user")) {
       /**
        * @see org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel#onClick(org.apache.wicket.ajax.AjaxRequestTarget)
        */
@@ -157,6 +160,8 @@ public class ImsPanel extends Panel
         target.add(mainContainer);
       }
     });
+    item.add(deleteDiv);
+    delete.setVisible(false);
   }
 
   @SuppressWarnings("serial")
@@ -190,7 +195,9 @@ public class ImsPanel extends Panel
 
       item.add(new AjaxMaxLengthEditableLabel("editableLabel", new PropertyModel<String>(im, "user")));
 
-      item.add(new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(im, "user")) {
+      final WebMarkupContainer deleteDiv = new WebMarkupContainer("deleteDiv");
+      deleteDiv.setOutputMarkupId(true);
+      deleteDiv.add(new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(im, "user")) {
         /**
          * @see org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel#onClick(org.apache.wicket.ajax.AjaxRequestTarget)
          */
@@ -208,7 +215,7 @@ public class ImsPanel extends Panel
           target.add(mainContainer);
         }
       });
-
+      item.add(deleteDiv);
     }
   }
 }

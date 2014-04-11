@@ -68,12 +68,12 @@ public class ContactEntryPanel extends Panel
 
   private final IModel<ContactEntryDO> model;
 
-  Component street;
-  Component city;
-  Component zipCode;
-  Component country;
-  Component state;
-  Component delete;
+  private Component street;
+  private Component city;
+  private Component zipCode;
+  private Component country;
+  private Component state;
+  private Component delete;
 
   /**
    * @param id

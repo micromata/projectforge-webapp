@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.ComponentTag;
@@ -69,6 +70,8 @@ public class EmailsPanel extends Panel
   private final String DEFAULT_EMAIL_VALUE = "E-Mail";
 
   private final String emailsXmlString;
+
+  private Component delete;
 
   /**
    * @param id
@@ -139,7 +142,9 @@ public class EmailsPanel extends Panel
       }
     });
 
-    item.add(new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(newEmailValue, "email")) {
+    final WebMarkupContainer deleteDiv = new WebMarkupContainer("deleteDiv");
+    deleteDiv.setOutputMarkupId(true);
+    deleteDiv.add(delete = new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(newEmailValue, "email")) {
       /**
        * @see org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel#onClick(org.apache.wicket.ajax.AjaxRequestTarget)
        */
@@ -157,6 +162,8 @@ public class EmailsPanel extends Panel
         target.add(mainContainer);
       }
     });
+    item.add(deleteDiv);
+    delete.setVisible(false);
   }
 
   @SuppressWarnings("serial")
@@ -178,7 +185,9 @@ public class EmailsPanel extends Panel
       });
       item.add(new AjaxMaxLengthEditableLabel("editableLabel", new PropertyModel<String>(email, "email")));
 
-      item.add(new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(email, "email")) {
+      final WebMarkupContainer deleteDiv = new WebMarkupContainer("deleteDiv");
+      deleteDiv.setOutputMarkupId(true);
+      deleteDiv.add(new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(email, "email")) {
         /**
          * @see org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel#onClick(org.apache.wicket.ajax.AjaxRequestTarget)
          */
@@ -196,7 +205,7 @@ public class EmailsPanel extends Panel
           target.add(mainContainer);
         }
       });
-
+      item.add(deleteDiv);
     }
   }
 }

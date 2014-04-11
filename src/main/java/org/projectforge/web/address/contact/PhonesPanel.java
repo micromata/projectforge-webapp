@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -66,6 +67,8 @@ public class PhonesPanel extends Panel
   private final PhoneValue newPhoneValue;
 
   private final String DEFAULT_PHONE_VALUE = "Telefon";
+
+  private Component delete;
 
   /**
    * @param id
@@ -121,7 +124,9 @@ public class PhonesPanel extends Panel
       }
     });
 
-    item.add(new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(newPhoneValue, "number")) {
+    final WebMarkupContainer deleteDiv = new WebMarkupContainer("deleteDiv");
+    deleteDiv.setOutputMarkupId(true);
+    deleteDiv.add(delete = new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(newPhoneValue, "number")) {
       /**
        * @see org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel#onClick(org.apache.wicket.ajax.AjaxRequestTarget)
        */
@@ -139,6 +144,8 @@ public class PhonesPanel extends Panel
         target.add(mainContainer);
       }
     });
+    item.add(deleteDiv);
+    delete.setVisible(false);
   }
 
   @SuppressWarnings("serial")
@@ -160,7 +167,9 @@ public class PhonesPanel extends Panel
       });
       item.add(new AjaxMaxLengthEditableLabel("editableLabel", new PropertyModel<String>(phone, "number")));
 
-      item.add(new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(phone, "number")) {
+      final WebMarkupContainer deleteDiv = new WebMarkupContainer("deleteDiv");
+      deleteDiv.setOutputMarkupId(true);
+      deleteDiv.add(new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(phone, "number")) {
         /**
          * @see org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel#onClick(org.apache.wicket.ajax.AjaxRequestTarget)
          */
@@ -178,7 +187,7 @@ public class PhonesPanel extends Panel
           target.add(mainContainer);
         }
       });
-
+      item.add(deleteDiv);
     }
   }
 }
