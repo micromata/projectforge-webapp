@@ -127,7 +127,7 @@ public abstract class ModalDialog extends Panel
   {
     super.onInitialize();
     if (bigWindow == true) {
-      mainSubContainer.add(AttributeModifier.append("class", "big-modal"));
+      mainContainer.add(AttributeModifier.append("class", "big-modal"));
     }
   }
 
