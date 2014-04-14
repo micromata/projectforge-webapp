@@ -328,4 +328,10 @@ public class ContactEntryPanel extends Panel
       item.add(deleteDiv);
     }
   }
+
+  public List<ContactEntryDO> getEntrys()
+  {
+    return entrys;
+  }
+
 }

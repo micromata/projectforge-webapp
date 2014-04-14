@@ -30,6 +30,7 @@ import org.projectforge.address.contact.ContactDO;
 import org.projectforge.address.contact.ContactDao;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.AbstractSecuredBasePage;
 
 /**
  * The controller of the edit formular page. Most functionality such as insert, update, delete etc. is done by the super class.
@@ -63,6 +64,18 @@ public class ContactEditPage extends AbstractEditPage<ContactDO, ContactEditForm
   protected ContactDao getBaseDao()
   {
     return contactDao;
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractEditPage#onSaveOrUpdate()
+   */
+  @Override
+  public AbstractSecuredBasePage onSaveOrUpdate()
+  {
+    form.getData().setEmailValues(form.getEmailsPanel().getEmailsAsXmlString());
+    form.getData().setPhoneValues(form.getPhonesPanel().getPhonesAsXmlString());
+    form.getData().setImValues(form.getImsPanel().getImsAsXmlString());
+    return super.onSaveOrUpdate();
   }
 
   /**

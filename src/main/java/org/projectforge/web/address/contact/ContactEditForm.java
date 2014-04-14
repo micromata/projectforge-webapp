@@ -75,18 +75,6 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
     super(parentPage, data);
   }
 
-  /**
-   * @see org.projectforge.web.wicket.AbstractSecuredForm#onSubmit()
-   */
-  @Override
-  protected void onSubmit()
-  {
-    getData().setEmailValues(emailsPanel.getEmailsAsXmlString());
-    getData().setPhoneValues(phonesPanel.getPhonesAsXmlString());
-    getData().setImValues(imsPanel.getImsAsXmlString());
-    super.onSubmit();
-  }
-
   @Override
   public void init()
   {
@@ -144,4 +132,21 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
   {
     return log;
   }
+
+  public EmailsPanel getEmailsPanel()
+  {
+    return emailsPanel;
+  }
+
+  public PhonesPanel getPhonesPanel()
+  {
+    return phonesPanel;
+  }
+
+  public ImsPanel getImsPanel()
+  {
+    return imsPanel;
+  }
+
+
 }
