@@ -39,8 +39,7 @@ public class SkillMatrixPluginUpdates
 {
   static MyDatabaseUpdateDao dao;
 
-  final static Class< ? >[] doClasses = new Class< ? >[] { //
-    SkillDO.class, SkillRatingDO.class};
+  final static Class< ? >[] doClasses = new Class< ? >[] { SkillDO.class, SkillRatingDO.class, TrainingDO.class, AttendeeDO.class};
 
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
@@ -52,7 +51,7 @@ public class SkillMatrixPluginUpdates
       {
         // Does the data-base tables already exist?
         // Check only the oldest table.
-        if (dao.doEntitiesExist(SkillDO.class) == false) {
+        if (dao.doEntitiesExist(doClasses) == false) {
           // The oldest table doesn't exist, therefore the plugin has to initialized completely.
           return UpdatePreCheckStatus.READY_FOR_UPDATE;
         }

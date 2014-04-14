@@ -21,6 +21,7 @@ import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.common.NumberHelper;
 import org.projectforge.excel.PropertyMapping;
 import org.projectforge.export.DOListExcelExporter;
 import org.projectforge.web.calendar.DateTimeFormatter;
@@ -32,6 +33,7 @@ import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * The controller of the list page. Most functionality such as search etc. is done by the super class.
@@ -52,9 +54,15 @@ IListPageColumnsCreator<AttendeeDO>
   @SpringBean(name = "userFormatter")
   private UserFormatter userFormatter;
 
+  public static final String PARAM_TRAINING_ID = "trainingId";
+
   public AttendeeListPage(final PageParameters parameters)
   {
     super(parameters, I18N_KEY_PREFIX);
+    final Integer trainingId = WicketUtils.getAsInteger(parameters, PARAM_TRAINING_ID);
+    if (NumberHelper.greaterZero(trainingId) == true) {
+      form.getSearchFilter().setTrainingId(trainingId);
+    }
   }
 
   /**
@@ -131,25 +139,6 @@ IListPageColumnsCreator<AttendeeDO>
   protected DOListExcelExporter createExcelExporter(final String filenameIdentifier)
   {
     return new DOListExcelExporter(filenameIdentifier) {
-      // /**
-      // * @see org.projectforge.excel.ExcelExporter#onBeforeSettingColumns(java.util.List)
-      // */
-      // @Override
-      // protected List<ExportColumn> onBeforeSettingColumns(final ContentProvider sheetProvider, final List<ExportColumn> columns)
-      // {
-      // final List<ExportColumn> sortedColumns = reorderColumns(columns, "kreditor", "konto", "kontoBezeichnung", "betreff", "datum",
-      // "faelligkeit", "bezahlDatum", "zahlBetrag");
-      // I18nExportColumn col = new I18nExportColumn("kontoBezeichnung", "fibu.konto.bezeichnung", MyXlsContentProvider.LENGTH_STD);
-      // sortedColumns.add(2, col);
-      // col = new I18nExportColumn("netSum", "fibu.common.netto");
-      // putCurrencyFormat(sheetProvider, col);
-      // sortedColumns.add(7, col);
-      // col = new I18nExportColumn("grossSum", "fibu.common.brutto");
-      // putCurrencyFormat(sheetProvider, col);
-      // sortedColumns.add(8, col);
-      // return sortedColumns;
-      // }
-
       /**
        * @see org.projectforge.excel.ExcelExporter#addMapping(org.projectforge.excel.PropertyMapping, java.lang.Object,
        *      java.lang.reflect.Field)

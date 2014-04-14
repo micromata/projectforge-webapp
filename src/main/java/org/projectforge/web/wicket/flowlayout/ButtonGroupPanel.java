@@ -23,7 +23,9 @@
 
 package org.projectforge.web.wicket.flowlayout;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 
@@ -37,11 +39,25 @@ public class ButtonGroupPanel extends Panel
 {
   private final RepeatingView repeater;
 
+  private final WebMarkupContainer container;
+
   public ButtonGroupPanel(final String id)
   {
     super(id);
+    container = new WebMarkupContainer("container");
+    add(container);
     repeater = new RepeatingView("repeater");
-    add(repeater);
+    container.add(repeater);
+  }
+
+  /**
+   * For grouping toggle check boxes. Adds attribute 'data-toggle="buttons"' in html markup.
+   * @return this for chaining.
+   */
+  public ButtonGroupPanel setToggleButtons()
+  {
+    container.add(AttributeModifier.append("data-toggle", "buttons"));
+    return this;
   }
 
   /**

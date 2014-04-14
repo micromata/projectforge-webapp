@@ -222,7 +222,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
         }
 
       }, SingleButtonPanel.NORMAL).setTooltip(getString("recalculate")));
-      final DivPanel checkBoxDiv = new DivPanel(fs.newChildId(), DivType.CHECKBOX) {
+      final DivPanel checkBoxDiv = new DivPanel(fs.newChildId(), DivType.BTN_GROUP) {
         /**
          * @see org.apache.wicket.Component#isVisible()
          */
@@ -343,7 +343,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
       positionsPanel.setHeading(new HtmlCodePanel(ToggleContainerPanel.HEADING_TEXT_ID, heading));
       final DivPanel content = new DivPanel(ToggleContainerPanel.CONTENT_ID);
       positionsPanel.add(content);
-      final GridBuilder posGridBuilder = new GridBuilder(content, content.newChildId(), true);
+      final GridBuilder posGridBuilder = new GridBuilder(content, content.newChildId());
       {
         // DropDownChoice status / project
         final FieldsetPanel fs = posGridBuilder.newFieldset(WicketUtils.createMultipleFieldsetLabel(getString("status"),

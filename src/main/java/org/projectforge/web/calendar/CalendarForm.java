@@ -39,7 +39,7 @@ import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DateTimePanel;
 import org.projectforge.web.wicket.components.JodaDatePanel;
 import org.projectforge.web.wicket.flowlayout.ButtonGroupPanel;
-import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.CheckBoxButton;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -105,7 +105,7 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
     final DivPanel checkBoxPanel = fieldset.addNewCheckBoxDiv();
 
     calendarPageSupport.addOptions(checkBoxPanel, true, filter);
-    checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "slot30"),
+    checkBoxPanel.add(new CheckBoxButton(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "slot30"),
         getString("calendar.option.slot30"), true).setTooltip(getString("calendar.option.slot30.tooltip")));
 
     buttonGroupPanel = new ButtonGroupPanel(fieldset.newChildId());

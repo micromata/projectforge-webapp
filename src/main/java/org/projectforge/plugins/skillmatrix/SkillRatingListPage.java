@@ -27,7 +27,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -37,20 +36,20 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.excel.ContentProvider;
-import org.projectforge.excel.ExportColumn;
+import org.projectforge.common.NumberHelper;
 import org.projectforge.excel.PropertyMapping;
 import org.projectforge.export.DOListExcelExporter;
-import org.projectforge.user.PFUserContext;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.user.UserPropertyColumn;
+import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * @author Billy Duong (b.duong@micromata.de)
@@ -69,9 +68,15 @@ IListPageColumnsCreator<SkillRatingDO>
   @SpringBean(name = "userFormatter")
   private UserFormatter userFormatter;
 
+  public static final String PARAM_SKILL_ID = "skillId";
+
   public SkillRatingListPage(final PageParameters parameters)
   {
     super(parameters, "plugins.skillmatrix.rating");
+    final Integer skillId = WicketUtils.getAsInteger(parameters, PARAM_SKILL_ID);
+    if (NumberHelper.greaterZero(skillId) == true) {
+      form.getSearchFilter().setSkillId(skillId);
+    }
   }
 
   /**
@@ -100,12 +105,10 @@ IListPageColumnsCreator<SkillRatingDO>
         final SkillRatingDO skillRating = (SkillRatingDO) rowModel.getObject();
         item.add(new ListSelectActionPanel(componentId, rowModel, SkillRatingEditPage.class, skillRating.getId(), returnToPage,
             DateTimeFormatter.instance().getFormattedDateTime(skillRating.getCreated())));
-        // Only the owner can click / edit his entries
-        if (ObjectUtils.equals(PFUserContext.getUserId(), skillRating.getUserId())) {
-          addRowClick(item);
-        }
+        addRowClick(item);
         cellItemListener.populateItem(item, componentId, rowModel);
       }
+
     };
 
     final CellItemListenerPropertyColumn<SkillRatingDO> modified = new CellItemListenerPropertyColumn<SkillRatingDO>(getString("modified"),
@@ -120,7 +123,7 @@ IListPageColumnsCreator<SkillRatingDO>
     // CellItemListenerPropertyColumn<SkillRatingDO>(SkillRatingDO.class,
     // getSortable("skill.title", sortable), "skill.title", cellItemListener);
     final CellItemListenerPropertyColumn<SkillRatingDO> skillTitle = new CellItemListenerPropertyColumn<SkillRatingDO>(
-        getString("plugins.skillmatrix.skill.title"), getSortable("skill.title", sortable), "skill.title", cellItemListener);
+        getString("plugins.skillmatrix.skillrating.skill"), getSortable("skill.title", sortable), "skill.title", cellItemListener);
 
     final CellItemListenerPropertyColumn<SkillRatingDO> experience = new CellItemListenerPropertyColumn<SkillRatingDO>(SkillRatingDO.class,
         getSortable("skillRating", sortable), "skillRating", cellItemListener);
@@ -173,25 +176,6 @@ IListPageColumnsCreator<SkillRatingDO>
   {
     return new DOListExcelExporter(filenameIdentifier) {
       /**
-       * @see org.projectforge.excel.ExcelExporter#onBeforeSettingColumns(java.util.List)
-       */
-      @Override
-      protected List<ExportColumn> onBeforeSettingColumns(final ContentProvider sheetProvider, final List<ExportColumn> columns)
-      {
-        final List<ExportColumn> sortedColumns = reorderColumns(columns, "skill", "user",  "sinceYear", "skillRating", "certificates",
-            "trainingCourses", "description", "comment");
-        //       I18nExportColumn col = new I18nExportColumn("kontoBezeichnung", "fibu.konto.bezeichnung", MyXlsContentProvider.LENGTH_STD);
-        //       sortedColumns.add(2, col);
-        //       col = new I18nExportColumn("netSum", "fibu.common.netto");
-        //       putCurrencyFormat(sheetProvider, col);
-        //       sortedColumns.add(7, col);
-        //       col = new I18nExportColumn("grossSum", "fibu.common.brutto");
-        //       putCurrencyFormat(sheetProvider, col);
-        //       sortedColumns.add(8, col);
-        return sortedColumns;
-      }
-
-      /**
        * @see org.projectforge.excel.ExcelExporter#addMapping(org.projectforge.excel.PropertyMapping, java.lang.Object,
        *      java.lang.reflect.Field)
        */
@@ -201,12 +185,6 @@ IListPageColumnsCreator<SkillRatingDO>
         if ("skill".equals(field.getName()) == true) {
           final SkillDO skill = ((SkillRatingDO) entry).getSkill();
           mapping.add(field.getName(), skill != null ? skill.getTitle() : "");
-        } else if ("sinceYear".equals(field.getName()) == true) {
-          final Integer i = ((SkillRatingDO) entry).getSinceYear();
-          String s = null;
-          if ( i != null)
-            s = i.toString();
-          mapping.add(field.getName(), s != null ? s : "");
         } else {
           super.addMapping(mapping, entry, field);
         }
@@ -264,4 +242,20 @@ IListPageColumnsCreator<SkillRatingDO>
     }
     super.unselect(property);
   }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#redirectToEditPage(org.apache.wicket.request.mapper.parameter.PageParameters)
+   */
+  @Override
+  protected AbstractEditPage< ? , ? , ? > redirectToEditPage(final PageParameters params)
+  {
+    if (params == null && form.getSearchFilter().getSkillId() != null) {
+      final PageParameters newParams = new PageParameters();
+      newParams.set(SkillRatingEditForm.PARAM_SKILL_ID, form.getSearchFilter().getSkillId());
+      return super.redirectToEditPage(newParams);
+    } else {
+      return super.redirectToEditPage(params);
+    }
+  }
+
 }

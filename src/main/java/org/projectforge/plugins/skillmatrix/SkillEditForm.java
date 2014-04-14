@@ -269,6 +269,9 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
 
   private String getGroupnames(final Integer[] ids)
   {
+    if (ids == null || ids.length == 0) {
+      return "";
+    }
     String s = "";
     final UserGroupCache userGroupCache = Registry.instance().getUserGroupCache();
     for (final Integer id : ids) {

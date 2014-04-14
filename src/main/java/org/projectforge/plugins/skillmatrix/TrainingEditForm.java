@@ -80,6 +80,8 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
 
   MultiChoiceListHelper<GroupDO> fullAccessGroupsListHelper, readonlyAccessGroupsListHelper;
 
+  public static final String PARAM_TRAINING_ID = "trainingId";
+
   /**
    * @param parentPage
    * @param data

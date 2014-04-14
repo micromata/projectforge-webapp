@@ -59,9 +59,8 @@ import org.projectforge.web.wicket.components.DateTimePanel;
 import org.projectforge.web.wicket.components.DateTimePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
-import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.CheckBoxButton;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldSetIconPosition;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.HiddenInputPanel;
@@ -205,13 +204,13 @@ AbstractSecuredForm<F, P>
     if (showOptionsPanel() == true) {
       gridBuilder.newSplitPanel(GridSize.COL66);
       optionsFieldsetPanel = gridBuilder.newFieldset(getOptionsLabel()).suppressLabelForWarning();
-      final DivPanel optionsCheckBoxesPanel = new DivPanel(optionsFieldsetPanel.newChildId(), DivType.CHECKBOX);
+      final DivPanel optionsCheckBoxesPanel = optionsFieldsetPanel.addNewCheckBoxDiv();
       onOptionsPanelCreate(optionsFieldsetPanel, optionsCheckBoxesPanel);
       if (showHistorySearchAndDeleteCheckbox() == true) {
-        optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(),
+        optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxButton(optionsCheckBoxesPanel.newChildId(),
             new PropertyModel<Boolean>(getSearchFilter(), "deleted"), getString(I18N_ONLY_DELETED), getString(I18N_ONLY_DELETED_TOOLTIP))
             .setWarning());
-        optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
+        optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxButton(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
             getSearchFilter(), "searchHistory"), getString("search.searchHistory"), getString("search.searchHistory.additional.tooltip")));
       }
       if (optionsCheckBoxesPanel.hasChilds() == true) {
@@ -520,16 +519,16 @@ AbstractSecuredForm<F, P>
     return this.searchFilter;
   }
 
-  public CheckBoxPanel createAutoRefreshCheckBoxPanel(final String id, final IModel<Boolean> model, final String label)
+  public CheckBoxButton createAutoRefreshCheckBoxButton(final String id, final IModel<Boolean> model, final String label)
   {
-    return createAutoRefreshCheckBoxPanel(id, model, label, null);
+    return createAutoRefreshCheckBoxButton(id, model, label, null);
   }
 
   @SuppressWarnings("serial")
-  protected CheckBoxPanel createAutoRefreshCheckBoxPanel(final String id, final IModel<Boolean> model, final String label,
+  protected CheckBoxButton createAutoRefreshCheckBoxButton(final String id, final IModel<Boolean> model, final String label,
       final String tooltip)
   {
-    final CheckBoxPanel checkBoxPanel = new CheckBoxPanel(id, model, label) {
+    final CheckBoxButton checkBoxPanel = new CheckBoxButton(id, model, label) {
       @Override
       protected boolean wantOnSelectionChangedNotifications()
       {

@@ -24,6 +24,7 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.PropertyInfo;
+import org.projectforge.core.ShortDisplayNameCapable;
 import org.projectforge.core.UserPrefParameter;
 import org.projectforge.database.Constants;
 import org.projectforge.user.PFUserDO;
@@ -36,7 +37,7 @@ import org.projectforge.user.PFUserDO;
 @Entity
 @Indexed
 @Table(name = "T_PLUGIN_SKILL_ATTENDEE")
-public class AttendeeDO extends DefaultBaseDO
+public class AttendeeDO extends DefaultBaseDO implements ShortDisplayNameCapable
 {
   private static final long serialVersionUID = -3676402473986512186L;
 
@@ -160,4 +161,9 @@ public class AttendeeDO extends DefaultBaseDO
     return this;
   }
 
+  @Transient
+  public String getShortDisplayName()
+  {
+    return getTraining() != null ? getTraining().getTitle() + " (#" + this.getId() + ")" : " (#" + this.getId() + ")";
+  }
 }

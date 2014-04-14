@@ -37,13 +37,10 @@ import org.projectforge.common.NumberHelper;
 import org.projectforge.core.Configuration;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.web.BrowserScreenWidthType;
-import org.projectforge.web.LayoutSettingsPage;
 import org.projectforge.web.UserAgentBrowser;
 import org.projectforge.web.UserAgentDetection;
 import org.projectforge.web.UserAgentDevice;
 import org.projectforge.web.UserAgentOS;
-import org.projectforge.web.user.UserPreferencesHelper;
 
 public class MySession extends WebSession
 {
@@ -70,8 +67,6 @@ public class MySession extends WebSession
   private boolean mobileUserAgent;
 
   private boolean ignoreMobileUserAgent;
-
-  private BrowserScreenWidthType browserScreenWidthType;
 
   /**
    * Random cross site request forgery token.
@@ -186,38 +181,6 @@ public class MySession extends WebSession
     return ignoreMobileUserAgent;
   }
 
-  public BrowserScreenWidthType getBrowserScreenWidthType()
-  {
-    if (browserScreenWidthType == null) {
-      final Integer userId = getUserId();
-      if (userId != null) {
-        browserScreenWidthType = (BrowserScreenWidthType) UserPreferencesHelper.getEntry(LayoutSettingsPage
-            .getBrowserScreenWidthUserPrefKey(this));
-        if (browserScreenWidthType != null) {
-          // browser screen width for the device is given.
-          return browserScreenWidthType;
-        }
-      }
-      if (isMobileUserAgent() == true) {
-        if (getUserAgentDevice() == UserAgentDevice.IPAD) {
-          browserScreenWidthType = BrowserScreenWidthType.NORMAL;
-        }
-        browserScreenWidthType = BrowserScreenWidthType.NARROW;
-      }
-      browserScreenWidthType = BrowserScreenWidthType.WIDE;
-    }
-    return browserScreenWidthType;
-  }
-
-  /**
-   * @param browserScreenWidthType the browserScreenWidthType to set
-   * @return this for chaining.
-   */
-  public MySession setBrowserScreenWidthType(final BrowserScreenWidthType browserScreenWidthType)
-  {
-    this.browserScreenWidthType = browserScreenWidthType;
-    return this;
-  }
 
   /**
    * @return the userAgentBrowser
