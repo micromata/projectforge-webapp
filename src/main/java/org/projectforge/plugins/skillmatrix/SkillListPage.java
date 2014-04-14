@@ -124,10 +124,6 @@ public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, Ski
     final CellItemListenerPropertyColumn<SkillDO> rateable = new CellItemListenerPropertyColumn<SkillDO>(SkillDO.class, getSortable(
         "rateable", sortable), "rateable", cellItemListener);
 
-    final CellItemListenerPropertyColumn<SkillDO> id = new CellItemListenerPropertyColumn<SkillDO>(SkillDO.class, getSortable(
-        "id", sortable), "id", cellItemListener);
-
-    columns.add(id);
     columns.add(title);
     columns.add(parentTitle);
     columns.add(description);

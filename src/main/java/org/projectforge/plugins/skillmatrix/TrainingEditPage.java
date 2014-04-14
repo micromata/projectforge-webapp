@@ -24,6 +24,7 @@
 package org.projectforge.plugins.skillmatrix;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.NumberHelper;
@@ -31,6 +32,7 @@ import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredBasePage;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 /**
  * The controller of the edit formular page. Most functionality such as insert, update, delete etc. is done by the super class.
@@ -57,6 +59,7 @@ public class TrainingEditPage extends AbstractEditPage<TrainingDO, TrainingEditF
   {
     super(parameters, I18N_KEY_PREFIX);
     init();
+    addTopMenuPanel();
     final Integer parentSkillId = WicketUtils.getAsInteger(parameters, PARAM_PARENT_SKILL_ID);
     if (NumberHelper.greaterZero(parentSkillId) == true) {
       trainingDao.setSkill(getData(), parentSkillId);
@@ -132,6 +135,27 @@ public class TrainingEditPage extends AbstractEditPage<TrainingDO, TrainingEditF
     trainingDao.setFullAccessGroups(getData(), form.fullAccessGroupsListHelper.getAssignedItems());
     trainingDao.setReadOnlyAccessGroups(getData(), form.readonlyAccessGroupsListHelper.getAssignedItems());
     return super.onSaveOrUpdate();
+  }
+
+  private void addTopMenuPanel()
+  {
+    if (isNew() == false) {
+      final Integer id = form.getData().getId();
+
+      @SuppressWarnings("serial")
+      final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+        @Override
+        public void onClick()
+        {
+          final PageParameters params = new PageParameters();
+          params.set(TrainingEditForm.PARAM_TRAINING_ID, id);
+          final AttendeeListPage page = new AttendeeListPage(params);
+          page.setReturnToPage(TrainingEditPage.this);
+          setResponsePage(page);
+        };
+      }, getString("plugins.skillmatrix.skilltraining.attendee.menu"));
+      addContentMenuEntry(menu);
+    }
   }
 
 }
