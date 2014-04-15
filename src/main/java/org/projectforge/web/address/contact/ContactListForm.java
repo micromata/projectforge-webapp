@@ -26,10 +26,7 @@ package org.projectforge.web.address.contact;
 import java.io.Serializable;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.contact.ContactFilter;
-import org.projectforge.plugins.skillmatrix.SkillDao;
-import org.projectforge.plugins.skillmatrix.TrainingDao;
 import org.projectforge.web.wicket.AbstractListForm;
 
 /**
@@ -43,12 +40,6 @@ public class ContactListForm extends AbstractListForm<ContactFilter, ContactList
 
   private static final Logger log = Logger.getLogger(ContactListForm.class);
 
-  @SpringBean(name = "trainingDao")
-  private TrainingDao trainingDao;
-
-  @SpringBean(name = "skillDao")
-  private SkillDao skillDao;
-
   /**
    * @param parentPage
    */
@@ -56,7 +47,6 @@ public class ContactListForm extends AbstractListForm<ContactFilter, ContactList
   {
     super(parentPage);
   }
-
 
   @Override
   protected void init()
