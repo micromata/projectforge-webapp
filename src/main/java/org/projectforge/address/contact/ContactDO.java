@@ -10,7 +10,10 @@
 package org.projectforge.address.contact;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -18,18 +21,22 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.IndexColumn;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.address.FormOfAddress;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.DefaultBaseDO;
+import org.projectforge.core.PFPersistancyBehavior;
 import org.projectforge.core.PropertyInfo;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.PFUserContext;
@@ -81,6 +88,69 @@ public class ContactDO extends DefaultBaseDO
   @PropertyInfo(i18nKey = "phoneValues")
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String phoneValues;
+
+  @PropertyInfo(i18nKey = "menu.contactList")
+  @PFPersistancyBehavior(autoUpdateCollectionEntries = true)
+  @IndexedEmbedded(depth = 1)
+  private List<ContactEntryDO> contacts = null;
+
+  /**
+   * Get the position entries for this object.
+   */
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "contact")
+  @IndexColumn(name = "number", base = 1)
+  public List<ContactEntryDO> getContacts()
+  {
+    return this.contacts;
+  }
+
+  /**
+   * @param number
+   * @return ContactEntryDO with given position number or null (iterates through the list of contacts and compares the number), if not
+   *         exist.
+   */
+  public ContactEntryDO getContact(final short number)
+  {
+    if (contacts == null) {
+      return null;
+    }
+    for (final ContactEntryDO contact : this.contacts) {
+      if (contact.getNumber() == number) {
+        return contact;
+      }
+    }
+    return null;
+  }
+
+  public ContactDO setContacts(final List<ContactEntryDO> contacts)
+  {
+    this.contacts = contacts;
+    return this;
+  }
+
+  public ContactDO addContact(final ContactEntryDO contactEntry)
+  {
+    ensureAndGetContacts();
+    short number = 1;
+    for (final ContactEntryDO pos : contacts) {
+      if (pos.getNumber() >= number) {
+        number = pos.getNumber();
+        number++;
+      }
+    }
+    contactEntry.setNumber(number);
+    contactEntry.setContact(this);
+    this.contacts.add(contactEntry);
+    return this;
+  }
+
+  public List<ContactEntryDO> ensureAndGetContacts()
+  {
+    if (this.contacts == null) {
+      setContacts(new ArrayList<ContactEntryDO>());
+    }
+    return getContacts();
+  }
 
   @Column
   public Date getBirthday()
