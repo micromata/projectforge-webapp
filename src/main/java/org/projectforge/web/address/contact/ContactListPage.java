@@ -70,7 +70,7 @@ IListPageColumnsCreator<ContactDO>
     columns.add(new CellItemListenerPropertyColumn<ContactDO>(ContactDO.class, getSortable("name", sortable), "name",
         cellItemListener));
 
-    columns.add(new CellItemListenerPropertyColumn<ContactDO>(ContactDO.class, getSortable("firstname", sortable), "firstname",
+    columns.add(new CellItemListenerPropertyColumn<ContactDO>(ContactDO.class, getSortable("firstName", sortable), "firstName",
         cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<ContactDO>(ContactDO.class, getSortable("title", sortable), "title", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<ContactDO>(ContactDO.class, getSortable("birthday", sortable), "birthday",

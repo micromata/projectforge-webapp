@@ -141,7 +141,7 @@ class ContactPageSupport implements Serializable
         if (StringUtils.isBlank(name.getValue()) == true
             && StringUtils.isBlank(firstName.getValue()) == true
             && StringUtils.isBlank(organization.getValue()) == true) {
-          form.error(getString("contact.form.error.toFewFields"));
+          form.error(getString("address.form.error.toFewFields"));
         }
       }
     });
@@ -189,7 +189,7 @@ class ContactPageSupport implements Serializable
 
   public FieldProperties<FormOfAddress> getFormOfAddressProperties()
   {
-    return new FieldProperties<FormOfAddress>("contact.form", new PropertyModel<FormOfAddress>(contact, "form"));
+    return new FieldProperties<FormOfAddress>("address.form", new PropertyModel<FormOfAddress>(contact, "form"));
   }
 
   public AbstractFieldsetPanel< ? > addTitle()
@@ -202,7 +202,7 @@ class ContactPageSupport implements Serializable
 
   public FieldProperties<String> getTitleProperties()
   {
-    return new FieldProperties<String>("contact.title", new PropertyModel<String>(contact, "title"));
+    return new FieldProperties<String>("address.title", new PropertyModel<String>(contact, "title"));
   }
 
   public AbstractFieldsetPanel< ? > addWebsite()
@@ -249,7 +249,7 @@ class ContactPageSupport implements Serializable
 
   public FieldProperties<String> getDivisionProperties()
   {
-    return new FieldProperties<String>("contact.division", new PropertyModel<String>(contact, "division"));
+    return new FieldProperties<String>("address.division", new PropertyModel<String>(contact, "division"));
   }
 
   public AbstractFieldsetPanel< ? > addPosition()
@@ -262,7 +262,7 @@ class ContactPageSupport implements Serializable
 
   public FieldProperties<String> getPositionTextProperties()
   {
-    return new FieldProperties<String>("contact.positionText", new PropertyModel<String>(contact, "positionText"));
+    return new FieldProperties<String>("address.positionText", new PropertyModel<String>(contact, "positionText"));
   }
 
   public AbstractFieldsetPanel< ? > addEmail()
@@ -343,7 +343,7 @@ class ContactPageSupport implements Serializable
 
   public FieldProperties<Date> getBirthdayProperties()
   {
-    return new FieldProperties<Date>("contact.birthday", new PropertyModel<Date>(contact, "birthday"));
+    return new FieldProperties<Date>("address.birthday", new PropertyModel<Date>(contact, "birthday"));
   }
 
   public AbstractFieldsetPanel< ? > addLanguage()
@@ -440,7 +440,7 @@ class ContactPageSupport implements Serializable
 
   public FieldProperties<String> getAddressTextProperties(final String addressType, final String addressTextProperty)
   {
-    return new FieldProperties<String>("contact.addressText", new PropertyModel<String>(contact, addressTextProperty)).setLabelDescription(
+    return new FieldProperties<String>("address.addressText", new PropertyModel<String>(contact, addressTextProperty)).setLabelDescription(
         addressType, false);
   }
 
@@ -454,7 +454,7 @@ class ContactPageSupport implements Serializable
 
   public FieldProperties<String> getZipCodeProperties(final String zipCodeProperty)
   {
-    return new FieldProperties<String>("contact.zipCode", new PropertyModel<String>(contact, zipCodeProperty));
+    return new FieldProperties<String>("address.zipCode", new PropertyModel<String>(contact, zipCodeProperty));
   }
 
   public AbstractFieldsetPanel< ? > addCity(final String cityProperty)
@@ -467,7 +467,7 @@ class ContactPageSupport implements Serializable
 
   public FieldProperties<String> getCityProperties(final String cityProperty)
   {
-    return new FieldProperties<String>("contact.city", new PropertyModel<String>(contact, cityProperty));
+    return new FieldProperties<String>("address.city", new PropertyModel<String>(contact, cityProperty));
   }
 
   public AbstractFieldsetPanel< ? > addCountry(final String countryProperty)
@@ -480,7 +480,7 @@ class ContactPageSupport implements Serializable
 
   public FieldProperties<String> getCountryProperties(final String countryProperty)
   {
-    return new FieldProperties<String>("contact.country", new PropertyModel<String>(contact, countryProperty));
+    return new FieldProperties<String>("address.country", new PropertyModel<String>(contact, countryProperty));
   }
 
   public AbstractFieldsetPanel< ? > addState(final String stateProperty)
@@ -493,7 +493,7 @@ class ContactPageSupport implements Serializable
 
   public FieldProperties<String> getStateProperties(final String stateProperty)
   {
-    return new FieldProperties<String>("contact.state", new PropertyModel<String>(contact, stateProperty));
+    return new FieldProperties<String>("address.state", new PropertyModel<String>(contact, stateProperty));
   }
 
   public String getString(final String key)
@@ -511,18 +511,18 @@ class ContactPageSupport implements Serializable
 
   public AddressParameters getBusinessAddressParameters()
   {
-    return new AddressParameters(getString("contact.heading.businessAddress"), "addressText", "zipCode", "city", "country", "state");
+    return new AddressParameters(getString("address.heading.businessAddress"), "addressText", "zipCode", "city", "country", "state");
   }
 
   public AddressParameters getPostalAddressParameters()
   {
-    return new AddressParameters(getString("contact.heading.postalAddress"), "postalAddressText", "postalZipCode", "postalCity",
+    return new AddressParameters(getString("address.heading.postalAddress"), "postalAddressText", "postalZipCode", "postalCity",
         "postalCountry", "postalState");
   }
 
   public AddressParameters getPrivateAddressParameters()
   {
-    return new AddressParameters(getString("contact.heading.privateAddress"), "privateAddressText", "privateZipCode", "privateCity",
+    return new AddressParameters(getString("address.heading.privateAddress"), "privateAddressText", "privateZipCode", "privateCity",
         "privateCountry", "privateState");
   }
 

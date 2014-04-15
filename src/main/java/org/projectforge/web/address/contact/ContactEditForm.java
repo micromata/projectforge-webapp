@@ -58,13 +58,14 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
 
   private ContactEntryPanel contactEntryPanel;
 
+  @SpringBean(name = "contactDao")
+  private ContactDao contactDao;
+
   @SpringBean(name = "personalContactDao")
   private PersonalContactDao personalContactDao;
 
   protected ContactPageSupport contactEditSupport;
 
-  @SpringBean(name = "contactDao")
-  private ContactDao contactDao;
 
   /**
    * @param parentPage
@@ -91,6 +92,8 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
         getString("address.tooltip.vCardList"));
     contactEditSupport.addTitle();
     contactEditSupport.addOrganization();
+    contactEditSupport.addDivision();
+    contactEditSupport.addPosition();
     contactEditSupport.addWebsite();
 
     contactEditSupport.addBirthday();
@@ -100,6 +103,8 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
 
     contactEditSupport.addFingerPrint();
     contactEditSupport.addPublicKey();
+
+    contactEditSupport.addComment();
 
     // Emails
     FieldsetPanel fs2 = gridBuilder.newFieldset(ContactDO.class, "emailValues").suppressLabelForWarning();

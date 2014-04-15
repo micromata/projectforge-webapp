@@ -65,7 +65,7 @@ public class ContactDO extends DefaultBaseDO
 
   @PropertyInfo(i18nKey = "firstName")
   @Field(index = Index.TOKENIZED, store = Store.NO)
-  private String firstname; // 255
+  private String firstName; // 255
 
   @PropertyInfo(i18nKey = "form")
   @Field(index = Index.TOKENIZED, store = Store.NO)
@@ -114,6 +114,15 @@ public class ContactDO extends DefaultBaseDO
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String organization; // 255
+
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String division; // 255
+
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String positionText; // 255
+
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String comment; // 5000;
 
   /**
    * Get the contact entries for this object.
@@ -188,19 +197,19 @@ public class ContactDO extends DefaultBaseDO
   @Column(name = "first_name", length = 255)
   public String getFirstName()
   {
-    return firstname;
+    return firstName;
   }
 
-  public ContactDO setFirstName(final String firstname)
+  public ContactDO setFirstName(final String firstName)
   {
-    this.firstname = firstname;
+    this.firstName = firstName;
     return this;
   }
 
   @Transient
   public String getFullName()
   {
-    return StringHelper.listToString(", ", name, firstname);
+    return StringHelper.listToString(", ", name, firstName);
   }
 
   @Transient
@@ -403,4 +412,41 @@ public class ContactDO extends DefaultBaseDO
     this.organization = organization;
     return this;
   }
+
+  @Column(name = "comment", length = 5000)
+  public String getComment()
+  {
+    return comment;
+  }
+
+  public ContactDO setComment(final String comment)
+  {
+    this.comment = comment;
+    return this;
+  }
+
+  @Column(length = 255)
+  public String getPositionText()
+  {
+    return positionText;
+  }
+
+  public ContactDO setPositionText(final String positionText)
+  {
+    this.positionText = positionText;
+    return this;
+  }
+
+  @Column(length = 255)
+  public String getDivision()
+  {
+    return division;
+  }
+
+  public ContactDO setDivision(final String division)
+  {
+    this.division = division;
+    return this;
+  }
+
 }
