@@ -100,6 +100,12 @@ public class ContactDO extends DefaultBaseDO
 
   private AddressStatus addressStatus = AddressStatus.UPTODATE;
 
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String publicKey; // 7000
+
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String fingerprint; // 255
+
   /**
    * Get the contact entries for this object.
    */
@@ -324,5 +330,27 @@ public class ContactDO extends DefaultBaseDO
   {
     this.addressStatus = addressStatus;
     return this;
+  }
+
+  @Column(name = "public_key", length = 7000)
+  public String getPublicKey()
+  {
+    return publicKey;
+  }
+
+  public void setPublicKey(final String publicKey)
+  {
+    this.publicKey = publicKey;
+  }
+
+  @Column(length = 255)
+  public String getFingerprint()
+  {
+    return fingerprint;
+  }
+
+  public void setFingerprint(final String fingerprint)
+  {
+    this.fingerprint = fingerprint;
   }
 }

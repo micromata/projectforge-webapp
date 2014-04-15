@@ -41,11 +41,13 @@ import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
+import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.flowlayout.FieldProperties;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.HtmlCommentPanel;
+import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 
 
 /**
@@ -133,6 +135,16 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
         AddressStatus.values());
     fs.addDropDownChoice(addressStatusProps.getModel(), addressStatusChoiceRenderer.getValues(), addressStatusChoiceRenderer).setRequired(true)
     .setNullValid(false);
+
+    // Fingerprint
+    final FieldProperties<String> fingerPrintProps = new FieldProperties<String>("address.fingerprint", new PropertyModel<String>(data, "fingerprint"));
+    fs = gridBuilder.newFieldset(fingerPrintProps);
+    fs.add(new MaxLengthTextField(fs.getTextFieldId(), fingerPrintProps.getModel()));
+
+    //Public key
+    final FieldProperties<String> publicKeyProps = new FieldProperties<String>("address.publicKey", new PropertyModel<String>(data, "publicKey"));
+    fs = gridBuilder.newFieldset(publicKeyProps);
+    fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, publicKeyProps.getModel()));// .setAutogrow();
 
     // Emails
     fs = gridBuilder.newFieldset(ContactDO.class, "emailValues").suppressLabelForWarning();
