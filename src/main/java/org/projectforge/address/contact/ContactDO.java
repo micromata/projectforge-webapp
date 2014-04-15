@@ -95,7 +95,7 @@ public class ContactDO extends DefaultBaseDO
   private List<ContactEntryDO> contacts = null;
 
   /**
-   * Get the position entries for this object.
+   * Get the contact entries for this object.
    */
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "contact")
   @IndexColumn(name = "number", base = 1)
