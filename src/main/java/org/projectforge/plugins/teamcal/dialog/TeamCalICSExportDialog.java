@@ -32,6 +32,7 @@ import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFeedHook;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.calendar.AbstractICSExportDialog;
 import org.projectforge.web.wicket.I18nParamMap;
+import org.projectforge.web.wicket.flowlayout.CheckBoxButton;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
@@ -107,7 +108,7 @@ public class TeamCalICSExportDialog extends AbstractICSExportDialog
         target.add(urlTextArea);
       }
     };
-    checkBoxesPanel.add(new CheckBoxPanel(checkBoxesPanel.newChildId(), checkBox, getString("plugins.teamcal.export.reminder.checkbox"))
+    checkBoxesPanel.add(new CheckBoxButton(checkBoxesPanel.newChildId(), checkBox, getString("plugins.teamcal.export.reminder.checkbox"))
     .setTooltip(getString("plugins.teamcal.export.reminder.checkbox.tooltip")));
   }
 

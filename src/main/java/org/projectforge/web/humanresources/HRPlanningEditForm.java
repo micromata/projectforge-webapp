@@ -70,7 +70,7 @@ import org.projectforge.web.wicket.components.JiraIssuesPanel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
-import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.CheckBoxButton;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -233,10 +233,10 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
         }
       };
       fs.add(checkBoxDiv);
-      checkBoxDiv.add(new CheckBoxPanel(checkBoxDiv.newChildId(), new PropertyModel<Boolean>(this, "showDeletedOnly"),
+      checkBoxDiv.add(new CheckBoxButton(checkBoxDiv.newChildId(), new PropertyModel<Boolean>(this, "showDeletedOnly"),
           getString("onlyDeleted")) {
         /**
-         * @see org.projectforge.web.wicket.flowlayout.CheckBoxPanel#onSelectionChanged(java.lang.Boolean)
+         * @see org.projectforge.web.wicket.flowlayout.CheckBoxButton#onSelectionChanged(java.lang.Boolean)
          */
         @Override
         protected void onSelectionChanged(final Boolean newSelection)

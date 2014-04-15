@@ -34,7 +34,7 @@ import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
-import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.CheckBoxButton;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
@@ -94,7 +94,7 @@ public class SkillTreeForm extends AbstractForm<SkillFilter, SkillTreePage>
       gridBuilder.newSplitPanel(GridSize.COL50);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).suppressLabelForWarning();
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-      checkBoxPanel.add(new MyCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "deleted"),
+      checkBoxPanel.add(new MyCheckBoxButton(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "deleted"),
           getString("deleted")).setWarning());
     }
 
@@ -210,9 +210,9 @@ public class SkillTreeForm extends AbstractForm<SkillFilter, SkillTreePage>
   }
 
   @SuppressWarnings("serial")
-  private class MyCheckBoxPanel extends CheckBoxPanel
+  private class MyCheckBoxButton extends CheckBoxButton
   {
-    public MyCheckBoxPanel(final String id, final IModel<Boolean> model, final String labelString)
+    public MyCheckBoxButton(final String id, final IModel<Boolean> model, final String labelString)
     {
       super(id, model, labelString);
     }
