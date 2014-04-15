@@ -102,7 +102,6 @@ IListPageColumnsCreator<ContactDO>
   {
     dataTable = createDataTable(createColumns(this, true), "lastUpdate", SortOrder.DESCENDING);
     form.add(dataTable);
-    //addExcelExport(getString("plugins.skillmatrix.skilltraining.attendee.menu"), getString("plugins.skillmatrix.skilltraining.attendee.menu"));
   }
 
 
