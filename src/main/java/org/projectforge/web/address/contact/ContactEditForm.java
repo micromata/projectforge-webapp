@@ -28,11 +28,13 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.address.FormOfAddress;
 import org.projectforge.address.contact.ContactDO;
 import org.projectforge.address.contact.ContactEntryDO;
 import org.projectforge.web.wicket.AbstractEditForm;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
@@ -41,6 +43,7 @@ import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.flowlayout.FieldProperties;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.HtmlCommentPanel;
 
 
 /**
@@ -71,6 +74,7 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
     super(parentPage, data);
   }
 
+  @SuppressWarnings("serial")
   @Override
   public void init()
   {
@@ -104,6 +108,13 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
     fs = gridBuilder.newFieldset(ContactDO.class, "birthday");
     fs.add(new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "birthday"), DatePanelSettings.get().withTargetType(
         java.sql.Date.class)));
+    fs.add(new HtmlCommentPanel(fs.newChildId(), new Model<String>() {
+      @Override
+      public String getObject()
+      {
+        return WicketUtils.getUTCDate("birthday", data.getBirthday());
+      }
+    }));
 
     // Emails
     emailsPanel = new EmailsPanel(fs.newChildId(), getData().getEmailValues());
