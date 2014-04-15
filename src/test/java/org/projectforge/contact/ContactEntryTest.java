@@ -64,7 +64,7 @@ public class ContactEntryTest extends TestBase
     log.debug(a1);
 
     final ContactEntryDO ae1 = new ContactEntryDO();
-    ae1.setAddress(a1);
+    ae1.setContact(a1);
     ae1.setContactType(ContactType.BUSINESS);
     ae1.setStreet("Marie-Calm-Straße 1-5");
     contactEntryDao.save(ae1);
@@ -95,7 +95,7 @@ public class ContactEntryTest extends TestBase
     contactDao.save(a1);
 
     ContactEntryDO ae1 = new ContactEntryDO();
-    ae1.setAddress(a1);
+    ae1.setContact(a1);
     ae1.setContactType(ContactType.BUSINESS);
     ae1.setStreet("Marie-Calm-Straße 1-5");
     contactEntryDao.save(ae1);
