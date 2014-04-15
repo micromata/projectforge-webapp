@@ -29,22 +29,22 @@ public class ContactEntryDao extends BaseDao<ContactEntryDO>
     super(ContactEntryDO.class);
   }
 
-
   public void setContactDao(final ContactDao contactDao)
   {
     this.contactDao = contactDao;
   }
 
   /**
-   * @param addressEntry
-   * @param address2Id If null, then address will be set to null;
+   * @param contactEntry
+   * @param contactId If null, then address will be set to null;
    * @see BaseDao#getOrLoad(Integer)
    */
-  public void setAddress(final ContactEntryDO addressEntry, final Integer address2Id)
+  public void setContact(final ContactEntryDO contactEntry, final Integer contactId)
   {
-    final ContactDO adress2 = contactDao.getOrLoad(address2Id);
-    addressEntry.setAddress(adress2);
+    final ContactDO contact = contactDao.getOrLoad(contactId);
+    contactEntry.setContact(contact);
   }
+
   /**
    * return Always true, no generic select access needed for address objects.
    * @see org.projectforge.core.BaseDao#hasSelectAccess()
@@ -63,7 +63,7 @@ public class ContactEntryDao extends BaseDao<ContactEntryDO>
   public boolean hasAccess(final PFUserDO user, final ContactEntryDO obj, final ContactEntryDO oldObj, final OperationType operationType,
       final boolean throwException)
   {
-    return accessChecker.hasPermission(user, obj.getAddressId(), AccessType.TASKS, operationType, throwException);
+    return accessChecker.hasPermission(user, obj.getContactId(), AccessType.TASKS, operationType, throwException);
   }
 
   /**
@@ -74,9 +74,9 @@ public class ContactEntryDao extends BaseDao<ContactEntryDO>
   {
     Validate.notNull(dbObj);
     Validate.notNull(obj);
-    Validate.notNull(dbObj.getAddressId());
-    Validate.notNull(obj.getAddressId());
-    if (accessChecker.hasPermission(user, obj.getAddressId(), AccessType.TASKS, OperationType.UPDATE, throwException) == false) {
+    Validate.notNull(dbObj.getContactId());
+    Validate.notNull(obj.getContactId());
+    if (accessChecker.hasPermission(user, obj.getContactId(), AccessType.TASKS, OperationType.UPDATE, throwException) == false) {
       return false;
     }
     //    if (dbObj.getAddressId().equals(obj.getAddressId()) == false) {
@@ -101,4 +101,5 @@ public class ContactEntryDao extends BaseDao<ContactEntryDO>
   {
     return new ContactEntryDO();
   }
+
 }
