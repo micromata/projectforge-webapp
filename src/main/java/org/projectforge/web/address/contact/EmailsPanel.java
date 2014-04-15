@@ -146,7 +146,9 @@ public class EmailsPanel extends Panel
       protected void onSubmit(final AjaxRequestTarget target)
       {
         super.onSubmit(target);
-        emails.add(new EmailValue().setEmail(newEmailValue.getEmail()).setContactType(newEmailValue.getContactType()));
+        if (StringUtils.isNotBlank(newEmailValue.getEmail()) == true && newEmailValue.getEmail().equals(DEFAULT_EMAIL_VALUE) == false) {
+          emails.add(new EmailValue().setEmail(newEmailValue.getEmail()).setContactType(newEmailValue.getContactType()));
+        }
         newEmailValue.setEmail(DEFAULT_EMAIL_VALUE);
         rebuildEmails();
         target.add(mainContainer);

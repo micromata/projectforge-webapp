@@ -129,7 +129,9 @@ public class PhonesPanel extends Panel
       protected void onSubmit(final AjaxRequestTarget target)
       {
         super.onSubmit(target);
-        phones.add(new PhoneValue().setNumber(newPhoneValue.getNumber()).setPhoneType(newPhoneValue.getPhoneType()));
+        if (StringUtils.isNotBlank(newPhoneValue.getNumber()) == true && newPhoneValue.getNumber().equals(DEFAULT_PHONE_VALUE) == false) {
+          phones.add(new PhoneValue().setNumber(newPhoneValue.getNumber()).setPhoneType(newPhoneValue.getPhoneType()));
+        }
         newPhoneValue.setNumber(DEFAULT_PHONE_VALUE);
         rebuildPhones();
         target.add(mainContainer);

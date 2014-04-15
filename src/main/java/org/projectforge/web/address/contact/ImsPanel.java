@@ -144,7 +144,9 @@ public class ImsPanel extends Panel
       protected void onSubmit(final AjaxRequestTarget target)
       {
         super.onSubmit(target);
-        ims.add(new InstantMessagingValue().setUser(newImValue.getUser()).setContactType(newImValue.getContactType()).setImType(newImValue.getImType()));
+        if (StringUtils.isNotBlank(newImValue.getUser()) == true && newImValue.getUser().equals(DEFAULT_IM_VALUE) == false) {
+          ims.add(new InstantMessagingValue().setUser(newImValue.getUser()).setContactType(newImValue.getContactType()).setImType(newImValue.getImType()));
+        }
         newImValue.setUser(DEFAULT_IM_VALUE);
         rebuildIms();
         target.add(mainContainer);

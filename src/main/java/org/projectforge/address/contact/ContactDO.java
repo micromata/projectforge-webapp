@@ -77,19 +77,19 @@ public class ContactDO extends DefaultBaseDO
   @DateBridge(resolution = Resolution.DAY)
   private Date birthday;
 
-  @PropertyInfo(i18nKey = "imValues")
+  @PropertyInfo(i18nKey = "contact.imValues")
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String imValues;
 
-  @PropertyInfo(i18nKey = "emailValues")
+  @PropertyInfo(i18nKey = "contact.emailValues")
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String emailValues;
 
-  @PropertyInfo(i18nKey = "phoneValues")
+  @PropertyInfo(i18nKey = "contact.phoneValues")
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String phoneValues;
 
-  @PropertyInfo(i18nKey = "menu.contactList")
+  @PropertyInfo(i18nKey = "contact.contacts")
   @PFPersistancyBehavior(autoUpdateCollectionEntries = true)
   @IndexedEmbedded(depth = 1)
   private List<ContactEntryDO> contacts = null;

@@ -117,16 +117,20 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
     }));
 
     // Emails
+    fs = gridBuilder.newFieldset(ContactDO.class, "emailValues").suppressLabelForWarning();
     emailsPanel = new EmailsPanel(fs.newChildId(), getData().getEmailValues());
     fs.add(emailsPanel);
 
     // Phones
+    fs = gridBuilder.newFieldset(ContactDO.class, "phoneValues").suppressLabelForWarning();
     fs.add(phonesPanel = new PhonesPanel(fs.newChildId(), getData().getPhoneValues()));
 
     // Instant Messaging Entries
+    fs = gridBuilder.newFieldset(ContactDO.class, "imValues").suppressLabelForWarning();
     fs.add(imsPanel = new ImsPanel(fs.newChildId(), getData().getImValues()));
 
     // Contacts
+    fs = gridBuilder.newFieldset(ContactDO.class, "contacts").suppressLabelForWarning();
     fs.add(contactEntryPanel = new ContactEntryPanel(fs.newChildId(), data, new PropertyModel<List<ContactEntryDO>>(data, "contacts")));
 
   }
