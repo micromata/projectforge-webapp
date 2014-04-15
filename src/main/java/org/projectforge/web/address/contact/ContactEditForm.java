@@ -30,6 +30,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.projectforge.address.AddressStatus;
+import org.projectforge.address.ContactStatus;
 import org.projectforge.address.FormOfAddress;
 import org.projectforge.address.contact.ContactDO;
 import org.projectforge.address.contact.ContactEntryDO;
@@ -115,6 +117,22 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
         return WicketUtils.getUTCDate("birthday", data.getBirthday());
       }
     }));
+
+    // ContactStatus
+    final FieldProperties<ContactStatus> contactStatusProps = new FieldProperties<ContactStatus>("address.contactStatus", new PropertyModel<ContactStatus>(data, "contactStatus"));
+    fs = gridBuilder.newFieldset(contactStatusProps);
+    final LabelValueChoiceRenderer<ContactStatus> contactStatusChoiceRenderer = new LabelValueChoiceRenderer<ContactStatus>(parentPage,
+        ContactStatus.values());
+    fs.addDropDownChoice(contactStatusProps.getModel(), contactStatusChoiceRenderer.getValues(), contactStatusChoiceRenderer).setRequired(true)
+    .setNullValid(false);
+
+    // AddressStatus
+    final FieldProperties<AddressStatus> addressStatusProps = new FieldProperties<AddressStatus>("address.addressStatus", new PropertyModel<AddressStatus>(data, "addressStatus"));
+    fs = gridBuilder.newFieldset(addressStatusProps);
+    final LabelValueChoiceRenderer<AddressStatus> addressStatusChoiceRenderer = new LabelValueChoiceRenderer<AddressStatus>(parentPage,
+        AddressStatus.values());
+    fs.addDropDownChoice(addressStatusProps.getModel(), addressStatusChoiceRenderer.getValues(), addressStatusChoiceRenderer).setRequired(true)
+    .setNullValid(false);
 
     // Emails
     fs = gridBuilder.newFieldset(ContactDO.class, "emailValues").suppressLabelForWarning();

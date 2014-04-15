@@ -33,6 +33,8 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
+import org.projectforge.address.AddressStatus;
+import org.projectforge.address.ContactStatus;
 import org.projectforge.address.FormOfAddress;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.DefaultBaseDO;
@@ -93,6 +95,10 @@ public class ContactDO extends DefaultBaseDO
   @PFPersistancyBehavior(autoUpdateCollectionEntries = true)
   @IndexedEmbedded(depth = 1)
   private List<ContactEntryDO> contacts = null;
+
+  private ContactStatus contactStatus = ContactStatus.ACTIVE;
+
+  private AddressStatus addressStatus = AddressStatus.UPTODATE;
 
   /**
    * Get the contact entries for this object.
@@ -294,4 +300,29 @@ public class ContactDO extends DefaultBaseDO
     return this;
   }
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "contact_status", length = 20, nullable = false)
+  public ContactStatus getContactStatus()
+  {
+    return contactStatus;
+  }
+
+  public ContactDO setContactStatus(final ContactStatus contactStatus)
+  {
+    this.contactStatus = contactStatus;
+    return this;
+  }
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "address_status", length = 20, nullable = false)
+  public AddressStatus getAddressStatus()
+  {
+    return addressStatus;
+  }
+
+  public ContactDO setAddressStatus(final AddressStatus addressStatus)
+  {
+    this.addressStatus = addressStatus;
+    return this;
+  }
 }
