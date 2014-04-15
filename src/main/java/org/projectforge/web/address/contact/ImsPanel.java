@@ -69,7 +69,7 @@ public class ImsPanel extends Panel
 
   private  InstantMessagingValue newImValue;
 
-  private final String DEFAULT_IM_VALUE = "Instant Messaging";
+  private final String DEFAULT_IM_VALUE = "Benutzer";
 
   private Component delete;
 
