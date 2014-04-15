@@ -59,15 +59,15 @@ public class ImsPanel extends Panel
 
   private List<InstantMessagingValue> ims = null;
 
-  private final RepeatingView imsRepeater;
+  private  RepeatingView imsRepeater;
 
-  private final WebMarkupContainer mainContainer, addNewImContainer;
+  private  WebMarkupContainer mainContainer, addNewImContainer;
 
-  private final LabelValueChoiceRenderer<ContactType> contactChoiceRenderer;
+  private  LabelValueChoiceRenderer<ContactType> contactChoiceRenderer;
 
-  private final LabelValueChoiceRenderer<InstantMessagingType> imChoiceRenderer;
+  private  LabelValueChoiceRenderer<InstantMessagingType> imChoiceRenderer;
 
-  private final InstantMessagingValue newImValue;
+  private  InstantMessagingValue newImValue;
 
   private final String DEFAULT_IM_VALUE = "Instant Messaging";
 
@@ -79,10 +79,21 @@ public class ImsPanel extends Panel
   public ImsPanel(final String id, final String imsXmlString)
   {
     super(id);
-    if (StringUtils.isNotBlank(imsXmlString) == true)
+    if (StringUtils.isNotBlank(imsXmlString) == true) {
       ims = contactDao.readImValues(imsXmlString);
-    if (ims == null)
+    }
+  }
+
+  /**
+   * @see org.apache.wicket.Component#onInitialize()
+   */
+  @Override
+  protected void onInitialize()
+  {
+    super.onInitialize();
+    if (ims == null) {
       ims = new ArrayList<InstantMessagingValue>();
+    }
     newImValue = new InstantMessagingValue().setUser(DEFAULT_IM_VALUE).setContactType(ContactType.BUSINESS).setImType(InstantMessagingType.AIM);
     contactChoiceRenderer = new LabelValueChoiceRenderer<ContactType>(this, ContactType.values());
     imChoiceRenderer = new LabelValueChoiceRenderer<InstantMessagingType>(this, InstantMessagingType.values());

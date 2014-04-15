@@ -58,13 +58,13 @@ public class PhonesPanel extends Panel
 
   private List<PhoneValue> phones = null;
 
-  private final RepeatingView phonesRepeater;
+  private RepeatingView phonesRepeater;
 
-  private final WebMarkupContainer mainContainer, addNewPhoneContainer;
+  private WebMarkupContainer mainContainer, addNewPhoneContainer;
 
-  private final LabelValueChoiceRenderer<PhoneType> formChoiceRenderer;
+  private LabelValueChoiceRenderer<PhoneType> formChoiceRenderer;
 
-  private final PhoneValue newPhoneValue;
+  private PhoneValue newPhoneValue;
 
   private final String DEFAULT_PHONE_VALUE = "Telefon";
 
@@ -76,10 +76,22 @@ public class PhonesPanel extends Panel
   public PhonesPanel(final String id, final String phonesXmlString)
   {
     super(id);
-    if (StringUtils.isNotBlank(phonesXmlString) == true)
+    if (StringUtils.isNotBlank(phonesXmlString) == true) {
       phones = contactDao.readPhoneValues(phonesXmlString);
-    if (phones == null)
+    }
+  }
+
+  /**
+   * @see org.apache.wicket.Component#onInitialize()
+   */
+  @Override
+  protected void onInitialize()
+  {
+    super.onInitialize();
+
+    if (phones == null) {
       phones = new ArrayList<PhoneValue>();
+    }
     newPhoneValue = new PhoneValue().setNumber(DEFAULT_PHONE_VALUE).setPhoneType(PhoneType.PRIVATE);
     formChoiceRenderer = new LabelValueChoiceRenderer<PhoneType>(this, PhoneType.values());
     mainContainer = new WebMarkupContainer("main");
