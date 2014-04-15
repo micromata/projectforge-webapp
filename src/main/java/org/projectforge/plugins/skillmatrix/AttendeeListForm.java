@@ -101,7 +101,7 @@ public class AttendeeListForm extends AbstractListForm<AttendeeFilter, AttendeeL
         @Override
         public PFUserDO getObject()
         {
-          return userGroupCache.getUser(getSearchFilter().getAttendeeId());
+          return getTenantRegistry().getUserGroupCache().getUser(getSearchFilter().getAttendeeId());
         }
 
         @Override

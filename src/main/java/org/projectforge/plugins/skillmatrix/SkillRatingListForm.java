@@ -82,7 +82,7 @@ public class SkillRatingListForm extends AbstractListForm<SkillRatingFilter, Ski
         @Override
         public PFUserDO getObject()
         {
-          return userGroupCache.getUser(getSearchFilter().getUserId());
+          return getTenantRegistry().getUserGroupCache().getUser(getSearchFilter().getUserId());
         }
 
         @Override

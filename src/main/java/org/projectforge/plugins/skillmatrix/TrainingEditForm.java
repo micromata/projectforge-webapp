@@ -36,7 +36,7 @@ import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.IValidator;
 import org.apache.wicket.validation.ValidationError;
 import org.projectforge.user.GroupDO;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.common.MultiChoiceListHelper;
 import org.projectforge.web.user.GroupsComparator;
@@ -136,7 +136,7 @@ public class TrainingEditForm extends AbstractEditForm<TrainingDO, TrainingEditP
         {
           @SuppressWarnings("unchecked")
           final ArrayList<GroupDO> groups = (ArrayList<GroupDO>) validatable.getValue();
-          final Collection<Integer> curUserGroupIds = userDao.getAssignedGroups(PFUserContext.getUser());
+          final Collection<Integer> curUserGroupIds = userDao.getAssignedGroups(ThreadLocalUserContext.getUser());
 
           boolean isInUserGroups = false;
           for (final GroupDO group: groups) {

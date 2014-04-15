@@ -28,7 +28,7 @@ import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.NumberHelper;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
@@ -142,7 +142,7 @@ public class SkillEditPage extends AbstractEditPage<SkillDO, SkillEditForm, Skil
   {
     if (isNew() == false) {
 
-      final Integer[] curUserGroupIds = userDao.getAssignedGroups(PFUserContext.getUser()).toArray(new Integer[0]);
+      final Integer[] curUserGroupIds = userDao.getAssignedGroups(ThreadLocalUserContext.getUser()).toArray(new Integer[0]);
       final Integer id = form.getData().getId();
 
       final Integer[] fullAccessGroupIds = form.skillRight.getFullAccessGroupIds(getData());
