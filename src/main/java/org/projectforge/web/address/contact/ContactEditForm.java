@@ -24,16 +24,13 @@
 package org.projectforge.web.address.contact;
 
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.FormOfAddress;
 import org.projectforge.address.contact.ContactDO;
-import org.projectforge.address.contact.ContactDao;
 import org.projectforge.address.contact.ContactEntryDO;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.bootstrap.GridSize;
@@ -57,14 +54,13 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
 
   private static final Logger log = Logger.getLogger(ContactEditForm.class);
 
-  @SpringBean(name = "contactDao")
-  private ContactDao contactDao;
-
   private EmailsPanel emailsPanel;
 
   private PhonesPanel phonesPanel;
 
   private ImsPanel imsPanel;
+
+  private ContactEntryPanel contactEntryPanel;
 
   /**
    * @param parentPage
@@ -110,17 +106,17 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
         java.sql.Date.class)));
 
     // Emails
-    emailsPanel = new EmailsPanel(fs.newChildId(), new PropertyModel<String>(data, "emailValues"));
+    emailsPanel = new EmailsPanel(fs.newChildId(), getData().getEmailValues());
     fs.add(emailsPanel);
 
     // Phones
     fs.add(phonesPanel = new PhonesPanel(fs.newChildId(), getData().getPhoneValues()));
 
-    // Instant Messaging Entrys
+    // Instant Messaging Entries
     fs.add(imsPanel = new ImsPanel(fs.newChildId(), getData().getImValues()));
 
-    final List<ContactEntryDO> entrys = new ArrayList<ContactEntryDO>();
-    fs.add(new ContactEntryPanel(fs.newChildId(), entrys));
+    // Contacts
+    fs.add(contactEntryPanel = new ContactEntryPanel(fs.newChildId(), data, new PropertyModel<List<ContactEntryDO>>(data, "contacts")));
 
   }
 
@@ -148,5 +144,9 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
     return imsPanel;
   }
 
+  public ContactEntryPanel getContactEntryPanel()
+  {
+    return contactEntryPanel;
+  }
 
 }
