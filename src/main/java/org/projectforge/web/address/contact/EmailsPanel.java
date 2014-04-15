@@ -31,7 +31,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
-import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -67,8 +66,6 @@ public class EmailsPanel extends Panel
   private EmailValue newEmailValue;
 
   private final String DEFAULT_EMAIL_VALUE = "E-Mail";
-
-  private String emailsXmlString;
 
   private Component delete;
 
@@ -111,21 +108,6 @@ public class EmailsPanel extends Panel
   public String getEmailsAsXmlString()
   {
     return contactDao.getEmailValuesAsXml(emails);
-  }
-
-  private String getEmailsXmlString()
-  {
-    return emailsXmlString;
-  }
-
-  /**
-   * @see org.apache.wicket.Component#onComponentTag(org.apache.wicket.markup.ComponentTag)
-   */
-  @Override
-  protected void onComponentTag(final ComponentTag tag)
-  {
-    tag.put("value", getEmailsXmlString());
-    super.onComponentTag(tag);
   }
 
   @SuppressWarnings("serial")
