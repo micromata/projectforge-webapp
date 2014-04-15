@@ -20,6 +20,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
@@ -39,7 +40,9 @@ public class ContactEntryDO extends DefaultBaseDO
 
   //private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ContactEntryDO.class);
 
-  private ContactDO address;
+  private short number;
+
+  private ContactDO contact;
 
   @PropertyInfo(i18nKey = "contactType")
   @Enumerated(EnumType.STRING)
@@ -70,24 +73,25 @@ public class ContactEntryDO extends DefaultBaseDO
    * Not used as object due to performance reasons.
    * @return
    */
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "address_id", nullable = false)
-  public ContactDO getAddress()
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "contact_id", nullable = false)
+  public ContactDO getContact()
   {
-    return address;
+    return contact;
   }
 
-  public void setAddress(final ContactDO address)
+  public ContactEntryDO setContact(final ContactDO contact)
   {
-    this.address = address;
+    this.contact = contact;
+    return this;
   }
 
   @Transient
-  public Integer getAddressId()
+  public Integer getContactId()
   {
-    if (this.address == null)
+    if (this.contact == null)
       return null;
-    return address.getId();
+    return contact.getId();
   }
 
   @Enumerated(EnumType.STRING)
@@ -196,17 +200,42 @@ public class ContactEntryDO extends DefaultBaseDO
     return this;
   }
 
+
+  public short getNumber()
+  {
+    return number;
+  }
+
+  public ContactEntryDO setNumber(final short number)
+  {
+    this.number = number;
+    return this;
+  }
+
   @Override
   public boolean equals(final Object o)
   {
     if (o instanceof ContactEntryDO) {
       final ContactEntryDO other = (ContactEntryDO) o;
-      if (ObjectUtils.equals(this.getContactType(), other.getContactType()) == false)
+      if (ObjectUtils.equals(this.getNumber(), other.getNumber()) == false) {
         return false;
-      if (ObjectUtils.equals(this.getId(), other.getId()) == false)
+      }
+      if (ObjectUtils.equals(this.getContactId(), other.getContactId()) == false) {
         return false;
+      }
       return true;
     }
     return false;
+  }
+
+  @Override
+  public int hashCode()
+  {
+    final HashCodeBuilder hcb = new HashCodeBuilder();
+    hcb.append(getNumber());
+    if (getContact() != null) {
+      hcb.append(getContact().getId());
+    }
+    return hcb.toHashCode();
   }
 }
