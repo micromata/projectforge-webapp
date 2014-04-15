@@ -24,30 +24,19 @@
 package org.projectforge.web.address.contact;
 
 
-import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.projectforge.address.AddressStatus;
-import org.projectforge.address.ContactStatus;
-import org.projectforge.address.FormOfAddress;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.contact.ContactDO;
+import org.projectforge.address.contact.ContactDao;
 import org.projectforge.address.contact.ContactEntryDO;
+import org.projectforge.address.contact.PersonalContactDao;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridSize;
-import org.projectforge.web.wicket.components.DatePanel;
-import org.projectforge.web.wicket.components.DatePanelSettings;
-import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
-import org.projectforge.web.wicket.components.MaxLengthTextArea;
-import org.projectforge.web.wicket.components.MaxLengthTextField;
-import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
-import org.projectforge.web.wicket.flowlayout.FieldProperties;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.HtmlCommentPanel;
-import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 
 
 /**
@@ -69,6 +58,14 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
 
   private ContactEntryPanel contactEntryPanel;
 
+  @SpringBean(name = "personalContactDao")
+  private PersonalContactDao personalContactDao;
+
+  protected ContactPageSupport contactEditSupport;
+
+  @SpringBean(name = "contactDao")
+  private ContactDao contactDao;
+
   /**
    * @param parentPage
    * @param data
@@ -78,90 +75,48 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
     super(parentPage, data);
   }
 
-  @SuppressWarnings("serial")
   @Override
   public void init()
   {
     super.init();
+    contactEditSupport = new ContactPageSupport(this, gridBuilder, (ContactDao) getBaseDao(), personalContactDao, data);
 
     gridBuilder.newSplitPanel(GridSize.COL75);
 
-    // name
-    FieldsetPanel fs = gridBuilder.newFieldset(ContactDO.class, "name");
-    final RequiredMaxLengthTextField name = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
-        "name"));
-    fs.add(name);
+    contactEditSupport.addName();
+    contactEditSupport.addFirstName();
+    final FieldsetPanel fs = (FieldsetPanel)contactEditSupport.addFormOfAddress();
+    final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+    checkBoxPanel.addCheckBox(new PropertyModel<Boolean>(contactEditSupport.personalContact, "favoriteCard"), getString("favorite"),
+        getString("address.tooltip.vCardList"));
+    contactEditSupport.addTitle();
+    contactEditSupport.addOrganization();
+    contactEditSupport.addWebsite();
 
-    // firstname
-    fs = gridBuilder.newFieldset(ContactDO.class, "firstname");
-    final MaxLengthTextField firstname = new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "firstname"));
-    fs.add(firstname);
+    contactEditSupport.addBirthday();
+    contactEditSupport.addLanguage();
+    contactEditSupport.addContactStatus();
+    contactEditSupport.addAddressStatus();
 
-    // form
-    final FieldProperties<FormOfAddress> props = new FieldProperties<FormOfAddress>("address.form", new PropertyModel<FormOfAddress>(data, "form"));
-    fs = gridBuilder.newFieldset(props);
-    final LabelValueChoiceRenderer<FormOfAddress> formChoiceRenderer = new LabelValueChoiceRenderer<FormOfAddress>(parentPage, FormOfAddress.values());
-    fs.addDropDownChoice(props.getModel(), formChoiceRenderer.getValues(), formChoiceRenderer).setRequired(true).setNullValid(false);
-
-    // title
-    fs = gridBuilder.newFieldset(ContactDO.class, "title");
-    final MaxLengthTextField title = new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "title"));
-    fs.add(title);
-
-    // birthday
-    fs = gridBuilder.newFieldset(ContactDO.class, "birthday");
-    fs.add(new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "birthday"), DatePanelSettings.get().withTargetType(
-        java.sql.Date.class)));
-    fs.add(new HtmlCommentPanel(fs.newChildId(), new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return WicketUtils.getUTCDate("birthday", data.getBirthday());
-      }
-    }));
-
-    // ContactStatus
-    final FieldProperties<ContactStatus> contactStatusProps = new FieldProperties<ContactStatus>("address.contactStatus", new PropertyModel<ContactStatus>(data, "contactStatus"));
-    fs = gridBuilder.newFieldset(contactStatusProps);
-    final LabelValueChoiceRenderer<ContactStatus> contactStatusChoiceRenderer = new LabelValueChoiceRenderer<ContactStatus>(parentPage,
-        ContactStatus.values());
-    fs.addDropDownChoice(contactStatusProps.getModel(), contactStatusChoiceRenderer.getValues(), contactStatusChoiceRenderer).setRequired(true)
-    .setNullValid(false);
-
-    // AddressStatus
-    final FieldProperties<AddressStatus> addressStatusProps = new FieldProperties<AddressStatus>("address.addressStatus", new PropertyModel<AddressStatus>(data, "addressStatus"));
-    fs = gridBuilder.newFieldset(addressStatusProps);
-    final LabelValueChoiceRenderer<AddressStatus> addressStatusChoiceRenderer = new LabelValueChoiceRenderer<AddressStatus>(parentPage,
-        AddressStatus.values());
-    fs.addDropDownChoice(addressStatusProps.getModel(), addressStatusChoiceRenderer.getValues(), addressStatusChoiceRenderer).setRequired(true)
-    .setNullValid(false);
-
-    // Fingerprint
-    final FieldProperties<String> fingerPrintProps = new FieldProperties<String>("address.fingerprint", new PropertyModel<String>(data, "fingerprint"));
-    fs = gridBuilder.newFieldset(fingerPrintProps);
-    fs.add(new MaxLengthTextField(fs.getTextFieldId(), fingerPrintProps.getModel()));
-
-    //Public key
-    final FieldProperties<String> publicKeyProps = new FieldProperties<String>("address.publicKey", new PropertyModel<String>(data, "publicKey"));
-    fs = gridBuilder.newFieldset(publicKeyProps);
-    fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, publicKeyProps.getModel()));// .setAutogrow();
+    contactEditSupport.addFingerPrint();
+    contactEditSupport.addPublicKey();
 
     // Emails
-    fs = gridBuilder.newFieldset(ContactDO.class, "emailValues").suppressLabelForWarning();
+    FieldsetPanel fs2 = gridBuilder.newFieldset(ContactDO.class, "emailValues").suppressLabelForWarning();
     emailsPanel = new EmailsPanel(fs.newChildId(), getData().getEmailValues());
-    fs.add(emailsPanel);
+    fs2.add(emailsPanel);
 
     // Phones
-    fs = gridBuilder.newFieldset(ContactDO.class, "phoneValues").suppressLabelForWarning();
-    fs.add(phonesPanel = new PhonesPanel(fs.newChildId(), getData().getPhoneValues()));
+    fs2 = gridBuilder.newFieldset(ContactDO.class, "phoneValues").suppressLabelForWarning();
+    fs2.add(phonesPanel = new PhonesPanel(fs.newChildId(), getData().getPhoneValues()));
 
     // Instant Messaging Entries
-    fs = gridBuilder.newFieldset(ContactDO.class, "imValues").suppressLabelForWarning();
-    fs.add(imsPanel = new ImsPanel(fs.newChildId(), getData().getImValues()));
+    fs2 = gridBuilder.newFieldset(ContactDO.class, "imValues").suppressLabelForWarning();
+    fs2.add(imsPanel = new ImsPanel(fs.newChildId(), getData().getImValues()));
 
     // Contacts
-    fs = gridBuilder.newFieldset(ContactDO.class, "contacts").suppressLabelForWarning();
-    fs.add(contactEntryPanel = new ContactEntryPanel(fs.newChildId(), data, new PropertyModel<List<ContactEntryDO>>(data, "contacts")));
+    fs2 = gridBuilder.newFieldset(ContactDO.class, "contacts").suppressLabelForWarning();
+    fs2.add(contactEntryPanel = new ContactEntryPanel(fs.newChildId(), data, new PropertyModel<List<ContactEntryDO>>(data, "contacts")));
 
   }
 

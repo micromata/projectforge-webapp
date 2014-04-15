@@ -59,6 +59,7 @@ class HibernateCoreEntities
     org.projectforge.address.PersonalAddressDO.class, //
     org.projectforge.address.contact.ContactDO.class, //
     org.projectforge.address.contact.ContactEntryDO.class, //
+    org.projectforge.address.contact.PersonalContactDO.class, //
     org.projectforge.book.BookDO.class, //
     org.projectforge.core.ConfigurationDO.class, //
     org.projectforge.database.DatabaseUpdateDO.class, //

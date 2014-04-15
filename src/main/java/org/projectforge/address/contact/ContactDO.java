@@ -12,6 +12,7 @@ package org.projectforge.address.contact;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -106,6 +107,14 @@ public class ContactDO extends DefaultBaseDO
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String fingerprint; // 255
 
+  private Locale communicationLanguage;
+
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String website; // 255
+
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String organization; // 255
+
   /**
    * Get the contact entries for this object.
    */
@@ -177,12 +186,12 @@ public class ContactDO extends DefaultBaseDO
   }
 
   @Column(name = "first_name", length = 255)
-  public String getFirstname()
+  public String getFirstName()
   {
     return firstname;
   }
 
-  public ContactDO setFirstname(final String firstname)
+  public ContactDO setFirstName(final String firstname)
   {
     this.firstname = firstname;
     return this;
@@ -203,8 +212,8 @@ public class ContactDO extends DefaultBaseDO
     if (getTitle() != null) {
       buf.append(getTitle()).append(" ");
     }
-    if (getFirstname() != null) {
-      buf.append(getFirstname()).append(" ");
+    if (getFirstName() != null) {
+      buf.append(getFirstName()).append(" ");
     }
     if (getName() != null) {
       buf.append(getName());
@@ -338,9 +347,10 @@ public class ContactDO extends DefaultBaseDO
     return publicKey;
   }
 
-  public void setPublicKey(final String publicKey)
+  public ContactDO setPublicKey(final String publicKey)
   {
     this.publicKey = publicKey;
+    return this;
   }
 
   @Column(length = 255)
@@ -349,8 +359,48 @@ public class ContactDO extends DefaultBaseDO
     return fingerprint;
   }
 
-  public void setFingerprint(final String fingerprint)
+  public ContactDO setFingerprint(final String fingerprint)
   {
     this.fingerprint = fingerprint;
+    return this;
+  }
+
+  /**
+   * @return The communication will take place in this language.
+   */
+  @Column(name = "communication_language")
+  public Locale getCommunicationLanguage()
+  {
+    return communicationLanguage;
+  }
+
+  public ContactDO setCommunicationLanguage(final Locale communicationLanguage)
+  {
+    this.communicationLanguage = communicationLanguage;
+    return this;
+  }
+
+  @Column(length = 255)
+  public String getWebsite()
+  {
+    return website;
+  }
+
+  public ContactDO setWebsite(final String website)
+  {
+    this.website = website;
+    return this;
+  }
+
+  @Column(length = 255)
+  public String getOrganization()
+  {
+    return organization;
+  }
+
+  public ContactDO setOrganization(final String organization)
+  {
+    this.organization = organization;
+    return this;
   }
 }

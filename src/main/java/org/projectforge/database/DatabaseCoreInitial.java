@@ -29,6 +29,7 @@ import org.projectforge.address.AddressDO;
 import org.projectforge.address.PersonalAddressDO;
 import org.projectforge.address.contact.ContactDO;
 import org.projectforge.address.contact.ContactEntryDO;
+import org.projectforge.address.contact.PersonalContactDO;
 import org.projectforge.book.BookDO;
 import org.projectforge.common.DatabaseDialect;
 import org.projectforge.continuousdb.DatabaseUpdateDao;
@@ -111,7 +112,7 @@ public class DatabaseCoreInitial
 
         // All the rest:
         AddressDO.class, PersonalAddressDO.class, //
-        ContactDO.class, ContactEntryDO.class, //
+        ContactDO.class, ContactEntryDO.class, PersonalContactDO.class, //
         BookDO.class, //
         ConfigurationDO.class, //
         DatabaseUpdateDO.class, //

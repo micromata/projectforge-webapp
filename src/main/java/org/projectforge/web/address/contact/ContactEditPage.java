@@ -43,7 +43,7 @@ public class ContactEditPage extends AbstractEditPage<ContactDO, ContactEditForm
 
   private static final Logger log = Logger.getLogger(ContactEditPage.class);
 
-  public static final String I18N_KEY_PREFIX = "contact";
+  public static final String I18N_KEY_PREFIX = "address";
 
   @SpringBean(name = "contactDao")
   private ContactDao contactDao;

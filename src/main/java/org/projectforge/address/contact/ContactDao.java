@@ -10,6 +10,7 @@
 package org.projectforge.address.contact;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.lang.Validate;
 //import org.apache.poi.ss.formula.functions.T;
@@ -206,4 +207,12 @@ public class ContactDao extends BaseDao<ContactDO>
     return phoneConverter.getValuesAsXml(values);
   }
 
+  public List<Locale> getUsedCommunicationLanguages()
+  {
+    @SuppressWarnings("unchecked")
+    final List<Locale> list = getHibernateTemplate()
+    .find(
+        "select distinct a.communicationLanguage from ContactDO a where deleted=false and a.communicationLanguage is not null order by a.communicationLanguage");
+    return list;
+  }
 }
