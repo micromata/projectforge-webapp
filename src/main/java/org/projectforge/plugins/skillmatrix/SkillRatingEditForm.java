@@ -31,7 +31,12 @@ import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.common.NumberHelper;
+import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ThreadLocalUserContext;
+import org.projectforge.user.UserDao;
+import org.projectforge.user.UserRights;
+import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
@@ -57,16 +62,24 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
 
   public static final String I18N_KEY_ERROR_SKILL_NOT_FOUND = "plugins.skillmatrix.error.skillNotFound";
 
+  public static final String PARAM_SKILL_ID = "skillId";
+
   @SpringBean(name = "skillDao")
   private SkillDao skillDao;
 
   @SpringBean(name = "skillRatingDao")
   private SkillRatingDao skillRatingDao;
 
+  @SpringBean(name = "userDao")
+  private UserDao userDao;
+
   // For AjaxRequest in skill and skill rating
   private FieldsetPanel fs;
 
   private final FormComponent< ? >[] dependentFormComponents = new FormComponent[2];
+
+  private boolean isUserInFullAccessGroup;
+
 
   /**
    * @param parentPage
@@ -83,6 +96,28 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
   protected void init()
   {
     super.init();
+
+    final Integer[] curUserGroupIds = userDao.getAssignedGroups(ThreadLocalUserContext.getUser()).toArray(new Integer[0]);
+    SkillDO skill = null;
+    if (isNew() == false) {
+      skill = getData().getSkill();
+    } else if (NumberHelper.greaterZero(this.getParentPage().skillId) == true) {
+      skill = skillDao.getById(this.getParentPage().skillId);
+    }
+
+    isUserInFullAccessGroup = false;
+    if (skill != null) {
+      final Integer[] fullAccessGroupIds =  ((SkillRight) UserRights.instance().getRight(SkillDao.USER_RIGHT_ID)).getFullAccessGroupIds(skill);
+      loop:
+        for (final Integer i: curUserGroupIds) {
+          for (final Integer j : fullAccessGroupIds) {
+            if (i == j) {
+              isUserInFullAccessGroup = true;
+              break loop;
+            }
+          }
+        }
+    }
 
     add(new IFormValidator() {
 
@@ -110,10 +145,18 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
     gridBuilder.newGridPanel();
     {
       // User
-      final FieldsetPanel fs = gridBuilder.newFieldset(SkillRatingDO.class, "user").suppressLabelForWarning();
-      final DivTextPanel username = new DivTextPanel(fs.newChildId(), data.getUser().getUsername());
-      username.setStrong();
-      fs.add(username);
+      final FieldsetPanel fs = gridBuilder.newFieldset(SkillRatingDO.class, "user");
+      if ( isUserInFullAccessGroup == false) {
+        data.setUser(ThreadLocalUserContext.getUser());
+        final DivTextPanel username = new DivTextPanel(fs.newChildId(), data.getUser().getUsername());
+        username.setStrong();
+        fs.add(username);
+      } else {
+        final UserSelectPanel attendeeSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(data, "user"),
+            parentPage, "userId");
+        attendeeSelectPanel.init();
+        fs.add(attendeeSelectPanel.setFocus().setRequired(true));
+      }
     }
     gridBuilder.newGridPanel();
     {
@@ -122,7 +165,7 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
       final SkillSelectPanel skillSelectPanel = new SkillSelectPanel(fs, new PropertyModel<SkillDO>(data, "skill"), parentPage,
           "skillId") {
         @Override
-        protected void onModelSelected(AjaxRequestTarget target, SkillDO skill)
+        protected void onModelSelected(final AjaxRequestTarget target, final SkillDO skill)
         {
           super.onModelSelected(target, skill);
           if (target != null) {

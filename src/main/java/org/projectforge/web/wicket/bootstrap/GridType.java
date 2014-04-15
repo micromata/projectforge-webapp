@@ -31,9 +31,9 @@ import org.projectforge.common.StringHelper;
  */
 public enum GridType
 {
-  CONTAINER("container"), CONTAINER_FLUID("container-fluid"), FIRST("first"), HAS_CHILDS("has-childs"), HAS_SIBLINGS("has-siblings"), NOT_FIRST(
-      "not-first"), OFFSET1("offset1"), OFFSET2("offste2"), OFFSET3("offset3"), ROW("row"), ROW_FLUID("row-fluid"), ROW_HAS_CHILDS(
-          "has-sub-rows");
+  CONTAINER("container"),CONTAINER_FLUID("container-fluid"), FIRST("first"), HAS_CHILDS("has-childs"), HAS_SIBLINGS("has-siblings"), NOT_FIRST("not-first"), //
+  OFFSET1("col-md-offset-1"), OFFSET2("col-md-offset-2"), OFFSET3("col-md-offset-3"), //
+  ROW("row"), ROW_HAS_CHILDS("has-sub-rows");
 
   private String classAttrValue;
 

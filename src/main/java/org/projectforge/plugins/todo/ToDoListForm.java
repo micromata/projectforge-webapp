@@ -139,18 +139,18 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
   @Override
   protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
   {
-    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxButton(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
         getSearchFilter(), "opened"), getString(ToDoStatus.OPENED.getI18nKey())));
-    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxButton(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
         getSearchFilter(), "reopened"), getString(ToDoStatus.RE_OPENED.getI18nKey())));
-    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxButton(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
         getSearchFilter(), "inprogress"), getString(ToDoStatus.IN_PROGRESS.getI18nKey())));
-    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxButton(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
         getSearchFilter(), "closed"), getString(ToDoStatus.CLOSED.getI18nKey())));
-    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxButton(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(
         getSearchFilter(), "postponed"), getString(ToDoStatus.POSTPONED.getI18nKey())));
     optionsCheckBoxesPanel
-    .add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(),
+    .add(createAutoRefreshCheckBoxButton(optionsCheckBoxesPanel.newChildId(),
         new PropertyModel<Boolean>(getSearchFilter(), "onlyRecent"), getString("plugins.todo.status.onlyRecent"),
         getString("plugins.todo.status.onlyRecent.tooltip")));
   }

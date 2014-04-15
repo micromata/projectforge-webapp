@@ -25,7 +25,6 @@ package org.projectforge.web;
 
 import java.util.Map;
 
-import org.apache.wicket.Session;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.junit.AfterClass;
@@ -41,7 +40,6 @@ import org.projectforge.web.mobile.LoginMobilePage;
 import org.projectforge.web.registry.WebRegistry;
 import org.projectforge.web.scripting.ScriptExecutePage;
 import org.projectforge.web.wicket.MessagePage;
-import org.projectforge.web.wicket.MySession;
 import org.projectforge.web.wicket.WicketPageTestBase;
 
 public class CallAllPagesTest extends WicketPageTestBase
@@ -67,9 +65,7 @@ public class CallAllPagesTest extends WicketPageTestBase
   @Test
   public void testAllMountedPages()
   {
-    testAllMountedPages(BrowserScreenWidthType.NARROW);
-    testAllMountedPages(BrowserScreenWidthType.NORMAL);
-    testAllMountedPages(BrowserScreenWidthType.WIDE);
+    _testAllMountedPages();
     testPage(LoginPage.class);
     testPage(LoginMobilePage.class);
     clearDatabase();
@@ -77,11 +73,10 @@ public class CallAllPagesTest extends WicketPageTestBase
     testPage(SetupPage.class);
   }
 
-  private void testAllMountedPages(final BrowserScreenWidthType browserScreenWidthType)
+  private void _testAllMountedPages()
   {
-    log.info("Test all web pages with resolution '" + browserScreenWidthType + "'.");
+    log.info("Test all web pages with.");
     login(TestBase.TEST_FULL_ACCESS_USER, TestBase.TEST_FULL_ACCESS_USER_PASSWORD);
-    ((MySession) Session.get()).setBrowserScreenWidthType(browserScreenWidthType);
     final SystemInfoCache systemInfoCache = TestConfiguration.getConfiguration().getBean("systemInfoCache", SystemInfoCache.class);
     SystemInfoCache.internalInitialize(systemInfoCache);
     final Map<String, Class< ? extends WebPage>> pages = WebRegistry.instance().getMountPages();

@@ -3,7 +3,7 @@
 // e. g. FontAwesome doesn't work.
 
 @import "bootstrap/bootstrap";
-@import "bootstrap/responsive";
+// @import "bootstrap/responsive";
 
 
 @import "table-css";
@@ -46,12 +46,12 @@ div.controls input, div.controls textarea {
 	padding-right: 4px;
 }
 label {
-	margin-top: 4px;
+	// margin-top: 4px;
 }
 .dropdown-menu li > a {
 	padding: 3px 24px 3px 10px;
 }
-/* Adressen Eingabefelder rutschen bei bei schmalem Bildschirm untereinander. */ 
+/* Adressen Eingabefelder rutschen bei bei schmalem Bildschirm untereinander. */
 label.control-label {
 	position: relative;
 	float: left;
@@ -64,6 +64,7 @@ div.controls {
 div.control-group {
 	clear:left;
 	padding-left: 10px;
+  padding-bottom: 14px;
 }
 
 form input.phone{
@@ -111,13 +112,13 @@ ul.nav-pills > li > a {
   padding-bottom: 3px;
   margin-top: 2px;
   margin-bottom: 2px;
-  .border-radius(5px);
+  // .border-radius(5px);
   color:@navbarText;
   background:#f0f0f0;
   border: 1px solid @navbarBorder;
-  .border-radius(@baseBorderRadius);
+  // .border-radius(@baseBorderRadius);
   .box-shadow(0 1px 4px rgba(0,0,0,.065));
-  
+
 }
 ul.nav-pills > li > a:hover {
 	color: @grayDark;
@@ -131,6 +132,17 @@ ul.nav-pills > .active > a:hover {
 
 /* Submenu nach unten ausklappen*/
 @media (max-width: 879px) {
+// @media (max-width: 767px) {
+  #pf_sortablecontainer{
+    width: auto!important;
+  }
+  .navbar-search.pull-left,
+  .navbar-nav.pull-right {
+    float: none!important
+  }
+  .navbar-collapse {
+    max-height: none!important;
+  }
 	// Sub menus
 	// ---------------------------
 	ul.dropdown-menu li.dropdown-submenu ul.dropdown-menu {
@@ -184,20 +196,20 @@ ul.nav-pills > .active > a:hover {
 		padding-right: 5px;
 		padding-bottom: 5px;
 	}
-	.nav-collapse .dropdown-menu {
+	.navbar-collapse .dropdown-menu {
 		margin:0;
 		height:0;
 	}
-	.nav-collapse li:hover .dropdown-menu {
+	.navbar-collapse li:hover .dropdown-menu {
 		/*height:auto;*/
 		height:0;
 		display:none;
 		visibility:hidden;
 	}
-	.nav-collapse li.mm_open:hover > .dropdown-menu,
-	.nav-collapse li.mm_open > .dropdown-menu,
-	.nav-collapse li.open:hover > .dropdown-menu,
-	.nav-collapse li.open > .dropdown-menu {
+	.navbar-collapse li.mm_open:hover > .dropdown-menu,
+	.navbar-collapse li.mm_open > .dropdown-menu,
+	.navbar-collapse li.open:hover > .dropdown-menu,
+	.navbar-collapse li.open > .dropdown-menu {
 		height:auto;
 		display:block;
 		visibility:visible;
@@ -207,17 +219,192 @@ ul.nav-pills > .active > a:hover {
 		display: block;
 		visibility: visible;
 	}
-	.nav-collapse .nav > li > a, .nav-collapse .dropdown-menu a {
+	.navbar-collapse .nav > li > a, .navbar-collapse .dropdown-menu a {
 		padding: 2px 15px;
 	}
-	.nav-collapse ul.dropdown-menu > .dropdown-submenu > a {
+	.navbar-collapse ul.dropdown-menu > .dropdown-submenu > a {
 		padding: 2px 15px;
-	} 
-	.nav-collapse ul.dropdown-menu ul.dropdown-menu a {
+	}
+	.navbar-collapse ul.dropdown-menu ul.dropdown-menu a {
 		padding: 2px 25px;
 	}
   .navbar .nav.pf_menueconfig,
   #pf_newentry{
       display:none;
     }
+
+// COLLAPSIBLE NAVBAR
+// ------------------
+// Nav collapse clears brand
+  .navbar-collapse {
+    clear: both;
+  }
+// Block-level the nav
+  .navbar-collapse .nav {
+    float: none;
+    // margin: 0 0 (@baseLineHeight / 2);
+  }
+  .navbar-collapse .nav > li {
+    float: none;
+  }
+  .navbar-collapse .nav > li > a {
+    margin-bottom: 2px;
+  }
+  .navbar-collapse .nav > .divider-vertical {
+    display: none;
+  }
+  .navbar-collapse .nav .nav-header {
+    color: @navbarText;
+    text-shadow: none;
+  }
+// Nav and dropdown links in navbar
+  .navbar-collapse .nav > li > a,
+  .navbar-collapse .dropdown-menu a {
+    padding: 9px 15px;
+    font-weight: bold;
+    // color: @navbarLinkColor;
+  }
+// Buttons
+  .navbar-collapse .btn {
+    padding: 4px 10px 4px;
+    font-weight: normal;
+  }
+  .navbar-collapse .dropdown-menu li + li a {
+    margin-bottom: 2px;
+  }
+// Buttons in the navbar
+  .navbar-collapse.in .btn-group {
+    margin-top: 5px;
+    padding: 0;
+  }
+// Dropdowns in the navbar
+  .navbar-collapse .dropdown-menu {
+    position: static;
+    top: auto;
+    left: auto;
+    float: none;
+    display: none;
+    max-width: none;
+    margin: 0 15px;
+    padding: 0;
+    background-color: transparent;
+    border: none;
+    .box-shadow(none);
+  }
+  .navbar-collapse .open > .dropdown-menu {
+    display: block;
+  }
+
+  .navbar-collapse .dropdown-menu:before,
+  .navbar-collapse .dropdown-menu:after {
+    display: none;
+  }
+  .navbar-collapse .dropdown-menu .divider {
+    display: none;
+  }
+  .navbar-collapse .nav > li > .dropdown-menu {
+    &:before,
+    &:after {
+      display: none;
+    }
+  }
+// Forms in navbar
+  .navbar-collapse .navbar-form,
+  .navbar-collapse .navbar-search {
+    float: none;
+    .box-shadow(~"inset 0 1px 0 rgba(255,255,255,.1), 0 1px 0 rgba(255,255,255,.1)");
+  }
+// Pull right (secondary) nav content
+  .navbar .navbar-collapse .nav.pull-right {
+    float: none;
+    margin-left: 0;
+  }
+// Hide everything in the navbar save .brand and toggle button */
+  .navbar-collapse,
+  .navbar-collapse.collapse {
+    overflow: hidden;
+    height: 0;
+  }
+// Navbar button
+  .navbar .btn-navbar {
+    display: block;
+  }
+
+// STATIC NAVBAR
+// -------------
+  .navbar-static .navbar-inner {
+    padding-left:  10px;
+    padding-right: 10px;
+  }
+}
+// Bootstrap3 Update
+
+// Navbar search
+// -------------------------
+.navbar-search {
+  position: relative;
+  float: left;
+  margin-bottom: 0;
+  .search-query {
+    margin-bottom: 0;
+    padding: 4px 14px;
+    border-radius:15px;
+    border-width:1px;
+    margin-top: 12px;
+  }
+}
+.container-fluid .row {
+  margin-left:0;
+  margin-right:0;
+}
+.breadcrumb > li + li:before {
+  content: "";
+  padding: 0;
+  color: transparent;
+}
+.breadcrumb > li {
+  vertical-align: top;
+  line-height: 26px;
+}
+.dropdown-menu {
+  font-size: 12px;
+}
+.dropdown-menu > li > a {
+  color: #777;
+}
+.navbar-collapse .dropdown-menu a {
+  padding: 4px 10px;
+  line-height: 20px;
+}
+.navActionBar {
+  padding: 0;
+  list-style: none;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  margin: 0 7px 10px;
+}
+.navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:hover, .navbar-default .navbar-nav > .open > a:focus,
+.nav .open > a, .nav .open > a:hover, .nav .open > a:focus {
+  background: transparent;
+}
+.navbar-nav .open .dropdown-menu > li > a, .navbar-nav .open .dropdown-menu .dropdown-header {
+  padding: 4px 10px;
+}
+//Buttons
+[data-toggle='buttons'] .btn-primary {
+  font-weight: normal;
+  display: block;
+  line-height: normal;
+  color: #aaaaaa;
+  font-size: 90%;
+  border: 1px solid #d3d3d3;
+  background: #e6e6e6 url(../../images/ui-bg_glass_75_e6e6e6_1x400.png) 50% 50% repeat-x;
+  font-weight: normal;
+  padding: 3px 4px 4px;
+}
+[data-toggle='buttons'] .btn-primary.active {
+  border-spacing: 2px;
+  border-color: gray;
+  color: #fff;
+  background: #4C5766;
 }

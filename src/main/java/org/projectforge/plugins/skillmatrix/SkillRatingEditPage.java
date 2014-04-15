@@ -26,8 +26,10 @@ package org.projectforge.plugins.skillmatrix;
 import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.common.NumberHelper;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * @author Billy Duong (b.duong@micromata.de)
@@ -44,13 +46,19 @@ public class SkillRatingEditPage extends AbstractEditPage<SkillRatingDO, SkillRa
   @SpringBean(name = "skillRatingDao")
   private SkillRatingDao skillRatingDao;
 
+  Integer skillId = -1;
+
   /**
    * @param parameters
    */
   public SkillRatingEditPage(final PageParameters parameters)
   {
     super(parameters, I18N_KEY_PREFIX);
+    skillId = WicketUtils.getAsInteger(parameters, SkillRatingEditForm.PARAM_SKILL_ID);
     init();
+    if (NumberHelper.greaterZero(skillId) == true) {
+      skillRatingDao.setSkill(getData(), skillId);
+    }
   }
 
   /**
@@ -85,7 +93,7 @@ public class SkillRatingEditPage extends AbstractEditPage<SkillRatingDO, SkillRa
    * @see org.projectforge.web.fibu.ISelectCallerPage#select(java.lang.String, java.lang.Object)
    */
   @Override
-  public void select(String property, Object selectedValue)
+  public void select(final String property, final Object selectedValue)
   {
     if("skillId".equals(property) == true) {
       skillRatingDao.setSkill(getData(), (Integer) selectedValue);
@@ -98,7 +106,7 @@ public class SkillRatingEditPage extends AbstractEditPage<SkillRatingDO, SkillRa
    * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
    */
   @Override
-  public void unselect(String property)
+  public void unselect(final String property)
   {
     if("skillId".equals(property) == true) {
       getData().setSkill(null);
@@ -111,7 +119,7 @@ public class SkillRatingEditPage extends AbstractEditPage<SkillRatingDO, SkillRa
    * @see org.projectforge.web.fibu.ISelectCallerPage#cancelSelection(java.lang.String)
    */
   @Override
-  public void cancelSelection(String property)
+  public void cancelSelection(final String property)
   {
     // Do nothing
   }

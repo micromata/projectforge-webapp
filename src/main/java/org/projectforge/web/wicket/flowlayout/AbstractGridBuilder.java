@@ -29,8 +29,6 @@ import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.projectforge.core.PropertyInfo;
-import org.projectforge.web.BrowserScreenWidthType;
-import org.projectforge.web.wicket.MySession;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -39,8 +37,6 @@ import org.projectforge.web.wicket.MySession;
 public abstract class AbstractGridBuilder<T extends AbstractFieldsetPanel< ? >> implements Serializable
 {
   private static final long serialVersionUID = -8804674487579491611L;
-
-  protected BrowserScreenWidthType browserScreenWidthType;
 
   protected RepeatingView parentRepeatingView;
 
@@ -62,11 +58,6 @@ public abstract class AbstractGridBuilder<T extends AbstractFieldsetPanel< ? >> 
 
   protected AbstractGridBuilder()
   {
-    final MySession session = MySession.get();
-    this.browserScreenWidthType = session.getBrowserScreenWidthType();
-    if (this.browserScreenWidthType == null) {
-      this.browserScreenWidthType = BrowserScreenWidthType.NORMAL;
-    }
   }
 
   /**

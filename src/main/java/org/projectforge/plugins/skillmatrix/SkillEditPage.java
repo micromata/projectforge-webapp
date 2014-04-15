@@ -147,14 +147,15 @@ public class SkillEditPage extends AbstractEditPage<SkillDO, SkillEditForm, Skil
 
       final Integer[] fullAccessGroupIds = form.skillRight.getFullAccessGroupIds(getData());
       boolean isUserInFullAccessGroup = false;
-      for (final Integer i: curUserGroupIds) {
-        for (final Integer j : fullAccessGroupIds) {
-          if (i == j) {
-            isUserInFullAccessGroup = true;
-            break;
+      fullAccessLoop:
+        for (final Integer i: curUserGroupIds) {
+          for (final Integer j : fullAccessGroupIds) {
+            if (i == j) {
+              isUserInFullAccessGroup = true;
+              break fullAccessLoop;
+            }
           }
         }
-      }
 
       if (isUserInFullAccessGroup == true) {
         final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
@@ -173,14 +174,15 @@ public class SkillEditPage extends AbstractEditPage<SkillDO, SkillEditForm, Skil
 
       final Integer[] trainingGroupIds = form.skillRight.getTrainingAccessGroupIds(getData());
       boolean isUserInTrainingGroup = false;
-      for (final Integer i: curUserGroupIds) {
-        for (final Integer j : trainingGroupIds) {
-          if (i == j) {
-            isUserInTrainingGroup = true;
-            break;
+      trainingLoop:
+        for (final Integer i: curUserGroupIds) {
+          for (final Integer j : trainingGroupIds) {
+            if (i == j) {
+              isUserInTrainingGroup = true;
+              break trainingLoop;
+            }
           }
         }
-      }
 
       if (isUserInTrainingGroup == true) {
         final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
@@ -193,7 +195,22 @@ public class SkillEditPage extends AbstractEditPage<SkillDO, SkillEditForm, Skil
             trainingEditPage.setReturnToPage(SkillEditPage.this);
             setResponsePage(trainingEditPage);
           };
-        }, getString("plugins.skillmatrix.skill.menu.addTraining"));
+        }, getString("plugins.skillmatrix.skilltraining.menu"));
+        addContentMenuEntry(menu);
+      }
+
+      if (isUserInFullAccessGroup == true) {
+        final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+          @Override
+          public void onClick()
+          {
+            final PageParameters params = new PageParameters();
+            params.add(SkillRatingListPage.PARAM_SKILL_ID, id);
+            final SkillRatingListPage skillRatingListPage = new SkillRatingListPage(params);
+            skillRatingListPage.setReturnToPage(SkillEditPage.this);
+            setResponsePage(skillRatingListPage);
+          };
+        }, getString("plugins.skillmatrix.skill.menu.addRating"));
         addContentMenuEntry(menu);
       }
     }

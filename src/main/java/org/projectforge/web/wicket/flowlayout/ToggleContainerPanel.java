@@ -47,11 +47,11 @@ public class ToggleContainerPanel extends Panel
 
   public static final String HEADING_TEXT_ID = "text";
 
-  private static final String ICON_STATUS_OPENED = "icon-minus";
+  private static final String ICON_STATUS_OPENED = "glyphicon glyphicon-minus";
 
-  private static final String ICON_OPENED = "icon-minus icon-white";
+  private static final String ICON_OPENED = "glyphicon glyphicon-minus glyphicon-white";
 
-  private static final String ICON_CLOSED = "icon-plus icon-white";
+  private static final String ICON_CLOSED = "glyphicon glyphicon-plus glyphicon-white";
 
   private final WebMarkupContainer panel, toggleContainer, toggleHeading, iconContainer;
 
@@ -275,7 +275,7 @@ public class ToggleContainerPanel extends Panel
   {
     final DivPanel content = new DivPanel(ToggleContainerPanel.CONTENT_ID);
     this.add(content);
-    final GridBuilder gridBuilder = new GridBuilder(content, content.newChildId(), true);
+    final GridBuilder gridBuilder = new GridBuilder(content, content.newChildId());
     return gridBuilder;
   }
 

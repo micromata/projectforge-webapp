@@ -51,10 +51,8 @@ import org.projectforge.multitenancy.TenantDO;
 import org.projectforge.multitenancy.TenantsCache;
 import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserContext;
-import org.projectforge.user.UserRights;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.FavoritesMenu;
-import org.projectforge.web.LayoutSettingsPage;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.MenuEntry;
 import org.projectforge.web.core.menuconfig.MenuConfig;
@@ -115,12 +113,6 @@ public class NavTopPanel extends NavAbstractPanel
     } else {
       goMobile.setVisible(false);
     }
-    final BookmarkablePageLink<Void> layoutSettingsMenuLink = new BookmarkablePageLink<Void>("layoutSettingsMenuLink",
-        LayoutSettingsPage.class);
-    if (UserRights.getAccessChecker().isRestrictedUser() == true) {
-      // Not visibible for restricted users:
-      layoutSettingsMenuLink.setVisible(false);
-    }
     add(new MenuConfig("menuconfig", getMenu(), favoritesMenu));
     final Form<String> searchForm = new Form<String>("searchForm") {
       private String searchString;
@@ -144,7 +136,6 @@ public class NavTopPanel extends NavAbstractPanel
     final TextField<String> searchField = new TextField<String>("searchField", new PropertyModel<String>(searchForm, "searchString"));
     WicketUtils.setPlaceHolderAttribute(searchField, getString("search.search"));
     searchForm.add(searchField);
-    add(layoutSettingsMenuLink);
     add(new BookmarkablePageLink<Void>("feedbackLink", FeedbackPage.class));
     {
       final AjaxLink<Void> showBookmarkLink = new AjaxLink<Void>("showBookmarkLink") {

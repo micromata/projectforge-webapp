@@ -63,7 +63,7 @@ public class AccessEditForm extends AbstractEditForm<GroupTaskAccessDO, AccessEd
     }
     {
       // Group
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("group"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("group")).suppressLabelForWarning();
       final GroupSelectPanel groupSelectPanel = new GroupSelectPanel(fs.newChildId(), new PropertyModel<GroupDO>(data, "group"),
           parentPage, "groupId");
       fs.add(groupSelectPanel.setRequired(true));

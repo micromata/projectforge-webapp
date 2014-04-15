@@ -101,7 +101,7 @@ public class SkillRatingListForm extends AbstractListForm<SkillRatingFilter, Ski
 
       // Skill
       gridBuilder.newSplitPanel(GridSize.COL50);
-      fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.skill.title"));
+      fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.skillrating.skill"));
       @SuppressWarnings("serial")
       final SkillTextSelectPanel skillSelectPanel = new SkillTextSelectPanel(fs.newChildId(), new Model<SkillDO>() {
         @Override

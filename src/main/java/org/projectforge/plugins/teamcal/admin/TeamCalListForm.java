@@ -100,7 +100,7 @@ public class TeamCalListForm extends AbstractListForm<TeamCalFilter, TeamCalList
       radioGroup.add(new Model<TeamCalFilter.OwnerType>(TeamCalFilter.OwnerType.OWN), getString("plugins.teamcal.own"));
       radioGroup.add(new Model<TeamCalFilter.OwnerType>(TeamCalFilter.OwnerType.OTHERS), getString("plugins.teamcal.others"));
     }
-    final DivPanel checkBoxesPanel = new DivPanel(optionsFieldsetPanel.newChildId(), DivType.CHECKBOX) {
+    final DivPanel checkBoxesPanel = new DivPanel(optionsFieldsetPanel.newChildId(), DivType.BTN_GROUP) {
       @Override
       public boolean isVisible()
       {
@@ -110,11 +110,11 @@ public class TeamCalListForm extends AbstractListForm<TeamCalFilter, TeamCalList
       }
     };
     optionsFieldsetPanel.add(checkBoxesPanel);
-    checkBoxesPanel.add(createAutoRefreshCheckBoxPanel(checkBoxesPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+    checkBoxesPanel.add(createAutoRefreshCheckBoxButton(checkBoxesPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
         "fullAccess"), getString("plugins.teamcal.fullAccess")));
-    checkBoxesPanel.add(createAutoRefreshCheckBoxPanel(checkBoxesPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+    checkBoxesPanel.add(createAutoRefreshCheckBoxButton(checkBoxesPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
         "readonlyAccess"), getString("plugins.teamcal.readonlyAccess")));
-    checkBoxesPanel.add(createAutoRefreshCheckBoxPanel(checkBoxesPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+    checkBoxesPanel.add(createAutoRefreshCheckBoxButton(checkBoxesPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
         "minimalAccess"), getString("plugins.teamcal.minimalAccess")));
     optionsFieldsetPanel.add(checkBoxesPanel);
   }

@@ -35,10 +35,10 @@ public class WicketRenderHeadUtils
 {
   private static final String[][] JAVASCRIPT_FILES_DEF = { //
     // { "scripts/jquery/1.8.2/jquery-1.8.2", ".min"}, // Wicket delivers jQuery version
+    // Needed: core, widget, mouse, position, draggable, droppable, resizable, selectable, sortable, datepicker (smoothness):
+    { "scripts/jqueryui/jquery-ui-1.10.4.custom", ".min"}, //
     { "include/bootstrap/js/bootstrap", ".min"}, //
-    { "scripts/contextmenu/jquery.contextmenu", ""}, //
-    // Needed: core, widget, mouse, position, draggable, dropable, resizable, selectable, sortable, button, datepicker:
-    { "scripts/jqueryui/jquery-ui-1.10.0.custom", ".min"} //
+    { "scripts/contextmenu/jquery.contextmenu", ""} //
   };
 
   private static final String[] JAVASCRIPT_FILES;
@@ -53,7 +53,7 @@ public class WicketRenderHeadUtils
   private static final String[][] CSS_FILES_DEF = { //
     { "styles/google-fonts/google-fonts", ""}, //
     // "http://fonts.googleapis.com/css?family=Droid+Sans:regular&amp;subset=latin", //
-    { "styles/jqueryui/1.10.0/smoothness/jquery-ui-1.10.0.custom", ".min"} //
+    { "styles/jqueryui/1.10.4/smoothness/jquery-ui-1.10.4.custom", ".min"} //
   };
 
   private static final String[] CSS_FILES;

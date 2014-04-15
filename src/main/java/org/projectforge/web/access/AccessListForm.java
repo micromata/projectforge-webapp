@@ -142,13 +142,13 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
   @Override
   protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
   {
-    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(),
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxButton(optionsCheckBoxesPanel.newChildId(),
         new PropertyModel<Boolean>(getSearchFilter(), "inherit"), getString("inherit")).setTooltip(
             getString("access.tooltip.filter.inherit")));
-    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(),
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxButton(optionsCheckBoxesPanel.newChildId(),
         new PropertyModel<Boolean>(getSearchFilter(), "includeAncestorTasks"), getString("access.filter.includeAncestorTasks")).setTooltip(
             getString("access.tooltip.filter.includeAncestorTasks")));
-    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxPanel(optionsCheckBoxesPanel.newChildId(),
+    optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxButton(optionsCheckBoxesPanel.newChildId(),
         new PropertyModel<Boolean>(getSearchFilter(), "includeDescendentTasks"), getString("access.filter.includeDescendentTasks"))
         .setTooltip(getString("access.tooltip.filter.includeDescendentTasks")));
   }

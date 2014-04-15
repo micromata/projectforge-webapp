@@ -97,7 +97,7 @@ public class TeamCalICSExportDialog extends AbstractICSExportDialog
       exportReminders = true;
     }
     final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).suppressLabelForWarning();
-    final DivPanel checkBoxesPanel = new DivPanel(fs.newChildId(), DivType.CHECKBOX);
+    final DivPanel checkBoxesPanel = new DivPanel(fs.newChildId(), DivType.BTN_GROUP);
     fs.add(checkBoxesPanel);
     @SuppressWarnings("serial")
     final AjaxCheckBox checkBox = new AjaxCheckBox(CheckBoxPanel.WICKET_ID, new PropertyModel<Boolean>(this, "exportReminders")) {

@@ -134,14 +134,18 @@ public class AttendeeEditForm extends AbstractEditForm<AttendeeDO, AttendeeEditP
     super.onBeforeRender();
     final TrainingDO training = data.getTraining();
 
-    if (training != null && training.getRatingArray() != null && training.getCertificateArray() != null) {
-      certificateChoiceRenderer.clear().setValueArray(training.getCertificateArray());
-      ratingChoiceRenderer.clear().setValueArray(training.getRatingArray());
-      ratingFs.setVisible(true);
-      certificateFs.setVisible(true);
-    } else {
-      ratingFs.setVisible(false);
-      certificateFs.setVisible(false);
+    if (training != null) {
+      if (training.getRatingArray() != null) {
+        ratingChoiceRenderer.clear().setValueArray(training.getRatingArray());
+        ratingFs.setVisible(true);
+      } else
+        ratingFs.setVisible(false);
+
+      if (training.getCertificateArray() != null) {
+        certificateChoiceRenderer.clear().setValueArray(training.getCertificateArray());
+        certificateFs.setVisible(true);
+      } else
+        certificateFs.setVisible(false);
     }
   }
 
