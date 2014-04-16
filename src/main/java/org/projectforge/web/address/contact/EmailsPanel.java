@@ -69,14 +69,17 @@ public class EmailsPanel extends Panel
 
   private Component delete;
 
+  private final PropertyModel<String> model;
+
   /**
    * @param id
    */
-  public EmailsPanel(final String id, final String emailsXmlString)
+  public EmailsPanel(final String id, final PropertyModel<String> model)
   {
     super(id);
-    if (StringUtils.isNotBlank(emailsXmlString) == true) {
-      emails = contactDao.readEmailValues(emailsXmlString);
+    this.model = model;
+    if (StringUtils.isNotBlank(model.getObject()) == true) {
+      emails = contactDao.readEmailValues(model.getObject());
     }
   }
 
@@ -130,6 +133,7 @@ public class EmailsPanel extends Panel
         super.onSubmit(target);
         if (StringUtils.isNotBlank(newEmailValue.getEmail()) == true && newEmailValue.getEmail().equals(DEFAULT_EMAIL_VALUE) == false) {
           emails.add(new EmailValue().setEmail(newEmailValue.getEmail()).setContactType(newEmailValue.getContactType()));
+          model.setObject(contactDao.getEmailValuesAsXml(emails));
         }
         newEmailValue.setEmail(DEFAULT_EMAIL_VALUE);
         rebuildEmails();
@@ -154,6 +158,7 @@ public class EmailsPanel extends Panel
           }
         }
         rebuildEmails();
+        model.setObject(contactDao.getEmailValuesAsXml(emails));
         target.add(mainContainer);
       }
     });
@@ -197,6 +202,7 @@ public class EmailsPanel extends Panel
             }
           }
           rebuildEmails();
+          model.setObject(contactDao.getEmailValuesAsXml(emails));
           target.add(mainContainer);
         }
       });
