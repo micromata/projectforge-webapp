@@ -48,14 +48,6 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
 
   private static final Logger log = Logger.getLogger(ContactEditForm.class);
 
-  private EmailsPanel emailsPanel;
-
-  private PhonesPanel phonesPanel;
-
-  private ImsPanel imsPanel;
-
-  private ContactEntryPanel contactEntryPanel;
-
   @SpringBean(name = "contactDao")
   private ContactDao contactDao;
 
@@ -106,20 +98,19 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
 
     // Emails
     FieldsetPanel fs2 = gridBuilder.newFieldset(ContactDO.class, "emailValues").suppressLabelForWarning();
-    emailsPanel = new EmailsPanel(fs.newChildId(), getData().getEmailValues());
-    fs2.add(emailsPanel);
+    fs2.add(new EmailsPanel(fs.newChildId(), new PropertyModel<String>(data, "emailValues")));
 
     // Phones
     fs2 = gridBuilder.newFieldset(ContactDO.class, "phoneValues").suppressLabelForWarning();
-    fs2.add(phonesPanel = new PhonesPanel(fs.newChildId(), getData().getPhoneValues()));
+    fs2.add(new PhonesPanel(fs.newChildId(), new PropertyModel<String>(data, "phoneValues")));
 
     // Instant Messaging Entries
     fs2 = gridBuilder.newFieldset(ContactDO.class, "imValues").suppressLabelForWarning();
-    fs2.add(imsPanel = new ImsPanel(fs.newChildId(), getData().getImValues()));
+    fs2.add(new ImsPanel(fs.newChildId(), new PropertyModel<String>(data, "imValues")));
 
     // Contacts
     fs2 = gridBuilder.newFieldset(ContactDO.class, "contacts").suppressLabelForWarning();
-    fs2.add(contactEntryPanel = new ContactEntryPanel(fs.newChildId(), new CompoundPropertyModel<ContactDO>(data)));
+    fs2.add(new ContactEntryPanel(fs.newChildId(), new CompoundPropertyModel<ContactDO>(data)));
 
   }
 
@@ -130,26 +121,6 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
   protected Logger getLogger()
   {
     return log;
-  }
-
-  public EmailsPanel getEmailsPanel()
-  {
-    return emailsPanel;
-  }
-
-  public PhonesPanel getPhonesPanel()
-  {
-    return phonesPanel;
-  }
-
-  public ImsPanel getImsPanel()
-  {
-    return imsPanel;
-  }
-
-  public ContactEntryPanel getContactEntryPanel()
-  {
-    return contactEntryPanel;
   }
 
 }
