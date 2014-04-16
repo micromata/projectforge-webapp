@@ -33,6 +33,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.address.contact.ContactDO;
 import org.projectforge.address.contact.ContactEntryDO;
@@ -48,8 +49,6 @@ import org.projectforge.web.wicket.flowlayout.IconType;
 public class ContactEntryPanel extends Panel
 {
   private static final long serialVersionUID = -7234382706624510638L;
-
-  private List<ContactEntryDO> entries;
 
   private RepeatingView entrysRepeater;
 
@@ -77,11 +76,10 @@ public class ContactEntryPanel extends Panel
   /**
    * @param id
    */
-  public ContactEntryPanel(final String id, final ContactDO contactDO, final PropertyModel<List<ContactEntryDO>> model)
+  public ContactEntryPanel(final String id, final CompoundPropertyModel<ContactDO>  model)
   {
     super(id);
-    this.contactDO = contactDO;
-    this.entries = model.getObject();
+    contactDO = model.getObject();
   }
 
   /**
@@ -253,7 +251,7 @@ public class ContactEntryPanel extends Panel
   private void rebuildEntrys()
   {
 
-    entries = contactDO.getContacts();
+    final List<ContactEntryDO> entries = contactDO.getContacts();
     if ( entries != null) {
       entrysRepeater.removeAll();
       for (final ContactEntryDO entry : entries) {
@@ -347,10 +345,4 @@ public class ContactEntryPanel extends Panel
       }
     }
   }
-
-  public List<ContactEntryDO> getEntries()
-  {
-    return contactDO.getContacts();
-  }
-
 }

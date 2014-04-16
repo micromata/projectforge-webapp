@@ -24,14 +24,12 @@
 package org.projectforge.web.address.contact;
 
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
+import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.contact.ContactDO;
 import org.projectforge.address.contact.ContactDao;
-import org.projectforge.address.contact.ContactEntryDO;
 import org.projectforge.address.contact.PersonalContactDao;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.bootstrap.GridSize;
@@ -121,7 +119,7 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
 
     // Contacts
     fs2 = gridBuilder.newFieldset(ContactDO.class, "contacts").suppressLabelForWarning();
-    fs2.add(contactEntryPanel = new ContactEntryPanel(fs.newChildId(), data, new PropertyModel<List<ContactEntryDO>>(data, "contacts")));
+    fs2.add(contactEntryPanel = new ContactEntryPanel(fs.newChildId(), new CompoundPropertyModel<ContactDO>(data)));
 
   }
 
