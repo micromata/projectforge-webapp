@@ -73,14 +73,17 @@ public class ImsPanel extends Panel
 
   private Component delete;
 
+  private final PropertyModel<String> model;
+
   /**
    * @param id
    */
-  public ImsPanel(final String id, final String imsXmlString)
+  public ImsPanel(final String id, final PropertyModel<String> model)
   {
     super(id);
-    if (StringUtils.isNotBlank(imsXmlString) == true) {
-      ims = contactDao.readImValues(imsXmlString);
+    this.model = model;
+    if (StringUtils.isNotBlank(model.getObject()) == true) {
+      ims = contactDao.readImValues(model.getObject());
     }
   }
 
@@ -108,10 +111,6 @@ public class ImsPanel extends Panel
 
     init(addNewImContainer);
     imsRepeater.setVisible(true);
-  }
-
-  public String getImsAsXmlString() {
-    return contactDao.getImValuesAsXml(ims);
   }
 
   @SuppressWarnings("serial")
@@ -146,6 +145,7 @@ public class ImsPanel extends Panel
         super.onSubmit(target);
         if (StringUtils.isNotBlank(newImValue.getUser()) == true && newImValue.getUser().equals(DEFAULT_IM_VALUE) == false) {
           ims.add(new InstantMessagingValue().setUser(newImValue.getUser()).setContactType(newImValue.getContactType()).setImType(newImValue.getImType()));
+          model.setObject(contactDao.getImValuesAsXml(ims));
         }
         newImValue.setUser(DEFAULT_IM_VALUE);
         rebuildIms();
@@ -170,6 +170,7 @@ public class ImsPanel extends Panel
           }
         }
         rebuildIms();
+        model.setObject(contactDao.getImValuesAsXml(ims));
         target.add(mainContainer);
       }
     });
@@ -225,6 +226,7 @@ public class ImsPanel extends Panel
             }
           }
           rebuildIms();
+          model.setObject(contactDao.getImValuesAsXml(ims));
           target.add(mainContainer);
         }
       });

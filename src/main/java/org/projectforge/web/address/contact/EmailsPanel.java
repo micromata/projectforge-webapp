@@ -108,11 +108,6 @@ public class EmailsPanel extends Panel
     emailsRepeater.setVisible(true);
   }
 
-  public String getEmailsAsXmlString()
-  {
-    return contactDao.getEmailValuesAsXml(emails);
-  }
-
   @SuppressWarnings("serial")
   void init(final WebMarkupContainer item)
   {

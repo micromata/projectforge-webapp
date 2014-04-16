@@ -70,14 +70,17 @@ public class PhonesPanel extends Panel
 
   private Component delete;
 
+  private final PropertyModel<String> model;
+
   /**
    * @param id
    */
-  public PhonesPanel(final String id, final String phonesXmlString)
+  public PhonesPanel(final String id, final PropertyModel<String> model)
   {
     super(id);
-    if (StringUtils.isNotBlank(phonesXmlString) == true) {
-      phones = contactDao.readPhoneValues(phonesXmlString);
+    this.model = model;
+    if (StringUtils.isNotBlank(model.getObject()) == true) {
+      phones = contactDao.readPhoneValues(model.getObject());
     }
   }
 
@@ -107,10 +110,6 @@ public class PhonesPanel extends Panel
     phonesRepeater.setVisible(true);
   }
 
-  public String getPhonesAsXmlString() {
-    return contactDao.getPhoneValuesAsXml(phones);
-  }
-
   @SuppressWarnings("serial")
   void init(final WebMarkupContainer item)
   {
@@ -131,6 +130,7 @@ public class PhonesPanel extends Panel
         super.onSubmit(target);
         if (StringUtils.isNotBlank(newPhoneValue.getNumber()) == true && newPhoneValue.getNumber().equals(DEFAULT_PHONE_VALUE) == false) {
           phones.add(new PhoneValue().setNumber(newPhoneValue.getNumber()).setPhoneType(newPhoneValue.getPhoneType()));
+          model.setObject(contactDao.getPhoneValuesAsXml(phones));
         }
         newPhoneValue.setNumber(DEFAULT_PHONE_VALUE);
         rebuildPhones();
@@ -155,6 +155,7 @@ public class PhonesPanel extends Panel
           }
         }
         rebuildPhones();
+        model.setObject(contactDao.getPhoneValuesAsXml(phones));
         target.add(mainContainer);
       }
     });
@@ -198,6 +199,7 @@ public class PhonesPanel extends Panel
             }
           }
           rebuildPhones();
+          model.setObject(contactDao.getPhoneValuesAsXml(phones));
           target.add(mainContainer);
         }
       });
