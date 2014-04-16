@@ -37,7 +37,7 @@ import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
-import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.CheckBoxButton;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldSetIconPosition;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -211,7 +211,7 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
   }
 
   @SuppressWarnings("serial")
-  private class MyCheckBoxPanel extends CheckBoxPanel
+  private class MyCheckBoxPanel extends CheckBoxButton
   {
     public MyCheckBoxPanel(final String id, final IModel<Boolean> model, final String labelString)
     {

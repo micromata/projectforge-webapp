@@ -37,7 +37,7 @@ import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.YearListCoiceRenderer;
-import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.CheckBoxButton;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -175,10 +175,10 @@ AbstractListForm<F, P>
     radioGroup.add(new Model<String>("ueberfaellig"), getString("fibu.rechnung.filter.ueberfaellig"));
 
     if (Configuration.getInstance().isCostConfigured() == true) {
-      optionsCheckBoxesPanel.add(new CheckBoxPanel(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+      optionsCheckBoxesPanel.add(new CheckBoxButton(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
           "showKostZuweisungStatus"), getString("fibu.rechnung.showKostZuweisungstatus")) {
         /**
-         * @see org.projectforge.web.wicket.flowlayout.CheckBoxPanel#wantOnSelectionChangedNotifications()
+         * @see org.projectforge.web.wicket.flowlayout.CheckBoxButton#wantOnSelectionChangedNotifications()
          */
         @Override
         protected boolean wantOnSelectionChangedNotifications()
@@ -187,7 +187,7 @@ AbstractListForm<F, P>
         }
 
         /**
-         * @see org.projectforge.web.wicket.flowlayout.CheckBoxPanel#onSelectionChanged()
+         * @see org.projectforge.web.wicket.flowlayout.CheckBoxButton#onSelectionChanged()
          */
         @Override
         protected void onSelectionChanged(final Boolean newSelection)

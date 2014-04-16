@@ -303,7 +303,7 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
         return "<h4>" + getString("securityAdvice") + "</h4>" + HtmlHelper.escapeHtml(content.getObject(), true);
       }
     });
-    hintBox.getDiv().add(AttributeModifier.append("class", "alert alert-block"));
+    hintBox.getDiv().add(AttributeModifier.append("class", "alert alert-danger"));
     hintBox.getLabel().setEscapeModelStrings(false);
     getPanel().add(hintBox);
     return hintBox;

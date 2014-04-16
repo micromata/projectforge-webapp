@@ -49,7 +49,7 @@ import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
-import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.CheckBoxButton;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -128,8 +128,8 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
     }
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).suppressLabelForWarning();
-      final DivPanel checkBoxesPanel = fs.addNewCheckBoxDiv();
-      checkBoxesPanel.add(new CheckBoxPanel(checkBoxesPanel.newChildId(), new PropertyModel<Boolean>(filter, "searchHistory"),
+      final DivPanel checkBoxButton = fs.addNewCheckBoxDiv();
+      checkBoxButton.add(new CheckBoxButton(checkBoxButton.newChildId(), new PropertyModel<Boolean>(filter, "searchHistory"),
           getString("search.searchHistory")).setTooltip(getString("search.searchHistory.additional.tooltip")));
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
