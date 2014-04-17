@@ -69,9 +69,9 @@ public class SkillTestHelper
     trainingUser3 = AbstractTestBase.initTestDB.addUser(prefix + "TrainingUser3");
     noAccessUser = AbstractTestBase.initTestDB.addUser(prefix + "NoAccessUser");
 
-    fullGroup1 = AbstractTestBase.initTestDB.addGroup(prefix + "FullGroup1", fullUser1.getUsername());
-    readonlyGroup1 = AbstractTestBase.initTestDB.addGroup(prefix + "ReadonlyGroup1", readonlyUser1.getUsername());
-    trainingGroup1 = AbstractTestBase.initTestDB.addGroup(prefix + "TrainingGroup1", trainingUser1.getUsername());
+    fullGroup1 = AbstractTestBase.initTestDB.addGroup(prefix + "FullGroup1", owner.getUsername(), fullUser1.getUsername());
+    readonlyGroup1 = AbstractTestBase.initTestDB.addGroup(prefix + "ReadonlyGroup1", owner.getUsername(), readonlyUser1.getUsername());
+    trainingGroup1 = AbstractTestBase.initTestDB.addGroup(prefix + "TrainingGroup1", owner.getUsername(), trainingUser1.getUsername());
 
     fullGroup2 = AbstractTestBase.initTestDB.addGroup(prefix + "FullGroup2", fullUser2.getUsername());
     readonlyGroup2 = AbstractTestBase.initTestDB.addGroup(prefix + "ReadonlyGroup2", readonlyUser2.getUsername());
