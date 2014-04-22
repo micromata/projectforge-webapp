@@ -24,7 +24,7 @@
 package org.projectforge.web.address.contact;
 
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -33,7 +33,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
-import org.apache.wicket.model.CompoundPropertyModel;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.address.contact.ContactDO;
 import org.projectforge.address.contact.ContactEntryDO;
@@ -71,15 +71,15 @@ public class ContactEntryPanel extends Panel
   private Component state;
   private Component delete;
 
-  private final ContactDO contactDO;
+  private final IModel<ContactDO>  model;
 
   /**
    * @param id
    */
-  public ContactEntryPanel(final String id, final CompoundPropertyModel<ContactDO>  model)
+  public ContactEntryPanel(final String id, final IModel<ContactDO>  model)
   {
     super(id);
-    contactDO = model.getObject();
+    this.model = model;
   }
 
   /**
@@ -91,7 +91,7 @@ public class ContactEntryPanel extends Panel
     super.onInitialize();
     newEntryValue = new ContactEntryDO().setStreet(DEFAULT_ENTRY_VALUE).setCity(DEFAULT_CITY_VALUE) //
         .setZipCode(DEFAULT_ZIPCODE_VALUE).setCountry(DEFAULT_COUNTRY_VALUE).setState(DEFAULT_STATE_VALUE).setContactType(ContactType.PRIVATE) //
-        .setContact(contactDO);
+        .setContact(model.getObject());
     formChoiceRenderer = new LabelValueChoiceRenderer<ContactType>(this, ContactType.values());
     mainContainer = new WebMarkupContainer("main");
     add(mainContainer.setOutputMarkupId(true));
@@ -207,7 +207,7 @@ public class ContactEntryPanel extends Panel
       protected void onSubmit(final AjaxRequestTarget target)
       {
         super.onSubmit(target);
-        contactDO.addContact(new ContactEntryDO().setStreet(newEntryValue.getStreet()).setCity(newEntryValue.getCity()) //
+        model.getObject().addContact(new ContactEntryDO().setStreet(newEntryValue.getStreet()).setCity(newEntryValue.getCity()) //
             .setZipCode(newEntryValue.getZipCode()).setCountry(newEntryValue.getCountry()) //
             .setState(newEntryValue.getState()).setContactType(newEntryValue.getContactType()));
         rebuildEntrys();
@@ -232,7 +232,7 @@ public class ContactEntryPanel extends Panel
       protected void onClick(final AjaxRequestTarget target)
       {
         super.onClick(target);
-        final Iterator<ContactEntryDO> it = contactDO.getContacts().iterator();
+        final Iterator<ContactEntryDO> it = model.getObject().getContacts().iterator();
         while (it.hasNext() == true) {
           if (it.next() == newEntryValue) {
             it.remove();
@@ -251,10 +251,11 @@ public class ContactEntryPanel extends Panel
   private void rebuildEntrys()
   {
 
-    final List<ContactEntryDO> entries = contactDO.getContacts();
+    final Set<ContactEntryDO> entries = model.getObject().getContacts();
     if ( entries != null) {
       entrysRepeater.removeAll();
       for (final ContactEntryDO entry : entries) {
+
         final WebMarkupContainer item = new WebMarkupContainer(entrysRepeater.newChildId());
         entrysRepeater.add(item);
         final DropDownChoice<ContactType> dropdownChoice = new DropDownChoice<ContactType>("choice", new PropertyModel<ContactType>(entry,
@@ -310,7 +311,7 @@ public class ContactEntryPanel extends Panel
           protected void onSubmit(final AjaxRequestTarget target)
           {
             super.onSubmit(target);
-            contactDO.addContact(new ContactEntryDO().setStreet(newEntryValue.getStreet()).setCity(newEntryValue.getCity()) //
+            model.getObject().addContact(new ContactEntryDO().setStreet(newEntryValue.getStreet()).setCity(newEntryValue.getCity()) //
                 .setZipCode(newEntryValue.getZipCode()).setCountry(newEntryValue.getCountry()) //
                 .setState(newEntryValue.getState()).setContactType(newEntryValue.getContactType()));
             rebuildEntrys();
@@ -331,7 +332,7 @@ public class ContactEntryPanel extends Panel
           protected void onClick(final AjaxRequestTarget target)
           {
             super.onClick(target);
-            final Iterator<ContactEntryDO> it = contactDO.getContacts().iterator();
+            final Iterator<ContactEntryDO> it = model.getObject().getContacts().iterator();
             while (it.hasNext() == true) {
               if (it.next() == entry) {
                 it.remove();
