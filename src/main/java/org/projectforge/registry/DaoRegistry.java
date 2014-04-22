@@ -28,6 +28,7 @@ import javax.sql.DataSource;
 import org.projectforge.access.AccessDao;
 import org.projectforge.address.AddressDao;
 import org.projectforge.address.contact.ContactDao;
+import org.projectforge.address.contact.ContactEntryDao;
 import org.projectforge.book.BookDao;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.ConfigurationDao;
@@ -100,6 +101,8 @@ public class DaoRegistry
 
   public static final String CONTACT = "contact";
 
+  public static final String CONTACTENTRY = "contactEntry";
+
   public static final String CONTRACT = "contract";
 
   public static final String COST_ASSIGNMENT = "costAssignment";
@@ -163,6 +166,8 @@ public class DaoRegistry
   private ConfigurationDao configurationDao;
 
   private ContactDao contactDao;
+
+  private ContactEntryDao contactEntryDao;
 
   private ContractDao contractDao;
 
@@ -238,6 +243,7 @@ public class DaoRegistry
 
     register(ADDRESS, AddressDao.class, addressDao, "address");
     register(CONTACT, ContactDao.class, contactDao, "contact");
+    register(CONTACTENTRY, ContactEntryDao.class, contactEntryDao, "contactEntry");
     register(TIMESHEET, TimesheetDao.class, timesheetDao, "timesheet") //
     .setSearchFilterClass(TimesheetFilter.class);
     register(BOOK, BookDao.class, bookDao, "book");
@@ -327,6 +333,11 @@ public class DaoRegistry
   public void setContactDao(final ContactDao contactDao)
   {
     this.contactDao = contactDao;
+  }
+
+  public void setContactEntryDao(final ContactEntryDao contactEntryDao)
+  {
+    this.contactEntryDao = contactEntryDao;
   }
 
   public void setAuftragDao(final AuftragDao auftragDao)
