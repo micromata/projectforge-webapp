@@ -17,7 +17,7 @@ import org.projectforge.user.PFUserDO;
 
 /**
  * @author Werner Feder (werner.feder@t-online.de)
- *
+ * TODO: Historisierung
  */
 public class ContactEntryDao extends BaseDao<ContactEntryDO>
 {
@@ -29,9 +29,10 @@ public class ContactEntryDao extends BaseDao<ContactEntryDO>
     super(ContactEntryDO.class);
   }
 
-  public void setContactDao(final ContactDao contactDao)
+  public ContactEntryDao setContactDao(final ContactDao contactDao)
   {
     this.contactDao = contactDao;
+    return this;
   }
 
   /**
