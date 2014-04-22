@@ -10,9 +10,9 @@
 package org.projectforge.address.contact;
 
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -95,7 +95,7 @@ public class ContactDO extends DefaultBaseDO
   @PropertyInfo(i18nKey = "contact.contacts")
   @PFPersistancyBehavior(autoUpdateCollectionEntries = true)
   @IndexedEmbedded(depth = 1)
-  private List<ContactEntryDO> contacts = null;
+  private Set<ContactEntryDO> contacts = null;
 
   private ContactStatus contactStatus = ContactStatus.ACTIVE;
 
@@ -129,7 +129,7 @@ public class ContactDO extends DefaultBaseDO
    */
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "contact")
   @IndexColumn(name = "number", base = 1)
-  public List<ContactEntryDO> getContacts()
+  public Set<ContactEntryDO> getContacts()
   {
     return this.contacts;
   }
@@ -152,7 +152,7 @@ public class ContactDO extends DefaultBaseDO
     return null;
   }
 
-  public ContactDO setContacts(final List<ContactEntryDO> contacts)
+  public ContactDO setContacts(final Set<ContactEntryDO> contacts)
   {
     this.contacts = contacts;
     return this;
@@ -174,10 +174,10 @@ public class ContactDO extends DefaultBaseDO
     return this;
   }
 
-  public List<ContactEntryDO> ensureAndGetContacts()
+  public Set<ContactEntryDO> ensureAndGetContacts()
   {
     if (this.contacts == null) {
-      setContacts(new ArrayList<ContactEntryDO>());
+      setContacts(new LinkedHashSet<ContactEntryDO>());
     }
     return getContacts();
   }
@@ -291,6 +291,7 @@ public class ContactDO extends DefaultBaseDO
     return this;
   }
 
+  @Column
   public String getImValues()
   {
     return imValues;
@@ -302,6 +303,7 @@ public class ContactDO extends DefaultBaseDO
     return this;
   }
 
+  @Column
   public String getEmailValues()
   {
     return emailValues;
@@ -313,6 +315,7 @@ public class ContactDO extends DefaultBaseDO
     return this;
   }
 
+  @Column
   public String getPhoneValues()
   {
     return phoneValues;
