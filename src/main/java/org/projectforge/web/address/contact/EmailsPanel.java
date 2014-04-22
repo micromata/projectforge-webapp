@@ -61,7 +61,7 @@ public class EmailsPanel extends Panel
 
   private WebMarkupContainer mainContainer, addNewEMailContainer;
 
-  private LabelValueChoiceRenderer<ContactType> formChoiceRenderer;
+  private LabelValueChoiceRenderer<ContactType> emailChoiceRenderer;
 
   private EmailValue newEmailValue;
 
@@ -94,7 +94,7 @@ public class EmailsPanel extends Panel
       emails = new ArrayList<EmailValue>();
     }
     newEmailValue = new EmailValue().setEmail(DEFAULT_EMAIL_VALUE).setContactType(ContactType.PRIVATE);
-    formChoiceRenderer = new LabelValueChoiceRenderer<ContactType>(this, ContactType.values());
+    emailChoiceRenderer = new LabelValueChoiceRenderer<ContactType>(this, ContactType.values());
     mainContainer = new WebMarkupContainer("main");
     add(mainContainer.setOutputMarkupId(true));
     emailsRepeater = new RepeatingView("liRepeater");
@@ -112,13 +112,14 @@ public class EmailsPanel extends Panel
   void init(final WebMarkupContainer item)
   {
     final DropDownChoice<ContactType> dropdownChoice = new DropDownChoice<ContactType>("choice", new PropertyModel<ContactType>(
-        newEmailValue, "contactType"), formChoiceRenderer.getValues(), formChoiceRenderer);
+        newEmailValue, "contactType"), emailChoiceRenderer.getValues(), emailChoiceRenderer);
     item.add(dropdownChoice);
     dropdownChoice.add(new AjaxFormComponentUpdatingBehavior("onchange") {
       @Override
       protected void onUpdate(final AjaxRequestTarget target)
       {
         newEmailValue.setContactType(dropdownChoice.getModelObject());
+        model.setObject(contactDao.getEmailValuesAsXml(emails));
       }
     });
     item.add(new AjaxMaxLengthEditableLabel("editableLabel", new PropertyModel<String>(newEmailValue, "email")) {
@@ -169,13 +170,14 @@ public class EmailsPanel extends Panel
       final WebMarkupContainer item = new WebMarkupContainer(emailsRepeater.newChildId());
       emailsRepeater.add(item);
       final DropDownChoice<ContactType> dropdownChoice = new DropDownChoice<ContactType>("choice", new PropertyModel<ContactType>(email,
-          "contactType"), formChoiceRenderer.getValues(), formChoiceRenderer);
+          "contactType"), emailChoiceRenderer.getValues(), emailChoiceRenderer);
       item.add(dropdownChoice);
       dropdownChoice.add(new AjaxFormComponentUpdatingBehavior("onchange") {
         @Override
         protected void onUpdate(final AjaxRequestTarget target)
         {
           email.setContactType(dropdownChoice.getModelObject());
+          model.setObject(contactDao.getEmailValuesAsXml(emails));
         }
       });
       item.add(new AjaxMaxLengthEditableLabel("editableLabel", new PropertyModel<String>(email, "email")));

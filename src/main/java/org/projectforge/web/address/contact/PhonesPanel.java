@@ -62,7 +62,7 @@ public class PhonesPanel extends Panel
 
   private WebMarkupContainer mainContainer, addNewPhoneContainer;
 
-  private LabelValueChoiceRenderer<PhoneType> formChoiceRenderer;
+  private LabelValueChoiceRenderer<PhoneType> phoneChoiceRenderer;
 
   private PhoneValue newPhoneValue;
 
@@ -96,7 +96,7 @@ public class PhonesPanel extends Panel
       phones = new ArrayList<PhoneValue>();
     }
     newPhoneValue = new PhoneValue().setNumber(DEFAULT_PHONE_VALUE).setPhoneType(PhoneType.PRIVATE);
-    formChoiceRenderer = new LabelValueChoiceRenderer<PhoneType>(this, PhoneType.values());
+    phoneChoiceRenderer = new LabelValueChoiceRenderer<PhoneType>(this, PhoneType.values());
     mainContainer = new WebMarkupContainer("main");
     add(mainContainer.setOutputMarkupId(true));
     phonesRepeater = new RepeatingView("liRepeater");
@@ -114,13 +114,14 @@ public class PhonesPanel extends Panel
   void init(final WebMarkupContainer item)
   {
     final DropDownChoice<PhoneType> dropdownChoice = new DropDownChoice<PhoneType>("choice", new PropertyModel<PhoneType>(
-        newPhoneValue, "phoneType"), formChoiceRenderer.getValues(), formChoiceRenderer);
+        newPhoneValue, "phoneType"), phoneChoiceRenderer.getValues(), phoneChoiceRenderer);
     item.add(dropdownChoice);
     dropdownChoice.add(new AjaxFormComponentUpdatingBehavior("onchange") {
       @Override
       protected void onUpdate(final AjaxRequestTarget target)
       {
         newPhoneValue.setPhoneType(dropdownChoice.getModelObject());
+        model.setObject(contactDao.getPhoneValuesAsXml(phones));
       }
     });
     item.add(new AjaxMaxLengthEditableLabel("editableLabel", new PropertyModel<String>(newPhoneValue, "number")) {
@@ -171,13 +172,14 @@ public class PhonesPanel extends Panel
       final WebMarkupContainer item = new WebMarkupContainer(phonesRepeater.newChildId());
       phonesRepeater.add(item);
       final DropDownChoice<PhoneType> dropdownChoice = new DropDownChoice<PhoneType>("choice", new PropertyModel<PhoneType>(phone,
-          "phoneType"), formChoiceRenderer.getValues(), formChoiceRenderer);
+          "phoneType"), phoneChoiceRenderer.getValues(), phoneChoiceRenderer);
       item.add(dropdownChoice);
       dropdownChoice.add(new AjaxFormComponentUpdatingBehavior("onchange") {
         @Override
         protected void onUpdate(final AjaxRequestTarget target)
         {
           phone.setPhoneType(dropdownChoice.getModelObject());
+          model.setObject(contactDao.getPhoneValuesAsXml(phones));
         }
       });
       item.add(new AjaxMaxLengthEditableLabel("editableLabel", new PropertyModel<String>(phone, "number")));
