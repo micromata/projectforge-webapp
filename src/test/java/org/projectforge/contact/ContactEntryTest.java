@@ -320,17 +320,17 @@ public class ContactEntryTest extends TestBase
   //  {
   //    final ContactDO address = new ContactDO();
   //    assertNull(address.getInstantMessaging4DB());
-  //    address.setInstantMessaging(InstantMessagingType.SKYPE, "skype-name");
+  //    address.setInstantMessaging(SocialMediaType.SKYPE, "skype-name");
   //    assertEquals("SKYPE=skype-name", address.getInstantMessaging4DB());
-  //    address.setInstantMessaging(InstantMessagingType.AIM, "aim-id");
+  //    address.setInstantMessaging(SocialMediaType.AIM, "aim-id");
   //    assertEquals("SKYPE=skype-name\nAIM=aim-id", address.getInstantMessaging4DB());
-  //    address.setInstantMessaging(InstantMessagingType.YAHOO, "yahoo-name");
+  //    address.setInstantMessaging(SocialMediaType.YAHOO, "yahoo-name");
   //    assertEquals("SKYPE=skype-name\nAIM=aim-id\nYAHOO=yahoo-name", address.getInstantMessaging4DB());
-  //    address.setInstantMessaging(InstantMessagingType.YAHOO, "");
+  //    address.setInstantMessaging(SocialMediaType.YAHOO, "");
   //    assertEquals("SKYPE=skype-name\nAIM=aim-id", address.getInstantMessaging4DB());
-  //    address.setInstantMessaging(InstantMessagingType.SKYPE, "");
+  //    address.setInstantMessaging(SocialMediaType.SKYPE, "");
   //    assertEquals("AIM=aim-id", address.getInstantMessaging4DB());
-  //    address.setInstantMessaging(InstantMessagingType.AIM, "");
+  //    address.setInstantMessaging(SocialMediaType.AIM, "");
   //    assertNull(address.getInstantMessaging4DB());
   //  }
 }

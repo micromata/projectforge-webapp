@@ -56,7 +56,7 @@ public enum InstantMessagingType
     } else if ("GOOGLE_TALK".equals(s) == true) {
       return GOOGLE_TALK;
     }
-    throw new UnsupportedOperationException("Unknown InstantMessagingType: '" + s + "'");
+    throw new UnsupportedOperationException("Unknown SocialMediaType: '" + s + "'");
   }
 
   /**

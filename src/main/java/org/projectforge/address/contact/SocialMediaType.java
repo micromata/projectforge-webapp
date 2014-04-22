@@ -29,20 +29,20 @@ import org.projectforge.core.I18nEnum;
 /**
  * @author Werner Feder (werner.feder@t-online.de)
  */
-public enum InstantMessagingType implements I18nEnum
+public enum SocialMediaType implements I18nEnum
 {
   AIM("aim"), FACEBOOK("facebook"), GADO("gado"), GOOGLE_TALK("googletalk"), ICQ("icq"), JABBER("jabber"), MSN("msn"), QQ("qq"), SKYPE("skype"), TWITTER("twitter"), YAHOO("yahoo"), OTHER("other") ;
 
-  public static final String I18N_KEY_INSTANTMESSAGINGTYPE_PREFIX = "instantmessagingtype.";
+  public static final String I18N_KEY_SOCIALMEDIATYPE_PREFIX = "socialmediatype.";
 
   /**
    * List of all available values.
    */
-  public static final InstantMessagingType[] LIST = new InstantMessagingType[] { AIM, FACEBOOK, GADO, GOOGLE_TALK, ICQ, JABBER, MSN, QQ, SKYPE, TWITTER, YAHOO, OTHER };
+  public static final SocialMediaType[] LIST = new SocialMediaType[] { AIM, FACEBOOK, GADO, GOOGLE_TALK, ICQ, JABBER, MSN, QQ, SKYPE, TWITTER, YAHOO, OTHER };
 
   private String key;
 
-  public static InstantMessagingType get(final String s)
+  public static SocialMediaType get(final String s)
   {
     if (StringUtils.isEmpty(s) == true) {
       return null;
@@ -72,7 +72,7 @@ public enum InstantMessagingType implements I18nEnum
     } else if ("OTHER".equals(s) == true) {
       return OTHER;
     }
-    throw new UnsupportedOperationException("Unknown InstantMessagingType: '" + s + "'");
+    throw new UnsupportedOperationException("Unknown SocialMediaType: '" + s + "'");
   }
 
   /**
@@ -84,7 +84,7 @@ public enum InstantMessagingType implements I18nEnum
     return key;
   }
 
-  InstantMessagingType(final String key)
+  SocialMediaType(final String key)
   {
     this.key = key;
   }
@@ -95,6 +95,6 @@ public enum InstantMessagingType implements I18nEnum
   @Override
   public String getI18nKey()
   {
-    return I18N_KEY_INSTANTMESSAGINGTYPE_PREFIX + key;
+    return I18N_KEY_SOCIALMEDIATYPE_PREFIX + key;
   }
 }

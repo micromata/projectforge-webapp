@@ -34,17 +34,17 @@ public class ContactDao extends BaseDao<ContactDO>
 
   private TaskDao taskDao;
 
-  private final XmlConverter<InstantMessagingValue> imConverter;
+  private final XmlConverter<SocialMediaValue> socialMediaConverter;
   private final XmlConverter<PhoneValue> phoneConverter;
   private final XmlConverter<EmailValue> emailConverter;
 
   public ContactDao()
   {
     super(ContactDO.class);
-    final InstantMessagingValue im = new InstantMessagingValue();
+    final SocialMediaValue socialMedia = new SocialMediaValue();
     final PhoneValue phone = new PhoneValue();
     final EmailValue email = new EmailValue();
-    imConverter = new XmlConverter<InstantMessagingValue>(im);
+    socialMediaConverter = new XmlConverter<SocialMediaValue>(socialMedia);
     phoneConverter = new XmlConverter<PhoneValue>(phone);
     emailConverter = new XmlConverter<EmailValue>(email);
   }
@@ -155,26 +155,26 @@ public class ContactDao extends BaseDao<ContactDO>
   }
 
   /**
-   * Exports xml string as List of Instant Messaging values.
-   * @param InstantMessagingValue values
+   * Exports xml string as List of Social Media values.
+   * @param SocialMediaValue values
    */
-  public List<InstantMessagingValue> readImValues(final String valuesAsXml)
+  public List<SocialMediaValue> readSocialMediaValues(final String valuesAsXml)
   {
-    return imConverter.readValues(valuesAsXml);
+    return socialMediaConverter.readValues(valuesAsXml);
   }
 
   /**
-   * Exports the Instant Messaging values as xml string.
-   * @param InstantMessagingValue values
+   * Exports the Social Media values as xml string.
+   * @param SocialMediaValue values
    */
-  public String getImValuesAsXml(final InstantMessagingValue... values)
+  public String getSocialMediaValuesAsXml(final SocialMediaValue... values)
   {
-    return imConverter.getValuesAsXml(values);
+    return socialMediaConverter.getValuesAsXml(values);
   }
 
-  public String getImValuesAsXml(final List<InstantMessagingValue> values)
+  public String getSocialMediaValuesAsXml(final List<SocialMediaValue> values)
   {
-    return imConverter.getValuesAsXml(values);
+    return socialMediaConverter.getValuesAsXml(values);
   }
 
   public List<EmailValue> readEmailValues(final String valuesAsXml)

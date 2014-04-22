@@ -811,7 +811,7 @@ public class AddressDO extends DefaultBaseDO
         try {
           type = InstantMessagingType.get(label);
         } catch (final Exception ex) {
-          log.error("Ignoring unknown InstantMessagingType: " + label, ex);
+          log.error("Ignoring unknown SocialMediaType: " + label, ex);
           continue;
         }
         setInstantMessaging(type, value);

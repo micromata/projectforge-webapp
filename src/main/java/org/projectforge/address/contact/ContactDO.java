@@ -82,7 +82,7 @@ public class ContactDO extends DefaultBaseDO
 
   @PropertyInfo(i18nKey = "contact.imValues")
   @Field(index = Index.TOKENIZED, store = Store.NO)
-  private String imValues;
+  private String socialMediaValues;
 
   @PropertyInfo(i18nKey = "contact.emailValues")
   @Field(index = Index.TOKENIZED, store = Store.NO)
@@ -292,14 +292,14 @@ public class ContactDO extends DefaultBaseDO
   }
 
   @Column
-  public String getImValues()
+  public String getSocialMediaValues()
   {
-    return imValues;
+    return socialMediaValues;
   }
 
-  public ContactDO setImValues(final String imValues)
+  public ContactDO setSocialMediaValues(final String socialMediaValues)
   {
-    this.imValues = imValues;
+    this.socialMediaValues = socialMediaValues;
     return this;
   }
 

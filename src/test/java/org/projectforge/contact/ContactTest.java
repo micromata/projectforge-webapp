@@ -43,9 +43,9 @@ import org.projectforge.address.contact.ContactDO;
 import org.projectforge.address.contact.ContactDao;
 import org.projectforge.address.contact.ContactType;
 import org.projectforge.address.contact.EmailValue;
-import org.projectforge.address.contact.InstantMessagingType;
-import org.projectforge.address.contact.InstantMessagingValue;
 import org.projectforge.address.contact.PhoneValue;
+import org.projectforge.address.contact.SocialMediaType;
+import org.projectforge.address.contact.SocialMediaValue;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.core.SimpleHistoryEntry;
@@ -77,15 +77,15 @@ public class ContactTest extends TestBase
     a1.setName("Kai Reinhard");
     a1.setTask(getTask("1.1"));
 
-    final InstantMessagingValue value1 = new InstantMessagingValue()
+    final SocialMediaValue value1 = new SocialMediaValue()
     .setContactType(ContactType.BUSINESS)
-    .setImType(InstantMessagingType.JABBER)
+    .setImType(SocialMediaType.JABBER)
     .setUser("Hurzel");
-    final InstantMessagingValue value2 = new InstantMessagingValue()
+    final SocialMediaValue value2 = new SocialMediaValue()
     .setContactType(ContactType.PRIVATE)
-    .setImType(InstantMessagingType.TWITTER)
+    .setImType(SocialMediaType.TWITTER)
     .setUser("Hurzeli");
-    a1.setImValues(contactDao.getImValuesAsXml(value1,value2));
+    a1.setSocialMediaValues(contactDao.getSocialMediaValuesAsXml(value1,value2));
 
     final EmailValue email1 = new EmailValue().setContactType(ContactType.BUSINESS).setEmail("theo.test@acme.com");
     final EmailValue email2 = new EmailValue().setContactType(ContactType.PRIVATE).setEmail("theo.test@t-offline.de");
@@ -100,8 +100,8 @@ public class ContactTest extends TestBase
 
     final ContactDO a1a = contactDao.getById(a1.getId());
 
-    ArrayList<InstantMessagingValue> list = new ArrayList<InstantMessagingValue>();
-    list = (ArrayList<InstantMessagingValue>) contactDao.readImValues(a1a.getImValues());
+    ArrayList<SocialMediaValue> list = new ArrayList<SocialMediaValue>();
+    list = (ArrayList<SocialMediaValue>) contactDao.readSocialMediaValues(a1a.getSocialMediaValues());
     assertEquals(value1.getUser(), list.get(0).getUser());
     assertEquals(value2.getUser(), list.get(1).getUser());
 
@@ -362,17 +362,17 @@ public class ContactTest extends TestBase
   //  {
   //    final ContactDO address = new ContactDO();
   //    assertNull(address.getInstantMessaging4DB());
-  //    address.setInstantMessaging(InstantMessagingType.SKYPE, "skype-name");
+  //    address.setInstantMessaging(SocialMediaType.SKYPE, "skype-name");
   //    assertEquals("SKYPE=skype-name", address.getInstantMessaging4DB());
-  //    address.setInstantMessaging(InstantMessagingType.AIM, "aim-id");
+  //    address.setInstantMessaging(SocialMediaType.AIM, "aim-id");
   //    assertEquals("SKYPE=skype-name\nAIM=aim-id", address.getInstantMessaging4DB());
-  //    address.setInstantMessaging(InstantMessagingType.YAHOO, "yahoo-name");
+  //    address.setInstantMessaging(SocialMediaType.YAHOO, "yahoo-name");
   //    assertEquals("SKYPE=skype-name\nAIM=aim-id\nYAHOO=yahoo-name", address.getInstantMessaging4DB());
-  //    address.setInstantMessaging(InstantMessagingType.YAHOO, "");
+  //    address.setInstantMessaging(SocialMediaType.YAHOO, "");
   //    assertEquals("SKYPE=skype-name\nAIM=aim-id", address.getInstantMessaging4DB());
-  //    address.setInstantMessaging(InstantMessagingType.SKYPE, "");
+  //    address.setInstantMessaging(SocialMediaType.SKYPE, "");
   //    assertEquals("AIM=aim-id", address.getInstantMessaging4DB());
-  //    address.setInstantMessaging(InstantMessagingType.AIM, "");
+  //    address.setInstantMessaging(SocialMediaType.AIM, "");
   //    assertNull(address.getInstantMessaging4DB());
   //  }
 }

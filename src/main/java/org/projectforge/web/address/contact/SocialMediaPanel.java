@@ -39,8 +39,8 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.contact.ContactDao;
 import org.projectforge.address.contact.ContactType;
-import org.projectforge.address.contact.InstantMessagingType;
-import org.projectforge.address.contact.InstantMessagingValue;
+import org.projectforge.address.contact.SocialMediaType;
+import org.projectforge.address.contact.SocialMediaValue;
 import org.projectforge.web.wicket.components.AjaxMaxLengthEditableLabel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel;
@@ -49,7 +49,7 @@ import org.projectforge.web.wicket.flowlayout.IconType;
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class ImsPanel extends Panel
+public class SocialMediaPanel extends Panel
 {
 
   private static final long serialVersionUID = -7631249461414483163L;
@@ -57,7 +57,7 @@ public class ImsPanel extends Panel
   @SpringBean(name = "contactDao")
   private ContactDao contactDao;
 
-  private List<InstantMessagingValue> ims = null;
+  private List<SocialMediaValue> ims = null;
 
   private  RepeatingView imsRepeater;
 
@@ -65,9 +65,9 @@ public class ImsPanel extends Panel
 
   private  LabelValueChoiceRenderer<ContactType> contactChoiceRenderer;
 
-  private  LabelValueChoiceRenderer<InstantMessagingType> imChoiceRenderer;
+  private  LabelValueChoiceRenderer<SocialMediaType> imChoiceRenderer;
 
-  private  InstantMessagingValue newImValue;
+  private  SocialMediaValue newImValue;
 
   private final String DEFAULT_IM_VALUE = "Benutzer";
 
@@ -78,12 +78,12 @@ public class ImsPanel extends Panel
   /**
    * @param id
    */
-  public ImsPanel(final String id, final PropertyModel<String> model)
+  public SocialMediaPanel(final String id, final PropertyModel<String> model)
   {
     super(id);
     this.model = model;
     if (StringUtils.isNotBlank(model.getObject()) == true) {
-      ims = contactDao.readImValues(model.getObject());
+      ims = contactDao.readSocialMediaValues(model.getObject());
     }
   }
 
@@ -95,11 +95,11 @@ public class ImsPanel extends Panel
   {
     super.onInitialize();
     if (ims == null) {
-      ims = new ArrayList<InstantMessagingValue>();
+      ims = new ArrayList<SocialMediaValue>();
     }
-    newImValue = new InstantMessagingValue().setUser(DEFAULT_IM_VALUE).setContactType(ContactType.BUSINESS).setImType(InstantMessagingType.AIM);
+    newImValue = new SocialMediaValue().setUser(DEFAULT_IM_VALUE).setContactType(ContactType.BUSINESS).setImType(SocialMediaType.AIM);
     contactChoiceRenderer = new LabelValueChoiceRenderer<ContactType>(this, ContactType.values());
-    imChoiceRenderer = new LabelValueChoiceRenderer<InstantMessagingType>(this, InstantMessagingType.values());
+    imChoiceRenderer = new LabelValueChoiceRenderer<SocialMediaType>(this, SocialMediaType.values());
     mainContainer = new WebMarkupContainer("main");
     add(mainContainer.setOutputMarkupId(true));
     imsRepeater = new RepeatingView("liRepeater");
@@ -124,10 +124,11 @@ public class ImsPanel extends Panel
       protected void onUpdate(final AjaxRequestTarget target)
       {
         newImValue.setContactType(contactChoice.getModelObject());
+        model.setObject(contactDao.getSocialMediaValuesAsXml(ims));
       }
     });
 
-    final DropDownChoice<InstantMessagingType> imChoice = new DropDownChoice<InstantMessagingType>("imChoice", new PropertyModel<InstantMessagingType>(
+    final DropDownChoice<SocialMediaType> imChoice = new DropDownChoice<SocialMediaType>("imChoice", new PropertyModel<SocialMediaType>(
         newImValue, "imType"), imChoiceRenderer.getValues(), imChoiceRenderer);
     item.add(imChoice);
     imChoice.add(new AjaxFormComponentUpdatingBehavior("onchange") {
@@ -135,6 +136,7 @@ public class ImsPanel extends Panel
       protected void onUpdate(final AjaxRequestTarget target)
       {
         newImValue.setImType(imChoice.getModelObject());
+        model.setObject(contactDao.getSocialMediaValuesAsXml(ims));
       }
     });
 
@@ -144,8 +146,8 @@ public class ImsPanel extends Panel
       {
         super.onSubmit(target);
         if (StringUtils.isNotBlank(newImValue.getUser()) == true && newImValue.getUser().equals(DEFAULT_IM_VALUE) == false) {
-          ims.add(new InstantMessagingValue().setUser(newImValue.getUser()).setContactType(newImValue.getContactType()).setImType(newImValue.getImType()));
-          model.setObject(contactDao.getImValuesAsXml(ims));
+          ims.add(new SocialMediaValue().setUser(newImValue.getUser()).setContactType(newImValue.getContactType()).setImType(newImValue.getImType()));
+          model.setObject(contactDao.getSocialMediaValuesAsXml(ims));
         }
         newImValue.setUser(DEFAULT_IM_VALUE);
         rebuildIms();
@@ -163,14 +165,14 @@ public class ImsPanel extends Panel
       protected void onClick(final AjaxRequestTarget target)
       {
         super.onClick(target);
-        final Iterator<InstantMessagingValue> it = ims.iterator();
+        final Iterator<SocialMediaValue> it = ims.iterator();
         while (it.hasNext() == true) {
           if (it.next() == newImValue) {
             it.remove();
           }
         }
         rebuildIms();
-        model.setObject(contactDao.getImValuesAsXml(ims));
+        model.setObject(contactDao.getSocialMediaValuesAsXml(ims));
         target.add(mainContainer);
       }
     });
@@ -182,7 +184,7 @@ public class ImsPanel extends Panel
   private void rebuildIms()
   {
     imsRepeater.removeAll();
-    for (final InstantMessagingValue im : ims) {
+    for (final SocialMediaValue im : ims) {
       final WebMarkupContainer item = new WebMarkupContainer(imsRepeater.newChildId());
       imsRepeater.add(item);
       final DropDownChoice<ContactType> contactChoice = new DropDownChoice<ContactType>("choice", new PropertyModel<ContactType>(im,
@@ -193,10 +195,11 @@ public class ImsPanel extends Panel
         protected void onUpdate(final AjaxRequestTarget target)
         {
           im.setContactType(contactChoice.getModelObject());
+          model.setObject(contactDao.getSocialMediaValuesAsXml(ims));
         }
       });
 
-      final DropDownChoice<InstantMessagingType> imChoice = new DropDownChoice<InstantMessagingType>("imChoice", new PropertyModel<InstantMessagingType>(
+      final DropDownChoice<SocialMediaType> imChoice = new DropDownChoice<SocialMediaType>("imChoice", new PropertyModel<SocialMediaType>(
           im, "imType"), imChoiceRenderer.getValues(), imChoiceRenderer);
       item.add(imChoice);
       imChoice.add(new AjaxFormComponentUpdatingBehavior("onchange") {
@@ -204,6 +207,7 @@ public class ImsPanel extends Panel
         protected void onUpdate(final AjaxRequestTarget target)
         {
           im.setImType(imChoice.getModelObject());
+          model.setObject(contactDao.getSocialMediaValuesAsXml(ims));
         }
       });
 
@@ -219,14 +223,14 @@ public class ImsPanel extends Panel
         protected void onClick(final AjaxRequestTarget target)
         {
           super.onClick(target);
-          final Iterator<InstantMessagingValue> it = ims.iterator();
+          final Iterator<SocialMediaValue> it = ims.iterator();
           while (it.hasNext() == true) {
             if (it.next() == im) {
               it.remove();
             }
           }
           rebuildIms();
-          model.setObject(contactDao.getImValuesAsXml(ims));
+          model.setObject(contactDao.getSocialMediaValuesAsXml(ims));
           target.add(mainContainer);
         }
       });
