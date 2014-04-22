@@ -14,10 +14,13 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -25,7 +28,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
-import org.projectforge.core.DefaultBaseDO;
+import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.PropertyInfo;
 
 /**
@@ -33,12 +36,14 @@ import org.projectforge.core.PropertyInfo;
  */
 @Entity
 @Indexed
-@Table(name = "T_CONTACTENTRY")
-public class ContactEntryDO extends DefaultBaseDO
+@Table(name = "T_CONTACTENTRY", uniqueConstraints = { @UniqueConstraint(columnNames = { "contact_id", "number"})})
+public class ContactEntryDO extends AbstractBaseDO<Integer>
 {
   private static final long serialVersionUID = -8141697905834021747L;
 
   //private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ContactEntryDO.class);
+
+  private Integer id;
 
   private short number;
 
@@ -68,6 +73,19 @@ public class ContactEntryDO extends DefaultBaseDO
   @PropertyInfo(i18nKey = "zipCode")
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String zipCode;
+
+  @Id
+  @GeneratedValue
+  @Column(name = "pk")
+  public Integer getId()
+  {
+    return id;
+  }
+
+  public void setId(final Integer id)
+  {
+    this.id = id;
+  }
 
   /**
    * Not used as object due to performance reasons.
@@ -113,6 +131,7 @@ public class ContactEntryDO extends DefaultBaseDO
   /**
    * @return the city
    */
+  @Column
   public String getCity()
   {
     return city;
@@ -131,6 +150,7 @@ public class ContactEntryDO extends DefaultBaseDO
   /**
    * @return the country
    */
+  @Column
   public String getCountry()
   {
     return country;
@@ -149,6 +169,7 @@ public class ContactEntryDO extends DefaultBaseDO
   /**
    * @return the state
    */
+  @Column
   public String getState()
   {
     return state;
@@ -167,6 +188,7 @@ public class ContactEntryDO extends DefaultBaseDO
   /**
    * @return the street
    */
+  @Column
   public String getStreet()
   {
     return street;
@@ -185,6 +207,7 @@ public class ContactEntryDO extends DefaultBaseDO
   /**
    * @return the zipCode
    */
+  @Column
   public String getZipCode()
   {
     return zipCode;
@@ -200,7 +223,7 @@ public class ContactEntryDO extends DefaultBaseDO
     return this;
   }
 
-
+  @Column
   public short getNumber()
   {
     return number;
