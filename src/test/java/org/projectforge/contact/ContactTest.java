@@ -79,11 +79,11 @@ public class ContactTest extends TestBase
 
     final SocialMediaValue value1 = new SocialMediaValue()
     .setContactType(ContactType.BUSINESS)
-    .setImType(SocialMediaType.JABBER)
+    .setSocialMediaType(SocialMediaType.JABBER)
     .setUser("Hurzel");
     final SocialMediaValue value2 = new SocialMediaValue()
     .setContactType(ContactType.PRIVATE)
-    .setImType(SocialMediaType.TWITTER)
+    .setSocialMediaType(SocialMediaType.TWITTER)
     .setUser("Hurzeli");
     a1.setSocialMediaValues(contactDao.getSocialMediaValuesAsXml(value1,value2));
 

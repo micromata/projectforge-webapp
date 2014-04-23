@@ -106,7 +106,7 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
 
     // Instant Messaging Entries
     fs2 = gridBuilder.newFieldset(ContactDO.class, "socialMediaValues").suppressLabelForWarning();
-    fs2.add(new SocialMediaPanel(fs.newChildId(), new PropertyModel<String>(data, "socialMediaValues")));
+    fs2.add(new SocialMediaPanel(fs.newChildId(), new CompoundPropertyModel<ContactDO>(data)));
 
     // Contacts
     fs2 = gridBuilder.newFieldset(ContactDO.class, "contacts").suppressLabelForWarning();
