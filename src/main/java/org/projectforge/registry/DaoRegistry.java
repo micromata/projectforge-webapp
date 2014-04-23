@@ -27,7 +27,6 @@ import javax.sql.DataSource;
 
 import org.projectforge.access.AccessDao;
 import org.projectforge.address.AddressDao;
-import org.projectforge.address.contact.AddressKatDao;
 import org.projectforge.address.contact.ContactDao;
 import org.projectforge.address.contact.ContactEntryDao;
 import org.projectforge.book.BookDao;
@@ -160,8 +159,6 @@ public class DaoRegistry
 
   private AddressDao addressDao;
 
-  private AddressKatDao addressKatDao;
-
   private AuftragDao auftragDao;
 
   private BuchungssatzDao buchungssatzDao;
@@ -247,7 +244,6 @@ public class DaoRegistry
     register(ACCESS, AccessDao.class, accessDao, "access");
 
     register(ADDRESS, AddressDao.class, addressDao, "address");
-    register(ADDRESSKAT, AddressKatDao.class, addressKatDao, "addressKat");
     register(CONTACT, ContactDao.class, contactDao, "contact");
     register(CONTACTENTRY, ContactEntryDao.class, contactEntryDao, "contactEntry");
     register(TIMESHEET, TimesheetDao.class, timesheetDao, "timesheet") //
@@ -334,11 +330,6 @@ public class DaoRegistry
   public void setAddressDao(final AddressDao addressDao)
   {
     this.addressDao = addressDao;
-  }
-
-  public void setAddressKatDao(final AddressKatDao addressKatDao)
-  {
-    this.addressKatDao = addressKatDao;
   }
 
   public void setContactDao(final ContactDao contactDao)

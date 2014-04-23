@@ -27,7 +27,6 @@ import org.projectforge.access.AccessEntryDO;
 import org.projectforge.access.GroupTaskAccessDO;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.PersonalAddressDO;
-import org.projectforge.address.contact.AddressKatDO;
 import org.projectforge.address.contact.ContactDO;
 import org.projectforge.address.contact.ContactEntryDO;
 import org.projectforge.address.contact.PersonalContactDO;
@@ -112,7 +111,7 @@ public class DatabaseCoreInitial
         KostZuweisungDO.class, //
 
         // All the rest:
-        AddressDO.class, AddressKatDO.class, PersonalAddressDO.class, //
+        AddressDO.class, PersonalAddressDO.class, //
         ContactDO.class, ContactEntryDO.class, PersonalContactDO.class, //
         BookDO.class, //
         ConfigurationDO.class, //

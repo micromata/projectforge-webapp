@@ -34,7 +34,6 @@
   <!-- Daos (automatically initialized as singletons.) -->
   <bean id="accessDao" class="org.projectforge.access.AccessDao" />
   <bean id="addressDao" class="org.projectforge.address.AddressDao" />
-  <bean id="addressKatDao" class="org.projectforge.address.contact.AddressKatDao" />
   <bean id="bookDao" class="org.projectforge.book.BookDao" />
   <bean id="configurationDao" class="org.projectforge.core.ConfigurationDao" />
   <bean id="contactDao" class="org.projectforge.address.contact.ContactDao" />
