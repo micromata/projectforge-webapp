@@ -29,7 +29,7 @@ public class SocialMediaValue implements Serializable
 
   @XmlField
   @PropertyInfo(i18nKey = "imType")
-  private SocialMediaType imType;
+  private SocialMediaType socialMediaType;
 
   @XmlField
   @PropertyInfo(i18nKey = "user")
@@ -46,14 +46,14 @@ public class SocialMediaValue implements Serializable
     return this;
   }
 
-  public SocialMediaType getImType()
+  public SocialMediaType getSocialMediaType()
   {
-    return imType;
+    return socialMediaType;
   }
 
-  public SocialMediaValue setImType(final SocialMediaType imType)
+  public SocialMediaValue setSocialMediaType(final SocialMediaType socialMediaType)
   {
-    this.imType = imType;
+    this.socialMediaType = socialMediaType;
     return this;
   }
 

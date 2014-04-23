@@ -35,8 +35,10 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.address.contact.ContactDO;
 import org.projectforge.address.contact.ContactDao;
 import org.projectforge.address.contact.ContactType;
 import org.projectforge.address.contact.SocialMediaType;
@@ -57,33 +59,33 @@ public class SocialMediaPanel extends Panel
   @SpringBean(name = "contactDao")
   private ContactDao contactDao;
 
-  private List<SocialMediaValue> ims = null;
+  private List<SocialMediaValue> socialMediaValues = null;
 
-  private  RepeatingView imsRepeater;
+  private  RepeatingView socialMediaRepeater;
 
-  private  WebMarkupContainer mainContainer, addNewImContainer;
+  private  WebMarkupContainer mainContainer, addNewSocialMediaContainer;
 
   private  LabelValueChoiceRenderer<ContactType> contactChoiceRenderer;
 
-  private  LabelValueChoiceRenderer<SocialMediaType> imChoiceRenderer;
+  private  LabelValueChoiceRenderer<SocialMediaType> socialMediaChoiceRenderer;
 
-  private  SocialMediaValue newImValue;
+  private  SocialMediaValue newSocialMediaValue;
 
   private final String DEFAULT_IM_VALUE = "Benutzer";
 
   private Component delete;
 
-  private final PropertyModel<String> model;
+  private final IModel<ContactDO> model;
 
   /**
    * @param id
    */
-  public SocialMediaPanel(final String id, final PropertyModel<String> model)
+  public SocialMediaPanel(final String id, final IModel<ContactDO> model)
   {
     super(id);
     this.model = model;
-    if (StringUtils.isNotBlank(model.getObject()) == true) {
-      ims = contactDao.readSocialMediaValues(model.getObject());
+    if (model != null && model.getObject() != null && StringUtils.isNotBlank(model.getObject().getSocialMediaValues()) == true) {
+      socialMediaValues = contactDao.readSocialMediaValues(model.getObject().getSocialMediaValues());
     }
   }
 
@@ -94,70 +96,71 @@ public class SocialMediaPanel extends Panel
   protected void onInitialize()
   {
     super.onInitialize();
-    if (ims == null) {
-      ims = new ArrayList<SocialMediaValue>();
+    if (socialMediaValues == null) {
+      socialMediaValues = new ArrayList<SocialMediaValue>();
     }
-    newImValue = new SocialMediaValue().setUser(DEFAULT_IM_VALUE).setContactType(ContactType.BUSINESS).setImType(SocialMediaType.AIM);
+    newSocialMediaValue = new SocialMediaValue().setUser(DEFAULT_IM_VALUE).setContactType(ContactType.BUSINESS).setSocialMediaType(SocialMediaType.AIM);
     contactChoiceRenderer = new LabelValueChoiceRenderer<ContactType>(this, ContactType.values());
-    imChoiceRenderer = new LabelValueChoiceRenderer<SocialMediaType>(this, SocialMediaType.values());
+    socialMediaChoiceRenderer = new LabelValueChoiceRenderer<SocialMediaType>(this, SocialMediaType.values());
     mainContainer = new WebMarkupContainer("main");
     add(mainContainer.setOutputMarkupId(true));
-    imsRepeater = new RepeatingView("liRepeater");
-    mainContainer.add(imsRepeater);
+    socialMediaRepeater = new RepeatingView("liRepeater");
+    mainContainer.add(socialMediaRepeater);
 
-    rebuildIms();
-    addNewImContainer = new WebMarkupContainer("liAddNewIm");
-    mainContainer.add(addNewImContainer);
+    rebuildSocialMedias();
+    addNewSocialMediaContainer = new WebMarkupContainer("liAddNewIm");
+    mainContainer.add(addNewSocialMediaContainer.setOutputMarkupId(true));
 
-    init(addNewImContainer);
-    imsRepeater.setVisible(true);
+    init(addNewSocialMediaContainer);
+    socialMediaRepeater.setVisible(true);
   }
 
   @SuppressWarnings("serial")
   void init(final WebMarkupContainer item)
   {
-    final DropDownChoice<ContactType> contactChoice = new DropDownChoice<ContactType>("choice", new PropertyModel<ContactType>(
-        newImValue, "contactType"), contactChoiceRenderer.getValues(), contactChoiceRenderer);
+    final DropDownChoice<ContactType> contactChoice = new DropDownChoice<ContactType>("contactChoice", new PropertyModel<ContactType>(
+        newSocialMediaValue, "contactType"), contactChoiceRenderer.getValues(), contactChoiceRenderer);
     item.add(contactChoice);
     contactChoice.add(new AjaxFormComponentUpdatingBehavior("onchange") {
       @Override
       protected void onUpdate(final AjaxRequestTarget target)
       {
-        newImValue.setContactType(contactChoice.getModelObject());
-        model.setObject(contactDao.getSocialMediaValuesAsXml(ims));
+        newSocialMediaValue.setContactType(contactChoice.getModelObject());
+        model.getObject().setSocialMediaValues(contactDao.getSocialMediaValuesAsXml(socialMediaValues));
       }
     });
 
-    final DropDownChoice<SocialMediaType> imChoice = new DropDownChoice<SocialMediaType>("imChoice", new PropertyModel<SocialMediaType>(
-        newImValue, "imType"), imChoiceRenderer.getValues(), imChoiceRenderer);
-    item.add(imChoice);
-    imChoice.add(new AjaxFormComponentUpdatingBehavior("onchange") {
+    final DropDownChoice<SocialMediaType> socialMediaChoice = new DropDownChoice<SocialMediaType>("socialMediaChoice", new PropertyModel<SocialMediaType>(
+        newSocialMediaValue, "socialMediaType"), socialMediaChoiceRenderer.getValues(), socialMediaChoiceRenderer);
+    item.add(socialMediaChoice);
+    socialMediaChoice.add(new AjaxFormComponentUpdatingBehavior("onchange") {
       @Override
       protected void onUpdate(final AjaxRequestTarget target)
       {
-        newImValue.setImType(imChoice.getModelObject());
-        model.setObject(contactDao.getSocialMediaValuesAsXml(ims));
+        newSocialMediaValue.setSocialMediaType(socialMediaChoice.getModelObject());
+        model.getObject().setSocialMediaValues(contactDao.getSocialMediaValuesAsXml(socialMediaValues));
+        target.add(mainContainer);
       }
     });
 
-    item.add(new AjaxMaxLengthEditableLabel("editableLabel", new PropertyModel<String>(newImValue, "user")) {
+    item.add(new AjaxMaxLengthEditableLabel("editableLabel", new PropertyModel<String>(newSocialMediaValue, "user")) {
       @Override
       protected void onSubmit(final AjaxRequestTarget target)
       {
         super.onSubmit(target);
-        if (StringUtils.isNotBlank(newImValue.getUser()) == true && newImValue.getUser().equals(DEFAULT_IM_VALUE) == false) {
-          ims.add(new SocialMediaValue().setUser(newImValue.getUser()).setContactType(newImValue.getContactType()).setImType(newImValue.getImType()));
-          model.setObject(contactDao.getSocialMediaValuesAsXml(ims));
+        if (StringUtils.isNotBlank(newSocialMediaValue.getUser()) == true && newSocialMediaValue.getUser().equals(DEFAULT_IM_VALUE) == false) {
+          socialMediaValues.add(new SocialMediaValue().setUser(newSocialMediaValue.getUser()).setContactType(newSocialMediaValue.getContactType()).setSocialMediaType(newSocialMediaValue.getSocialMediaType()));
+          model.getObject().setSocialMediaValues(contactDao.getSocialMediaValuesAsXml(socialMediaValues));
         }
-        newImValue.setUser(DEFAULT_IM_VALUE);
-        rebuildIms();
+        newSocialMediaValue.setUser(DEFAULT_IM_VALUE);
+        rebuildSocialMedias();
         target.add(mainContainer);
       }
     });
 
     final WebMarkupContainer deleteDiv = new WebMarkupContainer("deleteDiv");
     deleteDiv.setOutputMarkupId(true);
-    deleteDiv.add( delete = new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(newImValue, "user")) {
+    deleteDiv.add( delete = new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(newSocialMediaValue, "user")) {
       /**
        * @see org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel#onClick(org.apache.wicket.ajax.AjaxRequestTarget)
        */
@@ -165,14 +168,14 @@ public class SocialMediaPanel extends Panel
       protected void onClick(final AjaxRequestTarget target)
       {
         super.onClick(target);
-        final Iterator<SocialMediaValue> it = ims.iterator();
+        final Iterator<SocialMediaValue> it = socialMediaValues.iterator();
         while (it.hasNext() == true) {
-          if (it.next() == newImValue) {
+          if (it.next() == newSocialMediaValue) {
             it.remove();
           }
         }
-        rebuildIms();
-        model.setObject(contactDao.getSocialMediaValuesAsXml(ims));
+        rebuildSocialMedias();
+        model.getObject().setSocialMediaValues(contactDao.getSocialMediaValuesAsXml(socialMediaValues));
         target.add(mainContainer);
       }
     });
@@ -181,41 +184,42 @@ public class SocialMediaPanel extends Panel
   }
 
   @SuppressWarnings("serial")
-  private void rebuildIms()
+  private void rebuildSocialMedias()
   {
-    imsRepeater.removeAll();
-    for (final SocialMediaValue im : ims) {
-      final WebMarkupContainer item = new WebMarkupContainer(imsRepeater.newChildId());
-      imsRepeater.add(item);
-      final DropDownChoice<ContactType> contactChoice = new DropDownChoice<ContactType>("choice", new PropertyModel<ContactType>(im,
+    socialMediaRepeater.removeAll();
+    for (final SocialMediaValue socialMediaValue : socialMediaValues) {
+      final WebMarkupContainer item = new WebMarkupContainer(socialMediaRepeater.newChildId());
+      socialMediaRepeater.add(item);
+      final DropDownChoice<ContactType> contactChoice = new DropDownChoice<ContactType>("contactChoice", new PropertyModel<ContactType>(socialMediaValue,
           "contactType"), contactChoiceRenderer.getValues(), contactChoiceRenderer);
       item.add(contactChoice);
       contactChoice.add(new AjaxFormComponentUpdatingBehavior("onchange") {
         @Override
         protected void onUpdate(final AjaxRequestTarget target)
         {
-          im.setContactType(contactChoice.getModelObject());
-          model.setObject(contactDao.getSocialMediaValuesAsXml(ims));
+          socialMediaValue.setContactType(contactChoice.getModelObject());
+          model.getObject().setSocialMediaValues(contactDao.getSocialMediaValuesAsXml(socialMediaValues));
         }
       });
 
-      final DropDownChoice<SocialMediaType> imChoice = new DropDownChoice<SocialMediaType>("imChoice", new PropertyModel<SocialMediaType>(
-          im, "imType"), imChoiceRenderer.getValues(), imChoiceRenderer);
-      item.add(imChoice);
-      imChoice.add(new AjaxFormComponentUpdatingBehavior("onchange") {
+      final DropDownChoice<SocialMediaType> socialMediaChoice = new DropDownChoice<SocialMediaType>("socialMediaChoice", new PropertyModel<SocialMediaType>(
+          socialMediaValue, "socialMediaType"), socialMediaChoiceRenderer.getValues(), socialMediaChoiceRenderer);
+      item.add(socialMediaChoice);
+      socialMediaChoice.add(new AjaxFormComponentUpdatingBehavior("onchange") {
         @Override
         protected void onUpdate(final AjaxRequestTarget target)
         {
-          im.setImType(imChoice.getModelObject());
-          model.setObject(contactDao.getSocialMediaValuesAsXml(ims));
+          socialMediaValue.setSocialMediaType(socialMediaChoice.getModelObject());
+          model.getObject().setSocialMediaValues(contactDao.getSocialMediaValuesAsXml(socialMediaValues));
+          target.add(mainContainer);
         }
       });
 
-      item.add(new AjaxMaxLengthEditableLabel("editableLabel", new PropertyModel<String>(im, "user")));
+      item.add(new AjaxMaxLengthEditableLabel("editableLabel", new PropertyModel<String>(socialMediaValue, "user")));
 
       final WebMarkupContainer deleteDiv = new WebMarkupContainer("deleteDiv");
       deleteDiv.setOutputMarkupId(true);
-      deleteDiv.add(new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(im, "user")) {
+      deleteDiv.add(new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(socialMediaValue, "user")) {
         /**
          * @see org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel#onClick(org.apache.wicket.ajax.AjaxRequestTarget)
          */
@@ -223,18 +227,19 @@ public class SocialMediaPanel extends Panel
         protected void onClick(final AjaxRequestTarget target)
         {
           super.onClick(target);
-          final Iterator<SocialMediaValue> it = ims.iterator();
+          final Iterator<SocialMediaValue> it = socialMediaValues.iterator();
           while (it.hasNext() == true) {
-            if (it.next() == im) {
+            if (it.next() == socialMediaValue) {
               it.remove();
             }
           }
-          rebuildIms();
-          model.setObject(contactDao.getSocialMediaValuesAsXml(ims));
+          rebuildSocialMedias();
+          model.getObject().setSocialMediaValues(contactDao.getSocialMediaValuesAsXml(socialMediaValues));
           target.add(mainContainer);
         }
       });
       item.add(deleteDiv);
     }
   }
+
 }
