@@ -1,9 +1,23 @@
 /////////////////////////////////////////////////////////////////////////////
 //
-// Project   ProjectForge
+// Project ProjectForge Community Edition
+//         www.projectforge.org
 //
-// Copyright 2001-2009, Micromata GmbH, Kai Reinhard
-//           All rights reserved.
+// Copyright (C) 2001-2014 Kai Reinhard (k.reinhard@micromata.de)
+//
+// ProjectForge is dual-licensed.
+//
+// This community edition is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation; version 3 of the License.
+//
+// This community edition is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+// Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, see http://www.gnu.org/licenses/.
 //
 /////////////////////////////////////////////////////////////////////////////
 
@@ -55,9 +69,9 @@ public class SkillTestHelper
     trainingUser3 = AbstractTestBase.initTestDB.addUser(prefix + "TrainingUser3");
     noAccessUser = AbstractTestBase.initTestDB.addUser(prefix + "NoAccessUser");
 
-    fullGroup1 = AbstractTestBase.initTestDB.addGroup(prefix + "FullGroup1", fullUser1.getUsername());
-    readonlyGroup1 = AbstractTestBase.initTestDB.addGroup(prefix + "ReadonlyGroup1", readonlyUser1.getUsername());
-    trainingGroup1 = AbstractTestBase.initTestDB.addGroup(prefix + "TrainingGroup1", trainingUser1.getUsername());
+    fullGroup1 = AbstractTestBase.initTestDB.addGroup(prefix + "FullGroup1", owner.getUsername(), fullUser1.getUsername());
+    readonlyGroup1 = AbstractTestBase.initTestDB.addGroup(prefix + "ReadonlyGroup1", owner.getUsername(), readonlyUser1.getUsername());
+    trainingGroup1 = AbstractTestBase.initTestDB.addGroup(prefix + "TrainingGroup1", owner.getUsername(), trainingUser1.getUsername());
 
     fullGroup2 = AbstractTestBase.initTestDB.addGroup(prefix + "FullGroup2", fullUser2.getUsername());
     readonlyGroup2 = AbstractTestBase.initTestDB.addGroup(prefix + "ReadonlyGroup2", readonlyUser2.getUsername());

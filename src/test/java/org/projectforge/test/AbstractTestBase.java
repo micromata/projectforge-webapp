@@ -213,7 +213,7 @@ public class AbstractTestBase
           for (final AbstractPlugin plugin : plugins) {
             final Class< ? >[] classes = plugin.getPersistentEntities();
             if (classes != null) {
-              for (int i = classes.length -1 ; i >= 0; i--) {
+              for (int i = classes.length - 1; i >= 0; i--) {
                 deleteFrom(hibernateTemplate, classes[i].getName());
               }
             }
@@ -271,9 +271,14 @@ public class AbstractTestBase
 
   private static void deleteFrom(final HibernateTemplate hibernateTemplate, final String entity)
   {
-    final Query query = hibernateTemplate.getSessionFactory().getCurrentSession().createQuery("delete from " + entity);
-    query.executeUpdate();
-    hibernateTemplate.flush();
+    try {
+      final Query query = hibernateTemplate.getSessionFactory().getCurrentSession().createQuery("delete from " + entity);
+      query.executeUpdate();
+      hibernateTemplate.flush();
+    } catch (final Exception ex) {
+      log.info("delete from " + entity + " failed (may-be OK). Trying to use HibernateTemplate.deleteAll(List) instead.");
+      deleteAllDBObjects(hibernateTemplate, entity);
+    }
   }
 
   private static void deleteAllDBObjects(final HibernateTemplate hibernateTemplate, final String entity)

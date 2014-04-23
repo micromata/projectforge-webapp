@@ -176,7 +176,7 @@ public class SendSmsPage extends AbstractStandardFormPage
       client.executeMethod(method);
       final String response = method.getResponseBodyAsString();
       if (response == null) {
-        errorKey = getString("address.sendSms.sendMessage.result.unknownError");
+        errorKey = "address.sendSms.sendMessage.result.unknownError";
       } else if (response.startsWith("0") == true) {
         result = getLocalizedMessage("address.sendSms.sendMessage.result.successful", number, DateTimeFormatter.instance()
             .getFormattedDateTime(new Date()));
@@ -187,7 +187,7 @@ public class SendSmsPage extends AbstractStandardFormPage
       } else if (response.startsWith("3") == true) {
         errorKey = "address.sendSms.sendMessage.result.messageToLarge";
       } else {
-        errorKey = getString("address.sendSms.sendMessage.result.unknownError");
+        errorKey = "address.sendSms.sendMessage.result.unknownError";
       }
     } catch (final HttpException ex) {
       errorKey = "Call failed. Please contact administrator.";
