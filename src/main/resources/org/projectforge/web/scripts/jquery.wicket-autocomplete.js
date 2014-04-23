@@ -313,20 +313,6 @@ jQuery.autocomplete = function(input, options) {
 				maxHeight: options.scrollHeight,
 				overflow: 'auto'
 			});
-				
-			if($.browser.msie && typeof document.body.style.maxHeight == "undefined") {
-			    alert("To fix");
-				var listHeight = 0;
-				listItems.each(function() {
-					listHeight += this.offsetHeight;
-				});
-				var scrollbarsVisible = listHeight > options.scrollHeight;
-				list.css('height', scrollbarsVisible ? options.scrollHeight : listHeight );
-				if (!scrollbarsVisible) {
-					// IE doesn't recalculate width when scrollbar disappears
-					listItems.width( list.width() - parseInt(listItems.css("padding-left")) - parseInt(listItems.css("padding-right")) );
-				}
-			}
 		}
 	};
 
@@ -358,7 +344,7 @@ jQuery.autocomplete = function(input, options) {
 			// if the field no longer has focus or if there are no matches, do
 			// not display the drop down
 			if( !hasFocus || data.length == 0 ) return hideResultsNow();
-			if ($.browser.msie) {
+			if (navigator.appVersion.indexOf("MSIE") != -1) {
 				// we put a styled iframe behind the calendar so HTML SELECT
 				// elements don't show through
 				$results.append(document.createElement('iframe'));
@@ -523,7 +509,7 @@ jQuery.autocomplete = function(input, options) {
 		flushCache();
 	};
 
-	// function by Johannes & Kai
+	// function by Johannes & Kai 
 	this.clearHideTimeout = function() {
 		if (timeout) clearTimeout(timeout)
 	}
