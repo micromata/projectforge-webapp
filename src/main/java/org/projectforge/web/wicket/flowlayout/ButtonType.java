@@ -29,8 +29,8 @@ package org.projectforge.web.wicket.flowlayout;
  */
 public enum ButtonType
 {
-  CANCEL("red"), DARK("dark"), DEFAULT_SUBMIT("green"), DELETE("red"), DIALOG_CLOSE("close_dialog"), GREEN("green"), LIGHT("light"), RED(
-      "red");
+  CANCEL("btn-danger"), DARK("dark"), DEFAULT_SUBMIT("btn-success"), DELETE("btn-danger"), DIALOG_CLOSE("close_dialog"), GREEN("btn-success"), LIGHT("light"), RED(
+      "btn-danger");
 
   private String classAttrValue;
 
