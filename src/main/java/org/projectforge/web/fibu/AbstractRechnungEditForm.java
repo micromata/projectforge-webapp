@@ -662,7 +662,7 @@ extends AbstractEditForm<O, P>
   {
     costEditModalDialog = new CostEditModalDialog();
     final String title = (isNew() == true) ? "create" : "update";
-    costEditModalDialog.setCloseButtonLabel(getString(title)).wantsNotificationOnClose().setOutputMarkupId(true);
+    costEditModalDialog.setCloseButtonLabel(getString(title)).setOutputMarkupId(true);
     parentPage.add(costEditModalDialog);
     costEditModalDialog.init();
   }
@@ -704,16 +704,17 @@ extends AbstractEditForm<O, P>
     }
 
     /**
-     * @see org.projectforge.web.dialog.ModalDialog#handleCloseEvent(org.apache.wicket.ajax.AjaxRequestTarget)
+     * @see org.projectforge.web.dialog.ModalDialog#onCloseButtonSubmit(org.apache.wicket.ajax.AjaxRequestTarget)
      */
     @Override
-    protected void handleCloseEvent(final AjaxRequestTarget target)
+    protected boolean onCloseButtonSubmit(final AjaxRequestTarget target)
     {
       // Copy edited values to DO object.
       final AbstractRechnungsPositionDO srcPosition = rechnungCostEditTablePanel.getPosition();
       final KostZuweisungenCopyHelper kostZuweisungCopyHelper = new KostZuweisungenCopyHelper();
       kostZuweisungCopyHelper.mycopy(srcPosition.getKostZuweisungen(), position.getKostZuweisungen(), position);
       target.add(costTable.refresh().getTable());
+      return super.onCloseButtonSubmit(target);
     }
   }
 
