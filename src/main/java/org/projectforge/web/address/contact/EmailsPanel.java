@@ -122,6 +122,7 @@ public class EmailsPanel extends Panel
         model.setObject(contactDao.getEmailValuesAsXml(emails));
       }
     });
+
     item.add(new AjaxMaxLengthEditableLabel("editableLabel", new PropertyModel<String>(newEmailValue, "email")) {
       @Override
       protected void onSubmit(final AjaxRequestTarget target)
@@ -167,6 +168,7 @@ public class EmailsPanel extends Panel
   {
     emailsRepeater.removeAll();
     for (final EmailValue email : emails) {
+
       final WebMarkupContainer item = new WebMarkupContainer(emailsRepeater.newChildId());
       emailsRepeater.add(item);
       final DropDownChoice<ContactType> dropdownChoice = new DropDownChoice<ContactType>("choice", new PropertyModel<ContactType>(email,
@@ -180,7 +182,17 @@ public class EmailsPanel extends Panel
           model.setObject(contactDao.getEmailValuesAsXml(emails));
         }
       });
-      item.add(new AjaxMaxLengthEditableLabel("editableLabel", new PropertyModel<String>(email, "email")));
+
+      item.add(new AjaxMaxLengthEditableLabel("editableLabel", new PropertyModel<String>(email, "email")){
+        @Override
+        protected void onSubmit(final AjaxRequestTarget target)
+        {
+          super.onSubmit(target);
+          newEmailValue.setEmail(DEFAULT_EMAIL_VALUE);
+          rebuildEmails();
+          target.add(mainContainer);
+        }
+      });
 
       final WebMarkupContainer deleteDiv = new WebMarkupContainer("deleteDiv");
       deleteDiv.setOutputMarkupId(true);

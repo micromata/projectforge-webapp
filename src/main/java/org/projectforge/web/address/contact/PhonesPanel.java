@@ -124,6 +124,7 @@ public class PhonesPanel extends Panel
         model.setObject(contactDao.getPhoneValuesAsXml(phones));
       }
     });
+
     item.add(new AjaxMaxLengthEditableLabel("editableLabel", new PropertyModel<String>(newPhoneValue, "number")) {
       @Override
       protected void onSubmit(final AjaxRequestTarget target)
@@ -169,6 +170,7 @@ public class PhonesPanel extends Panel
   {
     phonesRepeater.removeAll();
     for (final PhoneValue phone : phones) {
+
       final WebMarkupContainer item = new WebMarkupContainer(phonesRepeater.newChildId());
       phonesRepeater.add(item);
       final DropDownChoice<PhoneType> dropdownChoice = new DropDownChoice<PhoneType>("choice", new PropertyModel<PhoneType>(phone,
@@ -182,7 +184,17 @@ public class PhonesPanel extends Panel
           model.setObject(contactDao.getPhoneValuesAsXml(phones));
         }
       });
-      item.add(new AjaxMaxLengthEditableLabel("editableLabel", new PropertyModel<String>(phone, "number")));
+
+      item.add(new AjaxMaxLengthEditableLabel("editableLabel", new PropertyModel<String>(phone, "number")){
+        @Override
+        protected void onSubmit(final AjaxRequestTarget target)
+        {
+          super.onSubmit(target);
+          newPhoneValue.setNumber(DEFAULT_PHONE_VALUE);
+          rebuildPhones();
+          target.add(mainContainer);
+        }
+      });
 
       final WebMarkupContainer deleteDiv = new WebMarkupContainer("deleteDiv");
       deleteDiv.setOutputMarkupId(true);

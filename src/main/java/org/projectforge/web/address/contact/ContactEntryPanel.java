@@ -311,9 +311,6 @@ public class ContactEntryPanel extends Panel
           protected void onSubmit(final AjaxRequestTarget target)
           {
             super.onSubmit(target);
-            model.getObject().addContact(new ContactEntryDO().setStreet(newEntryValue.getStreet()).setCity(newEntryValue.getCity()) //
-                .setZipCode(newEntryValue.getZipCode()).setCountry(newEntryValue.getCountry()) //
-                .setState(newEntryValue.getState()).setContactType(newEntryValue.getContactType()));
             rebuildEntrys();
             newEntryValue.setStreet(DEFAULT_ENTRY_VALUE).setCity(DEFAULT_CITY_VALUE).setZipCode(DEFAULT_ZIPCODE_VALUE) //
             .setCountry(DEFAULT_COUNTRY_VALUE).setState(DEFAULT_STATE_VALUE).setContactType(ContactType.PRIVATE);
