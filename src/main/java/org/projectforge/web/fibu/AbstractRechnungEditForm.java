@@ -573,7 +573,8 @@ extends AbstractEditForm<O, P>
                *      org.apache.wicket.Component, org.apache.wicket.Component)
                */
               @Override
-              protected void onRenderCostRow(final AbstractRechnungsPositionDO position, final KostZuweisungDO costAssignment, final Component cost1, final Component cost2)
+              protected void onRenderCostRow(final AbstractRechnungsPositionDO position, final KostZuweisungDO costAssignment,
+                  final Component cost1, final Component cost2)
               {
                 AbstractRechnungEditForm.this.onRenderCostRow(position, costAssignment, cost1, cost2);
               }
@@ -613,9 +614,18 @@ extends AbstractEditForm<O, P>
             } else {
               panel.add(new TextPanel(panel.newChildId(), " "));
             }
-            if (NumberHelper.isNotZero(fehlbetrag) == true) {
-              panel.add(new TextPanel(panel.newChildId(), CurrencyFormatter.format(fehlbetrag), TextStyle.RED));
-            }
+            panel.add(new TextPanel(panel.newChildId(), new Model<String>() {
+              @Override
+              public String getObject()
+              {
+                final BigDecimal fehlbetrag = position.getKostZuweisungNetFehlbetrag();
+                if (NumberHelper.isNotZero(fehlbetrag) == true) {
+                  return CurrencyFormatter.format(fehlbetrag);
+                } else {
+                  return "";
+                }
+              }
+            }, TextStyle.RED));
           }
         }
       }
