@@ -190,7 +190,7 @@ public class PhonesPanel extends Panel
         protected void onSubmit(final AjaxRequestTarget target)
         {
           super.onSubmit(target);
-          newPhoneValue.setNumber(DEFAULT_PHONE_VALUE);
+          model.setObject(contactDao.getPhoneValuesAsXml(phones));
           rebuildPhones();
           target.add(mainContainer);
         }

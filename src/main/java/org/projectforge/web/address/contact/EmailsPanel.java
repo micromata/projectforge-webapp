@@ -188,7 +188,7 @@ public class EmailsPanel extends Panel
         protected void onSubmit(final AjaxRequestTarget target)
         {
           super.onSubmit(target);
-          newEmailValue.setEmail(DEFAULT_EMAIL_VALUE);
+          model.setObject(contactDao.getEmailValuesAsXml(emails));
           rebuildEmails();
           target.add(mainContainer);
         }
