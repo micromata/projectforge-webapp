@@ -123,7 +123,6 @@ public class ContactEntryPanel extends Panel
 
     final WebMarkupContainer streetCodeDiv = new WebMarkupContainer("streetCodeDiv");
     streetCodeDiv.setOutputMarkupId(true);
-
     streetCodeDiv.add(new AjaxMaxLengthEditableLabel("street", new PropertyModel<String>(newEntryValue, "street")) {
       /**
        * @see org.apache.wicket.extensions.ajax.markup.html.AjaxEditableLabel#onEdit(org.apache.wicket.ajax.AjaxRequestTarget)
@@ -254,6 +253,7 @@ public class ContactEntryPanel extends Panel
     final Set<ContactEntryDO> entries = model.getObject().getContacts();
     if ( entries != null) {
       entrysRepeater.removeAll();
+
       for (final ContactEntryDO entry : entries) {
 
         final WebMarkupContainer item = new WebMarkupContainer(entrysRepeater.newChildId());
@@ -312,8 +312,6 @@ public class ContactEntryPanel extends Panel
           {
             super.onSubmit(target);
             rebuildEntrys();
-            newEntryValue.setStreet(DEFAULT_ENTRY_VALUE).setCity(DEFAULT_CITY_VALUE).setZipCode(DEFAULT_ZIPCODE_VALUE) //
-            .setCountry(DEFAULT_COUNTRY_VALUE).setState(DEFAULT_STATE_VALUE).setContactType(ContactType.PRIVATE);
             target.add(mainContainer);
           }
         }.setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true).setVisible(true));
