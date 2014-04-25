@@ -139,7 +139,6 @@ public class SocialMediaPanel extends Panel
       {
         newSocialMediaValue.setSocialMediaType(socialMediaChoice.getModelObject());
         model.getObject().setSocialMediaValues(contactDao.getSocialMediaValuesAsXml(socialMediaValues));
-        target.add(mainContainer);
       }
     });
 
@@ -188,6 +187,7 @@ public class SocialMediaPanel extends Panel
   {
     socialMediaRepeater.removeAll();
     for (final SocialMediaValue socialMediaValue : socialMediaValues) {
+
       final WebMarkupContainer item = new WebMarkupContainer(socialMediaRepeater.newChildId());
       socialMediaRepeater.add(item);
       final DropDownChoice<ContactType> contactChoice = new DropDownChoice<ContactType>("contactChoice", new PropertyModel<ContactType>(socialMediaValue,
@@ -211,11 +211,19 @@ public class SocialMediaPanel extends Panel
         {
           socialMediaValue.setSocialMediaType(socialMediaChoice.getModelObject());
           model.getObject().setSocialMediaValues(contactDao.getSocialMediaValuesAsXml(socialMediaValues));
-          target.add(mainContainer);
         }
       });
 
-      item.add(new AjaxMaxLengthEditableLabel("editableLabel", new PropertyModel<String>(socialMediaValue, "user")));
+      item.add(new AjaxMaxLengthEditableLabel("editableLabel", new PropertyModel<String>(socialMediaValue, "user")){
+        @Override
+        protected void onSubmit(final AjaxRequestTarget target)
+        {
+          super.onSubmit(target);
+          model.getObject().setSocialMediaValues(contactDao.getSocialMediaValuesAsXml(socialMediaValues));
+          rebuildSocialMedias();
+          target.add(mainContainer);
+        }
+      });
 
       final WebMarkupContainer deleteDiv = new WebMarkupContainer("deleteDiv");
       deleteDiv.setOutputMarkupId(true);
