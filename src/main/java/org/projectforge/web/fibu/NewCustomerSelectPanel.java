@@ -29,7 +29,6 @@ import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.form.FormComponent;
-import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
@@ -38,8 +37,6 @@ import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.KundeDao;
 import org.projectforge.fibu.KundeFormatter;
-import org.projectforge.user.PFUserContext;
-import org.projectforge.user.PFUserDO;
 import org.projectforge.web.user.UserPreferencesHelper;
 import org.projectforge.web.wicket.AbstractSelectPanel;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
@@ -142,8 +139,10 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
       /**
        * @see org.apache.wicket.Component#getConverter(java.lang.Class)
        */
+
+      @SuppressWarnings({ "unchecked", "rawtypes"})
       @Override
-      public <C> IConverter<C> getConverter(final Class<C> type)
+      public <C> IConverter<C>  getConverter(final Class<C> type)
       {
         return new IConverter() {
           @Override
@@ -153,15 +152,14 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
               getModel().setObject(null);
               return null;
             }
-            final int ind = value.indexOf(": ");
-            final String customername = ind >= 0 ? value.substring(0, ind) : value;
-            // final PFUserDO user = kundeDao.getById(customername);
-            // if (user == null) {
-            // error(getString("user.panel.error.usernameNotFound"));
-            // }
-            // getModel().setObject(user);
-            // return user;
-            return null;
+            final int ind = value.indexOf(" - ");
+            final String id = ind >= 0 ? value.substring(0, ind) : value;
+            final KundeDO kunde = kundeDao.getById(Integer.decode(id));
+            if (kunde == null) {
+              error(getString("panel.error.customernameNotFound"));
+            }
+            getModel().setObject(kunde);
+            return kunde;
           }
 
           @Override
@@ -170,15 +168,15 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
             if (value == null) {
               return "";
             }
-            final PFUserDO user = (PFUserDO) value;
-            return user.getUsername();
+            final KundeDO kunde = (KundeDO) value;
+            return formatLabel(kunde);
           }
 
         };
       }
     };
     currentCustomer = getModelObject();
-    customerTextField.enableTooltips().withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false).withWidth(400);
+    customerTextField.enableTooltips().withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false); //.withWidth(400);
   }
 
   /**
@@ -191,41 +189,11 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
   }
 
   @Override
-  @SuppressWarnings("serial")
   public NewCustomerSelectPanel init()
   {
     super.init();
-
     add(customerTextField);
-    final SubmitLink selectMeButton = new SubmitLink("selectMe") {
-      @Override
-      public void onSubmit()
-      {
-        caller.select(selectProperty, PFUserContext.getUserId());
-        markTextFieldModelAsChanged();
-      }
-
-      @Override
-      public boolean isVisible()
-      {
-        // Is visible if no user is given or the given user is not the current logged in user.
-        final KundeDO user = getModelObject();
-        return user == null || user.getId().equals(PFUserContext.getUser().getId()) == false;
-      }
-    };
-    add(selectMeButton);
-    selectMeButton.setDefaultFormProcessing(defaultFormProcessing);
-    //selectMeButton.add(new TooltipImage("selectMeHelp", WebConstants.IMAGE_USER_SELECT_ME, getString("tooltip.selectMe")));
     return this;
-  }
-
-  private void markTextFieldModelAsChanged()
-  {
-    customerTextField.modelChanged();
-    final KundeDO user = getModelObject();
-    if (user != null) {
-      getRecentCustomers().append(formatCustomer(user));
-    }
   }
 
   public NewCustomerSelectPanel withAutoSubmit(final boolean autoSubmit)
@@ -284,5 +252,16 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
   public FormComponent< ? > getFormComponent()
   {
     return customerTextField;
+  }
+
+  /**
+   * @return
+   */
+  public String getKundeTextInput()
+  {
+    if (customerTextField != null) {
+      return customerTextField.getRawInput();
+    }
+    return null;
   }
 }

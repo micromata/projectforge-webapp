@@ -108,7 +108,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
 
   protected RepeatingView positionsRepeater;
 
-  protected CustomerSelectPanel kundeSelectPanel;
+  protected NewCustomerSelectPanel kundeSelectPanel;
 
   private final List<Component> ajaxUpdateComponents = new ArrayList<Component>();
 
@@ -199,20 +199,22 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       statusChoice.setNullValid(false).setRequired(true);
       fs.add(statusChoice);
     }
-    gridBuilder.newGridPanel();
+    //    gridBuilder.newGridPanel();
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // project
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt")).suppressLabelForWarning();
-      final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data, "projekt"),
+      final NewProjektSelectPanel projektSelectPanel = new NewProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data, "projekt"),
           parentPage, "projektId");
       fs.add(projektSelectPanel);
       projektSelectPanel.init();
     }
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // customer
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde")).suppressLabelForWarning();
-      kundeSelectPanel = new CustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"), new PropertyModel<String>(
-          data, "kundeText"), parentPage, "kundeId");
+      kundeSelectPanel = new NewCustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"), parentPage, "kundeId");
+      //, new PropertyModel<String>( data, "kundeText"), parentPage, "kundeId");
       fs.add(kundeSelectPanel);
       kundeSelectPanel.init();
       fs.addHelpIcon(getString("fibu.auftrag.hint.kannVonProjektKundenAbweichen"));
