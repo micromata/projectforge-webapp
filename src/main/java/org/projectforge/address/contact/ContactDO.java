@@ -10,9 +10,12 @@
 package org.projectforge.address.contact;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -26,6 +29,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.IndexColumn;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
@@ -37,6 +41,8 @@ import org.hibernate.search.annotations.Store;
 import org.projectforge.address.AddressStatus;
 import org.projectforge.address.ContactStatus;
 import org.projectforge.address.FormOfAddress;
+import org.projectforge.address.InstantMessagingType;
+import org.projectforge.common.LabelValueBean;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.PFPersistancyBehavior;
@@ -55,7 +61,7 @@ public class ContactDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = -1177059694759828682L;
 
-  //private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ContactDO.class);
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ContactDO.class);
 
   private TaskDO task;
 
@@ -123,6 +129,114 @@ public class ContactDO extends DefaultBaseDO
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String comment; // 5000;
+
+  // @FieldBridge(impl = HibernateSearchInstantMessagingBridge.class)
+  // @Field(index = Index.TOKENIZED, store = Store.NO)
+  // TODO: Prepared for hibernate search.
+  private List<LabelValueBean<InstantMessagingType, String>> socialMedia = null;
+
+  /**
+   * List of instant messaging contacts in the form of a property file: {skype=hugo.mustermann\naim=12345dse}. Only for data base access,
+   * use getter an setter of instant messaging instead.
+   * @return
+   */
+  // @Column(name = "instant_messaging", length = 4000)
+  @Transient
+  // TODO: Prepared for data base persistence.
+  public String getSocialMedia4DB()
+  {
+    return getSocialMediaAsString(socialMedia);
+  }
+
+  public void setSocialMedia4DB(final String properties)
+  {
+    if (StringUtils.isBlank(properties) == true) {
+      this.socialMedia = null;
+    } else {
+      final StringTokenizer tokenizer = new StringTokenizer(properties, "\n");
+      while (tokenizer.hasMoreTokens() == true) {
+        final String line = tokenizer.nextToken();
+        if (StringUtils.isBlank(line) == true) {
+          continue;
+        }
+        final int idx = line.indexOf('=');
+        if (idx <= 0) {
+          log.error("Wrong social media entry format in data base: " + line);
+          continue;
+        }
+        String label = line.substring(0, idx);
+        final String value = "";
+        if (idx < line.length()) {
+          label = line.substring(idx);
+        }
+        InstantMessagingType type = null;
+        try {
+          type = InstantMessagingType.get(label);
+        } catch (final Exception ex) {
+          log.error("Ignoring unknown social media entry: " + label, ex);
+          continue;
+        }
+        setSocialMedia(type, value);
+      }
+    }
+  }
+
+  /**
+   * Instant messaging settings as property file.
+   * @return
+   */
+  @Transient
+  public List<LabelValueBean<InstantMessagingType, String>> getSocialMedia()
+  {
+    return socialMedia;
+  }
+
+  public void setSocialMedia(final InstantMessagingType type, final String value)
+  {
+    if (this.socialMedia == null) {
+      this.socialMedia = new ArrayList<LabelValueBean<InstantMessagingType, String>>();
+    } else {
+      for (final LabelValueBean<InstantMessagingType, String> entry : this.socialMedia) {
+        if (entry.getLabel() == type) {
+          // Entry found;
+          if (StringUtils.isBlank(value) == true) {
+            // Remove this entry:
+            this.socialMedia.remove(entry);
+          } else {
+            // Modify existing entry:
+            entry.setValue(value);
+          }
+          return;
+        }
+      }
+    }
+    this.socialMedia.add(new LabelValueBean<InstantMessagingType, String>(type, value));
+  }
+
+  /**
+   * Used for representation in the data base and for hibernate search (lucene).
+   */
+  static String getSocialMediaAsString(final List<LabelValueBean<InstantMessagingType, String>> list)
+  {
+    if (list == null || list.size() == 0) {
+      return null;
+    }
+    final StringBuffer buf = new StringBuffer();
+    boolean first = true;
+    for (final LabelValueBean<InstantMessagingType, String> lv : list) {
+      if (StringUtils.isBlank(lv.getValue()) == true) {
+        continue; // Do not write empty entries.
+      }
+      if (first == true)
+        first = false;
+      else buf.append("\n");
+      buf.append(lv.getLabel()).append("=").append(lv.getValue());
+    }
+    if (first == true) {
+      return null; // No entry was written.
+    }
+    return buf.toString();
+  }
 
   /**
    * Get the contact entries for this object.
