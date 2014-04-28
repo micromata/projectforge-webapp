@@ -25,7 +25,6 @@ package org.projectforge.web.fibu;
 
 import java.math.BigDecimal;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
@@ -68,7 +67,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
 
   private DropDownChoice<RechnungStatus> statusChoice;
 
-  private CustomerSelectPanel customerSelectPanel;
+  private NewCustomerSelectPanel customerSelectPanel;
 
   public RechnungEditForm(final RechnungEditPage parentPage, final RechnungDO data)
   {
@@ -136,7 +135,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     {
       // Customer
       final FieldsetPanel fs = gridBuilder.newFieldset(RechnungDO.class, "kunde");
-      customerSelectPanel = new CustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"), new PropertyModel<String>(
+      customerSelectPanel = new NewCustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"), new PropertyModel<String>(
           data, "kundeText"), parentPage, "kundeId");
       fs.add(customerSelectPanel);
       customerSelectPanel.init();
@@ -146,7 +145,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     {
       // Projekt
       final FieldsetPanel fs = gridBuilder.newFieldset(RechnungDO.class, "projekt").suppressLabelForWarning();
-      final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data, "projekt"),
+      final NewProjektSelectPanel projektSelectPanel = new NewProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data, "projekt"),
           parentPage, "projektId");
       fs.add(projektSelectPanel);
       projektSelectPanel.init();
@@ -236,12 +235,13 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     final BigDecimal zahlBetrag = zahlBetragField.getConvertedInput();
     final Integer projektId = getData().getProjektId();
     final Integer kundeId = getData().getKundeId();
-    final String kundeText = customerSelectPanel.getKundeTextField().getConvertedInput();
+    //final String kundeText = customerSelectPanel.getKundeTextField().getConvertedInput();
     final boolean zahlBetragExists = (zahlBetrag != null && zahlBetrag.compareTo(BigDecimal.ZERO) != 0);
     if (status == RechnungStatus.BEZAHLT && zahlBetragExists == false) {
       addError("fibu.rechnung.error.statusBezahltErfordertZahlBetrag");
     }
-    if (projektId == null && StringUtils.isBlank(kundeText) == true && kundeId == null) {
+    //    if (projektId == null && StringUtils.isBlank(kundeText) == true && kundeId == null) {
+    if (projektId == null &&  kundeId == null) {
       addError("fibu.rechnung.error.kundeTextOderProjektRequired");
     }
   }
