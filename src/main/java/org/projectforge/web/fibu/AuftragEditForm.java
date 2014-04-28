@@ -214,7 +214,6 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       // customer
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde")).suppressLabelForWarning();
       kundeSelectPanel = new NewCustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"), parentPage, "kundeId");
-      //, new PropertyModel<String>( data, "kundeText"), parentPage, "kundeId");
       fs.add(kundeSelectPanel);
       kundeSelectPanel.init();
       fs.addHelpIcon(getString("fibu.auftrag.hint.kannVonProjektKundenAbweichen"));
