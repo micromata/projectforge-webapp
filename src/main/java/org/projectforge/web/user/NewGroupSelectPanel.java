@@ -187,12 +187,6 @@ public class NewGroupSelectPanel extends AbstractSelectPanel<GroupDO> implements
         caller.unselect(selectProperty);
         groupTextField.clearInput();
       }
-
-      //      @Override
-      //      public boolean isVisible()
-      //      {
-      //        return isRequired() == false && getModelObject() != null;
-      //      }
     };
     unselectButton.setDefaultFormProcessing(defaultFormProcessing);
     add(unselectButton);
