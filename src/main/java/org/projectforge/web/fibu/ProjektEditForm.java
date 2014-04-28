@@ -41,7 +41,7 @@ import org.projectforge.reporting.Kost2Art;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.GroupDO;
 import org.projectforge.web.task.TaskSelectPanel;
-import org.projectforge.web.user.GroupSelectPanel;
+import org.projectforge.web.user.NewGroupSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
@@ -94,7 +94,7 @@ public class ProjektEditForm extends AbstractEditForm<ProjektDO, ProjektEditPage
     {
       // Customer
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde")).suppressLabelForWarning();
-      final CustomerSelectPanel kundeSelectPanel = new CustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"),
+      final NewCustomerSelectPanel kundeSelectPanel = new NewCustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"),
           null, parentPage, "kundeId");
       fs.add(kundeSelectPanel);
       kundeSelectPanel.init();
@@ -158,7 +158,7 @@ public class ProjektEditForm extends AbstractEditForm<ProjektDO, ProjektEditPage
     {
       // project manager group
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt.projektManagerGroup")).suppressLabelForWarning();
-      final GroupSelectPanel groupSelectPanel = new GroupSelectPanel(fs.newChildId(), new PropertyModel<GroupDO>(data,
+      final NewGroupSelectPanel groupSelectPanel = new NewGroupSelectPanel(fs.newChildId(), new PropertyModel<GroupDO>(data,
           "projektManagerGroup"), parentPage, "projektManagerGroupId");
       fs.add(groupSelectPanel);
       groupSelectPanel.init();
