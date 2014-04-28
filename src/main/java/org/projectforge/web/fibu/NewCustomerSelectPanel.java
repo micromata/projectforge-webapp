@@ -29,6 +29,7 @@ import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
@@ -36,10 +37,15 @@ import org.projectforge.common.RecentQueue;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.KundeDao;
+import org.projectforge.fibu.KundeFavorite;
 import org.projectforge.fibu.KundeFormatter;
+import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.user.UserPreferencesHelper;
 import org.projectforge.web.wicket.AbstractSelectPanel;
+import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
+import org.projectforge.web.wicket.components.FavoritesChoicePanel;
+import org.projectforge.web.wicket.components.TooltipImage;
 import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
 
 /**
@@ -53,6 +59,7 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
 
   private static final String USER_PREF_KEY_RECENT_CUSTOMERS = "CustomerSelectPanel:recentCustomers";
 
+  @SuppressWarnings("unused")
   private boolean defaultFormProcessing = false;
 
   @SpringBean(name = "kundeFormatter")
@@ -67,6 +74,9 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
 
   // Only used for detecting changes:
   private KundeDO currentCustomer;
+
+  private FavoritesChoicePanel<KundeDO, KundeFavorite> favoritesPanel;
+  //private SubmitLink unselectButton;
 
   /**
    * @param id
@@ -179,6 +189,7 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
     customerTextField.enableTooltips().withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false); //.withWidth(400);
   }
 
+
   /**
    * Should be called before init() method. If true, then the validation will be done after submitting.
    * @param defaultFormProcessing
@@ -188,12 +199,70 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
     this.defaultFormProcessing = defaultFormProcessing;
   }
 
+  @SuppressWarnings("serial")
   @Override
   public NewCustomerSelectPanel init()
   {
     super.init();
     add(customerTextField);
+    final boolean hasSelectAccess = kundeDao.hasLoggedInUserSelectAccess(false);
+    final SubmitLink unselectButton = new SubmitLink("unselect") {
+      @Override
+      public void onSubmit()
+      {
+        caller.unselect(selectProperty);
+        NewCustomerSelectPanel.this.getModel().setObject(null);
+        customerTextField.clearInput();
+      }
+      @Override
+      public boolean isVisible()
+      {
+        return hasSelectAccess == true;
+      }
+    };
+    unselectButton.setDefaultFormProcessing(false);
+    add(unselectButton);
+    unselectButton.add(new TooltipImage("unselectHelp", WebConstants.IMAGE_KUNDE_UNSELECT, getString("fibu.tooltip.unselectKunde")));
+    // DropDownChoice favorites
+    favoritesPanel = new FavoritesChoicePanel<KundeDO, KundeFavorite>("favorites", UserPrefArea.KUNDE_FAVORITE, tabIndex, "half select") {
+      @Override
+      protected void select(final KundeFavorite favorite)
+      {
+        if (favorite.getKunde() != null) {
+          NewCustomerSelectPanel.this.selectKunde(favorite.getKunde());
+        }
+      }
+
+      @Override
+      protected KundeDO getCurrentObject()
+      {
+        return NewCustomerSelectPanel.this.getModelObject();
+      }
+
+      @Override
+      protected KundeFavorite newFavoriteInstance(final KundeDO currentObject)
+      {
+        final KundeFavorite favorite = new KundeFavorite();
+        favorite.setKunde(currentObject);
+        return favorite;
+      }
+    };
+    add(favoritesPanel);
+    favoritesPanel.init();
+    if (showFavorites == false) {
+      favoritesPanel.setVisible(false);
+    }
     return this;
+  }
+
+  /**
+   * Will be called if the user has chosen an entry of the kunde favorites drop down choice.
+   * @param kunde
+   */
+  protected void selectKunde(final KundeDO kunde)
+  {
+    setModelObject(kunde);
+    caller.select(selectProperty, kunde.getId());
   }
 
   public NewCustomerSelectPanel withAutoSubmit(final boolean autoSubmit)
@@ -227,6 +296,7 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
     return this.recentCustomers;
   }
 
+  @SuppressWarnings("unused")
   private String formatCustomer(final KundeDO customer)
   {
     if (customer == null) {

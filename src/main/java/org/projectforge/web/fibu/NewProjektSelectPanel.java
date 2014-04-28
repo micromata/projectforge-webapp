@@ -29,17 +29,25 @@ import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.common.RecentQueue;
 import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.fibu.KundeDO;
+import org.projectforge.fibu.KundeDao;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.ProjektDao;
+import org.projectforge.fibu.ProjektFavorite;
 import org.projectforge.fibu.ProjektFormatter;
+import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.user.UserPreferencesHelper;
 import org.projectforge.web.wicket.AbstractSelectPanel;
+import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
+import org.projectforge.web.wicket.components.FavoritesChoicePanel;
+import org.projectforge.web.wicket.components.TooltipImage;
 import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
 
 /**
@@ -54,6 +62,7 @@ public class NewProjektSelectPanel extends AbstractSelectPanel<ProjektDO> implem
 
   private static final String USER_PREF_KEY_RECENT_PROJECTS = "ProjectSelectPanel:recentProjects";
 
+  @SuppressWarnings("unused")
   private boolean defaultFormProcessing = false;
 
   @SpringBean(name = "projektFormatter")
@@ -61,6 +70,9 @@ public class NewProjektSelectPanel extends AbstractSelectPanel<ProjektDO> implem
 
   @SpringBean(name = "projektDao")
   private ProjektDao projektDao;
+
+  @SpringBean(name = "kundeDao")
+  private KundeDao kundeDao;
 
   private RecentQueue<String> recentProjects;
 
@@ -153,9 +165,8 @@ public class NewProjektSelectPanel extends AbstractSelectPanel<ProjektDO> implem
               getModel().setObject(null);
               return null;
             }
-            final int ind = value.indexOf(": ");
-            final String projectname = ind >= 0 ? value.substring(ind + 2, value.length()) : value;
-            final ProjektDO project = null; //projektDao.getById(projectname);
+
+            final ProjektDO project = getProjekt(value);
             if (project == null) {
               error(getString("panel.error.projectNotFound"));
             }
@@ -189,12 +200,72 @@ public class NewProjektSelectPanel extends AbstractSelectPanel<ProjektDO> implem
     this.defaultFormProcessing = defaultFormProcessing;
   }
 
+  @SuppressWarnings("serial")
   @Override
   public NewProjektSelectPanel init()
   {
     super.init();
     add(projectTextField);
+    final boolean hasSelectAccess = projektDao.hasLoggedInUserSelectAccess(false);
+    final SubmitLink unselectButton = new SubmitLink("unselect") {
+      @Override
+      public void onSubmit()
+      {
+        caller.unselect(selectProperty);
+        NewProjektSelectPanel.this.getModel().setObject(null);
+        projectTextField.clearInput();
+      }
+
+      @Override
+      public boolean isVisible()
+      {
+        return hasSelectAccess == true;
+      }
+    };
+    unselectButton.setDefaultFormProcessing(false);
+    add(unselectButton);
+    unselectButton.add(new TooltipImage("unselectHelp", WebConstants.IMAGE_PROJEKT_UNSELECT, getString("fibu.tooltip.unselectProjekt")));
+    // DropDownChoice favorites
+    final FavoritesChoicePanel<ProjektDO, ProjektFavorite> favoritesPanel = new FavoritesChoicePanel<ProjektDO, ProjektFavorite>(
+        "favorites", UserPrefArea.PROJEKT_FAVORITE, tabIndex, "select half") {
+      @Override
+      protected void select(final ProjektFavorite favorite)
+      {
+        if (favorite.getProjekt() != null) {
+          NewProjektSelectPanel.this.selectProjekt(favorite.getProjekt());
+        }
+      }
+
+      @Override
+      protected ProjektDO getCurrentObject()
+      {
+        return NewProjektSelectPanel.this.getModelObject();
+      }
+
+      @Override
+      protected ProjektFavorite newFavoriteInstance(final ProjektDO currentObject)
+      {
+        final ProjektFavorite favorite = new ProjektFavorite();
+        favorite.setProjekt(currentObject);
+        return favorite;
+      }
+    };
+    add(favoritesPanel);
+    favoritesPanel.init();
+    if (showFavorites == false) {
+      favoritesPanel.setVisible(false);
+    }
     return this;
+  }
+
+  /**
+   * Will be called if the user has chosen an entry of the projekt favorites drop down choice.
+   * @param projekt
+   */
+  protected void selectProjekt(final ProjektDO projekt)
+  {
+    setModelObject(projekt);
+    caller.select(selectProperty, projekt.getId());
   }
 
   public NewProjektSelectPanel withAutoSubmit(final boolean autoSubmit)
@@ -228,6 +299,7 @@ public class NewProjektSelectPanel extends AbstractSelectPanel<ProjektDO> implem
     return this.recentProjects;
   }
 
+  @SuppressWarnings("unused")
   private String formatCustomer(final ProjektDO customer)
   {
     if (customer == null) {
@@ -262,6 +334,43 @@ public class NewProjektSelectPanel extends AbstractSelectPanel<ProjektDO> implem
   {
     if (projectTextField != null) {
       return projectTextField.getRawInput();
+    }
+    return null;
+  }
+
+  private ProjektDO getProjekt(final String input) {
+    int kundeId, kost2;
+    String nummernkreis, kId, nummer;
+    kundeId = kost2 = -1;
+    nummernkreis = kId = nummer = "";
+    final int ind1 = input.indexOf(".");
+    if (ind1 < 0) {
+      return null;
+    }
+    nummernkreis = input.substring(0, ind1);
+    final int ind2 = input.indexOf(".", ind1+1);
+    if (ind2 < 0) {
+      return null;
+    }
+    kId = input.substring(ind1+1, ind2);
+    final int ind3 = input.indexOf(" -", ind2+1);
+    if (ind3 < 0) {
+      return null;
+    }
+    nummer = input.substring(ind2+1, ind3);
+    kundeId = Integer.parseInt(kId);
+    kost2 = Integer.parseInt(nummer);
+    if ( kundeId < 0 || kost2 < 0) {
+      return null;
+    }
+    if (nummernkreis.equals("4") == true) {
+      return projektDao.getProjekt(kundeId, kost2);
+    } else if (nummernkreis.equals("5") == true){
+      final KundeDO kunde = kundeDao.getById(kundeId);
+      if (kunde == null) {
+        return null;
+      }
+      return projektDao.getProjekt(kunde, kost2);
     }
     return null;
   }
