@@ -30,9 +30,12 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.SubmitLink;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
+import org.projectforge.common.NumberHelper;
 import org.projectforge.common.RecentQueue;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.fibu.KundeDO;
@@ -41,10 +44,12 @@ import org.projectforge.fibu.KundeFavorite;
 import org.projectforge.fibu.KundeFormatter;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.user.UserPreferencesHelper;
+import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.AbstractSelectPanel;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.components.FavoritesChoicePanel;
+import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.TooltipImage;
 import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
 
@@ -76,7 +81,10 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
   private KundeDO currentCustomer;
 
   private FavoritesChoicePanel<KundeDO, KundeFavorite> favoritesPanel;
-  //private SubmitLink unselectButton;
+
+  private final PropertyModel<String> kundeText;
+
+  private TextField<String> kundeTextField;
 
   /**
    * @param id
@@ -84,10 +92,10 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
    * @param caller
    * @param selectProperty
    */
-  public NewCustomerSelectPanel(final String id, final IModel<KundeDO> model, final ISelectCallerPage caller, final String selectProperty)
-  {
-    this(id, model, null, caller, selectProperty);
-  }
+  //  public NewCustomerSelectPanel(final String id, final IModel<KundeDO> model, final ISelectCallerPage caller, final String selectProperty)
+  //  {
+  //    this(id, model, null, caller, selectProperty);
+  //  }
 
   /**
    * @param id
@@ -96,10 +104,11 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
    * @param selectProperty
    */
   @SuppressWarnings("serial")
-  public NewCustomerSelectPanel(final String id, final IModel<KundeDO> model, final String label, final ISelectCallerPage caller,
+  public NewCustomerSelectPanel(final String id, final IModel<KundeDO> model, final PropertyModel<String> kundeText, final ISelectCallerPage caller,
       final String selectProperty)
   {
     super(id, model, caller, selectProperty);
+    this.kundeText = kundeText;
     customerTextField = new PFAutoCompleteTextField<KundeDO>("customerField", getModel()) {
       @Override
       protected List<KundeDO> getChoices(final String input)
@@ -204,6 +213,19 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
   public NewCustomerSelectPanel init()
   {
     super.init();
+    if (kundeText != null) {
+      kundeTextField = new MaxLengthTextField("kundeText", kundeText) {
+        @Override
+        public boolean isVisible()
+        {
+          return (NewCustomerSelectPanel.this.getModelObject() == null || NumberHelper.greaterZero(NewCustomerSelectPanel.this.getModelObject()
+              .getId()) == false);
+        }
+      };
+      add(kundeTextField);
+    } else {
+      add(AbstractForm.createInvisibleDummyComponent("kundeText"));
+    }
     add(customerTextField);
     final boolean hasSelectAccess = kundeDao.hasLoggedInUserSelectAccess(false);
     final SubmitLink unselectButton = new SubmitLink("unselect") {
@@ -325,13 +347,22 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
   }
 
   /**
-   * @return
+   * @return The user's raw input of kunde text if given, otherwise null.
    */
   public String getKundeTextInput()
   {
-    if (customerTextField != null) {
-      return customerTextField.getRawInput();
+    if (kundeTextField != null) {
+      return kundeTextField.getRawInput();
     }
     return null;
   }
+
+  /**
+   * @return the kundeTextField
+   */
+  public TextField<String> getKundeTextField()
+  {
+    return kundeTextField;
+  }
+
 }
