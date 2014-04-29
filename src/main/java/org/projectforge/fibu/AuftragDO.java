@@ -26,7 +26,9 @@ package org.projectforge.fibu;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -122,6 +124,10 @@ public class AuftragDO extends DefaultBaseDO
   protected String uiStatusAsXml;
 
   protected AuftragUIStatus uiStatus;
+
+  @PFPersistancyBehavior(autoUpdateCollectionEntries = true)
+  @IndexedEmbedded(depth = 1)
+  private Set<PaymentScheduleDO> paymentSchedules = null;
 
   static {
     AbstractHistorizableBaseDO.putNonHistorizableProperty(AuftragDO.class, "uiStatusAsXml", "uiStatus");
@@ -633,5 +639,63 @@ public class AuftragDO extends DefaultBaseDO
   {
     this.uiStatus = uiStatus;
     return this;
+  }
+
+  /**
+   * Get the payment schedule entries for this object.
+   */
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "auftrag")
+  @IndexColumn(name = "number", base = 1)
+  public Set<PaymentScheduleDO> getPaymentSchedules()
+  {
+    return this.paymentSchedules;
+  }
+
+  /**
+   * @param number
+   * @return PaymentScheduleDO with given position number or null (iterates through the list of payment schedules and compares the number), if not
+   *         exist.
+   */
+  public PaymentScheduleDO getPaymentSchedule(final short number)
+  {
+    if (paymentSchedules == null) {
+      return null;
+    }
+    for (final PaymentScheduleDO schedule : this.paymentSchedules) {
+      if (schedule.getNumber() == number) {
+        return schedule;
+      }
+    }
+    return null;
+  }
+
+  public AuftragDO setPaymentSchedules(final Set<PaymentScheduleDO> paymentSchedules)
+  {
+    this.paymentSchedules = paymentSchedules;
+    return this;
+  }
+
+  public AuftragDO addPaymentSchedule(final PaymentScheduleDO paymentSchedule)
+  {
+    ensureAndGetPaymentSchedules();
+    short number = 1;
+    for (final PaymentScheduleDO pos : paymentSchedules) {
+      if (pos.getNumber() >= number) {
+        number = pos.getNumber();
+        number++;
+      }
+    }
+    paymentSchedule.setNumber(number);
+    paymentSchedule.setAuftrag(this);
+    this.paymentSchedules.add(paymentSchedule);
+    return this;
+  }
+
+  public Set<PaymentScheduleDO> ensureAndGetPaymentSchedules()
+  {
+    if (this.paymentSchedules == null) {
+      setPaymentSchedules(new LinkedHashSet<PaymentScheduleDO>());
+    }
+    return getPaymentSchedules();
   }
 }
