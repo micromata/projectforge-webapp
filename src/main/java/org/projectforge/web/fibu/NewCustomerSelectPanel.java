@@ -29,7 +29,6 @@ import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.form.FormComponent;
-import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
@@ -40,22 +39,17 @@ import org.projectforge.common.RecentQueue;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.KundeDao;
-import org.projectforge.fibu.KundeFavorite;
 import org.projectforge.fibu.KundeFormatter;
-import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.user.UserPreferencesHelper;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.AbstractSelectPanel;
-import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
-import org.projectforge.web.wicket.components.FavoritesChoicePanel;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
-import org.projectforge.web.wicket.components.TooltipImage;
 import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
 
 /**
  * This panel shows the actual customer.
- * @author Kai Reinhard (k.reinhard@micromata.de)
+ * @author Werner Feder (werner.feder@t-online.de)
  * 
  */
 public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> implements ComponentWrapperPanel
@@ -80,22 +74,9 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
   // Only used for detecting changes:
   private KundeDO currentCustomer;
 
-  private FavoritesChoicePanel<KundeDO, KundeFavorite> favoritesPanel;
-
   private final PropertyModel<String> kundeText;
 
   private TextField<String> kundeTextField;
-
-  /**
-   * @param id
-   * @param model
-   * @param caller
-   * @param selectProperty
-   */
-  //  public NewCustomerSelectPanel(final String id, final IModel<KundeDO> model, final ISelectCallerPage caller, final String selectProperty)
-  //  {
-  //    this(id, model, null, caller, selectProperty);
-  //  }
 
   /**
    * @param id
@@ -227,64 +208,7 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
       add(AbstractForm.createInvisibleDummyComponent("kundeText"));
     }
     add(customerTextField);
-    final boolean hasSelectAccess = kundeDao.hasLoggedInUserSelectAccess(false);
-    final SubmitLink unselectButton = new SubmitLink("unselect") {
-      @Override
-      public void onSubmit()
-      {
-        caller.unselect(selectProperty);
-        NewCustomerSelectPanel.this.getModel().setObject(null);
-        customerTextField.clearInput();
-      }
-      @Override
-      public boolean isVisible()
-      {
-        return hasSelectAccess == true;
-      }
-    };
-    unselectButton.setDefaultFormProcessing(false);
-    add(unselectButton);
-    unselectButton.add(new TooltipImage("unselectHelp", WebConstants.IMAGE_KUNDE_UNSELECT, getString("fibu.tooltip.unselectKunde")));
-    // DropDownChoice favorites
-    favoritesPanel = new FavoritesChoicePanel<KundeDO, KundeFavorite>("favorites", UserPrefArea.KUNDE_FAVORITE, tabIndex, "half select") {
-      @Override
-      protected void select(final KundeFavorite favorite)
-      {
-        if (favorite.getKunde() != null) {
-          NewCustomerSelectPanel.this.selectKunde(favorite.getKunde());
-        }
-      }
-
-      @Override
-      protected KundeDO getCurrentObject()
-      {
-        return NewCustomerSelectPanel.this.getModelObject();
-      }
-
-      @Override
-      protected KundeFavorite newFavoriteInstance(final KundeDO currentObject)
-      {
-        final KundeFavorite favorite = new KundeFavorite();
-        favorite.setKunde(currentObject);
-        return favorite;
-      }
-    };
-    add(favoritesPanel);
-    favoritesPanel.init();
-    if (showFavorites == false) {
-      favoritesPanel.setVisible(false);
-    }
     return this;
-  }
-
-  /**
-   * Will be called if the user has chosen an entry of the kunde favorites drop down choice.
-   * @param kunde
-   */
-  protected void selectKunde(final KundeDO kunde)
-  {
-    setModelObject(kunde);
-    caller.select(selectProperty, kunde.getId());
   }
 
   public NewCustomerSelectPanel withAutoSubmit(final boolean autoSubmit)
