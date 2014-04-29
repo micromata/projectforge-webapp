@@ -45,6 +45,7 @@ import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -58,6 +59,7 @@ import org.projectforge.fibu.AuftragsPositionsArt;
 import org.projectforge.fibu.AuftragsPositionsStatus;
 import org.projectforge.fibu.AuftragsStatus;
 import org.projectforge.fibu.KundeDO;
+import org.projectforge.fibu.PaymentScheduleDO;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.RechnungCache;
 import org.projectforge.fibu.RechnungDao;
@@ -116,6 +118,8 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
   private RechnungCache rechnungCache;
 
   private FormComponent< ? >[] positionsDependentFormComponents = new FormComponent[0];
+
+  private PaymentSchedulePanel paymentSchedulePanel;
 
   public AuftragEditForm(final AuftragEditPage parentPage, final AuftragDO data)
   {
@@ -252,6 +256,24 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       final DatePanel beauftragungsDatumPanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "beauftragungsDatum"),
           DatePanelSettings.get().withTargetType(java.sql.Date.class));
       fs.add(beauftragungsDatumPanel);
+    }
+    gridBuilder.newGridPanel();
+    {
+      // Zahlplan
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.paymentschedule"));
+      fs.add(paymentSchedulePanel =new PaymentSchedulePanel(fs.newChildId(), new CompoundPropertyModel<AuftragDO>(data)));
+
+      final Button addPositionButton = new Button(SingleButtonPanel.WICKET_ID) {
+        @Override
+        public final void onSubmit()
+        {
+          data.addPaymentSchedule(new PaymentScheduleDO());
+          paymentSchedulePanel.rebuildEntries();
+        }
+      };
+      final SingleButtonPanel addPositionButtonPanel = new SingleButtonPanel("add", addPositionButton, getString("add"));
+      addPositionButtonPanel.setTooltip(getString("fibu.auftrag.tooltip.addPosition"));
+      fs.add(addPositionButtonPanel);
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
@@ -509,4 +531,6 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
   {
     return log;
   }
+
 }
+
