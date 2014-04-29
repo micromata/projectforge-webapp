@@ -50,6 +50,7 @@ import org.projectforge.fibu.EmployeeDO;
 import org.projectforge.fibu.EmployeeSalaryDO;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KundeDO;
+import org.projectforge.fibu.PaymentScheduleDO;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.RechnungDO;
 import org.projectforge.fibu.RechnungsPositionDO;
@@ -121,6 +122,7 @@ public class DatabaseCoreInitial
         GanttChartDO.class, //
         HRPlanningDO.class, HRPlanningEntryDO.class, //
         MebEntryDO.class, ImportedMebEntryDO.class, //
+        PaymentScheduleDO.class, //
         PostausgangDO.class, //
         PosteingangDO.class, //
         ScriptDO.class, //

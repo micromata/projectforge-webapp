@@ -52,6 +52,7 @@ class HibernateCoreEntities
     org.projectforge.fibu.kost.KostZuweisungDO.class, //
     org.projectforge.fibu.KontoDO.class, //
     org.projectforge.fibu.KundeDO.class, //
+    org.projectforge.fibu.PaymentScheduleDO.class, //
     org.projectforge.fibu.ProjektDO.class, //
     org.projectforge.access.AccessEntryDO.class, //
     org.projectforge.access.GroupTaskAccessDO.class, //
