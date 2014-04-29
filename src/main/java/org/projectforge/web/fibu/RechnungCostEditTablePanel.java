@@ -204,11 +204,11 @@ public class RechnungCostEditTablePanel extends Panel
   {
     final WebMarkupContainer row = new WebMarkupContainer(id);
     row.setOutputMarkupId(true);
-    final Kost1FormComponent kost1 = new Kost1FormComponent("kost1", new PropertyModel<Kost1DO>(zuweisung, "kost1"), true);
+    final Kost1FormComponent kost1 = new Kost1FormComponent("kost1", new PropertyModel<Kost1DO>(zuweisung, "kost1"), true, true);
     kost1.setLabel(new Model<String>(getString("fibu.kost1")));
     row.add(kost1);
     ajaxComponents.register(kost1);
-    final Kost2FormComponent kost2 = new Kost2FormComponent("kost2", new PropertyModel<Kost2DO>(zuweisung, "kost2"), true);
+    final Kost2FormComponent kost2 = new Kost2FormComponent("kost2", new PropertyModel<Kost2DO>(zuweisung, "kost2"), true, true);
     kost2.setLabel(new Model<String>(getString("fibu.kost2")));
     row.add(kost2);
     ajaxComponents.register(kost2);

@@ -66,10 +66,15 @@ public class Kost1FormComponent extends PFAutoCompleteTextField<Kost1DO>
     }
   }
 
-  @SuppressWarnings("serial")
   public Kost1FormComponent(final String id, final IModel<Kost1DO> model, final boolean required)
   {
-    super(id,  model);
+    this(id, model, required, false);
+  }
+
+  @SuppressWarnings("serial")
+  public Kost1FormComponent(final String id, final IModel<Kost1DO> model, final boolean required, final boolean tooltipRightAlignment)
+  {
+    super(id, model, tooltipRightAlignment);
     if (required == true) {
       setRequired(true);
       add(new AbstractValidator<Kost1DO>() {
