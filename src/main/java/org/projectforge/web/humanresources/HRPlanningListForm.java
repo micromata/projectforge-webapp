@@ -41,7 +41,7 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.CSSColor;
 import org.projectforge.web.calendar.QuickSelectPanel;
-import org.projectforge.web.fibu.ProjektSelectPanel;
+import org.projectforge.web.fibu.NewProjektSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.WicketUtils;
@@ -161,7 +161,7 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
         gridBuilder.newGridPanel();
       }
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt"));
-      final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel(fs.newChildId(), new Model<ProjektDO>() {
+      final NewProjektSelectPanel projektSelectPanel = new NewProjektSelectPanel(fs.newChildId(), new Model<ProjektDO>() {
         @Override
         public ProjektDO getObject()
         {

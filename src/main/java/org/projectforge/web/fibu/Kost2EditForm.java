@@ -81,7 +81,7 @@ public class Kost2EditForm extends AbstractEditForm<Kost2DO, Kost2EditPage>
     {
       // Project
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt"));
-      final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data, "projekt"),
+      final NewProjektSelectPanel projektSelectPanel = new NewProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data, "projekt"),
           parentPage, "projektId");
       fs.add(projektSelectPanel);
       projektSelectPanel.init();

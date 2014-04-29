@@ -50,7 +50,7 @@ import org.projectforge.user.UserPrefDao;
 import org.projectforge.user.UserPrefEntryDO;
 import org.projectforge.web.fibu.Kost2DropDownChoice;
 import org.projectforge.web.fibu.NewCustomerSelectPanel;
-import org.projectforge.web.fibu.ProjektSelectPanel;
+import org.projectforge.web.fibu.NewProjektSelectPanel;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
@@ -269,7 +269,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
           fs.add(kost2DropDownChoice);
           dependentsMap.put(param.getParameter(), kost2DropDownChoice);
         } else if (ProjektDO.class.isAssignableFrom(param.getType()) == true) {
-          final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel(fs.newChildId(), new UserPrefPropertyModel<ProjektDO>(
+          final NewProjektSelectPanel projektSelectPanel = new NewProjektSelectPanel(fs.newChildId(), new UserPrefPropertyModel<ProjektDO>(
               userPrefDao, param, "valueAsObject"), parentPage, param.getParameter());
           if (data.getArea() == UserPrefArea.PROJEKT_FAVORITE) {
             projektSelectPanel.setShowFavorites(false);
