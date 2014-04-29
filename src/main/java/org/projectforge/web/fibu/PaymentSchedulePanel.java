@@ -98,7 +98,7 @@ public class PaymentSchedulePanel extends Panel
     entrysRepeater = new RepeatingView("liRepeater");
     mainContainer.add(entrysRepeater);
 
-    rebuildEntrys();
+    rebuildEntries();
     addNewEntryContainer = new WebMarkupContainer("liAddNewEntry");
     mainContainer.add(addNewEntryContainer);
 
@@ -149,7 +149,7 @@ public class PaymentSchedulePanel extends Panel
             it.remove();
           }
         }
-        rebuildEntrys();
+        rebuildEntries();
         target.add(mainContainer);
       }
     });
@@ -159,7 +159,7 @@ public class PaymentSchedulePanel extends Panel
 
   /********************************** rebuild ** ********************************* */
   @SuppressWarnings("serial")
-  private void rebuildEntrys()
+  public void rebuildEntries()
   {
 
     final Set<PaymentScheduleDO> entries = model.getObject().getPaymentSchedules();
@@ -210,12 +210,12 @@ public class PaymentSchedulePanel extends Panel
                 it.remove();
               }
             }
-            rebuildEntrys();
+            rebuildEntries();
             target.add(mainContainer);
           }
         });
         item.add(deleteDiv);
-        delete.setVisible(false);
+        delete.setVisible(true);
       }
     }
   }
