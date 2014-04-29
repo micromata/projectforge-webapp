@@ -19,7 +19,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
@@ -34,7 +37,7 @@ import org.projectforge.core.PropertyInfo;
  */
 @Entity
 @Indexed
-@Table(name = "T_PAYMENTSCHEDULE")
+@Table(name = "T_PAYMENTSCHEDULE", uniqueConstraints = { @UniqueConstraint(columnNames = { "auftrag_id", "number"})})
 public class PaymentScheduleDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = -8024212050762584171L;
@@ -105,7 +108,7 @@ public class PaymentScheduleDO extends DefaultBaseDO
     return this;
   }
 
-  @Column
+  @Column(scale = 2, precision = 12)
   public BigDecimal getAmount()
   {
     return amount;
@@ -141,4 +144,30 @@ public class PaymentScheduleDO extends DefaultBaseDO
     return this;
   }
 
+  @Override
+  public boolean equals(final Object o)
+  {
+    if (o instanceof PaymentScheduleDO) {
+      final PaymentScheduleDO other = (PaymentScheduleDO) o;
+      if (ObjectUtils.equals(this.getNumber(), other.getNumber()) == false) {
+        return false;
+      }
+      if (ObjectUtils.equals(this.getAuftragId(), other.getAuftragId()) == false) {
+        return false;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode()
+  {
+    final HashCodeBuilder hcb = new HashCodeBuilder();
+    hcb.append(getNumber());
+    if (getAuftrag() != null) {
+      hcb.append(getAuftrag().getId());
+    }
+    return hcb.toHashCode();
+  }
 }
