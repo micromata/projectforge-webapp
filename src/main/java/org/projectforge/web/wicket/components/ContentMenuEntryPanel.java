@@ -138,7 +138,7 @@ public class ContentMenuEntryPanel extends Panel
    */
   public ContentMenuEntryPanel setTooltip(final String tooltip)
   {
-    WicketUtils.addTooltip(link, tooltip);
+    WicketUtils.addTooltip(link, tooltip, true);
     return this;
   }
 
