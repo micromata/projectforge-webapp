@@ -1347,15 +1347,25 @@ if (typeof jQuery === 'undefined') { throw new Error('Bootstrap\'s JavaScript re
 
     // NEW
     function get_popover_placement(actualWidth, actualHeight) {
-        if ( window.mousePos.y + actualHeight + 10 > $('body').height() && window.mousePos.x + actualWidth <= screen.width) {
-            return { top: window.mousePos.y - actualHeight - 10, left: window.mousePos.x + 10 };
-        } else if ( window.mousePos.x + actualWidth > screen.width && window.mousePos.y + actualHeight + 10 <= $('body').height()) {
-            return { top: window.mousePos.y + 10, left: window.mousePos.x - actualWidth - 10 };
-        } else if ( window.mousePos.y + actualHeight + 10 > $('body').height() && window.mousePos.x + actualWidth >= screen.width) {
-            return { top: window.mousePos.y - actualHeight - 10, left: window.mousePos.x - actualWidth - 10 };
-        } else {
-            return { top: window.mousePos.y + 10, left: window.mousePos.x + 10 };
-        }
+    	if (window.mousePos.y > $('body').height() / 2) {
+    		// top
+            if (window.mousePos.x < $('body').width() / 2) {
+            	// top right
+                return { top: window.mousePos.y - actualHeight - 10, left: window.mousePos.x + 10 };
+            } else {
+            	// top left
+                return { top: window.mousePos.y - actualHeight - 10, left: window.mousePos.x - actualWidth - 10 };
+            }
+    	} else {
+    		// bottom
+            if (window.mousePos.x < $('body').width() / 2) {
+            	// bottom right
+                return { top: window.mousePos.y + 10, left: window.mousePos.x + 10 };
+            } else {
+            	// bottom left
+                return { top: window.mousePos.y + 10, left: window.mousePos.x - actualWidth - 10 };
+            }
+    	}
     }
 
     Tooltip.prototype.getTitle = function () {
