@@ -49,7 +49,7 @@ import org.projectforge.user.UserPrefDO;
 import org.projectforge.user.UserPrefDao;
 import org.projectforge.web.dialog.ModalDialog;
 import org.projectforge.web.task.TaskSelectPanel;
-import org.projectforge.web.user.GroupSelectPanel;
+import org.projectforge.web.user.NewGroupSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
@@ -232,7 +232,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
     {
       // Group
       final FieldsetPanel fs = gridBuilder.newFieldset(ToDoDO.class, "group");
-      final GroupSelectPanel groupSelectPanel = new GroupSelectPanel(fs.newChildId(), new PropertyModel<GroupDO>(data, "group"),
+      final NewGroupSelectPanel groupSelectPanel = new NewGroupSelectPanel(fs.newChildId(), new PropertyModel<GroupDO>(data, "group"),
           parentPage, "groupId");
       fs.add(groupSelectPanel);
       fs.setLabelFor(groupSelectPanel);

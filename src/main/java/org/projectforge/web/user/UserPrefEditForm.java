@@ -243,7 +243,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
           fs.add(taskSelectPanel);
           taskSelectPanel.init();
         } else if (GroupDO.class.isAssignableFrom(param.getType()) == true) {
-          final GroupSelectPanel groupSelectPanel = new GroupSelectPanel(fs.newChildId(), new UserPrefPropertyModel<GroupDO>(userPrefDao,
+          final NewGroupSelectPanel groupSelectPanel = new NewGroupSelectPanel(fs.newChildId(), new UserPrefPropertyModel<GroupDO>(userPrefDao,
               param, "valueAsObject"), parentPage, param.getParameter());
           fs.add(groupSelectPanel);
           groupSelectPanel.init();

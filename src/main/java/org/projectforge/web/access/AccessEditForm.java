@@ -31,7 +31,7 @@ import org.projectforge.access.GroupTaskAccessDO;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.GroupDO;
 import org.projectforge.web.task.TaskSelectPanel;
-import org.projectforge.web.user.GroupSelectPanel;
+import org.projectforge.web.user.NewGroupSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
@@ -64,7 +64,7 @@ public class AccessEditForm extends AbstractEditForm<GroupTaskAccessDO, AccessEd
     {
       // Group
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("group")).suppressLabelForWarning();
-      final GroupSelectPanel groupSelectPanel = new GroupSelectPanel(fs.newChildId(), new PropertyModel<GroupDO>(data, "group"),
+      final NewGroupSelectPanel groupSelectPanel = new NewGroupSelectPanel(fs.newChildId(), new PropertyModel<GroupDO>(data, "group"),
           parentPage, "groupId");
       fs.add(groupSelectPanel.setRequired(true));
       groupSelectPanel.init();
