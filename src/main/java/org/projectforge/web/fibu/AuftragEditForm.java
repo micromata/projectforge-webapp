@@ -45,7 +45,6 @@ import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.markup.repeater.RepeatingView;
-import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -108,7 +107,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
 
   protected CheckBox sendEMailNotficationCheckBox;
 
-  protected RepeatingView positionsRepeater;
+  protected RepeatingView positionsRepeater, paymentSchedulesRepeater;
 
   protected NewCustomerSelectPanel kundeSelectPanel;
 
@@ -119,7 +118,9 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
 
   private FormComponent< ? >[] positionsDependentFormComponents = new FormComponent[0];
 
-  private PaymentSchedulePanel paymentSchedulePanel;
+  private FormComponent< ? >[] schedulesDependentFormComponents = new FormComponent[0];
+
+  //  private PaymentSchedulePanel paymentSchedulePanel;
 
   public AuftragEditForm(final AuftragEditPage parentPage, final AuftragDO data)
   {
@@ -258,22 +259,39 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       fs.add(beauftragungsDatumPanel);
     }
     gridBuilder.newGridPanel();
+    paymentSchedulesRepeater = gridBuilder.newRepeatingView();
+    refreshSchedules();
     {
       // Zahlplan
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.paymentschedule"));
-      fs.add(paymentSchedulePanel =new PaymentSchedulePanel(fs.newChildId(), new CompoundPropertyModel<AuftragDO>(data)));
+      if (getBaseDao().hasInsertAccess(getUser()) == true) {
+        final DivPanel panel = gridBuilder.newGridPanel().getPanel();
+        final Button addPositionButton = new Button(SingleButtonPanel.WICKET_ID) {
+          @Override
+          public final void onSubmit()
+          {
+            getData().addPaymentSchedule(new PaymentScheduleDO());
+            refreshSchedules();
+          }
+        };
+        final SingleButtonPanel addPositionButtonPanel = new SingleButtonPanel(panel.newChildId(), addPositionButton, getString("add"));
+        addPositionButtonPanel.setTooltip(getString("fibu.auftrag.tooltip.addPosition"));
+        panel.add(addPositionButtonPanel);
+      }
 
-      final Button addPositionButton = new Button(SingleButtonPanel.WICKET_ID) {
-        @Override
-        public final void onSubmit()
-        {
-          data.addPaymentSchedule(new PaymentScheduleDO());
-          paymentSchedulePanel.rebuildEntries();
-        }
-      };
-      final SingleButtonPanel addPositionButtonPanel = new SingleButtonPanel("add", addPositionButton, getString("add"));
-      addPositionButtonPanel.setTooltip(getString("fibu.auftrag.tooltip.addPosition"));
-      fs.add(addPositionButtonPanel);
+      //      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.paymentschedule"));
+      //      fs.add(paymentSchedulePanel =new PaymentSchedulePanel(fs.newChildId(), new CompoundPropertyModel<AuftragDO>(data)));
+
+      //      final Button addPositionButton = new Button(SingleButtonPanel.WICKET_ID) {
+      //        @Override
+      //        public final void onSubmit()
+      //        {
+      //          data.addPaymentSchedule(new PaymentScheduleDO());
+      //          paymentSchedulePanel.rebuildEntries();
+      //        }
+      //      };
+      //      final SingleButtonPanel addPositionButtonPanel = new SingleButtonPanel("add", addPositionButton, getString("add"));
+      //      addPositionButtonPanel.setTooltip(getString("fibu.auftrag.tooltip.addPosition"));
+      //      fs.add(addPositionButtonPanel);
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
@@ -506,6 +524,85 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
     positionsDependentFormComponents = dependentComponents.toArray(new FormComponent[0]);
   }
 
+  @SuppressWarnings("serial")
+  void refreshSchedules()
+  {
+    paymentSchedulesRepeater.removeAll();
+    final Collection<FormComponent< ? >> dependentComponents = new ArrayList<FormComponent< ? >>();
+    if (CollectionUtils.isEmpty(data.getPaymentSchedules()) == true) {
+      // Ensure that at least one position is available:
+      data.addPaymentSchedule(new PaymentScheduleDO());
+    }
+    for (final PaymentScheduleDO schedule : data.getPaymentSchedules()) {
+      final boolean reached = schedule.isReached();
+      final ToggleContainerPanel schedulesPanel = new ToggleContainerPanel(paymentSchedulesRepeater.newChildId()) {
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.ToggleContainerPanel#wantsOnStatusChangedNotification()
+         */
+        @Override
+        protected boolean wantsOnStatusChangedNotification()
+        {
+          return true;
+        }
+
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.ToggleContainerPanel#onToggleStatusChanged(org.apache.wicket.ajax.AjaxRequestTarget,
+         *      boolean)
+         */
+        @Override
+        protected void onToggleStatusChanged(final AjaxRequestTarget target, final ToggleStatus toggleStatus)
+        {
+          if (toggleStatus == ToggleStatus.OPENED) {
+            data.getUiStatus().openPosition(schedule.getNumber());
+          } else {
+            data.getUiStatus().closePosition(schedule.getNumber());
+          }
+          setHeading(getPaymentScheduleHeading(schedule, this));
+        }
+      };
+      if (schedule.isReached()) {
+        schedulesPanel.setHighlightedHeader();
+      }
+      paymentSchedulesRepeater.add(schedulesPanel);
+      if (data.getUiStatus().isClosed(schedule.getNumber()) == true) {
+        schedulesPanel.setClosed();
+      } else {
+        schedulesPanel.setOpen();
+      }
+      schedulesPanel.setHeading(getPaymentScheduleHeading(schedule, schedulesPanel));
+
+      final GridBuilder posGridBuilder = schedulesPanel.createGridBuilder();
+      posGridBuilder.newGridPanel();
+      {
+        final FieldsetPanel fs = posGridBuilder.newFieldset(getString("date"));
+        fs.add(new DatePanel("scheduleDate", new PropertyModel<Date>(schedule, "scheduleDate"),
+            DatePanelSettings.get().withTargetType(java.sql.Date.class)));
+      }
+      {
+        final FieldsetPanel fs = posGridBuilder.newFieldset(getString("fibu.common.betrag"));
+        final TextField<String> amount = new TextField<String>(InputPanel.WICKET_ID, new PropertyModel<String>(schedule, "amount")) {
+          @SuppressWarnings({ "rawtypes", "unchecked"})
+          @Override
+          public IConverter getConverter(final Class type)
+          {
+            return new CurrencyConverter();
+          }
+        };
+        fs.add(amount);
+      }
+      {
+        final FieldsetPanel fs = posGridBuilder.newFieldset(getString("comment"));
+        fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(schedule, "comment")));
+      }
+      {
+        //        final FieldsetPanel fs = posGridBuilder.newFieldset(getString("fibu.common.reached"));
+        //        fs.add(new CheckBox( CheckBoxPanel.WICKET_ID, new PropertyModel<Boolean>(schedule, "reached")));
+        posGridBuilder.newFieldset(getString("fibu.common.reached")).addCheckBox(new PropertyModel<Boolean>(schedule, "reached"), null);
+      }
+    }
+    schedulesDependentFormComponents = dependentComponents.toArray(new FormComponent[0]);
+  }
+
   protected String getPositionHeading(final AuftragsPositionDO position, final ToggleContainerPanel positionsPanel)
   {
     if (positionsPanel.getToggleStatus() == ToggleStatus.OPENED) {
@@ -523,6 +620,26 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
     if (StringHelper.isNotBlank(position.getTitel()) == true) {
       heading.append(": ").append(StringUtils.abbreviate(position.getTitel(), 80));
     }
+    return heading.toString();
+  }
+
+  protected String getPaymentScheduleHeading(final PaymentScheduleDO schedule, final ToggleContainerPanel schedulesPanel)
+  {
+    if (schedulesPanel.getToggleStatus() == ToggleStatus.OPENED) {
+      return getString("label.position.short") + " #" + schedule.getNumber();
+    }
+    final StringBuffer heading = new StringBuffer();
+    heading.append(escapeHtml(getString("label.position.short"))).append(" #").append(schedule.getNumber());
+    heading.append(": ").append(CurrencyFormatter.format(schedule.getAmount()));
+    //    if (schedule.getStatus() != null) {
+    //      heading.append(", ").append(getString(schedule.getStatus().getI18nKey()));
+    //    }
+    //    if (schedule.isVollstaendigFakturiert() == false) {
+    //      heading.append(" (").append(getString("fibu.fakturiert.not")).append(")");
+    //    }
+    //    if (StringHelper.isNotBlank(schedule.getTitel()) == true) {
+    //      heading.append(": ").append(StringUtils.abbreviate(schedule.getTitel(), 80));
+    //    }
     return heading.toString();
   }
 
