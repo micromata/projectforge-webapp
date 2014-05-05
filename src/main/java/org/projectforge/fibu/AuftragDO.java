@@ -26,9 +26,7 @@ package org.projectforge.fibu;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -127,7 +125,15 @@ public class AuftragDO extends DefaultBaseDO
 
   @PFPersistancyBehavior(autoUpdateCollectionEntries = true)
   @IndexedEmbedded(depth = 1)
-  private Set<PaymentScheduleDO> paymentSchedules = null;
+  private List<PaymentScheduleDO> paymentSchedules = null;
+
+  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @DateBridge(resolution = Resolution.DAY)
+  private Date periodOfPerformanceBegin;
+
+  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @DateBridge(resolution = Resolution.DAY)
+  private Date periodOfPerformanceEnd;
 
   static {
     AbstractHistorizableBaseDO.putNonHistorizableProperty(AuftragDO.class, "uiStatusAsXml", "uiStatus");
@@ -646,7 +652,7 @@ public class AuftragDO extends DefaultBaseDO
    */
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "auftrag")
   @IndexColumn(name = "number", base = 1)
-  public Set<PaymentScheduleDO> getPaymentSchedules()
+  public List<PaymentScheduleDO> getPaymentSchedules()
   {
     return this.paymentSchedules;
   }
@@ -669,7 +675,7 @@ public class AuftragDO extends DefaultBaseDO
     return null;
   }
 
-  public AuftragDO setPaymentSchedules(final Set<PaymentScheduleDO> paymentSchedules)
+  public AuftragDO setPaymentSchedules(final List<PaymentScheduleDO> paymentSchedules)
   {
     this.paymentSchedules = paymentSchedules;
     return this;
@@ -691,11 +697,49 @@ public class AuftragDO extends DefaultBaseDO
     return this;
   }
 
-  public Set<PaymentScheduleDO> ensureAndGetPaymentSchedules()
+  public List<PaymentScheduleDO> ensureAndGetPaymentSchedules()
   {
     if (this.paymentSchedules == null) {
-      setPaymentSchedules(new LinkedHashSet<PaymentScheduleDO>());
+      setPaymentSchedules(new ArrayList<PaymentScheduleDO>());
     }
     return getPaymentSchedules();
+  }
+
+  /**
+   * @return the timeOfPerformanceBegin
+   */
+  @Column(name = "period_of_performance_begin")
+  public Date getPeriodOfPerformanceBegin()
+  {
+    return periodOfPerformanceBegin;
+  }
+
+  /**
+   * @param periodOfPerformanceBegin the periodOfPerformanceBegin to set
+   * @return this for chaining.
+   */
+  public AuftragDO setPeriodOfPerformanceBegin(final Date periodOfPerformanceBegin)
+  {
+    this.periodOfPerformanceBegin = periodOfPerformanceBegin;
+    return this;
+  }
+
+  /**
+   * @return the timeOfPerformanceEnd
+   */
+  @Column(name = "period_of_performance_end")
+  public Date getPeriodOfPerformanceEnd()
+  {
+    return periodOfPerformanceEnd;
+  }
+
+  /**
+   * @param periodOfPerformanceEnd the periodOfPerformanceEnd to set
+   * @return this for chaining.
+   */
+  public AuftragDO setPeriodOfPerformanceEnd(final Date periodOfPerformanceEnd)
+  {
+    this.periodOfPerformanceEnd = periodOfPerformanceEnd;
+    return this;
   }
 }
