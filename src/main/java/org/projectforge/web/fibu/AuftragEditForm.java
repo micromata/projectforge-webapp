@@ -118,9 +118,11 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
 
   private FormComponent< ? >[] positionsDependentFormComponents = new FormComponent[0];
 
-  private FormComponent< ? >[] schedulesDependentFormComponents = new FormComponent[0];
+  private DatePanel fromDatePanel, endDatePanel;
 
-  //  private PaymentSchedulePanel paymentSchedulePanel;
+  //private final FormComponent< ? >[] schedulesDependentFormComponents = new FormComponent[0];
+
+  //private PaymentSchedulePanel paymentSchedulePanel;
 
   public AuftragEditForm(final AuftragEditPage parentPage, final AuftragDO data)
   {
@@ -258,6 +260,19 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
           DatePanelSettings.get().withTargetType(java.sql.Date.class));
       fs.add(beauftragungsDatumPanel);
     }
+    gridBuilder.newSplitPanel(GridSize.COL50);
+    {
+      // Period of performance
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.periodOfPerformance"));
+      fromDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "periodOfPerformanceBegin"),
+          DatePanelSettings.get().withTargetType(java.sql.Date.class));
+      fs.add(fromDatePanel);
+      fs.add(new DivTextPanel(fs.newChildId(), "-"));
+      endDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "periodOfPerformanceEnd"),
+          DatePanelSettings.get().withTargetType(java.sql.Date.class));
+      fs.add(endDatePanel);
+    }
+
     gridBuilder.newGridPanel();
     paymentSchedulesRepeater = gridBuilder.newRepeatingView();
     refreshSchedules();
@@ -274,13 +289,16 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
           }
         };
         final SingleButtonPanel addPositionButtonPanel = new SingleButtonPanel(panel.newChildId(), addPositionButton, getString("add"));
-        addPositionButtonPanel.setTooltip(getString("fibu.auftrag.tooltip.addPosition"));
+        addPositionButtonPanel.setTooltip(getString("fibu.auftrag.tooltip.addPaymentschedule"));
         panel.add(addPositionButtonPanel);
       }
 
       //      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.paymentschedule"));
-      //      fs.add(paymentSchedulePanel =new PaymentSchedulePanel(fs.newChildId(), new CompoundPropertyModel<AuftragDO>(data)));
-
+      //      fs.add(paymentSchedulePanel = new PaymentSchedulePanel(fs.newChildId(), new CompoundPropertyModel<AuftragDO>(data)));
+      //    }
+      //    {
+      //      final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.newGridPanelId());
+      //
       //      final Button addPositionButton = new Button(SingleButtonPanel.WICKET_ID) {
       //        @Override
       //        public final void onSubmit()
@@ -337,14 +355,29 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       @Override
       public void validate(final Form< ? > form)
       {
+
+        final Date performanceFromDate = fromDatePanel.getDateField().getConvertedInput();
+        final Date performanceEndDate = endDatePanel.getDateField().getConvertedInput();
+        if (performanceFromDate == null || performanceEndDate == null) {
+          ;
+        } else if (performanceEndDate.before(performanceFromDate) == true) {
+          endDatePanel.error(getString("error.endDateBeforeBeginDate"));
+        }
+
         for (int i = 0; i < positionsDependentFormComponents.length - 1; i += 2) {
-          final Date performanceFromDate = ((DateTextField) positionsDependentFormComponents[i]).getConvertedInput();
-          final Date performanceEndDate = ((DateTextField) positionsDependentFormComponents[i + 1]).getConvertedInput();
-          if (performanceFromDate == null || performanceEndDate == null) {
+          final Date posPerformanceFromDate = ((DateTextField) positionsDependentFormComponents[i]).getConvertedInput();
+          final Date posPerformanceEndDate = ((DateTextField) positionsDependentFormComponents[i + 1]).getConvertedInput();
+          if (posPerformanceFromDate == null || posPerformanceEndDate == null) {
             continue;
           }
-          if (performanceEndDate.before(performanceFromDate) == true) {
+          if (posPerformanceEndDate.before(posPerformanceFromDate) == true) {
             positionsDependentFormComponents[i + 1].error(getString("error.endDateBeforeBeginDate"));
+          }
+          if (posPerformanceFromDate.before(performanceFromDate) == true) {
+            positionsDependentFormComponents[i + 1].error(getString("error.posFromDateBeforeFromDate"));
+          }
+          if (posPerformanceEndDate.after(performanceEndDate) == true) {
+            positionsDependentFormComponents[i + 1].error(getString("error.posEndDateAfterEndDate"));
           }
         }
       }
@@ -528,13 +561,13 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
   void refreshSchedules()
   {
     paymentSchedulesRepeater.removeAll();
-    final Collection<FormComponent< ? >> dependentComponents = new ArrayList<FormComponent< ? >>();
+    //final Collection<FormComponent< ? >> dependentComponents = new ArrayList<FormComponent< ? >>();
     if (CollectionUtils.isEmpty(data.getPaymentSchedules()) == true) {
       // Ensure that at least one position is available:
       data.addPaymentSchedule(new PaymentScheduleDO());
     }
     for (final PaymentScheduleDO schedule : data.getPaymentSchedules()) {
-      final boolean reached = schedule.isReached();
+      //final boolean reached = schedule.isReached();
       final ToggleContainerPanel schedulesPanel = new ToggleContainerPanel(paymentSchedulesRepeater.newChildId()) {
         /**
          * @see org.projectforge.web.wicket.flowlayout.ToggleContainerPanel#wantsOnStatusChangedNotification()
@@ -564,6 +597,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         schedulesPanel.setHighlightedHeader();
       }
       paymentSchedulesRepeater.add(schedulesPanel);
+      data.getUiStatus().closePosition(schedule.getNumber());
       if (data.getUiStatus().isClosed(schedule.getNumber()) == true) {
         schedulesPanel.setClosed();
       } else {
@@ -574,8 +608,8 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       final GridBuilder posGridBuilder = schedulesPanel.createGridBuilder();
       posGridBuilder.newGridPanel();
       {
-        final FieldsetPanel fs = posGridBuilder.newFieldset(getString("date"));
-        fs.add(new DatePanel("scheduleDate", new PropertyModel<Date>(schedule, "scheduleDate"),
+        final FieldsetPanel fs = posGridBuilder.newFieldset(getString("fibu.rechnung.datum.short"));
+        fs.add(new DatePanel(posGridBuilder.newGridPanelId(), new PropertyModel<Date>(schedule, "scheduleDate"),
             DatePanelSettings.get().withTargetType(java.sql.Date.class)));
       }
       {
@@ -595,12 +629,10 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(schedule, "comment")));
       }
       {
-        //        final FieldsetPanel fs = posGridBuilder.newFieldset(getString("fibu.common.reached"));
-        //        fs.add(new CheckBox( CheckBoxPanel.WICKET_ID, new PropertyModel<Boolean>(schedule, "reached")));
         posGridBuilder.newFieldset(getString("fibu.common.reached")).addCheckBox(new PropertyModel<Boolean>(schedule, "reached"), null);
       }
     }
-    schedulesDependentFormComponents = dependentComponents.toArray(new FormComponent[0]);
+    //schedulesDependentFormComponents = dependentComponents.toArray(new FormComponent[0]);
   }
 
   protected String getPositionHeading(final AuftragsPositionDO position, final ToggleContainerPanel positionsPanel)
@@ -626,10 +658,10 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
   protected String getPaymentScheduleHeading(final PaymentScheduleDO schedule, final ToggleContainerPanel schedulesPanel)
   {
     if (schedulesPanel.getToggleStatus() == ToggleStatus.OPENED) {
-      return getString("label.position.short") + " #" + schedule.getNumber();
+      return getString("fibu.auftrag.paymentschedule") + " #" + schedule.getNumber();
     }
     final StringBuffer heading = new StringBuffer();
-    heading.append(escapeHtml(getString("label.position.short"))).append(" #").append(schedule.getNumber());
+    heading.append(escapeHtml(getString("fibu.auftrag.paymentschedule"))).append(" #").append(schedule.getNumber());
     heading.append(": ").append(CurrencyFormatter.format(schedule.getAmount()));
     //    if (schedule.getStatus() != null) {
     //      heading.append(", ").append(getString(schedule.getStatus().getI18nKey()));
@@ -638,7 +670,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
     //      heading.append(" (").append(getString("fibu.fakturiert.not")).append(")");
     //    }
     //    if (StringHelper.isNotBlank(schedule.getTitel()) == true) {
-    //      heading.append(": ").append(StringUtils.abbreviate(schedule.getTitel(), 80));
+    //          heading.append(": ").append(StringUtils.abbreviate(schedule.getTitel(), 80));
     //    }
     return heading.toString();
   }
