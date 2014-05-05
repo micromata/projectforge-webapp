@@ -1,6 +1,5 @@
 <wicket:panel xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
   <ol class="attendees" wicket:id="main">
-    <li wicket:id="liRepeater"><span wicket:id="scheduleDate"></span>&nbsp<input wicket:id="amount" style="width: 6em;"></input>&nbsp<textarea wicket:id="comment"  style="width: 20em;"></textarea>&nbsp<input type="checkbox" wicket:id="reached"></input>&nbsp<div wicket:id="deleteDiv"><span><a href="delete" wicket:id="delete"></a></span></div></li>
-    <li wicket:id="liAddNewEntry"><span wicket:id="scheduleDate"></span>&nbsp<input wicket:id="amount" style="width: 6em;"></input>&nbsp<textarea wicket:id="comment" style="width: 20em;"></textarea>&nbsp<input type="checkbox" wicket:id="reached"></input>&nbsp<div wicket:id="deleteDiv"><span><a href="delete" wicket:id="delete"></a></span></div></li>
+    <li wicket:id="liRepeater"><span wicket:id="dateLabel"></span><span wicket:id="scheduleDate"></span>&nbsp<span wicket:id="amountLabel"></span>&nbsp<input wicket:id="amount" style="width: 8em;"></input>&nbsp<span wicket:id="commentLabel"></span>&nbsp<textarea wicket:id="comment"  style="width: 20em;"></textarea>&nbsp<span wicket:id="reachedLabel"></span>&nbsp<input type="checkbox" wicket:id="reached"></input>&nbsp<div wicket:id="deleteDiv"><span><a href="delete" wicket:id="delete"></a></span></div></li>
   </ol>
 </wicket:panel>
