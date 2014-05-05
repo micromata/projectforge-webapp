@@ -23,14 +23,14 @@
 
 package org.projectforge.web.fibu;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -57,21 +57,8 @@ public class PaymentSchedulePanel extends Panel
 
   private RepeatingView entrysRepeater;
 
-  private WebMarkupContainer mainContainer, addNewEntryContainer;
+  private WebMarkupContainer mainContainer;
 
-  private PaymentScheduleDO newEntryValue;
-
-  //  private final String DEFAULT_ENTRY_VALUE = "Neue Adresse";
-  //  private final String DEFAULT_STREET_VALUE = "Strasse";
-  //  private final String DEFAULT_ZIPCODE_VALUE= "Plz";
-  //  private final String DEFAULT_CITY_VALUE = "Stadt";
-  //  private final String DEFAULT_COUNTRY_VALUE = "Land";
-  //  private final String DEFAULT_STATE_VALUE = "Bundesland";
-  //
-  //  private Component city;
-  //  private Component zipCode;
-  //  private Component country;
-  //  private Component state;
   private Component delete;
 
   private final IModel<AuftragDO>  model;
@@ -92,69 +79,13 @@ public class PaymentSchedulePanel extends Panel
   protected void onInitialize()
   {
     super.onInitialize();
-    newEntryValue = new PaymentScheduleDO().setAmount(BigDecimal.ZERO).setAuftrag(model.getObject());
     mainContainer = new WebMarkupContainer("main");
     add(mainContainer.setOutputMarkupId(true));
     entrysRepeater = new RepeatingView("liRepeater");
     mainContainer.add(entrysRepeater);
 
     rebuildEntries();
-    addNewEntryContainer = new WebMarkupContainer("liAddNewEntry");
-    mainContainer.add(addNewEntryContainer);
-
-    init(addNewEntryContainer);
     entrysRepeater.setVisible(true);
-  }
-
-  /********************************** init ** ********************************* */
-  @SuppressWarnings("serial")
-  void init(final WebMarkupContainer item)
-  {
-
-    // scheduleDate
-    final DatePanel datePanel = new DatePanel("scheduleDate", new PropertyModel<Date>(newEntryValue, "scheduleDate"),
-        DatePanelSettings.get().withTargetType(java.sql.Date.class));
-    item.add(datePanel);
-
-    // amount
-    final TextField<String> amount = new TextField<String>("amount", new PropertyModel<String>(newEntryValue, "amount")) {
-      @SuppressWarnings({ "rawtypes", "unchecked"})
-      @Override
-      public IConverter getConverter(final Class type)
-      {
-        return new CurrencyConverter();
-      }
-    };
-    item.add(amount);
-
-    // comment
-    item.add(new MaxLengthTextArea("comment", new PropertyModel<String>(newEntryValue, "comment")));
-
-    // reached
-    item.add(new CheckBox("reached", new PropertyModel<Boolean>(newEntryValue, "reached")));
-
-    final WebMarkupContainer deleteDiv = new WebMarkupContainer("deleteDiv");
-    deleteDiv.setOutputMarkupId(true);
-    deleteDiv.add( delete = new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(newEntryValue, "comment")) {
-      /**
-       * @see org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel#onClick(org.apache.wicket.ajax.AjaxRequestTarget)
-       */
-      @Override
-      protected void onClick(final AjaxRequestTarget target)
-      {
-        super.onClick(target);
-        final Iterator<PaymentScheduleDO> it = model.getObject().getPaymentSchedules().iterator();
-        while (it.hasNext() == true) {
-          if (it.next() == newEntryValue) {
-            it.remove();
-          }
-        }
-        rebuildEntries();
-        target.add(mainContainer);
-      }
-    });
-    item.add(deleteDiv);
-    delete.setVisible(false);
   }
 
   /********************************** rebuild ** ********************************* */
@@ -162,7 +93,7 @@ public class PaymentSchedulePanel extends Panel
   public void rebuildEntries()
   {
 
-    final Set<PaymentScheduleDO> entries = model.getObject().getPaymentSchedules();
+    final List<PaymentScheduleDO> entries = model.getObject().getPaymentSchedules();
     if ( entries != null) {
       entrysRepeater.removeAll();
 
@@ -172,12 +103,14 @@ public class PaymentSchedulePanel extends Panel
         entrysRepeater.add(item);
 
         // scheduleDate
+        item.add(new Label("dateLabel", getString("fibu.rechnung.datum.short")));
         final DatePanel datePanel = new DatePanel("scheduleDate", new PropertyModel<Date>(entry, "scheduleDate"),
             DatePanelSettings.get().withTargetType(java.sql.Date.class));
         item.add(datePanel);
 
         // amount
-        final TextField<String> amount = new TextField<String>("amount", new PropertyModel<String>(newEntryValue, "amount")) {
+        item.add(new Label("amountLabel", getString("fibu.common.betrag")));
+        final TextField<String> amount = new TextField<String>("amount", new PropertyModel<String>(entry, "amount")) {
           @SuppressWarnings({ "rawtypes", "unchecked"})
           @Override
           public IConverter getConverter(final Class type)
@@ -188,9 +121,11 @@ public class PaymentSchedulePanel extends Panel
         item.add(amount);
 
         // comment
+        item.add(new Label("commentLabel", getString("comment")));
         item.add(new MaxLengthTextArea("comment", new PropertyModel<String>(entry, "comment")));
 
         // reached
+        item.add(new Label("reachedLabel", getString("fibu.common.reached")));
         item.add(new CheckBox("reached", new PropertyModel<Boolean>(entry, "reached")));
 
 
