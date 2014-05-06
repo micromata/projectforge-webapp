@@ -22,6 +22,7 @@ import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
@@ -169,5 +170,17 @@ public class PaymentScheduleDO extends DefaultBaseDO
       hcb.append(getAuftrag().getId());
     }
     return hcb.toHashCode();
+  }
+
+  @Transient
+  public boolean isEmpty()
+  {
+    if (StringUtils.isBlank(comment) == false) {
+      return false;
+    }
+    if (amount != null && amount.compareTo(BigDecimal.ZERO) != 0) {
+      return false;
+    }
+    return (scheduleDate == null);
   }
 }

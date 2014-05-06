@@ -462,6 +462,16 @@ public class AuftragDao extends BaseDao<AuftragDO>
     abgeschlossenNichtFakturiert = null;
     final String uiStatusAsXml = XmlObjectWriter.writeAsXml(obj.getUiStatus());
     obj.setUiStatusAsXml(uiStatusAsXml);
+    final int pmSize = obj.getPaymentSchedules().size();
+    for (int i = pmSize - 1; i > 0; i--) {
+      // Don't remove first payment schedule, remove only the last empty payment schedules.
+      final PaymentScheduleDO schedule = obj.getPaymentSchedules().get(i);
+      if (schedule.getId() == null && schedule.isEmpty() == true) {
+        obj.getPaymentSchedules().remove(i);
+      } else {
+        break;
+      }
+    }
   }
 
   @Override
