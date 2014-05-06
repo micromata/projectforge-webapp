@@ -369,11 +369,13 @@ public class AuftragDao extends BaseDao<AuftragDO>
     } else if (myFilter.isShowAbgelehnt() == true) {
       queryFilter.add(Restrictions.eq("auftragsStatus", AuftragsStatus.ABGELEHNT));
     } else if (myFilter.isShowAbgeschlossenNichtFakturiert() == true) {
-      queryFilter.createAlias("positionen", "position").add(
+      queryFilter.createAlias("positionen", "position").createAlias("paymentSchedules", "paymentSchedule").add(
           Restrictions.or(
-              Restrictions.eq("auftragsStatus", AuftragsStatus.ABGESCHLOSSEN),
-              Restrictions.and(Restrictions.eq("position.status", AuftragsPositionsStatus.ABGESCHLOSSEN),
-                  Restrictions.eq("position.vollstaendigFakturiert", false))));
+              Restrictions.or(
+                  Restrictions.eq("auftragsStatus", AuftragsStatus.ABGESCHLOSSEN),
+                  Restrictions.and(Restrictions.eq("position.status", AuftragsPositionsStatus.ABGESCHLOSSEN),
+                      Restrictions.eq("position.vollstaendigFakturiert", false))),
+                      Restrictions.eq("paymentSchedule.reached", true)));
       vollstaendigFakturiert = false; // Und noch nicht fakturiert.
     } else if (myFilter.isShowAkquise() == true) {
       queryFilter.add(Restrictions.in("auftragsStatus", new AuftragsStatus[] { AuftragsStatus.GELEGT, AuftragsStatus.IN_ERSTELLUNG,
