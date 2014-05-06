@@ -45,6 +45,7 @@ import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -120,9 +121,9 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
 
   private DatePanel fromDatePanel, endDatePanel;
 
-  //private final FormComponent< ? >[] schedulesDependentFormComponents = new FormComponent[0];
+  //  private final FormComponent< ? >[] schedulesDependentFormComponents = new FormComponent[0];
 
-  //private PaymentSchedulePanel paymentSchedulePanel;
+  private PaymentSchedulePanel paymentSchedulePanel;
 
   public AuftragEditForm(final AuftragEditPage parentPage, final AuftragDO data)
   {
@@ -273,43 +274,42 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       fs.add(endDatePanel);
     }
 
-    gridBuilder.newGridPanel();
-    paymentSchedulesRepeater = gridBuilder.newRepeatingView();
-    refreshSchedules();
+    //gridBuilder.newGridPanel();
+    //    paymentSchedulesRepeater = gridBuilder.newRepeatingView();
+    //    refreshSchedules();
+    //    {
+    //      // Zahlplan
+    //      if (getBaseDao().hasInsertAccess(getUser()) == true) {
+    //        final DivPanel panel = gridBuilder.newGridPanel().getPanel();
+    //        final Button addPositionButton = new Button(SingleButtonPanel.WICKET_ID) {
+    //          @Override
+    //          public final void onSubmit()
+    //          {
+    //            getData().addPaymentSchedule(new PaymentScheduleDO());
+    //            refreshSchedules();
+    //          }
+    //        };
+    //        final SingleButtonPanel addPositionButtonPanel = new SingleButtonPanel(panel.newChildId(), addPositionButton, getString("add"));
+    //        addPositionButtonPanel.setTooltip(getString("fibu.auftrag.tooltip.addPaymentschedule"));
+    //        panel.add(addPositionButtonPanel);
+    //      }
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
-      // Zahlplan
-      if (getBaseDao().hasInsertAccess(getUser()) == true) {
-        final DivPanel panel = gridBuilder.newGridPanel().getPanel();
-        final Button addPositionButton = new Button(SingleButtonPanel.WICKET_ID) {
-          @Override
-          public final void onSubmit()
-          {
-            getData().addPaymentSchedule(new PaymentScheduleDO());
-            refreshSchedules();
-          }
-        };
-        final SingleButtonPanel addPositionButtonPanel = new SingleButtonPanel(panel.newChildId(), addPositionButton, getString("add"));
-        addPositionButtonPanel.setTooltip(getString("fibu.auftrag.tooltip.addPaymentschedule"));
-        panel.add(addPositionButtonPanel);
-      }
-
-      //      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.paymentschedule"));
-      //      fs.add(paymentSchedulePanel = new PaymentSchedulePanel(fs.newChildId(), new CompoundPropertyModel<AuftragDO>(data)));
-      //    }
-      //    {
-      //      final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.newGridPanelId());
-      //
-      //      final Button addPositionButton = new Button(SingleButtonPanel.WICKET_ID) {
-      //        @Override
-      //        public final void onSubmit()
-      //        {
-      //          data.addPaymentSchedule(new PaymentScheduleDO());
-      //          paymentSchedulePanel.rebuildEntries();
-      //        }
-      //      };
-      //      final SingleButtonPanel addPositionButtonPanel = new SingleButtonPanel("add", addPositionButton, getString("add"));
-      //      addPositionButtonPanel.setTooltip(getString("fibu.auftrag.tooltip.addPosition"));
-      //      fs.add(addPositionButtonPanel);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.paymentschedule"));
+      fs.add(paymentSchedulePanel = new PaymentSchedulePanel(fs.newChildId(), new CompoundPropertyModel<AuftragDO>(data)));
+      paymentSchedulePanel.setVisible(data.getPaymentSchedules() != null && data.getPaymentSchedules().isEmpty() == false);
+      final Button addPositionButton = new Button(SingleButtonPanel.WICKET_ID) {
+        @Override
+        public final void onSubmit()
+        {
+          data.addPaymentSchedule(new PaymentScheduleDO());
+          paymentSchedulePanel.rebuildEntries();
+          paymentSchedulePanel.setVisible(true);
+        }
+      };
+      final SingleButtonPanel addPositionButtonPanel = new SingleButtonPanel(fs.newChildId(), addPositionButton, getString("add"));
+      addPositionButtonPanel.setTooltip(getString("fibu.auftrag.tooltip.addPosition"));
+      fs.add(addPositionButtonPanel);
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
     {

@@ -43,7 +43,7 @@ import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.converter.CurrencyConverter;
 
 /**
- * @author Kai Reinhard (k.reinhard@micromata.de)
+ * @author Werner Feder (werner.feder@t-online.de)
  */
 public class PaymentSchedulePanel extends Panel
 {
@@ -54,7 +54,7 @@ public class PaymentSchedulePanel extends Panel
 
   private WebMarkupContainer mainContainer;
 
-  private final IModel<AuftragDO>  model;
+  private final IModel<AuftragDO> model;
 
   /**
    * @param id
@@ -80,7 +80,6 @@ public class PaymentSchedulePanel extends Panel
     mainContainer.add(new Label("reachedLabel", getString("fibu.common.reached")));
     entrysRepeater = new RepeatingView("liRepeater");
     mainContainer.add(entrysRepeater);
-
     rebuildEntries();
     entrysRepeater.setVisible(true);
   }
@@ -91,16 +90,12 @@ public class PaymentSchedulePanel extends Panel
     final List<PaymentScheduleDO> entries = model.getObject().getPaymentSchedules();
     if ( entries != null) {
       entrysRepeater.removeAll();
-
       for (final PaymentScheduleDO entry : entries) {
-
         final WebMarkupContainer item = new WebMarkupContainer(entrysRepeater.newChildId());
         entrysRepeater.add(item);
-
         final DatePanel datePanel = new DatePanel("scheduleDate", new PropertyModel<Date>(entry, "scheduleDate"),
             DatePanelSettings.get().withTargetType(java.sql.Date.class));
         item.add(datePanel);
-
         final TextField<String> amount = new TextField<String>("amount", new PropertyModel<String>(entry, "amount")) {
           @SuppressWarnings({ "rawtypes", "unchecked"})
           @Override
@@ -110,10 +105,8 @@ public class PaymentSchedulePanel extends Panel
           }
         };
         item.add(amount);
-
         item.add(new MaxLengthTextField("comment", new PropertyModel<String>(entry, "comment")));
         item.add(new CheckBox("reached", new PropertyModel<Boolean>(entry, "reached")));
-
       }
     }
   }
