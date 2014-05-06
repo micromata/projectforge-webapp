@@ -295,7 +295,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
     //      }
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.paymentschedule"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.paymentschedule")).suppressLabelForWarning();
       fs.add(paymentSchedulePanel = new PaymentSchedulePanel(fs.newChildId(), new CompoundPropertyModel<AuftragDO>(data)));
       paymentSchedulePanel.setVisible(data.getPaymentSchedules() != null && data.getPaymentSchedules().isEmpty() == false);
       final Button addPositionButton = new Button(SingleButtonPanel.WICKET_ID) {
