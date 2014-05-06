@@ -24,11 +24,8 @@
 package org.projectforge.web.fibu;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
-import org.apache.wicket.Component;
-import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
@@ -42,10 +39,8 @@ import org.projectforge.fibu.AuftragDO;
 import org.projectforge.fibu.PaymentScheduleDO;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
-import org.projectforge.web.wicket.components.MaxLengthTextArea;
+import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.converter.CurrencyConverter;
-import org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel;
-import org.projectforge.web.wicket.flowlayout.IconType;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -58,8 +53,6 @@ public class PaymentSchedulePanel extends Panel
   private RepeatingView entrysRepeater;
 
   private WebMarkupContainer mainContainer;
-
-  private Component delete;
 
   private final IModel<AuftragDO>  model;
 
@@ -81,6 +74,10 @@ public class PaymentSchedulePanel extends Panel
     super.onInitialize();
     mainContainer = new WebMarkupContainer("main");
     add(mainContainer.setOutputMarkupId(true));
+    mainContainer.add(new Label("dateLabel", getString("fibu.rechnung.datum.short")));
+    mainContainer.add(new Label("amountLabel", getString("fibu.common.betrag")));
+    mainContainer.add(new Label("commentLabel", getString("comment")));
+    mainContainer.add(new Label("reachedLabel", getString("fibu.common.reached")));
     entrysRepeater = new RepeatingView("liRepeater");
     mainContainer.add(entrysRepeater);
 
@@ -88,11 +85,9 @@ public class PaymentSchedulePanel extends Panel
     entrysRepeater.setVisible(true);
   }
 
-  /********************************** rebuild ** ********************************* */
   @SuppressWarnings("serial")
   public void rebuildEntries()
   {
-
     final List<PaymentScheduleDO> entries = model.getObject().getPaymentSchedules();
     if ( entries != null) {
       entrysRepeater.removeAll();
@@ -102,14 +97,10 @@ public class PaymentSchedulePanel extends Panel
         final WebMarkupContainer item = new WebMarkupContainer(entrysRepeater.newChildId());
         entrysRepeater.add(item);
 
-        // scheduleDate
-        item.add(new Label("dateLabel", getString("fibu.rechnung.datum.short")));
         final DatePanel datePanel = new DatePanel("scheduleDate", new PropertyModel<Date>(entry, "scheduleDate"),
             DatePanelSettings.get().withTargetType(java.sql.Date.class));
         item.add(datePanel);
 
-        // amount
-        item.add(new Label("amountLabel", getString("fibu.common.betrag")));
         final TextField<String> amount = new TextField<String>("amount", new PropertyModel<String>(entry, "amount")) {
           @SuppressWarnings({ "rawtypes", "unchecked"})
           @Override
@@ -120,37 +111,9 @@ public class PaymentSchedulePanel extends Panel
         };
         item.add(amount);
 
-        // comment
-        item.add(new Label("commentLabel", getString("comment")));
-        item.add(new MaxLengthTextArea("comment", new PropertyModel<String>(entry, "comment")));
-
-        // reached
-        item.add(new Label("reachedLabel", getString("fibu.common.reached")));
+        item.add(new MaxLengthTextField("comment", new PropertyModel<String>(entry, "comment")));
         item.add(new CheckBox("reached", new PropertyModel<Boolean>(entry, "reached")));
 
-
-        final WebMarkupContainer deleteDiv = new WebMarkupContainer("deleteDiv");
-        deleteDiv.setOutputMarkupId(true);
-        deleteDiv.add( delete = new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(entry, "comment")) {
-          /**
-           * @see org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel#onClick(org.apache.wicket.ajax.AjaxRequestTarget)
-           */
-          @Override
-          protected void onClick(final AjaxRequestTarget target)
-          {
-            super.onClick(target);
-            final Iterator<PaymentScheduleDO> it = model.getObject().getPaymentSchedules().iterator();
-            while (it.hasNext() == true) {
-              if (it.next() == entry) {
-                it.remove();
-              }
-            }
-            rebuildEntries();
-            target.add(mainContainer);
-          }
-        });
-        item.add(deleteDiv);
-        delete.setVisible(true);
       }
     }
   }
