@@ -375,7 +375,9 @@ public class AuftragDao extends BaseDao<AuftragDO>
                   Restrictions.eq("auftragsStatus", AuftragsStatus.ABGESCHLOSSEN),
                   Restrictions.and(Restrictions.eq("position.status", AuftragsPositionsStatus.ABGESCHLOSSEN),
                       Restrictions.eq("position.vollstaendigFakturiert", false))),
-                      Restrictions.eq("paymentSchedule.reached", true)));
+                      Restrictions.and(Restrictions.eq("paymentSchedule.reached", true),
+                          Restrictions.eq("paymentSchedule.vollstaendigFakturiert", false)))
+          );
       vollstaendigFakturiert = false; // Und noch nicht fakturiert.
     } else if (myFilter.isShowAkquise() == true) {
       queryFilter.add(Restrictions.in("auftragsStatus", new AuftragsStatus[] { AuftragsStatus.GELEGT, AuftragsStatus.IN_ERSTELLUNG,
