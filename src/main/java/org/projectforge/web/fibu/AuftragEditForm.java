@@ -59,7 +59,9 @@ import org.projectforge.fibu.AuftragsPositionsArt;
 import org.projectforge.fibu.AuftragsPositionsStatus;
 import org.projectforge.fibu.AuftragsStatus;
 import org.projectforge.fibu.KundeDO;
+import org.projectforge.fibu.ModeOfPaymentType;
 import org.projectforge.fibu.PaymentScheduleDO;
+import org.projectforge.fibu.PeriodOfPerformanceType;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.RechnungCache;
 import org.projectforge.fibu.RechnungDao;
@@ -522,7 +524,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
           fs.setWarningBackground();
         }
       }
-      posGridBuilder.newSplitPanel(GridSize.COL66);
+      posGridBuilder.newSplitPanel(GridSize.COL100);
       {
         // Task
         final FieldsetPanel fs = posGridBuilder.newFieldset(getString("task"));
@@ -538,20 +540,69 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         fs.add(taskSelectPanel);
         taskSelectPanel.init();
       }
-      posGridBuilder.newSplitPanel(GridSize.COL33);
+
+      posGridBuilder.newSplitPanel(GridSize.COL100);
       {
         // Period of performance
         final FieldsetPanel fs = posGridBuilder.newFieldset(getString("fibu.periodOfPerformance"));
+
+        final LabelValueChoiceRenderer<PeriodOfPerformanceType> performanceChoiceRenderer = new LabelValueChoiceRenderer<PeriodOfPerformanceType>(
+            fs, PeriodOfPerformanceType.values());
+        final DropDownChoice<PeriodOfPerformanceType> performanceChoice = new DropDownChoice<PeriodOfPerformanceType>(fs.getDropDownChoiceId(),
+            new PropertyModel<PeriodOfPerformanceType>(position, "periodOfPerformanceType"), performanceChoiceRenderer.getValues(), performanceChoiceRenderer) {
+          /**
+           * @see org.apache.wicket.markup.html.form.AbstractSingleSelectChoice#getDefaultChoice(java.lang.String)
+           */
+          @Override
+          protected CharSequence getDefaultChoice(final String selectedValue)
+          {
+            return super.getDefaultChoice(PeriodOfPerformanceType.SEEABOVE.toString());
+          }
+          /**
+           * @see org.apache.wicket.Component#onModelChanged()
+           */
+          @Override
+          protected void onModelChanged()
+          {
+            // TODO Auto-generated method stub
+            super.onModelChanged();
+            if (this.getRawInput().equals(PeriodOfPerformanceType.SEEABOVE.toString()) == true) {
+              fromDatePanel.setVisible(false);
+              endDatePanel.setVisible(false);
+            } else {
+              fromDatePanel.setVisible(true);
+              endDatePanel.setVisible(true);
+            }
+          }
+        };
+        fs.add(performanceChoice);
+        //      }
+        //      {
+        //        final FieldsetPanel fs = posGridBuilder.newFieldset(getString("fibu.periodOfPerformance"));
         final DatePanel fromDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(position, "periodOfPerformanceBegin"),
             DatePanelSettings.get().withTargetType(java.sql.Date.class));
+        //        fromDatePanel.setVisible(getData().getPeriodOfPerformanceBegin() != null || getData().getPeriodOfPerformanceEnd() != null);
         fs.add(fromDatePanel);
         dependentComponents.add(fromDatePanel.getDateField());
-        fs.add(new DivTextPanel(fs.newChildId(), "-"));
+        final DivTextPanel panel = new DivTextPanel(fs.newChildId(), "-");
+        //        panel.setVisible(getData().getPeriodOfPerformanceBegin() != null || getData().getPeriodOfPerformanceEnd() != null);
+        fs.add(panel);
         final DatePanel endDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(position, "periodOfPerformanceEnd"),
             DatePanelSettings.get().withTargetType(java.sql.Date.class));
+        //        endDatePanel.setVisible(getData().getPeriodOfPerformanceBegin() != null || getData().getPeriodOfPerformanceEnd() != null);
         fs.add(endDatePanel);
         dependentComponents.add(endDatePanel.getDateField());
+        //fs.add(parent);
+        //      }
+        //      {
+        //        final FieldsetPanel fs = posGridBuilder.newFieldset(getString("fibu.periodOfPerformance"));
+        final LabelValueChoiceRenderer<ModeOfPaymentType> paymentChoiceRenderer = new LabelValueChoiceRenderer<ModeOfPaymentType>(
+            fs, ModeOfPaymentType.values());
+        final DropDownChoice<ModeOfPaymentType> paymentChoice = new DropDownChoice<ModeOfPaymentType>(fs.getDropDownChoiceId(),
+            new PropertyModel<ModeOfPaymentType>(position, "modeOfPaymentType"), paymentChoiceRenderer.getValues(), paymentChoiceRenderer);
+        fs.add(paymentChoice);
       }
+
       posGridBuilder.newGridPanel();
       {
         // Comment
