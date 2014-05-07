@@ -61,6 +61,9 @@ public class PaymentScheduleDO extends DefaultBaseDO
   @PropertyInfo(i18nKey = "fibu.common.reached")
   private boolean reached;
 
+  @PropertyInfo(i18nKey = "fibu.auftrag.vollstaendigFakturiert")
+  private boolean vollstaendigFakturiert;
+
   /**
    * Not used as object due to performance reasons.
    * @return AuftragDO
@@ -145,6 +148,21 @@ public class PaymentScheduleDO extends DefaultBaseDO
     return this;
   }
 
+  /**
+   * Dieses Flag wird manuell von der FiBu gesetzt und kann nur für abgeschlossene Aufträge gesetzt werden.
+   */
+  @Column(name = "vollstaendig_fakturiert", nullable = false)
+  public boolean isVollstaendigFakturiert()
+  {
+    return vollstaendigFakturiert;
+  }
+
+  public PaymentScheduleDO setVollstaendigFakturiert(final boolean vollstaendigFakturiert)
+  {
+    this.vollstaendigFakturiert = vollstaendigFakturiert;
+    return this;
+  }
+
   @Override
   public boolean equals(final Object o)
   {
@@ -183,4 +201,5 @@ public class PaymentScheduleDO extends DefaultBaseDO
     }
     return (scheduleDate == null);
   }
+
 }

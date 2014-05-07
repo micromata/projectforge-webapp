@@ -37,17 +37,23 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.fibu.AuftragDO;
 import org.projectforge.fibu.PaymentScheduleDO;
+import org.projectforge.fibu.RechnungDao;
+import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserRightValue;
+import org.projectforge.user.UserRights;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.converter.CurrencyConverter;
+import org.projectforge.web.wicket.flowlayout.CheckBoxButton;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
 
 /**
  * @author Werner Feder (werner.feder@t-online.de)
  */
 public class PaymentSchedulePanel extends Panel
 {
-
   private static final long serialVersionUID = 2669766778018430028L;
 
   private RepeatingView entrysRepeater;
@@ -56,13 +62,16 @@ public class PaymentSchedulePanel extends Panel
 
   private final IModel<AuftragDO> model;
 
+  private final PFUserDO user;
+
   /**
    * @param id
    */
-  public PaymentSchedulePanel(final String id, final IModel<AuftragDO>  model)
+  public PaymentSchedulePanel(final String id, final IModel<AuftragDO>  model, final PFUserDO user)
   {
     super(id);
     this.model = model;
+    this.user = user;
   }
 
   /**
@@ -107,6 +116,12 @@ public class PaymentSchedulePanel extends Panel
         item.add(amount);
         item.add(new MaxLengthTextField("comment", new PropertyModel<String>(entry, "comment")));
         item.add(new CheckBox("reached", new PropertyModel<Boolean>(entry, "reached")));
+        if (UserRights.getAccessChecker().hasRight(user, RechnungDao.USER_RIGHT_ID, UserRightValue.READWRITE) == true) {
+          final DivPanel checkBoxDiv = new DivPanel("vollstaendigFakturiert", DivType.BTN_GROUP);
+          item.add(checkBoxDiv);
+          checkBoxDiv.add(new CheckBoxButton(checkBoxDiv.newChildId(), new PropertyModel<Boolean>(entry, "vollstaendigFakturiert"),
+              getString("fibu.auftrag.vollstaendigFakturiert")));
+        }
       }
     }
   }
