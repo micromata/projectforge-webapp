@@ -283,9 +283,23 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
 
     gridBuilder.newSplitPanel(GridSize.COL66);
     {
-      // Zahlplan
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.paymentschedule")).suppressLabelForWarning();
-      fs.add(paymentSchedulePanel = new PaymentSchedulePanel(fs.newChildId(), new CompoundPropertyModel<AuftragDO>(data), getUser()));
+      // Payment schedule
+      final ToggleContainerPanel schedulesPanel = new ToggleContainerPanel(gridBuilder.getPanel().newChildId()) {
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.ToggleContainerPanel#wantsOnStatusChangedNotification()
+         */
+        @Override
+        protected boolean wantsOnStatusChangedNotification()
+        {
+          return true;
+        }
+      };
+      schedulesPanel.setHeading(getString("fibu.auftrag.paymentschedule"));
+      gridBuilder.getPanel().add(schedulesPanel);
+      schedulesPanel.setClosed();
+      final GridBuilder innerGridBuilder = schedulesPanel.createGridBuilder();
+      final DivPanel dp = innerGridBuilder.getPanel();
+      dp.add(paymentSchedulePanel = new PaymentSchedulePanel(dp.newChildId(), new CompoundPropertyModel<AuftragDO>(data), getUser()));
       paymentSchedulePanel.setVisible(data.getPaymentSchedules() != null && data.getPaymentSchedules().isEmpty() == false);
       final Button addPositionButton = new Button(SingleButtonPanel.WICKET_ID) {
         @Override
@@ -296,9 +310,9 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
           paymentSchedulePanel.setVisible(true);
         }
       };
-      final SingleButtonPanel addPositionButtonPanel = new SingleButtonPanel(fs.newChildId(), addPositionButton, getString("add"));
+      final SingleButtonPanel addPositionButtonPanel = new SingleButtonPanel(dp.newChildId(), addPositionButton, getString("add"));
       addPositionButtonPanel.setTooltip(getString("fibu.auftrag.tooltip.addPosition"));
-      fs.add(addPositionButtonPanel);
+      dp.add(addPositionButtonPanel);
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
@@ -312,10 +326,12 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.statusBeschreibung"));
       fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "statusBeschreibung")), true);
     }
+    // positions
     gridBuilder.newGridPanel();
     positionsRepeater = gridBuilder.newRepeatingView();
     refresh();
-    if (getBaseDao().hasInsertAccess(getUser()) == true) {
+    if (getBaseDao().hasInsertAccess(getUser()) == true)
+    {
       final DivPanel panel = gridBuilder.newGridPanel().getPanel();
       final Button addPositionButton = new Button(SingleButtonPanel.WICKET_ID) {
         @Override
