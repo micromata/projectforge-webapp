@@ -86,6 +86,7 @@
   <bean id="datevImportDao" class="org.projectforge.fibu.datev.DatevImportDao" />
   <bean id="kundeDao" class="org.projectforge.fibu.KundeDao" />
   <bean id="monthlyEmployeeReportDao" class="org.projectforge.fibu.MonthlyEmployeeReportDao" />
+  <bean id="paymentScheduleDao" class="org.projectforge.fibu.PaymentScheduleDao" />
   <bean id="projektDao" class="org.projectforge.fibu.ProjektDao" />
   <bean id="rechnungCache" class="org.projectforge.fibu.RechnungCache" singleton="true" />
   <bean id="rechnungDao" class="org.projectforge.fibu.RechnungDao">
