@@ -36,7 +36,7 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.datetime.markup.html.form.DateTextField;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
@@ -117,6 +117,8 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
   protected NewCustomerSelectPanel kundeSelectPanel;
 
   private final List<Component> ajaxUpdateComponents = new ArrayList<Component>();
+
+  private final List<Component> ajaxPosTargets = new ArrayList<Component>();
 
   @SpringBean(name = "rechnungCache")
   private RechnungCache rechnungCache;
@@ -279,28 +281,9 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       fs.add(endDatePanel);
     }
 
-    // gridBuilder.newGridPanel();
-    // paymentSchedulesRepeater = gridBuilder.newRepeatingView();
-    // refreshSchedules();
-    // {
-    // // Zahlplan
-    // if (getBaseDao().hasInsertAccess(getUser()) == true) {
-    // final DivPanel panel = gridBuilder.newGridPanel().getPanel();
-    // final Button addPositionButton = new Button(SingleButtonPanel.WICKET_ID) {
-    // @Override
-    // public final void onSubmit()
-    // {
-    // getData().addPaymentSchedule(new PaymentScheduleDO());
-    // refreshSchedules();
-    // }
-    // };
-    // final SingleButtonPanel addPositionButtonPanel = new SingleButtonPanel(panel.newChildId(), addPositionButton, getString("add"));
-    // addPositionButtonPanel.setTooltip(getString("fibu.auftrag.tooltip.addPaymentschedule"));
-    // panel.add(addPositionButtonPanel);
-    // }
-
     gridBuilder.newSplitPanel(GridSize.COL66);
     {
+      // Zahlplan
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.paymentschedule")).suppressLabelForWarning();
       fs.add(paymentSchedulePanel = new PaymentSchedulePanel(fs.newChildId(), new CompoundPropertyModel<AuftragDO>(data), getUser()));
       paymentSchedulePanel.setVisible(data.getPaymentSchedules() != null && data.getPaymentSchedules().isEmpty() == false);
@@ -361,18 +344,16 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       @Override
       public void validate(final Form< ? > form)
       {
-
         final Date performanceFromDate = fromDatePanel.getDateField().getConvertedInput();
         final Date performanceEndDate = endDatePanel.getDateField().getConvertedInput();
         if (performanceFromDate == null || performanceEndDate == null) {
-          ;
+          return;
         } else if (performanceEndDate.before(performanceFromDate) == true) {
           endDatePanel.error(getString("error.endDateBeforeBeginDate"));
         }
-
         for (int i = 0; i < positionsDependentFormComponents.length - 1; i += 2) {
-          final Date posPerformanceFromDate = ((DateTextField) positionsDependentFormComponents[i]).getConvertedInput();
-          final Date posPerformanceEndDate = ((DateTextField) positionsDependentFormComponents[i + 1]).getConvertedInput();
+          final Date posPerformanceFromDate = ((DatePanel) positionsDependentFormComponents[i]).getDateField().getConvertedInput();
+          final Date posPerformanceEndDate = ((DatePanel) positionsDependentFormComponents[i + 1]).getDateField().getConvertedInput();
           if (posPerformanceFromDate == null || posPerformanceEndDate == null) {
             continue;
           }
@@ -382,25 +363,25 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
           if (posPerformanceFromDate.before(performanceFromDate) == true) {
             positionsDependentFormComponents[i + 1].error(getString("error.posFromDateBeforeFromDate"));
           }
-          if (posPerformanceEndDate.after(performanceEndDate) == true) {
-            positionsDependentFormComponents[i + 1].error(getString("error.posEndDateAfterEndDate"));
-          }
         }
       }
     });
-
   }
 
   @SuppressWarnings("serial")
   void refresh()
   {
     positionsRepeater.removeAll();
+    this.ajaxPosTargets.clear();
+
     final Collection<FormComponent< ? >> dependentComponents = new ArrayList<FormComponent< ? >>();
     if (CollectionUtils.isEmpty(data.getPositionen()) == true) {
       // Ensure that at least one position is available:
       data.addPosition(new AuftragsPositionDO());
     }
+
     for (final AuftragsPositionDO position : data.getPositionen()) {
+
       final boolean abgeschlossenUndNichtFakturiert = position.isAbgeschlossenUndNichtVollstaendigFakturiert();
       final ToggleContainerPanel positionsPanel = new ToggleContainerPanel(positionsRepeater.newChildId()) {
         /**
@@ -556,58 +537,68 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
           @Override
           protected CharSequence getDefaultChoice(final String selectedValue)
           {
-            return super.getDefaultChoice(PeriodOfPerformanceType.SEEABOVE.toString());
-          }
-          /**
-           * @see org.apache.wicket.Component#onModelChanged()
-           */
-          @Override
-          protected void onModelChanged()
-          {
-            // TODO Auto-generated method stub
-            super.onModelChanged();
-            if (this.getRawInput().equals(PeriodOfPerformanceType.SEEABOVE.toString()) == true) {
-              fromDatePanel.setVisible(false);
-              endDatePanel.setVisible(false);
+            if (posHasOwnPeriodOfPerformance(position.getNumber()) == true) {
+              return super.getDefaultChoice(PeriodOfPerformanceType.OWN.toString());
             } else {
-              fromDatePanel.setVisible(true);
-              endDatePanel.setVisible(true);
+              return super.getDefaultChoice(PeriodOfPerformanceType.SEEABOVE.toString());
             }
           }
         };
+        performanceChoice.add(new AjaxFormComponentUpdatingBehavior("onchange") {
+          @Override
+          protected void onUpdate(final AjaxRequestTarget target)
+          {
+            final short pos = position.getNumber();
+            final PeriodOfPerformanceType s = performanceChoice.getModelObject();
+            final boolean visible = s.equals(PeriodOfPerformanceType.OWN);
+            setPosPeriodOfPerformaceVisible(pos, visible);
+            if (ajaxPosTargets != null) {
+              for (final Component ajaxPosTarget : ajaxPosTargets)
+                target.add(ajaxPosTarget);
+            }
+          }
+        });
+        performanceChoice.setOutputMarkupPlaceholderTag(true);
         fs.add(performanceChoice);
-        //      }
-        //      {
-        //        final FieldsetPanel fs = posGridBuilder.newFieldset(getString("fibu.periodOfPerformance"));
+
         final DatePanel fromDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(position, "periodOfPerformanceBegin"),
             DatePanelSettings.get().withTargetType(java.sql.Date.class));
-        //        fromDatePanel.setVisible(getData().getPeriodOfPerformanceBegin() != null || getData().getPeriodOfPerformanceEnd() != null);
+        fromDatePanel.getDateField().setOutputMarkupPlaceholderTag(true);
         fs.add(fromDatePanel);
-        dependentComponents.add(fromDatePanel.getDateField());
-        final DivTextPanel panel = new DivTextPanel(fs.newChildId(), "-");
-        //        panel.setVisible(getData().getPeriodOfPerformanceBegin() != null || getData().getPeriodOfPerformanceEnd() != null);
-        fs.add(panel);
+        ajaxPosTargets.add(fromDatePanel.getDateField());
+        dependentComponents.add(fromDatePanel);
+
+        final DivTextPanel divPanel = new DivTextPanel(fs.newChildId(), "-");
+        divPanel.getLabel4Ajax().setOutputMarkupPlaceholderTag(true);
+        fs.add(divPanel);
+        ajaxPosTargets.add(divPanel.getLabel4Ajax());
+
         final DatePanel endDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(position, "periodOfPerformanceEnd"),
             DatePanelSettings.get().withTargetType(java.sql.Date.class));
-        //        endDatePanel.setVisible(getData().getPeriodOfPerformanceBegin() != null || getData().getPeriodOfPerformanceEnd() != null);
+        endDatePanel.getDateField().setOutputMarkupPlaceholderTag(true);
         fs.add(endDatePanel);
-        dependentComponents.add(endDatePanel.getDateField());
-        //fs.add(parent);
-        //      }
-        //      {
-        //        final FieldsetPanel fs = posGridBuilder.newFieldset(getString("fibu.periodOfPerformance"));
+        ajaxPosTargets.add(endDatePanel.getDateField());
+        dependentComponents.add(endDatePanel);
+
         final LabelValueChoiceRenderer<ModeOfPaymentType> paymentChoiceRenderer = new LabelValueChoiceRenderer<ModeOfPaymentType>(
             fs, ModeOfPaymentType.values());
         final DropDownChoice<ModeOfPaymentType> paymentChoice = new DropDownChoice<ModeOfPaymentType>(fs.getDropDownChoiceId(),
             new PropertyModel<ModeOfPaymentType>(position, "modeOfPaymentType"), paymentChoiceRenderer.getValues(), paymentChoiceRenderer);
+        paymentChoice.setOutputMarkupPlaceholderTag(true);
         fs.add(paymentChoice);
+        ajaxPosTargets.add(paymentChoice);
       }
-
       posGridBuilder.newGridPanel();
       {
         // Comment
         final FieldsetPanel fs = posGridBuilder.newFieldset(getString("comment"));
         fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(position, "bemerkung")));
+      }
+
+      if (posHasOwnPeriodOfPerformance(position.getNumber()) == true) {
+        setPosPeriodOfPerformaceVisible(position.getNumber(), true);
+      } else {
+        setPosPeriodOfPerformaceVisible(position.getNumber(), false);
       }
     }
     positionsDependentFormComponents = dependentComponents.toArray(new FormComponent[0]);
@@ -728,4 +719,16 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
     return log;
   }
 
+  private boolean posHasOwnPeriodOfPerformance(final short number) {
+    return ( (getData().getPosition(number).getPeriodOfPerformanceBegin() != null && StringUtils.isBlank(getData().getPosition(number).getPeriodOfPerformanceBegin().toString()) == false)
+        || (getData().getPosition(number).getPeriodOfPerformanceEnd() != null && StringUtils.isBlank(getData().getPosition(number).getPeriodOfPerformanceEnd().toString()) == false)
+        || getData().getPosition(number).getPeriodOfPerformanceType() == PeriodOfPerformanceType.OWN);
+  }
+
+  private void setPosPeriodOfPerformaceVisible(final short pos, final boolean visible) {
+    ajaxPosTargets.get(pos*4-4).setVisible(visible);
+    ajaxPosTargets.get(pos*4-3).setVisible(visible);
+    ajaxPosTargets.get(pos*4-2).setVisible(visible);
+    ajaxPosTargets.get(pos*4-1).setVisible(visible);
+  }
 }
