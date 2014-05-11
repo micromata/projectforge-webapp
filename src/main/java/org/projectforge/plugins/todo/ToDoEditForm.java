@@ -60,7 +60,7 @@ import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.ButtonPanel;
-import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.CheckBoxButton;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
@@ -249,16 +249,16 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
     {
       // Options
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).suppressLabelForWarning();
-      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+      final DivPanel checkBoxButton = fs.addNewCheckBoxDiv();
       if (ConfigXml.getInstance().isSendMailConfigured() == true) {
-        checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(this, "sendNotification"),
+        checkBoxButton.add(new CheckBoxButton(checkBoxButton.newChildId(), new PropertyModel<Boolean>(this, "sendNotification"),
             getString("label.sendEMailNotification")).setTooltip(getString("plugins.todo.notification.tooltip")));
       }
       // if (ConfigXml.getInstance().isSmsConfigured() == true) {
       // checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(this, "sendShortMessage"),
       // getString("label.sendShortMessage")));
       // }
-      checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(this, "saveAsTemplate"),
+      checkBoxButton.add(new CheckBoxButton(checkBoxButton.newChildId(), new PropertyModel<Boolean>(this, "saveAsTemplate"),
           getString("userPref.saveAsTemplate")));
     }
     if (isNew() == false

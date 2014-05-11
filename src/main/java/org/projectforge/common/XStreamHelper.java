@@ -21,63 +21,33 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.plugins.skillmatrix;
+package org.projectforge.common;
 
-import org.projectforge.core.BaseSearchFilter;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
- * @author Werner Feder (werner.feder@t-online.de)
+ * Some helpers for using XStream (with proper UTF-8 encoding).
+ * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class TrainingFilter extends BaseSearchFilter
+public class XStreamHelper
 {
-
-  private static final long serialVersionUID = 698546539419443303L;
-
-  private Integer trainingId, skillId;
-
-  public TrainingFilter()
-  {
-  }
-
-  public TrainingFilter(final BaseSearchFilter filter)
-  {
-    super(filter);
-  }
-
   /**
-   * @return the trainingId
+   * @return new XStream initialized with UTF-8 DomDriver.
    */
-  public Integer getTrainingId()
+  public static XStream createXStream()
   {
-    return trainingId;
+    return new XStream(new DomDriver("UTF-8"));
   }
 
-  /**
-   * @param trainingId the trainingId to set
-   * @return this for chaining.
-   */
-  public TrainingFilter setTrainingId(final Integer trainingId)
+  public static String toXml(final XStream xstream, final Object object)
   {
-    this.trainingId = trainingId;
-    return this;
+    return xstream.toXML(object);
   }
 
-  /**
-   * @return the skillId
-   */
-  public Integer getSkillId()
+  public static Object fromXml(final XStream xstream, final String xml)
   {
-    return skillId;
-  }
-
-  /**
-   * @param skillId the skillId to set
-   * @return this for chaining.
-   */
-  public TrainingFilter setSkillId(final Integer skillId)
-  {
-    this.skillId = skillId;
-    return this;
+    return xstream.fromXML(xml);
   }
 }

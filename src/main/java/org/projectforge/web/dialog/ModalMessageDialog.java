@@ -147,7 +147,7 @@ public class ModalMessageDialog extends ModalDialog
       setMessage("");
     }
     if (type != null) {
-      messageComponent.add(AttributeModifier.append("class", type.getClassAttrValue() + " alert-block"));
+      messageComponent.add(AttributeModifier.append("class", type.getClassAttrValue() + " alert-danger"));
     }
     if (titleSet == false) {
       if (type == null) {

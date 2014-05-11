@@ -46,18 +46,16 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.continuousdb.DatabaseSupport;
 import org.projectforge.core.SimpleHistoryEntry;
 import org.projectforge.database.HibernateUtils;
-import org.projectforge.multitenancy.TenantRegistryMap;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.plugins.core.PluginsRegistry;
 import org.projectforge.registry.DaoRegistry;
-import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.Login;
 import org.projectforge.user.LoginDefaultHandler;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserDao;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -157,10 +155,6 @@ public class AbstractTestBase
     testConfiguration = TestConfiguration.getConfiguration();
     final DaoRegistry daoRegistry = TestConfiguration.getConfiguration().getBean("daoRegistry", DaoRegistry.class);
     daoRegistry.init();
-    final Registry registry = Registry.instance();
-    if (registry.getBeanFactory() == null) {
-      registry.setBeanFactory(TestConfiguration.getConfiguration().getBeanFactory());
-    }
     initTestDB = testConfiguration.getBean("initTestDB", InitTestDB.class);
     testConfiguration.autowire(initTestDB, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME);
     final File testDir = new File(TEST_DIR);
@@ -178,12 +172,13 @@ public class AbstractTestBase
   public static void init(final boolean createTestData) throws BeansException, IOException
   {
     clearDatabase();
-    final LoginDefaultHandler loginHandler = new LoginDefaultHandler();
-    loginHandler.initialize();
-    Login.getInstance().setLoginHandler(loginHandler);
+
     if (createTestData == true) {
       initTestDB.initDatabase();
     }
+    final LoginDefaultHandler loginHandler = new LoginDefaultHandler();
+    loginHandler.initialize();
+    Login.getInstance().setLoginHandler(loginHandler);
   }
 
   public static InitTestDB getInitTestDB()
@@ -202,8 +197,7 @@ public class AbstractTestBase
   @SuppressWarnings({ "unchecked", "rawtypes"})
   protected static void clearDatabase()
   {
-    log.info("clearDatabase...");
-    ThreadLocalUserContext.setUser(ADMIN_USER); // Logon admin user.
+    PFUserContext.setUser(ADMIN_USER); // Logon admin user.
     final TransactionTemplate transactionTemplate = testConfiguration.getBean("txTemplate", TransactionTemplate.class);
     final HibernateTemplate hibernateTemplate = testConfiguration.getBean("hibernate", HibernateTemplate.class);
     transactionTemplate.execute(new TransactionCallback() {
@@ -225,9 +219,6 @@ public class AbstractTestBase
             }
           }
         }
-        deleteFrom(hibernateTemplate, "TeamEventAttendeeDO"); // Plugin stuff needed
-        deleteFrom(hibernateTemplate, "TeamEventDO"); // Because it's part of
-        deleteFrom(hibernateTemplate, "TeamCalDO"); // the dump file.
         deleteFrom(hibernateTemplate, "TimesheetDO");
         deleteFrom(hibernateTemplate, "HRPlanningEntryDO");
         deleteFrom(hibernateTemplate, "HRPlanningDO");
@@ -263,7 +254,6 @@ public class AbstractTestBase
         deleteFrom(hibernateTemplate, "UserRightDO");
         deleteFrom(hibernateTemplate, "UserXmlPreferencesDO");
         deleteAllDBObjects(hibernateTemplate, "GroupDO");
-        deleteAllDBObjects(hibernateTemplate, "TenantDO");
         deleteAllDBObjects(hibernateTemplate, "PFUserDO");
         deleteFrom(hibernateTemplate, "de.micromata.hibernate.history.delta.PropertyDelta");
         deleteFrom(hibernateTemplate, "de.micromata.hibernate.history.HistoryEntry");
@@ -277,8 +267,6 @@ public class AbstractTestBase
         return null;
       }
     });
-    TenantRegistryMap.getInstance().setAllUserGroupCachesAsExpired();
-    Registry.instance().getUserCache().setExpired();
   }
 
   private static void deleteFrom(final HibernateTemplate hibernateTemplate, final String entity)
@@ -288,7 +276,8 @@ public class AbstractTestBase
       query.executeUpdate();
       hibernateTemplate.flush();
     } catch (final Exception ex) {
-      // Do nothing, it's only a test case and the object is may-be already deleted.
+      log.info("delete from " + entity + " failed (may-be OK). Trying to use HibernateTemplate.deleteAll(List) instead.");
+      deleteAllDBObjects(hibernateTemplate, entity);
     }
   }
 
@@ -307,18 +296,18 @@ public class AbstractTestBase
     if (user == null) {
       fail("User not found: " + username);
     }
-    ThreadLocalUserContext.setUser(PFUserDO.createCopyWithoutSecretFields(user));
+    PFUserContext.setUser(user);
     return user;
   }
 
   public void logon(final PFUserDO user)
   {
-    ThreadLocalUserContext.setUser(user);
+    PFUserContext.setUser(user);
   }
 
   protected void logoff()
   {
-    ThreadLocalUserContext.setUser(null);
+    PFUserContext.setUser(null);
   }
 
   /**
@@ -360,7 +349,6 @@ public class AbstractTestBase
 
   protected static void deleteDB()
   {
-    log.info("deleteDB...");
     final String databaseUrl = testConfiguration.getDatabaseUrl();
     final String baseFilename = databaseUrl.substring(databaseUrl.lastIndexOf(':') + 1);
     final File data = new File(baseFilename + ".data");
@@ -373,8 +361,6 @@ public class AbstractTestBase
       deleteFile(baseFilename + ".properties");
       deleteFile(baseFilename + ".script");
     }
-    TenantRegistryMap.getInstance().setAllUserGroupCachesAsExpired();
-    Registry.instance().getUserCache().setExpired();
   }
 
   private static void deleteFile(final String filename)

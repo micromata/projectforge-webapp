@@ -150,9 +150,14 @@ public class UserXmlPreferencesDO implements Serializable
     return key;
   }
 
-  public void setKey(final String key)
+  /**
+   * @param key
+   * @return this for chaining.
+   */
+  public UserXmlPreferencesDO setKey(final String key)
   {
     this.key = key;
+    return this;
   }
 
   /**
@@ -165,9 +170,14 @@ public class UserXmlPreferencesDO implements Serializable
     return serializedSettings;
   }
 
-  public void setSerializedSettings(final String settings)
+  /**
+   * @param settings
+   * @return this for chaining.
+   */
+  public UserXmlPreferencesDO setSerializedSettings(final String settings)
   {
     this.serializedSettings = settings;
+    return this;
   }
 
   @Basic
@@ -225,10 +235,12 @@ public class UserXmlPreferencesDO implements Serializable
   /**
    * Sets CURRENT_VERSION as version.
    * @see #CURRENT_VERSION
+   * @return this for chaining.
    */
   @Column
-  public void setVersion()
+  public UserXmlPreferencesDO setVersion()
   {
     this.version = CURRENT_VERSION;
+    return this;
   }
 }

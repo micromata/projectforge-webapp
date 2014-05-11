@@ -48,7 +48,7 @@ import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
-import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.CheckBoxButton;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -183,14 +183,14 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
       // Options
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).suppressLabelForWarning();
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-      checkBoxPanel.addCheckBox(new PropertyModel<Boolean>(data.getStyle(), "relativeTimeValues"),
+      checkBoxPanel.addCheckBoxButton(new PropertyModel<Boolean>(data.getStyle(), "relativeTimeValues"),
           getString("gantt.style.relativeTimeValues"));
-      checkBoxPanel.addCheckBox(new PropertyModel<Boolean>(data.getStyle(), "showToday"), getString("gantt.style.showToday"));
-      checkBoxPanel.addCheckBox(new PropertyModel<Boolean>(data.getStyle(), "showCompletion"), getString("gantt.style.showCompletion"));
-      checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSettings(), "showOnlyVisibles"),
+      checkBoxPanel.addCheckBoxButton(new PropertyModel<Boolean>(data.getStyle(), "showToday"), getString("gantt.style.showToday"));
+      checkBoxPanel.addCheckBoxButton(new PropertyModel<Boolean>(data.getStyle(), "showCompletion"), getString("gantt.style.showCompletion"));
+      checkBoxPanel.add(new CheckBoxButton(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSettings(), "showOnlyVisibles"),
           getString("gantt.settings.showOnlyVisibles")) {
         /**
-         * @see org.projectforge.web.wicket.flowlayout.CheckBoxPanel#wantOnSelectionChangedNotifications()
+         * @see org.projectforge.web.wicket.flowlayout.CheckBoxButton#wantOnSelectionChangedNotifications()
          */
         @Override
         protected boolean wantOnSelectionChangedNotifications()

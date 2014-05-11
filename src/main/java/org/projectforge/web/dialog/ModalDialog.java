@@ -27,6 +27,7 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxEventBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.attributes.AjaxRequestAttributes;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.feedback.ComponentFeedbackMessageFilter;
 import org.apache.wicket.markup.head.IHeaderResponse;
@@ -88,6 +89,10 @@ public abstract class ModalDialog extends Panel
 
   protected FeedbackPanel formFeedback;
 
+  private final IModel<Boolean> useCloseHandler = Model.of(false);
+
+  private final AjaxEventBehavior closeBehavior;
+
   /**
    * If true, a GridBuilder is automatically available.
    */
@@ -106,6 +111,7 @@ public abstract class ModalDialog extends Panel
   /**
    * @param id
    */
+  @SuppressWarnings("serial")
   public ModalDialog(final String id)
   {
     super(id);
@@ -117,6 +123,21 @@ public abstract class ModalDialog extends Panel
     gridContentContainer.setOutputMarkupId(true);
     buttonBarContainer = new WebMarkupContainer("buttonBar");
     buttonBarContainer.setOutputMarkupId(true);
+    closeBehavior = new AjaxEventBehavior("hidden.bs.modal") {
+      @Override
+      protected void onEvent(final AjaxRequestTarget target)
+      {
+        handleCloseEvent(target);
+      }
+
+      @Override
+      protected void updateAjaxAttributes(final AjaxRequestAttributes attributes)
+      {
+        super.updateAjaxAttributes(attributes);
+
+        attributes.setEventPropagation(AjaxRequestAttributes.EventPropagation.BUBBLE);
+      }
+    };
   }
 
   /**
@@ -128,6 +149,9 @@ public abstract class ModalDialog extends Panel
     super.onInitialize();
     if (bigWindow == true) {
       mainSubContainer.add(AttributeModifier.append("class", "big-modal"));
+    }
+    if (useCloseHandler.getObject() == true) {
+      mainContainer.add(closeBehavior);
     }
   }
 
@@ -230,23 +254,9 @@ public abstract class ModalDialog extends Panel
     return this;
   }
 
-  @SuppressWarnings("serial")
   public ModalDialog wantsNotificationOnClose()
   {
-    mainContainer.add(new AjaxEventBehavior("hidden") {
-      @Override
-      protected void onEvent(final AjaxRequestTarget target)
-      {
-        csrfTokenHandler.onSubmit();
-        handleCloseEvent(target);
-      }
-    });
-    return this;
-  }
-
-  public ModalDialog addAjaxEventBehavior(final AjaxEventBehavior behavior)
-  {
-    mainContainer.add(behavior);
+    setUseCloseHandler(true);
     return this;
   }
 
@@ -283,6 +293,11 @@ public abstract class ModalDialog extends Panel
       // max-height of .modal-body is 600px, need to enlarge this setting for resizing.
       .append(
           ", .modal-body', resize: function( event, ui ) {$('.modal-body').css('max-height', '4000px');}, minWidth: 300, minHeight: 200 })");
+    }
+    if (useCloseHandler.getObject()) {
+      script.append(";$('#").append(getMainContainerMarkupId()).append("').on('hidden', function () { ")
+      .append("  Wicket.Ajax.ajax({'u':'").append(closeBehavior.getCallbackUrl()).append("','c':'").append(getMainContainerMarkupId())
+      .append("'});").append("})");
     }
     return script.toString();
   }
@@ -542,5 +557,17 @@ public abstract class ModalDialog extends Panel
   public WebMarkupContainer getMainContainer()
   {
     return mainContainer;
+  }
+
+  /**
+   * Sets whether the close handler is used or not. Default is false.
+   * 
+   * @param useCloseHandler True if close handler should be used
+   * @return This
+   */
+  public final ModalDialog setUseCloseHandler(final boolean useCloseHandler)
+  {
+    this.useCloseHandler.setObject(useCloseHandler);
+    return this;
   }
 }

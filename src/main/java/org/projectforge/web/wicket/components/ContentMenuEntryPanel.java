@@ -138,7 +138,7 @@ public class ContentMenuEntryPanel extends Panel
    */
   public ContentMenuEntryPanel setTooltip(final String tooltip)
   {
-    WicketUtils.addTooltip(link, tooltip);
+    WicketUtils.addTooltip(link, tooltip, true);
     return this;
   }
 
@@ -154,7 +154,7 @@ public class ContentMenuEntryPanel extends Panel
       // Needed because hover doesn't work if a tag contains embedded i tag.
       ((IconPanel)labelComponent).setTooltip(Model.of(title), Model.of(text));
     }
-    WicketUtils.addTooltip(link, title, text);
+    WicketUtils.addTooltip(link, title, text, true);
     return this;
   }
 

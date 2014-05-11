@@ -53,6 +53,8 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
 
   protected boolean providesTooltip;
 
+  private boolean tooltipRightAlignment;
+
   private IAutoCompleteRenderer<String> renderer;
 
   private static final String CONTENT = "delete";
@@ -63,16 +65,32 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    */
   protected PFAutoCompleteTextField(final String id, final IModel<T> model)
   {
-    this(id, model, PFAutoCompleteRenderer.INSTANCE, new PFAutoCompleteSettings());// , type, StringAutoCompleteRenderer.INSTANCE,
-    // settings);
+    this(id, model, false);
+  }
+
+  /**
+   * @param id
+   * @param model
+   * @param tooltipRightAlignment
+   */
+  protected PFAutoCompleteTextField(final String id, final IModel<T> model, final boolean tooltipRightAlignment)
+  {
+    this(id, model, PFAutoCompleteRenderer.INSTANCE, new PFAutoCompleteSettings(), tooltipRightAlignment);
   }
 
   protected PFAutoCompleteTextField(final String id, final IModel<T> model, final IAutoCompleteRenderer<String> renderer,
       final PFAutoCompleteSettings settings)
   {
+    this(id, model, renderer, settings, false);
+  }
+
+  protected PFAutoCompleteTextField(final String id, final IModel<T> model, final IAutoCompleteRenderer<String> renderer,
+      final PFAutoCompleteSettings settings, final boolean tooltipRightAlignment)
+  {
     super(id, model);
     this.renderer = renderer;
     this.settings = settings;
+    this.tooltipRightAlignment = tooltipRightAlignment;
   }
 
   /**
@@ -155,7 +173,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
       {
         return PFAutoCompleteTextField.this.getTooltip();
       }
-    });
+    }, tooltipRightAlignment);
     return this;
   }
 

@@ -78,7 +78,7 @@ import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.converter.CurrencyConverter;
-import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.CheckBoxButton;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -416,7 +416,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         }
         if (getTenantRegistry().getUserGroupCache().isUserMemberOfFinanceGroup() == true) {
           final DivPanel checkBoxDiv = fs.addNewCheckBoxDiv();
-          checkBoxDiv.add(new CheckBoxPanel(checkBoxDiv.newChildId(), new PropertyModel<Boolean>(position, "vollstaendigFakturiert"),
+          checkBoxDiv.add(new CheckBoxButton(checkBoxDiv.newChildId(), new PropertyModel<Boolean>(position, "vollstaendigFakturiert"),
               getString("fibu.auftrag.vollstaendigFakturiert")));
         }
       }

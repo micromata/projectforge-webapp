@@ -36,7 +36,7 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRights;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.user.UserSelectPanel;
-import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.CheckBoxButton;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
@@ -90,10 +90,10 @@ public class CalendarPageSupport implements Serializable
   private void addCheckBox(final DivPanel checkBoxDivPanel, final ICalendarFilter filter, final String property, final String labelKey,
       final String tooltipKey, final boolean autoSubmit)
   {
-    final CheckBoxPanel checkBoxPanel = new CheckBoxPanel(checkBoxDivPanel.newChildId(), new PropertyModel<Boolean>(filter, property),
+    final CheckBoxButton checkBoxButton = new CheckBoxButton(checkBoxDivPanel.newChildId(), new PropertyModel<Boolean>(filter, property),
         checkBoxDivPanel.getString(labelKey), autoSubmit);
     if (autoSubmit == false) {
-      checkBoxPanel.getCheckBox().add(new OnChangeAjaxBehavior() {
+      checkBoxButton.getCheckBox().add(new OnChangeAjaxBehavior() {
         @Override
         protected void onUpdate(final AjaxRequestTarget target)
         {
@@ -102,9 +102,9 @@ public class CalendarPageSupport implements Serializable
       });
     }
     if (tooltipKey != null) {
-      checkBoxPanel.setTooltip(checkBoxDivPanel.getString(tooltipKey));
+      checkBoxButton.setTooltip(checkBoxDivPanel.getString(tooltipKey));
     }
-    checkBoxDivPanel.add(checkBoxPanel);
+    checkBoxDivPanel.add(checkBoxButton);
   }
 
   /**

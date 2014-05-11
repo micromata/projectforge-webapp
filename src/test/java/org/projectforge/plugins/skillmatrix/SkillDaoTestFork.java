@@ -3,7 +3,7 @@
 // Project ProjectForge Community Edition
 //         www.projectforge.org
 //
-// Copyright (C) 2001-2013 Kai Reinhard (k.reinhard@micromata.de)
+// Copyright (C) 2001-2014 Kai Reinhard (k.reinhard@micromata.de)
 //
 // ProjectForge is dual-licensed.
 //
@@ -57,9 +57,8 @@ public class SkillDaoTestFork extends PluginTestBase
     skillId = skill.getId();
     logon(testHelper.getOwner());
     Assert.assertEquals("skill.title", skillDao.getById(skillId).getTitle());
-    checkSelectAccess(true, testHelper.getOwner(), testHelper.getFullUser1(), testHelper.getFullUser3(), testHelper.getReadonlyUser1(),
-        testHelper.getReadonlyUser3(), testHelper.getTrainingUser1(), testHelper.getTrainingUser3());
-    checkSelectAccess(false, testHelper.getNoAccessUser());
+    checkSelectAccess(true, testHelper.getOwner(), testHelper.getFullUser1(), testHelper.getReadonlyUser1());
+    checkSelectAccess(false, testHelper.getNoAccessUser(), testHelper.getFullUser2(), testHelper.getReadonlyUser2());
   }
 
   private void checkSelectAccess(final boolean access, final PFUserDO... users)

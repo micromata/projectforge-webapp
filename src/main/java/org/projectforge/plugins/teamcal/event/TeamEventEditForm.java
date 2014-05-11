@@ -63,7 +63,7 @@ import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
-import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.CheckBoxButton;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -102,7 +102,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
   TeamEventRecurrenceData recurrenceData;
 
-  private DivPanel customizedCheckBoxPanel;
+  private DivPanel customizedCheckBoxButton;
 
   private TeamAttendeesPanel attendeesPanel;
 
@@ -205,7 +205,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       // ALL DAY CHECKBOX
       final FieldsetPanel fieldSet = gridBuilder.newFieldset("").suppressLabelForWarning();
       final DivPanel divPanel = fieldSet.addNewCheckBoxDiv();
-      final CheckBoxPanel checkBox = new CheckBoxPanel(divPanel.newChildId(), new PropertyModel<Boolean>(data, "allDay"),
+      final CheckBoxButton checkBox = new CheckBoxButton(divPanel.newChildId(), new PropertyModel<Boolean>(data, "allDay"),
           getString("plugins.teamcal.event.allDay"));
       checkBox.getCheckBox().add(new AjaxFormComponentUpdatingBehavior("onChange") {
         @Override
@@ -259,8 +259,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
           setRecurrenceComponentsVisibility(target);
         }
       });
-      customizedCheckBoxPanel = recurrenceFieldset.addNewCheckBoxDiv();
-      final CheckBoxPanel checkBox = new CheckBoxPanel(customizedCheckBoxPanel.newChildId(), new PropertyModel<Boolean>(recurrenceData,
+      customizedCheckBoxButton = recurrenceFieldset.addNewCheckBoxDiv();
+      final CheckBoxButton checkBox = new CheckBoxButton(customizedCheckBoxButton.newChildId(), new PropertyModel<Boolean>(recurrenceData,
           "customized"), getString("plugins.teamcal.event.recurrence.customized"));
       checkBox.getCheckBox().add(new AjaxFormComponentUpdatingBehavior("onChange") {
         @Override
@@ -269,7 +269,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
           setRecurrenceComponentsVisibility(target);
         }
       });
-      customizedCheckBoxPanel.add(checkBox);
+      customizedCheckBoxButton.add(checkBox);
     }
     {
       // Interval (day, weeks, months, ...). Only visible if recurrenceData.interval != NONE.
@@ -388,12 +388,12 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   private void setRecurrenceComponentsVisibility(final AjaxRequestTarget target)
   {
     if (recurrenceData.getFrequency() == RecurrenceFrequency.NONE) {
-      customizedCheckBoxPanel.setVisible(false);
+      customizedCheckBoxButton.setVisible(false);
       recurrenceUntilDateFieldset.setVisible(false);
       recurrenceExDateFieldset.setVisible(false);
       recurrenceIntervalFieldset.setVisible(false);
     } else {
-      customizedCheckBoxPanel.setVisible(true);
+      customizedCheckBoxButton.setVisible(true);
       recurrenceUntilDateFieldset.setVisible(true);
       recurrenceExDateFieldset.setVisible(true);
       recurrenceIntervalFieldset.setVisible(recurrenceData.isCustomized());

@@ -216,6 +216,21 @@ public class DivPanel extends Panel
     return checkBox;
   }
 
+  public CheckBoxButton addCheckBoxButton(final IModel<Boolean> model, final String labelString)
+  {
+    return addCheckBoxButton(model, labelString, null);
+  }
+
+  public CheckBoxButton addCheckBoxButton(final IModel<Boolean> model, final String labelString, final String tooltip)
+  {
+    final CheckBoxButton checkBox = new CheckBoxButton(newChildId(), model, labelString);
+    if (tooltip != null) {
+      checkBox.setTooltip(tooltip);
+    }
+    add(checkBox);
+    return checkBox;
+  }
+
   /**
    * @return the div
    */
