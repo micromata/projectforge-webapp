@@ -806,7 +806,20 @@ public class WicketUtils
    */
   public static Component addTooltip(final Component component, final String title, final String text)
   {
-    return addTooltip(component, Model.of(title), Model.of(text));
+    return addTooltip(component, title, text, false);
+  }
+
+  /**
+   * Adds a SimpleAttributeModifier("title", ...) to the given component.
+   * @param component
+   * @param title
+   * @param text
+   * @see #createTooltip(String, String)
+   * @see #setStyleHasTooltip(Component)
+   */
+  public static Component addTooltip(final Component component, final String title, final String text, final boolean rightAlignment)
+  {
+    return addTooltip(component, Model.of(title), Model.of(text), rightAlignment);
   }
 
   /**
@@ -892,7 +905,7 @@ public class WicketUtils
     };
     component.add(AttributeModifier.replace("data-html", true));
     if (title != null && title.getObject() != null) {
-      component.add(AttributeModifier.replace("rel", "mypopup"));
+      component.add(AttributeModifier.replace("rel", rightAlignment ? "mypopup-right" : "mypopup"));
       component.add(AttributeModifier.replace("data-original-title", title));
       component.add(AttributeModifier.replace("data-content", myModel));
     } else {

@@ -186,6 +186,12 @@ function initializeComponents() {
         trigger: 'hover'
     });
 
+	$('[rel=mypopup-right]').popover({
+        container: 'body',
+        placement: 'right auto',
+        trigger: 'hover'
+    });
+
     $('[rel=mytooltip]').tooltip({
     	container: 'body',
     	placement: 'bottom auto',
