@@ -480,6 +480,7 @@ public class AuftragDO extends DefaultBaseDO
     return false;
   }
 
+
   /**
    * Get the position entries for this object.
    */
@@ -703,6 +704,19 @@ public class AuftragDO extends DefaultBaseDO
       setPaymentSchedules(new ArrayList<PaymentScheduleDO>());
     }
     return getPaymentSchedules();
+  }
+
+  @Transient
+  public boolean isZahlplanAbgeschlossenUndNichtVollstaendigFakturiert()
+  {
+    if (getPaymentSchedules() != null) {
+      for (final PaymentScheduleDO pos : getPaymentSchedules()) {
+        if (pos.isReached() == true && pos.isVollstaendigFakturiert() == false) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   /**
