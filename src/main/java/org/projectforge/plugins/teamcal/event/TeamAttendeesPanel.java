@@ -24,7 +24,7 @@
 package org.projectforge.plugins.teamcal.event;
 
 import java.util.Iterator;
-import java.util.Set;
+import java.util.SortedSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.MarkupContainer;
@@ -48,7 +48,7 @@ public class TeamAttendeesPanel extends Panel
 {
   private static final long serialVersionUID = 5951744897882589488L;
 
-  private final Set<TeamEventAttendeeDO> attendees;
+  private final SortedSet<TeamEventAttendeeDO> attendees;
 
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
@@ -60,7 +60,7 @@ public class TeamAttendeesPanel extends Panel
   /**
    * @param id
    */
-  public TeamAttendeesPanel(final String id, final Set<TeamEventAttendeeDO> attendees)
+  public TeamAttendeesPanel(final String id, final SortedSet<TeamEventAttendeeDO> attendees)
   {
     super(id);
     this.attendees = attendees;
@@ -73,7 +73,7 @@ public class TeamAttendeesPanel extends Panel
     mainContainer.add(item);
     item.add(new AttendeeEditableLabel("editableLabel", Model.of(new TeamEventAttendeeDO()), true));
     item.add(new Label("status", "invisible").setVisible(false));
-    attendeesRepeater.setVisible(false);
+    attendeesRepeater.setVisible(true);
   }
 
   @SuppressWarnings("serial")
@@ -155,11 +155,6 @@ public class TeamAttendeesPanel extends Panel
     {
       final TeamEventAttendeeDO attendee = attendeeModel.getObject();
       if (lastEntry == true) {
-        if (StringUtils.isBlank(attendee.getUrl()) == true) {
-          // Do nothing.
-          super.onSubmit(target);
-          return;
-        }
         final TeamEventAttendeeDO clone = new TeamEventAttendeeDO();
         clone.setUrl(attendee.getUrl()).setUser(attendee.getUser());
         attendees.add(clone);
@@ -181,22 +176,7 @@ public class TeamAttendeesPanel extends Panel
     @Override
     protected FormComponent<String> newEditor(final MarkupContainer parent, final String componentId, final IModel<String> model)
     {
-
       final FormComponent<String> form = super.newEditor(parent, componentId, model);
-      // form.add(new AutoCompleteBehavior<String>(new PFAutoCompleteRenderer()) {
-      // private static final long serialVersionUID = 1L;
-      //
-      // @Override
-      // protected Iterator<String> getChoices(final String input)
-      // {
-      // final List<String> list = new LinkedList<String>();
-      // list.add("Kai Reinhard");
-      // list.add("Horst xy");
-      // list.add("k.reinhard@micromata.de");
-      // list.add("h.xy@irgendwas.de");
-      // return list.iterator();
-      // }
-      // });
       return form;
     }
   }

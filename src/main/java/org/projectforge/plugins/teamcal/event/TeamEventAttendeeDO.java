@@ -102,7 +102,7 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
    * Is set if the attendee is a ProjectForge user.
    * @return the userId
    */
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "user_id")
   public PFUserDO getUser()
   {

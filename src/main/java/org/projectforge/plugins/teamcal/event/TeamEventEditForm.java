@@ -25,7 +25,7 @@ package org.projectforge.plugins.teamcal.event;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
+import java.util.SortedSet;
 
 import net.fortuna.ical4j.model.Recur;
 
@@ -104,15 +104,13 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
   private DivPanel customizedCheckBoxButton;
 
-  private TeamAttendeesPanel attendeesPanel;
-
   private WebMarkupContainer recurrencePanel;
 
   private FieldsetPanel recurrenceFieldset, recurrenceUntilDateFieldset, recurrenceIntervalFieldset, recurrenceExDateFieldset;
 
   final TeamEventRight right = new TeamEventRight();
 
-  private Set<TeamEventAttendeeDO> attendees;
+  private SortedSet<TeamEventAttendeeDO> attendees;
 
   private final FormComponent< ? >[] dependentFormComponents = new FormComponent[6];
 
@@ -326,7 +324,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       gridBuilder.newSplitPanel(GridSize.COL50);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.attendees")).suppressLabelForWarning();
       attendees = getData().ensureAttendees();
-      fs.add(attendeesPanel = new TeamAttendeesPanel(fs.newChildId(), attendees));
+      fs.add(new TeamAttendeesPanel(fs.newChildId(), attendees));
     }
 
     gridBuilder.newGridPanel();
