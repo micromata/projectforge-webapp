@@ -238,7 +238,7 @@ public class LoginDefaultHandler implements LoginHandler
       return hibernateTemplate.find("from PFUserDO t");
     } catch (final Exception ex) {
       log.fatal("******* Exception while getting users from data-base (OK only in case of migration from older versions): "
-          + ex.getMessage());
+          + ex.getMessage(), ex);
       return new ArrayList<PFUserDO>();
     }
   }
