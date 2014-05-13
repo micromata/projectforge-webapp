@@ -76,10 +76,10 @@ public class TimesheetMassUpdateForm extends AbstractMassEditForm<TimesheetDO, T
     gridBuilder.newGridPanel();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task"));
+      fs.addCheckBox(new PropertyModel<Boolean>(this, "updateTask"), getString("update") + ":", getString("massupdate.updateTask"));
       final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs, new PropertyModel<TaskDO>(data, "task"), parentPage, "taskId");
       fs.add(taskSelectPanel);
       taskSelectPanel.init();
-      fs.addCheckBox(new PropertyModel<Boolean>(this, "updateTask"), getString("update"), getString("massupdate.updateTask"));
     }
     {
       kost2Fieldset = new FieldsetPanel(gridBuilder.getPanel(), getString("fibu.kost2")) {
