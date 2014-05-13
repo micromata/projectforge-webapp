@@ -423,7 +423,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
           fs.add(AbstractUnsecureBasePage.createInvisibleDummyComponent(fs.newChildId()));
         }
         if (userGroupCache.isUserMemberOfFinanceGroup() == true) {
-          final DivPanel checkBoxDiv = fs.addNewCheckBoxDiv();
+          final DivPanel checkBoxDiv = fs.addNewCheckBoxButtonDiv();
           checkBoxDiv.add(new CheckBoxButton(checkBoxDiv.newChildId(), new PropertyModel<Boolean>(position, "vollstaendigFakturiert"),
               getString("fibu.auftrag.vollstaendigFakturiert")));
         }

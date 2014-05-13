@@ -97,7 +97,7 @@ public abstract class AbstractImportForm<F, P extends AbstractImportPage<?>, S e
         return storagePanel.isVisible();
       }
     };
-    final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
+    final DivPanel radioGroupPanel = fs.addNewRadioBoxButtonDiv();
     final RadioGroupPanel<String> radioGroup = new RadioGroupPanel<String>(radioGroupPanel.newChildId(), "filterType",
         new PropertyModel<String>(importFilter, "listType")) {
       /**

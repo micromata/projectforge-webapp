@@ -128,7 +128,7 @@ public class LiquidityEntryListForm extends AbstractListForm<LiquidityFilter, Li
     nextDaysChoice.setNullValid(false);
     optionsFieldsetPanel.add(nextDaysChoice, true);
     {
-      final DivPanel radioGroupPanel = optionsFieldsetPanel.addNewRadioBoxDiv();
+      final DivPanel radioGroupPanel = optionsFieldsetPanel.addNewRadioBoxButtonDiv();
       final RadioGroupPanel<PaymentStatus> radioGroup = new RadioGroupPanel<PaymentStatus>(radioGroupPanel.newChildId(), "paymentStatus",
           new PropertyModel<PaymentStatus>(getSearchFilter(), "paymentStatus")) {
         /**
@@ -155,7 +155,7 @@ public class LiquidityEntryListForm extends AbstractListForm<LiquidityFilter, Li
       radioGroup.add(new Model<PaymentStatus>(PaymentStatus.PAID), getString(PaymentStatus.PAID.getI18nKey()));
     }
     {
-      final DivPanel radioGroupPanel = optionsFieldsetPanel.addNewRadioBoxDiv();
+      final DivPanel radioGroupPanel = optionsFieldsetPanel.addNewRadioBoxButtonDiv();
       final RadioGroupPanel<AmountType> radioGroup = new RadioGroupPanel<AmountType>(radioGroupPanel.newChildId(), "amountType",
           new PropertyModel<AmountType>(getSearchFilter(), "amountType")) {
         /**
