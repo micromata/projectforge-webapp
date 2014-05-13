@@ -31,6 +31,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Resolution;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.PropertyInfo;
+import org.projectforge.core.ShortDisplayNameCapable;
 
 /**
  * @author Werner Feder (werner.feder@t-online.de)
@@ -39,7 +40,7 @@ import org.projectforge.core.PropertyInfo;
 @Entity
 @Indexed
 @Table(name = "T_PAYMENTSCHEDULE", uniqueConstraints = { @UniqueConstraint(columnNames = { "auftrag_id", "number"})})
-public class PaymentScheduleDO extends DefaultBaseDO
+public class PaymentScheduleDO extends DefaultBaseDO  implements ShortDisplayNameCapable
 {
   private static final long serialVersionUID = -8024212050762584171L;
 
@@ -200,6 +201,15 @@ public class PaymentScheduleDO extends DefaultBaseDO
       return false;
     }
     return (scheduleDate == null);
+  }
+
+  /**
+   * @see org.projectforge.core.ShortDisplayNameCapable#getShortDisplayName()
+   */
+  @Transient
+  public String getShortDisplayName()
+  {
+    return getAuftragId() == null ? Short.toString(number) : getAuftragId().toString() + ":" + Short.toString(number);
   }
 
 }
