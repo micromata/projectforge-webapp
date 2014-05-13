@@ -31,6 +31,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
+import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.bootstrap.GridType;
 
@@ -41,6 +42,8 @@ import org.projectforge.web.wicket.bootstrap.GridType;
  */
 public class DivPanel extends Panel
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(DivPanel.class);
+
   private static final long serialVersionUID = 6130552547273354134L;
 
   RepeatingView repeater;
@@ -52,6 +55,8 @@ public class DivPanel extends Panel
   private DivPanelVisibility visibility;
 
   private int childCounter = 0;
+
+  private boolean buttonGroup = false;
 
   /**
    * @param id
@@ -106,6 +111,7 @@ public class DivPanel extends Panel
           div.add(AttributeModifier.append("class", cssClass.getClassAttrValue()));
           if (cssClass == DivType.BTN_GROUP) {
             add(AttributeModifier.append("data-toggle", "buttons"));
+            buttonGroup = true;
           }
         }
       }
@@ -156,6 +162,24 @@ public class DivPanel extends Panel
   @Override
   public DivPanel add(final Component... childs)
   {
+    if (WebConfiguration.isDevelopmentMode() == true) {
+      for (final Component child : childs) {
+        if (child instanceof CheckBoxButton) {
+          if (buttonGroup == false) {
+            log.warn("*** Dear developer: this DivPanel should be use css class "
+                + DivType.BTN_GROUP
+                + " if CheckBoxButtons are added! Otherwise check box buttons doesn't work.");
+          }
+        }
+        if (child instanceof RadioGroupPanel) {
+          if (buttonGroup == false) {
+            log.warn("*** Dear developer: this DivPanel should be use css class "
+                + DivType.BTN_GROUP
+                + " if RadioGroupPanel are added! Otherwise radio box buttons doesn't work.");
+          }
+        }
+      }
+    }
     repeater.add(childs);
     return this;
 
@@ -199,21 +223,6 @@ public class DivPanel extends Panel
   {
     childCounter++;
     return repeater.newChildId();
-  }
-
-  public CheckBoxPanel addCheckBox(final IModel<Boolean> model, final String labelString)
-  {
-    return addCheckBox(model, labelString, null);
-  }
-
-  public CheckBoxPanel addCheckBox(final IModel<Boolean> model, final String labelString, final String tooltip)
-  {
-    final CheckBoxPanel checkBox = new CheckBoxPanel(newChildId(), model, labelString);
-    if (tooltip != null) {
-      checkBox.setTooltip(tooltip);
-    }
-    add(checkBox);
-    return checkBox;
   }
 
   public CheckBoxButton addCheckBoxButton(final IModel<Boolean> model, final String labelString)

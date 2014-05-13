@@ -37,7 +37,6 @@ import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.wicket.AbstractMassEditForm;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
-import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class TimesheetMassUpdateForm extends AbstractMassEditForm<TimesheetDO, TimesheetMassUpdatePage>
@@ -80,8 +79,7 @@ public class TimesheetMassUpdateForm extends AbstractMassEditForm<TimesheetDO, T
       final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs, new PropertyModel<TaskDO>(data, "task"), parentPage, "taskId");
       fs.add(taskSelectPanel);
       taskSelectPanel.init();
-      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-      checkBoxPanel.addCheckBox(new PropertyModel<Boolean>(this, "updateTask"), getString("update"), getString("massupdate.updateTask"));
+      fs.addCheckBox(new PropertyModel<Boolean>(this, "updateTask"), getString("update"), getString("massupdate.updateTask"));
     }
     {
       kost2Fieldset = new FieldsetPanel(gridBuilder.getPanel(), getString("fibu.kost2")) {

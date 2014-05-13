@@ -93,7 +93,7 @@ public class SkillTreeForm extends AbstractForm<SkillFilter, SkillTreePage>
     {
       gridBuilder.newSplitPanel(GridSize.COL50);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).suppressLabelForWarning();
-      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+      final DivPanel checkBoxPanel = fs.addNewCheckBoxButtonDiv();
       checkBoxPanel.add(new MyCheckBoxButton(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "deleted"),
           getString("deleted")).setWarning());
     }

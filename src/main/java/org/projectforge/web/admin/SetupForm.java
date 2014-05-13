@@ -111,7 +111,7 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
     {
       // RadioChoice mode
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.setup.target"));
-      final DivPanel radioPanel = fs.addNewRadioBoxDiv();
+      final DivPanel radioPanel = fs.addNewRadioBoxButtonDiv();
       fs.add(radioPanel);
       fs.setLabelFor(radioPanel);
       final RadioGroupPanel<SetupTarget> radioGroup = new RadioGroupPanel<SetupTarget>(radioPanel.newChildId(), "setuptarget",
