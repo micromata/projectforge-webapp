@@ -31,15 +31,18 @@ import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.wicket.components.AjaxMaxLengthEditableLabel;
+import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -57,6 +60,8 @@ public class TeamAttendeesPanel extends Panel
 
   private final WebMarkupContainer mainContainer;
 
+  private final LabelValueChoiceRenderer<TeamAttendeeStatus> statusChoiceRenderer;
+
   /**
    * @param id
    */
@@ -64,6 +69,7 @@ public class TeamAttendeesPanel extends Panel
   {
     super(id);
     this.attendees = attendees;
+    statusChoiceRenderer = new LabelValueChoiceRenderer<TeamAttendeeStatus>(this, TeamAttendeeStatus.values());
     mainContainer = new WebMarkupContainer("main");
     add(mainContainer.setOutputMarkupId(true));
     attendeesRepeater = new RepeatingView("liRepeater");
@@ -74,6 +80,17 @@ public class TeamAttendeesPanel extends Panel
     item.add(new AttendeeEditableLabel("editableLabel", Model.of(new TeamEventAttendeeDO()), true));
     item.add(new Label("status", "invisible").setVisible(false));
     attendeesRepeater.setVisible(true);
+  }
+
+  /**
+   * @see org.apache.wicket.Component#onInitialize()
+   */
+  @Override
+  protected void onInitialize()
+  {
+    // TODO Auto-generated method stub
+    super.onInitialize();
+    //throw new UnsupportedOperationException();
   }
 
   @SuppressWarnings("serial")
@@ -188,7 +205,11 @@ public class TeamAttendeesPanel extends Panel
       final WebMarkupContainer item = new WebMarkupContainer(attendeesRepeater.newChildId());
       attendeesRepeater.add(item);
       item.add(new AttendeeEditableLabel("editableLabel", Model.of(attendee), false));
-      item.add(new Label("status", "invisible").setVisible(false));
+      //      item.add(new Label("status", Model.of(attendee)).setVisible(false));
+      final DropDownChoice<TeamAttendeeStatus> statusChoice = new DropDownChoice<TeamAttendeeStatus>("status",
+          new PropertyModel<TeamAttendeeStatus>(attendee, "status"), statusChoiceRenderer.getValues(), statusChoiceRenderer);
+      item.add(statusChoice);
     }
   }
+
 }

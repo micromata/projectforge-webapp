@@ -66,7 +66,7 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
 
   private String loginToken;
 
-  private TeamAttendeeStatus status;
+  private TeamAttendeeStatus status = TeamAttendeeStatus.NEEDS_ACTION;
 
   private String comment;
 

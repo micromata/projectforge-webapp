@@ -33,6 +33,7 @@ import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.DateHelper;
 import org.projectforge.core.ModificationStatus;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarPage;
@@ -265,8 +266,15 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   {
     super.onSaveOrUpdate();
 
+    if (getData().getAttendees() != null && getData().getAttendees().isEmpty() == false) {
+      final TeamEventAttendeeDO attendee = new TeamEventAttendeeDO();
+      attendee.setUser(PFUserContext.getUser()).setStatus(TeamAttendeeStatus.ACCEPTED);
+      getData().getAttendees().add(attendee);
+    }
+
     getData().setRecurrence(form.recurrenceData);
     if (recurrencyChangeType == null || recurrencyChangeType == RecurrencyChangeType.ALL) {
+      showICal();
       return null;
     }
     final Integer masterId = getData().getId(); // Store the id of the master entry.
@@ -275,10 +283,12 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
     final TeamEventDO masterEvent = teamEventDao.getById(masterId);
     if (masterEvent == null) {
       log.error("masterEvent is null?! Do nothing more after saving team event.");
+      showICal();
       return null;
     }
     if (eventOfCaller == null) {
       log.error("eventOfCaller is null?! Do nothing more after saving team event.");
+      showICal();
       return null;
     }
     form.setData(masterEvent);
@@ -292,6 +302,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       }
       form.recurrenceData.setUntil(recurrenceUntil); // Minus 24 hour.
       getData().setRecurrence(form.recurrenceData);
+      showICal();
       return null;
     } else if (recurrencyChangeType == RecurrencyChangeType.ONLY_CURRENT) { // only current date
       // Add current date to the master date as exclusion date and save this event (without recurrence settings).
@@ -306,8 +317,10 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
             + masterEvent.getRecurrenceExDate());
         log.debug("The new event is: " + newEvent);
       }
+      showICal();
       return null;
     }
+    showICal();
     return null;
   }
 
@@ -362,4 +375,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
     return new TeamEventEditForm(this, data);
   }
 
+  private void showICal() {
+    final String s = ICal4JUtils.getICal(getData());
+  }
 }
