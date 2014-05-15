@@ -80,6 +80,9 @@ public class TeamEventUtils
     if (recurData == null || recurData.getFrequency() == null || recurData.getFrequency() == RecurrenceFrequency.NONE) {
       return null;
     }
+    if (recurData.isCustomized() == false) {
+      recurData.setInterval(1);
+    }
     final Recur recur = new Recur();
     final net.fortuna.ical4j.model.Date untilDate = ICal4JUtils.getICal4jDate(recurData.getUntil(), recurData.getTimeZone());
     if (untilDate != null) {
