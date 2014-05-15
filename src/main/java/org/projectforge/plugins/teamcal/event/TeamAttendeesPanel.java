@@ -56,11 +56,11 @@ public class TeamAttendeesPanel extends Panel
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
 
-  private final RepeatingView attendeesRepeater;
+  private RepeatingView attendeesRepeater;
 
-  private final WebMarkupContainer mainContainer;
+  private WebMarkupContainer mainContainer;
 
-  private final LabelValueChoiceRenderer<TeamAttendeeStatus> statusChoiceRenderer;
+  private LabelValueChoiceRenderer<TeamAttendeeStatus> statusChoiceRenderer;
 
   /**
    * @param id
@@ -69,6 +69,15 @@ public class TeamAttendeesPanel extends Panel
   {
     super(id);
     this.attendees = attendees;
+  }
+
+  /**
+   * @see org.apache.wicket.Component#onInitialize()
+   */
+  @Override
+  protected void onInitialize()
+  {
+    super.onInitialize();
     statusChoiceRenderer = new LabelValueChoiceRenderer<TeamAttendeeStatus>(this, TeamAttendeeStatus.values());
     mainContainer = new WebMarkupContainer("main");
     add(mainContainer.setOutputMarkupId(true));
@@ -80,17 +89,6 @@ public class TeamAttendeesPanel extends Panel
     item.add(new AttendeeEditableLabel("editableLabel", Model.of(new TeamEventAttendeeDO()), true));
     item.add(new Label("status", "invisible").setVisible(false));
     attendeesRepeater.setVisible(true);
-  }
-
-  /**
-   * @see org.apache.wicket.Component#onInitialize()
-   */
-  @Override
-  protected void onInitialize()
-  {
-    // TODO Auto-generated method stub
-    super.onInitialize();
-    //throw new UnsupportedOperationException();
   }
 
   @SuppressWarnings("serial")
@@ -205,9 +203,9 @@ public class TeamAttendeesPanel extends Panel
       final WebMarkupContainer item = new WebMarkupContainer(attendeesRepeater.newChildId());
       attendeesRepeater.add(item);
       item.add(new AttendeeEditableLabel("editableLabel", Model.of(attendee), false));
-      //      item.add(new Label("status", Model.of(attendee)).setVisible(false));
       final DropDownChoice<TeamAttendeeStatus> statusChoice = new DropDownChoice<TeamAttendeeStatus>("status",
           new PropertyModel<TeamAttendeeStatus>(attendee, "status"), statusChoiceRenderer.getValues(), statusChoiceRenderer);
+      statusChoice.setEnabled(false);
       item.add(statusChoice);
     }
   }
