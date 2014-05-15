@@ -216,7 +216,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       // project
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt")).suppressLabelForWarning();
       final NewProjektSelectPanel projektSelectPanel = new NewProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data,
-          "projekt"), parentPage, "projektId");
+          "projekt"), "projektId");
       fs.add(projektSelectPanel);
       projektSelectPanel.init();
     }
@@ -225,7 +225,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       // customer
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde")).suppressLabelForWarning();
       kundeSelectPanel = new NewCustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"), new PropertyModel<String>(
-          data, "kundeText"), parentPage, "kundeId");
+          data, "kundeText"), "kundeId");
       fs.add(kundeSelectPanel);
       kundeSelectPanel.init();
       fs.addHelpIcon(getString("fibu.auftrag.hint.kannVonProjektKundenAbweichen"));
@@ -290,6 +290,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         {
           return true;
         }
+
         /**
          * @see org.projectforge.web.wicket.flowlayout.ToggleContainerPanel#onToggleStatusChanged(org.apache.wicket.ajax.AjaxRequestTarget,
          *      boolean)
@@ -336,8 +337,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
     gridBuilder.newGridPanel();
     positionsRepeater = gridBuilder.newRepeatingView();
     refresh();
-    if (getBaseDao().hasInsertAccess(getUser()) == true)
-    {
+    if (getBaseDao().hasInsertAccess(getUser()) == true) {
       final DivPanel panel = gridBuilder.newGridPanel().getPanel();
       final Button addPositionButton = new Button(SingleButtonPanel.WICKET_ID) {
         @Override
@@ -550,8 +550,9 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         final FieldsetPanel fs = posGridBuilder.newFieldset(getString("fibu.periodOfPerformance"));
         final LabelValueChoiceRenderer<PeriodOfPerformanceType> performanceChoiceRenderer = new LabelValueChoiceRenderer<PeriodOfPerformanceType>(
             fs, PeriodOfPerformanceType.values());
-        final DropDownChoice<PeriodOfPerformanceType> performanceChoice = new DropDownChoice<PeriodOfPerformanceType>(fs.getDropDownChoiceId(),
-            new PropertyModel<PeriodOfPerformanceType>(position, "periodOfPerformanceType"), performanceChoiceRenderer.getValues(), performanceChoiceRenderer) {
+        final DropDownChoice<PeriodOfPerformanceType> performanceChoice = new DropDownChoice<PeriodOfPerformanceType>(
+            fs.getDropDownChoiceId(), new PropertyModel<PeriodOfPerformanceType>(position, "periodOfPerformanceType"),
+            performanceChoiceRenderer.getValues(), performanceChoiceRenderer) {
           /**
            * @see org.apache.wicket.markup.html.form.AbstractSingleSelectChoice#getDefaultChoice(java.lang.String)
            */
@@ -601,8 +602,8 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         ajaxPosTargets.add(endDatePanel.getDateField());
         dependentComponents.add(endDatePanel);
 
-        final LabelValueChoiceRenderer<ModeOfPaymentType> paymentChoiceRenderer = new LabelValueChoiceRenderer<ModeOfPaymentType>(
-            fs, ModeOfPaymentType.values());
+        final LabelValueChoiceRenderer<ModeOfPaymentType> paymentChoiceRenderer = new LabelValueChoiceRenderer<ModeOfPaymentType>(fs,
+            ModeOfPaymentType.values());
         final DropDownChoice<ModeOfPaymentType> paymentChoice = new DropDownChoice<ModeOfPaymentType>(fs.getDropDownChoiceId(),
             new PropertyModel<ModeOfPaymentType>(position, "modeOfPaymentType"), paymentChoiceRenderer.getValues(), paymentChoiceRenderer);
         paymentChoice.setOutputMarkupPlaceholderTag(true);
@@ -654,11 +655,12 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       }
     }
     if (schedulesPanel.getToggleStatus() == ToggleStatus.OPENED) {
-      return getString("fibu.auftrag.paymentschedule") + " (" + paymentSchedules.size() +")";
+      return getString("fibu.auftrag.paymentschedule") + " (" + paymentSchedules.size() + ")";
     }
     final StringBuffer heading = new StringBuffer();
     heading.append(escapeHtml(getString("fibu.auftrag.paymentschedule"))).append(" (").append(paymentSchedules.size()).append(")");
-    heading.append(": ").append(CurrencyFormatter.format(ges)).append(" ").append(getString("fibu.fakturiert")).append(" ").append(CurrencyFormatter.format(invoiced));
+    heading.append(": ").append(CurrencyFormatter.format(ges)).append(" ").append(getString("fibu.fakturiert")).append(" ")
+    .append(CurrencyFormatter.format(invoiced));
     return heading.toString();
   }
 
@@ -668,16 +670,19 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
     return log;
   }
 
-  private boolean posHasOwnPeriodOfPerformance(final short number) {
-    return ( (getData().getPosition(number).getPeriodOfPerformanceBegin() != null && StringUtils.isBlank(getData().getPosition(number).getPeriodOfPerformanceBegin().toString()) == false)
-        || (getData().getPosition(number).getPeriodOfPerformanceEnd() != null && StringUtils.isBlank(getData().getPosition(number).getPeriodOfPerformanceEnd().toString()) == false)
-        || getData().getPosition(number).getPeriodOfPerformanceType() == PeriodOfPerformanceType.OWN);
+  private boolean posHasOwnPeriodOfPerformance(final short number)
+  {
+    return ((getData().getPosition(number).getPeriodOfPerformanceBegin() != null && StringUtils.isBlank(getData().getPosition(number)
+        .getPeriodOfPerformanceBegin().toString()) == false)
+        || (getData().getPosition(number).getPeriodOfPerformanceEnd() != null && StringUtils.isBlank(getData().getPosition(number)
+            .getPeriodOfPerformanceEnd().toString()) == false) || getData().getPosition(number).getPeriodOfPerformanceType() == PeriodOfPerformanceType.OWN);
   }
 
-  private void setPosPeriodOfPerformanceVisible(final short pos, final boolean visible) {
-    ajaxPosTargets.get(pos*4-4).setVisible(visible);
-    ajaxPosTargets.get(pos*4-3).setVisible(visible);
-    ajaxPosTargets.get(pos*4-2).setVisible(visible);
-    ajaxPosTargets.get(pos*4-1).setVisible(visible);
+  private void setPosPeriodOfPerformanceVisible(final short pos, final boolean visible)
+  {
+    ajaxPosTargets.get(pos * 4 - 4).setVisible(visible);
+    ajaxPosTargets.get(pos * 4 - 3).setVisible(visible);
+    ajaxPosTargets.get(pos * 4 - 2).setVisible(visible);
+    ajaxPosTargets.get(pos * 4 - 1).setVisible(visible);
   }
 }

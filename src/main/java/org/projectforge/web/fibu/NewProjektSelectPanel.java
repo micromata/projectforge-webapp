@@ -81,9 +81,9 @@ public class NewProjektSelectPanel extends AbstractSelectPanel<ProjektDO> implem
    * @param caller
    * @param selectProperty
    */
-  public NewProjektSelectPanel(final String id, final IModel<ProjektDO> model, final ISelectCallerPage caller, final String selectProperty)
+  public NewProjektSelectPanel(final String id, final IModel<ProjektDO> model, final String selectProperty)
   {
-    this(id, model, null, caller, selectProperty);
+    this(id, model, null, selectProperty);
   }
 
   /**
@@ -93,10 +93,9 @@ public class NewProjektSelectPanel extends AbstractSelectPanel<ProjektDO> implem
    * @param selectProperty
    */
   @SuppressWarnings("serial")
-  public NewProjektSelectPanel(final String id, final IModel<ProjektDO> model, final String label, final ISelectCallerPage caller,
-      final String selectProperty)
+  public NewProjektSelectPanel(final String id, final IModel<ProjektDO> model, final String label, final String selectProperty)
   {
-    super(id, model, caller, selectProperty);
+    super(id, model, null, selectProperty);
     projectTextField = new PFAutoCompleteTextField<ProjektDO>("projectField", getModel()) {
       @Override
       protected List<ProjektDO> getChoices(final String input)
@@ -149,7 +148,7 @@ public class NewProjektSelectPanel extends AbstractSelectPanel<ProjektDO> implem
 
       @SuppressWarnings({ "unchecked", "rawtypes"})
       @Override
-      public <C> IConverter<C>  getConverter(final Class<C> type)
+      public <C> IConverter<C> getConverter(final Class<C> type)
       {
         return new IConverter() {
           @Override
@@ -182,7 +181,7 @@ public class NewProjektSelectPanel extends AbstractSelectPanel<ProjektDO> implem
       }
     };
     currentProject = getModelObject();
-    projectTextField.enableTooltips().withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false); //.withWidth(400);
+    projectTextField.enableTooltips().withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false); // .withWidth(400);
   }
 
   /**
@@ -261,7 +260,8 @@ public class NewProjektSelectPanel extends AbstractSelectPanel<ProjektDO> implem
     return projectTextField;
   }
 
-  private ProjektDO getProjekt(final String input) {
+  private ProjektDO getProjekt(final String input)
+  {
     int kundeId, kost2;
     String nummernkreis, kId, nummer;
     kundeId = kost2 = -1;
@@ -271,24 +271,24 @@ public class NewProjektSelectPanel extends AbstractSelectPanel<ProjektDO> implem
       return null;
     }
     nummernkreis = input.substring(0, ind1);
-    final int ind2 = input.indexOf(".", ind1+1);
+    final int ind2 = input.indexOf(".", ind1 + 1);
     if (ind2 < 0) {
       return null;
     }
-    kId = input.substring(ind1+1, ind2);
-    final int ind3 = input.indexOf(" -", ind2+1);
+    kId = input.substring(ind1 + 1, ind2);
+    final int ind3 = input.indexOf(" -", ind2 + 1);
     if (ind3 < 0) {
       return null;
     }
-    nummer = input.substring(ind2+1, ind3);
+    nummer = input.substring(ind2 + 1, ind3);
     kundeId = Integer.parseInt(kId);
     kost2 = Integer.parseInt(nummer);
-    if ( kundeId < 0 || kost2 < 0) {
+    if (kundeId < 0 || kost2 < 0) {
       return null;
     }
     if (nummernkreis.equals("4") == true) {
       return projektDao.getProjekt(kundeId, kost2);
-    } else if (nummernkreis.equals("5") == true){
+    } else if (nummernkreis.equals("5") == true) {
       final KundeDO kunde = kundeDao.getById(kundeId);
       if (kunde == null) {
         return null;

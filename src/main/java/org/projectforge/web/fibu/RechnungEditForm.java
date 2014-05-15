@@ -135,8 +135,8 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     {
       // Customer
       final FieldsetPanel fs = gridBuilder.newFieldset(RechnungDO.class, "kunde");
-      customerSelectPanel = new NewCustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"), new PropertyModel<String>(
-          data, "kundeText"), parentPage, "kundeId");
+      customerSelectPanel = new NewCustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"),
+          new PropertyModel<String>(data, "kundeText"), "kundeId");
       fs.add(customerSelectPanel);
       customerSelectPanel.init();
       fs.setLabelFor(customerSelectPanel.getKundeTextField());
@@ -145,8 +145,8 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     {
       // Projekt
       final FieldsetPanel fs = gridBuilder.newFieldset(RechnungDO.class, "projekt").suppressLabelForWarning();
-      final NewProjektSelectPanel projektSelectPanel = new NewProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data, "projekt"),
-          parentPage, "projektId");
+      final NewProjektSelectPanel projektSelectPanel = new NewProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data,
+          "projekt"), "projektId");
       fs.add(projektSelectPanel);
       projektSelectPanel.init();
     }
@@ -216,7 +216,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
       differs = true;
     } else if (area >= 0 && cost2.getBereich() != area) {
       differs = true;
-    } else if (number >= 0&& cost2.getTeilbereich() != number) {
+    } else if (number >= 0 && cost2.getTeilbereich() != number) {
       differs = true;
     }
     if (differs == true) {
@@ -235,13 +235,13 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     final BigDecimal zahlBetrag = zahlBetragField.getConvertedInput();
     final Integer projektId = getData().getProjektId();
     final Integer kundeId = getData().getKundeId();
-    //final String kundeText = customerSelectPanel.getKundeTextField().getConvertedInput();
+    // final String kundeText = customerSelectPanel.getKundeTextField().getConvertedInput();
     final boolean zahlBetragExists = (zahlBetrag != null && zahlBetrag.compareTo(BigDecimal.ZERO) != 0);
     if (status == RechnungStatus.BEZAHLT && zahlBetragExists == false) {
       addError("fibu.rechnung.error.statusBezahltErfordertZahlBetrag");
     }
-    //    if (projektId == null && StringUtils.isBlank(kundeText) == true && kundeId == null) {
-    if (projektId == null &&  kundeId == null) {
+    // if (projektId == null && StringUtils.isBlank(kundeText) == true && kundeId == null) {
+    if (projektId == null && kundeId == null) {
       addError("fibu.rechnung.error.kundeTextOderProjektRequired");
     }
   }

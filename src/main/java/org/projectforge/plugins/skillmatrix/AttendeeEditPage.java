@@ -26,14 +26,13 @@ package org.projectforge.plugins.skillmatrix;
 import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 
 /**
  * The controller of the edit formular page. Most functionality such as insert, update, delete etc. is done by the super class.
  * @author Werner Feder (werner.feder@t-online.de)
  */
-public class AttendeeEditPage extends AbstractEditPage<AttendeeDO, AttendeeEditForm, AttendeeDao> implements ISelectCallerPage
+public class AttendeeEditPage extends AbstractEditPage<AttendeeDO, AttendeeEditForm, AttendeeDao>
 {
 
   private static final long serialVersionUID = 6051980938679738200L;
@@ -80,32 +79,5 @@ public class AttendeeEditPage extends AbstractEditPage<AttendeeDO, AttendeeEditF
   protected AttendeeEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final AttendeeDO data)
   {
     return new AttendeeEditForm(this, data);
-  }
-
-  /**
-   * @see org.projectforge.web.fibu.ISelectCallerPage#select(java.lang.String, java.lang.Object)
-   */
-  @Override
-  public void select(final String property, final Object selectedValue)
-  {
-    // Do nothing
-  }
-
-  /**
-   * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
-   */
-  @Override
-  public void unselect(final String property)
-  {
-    // Do nothing
-  }
-
-  /**
-   * @see org.projectforge.web.fibu.ISelectCallerPage#cancelSelection(java.lang.String)
-   */
-  @Override
-  public void cancelSelection(final String property)
-  {
-    // Do nothing
   }
 }

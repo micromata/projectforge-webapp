@@ -94,8 +94,8 @@ public class ProjektEditForm extends AbstractEditForm<ProjektDO, ProjektEditPage
     {
       // Customer
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde")).suppressLabelForWarning();
-      final NewCustomerSelectPanel kundeSelectPanel = new NewCustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"),
-          null, parentPage, "kundeId");
+      final NewCustomerSelectPanel kundeSelectPanel = new NewCustomerSelectPanel(fs.newChildId(),
+          new PropertyModel<KundeDO>(data, "kunde"), null, "kundeId");
       fs.add(kundeSelectPanel);
       kundeSelectPanel.init();
     }

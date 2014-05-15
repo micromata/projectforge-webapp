@@ -27,12 +27,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.calendar.DayHolder;
-import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.ProjektDao;
 import org.projectforge.fibu.RechnungDO;
 import org.projectforge.fibu.RechnungDao;
@@ -44,7 +42,7 @@ import org.projectforge.web.wicket.AbstractSecuredBasePage;
 import org.projectforge.web.wicket.EditPage;
 
 @EditPage(defaultReturnPage = RechnungListPage.class)
-public class RechnungEditPage extends AbstractEditPage<RechnungDO, RechnungEditForm, RechnungDao> implements ISelectCallerPage
+public class RechnungEditPage extends AbstractEditPage<RechnungDO, RechnungEditForm, RechnungDao>
 {
   private static final long serialVersionUID = 2561721641251015056L;
 
@@ -127,40 +125,25 @@ public class RechnungEditPage extends AbstractEditPage<RechnungDO, RechnungEditF
     form.refresh();
   }
 
-  public void cancelSelection(final String property)
-  {
-    // Do nothing.
-  }
-
-  public void select(final String property, final Object selectedValue)
-  {
-    if ("projektId".equals(property) == true) {
-      rechnungDao.setProjekt(getData(), (Integer) selectedValue);
-      if (getData().getProjektId() != null
-          && getData().getProjektId() >= 0
-          && getData().getKundeId() == null
-          && StringUtils.isBlank(getData().getKundeText()) == true) {
-        // User has selected a project and the kunde is not set:
-        final ProjektDO projekt = projektDao.getById(getData().getProjektId());
-        if (projekt != null) {
-          rechnungDao.setKunde(getData(), projekt.getKundeId());
-        }
-      }
-    } else if ("kundeId".equals(property) == true) {
-      rechnungDao.setKunde(getData(), (Integer) selectedValue);
-    } else {
-      log.error("Property '" + property + "' not supported for selection.");
-    }
-  }
-
-  public void unselect(final String property)
-  {
-    if ("projektId".equals(property) == true) {
-      getData().setProjekt(null);
-    } else if ("kundeId".equals(property) == true) {
-      getData().setKunde(null);
-    } else {
-      log.error("Property '" + property + "' not supported for selection.");
-    }
-  }
+  // TODO: Move to ajax...
+  //  public void select(final String property, final Object selectedValue)
+  //  {
+  //    if ("projektId".equals(property) == true) {
+  //      rechnungDao.setProjekt(getData(), (Integer) selectedValue);
+  //      if (getData().getProjektId() != null
+  //          && getData().getProjektId() >= 0
+  //          && getData().getKundeId() == null
+  //          && StringUtils.isBlank(getData().getKundeText()) == true) {
+  //        // User has selected a project and the kunde is not set:
+  //        final ProjektDO projekt = projektDao.getById(getData().getProjektId());
+  //        if (projekt != null) {
+  //          rechnungDao.setKunde(getData(), projekt.getKundeId());
+  //        }
+  //      }
+  //    } else if ("kundeId".equals(property) == true) {
+  //      rechnungDao.setKunde(getData(), (Integer) selectedValue);
+  //    } else {
+  //      log.error("Property '" + property + "' not supported for selection.");
+  //    }
+  //  }
 }

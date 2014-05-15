@@ -85,10 +85,10 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
    * @param selectProperty
    */
   @SuppressWarnings("serial")
-  public NewCustomerSelectPanel(final String id, final IModel<KundeDO> model, final PropertyModel<String> kundeText, final ISelectCallerPage caller,
+  public NewCustomerSelectPanel(final String id, final IModel<KundeDO> model, final PropertyModel<String> kundeText,
       final String selectProperty)
   {
-    super(id, model, caller, selectProperty);
+    super(id, model, null, selectProperty);
     this.kundeText = kundeText;
     customerTextField = new PFAutoCompleteTextField<KundeDO>("customerField", getModel()) {
       @Override
@@ -142,7 +142,7 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
 
       @SuppressWarnings({ "unchecked", "rawtypes"})
       @Override
-      public <C> IConverter<C>  getConverter(final Class<C> type)
+      public <C> IConverter<C> getConverter(final Class<C> type)
       {
         return new IConverter() {
           @Override
@@ -176,9 +176,8 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
       }
     };
     currentCustomer = getModelObject();
-    customerTextField.enableTooltips().withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false); //.withWidth(400);
+    customerTextField.enableTooltips().withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false); // .withWidth(400);
   }
-
 
   /**
    * Should be called before init() method. If true, then the validation will be done after submitting.
@@ -199,8 +198,8 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
         @Override
         public boolean isVisible()
         {
-          return (NewCustomerSelectPanel.this.getModelObject() == null || NumberHelper.greaterZero(NewCustomerSelectPanel.this.getModelObject()
-              .getId()) == false);
+          return (NewCustomerSelectPanel.this.getModelObject() == null || NumberHelper.greaterZero(NewCustomerSelectPanel.this
+              .getModelObject().getId()) == false);
         }
       };
       add(kundeTextField);
