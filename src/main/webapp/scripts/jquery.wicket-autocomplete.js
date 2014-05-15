@@ -531,14 +531,10 @@ jQuery.autocomplete = function(input, options) {
 	
 
 	function findPos(obj) {
-		var curleft = obj.offsetLeft || 0;
-		var curtop = obj.offsetTop || 0;
-		while (obj = obj.offsetParent) {
-			//if ($(obj).hasClass("modal")) break;
-			curleft += obj.offsetLeft
-			curtop += obj.offsetTop
-		}
-		return {x:curleft,y:curtop};
+		var offset = $(obj).offset();
+		var posY = offset.top ;//- $(window).scrollTop();
+		var posX = offset.left;// - $(window).scrollLeft(); 
+		return {x:posX, y:posY};
 	}
 }
 

@@ -202,7 +202,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     {
       // ALL DAY CHECKBOX
       final FieldsetPanel fieldSet = gridBuilder.newFieldset("").suppressLabelForWarning();
-      final DivPanel divPanel = fieldSet.addNewCheckBoxDiv();
+      final DivPanel divPanel = fieldSet.addNewCheckBoxButtonDiv();
       final CheckBoxButton checkBox = new CheckBoxButton(divPanel.newChildId(), new PropertyModel<Boolean>(data, "allDay"),
           getString("plugins.teamcal.event.allDay"));
       checkBox.getCheckBox().add(new AjaxFormComponentUpdatingBehavior("onChange") {
@@ -257,7 +257,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
           setRecurrenceComponentsVisibility(target);
         }
       });
-      customizedCheckBoxButton = recurrenceFieldset.addNewCheckBoxDiv();
+      customizedCheckBoxButton = recurrenceFieldset.addNewCheckBoxButtonDiv();
       final CheckBoxButton checkBox = new CheckBoxButton(customizedCheckBoxButton.newChildId(), new PropertyModel<Boolean>(recurrenceData,
           "customized"), getString("plugins.teamcal.event.recurrence.customized"));
       checkBox.getCheckBox().add(new AjaxFormComponentUpdatingBehavior("onChange") {

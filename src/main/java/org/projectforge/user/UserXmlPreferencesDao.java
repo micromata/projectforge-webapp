@@ -31,6 +31,7 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.Validate;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.common.GZIPHelper;
+import org.projectforge.common.XStreamHelper;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.task.TaskDO;
@@ -68,7 +69,7 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
 
   public UserXmlPreferencesDao()
   {
-    xstream = new XStream();
+    xstream = XStreamHelper.createXStream();
     xstream.processAnnotations(new Class< ? >[] { UserXmlPreferencesMap.class, TaskFilter.class, TimesheetPrefData.class,
         ScriptCallData.class, RecentScriptCalls.class});
     registerConverter(UserDao.class, PFUserDO.class, 20);
@@ -178,7 +179,7 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
         final String uncompressed = GZIPHelper.uncompress(xml.substring(1));
         xml = uncompressed;
       }
-      final Object value = xstream.fromXML(xml);
+      final Object value = XStreamHelper.fromXml(xstream, xml);
       return value;
     } catch (final Throwable ex) {
       if (logError == true) {
@@ -197,7 +198,7 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
 
   public String serialize(final UserXmlPreferencesDO userPrefs, final Object value)
   {
-    final String xml = xstream.toXML(value);
+    final String xml = XStreamHelper.toXml(xstream, value);
     if (xml.length() > 1000) {
       // Compress value:
       final String compressed = GZIPHelper.compress(xml);

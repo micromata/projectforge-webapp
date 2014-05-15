@@ -102,7 +102,7 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
     WicketUtils.addTooltip(firstHourDropDownChoice, getString("calendar.option.firstHour.tooltip"));
     fieldset.add(firstHourDropDownChoice);
 
-    final DivPanel checkBoxPanel = fieldset.addNewCheckBoxDiv();
+    final DivPanel checkBoxPanel = fieldset.addNewCheckBoxButtonDiv();
 
     calendarPageSupport.addOptions(checkBoxPanel, true, filter);
     checkBoxPanel.add(new CheckBoxButton(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "slot30"),

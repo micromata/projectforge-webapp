@@ -738,14 +738,11 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   }
 
   /**
-   * @return the lastPasswordChange. If not given the creation time of this user object is used instead.
+   * @return the lastPasswordChange.
    */
   @Column(name = "last_password_change")
   public Date getLastPasswordChange()
   {
-    if (lastPasswordChange == null) {
-      return this.getCreated() != null ? this.getCreated() : null;
-    }
     return lastPasswordChange;
   }
 
