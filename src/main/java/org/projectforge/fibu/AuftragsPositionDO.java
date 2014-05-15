@@ -342,7 +342,7 @@ public class AuftragsPositionDO extends DefaultBaseDO implements ShortDisplayNam
   }
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "periodOfPerformanceType", length = 10)
+  @Column(name = "period_of_performance_type", length = 10)
   public PeriodOfPerformanceType getPeriodOfPerformanceType()
   {
     return periodOfPerformanceType;
@@ -355,7 +355,7 @@ public class AuftragsPositionDO extends DefaultBaseDO implements ShortDisplayNam
   }
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "modeOfPaymentTypeType", length = 13)
+  @Column(name = "mode_of_payment_type", length = 13)
   public ModeOfPaymentType getModeOfPaymentType()
   {
     return modeOfPaymentType;
