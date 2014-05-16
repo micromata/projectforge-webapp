@@ -288,4 +288,11 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
     return kundeTextField;
   }
 
+  /**
+   * @return the projectTextField
+   */
+  public PFAutoCompleteTextField<KundeDO> getTextField()
+  {
+    return customerTextField;
+  }
 }
