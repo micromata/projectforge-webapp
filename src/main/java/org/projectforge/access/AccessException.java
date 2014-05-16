@@ -29,11 +29,12 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.projectforge.core.MessageParam;
 import org.projectforge.core.MessageParamType;
 import org.projectforge.core.UserException;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
 
 /**
  * This class will be thrown by AccessChecker, if no access is given for the demanded action by an user.
@@ -115,7 +116,7 @@ public class AccessException extends UserException
   {
     final Object[] result = new Object[3];
     if (taskTree != null && this.taskId != null) {
-      final TaskDO task = taskTree.getTaskById(taskId);
+      final TaskDO task = getTaskTree().getTaskById(taskId);
       if (task != null) {
         result[0] = task.getTitle();
       } else {
@@ -137,7 +138,7 @@ public class AccessException extends UserException
   {
     final MessageParam[] result = new MessageParam[3];
     if (taskTree != null && this.taskId != null) {
-      final TaskDO task = taskTree.getTaskById(taskId);
+      final TaskDO task = getTaskTree().getTaskById(taskId);
       if (task != null) {
         result[0] = new MessageParam(task.getTitle());
       } else {
@@ -229,14 +230,12 @@ public class AccessException extends UserException
     this.user = user;
   }
 
-  public TaskTree getTaskTree()
+  private TaskTree getTaskTree()
   {
+    if (taskTree == null) {
+      taskTree = Registry.instance().getTaskTree();
+    }
     return taskTree;
-  }
-
-  public void setTaskTree(final TaskTree taskTree)
-  {
-    this.taskTree = taskTree;
   }
 
   @Override
@@ -247,7 +246,7 @@ public class AccessException extends UserException
       builder.append("user", String.valueOf(user.getId()) + ":" + user.getUsername());
     }
     if (taskId != null) {
-      final TaskDO task = taskTree != null ? taskTree.getTaskById(taskId) : null;
+      final TaskDO task = taskTree != null ? getTaskTree().getTaskById(taskId) : null;
       final String ts = task != null ? ":" + task.getShortDisplayName() : "";
       builder.append("task", String.valueOf(taskId) + ts);
     }
