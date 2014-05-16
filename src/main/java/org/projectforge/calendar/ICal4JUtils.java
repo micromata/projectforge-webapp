@@ -52,10 +52,10 @@ import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.util.Dates;
 
 import org.apache.commons.lang.StringUtils;
+import org.projectforge.common.StringHelper;
 import org.projectforge.common.DateFormats;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.RecurrenceFrequency;
-import org.projectforge.common.StringHelper;
 import org.projectforge.plugins.teamcal.event.TeamEventAttendeeDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.user.PFUserContext;
@@ -420,8 +420,14 @@ public class ICal4JUtils
       vEvent.getProperties().add(new Comment(teamEvent.getNote()));
     }
     final PFUserDO user = PFUserContext.getUser();
-    final String s = user.getFullname() + "\\, " + user.getOrganization() + "\\, " + user.getPersonalPhoneIdentifiers();
-    vEvent.getProperties().add(new Contact(s.intern()));
+    String s = user.getFullname();
+    if (user.getOrganization() != null) {
+      s += "\\, " + user.getOrganization();
+    }
+    if (user.getPersonalPhoneIdentifiers() != null) {
+      s += "\\, " + user.getPersonalPhoneIdentifiers();
+    }
+    vEvent.getProperties().add(new Contact(s));
     try {
       if (StringUtils.isNotBlank(user.getEmail()) == true) {
         final ParameterList organizerParams = new ParameterList();
