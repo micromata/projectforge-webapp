@@ -270,7 +270,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
           dependentsMap.put(param.getParameter(), kost2DropDownChoice);
         } else if (ProjektDO.class.isAssignableFrom(param.getType()) == true) {
           final NewProjektSelectPanel projektSelectPanel = new NewProjektSelectPanel(fs.newChildId(), new UserPrefPropertyModel<ProjektDO>(
-              userPrefDao, param, "valueAsObject"), param.getParameter());
+              userPrefDao, param, "valueAsObject"), parentPage, param.getParameter());
           if (data.getArea() == UserPrefArea.PROJEKT_FAVORITE) {
             projektSelectPanel.setShowFavorites(false);
           }
