@@ -376,6 +376,15 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   }
 
   private void showICal() {
-    final String s = ICal4JUtils.getICal(getData());
+    //    final Mail msg = new Mail();
+    //    msg.setTo("werner.feder@t-online.de");
+    //    final String subject = "Einladung";
+    //    msg.setProjectForgeSubject(subject);
+    final String content = ICal4JUtils.getICal(getData());
+    //    msg.setContent(content);
+    //    msg.setContentType("calendar");
+    //    final SendMail sendMail = new SendMail();
+    //    sendMail.setConfigXml(ConfigXml.getInstance());
+    //    sendMail.send(msg);
   }
 }
