@@ -149,6 +149,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
   protected void init()
   {
     super.init();
+
     /* GRID8 - BLOCK */
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
@@ -216,16 +217,27 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       // project
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt")).suppressLabelForWarning();
       final NewProjektSelectPanel projektSelectPanel = new NewProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data,
-          "projekt"), "projektId");
-      fs.add(projektSelectPanel);
+          "projekt"), parentPage, "projektId");
+      projektSelectPanel.getTextField().add(new AjaxFormComponentUpdatingBehavior("change") {
+        @Override
+        protected void onUpdate(final AjaxRequestTarget target)
+        {
+          if (getData().getKundeId() == null && StringUtils.isBlank(getData().getKundeText()) == true) {
+            getData().setKunde(projektSelectPanel.getModelObject().getKunde());
+          }
+          target.add(kundeSelectPanel.getTextField());
+        }
+      });
       projektSelectPanel.init();
+      fs.add(projektSelectPanel);
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // customer
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde")).suppressLabelForWarning();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde")).suppressLabelForWarning(); //
       kundeSelectPanel = new NewCustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"), new PropertyModel<String>(
           data, "kundeText"), "kundeId");
+      kundeSelectPanel.getTextField().setOutputMarkupId(true);
       fs.add(kundeSelectPanel);
       kundeSelectPanel.init();
       fs.addHelpIcon(getString("fibu.auftrag.hint.kannVonProjektKundenAbweichen"));
