@@ -77,8 +77,10 @@ public class ContactEditForm extends AbstractEditForm<ContactDO, ContactEditPage
     contactEditSupport.addName();
     contactEditSupport.addFirstName();
     final FieldsetPanel fs = (FieldsetPanel)contactEditSupport.addFormOfAddress();
-    final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-    checkBoxPanel.addCheckBox(new PropertyModel<Boolean>(contactEditSupport.personalContact, "favoriteCard"), getString("favorite"),
+    //    final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+    //    checkBoxPanel.addCheckBox(new PropertyModel<Boolean>(contactEditSupport.personalContact, "favoriteCard"), getString("favorite"),
+    final DivPanel checkBoxPanel = fs.addNewCheckBoxButtonDiv();
+    checkBoxPanel.addCheckBoxButton(new PropertyModel<Boolean>(contactEditSupport.personalContact, "favoriteCard"), getString("favorite"),
         getString("address.tooltip.vCardList"));
     contactEditSupport.addTitle();
     contactEditSupport.addOrganization();
