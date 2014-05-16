@@ -81,9 +81,9 @@ public class NewProjektSelectPanel extends AbstractSelectPanel<ProjektDO> implem
    * @param caller
    * @param selectProperty
    */
-  public NewProjektSelectPanel(final String id, final IModel<ProjektDO> model, final String selectProperty)
+  public NewProjektSelectPanel(final String id, final IModel<ProjektDO> model, final ISelectCallerPage caller, final String selectProperty)
   {
-    this(id, model, null, selectProperty);
+    this(id, model, null, caller, selectProperty);
   }
 
   /**
@@ -93,9 +93,9 @@ public class NewProjektSelectPanel extends AbstractSelectPanel<ProjektDO> implem
    * @param selectProperty
    */
   @SuppressWarnings("serial")
-  public NewProjektSelectPanel(final String id, final IModel<ProjektDO> model, final String label, final String selectProperty)
+  public NewProjektSelectPanel(final String id, final IModel<ProjektDO> model, final String label, final ISelectCallerPage iCaller, final String selectProperty)
   {
-    super(id, model, null, selectProperty);
+    super(id, model, iCaller, selectProperty);
     projectTextField = new PFAutoCompleteTextField<ProjektDO>("projectField", getModel()) {
       @Override
       protected List<ProjektDO> getChoices(final String input)
@@ -164,6 +164,7 @@ public class NewProjektSelectPanel extends AbstractSelectPanel<ProjektDO> implem
               error(getString("panel.error.projectNotFound"));
             }
             getModel().setObject(project);
+
             return project;
           }
 
@@ -296,5 +297,13 @@ public class NewProjektSelectPanel extends AbstractSelectPanel<ProjektDO> implem
       return projektDao.getProjekt(kunde, kost2);
     }
     return null;
+  }
+
+  /**
+   * @return the projectTextField
+   */
+  public PFAutoCompleteTextField<ProjektDO> getTextField()
+  {
+    return projectTextField;
   }
 }
