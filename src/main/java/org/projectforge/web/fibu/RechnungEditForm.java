@@ -25,9 +25,12 @@ package org.projectforge.web.fibu;
 
 import java.math.BigDecimal;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.TextField;
@@ -74,6 +77,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     super(parentPage, data);
   }
 
+  @SuppressWarnings("serial")
   @Override
   protected void onInit()
   {
@@ -133,22 +137,33 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     }
     gridBuilder.newSubSplitPanel(GridSize.COL100);
     {
-      // Customer
-      final FieldsetPanel fs = gridBuilder.newFieldset(RechnungDO.class, "kunde");
-      customerSelectPanel = new NewCustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"),
-          new PropertyModel<String>(data, "kundeText"), "kundeId");
-      fs.add(customerSelectPanel);
-      customerSelectPanel.init();
-      fs.setLabelFor(customerSelectPanel.getKundeTextField());
-      fs.addHelpIcon(getString("fibu.rechnung.hint.kannVonProjektKundenAbweichen"));
-    }
-    {
       // Projekt
       final FieldsetPanel fs = gridBuilder.newFieldset(RechnungDO.class, "projekt").suppressLabelForWarning();
       final NewProjektSelectPanel projektSelectPanel = new NewProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data,
           "projekt"), parentPage, "projektId");
-      fs.add(projektSelectPanel);
+      projektSelectPanel.getTextField().add(new AjaxFormComponentUpdatingBehavior("change") {
+        @Override
+        protected void onUpdate(final AjaxRequestTarget target)
+        {
+          if (getData().getKundeId() == null && StringUtils.isBlank(getData().getKundeText()) == true) {
+            getData().setKunde(projektSelectPanel.getModelObject().getKunde());
+          }
+          target.add(customerSelectPanel.getTextField());
+        }
+      });
       projektSelectPanel.init();
+      fs.add(projektSelectPanel);
+    }
+    {
+      // Customer
+      final FieldsetPanel fs = gridBuilder.newFieldset(RechnungDO.class, "kunde");
+      customerSelectPanel = new NewCustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"),
+          new PropertyModel<String>(data, "kundeText"), "kundeId");
+      customerSelectPanel.getTextField().setOutputMarkupId(true);
+      fs.add(customerSelectPanel);
+      customerSelectPanel.init();
+      fs.setLabelFor(customerSelectPanel.getKundeTextField());
+      fs.addHelpIcon(getString("fibu.rechnung.hint.kannVonProjektKundenAbweichen"));
     }
   }
 
