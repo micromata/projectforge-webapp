@@ -23,6 +23,10 @@
 
 package org.projectforge.plugins.teamcal.event;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -35,7 +39,10 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.DateHelper;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.core.ModificationStatus;
+import org.projectforge.mail.Mail;
+import org.projectforge.mail.SendMail;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarPage;
 import org.projectforge.registry.Registry;
 import org.projectforge.timesheet.TimesheetDO;
@@ -274,7 +281,6 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
 
     getData().setRecurrence(form.recurrenceData);
     if (recurrencyChangeType == null || recurrencyChangeType == RecurrencyChangeType.ALL) {
-      showICal();
       return null;
     }
     final Integer masterId = getData().getId(); // Store the id of the master entry.
@@ -283,12 +289,10 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
     final TeamEventDO masterEvent = teamEventDao.getById(masterId);
     if (masterEvent == null) {
       log.error("masterEvent is null?! Do nothing more after saving team event.");
-      showICal();
       return null;
     }
     if (eventOfCaller == null) {
       log.error("eventOfCaller is null?! Do nothing more after saving team event.");
-      showICal();
       return null;
     }
     form.setData(masterEvent);
@@ -302,7 +306,6 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       }
       form.recurrenceData.setUntil(recurrenceUntil); // Minus 24 hour.
       getData().setRecurrence(form.recurrenceData);
-      showICal();
       return null;
     } else if (recurrencyChangeType == RecurrencyChangeType.ONLY_CURRENT) { // only current date
       // Add current date to the master date as exclusion date and save this event (without recurrence settings).
@@ -317,10 +320,8 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
             + masterEvent.getRecurrenceExDate());
         log.debug("The new event is: " + newEvent);
       }
-      showICal();
       return null;
     }
-    showICal();
     return null;
   }
 
@@ -334,6 +335,17 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       newEvent.setExternalUid(null); // Avoid multiple usage of external uids.
       teamEventDao.save(newEvent);
     }
+    return null;
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractEditPage#afterSaveOrUpdate()
+   */
+  @Override
+  public AbstractSecuredBasePage afterSaveOrUpdate()
+  {
+    super.afterSaveOrUpdate();
+    sendIcsFile();
     return null;
   }
 
@@ -375,16 +387,52 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
     return new TeamEventEditForm(this, data);
   }
 
-  private void showICal() {
-    //    final Mail msg = new Mail();
-    //    msg.setTo("werner.feder@t-online.de");
-    //    final String subject = "Einladung";
-    //    msg.setProjectForgeSubject(subject);
+  private void sendIcsFile() {
+    final String workdir ="tmp/";
+    final String[] attachmentfiles = new String[1];
+    attachmentfiles[0] = getData().getUid() + ".ics";
     final String content = ICal4JUtils.getICal(getData());
-    //    msg.setContent(content);
-    //    msg.setContentType("calendar");
-    //    final SendMail sendMail = new SendMail();
-    //    sendMail.setConfigXml(ConfigXml.getInstance());
-    //    sendMail.send(msg);
+    if (writeIcsFile(content, workdir, attachmentfiles ) == false) {
+      log.error("Can't write attachmentfile: " + attachmentfiles[0]);
+      return;
+    }
+    final Mail msg = new Mail();
+    msg.setProjectForgeSubject("Einladung");
+    msg.setContent(content);
+    msg.setContentType(Mail.CONTENTTYPE_TEXT);
+    final SendMail sendMail = new SendMail();
+    sendMail.setConfigXml(ConfigXml.getInstance());
+    for (final TeamEventAttendeeDO attendee : getData().getAttendees()) {
+      if (attendee.getUserId() == null) {
+        msg.setTo(attendee.getUrl());
+        sendMail.send(msg, workdir, attachmentfiles);
+      } else {
+        if (attendee.getUser().equals(PFUserContext.getUser()) == false) {
+          msg.setTo(attendee.getUser());
+          sendMail.send(msg, workdir, attachmentfiles);
+        }
+      }
+    }
   }
+
+  private boolean writeIcsFile(final String content, final String workdir, final String[]attachmentfiles) {
+    PrintWriter pWriter = null;
+    boolean success = true;
+    for (int i=0; i < attachmentfiles.length; i++) {
+      try {
+        pWriter = new PrintWriter(new BufferedWriter(new FileWriter(workdir + attachmentfiles[i])));
+        pWriter.println(content);
+      } catch (final IOException ioe) {
+        ioe.printStackTrace();
+        success = false;
+      } finally {
+        if (pWriter != null){
+          pWriter.flush();
+          pWriter.close();
+        }
+      }
+    }
+    return success;
+  }
+
 }
