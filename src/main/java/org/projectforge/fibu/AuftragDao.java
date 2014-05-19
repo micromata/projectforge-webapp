@@ -558,7 +558,7 @@ public class AuftragDao extends BaseDao<AuftragDO>
     final String content = sendMail.renderGroovyTemplate(msg, "mail/orderChangeNotification.html", data, contactPerson);
     msg.setContent(content);
     msg.setContentType(Mail.CONTENTTYPE_HTML);
-    return sendMail.send(msg);
+    return sendMail.send(msg, null, null);
   }
 
   /**
