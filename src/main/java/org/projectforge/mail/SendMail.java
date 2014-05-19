@@ -23,16 +23,21 @@
 
 package org.projectforge.mail;
 
+import java.io.File;
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
@@ -63,18 +68,20 @@ public class SendMail
    * Get the ProjectForge standard subject: "[ProjectForge] ..."
    * @param subject
    */
-  public static String getProjectForgeSubject(String subject)
+  public static String getProjectForgeSubject(final String subject)
   {
     return STANDARD_SUBJECT_PREFIX + subject;
   }
 
   /**
    * @param composedMessage
+   * @param workdir
+   * @param attachmentfiles
    * @return true for successful sending, otherwise an exception will be thrown.
    * @throws UserException if to address is not given.
    * @throws InternalErrorException due to technical failures.
    */
-  public boolean send(final Mail composedMessage)
+  public boolean send(final Mail composedMessage, final String workdir, final String[] attachmentfiles)
   {
     final String to = composedMessage.getTo();
     if (to == null || to.trim().length() == 0) {
@@ -85,12 +92,16 @@ public class SendMail
       log.error("No e-mail host configured. E-Mail not sent: " + composedMessage.toString());
       return false;
     }
+    if ( (StringUtils.isBlank(workdir) == true && attachmentfiles != null) || (StringUtils.isNotBlank(workdir) == true && attachmentfiles == null) ) {
+      log.error("Either workdir or attachmentfiles == null. Can't send attachmentfiles.");
+      return false;
+    }
     log.info("Try to send email to " + to);
     // Get a Session object
 
     if (properties == null) {
       properties = new Properties();
-      String protocol = sendMailConfig.getProtocol();
+      final String protocol = sendMailConfig.getProtocol();
       properties.put("mail.from", sendMailConfig.getFrom());
       properties.put("mail.mime.charset", "UTF-8");
       properties.put("mail.transport.protocol", sendMailConfig.getProtocol());
@@ -104,17 +115,21 @@ public class SendMail
       @Override
       public void run()
       {
-       sendIt(composedMessage);
+        if (StringUtils.isNotBlank(workdir) == true) {
+          sendIt(composedMessage, workdir, attachmentfiles);
+        } else {
+          sendIt(composedMessage);
+        }
       }
     }.start();
     return true;
   }
-  
+
   private void sendIt(final Mail composedMessage) {
     final Session session = Session.getInstance(properties);
     Transport transport = null;
     try {
-      MimeMessage message = new MimeMessage(session);
+      final MimeMessage message = new MimeMessage(session);
       if (composedMessage.getFrom() != null) {
         message.setFrom(new InternetAddress(composedMessage.getFrom()));
       } else {
@@ -142,20 +157,97 @@ public class SendMail
         transport.connect();
       }
       transport.sendMessage(message, message.getAllRecipients());
-    } catch (MessagingException ex) {
+    } catch (final MessagingException ex) {
       log.error("While creating and sending message: " + composedMessage.toString(), ex);
       throw new InternalErrorException("mail.error.exception");
     } finally {
       if (transport != null) {
         try {
           transport.close();
-        } catch (MessagingException ex) {
+        } catch (final MessagingException ex) {
           log.error("While creating and sending message: " + composedMessage.toString(), ex);
           throw new InternalErrorException("mail.error.exception");
         }
       }
     }
     log.info("E-Mail successfully sent: " + composedMessage.toString());
+  }
+
+  private void sendIt(final Mail composedMessage, final String workdir, final String[] attachmentfiles) {
+    final Session session = Session.getInstance(properties);
+    Transport transport = null;
+    try {
+      final MimeMessage message = new MimeMessage(session);
+      if (composedMessage.getFrom() != null) {
+        message.setFrom(new InternetAddress(composedMessage.getFrom()));
+      } else {
+        message.setFrom();
+      }
+      message.setRecipients(Message.RecipientType.TO, composedMessage.getTo());
+      String subject;
+      subject = composedMessage.getSubject();
+      message.setSubject(subject, sendMailConfig.getCharset());
+      message.setSentDate(new Date());
+      // create and fill the first message part
+      final MimeBodyPart mbp1 = new MimeBodyPart();
+      String type ="text/";
+      if (StringUtils.isNotBlank(composedMessage.getContentType()) == true) {
+        type += composedMessage.getContentType();
+        type += "; charset=";
+        type += composedMessage.getCharset();
+      } else {
+        type = "text/html; charset=";
+        type += sendMailConfig.getCharset();
+      }
+      mbp1.setContent(composedMessage.getContent(), type);
+      mbp1.setHeader("Content-Transfer-Encoding", "8bit");
+      // create the Multipart and its parts to it
+      final MimeMultipart mp = new MimeMultipart();
+      mp.addBodyPart(mbp1);
+      if (attachmentfiles != null && attachmentfiles.length > 0) {
+        // create an Array of message parts for Attachments
+        final MimeBodyPart mbp[] = new MimeBodyPart[attachmentfiles.length];
+        for (int i=0; i < attachmentfiles.length; i++) {
+          // create the next message part
+          mbp[i] = new MimeBodyPart();
+          // attach the file to the message
+          final FileDataSource fds=
+              new FileDataSource(workdir + attachmentfiles[i]);
+          mbp[i].setDataHandler( new DataHandler(fds));
+          mbp[i].setFileName(attachmentfiles[i]);
+          mp.addBodyPart(mbp[i]);
+        }
+      }
+      // add the Multipart to the message
+      message.setContent(mp);
+      message.saveChanges(); // don't forget this
+      transport = session.getTransport();
+      if (StringUtils.isNotEmpty(sendMailConfig.getUser()) == true) {
+        transport.connect(sendMailConfig.getUser(), sendMailConfig.getPassword());
+      } else {
+        transport.connect();
+      }
+      transport.sendMessage(message, message.getAllRecipients());
+    } catch (final MessagingException ex) {
+      log.error("While creating and sending message: " + composedMessage.toString(), ex);
+      throw new InternalErrorException("mail.error.exception");
+    } finally {
+      if (transport != null) {
+        try {
+          transport.close();
+        } catch (final MessagingException ex) {
+          log.error("While creating and sending message: " + composedMessage.toString(), ex);
+          throw new InternalErrorException("mail.error.exception");
+        }
+      }
+    }
+    log.info("E-Mail successfully sent: " + composedMessage.toString());
+    for (int i=0; i < attachmentfiles.length; i++) {
+      final File file = new File(workdir + attachmentfiles[i]);
+      if (file.exists() == true) {
+        file.delete();
+      }
+    }
   }
 
   /**
