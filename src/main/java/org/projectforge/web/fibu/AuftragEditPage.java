@@ -23,6 +23,7 @@
 
 package org.projectforge.web.fibu;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -33,6 +34,7 @@ import org.projectforge.core.ModificationStatus;
 import org.projectforge.fibu.AuftragDO;
 import org.projectforge.fibu.AuftragDao;
 import org.projectforge.fibu.AuftragsPositionDO;
+import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.ProjektDao;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.web.wicket.AbstractEditPage;
@@ -80,7 +82,25 @@ public class AuftragEditPage extends AbstractEditPage<AuftragDO, AuftragEditForm
    */
   public void select(final String property, final Object selectedValue)
   {
-    if (property.startsWith("taskId:") == true) {
+    if ("projektId".equals(property) == true) {
+      auftragDao.setProjekt(getData(), (Integer) selectedValue);
+      this.form.projektSelectPanel.getTextField().clearInput();
+      if (getData().getProjektId() != null && getData().getProjektId() >= 0 && getData().getKundeId() == null) {
+        if (StringUtils.isBlank(form.kundeSelectPanel.getKundeTextInput()) == true) {
+          // User has selected a project and the kunde is not set:
+          final ProjektDO projekt = projektDao.getById(getData().getProjektId());
+          if (projekt != null) {
+            auftragDao.setKunde(getData(), projekt.getKundeId());
+            this.form.kundeSelectPanel.getTextField().clearInput();
+          }
+        }
+      }
+    } else if ("kundeId".equals(property) == true) {
+      auftragDao.setKunde(getData(), (Integer) selectedValue);
+    } else if ("contactPersonId".equals(property) == true) {
+      auftragDao.setContactPerson(getData(), (Integer) selectedValue);
+      setSendEMailNotification();
+    } else if (property.startsWith("taskId:") == true) {
       final Short number = NumberHelper.parseShort(property.substring(property.indexOf(':') + 1));
       final AuftragsPositionDO pos = getData().getPosition(number);
       auftragDao.setTask(pos, (Integer) selectedValue);
@@ -101,7 +121,15 @@ public class AuftragEditPage extends AbstractEditPage<AuftragDO, AuftragEditForm
    */
   public void unselect(final String property)
   {
-    if (property.startsWith("taskId:") == true) {
+    if ("projektId".equals(property) == true) {
+      getData().setProjekt(null);
+      this.form.projektSelectPanel.getTextField().clearInput();
+    } else if ("kundeId".equals(property) == true) {
+      getData().setKunde(null);
+    } else if ("contactPersonId".equals(property) == true) {
+      getData().setContactPerson(null);
+      setSendEMailNotification();
+    } else if (property.startsWith("taskId:") == true) {
       final Short number = NumberHelper.parseShort(property.substring(property.indexOf(':') + 1));
       final AuftragsPositionDO pos = getData().getPosition(number);
       pos.setTask(null);

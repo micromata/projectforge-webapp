@@ -129,6 +129,8 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
 
   private PaymentSchedulePanel paymentSchedulePanel;
 
+  protected NewProjektSelectPanel projektSelectPanel;
+
   public AuftragEditForm(final AuftragEditPage parentPage, final AuftragDO data)
   {
     super(parentPage, data);
@@ -216,7 +218,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
     {
       // project
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt")).suppressLabelForWarning();
-      final NewProjektSelectPanel projektSelectPanel = new NewProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data,
+      projektSelectPanel = new NewProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data,
           "projekt"), parentPage, "projektId");
       projektSelectPanel.getTextField().add(new AjaxFormComponentUpdatingBehavior("change") {
         @Override
@@ -229,12 +231,13 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         }
       });
       projektSelectPanel.init();
+      //      ajaxUpdateComponents.add(projektSelectPanel.getTextField());
       fs.add(projektSelectPanel);
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // customer
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde")).suppressLabelForWarning(); //
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde")).suppressLabelForWarning();
       kundeSelectPanel = new NewCustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"), new PropertyModel<String>(
           data, "kundeText"), "kundeId");
       kundeSelectPanel.getTextField().setOutputMarkupId(true);

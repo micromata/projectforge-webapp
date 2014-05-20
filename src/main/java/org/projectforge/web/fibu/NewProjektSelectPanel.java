@@ -29,6 +29,7 @@ import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
@@ -38,10 +39,15 @@ import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.KundeDao;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.ProjektDao;
+import org.projectforge.fibu.ProjektFavorite;
 import org.projectforge.fibu.ProjektFormatter;
+import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.user.UserPreferencesHelper;
 import org.projectforge.web.wicket.AbstractSelectPanel;
+import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
+import org.projectforge.web.wicket.components.FavoritesChoicePanel;
+import org.projectforge.web.wicket.components.TooltipImage;
 import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
 
 /**
@@ -145,7 +151,6 @@ public class NewProjektSelectPanel extends AbstractSelectPanel<ProjektDO> implem
       /**
        * @see org.apache.wicket.Component#getConverter(java.lang.Class)
        */
-
       @SuppressWarnings({ "unchecked", "rawtypes"})
       @Override
       public <C> IConverter<C> getConverter(final Class<C> type)
@@ -195,11 +200,84 @@ public class NewProjektSelectPanel extends AbstractSelectPanel<ProjektDO> implem
   }
 
   @Override
+  @SuppressWarnings("serial")
   public NewProjektSelectPanel init()
   {
     super.init();
     add(projectTextField);
+    final SubmitLink selectButton = new SubmitLink("select") {
+      @Override
+      public void onSubmit()
+      {
+        setResponsePage(new ProjektListPage(caller, selectProperty));
+      };
+    };
+
+    selectButton.setDefaultFormProcessing(false);
+    add(selectButton);
+    final boolean hasSelectAccess = projektDao.hasLoggedInUserSelectAccess(false);
+    if (hasSelectAccess == false) {
+      selectButton.setVisible(false);
+    }
+    selectButton.add(new TooltipImage("selectHelp", WebConstants.IMAGE_PROJEKT_SELECT, getString("fibu.tooltip.selectProjekt")));
+    final SubmitLink unselectButton = new SubmitLink("unselect") {
+      @Override
+      public void onSubmit()
+      {
+        caller.unselect(selectProperty);
+      }
+
+      @Override
+      public boolean isVisible()
+      {
+        return hasSelectAccess == true && isRequired() == false && NewProjektSelectPanel.this.getModelObject() != null;
+      }
+    };
+
+    unselectButton.setDefaultFormProcessing(false);
+    add(unselectButton);
+    unselectButton.add(new TooltipImage("unselectHelp", WebConstants.IMAGE_PROJEKT_UNSELECT, getString("fibu.tooltip.unselectProjekt")));
+    // DropDownChoice favorites
+    final FavoritesChoicePanel<ProjektDO, ProjektFavorite> favoritesPanel = new FavoritesChoicePanel<ProjektDO, ProjektFavorite>(
+        "favorites", UserPrefArea.PROJEKT_FAVORITE, tabIndex, "select half") {
+      @Override
+      protected void select(final ProjektFavorite favorite)
+      {
+        if (favorite.getProjekt() != null) {
+          NewProjektSelectPanel.this.selectProjekt(favorite.getProjekt());
+        }
+      }
+
+      @Override
+      protected ProjektDO getCurrentObject()
+      {
+        return NewProjektSelectPanel.this.getModelObject();
+      }
+
+      @Override
+      protected ProjektFavorite newFavoriteInstance(final ProjektDO currentObject)
+      {
+        final ProjektFavorite favorite = new ProjektFavorite();
+        favorite.setProjekt(currentObject);
+        return favorite;
+      }
+    };
+    add(favoritesPanel);
+    favoritesPanel.init();
+    if (showFavorites == false) {
+      favoritesPanel.setVisible(false);
+    }
     return this;
+  }
+
+  /**
+   * Will be called if the user has chosen an entry of the projekt favorites drop down choice.
+   * @param projekt
+   */
+  protected void selectProjekt(final ProjektDO projekt)
+  {
+    setModelObject(projekt);
+    caller.select(selectProperty, projekt.getId());
   }
 
   public NewProjektSelectPanel withAutoSubmit(final boolean autoSubmit)
@@ -306,4 +384,5 @@ public class NewProjektSelectPanel extends AbstractSelectPanel<ProjektDO> implem
   {
     return projectTextField;
   }
+
 }
