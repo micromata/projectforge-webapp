@@ -97,6 +97,7 @@ public class AuftragEditPage extends AbstractEditPage<AuftragDO, AuftragEditForm
       }
     } else if ("kundeId".equals(property) == true) {
       auftragDao.setKunde(getData(), (Integer) selectedValue);
+      this.form.kundeSelectPanel.getTextField().clearInput();
     } else if ("contactPersonId".equals(property) == true) {
       auftragDao.setContactPerson(getData(), (Integer) selectedValue);
       setSendEMailNotification();
@@ -126,6 +127,7 @@ public class AuftragEditPage extends AbstractEditPage<AuftragDO, AuftragEditForm
       this.form.projektSelectPanel.getTextField().clearInput();
     } else if ("kundeId".equals(property) == true) {
       getData().setKunde(null);
+      this.form.kundeSelectPanel.getTextField().clearInput();
     } else if ("contactPersonId".equals(property) == true) {
       getData().setContactPerson(null);
       setSendEMailNotification();

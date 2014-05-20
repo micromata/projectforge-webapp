@@ -278,7 +278,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
           projektSelectPanel.init();
         } else if (KundeDO.class.isAssignableFrom(param.getType()) == true) {
           final NewCustomerSelectPanel kundeSelectPanel = new NewCustomerSelectPanel(fs.newChildId(), new UserPrefPropertyModel<KundeDO>(
-              userPrefDao, param, "valueAsObject"), null, param.getParameter());
+              userPrefDao, param, "valueAsObject"), null, parentPage, param.getParameter());
           if (data.getArea() == UserPrefArea.KUNDE_FAVORITE) {
             kundeSelectPanel.setShowFavorites(false);
           }

@@ -158,7 +158,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
       // Customer
       final FieldsetPanel fs = gridBuilder.newFieldset(RechnungDO.class, "kunde");
       customerSelectPanel = new NewCustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"),
-          new PropertyModel<String>(data, "kundeText"), "kundeId");
+          new PropertyModel<String>(data, "kundeText"), parentPage, "kundeId");
       customerSelectPanel.getTextField().setOutputMarkupId(true);
       fs.add(customerSelectPanel);
       customerSelectPanel.init();

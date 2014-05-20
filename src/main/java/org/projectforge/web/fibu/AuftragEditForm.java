@@ -239,7 +239,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       // customer
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde")).suppressLabelForWarning();
       kundeSelectPanel = new NewCustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"), new PropertyModel<String>(
-          data, "kundeText"), "kundeId");
+          data, "kundeText"), parentPage, "kundeId");
       kundeSelectPanel.getTextField().setOutputMarkupId(true);
       fs.add(kundeSelectPanel);
       kundeSelectPanel.init();
