@@ -67,6 +67,8 @@ public class Kost2EditForm extends AbstractEditForm<Kost2DO, Kost2EditPage>
 
   protected TextField<Integer> kost2ArtField;
 
+  protected NewProjektSelectPanel projektSelectPanel;
+
   public Kost2EditForm(final Kost2EditPage parentPage, final Kost2DO data)
   {
     super(parentPage, data);
@@ -81,7 +83,7 @@ public class Kost2EditForm extends AbstractEditForm<Kost2DO, Kost2EditPage>
     {
       // Project
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt"));
-      final NewProjektSelectPanel projektSelectPanel = new NewProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data,
+      projektSelectPanel = new NewProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data,
           "projekt"), parentPage,"projektId");
       fs.add(projektSelectPanel);
       projektSelectPanel.init();

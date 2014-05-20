@@ -110,6 +110,8 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
 
   private FormComponent< ? >[] dependentEntryFormComponentsArray;
 
+  protected List<NewProjektSelectPanel> projektSelectPanels = new ArrayList<NewProjektSelectPanel>();
+
   public HRPlanningEditForm(final HRPlanningEditPage parentPage, final HRPlanningDO data)
   {
     super(parentPage, data);
@@ -320,6 +322,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
       // Ensure that at least one entry is available:
       data.addEntry(new HRPlanningEntryDO());
     }
+    projektSelectPanels.clear();
     int idx = -1;
     dependentEntryFormComponents.clear();
     dependentEntryFormComponentsArray = null;
@@ -361,6 +364,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
         fs.add(projektSelectPanel);
         projektSelectPanel.init();
         dependentEntryFormComponents.add(projektSelectPanel);
+        projektSelectPanels.add(projektSelectPanel);
 
         final Button button = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("deleteUndelete")) {
           @Override

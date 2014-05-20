@@ -70,7 +70,9 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
 
   private DropDownChoice<RechnungStatus> statusChoice;
 
-  private NewCustomerSelectPanel customerSelectPanel;
+  protected NewCustomerSelectPanel customerSelectPanel;
+
+  protected NewProjektSelectPanel projektSelectPanel;
 
   public RechnungEditForm(final RechnungEditPage parentPage, final RechnungDO data)
   {
@@ -139,7 +141,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     {
       // Projekt
       final FieldsetPanel fs = gridBuilder.newFieldset(RechnungDO.class, "projekt").suppressLabelForWarning();
-      final NewProjektSelectPanel projektSelectPanel = new NewProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data,
+      projektSelectPanel = new NewProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data,
           "projekt"), parentPage, "projektId");
       projektSelectPanel.getTextField().add(new AjaxFormComponentUpdatingBehavior("change") {
         @Override

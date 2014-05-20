@@ -154,6 +154,9 @@ public class ToDoEditPage extends AbstractEditPage<ToDoDO, ToDoEditForm, ToDoDao
   {
     if ("taskId".equals(property) == true) {
       toDoDao.setTask(getData(), (Integer) selectedValue);
+    } else if ("groupId".equals(property) == true) {
+      toDoDao.setGroup(getData(), (Integer) selectedValue);
+      form.groupSelectPanel.getTextField().modelChanged();
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }
@@ -166,6 +169,9 @@ public class ToDoEditPage extends AbstractEditPage<ToDoDO, ToDoEditForm, ToDoDao
   {
     if ("taskId".equals(property) == true) {
       getData().setTask(null);
+    } else if ("groupId".equals(property) == true) {
+      getData().setGroup(null);
+      form.groupSelectPanel.getTextField().modelChanged();
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }

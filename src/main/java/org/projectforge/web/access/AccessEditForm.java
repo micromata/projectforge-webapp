@@ -43,6 +43,8 @@ public class AccessEditForm extends AbstractEditForm<GroupTaskAccessDO, AccessEd
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AccessEditForm.class);
 
+  protected NewGroupSelectPanel groupSelectPanel;
+
   public AccessEditForm(final AccessEditPage parentPage, final GroupTaskAccessDO data)
   {
     super(parentPage, data);
@@ -64,7 +66,7 @@ public class AccessEditForm extends AbstractEditForm<GroupTaskAccessDO, AccessEd
     {
       // Group
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("group")).suppressLabelForWarning();
-      final NewGroupSelectPanel groupSelectPanel = new NewGroupSelectPanel(fs.newChildId(), new PropertyModel<GroupDO>(data, "group"),
+      groupSelectPanel = new NewGroupSelectPanel(fs.newChildId(), new PropertyModel<GroupDO>(data, "group"),
           parentPage, "groupId");
       fs.add(groupSelectPanel.setRequired(true));
       groupSelectPanel.init();

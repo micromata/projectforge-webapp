@@ -49,6 +49,8 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
   @SpringBean(name = "taskTree")
   private TaskTree taskTree;
 
+  protected NewGroupSelectPanel groupSelectPanel;
+
   @SuppressWarnings("serial")
   @Override
   protected void init()
@@ -58,7 +60,7 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
     {
       // Group
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("group")).suppressLabelForWarning();
-      final NewGroupSelectPanel groupSelectPanel = new NewGroupSelectPanel(fs.newChildId(), new Model<GroupDO>() {
+      groupSelectPanel = new NewGroupSelectPanel(fs.newChildId(), new Model<GroupDO>() {
         @Override
         public GroupDO getObject()
         {

@@ -98,10 +98,12 @@ public class ProjektEditPage extends AbstractEditPage<ProjektDO, ProjektEditForm
   {
     if ("kundeId".equals(property) == true) {
       projektDao.setKunde(getData(), (Integer) selectedValue);
+      form.kundeSelectPanel.getTextField().modelChanged();;
     } else if ("taskId".equals(property) == true) {
       projektDao.setTask(getData(), (Integer) selectedValue);
     } else if ("projektManagerGroupId".equals(property) == true) {
       projektDao.setProjektManagerGroup(getData(), (Integer) selectedValue);
+      form.groupSelectPanel.getTextField().modelChanged();
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }
@@ -111,10 +113,12 @@ public class ProjektEditPage extends AbstractEditPage<ProjektDO, ProjektEditForm
   {
     if ("kundeId".equals(property) == true) {
       getData().setKunde(null);
+      form.kundeSelectPanel.getTextField().modelChanged();
     } else if ("taskId".equals(property) == true) {
       getData().setTask(null);
     } else if ("projektManagerGroupId".equals(property) == true) {
       getData().setProjektManagerGroup(null);
+      form.groupSelectPanel.getTextField().modelChanged();
     } else {
       log.error("Property '" + property + "' not supported for unselection.");
     }
