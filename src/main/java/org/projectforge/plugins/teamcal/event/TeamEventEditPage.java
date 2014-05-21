@@ -397,17 +397,19 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       return;
     }
     final Mail msg = new Mail();
-    msg.setProjectForgeSubject("Einladung");
-    msg.setContent(content);
-    msg.setContentType(Mail.CONTENTTYPE_TEXT);
+    msg.setProjectForgeSubject(composeSubject());
+
+    msg.setContentType(Mail.CONTENTTYPE_HTML);
     final SendMail sendMail = new SendMail();
     sendMail.setConfigXml(ConfigXml.getInstance());
     for (final TeamEventAttendeeDO attendee : getData().getAttendees()) {
       if (attendee.getUserId() == null) {
+        msg.setContent(composeContent(attendee.getId()));
         msg.setTo(attendee.getUrl());
         sendMail.send(msg, workdir, attachmentfiles);
       } else {
         if (attendee.getUser().equals(PFUserContext.getUser()) == false) {
+          msg.setContent(composeContent(attendee.getId()));
           msg.setTo(attendee.getUser());
           sendMail.send(msg, workdir, attachmentfiles);
         }
@@ -435,4 +437,43 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
     return success;
   }
 
+  private String composeSubject() {
+    String s = PFUserContext.getUser().getFullname();
+    s += " " + getString("plugins.teamcal.event.subject1");
+    s += " „" + getData().getSubject() + "“ ";
+    s += getString("plugins.teamcal.event.subject2");
+    return s;
+  }
+
+  private String composeContent(final Integer number) {
+    String s= "<html><body><h2>" + composeSubject() +"</h2>";
+    s += "<table>";
+    s += "<tr>";
+    s += "<td>" + getString("plugins.teamcal.event.event") + "</td>";
+    s += "<td>" +  getData().getStartDate() + " - " + getData().getEndDate() + "</td>";
+    s += "</tr>";
+    s += "<tr>";
+    s += "<td>" + getString("plugins.teamcal.event.location") + "</td>";
+    s += "<td>" + getData().getLocation() + "</td>";
+    s += "</tr>";
+    s += "<tr>";
+    s += "<td>" + getString("plugins.teamcal.attendees") + "</td>";
+    s += "<td>" + PFUserContext.getUser().getFullname() + " " + getString("plugins.teamcal.event.andyou") + "</td>";
+    s += "</tr>";
+    s += "<tr>";
+    s += "<td></td>";
+    s += "<td>" + "<a href=\"http://localhost:8080/ProjectForge/Calendar/Event/?e=" + getData().getUid() + "&p=p" + number.toString() + "\">" + getString("plugins.teamcal.event.showreplies") + "</a></td>";
+    s += "</tr>";
+    s += "</table>";
+    s += "<table>";
+    s += "<tr>";
+    s += "<td>" + "<a href=\"http://localhost:8080/ProjectForge/Calendar/Eventreply/?e=" + getData().getUid() + "&p=p" + number.toString() + "&r=accept\">" + getString("plugins.teamcal.event.accept") + "</a></td>";
+    s += "<td>" + "<a href=\"http://localhost:8080/ProjectForge/Calendar/Eventreply/?e=" + getData().getUid() + "&p=p" + number.toString() + "&r=decline\">" + getString("plugins.teamcal.event.decline") + "</a></td>";
+    s += "<td>" + "<a href=\"http://localhost:8080/ProjectForge/Calendar/Eventreply/?e=" + getData().getUid() + "&p=p" + number.toString() + "&r=tentative\">" + getString("plugins.teamcal.event.tentative") + "</a></td>";
+    s += "</tr>";
+    s += "</table>";
+    s += "</body>";
+    s += "</html>";
+    return s;
+  }
 }
