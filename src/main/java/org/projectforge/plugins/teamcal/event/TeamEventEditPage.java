@@ -23,10 +23,6 @@
 
 package org.projectforge.plugins.teamcal.event;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -37,12 +33,8 @@ import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.DateHelper;
-import org.projectforge.core.ConfigXml;
 import org.projectforge.core.ModificationStatus;
-import org.projectforge.mail.Mail;
-import org.projectforge.mail.SendMail;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarPage;
 import org.projectforge.registry.Registry;
 import org.projectforge.timesheet.TimesheetDO;
@@ -78,7 +70,9 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   /**
    * Used for recurrence events in {@link #onSaveOrUpdate()} and {@link #afterSaveOrUpdate()}
    */
-  private TeamEventDO newEvent;
+  private TeamEventDO newEvent, orgEvent;
+
+  private boolean isNew = false;
 
   /**
    * @param parameters
@@ -87,6 +81,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   {
     super(parameters, "plugins.teamcal.event");
     super.init();
+    orgEvent = null;
   }
 
   /**
@@ -165,6 +160,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   {
     super.init(data);
     if (isNew() == false) {
+      orgEvent = data;
       @SuppressWarnings("serial")
       final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(),
           new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
@@ -192,6 +188,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       addContentMenuEntry(menu);
     }
     if (isNew() == true) {
+      orgEvent = null;
       @SuppressWarnings("serial")
       final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new SubmitLink(
           ContentMenuEntryPanel.LINK_ID, form) {
@@ -248,6 +245,9 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   public AbstractSecuredBasePage onDelete()
   {
     super.onDelete();
+    final TeamEventMailer mailer = new TeamEventMailer();
+    mailer.send(getData(), orgEvent, TeamEventMailer.REJECTION);
+
     if (recurrencyChangeType == null || recurrencyChangeType == RecurrencyChangeType.ALL) {
       return null;
     }
@@ -277,6 +277,10 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       final TeamEventAttendeeDO attendee = new TeamEventAttendeeDO();
       attendee.setUser(PFUserContext.getUser()).setStatus(TeamAttendeeStatus.ACCEPTED);
       getData().getAttendees().add(attendee);
+    }
+
+    if (isNew()) {
+      isNew = true;
     }
 
     getData().setRecurrence(form.recurrenceData);
@@ -345,7 +349,12 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   public AbstractSecuredBasePage afterSaveOrUpdate()
   {
     super.afterSaveOrUpdate();
-    sendIcsFile();
+    final TeamEventMailer mailer = new TeamEventMailer();
+    if (isNew == true) {
+      mailer.send(getData(), orgEvent, TeamEventMailer.INVITATION);
+    } else {
+      mailer.send(getData(), orgEvent, TeamEventMailer.UPDATE);
+    }
     return null;
   }
 
@@ -387,93 +396,4 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
     return new TeamEventEditForm(this, data);
   }
 
-  private void sendIcsFile() {
-    final String workdir ="tmp/";
-    final String[] attachmentfiles = new String[1];
-    attachmentfiles[0] = getData().getUid() + ".ics";
-    final String content = ICal4JUtils.getICal(getData());
-    if (writeIcsFile(content, workdir, attachmentfiles ) == false) {
-      log.error("Can't write attachmentfile: " + attachmentfiles[0]);
-      return;
-    }
-    final Mail msg = new Mail();
-    msg.setProjectForgeSubject(composeSubject());
-
-    msg.setContentType(Mail.CONTENTTYPE_HTML);
-    final SendMail sendMail = new SendMail();
-    sendMail.setConfigXml(ConfigXml.getInstance());
-    for (final TeamEventAttendeeDO attendee : getData().getAttendees()) {
-      if (attendee.getUserId() == null) {
-        msg.setContent(composeContent(attendee.getId()));
-        msg.setTo(attendee.getUrl());
-        sendMail.send(msg, workdir, attachmentfiles);
-      } else {
-        if (attendee.getUser().equals(PFUserContext.getUser()) == false) {
-          msg.setContent(composeContent(attendee.getId()));
-          msg.setTo(attendee.getUser());
-          sendMail.send(msg, workdir, attachmentfiles);
-        }
-      }
-    }
-  }
-
-  private boolean writeIcsFile(final String content, final String workdir, final String[]attachmentfiles) {
-    PrintWriter pWriter = null;
-    boolean success = true;
-    for (int i=0; i < attachmentfiles.length; i++) {
-      try {
-        pWriter = new PrintWriter(new BufferedWriter(new FileWriter(workdir + attachmentfiles[i])));
-        pWriter.println(content);
-      } catch (final IOException ioe) {
-        ioe.printStackTrace();
-        success = false;
-      } finally {
-        if (pWriter != null){
-          pWriter.flush();
-          pWriter.close();
-        }
-      }
-    }
-    return success;
-  }
-
-  private String composeSubject() {
-    String s = PFUserContext.getUser().getFullname();
-    s += " " + getString("plugins.teamcal.event.subject1");
-    s += " „" + getData().getSubject() + "“ ";
-    s += getString("plugins.teamcal.event.subject2");
-    return s;
-  }
-
-  private String composeContent(final Integer number) {
-    String s= "<html><body><h2>" + composeSubject() +"</h2>";
-    s += "<table>";
-    s += "<tr>";
-    s += "<td>" + getString("plugins.teamcal.event.event") + "</td>";
-    s += "<td>" +  getData().getStartDate() + " - " + getData().getEndDate() + "</td>";
-    s += "</tr>";
-    s += "<tr>";
-    s += "<td>" + getString("plugins.teamcal.event.location") + "</td>";
-    s += "<td>" + getData().getLocation() + "</td>";
-    s += "</tr>";
-    s += "<tr>";
-    s += "<td>" + getString("plugins.teamcal.attendees") + "</td>";
-    s += "<td>" + PFUserContext.getUser().getFullname() + " " + getString("plugins.teamcal.event.andyou") + "</td>";
-    s += "</tr>";
-    s += "<tr>";
-    s += "<td></td>";
-    s += "<td>" + "<a href=\"http://localhost:8080/ProjectForge/Calendar/Event/?e=" + getData().getUid() + "&p=p" + number.toString() + "\">" + getString("plugins.teamcal.event.showreplies") + "</a></td>";
-    s += "</tr>";
-    s += "</table>";
-    s += "<table>";
-    s += "<tr>";
-    s += "<td>" + "<a href=\"http://localhost:8080/ProjectForge/Calendar/Eventreply/?e=" + getData().getUid() + "&p=p" + number.toString() + "&r=accept\">" + getString("plugins.teamcal.event.accept") + "</a></td>";
-    s += "<td>" + "<a href=\"http://localhost:8080/ProjectForge/Calendar/Eventreply/?e=" + getData().getUid() + "&p=p" + number.toString() + "&r=decline\">" + getString("plugins.teamcal.event.decline") + "</a></td>";
-    s += "<td>" + "<a href=\"http://localhost:8080/ProjectForge/Calendar/Eventreply/?e=" + getData().getUid() + "&p=p" + number.toString() + "&r=tentative\">" + getString("plugins.teamcal.event.tentative") + "</a></td>";
-    s += "</tr>";
-    s += "</table>";
-    s += "</body>";
-    s += "</html>";
-    return s;
-  }
 }
