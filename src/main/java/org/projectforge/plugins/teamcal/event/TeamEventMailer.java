@@ -13,13 +13,18 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.mail.Mail;
 import org.projectforge.mail.SendMail;
+import org.projectforge.registry.Registry;
 import org.projectforge.scripting.I18n;
 import org.projectforge.user.PFUserContext;
+
+import de.micromata.hibernate.history.HistoryEntry;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -28,25 +33,46 @@ import org.projectforge.user.PFUserContext;
 public class TeamEventMailer
 {
 
-  public final static String INVITATION = "invitation";
-  public final static String UPDATE     = "update";
-  public final static String REJECTION  = "rejection";
+  private static TeamEventMailer instance = null;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamEventMailer.class);
 
-  public TeamEventMailer() {
+  private final Queue<TeamEventMailValue> queue;
+
+  private final TeamEventDao teamEventDao;
+
+  private TeamEventMailer() {
+    queue =  new LinkedList<TeamEventMailValue>();
+    teamEventDao = Registry.instance().getDao(TeamEventDao.class);
   }
 
-  public boolean send(final TeamEventDO event, final TeamEventDO orgEvent, final String mode) {
-    if (mode.equals(INVITATION)) {
-      return sendIcsFile(event);
-    } else {
-      log.error("Unsupported mode: " + mode + ". No email sent.");
-      return false;
+  public static TeamEventMailer getInstance() {
+    if (instance == null) {
+      instance = new TeamEventMailer();
     }
+    return instance;
   }
 
-  private boolean sendIcsFile(final TeamEventDO event) {
+  public Queue<TeamEventMailValue> getQueue()
+  {
+    return queue;
+  }
+
+  public boolean send() {
+    int failures = 0;
+    while (queue.isEmpty() == false) {
+      final TeamEventMailValue value = queue.poll();
+      final TeamEventDO event = teamEventDao.getById(value.getId());
+      if (sendIcsFile(event, value.getType()) == false) {
+        failures++;
+      } else {
+        // TODO: event.setLastEmail(now);
+      }
+    }
+    return failures == 0 ? true : false;
+  }
+
+  private boolean sendIcsFile(final TeamEventDO event, final TeamEventMailType type) {
     final String workdir ="tmp/";
     final String[] attachmentfiles = new String[1];
     attachmentfiles[0] = event.getUid() + ".ics";
@@ -56,18 +82,21 @@ public class TeamEventMailer
       return false;
     }
     final Mail msg = new Mail();
-    msg.setProjectForgeSubject(composeSubject(event));
+    msg.setProjectForgeSubject(composeSubject(event, type));
 
     msg.setContentType(Mail.CONTENTTYPE_HTML);
     int failures = 0;
     final SendMail sendMail = new SendMail();
     sendMail.setConfigXml(ConfigXml.getInstance());
     for (final TeamEventAttendeeDO attendee : event.getAttendees()) {
-      msg.setContent(composeHtmlContent(event, attendee.getId()));
+      msg.setContent(composeHtmlContent(event, attendee.getId(), type));
       if (attendee.getUserId() == null) {
         msg.setTo(attendee.getUrl());
       } else {
         msg.setTo(attendee.getUser());
+        if (attendee.getUser().equals(PFUserContext.getUser()) == true) {
+          continue;
+        }
       }
       if (sendMail.send(msg, workdir, attachmentfiles) == false) {
         failures++;
@@ -94,16 +123,38 @@ public class TeamEventMailer
     return success;
   }
 
-  private String composeSubject(final TeamEventDO event) {
-    String s = PFUserContext.getUser().getFullname();
-    s += " " + I18n.getString("plugins.teamcal.event.subject1");
-    s += " „" + event.getSubject() + "“ ";
-    s += I18n.getString("plugins.teamcal.event.subject2");
-    return s;
+  private String composeSubject(final TeamEventDO event, final TeamEventMailType type) {
+    String s = "";
+    switch (type) {
+      case INVITATION: {
+        s += PFUserContext.getUser().getFullname();
+        s += " " + I18n.getString("plugins.teamcal.event.invitation1");
+        s += " „" + event.getSubject() + "“ ";
+        s += I18n.getString("plugins.teamcal.event.invitation2");
+        return s;
+      }
+      case UPDATE: {
+        s += " „" + event.getSubject() + "“ ";
+        s += I18n.getString("plugins.teamcal.event.update");
+        return s;
+      }
+      case REJECTION: {
+        s += " „" + event.getSubject() + "“ ";
+        s += I18n.getString("plugins.teamcal.event.rejection");
+        return s;
+      }
+      default:
+        s += "Unsupported TeamEventMailType: " + type;
+        log.error(s);
+        return s;
+    }
   }
 
-  private String composeHtmlContent(final TeamEventDO event, final Integer number) {
-    String s= "<html><body><h2>" + composeSubject(event) +"</h2>";
+  private String composeHtmlContent(final TeamEventDO event, final Integer number, final TeamEventMailType type) {
+    if (type == TeamEventMailType.UPDATE) {
+      return composeHtmlUpdateContent(event, number, type);
+    }
+    String s= "<html><body><h2>" + composeSubject(event, type) +"</h2>";
     s += "<table>";
     s += "<tr>";
     s += "<td>" + I18n.getString("plugins.teamcal.event.event") + "</td>";
@@ -129,6 +180,19 @@ public class TeamEventMailer
     s += "<td>" + "<a href=\"http://localhost:8080/ProjectForge/Calendar/Eventreply/?e=" + event.getUid() + "&p=p" + number.toString() + "&r=tentative\">" + I18n.getString("plugins.teamcal.event.tentative") + "</a></td>";
     s += "</tr>";
     s += "</table></br>";
+    s += "</body>";
+    s += "</html>";
+    return s;
+  }
+
+  private String composeHtmlUpdateContent(final TeamEventDO event, final Integer number, final TeamEventMailType type) {
+    final HistoryEntry[] entries = teamEventDao.getHistoryEntries(event);
+    /**
+     * TODO
+     * alle entries ermitteln, die nach event.getLastEmail() liegen
+     */
+    String s= "<html><body><h2>" + composeSubject(event, type) +"</h2>";
+    s += "</br>Yet not implemented</br>";
     s += "</body>";
     s += "</html>";
     return s;
