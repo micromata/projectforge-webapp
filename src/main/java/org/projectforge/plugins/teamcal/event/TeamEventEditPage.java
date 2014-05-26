@@ -70,7 +70,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   /**
    * Used for recurrence events in {@link #onSaveOrUpdate()} and {@link #afterSaveOrUpdate()}
    */
-  private TeamEventDO newEvent, orgEvent;
+  private TeamEventDO newEvent;
 
   private boolean isNew = false;
 
@@ -81,7 +81,6 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   {
     super(parameters, "plugins.teamcal.event");
     super.init();
-    orgEvent = null;
   }
 
   /**
@@ -160,7 +159,6 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   {
     super.init(data);
     if (isNew() == false) {
-      orgEvent = data;
       @SuppressWarnings("serial")
       final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(),
           new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
@@ -188,7 +186,6 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       addContentMenuEntry(menu);
     }
     if (isNew() == true) {
-      orgEvent = null;
       @SuppressWarnings("serial")
       final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new SubmitLink(
           ContentMenuEntryPanel.LINK_ID, form) {
@@ -245,8 +242,10 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   public AbstractSecuredBasePage onDelete()
   {
     super.onDelete();
-    final TeamEventMailer mailer = new TeamEventMailer();
-    mailer.send(getData(), orgEvent, TeamEventMailer.REJECTION);
+    final TeamEventMailer mailer = TeamEventMailer.getInstance();
+    final TeamEventMailValue value = new TeamEventMailValue(getData().getId(), TeamEventMailType.REJECTION);
+    mailer.getQueue().offer(value);
+    mailer.send();
 
     if (recurrencyChangeType == null || recurrencyChangeType == RecurrencyChangeType.ALL) {
       return null;
@@ -349,12 +348,15 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   public AbstractSecuredBasePage afterSaveOrUpdate()
   {
     super.afterSaveOrUpdate();
-    final TeamEventMailer mailer = new TeamEventMailer();
+    final TeamEventMailer mailer = TeamEventMailer.getInstance();
+    TeamEventMailValue value = null;
     if (isNew == true) {
-      mailer.send(getData(), orgEvent, TeamEventMailer.INVITATION);
+      value = new TeamEventMailValue(getData().getId(), TeamEventMailType.INVITATION);
     } else {
-      mailer.send(getData(), orgEvent, TeamEventMailer.UPDATE);
+      value = new TeamEventMailValue(getData().getId(), TeamEventMailType.UPDATE);
     }
+    mailer.getQueue().offer(value);
+    mailer.send();
     return null;
   }
 
