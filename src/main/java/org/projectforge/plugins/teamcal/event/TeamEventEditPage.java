@@ -275,11 +275,16 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
     if (getData().getAttendees() != null && getData().getAttendees().isEmpty() == false) {
       final TeamEventAttendeeDO attendee = new TeamEventAttendeeDO();
       attendee.setUser(PFUserContext.getUser()).setStatus(TeamAttendeeStatus.ACCEPTED);
-      getData().getAttendees().add(attendee);
+      getData().addAttendee(attendee);
     }
 
     if (isNew()) {
       isNew = true;
+    } else {
+      final TeamEventDO oldData = teamEventDao.getById(getData().getId());
+      if (getData().mustIncSequence(oldData) == true) {
+        getData().incSequence();
+      }
     }
 
     getData().setRecurrence(form.recurrenceData);
@@ -340,6 +345,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
     }
     return null;
   }
+
 
   /**
    * @see org.projectforge.web.wicket.AbstractEditPage#afterSaveOrUpdate()

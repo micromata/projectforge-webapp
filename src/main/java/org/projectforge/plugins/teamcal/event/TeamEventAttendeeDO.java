@@ -60,6 +60,10 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
 {
   private static final long serialVersionUID = -3293247578185393730L;
 
+  private Integer id;
+
+  private Short number;
+
   private String url;
 
   private PFUserDO user;
@@ -71,8 +75,6 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
   private String comment;
 
   private String commentOfAttendee;
-
-  private Integer id;
 
   private static final Set<String> NON_HISTORIZABLE_ATTRIBUTES;
 
@@ -225,6 +227,26 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
     return this;
   }
 
+
+  /**
+   * @return the number
+   */
+  @Column
+  public Short getNumber()
+  {
+    return number;
+  }
+
+  /**
+   * @param number the number to set
+   * @return this for chaining.
+   */
+  public TeamEventAttendeeDO setNumber(final Short number)
+  {
+    this.number = number;
+    return this;
+  }
+
   /**
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
@@ -347,6 +369,10 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
     if (ObjectUtils.equals(this.id, source.id) == false) {
       modStatus = ModificationStatus.MAJOR;
       this.id = source.id;
+    }
+    if (ObjectUtils.equals(this.number, source.number) == false) {
+      modStatus = ModificationStatus.MAJOR;
+      this.number = source.number;
     }
     if (ObjectUtils.equals(this.url, source.url) == false) {
       modStatus = ModificationStatus.MAJOR;

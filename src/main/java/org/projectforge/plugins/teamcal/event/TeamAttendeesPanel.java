@@ -172,7 +172,7 @@ public class TeamAttendeesPanel extends Panel
       if (lastEntry == true) {
         final TeamEventAttendeeDO clone = new TeamEventAttendeeDO();
         clone.setUrl(attendee.getUrl()).setUser(attendee.getUser());
-        attendees.add(clone);
+        addAttendee(clone);
         rebuildAttendees();
         target.add(mainContainer);
       } else if (attendee.getUserId() == null && StringUtils.isBlank(attendee.getUrl()) == true) {
@@ -210,4 +210,16 @@ public class TeamAttendeesPanel extends Panel
     }
   }
 
+  private void addAttendee(final TeamEventAttendeeDO attendee)
+  {
+    short number = 1;
+    for (final TeamEventAttendeeDO pos : attendees) {
+      if (pos.getNumber() >= number) {
+        number = pos.getNumber();
+        number++;
+      }
+    }
+    attendee.setNumber(number);
+    this.attendees.add(attendee);
+  }
 }
