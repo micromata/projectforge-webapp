@@ -47,15 +47,16 @@ import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.Organizer;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.RRule;
+import net.fortuna.ical4j.model.property.Sequence;
 import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.util.Dates;
 
 import org.apache.commons.lang.StringUtils;
-import org.projectforge.common.StringHelper;
 import org.projectforge.common.DateFormats;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.RecurrenceFrequency;
+import org.projectforge.common.StringHelper;
 import org.projectforge.plugins.teamcal.event.TeamEventAttendeeDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.user.PFUserContext;
@@ -410,6 +411,7 @@ public class ICal4JUtils
     calendar.getProperties().add(Version.VERSION_2_0);
     calendar.getProperties().add(CalScale.GREGORIAN);
     final VEvent vEvent = ICal4JUtils.createVEvent(teamEvent.getStartDate(), teamEvent.getEndDate(), teamEvent.getUid(), teamEvent.getSubject(), teamEvent.isAllDay());
+    vEvent.getProperties().add(new Sequence(teamEvent.getSequence()));
     if (teamEvent.hasRecurrence() == true) {
       vEvent.getProperties().add(new RRule(teamEvent.getRecurrenceObject()));
     }
