@@ -30,26 +30,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.ParameterList;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.TimeZoneRegistry;
 import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.parameter.Cn;
-import net.fortuna.ical4j.model.parameter.PartStat;
-import net.fortuna.ical4j.model.property.Attendee;
-import net.fortuna.ical4j.model.property.CalScale;
-import net.fortuna.ical4j.model.property.Comment;
-import net.fortuna.ical4j.model.property.Contact;
-import net.fortuna.ical4j.model.property.Location;
-import net.fortuna.ical4j.model.property.Organizer;
-import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.RRule;
-import net.fortuna.ical4j.model.property.Sequence;
 import net.fortuna.ical4j.model.property.Uid;
-import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.util.Dates;
 
 import org.apache.commons.lang.StringUtils;
@@ -57,10 +44,7 @@ import org.projectforge.common.DateFormats;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.RecurrenceFrequency;
 import org.projectforge.common.StringHelper;
-import org.projectforge.plugins.teamcal.event.TeamEventAttendeeDO;
-import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.user.PFUserContext;
-import org.projectforge.user.PFUserDO;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -404,65 +388,4 @@ public class ICal4JUtils
     }
   }
 
-  public static String getICal(final TeamEventDO teamEvent) {
-    final StringBuffer buf = new StringBuffer();
-    final Calendar calendar = new Calendar();
-    calendar.getProperties().add(new ProdId("-//Ben Fortuna//iCal4j 1.0//EN"));
-    calendar.getProperties().add(Version.VERSION_2_0);
-    calendar.getProperties().add(CalScale.GREGORIAN);
-    final VEvent vEvent = ICal4JUtils.createVEvent(teamEvent.getStartDate(), teamEvent.getEndDate(), teamEvent.getUid(), teamEvent.getSubject(), teamEvent.isAllDay());
-    vEvent.getProperties().add(new Sequence(teamEvent.getSequence()));
-    if (teamEvent.hasRecurrence() == true) {
-      vEvent.getProperties().add(new RRule(teamEvent.getRecurrenceObject()));
-    }
-    if (StringUtils.isNotBlank(teamEvent.getLocation()) == true) {
-      vEvent.getProperties().add(new Location(teamEvent.getLocation()));
-    }
-    if (StringUtils.isNotBlank(teamEvent.getNote()) == true) {
-      vEvent.getProperties().add(new Comment(teamEvent.getNote()));
-    }
-    final PFUserDO user = PFUserContext.getUser();
-    String s = user.getFullname();
-    if (user.getOrganization() != null) {
-      s += "\\, " + user.getOrganization();
-    }
-    if (user.getPersonalPhoneIdentifiers() != null) {
-      s += "\\, " + user.getPersonalPhoneIdentifiers();
-    }
-    vEvent.getProperties().add(new Contact(s));
-    try {
-      if (StringUtils.isNotBlank(user.getEmail()) == true) {
-        final ParameterList organizerParams = new ParameterList();
-        organizerParams.add(new Cn(user.getFullname()));
-        final Organizer organizer = new Organizer(organizerParams, user.getEmail());
-        vEvent.getProperties().add(organizer);
-      }
-    } catch (final Exception e) {
-      log.error("Cant't build organizer " + e.getMessage());
-    }
-    if (teamEvent.getAttendees() != null) {
-      for (final TeamEventAttendeeDO attendee : teamEvent.getAttendees() ) {
-        final ParameterList attendeeParams = new ParameterList();
-        if (attendee.getUser() != null) {
-          try {
-            attendeeParams.add(new Cn(attendee.getUser().getFullname()));
-            attendeeParams.add(new PartStat(attendee.getStatus().name()));
-            vEvent.getProperties().add(new Attendee(attendeeParams, attendee.getUser().getEmail()));
-          } catch (final Exception e) {
-            log.error("Cant't build attendee " + e.getMessage());
-          }
-        } else {
-          try {
-            attendeeParams.add(new PartStat(attendee.getStatus().name()));
-            vEvent.getProperties().add(new Attendee(attendeeParams, attendee.getUrl()));
-          }  catch (final Exception e) {
-            log.error("Cant't build attendee " + e.getMessage());
-          }
-        }
-      }
-    }
-    calendar.getComponents().add(vEvent);
-    buf.append(calendar.toString());
-    return buf.toString();
-  }
 }
