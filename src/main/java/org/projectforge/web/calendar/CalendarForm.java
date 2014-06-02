@@ -177,8 +177,7 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
     this.filter = filter;
   }
 
-  @Override
-  public PFUserDO getUser()
+  public PFUserDO getTimesheetsUser()
   {
     final Integer userId = getFilter().getTimesheetUserId();
     return userId != null ? userGroupCache.getUser(userId) : null;
