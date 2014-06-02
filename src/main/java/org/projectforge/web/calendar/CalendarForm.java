@@ -23,41 +23,23 @@
 
 package org.projectforge.web.calendar;
 
-import java.util.Calendar;
-
-import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.AjaxSelfUpdatingTimerBehavior;
-import org.apache.wicket.ajax.markup.html.form.AjaxButton;
-import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.apache.wicket.util.time.Duration;
 import org.joda.time.DateMidnight;
-import org.projectforge.timesheet.TimesheetDO;
-import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
-import org.projectforge.web.timesheet.TimesheetEditPage;
+import org.projectforge.web.calendar.workflow.WorkflowUtils;
 import org.projectforge.web.wicket.AbstractStandardForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DateTimePanel;
 import org.projectforge.web.wicket.components.JodaDatePanel;
-import org.projectforge.web.wicket.flowlayout.ButtonGroupPanel;
-import org.projectforge.web.wicket.flowlayout.ButtonPanel;
-import org.projectforge.web.wicket.flowlayout.ButtonType;
-import org.projectforge.web.wicket.flowlayout.CheckBoxButton;
-import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.DivTextPanel;
-import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
-import org.projectforge.web.wicket.flowlayout.IconType;
+import org.projectforge.web.wicket.flowlayout.*;
 
 public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarPage>
 {
@@ -153,170 +135,10 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
 
     gridBuilder.newSplitPanel(GridSize.SPAN3);
 
-
-    // workflow SubmitButton
-    final FieldsetPanel workflowFs = gridBuilder.newFieldset("Workflow");
-    workflowFs.setLabelFor(new Label("a","b"));
-    final AjaxButton workflowSubmitButton = new AjaxButton(ButtonPanel.BUTTON_ID,new Model<String>(PFUserContext.getLocalizedString("workflow.toggle.submit"))){
-      @Override
-      protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
-      {
-        if(oldTime()!=null){
-          SubmitWorkflow(PFUserContext.getUser().getLastWorkflowSubmit(), newTime());
-          PFUserContext.getUser().setLastWorkflowSubmit(newTime());
-        }
-      }
-    };
-    workflowSubmitButton.setVisible(PFUserContext.getUser().getLastWorkflowSubmit()!=null);
-    workflowSubmitButton.setOutputMarkupId(true);
-    workflowSubmitButton.setOutputMarkupPlaceholderTag(true);
-
-
-    // workflow ToggleButton
-    final AjaxButton workflowToggleButton = new AjaxButton(ButtonPanel.BUTTON_ID,new Model<String>("TEST3")) {
-      @Override
-      protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
-      {
-        if(oldTime()==null){//Start Workflow
-          PFUserContext.getUser().setLastWorkflowSubmit(newTime());
-          updateButtonSubmit(workflowSubmitButton, true);
-        }
-        else{//Stop Workflow
-          SubmitWorkflow(newTime(),oldTime());
-        }
-        updateButtonToggle(this);
-        target.add(this);
-        target.add(workflowSubmitButton);
-      }
-    };
-    workflowToggleButton.setOutputMarkupId(true);
-    workflowToggleButton.setOutputMarkupPlaceholderTag(true);
-    //Auto-updating of the Time on the button and similar
-    final AjaxSelfUpdatingTimerBehavior ajaxSelfUpdatingTimerBehavior=new AjaxSelfUpdatingTimerBehavior(Duration.seconds(30)){
-
-      @Override
-      protected void onPostProcessTarget(final AjaxRequestTarget target)
-      {
-        updateLabeling();
-        target.add(workflowSubmitButton);
-      }
-      /*
-       * Updates time on the button
-       */
-      void updateLabeling(){
-        if(oldTime()!=null){
-          ((AjaxButton)getComponent()).replace(new Label("title", TimePeriodString(oldTime(),newTime())));
-          if(oldTime().get(Calendar.DAY_OF_YEAR)!=newTime().get(Calendar.DAY_OF_YEAR)||oldTime().get(Calendar.YEAR)!=newTime().get(Calendar.YEAR)){
-            //There are no entries over 2 days or more
-            SubmitWorkflow(oldTime(), newTime());
-            PFUserContext.getUser().setLastWorkflowSubmit(newTime());
-          }
-        }
-      }
-    };
-    workflowSubmitButton.add(ajaxSelfUpdatingTimerBehavior);
-
-    workflowFs.add(new ButtonPanel(workflowFs.newChildId(), "This Text get overwritten", workflowToggleButton, ButtonType.DARK));
-    workflowFs.add(new ButtonPanel(workflowFs.newChildId(), "This Text get overwritten", workflowSubmitButton, ButtonType.GREEN));
-    updateButtonToggle(workflowToggleButton);
-    updateButtonSubmit(workflowSubmitButton, oldTime()!=null);
+    final FieldsetPanel workflowFs = gridBuilder.newFieldset("Workflow"); // TODO JU i18n
+    WorkflowUtils.addWorkflowPanel(workflowFs);
 
     onAfterInit(gridBuilder);
-  }
-
-  /*
-   * @return The last time the User saved his time. Might be null.
-   */
-  Calendar oldTime(){
-    return PFUserContext.getUser().getLastWorkflowSubmit();
-  }
-
-  /*
-   * @return The current time, rounded to 5-minute steps
-   */
-  Calendar newTime(){
-    return RoundTo5Minutes(Calendar.getInstance(PFUserContext.getTimeZone()));
-  }
-
-  /*
-   * @param calendar The Calendar that has to be changed
-   * @return The calendar, set to the last midnight
-   */
-  Calendar CalendarToMidnight(final Calendar calendar){
-    calendar.set(Calendar.HOUR, 0);
-    calendar.set(Calendar.MINUTE, 0);
-    calendar.set(Calendar.SECOND, 0);
-    calendar.set(Calendar.MILLISECOND, 0);
-    return calendar;
-  }
-
-  /*
-   * @param workflowSubmitButton The AjaxButton that should be updated.
-   * @param visibility The new visibility.
-   */
-  void updateButtonSubmit(final AjaxButton workflowSubmitButton, final boolean visibility){
-    workflowSubmitButton.setVisible(visibility);
-    workflowSubmitButton.replace(new Label("title", TimePeriodString(PFUserContext.getUser().getLastWorkflowSubmit(),newTime())));
-  }
-
-  /*
-   * @param workflowToggleButton The AjaxButton that should be updated.
-   * @return The new text on the button.
-   */
-  String updateButtonToggle(final AjaxButton workflowToggleButton){
-    final String result = PFUserContext.getLocalizedString(oldTime()==null?"workflow.toggle.start":"workflow.toggle.stop");
-    workflowToggleButton.replace(new Label("title", result));
-    return result;
-  }
-
-  /*
-   * @param start The Start
-   * @param stop The Stop
-   * @result String representing the Period
-   */
-  String TimePeriodString(final Calendar start,final Calendar stop){
-    final DateTimeFormatter dtf = new DateTimeFormatter();
-    final boolean timeStored = (start!=null);
-    if(timeStored){
-      return dtf.getFormattedTime(start.getTime())+" "+PFUserContext.getLocalizedString("workflow.timeTo")+" "+dtf.getFormattedTime(stop.getTime());
-    }
-    return "";
-  }
-
-  /*
-   * Submits the current workflow-settings. Also opens a responsePage for further proceeding.
-   * @param start The Start
-   * @param stop The Stop
-   */
-  void SubmitWorkflow(final Calendar start,final Calendar stop){
-    final TimesheetDO timesheetDO = new TimesheetDO();
-    timesheetDO.setStartDate(start.getTimeInMillis());
-    timesheetDO.setStopTime(stop.getTimeInMillis());
-    timesheetDO.setDescription("Created by Workflow");
-    final TimesheetEditPage responsePage = new TimesheetEditPage(timesheetDO);
-    responsePage.setReturnToPage((WebPage) getPage());
-    setResponsePage(responsePage);
-    PFUserContext.getUser().removeLastWorkflowSubmit();
-  }
-
-  /*
-   *Rounds a date up or down to the next 5-minute mark
-   *@param Date that should be rounded
-   */
-  public static Calendar RoundTo5Minutes(final Calendar date){
-    if(date==null){
-      return null;
-    }
-    int minutes = date.get(Calendar.MINUTE);
-    final int seconds = date.get(Calendar.SECOND);
-    if((minutes%5==2&&seconds>=20)||minutes%5>2){
-      minutes+=5;
-    }
-    minutes-=minutes%5;
-    date.set(Calendar.MINUTE,minutes);
-    date.set(Calendar.SECOND, 0);
-    date.set(Calendar.MILLISECOND, 0);
-    return date;
   }
 
   protected String getRefreshIconTooltip()
