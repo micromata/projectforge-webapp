@@ -263,6 +263,8 @@ public class TeamEventMailer
     final Date d2 = new Date(event.getEndDate().getTime());
     final SimpleDateFormat df1 = new SimpleDateFormat("EEEEE, dd. MMMM yyyy, HH:mm");
     final SimpleDateFormat df2 = new SimpleDateFormat("HH:mm");
+    df1.setTimeZone(PFUserContext.getTimeZone());
+    df2.setTimeZone(PFUserContext.getTimeZone());
     final String s = df1.format(d1) + " Uhr - " + df2.format(d2) + " Uhr";
     buf.append("<td>").append(s).append("</td>");
     buf.append("</tr>");
@@ -383,12 +385,11 @@ public class TeamEventMailer
     calendar.getProperties().add(new ProdId("-//Ben Fortuna//iCal4j 1.0//EN"));
     calendar.getProperties().add(Version.VERSION_2_0);
     calendar.getProperties().add(CalScale.GREGORIAN);
+    final TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
+    final VTimeZone tz = registry.getTimeZone(PFUserContext.getTimeZone().getID()).getVTimeZone();
+    calendar.getComponents().add(tz);
     switch (type) {
-      case INVITATION: {
-        final TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
-        final VTimeZone tz = registry.getTimeZone(PFUserContext.getTimeZone().getID()).getVTimeZone();
-        calendar.getComponents().add(tz);
-      }
+      case INVITATION:
       case UPDATE:
         calendar.getProperties().add(Method.REQUEST);
         break;
@@ -409,10 +410,10 @@ public class TeamEventMailer
     final PFUserDO user = PFUserContext.getUser();
     String s = user.getFullname();
     if (user.getOrganization() != null) {
-      s += "\\, " + user.getOrganization();
+      s += "\n" + user.getOrganization();
     }
     if (user.getPersonalPhoneIdentifiers() != null) {
-      s += "\\, " + user.getPersonalPhoneIdentifiers();
+      s += "\n" + user.getPersonalPhoneIdentifiers();
     }
     vEvent.getProperties().add(new Contact(s));
     try {
