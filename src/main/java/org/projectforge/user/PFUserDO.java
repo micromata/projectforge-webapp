@@ -25,7 +25,6 @@ package org.projectforge.user;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -63,12 +62,11 @@ import org.projectforge.core.Configuration;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.ModificationStatus;
 import org.projectforge.core.ShortDisplayNameCapable;
-import org.projectforge.web.calendar.CalendarForm;
 
 /**
- * 
+ *
  * @author Kai Reinhard (k.reinhard@micromata.de)
- * 
+ *
  */
 @Entity
 @Indexed
@@ -152,9 +150,6 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   private Set<UserRightDO> rights = new HashSet<UserRightDO>();
 
   private boolean hrPlanning = true;
-
-  @Field(index = Index.TOKENIZED, store = Store.NO)
-  private Calendar lastWorkflowSubmit = Calendar.getInstance();
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String ldapValues;
@@ -959,32 +954,4 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   {
     return getShortDisplayName();
   }
-
-  /*
-   * @return The User last submit
-   */
-  @Transient
-  public Calendar getLastWorkflowSubmit(){
-    return CalendarForm.RoundTo5Minutes(lastWorkflowSubmit);
-  }
-
-  /**
-   * @param Time used as start for the next workflow-submit
-   * @return this for chaining.
-   */
-  @Transient
-  public PFUserDO setLastWorkflowSubmit(final Calendar lastWorkflowSubmit){
-    this.lastWorkflowSubmit = CalendarForm.RoundTo5Minutes(lastWorkflowSubmit);
-    return this;
-  }
-
-  /**
-   * @param Time used as start for the next workflow-submit
-   */
-  @Transient
-  public PFUserDO removeLastWorkflowSubmit(){
-    lastWorkflowSubmit=null;
-    return this;
-  }
-
 }
