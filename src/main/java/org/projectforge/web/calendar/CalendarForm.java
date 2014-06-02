@@ -39,7 +39,13 @@ import org.projectforge.web.wicket.bootstrap.GridBuilder;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.components.DateTimePanel;
 import org.projectforge.web.wicket.components.JodaDatePanel;
-import org.projectforge.web.wicket.flowlayout.*;
+import org.projectforge.web.wicket.flowlayout.ButtonGroupPanel;
+import org.projectforge.web.wicket.flowlayout.CheckBoxButton;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
 
 public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarPage>
 {
