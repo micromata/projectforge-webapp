@@ -342,6 +342,10 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
     if (newEvent != null) {
       newEvent.setExternalUid(null); // Avoid multiple usage of external uids.
       teamEventDao.save(newEvent);
+      final TeamEventMailer mailer = TeamEventMailer.getInstance();
+      final TeamEventMailValue value = new TeamEventMailValue(newEvent.getId(), TeamEventMailType.UPDATE);
+      mailer.getQueue().offer(value);
+      mailer.send();
     }
     return null;
   }
@@ -354,15 +358,17 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   public AbstractSecuredBasePage afterSaveOrUpdate()
   {
     super.afterSaveOrUpdate();
-    final TeamEventMailer mailer = TeamEventMailer.getInstance();
-    TeamEventMailValue value = null;
-    if (isNew == true) {
-      value = new TeamEventMailValue(getData().getId(), TeamEventMailType.INVITATION);
-    } else {
-      value = new TeamEventMailValue(getData().getId(), TeamEventMailType.UPDATE);
+    if (newEvent == null) {
+      final TeamEventMailer mailer = TeamEventMailer.getInstance();
+      TeamEventMailValue value = null;
+      if (isNew == true) {
+        value = new TeamEventMailValue(getData().getId(), TeamEventMailType.INVITATION);
+      } else {
+        value = new TeamEventMailValue(getData().getId(), TeamEventMailType.UPDATE);
+      }
+      mailer.getQueue().offer(value);
+      mailer.send();
     }
-    mailer.getQueue().offer(value);
-    mailer.send();
     return null;
   }
 
