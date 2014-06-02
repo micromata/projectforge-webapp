@@ -21,11 +21,9 @@ import java.util.List;
 import java.util.Queue;
 
 import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.ParameterList;
-import net.fortuna.ical4j.model.PropertyList;
-import net.fortuna.ical4j.model.UtcOffset;
-import net.fortuna.ical4j.model.component.Standard;
+import net.fortuna.ical4j.model.TimeZoneRegistry;
+import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.parameter.Cn;
@@ -36,17 +34,12 @@ import net.fortuna.ical4j.model.property.Attendee;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Comment;
 import net.fortuna.ical4j.model.property.Contact;
-import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.Method;
 import net.fortuna.ical4j.model.property.Organizer;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.Sequence;
-import net.fortuna.ical4j.model.property.TzId;
-import net.fortuna.ical4j.model.property.TzName;
-import net.fortuna.ical4j.model.property.TzOffsetFrom;
-import net.fortuna.ical4j.model.property.TzOffsetTo;
 import net.fortuna.ical4j.model.property.Version;
 
 import org.apache.commons.lang.StringUtils;
@@ -392,26 +385,8 @@ public class TeamEventMailer
     calendar.getProperties().add(CalScale.GREGORIAN);
     switch (type) {
       case INVITATION: {
-        // create timezone property..
-        final java.util.TimeZone timezone = java.util.TimeZone.getDefault();
-        final TzName standardTzName = new TzName(new ParameterList(), timezone.getDisplayName());
-        final DtStart standardTzStart = new DtStart(new ParameterList(), new net.fortuna.ical4j.model.Date());
-        final TzOffsetTo standardTzOffsetTo = new TzOffsetTo(new ParameterList(), new UtcOffset (timezone.getRawOffset()));
-        // "offset to" plus one (1) hour??
-        final long millisPerHour = 1000 * 60 * 60;
-        final TzOffsetFrom standardTzOffsetFrom = new TzOffsetFrom(null, new UtcOffset(timezone.getRawOffset() + millisPerHour));
-        final PropertyList standardTzProps = new PropertyList();
-        standardTzProps.add(standardTzName);
-        standardTzProps.add(standardTzStart);
-        standardTzProps.add(standardTzOffsetTo);
-        standardTzProps.add(standardTzOffsetFrom);
-        final Standard standardTz = new Standard(standardTzProps);
-        final TzId tzId = new TzId(null, timezone.getID());
-        final PropertyList tzProps = new PropertyList();
-        tzProps.add(tzId);
-        final ComponentList tzComponents = new ComponentList();
-        tzComponents.add(standardTz);
-        final VTimeZone tz = new VTimeZone(tzProps, tzComponents);
+        final TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
+        final VTimeZone tz = registry.getTimeZone(PFUserContext.getTimeZone().getID()).getVTimeZone();
         calendar.getComponents().add(tz);
       }
       case UPDATE:
