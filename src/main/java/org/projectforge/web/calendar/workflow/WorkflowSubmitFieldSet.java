@@ -31,6 +31,7 @@ import java.util.Calendar;
  */
 public class WorkflowSubmitFieldSet implements Serializable
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(WorkflowSubmitFieldSet.class);
 
   private static final String WORKFLOW_LAST_SUBMIT_KEY = "WORKFLOW_LAST_SUBMIT_KEY";
 
@@ -168,7 +169,7 @@ public class WorkflowSubmitFieldSet implements Serializable
         calendar.setTimeInMillis(Long.parseLong(fromCache.toString()));
         return calendar;
       } catch (Exception e) {
-        // TODO logging
+        log.warn("Unable to read stored value 'lastWorkflowSubmit' from userXmlPreferencesCache", e);
         return null;
       }
     }

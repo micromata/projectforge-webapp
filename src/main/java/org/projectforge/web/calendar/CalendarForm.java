@@ -29,10 +29,12 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.joda.time.DateMidnight;
+import org.projectforge.core.Configuration;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
+import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.calendar.workflow.WorkflowSubmitFieldSet;
 import org.projectforge.web.wicket.AbstractStandardForm;
 import org.projectforge.web.wicket.WicketUtils;
@@ -57,6 +59,9 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
 
   @SpringBean(name = "userDao")
   protected UserDao userDao;
+
+  @SpringBean(name = "userXmlPreferencesCache")
+  protected UserXmlPreferencesCache userXmlPreferencesCache;
 
   protected ICalendarFilter filter;
 
@@ -142,8 +147,10 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
 
     gridBuilder.newSplitPanel(GridSize.SPAN3);
 
-    final FieldsetPanel workflowFs = gridBuilder.newFieldset(PFUserContext.getLocalizedString("workflow.title"));
-    new WorkflowSubmitFieldSet(workflowFs, null, getWebPage());
+    if (Configuration.isDevelopmentMode() == true) {
+      final FieldsetPanel workflowFs = gridBuilder.newFieldset(PFUserContext.getLocalizedString("workflow.title"));
+      new WorkflowSubmitFieldSet(workflowFs, userXmlPreferencesCache, getWebPage());
+    }
 
     onAfterInit(gridBuilder);
   }
