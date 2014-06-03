@@ -7,6 +7,8 @@ import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.model.AbstractReadOnlyModel;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.util.time.Duration;
 import org.projectforge.timesheet.TimesheetDO;
@@ -60,11 +62,9 @@ public class WorkflowUtils implements Serializable
       {
         if (WorkflowUtils.oldTime() == null) {// Start Workflow
           MySession.get().setLastWorkflowSubmit(newTime());
-          WorkflowUtils.updateButtonSubmit(workflowSubmitButton, true);
         } else {// Stop Workflow
           WorkflowUtils.submitWorkflow(this);
         }
-        WorkflowUtils.updateButtonToggle(this);
         target.add(this);
         target.add(workflowSubmitButton);
       }
@@ -99,10 +99,25 @@ public class WorkflowUtils implements Serializable
     };
     workflowSubmitButton.add(ajaxSelfUpdatingTimerBehavior);
 
-    fieldsetPanel.add(new ButtonPanel(fieldsetPanel.newChildId(), "This Text get overwritten", workflowToggleButton, ButtonType.DARK));
-    fieldsetPanel.add(new ButtonPanel(fieldsetPanel.newChildId(), "This Text get overwritten", workflowSubmitButton, ButtonType.GREEN));
-    WorkflowUtils.updateButtonToggle(workflowToggleButton);
-    WorkflowUtils.updateButtonSubmit(workflowSubmitButton, WorkflowUtils.oldTime() != null);
+    IModel<String> toggleButtonModel = new AbstractReadOnlyModel<String>() {
+
+      @Override
+      public String getObject()
+      {
+        return PFUserContext.getLocalizedString(oldTime() == null ? "workflow.toggle.start" : "workflow.toggle.stop");
+      }
+    };
+    fieldsetPanel.add(new ButtonPanel(fieldsetPanel.newChildId(), toggleButtonModel, workflowToggleButton, ButtonType.DARK));
+
+    IModel<String> submitButtonModel = new AbstractReadOnlyModel<String>() {
+
+      @Override
+      public String getObject()
+      {
+        return timePeriodString(MySession.get().getLastWorkflowSubmit(), newTime());
+      }
+    };
+    fieldsetPanel.add(new ButtonPanel(fieldsetPanel.newChildId(), submitButtonModel, workflowSubmitButton, ButtonType.GREEN));
   }
 
   /**
@@ -119,40 +134,6 @@ public class WorkflowUtils implements Serializable
   public static Calendar newTime()
   {
     return roundTo5Minutes(Calendar.getInstance(PFUserContext.getTimeZone()));
-  }
-
-  /**
-   * @param calendar The Calendar that has to be changed
-   * @return The calendar, set to the last midnight
-   */
-  public static Calendar calendarToMidnight(final Calendar calendar)
-  {
-    calendar.set(Calendar.HOUR, 0);
-    calendar.set(Calendar.MINUTE, 0);
-    calendar.set(Calendar.SECOND, 0);
-    calendar.set(Calendar.MILLISECOND, 0);
-    return calendar;
-  }
-
-  /**
-   * @param workflowSubmitButton The AjaxButton that should be updated.
-   * @param visibility The new visibility.
-   */
-  public static void updateButtonSubmit(final AjaxButton workflowSubmitButton, final boolean visibility)
-  {
-    workflowSubmitButton.setVisible(visibility);
-    workflowSubmitButton.replace(new Label("title", timePeriodString(MySession.get().getLastWorkflowSubmit(), newTime())));
-  }
-
-  /**
-   * @param workflowToggleButton The AjaxButton that should be updated.
-   * @return The new text on the button.
-   */
-  public static String updateButtonToggle(final AjaxButton workflowToggleButton)
-  {
-    final String result = PFUserContext.getLocalizedString(oldTime() == null ? "workflow.toggle.start" : "workflow.toggle.stop");
-    workflowToggleButton.replace(new Label("title", result));
-    return result;
   }
 
   /**
@@ -187,7 +168,7 @@ public class WorkflowUtils implements Serializable
     final TimesheetDO timesheetDO = new TimesheetDO();
     timesheetDO.setStartDate(oldTime().getTimeInMillis());
     timesheetDO.setStopTime(newTime().getTimeInMillis());
-    timesheetDO.setDescription("Created by Workflow");
+    // timesheetDO.setDescription("Created by Workflow");
     final TimesheetEditPage responsePage = new TimesheetEditPage(timesheetDO);
     if (component.getPage() instanceof WebPage) {
       responsePage.setReturnToPage((WebPage) component.getPage());
