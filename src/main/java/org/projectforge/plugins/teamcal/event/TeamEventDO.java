@@ -907,19 +907,33 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
   public TeamEventDO clone()
   {
     final TeamEventDO clone = new TeamEventDO();
+    clone.setCalendar(this.getCalendar());
     clone.startDate = this.startDate;
     clone.endDate = this.endDate;
     clone.allDay = this.allDay;
     clone.subject = this.subject;
     clone.location = this.location;
-    clone.attendees = this.attendees;
     clone.recurrenceExDate = this.recurrenceExDate;
     clone.recurrenceRule = this.recurrenceRule;
+    clone.recurrenceReferenceDate = this.recurrenceReferenceDate;
+    clone.recurrenceReferenceId = this.recurrenceReferenceId;
     clone.recurrenceUntil = this.recurrenceUntil;
+    clone.organizer = this.organizer;
+    clone.note = this.note;
     clone.externalUid = this.externalUid;
     clone.lastEmail = this.lastEmail;
     clone.sequence = this.sequence;
     clone.status = this.status;
+    clone.reminderDuration = this.reminderDuration;
+    clone.reminderDurationType = this.reminderDurationType;
+    clone.reminderActionType = this.reminderActionType;
+    if (this.attendees != null && this.attendees.isEmpty() == false) {
+      clone.attendees = clone.ensureAttendees();
+      for (final TeamEventAttendeeDO attendee: this.getAttendees()) {
+        attendee.setId(null);
+        clone.addAttendee(attendee);
+      }
+    }
     return clone;
   }
 
