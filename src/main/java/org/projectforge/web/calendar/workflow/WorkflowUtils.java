@@ -61,9 +61,11 @@ public class WorkflowUtils implements Serializable
       @Override
       protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
       {
-        if (oldTime() == null) {// Start Workflow
+        if (oldTime() == null) {
+          // Start Workflow
           MySession.get().setLastWorkflowSubmit(newTime());
-        } else {// Stop Workflow
+        } else {
+          // Stop Workflow
           submitWorkflow(this);
         }
         target.add(this);
@@ -142,8 +144,7 @@ public class WorkflowUtils implements Serializable
    * 
    * @param start the start
    * @param stop the stop
-   * @return the string
-   * @result String representing the Period
+   * @return the String representing the Period
    */
   private static String timePeriodString(Calendar start, Calendar stop)
   {
