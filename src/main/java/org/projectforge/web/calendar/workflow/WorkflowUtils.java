@@ -9,10 +9,12 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.util.time.Duration;
+import org.hibernate.dialect.MySQL5Dialect;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.timesheet.TimesheetEditPage;
+import org.projectforge.web.wicket.MySession;
 import org.projectforge.web.wicket.flowlayout.ButtonPanel;
 import org.projectforge.web.wicket.flowlayout.ButtonType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -42,8 +44,13 @@ public class WorkflowUtils implements Serializable
           WorkflowUtils.submitWorkflow(this);
         }
       }
+
+      @Override
+      public boolean isVisible()
+      {
+        return MySession.get().getLastWorkflowSubmit() != null;
+      }
     };
-    // workflowSubmitButton.setVisible(PFUserContext.getUser().getLastWorkflowSubmit() != null); // TODO JU
     workflowSubmitButton.setOutputMarkupId(true);
     workflowSubmitButton.setOutputMarkupPlaceholderTag(true);
 
@@ -53,7 +60,7 @@ public class WorkflowUtils implements Serializable
       protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
       {
         if (WorkflowUtils.oldTime() == null) {// Start Workflow
-          // PFUserContext.getUser().setLastWorkflowSubmit(newTime()); TODO JU
+          MySession.get().setLastWorkflowSubmit(newTime());
           WorkflowUtils.updateButtonSubmit(workflowSubmitButton, true);
         } else {// Stop Workflow
           WorkflowUtils.submitWorkflow(this);
@@ -81,12 +88,12 @@ public class WorkflowUtils implements Serializable
       void updateLabeling()
       {
         if (WorkflowUtils.oldTime() != null) {
-          ((AjaxButton) getComponent()).replace(new Label("title", WorkflowUtils.timePeriodString()));
+          ((AjaxButton) getComponent()).replace(new Label("title", WorkflowUtils.timePeriodString(oldTime(), newTime())));
           if (WorkflowUtils.oldTime().get(Calendar.DAY_OF_YEAR) != WorkflowUtils.newTime().get(Calendar.DAY_OF_YEAR)
               || WorkflowUtils.oldTime().get(Calendar.YEAR) != WorkflowUtils.newTime().get(Calendar.YEAR)) {
             // There are no entries over 2 days or more
             WorkflowUtils.submitWorkflow(workflowToggleButton);
-            // PFUserContext.getUser().setLastWorkflowSubmit(WorkflowUtils.newTime()); // TODO JU
+            MySession.get().setLastWorkflowSubmit(WorkflowUtils.newTime());
           }
         }
       }
@@ -104,8 +111,7 @@ public class WorkflowUtils implements Serializable
    */
   public static Calendar oldTime()
   {
-    // return PFUserContext.getUser().getLastWorkflowSubmit(); TODO JU
-    return null;
+    return MySession.get().getLastWorkflowSubmit();
   }
 
   /**
@@ -136,8 +142,7 @@ public class WorkflowUtils implements Serializable
   public static void updateButtonSubmit(final AjaxButton workflowSubmitButton, final boolean visibility)
   {
     workflowSubmitButton.setVisible(visibility);
-    // TODO JU
-    // workflowSubmitButton.replace(new Label("title", timePeriodString(PFUserContext.getUser().getLastWorkflowSubmit(), newTime())));
+    workflowSubmitButton.replace(new Label("title", timePeriodString(MySession.get().getLastWorkflowSubmit(), newTime())));
   }
 
   /**
@@ -152,12 +157,15 @@ public class WorkflowUtils implements Serializable
   }
 
   /**
+   * Time period string.
+   * 
+   * @param start the start
+   * @param stop the stop
+   * @return the string
    * @result String representing the Period
    */
-  public static String timePeriodString()
+  public static String timePeriodString(Calendar start, Calendar stop)
   {
-    Calendar stop = newTime();
-    Calendar start = oldTime();
     final DateTimeFormatter dtf = new DateTimeFormatter();
     final boolean timeStored = (start != null);
     if (timeStored) {
@@ -186,7 +194,7 @@ public class WorkflowUtils implements Serializable
       responsePage.setReturnToPage((WebPage) component.getPage());
     }
     component.setResponsePage(responsePage);
-    // PFUserContext.getUser().removeLastWorkflowSubmit(); TODO JU
+    MySession.get().setLastWorkflowSubmit(null);
   }
 
   /**

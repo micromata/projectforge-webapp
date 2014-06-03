@@ -24,6 +24,7 @@
 package org.projectforge.web.wicket;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.TimeZone;
 
 import org.apache.wicket.Session;
@@ -67,6 +68,8 @@ public class MySession extends WebSession
   private boolean mobileUserAgent;
 
   private boolean ignoreMobileUserAgent;
+  
+  private Calendar lastWorkflowSubmit;
 
   /**
    * Random cross site request forgery token.
@@ -270,5 +273,15 @@ public class MySession extends WebSession
   public ClientProperties getClientProperties()
   {
     return clientProperties;
+  }
+
+  public Calendar getLastWorkflowSubmit()
+  {
+    return lastWorkflowSubmit;
+  }
+
+  public void setLastWorkflowSubmit(Calendar lastWorkflowSubmit)
+  {
+    this.lastWorkflowSubmit = lastWorkflowSubmit;
   }
 }
