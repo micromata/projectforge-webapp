@@ -10,6 +10,7 @@
 package org.projectforge.plugins.teamcal.event;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -141,6 +142,7 @@ public class TeamEventMailer
       final TeamEventDO event = teamEventDao.getById(value.getId());
       if (sendIcsFile(event, value.getType()) == false) {
         failures++;
+        log.error("Can't send all emails for TeamEvent: " + event.getSubject());
       } else {
         final Timestamp t = new Timestamp(event.getLastUpdate().getTime());
         event.setLastEmail(t);
@@ -151,19 +153,19 @@ public class TeamEventMailer
   }
 
   private boolean sendIcsFile(final TeamEventDO event, final TeamEventMailType type) {
-    final String workdir ="tmp/";
-    final String[] attachmentfiles = new String[1];
-    attachmentfiles[0] = event.getUid() + ".ics";
+    int failures = 0;
     final String content = getICal(event, type);
-    if (writeFile(content, workdir, attachmentfiles[0] ) == false) {
-      log.error("Can't write attachmentfile: " + attachmentfiles[0]);
-      return false;
+    final File[] attachmentfiles = new File[1];
+    attachmentfiles[0] = writeTempFile(content, "ICal-", "ics");
+    if (attachmentfiles[0] == null) {
+      log.error("Can't write attachmentfile: " + "ICal-" + ".ics");
+      failures++;
     }
     final Mail msg = new Mail();
     msg.setProjectForgeSubject(composeSubject(event, type));
 
     msg.setContentType(Mail.CONTENTTYPE_HTML);
-    int failures = 0;
+
     final SendMail sendMail = new SendMail();
     sendMail.setConfigXml(ConfigXml.getInstance());
     for (final TeamEventAttendeeDO attendee : event.getAttendees()) {
@@ -176,29 +178,31 @@ public class TeamEventMailer
           continue;
         }
       }
-      if (sendMail.send(msg, workdir, attachmentfiles) == false) {
+      if (sendMail.send(msg, attachmentfiles) == false) {
         failures++;
       }
     }
     return failures == 0 ? true : false;
   }
 
-  private boolean writeFile(final String content, final String workdir, final String file) {
+  private static File writeTempFile(final String content, final String prefix, final String suffix) {
     PrintWriter pWriter = null;
-    boolean success = true;
+    File temp = null;
     try {
-      pWriter = new PrintWriter(new BufferedWriter(new FileWriter(workdir + file)));
+      temp = File.createTempFile(prefix, "." + suffix);
+      pWriter = new PrintWriter(new BufferedWriter(new FileWriter(temp)));
       pWriter.println(content);
-    } catch (final IOException ioe) {
-      ioe.printStackTrace();
-      success = false;
+      temp.deleteOnExit();
+    } catch (final IOException ex) {
+      ex.printStackTrace();
+      log.error("Can't  write file." + ex.toString());
     } finally {
       if (pWriter != null) {
         pWriter.flush();
         pWriter.close();
       }
     }
-    return success;
+    return temp;
   }
 
   private String composeHtmlContent(final TeamEventDO event, final Short number, final TeamEventMailType type) {
