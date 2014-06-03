@@ -41,8 +41,9 @@ public class WorkflowUtils implements Serializable
       @Override
       protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
       {
-        if (WorkflowUtils.oldTime() != null) {
-          WorkflowUtils.submitWorkflow(this);
+        if (oldTime() != null) {
+          submitWorkflow(this);
+          MySession.get().setLastWorkflowSubmit(newTime());
         }
       }
 
@@ -60,10 +61,10 @@ public class WorkflowUtils implements Serializable
       @Override
       protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
       {
-        if (WorkflowUtils.oldTime() == null) {// Start Workflow
+        if (oldTime() == null) {// Start Workflow
           MySession.get().setLastWorkflowSubmit(newTime());
         } else {// Stop Workflow
-          WorkflowUtils.submitWorkflow(this);
+          submitWorkflow(this);
         }
         target.add(this);
         target.add(workflowSubmitButton);
@@ -86,13 +87,13 @@ public class WorkflowUtils implements Serializable
        */
       void updateLabeling()
       {
-        if (WorkflowUtils.oldTime() != null) {
-          ((AjaxButton) getComponent()).replace(new Label("title", WorkflowUtils.timePeriodString(oldTime(), newTime())));
-          if (WorkflowUtils.oldTime().get(Calendar.DAY_OF_YEAR) != WorkflowUtils.newTime().get(Calendar.DAY_OF_YEAR)
-              || WorkflowUtils.oldTime().get(Calendar.YEAR) != WorkflowUtils.newTime().get(Calendar.YEAR)) {
+        if (oldTime() != null) {
+          ((AjaxButton) getComponent()).replace(new Label("title", timePeriodString(oldTime(), newTime())));
+          if (oldTime().get(Calendar.DAY_OF_YEAR) != newTime().get(Calendar.DAY_OF_YEAR)
+              || oldTime().get(Calendar.YEAR) != newTime().get(Calendar.YEAR)) {
             // There are no entries over 2 days or more
-            WorkflowUtils.submitWorkflow(workflowToggleButton);
-            MySession.get().setLastWorkflowSubmit(WorkflowUtils.newTime());
+            submitWorkflow(workflowToggleButton);
+            MySession.get().setLastWorkflowSubmit(newTime());
           }
         }
       }
