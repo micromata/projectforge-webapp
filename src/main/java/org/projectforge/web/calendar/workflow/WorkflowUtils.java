@@ -9,7 +9,6 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.util.time.Duration;
-import org.hibernate.dialect.MySQL5Dialect;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.calendar.DateTimeFormatter;
