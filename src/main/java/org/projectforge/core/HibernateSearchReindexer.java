@@ -82,7 +82,7 @@ public class HibernateSearchReindexer
         msg.setProjectForgeSubject("Error while re-indexing ProjectForge data-base.");
         msg.setContent(ERROR_MSG + "\n\nResult:\n" + result);
         msg.setContentType(Mail.CONTENTTYPE_TEXT);
-        sendMail.send(msg, null, null);
+        sendMail.send(msg, null);
       }
     }
     log.info("Re-index job finished successfully.");

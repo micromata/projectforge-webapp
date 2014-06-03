@@ -81,7 +81,7 @@ public class SendMail
    * @throws UserException if to address is not given.
    * @throws InternalErrorException due to technical failures.
    */
-  public boolean send(final Mail composedMessage, final String workdir, final String[] attachmentfiles)
+  public boolean send(final Mail composedMessage, final File[] attachmentfiles)
   {
     final String to = composedMessage.getTo();
     if (to == null || to.trim().length() == 0) {
@@ -90,10 +90,6 @@ public class SendMail
     }
     if (StringUtils.isBlank(sendMailConfig.getHost()) == true) {
       log.error("No e-mail host configured. E-Mail not sent: " + composedMessage.toString());
-      return false;
-    }
-    if ( (StringUtils.isBlank(workdir) == true && attachmentfiles != null) || (StringUtils.isNotBlank(workdir) == true && attachmentfiles == null) ) {
-      log.error("Either workdir or attachmentfiles == null. Can't send attachmentfiles.");
       return false;
     }
     log.info("Try to send email to " + to);
@@ -115,8 +111,8 @@ public class SendMail
       @Override
       public void run()
       {
-        if (StringUtils.isNotBlank(workdir) == true) {
-          sendIt(composedMessage, workdir, attachmentfiles);
+        if (attachmentfiles != null && attachmentfiles.length > 0) {
+          sendIt(composedMessage, attachmentfiles);
         } else {
           sendIt(composedMessage);
         }
@@ -173,10 +169,11 @@ public class SendMail
     log.info("E-Mail successfully sent: " + composedMessage.toString());
   }
 
-  private void sendIt(final Mail composedMessage, final String workdir, final String[] attachmentfiles) {
+  private void sendIt(final Mail composedMessage, final File[] attachmentfiles) {
     final Session session = Session.getInstance(properties);
     Transport transport = null;
     try {
+
       final MimeMessage message = new MimeMessage(session);
       if (composedMessage.getFrom() != null) {
         message.setFrom(new InternetAddress(composedMessage.getFrom()));
@@ -212,11 +209,13 @@ public class SendMail
           mbp[i] = new MimeBodyPart();
           // attach the file to the message
           final FileDataSource fds=
-              new FileDataSource(workdir + attachmentfiles[i]);
+              new FileDataSource(attachmentfiles[i]);
           mbp[i].setDataHandler( new DataHandler(fds));
-          mbp[i].setFileName(attachmentfiles[i]);
+          mbp[i].setFileName(attachmentfiles[i].getName());
           mp.addBodyPart(mbp[i]);
         }
+      } else {
+        log.error("attachmentfiles == null or empty. Can't send attachmentfiles.");
       }
       // add the Multipart to the message
       message.setContent(mp);
@@ -242,12 +241,6 @@ public class SendMail
       }
     }
     log.info("E-Mail successfully sent: " + composedMessage.toString());
-    for (int i=0; i < attachmentfiles.length; i++) {
-      final File file = new File(workdir + attachmentfiles[i]);
-      if (file.exists() == true) {
-        file.delete();
-      }
-    }
   }
 
   /**

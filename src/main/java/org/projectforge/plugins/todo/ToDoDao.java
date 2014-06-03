@@ -223,7 +223,7 @@ public class ToDoDao extends BaseDao<ToDoDO>
     final String content = sendMail.renderGroovyTemplate(msg, "mail/todoChangeNotification.html", data, recipient);
     msg.setContent(content);
     msg.setContentType(Mail.CONTENTTYPE_HTML);
-    sendMail.send(msg, null, null);
+    sendMail.send(msg, null);
   }
 
   @Override
