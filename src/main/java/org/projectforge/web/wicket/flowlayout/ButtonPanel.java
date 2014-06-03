@@ -27,6 +27,7 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.projectforge.web.wicket.WicketUtils;
 
@@ -46,9 +47,15 @@ public class ButtonPanel extends Panel
 
   public ButtonPanel(final String id, final String label, final ButtonType... buttonTypes)
   {
+    this(id, Model.of(label), new Button(BUTTON_ID, new Model<String>(label)), buttonTypes);
+  }
+
+  public ButtonPanel(final String id, final IModel<String> labelModel, final Button button, final ButtonType... buttonTypes)
+  {
     super(id);
-    button = new Button(BUTTON_ID, new Model<String>(label));
-    button.add(new Label("title", label));
+    this.button = button;
+    label = new Label("title", labelModel);
+    button.add(label);
     for (final ButtonType buttonType : buttonTypes) {
       button.add(AttributeModifier.append("class", buttonType.getClassAttrValue()));
     }
@@ -57,13 +64,7 @@ public class ButtonPanel extends Panel
 
   public ButtonPanel(final String id, final String label, final Button button, final ButtonType... buttonTypes)
   {
-    super(id);
-    this.button = button;
-    button.add(new Label("title", label));
-    for (final ButtonType buttonType : buttonTypes) {
-      button.add(AttributeModifier.append("class", buttonType.getClassAttrValue()));
-    }
-    add(button);
+    this(id, Model.of(label), button, buttonTypes);
   }
 
 
