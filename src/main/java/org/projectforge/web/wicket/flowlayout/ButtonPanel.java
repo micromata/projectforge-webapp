@@ -55,11 +55,11 @@ public class ButtonPanel extends Panel
     add(button);
   }
 
-  public ButtonPanel(final String id, final String title, final Button button, final ButtonType... buttonTypes)
+  public ButtonPanel(final String id, final String label, final Button button, final ButtonType... buttonTypes)
   {
     super(id);
     this.button = button;
-    button.add(new Label("title", title));
+    button.add(new Label("title", label));
     for (final ButtonType buttonType : buttonTypes) {
       button.add(AttributeModifier.append("class", buttonType.getClassAttrValue()));
     }
