@@ -36,7 +36,7 @@ public class WorkflowUtils implements Serializable
   {
     // workflow SubmitButton
     final AjaxButton workflowSubmitButton = new AjaxButton(ButtonPanel.BUTTON_ID, Model.of(PFUserContext
-        .getLocalizedString("workflow.toggle.submit"))) {
+        .getLocalizedString("workflow.toggle.start"))) {
 
       @Override
       protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
