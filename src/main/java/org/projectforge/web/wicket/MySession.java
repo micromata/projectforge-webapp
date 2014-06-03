@@ -68,7 +68,8 @@ public class MySession extends WebSession
   private boolean mobileUserAgent;
 
   private boolean ignoreMobileUserAgent;
-  
+
+  // TODO JU move to user prefs
   private Calendar lastWorkflowSubmit;
 
   /**
