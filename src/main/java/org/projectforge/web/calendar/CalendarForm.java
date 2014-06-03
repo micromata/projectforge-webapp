@@ -29,6 +29,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.joda.time.DateMidnight;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
@@ -141,7 +142,7 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
 
     gridBuilder.newSplitPanel(GridSize.SPAN3);
 
-    final FieldsetPanel workflowFs = gridBuilder.newFieldset("Workflow"); // TODO JU i18n
+    final FieldsetPanel workflowFs = gridBuilder.newFieldset(PFUserContext.getLocalizedString("workflow.title"));
     WorkflowUtils.addWorkflowPanel(workflowFs);
 
     onAfterInit(gridBuilder);
