@@ -81,7 +81,7 @@ public class WorkflowUtils implements Serializable
         target.add(workflowSubmitButton);
       }
 
-      /*
+      /**
        * Updates time on the button
        */
       void updateLabeling()
@@ -123,7 +123,7 @@ public class WorkflowUtils implements Serializable
   /**
    * @return The last time the User saved his time. Might be null.
    */
-  public static Calendar oldTime()
+  private static Calendar oldTime()
   {
     return MySession.get().getLastWorkflowSubmit();
   }
@@ -131,7 +131,7 @@ public class WorkflowUtils implements Serializable
   /**
    * @return The current time, rounded to 5-minute steps
    */
-  public static Calendar newTime()
+  private static Calendar newTime()
   {
     return roundTo5Minutes(Calendar.getInstance(PFUserContext.getTimeZone()));
   }
@@ -144,7 +144,7 @@ public class WorkflowUtils implements Serializable
    * @return the string
    * @result String representing the Period
    */
-  public static String timePeriodString(Calendar start, Calendar stop)
+  private static String timePeriodString(Calendar start, Calendar stop)
   {
     final DateTimeFormatter dtf = new DateTimeFormatter();
     final boolean timeStored = (start != null);
@@ -163,7 +163,7 @@ public class WorkflowUtils implements Serializable
    * 
    * @param component the according component
    */
-  public static void submitWorkflow(Component component)
+  private static void submitWorkflow(Component component)
   {
     final TimesheetDO timesheetDO = new TimesheetDO();
     timesheetDO.setStartDate(oldTime().getTimeInMillis());
@@ -182,7 +182,7 @@ public class WorkflowUtils implements Serializable
    * 
    * @param date that should be rounded
    */
-  public static Calendar roundTo5Minutes(final Calendar date)
+  private static Calendar roundTo5Minutes(final Calendar date)
   {
     if (date == null) {
       return null;
