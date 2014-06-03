@@ -1,6 +1,5 @@
 package org.projectforge.web.calendar.workflow;
 
-import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.AjaxSelfUpdatingTimerBehavior;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
@@ -13,6 +12,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.util.time.Duration;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.user.PFUserContext;
+import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.timesheet.TimesheetEditPage;
 import org.projectforge.web.wicket.MySession;
@@ -29,11 +29,19 @@ import java.util.Calendar;
  * @author Julius Hege (julheg@gmx.de)
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  */
-public class WorkflowUtils implements Serializable
+public class WorkflowSubmitFieldSet implements Serializable
 {
 
-  public static void addWorkflowPanel(FieldsetPanel fieldsetPanel)
+  private static final String WORKFLOW_LAST_SUBMIT_KEY = "WORKFLOW_LAST_SUBMIT_KEY";
+
+  private final UserXmlPreferencesCache userXmlPreferencesCache;
+
+  private final WebPage accordingWebPage;
+
+  public WorkflowSubmitFieldSet(FieldsetPanel fieldsetPanel, final UserXmlPreferencesCache userXmlPreferencesCache, WebPage accordingWebPage)
   {
+    this.userXmlPreferencesCache = userXmlPreferencesCache;
+    this.accordingWebPage = accordingWebPage;
     // workflow SubmitButton
     final AjaxButton workflowSubmitButton = new AjaxButton(ButtonPanel.BUTTON_ID, Model.of(PFUserContext
         .getLocalizedString("workflow.toggle.start"))) {
@@ -42,15 +50,15 @@ public class WorkflowUtils implements Serializable
       protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
       {
         if (oldTime() != null) {
-          submitWorkflow(this);
-          MySession.get().setLastWorkflowSubmit(newTime());
+          submitWorkflow();
+          setLastWorkflowSubmitToCurrentTime();
         }
       }
 
       @Override
       public boolean isVisible()
       {
-        return MySession.get().getLastWorkflowSubmit() != null;
+        return oldTime() != null;
       }
     };
     workflowSubmitButton.setOutputMarkupId(true);
@@ -63,10 +71,10 @@ public class WorkflowUtils implements Serializable
       {
         if (oldTime() == null) {
           // Start Workflow
-          MySession.get().setLastWorkflowSubmit(newTime());
+          setLastWorkflowSubmitToCurrentTime();
         } else {
           // Stop Workflow
-          submitWorkflow(this);
+          submitWorkflow();
         }
         target.add(this);
         target.add(workflowSubmitButton);
@@ -94,8 +102,8 @@ public class WorkflowUtils implements Serializable
           if (oldTime().get(Calendar.DAY_OF_YEAR) != newTime().get(Calendar.DAY_OF_YEAR)
               || oldTime().get(Calendar.YEAR) != newTime().get(Calendar.YEAR)) {
             // There are no entries over 2 days or more
-            submitWorkflow(workflowToggleButton);
-            MySession.get().setLastWorkflowSubmit(newTime());
+            submitWorkflow();
+            setLastWorkflowSubmitToCurrentTime();
           }
         }
       }
@@ -117,18 +125,53 @@ public class WorkflowUtils implements Serializable
       @Override
       public String getObject()
       {
-        return timePeriodString(MySession.get().getLastWorkflowSubmit(), newTime());
+        return timePeriodString(oldTime(), newTime());
       }
     };
     fieldsetPanel.add(new ButtonPanel(fieldsetPanel.newChildId(), submitButtonModel, workflowSubmitButton, ButtonType.GREEN));
   }
 
   /**
+   * Sets last workflow submit.
+   */
+  private void setLastWorkflowSubmitToCurrentTime()
+  {
+    userXmlPreferencesCache.putEntry(MySession.get().getUserId(), WORKFLOW_LAST_SUBMIT_KEY, newTime().getTimeInMillis(), true);
+  }
+
+  /**
+   * Submits the current workflow-settings. Also opens a responsePage for further proceeding.
+   */
+  private void submitWorkflow()
+  {
+    final TimesheetDO timesheetDO = new TimesheetDO();
+    timesheetDO.setStartDate(oldTime().getTimeInMillis());
+    timesheetDO.setStopTime(newTime().getTimeInMillis());
+    // timesheetDO.setDescription("Created by Workflow");
+    final TimesheetEditPage responsePage = new TimesheetEditPage(timesheetDO);
+    responsePage.setReturnToPage(accordingWebPage);
+    accordingWebPage.setResponsePage(responsePage);
+    userXmlPreferencesCache.removeEntry(MySession.get().getUserId(), WORKFLOW_LAST_SUBMIT_KEY);
+  }
+
+  /**
    * @return The last time the User saved his time. Might be null.
    */
-  private static Calendar oldTime()
+  private Calendar oldTime()
   {
-    return MySession.get().getLastWorkflowSubmit();
+    Object fromCache = userXmlPreferencesCache.getEntry(MySession.get().getUserId(), WORKFLOW_LAST_SUBMIT_KEY);
+    if (fromCache == null) {
+      return null;
+    } else {
+      try {
+        Calendar calendar = Calendar.getInstance(PFUserContext.getTimeZone());
+        calendar.setTimeInMillis(Long.parseLong(fromCache.toString()));
+        return calendar;
+      } catch (Exception e) {
+        // TODO logging
+        return null;
+      }
+    }
   }
 
   /**
@@ -158,25 +201,6 @@ public class WorkflowUtils implements Serializable
           + dtf.getFormattedTime(stop.getTime());
     }
     return "";
-  }
-
-  /**
-   * Submits the current workflow-settings. Also opens a responsePage for further proceeding.
-   * 
-   * @param component the according component
-   */
-  private static void submitWorkflow(Component component)
-  {
-    final TimesheetDO timesheetDO = new TimesheetDO();
-    timesheetDO.setStartDate(oldTime().getTimeInMillis());
-    timesheetDO.setStopTime(newTime().getTimeInMillis());
-    // timesheetDO.setDescription("Created by Workflow");
-    final TimesheetEditPage responsePage = new TimesheetEditPage(timesheetDO);
-    if (component.getPage() instanceof WebPage) {
-      responsePage.setReturnToPage((WebPage) component.getPage());
-    }
-    component.setResponsePage(responsePage);
-    MySession.get().setLastWorkflowSubmit(null);
   }
 
   /**

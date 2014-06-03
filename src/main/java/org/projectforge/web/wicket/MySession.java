@@ -69,9 +69,6 @@ public class MySession extends WebSession
 
   private boolean ignoreMobileUserAgent;
 
-  // TODO JU move to user prefs
-  private Calendar lastWorkflowSubmit;
-
   /**
    * Random cross site request forgery token.
    */
@@ -276,13 +273,4 @@ public class MySession extends WebSession
     return clientProperties;
   }
 
-  public Calendar getLastWorkflowSubmit()
-  {
-    return lastWorkflowSubmit;
-  }
-
-  public void setLastWorkflowSubmit(Calendar lastWorkflowSubmit)
-  {
-    this.lastWorkflowSubmit = lastWorkflowSubmit;
-  }
 }

@@ -33,7 +33,7 @@ import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
-import org.projectforge.web.calendar.workflow.WorkflowUtils;
+import org.projectforge.web.calendar.workflow.WorkflowSubmitFieldSet;
 import org.projectforge.web.wicket.AbstractStandardForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.bootstrap.GridBuilder;
@@ -143,7 +143,7 @@ public class CalendarForm extends AbstractStandardForm<CalendarFilter, CalendarP
     gridBuilder.newSplitPanel(GridSize.SPAN3);
 
     final FieldsetPanel workflowFs = gridBuilder.newFieldset(PFUserContext.getLocalizedString("workflow.title"));
-    WorkflowUtils.addWorkflowPanel(workflowFs);
+    new WorkflowSubmitFieldSet(workflowFs, null, getWebPage());
 
     onAfterInit(gridBuilder);
   }
