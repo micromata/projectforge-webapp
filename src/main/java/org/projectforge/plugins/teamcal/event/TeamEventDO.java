@@ -146,7 +146,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
   private Integer sequence = 0;
 
   //See RFC 2445 section 4.8.1.11
-  private TeamEventStatus status = TeamEventStatus.UNKNOWN;
+  //  private TeamEventStatus status = TeamEventStatus.UNKNOWN;
 
   private static final Set<String> NON_HISTORIZABLE_ATTRIBUTES;
 
@@ -168,7 +168,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
     reminderActionType = null;
     lastEmail = null;
     sequence = null;
-    status = null;
+    //       status = null;
   }
 
   public TeamEventDO()
@@ -751,24 +751,24 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
     sequence++;
   }
 
-  /**
-   * @return the status
-   */
-  @Column
-  public TeamEventStatus getStatus()
-  {
-    return status;
-  }
-
-  /**
-   * @param status the status to set
-   * @return this for chaining.
-   */
-  public TeamEventDO setStatus(final TeamEventStatus status)
-  {
-    this.status = status;
-    return this;
-  }
+  //  /**
+  //   * @return the status
+  //   */
+  //  @Column
+  //  public TeamEventStatus getStatus()
+  //  {
+  //    return status;
+  //  }
+  //
+  //  /**
+  //   * @param status the status to set
+  //   * @return this for chaining.
+  //   */
+  //  public TeamEventDO setStatus(final TeamEventStatus status)
+  //  {
+  //    this.status = status;
+  //    return this;
+  //  }
 
   /**
    * @see java.lang.Object#hashCode()
@@ -923,7 +923,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
     clone.externalUid = this.externalUid;
     clone.lastEmail = this.lastEmail;
     clone.sequence = this.sequence;
-    clone.status = this.status;
+    //    clone.status = this.status;
     clone.reminderDuration = this.reminderDuration;
     clone.reminderDurationType = this.reminderDurationType;
     clone.reminderActionType = this.reminderActionType;

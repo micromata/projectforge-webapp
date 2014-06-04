@@ -75,17 +75,24 @@ public class TeamEventMailer
     protected final Date lastEmail;
     protected final HistoryEntry[] entries;
     private final List<HistoryEntry> list;
+    private boolean locationChanged;
+    private boolean dateChanged;
+    private boolean recurrenceChanged;
+
     public Marker(final HistoryEntry[] entries, final Date lastEmail) {
       this.entries = entries;
       this.lastEmail=lastEmail;
       list = new LinkedList<HistoryEntry>();
       for (int i=0; i < entries.length-1; i++) {
-        if (entries[i].getTimestamp().after(lastEmail)) {
+        if (entries[i].getTimestamp().getTime() > lastEmail.getTime()) {
           list.add(entries[i]);
         }
       }
+      locationChanged = hasLocationChanged();
+      dateChanged = hasDateChanged();
+      recurrenceChanged = hasRecurrenceChanged();
     }
-    public boolean hasLocationChanged() {
+    private boolean hasLocationChanged() {
       for (final HistoryEntry entry : list) {
         for (final PropertyDelta delta : entry.getDelta()) {
           if (StringUtils.contains(delta.getPropertyName(), "location") == true) {
@@ -95,18 +102,18 @@ public class TeamEventMailer
       }
       return false;
     }
-    public boolean hasDateChanged() {
+    private boolean hasDateChanged() {
       for (final HistoryEntry entry : list) {
         for (final PropertyDelta delta : entry.getDelta()) {
           if (StringUtils.contains(delta.getPropertyName(), "startDate") == true ||
-              StringUtils.contains(delta.getPropertyName(), "endDate") == true) {
+              StringUtils.contains(delta.getPropertyName(), "endDate") == true ) {
             return true;
           }
         }
       }
       return false;
     }
-    public boolean hasRecurrencyChanged() {
+    private boolean hasRecurrenceChanged() {
       for (final HistoryEntry entry : list) {
         for (final PropertyDelta delta : entry.getDelta()) {
           if (StringUtils.contains(delta.getPropertyName(), "recurrenceRule") == true) {
@@ -115,6 +122,33 @@ public class TeamEventMailer
         }
       }
       return false;
+    }
+    public void computeChanges(final TeamEventDO event, final TeamEventDO orgEvent) {
+      if (StringUtils.equals(event.getLocation(), orgEvent.getLocation()) == false) {
+        locationChanged = true;
+      }
+      if (event.getStartDate() != null && orgEvent.getStartDate() != null &&
+          event.getEndDate() != null && orgEvent.getEndDate() != null) {
+        if (event.getStartDate().equals(orgEvent.getStartDate()) == false ||
+            event.getEndDate().equals(orgEvent.getEndDate()) == false) {
+          dateChanged = true;
+        }
+      }
+      if (StringUtils.equals(event.getRecurrenceRule(), orgEvent.getRecurrenceRule()) == false) {
+        recurrenceChanged = true;
+      }
+    }
+    public boolean isLocationChanged()
+    {
+      return locationChanged;
+    }
+    public boolean isDateChanged()
+    {
+      return dateChanged;
+    }
+    public boolean isRecurrenceChanged()
+    {
+      return recurrenceChanged;
     }
   }
 
@@ -133,56 +167,6 @@ public class TeamEventMailer
   public Queue<TeamEventMailValue> getQueue()
   {
     return queue;
-  }
-
-  public boolean send() {
-    int failures = 0;
-    while (queue.isEmpty() == false) {
-      final TeamEventMailValue value = queue.poll();
-      final TeamEventDO event = teamEventDao.getById(value.getId());
-      if (sendIcsFile(event, value.getType()) == false) {
-        failures++;
-        log.error("Can't send all emails for TeamEvent: " + event.getSubject());
-      } else {
-        final Timestamp t = new Timestamp(event.getLastUpdate().getTime());
-        event.setLastEmail(t);
-        teamEventDao.saveOrUpdate(event);
-      }
-    }
-    return failures == 0 ? true : false;
-  }
-
-  private boolean sendIcsFile(final TeamEventDO event, final TeamEventMailType type) {
-    int failures = 0;
-    final String content = getICal(event, type);
-    final File[] attachmentfiles = new File[1];
-    attachmentfiles[0] = writeTempFile(content, "ICal-", "ics");
-    if (attachmentfiles[0] == null) {
-      log.error("Can't write attachmentfile: " + "ICal-" + ".ics");
-      failures++;
-    }
-    final Mail msg = new Mail();
-    msg.setProjectForgeSubject(composeSubject(event, type));
-
-    msg.setContentType(Mail.CONTENTTYPE_HTML);
-
-    final SendMail sendMail = new SendMail();
-    sendMail.setConfigXml(ConfigXml.getInstance());
-    for (final TeamEventAttendeeDO attendee : event.getAttendees()) {
-      msg.setContent(composeHtmlContent(event, attendee.getNumber(), type));
-      if (attendee.getUserId() == null) {
-        msg.setTo(attendee.getUrl());
-      } else {
-        msg.setTo(attendee.getUser());
-        if (attendee.getUser().equals(PFUserContext.getUser()) == true) {
-          continue;
-        }
-      }
-      if (sendMail.send(msg, attachmentfiles) == false) {
-        failures++;
-      }
-    }
-    return failures == 0 ? true : false;
   }
 
   private static File writeTempFile(final String content, final String prefix, final String suffix) {
@@ -205,9 +189,60 @@ public class TeamEventMailer
     return temp;
   }
 
-  private String composeHtmlContent(final TeamEventDO event, final Short number, final TeamEventMailType type) {
+  public boolean send() {
+    int failures = 0;
+    while (queue.isEmpty() == false) {
+      final TeamEventMailValue value = queue.poll();
+      final TeamEventDO event = teamEventDao.getById(value.getId());
+      if (sendIcsFile(event, value.getType(), value.getOrgId()) == false) {
+        failures++;
+        log.error("Can't send all emails for TeamEvent: " + event.getSubject());
+      } else {
+        final Timestamp t = new Timestamp(event.getLastUpdate().getTime());
+        event.setLastEmail(t);
+        teamEventDao.saveOrUpdate(event);
+      }
+    }
+    return failures == 0 ? true : false;
+  }
 
+  private boolean sendIcsFile(final TeamEventDO event, final TeamEventMailType type, final Integer orgId) {
+    int failures = 0;
     final Marker marker = new Marker(teamEventDao.getHistoryEntries(event), event.getLastEmail());
+    if (orgId != null) {
+      final TeamEventDO orgEvent = teamEventDao.getById(orgId);
+      marker.computeChanges(event, orgEvent);
+    }
+    final String content = getICal(event, type);
+    final File[] attachmentfiles = new File[1];
+    attachmentfiles[0] = writeTempFile(content, "ICal-", "ics");
+    if (attachmentfiles[0] == null) {
+      log.error("Can't write attachmentfile: " + "ICal-" + ".ics");
+      failures++;
+    }
+    final Mail msg = new Mail();
+    msg.setProjectForgeSubject(composeSubject(event, type));
+    msg.setContentType(Mail.CONTENTTYPE_HTML);
+    final SendMail sendMail = new SendMail();
+    sendMail.setConfigXml(ConfigXml.getInstance());
+    for (final TeamEventAttendeeDO attendee : event.getAttendees()) {
+      msg.setContent(composeHtmlContent(event, attendee.getNumber(), type, marker));
+      if (attendee.getUserId() == null) {
+        msg.setTo(attendee.getUrl());
+      } else {
+        msg.setTo(attendee.getUser());
+        if (attendee.getUser().equals(PFUserContext.getUser()) == true) {
+          continue;
+        }
+      }
+      if (sendMail.send(msg, attachmentfiles) == false) {
+        failures++;
+      }
+    }
+    return failures == 0 ? true : false;
+  }
+
+  private String composeHtmlContent(final TeamEventDO event, final Short number, final TeamEventMailType type, final Marker marker) {
     final StringBuffer buf = new StringBuffer();
     buf.append("<html><body><h2>").append(composeSubject(event, type)).append("</h2>");
     buf.append("<table>");
@@ -219,8 +254,7 @@ public class TeamEventMailer
     buf.append("</table>");
     buf.append(composeButtons(event, number, type));
     buf.append("</body></html>");
-    final String s = buf.toString();
-    return s;
+    return buf.toString();
   }
 
   private String composeSubject(final TeamEventDO event, final TeamEventMailType type) {
@@ -255,7 +289,7 @@ public class TeamEventMailer
     buf.append("<tr>");
     switch (type) {
       case UPDATE:
-        if (marker.hasDateChanged() == true) {
+        if (marker.isDateChanged() == true) {
           buf.append("<td>").append(I18n.getString("plugins.teamcal.event.changed")).append("</td>");
           break;
         }
@@ -281,7 +315,7 @@ public class TeamEventMailer
       buf.append("<tr>");
       switch (type) {
         case UPDATE:
-          if (marker.hasRecurrencyChanged() == true) {
+          if (marker.isRecurrenceChanged() == true) {
             buf.append("<td>").append(I18n.getString("plugins.teamcal.event.recurrence.changed")).append("</td>");
           } else {
             buf.append("<td></td>");
@@ -312,7 +346,7 @@ public class TeamEventMailer
           buf.append("<td>").append(I18n.getString("plugins.teamcal.event.location")).append("</td>");
           break;
         case UPDATE:
-          if (marker.hasLocationChanged() ==true) {
+          if (marker.isLocationChanged() ==true) {
             buf.append("<td>").append(I18n.getString("plugins.teamcal.event.location.changed")).append("</td>");
           } else {
             buf.append("<td>").append(I18n.getString("plugins.teamcal.event.location")).append("</td>");

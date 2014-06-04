@@ -32,6 +32,11 @@ public enum TeamEventStatus implements I18nEnum
 {
   UNKNOWN("unknown"), COMMITTED("committed"), DECLINED("declined"), PERHAPS("perhaps");
 
+  /**
+   * List of all available values.
+   */
+  public static final TeamEventStatus[] LIST = new TeamEventStatus[] { UNKNOWN, COMMITTED, DECLINED, PERHAPS };
+
   private String key;
 
   /**

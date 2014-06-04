@@ -72,7 +72,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
    */
   private TeamEventDO newEvent;
 
-  private boolean isNew = false;
+  private boolean wasNew = false;
 
   /**
    * @param parameters
@@ -242,10 +242,12 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   public AbstractSecuredBasePage onDelete()
   {
     super.onDelete();
-    final TeamEventMailer mailer = TeamEventMailer.getInstance();
-    final TeamEventMailValue value = new TeamEventMailValue(getData().getId(), TeamEventMailType.REJECTION);
-    mailer.getQueue().offer(value);
-    mailer.send();
+    if (getData().getAttendees() != null && getData().getAttendees().isEmpty() == false) {
+      final TeamEventMailer mailer = TeamEventMailer.getInstance();
+      final TeamEventMailValue value = new TeamEventMailValue(getData().getId(), TeamEventMailType.REJECTION, null);
+      mailer.getQueue().offer(value);
+      mailer.send();
+    }
     if (recurrencyChangeType == null || recurrencyChangeType == RecurrencyChangeType.ALL) {
       return null;
     }
@@ -270,13 +272,13 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   public AbstractSecuredBasePage onSaveOrUpdate()
   {
     super.onSaveOrUpdate();
-    if (getData().getAttendees() != null && getData().getAttendees().isEmpty() == false) {
-      final TeamEventAttendeeDO attendee = new TeamEventAttendeeDO();
-      attendee.setUser(PFUserContext.getUser()).setStatus(TeamAttendeeStatus.ACCEPTED);
-      getData().addAttendee(attendee);
-    }
     if (isNew()) {
-      isNew = true;
+      wasNew = true;
+      if (getData().getAttendees() != null && getData().getAttendees().isEmpty() == false) {
+        final TeamEventAttendeeDO attendee = new TeamEventAttendeeDO();
+        attendee.setUser(PFUserContext.getUser()).setStatus(TeamAttendeeStatus.ACCEPTED);
+        getData().addAttendee(attendee);
+      }
     } else {
       final TeamEventDO oldData = teamEventDao.getById(getData().getId());
       if (getData().mustIncSequence(oldData) == true) {
@@ -339,10 +341,12 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       newEvent.setExternalUid(null); // Avoid multiple usage of external uids.
       newEvent.setSequence(0);
       teamEventDao.save(newEvent);
-      final TeamEventMailer mailer = TeamEventMailer.getInstance();
-      final TeamEventMailValue value = new TeamEventMailValue(newEvent.getId(), TeamEventMailType.UPDATE);
-      mailer.getQueue().offer(value);
-      mailer.send();
+      if (newEvent.getAttendees() != null && newEvent.getAttendees().isEmpty() == false) {
+        final TeamEventMailer mailer = TeamEventMailer.getInstance();
+        final TeamEventMailValue value = new TeamEventMailValue(newEvent.getId(), TeamEventMailType.UPDATE, getData().getId());
+        mailer.getQueue().offer(value);
+        mailer.send();
+      }
     }
     return null;
   }
@@ -356,15 +360,17 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   {
     super.afterSaveOrUpdate();
     if (newEvent == null) {
-      final TeamEventMailer mailer = TeamEventMailer.getInstance();
-      TeamEventMailValue value = null;
-      if (isNew == true) {
-        value = new TeamEventMailValue(getData().getId(), TeamEventMailType.INVITATION);
-      } else {
-        value = new TeamEventMailValue(getData().getId(), TeamEventMailType.UPDATE);
+      if (getData().getAttendees() != null && getData().getAttendees().isEmpty() == false) {
+        final TeamEventMailer mailer = TeamEventMailer.getInstance();
+        TeamEventMailValue value = null;
+        if (wasNew == true) {
+          value = new TeamEventMailValue(getData().getId(), TeamEventMailType.INVITATION, null);
+        } else {
+          value = new TeamEventMailValue(getData().getId(), TeamEventMailType.UPDATE, null);
+        }
+        mailer.getQueue().offer(value);
+        mailer.send();
       }
-      mailer.getQueue().offer(value);
-      mailer.send();
     }
     return null;
   }

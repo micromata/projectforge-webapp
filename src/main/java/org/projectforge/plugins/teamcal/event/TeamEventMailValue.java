@@ -19,9 +19,12 @@ public class TeamEventMailValue
 
   private final TeamEventMailType type;
 
-  public TeamEventMailValue(final Integer id, final TeamEventMailType type) {
+  private final Integer orgId;
+
+  public TeamEventMailValue(final Integer id, final TeamEventMailType type, final Integer orgId) {
     this.id = id;
     this.type = type;
+    this.orgId = orgId;
   }
 
   public Integer getId()
@@ -32,5 +35,10 @@ public class TeamEventMailValue
   public TeamEventMailType getType()
   {
     return type;
+  }
+
+  public Integer getOrgId()
+  {
+    return orgId;
   }
 }
