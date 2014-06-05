@@ -11,9 +11,16 @@ package org.projectforge.plugins.teamcal.event;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -189,6 +196,60 @@ public class TeamEventMailer
     return temp;
   }
 
+  private static File writeMemFile1(final String content, final String prefix, final String suffix) {
+    File file = null;
+    FileOutputStream out = null;
+    FileChannel fileOutputChannel = null;
+    try {
+      file = File.createTempFile(prefix, "." + suffix);
+      out = new FileOutputStream(file);
+      fileOutputChannel = out.getChannel();
+      final ByteBuffer buffer = Charset.defaultCharset().encode(CharBuffer.wrap(content.toCharArray()));
+      fileOutputChannel.write(new ByteBuffer[] { buffer });
+      fileOutputChannel.force(true);
+      file.deleteOnExit();
+    } catch (final IOException ex) {
+      ex.printStackTrace();
+      log.error("Can't  write file." + ex.toString());
+    } finally {
+      if (out != null) {
+        try {
+          fileOutputChannel.close();
+          out.flush();
+          out.close();
+        } catch (final Exception ex) {
+          log.error("Can't  close FileOutputStream.");
+        }
+      }
+    }
+    return file;
+  }
+
+  private static File writeMemFile2(final String content, final String prefix, final String suffix) {
+    File file = null;
+    RandomAccessFile rafile = null;
+    MappedByteBuffer out = null;
+    try {
+      file = new File(prefix + "123456789" + "." + suffix);
+      rafile = new RandomAccessFile(file, "rw");
+      final ByteBuffer buffer = Charset.defaultCharset().encode(CharBuffer.wrap(content.toCharArray()));
+      out = rafile.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, buffer.capacity());
+      out.put(buffer);
+    } catch (final IOException ex) {
+      ex.printStackTrace();
+      log.error("Can't  write file." + ex.toString());
+    } finally {
+      if (rafile != null) {
+        try {
+          rafile.close();
+        } catch (final Exception ex) {
+          log.error("Can't  close FileOutputStream.");
+        }
+      }
+    }
+    return file;
+  }
+
   public boolean send() {
     int failures = 0;
     while (queue.isEmpty() == false) {
@@ -214,12 +275,12 @@ public class TeamEventMailer
       marker.computeChanges(event, orgEvent);
     }
     final String content = getICal(event, type);
-    final File[] attachmentfiles = new File[1];
-    attachmentfiles[0] = writeTempFile(content, "ICal-", "ics");
-    if (attachmentfiles[0] == null) {
-      log.error("Can't write attachmentfile: " + "ICal-" + ".ics");
-      failures++;
-    }
+    //    final File[] attachmentfiles = new File[1];
+    //    attachmentfiles[0] = writeMemFile1(content, "ICal-", "ics");
+    //    if (attachmentfiles[0] == null) {
+    //      log.error("Can't write attachmentfile: " + "ICal-" + ".ics");
+    //      failures++;
+    //    }
     final Mail msg = new Mail();
     msg.setProjectForgeSubject(composeSubject(event, type));
     msg.setContentType(Mail.CONTENTTYPE_HTML);
@@ -235,7 +296,7 @@ public class TeamEventMailer
           continue;
         }
       }
-      if (sendMail.send(msg, attachmentfiles) == false) {
+      if (sendMail.send(msg, content, null) == false) {
         failures++;
       }
     }
