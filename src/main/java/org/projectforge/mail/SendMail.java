@@ -23,12 +23,12 @@
 
 package org.projectforge.mail;
 
-import java.io.File;
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
+import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -38,9 +38,11 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.util.ByteArrayDataSource;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.RandomUtils;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.InternalErrorException;
 import org.projectforge.core.UserException;
@@ -81,7 +83,7 @@ public class SendMail
    * @throws UserException if to address is not given.
    * @throws InternalErrorException due to technical failures.
    */
-  public boolean send(final Mail composedMessage, final File[] attachmentfiles)
+  public boolean send(final Mail composedMessage, final String icalContent, final String[] attachmentfiles)
   {
     final String to = composedMessage.getTo();
     if (to == null || to.trim().length() == 0) {
@@ -111,10 +113,10 @@ public class SendMail
       @Override
       public void run()
       {
-        if (attachmentfiles != null && attachmentfiles.length > 0) {
-          sendIt(composedMessage, attachmentfiles);
-        } else {
+        if (StringUtils.isBlank(icalContent) == true && attachmentfiles == null ) {
           sendIt(composedMessage);
+        } else {
+          sendIt(composedMessage, icalContent, attachmentfiles);
         }
       }
     }.start();
@@ -169,7 +171,7 @@ public class SendMail
     log.info("E-Mail successfully sent: " + composedMessage.toString());
   }
 
-  private void sendIt(final Mail composedMessage, final File[] attachmentfiles) {
+  private void sendIt(final Mail composedMessage, final String icalContent, final String[] attachmentfiles) {
     final Session session = Session.getInstance(properties);
     Transport transport = null;
     try {
@@ -201,6 +203,16 @@ public class SendMail
       // create the Multipart and its parts to it
       final MimeMultipart mp = new MimeMultipart();
       mp.addBodyPart(mbp1);
+
+      if (StringUtils.isNotBlank(icalContent) == true) {
+        final DataSource dataSource = new ByteArrayDataSource(icalContent.getBytes(), "text/plain");
+        final MimeBodyPart icalBodyPart = new MimeBodyPart();
+        icalBodyPart.setDataHandler(new DataHandler(dataSource));
+        final String s = Integer.toString(RandomUtils.nextInt());
+        icalBodyPart.setFileName("ICal-" + s + ".ics");
+        mp.addBodyPart(icalBodyPart);
+      }
+
       if (attachmentfiles != null && attachmentfiles.length > 0) {
         // create an Array of message parts for Attachments
         final MimeBodyPart mbp[] = new MimeBodyPart[attachmentfiles.length];
@@ -211,12 +223,11 @@ public class SendMail
           final FileDataSource fds=
               new FileDataSource(attachmentfiles[i]);
           mbp[i].setDataHandler( new DataHandler(fds));
-          mbp[i].setFileName(attachmentfiles[i].getName());
+          mbp[i].setFileName(attachmentfiles[i]);
           mp.addBodyPart(mbp[i]);
         }
-      } else {
-        log.error("attachmentfiles == null or empty. Can't send attachmentfiles.");
       }
+
       // add the Multipart to the message
       message.setContent(mp);
       message.saveChanges(); // don't forget this
