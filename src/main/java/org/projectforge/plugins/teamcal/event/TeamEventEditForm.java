@@ -37,6 +37,7 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -67,6 +68,7 @@ import org.projectforge.web.wicket.flowlayout.CheckBoxButton;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.FileUploadPanel;
 import org.projectforge.web.wicket.flowlayout.HtmlCommentPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 import org.projectforge.web.wicket.flowlayout.ToggleContainerPanel;
@@ -116,6 +118,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
   // Needed by autocompletion for location fields.
   private TeamCalDO[] calendarsWithFullAccess;
+
+  protected FileUploadField fileUploadField;
 
   /**
    * @param parentPage
@@ -325,6 +329,23 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.attendees")).suppressLabelForWarning();
       attendees = getData().ensureAttendees();
       fs.add(new TeamAttendeesPanel(fs.newChildId(), attendees));
+    }
+
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("file"), "*.*");
+      fileUploadField = new FileUploadField(FileUploadPanel.WICKET_ID);
+      final FileUploadPanel fileUploadPanel;
+      fs.add(fileUploadPanel = new FileUploadPanel(fs.newChildId(), fileUploadField));
+      //      fileUploadPanel.add(new AjaxFormComponentUpdatingBehavior("onchange") {
+      //        @Override
+      //        protected void onUpdate(final AjaxRequestTarget target)
+      //        {
+      //          final List<FileUpload> fileUploads = fileUploadField.getFileUploads();
+      //          for (final FileUpload fileUpload: fileUploads) {
+      //            log.info(fileUpload.getClientFileName());
+      //          }
+      //        }
+      //      });
     }
 
     gridBuilder.newGridPanel();

@@ -40,6 +40,7 @@ import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.ConfigurationParam;
 import org.projectforge.database.MyDatabaseUpdateDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
+import org.projectforge.plugins.teamcal.event.TeamEventAttachmentDO;
 import org.projectforge.plugins.teamcal.event.TeamEventAttendeeDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.registry.Registry;
@@ -57,15 +58,55 @@ public class TeamCalPluginUpdates
   static MyDatabaseUpdateDao dao;
 
   final static Class< ? >[] doClasses = new Class< ? >[] { //
-    TeamCalDO.class, TeamEventDO.class, TeamEventAttendeeDO.class};
+    TeamCalDO.class, TeamEventDO.class, TeamEventAttendeeDO.class, TeamEventAttachmentDO.class};
 
   final static String[] newAttributes51 = { "externalSubscription", "externalSubscriptionCalendarBinary", "externalSubscriptionHash",
     "externalSubscriptionUrl", "externalSubscriptionUpdateInterval"};
+
+  final static String[] newAttributes52 = { "lastEmail", "sequence"};
 
   @SuppressWarnings("serial")
   public static List<UpdateEntry> getUpdateEntries()
   {
     final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
+    // /////////////////////////////////////////////////////////////////
+    // 5.2 ?
+    // /////////////////////////////////////////////////////////////////
+    list.add(new UpdateEntryImpl(
+        TeamCalPlugin.ID,
+        "5.2",
+        "2014-06-05",
+        "Added table T_PLUGIN_CALENDAR_EVENT_ATTACHMENT, added fields lastEmail, attendees, sequence and attachments to T_PLUGIN_CALENDAR_EVENT_ATTENDEE.") {
+      final Table eventTable = new Table(TeamEventDO.class);
+
+      @Override
+      public UpdatePreCheckStatus runPreCheck()
+      {
+        // Does the data-base table already exist?
+        if (dao.doEntitiesExist(TeamEventAttachmentDO.class) == true &&
+            dao.doTableAttributesExist(TeamEventAttachmentDO.class, "content") == true &&
+            dao.doTableAttributesExist(TeamEventDO.class, newAttributes52) == true) {
+          return UpdatePreCheckStatus.ALREADY_UPDATED;
+        } else {
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
+      }
+
+      @Override
+      public UpdateRunningStatus runUpdate()
+      {
+        if (dao.doEntitiesExist(TeamEventAttachmentDO.class) == false) {
+          new SchemaGenerator(dao).add(TeamEventAttachmentDO.class).createSchema();
+        }
+        if (dao.doTableAttributesExist(TeamEventAttachmentDO.class, "content") == false) {
+          dao.addTableAttributes(TeamEventAttachmentDO.class, "content");
+        }
+        if (dao.doTableAttributesExist(TeamEventDO.class, newAttributes52) == false) {
+          dao.addTableAttributes(TeamEventDO.class, newAttributes52);
+        }
+        return UpdateRunningStatus.DONE;
+      }
+    });
     // /////////////////////////////////////////////////////////////////
     // 5.1
     // /////////////////////////////////////////////////////////////////

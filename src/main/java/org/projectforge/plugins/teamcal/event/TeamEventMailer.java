@@ -275,12 +275,6 @@ public class TeamEventMailer
       marker.computeChanges(event, orgEvent);
     }
     final String content = getICal(event, type);
-    //    final File[] attachmentfiles = new File[1];
-    //    attachmentfiles[0] = writeMemFile1(content, "ICal-", "ics");
-    //    if (attachmentfiles[0] == null) {
-    //      log.error("Can't write attachmentfile: " + "ICal-" + ".ics");
-    //      failures++;
-    //    }
     final Mail msg = new Mail();
     msg.setProjectForgeSubject(composeSubject(event, type));
     msg.setContentType(Mail.CONTENTTYPE_HTML);
@@ -296,9 +290,20 @@ public class TeamEventMailer
           continue;
         }
       }
-      if (sendMail.send(msg, content, null) == false) {
-        failures++;
+      switch (type) {
+        case INVITATION:
+          if (sendMail.send(msg, content, event.getAttachments()) == false) {
+            failures++;
+          }
+          break;
+        case UPDATE:
+        case REJECTION:
+          if (sendMail.send(msg, content, null) == false) {
+            failures++;
+          }
+          break;
       }
+
     }
     return failures == 0 ? true : false;
   }

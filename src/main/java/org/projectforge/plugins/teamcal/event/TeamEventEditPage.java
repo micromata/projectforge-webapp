@@ -25,11 +25,13 @@ package org.projectforge.plugins.teamcal.event;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.form.SubmitLink;
+import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -279,11 +281,23 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
         attendee.setUser(PFUserContext.getUser()).setStatus(TeamAttendeeStatus.ACCEPTED);
         getData().addAttendee(attendee);
       }
+      final List<FileUpload> fileUploads = form.fileUploadField.getFileUploads();
+      if (fileUploads != null) {
+        for (final FileUpload fileUpload: fileUploads) {
+          final TeamEventAttachmentDO attachment = new TeamEventAttachmentDO();
+          attachment.setFilename(fileUpload.getClientFileName());
+          attachment.setContent(fileUpload.getBytes());
+          getData().addAttachment(attachment);
+        }
+      } else {
+        getData().getAttachments().clear();
+      }
     } else {
       final TeamEventDO oldData = teamEventDao.getById(getData().getId());
       if (getData().mustIncSequence(oldData) == true) {
         getData().incSequence();
       }
+
     }
     getData().setRecurrence(form.recurrenceData);
     if (recurrencyChangeType == null || recurrencyChangeType == RecurrencyChangeType.ALL) {

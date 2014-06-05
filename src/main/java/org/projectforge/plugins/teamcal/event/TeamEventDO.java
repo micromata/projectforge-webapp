@@ -148,6 +148,9 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
   //See RFC 2445 section 4.8.1.11
   //  private TeamEventStatus status = TeamEventStatus.UNKNOWN;
 
+  @PFPersistancyBehavior(autoUpdateCollectionEntries = true)
+  private SortedSet<TeamEventAttachmentDO> attachments;
+
   private static final Set<String> NON_HISTORIZABLE_ATTRIBUTES;
 
   static {
@@ -168,6 +171,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
     reminderActionType = null;
     lastEmail = null;
     sequence = null;
+    attachments = null;
     //       status = null;
   }
 
@@ -751,6 +755,46 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
     sequence++;
   }
 
+  /**
+   * @return the attachments
+   */
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @JoinColumn(name = "team_event_fk2", insertable = true, updatable = true)
+  @Sort(type = SortType.NATURAL)
+  public SortedSet<TeamEventAttachmentDO> getAttachments()
+  {
+    return attachments;
+  }
+
+  /**
+   * @param attachments the attachments to set
+   * @return this for chaining.
+   */
+  public TeamEventDO setAttachments(final SortedSet<TeamEventAttachmentDO> attachments)
+  {
+    this.attachments = attachments;
+    return this;
+  }
+
+  /**
+   * Creates a {@link TreeSet}.
+   * @return this for chaining.
+   */
+  public SortedSet<TeamEventAttachmentDO> ensureAttachments()
+  {
+    if (this.attachments == null) {
+      this.attachments = new TreeSet<TeamEventAttachmentDO>();
+    }
+    return this.attachments;
+  }
+
+  public TeamEventDO addAttachment(final TeamEventAttachmentDO attachment)
+  {
+    ensureAttachments();
+    this.attachments.add(attachment);
+    return this;
+  }
+
   //  /**
   //   * @return the status
   //   */
@@ -779,6 +823,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
     final int prime = 31;
     int result = 1;
     result = prime * result + (allDay ? 1231 : 1237);
+    result = prime * result + ((attachments == null) ? 0 : attachments.hashCode());
     result = prime * result + ((attendees == null) ? 0 : attendees.hashCode());
     result = prime * result + ((calendar == null) ? 0 : calendar.hashCode());
     result = prime * result + ((endDate == null) ? 0 : endDate.hashCode());
@@ -863,6 +908,11 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
         return false;
     } else if (!subject.equals(other.subject))
       return false;
+    if (attachments == null) {
+      if (other.attachments != null)
+        return false;
+    } else if (!attachments.equals(other.attachments))
+      return false;
     return true;
   }
 
@@ -932,6 +982,13 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
       for (final TeamEventAttendeeDO attendee: this.getAttendees()) {
         attendee.setId(null);
         clone.addAttendee(attendee);
+      }
+    }
+    if (this.attachments != null && this.attachments.isEmpty() == false) {
+      clone.attachments = clone.ensureAttachments();
+      for (final TeamEventAttachmentDO attachment: this.getAttachments()) {
+        attachment.setId(null);
+        clone.addAttachment(attachment);
       }
     }
     return clone;

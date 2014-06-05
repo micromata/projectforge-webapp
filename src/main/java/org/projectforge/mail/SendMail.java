@@ -26,10 +26,10 @@ package org.projectforge.mail;
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
+import java.util.SortedSet;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
-import javax.activation.FileDataSource;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -46,6 +46,7 @@ import org.apache.commons.lang.math.RandomUtils;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.InternalErrorException;
 import org.projectforge.core.UserException;
+import org.projectforge.plugins.teamcal.event.TeamEventAttachmentDO;
 import org.projectforge.scripting.GroovyEngine;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
@@ -83,7 +84,7 @@ public class SendMail
    * @throws UserException if to address is not given.
    * @throws InternalErrorException due to technical failures.
    */
-  public boolean send(final Mail composedMessage, final String icalContent, final String[] attachmentfiles)
+  public boolean send(final Mail composedMessage, final String icalContent, final SortedSet<TeamEventAttachmentDO> attachments)
   {
     final String to = composedMessage.getTo();
     if (to == null || to.trim().length() == 0) {
@@ -113,10 +114,10 @@ public class SendMail
       @Override
       public void run()
       {
-        if (StringUtils.isBlank(icalContent) == true && attachmentfiles == null ) {
+        if (StringUtils.isBlank(icalContent) == true && attachments == null ) {
           sendIt(composedMessage);
         } else {
-          sendIt(composedMessage, icalContent, attachmentfiles);
+          sendIt(composedMessage, icalContent, attachments);
         }
       }
     }.start();
@@ -171,7 +172,7 @@ public class SendMail
     log.info("E-Mail successfully sent: " + composedMessage.toString());
   }
 
-  private void sendIt(final Mail composedMessage, final String icalContent, final String[] attachmentfiles) {
+  private void sendIt(final Mail composedMessage, final String icalContent, final SortedSet<TeamEventAttachmentDO> attachments) {
     final Session session = Session.getInstance(properties);
     Transport transport = null;
     try {
@@ -213,18 +214,20 @@ public class SendMail
         mp.addBodyPart(icalBodyPart);
       }
 
-      if (attachmentfiles != null && attachmentfiles.length > 0) {
+      if (attachments != null && attachments.isEmpty() == false) {
         // create an Array of message parts for Attachments
-        final MimeBodyPart mbp[] = new MimeBodyPart[attachmentfiles.length];
-        for (int i=0; i < attachmentfiles.length; i++) {
+        final MimeBodyPart mbp[] = new MimeBodyPart[attachments.size()];
+        int i=0;
+        for (final TeamEventAttachmentDO attachment: attachments) {
           // create the next message part
           mbp[i] = new MimeBodyPart();
           // attach the file to the message
-          final FileDataSource fds=
-              new FileDataSource(attachmentfiles[i]);
-          mbp[i].setDataHandler( new DataHandler(fds));
-          mbp[i].setFileName(attachmentfiles[i]);
+          final DataSource ds=
+              new ByteArrayDataSource(attachment.getContent(),"application/pdf");
+          mbp[i].setDataHandler( new DataHandler(ds));
+          mbp[i].setFileName(attachment.getFilename());
           mp.addBodyPart(mbp[i]);
+          i++;
         }
       }
 
