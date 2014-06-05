@@ -54,7 +54,7 @@ public class SendFeedback
     final String content = sendMail.renderGroovyTemplate(msg, "mail/feedback.txt", params, PFUserContext.getUser());
     msg.setContent(content);
     msg.setContentType(Mail.CONTENTTYPE_TEXT);
-    return sendMail.send(msg, null);
+    return sendMail.send(msg, null, null);
   }
 
   public void setSendMail(final SendMail sendMail)
