@@ -30,6 +30,7 @@ import java.util.SortedSet;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+import javax.activation.MimetypesFileTypeMap;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -217,13 +218,21 @@ public class SendMail
       if (attachments != null && attachments.isEmpty() == false) {
         // create an Array of message parts for Attachments
         final MimeBodyPart mbp[] = new MimeBodyPart[attachments.size()];
+        // remember you can extend this functionality with META-INF/mime.types
+        // See http://docs.oracle.com/javaee/5/api/javax/activation/MimetypesFileTypeMap.html
+        final MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
         int i=0;
         for (final TeamEventAttachmentDO attachment: attachments) {
           // create the next message part
           mbp[i] = new MimeBodyPart();
+          // only by file name
+          String mimeType = mimeTypesMap.getContentType(attachment.getFilename());
+          if (StringUtils.isBlank(mimeType)) {
+            mimeType = "application/octet-stream";
+          }
           // attach the file to the message
           final DataSource ds=
-              new ByteArrayDataSource(attachment.getContent(),"application/pdf");
+              new ByteArrayDataSource(attachment.getContent(), mimeType);
           mbp[i].setDataHandler( new DataHandler(ds));
           mbp[i].setFileName(attachment.getFilename());
           mp.addBodyPart(mbp[i]);
