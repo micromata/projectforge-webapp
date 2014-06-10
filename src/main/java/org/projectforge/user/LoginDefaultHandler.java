@@ -125,7 +125,7 @@ public class LoginDefaultHandler implements LoginHandler
       user = loadUser(jdbc, sql, username, true);
     } catch (final Exception ex) {
       log.warn("This SQLException is only OK if you've a ProjectForge installation 5.2 or minor!");
-      sql = "select pk, firstname, lastname, password from t_pf_user where username=? and deleted=false and deactivated=false and restricted_user=false";
+      sql = "select pk, firstname, lastname, password from t_pf_user where username=? and deleted=false";
       user = loadUser(jdbc, sql, username, false);
     }
     if (user == null) {
