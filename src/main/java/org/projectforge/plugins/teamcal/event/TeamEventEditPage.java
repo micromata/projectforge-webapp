@@ -25,13 +25,11 @@ package org.projectforge.plugins.teamcal.event;
 
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.form.SubmitLink;
-import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -74,7 +72,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
    */
   private TeamEventDO newEvent;
 
-  private boolean wasNew = false;
+  private final boolean wasNew = false;
 
   /**
    * @param parameters
@@ -244,12 +242,12 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   public AbstractSecuredBasePage onDelete()
   {
     super.onDelete();
-    if (getData().getAttendees() != null && getData().getAttendees().isEmpty() == false) {
-      final TeamEventMailer mailer = TeamEventMailer.getInstance();
-      final TeamEventMailValue value = new TeamEventMailValue(getData().getId(), TeamEventMailType.REJECTION, null);
-      mailer.getQueue().offer(value);
-      mailer.send();
-    }
+    //    if (getData().getAttendees() != null && getData().getAttendees().isEmpty() == false) {
+    //      final TeamEventMailer mailer = TeamEventMailer.getInstance();
+    //      final TeamEventMailValue value = new TeamEventMailValue(getData().getId(), TeamEventMailType.REJECTION, null);
+    //      mailer.getQueue().offer(value);
+    //      mailer.send();
+    //    }
     if (recurrencyChangeType == null || recurrencyChangeType == RecurrencyChangeType.ALL) {
       return null;
     }
@@ -274,31 +272,31 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   public AbstractSecuredBasePage onSaveOrUpdate()
   {
     super.onSaveOrUpdate();
-    if (isNew()) {
-      wasNew = true;
-      if (getData().getAttendees() != null && getData().getAttendees().isEmpty() == false) {
-        final TeamEventAttendeeDO attendee = new TeamEventAttendeeDO();
-        attendee.setUser(PFUserContext.getUser()).setStatus(TeamAttendeeStatus.ACCEPTED);
-        getData().addAttendee(attendee);
-      }
-      final List<FileUpload> fileUploads = form.fileUploadField.getFileUploads();
-      if (fileUploads != null) {
-        for (final FileUpload fileUpload: fileUploads) {
-          final TeamEventAttachmentDO attachment = new TeamEventAttachmentDO();
-          attachment.setFilename(fileUpload.getClientFileName());
-          attachment.setContent(fileUpload.getBytes());
-          getData().addAttachment(attachment);
-        }
-      } else {
-        getData().getAttachments().clear();
-      }
-    } else {
-      final TeamEventDO oldData = teamEventDao.getById(getData().getId());
-      if (getData().mustIncSequence(oldData) == true) {
-        getData().incSequence();
-      }
-
-    }
+    //    if (isNew()) {
+    //      wasNew = true;
+    //      if (getData().getAttendees() != null && getData().getAttendees().isEmpty() == false) {
+    //        final TeamEventAttendeeDO attendee = new TeamEventAttendeeDO();
+    //        attendee.setUser(PFUserContext.getUser()).setStatus(TeamAttendeeStatus.ACCEPTED);
+    //        getData().addAttendee(attendee);
+    //      }
+    //      final List<FileUpload> fileUploads = form.fileUploadField.getFileUploads();
+    //      if (fileUploads != null) {
+    //        for (final FileUpload fileUpload: fileUploads) {
+    //          final TeamEventAttachmentDO attachment = new TeamEventAttachmentDO();
+    //          attachment.setFilename(fileUpload.getClientFileName());
+    //          attachment.setContent(fileUpload.getBytes());
+    //          getData().addAttachment(attachment);
+    //        }
+    //      } else {
+    //        getData().getAttachments().clear();
+    //      }
+    //    } else {
+    //      final TeamEventDO oldData = teamEventDao.getById(getData().getId());
+    //      if (getData().mustIncSequence(oldData) == true) {
+    //        getData().incSequence();
+    //      }
+    //
+    //    }
     getData().setRecurrence(form.recurrenceData);
     if (recurrencyChangeType == null || recurrencyChangeType == RecurrencyChangeType.ALL) {
       return null;
@@ -355,12 +353,12 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       newEvent.setExternalUid(null); // Avoid multiple usage of external uids.
       newEvent.setSequence(0);
       teamEventDao.save(newEvent);
-      if (newEvent.getAttendees() != null && newEvent.getAttendees().isEmpty() == false) {
-        final TeamEventMailer mailer = TeamEventMailer.getInstance();
-        final TeamEventMailValue value = new TeamEventMailValue(newEvent.getId(), TeamEventMailType.UPDATE, getData().getId());
-        mailer.getQueue().offer(value);
-        mailer.send();
-      }
+      //      if (newEvent.getAttendees() != null && newEvent.getAttendees().isEmpty() == false) {
+      //        final TeamEventMailer mailer = TeamEventMailer.getInstance();
+      //        final TeamEventMailValue value = new TeamEventMailValue(newEvent.getId(), TeamEventMailType.UPDATE, getData().getId());
+      //        mailer.getQueue().offer(value);
+      //        mailer.send();
+      //      }
     }
     return null;
   }
@@ -373,19 +371,19 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   public AbstractSecuredBasePage afterSaveOrUpdate()
   {
     super.afterSaveOrUpdate();
-    if (newEvent == null) {
-      if (getData().getAttendees() != null && getData().getAttendees().isEmpty() == false) {
-        final TeamEventMailer mailer = TeamEventMailer.getInstance();
-        TeamEventMailValue value = null;
-        if (wasNew == true) {
-          value = new TeamEventMailValue(getData().getId(), TeamEventMailType.INVITATION, null);
-        } else {
-          value = new TeamEventMailValue(getData().getId(), TeamEventMailType.UPDATE, null);
-        }
-        mailer.getQueue().offer(value);
-        mailer.send();
-      }
-    }
+    //    if (newEvent == null) {
+    //      if (getData().getAttendees() != null && getData().getAttendees().isEmpty() == false) {
+    //        final TeamEventMailer mailer = TeamEventMailer.getInstance();
+    //        TeamEventMailValue value = null;
+    //        if (wasNew == true) {
+    //          value = new TeamEventMailValue(getData().getId(), TeamEventMailType.INVITATION, null);
+    //        } else {
+    //          value = new TeamEventMailValue(getData().getId(), TeamEventMailType.UPDATE, null);
+    //        }
+    //        mailer.getQueue().offer(value);
+    //        mailer.send();
+    //      }
+    //    }
     return null;
   }
 

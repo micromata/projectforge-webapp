@@ -68,7 +68,6 @@ import org.projectforge.web.wicket.flowlayout.CheckBoxButton;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.FileUploadPanel;
 import org.projectforge.web.wicket.flowlayout.HtmlCommentPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 import org.projectforge.web.wicket.flowlayout.ToggleContainerPanel;
@@ -331,22 +330,12 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       fs.add(new TeamAttendeesPanel(fs.newChildId(), attendees));
     }
 
-    {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("file"), "*.*");
-      fileUploadField = new FileUploadField(FileUploadPanel.WICKET_ID);
-      final FileUploadPanel fileUploadPanel;
-      fs.add(fileUploadPanel = new FileUploadPanel(fs.newChildId(), fileUploadField));
-      //      fileUploadPanel.add(new AjaxFormComponentUpdatingBehavior("onchange") {
-      //        @Override
-      //        protected void onUpdate(final AjaxRequestTarget target)
-      //        {
-      //          final List<FileUpload> fileUploads = fileUploadField.getFileUploads();
-      //          for (final FileUpload fileUpload: fileUploads) {
-      //            log.info(fileUpload.getClientFileName());
-      //          }
-      //        }
-      //      });
-    }
+    //    {
+    //      final FieldsetPanel fs = gridBuilder.newFieldset(getString("file"), "*.*");
+    //      fileUploadField = new FileUploadField(FileUploadPanel.WICKET_ID);
+    //      final FileUploadPanel fileUploadPanel;
+    //      fs.add(fileUploadPanel = new FileUploadPanel(fs.newChildId(), fileUploadField));
+    //    }
 
     gridBuilder.newGridPanel();
     {
