@@ -29,7 +29,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.plugins.teamcal.event.TeamEventDao;
 import org.projectforge.user.PFUserContext;
 
-// Represents the counter for displaying the open to-do entries as white number in red bubble beside the to-do menu entry.
+// Represents the counter for displaying the teamEvents with status needs_action for current user as white number in red bubble beside the to-do menu entry.
 public class MenuCounterEventNeedsAction extends Model<Integer>
 {
   private static final long serialVersionUID = -6203867255786689166L;
