@@ -429,9 +429,9 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   {
     if (access == false) {
       final TeamCalDO calendar = data.getCalendar();
-      final Label teamCalTitle = new Label(fieldSet.newChildId(), calendar != null ? new PropertyModel<String>(data.getCalendar(), "title")
-          : "");
+      final Label teamCalTitle = new Label(fieldSet.newChildId(), calendar != null ? calendar.getTitle() : "");
       fieldSet.add(teamCalTitle);
+      fieldSet.suppressLabelForWarning();
     } else {
       final List<TeamCalDO> list = teamCalDao.getAllCalendarsWithFullAccess();
       calendarsWithFullAccess = list.toArray(new TeamCalDO[0]);
