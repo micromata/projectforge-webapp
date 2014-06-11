@@ -91,8 +91,10 @@ public class TeamEventMailer
       this.lastEmail=lastEmail;
       list = new LinkedList<HistoryEntry>();
       for (int i=0; i < entries.length-1; i++) {
-        if (entries[i].getTimestamp().getTime() > lastEmail.getTime()) {
-          list.add(entries[i]);
+        if (lastEmail != null) {
+          if (entries[i].getTimestamp().getTime() > lastEmail.getTime()) {
+            list.add(entries[i]);
+          }
         }
       }
       locationChanged = hasLocationChanged();
