@@ -289,8 +289,6 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
           attachment.setContent(fileUpload.getBytes());
           getData().addAttachment(attachment);
         }
-      } else {
-        getData().getAttachments().clear();
       }
     } else {
       final TeamEventDO oldData = teamEventDao.getById(getData().getId());
