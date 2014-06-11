@@ -146,6 +146,21 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     return null;
   }
 
+  @SuppressWarnings("unchecked")
+  public int getNeedsActionEvents(final Integer id) {
+    if (id == null) {
+      return 0;
+    }
+    final List<TeamEventAttendeeDO> list;
+    //list = getHibernateTemplate().find("from TeamEventAttendeeDO a where a.user.id=? and a.status='NEEDS_ACTION'", id);
+    list = getHibernateTemplate().find("from TeamCalDO c, TeamEventDO e, TeamEventAttendeeDO a where c.owner.id=? and c.id=e.calendar.id and a.user.id=? and a.status='NEEDS_ACTION'", id, id);
+    if (list != null) {
+      return list.size();
+    } else {
+      return 0;
+    }
+  }
+
   /**
    * Sets midnight (UTC) of all day events.
    * @see org.projectforge.core.BaseDao#onSaveOrModify(org.projectforge.core.ExtendedBaseDO)
