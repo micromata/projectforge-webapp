@@ -68,6 +68,7 @@ import org.projectforge.web.wicket.flowlayout.CheckBoxButton;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.FileUploadPanel;
 import org.projectforge.web.wicket.flowlayout.HtmlCommentPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 import org.projectforge.web.wicket.flowlayout.ToggleContainerPanel;
@@ -116,7 +117,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   private final FormComponent< ? >[] dependentFormComponents = new FormComponent[6];
 
   // Needed by autocompletion for location fields.
-  private TeamCalDO[] calendarsWithFullAccess;
+  protected TeamCalDO[] calendarsWithFullAccess;
 
   protected FileUploadField fileUploadField;
 
@@ -330,12 +331,12 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       fs.add(new TeamAttendeesPanel(fs.newChildId(), attendees));
     }
 
-    //    {
-    //      final FieldsetPanel fs = gridBuilder.newFieldset(getString("file"), "*.*");
-    //      fileUploadField = new FileUploadField(FileUploadPanel.WICKET_ID);
-    //      final FileUploadPanel fileUploadPanel;
-    //      fs.add(fileUploadPanel = new FileUploadPanel(fs.newChildId(), fileUploadField));
-    //    }
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("file"), "*.*");
+      fileUploadField = new FileUploadField(FileUploadPanel.WICKET_ID);
+      final FileUploadPanel fileUploadPanel;
+      fs.add(fileUploadPanel = new FileUploadPanel(fs.newChildId(), fileUploadField));
+    }
 
     gridBuilder.newGridPanel();
     {
