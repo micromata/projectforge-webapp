@@ -354,21 +354,21 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       newEvent.setSequence(0);
       teamEventDao.save(newEvent);
       if (newEvent.getAttendees() != null && newEvent.getAttendees().isEmpty() == false) {
-        for (final TeamEventAttendeeDO attendee: newEvent.getAttendees()) {
-          if (attendee.getUser() != null) {
-            if (attendee.getUser().equals(PFUserContext.getUser())== true) {
-              continue;
-            }
-            for (int i=0; i < form.calendarsWithFullAccess.length; i++) {
-              final Integer id = form.calendarsWithFullAccess[i].getOwnerId();
-              if (id.equals(attendee.getUser().getId()) == true) {
-                final TeamEventDO temp = getData();
-                temp.setCalendar(form.calendarsWithFullAccess[i]);
-                this.teamEventDao.saveOrUpdate(temp);
-              }
-            }
-          }
-        }
+        //        for (final TeamEventAttendeeDO attendee: newEvent.getAttendees()) {
+        //          if (attendee.getUser() != null) {
+        //            if (attendee.getUser().equals(PFUserContext.getUser())== true) {
+        //              continue;
+        //            }
+        //            for (int i=0; i < form.calendarsWithFullAccess.length; i++) {
+        //              final Integer id = form.calendarsWithFullAccess[i].getOwnerId();
+        //              if (id.equals(attendee.getUser().getId()) == true) {
+        //                final TeamEventDO temp = getData();
+        //                temp.setCalendar(form.calendarsWithFullAccess[i]);
+        //                this.teamEventDao.saveOrUpdate(temp);
+        //              }
+        //            }
+        //          }
+        //        }
         final TeamEventMailer mailer = TeamEventMailer.getInstance();
         final TeamEventMailValue value = new TeamEventMailValue(newEvent.getId(), TeamEventMailType.UPDATE, getData().getId());
         mailer.getQueue().offer(value);
@@ -388,25 +388,26 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
     super.afterSaveOrUpdate();
     if (newEvent == null) {
       if (getData().getAttendees() != null && getData().getAttendees().isEmpty() == false) {
-        for (final TeamEventAttendeeDO attendee: getData().getAttendees()) {
-          if (attendee.getUser() != null) {
-            if (attendee.getUser().equals(PFUserContext.getUser())== true) {
-              continue;
-            }
-            for (int i=0; i < form.calendarsWithFullAccess.length; i++) {
-              final Integer id = form.calendarsWithFullAccess[i].getOwnerId();
-              if (id.equals(attendee.getUser().getId()) == true) {
-                final TeamEventDO temp = getData();
-                temp.setCalendar(form.calendarsWithFullAccess[i]);
-                this.teamEventDao.saveOrUpdate(temp);
-              }
-            }
-          }
-        }
         final TeamEventMailer mailer = TeamEventMailer.getInstance();
         TeamEventMailValue value = null;
         if (wasNew == true) {
           value = new TeamEventMailValue(getData().getId(), TeamEventMailType.INVITATION, null);
+          for (final TeamEventAttendeeDO attendee: getData().getAttendees()) {
+            if (attendee.getUser() != null) {
+              if (attendee.getUser().equals(PFUserContext.getUser())== true) {
+                continue;
+              }
+              for (int i=0; i < form.calendarsWithFullAccess.length; i++) {
+                final Integer id = form.calendarsWithFullAccess[i].getOwnerId();
+                if (id.equals(attendee.getUser().getId()) == true) {
+                  final TeamEventDO temp = getData().clone();
+                  temp.setId(null);
+                  temp.setCalendar(form.calendarsWithFullAccess[i]);
+                  this.teamEventDao.save(temp);
+                }
+              }
+            }
+          }
         } else {
           value = new TeamEventMailValue(getData().getId(), TeamEventMailType.UPDATE, null);
         }

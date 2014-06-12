@@ -49,6 +49,7 @@ import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.annotations.IndexColumn;
 import org.hibernate.annotations.Sort;
 import org.hibernate.annotations.SortType;
 import org.hibernate.search.annotations.DateBridge;
@@ -347,7 +348,8 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
    * @return the attendees
    */
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-  @JoinColumn(name = "team_event_fk", insertable = true, updatable = true)
+  @JoinColumn(name = "teamevent_id", nullable = false)
+  @IndexColumn(name = "number")
   @Sort(type = SortType.NATURAL)
   public SortedSet<TeamEventAttendeeDO> getAttendees()
   {
@@ -387,6 +389,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
       }
     }
     attendee.setNumber(number);
+    attendee.setTeamEvent(this);
     this.attendees.add(attendee);
     return this;
   }

@@ -32,8 +32,6 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -44,6 +42,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.search.annotations.Indexed;
 import org.projectforge.core.BaseDO;
+import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.ModificationStatus;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRights;
@@ -56,11 +55,11 @@ import de.micromata.hibernate.history.ExtendedHistorizable;
 @Entity
 @Indexed
 @Table(name = "T_PLUGIN_CALENDAR_EVENT_ATTENDEE")
-public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAttendeeDO>, BaseDO<Integer>, ExtendedHistorizable
+public class TeamEventAttendeeDO extends DefaultBaseDO implements Serializable, Comparable<TeamEventAttendeeDO>, ExtendedHistorizable
 {
   private static final long serialVersionUID = -3293247578185393730L;
 
-  private Integer id;
+  private TeamEventDO teamEvent;
 
   private Short number;
 
@@ -85,19 +84,25 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
     NON_HISTORIZABLE_ATTRIBUTES.add("loginToken");
   }
 
-  @Override
-  @Id
-  @GeneratedValue
-  @Column(name = "pk")
-  public Integer getId()
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "teamevent_id", insertable=false, updatable=false, nullable = false)
+  public TeamEventDO getTeamEvent()
   {
-    return id;
+    return teamEvent;
   }
 
-  @Override
-  public void setId(final Integer id)
+  public TeamEventAttendeeDO setTeamEvent(final TeamEventDO teamEvent)
   {
-    this.id = id;
+    this.teamEvent = teamEvent;
+    return this;
+  }
+
+  @Transient
+  public Integer getTeamEventId()
+  {
+    if (this.teamEvent == null)
+      return null;
+    return teamEvent.getId();
   }
 
   /**
@@ -227,7 +232,6 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
     return this;
   }
 
-
   /**
    * @return the number
    */
@@ -253,7 +257,7 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
   @Override
   public int compareTo(final TeamEventAttendeeDO arg0)
   {
-    if (this.id != null && ObjectUtils.equals(this.id, arg0.id) == true) {
+    if (this.getId() != null && ObjectUtils.equals(this.getId(), arg0.getId()) == true) {
       return 0;
     }
     return this.toString().toLowerCase().compareTo(arg0.toString().toLowerCase());
@@ -266,8 +270,8 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
   public int hashCode()
   {
     final HashCodeBuilder hcb = new HashCodeBuilder();
-    if (this.id != null) {
-      hcb.append(this.id);
+    if (this.getId() != null) {
+      hcb.append(this.getId());
       return hcb.toHashCode();
     }
     if (this.user != null) {
@@ -285,7 +289,7 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
   public boolean equals(final Object o)
   {
     if (o instanceof TeamEventAttendeeDO) {
-      if (this.id != null && ObjectUtils.equals(this.id, ((TeamEventAttendeeDO) o).id) == true) {
+      if (this.getId() != null && ObjectUtils.equals(this.getId(), ((TeamEventAttendeeDO) o).getId()) == true) {
         return true;
       }
       final TeamEventAttendeeDO other = (TeamEventAttendeeDO) o;
@@ -312,7 +316,7 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
         return "id=" + getUserId() + " (not found)";
       }
     } else if (StringUtils.isBlank(url) == true) {
-      return String.valueOf(id);
+      return String.valueOf(this.getId());
     }
     return StringUtils.defaultString(this.url);
   }
@@ -366,9 +370,9 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
     }
     final TeamEventAttendeeDO source = (TeamEventAttendeeDO) src;
     ModificationStatus modStatus = ModificationStatus.NONE;
-    if (ObjectUtils.equals(this.id, source.id) == false) {
+    if (ObjectUtils.equals(this.getId(), source.getId()) == false) {
       modStatus = ModificationStatus.MAJOR;
-      this.id = source.id;
+      this.setId(source.getId());
     }
     if (ObjectUtils.equals(this.number, source.number) == false) {
       modStatus = ModificationStatus.MAJOR;
