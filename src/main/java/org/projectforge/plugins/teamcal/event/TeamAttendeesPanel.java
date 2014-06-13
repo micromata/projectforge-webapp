@@ -39,6 +39,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.wicket.components.AjaxMaxLengthEditableLabel;
@@ -205,7 +206,13 @@ public class TeamAttendeesPanel extends Panel
       item.add(new AttendeeEditableLabel("editableLabel", Model.of(attendee), false));
       final DropDownChoice<TeamAttendeeStatus> statusChoice = new DropDownChoice<TeamAttendeeStatus>("status",
           new PropertyModel<TeamAttendeeStatus>(attendee, "status"), statusChoiceRenderer.getValues(), statusChoiceRenderer);
-      statusChoice.setEnabled(false);
+      if (attendee.getUserId() != null) {
+        if (attendee.getUserId().equals(PFUserContext.getUserId()) == true) {
+          statusChoice.setEnabled(true);
+        } else {
+          statusChoice.setEnabled(false);
+        }
+      }
       item.add(statusChoice);
     }
   }
