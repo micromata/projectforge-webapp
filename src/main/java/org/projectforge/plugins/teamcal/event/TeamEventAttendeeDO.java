@@ -82,6 +82,7 @@ public class TeamEventAttendeeDO extends DefaultBaseDO implements Serializable, 
   static {
     NON_HISTORIZABLE_ATTRIBUTES = new HashSet<String>();
     NON_HISTORIZABLE_ATTRIBUTES.add("loginToken");
+    NON_HISTORIZABLE_ATTRIBUTES.add("lastUpdate");
   }
 
   @ManyToOne(fetch = FetchType.EAGER)
@@ -296,6 +297,8 @@ public class TeamEventAttendeeDO extends DefaultBaseDO implements Serializable, 
       if (ObjectUtils.equals(this.getUserId(), other.getUserId()) == false)
         return false;
       if (StringUtils.equals(this.getUrl(), other.getUrl()) == false)
+        return false;
+      if (this.getStatus() != other.getStatus())
         return false;
       return true;
     }

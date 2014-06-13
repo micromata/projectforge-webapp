@@ -331,7 +331,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       fs.add(new TeamAttendeesPanel(fs.newChildId(), attendees));
     }
 
-    {
+    if (WebConfiguration.isDevelopmentMode() == true) {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("file"), "*.*");
       fileUploadField = new FileUploadField(FileUploadPanel.WICKET_ID);
       final FileUploadPanel fileUploadPanel;

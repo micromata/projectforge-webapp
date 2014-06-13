@@ -9,18 +9,6 @@
 
 package org.projectforge.plugins.teamcal.event;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -53,15 +41,13 @@ import net.fortuna.ical4j.model.property.Version;
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.core.ConfigXml;
+import org.projectforge.core.DisplayHistoryEntry;
 import org.projectforge.mail.Mail;
 import org.projectforge.mail.SendMail;
 import org.projectforge.registry.Registry;
 import org.projectforge.scripting.I18n;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
-
-import de.micromata.hibernate.history.HistoryEntry;
-import de.micromata.hibernate.history.delta.PropertyDelta;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -80,54 +66,59 @@ public class TeamEventMailer
 
   class Marker {
     protected final Date lastEmail;
-    protected final HistoryEntry[] entries;
-    private final List<HistoryEntry> list;
+    protected final List<DisplayHistoryEntry> entries;
+    private final List<DisplayHistoryEntry> list;
     private boolean locationChanged;
     private boolean dateChanged;
     private boolean recurrenceChanged;
+    private boolean statusChanged;
+    private String attendeeName = null;
 
-    public Marker(final HistoryEntry[] entries, final Date lastEmail) {
+    public Marker(final List<DisplayHistoryEntry> entries, final Date lastEmail) {
       this.entries = entries;
       this.lastEmail=lastEmail;
-      list = new LinkedList<HistoryEntry>();
-      for (int i=0; i < entries.length-1; i++) {
+      list = new LinkedList<DisplayHistoryEntry>();
+      for (final DisplayHistoryEntry entry: entries) {
         if (lastEmail != null) {
-          if (entries[i].getTimestamp().getTime() > lastEmail.getTime()) {
-            list.add(entries[i]);
+          if (entry.getTimestamp().getTime() > lastEmail.getTime()) {
+            list.add(entry);
           }
         }
       }
       locationChanged = hasLocationChanged();
       dateChanged = hasDateChanged();
       recurrenceChanged = hasRecurrenceChanged();
+      statusChanged = hasStatusChanged();
     }
     private boolean hasLocationChanged() {
-      for (final HistoryEntry entry : list) {
-        for (final PropertyDelta delta : entry.getDelta()) {
-          if (StringUtils.contains(delta.getPropertyName(), "location") == true) {
-            return true;
-          }
+      for (final DisplayHistoryEntry entry : list) {
+        if (StringUtils.contains(entry.getPropertyName(), "location") == true) {
+          return true;
         }
       }
       return false;
     }
     private boolean hasDateChanged() {
-      for (final HistoryEntry entry : list) {
-        for (final PropertyDelta delta : entry.getDelta()) {
-          if (StringUtils.contains(delta.getPropertyName(), "startDate") == true ||
-              StringUtils.contains(delta.getPropertyName(), "endDate") == true ) {
-            return true;
-          }
+      for (final DisplayHistoryEntry entry : list) {
+        if (StringUtils.contains(entry.getPropertyName(), "startDate") == true ||
+            StringUtils.contains(entry.getPropertyName(), "endDate") == true ) {
+          return true;
         }
       }
       return false;
     }
     private boolean hasRecurrenceChanged() {
-      for (final HistoryEntry entry : list) {
-        for (final PropertyDelta delta : entry.getDelta()) {
-          if (StringUtils.contains(delta.getPropertyName(), "recurrenceRule") == true) {
-            return true;
-          }
+      for (final DisplayHistoryEntry entry : list) {
+        if (StringUtils.contains(entry.getPropertyName(), "recurrenceRule") == true) {
+          return true;
+        }
+      }
+      return false;
+    }
+    private boolean hasStatusChanged() {
+      for (final DisplayHistoryEntry entry : list) {
+        if (StringUtils.contains(entry.getPropertyName(), "status") == true) {
+          return true;
         }
       }
       return false;
@@ -146,6 +137,22 @@ public class TeamEventMailer
       if (StringUtils.equals(event.getRecurrenceRule(), orgEvent.getRecurrenceRule()) == false) {
         recurrenceChanged = true;
       }
+      if (event.getAttendees().size() != orgEvent.getAttendees().size()) {
+        statusChanged = true;
+        return;
+      }
+      for (final TeamEventAttendeeDO attendee: event.getAttendees()) {
+        for (final TeamEventAttendeeDO orgAttendee: orgEvent.getAttendees()) {
+          if (attendee.equals(orgAttendee) == false) {
+            statusChanged = true;
+            if (attendee.getUserId() != null) {
+              attendeeName = attendee.getUser().getFullname();
+            } else {
+              attendeeName = attendee.getUrl();
+            }
+          }
+        }
+      }
     }
     public boolean isLocationChanged()
     {
@@ -158,6 +165,14 @@ public class TeamEventMailer
     public boolean isRecurrenceChanged()
     {
       return recurrenceChanged;
+    }
+    public boolean isStatusChanged()
+    {
+      return statusChanged;
+    }
+    public String getAttendeeName()
+    {
+      return attendeeName;
     }
   }
 
@@ -176,80 +191,6 @@ public class TeamEventMailer
   public Queue<TeamEventMailValue> getQueue()
   {
     return queue;
-  }
-
-  private static File writeTempFile(final String content, final String prefix, final String suffix) {
-    PrintWriter pWriter = null;
-    File temp = null;
-    try {
-      temp = File.createTempFile(prefix, "." + suffix);
-      pWriter = new PrintWriter(new BufferedWriter(new FileWriter(temp)));
-      pWriter.println(content);
-      temp.deleteOnExit();
-    } catch (final IOException ex) {
-      ex.printStackTrace();
-      log.error("Can't  write file." + ex.toString());
-    } finally {
-      if (pWriter != null) {
-        pWriter.flush();
-        pWriter.close();
-      }
-    }
-    return temp;
-  }
-
-  private static File writeMemFile1(final String content, final String prefix, final String suffix) {
-    File file = null;
-    FileOutputStream out = null;
-    FileChannel fileOutputChannel = null;
-    try {
-      file = File.createTempFile(prefix, "." + suffix);
-      out = new FileOutputStream(file);
-      fileOutputChannel = out.getChannel();
-      final ByteBuffer buffer = Charset.defaultCharset().encode(CharBuffer.wrap(content.toCharArray()));
-      fileOutputChannel.write(new ByteBuffer[] { buffer });
-      fileOutputChannel.force(true);
-      file.deleteOnExit();
-    } catch (final IOException ex) {
-      ex.printStackTrace();
-      log.error("Can't  write file." + ex.toString());
-    } finally {
-      if (out != null) {
-        try {
-          fileOutputChannel.close();
-          out.flush();
-          out.close();
-        } catch (final Exception ex) {
-          log.error("Can't  close FileOutputStream.");
-        }
-      }
-    }
-    return file;
-  }
-
-  private static File writeMemFile2(final String content, final String prefix, final String suffix) {
-    File file = null;
-    RandomAccessFile rafile = null;
-    MappedByteBuffer out = null;
-    try {
-      file = new File(prefix + "123456789" + "." + suffix);
-      rafile = new RandomAccessFile(file, "rw");
-      final ByteBuffer buffer = Charset.defaultCharset().encode(CharBuffer.wrap(content.toCharArray()));
-      out = rafile.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, buffer.capacity());
-      out.put(buffer);
-    } catch (final IOException ex) {
-      ex.printStackTrace();
-      log.error("Can't  write file." + ex.toString());
-    } finally {
-      if (rafile != null) {
-        try {
-          rafile.close();
-        } catch (final Exception ex) {
-          log.error("Can't  close FileOutputStream.");
-        }
-      }
-    }
-    return file;
   }
 
   public boolean send() {
@@ -271,7 +212,7 @@ public class TeamEventMailer
 
   private boolean sendIcsFile(final TeamEventDO event, final TeamEventMailType type, final Integer orgId) {
     int failures = 0;
-    final Marker marker = new Marker(teamEventDao.getHistoryEntries(event), event.getLastEmail());
+    final Marker marker = new Marker(teamEventDao.getDisplayHistoryEntries(event), event.getLastEmail());
     if (orgId != null) {
       final TeamEventDO orgEvent = teamEventDao.getById(orgId);
       marker.computeChanges(event, orgEvent);
@@ -317,7 +258,7 @@ public class TeamEventMailer
     buf.append(composeDate(event, type, marker));
     buf.append(composeRecurrence(event, number, type, marker));
     buf.append(composeLocation(event, type, marker));
-    buf.append(composeAttendees(event, number, type));
+    buf.append(composeAttendees(event, number, type, marker));
     buf.append(composeModifier(event, type));
     buf.append("</table>");
     buf.append(composeButtons(event, number, type));
@@ -425,7 +366,7 @@ public class TeamEventMailer
     return buf.toString();
   }
 
-  private String composeAttendees(final TeamEventDO event, final Short number, final TeamEventMailType type) {
+  private String composeAttendees(final TeamEventDO event, final Short number, final TeamEventMailType type, final Marker marker) {
     final StringBuffer buf = new StringBuffer();
     if (event.getAttendees() != null || event.getAttendees().isEmpty() == false) {
       buf.append("<tr>");
@@ -437,6 +378,20 @@ public class TeamEventMailer
           break;
         case INVITATION:
         case UPDATE:
+          if (marker.isStatusChanged() == true) {
+            for (final TeamEventAttendeeDO attendee: event.getAttendees()) {
+              buf.append("<tr>");
+              buf.append("<td></td>");
+              if (attendee.getUserId() != null) {
+                buf.append("<td>").append(attendee.getUser().getFullname());
+              } else {
+                buf.append("<td>").append(attendee.getUrl());
+              }
+              buf.append(" ").append(I18n.getString(attendee.getStatus().getI18nKey()));
+              buf.append("</td>");
+              buf.append("</tr>");
+            }
+          }
           buf.append("<tr>");
           buf.append("<td></td>");
           buf.append("<td>").append("<a href=\"http://localhost:8080/ProjectForge/Calendar/Event/?e=").append(event.getUid()).append("&p=p").append(number.toString()).append("\">").append(I18n.getString("plugins.teamcal.event.showreplies")).append("</a></td>");
