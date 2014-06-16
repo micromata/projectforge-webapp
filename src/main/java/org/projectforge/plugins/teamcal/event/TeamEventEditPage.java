@@ -76,7 +76,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
 
   private boolean wasNew = false;
 
-  private NotificationController notificationController;
+  private NotificationController notificationController = null;
 
   /**
    * @param parameters
@@ -85,7 +85,6 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   {
     super(parameters, "plugins.teamcal.event");
     super.init();
-    //    notificationController = new NotificationController(new TeamEventDO(), form.calendarsWithFullAccess);
   }
 
   /**
@@ -163,7 +162,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   protected void init(final TeamEventDO data)
   {
     super.init(data);
-    notificationController = new NotificationController(form.calendarsWithFullAccess);
+    notificationController = new NotificationController(getData(), form.calendarsWithFullAccess);
     if (isNew() == false) {
       @SuppressWarnings("serial")
       final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(),
@@ -275,6 +274,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
     super.onSaveOrUpdate();
     if (isNew()) {
       wasNew = true;
+      getData().setOrganizer(PFUserContext.getUser().getFullname());
       if (getData().getAttendees() != null && getData().getAttendees().isEmpty() == false) {
         final TeamEventAttendeeDO attendee = new TeamEventAttendeeDO();
         attendee.setUser(PFUserContext.getUser()).setStatus(TeamAttendeeStatus.ACCEPTED);
@@ -352,7 +352,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       newEvent.setExternalUid(null); // Avoid multiple usage of external uids.
       newEvent.setSequence(0);
       teamEventDao.save(newEvent);
-      notificationController.afterUpdate(newEvent, getData().getId());
+      notificationController.afterUpdate(newEvent, teamEventDao);
     }
     return null;
   }
