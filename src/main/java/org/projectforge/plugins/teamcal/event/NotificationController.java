@@ -24,40 +24,29 @@ public class NotificationController implements Serializable
 
   private final TeamCalDO[] calendarsWithFullAccess;
 
-  public NotificationController(final TeamCalDO[] calendarsWithFullAccess) {
+  private final TeamEventDiff orgData;
+
+  public NotificationController(final TeamEventDO data, final TeamCalDO[] calendarsWithFullAccess) {
+    orgData = new TeamEventDiff(data);
     this.calendarsWithFullAccess = calendarsWithFullAccess;
   }
 
   public void onDelete(final TeamEventDO data) {
     if (data.getAttendees() != null && data.getAttendees().isEmpty() == false) {
       final TeamEventMailer mailer = TeamEventMailer.getInstance();
-      final TeamEventMailValue value = new TeamEventMailValue(data.getId(), TeamEventMailType.REJECTION, null);
+      final TeamEventMailValue value = new TeamEventMailValue(data.getId(), TeamEventMailType.REJECTION);
       mailer.getQueue().offer(value);
-      mailer.send();
+      mailer.send(orgData);
     }
   }
 
-  public void afterUpdate(final TeamEventDO data, final Integer orgId) {
+  public void afterUpdate(final TeamEventDO data, final TeamEventDao teamEventDao) {
     if (data.getAttendees() != null && data.getAttendees().isEmpty() == false) {
-      //        for (final TeamEventAttendeeDO attendee: newEvent.getAttendees()) {
-      //          if (attendee.getUser() != null) {
-      //            if (attendee.getUser().equals(PFUserContext.getUser())== true) {
-      //              continue;
-      //            }
-      //            for (int i=0; i < form.calendarsWithFullAccess.length; i++) {
-      //              final Integer id = form.calendarsWithFullAccess[i].getOwnerId();
-      //              if (id.equals(attendee.getUser().getId()) == true) {
-      //                final TeamEventDO temp = getData();
-      //                temp.setCalendar(form.calendarsWithFullAccess[i]);
-      //                this.teamEventDao.saveOrUpdate(temp);
-      //              }
-      //            }
-      //          }
-      //        }
+      orgData.computeChanges(data, teamEventDao.getDisplayHistoryEntries(data));
       final TeamEventMailer mailer = TeamEventMailer.getInstance();
-      final TeamEventMailValue value = new TeamEventMailValue(data.getId(), TeamEventMailType.UPDATE, orgId);
+      final TeamEventMailValue value = new TeamEventMailValue(data.getId(), TeamEventMailType.UPDATE);
       mailer.getQueue().offer(value);
-      mailer.send();
+      mailer.send(orgData);
     }
   }
 
@@ -66,7 +55,7 @@ public class NotificationController implements Serializable
       final TeamEventMailer mailer = TeamEventMailer.getInstance();
       TeamEventMailValue value = null;
       if (wasNew == true) {
-        value = new TeamEventMailValue(data.getId(), TeamEventMailType.INVITATION, null);
+        value = new TeamEventMailValue(data.getId(), TeamEventMailType.INVITATION);
         for (final TeamEventAttendeeDO attendee: data.getAttendees()) {
           if (attendee.getUser() != null) {
             if (attendee.getUser().equals(PFUserContext.getUser())== true) {
@@ -84,10 +73,11 @@ public class NotificationController implements Serializable
           }
         }
       } else {
-        value = new TeamEventMailValue(data.getId(), TeamEventMailType.UPDATE, null);
+        orgData.computeChanges(data, teamEventDao.getDisplayHistoryEntries(data));
+        value = new TeamEventMailValue(data.getId(), TeamEventMailType.UPDATE);
       }
       mailer.getQueue().offer(value);
-      mailer.send();
+      mailer.send(orgData);
     }
   }
 }
