@@ -67,7 +67,6 @@ public class TeamEventMailer
   class Marker {
     protected final Date lastEmail;
     protected final List<DisplayHistoryEntry> entries;
-    private final List<DisplayHistoryEntry> list;
     private boolean locationChanged;
     private boolean dateChanged;
     private boolean recurrenceChanged;
@@ -77,11 +76,10 @@ public class TeamEventMailer
     public Marker(final List<DisplayHistoryEntry> entries, final Date lastEmail) {
       this.entries = entries;
       this.lastEmail=lastEmail;
-      list = new LinkedList<DisplayHistoryEntry>();
       for (final DisplayHistoryEntry entry: entries) {
         if (lastEmail != null) {
-          if (entry.getTimestamp().getTime() > lastEmail.getTime()) {
-            list.add(entry);
+          if (lastEmail.getTime() > entry.getTimestamp().getTime()) {
+            entries.remove(entry);
           }
         }
       }
@@ -91,7 +89,7 @@ public class TeamEventMailer
       statusChanged = hasStatusChanged();
     }
     private boolean hasLocationChanged() {
-      for (final DisplayHistoryEntry entry : list) {
+      for (final DisplayHistoryEntry entry : entries) {
         if (StringUtils.contains(entry.getPropertyName(), "location") == true) {
           return true;
         }
@@ -99,7 +97,7 @@ public class TeamEventMailer
       return false;
     }
     private boolean hasDateChanged() {
-      for (final DisplayHistoryEntry entry : list) {
+      for (final DisplayHistoryEntry entry : entries) {
         if (StringUtils.contains(entry.getPropertyName(), "startDate") == true ||
             StringUtils.contains(entry.getPropertyName(), "endDate") == true ) {
           return true;
@@ -108,7 +106,7 @@ public class TeamEventMailer
       return false;
     }
     private boolean hasRecurrenceChanged() {
-      for (final DisplayHistoryEntry entry : list) {
+      for (final DisplayHistoryEntry entry : entries) {
         if (StringUtils.contains(entry.getPropertyName(), "recurrenceRule") == true) {
           return true;
         }
@@ -116,7 +114,7 @@ public class TeamEventMailer
       return false;
     }
     private boolean hasStatusChanged() {
-      for (final DisplayHistoryEntry entry : list) {
+      for (final DisplayHistoryEntry entry : entries) {
         if (StringUtils.contains(entry.getPropertyName(), "status") == true) {
           return true;
         }
