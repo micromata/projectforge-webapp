@@ -470,6 +470,13 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
         (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withTargetType(java.sql.Timestamp.class)
         .withRequired(true), DatePrecision.MINUTE_5);
     endDateTimePanel.getDateField().setOutputMarkupId(true);
+    endDateTimePanel.getDateField().add(new AjaxFormComponentUpdatingBehavior("change") {
+
+      @Override
+      protected void onUpdate(AjaxRequestTarget target) {
+        // do nothing
+      }
+    });
 
     endDateField.add(endDateTimePanel);
     dateFieldToolTip(endDateTimePanel);
