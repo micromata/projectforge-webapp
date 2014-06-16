@@ -474,7 +474,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
       @Override
       protected void onUpdate(AjaxRequestTarget target) {
-        // do nothing
+        // do nothing, just update
       }
     });
 
