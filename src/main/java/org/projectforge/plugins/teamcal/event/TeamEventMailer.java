@@ -71,7 +71,6 @@ public class TeamEventMailer
     private boolean dateChanged;
     private boolean recurrenceChanged;
     private boolean statusChanged;
-    private String attendeeName = null;
 
     public Marker(final List<DisplayHistoryEntry> entries, final Date lastEmail) {
       this.entries = entries;
@@ -143,11 +142,6 @@ public class TeamEventMailer
         for (final TeamEventAttendeeDO orgAttendee: orgEvent.getAttendees()) {
           if (attendee.equals(orgAttendee) == false) {
             statusChanged = true;
-            if (attendee.getUserId() != null) {
-              attendeeName = attendee.getUser().getFullname();
-            } else {
-              attendeeName = attendee.getUrl();
-            }
           }
         }
       }
@@ -167,10 +161,6 @@ public class TeamEventMailer
     public boolean isStatusChanged()
     {
       return statusChanged;
-    }
-    public String getAttendeeName()
-    {
-      return attendeeName;
     }
   }
 
