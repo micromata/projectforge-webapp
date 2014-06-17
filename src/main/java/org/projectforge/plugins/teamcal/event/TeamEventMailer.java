@@ -74,7 +74,7 @@ public class TeamEventMailer
 
   private boolean sendIcsFile(final TeamEventDO event, final TeamEventMailType type, final TeamEventDiff orgData) {
     int failures = 0;
-    final String content = TeamEventUtils.getICal(event, type);
+    final String content = TeamEventUtils.getICalString(event, type);
     final Mail msg = new Mail();
     msg.setProjectForgeSubject(composeSubject(event, type));
     msg.setContentType(Mail.CONTENTTYPE_HTML);

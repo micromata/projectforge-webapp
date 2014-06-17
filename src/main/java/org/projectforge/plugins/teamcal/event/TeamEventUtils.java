@@ -343,7 +343,7 @@ public class TeamEventUtils
     return events;
   }
 
-  public static String getICal(final TeamEventDO teamEvent, final TeamEventMailType type) {
+  public static String getICalString(final TeamEventDO teamEvent, final TeamEventMailType type) {
     final StringBuffer buf = new StringBuffer();
     final net.fortuna.ical4j.model.Calendar calendar = new net.fortuna.ical4j.model.Calendar();
     calendar.getProperties().add(new ProdId("-//Ben Fortuna//iCal4j 1.0//EN"));
@@ -360,7 +360,7 @@ public class TeamEventUtils
       case REJECTION:
         calendar.getProperties().add(Method.CANCEL);
     }
-    final VEvent vEvent = ICal4JUtils.createVEvent(teamEvent.getStartDate(), teamEvent.getEndDate(), teamEvent.getUid(), teamEvent.getSubject(), teamEvent.isAllDay());
+    final VEvent vEvent = createVEvent(teamEvent, ICal4JUtils.getTimeZone(PFUserContext.getTimeZone()));
     vEvent.getProperties().add(new Sequence(teamEvent.getSequence()));
     if (teamEvent.hasRecurrence() == true) {
       vEvent.getProperties().add(new RRule(teamEvent.getRecurrenceObject()));
