@@ -35,20 +35,40 @@ import java.util.List;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.DateList;
 import net.fortuna.ical4j.model.Dur;
+import net.fortuna.ical4j.model.ParameterList;
 import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.TimeZone;
+import net.fortuna.ical4j.model.TimeZoneRegistry;
+import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.component.VTimeZone;
+import net.fortuna.ical4j.model.parameter.Cn;
+import net.fortuna.ical4j.model.parameter.PartStat;
+import net.fortuna.ical4j.model.parameter.Role;
+import net.fortuna.ical4j.model.parameter.Rsvp;
 import net.fortuna.ical4j.model.parameter.Value;
+import net.fortuna.ical4j.model.property.Attendee;
+import net.fortuna.ical4j.model.property.CalScale;
+import net.fortuna.ical4j.model.property.Comment;
+import net.fortuna.ical4j.model.property.Contact;
 import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.ExDate;
+import net.fortuna.ical4j.model.property.Location;
+import net.fortuna.ical4j.model.property.Method;
+import net.fortuna.ical4j.model.property.Organizer;
+import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.RRule;
+import net.fortuna.ical4j.model.property.Sequence;
+import net.fortuna.ical4j.model.property.Version;
 
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.RecurrenceFrequency;
+import org.projectforge.user.PFUserContext;
+import org.projectforge.user.PFUserDO;
 import org.projectforge.web.calendar.CalendarFeed;
 
 /**
@@ -321,5 +341,86 @@ public class TeamEventUtils
       };
     });
     return events;
+  }
+
+  public static String getICal(final TeamEventDO teamEvent, final TeamEventMailType type) {
+    final StringBuffer buf = new StringBuffer();
+    final net.fortuna.ical4j.model.Calendar calendar = new net.fortuna.ical4j.model.Calendar();
+    calendar.getProperties().add(new ProdId("-//Ben Fortuna//iCal4j 1.0//EN"));
+    calendar.getProperties().add(Version.VERSION_2_0);
+    calendar.getProperties().add(CalScale.GREGORIAN);
+    final TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
+    final VTimeZone tz = registry.getTimeZone(PFUserContext.getTimeZone().getID()).getVTimeZone();
+    calendar.getComponents().add(tz);
+    switch (type) {
+      case INVITATION:
+      case UPDATE:
+        calendar.getProperties().add(Method.REQUEST);
+        break;
+      case REJECTION:
+        calendar.getProperties().add(Method.CANCEL);
+    }
+    final VEvent vEvent = ICal4JUtils.createVEvent(teamEvent.getStartDate(), teamEvent.getEndDate(), teamEvent.getUid(), teamEvent.getSubject(), teamEvent.isAllDay());
+    vEvent.getProperties().add(new Sequence(teamEvent.getSequence()));
+    if (teamEvent.hasRecurrence() == true) {
+      vEvent.getProperties().add(new RRule(teamEvent.getRecurrenceObject()));
+    }
+    if (StringUtils.isNotBlank(teamEvent.getLocation()) == true) {
+      vEvent.getProperties().add(new Location(teamEvent.getLocation()));
+    }
+    if (StringUtils.isNotBlank(teamEvent.getNote()) == true) {
+      vEvent.getProperties().add(new Comment(teamEvent.getNote()));
+    }
+    final PFUserDO user = PFUserContext.getUser();
+    String s = user.getFullname();
+    if (user.getOrganization() != null) {
+      s += "\n" + user.getOrganization();
+    }
+    if (user.getPersonalPhoneIdentifiers() != null) {
+      s += "\n" + user.getPersonalPhoneIdentifiers();
+    }
+    vEvent.getProperties().add(new Contact(s));
+    try {
+      if (StringUtils.isNotBlank(user.getEmail()) == true) {
+        final ParameterList organizerParams = new ParameterList();
+        organizerParams.add(new Cn(user.getFullname()));
+        final Organizer organizer = new Organizer(organizerParams, "mailto:" + user.getEmail());
+        vEvent.getProperties().add(organizer);
+      }
+    } catch (final Exception e) {
+      log.error("Cant't build organizer " + e.getMessage());
+    }
+    if (teamEvent.getAttendees() != null) {
+      for (final TeamEventAttendeeDO attendee : teamEvent.getAttendees() ) {
+        final ParameterList attendeeParams = new ParameterList();
+        if (attendee.getUser() != null) {
+          try {
+            attendeeParams.add(new Cn(attendee.getUser().getFullname()));
+            attendeeParams.add(new PartStat(attendee.getStatus().name()));
+            if (attendee.getStatus().equals(TeamAttendeeStatus.NEEDS_ACTION) == true) {
+              attendeeParams.add(Role.REQ_PARTICIPANT);
+              attendeeParams.add(Rsvp.TRUE);
+            }
+            vEvent.getProperties().add(new Attendee(attendeeParams, "mailto:" + attendee.getUser().getEmail()));
+          } catch (final Exception e) {
+            log.error("Cant't build attendee " + e.getMessage());
+          }
+        } else {
+          try {
+            attendeeParams.add(new PartStat(attendee.getStatus().name()));
+            if (attendee.getStatus().equals(TeamAttendeeStatus.NEEDS_ACTION) == true) {
+              attendeeParams.add(Role.REQ_PARTICIPANT);
+              attendeeParams.add(Rsvp.TRUE);
+            }
+            vEvent.getProperties().add(new Attendee(attendeeParams, "mailto:" + attendee.getUrl()));
+          }  catch (final Exception e) {
+            log.error("Cant't build attendee " + e.getMessage());
+          }
+        }
+      }
+    }
+    calendar.getComponents().add(vEvent);
+    buf.append(calendar.toString());
+    return buf.toString();
   }
 }
