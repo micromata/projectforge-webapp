@@ -37,6 +37,9 @@ import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalEditPage;
 import org.projectforge.plugins.teamcal.admin.TeamCalListPage;
 import org.projectforge.plugins.teamcal.admin.TeamCalRight;
+import org.projectforge.plugins.teamcal.event.LocalInvitationDO;
+import org.projectforge.plugins.teamcal.event.LocalInvitationDao;
+import org.projectforge.plugins.teamcal.event.LocalInvitationRight;
 import org.projectforge.plugins.teamcal.event.TeamEventAttachmentDO;
 import org.projectforge.plugins.teamcal.event.TeamEventAttendeeDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
@@ -79,7 +82,7 @@ public class TeamCalPlugin extends AbstractPlugin
 
   public static final String RESOURCE_BUNDLE_NAME = TeamCalPlugin.class.getPackage().getName() + ".TeamCalI18nResources";
 
-  private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { TeamCalDO.class, TeamEventDO.class, TeamEventAttendeeDO.class, TeamEventAttachmentDO.class};
+  private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { TeamCalDO.class, TeamEventDO.class, TeamEventAttendeeDO.class, TeamEventAttachmentDO.class, LocalInvitationDO.class};
 
   /**
    * This dao should be defined in pluginContext.xml (as resources) for proper initialization.
@@ -87,6 +90,8 @@ public class TeamCalPlugin extends AbstractPlugin
   private TeamCalDao teamCalDao;
 
   private TeamEventDao teamEventDao;
+
+  private LocalInvitationDao localInvitationDao;
 
   @Override
   public Class< ? >[] getPersistentEntities()
@@ -106,10 +111,12 @@ public class TeamCalPlugin extends AbstractPlugin
     final RegistryEntry entry = new RegistryEntry(ID, TeamCalDao.class, teamCalDao, "plugins.teamcal");
     final RegistryEntry eventEntry = new RegistryEntry("teamEvent", TeamEventDao.class, teamEventDao, "plugins.teamcal.event");
     eventEntry.setNestedDOClasses(TeamEventAttendeeDO.class, TeamEventAttachmentDO.class);
+    final RegistryEntry invitationEntry = new RegistryEntry("localInvitation", LocalInvitationDao.class, localInvitationDao, "plugins.teamcal.event");
 
     // The CalendarDao is automatically available by the scripting engine!
     register(entry);
     register(eventEntry);
+    register(invitationEntry);
 
 
     // Register the web part:
@@ -131,6 +138,7 @@ public class TeamCalPlugin extends AbstractPlugin
     // Define the access management:
     registerRight(new TeamCalRight());
     registerRight(new TeamEventRight());
+    registerRight(new LocalInvitationRight());
 
     // All the i18n stuff:
     addResourceBundle(RESOURCE_BUNDLE_NAME);
@@ -156,6 +164,11 @@ public class TeamCalPlugin extends AbstractPlugin
   public void setTeamEventDao(final TeamEventDao teamEventDao)
   {
     this.teamEventDao = teamEventDao;
+  }
+
+  public void setLocalInvitationDao(final LocalInvitationDao localInvitationDao)
+  {
+    this.localInvitationDao = localInvitationDao;
   }
 
   /**

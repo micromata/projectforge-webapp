@@ -40,6 +40,7 @@ import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.ConfigurationParam;
 import org.projectforge.database.MyDatabaseUpdateDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
+import org.projectforge.plugins.teamcal.event.LocalInvitationDO;
 import org.projectforge.plugins.teamcal.event.TeamEventAttachmentDO;
 import org.projectforge.plugins.teamcal.event.TeamEventAttendeeDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
@@ -58,7 +59,7 @@ public class TeamCalPluginUpdates
   static MyDatabaseUpdateDao dao;
 
   final static Class< ? >[] doClasses = new Class< ? >[] { //
-    TeamCalDO.class, TeamEventDO.class, TeamEventAttendeeDO.class, TeamEventAttachmentDO.class};
+    TeamCalDO.class, TeamEventDO.class, TeamEventAttendeeDO.class, TeamEventAttachmentDO.class, LocalInvitationDO.class};
 
   final static String[] newAttributes51 = { "externalSubscription", "externalSubscriptionCalendarBinary", "externalSubscriptionHash",
     "externalSubscriptionUrl", "externalSubscriptionUpdateInterval"};
@@ -70,6 +71,36 @@ public class TeamCalPluginUpdates
   {
     final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
     // /////////////////////////////////////////////////////////////////
+    // 5.3 ?
+    // /////////////////////////////////////////////////////////////////
+    list.add(new UpdateEntryImpl(
+        TeamCalPlugin.ID,
+        "5.3",
+        "2014-06-18",
+        "Added table T_PLUGIN_CALENDAR_LOCAL_INVITATION.") {
+
+      @Override
+      public UpdatePreCheckStatus runPreCheck()
+      {
+        // Does the data-base table already exist?
+        if (dao.doEntitiesExist(LocalInvitationDO.class) == true) {
+          return UpdatePreCheckStatus.ALREADY_UPDATED;
+        } else {
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
+      }
+
+      @Override
+      public UpdateRunningStatus runUpdate()
+      {
+        if (dao.doEntitiesExist(LocalInvitationDO.class) == false) {
+          new SchemaGenerator(dao).add(LocalInvitationDO.class).createSchema();
+        }
+        return UpdateRunningStatus.DONE;
+      }
+    });
+
+    // /////////////////////////////////////////////////////////////////
     // 5.2 ?
     // /////////////////////////////////////////////////////////////////
     list.add(new UpdateEntryImpl(
@@ -77,7 +108,6 @@ public class TeamCalPluginUpdates
         "5.2",
         "2014-06-05",
         "Added table T_PLUGIN_CALENDAR_EVENT_ATTACHMENT, added fields lastEmail, attendees, sequence and attachments to T_PLUGIN_CALENDAR_EVENT_ATTENDEE.") {
-      final Table eventTable = new Table(TeamEventDO.class);
 
       @Override
       public UpdatePreCheckStatus runPreCheck()

@@ -5,4 +5,5 @@
   <bean id="teamCalDao" class="org.projectforge.plugins.teamcal.admin.TeamCalDao" />
   <bean id="teamCalImportDao" class="org.projectforge.plugins.teamcal.event.importics.TeamCalImportDao" />
   <bean id="teamEventDao" class="org.projectforge.plugins.teamcal.event.TeamEventDao" />
+  <bean id="localInvitationDao" class="org.projectforge.plugins.teamcal.event.LocalInvitationDao" />
 </beans>

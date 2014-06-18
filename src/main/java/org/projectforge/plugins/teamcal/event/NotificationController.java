@@ -11,7 +11,6 @@ package org.projectforge.plugins.teamcal.event;
 
 import java.io.Serializable;
 
-import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.user.PFUserContext;
 
 /**
@@ -22,13 +21,10 @@ public class NotificationController implements Serializable
 {
   private static final long serialVersionUID = -5256549570640682669L;
 
-  private final TeamCalDO[] calendarsWithFullAccess;
-
   private final TeamEventDiff orgData;
 
-  public NotificationController(final TeamEventDO data, final TeamCalDO[] calendarsWithFullAccess) {
+  public NotificationController(final TeamEventDO data) {
     orgData = new TeamEventDiff(data);
-    this.calendarsWithFullAccess = calendarsWithFullAccess;
   }
 
   public void onDelete(final TeamEventDO data) {
@@ -50,7 +46,7 @@ public class NotificationController implements Serializable
     }
   }
 
-  public void afterSaveOrUpdate(final TeamEventDO data, final TeamEventDao teamEventDao, final boolean wasNew) {
+  public void afterSaveOrUpdate(final TeamEventDO data, final TeamEventDao teamEventDao, final LocalInvitationDao localInvitationDao, final boolean wasNew) {
     if (data.getAttendees() != null && data.getAttendees().isEmpty() == false) {
       final TeamEventMailer mailer = TeamEventMailer.getInstance();
       TeamEventMailValue value = null;
@@ -61,14 +57,10 @@ public class NotificationController implements Serializable
             if (attendee.getUser().equals(PFUserContext.getUser())== true) {
               continue;
             }
-            for (int i=0; i < calendarsWithFullAccess.length; i++) {
-              final Integer id = calendarsWithFullAccess[i].getOwnerId();
-              if (id.equals(attendee.getUser().getId()) == true) {
-                final TeamEventDO temp = data.clone();
-                temp.setId(null);
-                temp.setCalendar(calendarsWithFullAccess[i]);
-                teamEventDao.save(temp);
-              }
+            if (attendee.getUserId() != null) {
+              final LocalInvitationDO invitation = new LocalInvitationDO();
+              invitation.setEvent(data).setUser(attendee.getUser());
+              localInvitationDao.saveOrUpdate(invitation);
             }
           }
         }

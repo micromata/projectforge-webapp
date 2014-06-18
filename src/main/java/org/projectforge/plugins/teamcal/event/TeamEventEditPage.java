@@ -62,6 +62,9 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   @SpringBean(name = "teamEventDao")
   private TeamEventDao teamEventDao;
 
+  @SpringBean(name = "localInvitationDao")
+  private LocalInvitationDao localInvitationDao;
+
   private RecurrencyChangeType recurrencyChangeType;
 
   /**
@@ -162,7 +165,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   protected void init(final TeamEventDO data)
   {
     super.init(data);
-    notificationController = new NotificationController(getData(), form.calendarsWithFullAccess);
+    notificationController = new NotificationController(getData());
     if (isNew() == false) {
       @SuppressWarnings("serial")
       final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(),
@@ -366,7 +369,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   {
     super.afterSaveOrUpdate();
     if (newEvent == null) {
-      notificationController.afterSaveOrUpdate(getData(), teamEventDao, wasNew);
+      notificationController.afterSaveOrUpdate(getData(), teamEventDao, localInvitationDao,  wasNew);
     }
     return null;
   }
