@@ -59,7 +59,7 @@ public class NotificationController implements Serializable
             }
             if (attendee.getUserId() != null) {
               final LocalInvitationDO invitation = new LocalInvitationDO();
-              invitation.setEvent(data).setUser(attendee.getUser());
+              invitation.setTeamEvent(data).setUser(attendee.getUser());
               localInvitationDao.saveOrUpdate(invitation);
             }
           }

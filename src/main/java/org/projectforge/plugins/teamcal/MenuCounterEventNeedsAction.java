@@ -26,29 +26,29 @@ package org.projectforge.plugins.teamcal;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.plugins.teamcal.event.TeamEventDao;
+import org.projectforge.plugins.teamcal.event.LocalInvitationDao;
 import org.projectforge.user.PFUserContext;
 
-// Represents the counter for displaying the teamEvents with status needs_action for current user as white number in red bubble beside the to-do menu entry.
+// Represents the counter for displaying the local invitations for current user as white number in red bubble beside the local invitations menu entry.
 public class MenuCounterEventNeedsAction extends Model<Integer>
 {
   private static final long serialVersionUID = -6203867255786689166L;
 
-  @SpringBean(name = "teamEventDao")
-  private TeamEventDao teamEventDao;
+  @SpringBean(name = "localInvitationDao")
+  private LocalInvitationDao localInvitationDao;
 
   @Override
   public Integer getObject()
   {
-    if (teamEventDao == null) {
+    if (localInvitationDao == null) {
       Injector.get().inject(this);
     }
     final Integer id = PFUserContext.getUserId();
-    return teamEventDao.getNeedsActionEvents(id);
+    return localInvitationDao.getLocalInvitations(id);
   }
 
-  public void setTeamEventDao(final TeamEventDao teamEventDao)
+  public void setLocalInvitationDao(final LocalInvitationDao localInvitationDao)
   {
-    this.teamEventDao = teamEventDao;
+    this.localInvitationDao = localInvitationDao;
   }
 }

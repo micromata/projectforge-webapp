@@ -22,7 +22,7 @@ import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.user.PFUserDO;
 
 /**
- * @author Werner Feder (w.feder-extern@micromata.de)
+ * @author Werner Feder (w.feder.extern@micromata.de)
  *
  */
 @Entity
@@ -36,7 +36,7 @@ public class LocalInvitationDO extends DefaultBaseDO
   private PFUserDO user;
 
   @IndexedEmbedded(depth = 1)
-  private TeamEventDO event;
+  private TeamEventDO teamEvent;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_fk", nullable = false)
@@ -59,20 +59,20 @@ public class LocalInvitationDO extends DefaultBaseDO
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "event_fk", nullable = false)
-  public TeamEventDO getEvent()
+  public TeamEventDO getTeamEvent()
   {
-    return event;
+    return teamEvent;
   }
 
-  public LocalInvitationDO setEvent(final TeamEventDO event)
+  public LocalInvitationDO setTeamEvent(final TeamEventDO teamEvent)
   {
-    this.event = event;
+    this.teamEvent = teamEvent;
     return this;
   }
 
   @Transient
-  public Integer getEventId()
+  public Integer getTeamEventId()
   {
-    return event != null ? event.getId() : null;
+    return teamEvent != null ? teamEvent.getId() : null;
   }
 }

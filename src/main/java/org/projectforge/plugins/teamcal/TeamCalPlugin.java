@@ -39,6 +39,8 @@ import org.projectforge.plugins.teamcal.admin.TeamCalListPage;
 import org.projectforge.plugins.teamcal.admin.TeamCalRight;
 import org.projectforge.plugins.teamcal.event.LocalInvitationDO;
 import org.projectforge.plugins.teamcal.event.LocalInvitationDao;
+import org.projectforge.plugins.teamcal.event.LocalInvitationEditPage;
+import org.projectforge.plugins.teamcal.event.LocalInvitationListPage;
 import org.projectforge.plugins.teamcal.event.LocalInvitationRight;
 import org.projectforge.plugins.teamcal.event.TeamEventAttachmentDO;
 import org.projectforge.plugins.teamcal.event.TeamEventAttendeeDO;
@@ -111,7 +113,7 @@ public class TeamCalPlugin extends AbstractPlugin
     final RegistryEntry entry = new RegistryEntry(ID, TeamCalDao.class, teamCalDao, "plugins.teamcal");
     final RegistryEntry eventEntry = new RegistryEntry("teamEvent", TeamEventDao.class, teamEventDao, "plugins.teamcal.event");
     eventEntry.setNestedDOClasses(TeamEventAttendeeDO.class, TeamEventAttachmentDO.class);
-    final RegistryEntry invitationEntry = new RegistryEntry("localInvitation", LocalInvitationDao.class, localInvitationDao, "plugins.teamcal.event");
+    final RegistryEntry invitationEntry = new RegistryEntry("localInvitation", LocalInvitationDao.class, localInvitationDao, "plugins.teamcal.event.localinvitation");
 
     // The CalendarDao is automatically available by the scripting engine!
     register(entry);
@@ -124,12 +126,18 @@ public class TeamCalPlugin extends AbstractPlugin
     registerWeb(ID, TeamCalListPage.class, TeamCalEditPage.class, DaoRegistry.ADDRESS, false); // At second position (after Address entry)
     // for SearchPage.
     registerWeb("teamEvent", TeamEventListPage.class, TeamEventEditPage.class, ID, false); // At position after entry.
+    // Local Invitation
+    registerWeb("localInvitation", LocalInvitationListPage.class, LocalInvitationEditPage.class, ID, false); // At position after entry.
+
 
     addMountPage("teamCalendar", TeamCalCalendarPage.class);
     // Register the menu entry as sub menu entry of the misc menu:
     final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.COMMON);
     // registerMenuItem(new MenuItemDef(parentMenu, ID, 7, "plugins.teamcal.menu", TeamCalCalendarPage.class));
-    registerMenuItem(new TeamCalMenuItemDef(parentMenu, ID + "List", 11, "plugins.teamcal.title.list", TeamCalListPage.class));
+    registerMenuItem(new MenuItemDef(parentMenu, ID + "List", 11, "plugins.teamcal.title.list", TeamCalListPage.class));
+
+    registerMenuItem(new TeamCalMenuItemDef(parentMenu, ID + "List", 12, "plugins.teamcal.event.localinvitation.title.list", LocalInvitationListPage.class));
+
     final MenuItemDef menuItemDef = MenuItemRegistry.instance().get(MenuItemDefId.CALENDAR);
     menuItemDef.setPageClass(TeamCalCalendarPage.class);
     WicketApplication.setDefaultPage(TeamCalCalendarPage.class);

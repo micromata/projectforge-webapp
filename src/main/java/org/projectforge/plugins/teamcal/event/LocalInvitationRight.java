@@ -10,13 +10,15 @@
 package org.projectforge.plugins.teamcal.event;
 
 import org.projectforge.access.OperationType;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRightAccessCheck;
 import org.projectforge.user.UserRightCategory;
 import org.projectforge.user.UserRightValue;
+import org.projectforge.user.UserRights;
 
 /**
- * @author Kai Reinhard (k.reinhard@micromata.de)
+ * @author Werner Feder (w.feder.extern@micromata.de)
  *
  */
 public class LocalInvitationRight extends UserRightAccessCheck<LocalInvitationDO>
@@ -31,6 +33,19 @@ public class LocalInvitationRight extends UserRightAccessCheck<LocalInvitationDO
   @Override
   public boolean hasAccess(final PFUserDO user, final LocalInvitationDO obj, final LocalInvitationDO oldObj, final OperationType operationType)
   {
-    return true;
+    if (UserRights.getAccessChecker().isUserMemberOfAdminGroup(user) == true) {
+      return true;
+    }
+
+    final LocalInvitationDO invitation = (oldObj != null) ? oldObj : obj;
+    if (invitation == null) {
+      return true;
+    }
+
+    if (invitation.getUserId().equals(PFUserContext.getUserId()) == true) {
+      return true;
+    }
+
+    return false;
   }
 }
