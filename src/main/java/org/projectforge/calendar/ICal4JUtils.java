@@ -126,8 +126,10 @@ public class ICal4JUtils
     try {
       final RRule rule = new RRule(rruleString);
       // set the recurrence end date to the last minute of the day
-      rule.getRecur().getUntil().setHours(23);
-      rule.getRecur().getUntil().setMinutes(59);
+      if (rule != null && rule.getRecur() != null) {
+        rule.getRecur().getUntil().setHours(23);
+        rule.getRecur().getUntil().setMinutes(59);
+      }
       return rule;
     } catch (final ParseException ex) {
       log.error("Exception encountered while parsing rrule '" + rruleString + "': " + ex.getMessage(), ex);
