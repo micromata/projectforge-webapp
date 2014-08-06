@@ -117,6 +117,7 @@ public class ICal4JUtils
    * @param rruleString
    * @return null if rruleString is empty, otherwise new RRule object.
    */
+  @SuppressWarnings("deprecation")
   public static RRule calculateRecurrenceRule(final String rruleString)
   {
     if (StringUtils.isBlank(rruleString) == true) {
@@ -124,6 +125,9 @@ public class ICal4JUtils
     }
     try {
       final RRule rule = new RRule(rruleString);
+      // set the recurrence end date to the last minute of the day
+      rule.getRecur().getUntil().setHours(23);
+      rule.getRecur().getUntil().setMinutes(59);
       return rule;
     } catch (final ParseException ex) {
       log.error("Exception encountered while parsing rrule '" + rruleString + "': " + ex.getMessage(), ex);
