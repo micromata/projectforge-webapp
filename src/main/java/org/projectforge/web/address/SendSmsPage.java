@@ -87,9 +87,10 @@ public class SendSmsPage extends AbstractStandardFormPage
         + getString("charactersLeft")
         + "');\n"
         + "    }\n"
-        + "    $('textarea[maxlength]').limitMaxlength({\n"
-        + "        onEdit: onEditCallback,\n"
-        + "    });\n"
+        // TODO: Doesn't work with autocompletion!
+        //        + "    $('textarea[maxlength]').limitMaxlength({\n"
+        //        + "        onEdit: onEditCallback,\n"
+        //        + "    });\n"
         + " });\n";
 
     body.add(new Label("javascript", javaScript).setEscapeModelStrings(false));
