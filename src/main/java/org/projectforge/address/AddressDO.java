@@ -614,7 +614,7 @@ public class AddressDO extends DefaultBaseDO
     return this;
   }
 
-  @Column(name = "public_key", length = 7000)
+  @Column(name = "public_key", length = 20000)
   public String getPublicKey()
   {
     return publicKey;

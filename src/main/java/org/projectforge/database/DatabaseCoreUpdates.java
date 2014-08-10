@@ -64,6 +64,31 @@ public class DatabaseCoreUpdates
   {
     final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
     // /////////////////////////////////////////////////////////////////
+    // 5.5
+    // /////////////////////////////////////////////////////////////////
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "5.5", "2014-06-17", "Length of t_address.public_key increased.") {
+
+      @Override
+      public UpdatePreCheckStatus runPreCheck()
+      {
+        if (dao.doTableAttributesExist(AddressDO.class, "publicKey") == false) { // TODO!!!!!!!! Check 5.4 or previous!!!!!!!
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
+        return UpdatePreCheckStatus.ALREADY_UPDATED;
+      }
+
+      @Override
+      public UpdateRunningStatus runUpdate()
+      {
+        if (dao.doTableAttributesExist(AddressDO.class, "pgp_public_key") == false) {
+          final Table addressTable = new Table(AddressDO.class);
+          dao.alterTableColumnVarCharLength(addressTable.getName(), "public_key", 20000);
+        }
+        return UpdateRunningStatus.DONE;
+      }
+    });
+
+    // /////////////////////////////////////////////////////////////////
     // 5.3
     // /////////////////////////////////////////////////////////////////
     list.add(new UpdateEntryImpl(CORE_REGION_ID, "5.3", "2013-11-24", "Adds t_pf_user.last_password_change, t_pf_user.password_salt.") {
