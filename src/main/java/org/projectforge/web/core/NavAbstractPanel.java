@@ -83,7 +83,7 @@ public abstract class NavAbstractPanel extends Panel
       } else {
         link = new ExternalLink("link", "#");
         if (menuEntry.hasSubMenuEntries() == false) {
-          // Add empty
+          // TODO Add empty
         }
       }
     }
