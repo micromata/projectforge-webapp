@@ -244,16 +244,16 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       recurrenceFieldset = gridBuilder.newFieldset(getString("plugins.teamcal.event.recurrence"));
       recurrencePanel = gridBuilder.getPanel().getDiv();
       recurrencePanel.setOutputMarkupId(true);
-      final RecurrenceFrequency[] intervals = TeamEventUtils.getSupportedRecurrenceIntervals();
-      final LabelValueChoiceRenderer<RecurrenceFrequency> intervalChoiceRenderer = new LabelValueChoiceRenderer<RecurrenceFrequency>(
-          recurrenceFieldset, intervals);
-      final DropDownChoice<RecurrenceFrequency> intervalChoice = new DropDownChoice<RecurrenceFrequency>(
+      final RecurrenceFrequency[] supportedFrequencies = TeamEventUtils.getSupportedRecurrenceFrequencies();
+      final LabelValueChoiceRenderer<RecurrenceFrequency> frequencyChoiceRenderer = new LabelValueChoiceRenderer<RecurrenceFrequency>(
+          recurrenceFieldset, supportedFrequencies);
+      final DropDownChoice<RecurrenceFrequency> frequencyChoice = new DropDownChoice<RecurrenceFrequency>(
           recurrenceFieldset.getDropDownChoiceId(), new PropertyModel<RecurrenceFrequency>(recurrenceData, "frequency"),
-          intervalChoiceRenderer.getValues(), intervalChoiceRenderer);
-      intervalChoice.setNullValid(false);
-      recurrenceFieldset.add(intervalChoice);
+          frequencyChoiceRenderer.getValues(), frequencyChoiceRenderer);
+      frequencyChoice.setNullValid(false);
+      recurrenceFieldset.add(frequencyChoice);
       recurrenceFieldset.getFieldset().setOutputMarkupId(true);
-      intervalChoice.add(new AjaxFormComponentUpdatingBehavior("onChange") {
+      frequencyChoice.add(new AjaxFormComponentUpdatingBehavior("onChange") {
         @Override
         protected void onUpdate(final AjaxRequestTarget target)
         {
