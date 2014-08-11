@@ -435,14 +435,6 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
     }
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked"})
-  @Override
-  @Transient
-  public Set getHistorizableAttributes()
-  {
-    return null;
-  }
-
   /**
    * The locale given from the client (e. g. from the browser by the http request). This locale is needed by PFUserContext for getting the
    * browser locale if the user's locale is null and the request's locale is not available.
