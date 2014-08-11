@@ -117,7 +117,6 @@ public class ICal4JUtils
    * @param rruleString
    * @return null if rruleString is empty, otherwise new RRule object.
    */
-  @SuppressWarnings("deprecation")
   public static RRule calculateRecurrenceRule(final String rruleString)
   {
     if (StringUtils.isBlank(rruleString) == true) {
@@ -126,9 +125,11 @@ public class ICal4JUtils
     try {
       final RRule rule = new RRule(rruleString);
       // set the recurrence end date to the last minute of the day
-      if (rule.getRecur() != null && rule.getRecur().getUntil() != null) {
-        rule.getRecur().getUntil().setHours(23);
-        rule.getRecur().getUntil().setMinutes(59);
+      final Recur recur = rule.getRecur();
+      final net.fortuna.ical4j.model.Date until = recur != null ? recur.getUntil() : null;
+      if (until != null) {
+        final Date untilEndOfDay = CalendarUtils.getEndOfDay(until, PFUserContext.getTimeZone());
+        recur.setUntil(new net.fortuna.ical4j.model.Date(untilEndOfDay));
       }
       return rule;
     } catch (final ParseException ex) {
