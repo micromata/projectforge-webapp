@@ -60,32 +60,31 @@ public class TeamCalPluginUpdates
   final static Class< ? >[] doClasses = new Class< ? >[] { //
     TeamCalDO.class, TeamEventDO.class, TeamEventAttendeeDO.class, TeamEventAttachmentDO.class};
 
-  final static String[] newAttributes51 = { "externalSubscription", "externalSubscriptionCalendarBinary", "externalSubscriptionHash",
+  final static String[] newEventAttributes51 = { "externalSubscription", "externalSubscriptionCalendarBinary", "externalSubscriptionHash",
     "externalSubscriptionUrl", "externalSubscriptionUpdateInterval"};
 
-  final static String[] newAttributes52 = { "lastEmail", "sequence"};
+  final static String[] newEventAttributes52 = { "lastEmail", "sequence"};
 
   @SuppressWarnings("serial")
   public static List<UpdateEntry> getUpdateEntries()
   {
     final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
     // /////////////////////////////////////////////////////////////////
-    // 5.2 ?
+    // 5.5
     // /////////////////////////////////////////////////////////////////
     list.add(new UpdateEntryImpl(
         TeamCalPlugin.ID,
-        "5.2",
-        "2014-06-05",
+        "5.5",
+        "2014-08-11",
         "Added table T_PLUGIN_CALENDAR_EVENT_ATTACHMENT, added fields lastEmail, attendees, sequence and attachments to T_PLUGIN_CALENDAR_EVENT_ATTENDEE.") {
-      final Table eventTable = new Table(TeamEventDO.class);
 
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
         // Does the data-base table already exist?
-        if (dao.doEntitiesExist(TeamEventAttachmentDO.class) == true &&
-            dao.doTableAttributesExist(TeamEventAttachmentDO.class, "content") == true &&
-            dao.doTableAttributesExist(TeamEventDO.class, newAttributes52) == true) {
+        if (dao.doEntitiesExist(TeamEventAttachmentDO.class) == true
+            && dao.doTableAttributesExist(TeamEventDO.class, newEventAttributes52) == true
+            && dao.doTableAttributesExist(TeamEventAttendeeDO.class, "number") == true) {
           return UpdatePreCheckStatus.ALREADY_UPDATED;
         } else {
           return UpdatePreCheckStatus.READY_FOR_UPDATE;
@@ -96,13 +95,14 @@ public class TeamCalPluginUpdates
       public UpdateRunningStatus runUpdate()
       {
         if (dao.doEntitiesExist(TeamEventAttachmentDO.class) == false) {
-          new SchemaGenerator(dao).add(TeamEventAttachmentDO.class).createSchema();
+          dao.dropTable(new Table(TeamEventAttendeeDO.class).getName()); // Table wasn't in use yet.
+          new SchemaGenerator(dao).add(TeamEventDO.class, TeamEventAttendeeDO.class, TeamEventAttachmentDO.class).createSchema();
         }
-        if (dao.doTableAttributesExist(TeamEventAttachmentDO.class, "content") == false) {
-          dao.addTableAttributes(TeamEventAttachmentDO.class, "content");
+        if (dao.doTableAttributesExist(TeamEventDO.class, newEventAttributes52) == false) {
+          dao.addTableAttributes(TeamEventDO.class, newEventAttributes52);
         }
-        if (dao.doTableAttributesExist(TeamEventDO.class, newAttributes52) == false) {
-          dao.addTableAttributes(TeamEventDO.class, newAttributes52);
+        if (dao.doTableAttributesExist(TeamEventAttendeeDO.class, "number") == false) {
+          dao.addTableAttributes(TeamEventAttendeeDO.class, "number");
         }
         return UpdateRunningStatus.DONE;
       }
@@ -122,7 +122,7 @@ public class TeamCalPluginUpdates
       {
         // Does the data-base table already exist?
         if (dao.doTableAttributesExist(TeamEventAttendeeDO.class, "commentOfAttendee") == true
-            && dao.doTableAttributesExist(TeamCalDO.class, newAttributes51) == true) {
+            && dao.doTableAttributesExist(TeamCalDO.class, newEventAttributes51) == true) {
           return UpdatePreCheckStatus.ALREADY_UPDATED;
         } else {
           return UpdatePreCheckStatus.READY_FOR_UPDATE;
@@ -138,8 +138,8 @@ public class TeamCalPluginUpdates
           // TeamEventDO is only needed for generating OneToMany relation with attendee table:
           new SchemaGenerator(dao).add(TeamEventDO.class, TeamEventAttendeeDO.class).createSchema();
         }
-        if (dao.doTableAttributesExist(TeamCalDO.class, newAttributes51) == false) {
-          dao.addTableAttributes(TeamCalDO.class, newAttributes51);
+        if (dao.doTableAttributesExist(TeamCalDO.class, newEventAttributes51) == false) {
+          dao.addTableAttributes(TeamCalDO.class, newEventAttributes51);
         }
         return UpdateRunningStatus.DONE;
       }
