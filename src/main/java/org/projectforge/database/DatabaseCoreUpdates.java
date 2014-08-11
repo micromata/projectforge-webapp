@@ -72,11 +72,14 @@ public class DatabaseCoreUpdates
         CORE_REGION_ID,
         "5.5",
         "2014-08-11",
-        "Adds t_fibu_auftrag_position.period_of_performance_type, t_fibu_auftrag_position.mode_of_payment_type, t_fibu_payment_schedule, t_fibu_auftrag.period_of_performance_{begin|end}, length of t_address.public_key increased.") {
+        "Adds t_group.ldap_values, t_fibu_auftrag_position.period_of_performance_type, t_fibu_auftrag_position.mode_of_payment_type, t_fibu_payment_schedule, t_fibu_auftrag.period_of_performance_{begin|end}, length of t_address.public_key increased.") {
 
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
+        if (dao.doTableAttributesExist(GroupDO.class, "ldapValues") == false) {
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
         if (dao.doTableAttributesExist(AuftragsPositionDO.class, "periodOfPerformanceType", "modeOfPaymentType") == false) {
           return UpdatePreCheckStatus.READY_FOR_UPDATE;
         }
@@ -92,11 +95,14 @@ public class DatabaseCoreUpdates
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        if (dao.doTableAttributesExist(AuftragsPositionDO.class, "periodOfPerformanceType", "modeOfPaymentType") == false) {
-          dao.addTableAttributes(AuftragsPositionDO.class, "periodOfPerformanceType", "modeOfPaymentType");
-          // No length check available so assume enlargement if periodOfPerformanceType doesn't yet exist:
+        if (dao.doTableAttributesExist(GroupDO.class, "ldapValues") == false) {
+          dao.addTableAttributes(GroupDO.class, "ldapValues");
+          // No length check available so assume enlargement if ldapValues doesn't yet exist:
           final Table addressTable = new Table(AddressDO.class);
           dao.alterTableColumnVarCharLength(addressTable.getName(), "public_key", 20000);
+        }
+        if (dao.doTableAttributesExist(AuftragsPositionDO.class, "periodOfPerformanceType", "modeOfPaymentType") == false) {
+          dao.addTableAttributes(AuftragsPositionDO.class, "periodOfPerformanceType", "modeOfPaymentType");
         }
         if (dao.doTableAttributesExist(AuftragDO.class, "periodOfPerformanceBegin", "periodOfPerformanceEnd") == false) {
           dao.addTableAttributes(AuftragDO.class, "periodOfPerformanceBegin", "periodOfPerformanceEnd");

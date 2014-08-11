@@ -26,11 +26,15 @@ package org.projectforge.ldap;
 import java.util.Map;
 
 import org.apache.commons.collections.SetUtils;
+import org.apache.commons.lang.StringUtils;
 import org.projectforge.common.BeanHelper;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.xml.stream.XmlObjectReader;
+import org.projectforge.xml.stream.XmlObjectWriter;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -91,8 +95,83 @@ public class GroupDOConverter
         }
       }
     }
+    if (isPosixAccountValuesEmpty(ldapGroup) == false) {
+      pfGroup.setLdapValues(getLdapValuesAsXml(ldapGroup));
+    }
     return ldapGroup;
   }
+
+  public static boolean isPosixAccountValuesEmpty(final LdapGroup ldapGroup)
+  {
+    return ldapGroup.getGidNumber() == null;
+  }
+
+  /**
+   * Sets the LDAP values such as posix account properties of the given ldapGroup configured in the given xml string.
+   * @param ldapGroup
+   * @param ldapValuesAsXml Posix account values as xml.
+   */
+  public static void setLdapValues(final LdapGroup ldapGroup, final String ldapValuesAsXml)
+  {
+    if (StringUtils.isBlank(ldapValuesAsXml) == true) {
+      return;
+    }
+    final LdapConfig ldapConfig = ConfigXml.getInstance().getLdapConfig();
+    final LdapPosixAccountsConfig posixAccountsConfig = ldapConfig != null ? ldapConfig.getPosixAccountsConfig() : null;
+    if (posixAccountsConfig == null) {
+      // No posix account default values configured
+      return;
+    }
+    final LdapGroupValues values = readLdapGroupValues(ldapValuesAsXml);
+    if (values == null) {
+      return;
+    }
+    if (values.getGidNumber() != null) {
+      ldapGroup.setGidNumber(values.getGidNumber());
+    }
+  }
+
+  public static LdapGroupValues readLdapGroupValues(final String ldapValuesAsXml)
+  {
+    if (StringUtils.isBlank(ldapValuesAsXml) == true) {
+      return null;
+    }
+    final XmlObjectReader reader = new XmlObjectReader();
+    reader.initialize(LdapGroupValues.class);
+    final LdapGroupValues values = (LdapGroupValues) reader.read(ldapValuesAsXml);
+    return values;
+  }
+
+  /**
+   * Exports the LDAP values such as posix account properties of the given ldapGroup as xml string.
+   * @param ldapGroup
+   */
+  public static String getLdapValuesAsXml(final LdapGroup ldapGroup)
+  {
+    final LdapConfig ldapConfig = ConfigXml.getInstance().getLdapConfig();
+    final LdapPosixAccountsConfig posixAccountsConfig = ldapConfig != null ? ldapConfig.getPosixAccountsConfig() : null;
+    LdapGroupValues values = null;
+    if (posixAccountsConfig != null) {
+      values = new LdapGroupValues();
+      if (ldapGroup.getGidNumber() != null) {
+        values.setGidNumber(ldapGroup.getGidNumber());
+      }
+    }
+    return getLdapValuesAsXml(values);
+  }
+
+  /**
+   * Exports the LDAP values such as posix account properties of the given ldapGroup as xml string.
+   * @param values
+   */
+  public static String getLdapValuesAsXml(final LdapGroupValues values)
+  {
+    final XmlObjectReader reader = new XmlObjectReader();
+    reader.initialize(LdapGroupValues.class);
+    final String xml = XmlObjectWriter.writeAsXml(values);
+    return xml;
+  }
+
 
   public static String buildBusinessCategory(final GroupDO group)
   {

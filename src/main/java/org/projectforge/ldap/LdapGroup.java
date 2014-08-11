@@ -31,6 +31,8 @@ import java.util.Set;
  */
 public class LdapGroup extends LdapObject<String>
 {
+  private Integer gidNumber; // POSIX gid
+
   private String description, organization, businessCategory;
 
   private final Set<String> members = new HashSet<String>();
@@ -122,6 +124,20 @@ public class LdapGroup extends LdapObject<String>
   public LdapGroup setDescription(final String description)
   {
     this.description = description;
+    return this;
+  }
+
+  /**
+   * @return The gid number of object class posixAccount.
+   */
+  public Integer getGidNumber()
+  {
+    return gidNumber;
+  }
+
+  public LdapGroup setGidNumber(final Integer gidNumber)
+  {
+    this.gidNumber = gidNumber;
     return this;
   }
 }

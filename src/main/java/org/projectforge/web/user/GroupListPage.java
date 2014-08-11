@@ -37,6 +37,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.OperationType;
+import org.projectforge.ldap.LdapUserDao;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
 import org.projectforge.web.fibu.ISelectCallerPage;
@@ -106,6 +107,10 @@ public class GroupListPage extends AbstractListPage<GroupListForm, GroupDao, Gro
         sortable), "description", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<GroupDO>(new Model<String>(getString("group.assignedUsers")), getSortable("usernames",
         sortable), "usernames", cellItemListener));
+    if (LdapUserDao.isPosixAccountsConfigured() == true) {
+      columns
+      .add(new CellItemListenerPropertyColumn<GroupDO>(getString("group.ldapValues"), "ldapValues", "ldapValues", cellItemListener));
+    }
     return columns;
   }
 

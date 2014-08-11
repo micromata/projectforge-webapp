@@ -72,9 +72,9 @@ public class GroupDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   private boolean localGroup;
 
-  //private boolean nestedGroupsAllowed = true;
+  // private boolean nestedGroupsAllowed = true;
 
-  //private String nestedGroupIds;
+  // private String nestedGroupIds;
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String organization;
@@ -83,6 +83,9 @@ public class GroupDO extends DefaultBaseDO implements ShortDisplayNameCapable
   private String description;
 
   private String usernames;
+
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String ldapValues;
 
   @ContainedIn
   @IndexedEmbedded(depth = 1)
@@ -243,6 +246,27 @@ public class GroupDO extends DefaultBaseDO implements ShortDisplayNameCapable
   public void setOrganization(final String organization)
   {
     this.organization = organization;
+  }
+
+  /**
+   * LDAP values as key-value-pairs, e. g. gidNumber=1000 For handling of string values see {@link org.apache.commons.csv.writer.CSVWriter}.
+   * This field is handled by the ldap package and has no further effect in ProjectForge's core package.
+   * @return the ldapValues
+   */
+  @Column(name = "ldap_values", length = 4000)
+  public String getLdapValues()
+  {
+    return ldapValues;
+  }
+
+  /**
+   * @param ldapValues the ldapValues to set
+   * @return this for chaining.
+   */
+  public GroupDO setLdapValues(final String ldapValues)
+  {
+    this.ldapValues = ldapValues;
+    return this;
   }
 
   @Override
