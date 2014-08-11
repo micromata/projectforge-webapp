@@ -40,7 +40,7 @@ public class LdapSambaAccountsUtils
 
   /**
    * Get all given uid numbers of all ProjectForge users including any deleted user and get the next highest and free number. The number is
-   * 1000 if no uid number (with an value greater than 999) is found.
+   * 1000 if no uid number (with a value greater than 999) is found.
    */
   public static int getNextFreeSambaSIDNumber()
   {
