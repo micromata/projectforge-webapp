@@ -27,7 +27,6 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
@@ -58,12 +57,14 @@ import org.hibernate.search.annotations.Store;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.calendar.TimePeriod;
 import org.projectforge.common.DateFormats;
+import org.projectforge.core.AbstractHistorizableBaseDO;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.PFPersistancyBehavior;
 import org.projectforge.database.Constants;
 import org.projectforge.plugins.teamcal.TeamCalConfig;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.user.PFUserContext;
+import org.projectforge.user.PFUserDO;
 
 import de.micromata.hibernate.history.ExtendedHistorizable;
 
@@ -148,11 +149,8 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
   @PFPersistancyBehavior(autoUpdateCollectionEntries = true)
   private Set<TeamEventAttachmentDO> attachments;
 
-  private static final Set<String> NON_HISTORIZABLE_ATTRIBUTES;
-
   static {
-    NON_HISTORIZABLE_ATTRIBUTES = new HashSet<String>();
-    NON_HISTORIZABLE_ATTRIBUTES.add("lastEmail");
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(PFUserDO.class, "llastEmail");
   }
 
   /**
@@ -988,26 +986,5 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
       }
     }
     return clone;
-  }
-
-  /**
-   * @see de.micromata.hibernate.history.ExtendedHistorizable#getHistorizableAttributes()
-   */
-  @Transient
-  @Override
-  public Set<String> getHistorizableAttributes()
-  {
-    // All attributes are historizable.
-    return null;
-  }
-
-  /**
-   * @see de.micromata.hibernate.history.ExtendedHistorizable#getNonHistorizableAttributes()
-   */
-  @Transient
-  @Override
-  public Set<String> getNonHistorizableAttributes()
-  {
-    return NON_HISTORIZABLE_ATTRIBUTES;
   }
 }
