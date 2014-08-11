@@ -806,7 +806,20 @@ public class WicketUtils
    */
   public static Component addTooltip(final Component component, final String title, final String text)
   {
-    return addTooltip(component, Model.of(title), Model.of(text));
+    return addTooltip(component, title, text, true);
+  }
+
+  /**
+   * Adds a SimpleAttributeModifier("title", ...) to the given component.
+   * @param component
+   * @param title
+   * @param text
+   * @see #createTooltip(String, String)
+   * @see #setStyleHasTooltip(Component)
+   */
+  public static Component addTooltip(final Component component, final String title, final String text, final boolean rightAlignment)
+  {
+    return addTooltip(component, Model.of(title), Model.of(text), rightAlignment);
   }
 
   /**
@@ -818,7 +831,20 @@ public class WicketUtils
    */
   public static Component addTooltip(final Component component, final String text)
   {
-    return addTooltip(component, null, Model.of(text));
+    return addTooltip(component, text, true);
+  }
+
+  /**
+   * Adds a SimpleAttributeModifier("title", ...) to the given component.
+   * @param component
+   * @param text
+   * @param rightAlignment If false (default is true) the tooltip will be aligned at the bottom.
+   * @see #createTooltip(String, String)
+   * @see #setStyleHasTooltip(Component)
+   */
+  public static Component addTooltip(final Component component, final String text, final boolean rightAlignment)
+  {
+    return addTooltip(component, null, Model.of(text), rightAlignment);
   }
 
   /**
@@ -828,7 +854,17 @@ public class WicketUtils
    */
   public static Component addTooltip(final Component component, final IModel<String> text)
   {
-    return addTooltip(component, null, text);
+    return addTooltip(component, text, true);
+  }
+
+  /**
+   * Adds a SimpleAttributeModifier("title", ...) to the given component. Does not modify the given tool tip text!
+   * @param component
+   * @param text
+   */
+  public static Component addTooltip(final Component component, final IModel<String> text, final boolean rightAlignment)
+  {
+    return addTooltip(component, null, text, rightAlignment);
   }
 
   /**
@@ -839,9 +875,21 @@ public class WicketUtils
    */
   public static Component addTooltip(final Component component, final IModel<String> title, final IModel<String> text)
   {
+    return addTooltip(component, title, text, true);
+  }
+
+  /**
+   * Adds a SimpleAttributeModifier("title", ...) to the given component. Does not modify the given tool tip text!
+   * @param component
+   * @param title
+   * @param text If the string contains "\n" characters then html=true and &lt;br/&gt; are used.
+   * @param rightAlignment If false (default is true) the tooltip will be aligned at the bottom.
+   */
+  public static Component addTooltip(final Component component, final IModel<String> title, final IModel<String> text,
+      final boolean rightAlignment)
+  {
     @SuppressWarnings("serial")
-    final
-    IModel<String> myModel = new Model<String>() {
+    final IModel<String> myModel = new Model<String>() {
       /**
        * @see org.apache.wicket.model.Model#getObject()
        */
@@ -857,11 +905,11 @@ public class WicketUtils
     };
     component.add(AttributeModifier.replace("data-html", true));
     if (title != null && title.getObject() != null) {
-      component.add(AttributeModifier.replace("rel", "mypopup"));
+      component.add(AttributeModifier.replace("rel", rightAlignment ? "mypopup-right" : "mypopup"));
       component.add(AttributeModifier.replace("data-original-title", title));
       component.add(AttributeModifier.replace("data-content", myModel));
     } else {
-      component.add(AttributeModifier.replace("rel", "mytooltip"));
+      component.add(AttributeModifier.replace("rel", rightAlignment ? "mytooltip-right" : "mytooltip"));
       component.add(AttributeModifier.replace("title", myModel));
     }
     return component;

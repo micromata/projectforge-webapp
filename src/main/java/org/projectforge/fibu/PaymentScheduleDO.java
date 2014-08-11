@@ -35,12 +35,12 @@ import org.projectforge.core.ShortDisplayNameCapable;
 
 /**
  * @author Werner Feder (werner.feder@t-online.de)
- *
+ * 
  */
 @Entity
 @Indexed
-@Table(name = "T_PAYMENTSCHEDULE", uniqueConstraints = { @UniqueConstraint(columnNames = { "auftrag_id", "number"})})
-public class PaymentScheduleDO extends DefaultBaseDO  implements ShortDisplayNameCapable
+@Table(name = "T__FIBU_PAYMENT_SCHEDULE", uniqueConstraints = { @UniqueConstraint(columnNames = { "auftrag_id", "number"})})
+public class PaymentScheduleDO extends DefaultBaseDO implements ShortDisplayNameCapable
 {
   private static final long serialVersionUID = -8024212050762584171L;
 
@@ -101,7 +101,8 @@ public class PaymentScheduleDO extends DefaultBaseDO  implements ShortDisplayNam
     this.number = number;
     return this;
   }
-  @Column
+
+  @Column(name = "schedule_date")
   public Date getScheduleDate()
   {
     return scheduleDate;

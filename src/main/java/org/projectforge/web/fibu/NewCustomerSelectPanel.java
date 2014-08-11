@@ -29,6 +29,7 @@ import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
@@ -39,12 +40,17 @@ import org.projectforge.common.RecentQueue;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.KundeDao;
+import org.projectforge.fibu.KundeFavorite;
 import org.projectforge.fibu.KundeFormatter;
+import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.user.UserPreferencesHelper;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.AbstractSelectPanel;
+import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
+import org.projectforge.web.wicket.components.FavoritesChoicePanel;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
+import org.projectforge.web.wicket.components.TooltipImage;
 import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
 
 /**
@@ -78,6 +84,8 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
 
   private TextField<String> kundeTextField;
 
+  private FavoritesChoicePanel<KundeDO, KundeFavorite> favoritesPanel;
+
   /**
    * @param id
    * @param model
@@ -85,8 +93,8 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
    * @param selectProperty
    */
   @SuppressWarnings("serial")
-  public NewCustomerSelectPanel(final String id, final IModel<KundeDO> model, final PropertyModel<String> kundeText, final ISelectCallerPage caller,
-      final String selectProperty)
+  public NewCustomerSelectPanel(final String id, final IModel<KundeDO> model, final PropertyModel<String> kundeText,
+      final ISelectCallerPage caller, final String selectProperty)
   {
     super(id, model, caller, selectProperty);
     this.kundeText = kundeText;
@@ -142,7 +150,7 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
 
       @SuppressWarnings({ "unchecked", "rawtypes"})
       @Override
-      public <C> IConverter<C>  getConverter(final Class<C> type)
+      public <C> IConverter<C> getConverter(final Class<C> type)
       {
         return new IConverter() {
           @Override
@@ -176,9 +184,8 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
       }
     };
     currentCustomer = getModelObject();
-    customerTextField.enableTooltips().withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false); //.withWidth(400);
+    customerTextField.enableTooltips().withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false); // .withWidth(400);
   }
-
 
   /**
    * Should be called before init() method. If true, then the validation will be done after submitting.
@@ -199,8 +206,8 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
         @Override
         public boolean isVisible()
         {
-          return (NewCustomerSelectPanel.this.getModelObject() == null || NumberHelper.greaterZero(NewCustomerSelectPanel.this.getModelObject()
-              .getId()) == false);
+          return (NewCustomerSelectPanel.this.getModelObject() == null || NumberHelper.greaterZero(NewCustomerSelectPanel.this
+              .getModelObject().getId()) == false);
         }
       };
       add(kundeTextField);
@@ -208,6 +215,61 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
       add(AbstractForm.createInvisibleDummyComponent("kundeText"));
     }
     add(customerTextField);
+    final SubmitLink selectButton = new SubmitLink("select") {
+      @Override
+      public void onSubmit()
+      {
+        setResponsePage(new CustomerListPage(caller, selectProperty));
+      };
+    };
+    selectButton.setDefaultFormProcessing(false);
+    add(selectButton);
+    selectButton.add(new TooltipImage("selectHelp", WebConstants.IMAGE_KUNDE_SELECT, getString("fibu.tooltip.selectKunde")));
+    final SubmitLink unselectButton = new SubmitLink("unselect") {
+      @Override
+      public void onSubmit()
+      {
+        caller.unselect(selectProperty);
+      }
+
+      @Override
+      public boolean isVisible()
+      {
+        return NewCustomerSelectPanel.this.getModelObject() != null;
+      }
+    };
+    unselectButton.setDefaultFormProcessing(false);
+    add(unselectButton);
+    unselectButton.add(new TooltipImage("unselectHelp", WebConstants.IMAGE_KUNDE_UNSELECT, getString("fibu.tooltip.unselectKunde")));
+    // DropDownChoice favorites
+    favoritesPanel = new FavoritesChoicePanel<KundeDO, KundeFavorite>("favorites", UserPrefArea.KUNDE_FAVORITE, tabIndex, "half select") {
+      @Override
+      protected void select(final KundeFavorite favorite)
+      {
+        if (favorite.getKunde() != null) {
+          NewCustomerSelectPanel.this.selectKunde(favorite.getKunde());
+        }
+      }
+
+      @Override
+      protected KundeDO getCurrentObject()
+      {
+        return NewCustomerSelectPanel.this.getModelObject();
+      }
+
+      @Override
+      protected KundeFavorite newFavoriteInstance(final KundeDO currentObject)
+      {
+        final KundeFavorite favorite = new KundeFavorite();
+        favorite.setKunde(currentObject);
+        return favorite;
+      }
+    };
+    add(favoritesPanel);
+    favoritesPanel.init();
+    if (showFavorites == false) {
+      favoritesPanel.setVisible(false);
+    }
     return this;
   }
 
@@ -282,6 +344,16 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
   }
 
   /**
+   * Will be called if the user has chosen an entry of the kunde favorites drop down choice.
+   * @param kunde
+   */
+  protected void selectKunde(final KundeDO kunde)
+  {
+    setModelObject(kunde);
+    caller.select(selectProperty, kunde.getId());
+  }
+
+  /**
    * @return the kundeTextField
    */
   public TextField<String> getKundeTextField()
@@ -289,4 +361,11 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
     return kundeTextField;
   }
 
+  /**
+   * @return the projectTextField
+   */
+  public PFAutoCompleteTextField<KundeDO> getTextField()
+  {
+    return customerTextField;
+  }
 }

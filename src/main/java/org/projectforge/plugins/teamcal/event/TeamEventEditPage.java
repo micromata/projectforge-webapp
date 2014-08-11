@@ -33,7 +33,6 @@ import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.common.DateHelper;
 import org.projectforge.core.ModificationStatus;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarPage;
@@ -72,6 +71,8 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
    * Used for recurrence events in {@link #onSaveOrUpdate()} and {@link #afterSaveOrUpdate()}
    */
   private TeamEventDO newEvent;
+
+  private final boolean wasNew = false;
 
   /**
    * @param parameters
@@ -241,6 +242,12 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   public AbstractSecuredBasePage onDelete()
   {
     super.onDelete();
+    //    if (getData().getAttendees() != null && getData().getAttendees().isEmpty() == false) {
+    //      final TeamEventMailer mailer = TeamEventMailer.getInstance();
+    //      final TeamEventMailValue value = new TeamEventMailValue(getData().getId(), TeamEventMailType.REJECTION, null);
+    //      mailer.getQueue().offer(value);
+    //      mailer.send();
+    //    }
     if (recurrencyChangeType == null || recurrencyChangeType == RecurrencyChangeType.ALL) {
       return null;
     }
@@ -265,16 +272,33 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   public AbstractSecuredBasePage onSaveOrUpdate()
   {
     super.onSaveOrUpdate();
-
-    if (getData().getAttendees() != null && getData().getAttendees().isEmpty() == false) {
-      final TeamEventAttendeeDO attendee = new TeamEventAttendeeDO();
-      attendee.setUser(PFUserContext.getUser()).setStatus(TeamAttendeeStatus.ACCEPTED);
-      getData().getAttendees().add(attendee);
-    }
-
+    //    if (isNew()) {
+    //      wasNew = true;
+    //      if (getData().getAttendees() != null && getData().getAttendees().isEmpty() == false) {
+    //        final TeamEventAttendeeDO attendee = new TeamEventAttendeeDO();
+    //        attendee.setUser(PFUserContext.getUser()).setStatus(TeamAttendeeStatus.ACCEPTED);
+    //        getData().addAttendee(attendee);
+    //      }
+    //      final List<FileUpload> fileUploads = form.fileUploadField.getFileUploads();
+    //      if (fileUploads != null) {
+    //        for (final FileUpload fileUpload: fileUploads) {
+    //          final TeamEventAttachmentDO attachment = new TeamEventAttachmentDO();
+    //          attachment.setFilename(fileUpload.getClientFileName());
+    //          attachment.setContent(fileUpload.getBytes());
+    //          getData().addAttachment(attachment);
+    //        }
+    //      } else {
+    //        getData().getAttachments().clear();
+    //      }
+    //    } else {
+    //      final TeamEventDO oldData = teamEventDao.getById(getData().getId());
+    //      if (getData().mustIncSequence(oldData) == true) {
+    //        getData().incSequence();
+    //      }
+    //
+    //    }
     getData().setRecurrence(form.recurrenceData);
     if (recurrencyChangeType == null || recurrencyChangeType == RecurrencyChangeType.ALL) {
-      showICal();
       return null;
     }
     final Integer masterId = getData().getId(); // Store the id of the master entry.
@@ -283,31 +307,28 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
     final TeamEventDO masterEvent = teamEventDao.getById(masterId);
     if (masterEvent == null) {
       log.error("masterEvent is null?! Do nothing more after saving team event.");
-      showICal();
       return null;
     }
     if (eventOfCaller == null) {
       log.error("eventOfCaller is null?! Do nothing more after saving team event.");
-      showICal();
       return null;
     }
     form.setData(masterEvent);
     if (recurrencyChangeType == RecurrencyChangeType.ALL_FUTURE) {
       // Set the end date of the master date one day before current date and save this event.
       final Date recurrenceUntil = new Date(eventOfCaller.getStartDate().getTime() - 24 * 3600 * 1000);
-      newEvent = oldDataObject;
+      newEvent = oldDataObject.clone();
       if (log.isDebugEnabled() == true) {
         log.debug("Recurrency until date of master entry will be set to: " + DateHelper.formatAsUTC(recurrenceUntil));
         log.debug("The new event is: " + newEvent);
       }
       form.recurrenceData.setUntil(recurrenceUntil); // Minus 24 hour.
       getData().setRecurrence(form.recurrenceData);
-      showICal();
       return null;
     } else if (recurrencyChangeType == RecurrencyChangeType.ONLY_CURRENT) { // only current date
       // Add current date to the master date as exclusion date and save this event (without recurrence settings).
       masterEvent.addRecurrenceExDate(eventOfCaller.getStartDate(), PFUserContext.getTimeZone());
-      newEvent = oldDataObject;
+      newEvent = oldDataObject.clone();
       newEvent.setRecurrenceDate(eventOfCaller.getStartDate());
       newEvent.setRecurrenceReferenceId(masterEvent.getId());
       if (log.isDebugEnabled() == true) {
@@ -317,10 +338,8 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
             + masterEvent.getRecurrenceExDate());
         log.debug("The new event is: " + newEvent);
       }
-      showICal();
       return null;
     }
-    showICal();
     return null;
   }
 
@@ -332,8 +351,39 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   {
     if (newEvent != null) {
       newEvent.setExternalUid(null); // Avoid multiple usage of external uids.
+      newEvent.setSequence(0);
       teamEventDao.save(newEvent);
+      //      if (newEvent.getAttendees() != null && newEvent.getAttendees().isEmpty() == false) {
+      //        final TeamEventMailer mailer = TeamEventMailer.getInstance();
+      //        final TeamEventMailValue value = new TeamEventMailValue(newEvent.getId(), TeamEventMailType.UPDATE, getData().getId());
+      //        mailer.getQueue().offer(value);
+      //        mailer.send();
+      //      }
     }
+    return null;
+  }
+
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractEditPage#afterSaveOrUpdate()
+   */
+  @Override
+  public AbstractSecuredBasePage afterSaveOrUpdate()
+  {
+    super.afterSaveOrUpdate();
+    //    if (newEvent == null) {
+    //      if (getData().getAttendees() != null && getData().getAttendees().isEmpty() == false) {
+    //        final TeamEventMailer mailer = TeamEventMailer.getInstance();
+    //        TeamEventMailValue value = null;
+    //        if (wasNew == true) {
+    //          value = new TeamEventMailValue(getData().getId(), TeamEventMailType.INVITATION, null);
+    //        } else {
+    //          value = new TeamEventMailValue(getData().getId(), TeamEventMailType.UPDATE, null);
+    //        }
+    //        mailer.getQueue().offer(value);
+    //        mailer.send();
+    //      }
+    //    }
     return null;
   }
 
@@ -375,7 +425,4 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
     return new TeamEventEditForm(this, data);
   }
 
-  private void showICal() {
-    final String s = ICal4JUtils.getICal(getData());
-  }
 }

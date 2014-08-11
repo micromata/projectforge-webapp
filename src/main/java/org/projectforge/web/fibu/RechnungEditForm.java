@@ -25,9 +25,12 @@ package org.projectforge.web.fibu;
 
 import java.math.BigDecimal;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.TextField;
@@ -67,13 +70,16 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
 
   private DropDownChoice<RechnungStatus> statusChoice;
 
-  private NewCustomerSelectPanel customerSelectPanel;
+  protected NewCustomerSelectPanel customerSelectPanel;
+
+  protected NewProjektSelectPanel projektSelectPanel;
 
   public RechnungEditForm(final RechnungEditPage parentPage, final RechnungDO data)
   {
     super(parentPage, data);
   }
 
+  @SuppressWarnings("serial")
   @Override
   protected void onInit()
   {
@@ -133,22 +139,33 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     }
     gridBuilder.newSubSplitPanel(GridSize.COL100);
     {
+      // Projekt
+      final FieldsetPanel fs = gridBuilder.newFieldset(RechnungDO.class, "projekt").suppressLabelForWarning();
+      projektSelectPanel = new NewProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data,
+          "projekt"), parentPage, "projektId");
+      projektSelectPanel.getTextField().add(new AjaxFormComponentUpdatingBehavior("change") {
+        @Override
+        protected void onUpdate(final AjaxRequestTarget target)
+        {
+          if (getData().getKundeId() == null && StringUtils.isBlank(getData().getKundeText()) == true) {
+            getData().setKunde(projektSelectPanel.getModelObject().getKunde());
+          }
+          target.add(customerSelectPanel.getTextField());
+        }
+      });
+      projektSelectPanel.init();
+      fs.add(projektSelectPanel);
+    }
+    {
       // Customer
       final FieldsetPanel fs = gridBuilder.newFieldset(RechnungDO.class, "kunde");
-      customerSelectPanel = new NewCustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"), new PropertyModel<String>(
-          data, "kundeText"), parentPage, "kundeId");
+      customerSelectPanel = new NewCustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"),
+          new PropertyModel<String>(data, "kundeText"), parentPage, "kundeId");
+      customerSelectPanel.getTextField().setOutputMarkupId(true);
       fs.add(customerSelectPanel);
       customerSelectPanel.init();
       fs.setLabelFor(customerSelectPanel.getKundeTextField());
       fs.addHelpIcon(getString("fibu.rechnung.hint.kannVonProjektKundenAbweichen"));
-    }
-    {
-      // Projekt
-      final FieldsetPanel fs = gridBuilder.newFieldset(RechnungDO.class, "projekt").suppressLabelForWarning();
-      final NewProjektSelectPanel projektSelectPanel = new NewProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data, "projekt"),
-          parentPage, "projektId");
-      fs.add(projektSelectPanel);
-      projektSelectPanel.init();
     }
   }
 
@@ -216,7 +233,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
       differs = true;
     } else if (area >= 0 && cost2.getBereich() != area) {
       differs = true;
-    } else if (number >= 0&& cost2.getTeilbereich() != number) {
+    } else if (number >= 0 && cost2.getTeilbereich() != number) {
       differs = true;
     }
     if (differs == true) {
@@ -235,13 +252,13 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     final BigDecimal zahlBetrag = zahlBetragField.getConvertedInput();
     final Integer projektId = getData().getProjektId();
     final Integer kundeId = getData().getKundeId();
-    //final String kundeText = customerSelectPanel.getKundeTextField().getConvertedInput();
+    // final String kundeText = customerSelectPanel.getKundeTextField().getConvertedInput();
     final boolean zahlBetragExists = (zahlBetrag != null && zahlBetrag.compareTo(BigDecimal.ZERO) != 0);
     if (status == RechnungStatus.BEZAHLT && zahlBetragExists == false) {
       addError("fibu.rechnung.error.statusBezahltErfordertZahlBetrag");
     }
-    //    if (projektId == null && StringUtils.isBlank(kundeText) == true && kundeId == null) {
-    if (projektId == null &&  kundeId == null) {
+    // if (projektId == null && StringUtils.isBlank(kundeText) == true && kundeId == null) {
+    if (projektId == null && kundeId == null) {
       addError("fibu.rechnung.error.kundeTextOderProjektRequired");
     }
   }

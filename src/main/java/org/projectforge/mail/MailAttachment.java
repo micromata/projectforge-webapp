@@ -21,26 +21,15 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.web.wicket.flowlayout;
+package org.projectforge.mail;
+
 
 /**
- * Used for defining class attribute value for button elements.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public enum ButtonType
+public interface MailAttachment
 {
-  CANCEL("btn-danger"), DARK("dark"), DEFAULT_SUBMIT("btn-success"), DELETE("btn-danger"), DIALOG_CLOSE("close_dialog"), GREEN("btn-success"), LIGHT("light"), RED(
-      "btn-danger");
+  public String getFilename();
 
-  private String classAttrValue;
-
-  public String getClassAttrValue()
-  {
-    return classAttrValue;
-  }
-
-  private ButtonType(final String classAttrValue)
-  {
-    this.classAttrValue = classAttrValue;
-  }
+  public byte[] getContent();
 }

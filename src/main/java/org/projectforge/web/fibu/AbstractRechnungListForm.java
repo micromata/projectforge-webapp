@@ -148,7 +148,7 @@ AbstractListForm<F, P>
     monthChoice.setNullValid(false);
     optionsFieldsetPanel.add(monthChoice, true);
 
-    final DivPanel radioGroupPanel = optionsFieldsetPanel.addNewRadioBoxDiv();
+    final DivPanel radioGroupPanel = optionsFieldsetPanel.addNewRadioBoxButtonDiv();
     final RadioGroupPanel<String> radioGroup = new RadioGroupPanel<String>(radioGroupPanel.newChildId(), "listtype",
         new PropertyModel<String>(getSearchFilter(), "listType")) {
       /**

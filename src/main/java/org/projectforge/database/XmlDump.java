@@ -64,6 +64,7 @@ import org.hibernate.SessionFactory;
 import org.projectforge.access.AccessEntryDO;
 import org.projectforge.access.GroupTaskAccessDO;
 import org.projectforge.common.BeanHelper;
+import org.projectforge.common.XStreamHelper;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.ConfigurationDO;
 import org.projectforge.database.xstream.HibernateXmlConverter;
@@ -95,7 +96,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 import de.micromata.hibernate.history.HistoryEntry;
 
@@ -259,7 +259,7 @@ public class XmlDump
       final SessionFactory sessionFactory = hibernate.getSessionFactory();
       session = sessionFactory.openSession(EmptyInterceptor.INSTANCE);
       session.setFlushMode(FlushMode.AUTO);
-      final XStream xstream = new XStream(new DomDriver());
+      final XStream xstream = XStreamHelper.createXStream();
       xstream.setMode(XStream.ID_REFERENCES);
       xstreamSavingConverter.setSession(session);
       xstream.registerConverter(xstreamSavingConverter, 10);

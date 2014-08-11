@@ -21,26 +21,52 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.web.wicket.flowlayout;
+package org.projectforge.plugins.teamcal.event;
+
+import org.projectforge.core.I18nEnum;
 
 /**
- * Used for defining class attribute value for button elements.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public enum ButtonType
+public enum TeamEventStatus implements I18nEnum
 {
-  CANCEL("btn-danger"), DARK("dark"), DEFAULT_SUBMIT("btn-success"), DELETE("btn-danger"), DIALOG_CLOSE("close_dialog"), GREEN("btn-success"), LIGHT("light"), RED(
-      "btn-danger");
+  UNKNOWN("unknown"), COMMITTED("committed"), DECLINED("declined"), PERHAPS("perhaps");
 
-  private String classAttrValue;
+  /**
+   * List of all available values.
+   */
+  public static final TeamEventStatus[] LIST = new TeamEventStatus[] { UNKNOWN, COMMITTED, DECLINED, PERHAPS };
 
-  public String getClassAttrValue()
+  private String key;
+
+  /**
+   * @return The key suffix will be used e. g. for i18n.
+   */
+  public String getKey()
   {
-    return classAttrValue;
+    return key;
   }
 
-  private ButtonType(final String classAttrValue)
+  /**
+   * @return The full i18n key including the i18n prefix "fibu.auftrag.status.".
+   */
+  public String getI18nKey()
   {
-    this.classAttrValue = classAttrValue;
+    return "plugins.teamcal.event.status." + key;
+  }
+
+  TeamEventStatus(final String key)
+  {
+    this.key = key;
+  }
+
+  public boolean isIn(final TeamEventStatus... status)
+  {
+    for (final TeamEventStatus st : status) {
+      if (this == st) {
+        return true;
+      }
+    }
+    return false;
   }
 }

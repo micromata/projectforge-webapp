@@ -21,26 +21,33 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.web.wicket.flowlayout;
+package org.projectforge.common;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
- * Used for defining class attribute value for button elements.
+ * Some helpers for using XStream (with proper UTF-8 encoding).
  * @author Kai Reinhard (k.reinhard@micromata.de)
+ * 
  */
-public enum ButtonType
+public class XStreamHelper
 {
-  CANCEL("btn-danger"), DARK("dark"), DEFAULT_SUBMIT("btn-success"), DELETE("btn-danger"), DIALOG_CLOSE("close_dialog"), GREEN("btn-success"), LIGHT("light"), RED(
-      "btn-danger");
-
-  private String classAttrValue;
-
-  public String getClassAttrValue()
+  /**
+   * @return new XStream initialized with UTF-8 DomDriver.
+   */
+  public static XStream createXStream()
   {
-    return classAttrValue;
+    return new XStream(new DomDriver("UTF-8"));
   }
 
-  private ButtonType(final String classAttrValue)
+  public static String toXml(final XStream xstream, final Object object)
   {
-    this.classAttrValue = classAttrValue;
+    return xstream.toXML(object);
+  }
+
+  public static Object fromXml(final XStream xstream, final String xml)
+  {
+    return xstream.fromXML(xml);
   }
 }

@@ -87,6 +87,6 @@ public class EventDroppedCallbackScriptGenerator
   public static String getEventDroppedJavascript(Component component, String url, String script, String urlTail)
   {
     return JS_TEMPLATE.asString(buildMap(component, script.replace(urlTail, url + "&which=\"+which+\""))).replace(LINE_SEPARATOR, "")
-        .replace("  ", " ");
+        .replace("  ", " ") + "; hideAllTooltips();";
   }
 }

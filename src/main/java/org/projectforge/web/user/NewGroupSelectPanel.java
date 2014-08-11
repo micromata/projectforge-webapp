@@ -14,6 +14,7 @@ import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
@@ -23,7 +24,9 @@ import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractSelectPanel;
+import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
+import org.projectforge.web.wicket.components.TooltipImage;
 import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
 
 /**
@@ -38,7 +41,6 @@ public class NewGroupSelectPanel extends AbstractSelectPanel<GroupDO> implements
 
   private static final String USER_PREF_KEY_RECENT_GROUPS = "GroupSelectPanel:recentGroups";
 
-  @SuppressWarnings("unused")
   private boolean defaultFormProcessing = false;
 
   @SpringBean(name = "groupDao")
@@ -172,11 +174,38 @@ public class NewGroupSelectPanel extends AbstractSelectPanel<GroupDO> implements
     this.defaultFormProcessing = defaultFormProcessing;
   }
 
+  @SuppressWarnings("serial")
   @Override
   public NewGroupSelectPanel init()
   {
     super.init();
     add(groupTextField);
+    final SubmitLink selectButton = new SubmitLink("select") {
+      @Override
+      public void onSubmit()
+      {
+        setResponsePage(new GroupListPage(caller, selectProperty));
+      };
+    };
+    selectButton.setDefaultFormProcessing(defaultFormProcessing);
+    add(selectButton);
+    selectButton.add(new TooltipImage("selectHelp", WebConstants.IMAGE_GROUP_SELECT, getString("tooltip.selectGroup")));
+    final SubmitLink unselectButton = new SubmitLink("unselect") {
+      @Override
+      public void onSubmit()
+      {
+        caller.unselect(selectProperty);
+      }
+
+      @Override
+      public boolean isVisible()
+      {
+        return isRequired() == false && getModelObject() != null;
+      }
+    };
+    unselectButton.setDefaultFormProcessing(defaultFormProcessing);
+    add(unselectButton);
+    unselectButton.add(new TooltipImage("unselectHelp", WebConstants.IMAGE_GROUP_UNSELECT, getString("tooltip.unselectGroup")));
     return this;
   }
 
@@ -227,6 +256,10 @@ public class NewGroupSelectPanel extends AbstractSelectPanel<GroupDO> implements
   @Override
   public FormComponent< ? > getFormComponent()
   {
+    return groupTextField;
+  }
+
+  public PFAutoCompleteTextField<GroupDO> getTextField() {
     return groupTextField;
   }
 

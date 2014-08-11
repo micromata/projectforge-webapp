@@ -61,7 +61,7 @@ public class HRListForm extends AbstractListForm<HRFilter, HRListPage>
     final HRFilter filter = getSearchFilter();
     gridBuilder.newGridPanel();
     final FieldsetPanel fs = gridBuilder.newFieldset(super.getOptionsLabel()).suppressLabelForWarning();
-    final DivPanel optionsCheckBoxesPanel = fs.addNewCheckBoxDiv();
+    final DivPanel optionsCheckBoxesPanel = fs.addNewCheckBoxButtonDiv();
     optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxButton(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(filter, "showPlanning"),
         getString("hr.planning.filter.showPlanning")));
     optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxButton(optionsCheckBoxesPanel.newChildId(), new PropertyModel<Boolean>(filter, "showBookedTimesheets"),

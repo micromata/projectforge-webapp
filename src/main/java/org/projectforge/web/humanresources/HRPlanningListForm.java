@@ -80,6 +80,8 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
 
   protected DatePanel stopDate;
 
+  protected NewProjektSelectPanel projektSelectPanel;
+
   @SuppressWarnings({ "serial"})
   @Override
   protected void init()
@@ -161,7 +163,7 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
         gridBuilder.newGridPanel();
       }
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt"));
-      final NewProjektSelectPanel projektSelectPanel = new NewProjektSelectPanel(fs.newChildId(), new Model<ProjektDO>() {
+      projektSelectPanel = new NewProjektSelectPanel(fs.newChildId(), new Model<ProjektDO>() {
         @Override
         public ProjektDO getObject()
         {

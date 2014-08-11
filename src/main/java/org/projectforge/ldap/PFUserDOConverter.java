@@ -105,7 +105,7 @@ public class PFUserDOConverter
     }
     ldapUser.setRestrictedUser(user.isRestrictedUser());
     setLdapValues(ldapUser, user.getLdapValues());
-    ldapUser.setSambaPwdLastSet(user.getLastPasswordChange());
+    ldapUser.setSambaPwdLastSet(user.getLastPasswordChange() != null ? user.getLastPasswordChange() : user.getCreated());
     return ldapUser;
   }
 

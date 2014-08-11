@@ -87,6 +87,8 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
 
   private MaxLengthTextArea commentTextArea, closeToDoDialogCommentTextArea;
 
+  protected NewGroupSelectPanel groupSelectPanel;
+
   public ToDoEditForm(final ToDoEditPage parentPage, final ToDoDO data)
   {
     super(parentPage, data);
@@ -232,7 +234,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
     {
       // Group
       final FieldsetPanel fs = gridBuilder.newFieldset(ToDoDO.class, "group");
-      final NewGroupSelectPanel groupSelectPanel = new NewGroupSelectPanel(fs.newChildId(), new PropertyModel<GroupDO>(data, "group"),
+      groupSelectPanel = new NewGroupSelectPanel(fs.newChildId(), new PropertyModel<GroupDO>(data, "group"),
           parentPage, "groupId");
       fs.add(groupSelectPanel);
       fs.setLabelFor(groupSelectPanel);
@@ -253,7 +255,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
     {
       // Options
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).suppressLabelForWarning();
-      final DivPanel checkBoxButton = fs.addNewCheckBoxDiv();
+      final DivPanel checkBoxButton = fs.addNewCheckBoxButtonDiv();
       if (ConfigXml.getInstance().isSendMailConfigured() == true) {
         checkBoxButton.add(new CheckBoxButton(checkBoxButton.newChildId(), new PropertyModel<Boolean>(this, "sendNotification"),
             getString("label.sendEMailNotification")).setTooltip(getString("plugins.todo.notification.tooltip")));

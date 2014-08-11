@@ -88,7 +88,7 @@ public class AttendeeEditPage extends AbstractEditPage<AttendeeDO, AttendeeEditF
   @Override
   public void select(final String property, final Object selectedValue)
   {
-    // Do nothing
+
   }
 
   /**
@@ -97,7 +97,7 @@ public class AttendeeEditPage extends AbstractEditPage<AttendeeDO, AttendeeEditF
   @Override
   public void unselect(final String property)
   {
-    // Do nothing
+
   }
 
   /**
@@ -106,6 +106,7 @@ public class AttendeeEditPage extends AbstractEditPage<AttendeeDO, AttendeeEditF
   @Override
   public void cancelSelection(final String property)
   {
-    // Do nothing
+
   }
+
 }
