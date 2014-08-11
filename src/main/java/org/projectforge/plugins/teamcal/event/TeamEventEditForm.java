@@ -481,7 +481,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     endDateTimePanel.getDateField().add(new AjaxFormComponentUpdatingBehavior("change") {
 
       @Override
-      protected void onUpdate(AjaxRequestTarget target) {
+      protected void onUpdate(final AjaxRequestTarget target) {
         // do nothing, just update
       }
     });
