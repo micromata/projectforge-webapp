@@ -64,7 +64,6 @@ import org.projectforge.database.Constants;
 import org.projectforge.plugins.teamcal.TeamCalConfig;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.user.PFUserContext;
-import org.projectforge.user.PFUserDO;
 
 import de.micromata.hibernate.history.ExtendedHistorizable;
 
@@ -150,7 +149,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
   private Set<TeamEventAttachmentDO> attachments;
 
   static {
-    AbstractHistorizableBaseDO.putNonHistorizableProperty(PFUserDO.class, "llastEmail");
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(TeamEventDO.class, "lastEmail");
   }
 
   /**
