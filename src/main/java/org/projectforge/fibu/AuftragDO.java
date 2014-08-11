@@ -123,6 +123,18 @@ public class AuftragDO extends DefaultBaseDO
 
   protected AuftragUIStatus uiStatus;
 
+  @PFPersistancyBehavior(autoUpdateCollectionEntries = true)
+  @IndexedEmbedded(depth = 1)
+  private List<PaymentScheduleDO> paymentSchedules = null;
+
+  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @DateBridge(resolution = Resolution.DAY)
+  private Date periodOfPerformanceBegin;
+
+  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @DateBridge(resolution = Resolution.DAY)
+  private Date periodOfPerformanceEnd;
+
   static {
     AbstractHistorizableBaseDO.putNonHistorizableProperty(AuftragDO.class, "uiStatusAsXml", "uiStatus");
   }
@@ -468,6 +480,7 @@ public class AuftragDO extends DefaultBaseDO
     return false;
   }
 
+
   /**
    * Get the position entries for this object.
    */
@@ -632,6 +645,115 @@ public class AuftragDO extends DefaultBaseDO
   public AuftragDO setUiStatus(final AuftragUIStatus uiStatus)
   {
     this.uiStatus = uiStatus;
+    return this;
+  }
+
+  /**
+   * Get the payment schedule entries for this object.
+   */
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "auftrag")
+  @IndexColumn(name = "number", base = 1)
+  public List<PaymentScheduleDO> getPaymentSchedules()
+  {
+    return this.paymentSchedules;
+  }
+
+  /**
+   * @param number
+   * @return PaymentScheduleDO with given position number or null (iterates through the list of payment schedules and compares the number), if not
+   *         exist.
+   */
+  public PaymentScheduleDO getPaymentSchedule(final short number)
+  {
+    if (paymentSchedules == null) {
+      return null;
+    }
+    for (final PaymentScheduleDO schedule : this.paymentSchedules) {
+      if (schedule.getNumber() == number) {
+        return schedule;
+      }
+    }
+    return null;
+  }
+
+  public AuftragDO setPaymentSchedules(final List<PaymentScheduleDO> paymentSchedules)
+  {
+    this.paymentSchedules = paymentSchedules;
+    return this;
+  }
+
+  public AuftragDO addPaymentSchedule(final PaymentScheduleDO paymentSchedule)
+  {
+    ensureAndGetPaymentSchedules();
+    short number = 1;
+    for (final PaymentScheduleDO pos : paymentSchedules) {
+      if (pos.getNumber() >= number) {
+        number = pos.getNumber();
+        number++;
+      }
+    }
+    paymentSchedule.setNumber(number);
+    paymentSchedule.setAuftrag(this);
+    this.paymentSchedules.add(paymentSchedule);
+    return this;
+  }
+
+  public List<PaymentScheduleDO> ensureAndGetPaymentSchedules()
+  {
+    if (this.paymentSchedules == null) {
+      setPaymentSchedules(new ArrayList<PaymentScheduleDO>());
+    }
+    return getPaymentSchedules();
+  }
+
+  @Transient
+  public boolean isZahlplanAbgeschlossenUndNichtVollstaendigFakturiert()
+  {
+    if (getPaymentSchedules() != null) {
+      for (final PaymentScheduleDO pos : getPaymentSchedules()) {
+        if (pos.isReached() == true && pos.isVollstaendigFakturiert() == false) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * @return the timeOfPerformanceBegin
+   */
+  @Column(name = "period_of_performance_begin")
+  public Date getPeriodOfPerformanceBegin()
+  {
+    return periodOfPerformanceBegin;
+  }
+
+  /**
+   * @param periodOfPerformanceBegin the periodOfPerformanceBegin to set
+   * @return this for chaining.
+   */
+  public AuftragDO setPeriodOfPerformanceBegin(final Date periodOfPerformanceBegin)
+  {
+    this.periodOfPerformanceBegin = periodOfPerformanceBegin;
+    return this;
+  }
+
+  /**
+   * @return the timeOfPerformanceEnd
+   */
+  @Column(name = "period_of_performance_end")
+  public Date getPeriodOfPerformanceEnd()
+  {
+    return periodOfPerformanceEnd;
+  }
+
+  /**
+   * @param periodOfPerformanceEnd the periodOfPerformanceEnd to set
+   * @return this for chaining.
+   */
+  public AuftragDO setPeriodOfPerformanceEnd(final Date periodOfPerformanceEnd)
+  {
+    this.periodOfPerformanceEnd = periodOfPerformanceEnd;
     return this;
   }
 }

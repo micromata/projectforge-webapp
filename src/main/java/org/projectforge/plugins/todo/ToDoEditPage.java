@@ -152,14 +152,11 @@ public class ToDoEditPage extends AbstractEditPage<ToDoDO, ToDoEditForm, ToDoDao
    */
   public void select(final String property, final Object selectedValue)
   {
-    if ("reporterId".equals(property) == true) {
-      toDoDao.setReporter(getData(), (Integer) selectedValue);
-    } else if ("assigneeId".equals(property) == true) {
-      toDoDao.setAssignee(getData(), (Integer) selectedValue);
-    } else if ("taskId".equals(property) == true) {
+    if ("taskId".equals(property) == true) {
       toDoDao.setTask(getData(), (Integer) selectedValue);
     } else if ("groupId".equals(property) == true) {
       toDoDao.setGroup(getData(), (Integer) selectedValue);
+      form.groupSelectPanel.getTextField().modelChanged();
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }
@@ -170,14 +167,11 @@ public class ToDoEditPage extends AbstractEditPage<ToDoDO, ToDoEditForm, ToDoDao
    */
   public void unselect(final String property)
   {
-    if ("reporterId".equals(property) == true) {
-      getData().setReporter(null);
-    } else if ("assigneeId".equals(property) == true) {
-      getData().setAssignee(null);
-    } else if ("taskId".equals(property) == true) {
+    if ("taskId".equals(property) == true) {
       getData().setTask(null);
     } else if ("groupId".equals(property) == true) {
       getData().setGroup(null);
+      form.groupSelectPanel.getTextField().modelChanged();
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }

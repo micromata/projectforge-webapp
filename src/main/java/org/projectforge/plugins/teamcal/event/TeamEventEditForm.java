@@ -37,6 +37,7 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -104,8 +105,6 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
   private DivPanel customizedCheckBoxButton;
 
-  private TeamAttendeesPanel attendeesPanel;
-
   private WebMarkupContainer recurrencePanel;
 
   private FieldsetPanel recurrenceFieldset, recurrenceUntilDateFieldset, recurrenceIntervalFieldset, recurrenceExDateFieldset;
@@ -118,6 +117,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
   // Needed by autocompletion for location fields.
   private TeamCalDO[] calendarsWithFullAccess;
+
+  protected FileUploadField fileUploadField;
 
   /**
    * @param parentPage
@@ -326,8 +327,15 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       gridBuilder.newSplitPanel(GridSize.COL50);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.attendees")).suppressLabelForWarning();
       attendees = getData().ensureAttendees();
-      fs.add(attendeesPanel = new TeamAttendeesPanel(fs.newChildId(), attendees));
+      fs.add(new TeamAttendeesPanel(fs.newChildId(), attendees));
     }
+
+    //    {
+    //      final FieldsetPanel fs = gridBuilder.newFieldset(getString("file"), "*.*");
+    //      fileUploadField = new FileUploadField(FileUploadPanel.WICKET_ID);
+    //      final FileUploadPanel fileUploadPanel;
+    //      fs.add(fileUploadPanel = new FileUploadPanel(fs.newChildId(), fileUploadField));
+    //    }
 
     gridBuilder.newGridPanel();
     {

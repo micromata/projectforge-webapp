@@ -29,14 +29,14 @@ public enum InstantMessagingType
 {
   SKYPE("skype"), AIM("aim"), GOOGLE_TALK("googletalk"), ICQ("icq"), MSN("msn"), YAHOO("yahoo"), JABBER("jabber");
 
-/**
- * List of all available values.
- */
+  /**
+   * List of all available values.
+   */
   public static final InstantMessagingType[] LIST = new InstantMessagingType[] { SKYPE, ICQ, MSN, YAHOO, JABBER, AIM, GOOGLE_TALK};
 
   private String key;
 
-  public static InstantMessagingType get(String s)
+  public static InstantMessagingType get(final String s)
   {
     if (StringUtils.isEmpty(s) == true) {
       return null;
@@ -68,7 +68,7 @@ public enum InstantMessagingType
     return key;
   }
 
-  InstantMessagingType(String key)
+  InstantMessagingType(final String key)
   {
     this.key = key;
   }

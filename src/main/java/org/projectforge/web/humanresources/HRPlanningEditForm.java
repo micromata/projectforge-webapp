@@ -58,7 +58,7 @@ import org.projectforge.humanresources.HRPlanningEntryDao;
 import org.projectforge.humanresources.HRPlanningEntryStatus;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.calendar.DateTimeFormatter;
-import org.projectforge.web.fibu.ProjektSelectPanel;
+import org.projectforge.web.fibu.NewProjektSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
@@ -110,6 +110,8 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
 
   private FormComponent< ? >[] dependentEntryFormComponentsArray;
 
+  protected List<NewProjektSelectPanel> projektSelectPanels = new ArrayList<NewProjektSelectPanel>();
+
   public HRPlanningEditForm(final HRPlanningEditPage parentPage, final HRPlanningDO data)
   {
     super(parentPage, data);
@@ -153,7 +155,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
           @SuppressWarnings("unchecked")
           final DropDownChoice<HRPlanningEntryStatus> statusChoice = (DropDownChoice<HRPlanningEntryStatus>) dependentEntryFormComponentsArray[i];
           final HRPlanningEntryStatus status = statusChoice.getConvertedInput();
-          final ProjektSelectPanel projektSelectPanel = (ProjektSelectPanel) dependentEntryFormComponentsArray[i + 1];
+          final NewProjektSelectPanel projektSelectPanel = (NewProjektSelectPanel) dependentEntryFormComponentsArray[i + 1];
           final ProjektDO projekt = projektSelectPanel.getModelObject();
           if (projekt == null && status == null) {
             projektSelectPanel.error(getString("hr.planning.entry.error.statusOrProjektRequired"));
@@ -320,6 +322,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
       // Ensure that at least one entry is available:
       data.addEntry(new HRPlanningEntryDO());
     }
+    projektSelectPanels.clear();
     int idx = -1;
     dependentEntryFormComponents.clear();
     dependentEntryFormComponentsArray = null;
@@ -355,12 +358,13 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
         statusChoice.setNullValid(true).setRequired(false).setEnabled(!entry.isDeleted());
         fs.add(statusChoice);
         dependentEntryFormComponents.add(statusChoice);
-        final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel(fs.newChildId(),
+        final NewProjektSelectPanel projektSelectPanel = new NewProjektSelectPanel(fs.newChildId(),
             new PropertyModel<ProjektDO>(entry, "projekt"), parentPage, "projektId:" + idx);
         projektSelectPanel.setRequired(false).setEnabled(!entry.isDeleted());
         fs.add(projektSelectPanel);
         projektSelectPanel.init();
         dependentEntryFormComponents.add(projektSelectPanel);
+        projektSelectPanels.add(projektSelectPanel);
 
         final Button button = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("deleteUndelete")) {
           @Override

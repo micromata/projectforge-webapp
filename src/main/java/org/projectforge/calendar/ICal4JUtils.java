@@ -394,4 +394,5 @@ public class ICal4JUtils
       super(javaDate.getTime(), Dates.PRECISION_DAY, timeZone);
     }
   }
+
 }

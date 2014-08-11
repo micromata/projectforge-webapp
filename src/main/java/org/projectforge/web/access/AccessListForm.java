@@ -33,7 +33,7 @@ import org.projectforge.task.TaskTree;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.task.TaskSelectPanel;
-import org.projectforge.web.user.GroupSelectPanel;
+import org.projectforge.web.user.NewGroupSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.bootstrap.GridSize;
@@ -49,6 +49,8 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
   @SpringBean(name = "taskTree")
   private TaskTree taskTree;
 
+  protected NewGroupSelectPanel groupSelectPanel;
+
   @SuppressWarnings("serial")
   @Override
   protected void init()
@@ -58,7 +60,7 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
     {
       // Group
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("group")).suppressLabelForWarning();
-      final GroupSelectPanel groupSelectPanel = new GroupSelectPanel(fs.newChildId(), new Model<GroupDO>() {
+      groupSelectPanel = new NewGroupSelectPanel(fs.newChildId(), new Model<GroupDO>() {
         @Override
         public GroupDO getObject()
         {

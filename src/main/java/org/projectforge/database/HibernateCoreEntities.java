@@ -52,11 +52,15 @@ class HibernateCoreEntities
     org.projectforge.fibu.kost.KostZuweisungDO.class, //
     org.projectforge.fibu.KontoDO.class, //
     org.projectforge.fibu.KundeDO.class, //
+    org.projectforge.fibu.PaymentScheduleDO.class, //
     org.projectforge.fibu.ProjektDO.class, //
     org.projectforge.access.AccessEntryDO.class, //
     org.projectforge.access.GroupTaskAccessDO.class, //
     org.projectforge.address.AddressDO.class, //
     org.projectforge.address.PersonalAddressDO.class, //
+    org.projectforge.address.contact.ContactDO.class, //
+    org.projectforge.address.contact.ContactEntryDO.class, //
+    org.projectforge.address.contact.PersonalContactDO.class, //
     org.projectforge.book.BookDO.class, //
     org.projectforge.core.ConfigurationDO.class, //
     org.projectforge.database.DatabaseUpdateDO.class, //

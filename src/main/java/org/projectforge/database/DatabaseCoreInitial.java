@@ -27,6 +27,9 @@ import org.projectforge.access.AccessEntryDO;
 import org.projectforge.access.GroupTaskAccessDO;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.PersonalAddressDO;
+import org.projectforge.address.contact.ContactDO;
+import org.projectforge.address.contact.ContactEntryDO;
+import org.projectforge.address.contact.PersonalContactDO;
 import org.projectforge.book.BookDO;
 import org.projectforge.common.DatabaseDialect;
 import org.projectforge.continuousdb.DatabaseUpdateDao;
@@ -47,6 +50,7 @@ import org.projectforge.fibu.EmployeeDO;
 import org.projectforge.fibu.EmployeeSalaryDO;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KundeDO;
+import org.projectforge.fibu.PaymentScheduleDO;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.RechnungDO;
 import org.projectforge.fibu.RechnungsPositionDO;
@@ -109,6 +113,7 @@ public class DatabaseCoreInitial
 
         // All the rest:
         AddressDO.class, PersonalAddressDO.class, //
+        ContactDO.class, ContactEntryDO.class, PersonalContactDO.class, //
         BookDO.class, //
         ConfigurationDO.class, //
         DatabaseUpdateDO.class, //
@@ -117,6 +122,7 @@ public class DatabaseCoreInitial
         GanttChartDO.class, //
         HRPlanningDO.class, HRPlanningEntryDO.class, //
         MebEntryDO.class, ImportedMebEntryDO.class, //
+        PaymentScheduleDO.class, //
         PostausgangDO.class, //
         PosteingangDO.class, //
         ScriptDO.class, //

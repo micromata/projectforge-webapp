@@ -61,6 +61,7 @@ import org.projectforge.web.address.AddressListPage;
 import org.projectforge.web.address.AddressMobileListPage;
 import org.projectforge.web.address.PhoneCallPage;
 import org.projectforge.web.address.SendSmsPage;
+import org.projectforge.web.address.contact.ContactListPage;
 import org.projectforge.web.admin.AdminPage;
 import org.projectforge.web.admin.SystemUpdatePage;
 import org.projectforge.web.book.BookListPage;
@@ -263,6 +264,7 @@ public class MenuItemRegistry
       }
     };
     reg.register(meb);
+    reg.register(common, MenuItemDefId.CONTACT_LIST, 90, ContactListPage.class);
     reg.register(common, MenuItemDefId.SEARCH, 100, SearchPage.class);
 
     // PROJECT_MANAGEMENT

@@ -44,6 +44,8 @@ import org.projectforge.web.address.AddressMobileViewPage;
 import org.projectforge.web.address.AddressViewPage;
 import org.projectforge.web.address.PhoneCallPage;
 import org.projectforge.web.address.SendSmsPage;
+import org.projectforge.web.address.contact.ContactEditPage;
+import org.projectforge.web.address.contact.ContactListPage;
 import org.projectforge.web.admin.AdminPage;
 import org.projectforge.web.admin.SetupPage;
 import org.projectforge.web.admin.SystemUpdatePage;
@@ -289,6 +291,9 @@ public class WebRegistry
     register(DaoRegistry.ADDRESS, AddressListPage.class);
     addMountPages(DaoRegistry.ADDRESS, AddressListPage.class, AddressEditPage.class);
     addMountPage(DaoRegistry.ADDRESS + "View", AddressViewPage.class);
+
+    register(DaoRegistry.CONTACT, ContactListPage.class);
+    addMountPages(DaoRegistry.CONTACT, ContactListPage.class, ContactEditPage.class);
 
     register(DaoRegistry.BOOK, BookListPage.class);
     addMountPages(DaoRegistry.BOOK, BookListPage.class, BookEditPage.class);

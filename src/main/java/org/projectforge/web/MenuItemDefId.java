@@ -45,6 +45,7 @@ public enum MenuItemDefId
   CALENDAR("calendar"), //
   CHANGE_PASSWORD("changePassword"), //
   CONFIGURATION("configuration"), //
+  CONTACT_LIST("contactList"), //
   CONTRACTS("contracts"), //
   COST1_LIST("fibu.kost1"), //
   COST2_LIST("fibu.kost2"), //

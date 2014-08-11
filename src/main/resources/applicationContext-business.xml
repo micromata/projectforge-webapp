@@ -36,6 +36,8 @@
   <bean id="addressDao" class="org.projectforge.address.AddressDao" />
   <bean id="bookDao" class="org.projectforge.book.BookDao" />
   <bean id="configurationDao" class="org.projectforge.core.ConfigurationDao" />
+  <bean id="contactDao" class="org.projectforge.address.contact.ContactDao" />
+  <bean id="contactEntryDao" class="org.projectforge.address.contact.ContactEntryDao" />
   <bean id="contractDao" class="org.projectforge.orga.ContractDao" />
   <bean id="databaseDao" class="org.projectforge.database.DatabaseDao" />
   <bean id="ganttChartDao" class="org.projectforge.gantt.GanttChartDao" />
@@ -46,6 +48,7 @@
   <bean id="initDatabaseDao" class="org.projectforge.database.InitDatabaseDao" />
   <bean id="mebDao" class="org.projectforge.meb.MebDao" />
   <bean id="personalAddressDao" class="org.projectforge.address.PersonalAddressDao" />
+  <bean id="personalContactDao" class="org.projectforge.address.contact.PersonalContactDao" />
   <bean id="postausgangDao" class="org.projectforge.orga.PostausgangDao" />
   <bean id="posteingangDao" class="org.projectforge.orga.PosteingangDao" />
   <bean id="scriptDao" class="org.projectforge.scripting.ScriptDao" />
@@ -83,6 +86,7 @@
   <bean id="datevImportDao" class="org.projectforge.fibu.datev.DatevImportDao" />
   <bean id="kundeDao" class="org.projectforge.fibu.KundeDao" />
   <bean id="monthlyEmployeeReportDao" class="org.projectforge.fibu.MonthlyEmployeeReportDao" />
+  <bean id="paymentScheduleDao" class="org.projectforge.fibu.PaymentScheduleDao" />
   <bean id="projektDao" class="org.projectforge.fibu.ProjektDao" />
   <bean id="rechnungCache" class="org.projectforge.fibu.RechnungCache" singleton="true" />
   <bean id="rechnungDao" class="org.projectforge.fibu.RechnungDao">

@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.projectforge.address.AddressDO;
 import org.projectforge.continuousdb.DatabaseResultRow;
+import org.projectforge.continuousdb.SchemaGenerator;
 import org.projectforge.continuousdb.Table;
 import org.projectforge.continuousdb.TableAttribute;
 import org.projectforge.continuousdb.UpdateEntry;
@@ -39,6 +40,7 @@ import org.projectforge.fibu.AuftragsPositionDO;
 import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KundeDO;
+import org.projectforge.fibu.PaymentScheduleDO;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.RechnungDO;
 import org.projectforge.registry.Registry;
@@ -66,12 +68,22 @@ public class DatabaseCoreUpdates
     // /////////////////////////////////////////////////////////////////
     // 5.5
     // /////////////////////////////////////////////////////////////////
-    list.add(new UpdateEntryImpl(CORE_REGION_ID, "5.5", "2014-06-17", "Length of t_address.public_key increased.") {
+    list.add(new UpdateEntryImpl(
+        CORE_REGION_ID,
+        "5.5",
+        "2014-08-11",
+        "Adds t_fibu_auftrag_position.period_of_performance_type, t_fibu_auftrag_position.mode_of_payment_type, t_fibu_payment_schedule, t_fibu_auftrag.period_of_performance_{begin|end}, length of t_address.public_key increased.") {
 
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        if (dao.doTableAttributesExist(AddressDO.class, "publicKey") == false) { // TODO!!!!!!!! Check 5.4 or previous!!!!!!!
+        if (dao.doTableAttributesExist(AuftragsPositionDO.class, "periodOfPerformanceType", "modeOfPaymentType") == false) {
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
+        if (dao.doTableAttributesExist(AuftragDO.class, "periodOfPerformanceBegin", "periodOfPerformanceEnd") == false) {
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
+        if (dao.doEntitiesExist(PaymentScheduleDO.class) == false) {
           return UpdatePreCheckStatus.READY_FOR_UPDATE;
         }
         return UpdatePreCheckStatus.ALREADY_UPDATED;
@@ -80,9 +92,18 @@ public class DatabaseCoreUpdates
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        if (dao.doTableAttributesExist(AddressDO.class, "pgp_public_key") == false) {
+        if (dao.doTableAttributesExist(AuftragsPositionDO.class, "periodOfPerformanceType", "modeOfPaymentType") == false) {
+          dao.addTableAttributes(AuftragsPositionDO.class, "periodOfPerformanceType", "modeOfPaymentType");
+          // No length check available so assume enlargement if periodOfPerformanceType doesn't yet exist:
           final Table addressTable = new Table(AddressDO.class);
           dao.alterTableColumnVarCharLength(addressTable.getName(), "public_key", 20000);
+        }
+        if (dao.doTableAttributesExist(AuftragDO.class, "periodOfPerformanceBegin", "periodOfPerformanceEnd") == false) {
+          dao.addTableAttributes(AuftragDO.class, "periodOfPerformanceBegin", "periodOfPerformanceEnd");
+        }
+        if (dao.doEntitiesExist(PaymentScheduleDO.class) == false) {
+          new SchemaGenerator(dao).add(PaymentScheduleDO.class).createSchema();
+          dao.createMissingIndices();
         }
         return UpdateRunningStatus.DONE;
       }

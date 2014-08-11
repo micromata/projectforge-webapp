@@ -36,7 +36,7 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.datetime.markup.html.form.DateTextField;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
@@ -45,6 +45,7 @@ import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -58,6 +59,9 @@ import org.projectforge.fibu.AuftragsPositionsArt;
 import org.projectforge.fibu.AuftragsPositionsStatus;
 import org.projectforge.fibu.AuftragsStatus;
 import org.projectforge.fibu.KundeDO;
+import org.projectforge.fibu.ModeOfPaymentType;
+import org.projectforge.fibu.PaymentScheduleDO;
+import org.projectforge.fibu.PeriodOfPerformanceType;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.RechnungCache;
 import org.projectforge.fibu.RechnungDao;
@@ -65,6 +69,8 @@ import org.projectforge.fibu.RechnungsPositionVO;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
+import org.projectforge.user.UserRightValue;
+import org.projectforge.user.UserRights;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
@@ -106,16 +112,24 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
 
   protected CheckBox sendEMailNotficationCheckBox;
 
-  protected RepeatingView positionsRepeater;
+  protected RepeatingView positionsRepeater, paymentSchedulesRepeater;
 
-  protected CustomerSelectPanel kundeSelectPanel;
+  protected NewCustomerSelectPanel kundeSelectPanel;
 
   private final List<Component> ajaxUpdateComponents = new ArrayList<Component>();
+
+  private final List<Component> ajaxPosTargets = new ArrayList<Component>();
 
   @SpringBean(name = "rechnungCache")
   private RechnungCache rechnungCache;
 
   private FormComponent< ? >[] positionsDependentFormComponents = new FormComponent[0];
+
+  private DatePanel fromDatePanel, endDatePanel;
+
+  private PaymentSchedulePanel paymentSchedulePanel;
+
+  protected NewProjektSelectPanel projektSelectPanel;
 
   public AuftragEditForm(final AuftragEditPage parentPage, final AuftragDO data)
   {
@@ -137,6 +151,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
   protected void init()
   {
     super.init();
+
     /* GRID8 - BLOCK */
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
@@ -199,20 +214,33 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       statusChoice.setNullValid(false).setRequired(true);
       fs.add(statusChoice);
     }
-    gridBuilder.newGridPanel();
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // project
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt")).suppressLabelForWarning();
-      final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data, "projekt"),
-          parentPage, "projektId");
-      fs.add(projektSelectPanel);
+      projektSelectPanel = new NewProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data,
+          "projekt"), parentPage, "projektId");
+      projektSelectPanel.getTextField().add(new AjaxFormComponentUpdatingBehavior("change") {
+        @Override
+        protected void onUpdate(final AjaxRequestTarget target)
+        {
+          if (getData().getKundeId() == null && StringUtils.isBlank(getData().getKundeText()) == true) {
+            getData().setKunde(projektSelectPanel.getModelObject().getKunde());
+          }
+          target.add(kundeSelectPanel.getTextField());
+        }
+      });
       projektSelectPanel.init();
+      //      ajaxUpdateComponents.add(projektSelectPanel.getTextField());
+      fs.add(projektSelectPanel);
     }
+    gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // customer
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde")).suppressLabelForWarning();
-      kundeSelectPanel = new CustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"), new PropertyModel<String>(
+      kundeSelectPanel = new NewCustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"), new PropertyModel<String>(
           data, "kundeText"), parentPage, "kundeId");
+      kundeSelectPanel.getTextField().setOutputMarkupId(true);
       fs.add(kundeSelectPanel);
       kundeSelectPanel.init();
       fs.addHelpIcon(getString("fibu.auftrag.hint.kannVonProjektKundenAbweichen"));
@@ -254,6 +282,62 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
+      // Period of performance
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.periodOfPerformance"));
+      fromDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "periodOfPerformanceBegin"), DatePanelSettings.get()
+          .withTargetType(java.sql.Date.class));
+      fs.add(fromDatePanel);
+      fs.add(new DivTextPanel(fs.newChildId(), "-"));
+      endDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "periodOfPerformanceEnd"), DatePanelSettings.get()
+          .withTargetType(java.sql.Date.class));
+      fs.add(endDatePanel);
+    }
+
+    gridBuilder.newSplitPanel(GridSize.COL50);
+    {
+      // Payment schedule
+      final ToggleContainerPanel schedulesPanel = new ToggleContainerPanel(gridBuilder.getPanel().newChildId()) {
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.ToggleContainerPanel#wantsOnStatusChangedNotification()
+         */
+        @Override
+        protected boolean wantsOnStatusChangedNotification()
+        {
+          return true;
+        }
+
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.ToggleContainerPanel#onToggleStatusChanged(org.apache.wicket.ajax.AjaxRequestTarget,
+         *      boolean)
+         */
+        @Override
+        protected void onToggleStatusChanged(final AjaxRequestTarget target, final ToggleStatus toggleStatus)
+        {
+          setHeading(getPaymentScheduleHeading(data.getPaymentSchedules(), this));
+        }
+      };
+      schedulesPanel.setClosed();
+      schedulesPanel.setHeading(getPaymentScheduleHeading(data.getPaymentSchedules(), schedulesPanel));
+      gridBuilder.getPanel().add(schedulesPanel);
+      final GridBuilder innerGridBuilder = schedulesPanel.createGridBuilder();
+      final DivPanel dp = innerGridBuilder.getPanel();
+      dp.add(paymentSchedulePanel = new PaymentSchedulePanel(dp.newChildId(), new CompoundPropertyModel<AuftragDO>(data), getUser()));
+      paymentSchedulePanel.setVisible(data.getPaymentSchedules() != null && data.getPaymentSchedules().isEmpty() == false);
+      final Button addPositionButton = new Button(SingleButtonPanel.WICKET_ID) {
+        @Override
+        public final void onSubmit()
+        {
+          data.addPaymentSchedule(new PaymentScheduleDO());
+          paymentSchedulePanel.rebuildEntries();
+          paymentSchedulePanel.setVisible(true);
+        }
+      };
+      final SingleButtonPanel addPositionButtonPanel = new SingleButtonPanel(dp.newChildId(), addPositionButton, getString("add"));
+      addPositionButtonPanel.setTooltip(getString("fibu.auftrag.tooltip.addPosition"));
+      dp.add(addPositionButtonPanel);
+    }
+    gridBuilder.newSplitPanel(GridSize.COL50);
+    {
       // comment
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));
       fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "bemerkung")), true);
@@ -264,6 +348,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.statusBeschreibung"));
       fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "statusBeschreibung")), true);
     }
+    // positions
     gridBuilder.newGridPanel();
     positionsRepeater = gridBuilder.newRepeatingView();
     refresh();
@@ -296,31 +381,44 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       @Override
       public void validate(final Form< ? > form)
       {
+        final Date performanceFromDate = fromDatePanel.getDateField().getConvertedInput();
+        final Date performanceEndDate = endDatePanel.getDateField().getConvertedInput();
+        if (performanceFromDate == null || performanceEndDate == null) {
+          return;
+        } else if (performanceEndDate.before(performanceFromDate) == true) {
+          endDatePanel.error(getString("error.endDateBeforeBeginDate"));
+        }
         for (int i = 0; i < positionsDependentFormComponents.length - 1; i += 2) {
-          final Date performanceFromDate = ((DateTextField) positionsDependentFormComponents[i]).getConvertedInput();
-          final Date performanceEndDate = ((DateTextField) positionsDependentFormComponents[i + 1]).getConvertedInput();
-          if (performanceFromDate == null || performanceEndDate == null) {
+          final Date posPerformanceFromDate = ((DatePanel) positionsDependentFormComponents[i]).getDateField().getConvertedInput();
+          final Date posPerformanceEndDate = ((DatePanel) positionsDependentFormComponents[i + 1]).getDateField().getConvertedInput();
+          if (posPerformanceFromDate == null || posPerformanceEndDate == null) {
             continue;
           }
-          if (performanceEndDate.before(performanceFromDate) == true) {
+          if (posPerformanceEndDate.before(posPerformanceFromDate) == true) {
             positionsDependentFormComponents[i + 1].error(getString("error.endDateBeforeBeginDate"));
+          }
+          if (posPerformanceFromDate.before(performanceFromDate) == true) {
+            positionsDependentFormComponents[i + 1].error(getString("error.posFromDateBeforeFromDate"));
           }
         }
       }
     });
-
   }
 
   @SuppressWarnings("serial")
   void refresh()
   {
     positionsRepeater.removeAll();
+    this.ajaxPosTargets.clear();
+
     final Collection<FormComponent< ? >> dependentComponents = new ArrayList<FormComponent< ? >>();
     if (CollectionUtils.isEmpty(data.getPositionen()) == true) {
       // Ensure that at least one position is available:
       data.addPosition(new AuftragsPositionDO());
     }
+
     for (final AuftragsPositionDO position : data.getPositionen()) {
+
       final boolean abgeschlossenUndNichtFakturiert = position.isAbgeschlossenUndNichtVollstaendigFakturiert();
       final ToggleContainerPanel positionsPanel = new ToggleContainerPanel(positionsRepeater.newChildId()) {
         /**
@@ -400,7 +498,8 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         }
       }
       posGridBuilder.newSplitPanel(GridSize.COL33);
-      final Set<RechnungsPositionVO> invoicePositionsByOrderPositionId = rechnungCache.getRechnungsPositionVOSetByAuftragsPositionId(position.getId());
+      final Set<RechnungsPositionVO> invoicePositionsByOrderPositionId = rechnungCache
+          .getRechnungsPositionVOSetByAuftragsPositionId(position.getId());
       final boolean showInvoices = CollectionUtils.isNotEmpty(invoicePositionsByOrderPositionId);
       {
         // Invoices
@@ -422,7 +521,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         } else {
           fs.add(AbstractUnsecureBasePage.createInvisibleDummyComponent(fs.newChildId()));
         }
-        if (userGroupCache.isUserMemberOfFinanceGroup() == true) {
+        if (UserRights.getAccessChecker().hasRight(getUser(), RechnungDao.USER_RIGHT_ID, UserRightValue.READWRITE) == true) {
           final DivPanel checkBoxDiv = fs.addNewCheckBoxButtonDiv();
           checkBoxDiv.add(new CheckBoxButton(checkBoxDiv.newChildId(), new PropertyModel<Boolean>(position, "vollstaendigFakturiert"),
               getString("fibu.auftrag.vollstaendigFakturiert")));
@@ -443,7 +542,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
           fs.setWarningBackground();
         }
       }
-      posGridBuilder.newSplitPanel(GridSize.COL66);
+      posGridBuilder.newSplitPanel(GridSize.COL100);
       {
         // Task
         final FieldsetPanel fs = posGridBuilder.newFieldset(getString("task"));
@@ -459,19 +558,72 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         fs.add(taskSelectPanel);
         taskSelectPanel.init();
       }
-      posGridBuilder.newSplitPanel(GridSize.COL33);
+
+      posGridBuilder.newSplitPanel(GridSize.COL100);
       {
         // Period of performance
         final FieldsetPanel fs = posGridBuilder.newFieldset(getString("fibu.periodOfPerformance"));
+        final LabelValueChoiceRenderer<PeriodOfPerformanceType> performanceChoiceRenderer = new LabelValueChoiceRenderer<PeriodOfPerformanceType>(
+            fs, PeriodOfPerformanceType.values());
+        final DropDownChoice<PeriodOfPerformanceType> performanceChoice = new DropDownChoice<PeriodOfPerformanceType>(
+            fs.getDropDownChoiceId(), new PropertyModel<PeriodOfPerformanceType>(position, "periodOfPerformanceType"),
+            performanceChoiceRenderer.getValues(), performanceChoiceRenderer) {
+          /**
+           * @see org.apache.wicket.markup.html.form.AbstractSingleSelectChoice#getDefaultChoice(java.lang.String)
+           */
+          @Override
+          protected CharSequence getDefaultChoice(final String selectedValue)
+          {
+            if (posHasOwnPeriodOfPerformance(position.getNumber()) == true) {
+              return super.getDefaultChoice(PeriodOfPerformanceType.OWN.toString());
+            } else {
+              return super.getDefaultChoice(PeriodOfPerformanceType.SEEABOVE.toString());
+            }
+          }
+        };
+        performanceChoice.add(new AjaxFormComponentUpdatingBehavior("onchange") {
+          @Override
+          protected void onUpdate(final AjaxRequestTarget target)
+          {
+            final short pos = position.getNumber();
+            final PeriodOfPerformanceType s = performanceChoice.getModelObject();
+            final boolean visible = s.equals(PeriodOfPerformanceType.OWN);
+            setPosPeriodOfPerformanceVisible(pos, visible);
+            if (ajaxPosTargets != null) {
+              for (final Component ajaxPosTarget : ajaxPosTargets)
+                target.add(ajaxPosTarget);
+            }
+          }
+        });
+        performanceChoice.setOutputMarkupPlaceholderTag(true);
+        fs.add(performanceChoice);
+
         final DatePanel fromDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(position, "periodOfPerformanceBegin"),
             DatePanelSettings.get().withTargetType(java.sql.Date.class));
+        fromDatePanel.getDateField().setOutputMarkupPlaceholderTag(true);
         fs.add(fromDatePanel);
-        dependentComponents.add(fromDatePanel.getDateField());
-        fs.add(new DivTextPanel(fs.newChildId(), "-"));
+        ajaxPosTargets.add(fromDatePanel.getDateField());
+        dependentComponents.add(fromDatePanel);
+
+        final DivTextPanel divPanel = new DivTextPanel(fs.newChildId(), "-");
+        divPanel.getLabel4Ajax().setOutputMarkupPlaceholderTag(true);
+        fs.add(divPanel);
+        ajaxPosTargets.add(divPanel.getLabel4Ajax());
+
         final DatePanel endDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(position, "periodOfPerformanceEnd"),
             DatePanelSettings.get().withTargetType(java.sql.Date.class));
+        endDatePanel.getDateField().setOutputMarkupPlaceholderTag(true);
         fs.add(endDatePanel);
-        dependentComponents.add(endDatePanel.getDateField());
+        ajaxPosTargets.add(endDatePanel.getDateField());
+        dependentComponents.add(endDatePanel);
+
+        final LabelValueChoiceRenderer<ModeOfPaymentType> paymentChoiceRenderer = new LabelValueChoiceRenderer<ModeOfPaymentType>(fs,
+            ModeOfPaymentType.values());
+        final DropDownChoice<ModeOfPaymentType> paymentChoice = new DropDownChoice<ModeOfPaymentType>(fs.getDropDownChoiceId(),
+            new PropertyModel<ModeOfPaymentType>(position, "modeOfPaymentType"), paymentChoiceRenderer.getValues(), paymentChoiceRenderer);
+        paymentChoice.setOutputMarkupPlaceholderTag(true);
+        fs.add(paymentChoice);
+        ajaxPosTargets.add(paymentChoice);
       }
       posGridBuilder.newGridPanel();
       {
@@ -479,6 +631,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         final FieldsetPanel fs = posGridBuilder.newFieldset(getString("comment"));
         fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(position, "bemerkung")));
       }
+      setPosPeriodOfPerformanceVisible(position.getNumber(), posHasOwnPeriodOfPerformance(position.getNumber()));
     }
     positionsDependentFormComponents = dependentComponents.toArray(new FormComponent[0]);
   }
@@ -503,9 +656,48 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
     return heading.toString();
   }
 
+  protected String getPaymentScheduleHeading(final List<PaymentScheduleDO> paymentSchedules, final ToggleContainerPanel schedulesPanel)
+  {
+    BigDecimal ges = BigDecimal.ZERO;
+    BigDecimal invoiced = BigDecimal.ZERO;
+    for (final PaymentScheduleDO schedule : paymentSchedules) {
+      ges = ges.add(schedule.getAmount());
+      if (schedule.isVollstaendigFakturiert() == true) {
+        invoiced = invoiced.add(schedule.getAmount());
+      }
+      if (schedule.isReached() == true && schedule.isVollstaendigFakturiert() == false) {
+        schedulesPanel.setHighlightedHeader();
+      }
+    }
+    if (schedulesPanel.getToggleStatus() == ToggleStatus.OPENED) {
+      return getString("fibu.auftrag.paymentschedule") + " (" + paymentSchedules.size() + ")";
+    }
+    final StringBuffer heading = new StringBuffer();
+    heading.append(escapeHtml(getString("fibu.auftrag.paymentschedule"))).append(" (").append(paymentSchedules.size()).append(")");
+    heading.append(": ").append(CurrencyFormatter.format(ges)).append(" ").append(getString("fibu.fakturiert")).append(" ")
+    .append(CurrencyFormatter.format(invoiced));
+    return heading.toString();
+  }
+
   @Override
   protected Logger getLogger()
   {
     return log;
+  }
+
+  private boolean posHasOwnPeriodOfPerformance(final short number)
+  {
+    return ((getData().getPosition(number).getPeriodOfPerformanceBegin() != null && StringUtils.isBlank(getData().getPosition(number)
+        .getPeriodOfPerformanceBegin().toString()) == false)
+        || (getData().getPosition(number).getPeriodOfPerformanceEnd() != null && StringUtils.isBlank(getData().getPosition(number)
+            .getPeriodOfPerformanceEnd().toString()) == false) || getData().getPosition(number).getPeriodOfPerformanceType() == PeriodOfPerformanceType.OWN);
+  }
+
+  private void setPosPeriodOfPerformanceVisible(final short pos, final boolean visible)
+  {
+    ajaxPosTargets.get(pos * 4 - 4).setVisible(visible);
+    ajaxPosTargets.get(pos * 4 - 3).setVisible(visible);
+    ajaxPosTargets.get(pos * 4 - 2).setVisible(visible);
+    ajaxPosTargets.get(pos * 4 - 1).setVisible(visible);
   }
 }

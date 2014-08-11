@@ -130,6 +130,7 @@ public class HRPlanningEditPage extends AbstractEditPage<HRPlanningDO, HRPlannin
       final Integer idx = NumberHelper.parseInteger(property.substring(property.indexOf(':') + 1));
       final HRPlanningEntryDO entry = getData().getEntry(idx);
       hrPlanningDao.setProjekt(entry, (Integer) selectedValue);
+      form.projektSelectPanels.get(idx).getTextField().modelChanged();
     } else if ("userId".equals(property) == true) {
       getBaseDao().setUser(getData(), (Integer) selectedValue);
       form.refresh();
@@ -147,6 +148,7 @@ public class HRPlanningEditPage extends AbstractEditPage<HRPlanningDO, HRPlannin
       final Integer idx = NumberHelper.parseInteger(property.substring(property.indexOf(':') + 1));
       final HRPlanningEntryDO entry = getData().getEntry(idx);
       entry.setProjekt(null);
+      form.projektSelectPanels.get(idx).getTextField().modelChanged();
       // form.refresh();
     } else {
       log.error("Property '" + property + "' not supported for selection.");
