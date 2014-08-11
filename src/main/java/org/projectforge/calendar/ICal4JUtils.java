@@ -126,7 +126,7 @@ public class ICal4JUtils
     try {
       final RRule rule = new RRule(rruleString);
       // set the recurrence end date to the last minute of the day
-      if (rule.getRecur() != null) {
+      if (rule.getRecur() != null && rule.getRecur().getUntil() != null) {
         rule.getRecur().getUntil().setHours(23);
         rule.getRecur().getUntil().setMinutes(59);
       }
