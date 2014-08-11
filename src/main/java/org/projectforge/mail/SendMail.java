@@ -23,10 +23,10 @@
 
 package org.projectforge.mail;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
-import java.util.SortedSet;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -47,7 +47,6 @@ import org.apache.commons.lang.math.RandomUtils;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.InternalErrorException;
 import org.projectforge.core.UserException;
-import org.projectforge.plugins.teamcal.event.TeamEventAttachmentDO;
 import org.projectforge.scripting.GroovyEngine;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
@@ -85,7 +84,7 @@ public class SendMail
    * @throws UserException if to address is not given.
    * @throws InternalErrorException due to technical failures.
    */
-  public boolean send(final Mail composedMessage, final String icalContent, final SortedSet<TeamEventAttachmentDO> attachments)
+  public boolean send(final Mail composedMessage, final String icalContent, final Collection<? extends MailAttachment> attachments)
   {
     final String to = composedMessage.getTo();
     if (to == null || to.trim().length() == 0) {
@@ -173,7 +172,7 @@ public class SendMail
     log.info("E-Mail successfully sent: " + composedMessage.toString());
   }
 
-  private void sendIt(final Mail composedMessage, final String icalContent, final SortedSet<TeamEventAttachmentDO> attachments) {
+  private void sendIt(final Mail composedMessage, final String icalContent, final Collection<? extends MailAttachment> attachments) {
     final Session session = Session.getInstance(properties);
     Transport transport = null;
     try {
@@ -222,7 +221,7 @@ public class SendMail
         // See http://docs.oracle.com/javaee/5/api/javax/activation/MimetypesFileTypeMap.html
         final MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
         int i=0;
-        for (final TeamEventAttachmentDO attachment: attachments) {
+        for (final MailAttachment attachment: attachments) {
           // create the next message part
           mbp[i] = new MimeBodyPart();
           // only by file name
