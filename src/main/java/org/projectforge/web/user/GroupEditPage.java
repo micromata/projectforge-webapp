@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.ldap.GroupDOConverter;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
 import org.projectforge.web.wicket.AbstractEditPage;
@@ -74,8 +75,13 @@ public class GroupEditPage extends AbstractEditPage<GroupDO, GroupEditForm, Grou
   {
     groupDao.setAssignedUsers(getData(), form.assignUsersListHelper.getAssignedItems());
     //groupDao.setNestedGroups(getData(), form.nestedGroupsListHelper.getAssignedItems());
+    if (form.ldapGroupValues.isValuesEmpty() == false) {
+      final String xml = GroupDOConverter.getLdapValuesAsXml(form.ldapGroupValues);
+      getData().setLdapValues(xml);
+    }
     return super.onSaveOrUpdate();
   }
+
 
   @Override
   protected GroupDao getBaseDao()

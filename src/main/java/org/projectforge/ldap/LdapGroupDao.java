@@ -27,16 +27,20 @@ import java.util.List;
 
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.projectforge.common.NumberHelper;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 public class LdapGroupDao extends LdapDao<String, LdapGroup>
 {
-  private static final String[] ADDITIONAL_OBJECT_CLASSES = { "top"};// { "posixGroup"};// null;//{ "groupOfNames"};
+  private static final String[] ADDITIONAL_OBJECT_CLASSES = { "top"};
+
+  private static final String[] ADDITIONAL_OBJECT_CLASSES_WITH_POSIX_SUPPORT = { "top", "posixGroup"};
 
   private static final String NONE_UNIQUE_MEMBER_ID = "cn=none";
 
@@ -71,6 +75,19 @@ public class LdapGroupDao extends LdapDao<String, LdapGroup>
   @Override
   protected String[] getAdditionalObjectClasses()
   {
+    throw new UnsupportedOperationException("Call getAdditionalObjectClasses(LdapGroup) instead.");
+  }
+
+  /**
+   * @see org.projectforge.ldap.LdapDao#getAdditionalObjectClasses(org.projectforge.ldap.LdapObject)
+   */
+  @Override
+  protected String[] getAdditionalObjectClasses(final LdapGroup obj)
+  {
+    final boolean posixAccount = isPosixAccountsConfigured() == true && GroupDOConverter.isPosixAccountValuesEmpty(obj) == false;
+    if (posixAccount == true) {
+      return ADDITIONAL_OBJECT_CLASSES_WITH_POSIX_SUPPORT;
+    }
     return ADDITIONAL_OBJECT_CLASSES;
   }
 
@@ -109,6 +126,21 @@ public class LdapGroupDao extends LdapDao<String, LdapGroup>
     } else {
       createAndAddModificationItems(list, "uniqueMember", NONE_UNIQUE_MEMBER_ID);
     }
+    final boolean modifyPosixAccount = isPosixAccountsConfigured() == true && GroupDOConverter.isPosixAccountValuesEmpty(group) == false;
+    if (modifyPosixAccount == true) {
+      if (group.getObjectClasses() != null) {
+        final List<String> missedObjectClasses = LdapUtils.getMissedObjectClasses(getAdditionalObjectClasses(group), getObjectClass(),
+            group.getObjectClasses());
+        if (CollectionUtils.isNotEmpty(missedObjectClasses) == true) {
+          for (final String missedObjectClass : missedObjectClasses) {
+            list.add(createModificationItem(DirContext.ADD_ATTRIBUTE, "objectClass", missedObjectClass));
+          }
+        }
+      }
+    }
+    if (modifyPosixAccount == true) {
+      createAndAddModificationItems(list, "gidNumber", String.valueOf(group.getGidNumber()));
+    }
     return list;
   }
 
@@ -127,6 +159,11 @@ public class LdapGroupDao extends LdapDao<String, LdapGroup>
       for (final String member : members) {
         group.addMember(member, ldapConfig.getBaseDN());
       }
+    }
+    final boolean posixAccountsConfigured = isPosixAccountsConfigured();
+    if (posixAccountsConfigured == true) {
+      final String no = LdapUtils.getAttributeStringValue(attributes, "gidNumber");
+      group.setGidNumber(NumberHelper.parseInteger(no));
     }
     return group;
   }
@@ -153,5 +190,10 @@ public class LdapGroupDao extends LdapDao<String, LdapGroup>
   protected String getOuBase()
   {
     return ldapConfig.getGroupBase();
+  }
+
+  public static boolean isPosixAccountsConfigured()
+  {
+    return LdapUserDao.isPosixAccountsConfigured();
   }
 }

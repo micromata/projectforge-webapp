@@ -23,11 +23,13 @@
 
 package org.projectforge.ldap;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.SetUtils;
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.common.BeanHelper;
+import org.projectforge.common.ListHelper;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.registry.Registry;
@@ -55,14 +57,17 @@ public class GroupDOConverter
     return null;
   }
 
-  public static GroupDO convert(final LdapGroup group)
+  public static GroupDO convert(final LdapGroup ldapGroup)
   {
-    final GroupDO pfGroup = new GroupDO();
-    pfGroup.setId(getId(group));
-    pfGroup.setName(group.getCommonName());
-    pfGroup.setOrganization(group.getOrganization());
-    pfGroup.setDescription(group.getDescription());
-    return pfGroup;
+    final GroupDO group = new GroupDO();
+    group.setId(getId(ldapGroup));
+    group.setName(ldapGroup.getCommonName());
+    group.setOrganization(ldapGroup.getOrganization());
+    group.setDescription(ldapGroup.getDescription());
+    if (isPosixAccountValuesEmpty(ldapGroup) == false) {
+      group.setLdapValues(getLdapValuesAsXml(ldapGroup));
+    }
+    return group;
   }
 
   public static LdapGroup convert(final GroupDO pfGroup, final String baseDN, final Map<Integer, LdapUser> ldapUserMap)
@@ -95,9 +100,7 @@ public class GroupDOConverter
         }
       }
     }
-    if (isPosixAccountValuesEmpty(ldapGroup) == false) {
-      pfGroup.setLdapValues(getLdapValuesAsXml(ldapGroup));
-    }
+    setLdapValues(ldapGroup, pfGroup.getLdapValues());
     return ldapGroup;
   }
 
@@ -128,6 +131,8 @@ public class GroupDOConverter
     }
     if (values.getGidNumber() != null) {
       ldapGroup.setGidNumber(values.getGidNumber());
+    } else {
+      ldapGroup.setGidNumber(-1);
     }
   }
 
@@ -198,16 +203,13 @@ public class GroupDOConverter
    */
   public static boolean copyGroupFields(final LdapGroup src, final LdapGroup dest)
   {
-    boolean modified = BeanHelper.copyProperties(src, dest, true, "description", "organization");
-    // Checks if the sets aren't equal:
-    if (SetUtils.isEqualSet(src.getMembers(), dest.getMembers()) == false) {
-      if (LdapGroupDao.hasMembers(src) == true || LdapGroupDao.hasMembers(dest) == true) {
-        // If both, src and dest have no members, then do nothing, otherwise:
-        modified = true;
-        dest.clearMembers();
-        dest.addAllMembers(src.getMembers());
-      }
+    boolean modified;
+    final List<String> properties = new LinkedList<String>();
+    ListHelper.addAll(properties, "description", "organization");
+    if (LdapUserDao.isPosixAccountsConfigured() == true && isPosixAccountValuesEmpty(src) == false) {
+      ListHelper.addAll(properties, "gidNumber");
     }
+    modified = BeanHelper.copyProperties(src, dest, true, properties.toArray(new String[0]));
     return modified;
   }
 }
