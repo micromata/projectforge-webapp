@@ -23,7 +23,6 @@
 
 package org.projectforge.plugins.teamcal.event;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,8 +31,6 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -43,10 +40,8 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.search.annotations.Indexed;
-import org.projectforge.core.BaseDO;
-import org.projectforge.core.ModificationStatus;
+import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserRights;
 
 import de.micromata.hibernate.history.ExtendedHistorizable;
 
@@ -56,11 +51,9 @@ import de.micromata.hibernate.history.ExtendedHistorizable;
 @Entity
 @Indexed
 @Table(name = "T_PLUGIN_CALENDAR_EVENT_ATTENDEE")
-public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAttendeeDO>, BaseDO<Integer>, ExtendedHistorizable
+public class TeamEventAttendeeDO extends DefaultBaseDO implements Comparable<TeamEventAttendeeDO>, ExtendedHistorizable
 {
   private static final long serialVersionUID = -3293247578185393730L;
-
-  private Integer id;
 
   private Short number;
 
@@ -83,21 +76,6 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
   static {
     NON_HISTORIZABLE_ATTRIBUTES = new HashSet<String>();
     NON_HISTORIZABLE_ATTRIBUTES.add("loginToken");
-  }
-
-  @Override
-  @Id
-  @GeneratedValue
-  @Column(name = "pk")
-  public Integer getId()
-  {
-    return id;
-  }
-
-  @Override
-  public void setId(final Integer id)
-  {
-    this.id = id;
   }
 
   /**
@@ -227,7 +205,6 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
     return this;
   }
 
-
   /**
    * @return the number
    */
@@ -253,7 +230,7 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
   @Override
   public int compareTo(final TeamEventAttendeeDO arg0)
   {
-    if (this.id != null && ObjectUtils.equals(this.id, arg0.id) == true) {
+    if (this.getId() != null && ObjectUtils.equals(this.getId(), arg0.getId()) == true) {
       return 0;
     }
     return this.toString().toLowerCase().compareTo(arg0.toString().toLowerCase());
@@ -266,8 +243,8 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
   public int hashCode()
   {
     final HashCodeBuilder hcb = new HashCodeBuilder();
-    if (this.id != null) {
-      hcb.append(this.id);
+    if (this.getId() != null) {
+      hcb.append(this.getId());
       return hcb.toHashCode();
     }
     if (this.user != null) {
@@ -285,7 +262,7 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
   public boolean equals(final Object o)
   {
     if (o instanceof TeamEventAttendeeDO) {
-      if (this.id != null && ObjectUtils.equals(this.id, ((TeamEventAttendeeDO) o).id) == true) {
+      if (this.getId() != null && ObjectUtils.equals(this.getId(), ((TeamEventAttendeeDO) o).getId()) == true) {
         return true;
       }
       final TeamEventAttendeeDO other = (TeamEventAttendeeDO) o;
@@ -296,105 +273,6 @@ public class TeamEventAttendeeDO implements Serializable, Comparable<TeamEventAt
       return true;
     }
     return false;
-  }
-
-  /**
-   * @see java.lang.Object#toString()
-   */
-  @Override
-  public String toString()
-  {
-    if (this.getUserId() != null) {
-      final PFUserDO user = UserRights.getUserGroupCache().getUser(getUserId());
-      if (user != null) {
-        return user.getFullname() + " (id=" + getUserId() + ")";
-      } else {
-        return "id=" + getUserId() + " (not found)";
-      }
-    } else if (StringUtils.isBlank(url) == true) {
-      return String.valueOf(id);
-    }
-    return StringUtils.defaultString(this.url);
-  }
-
-  /**
-   * @see org.projectforge.core.BaseDO#isMinorChange()
-   */
-  @Transient
-  @Override
-  public boolean isMinorChange()
-  {
-    return false;
-  }
-
-  /**
-   * @see org.projectforge.core.BaseDO#setMinorChange(boolean)
-   */
-  @Override
-  public void setMinorChange(final boolean value)
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * @see org.projectforge.core.BaseDO#getAttribute(java.lang.String)
-   */
-  @Transient
-  @Override
-  public Object getAttribute(final String key)
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * @see org.projectforge.core.BaseDO#setAttribute(java.lang.String, java.lang.Object)
-   */
-  @Override
-  public void setAttribute(final String key, final Object value)
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * @see org.projectforge.core.BaseDO#copyValuesFrom(org.projectforge.core.BaseDO, java.lang.String[])
-   */
-  @Override
-  public ModificationStatus copyValuesFrom(final BaseDO< ? extends Serializable> src, final String... ignoreFields)
-  {
-    if (src instanceof TeamEventAttendeeDO == false) {
-      throw new UnsupportedOperationException();
-    }
-    final TeamEventAttendeeDO source = (TeamEventAttendeeDO) src;
-    ModificationStatus modStatus = ModificationStatus.NONE;
-    if (ObjectUtils.equals(this.id, source.id) == false) {
-      modStatus = ModificationStatus.MAJOR;
-      this.id = source.id;
-    }
-    if (ObjectUtils.equals(this.number, source.number) == false) {
-      modStatus = ModificationStatus.MAJOR;
-      this.number = source.number;
-    }
-    if (ObjectUtils.equals(this.url, source.url) == false) {
-      modStatus = ModificationStatus.MAJOR;
-      this.url = source.url;
-    }
-    if (ObjectUtils.equals(this.getUser(), source.getUser()) == false) {
-      modStatus = ModificationStatus.MAJOR;
-      this.user = source.user;
-    }
-    if (ObjectUtils.equals(this.loginToken, source.loginToken) == false) {
-      modStatus = ModificationStatus.MAJOR;
-      this.loginToken = source.loginToken;
-    }
-    if (this.status != source.status) {
-      modStatus = ModificationStatus.MAJOR;
-      this.status = source.status;
-    }
-    if (this.comment != source.comment) {
-      modStatus = ModificationStatus.MAJOR;
-      this.comment = source.comment;
-    }
-    return modStatus;
   }
 
   /**
