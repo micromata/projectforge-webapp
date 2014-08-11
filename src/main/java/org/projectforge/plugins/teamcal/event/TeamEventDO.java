@@ -29,7 +29,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
@@ -49,8 +48,6 @@ import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.annotations.Sort;
-import org.hibernate.annotations.SortType;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
@@ -130,7 +127,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
   private String note;
 
   @PFPersistancyBehavior(autoUpdateCollectionEntries = true)
-  private SortedSet<TeamEventAttendeeDO> attendees;
+  private Set<TeamEventAttendeeDO> attendees;
 
   private String organizer;
 
@@ -145,11 +142,11 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
   // See RFC 2445 section 4.8.7.4
   private Integer sequence = 0;
 
-  //See RFC 2445 section 4.8.1.11
-  //  private TeamEventStatus status = TeamEventStatus.UNKNOWN;
+  // See RFC 2445 section 4.8.1.11
+  // private TeamEventStatus status = TeamEventStatus.UNKNOWN;
 
   @PFPersistancyBehavior(autoUpdateCollectionEntries = true)
-  private SortedSet<TeamEventAttachmentDO> attachments;
+  private Set<TeamEventAttachmentDO> attachments;
 
   private static final Set<String> NON_HISTORIZABLE_ATTRIBUTES;
 
@@ -172,7 +169,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
     lastEmail = null;
     sequence = null;
     attachments = null;
-    //       status = null;
+    // status = null;
   }
 
   public TeamEventDO()
@@ -304,7 +301,6 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
     return this;
   }
 
-
   /**
    * @return the lastEmail
    */
@@ -346,10 +342,9 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
   /**
    * @return the attendees
    */
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-  @JoinColumn(name = "team_event_fk", insertable = true, updatable = true)
-  @Sort(type = SortType.NATURAL)
-  public SortedSet<TeamEventAttendeeDO> getAttendees()
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @JoinColumn(name = "team_event_fk")
+  public Set<TeamEventAttendeeDO> getAttendees()
   {
     return attendees;
   }
@@ -358,7 +353,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
    * @param attendees the attendees to set
    * @return this for chaining.
    */
-  public TeamEventDO setAttendees(final SortedSet<TeamEventAttendeeDO> attendees)
+  public TeamEventDO setAttendees(final Set<TeamEventAttendeeDO> attendees)
   {
     this.attendees = attendees;
     return this;
@@ -368,7 +363,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
    * Creates a {@link TreeSet}.
    * @return this for chaining.
    */
-  public SortedSet<TeamEventAttendeeDO> ensureAttendees()
+  public Set<TeamEventAttendeeDO> ensureAttendees()
   {
     if (this.attendees == null) {
       this.attendees = new TreeSet<TeamEventAttendeeDO>();
@@ -751,17 +746,17 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
     return this;
   }
 
-  public void incSequence() {
+  public void incSequence()
+  {
     sequence++;
   }
 
   /**
    * @return the attachments
    */
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-  @JoinColumn(name = "team_event_fk2", insertable = true, updatable = true)
-  @Sort(type = SortType.NATURAL)
-  public SortedSet<TeamEventAttachmentDO> getAttachments()
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @JoinColumn(name = "team_event_fk2")
+  public Set<TeamEventAttachmentDO> getAttachments()
   {
     return attachments;
   }
@@ -770,7 +765,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
    * @param attachments the attachments to set
    * @return this for chaining.
    */
-  public TeamEventDO setAttachments(final SortedSet<TeamEventAttachmentDO> attachments)
+  public TeamEventDO setAttachments(final Set<TeamEventAttachmentDO> attachments)
   {
     this.attachments = attachments;
     return this;
@@ -780,7 +775,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
    * Creates a {@link TreeSet}.
    * @return this for chaining.
    */
-  public SortedSet<TeamEventAttachmentDO> ensureAttachments()
+  public Set<TeamEventAttachmentDO> ensureAttachments()
   {
     if (this.attachments == null) {
       this.attachments = new TreeSet<TeamEventAttachmentDO>();
@@ -795,24 +790,24 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
     return this;
   }
 
-  //  /**
-  //   * @return the status
-  //   */
-  //  @Column
-  //  public TeamEventStatus getStatus()
-  //  {
-  //    return status;
-  //  }
+  // /**
+  // * @return the status
+  // */
+  // @Column
+  // public TeamEventStatus getStatus()
+  // {
+  // return status;
+  // }
   //
-  //  /**
-  //   * @param status the status to set
-  //   * @return this for chaining.
-  //   */
-  //  public TeamEventDO setStatus(final TeamEventStatus status)
-  //  {
-  //    this.status = status;
-  //    return this;
-  //  }
+  // /**
+  // * @param status the status to set
+  // * @return this for chaining.
+  // */
+  // public TeamEventDO setStatus(final TeamEventStatus status)
+  // {
+  // this.status = status;
+  // return this;
+  // }
 
   /**
    * @see java.lang.Object#hashCode()
@@ -916,7 +911,8 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
     return true;
   }
 
-  public boolean mustIncSequence(final TeamEventDO other) {
+  public boolean mustIncSequence(final TeamEventDO other)
+  {
     if (location == null) {
       if (other.location != null)
         return true;
@@ -973,20 +969,20 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
     clone.externalUid = this.externalUid;
     clone.lastEmail = this.lastEmail;
     clone.sequence = this.sequence;
-    //    clone.status = this.status;
+    // clone.status = this.status;
     clone.reminderDuration = this.reminderDuration;
     clone.reminderDurationType = this.reminderDurationType;
     clone.reminderActionType = this.reminderActionType;
     if (this.attendees != null && this.attendees.isEmpty() == false) {
       clone.attendees = clone.ensureAttendees();
-      for (final TeamEventAttendeeDO attendee: this.getAttendees()) {
+      for (final TeamEventAttendeeDO attendee : this.getAttendees()) {
         attendee.setId(null);
         clone.addAttendee(attendee);
       }
     }
     if (this.attachments != null && this.attachments.isEmpty() == false) {
       clone.attachments = clone.ensureAttachments();
-      for (final TeamEventAttachmentDO attachment: this.getAttachments()) {
+      for (final TeamEventAttachmentDO attachment : this.getAttachments()) {
         attachment.setId(null);
         clone.addAttachment(attachment);
       }

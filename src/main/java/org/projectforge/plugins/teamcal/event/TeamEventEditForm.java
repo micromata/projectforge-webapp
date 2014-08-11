@@ -25,7 +25,7 @@ package org.projectforge.plugins.teamcal.event;
 
 import java.util.Date;
 import java.util.List;
-import java.util.SortedSet;
+import java.util.Set;
 
 import net.fortuna.ical4j.model.Recur;
 
@@ -111,7 +111,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
   final TeamEventRight right = new TeamEventRight();
 
-  private SortedSet<TeamEventAttendeeDO> attendees;
+  private Set<TeamEventAttendeeDO> attendees;
 
   private final FormComponent< ? >[] dependentFormComponents = new FormComponent[6];
 
