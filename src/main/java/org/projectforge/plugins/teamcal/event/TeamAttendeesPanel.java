@@ -24,7 +24,7 @@
 package org.projectforge.plugins.teamcal.event;
 
 import java.util.Iterator;
-import java.util.SortedSet;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.MarkupContainer;
@@ -51,7 +51,7 @@ public class TeamAttendeesPanel extends Panel
 {
   private static final long serialVersionUID = 5951744897882589488L;
 
-  private final SortedSet<TeamEventAttendeeDO> attendees;
+  private final Set<TeamEventAttendeeDO> attendees;
 
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
@@ -65,7 +65,7 @@ public class TeamAttendeesPanel extends Panel
   /**
    * @param id
    */
-  public TeamAttendeesPanel(final String id, final SortedSet<TeamEventAttendeeDO> attendees)
+  public TeamAttendeesPanel(final String id, final Set<TeamEventAttendeeDO> attendees)
   {
     super(id);
     this.attendees = attendees;
