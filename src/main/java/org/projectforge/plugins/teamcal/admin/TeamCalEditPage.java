@@ -29,6 +29,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.plugins.teamcal.event.TeamEventListPage;
 import org.projectforge.plugins.teamcal.event.importics.TeamCalImportPage;
+import org.projectforge.plugins.teamcal.externalsubscription.TeamEventExternalSubscriptionCache;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredBasePage;
 import org.projectforge.web.wicket.EditPage;
@@ -100,6 +101,17 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
     teamCalDao.setFullAccessGroups(getData(), form.fullAccessGroupsListHelper.getAssignedItems());
     teamCalDao.setReadonlyAccessGroups(getData(), form.readonlyAccessGroupsListHelper.getAssignedItems());
     teamCalDao.setMinimalAccessGroups(getData(), form.minimalAccessGroupsListHelper.getAssignedItems());
+    TeamCalDO data = form.getData();
+    // if calendar is present in subscription cache and is not an external subscription anymore -> cleanup!
+    if (data != null && data.getId() != null
+        && data.isExternalSubscription() == false
+        && TeamEventExternalSubscriptionCache.instance().isExternalSubscribedCalendar(data.getId())) {
+      data.setExternalSubscriptionCalendarBinary(null);
+      data.setExternalSubscriptionUrl(null);
+      data.setExternalSubscriptionUpdateInterval(null);
+      data.setExternalSubscriptionHash(null);
+      TeamEventExternalSubscriptionCache.instance().updateCache(teamCalDao, data, true);
+    }
     return super.onSaveOrUpdate();
   }
 
