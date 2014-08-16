@@ -218,8 +218,8 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
     {
       // project
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt")).suppressLabelForWarning();
-      projektSelectPanel = new NewProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data,
-          "projekt"), parentPage, "projektId");
+      projektSelectPanel = new NewProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data, "projekt"), parentPage,
+          "projektId");
       projektSelectPanel.getTextField().add(new AjaxFormComponentUpdatingBehavior("change") {
         @Override
         protected void onUpdate(final AjaxRequestTarget target)
@@ -230,9 +230,9 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
           target.add(kundeSelectPanel.getTextField());
         }
       });
-      projektSelectPanel.init();
-      //      ajaxUpdateComponents.add(projektSelectPanel.getTextField());
       fs.add(projektSelectPanel);
+      projektSelectPanel.init();
+      // ajaxUpdateComponents.add(projektSelectPanel.getTextField());
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
@@ -660,22 +660,31 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
   {
     BigDecimal ges = BigDecimal.ZERO;
     BigDecimal invoiced = BigDecimal.ZERO;
-    for (final PaymentScheduleDO schedule : paymentSchedules) {
-      ges = ges.add(schedule.getAmount());
-      if (schedule.isVollstaendigFakturiert() == true) {
-        invoiced = invoiced.add(schedule.getAmount());
-      }
-      if (schedule.isReached() == true && schedule.isVollstaendigFakturiert() == false) {
-        schedulesPanel.setHighlightedHeader();
+    final int paymentSchedulesSize = paymentSchedules != null ? paymentSchedules.size() : 0;
+    if (paymentSchedulesSize > 0) {
+      for (final PaymentScheduleDO schedule : paymentSchedules) {
+        final BigDecimal scheduleAmount = schedule.getAmount() != null ? schedule.getAmount() : BigDecimal.ZERO;
+        ges = ges.add(scheduleAmount);
+        if (schedule.isVollstaendigFakturiert() == true) {
+          invoiced = invoiced.add(scheduleAmount);
+        }
+        if (schedule.isReached() == true && schedule.isVollstaendigFakturiert() == false) {
+          schedulesPanel.setHighlightedHeader();
+        }
       }
     }
     if (schedulesPanel.getToggleStatus() == ToggleStatus.OPENED) {
-      return getString("fibu.auftrag.paymentschedule") + " (" + paymentSchedules.size() + ")";
+      return getString("fibu.auftrag.paymentschedule") + " (" + paymentSchedulesSize + ")";
     }
     final StringBuffer heading = new StringBuffer();
-    heading.append(escapeHtml(getString("fibu.auftrag.paymentschedule"))).append(" (").append(paymentSchedules.size()).append(")");
-    heading.append(": ").append(CurrencyFormatter.format(ges)).append(" ").append(getString("fibu.fakturiert")).append(" ")
-    .append(CurrencyFormatter.format(invoiced));
+    heading.append(escapeHtml(getString("fibu.auftrag.paymentschedule")));
+    if (paymentSchedulesSize > 0) {
+      heading.append(" (").append(paymentSchedulesSize).append(")");
+      heading.append(": ").append(CurrencyFormatter.format(ges)).append(" ").append(getString("fibu.fakturiert")).append(" ")
+      .append(CurrencyFormatter.format(invoiced));
+    } else {
+      heading.append(" (-)");
+    }
     return heading.toString();
   }
 

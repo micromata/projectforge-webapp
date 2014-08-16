@@ -369,15 +369,17 @@ public class AuftragDao extends BaseDao<AuftragDO>
     } else if (myFilter.isShowAbgelehnt() == true) {
       queryFilter.add(Restrictions.eq("auftragsStatus", AuftragsStatus.ABGELEHNT));
     } else if (myFilter.isShowAbgeschlossenNichtFakturiert() == true) {
-      queryFilter.createAlias("positionen", "position").createAlias("paymentSchedules", "paymentSchedule").add(
+      queryFilter
+      .createAlias("positionen", "position")
+      .createAlias("paymentSchedules", "paymentSchedule")
+      .add(
           Restrictions.or(
               Restrictions.or(
                   Restrictions.eq("auftragsStatus", AuftragsStatus.ABGESCHLOSSEN),
                   Restrictions.and(Restrictions.eq("position.status", AuftragsPositionsStatus.ABGESCHLOSSEN),
                       Restrictions.eq("position.vollstaendigFakturiert", false))),
                       Restrictions.and(Restrictions.eq("paymentSchedule.reached", true),
-                          Restrictions.eq("paymentSchedule.vollstaendigFakturiert", false)))
-          );
+                          Restrictions.eq("paymentSchedule.vollstaendigFakturiert", false))));
       vollstaendigFakturiert = false; // Und noch nicht fakturiert.
     } else if (myFilter.isShowAkquise() == true) {
       queryFilter.add(Restrictions.in("auftragsStatus", new AuftragsStatus[] { AuftragsStatus.GELEGT, AuftragsStatus.IN_ERSTELLUNG,
@@ -466,14 +468,16 @@ public class AuftragDao extends BaseDao<AuftragDO>
     abgeschlossenNichtFakturiert = null;
     final String uiStatusAsXml = XmlObjectWriter.writeAsXml(obj.getUiStatus());
     obj.setUiStatusAsXml(uiStatusAsXml);
-    final int pmSize = obj.getPaymentSchedules().size();
-    for (int i = pmSize - 1; i > 0; i--) {
-      // Don't remove first payment schedule, remove only the last empty payment schedules.
-      final PaymentScheduleDO schedule = obj.getPaymentSchedules().get(i);
-      if (schedule.getId() == null && schedule.isEmpty() == true) {
-        obj.getPaymentSchedules().remove(i);
-      } else {
-        break;
+    if (CollectionUtils.isNotEmpty(obj.getPaymentSchedules()) == true) {
+      final int pmSize = obj.getPaymentSchedules().size();
+      for (int i = pmSize - 1; i > 0; i--) {
+        // Don't remove first payment schedule, remove only the last empty payment schedules.
+        final PaymentScheduleDO schedule = obj.getPaymentSchedules().get(i);
+        if (schedule.getId() == null && schedule.isEmpty() == true) {
+          obj.getPaymentSchedules().remove(i);
+        } else {
+          break;
+        }
       }
     }
   }
