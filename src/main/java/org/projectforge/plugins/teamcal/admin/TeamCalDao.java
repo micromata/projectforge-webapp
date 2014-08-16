@@ -301,7 +301,8 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
   }
 
   @Override
-  protected void afterSave(final TeamCalDO obj) {
+  protected void afterSave(final TeamCalDO obj)
+  {
     super.afterSave(obj);
     if (obj.isExternalSubscription() == true) {
       TeamEventExternalSubscriptionCache.instance().updateCache(this, obj);
@@ -309,11 +310,25 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
   }
 
   @Override
-  protected void afterUpdate(final TeamCalDO obj, final TeamCalDO dbObj) {
+  protected void afterUpdate(final TeamCalDO obj, final TeamCalDO dbObj)
+  {
     super.afterUpdate(obj, dbObj);
-    if (obj != null && dbObj != null && obj.isExternalSubscription() == true && StringUtils.equals(obj.getExternalSubscriptionUrl(), dbObj.getExternalSubscriptionUrl()) == false) {
+    if (obj != null
+        && dbObj != null
+        && obj.isExternalSubscription() == true
+        && StringUtils.equals(obj.getExternalSubscriptionUrl(), dbObj.getExternalSubscriptionUrl()) == false) {
       // only update if the url has changed!
       TeamEventExternalSubscriptionCache.instance().updateCache(this, obj);
+    }
+    // if calendar is present in subscription cache and is not an external subscription anymore -> cleanup!
+    if (obj != null
+        && obj.isExternalSubscription() == false
+        && TeamEventExternalSubscriptionCache.instance().isExternalSubscribedCalendar(obj.getId())) {
+      obj.setExternalSubscriptionCalendarBinary(null);
+      obj.setExternalSubscriptionUrl(null);
+      obj.setExternalSubscriptionUpdateInterval(null);
+      obj.setExternalSubscriptionHash(null);
+      TeamEventExternalSubscriptionCache.instance().updateCache(this, obj, true);
     }
   }
 }
