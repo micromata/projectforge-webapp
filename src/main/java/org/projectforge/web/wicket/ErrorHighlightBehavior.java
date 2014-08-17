@@ -61,9 +61,9 @@ public class ErrorHighlightBehavior extends Behavior
     }
     final String value = tag.getAttribute("class");
     if (StringUtils.isEmpty(value) == true) {
-      tag.put("class", "error");
+      tag.put("class", "has-error");
     } else {
-      tag.put("class", value + " error");
+      tag.put("class", value + " has-error");
     }
   }
 }
