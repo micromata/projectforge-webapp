@@ -23,6 +23,7 @@
 
 package org.projectforge.database;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +39,7 @@ import org.projectforge.continuousdb.UpdateRunningStatus;
 import org.projectforge.fibu.AuftragDO;
 import org.projectforge.fibu.AuftragsPositionDO;
 import org.projectforge.fibu.EingangsrechnungDO;
+import org.projectforge.fibu.EmployeeDO;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.PaymentScheduleDO;
@@ -77,6 +79,9 @@ public class DatabaseCoreUpdates
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
+        if (dao.doTableAttributesExist(EmployeeDO.class, "weeklyWorkingHours") == false) {
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
         if (dao.doTableAttributesExist(GroupDO.class, "ldapValues") == false) {
           return UpdatePreCheckStatus.READY_FOR_UPDATE;
         }
@@ -95,11 +100,28 @@ public class DatabaseCoreUpdates
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        if (dao.doTableAttributesExist(GroupDO.class, "ldapValues") == false) {
-          dao.addTableAttributes(GroupDO.class, "ldapValues");
+        if (dao.doTableAttributesExist(EmployeeDO.class, "weeklyWorkingHours") == false) {
           // No length check available so assume enlargement if ldapValues doesn't yet exist:
           final Table addressTable = new Table(AddressDO.class);
           dao.alterTableColumnVarCharLength(addressTable.getName(), "public_key", 20000);
+
+          final Table employeeTable = new Table(EmployeeDO.class);
+          dao.renameTableAttribute(employeeTable.getName(), "wochenstunden", "old_weekly_working_hours");
+          dao.addTableAttributes(EmployeeDO.class, "weeklyWorkingHours");
+          final List<DatabaseResultRow> rows = dao.query("select pk, old_weekly_working_hours from t_fibu_employee");
+          if (rows != null) {
+            for (final DatabaseResultRow row : rows) {
+              final Integer pk = (Integer) row.getEntry("pk").getValue();
+              final Integer oldWeeklyWorkingHours = (Integer) row.getEntry("old_weekly_working_hours").getValue();
+              if (oldWeeklyWorkingHours == null) {
+                continue;
+              }
+              dao.update("update t_fibu_employee set weekly_working_hours=? where pk=?", new BigDecimal(oldWeeklyWorkingHours), pk);
+            }
+          }
+        }
+        if (dao.doTableAttributesExist(GroupDO.class, "ldapValues") == false) {
+          dao.addTableAttributes(GroupDO.class, "ldapValues");
         }
         if (dao.doTableAttributesExist(AuftragsPositionDO.class, "periodOfPerformanceType", "modeOfPaymentType") == false) {
           dao.addTableAttributes(AuftragsPositionDO.class, "periodOfPerformanceType", "modeOfPaymentType");

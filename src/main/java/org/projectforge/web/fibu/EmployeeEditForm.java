@@ -23,6 +23,7 @@
 
 package org.projectforge.web.fibu;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
@@ -50,6 +51,8 @@ public class EmployeeEditForm extends AbstractEditForm<EmployeeDO, EmployeeEditP
   private static final long serialVersionUID = 8746545908106124484L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(EmployeeEditForm.class);
+
+  private static final BigDecimal NUMBER_OF_WEEK_HOURS = new BigDecimal(168);
 
   public EmployeeEditForm(final EmployeeEditPage parentPage, final EmployeeDO data)
   {
@@ -98,8 +101,8 @@ public class EmployeeEditForm extends AbstractEditForm<EmployeeDO, EmployeeEditP
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
       // Weekly hours
-      final FieldsetPanel fs = gridBuilder.newFieldset(EmployeeDO.class, "wochenstunden");
-      fs.add(new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data, "wochenstunden"), 0, 168));
+      final FieldsetPanel fs = gridBuilder.newFieldset(EmployeeDO.class, "weeklyWorkingHours");
+      fs.add(new MinMaxNumberField<BigDecimal>(InputPanel.WICKET_ID, new PropertyModel<BigDecimal>(data, "weeklyWorkingHours"), BigDecimal.ZERO, NUMBER_OF_WEEK_HOURS));
     }
     {
       // Holidays

@@ -63,8 +63,8 @@ public class PersonalStatisticsPage extends AbstractSecuredPage
     body.add(timesheetDisciplineChartTitle);
     final EmployeeDO employee = employeeDao.getByUserId(PFUserContext.getUserId());
     double workingHoursPerDay = 8;
-    if (employee != null && NumberHelper.greaterZero(employee.getWochenstunden()) == true) {
-      workingHoursPerDay = employee.getWochenstunden() / 5;
+    if (employee != null && NumberHelper.isGreaterZero(employee.getWeeklyWorkingHours()) == true) {
+      workingHoursPerDay = employee.getWeeklyWorkingHours().doubleValue() / 5;
     }
     final TimesheetDisciplineChartBuilder chartBuilder = new TimesheetDisciplineChartBuilder();
     final JFreeChart chart1 = chartBuilder.create(timesheetDao, getUser().getId(), workingHoursPerDay, LAST_N_DAYS, true);

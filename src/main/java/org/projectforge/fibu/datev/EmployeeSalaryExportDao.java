@@ -336,13 +336,13 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
     final ExportRow row = sheet.addRow();
     row.addCell(0, user.getFullname());
     // Wochenstunden
-    row.addCell(1, employee.getWochenstunden(), "STUNDEN");
+    row.addCell(1, employee.getWeeklyWorkingHours(), "STUNDEN");
     // Sollstunden: Wochenstunden * Arbeitstage / 5 Arbeitstage pro Woche
-    Integer wochenstunden = employee.getWochenstunden();
+    BigDecimal wochenstunden = employee.getWeeklyWorkingHours();
     if (wochenstunden == null) {
-      wochenstunden = 0;
+      wochenstunden = BigDecimal.ZERO;
     }
-    final BigDecimal soll = new BigDecimal(wochenstunden).multiply(numberOfWorkingDays).divide(new BigDecimal(5), 2, RoundingMode.HALF_UP);
+    final BigDecimal soll = wochenstunden.multiply(numberOfWorkingDays).divide(new BigDecimal(5), 2, RoundingMode.HALF_UP);
     row.addCell(2, soll, "STUNDEN");
     // Iststunden
     final BigDecimal total = totalDuration.divide(new BigDecimal(3600000), 2, RoundingMode.HALF_UP);

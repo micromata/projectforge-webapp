@@ -23,6 +23,7 @@
 
 package org.projectforge.fibu;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -95,7 +96,7 @@ public class EmployeeDO extends DefaultBaseDO
 
   @PropertyInfo(i18nKey = "fibu.employee.wochenstunden")
   @Field(index = Index.UN_TOKENIZED, store = Store.NO)
-  private Integer wochenstunden;
+  private BigDecimal weeklyWorkingHours;
 
   @PropertyInfo(i18nKey = "comment")
   @Field(index = Index.TOKENIZED, store = Store.NO)
@@ -174,15 +175,15 @@ public class EmployeeDO extends DefaultBaseDO
     this.urlaubstage = urlaubstage;
   }
 
-  @Column
-  public Integer getWochenstunden()
+  @Column(name="weekly_working_hours", scale = 5, precision = 10)
+  public BigDecimal getWeeklyWorkingHours()
   {
-    return wochenstunden;
+    return weeklyWorkingHours;
   }
 
-  public void setWochenstunden(final Integer wochenstunden)
+  public void setWeeklyWorkingHours(final BigDecimal weeklyWorkingHours)
   {
-    this.wochenstunden = wochenstunden;
+    this.weeklyWorkingHours = weeklyWorkingHours;
   }
 
   @Column(name = "eintritt")
