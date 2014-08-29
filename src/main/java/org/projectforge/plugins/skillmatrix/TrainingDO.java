@@ -99,7 +99,7 @@ public class TrainingDO extends DefaultBaseDO implements ShortDisplayNameCapable
     return this.getTitle() + " (#" + this.getId() + ")";
   }
 
-  @Column(length = 100)
+  @Column(length = 255)
   public String getTitle()
   {
     return title;
@@ -156,6 +156,7 @@ public class TrainingDO extends DefaultBaseDO implements ShortDisplayNameCapable
   /**
    * @return the rating
    */
+  @Column(length = 255)
   public String getRating()
   {
     return rating;
@@ -174,6 +175,7 @@ public class TrainingDO extends DefaultBaseDO implements ShortDisplayNameCapable
   /**
    * @return the certificate
    */
+  @Column(length = 4000)
   public String getCertificate()
   {
     return certificate;
@@ -189,26 +191,32 @@ public class TrainingDO extends DefaultBaseDO implements ShortDisplayNameCapable
     return this;
   }
 
-  public Date getStartDate() {
+  @Column(name = "start_date")
+  public Date getStartDate()
+  {
     return startDate;
   }
 
   /**
    * @return this for chaining.
    */
-  public TrainingDO setStartDate(final Date startDate) {
+  public TrainingDO setStartDate(final Date startDate)
+  {
     this.startDate = startDate;
     return this;
   }
 
-  public Date getEndDate() {
+  @Column(name = "end_date")
+  public Date getEndDate()
+  {
     return endDate;
   }
 
   /**
    * @return this for chaining.
    */
-  public TrainingDO setEndDate(final Date endDate) {
+  public TrainingDO setEndDate(final Date endDate)
+  {
     this.endDate = endDate;
     return this;
   }
@@ -220,19 +228,21 @@ public class TrainingDO extends DefaultBaseDO implements ShortDisplayNameCapable
       return null;
     }
     final String[] sar = StringUtils.split(values, ";");
-    for (int i=0; i < sar.length; i++) {
+    for (int i = 0; i < sar.length; i++) {
       sar[i] = StringUtils.trim(sar[i]);
     }
     return sar;
   }
 
   @Transient
-  public String[] getRatingArray() {
+  public String[] getRatingArray()
+  {
     return getValuesArray(getRating());
   }
 
   @Transient
-  public String[] getCertificateArray() {
+  public String[] getCertificateArray()
+  {
     return getValuesArray(getCertificate());
   }
 
@@ -240,7 +250,7 @@ public class TrainingDO extends DefaultBaseDO implements ShortDisplayNameCapable
    * Members of these groups have full read/write access to this training.
    * @return the fullAccessGroupIds
    */
-  @Column(name = "full_access_group_ids", nullable = true)
+  @Column(name = "full_access_group_ids", length = 4000, nullable = true)
   public String getFullAccessGroupIds()
   {
     return fullAccessGroupIds;
@@ -261,7 +271,7 @@ public class TrainingDO extends DefaultBaseDO implements ShortDisplayNameCapable
    * Members of these groups have full read-only access to this training.
    * @return the readOnlyAccessGroupIds
    */
-  @Column(name = "readonly_access_group_ids", nullable = true)
+  @Column(name = "readonly_access_group_ids", length = 4000, nullable = true)
   public String getReadOnlyAccessGroupIds()
   {
     return readOnlyAccessGroupIds;
@@ -276,5 +286,4 @@ public class TrainingDO extends DefaultBaseDO implements ShortDisplayNameCapable
     this.readOnlyAccessGroupIds = readOnlyAccessGroupIds;
     return this;
   }
-
 }

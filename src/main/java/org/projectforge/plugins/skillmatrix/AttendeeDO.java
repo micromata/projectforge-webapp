@@ -142,6 +142,7 @@ public class AttendeeDO extends DefaultBaseDO implements ShortDisplayNameCapable
   /**
    * @return the rating
    */
+  @Column(length = 1000)
   public String getRating()
   {
     return rating;
@@ -160,6 +161,7 @@ public class AttendeeDO extends DefaultBaseDO implements ShortDisplayNameCapable
   /**
    * @return the certificate
    */
+  @Column(length = 4000)
   public String getCertificate()
   {
     return certificate;

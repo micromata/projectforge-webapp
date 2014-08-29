@@ -46,9 +46,9 @@ import org.projectforge.user.PFUserDO;
 
 /**
  * A skill usable for a skill matrix.
- *
+ * 
  * @author Billy Duong (b.duong@micromata.de)
- *
+ * 
  */
 @Entity
 @Indexed
@@ -168,7 +168,7 @@ public class SkillRatingDO extends DefaultBaseDO
     return this;
   }
 
-  @Column
+  @Column(name = "since_year")
   public Integer getSinceYear()
   {
     return sinceYear;
@@ -183,7 +183,7 @@ public class SkillRatingDO extends DefaultBaseDO
     return this;
   }
 
-  @Column(length = Constants.LENGTH_SUBJECT)
+  @Column(length = 4000)
   public String getCertificates()
   {
     return certificates;
@@ -198,7 +198,7 @@ public class SkillRatingDO extends DefaultBaseDO
     return this;
   }
 
-  @Column(length = Constants.LENGTH_SUBJECT)
+  @Column(length = 4000)
   public String getTrainingCourses()
   {
     return trainingCourses;
