@@ -25,6 +25,7 @@ package org.projectforge.plugins.teamcal.admin;
 
 import java.util.Collection;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
@@ -42,6 +43,7 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.web.common.MultiChoiceListHelper;
 import org.projectforge.web.user.GroupsComparator;
 import org.projectforge.web.user.GroupsProvider;
+import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.user.UsersComparator;
 import org.projectforge.web.user.UsersProvider;
 import org.projectforge.web.wicket.AbstractEditForm;
@@ -144,7 +146,15 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
         data.setOwner(getUser());
       }
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.owner")).suppressLabelForWarning();
-      fs.add(new Label(fs.newChildId(), data.getOwner().getUsername() + ""));
+      if (accessChecker.isLoggedInUserMemberOfAdminGroup() == true || ObjectUtils.equals(data.getOwnerId(), getUserId()) == true) {
+        final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(data, "owner"), parentPage,
+            "ownerId");
+        userSelectPanel.setRequired(true);
+        fs.add(userSelectPanel);
+        userSelectPanel.init();
+      } else {
+        fs.add(new Label(fs.newChildId(), data.getOwner().getUsername() + ""));
+      }
     }
 
     if (accessChecker.isRestrictedUser() == false && isNew() == false) {
