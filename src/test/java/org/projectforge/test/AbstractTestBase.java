@@ -204,19 +204,19 @@ public class AbstractTestBase
         for (final Class< ? > cls : HibernateEntities.instance().getDescOrderedEntities()) {
           final String name = cls.getName();
           final String simpleName = cls.getSimpleName();
-          if (StringHelper.isIn(simpleName, "TaskDO", "GroupDO", "PFUserDO") == true) {
-            log.debug("***** deleteAllDBObjects: " + name);
+          if (StringHelper.isIn(simpleName, "TaskDO", "GroupDO") == true) {
+            log.debug("deleteAllDBObjects: " + name);
             // cycle reference (task refers task etc.)
             deleteAllDBObjects(hibernateTemplate, name);
           } else {
-            log.debug("***** deleteFrom: " + name);
+            log.debug("deleteFrom: " + name);
             deleteFrom(hibernateTemplate, name);
           }
         }
         for (final Class< ? > cls : HibernateEntities.instance().getDescOrderedHistoryEntities()) {
           final String name = cls.getName();
           deleteFrom(hibernateTemplate, name);
-          log.debug("***** deleteFrom: " + name);
+          log.debug("deleteFrom: " + name);
         }
         List< ? > all = hibernateTemplate.find("from java.lang.Object o");
         if (all != null && all.size() > 0) {
