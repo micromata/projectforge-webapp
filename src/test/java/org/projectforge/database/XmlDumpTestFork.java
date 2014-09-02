@@ -79,8 +79,8 @@ public class XmlDumpTestFork extends TestBase
     final PFUserDO user = userDao.internalLoadAll().get(0);
     user.setUsername("changed");
     userDao.internalUpdate(user);
-    log.info("The following import error from XmlDump are OK.");
+    log.info("****** { The following import error from XmlDump are OK.");
     assertEquals("Error should be detected.", -counter, xmlDump.verifyDump(converter));
-    log.info("The previous import error from XmlDump are OK.");
+    log.info("****** } The previous import error from XmlDump are OK.");
   }
 }
