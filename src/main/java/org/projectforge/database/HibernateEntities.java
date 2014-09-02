@@ -37,6 +37,8 @@ public class HibernateEntities
   // each test).
   // The entities are inserted in ascending order and deleted in descending order.
   static final Class< ? >[] CORE_ENTITIES = { //
+    org.projectforge.user.UserRightDO.class, //
+
     org.projectforge.user.PFUserDO.class, //
     org.projectforge.user.GroupDO.class, //
     org.projectforge.task.TaskDO.class, //
@@ -44,27 +46,28 @@ public class HibernateEntities
     org.projectforge.access.GroupTaskAccessDO.class, //
     org.projectforge.access.AccessEntryDO.class, //
 
+    org.projectforge.fibu.KontoDO.class, //
+    org.projectforge.fibu.KundeDO.class, //
     org.projectforge.fibu.ProjektDO.class, //
 
-    org.projectforge.fibu.AuftragsPositionDO.class, //
     org.projectforge.fibu.AuftragDO.class, //
+    org.projectforge.fibu.AuftragsPositionDO.class, //
+
+    org.projectforge.fibu.kost.Kost1DO.class, //
+    org.projectforge.fibu.kost.Kost2ArtDO.class, //
+    org.projectforge.fibu.kost.Kost2DO.class, //
 
     org.projectforge.fibu.EmployeeDO.class, //
     org.projectforge.fibu.EmployeeSalaryDO.class, //
 
-    org.projectforge.fibu.EingangsrechnungsPositionDO.class, //
     org.projectforge.fibu.EingangsrechnungDO.class, //
+    org.projectforge.fibu.EingangsrechnungsPositionDO.class, //
 
-    org.projectforge.fibu.RechnungsPositionDO.class, //
     org.projectforge.fibu.RechnungDO.class, //
+    org.projectforge.fibu.RechnungsPositionDO.class, //
 
-    org.projectforge.fibu.kost.BuchungssatzDO.class, //
-    org.projectforge.fibu.kost.Kost1DO.class, //
-    org.projectforge.fibu.kost.Kost2DO.class, //
-    org.projectforge.fibu.kost.Kost2ArtDO.class, //
     org.projectforge.fibu.kost.KostZuweisungDO.class, //
-    org.projectforge.fibu.KontoDO.class, //
-    org.projectforge.fibu.KundeDO.class, //
+    org.projectforge.fibu.kost.BuchungssatzDO.class, //
     org.projectforge.fibu.PaymentScheduleDO.class, //
     org.projectforge.address.AddressDO.class, //
     org.projectforge.address.PersonalAddressDO.class, //
@@ -86,7 +89,6 @@ public class HibernateEntities
     org.projectforge.timesheet.TimesheetDO.class, //
     org.projectforge.user.UserPrefDO.class, //
     org.projectforge.user.UserPrefEntryDO.class, //
-    org.projectforge.user.UserRightDO.class, //
     org.projectforge.user.UserXmlPreferencesDO.class};
 
   static final Class< ? >[] HISTORY_ENTITIES = { //
@@ -94,9 +96,7 @@ public class HibernateEntities
     de.micromata.hibernate.history.delta.PropertyDelta.class, //
     de.micromata.hibernate.history.delta.SimplePropertyDelta.class, //
     de.micromata.hibernate.history.delta.CollectionPropertyDelta.class, //
-    de.micromata.hibernate.history.delta.AssociationPropertyDelta.class
-
-  };
+    de.micromata.hibernate.history.delta.AssociationPropertyDelta.class};
 
   private static HibernateEntities instance = new HibernateEntities();
 
