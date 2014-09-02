@@ -72,7 +72,7 @@ public class AccountingConfig implements Serializable
    */
   public IntRanges getDebitorsAccountNumberRanges()
   {
-    return new IntRanges(debitorsAccountNumberRangesString);
+    return (IntRanges) new IntRanges(debitorsAccountNumberRangesString).setNullRangeMatchesAlways(true);
   }
 
   /**
@@ -81,7 +81,7 @@ public class AccountingConfig implements Serializable
    */
   public IntRanges getCreditorsAccountNumberRanges()
   {
-    return new IntRanges(creditorsAccountNumberRangesString);
+    return (IntRanges) new IntRanges(creditorsAccountNumberRangesString).setNullRangeMatchesAlways(true);
   }
 
   public void reset()

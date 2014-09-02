@@ -66,6 +66,9 @@ public class IntRangesTest
     doesMatch(new IntRanges("42"), 42);
     doesNotMatch(new IntRanges("42"), 0, -1);
 
+    doesMatch((IntRanges)new IntRanges("").setNullRangeMatchesAlways(true), 0, 42);
+    doesNotMatch(new IntRanges(""), 0, -1);
+
     doesMatch(new IntRanges("42-44,-3--5,-8,0"), 42, 43, 44, -5, -4, -3, -8, 0);
     doesNotMatch(new IntRanges("42-44,-3--5,-8,0"), 41, 45, -6, -2, -7, -9, -1, 1);
   }
