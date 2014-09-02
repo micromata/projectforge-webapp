@@ -49,6 +49,9 @@ public class SkillMatrixPlugin extends AbstractPlugin
 
   static UserPrefArea USER_PREF_AREA;
 
+  // The order of the entities is important for xml dump and imports as well as for test cases (order for deleting objects at the end of
+  // each test).
+  // The entities are inserted in ascending order and deleted in descending order.
   private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { SkillDO.class, SkillRatingDO.class, TrainingDO.class, AttendeeDO.class};
 
   public static final String I18N_KEY_SKILLMATRIX_PREFIX = "plugins.skillmatrix";

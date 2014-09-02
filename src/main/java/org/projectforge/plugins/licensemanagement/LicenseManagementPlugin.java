@@ -39,10 +39,14 @@ public class LicenseManagementPlugin extends AbstractPlugin
 {
   public static final String ID = "licenseManagement";
 
-  public static final String RESOURCE_BUNDLE_NAME = LicenseManagementPlugin.class.getPackage().getName() + ".LicenseManagementI18nResources";
+  public static final String RESOURCE_BUNDLE_NAME = LicenseManagementPlugin.class.getPackage().getName()
+      + ".LicenseManagementI18nResources";
 
   static UserPrefArea USER_PREF_AREA;
 
+  // The order of the entities is important for xml dump and imports as well as for test cases (order for deleting objects at the end of
+  // each test).
+  // The entities are inserted in ascending order and deleted in descending order.
   private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { LicenseDO.class};
 
   /**
