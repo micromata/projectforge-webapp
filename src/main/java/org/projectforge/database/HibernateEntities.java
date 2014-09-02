@@ -37,9 +37,8 @@ public class HibernateEntities
   // each test).
   // The entities are inserted in ascending order and deleted in descending order.
   static final Class< ? >[] CORE_ENTITIES = { //
-    org.projectforge.user.UserRightDO.class, //
-
     org.projectforge.user.PFUserDO.class, //
+    org.projectforge.user.UserRightDO.class, //
     org.projectforge.user.GroupDO.class, //
     org.projectforge.task.TaskDO.class, //
 
