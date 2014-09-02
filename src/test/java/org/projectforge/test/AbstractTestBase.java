@@ -207,7 +207,7 @@ public class AbstractTestBase
             deleteFrom(hibernateTemplate, table);
           }
         }
-        for (final Class< ? > cls : HibernateEntities.instance().getDescOrderedListOfEntities()) {
+        for (final Class< ? > cls : HibernateEntities.instance().getDescOrderedEntities()) {
           final String name = cls.getName();
           log.debug("***** deleteFrom: " + name);
           deleteFrom(hibernateTemplate, name);

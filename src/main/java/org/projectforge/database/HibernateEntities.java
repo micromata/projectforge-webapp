@@ -124,7 +124,7 @@ public class HibernateEntities
    * should be in the list before A.
    * @return The (unmodifiable) list of all hibernate entities (including the plugin's entities).
    */
-  public List<Class< ? >> getOrderedListOfEntities()
+  public List<Class< ? >> getOrderedEntities()
   {
     if (unmodifiableList == null) {
       unmodifiableList = Collections.unmodifiableList(coreEntities);
@@ -137,7 +137,7 @@ public class HibernateEntities
    * should be in the list before B.
    * @return The (unmodifiable) list of all hibernate entities (including the plugin's entities) in reverse order.
    */
-  public List<Class< ? >> getDescOrderedListOfEntities()
+  public List<Class< ? >> getDescOrderedEntities()
   {
     if (unmodifiableListDesc == null) {
       final List<Class< ? >> list = new ArrayList<Class< ? >>();
