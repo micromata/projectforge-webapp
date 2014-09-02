@@ -29,6 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 
@@ -85,6 +88,9 @@ public abstract class AbstractRechnungDO<T extends AbstractRechnungsPositionDO> 
   @PropertyInfo(i18nKey = "fibu.rechnung.zahlBetrag", type = PropertyType.CURRENCY)
   @Field(index = Index.UN_TOKENIZED)
   protected BigDecimal zahlBetrag;
+
+  @PropertyInfo(i18nKey = "fibu.konto")
+  private KontoDO konto;
 
   @PFPersistancyBehavior(autoUpdateCollectionEntries = true)
   @IndexedEmbedded(depth = 2)
@@ -256,6 +262,28 @@ public abstract class AbstractRechnungDO<T extends AbstractRechnungsPositionDO> 
     }
     final DayHolder today = new DayHolder();
     return (this.faelligkeit == null || this.faelligkeit.before(today.getDate()) == true);
+  }
+
+  /**
+   * This Datev account number is used for the exports of invoices. For debitor invoices (RechnungDO): If not given then the account number
+   * assigned to the ProjektDO if set or KundeDO is used instead (default).
+   */
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "konto_id")
+  public KontoDO getKonto()
+  {
+    return konto;
+  }
+
+  public void setKonto(final KontoDO konto)
+  {
+    this.konto = konto;
+  }
+
+  @Transient
+  public Integer getKontoId()
+  {
+    return konto != null ? konto.getId() : null;
   }
 
   @Transient

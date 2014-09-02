@@ -32,8 +32,6 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -43,7 +41,6 @@ import org.hibernate.annotations.IndexColumn;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.core.AbstractHistorizableBaseDO;
 import org.projectforge.core.PropertyInfo;
@@ -67,10 +64,6 @@ public class EingangsrechnungDO extends AbstractRechnungDO<EingangsrechnungsPosi
   @PropertyInfo(i18nKey = "fibu.common.creditor")
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String kreditor;
-
-  @PropertyInfo(i18nKey = "fibu.konto")
-  @IndexedEmbedded(depth = 1)
-  private KontoDO konto;
 
   @PropertyInfo(i18nKey = "fibu.payment.type")
   private PaymentType paymentType;
@@ -111,24 +104,6 @@ public class EingangsrechnungDO extends AbstractRechnungDO<EingangsrechnungsPosi
   public List<EingangsrechnungsPositionDO> getPositionen()
   {
     return this.positionen;
-  }
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "konto_id")
-  public KontoDO getKonto()
-  {
-    return konto;
-  }
-
-  public void setKonto(final KontoDO konto)
-  {
-    this.konto = konto;
-  }
-
-  @Transient
-  public Integer getKontoId()
-  {
-    return konto != null ? konto.getId() : null;
   }
 
   /**
