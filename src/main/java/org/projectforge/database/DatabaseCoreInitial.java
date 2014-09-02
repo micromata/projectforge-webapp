@@ -23,14 +23,6 @@
 
 package org.projectforge.database;
 
-import org.projectforge.access.AccessEntryDO;
-import org.projectforge.access.GroupTaskAccessDO;
-import org.projectforge.address.AddressDO;
-import org.projectforge.address.PersonalAddressDO;
-import org.projectforge.address.contact.ContactDO;
-import org.projectforge.address.contact.ContactEntryDO;
-import org.projectforge.address.contact.PersonalContactDO;
-import org.projectforge.book.BookDO;
 import org.projectforge.common.DatabaseDialect;
 import org.projectforge.continuousdb.DatabaseUpdateDao;
 import org.projectforge.continuousdb.SchemaGenerator;
@@ -41,41 +33,7 @@ import org.projectforge.continuousdb.UpdateEntry;
 import org.projectforge.continuousdb.UpdateEntryImpl;
 import org.projectforge.continuousdb.UpdatePreCheckStatus;
 import org.projectforge.continuousdb.UpdateRunningStatus;
-import org.projectforge.core.ConfigurationDO;
-import org.projectforge.fibu.AuftragDO;
-import org.projectforge.fibu.AuftragsPositionDO;
-import org.projectforge.fibu.EingangsrechnungDO;
-import org.projectforge.fibu.EingangsrechnungsPositionDO;
-import org.projectforge.fibu.EmployeeDO;
-import org.projectforge.fibu.EmployeeSalaryDO;
-import org.projectforge.fibu.KontoDO;
-import org.projectforge.fibu.KundeDO;
-import org.projectforge.fibu.PaymentScheduleDO;
-import org.projectforge.fibu.ProjektDO;
-import org.projectforge.fibu.RechnungDO;
-import org.projectforge.fibu.RechnungsPositionDO;
-import org.projectforge.fibu.kost.BuchungssatzDO;
-import org.projectforge.fibu.kost.Kost1DO;
-import org.projectforge.fibu.kost.Kost2ArtDO;
-import org.projectforge.fibu.kost.Kost2DO;
-import org.projectforge.fibu.kost.KostZuweisungDO;
-import org.projectforge.gantt.GanttChartDO;
-import org.projectforge.humanresources.HRPlanningDO;
-import org.projectforge.humanresources.HRPlanningEntryDO;
-import org.projectforge.meb.ImportedMebEntryDO;
-import org.projectforge.meb.MebEntryDO;
-import org.projectforge.orga.ContractDO;
-import org.projectforge.orga.PostausgangDO;
-import org.projectforge.orga.PosteingangDO;
-import org.projectforge.scripting.ScriptDO;
-import org.projectforge.task.TaskDO;
-import org.projectforge.timesheet.TimesheetDO;
-import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserPrefDO;
-import org.projectforge.user.UserPrefEntryDO;
-import org.projectforge.user.UserRightDO;
-import org.projectforge.user.UserXmlPreferencesDO;
 
 import de.micromata.hibernate.history.HistoryEntry;
 import de.micromata.hibernate.history.delta.PropertyDelta;
@@ -92,54 +50,14 @@ public class DatabaseCoreInitial
   {
     final DatabaseUpdateDao dao = databaseUpdater.getDatabaseUpdateDao();
 
-    final Class< ? >[] doClasses = new Class< ? >[] { //
-        // First needed data-base objects:
-        HistoryEntry.class, PropertyDelta.class, //
-        PFUserDO.class, GroupDO.class, TaskDO.class, GroupTaskAccessDO.class, //
-        AccessEntryDO.class, //
-
-        // To create second:
-        KontoDO.class, //
-
-        // To create third:
-        KundeDO.class, ProjektDO.class, //
-        Kost1DO.class, Kost2ArtDO.class, Kost2DO.class, //
-        AuftragDO.class, AuftragsPositionDO.class, //
-        EingangsrechnungDO.class, EingangsrechnungsPositionDO.class, //
-        RechnungDO.class, RechnungsPositionDO.class, //
-        EmployeeDO.class, //
-        EmployeeSalaryDO.class, //
-        KostZuweisungDO.class, //
-
-        // All the rest:
-        AddressDO.class, PersonalAddressDO.class, //
-        ContactDO.class, ContactEntryDO.class, PersonalContactDO.class, //
-        BookDO.class, //
-        ConfigurationDO.class, //
-        DatabaseUpdateDO.class, //
-        BuchungssatzDO.class, //
-        ContractDO.class, //
-        GanttChartDO.class, //
-        HRPlanningDO.class, HRPlanningEntryDO.class, //
-        MebEntryDO.class, ImportedMebEntryDO.class, //
-        PaymentScheduleDO.class, //
-        PostausgangDO.class, //
-        PosteingangDO.class, //
-        ScriptDO.class, //
-        TimesheetDO.class, //
-        UserPrefDO.class, //
-        UserPrefEntryDO.class, //
-        UserRightDO.class, //
-        UserXmlPreferencesDO.class //
-    };
-
-    return new UpdateEntryImpl(CORE_REGION_ID, "2013-04-25", "Adds all core tables T_*.") {
+    return new UpdateEntryImpl(CORE_REGION_ID, "2014-09-02", "Adds all core tables T_*.") {
 
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
         // Does the data-base tables already exist?
-        if (dao.doEntitiesExist(doClasses) == false) {
+        if (dao.doEntitiesExist(HibernateEntities.CORE_ENTITIES) == false
+            || dao.doEntitiesExist(HibernateEntities.HISTORY_ENTITIES) == false) {
           return UpdatePreCheckStatus.READY_FOR_UPDATE;
         }
         return UpdatePreCheckStatus.ALREADY_UPDATED;
@@ -152,10 +70,11 @@ public class DatabaseCoreInitial
           // User table doesn't exist, therefore schema should be empty. PostgreSQL needs sequence for primary keys:
           dao.createSequence("hibernate_sequence", true);
         }
-        final SchemaGenerator schemaGenerator = new SchemaGenerator(dao).add(doClasses);
+        final SchemaGenerator schemaGenerator = new SchemaGenerator(dao).add(HibernateEntities.CORE_ENTITIES).add(HibernateEntities.HISTORY_ENTITIES);
         final Table propertyDeltaTable = schemaGenerator.getTable(PropertyDelta.class);
         final TableAttribute attr = propertyDeltaTable.getAttributeByName("clazz");
-        attr.setNullable(false).setType(TableAttributeType.VARCHAR).setLength(31); // Discriminator value is may-be not handled correctly by continuous-db.
+        attr.setNullable(false).setType(TableAttributeType.VARCHAR).setLength(31); // Discriminator value is may-be not handled correctly by
+        // continuous-db.
         final Table historyEntryTable = schemaGenerator.getTable(HistoryEntry.class);
         final TableAttribute typeAttr = historyEntryTable.getAttributeByName("type");
         typeAttr.setType(TableAttributeType.INT);
