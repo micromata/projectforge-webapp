@@ -77,6 +77,7 @@ import org.projectforge.fibu.AuftragsPositionDO;
 import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.EingangsrechnungsPositionDO;
 import org.projectforge.fibu.EmployeeSalaryDO;
+import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.RechnungDO;
@@ -184,8 +185,16 @@ public class XmlDump
         } else if (obj instanceof AbstractRechnungDO< ? >) {
           final AbstractRechnungDO< ? extends AbstractRechnungsPositionDO> rechnung = (AbstractRechnungDO< ? >) obj;
           final List< ? extends AbstractRechnungsPositionDO> positions = rechnung.getPositionen();
+          final KontoDO konto = rechnung.getKonto();
+          if (konto != null) {
+            save(konto);
+            rechnung.setKonto(null);
+          }
           rechnung.setPositionen(null); // Need to nullable positions first (otherwise insert fails).
           final Serializable id = save(rechnung);
+          if (konto != null) {
+            rechnung.setKonto(konto);
+          }
           if (positions != null) {
             for (final AbstractRechnungsPositionDO pos : positions) {
               if (pos.getKostZuweisungen() != null) {
