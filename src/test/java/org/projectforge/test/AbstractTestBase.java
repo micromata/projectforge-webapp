@@ -43,6 +43,7 @@ import org.projectforge.access.AccessException;
 import org.projectforge.access.AccessType;
 import org.projectforge.access.OperationType;
 import org.projectforge.common.DateHelper;
+import org.projectforge.common.StringHelper;
 import org.projectforge.continuousdb.DatabaseSupport;
 import org.projectforge.core.SimpleHistoryEntry;
 import org.projectforge.database.HibernateEntities;
@@ -139,8 +140,6 @@ public class AbstractTestBase
 
   protected int mCount = 0;
 
-  protected static String[] tablesToDeleteAfterTests = null;
-
   protected static TestConfiguration getTestConfiguration()
   {
     return testConfiguration;
@@ -202,15 +201,17 @@ public class AbstractTestBase
     transactionTemplate.execute(new TransactionCallback() {
       public Object doInTransaction(final TransactionStatus status)
       {
-        if (tablesToDeleteAfterTests != null) {
-          for (final String table : tablesToDeleteAfterTests) {
-            deleteFrom(hibernateTemplate, table);
-          }
-        }
         for (final Class< ? > cls : HibernateEntities.instance().getDescOrderedEntities()) {
           final String name = cls.getName();
-          log.debug("***** deleteFrom: " + name);
-          deleteFrom(hibernateTemplate, name);
+          final String simpleName = cls.getSimpleName();
+          if (StringHelper.isIn(simpleName, "TaskDO", "GroupDO", "PFUserDO") == true) {
+            log.debug("***** deleteAllDBObjects: " + name);
+            // cycle reference (task refers task etc.)
+            deleteAllDBObjects(hibernateTemplate, name);
+          } else {
+            log.debug("***** deleteFrom: " + name);
+            deleteFrom(hibernateTemplate, name);
+          }
         }
         for (final Class< ? > cls : HibernateEntities.instance().getDescOrderedHistoryEntities()) {
           final String name = cls.getName();
