@@ -39,6 +39,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.proxy.HibernateProxyHelper;
+import org.projectforge.database.HibernateEntities;
 import org.springframework.dao.DataAccessException;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -54,7 +55,6 @@ import com.thoughtworks.xstream.io.xml.CompactWriter;
 import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
 
-import de.micromata.hibernate.history.HistoryEntry;
 import de.micromata.hibernate.history.delta.AssociationPropertyDelta;
 import de.micromata.hibernate.history.delta.CollectionPropertyDelta;
 import de.micromata.hibernate.history.delta.PropertyDelta;
@@ -162,37 +162,45 @@ public class HibernateXmlConverter
 
     session.flush();
     // Alles laden
-    List< ? > list = session.createQuery("select o from java.lang.Object o").setReadOnly(true).list();
-    list = (List< ? >) CollectionUtils.select(list, PredicateUtils.uniquePredicate());
-    final int size = list.size();
-    log.info("Writing " + size + " objects");
-    for (final Iterator< ? > it = list.iterator(); it.hasNext();) {
-      final Object obj = it.next();
-      if (log.isDebugEnabled()) {
-        log.debug("loaded object " + obj);
-      }
-      if ((obj instanceof HistoryEntry || obj instanceof PropertyDelta) && includeHistory == false) {
+    final List<Class< ? >> entities = new ArrayList<Class< ? >>();
+    entities.addAll(HibernateEntities.instance().getOrderedEntities());
+    entities.addAll(HibernateEntities.instance().getOrderedHistoryEntities());
+    for (final Class< ? > entityClass : entities) {
+      final String entitySimpleName = entityClass.getSimpleName();
+      final String entityType = entityClass.getName();
+      if (includeHistory == false && entityType.startsWith("de.micromata.hibernate.history.") == true) {
+        // Skip history entries.
         continue;
       }
-      Hibernate.initialize(obj);
-      final Class< ? > targetClass = HibernateProxyHelper.getClassWithoutInitializingProxy(obj);
-      final ClassMetadata classMetadata = session.getSessionFactory().getClassMetadata(targetClass);
-      if (classMetadata == null) {
-        log.fatal("Can't init " + obj + " of type " + targetClass);
-        continue;
-      }
-      // initalisierung des Objekts...
-      defaultXStream.marshal(obj, new CompactWriter(new NullWriter()));
+      List< ? > list = session.createQuery("select o from " + entityType + " o").setReadOnly(true).list();
+      list = (List< ? >) CollectionUtils.select(list, PredicateUtils.uniquePredicate());
+      final int size = list.size();
+      log.info("Writing " + size + " objects");
+      for (final Iterator< ? > it = list.iterator(); it.hasNext();) {
+        final Object obj = it.next();
+        if (log.isDebugEnabled()) {
+          log.debug("loaded object " + obj);
+        }
+        Hibernate.initialize(obj);
+        final Class< ? > targetClass = HibernateProxyHelper.getClassWithoutInitializingProxy(obj);
+        final ClassMetadata classMetadata = session.getSessionFactory().getClassMetadata(targetClass);
+        if (classMetadata == null) {
+          log.fatal("Can't init " + obj + " of type " + targetClass);
+          continue;
+        }
+        // initalisierung des Objekts...
+        defaultXStream.marshal(obj, new CompactWriter(new NullWriter()));
 
-      if (preserveIds == false) {
-        // Nun kann die ID gelöscht werden
-        classMetadata.setIdentifier(obj, null, EntityMode.POJO);
-      }
-      if (log.isDebugEnabled()) {
-        log.debug("loading evicted object " + obj);
-      }
-      if (this.ignoreFromTopLevelListing.contains(targetClass) == false) {
-        all.add(obj);
+        if (preserveIds == false) {
+          // Nun kann die ID gelöscht werden
+          classMetadata.setIdentifier(obj, null, EntityMode.POJO);
+        }
+        if (log.isDebugEnabled()) {
+          log.debug("loading evicted object " + obj);
+        }
+        if (this.ignoreFromTopLevelListing.contains(targetClass) == false) {
+          all.add(obj);
+        }
       }
     }
     // und schreiben
