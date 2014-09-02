@@ -49,6 +49,7 @@ import java.util.zip.GZIPOutputStream;
 
 import javax.persistence.Transient;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ClassUtils;
@@ -467,6 +468,12 @@ public class XmlDump
           continue;
         } else if (fieldValue1 == null) {
           if (fieldValue2 != null) {
+            if (fieldValue2 instanceof Collection< ? >) {
+              if (CollectionUtils.isEmpty((Collection< ? >) fieldValue2) == true) {
+                // null is equals to empty collection in this case.
+                return true;
+              }
+            }
             if (logDifference == true) {
               log.error("Field '" + field.getName() + "': value 1 '" + fieldValue1 + "' is different from value 2 '" + fieldValue2 + "'.");
             }
@@ -523,6 +530,7 @@ public class XmlDump
             if (logDifference == true) {
               log.error("Field '" + field.getName() + "': value 1 '" + fieldValue1 + "' is different from value 2 '" + fieldValue2 + "'.");
             }
+            return false;
           }
         } else if (ObjectUtils.equals(fieldValue2, fieldValue1) == false) {
           if (logDifference == true) {
