@@ -43,7 +43,6 @@ import org.projectforge.access.AccessException;
 import org.projectforge.access.AccessType;
 import org.projectforge.access.OperationType;
 import org.projectforge.common.DateHelper;
-import org.projectforge.common.StringHelper;
 import org.projectforge.continuousdb.DatabaseSupport;
 import org.projectforge.core.SimpleHistoryEntry;
 import org.projectforge.database.HibernateEntities;
@@ -209,20 +208,14 @@ public class AbstractTestBase
           }
         }
         for (final Class< ? > cls : HibernateEntities.instance().getDescOrderedListOfEntities()) {
-          final String simpleName = cls.getSimpleName();
           final String name = cls.getName();
-          if (StringHelper.isIn(simpleName, "ProjektDO", "TaskDO", "MebEntryDO", "GroupDO", "PFUserDO") == true) {
-            log.info("***** deleteAllDBObjects: " + name);
-            deleteAllDBObjects(hibernateTemplate, name);
-          } else {
-            log.info("***** deleteFrom: " + name);
-            deleteFrom(hibernateTemplate, name);
-          }
+          log.debug("***** deleteFrom: " + name);
+          deleteFrom(hibernateTemplate, name);
         }
         for (final Class< ? > cls : HibernateEntities.instance().getDescOrderedHistoryEntities()) {
           final String name = cls.getName();
           deleteFrom(hibernateTemplate, name);
-          log.info("***** deleteFrom: " + name);
+          log.debug("***** deleteFrom: " + name);
         }
         List< ? > all = hibernateTemplate.find("from java.lang.Object o");
         if (all != null && all.size() > 0) {
