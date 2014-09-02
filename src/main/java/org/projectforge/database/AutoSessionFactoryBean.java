@@ -53,7 +53,11 @@ public class AutoSessionFactoryBean extends AnnotationSessionFactoryBean
   @Override
   protected void postProcessAnnotationConfiguration(final AnnotationConfiguration config) throws HibernateException
   {
-    for (final Class< ? > entityClass : HibernateCoreEntities.CORE_ENTITIES) {
+    for (final Class< ? > entityClass : HibernateEntities.CORE_ENTITIES) {
+      log.debug("Adding class " + entityClass.getName());
+      config.addAnnotatedClass(entityClass);
+    }
+    for (final Class< ? > entityClass : HibernateEntities.HISTORY_ENTITIES) {
       log.debug("Adding class " + entityClass.getName());
       config.addAnnotatedClass(entityClass);
     }
@@ -65,6 +69,7 @@ public class AutoSessionFactoryBean extends AnnotationSessionFactoryBean
         for (final Class< ? > entity : persistentEntities) {
           log.debug("Adding class " + entity.getName());
           config.addAnnotatedClass(entity);
+          HibernateEntities.instance().addEntity(entity);
         }
       }
     }
