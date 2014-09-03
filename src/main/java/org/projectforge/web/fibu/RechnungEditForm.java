@@ -133,9 +133,10 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
       final FieldsetPanel fs = gridBuilder.newFieldset(RechnungDO.class, "konto");
       final KontoSelectPanel kontoSelectPanel = new KontoSelectPanel(fs.newChildId(), new PropertyModel<KontoDO>(data, "konto"), null,
           "kontoId");
-      kontoSelectPanel.setKontoNumberRanges(AccountingConfig.getInstance().getDebitorsAccountNumberRanges()).init();
+      kontoSelectPanel.setKontoNumberRanges(AccountingConfig.getInstance().getDebitorsAccountNumberRanges());
       fs.addHelpIcon(getString("fibu.rechnung.konto.tooltip"));
       fs.add(kontoSelectPanel);
+      kontoSelectPanel.init();
     }
     gridBuilder.newSubSplitPanel(GridSize.COL100);
     {
@@ -153,8 +154,8 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
           target.add(customerSelectPanel.getTextField());
         }
       });
-      projektSelectPanel.init();
       fs.add(projektSelectPanel);
+      projektSelectPanel.init();
     }
     {
       // Customer
