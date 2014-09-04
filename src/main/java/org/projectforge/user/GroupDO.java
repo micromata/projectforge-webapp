@@ -273,11 +273,20 @@ public class GroupDO extends DefaultBaseDO implements ShortDisplayNameCapable
   public String toString()
   {
     final ToStringBuilder builder = new ToStringBuilder(this);
+    builder.append("id", getId());
     builder.append("name", getName());
     builder.append("organization", getOrganization());
     builder.append("description", getDescription());
     if (getSafeAssignedUsers() != null) {
-      builder.append("assignedUsers", this.assignedUsers);
+      final StringBuilder sb = new StringBuilder();
+      boolean first = true;
+      for (final PFUserDO user : this.assignedUsers) {
+        if (first == true)
+          first = false;
+        else sb.append(", ");
+        sb.append(user.getDisplayUsername());
+      }
+      builder.append("assignedUsers", sb.toString());
     } else {
       builder.append("assignedUsers", "LazyCollection");
     }
