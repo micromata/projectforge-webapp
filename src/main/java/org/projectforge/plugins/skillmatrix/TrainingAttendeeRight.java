@@ -37,7 +37,7 @@ import org.projectforge.user.UserRights;
  * Define the access rights.
  * @author Werner Feder (werner.feder@t-online.de)
  */
-public class AttendeeRight extends UserRightAccessCheck<AttendeeDO>
+public class TrainingAttendeeRight extends UserRightAccessCheck<TrainingAttendeeDO>
 {
   private static final long serialVersionUID = -3590945654632199595L;
 
@@ -48,9 +48,9 @@ public class AttendeeRight extends UserRightAccessCheck<AttendeeDO>
    * @param category
    * @param rightValues
    */
-  public AttendeeRight()
+  public TrainingAttendeeRight()
   {
-    super(AttendeeDao.USER_RIGHT_ID, UserRightCategory.PLUGINS, UserRightValue.TRUE);
+    super(TrainingAttendeeDao.USER_RIGHT_ID, UserRightCategory.PLUGINS, UserRightValue.TRUE);
   }
 
   private UserGroupCache getUserGroupCache()
@@ -62,13 +62,13 @@ public class AttendeeRight extends UserRightAccessCheck<AttendeeDO>
   }
 
   @Override
-  public boolean hasAccess(final PFUserDO user, final AttendeeDO obj, final AttendeeDO oldObj, final OperationType operationType)
+  public boolean hasAccess(final PFUserDO user, final TrainingAttendeeDO obj, final TrainingAttendeeDO oldObj, final OperationType operationType)
   {
     if (UserRights.getAccessChecker().isUserMemberOfAdminGroup(user) == true) {
       return true;
     }
 
-    final AttendeeDO attendee = (oldObj != null) ? oldObj : obj;
+    final TrainingAttendeeDO attendee = (oldObj != null) ? oldObj : obj;
     if (attendee == null) {
       return true;
     }

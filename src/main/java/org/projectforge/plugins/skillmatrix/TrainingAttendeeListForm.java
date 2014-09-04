@@ -38,12 +38,12 @@ import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
  * The list formular for the list view.
  * @author Werner Feder (werner.feder@t-online.de)
  */
-public class AttendeeListForm extends AbstractListForm<AttendeeFilter, AttendeeListPage> implements Serializable
+public class TrainingAttendeeListForm extends AbstractListForm<TrainingAttendeeFilter, TrainingAttendeeListPage> implements Serializable
 {
 
   private static final long serialVersionUID = 314512845221133499L;
 
-  private static final Logger log = Logger.getLogger(AttendeeListForm.class);
+  private static final Logger log = Logger.getLogger(TrainingAttendeeListForm.class);
 
   @SpringBean(name = "trainingDao")
   private TrainingDao trainingDao;
@@ -54,7 +54,7 @@ public class AttendeeListForm extends AbstractListForm<AttendeeFilter, AttendeeL
   /**
    * @param parentPage
    */
-  public AttendeeListForm(final AttendeeListPage parentPage)
+  public TrainingAttendeeListForm(final TrainingAttendeeListPage parentPage)
   {
     super(parentPage);
   }
@@ -124,9 +124,9 @@ public class AttendeeListForm extends AbstractListForm<AttendeeFilter, AttendeeL
    * @see org.projectforge.web.wicket.AbstractListForm#newSearchFilterInstance()
    */
   @Override
-  protected AttendeeFilter newSearchFilterInstance()
+  protected TrainingAttendeeFilter newSearchFilterInstance()
   {
-    return new AttendeeFilter();
+    return new TrainingAttendeeFilter();
   }
 
   /**

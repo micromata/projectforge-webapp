@@ -39,7 +39,7 @@ import org.projectforge.user.UserRightId;
  * implemented by the super class.
  * @author Werner Feder (werner.feder@t-online.de)
  */
-public class AttendeeDao extends BaseDao<AttendeeDO>
+public class TrainingAttendeeDao extends BaseDao<TrainingAttendeeDO>
 {
 
   public static final String UNIQUE_PLUGIN_ID = "PLUGIN_SKILL_MATRIX_TRAINING_ATTENDEE";
@@ -48,15 +48,15 @@ public class AttendeeDao extends BaseDao<AttendeeDO>
 
   public static final UserRightId USER_RIGHT_ID = new UserRightId(UNIQUE_PLUGIN_ID, "plugin20", I18N_KEY_SKILL_PREFIX);
 
-  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "attendee.firstname", "attendee.lastname", "attendee.username", "training.title",
+  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "trainingAttendee.firstname", "trainingAttendee.lastname", "trainingAttendee.username", "training.title",
     "training.skill.title", "rating", "certificate" };
 
   private TrainingDao trainingDao;
   private UserDao userDao;
 
-  public AttendeeDao()
+  public TrainingAttendeeDao()
   {
-    super(AttendeeDO.class);
+    super(TrainingAttendeeDO.class);
     userRightId = USER_RIGHT_ID;
   }
 
@@ -67,9 +67,9 @@ public class AttendeeDao extends BaseDao<AttendeeDO>
   }
 
   @Override
-  public AttendeeDO newInstance()
+  public TrainingAttendeeDO newInstance()
   {
-    return new AttendeeDO();
+    return new TrainingAttendeeDO();
   }
 
   public TrainingDao getTraingDao()
@@ -77,7 +77,7 @@ public class AttendeeDao extends BaseDao<AttendeeDO>
     return trainingDao;
   }
 
-  public AttendeeDao setTraingDao(final TrainingDao trainingDao)
+  public TrainingAttendeeDao setTraingDao(final TrainingDao trainingDao)
   {
     this.trainingDao = trainingDao;
     return this;
@@ -88,20 +88,20 @@ public class AttendeeDao extends BaseDao<AttendeeDO>
     return userDao;
   }
 
-  public AttendeeDao setUserDao(final UserDao userDao)
+  public TrainingAttendeeDao setUserDao(final UserDao userDao)
   {
     this.userDao = userDao;
     return this;
   }
 
   @Override
-  public List<AttendeeDO> getList(final BaseSearchFilter filter)
+  public List<TrainingAttendeeDO> getList(final BaseSearchFilter filter)
   {
-    final AttendeeFilter myFilter;
-    if (filter instanceof AttendeeFilter) {
-      myFilter = (AttendeeFilter) filter;
+    final TrainingAttendeeFilter myFilter;
+    if (filter instanceof TrainingAttendeeFilter) {
+      myFilter = (TrainingAttendeeFilter) filter;
     } else {
-      myFilter = new AttendeeFilter(filter);
+      myFilter = new TrainingAttendeeFilter(filter);
     }
     final QueryFilter queryFilter = new QueryFilter(myFilter);
     final String searchString = myFilter.getSearchString();
@@ -109,7 +109,7 @@ public class AttendeeDao extends BaseDao<AttendeeDO>
     if (myFilter.getAttendeeId() != null) {
       final PFUserDO attendee = new PFUserDO();
       attendee.setId(myFilter.getAttendeeId());
-      queryFilter.add(Restrictions.eq("attendee", attendee));
+      queryFilter.add(Restrictions.eq("trainingAttendee", attendee));
     }
     if (myFilter.getTrainingId() != null) {
       final TrainingDO training = new TrainingDO();
@@ -117,7 +117,7 @@ public class AttendeeDao extends BaseDao<AttendeeDO>
       queryFilter.add(Restrictions.eq("training", training));
     }
     queryFilter.addOrder(Order.desc("created"));
-    final List<AttendeeDO> list = getList(queryFilter);
+    final List<TrainingAttendeeDO> list = getList(queryFilter);
     myFilter.setSearchString(searchString); // Restore search string.
     return list;
   }

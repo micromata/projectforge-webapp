@@ -23,6 +23,7 @@
 
 package org.projectforge.plugins.skillmatrix;
 
+import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.model.PropertyModel;
@@ -32,6 +33,8 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.bootstrap.GridSize;
+import org.projectforge.web.wicket.components.DatePanel;
+import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -40,18 +43,19 @@ import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
  * This is the edit formular page.
  * @author Werner Feder (werner.feder@t-online.de)
  */
-public class AttendeeEditForm extends AbstractEditForm<AttendeeDO, AttendeeEditPage>
+public class TrainingAttendeeEditForm extends AbstractEditForm<TrainingAttendeeDO, TrainingAttendeeEditPage>
 {
 
   private static final long serialVersionUID = 6814668114853472909L;
 
-  private static final Logger log = Logger.getLogger(AttendeeEditForm.class);
+  private static final Logger log = Logger.getLogger(TrainingAttendeeEditForm.class);
 
   private FieldsetPanel ratingFs, certificateFs;
+
   private LabelValueChoiceRenderer<String> ratingChoiceRenderer, certificateChoiceRenderer;
 
-  @SpringBean(name = "attendeeDao")
-  private AttendeeDao attendeeDao;
+  @SpringBean(name = "trainingAttendeeDao")
+  private TrainingAttendeeDao trainingAttendeeDao;
 
   @SpringBean(name = "skillDao")
   private SkillDao skillDao;
@@ -60,11 +64,10 @@ public class AttendeeEditForm extends AbstractEditForm<AttendeeDO, AttendeeEditP
    * @param parentPage
    * @param data
    */
-  public AttendeeEditForm(final AttendeeEditPage parentPage, final AttendeeDO data)
+  public TrainingAttendeeEditForm(final TrainingAttendeeEditPage parentPage, final TrainingAttendeeDO data)
   {
     super(parentPage, data);
   }
-
 
   @Override
   public void init()
@@ -74,23 +77,23 @@ public class AttendeeEditForm extends AbstractEditForm<AttendeeDO, AttendeeEditP
     gridBuilder.newSplitPanel(GridSize.COL50);
 
     // Training
-    FieldsetPanel fs = gridBuilder.newFieldset(AttendeeDO.class, "training");
+    FieldsetPanel fs = gridBuilder.newFieldset(TrainingAttendeeDO.class, "training");
     TrainingDO training = data.getTraining();
     if (Hibernate.isInitialized(training) == false) {
-      training = attendeeDao.getTraingDao().getOrLoad(training.getId());
+      training = trainingAttendeeDao.getTraingDao().getOrLoad(training.getId());
       data.setTraining(training);
     }
-    final TrainingSelectPanel trainingSelectPanel = new TrainingSelectPanel(fs.newChildId(), new PropertyModel<TrainingDO>(data, "training"),
-        parentPage, "trainingId");
+    final TrainingSelectPanel trainingSelectPanel = new TrainingSelectPanel(fs.newChildId(),
+        new PropertyModel<TrainingDO>(data, "training"), parentPage, "trainingId");
     trainingSelectPanel.setDefaultFormProcessing(false);
     trainingSelectPanel.init().withAutoSubmit(true).setRequired(true);
     fs.add(trainingSelectPanel);
 
     // Attendee
-    fs = gridBuilder.newFieldset(AttendeeDO.class, "attendee");
+    fs = gridBuilder.newFieldset(TrainingAttendeeDO.class, "attendee");
     PFUserDO attendee = data.getAttendee();
     if (Hibernate.isInitialized(attendee) == false) {
-      attendee = attendeeDao.getUserDao().getOrLoad(attendee.getId());
+      attendee = trainingAttendeeDao.getUserDao().getOrLoad(attendee.getId());
       data.setAttendee(attendee);
     }
     final UserSelectPanel attendeeSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(data, "attendee"),
@@ -103,26 +106,34 @@ public class AttendeeEditForm extends AbstractEditForm<AttendeeDO, AttendeeEditP
     } else {
       attendeeSelectPanel.setFocus();
     }
-
     { // Rating
-      ratingFs = gridBuilder.newFieldset(AttendeeDO.class, "rating");
+      ratingFs = gridBuilder.newFieldset(TrainingAttendeeDO.class, "rating");
       ratingChoiceRenderer = new LabelValueChoiceRenderer<String>();
       ratingFs.addDropDownChoice(new PropertyModel<String>(data, "rating"), ratingChoiceRenderer.getValues(), ratingChoiceRenderer)
       .setNullValid(true);
     }
-
     { // Certificate
-      certificateFs = gridBuilder.newFieldset(AttendeeDO.class, "certificate");
+      certificateFs = gridBuilder.newFieldset(TrainingAttendeeDO.class, "certificate");
       certificateChoiceRenderer = new LabelValueChoiceRenderer<String>();
-      certificateFs.addDropDownChoice(new PropertyModel<String>(data, "certificate"), certificateChoiceRenderer.getValues(), certificateChoiceRenderer)
-      .setNullValid(true);
+      certificateFs.addDropDownChoice(new PropertyModel<String>(data, "certificate"), certificateChoiceRenderer.getValues(),
+          certificateChoiceRenderer).setNullValid(true);
     }
-
+    {
+      // startDate
+      fs = gridBuilder.newFieldset(TrainingDO.class, "startDate");
+      fs.add(new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "startDate"), DatePanelSettings.get().withTargetType(
+          java.sql.Date.class)));
+    }
+    {
+      // EndDate
+      fs = gridBuilder.newFieldset(TrainingDO.class, "endDate");
+      fs.add(new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "endDate"), DatePanelSettings.get().withTargetType(
+          java.sql.Date.class)));
+    }
     { // Description
-      fs = gridBuilder.newFieldset(AttendeeDO.class, "description");
+      fs = gridBuilder.newFieldset(TrainingAttendeeDO.class, "description");
       fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "description"))).setAutogrow();
     }
-
   }
 
   /**
@@ -138,14 +149,12 @@ public class AttendeeEditForm extends AbstractEditForm<AttendeeDO, AttendeeEditP
       if (training.getRatingArray() != null) {
         ratingChoiceRenderer.clear().setValueArray(training.getRatingArray());
         ratingFs.setVisible(true);
-      } else
-        ratingFs.setVisible(false);
+      } else ratingFs.setVisible(false);
 
       if (training.getCertificateArray() != null) {
         certificateChoiceRenderer.clear().setValueArray(training.getCertificateArray());
         certificateFs.setVisible(true);
-      } else
-        certificateFs.setVisible(false);
+      } else certificateFs.setVisible(false);
     }
   }
 
