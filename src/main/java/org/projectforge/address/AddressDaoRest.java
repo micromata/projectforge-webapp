@@ -36,6 +36,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.PredicateUtils;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.registry.Registry;
 import org.projectforge.rest.JsonUtils;
@@ -130,7 +132,9 @@ public class AddressDaoRest
         }
       }
     }
-    final String json = JsonUtils.toJson(result);
+    @SuppressWarnings("unchecked")
+    final List<AddressObject> uniqResult = (List<AddressObject>) CollectionUtils.select(result, PredicateUtils.uniquePredicate());
+    final String json = JsonUtils.toJson(uniqResult);
     log.info("Rest call finished (" + result.size() + " addresses)...");
     return Response.ok(json).build();
   }
