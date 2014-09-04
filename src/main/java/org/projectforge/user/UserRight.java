@@ -27,11 +27,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class UserRight implements Serializable
+import org.projectforge.core.ShortDisplayNameCapable;
+
+public abstract class UserRight implements Serializable, ShortDisplayNameCapable
 {
   private static final long serialVersionUID = -4356329396089081134L;
 
-  private UserRightId id;
+  private final UserRightId id;
 
   protected UserRightValue[] values;
 
@@ -140,7 +142,7 @@ public abstract class UserRight implements Serializable
         list.add(value);
       }
     }
-    UserRightValue[] oa = new UserRightValue[list.size()];
+    final UserRightValue[] oa = new UserRightValue[list.size()];
     list.toArray(oa);
     return oa;
   }
@@ -206,10 +208,19 @@ public abstract class UserRight implements Serializable
     return category;
   }
 
-  public UserRight setCategory(UserRightCategory category)
+  public UserRight setCategory(final UserRightCategory category)
   {
     this.category = category;
     return this;
+  }
+
+  /**
+   * @see org.projectforge.core.ShortDisplayNameCapable#getShortDisplayName()
+   */
+  @Override
+  public String getShortDisplayName()
+  {
+    return this.id.toString();
   }
 
   @Override
