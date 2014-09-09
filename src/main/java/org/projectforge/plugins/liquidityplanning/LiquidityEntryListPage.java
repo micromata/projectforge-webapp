@@ -233,6 +233,13 @@ IListPageColumnsCreator<LiquidityEntryDO>
     };
   }
 
+  /**
+   * Calculates expected dates of payments inside the last year (-365 days).
+   * @param rechnungDao
+   * @param eingangsrechnungDao
+   * @param liquidityEntryDao
+   * @return
+   */
   static LiquidityForecast getForecast(final RechnungDao rechnungDao, final EingangsrechnungDao eingangsrechnungDao,
       final LiquidityEntryDao liquidityEntryDao)
   {
