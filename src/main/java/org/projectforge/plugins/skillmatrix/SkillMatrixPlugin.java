@@ -27,7 +27,6 @@ import org.projectforge.continuousdb.UpdateEntry;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.MenuItemDef;
-import org.projectforge.web.MenuItemDefId;
 
 /**
  * @author Billy Duong (b.duong@micromata.de)
@@ -101,8 +100,9 @@ public class SkillMatrixPlugin extends AbstractPlugin
     registerWeb(ID_SKILL_TRAINING_ATTENDEE, TrainingAttendeeListPage.class, TrainingAttendeeEditPage.class);
 
     // Register the menu entry as sub menu entry of the misc menu:
-    final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
+    final MenuItemDef parentMenu = new MenuItemDef(null, ID_SKILL, 90, I18N_KEY_SKILL_MENU_ENTRY, SkillTreePage.class);
 
+    registerMenuItem(parentMenu);
     registerMenuItem(new MenuItemDef(parentMenu, ID_SKILL_TREE, 5, I18N_KEY_SKILLTREE_MENU_ENTRY, SkillTreePage.class));
     registerMenuItem(new MenuItemDef(parentMenu, ID_SKILL_RATING, 5, I18N_KEY_SKILLRATING_MENU_ENTRY, SkillRatingListPage.class));
     registerMenuItem(new MenuItemDef(parentMenu, ID_SKILL, 5, I18N_KEY_SKILL_MENU_ENTRY, SkillListPage.class));
