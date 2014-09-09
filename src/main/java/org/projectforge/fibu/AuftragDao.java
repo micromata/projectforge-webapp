@@ -610,9 +610,23 @@ public class AuftragDao extends BaseDao<AuftragDO>
         for (final DisplayHistoryEntry entry : entries) {
           final String propertyName = entry.getPropertyName();
           if (propertyName != null) {
-            entry.setPropertyName("#" + position.getNumber() + ":" + entry.getPropertyName()); // Prepend number of positon.
+            entry.setPropertyName("Pos#" + position.getNumber() + ":" + entry.getPropertyName()); // Prepend number of positon.
           } else {
-            entry.setPropertyName("#" + position.getNumber());
+            entry.setPropertyName("Pos#" + position.getNumber());
+          }
+        }
+        list.addAll(entries);
+      }
+    }
+    if (CollectionUtils.isNotEmpty(obj.getPaymentSchedules()) == true) {
+      for (final PaymentScheduleDO schedule : obj.getPaymentSchedules()) {
+        final List<DisplayHistoryEntry> entries = internalGetDisplayHistoryEntries(schedule);
+        for (final DisplayHistoryEntry entry : entries) {
+          final String propertyName = entry.getPropertyName();
+          if (propertyName != null) {
+            entry.setPropertyName("PaymentSchedule#" + schedule.getNumber() + ":" + entry.getPropertyName()); // Prepend number of positon.
+          } else {
+            entry.setPropertyName("PaymentSchedule#" + schedule.getNumber());
           }
         }
         list.addAll(entries);
