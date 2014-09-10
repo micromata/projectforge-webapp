@@ -987,4 +987,23 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
     }
     return clone;
   }
+
+  public TeamEventDO createMinimalCopy()
+  {
+    final TeamEventDO result = new TeamEventDO();
+    result.externalUid = this.externalUid;
+    result.setId(this.getId());
+    result.setCalendar(this.getCalendar());
+    result.startDate = this.startDate;
+    result.endDate = this.endDate;
+    result.allDay = this.allDay;
+    result.recurrenceExDate = this.recurrenceExDate;
+    result.recurrenceRule = this.recurrenceRule;
+    result.recurrenceReferenceDate = this.recurrenceReferenceDate;
+    result.recurrenceReferenceId = this.recurrenceReferenceId;
+    result.recurrenceUntil = this.recurrenceUntil;
+    result.externalUid = this.externalUid;
+    result.sequence = this.sequence;
+    return result;
+  }
 }

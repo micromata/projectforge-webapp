@@ -109,7 +109,7 @@ public class SubscriptionHolder implements Serializable
       }
       if (matches(teamEventDo, startTime, endTime) == true) {
         if (minimalAccess == true) {
-          result.add(teamEventDo.clone().clearFields());
+          result.add(teamEventDo.createMinimalCopy());
         } else {
           result.add(teamEventDo);
         }

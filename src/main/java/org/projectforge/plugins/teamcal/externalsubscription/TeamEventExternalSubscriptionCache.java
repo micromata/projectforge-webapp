@@ -157,8 +157,8 @@ public class TeamEventExternalSubscriptionCache
     final List<TeamEventDO> result = new ArrayList<TeamEventDO>();
     // precondition: existing teamcals ins filter
     final Collection<Integer> teamCals = new LinkedList<Integer>();
+    final Integer userId = PFUserContext.getUserId();
     if (CollectionUtils.isNotEmpty(filter.getTeamCals()) == true) {
-      final Integer userId = PFUserContext.getUserId();
       for (final Integer calendarId : filter.getTeamCals()) {
         final TeamEventSubscription eventSubscription = subscriptions.get(calendarId);
         if (eventSubscription == null) {
@@ -176,7 +176,6 @@ public class TeamEventExternalSubscriptionCache
       final TeamEventSubscription eventSubscription = subscriptions.get(filter.getTeamCalId());
       if (eventSubscription != null) {
         final TeamCalDO cal = TeamCalCache.getInstance().getCalendar(filter.getTeamCalId());
-        final Integer userId = PFUserContext.getUserId();
         if (getTeamCalRight().getAccessType(cal, userId)
             .isIn(TeamCalAccessType.FULL, TeamCalAccessType.READONLY, TeamCalAccessType.MINIMAL) == true) {
           teamCals.add(filter.getTeamCalId());
@@ -189,7 +188,14 @@ public class TeamEventExternalSubscriptionCache
         if (eventSubscription != null) {
           final List<TeamEventDO> recurrenceEvents = eventSubscription.getRecurrenceEvents();
           if (recurrenceEvents != null && recurrenceEvents.size() > 0) {
-            result.addAll(recurrenceEvents);
+            for (final TeamEventDO event : recurrenceEvents) {
+              final TeamCalDO calendar = TeamCalCache.getInstance().getCalendar(calendarId);
+              if (getTeamCalRight().getAccessType(calendar, userId) == TeamCalAccessType.MINIMAL) {
+                result.add(event.createMinimalCopy());
+              } else {
+                result.add(event);
+              }
+            }
           }
         }
       }
