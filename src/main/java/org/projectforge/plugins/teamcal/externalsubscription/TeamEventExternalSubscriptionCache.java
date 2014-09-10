@@ -30,12 +30,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.criterion.Restrictions;
 import org.projectforge.core.QueryFilter;
+import org.projectforge.plugins.teamcal.admin.TeamCalAccessType;
+import org.projectforge.plugins.teamcal.admin.TeamCalCache;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
+import org.projectforge.plugins.teamcal.admin.TeamCalRight;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.plugins.teamcal.event.TeamEventFilter;
+import org.projectforge.user.PFUserContext;
+import org.projectforge.user.UserRights;
 
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
@@ -47,6 +53,8 @@ public class TeamEventExternalSubscriptionCache
   private final Map<Integer, TeamEventSubscription> subscriptions;
 
   private static final Long SUBSCRIPTION_UPDATE_TIME = 5L * 60 * 1000; // 5 min
+
+  private transient TeamCalRight teamCalRight;
 
   private TeamEventExternalSubscriptionCache()
   {
@@ -136,7 +144,12 @@ public class TeamEventExternalSubscriptionCache
     if (eventSubscription == null) {
       return null;
     }
-    return eventSubscription.getEvents(startTime, endTime);
+    final Integer userId = PFUserContext.getUserId();
+    final TeamCalAccessType accessType = getAccessType(eventSubscription.getTeamCalId(), userId);
+    if (accessType == TeamCalAccessType.NONE) {
+      return null;
+    }
+    return eventSubscription.getEvents(startTime, endTime, accessType == TeamCalAccessType.MINIMAL);
   }
 
   public List<TeamEventDO> getRecurrenceEvents(final TeamEventFilter filter)
@@ -144,11 +157,31 @@ public class TeamEventExternalSubscriptionCache
     final List<TeamEventDO> result = new ArrayList<TeamEventDO>();
     // precondition: existing teamcals ins filter
     final Collection<Integer> teamCals = new LinkedList<Integer>();
-    if (filter.getTeamCals() != null && filter.getTeamCals().size() > 0) {
-      teamCals.addAll(filter.getTeamCals());
+    if (CollectionUtils.isNotEmpty(filter.getTeamCals()) == true) {
+      final Integer userId = PFUserContext.getUserId();
+      for (final Integer calendarId : filter.getTeamCals()) {
+        final TeamEventSubscription eventSubscription = subscriptions.get(calendarId);
+        if (eventSubscription == null) {
+          continue;
+        }
+        final TeamCalDO calendar = TeamCalCache.getInstance().getCalendar(calendarId);
+        if (getTeamCalRight().getAccessType(calendar, userId).isIn(TeamCalAccessType.FULL, TeamCalAccessType.READONLY,
+            TeamCalAccessType.MINIMAL) == false) {
+          continue;
+        }
+        teamCals.add(calendarId);
+      }
     }
     if (filter.getTeamCalId() != null) {
-      teamCals.add(filter.getTeamCalId());
+      final TeamEventSubscription eventSubscription = subscriptions.get(filter.getTeamCalId());
+      if (eventSubscription != null) {
+        final TeamCalDO cal = TeamCalCache.getInstance().getCalendar(filter.getTeamCalId());
+        final Integer userId = PFUserContext.getUserId();
+        if (getTeamCalRight().getAccessType(cal, userId)
+            .isIn(TeamCalAccessType.FULL, TeamCalAccessType.READONLY, TeamCalAccessType.MINIMAL) == true) {
+          teamCals.add(filter.getTeamCalId());
+        }
+      }
     }
     if (teamCals != null) {
       for (final Integer calendarId : teamCals) {
@@ -164,4 +197,20 @@ public class TeamEventExternalSubscriptionCache
     return result;
   }
 
+  private TeamCalAccessType getAccessType(final Integer calendarId, final Integer userId)
+  {
+    final TeamCalDO cal = TeamCalCache.getInstance().getCalendar(calendarId);
+    return getTeamCalRight().getAccessType(cal, userId);
+  }
+
+  /**
+   * @return the teamCalRight
+   */
+  public TeamCalRight getTeamCalRight()
+  {
+    if (teamCalRight == null) {
+      teamCalRight = (TeamCalRight) UserRights.instance().getRight(TeamCalDao.USER_RIGHT_ID);
+    }
+    return teamCalRight;
+  }
 }
