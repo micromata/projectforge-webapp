@@ -67,12 +67,15 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
 
   private TeamCalICSExportDialog icsExportDialog;
 
+  private final boolean isAdminUser;
+
   /**
    * 
    */
   public TeamCalListPage(final PageParameters parameters)
   {
     super(parameters, "plugins.teamcal");
+    isAdminUser = accessChecker.isLoggedInUserMemberOfAdminGroup();
   }
 
   /**
@@ -131,6 +134,8 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
           label = getString("plugins.teamcal.readonlyAccess");
         } else if (right.hasMinimalAccess(teamCal, getUserId()) == true) {
           label = getString("plugins.teamcal.minimalAccess");
+        } else if (isAdminUser == true) {
+          label = getString("plugins.teamcal.adminAccess");
         } else {
           label = "???";
         }

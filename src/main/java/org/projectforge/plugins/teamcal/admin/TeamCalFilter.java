@@ -37,10 +37,10 @@ public class TeamCalFilter extends BaseSearchFilter implements Serializable
 
   public enum OwnerType
   {
-    ALL, OWN, OTHERS;
+    ALL, OWN, OTHERS, ADMIN;
   }
 
-  private boolean fullAccess, readonlyAccess, minimalAccess;
+  private boolean fullAccess, readonlyAccess, minimalAccess, adminAccess;
 
   protected OwnerType calOwner;
 
@@ -72,6 +72,14 @@ public class TeamCalFilter extends BaseSearchFilter implements Serializable
   {
     this.calOwner = calOwner;
     return this;
+  }
+
+  /**
+   * @return true if calOwner == {@link OwnerType#ADMIN}
+   */
+  public boolean isAdmin()
+  {
+    return calOwner == OwnerType.ADMIN;
   }
 
   /**
