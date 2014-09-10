@@ -219,7 +219,7 @@ public class TeamEventSubscription implements Serializable
    * @param md5
    * @return
    */
-  private String calcHexHash(byte[] md5) {
+  private String calcHexHash(final byte[] md5) {
     String result = null;
     if (md5 != null) {
       result = new BigInteger(1, md5).toString(16);
@@ -227,11 +227,11 @@ public class TeamEventSubscription implements Serializable
     return result;
   }
 
-  public List<TeamEventDO> getEvents(final Long startTime, final Long endTime)
+  public List<TeamEventDO> getEvents(final Long startTime, final Long endTime, final boolean minimalAccess)
   {
-    Long perfStart = System.currentTimeMillis();
-    List<TeamEventDO> result = eventDurationAccess.getResultList(startTime, endTime);
-    Long perfDuration = System.currentTimeMillis() - perfStart;
+    final Long perfStart = System.currentTimeMillis();
+    final List<TeamEventDO> result = eventDurationAccess.getResultList(startTime, endTime, minimalAccess);
+    final Long perfDuration = System.currentTimeMillis() - perfStart;
     log.info("calculation of team events took " + perfDuration + " ms for " + result.size() + " events of " +eventDurationAccess.size() + " in total from calendar #"+teamCalId+".");
     return result;
   }
