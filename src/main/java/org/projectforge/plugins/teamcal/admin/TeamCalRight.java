@@ -65,7 +65,7 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
   @Override
   public boolean hasSelectAccess(final PFUserDO user, final TeamCalDO obj)
   {
-    if (isOwner(user, obj) == true) {
+    if (isOwner(user, obj) == true || UserRights.getAccessChecker().isUserMemberOfAdminGroup(user) == true) {
       // User has full access to his own calendars.
       return true;
     }
@@ -154,7 +154,8 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
   /**
    * @param calendar
    * @param userId
-   * @return {@link TeamCalAccessType#NONE}, {@link TeamCalAccessType#MINIMAL}, {@link TeamCalAccessType#READONLY} or {@link TeamCalAccessType#FULL}. null will never be returned!
+   * @return {@link TeamCalAccessType#NONE}, {@link TeamCalAccessType#MINIMAL}, {@link TeamCalAccessType#READONLY} or
+   *         {@link TeamCalAccessType#FULL}. null will never be returned!
    */
   public TeamCalAccessType getAccessType(final TeamCalDO calendar, final Integer userId)
   {

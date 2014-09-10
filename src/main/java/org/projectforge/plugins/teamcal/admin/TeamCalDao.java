@@ -101,6 +101,7 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
     else {
       myFilter = new TeamCalFilter(filter);
     }
+    final PFUserDO user = PFUserContext.getUser();
     final QueryFilter queryFilter = new QueryFilter(myFilter);
     queryFilter.addOrder(Order.asc("title"));
     final List<TeamCalDO> list = getList(queryFilter);
@@ -110,23 +111,30 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
     }
     final List<TeamCalDO> result = new ArrayList<TeamCalDO>();
     final TeamCalRight right = (TeamCalRight) getUserRight();
-    final PFUserDO user = PFUserContext.getUser();
     final Integer userId = user.getId();
+    final boolean adminAccessOnly = (myFilter.isAdmin() == true && accessChecker.isUserMemberOfAdminGroup(user) == true);
     for (final TeamCalDO cal : list) {
       final boolean isOwn = right.isOwner(user, cal);
       if (isOwn == true) {
         // User is owner.
+        if (adminAccessOnly == true) {
+          continue;
+        }
         if (myFilter.isAll() == true || myFilter.isOwn() == true) {
           // Calendar matches the filter:
           result.add(cal);
         }
       } else {
         // User is not owner.
-        if (myFilter.isAll() == true || myFilter.isOthers() == true) {
+        if (myFilter.isAll() == true || myFilter.isOthers() == true || adminAccessOnly == true) {
           if ((myFilter.isFullAccess() == true && right.hasFullAccess(cal, userId) == true)
               || (myFilter.isReadonlyAccess() == true && right.hasReadonlyAccess(cal, userId) == true)
               || (myFilter.isMinimalAccess() == true && right.hasMinimalAccess(cal, userId) == true)) {
             // Calendar matches the filter:
+            if (adminAccessOnly == false) {
+              result.add(cal);
+            }
+          } else if (adminAccessOnly == true) {
             result.add(cal);
           }
         }
