@@ -92,7 +92,7 @@ public class SubscriptionHolder implements Serializable
     sorted = true;
   }
 
-  public List<TeamEventDO> getResultList(final Long startTime, final Long endTime)
+  public List<TeamEventDO> getResultList(final Long startTime, final Long endTime, final boolean minimalAccess)
   {
     // sorting should by synchronized
     synchronized (this) {
@@ -108,7 +108,11 @@ public class SubscriptionHolder implements Serializable
         break;
       }
       if (matches(teamEventDo, startTime, endTime) == true) {
-        result.add(teamEventDo);
+        if (minimalAccess == true) {
+          result.add(teamEventDo.clone().clearFields());
+        } else {
+          result.add(teamEventDo);
+        }
       }
     }
     // and return
