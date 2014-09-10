@@ -148,7 +148,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
         }
 
         // id <= 0 is hint for abo events -> not editable
-        if(eventDO.getId() <= 0) {
+        if(eventDO.getId() != null && eventDO.getId() <= 0) {
           event.setEditable(false);
         }
 
