@@ -41,7 +41,7 @@ import org.projectforge.fibu.EmployeeSalaryDao;
 import org.projectforge.fibu.EmployeeScriptingDao;
 import org.projectforge.fibu.KontoDao;
 import org.projectforge.fibu.KundeDao;
-import org.projectforge.fibu.PaymentScheduleDao;
+import org.projectforge.fibu.PaymentScheduleDO;
 import org.projectforge.fibu.ProjektDao;
 import org.projectforge.fibu.RechnungDao;
 import org.projectforge.fibu.RechnungsPositionDO;
@@ -206,8 +206,6 @@ public class DaoRegistry
 
   private MebDao mebDao;
 
-  private PaymentScheduleDao paymentScheduleDao;
-
   private PostausgangDao postausgangDao;
 
   private PosteingangDao posteingangDao;
@@ -265,7 +263,7 @@ public class DaoRegistry
     .setFullTextSearchSupport(false).setSearchable(false);
 
     register(ORDERBOOK, AuftragDao.class, auftragDao, "fibu.auftrag") // Needs customer, project
-    .setNestedDOClasses(AuftragsPositionDO.class);
+    .setNestedDOClasses(AuftragsPositionDO.class, PaymentScheduleDO.class);
     register(OUTGOING_INVOICE, RechnungDao.class, rechnungDao, "fibu.rechnung") // Needs customer, project
     .setNestedDOClasses(RechnungsPositionDO.class);
     Registry.instance().setInvoiceCache(rechnungDao.getRechnungCache());
@@ -281,8 +279,6 @@ public class DaoRegistry
     register(CONTRACT, ContractDao.class, contractDao, "legalAffaires.contract");
     register(OUTGOING_MAIL, PostausgangDao.class, postausgangDao, "orga.postausgang");
     register(INCOMING_MAIL, PosteingangDao.class, posteingangDao, "orga.posteingang");
-
-    register(PAYMENTSCHEDULE, PaymentScheduleDao.class, paymentScheduleDao, "paymentSchedule");
 
     register(GANTT, GanttChartDao.class, ganttChartDao, "gantt");
     register(HR_PLANNING, HRPlanningDao.class, hrPlanningDao, "hr.planning") //
@@ -467,10 +463,6 @@ public class DaoRegistry
   public void setProjektDao(final ProjektDao projektDao)
   {
     this.projektDao = projektDao;
-  }
-
-  public void setPaymentScheduleDao(final PaymentScheduleDao paymentScheduleDao) {
-    this.paymentScheduleDao = paymentScheduleDao;
   }
 
   public void setScriptDao(final ScriptDao scriptDao)
