@@ -21,7 +21,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.web.address.contact;
+package org.projectforge.plugins.crm;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -38,11 +38,6 @@ import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.plugins.crm.ContactDO;
-import org.projectforge.plugins.crm.ContactDao;
-import org.projectforge.plugins.crm.ContactType;
-import org.projectforge.plugins.crm.SocialMediaType;
-import org.projectforge.plugins.crm.SocialMediaValue;
 import org.projectforge.web.wicket.components.AjaxMaxLengthEditableLabel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel;

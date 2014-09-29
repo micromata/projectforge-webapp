@@ -21,12 +21,11 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.web.address.contact;
+package org.projectforge.plugins.crm;
 
 import java.io.Serializable;
 
 import org.apache.log4j.Logger;
-import org.projectforge.plugins.crm.ContactFilter;
 import org.projectforge.web.wicket.AbstractListForm;
 
 /**

@@ -21,16 +21,13 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.web.address.contact;
+package org.projectforge.plugins.crm;
 
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.plugins.crm.ContactDO;
-import org.projectforge.plugins.crm.ContactDao;
-import org.projectforge.plugins.crm.PersonalContactDao;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.bootstrap.GridSize;
 import org.projectforge.web.wicket.flowlayout.DivPanel;

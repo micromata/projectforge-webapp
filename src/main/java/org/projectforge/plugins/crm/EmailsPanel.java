@@ -21,7 +21,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.web.address.contact;
+package org.projectforge.plugins.crm;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -37,36 +37,32 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.address.PhoneType;
-import org.projectforge.plugins.crm.ContactDao;
-import org.projectforge.plugins.crm.PhoneValue;
 import org.projectforge.web.wicket.components.AjaxMaxLengthEditableLabel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 
 /**
- * @author Werner Feder (werner.feder@t-online.de)
+ * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class PhonesPanel extends Panel
+public class EmailsPanel extends Panel
 {
-
-  private static final long serialVersionUID = -5390479088481704778L;
+  private static final long serialVersionUID = -7950224503861575606L;
 
   @SpringBean(name = "contactDao")
   private ContactDao contactDao;
 
-  private List<PhoneValue> phones = null;
+  private List<EmailValue> emails = null;
 
-  private RepeatingView phonesRepeater;
+  private RepeatingView emailsRepeater;
 
-  private WebMarkupContainer mainContainer, addNewPhoneContainer;
+  private WebMarkupContainer mainContainer, addNewEMailContainer;
 
-  private LabelValueChoiceRenderer<PhoneType> phoneChoiceRenderer;
+  private LabelValueChoiceRenderer<ContactType> emailChoiceRenderer;
 
-  private PhoneValue newPhoneValue;
+  private EmailValue newEmailValue;
 
-  private final String DEFAULT_PHONE_VALUE = "Telefon";
+  private final String DEFAULT_EMAIL_VALUE = "E-Mail";
 
   private Component delete;
 
@@ -75,12 +71,12 @@ public class PhonesPanel extends Panel
   /**
    * @param id
    */
-  public PhonesPanel(final String id, final PropertyModel<String> model)
+  public EmailsPanel(final String id, final PropertyModel<String> model)
   {
     super(id);
     this.model = model;
     if (StringUtils.isNotBlank(model.getObject()) == true) {
-      phones = contactDao.readPhoneValues(model.getObject());
+      emails = contactDao.readEmailValues(model.getObject());
     }
   }
 
@@ -91,58 +87,57 @@ public class PhonesPanel extends Panel
   protected void onInitialize()
   {
     super.onInitialize();
-
-    if (phones == null) {
-      phones = new ArrayList<PhoneValue>();
+    if (emails == null) {
+      emails = new ArrayList<EmailValue>();
     }
-    newPhoneValue = new PhoneValue().setNumber(DEFAULT_PHONE_VALUE).setPhoneType(PhoneType.PRIVATE);
-    phoneChoiceRenderer = new LabelValueChoiceRenderer<PhoneType>(this, PhoneType.values());
+    newEmailValue = new EmailValue().setEmail(DEFAULT_EMAIL_VALUE).setContactType(ContactType.PRIVATE);
+    emailChoiceRenderer = new LabelValueChoiceRenderer<ContactType>(this, ContactType.values());
     mainContainer = new WebMarkupContainer("main");
     add(mainContainer.setOutputMarkupId(true));
-    phonesRepeater = new RepeatingView("liRepeater");
-    mainContainer.add(phonesRepeater);
+    emailsRepeater = new RepeatingView("liRepeater");
+    mainContainer.add(emailsRepeater);
 
-    rebuildPhones();
-    addNewPhoneContainer = new WebMarkupContainer("liAddNewPhone");
-    mainContainer.add(addNewPhoneContainer);
+    rebuildEmails();
+    addNewEMailContainer = new WebMarkupContainer("liAddNewEmail");
+    mainContainer.add(addNewEMailContainer);
 
-    init(addNewPhoneContainer);
-    phonesRepeater.setVisible(true);
+    init(addNewEMailContainer);
+    emailsRepeater.setVisible(true);
   }
 
   @SuppressWarnings("serial")
   void init(final WebMarkupContainer item)
   {
-    final DropDownChoice<PhoneType> dropdownChoice = new DropDownChoice<PhoneType>("choice", new PropertyModel<PhoneType>(
-        newPhoneValue, "phoneType"), phoneChoiceRenderer.getValues(), phoneChoiceRenderer);
+    final DropDownChoice<ContactType> dropdownChoice = new DropDownChoice<ContactType>("choice", new PropertyModel<ContactType>(
+        newEmailValue, "contactType"), emailChoiceRenderer.getValues(), emailChoiceRenderer);
     item.add(dropdownChoice);
     dropdownChoice.add(new AjaxFormComponentUpdatingBehavior("onchange") {
       @Override
       protected void onUpdate(final AjaxRequestTarget target)
       {
-        newPhoneValue.setPhoneType(dropdownChoice.getModelObject());
-        model.setObject(contactDao.getPhoneValuesAsXml(phones));
+        newEmailValue.setContactType(dropdownChoice.getModelObject());
+        model.setObject(contactDao.getEmailValuesAsXml(emails));
       }
     });
 
-    item.add(new AjaxMaxLengthEditableLabel("editableLabel", new PropertyModel<String>(newPhoneValue, "number")) {
+    item.add(new AjaxMaxLengthEditableLabel("editableLabel", new PropertyModel<String>(newEmailValue, "email")) {
       @Override
       protected void onSubmit(final AjaxRequestTarget target)
       {
         super.onSubmit(target);
-        if (StringUtils.isNotBlank(newPhoneValue.getNumber()) == true && newPhoneValue.getNumber().equals(DEFAULT_PHONE_VALUE) == false) {
-          phones.add(new PhoneValue().setNumber(newPhoneValue.getNumber()).setPhoneType(newPhoneValue.getPhoneType()));
-          model.setObject(contactDao.getPhoneValuesAsXml(phones));
+        if (StringUtils.isNotBlank(newEmailValue.getEmail()) == true && newEmailValue.getEmail().equals(DEFAULT_EMAIL_VALUE) == false) {
+          emails.add(new EmailValue().setEmail(newEmailValue.getEmail()).setContactType(newEmailValue.getContactType()));
+          model.setObject(contactDao.getEmailValuesAsXml(emails));
         }
-        newPhoneValue.setNumber(DEFAULT_PHONE_VALUE);
-        rebuildPhones();
+        newEmailValue.setEmail(DEFAULT_EMAIL_VALUE);
+        rebuildEmails();
         target.add(mainContainer);
       }
     });
 
     final WebMarkupContainer deleteDiv = new WebMarkupContainer("deleteDiv");
     deleteDiv.setOutputMarkupId(true);
-    deleteDiv.add(delete = new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(newPhoneValue, "number")) {
+    deleteDiv.add(delete = new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(newEmailValue, "email")) {
       /**
        * @see org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel#onClick(org.apache.wicket.ajax.AjaxRequestTarget)
        */
@@ -150,14 +145,14 @@ public class PhonesPanel extends Panel
       protected void onClick(final AjaxRequestTarget target)
       {
         super.onClick(target);
-        final Iterator<PhoneValue> it = phones.iterator();
+        final Iterator<EmailValue> it = emails.iterator();
         while (it.hasNext() == true) {
-          if (it.next() == newPhoneValue) {
+          if (it.next() == newEmailValue) {
             it.remove();
           }
         }
-        rebuildPhones();
-        model.setObject(contactDao.getPhoneValuesAsXml(phones));
+        rebuildEmails();
+        model.setObject(contactDao.getEmailValuesAsXml(emails));
         target.add(mainContainer);
       }
     });
@@ -166,39 +161,39 @@ public class PhonesPanel extends Panel
   }
 
   @SuppressWarnings("serial")
-  private void rebuildPhones()
+  private void rebuildEmails()
   {
-    phonesRepeater.removeAll();
-    for (final PhoneValue phone : phones) {
+    emailsRepeater.removeAll();
+    for (final EmailValue email : emails) {
 
-      final WebMarkupContainer item = new WebMarkupContainer(phonesRepeater.newChildId());
-      phonesRepeater.add(item);
-      final DropDownChoice<PhoneType> dropdownChoice = new DropDownChoice<PhoneType>("choice", new PropertyModel<PhoneType>(phone,
-          "phoneType"), phoneChoiceRenderer.getValues(), phoneChoiceRenderer);
+      final WebMarkupContainer item = new WebMarkupContainer(emailsRepeater.newChildId());
+      emailsRepeater.add(item);
+      final DropDownChoice<ContactType> dropdownChoice = new DropDownChoice<ContactType>("choice", new PropertyModel<ContactType>(email,
+          "contactType"), emailChoiceRenderer.getValues(), emailChoiceRenderer);
       item.add(dropdownChoice);
       dropdownChoice.add(new AjaxFormComponentUpdatingBehavior("onchange") {
         @Override
         protected void onUpdate(final AjaxRequestTarget target)
         {
-          phone.setPhoneType(dropdownChoice.getModelObject());
-          model.setObject(contactDao.getPhoneValuesAsXml(phones));
+          email.setContactType(dropdownChoice.getModelObject());
+          model.setObject(contactDao.getEmailValuesAsXml(emails));
         }
       });
 
-      item.add(new AjaxMaxLengthEditableLabel("editableLabel", new PropertyModel<String>(phone, "number")){
+      item.add(new AjaxMaxLengthEditableLabel("editableLabel", new PropertyModel<String>(email, "email")){
         @Override
         protected void onSubmit(final AjaxRequestTarget target)
         {
           super.onSubmit(target);
-          model.setObject(contactDao.getPhoneValuesAsXml(phones));
-          rebuildPhones();
+          model.setObject(contactDao.getEmailValuesAsXml(emails));
+          rebuildEmails();
           target.add(mainContainer);
         }
       });
 
       final WebMarkupContainer deleteDiv = new WebMarkupContainer("deleteDiv");
       deleteDiv.setOutputMarkupId(true);
-      deleteDiv.add(new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(phone, "number")) {
+      deleteDiv.add(new AjaxIconLinkPanel("delete", IconType.REMOVE, new PropertyModel<String>(email, "email")) {
         /**
          * @see org.projectforge.web.wicket.flowlayout.AjaxIconLinkPanel#onClick(org.apache.wicket.ajax.AjaxRequestTarget)
          */
@@ -206,14 +201,14 @@ public class PhonesPanel extends Panel
         protected void onClick(final AjaxRequestTarget target)
         {
           super.onClick(target);
-          final Iterator<PhoneValue> it = phones.iterator();
+          final Iterator<EmailValue> it = emails.iterator();
           while (it.hasNext() == true) {
-            if (it.next() == phone) {
+            if (it.next() == email) {
               it.remove();
             }
           }
-          rebuildPhones();
-          model.setObject(contactDao.getPhoneValuesAsXml(phones));
+          rebuildEmails();
+          model.setObject(contactDao.getEmailValuesAsXml(emails));
           target.add(mainContainer);
         }
       });

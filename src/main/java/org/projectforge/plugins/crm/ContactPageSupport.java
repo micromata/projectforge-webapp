@@ -21,7 +21,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.web.address.contact;
+package org.projectforge.plugins.crm;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -39,10 +39,6 @@ import org.apache.wicket.model.ResourceModel;
 import org.projectforge.address.AddressStatus;
 import org.projectforge.address.ContactStatus;
 import org.projectforge.address.FormOfAddress;
-import org.projectforge.plugins.crm.ContactDO;
-import org.projectforge.plugins.crm.ContactDao;
-import org.projectforge.plugins.crm.PersonalContactDO;
-import org.projectforge.plugins.crm.PersonalContactDao;
 import org.projectforge.web.common.PhoneNumberValidator;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteMaxLengthTextField;
