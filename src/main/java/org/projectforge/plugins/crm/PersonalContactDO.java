@@ -21,7 +21,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.address.contact;
+package org.projectforge.plugins.crm;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

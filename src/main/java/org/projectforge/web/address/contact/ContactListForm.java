@@ -26,7 +26,7 @@ package org.projectforge.web.address.contact;
 import java.io.Serializable;
 
 import org.apache.log4j.Logger;
-import org.projectforge.address.contact.ContactFilter;
+import org.projectforge.plugins.crm.ContactFilter;
 import org.projectforge.web.wicket.AbstractListForm;
 
 /**

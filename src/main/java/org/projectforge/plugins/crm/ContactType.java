@@ -21,7 +21,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.address.contact;
+package org.projectforge.plugins.crm;
 
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.core.I18nEnum;

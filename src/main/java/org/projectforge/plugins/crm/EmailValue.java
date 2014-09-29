@@ -21,25 +21,50 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.address.contact;
+package org.projectforge.plugins.crm;
 
-import org.projectforge.core.BaseSearchFilter;
+import java.io.Serializable;
+
+import org.projectforge.core.PropertyInfo;
+import org.projectforge.xml.stream.XmlField;
+import org.projectforge.xml.stream.XmlObject;
 
 /**
  * @author Werner Feder (werner.feder@t-online.de)
- * 
  */
-public class ContactFilter extends BaseSearchFilter
+@XmlObject(alias = "value")
+public class EmailValue implements Serializable
 {
+  private static final long serialVersionUID = 3930937731653442004L;
 
-  private static final long serialVersionUID = -2555263898845331080L;
+  @XmlField
+  @PropertyInfo(i18nKey = "contactType")
+  private ContactType contactType;
 
-  public ContactFilter()
+  @XmlField
+  @PropertyInfo(i18nKey = "email")
+  private String email;
+
+  public ContactType getContactType()
   {
+    return contactType;
   }
 
-  public ContactFilter(final BaseSearchFilter filter)
+  public EmailValue setContactType(final ContactType contactType)
   {
-    super(filter);
+    this.contactType = contactType;
+    return this;
   }
+
+  public String getEmail()
+  {
+    return email;
+  }
+
+  public EmailValue setEmail(final String email)
+  {
+    this.email = email;
+    return this;
+  }
+
 }

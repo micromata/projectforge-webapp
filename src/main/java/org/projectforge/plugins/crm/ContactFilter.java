@@ -21,51 +21,25 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.address.contact;
+package org.projectforge.plugins.crm;
 
-import java.io.Serializable;
-
-import org.projectforge.address.PhoneType;
-import org.projectforge.core.PropertyInfo;
-import org.projectforge.xml.stream.XmlField;
-import org.projectforge.xml.stream.XmlObject;
+import org.projectforge.core.BaseSearchFilter;
 
 /**
  * @author Werner Feder (werner.feder@t-online.de)
+ * 
  */
-@XmlObject(alias = "value")
-public class PhoneValue implements Serializable
+public class ContactFilter extends BaseSearchFilter
 {
-  private static final long serialVersionUID = 8470994791533327287L;
 
-  @XmlField
-  @PropertyInfo(i18nKey = "phoneType")
-  private PhoneType phoneType;
+  private static final long serialVersionUID = -2555263898845331080L;
 
-  @XmlField
-  @PropertyInfo(i18nKey = "number")
-  private String number;
-
-  public PhoneType getPhoneType()
+  public ContactFilter()
   {
-    return phoneType;
   }
 
-  public PhoneValue setPhoneType(final PhoneType phoneType)
+  public ContactFilter(final BaseSearchFilter filter)
   {
-    this.phoneType = phoneType;
-    return this;
+    super(filter);
   }
-
-  public String getNumber()
-  {
-    return number;
-  }
-
-  public PhoneValue setNumber(final String number)
-  {
-    this.number = number;
-    return this;
-  }
-
 }

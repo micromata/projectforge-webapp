@@ -21,10 +21,11 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.address.contact;
+package org.projectforge.plugins.crm;
 
 import java.io.Serializable;
 
+import org.projectforge.address.PhoneType;
 import org.projectforge.core.PropertyInfo;
 import org.projectforge.xml.stream.XmlField;
 import org.projectforge.xml.stream.XmlObject;
@@ -33,37 +34,37 @@ import org.projectforge.xml.stream.XmlObject;
  * @author Werner Feder (werner.feder@t-online.de)
  */
 @XmlObject(alias = "value")
-public class EmailValue implements Serializable
+public class PhoneValue implements Serializable
 {
-  private static final long serialVersionUID = 3930937731653442004L;
+  private static final long serialVersionUID = 8470994791533327287L;
 
   @XmlField
-  @PropertyInfo(i18nKey = "contactType")
-  private ContactType contactType;
+  @PropertyInfo(i18nKey = "phoneType")
+  private PhoneType phoneType;
 
   @XmlField
-  @PropertyInfo(i18nKey = "email")
-  private String email;
+  @PropertyInfo(i18nKey = "number")
+  private String number;
 
-  public ContactType getContactType()
+  public PhoneType getPhoneType()
   {
-    return contactType;
+    return phoneType;
   }
 
-  public EmailValue setContactType(final ContactType contactType)
+  public PhoneValue setPhoneType(final PhoneType phoneType)
   {
-    this.contactType = contactType;
+    this.phoneType = phoneType;
     return this;
   }
 
-  public String getEmail()
+  public String getNumber()
   {
-    return email;
+    return number;
   }
 
-  public EmailValue setEmail(final String email)
+  public PhoneValue setNumber(final String number)
   {
-    this.email = email;
+    this.number = number;
     return this;
   }
 

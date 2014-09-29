@@ -27,8 +27,6 @@ import javax.sql.DataSource;
 
 import org.projectforge.access.AccessDao;
 import org.projectforge.address.AddressDao;
-import org.projectforge.address.contact.ContactDao;
-import org.projectforge.address.contact.ContactEntryDao;
 import org.projectforge.book.BookDao;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.ConfigurationDao;
@@ -58,6 +56,8 @@ import org.projectforge.meb.MebDao;
 import org.projectforge.orga.ContractDao;
 import org.projectforge.orga.PostausgangDao;
 import org.projectforge.orga.PosteingangDao;
+import org.projectforge.plugins.crm.ContactDao;
+import org.projectforge.plugins.crm.ContactEntryDao;
 import org.projectforge.scripting.ScriptDao;
 import org.projectforge.task.TaskDao;
 import org.projectforge.timesheet.TimesheetDao;
