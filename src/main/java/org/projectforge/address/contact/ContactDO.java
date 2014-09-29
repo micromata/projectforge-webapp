@@ -115,7 +115,7 @@ public class ContactDO extends DefaultBaseDO
   @PropertyInfo(i18nKey = "contact.contacts")
   @PFPersistancyBehavior(autoUpdateCollectionEntries = true)
   @IndexedEmbedded(depth = 1)
-  private Set<ContactEntryDO> contacts = null;
+  private Set<ContactEntryDO> contactEntries = null;
 
   private ContactStatus contactStatus = ContactStatus.ACTIVE;
 
@@ -257,9 +257,9 @@ public class ContactDO extends DefaultBaseDO
    */
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "contact")
   @IndexColumn(name = "number", base = 1)
-  public Set<ContactEntryDO> getContacts()
+  public Set<ContactEntryDO> getContactEntries()
   {
-    return this.contacts;
+    return this.contactEntries;
   }
 
   /**
@@ -267,12 +267,12 @@ public class ContactDO extends DefaultBaseDO
    * @return ContactEntryDO with given position number or null (iterates through the list of contacts and compares the number), if not
    *         exist.
    */
-  public ContactEntryDO getContact(final short number)
+  public ContactEntryDO getContactEntry(final short number)
   {
-    if (contacts == null) {
+    if (contactEntries == null) {
       return null;
     }
-    for (final ContactEntryDO contact : this.contacts) {
+    for (final ContactEntryDO contact : this.contactEntries) {
       if (contact.getNumber() == number) {
         return contact;
       }
@@ -280,17 +280,17 @@ public class ContactDO extends DefaultBaseDO
     return null;
   }
 
-  public ContactDO setContacts(final Set<ContactEntryDO> contacts)
+  public ContactDO setContactEntries(final Set<ContactEntryDO> contactEntries)
   {
-    this.contacts = contacts;
+    this.contactEntries = contactEntries;
     return this;
   }
 
-  public ContactDO addContact(final ContactEntryDO contactEntry)
+  public ContactDO addContactEntry(final ContactEntryDO contactEntry)
   {
-    ensureAndGetContacts();
+    ensureAndGetContactEntries();
     short number = 1;
-    for (final ContactEntryDO pos : contacts) {
+    for (final ContactEntryDO pos : contactEntries) {
       if (pos.getNumber() >= number) {
         number = pos.getNumber();
         number++;
@@ -298,16 +298,16 @@ public class ContactDO extends DefaultBaseDO
     }
     contactEntry.setNumber(number);
     contactEntry.setContact(this);
-    this.contacts.add(contactEntry);
+    this.contactEntries.add(contactEntry);
     return this;
   }
 
-  public Set<ContactEntryDO> ensureAndGetContacts()
+  public Set<ContactEntryDO> ensureAndGetContactEntries()
   {
-    if (this.contacts == null) {
-      setContacts(new LinkedHashSet<ContactEntryDO>());
+    if (this.contactEntries == null) {
+      setContactEntries(new LinkedHashSet<ContactEntryDO>());
     }
-    return getContacts();
+    return getContactEntries();
   }
 
   @Column

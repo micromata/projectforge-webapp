@@ -206,7 +206,7 @@ public class ContactEntryPanel extends Panel
       protected void onSubmit(final AjaxRequestTarget target)
       {
         super.onSubmit(target);
-        model.getObject().addContact(new ContactEntryDO().setStreet(newEntryValue.getStreet()).setCity(newEntryValue.getCity()) //
+        model.getObject().addContactEntry(new ContactEntryDO().setStreet(newEntryValue.getStreet()).setCity(newEntryValue.getCity()) //
             .setZipCode(newEntryValue.getZipCode()).setCountry(newEntryValue.getCountry()) //
             .setState(newEntryValue.getState()).setContactType(newEntryValue.getContactType()));
         rebuildEntrys();
@@ -231,7 +231,7 @@ public class ContactEntryPanel extends Panel
       protected void onClick(final AjaxRequestTarget target)
       {
         super.onClick(target);
-        final Iterator<ContactEntryDO> it = model.getObject().getContacts().iterator();
+        final Iterator<ContactEntryDO> it = model.getObject().getContactEntries().iterator();
         while (it.hasNext() == true) {
           if (it.next() == newEntryValue) {
             it.remove();
@@ -250,7 +250,7 @@ public class ContactEntryPanel extends Panel
   private void rebuildEntrys()
   {
 
-    final Set<ContactEntryDO> entries = model.getObject().getContacts();
+    final Set<ContactEntryDO> entries = model.getObject().getContactEntries();
     if ( entries != null) {
       entrysRepeater.removeAll();
 
@@ -327,7 +327,7 @@ public class ContactEntryPanel extends Panel
           protected void onClick(final AjaxRequestTarget target)
           {
             super.onClick(target);
-            final Iterator<ContactEntryDO> it = model.getObject().getContacts().iterator();
+            final Iterator<ContactEntryDO> it = model.getObject().getContactEntries().iterator();
             while (it.hasNext() == true) {
               if (it.next() == entry) {
                 it.remove();
