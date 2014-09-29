@@ -56,8 +56,6 @@ import org.projectforge.meb.MebDao;
 import org.projectforge.orga.ContractDao;
 import org.projectforge.orga.PostausgangDao;
 import org.projectforge.orga.PosteingangDao;
-import org.projectforge.plugins.crm.ContactDao;
-import org.projectforge.plugins.crm.ContactEntryDao;
 import org.projectforge.scripting.ScriptDao;
 import org.projectforge.task.TaskDao;
 import org.projectforge.timesheet.TimesheetDao;
@@ -101,10 +99,6 @@ public class DaoRegistry
   public static final String BOOK = "book";
 
   public static final String CONFIGURATION = "configuration";
-
-  public static final String CONTACT = "contact";
-
-  public static final String CONTACTENTRY = "contactEntry";
 
   public static final String CONTRACT = "contract";
 
@@ -169,10 +163,6 @@ public class DaoRegistry
   private BookDao bookDao;
 
   private ConfigurationDao configurationDao;
-
-  private ContactDao contactDao;
-
-  private ContactEntryDao contactEntryDao;
 
   private ContractDao contractDao;
 
@@ -247,8 +237,6 @@ public class DaoRegistry
     register(ACCESS, AccessDao.class, accessDao, "access");
 
     register(ADDRESS, AddressDao.class, addressDao, "address");
-    register(CONTACT, ContactDao.class, contactDao, "contact");
-    register(CONTACTENTRY, ContactEntryDao.class, contactEntryDao, "contactEntry");
     register(TIMESHEET, TimesheetDao.class, timesheetDao, "timesheet") //
     .setSearchFilterClass(TimesheetFilter.class);
     register(BOOK, BookDao.class, bookDao, "book");
@@ -333,16 +321,6 @@ public class DaoRegistry
   public void setAddressDao(final AddressDao addressDao)
   {
     this.addressDao = addressDao;
-  }
-
-  public void setContactDao(final ContactDao contactDao)
-  {
-    this.contactDao = contactDao;
-  }
-
-  public void setContactEntryDao(final ContactEntryDao contactEntryDao)
-  {
-    this.contactEntryDao = contactEntryDao;
   }
 
   public void setAuftragDao(final AuftragDao auftragDao)

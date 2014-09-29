@@ -31,8 +31,6 @@ import java.util.Map;
 import org.apache.commons.lang.Validate;
 import org.apache.wicket.markup.html.WebPage;
 import org.projectforge.core.BaseDao;
-import org.projectforge.plugins.crm.ContactEditPage;
-import org.projectforge.plugins.crm.ContactListPage;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.registry.Registry;
 import org.projectforge.web.LoginPage;
@@ -291,9 +289,6 @@ public class WebRegistry
     register(DaoRegistry.ADDRESS, AddressListPage.class);
     addMountPages(DaoRegistry.ADDRESS, AddressListPage.class, AddressEditPage.class);
     addMountPage(DaoRegistry.ADDRESS + "View", AddressViewPage.class);
-
-    register(DaoRegistry.CONTACT, ContactListPage.class);
-    addMountPages(DaoRegistry.CONTACT, ContactListPage.class, ContactEditPage.class);
 
     register(DaoRegistry.BOOK, BookListPage.class);
     addMountPages(DaoRegistry.BOOK, BookListPage.class, BookEditPage.class);

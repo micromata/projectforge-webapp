@@ -51,7 +51,6 @@ import org.projectforge.humanresources.HRPlanningDao;
 import org.projectforge.orga.ContractDao;
 import org.projectforge.orga.PostausgangDao;
 import org.projectforge.orga.PosteingangDao;
-import org.projectforge.plugins.crm.ContactListPage;
 import org.projectforge.user.Login;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
@@ -264,7 +263,6 @@ public class MenuItemRegistry
       }
     };
     reg.register(meb);
-    reg.register(common, MenuItemDefId.CONTACT_LIST, 90, ContactListPage.class);
     reg.register(common, MenuItemDefId.SEARCH, 100, SearchPage.class);
 
     // PROJECT_MANAGEMENT
