@@ -158,14 +158,18 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
   public TeamEventDO clearFields()
   {
     subject = location = note = null;
-    attendees = null;
+    if (attendees != null) {
+      attendees.clear();
+    }
     organizer = null;
     reminderDuration = null;
     reminderDurationType = null;
     reminderActionType = null;
     lastEmail = null;
     sequence = null;
-    attachments = null;
+    if (attachments != null) {
+      attachments.clear();
+    }
     // status = null;
     return this;
   }
@@ -340,7 +344,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
   /**
    * @return the attendees
    */
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   @JoinColumn(name = "team_event_fk")
   public Set<TeamEventAttendeeDO> getAttendees()
   {
@@ -752,7 +756,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
   /**
    * @return the attachments
    */
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   @JoinColumn(name = "team_event_fk2")
   public Set<TeamEventAttachmentDO> getAttachments()
   {
@@ -847,65 +851,89 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
     if (allDay != other.allDay)
       return false;
     if (attendees == null) {
-      if (other.attendees != null)
+      if (other.attendees != null) {
         return false;
-    } else if (!attendees.equals(other.attendees))
+      }
+    } else if (attendees.equals(other.attendees) == false) {
       return false;
+    }
     if (calendar == null) {
-      if (other.calendar != null)
+      if (other.calendar != null) {
         return false;
-    } else if (!calendar.equals(other.calendar))
+      }
+    } else if (calendar.equals(other.calendar) == false) {
       return false;
+    }
     if (endDate == null) {
-      if (other.endDate != null)
+      if (other.endDate != null) {
         return false;
-    } else if (!endDate.equals(other.endDate))
+      }
+    } else if (endDate.equals(other.endDate) == false) {
       return false;
+    }
     if (externalUid == null) {
-      if (other.externalUid != null)
+      if (other.externalUid != null) {
         return false;
-    } else if (!externalUid.equals(other.externalUid))
+      }
+    } else if (externalUid.equals(other.externalUid) == false) {
       return false;
+    }
     if (location == null) {
-      if (other.location != null)
+      if (other.location != null) {
         return false;
-    } else if (!location.equals(other.location))
+      }
+    } else if (location.equals(other.location) == false) {
       return false;
+    }
     if (note == null) {
-      if (other.note != null)
+      if (other.note != null) {
         return false;
-    } else if (!note.equals(other.note))
+      }
+    } else if (note.equals(other.note) == false) {
       return false;
+    }
     if (recurrenceExDate == null) {
-      if (other.recurrenceExDate != null)
+      if (other.recurrenceExDate != null) {
         return false;
-    } else if (!recurrenceExDate.equals(other.recurrenceExDate))
+      }
+    } else if (recurrenceExDate.equals(other.recurrenceExDate) == false) {
       return false;
+    }
     if (recurrenceRule == null) {
-      if (other.recurrenceRule != null)
+      if (other.recurrenceRule != null) {
         return false;
-    } else if (!recurrenceRule.equals(other.recurrenceRule))
+      }
+    } else if (recurrenceRule.equals(other.recurrenceRule) == false) {
       return false;
+    }
     if (recurrenceUntil == null) {
-      if (other.recurrenceUntil != null)
+      if (other.recurrenceUntil != null) {
         return false;
-    } else if (!recurrenceUntil.equals(other.recurrenceUntil))
+      }
+    } else if (recurrenceUntil.equals(other.recurrenceUntil) == false) {
       return false;
+    }
     if (startDate == null) {
-      if (other.startDate != null)
+      if (other.startDate != null) {
         return false;
-    } else if (!startDate.equals(other.startDate))
+      }
+    } else if (startDate.equals(other.startDate) == false) {
       return false;
+    }
     if (subject == null) {
-      if (other.subject != null)
+      if (other.subject != null) {
         return false;
-    } else if (!subject.equals(other.subject))
+      }
+    } else if (subject.equals(other.subject) == false) {
       return false;
+    }
     if (attachments == null) {
-      if (other.attachments != null)
+      if (other.attachments != null) {
         return false;
-    } else if (!attachments.equals(other.attachments))
+      }
+    } else if (attachments.equals(other.attachments) == false) {
       return false;
+    }
     return true;
   }
 

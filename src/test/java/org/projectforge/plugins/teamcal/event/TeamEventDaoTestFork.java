@@ -30,6 +30,7 @@ import java.util.TreeSet;
 
 import junit.framework.Assert;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectforge.access.AccessException;
@@ -137,10 +138,11 @@ public class TeamEventDaoTestFork extends PluginTestBase
     for (final PFUserDO user : users) {
       logon(user);
       final TeamEventDO event = teamEventDao.getById(eventId);
-      Assert.assertNull("Field should be null for minimal users.", event.getAttendees());
-      Assert.assertNull("Field should be null for minimal users.", event.getSubject());
-      Assert.assertNull("Field should be null for minimal users.", event.getLocation());
-      Assert.assertNull("Field should be null for minimal users.", event.getNote());
+      Assert.assertTrue("Field 'attendees' should be null for minimal users.", CollectionUtils.isEmpty(event.getAttendees()));
+      Assert.assertTrue("Field 'attachments' should be null for minimal users.", CollectionUtils.isEmpty(event.getAttachments()));
+      Assert.assertNull("Field 'subject' should be null for minimal users.", event.getSubject());
+      Assert.assertNull("Field 'localtion' should be null for minimal users.", event.getLocation());
+      Assert.assertNull("Field 'note' should be null for minimal users.", event.getNote());
     }
   }
 
