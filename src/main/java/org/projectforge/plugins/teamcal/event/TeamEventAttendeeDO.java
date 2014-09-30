@@ -243,15 +243,12 @@ public class TeamEventAttendeeDO extends DefaultBaseDO implements Comparable<Tea
   public int hashCode()
   {
     final HashCodeBuilder hcb = new HashCodeBuilder();
+    hcb.append(this.getId());
     if (this.getId() != null) {
-      hcb.append(this.getId());
       return hcb.toHashCode();
     }
-    if (this.user != null) {
-      hcb.append(this.user.getId());
-    } else {
-      hcb.append(this.url);
-    }
+    hcb.append(this.getUserId());
+    hcb.append(this.url);
     return hcb.toHashCode();
   }
 
@@ -261,18 +258,20 @@ public class TeamEventAttendeeDO extends DefaultBaseDO implements Comparable<Tea
   @Override
   public boolean equals(final Object o)
   {
-    if (o instanceof TeamEventAttendeeDO) {
-      if (this.getId() != null && ObjectUtils.equals(this.getId(), ((TeamEventAttendeeDO) o).getId()) == true) {
-        return true;
-      }
-      final TeamEventAttendeeDO other = (TeamEventAttendeeDO) o;
-      if (ObjectUtils.equals(this.getUserId(), other.getUserId()) == false)
-        return false;
-      if (StringUtils.equals(this.getUrl(), other.getUrl()) == false)
-        return false;
+    if (o instanceof TeamEventAttendeeDO == false) {
+      return false;
+    }
+    final TeamEventAttendeeDO other = (TeamEventAttendeeDO) o;
+    if (this.getId() != null && ObjectUtils.equals(this.getId(), other.getId()) == true) {
       return true;
     }
-    return false;
+    if (ObjectUtils.equals(this.getUserId(), other.getUserId()) == false) {
+      return false;
+    }
+    if (StringUtils.equals(this.getUrl(), other.getUrl()) == false) {
+      return false;
+    }
+    return true;
   }
 
   /**

@@ -93,16 +93,12 @@ public class TeamEventAttachmentDO extends DefaultBaseDO implements Comparable<T
   public int hashCode()
   {
     final HashCodeBuilder hcb = new HashCodeBuilder();
+    hcb.append(getId());
     if (getId() != null) {
-      hcb.append(getId());
       return hcb.toHashCode();
     }
-    if (this.filename != null) {
-      hcb.append(this.filename);
-    }
-    if (this.content != null) {
-      hcb.append(this.content);
-    }
+    hcb.append(this.filename);
+    hcb.append(this.content);
     return hcb.toHashCode();
   }
 
@@ -112,18 +108,20 @@ public class TeamEventAttachmentDO extends DefaultBaseDO implements Comparable<T
   @Override
   public boolean equals(final Object o)
   {
-    if (o instanceof TeamEventAttachmentDO) {
-      if (getId() != null && ObjectUtils.equals(this.getId(), ((TeamEventAttachmentDO) o).getId()) == true) {
-        return true;
-      }
-      final TeamEventAttachmentDO other = (TeamEventAttachmentDO) o;
-      if (StringUtils.equals(this.getFilename(), other.getFilename()) == false)
-        return false;
-      if (ObjectUtils.equals(this.getContent(), other.getContent()) == false)
-        return false;
+    if (o instanceof TeamEventAttachmentDO == false) {
+      return false;
+    }
+    final TeamEventAttachmentDO other = (TeamEventAttachmentDO) o;
+    if (getId() != null && ObjectUtils.equals(this.getId(), other.getId()) == true) {
       return true;
     }
-    return false;
+    if (StringUtils.equals(this.getFilename(), other.getFilename()) == false) {
+      return false;
+    }
+    if (ObjectUtils.equals(this.getContent(), other.getContent()) == false) {
+      return false;
+    }
+    return true;
   }
 
   /**
