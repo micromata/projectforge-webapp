@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.SetUtils;
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.common.BeanHelper;
 import org.projectforge.common.ListHelper;
@@ -210,6 +211,15 @@ public class GroupDOConverter
       ListHelper.addAll(properties, "gidNumber");
     }
     modified = BeanHelper.copyProperties(src, dest, true, properties.toArray(new String[0]));
+    // Checks if the sets aren't equal:
+    if (SetUtils.isEqualSet(src.getMembers(), dest.getMembers()) == false) {
+      if (LdapGroupDao.hasMembers(src) == true || LdapGroupDao.hasMembers(dest) == true) {
+        // If both, src and dest have no members, then do nothing, otherwise:
+        modified = true;
+        dest.clearMembers();
+        dest.addAllMembers(src.getMembers());
+      }
+    }
     return modified;
   }
 }
