@@ -161,8 +161,9 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
               return null;
             }
             final int ind = value.indexOf(" - ");
-            final String id = ind >= 0 ? value.substring(0, ind) : value;
-            final KundeDO kunde = kundeDao.getById(Integer.decode(id));
+            final String idString = ind >= 0 ? value.substring(0, ind) : value;
+            final Integer id = NumberHelper.parseInteger(idString);
+            final KundeDO kunde = id != null ? kundeDao.getById(id) : null;
             if (kunde == null) {
               error(getString("panel.error.customernameNotFound"));
             }
