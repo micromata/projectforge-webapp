@@ -33,8 +33,8 @@ import org.hibernate.Criteria;
 import org.hibernate.FetchMode;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.projectforge.common.DateHelper;
 
 
@@ -45,7 +45,7 @@ import org.projectforge.common.DateHelper;
  */
 public class QueryFilter
 {
-  private List<Object> filterSettings = new ArrayList<Object>();
+  private final List<Object> filterSettings = new ArrayList<Object>();
 
   private int maxResults = -1;
 
@@ -69,12 +69,12 @@ public class QueryFilter
     this.filter = new BaseSearchFilter();
   }
 
-  public QueryFilter(BaseSearchFilter filter)
+  public QueryFilter(final BaseSearchFilter filter)
   {
     this.filter = filter;
   }
 
-  private QueryFilter(String name)
+  private QueryFilter(final String name)
   {
     this.name = name;
   }
@@ -106,7 +106,7 @@ public class QueryFilter
     return locale;
   }
 
-  public void setLocale(Locale locale)
+  public void setLocale(final Locale locale)
   {
     this.locale = locale;
   }
@@ -120,7 +120,7 @@ public class QueryFilter
     return filter.getErrorMessage();
   }
 
-  public void setErrorMessage(String errorMessage)
+  public void setErrorMessage(final String errorMessage)
   {
     filter.setErrorMessage(errorMessage);
   }
@@ -140,7 +140,7 @@ public class QueryFilter
    * @param criterion
    * @return
    */
-  public QueryFilter add(Criterion criterion)
+  public QueryFilter add(final Criterion criterion)
   {
     filterSettings.add(criterion);
     return this;
@@ -151,13 +151,13 @@ public class QueryFilter
    * @param order
    * @return
    */
-  public QueryFilter addOrder(Order order)
+  public QueryFilter addOrder(final Order order)
   {
     filterSettings.add(order);
     return this;
   }
 
-  public void setFetchMode(String associationPath, FetchMode mode)
+  public void setFetchMode(final String associationPath, final FetchMode mode)
   {
     this.associationPath = associationPath;
     this.fetchMode = mode;
@@ -172,7 +172,7 @@ public class QueryFilter
   public void setYearAndMonth(final String dateField, final int year, final int month)
   {
     if (year > 0) {
-      Calendar cal = DateHelper.getUTCCalendar();
+      final Calendar cal = DateHelper.getUTCCalendar();
       cal.set(Calendar.YEAR, year);
       java.sql.Date lo = null;
       java.sql.Date hi = null;
@@ -180,39 +180,39 @@ public class QueryFilter
         cal.set(Calendar.MONTH, month);
         cal.set(Calendar.DAY_OF_MONTH, 1);
         lo = new java.sql.Date(cal.getTimeInMillis());
-        int lastDayOfMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+        final int lastDayOfMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
         cal.set(Calendar.DAY_OF_MONTH, lastDayOfMonth);
         hi = new java.sql.Date(cal.getTimeInMillis());
       } else {
         cal.set(Calendar.DAY_OF_YEAR, 1);
         lo = new java.sql.Date(cal.getTimeInMillis());
-        int lastDayOfYear = cal.getActualMaximum(Calendar.DAY_OF_YEAR);
+        final int lastDayOfYear = cal.getActualMaximum(Calendar.DAY_OF_YEAR);
         cal.set(Calendar.DAY_OF_YEAR, lastDayOfYear);
         hi = new java.sql.Date(cal.getTimeInMillis());
       }
-      add(Expression.between(dateField, lo, hi));
+      add(Restrictions.between(dateField, lo, hi));
     }
   }
 
-  public Criteria buildCriteria(Session session, Class< ? > clazz)
+  public Criteria buildCriteria(final Session session, final Class< ? > clazz)
   {
-    Criteria criteria = session.createCriteria(clazz);
+    final Criteria criteria = session.createCriteria(clazz);
     buildCriteria(criteria);
     return criteria;
   }
 
-  private void buildCriteria(Criteria criteria)
+  private void buildCriteria(final Criteria criteria)
   {
-    for (Object obj : filterSettings) {
+    for (final Object obj : filterSettings) {
       if (obj instanceof Criterion) {
         criteria.add((Criterion) obj);
       } else if (obj instanceof Order) {
         criteria.addOrder((Order) obj);
       } else if (obj instanceof Alias) {
-        Alias alias = (Alias) obj;
-        criteria.createAlias(alias.arg0, alias.arg1);
+        final Alias alias = (Alias) obj;
+        criteria.createAlias(alias.arg0, alias.arg1, alias.joinType);
       } else if (obj instanceof QueryFilter) {
-        QueryFilter filter = (QueryFilter) obj;
+        final QueryFilter filter = (QueryFilter) obj;
         Criteria subCriteria;
         if (StringUtils.isEmpty(filter.getAlias()) == true) {
           subCriteria = criteria.createCriteria(filter.getName());
@@ -233,22 +233,31 @@ public class QueryFilter
   /**
    * @see org.hibernate.Criteria#createAlias(String, String)
    */
-  public QueryFilter createAlias(String arg0, String arg1)
+  public QueryFilter createAlias(final String arg0, final String arg1)
   {
     filterSettings.add(new Alias(arg0, arg1));
     return this;
   }
 
-  public QueryFilter createCriteria(String name)
+  /**
+   * @see org.hibernate.Criteria#createAlias(String, String, int)
+   */
+  public QueryFilter createAlias(final String arg0, final String arg1, final int joinType)
   {
-    QueryFilter filter = new QueryFilter(name);
+    filterSettings.add(new Alias(arg0, arg1, joinType));
+    return this;
+  }
+
+  public QueryFilter createCriteria(final String name)
+  {
+    final QueryFilter filter = new QueryFilter(name);
     filterSettings.add(filter);
     return filter;
   }
 
-  public QueryFilter createCriteria(String name, String alias)
+  public QueryFilter createCriteria(final String name, final String alias)
   {
-    QueryFilter filter = new QueryFilter(name);
+    final QueryFilter filter = new QueryFilter(name);
     filter.alias = alias;
     filterSettings.add(filter);
     return filter;
@@ -259,7 +268,7 @@ public class QueryFilter
    * @param value
    * @return
    */
-  public QueryFilter setMaxResults(int value)
+  public QueryFilter setMaxResults(final int value)
   {
     this.maxResults = value;
     return this;
@@ -276,10 +285,19 @@ public class QueryFilter
 
     String arg1;
 
-    Alias(String arg0, String arg1)
+    int joinType = Criteria.INNER_JOIN;
+
+    Alias(final String arg0, final String arg1)
     {
       this.arg0 = arg0;
       this.arg1 = arg1;
+    }
+
+    Alias(final String arg0, final String arg1, final int joinType)
+    {
+      this.arg0 = arg0;
+      this.arg1 = arg1;
+      this.joinType = joinType;
     }
   };
 }
