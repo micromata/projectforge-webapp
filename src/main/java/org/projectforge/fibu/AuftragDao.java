@@ -342,19 +342,6 @@ public class AuftragDao extends BaseDao<AuftragDO>
       myFilter = new AuftragFilter(filter);
     }
     final QueryFilter queryFilter = new QueryFilter(myFilter);
-    if (myFilter.getYear() > 1900) {
-      final Calendar cal = DateHelper.getUTCCalendar();
-      cal.set(Calendar.YEAR, myFilter.getYear());
-      java.sql.Date lo = null;
-      java.sql.Date hi = null;
-      cal.set(Calendar.DAY_OF_YEAR, 1);
-      lo = new java.sql.Date(cal.getTimeInMillis());
-      final int lastDayOfYear = cal.getActualMaximum(Calendar.DAY_OF_YEAR);
-      cal.set(Calendar.DAY_OF_YEAR, lastDayOfYear);
-      hi = new java.sql.Date(cal.getTimeInMillis());
-      queryFilter.add(Restrictions.between("angebotsDatum", lo, hi));
-    }
-    queryFilter.addOrder(Order.desc("nummer"));
     Boolean vollstaendigFakturiert = null;
     if (myFilter.isShowBeauftragtNochNichtVollstaendigFakturiert() == true) {
       queryFilter.add(Restrictions.not(Restrictions.in("auftragsStatus", new AuftragsStatus[] { AuftragsStatus.ABGELEHNT,
@@ -369,18 +356,8 @@ public class AuftragDao extends BaseDao<AuftragDO>
     } else if (myFilter.isShowAbgelehnt() == true) {
       queryFilter.add(Restrictions.eq("auftragsStatus", AuftragsStatus.ABGELEHNT));
     } else if (myFilter.isShowAbgeschlossenNichtFakturiert() == true) {
-      queryFilter
-      .createAlias("positionen", "position")
-      .createAlias("paymentSchedules", "paymentSchedule")
-      .add(
-          Restrictions.or(
-              Restrictions.or(
-                  Restrictions.eq("auftragsStatus", AuftragsStatus.ABGESCHLOSSEN),
-                  Restrictions.and(Restrictions.eq("position.status", AuftragsPositionsStatus.ABGESCHLOSSEN),
-                      Restrictions.eq("position.vollstaendigFakturiert", false))),
-                      Restrictions.and(Restrictions.eq("paymentSchedule.reached", true),
-                          Restrictions.eq("paymentSchedule.vollstaendigFakturiert", false))));
-      vollstaendigFakturiert = false; // Und noch nicht fakturiert.
+      // No restriction (filtering below).
+      vollstaendigFakturiert = false;
     } else if (myFilter.isShowAkquise() == true) {
       queryFilter.add(Restrictions.in("auftragsStatus", new AuftragsStatus[] { AuftragsStatus.GELEGT, AuftragsStatus.IN_ERSTELLUNG,
           AuftragsStatus.GROB_KALKULATION}));
@@ -390,6 +367,19 @@ public class AuftragDao extends BaseDao<AuftragDO>
     } else if (myFilter.isShowErsetzt() == true) {
       queryFilter.add(Restrictions.eq("auftragsStatus", AuftragsStatus.ERSETZT));
     }
+    if (myFilter.getYear() > 1900) {
+      final Calendar cal = DateHelper.getUTCCalendar();
+      cal.set(Calendar.YEAR, myFilter.getYear());
+      java.sql.Date lo = null;
+      java.sql.Date hi = null;
+      cal.set(Calendar.DAY_OF_YEAR, 1);
+      lo = new java.sql.Date(cal.getTimeInMillis());
+      final int lastDayOfYear = cal.getActualMaximum(Calendar.DAY_OF_YEAR);
+      cal.set(Calendar.DAY_OF_YEAR, lastDayOfYear);
+      hi = new java.sql.Date(cal.getTimeInMillis());
+      queryFilter.add(Restrictions.between("angebotsDatum", lo, hi));
+    }
+    queryFilter.addOrder(Order.desc("nummer"));
     final List<AuftragDO> list;
     if (checkAccess == true) {
       list = getList(queryFilter);
@@ -403,6 +393,12 @@ public class AuftragDao extends BaseDao<AuftragDO>
         public boolean evaluate(final Object object)
         {
           final AuftragDO auftrag = (AuftragDO) object;
+          if (myFilter.isShowAbgeschlossenNichtFakturiert() == true) {
+            if (auftrag.isAbgeschlossenUndNichtVollstaendigFakturiert() == false
+                && auftrag.isZahlplanAbgeschlossenUndNichtVollstaendigFakturiert() == false) {
+              return false;
+            }
+          }
           if (fil.getAuftragsPositionsArt() != null) {
             boolean match = false;
             if (CollectionUtils.isNotEmpty(auftrag.getPositionen()) == true) {
