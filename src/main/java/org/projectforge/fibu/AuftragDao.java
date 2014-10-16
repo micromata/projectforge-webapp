@@ -38,6 +38,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
+import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.projectforge.access.OperationType;
@@ -356,7 +357,17 @@ public class AuftragDao extends BaseDao<AuftragDO>
     } else if (myFilter.isShowAbgelehnt() == true) {
       queryFilter.add(Restrictions.eq("auftragsStatus", AuftragsStatus.ABGELEHNT));
     } else if (myFilter.isShowAbgeschlossenNichtFakturiert() == true) {
-      // No restriction (filtering below).
+      queryFilter
+      .createAlias("positionen", "position")
+      .createAlias("paymentSchedules", "paymentSchedule", Criteria.FULL_JOIN)
+      .add(
+          Restrictions.or(
+              Restrictions.or(
+                  Restrictions.eq("auftragsStatus", AuftragsStatus.ABGESCHLOSSEN),
+                  Restrictions.and(Restrictions.eq("position.status", AuftragsPositionsStatus.ABGESCHLOSSEN),
+                      Restrictions.eq("position.vollstaendigFakturiert", false))),
+                      Restrictions.and(Restrictions.eq("paymentSchedule.reached", true),
+                          Restrictions.eq("paymentSchedule.vollstaendigFakturiert", false))));
       vollstaendigFakturiert = false;
     } else if (myFilter.isShowAkquise() == true) {
       queryFilter.add(Restrictions.in("auftragsStatus", new AuftragsStatus[] { AuftragsStatus.GELEGT, AuftragsStatus.IN_ERSTELLUNG,
@@ -393,12 +404,6 @@ public class AuftragDao extends BaseDao<AuftragDO>
         public boolean evaluate(final Object object)
         {
           final AuftragDO auftrag = (AuftragDO) object;
-          if (myFilter.isShowAbgeschlossenNichtFakturiert() == true) {
-            if (auftrag.isAbgeschlossenUndNichtVollstaendigFakturiert() == false
-                && auftrag.isZahlplanAbgeschlossenUndNichtVollstaendigFakturiert() == false) {
-              return false;
-            }
-          }
           if (fil.getAuftragsPositionsArt() != null) {
             boolean match = false;
             if (CollectionUtils.isNotEmpty(auftrag.getPositionen()) == true) {
