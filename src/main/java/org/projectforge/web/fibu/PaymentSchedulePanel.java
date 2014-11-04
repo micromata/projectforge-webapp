@@ -41,6 +41,7 @@ import org.projectforge.fibu.RechnungDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRightValue;
 import org.projectforge.user.UserRights;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
@@ -67,7 +68,7 @@ public class PaymentSchedulePanel extends Panel
   /**
    * @param id
    */
-  public PaymentSchedulePanel(final String id, final IModel<AuftragDO>  model, final PFUserDO user)
+  public PaymentSchedulePanel(final String id, final IModel<AuftragDO> model, final PFUserDO user)
   {
     super(id);
     this.model = model;
@@ -97,13 +98,13 @@ public class PaymentSchedulePanel extends Panel
   public void rebuildEntries()
   {
     final List<PaymentScheduleDO> entries = model.getObject().getPaymentSchedules();
-    if ( entries != null) {
+    if (entries != null) {
       entrysRepeater.removeAll();
       for (final PaymentScheduleDO entry : entries) {
         final WebMarkupContainer item = new WebMarkupContainer(entrysRepeater.newChildId());
         entrysRepeater.add(item);
-        final DatePanel datePanel = new DatePanel("scheduleDate", new PropertyModel<Date>(entry, "scheduleDate"),
-            DatePanelSettings.get().withTargetType(java.sql.Date.class));
+        final DatePanel datePanel = new DatePanel("scheduleDate", new PropertyModel<Date>(entry, "scheduleDate"), DatePanelSettings.get()
+            .withTargetType(java.sql.Date.class));
         item.add(datePanel);
         final TextField<String> amount = new TextField<String>("amount", new PropertyModel<String>(entry, "amount")) {
           @SuppressWarnings({ "rawtypes", "unchecked"})
@@ -121,6 +122,8 @@ public class PaymentSchedulePanel extends Panel
           item.add(checkBoxDiv);
           checkBoxDiv.add(new CheckBoxButton(checkBoxDiv.newChildId(), new PropertyModel<Boolean>(entry, "vollstaendigFakturiert"),
               getString("fibu.auftrag.vollstaendigFakturiert")));
+        } else {
+          item.add(WicketUtils.getInvisibleComponent("vollstaendigFakturiert"));
         }
       }
     }
