@@ -137,6 +137,19 @@ public class TeamEventRecurrenceData implements Serializable
   }
 
   /**
+   * Used by Wicket form field in {@link TeamEventEditForm}.
+   * @param value If true than interval will be set as 2 as default otherwise as -1.
+   */
+  public void setCustomized(final boolean value)
+  {
+    if (value == true) {
+      this.interval = 2;
+    } else {
+      this.interval = -1;
+    }
+  }
+
+  /**
    * @return the timeZone
    */
   public TimeZone getTimeZone()
