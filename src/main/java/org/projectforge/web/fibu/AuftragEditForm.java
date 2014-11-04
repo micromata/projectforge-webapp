@@ -662,9 +662,11 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
     BigDecimal invoiced = BigDecimal.ZERO;
     if (paymentSchedules != null) {
       for (final PaymentScheduleDO schedule : paymentSchedules) {
-        ges = ges.add(schedule.getAmount());
-        if (schedule.isVollstaendigFakturiert() == true) {
-          invoiced = invoiced.add(schedule.getAmount());
+        if (schedule.getAmount() != null) {
+          ges = ges.add(schedule.getAmount());
+          if (schedule.isVollstaendigFakturiert() == true) {
+            invoiced = invoiced.add(schedule.getAmount());
+          }
         }
         if (schedule.isReached() == true && schedule.isVollstaendigFakturiert() == false) {
           schedulesPanel.setHighlightedHeader();
