@@ -127,10 +127,14 @@ public class HRPlanningEditPage extends AbstractEditPage<HRPlanningDO, HRPlannin
   public void select(final String property, final Object selectedValue)
   {
     if (property.startsWith("projektId:") == true) {
-      final Integer idx = NumberHelper.parseInteger(property.substring(property.indexOf(':') + 1));
-      final HRPlanningEntryDO entry = getData().getEntry(idx);
-      hrPlanningDao.setProjekt(entry, (Integer) selectedValue);
-      form.projektSelectPanels.get(idx).getTextField().modelChanged();
+      try {
+        final Integer idx = NumberHelper.parseInteger(property.substring(property.indexOf(':') + 1));
+        final HRPlanningEntryDO entry = getData().getEntry(idx);
+        hrPlanningDao.setProjekt(entry, (Integer) selectedValue);
+        form.projektSelectPanels.get(idx).getTextField().modelChanged();
+      } catch (final ArrayIndexOutOfBoundsException ex) {
+        log.error("Oups, idx not supported: " + ex.getMessage(), ex);
+      }
     } else if ("userId".equals(property) == true) {
       getBaseDao().setUser(getData(), (Integer) selectedValue);
       form.refresh();
