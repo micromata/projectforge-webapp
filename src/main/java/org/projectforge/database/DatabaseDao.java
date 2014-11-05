@@ -50,7 +50,7 @@ import org.projectforge.core.ExtendedBaseDO;
 import org.projectforge.core.ReindexSettings;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.web.calendar.DateTimeFormatter;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -163,7 +163,7 @@ public class DatabaseDao extends HibernateDaoSupport
 
   private long reindexObjects(final Class< ? > clazz, final ReindexSettings settings)
   {
-    final Session session = getSession();
+    final Session session = getSessionFactory().getCurrentSession();
     Criteria criteria = createCriteria(session, clazz, settings, true);
     final Long number = (Long) criteria.uniqueResult(); // Get number of objects to re-index (select count(*) from).
     final boolean scrollMode = number > MIN_REINDEX_ENTRIES_4_USE_SCROLL_MODE ? true : false;
@@ -216,7 +216,7 @@ public class DatabaseDao extends HibernateDaoSupport
    */
   private long reindexMassIndexer(final Class< ? > clazz)
   {
-    final Session session = getSession();
+    final Session session = getSessionFactory().getCurrentSession();
     final Criteria criteria = createCriteria(session, clazz, null, true);
     final Long number = (Long) criteria.uniqueResult(); // Get number of objects to re-index (select count(*) from).
     log.info("Starting (mass) re-indexing of " + number + " entries of type " + clazz.getName() + "...");

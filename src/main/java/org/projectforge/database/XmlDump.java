@@ -94,7 +94,7 @@ import org.projectforge.user.UserPrefDO;
 import org.projectforge.user.UserPrefEntryDO;
 import org.projectforge.user.UserRightDO;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate4.HibernateTemplate;
 
 import com.thoughtworks.xstream.XStream;
 

@@ -41,7 +41,7 @@
     </constructor-arg>
   </bean>
   <!-- hibernate Session to DB -->
-  <bean id="sessionFactory" class="org.projectforge.database.AutoSessionFactoryBean">
+  <bean id="sessionFactory" class="org.projectforge.database.PersistenceConfig">
     <!--property name="mappingResources"> <value>${hibernate.mappings}</value> </property -->
     <!-- property name="initialXmlData"> <value>classpath:database-dump.xml</value> </property -->
     <!-- property name="dumpOnExit"> <value>false</value> </property -->

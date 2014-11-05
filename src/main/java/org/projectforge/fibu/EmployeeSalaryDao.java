@@ -35,7 +35,6 @@ import org.projectforge.core.UserException;
 import org.projectforge.database.SQLHelper;
 import org.projectforge.user.UserRightId;
 
-
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
@@ -66,12 +65,13 @@ public class EmployeeSalaryDao extends BaseDao<EmployeeSalaryDO>
   @SuppressWarnings("unchecked")
   public int[] getYears()
   {
-    List<Object[]> list = (List<Object[]>) getSession().createQuery("select min(year), max(year) from EmployeeSalaryDO t").list();
+    final List<Object[]> list = getSessionFactory().getCurrentSession()
+        .createQuery("select min(year), max(year) from EmployeeSalaryDO t").list();
     return SQLHelper.getYears(list);
   }
 
   @Override
-  public List<EmployeeSalaryDO> getList(BaseSearchFilter filter)
+  public List<EmployeeSalaryDO> getList(final BaseSearchFilter filter)
   {
     final EmployeeSalaryFilter myFilter;
     if (filter instanceof EmployeeSalaryFilter) {
@@ -88,28 +88,28 @@ public class EmployeeSalaryDao extends BaseDao<EmployeeSalaryDO>
     }
     queryFilter.addOrder(Order.desc("year")).addOrder(Order.desc("month"));
 
-    List<EmployeeSalaryDO> list = getList(queryFilter);
+    final List<EmployeeSalaryDO> list = getList(queryFilter);
     return list;
   }
 
   /**
-   * Sets the scales of percentage and currency amounts. <br/> Gutschriftsanzeigen dürfen keine Rechnungsnummer haben. Wenn eine
-   * Rechnungsnummer für neue Rechnungen gegeben wurde, so muss sie fortlaufend sein. Berechnet das Zahlungsziel in Tagen, wenn nicht
-   * gesetzt, damit es indiziert wird.
+   * Sets the scales of percentage and currency amounts. <br/>
+   * Gutschriftsanzeigen dürfen keine Rechnungsnummer haben. Wenn eine Rechnungsnummer für neue Rechnungen gegeben wurde, so muss sie
+   * fortlaufend sein. Berechnet das Zahlungsziel in Tagen, wenn nicht gesetzt, damit es indiziert wird.
    * @see org.projectforge.core.BaseDao#onSaveOrModify(org.projectforge.core.ExtendedBaseDO)
    */
   @SuppressWarnings("unchecked")
   @Override
-  protected void onSaveOrModify(EmployeeSalaryDO obj)
+  protected void onSaveOrModify(final EmployeeSalaryDO obj)
   {
     if (obj.getId() == null) {
-      List list = getHibernateTemplate().find("from EmployeeSalaryDO s where s.year = ? and s.month = ? and s.employee.id = ?",
+      final List list = getHibernateTemplate().find("from EmployeeSalaryDO s where s.year = ? and s.month = ? and s.employee.id = ?",
           new Object[] { obj.getYear(), obj.getMonth(), obj.getEmployeeId()});
       if (CollectionUtils.isNotEmpty(list) == true) {
         throw new UserException("fibu.employee.salary.error.salaryAlreadyExist");
       }
     } else {
-      List list = getHibernateTemplate().find("from EmployeeSalaryDO s where s.year = ? and s.month = ? and s.employee.id = ? and id <> ?",
+      final List list = getHibernateTemplate().find("from EmployeeSalaryDO s where s.year = ? and s.month = ? and s.employee.id = ? and id <> ?",
           new Object[] { obj.getYear(), obj.getMonth(), obj.getEmployeeId(), obj.getId()});
       if (CollectionUtils.isNotEmpty(list) == true) {
         throw new UserException("fibu.employee.salary.error.salaryAlreadyExist");
@@ -122,13 +122,13 @@ public class EmployeeSalaryDao extends BaseDao<EmployeeSalaryDO>
    * @param employeeId If null, then employee will be set to null;
    * @see BaseDao#getOrLoad(Integer)
    */
-  public void setEmployee(final EmployeeSalaryDO employeeSalary, Integer employeeId)
+  public void setEmployee(final EmployeeSalaryDO employeeSalary, final Integer employeeId)
   {
-    EmployeeDO employee = employeeDao.getOrLoad(employeeId);
+    final EmployeeDO employee = employeeDao.getOrLoad(employeeId);
     employeeSalary.setEmployee(employee);
   }
 
-  public void setEmployeeDao(EmployeeDao employeeDao)
+  public void setEmployeeDao(final EmployeeDao employeeDao)
   {
     this.employeeDao = employeeDao;
   }

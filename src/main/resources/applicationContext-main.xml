@@ -16,7 +16,7 @@
     </constructor-arg>
   </bean>
   <!-- hibernate Session to DB -->
-  <bean id="sessionFactory" class="org.projectforge.database.AutoSessionFactoryBean">
+  <bean id="sessionFactory" class="org.projectforge.database.PersistenceConfig">
     <property name="hibernateProperties">
       <props>
         <prop key="hibernate.dialect">${hibernate.dialect}</prop>

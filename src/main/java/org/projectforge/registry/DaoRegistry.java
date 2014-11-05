@@ -65,7 +65,7 @@ import org.projectforge.user.UserDao;
 import org.projectforge.user.UserPrefDao;
 import org.projectforge.user.UserRightDao;
 import org.projectforge.user.UserXmlPreferencesDao;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate4.HibernateTemplate;
 
 /**
  * Helper object which stores all dao objects and put them into the registry. <br/>

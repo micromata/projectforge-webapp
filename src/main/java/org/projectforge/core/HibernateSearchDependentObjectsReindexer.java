@@ -44,7 +44,7 @@ import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.projectforge.registry.Registry;
 import org.projectforge.registry.RegistryEntry;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate4.HibernateTemplate;
 import org.springframework.util.CollectionUtils;
 
 /**

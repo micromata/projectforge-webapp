@@ -31,7 +31,7 @@ import org.projectforge.fibu.kost.BuchungssatzDO;
 import org.projectforge.fibu.kost.BuchungssatzDao;
 import org.projectforge.fibu.kost.BuchungssatzFilter;
 import org.projectforge.user.ProjectForgeGroup;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -37,7 +37,7 @@ import org.projectforge.common.AbstractCache;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.reporting.Kost2Art;
 import org.projectforge.reporting.impl.Kost2ArtImpl;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate4.HibernateTemplate;
 
 /**
  * The kost2 entries will be cached.

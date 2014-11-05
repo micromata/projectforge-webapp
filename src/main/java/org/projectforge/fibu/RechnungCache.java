@@ -31,7 +31,7 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.projectforge.common.AbstractCache;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate4.HibernateTemplate;
 
 /**
  * Caches the order positions assigned to invoice positions.

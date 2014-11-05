@@ -154,7 +154,8 @@ public class AuftragDao extends BaseDao<AuftragDO>
   @SuppressWarnings("unchecked")
   public int[] getYears()
   {
-    final List<Object[]> list = getSession().createQuery("select min(angebotsDatum), max(angebotsDatum) from AuftragDO t").list();
+    final List<Object[]> list = getSessionFactory().getCurrentSession()
+        .createQuery("select min(angebotsDatum), max(angebotsDatum) from AuftragDO t").list();
     return SQLHelper.getYears(list);
   }
 
@@ -585,7 +586,7 @@ public class AuftragDao extends BaseDao<AuftragDO>
         return orig.getNummer();
       }
     }
-    final List<Integer> list = getSession().createQuery("select max(t.nummer) from AuftragDO t").list();
+    final List<Integer> list = getSessionFactory().getCurrentSession().createQuery("select max(t.nummer) from AuftragDO t").list();
     Validate.notNull(list);
     if (list.size() == 0 || list.get(0) == null) {
       log.info("First entry of AuftragDO");

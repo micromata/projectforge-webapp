@@ -39,7 +39,7 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.fibu.EmployeeDO;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.web.UserFilter;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate4.HibernateTemplate;
 
 /**
  * The group user relations will be cached with this class.

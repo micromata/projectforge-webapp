@@ -23,10 +23,9 @@
 
 package org.projectforge.database;
 
+import java.io.IOException;
 import java.lang.annotation.ElementType;
 
-import org.hibernate.HibernateException;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
@@ -34,28 +33,38 @@ import org.hibernate.search.cfg.SearchMapping;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.plugins.core.PluginsRegistry;
-import org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean;
+import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 
 import de.micromata.hibernate.history.HistoryEntry;
 import de.micromata.hibernate.history.delta.PropertyDelta;
 
 /**
- * @author Wolfgang Jung (w.jung@micromata.de)
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class AutoSessionFactoryBean extends AnnotationSessionFactoryBean
+// @Configuration
+// @EnableTransactionManagement
+// @PropertySource({ "classpath:persistence-mysql.properties" })
+// @ComponentScan({ "org.baeldung.spring.persistence" })
+public class PersistenceConfig extends LocalSessionFactoryBean
 {
-  /** The logger */
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AutoSessionFactoryBean.class);
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(PersistenceConfig.class);
+
+  // @Autowired
+  // private Environment env;
 
   private boolean schemaUpdate;
 
   /**
-   * @see org.springframework.orm.hibernate4.LocalSessionFactoryBean#postProcessConfiguration(org.hibernate.cfg.Configuration)
+   * @see org.springframework.orm.hibernate4.LocalSessionFactoryBean#afterPropertiesSet()
    */
   @Override
-  protected void postProcessConfiguration(final Configuration config) throws HibernateException
+  public void afterPropertiesSet() throws IOException
   {
+    super.afterPropertiesSet();
+    final org.hibernate.cfg.Configuration config = getConfiguration();
+    config.setProperty("hibernate.hbm2ddl.auto", String.valueOf(this.schemaUpdate));
+    // sessionFactory.setDataSource(restDataSource());
+    // sessionFactory.setPackagesToScan(new String[] { "org.baeldung.spring.persistence.model"});
     for (final Class< ? > entityClass : HibernateEntities.CORE_ENTITIES) {
       log.debug("Adding class " + entityClass.getName());
       config.addAnnotatedClass(entityClass);
@@ -94,32 +103,51 @@ public class AutoSessionFactoryBean extends AnnotationSessionFactoryBean
     .property("oldValue", ElementType.METHOD).field().store(Store.NO) //
     .property("newValue", ElementType.METHOD).field().store(Store.NO); //
     config.getProperties().put("hibernate.search.model_mapping", mapping);
-    super.postProcessConfiguration(config);
   }
 
-  /**
-   * Nach dem Update des Schema die Datenbank mit den in der XML-Datei angegebenen Objekten befüllt.
-   * @see org.springframework.orm.hibernate4.LocalSessionFactoryBean#updateDatabaseSchema()
-   */
-  @Override
-  public void afterPropertiesSet()
-  {
-    super.setSchemaUpdate(false);
-    try {
-      super.afterPropertiesSet();
-    } catch (final Exception ex) {
-      throw new RuntimeException(ex);
-    }
-    if (schemaUpdate == true) {
-      super.setSchemaUpdate(schemaUpdate);
-      updateDatabaseSchema();
-    }
-  }
+  // @Bean
+  // public DataSource restDataSource()
+  // {
+  // final BasicDataSource dataSource = new BasicDataSource();
+  // dataSource.setDriverClassName(env.getProperty("jdbc.driverClassName"));
+  // dataSource.setUrl(env.getProperty("jdbc.url"));
+  // dataSource.setUsername(env.getProperty("jdbc.user"));
+  // dataSource.setPassword(env.getProperty("jdbc.pass"));
+  //
+  // return dataSource;
+  // }
 
-  @Override
+  // @Bean
+  // @Autowired
+  // public HibernateTransactionManager transactionManager(final SessionFactory sessionFactory)
+  // {
+  // final HibernateTransactionManager txManager = new HibernateTransactionManager();
+  // txManager.setSessionFactory(sessionFactory);
+  //
+  // return txManager;
+  // }
+
+  // @Bean
+  // public PersistenceExceptionTranslationPostProcessor exceptionTranslation()
+  // {
+  // return new PersistenceExceptionTranslationPostProcessor();
+  // }
+
+  // @Bean
+  // @SuppressWarnings("serial")
+  // Properties hibernateProperties()
+  // {
+  // return new Properties() {
+  // {
+  // setProperty("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
+  // setProperty("hibernate.dialect", env.getProperty("hibernate.dialect"));
+  // setProperty("hibernate.globally_quoted_identifiers", "true");
+  // }
+  // };
+  // }
+
   public void setSchemaUpdate(final boolean schemaUpdate)
   {
-    super.setSchemaUpdate(schemaUpdate);
     this.schemaUpdate = schemaUpdate;
   }
 
@@ -127,6 +155,8 @@ public class AutoSessionFactoryBean extends AnnotationSessionFactoryBean
    * Needed for ensuring that configuration is initialized.
    * @param configXml
    */
+  // @Bean
+  // @Autowired
   public void setConfigXml(final ConfigXml configXml)
   {
     // Do nothing. Ensure only that configuration is initialized.

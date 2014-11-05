@@ -28,7 +28,7 @@ import java.util.List;
 import org.apache.commons.lang.Validate;
 import org.hibernate.Query;
 import org.projectforge.access.AccessChecker;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 

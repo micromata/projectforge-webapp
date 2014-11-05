@@ -60,7 +60,7 @@ public class BuchungssatzDao extends BaseDao<BuchungssatzDO>
   @SuppressWarnings("unchecked")
   public int[] getYears()
   {
-    final List<Object[]> list = getSession().createQuery("select min(year), max(year) from BuchungssatzDO t").list();
+    final List<Object[]> list = getSessionFactory().getCurrentSession().createQuery("select min(year), max(year) from BuchungssatzDO t").list();
     if (list.size() == 0 || list.get(0) == null || list.get(0)[0] == null) {
       return new int[] { Calendar.getInstance().get(Calendar.YEAR)};
     }

@@ -42,7 +42,7 @@ import org.projectforge.web.scripting.RecentScriptCalls;
 import org.projectforge.web.scripting.ScriptCallData;
 import org.projectforge.xstream.JodaDateMidnightConverter;
 import org.projectforge.xstream.JodaDateTimeConverter;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;

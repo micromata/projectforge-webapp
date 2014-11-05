@@ -149,7 +149,8 @@ public class RechnungDao extends BaseDao<RechnungDO>
   @SuppressWarnings("unchecked")
   public int[] getYears()
   {
-    final List<Object[]> list = getSession().createQuery("select min(datum), max(datum) from RechnungDO t").list();
+    final List<Object[]> list = getSessionFactory().getCurrentSession().createQuery("select min(datum), max(datum) from RechnungDO t")
+        .list();
     return SQLHelper.getYears(list);
   }
 
@@ -376,7 +377,7 @@ public class RechnungDao extends BaseDao<RechnungDO>
         return orig.getNummer();
       }
     }
-    final List<Integer> list = getSession().createQuery("select max(t.nummer) from RechnungDO t").list();
+    final List<Integer> list = getSessionFactory().getCurrentSession().createQuery("select max(t.nummer) from RechnungDO t").list();
     Validate.notNull(list);
     if (list.size() == 0 || list.get(0) == null) {
       log.info("First entry of RechnungDO");

@@ -26,7 +26,6 @@ package org.projectforge.core;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -74,8 +73,8 @@ import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserRight;
 import org.projectforge.user.UserRightId;
 import org.projectforge.user.UserRights;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate4.HibernateCallback;
+import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -318,7 +317,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       }
     }
     @SuppressWarnings("unchecked")
-    final O result = (O) getSession().load(clazz, id);
+    final O result = (O) getSessionFactory().getCurrentSession().load(clazz, id);
     return result;
   }
 
@@ -336,7 +335,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     if (idList == null) {
       return null;
     }
-    final Session session = getSession();
+    final Session session = getSessionFactory().getCurrentSession();
     final Criteria criteria = session.createCriteria(clazz).add(Restrictions.in("id", idList));
     @SuppressWarnings("unchecked")
     final List<O> list = selectUnique(criteria.list());
@@ -407,13 +406,13 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
 
     List<O> list = null;
     {
-      final Criteria criteria = filter.buildCriteria(getSession(), clazz);
+      final Criteria criteria = filter.buildCriteria(getSessionFactory().getCurrentSession(), clazz);
       setCacheRegion(criteria);
       if (searchFilter.isSearchNotEmpty() == true) {
         final String searchString = modifySearchString(searchFilter.getSearchString());
         final String[] searchFields = searchFilter.getSearchFields() != null ? searchFilter.getSearchFields() : getSearchFields();
         try {
-          final FullTextSession fullTextSession = Search.getFullTextSession(getSession());
+          final FullTextSession fullTextSession = Search.getFullTextSession(getSessionFactory().getCurrentSession());
           final org.apache.lucene.search.Query query = createFullTextQuery(searchFields, filter, searchString);
           if (query == null) {
             // An error occured:
@@ -440,7 +439,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
         list = selectUnique(list);
         if (list.size() > 0 && searchFilter.isUseModificationFilter() == true) {
           // Search now all history entries which were modified by the given user and/or in the given time period.
-          final Set<Integer> idSet = getHistoryEntries(getSession(), searchFilter, false);
+          final Set<Integer> idSet = getHistoryEntries(getSessionFactory().getCurrentSession(), searchFilter, false);
           final List<O> result = new ArrayList<O>();
           for (final O entry : list) {
             if (contains(idSet, entry) == true) {
@@ -453,7 +452,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     }
     if (searchFilter.isSearchHistory() == true && searchFilter.isSearchNotEmpty() == true) {
       // Search now all history for the given search string.
-      final Set<Integer> idSet = getHistoryEntries(getSession(), searchFilter, true);
+      final Set<Integer> idSet = getHistoryEntries(getSessionFactory().getCurrentSession(), searchFilter, true);
       if (CollectionUtils.isNotEmpty(idSet) == true) {
         for (final O entry : list) {
           if (idSet.contains(entry.getId()) == true) {
@@ -461,7 +460,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
           }
         }
         if (idSet.isEmpty() == false) {
-          final Criteria criteria = filter.buildCriteria(getSession(), clazz);
+          final Criteria criteria = filter.buildCriteria(getSessionFactory().getCurrentSession(), clazz);
           setCacheRegion(criteria);
           criteria.add(Restrictions.in("id", idSet));
           final List<O> historyMatchingEntities = criteria.list();
@@ -691,7 +690,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       return EMPTY_HISTORY_ENTRIES;
     }
     final List<DisplayHistoryEntry> result = getHibernateTemplate().execute(new HibernateCallback<List<DisplayHistoryEntry>>() {
-      public List<DisplayHistoryEntry> doInHibernate(final Session session) throws HibernateException, SQLException
+      public List<DisplayHistoryEntry> doInHibernate(final Session session) throws HibernateException
       {
         final HistoryEntry[] entries = getHistoryEntries(obj);
         if (entries == null) {
@@ -707,7 +706,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   {
     accessChecker.checkRestrictedUser();
     final List<DisplayHistoryEntry> result = getHibernateTemplate().execute(new HibernateCallback<List<DisplayHistoryEntry>>() {
-      public List<DisplayHistoryEntry> doInHibernate(final Session session) throws HibernateException, SQLException
+      public List<DisplayHistoryEntry> doInHibernate(final Session session) throws HibernateException
       {
         final HistoryEntry[] entries = internalGetHistoryEntries(obj);
         if (entries == null) {
@@ -755,7 +754,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   public List<SimpleHistoryEntry> getSimpleHistoryEntries(final O obj)
   {
     final List<SimpleHistoryEntry> result = getHibernateTemplate().execute(new HibernateCallback<List<SimpleHistoryEntry>>() {
-      public List<SimpleHistoryEntry> doInHibernate(final Session session) throws HibernateException, SQLException
+      public List<SimpleHistoryEntry> doInHibernate(final Session session) throws HibernateException
       {
         final HistoryEntry[] entries = getHistoryEntries(obj);
         if (entries == null) {
@@ -1079,7 +1078,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       log.info("No modifications detected (no update needed): " + dbObj.toString());
     }
     prepareHibernateSearch(obj, OperationType.UPDATE);
-    final Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
+    final Session session = getSessionFactory().getCurrentSession();
     session.flush();
     Search.getFullTextSession(session).flushToIndexes();
     afterSaveOrModify(obj);
@@ -1164,7 +1163,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     Search.getFullTextSession(session).flushToIndexes();
     afterSaveOrModify(obj);
     afterDelete(obj);
-    getSession().flush();
+    getSessionFactory().getCurrentSession().flush();
     log.info("Object marked as deleted: " + dbObj.toString());
   }
 
@@ -1585,7 +1584,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
         + property
         + ") like ?) order by t."
         + property;
-    final Query query = getSession().createQuery(hql);
+    final Query query = getSessionFactory().getCurrentSession().createQuery(hql);
     final DateHolder dh = new DateHolder();
     dh.add(Calendar.YEAR, -2); // Search only for entries of the last 2 years.
     query.setDate(0, dh.getDate());
@@ -1722,7 +1721,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       buf.append(") AND (");
       final String searchString = buf.toString() + modifySearchString(filter.getSearchString()) + ")";
       try {
-        final FullTextSession fullTextSession = Search.getFullTextSession(getSession());
+        final FullTextSession fullTextSession = Search.getFullTextSession(getSessionFactory().getCurrentSession());
         final org.apache.lucene.search.Query query = createFullTextQuery(HISTORY_SEARCH_FIELDS, null, searchString);
         if (query == null) {
           // An error occured:

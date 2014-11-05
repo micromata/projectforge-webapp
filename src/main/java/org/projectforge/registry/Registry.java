@@ -38,7 +38,7 @@ import org.projectforge.fibu.RechnungCache;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserXmlPreferencesDao;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate4.HibernateTemplate;
 
 /**
  * Registry for dao's. Here you can register additional daos and plugins (extensions of ProjectForge).

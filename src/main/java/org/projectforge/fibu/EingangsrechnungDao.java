@@ -70,7 +70,8 @@ public class EingangsrechnungDao extends BaseDao<EingangsrechnungDO>
   @SuppressWarnings("unchecked")
   public int[] getYears()
   {
-    final List<Object[]> list = getSession().createQuery("select min(datum), max(datum) from EingangsrechnungDO t").list();
+    final List<Object[]> list = getSessionFactory().getCurrentSession()
+        .createQuery("select min(datum), max(datum) from EingangsrechnungDO t").list();
     return SQLHelper.getYears(list);
   }
 
@@ -276,7 +277,6 @@ public class EingangsrechnungDao extends BaseDao<EingangsrechnungDO>
   {
     this.kontoDao = kontoDao;
   }
-
 
   /**
    * @see org.projectforge.core.BaseDao#useOwnCriteriaCacheRegion()

@@ -31,7 +31,7 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.LazyInitializationException;
 import org.projectforge.common.AbstractCache;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate4.HibernateTemplate;
 
 /**
  * Caches the DATEV accounts.
