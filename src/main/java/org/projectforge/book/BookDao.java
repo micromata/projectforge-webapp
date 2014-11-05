@@ -155,10 +155,10 @@ public class BookDao extends BaseDao<BookDO>
     List<BookDO> list = null;
     if (book.getId() == null) {
       // New book
-      list = getHibernateTemplate().find("from BookDO b where b.signature = ?", book.getSignature());
+      list = (List<BookDO>) getHibernateTemplate().find("from BookDO b where b.signature = ?", book.getSignature());
     } else {
       // Book already exists. Check maybe changed signature:
-      list = getHibernateTemplate().find("from BookDO b where b.signature = ? and pk <> ?",
+      list = (List<BookDO>) getHibernateTemplate().find("from BookDO b where b.signature = ? and pk <> ?",
           new Object[] { book.getSignature(), book.getId()});
     }
     if (CollectionUtils.isNotEmpty(list) == true) {
@@ -249,7 +249,6 @@ public class BookDao extends BaseDao<BookDO>
   {
     return new BookDO();
   }
-
 
   /**
    * @see org.projectforge.core.BaseDao#useOwnCriteriaCacheRegion()

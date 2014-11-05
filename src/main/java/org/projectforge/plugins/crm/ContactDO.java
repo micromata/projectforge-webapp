@@ -45,9 +45,9 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.IndexColumn;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
@@ -80,36 +80,36 @@ public class ContactDO extends DefaultBaseDO
   private TaskDO task;
 
   @PropertyInfo(i18nKey = "name")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String name; // 255 not null
 
   @PropertyInfo(i18nKey = "firstName")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String firstName; // 255
 
   @PropertyInfo(i18nKey = "form")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private FormOfAddress form;
 
   @PropertyInfo(i18nKey = "title")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String title; // 255
 
   @PropertyInfo(i18nKey = "birthday")
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   @DateBridge(resolution = Resolution.DAY)
   private Date birthday;
 
   @PropertyInfo(i18nKey = "contact.imValues")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String socialMediaValues;
 
   @PropertyInfo(i18nKey = "contact.emailValues")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String emailValues;
 
   @PropertyInfo(i18nKey = "contact.phoneValues")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String phoneValues;
 
   @PropertyInfo(i18nKey = "contact.contacts")
@@ -121,31 +121,31 @@ public class ContactDO extends DefaultBaseDO
 
   private AddressStatus addressStatus = AddressStatus.UPTODATE;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String publicKey; // 7000
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String fingerprint; // 255
 
   private Locale communicationLanguage;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String website; // 255
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String organization; // 255
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String division; // 255
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String positionText; // 255
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String comment; // 5000;
 
   // @FieldBridge(impl = HibernateSearchInstantMessagingBridge.class)
-  // @Field(index = Index.TOKENIZED, store = Store.NO)
+  // @Field(store = Store.NO)
   // TODO: Prepared for hibernate search.
   private List<LabelValueBean<InstantMessagingType, String>> socialMedia = null;
 

@@ -29,11 +29,11 @@ import java.util.HashSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.hibernate.collection.PersistentList;
-import org.hibernate.collection.PersistentMap;
-import org.hibernate.collection.PersistentSet;
-import org.hibernate.collection.PersistentSortedMap;
-import org.hibernate.collection.PersistentSortedSet;
+import org.hibernate.collection.internal.PersistentList;
+import org.hibernate.collection.internal.PersistentMap;
+import org.hibernate.collection.internal.PersistentSet;
+import org.hibernate.collection.internal.PersistentSortedMap;
+import org.hibernate.collection.internal.PersistentSortedSet;
 
 import com.thoughtworks.xstream.mapper.Mapper;
 import com.thoughtworks.xstream.mapper.XmlFriendlyMapper;

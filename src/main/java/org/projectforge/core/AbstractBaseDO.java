@@ -47,7 +47,7 @@ import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
-import org.hibernate.collection.PersistentSet;
+import org.hibernate.collection.internal.PersistentSet;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.common.ReflectionToString;
 import org.projectforge.database.HibernateUtils;

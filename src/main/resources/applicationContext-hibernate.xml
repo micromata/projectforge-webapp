@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans default-lazy-init="false" default-autowire="no">
-  <!-- You may find the hibernate session factory and hibernate dialect in the main applicationContext-file.
--->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	   					   http://www.springframework.org/schema/beans/spring-beans.xsd"
+  default-lazy-init="false" default-autowire="no">
+  <!-- You may find the hibernate session factory and hibernate dialect in the main applicationContext-file. -->
 
   <!-- shortcut to hibernate -->
   <bean id="hibernate" class="org.springframework.orm.hibernate3.HibernateTemplate">
@@ -53,7 +54,7 @@
   </bean>
   <bean id="txInterceptor" class="org.springframework.transaction.interceptor.TransactionInterceptor">
     <property name="transactionAttributeSource">
-      <bean class="org.springframework.transaction.annotation.AnnotationTransactionAttributeSource"/>
+      <bean class="org.springframework.transaction.annotation.AnnotationTransactionAttributeSource" />
     </property>
     <property name="transactionManager" ref="transactionManager" />
   </bean>

@@ -136,7 +136,7 @@ public class ProjektDao extends BaseDao<ProjektDO>
     if (projectManagerGroup != null) {
       final GroupDO group = groupDao.internalGetById(projectManagerGroup.getId());
       projekt.setProjektManagerGroup(group);
-      //Hibernate.initialize(projectManagerGroup); // Does not work.
+      // Hibernate.initialize(projectManagerGroup); // Does not work.
     }
   }
 
@@ -144,7 +144,7 @@ public class ProjektDao extends BaseDao<ProjektDO>
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public ProjektDO getProjekt(final KundeDO kunde, final int nummer)
   {
-    final List<ProjektDO> list = getHibernateTemplate().find("from ProjektDO p where p.kunde.id=? and p.nummer=?",
+    final List<ProjektDO> list = (List<ProjektDO>) getHibernateTemplate().find("from ProjektDO p where p.kunde.id=? and p.nummer=?",
         new Object[] { kunde.getId(), nummer});
     if (CollectionUtils.isEmpty(list) == true) {
       return null;
@@ -156,7 +156,7 @@ public class ProjektDao extends BaseDao<ProjektDO>
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public ProjektDO getProjekt(final int intern_kost2_4, final int nummer)
   {
-    final List<ProjektDO> list = getHibernateTemplate().find("from ProjektDO p where p.internKost2_4=? and p.nummer=?",
+    final List<ProjektDO> list = (List<ProjektDO>) getHibernateTemplate().find("from ProjektDO p where p.internKost2_4=? and p.nummer=?",
         new Object[] { intern_kost2_4, nummer});
     if (CollectionUtils.isEmpty(list) == true) {
       return null;

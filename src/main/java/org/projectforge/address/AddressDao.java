@@ -109,7 +109,7 @@ public class AddressDao extends BaseDao<AddressDO>
   public List<Locale> getUsedCommunicationLanguages()
   {
     @SuppressWarnings("unchecked")
-    final List<Locale> list = getHibernateTemplate()
+    final List<Locale> list = (List<Locale>) getHibernateTemplate()
     .find(
         "select distinct a.communicationLanguage from AddressDO a where deleted=false and a.communicationLanguage is not null order by a.communicationLanguage");
     return list;

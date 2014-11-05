@@ -35,8 +35,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.common.CurrencyHelper;
@@ -59,15 +59,15 @@ public abstract class AbstractRechnungsPositionDO extends DefaultBaseDO implemen
 
   protected short number;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   protected String text;
 
   protected BigDecimal menge;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   protected BigDecimal einzelNetto;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   protected BigDecimal vat;
 
   @PFPersistancyBehavior(autoUpdateCollectionEntries = true)

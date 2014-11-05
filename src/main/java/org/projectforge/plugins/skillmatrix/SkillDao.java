@@ -83,7 +83,7 @@ public class SkillDao extends BaseDao<SkillDO>
     synchronized (this) {
       checkConstraintViolation(obj);
     }
-    if(obj.getParent() == null && skillTree.isRootNode(obj) == false) {
+    if (obj.getParent() == null && skillTree.isRootNode(obj) == false) {
       obj.setParent(skillTree.getRootSkillNode().getSkill());
     }
   }
@@ -127,7 +127,7 @@ public class SkillDao extends BaseDao<SkillDO>
       sb.append(" and s.id != ?");
       params.add(skill.getId());
     }
-    list = getHibernateTemplate().find(sb.toString(), params.toArray());
+    list = (List<SkillDO>) getHibernateTemplate().find(sb.toString(), params.toArray());
     if (CollectionUtils.isNotEmpty(list) == true) {
       throw new UserException(I18N_KEY_ERROR_DUPLICATE_CHILD_SKILL);
     }
@@ -152,7 +152,8 @@ public class SkillDao extends BaseDao<SkillDO>
   }
 
   /**
-   * @see org.projectforge.core.BaseDao#hasUpdateAccess(org.projectforge.user.PFUserDO, org.projectforge.core.ExtendedBaseDO, org.projectforge.core.ExtendedBaseDO, boolean)
+   * @see org.projectforge.core.BaseDao#hasUpdateAccess(org.projectforge.user.PFUserDO, org.projectforge.core.ExtendedBaseDO,
+   *      org.projectforge.core.ExtendedBaseDO, boolean)
    */
   @Override
   public boolean hasUpdateAccess(final PFUserDO user, final SkillDO obj, final SkillDO dbObj, final boolean throwException)
@@ -233,7 +234,7 @@ public class SkillDao extends BaseDao<SkillDO>
     if (title == null) {
       return null;
     }
-    final List<SkillDO> list = getHibernateTemplate().find("from SkillDO u where u.title = ?", title);
+    final List<SkillDO> list = (List<SkillDO>)getHibernateTemplate().find("from SkillDO u where u.title = ?", title);
     if (CollectionUtils.isEmpty(list) == true) {
       return null;
     }

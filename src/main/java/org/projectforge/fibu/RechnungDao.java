@@ -228,7 +228,7 @@ public class RechnungDao extends BaseDao<RechnungDO>
           throw new UserException("fibu.rechnung.error.rechnungsNummerIstNichtFortlaufend");
         }
       } else {
-        final List<RechnungDO> list = getHibernateTemplate().find("from RechnungDO r where r.nummer = ? and r.id <> ?",
+        final List<RechnungDO> list = (List<RechnungDO>) getHibernateTemplate().find("from RechnungDO r where r.nummer = ? and r.id <> ?",
             new Object[] { obj.getNummer(), obj.getId()});
         if (list != null && list.size() > 0) {
           throw new UserException("fibu.rechnung.error.rechnungsNummerBereitsVergeben");

@@ -35,9 +35,9 @@ import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
@@ -55,32 +55,32 @@ import de.micromata.hibernate.history.Historizable;
  */
 @Entity
 @Indexed
-@ClassBridge(name = "kost2", index = Index.TOKENIZED, store = Store.NO, impl = HibernateSearchProjectKostBridge.class)
+@ClassBridge(name = "kost2", store = Store.NO, impl = HibernateSearchProjectKostBridge.class)
 @Table(name = "T_FIBU_PROJEKT", uniqueConstraints = { @UniqueConstraint(columnNames = { "nummer", "kunde_id"}),
     @UniqueConstraint(columnNames = { "nummer", "intern_kost2_4"})})
 public class ProjektDO extends DefaultBaseDO implements Historizable, ShortDisplayNameCapable
 {
   private static final long serialVersionUID = 7842680360705785761L;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private int nummer;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String name;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String identifier;
 
   @IndexedEmbedded(depth = 1)
   private KundeDO kunde;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private Integer internKost2_4;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private ProjektStatus status;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String description;
 
   @IndexedEmbedded(depth = 1)

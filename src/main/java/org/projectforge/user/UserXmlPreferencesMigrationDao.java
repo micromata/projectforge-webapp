@@ -76,7 +76,7 @@ public class UserXmlPreferencesMigrationDao extends HibernateDaoSupport
   {
     accessChecker.checkIsLoggedInUserMemberOfAdminGroup();
     final StringBuffer buf = new StringBuffer();
-    final List<UserXmlPreferencesDO> list = getHibernateTemplate().find(
+    final List<UserXmlPreferencesDO> list = (List<UserXmlPreferencesDO>) getHibernateTemplate().find(
         "from " + UserXmlPreferencesDO.class.getSimpleName() + " t order by user.id, key");
     int versionNumber = Integer.MAX_VALUE;
     for (final UserXmlPreferencesDO userPrefs : list) {
@@ -110,8 +110,8 @@ public class UserXmlPreferencesMigrationDao extends HibernateDaoSupport
    */
   protected void deleteOldKeys(final String key)
   {
-    final Query query = getHibernateTemplate().getSessionFactory().getCurrentSession().createQuery(
-        "delete from " + UserXmlPreferencesDO.class.getSimpleName() + " where key = '" + key + "'");
+    final Query query = getHibernateTemplate().getSessionFactory().getCurrentSession()
+        .createQuery("delete from " + UserXmlPreferencesDO.class.getSimpleName() + " where key = '" + key + "'");
     final int numberOfUpdatedEntries = query.executeUpdate();
     log.info(numberOfUpdatedEntries + " '" + key + "' entries deleted.");
   }

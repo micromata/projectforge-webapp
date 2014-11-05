@@ -62,7 +62,7 @@ public class AddressCampaignValueDao extends BaseDao<AddressCampaignValueDO>
   @SuppressWarnings("unchecked")
   public AddressCampaignValueDO get(final Integer addressId, final Integer addressCampaignId)
   {
-    final List<AddressCampaignValueDO> list = getHibernateTemplate().find(
+    final List<AddressCampaignValueDO> list = (List<AddressCampaignValueDO>) getHibernateTemplate().find(
         "from AddressCampaignValueDO a where a.address.id = ? and a.addressCampaign.id = ?", new Object[] { addressId, addressCampaignId});
     if (CollectionUtils.isEmpty(list) == true) {
       return null;
@@ -161,7 +161,7 @@ public class AddressCampaignValueDao extends BaseDao<AddressCampaignValueDO>
       return map;
     }
     @SuppressWarnings("unchecked")
-    final List<AddressCampaignValueDO> list = getHibernateTemplate().find(
+    final List<AddressCampaignValueDO> list = (List<AddressCampaignValueDO>) getHibernateTemplate().find(
         "from AddressCampaignValueDO a where a.addressCampaign.id = ? and deleted = false", searchFilter.getAddressCampaignId());
     if (CollectionUtils.isEmpty(list) == true) {
       return map;

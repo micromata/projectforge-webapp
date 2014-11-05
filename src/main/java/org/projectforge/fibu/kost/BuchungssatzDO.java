@@ -40,9 +40,9 @@ import javax.persistence.UniqueConstraint;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
@@ -65,19 +65,19 @@ public class BuchungssatzDO extends DefaultBaseDO implements Historizable, Compa
 
   private static final Logger log = Logger.getLogger(BuchungssatzDO.class);
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO,store = Store.NO)
   private Integer year;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO,store = Store.NO)
   private Integer month;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO,store = Store.NO)
   private Integer satznr;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO,store = Store.NO)
   private BigDecimal betrag;
 
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   private SHType sh;
 
   private boolean ignore = false;
@@ -88,17 +88,17 @@ public class BuchungssatzDO extends DefaultBaseDO implements Historizable, Compa
   @IndexedEmbedded(depth = 1)
   private KontoDO gegenKonto;
 
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   @DateBridge(resolution = Resolution.DAY)
   private Date datum;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String beleg;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String text;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String menge;
 
   @IndexedEmbedded(depth = 1)
@@ -107,7 +107,7 @@ public class BuchungssatzDO extends DefaultBaseDO implements Historizable, Compa
   @IndexedEmbedded(depth = 3)
   private Kost2DO kost2;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String comment;
 
   /**

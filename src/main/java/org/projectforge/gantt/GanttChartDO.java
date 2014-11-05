@@ -57,7 +57,7 @@ public class GanttChartDO extends AbstractBaseDO<Integer>
 
   private Integer id;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String name;
 
   @IndexedEmbedded(depth = 1)

@@ -42,10 +42,10 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.IndexColumn;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Fields;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
@@ -69,19 +69,18 @@ public class AuftragDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = -3114903689890703366L;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private Integer nummer;
 
   /** Dies sind die alten Auftragsnummern oder Kundenreferenzen. */
-  @Fields({ @Field(index = Index.TOKENIZED, name = "referenz_tokenized", store = Store.NO),
-    @Field(index = Index.UN_TOKENIZED, store = Store.NO)})
+  @Fields({ @Field(name = "referenz_tokenized", store = Store.NO), @Field(analyze = Analyze.NO, store = Store.NO)})
   private String referenz;
 
   @PFPersistancyBehavior(autoUpdateCollectionEntries = true)
   @IndexedEmbedded(depth = 1)
   private List<AuftragsPositionDO> positionen = null;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private AuftragsStatus auftragsStatus;
 
   @IndexedEmbedded(depth = 1)
@@ -90,26 +89,26 @@ public class AuftragDO extends DefaultBaseDO
   @IndexedEmbedded(depth = 1)
   private KundeDO kunde;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String kundeText;
 
   @IndexedEmbedded(depth = 2)
   private ProjektDO projekt;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String titel;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String bemerkung;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String statusBeschreibung;
 
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   @DateBridge(resolution = Resolution.DAY)
   private Date angebotsDatum;
 
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   @DateBridge(resolution = Resolution.DAY)
   private Date bindungsFrist;
 
@@ -127,11 +126,11 @@ public class AuftragDO extends DefaultBaseDO
   @IndexedEmbedded(depth = 1)
   private List<PaymentScheduleDO> paymentSchedules = null;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   @DateBridge(resolution = Resolution.DAY)
   private Date periodOfPerformanceBegin;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   @DateBridge(resolution = Resolution.DAY)
   private Date periodOfPerformanceEnd;
 
@@ -480,7 +479,6 @@ public class AuftragDO extends DefaultBaseDO
     return false;
   }
 
-
   /**
    * Get the position entries for this object.
    */
@@ -660,8 +658,8 @@ public class AuftragDO extends DefaultBaseDO
 
   /**
    * @param number
-   * @return PaymentScheduleDO with given position number or null (iterates through the list of payment schedules and compares the number), if not
-   *         exist.
+   * @return PaymentScheduleDO with given position number or null (iterates through the list of payment schedules and compares the number),
+   *         if not exist.
    */
   public PaymentScheduleDO getPaymentSchedule(final short number)
   {

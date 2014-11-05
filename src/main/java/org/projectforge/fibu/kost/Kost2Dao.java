@@ -40,7 +40,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-
 @Transactional(readOnly = true, propagation = Propagation.SUPPORTS, isolation = Isolation.REPEATABLE_READ)
 public class Kost2Dao extends BaseDao<Kost2DO>
 {
@@ -125,7 +124,7 @@ public class Kost2Dao extends BaseDao<Kost2DO>
   @SuppressWarnings("unchecked")
   public Kost2DO getKost2(final int nummernkreis, final int bereich, final int teilbereich, final int kost2Art)
   {
-    final List<Kost2DO> list = getHibernateTemplate().find(
+    final List<Kost2DO> list = (List<Kost2DO>) getHibernateTemplate().find(
         "from Kost2DO k where k.nummernkreis=? and k.bereich=? and k.teilbereich=? and k.kost2Art.id=?",
         new Object[] { nummernkreis, bereich, teilbereich, kost2Art});
     if (CollectionUtils.isEmpty(list) == true) {
@@ -137,10 +136,10 @@ public class Kost2Dao extends BaseDao<Kost2DO>
   @SuppressWarnings("unchecked")
   public List<Kost2DO> getActiveKost2(final int nummernkreis, final int bereich, final int teilbereich)
   {
-    final List<Kost2DO> list = getHibernateTemplate()
-    .find(
-        "from Kost2DO k where k.nummernkreis=? and k.bereich=? and k.teilbereich=? and (k.kostentraegerStatus='ACTIVE' or k.kostentraegerStatus is null) order by k.kost2Art.id",
-        new Object[] { nummernkreis, bereich, teilbereich});
+    final List<Kost2DO> list = (List<Kost2DO>) getHibernateTemplate()
+        .find(
+            "from Kost2DO k where k.nummernkreis=? and k.bereich=? and k.teilbereich=? and (k.kostentraegerStatus='ACTIVE' or k.kostentraegerStatus is null) order by k.kost2Art.id",
+            new Object[] { nummernkreis, bereich, teilbereich});
     if (CollectionUtils.isEmpty(list) == true) {
       return null;
     }
@@ -178,10 +177,11 @@ public class Kost2Dao extends BaseDao<Kost2DO>
     } else if (myFilter.isEnded() == true) {
       queryFilter.add(Restrictions.eq("kostentraegerStatus", KostentraegerStatus.ENDED));
     } else if (myFilter.isNotEnded() == true) {
-      queryFilter.add(Restrictions.or(Restrictions.ne("kostentraegerStatus", ProjektStatus.ENDED), Restrictions.isNull("kostentraegerStatus")));
+      queryFilter.add(Restrictions.or(Restrictions.ne("kostentraegerStatus", ProjektStatus.ENDED),
+          Restrictions.isNull("kostentraegerStatus")));
     }
-    queryFilter.addOrder(Order.asc("nummernkreis")).addOrder(Order.asc("bereich")).addOrder(Order.asc("teilbereich")).addOrder(
-        Order.asc("art.id"));
+    queryFilter.addOrder(Order.asc("nummernkreis")).addOrder(Order.asc("bereich")).addOrder(Order.asc("teilbereich"))
+    .addOrder(Order.asc("art.id"));
     return getList(queryFilter);
   }
 
@@ -216,11 +216,11 @@ public class Kost2Dao extends BaseDao<Kost2DO>
     final String sql = "from Kost2DO k where k.nummernkreis = ? and k.bereich = ? and k.teilbereich = ? and k.kost2Art.id = ?";
     if (obj.getId() == null) {
       // New kost entry
-      list = getHibernateTemplate().find(sql,
+      list = (List<Kost2DO>) getHibernateTemplate().find(sql,
           new Object[] { obj.getNummernkreis(), obj.getBereich(), obj.getTeilbereich(), obj.getKost2ArtId()});
     } else {
       // kost entry already exists. Check maybe changed:
-      list = getHibernateTemplate().find(sql + " and pk <> ?",
+      list = (List<Kost2DO>) getHibernateTemplate().find(sql + " and pk <> ?",
           new Object[] { obj.getNummernkreis(), obj.getBereich(), obj.getTeilbereich(), obj.getKost2ArtId(), obj.getId()});
     }
     if (CollectionUtils.isNotEmpty(list) == true) {

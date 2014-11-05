@@ -33,9 +33,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
@@ -71,24 +71,24 @@ public class TrainingAttendeeDO extends DefaultBaseDO implements ShortDisplayNam
 
   @PropertyInfo(i18nKey = "plugins.skillmatrix.skill.description")
   @UserPrefParameter(i18nKey = "description", multiline = true)
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String description;
 
   @PropertyInfo(i18nKey = "plugins.skillmatrix.skilltraining.rating")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String rating;
 
   @PropertyInfo(i18nKey = "plugins.skillmatrix.skilltraining.certificate")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String certificate;
 
   @PropertyInfo(i18nKey = "plugins.skillmatrix.skilltraining.startDate")
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   @DateBridge(resolution = Resolution.DAY)
   private Date startDate;
 
   @PropertyInfo(i18nKey = "plugins.skillmatrix.skilltraining.endDate")
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   @DateBridge(resolution = Resolution.DAY)
   private Date endDate;
 

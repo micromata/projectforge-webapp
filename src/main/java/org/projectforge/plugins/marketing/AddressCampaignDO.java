@@ -50,13 +50,13 @@ public class AddressCampaignDO extends DefaultBaseDO
 
   public static final int MAX_VALUE_LENGTH = 100;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String title;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String values;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String comment;
 
   @Column(length = Constants.LENGTH_TITLE)

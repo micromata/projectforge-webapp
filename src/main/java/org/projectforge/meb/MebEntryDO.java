@@ -37,9 +37,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
@@ -58,19 +58,19 @@ public class MebEntryDO extends AbstractBaseDO<Integer>
 {
   private static final long serialVersionUID = 4424813938259685100L;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private Integer id;
 
   @IndexedEmbedded(depth = 1)
   private PFUserDO owner;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String sender;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String message;
 
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   @DateBridge(resolution = Resolution.DAY)
   private Date date;
 
@@ -84,9 +84,9 @@ public class MebEntryDO extends AbstractBaseDO<Integer>
     return id;
   }
 
-  public void setId(Integer id)
+  public void setId(final Integer id)
   {
-    this.id = (Integer) id;
+    this.id = id;
   }
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -106,7 +106,7 @@ public class MebEntryDO extends AbstractBaseDO<Integer>
     }
   }
 
-  public MebEntryDO setOwner(PFUserDO owner)
+  public MebEntryDO setOwner(final PFUserDO owner)
   {
     this.owner = owner;
     return this;
@@ -118,7 +118,7 @@ public class MebEntryDO extends AbstractBaseDO<Integer>
     return sender;
   }
 
-  public MebEntryDO setSender(String sender)
+  public MebEntryDO setSender(final String sender)
   {
     this.sender = sender;
     return this;
@@ -130,7 +130,7 @@ public class MebEntryDO extends AbstractBaseDO<Integer>
     return message;
   }
 
-  public void setMessage(String message)
+  public void setMessage(final String message)
   {
     this.message = message;
   }
@@ -142,7 +142,7 @@ public class MebEntryDO extends AbstractBaseDO<Integer>
     return status;
   }
 
-  public MebEntryDO setStatus(MebEntryStatus status)
+  public MebEntryDO setStatus(final MebEntryStatus status)
   {
     this.status = status;
     return this;
@@ -154,7 +154,7 @@ public class MebEntryDO extends AbstractBaseDO<Integer>
     return date;
   }
 
-  public MebEntryDO setDate(Date date)
+  public MebEntryDO setDate(final Date date)
   {
     this.date = date;
     return this;

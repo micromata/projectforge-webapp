@@ -31,14 +31,13 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.core.DefaultBaseDO;
-
 
 /**
  * Posteingangsbuch
@@ -52,23 +51,23 @@ public class PostausgangDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = -8698436502147274025L;
 
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   @DateBridge(resolution = Resolution.DAY)
   private Date datum;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String empfaenger;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String person;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String inhalt;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String bemerkung;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private PostType type;
 
   @Column(nullable = false)

@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.projectforge</groupId>
     <artifactId>projectforge-parent</artifactId>
-    <version>5.4.1-SNAPSHOT</version> <!-- automatically set -->
+    <version>5.4</version> <!-- automatically set -->
   </parent>
   <licenses>
     <license>
@@ -28,7 +28,7 @@
     <repository>
       <id>org.projectforge.repo</id>
       <name>ProjectForge-REPO</name>
-      <url>http://www.projectforge.org/nexus/content/repositories/ProjectForge-Snapshots</url> <!-- automatically set -->
+      <url>http://www.projectforge.org/nexus/content/repositories/ProjectForge</url> <!-- automatically set -->
     </repository>
   </repositories>
   <dependencies>
@@ -141,9 +141,9 @@
       <version>${dom4j.version}</version>
     </dependency>
     <dependency>
-      <groupId>hsqldb</groupId>
+      <groupId>org.hsqldb</groupId>
       <artifactId>hsqldb</artifactId>
-      <version>1.8.0.7</version>
+      <version>2.3.2</version>
       <scope>test</scope>
     </dependency>
     <dependency> <!-- Version check: 2010-08-28: 3.13.GA -->
@@ -306,19 +306,19 @@
       <!-- see: http://repository.jboss.org/nexus/content/groups/public/org/hibernate/hibernate-core/ -->
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-core</artifactId>
-      <version>3.6.10.Final</version>
+      <version>4.3.7.Final</version>
     </dependency>
     <!-- dependency> <groupId>org.hibernate</groupId> <artifactId>hibernate-ehcache</artifactId> <version>4.1.7.Final</version> </dependency -->
     <dependency>
       <groupId>net.sf.ehcache</groupId>
       <artifactId>ehcache-core</artifactId>
-      <version>2.6.5</version>
+      <version>2.6.9</version>
     </dependency>
     <dependency> <!-- Version check: 2010-08-28 -->
       <!-- see: http://repository.jboss.org/nexus/content/groups/public/org/hibernate/hibernate-search/ -->
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-search</artifactId>
-      <version>3.4.2.Final</version>
+      <version>4.5.1.Final</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

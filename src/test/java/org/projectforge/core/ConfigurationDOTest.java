@@ -32,12 +32,11 @@ import java.util.List;
 import org.junit.Test;
 import org.projectforge.test.TestBase;
 
-
 public class ConfigurationDOTest extends TestBase
 {
   private ConfigurationDao configurationDao;
 
-  public void setConfigurationDao(ConfigurationDao configurationDao)
+  public void setConfigurationDao(final ConfigurationDao configurationDao)
   {
     this.configurationDao = configurationDao;
   }
@@ -63,12 +62,13 @@ public class ConfigurationDOTest extends TestBase
     config.setParameter("unknown");
     config.setValue("Hurzel");
     configurationDao.internalSave(config);
-    List<ConfigurationDO> list = getHibernateTemplate().find("from ConfigurationDO c where c.parameter = 'unknown'");
-    config = (ConfigurationDO) list.get(0);
+    List<ConfigurationDO> list = (List<ConfigurationDO>) getHibernateTemplate()
+        .find("from ConfigurationDO c where c.parameter = 'unknown'");
+    config = list.get(0);
     assertEquals("Hurzel", config.getStringValue());
     configurationDao.checkAndUpdateDatabaseEntries();
-    list = getHibernateTemplate().find("from ConfigurationDO c where c.parameter = 'unknown'");
-    config = (ConfigurationDO) list.get(0);
+    list = (List<ConfigurationDO>) getHibernateTemplate().find("from ConfigurationDO c where c.parameter = 'unknown'");
+    config = list.get(0);
     assertEquals("Entry should be deleted.", true, config.isDeleted());
 
     config = configurationDao.getEntry(ConfigurationParam.MESSAGE_OF_THE_DAY);
@@ -87,7 +87,7 @@ public class ConfigurationDOTest extends TestBase
     try {
       config.setType(ConfigurationType.INTEGER);
       fail("Exception should be thrown.");
-    } catch (RuntimeException ex) {
+    } catch (final RuntimeException ex) {
 
     }
   }

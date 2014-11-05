@@ -33,10 +33,10 @@ import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.PredicateUtils;
-import org.hibernate.EntityMode;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.proxy.HibernateProxyHelper;
 import org.projectforge.database.HibernateEntities;
@@ -193,7 +193,7 @@ public class HibernateXmlConverter
 
         if (preserveIds == false) {
           // Nun kann die ID gelöscht werden
-          classMetadata.setIdentifier(obj, null, EntityMode.POJO);
+          classMetadata.setIdentifier(obj, null, (SessionImplementor)session);
         }
         if (log.isDebugEnabled()) {
           log.debug("loading evicted object " + obj);

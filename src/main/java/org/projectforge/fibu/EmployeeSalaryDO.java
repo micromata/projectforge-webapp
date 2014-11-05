@@ -36,8 +36,8 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
@@ -62,19 +62,19 @@ public class EmployeeSalaryDO extends DefaultBaseDO
   private EmployeeDO employee;
 
   @PropertyInfo(i18nKey = "calendar.year")
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private Integer year;
 
   @PropertyInfo(i18nKey = "calendar.month")
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private Integer month;
 
   @PropertyInfo(i18nKey = "fibu.employee.salary.bruttoMitAgAnteil")
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private BigDecimal bruttoMitAgAnteil;
 
   @PropertyInfo(i18nKey = "comment")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String comment;
 
   @PropertyInfo(i18nKey = "fibu.employee.salary.type")

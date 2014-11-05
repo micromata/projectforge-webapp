@@ -39,7 +39,6 @@ import org.projectforge.reporting.Kost2Art;
 import org.projectforge.reporting.impl.Kost2ArtImpl;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
-
 /**
  * The kost2 entries will be cached.
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -57,7 +56,7 @@ public class KostCache extends AbstractCache
   private Map<Integer, Kost1DO> kost1Map;
 
   private List<Kost2Art> allKost2Arts;
-  
+
   private boolean kost2EntriesExists = false;
 
   public Kost2DO getKost2(final Integer kost2Id)
@@ -94,7 +93,7 @@ public class KostCache extends AbstractCache
     return null;
   }
 
-  public List<Kost2DO> getActiveKost2(int nummernkreis, int bereich, int teilbereich)
+  public List<Kost2DO> getActiveKost2(final int nummernkreis, final int bereich, final int teilbereich)
   {
     final List<Kost2DO> list = new ArrayList<Kost2DO>();
     for (final Kost2DO kost : getKost2Map().values()) {
@@ -123,19 +122,19 @@ public class KostCache extends AbstractCache
    * Gibt die für das Projekt definierten, nicht gelöschten Kostenarten zurück.
    * @param projektId
    */
-  public Set<Kost2ArtDO> getKost2Arts(Integer projektId)
+  public Set<Kost2ArtDO> getKost2Arts(final Integer projektId)
   {
     checkRefresh();
-    Set<Kost2ArtDO> set = new TreeSet<Kost2ArtDO>();
+    final Set<Kost2ArtDO> set = new TreeSet<Kost2ArtDO>();
     if (projektId == null) {
       return set;
     }
-    for (Kost2DO kost : getKost2Map().values()) {
+    for (final Kost2DO kost : getKost2Map().values()) {
       if (kost.isDeleted() == true) {
         continue;
       }
       if (ObjectUtils.equals(projektId, kost.getProjektId()) == true) {
-        Kost2ArtDO kost2Art = kost.getKost2Art();
+        final Kost2ArtDO kost2Art = kost.getKost2Art();
         if (kost2Art != null) {
           set.add(kost2Art);
         }
@@ -148,12 +147,12 @@ public class KostCache extends AbstractCache
    * Gibt alle nicht gelöschten Kostenarten zurück, wobei die für das Projekt definierten entsprechend markiert sind.
    * @param projektId
    */
-  public List<Kost2Art> getAllKost2Arts(Integer projektId)
+  public List<Kost2Art> getAllKost2Arts(final Integer projektId)
   {
     checkRefresh();
     final Set<Kost2ArtDO> set = getKost2Arts(projektId);
     final List<Kost2Art> result = new ArrayList<Kost2Art>();
-    for (Kost2Art kost2Art : allKost2Arts) {
+    for (final Kost2Art kost2Art : allKost2Arts) {
       if (kost2Art.isDeleted() == true) {
         continue;
       }
@@ -182,7 +181,7 @@ public class KostCache extends AbstractCache
     }
     return list;
   }
-  
+
   public boolean isKost2EntriesExists()
   {
     checkRefresh();
@@ -210,10 +209,10 @@ public class KostCache extends AbstractCache
   @SuppressWarnings("unchecked")
   void updateKost2Arts()
   {
-    List<Kost2ArtDO> result = hibernateTemplate.find("from Kost2ArtDO t where t.deleted = false order by t.id");
-    List<Kost2Art> list = new ArrayList<Kost2Art>();
-    for (Kost2ArtDO kost2ArtDO : result) {
-      Kost2ArtImpl art = new Kost2ArtImpl(kost2ArtDO);
+    final List<Kost2ArtDO> result = (List<Kost2ArtDO>) hibernateTemplate.find("from Kost2ArtDO t where t.deleted = false order by t.id");
+    final List<Kost2Art> list = new ArrayList<Kost2Art>();
+    for (final Kost2ArtDO kost2ArtDO : result) {
+      final Kost2ArtImpl art = new Kost2ArtImpl(kost2ArtDO);
       list.add(art);
     }
     // This method must not be synchronized because it works with a new copy of list.
@@ -235,21 +234,22 @@ public class KostCache extends AbstractCache
   /**
    * This method will be called by CacheHelper and is synchronized via getData();
    */
+  @Override
   @SuppressWarnings("unchecked")
   protected void refresh()
   {
     log.info("Initializing KostCache ...");
     // This method must not be synchronized because it works with a new copy of maps.
     final Map<Integer, Kost1DO> map1 = new HashMap<Integer, Kost1DO>();
-    final List<Kost1DO> list1 = hibernateTemplate.find("from Kost1DO t");
-    for (Kost1DO kost1 : list1) {
+    final List<Kost1DO> list1 = (List<Kost1DO>) hibernateTemplate.find("from Kost1DO t");
+    for (final Kost1DO kost1 : list1) {
       map1.put(kost1.getId(), kost1);
     }
     this.kost1Map = map1;
     final Map<Integer, Kost2DO> map2 = new HashMap<Integer, Kost2DO>();
-    final List<Kost2DO> list2 = hibernateTemplate.find("from Kost2DO t");
+    final List<Kost2DO> list2 = (List<Kost2DO>) hibernateTemplate.find("from Kost2DO t");
     kost2EntriesExists = false;
-    for (Kost2DO kost2 : list2) {
+    for (final Kost2DO kost2 : list2) {
       if (kost2EntriesExists == false && kost2.isDeleted() == false) {
         kost2EntriesExists = true;
       }
@@ -260,7 +260,7 @@ public class KostCache extends AbstractCache
     log.info("Initializing of KostCache done.");
   }
 
-  public void setHibernateTemplate(HibernateTemplate hibernateTemplate)
+  public void setHibernateTemplate(final HibernateTemplate hibernateTemplate)
   {
     this.hibernateTemplate = hibernateTemplate;
   }

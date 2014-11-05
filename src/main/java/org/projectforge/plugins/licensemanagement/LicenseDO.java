@@ -35,10 +35,10 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.Type;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
@@ -54,7 +54,7 @@ import org.projectforge.user.HibernateSearchUsersBridge;
  */
 @Entity
 @Indexed
-@ClassBridge(name = "owners", index = Index.TOKENIZED, store = Store.NO, impl = HibernateSearchUsersBridge.class)
+@ClassBridge(name = "owners", store = Store.NO, impl = HibernateSearchUsersBridge.class)
 @Table(name = "T_PLUGIN_LM_LICENSE")
 public class LicenseDO extends DefaultBaseDO
 {
@@ -64,36 +64,36 @@ public class LicenseDO extends DefaultBaseDO
     AbstractHistorizableBaseDO.putNonHistorizableProperty(LicenseDO.class, "file1", "file2");
   }
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String organization;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String product;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String version;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String updateFromVersion;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String licenseHolder;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String key;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private Integer numberOfLicenses;
 
   private String ownerIds;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String device;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String comment;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private LicenseStatus status;
 
   @DateBridge(resolution = Resolution.DAY)
@@ -104,12 +104,12 @@ public class LicenseDO extends DefaultBaseDO
 
   private byte[] file1;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String filename1;
 
   private byte[] file2;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String filename2;
 
   @Transient

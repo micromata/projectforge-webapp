@@ -35,9 +35,9 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
@@ -76,20 +76,20 @@ public class TimesheetDO extends DefaultBaseDO implements Comparable<TimesheetDO
 
   private String timeZone;
 
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   @DateBridge(resolution = Resolution.MINUTE)
   private Timestamp startTime;
 
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   @DateBridge(resolution = Resolution.MINUTE)
   private Timestamp stopTime;
 
   @UserPrefParameter(i18nKey = "timesheet.location")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String location;
 
   @UserPrefParameter(i18nKey = "description", multiline = true)
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String description;
 
   @UserPrefParameter(i18nKey = "fibu.kost2", orderString = "3", dependsOn = "task")

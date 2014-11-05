@@ -46,9 +46,7 @@ public class SkillRatingDao extends BaseDao<SkillRatingDO>
 
   public static final String I18N_KEY_SKILLRATING_PREFIX = "plugins.skillmatrix.skillrating";
 
-  public static final UserRightId USER_RIGHT_ID = new UserRightId(
-      UNIQUE_PLUGIN_ID, "plugin20",
-      I18N_KEY_SKILLRATING_PREFIX);
+  public static final UserRightId USER_RIGHT_ID = new UserRightId(UNIQUE_PLUGIN_ID, "plugin20", I18N_KEY_SKILLRATING_PREFIX);
 
   static final String I18N_KEY_ERROR_CYCLIC_REFERENCE = "plugins.skillmatrix.error.cyclicReference";
 
@@ -58,7 +56,7 @@ public class SkillRatingDao extends BaseDao<SkillRatingDO>
 
   public static final String I18N_KEY_ERROR_UNRATEABLE_SKILL_WITH_RATING = "plugins.skillmatrix.error.unrateableSkillWithRating";
 
-  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "skill.title" };
+  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "skill.title"};
 
   public SkillRatingDao()
   {
@@ -92,18 +90,20 @@ public class SkillRatingDao extends BaseDao<SkillRatingDO>
   private void checkConstraintViolation(final SkillRatingDO skillRating) throws UserException
   {
     List<SkillRatingDO> list;
-    if(skillRating.getId() != null) {
-      list = getHibernateTemplate().find("from SkillRatingDO s where s.user.id = ? and s.skill.id = ? and s.id != ?", new Object[] { skillRating.getUserId(), skillRating.getSkillId(), skillRating.getId()});
+    if (skillRating.getId() != null) {
+      list = (List<SkillRatingDO>) getHibernateTemplate().find("from SkillRatingDO s where s.user.id = ? and s.skill.id = ? and s.id != ?",
+          new Object[] { skillRating.getUserId(), skillRating.getSkillId(), skillRating.getId()});
     } else {
-      list = getHibernateTemplate().find("from SkillRatingDO s where s.user.id = ? and s.skill.id = ?", new Object[] { skillRating.getUserId(), skillRating.getSkillId()});
+      list = (List<SkillRatingDO>) getHibernateTemplate().find("from SkillRatingDO s where s.user.id = ? and s.skill.id = ?",
+          new Object[] { skillRating.getUserId(), skillRating.getSkillId()});
     }
-    if(CollectionUtils.isNotEmpty(list) == true) {
+    if (CollectionUtils.isNotEmpty(list) == true) {
       throw new UserException(I18N_KEY_ERROR_DUPLICATE_RATING);
     }
 
-    if(skillRating.getSkill().isRateable() == false && skillRating.getSkillRating() != null) {
+    if (skillRating.getSkill().isRateable() == false && skillRating.getSkillRating() != null) {
       throw new UserException(I18N_KEY_ERROR_UNRATEABLE_SKILL_WITH_RATING);
-    } else if(skillRating.getSkill().isRateable() == true && skillRating.getSkillRating() == null) {
+    } else if (skillRating.getSkill().isRateable() == true && skillRating.getSkillRating() == null) {
       throw new UserException(I18N_KEY_ERROR_RATEABLE_SKILL_WITH_NULL_RATING);
     }
   }
@@ -133,8 +133,7 @@ public class SkillRatingDao extends BaseDao<SkillRatingDO>
     final String searchString = myFilter.getSearchString();
 
     if (myFilter.getSkillRating() != null) {
-      final Object[] values = SkillRating.getRequiredExperienceValues(myFilter
-          .getSkillRating());
+      final Object[] values = SkillRating.getRequiredExperienceValues(myFilter.getSkillRating());
       queryFilter.add(Restrictions.in("skillRating", values));
     }
 

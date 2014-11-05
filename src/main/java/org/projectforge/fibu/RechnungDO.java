@@ -41,8 +41,8 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.IndexColumn;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
@@ -61,7 +61,7 @@ public class RechnungDO extends AbstractRechnungDO<RechnungsPositionDO> implemen
   private static final long serialVersionUID = 8143023040624332677L;
 
   @PropertyInfo(i18nKey = "fibu.rechnung.nummer")
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private Integer nummer;
 
   @PropertyInfo(i18nKey = "fibu.kunde")
@@ -69,7 +69,7 @@ public class RechnungDO extends AbstractRechnungDO<RechnungsPositionDO> implemen
   private KundeDO kunde;
 
   @PropertyInfo(i18nKey = "fibu.kunde")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String kundeText;
 
   @PropertyInfo(i18nKey = "fibu.projekt")
@@ -77,11 +77,11 @@ public class RechnungDO extends AbstractRechnungDO<RechnungsPositionDO> implemen
   private ProjektDO projekt;
 
   @PropertyInfo(i18nKey = "fibu.rechnung.status")
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private RechnungStatus status;
 
   @PropertyInfo(i18nKey = "fibu.rechnung.typ")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private RechnungTyp typ;
 
   static {

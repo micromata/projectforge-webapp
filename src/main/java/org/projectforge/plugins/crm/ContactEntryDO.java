@@ -61,27 +61,27 @@ public class ContactEntryDO extends DefaultBaseDO
 
   @PropertyInfo(i18nKey = "contactType")
   @Enumerated(EnumType.STRING)
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private ContactType contactType; // 15
 
   @PropertyInfo(i18nKey = "city")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String city;
 
   @PropertyInfo(i18nKey = "country")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String country;
 
   @PropertyInfo(i18nKey = "state")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String state;
 
   @PropertyInfo(i18nKey = "street")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String street;
 
   @PropertyInfo(i18nKey = "zipCode")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String zipCode;
 
   /**

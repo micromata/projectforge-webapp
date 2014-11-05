@@ -31,14 +31,13 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.core.DefaultBaseDO;
-
 
 /**
  * Posteingangsbuch
@@ -52,23 +51,23 @@ public class PosteingangDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = -4713747110526000256L;
 
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   @DateBridge(resolution = Resolution.DAY)
   private Date datum;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String absender;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String person;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String inhalt;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String bemerkung;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private PostType type;
 
   @Column(nullable = false)
@@ -77,7 +76,7 @@ public class PosteingangDO extends DefaultBaseDO
     return datum;
   }
 
-  public void setDatum(Date datum)
+  public void setDatum(final Date datum)
   {
     this.datum = datum;
   }
@@ -88,7 +87,7 @@ public class PosteingangDO extends DefaultBaseDO
     return person;
   }
 
-  public void setPerson(String person)
+  public void setPerson(final String person)
   {
     this.person = person;
   }
@@ -99,7 +98,7 @@ public class PosteingangDO extends DefaultBaseDO
     return absender;
   }
 
-  public void setAbsender(String absender)
+  public void setAbsender(final String absender)
   {
     this.absender = absender;
   }
@@ -110,7 +109,7 @@ public class PosteingangDO extends DefaultBaseDO
     return inhalt;
   }
 
-  public void setInhalt(String inhalt)
+  public void setInhalt(final String inhalt)
   {
     this.inhalt = inhalt;
   }
@@ -121,7 +120,7 @@ public class PosteingangDO extends DefaultBaseDO
     return bemerkung;
   }
 
-  public void setBemerkung(String bemerkung)
+  public void setBemerkung(final String bemerkung)
   {
     this.bemerkung = bemerkung;
   }
@@ -133,7 +132,7 @@ public class PosteingangDO extends DefaultBaseDO
     return type;
   }
 
-  public void setType(PostType type)
+  public void setType(final PostType type)
   {
     this.type = type;
   }

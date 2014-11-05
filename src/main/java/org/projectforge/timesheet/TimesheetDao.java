@@ -135,7 +135,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
   @SuppressWarnings("unchecked")
   public int[] getYears(final Integer userId)
   {
-    final List<Object[]> list = getHibernateTemplate().find(
+    final List<Object[]> list = (List<Object[]>) getHibernateTemplate().find(
         "select min(startTime), max(startTime) from TimesheetDO t where user.id=? and deleted=false", userId);
     return SQLHelper.getYears(list);
   }

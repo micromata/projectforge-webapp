@@ -112,7 +112,7 @@ public class ContractDao extends BaseDao<ContractDO>
         throw new UserException("legalAffaires.contract.error.numberNotConsecutivelyNumbered");
       }
     } else {
-      final List<RechnungDO> list = getHibernateTemplate().find("from ContractDO c where c.number = ? and c.id <> ?",
+      final List<RechnungDO> list = (List<RechnungDO>) getHibernateTemplate().find("from ContractDO c where c.number = ? and c.id <> ?",
           new Object[] { obj.getNumber(), obj.getId()});
       if (list != null && list.size() > 0) {
         throw new UserException("legalAffaires.contract.error.numberAlreadyExists");

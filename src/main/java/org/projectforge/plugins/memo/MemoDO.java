@@ -33,8 +33,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
@@ -61,18 +61,18 @@ public class MemoDO extends AbstractBaseDO<Integer>
   private static final long serialVersionUID = -1755234078022019415L;
 
   @PropertyInfo(i18nKey = "id")
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private Integer id;
 
   @PropertyInfo(i18nKey = "plugins.memo.subject")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String subject;
 
   @IndexedEmbedded
   private PFUserDO owner;
 
   @PropertyInfo(i18nKey = "plugins.memo.memo")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String memo;
 
   @Override

@@ -56,7 +56,7 @@ public class KontoDao extends BaseDao<KontoDO>
     if (kontonummer == null) {
       return null;
     }
-    final List<KontoDO> list = getHibernateTemplate().find("from KontoDO u where u.nummer = ?", kontonummer);
+    final List<KontoDO> list = (List<KontoDO>) getHibernateTemplate().find("from KontoDO u where u.nummer = ?", kontonummer);
     if (CollectionUtils.isEmpty(list) == true) {
       return null;
     }

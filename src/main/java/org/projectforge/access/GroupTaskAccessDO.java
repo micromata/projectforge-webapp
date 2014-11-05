@@ -80,7 +80,7 @@ public class GroupTaskAccessDO extends DefaultBaseDO
 
   private boolean recursive = true;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String description;
 
   private Set<AccessEntryDO> accessEntries = null;

@@ -21,43 +21,11 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.core;
+package org.projectforge.lucene;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import org.apache.lucene.util.Version;
 
-import org.hibernate.search.annotations.Analyze;
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Store;
-import org.projectforge.lucene.ClassicAnalyzer;
-
-
-/**
- * @author Kai Reinhard (k.reinhard@micromata.de)
- */
-@MappedSuperclass
-@Analyzer(impl = ClassicAnalyzer.class)
-public class DefaultBaseDO extends AbstractHistorizableBaseDO<Integer>
+public final class LuceneVersionDef
 {
-  private static final long serialVersionUID = 659687830219996653L;
-
-  @PropertyInfo(i18nKey = "id")
-  @Field(analyze = Analyze.NO, store = Store.NO)
-  private Integer id;
-
-  @Id
-  @GeneratedValue
-  @Column(name = "pk")
-  public Integer getId()
-  {
-    return id;
-  }
-
-  public void setId(final Integer id)
-  {
-    this.id = id;
-  }
+  public static final Version CURRENT_VERSION =  Version.LUCENE_36;
 }

@@ -165,7 +165,7 @@ public class PersonalContactDao extends HibernateDaoSupport
     final PFUserDO owner = PFUserContext.getUser();
     Validate.notNull(owner);
     Validate.notNull(owner.getId());
-    final List<PersonalContactDO> list = getHibernateTemplate().find(
+    final List<PersonalContactDO> list = (List<PersonalContactDO>)getHibernateTemplate().find(
         "from " + PersonalContactDO.class.getSimpleName() + " t where t.owner.id = ? and t.contact.id = ?",
         new Object[] { owner.getId(), contactId});
     if (list != null) {
@@ -194,7 +194,7 @@ public class PersonalContactDao extends HibernateDaoSupport
     Validate.notNull(owner);
     Validate.notNull(owner.getId());
     @SuppressWarnings("unchecked")
-    final List<PersonalContactDO> list = getHibernateTemplate().find(
+    final List<PersonalContactDO> list = (List<PersonalContactDO>)getHibernateTemplate().find(
         "from "
             + PersonalContactDO.class.getSimpleName()
             + " t join fetch t.contact where t.owner.id=? and t.contact.deleted=false order by t.contact.name, t.contact.firstName",
@@ -213,7 +213,7 @@ public class PersonalContactDao extends HibernateDaoSupport
     final PFUserDO owner = PFUserContext.getUser();
     Validate.notNull(owner);
     Validate.notNull(owner.getId());
-    final List<PersonalContactDO> list = getHibernateTemplate().find(
+    final List<PersonalContactDO> list = (List<PersonalContactDO>)getHibernateTemplate().find(
         "from " + PersonalContactDO.class.getSimpleName() + " t where t.owner.id = ?", owner.getId());
     final Map<Integer, PersonalContactDO> result = new HashMap<Integer, PersonalContactDO>();
     for (final PersonalContactDO entry : list) {
@@ -235,7 +235,7 @@ public class PersonalContactDao extends HibernateDaoSupport
     final PFUserDO owner = PFUserContext.getUser();
     Validate.notNull(owner);
     Validate.notNull(owner.getId());
-    final List<PersonalContactDO> list = getHibernateTemplate().find(
+    final List<PersonalContactDO> list = (List<PersonalContactDO>)getHibernateTemplate().find(
         "from "
             + PersonalContactDO.class.getSimpleName()
             + " t join fetch t.contact where t.owner.id = ? and t.contact.deleted = false order by t.contact.name, t.contact.firstName",

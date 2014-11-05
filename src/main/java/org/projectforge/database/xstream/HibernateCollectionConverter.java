@@ -29,9 +29,9 @@ import java.util.HashSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.hibernate.collection.PersistentCollection;
-import org.hibernate.collection.PersistentSet;
-import org.hibernate.collection.PersistentSortedSet;
+import org.hibernate.collection.internal.PersistentSet;
+import org.hibernate.collection.internal.PersistentSortedSet;
+import org.hibernate.collection.spi.PersistentCollection;
 
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.ConverterLookup;
@@ -50,17 +50,17 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
  */
 public class HibernateCollectionConverter implements Converter
 {
-  private Converter listSetConverter;
+  private final Converter listSetConverter;
 
-  private Converter mapConverter;
+  private final Converter mapConverter;
 
-  private Converter treeMapConverter;
+  private final Converter treeMapConverter;
 
-  private Converter treeSetConverter;
+  private final Converter treeSetConverter;
 
-  private Converter defaultConverter;
+  private final Converter defaultConverter;
 
-  public HibernateCollectionConverter(ConverterLookup converterLookup)
+  public HibernateCollectionConverter(final ConverterLookup converterLookup)
   {
     listSetConverter = converterLookup.lookupConverterForType(ArrayList.class);
     mapConverter = converterLookup.lookupConverterForType(HashMap.class);
@@ -72,7 +72,7 @@ public class HibernateCollectionConverter implements Converter
   /**
    * @see com.thoughtworks.xstream.converters.Converter#canConvert(java.lang.Class)
    */
-  public boolean canConvert(Class type)
+  public boolean canConvert(final Class type)
   {
     return PersistentCollection.class.isAssignableFrom(type);
   }
@@ -81,12 +81,12 @@ public class HibernateCollectionConverter implements Converter
    * @see com.thoughtworks.xstream.converters.Converter#marshal(java.lang.Object, com.thoughtworks.xstream.io.HierarchicalStreamWriter,
    *      com.thoughtworks.xstream.converters.MarshallingContext)
    */
-  public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context)
+  public void marshal(final Object source, final HierarchicalStreamWriter writer, final MarshallingContext context)
   {
     Object collection = source;
 
     if (source instanceof PersistentCollection) {
-      PersistentCollection col = (PersistentCollection) source;
+      final PersistentCollection col = (PersistentCollection) source;
       col.forceInitialization();
       // ToDo ES: collection = col.getCollectionSnapshot().getSnapshot();
       collection = col.getStoredSnapshot();
@@ -125,7 +125,7 @@ public class HibernateCollectionConverter implements Converter
    * @see com.thoughtworks.xstream.converters.Converter#unmarshal(com.thoughtworks.xstream.io.HierarchicalStreamReader,
    *      com.thoughtworks.xstream.converters.UnmarshallingContext)
    */
-  public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context)
+  public Object unmarshal(final HierarchicalStreamReader reader, final UnmarshallingContext context)
   {
     return null;
   }

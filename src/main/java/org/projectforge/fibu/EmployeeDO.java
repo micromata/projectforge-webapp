@@ -36,9 +36,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
@@ -69,37 +69,37 @@ public class EmployeeDO extends DefaultBaseDO
   private Kost1DO kost1;
 
   @PropertyInfo(i18nKey = "status")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private EmployeeStatus status;
 
   @PropertyInfo(i18nKey = "address.positionText")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String position;
 
   @PropertyInfo(i18nKey = "fibu.employee.eintrittsdatum")
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   @DateBridge(resolution = Resolution.DAY)
   private Date eintrittsDatum;
 
   @PropertyInfo(i18nKey = "fibu.employee.austrittsdatum")
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   @DateBridge(resolution = Resolution.DAY)
   private Date austrittsDatum;
 
   @PropertyInfo(i18nKey = "address.division")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String abteilung;
 
   @PropertyInfo(i18nKey = "fibu.employee.urlaubstage")
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private Integer urlaubstage;
 
   @PropertyInfo(i18nKey = "fibu.employee.wochenstunden")
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private BigDecimal weeklyWorkingHours;
 
   @PropertyInfo(i18nKey = "comment")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String comment;
 
   @Enumerated(EnumType.STRING)

@@ -56,7 +56,6 @@ import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
-import org.hibernate.EmptyInterceptor;
 import org.hibernate.FlushMode;
 import org.hibernate.Hibernate;
 import org.hibernate.LockOptions;
@@ -267,7 +266,7 @@ public class XmlDump
     Session session = null;
     try {
       final SessionFactory sessionFactory = hibernate.getSessionFactory();
-      session = sessionFactory.openSession(EmptyInterceptor.INSTANCE);
+      session = sessionFactory.openSession();
       session.setFlushMode(FlushMode.AUTO);
       final XStream xstream = XStreamHelper.createXStream();
       xstream.setMode(XStream.ID_REFERENCES);
@@ -378,7 +377,7 @@ public class XmlDump
     Session session = null;
     boolean hasError = false;
     try {
-      session = sessionFactory.openSession(EmptyInterceptor.INSTANCE);
+      session = sessionFactory.openSession();
       session.setDefaultReadOnly(true);
       int counter = 0;
       for (final Map.Entry<Class< ? >, List<Object>> entry : xstreamSavingConverter.getAllObjects().entrySet()) {

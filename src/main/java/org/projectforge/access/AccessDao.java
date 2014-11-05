@@ -111,7 +111,7 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public List<GroupTaskAccessDO> internalLoadAll()
   {
-    List<GroupTaskAccessDO> list = getHibernateTemplate().find(
+    List<GroupTaskAccessDO> list = (List<GroupTaskAccessDO>)getHibernateTemplate().find(
         "from GroupTaskAccessDO g join fetch g.accessEntries where deleted=false order by g.task.id, g.group.id");
     list = selectUnique(list);
     return list;
@@ -131,7 +131,7 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
     Validate.notNull(task.getId());
     Validate.notNull(group);
     Validate.notNull(group.getId());
-    final List<GroupTaskAccessDO> list = getHibernateTemplate().find("from GroupTaskAccessDO a where a.task.id = ? and a.group.id = ?",
+    final List<GroupTaskAccessDO> list = (List<GroupTaskAccessDO>)getHibernateTemplate().find("from GroupTaskAccessDO a where a.task.id = ? and a.group.id = ?",
         new Object[] { task.getId(), group.getId()});
     if (list != null && list.size() == 1) {
       final GroupTaskAccessDO access = list.get(0);

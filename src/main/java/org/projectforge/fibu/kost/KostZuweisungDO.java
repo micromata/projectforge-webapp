@@ -36,8 +36,8 @@ import javax.persistence.UniqueConstraint;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
@@ -66,7 +66,7 @@ public class KostZuweisungDO extends DefaultBaseDO implements ShortDisplayNameCa
 
   private short index;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private BigDecimal netto;
 
   @IndexedEmbedded(depth = 1)
@@ -84,7 +84,7 @@ public class KostZuweisungDO extends DefaultBaseDO implements ShortDisplayNameCa
   @IndexedEmbedded(depth = 1)
   private EmployeeSalaryDO employeeSalary;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String comment;
 
   /**

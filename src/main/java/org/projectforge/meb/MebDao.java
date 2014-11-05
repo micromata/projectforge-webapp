@@ -63,7 +63,7 @@ public class MebDao extends BaseDao<MebEntryDO>
 
   private UserDao userDao;
 
-  private MebCache mebCache = new MebCache(this);
+  private final MebCache mebCache = new MebCache(this);
 
   /**
    * Removes all non digit and letter characters (also white-spaces) first. Afterward a MD5 checksum is calculated.
@@ -76,9 +76,9 @@ public class MebDao extends BaseDao<MebEntryDO>
     final String str = StringHelper.removeNonDigitsAndNonASCIILetters(message);
     try {
       final MessageDigest md5 = MessageDigest.getInstance("MD5");
-      byte[] result = md5.digest(str.getBytes());
+      final byte[] result = md5.digest(str.getBytes());
       return StringHelper.asHex(result);
-    } catch (NoSuchAlgorithmException ex) {
+    } catch (final NoSuchAlgorithmException ex) {
       log.error("Exception encountered " + ex, ex);
       return "";
     }
@@ -100,7 +100,7 @@ public class MebDao extends BaseDao<MebEntryDO>
       }
     } else {
       try {
-        long seconds = Long.parseLong(dateString);
+        final long seconds = Long.parseLong(dateString);
         if (seconds < 1274480916 || seconds > 1999999999) {
           log.warn("Servlet call for receiving sms ignored because date string is not parseable (millis since 01/01/1970 or format '"
               + DATE_FORMAT
@@ -194,14 +194,14 @@ public class MebDao extends BaseDao<MebEntryDO>
     synchronized (this) {
       final String checkSum = createCheckSum(entry.getMessage());
       // First check weather the entry is already in the data base or not.
-      final List<ImportedMebEntryDO> entryList = getHibernateTemplate().find(
+      final List<ImportedMebEntryDO> entryList = (List<ImportedMebEntryDO>)getHibernateTemplate().find(
           "from ImportedMebEntryDO e where e.sender = ? and e.date = ? and e.checkSum = ?",
           new Object[] { entry.getSender(), entry.getDate(), checkSum});
       if (entryList != null && entryList.size() > 0) {
         return false;
       }
       // Try to assign the owner from the sender string.
-      final List<Object[]> userList = (List<Object[]>) getSession().createQuery(
+      final List<Object[]> userList = getSession().createQuery(
           "select id, personalMebMobileNumbers from PFUserDO u where deleted = false and personalMebMobileNumbers is not null").list();
       final String senderNumber = StringHelper.removeNonDigits(entry.getSender());
       Integer pk = null;
@@ -236,7 +236,7 @@ public class MebDao extends BaseDao<MebEntryDO>
   }
 
   @Override
-  protected void afterSaveOrModify(MebEntryDO obj)
+  protected void afterSaveOrModify(final MebEntryDO obj)
   {
     mebCache.setExpired();
   }
@@ -247,12 +247,12 @@ public class MebDao extends BaseDao<MebEntryDO>
     return new MebEntryDO();
   }
 
-  public void setDataSource(DataSource dataSource)
+  public void setDataSource(final DataSource dataSource)
   {
     this.dataSource = dataSource;
   }
 
-  public void setUserDao(UserDao userDao)
+  public void setUserDao(final UserDao userDao)
   {
     this.userDao = userDao;
   }

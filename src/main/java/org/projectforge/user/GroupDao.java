@@ -59,7 +59,7 @@ public class GroupDao extends BaseDao<GroupDO>
 
   private UserDao userDao;
 
-  //private final GroupsProvider groupsProvider = new GroupsProvider();
+  // private final GroupsProvider groupsProvider = new GroupsProvider();
 
   public void setUserDao(final UserDao userDao)
   {
@@ -111,10 +111,11 @@ public class GroupDao extends BaseDao<GroupDO>
     List<GroupDO> list = null;
     if (group.getId() == null) {
       // New group
-      list = getHibernateTemplate().find("from GroupDO g where g.name = ?", group.getName());
+      list = (List<GroupDO>) getHibernateTemplate().find("from GroupDO g where g.name = ?", group.getName());
     } else {
       // group already exists. Check maybe changed name:
-      list = getHibernateTemplate().find("from GroupDO g where g.name = ? and pk <> ?", new Object[] { group.getName(), group.getId()});
+      list = (List<GroupDO>) getHibernateTemplate().find("from GroupDO g where g.name = ? and pk <> ?",
+          new Object[] { group.getName(), group.getId()});
     }
     if (CollectionUtils.isNotEmpty(list) == true) {
       return true;
@@ -154,31 +155,31 @@ public class GroupDao extends BaseDao<GroupDO>
     }
   }
 
-  //  /**
-  //   * Please note: Only the string group.nestedGroups will be modified (but not be saved)!
-  //   * @param group
-  //   * @param nestedGroups Full list of all nested groups which have to assigned to this group.
-  //   * @return
-  //   */
-  //  public void setNestedGroups(final GroupDO group, final Collection<GroupDO> nestedGroups)
-  //  {
-  //    if (group.isNestedGroupsAllowed() == false && CollectionUtils.isNotEmpty(nestedGroups) == true) {
-  //      log.warn("Couldn't set nested groups because given group doesn't allow nested groups: " + group);
-  //      group.setNestedGroupIds(null);
-  //      return;
-  //    }
-  //    group.setNestedGroupIds(groupsProvider.getGroupIds(nestedGroups));
-  //  }
+  // /**
+  // * Please note: Only the string group.nestedGroups will be modified (but not be saved)!
+  // * @param group
+  // * @param nestedGroups Full list of all nested groups which have to assigned to this group.
+  // * @return
+  // */
+  // public void setNestedGroups(final GroupDO group, final Collection<GroupDO> nestedGroups)
+  // {
+  // if (group.isNestedGroupsAllowed() == false && CollectionUtils.isNotEmpty(nestedGroups) == true) {
+  // log.warn("Couldn't set nested groups because given group doesn't allow nested groups: " + group);
+  // group.setNestedGroupIds(null);
+  // return;
+  // }
+  // group.setNestedGroupIds(groupsProvider.getGroupIds(nestedGroups));
+  // }
   //
-  //  public Collection<GroupDO> getSortedNestedGroups(final GroupDO group)
-  //  {
-  //    if (group.isNestedGroupsAllowed() == false && StringUtils.isNotEmpty(group.getNestedGroupIds()) == true) {
-  //      log.warn("Ignore nested groups because given group doesn't allow nested groups: " + group);
-  //      group.setNestedGroupIds(null);
-  //      return null;
-  //    }
-  //    return groupsProvider.getSortedGroups(group.getNestedGroupIds());
-  //  }
+  // public Collection<GroupDO> getSortedNestedGroups(final GroupDO group)
+  // {
+  // if (group.isNestedGroupsAllowed() == false && StringUtils.isNotEmpty(group.getNestedGroupIds()) == true) {
+  // log.warn("Ignore nested groups because given group doesn't allow nested groups: " + group);
+  // group.setNestedGroupIds(null);
+  // return null;
+  // }
+  // return groupsProvider.getSortedGroups(group.getNestedGroupIds());
+  // }
 
   /**
    * Creates for every user an history entry if the user is part of this new group.
@@ -306,7 +307,7 @@ public class GroupDao extends BaseDao<GroupDO>
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   List<GroupDO> loadAll()
   {
-    final List<GroupDO> list = getHibernateTemplate().find("from GroupDO t join");
+    final List<GroupDO> list = (List<GroupDO>) getHibernateTemplate().find("from GroupDO t join");
     return list;
   }
 
@@ -392,14 +393,13 @@ public class GroupDao extends BaseDao<GroupDO>
     return new GroupDO();
   }
 
-
   public GroupDO getByName(final String name)
   {
     if (name == null) {
       return null;
     }
     @SuppressWarnings("unchecked")
-    final List<GroupDO> list = getHibernateTemplate().find("from GroupDO u where u.name = ?", name);
+    final List<GroupDO> list = (List<GroupDO>) getHibernateTemplate().find("from GroupDO u where u.name = ?", name);
     if (CollectionUtils.isEmpty(list) == true) {
       return null;
     }

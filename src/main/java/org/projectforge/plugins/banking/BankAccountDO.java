@@ -44,19 +44,19 @@ public class BankAccountDO extends DefaultBaseDO implements Historizable, ShortD
 {
   private static final long serialVersionUID = -6492718816678384637L;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String accountNumber;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String bank;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String bankIdentificationCode;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String name;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String description;
 
   @Column(name = "account_number", length = 255, nullable = false, unique = true)

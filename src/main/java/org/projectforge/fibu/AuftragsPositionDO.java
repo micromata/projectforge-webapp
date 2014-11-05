@@ -40,10 +40,10 @@ import javax.persistence.UniqueConstraint;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
@@ -58,7 +58,7 @@ import org.projectforge.task.TaskDO;
  */
 @Entity
 @Indexed
-@ClassBridge(name = "position", index = Index.UN_TOKENIZED, store = Store.NO, impl = HibernateSearchAuftragsPositionBridge.class)
+@ClassBridge(name = "position", analyze = Analyze.NO, store = Store.NO, impl = HibernateSearchAuftragsPositionBridge.class)
 @Table(name = "t_fibu_auftrag_position", uniqueConstraints = { @UniqueConstraint(columnNames = { "auftrag_fk", "number"})})
 public class AuftragsPositionDO extends DefaultBaseDO implements ShortDisplayNameCapable
 {
@@ -70,40 +70,40 @@ public class AuftragsPositionDO extends DefaultBaseDO implements ShortDisplayNam
 
   private TaskDO task;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private AuftragsPositionsArt art;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private AuftragsPositionsStatus status;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String titel;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String bemerkung;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private BigDecimal nettoSumme;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private BigDecimal personDays;
 
   private BigDecimal fakturiertSum = null;
 
   private boolean vollstaendigFakturiert;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private PeriodOfPerformanceType periodOfPerformanceType;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   @DateBridge(resolution = Resolution.DAY)
   private Date periodOfPerformanceBegin;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   @DateBridge(resolution = Resolution.DAY)
   private Date periodOfPerformanceEnd;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private ModeOfPaymentType modeOfPaymentType;
 
   @Transient

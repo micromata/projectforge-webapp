@@ -189,7 +189,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       } else if (field.isAnnotationPresent(org.hibernate.search.annotations.Fields.class) == true) {
         // @Fields( {
         // @Field(index = Index.TOKENIZED),
-        // @Field(name = "name_forsort", index = Index.UN_TOKENIZED)
+        // @Field(name = "name_forsort", analyze = Analyze.NO)
         // } )
         final org.hibernate.search.annotations.Fields annFields = field.getAnnotation(org.hibernate.search.annotations.Fields.class);
         for (final org.hibernate.search.annotations.Field annotation : annFields.value()) {
@@ -326,7 +326,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   public List<O> internalLoadAll()
   {
     @SuppressWarnings("unchecked")
-    final List<O> list = getHibernateTemplate().find("from " + clazz.getSimpleName() + " t");
+    final List<O> list = (List<O>) getHibernateTemplate().find("from " + clazz.getSimpleName() + " t");
     return list;
   }
 

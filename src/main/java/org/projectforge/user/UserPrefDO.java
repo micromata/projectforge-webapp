@@ -46,8 +46,8 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
@@ -71,14 +71,14 @@ public class UserPrefDO extends AbstractBaseDO<Integer>
   @IndexedEmbedded(depth = 1)
   private PFUserDO user;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String name; // 255 not null
 
   private UserPrefArea area; // 20;
 
   private Set<UserPrefEntryDO> prefEntries;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private Integer id;
 
   @Id
@@ -240,7 +240,6 @@ public class UserPrefDO extends AbstractBaseDO<Integer>
     }
     return entry.getValue();
   }
-
 
   /**
    * @param parameter

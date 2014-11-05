@@ -64,10 +64,10 @@ public class ScriptDO extends DefaultBaseDO
     AbstractHistorizableBaseDO.putNonHistorizableProperty(ScriptDO.class, "script", "scriptBackup", "file");
   }
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String name; // 255 not null
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String description; // 4000;
 
   private byte[] script;
@@ -76,7 +76,7 @@ public class ScriptDO extends DefaultBaseDO
 
   private byte[] file;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String filename;
 
   private String parameter1Name;
@@ -103,7 +103,7 @@ public class ScriptDO extends DefaultBaseDO
 
   private ScriptParameterType parameter6Type;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   @Column(length = 255, nullable = false)
   public String getName()
   {
@@ -160,7 +160,7 @@ public class ScriptDO extends DefaultBaseDO
   }
 
   @Transient
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   public String getScriptAsString()
   {
     return convert(script);
@@ -237,7 +237,7 @@ public class ScriptDO extends DefaultBaseDO
     this.filename = filename;
   }
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   @Column(length = 4000)
   public String getDescription()
   {
@@ -249,7 +249,7 @@ public class ScriptDO extends DefaultBaseDO
     this.description = description;
   }
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   @Column(length = PARAMETER_NAME_MAX_LENGTH)
   public String getParameter1Name()
   {
@@ -273,7 +273,7 @@ public class ScriptDO extends DefaultBaseDO
     this.parameter1Type = parameter1Type;
   }
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   @Column(length = PARAMETER_NAME_MAX_LENGTH)
   public String getParameter2Name()
   {
@@ -297,7 +297,7 @@ public class ScriptDO extends DefaultBaseDO
     this.parameter2Type = parameter2Type;
   }
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   @Column(length = PARAMETER_NAME_MAX_LENGTH)
   public String getParameter3Name()
   {
@@ -321,7 +321,7 @@ public class ScriptDO extends DefaultBaseDO
     this.parameter3Type = parameter3Type;
   }
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   @Column(length = PARAMETER_NAME_MAX_LENGTH)
   public String getParameter4Name()
   {
@@ -345,7 +345,7 @@ public class ScriptDO extends DefaultBaseDO
     this.parameter4Type = parameter4Type;
   }
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   @Column(length = PARAMETER_NAME_MAX_LENGTH)
   public String getParameter5Name()
   {
@@ -369,7 +369,7 @@ public class ScriptDO extends DefaultBaseDO
     this.parameter5Type = parameter5Type;
   }
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   @Column(length = PARAMETER_NAME_MAX_LENGTH)
   public String getParameter6Name()
   {

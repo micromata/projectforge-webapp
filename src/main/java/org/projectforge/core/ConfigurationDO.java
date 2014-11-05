@@ -52,10 +52,10 @@ public class ConfigurationDO extends DefaultBaseDO
 
   private static final long serialVersionUID = -1369978022611555731L;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String parameter;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String stringValue;
 
   private Integer intValue;

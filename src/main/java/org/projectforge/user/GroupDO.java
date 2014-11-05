@@ -67,7 +67,7 @@ public class GroupDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   private static final long serialVersionUID = 5044537226571167954L;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String name;
 
   private boolean localGroup;
@@ -76,15 +76,15 @@ public class GroupDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   // private String nestedGroupIds;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String organization;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String description;
 
   private String usernames;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String ldapValues;
 
   @ContainedIn

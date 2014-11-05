@@ -18,6 +18,7 @@ package org.projectforge.lucene;
  */
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Set;
@@ -90,7 +91,7 @@ public final class StandardAnalyzer extends StopwordAnalyzerBase {
    * <a href="#version">above</a>}
    * @param stopwords File to read stop words from */
   public StandardAnalyzer(final Version matchVersion, final File stopwords) throws IOException {
-    this(matchVersion, WordlistLoader.getWordSet(stopwords));
+    this(matchVersion, WordlistLoader.getWordSet(new FileReader(stopwords), LuceneVersionDef.CURRENT_VERSION));
   }
 
   /** Builds an analyzer with the stop words from the given reader.
@@ -99,7 +100,7 @@ public final class StandardAnalyzer extends StopwordAnalyzerBase {
    * <a href="#version">above</a>}
    * @param stopwords Reader to read stop words from */
   public StandardAnalyzer(final Version matchVersion, final Reader stopwords) throws IOException {
-    this(matchVersion, WordlistLoader.getWordSet(stopwords));
+    this(matchVersion, WordlistLoader.getWordSet(stopwords, LuceneVersionDef.CURRENT_VERSION));
   }
 
   /**

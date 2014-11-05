@@ -40,7 +40,6 @@ import org.projectforge.user.UserRightId;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-
 public class Kost1Dao extends BaseDao<Kost1DO>
 {
   public static final UserRightId USER_RIGHT_ID = UserRightId.FIBU_COST_UNIT;
@@ -106,8 +105,7 @@ public class Kost1Dao extends BaseDao<Kost1DO>
   public Kost1DO getKost1(final int nummernkreis, final int bereich, final int teilbereich, final int endziffer)
   {
     @SuppressWarnings("unchecked")
-    final
-    List<Kost1DO> list = getHibernateTemplate().find(
+    final List<Kost1DO> list = (List<Kost1DO>) getHibernateTemplate().find(
         "from Kost1DO k where k.nummernkreis=? and k.bereich=? and k.teilbereich=? and k.endziffer=?",
         new Object[] { nummernkreis, bereich, teilbereich, endziffer});
     if (CollectionUtils.isEmpty(list) == true) {
@@ -134,9 +132,11 @@ public class Kost1Dao extends BaseDao<Kost1DO>
     } else if (myFilter.isEnded() == true) {
       queryFilter.add(Restrictions.eq("kostentraegerStatus", KostentraegerStatus.ENDED));
     } else if (myFilter.isNotEnded() == true) {
-      queryFilter.add(Restrictions.or(Restrictions.ne("kostentraegerStatus", ProjektStatus.ENDED), Restrictions.isNull("kostentraegerStatus")));
+      queryFilter.add(Restrictions.or(Restrictions.ne("kostentraegerStatus", ProjektStatus.ENDED),
+          Restrictions.isNull("kostentraegerStatus")));
     }
-    queryFilter.addOrder(Order.asc("nummernkreis")).addOrder(Order.asc("bereich")).addOrder(Order.asc("teilbereich")).addOrder(Order.asc("endziffer"));
+    queryFilter.addOrder(Order.asc("nummernkreis")).addOrder(Order.asc("bereich")).addOrder(Order.asc("teilbereich"))
+    .addOrder(Order.asc("endziffer"));
     return getList(queryFilter);
   }
 
@@ -148,11 +148,11 @@ public class Kost1Dao extends BaseDao<Kost1DO>
     final String sql = "from Kost1DO k where k.nummernkreis = ? and k.bereich = ? and k.teilbereich = ? and k.endziffer = ?";
     if (obj.getId() == null) {
       // New entry
-      list = getHibernateTemplate().find(sql,
+      list = (List<Kost2DO>) getHibernateTemplate().find(sql,
           new Object[] { obj.getNummernkreis(), obj.getBereich(), obj.getTeilbereich(), obj.getEndziffer()});
     } else {
       // entry already exists. Check maybe changed:
-      list = getHibernateTemplate().find(sql + " and pk <> ?",
+      list = (List<Kost2DO>) getHibernateTemplate().find(sql + " and pk <> ?",
           new Object[] { obj.getNummernkreis(), obj.getBereich(), obj.getTeilbereich(), obj.getEndziffer(), obj.getId()});
     }
     if (CollectionUtils.isNotEmpty(list) == true) {

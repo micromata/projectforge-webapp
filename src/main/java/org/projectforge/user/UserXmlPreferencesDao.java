@@ -125,8 +125,8 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
       checkAccess(userId);
     }
     @SuppressWarnings("unchecked")
-    final List<UserXmlPreferencesDO> list = getHibernateTemplate().find("from UserXmlPreferencesDO u where u.user.id = ? and u.key = ?",
-        new Object[] { userId, key});
+    final List<UserXmlPreferencesDO> list = (List<UserXmlPreferencesDO>) getHibernateTemplate().find(
+        "from UserXmlPreferencesDO u where u.user.id = ? and u.key = ?", new Object[] { userId, key});
     Validate.isTrue(list.size() <= 1);
     if (list.size() == 1) {
       return list.get(0);
@@ -143,7 +143,8 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
   {
     checkAccess(userId);
     @SuppressWarnings("unchecked")
-    final List<UserXmlPreferencesDO> list = getHibernateTemplate().find("from UserXmlPreferencesDO u where u.user.id = ?", userId);
+    final List<UserXmlPreferencesDO> list = (List<UserXmlPreferencesDO>) getHibernateTemplate().find(
+        "from UserXmlPreferencesDO u where u.user.id = ?", userId);
     return list;
   }
 

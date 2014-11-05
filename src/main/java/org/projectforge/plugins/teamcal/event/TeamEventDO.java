@@ -47,9 +47,9 @@ import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
@@ -94,23 +94,23 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
 {
   private static final long serialVersionUID = -9205582135590380919L;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String subject;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String location;
 
   private boolean allDay;
 
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   @DateBridge(resolution = Resolution.MINUTE)
   private Timestamp startDate;
 
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   @DateBridge(resolution = Resolution.MINUTE)
   private Timestamp endDate;
 
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   @DateBridge(resolution = Resolution.SECOND)
   private Timestamp lastEmail;
 
@@ -123,7 +123,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, 
 
   private java.util.Date recurrenceUntil;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String note;
 
   @PFPersistancyBehavior(autoUpdateCollectionEntries = true)

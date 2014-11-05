@@ -29,9 +29,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
@@ -65,13 +65,13 @@ public class LessonsLearnedDO extends DefaultBaseDO
   private boolean processReviewRequired;
 
   @UserPrefParameter(i18nKey = "description", multiline = true)
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String description;
 
   private String reason;
 
   @UserPrefParameter(i18nKey = "comment", multiline = true)
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String comment;
 
   private String arrangements;
@@ -80,7 +80,7 @@ public class LessonsLearnedDO extends DefaultBaseDO
 
   private PFUserDO responsibleUser;
 
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   @DateBridge(resolution = Resolution.DAY)
   private Date dueDate;
 

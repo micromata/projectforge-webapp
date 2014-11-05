@@ -54,7 +54,7 @@ public class ConfigurationDao extends BaseDao<ConfigurationDO>
    * @see Configuration#setExpired()
    */
   @Override
-  protected void afterSaveOrModify(ConfigurationDO obj)
+  protected void afterSaveOrModify(final ConfigurationDO obj)
   {
     Configuration.getInstance().setExpired();
   }
@@ -83,14 +83,14 @@ public class ConfigurationDao extends BaseDao<ConfigurationDO>
   {
     Validate.notNull(param);
     @SuppressWarnings("unchecked")
-    final List<ConfigurationDO> list = getHibernateTemplate().find("from ConfigurationDO c where c.parameter = ?", param.getKey());
+    final List<ConfigurationDO> list = (List<ConfigurationDO>)getHibernateTemplate().find("from ConfigurationDO c where c.parameter = ?", param.getKey());
     if (list == null || list.isEmpty() == true || list.get(0) == null) {
       return null;
     }
     return list.get(0);
   }
 
-  public Object getValue(final ConfigurationParam parameter, ConfigurationDO configurationDO)
+  public Object getValue(final ConfigurationParam parameter, final ConfigurationDO configurationDO)
   {
     if (parameter.getType().isIn(ConfigurationType.STRING, ConfigurationType.TEXT) == true) {
       if (configurationDO == null) {
@@ -191,7 +191,7 @@ public class ConfigurationDao extends BaseDao<ConfigurationDO>
     internalSave(configuration);
   }
 
-  public void setTaskTree(TaskTree taskTree)
+  public void setTaskTree(final TaskTree taskTree)
   {
     this.taskTree = taskTree;
   }

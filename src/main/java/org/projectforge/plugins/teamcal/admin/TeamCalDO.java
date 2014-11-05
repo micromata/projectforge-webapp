@@ -54,7 +54,7 @@ import org.projectforge.user.PFUserDO;
  */
 @Entity
 @Indexed
-@ClassBridge(name = "usersgroups", index = Index.TOKENIZED, store = Store.NO, impl = HibernateSearchUsersGroupsBridge.class)
+@ClassBridge(name = "usersgroups", store = Store.NO, impl = HibernateSearchUsersGroupsBridge.class)
 @Table(name = "T_PLUGIN_CALENDAR")
 public class TeamCalDO extends DefaultBaseDO
 {
@@ -66,7 +66,7 @@ public class TeamCalDO extends DefaultBaseDO
   }
 
   // @UserPrefParameter(i18nKey = "plugins.teamcal.subject")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String title;
 
   @IndexedEmbedded(depth = 1)
@@ -78,7 +78,7 @@ public class TeamCalDO extends DefaultBaseDO
 
   private String minimalAccessGroupIds, minimalAccessUserIds;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String description;
 
   private boolean externalSubscription;

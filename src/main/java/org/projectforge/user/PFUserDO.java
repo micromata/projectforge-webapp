@@ -86,10 +86,10 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   private transient Map<String, Object> attributeMap;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String username;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String jiraUsername;
 
   private String password;
@@ -102,16 +102,16 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   private boolean deactivated;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String firstname;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String lastname;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String description;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String email;
 
   private String stayLoggedInKey;
@@ -138,23 +138,23 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   private TimeNotation timeNotation;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String organization;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String personalPhoneIdentifiers;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String personalMebMobileNumbers;
 
   private Set<UserRightDO> rights = new HashSet<UserRightDO>();
 
   private boolean hrPlanning = true;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String ldapValues;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String sshPublicKey;
 
   @Transient

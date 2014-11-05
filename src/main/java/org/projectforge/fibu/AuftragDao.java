@@ -165,7 +165,8 @@ public class AuftragDao extends BaseDao<AuftragDO>
   {
     final Map<Integer, Set<AuftragsPositionVO>> result = new HashMap<Integer, Set<AuftragsPositionVO>>();
     @SuppressWarnings("unchecked")
-    final List<AuftragsPositionDO> list = getHibernateTemplate().find("from AuftragsPositionDO a where a.task.id is not null");
+    final List<AuftragsPositionDO> list = (List<AuftragsPositionDO>) getHibernateTemplate().find(
+        "from AuftragsPositionDO a where a.task.id is not null");
     if (list == null) {
       return result;
     }
@@ -303,7 +304,7 @@ public class AuftragDao extends BaseDao<AuftragDO>
       return null;
     }
     @SuppressWarnings("unchecked")
-    final List<AuftragDO> list = getHibernateTemplate().find("from AuftragDO k where k.nummer=?", auftragsNummer);
+    final List<AuftragDO> list = (List<AuftragDO>) getHibernateTemplate().find("from AuftragDO k where k.nummer=?", auftragsNummer);
     if (CollectionUtils.isEmpty(list) == true) {
       return null;
     }
@@ -442,7 +443,7 @@ public class AuftragDao extends BaseDao<AuftragDO>
         throw new UserException("fibu.auftrag.error.nummerIstNichtFortlaufend");
       }
     } else {
-      final List<RechnungDO> list = getHibernateTemplate().find("from AuftragDO r where r.nummer = ? and r.id <> ?",
+      final List<RechnungDO> list = (List<RechnungDO>) getHibernateTemplate().find("from AuftragDO r where r.nummer = ? and r.id <> ?",
           new Object[] { obj.getNummer(), obj.getId()});
       if (list != null && list.size() > 0) {
         throw new UserException("fibu.auftrag.error.nummerBereitsVergeben");

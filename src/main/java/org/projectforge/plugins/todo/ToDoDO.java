@@ -35,9 +35,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
@@ -65,7 +65,7 @@ public class ToDoDO extends DefaultBaseDO
 
   @PropertyInfo(i18nKey = "plugins.todo.subject")
   @UserPrefParameter(i18nKey = "plugins.todo.subject")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String subject;
 
   @PropertyInfo(i18nKey = "plugins.todo.reporter")
@@ -90,38 +90,38 @@ public class ToDoDO extends DefaultBaseDO
 
   @PropertyInfo(i18nKey = "description")
   @UserPrefParameter(i18nKey = "description", multiline = true)
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String description;
 
   @PropertyInfo(i18nKey = "comment")
   @UserPrefParameter(i18nKey = "comment", multiline = true)
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String comment;
 
   @PropertyInfo(i18nKey = "plugins.todo.type")
   @UserPrefParameter(i18nKey = "plugins.todo.type")
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private ToDoType type;
 
   @PropertyInfo(i18nKey = "plugins.todo.status")
   @UserPrefParameter(i18nKey = "plugins.todo.status")
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private ToDoStatus status;
 
   private boolean recent;
 
   @PropertyInfo(i18nKey = "priority")
   @UserPrefParameter(i18nKey = "priority")
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private Priority priority;
 
   @PropertyInfo(i18nKey = "dueDate")
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   @DateBridge(resolution = Resolution.DAY)
   private Date dueDate;
 
   @PropertyInfo(i18nKey = "resubmissionOnDate")
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   @DateBridge(resolution = Resolution.DAY)
   private Date resubmission;
 

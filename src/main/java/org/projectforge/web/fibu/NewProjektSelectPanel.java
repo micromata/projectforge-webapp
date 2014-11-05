@@ -341,6 +341,7 @@ public class NewProjektSelectPanel extends AbstractSelectPanel<ProjektDO> implem
 
   private ProjektDO getProjekt(final String input)
   {
+    // TODO: defensives Programmieren:
     int kundeId, kost2;
     String nummernkreis, kId, nummer;
     kundeId = kost2 = -1;

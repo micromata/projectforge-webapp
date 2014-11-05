@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans default-lazy-init="false" default-autowire="byType">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	   					   http://www.springframework.org/schema/beans/spring-beans.xsd"
+  default-lazy-init="false" default-autowire="byType">
   <!-- Web -->
-  <bean id="dateTimeFormatter" class="org.projectforge.web.calendar.DateTimeFormatter" singleton="true" />
+  <bean id="dateTimeFormatter" class="org.projectforge.web.calendar.DateTimeFormatter" scope="singleton" />
   <bean id="formatterFactory" class="org.projectforge.renderer.custom.FormatterFactory">
     <!-- PDF Renderer Formatter -->
     <property name="formatters">
@@ -18,17 +20,17 @@
       </map>
     </property>
   </bean>
-  <bean id="htmlHelper" class="org.projectforge.web.HtmlHelper" singleton="true" />
-  <bean id="kundeFormatter" class="org.projectforge.fibu.KundeFormatter" singleton="true" />
-  <bean id="menuBuilder" class="org.projectforge.web.MenuBuilder" singleton="true" />
-  <bean id="priorityFormatter" class="org.projectforge.web.core.PriorityFormatter" singleton="true" />
-  <bean id="projektFormatter" class="org.projectforge.fibu.ProjektFormatter" singleton="true" />
-  <bean id="sessionStorage" class="org.projectforge.web.core.SessionStorage" singleton="true" />
-  <bean id="taskFormatter" class="org.projectforge.web.task.TaskFormatter" singleton="true" />
-  <bean id="userFormatter" class="org.projectforge.web.user.UserFormatter" singleton="true" />
+  <bean id="htmlHelper" class="org.projectforge.web.HtmlHelper" scope="singleton" />
+  <bean id="kundeFormatter" class="org.projectforge.fibu.KundeFormatter" scope="singleton" />
+  <bean id="menuBuilder" class="org.projectforge.web.MenuBuilder" scope="singleton" />
+  <bean id="priorityFormatter" class="org.projectforge.web.core.PriorityFormatter" scope="singleton" />
+  <bean id="projektFormatter" class="org.projectforge.fibu.ProjektFormatter" scope="singleton" />
+  <bean id="sessionStorage" class="org.projectforge.web.core.SessionStorage" scope="singleton" />
+  <bean id="taskFormatter" class="org.projectforge.web.task.TaskFormatter" scope="singleton" />
+  <bean id="userFormatter" class="org.projectforge.web.user.UserFormatter" scope="singleton" />
   <bean id="wicketApplicationFilter" class="org.projectforge.web.wicket.WicketApplicationFilter" />
   <bean id="RestUserFilter" class="org.projectforge.web.rest.RestUserFilter" />
-	
+
   <!-- Scheduling -->
   <bean id="cronSetup" class="org.projectforge.core.CronSetup" />
   <bean id="hibernateSearchReindexer" class="org.projectforge.core.HibernateSearchReindexer" />

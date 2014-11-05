@@ -75,7 +75,7 @@ public class EmployeeDao extends BaseDao<EmployeeDO>
   public EmployeeDO getByUserId(final Integer userId)
   {
     @SuppressWarnings("unchecked")
-    final List<EmployeeDO> list = getHibernateTemplate().find("from EmployeeDO e where e.user.id = ?", userId);
+    final List<EmployeeDO> list = (List<EmployeeDO>) getHibernateTemplate().find("from EmployeeDO e where e.user.id = ?", userId);
     if (list != null && list.size() > 0) {
       return list.get(0);
     }
@@ -97,8 +97,8 @@ public class EmployeeDao extends BaseDao<EmployeeDO>
     final String lastname = tokenizer.nextToken().trim();
     final String firstname = tokenizer.nextToken().trim();
     @SuppressWarnings("unchecked")
-    final List<EmployeeDO> list = getHibernateTemplate().find("from EmployeeDO e where e.user.lastname = ? and e.user.firstname = ?",
-        new Object[] { lastname, firstname});
+    final List<EmployeeDO> list = (List<EmployeeDO>) getHibernateTemplate().find(
+        "from EmployeeDO e where e.user.lastname = ? and e.user.firstname = ?", new Object[] { lastname, firstname});
     // final List<EmployeeDO> list = getHibernateTemplate().find("from EmployeeDO e where e.user.lastname = ?", lastname);
     if (list != null && list.size() == 1) {
       return list.get(0);

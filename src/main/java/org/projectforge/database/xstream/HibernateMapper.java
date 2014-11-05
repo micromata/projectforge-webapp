@@ -30,12 +30,12 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.hibernate.collection.PersistentBag;
-import org.hibernate.collection.PersistentList;
-import org.hibernate.collection.PersistentMap;
-import org.hibernate.collection.PersistentSet;
-import org.hibernate.collection.PersistentSortedMap;
-import org.hibernate.collection.PersistentSortedSet;
+import org.hibernate.collection.internal.PersistentBag;
+import org.hibernate.collection.internal.PersistentList;
+import org.hibernate.collection.internal.PersistentMap;
+import org.hibernate.collection.internal.PersistentSet;
+import org.hibernate.collection.internal.PersistentSortedMap;
+import org.hibernate.collection.internal.PersistentSortedSet;
 import org.hibernate.proxy.HibernateProxy;
 
 import com.thoughtworks.xstream.mapper.Mapper;
@@ -54,9 +54,9 @@ import com.thoughtworks.xstream.mapper.MapperWrapper;
 public class HibernateMapper extends MapperWrapper
 {
 
-  private Map<Class< ? >, Class< ? >> collectionMap = new HashMap<Class< ? >, Class< ? >>();
+  private final Map<Class< ? >, Class< ? >> collectionMap = new HashMap<Class< ? >, Class< ? >>();
 
-  public HibernateMapper(MapperWrapper arg0)
+  public HibernateMapper(final MapperWrapper arg0)
   {
     super(arg0);
     init();
@@ -72,7 +72,7 @@ public class HibernateMapper extends MapperWrapper
     collectionMap.put(PersistentSortedSet.class, TreeSet.class);
   }
 
-  public HibernateMapper(Mapper arg0)
+  public HibernateMapper(final Mapper arg0)
   {
     super(arg0);
     init();
@@ -80,12 +80,12 @@ public class HibernateMapper extends MapperWrapper
 
   @SuppressWarnings("unchecked")
   @Override
-  public Class defaultImplementationOf(Class clazz)
+  public Class defaultImplementationOf(final Class clazz)
   {
     // System.err.println("checking class:" + clazz);
     if (collectionMap.containsKey(clazz)) {
       // System.err.println("** substituting " + clazz + " with " + collectionMap.get(clazz));
-      return (Class) collectionMap.get(clazz);
+      return collectionMap.get(clazz);
     }
 
     return super.defaultImplementationOf(clazz);
@@ -93,7 +93,7 @@ public class HibernateMapper extends MapperWrapper
 
   @SuppressWarnings("unchecked")
   @Override
-  public String serializedClass(Class clazz)
+  public String serializedClass(final Class clazz)
   {
     // check whether we are hibernate proxy and substitute real name
     for (int i = 0; i < clazz.getInterfaces().length; i++) {

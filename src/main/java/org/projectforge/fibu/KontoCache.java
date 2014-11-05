@@ -62,8 +62,10 @@ public class KontoCache extends AbstractCache
   }
 
   /**
-   * Gets account of given project if given, otherwise the account assigned to the customer assigned to this project. If no account is given at all, null is returned.<br/>
-   * Please note: The object of project must be initialized including the assigned customer, if not a {@link LazyInitializationException} could be thrown.
+   * Gets account of given project if given, otherwise the account assigned to the customer assigned to this project. If no account is given
+   * at all, null is returned.<br/>
+   * Please note: The object of project must be initialized including the assigned customer, if not a {@link LazyInitializationException}
+   * could be thrown.
    * @param project
    * @return The assigned account if given, otherwise null.
    */
@@ -91,7 +93,8 @@ public class KontoCache extends AbstractCache
    * <li>Returns the account of the assigned project if given.</li>
    * <li>Returns the account assigned to the customer of this invoice if given.</li>
    * <li>Returns the account of the customer assigned to the project if given.<br/>
-   * Please note: The object of project must be initialized including the assigned customer, if not a {@link LazyInitializationException} could be thrown.
+   * Please note: The object of project must be initialized including the assigned customer, if not a {@link LazyInitializationException}
+   * could be thrown.
    * @param invoice
    * @return The assigned account if given, otherwise null.
    */
@@ -138,7 +141,7 @@ public class KontoCache extends AbstractCache
     log.info("Initializing KontoCache ...");
     // This method must not be synchronized because it works with a new copy of maps.
     final Map<Integer, KontoDO> map = new HashMap<Integer, KontoDO>();
-    final List<KontoDO> list = hibernateTemplate.find("from KontoDO t where deleted=false");
+    final List<KontoDO> list = (List<KontoDO>) hibernateTemplate.find("from KontoDO t where deleted=false");
     for (final KontoDO konto : list) {
       map.put(konto.getId(), konto);
     }

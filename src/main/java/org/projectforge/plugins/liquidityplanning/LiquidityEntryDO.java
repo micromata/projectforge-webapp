@@ -30,9 +30,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
@@ -55,24 +55,24 @@ public class LiquidityEntryDO extends DefaultBaseDO
   private static final long serialVersionUID = 6006883617791360816L;
 
   @PropertyInfo(i18nKey = "plugins.liquidityplanning.entry.dateOfPayment")
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   @DateBridge(resolution = Resolution.DAY)
   private Date dateOfPayment;
 
   @PropertyInfo(i18nKey = "fibu.common.betrag", type = PropertyType.CURRENCY)
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   private BigDecimal amount;
 
   @PropertyInfo(i18nKey = "fibu.rechnung.status.bezahlt")
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   private boolean paid;
 
   @PropertyInfo(i18nKey = "fibu.rechnung.betreff")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String subject;
 
   @PropertyInfo(i18nKey = "comment")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String comment;
 
   @Column(length = Constants.LENGTH_TITLE)

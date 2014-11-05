@@ -74,7 +74,7 @@ public class DatabaseUpdateDO
   }
 
   /**
-   * @param version
+   * @param CURRENT_VERSION
    * @return this for chaining.
    */
   public DatabaseUpdateDO setVersionString(final String versionString)

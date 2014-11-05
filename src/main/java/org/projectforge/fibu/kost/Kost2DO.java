@@ -53,14 +53,14 @@ import de.micromata.hibernate.history.Historizable;
 
 @Entity
 @Indexed
-@ClassBridge(name = "nummer", index = Index.TOKENIZED, store = Store.NO, impl = HibernateSearchKost2Bridge.class)
+@ClassBridge(name = "nummer", store = Store.NO, impl = HibernateSearchKost2Bridge.class)
 @Table(name = "T_FIBU_KOST2", uniqueConstraints = { @UniqueConstraint(columnNames = { "nummernkreis", "bereich", "teilbereich",
 "kost2_art_id"})})
 public class Kost2DO extends DefaultBaseDO implements Historizable, ShortDisplayNameCapable, Comparable<Kost2DO>
 {
   private static final long serialVersionUID = -6534347300453425760L;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private KostentraegerStatus kostentraegerStatus;
 
   private int nummernkreis;
@@ -73,10 +73,10 @@ public class Kost2DO extends DefaultBaseDO implements Historizable, ShortDisplay
 
   private BigDecimal workFraction;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String description;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String comment;
 
   @IndexedEmbedded(depth = 2)

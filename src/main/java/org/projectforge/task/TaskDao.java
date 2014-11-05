@@ -159,12 +159,12 @@ public class TaskDao extends BaseDao<TaskDO>
     final String intervalInSeconds = DatabaseSupport.getInstance().getIntervalInSeconds("startTime", "stopTime");
     if (intervalInSeconds != null) {
       @SuppressWarnings("unchecked")
-      final List<Object[]> list = getHibernateTemplate().find(
+      final List<Object[]> list = (List<Object[]>) getHibernateTemplate().find(
           "select " + intervalInSeconds + ", task.id from TimesheetDO where deleted=false group by task.id");
       return list;
     }
     @SuppressWarnings("unchecked")
-    final List<Object[]> result = getHibernateTemplate().find(
+    final List<Object[]> result = (List<Object[]>) getHibernateTemplate().find(
         "select startTime, stopTime, task.id from TimesheetDO where deleted=false order by task.id");
     final List<Object[]> list = new ArrayList<Object[]>();
     if (CollectionUtils.isEmpty(result) == false) {
@@ -204,7 +204,7 @@ public class TaskDao extends BaseDao<TaskDO>
     final String intervalInSeconds = DatabaseSupport.getInstance().getIntervalInSeconds("startTime", "stopTime");
     if (intervalInSeconds != null) {
       @SuppressWarnings("unchecked")
-      final List<Object> list = getHibernateTemplate().find(
+      final List<Object> list = (List<Object>) getHibernateTemplate().find(
           "select "
               + DatabaseSupport.getInstance().getIntervalInSeconds("startTime", "stopTime")
               + " from TimesheetDO where task.id = ? and deleted=false", taskId);
@@ -221,7 +221,7 @@ public class TaskDao extends BaseDao<TaskDO>
       }
     }
     @SuppressWarnings("unchecked")
-    final List<Object[]> result = getHibernateTemplate().find(
+    final List<Object[]> result = (List<Object[]>) getHibernateTemplate().find(
         "select startTime, stopTime from TimesheetDO where task.id = ? and deleted=false", taskId);
     if (CollectionUtils.isEmpty(result) == true) {
       return new Long(0);
@@ -287,10 +287,10 @@ public class TaskDao extends BaseDao<TaskDO>
     } else {
       List<TaskDO> list;
       if (task.getId() != null) {
-        list = getHibernateTemplate().find("from TaskDO t where t.parentTask.id = ? and t.title = ? and t.id != ?",
+        list = (List<TaskDO>) getHibernateTemplate().find("from TaskDO t where t.parentTask.id = ? and t.title = ? and t.id != ?",
             new Object[] { task.getParentTaskId(), task.getTitle(), task.getId()});
       } else {
-        list = getHibernateTemplate().find("from TaskDO t where t.parentTask.id = ? and t.title = ?",
+        list = (List<TaskDO>) getHibernateTemplate().find("from TaskDO t where t.parentTask.id = ? and t.title = ?",
             new Object[] { task.getParentTaskId(), task.getTitle()});
       }
       if (CollectionUtils.isNotEmpty(list) == true) {

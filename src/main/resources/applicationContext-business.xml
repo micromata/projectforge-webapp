@@ -1,32 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans default-lazy-init="false" default-autowire="byType">
-  <bean id="accessChecker" class="org.projectforge.access.AccessChecker" singleton="true" />
-  <bean id="addressExport" class="org.projectforge.address.AddressExport" singleton="true" />
-  <bean id="configuration" class="org.projectforge.core.Configuration" singleton="true" />
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	   					   http://www.springframework.org/schema/beans/spring-beans.xsd"
+  default-lazy-init="false" default-autowire="byType">
+  <bean id="accessChecker" class="org.projectforge.access.AccessChecker" scope="singleton" />
+  <bean id="addressExport" class="org.projectforge.address.AddressExport" scope="singleton" />
+  <bean id="configuration" class="org.projectforge.core.Configuration" scope="singleton" />
   <bean id="groovyExecutor" class="org.projectforge.scripting.GroovyExecutor" />
-  <bean id="myDatabaseUpdater" class="org.projectforge.database.MyDatabaseUpdater" singleton="true" />
+  <bean id="myDatabaseUpdater" class="org.projectforge.database.MyDatabaseUpdater" scope="singleton" />
   <bean id="historyAdapter" class="de.micromata.hibernate.history.HistoryAdapter" />
-  <bean id="pdfRenderer" class="org.projectforge.renderer.PdfRenderer" singleton="true">
+  <bean id="pdfRenderer" class="org.projectforge.renderer.PdfRenderer" scope="singleton">
     <property name="fontResourceDir" value="fonts" />
   </bean>
-  <bean id="daoRegistry" class="org.projectforge.registry.DaoRegistry" singleton="true" />
+  <bean id="daoRegistry" class="org.projectforge.registry.DaoRegistry" scope="singleton" />
   <bean id="hrPlanningExport" class="org.projectforge.humanresources.HRPlanningExport" />
   <bean id="mebMailClient" class="org.projectforge.meb.MebMailClient" />
-  <bean id="orderExport" class="org.projectforge.fibu.OrderExport" singleton="true" />
-  <bean id="sendMail" class="org.projectforge.mail.SendMail" singleton="true" />
-  <bean id="statisticsCache" class="org.projectforge.database.StatisticsCache" singleton="true">
+  <bean id="orderExport" class="org.projectforge.fibu.OrderExport" scope="singleton" />
+  <bean id="sendMail" class="org.projectforge.mail.SendMail" scope="singleton" />
+  <bean id="statisticsCache" class="org.projectforge.database.StatisticsCache" scope="singleton">
     <property name="expireTimeInHours" value="12" />
   </bean>
-  <bean id="taskTree" class="org.projectforge.task.TaskTree" singleton="true">
+  <bean id="taskTree" class="org.projectforge.task.TaskTree" scope="singleton">
     <property name="expireTimeInHours">
       <value>1</value>
     </property>
   </bean>
-  <bean id="userGroupCache" class="org.projectforge.user.UserGroupCache" singleton="true">
+  <bean id="userGroupCache" class="org.projectforge.user.UserGroupCache" scope="singleton">
     <property name="expireTimeInHours" value="1" />
   </bean>
-  <bean id="systemInfoCache" class="org.projectforge.core.SystemInfoCache" singleton="true">
+  <bean id="systemInfoCache" class="org.projectforge.core.SystemInfoCache" scope="singleton">
     <property name="expireTimeInHours" value="1" />
   </bean>
   <bean id="xmlDump" class="org.projectforge.database.XmlDump" />
@@ -58,7 +60,7 @@
   <bean id="userDao" class="org.projectforge.user.UserDao" />
   <bean id="userPrefDao" class="org.projectforge.user.UserPrefDao" />
   <bean id="userRightDao" class="org.projectforge.user.UserRightDao" />
-  <bean id="userXmlPreferencesCache" class="org.projectforge.user.UserXmlPreferencesCache" singleton="true">
+  <bean id="userXmlPreferencesCache" class="org.projectforge.user.UserXmlPreferencesCache" scope="singleton">
     <property name="expireTimeInMinutes">
       <value>10</value>
     </property>
@@ -73,18 +75,18 @@
   <bean id="employeeDao" class="org.projectforge.fibu.EmployeeDao" />
   <bean id="employeeSalaryExportDao" class="org.projectforge.fibu.datev.EmployeeSalaryExportDao" />
   <bean id="employeeSalaryDao" class="org.projectforge.fibu.EmployeeSalaryDao" />
-  <bean id="kontoCache" class="org.projectforge.fibu.KontoCache" singleton="true" />
+  <bean id="kontoCache" class="org.projectforge.fibu.KontoCache" scope="singleton" />
   <bean id="kontoDao" class="org.projectforge.fibu.KontoDao" />
   <bean id="kost1Dao" class="org.projectforge.fibu.kost.Kost1Dao" />
   <bean id="kost2Dao" class="org.projectforge.fibu.kost.Kost2Dao" />
   <bean id="kost2ArtDao" class="org.projectforge.fibu.kost.Kost2ArtDao" />
-  <bean id="kostCache" class="org.projectforge.fibu.kost.KostCache" singleton="true" />
+  <bean id="kostCache" class="org.projectforge.fibu.kost.KostCache" scope="singleton" />
   <bean id="kostZuweisungDao" class="org.projectforge.fibu.kost.KostZuweisungDao" />
   <bean id="datevImportDao" class="org.projectforge.fibu.datev.DatevImportDao" />
   <bean id="kundeDao" class="org.projectforge.fibu.KundeDao" />
   <bean id="monthlyEmployeeReportDao" class="org.projectforge.fibu.MonthlyEmployeeReportDao" />
   <bean id="projektDao" class="org.projectforge.fibu.ProjektDao" />
-  <bean id="rechnungCache" class="org.projectforge.fibu.RechnungCache" singleton="true" />
+  <bean id="rechnungCache" class="org.projectforge.fibu.RechnungCache" scope="singleton" />
   <bean id="rechnungDao" class="org.projectforge.fibu.RechnungDao">
     <property name="defaultSteuersatz">
       <value>0.19</value>

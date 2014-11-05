@@ -32,9 +32,9 @@ import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.core.DefaultBaseDO;
@@ -45,13 +45,13 @@ import de.micromata.hibernate.history.Historizable;
 
 @Entity
 @Indexed
-@ClassBridge(name = "nummer", index = Index.TOKENIZED, store = Store.NO, impl = HibernateSearchKost1Bridge.class)
+@ClassBridge(name = "nummer", store = Store.NO, impl = HibernateSearchKost1Bridge.class)
 @Table(name = "T_FIBU_KOST1", uniqueConstraints = { @UniqueConstraint(columnNames = { "nummernkreis", "bereich", "teilbereich", "endziffer"})})
 public class Kost1DO extends DefaultBaseDO implements Historizable, ShortDisplayNameCapable
 {
   private static final long serialVersionUID = -6534347300453425760L;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private KostentraegerStatus kostentraegerStatus;
 
   private int nummernkreis;
@@ -62,7 +62,7 @@ public class Kost1DO extends DefaultBaseDO implements Historizable, ShortDisplay
 
   private int endziffer;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String description;
 
   @Enumerated(EnumType.STRING)
@@ -72,7 +72,7 @@ public class Kost1DO extends DefaultBaseDO implements Historizable, ShortDisplay
     return kostentraegerStatus;
   }
 
-  public void setKostentraegerStatus(KostentraegerStatus kostentraegerStatus)
+  public void setKostentraegerStatus(final KostentraegerStatus kostentraegerStatus)
   {
     this.kostentraegerStatus = kostentraegerStatus;
   }
@@ -82,7 +82,7 @@ public class Kost1DO extends DefaultBaseDO implements Historizable, ShortDisplay
   {
     return KostFormatter.format(this);
   }
-  
+
   /**
    * Format: #.###.##.##
    * @see KostFormatter#format(Kost2DO)
@@ -112,7 +112,7 @@ public class Kost1DO extends DefaultBaseDO implements Historizable, ShortDisplay
     return nummernkreis;
   }
 
-  public void setNummernkreis(int bereich)
+  public void setNummernkreis(final int bereich)
   {
     this.nummernkreis = bereich;
   }
@@ -127,7 +127,7 @@ public class Kost1DO extends DefaultBaseDO implements Historizable, ShortDisplay
     return bereich;
   }
 
-  public void setBereich(int bereich)
+  public void setBereich(final int bereich)
   {
     this.bereich = bereich;
   }
@@ -142,7 +142,7 @@ public class Kost1DO extends DefaultBaseDO implements Historizable, ShortDisplay
     return teilbereich;
   }
 
-  public void setTeilbereich(int teilbereich)
+  public void setTeilbereich(final int teilbereich)
   {
     this.teilbereich = teilbereich;
   }
@@ -153,7 +153,7 @@ public class Kost1DO extends DefaultBaseDO implements Historizable, ShortDisplay
     return endziffer;
   }
 
-  public void setEndziffer(int endziffer)
+  public void setEndziffer(final int endziffer)
   {
     this.endziffer = endziffer;
   }
@@ -168,7 +168,7 @@ public class Kost1DO extends DefaultBaseDO implements Historizable, ShortDisplay
     return description;
   }
 
-  public void setDescription(String description)
+  public void setDescription(final String description)
   {
     this.description = description;
   }
@@ -179,10 +179,10 @@ public class Kost1DO extends DefaultBaseDO implements Historizable, ShortDisplay
    */
 
   @Override
-  public boolean equals(Object o)
+  public boolean equals(final Object o)
   {
     if (o instanceof Kost1DO) {
-      Kost1DO other = (Kost1DO) o;
+      final Kost1DO other = (Kost1DO) o;
       return (this.nummernkreis == other.nummernkreis && this.bereich == other.bereich && this.teilbereich == other.teilbereich && this.endziffer == other.endziffer);
     }
     return false;
@@ -196,7 +196,7 @@ public class Kost1DO extends DefaultBaseDO implements Historizable, ShortDisplay
   @Override
   public int hashCode()
   {
-    HashCodeBuilder hcb = new HashCodeBuilder();
+    final HashCodeBuilder hcb = new HashCodeBuilder();
     hcb.append(this.nummernkreis).append(this.bereich).append(this.teilbereich).append(this.endziffer);
     return hcb.toHashCode();
   }

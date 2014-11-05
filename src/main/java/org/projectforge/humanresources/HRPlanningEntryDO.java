@@ -38,8 +38,8 @@ import javax.persistence.Transient;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
@@ -51,7 +51,6 @@ import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.ProjektFormatter;
 import org.projectforge.user.PFUserContext;
-
 
 /**
  * 
@@ -71,40 +70,40 @@ public class HRPlanningEntryDO extends DefaultBaseDO implements ShortDisplayName
   @IndexedEmbedded(depth = 2)
   private ProjektDO projekt;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private HRPlanningEntryStatus status;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private Priority priority;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private Integer probability;
 
   /**
    * Ohne Wochentagszuordnung.
    */
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private BigDecimal unassignedHours;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private BigDecimal mondayHours;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private BigDecimal tuesdayHours;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private BigDecimal wednesdayHours;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private BigDecimal thursdayHours;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private BigDecimal fridayHours;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private BigDecimal weekendHours;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String description;
 
   @ManyToOne(fetch = FetchType.EAGER)
@@ -114,7 +113,7 @@ public class HRPlanningEntryDO extends DefaultBaseDO implements ShortDisplayName
     return planning;
   }
 
-  public void setPlanning(HRPlanningDO planning)
+  public void setPlanning(final HRPlanningDO planning)
   {
     this.planning = planning;
   }
@@ -135,7 +134,7 @@ public class HRPlanningEntryDO extends DefaultBaseDO implements ShortDisplayName
     return priority;
   }
 
-  public void setPriority(Priority priority)
+  public void setPriority(final Priority priority)
   {
     this.priority = priority;
   }
@@ -146,7 +145,7 @@ public class HRPlanningEntryDO extends DefaultBaseDO implements ShortDisplayName
     return probability;
   }
 
-  public void setProbability(Integer probability)
+  public void setProbability(final Integer probability)
   {
     this.probability = probability;
   }
@@ -160,7 +159,7 @@ public class HRPlanningEntryDO extends DefaultBaseDO implements ShortDisplayName
     return unassignedHours;
   }
 
-  public void setUnassignedHours(BigDecimal unassignedHours)
+  public void setUnassignedHours(final BigDecimal unassignedHours)
   {
     this.unassignedHours = unassignedHours;
   }
@@ -171,7 +170,7 @@ public class HRPlanningEntryDO extends DefaultBaseDO implements ShortDisplayName
     return mondayHours;
   }
 
-  public void setMondayHours(BigDecimal mondayHours)
+  public void setMondayHours(final BigDecimal mondayHours)
   {
     this.mondayHours = mondayHours;
   }
@@ -182,7 +181,7 @@ public class HRPlanningEntryDO extends DefaultBaseDO implements ShortDisplayName
     return tuesdayHours;
   }
 
-  public void setTuesdayHours(BigDecimal tuesdayHours)
+  public void setTuesdayHours(final BigDecimal tuesdayHours)
   {
     this.tuesdayHours = tuesdayHours;
   }
@@ -193,7 +192,7 @@ public class HRPlanningEntryDO extends DefaultBaseDO implements ShortDisplayName
     return wednesdayHours;
   }
 
-  public void setWednesdayHours(BigDecimal wednesdayHours)
+  public void setWednesdayHours(final BigDecimal wednesdayHours)
   {
     this.wednesdayHours = wednesdayHours;
   }
@@ -204,7 +203,7 @@ public class HRPlanningEntryDO extends DefaultBaseDO implements ShortDisplayName
     return thursdayHours;
   }
 
-  public void setThursdayHours(BigDecimal thursdayHours)
+  public void setThursdayHours(final BigDecimal thursdayHours)
   {
     this.thursdayHours = thursdayHours;
   }
@@ -215,7 +214,7 @@ public class HRPlanningEntryDO extends DefaultBaseDO implements ShortDisplayName
     return fridayHours;
   }
 
-  public void setFridayHours(BigDecimal fridayHours)
+  public void setFridayHours(final BigDecimal fridayHours)
   {
     this.fridayHours = fridayHours;
   }
@@ -226,7 +225,7 @@ public class HRPlanningEntryDO extends DefaultBaseDO implements ShortDisplayName
     return weekendHours;
   }
 
-  public void setWeekendHours(BigDecimal weekendHours)
+  public void setWeekendHours(final BigDecimal weekendHours)
   {
     this.weekendHours = weekendHours;
   }
@@ -237,7 +236,7 @@ public class HRPlanningEntryDO extends DefaultBaseDO implements ShortDisplayName
     return description;
   }
 
-  public void setDescription(String description)
+  public void setDescription(final String description)
   {
     this.description = description;
   }
@@ -255,7 +254,7 @@ public class HRPlanningEntryDO extends DefaultBaseDO implements ShortDisplayName
     return projekt;
   }
 
-  public void setProjekt(ProjektDO projekt)
+  public void setProjekt(final ProjektDO projekt)
   {
     this.projekt = projekt;
   }
@@ -305,7 +304,7 @@ public class HRPlanningEntryDO extends DefaultBaseDO implements ShortDisplayName
     return status;
   }
 
-  public void setStatus(HRPlanningEntryStatus status)
+  public void setStatus(final HRPlanningEntryStatus status)
   {
     this.status = status;
   }
@@ -349,10 +348,10 @@ public class HRPlanningEntryDO extends DefaultBaseDO implements ShortDisplayName
   }
 
   @Override
-  public boolean equals(Object o)
+  public boolean equals(final Object o)
   {
     if (o instanceof HRPlanningEntryDO) {
-      HRPlanningEntryDO other = (HRPlanningEntryDO) o;
+      final HRPlanningEntryDO other = (HRPlanningEntryDO) o;
       if (this.getId() != null || other.getId() != null) {
         return ObjectUtils.equals(this.getId(), other.getId());
       }
@@ -370,7 +369,7 @@ public class HRPlanningEntryDO extends DefaultBaseDO implements ShortDisplayName
   @Override
   public int hashCode()
   {
-    HashCodeBuilder hcb = new HashCodeBuilder();
+    final HashCodeBuilder hcb = new HashCodeBuilder();
     if (getId() != null) {
       hcb.append(getId());
     } else {
@@ -392,7 +391,7 @@ public class HRPlanningEntryDO extends DefaultBaseDO implements ShortDisplayName
   {
     return getProjekt() != null ? getProjekt().getName() : "";
   }
-  
+
   /**
    * Clones this entry (without id's).
    * @return

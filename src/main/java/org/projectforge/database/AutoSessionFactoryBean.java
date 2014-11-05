@@ -26,8 +26,8 @@ package org.projectforge.database;
 import java.lang.annotation.ElementType;
 
 import org.hibernate.HibernateException;
-import org.hibernate.cfg.AnnotationConfiguration;
-import org.hibernate.search.annotations.Index;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.cfg.SearchMapping;
@@ -50,8 +50,11 @@ public class AutoSessionFactoryBean extends AnnotationSessionFactoryBean
 
   private boolean schemaUpdate;
 
+  /**
+   * @see org.springframework.orm.hibernate3.LocalSessionFactoryBean#postProcessConfiguration(org.hibernate.cfg.Configuration)
+   */
   @Override
-  protected void postProcessAnnotationConfiguration(final AnnotationConfiguration config) throws HibernateException
+  protected void postProcessConfiguration(final Configuration config) throws HibernateException
   {
     for (final Class< ? > entityClass : HibernateEntities.CORE_ENTITIES) {
       log.debug("Adding class " + entityClass.getName());
@@ -78,9 +81,9 @@ public class AutoSessionFactoryBean extends AnnotationSessionFactoryBean
     final SearchMapping mapping = new SearchMapping();
     mapping.entity(HistoryEntry.class).indexed() //
     .property("id", ElementType.METHOD).documentId().name("id")//
-    .property("userName", ElementType.METHOD).field().index(Index.UN_TOKENIZED).store(Store.NO) //
+    .property("userName", ElementType.METHOD).field().analyze(Analyze.NO).store(Store.NO) //
     // Must be tokenized for using lower case (MultiFieldQueryParser uses lower case strings):
-    .property("className", ElementType.METHOD).field().index(Index.TOKENIZED).store(Store.NO) //
+    .property("className", ElementType.METHOD).field().store(Store.NO) //
     .property("timestamp", ElementType.METHOD).field().store(Store.NO).dateBridge(Resolution.MINUTE) //
     // Needed in BaseDao for FullTextQuery.setProjection("entityId"):
     .property("entityId", ElementType.METHOD).field().store(Store.YES) //
@@ -88,10 +91,10 @@ public class AutoSessionFactoryBean extends AnnotationSessionFactoryBean
     // PropertyDelta:
     .entity(PropertyDelta.class) //
     .property("id", ElementType.METHOD).documentId().name("id")//
-    .property("oldValue", ElementType.METHOD).field().index(Index.TOKENIZED).store(Store.NO) //
-    .property("newValue", ElementType.METHOD).field().index(Index.TOKENIZED).store(Store.NO); //
+    .property("oldValue", ElementType.METHOD).field().store(Store.NO) //
+    .property("newValue", ElementType.METHOD).field().store(Store.NO); //
     config.getProperties().put("hibernate.search.model_mapping", mapping);
-    super.postProcessAnnotationConfiguration(config);
+    super.postProcessConfiguration(config);
   }
 
   /**

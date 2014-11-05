@@ -42,10 +42,10 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.ClassBridge;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
@@ -65,7 +65,7 @@ import org.projectforge.user.PFUserDO;
  */
 @Entity
 @Indexed
-@ClassBridge(name = "taskpath", index = Index.TOKENIZED, store = Store.NO, impl = HibernateSearchTaskPathBridge.class)
+@ClassBridge(name = "taskpath", store = Store.NO, impl = HibernateSearchTaskPathBridge.class)
 @Table(name = "T_TASK", uniqueConstraints = { @UniqueConstraint(columnNames = { "parent_task_id", "title"})})
 public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cloneable// , GanttObject
 {
@@ -87,36 +87,36 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
 
   private TaskDO parentTask = null;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String title;
 
   private TaskStatus status = TaskStatus.N;
 
   private Priority priority;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String shortDescription;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String description;
 
   /** -&gt; Gantt */
   @Deprecated
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private Integer progress;
 
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private Integer maxHours;
 
   /** -&gt; Gantt */
   @Deprecated
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   @DateBridge(resolution = Resolution.DAY)
   private Date startDate;
 
   /** -&gt; Gantt */
   @Deprecated
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   @DateBridge(resolution = Resolution.DAY)
   private Date endDate;
 
@@ -124,14 +124,14 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
   @Deprecated
   private BigDecimal duration;
 
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   @DateBridge(resolution = Resolution.DAY)
   private Date protectTimesheetsUntil;
 
   @IndexedEmbedded(depth = 1)
   private PFUserDO responsibleUser;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String reference;
 
   private TimesheetBookingStatus timesheetBookingStatus = TimesheetBookingStatus.DEFAULT;
@@ -147,7 +147,7 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
 
   /** -&gt; Gantt */
   @Deprecated
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String workpackageCode;
 
   /** -&gt; Gantt */

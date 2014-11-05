@@ -37,7 +37,7 @@ import org.projectforge.core.I18nEnum;
  * 
  */
 @Indexed
-@ClassBridge(index = Index.TOKENIZED, store = Store.NO, impl = HibernateSearchUserRightIdBridge.class)
+@ClassBridge(store = Store.NO, impl = HibernateSearchUserRightIdBridge.class)
 public class UserRightId implements I18nEnum, Comparable<UserRightId>, Serializable
 {
   private static final long serialVersionUID = 2328022474754212904L;

@@ -59,10 +59,10 @@ public class Kost2ArtDO extends AbstractHistorizableBaseDO<Integer> implements C
   /** Zweistellige Endziffer von KOST2 */
   private Integer id;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String name;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String description;
 
   private boolean fakturiert;

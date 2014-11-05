@@ -165,7 +165,7 @@ public class PersonalAddressDao extends HibernateDaoSupport
     final PFUserDO owner = PFUserContext.getUser();
     Validate.notNull(owner);
     Validate.notNull(owner.getId());
-    final List<PersonalAddressDO> list = getHibernateTemplate().find(
+    final List<PersonalAddressDO> list = (List<PersonalAddressDO>) getHibernateTemplate().find(
         "from " + PersonalAddressDO.class.getSimpleName() + " t where t.owner.id = ? and t.address.id = ?",
         new Object[] { owner.getId(), addressId});
     if (list != null) {
@@ -194,7 +194,7 @@ public class PersonalAddressDao extends HibernateDaoSupport
     Validate.notNull(owner);
     Validate.notNull(owner.getId());
     @SuppressWarnings("unchecked")
-    final List<PersonalAddressDO> list = getHibernateTemplate().find(
+    final List<PersonalAddressDO> list = (List<PersonalAddressDO>) getHibernateTemplate().find(
         "from "
             + PersonalAddressDO.class.getSimpleName()
             + " t join fetch t.address where t.owner.id=? and t.address.deleted=false order by t.address.name, t.address.firstName",
@@ -213,7 +213,7 @@ public class PersonalAddressDao extends HibernateDaoSupport
     final PFUserDO owner = PFUserContext.getUser();
     Validate.notNull(owner);
     Validate.notNull(owner.getId());
-    final List<PersonalAddressDO> list = getHibernateTemplate().find(
+    final List<PersonalAddressDO> list = (List<PersonalAddressDO>) getHibernateTemplate().find(
         "from " + PersonalAddressDO.class.getSimpleName() + " t where t.owner.id = ?", owner.getId());
     final Map<Integer, PersonalAddressDO> result = new HashMap<Integer, PersonalAddressDO>();
     for (final PersonalAddressDO entry : list) {
@@ -235,7 +235,7 @@ public class PersonalAddressDao extends HibernateDaoSupport
     final PFUserDO owner = PFUserContext.getUser();
     Validate.notNull(owner);
     Validate.notNull(owner.getId());
-    final List<PersonalAddressDO> list = getHibernateTemplate().find(
+    final List<PersonalAddressDO> list = (List<PersonalAddressDO>) getHibernateTemplate().find(
         "from "
             + PersonalAddressDO.class.getSimpleName()
             + " t join fetch t.address where t.owner.id = ? and t.address.deleted = false order by t.address.name, t.address.firstName",

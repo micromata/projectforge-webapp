@@ -40,7 +40,7 @@ import org.projectforge.user.ProjectForgeGroup;
 public class BuchungssatzDao extends BaseDao<BuchungssatzDO>
 {
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "kost1.nummer", "kost1.description", "kost2.nummer",
-      "kost2.description", "kost2.comment", "kost2.projekt.name", "kost2.projekt.kunde.name", "konto.nummer", "gegenKonto.nummer"};
+    "kost2.description", "kost2.comment", "kost2.projekt.name", "kost2.projekt.kunde.name", "konto.nummer", "gegenKonto.nummer"};
 
   @Override
   protected String[] getAdditionalSearchFields()
@@ -60,16 +60,16 @@ public class BuchungssatzDao extends BaseDao<BuchungssatzDO>
   @SuppressWarnings("unchecked")
   public int[] getYears()
   {
-    List<Object[]> list = (List<Object[]>) getSession().createQuery("select min(year), max(year) from BuchungssatzDO t").list();
+    final List<Object[]> list = getSession().createQuery("select min(year), max(year) from BuchungssatzDO t").list();
     if (list.size() == 0 || list.get(0) == null || list.get(0)[0] == null) {
       return new int[] { Calendar.getInstance().get(Calendar.YEAR)};
     }
-    int minYear = (Integer) list.get(0)[0];
-    int maxYear = (Integer) list.get(0)[1];
+    final int minYear = (Integer) list.get(0)[0];
+    final int maxYear = (Integer) list.get(0)[1];
     if (minYear > maxYear || maxYear - minYear > 30) {
       throw new UnsupportedOperationException("Paranoia Exception");
     }
-    int[] res = new int[maxYear - minYear + 1];
+    final int[] res = new int[maxYear - minYear + 1];
     int i = 0;
     for (int year = maxYear; year >= minYear; year--) {
       res[i++] = year;
@@ -78,9 +78,9 @@ public class BuchungssatzDao extends BaseDao<BuchungssatzDO>
   }
 
   @SuppressWarnings("unchecked")
-  public BuchungssatzDO getBuchungssatz(int year, int month, int satznr)
+  public BuchungssatzDO getBuchungssatz(final int year, final int month, final int satznr)
   {
-    List<BuchungssatzDO> list = getHibernateTemplate().find(
+    final List<BuchungssatzDO> list = (List<BuchungssatzDO>) getHibernateTemplate().find(
         "from BuchungssatzDO satz where satz.year = ? and satz.month = ? and satz.satznr = ?", new Object[] { year, month, satznr});
     if (CollectionUtils.isEmpty(list) == true) {
       return null;
@@ -88,10 +88,10 @@ public class BuchungssatzDao extends BaseDao<BuchungssatzDO>
     return list.get(0);
   }
 
-  public boolean validateTimeperiod(BuchungssatzFilter myFilter)
+  public boolean validateTimeperiod(final BuchungssatzFilter myFilter)
   {
-    int toMonth = myFilter.getToMonth();
-    int toYear = myFilter.getToYear();
+    final int toMonth = myFilter.getToMonth();
+    final int toYear = myFilter.getToYear();
     if (toMonth >= 0 && toYear < 0 || toMonth < 0 && toYear > 0) {
       // toMonth given, but not toYear or vice versa.
       return false;
@@ -116,7 +116,7 @@ public class BuchungssatzDao extends BaseDao<BuchungssatzDO>
   }
 
   @Override
-  public List<BuchungssatzDO> getList(BaseSearchFilter filter)
+  public List<BuchungssatzDO> getList(final BaseSearchFilter filter)
   {
     accessChecker.checkIsLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
     final BuchungssatzFilter myFilter;
@@ -139,10 +139,10 @@ public class BuchungssatzDao extends BaseDao<BuchungssatzDO>
         queryFilter.add(Restrictions.between("month", myFilter.getFromMonth(), myFilter.getToMonth()));
       } else {
         // between but different years
-        queryFilter.add(Restrictions.disjunction().add(
-            Restrictions.and(Restrictions.eq("year", myFilter.getFromYear()), Restrictions.ge("month", myFilter.getFromMonth()))).add(
-            Restrictions.and(Restrictions.eq("year", myFilter.getToYear()), Restrictions.le("month", myFilter.getToMonth()))).add(
-            Restrictions.and(Restrictions.gt("year", myFilter.getFromYear()), Restrictions.lt("year", myFilter.getToYear()))));
+        queryFilter.add(Restrictions.disjunction()
+            .add(Restrictions.and(Restrictions.eq("year", myFilter.getFromYear()), Restrictions.ge("month", myFilter.getFromMonth())))
+            .add(Restrictions.and(Restrictions.eq("year", myFilter.getToYear()), Restrictions.le("month", myFilter.getToMonth())))
+            .add(Restrictions.and(Restrictions.gt("year", myFilter.getFromYear()), Restrictions.lt("year", myFilter.getToYear()))));
       }
     } else {
       // Nur Von-Monat gesetzt.
@@ -179,7 +179,8 @@ public class BuchungssatzDao extends BaseDao<BuchungssatzDO>
    * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
    */
   @Override
-  public boolean hasAccess(final PFUserDO user, final BuchungssatzDO obj, final BuchungssatzDO oldObj,final OperationType operationType,final boolean throwException)
+  public boolean hasAccess(final PFUserDO user, final BuchungssatzDO obj, final BuchungssatzDO oldObj, final OperationType operationType,
+      final boolean throwException)
   {
     return accessChecker.isUserMemberOfGroup(user, throwException, ProjectForgeGroup.FINANCE_GROUP);
   }

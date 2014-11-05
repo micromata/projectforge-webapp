@@ -33,8 +33,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
@@ -66,30 +66,30 @@ public class SkillRatingDO extends DefaultBaseDO
   private SkillDO skill;
 
   @PropertyInfo(i18nKey = "plugins.skillmatrix.skillrating.sinceyear")
-  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @Field(analyze = Analyze.NO, store = Store.NO)
   private Integer sinceYear;
 
   @PropertyInfo(i18nKey = "plugins.skillmatrix.skillrating.rating")
   @Enumerated(EnumType.STRING)
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private SkillRating skillRating;
 
   @PropertyInfo(i18nKey = "plugins.skillmatrix.skillrating.certificates")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String certificates;
 
   @PropertyInfo(i18nKey = "plugins.skillmatrix.skillrating.trainingcourses")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String trainingCourses;
 
   @PropertyInfo(i18nKey = "plugins.skillmatrix.skillrating.description")
   @UserPrefParameter(i18nKey = "description", multiline = true)
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String description;
 
   @PropertyInfo(i18nKey = "plugins.skillmatrix.skillrating.comment")
   @UserPrefParameter(i18nKey = "comment", multiline = true)
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String comment;
 
   @ManyToOne(fetch = FetchType.LAZY)

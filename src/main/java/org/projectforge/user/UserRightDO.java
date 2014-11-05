@@ -39,8 +39,8 @@ import javax.persistence.UniqueConstraint;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.projectforge.core.DefaultBaseDO;
@@ -56,7 +56,7 @@ public class UserRightDO extends DefaultBaseDO implements Comparable<UserRightDO
   @IndexedEmbedded(depth = 2)
   private UserRightId rightId;
 
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   protected UserRightValue value;
 
   @IndexedEmbedded(depth = 1)

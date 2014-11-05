@@ -136,10 +136,11 @@ public class HRPlanningDao extends BaseDao<HRPlanningDO>
     final List<HRPlanningDO> list;
     if (planningId == null) {
       // New entry
-      list = getHibernateTemplate().find("from HRPlanningDO p where p.user.id = ? and p.week = ?", new Object[] { userId, week});
+      list = (List<HRPlanningDO>) getHibernateTemplate().find("from HRPlanningDO p where p.user.id = ? and p.week = ?",
+          new Object[] { userId, week});
     } else {
       // Entry already exists. Check collision:
-      list = getHibernateTemplate().find("from HRPlanningDO p where p.user.id = ? and p.week = ? and pk <> ?",
+      list = (List<HRPlanningDO>) getHibernateTemplate().find("from HRPlanningDO p where p.user.id = ? and p.week = ? and pk <> ?",
           new Object[] { userId, week, planningId});
     }
     return (CollectionUtils.isNotEmpty(list) == true);
@@ -158,8 +159,8 @@ public class HRPlanningDao extends BaseDao<HRPlanningDO>
       log.error("Date is not begin of week, try to change date: " + DateHelper.formatAsUTC(date.getDate()));
       date.setBeginOfWeek();
     }
-    final List<HRPlanningDO> list = getHibernateTemplate().find("from HRPlanningDO p where p.user.id = ? and p.week = ?",
-        new Object[] { userId, date.getSQLDate()});
+    final List<HRPlanningDO> list = (List<HRPlanningDO>) getHibernateTemplate().find(
+        "from HRPlanningDO p where p.user.id = ? and p.week = ?", new Object[] { userId, date.getSQLDate()});
     if (list == null || list.size() != 1) {
       return null;
     }

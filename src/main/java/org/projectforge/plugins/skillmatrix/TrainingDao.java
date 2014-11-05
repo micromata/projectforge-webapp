@@ -37,7 +37,8 @@ import org.projectforge.user.UserRightId;
 import org.projectforge.web.user.GroupsProvider;
 
 /**
- * This is the base data access object class. Most functionality such as access checking, select, insert, update, save, delete etc. is implemented by the super class.
+ * This is the base data access object class. Most functionality such as access checking, select, insert, update, save, delete etc. is
+ * implemented by the super class.
  * @author Werner Feder (werner.feder@t-online.de)
  */
 public class TrainingDao extends BaseDao<TrainingDO>
@@ -49,7 +50,7 @@ public class TrainingDao extends BaseDao<TrainingDO>
 
   public static final UserRightId USER_RIGHT_ID = new UserRightId(UNIQUE_PLUGIN_ID, "plugin20", I18N_KEY_SKILL_PREFIX);
 
-  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "skill.title" };
+  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "skill.title"};
 
   private SkillDao skillDao;
 
@@ -100,7 +101,7 @@ public class TrainingDao extends BaseDao<TrainingDO>
     if (title == null) {
       return null;
     }
-    final List<TrainingDO> list = getHibernateTemplate().find("from TrainingDO u where u.title = ?", title);
+    final List<TrainingDO> list = (List<TrainingDO>) getHibernateTemplate().find("from TrainingDO u where u.title = ?", title);
     if (CollectionUtils.isEmpty(list) == true) {
       return null;
     }

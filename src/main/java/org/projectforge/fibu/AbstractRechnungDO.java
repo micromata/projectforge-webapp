@@ -36,6 +36,7 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.hibernate.search.annotations.Analyze;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
@@ -56,37 +57,37 @@ public abstract class AbstractRechnungDO<T extends AbstractRechnungsPositionDO> 
   private static final long serialVersionUID = -8936320220788212987L;
 
   @PropertyInfo(i18nKey = "fibu.rechnung.datum")
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   @DateBridge(resolution = Resolution.DAY)
   protected Date datum;
 
   @PropertyInfo(i18nKey = "fibu.rechnung.betreff")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   protected String betreff;
 
   @PropertyInfo(i18nKey = "comment")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   protected String bemerkung;
 
   @PropertyInfo(i18nKey = "fibu.rechnung.besonderheiten")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   protected String besonderheiten;
 
   @PropertyInfo(i18nKey = "fibu.rechnung.faelligkeit")
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   @DateBridge(resolution = Resolution.DAY)
   protected Date faelligkeit;
 
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   protected transient Integer zahlungsZielInTagen;
 
   @PropertyInfo(i18nKey = "fibu.rechnung.bezahlDatum")
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   @DateBridge(resolution = Resolution.DAY)
   protected Date bezahlDatum;
 
   @PropertyInfo(i18nKey = "fibu.rechnung.zahlBetrag", type = PropertyType.CURRENCY)
-  @Field(index = Index.UN_TOKENIZED)
+  @Field(analyze = Analyze.NO)
   protected BigDecimal zahlBetrag;
 
   @PropertyInfo(i18nKey = "fibu.konto")

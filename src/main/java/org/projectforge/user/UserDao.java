@@ -287,7 +287,7 @@ public class UserDao extends BaseDao<PFUserDO>
       contextUser.setPassword(null);
       return contextUser;
     }
-    final List<PFUserDO> list = getHibernateTemplate().find("from PFUserDO u where u.username = ?", username);
+    final List<PFUserDO> list = (List<PFUserDO>) getHibernateTemplate().find("from PFUserDO u where u.username = ?", username);
     if (list != null && list.isEmpty() == false && list.get(0) != null) {
       user = list.get(0);
       user.setLoginFailures(user.getLoginFailures() + 1);
@@ -299,7 +299,7 @@ public class UserDao extends BaseDao<PFUserDO>
   @SuppressWarnings("unchecked")
   private PFUserDO getUser(final String username, final String password, final boolean updateSaltAndPepperIfNeeded)
   {
-    final List<PFUserDO> list = getHibernateTemplate().find("from PFUserDO u where u.username = ?", username);
+    final List<PFUserDO> list = (List<PFUserDO>) getHibernateTemplate().find("from PFUserDO u where u.username = ?", username);
     if (list == null || list.isEmpty() == true || list.get(0) == null) {
       return null;
     }
@@ -318,8 +318,8 @@ public class UserDao extends BaseDao<PFUserDO>
   @SuppressWarnings("unchecked")
   public PFUserDO getUserByStayLoggedInKey(final String username, final String stayLoggedInKey)
   {
-    final List<PFUserDO> list = getHibernateTemplate().find("from PFUserDO u where u.username = ? and u.stayLoggedInKey = ?",
-        new Object[] { username, stayLoggedInKey});
+    final List<PFUserDO> list = (List<PFUserDO>) getHibernateTemplate().find(
+        "from PFUserDO u where u.username = ? and u.stayLoggedInKey = ?", new Object[] { username, stayLoggedInKey});
     PFUserDO user = null;
     if (list != null && list.isEmpty() == false && list.get(0) != null) {
       user = list.get(0);
@@ -343,10 +343,10 @@ public class UserDao extends BaseDao<PFUserDO>
     List<PFUserDO> list = null;
     if (user.getId() == null) {
       // New user
-      list = getHibernateTemplate().find("from PFUserDO u where u.username = ?", user.getUsername());
+      list = (List<PFUserDO>) getHibernateTemplate().find("from PFUserDO u where u.username = ?", user.getUsername());
     } else {
       // user already exists. Check maybe changed username:
-      list = getHibernateTemplate().find("from PFUserDO u where u.username = ? and pk <> ?",
+      list = (List<PFUserDO>) getHibernateTemplate().find("from PFUserDO u where u.username = ? and pk <> ?",
           new Object[] { user.getUsername(), user.getId()});
     }
     if (CollectionUtils.isNotEmpty(list) == true) {
@@ -521,8 +521,8 @@ public class UserDao extends BaseDao<PFUserDO>
   @SuppressWarnings("unchecked")
   public PFUserDO getUserByAuthenticationToken(final Integer userId, final String authKey)
   {
-    final List<PFUserDO> list = getHibernateTemplate().find("from PFUserDO u where u.id = ? and u.authenticationToken = ?",
-        new Object[] { userId, authKey});
+    final List<PFUserDO> list = (List<PFUserDO>) getHibernateTemplate().find(
+        "from PFUserDO u where u.id = ? and u.authenticationToken = ?", new Object[] { userId, authKey});
     PFUserDO user = null;
     if (list != null && list.isEmpty() == false && list.get(0) != null) {
       user = list.get(0);
@@ -655,7 +655,7 @@ public class UserDao extends BaseDao<PFUserDO>
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public PFUserDO getInternalByName(final String username)
   {
-    final List<PFUserDO> list = getHibernateTemplate().find("from PFUserDO u where u.username = ?", username);
+    final List<PFUserDO> list = (List<PFUserDO>) getHibernateTemplate().find("from PFUserDO u where u.username = ?", username);
     if (list != null && list.size() > 0) {
       return list.get(0);
     }

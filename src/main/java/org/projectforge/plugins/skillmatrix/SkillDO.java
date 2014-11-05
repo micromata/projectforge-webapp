@@ -54,7 +54,7 @@ public class SkillDO extends DefaultBaseDO
   private static final long serialVersionUID = 6102127905651011282L;
 
   @PropertyInfo(i18nKey = "plugins.skillmatrix.skill.title")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String title;
 
   // Null if this skill is a top level skill.
@@ -64,12 +64,12 @@ public class SkillDO extends DefaultBaseDO
 
   @PropertyInfo(i18nKey = "plugins.skillmatrix.skill.description")
   @UserPrefParameter(i18nKey = "description", multiline = true)
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String description;
 
   @PropertyInfo(i18nKey = "plugins.skillmatrix.skill.comment")
   @UserPrefParameter(i18nKey = "comment", multiline = true)
-  @Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(store = Store.NO)
   private String comment;
 
   @PropertyInfo(i18nKey = "plugins.skillmatrix.skill.rateable")

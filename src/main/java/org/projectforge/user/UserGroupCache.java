@@ -416,7 +416,7 @@ public class UserGroupCache extends AbstractCache
     EmployeeDO employee = this.employeeMap.get(userId);
     if (employee == null) {
       @SuppressWarnings("unchecked")
-      final List<EmployeeDO> list = this.hibernateTemplate.find("from EmployeeDO e where e.user.id = ?", userId);
+      final List<EmployeeDO> list = (List<EmployeeDO>) this.hibernateTemplate.find("from EmployeeDO e where e.user.id = ?", userId);
       if (list != null && list.size() > 0) {
         employee = list.get(0);
         this.employeeMap.put(userId, employee);
@@ -535,7 +535,7 @@ public class UserGroupCache extends AbstractCache
     final Map<Integer, List<UserRightDO>> rMap = new HashMap<Integer, List<UserRightDO>>();
     List<UserRightDO> rights;
     try {
-      rights = hibernateTemplate.find("from UserRightDO t order by user.id, right_id");
+      rights = (List<UserRightDO>) hibernateTemplate.find("from UserRightDO t order by user.id, right_id");
     } catch (final Exception ex) {
       log.fatal("******* Exception while getting user rights from data-base (only OK for migration from older versions): "
           + ex.getMessage());

@@ -50,42 +50,42 @@ public class NewKostZuweisungDao extends BaseDao<KostZuweisungDO>
 
   private MonthlyEmployeeReportDao monthlyEmployeeReportDao;
 
-  //  public ResultHolder checkMonth(final int year, final int month)
-  //  {
-  //    final EmployeeSalaryFilter filter = new EmployeeSalaryFilter();
-  //    filter.setYear(year);
-  //    filter.setMonth(month);
-  //    // Get all salaries of the given month
-  //    final List<EmployeeSalaryDO> list = employeeSalaryDao.getList(filter);
-  //    for (final EmployeeSalaryDO salary : list) {
-  //      // For every employee (user)
-  //      final PFUserDO user = userGroupCache.getUser(salary.getEmployee().getUserId());
-  //      if (year != salary.getYear()) {
-  //        log.warn("Salary to check is not of the same year " + year + " as expected: " + salary);
-  //        continue;
-  //      }
-  //      if (month != salary.getMonth()) {
-  //        log.warn("Salary to check is not of the same month " + month + " as expected: " + salary);
-  //        continue;
-  //      }
-  //      final MonthlyEmployeeReport report = monthlyEmployeeReportDao.getReport(year, month, user);
-  //      final Map<String, Kost2Row> rows = report.getKost2Rows();
-  //      final Map<Integer, MonthlyEmployeeReportEntry> employeeReportMap = report.getKost2Durations();
-  //      final Kost1DO kost1 = salary.getEmployee().getKost1();
-  //      final long totalMillis = report.getTotalDuration();
-  //      for (final Kost2Row row : rows.values()) {
-  //        final Kost2DO kost2 = row.getKost2();
-  //        kostZuweisungDao.getKostZuweisungen(salary);
-  //        final MonthlyEmployeeReportEntry employeeReportEntry = employeeReportMap.get(kost2.getId());
-  //        final long durationMillis = employeeReportEntry.getMillis();
-  //        final KostZuweisungDO kostZuweisung = new KostZuweisungDO();
-  //        kostZuweisung.setKost1(kost1);
-  //        kostZuweisung.setKost2(kost2);
-  //        //kostZuweisung.setNetto(netto);
-  //        kostZuweisung.setEmployeeSalary(salary);
-  //      }
-  //    }
-  //  }
+  // public ResultHolder checkMonth(final int year, final int month)
+  // {
+  // final EmployeeSalaryFilter filter = new EmployeeSalaryFilter();
+  // filter.setYear(year);
+  // filter.setMonth(month);
+  // // Get all salaries of the given month
+  // final List<EmployeeSalaryDO> list = employeeSalaryDao.getList(filter);
+  // for (final EmployeeSalaryDO salary : list) {
+  // // For every employee (user)
+  // final PFUserDO user = userGroupCache.getUser(salary.getEmployee().getUserId());
+  // if (year != salary.getYear()) {
+  // log.warn("Salary to check is not of the same year " + year + " as expected: " + salary);
+  // continue;
+  // }
+  // if (month != salary.getMonth()) {
+  // log.warn("Salary to check is not of the same month " + month + " as expected: " + salary);
+  // continue;
+  // }
+  // final MonthlyEmployeeReport report = monthlyEmployeeReportDao.getReport(year, month, user);
+  // final Map<String, Kost2Row> rows = report.getKost2Rows();
+  // final Map<Integer, MonthlyEmployeeReportEntry> employeeReportMap = report.getKost2Durations();
+  // final Kost1DO kost1 = salary.getEmployee().getKost1();
+  // final long totalMillis = report.getTotalDuration();
+  // for (final Kost2Row row : rows.values()) {
+  // final Kost2DO kost2 = row.getKost2();
+  // kostZuweisungDao.getKostZuweisungen(salary);
+  // final MonthlyEmployeeReportEntry employeeReportEntry = employeeReportMap.get(kost2.getId());
+  // final long durationMillis = employeeReportEntry.getMillis();
+  // final KostZuweisungDO kostZuweisung = new KostZuweisungDO();
+  // kostZuweisung.setKost1(kost1);
+  // kostZuweisung.setKost2(kost2);
+  // //kostZuweisung.setNetto(netto);
+  // kostZuweisung.setEmployeeSalary(salary);
+  // }
+  // }
+  // }
 
   public NewKostZuweisungDao()
   {
@@ -95,8 +95,8 @@ public class NewKostZuweisungDao extends BaseDao<KostZuweisungDO>
   public List<KostZuweisungDO> getKostZuweisungen(final EmployeeSalaryDO salary)
   {
     @SuppressWarnings("unchecked")
-    final List<KostZuweisungDO> list = getHibernateTemplate().find("from KostZuweisungDO k where k.employeeSalary.id = ? and u.password = ?",
-        salary.getId());
+    final List<KostZuweisungDO> list = (List<KostZuweisungDO>) getHibernateTemplate().find(
+        "from KostZuweisungDO k where k.employeeSalary.id = ? and u.password = ?", salary.getId());
     return list;
   }
 
