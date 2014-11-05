@@ -52,6 +52,8 @@ import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 
+import de.micromata.hibernate.history.delta.PropertyDelta;
+
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
@@ -104,6 +106,10 @@ public class DatabaseCoreUpdates
           // No length check available so assume enlargement if ldapValues doesn't yet exist:
           final Table addressTable = new Table(AddressDO.class);
           dao.alterTableColumnVarCharLength(addressTable.getName(), "public_key", 20000);
+
+          final Table propertyDeltaTable = new Table(PropertyDelta.class);
+          dao.alterTableColumnVarCharLength(propertyDeltaTable.getName(), "old_value", 20000);
+          dao.alterTableColumnVarCharLength(propertyDeltaTable.getName(), "new_value", 20000);
 
           final Table employeeTable = new Table(EmployeeDO.class);
           dao.renameTableAttribute(employeeTable.getName(), "wochenstunden", "old_weekly_working_hours");
