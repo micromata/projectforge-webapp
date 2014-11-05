@@ -46,7 +46,6 @@ import org.projectforge.address.PersonalAddressDao;
 import org.projectforge.web.common.PhoneNumberValidator;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteMaxLengthTextField;
-import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
@@ -427,7 +426,7 @@ class AddressPageSupport implements Serializable
   {
     final FieldProperties<String> props = getAddressTextProperties(addressType, addressTextProperty);
     final AbstractFieldsetPanel< ? > fs = gridBuilder.newFieldset(props);
-    fs.add(new PFAutoCompleteTextField<String>(fs.getTextFieldId(), props.getModel()) {
+    fs.add(new PFAutoCompleteMaxLengthTextField(fs.getTextFieldId(), props.getPropertyModel()) {
       @Override
       protected List<String> getChoices(final String input)
       {
