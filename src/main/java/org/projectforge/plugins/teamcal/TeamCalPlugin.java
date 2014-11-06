@@ -55,6 +55,7 @@ import org.projectforge.plugins.teamcal.integration.TemplateEntry;
 import org.projectforge.plugins.teamcal.rest.TeamCalDaoRest;
 import org.projectforge.plugins.teamcal.rest.TeamEventDaoRest;
 import org.projectforge.registry.DaoRegistry;
+import org.projectforge.registry.Registry;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
@@ -82,7 +83,8 @@ public class TeamCalPlugin extends AbstractPlugin
   // The order of the entities is important for xml dump and imports as well as for test cases (order for deleting objects at the end of
   // each test).
   // The entities are inserted in ascending order and deleted in descending order.
-  private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { TeamCalDO.class, TeamEventDO.class, TeamEventAttendeeDO.class, TeamEventAttachmentDO.class};
+  private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { TeamCalDO.class, TeamEventDO.class, TeamEventAttendeeDO.class,
+    TeamEventAttachmentDO.class};
 
   /**
    * This dao should be defined in pluginContext.xml (as resources) for proper initialization.
@@ -113,7 +115,6 @@ public class TeamCalPlugin extends AbstractPlugin
     // The CalendarDao is automatically available by the scripting engine!
     register(entry);
     register(eventEntry);
-
 
     // Register the web part:
     registerWeb(ID, TeamCalListPage.class, TeamCalEditPage.class);
@@ -192,6 +193,10 @@ public class TeamCalPlugin extends AbstractPlugin
       if (TeamCalCalendarPage.USERPREF_KEY.equals(userPrefs.getKey()) == false) {
         return;
       }
+      if (userXmlPreferencesDao == null) {
+        // Only for testcases.
+        userXmlPreferencesDao = Registry.instance().getUserXmlPreferencesDao();
+      }
       final Object userPrefsObj = userXmlPreferencesDao.deserialize(userPrefs, true);
       if (userPrefsObj == null || userPrefsObj instanceof TeamCalCalendarFilter == false) {
         return;
@@ -267,7 +272,8 @@ public class TeamCalPlugin extends AbstractPlugin
     final Thread t = new Thread() {
 
       @Override
-      public void run() {
+      public void run()
+      {
         TeamEventExternalSubscriptionCache.instance().updateCache(teamCalDao);
       }
     };
