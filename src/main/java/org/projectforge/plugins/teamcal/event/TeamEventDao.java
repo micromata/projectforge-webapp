@@ -312,7 +312,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     final String s = "select distinct location from "
         + clazz.getSimpleName()
         + " t where deleted=false and t.calendar in :cals and lastUpdate > :lastUpdate and lower(t.location) like :location) order by t.location";
-    final Query query = getSession().createQuery(s);
+    final Query query = getSessionFactory().getCurrentSession().createQuery(s);
     query.setParameterList("cals", calendars);
     final DateHolder dh = new DateHolder();
     dh.add(Calendar.YEAR, -1);

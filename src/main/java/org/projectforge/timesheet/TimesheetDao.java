@@ -537,7 +537,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
         }
         // An user should see his own time sheets, but the values should be hidden.
         // A project manager should also see all time sheets, but the values should be hidden.
-        getSession().evict(obj);
+        getSessionFactory().getCurrentSession().evict(obj);
         obj.setDescription(HIDDEN_FIELD_MARKER);
         obj.setLocation(HIDDEN_FIELD_MARKER);
         log.debug("User has no access to own time sheet (or project manager): " + obj);
@@ -772,7 +772,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
     final String s = "select distinct location from "
         + clazz.getSimpleName()
         + " t where deleted=false and t.user.id = ? and lastUpdate > ? and lower(t.location) like ?) order by t.location";
-    final Query query = getSession().createQuery(s);
+    final Query query = getSessionFactory().getCurrentSession().createQuery(s);
     query.setInteger(0, PFUserContext.getUser().getId());
     final DateHolder dh = new DateHolder();
     dh.add(Calendar.YEAR, -1);
@@ -794,7 +794,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
     log.info("Get recent locations from the database.");
     final String s = "select location from "
         + (clazz.getSimpleName() + " t where deleted=false and t.user.id = ? and lastUpdate > ? and t.location != null and t.location != '' order by t.lastUpdate desc");
-    final Query query = getSession().createQuery(s);
+    final Query query = getSessionFactory().getCurrentSession().createQuery(s);
     query.setInteger(0, PFUserContext.getUser().getId());
     final DateHolder dh = new DateHolder();
     dh.add(Calendar.YEAR, -1);

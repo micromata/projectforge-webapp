@@ -201,7 +201,7 @@ public class MebDao extends BaseDao<MebEntryDO>
         return false;
       }
       // Try to assign the owner from the sender string.
-      final List<Object[]> userList = getSession().createQuery(
+      final List<Object[]> userList = getSessionFactory().getCurrentSession().createQuery(
           "select id, personalMebMobileNumbers from PFUserDO u where deleted = false and personalMebMobileNumbers is not null").list();
       final String senderNumber = StringHelper.removeNonDigits(entry.getSender());
       Integer pk = null;
@@ -219,7 +219,7 @@ public class MebDao extends BaseDao<MebEntryDO>
         }
       }
       if (pk != null) {
-        final PFUserDO user = (PFUserDO) getSession().load(PFUserDO.class, pk);
+        final PFUserDO user = (PFUserDO) getSessionFactory().getCurrentSession().load(PFUserDO.class, pk);
         entry.setOwner(user);
       }
       internalSave(entry);

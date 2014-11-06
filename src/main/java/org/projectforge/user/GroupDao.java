@@ -280,7 +280,7 @@ public class GroupDao extends BaseDao<GroupDO>
         }
       }
     }
-    getSession().flush();
+    getSessionFactory().getCurrentSession().flush();
     createHistoryEntry(user, unassignedGroups, assignedGroups);
     userGroupCache.setExpired();
       }

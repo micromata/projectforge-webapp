@@ -89,7 +89,7 @@ public class ContractDao extends BaseDao<ContractDO>
   @SuppressWarnings("unchecked")
   public int[] getYears()
   {
-    final List<Object[]> list = getSession().createQuery("select min(date), max(date) from ContractDO t").list();
+    final List<Object[]> list = getSessionFactory().getCurrentSession().createQuery("select min(date), max(date) from ContractDO t").list();
     return SQLHelper.getYears(list);
   }
 
@@ -136,7 +136,7 @@ public class ContractDao extends BaseDao<ContractDO>
         return orig.getNumber();
       }
     }
-    final List<Integer> list = getSession().createQuery("select max(t.number) from ContractDO t").list();
+    final List<Integer> list = getSessionFactory().getCurrentSession().createQuery("select max(t.number) from ContractDO t").list();
     Validate.notNull(list);
     if (list.size() == 0 || list.get(0) == null) {
       log.info("First entry of ContractDO");

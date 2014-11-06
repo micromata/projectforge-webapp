@@ -94,7 +94,7 @@ public class UserPrefDao extends BaseDao<UserPrefDO>
   {
     final PFUserDO user = PFUserContext.getUser();
     @SuppressWarnings("unchecked")
-    final List<Object> list = getSession().createQuery("select name from UserPrefDO t where user_fk=? and areaString = ? order by name")
+    final List<Object> list = getSessionFactory().getCurrentSession().createQuery("select name from UserPrefDO t where user_fk=? and areaString = ? order by name")
     .setInteger(0, user.getId()).setParameter(1, area.getId()).list();
     final String[] result = new String[list.size()];
     int i = 0;

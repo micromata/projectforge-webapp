@@ -52,7 +52,7 @@ public class PosteingangDao extends BaseDao<PosteingangDO>
   @SuppressWarnings("unchecked")
   public int[] getYears()
   {
-    final List<Object[]> list = getSession().createQuery("select min(datum), max(datum) from PosteingangDO t").list();
+    final List<Object[]> list = getSessionFactory().getCurrentSession().createQuery("select min(datum), max(datum) from PosteingangDO t").list();
     return SQLHelper.getYears(list);
   }
 
