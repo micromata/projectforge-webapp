@@ -6,16 +6,12 @@
   <!-- You may find the hibernate session factory and hibernate dialect in the main applicationContext-file. -->
 
   <!-- shortcut to hibernate -->
-  <bean id="hibernate" class="org.springframework.orm.hibernate3.HibernateTemplate">
+  <bean id="hibernate" class="org.springframework.orm.hibernate4.HibernateTemplate">
     <constructor-arg>
       <ref bean="sessionFactory" />
     </constructor-arg>
-    <property name="alwaysUseNewSession">
-      <value>false</value>
-    </property>
-    <property name="flushModeName">
-      <value>FLUSH_AUTO</value>
-    </property>
+    <!-- property name="alwaysUseNewSession"> <value>false</value> </property -->
+    <!-- property name="flushModeName"> <value>FLUSH_AUTO</value> </property -->
     <property name="cacheQueries">
       <value>true</value>
     </property>
@@ -44,10 +40,9 @@
       <props></props>
     </property>
   </bean>
-  <bean class="org.springframework.orm.hibernate3.HibernateTransactionManager" autowire="no" id="transactionManager">
-    <property name="sessionFactory">
-      <ref bean="sessionFactory" />
-    </property>
+  <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+    <property name="dataSource" ref="dataSource" />
+    <property name="sessionFactory" ref="sessionFactory" />
   </bean>
   <bean id="txTemplate" class="org.springframework.transaction.support.TransactionTemplate" autowire="no">
     <property name="transactionManager" ref="transactionManager" />

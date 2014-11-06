@@ -31,8 +31,8 @@
         <prop key="hibernate.bytecode.use_reflection_optimizer">true</prop>
         <prop key="hibernate.cache.use_query_cache">true</prop>
         <prop key="hibernate.cache.use_second_level_cache">true</prop>
-        <prop key="hibernate.cache.provider_class">net.sf.ehcache.hibernate.SingletonEhCacheProvider</prop>
-        <prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.SingletonEhCacheRegionFactory</prop>
+        <prop key="hibernate.cache.provider_class">org.hibernate.cache.ehcache.SingletonEhCacheProvider</prop>
+        <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory</prop>
         <prop key="hibernate.connection.driver_class">org.postgresql.Driver</prop> <!-- Overwritten by context.xml. -->
         <prop key="hibernate.jdbc.batch_size">50</prop>
         <prop key="hibernate.jdbc.fetch_size">200</prop>

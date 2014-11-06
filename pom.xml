@@ -146,10 +146,10 @@
       <version>2.3.2</version>
       <scope>test</scope>
     </dependency>
-    <dependency> <!-- Version check: 2010-08-28: 3.13.GA -->
+    <dependency>
       <groupId>javassist</groupId>
       <artifactId>javassist</artifactId>
-      <version>3.12.1.GA</version> <!-- Current: 3.13.GA -->
+      <version>3.18.2.GA</version> 
     </dependency>
     <dependency> <!-- Version check: 2010-08-28 -->
       <groupId>javax.mail</groupId>
@@ -306,9 +306,13 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-ehcache</artifactId>
-      <version>4.3.7.Final</version>
+      <version>4.3.5.Final</version>
     </dependency>
-    <!--dependency> <groupId>net.sf.ehcache</groupId> <artifactId>ehcache-core</artifactId> <version>2.6.9</version> </dependency -->
+    <!-- dependency>
+      <groupId>net.sf.ehcache</groupId>
+      <artifactId>ehcache-core</artifactId>
+      <version>2.6.9</version>
+    </dependency-->
     <dependency> <!-- Version check: 2010-08-28 -->
       <!-- see: http://repository.jboss.org/nexus/content/groups/public/org/hibernate/hibernate-search/ -->
       <groupId>org.hibernate</groupId>
