@@ -70,16 +70,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 public class AuftragDao extends BaseDao<AuftragDO>
 {
-  /**
-   * No support for HsqlDB due to bugs in combination of Hibernate 3.6 and Hsql 1.8 when filtering not invoiced but archived payment
-   * schedule entries.
-   * @return false for HsqlDB installation.
-   */
-  public static final boolean isPaymentScheduleInvoicedBug()
-  {
-    return HibernateUtils.getDialect() == DatabaseDialect.HSQL;
-  }
-
   public static final UserRightId USER_RIGHT_ID = UserRightId.PM_ORDER_BOOK;
 
   public final static int START_NUMBER = 1;
@@ -369,27 +359,14 @@ public class AuftragDao extends BaseDao<AuftragDO>
     } else if (myFilter.isShowAbgelehnt() == true) {
       queryFilter.add(Restrictions.eq("auftragsStatus", AuftragsStatus.ABGELEHNT));
     } else if (myFilter.isShowAbgeschlossenNichtFakturiert() == true) {
-      if (isPaymentScheduleInvoicedBug() == true) {
-        log.warn("Due to an hsql db bug, not invoiced but archieved payment schedules aren't selected or highlighted. If this feature is needed please upgrade to another database (e. g. PostgreSQL).");
-        queryFilter.createAlias("positionen", "position").add(
-            Restrictions.or(
-                Restrictions.eq("auftragsStatus", AuftragsStatus.ABGESCHLOSSEN),
-                Restrictions.and(Restrictions.eq("position.status", AuftragsPositionsStatus.ABGESCHLOSSEN),
-                    Restrictions.eq("position.vollstaendigFakturiert", false))));
-      } else {
-        // This doesn't work for current hsqldb installation.
-        queryFilter
-        .createAlias("positionen", "position")
-        .createAlias("paymentSchedules", "paymentSchedule", Criteria.FULL_JOIN)
-        .add(
-            Restrictions.or(
-                Restrictions.or(
-                    Restrictions.eq("auftragsStatus", AuftragsStatus.ABGESCHLOSSEN),
-                    Restrictions.and(Restrictions.eq("position.status", AuftragsPositionsStatus.ABGESCHLOSSEN),
-                        Restrictions.eq("position.vollstaendigFakturiert", false))),
-                        Restrictions.and(Restrictions.eq("paymentSchedule.reached", true),
-                            Restrictions.eq("paymentSchedule.vollstaendigFakturiert", false))));
-      }
+      queryFilter
+      .createAlias("positionen", "position")
+      .createAlias("paymentSchedules", "paymentSchedule", Criteria.FULL_JOIN)
+      .add(
+          Restrictions.or(
+              Restrictions.or(Restrictions.eq("auftragsStatus", AuftragsStatus.ABGESCHLOSSEN),
+                  Restrictions.eq("position.status", AuftragsPositionsStatus.ABGESCHLOSSEN)),
+                  Restrictions.eq("paymentSchedule.reached", true)));
       vollstaendigFakturiert = false;
     } else if (myFilter.isShowAkquise() == true) {
       queryFilter.add(Restrictions.in("auftragsStatus", new AuftragsStatus[] { AuftragsStatus.GELEGT, AuftragsStatus.IN_ERSTELLUNG,
@@ -420,7 +397,7 @@ public class AuftragDao extends BaseDao<AuftragDO>
       list = internalGetList(queryFilter);
     }
     if (vollstaendigFakturiert != null || myFilter.getAuftragsPositionsArt() != null) {
-      final Boolean fakturiert = vollstaendigFakturiert;
+      final Boolean invoiced = vollstaendigFakturiert;
       final AuftragFilter fil = myFilter;
       CollectionUtils.filter(list, new Predicate() {
         public boolean evaluate(final Object object)
@@ -440,10 +417,30 @@ public class AuftragDao extends BaseDao<AuftragDO>
               return false;
             }
           }
-          if (fakturiert != null) {
-            return auftrag.isVollstaendigFakturiert() == fakturiert;
+          final boolean orderIsCompletelyInvoiced = auftrag.isVollstaendigFakturiert();
+          if (HibernateUtils.getDialect() != DatabaseDialect.HSQL && myFilter.isShowAbgeschlossenNichtFakturiert() == true) {
+            // if order is completed and not all positions are completely invoiced
+            if (auftrag.getAuftragsStatus() == AuftragsStatus.ABGESCHLOSSEN && orderIsCompletelyInvoiced == false) {
+              return true;
+            }
+            // if order is completed and not completely invoiced
+            if (auftrag.getPositionen() != null) {
+              for (final AuftragsPositionDO pos : auftrag.getPositionen()) {
+                if (pos.isAbgeschlossenUndNichtVollstaendigFakturiert() == true) {
+                  return true;
+                }
+              }
+            }
+            if (auftrag.getPaymentSchedules() != null) {
+              for (final PaymentScheduleDO schedule : auftrag.getPaymentSchedules()) {
+                if (schedule.isReached() == true && schedule.isVollstaendigFakturiert() == false) {
+                  return true;
+                }
+              }
+            }
+            return false;
           }
-          return true;
+          return orderIsCompletelyInvoiced == invoiced;
         }
       });
     }
