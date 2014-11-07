@@ -42,6 +42,7 @@ import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.projectforge.access.OperationType;
+import org.projectforge.common.DatabaseDialect;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.BaseDao;
@@ -52,6 +53,7 @@ import org.projectforge.core.MessageParam;
 import org.projectforge.core.MessageParamType;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.core.UserException;
+import org.projectforge.database.HibernateUtils;
 import org.projectforge.database.SQLHelper;
 import org.projectforge.mail.Mail;
 import org.projectforge.mail.SendMail;
@@ -68,6 +70,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 public class AuftragDao extends BaseDao<AuftragDO>
 {
+  /**
+   * No support for HsqlDB due to bugs in combination of Hibernate 3.6 and Hsql 1.8 when filtering not invoiced but archived payment
+   * schedule entries.
+   * @return false for HsqlDB installation.
+   */
+  public static final boolean isPaymentScheduleInvoicedBug()
+  {
+    return HibernateUtils.getDialect() == DatabaseDialect.HSQL;
+  }
+
   public static final UserRightId USER_RIGHT_ID = UserRightId.PM_ORDER_BOOK;
 
   public final static int START_NUMBER = 1;
@@ -357,17 +369,27 @@ public class AuftragDao extends BaseDao<AuftragDO>
     } else if (myFilter.isShowAbgelehnt() == true) {
       queryFilter.add(Restrictions.eq("auftragsStatus", AuftragsStatus.ABGELEHNT));
     } else if (myFilter.isShowAbgeschlossenNichtFakturiert() == true) {
-      queryFilter
-      .createAlias("positionen", "position")
-      .createAlias("paymentSchedules", "paymentSchedule", Criteria.FULL_JOIN)
-      .add(
-          Restrictions.or(
-              Restrictions.or(
-                  Restrictions.eq("auftragsStatus", AuftragsStatus.ABGESCHLOSSEN),
-                  Restrictions.and(Restrictions.eq("position.status", AuftragsPositionsStatus.ABGESCHLOSSEN),
-                      Restrictions.eq("position.vollstaendigFakturiert", false))),
-                      Restrictions.and(Restrictions.eq("paymentSchedule.reached", true),
-                          Restrictions.eq("paymentSchedule.vollstaendigFakturiert", false))));
+      if (isPaymentScheduleInvoicedBug() == true) {
+        log.warn("Due to an hsql db bug, not invoiced but archieved payment schedules aren't selected or highlighted. If this feature is needed please upgrade to another database (e. g. PostgreSQL).");
+        queryFilter.createAlias("positionen", "position").add(
+            Restrictions.or(
+                Restrictions.eq("auftragsStatus", AuftragsStatus.ABGESCHLOSSEN),
+                Restrictions.and(Restrictions.eq("position.status", AuftragsPositionsStatus.ABGESCHLOSSEN),
+                    Restrictions.eq("position.vollstaendigFakturiert", false))));
+      } else {
+        // This doesn't work for current hsqldb installation.
+        queryFilter
+        .createAlias("positionen", "position")
+        .createAlias("paymentSchedules", "paymentSchedule", Criteria.FULL_JOIN)
+        .add(
+            Restrictions.or(
+                Restrictions.or(
+                    Restrictions.eq("auftragsStatus", AuftragsStatus.ABGESCHLOSSEN),
+                    Restrictions.and(Restrictions.eq("position.status", AuftragsPositionsStatus.ABGESCHLOSSEN),
+                        Restrictions.eq("position.vollstaendigFakturiert", false))),
+                        Restrictions.and(Restrictions.eq("paymentSchedule.reached", true),
+                            Restrictions.eq("paymentSchedule.vollstaendigFakturiert", false))));
+      }
       vollstaendigFakturiert = false;
     } else if (myFilter.isShowAkquise() == true) {
       queryFilter.add(Restrictions.in("auftragsStatus", new AuftragsStatus[] { AuftragsStatus.GELEGT, AuftragsStatus.IN_ERSTELLUNG,
