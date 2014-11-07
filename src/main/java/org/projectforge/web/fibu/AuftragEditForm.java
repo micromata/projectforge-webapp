@@ -230,9 +230,9 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
           target.add(kundeSelectPanel.getTextField());
         }
       });
-      projektSelectPanel.init();
       // ajaxUpdateComponents.add(projektSelectPanel.getTextField());
       fs.add(projektSelectPanel);
+      projektSelectPanel.init();
     }
     gridBuilder.newSplitPanel(GridSize.COL50);
     {
@@ -445,7 +445,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
           setHeading(getPositionHeading(position, this));
         }
       };
-      if (position.isAbgeschlossenUndNichtVollstaendigFakturiert()) {
+      if (abgeschlossenUndNichtFakturiert == true) {
         positionsPanel.setHighlightedHeader();
       }
       positionsRepeater.add(positionsPanel);
