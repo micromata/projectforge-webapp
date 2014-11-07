@@ -87,7 +87,7 @@ public class MessagePage extends AbstractSecuredPage
       public String getObject()
       {
         if (warning == true) {
-          return "alert";
+          return "alert alert-warning";
         } else {
           return "alert alert-success";
         }
