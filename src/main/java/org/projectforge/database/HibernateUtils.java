@@ -64,6 +64,8 @@ public class HibernateUtils
 
   private Configuration configuration;
 
+  private DatabaseDialect databaseDialect;
+
   private final Map<String, Integer> columnLengthMap = new HashMap<String, Integer>();
 
   /**
@@ -270,14 +272,16 @@ public class HibernateUtils
 
   public static DatabaseDialect getDialect()
   {
-    final String dialect = getConfiguration().getProperty("hibernate.dialect");
-    if ("org.hibernate.dialect.PostgreSQLDialect".equals(dialect) == true) {
-      return DatabaseDialect.PostgreSQL;
-    } else if ("org.hibernate.dialect.HSQLDialect".equals(dialect) == true) {
-      return DatabaseDialect.HSQL;
+    if (instance.databaseDialect == null) {
+      final String dialect = getConfiguration().getProperty("hibernate.dialect");
+      if ("org.hibernate.dialect.PostgreSQLDialect".equals(dialect) == true) {
+        instance.databaseDialect = DatabaseDialect.PostgreSQL;
+      } else if ("org.hibernate.dialect.HSQLDialect".equals(dialect) == true) {
+        instance.databaseDialect = DatabaseDialect.HSQL;
+      }
+      log.warn("Unknown or unsupported dialect: " + dialect);
     }
-    log.warn("Unknown or unsupported dialect: " + dialect);
-    return null;
+    return instance.databaseDialect;
   }
 
   private boolean internalIsEntity(final Class< ? > entity)
