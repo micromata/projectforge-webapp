@@ -50,6 +50,8 @@ import de.micromata.hibernate.history.delta.PropertyDelta;
  */
 public class DisplayHistoryEntry implements Serializable
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(DisplayHistoryEntry.class);
+
   private static final long serialVersionUID = 3900345445639438747L;
 
   private PFUserDO user;
@@ -108,10 +110,30 @@ public class DisplayHistoryEntry implements Serializable
       }
     }
     if (oldObjectValue == null) {
-      oldObjectValue = prop.getOldObjectValue(session);
+      try {
+        oldObjectValue = prop.getOldObjectValue(session);
+      } catch (final Exception ex) {
+        oldObjectValue = "???";
+        log.warn("Error while try to parse old object value '"
+            + prop.getOldValue()
+            + "' of prop-type '"
+            + prop.getClass().getName()
+            + "': "
+            + ex.getMessage(), ex);
+      }
     }
     if (newObjectValue == null) {
-      newObjectValue = prop.getNewObjectValue(session);
+      try {
+        newObjectValue = prop.getNewObjectValue(session);
+      } catch (final Exception ex) {
+        newObjectValue = "???";
+        log.warn("Error while try to parse new object value '"
+            + prop.getNewValue()
+            + "' of prop-type '"
+            + prop.getClass().getName()
+            + "': "
+            + ex.getMessage(), ex);
+      }
     }
     final String propType = prop.getPropertyType();
     if (prop instanceof CollectionPropertyDelta) {
@@ -137,14 +159,14 @@ public class DisplayHistoryEntry implements Serializable
     if (objectValue instanceof java.sql.Date) {
       return DateHelper.formatIsoDate((Date) objectValue);
     } else if (objectValue instanceof Date) {
-      return DateHelper.formatIsoTimestamp((Date)objectValue);
+      return DateHelper.formatIsoTimestamp((Date) objectValue);
     }
     return String.valueOf(objectValue);
   }
 
   private Object toShortNameOfList(final Object value)
   {
-    if (value instanceof Collection<?>) {
+    if (value instanceof Collection< ? >) {
       return CollectionUtils.collect((Collection< ? >) value, new Transformer() {
         public Object transform(final Object input)
         {
@@ -211,7 +233,8 @@ public class DisplayHistoryEntry implements Serializable
   }
 
   /**
-   * Use-full for prepending id of childs (e. g. entries in a collection displayed in the history table of the parent object). Example: AuftragDO -> AuftragsPositionDO.
+   * Use-full for prepending id of childs (e. g. entries in a collection displayed in the history table of the parent object). Example:
+   * AuftragDO -> AuftragsPositionDO.
    * @param propertyName
    */
   public void setPropertyName(final String propertyName)
