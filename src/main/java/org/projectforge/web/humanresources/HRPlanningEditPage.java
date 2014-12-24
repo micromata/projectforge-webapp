@@ -132,7 +132,7 @@ public class HRPlanningEditPage extends AbstractEditPage<HRPlanningDO, HRPlannin
         final HRPlanningEntryDO entry = getData().getEntry(idx);
         hrPlanningDao.setProjekt(entry, (Integer) selectedValue);
         form.projektSelectPanels.get(idx).getTextField().modelChanged();
-      } catch (final ArrayIndexOutOfBoundsException ex) {
+      } catch (final IndexOutOfBoundsException ex) {
         log.error("Oups, idx not supported: " + ex.getMessage(), ex);
       }
     } else if ("userId".equals(property) == true) {
