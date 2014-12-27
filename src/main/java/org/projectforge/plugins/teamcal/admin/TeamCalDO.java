@@ -320,6 +320,37 @@ public class TeamCalDO extends DefaultBaseDO
     this.externalSubscriptionUrl = externalSubscriptionUrl;
   }
 
+  /**
+   * Shorten the url or avoiding logging of user credentials as part of the url.<br>
+   * Example: Shorten http://www.projectforge.org/cal/... -> http://www.projectforge.org
+   * 
+   * @return
+   */
+  @Transient
+  public String getExternalSubscriptionUrlAnonymized()
+  {
+    if (this.externalSubscriptionUrl == null) {
+      return "";
+    }
+    final StringBuffer buf = new StringBuffer();
+    boolean dotRead = false;
+    for (int i = 0; i < externalSubscriptionUrl.length(); i++) {
+      final char ch = externalSubscriptionUrl.charAt(i);
+      if (dotRead == true && ch == '/') { // Slash after domain found
+        // Shorten http://www.projectforge.org/cal/... -> http://www.projectforge.org
+        buf.append("/...");
+        break;
+      } else if (ch == '?') {
+        buf.append("?...");
+        break;
+      } else if (ch == '.') {
+        dotRead = true;
+      }
+      buf.append(ch);
+    }
+    return buf.toString();
+  }
+
   @Basic(fetch = FetchType.LAZY)
   @Column(name = "ext_subscription_calendar_binary")
   @Type(type = "binary")
