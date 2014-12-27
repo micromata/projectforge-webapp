@@ -25,6 +25,7 @@ package org.projectforge.plugins.teamcal.externalsubscription;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,6 +33,7 @@ import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.criterion.Restrictions;
+import org.projectforge.common.DateHelper;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.plugins.teamcal.admin.TeamCalAccessType;
 import org.projectforge.plugins.teamcal.admin.TeamCalCache;
@@ -49,6 +51,10 @@ import org.projectforge.user.UserRights;
 public class TeamEventExternalSubscriptionCache
 {
   private static final TeamEventExternalSubscriptionCache instance = new TeamEventExternalSubscriptionCache();
+
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamEventExternalSubscriptionCache.class);
+
+  private static final long MAX_WAIT_MS_AFTER_FAILED_UPDATE = 1000 * 60 * 60 * 24; // 24 h
 
   private final Map<Integer, TeamEventSubscription> subscriptions;
 
@@ -116,20 +122,43 @@ public class TeamEventExternalSubscriptionCache
    */
   public void updateCache(final TeamCalDao dao, final TeamCalDO calendar, final boolean force)
   {
-    final TeamEventSubscription compareSubscription = subscriptions.get(calendar.getId());
+    final Integer calId = calendar.getId();
+    if (calId == null) {
+      log.error("Oups, calId is null (can't update subscription): " + calendar);
+      return;
+    }
+    TeamEventSubscription teamEventSubscription = subscriptions.get(calId);
     final Long now = System.currentTimeMillis();
     final Long addedTime = calendar.getExternalSubscriptionUpdateInterval() == null ? SUBSCRIPTION_UPDATE_TIME : 1000L * calendar
         .getExternalSubscriptionUpdateInterval();
-    if (compareSubscription == null) {
-      // create the calendar
-      final TeamEventSubscription teamEventSubscription = new TeamEventSubscription(dao, calendar);
+    if (teamEventSubscription == null) {
+      // First update of subscribed calendar:
+      teamEventSubscription = new TeamEventSubscription();
       subscriptions.put(calendar.getId(), teamEventSubscription);
-    } else if (force == true || compareSubscription.getLastUpdated() == null || compareSubscription.getLastUpdated() + addedTime <= now) {
-      // update the calendar
-      // we update the cache softly, therefore we create a new instance and replace the old instance in the cached map then
-      // creation and update is therefore the same two lines of code, but semantically different things
-      final TeamEventSubscription teamEventSubscription = new TeamEventSubscription(dao, calendar);
-      subscriptions.put(calendar.getId(), teamEventSubscription);
+      teamEventSubscription.update(dao, calendar);
+    } else if (force == true || teamEventSubscription.getLastUpdated() == null || teamEventSubscription.getLastUpdated() + addedTime <= now) {
+      if (force == false && teamEventSubscription.getNumberOfFailedUpdates() > 0) {
+        // Errors occurred and update not forced. Don't update e. g. every 5 minutes if a permanently error occurs.
+        Long lastRun = teamEventSubscription.getLastUpdated();
+        if (lastRun == null) {
+          lastRun = teamEventSubscription.getLastFailedUpdate();
+        }
+        if (lastRun == null || lastRun + teamEventSubscription.getNumberOfFailedUpdates() * addedTime <= now) {
+          teamEventSubscription.update(dao, calendar);
+        } else if (lastRun + MAX_WAIT_MS_AFTER_FAILED_UPDATE > now) {
+          log.info("Try to update subscribed calendar after "
+              + (MAX_WAIT_MS_AFTER_FAILED_UPDATE / 1000 / 60 / 60)
+              + " hours. Number of failed updates: "
+              + teamEventSubscription.getNumberOfFailedUpdates()
+              + ", time of last successful update (UTC): "
+              + (teamEventSubscription.getLastUpdated() != null ? DateHelper.formatAsUTC(new Date(teamEventSubscription.getLastUpdated()))
+                  : "-"));
+          teamEventSubscription.update(dao, calendar);
+        }
+      } else {
+        // update the calendar
+        teamEventSubscription.update(dao, calendar);
+      }
     }
   }
 
