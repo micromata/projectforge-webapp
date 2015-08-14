@@ -58,7 +58,7 @@ public class LdapUserDao extends LdapDao<String, LdapUser>
 
   private static final String DEACTIVATED_SUB_CONTEXT3 = DEACTIVATED_SUB_CONTEXT2 + ",";
 
-  static final String DEACTIVATED_MAIL = "deactivated@devnull.com";
+  static final String DEACTIVATED_MAIL = "deactivated@localhost";
 
   public static final String RESTRICTED_USER_SUB_CONTEXT = "restricted";
 
