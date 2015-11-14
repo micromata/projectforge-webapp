@@ -26,6 +26,7 @@ package org.projectforge.plugins.teamcal.admin;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
@@ -108,6 +109,20 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
         item.add(new ListSelectActionPanel(componentId, rowModel, TeamCalEditPage.class, teamCal.getId(), returnToPage, teamCal.getTitle()));
         cellItemListener.populateItem(item, componentId, rowModel);
         addRowClick(item);
+      }
+    });
+    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("plugins.teamcal.externalsubscription.label"), getSortable(
+        "externalSubscriptionUrlAnonymized", sortable), "externalSubscriptionUrlAnonymized", cellItemListener) {
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
+       */
+      @Override
+      public void populateItem(final Item<ICellPopulator<TeamCalDO>> item, final String componentId, final IModel<TeamCalDO> rowModel)
+      {
+        final TeamCalDO teamCal = rowModel.getObject();
+        item.add(new Label(componentId, StringUtils.defaultString(teamCal.getExternalSubscriptionUrlAnonymized())));
+        cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
 
