@@ -82,37 +82,6 @@ public class TeamEventAttendeeDO extends DefaultBaseDO implements Comparable<Tea
   }
 
   /**
-   * @see org.projectforge.core.BaseDO#getTenant()
-   */
-  @Override
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "tenant_id")
-  public TenantDO getTenant()
-  {
-    return this.tenant;
-  }
-
-  /**
-   * @see org.projectforge.core.BaseDO#getTenantId()
-   */
-  @Override
-  @Transient
-  public Integer getTenantId()
-  {
-    return tenant != null ? tenant.getId() : null;
-  }
-
-  /**
-   * @see org.projectforge.core.BaseDO#setTenant(TenantDO)
-   */
-  @Override
-  public TeamEventAttendeeDO setTenant(final TenantDO tenant)
-  {
-    this.tenant = tenant;
-    return this;
-  }
-
-  /**
    * Is set if the attendee is a ProjectForge user.
    * @return the userId
    */
@@ -306,26 +275,5 @@ public class TeamEventAttendeeDO extends DefaultBaseDO implements Comparable<Tea
       return false;
     }
     return true;
-  }
-
-  /**
-   * @see de.micromata.hibernate.history.ExtendedHistorizable#getHistorizableAttributes()
-   */
-  @Transient
-  @Override
-  public Set<String> getHistorizableAttributes()
-  {
-    // All attributes are historizable.
-    return null;
-  }
-
-  /**
-   * @see de.micromata.hibernate.history.ExtendedHistorizable#getNonHistorizableAttributes()
-   */
-  @Transient
-  @Override
-  public Set<String> getNonHistorizableAttributes()
-  {
-    return NON_HISTORIZABLE_ATTRIBUTES;
   }
 }
