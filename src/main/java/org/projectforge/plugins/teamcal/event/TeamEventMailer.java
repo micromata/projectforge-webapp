@@ -59,8 +59,8 @@ import org.projectforge.mail.Mail;
 import org.projectforge.mail.SendMail;
 import org.projectforge.registry.Registry;
 import org.projectforge.scripting.I18n;
-import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
 
 import de.micromata.hibernate.history.HistoryEntry;
 import de.micromata.hibernate.history.delta.PropertyDelta;
@@ -214,7 +214,7 @@ public class TeamEventMailer
         msg.setTo(attendee.getUrl());
       } else {
         msg.setTo(attendee.getUser());
-        if (attendee.getUser().equals(PFUserContext.getUser()) == true) {
+        if (attendee.getUser().equals(ThreadLocalUserContext.getUser()) == true) {
           continue;
         }
       }
@@ -255,7 +255,7 @@ public class TeamEventMailer
     final StringBuffer buf = new StringBuffer();
     switch (type) {
       case INVITATION: {
-        buf.append(PFUserContext.getUser().getFullname());
+        buf.append(ThreadLocalUserContext.getUser().getFullname());
         buf.append(" ").append(I18n.getString("plugins.teamcal.event.invitation1"));
         buf.append(" „").append(event.getSubject()).append("“ ");
         buf.append(I18n.getString("plugins.teamcal.event.invitation2"));
@@ -295,8 +295,8 @@ public class TeamEventMailer
     final Date d2 = new Date(event.getEndDate().getTime());
     final SimpleDateFormat df1 = new SimpleDateFormat("EEEEE, dd. MMMM yyyy, HH:mm");
     final SimpleDateFormat df2 = new SimpleDateFormat("HH:mm");
-    df1.setTimeZone(PFUserContext.getTimeZone());
-    df2.setTimeZone(PFUserContext.getTimeZone());
+    df1.setTimeZone(ThreadLocalUserContext.getTimeZone());
+    df2.setTimeZone(ThreadLocalUserContext.getTimeZone());
     final String s = df1.format(d1) + " Uhr - " + df2.format(d2) + " Uhr";
     buf.append("<td>").append(s).append("</td>");
     buf.append("</tr>");
@@ -356,7 +356,7 @@ public class TeamEventMailer
     if (event.getAttendees() != null || event.getAttendees().isEmpty() == false) {
       buf.append("<tr>");
       buf.append("<td>").append(I18n.getString("plugins.teamcal.attendees")).append("</td>");
-      buf.append("<td>").append(PFUserContext.getUser().getFullname()).append(" ").append(I18n.getString("plugins.teamcal.event.andyou")).append("</td>");
+      buf.append("<td>").append(ThreadLocalUserContext.getUser().getFullname()).append(" ").append(I18n.getString("plugins.teamcal.event.andyou")).append("</td>");
       buf.append("</tr>");
       switch (type) {
         case REJECTION:
@@ -380,13 +380,13 @@ public class TeamEventMailer
       case UPDATE:
         buf.append("<tr>");
         buf.append("<td>").append(I18n.getString("plugins.teamcal.event.changedby")).append("</td>");
-        buf.append("<td>").append(PFUserContext.getUser().getFullname()).append("</td>");
+        buf.append("<td>").append(ThreadLocalUserContext.getUser().getFullname()).append("</td>");
         buf.append("</tr>");
         break;
       case REJECTION:
         buf.append("<tr>");
         buf.append("<td>").append(I18n.getString("plugins.teamcal.event.deletedby")).append("</td>");
-        buf.append("<td>").append(PFUserContext.getUser().getFullname()).append("</td>");
+        buf.append("<td>").append(ThreadLocalUserContext.getUser().getFullname()).append("</td>");
         buf.append("</tr>");
     }
     return buf.toString();
@@ -418,7 +418,7 @@ public class TeamEventMailer
     calendar.getProperties().add(Version.VERSION_2_0);
     calendar.getProperties().add(CalScale.GREGORIAN);
     final TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
-    final VTimeZone tz = registry.getTimeZone(PFUserContext.getTimeZone().getID()).getVTimeZone();
+    final VTimeZone tz = registry.getTimeZone(ThreadLocalUserContext.getTimeZone().getID()).getVTimeZone();
     calendar.getComponents().add(tz);
     switch (type) {
       case INVITATION:
@@ -439,7 +439,7 @@ public class TeamEventMailer
     if (StringUtils.isNotBlank(teamEvent.getNote()) == true) {
       vEvent.getProperties().add(new Comment(teamEvent.getNote()));
     }
-    final PFUserDO user = PFUserContext.getUser();
+    final PFUserDO user = ThreadLocalUserContext.getUser();
     String s = user.getFullname();
     if (user.getOrganization() != null) {
       s += "\n" + user.getOrganization();

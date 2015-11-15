@@ -36,8 +36,8 @@ import org.projectforge.access.AccessChecker;
 import org.projectforge.access.AccessException;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.ModificationStatus;
-import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserDao;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Isolation;
@@ -96,7 +96,7 @@ public class PersonalContactDao extends HibernateDaoSupport
     Validate.notNull(obj);
     Validate.notNull(obj.getOwnerId());
     Validate.notNull(obj.getContactId());
-    final PFUserDO owner = PFUserContext.getUser();
+    final PFUserDO owner = ThreadLocalUserContext.getUser();
     if (owner == null || owner.getId().equals(obj.getOwnerId()) == false) {
       throw new AccessException("address.accessException.userIsNotOwnerOfPersonalAddress");
     }
@@ -162,7 +162,7 @@ public class PersonalContactDao extends HibernateDaoSupport
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public PersonalContactDO getByContactId(final Integer contactId)
   {
-    final PFUserDO owner = PFUserContext.getUser();
+    final PFUserDO owner = ThreadLocalUserContext.getUser();
     Validate.notNull(owner);
     Validate.notNull(owner.getId());
     final List<PersonalContactDO> list = getHibernateTemplate().find(
@@ -190,7 +190,7 @@ public class PersonalContactDao extends HibernateDaoSupport
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public List<PersonalContactDO> getList()
   {
-    final PFUserDO owner = PFUserContext.getUser();
+    final PFUserDO owner = ThreadLocalUserContext.getUser();
     Validate.notNull(owner);
     Validate.notNull(owner.getId());
     @SuppressWarnings("unchecked")
@@ -210,7 +210,7 @@ public class PersonalContactDao extends HibernateDaoSupport
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public Map<Integer, PersonalContactDO> getPersonalAddressByAddressId()
   {
-    final PFUserDO owner = PFUserContext.getUser();
+    final PFUserDO owner = ThreadLocalUserContext.getUser();
     Validate.notNull(owner);
     Validate.notNull(owner.getId());
     final List<PersonalContactDO> list = getHibernateTemplate().find(
@@ -232,7 +232,7 @@ public class PersonalContactDao extends HibernateDaoSupport
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public List<ContactDO> getMyAddresses()
   {
-    final PFUserDO owner = PFUserContext.getUser();
+    final PFUserDO owner = ThreadLocalUserContext.getUser();
     Validate.notNull(owner);
     Validate.notNull(owner.getId());
     final List<PersonalContactDO> list = getHibernateTemplate().find(

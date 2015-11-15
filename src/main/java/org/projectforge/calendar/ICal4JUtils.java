@@ -128,7 +128,7 @@ public class ICal4JUtils
       final Recur recur = rule.getRecur();
       final net.fortuna.ical4j.model.Date until = recur != null ? recur.getUntil() : null;
       if (until != null) {
-        final Date untilEndOfDay = CalendarUtils.getEndOfDay(until, PFUserContext.getTimeZone());
+        final Date untilEndOfDay = CalendarUtils.getEndOfDay(until, ThreadLocalUserContext.getTimeZone());
         recur.setUntil(new net.fortuna.ical4j.model.Date(untilEndOfDay));
       }
       return rule;

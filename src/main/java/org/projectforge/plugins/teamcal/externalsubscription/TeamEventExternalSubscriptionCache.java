@@ -42,7 +42,7 @@ import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalRight;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.plugins.teamcal.event.TeamEventFilter;
-import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserRights;
 
 /**
@@ -173,7 +173,7 @@ public class TeamEventExternalSubscriptionCache
     if (eventSubscription == null) {
       return null;
     }
-    final Integer userId = PFUserContext.getUserId();
+    final Integer userId = ThreadLocalUserContext.getUserId();
     final TeamCalAccessType accessType = getAccessType(eventSubscription.getTeamCalId(), userId);
     if (accessType == TeamCalAccessType.NONE) {
       return null;
@@ -186,7 +186,7 @@ public class TeamEventExternalSubscriptionCache
     final List<TeamEventDO> result = new ArrayList<TeamEventDO>();
     // precondition: existing teamcals ins filter
     final Collection<Integer> teamCals = new LinkedList<Integer>();
-    final Integer userId = PFUserContext.getUserId();
+    final Integer userId = ThreadLocalUserContext.getUserId();
     if (CollectionUtils.isNotEmpty(filter.getTeamCals()) == true) {
       for (final Integer calendarId : filter.getTeamCals()) {
         final TeamEventSubscription eventSubscription = subscriptions.get(calendarId);
