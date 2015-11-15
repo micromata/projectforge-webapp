@@ -23,6 +23,7 @@
 
 package org.projectforge.database;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -46,6 +47,7 @@ import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.EmployeeDO;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KundeDO;
+import org.projectforge.fibu.PaymentScheduleDO;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.RechnungDO;
 import org.projectforge.fibu.kost.BuchungssatzDO;
@@ -66,6 +68,8 @@ import org.projectforge.user.UserPrefEntryDO;
 import org.projectforge.user.UserRightDO;
 import org.projectforge.user.UserXmlPreferencesDO;
 
+import de.micromata.hibernate.history.delta.PropertyDelta;
+
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
@@ -81,10 +85,11 @@ public class DatabaseCoreUpdates
   public static List<UpdateEntry> getUpdateEntries()
   {
     final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
+
     // /////////////////////////////////////////////////////////////////
-    // 5.4
+    // 5.6
     // /////////////////////////////////////////////////////////////////
-    list.add(new UpdateEntryImpl(CORE_REGION_ID, "5.4", "2013-12-31",
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "5.6", "2015-11-14",
         "Adds t_tenant, tenant_id to all entities for multi-tenancy. Adds t_configuration.is_global, t_pf_user.super_admin.") {
       final Table configurationTable = new Table(ConfigurationDO.class);
 
@@ -167,6 +172,81 @@ public class DatabaseCoreUpdates
             dao.dropAndRecreateAllUniqueConstraints(entity);
           }
         }
+      }
+    });
+
+    // /////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////
+    // 5.5
+    // /////////////////////////////////////////////////////////////////
+    list.add(new UpdateEntryImpl(
+        CORE_REGION_ID,
+        "5.5",
+        "2014-08-11",
+        "Adds t_group.ldap_values, t_fibu_auftrag_position.period_of_performance_type, t_fibu_auftrag_position.mode_of_payment_type, t_fibu_payment_schedule, t_fibu_auftrag.period_of_performance_{begin|end}, length of t_address.public_key increased.") {
+
+      @Override
+      public UpdatePreCheckStatus runPreCheck()
+      {
+        if (dao.doTableAttributesExist(EmployeeDO.class, "weeklyWorkingHours") == false) {
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
+        if (dao.doTableAttributesExist(GroupDO.class, "ldapValues") == false) {
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
+        if (dao.doTableAttributesExist(AuftragsPositionDO.class, "periodOfPerformanceType", "modeOfPaymentType") == false) {
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
+        if (dao.doTableAttributesExist(AuftragDO.class, "periodOfPerformanceBegin", "periodOfPerformanceEnd") == false) {
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
+        if (dao.doEntitiesExist(PaymentScheduleDO.class) == false) {
+          return UpdatePreCheckStatus.READY_FOR_UPDATE;
+        }
+        return UpdatePreCheckStatus.ALREADY_UPDATED;
+      }
+
+      @Override
+      public UpdateRunningStatus runUpdate()
+      {
+        if (dao.doTableAttributesExist(EmployeeDO.class, "weeklyWorkingHours") == false) {
+          // No length check available so assume enlargement if ldapValues doesn't yet exist:
+          final Table addressTable = new Table(AddressDO.class);
+          dao.alterTableColumnVarCharLength(addressTable.getName(), "public_key", 20000);
+
+          final Table propertyDeltaTable = new Table(PropertyDelta.class);
+          dao.alterTableColumnVarCharLength(propertyDeltaTable.getName(), "old_value", 20000);
+          dao.alterTableColumnVarCharLength(propertyDeltaTable.getName(), "new_value", 20000);
+
+          final Table employeeTable = new Table(EmployeeDO.class);
+          dao.renameTableAttribute(employeeTable.getName(), "wochenstunden", "old_weekly_working_hours");
+          dao.addTableAttributes(EmployeeDO.class, "weeklyWorkingHours");
+          final List<DatabaseResultRow> rows = dao.query("select pk, old_weekly_working_hours from t_fibu_employee");
+          if (rows != null) {
+            for (final DatabaseResultRow row : rows) {
+              final Integer pk = (Integer) row.getEntry("pk").getValue();
+              final Integer oldWeeklyWorkingHours = (Integer) row.getEntry("old_weekly_working_hours").getValue();
+              if (oldWeeklyWorkingHours == null) {
+                continue;
+              }
+              dao.update("update t_fibu_employee set weekly_working_hours=? where pk=?", new BigDecimal(oldWeeklyWorkingHours), pk);
+            }
+          }
+        }
+        if (dao.doTableAttributesExist(GroupDO.class, "ldapValues") == false) {
+          dao.addTableAttributes(GroupDO.class, "ldapValues");
+        }
+        if (dao.doTableAttributesExist(AuftragsPositionDO.class, "periodOfPerformanceType", "modeOfPaymentType") == false) {
+          dao.addTableAttributes(AuftragsPositionDO.class, "periodOfPerformanceType", "modeOfPaymentType");
+        }
+        if (dao.doTableAttributesExist(AuftragDO.class, "periodOfPerformanceBegin", "periodOfPerformanceEnd") == false) {
+          dao.addTableAttributes(AuftragDO.class, "periodOfPerformanceBegin", "periodOfPerformanceEnd");
+        }
+        if (dao.doEntitiesExist(PaymentScheduleDO.class) == false) {
+          new SchemaGenerator(dao).add(PaymentScheduleDO.class).createSchema();
+          dao.createMissingIndices();
+        }
+        return UpdateRunningStatus.DONE;
       }
     });
 

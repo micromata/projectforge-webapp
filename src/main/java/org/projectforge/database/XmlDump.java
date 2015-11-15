@@ -49,6 +49,7 @@ import java.util.zip.GZIPOutputStream;
 
 import javax.persistence.Transient;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ClassUtils;
@@ -76,6 +77,7 @@ import org.projectforge.fibu.AuftragsPositionDO;
 import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.EingangsrechnungsPositionDO;
 import org.projectforge.fibu.EmployeeSalaryDO;
+import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.RechnungDO;
@@ -183,8 +185,16 @@ public class XmlDump
         } else if (obj instanceof AbstractRechnungDO< ? >) {
           final AbstractRechnungDO< ? extends AbstractRechnungsPositionDO> rechnung = (AbstractRechnungDO< ? >) obj;
           final List< ? extends AbstractRechnungsPositionDO> positions = rechnung.getPositionen();
+          final KontoDO konto = rechnung.getKonto();
+          if (konto != null) {
+            save(konto);
+            rechnung.setKonto(null);
+          }
           rechnung.setPositionen(null); // Need to nullable positions first (otherwise insert fails).
           final Serializable id = save(rechnung);
+          if (konto != null) {
+            rechnung.setKonto(konto);
+          }
           if (positions != null) {
             for (final AbstractRechnungsPositionDO pos : positions) {
               if (pos.getKostZuweisungen() != null) {
@@ -399,14 +409,15 @@ public class XmlDump
       }
       for (final HistoryEntry historyEntry : xstreamSavingConverter.getHistoryEntries()) {
         final Class< ? > type = xstreamSavingConverter.getClassFromHistoryName(historyEntry.getClassName());
-        final Object o = session.get(type, historyEntry.getEntityId());
+        final Object o = type != null ? session.get(type, historyEntry.getEntityId()) : null;
         if (o == null) {
-          log.error("A corrupted history entry found (entity of class '"
+          log.warn("A corrupted history entry found (entity of class '"
               + historyEntry.getClassName()
-              + "' with id + "
+              + "' with id "
               + historyEntry.getEntityId()
               + " not found: "
-              + historyEntry);
+              + historyEntry
+              + ". This doesn't affect the functioning of ProjectForge, this may result in orphaned history entries.");
           hasError = true;
         }
         ++counter;
@@ -466,6 +477,12 @@ public class XmlDump
           continue;
         } else if (fieldValue1 == null) {
           if (fieldValue2 != null) {
+            if (fieldValue2 instanceof Collection< ? >) {
+              if (CollectionUtils.isEmpty((Collection< ? >) fieldValue2) == true) {
+                // null is equals to empty collection in this case.
+                return true;
+              }
+            }
             if (logDifference == true) {
               log.error("Field '" + field.getName() + "': value 1 '" + fieldValue1 + "' is different from value 2 '" + fieldValue2 + "'.");
             }
@@ -518,10 +535,11 @@ public class XmlDump
             return false;
           }
         } else if (fieldValue1.getClass().isArray() == true) {
-          if (ArrayUtils.isEquals( fieldValue1, fieldValue2) == false) {
+          if (ArrayUtils.isEquals(fieldValue1, fieldValue2) == false) {
             if (logDifference == true) {
               log.error("Field '" + field.getName() + "': value 1 '" + fieldValue1 + "' is different from value 2 '" + fieldValue2 + "'.");
             }
+            return false;
           }
         } else if (ObjectUtils.equals(fieldValue2, fieldValue1) == false) {
           if (logDifference == true) {

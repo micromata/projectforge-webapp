@@ -38,6 +38,9 @@ public class MemoPlugin extends AbstractPlugin
 
   public static final String RESOURCE_BUNDLE_NAME = MemoPlugin.class.getPackage().getName() + ".MemoI18nResources";
 
+  // The order of the entities is important for xml dump and imports as well as for test cases (order for deleting objects at the end of
+  // each test).
+  // The entities are inserted in ascending order and deleted in descending order.
   private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { MemoDO.class};
 
   private MemoDao memoDao;

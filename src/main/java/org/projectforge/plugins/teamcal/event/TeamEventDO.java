@@ -27,7 +27,7 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.SortedSet;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
@@ -47,8 +47,6 @@ import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.annotations.Sort;
-import org.hibernate.annotations.SortType;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
@@ -59,12 +57,15 @@ import org.hibernate.search.annotations.Store;
 import org.projectforge.calendar.ICal4JUtils;
 import org.projectforge.calendar.TimePeriod;
 import org.projectforge.common.DateFormats;
+import org.projectforge.core.AbstractHistorizableBaseDO;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.PFPersistancyBehavior;
 import org.projectforge.database.Constants;
 import org.projectforge.plugins.teamcal.TeamCalConfig;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.user.ThreadLocalUserContext;
+
+import de.micromata.hibernate.history.ExtendedHistorizable;
 
 /**
  * Overview of used (and may-be planned) fields:
@@ -89,7 +90,7 @@ import org.projectforge.user.ThreadLocalUserContext;
 @Entity
 @Indexed
 @Table(name = "T_PLUGIN_CALENDAR_EVENT")
-public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
+public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable, ExtendedHistorizable
 {
   private static final long serialVersionUID = -9205582135590380919L;
 
@@ -109,6 +110,10 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   @DateBridge(resolution = Resolution.MINUTE)
   private Timestamp endDate;
 
+  @Field(index = Index.UN_TOKENIZED)
+  @DateBridge(resolution = Resolution.SECOND)
+  private Timestamp lastEmail;
+
   @IndexedEmbedded(depth = 1)
   private TeamCalDO calendar;
 
@@ -122,7 +127,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   private String note;
 
   @PFPersistancyBehavior(autoUpdateCollectionEntries = true)
-  private SortedSet<TeamEventAttendeeDO> attendees;
+  private Set<TeamEventAttendeeDO> attendees;
 
   private String organizer;
 
@@ -134,17 +139,39 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
 
   private ReminderActionType reminderActionType;
 
+  // See RFC 2445 section 4.8.7.4
+  private Integer sequence = 0;
+
+  // See RFC 2445 section 4.8.1.11
+  // private TeamEventStatus status = TeamEventStatus.UNKNOWN;
+
+  @PFPersistancyBehavior(autoUpdateCollectionEntries = true)
+  private Set<TeamEventAttachmentDO> attachments;
+
+  static {
+    AbstractHistorizableBaseDO.putNonHistorizableProperty(TeamEventDO.class, "lastEmail");
+  }
+
   /**
    * Clear fields for viewers with minimal access. If you add new fields don't forget to clear these fields here.
    */
-  public void clearFields()
+  public TeamEventDO clearFields()
   {
     subject = location = note = null;
-    attendees = null;
+    if (attendees != null) {
+      attendees.clear();
+    }
     organizer = null;
     reminderDuration = null;
     reminderDurationType = null;
     reminderActionType = null;
+    lastEmail = null;
+    sequence = null;
+    if (attachments != null) {
+      attachments.clear();
+    }
+    // status = null;
+    return this;
   }
 
   public TeamEventDO()
@@ -277,6 +304,25 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   }
 
   /**
+   * @return the lastEmail
+   */
+  @Column(name = "last_email")
+  public Timestamp getLastEmail()
+  {
+    return lastEmail;
+  }
+
+  /**
+   * @param lastEmail the lastEmail to set
+   * @return this for chaining.
+   */
+  public TeamEventDO setLastEmail(final Timestamp lastEmail)
+  {
+    this.lastEmail = lastEmail;
+    return this;
+  }
+
+  /**
    * @return the note
    */
   @Column(length = 4000)
@@ -299,9 +345,8 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
    * @return the attendees
    */
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-  @JoinColumn(name = "team_event_fk", insertable = true, updatable = true)
-  @Sort(type = SortType.NATURAL)
-  public SortedSet<TeamEventAttendeeDO> getAttendees()
+  @JoinColumn(name = "team_event_fk")
+  public Set<TeamEventAttendeeDO> getAttendees()
   {
     return attendees;
   }
@@ -310,7 +355,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
    * @param attendees the attendees to set
    * @return this for chaining.
    */
-  public TeamEventDO setAttendees(final SortedSet<TeamEventAttendeeDO> attendees)
+  public TeamEventDO setAttendees(final Set<TeamEventAttendeeDO> attendees)
   {
     this.attendees = attendees;
     return this;
@@ -320,12 +365,27 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
    * Creates a {@link TreeSet}.
    * @return this for chaining.
    */
-  public SortedSet<TeamEventAttendeeDO> ensureAttendees()
+  public Set<TeamEventAttendeeDO> ensureAttendees()
   {
     if (this.attendees == null) {
       this.attendees = new TreeSet<TeamEventAttendeeDO>();
     }
     return this.attendees;
+  }
+
+  public TeamEventDO addAttendee(final TeamEventAttendeeDO attendee)
+  {
+    ensureAttendees();
+    short number = 1;
+    for (final TeamEventAttendeeDO pos : attendees) {
+      if (pos.getNumber() >= number) {
+        number = pos.getNumber();
+        number++;
+      }
+    }
+    attendee.setNumber(number);
+    this.attendees.add(attendee);
+    return this;
   }
 
   /**
@@ -670,6 +730,88 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   }
 
   /**
+   * @return the sequence
+   */
+  @Column
+  public Integer getSequence()
+  {
+    return sequence;
+  }
+
+  /**
+   * @param sequence the sequence to set
+   * @return this for chaining.
+   */
+  public TeamEventDO setSequence(final Integer sequence)
+  {
+    this.sequence = sequence;
+    return this;
+  }
+
+  public void incSequence()
+  {
+    sequence++;
+  }
+
+  /**
+   * @return the attachments
+   */
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @JoinColumn(name = "team_event_fk2")
+  public Set<TeamEventAttachmentDO> getAttachments()
+  {
+    return attachments;
+  }
+
+  /**
+   * @param attachments the attachments to set
+   * @return this for chaining.
+   */
+  public TeamEventDO setAttachments(final Set<TeamEventAttachmentDO> attachments)
+  {
+    this.attachments = attachments;
+    return this;
+  }
+
+  /**
+   * Creates a {@link TreeSet}.
+   * @return this for chaining.
+   */
+  public Set<TeamEventAttachmentDO> ensureAttachments()
+  {
+    if (this.attachments == null) {
+      this.attachments = new TreeSet<TeamEventAttachmentDO>();
+    }
+    return this.attachments;
+  }
+
+  public TeamEventDO addAttachment(final TeamEventAttachmentDO attachment)
+  {
+    ensureAttachments();
+    this.attachments.add(attachment);
+    return this;
+  }
+
+  // /**
+  // * @return the status
+  // */
+  // @Column
+  // public TeamEventStatus getStatus()
+  // {
+  // return status;
+  // }
+  //
+  // /**
+  // * @param status the status to set
+  // * @return this for chaining.
+  // */
+  // public TeamEventDO setStatus(final TeamEventStatus status)
+  // {
+  // this.status = status;
+  // return this;
+  // }
+
+  /**
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -678,6 +820,7 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
     final int prime = 31;
     int result = 1;
     result = prime * result + (allDay ? 1231 : 1237);
+    result = prime * result + ((attachments == null) ? 0 : attachments.hashCode());
     result = prime * result + ((attendees == null) ? 0 : attendees.hashCode());
     result = prime * result + ((calendar == null) ? 0 : calendar.hashCode());
     result = prime * result + ((endDate == null) ? 0 : endDate.hashCode());
@@ -708,61 +851,125 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
     if (allDay != other.allDay)
       return false;
     if (attendees == null) {
-      if (other.attendees != null)
+      if (other.attendees != null) {
         return false;
-    } else if (!attendees.equals(other.attendees))
+      }
+    } else if (attendees.equals(other.attendees) == false) {
       return false;
+    }
     if (calendar == null) {
-      if (other.calendar != null)
+      if (other.calendar != null) {
         return false;
-    } else if (!calendar.equals(other.calendar))
+      }
+    } else if (calendar.equals(other.calendar) == false) {
       return false;
+    }
     if (endDate == null) {
-      if (other.endDate != null)
+      if (other.endDate != null) {
         return false;
-    } else if (!endDate.equals(other.endDate))
+      }
+    } else if (endDate.equals(other.endDate) == false) {
       return false;
+    }
     if (externalUid == null) {
-      if (other.externalUid != null)
+      if (other.externalUid != null) {
         return false;
-    } else if (!externalUid.equals(other.externalUid))
+      }
+    } else if (externalUid.equals(other.externalUid) == false) {
       return false;
+    }
+    if (location == null) {
+      if (other.location != null) {
+        return false;
+      }
+    } else if (location.equals(other.location) == false) {
+      return false;
+    }
+    if (note == null) {
+      if (other.note != null) {
+        return false;
+      }
+    } else if (note.equals(other.note) == false) {
+      return false;
+    }
+    if (recurrenceExDate == null) {
+      if (other.recurrenceExDate != null) {
+        return false;
+      }
+    } else if (recurrenceExDate.equals(other.recurrenceExDate) == false) {
+      return false;
+    }
+    if (recurrenceRule == null) {
+      if (other.recurrenceRule != null) {
+        return false;
+      }
+    } else if (recurrenceRule.equals(other.recurrenceRule) == false) {
+      return false;
+    }
+    if (recurrenceUntil == null) {
+      if (other.recurrenceUntil != null) {
+        return false;
+      }
+    } else if (recurrenceUntil.equals(other.recurrenceUntil) == false) {
+      return false;
+    }
+    if (startDate == null) {
+      if (other.startDate != null) {
+        return false;
+      }
+    } else if (startDate.equals(other.startDate) == false) {
+      return false;
+    }
+    if (subject == null) {
+      if (other.subject != null) {
+        return false;
+      }
+    } else if (subject.equals(other.subject) == false) {
+      return false;
+    }
+    if (attachments == null) {
+      if (other.attachments != null) {
+        return false;
+      }
+    } else if (attachments.equals(other.attachments) == false) {
+      return false;
+    }
+    return true;
+  }
+
+  public boolean mustIncSequence(final TeamEventDO other)
+  {
     if (location == null) {
       if (other.location != null)
-        return false;
+        return true;
     } else if (!location.equals(other.location))
-      return false;
-    if (note == null) {
-      if (other.note != null)
-        return false;
-    } else if (!note.equals(other.note))
-      return false;
-    if (recurrenceExDate == null) {
-      if (other.recurrenceExDate != null)
-        return false;
-    } else if (!recurrenceExDate.equals(other.recurrenceExDate))
-      return false;
-    if (recurrenceRule == null) {
-      if (other.recurrenceRule != null)
-        return false;
-    } else if (!recurrenceRule.equals(other.recurrenceRule))
-      return false;
-    if (recurrenceUntil == null) {
-      if (other.recurrenceUntil != null)
-        return false;
-    } else if (!recurrenceUntil.equals(other.recurrenceUntil))
-      return false;
+      return true;
     if (startDate == null) {
       if (other.startDate != null)
-        return false;
+        return true;
     } else if (!startDate.equals(other.startDate))
-      return false;
-    if (subject == null) {
-      if (other.subject != null)
-        return false;
-    } else if (!subject.equals(other.subject))
-      return false;
-    return true;
+      return true;
+    if (endDate == null) {
+      if (other.endDate != null)
+        return true;
+    } else if (!endDate.equals(other.endDate))
+      return true;
+    if (recurrenceExDate == null) {
+      if (other.recurrenceExDate != null)
+        return true;
+    } else if (!recurrenceExDate.equals(other.recurrenceExDate))
+      return true;
+    if (recurrenceRule == null) {
+      if (other.recurrenceRule != null)
+        return true;
+    } else if (!recurrenceRule.equals(other.recurrenceRule))
+      return true;
+    if (recurrenceUntil == null) {
+      if (other.recurrenceUntil != null)
+        return true;
+    } else if (!recurrenceUntil.equals(other.recurrenceUntil))
+      return true;
+    return false;
   }
 
   /**
@@ -772,16 +979,59 @@ public class TeamEventDO extends DefaultBaseDO implements TeamEvent, Cloneable
   public TeamEventDO clone()
   {
     final TeamEventDO clone = new TeamEventDO();
+    clone.setCalendar(this.getCalendar());
     clone.startDate = this.startDate;
     clone.endDate = this.endDate;
     clone.allDay = this.allDay;
     clone.subject = this.subject;
     clone.location = this.location;
-    clone.attendees = this.attendees;
     clone.recurrenceExDate = this.recurrenceExDate;
     clone.recurrenceRule = this.recurrenceRule;
+    clone.recurrenceReferenceDate = this.recurrenceReferenceDate;
+    clone.recurrenceReferenceId = this.recurrenceReferenceId;
     clone.recurrenceUntil = this.recurrenceUntil;
+    clone.organizer = this.organizer;
+    clone.note = this.note;
     clone.externalUid = this.externalUid;
+    clone.lastEmail = this.lastEmail;
+    clone.sequence = this.sequence;
+    // clone.status = this.status;
+    clone.reminderDuration = this.reminderDuration;
+    clone.reminderDurationType = this.reminderDurationType;
+    clone.reminderActionType = this.reminderActionType;
+    if (this.attendees != null && this.attendees.isEmpty() == false) {
+      clone.attendees = clone.ensureAttendees();
+      for (final TeamEventAttendeeDO attendee : this.getAttendees()) {
+        attendee.setId(null);
+        clone.addAttendee(attendee);
+      }
+    }
+    if (this.attachments != null && this.attachments.isEmpty() == false) {
+      clone.attachments = clone.ensureAttachments();
+      for (final TeamEventAttachmentDO attachment : this.getAttachments()) {
+        attachment.setId(null);
+        clone.addAttachment(attachment);
+      }
+    }
     return clone;
+  }
+
+  public TeamEventDO createMinimalCopy()
+  {
+    final TeamEventDO result = new TeamEventDO();
+    result.externalUid = this.externalUid;
+    result.setId(this.getId());
+    result.setCalendar(this.getCalendar());
+    result.startDate = this.startDate;
+    result.endDate = this.endDate;
+    result.allDay = this.allDay;
+    result.recurrenceExDate = this.recurrenceExDate;
+    result.recurrenceRule = this.recurrenceRule;
+    result.recurrenceReferenceDate = this.recurrenceReferenceDate;
+    result.recurrenceReferenceId = this.recurrenceReferenceId;
+    result.recurrenceUntil = this.recurrenceUntil;
+    result.externalUid = this.externalUid;
+    result.sequence = this.sequence;
+    return result;
   }
 }

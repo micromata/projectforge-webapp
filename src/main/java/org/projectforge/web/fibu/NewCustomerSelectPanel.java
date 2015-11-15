@@ -30,24 +30,32 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.SubmitLink;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
+import org.projectforge.common.NumberHelper;
 import org.projectforge.common.RecentQueue;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.KundeDao;
+import org.projectforge.fibu.KundeFavorite;
 import org.projectforge.fibu.KundeFormatter;
-import org.projectforge.user.ThreadLocalUserContext;
-import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.user.UserPreferencesHelper;
+import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.AbstractSelectPanel;
+import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
+import org.projectforge.web.wicket.components.FavoritesChoicePanel;
+import org.projectforge.web.wicket.components.MaxLengthTextField;
+import org.projectforge.web.wicket.components.TooltipImage;
 import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
 
 /**
  * This panel shows the actual customer.
- * @author Kai Reinhard (k.reinhard@micromata.de)
+ * @author Werner Feder (werner.feder@t-online.de)
  * 
  */
 public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> implements ComponentWrapperPanel
@@ -56,6 +64,7 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
 
   private static final String USER_PREF_KEY_RECENT_CUSTOMERS = "CustomerSelectPanel:recentCustomers";
 
+  @SuppressWarnings("unused")
   private boolean defaultFormProcessing = false;
 
   @SpringBean(name = "kundeFormatter")
@@ -71,16 +80,11 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
   // Only used for detecting changes:
   private KundeDO currentCustomer;
 
-  /**
-   * @param id
-   * @param model
-   * @param caller
-   * @param selectProperty
-   */
-  public NewCustomerSelectPanel(final String id, final IModel<KundeDO> model, final ISelectCallerPage caller, final String selectProperty)
-  {
-    this(id, model, null, caller, selectProperty);
-  }
+  private final PropertyModel<String> kundeText;
+
+  private TextField<String> kundeTextField;
+
+  private FavoritesChoicePanel<KundeDO, KundeFavorite> favoritesPanel;
 
   /**
    * @param id
@@ -89,10 +93,11 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
    * @param selectProperty
    */
   @SuppressWarnings("serial")
-  public NewCustomerSelectPanel(final String id, final IModel<KundeDO> model, final String label, final ISelectCallerPage caller,
-      final String selectProperty)
+  public NewCustomerSelectPanel(final String id, final IModel<KundeDO> model, final PropertyModel<String> kundeText,
+      final ISelectCallerPage caller, final String selectProperty)
   {
     super(id, model, caller, selectProperty);
+    this.kundeText = kundeText;
     customerTextField = new PFAutoCompleteTextField<KundeDO>("customerField", getModel()) {
       @Override
       protected List<KundeDO> getChoices(final String input)
@@ -142,6 +147,8 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
       /**
        * @see org.apache.wicket.Component#getConverter(java.lang.Class)
        */
+
+      @SuppressWarnings({ "unchecked", "rawtypes"})
       @Override
       public <C> IConverter<C> getConverter(final Class<C> type)
       {
@@ -153,15 +160,15 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
               getModel().setObject(null);
               return null;
             }
-            final int ind = value.indexOf(": ");
-            final String customername = ind >= 0 ? value.substring(0, ind) : value;
-            // final PFUserDO user = kundeDao.getById(customername);
-            // if (user == null) {
-            // error(getString("user.panel.error.usernameNotFound"));
-            // }
-            // getModel().setObject(user);
-            // return user;
-            return null;
+            final int ind = value.indexOf(" - ");
+            final String idString = ind >= 0 ? value.substring(0, ind) : value;
+            final Integer id = NumberHelper.parseInteger(idString);
+            final KundeDO kunde = id != null ? kundeDao.getById(id) : null;
+            if (kunde == null) {
+              error(getString("panel.error.customernameNotFound"));
+            }
+            getModel().setObject(kunde);
+            return kunde;
           }
 
           @Override
@@ -170,15 +177,15 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
             if (value == null) {
               return "";
             }
-            final PFUserDO user = (PFUserDO) value;
-            return user.getUsername();
+            final KundeDO kunde = (KundeDO) value;
+            return formatLabel(kunde);
           }
 
         };
       }
     };
     currentCustomer = getModelObject();
-    customerTextField.enableTooltips().withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false).withWidth(400);
+    customerTextField.enableTooltips().withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false); // .withWidth(400);
   }
 
   /**
@@ -190,42 +197,81 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
     this.defaultFormProcessing = defaultFormProcessing;
   }
 
-  @Override
   @SuppressWarnings("serial")
+  @Override
   public NewCustomerSelectPanel init()
   {
     super.init();
-
+    if (kundeText != null) {
+      kundeTextField = new MaxLengthTextField("kundeText", kundeText) {
+        @Override
+        public boolean isVisible()
+        {
+          return (NewCustomerSelectPanel.this.getModelObject() == null || NumberHelper.greaterZero(NewCustomerSelectPanel.this
+              .getModelObject().getId()) == false);
+        }
+      };
+      add(kundeTextField);
+    } else {
+      add(AbstractForm.createInvisibleDummyComponent("kundeText"));
+    }
     add(customerTextField);
-    final SubmitLink selectMeButton = new SubmitLink("selectMe") {
+    final SubmitLink selectButton = new SubmitLink("select") {
       @Override
       public void onSubmit()
       {
-        caller.select(selectProperty, ThreadLocalUserContext.getUserId());
-        markTextFieldModelAsChanged();
+        setResponsePage(new CustomerListPage(caller, selectProperty));
+      };
+    };
+    selectButton.setDefaultFormProcessing(false);
+    add(selectButton);
+    selectButton.add(new TooltipImage("selectHelp", WebConstants.IMAGE_KUNDE_SELECT, getString("fibu.tooltip.selectKunde")));
+    final SubmitLink unselectButton = new SubmitLink("unselect") {
+      @Override
+      public void onSubmit()
+      {
+        caller.unselect(selectProperty);
       }
 
       @Override
       public boolean isVisible()
       {
-        // Is visible if no user is given or the given user is not the current logged in user.
-        final KundeDO user = getModelObject();
-        return user == null || user.getId().equals(ThreadLocalUserContext.getUser().getId()) == false;
+        return NewCustomerSelectPanel.this.getModelObject() != null;
       }
     };
-    add(selectMeButton);
-    selectMeButton.setDefaultFormProcessing(defaultFormProcessing);
-    //selectMeButton.add(new TooltipImage("selectMeHelp", WebConstants.IMAGE_USER_SELECT_ME, getString("tooltip.selectMe")));
-    return this;
-  }
+    unselectButton.setDefaultFormProcessing(false);
+    add(unselectButton);
+    unselectButton.add(new TooltipImage("unselectHelp", WebConstants.IMAGE_KUNDE_UNSELECT, getString("fibu.tooltip.unselectKunde")));
+    // DropDownChoice favorites
+    favoritesPanel = new FavoritesChoicePanel<KundeDO, KundeFavorite>("favorites", UserPrefArea.KUNDE_FAVORITE, tabIndex, "half select") {
+      @Override
+      protected void select(final KundeFavorite favorite)
+      {
+        if (favorite.getKunde() != null) {
+          NewCustomerSelectPanel.this.selectKunde(favorite.getKunde());
+        }
+      }
 
-  private void markTextFieldModelAsChanged()
-  {
-    customerTextField.modelChanged();
-    final KundeDO user = getModelObject();
-    if (user != null) {
-      getRecentCustomers().append(formatCustomer(user));
+      @Override
+      protected KundeDO getCurrentObject()
+      {
+        return NewCustomerSelectPanel.this.getModelObject();
+      }
+
+      @Override
+      protected KundeFavorite newFavoriteInstance(final KundeDO currentObject)
+      {
+        final KundeFavorite favorite = new KundeFavorite();
+        favorite.setKunde(currentObject);
+        return favorite;
+      }
+    };
+    add(favoritesPanel);
+    favoritesPanel.init();
+    if (showFavorites == false) {
+      favoritesPanel.setVisible(false);
     }
+    return this;
   }
 
   public NewCustomerSelectPanel withAutoSubmit(final boolean autoSubmit)
@@ -259,6 +305,7 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
     return this.recentCustomers;
   }
 
+  @SuppressWarnings("unused")
   private String formatCustomer(final KundeDO customer)
   {
     if (customer == null) {
@@ -282,6 +329,43 @@ public class NewCustomerSelectPanel extends AbstractSelectPanel<KundeDO> impleme
    */
   @Override
   public FormComponent< ? > getFormComponent()
+  {
+    return customerTextField;
+  }
+
+  /**
+   * @return The user's raw input of kunde text if given, otherwise null.
+   */
+  public String getKundeTextInput()
+  {
+    if (kundeTextField != null) {
+      return kundeTextField.getRawInput();
+    }
+    return null;
+  }
+
+  /**
+   * Will be called if the user has chosen an entry of the kunde favorites drop down choice.
+   * @param kunde
+   */
+  protected void selectKunde(final KundeDO kunde)
+  {
+    setModelObject(kunde);
+    caller.select(selectProperty, kunde.getId());
+  }
+
+  /**
+   * @return the kundeTextField
+   */
+  public TextField<String> getKundeTextField()
+  {
+    return kundeTextField;
+  }
+
+  /**
+   * @return the projectTextField
+   */
+  public PFAutoCompleteTextField<KundeDO> getTextField()
   {
     return customerTextField;
   }

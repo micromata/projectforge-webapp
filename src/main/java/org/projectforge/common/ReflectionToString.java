@@ -25,12 +25,14 @@ package org.projectforge.common;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.TimeZone;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.Hibernate;
 import org.projectforge.core.BaseDO;
+import org.projectforge.core.ShortDisplayNameCapable;
 import org.projectforge.database.HibernateUtils;
 
 /**
@@ -40,7 +42,7 @@ import org.projectforge.database.HibernateUtils;
  */
 public class ReflectionToString extends ReflectionToStringBuilder
 {
-  public ReflectionToString(Object arg0)
+  public ReflectionToString(final Object arg0)
   {
     super(Hibernate.isInitialized(arg0) ? arg0 : "Lazy" + arg0.getClass() + "@" + System.identityHashCode(arg0));
   }
@@ -56,31 +58,62 @@ public class ReflectionToString extends ReflectionToStringBuilder
           return super.append(fieldName, id != null ? id : "<id>");
         }
         return super.append(fieldName, "LazyCollection");
+      } else if (ShortDisplayNameCapable.class.isAssignableFrom(object.getClass()) == true) {
+        return super.append(fieldName, myToString(object));
+      } else if (BaseDO.class.isAssignableFrom(object.getClass()) == true) {
+        return super.append(fieldName, myToString(object));
+      } else if (object instanceof Collection) {
+        final StringBuilder sb = new StringBuilder().append("[");
+        boolean first = true;
+        for (final Object el : (Collection< ? >) object) {
+          if (first == true)
+            first = false;
+          else sb.append(", ");
+          sb.append(myToString(el));
+        }
+        return super.append(fieldName, sb.append("]").toString());
       } else if (object instanceof TimeZone) {
-        return super.append(fieldName, ((TimeZone)object).getID());
+        return super.append(fieldName, ((TimeZone) object).getID());
       }
     }
     return super.append(fieldName, object);
   }
 
+  private String myToString(final Object obj)
+  {
+    if (obj == null) {
+      return "<null>";
+    } else if (ShortDisplayNameCapable.class.isAssignableFrom(obj.getClass()) == true) {
+      if (BaseDO.class.isAssignableFrom(obj.getClass()) == true) {
+        final Serializable id = HibernateUtils.getIdentifier((BaseDO< ? >) obj);
+        return id + ":" + ((ShortDisplayNameCapable) obj).getShortDisplayName();
+      }
+      return ((ShortDisplayNameCapable) obj).getShortDisplayName();
+    } else if (BaseDO.class.isAssignableFrom(obj.getClass()) == true) {
+      final Serializable id = HibernateUtils.getIdentifier((BaseDO< ? >) obj);
+      return id != null ? id.toString() : "<id>";
+    }
+    return obj.toString();
+  }
+
   @Override
-  protected boolean accept(Field field)
+  protected boolean accept(final Field field)
   {
     try {
-      Object value = getValue(field);
+      final Object value = getValue(field);
       if (Hibernate.isInitialized(value) == false) {
         append(field.getName(), value);
         return false;
       }
-    } catch (IllegalArgumentException ex) {
+    } catch (final IllegalArgumentException ex) {
       return false;
-    } catch (IllegalAccessException ex) {
+    } catch (final IllegalAccessException ex) {
       return false;
     }
     return super.accept(field);
   }
 
-  public static String asString(Object o)
+  public static String asString(final Object o)
   {
     return new ReflectionToString(o).toString();
   }

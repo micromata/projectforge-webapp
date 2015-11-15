@@ -614,7 +614,7 @@ public class AddressDO extends DefaultBaseDO
     return this;
   }
 
-  @Column(name = "public_key", length = 7000)
+  @Column(name = "public_key", length = 20000)
   public String getPublicKey()
   {
     return publicKey;
@@ -811,7 +811,7 @@ public class AddressDO extends DefaultBaseDO
         try {
           type = InstantMessagingType.get(label);
         } catch (final Exception ex) {
-          log.error("Ignoring unknown InstantMessagingType: " + label, ex);
+          log.error("Ignoring unknown Instant Messaging entry: " + label, ex);
           continue;
         }
         setInstantMessaging(type, value);

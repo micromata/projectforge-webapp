@@ -180,6 +180,7 @@ IListPageColumnsCreator<GroupTaskAccessDO>
       refresh();
     } else if ("groupId".equals(property) == true) {
       form.getSearchFilter().setGroupId((Integer) selectedValue);
+      form.groupSelectPanel.getTextField().modelChanged();
       refresh();
     } else if ("userId".equals(property) == true) {
       form.getSearchFilter().setUserId((Integer) selectedValue);
@@ -201,6 +202,7 @@ IListPageColumnsCreator<GroupTaskAccessDO>
       refresh();
     } else if ("groupId".equals(property) == true) {
       form.getSearchFilter().setGroupId(null);
+      form.groupSelectPanel.getTextField().modelChanged();
       refresh();
     } else if ("userId".equals(property) == true) {
       form.getSearchFilter().setUserId(null);

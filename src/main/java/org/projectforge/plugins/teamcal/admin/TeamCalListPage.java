@@ -26,6 +26,7 @@ package org.projectforge.plugins.teamcal.admin;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
@@ -67,12 +68,15 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
 
   private TeamCalICSExportDialog icsExportDialog;
 
+  private final boolean isAdminUser;
+
   /**
    * 
    */
   public TeamCalListPage(final PageParameters parameters)
   {
     super(parameters, "plugins.teamcal");
+    isAdminUser = accessChecker.isLoggedInUserMemberOfAdminGroup();
   }
 
   /**
@@ -107,6 +111,20 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
         addRowClick(item);
       }
     });
+    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("plugins.teamcal.externalsubscription.label"), getSortable(
+        "externalSubscriptionUrlAnonymized", sortable), "externalSubscriptionUrlAnonymized", cellItemListener) {
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
+       */
+      @Override
+      public void populateItem(final Item<ICellPopulator<TeamCalDO>> item, final String componentId, final IModel<TeamCalDO> rowModel)
+      {
+        final TeamCalDO teamCal = rowModel.getObject();
+        item.add(new Label(componentId, StringUtils.defaultString(teamCal.getExternalSubscriptionUrlAnonymized())));
+        cellItemListener.populateItem(item, componentId, rowModel);
+      }
+    });
 
     columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("plugins.teamcal.description"),
         getSortable("description", sortable), "description", cellItemListener));
@@ -131,6 +149,8 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
           label = getString("plugins.teamcal.readonlyAccess");
         } else if (right.hasMinimalAccess(teamCal, getUserId()) == true) {
           label = getString("plugins.teamcal.minimalAccess");
+        } else if (isAdminUser == true) {
+          label = getString("plugins.teamcal.adminAccess");
         } else {
           label = "???";
         }

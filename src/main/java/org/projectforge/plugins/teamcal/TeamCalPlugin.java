@@ -37,6 +37,7 @@ import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.admin.TeamCalEditPage;
 import org.projectforge.plugins.teamcal.admin.TeamCalListPage;
 import org.projectforge.plugins.teamcal.admin.TeamCalRight;
+import org.projectforge.plugins.teamcal.event.TeamEventAttachmentDO;
 import org.projectforge.plugins.teamcal.event.TeamEventAttendeeDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDao;
@@ -54,6 +55,7 @@ import org.projectforge.plugins.teamcal.integration.TemplateEntry;
 import org.projectforge.plugins.teamcal.rest.TeamCalDaoRest;
 import org.projectforge.plugins.teamcal.rest.TeamEventDaoRest;
 import org.projectforge.registry.DaoRegistry;
+import org.projectforge.registry.Registry;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
@@ -78,7 +80,11 @@ public class TeamCalPlugin extends AbstractPlugin
 
   public static final String RESOURCE_BUNDLE_NAME = TeamCalPlugin.class.getPackage().getName() + ".TeamCalI18nResources";
 
-  private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { TeamCalDO.class, TeamEventDO.class, TeamEventAttendeeDO.class};
+  // The order of the entities is important for xml dump and imports as well as for test cases (order for deleting objects at the end of
+  // each test).
+  // The entities are inserted in ascending order and deleted in descending order.
+  private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { TeamCalDO.class, TeamEventDO.class, TeamEventAttendeeDO.class,
+    TeamEventAttachmentDO.class};
 
   /**
    * This dao should be defined in pluginContext.xml (as resources) for proper initialization.
@@ -104,12 +110,11 @@ public class TeamCalPlugin extends AbstractPlugin
     TeamCalPluginUpdates.dao = getDatabaseUpdateDao();
     final RegistryEntry entry = new RegistryEntry(ID, TeamCalDao.class, teamCalDao, "plugins.teamcal");
     final RegistryEntry eventEntry = new RegistryEntry("teamEvent", TeamEventDao.class, teamEventDao, "plugins.teamcal.event");
-    eventEntry.setNestedDOClasses(TeamEventAttendeeDO.class);
+    eventEntry.setNestedDOClasses(TeamEventAttendeeDO.class, TeamEventAttachmentDO.class);
 
     // The CalendarDao is automatically available by the scripting engine!
     register(entry);
     register(eventEntry);
-
 
     // Register the web part:
     registerWeb(ID, TeamCalListPage.class, TeamCalEditPage.class);
@@ -188,6 +193,10 @@ public class TeamCalPlugin extends AbstractPlugin
       if (TeamCalCalendarPage.USERPREF_KEY.equals(userPrefs.getKey()) == false) {
         return;
       }
+      if (userXmlPreferencesDao == null) {
+        // Only for testcases.
+        userXmlPreferencesDao = Registry.instance().getUserXmlPreferencesDao();
+      }
       final Object userPrefsObj = userXmlPreferencesDao.deserialize(userPrefs, true);
       if (userPrefsObj == null || userPrefsObj instanceof TeamCalCalendarFilter == false) {
         return;
@@ -263,7 +272,8 @@ public class TeamCalPlugin extends AbstractPlugin
     final Thread t = new Thread() {
 
       @Override
-      public void run() {
+      public void run()
+      {
         TeamEventExternalSubscriptionCache.instance().updateCache(teamCalDao);
       }
     };

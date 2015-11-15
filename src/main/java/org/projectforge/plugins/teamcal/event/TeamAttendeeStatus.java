@@ -30,7 +30,9 @@ import org.projectforge.core.I18nEnum;
  */
 public enum TeamAttendeeStatus implements I18nEnum
 {
-  UNKNOWN("unknown"), COMMITTED("committed"), DECLINED("declined"), PERHAPS("perhaps");
+  //UNKNOWN("unknown"), COMMITTED("committed"), DECLINED("declined"), PERHAPS("perhaps");
+  ACCEPTED("accepted"), COMPLETED("completed"), DECLINED("declined"), DELEGATED("delegated"), //
+  IN_PROCESS("in_process"), NEEDS_ACTION("needs_action"), TENTATIVE("tentative");
 
   private String key;
 
@@ -47,7 +49,7 @@ public enum TeamAttendeeStatus implements I18nEnum
    */
   public String getI18nKey()
   {
-    return "plugins.teamcal.attendee.status" + key;
+    return "plugins.teamcal.attendee.status." + key;
   }
 
   TeamAttendeeStatus(final String key)

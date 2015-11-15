@@ -31,15 +31,18 @@ import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.PropertyModel;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.wicket.components.AjaxMaxLengthEditableLabel;
+import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -50,9 +53,11 @@ public class TeamAttendeesPanel extends Panel
 
   private final Set<TeamEventAttendeeDO> attendees;
 
-  private final RepeatingView attendeesRepeater;
+  private RepeatingView attendeesRepeater;
 
-  private final WebMarkupContainer mainContainer;
+  private WebMarkupContainer mainContainer;
+
+  private LabelValueChoiceRenderer<TeamAttendeeStatus> statusChoiceRenderer;
 
   /**
    * @param id
@@ -61,6 +66,16 @@ public class TeamAttendeesPanel extends Panel
   {
     super(id);
     this.attendees = attendees;
+  }
+
+  /**
+   * @see org.apache.wicket.Component#onInitialize()
+   */
+  @Override
+  protected void onInitialize()
+  {
+    super.onInitialize();
+    statusChoiceRenderer = new LabelValueChoiceRenderer<TeamAttendeeStatus>(this, TeamAttendeeStatus.values());
     mainContainer = new WebMarkupContainer("main");
     add(mainContainer.setOutputMarkupId(true));
     attendeesRepeater = new RepeatingView("liRepeater");
@@ -70,7 +85,7 @@ public class TeamAttendeesPanel extends Panel
     mainContainer.add(item);
     item.add(new AttendeeEditableLabel("editableLabel", Model.of(new TeamEventAttendeeDO()), true));
     item.add(new Label("status", "invisible").setVisible(false));
-    attendeesRepeater.setVisible(false);
+    attendeesRepeater.setVisible(true);
   }
 
   @SuppressWarnings("serial")
@@ -154,14 +169,9 @@ public class TeamAttendeesPanel extends Panel
     {
       final TeamEventAttendeeDO attendee = attendeeModel.getObject();
       if (lastEntry == true) {
-        if (StringUtils.isBlank(attendee.getUrl()) == true) {
-          // Do nothing.
-          super.onSubmit(target);
-          return;
-        }
         final TeamEventAttendeeDO clone = new TeamEventAttendeeDO();
         clone.setUrl(attendee.getUrl()).setUser(attendee.getUser());
-        attendees.add(clone);
+        addAttendee(clone);
         rebuildAttendees();
         target.add(mainContainer);
       } else if (attendee.getUserId() == null && StringUtils.isBlank(attendee.getUrl()) == true) {
@@ -180,22 +190,7 @@ public class TeamAttendeesPanel extends Panel
     @Override
     protected FormComponent<String> newEditor(final MarkupContainer parent, final String componentId, final IModel<String> model)
     {
-
       final FormComponent<String> form = super.newEditor(parent, componentId, model);
-      // form.add(new AutoCompleteBehavior<String>(new PFAutoCompleteRenderer()) {
-      // private static final long serialVersionUID = 1L;
-      //
-      // @Override
-      // protected Iterator<String> getChoices(final String input)
-      // {
-      // final List<String> list = new LinkedList<String>();
-      // list.add("Kai Reinhard");
-      // list.add("Horst xy");
-      // list.add("k.reinhard@micromata.de");
-      // list.add("h.xy@irgendwas.de");
-      // return list.iterator();
-      // }
-      // });
       return form;
     }
   }
@@ -207,7 +202,23 @@ public class TeamAttendeesPanel extends Panel
       final WebMarkupContainer item = new WebMarkupContainer(attendeesRepeater.newChildId());
       attendeesRepeater.add(item);
       item.add(new AttendeeEditableLabel("editableLabel", Model.of(attendee), false));
-      item.add(new Label("status", "invisible").setVisible(false));
+      final DropDownChoice<TeamAttendeeStatus> statusChoice = new DropDownChoice<TeamAttendeeStatus>("status",
+          new PropertyModel<TeamAttendeeStatus>(attendee, "status"), statusChoiceRenderer.getValues(), statusChoiceRenderer);
+      statusChoice.setEnabled(false);
+      item.add(statusChoice);
     }
+  }
+
+  private void addAttendee(final TeamEventAttendeeDO attendee)
+  {
+    short number = 1;
+    for (final TeamEventAttendeeDO pos : attendees) {
+      if (pos.getNumber() >= number) {
+        number = pos.getNumber();
+        number++;
+      }
+    }
+    attendee.setNumber(number);
+    this.attendees.add(attendee);
   }
 }

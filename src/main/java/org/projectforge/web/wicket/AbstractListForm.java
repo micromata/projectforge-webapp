@@ -199,7 +199,7 @@ AbstractSecuredForm<F, P>
     if (showOptionsPanel() == true) {
       gridBuilder.newSplitPanel(GridSize.COL66);
       optionsFieldsetPanel = gridBuilder.newFieldset(getOptionsLabel()).suppressLabelForWarning();
-      final DivPanel optionsCheckBoxesPanel = optionsFieldsetPanel.addNewCheckBoxDiv();
+      final DivPanel optionsCheckBoxesPanel = optionsFieldsetPanel.addNewCheckBoxButtonDiv();
       onOptionsPanelCreate(optionsFieldsetPanel, optionsCheckBoxesPanel);
       if (showHistorySearchAndDeleteCheckbox() == true) {
         optionsCheckBoxesPanel.add(createAutoRefreshCheckBoxButton(optionsCheckBoxesPanel.newChildId(),
@@ -388,7 +388,7 @@ AbstractSecuredForm<F, P>
 
   protected void createSearchFieldTooltip(final Component field)
   {
-    WicketUtils.addTooltip(field, getString("search.string.info.title"), getParentPage().getSearchToolTip());
+    WicketUtils.addTooltip(field, getString("search.string.info.title"), getParentPage().getSearchToolTip(), false);
   }
 
   public void addActionButton(final Component entry)

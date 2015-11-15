@@ -257,7 +257,7 @@ public class TeamCalFilterDialog extends ModalDialog
   private void redrawOptionControls()
   {
     optionsFieldset.removeAllFields();
-    final DivPanel checkBoxPanel = optionsFieldset.addNewCheckBoxDiv();
+    final DivPanel checkBoxPanel = optionsFieldset.addNewCheckBoxButtonDiv();
     calendarPageSupport.addOptions(checkBoxPanel, false, filter);
   }
 

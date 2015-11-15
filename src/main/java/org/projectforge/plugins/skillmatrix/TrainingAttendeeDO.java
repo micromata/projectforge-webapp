@@ -23,6 +23,8 @@
 
 package org.projectforge.plugins.skillmatrix;
 
+import java.sql.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -31,10 +33,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.PropertyInfo;
@@ -50,8 +54,8 @@ import org.projectforge.user.PFUserDO;
  */
 @Entity
 @Indexed
-@Table(name = "T_PLUGIN_SKILL_ATTENDEE")
-public class AttendeeDO extends DefaultBaseDO implements ShortDisplayNameCapable
+@Table(name = "T_PLUGIN_SKILL_TRAINING_ATTENDEE")
+public class TrainingAttendeeDO extends DefaultBaseDO implements ShortDisplayNameCapable
 {
   private static final long serialVersionUID = -3676402473986512186L;
 
@@ -78,6 +82,16 @@ public class AttendeeDO extends DefaultBaseDO implements ShortDisplayNameCapable
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String certificate;
 
+  @PropertyInfo(i18nKey = "plugins.skillmatrix.skilltraining.startDate")
+  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @DateBridge(resolution = Resolution.DAY)
+  private Date startDate;
+
+  @PropertyInfo(i18nKey = "plugins.skillmatrix.skilltraining.endDate")
+  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  @DateBridge(resolution = Resolution.DAY)
+  private Date endDate;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "attendee_fk")
   public PFUserDO getAttendee()
@@ -95,7 +109,7 @@ public class AttendeeDO extends DefaultBaseDO implements ShortDisplayNameCapable
    * @param skill
    * @return this for chaining.
    */
-  public AttendeeDO setAttendee(final PFUserDO attendee)
+  public TrainingAttendeeDO setAttendee(final PFUserDO attendee)
   {
     this.attendee = attendee;
     return this;
@@ -111,7 +125,7 @@ public class AttendeeDO extends DefaultBaseDO implements ShortDisplayNameCapable
    * @param skill
    * @return this for chaining.
    */
-  public AttendeeDO setTraining(final TrainingDO training)
+  public TrainingAttendeeDO setTraining(final TrainingDO training)
   {
     this.training = training;
     return this;
@@ -133,7 +147,7 @@ public class AttendeeDO extends DefaultBaseDO implements ShortDisplayNameCapable
   /**
    * @return this for chaining.
    */
-  public AttendeeDO setDescription(final String description)
+  public TrainingAttendeeDO setDescription(final String description)
   {
     this.description = description;
     return this;
@@ -142,6 +156,7 @@ public class AttendeeDO extends DefaultBaseDO implements ShortDisplayNameCapable
   /**
    * @return the rating
    */
+  @Column(length = 1000)
   public String getRating()
   {
     return rating;
@@ -151,7 +166,7 @@ public class AttendeeDO extends DefaultBaseDO implements ShortDisplayNameCapable
    * @param rating the rating to set
    * @return this for chaining.
    */
-  public AttendeeDO setRating(final String rating)
+  public TrainingAttendeeDO setRating(final String rating)
   {
     this.rating = rating;
     return this;
@@ -160,6 +175,7 @@ public class AttendeeDO extends DefaultBaseDO implements ShortDisplayNameCapable
   /**
    * @return the certificate
    */
+  @Column(length = 4000)
   public String getCertificate()
   {
     return certificate;
@@ -169,9 +185,40 @@ public class AttendeeDO extends DefaultBaseDO implements ShortDisplayNameCapable
    * @param certificate the certificate to set
    * @return this for chaining.
    */
-  public AttendeeDO setCertificate(final String certificate)
+  public TrainingAttendeeDO setCertificate(final String certificate)
   {
     this.certificate = certificate;
+    return this;
+  }
+
+
+  @Column(name = "start_date")
+  public Date getStartDate()
+  {
+    return startDate;
+  }
+
+  /**
+   * @return this for chaining.
+   */
+  public TrainingAttendeeDO setStartDate(final Date startDate)
+  {
+    this.startDate = startDate;
+    return this;
+  }
+
+  @Column(name = "end_date")
+  public Date getEndDate()
+  {
+    return endDate;
+  }
+
+  /**
+   * @return this for chaining.
+   */
+  public TrainingAttendeeDO setEndDate(final Date endDate)
+  {
+    this.endDate = endDate;
     return this;
   }
 

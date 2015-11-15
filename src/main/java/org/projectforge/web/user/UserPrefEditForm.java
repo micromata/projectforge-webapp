@@ -48,9 +48,9 @@ import org.projectforge.user.UserPrefAreaRegistry;
 import org.projectforge.user.UserPrefDO;
 import org.projectforge.user.UserPrefDao;
 import org.projectforge.user.UserPrefEntryDO;
-import org.projectforge.web.fibu.CustomerSelectPanel;
 import org.projectforge.web.fibu.Kost2DropDownChoice;
-import org.projectforge.web.fibu.ProjektSelectPanel;
+import org.projectforge.web.fibu.NewCustomerSelectPanel;
+import org.projectforge.web.fibu.NewProjektSelectPanel;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
@@ -243,8 +243,8 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
           fs.add(taskSelectPanel);
           taskSelectPanel.init();
         } else if (GroupDO.class.isAssignableFrom(param.getType()) == true) {
-          final GroupSelectPanel groupSelectPanel = new GroupSelectPanel(fs.newChildId(), new UserPrefPropertyModel<GroupDO>(userPrefDao,
-              param, "valueAsObject"), parentPage, param.getParameter());
+          final NewGroupSelectPanel groupSelectPanel = new NewGroupSelectPanel(fs.newChildId(), new UserPrefPropertyModel<GroupDO>(
+              userPrefDao, param, "valueAsObject"), parentPage, param.getParameter());
           fs.add(groupSelectPanel);
           groupSelectPanel.init();
         } else if (Kost2DO.class.isAssignableFrom(param.getType()) == true) {
@@ -269,7 +269,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
           fs.add(kost2DropDownChoice);
           dependentsMap.put(param.getParameter(), kost2DropDownChoice);
         } else if (ProjektDO.class.isAssignableFrom(param.getType()) == true) {
-          final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel(fs.newChildId(), new UserPrefPropertyModel<ProjektDO>(
+          final NewProjektSelectPanel projektSelectPanel = new NewProjektSelectPanel(fs.newChildId(), new UserPrefPropertyModel<ProjektDO>(
               userPrefDao, param, "valueAsObject"), parentPage, param.getParameter());
           if (data.getArea() == UserPrefArea.PROJEKT_FAVORITE) {
             projektSelectPanel.setShowFavorites(false);
@@ -277,7 +277,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
           fs.add(projektSelectPanel);
           projektSelectPanel.init();
         } else if (KundeDO.class.isAssignableFrom(param.getType()) == true) {
-          final CustomerSelectPanel kundeSelectPanel = new CustomerSelectPanel(fs.newChildId(), new UserPrefPropertyModel<KundeDO>(
+          final NewCustomerSelectPanel kundeSelectPanel = new NewCustomerSelectPanel(fs.newChildId(), new UserPrefPropertyModel<KundeDO>(
               userPrefDao, param, "valueAsObject"), null, parentPage, param.getParameter());
           if (data.getArea() == UserPrefArea.KUNDE_FAVORITE) {
             kundeSelectPanel.setShowFavorites(false);

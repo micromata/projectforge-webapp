@@ -182,7 +182,7 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
     {
       // Options
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).suppressLabelForWarning();
-      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+      final DivPanel checkBoxPanel = fs.addNewCheckBoxButtonDiv();
       checkBoxPanel.addCheckBoxButton(new PropertyModel<Boolean>(data.getStyle(), "relativeTimeValues"),
           getString("gantt.style.relativeTimeValues"));
       checkBoxPanel.addCheckBoxButton(new PropertyModel<Boolean>(data.getStyle(), "showToday"), getString("gantt.style.showToday"));

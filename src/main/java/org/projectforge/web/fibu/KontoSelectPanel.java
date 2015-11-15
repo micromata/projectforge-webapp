@@ -70,29 +70,6 @@ public class KontoSelectPanel extends AbstractSelectPanel<KontoDO> implements Co
   public KontoSelectPanel(final String id, final IModel<KontoDO> model, final ISelectCallerPage caller, final String selectProperty)
   {
     super(id, model, caller, selectProperty);
-  }
-
-  /**
-   * If set then only accounting numbers are given in auto-completion list, whose number matches the given range(s).
-   * @param kontoNumberRanges the kontoNumberRanges to set
-   * @return this for chaining.
-   * @see Ranges#setRanges(String)
-   */
-  public KontoSelectPanel setKontoNumberRanges(final IntRanges kontoNumberRanges)
-  {
-    this.kontoNumberRanges = kontoNumberRanges;
-    return this;
-  }
-
-  /**
-   * Must be called before component is added to a field set. This is different to most other Panels in ProjectForge.
-   * @see org.projectforge.web.wicket.AbstractSelectPanel#init()
-   */
-  @Override
-  @SuppressWarnings("serial")
-  public KontoSelectPanel init()
-  {
-    super.init();
     kontoTextField = new PFAutoCompleteTextField<KontoDO>("kontoField", getModel()) {
       @Override
       protected List<KontoDO> getChoices(final String input)
@@ -188,6 +165,29 @@ public class KontoSelectPanel extends AbstractSelectPanel<KontoDO> implements Co
         return getString("fibu.konto");
       }
     });
+  }
+
+  /**
+   * If set then only accounting numbers are given in auto-completion list, whose number matches the given range(s).
+   * @param kontoNumberRanges the kontoNumberRanges to set
+   * @return this for chaining.
+   * @see Ranges#setRanges(String)
+   */
+  public KontoSelectPanel setKontoNumberRanges(final IntRanges kontoNumberRanges)
+  {
+    this.kontoNumberRanges = kontoNumberRanges;
+    return this;
+  }
+
+  /**
+   * Must be called before component is added to a field set. This is different to most other Panels in ProjectForge.
+   * @see org.projectforge.web.wicket.AbstractSelectPanel#init()
+   */
+  @Override
+  @SuppressWarnings("serial")
+  public KontoSelectPanel init()
+  {
+    super.init();
     add(kontoTextField);
     return this;
   }

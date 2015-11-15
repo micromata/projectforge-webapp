@@ -203,6 +203,9 @@ function initializeComponents() {
     	placement: 'right auto',
         trigger: 'hover'
     });
+    $(document).on("show.bs.tooltip, show.bs.popover", function() {
+        hideAllTooltips();
+    });
 }
 
 function hideAllTooltips() {

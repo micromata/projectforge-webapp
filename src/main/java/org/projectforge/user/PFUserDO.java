@@ -437,14 +437,6 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
     }
   }
 
-  @SuppressWarnings({ "rawtypes", "unchecked"})
-  @Override
-  @Transient
-  public Set getHistorizableAttributes()
-  {
-    return null;
-  }
-
   /**
    * The locale given from the client (e. g. from the browser by the http request). This locale is needed by ThreadLocalUserContext for
    * getting the browser locale if the user's locale is null and the request's locale is not available.
@@ -739,14 +731,11 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   }
 
   /**
-   * @return the lastPasswordChange. If not given the creation time of this user object is used instead.
+   * @return the lastPasswordChange.
    */
   @Column(name = "last_password_change")
   public Date getLastPasswordChange()
   {
-    if (lastPasswordChange == null) {
-      return this.getCreated() != null ? this.getCreated() : null;
-    }
     return lastPasswordChange;
   }
 

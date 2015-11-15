@@ -69,14 +69,14 @@ public class ContractEditForm extends AbstractEditForm<ContractDO, ContractEditP
   @SuppressWarnings("serial")
   private PFAutoCompleteTextField<String> createAutocompleteTextField(final String property)
   {
-    final PFAutoCompleteTextField<String> textField = (new PFAutoCompleteMaxLengthTextField(InputPanel.WICKET_ID,
-        new PropertyModel<String>(data, property)) {
+    final PFAutoCompleteTextField<String> textField = new PFAutoCompleteMaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(
+        data, property)) {
       @Override
       protected List<String> getChoices(final String input)
       {
         return parentPage.getBaseDao().getAutocompletion(property, input);
       }
-    }.withMatchContains(true).withMinChars(2));
+    }.withMatchContains(true).withMinChars(2);
     return textField;
   }
 
@@ -90,8 +90,7 @@ public class ContractEditForm extends AbstractEditForm<ContractDO, ContractEditP
       // Number
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("legalAffaires.contract.number"));
       fs.add(new DivTextPanel(fs.newChildId(), "C-"));
-      numberField = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data,
-          "number"), 0, 99999999);
+      numberField = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data, "number"), 0, 99999999);
       numberField.setMaxLength(8);
       WicketUtils.setSize(numberField, 6);
       fs.add(numberField);

@@ -136,6 +136,7 @@ public class RechnungEditPage extends AbstractEditPage<RechnungDO, RechnungEditF
   {
     if ("projektId".equals(property) == true) {
       rechnungDao.setProjekt(getData(), (Integer) selectedValue);
+      form.projektSelectPanel.getTextField().modelChanged();
       if (getData().getProjektId() != null
           && getData().getProjektId() >= 0
           && getData().getKundeId() == null
@@ -144,10 +145,12 @@ public class RechnungEditPage extends AbstractEditPage<RechnungDO, RechnungEditF
         final ProjektDO projekt = projektDao.getById(getData().getProjektId());
         if (projekt != null) {
           rechnungDao.setKunde(getData(), projekt.getKundeId());
+          form.customerSelectPanel.getTextField().modelChanged();
         }
       }
     } else if ("kundeId".equals(property) == true) {
       rechnungDao.setKunde(getData(), (Integer) selectedValue);
+      form.customerSelectPanel.getTextField().modelChanged();
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }
@@ -157,8 +160,10 @@ public class RechnungEditPage extends AbstractEditPage<RechnungDO, RechnungEditF
   {
     if ("projektId".equals(property) == true) {
       getData().setProjekt(null);
+      form.projektSelectPanel.getTextField().modelChanged();
     } else if ("kundeId".equals(property) == true) {
       getData().setKunde(null);
+      form.customerSelectPanel.getTextField().modelChanged();
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }

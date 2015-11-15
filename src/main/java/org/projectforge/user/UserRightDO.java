@@ -44,11 +44,12 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.projectforge.core.DefaultBaseDO;
+import org.projectforge.core.ShortDisplayNameCapable;
 
 @Entity
 @Indexed
 @Table(name = "T_USER_RIGHT", uniqueConstraints = { @UniqueConstraint(columnNames = { "user_fk", "right_id", "tenant_id"})})
-public class UserRightDO extends DefaultBaseDO implements Comparable<UserRightDO>, Serializable
+public class UserRightDO extends DefaultBaseDO implements Comparable<UserRightDO>, Serializable, ShortDisplayNameCapable
 {
   private static final long serialVersionUID = 6703048743393453733L;
 
@@ -181,6 +182,16 @@ public class UserRightDO extends DefaultBaseDO implements Comparable<UserRightDO
       hcb.append(getRightId().hashCode());
     hcb.append(getId());
     return hcb.toHashCode();
+  }
+
+  /**
+   * @see org.projectforge.core.ShortDisplayNameCapable#getShortDisplayName()
+   */
+  @Transient
+  @Override
+  public String getShortDisplayName()
+  {
+    return String.valueOf(this.rightId);
   }
 
   @Override

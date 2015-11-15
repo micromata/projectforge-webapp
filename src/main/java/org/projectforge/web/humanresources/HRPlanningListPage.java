@@ -276,6 +276,7 @@ ISelectCallerPage
   {
     if ("projektId".equals(property) == true) {
       form.getSearchFilter().setProjektId((Integer) selectedValue);
+      form.projektSelectPanel.getTextField().modelChanged();
       refresh();
     } else if ("userId".equals(property) == true) {
       form.getSearchFilter().setUserId((Integer) selectedValue);
@@ -303,6 +304,7 @@ ISelectCallerPage
   {
     if ("projektId".equals(property) == true) {
       form.getSearchFilter().setProjektId(null);
+      form.projektSelectPanel.getTextField().modelChanged();
       refresh();
     } else if ("userId".equals(property) == true) {
       form.getSearchFilter().setUserId(null);

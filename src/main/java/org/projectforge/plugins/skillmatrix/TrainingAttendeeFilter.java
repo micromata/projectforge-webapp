@@ -29,17 +29,17 @@ import org.projectforge.core.BaseSearchFilter;
  * @author Werner Feder (werner.feder@t-online.de)
  * 
  */
-public class AttendeeFilter extends BaseSearchFilter
+public class TrainingAttendeeFilter extends BaseSearchFilter
 {
   private static final long serialVersionUID = 1278054558397436842L;
 
   private Integer attendeeId, trainingId;
 
-  public AttendeeFilter()
+  public TrainingAttendeeFilter()
   {
   }
 
-  public AttendeeFilter(final BaseSearchFilter filter)
+  public TrainingAttendeeFilter(final BaseSearchFilter filter)
   {
     super(filter);
   }
@@ -55,7 +55,7 @@ public class AttendeeFilter extends BaseSearchFilter
    * @param attendeeId the attendeeId to set
    * @return this for chaining.
    */
-  public AttendeeFilter setAttendeeId(final Integer attendeeId)
+  public TrainingAttendeeFilter setAttendeeId(final Integer attendeeId)
   {
     this.attendeeId = attendeeId;
     return this;
@@ -73,7 +73,7 @@ public class AttendeeFilter extends BaseSearchFilter
    * @param trainingId the trainingId to set
    * @return this for chaining.
    */
-  public AttendeeFilter setTrainingId(final Integer trainingId)
+  public TrainingAttendeeFilter setTrainingId(final Integer trainingId)
   {
     this.trainingId = trainingId;
     return this;

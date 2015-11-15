@@ -77,7 +77,7 @@ public class SkillDO extends DefaultBaseDO
 
   private String fullAccessGroupIds, readOnlyAccessGroupIds, trainingGroupsIds;
 
-  @Column(length = 100)
+  @Column(length = 255)
   public String getTitle()
   {
     return title;
@@ -170,7 +170,7 @@ public class SkillDO extends DefaultBaseDO
    * Members of these groups have full read/write access to this skill and related trainings.
    * @return the fullAccessGroupIds
    */
-  @Column(name = "full_access_group_ids", nullable = true)
+  @Column(name = "full_access_group_ids", length = 4000, nullable = true)
   public String getFullAccessGroupIds()
   {
     return fullAccessGroupIds;
@@ -191,7 +191,7 @@ public class SkillDO extends DefaultBaseDO
    * Members of these groups have full read-only access to this skill.
    * @return the readOnlyAccessGroupIds
    */
-  @Column(name = "readonly_access_group_ids", nullable = true)
+  @Column(name = "readonly_access_group_ids", length = 4000, nullable = true)
   public String getReadOnlyAccessGroupIds()
   {
     return readOnlyAccessGroupIds;
@@ -211,7 +211,7 @@ public class SkillDO extends DefaultBaseDO
    * Members of these groups have full read/write access to trainings of this skill.
    * @return the trainingGroupsIds
    */
-  @Column(name = "training_access_group_ids", nullable = true)
+  @Column(name = "training_access_group_ids", length = 4000, nullable = true)
   public String getTrainingAccessGroupIds()
   {
     return trainingGroupsIds;

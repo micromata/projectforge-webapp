@@ -29,6 +29,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.plugins.teamcal.event.TeamEventListPage;
 import org.projectforge.plugins.teamcal.event.importics.TeamCalImportPage;
+import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredBasePage;
 import org.projectforge.web.wicket.EditPage;
@@ -39,7 +40,7 @@ import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
  * 
  */
 @EditPage(defaultReturnPage = TeamCalListPage.class)
-public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm, TeamCalDao>
+public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm, TeamCalDao> implements ISelectCallerPage
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalEditPage.class);
 
@@ -101,6 +102,30 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
     teamCalDao.setReadonlyAccessGroups(getData(), form.readonlyAccessGroupsListHelper.getAssignedItems());
     teamCalDao.setMinimalAccessGroups(getData(), form.minimalAccessGroupsListHelper.getAssignedItems());
     return super.onSaveOrUpdate();
+  }
+
+  /**
+   * @see org.projectforge.web.fibu.ISelectCallerPage#select(java.lang.String, java.lang.Integer)
+   */
+  public void select(final String property, final Object selectedValue)
+  {
+    log.error("Property '" + property + "' not supported for selection.");
+  }
+
+  /**
+   * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
+   */
+  public void unselect(final String property)
+  {
+    log.error("Property '" + property + "' not supported for unselection.");
+  }
+
+  /**
+   * @see org.projectforge.web.fibu.ISelectCallerPage#cancelSelection(java.lang.String)
+   */
+  public void cancelSelection(final String property)
+  {
+    log.error("Property '" + property + "' not supported for cancelling.");
   }
 
   /**

@@ -83,14 +83,20 @@ public class MenuEntry implements Serializable, Comparable<MenuEntry>
 
   public IModel<Integer> getNewCounterModel()
   {
-    if (hasSubMenuEntries() == false) {
+    return getNewCounterModel(0);
+  }
+
+  private IModel<Integer> getNewCounterModel(final int depth)
+  {
+    if (hasSubMenuEntries() == false || depth == 10) {
+      // End less loop detection (depth == 10).
       return newCounterModel;
     }
     if (totalNewCounterModelEvaluated == true) {
       return totalNewCounterModel;
     }
     for (final MenuEntry subEntry : subMenuEntries) {
-      final IModel<Integer> subSumModel = subEntry.getNewCounterModel();
+      final IModel<Integer> subSumModel = subEntry.getNewCounterModel(depth + 1);
       if (subSumModel == null) {
         continue;
       }

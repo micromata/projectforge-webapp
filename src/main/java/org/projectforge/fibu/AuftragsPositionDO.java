@@ -92,6 +92,9 @@ public class AuftragsPositionDO extends DefaultBaseDO implements ShortDisplayNam
 
   private boolean vollstaendigFakturiert;
 
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private PeriodOfPerformanceType periodOfPerformanceType;
+
   @Field(index = Index.UN_TOKENIZED, store = Store.NO)
   @DateBridge(resolution = Resolution.DAY)
   private Date periodOfPerformanceBegin;
@@ -100,13 +103,17 @@ public class AuftragsPositionDO extends DefaultBaseDO implements ShortDisplayNam
   @DateBridge(resolution = Resolution.DAY)
   private Date periodOfPerformanceEnd;
 
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private ModeOfPaymentType modeOfPaymentType;
+
   @Transient
   public boolean isAbgeschlossenUndNichtVollstaendigFakturiert()
   {
-    if (auftrag.getAuftragsStatus() == null) {
+    if (getStatus() == AuftragsPositionsStatus.NICHT_BEAUFTRAGT) {
       return false;
     }
-    if (auftrag.getAuftragsStatus().isIn(AuftragsStatus.ABGESCHLOSSEN) == false && getStatus() != AuftragsPositionsStatus.ABGESCHLOSSEN) {
+    if (auftrag.getAuftragsStatus() == AuftragsStatus.ABGESCHLOSSEN) {
+    } else if (getStatus() != AuftragsPositionsStatus.ABGESCHLOSSEN) {
       return false;
     }
     return !isVollstaendigFakturiert();
@@ -333,6 +340,32 @@ public class AuftragsPositionDO extends DefaultBaseDO implements ShortDisplayNam
     if (vollstaendigFakturiert == true && (status == null || status.isIn(AuftragsPositionsStatus.ABGESCHLOSSEN) == false)) {
       throw new UserException("fibu.auftrag.error.nurAbgeschlosseneAuftragsPositionenKoennenVollstaendigFakturiertSein");
     }
+  }
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "period_of_performance_type", length = 10)
+  public PeriodOfPerformanceType getPeriodOfPerformanceType()
+  {
+    return periodOfPerformanceType;
+  }
+
+  public AuftragsPositionDO setPeriodOfPerformanceType(final PeriodOfPerformanceType periodOfPerformanceType)
+  {
+    this.periodOfPerformanceType = periodOfPerformanceType;
+    return this;
+  }
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "mode_of_payment_type", length = 13)
+  public ModeOfPaymentType getModeOfPaymentType()
+  {
+    return modeOfPaymentType;
+  }
+
+  public AuftragsPositionDO setModeOfPaymentType(final ModeOfPaymentType modeOfPaymentType)
+  {
+    this.modeOfPaymentType = modeOfPaymentType;
+    return this;
   }
 
   @Override

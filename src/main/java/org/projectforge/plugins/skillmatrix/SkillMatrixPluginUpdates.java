@@ -39,7 +39,7 @@ public class SkillMatrixPluginUpdates
 {
   static MyDatabaseUpdateDao dao;
 
-  final static Class< ? >[] doClasses = new Class< ? >[] { SkillDO.class, SkillRatingDO.class, TrainingDO.class, AttendeeDO.class};
+  final static Class< ? >[] doClasses = new Class< ? >[] { SkillDO.class, SkillRatingDO.class, TrainingDO.class, TrainingAttendeeDO.class};
 
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()

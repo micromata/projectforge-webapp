@@ -84,17 +84,20 @@ public class AuftragEditPage extends AbstractEditPage<AuftragDO, AuftragEditForm
   {
     if ("projektId".equals(property) == true) {
       auftragDao.setProjekt(getData(), (Integer) selectedValue);
+      form.projektSelectPanel.getTextField().modelChanged();
       if (getData().getProjektId() != null && getData().getProjektId() >= 0 && getData().getKundeId() == null) {
         if (StringUtils.isBlank(form.kundeSelectPanel.getKundeTextInput()) == true) {
           // User has selected a project and the kunde is not set:
           final ProjektDO projekt = projektDao.getById(getData().getProjektId());
           if (projekt != null) {
             auftragDao.setKunde(getData(), projekt.getKundeId());
+            form.kundeSelectPanel.getTextField().modelChanged();
           }
         }
       }
     } else if ("kundeId".equals(property) == true) {
       auftragDao.setKunde(getData(), (Integer) selectedValue);
+      form.kundeSelectPanel.getTextField().modelChanged();
     } else if ("contactPersonId".equals(property) == true) {
       auftragDao.setContactPerson(getData(), (Integer) selectedValue);
       setSendEMailNotification();
@@ -121,8 +124,10 @@ public class AuftragEditPage extends AbstractEditPage<AuftragDO, AuftragEditForm
   {
     if ("projektId".equals(property) == true) {
       getData().setProjekt(null);
+      form.projektSelectPanel.getTextField().modelChanged();
     } else if ("kundeId".equals(property) == true) {
       getData().setKunde(null);
+      form.kundeSelectPanel.getTextField().modelChanged();
     } else if ("contactPersonId".equals(property) == true) {
       getData().setContactPerson(null);
       setSendEMailNotification();

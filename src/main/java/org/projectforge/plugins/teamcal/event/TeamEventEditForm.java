@@ -37,6 +37,7 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -104,8 +105,6 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
   private DivPanel customizedCheckBoxButton;
 
-  private TeamAttendeesPanel attendeesPanel;
-
   private WebMarkupContainer recurrencePanel;
 
   private FieldsetPanel recurrenceFieldset, recurrenceUntilDateFieldset, recurrenceIntervalFieldset, recurrenceExDateFieldset;
@@ -118,6 +117,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
   // Needed by autocompletion for location fields.
   private TeamCalDO[] calendarsWithFullAccess;
+
+  protected FileUploadField fileUploadField;
 
   /**
    * @param parentPage
@@ -204,7 +205,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     {
       // ALL DAY CHECKBOX
       final FieldsetPanel fieldSet = gridBuilder.newFieldset("").suppressLabelForWarning();
-      final DivPanel divPanel = fieldSet.addNewCheckBoxDiv();
+      final DivPanel divPanel = fieldSet.addNewCheckBoxButtonDiv();
       final CheckBoxButton checkBox = new CheckBoxButton(divPanel.newChildId(), new PropertyModel<Boolean>(data, "allDay"),
           getString("plugins.teamcal.event.allDay"));
       checkBox.getCheckBox().add(new AjaxFormComponentUpdatingBehavior("onChange") {
@@ -243,23 +244,23 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       recurrenceFieldset = gridBuilder.newFieldset(getString("plugins.teamcal.event.recurrence"));
       recurrencePanel = gridBuilder.getPanel().getDiv();
       recurrencePanel.setOutputMarkupId(true);
-      final RecurrenceFrequency[] intervals = TeamEventUtils.getSupportedRecurrenceIntervals();
-      final LabelValueChoiceRenderer<RecurrenceFrequency> intervalChoiceRenderer = new LabelValueChoiceRenderer<RecurrenceFrequency>(
-          recurrenceFieldset, intervals);
-      final DropDownChoice<RecurrenceFrequency> intervalChoice = new DropDownChoice<RecurrenceFrequency>(
+      final RecurrenceFrequency[] supportedFrequencies = TeamEventUtils.getSupportedRecurrenceFrequencies();
+      final LabelValueChoiceRenderer<RecurrenceFrequency> frequencyChoiceRenderer = new LabelValueChoiceRenderer<RecurrenceFrequency>(
+          recurrenceFieldset, supportedFrequencies);
+      final DropDownChoice<RecurrenceFrequency> frequencyChoice = new DropDownChoice<RecurrenceFrequency>(
           recurrenceFieldset.getDropDownChoiceId(), new PropertyModel<RecurrenceFrequency>(recurrenceData, "frequency"),
-          intervalChoiceRenderer.getValues(), intervalChoiceRenderer);
-      intervalChoice.setNullValid(false);
-      recurrenceFieldset.add(intervalChoice);
+          frequencyChoiceRenderer.getValues(), frequencyChoiceRenderer);
+      frequencyChoice.setNullValid(false);
+      recurrenceFieldset.add(frequencyChoice);
       recurrenceFieldset.getFieldset().setOutputMarkupId(true);
-      intervalChoice.add(new AjaxFormComponentUpdatingBehavior("onChange") {
+      frequencyChoice.add(new AjaxFormComponentUpdatingBehavior("onChange") {
         @Override
         protected void onUpdate(final AjaxRequestTarget target)
         {
           setRecurrenceComponentsVisibility(target);
         }
       });
-      customizedCheckBoxButton = recurrenceFieldset.addNewCheckBoxDiv();
+      customizedCheckBoxButton = recurrenceFieldset.addNewCheckBoxButtonDiv();
       final CheckBoxButton checkBox = new CheckBoxButton(customizedCheckBoxButton.newChildId(), new PropertyModel<Boolean>(recurrenceData,
           "customized"), getString("plugins.teamcal.event.recurrence.customized"));
       checkBox.getCheckBox().add(new AjaxFormComponentUpdatingBehavior("onChange") {
@@ -326,8 +327,15 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       gridBuilder.newSplitPanel(GridSize.COL50);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.attendees")).suppressLabelForWarning();
       attendees = getData().ensureAttendees();
-      fs.add(attendeesPanel = new TeamAttendeesPanel(fs.newChildId(), attendees));
+      fs.add(new TeamAttendeesPanel(fs.newChildId(), attendees));
     }
+
+    //    {
+    //      final FieldsetPanel fs = gridBuilder.newFieldset(getString("file"), "*.*");
+    //      fileUploadField = new FileUploadField(FileUploadPanel.WICKET_ID);
+    //      final FileUploadPanel fileUploadPanel;
+    //      fs.add(fileUploadPanel = new FileUploadPanel(fs.newChildId(), fileUploadField));
+    //    }
 
     gridBuilder.newGridPanel();
     {
@@ -470,6 +478,13 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
         (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withTargetType(java.sql.Timestamp.class)
         .withRequired(true), DatePrecision.MINUTE_5);
     endDateTimePanel.getDateField().setOutputMarkupId(true);
+    endDateTimePanel.getDateField().add(new AjaxFormComponentUpdatingBehavior("change") {
+
+      @Override
+      protected void onUpdate(final AjaxRequestTarget target) {
+        // do nothing, just update
+      }
+    });
 
     endDateField.add(endDateTimePanel);
     dateFieldToolTip(endDateTimePanel);

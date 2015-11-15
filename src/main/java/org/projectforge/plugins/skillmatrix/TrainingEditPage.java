@@ -149,7 +149,7 @@ public class TrainingEditPage extends AbstractEditPage<TrainingDO, TrainingEditF
         {
           final PageParameters params = new PageParameters();
           params.set(TrainingEditForm.PARAM_TRAINING_ID, id);
-          final AttendeeListPage page = new AttendeeListPage(params);
+          final TrainingAttendeeListPage page = new TrainingAttendeeListPage(params);
           page.setReturnToPage(TrainingEditPage.this);
           setResponsePage(page);
         };

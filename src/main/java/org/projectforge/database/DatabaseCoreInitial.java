@@ -135,7 +135,8 @@ public class DatabaseCoreInitial
       public UpdatePreCheckStatus runPreCheck()
       {
         // Does the data-base tables already exist?
-        if (dao.doEntitiesExist(doClasses) == false) {
+        if (dao.doEntitiesExist(HibernateEntities.CORE_ENTITIES) == false
+            || dao.doEntitiesExist(HibernateEntities.HISTORY_ENTITIES) == false) {
           return UpdatePreCheckStatus.READY_FOR_UPDATE;
         }
         return UpdatePreCheckStatus.ALREADY_UPDATED;
@@ -148,10 +149,14 @@ public class DatabaseCoreInitial
           // User table doesn't exist, therefore schema should be empty. PostgreSQL needs sequence for primary keys:
           dao.createSequence("hibernate_sequence", true);
         }
-        final SchemaGenerator schemaGenerator = new SchemaGenerator(dao).add(doClasses);
+        final SchemaGenerator schemaGenerator = new SchemaGenerator(dao).add(HibernateEntities.CORE_ENTITIES).add(
+            HibernateEntities.HISTORY_ENTITIES);
         final Table propertyDeltaTable = schemaGenerator.getTable(PropertyDelta.class);
         final TableAttribute attr = propertyDeltaTable.getAttributeByName("clazz");
-        attr.setNullable(false).setType(TableAttributeType.VARCHAR).setLength(31); // Discriminator value is may-be not handled correctly by continuous-db.
+        attr.setNullable(false).setType(TableAttributeType.VARCHAR).setLength(31); // Discriminator value is may-be not handled correctly by
+        propertyDeltaTable.getAttributeByName("old_value").setLength(20000); // Increase length.
+        propertyDeltaTable.getAttributeByName("new_value").setLength(20000); // Increase length.
+        // continuous-db.
         final Table historyEntryTable = schemaGenerator.getTable(HistoryEntry.class);
         final TableAttribute typeAttr = historyEntryTable.getAttributeByName("type");
         typeAttr.setType(TableAttributeType.INT);

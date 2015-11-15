@@ -806,7 +806,7 @@ public class WicketUtils
    */
   public static Component addTooltip(final Component component, final String title, final String text)
   {
-    return addTooltip(component, title, text, false);
+    return addTooltip(component, title, text, true);
   }
 
   /**
@@ -831,14 +831,14 @@ public class WicketUtils
    */
   public static Component addTooltip(final Component component, final String text)
   {
-    return addTooltip(component, text, false);
+    return addTooltip(component, text, true);
   }
 
   /**
    * Adds a SimpleAttributeModifier("title", ...) to the given component.
    * @param component
    * @param text
-   * @param rightAlignment If false (default) the tooltip will be aligned at the bottom. Unused for pop-overs.
+   * @param rightAlignment If false (default is true) the tooltip will be aligned at the bottom.
    * @see #createTooltip(String, String)
    * @see #setStyleHasTooltip(Component)
    */
@@ -854,7 +854,7 @@ public class WicketUtils
    */
   public static Component addTooltip(final Component component, final IModel<String> text)
   {
-    return addTooltip(component, text, false);
+    return addTooltip(component, text, true);
   }
 
   /**
@@ -875,7 +875,7 @@ public class WicketUtils
    */
   public static Component addTooltip(final Component component, final IModel<String> title, final IModel<String> text)
   {
-    return addTooltip(component, title, text, false);
+    return addTooltip(component, title, text, true);
   }
 
   /**
@@ -883,7 +883,7 @@ public class WicketUtils
    * @param component
    * @param title
    * @param text If the string contains "\n" characters then html=true and &lt;br/&gt; are used.
-   * @param rightAlignment If false (default) the tooltip will be aligned at the bottom. Unused for pop-overs.
+   * @param rightAlignment If false (default is true) the tooltip will be aligned at the bottom.
    */
   public static Component addTooltip(final Component component, final IModel<String> title, final IModel<String> text,
       final boolean rightAlignment)

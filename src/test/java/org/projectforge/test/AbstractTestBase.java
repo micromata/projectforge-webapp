@@ -43,12 +43,12 @@ import org.projectforge.access.AccessException;
 import org.projectforge.access.AccessType;
 import org.projectforge.access.OperationType;
 import org.projectforge.common.DateHelper;
+import org.projectforge.common.StringHelper;
 import org.projectforge.continuousdb.DatabaseSupport;
 import org.projectforge.core.SimpleHistoryEntry;
+import org.projectforge.database.HibernateEntities;
 import org.projectforge.database.HibernateUtils;
 import org.projectforge.multitenancy.TenantRegistryMap;
-import org.projectforge.plugins.core.AbstractPlugin;
-import org.projectforge.plugins.core.PluginsRegistry;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
@@ -142,8 +142,6 @@ public class AbstractTestBase
 
   protected int mCount = 0;
 
-  protected static String[] tablesToDeleteAfterTests = null;
-
   protected static TestConfiguration getTestConfiguration()
   {
     return testConfiguration;
@@ -209,64 +207,23 @@ public class AbstractTestBase
     transactionTemplate.execute(new TransactionCallback() {
       public Object doInTransaction(final TransactionStatus status)
       {
-        if (tablesToDeleteAfterTests != null) {
-          for (final String table : tablesToDeleteAfterTests) {
-            deleteFrom(hibernateTemplate, table);
+        for (final Class< ? > cls : HibernateEntities.instance().getDescOrderedEntities()) {
+          final String name = cls.getName();
+          final String simpleName = cls.getSimpleName();
+          if (StringHelper.isIn(simpleName, "TaskDO", "GroupDO") == true) {
+            log.debug("deleteAllDBObjects: " + name);
+            // cycle reference (task refers task etc.)
+            deleteAllDBObjects(hibernateTemplate, name);
+          } else {
+            log.debug("deleteFrom: " + name);
+            deleteFrom(hibernateTemplate, name);
           }
         }
-        final List<AbstractPlugin> plugins = PluginsRegistry.instance().getPlugins();
-        if (plugins != null) {
-          for (final AbstractPlugin plugin : plugins) {
-            final Class< ? >[] classes = plugin.getPersistentEntities();
-            if (classes != null) {
-              for (int i = classes.length - 1; i >= 0; i--) {
-                deleteFrom(hibernateTemplate, classes[i].getName());
-              }
-            }
-          }
+        for (final Class< ? > cls : HibernateEntities.instance().getDescOrderedHistoryEntities()) {
+          final String name = cls.getName();
+          deleteFrom(hibernateTemplate, name);
+          log.debug("deleteFrom: " + name);
         }
-        deleteFrom(hibernateTemplate, "TeamEventAttendeeDO"); // Plugin stuff needed
-        deleteFrom(hibernateTemplate, "TeamEventDO"); // Because it's part of
-        deleteFrom(hibernateTemplate, "TeamCalDO"); // the dump file.
-        deleteFrom(hibernateTemplate, "TimesheetDO");
-        deleteFrom(hibernateTemplate, "HRPlanningEntryDO");
-        deleteFrom(hibernateTemplate, "HRPlanningDO");
-        deleteFrom(hibernateTemplate, "AccessEntryDO");
-        deleteFrom(hibernateTemplate, "PersonalAddressDO");
-        deleteFrom(hibernateTemplate, "AddressDO");
-        deleteFrom(hibernateTemplate, "KostZuweisungDO");
-        deleteFrom(hibernateTemplate, "RechnungsPositionDO"); // Before Autrag*DO
-        deleteFrom(hibernateTemplate, "RechnungDO");
-        deleteFrom(hibernateTemplate, "AuftragsPositionDO");
-        deleteFrom(hibernateTemplate, "AuftragDO");
-        deleteFrom(hibernateTemplate, "BookDO");
-        deleteFrom(hibernateTemplate, "BuchungssatzDO");
-        deleteFrom(hibernateTemplate, "ConfigurationDO");
-        deleteFrom(hibernateTemplate, "EingangsrechnungsPositionDO");
-        deleteFrom(hibernateTemplate, "EingangsrechnungDO");
-        deleteFrom(hibernateTemplate, "EmployeeDO");
-        deleteFrom(hibernateTemplate, "EmployeeSalaryDO");
-        deleteFrom(hibernateTemplate, "KontoDO");
-        deleteFrom(hibernateTemplate, "Kost1DO");
-        deleteFrom(hibernateTemplate, "Kost2DO");
-        deleteFrom(hibernateTemplate, "Kost2ArtDO");
-        deleteFrom(hibernateTemplate, "GroupTaskAccessDO");
-        deleteAllDBObjects(hibernateTemplate, "ProjektDO"); // Before task
-        deleteFrom(hibernateTemplate, "KundeDO");
-        deleteFrom(hibernateTemplate, "GanttChartDO"); // Before task
-        deleteAllDBObjects(hibernateTemplate, "TaskDO");
-        deleteAllDBObjects(hibernateTemplate, "MebEntryDO");
-        deleteFrom(hibernateTemplate, "ImportedMebEntryDO");
-        deleteFrom(hibernateTemplate, "ScriptDO");
-        deleteFrom(hibernateTemplate, "UserPrefEntryDO");
-        deleteFrom(hibernateTemplate, "UserPrefDO");
-        deleteFrom(hibernateTemplate, "UserRightDO");
-        deleteFrom(hibernateTemplate, "UserXmlPreferencesDO");
-        deleteAllDBObjects(hibernateTemplate, "GroupDO");
-        deleteAllDBObjects(hibernateTemplate, "TenantDO");
-        deleteAllDBObjects(hibernateTemplate, "PFUserDO");
-        deleteFrom(hibernateTemplate, "de.micromata.hibernate.history.delta.PropertyDelta");
-        deleteFrom(hibernateTemplate, "de.micromata.hibernate.history.HistoryEntry");
         List< ? > all = hibernateTemplate.find("from java.lang.Object o");
         if (all != null && all.size() > 0) {
           all = hibernateTemplate.find("from java.lang.Object o");

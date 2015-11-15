@@ -26,6 +26,8 @@ package org.projectforge.plugins.teamcal.admin;
 import org.apache.log4j.Logger;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.access.AccessChecker;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
@@ -41,6 +43,9 @@ public class TeamCalListForm extends AbstractListForm<TeamCalFilter, TeamCalList
   private static final long serialVersionUID = 3659495003810851072L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalListForm.class);
+
+  @SpringBean(name = "accessChecker")
+  private AccessChecker accessChecker;
 
   public TeamCalListForm(final TeamCalListPage parentPage)
   {
@@ -65,7 +70,7 @@ public class TeamCalListForm extends AbstractListForm<TeamCalFilter, TeamCalList
   protected void onOptionsPanelCreate(final FieldsetPanel optionsFieldsetPanel, final DivPanel optionsCheckBoxesPanel)
   {
     {
-      final DivPanel radioGroupPanel = optionsFieldsetPanel.addNewRadioBoxDiv();
+      final DivPanel radioGroupPanel = optionsFieldsetPanel.addNewRadioBoxButtonDiv();
       final RadioGroupPanel<TeamCalFilter.OwnerType> radioGroup = new RadioGroupPanel<TeamCalFilter.OwnerType>(
           radioGroupPanel.newChildId(), "ownerType", new PropertyModel<TeamCalFilter.OwnerType>(getSearchFilter(), "ownerType")) {
         /**
@@ -99,6 +104,9 @@ public class TeamCalListForm extends AbstractListForm<TeamCalFilter, TeamCalList
       radioGroup.add(new Model<TeamCalFilter.OwnerType>(TeamCalFilter.OwnerType.ALL), getString("filter.all"));
       radioGroup.add(new Model<TeamCalFilter.OwnerType>(TeamCalFilter.OwnerType.OWN), getString("plugins.teamcal.own"));
       radioGroup.add(new Model<TeamCalFilter.OwnerType>(TeamCalFilter.OwnerType.OTHERS), getString("plugins.teamcal.others"));
+      if (accessChecker.isLoggedInUserMemberOfAdminGroup() == true) {
+        radioGroup.add(new Model<TeamCalFilter.OwnerType>(TeamCalFilter.OwnerType.ADMIN), getString("plugins.teamcal.adminAccess"));
+      }
     }
     final DivPanel checkBoxesPanel = new DivPanel(optionsFieldsetPanel.newChildId(), DivType.BTN_GROUP) {
       @Override

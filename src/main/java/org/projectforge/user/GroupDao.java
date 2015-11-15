@@ -411,4 +411,18 @@ public class GroupDao extends BaseDao<GroupDO>
   {
     return new GroupDO();
   }
+
+
+  public GroupDO getByName(final String name)
+  {
+    if (name == null) {
+      return null;
+    }
+    @SuppressWarnings("unchecked")
+    final List<GroupDO> list = getHibernateTemplate().find("from GroupDO u where u.name = ?", name);
+    if (CollectionUtils.isEmpty(list) == true) {
+      return null;
+    }
+    return list.get(0);
+  }
 }

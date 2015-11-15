@@ -70,6 +70,7 @@ public class AccessEditPage extends AbstractEditPage<GroupTaskAccessDO, AccessEd
       accessDao.setTask(getData(), (Integer) selectedValue);
     } else if ("groupId".equals(property) == true) {
       accessDao.setGroup(getData(), (Integer) selectedValue);
+      form.groupSelectPanel.getTextField().modelChanged();
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }
@@ -81,6 +82,7 @@ public class AccessEditPage extends AbstractEditPage<GroupTaskAccessDO, AccessEd
       getData().setTask(null);
     } else if ("groupId".equals(property) == true) {
       getData().setGroup(null);
+      form.groupSelectPanel.getTextField().modelChanged();
     } else {
       log.error("Property '" + property + "' not supported for unselection.");
     }

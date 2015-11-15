@@ -36,11 +36,17 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.PredicateUtils;
+import org.apache.commons.lang.BooleanUtils;
+import org.projectforge.access.AccessChecker;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.registry.Registry;
 import org.projectforge.rest.JsonUtils;
 import org.projectforge.rest.RestPaths;
 import org.projectforge.rest.objects.AddressObject;
+import org.projectforge.user.ProjectForgeGroup;
+import org.projectforge.user.UserRights;
 import org.projectforge.web.rest.converter.AddressDOConverter;
 
 /**
@@ -54,12 +60,15 @@ public class AddressDaoRest
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressDaoRest.class);
 
+  private final AccessChecker accessChecker;
+
   private final AddressDao addressDao;
 
   private final PersonalAddressDao personalAddressDao;
 
   public AddressDaoRest()
   {
+    this.accessChecker = UserRights.getAccessChecker();
     this.addressDao = Registry.instance().getDao(AddressDao.class);
     this.personalAddressDao = this.addressDao.getPersonalAddressDao();
   }
@@ -74,12 +83,15 @@ public class AddressDaoRest
    * </ol>
    * @param searchTerm
    * @param modifiedSince milliseconds since 1970 (UTC)
+   * @param all If true and the user is member of the ProjectForge's group {@link ProjectForgeGroup#FINANCE_GROUP} or
+   *          {@link ProjectForgeGroup#MARKETING_GROUP} the export contains all addresses instead of only favorite addresses.
    * @see AddressDaoClientMain
    */
   @GET
   @Path(RestPaths.LIST)
   @Produces(MediaType.APPLICATION_JSON)
-  public Response getList(@QueryParam("search") final String searchTerm, @QueryParam("modifiedSince") final Long modifiedSince)
+  public Response getList(@QueryParam("search") final String searchTerm, @QueryParam("modifiedSince") final Long modifiedSince,
+      @QueryParam("all") final Boolean all)
   {
     final AddressFilter filter = new AddressFilter(new BaseSearchFilter());
     Date modifiedSinceDate = null;
@@ -90,12 +102,22 @@ public class AddressDaoRest
     filter.setSearchString(searchTerm);
     final List<AddressDO> list = addressDao.getList(filter);
 
-    final List<PersonalAddressDO> favorites = personalAddressDao.getList();
-    final Set<Integer> favoritesSet = new HashSet<Integer>();
-    if (favorites != null) {
-      for (final PersonalAddressDO personalAddress : favorites) {
-        if (personalAddress.isFavoriteCard() == true && personalAddress.isDeleted() == false) {
-          favoritesSet.add(personalAddress.getAddressId());
+    boolean exportAll = false;
+    if (BooleanUtils.isTrue(all) == true
+        && accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.MARKETING_GROUP) == true) {
+      exportAll = true;
+    }
+
+    List<PersonalAddressDO> favorites = null;
+    Set<Integer> favoritesSet = null;
+    if (exportAll == false) {
+      favorites = personalAddressDao.getList();
+      favoritesSet = new HashSet<Integer>();
+      if (favorites != null) {
+        for (final PersonalAddressDO personalAddress : favorites) {
+          if (personalAddress.isFavoriteCard() == true && personalAddress.isDeleted() == false) {
+            favoritesSet.add(personalAddress.getAddressId());
+          }
         }
       }
     }
@@ -103,7 +125,7 @@ public class AddressDaoRest
     final Set<Integer> alreadyExported = new HashSet<Integer>();
     if (list != null) {
       for (final AddressDO addressDO : list) {
-        if (favoritesSet.contains(addressDO.getId()) == false) {
+        if (exportAll == false && favoritesSet.contains(addressDO.getId()) == false) {
           // Export only personal favorites due to data-protection.
           continue;
         }
@@ -112,7 +134,7 @@ public class AddressDaoRest
         alreadyExported.add(address.getId());
       }
     }
-    if (modifiedSinceDate != null) {
+    if (exportAll == false && modifiedSinceDate != null) {
       // Add now personal address entries which were modified since the given date (deleted or added):
       for (final PersonalAddressDO personalAddress : favorites) {
         if (alreadyExported.contains(personalAddress.getAddressId()) == true) {
@@ -130,7 +152,9 @@ public class AddressDaoRest
         }
       }
     }
-    final String json = JsonUtils.toJson(result);
+    @SuppressWarnings("unchecked")
+    final List<AddressObject> uniqResult = (List<AddressObject>) CollectionUtils.select(result, PredicateUtils.uniquePredicate());
+    final String json = JsonUtils.toJson(uniqResult);
     log.info("Rest call finished (" + result.size() + " addresses)...");
     return Response.ok(json).build();
   }

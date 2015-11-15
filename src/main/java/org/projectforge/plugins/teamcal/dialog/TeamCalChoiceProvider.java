@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.access.AccessException;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
@@ -41,10 +42,11 @@ import com.vaynberg.wicket.select2.TextChoiceProvider;
  * Provider class for multipleChoice.
  * 
  * @author M. Lauterbach (m.lauterbach@micromata.de)
- *
+ * 
  */
 public class TeamCalChoiceProvider extends TextChoiceProvider<TeamCalDO>
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalChoiceProvider.class);
 
   private static final long serialVersionUID = -8310756569504320965L;
 
@@ -124,7 +126,12 @@ public class TeamCalChoiceProvider extends TextChoiceProvider<TeamCalDO>
       if (teamCalId == null) {
         continue;
       }
-      final TeamCalDO teamCal = getTeamCalDao().getById(teamCalId);
+      TeamCalDO teamCal = null;
+      try {
+        teamCal = getTeamCalDao().getById(teamCalId);
+      } catch (final AccessException ex) {
+        log.warn("User has no access to the selected calendar '" + id + "'.");
+      }
       if (teamCal != null) {
         list.add(teamCal);
       }
@@ -132,7 +139,8 @@ public class TeamCalChoiceProvider extends TextChoiceProvider<TeamCalDO>
     return list;
   }
 
-  private TeamCalDao getTeamCalDao() {
+  private TeamCalDao getTeamCalDao()
+  {
     return teamCalDao;
   }
 

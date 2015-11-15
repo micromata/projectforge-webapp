@@ -58,7 +58,7 @@ public class TeamEventUtils
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamEventUtils.class);
 
-  private static final RecurrenceFrequency[] SUPPORTED_INTERVALS = new RecurrenceFrequency[] { RecurrenceFrequency.NONE,
+  private static final RecurrenceFrequency[] SUPPORTED_FREQUENCIES = new RecurrenceFrequency[] { RecurrenceFrequency.NONE,
     RecurrenceFrequency.DAILY, RecurrenceFrequency.WEEKLY, RecurrenceFrequency.MONTHLY, RecurrenceFrequency.YEARLY};
 
   // needed to convert weeks into days
@@ -79,6 +79,9 @@ public class TeamEventUtils
   {
     if (recurData == null || recurData.getFrequency() == null || recurData.getFrequency() == RecurrenceFrequency.NONE) {
       return null;
+    }
+    if (recurData.isCustomized() == false) {
+      recurData.setInterval(1);
     }
     final Recur recur = new Recur();
     final net.fortuna.ical4j.model.Date untilDate = ICal4JUtils.getICal4jDate(recurData.getUntil(), recurData.getTimeZone());
@@ -261,9 +264,9 @@ public class TeamEventUtils
     return teamEvent;
   }
 
-  public static RecurrenceFrequency[] getSupportedRecurrenceIntervals()
+  public static RecurrenceFrequency[] getSupportedRecurrenceFrequencies()
   {
-    return SUPPORTED_INTERVALS;
+    return SUPPORTED_FREQUENCIES;
   }
 
   public static List<VEvent> getVEvents(final net.fortuna.ical4j.model.Calendar calendar)

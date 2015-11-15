@@ -67,6 +67,7 @@ public class Kost2EditPage extends AbstractEditPage<Kost2DO, Kost2EditForm, Kost
   {
     if ("projektId".equals(property) == true) {
       kost2Dao.setProjekt(getData(), (Integer) selectedValue);
+      form.projektSelectPanel.getTextField().modelChanged();
       form.nummernkreisField.modelChanged();
       form.bereichField.modelChanged();
       form.teilbereichField.modelChanged();
@@ -83,6 +84,7 @@ public class Kost2EditPage extends AbstractEditPage<Kost2DO, Kost2EditForm, Kost
   {
     if ("projektId".equals(property) == true) {
       getData().setProjekt(null);
+      form.projektSelectPanel.getTextField().modelChanged();
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }

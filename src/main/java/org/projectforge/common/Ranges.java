@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Holds number ranges, such as "10,20-25,30-35,50" (comma separated ranges and values).
@@ -47,6 +48,8 @@ public abstract class Ranges<T extends Comparable<T>> implements Serializable
 
   private final char rangesSeparatorChar = '-';
 
+  private boolean nullRangeMatchesAlways;
+
   /**
    * Number ranges, such as "10,20-25,30-35,50" (comma separated ranges and values).
    * @param rangesString
@@ -61,18 +64,17 @@ public abstract class Ranges<T extends Comparable<T>> implements Serializable
     if (value == null) {
       return false;
     }
-    if (ranges != null) {
-      for (final Range<T> range : ranges) {
-        if (range.doesMatch(value) == true) {
-          return true;
-        }
+    if (CollectionUtils.isEmpty(ranges) == true && CollectionUtils.isEmpty(values) == true) {
+      return nullRangeMatchesAlways;
+    }
+    for (final Range<T> range : ranges) {
+      if (range.doesMatch(value) == true) {
+        return true;
       }
     }
-    if (values != null) {
-      for (final T val : values) {
-        if (value.compareTo(val) == 0) {
-          return true;
-        }
+    for (final T val : values) {
+      if (value.compareTo(val) == 0) {
+        return true;
       }
     }
     return false;
@@ -120,6 +122,17 @@ public abstract class Ranges<T extends Comparable<T>> implements Serializable
         }
       }
     }
+    return this;
+  }
+
+  /**
+   * If set to true, all values will match if no range is given.
+   * @param nullRangeMatchesAlways the nullRangeMatchesAlways to set
+   * @return this for chaining.
+   */
+  public Ranges<T> setNullRangeMatchesAlways(final boolean nullRangeMatchesAlways)
+  {
+    this.nullRangeMatchesAlways = nullRangeMatchesAlways;
     return this;
   }
 

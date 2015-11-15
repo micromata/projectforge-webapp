@@ -121,9 +121,9 @@ public class TeamCalEventId
   public String toString()
   {
     if (date == null) {
-      return databaseId.toString();
+      return String.valueOf(databaseId);
     } else {
-      return databaseId.toString() + "-" + getDateFormat().format(date);
+      return String.valueOf(databaseId) + "-" + getDateFormat().format(date);
     }
   }
 }

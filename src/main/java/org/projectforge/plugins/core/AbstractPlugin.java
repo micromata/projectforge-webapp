@@ -239,7 +239,7 @@ public abstract class AbstractPlugin
   protected AbstractPlugin registerWeb(final String id, final Class< ? extends WebPage> pageListClass,
       final Class< ? extends WebPage> pageEditClass)
   {
-    registerWeb(id, pageEditClass, pageEditClass, null, false);
+    registerWeb(id, pageListClass, pageEditClass, null, false);
     return this;
   }
 

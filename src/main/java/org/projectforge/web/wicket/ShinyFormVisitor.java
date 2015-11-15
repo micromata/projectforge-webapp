@@ -89,7 +89,7 @@ public class ShinyFormVisitor implements IVisitor<Component, Void>, Serializable
     return;
   }
 
-  /** Avoid borders arround components and child components. */
+  /** Avoid borders around components and child components. */
   private boolean hasInvalidParent(final Component component)
   {
     if (component == null) {

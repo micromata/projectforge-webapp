@@ -124,6 +124,13 @@ public class ICal4JUtils
     }
     try {
       final RRule rule = new RRule(rruleString);
+      // set the recurrence end date to the last minute of the day
+      final Recur recur = rule.getRecur();
+      final net.fortuna.ical4j.model.Date until = recur != null ? recur.getUntil() : null;
+      if (until != null) {
+        final Date untilEndOfDay = CalendarUtils.getEndOfDay(until, PFUserContext.getTimeZone());
+        recur.setUntil(new net.fortuna.ical4j.model.Date(untilEndOfDay));
+      }
       return rule;
     } catch (final ParseException ex) {
       log.error("Exception encountered while parsing rrule '" + rruleString + "': " + ex.getMessage(), ex);
@@ -387,4 +394,5 @@ public class ICal4JUtils
       super(javaDate.getTime(), Dates.PRECISION_DAY, timeZone);
     }
   }
+
 }

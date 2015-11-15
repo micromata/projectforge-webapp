@@ -238,7 +238,7 @@ public class QueryFilter
         criteria.addOrder((Order) obj);
       } else if (obj instanceof Alias) {
         final Alias alias = (Alias) obj;
-        criteria.createAlias(alias.arg0, alias.arg1);
+        criteria.createAlias(alias.arg0, alias.arg1, alias.joinType);
       } else if (obj instanceof QueryFilter) {
         final QueryFilter filter = (QueryFilter) obj;
         Criteria subCriteria;
@@ -264,6 +264,15 @@ public class QueryFilter
   public QueryFilter createAlias(final String arg0, final String arg1)
   {
     filterSettings.add(new Alias(arg0, arg1));
+    return this;
+  }
+
+  /**
+   * @see org.hibernate.Criteria#createAlias(String, String, int)
+   */
+  public QueryFilter createAlias(final String arg0, final String arg1, final int joinType)
+  {
+    filterSettings.add(new Alias(arg0, arg1, joinType));
     return this;
   }
 
@@ -304,10 +313,19 @@ public class QueryFilter
 
     String arg1;
 
+    int joinType = Criteria.INNER_JOIN;
+
     Alias(final String arg0, final String arg1)
     {
       this.arg0 = arg0;
       this.arg1 = arg1;
+    }
+
+    Alias(final String arg0, final String arg1, final int joinType)
+    {
+      this.arg0 = arg0;
+      this.arg1 = arg1;
+      this.joinType = joinType;
     }
   };
 }

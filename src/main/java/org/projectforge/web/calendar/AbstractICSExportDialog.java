@@ -78,6 +78,7 @@ public abstract class AbstractICSExportDialog extends ModalDialog
       urlTextArea.setOutputMarkupId(true);
       fs.add(urlTextArea);
       urlTextArea.add(AttributeModifier.replace("onClick", "$(this).select();"));
+      urlTextArea.add(new QRCodeDivAppenderBehavior());
     }
   }
 

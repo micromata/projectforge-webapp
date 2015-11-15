@@ -277,9 +277,23 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
    */
   public CheckBoxPanel addCheckBox(final IModel<Boolean> model, final String labelString)
   {
-    final CheckBoxPanel checkBoxPanel = new CheckBoxPanel(newChildId(), model, labelString);
-    add(checkBoxPanel);
-    return checkBoxPanel;
+    return addCheckBox(model, labelString, null);
+  }
+
+  /**
+   * @param model
+   * @param labelString
+   * @return The created CheckBoxPanel.
+   * @see CheckBoxPanel#CheckBoxPanel(String, IModel, String)
+   */
+  public CheckBoxPanel addCheckBox(final IModel<Boolean> model, final String labelString, final String tooltip)
+  {
+    final CheckBoxPanel checkBox = new CheckBoxPanel(newChildId(), model, labelString);
+    if (tooltip != null) {
+      checkBox.setTooltip(tooltip);
+    }
+    add(checkBox);
+    return checkBox;
   }
 
   /**
@@ -466,14 +480,14 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
     return this;
   }
 
-  public DivPanel addNewCheckBoxDiv()
+  public DivPanel addNewCheckBoxButtonDiv()
   {
     final DivPanel checkBoxDiv = new DivPanel(newChildId(), DivType.BTN_GROUP);
     add(checkBoxDiv);
     return checkBoxDiv;
   }
 
-  public DivPanel addNewRadioBoxDiv()
+  public DivPanel addNewRadioBoxButtonDiv()
   {
     final DivPanel radioBoxDiv = new DivPanel(newChildId(), DivType.BTN_GROUP);
     add(radioBoxDiv);

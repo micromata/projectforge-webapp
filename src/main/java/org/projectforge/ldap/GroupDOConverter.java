@@ -23,14 +23,21 @@
 
 package org.projectforge.ldap;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.SetUtils;
+import org.apache.commons.lang.StringUtils;
 import org.projectforge.common.BeanHelper;
+import org.projectforge.common.ListHelper;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.xml.stream.XmlObjectReader;
+import org.projectforge.xml.stream.XmlObjectWriter;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -51,14 +58,17 @@ public class GroupDOConverter
     return null;
   }
 
-  public static GroupDO convert(final LdapGroup group)
+  public static GroupDO convert(final LdapGroup ldapGroup)
   {
-    final GroupDO pfGroup = new GroupDO();
-    pfGroup.setId(getId(group));
-    pfGroup.setName(group.getCommonName());
-    pfGroup.setOrganization(group.getOrganization());
-    pfGroup.setDescription(group.getDescription());
-    return pfGroup;
+    final GroupDO group = new GroupDO();
+    group.setId(getId(ldapGroup));
+    group.setName(ldapGroup.getCommonName());
+    group.setOrganization(ldapGroup.getOrganization());
+    group.setDescription(ldapGroup.getDescription());
+    if (isPosixAccountValuesEmpty(ldapGroup) == false) {
+      group.setLdapValues(getLdapValuesAsXml(ldapGroup));
+    }
+    return group;
   }
 
   public static LdapGroup convert(final GroupDO pfGroup, final String baseDN, final Map<Integer, LdapUser> ldapUserMap)
@@ -91,8 +101,83 @@ public class GroupDOConverter
         }
       }
     }
+    setLdapValues(ldapGroup, pfGroup.getLdapValues());
     return ldapGroup;
   }
+
+  public static boolean isPosixAccountValuesEmpty(final LdapGroup ldapGroup)
+  {
+    return ldapGroup.getGidNumber() == null;
+  }
+
+  /**
+   * Sets the LDAP values such as posix account properties of the given ldapGroup configured in the given xml string.
+   * @param ldapGroup
+   * @param ldapValuesAsXml Posix account values as xml.
+   */
+  public static void setLdapValues(final LdapGroup ldapGroup, final String ldapValuesAsXml)
+  {
+    if (StringUtils.isBlank(ldapValuesAsXml) == true) {
+      return;
+    }
+    final LdapConfig ldapConfig = ConfigXml.getInstance().getLdapConfig();
+    final LdapPosixAccountsConfig posixAccountsConfig = ldapConfig != null ? ldapConfig.getPosixAccountsConfig() : null;
+    if (posixAccountsConfig == null) {
+      // No posix account default values configured
+      return;
+    }
+    final LdapGroupValues values = readLdapGroupValues(ldapValuesAsXml);
+    if (values == null) {
+      return;
+    }
+    if (values.getGidNumber() != null) {
+      ldapGroup.setGidNumber(values.getGidNumber());
+    } else {
+      ldapGroup.setGidNumber(-1);
+    }
+  }
+
+  public static LdapGroupValues readLdapGroupValues(final String ldapValuesAsXml)
+  {
+    if (StringUtils.isBlank(ldapValuesAsXml) == true) {
+      return null;
+    }
+    final XmlObjectReader reader = new XmlObjectReader();
+    reader.initialize(LdapGroupValues.class);
+    final LdapGroupValues values = (LdapGroupValues) reader.read(ldapValuesAsXml);
+    return values;
+  }
+
+  /**
+   * Exports the LDAP values such as posix account properties of the given ldapGroup as xml string.
+   * @param ldapGroup
+   */
+  public static String getLdapValuesAsXml(final LdapGroup ldapGroup)
+  {
+    final LdapConfig ldapConfig = ConfigXml.getInstance().getLdapConfig();
+    final LdapPosixAccountsConfig posixAccountsConfig = ldapConfig != null ? ldapConfig.getPosixAccountsConfig() : null;
+    LdapGroupValues values = null;
+    if (posixAccountsConfig != null) {
+      values = new LdapGroupValues();
+      if (ldapGroup.getGidNumber() != null) {
+        values.setGidNumber(ldapGroup.getGidNumber());
+      }
+    }
+    return getLdapValuesAsXml(values);
+  }
+
+  /**
+   * Exports the LDAP values such as posix account properties of the given ldapGroup as xml string.
+   * @param values
+   */
+  public static String getLdapValuesAsXml(final LdapGroupValues values)
+  {
+    final XmlObjectReader reader = new XmlObjectReader();
+    reader.initialize(LdapGroupValues.class);
+    final String xml = XmlObjectWriter.writeAsXml(values);
+    return xml;
+  }
+
 
   public static String buildBusinessCategory(final GroupDO group)
   {
@@ -119,7 +204,13 @@ public class GroupDOConverter
    */
   public static boolean copyGroupFields(final LdapGroup src, final LdapGroup dest)
   {
-    boolean modified = BeanHelper.copyProperties(src, dest, true, "description", "organization");
+    boolean modified;
+    final List<String> properties = new LinkedList<String>();
+    ListHelper.addAll(properties, "description", "organization");
+    if (LdapUserDao.isPosixAccountsConfigured() == true && isPosixAccountValuesEmpty(src) == false) {
+      ListHelper.addAll(properties, "gidNumber");
+    }
+    modified = BeanHelper.copyProperties(src, dest, true, properties.toArray(new String[0]));
     // Checks if the sets aren't equal:
     if (SetUtils.isEqualSet(src.getMembers(), dest.getMembers()) == false) {
       if (LdapGroupDao.hasMembers(src) == true || LdapGroupDao.hasMembers(dest) == true) {

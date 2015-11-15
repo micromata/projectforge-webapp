@@ -64,7 +64,7 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
     addressEditSupport.addName();
     addressEditSupport.addFirstName();
     final FieldsetPanel fs = (FieldsetPanel)addressEditSupport.addFormOfAddress();
-    final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+    final DivPanel checkBoxPanel = fs.addNewCheckBoxButtonDiv();
     checkBoxPanel.addCheckBoxButton(new PropertyModel<Boolean>(addressEditSupport.personalAddress, "favoriteCard"), getString("favorite"),
         getString("address.tooltip.vCardList"));
     addressEditSupport.addTitle();
@@ -127,7 +127,7 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
       final String favoriteProperty, final FieldType fieldType)
   {
     final FieldsetPanel fs = (FieldsetPanel)addressEditSupport.addPhoneNumber(property, labelKey, labelDescriptionKey, fieldType);
-    final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+    final DivPanel checkBoxPanel = fs.addNewCheckBoxButtonDiv();
     checkBoxPanel
     .addCheckBoxButton(new PropertyModel<Boolean>(addressEditSupport.personalAddress, favoriteProperty), PHONE_NUMBER_FAVORITE_LABEL)
     .setTooltip(getString("address.tooltip.phonelist"));

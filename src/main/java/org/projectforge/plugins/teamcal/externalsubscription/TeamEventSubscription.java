@@ -43,6 +43,7 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.projectforge.common.DateHelper;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.plugins.teamcal.event.TeamEventDO;
@@ -50,6 +51,7 @@ import org.projectforge.plugins.teamcal.event.TeamEventUtils;
 import org.projectforge.web.calendar.CalendarFeed;
 
 /**
+ * Holds and updates events of a subscribed calendar.
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  */
 public class TeamEventSubscription implements Serializable
@@ -58,77 +60,84 @@ public class TeamEventSubscription implements Serializable
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamEventSubscription.class);
 
-  private final Integer teamCalId;
+  private Integer teamCalId;
 
-  private final SubscriptionHolder eventDurationAccess;
+  private SubscriptionHolder subscription;
 
-  private final List<TeamEventDO> recurrenceEvents;
-
-  private final TeamCalDao teamCalDao;
+  private List<TeamEventDO> recurrenceEvents;
 
   private String currentInitializedHash;
 
-  private Long lastUpdated;
+  private Long lastUpdated, lastFailedUpdate;
 
-  private final HttpClient client;
+  private int numberOfFailedUpdates = 0;
+
+  private String lastErrorMessage;
 
   private static final Long TIME_IN_THE_PAST = 60L * 24 * 60 * 60 * 1000; // 60 days in millis in the past to subscribe
 
-  public TeamEventSubscription(final TeamCalDao teamCalDao, final TeamCalDO teamCalDo)
+  public TeamEventSubscription()
   {
-    this.teamCalDao = teamCalDao;
-    this.teamCalId = teamCalDo.getId();
-    eventDurationAccess = new SubscriptionHolder();
-    recurrenceEvents = new ArrayList<TeamEventDO>();
-    currentInitializedHash = null;
-    lastUpdated = null;
-    client = new HttpClient();
-    init(teamCalDo);
   }
 
-  private void init(final TeamCalDO teamCalDo)
+  /**
+   * @return the lastErrorMessage
+   */
+  public String getLastErrorMessage()
   {
-    String url = teamCalDo.getExternalSubscriptionUrl();
-    if (teamCalDo.isExternalSubscription() == false || StringUtils.isEmpty(url) == true) {
+    return lastErrorMessage;
+  }
+
+  /**
+   * @return the numberOfFailedUpdates
+   */
+  public int getNumberOfFailedUpdates()
+  {
+    return numberOfFailedUpdates;
+  }
+
+  /**
+   * @return the lastFailedUpdate
+   */
+  public Long getLastFailedUpdate()
+  {
+    return lastFailedUpdate;
+  }
+
+  /**
+   * We update the cache softly, therefore we create a new instance and replace the old instance in the cached map then creation and update
+   * is therefore the same two lines of code, but semantically different things.
+   */
+  public void update(final TeamCalDao teamCalDao, final TeamCalDO teamCalDO)
+  {
+    this.teamCalId = teamCalDO.getId();
+    currentInitializedHash = null;
+    lastUpdated = null;
+    String url = teamCalDO.getExternalSubscriptionUrl();
+    if (teamCalDO.isExternalSubscription() == false || StringUtils.isEmpty(url) == true) {
       // No external subscription.
+      clear();
       return;
     }
     url = StringUtils.replace(url, "webcal", "http");
-    // Shorten the url or avoiding logging of user credentials as part of the url
-    final StringBuffer buf = new StringBuffer();
-    boolean dotRead = false;
-    for (int i = 0; i < url.length(); i++) {
-      final char ch = url.charAt(i);
-      if (dotRead == true && ch == '/') { // Slash after domain found
-        // Shorten http://www.projectforge.org/cal/... -> http://www.projectforge.org
-        buf.append("/...");
-        break;
-      } else if (ch == '?') {
-        buf.append("?...");
-        break;
-      } else if (ch == '.') {
-        dotRead = true;
-      }
-      buf.append(ch);
-    }
-    final String displayUrl = buf.toString();
-    log.info("Getting subscribed calendar #" + teamCalDo.getId() + " from: " + displayUrl);
+    final String displayUrl = teamCalDO.getExternalSubscriptionUrlAnonymized();
+    log.info("Getting subscribed calendar #" + teamCalDO.getId() + " from: " + displayUrl);
     final CalendarBuilder builder = new CalendarBuilder();
     byte[] bytes = null;
     try {
 
       // Create a method instance.
       final GetMethod method = new GetMethod(url);
-
+      final HttpClient client = new HttpClient();
       final int statusCode = client.executeMethod(method);
 
       if (statusCode != HttpStatus.SC_OK) {
-        log.error("Unable to gather subscription calendar #"
-            + teamCalDo.getId()
+        error("Unable to gather subscription calendar #"
+            + teamCalDO.getId()
             + " information, using database from url '"
             + displayUrl
             + "'. Received statusCode: "
-            + statusCode);
+            + statusCode, null);
         return;
       }
 
@@ -139,30 +148,35 @@ public class TeamEventSubscription implements Serializable
       bytes = IOUtils.toByteArray(stream);
 
       final String md5 = calcHexHash(md.digest(bytes));
-      if (StringUtils.equals(md5, teamCalDo.getExternalSubscriptionHash()) == false) {
-        teamCalDo.setExternalSubscriptionHash(md5);
-        teamCalDo.setExternalSubscriptionCalendarBinary(bytes);
+      if (StringUtils.equals(md5, teamCalDO.getExternalSubscriptionHash()) == false) {
+        teamCalDO.setExternalSubscriptionHash(md5);
+        teamCalDO.setExternalSubscriptionCalendarBinary(bytes);
         // internalUpdate is valid at this point, because we are calling this method in an async thread
-        teamCalDao.internalUpdate(teamCalDo);
+        teamCalDao.internalUpdate(teamCalDO);
       }
     } catch (final Exception e) {
-      bytes = teamCalDo.getExternalSubscriptionCalendarBinary();
-      log.error("Unable to gather subscription calendar #"
-          + teamCalDo.getId()
+      bytes = teamCalDO.getExternalSubscriptionCalendarBinary();
+      error("Unable to gather subscription calendar #"
+          + teamCalDO.getId()
           + " information, using database from url '"
           + displayUrl
           + "': "
           + e.getMessage(), e);
     }
     if (bytes == null) {
-      log.error("Unable to use database subscription calendar #" + teamCalDo.getId() + " information, quit from url '" + displayUrl + "'.");
+      error("Unable to use database subscription calendar #" + teamCalDO.getId() + " information, quit from url '" + displayUrl + "'.",
+          null);
       return;
     }
-    if (currentInitializedHash != null && StringUtils.equals(currentInitializedHash, teamCalDo.getExternalSubscriptionHash()) == true) {
+    if (currentInitializedHash != null && StringUtils.equals(currentInitializedHash, teamCalDO.getExternalSubscriptionHash()) == true) {
       // nothing to do here if the hashes are equal
-      log.info("No modification of subscribed calendar #" + teamCalDo.getId() + " found from: " + displayUrl + " (OK, nothing to be done).");
+      log.info("No modification of subscribed calendar #" + teamCalDO.getId() + " found from: " + displayUrl + " (OK, nothing to be done).");
+      clear();
       return;
     }
+
+    final SubscriptionHolder newSubscription = new SubscriptionHolder();
+    final ArrayList<TeamEventDO> newRecurrenceEvents = new ArrayList<TeamEventDO>();
     try {
       final Date timeInPast = new Date(System.currentTimeMillis() - TIME_IN_THE_PAST);
       final Calendar calendar = builder.build(new ByteArrayInputStream(bytes));
@@ -181,32 +195,33 @@ public class TeamEventSubscription implements Serializable
         }
         vEvents.add(event);
       }
-      // clear
-      eventDurationAccess.clear();
-      recurrenceEvents.clear();
 
       // the event id must (!) be negative and decrementing (different on each event)
       Integer startId = -1;
       for (final VEvent event : vEvents) {
         final TeamEventDO teamEvent = TeamEventUtils.createTeamEventDO(event);
         teamEvent.setId(startId);
-        teamEvent.setCalendar(teamCalDo);
+        teamEvent.setCalendar(teamCalDO);
 
         if (teamEvent.hasRecurrence() == true) {
           // special treatment for recurrence events ..
-          recurrenceEvents.add(teamEvent);
+          newRecurrenceEvents.add(teamEvent);
         } else {
-          eventDurationAccess.add(teamEvent);
+          newSubscription.add(teamEvent);
         }
 
         startId--;
       }
+      // OK, update the subscription:
+      recurrenceEvents = newRecurrenceEvents;
+      subscription = newSubscription;
       lastUpdated = System.currentTimeMillis();
-      currentInitializedHash = teamCalDo.getExternalSubscriptionHash();
-      log.info("Subscribed calendar #" + teamCalDo.getId() + " successfully received from: " + displayUrl);
+      currentInitializedHash = teamCalDO.getExternalSubscriptionHash();
+      clear();
+      log.info("Subscribed calendar #" + teamCalDO.getId() + " successfully received from: " + displayUrl);
     } catch (final Exception e) {
-      log.error("Unable to instantiate team event list for calendar #"
-          + teamCalDo.getId()
+      error("Unable to instantiate team event list for calendar #"
+          + teamCalDO.getId()
           + " information, quit from url '"
           + displayUrl
           + "': "
@@ -214,12 +229,38 @@ public class TeamEventSubscription implements Serializable
     }
   }
 
+  private void clear()
+  {
+    this.lastErrorMessage = null;
+    this.lastFailedUpdate = null;
+    this.numberOfFailedUpdates = 0;
+  }
+
+  private void error(final String errorMessage, final Exception ex)
+  {
+    this.numberOfFailedUpdates++;
+    final StringBuilder sb = new StringBuilder();
+    sb.append(errorMessage).append(" (").append(this.numberOfFailedUpdates).append(". failed attempts");
+    if (this.lastUpdated != null) {
+      sb.append(", last successful update ").append(DateHelper.formatAsUTC(new Date(this.lastUpdated))).append(" UTC");
+    }
+    sb.append(".)");
+    this.lastErrorMessage = sb.toString();
+    if (ex != null) {
+      log.error(this.lastErrorMessage, ex);
+    } else {
+      log.error(this.lastErrorMessage);
+    }
+    this.lastFailedUpdate = System.currentTimeMillis();
+  }
+
   /**
    * calculates hexadecimal representation of
    * @param md5
    * @return
    */
-  private String calcHexHash(byte[] md5) {
+  private String calcHexHash(final byte[] md5)
+  {
     String result = null;
     if (md5 != null) {
       result = new BigInteger(1, md5).toString(16);
@@ -227,12 +268,23 @@ public class TeamEventSubscription implements Serializable
     return result;
   }
 
-  public List<TeamEventDO> getEvents(final Long startTime, final Long endTime)
+  public List<TeamEventDO> getEvents(final Long startTime, final Long endTime, final boolean minimalAccess)
   {
-    Long perfStart = System.currentTimeMillis();
-    List<TeamEventDO> result = eventDurationAccess.getResultList(startTime, endTime);
-    Long perfDuration = System.currentTimeMillis() - perfStart;
-    log.info("calculation of team events took " + perfDuration + " ms for " + result.size() + " events of " +eventDurationAccess.size() + " in total from calendar #"+teamCalId+".");
+    if (subscription == null) {
+      return new ArrayList<TeamEventDO>();
+    }
+    // final Long perfStart = System.currentTimeMillis();
+    final List<TeamEventDO> result = subscription.getResultList(startTime, endTime, minimalAccess);
+    // final Long perfDuration = System.currentTimeMillis() - perfStart;
+    // log.info("calculation of team events took "
+    // + perfDuration
+    // + " ms for "
+    // + result.size()
+    // + " events of "
+    // + eventDurationAccess.size()
+    // + " in total from calendar #"
+    // + teamCalId
+    // + ".");
     return result;
   }
 
@@ -241,6 +293,9 @@ public class TeamEventSubscription implements Serializable
     return teamCalId;
   }
 
+  /**
+   * @return Time of last update (successfully).
+   */
   public Long getLastUpdated()
   {
     return lastUpdated;

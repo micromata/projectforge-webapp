@@ -35,7 +35,7 @@ public class SendFeedback
 {
   private SendMail sendMail;
 
-  private Map<String, Object> params = new HashMap<String, Object>();
+  private final Map<String, Object> params = new HashMap<String, Object>();
 
   /**
    * Sender will be set automatically to logged in context user, if not given.
@@ -51,13 +51,13 @@ public class SendFeedback
     msg.setTo(data.getReceiver());
     msg.setProjectForgeSubject(data.getSubject());
     params.put("subject", data.getSubject());
-    String content = sendMail.renderGroovyTemplate(msg, "mail/feedback.txt", params, ThreadLocalUserContext.getUser());
+    final String content = sendMail.renderGroovyTemplate(msg, "mail/feedback.txt", params, ThreadLocalUserContext.getUser());
     msg.setContent(content);
     msg.setContentType(Mail.CONTENTTYPE_TEXT);
-    return sendMail.send(msg);
+    return sendMail.send(msg, null, null);
   }
 
-  public void setSendMail(SendMail sendMail)
+  public void setSendMail(final SendMail sendMail)
   {
     this.sendMail = sendMail;
   }
@@ -67,7 +67,7 @@ public class SendFeedback
    * @param key
    * @param value
    */
-  public void addParameter(String key, Object value)
+  public void addParameter(final String key, final Object value)
   {
     params.put(key, value);
   }

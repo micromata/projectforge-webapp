@@ -66,7 +66,7 @@ public class AddressListForm extends AbstractListForm<AddressListFilter, Address
       final AddressFilter searchFilter)
   {
     {
-      final DivPanel radioGroupPanel = optionsFieldsetPanel.addNewRadioBoxDiv();
+      final DivPanel radioGroupPanel = optionsFieldsetPanel.addNewRadioBoxButtonDiv();
       final RadioGroupPanel<String> radioGroup = new RadioGroupPanel<String>(radioGroupPanel.newChildId(), "listtype",
           new PropertyModel<String>(searchFilter, "listType")) {
         /**
@@ -114,7 +114,7 @@ public class AddressListForm extends AbstractListForm<AddressListFilter, Address
         }
       });
       final FieldsetPanel fieldset = gridBuilder.newFieldset(parentPage.getString("address.contactStatus")).suppressLabelForWarning();
-      final DivPanel checkBoxPanel = fieldset.addNewCheckBoxDiv();
+      final DivPanel checkBoxPanel = fieldset.addNewCheckBoxButtonDiv();
       checkBoxPanel.add(form.createAutoRefreshCheckBoxButton(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(searchFilter, "active"),
           parentPage.getString("address.contactStatus.active")));
       checkBoxPanel.add(form.createAutoRefreshCheckBoxButton(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(searchFilter,
@@ -129,7 +129,7 @@ public class AddressListForm extends AbstractListForm<AddressListFilter, Address
     {
       gridBuilder.newSplitPanel(GridSize.COL50);
       final FieldsetPanel fieldset = gridBuilder.newFieldset(parentPage.getString("address.addressStatus")).suppressLabelForWarning();
-      final DivPanel checkBoxPanel = fieldset.addNewCheckBoxDiv();
+      final DivPanel checkBoxPanel = fieldset.addNewCheckBoxButtonDiv();
       checkBoxPanel.add(form.createAutoRefreshCheckBoxButton(checkBoxPanel.newChildId(),
           new PropertyModel<Boolean>(searchFilter, "uptodate"), parentPage.getString("address.addressStatus.uptodate")));
       checkBoxPanel.add(form.createAutoRefreshCheckBoxButton(checkBoxPanel.newChildId(),

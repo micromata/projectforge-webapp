@@ -23,7 +23,6 @@
 
 package org.projectforge.core;
 
-
 /**
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -31,5 +30,10 @@ package org.projectforge.core;
  */
 public enum ModificationStatus
 {
-  NONE, MINOR, MAJOR;
+  /** Object isn't modified. */
+  NONE,
+  /** Modification is minor (e. g. only nonhistorizable attributes are modified). Therefore no history entries will be written. */
+  MINOR,
+  /** Modification of object (e. g. normal case). see MINOR. */
+  MAJOR;
 }

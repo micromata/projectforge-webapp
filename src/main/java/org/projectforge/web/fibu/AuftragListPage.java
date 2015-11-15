@@ -114,7 +114,7 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
         appendCssClasses(item, auftrag.getId(), auftrag.isDeleted());
         if (isDeleted) {
           // Do nothing further.
-        } else if (auftrag.isAbgeschlossenUndNichtVollstaendigFakturiert() == true) {
+        } else if (auftrag.isAbgeschlossenUndNichtVollstaendigFakturiert() == true || auftrag.isZahlplanAbgeschlossenUndNichtVollstaendigFakturiert() == true) {
           appendCssClasses(item, RowCssClass.IMPORTANT_ROW);
         } else if (auftrag.getAuftragsStatus().isIn(AuftragsStatus.BEAUFTRAGT, AuftragsStatus.LOI) == true) {
           appendCssClasses(item, RowCssClass.SUCCESS_ROW);

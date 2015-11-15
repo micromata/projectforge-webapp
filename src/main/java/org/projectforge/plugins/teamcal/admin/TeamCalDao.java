@@ -37,8 +37,8 @@ import org.projectforge.core.QueryFilter;
 import org.projectforge.plugins.teamcal.admin.TeamCalFilter.OwnerType;
 import org.projectforge.plugins.teamcal.externalsubscription.TeamEventExternalSubscriptionCache;
 import org.projectforge.user.GroupDO;
-import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ThreadLocalUserContext;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRightId;
 import org.projectforge.web.user.GroupsProvider;
@@ -101,6 +101,7 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
     else {
       myFilter = new TeamCalFilter(filter);
     }
+    final PFUserDO user = ThreadLocalUserContext.getUser();
     final QueryFilter queryFilter = new QueryFilter(myFilter);
     queryFilter.addOrder(Order.asc("title"));
     final List<TeamCalDO> list = getList(queryFilter);
@@ -110,23 +111,30 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
     }
     final List<TeamCalDO> result = new ArrayList<TeamCalDO>();
     final TeamCalRight right = (TeamCalRight) getUserRight();
-    final PFUserDO user = ThreadLocalUserContext.getUser();
     final Integer userId = user.getId();
+    final boolean adminAccessOnly = (myFilter.isAdmin() == true && accessChecker.isUserMemberOfAdminGroup(user) == true);
     for (final TeamCalDO cal : list) {
       final boolean isOwn = right.isOwner(user, cal);
       if (isOwn == true) {
         // User is owner.
+        if (adminAccessOnly == true) {
+          continue;
+        }
         if (myFilter.isAll() == true || myFilter.isOwn() == true) {
           // Calendar matches the filter:
           result.add(cal);
         }
       } else {
         // User is not owner.
-        if (myFilter.isAll() == true || myFilter.isOthers() == true) {
+        if (myFilter.isAll() == true || myFilter.isOthers() == true || adminAccessOnly == true) {
           if ((myFilter.isFullAccess() == true && right.hasFullAccess(cal, userId) == true)
               || (myFilter.isReadonlyAccess() == true && right.hasReadonlyAccess(cal, userId) == true)
               || (myFilter.isMinimalAccess() == true && right.hasMinimalAccess(cal, userId) == true)) {
             // Calendar matches the filter:
+            if (adminAccessOnly == false) {
+              result.add(cal);
+            }
+          } else if (adminAccessOnly == true) {
             result.add(cal);
           }
         }
@@ -301,7 +309,8 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
   }
 
   @Override
-  protected void afterSave(final TeamCalDO obj) {
+  protected void afterSave(final TeamCalDO obj)
+  {
     super.afterSave(obj);
     if (obj.isExternalSubscription() == true) {
       TeamEventExternalSubscriptionCache.instance().updateCache(this, obj);
@@ -309,11 +318,25 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
   }
 
   @Override
-  protected void afterUpdate(final TeamCalDO obj, final TeamCalDO dbObj) {
+  protected void afterUpdate(final TeamCalDO obj, final TeamCalDO dbObj)
+  {
     super.afterUpdate(obj, dbObj);
-    if (obj != null && dbObj != null && obj.isExternalSubscription() == true && StringUtils.equals(obj.getExternalSubscriptionUrl(), dbObj.getExternalSubscriptionUrl()) == false) {
+    if (obj != null
+        && dbObj != null
+        && obj.isExternalSubscription() == true
+        && StringUtils.equals(obj.getExternalSubscriptionUrl(), dbObj.getExternalSubscriptionUrl()) == false) {
       // only update if the url has changed!
       TeamEventExternalSubscriptionCache.instance().updateCache(this, obj);
+    }
+    // if calendar is present in subscription cache and is not an external subscription anymore -> cleanup!
+    if (obj != null
+        && obj.isExternalSubscription() == false
+        && TeamEventExternalSubscriptionCache.instance().isExternalSubscribedCalendar(obj.getId())) {
+      obj.setExternalSubscriptionCalendarBinary(null);
+      obj.setExternalSubscriptionUrl(null);
+      obj.setExternalSubscriptionUpdateInterval(null);
+      obj.setExternalSubscriptionHash(null);
+      TeamEventExternalSubscriptionCache.instance().updateCache(this, obj, true);
     }
   }
 }

@@ -35,7 +35,7 @@ import org.projectforge.web.task.TaskEditPage;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.task.TaskTreePage;
 import org.projectforge.web.user.GroupEditPage;
-import org.projectforge.web.user.GroupSelectPanel;
+import org.projectforge.web.user.NewGroupSelectPanel;
 import org.projectforge.web.wicket.AbstractStandardForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
@@ -155,7 +155,7 @@ public class TaskWizardForm extends AbstractStandardForm<TaskWizardForm, TaskWiz
     section.add(new DivTextPanel(section.newChildId(), getString("task.wizard." + key + ".intro")));
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("group")).suppressLabelForWarning();
-      final GroupSelectPanel groupSelectPanel = new GroupSelectPanel(fs.newChildId(), new PropertyModel<GroupDO>(this, key), parentPage,
+      final NewGroupSelectPanel groupSelectPanel = new NewGroupSelectPanel(fs.newChildId(), new PropertyModel<GroupDO>(this, key), parentPage,
           key + "Id");
       fs.add(groupSelectPanel);
       groupSelectPanel.setShowFavorites(false).init();

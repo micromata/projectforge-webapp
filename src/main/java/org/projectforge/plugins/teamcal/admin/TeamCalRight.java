@@ -132,11 +132,17 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
 
   public boolean isOwner(final PFUserDO user, final TeamCalDO cal)
   {
+    if (cal == null) {
+      return false;
+    }
     return ObjectUtils.equals(user.getId(), cal.getOwnerId()) == true;
   }
 
   public boolean isOwner(final Integer userId, final TeamCalDO cal)
   {
+    if (cal == null || userId == null) {
+      return false;
+    }
     return ObjectUtils.equals(userId, cal.getOwnerId()) == true;
   }
 
@@ -145,8 +151,32 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
     return getUserGroupCache().isUserMemberOfAtLeastOneGroup(user.getId(), groupIds);
   }
 
+  /**
+   * @param calendar
+   * @param userId
+   * @return {@link TeamCalAccessType#NONE}, {@link TeamCalAccessType#MINIMAL}, {@link TeamCalAccessType#READONLY} or
+   *         {@link TeamCalAccessType#FULL}. null will never be returned!
+   */
+  public TeamCalAccessType getAccessType(final TeamCalDO calendar, final Integer userId)
+  {
+    if (calendar == null || userId == null) {
+      return TeamCalAccessType.NONE;
+    }
+    if (hasFullAccess(calendar, userId) == true) {
+      return TeamCalAccessType.FULL;
+    } else if (hasReadonlyAccess(calendar, userId) == true) {
+      return TeamCalAccessType.READONLY;
+    } else if (hasMinimalAccess(calendar, userId) == true) {
+      return TeamCalAccessType.MINIMAL;
+    }
+    return TeamCalAccessType.NONE;
+  }
+
   public boolean hasFullAccess(final TeamCalDO calendar, final Integer userId)
   {
+    if (calendar == null || userId == null) {
+      return false;
+    }
     if (isOwner(userId, calendar) == true) {
       return true;
     }
@@ -157,6 +187,9 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
 
   public boolean hasReadonlyAccess(final TeamCalDO calendar, final Integer userId)
   {
+    if (calendar == null || userId == null) {
+      return false;
+    }
     if (hasFullAccess(calendar, userId) == true) {
       // User has full access (which is more than read-only access).
       return false;
@@ -168,6 +201,9 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
 
   public boolean hasMinimalAccess(final TeamCalDO calendar, final Integer userId)
   {
+    if (calendar == null || userId == null) {
+      return false;
+    }
     if (hasFullAccess(calendar, userId) == true || hasReadonlyAccess(calendar, userId) == true) {
       // User has full access or read-only access (which is more than minimal access).
       return false;

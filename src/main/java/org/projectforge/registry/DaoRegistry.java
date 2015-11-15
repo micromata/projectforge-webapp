@@ -41,6 +41,7 @@ import org.projectforge.fibu.EmployeeSalaryDao;
 import org.projectforge.fibu.EmployeeScriptingDao;
 import org.projectforge.fibu.KontoDao;
 import org.projectforge.fibu.KundeDao;
+import org.projectforge.fibu.PaymentScheduleDO;
 import org.projectforge.fibu.ProjektDao;
 import org.projectforge.fibu.RechnungDao;
 import org.projectforge.fibu.RechnungsPositionDO;
@@ -97,6 +98,8 @@ public class DaoRegistry
 
   public static final String ADDRESS = "address";
 
+  public static final String ADDRESSKAT = "addressKat";
+
   public static final String BOOK = "book";
 
   public static final String CONFIGURATION = "configuration";
@@ -136,6 +139,8 @@ public class DaoRegistry
   public static final String OUTGOING_INVOICE = "outgoingInvoice";
 
   public static final String OUTGOING_MAIL = "outgoingMail";
+
+  public static final String PAYMENTSCHEDULE = "paymentSchedule";
 
   public static final String PROJECT = "project";
 
@@ -256,7 +261,7 @@ public class DaoRegistry
     .setFullTextSearchSupport(false).setSearchable(false);
 
     register(ORDERBOOK, AuftragDao.class, auftragDao, "fibu.auftrag") // Needs customer, project
-    .setNestedDOClasses(AuftragsPositionDO.class);
+    .setNestedDOClasses(AuftragsPositionDO.class, PaymentScheduleDO.class);
     register(OUTGOING_INVOICE, RechnungDao.class, rechnungDao, "fibu.rechnung") // Needs customer, project
     .setNestedDOClasses(RechnungsPositionDO.class);
     register(INCOMING_INVOICE, EingangsrechnungDao.class, eingangsrechnungDao, "fibu.eingangsrechnung") //

@@ -27,7 +27,6 @@ import org.projectforge.continuousdb.UpdateEntry;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.MenuItemDef;
-import org.projectforge.web.MenuItemDefId;
 
 /**
  * @author Billy Duong (b.duong@micromata.de)
@@ -49,7 +48,10 @@ public class SkillMatrixPlugin extends AbstractPlugin
 
   static UserPrefArea USER_PREF_AREA;
 
-  private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { SkillDO.class, SkillRatingDO.class, TrainingDO.class, AttendeeDO.class};
+  // The order of the entities is important for xml dump and imports as well as for test cases (order for deleting objects at the end of
+  // each test).
+  // The entities are inserted in ascending order and deleted in descending order.
+  private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { SkillDO.class, SkillRatingDO.class, TrainingDO.class, TrainingAttendeeDO.class};
 
   public static final String I18N_KEY_SKILLMATRIX_PREFIX = "plugins.skillmatrix";
 
@@ -69,7 +71,7 @@ public class SkillMatrixPlugin extends AbstractPlugin
   private SkillDao skillDao;
   private SkillRatingDao skillRatingDao;
   private TrainingDao trainingDao;
-  private AttendeeDao attendeeDao;
+  private TrainingAttendeeDao trainingAttendeeDao;
 
 
   @Override
@@ -89,22 +91,23 @@ public class SkillMatrixPlugin extends AbstractPlugin
     register(ID_SKILL_RATING, SkillRatingDao.class, skillRatingDao, I18N_KEY_SKILLMATRIX_PREFIX);
     register(ID_SKILL, SkillDao.class, skillDao, I18N_KEY_SKILLMATRIX_PREFIX);
     register(ID_SKILL_TRAINING, TrainingDao.class, trainingDao, I18N_KEY_SKILLMATRIX_PREFIX);
-    register(ID_SKILL_TRAINING_ATTENDEE, AttendeeDao.class, attendeeDao, I18N_KEY_SKILLMATRIX_PREFIX);
+    register(ID_SKILL_TRAINING_ATTENDEE, TrainingAttendeeDao.class, trainingAttendeeDao, I18N_KEY_SKILLMATRIX_PREFIX);
 
     // Register the web part:
     registerWeb(ID_SKILL_RATING, SkillRatingListPage.class, SkillRatingEditPage.class);
     registerWeb(ID_SKILL, SkillListPage.class, SkillEditPage.class);
     registerWeb(ID_SKILL_TRAINING, TrainingListPage.class, TrainingEditPage.class);
-    registerWeb(ID_SKILL_TRAINING_ATTENDEE, AttendeeListPage.class, AttendeeEditPage.class);
+    registerWeb(ID_SKILL_TRAINING_ATTENDEE, TrainingAttendeeListPage.class, TrainingAttendeeEditPage.class);
 
     // Register the menu entry as sub menu entry of the misc menu:
-    final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
+    final MenuItemDef parentMenu = new MenuItemDef(null, ID_SKILL, 90, I18N_KEY_SKILL_MENU_ENTRY, SkillTreePage.class);
 
+    registerMenuItem(parentMenu);
     registerMenuItem(new MenuItemDef(parentMenu, ID_SKILL_TREE, 5, I18N_KEY_SKILLTREE_MENU_ENTRY, SkillTreePage.class));
     registerMenuItem(new MenuItemDef(parentMenu, ID_SKILL_RATING, 5, I18N_KEY_SKILLRATING_MENU_ENTRY, SkillRatingListPage.class));
     registerMenuItem(new MenuItemDef(parentMenu, ID_SKILL, 5, I18N_KEY_SKILL_MENU_ENTRY, SkillListPage.class));
     registerMenuItem(new MenuItemDef(parentMenu, ID_SKILL_TRAINING, 5, I18N_KEY_SKILLTRAINING_MENU_ENTRY, TrainingListPage.class));
-    registerMenuItem(new MenuItemDef(parentMenu, ID_SKILL_TRAINING_ATTENDEE, 5, I18N_KEY_SKILLTRAINING_ATTENDEE_MENU_ENTRY, AttendeeListPage.class));
+    registerMenuItem(new MenuItemDef(parentMenu, ID_SKILL_TRAINING_ATTENDEE, 5, I18N_KEY_SKILLTRAINING_ATTENDEE_MENU_ENTRY, TrainingAttendeeListPage.class));
 
     // .setMobileMenu(SkillRatingMobileListPage.class, 10));
 
@@ -112,7 +115,7 @@ public class SkillMatrixPlugin extends AbstractPlugin
     registerRight(new SkillRight());
     registerRight(new SkillRatingRight());
     registerRight(new TrainingRight());
-    registerRight(new AttendeeRight());
+    registerRight(new TrainingAttendeeRight());
 
     // All the i18n stuff:
     addResourceBundle(RESOURCE_BUNDLE_NAME);
@@ -137,9 +140,9 @@ public class SkillMatrixPlugin extends AbstractPlugin
     this.trainingDao = trainingDao;
   }
 
-  public void setAttendeeDao(final AttendeeDao attendeeDao)
+  public void setTrainingAttendeeDao(final TrainingAttendeeDao trainingAttendeeDao)
   {
-    this.attendeeDao = attendeeDao;
+    this.trainingAttendeeDao = trainingAttendeeDao;
   }
 
   /**
