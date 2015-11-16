@@ -236,13 +236,18 @@ public class RechnungDO extends AbstractRechnungDO<RechnungsPositionDO> implemen
 
   public int compareTo(final RechnungDO o)
   {
-    final int r = this.datum.compareTo(o.datum);
-    if (r != 0) {
-      return -r;
+    if (this.datum != null && o.datum != null) {
+      final int r = this.datum.compareTo(o.datum);
+      if (r != 0) {
+        return -r;
+      }
     }
     if (this.nummer == null) {
       return (o.nummer == null) ? 0 : 1;
     }
-    return (o.nummer == null) ? 0 : -1;
+    if (o.nummer == null) {
+      return -1;
+    }
+    return this.nummer.compareTo(o.nummer);
   }
 }
