@@ -195,7 +195,8 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
       queryFilter.add(Restrictions.eq("user", user));
     }
     if (filter.getStartTime() != null && filter.getStopTime() != null) {
-      queryFilter.add(Restrictions.between("startTime", filter.getStartTime(), filter.getStopTime()));
+      queryFilter.add(Restrictions.and(Restrictions.ge("stopTime", filter.getStartTime()),
+          Restrictions.le("startTime", filter.getStopTime())));
     } else if (filter.getStartTime() != null) {
       queryFilter.add(Restrictions.ge("startTime", filter.getStartTime()));
     } else if (filter.getStopTime() != null) {
