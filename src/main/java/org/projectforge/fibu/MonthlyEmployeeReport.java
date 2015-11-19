@@ -59,6 +59,8 @@ public class MonthlyEmployeeReport implements Serializable
 {
   private static final long serialVersionUID = -4636357379552246075L;
 
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MonthlyEmployeeReport.class);
+
   public class Kost2Row implements Serializable
   {
     private static final long serialVersionUID = -5379735557333691194L;
@@ -237,7 +239,12 @@ public class MonthlyEmployeeReport implements Serializable
         return;
       }
     }
-    throw new RuntimeException("Oups, given time sheet is not inside the month represented by this month object.");
+    log.info("Ignoring time sheet which isn't inside current month: "
+        + year
+        + "-"
+        + StringHelper.format2DigitNumber(month + 1)
+        + ": "
+        + sheet);
   }
 
   public void calculate()
