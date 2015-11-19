@@ -447,7 +447,7 @@ public class AuftragDO extends DefaultBaseDO
 
   /**
    * @return true wenn alle Auftragspositionen vollständig fakturiert sind.
-   * @see AuftragsPositionDO#isCompleteInvoiced()
+   * @see AuftragsPositionDO#isVollstaendigFakturiert()
    */
   @Transient
   public boolean isVollstaendigFakturiert()
@@ -639,7 +639,7 @@ public class AuftragDO extends DefaultBaseDO
   }
 
   /**
-   * @param rechungUiStatus the rechungUiStatus to set
+   * @param uiStatus the rechungUiStatus to set
    * @return this for chaining.
    */
   public AuftragDO setUiStatus(final AuftragUIStatus uiStatus)

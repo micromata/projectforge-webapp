@@ -98,7 +98,7 @@ public class ProjektDao extends BaseDao<ProjektDO>
 
   /**
    * @param projekt
-   * @param tadkId If null, then task will be set to null;
+   * @param taskId If null, then task will be set to null;
    * @see BaseDao#getOrLoad(Integer)
    */
   public void setTask(final ProjektDO projekt, final Integer taskId)

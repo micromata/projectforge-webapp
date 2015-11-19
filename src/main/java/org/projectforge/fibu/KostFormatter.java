@@ -36,7 +36,6 @@ public class KostFormatter
 
   /**
    * @return Id im dreistelligen Format: "001" - "999" oder "???" wenn id null ist.
-   * @see #getId()
    * @see #format3Digits(Integer)
    */
   public static String format(final KundeDO kunde)

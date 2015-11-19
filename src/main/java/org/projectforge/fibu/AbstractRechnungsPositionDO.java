@@ -187,7 +187,7 @@ public abstract class AbstractRechnungsPositionDO extends DefaultBaseDO implemen
   }
 
   /**
-   * @param idx Index of the cost assignment not index of collection.
+   * @param index Index of the cost assignment not index of collection.
    * @return KostZuweisungDO with given index or null, if not exist.
    */
   public KostZuweisungDO getKostZuweisung(final int index)

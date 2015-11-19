@@ -411,7 +411,7 @@ public abstract class AbstractRechnungDO<T extends AbstractRechnungsPositionDO> 
   }
 
   /**
-   * @param rechungUiStatus the rechungUiStatus to set
+   * @param uiStatus the rechungUiStatus to set
    * @return this for chaining.
    */
   public AbstractRechnungDO<T> setUiStatus(final RechnungUIStatus uiStatus)

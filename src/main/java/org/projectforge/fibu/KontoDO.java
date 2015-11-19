@@ -71,7 +71,6 @@ public class KontoDO extends DefaultBaseDO implements Historizable, ShortDisplay
 
   /**
    * Formats the account as string: "[nummer] [title]", e. g. "11000 Micromata GmbH"
-   * @param konto
    */
   public String formatKonto()
   {

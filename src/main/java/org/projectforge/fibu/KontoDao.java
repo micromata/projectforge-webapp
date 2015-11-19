@@ -79,7 +79,6 @@ public class KontoDao extends BaseDao<KontoDO>
 
   /**
    * @param kontoCache the kontoCache to set
-   * @return this for chaining.
    */
   public void setKontoCache(final KontoCache kontoCache)
   {

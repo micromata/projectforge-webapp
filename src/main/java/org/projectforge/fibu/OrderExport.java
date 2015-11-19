@@ -23,7 +23,6 @@
 
 package org.projectforge.fibu;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
@@ -212,8 +211,8 @@ public class OrderExport
   /**
    * Exports the filtered list as table with almost all fields. For members of group FINANCE_GROUP (PF_Finance) and MARKETING_GROUP
    * (PF_Marketing) all addresses are exported, for others only those which are marked as personal favorites.
-   * @param Used by sub classes such as AddressCampaignValueExport.
-   * @throws IOException
+   * @param list by sub classes such as AddressCampaignValueExport.
+   * @param params
    */
   public byte[] export(final List<AuftragDO> list, final Object... params)
   {

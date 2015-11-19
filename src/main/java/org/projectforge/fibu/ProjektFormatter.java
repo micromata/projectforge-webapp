@@ -74,14 +74,14 @@ public class ProjektFormatter extends BaseFormatter
   }
 
   /**
-   * @see #format(ProjektDO, boolean, String, boolean)
+   * @see #format(ProjektDO, boolean)
    */
   public String format(final Integer projektId, final boolean showOnlyNumber)
   {
     ProjektDO projekt = null;
     try {
       projekt = projektDao.getById(projektId);
-    } catch (AccessException ex) {
+    } catch (final AccessException ex) {
       log.info(ex.getMessage());
       return getNotVisibleString();
     }
@@ -92,8 +92,6 @@ public class ProjektFormatter extends BaseFormatter
    * Formats given project as string.
    * @param projekt The project to show.
    * @param showOnlyNumber If true then only the kost2 number will be shown.
-   * @param select If not empty then the project is selectable for the variable (named via this parameter).
-   * @param nullable If true then the unselect button will be shown.
    * @return
    */
   public String format(final ProjektDO projekt, final boolean showOnlyNumber)
@@ -101,9 +99,9 @@ public class ProjektFormatter extends BaseFormatter
     if (projekt == null) {
       return "";
     }
-    StringBuffer sb = new StringBuffer();
+    final StringBuffer sb = new StringBuffer();
     // final KundeDO kunde = projekt.getKunde();
-    boolean hasAccess = projektDao.hasLoggedInUserSelectAccess(false);
+    final boolean hasAccess = projektDao.hasLoggedInUserSelectAccess(false);
     if (hasAccess == false) {
       return null;
     } else if (projekt != null) {
@@ -117,7 +115,7 @@ public class ProjektFormatter extends BaseFormatter
     return sb.toString();
   }
 
-  public void setProjektDao(ProjektDao projektDao)
+  public void setProjektDao(final ProjektDao projektDao)
   {
     this.projektDao = projektDao;
   }

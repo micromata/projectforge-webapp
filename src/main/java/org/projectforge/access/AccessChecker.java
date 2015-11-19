@@ -127,7 +127,6 @@ public class AccessChecker
 
   /**
    * Checks if the user is an admin user (member of admin group). If not, an AccessException will be thrown.
-   * @see #isUserMemberOfAdminGroup()
    */
   public void checkIsLoggedInUserMemberOfAdminGroup()
   {
@@ -135,7 +134,6 @@ public class AccessChecker
   }
 
   /**
-   * @param userId
    * @return
    * @see org.projectforge.user.UserGroupCache#isUserMemberOfAdminGroup(java.lang.Integer)
    */
@@ -145,9 +143,8 @@ public class AccessChecker
   }
 
   /**
-   * @param userId
+   * @param user
    * @return
-   * @see org.projectforge.user.UserGroupCache#isUserMemberOfAdminGroup(java.lang.Integer)
    */
   public boolean isUserMemberOfAdminGroup(final PFUserDO user)
   {
@@ -155,9 +152,8 @@ public class AccessChecker
   }
 
   /**
-   * @param userId
+   * @param throwException
    * @return
-   * @see org.projectforge.user.UserGroupCache#isUserMemberOfAdminGroup(java.lang.Integer)
    */
   public boolean isLoggedInUserMemberOfAdminGroup(final boolean throwException)
   {
@@ -165,7 +161,8 @@ public class AccessChecker
   }
 
   /**
-   * @param userId
+   * @param user
+   * @param throwException
    * @return
    * @see org.projectforge.user.UserGroupCache#isUserMemberOfAdminGroup(java.lang.Integer)
    */
@@ -176,7 +173,6 @@ public class AccessChecker
 
   /**
    * Checks if the user is in one of the given groups. If not, an AccessException will be thrown.
-   * @see #isUserMemberOfGroup(ProjectForgeGroup...)
    */
   public void checkIsLoggedInUserMemberOfGroup(final ProjectForgeGroup... groups)
   {
@@ -185,7 +181,7 @@ public class AccessChecker
 
   /**
    * Checks if the user is in one of the given groups. If not, an AccessException will be thrown.
-   * @see #isUserMemberOfGroup(ProjectForgeGroup...)
+   * @see #isUserMemberOfGroup(PFUserDO, ProjectForgeGroup...)
    */
   public void checkIsUserMemberOfGroup(final PFUserDO user, final ProjectForgeGroup... groups)
   {
@@ -198,7 +194,6 @@ public class AccessChecker
    * Checks if the user of the PFUserContext (logged in user) is member at least of one of the given groups.
    * 
    * @param groups
-   * @see #isUserMemberOfGroup(boolean, ProjectForgeGroup...)
    */
   public boolean isLoggedInUserMemberOfGroup(final ProjectForgeGroup... groups)
   {
@@ -398,7 +393,6 @@ public class AccessChecker
   /**
    * Use context user (logged-in user).
    * @param rightId
-   * @param obj
    * @param throwException
    * @see #hasSelectAccess(PFUserDO, UserRightId, boolean)
    */
@@ -408,13 +402,12 @@ public class AccessChecker
   }
 
   /**
-   * Calls {@link #hasAccess(UserRightId, Object, Object, OperationType, boolean)} with {@link OperationType#SELECT} and both Objects as
+   * Calls {@link #hasAccess(PFUserDO, UserRightId, Object, Object, OperationType, boolean)} with {@link OperationType#SELECT} and both Objects as
    * null.
    * @param user Check the access for the given user instead of the logged-in user.
    * @param rightId
-   * @param obj
    * @param throwException
-   * @see #hasAccess(UserRightId, Object, Object, OperationType, boolean)
+   * @see #hasAccess(PFUserDO, UserRightId, Object, Object, OperationType, boolean)
    */
   public boolean hasSelectAccess(final PFUserDO user, final UserRightId rightId, final boolean throwException)
   {
@@ -422,11 +415,11 @@ public class AccessChecker
   }
 
   /**
-   * Calls {@link #hasAccess(UserRightId, Object, Object, OperationType, boolean)} with {@link OperationType#SELECT}.
+   * Calls {@link #hasLoggedInUserAccess(UserRightId, Object, Object, OperationType, boolean)} with {@link OperationType#SELECT}.
    * @param rightId
    * @param obj
    * @param throwException
-   * @see #hasAccess(UserRightId, Object, Object, OperationType, boolean)
+   * @see #hasLoggedInUserAccess(UserRightId, Object, Object, OperationType, boolean)
    */
   public boolean hasLoggedInUserSelectAccess(final UserRightId rightId, final Object obj, final boolean throwException)
   {
@@ -434,11 +427,11 @@ public class AccessChecker
   }
 
   /**
-   * Calls {@link #hasAccess(UserRightId, Object, Object, OperationType, boolean)} with {@link OperationType#INSERT}.
+   * Calls {@link #hasLoggedInUserAccess(UserRightId, Object, Object, OperationType, boolean)} with {@link OperationType#INSERT}.
    * @param rightId
    * @param obj
    * @param throwException
-   * @see #hasAccess(UserRightId, Object, Object, OperationType, boolean)
+   * @see #hasLoggedInUserAccess(UserRightId, Object, Object, OperationType, boolean)
    */
   public boolean hasLoggedInUserInsertAccess(final UserRightId rightId, final Object obj, final boolean throwException)
   {
@@ -446,11 +439,10 @@ public class AccessChecker
   }
 
   /**
-   * Calls {@link #hasAccess(UserRightId, Object, Object, OperationType, boolean)} with {@link OperationType#INSERT}.
+   * Calls {@link #hasLoggedInUserAccess(UserRightId, Object, Object, OperationType, boolean)} with {@link OperationType#INSERT}.
    * @param rightId
-   * @param obj
    * @param throwException
-   * @see #hasAccess(UserRightId, Object, Object, OperationType, boolean)
+   * @see #hasLoggedInUserAccess(UserRightId, Object, Object, OperationType, boolean)
    */
   public boolean hasLoggedInUserInsertAccess(final UserRightId rightId, final boolean throwException)
   {
@@ -458,11 +450,11 @@ public class AccessChecker
   }
 
   /**
-   * Calls {@link #hasAccess(UserRightId, Object, Object, OperationType, boolean)} with {@link OperationType#INSERT}.
+   * Calls {@link #hasAccess(PFUserDO, UserRightId, Object, Object, OperationType, boolean)} with {@link OperationType#INSERT}.
+   * @param user
    * @param rightId
-   * @param obj
    * @param throwException
-   * @see #hasAccess(UserRightId, Object, Object, OperationType, boolean)
+   * @see #hasAccess(PFUserDO, UserRightId, Object, Object, OperationType, boolean)
    */
   public boolean hasInsertAccess(final PFUserDO user, final UserRightId rightId, final boolean throwException)
   {
@@ -470,12 +462,12 @@ public class AccessChecker
   }
 
   /**
-   * Calls {@link #hasAccess(UserRightId, Object, Object, OperationType, boolean)} with {@link OperationType#UPDATE}.
+   * Calls {@link #hasLoggedInUserAccess(UserRightId, Object, Object, OperationType, boolean)} with {@link OperationType#UPDATE}.
    * @param rightId
    * @param obj
    * @param oldObj
    * @param throwException
-   * @see #hasAccess(UserRightId, Object, Object, OperationType, boolean)
+   * @see #hasLoggedInUserAccess(UserRightId, Object, Object, OperationType, boolean)
    */
   public boolean hasLoggedInUserUpdateAccess(final UserRightId rightId, final Object obj, final Object oldObj, final boolean throwException)
   {
@@ -483,12 +475,12 @@ public class AccessChecker
   }
 
   /**
-   * Calls {@link #hasAccess(UserRightId, Object, Object, OperationType, boolean)} with {@link OperationType#DELETE}.
+   * Calls {@link #hasLoggedInUserAccess(UserRightId, Object, Object, OperationType, boolean)} with {@link OperationType#DELETE}.
    * @param rightId
    * @param obj
    * @param oldObj
    * @param throwException
-   * @see #hasAccess(UserRightId, Object, Object, OperationType, boolean)
+   * @see #hasLoggedInUserAccess(UserRightId, Object, Object, OperationType, boolean)
    */
   public boolean hasLoggedInUserDeleteAccess(final UserRightId rightId, final Object oldObj, final Object obj, final boolean throwException)
   {
@@ -497,8 +489,7 @@ public class AccessChecker
 
   /**
    * Throws now exception if the right check fails.
-   * @see #hasRight(UserRightId, boolean, UserRightValue...)
-   * @deprec
+   * @see #hasRight(PFUserDO, UserRightId, boolean, UserRightValue...)
    */
   public boolean hasLoggedInUserRight(final UserRightId rightId, final UserRightValue... values)
   {
@@ -507,7 +498,7 @@ public class AccessChecker
 
   /**
    * Throws now exception if the right check fails.
-   * @see #hasRight(UserRightId, boolean, UserRightValue...)
+   * @see #hasRight(PFUserDO, UserRightId, boolean, UserRightValue...)
    */
   public boolean hasRight(final PFUserDO user, final UserRightId rightId, final UserRightValue... values)
   {
@@ -560,7 +551,7 @@ public class AccessChecker
   /**
    * @param rightId
    * @param throwException
-   * @see #hasRight(UserRightId, boolean, UserRightValue...)
+   * @see #hasReadAccess(PFUserDO, UserRightId, boolean)
    */
   public boolean hasLoggedInUserReadAccess(final UserRightId rightId, final boolean throwException)
   {
@@ -570,7 +561,7 @@ public class AccessChecker
   /**
    * @param rightId
    * @param throwException
-   * @see #hasRight(UserRightId, boolean, UserRightValue...)
+   * @see #hasRight(PFUserDO, UserRightId, boolean, UserRightValue...)
    */
   public boolean hasReadAccess(final PFUserDO user, final UserRightId rightId, final boolean throwException)
   {
@@ -578,10 +569,9 @@ public class AccessChecker
   }
 
   /**
-   * Calls {@link #hasReadAccess(UserRightId, boolean)} with throwException = true.
+   * Calls {@link #hasLoggedInUserReadAccess(UserRightId, boolean)} with throwException = true.
    * @param rightId
-   * @param value
-   * @see #hasReadAccess(UserRightId, boolean)
+   * @see #hasLoggedInUserReadAccess(UserRightId, boolean)
    */
   public boolean checkLoggedInUserReadAccess(final UserRightId rightId)
   {
@@ -591,7 +581,7 @@ public class AccessChecker
   /**
    * @param rightId
    * @param throwException
-   * @see #hasRight(UserRightId, boolean, UserRightValue...)
+   * @see #hasLoggedInUserRight(UserRightId, boolean, UserRightValue...)
    */
   public boolean hasLoggedInUserWriteAccess(final UserRightId rightId, final boolean throwException)
   {
@@ -599,10 +589,9 @@ public class AccessChecker
   }
 
   /**
-   * Calls {@link #hasWriteAccess(UserRightId, boolean)} with throwException = true.
+   * Calls {@link #hasLoggedInUserWriteAccess(UserRightId, boolean)} with throwException = true.
    * @param rightId
-   * @param value
-   * @see #hasWriteAccess(UserRightId, boolean)
+   * @see #hasLoggedInUserWriteAccess(UserRightId, boolean)
    */
   public boolean checkLoggedInUserWriteAccess(final UserRightId rightId)
   {
@@ -634,10 +623,10 @@ public class AccessChecker
   }
 
   /**
-   * Calls {@link #hasRight(UserRightId, UserRightValue, boolean)} with throwException = true.
+   * Calls {@link #hasLoggedInUserRight(UserRightId, boolean, UserRightValue...)} with throwException = true.
    * @param rightId
-   * @param value
-   * @see #hasRight(UserRightId, UserRightValue, boolean)
+   * @param values
+   * @see #hasLoggedInUserRight(UserRightId, boolean, UserRightValue...)
    */
   public boolean checkLoggedInUserRight(final UserRightId rightId, final UserRightValue... values)
   {
@@ -645,10 +634,11 @@ public class AccessChecker
   }
 
   /**
-   * Calls {@link #hasRight(UserRightId, UserRightValue, boolean)} with throwException = true.
+   * Calls {@link #hasRight(PFUserDO, UserRightId, boolean, UserRightValue...)} with throwException = true.
+   * @param user
    * @param rightId
-   * @param value
-   * @see #hasRight(UserRightId, UserRightValue, boolean)
+   * @param values
+   * @see #hasRight(PFUserDO, UserRightId, boolean, UserRightValue...)
    */
   public boolean checkUserRight(final PFUserDO user, final UserRightId rightId, final UserRightValue... values)
   {

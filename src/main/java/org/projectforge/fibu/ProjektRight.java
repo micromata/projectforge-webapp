@@ -47,16 +47,15 @@ public class ProjektRight extends UserRightAccessCheck<ProjektDO>
     super(UserRightId.PM_PROJECT, UserRightCategory.PM, UserRights.FALSE_READONLY_READWRITE);
     initializeUserGroupsRight(UserRights.FALSE_READONLY_READWRITE, UserRights.FIBU_ORGA_PM_GROUPS)
     // All project managers have read only access:
-        .setAvailableGroupRightValues(ProjectForgeGroup.PROJECT_MANAGER, UserRightValue.READONLY)
-        // All project assistants have no, read or read-only access:
-        .setAvailableGroupRightValues(ProjectForgeGroup.PROJECT_ASSISTANT, UserRightValue.READONLY)
-        // Read only access for controlling users:
-        .setReadOnlyForControlling();
+    .setAvailableGroupRightValues(ProjectForgeGroup.PROJECT_MANAGER, UserRightValue.READONLY)
+    // All project assistants have no, read or read-only access:
+    .setAvailableGroupRightValues(ProjectForgeGroup.PROJECT_ASSISTANT, UserRightValue.READONLY)
+    // Read only access for controlling users:
+    .setReadOnlyForControlling();
   }
 
   /**
    * @return True, if {@link UserRightId#PM_PROJECT} is potentially available for the user (independent from the configured value).
-   * @see org.projectforge.user.UserRightAccessCheck#hasSelectAccess(org.projectforge.access.AccessChecker, org.projectforge.user.PFUserDO)
    */
   @Override
   public boolean hasSelectAccess(final PFUserDO user)
@@ -98,7 +97,6 @@ public class ProjektRight extends UserRightAccessCheck<ProjektDO>
 
   /**
    * History access only allowed for users with read and/or write access.
-   * @see org.projectforge.user.UserRightAccessCheck#hasHistoryAccess(java.lang.Object)
    */
   @Override
   public boolean hasHistoryAccess(final PFUserDO user, final ProjektDO obj)

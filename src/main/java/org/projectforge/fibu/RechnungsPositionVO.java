@@ -109,9 +109,6 @@ public class RechnungsPositionVO implements Comparable<RechnungsPositionVO>, Ser
     return rechnungNummer;
   }
 
-  /**
-   * @see RechnungDO#getTitel()
-   */
   public String getRechnungTitle()
   {
     return rechnungBetreff;

@@ -64,7 +64,6 @@ public class AuftragRight extends UserRightAccessCheck<AuftragDO>
 
   /**
    * @return True, if {@link UserRightId#PM_PROJECT} is potentially available for the user (independent from the configured value).
-   * @see org.projectforge.user.UserRightAccessCheck#hasSelectAccess(org.projectforge.access.AccessChecker, org.projectforge.user.PFUserDO)
    */
   @Override
   public boolean hasSelectAccess(final PFUserDO user)
@@ -80,7 +79,6 @@ public class AuftragRight extends UserRightAccessCheck<AuftragDO>
    * Ebenso sehen Projektmanager und Projektassistenten einen Auftrag analog zu einer Kontaktperson, sofern sie Mitglied der
    * ProjektManagerGroup des zugordneten Projekts sind. <br/>
    * Nur Mitglieder der FINANCE_GROUP dürfen für Aufträge das Flag "vollständig fakturiert" ändern.
-   * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
    */
   @Override
   public boolean hasAccess(final PFUserDO user, final AuftragDO obj, final  AuftragDO oldObj, final OperationType operationType)

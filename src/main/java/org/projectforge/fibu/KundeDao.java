@@ -53,7 +53,6 @@ public class KundeDao extends BaseDao<KundeDO>
 
   /**
    * return Always true, no generic select access needed for address objects.
-   * @see org.projectforge.core.BaseDao#hasSelectAccess()
    */
   @Override
   public boolean hasSelectAccess(final PFUserDO user, final boolean throwException)
@@ -86,9 +85,6 @@ public class KundeDao extends BaseDao<KundeDO>
     return false;
   }
 
-  /**
-   * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
-   */
   @Override
   public boolean hasAccess(final PFUserDO user, final KundeDO obj, final KundeDO oldObj, final OperationType operationType,
       final boolean throwException)

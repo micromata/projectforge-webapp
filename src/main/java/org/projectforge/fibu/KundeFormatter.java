@@ -31,9 +31,9 @@ import org.projectforge.common.BaseFormatter;
 public class KundeFormatter extends BaseFormatter
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(KundeFormatter.class);
-  
+
   private KundeDao kundeDao;
-  
+
   /**
    * Displays customers and/or kundeText as String.
    * @param kunde null supported.
@@ -57,15 +57,15 @@ public class KundeFormatter extends BaseFormatter
     return buf.toString();
 
   }
-  
+
   /**
-   * @see #format(KundeDO, boolean, boolean)
+   * @see #format(KundeDO, boolean)
    */
   public String format(final Integer kundeId, final boolean showOnlyNumber) {
     KundeDO kunde = null;
     try {
       kunde = kundeDao.getById(kundeId);
-    } catch (AccessException ex) {
+    } catch (final AccessException ex) {
       log.info(ex.getMessage());
       return getNotVisibleString();
     }
@@ -83,11 +83,11 @@ public class KundeFormatter extends BaseFormatter
     if (kunde == null) {
       return "";
     }
-    StringBuffer sb = new StringBuffer();
+    final StringBuffer sb = new StringBuffer();
 
-    boolean hasAccess = kundeDao.hasLoggedInUserSelectAccess(false);
+    final boolean hasAccess = kundeDao.hasLoggedInUserSelectAccess(false);
     if (hasAccess == false) {
-        appendNotVisible(sb);
+      appendNotVisible(sb);
     } else {
       if (showOnlyNumber == true) {
         sb.append(KostFormatter.format(kunde));
@@ -97,8 +97,8 @@ public class KundeFormatter extends BaseFormatter
     }
     return sb.toString();
   }
-  
-  public void setKundeDao(KundeDao kundeDao)
+
+  public void setKundeDao(final KundeDao kundeDao)
   {
     this.kundeDao = kundeDao;
   }
